@@ -6804,3 +6804,17 @@ Build U4f. My size stop stays: past 6,000 added lines the build stops and I get 
 ```
 
 - **The freeze** (the main session's record): u4f-lead-bound.md equal to its text at 9ad2effb (sha256 57c588ec43bae7b7aecc6a9a061ec5b5c1f1ad7b5545d7fd43cd22c59410660c); its fenced value's sha256 4717cd895d9834154d3179f397859096b5a30f7ec290ea03f30148b912e53a2b.
+
+## Card blocks moved 2026-11-18 (card_trim_1118.py; from the card's 'Now: U4f', 'Choices taken without him' and 'Running work')
+- **Launch DONE (11:3x-11:49 UTC; each step's figures in this card at a64c216):** the u4r-P3-0f066338dd8d pack (5,433
+  → 5,808 MiB), the six part-cleans (12,154 MiB), the light run (refs 1463, marks 81, self 78/78, redact 307 items), the
+  fill and every check on it (L4 item 10: D6, stamps_anchors.py, r31_check.py, adv_words_check.py's 37 hits all passing
+  by the fold check's §3), the check-in and the saver; builder 1 from the launch head
+  827518bde465cf208e461da5fb605993c2bb3220 (u4r-build.md:5-15's form: main's docs-only #55-#57 make origin/main no
+  ancestor of this branch).
+- **2026-11-17:** the advisor's rulings on U4F-Q1 to Q18 (advisor-u4f-brief.md:173-198), all but Q8 (iii), which
+  sends the lead bound's value to him (LEAD-BOUND). Why: they choose how U4f is built and tested inside plan §5 U4f;
+  the brief is not built yet, so each can be undone; none changes a marks.json text or a judge file.
+- **2026-11-17:** no second review round or second model by default from now on (one round; a second only where round
+  1 leaves a High or a design change); a workflow only for parallel review rounds. Why: TEST-FIRST rule 3.
+- The last workflow: wf_b2a20e74-6aa (the fix pass and the advisor's check), done before 22:43 UTC on 2026-11-17.

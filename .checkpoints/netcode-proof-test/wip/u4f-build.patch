@@ -12,26 +12,46 @@ index 9c58b9a..b160e1a 100644
  | `JoinAccepted` | room → client | control stream | owner | Sender: the room only, once per accepted `Join`, to that client. npt-client: the size; each value in range; a `FullState` follows on a full-state stream | 256 B (proposed: 2 B length + 1 B type + 3 B slot, team and squad + 2 B mode id + 32 B mode hash + 32 B content hash + 4 B server tick + 4 B tick and snapshot rates = 80 B, rounded up) | built in U4 | row 671; part 11:506 (the room assigns team and squad) |
  | `JoinRejected` | room → client | control stream | owner | Sender: the room only; it then closes the connection. It carries a reason code and nothing else (proposed codes: bad token, bind mismatch, roster full, wrong version, wrong content hash). npt-client: the size | 16 B (proposed: 2 B length + 1 B type + 1 B reason = 4 B, rounded up) | built in U4 | row 671; plan §10.3 |
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index 47f91ef..5cef67e 100644
+index 47f91ef..49952fb 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
-@@ -109,6 +109,10 @@ pub struct Behaviour {
+@@ -87,6 +87,8 @@ enum Kind {
+     Clamp,
+     /// Open loop: fire held, the walk, aimed at a seeded point near the centre.
+     Steady,
++    /// Open loop: the walk with fire never pressed or held (-47's clock suite, U4F-Q4 (b): no event is stamped).
++    NoFire,
+ }
+ 
+ /// One client's behaviour (the module text): the brawl or an open-loop script, seeded per slot.
+@@ -109,6 +111,10 @@ pub struct Behaviour {
      /// The leash's state (the brawl only): steering toward the centre, from past [`LEASH_OUT_CM`] until inside
      /// [`LEASH_IN_CM`].
      steering: bool,
 +    /// U4f's controller rule (U4F-Q7 (iii) (c)): each step gives the commands the endpoint says are due.
 +    controlled: bool,
-+    /// The brawl's fire press on every second command (`brawl_presses`).
-+    presses_too: bool,
++    /// A fire press on every `press_every`-th command given (`with_press_every`); 0: the kind's own rule.
++    press_every: u64,
  }
  
  /// splitmix64's step: the bots' one generator, seeded per slot (no clock, no hash map).
-@@ -167,9 +171,28 @@ impl Behaviour {
+@@ -128,8 +134,8 @@ fn below(word: u64, n: u64) -> u64 {
+ /// A move vector from (x, y) toward the origin at about full command length, inside the room's x² + y² ≤ 127² check
+ /// (so the sim never scales it: world.rs:494-498): each part is 127 times its share of ⌈|(x, y)|⌉, truncated toward 0,
+ /// so the vector is never longer than 127 and, at the leash's radii, longer than 125. Integers only. Its inputs are
+-/// decoded grid positions (16 bits on the wire: |x|, |y| at most 32,768, npt-proto quant.rs:197-215), so x² + y² stays
+-/// below 2^31 and the i64 arithmetic cannot overflow; it is not for other inputs.
++/// decoded grid positions (16 bits on the wire: |x|, |y| at most 32,768, npt-proto quant.rs:197-215), so x² + y² is at
++/// most 2^31 and the i64 arithmetic cannot overflow; it is not for other inputs.
+ fn toward_centre(x: i32, y: i32) -> [i8; 2] {
+     let (x, y) = (i64::from(x), i64::from(y));
+     let d2 = x * x + y * y;
+@@ -167,14 +173,39 @@ impl Behaviour {
              given: 0,
              skipped: 0,
              steering: false,
 +            controlled: false,
-+            presses_too: false,
++            press_every: 0,
          }
      }
  
@@ -44,18 +64,29 @@ index 47f91ef..5cef67e 100644
 +        self
 +    }
 +
-+    /// The brawl with a fire press on every second command it gives (U4F-Q11 (i) (a): -20's 10,000 scripted presses on
-+    /// the load r2's P3 suite showed); a press waits for a command, never per step.
-+    pub fn brawl_presses(scene: &Scene, slot: u8, seed: u64) -> Behaviour {
-+        let mut b = Behaviour::new(Kind::Brawl, scene, slot, seed);
-+        b.presses_too = true;
-+        b
++    /// The same behaviour with a fire press on every `n`-th command it gives (U4F-Q11 (i) (a): -20's runs give the brawl
++    /// `n` = 2, npt-lab's `--brawl-press-every`, for its 10,000 scripted presses on the load r2's P3 suite showed); a
++    /// press waits for a command, never per step; 0 keeps the kind's own rule.
++    pub fn with_press_every(mut self, n: u64) -> Behaviour {
++        self.press_every = n;
++        self
 +    }
 +
      /// The brawl of `slot` in `scene`, from the run's `seed`.
      pub fn brawl(scene: &Scene, slot: u8, seed: u64) -> Behaviour {
          Behaviour::new(Kind::Brawl, scene, slot, seed)
-@@ -221,6 +244,17 @@ impl Behaviour {
+     }
+ 
++    /// The clock suite's open-loop script (-47; U4F-Q4 (b)): the walk, fire never held or pressed, so the room stamps
++    /// no gameplay event and carry 75's admission bound is never met.
++    pub fn never_fires(scene: &Scene, slot: u8, seed: u64) -> Behaviour {
++        Behaviour::new(Kind::NoFire, scene, slot, seed)
++    }
++
+     /// The open-loop script named `script` (`presses`, `clamp` or `steady`) of `slot` in `scene`, from `seed`;
+     /// `None` for another name.
+     pub fn script(scene: &Scene, slot: u8, seed: u64, script: &str) -> Option<Behaviour> {
+@@ -221,6 +252,17 @@ impl Behaviour {
          let (Some(newest), Some(_)) = (endpoint.newest_tick(), endpoint.slot()) else {
              return false;
          };
@@ -73,15 +104,134 @@ index 47f91ef..5cef67e 100644
          if !self.every_step && self.last_newest == Some(newest) {
              self.skipped += 1;
              return false;
-@@ -276,7 +310,7 @@ impl Behaviour {
+@@ -276,7 +318,12 @@ impl Behaviour {
          own: Option<([i32; 3], bool)>,
      ) -> Command {
          let k = self.given;
 -        if self.kind == Kind::Presses && k % 2 == 1 {
-+        if (self.kind == Kind::Presses || self.presses_too) && k % 2 == 1 {
++        let every = if self.press_every > 0 {
++            self.press_every
++        } else {
++            2 * u64::from(self.kind == Kind::Presses)
++        };
++        if every > 0 && k % every == every - 1 {
              self.presses[Command::PRESS_FIRE] = self.presses[Command::PRESS_FIRE].wrapping_add(1);
          }
          let aim = match self.kind {
+@@ -289,7 +336,11 @@ impl Behaviour {
+             _ => walk,
+         };
+         Command {
+-            buttons: Command::FIRE,
++            buttons: if self.kind == Kind::NoFire {
++                0
++            } else {
++                Command::FIRE
++            },
+             presses: self.presses,
+             move_xy: if self.kind == Kind::Clamp {
+                 [0, 0]
+@@ -401,7 +452,7 @@ mod tests {
+             steer,
+             "still outside the inner radius"
+         );
+-        let (got, walk) = give(Some(([1_450, 0, 150], true)));
++        let (got, walk) = give(Some(([0, 0, 150], true)));
+         assert_eq!(got, walk, "dead: the walk");
+         let (got, walk) = give(None);
+         assert_eq!(got, walk, "no complete tick: the walk");
+@@ -466,6 +517,91 @@ mod tests {
+         }
+     }
+ 
++    /// f36 (ii) (TE3-1): over 300 steps of a lossless loop on the room's tick grid (a snapshot each step but every fifth,
++    /// each ping answered at once with the server's time), a controller run's behaviour gives a command for every stamp
++    /// the endpoint names (as many commands as stamps sent, the stamps contiguous); a fixed-lead run keeps
++    /// lib.rs:14-21's rule: one command at each step whose newest tick moved, none at the others.
++    #[test]
++    fn f36_ii_a_controller_run_gives_every_stamp_and_a_fixed_lead_run_keeps_its_rule() {
++        use npt_proto::{Direction, JoinAccepted, Message, Pong, Snapshot, decode, encode};
++        let bytes = |m: &Message| {
++            let mut o = Vec::new();
++            encode(m, &mut o).expect("encodes");
++            o
++        };
++        let scene = Scene::stress();
++        let period = 1_000_000_000 / 30;
++        for controlled in [true, false] {
++            let (mut e, mut b) = (
++                ClientEndpoint::new(npt_proto::Join::default(), 30),
++                Behaviour::brawl(&scene, 0, 1),
++            );
++            if controlled {
++                (e, b) = (e.with_clock(9), b.controlled());
++            } else {
++                e = e.with_lead(2);
++            }
++            let ja = Message::JoinAccepted(JoinAccepted {
++                tick: 100,
++                ..JoinAccepted::default()
++            });
++            let mut rx = vec![(Channel::Control, bytes(&ja), 0)];
++            let (mut stamps, mut gave, mut moved) = (Vec::new(), 0u64, 0u64);
++            for k in 0..300u32 {
++                let now = u64::from(k) * period;
++                if k % 5 != 4 {
++                    let s = Snapshot {
++                        tick: 100 + k,
++                        groups: 1,
++                        ..Snapshot::default()
++                    };
++                    rx.push((Channel::Datagram, bytes(&Message::Snapshot(s)), now));
++                    moved += 1;
++                }
++                let given = b.step(&mut e, &rx, now, &[]);
++                gave += u64::from(given);
++                assert!(controlled || given == (k % 5 != 4), "step {k}");
++                rx.clear();
++                for d in e.step().datagrams {
++                    match decode(Direction::ClientToRoom, Channel::Datagram, &d) {
++                        Ok(Message::Input(i)) => {
++                            for c in i.commands.iter().rev() {
++                                if stamps.last().is_none_or(|&(s, _)| c.seq > s) {
++                                    stamps.push((c.seq, c.tick));
++                                }
++                            }
++                        }
++                        Ok(Message::Ping(p)) => {
++                            let pong = Pong {
++                                id: p.id,
++                                echo_ns: p.sent_ns,
++                                tick: 101 + k,
++                                hold_us: 0,
++                                server_ns: now,
++                            };
++                            rx.push((Channel::Datagram, bytes(&Message::Pong(pong)), now));
++                        }
++                        _ => {}
++                    }
++                }
++            }
++            assert!(stamps.len() >= 240, "{controlled}: {} stamps", stamps.len());
++            for w in stamps.windows(2) {
++                assert_eq!(w[1].0, w[0].0 + 1, "{controlled}: every sequence sent");
++                if controlled {
++                    assert_eq!(w[1].1, w[0].1 + 1, "contiguous stamps: {w:?}");
++                }
++            }
++            let want = if controlled {
++                stamps.len() as u64
++            } else {
++                moved
++            };
++            assert_eq!(b.given(), want, "{controlled}: commands given");
++            assert!(gave <= b.given(), "{controlled}");
++        }
++    }
++
+     /// The judged runs' first tick (the run scripts' `--tick-start 63736`).
+     const FIRST: u32 = 63_736;
+     /// The feed's delay, in World steps: each slot decides on its soldier as it was this many steps before, the
 diff --git a/spikes/netcode-proof/crates/client/src/lib.rs b/spikes/netcode-proof/crates/client/src/lib.rs
 index 74ed082..c3cec38 100644
 --- a/spikes/netcode-proof/crates/client/src/lib.rs
@@ -643,10 +793,30 @@ index 3540ec8..bd617c8 100644
      let bitten = npt_client::grid_with_bite(id).expect("the client plants -17's");
      assert_eq!(bitten, Config::floor_rounding());
 diff --git a/spikes/netcode-proof/crates/lab/src/logs.rs b/spikes/netcode-proof/crates/lab/src/logs.rs
-index c26fccd..dca1d51 100644
+index c26fccd..ab450ab 100644
 --- a/spikes/netcode-proof/crates/lab/src/logs.rs
 +++ b/spikes/netcode-proof/crates/lab/src/logs.rs
-@@ -561,10 +561,24 @@ impl Logs {
+@@ -136,7 +136,18 @@ struct RoomTrack {
+     late: Vec<u64>,
+     refused: Vec<[u64; 4]>,
+     events_at: Option<usize>,
+-    second: Option<(u64, Phase, [i64; 6])>,
++    second: Option<Second>,
++}
++
++/// One second's sums so far, and its per-client samples: each joined client's input buffer depth at its last tick
++/// (`second.s.buffer_depth_count`, -20) and each slot's most events queued at once (`second.s.event_queue_max_count`,
++/// 2.8's high-water series).
++struct Second {
++    sec: u64,
++    ph: Phase,
++    acc: [i64; 6],
++    depth: Vec<i64>,
++    queue_max: Vec<i64>,
+ }
+ 
+ /// The run's logs (the module text).
+@@ -561,10 +572,32 @@ impl Logs {
          self.track.late.resize(n, 0);
          self.track.refused.resize(n, [0; 4]);
          let mut refused_events = Vec::new();
@@ -654,6 +824,11 @@ index c26fccd..dca1d51 100644
 +        // the command stamped for this tick arrived before it ran (`cmd_on_time`; `input_missing` its complement); and
 +        // the press edges the commands run this tick carried, lost and doubled (shared with -58).
 +        let (mut on_time, mut missing, mut presses) = (Vec::new(), Vec::new(), [0i64; 3]);
++        // U4F-Q3 (c): under option A each command run's stamp less the tick; -20's depth per client (0 under A); 2.8's
++        // most events queued at once this tick per slot (the cap less the tick's lowest headroom: before an overflow
++        // resync cleared the queue).
++        let (mut ran_early, mut depth, mut queue_max) = (Vec::new(), Vec::new(), vec![0i64; n]);
++        let cap = i64::from(room.event_cap().0);
          for (s, h) in server.iter_mut().enumerate() {
              let Some(c) = room.client(s as u8) else {
                  continue;
@@ -667,11 +842,14 @@ index c26fccd..dca1d51 100644
 +                for (p, x) in presses.iter_mut().zip([seen, lost, doubled]) {
 +                    *p += i64::from(x);
 +                }
++                ran_early.extend(c.ran_early().iter().map(|&x| i64::from(x)));
++                depth.push(i64::from(c.buffer_depth_ticks()));
++                queue_max[s] = cap - c.headroom();
 +            }
              *h = c.server_hash();
              if h.is_some() {
                  self.logged.entry(w).or_insert_with(|| vec![false; n])[s] = true;
-@@ -607,6 +621,11 @@ impl Logs {
+@@ -607,6 +640,12 @@ impl Logs {
              effects.values().copied().max().unwrap_or(0),
          );
          v.insert("late_count".into(), late as i64);
@@ -680,11 +858,93 @@ index c26fccd..dca1d51 100644
 +        v.insert("press_doubled_count".into(), presses[2]);
 +        rec.s.insert("cmd_on_time".into(), on_time);
 +        rec.s.insert("input_missing".into(), missing);
++        rec.s.insert("cmd_ran_early_count".into(), ran_early);
          let flags: Vec<i64> = (0..n)
              .map(|s| i64::from(sets.get(s).is_some_and(|x| x.everyone)))
              .collect();
+@@ -664,7 +703,7 @@ impl Logs {
+             e.t = Some(w);
+             self.room.event(&e).map_err(io)?;
+         }
+-        self.room_second(world, t, ph, records)
++        self.room_second(world, t, ph, records, depth, queue_max)
+     }
+ 
+     /// The per-second counts: shots, gameplay events (hits and kills) and projectile spawns from the World's own event
+@@ -675,6 +714,8 @@ impl Logs {
+         t: u32,
+         ph: Phase,
+         records: &[npt_sim::EntityRecord],
++        depth: Vec<i64>,
++        queue_max: Vec<i64>,
+     ) -> Result<u64, String> {
+         let (events, shots, reliable) = dump_events(world, &mut self.track.events_at)?;
+         let mut portal = 0i64;
+@@ -723,24 +764,43 @@ impl Logs {
+             stand_in_spawns,
+         ];
+         match &mut self.track.second {
+-            Some((s, p, acc)) if *s == sec => {
+-                *p = ph;
+-                for (a, x) in acc.iter_mut().zip(add) {
+-                    *a += x;
++            Some(x) if x.sec == sec => {
++                x.ph = ph;
++                for (a, v) in x.acc.iter_mut().zip(add) {
++                    *a += v;
++                }
++                x.depth = depth;
++                for (m, q) in x.queue_max.iter_mut().zip(queue_max) {
++                    *m = (*m).max(q);
+                 }
+             }
+             _ => {
+-                if let Some((s, p, acc)) = self.track.second.take() {
+-                    self.write_second(s, p, acc)?;
++                if let Some(x) = self.track.second.take() {
++                    self.write_second(x)?;
+                 }
+-                self.track.second = Some((sec, ph, add));
++                self.track.second = Some(Second {
++                    sec,
++                    ph,
++                    acc: add,
++                    depth,
++                    queue_max,
++                });
+             }
+         }
+         Ok(events as u64)
+     }
+ 
+-    fn write_second(&mut self, sec: u64, ph: Phase, acc: [i64; 6]) -> Result<(), String> {
++    fn write_second(&mut self, x: Second) -> Result<(), String> {
++        let Second {
++            sec,
++            ph,
++            acc,
++            depth,
++            queue_max,
++        } = x;
+         let mut r = SecondRecord::new(sec, ph);
++        r.s.insert("buffer_depth_count".to_owned(), depth);
++        r.s.insert("event_queue_max_count".to_owned(), queue_max);
+         for (name, v) in [
+             "shots_count",
+             "portal_changes_count",
+@@ -766,8 +826,8 @@ impl Logs {
+     /// decided lost (the module text), every complete tick written, then the footers. `ended` is `Clean`, or `Crash`
+     /// when a hash came after its tick was written (never silently dropped).
+     pub(crate) fn finish(mut self, ended: Ended, last: &[EventRecord]) -> Result<Counts, String> {
+-        if let Some((s, p, acc)) = self.track.second.take() {
+-            self.write_second(s, p, acc)?;
++        if let Some(x) = self.track.second.take() {
++            self.write_second(x)?;
+         }
+         let logged: Vec<(u64, Vec<bool>)> =
+             self.logged.iter().map(|(w, l)| (*w, l.clone())).collect();
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
-index 311e0a9..b96a22f 100644
+index 311e0a9..05b0e5b 100644
 --- a/spikes/netcode-proof/crates/lab/src/scenario.rs
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
 @@ -42,7 +42,11 @@ use npt_l1::{DatagramCounts, L1Net, Profile};
@@ -700,7 +960,30 @@ index 311e0a9..b96a22f 100644
  use npt_server::{Decoder, RttSource, Schedule, due_ticks};
  use npt_sim::replay::Recording;
  use npt_sim::{Placement, Scene, StandIns, World};
-@@ -687,6 +691,10 @@ pub(crate) struct Settings {
+@@ -228,7 +232,6 @@ impl Bites {
+         let proto = npt_proto::BITES.contains(&id);
+         let b = Bites {
+             id: Some(id.to_owned()),
+-            world: Sim::BITES.contains(&id),
+             room: npt_room::BITES.contains(&id) || proto,
+             client: npt_client::BITES.contains(&id) || proto,
+             decoder: proto,
+@@ -246,6 +249,8 @@ impl Bites {
+             )
+             .with_bite(id)
+             .is_some(),
++            // npt-sim's two -21 check bites are a list apart from `World::BITES`, planted the same way (F2).
++            world: Sim::BITES.contains(&id) || Sim::CHECK_BITES.contains(&id),
+             whole_as_lost: LAB_BITES[0] == id,
+             late_command: LAB_BITES[1] == id,
+             link_lost_overstated: LAB_BITES[2] == id,
+@@ -683,10 +688,23 @@ pub(crate) struct Settings {
+     /// profile.
+     pub(crate) burst_spacing_ns: u64,
+     pub(crate) behaviour: String,
++    /// The brawl's fire press on every n-th command (`--brawl-press-every`; U4F-Q11 (i) (a): 2 in -20's runs); 0 off.
++    pub(crate) brawl_press_every: u64,
+     pub(crate) every_step: bool,
      pub(crate) bites: Bites,
      pub(crate) arm_tick: u32,
      pub(crate) lead: u32,
@@ -708,36 +991,71 @@ index 311e0a9..b96a22f 100644
 +    pub(crate) cmd_timing: CmdTiming,
 +    /// U4f's tick-lead controller on every endpoint (`--controller 1`); else the fixed lead `lead` (U4F-Q7 (i)).
 +    pub(crate) controller: bool,
++    /// The room's event cap set as data (`--event-cap`: 2.8's measurement, and a short never-ack test); else the room's.
++    pub(crate) event_cap: Option<u32>,
++    /// The run's suite (`--suite`, `params.suite`): `clock` (-47) reconnects its clients, `never-ack` (-22) makes slot
++    /// 0 the never-acker.
++    pub(crate) suite: String,
++    /// -47's connects (`--connects`, the clock suite's), counted over every slot's sessions.
++    pub(crate) connects: u64,
      pub(crate) record: Option<PathBuf>,
      pub(crate) bytes: Option<PathBuf>,
      /// Whether the run writes its logs (`false`: a runner recording regenerated inside `npt-lab hash`).
-@@ -871,6 +879,8 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -767,6 +785,23 @@ struct Client {
+     last_stamp: Option<u32>,
+     duplicates: u64,
+     bytes_log: Option<std::io::BufWriter<std::fs::File>>,
++    /// The clock suite (-47): this connect's number in the run, the host instant of its first clock sample, and whether
++    /// its estimate was read (its slot then reconnects while connects remain).
++    seq: u64,
++    first_sample_ns: Option<u64>,
++    read: bool,
++}
++
++/// A fresh endpoint of `slot` for a run: its fixed lead or U4f's controller, its starts and its bite.
++fn endpoint_of(s: &Settings, slot: u8) -> ClientEndpoint {
++    let e = ClientEndpoint::new(join_of(s.seed, slot), npt_sim::TICK_HZ)
++        .with_lead(s.lead)
++        .with_starts(s.cmd_start, s.event_start);
++    s.bites.client(if s.controller {
++        e.with_clock(CONTROLLER_MAX_LEAD)
++    } else {
++        e
++    })
+ }
+ 
+ /// One burst of B1 for one client: (start, return), its heal, and what -18's record carries beside it.
+@@ -871,6 +906,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          s.arm_tick,
          &s.bites,
      );
-+    // OQ-0001-6's option, before any join (a start-up setting).
++    // OQ-0001-6's option, before any join (a start-up setting); the event cap opened for 2.8's measurement.
 +    server.room.set_cmd_timing(s.cmd_timing);
++    if let Some(cap) = s.event_cap {
++        server.room = server.room.clone().with_event_cap(cap);
++    }
      let quant = s.bites.quant();
      let mut schedule = s.bites.schedule();
      let net = s.bites.net(s.seed);
-@@ -899,9 +909,16 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
-         let endpoint = ClientEndpoint::new(join_of(s.seed, slot), npt_sim::TICK_HZ)
-             .with_lead(s.lead)
-             .with_starts(s.cmd_start, s.event_start);
-+        let endpoint = if s.controller {
-+            endpoint.with_clock(CONTROLLER_MAX_LEAD)
-+        } else {
-+            endpoint
-+        };
-         let endpoint = s.bites.client(endpoint);
-         let behaviour = if s.behaviour == "brawl" {
-             Behaviour::brawl(&scene, slot, s.seed)
-+        } else if s.behaviour == "brawl-presses" {
-+            Behaviour::brawl_presses(&scene, slot, s.seed)
+@@ -896,12 +936,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+     let mut clients: Vec<Client> = Vec::new();
+     for &slot in &order {
+         let link = net.connect(s.profile.clone(), MAX_DATAGRAM, 0);
+-        let endpoint = ClientEndpoint::new(join_of(s.seed, slot), npt_sim::TICK_HZ)
+-            .with_lead(s.lead)
+-            .with_starts(s.cmd_start, s.event_start);
+-        let endpoint = s.bites.client(endpoint);
+-        let behaviour = if s.behaviour == "brawl" {
+-            Behaviour::brawl(&scene, slot, s.seed)
++        let endpoint = endpoint_of(s, slot);
++        let behaviour = if s.suite == "clock" {
++            Behaviour::never_fires(&scene, slot, s.seed)
++        } else if s.behaviour == "brawl" {
++            Behaviour::brawl(&scene, slot, s.seed).with_press_every(s.brawl_press_every)
          } else {
              Behaviour::script(&scene, slot, s.seed, &s.behaviour)
                  .ok_or_else(|| Failure::Usage(format!("--behaviour {:?}", s.behaviour)))?
-@@ -911,6 +928,12 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -911,6 +950,12 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          } else {
              behaviour
          };
@@ -750,7 +1068,77 @@ index 311e0a9..b96a22f 100644
          let bytes_log = match &s.bytes {
              None => None,
              Some(dir) => {
-@@ -1142,7 +1165,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -933,8 +978,13 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+             last_stamp: None,
+             duplicates: 0,
+             bytes_log,
++            seq: u64::from(slot),
++            first_sample_ns: None,
++            read: false,
+         });
+     }
++    // The clock suite's connects begun (each slot's first, then one per reconnect).
++    let mut connects = u64::from(n);
+     clients.sort_by_key(|c| c.slot);
+     let digest = order_digest(&order);
+     let mut mirror = Mirror::new(scene.slots(), scene.effect_rows(), scene.name() == "ES");
+@@ -1003,6 +1053,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+                 )));
+             }
+             logs.admit(slot, session, tick, phase(k)).map_err(fail)?;
++            // U4F-Q4 (b): the clock suite files no client hash, so no slot waits on one.
++            if s.suite == "clock" {
++                logs.gone(slot);
++            }
+         }
+         for (slot, _) in woke.ended {
+             logs.gone(slot);
+@@ -1112,7 +1166,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+                 .world_hashes
+                 .push((t, npt_sim::SimCore::state_hash(server.room.sim())));
+             k += 1;
+-            if k == s.warmup_ticks {
++            if k == s.warmup_ticks && s.suite != "clock" {
+                 for c in &clients {
+                     if !logs.started(c.slot) {
+                         return Err(fail(format!(
+@@ -1137,12 +1191,43 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+                 write_step(w, host, &received).map_err(fail)?;
+             }
+             c.endpoint.input(None, &received, host);
++            if s.suite == "clock" && !c.read {
++                let clock = c.endpoint.clock();
++                if c.first_sample_ns.is_none() && !clock.samples().is_empty() {
++                    c.first_sample_ns = Some(host);
++                }
++                if let (Some(f), Some(est)) = (c.first_sample_ns, clock.offset_ns())
++                    && host >= f + 2 * SEC
++                {
++                    // -47 (2.1's read instant): |estimate - true| at this connect's first step at or after 2 s from its
++                    // first sample; the true offset is the host clock's seeded one.
++                    let mut e = EventRecord::new("connect_clock", phase(k))
++                        .with("slot", c.slot)
++                        .with("seq", c.seq)
++                        .with("offset_err_ns", est.abs_diff(c.offset_ns as i64));
++                    e.ns = Some(now);
++                    logs.lab_event(&e).map_err(fail)?;
++                    c.read = true;
++                    if connects < s.connects {
++                        // The slot's next connect: a fresh link (the old one dropped, so the room frees the slot),
++                        // endpoint and host offset.
++                        c.link = net.connect(s.profile.clone(), MAX_DATAGRAM, 0);
++                        c.endpoint = endpoint_of(s, c.slot);
++                        c.offset_ns = below(mix(&mut rng), 1_000 * SEC);
++                        c.inbox.clear();
++                        (c.seq, c.first_sample_ns, c.read) = (connects, None, false);
++                        connects += 1;
++                        c.next_step_ns = now + 1;
++                        continue;
++                    }
++                }
++            }
+             if let Some(newest) = c.endpoint.newest_tick() {
+                 mirror.view(c.slot, newest, &mut view);
              } else {
                  view.clear();
              }
@@ -759,7 +1147,18 @@ index 311e0a9..b96a22f 100644
                  let stamp = c.endpoint.newest_tick().map(|t| t.wrapping_add(s.lead));
                  if stamp.is_some() && stamp == c.last_stamp {
                      c.duplicates += 1;
-@@ -1267,10 +1290,50 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1162,7 +1247,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+             for (ch, b) in &out.reliable {
+                 c.link.send_reliable(*ch, b, now);
+             }
+-            logs.filed(c.slot, &out.hashes, &out.lost);
++            if s.suite != "clock" {
++                logs.filed(c.slot, &out.hashes, &out.lost);
++            }
+             for w in &out.wraps {
+                 let t = c.endpoint.newest_tick().unwrap_or(s.tick_start);
+                 logs.wrapped(w, t, phase(k)).map_err(fail)?;
+@@ -1267,10 +1354,51 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              .with("rewinds_refused_count", k.rewinds_refused)
              .with("stale_count", c.endpoint.stale())
              .with("events_queued_count", k.events_queued)
@@ -780,7 +1179,8 @@ index 311e0a9..b96a22f 100644
 +                "unencodable_commands_count",
 +                c.endpoint.unencodable_commands(),
 +            )
-+            .with("lead_now_count", c.endpoint.lead_now().unwrap_or(-1));
++            .with("lead_now_count", c.endpoint.lead_now().unwrap_or(-1))
++            .with("unknown_pongs_count", c.endpoint.unknown_pongs());
 +        if let Some(d) = server.session(c.slot).map(|x| x.decoder.counters().clone()) {
 +            // The session's pump counters (2.5): every refusal field, 0 expected on an honest client.
 +            e = e
@@ -811,7 +1211,7 @@ index 311e0a9..b96a22f 100644
      summary.audit = mirror.audit.clone();
      last.push(
          EventRecord::new("fate_log", Phase::After).with("sha256", summary.fate_log_sha256.clone()),
-@@ -1367,8 +1430,23 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1367,8 +1495,23 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
      let mut p: BTreeMap<String, Value> = BTreeMap::new();
      let w = s.scene.weapon();
      p.insert("suite".into(), suite.into());
@@ -837,28 +1237,46 @@ index 311e0a9..b96a22f 100644
      p.insert("tick_start".into(), s.tick_start.into());
      p.insert(
          "ticks_below_wrap".into(),
-@@ -1422,7 +1500,7 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
+@@ -1388,7 +1531,16 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+     p.insert("soldier_health_count".into(), s.scene.health().into());
+     p.insert("warmup_ticks_count".into(), s.warmup_ticks.into());
+     p.insert("measured_ticks_count".into(), s.measured_ticks.into());
+-    p.insert("behaviour".into(), s.behaviour.clone().into());
++    // The clock suite's clients run npt-bots' never-firing script, which `behaviour`'s row does not list (F4's rule):
++    // the suite and its connect count name it.
++    if s.suite == "clock" {
++        p.insert("connects_count".into(), s.connects.into());
++    } else {
++        p.insert("behaviour".into(), s.behaviour.clone().into());
++    }
++    if s.brawl_press_every > 0 {
++        p.insert("brawl_press_every_count".into(), s.brawl_press_every.into());
++    }
+     p.insert(
+         "features".into(),
+         Value::Array(if cfg!(feature = "bites") {
+@@ -1422,7 +1574,8 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
  [--twin <run>] [--suite <name>] [--clients <n>] [--tick-start <n>] [--event-start <n>] [--cmd-start <n>] \
  [--warmup-s <s>] [--measured-s <s>] [--after-max-s <s>] [--behaviour brawl|presses|clamp|steady] [--bursts <n>] \
  [--burst-first-s <s>] [--burst-every-s <s>] [--bite <id> [--arm-tick <n>]] [--record <file>] [--bytes <folder>] \
 -[--every-step 1] [--lead <1..8>] [--logs 0 (with --record)]";
-+[--every-step 1] [--lead <1..8>] [--logs 0 (with --record)] [--cmd-timing A|B] [--controller 0|1]";
++[--every-step 1] [--lead <1..8>] [--logs 0 (with --record)] [--cmd-timing A|B] [--controller 0|1] \
++[--brawl-press-every <n> (the brawl)] [--event-cap <n>] [--connects <n> (with --suite clock)]";
  
  /// B1's burst starts (u4r-brief.md 7.1, -18's row): `count` bursts, the first `first_s` after the measured phase's
  /// first tick and one every `every_s`, each starting a seeded offset in [0, 1 tick) after its tick boundary.
-@@ -1524,9 +1602,9 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -1529,6 +1682,10 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+             "--behaviour {behaviour:?}: brawl, presses, clamp or steady"
          ));
      }
-     let behaviour = take("behaviour").unwrap_or_else(|| "brawl".to_owned());
--    if !["brawl", "presses", "clamp", "steady"].contains(&behaviour.as_str()) {
-+    if !["brawl", "brawl-presses", "presses", "clamp", "steady"].contains(&behaviour.as_str()) {
-         return Err(format!(
--            "--behaviour {behaviour:?}: brawl, presses, clamp or steady"
-+            "--behaviour {behaviour:?}: brawl, brawl-presses, presses, clamp or steady"
-         ));
-     }
++    let brawl_press_every = num(take("brawl-press-every"), "brawl-press-every", 0)?;
++    if brawl_press_every > 0 && behaviour != "brawl" {
++        return Err("--brawl-press-every is the brawl's (--behaviour brawl)".to_owned());
++    }
      let bursts = num(take("bursts"), "bursts", 10)?;
-@@ -1549,6 +1627,16 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+     let burst_first_s = num(take("burst-first-s"), "burst-first-s", 30)?;
+     let burst_every_s = num(take("burst-every-s"), "burst-every-s", 60)?;
+@@ -1549,6 +1706,28 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
          Some("0") => false,
          Some(v) => return Err(format!("--logs {v:?}: 0 or 1")),
      };
@@ -872,55 +1290,92 @@ index 311e0a9..b96a22f 100644
 +        Some("1") => true,
 +        Some(v) => return Err(format!("--controller {v:?}: 0 or 1")),
 +    };
++    let connects = num(take("connects"), "connects", 0)?;
++    if (suite == "clock") != (connects > 0) {
++        return Err("--suite clock and --connects <n> (from 1) go together".to_owned());
++    }
++    let event_cap = take("event-cap")
++        .map(|v| {
++            v.parse::<u32>()
++                .ok()
++                .filter(|c| *c >= 1)
++                .ok_or(format!("--event-cap {v:?}: a whole number from 1"))
++        })
++        .transpose()?;
      let lead_override = take("lead")
          .map(|v| {
              v.parse::<u32>()
-@@ -1673,6 +1761,8 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -1669,10 +1848,17 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+         after_max_ticks,
+         burst_spacing_ns,
+         behaviour,
++        brawl_press_every,
+         every_step,
          bites,
          arm_tick,
          lead,
 +        cmd_timing,
-+        controller,
++        // The clock suite's estimate is ClockSync's, which runs only under the controller.
++        controller: controller || suite == "clock",
++        event_cap,
++        suite: suite.clone(),
++        connects,
          record,
          bytes,
          logs,
-@@ -2987,4 +3077,93 @@ pub(crate) mod tests {
+@@ -1722,7 +1908,12 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
+         } else {
+             ""
+         },
+-        s.lead,
++        // A controller run has no one lead: the controller's cap (F10).
++        if s.controller {
++            format!("the controller's, at most {CONTROLLER_MAX_LEAD}")
++        } else {
++            s.lead.to_string()
++        },
+         o.commands,
+         o.skipped,
+         o.duplicates,
+@@ -2987,4 +3178,156 @@ pub(crate) mod tests {
              "L from the counts, never the written record"
          );
      }
 +
 +    /// U4f's short controller run (u4f-brief.md 2.10's scale: 16 clients, P2_SHORT's lengths) on P3 under option
-+    /// `timing`, the brawl with a press every second command.
-+    fn u4f_short(name: &str, timing: &str) -> Scratch {
-+        let dir = scratch(name);
-+        let s = settings(
-+            &dir,
-+            &format!(
-+                "--seed 1 --profile P3 --clients 16 --warmup-s 6 --measured-s 4 --after-max-s 10 --controller 1 \
-+                 --cmd-timing {timing} --behaviour brawl-presses"
-+            ),
-+        );
-+        let o = run(&s).unwrap_or_else(|e| panic!("{name}: {e:?}"));
-+        println!("{name}: {}", summary_line(&s, &o));
-+        dir
++    /// `timing`, the brawl with a press every second command: made once per test process and option, its three logs
++    /// (room, client, lab) read by every test that shares it (the advisor's F11); its folder removed once read.
++    fn u4f_short(timing: &'static str) -> &'static [npt_log::Log] {
++        static RUNS: [std::sync::OnceLock<Vec<npt_log::Log>>; 2] =
++            [std::sync::OnceLock::new(), std::sync::OnceLock::new()];
++        RUNS[usize::from(timing == "B")].get_or_init(|| {
++            let name = format!("u4f-short-{timing}");
++            let dir = scratch(&name);
++            let s = settings(
++                &dir,
++                &format!(
++                    "--seed 1 --profile P3 --clients 16 --warmup-s 6 --measured-s 4 --after-max-s 10 \
++                     --controller 1 --cmd-timing {timing} --brawl-press-every 2"
++                ),
++            );
++            let o = run(&s).unwrap_or_else(|e| panic!("{name}: {e:?}"));
++            println!("{name}: {}", summary_line(&s, &o));
++            crate::contract::read(&dir).expect("its logs")
++        })
 +    }
 +
-+    /// f6 (TE-14): the lab builds both options' endpoints with one controller setting (the header records the option,
-+    /// the controller's cap and LEAD-BOUND's 400 ms, and no `lead_ticks_count`: TE-20), and npt-client reads no
-+    /// `cmd_timing` (README :191-192 makes it the room's and the scenario's).
-+    #[test]
-+    fn f6_both_options_take_one_controller_setting_and_the_client_reads_no_cmd_timing() {
-+        for timing in ["A", "B"] {
-+            let dir = u4f_short(&format!("u4f-f6-{timing}"), timing);
-+            let p = read(&dir, "room").header.params;
-+            assert_eq!(p.get("cmd_timing").and_then(|v| v.as_str()), Some(timing));
-+            assert_eq!(
-+                p.get("controller_max_lead_count").and_then(|v| v.as_u64()),
-+                Some(u64::from(CONTROLLER_MAX_LEAD))
-+            );
-+            assert!(!p.contains_key("lead_ticks_count"), "TE-20");
-+            assert_eq!(p.get("lead_bound_ms").and_then(|v| v.as_u64()), Some(400));
-+        }
++    /// f6 (TE-14), one option: the lab builds the endpoints with the one controller setting (the header records the
++    /// option, the controller's cap and LEAD-BOUND's 400 ms, and no `lead_ticks_count`: TE-20), and npt-client reads
++    /// no `cmd_timing` (README :191-192 makes it the room's and the scenario's).
++    fn f6(timing: &'static str) {
++        let p = &u4f_short(timing)[0].header.params;
++        assert_eq!(p.get("cmd_timing").and_then(|v| v.as_str()), Some(timing));
++        assert_eq!(
++            p.get("controller_max_lead_count").and_then(|v| v.as_u64()),
++            Some(u64::from(CONTROLLER_MAX_LEAD))
++        );
++        assert!(!p.contains_key("lead_ticks_count"), "TE-20");
++        assert_eq!(p.get("lead_bound_ms").and_then(|v| v.as_u64()), Some(400));
 +        for src in [
 +            include_str!("../../client/src/lib.rs"),
 +            include_str!("../../client/src/clock.rs"),
@@ -929,32 +1384,94 @@ index 311e0a9..b96a22f 100644
 +        }
 +    }
 +
-+    /// f28's -20 half and f34's lab half: a controller run under each option writes -20's series by stamp
-+    /// (`tick.s.cmd_on_time` and `tick.s.input_missing`, one entry each per eligible client, complements) and the press
-+    /// series, presses seen; P3's on-time share on this short run is reported and above 99 % (f36 holds the 99.9 %).
 +    #[test]
-+    fn f28_a_controller_run_writes_20s_series_under_both_options() {
-+        for timing in ["A", "B"] {
-+            let dir = u4f_short(&format!("u4f-f28-{timing}"), timing);
-+            let room = read(&dir, "room");
-+            let (mut on, mut miss, mut presses, mut lost) = (0u64, 0u64, 0i64, 0i64);
-+            for t in room.ticks.iter().filter(|r| r.ph == Phase::Measured) {
-+                let a = t.s.get("cmd_on_time").expect("gap: cmd_on_time");
-+                let b = t.s.get("input_missing").expect("gap: input_missing");
-+                assert_eq!(a.len(), b.len(), "tick {}", t.t);
-+                assert!(a.iter().zip(b).all(|(x, y)| x + y == 1));
-+                on += a.iter().filter(|x| **x == 1).count() as u64;
-+                miss += b.iter().filter(|x| **x == 1).count() as u64;
-+                presses += t.v.get("press_count").copied().unwrap_or(0);
-+                lost += t.v.get("press_lost_count").copied().unwrap_or(0);
-+            }
-+            let share = on as f64 / (on + miss).max(1) as f64;
-+            println!(
-+                "u4f f28 {timing}: on time {on} of {}, {share:.5}; presses {presses}, lost {lost}",
-+                on + miss
++    fn f6_option_a_takes_the_one_controller_setting_and_the_client_reads_no_cmd_timing() {
++        f6("A");
++    }
++
++    #[test]
++    fn f6_option_b_takes_the_one_controller_setting_and_the_client_reads_no_cmd_timing() {
++        f6("B");
++    }
++
++    /// f28's -20 half (and f34's lab half), one option: the contract checker on the run's logs against SERIES.md finds
++    /// no failure (every written name has its row: F3), `lead_ticks_count` is absent (TE-20), every client's pump
++    /// counters (`input_limited` among them) are written, -20's series are written by stamp (`tick.s.cmd_on_time` and
++    /// `tick.s.input_missing`, one entry each per eligible client, complements) with the press series, presses seen;
++    /// P3's on-time share on this short run is reported and above 99 % (f36 holds the 99.9 %).
++    fn f28_20(timing: &'static str) {
++        let logs = u4f_short(timing);
++        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
++        assert_eq!(c.failures, Vec::<String>::new(), "{timing}: {:?}", c.lines);
++        assert!(!logs[0].header.params.contains_key("lead_ticks_count"));
++        let counts = logs[2].events.iter().filter(|e| e.ev == "client_counts");
++        assert_eq!(
++            counts
++                .filter(|e| e.f.contains_key("pump_input_limited_count"))
++                .count(),
++            16
++        );
++        let (mut on, mut miss, mut presses, mut lost) = (0u64, 0u64, 0i64, 0i64);
++        for t in logs[0].ticks.iter().filter(|r| r.ph == Phase::Measured) {
++            let a = t.s.get("cmd_on_time").expect("gap: cmd_on_time");
++            let b = t.s.get("input_missing").expect("gap: input_missing");
++            assert_eq!(a.len(), b.len(), "tick {}", t.t);
++            assert!(a.iter().zip(b).all(|(x, y)| x + y == 1));
++            on += a.iter().filter(|x| **x == 1).count() as u64;
++            miss += b.iter().filter(|x| **x == 1).count() as u64;
++            presses += t.v.get("press_count").copied().unwrap_or(0);
++            lost += t.v.get("press_lost_count").copied().unwrap_or(0);
++        }
++        let share = on as f64 / (on + miss).max(1) as f64;
++        println!(
++            "u4f f28 {timing}: on time {on} of {}, {share:.5}; presses {presses}, lost {lost}",
++            on + miss
++        );
++        assert!(on + miss > 16 * 100 && share > 0.99, "{timing}: {share}");
++        assert!(presses > 0);
++        // U4F-Q3 (c): the depth per client each second, 0 under A; the ticks each command ran before its stamp, A only.
++        let depth: Vec<i64> = logs[0]
++            .seconds
++            .iter()
++            .flat_map(|s| {
++                s.s.get("buffer_depth_count")
++                    .expect("gap: buffer_depth_count")
++            })
++            .copied()
++            .collect();
++        let early: Vec<i64> = logs[0]
++            .ticks
++            .iter()
++            .flat_map(|t| t.s.get("cmd_ran_early_count").expect("gap: cmd_ran_early"))
++            .copied()
++            .collect();
++        assert!(!depth.is_empty());
++        assert_eq!(depth.iter().all(|d| *d == 0), timing == "A");
++        assert_eq!(early.is_empty(), timing == "B");
++    }
++
++    #[test]
++    fn f28_option_a_a_controller_run_writes_20s_series_each_with_its_row() {
++        f28_20("A");
++    }
++
++    #[test]
++    fn f28_option_b_a_controller_run_writes_20s_series_each_with_its_row() {
++        f28_20("B");
++    }
++
++    /// F2: npt-sim's two -21 check bites (`World::CHECK_BITES`, a list apart from `World::BITES`) are accepted by
++    /// `--bite` and routed to the world alone (bites builds only).
++    #[cfg(feature = "bites")]
++    #[test]
++    fn f2_the_sims_check_bites_are_routed_to_the_world_alone() {
++        for id in Sim::CHECK_BITES {
++            let b = Bites::of(id).unwrap_or_else(|e| panic!("{id}: {e}"));
++            assert!(b.world, "{id}");
++            assert!(
++                !(b.room || b.client || b.decoder || b.l1 || b.schedule || b.pump),
++                "{id}"
 +            );
-+            assert!(on + miss > 16 * 100 && share > 0.99, "{timing}: {share}");
-+            assert!(presses > 0);
 +        }
 +    }
 +
@@ -962,8 +1479,7 @@ index 311e0a9..b96a22f 100644
 +    /// of its two directions' shares (npt-l1's fate log, as the -3 probe computes them).
 +    #[test]
 +    fn f40_a_p3_run_writes_its_measured_reorder_share_as_an_event() {
-+        let dir = u4f_short("u4f-f40", "B");
-+        let lab = read(&dir, "lab");
++        let lab = &u4f_short("B")[2];
 +        let r: Vec<&npt_log::EventRecord> =
 +            lab.events.iter().filter(|e| e.ev == "reorder").collect();
 +        assert_eq!(r.len(), 1);
@@ -1748,7 +2264,7 @@ index f66dce9..954d8d1 100644
 +    "PM-0001-21/not-older-than",
  ];
 diff --git a/spikes/netcode-proof/crates/room/src/room.rs b/spikes/netcode-proof/crates/room/src/room.rs
-index 83118b2..f2e731f 100644
+index 83118b2..76dd45a 100644
 --- a/spikes/netcode-proof/crates/room/src/room.rs
 +++ b/spikes/netcode-proof/crates/room/src/room.rs
 @@ -18,7 +18,7 @@ use crate::encoder::{
@@ -1960,7 +2476,7 @@ index 83118b2..f2e731f 100644
      /// A room over `sim` running `scene`, its static graph read from `greybox` (`areas()` and `portals()`: the
      /// tests pass `World::greybox()`), a roster of `tokens` admitting at most `n` sessions, at `tick_hz` ticks a second
      /// (production callers pass `npt_sim::TICK_HZ`: the window's rate is an argument, the F2 ruling). Its first tick
-@@ -472,10 +575,76 @@ impl<S: SimCore> Room<S> {
+@@ -472,10 +575,83 @@ impl<S: SimCore> Room<S> {
              stamped: Vec::new(),
              reports: InputReports::default(),
              index: Index::default(),
@@ -1994,8 +2510,15 @@ index 83118b2..f2e731f 100644
 +    }
 +
 +    /// [`Room::with_cmd_timing`] in place, for a caller that holds the room inside its own server (npt-lab): a start-up
-+    /// setting, given before any join (a slot joined earlier keeps the option it joined under).
++    /// setting, given before any join.
++    ///
++    /// # Panics
++    /// In a debug or test build, once any slot has joined (the option never changes in a run: F7).
 +    pub fn set_cmd_timing(&mut self, timing: CmdTiming) {
++        debug_assert!(
++            self.clients.iter().all(Option::is_none),
++            "the command-timing option is set before any join"
++        );
 +        self.timing = timing;
 +    }
 +
@@ -2037,7 +2560,7 @@ index 83118b2..f2e731f 100644
      /// The same room with the event queue's cap set as data (for the run's header; a test may set a small one). The
      /// cap then is no longer the provisional one.
      pub fn with_event_cap(mut self, cap: u32) -> Room<S> {
-@@ -650,7 +819,7 @@ impl<S: SimCore> Room<S> {
+@@ -650,7 +826,7 @@ impl<S: SimCore> Room<S> {
              team: self.teams.get(i).copied().unwrap_or(0),
              ack,
              queue: EventQueue::new(self.event_cap, self.bitten(RoomBite::Unbounded)),
@@ -2046,7 +2569,7 @@ index 83118b2..f2e731f 100644
              encoder: Encoder::new(self.tick_hz, self.quant),
              priority: Priority::default(),
              full_state_due: Some(false),
-@@ -743,6 +912,23 @@ impl<S: SimCore> Room<S> {
+@@ -743,6 +919,23 @@ impl<S: SimCore> Room<S> {
  
      fn receive_input(&mut self, slot: u8, input: &Input) {
          let w = self.wrap();
@@ -2070,7 +2593,7 @@ index 83118b2..f2e731f 100644
          let Some(c) = self
              .clients
              .get_mut(usize::from(slot))
-@@ -780,24 +966,53 @@ impl<S: SimCore> Room<S> {
+@@ -780,24 +973,53 @@ impl<S: SimCore> Room<S> {
                      }
                  }
                  Acked::Old => c.counters.acks_old += 1,
@@ -2132,7 +2655,7 @@ index 83118b2..f2e731f 100644
      }
  
      /// Runs one tick: the commands, the step, the history, the flood, the reports, interest, the events and every
-@@ -807,6 +1022,8 @@ impl<S: SimCore> Room<S> {
+@@ -807,6 +1029,8 @@ impl<S: SimCore> Room<S> {
          for c in self.clients.iter_mut().flatten() {
              c.begin_tick();
          }
@@ -2141,7 +2664,7 @@ index 83118b2..f2e731f 100644
          self.fill_input(t);
          // Carry 26: the step's events are copied (stamped with the tick and their 32-bit numbers: carry 23) before
          // anything else is read from the sim.
-@@ -826,8 +1043,10 @@ impl<S: SimCore> Room<S> {
+@@ -826,8 +1050,10 @@ impl<S: SimCore> Room<S> {
          self.next_tick = t.wrapping_add(1);
      }
  
@@ -2154,7 +2677,7 @@ index 83118b2..f2e731f 100644
      fn fill_input(&mut self, t: u32) {
          self.input.tick = t;
          self.input.spawns.clear();
-@@ -837,11 +1056,17 @@ impl<S: SimCore> Room<S> {
+@@ -837,11 +1063,17 @@ impl<S: SimCore> Room<S> {
          self.input.attributes.clear();
          self.input.attributes.append(&mut self.scripted_attributes);
          self.input.commands.clear();
@@ -2173,7 +2696,7 @@ index 83118b2..f2e731f 100644
              let taken = c.input.take(t);
              c.counters.late += u64::from(taken.late);
              let Some(cmd) = taken.command else {
-@@ -852,29 +1077,29 @@ impl<S: SimCore> Room<S> {
+@@ -852,29 +1084,29 @@ impl<S: SimCore> Room<S> {
              } else {
                  c.counters.commands_run += 1;
              }
@@ -2224,7 +2747,7 @@ index 83118b2..f2e731f 100644
      }
  
      fn index_records(&mut self) {
-@@ -1092,6 +1317,53 @@ impl<S: SimCore> Room<S> {
+@@ -1092,6 +1324,53 @@ impl<S: SimCore> Room<S> {
      }
  }
  
@@ -2278,7 +2801,7 @@ index 83118b2..f2e731f 100644
  /// Sends `c` a full state at tick `t`: its own-state records and its relevant records whole (catalogue §3's
  /// `FullState` rows), recorded in the ring as one acknowledged-group tick, the queue cleared.
  fn full_state(
-@@ -1403,13 +1675,84 @@ mod tests {
+@@ -1403,13 +1682,84 @@ mod tests {
          let mut a = vec![cmd(3, 1), cmd(0, 7), cmd(3, u32::MAX), cmd(1, 5), cmd(3, 0)];
          let mut b = a.clone();
          b.reverse();
@@ -2708,10 +3231,10 @@ index d3bddd8..8302434 100644
                  self.reports.ammunition += 1;
                  self.refuse(c, RefusalKind::Ammunition);
 diff --git a/spikes/netcode-proof/marks/SERIES.md b/spikes/netcode-proof/marks/SERIES.md
-index 34a0189..37b6c3b 100644
+index 34a0189..b45900b 100644
 --- a/spikes/netcode-proof/marks/SERIES.md
 +++ b/spikes/netcode-proof/marks/SERIES.md
-@@ -369,6 +369,16 @@ are written once at the run's end, after the measured phase. No mark reads them
+@@ -369,6 +369,20 @@ are written once at the run's end, after the measured phase. No mark reads them
  |---|---|---|---|---|
  | `tick.s.in_building_slot_area` | pairs (slot, area) | npt-lab (from npt-sim's Soldier records' `area`) | the room log, on every logged tick (any phase) where a soldier's feet are in a building area: each such soldier's slot, then its area (building i is area i + 1: the greybox's area rule, half-open on each footprint), in slot order; absent on a tick with none. The run's summary line prints the measured total as "in a building: N slot-ticks (slots ...)" | none (recorded) |
  
@@ -2719,10 +3242,14 @@ index 34a0189..37b6c3b 100644
 +
 +| Name | Unit | Written by (crate) | Meaning | Marks |
 +|---|---|---|---|---|
-+| `header.params.lead_bound_ms` | ms | npt-lab (from `Room::LEAD_BOUND_MS`) | the room's lead bound (LEAD-BOUND, Mustafa 2026-11-18: 400 ms, 12 ticks at 30 Hz): a command stamped more than this ahead of the room's next tick is refused as kind 1 | none (recorded) |
++| `header.params.lead_bound_ms` | ms | npt-lab (from `Room::LEAD_BOUND_MS`) | the room's lead bound in ms, frozen at Mustafa's LEAD-BOUND yes of 2026-11-18 (400 ms: 12 ticks at 30 Hz, 24 at 60 Hz, by `ticks_for_ms_at`); the frozen text (u4f-lead-bound.md's fence) reads "A command stamped more than the bound ahead of the room's tick is refused and counted as kind 1 (2.4), never run."; the room's tick is 2.4's, the tick the room runs next (the one its JoinAccepted and Pong name) | none (recorded) |
++| `header.params.connects_count` | count | npt-lab | present on a clock-suite run (`--suite clock --connects <n>`, -47: 1,000 in the judged runs; 2.7): its connects over all slots; each client runs npt-bots' never-firing script (`Behaviour::never_fires`, U4F-Q4 (b): no event stamped, no client hash filed, so that run's header has no `behaviour`), its estimate read once at 2 s (`event.connect_clock`, fields `slot` and `seq`, the connect's number), then, while connects remain, the slot connects again as a fresh endpoint with a fresh seeded host offset | none (recorded) |
++| `header.params.brawl_press_every_count` | count (commands) | npt-lab | present on a run whose brawl presses fire (`--brawl-press-every <n>`, U4F-Q11 (i) (a): 2 in -20's runs): the brawl moves its fire press counter by one on every n-th command it gives; absent when off | none (recorded) |
 +| `header.params.controller_max_lead_count` | count (ticks) | npt-lab | present on a run whose endpoints run U4f's tick-lead controller (`--controller 1`; then no `lead_ticks_count`): the most ticks ahead of the server's estimated current tick a client stamps (9 under both options) | none (recorded) |
-+| `event.client_counts.lead_refused_count`, `.not_newer_count`, `.seq_refused_count`, `.move_refused_count`, `.aim_refused_count`, `.ack_refused_count`, `.seq_outside_window_count`, `.rejoin_overlap_count`, `.commands_repeat_count`, `.stamps_skipped_count`, `.unencodable_commands_count`, `.lead_now_count` | count (`lead_now_count` ticks, signed; -1 when none) | npt-lab (from npt-room's and npt-client's counters) | per client at the run's end (field `slot`): the room's refusals by kind (1, 2, 3, 4, 6, 8 by datagram), the sequences outside the kept window, a rejoin's overlap, the redundant copies; the endpoint's skipped stamps, unencodable commands and the lead its controller set last | none (reported) |
++| `event.client_counts.lead_refused_count`, `.not_newer_count`, `.seq_refused_count`, `.move_refused_count`, `.aim_refused_count`, `.ack_refused_count`, `.seq_outside_window_count`, `.rejoin_overlap_count`, `.commands_repeat_count`, `.stamps_skipped_count`, `.unencodable_commands_count`, `.lead_now_count`, `.unknown_pongs_count` | count (`lead_now_count` ticks, signed; -1 when none) | npt-lab (from npt-room's and npt-client's counters) | per client at the run's end (field `slot`): the room's refusals by kind (1, 2, 3, 4, 6, 8 by datagram), the sequences outside the kept window, a rejoin's overlap, the redundant copies; the endpoint's skipped stamps, unencodable commands, the lead its controller set last and the `Pong`s naming none of its pings, dropped (`ClientEndpoint::unknown_pongs`) | none (reported) |
 +| `event.client_counts.pump_too_large_count`, `.pump_trailing_bytes_count`, `.pump_unknown_field_count`, `.pump_wrong_channel_count`, `.pump_input_limited_count`, `.pump_ping_limited_count`, `.pump_pong_unknown_count`, `.pump_join_again_count`, `.pump_before_join_count` | count | npt-lab (from npt-server's `Counters` of the client's session) | per client at the run's end (field `slot`), while its session lives: the pump's refusal counts (2.5; 0 expected on an honest client) | none (reported) |
++| `tick.s.cmd_ran_early_count` | count (ticks), signed | npt-lab (from npt-room's `ClientSlot::ran_early`) | the room log, every room tick: under option A one entry per command run this tick (slot order, each slot's in its run order), its stamp less this tick (positive: run before its stamp; U4F-Q3 (c), reported beside `second.s.buffer_depth_count`, which is 0 under A); empty under option B | none (reported) |
++| `second.s.event_queue_max_count` | count | npt-lab (from npt-room: the event cap less `ClientSlot::headroom`) | the room log, each second, one per client slot (the run's `clients` entries; 0 for a slot with no joined client): the most gameplay events queued for that client at once in the second, before an overflow resync cleared them (2.8's high-water marks, per 30 s bin and per burst: carry 58; read by ops/runs/c-u4f-cap.mjs) | none (reported) |
 +| `event.reorder.permille`, `.up_permille`, `.down_permille` | permille | npt-lab (L1, from npt-l1's fate log) | once per scenario run, at its end: the measured reorder share as the -3 probe computes it (each direction's RFC 4737 reordered datagrams per 1000 delivered; `permille` the lower), the event route the `reorder` rule already reads (the row `header.params.reorder_permille / event reorder (permille)` names it) | the `reorder` rule (no change to it) |
 +
  ## Series read only by figures (19)
@@ -3954,10 +4481,10 @@ index 0000000..2b0738e
 +}
 diff --git a/spikes/netcode-proof/crates/room/tests/commands.rs b/spikes/netcode-proof/crates/room/tests/commands.rs
 new file mode 100644
-index 0000000..b24f3ca
+index 0000000..87e07ae
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/room/tests/commands.rs
-@@ -0,0 +1,953 @@
+@@ -0,0 +1,964 @@
 +//! U4f's room tests of the command checks (u4f-brief.md 2.3, 2.4, 2.10): option A beside option B, 2.4's order with
 +//! one kind per refusal, the kept window, the join anchor and the slot's kept stamp across joins, the signed-distance
 +//! compares at room tick 1, `tick.s.cmd_on_time` by stamp, and (bites builds) each -21 room bite's unit proof. Every
@@ -4293,7 +4820,8 @@ index 0000000..b24f3ca
 +}
 +
 +/// f11 (ii): an honest late command (its stamp newer than the newest accepted, but for a tick already run under B, or
-+/// more than W = 8 ticks behind under A) is counted `late`, never kind 2.
++/// more than W = 8 ticks behind under A) is counted `late`, never kind 2; and a command as late that also breaks kind 4
++/// (a long move), or kind 6 (an off-map aim), is counted under its forged kind, never `late` (the advisor's R2 (b)).
 +#[test]
 +fn f11_an_honest_late_command_is_counted_late_never_kind_2() {
 +    for timing in BOTH {
@@ -4303,11 +4831,21 @@ index 0000000..b24f3ca
 +            tick(&mut r);
 +        }
 +        let behind = if timing == CmdTiming::B { 2 } else { 3 };
-+        send(&mut r, &[cmd(2, j + behind)]);
++        let long = Command {
++            move_xy: [127, 127],
++            ..cmd(3, j + behind)
++        };
++        let off = Command {
++            aim: [0, 12_801, 0],
++            ..cmd(4, j + behind)
++        };
++        send(&mut r, &[cmd(2, j + behind), long, off]);
 +        let ran = tick(&mut r);
-+        assert!(!ran.contains(&2), "{timing:?}");
++        assert!(!ran.iter().any(|s| (2..=4).contains(s)), "{timing:?}");
++        assert_eq!(refused(&r), [(3, 4), (4, 6)], "{timing:?}");
 +        let k = counters(&r);
 +        assert_eq!((k.late, k.not_newer), (1, 0), "{timing:?}: {k:?}");
++        assert_eq!(forged(&k), [0, 0, 0, 1, 0, 1, 0, 0], "{timing:?}");
 +    }
 +}
 +
@@ -4910,4 +5448,150 @@ index 0000000..b24f3ca
 +        }
 +        assert_eq!(most, [8, 16]);
 +    }
++}
+diff --git a/spikes/netcode-proof/ops/runs/c-u4f-cap.mjs b/spikes/netcode-proof/ops/runs/c-u4f-cap.mjs
+new file mode 100644
+index 0000000..d00fe9d
+--- /dev/null
++++ b/spikes/netcode-proof/ops/runs/c-u4f-cap.mjs
+@@ -0,0 +1,140 @@
++#!/usr/bin/env node
++// U4f's event-cap measurement (u4f-brief.md 2.8 items 3-5; U4F-Q12 (b); carries 57, 58 and 50), on c-u4r-r2.mjs's
++// model: nine short runs, SS, 48 clients, the brawl with U4f's tick-lead controller, at P2, P3 and B1 (2 bursts), seeds 1
++// to 3, each with the room's queue cap opened to CAP_OPEN (`--event-cap`), so no overflow resync clears a queue and the
++// high-water marks show the need, not the provisional cap. Per run, then over all nine:
++// - the rate: the room's reliable gameplay events a second (`second.v.reliable_events_count`), mean and max per 30 s bin
++//   of the measured phase, and each client's mean queued rate over the run (`event.client_counts.events_queued_count`
++//   over the run's seconds, from `event.run_lengths`);
++// - the queue's high-water mark per client: the most of `second.s.event_queue_max_count` in each 30 s bin, and per burst
++//   (`event.burst_heal.queue_max_count`, B1);
++// - the value (U4F-Q12 (b)): the largest per-client high-water mark seen times MARGIN, rounded up to a multiple of 64,
++//   checked below carry 50's upper bound (NA-12): the lowest client's mean queued rate x 255 / 30 (an event older than
++//   255 ticks expires: room/src/events.rs:19-20), so a never-acker reaches the cap before its events expire. The value
++//   and its figures go to the advisor before any -22 run (carry 57); plan §4.7's text is the main session's.
++// Run it under the lane runner, exclusive (u4f-brief.md section 4 rule 2), from the spike:
++//   bash <u4f-run.sh> -x <worktree> <log> node ops/runs/c-u4f-cap.mjs --date YYYY-MM-DD --out <new folder>
++// The builder's runs hold uncommitted edits (2.8 item 3: builder evidence): every log names HEAD, and cap.txt's head
++// adds `git diff HEAD`'s sha256. One release build of npt-lab, at least 4 GiB free before it and before each run
++// (section 4 rule 6), copied to <out>/bin; each run's logs under <out>/<profile>-s<seed>/, cap.txt beside them. Each
++// command runs through check.mjs's run() with a 600 s limit; a stopped run is a result, never retried.
++
++import { spawnSync } from "node:child_process";
++import { createHash } from "node:crypto";
++import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from "node:fs";
++import { dirname, join, resolve } from "node:path";
++import { fileURLToPath } from "node:url";
++import { builtArtifact, run } from "../../check.mjs";
++import { roomFor } from "./c-u4r-runs.mjs";
++
++const SPIKE = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
++/** The opened cap for the measurement: above carry 50's bound at any rate seen, so no queue meets it. */
++export const CAP_OPEN = 8_192;
++/** The stated margin over the largest per-client high-water mark (U4F-Q12 (b)). */
++export const MARGIN = 1.5;
++/** An event's age bound, ticks (the event section's 8 bits: carry 50), and the tick rate. */
++const AGE_TICKS = 255;
++const TICK_HZ = 30;
++const STEP_LIMIT_MS = 600_000;
++const LENGTHS = ["--warmup-s", "10", "--measured-s", "60"];
++const B1 = ["--bursts", "2", "--burst-first-s", "10", "--burst-every-s", "30"];
++export const RUNS = ["P2", "P3", "B1"].flatMap((p) => [1, 2, 3].map((seed) => ({ profile: p, seed })));
++
++/** One log's records by kind (`k`: header, tick, second, event, footer). */
++export function records(path) {
++  const out = { second: [], event: [] };
++  for (const line of readFileSync(path, "utf8").split("\n")) {
++    if (!line) continue;
++    const r = JSON.parse(line);
++    out[r.k]?.push(r);
++  }
++  return out;
++}
++
++/** One run's figures from its room and lab logs (the module text). */
++export function figures(room, lab) {
++  const measured = room.second.filter((s) => s.ph === "measured");
++  const first = measured[0]?.sec ?? 0;
++  const bins = [];
++  for (const s of measured) {
++    const b = (bins[Math.floor((s.sec - first) / 30)] ??= { secs: 0, events: 0, rateMax: 0, queueMax: 0 });
++    const r = s.v?.reliable_events_count ?? 0;
++    b.secs += 1;
++    b.events += r;
++    b.rateMax = Math.max(b.rateMax, r);
++    b.queueMax = Math.max(b.queueMax, ...(s.s?.event_queue_max_count ?? [0]));
++  }
++  const bursts = {};
++  for (const e of lab.event.filter((x) => x.ev === "burst_heal")) bursts[e.f.burst] = Math.max(bursts[e.f.burst] ?? 0, e.f.queue_max_count);
++  const len = lab.event.find((e) => e.ev === "run_lengths")?.f ?? {};
++  const secs = (len.warmup_ticks_count + len.measured_ticks_count + len.after_ticks_count) / TICK_HZ;
++  const rates = lab.event.filter((e) => e.ev === "client_counts").map((e) => e.f.events_queued_count / secs);
++  return { bins, bursts, rateLow: Math.min(...rates), rateHigh: Math.max(...rates), high: Math.max(0, ...bins.map((b) => b.queueMax), ...Object.values(bursts)) };
++}
++
++/** The value and carry 50's bound from all runs' figures: [value, bound, the line]. */
++export function value(all) {
++  const high = Math.max(...all.map((f) => f.high));
++  const v = Math.ceil((high * MARGIN) / 64) * 64;
++  const bound = Math.floor((Math.min(...all.map((f) => f.rateLow)) * AGE_TICKS) / TICK_HZ);
++  const ok = v < bound;
++  return [v, bound, `value: the largest per-client high-water mark ${high} x the margin ${MARGIN}, rounded up to 64: ${v}; carry 50's bound (the lowest client's mean queued rate x ${AGE_TICKS} / ${TICK_HZ}): ${bound}; ${ok ? "below it" : "NOT below it: to the advisor"}`];
++}
++
++function sh(cmd, args) {
++  const r = spawnSync(cmd, args, { cwd: SPIKE, encoding: "utf8", maxBuffer: 1 << 28 });
++  if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")}: exit ${r.status}\n${r.stdout}${r.stderr}`);
++  return r.stdout;
++}
++
++function floor(what) {
++  const s = statfsSync(SPIKE);
++  const r = roomFor(s.bavail * s.bsize, 0, what);
++  if (!r.ok) throw new Error(r.line);
++}
++
++function main(argv) {
++  const opt = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : undefined);
++  const [date, out] = [opt("--date"), opt("--out")];
++  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || !out || argv.length !== 4) throw new Error("usage: c-u4f-cap.mjs --date YYYY-MM-DD --out <new folder>");
++  if (existsSync(out)) throw new Error(`${out} exists: a measurement is never overwritten`);
++  const commit = sh("git", ["rev-parse", "HEAD"]).trim();
++  const diff = createHash("sha256").update(sh("git", ["diff", "HEAD", "--", "."])).digest("hex");
++  floor("the release build of npt-lab");
++  const b = spawnSync("cargo", ["build", "-v", "--release", "--locked", "--offline", "-p", "npt-lab", "--message-format=json"], { cwd: SPIKE, encoding: "utf8", maxBuffer: 1 << 28 });
++  if (b.status !== 0) throw new Error(`the release build: exit ${b.status}\n${b.stderr}`);
++  for (const l of b.stderr.split("\n")) if (/^\s*(Compiling|Fresh) npt-/.test(l)) console.log(l);
++  mkdirSync(join(out, "bin"), { recursive: true });
++  const lab = join(out, "bin", "npt-lab");
++  copyFileSync(builtArtifact(b.stdout.trim(), { target: "npt-lab", kind: "bin" }), lab);
++  const lines = [`# U4f's cap measurement (2.8), ${date}: commit ${commit}, git diff HEAD sha256 ${diff}; cap opened to ${CAP_OPEN}`];
++  const all = [];
++  for (const { profile, seed } of RUNS) {
++    floor(`run ${profile} seed ${seed}`);
++    const dir = join(out, `${profile}-s${seed}`);
++    const args = ["scenario", "--run", `cap-${profile}-s${seed}`, "--set", "u4f-cap", "--date", date, "--commit", commit, "--out", dir, "--scene", "SS", "--profile", profile, "--seed", String(seed), ...LENGTHS, ...(profile === "B1" ? B1 : []), "--controller", "1", "--event-cap", String(CAP_OPEN), "--suite", "brawl"];
++    const t0 = Date.now();
++    const r = run(lab, args, SPIKE, process.env, STEP_LIMIT_MS);
++    const head = `## ${profile} seed ${seed}: ${r.timedOut ? "stopped" : `exit ${r.status}`} (wall ${((Date.now() - t0) / 1000).toFixed(1)} s): ${r.stdout.trim()}`;
++    lines.push(head);
++    console.log(head);
++    if (r.timedOut || r.status !== 0) continue;
++    const f = figures(records(join(dir, "room.jsonl")), records(join(dir, "lab.jsonl")));
++    all.push(f);
++    for (const [i, x] of f.bins.entries()) lines.push(`  bin ${i} (${x.secs} s): reliable events a second mean ${(x.events / x.secs).toFixed(1)}, max ${x.rateMax}; per-client queue high-water ${x.queueMax}`);
++    for (const [k, q] of Object.entries(f.bursts)) lines.push(`  burst ${k}: per-client queue high-water from its start to its heal ${q}`);
++    lines.push(`  clients' mean queued rate a second: lowest ${f.rateLow.toFixed(1)}, highest ${f.rateHigh.toFixed(1)}; the run's high-water ${f.high}`);
++  }
++  if (all.length) lines.push(value(all)[2]);
++  console.log(lines.slice(-1)[0]);
++  writeFileSync(join(out, "cap.txt"), `${lines.join("\n")}\n`);
++}
++
++if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
++  try {
++    main(process.argv.slice(2));
++  } catch (e) {
++    console.error(`c-u4f-cap: ${e.message}`);
++    process.exit(1);
++  }
 +}

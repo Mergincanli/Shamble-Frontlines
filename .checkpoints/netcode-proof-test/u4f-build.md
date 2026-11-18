@@ -306,3 +306,100 @@ lines (untracked files do not show in `git diff`); the launch commit's .checkpoi
   row, written without touching the row's text: for the reviewer's read (a new row would duplicate the name).
 - The summary line's "lead N" prints `lead_for(profile)` even on a controller run (cosmetic; the header is right).
 - The unbuilt parts listed under Block 5/6 above, and the plants of f26, f27 and D14.
+
+## Builder 2
+
+Task: U4f's second builder (general-purpose, opus, effort xhigh): finish U4f (clock and commands) from builder 1's partial
+build, by the 22 lines of advisor-u4f-build1.md:162-246 (sha256 da98295e...), u4f-brief.md rev 3.3 (sha256 135325a0...)
+and the main session's prompt. Where the prompt and the ruling differ, the prompt wins: line 1's worktree is replaced by
+a fresh worktree (builder 1's, agent-a856ba7c..., stays untouched as a backup); logs under .gate/u4f/ start `w2-`.
+
+### Start (done)
+
+- Ruling sha256 da98295e0d0eae7c12e46f0a282dce3c452f75dc74346c3f55aec26baa84f7cb, brief 135325a0...2a681a502f, runner
+  70eb3da5...ddae6ddae: all three match the prompt (`sha256sum`).
+- Worktree: /home/user/Shamble-Frontlines/.claude/worktrees/agent-aa8301a8782f8f434 (made at origin/main 22c6afa0).
+  `git merge --ff-only d1b24c3b21cfd6715bcc45231eed3e17f0a28b17`: exit 128 (diverging); then `git switch -c u4f-build2
+  d1b24c3b21cfd6715bcc45231eed3e17f0a28b17`: "Switched to a new branch 'u4f-build2'". Branch u4f-build2.
+- `git log -1 --format=%H`: d1b24c3b21cfd6715bcc45231eed3e17f0a28b17 (launch head 2).
+- `git diff --quiet 5b29296b03f4e116c0afac8b89d9bc15cc1adaf7 HEAD -- spikes/`: exit 0.
+- `git merge-base --is-ancestor 0ad9661 HEAD`: exit 0.
+- `sha256sum .checkpoints/netcode-proof-test/wip/u4f-build.patch`: 92fc99aa9f01aebf98c21f5d106a827a7a254e024d65702b733654f2eef2e837
+  (matches); `git apply --check`: exit 0; `git apply`: exit 0 (the one git write).
+- Line 2's checks: `git diff --stat 5b29296b -- spikes/ docs/`: 18 files, 1,606 insertions, 248 deletions; `git status
+  --short`: those 18 modified and 6 untracked new files (lab/tests/ holds bite_homes.rs only), lines by the Grep tool's
+  count of `^`: clock.rs 348, carry80.rs 158, trace.rs 556, bite_homes.rs 48, pong.rs 84, commands.rs 953 = 2,147;
+  3,753 added in all. Equal to the notes: no stop.
+- Mustafa's words read at history.md:6801 and :6803 (no marks.json, judge or existing SERIES.md row change without
+  asking him first; the size stop past 6,000 added lines).
+- `df -h /home/user` at start: 252G size, 27G used, 12G avail (70 %).
+
+### B1: the fixes of lines 6 to 14 (done; lines 12 and 13 apply with the cheats, B7 and B8)
+
+- Line 6 (F3, F11): scenario.rs's `u4f_short(timing)` now makes each option's short run once per test process
+  (`OnceLock`, its three logs read into memory, the scratch folder removed); f6 and f28 are one test each per option
+  (`f6_option_a_...`, `f6_option_b_...`, `f28_option_a_...`, `f28_option_b_...`); each f28 test runs
+  `contract::check` on its run's logs against marks/SERIES.md and asserts no failure at all (stronger than no name
+  failure: the (c) rules and the class audit pass too at 16 clients), `lead_ticks_count` absent, every client's
+  `pump_input_limited_count` written (16), and -20's series as before; f40 reads option B's shared run.
+- Line 7 (F4): `--behaviour brawl` stays the brawl; `--brawl-press-every <n>` (0 off; the brawl only, else a usage
+  error) gives npt-bots' new `Behaviour::with_press_every(n)` (replaces builder 1's `brawl_presses`: a fire press on
+  every n-th command; n = 2 is the old rule); header `params.brawl_press_every_count` only when on, with a new row in
+  U4f's subsection; `brawl-presses` is gone from the settings, the header and the usage line.
+- Line 8 (F5): the `header.params.lead_bound_ms` row's meaning cell holds the ruling's words exactly.
+- Line 9: f11 (ii) gains, under both options, a late command breaking kind 4 and one breaking kind 6: refused (3, 4)
+  and (4, 6), late 1 (the honest one), forged [0, 0, 0, 1, 0, 1, 0, 0] (+0 tests).
+- Line 10 (F2): `Bites::of` sets `world` from `World::BITES` or `World::CHECK_BITES`; a bites-build lab test
+  `f2_the_sims_check_bites_are_routed_to_the_world_alone` (+1 bites only).
+- Line 11 (F6, F7): `event.client_counts.unknown_pongs_count` written (the endpoint's `unknown_pongs()`, so it stays
+  public), added to U4f's client_counts row; `Room::set_cmd_timing` debug-asserts no slot has joined.
+- Line 14 (F10): the summary line prints "lead the controller's, at most 9" on a controller run.
+- Logs: .gate/u4f/w2-b1-test.log (`cargo test --locked -p npt-room -p npt-bots -p npt-lab`, then `-p npt-room -p
+  npt-lab --all-features`), 13:51:32-13:57:48 UTC, both exit 0: measured lab main.rs 65 passed, 1 ignored (builder 1's
+  63: f6 and f28 split, +2); room commands 25, room 19, lib 23; bots 3 + 5; bites build lab main.rs 76 passed (f2's
+  test among them), commands 37, room 27, lib 23, bite_homes 1.
+- SIZE-CHECK after B1: `git diff --shortstat 5b29296b -- spikes/ docs/` 1,683 insertions (18 files) + 2,158 lines in
+  the 6 new files (commands.rs now 964) = **3,841**.
+
+### B2: -20's rest (line 16), with B3's lab writers (in progress)
+
+- logs.rs: the room log's second records gain `second.s.buffer_depth_count` (each joined client's input buffer depth
+  at the second's last tick, `ClientSlot::buffer_depth_ticks`: 0 under A by construction, input.rs:192-196) and
+  `second.s.event_queue_max_count` (B3's high-water series: per slot, the most events queued at once in the second, the
+  cap less the tick's lowest `headroom()`, so a count before an overflow resync cleared them); every room tick record
+  gains `tick.s.cmd_ran_early_count` (U4F-Q3 (c): under A each command run's stamp less the tick; empty under B). Two
+  new SERIES.md rows (`tick.s.cmd_ran_early_count`, `second.s.event_queue_max_count`); `buffer_depth_count` has its
+  row (:101). `RoomTrack::second` became a `Second` struct (the per-client samples beside the sums).
+- scenario.rs: `--event-cap <n>` (B3's opened cap and f21's short run: `Room::with_event_cap`, so the header records
+  the cap and `event_queue_cap_provisional` false).
+- f28's -20 half asserts both new -20 series written (depth all 0 under A only; ran-early entries under A only).
+- f36 (ii): npt-bots' `f36_ii_a_controller_run_gives_every_stamp_and_a_fixed_lead_run_keeps_its_rule` (+1): a
+  lossless loop of 300 steps (a snapshot each step but every fifth, pings answered at once with the server's time).
+- TE-B1-R2-1 with RR2-B1-1 rode (P35): the leash test's dead input at (0, 0) (bots lib.rs), toward_centre's doc "is at
+  most 2^31".
+- Finding (fixed, cause known): f36 (ii)'s first run failed at its own count assert, `stamps.len() > 250` with 240
+  stamps on the fixed-lead half: 240 is that half's moved steps by construction (300 less every fifth), so the bound
+  was the test's error, not the code's; now `>= 240` (.gate/u4f/w2-b2-test2.log:33-34; the controller half passed).
+  `cargo fmt --check`'s two diffs (scenario.rs) applied by Edit (w2-b2-test.log).
+- The B2 tree's check: .gate/u4f/w2-b2-test3.log (`cargo test --locked -p npt-bots -p npt-lab`, 14:01:58-14:04:05
+  UTC, exit 0): bots lib 4 passed, 1 ignored (f36 (ii) among them); lab main.rs 65 passed, 1 ignored.
+- **The plants (P26: each by Edit in place, one `-x -k` runner call, restored by Edit, the file's sha256 checked):**
+  client/src/lib.rs clean 1f932bd56ffcf2cd77466e945e9b674bf1f0aa036a27c58499345f26353a7a13; room/src/room.rs clean
+  8d7ad78f5cb151436716bb84ba7226eb5a0dc2ae852735615cb344e638945c6a.
+  - f26 half 1 (w2-plant-f26-1.log, 14:04:27): in `old_header`'s before-the-first-header branch, `self.bad_header(t);`
+    replaced by `let i = self.slot_for(t); self.ring[i].filed = Filed::Sentinel; self.out.hashes.push((t, 0));
+    self.acknowledge(t, 0);` (a ring slot taken, the bad tick acknowledged): `f26_the_clients_two_too_old_cases`
+    FAILED at carry80.rs:112, "filed once", left [(60, 0), (60, 0)]; restored, sha256 1f932bd5... (equal).
+  - f26 half 2, the P-form (w2-plant-f26-2.log, 14:04:43): in `old_header`'s from-the-first-header branch, after
+    `self.stale += 1;`, `self.out.hashes.push((t, 0));` (the too-old tick given the sentinel too): f26 FAILED at
+    carry80.rs:124, "nothing filed: [(105, 0)]"; restored, sha256 1f932bd5... (equal).
+  - f27 (w2-plant-f27.log, 14:05:01): in `full_state`, the hash compare's `match` replaced by `let _ = hash;
+    self.duplicates += 1;` (the old rule): `f27_a_full_state_of_another_hash_after_a_snapshot_files_the_sentinel`
+    FAILED at carry80.rs:147, left [] right [(105, 0)]; restored, sha256 1f932bd5... (equal).
+  - D14 (w2-d14.log, 14:05:18, `cargo test --locked -p npt-room --all-features --lib f8_`): `canonical`'s body
+    replaced by the head's old comparator (`sort_by` with `(b.tick.wrapping_sub(a.tick) as i32).cmp(&0).reverse()`
+    after the slot; 5b29296b room.rs:363-368). **The outcome: it misorders, no panic**, on the toolchain's sort of 3
+    elements: `f8_one_slots_commands_2_pow_31_ticks_apart_sort_to_one_order` FAILED at room.rs:1708 "at 0" (the two
+    arrival orders sort ticks 0 and 2^31 two ways: left (0, 2^31), right (2^31, 0)), and the property test FAILED at
+    room.rs:1755 on case 0 (its order is not by signed distance from the tick run); no panic message in either.
+    Restored, sha256 8d7ad78f... (equal).

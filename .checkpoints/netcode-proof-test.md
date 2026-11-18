@@ -65,12 +65,6 @@
   report names it in a line of its own with who reviewed it** (the advisor's A1; read by the advisor and the
   test-engineer); no marks.json, judge file or existing SERIES.md row may change: if the build needs one, stop and ask
   him; "Build U4f"; his size stop past 6,000 added lines stays.
-- **Launch DONE (11:3x-11:49 UTC; each step's figures in this card at a64c216):** the u4r-P3-0f066338dd8d pack (5,433
-  → 5,808 MiB), the six part-cleans (12,154 MiB), the light run (refs 1463, marks 81, self 78/78, redact 307 items), the
-  fill and every check on it (L4 item 10: D6, stamps_anchors.py, r31_check.py, adv_words_check.py's 37 hits all passing
-  by the fold check's §3), the check-in and the saver; builder 1 from the launch head
-  827518bde465cf208e461da5fb605993c2bb3220 (u4r-build.md:5-15's form: main's docs-only #55-#57 make origin/main no
-  ancestor of this branch).
 - **Builder 1 (11:46-13:13 UTC): a PARTIAL build, by its own stop** (notes u4f-build.md, here; return in the chat):
   built and tested npt-room, npt-client (ClockSync, the controller, carry 80 (b)-(e)), the Pong's `server_ns`, P33's
   fix, npt-sim's two bite sites, the lab's core; not built (notes :162-172): -21's cheats and suites, twins,
@@ -101,11 +95,6 @@
   marks.json or judge change's reviewer named in its own line (his 13:35 rule).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
-- **2026-11-17:** the advisor's rulings on U4F-Q1 to Q18 (advisor-u4f-brief.md:173-198), all but Q8 (iii), which
-  sends the lead bound's value to him (LEAD-BOUND). Why: they choose how U4f is built and tested inside plan §5 U4f;
-  the brief is not built yet, so each can be undone; none changes a marks.json text or a judge file.
-- **2026-11-17:** no second review round or second model by default from now on (one round; a second only where round
-  1 leaves a High or a design change); a workflow only for parallel review rounds. Why: TEST-FIRST rule 3.
 - **2026-11-18 (named in that day's message):** D3-1's fix by the advisor's ruling (advisor-u4f-fold-check.md): U4f's
   lab writes a `reorder` event at a run's end (B9, test f40) so -20's existing reorder rule can read the measured share.
   Why: no bar text, judge file or marks.json changes; undone by dropping B9 before the build merges.
@@ -171,17 +160,26 @@
 - **Builder 2 RUNS from about 13:45 UTC** (agent aa8301a8782f8f434; general-purpose, opus, xhigh, isolation worktree;
   resume by SendMessage, or a fresh copy that reads its notes and `git diff` first), by the ruling's 22 lines with
   line 1's worktree replaced: launch head 2 d1b24c3b21cfd6715bcc45231eed3e17f0a28b17, builder 1's snapshot applied and
-  checked (24 files, 3,753 added) before any edit; its logs `.gate/u4f/w2-*`. **At each check-in:** snapshot its worktree, `python3 -I
+  checked (24 files, 3,753 added) before any edit; its logs `.gate/u4f/w2-*`. Its worktree
+  `/home/user/Shamble-Frontlines/.claude/worktrees/agent-aa8301a8782f8f434`, branch u4f-build2 at d1b24c3. Done by the
+  cut: B1 (the fixes: 3,841 lines after it), B2's -20 writers and f36 (ii), the plants f26 (two), f27 and D14 (it
+  misorders, no panic); B3 begun. **Cut 14:06:57, resumed about 16:38 UTC** (Cuts, below); snapshot at 16:37
+  wip/u4f-build.patch 310ee809b2dabf8f…, 259,563 bytes, 25 files, on d1b24c3. **At each check-in:** snapshot its worktree, `python3 -I
   .checkpoints/netcode-proof-test/worktree_patch.py <worktree> .checkpoints/netcode-proof-test/wip/u4f-build.patch
   u4f-build` (the one snapshot then stands for builder 2's worktree, builder 1's work included; WIP-CLEAN deletes it at
   the merge), then save the card; on a cut, check the worktree against its last snapshot first.
-- The saver bsacee7la runs from 13:35 UTC (`node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
-  "Claude-Session: …"`, run_in_background, timeout 7200000; its window ends about 15:25: restart it while agents run).
-  The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 14:34 UTC); pause it when no agent runs.
-- The last workflow: wf_b2a20e74-6aa (the fix pass and the advisor's check), done before 22:43 UTC on 2026-11-17.
+- The saver bmhupn5a8 runs from 16:38 UTC (bsacee7la ran 13:35 to about 15:25) (`node .claude/scripts/checkpoint.mjs
+  watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout 7200000; its window ends about
+  18:28: restart it while agents run). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 18:34 UTC);
+  pause it when no agent runs.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - Every cut until 2026-11-17 is in history.md from :5791 on (the old card's block, the latest first).
+- **2026-11-18 14:06:57 to 16:38 UTC (builder 2):** "You've hit your org's monthly spend limit · ask your admin for a
+  higher limit · your 5-hour limit resets 4:10pm (UTC)" (14:06:57.143, builder 2's transcript, right after its Edit at
+  14:06:56 that added SERIES.md's `header.params.connects_count` row whole). Checked at 16:37: no plant in place
+  (room.rs 8d7ad78f…, client lib.rs 1f932bd5…, its notes' clean sha256s), no half edit; snapshot taken; resumed by
+  SendMessage about 16:38 UTC. The 14:35 and 16:34 check-ins reached the session only at 16:36 (handled together).
 - **2026-11-17 19:46 to 22:16 UTC:** "You've hit your org's monthly spend limit · ask your admin for a higher limit ·
   your 5-hour limit resets 10:10pm (UTC)" (19:46:41.750, the advisor agent's transcript). Resumed 22:15:24 (the
   check-in); the workflow by resumeFromRunId at about 22:17. Nothing was half done.
