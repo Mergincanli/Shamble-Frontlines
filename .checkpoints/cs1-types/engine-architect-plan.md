@@ -222,3 +222,19 @@ Memory: none (memory: local; .claude/agent-memory-local/engine-architect/ absent
   or ".ts"); resolved versions of thiserror/syn/proc-macro2/quote/unicode-ident; ts-rs compiling under clippy --all-targets
   for wasm32; RustSec status (security-auditor); tsc -b with noEmit in TS 6.0.3 (plan uses -p); ambient enum result.
 ### B7 DONE. Next: B8 write plan-draft.md.
+### B8 DONE: plan-draft.md written (/home/user/Shamble-Frontlines/.checkpoints/cs1-types/plan-draft.md)
+Key decisions in it:
+- D1 Export without #[ts(export)], TS_RS_EXPORT_DIR or .cargo/config.toml: one unit test per crate builds
+  ts_rs::Config::new().with_out_dir(scratch).with_import_extension(Some("ts")), calls export_all, compares names+bytes with
+  the committed folder; SHAMBLE_WRITE_TYPES=1 regenerates (clears the folder first). set_var is unsafe in 2024 (S10).
+- D2 Layout: const table in client-endpoint, explicit offsets checked by a test; header = tick u32 @0, layout_hash u32 @4;
+  LAYOUT_HASH = FNV-1a 32 (RFC 9923) const fn over canonical LE bytes of every name/type/offset/stride; TS only compares
+  (DataView getUint32 LE) with the generated constant; checkLayoutHash(block: ArrayBuffer): LayoutCheck in packages/types.
+- D3 ts-rs "=12.0.1", default-features = false, [workspace.dependencies] + protocol dev-dependency, derives behind
+  cfg_attr(test); no sim change; no tsconfig committed (tsc from a scratch config under .gate/cs1-types/); Snapshot =
+  header only; every unsure width marked provisional; ~505 hand-written lines.
+Open points: O1 provisional widths/names, mode_hash (A1:686 only); O2 no header counts until cs4's first section;
+O3 check lives in packages/types; O4 R5-TSLINT-OQ3 split (wasm-bindgen half at cs2); O5 add security-auditor.
+Section-2 citation fix applied: the 20 runs and type check come from BP:456-458, G4 from BP:977-978.
+### B9 DONE: 169 lines, max 120 columns (python check), all ASCII; re-read once; citations spot-checked.
+DONE

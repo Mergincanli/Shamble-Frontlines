@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 12:10 CET (from the clock)
+- **Last update:** 2026-11-18 12:43 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -17,9 +17,17 @@
 2. Session check at 11:09 UTC (get_session): model claude-fable-5-2 (configured and last served); context 862,376 of
    1,000,000 tokens used (automatic compaction at 901,600): he is asked to compact; heavy reading goes to agents.
 
+3. engine-architect's plan draft is done (`cs1-types/plan-draft.md`, 169 lines; notes `engine-architect-plan.md`):
+   ts-rs 12.0.1 as a dev-dependency of `protocol` only, derives behind `cfg_attr(test)`; export tests that write to a
+   scratch folder and compare with the committed files (write mode: `SHAMBLE_WRITE_TYPES=1`); the layout table as a
+   `const` in `client-endpoint`, header `tick` u32 at 0 and `layout_hash` u32 at 4, hash FNV-1a 32-bit at compile
+   time; `checkLayoutHash` in `packages/types`; about 505 hand-written lines. The main session read it whole and
+   adopted it in `cs1-types/plan.md` with its decisions on O1 to O5 and seven additions (who builds, the CI edit
+   drafted for him, the test archive, the docs pass, the report, the size, the rules kept).
+
 ## Current step
-3. The plan for change-set 1 (`cs1-types/plan.md`), then the advisor agent's review of it (effort max). No file
-   outside `.checkpoints/` is edited before its APPROVE.
+4. (11:43 UTC) The advisor agent reviews the plan (effort max; notes `cs1-types/advisor-plan.md`). No file outside
+   `.checkpoints/` is edited before its APPROVE.
 
 ## Next steps
 4. Build (Rust: the first message types of `protocol`, the block's layout table in `client-endpoint`, our own small
@@ -54,4 +62,4 @@
 
 ## Running work
 - saver: background task b98z35xsq, started 11:11 UTC on 2026-11-18.
-- agents (1 of 3): engine-architect drafts the plan (`cs1-types/plan-draft.md`; its notes `engine-architect-plan.md`).
+- agents (1 of 3): the advisor agent on the plan.

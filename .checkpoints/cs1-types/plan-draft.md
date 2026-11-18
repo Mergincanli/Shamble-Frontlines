@@ -9,8 +9,8 @@ The page and the simulation share one description of their data, generated from 
 
 ## 2. Done-when and pass marks
 Step 2.4's done-when (A2:1493-1494): "the marks of the spike's item 4 hold in CI" (item 4: A2:1166-1170). "Met": every
-clause holds; "shown": it passed here (BP:208-211). The gate and CI edits that follow (BP:977-978: G4, the 20 runs in
-CI, a type check) are asked of Mustafa with their exact text, drafted in the report (BP:25), outside this change-set.
+clause holds; "shown": it passed here (BP:208-211). The gate and CI edits that follow (G4: BP:977-978; the 20 runs and a
+type check in CI: BP:456-458) are asked of Mustafa with their exact text, drafted in the report (BP:25), not built here.
 - PM-0002-15 (A2:1287): "regenerating every generated type (the ts-rs output, the block's layout and its hash) gives 0
   changed bytes against the committed files; a field renamed in an exported Rust type without regenerating fails; a
   hand edit to a generated file fails". Met here (BP:454): the export tests run in today's `cargo test` (TY:82-83), the
@@ -49,9 +49,9 @@ review: BP:221-222, P15:73. Tier 1: root `Cargo.toml` is unguarded today (BP:219
 npm lockfile, every tsconfig, rustfmt, clippy file (2.3's: BP:964-969, P15:135-137), `.github/`, the other crates.
 
 ## 4. The exact symbols
-**`protocol`** (A2:188): `pub` structs deriving `Debug, Clone, PartialEq, Eq`, plus `#[cfg_attr(test,
-derive(ts_rs::TS))]`; no serde (the codec is cs3's); Rust field names kept in TypeScript. "Prov." = open in the drafts:
-provisional; cs3's codec fixes wire widths; the proof test may move them (BP:1257-1258). Ticks `u32` (A4:185, A4:155).
+**`protocol`** (A2:188): structs, `#[derive(Debug, Clone, PartialEq, Eq)]`, `#[cfg_attr(test, derive(ts_rs::TS))]`,
+no serde (cs3's codec); Rust field names kept in TypeScript. "Prov." = open in the drafts, so provisional: cs3's codec
+fixes wire widths (A1's: A4:155-156), the proof test may move them (BP:1257-1258). Ticks are `u32` (A4:185).
 - `Join` (A1:685): `token: Vec<u8>` (format open, lobby at Slice 3; prov.); `protocol_version: u16` (A1:446-447; prov.);
   `content_hash: [u8; 32]` (SHA-256: A5:431-436).
 - `JoinAccepted` (A1:686): `slot`, `team`, `squad: u8` (prov.; u8 holds 48+); `mode_id: String` (ids are strings:
@@ -62,9 +62,9 @@ provisional; cs3's codec fixes wire widths; the proof test may move them (BP:125
 - `Command` (A1:225-227): `tick: u32`; `sequence: u16` (16-bit or narrower, A1:1607; wraps, A1:234); `move_x`,
   `move_y: i8` (length at most 1, A1:234; prov.); `buttons: u16` (bitfield; buttons come with cs4 and cs8: prov.);
   `presses: [u8; 16]` (a counter per button, A1:1607's width rule; prov.); `aim: AimPoint`; `view_time: ViewTime`.
-- `AimPoint` (A1:226-227, "at most 80 bits"): `x: i16`, `y: u16`, `z: i16` in cm, E3's step and ranges (A1:280), as
-  PM-0002-77 proposes (A2:1286); y up as in three.js, fixed by no draft read (prov.). `ViewTime` (A1:227):
-  `tick: u32`, `fraction: u16` in 1/65,536 of a tick (prov.: the sim's time unit is set at cs4, A4:191-196, BP:768).
+- `AimPoint` (A1:226-227, "at most 80 bits"): `x: i16`, `y: u16`, `z: i16` in cm: E3's position step and ranges
+  (A1:280), the step PM-0002-77 uses (A2:1286); y is up as in three.js, which no draft read fixes (prov.).
+- `ViewTime` (A1:227): `tick: u32`, `fraction: u16` (1/65,536 tick; prov.: the sim's time unit is set at cs4, BP:768).
 - `Snapshot` (A1:683), header only (sections are soldier and event data: cs4, cs8): `server_tick: u32` (A1:318-319);
   `baseline_tick: Option<u32>` (none: coded against defaults, A1:277-278; the 16-bit wire offset is cs3's);
   `newest_command_received`, `last_processed_command: Option<u16>` (sequences, A1:228-230); `group: u8` (A1:293-294).
@@ -113,8 +113,7 @@ It reads the u32 at the generated offset, little-endian, never throws; the page 
   naming `Join.ts`. (3) Control: the rename, `SHAMBLE_WRITE_TYPES=1 cargo test -p protocol --locked`, then the plain
   run, tsc and Vitest pass. (4) A header field added, no regeneration: `cargo test -p client-endpoint --locked` fails;
   the report prints old and new `LAYOUT_HASH` (the page would refuse; the Wasm form is cs2's, BP:455).
-- PM-0002-17's bites: a class with a parameter property, and an `enum`, each in a scratch file, each fails tsc; the
-  result for `declare enum` is recorded (R5-TSLINT-OQ3).
+- PM-0002-17's bites (scratch files): a parameter property and an `enum` each fail tsc; `declare enum` is recorded.
 - PM-0002-19: 20 runs of `SHAMBLE_WRITE_TYPES=1 cargo test --workspace --locked` (default threads), sha256 of every
   generated file after each: one distinct set, and `git diff --exit-code packages/types/src/generated` is empty.
 - Today's CI, no workflow edit, runs the export, rule and hash tests (TY:82; protocol's in release, TY:83), the wasm32
@@ -133,7 +132,8 @@ cargo clippy -p protocol --all-targets --locked -- -W clippy::pedantic -D warnin
 npm ci --ignore-scripts --no-audit --no-fund && node node_modules/typescript/bin/tsc -p .gate/cs1-types/tsconfig.json
 cd packages/types && node ../../node_modules/vitest/vitest.mjs run   # the bin path vitest's package.json names
 node tools/gate.mjs
-test ! -e .cargo/config.toml && git grep -n spikes -- ':!*.md'   # BP:955-959; and no "type" in root package.json
+test ! -e .cargo/config.toml && ! grep -q '"type"' package.json   # BP:955-959, two of the three rules
+! git diff --name-only origin/main... -- ':!*.md' | xargs grep -l spikes   # the third, over this set's files
 ```
 First read the "Lane requests" issue (P15:164-168). Scratch tsconfig, not committed (BP:966-967), text in the report:
 A2:421-426's flags plus `noEmit`, `allowImportingTsExtensions` (stubs import `./index.ts`), `module: "preserve"`,
