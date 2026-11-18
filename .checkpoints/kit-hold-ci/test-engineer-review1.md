@@ -137,3 +137,15 @@ Raw TAP: scratchpad B/<id>.txt.
   main's counts are the same by construction (not re-run in a main worktree).
 - `node tools/gate.mjs --no-smoke`: GATE PASS (5a skipped). It reads legacy/ only: no evidence about this PR's files.
 - `sha256sum` (GNU coreutils 9.4) prints byte for byte the "<hash>  <path>" lines the tests build in Node.
+- Correction to F's first line (coordinator's note ~18:53: compare commits, not the working tree): re-run as
+  `git diff --numstat origin/main 4877599 -- .claude .github`: 10+0, 47+1, 224+1, 12+0 = 293 added, 2 removed.
+  The working tree equals 4877599 for .claude .github legacy tools (`git diff --quiet 4877599 -- ...`); the docs
+  pass touches docs/ only, so every test and gate run above measured the head.
+
+### Block E plan (local plant, started 18:57 UTC)
+Worktree .gate/test-engineer-plant (detached at HEAD), CARGO_TARGET_DIR .gate/test-engineer-plant-target, every
+cargo call `--locked --offline`; no commit: the plant is made in the worktree's own index (`git update-index
+--chmod=+x`) plus the file's bit, which is what a checkout of the CI plant commit gives. Steps: (1) clean: plain
+test, write mode, compare -> empty; (2) the plant: plain test passes, write mode, compare -> " M ...Join.ts";
+(3) a content change: the plain test fails first (ci-evidence's "cannot be reached"); (4) restore, worktree
+removed with `git worktree remove` (no force), my target folder deleted.
