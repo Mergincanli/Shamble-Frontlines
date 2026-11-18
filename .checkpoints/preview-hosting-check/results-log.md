@@ -600,3 +600,10 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   49c5e112-f261-48e8-9b31-ee3d56bf008b):
   git ls-remote at 18:59:29 UTC lists no cs/pd-three and no cs/pdt-three (deleted); cs/pd-one, cs/pd-off, cs/pd-open,
   cs/pdt-one, check-token, setup and main (347d5e0) remain. Case (b) and (b'): merged, branch deleted, as planned.
+
+### Day 1, sitting 3 (the token tests, PM-0006-32; consultation 20's order)
+- His list sent at about 19:06 UTC (the order: off, on; "say "plan order" if you prefer"); no reply before the go; the
+  go by this session's scheduled check-in (fired 19:10:59 UTC).
+- Step 1 (the reviewer off since his untick, 18:08 UTC): cs/b9-edit 7f3a684 pushed at 19:11:17 UTC (deploy.yml = the
+  approved variant fd3dc4c6029b; the other three workflows unchanged); pull request #9 "Token test: cs/b9-edit, the
+  deploy job rewritten" opened right after.
