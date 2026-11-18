@@ -109,6 +109,22 @@ session's text he agreed to, as at rev 3.2). The other 35 are session text: :414
 under his :411-412), :1913, and 33 in the archived card (:2284-6789). L4 item 10's re-run at launch reads its hits the
 same way: a hit passes when its history line lies outside his quoted words.
 
+## 4 The launch fill (L4 item 3): copies once, pointers elsewhere (the coordinator's question, after the dry run)
+Read: u4f-fill-dryrun.md (u4f_fill.py acb9f891…; brief 50530a82…, 1,835 lines; all 36 anchors once; 1,835 -> 2,003).
+**ACCEPT leans (1) to (3)**, under TEST-FIRST rule 3 (history.md:2264-2267); "gone from its every place" asked that no
+placeholder stay unfilled, never that a text be repeated. Conditions, all in the same script run:
+- The asserts gain: each copy's text stands exactly once in the brief, inside item 3's list under its name; every
+  pointer names a Pn whose copy is there; no `<<P`, `<<PV1>>` or `<base>` left but in the three exempt lines (C2's,
+  C28's and 0.5's "Values:" line, named by their text); the 7-word check outside item 3 stays 0. `<base>` and PV1 are
+  values: filled everywhere else, as the dry run does.
+- Pointer form, everywhere else: "Pn (copied in section 12 item 3)"; inside the 2.9 heading the same, nothing more.
+- 0.5: "the main session copies each by script at launch (section 12 item 3)," -> "the main session copies each by script
+  at launch, once, under its name in section 12 item 3's list, every other place pointing there (TEST-FIRST rule 3),".
+- Item 3: "the placeholder gone from its every place in the brief," -> "the placeholder gone from its every place in the
+  brief (its copy once in this list, a pointer elsewhere; C2's, C28's and 0.5's name-only mentions kept),".
+- Quotation marks as lean (3); a copy whose first word would start a line with "#" or a list number stays inside its
+  quotes on that line, so no heading or list item is made. Nothing here goes to Mustafa.
+
 ## Decisions needed
 None. (LEAD-BOUND, the lead bound's first value, is already with Mustafa.)
 
