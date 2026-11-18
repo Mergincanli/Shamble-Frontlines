@@ -176,9 +176,9 @@
 - **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
   `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
   final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,276 B, 29 files: the one snapshot until the merge.
-- **The advisor ENDED 23:18 UTC** (agent ad617f46f49185e8c, 23:04-23:18; general-purpose, opus, xhigh, on main's
-  advisor.md) with its stop ruling, advisor-u4f-stop.md. Next: MAIN-60's plan (main-60-plan.md, on main-54-plan.md
-  and its C1-C7, history.md:2533-2541) to the advisor before it runs; then R3 (iii)'s four hand runs.
+- **The advisor's stop ruling ENDED 23:18 UTC** (agent ad617f46f49185e8c). **MAIN-60's plan** (main-60-plan.md) is
+  with the advisor from 23:25 UTC (agent a43d2f5b263b6c069; its review to advisor-main-60.md; on a cut: SendMessage);
+  then the take-in by its steps, then R3 (iii)'s four hand runs.
 - The saver b4p5xbtmj runs from 22:39 UTC (bgig20ts2 ran 18:11 to about 20:01, its window) (`node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout
   7200000; its window ends about 00:29: restart it while agents run). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
