@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 13:30 CET (from the clock)
+- **Last update:** 2026-11-18 13:48 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -38,38 +38,59 @@
    `~/.cargo/registry/src/index.crates.io-*/`. Committed with "[skip ci]" (both workflows run on every push, and CI's
    `cargo test` would compile ts-rs before the security check). NOTHING has been compiled yet.
 
+6. Build, steps B and C (12:18 to 12:47 UTC), commits ef9741c (work in progress, pushed with the skip mark as the
+   head of its own push, 12:30:22 UTC; no CI run followed) and 82142fa (12:47 UTC):
+   - `crates/client-endpoint`: `layout.rs`, `layout_ts.rs`, `lib.rs`; `crates/protocol`: `messages.rs`,
+     `ts_export.rs`, `lib.rs`; `packages/types`: `generated/block/layout.ts` (`LAYOUT_HASH = 0x2df78c30`),
+     `generated/protocol/` (eight files by ts-rs), `layout-check.ts`, its test, `index.ts`, `index.test.ts`, the
+     description line of `package.json`.
+   - The security answer (12:27 UTC; `cs1-types/security-auditor-deps.md`, block B13): CLEAR TO BUILD for the nine
+     crates. P1 Medium (process: CI run 168 built them before the check). Lows L1 (ts-rs ships no licence file), L2
+     (the draft's "MSRV 1.88.0" is 1.78.0), L3 (the scratch folder; closed in `ts_export.rs`), L4 (the CI cut stops
+     IP traffic only).
+   - The advisor agent on it (received 12:44 UTC; `cs1-types/advisor-security.md`): APPROVE. Condition 3 met for all
+     nine. P1 stays Medium and is a breach, in substance, of CLAUDE.md's Never line "run unreviewed code fetched
+     from the internet" and of condition 3: the report says it in those words. The build did not need his word
+     first. Deviations 1 to 3 accepted. Its two Lows taken in 82142fa (write mode never follows a link; the hash
+     fixtures are valid tables). New finding A1, Medium, on the CI setup (the cut separates the network, not the
+     files or the user: build code could rewrite files that later steps run outside the cut; security-auditor
+     confirms or refutes it in round 1). A decision entry for the report: DEP-HOLD (text in its notes).
+   - **Its conditions from here:** (1) every cargo command with `--locked`; any change to Cargo.lock, a dependency
+     line, a feature or `default-features = false` goes back to security-auditor before anything compiles; (2) ts-rs
+     only through `Config::new()` and the test's own folder: no `#[ts(export)]`, `export_to`, `from_env`; (3) the
+     hold rule for every further dependency (below); (4) the report holds: P1 named as a breach with the record's
+     times (566d1d1 and da22f96 at 12:04:33; run 44300471741 step 7 from 12:04:55 to 12:05:07; the cancel; the chat
+     message), ef9741c and that no CI run followed it, the reach qualified (the branch's caches could not be
+     listed), L1 to L4 and A1 as follow-ups, DEP-HOLD under Decisions needed, and that P1 and A1 are security
+     findings left open, so the pull request is needs-mustafa; (5) round 1's security-auditor covers `ts_export.rs`,
+     both write modes and A1; (6) the report gives the counted size, recounted after every fix.
+   - **The hold rule (the advisor agent's point 3), for every new or bumped dependency in this chat:** (a) keep a
+     text patch of the pending edits in the checkpoint folder; (b) until security-auditor answers nothing builds the
+     dependency graph that holds it, in any worktree (allowed: fetch, tree, metadata, fmt, and `-p` on crates
+     outside its reach, checked with `cargo tree -i`; npm: `--ignore-scripts` and nothing that runs the package);
+     (c) other code is committed by path only (no `-a`, `add -A`, `add .`), after reading `git diff --cached
+     --name-only`; (d) if a dependency edit is committed anyway, nothing is pushed until the answer. A skip mark on
+     a commit that is not the head protects nothing, nor does a cancel. For change-set 1 from now on: push
+     normally; CI may build ts-rs.
+   - Checks by hand on 82142fa's tree, all exit 0: `cargo fmt --all --check`; clippy `--workspace --all-targets
+     --locked -D warnings` for host and for wasm32; `cargo test --workspace --locked` (client-endpoint 5 tests,
+     protocol 2, the four other crates 1 each); `cargo test --release -p sim -p protocol --locked`; the wasm32 build
+     of the five crates; `cargo tree --locked -p protocol -e normal --target wasm32-unknown-unknown` (protocol
+     alone; with `-e dev`: ts-rs v12.0.1); pedantic clippy on `protocol`; tsc by path with both scratch configs
+     under `.gate/cs1-types/` (`tsconfig.json`: tests included, `skipLibCheck`, because Vitest's own `.d.ts` files
+     need DOM names; `tsconfig.shipped.json`: shipped sources alone, library files checked); Vitest in
+     `packages/types` (2 files, 6 tests); `node tools/gate.mjs --no-smoke` PASS; the repository map check OK (129
+     entries cover 109 paths); no `.cargo/config.toml`, no "type" in the root `package.json`; no non-Markdown file
+     of the set names the spike's folder.
+   - No "Lane requests" issue exists (12:28 UTC: the only open issue is the Night queue, #16).
+   - Size, counted on 82142fa against main (generated files and the lockfile left out): 757 lines added, 12
+     removed; 1.26 times the plan of 600; stop line 1,200.
+
 ## Current step
-6. Build. The work so far is committed as ef9741c (12:30 UTC, "work in progress", the head of its own push, with
-   the skip mark; pushed by its exact SHA with the saver stopped; checked right after the push, 12:30 UTC: no CI run started, the newest
-   runs on the branch are still 168 and 869 on da22f96). It also holds `packages/types/src/index.ts`, `index.test.ts`
-   (they wait for the generated message files) and the package's new description line. No "Lane requests" issue
-   exists (12:28 UTC: the only open issue is the Night queue, #16). Earlier note, kept:
-   Build, in the working tree only (NO code commit before the security answer; see the rule below). State at 12:26 UTC:
-   - DONE, uncommitted: `crates/client-endpoint/src/layout.rs` (243 lines), `layout_ts.rs` (141), `lib.rs` (8);
-     `packages/types/src/generated/block/layout.ts` written by write mode (`LAYOUT_HASH = 0x2df78c30`);
-     `packages/types/src/layout-check.ts` and `layout-check.test.ts`. Checks run on them: `cargo fmt --all --check`
-     ok; `cargo test -p client-endpoint --locked` 5 passed; clippy `-p client-endpoint --all-targets -D warnings` clean
-     for host and wasm32; Vitest in `packages/types` 5 passed (2 files; the stub test still there); tsc by path, 0
-     errors, with two scratch configs under `.gate/cs1-types/` (`tsconfig.json`: tests included, `skipLibCheck`,
-     because Vitest's own `.d.ts` files need DOM names; `tsconfig.shipped.json`: shipped sources alone, library
-     files checked). `npm ci --ignore-scripts` was run (46 packages, the locked ones).
-   - WRITTEN, NOT COMPILED (formatted only): `crates/protocol/src/messages.rs` (116 lines, the eight types),
-     `ts_export.rs` (106; scratch folder made with an exclusive `create_dir` under the temporary folder, pid plus a
-     counter, never reused or cleared; removed after a pass), `lib.rs` (modules; the overflow test kept).
-   - LEFT after the advisor agent's ruling: compile and test `protocol`; write mode for `generated/protocol/`;
-     `packages/types/src/index.ts` and `index.test.ts` (the stub `PACKAGE` goes); the description line in
-     `packages/types/package.json`; section 6's checks; the planted defects; the 20 runs.
-   - **The security answer is in (12:27 UTC; `cs1-types/security-auditor-deps.md`, block B13): CLEAR TO BUILD for the
-     nine crates.** One Medium, P1, a process finding: CI run 168 built them before the check (block B14: small
-     reach, the code that ran is reviewed clean; fix: dependency edits stay uncommitted until the check answers).
-     Lows: L1 ts-rs ships no licence file (MIT declared); L2 the draft's "MSRV 1.88.0" is 1.78.0 in the published
-     manifest (correct it in the report); L3 the scratch folder (taken into `ts_export.rs` as above); L4 the CI cut
-     stops IP traffic only (R6, later). Not checked by it: listed at the end of B13.
-   - **The advisor agent rules on it now** (started 12:28 UTC; notes `cs1-types/advisor-security.md`; the plan: a
-     finding at Medium or above stops the build and goes to the advisor agent). Until its APPROVE nothing that
-     compiles ts-rs runs and no code commit is made. If the agent is lost: start it again with the same five
-     points (does the answer meet condition 3; P1's severity and whether Mustafa's word is needed first; the fix
-     for dependency changes and a decision entry on the kit option; L3; the three deviations and the size).
+7. (12:48 UTC) The push of 82142fa (this save: CI runs `gate` and `toolchain` on it, the first CI build after the
+   ruling). Then: the planted defects (`bash .checkpoints/cs1-types/plant.sh >
+   .checkpoints/cs1-types/plant-results.txt 2>&1`; worktree `.gate/cs1-types/plant`, removed by the script) and the
+   20 runs (`runs20.sh` beside it), then the reviews.
 
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
@@ -83,10 +104,7 @@
   before the first build) is missed for that one CI run. security-auditor was told at 12:06 UTC and adds to its
   answer what that run could reach and the miss's severity; the miss goes to Mustafa (told in chat), to the advisor
   agent with the security answer, and into the report.
-- **Rule until the advisor agent's APPROVE on the security answer:** nothing that compiles ts-rs runs here, and no push
-  may start CI: a code commit is pushed only as the head of its own push with "[skip ci]" in its message, by its exact
-  SHA (`git push origin <sha>:refs/heads/<branch>`), with the saver stopped first (TaskStop) and started again after.
-  A foreground `checkpoint.mjs save` is run only when no code commit is ahead of the remote.
+- The rule that held until the advisor agent's APPROVE (12:44 UTC) is over: see step 6's hold rule for what binds now.
 
 ## Build notes (the main session's design choices, to carry out and to list in the report's deviations)
 - `crates/client-endpoint/src/layout.rs`: `ElementType { U8, U32 }` with `const fn name()` ("u8", "u32") and `const fn
@@ -118,8 +136,8 @@
   (one per rule); added rule: a stride is a multiple of the section's largest field (ADR 0002 part 5: "each section is
   aligned to its largest element type"). `hash_covers_every_value` has eight changed tables (also the order of two
   fields). The shipped table uses `#[rustfmt::skip]` with one field per line.
-- **Size so far:** client-endpoint 392 lines against 213 planned (rustfmt's default widths and the bites); the whole
-  set is heading for about 700 against 600 planned (stop line 1,200).
+- **Why the size grew:** client-endpoint is 392 lines against 213 planned (rustfmt's default widths; the rules check's
+  nine bites; eight hash tables), protocol 230 against 185 (a doc line per field), the TypeScript 131 against 105.
 - Then `protocol` (after the security answer): `messages.rs` with the eight types of the draft's section 4 (doc lines
   mark every provisional field, the two acknowledgement fields of `Snapshot` included, and the module doc names
   OQ-0001-6, OQ-0001-7, R2-XU-OQ4, the mode hash and the join token's format); `ts_export.rs`
@@ -161,5 +179,4 @@
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
   stopped at 12:30:03 UTC for the code push).
-- agents (1 of 3): the advisor agent on the security answer and the CI miss (started 12:28 UTC). security-auditor
-  finished its notes at 12:27 UTC (DONE).
+- agents: none running (security-auditor finished 12:27 UTC, the advisor agent 12:44 UTC).
