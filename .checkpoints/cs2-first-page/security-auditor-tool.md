@@ -51,3 +51,38 @@ Plan: read plan.md s6-7 + advisor F2; read the 0.2.130 release page/assets via W
   = local sha256 of the curl'd file. Source-code archives are not subjects (GitHub docs S6: made on request).
   So the attestation BINDS: tag -> commit -> asset name -> sha256. It says NOTHING about how the binary was built (no
   workflow, runner or source-to-binary link). Signature not yet checked (needs exact bytes + trust root).
+- 21:42 S9 signing certificate (bundle's verificationMaterial.certificate.rawBytes, 748 b64 chars, transcribed through
+  WebFetch in 8 chunks into tool-check/attestation-cert.webfetch.b64; DSSE sig 96 chars, no keyid, into
+  attestation-sig.webfetch.b64). openssl x509 -text: Issuer "O=GitHub, Inc., CN=Fulcio Intermediate l1"; Subject
+  "O=GitHub, Inc., CN=Attester"; serial 14:4b:1b:8a:...:d3:43; valid 2026-06-12 to 2027-06-12 (one-year cert, not a
+  10-minute Fulcio identity cert); P-256 key; KU digitalSignature (critical); EKU codeSigning; CA:FALSE; AKI
+  C0:E1:B8:52:A4:4B:4F:3E:DE:7A:38:11:06:CF:49:8E:A1:45:9B:33; SAN URI https://dotcom.releases.github.com; signed
+  ecdsa-with-SHA384. = GitHub's own Sigstore instance (GitHub's CA), signer identity "GitHub releases", not a workflow.
+- 21:43 S10 DSSE signature CHECKED here (python3 -I + openssl only): PAE = "DSSEv1 28 application/vnd.in-toto+json 2670 "
+  + payload (2,714 B); `openssl dgst -sha256 -verify attester-pub.pem -signature sig.der pae.bin` -> "Verified OK" (sig =
+  DER ECDSA, 70 B). Negative control: musl digest's first digit 9->8 in the PAE -> "Verification failure", exit 1.
+  Proves: payload + signature + cert public key were transcribed exactly, and the statement (tag 0.2.130 -> commit
+  c93b8ae... -> musl tarball sha256 9687f3bb...227f) was signed by the "Attester" key of the cert. NOT proved here: that
+  the cert chains to GitHub's root (needs "Fulcio Intermediate l1" + root from GitHub's trusted_root.json, TUF repo
+  tuf-repo.github.com, root embedded in gh) and the RFC 3161 timestamp (needs the TSA chain from the same trusted root).
+  Cert bytes outside the key (names, SAN, extensions) are only checked by that chain step.
+- 21:45 S11 release pipeline at the tag commit (WebFetch of raw.githubusercontent.com/wasm-bindgen/wasm-bindgen/c93b8ae.../.github/workflows/{release-tag,main}.yml;
+  fetch-model quotes, data only): release-tag.yml (on CI completed on main; permissions {} / contents: read; creates the tag
+  with a GitHub App token "permission-contents: write" when Cargo.toml's version changed). main.yml on the tag push: 7 dist_*
+  jobs on GitHub-hosted runners, e.g. dist_linux_x86_64_musl: `cargo build --manifest-path crates/cli/Cargo.toml --target
+  x86_64-unknown-linux-musl --features vendored-openssl --release` (no --locked shown); uses actions/checkout@v7,
+  dtolnay/rust-toolchain@stable, actions/upload-artifact@v7 (tags, not SHAs). deploy job (contents: write): `tar czvf
+  gh-release/$name.tar.gz -C tmp $name` + `sha256sum gh-release/$name.tar.gz > gh-release/$name.tar.gz.sha256sum` (explains
+  the "gh-release/" prefix), draft release via softprops/action-gh-release@v3. publish job: environment "publish" (approval
+  per the release-tag comment), id-token: write, rust-lang/crates-io-auth-action@v1 = crates.io TRUSTED PUBLISHING,
+  `./publish publish`. release job: `diff built uploaded` then `gh release edit ... --draft=false --latest`.
+  "No attestation step exists" (no attest-build-provenance / cosign): NO build provenance for the binaries. The only signed
+  statement is GitHub's release attestation (integrity vs the release, not how it was built).
+- 21:46 S12 crates.io API https://crates.io/api/v1/crates/wasm-bindgen-cli/0.2.130 (WebFetch): created_at
+  2026-10-30T06:15:16.195867Z; checksum c37f6904387d19a319525c74af274c73912f3871c35555aa49f3ea64ebb2fc7a; crate_size 56,655;
+  not yanked; MIT OR Apache-2.0; rust_version 1.86; published_by null; trustpub_data {provider github, repository
+  wasm-bindgen/wasm-bindgen, run_id 41011884567, sha c93b8ae848d4d9e6beaeaf9516e18a7cadd818a2} = SAME commit as the release
+  tag; bins wasm-bindgen, wasm-bindgen-test-runner, wasm2es6js; features default ["rustls-tls"] (ureq/rustls), native-tls,
+  openssl (dep:native-tls), vendored-openssl ["openssl","native-tls/vendored"]. Timeline: assets uploaded 06:11:06-07Z,
+  crate published 06:15:16Z, release published 06:16: one tag run. The prebuilt Linux binaries are built with
+  --features vendored-openssl ON TOP of default rustls (OpenSSL C sources compiled in); `cargo install` default = rustls only.
