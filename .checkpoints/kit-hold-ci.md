@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 19:42 CET (from the clock)
+- **Last update:** 2026-11-18 20:03 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -248,7 +248,7 @@
       the final files, 113 lines: script 6, tests 67, rules 2 added; none removed) regenerated at 18:07 UTC.
     - `kit-hold-ci/decisions.mjs` now holds his three messages (not run yet).
 
-23. engine-architect's draft of change-set 2's plan is written (17:20 to about 18:09 UTC):
+23. engine-architect's draft of change-set 2's plan is written (17:19:38 to about 18:09 UTC):
     `kit-hold-ci/cs2-plan-draft.md` (777 lines) and its notes; nothing built, no library fetched. Its summary: the
     Rust simulation as WebAssembly in one Worker at 30 ticks a second, one block per tick to the page, an empty lit
     ground with a 1 m grid, the backend named, the small server for Brave. New libraries: wasm-bindgen =0.2.130 (and
@@ -316,13 +316,28 @@
     Oversight"); they stay. At 18:11:53 I had removed the stray folder `run-final-GbS2` with the same kind of call;
     the settings deny `rm -rf`, so that was a route I should have asked for. Both in the draft.
 
+34. **docs-keeper** (18:33:06 to about 19:01 UTC; `kit-hold-ci/docs-keeper-notes.md`, moved lines in
+    `docs-keeper-moved-lines.md`): STATUS (120 lines: #58 merged, #60's row, Next, Waiting on Mustafa, three
+    follow-up bullets, the binding line reworded), the archive (+123: #58's row in merged form, #58's follow-ups
+    copied, the block for #60 with his list for the gate v2's plan and every reviewer's line), ROADMAP (#60's entry;
+    #58 MERGED; #46's entry folded into Build history), the map (the report's row; one own line corrected). Moved by
+    script, byte for byte: 13 lines (STATUS:29 to the archive; ROADMAP:259-270 to ROADMAP:108-119). Its
+    RECORD-FILES check: no other lane's line changed unless moved byte for byte. Lines of other pull requests that
+    now say less than the code does are left and listed (the map's rows for the checkpoint rules, the script and the
+    workflow; two archived follow-ups): its question REC-OLD for Mustafa, in the report. Main on GitHub: 9b4b518,
+    with `gate` run 884 and `toolchain` run 182 green (read by me with the GitHub tools at 19:02 UTC).
+35. **The report is written**: `docs/reports/2026-11-18-kit-hold-ci.md` (604 lines; the changed lines in full; the
+    five open Mediums under their own heading; "What went wrong" with four items: the hole, the chat's mode at the
+    writes, the count, the times). Checked by script (19:03 UTC): every one of 16 quotes of his words stands word
+    for word in his three messages or in DECISIONS; my four questions stand in the session's record at 16:23:55 and
+    17:48:13 UTC. The map check: OK (140 entries, 109 paths). Main fetched again at 19:02 UTC: still 9b4b518.
+
 ## Current step
-34. (18:42 UTC, from the clock) Running: docs-keeper (since 18:33:06; it was sent test-engineer's follow-up
-    lines). All reviews and the verifier are in; nothing is Critical or High, so nothing changes in the kit or CI
-    files. When docs-keeper is in: its moved lines into the report; the report from the draft into
-    `docs/reports/2026-11-18-kit-hold-ci.md`; the map check; main fetched again; one docs commit by path; push;
-    the advisor agent on that head; then the last commit (the checkpoint deleted, the report names the commit
-    before it; no skip mark); CI on it; the pull request's description, "ready", the label needs-mustafa.
+36. (19:03 UTC, from the clock) Commit the docs pass and the report by path; push; read CI; the advisor agent on
+    that head (its notes: `kit-hold-ci/advisor-final.md`). Then save the notes a last time; the last commit deletes
+    `.checkpoints/kit-hold-ci*` and writes the name of the notes' commit into the report ("Where the notes are");
+    no skip mark; CI on it; the advisor agent's word on the final head into the pull request's description; "ready";
+    the label needs-mustafa. No agent is running.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
@@ -339,8 +354,8 @@
 
 ## Running work
 - saver: background task b4bg0wkfu, started 18:04 UTC on 2026-11-18 on the fixed script (2-hour limit).
-- agents: docs-keeper (since 18:33:06 UTC). Done: infra-engineer, engine-architect (change-set 2's plan draft),
-  security-auditor, test-engineer, the verifier.
+- agents: none running. Done: infra-engineer, engine-architect (change-set 2's plan draft), security-auditor,
+  test-engineer, the verifier, docs-keeper.
 
 ## For the list of the quality gate v2's plan (his words of 15:38 and 18:01 UTC)
 - A CI check that refuses to build when the lockfile gains an entry with no recorded review (DEP-HOLD's option (c)).

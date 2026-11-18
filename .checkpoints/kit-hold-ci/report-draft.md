@@ -14,9 +14,10 @@ Nothing a player sees, hears or feels.
 
 ## Outcome
 DONE: written with the texts he said yes to, reviewed in one round, verified. It waits for the Advisor's check of
-this report and then for Mustafa's go on the merge. No finding is Critical or High. **Two Medium findings of the
-security review stay open as follow-ups**, by his word of 18:01:08 ("A later finding on them that is not Critical or
-High becomes a follow-up"): they stand under "Open findings". What went wrong on the way comes first.
+this report and then for Mustafa's go on the merge. No finding is Critical or High. **Five Medium findings stay
+open as follow-ups**, by his word of 18:01:08 ("A later finding on them that is not Critical or High becomes a
+follow-up"): two of the security review and three missing tests. They stand under "Open findings". What went wrong
+on the way comes first.
 
 ## What went wrong on the way
 1. **A hole in my own changed lines stood on the pushed branch for 45 minutes** (17:18:16 to 18:03:10).
@@ -73,6 +74,11 @@ High becomes a follow-up"): they stand under "Open findings". What went wrong on
      a lockfile quotes each record (with the commit it was pushed in) and the security answer it names; the review
      checks every changed manifest at the head against those lines or main.
    - Until then, by practice and with no kit change: change-set 2's report does exactly that.
+3. **Medium, three times (test-engineer): three behaviours of the hold are pinned by no test.** They hold by code
+   reading and by probes, and the report does not call them tested: main's side of the "equal to main" comparison
+   is read at the exact path; a `deleted  <path>` line does not release a plain file that still exists;
+   `origin/main` is compared, not a local `main`. The follow-up: a test for each (test-engineer wrote a scratch
+   test for each, which passes on this head and fails on a broken copy).
 
 ## His words, the questions put to him in chat, and his answers
 His three messages of today stand word for word in `docs/DECISIONS.md` (by script, this pull request's docs pass):
@@ -105,8 +111,8 @@ Also carried out from his message of 15:38:13, outside this pull request: #58 me
 the merge message); the "Lane requests" issue opened as #59 (his LANE-ISSUE (a)); #58 not watched (WATCH-58 (b)).
 
 ## Plan and approval
-- The plan: `.checkpoints/kit-hold-ci/plan.md` at commit CHECKPOINT-COMMIT. Planned size: 150 added lines; the stop
-  line (twice the plan): 300.
+- The plan: `plan.md` in the notes (see "Where the notes are", below). Planned size: 150 added lines; the stop line
+  (twice the plan): 300.
 - The advisor agent on the plan (15:46 to 16:07): APPROVE on eight conditions, all taken. On the revised kit text
   (16:18): REVISE, one test step never reached the hold; fixed and shown failing on a broken copy (16:22), which was
   its condition for APPROVE. On the lines changed after his KIT-TEXT answer (16:51 to about 17:10, one read, as he
@@ -220,7 +226,7 @@ endpoint; the excerpts stand in `ci-evidence.md` in the notes):
 | 0c0e271 | the planted change | `toolchain` push 44357616602 (job 134989872637); pull request 44357633651 (job 134989932210) | both failed at the compare step; each job's log ends with "writing the generated types again changed:", " M packages/types/src/generated/protocol/Join.ts" and "Process completed with exit code 1." (17:21:20 in the push job, 17:21:21 in the pull request's) |
 | 415bd73 | the plant taken back (pushed after both plant runs had ended) | `toolchain` push 44357864275, pull request 44357881263; `gate` push 44357864589, pull request 44357881162 | all success |
 | 4877599 | the fix | `toolchain` push 44365431438, pull request 44365446199; `gate` push 44365431235, pull request 44365445961 | all success |
-| FINAL-HEAD | this report's head | PENDING | PENDING |
+| the head that carries this report | the docs and the report | read after the push | they stand in the pull request's description |
 
 - **The stop rule** for the new CI lines (none had run on a runner before; if the clean run failed on one, or the log
   did not show "Cache mode: none": stop and tell him): not triggered.
@@ -242,7 +248,8 @@ endpoint; the excerpts stand in `ci-evidence.md` in the notes):
     same user and could silence both. They guard against honest mistakes.
 
 ## Reviews
-One round, on the final text. PENDING: the advisor agent.
+One round, on the final text. The advisor agent reviews the head that carries this report, as it reviews every
+pushed head; its verdict stands in the pull request's description.
 
 - **security-auditor** (the kit hold, and a security read of the CI edits; 18:03:55 to about 18:31; about 85 probe
   runs in scratch repositories): nothing Critical or High; two Mediums (under "Open findings"), two Lows and wording.
@@ -316,9 +323,9 @@ One round, on the final text. PENDING: the advisor agent.
 - **Models:** this chat runs Fable 5.2 (checked 15:38 and 16:40). It wrote the kit edit under his DEP-HOLD ("my
   exception to the kit freeze, for this one change") and the two CI edits under his GATE-FOLLOW (b) with (i). The
   guard is not touched. Every agent ran on Opus 5.5 at effort max.
-- **Change-set 2's plan** was drafted beside it by engine-architect (17:19 to about 18:09), as he allowed: a draft in the
-  notes (`cs2-plan-draft.md`, 777 lines); nothing of it is built, no library is fetched, no manifest is touched. It
-  is not part of this pull request's review. It is taken up from CHECKPOINT-COMMIT when change-set 2 starts.
+- **Change-set 2's plan** was drafted beside it by engine-architect (17:19 to about 18:09), as he allowed: a draft in
+  the notes (`cs2-plan-draft.md`, 777 lines); nothing of it is built, no library is fetched, no manifest is touched. It
+  is not part of this pull request's review. It is taken up from the notes' last commit when change-set 2 starts.
 
 ## Not covered, and not verified
 **Not covered by the hold, by his choice** ("Keep it to that: no guard change and no longer watch list now"):
@@ -409,8 +416,16 @@ note).
   kit's four test files run in no CI job;
 - infra-engineer's lines for the quality gate v2's list.
 
-**Carried from #58**, unchanged: round 2's Lows of change-set 1; the two doc lines that claim more than the code
-does (to be corrected in the next pull request that touches those files: this one does not).
+**Carried from #58**, unchanged: round 2's Lows of change-set 1; the doc lines that claim more than the code does
+(`crates/protocol/src/ts_export.rs`, `crates/client-endpoint/src/layout_ts.rs`, `crates/protocol/src/messages.rs`;
+to be corrected in the next pull request that touches those files: this one touches none of them).
+
+**Lines of the record files that now say less than the code does**, left because other pull requests wrote them
+(his RECORD-FILES; docs-keeper's list): `docs/REPO_MAP.md`'s rows for `.claude/CHECKPOINTS.md` (no word of the
+hold), `checkpoint.mjs` (the same) and `toolchain.yml` (no word of the compare step, the type checks and
+`cache-mode: none`); in `docs/STATUS_ARCHIVE.md` the follow-up TSCONFIG ("CI prints `tsc --version` only"), the
+follow-up SETUP-NODE-CACHE, and citations of 2026-11-13 whose line numbers in `checkpoint.mjs` and `toolchain.yml`
+have moved; STATUS's "CI green on 82c605e". See the decision REC-OLD.
 
 ## Risks
 - The hold is a seatbelt in one script. A session that pushes by hand is not held; the rule line says so.
@@ -431,10 +446,44 @@ agent's fix and the fix he said yes to as KIT-FIX.
 KIT-CHANGE-DIFF
 
 ## Every line the docs pass moved (his OLD-LINES: "Its report lists each line it moved.")
-PENDING
+Moved by script (`docs-keeper-move.mjs` in the notes), byte for byte, with a sha256 of each block at both places:
+
+| # | From | To | First words | Written by |
+|---|---|---|---|---|
+| 1 | `docs/STATUS.md`:29 (1 line) | `docs/STATUS_ARCHIVE.md`:159, "In flight", first row | "\| #58 \| change-set 1 of the build plan, Types (foundation step 2.4), by lane 1:" | this lane (#58) |
+| 2 | `docs/ROADMAP.md`:259-270 (12 lines) | `docs/ROADMAP.md`:108-119, "Build history", after #44's entry | "**Kit v3.5, the guard's rename gap [2026-11-09 to 11-10, MERGED]**" | #52 |
+
+- Why: (1) #58 is merged (9b4b518); after the move its cells were put into the archive's four-column form, as #57's
+  row was by the last pass (this lane's own line). (2) Pull request #46 is merged (2d22b69, 2026-11-10); "Recent
+  work" would have held 13 entries with #60's, so the oldest folds into "Build history".
+- Separators: one blank line removed (ROADMAP:258) and one added (ROADMAP:107).
+- Not a move, a copy: the "Follow-ups" lines of `docs/reports/2026-11-18-cs1-types.md` (its lines 234 to 268) were
+  copied by the same script into the archive's live "Follow-ups", each indented by two spaces; the report keeps
+  them.
+- The line numbers are those right after the script ran; later edits of the same pass shift some.
+
+## Where the notes are
+The checkpoint of this change-set (`.checkpoints/kit-hold-ci.md`) and its notes folder are deleted in the pull
+request's last commit, as the rules ask. They stay readable at the commit before it, NOTES-COMMIT: the plan, the
+advisor agent's notes, the three reviews, the verifier's notes, docs-keeper's notes and scripts, his three messages
+as saved by script, the texts he said yes to (`kit-edit-as-shown.diff`, `kit-fix2.diff`), `ci-evidence.md`, the replay
+and the probe with their results, and the draft of change-set 2's plan.
 
 ## Decisions needed
-PENDING
+**REC-OLD: who may correct a line of the shared record files when the pull request that wrote it is long merged?**
+- Why it matters: the map you and the Advisor read first now says less than the code does in three rows (the
+  checkpoint rules, the checkpoint script, the `toolchain` workflow), and two archived follow-ups are out of date.
+  Your RECORD-FILES and OLD-LINES let a docs pass move such lines byte for byte, never reword them.
+- Options: (a) a docs pass may correct such a line when the code it describes has changed, and its report lists
+  each line it corrected, with the old and the new text; (b) leave them, and each report lists them as out of date.
+- Recommendation: (a). It does not block this pull request.
+
+Not asked again, because you have answered them: the five open Mediums are follow-ups by your word of 18:01:08. If
+you want one fixed before the merge, say so: each is a kit edit and comes to you with its exact text first.
 
 ## For Mustafa
-PENDING
+1. Pass this report to the Advisor (your words: "Its ready report goes to the Advisor before my go").
+2. After the Advisor's check: your go on the merge of #60 in the build chat, for the head the pull request shows
+   then. It merges by a merge commit with your words in its message, as #58 did.
+3. Answer REC-OLD when it suits you.
+4. Still open from #58: did its test zip save and unpack on your laptop?

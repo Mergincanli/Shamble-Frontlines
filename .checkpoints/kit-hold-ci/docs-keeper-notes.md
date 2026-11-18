@@ -118,3 +118,61 @@ B11. DONE and the answer.
   bullet, the two doc lines' files named), :103-104 his gate v2 list, :105-106 the binding line (CHECKPOINTS.md §3's
   hold + the advisor agent's ruling of #58: uncommitted, nothing builds the graph, --locked). STATUS = 120 lines; no
   own prose line over 120 chars. Next B6 (archive).
+- B6 done: archive :159 #58's moved row (own) edited into four cells: bold title + Work (its follow-ups' names and a
+  pointer to "From change-set 1, Types (PR #58)"); Branch "merged: PR #58 ..., 9b4b518, 15:39:28 UTC (merged_at
+  15:39:29), on his go of 15:38:13 UTC for head 1bfe462..., after the advisor agent's APPROVE (in the PR's
+  description); CI green on main (gate 884 with smoke, id 44338178450; toolchain 182, id 44338178455)"; State: what he
+  accepted (paraphrased; one quote "written down, not waived", DECISIONS:194), his five answers with what each led to
+  (#60, #59 opened 15:41:35 UTC); Waiting "none". Follow-ups: header of mine before the copy (quote DECISIONS:197 exact)
+  + the copy (report :234-268) + a "Since" note (CI-CUT part 1 = #60's, part 2 on his gate v2 list; the two doc lines'
+  files and lines [verified]: ts_export.rs:76, layout_ts.rs:58, messages.rs:56; #60 touches none). New block "From the
+  kit hold and two CI edits (PR #60)": his gate v2 list in his words (DECISIONS :201, :205, :146; option (c) quoted
+  from #58's report :356-357), the reviewers' lines (infra L1, L5, Q7; test-engineer F11; security-auditor's "Not
+  covered"), security-auditor F1 and F3 (open Mediums) and F2, F4, F5; test-engineer F1-F3 and F4-F10; infra L2, L3,
+  L4, L6. Health: one new row of mine "CI on main, latest" (9b4b518: gate 884 + smoke, toolchain 182); the old "CI on
+  main" row (#52's, 44446a5) left. No added prose line over 120. Archive = 1407 lines. Next B7 (ROADMAP).
+- B7 done: ROADMAP: #60's entry (new, :157-164, "[2026-11-18, PR #60, in flight]", 8 lines; codes glossed in place;
+  "Next: the Advisor's check of its ready report, then his go" stays true whatever the last verdicts say); #58's entry
+  (own) -> "[2026-11-18, MERGED]", its middle lines unchanged, its last line replaced by 4 lines (Merged: PR #58,
+  9b4b518, 15:39:28 UTC, by merge commit, on his go after that APPROVE; CI green on main: gate 884 with smoke,
+  toolchain 182; the two misses accepted; five answers -> #60, #59, no watch). Recent work = 12 entries (#60 .. #49);
+  #46 folded at :108-119 (B4). ROADMAP = 282 lines. Next B8 (REPO_MAP).
+- B8 done: REPO_MAP: one new row of mine after #58's report: `docs/reports/2026-11-18-kit-hold-ci.md` (the report of
+  PR #60, with the hold, `CHECKPOINTS.md` §3, and the three CI additions named). Map check: "in the map but not in the
+  repository: docs/reports/2026-11-18-kit-hold-ci.md", exit 1 (the main session writes the report after this pass).
+  The same check logic without that row: missing 0, stale 0, 139 entries cover 109 required paths. Left, other
+  lanes' lines (RECORD-FILES), now less than complete: :97 `.claude/CHECKPOINTS.md` (9660197, #55: names §3's saver
+  rule, not the hold), :135 `.claude/scripts/checkpoint.mjs` (550856a, #48: "Commits and pushes `.checkpoints/` only",
+  nothing on the hold), :165 `.github/workflows/toolchain.yml` (550856a, #48: lists the steps inside the cut without
+  the write-and-compare and the two type checks, and no word of `cache-mode: none`); :136 the tests row has no count,
+  still true; :6 "Last checked: 2026-11-17" (#55). Issues: REPO_MAP lists files only; #59 named in STATUS's Part 15
+  item (own line). Next B9 (drift).
+- B9 done (drift; docs/ without reports/, research/, DECISIONS.md; greps for the checkpoint script, toolchain.yml and
+  the job's steps, #58's state, type checking, the cache): fixed, this lane's lines: STATUS (B5), ROADMAP #58 (B7),
+  REPO_MAP :26 (500757c, #58: "the tests compare every file byte for byte" -> in `protocol/` and `block/`, a file
+  directly in generated/ refused, a third folder unnoticed [verified: ts_export.rs:56-63, :136-155; layout_ts.rs:112-134];
+  CI writes it again and compares, PR #60 [verified: toolchain.yml :85-87]). Left, other lanes' lines, listed for the
+  answer: archive :669 TSCONFIG "CI prints `tsc --version` only" (3f98c0b/554face, #52; after #60 CI also type-checks
+  packages/types with strict flags, still no tsconfig); archive SETUP-NODE-CACHE (~:687, #52; the toolchain job now
+  runs with cache-mode none, gate.yml unchanged); archive :699 `checkpoint.mjs:168` and :731-736 `toolchain.yml:78`,
+  `:82-87` (dated citations [verified 2026-11-13]; the lines moved); REPO_MAP :97, :135, :165 (B8); STATUS :22-23
+  "CI green on 82c605e" (9660197, #55); archive Health "CI on main" (44446a5; my "latest" row above it). No claim in
+  START_HERE, MODULE_MAP, TECHNICAL, ART_DIRECTION, ANIMATION_PLAN or docs/adr/ about the checkpoint script or the
+  toolchain job's steps (grep empty). Next B10 (checks).
+- B10 done (19:00 UTC, date -u): STATUS 120 lines; the only prose line over 120 is :23 (#55's, unchanged); added lines
+  in the four files: none over 120 (the indented copy peaks at exactly 120). Table cells: STATUS #60 row 5, archive
+  #58 row 4. RECORD-FILES proof (docs-keeper-blame-check.mjs, adapted: own = #56, #57, #58 commits): "31 removed lines
+  checked; 0 not this lane's and not moved" (own 18: STATUS 15, ROADMAP 2, REPO_MAP 1; moved 12; blank 1); the archive
+  gained lines only. Map check: exit 1 on the report only (the main session writes it next); without that row: OK, 139
+  entries cover 109 paths. numstat: REPO_MAP +2 -1 (166), ROADMAP +27 -15 (282), STATUS +15 -15 (120), archive +123 -0
+  (1408). Untouched: DECISIONS.md (committed a18a62b by the main session), docs/reports/, code, kit.
+  Late fix in B5's bullet: "From change-sets 0 and 1 (PRs #56, #58) and Part 15" now also names "#58's other
+  follow-ups" (its security check's Lows and its later-change lines), so none of #58's open items drops out of STATUS.
+- For the caller: (1) #60's own findings ride in its In flight row, not in STATUS's Follow-ups section (120-line cap;
+  precedent #56/#58 rows); their text is in the archive now. (2) REPO_MAP :97, :135, :165 and the archive's TSCONFIG
+  and SETUP-NODE-CACHE lines are other lanes' and now less than complete; RECORD-FILES + OLD-LINES leave no lane
+  that may reword them (a possible question for Mustafa). (3) Report draft vs the record: engine-architect's start
+  17:19 (draft) vs 17:20 (card step 23); "Two Medium findings" in Outcome/Open findings predates test-engineer's
+  three Mediums; the "new tests bite" table cites broken-main-before-plain and broken-main-pathspec, which
+  test-engineer says no longer bite at head (High if presented as evidence about this head).
+DONE
