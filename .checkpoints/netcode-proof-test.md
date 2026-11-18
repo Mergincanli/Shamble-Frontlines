@@ -59,8 +59,12 @@
   (i) and (iii) (c); Q8 (b) at 400 ms; Q18 (a) with (ii) (d); the rest at :173-198). After the fold: at least +118
   measured tests, +133 bites build, 67 negative cases, 21 pre-runs, disk about 3,727 MiB, planned size about 5,150
   added lines (4,200 to 6,200; his stop past 6,000).
-- **Progress 2026-11-18 (from 00:41 UTC):** L2's draft written (u4f-lead-bound.md); its two reads RUNNING (the
-  advisor: notes advisor-u4f-lead-bound.md; the test-engineer: test-engineer-u4f-lead-bound.md); L1's fold RUNNING (one
+- **Progress 2026-11-18 (from 00:41 UTC):** L2 DONE: u4f-lead-bound.md drafted, read once by the advisor and the
+  test-engineer (both SEND WITH EDITS: advisor-u4f-lead-bound.md, test-engineer-u4f-lead-bound.md), every edit applied
+  (the movement reading in its own section with the honest reference on the same live ticks; both check names quoted
+  from marks.json:5027, :5039; `ticks_for_ms_at(rate, 400)`; full-speed walking at 6 m/s; option A and B glossed), and
+  **posted to him in the day's message (2026-11-18); WAITING for his yes**. The advisor's walking-only line for the
+  fold sent to the fold agent. L1's fold RUNNING (one
   agent acting as netcode-architect; notes u4f-brief-r33-notes.md); L3 DONE (carry 90 added to u4s-carries.md's U4h
   section, quoting advisor-u4f-brief.md:258-259, checked equal by a read-only compare). **D3 DONE, with a finding
   (D3-1, Medium, for the advisor):** U4r's P3 logs hold only `reorder_step_permille` (10, the step's setting), never
