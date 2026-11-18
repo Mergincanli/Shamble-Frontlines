@@ -5,7 +5,7 @@ from engine-architect's draft (`cs2-first-page/plan-draft.md`, Opus 5.5 at effor
 the notes at commit f167f061; its sources: `cs2-first-page/engine-architect-plan-notes.md`). What the main session
 changed is listed in section 20; everything else is the draft's text. **Revision 2, 2026-11-18 21:34 UTC (from the clock):** the
 advisor agent's plan review (APPROVE with eight conditions, `cs2-first-page/advisor-plan.md`) is worked in; section 22
-says where each condition is met. **Revision 3, 2026-11-18 22:00 UTC:** the verifier's check of the web facts (PASS after four
+says where each condition is met. **Revision 4** is in section 20, point 14. **Revision 3, 2026-11-18 22:00 UTC:** the verifier's check of the web facts (PASS after four
 corrections) and security-auditor's reading on the wasm-bindgen tool's proof of origin (provable here only in part:
 question TOOL-SOURCE) are worked in. For the build. Nothing is built. No library was fetched, installed or built for this plan: documentation and registry pages
 were read, and four addresses were asked for their headers only (section 6). Base: main
@@ -347,32 +347,40 @@ answer; every cargo command takes `--locked`; the checkpoint script holds a push
    `checkpoint.mjs:226`). Only then: `npm ci --ignore-scripts`, the tool's route below, and the first build that holds
    the new crates.
 5a. **The tool's route** (the advisor agent's condition 5; it is code from the internet that no lockfile covers).
-   What the release offers and what can be checked here is in `cs2-first-page/security-auditor-tool.md`
-   (security-auditor, Opus 5.5 at effort max, 2026-11-18): the release is marked immutable by GitHub; the tarball's
-   sha256 is 9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f by three statements that agree (the
-   project's `.sha256sum`, the digest GitHub states for the file, and GitHub's signed release statement, whose
-   signature checks against the key in its own certificate); its size is 11,860,397 bytes. **Not provable here:**
-   that the statement's certificate chains to GitHub's root (the tool for that, `gh release verify-asset`, is not
-   usable in this container), and how the project built the binary (no build record exists). So the first run here
-   needs his answer to TOOL-SOURCE. Under its (a), the route is:
-   1. a new folder made with plain `mkdir` under `.gate/` (neither `.gate` nor `.gate/tools` a link); the download
-      with `curl --fail --proto '=https' --proto-redir '=https' --max-filesize 12000000`;
-   2. the size compared with 11860397, then the sha256 with the value above, before any `tar` call;
+   **Mustafa's answer TOOL-SOURCE** (2026-11-18, 22:34:37 UTC; `cs2-first-page/mustafa-2026-11-18-2326-five-answers.md`):
+   "(a), for this one file only: wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz, 11860397 bytes, sha256
+   9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f, by the route of your plan's section 7, item 5a.
+   This is my yes to run that ready-built program on the proof you have. My rule on unreviewed code from the internet
+   stands as it is: every other file, version or checksum comes back to me." And: "Inside it the program
+   wasm-bindgen has 8170784 bytes and sha256 ca4df773020dae87d92b9eadb2b85412bea7a9cf6318ab9999dd119fd9f46931. If
+   your copy differs in any of these, stop and tell me."
+   What the release offers and what can be checked here: `cs2-first-page/security-auditor-tool.md`. The route, with
+   security-auditor's fixes from its dependency answer (F1 to F5, revision 4 of 2026-11-18 23:08 UTC):
+   1. a new folder made with plain `mkdir` under `.gate/` (neither `.gate` nor `.gate/tools` a link); the download of
+      exactly `https://github.com/wasm-bindgen/wasm-bindgen/releases/download/0.2.130/wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz`
+      with `curl --fail -L --max-redirs 2 --proto '=https' --proto-redir '=https' --max-filesize 12000000`, the final
+      address recorded;
+   2. the size compared with 11860397, then the sha256 with his value, before any `tar` call;
    3. the member list read with `tar -tzf` and `tar -tvzf` and recorded: exactly the folder
-      `wasm-bindgen-0.2.130-x86_64-unknown-linux-musl/` with `README.md`, `LICENSE-MIT`, `LICENSE-APACHE`,
-      `wasm-bindgen`, `wasm-bindgen-test-runner` and `wasm2es6js`; regular files and folders only, no name twice, no
-      member above 64 MiB; anything else stops the step;
+      `wasm-bindgen-0.2.130-x86_64-unknown-linux-musl/` and in it the six files `README.md`, `LICENSE-MIT`,
+      `LICENSE-APACHE`, `wasm-bindgen`, `wasm-bindgen-test-runner` and `wasm2es6js` (seven lines with the folder's
+      own); regular files and one folder only, no name twice, no member above 64 MiB; anything else stops the step;
    4. only the one member taken out, into the new empty folder `.gate/tools/wasm-bindgen-0.2.130/`, with
       `--no-same-owner --no-same-permissions --strip-components=1` (this container runs as root, where `tar` would
       keep owners and permission bits);
-   5. before any run: it is a regular file and no link; `chmod 0555` on the file and its folder; `readelf -h` and
+   5. **before any run, `--version` included:** the program is a regular file and no link; its size is 8170784 and
+      its sha256 is ca4df773020dae87d92b9eadb2b85412bea7a9cf6318ab9999dd119fd9f46931, **his values; on any
+      difference nothing is run and he is told**; `chmod 0555` on the file and its folder; `readelf -h` and
       `readelf -l` show an ELF64 x86-64 file with no interpreter (static);
-   6. the binary's sha256 and size go into `cs2-first-page/wasm-bindgen-cli-check.md`, and `build.mjs` compares them
-      before every run, `--version` included (a build script runs as the same user and could replace the file), and
-      refuses to run the tool at all when the expected value is not given. The
-      expected values reach `build.mjs` through the environment (`SHAMBLE_WASM_BINDGEN_SHA256`), read from that notes
-      file here and written in the workflow in CI.
-   No other source is used without a security answer of its own.
+   6. the measured values go into `cs2-first-page/wasm-bindgen-cli-check.md`. The expected values have a lasting,
+      tracked home, `packages/client/scripts/wasm-bindgen-tool.mjs` (the version, the archive's address, size and
+      sha256, the program's size and sha256, with his words beside them), so a change to any of them is a reviewed
+      diff and comes back to him. `build.mjs` reads them from there, never from the environment; it compares the
+      file's size and sha256 before every run (`checkCliFile`), and runs exactly the absolute path it checked, never
+      a name looked up on the `PATH`.
+   **Every other file, version or checksum comes back to him** (his words above). What stays as a small risk, in
+   security-auditor's words (Low): this container runs as root, so a process left behind by a build script could
+   swap the tool between the check and the run.
 6. **No shared cargo target folder.** The planted-defect worktrees build into folders of their own
    (`CARGO_TARGET_DIR=.gate/cs2-plant-target`). Change-set 1's export tests also stop when they run outside the copy they
    were built in.
@@ -419,9 +427,10 @@ step that changes no manifest pushes normally; step 3's push goes through the ho
    its hold. Then `npm ci --ignore-scripts`, and, once TOOL-SOURCE is answered, the tool by its route (section 7, item
    5a): downloaded, its size and sha256 compared, its member list read, the one binary taken out into
    `.gate/tools/wasm-bindgen-0.2.130/`, checked without running it, its own sha256 recorded.
-   Then `cargo tree --workspace -e normal,dev` names every third-party crate compiled into our libraries and tests
-   (ts-rs and thiserror are dev-dependencies, so the `dev` edges are needed; proc-macro crates are left out, as the
-   rule says), against the overflow overrides of step 2 (section 16, at its end).
+   Then `cargo tree --locked --workspace -e normal,dev,no-proc-macro --target all --prefix none` names every
+   third-party crate compiled into our libraries and tests (ts-rs and thiserror are dev-dependencies, so the `dev`
+   edges are needed; proc macros and what only they pull in are left out, as the rule says): exactly the six names of
+   the overflow overrides (section 16, at its end).
 4. **The bindings and the build.** `sim-wasm`'s `Sim`. The build path of `build.mjs`: it reads wasm-bindgen's version
    from `Cargo.lock`, refuses any other tool version before it generates bindings (PM-0002-18), runs `cargo build
    --locked --release --target wasm32-unknown-unknown -p sim-wasm`, then `wasm-bindgen --target web --out-dir
@@ -544,8 +553,8 @@ git status --porcelain --untracked-files=all -- packages/types/src/generated    
 ```
 **The build (from step 4):**
 ```
-SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" SHAMBLE_WASM_BINDGEN_SHA256=<the binary's recorded sha256> node packages/client/scripts/build.mjs
-SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" SHAMBLE_WASM_BINDGEN_SHA256=<the binary's recorded sha256> node packages/client/scripts/build.mjs --production --out-dir .gate/cs2-first-page/dist-prod
+SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" node packages/client/scripts/build.mjs
+SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" node packages/client/scripts/build.mjs --production --out-dir .gate/cs2-first-page/dist-prod
 ```
 **TypeScript** (the strict flags of CI-TYPES, `toolchain.yml` :93, with each package's own `lib` and `types`, as ADR 0002
 part 7 asks; no tsconfig is committed, since type settings are the 2.3 chat's; TS5112 is why `--ignoreConfig` is
@@ -568,7 +577,7 @@ node node_modules/vitest/vitest.mjs run --root packages/client
 **The browser:**
 ```
 SHAMBLE_CHROMIUM=/opt/pw-browsers/chromium SHAMBLE_DIST="$PWD/packages/client/dist" node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off
-cargo tree --locked --workspace -e normal,dev --prefix none    # every third-party crate that is no proc macro has its overflow block (proc macros are told apart by cargo metadata)
+cargo tree --locked --workspace -e normal,dev,no-proc-macro --target all --prefix none    # the third-party names are exactly the six with an overflow block
 node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=node --trace off
 ```
 **The rest:**
@@ -1082,6 +1091,13 @@ The draft stays beside this file, byte for byte (`cs2-first-page/plan-draft.md`)
     small server, the Worker's pure modules, the build script's pure checks) may be built now, within four limits
     (no import by package name of what step 2's manifests bring in; no use of Vite's API yet; commits by path and
     pushes only through the checkpoint script; CI's `npm test` stays green).
+
+14. **Revision 4** (2026-11-18 23:08 UTC), after Mustafa's five answers and security-auditor's dependency answer ("yes with
+    conditions"): item 5a carries his words on TOOL-SOURCE and the fixes F1 to F5 (his values for the program
+    compared before any run; "every other file, version or checksum comes back to me"; the exact address with
+    redirects; the expected values in a tracked module instead of the environment; the exact path run); the
+    overflow check's command (F7). Its condition 3 (Vite's servers never listen beyond 127.0.0.1; vite stays at
+    8.3.7 or later) is what step 6 already plans. Its F6 (the npm scope `@shamble` is unclaimed) becomes a follow-up.
 
 ## 21. Records due with this change-set (beyond section 4.2's docs row)
 - `docs/DECISIONS.md`, by script, never retyped: his message of 2026-11-18, 20:20:09 UTC (his go on #60, WRITE-MODE
