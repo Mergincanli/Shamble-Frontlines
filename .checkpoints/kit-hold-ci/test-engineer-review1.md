@@ -112,3 +112,28 @@ Raw TAP: scratchpad B/<id>.txt.
   X10 M15c unpushed branch vs main's newer tip (over-hold).
 - So M07b, M12, M06i, M19, M16, M06f/g, M14, M11c, M26, M15c are real gaps (not equivalent copies). M02b, M03b,
   M11 are equivalent; M05c, M22, M23 carry no claim; M17, M18 cannot be reached without making git fail.
+
+### Block D, part 2 (done 18:47 UTC)
+- Each new test alone (`--test-name-pattern`): 1/1 pass for each of #28-#33: no order dependence.
+- Under load: 8 more full runs, 4 at a time on 4 cores: 33/33 each; slowest watch tests: #9 1612 ms, #32 1163 ms.
+  Totals at head: 14 full runs, 0 failures; plus 49 broken-copy runs where every test outside the hold passed.
+- Temp folder: 0 leftover /tmp/checkpoint-test-* after all runs, failing ones included.
+- t.after order (after-order.test.mjs): FIFO. So in every watch test (#9, #15, #16, #32) the fixture's rmSync runs
+  BEFORE child.kill: the watch child is alive while its repo is deleted. Never seen to fail (63 runs); the child's
+  next git call is ~600 ms after the line the test waits for. Pre-existing pattern from main's tests; #32 copies it.
+- No assertion that cannot fail found; every step reaches the hold (M03 kills at :471 = step 3 reaches the record
+  read; M13 at :653 = step 4 reaches the push-side read). Weak spots: test 29's look-alike `not-package.json.txt`
+  pins neither anchor alone; test 33 step 3's link case is guarded twice in the code (M11 equivalent); step 4 pins
+  the push side only.
+- The kit tests run nowhere in CI: neither workflow nor tools/gate.mjs runs any `.claude/**/*.test.mjs` (grep).
+  All test evidence for the kit is local (node 22.23.4, git 2.43.0 here).
+
+### Block F (done 18:52 UTC)
+- `git diff --numstat origin/main -- .claude .github` at 4877599 (and equal for the working tree): 10+0
+  CHECKPOINTS.md, 47+1 checkpoint.mjs, 224+1 checkpoint.test.mjs, 12+0 toolchain.yml = 293 added, 2 removed. MATCHES.
+- routine-guard 1107/1107 pass; settings 127/127; kept-logs 10 tests: 9 pass, 1 skipped (#10 needs
+  KEPT_LOGS_DRY_RUN), 0 fail. MATCH the record. Their inputs (.claude/hooks/**, settings.json, kept-logs.*) are
+  byte-identical to main (`git diff --quiet origin/main 4877599 -- ...`) and none reads a changed file's content, so
+  main's counts are the same by construction (not re-run in a main worktree).
+- `node tools/gate.mjs --no-smoke`: GATE PASS (5a skipped). It reads legacy/ only: no evidence about this PR's files.
+- `sha256sum` (GNU coreutils 9.4) prints byte for byte the "<hash>  <path>" lines the tests build in Node.

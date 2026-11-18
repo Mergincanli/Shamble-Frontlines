@@ -140,3 +140,8 @@ Scratch: `.gate/kit-hold-ci/verifier/` and the session scratchpad. I edit nothin
 - Draft table overclaim (Low): row 0c0e271 puts the push AND the pull-request run under "failed at the compare step:
   <the two log lines> (17:21:20)". The record (card step 16, ci-evidence §2) quotes those lines from the push job only;
   for the pull-request job it records only "step 7 ... failure, 17:21:17 to 17:21:21".
+
+### Check 4 addendum (coordinator's note: compare commits, not the working tree)
+- `git diff --stat origin/main 4877599 -- . ':!.checkpoints'`: exactly the four files, "4 files changed, 293 insertions(+),
+  2 deletions(-)"; the same at the committed HEAD 54d72b9. The working tree's uncommitted `docs/DECISIONS.md` (the
+  session's docs pass, begun about 18:30) is outside this check and not judged.

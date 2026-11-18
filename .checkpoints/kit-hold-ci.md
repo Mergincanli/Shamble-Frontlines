@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 19:16 CET (from the clock)
+- **Last update:** 2026-11-18 19:35 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -268,14 +268,31 @@
     PENDING). The questions were put to him at 16:23:55 UTC (KIT-TEXT) and 17:48:13 UTC (KIT-FIX, KIT-REMOVED,
     WATCH-60), by the session's record.
 
+26. CI on 4877599, all four success: `toolchain` push 44365431438 and pull request 44365446199; `gate` push
+    44365431235 (18:03:14 to 18:09:29) and pull request 44365445961 (18:03:18 to 18:04:13).
+27. **security-auditor, review 1** (18:03:55 to about 18:31 UTC; `kit-hold-ci/security-auditor-review1.md`; about 85
+    probe runs in scratch repositories): nothing Critical or High. By his word of 18:01 every finding is a
+    follow-up. **F1 Medium:** the hold splits the list of changed files that the helper `run()` returns trimmed and
+    decoded as UTF-8, so in two corners the path checked is not the path pushed (a root folder whose name begins with
+    a blank character, when it is the first changed path; a folder name that is not valid UTF-8 with a look-alike
+    on main): shown pushed with no record; tiny reach, same class as the ":" hole. **F3 Medium:** nothing makes the
+    review of a pull request read the record (no rule names a reader; the notes are deleted before ready). F2 Low (a
+    record that is a link or a folder still releases); F4 Low (with `push.followTags` on, a tag on an in-between
+    commit goes out and `toolchain` runs on tag pushes); F5 Low, wording in five places. Every injected git failure
+    ended held. Nothing changed for pushes with no manifest change, but a new branch in a clone with no `origin/main`
+    is now held as unreadable. The CI edits open nothing new. Its list "Not covered" is in the report's draft.
+28. `docs/DECISIONS.md`: his three messages of today written by `kit-hold-ci/decisions.mjs` (18:32 UTC; all twelve
+    checks yes; 84 lines added; every other byte of main's file unchanged). Uncommitted until the docs commit.
+    Main was fetched before it: still 9b4b518.
+
 ## Current step
-26. (18:16 UTC) Running: security-auditor (since 18:03:55), test-engineer (since 18:07:41), the verifier (since
-    18:15:22; the agents' start times are the session record's, read by script; on
-    the code, the evidence and the draft's finished sections). When they are in: follow-ups into the draft (a High
-    or Critical on the kit lines would need a fix and his word; below that: follow-ups, his word of 18:01); then
-    docs (main is still 9b4b518: fetched 18:08; DECISIONS by `decisions.mjs`; docs-keeper for STATUS, ROADMAP, the
-    archive, the map), the report into `docs/reports/2026-11-18-kit-hold-ci.md`, the advisor agent on the head, the
-    checkpoint's deletion in the last commit (no skip mark), CI on that head, the pull request ready with the label
+29. (18:35 UTC) Running: test-engineer (since 18:07:41), the verifier (since 18:15:22), docs-keeper (STATUS,
+    ROADMAP, the map, the archive; its notes `kit-hold-ci/docs-keeper-notes.md`, its moved lines
+    `docs-keeper-moved-lines.md`). The verifier and test-engineer were told that `docs/` changes in the working tree
+    and that they compare commits. When they are in: test-engineer's follow-up lines to docs-keeper (a second short
+    message); the report from the draft into `docs/reports/2026-11-18-kit-hold-ci.md`; the map check; one docs
+    commit by path; push; the advisor agent on that head; then the last commit (the checkpoint deleted, the report
+    names the commit before it; no skip mark); CI on it; the pull request's description and "ready", label
     needs-mustafa.
 
 ## Next steps
@@ -293,8 +310,8 @@
 
 ## Running work
 - saver: background task b4bg0wkfu, started 18:04 UTC on 2026-11-18 on the fixed script (2-hour limit).
-- agents: security-auditor (review 1, since 18:03:55 UTC); test-engineer (review 1, since 18:07:41 UTC); the
-  verifier (since 18:15:22 UTC). Done: infra-engineer (review 1), engine-architect (change-set 2's plan draft).
+- agents: test-engineer (review 1, since 18:07:41 UTC); the verifier (since 18:15:22 UTC); docs-keeper (since
+  about 18:34 UTC). Done: infra-engineer, engine-architect (change-set 2's plan draft), security-auditor.
 
 ## For the list of the quality gate v2's plan (his words of 15:38 and 18:01 UTC)
 - A CI check that refuses to build when the lockfile gains an entry with no recorded review (DEP-HOLD's option (c)).
