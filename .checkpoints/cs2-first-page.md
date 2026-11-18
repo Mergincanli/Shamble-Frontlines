@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 20:40 UTC (from the clock)
+- **Last update:** 2026-11-18 20:44 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -89,8 +89,15 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 4. The test zip of change-set 1 was sent to him again with its steps (`.gate/cs1-types/archive/`, 6,480 bytes, sha256
    7138ea42...; 20:40 UTC by the session's record of the save that followed).
 
+5. **The zip route to his laptop is proven** (his message of 2026-11-18, 20:44:29 UTC, with a screenshot;
+   `cs2-first-page/mustafa-2026-11-18-zip-saved.md`, by script): "the zip saved and unpacked". His screenshot shows
+   `README.txt`, `sha256.txt` and the folder `packages` in `Downloads\shamble-cs1-types-test-archive`, and Windows
+   PowerShell 5.1 printing the SHA256 of `packages\types\src\generated\block\layout.ts`: as I read it from the image
+   it equals the expected d6c6352c...fb2ef (compared by script, ignoring case). This answers the open point of #58
+   (STATUS, "Waiting on Mustafa": to be taken out in this change-set's docs pass). Noted 2026-11-18 20:44 UTC.
+
 ## Current step
-5. **Stopped for his compaction** (his words: "Then stop and tell me the path of its resume card: I compact this chat
+6. **Stopped for his compaction** (his words: "Then stop and tell me the path of its resume card: I compact this chat
    before you go on."). Nothing of change-set 2 is started beyond this card.
 
 ## Next steps (after the compaction)
@@ -135,9 +142,8 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
   `crates/client-endpoint/src/layout_ts.rs` and `crates/protocol/src/messages.rs` that claim more than the code
   does, "corrected in the next pull request that touches those files" (change-set 2 may be that one).
 - Two wording slips stay in #60's report, named in that pull request's description (accepted with his go).
-- The test zip of change-set 1 (the file route to his laptop): he asked for the instructions again on 2026-11-18,
-  20:20 UTC; they were sent again with the file in the message that ends this step. His answer is still open, and
-  change-set 2's Brave check rests on that route.
+- (The test zip of change-set 1: answered, step 5. The file route for a zip works; change-set 2's Brave check
+  can rest on it.)
 
 ## Key facts
 - Here: Node 22.23.4, git 2.43.0, cargo 1.99.1. The smoke check cannot start in this container (the installed
