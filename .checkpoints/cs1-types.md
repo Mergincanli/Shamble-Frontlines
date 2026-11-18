@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 13:04 CET (from the clock)
+- **Last update:** 2026-11-18 13:06 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -49,6 +49,21 @@
    - the main session writes `client-endpoint` (no ts-rs there: `cargo test -p client-endpoint` is safe to run).
    Mustafa, 12:03 UTC (two messages while this ran): "Save your progress I'm going to run the compact command" and
    "Same for the agents": this save; the agent was told to save its notes at once and carry on.
+
+## A process miss to report (records, with their times)
+- **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
+  "[skip ci]", but the checkpoint commit pushed on top of it (da22f96, 12:04:37 UTC) did not: `checkpoint.mjs` leaves
+  the mark out when a code commit is ahead (its line 167). The push started `toolchain` run 44300471741 (number 168,
+  job 134788575344, GitHub-hosted runner). Its step "Build and test with the network cut off" ran 12:04:55 to
+  12:05:07 UTC; the job's log reaches the script's last command (`tsc --version`: "Version 6.0.3") before the cancel
+  the main session sent landed (conclusion: cancelled). So `cargo test --workspace --locked`, the release tests and
+  the wasm32 build ran on that runner with the nine crates: their build scripts and the thiserror-impl proc macro ran
+  there, inside the job's network cut. Nothing was compiled on this machine. The advisor agent's condition 3 (check
+  before the first build) is missed for that one CI run. security-auditor was told at 12:06 UTC and adds to its
+  answer what that run could reach and the miss's severity; the miss goes to Mustafa (told in chat), to the advisor
+  agent with the security answer, and into the report.
+- **Rule until the security answer says CLEAR TO BUILD:** no code commit (working-tree edits only), so every push is a
+  checkpoint-only push and carries "[skip ci]".
 
 ## Build notes (the main session's design choices, to carry out and to list in the report's deviations)
 - `crates/client-endpoint/src/layout.rs`: `ElementType { U8, U32 }` with `const fn name()` ("u8", "u32") and `const fn
