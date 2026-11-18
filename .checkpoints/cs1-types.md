@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 13:50 CET (from the clock)
+- **Last update:** 2026-11-18 14:08 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -118,6 +118,20 @@
    needed, the verifier, the docs pass, the report, the advisor agent on the final head, the pull request.
    If an agent is lost: start it again with the brief in this step; its notes file says where it was.
 
+   **Round 1 so far** (no code edit until all five reviewers are done: they read the working tree):
+   - rust-reviewer, back 13:08 UTC: APPROVE, six Lows (`cs1-types/rust-reviewer-review1.md`): (1) no test fails when
+     the hash's tag bytes are removed: add its pair of tables A and B (both keep the rules; one stream without tags)
+     to `hash_covers_every_value`; (2) a section name that is a JavaScript reserved word passes the rules but breaks
+     `export const <name>`; (3) `broken_rule`'s additions can overflow: `checked_add`; (4) the scratch folder's loop
+     hides the real error: retry only on `AlreadyExists`; (5) write mode's `ends_with` check cannot fail, and
+     client-endpoint's comparison reads `layout.ts` through a link while protocol's refuses links; (6) 15 public items
+     have no doc line, and the `SECTION_TAG` doc claims more than holds. For later steps: a by-name field handle and
+     `Section::align()` for the block writer (cs2); decoders cap sender-sized fields, `Join` gets a redacting Debug
+     (cs3); the export tests trap on wasm32 if a wasm32 test run is ever added. Its scratch copy `.gate/rr-cs1`
+     (gitignored, 32 MB) can go.
+   - engine-architect started 13:08 UTC; test-engineer and security-auditor still running; netcode-architect waits
+     for a free slot.
+
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
   "[skip ci]", but the checkpoint commit pushed on top of it (da22f96, 12:04:37 UTC) did not: `checkpoint.mjs` leaves
@@ -205,4 +219,5 @@
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
   stopped at 12:30:03 UTC for the code push).
-- agents (3 of 3 from 12:50 UTC): rust-reviewer, test-engineer, security-auditor, round 1 (batch 2 follows).
+- agents (3 of 3): test-engineer, security-auditor (since 12:51 UTC), engine-architect (since 13:08 UTC), round 1;
+  netcode-architect follows.

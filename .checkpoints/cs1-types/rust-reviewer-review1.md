@@ -33,3 +33,39 @@ No earlier rust-reviewer memory found (.claude/agent-memory-local has security-a
   (src/export.rs:20-24,142-167): safe here only because every run gets a new scratch path. File::create follows links
   (export.rs:154): safe because the scratch folder is new and exclusive.
 - (info) cargo tree: protocol -e normal (host, wasm32, --target all) = protocol alone; -i ts-rs = dev-dependency of protocol only.
+- (info, checked right) Same hash on every target: const assert LAYOUT_HASH == 0x2df7_8c30 compiles for wasm32 and native
+  (scratch copy .gate/rr-cs1, release); run time on wasm32 (Node) and native (ctypes) both 0x2df78c30.
+- (info) Wasm size: no shipped .wasm yet (sim-wasm is an empty stub, no dep on client-endpoint). Proxy cdylib of
+  client-endpoint, rustc 1.99.1 release, no wasm-opt, gzip -9 (Node zlib): const-only export 349 B raw / 302 B gz;
+  with a run-time layout_hash() call 1,343 / 772. Keep writing the const.
+- L-a (Low) layout.rs:124-132: names like delete/enum/default/package/class/new pass broken_rule (probe test in scratch,
+  ok), but layout_ts.rs:26 prints `export const <name>` -> invalid TS; doc says "printable as TypeScript names".
+- L-b (Low) layout.rs:154,157,160: `at + size` / `offset + size` overflow for offsets > u32::MAX-4; overflow checks on
+  in every profile (Cargo.toml profile.release) -> panic "attempt to add with overflow" (probe offset 0xFFFF_FFFC, debug
+  and release, exit 101). Never a silent pass; names no rule.
+- L-c (Low) ts_export.rs:18-21: any create_dir error = "name taken"; TMPDIR=/nonexistent-rr -> 100 tries then panic
+  "a scratch folder can be made in the temporary folder" without path or io error (exit 101).
+- L-d (Low) layout_ts.rs:41-44, ts_export.rs:45-48: write-mode guard ends_with(GENERATED_FOLDER) is a tautology (folder
+  built from the same const at layout_ts.rs:59-61, ts_export.rs:77-79); ../.. = repo root is unchecked. Also
+  client-endpoint's compare follows a link at layout.ts (layout_ts.rs:67-84) where protocol's files_in refuses links.
+- L-e (Low) 15 public items without docs (missing_docs run): messages.rs:49,50,79,80,87,90,97; layout.rs:9,10,36-38,44-46.
+- Commands so far: fmt --check 0; clippy native -D warnings 0; clippy wasm32 -D warnings 0; pedantic (both crates) 0,
+  no warnings; cargo test --workspace 0 (ce 5, protocol 2); test --release -p protocol -p client-endpoint 0; 8 parallel
+  runs of the protocol export binary all ok, 0 leftovers; wasm32 build of 5 crates 0; cargo doc -D warnings 0;
+  cargo tree checks 0; cargo audit/deny: not installed (not run).
+- L-f (Low) Deviation 1's tag bytes have no test that bites: scratch copy with both tag lines removed, layout.ts
+  regenerated (0xafcb2f9a): the 5 committed client-endpoint tests pass; only my probe fails. Pair valid under
+  broken_rule, one stream without tags (Python: both 0x60d6dbf4; tagged 0x4265359c vs 0xbd51cd2f):
+  A=[section("a",0xFFFF_FFFF,[field("b",U8,0x7a79_7800),field("c",U8,0)])],
+  B=[section("a",0xFFFF_FFFF,[]),section("b",0x0000_3875,[field("xyzc",U8,0)])]. Add as a must-differ pair.
+- L-a evidence: node 22.23.4 `export const delete = ...` -> SyntaxError Unexpected token 'delete'; enum -> Unexpected
+  reserved word. Field names are object keys: reserved words fine there.
+- Forward F1 (cs2 writer): no by-name handle (positional fields[1] retargets on reorder) -> const fn offset(section,
+  field) with a compile-time panic; Section::align() (computed twice: layout.rs:139-140, layout_ts.rs:22-23); section
+  start padding in the block not representable in the table: one owner + a test in cs2/cs4.
+- Forward F2 (cs3 codec): Join.token, mode_id, Input.acks/commands sender-sized -> cap before allocating; token as a
+  credential: no derived Debug (redact), no derived == for auth.
+- Forward F3: temp_dir() and process::id() trap on wasm32-unknown-unknown (scratch, Node: RuntimeError unreachable):
+  gate ts_export/layout_ts with not(target_family = "wasm") if a wasm32 lane ever runs these #[test]s.
+- Verdict: APPROVE (no finding at Medium or above; six Lows L-a..L-f).
+DONE 2026-11-18 (scratch copy left at .gate/rr-cs1, gitignored).
