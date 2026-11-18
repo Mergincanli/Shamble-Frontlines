@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 14:21 CET (from the clock)
+- **Last update:** 2026-11-18 14:30 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -167,9 +167,39 @@
      means; the guard for plain pushes; release by a recorded review of the exact lockfile; more files: the
      toolchain file, `.cargo/config.toml`, `.npmrc`, workflow and action files, `.gitmodules`). An anti-cheat table
      (one row per message field, for the codec step) is in its notes.
-   - engine-architect (since 13:07:58 UTC) and netcode-architect (since 13:15:48 UTC) are running.
-   - **The fix pass, when all five are back** (then the planted defects and the 20 runs again, with a target folder
-     of their own, never shared with the main folder, and a check that every file is newer than each run's start).
+   - engine-architect (13:07:58 to 13:28:10 UTC): REVISE (`cs1-types/engine-architect-review1.md`). High 1, the same
+     root as test-engineer's: the export tests bake `CARGO_MANIFEST_DIR` in at compile time; it showed a third case
+     (a binary built at 13:04 in security-auditor's removed worktree ran in the main folder at about 13:23): **the
+     main `target/` holds stale binaries; rebuild before any evidence run**; each test must stop when the run-time
+     `CARGO_MANIFEST_DIR` differs from the baked one. Medium 2 (the report): PM-0002-15 is not "met": only its
+     zero-difference clause runs in CI; the planted defects and the control are shown here; met in full when the
+     gate's own planted runs exist (PM-0002-43); the report names the difference from the build plan's line. Lows:
+     3 drop `align` from the generated file (the hash does not cover it, nothing reads it); 4 print one object,
+     `export const BLOCK_LAYOUT = { header: {…} } as const`, not a top-level constant per section (reserved words,
+     collisions); 5 destructure `Section` and `Field` fully in `layout_hash` and `render_typescript`; 6 read the
+     hash as soon as 8 bytes exist, then require the whole header (now or by cs4); 7 the report: never use ts-rs's
+     `repr(enum)`; 8 a follow-up for the 2.3 chat: its formatter must skip `packages/types/src/generated/**`; 9 for
+     the drafts: no TypeScript code reads the message types in the chosen design; 10 name change-set 3 where the
+     doc says "the protocol's first messages"; 11 for cs2: `package.json` needs an `exports` entry. All three
+     deviations stay. Nothing is beyond the card. The ADR pointer's text is in its answer (its notes).
+   - netcode-architect (13:15:48 to 13:28:55 UTC): APPROVE, seven Lows, all doc lines in `messages.rs`
+     (`cs1-types/netcode-architect-review1.md`): L1 `AimPoint`'s centimetres and widths are borrowed from E3 (entity
+     positions): mark the step and widths provisional, cite E3 and PM-0001-51, say the encoder clamps height; L2
+     counters wrap at their wire width and are compared only through the codec's wrap-aware helper; `presses` wraps
+     too; L3 `sequence` is provisional ("16-bit or narrower"); L4 the tick rate is fixed at build time: the client
+     checks `tick_rate_hz` against its build; `snapshot_rate_hz` is nominal; L5 say the order of `commands` and that
+     sequences are consecutive; L6 `slot` is the soldier's sim index; say how `squad` counts; L7 (optional) one const
+     for the 16 buttons. Its provisional list and its decoder checks for change-set 3 are in its notes: the report
+     passes them on.
+   - **All five are back. Round 1's verdicts: two REVISE (test-engineer, engine-architect), three with no finding at
+     Medium or above.** One High (the 20-runs record; the stale binaries), Mediums: write mode makes a missing tree
+     again; one Vitest test cannot fail without tsc; the hash test's blind spots; the report's word for
+     PM-0002-15; A1 (CI, outside this diff).
+   - **The fix pass (now):** every finding above is taken unless noted in the fix notes
+     (`cs1-types/fix-pass-1.md`, written with the fixes). Then: a clean rebuild, the hand checks, the planted
+     defects and the 20 runs again with a target folder of their own (never shared with the main folder; every
+     file newer than each run's start), CI on the pushed head, round 2 on what changed (test-engineer and
+     engine-architect, whose verdicts were REVISE, and rust-reviewer for the changed Rust), the verifier.
 
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
@@ -258,5 +288,4 @@
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
   stopped at 12:30:03 UTC for the code push).
-- agents (2 of 3): engine-architect (since 13:07:58 UTC), netcode-architect (since 13:15:48 UTC), round 1. Times from
-  the session record.
+- agents: none running (round 1 is back; times in step 8).
