@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 17:28 Amsterdam (16:28 UTC)
+- **Last update:** 2026-11-18 18:11 Amsterdam (17:11 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -445,6 +445,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Check-in 3 (fired 16:31:29 UTC, read 16:31:34): still none. **Finding** (results log): the hourly schedule has not
      fired in its first two slots (15:23 and 16:23 UTC). No further check-in. A probe run started by hand after
      `round-a`'s verify.
+   - The probe run started by hand (run #1, id 44355175073, 17:08:00-17:08:26 UTC, success; results log): both setup
+     links 404 "gone" as expected; production and round-a's links "serve". Step 22's first outcome (nothing to do);
+     the script has met Cloudflare. To be saved as done after the next consultation (his rule: before, never after).
    - It does not block sitting 1. It blocks sitting 2's closes (consultation 17): the 24-hour reading rests on a script
      that has never run against Cloudflare, so one probe run is read before the clocks start, started by hand
      (`purpose: deletion`) if the schedule still has not fired.
@@ -485,6 +488,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      #2, id 44347351522, head 2162db55d93f; plan green (16:27:00-16:27:07), the three builds green (production, iso-off,
      iso-on; done by 16:27:34); the three deploy legs "waiting" on `preview` from 16:27:34 UTC; no other run waits. His
      list sent next.
+   - `round-a` done (results log): his one approval event (17:01:51-53 UTC leg starts; his click count asked); 3
+     uploads (0354374e production, 6e61a4c4 iso-off, e48ee07b iso-on); SIZES flagged 0 on all three builds; verify
+     exit 1, summary pass 5, fail 1, no reading 0: **Risk 13 happened** (production's one-off link carries noindex on
+     all 7 paths; production's own address clean); everything else as expected. The sitting continues: next, the three
+     links to him (Brave steps 1-3) and his first build count; `uploads` starts only after that count.
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.

@@ -307,3 +307,43 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   production (16:27:09-16:27:16), iso-off (16:27:09-16:27:34), iso-on (16:27:09-16:27:20); the three deploy legs
   (production, iso-off, iso-on) "waiting" on `preview` from 16:27:34 UTC. His list sent after that; still waiting at
   16:31:34 UTC.
+- His approval (his message "Done:" with a screenshot of run #2's summary, 2026-11-18 17:06:23 UTC,
+  3f82e55a-75de-4181-898f-d30fb10e81b9): the run page shows one event,
+  "Mergincanli approved", Environments "preview and 2 more". The three deploy legs started at 17:01:51 (iso-on),
+  17:01:53 (production) and 17:01:53 (iso-off) UTC, within 3 seconds: consistent with one approval releasing all three
+  (his count of clicks asked). From waiting (16:27:34) to the release: 34 min 17 s (his list went out after 16:28).
+- The uploads (each leg's log, word for word): production: "The project's production branch: main" / "✨ Success!
+  Uploaded 1 files (7 already uploaded) (0.69 sec)" / deployment 0354374e-8cf6-4b8f-9735-15472d1529d9,
+  https://0354374e.shamble-preview-check.pages.dev, alias null, environment "production", made 17:02:25.115Z. iso-off:
+  "✨ Success! Uploaded 2 files (6 already uploaded) (2.17 sec)" / 6e61a4c4-37e0-443a-87ee-22ab90961be0, alias
+  https://iso-off.shamble-preview-check.pages.dev, environment "preview", made 17:02:13.827Z. iso-on: "✨ Success!
+  Uploaded 2 files (6 already uploaded) (2.71 sec)" / e48ee07b-2734-4be9-9e71-e46f217f6a9f, alias
+  https://iso-on.shamble-preview-check.pages.dev, environment "preview", made 17:02:13.221Z. Every record's marker
+  2162db55d93f59cf2ed7e371a3915409f0b5a587.
+- PM-0006-5 (each build's SIZES line, word for word, the same for all three; node v22.23.4): "largest:
+  content.ef463692.bin, 65536 bytes; limit 26214400 bytes; flagged: 0" / "SIZES
+  {"largest":{"path":"content.ef463692.bin","size":65536},"limit":26214400,"flagged":[],"count":9}".
+- PM-0006-2, verify (job 134977500343, 17:02:33-17:02:49; headers-44347351522, artifact 14448883620, zip sha256
+  bbb324aadcea..., equal to the log's digest; read with jq from `.gate/preview-hosting-check/day1/round-a/`):
+  "summary: {"records":3,"pass":5,"fail":1,"no_reading":0}", exit 1. Per link: iso-off stable and one-off pass;
+  iso-on stable and one-off pass; production stable (https://shamble-preview-check.pages.dev/) pass; **production
+  one-off (https://0354374e.shamble-preview-check.pages.dev/) fail on all 7 paths: "production carries X-Robots-Tag
+  noindex"** (value "noindex"; production's build writes no noindex, so the host added it). Every response 200 on the
+  first try. All other headers as expected: `.wasm` application/wasm on all 6 links; the content file "public,
+  max-age=31536000, immutable", the rest "public, max-age=0, must-revalidate"; noindex on all 4 preview links;
+  iso-on's COOP "same-origin" and COEP "require-corp" on all 7 paths of both links; no COOP/COEP elsewhere.
+  X-Check-Rule: "project-host" on production's own address; "version-host" on the 5 other links, the branch links
+  included (R5-PREV-OQ6, recorded, judged nowhere).
+- **Risk 13 (plan.md:1358) has happened:** production's one-off link carries noindex, so PM-0006-2's row is not met as
+  written. Recorded "not met as written", never a pass; it goes to the draft's author with the report (ADR 0006
+  :1409-1414) and holds the check's end until the draft is revised (:1401). The sitting continues; `restore-production`
+  reads it again.
+- **The first probe run** (started by hand by the session, `purpose: deletion`, after `round-a`'s verify): probe run
+  #1, id 44355175073, created 17:08:00 UTC, completed 17:08:26, success; probe-results-44355175073 (artifact
+  14452700323, zip sha256 4f37fba6fad4..., equal to its digest), probed_at 2026-11-18T17:08:20.713Z, read with jq from
+  `.gate/preview-hosting-check/day1/probe-1/`. Rows, word for word in substance: setup (case "rehearsal", pull request
+  1 closed and merged 14:57:11Z, hours_since_close 2.19) stable https://setup.shamble-preview-check.pages.dev/ status
+  404, outcome "gone", expected "gone"; one-off https://1f6487e4.shamble-preview-check.pages.dev/ 404 "gone", expected
+  "gone"; production (main) stable 200 "serves", expected "serves"; production one-off (0354374e) 200 "serves",
+  expected null; iso-off and iso-on, both links, 200 "serves", expected "serves". Every row 1 try. So the script works
+  against Cloudflare, and the setup upload is gone from both links (step 22's first outcome: nothing to do).
