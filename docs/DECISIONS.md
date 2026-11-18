@@ -127,6 +127,90 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-18, 18:01:08 UTC: his answers to three questions of the build chat, and the size accepted:
+  KIT-FIX (may a fix to the checkpoint script's hold, in the lines changed after his first answer, be written with the
+  exact text shown: yes, as shown), KIT-REMOVED (should a manifest that main removed also pass the hold when a branch
+  takes main in: no, it stays held, and the question goes on the list for the quality gate v2's plan) and WATCH-60
+  (should the build chat watch pull request #60: no)** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his
+  personal account; his label: "My words of 2026-11-18, 18:52 (Amsterdam time)"; extracted by script from the session's
+  transcript, message 1eed5c8d-349d-471c-a9e3-106bfb012cc0, whole). The text he said yes to is
+  `.checkpoints/kit-hold-ci/kit-fix2.diff` at commit f7e232fbfb78d41ec06f72f6444a8973096a1685 (45 lines, sha256
+  9197f070e456ac628703f4211380174ccdc037e8bcd4eb1a950da252b7a4d7f9); the three questions as asked, and that text, stand
+  in `docs/reports/2026-11-18-kit-hold-ci.md`. Copied by script (779 bytes, sha256
+  9c9815fa59e1ea2cdea4cf0e044d27662af43df3514391dd7f86900d40607316):
+> My words of 2026-11-18, 18:52 (Amsterdam time): my answers to KIT-FIX, KIT-REMOVED and WATCH-60.
+>
+> KIT-FIX: (a), yes, as shown: the text of kit-fix2.diff as it stands in your notes at commit f7e232fb (45 lines, sha256 9197f070e456ac628703f4211380174ccdc037e8bcd4eb1a950da252b7a4d7f9). Write it into the two kit files.
+> With this fix the kit lines are final for this pull request. A later finding on them that is not Critical or High becomes a follow-up.
+>
+> KIT-REMOVED: (a). A manifest that main removed stays held. Put the question on the list for the quality gate v2's plan, together with the line of the approved text that still reads a path beginning with ":" as a pattern.
+>
+> WATCH-60: (b), no.
+>
+> The size as you count it, 293 added lines against the stop line of 300, is accepted.
+- **Taken by Mustafa, 2026-11-18, 16:39:23 UTC: his answer to the question KIT-TEXT (may the checkpoint script's hold on
+  a dependency change be written with the exact text shown to him): yes, with one change, a manifest or lockfile whose
+  content in the push equals its content on main is not held; and his yes to the planted change for CI's compare step,
+  to the reading of "nothing else in it" and to the stop rule for the new CI lines** (the build chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-18, 17:30 (Amsterdam
+  time)"; extracted by script from the session's transcript, message 5f5cb1d6-18bd-43d9-beb6-fd9953e6c260, whole: its
+  first paragraph is his instruction to the chat after a compaction). The text he answered on is
+  `.checkpoints/kit-hold-ci/kit-edit.diff` at commit 3ebe654ab0992b216842b3470fe938f31d83a9f7 (262 lines, sha256
+  70756f3db803e31acd79c290918c4a38ca8720b55145bd5354bba2cd72026ce5); the question, that text, the lines changed after
+  his answer, the planted change and the stop rule stand in `docs/reports/2026-11-18-kit-hold-ci.md`. Copied by script
+  (1542 bytes, sha256 1f3b95b4f4866da5a36ae16348d926d9b3c1b9d5b876b93f41236f3d04e227e7):
+> You were just compacted to cut usage. Nothing is lost: read the resume card .checkpoints/kit-hold-ci.md first, then the files in .checkpoints/kit-hold-ci/. Do not redo finished work. Before anything else, check three things and tell me the result in three lines: the scratch copies in .gate/kit-hold-ci/ still exist and give exactly kit-edit.diff and ci-edit.diff; no file in .claude/ or .github/ is edited; the background saver runs (start it again if it does not).
+>
+> My words of 2026-11-18, 17:30 (Amsterdam time): my answer to KIT-TEXT, on kit-edit.diff as it stands in your notes at commit 3ebe654a (262 lines, sha256 70756f3db803e31acd79c290918c4a38ca8720b55145bd5354bba2cd72026ce5).
+>
+> KIT-TEXT: (b), yes, with one change.
+> The change: a manifest or lockfile is not held when its content in the push equals its content on main. That content was merged with my go, so a branch that takes main in is not stopped by it. Say so in the rule line too. Everything else stays exactly as in that file.
+> Add a test for the change and show it failing on a broken copy, as you did for the others. Your advisor agent reads the changed lines once. Then write the four files. Your ready report shows the changed lines; I do not need to see them before you write.
+>
+> The planted change for the compare step: yes, as you describe it (one generated file committed with the executable bit, taken back in the next commit).
+> "Nothing else in it": your reading is right. The report and the records that are due ride along.
+> Your stop rule for the new CI lines stands.
+- **Taken by Mustafa, 2026-11-18, 15:38:13 UTC: his go on the merge of #58 (change-set 1, Types: the generated types,
+  the block's layout table and its hash), what he accepts with it, his answers to its five questions, and what comes
+  after** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of
+  2026-11-18, 16:24 (Amsterdam time)"; extracted by script from the session's transcript, message
+  12484c8a-3a90-425f-b2a3-fbd2ced44837, whole). The five questions stand in `docs/reports/2026-11-18-cs1-types.md`,
+  "Decisions needed": DEP-HOLD (how a dependency change is kept from being built before its security check), CI-TYPES (a
+  type check and a regenerate-and-compare step in CI), CI-CUT (no cache in the toolchain job), LANE-ISSUE (who opens the
+  "Lane requests" issue) and WATCH-58 (whether the build chat watches that pull request). The same words stand byte for
+  byte in the message of merge commit 9b4b518f520aa2360a8007dc857ba74b343c8a40 (2026-11-18, 15:39:28 UTC; parents
+  22c6afa and 1bfe462). Before the merge the session read the head again (1bfe462e339511cfae6b30a1015330d9ff2e718c) and
+  `gate`, `smoke` and `toolchain` on it, for the push and for the pull request: green. Copied by script and checked byte
+  for byte against that merge commit's message:
+> My words of 2026-11-18, 16:24 (Amsterdam time): my go on the merge of pull request #58, and my answers to its five questions.
+>
+> Merge pull request #58 (change-set 1, Types, foundation step 2.4: the generated types, the block's layout table and its hash) into main by a merge commit, at head 1bfe462e339511cfae6b30a1015330d9ff2e718c. Put these words in the merge message.
+>
+> Before you merge:
+> - Read gate, smoke and toolchain on that head once more. All three are green, or you stop and tell me.
+> - If the head is not 1bfe462e339511cfae6b30a1015330d9ff2e718c, stop. A later push needs the advisor agent's review and my go again.
+>
+> What I accept with this merge:
+> - Miss 1 stands as written: CI built the nine new packages before their security check, against my rule on unreviewed code from the internet. Rated Medium, found clean afterwards. It is written down, not waived.
+> - Miss 2 stands as written: one evidence record did not hold, your test reviewer caught it, and the runs were redone.
+> - The size as counted: 940 hand-written lines against 600 planned, under my stop line of 1,200.
+> - Round 2's Lows as follow-ups. The two doc lines that claim more than the code does are corrected in the next pull request that touches those files.
+> - What you did not verify: Firefox, WebKit and Safari; Windows and macOS.
+> - As before, the checkpoint commits enter main's history with this merge.
+>
+> DEP-HOLD: (a). The checkpoint script holds a push that changes a manifest or a lockfile until the security check of that change has answered. This is my exception to the kit freeze, for this one change. Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no longer watch list now. The check in CI that option (c) adds is not decided here: put it on the list for the quality gate v2's plan.
+>
+> CI-TYPES: (a), yes, with the exact text as it stands in the report at this head, in the section "The exact texts asked for". Its pull request shows two things from a real run: the compare step failing once on a planted change, and passing on the clean tree.
+>
+> CI-CUT: (a). Part 1 now, with the exact text of that same section; part 2 waits for the quality gate v2's workflow. Its pull request shows "Cache mode: none" in the job's log.
+>
+> LANE-ISSUE: (a). You open it. A comment there is never my word.
+>
+> WATCH-58: (b), no.
+>
+> After the merge:
+> - One small pull request with the kit hold and the two CI edits, nothing else in it. Its ready report goes to the Advisor before my go.
+> - You may write change-set 2's plan beside it. No new library of change-set 2 is committed before that pull request is merged.
 - **Taken by Mustafa, 2026-11-18, 11:08:25 UTC: his go on the merge of #57 (Part 15 of the build plan, "The second
   lane", with his six answers), what he accepts with it, his answer OLD-LINES, and what comes after** (the build chat,
   session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-18, 11:31 (Amsterdam

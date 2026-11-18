@@ -14,9 +14,19 @@
 // re-read right before each push; never a force push; a refused push is reported and left alone; staged notes that
 // look like a secret (tokens, keys, credentials in URLs) are not committed. The script alone decides "[skip ci]": only
 // when every commit it pushes touches .checkpoints/ alone; skip markers from the caller are refused.
+// Dependency hold (Mustafa's DEP-HOLD, 2026-11-18): save and watch never push while what they would push changes a
+// manifest or a lockfile (Cargo.toml, Cargo.lock, package.json, package-lock.json, npm-shrinkwrap.json, in any folder)
+// whose security check is not recorded: the notes are committed locally, the files are named, save exits 1. Released
+// by .checkpoints/<slug>/dependency-check.md, written after security-auditor's answer and naming its notes file: one
+// line per held file, "<sha256>  <path>" as sha256sum prints it from the repository root ("deleted  <path>" for a
+// removed file); then save again. The script trusts that record; the review of the pull request reads it.
+// Not held: a manifest or lockfile whose content in the push equals its content on main (origin/main as this clone
+// last fetched it): that content was merged with Mustafa's go, so a branch that takes main in is not stopped by it.
 // Run from the repository root. Node 22, no dependencies.
-// Exit codes: 0 saved or nothing to save · 1 a git step failed or a secret was found · 2 usage error or refused by a guard.
+// Exit codes: 0 saved or nothing to save · 1 a git step failed, a secret was found or a dependency change is held ·
+// 2 usage error or refused by a guard.
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -24,6 +34,7 @@ const DIR = '.checkpoints/';
 const BRANCH_OK = /^(cs|claude)\/[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/;
 const SLUG_OK = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const SKIP_MARK = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|^\s*skip-checks\s*:/im;
+const DEP_FILE = /(^|\/)(Cargo\.toml|Cargo\.lock|package\.json|package-lock\.json|npm-shrinkwrap\.json)$/;
 // An escape that can stand just before a key in pasted text: %XX (also %25-chained: %252C), %uXXXX, quoted-printable
 // =XX, and backslash escapes (JSON's \b \f \n \r \t, \v \0, \xXX, \uXXXX). The patterns with a left boundary accept it
 // there, so "q=%20sk-..." or "a\nAKIA..." is still caught. Declared before SECRETS, which uses it at load.
@@ -99,6 +110,34 @@ function onlyCheckpointsAhead(branch, rev) {
   if (!remote.ok) return false;
   const d = git('diff', '--name-only', remote.out, rev);
   return d.ok && d.out.split('\n').filter(Boolean).every((f) => f.startsWith(DIR));
+}
+
+// The manifests and lockfiles that pushing `rev` would publish with no recorded check: changed, tree to tree, against
+// the remote branch (against main's merge-base while the branch is not on the remote yet) and not named, with the
+// sha256 of their content in `rev`, in that commit's .checkpoints/<slug>/dependency-check.md. Held whatever the
+// record says: what cannot be read, and an entry that is not a plain file (a link, a submodule).
+// Not held, with or without a record: a plain file whose content in `rev` equals its content on origin/main.
+function heldDependencyFiles(o, branch, rev) {
+  const remote = git('rev-parse', '--verify', '--quiet', `refs/remotes/origin/${branch}`);
+  const base = remote.ok ? remote : git('merge-base', 'refs/remotes/origin/main', rev);
+  const names = base.ok ? git('diff', '-z', '--name-only', '--no-renames', base.out, rev) : base;
+  if (!names.ok) return ['(what this push changes could not be read)'];
+  const record = git('show', `${rev}:${DIR}${o.slug}/dependency-check.md`);
+  const released = new Set(record.ok ? record.out.split('\n').map((l) => l.trim()) : []);
+  return names.out.split('\0').filter((f) => DEP_FILE.test(f)).filter((f) => {
+    const entry = git('ls-tree', rev, '--', f);
+    if (!entry.ok) return true;
+    if (!entry.out) return !released.has(`deleted  ${f}`);
+    const plain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(entry.out);
+    if (!plain) return true;
+    const blobAt = (ref) => /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('--literal-pathspecs', 'ls-tree', ref, '--', f).out)?.[1];
+    const inPush = blobAt(rev);
+    if (inPush && inPush === blobAt('refs/remotes/origin/main')) return false;
+    try {
+      const blob = execFileSync('git', ['cat-file', 'blob', plain[1]], { stdio: ['ignore', 'pipe', 'ignore'], shell: false, maxBuffer: 64 << 20 });
+      return !released.has(`${createHash('sha256').update(blob).digest('hex')}  ${f}`);
+    } catch { return true; }
+  });
 }
 
 // The notes staged in a private index that look like a secret: [path, kind] pairs. Names are read NUL-separated (never
@@ -177,6 +216,13 @@ async function save(o, branch, subject, background) {
   const sync = await withLockRetry(() => git('reset', '--quiet', 'HEAD', '--', DIR));
   if (!sync.ok) log(`WARNING: the index's ${DIR} entries are behind HEAD; run: git reset -q HEAD -- ${DIR}`);
   const sha = commit.out.slice(0, 7);
+  const held = heldDependencyFiles(o, branch, commit.out);
+  if (held.length) {
+    log(`saved locally, NOT pushed ${sha} on ${branch}: the push would publish a dependency change with no recorded check: ${held.join(', ')}. ` +
+      `After security-auditor's answer on it, write ${DIR}${o.slug}/dependency-check.md (one line per file: "<sha256>  <path>" as sha256sum prints it ` +
+      `from the repository root, "deleted  <path>" for a removed file) and save again; until then build nothing that holds the change`);
+    return 1;
+  }
   if (background && codeAhead) {
     log(`saved locally, NOT pushed ${sha} on ${branch}: the branch has unpushed commits outside ${DIR} (push them yourself)`);
     return 0;
