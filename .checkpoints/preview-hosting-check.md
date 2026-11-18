@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 20:01 Amsterdam (19:01 UTC)
+- **Last update:** 2026-11-18 20:05 Amsterdam (19:05 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -540,7 +540,6 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      Cloudflare; the setup upload gone); the silent schedule stays an open finding. Step 23: every run of sitting 1
      read and tallied against its list (results log); the link count corrected (15 preview links, 24 readings).
 
-## Current step
 24. Sitting 2 (plan Part 3 C) under REVIEWER (b), prepared after consultation 19; first his answer: tonight or
    tomorrow (the last close fixes the earliest hour of Day 2). Before the first push, settled in writing:
    - Pacing: deploy.yml has no concurrency group; a branch gets its next push only after its previous run's verify
@@ -611,17 +610,44 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Sitting 3 prepared (not pushed; from `main` 347d5e0): cs/b9-edit 7f3a684 (deploy.yml = the approved variant
      fd3dc4c6029b; close, probe, browsers unchanged), cs/b9-prod 9965630 (deploy.yml = 8b745631a278); each changes only
      deploy.yml. Consultation next (step 24 done; sitting 3's approach), then his list.
+   - Closed 2026-11-18 after consultation 20: sitting 2 done (results log); the results-log line on the ten runs reworded
+     to what was read (conclusions, and the cleanups' deleted ids matched to the probe's records with jq).
+
+## Current step
+25. Sitting 3, the token tests (PM-0006-32), in consultation 20's order (the reviewer starts off under REVIEWER (b)):
+   1. push cs/b9-edit (7f3a684) and open its pull request with the reviewer off: its deploy job must run without
+      asking and print "secret: present" (the plan's step 2, the reviewer bite);
+   2. he ticks "Required reviewers" once and saves; his screenshot shows Mergincanli listed, "Prevent self-review" and
+      the administrator bypass unticked;
+   3. I re-run b9-edit (rerun_workflow_run; if refused, his click with debug logging unticked): it must wait (SA-R4:
+      F4 asks only that a run waits after the re-tick; covered, so the plan's rejection drops); he approves; "secret:
+      present" (the plan's step 1, the control);
+   4. push cs/b9-prod (9965630) and open its pull request: its job must be refused at once (production admits main
+      only); the refusal's words read from the public run page (a logged-out picture) or the check run;
+   5. he sets `production` to "No restriction" and saves; I re-run the failed job: "secret: present" (CANARY);
+   6. he restores "Selected branches and tags" with the `main` rule (a screenshot showing `main`); I re-run b9-prod
+      once more: refused again (the measurement);
+   7. SA-R8: his screenshot of the empty "Repository secrets" list.
+   - Outcome rows (written before the first push): the off run waits → stop, his preview page read; any run prints
+     "secret: absent" → stop, the secret not delivered (a finding); the re-run after his tick does not wait → stop, his
+     setting read again; cs/b9-prod not refused → the sitting stops (a security finding for the report and step 2.6);
+     production's restore without `main` → fixed before the last re-run.
+   - Open windows (written here when they open, cleared on the proof run): the reviewer off since 18:08 UTC (his
+     untick; closes at his tick in step 2); production's branch rule open (step 5 to step 6).
+   - Red mails: cs/b9-prod goes red on purpose twice (steps 4 and 6). His list says "say 'plan order' if you prefer
+     on, off, on"; the go by a scheduled check-in, as in sitting 2.
+   - get_session at about 19:02 UTC: 563,418 of 1,000,000 tokens (automatic compaction at 901,600).
 
 ## Next steps
-1. His answer: sitting 2 tonight or tomorrow; then his list (step 24) and sitting 2.
-2. SAFARI-RUN's fix after the closes (step 24's bullet), one entry to him; the browser run on the fix branch before
-   Day 2's wall.
-3. Sitting 3: his re-tick of "Required reviewers" first (a screenshot: Mergincanli as reviewer, the administrator
-   bypass unticked; it blocks sitting 3), then plan Part 3 C sitting 3 with SA-R4 and SA-R8; the reviewer stays on
-   for Day 2.
-4. Day 2 (the 24-hour reading, the wall, Brave steps 5-8, the revoke, the revoked proof) by 2026-11-25 (the token ends
-   2026-11-25T22:59:59Z); then the report and the closing docs pull request (DECISIONS.md: his answers word for word,
-   REVIEWER (b) included); step 2.6's plan with the locked install and one line on a click-free preview design.
+1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
+2. Check-ins already set: trig_013vUKHaNSSNDvcRH4hA6UiE (2026-11-18 19:55 UTC, a by-hand probe, the hourly stand-in);
+   trig_01Fd2yqXX6LL2QP4hLnrCuu6 (2026-11-19 18:55 UTC, the 24-hour probe for PREV-DELETE).
+3. Day 2 (plan Part 3 D) from 2026-11-19 18:51 UTC (the last close + 24 h) and by 2026-11-25 (the token ends
+   2026-11-25T22:59:59Z): the 24-hour reading, the login wall, Brave steps 5-8, the closes of (c) and the two
+   token-test pull requests ((c)'s cleanup approved, the other two rejected: the reviewer is on again after sitting 3),
+   the revoke, the `revoked` run.
+4. Then the report and the closing docs pull request (DECISIONS.md: his answers word for word, REVIEWER (b) and the
+   browsers decision included); step 2.6's plan with the locked install and one line on a click-free preview design.
 
 ## For the report (the checkpoint is deleted at the end)
 - His point 3 of 2026-11-16, to carry into step 2.6's plan: "For step 2.6, not for this check: plan a locked install (a
@@ -646,6 +672,12 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 - The process account (his rule: only what a record shows, with its time): the process slip of 2026-11-15 and F-A
   (Open findings); the "repository ready" record (step 12's added bullet); the effort not passed to the web-fetch
   agent (Running work).
+
+- Day 1's findings for the report (consultation 20): the reviewer-off window (his untick 2026-11-18 18:08 UTC, until
+  his tick in sitting 3), with his words on the approvals; Safari dropped by his decision (18:21:30 UTC), so PM-0006-3
+  is read on Chrome, Edge and Firefox; the hourly schedule silent in its first four slots (15:23-18:23 UTC); the build
+  count "no count shown" before and after ten uploads; old production uploads keep serving on their one-off links
+  (0354374e, e9a37459 the noindex bite, de1c3e5e); Risk 13 (production's one-off link carries noindex).
 
 ## Open findings
 - The advisor agent's F-A (2026-11-16): rewriting "Current step" at each update lost steps 11, 12, 14 and 16 from this
@@ -728,9 +760,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   all IP addresses can use the token." (the new form's "Allow" box: not described).
 
 ## Key numbers
-- Test repository Mergincanli/shamble-preview-check (public): `main` 2162db55d93f... (pull request #1 merged
-  2026-11-18 14:57:11 UTC; tree 433ff32b82d4..., the same as `setup` 1619164); branches `setup` (1619164) and
-  `check-token` (863b639); pull request #2 closed unmerged.
+- Test repository Mergincanli/shamble-preview-check (public): `main` 347d5e044871... since 2026-11-18 18:50:43 UTC
+  (merges of #4 756d33f and #8 347d5e0 on top of 2162db5, the setup merge; workflows unchanged, plus two text
+  files); branches `setup`, `check-token`, cs/pd-one, cs/pd-off, cs/pd-open, cs/pdt-one (cs/pd-three and
+  cs/pdt-three deleted by him); pull requests: #1 merged, #2 closed, #3 (a) / #6 (d) / #7 (a') closed unmerged, #4
+  (b) / #8 (b') merged, #5 (c) open. Runs: 25 at the end of sitting 2.
 - Workflows at `main` (sha256 prefixes, re-hashed 2026-11-18): deploy.yml 29593af18d34, close.yml 3afdf389d636,
   probe.yml f24ad6e81daf, browsers.yml 6791076916ae; token-test variants (not placed) fd3dc4c6029b, 8b745631a278;
   check-token.yml 0ad66aa0f2b3 (on `check-token` only).
@@ -1010,6 +1044,18 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    tomorrow, polling by artifacts or check-ins; SAFARI-RUN after the closes (cause confirmed in the packages first,
    the smallest change, a forced local run in Chrome, a branch and a by-hand start, the first Windows set counts, one
    entry); to him now: short, the two open findings in a line each and the one question.
+
+20. 2026-11-18 19:00:57 UTC (called; transcript time), moment 5 (before step 24 was saved as done) and
+   moment 1 (sitting 3's approach) · Q: may step 24 close, and how does sitting 3 go with the reviewer off? · Changed:
+   the results-log line on the ten runs reworded to what was read, the deleted ids matched to the probe's records with
+   jq; Next steps and Key numbers rewritten (main 347d5e0, the Safari fix removed, the check-in ids); "For the report"
+   gains the reviewer-off window, Safari dropped, the silent schedule, "no count shown", old production uploads
+   serving; sitting 3 reordered: b9-edit pushed with the reviewer off first (the bite), then his one tick and screenshot,
+   then the re-run that must wait and that he approves (the control; SA-R4 covered, the rejection drops), then b9-prod
+   as planned with a second refusal after the restore; no new yes needed (no approved text changes, all acts in his
+   go), one line on his list for "plan order"; outcome rows before the first push; the refusal's words from the public
+   run page; rerun_workflow_run for b9-edit; production's restore shown with `main`; open windows written into Current
+   step; get_session first; the red mails said.
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time

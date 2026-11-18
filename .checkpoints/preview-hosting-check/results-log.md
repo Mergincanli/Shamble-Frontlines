@@ -521,8 +521,12 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   `deployments: write`: the link shows without it, as the security-auditor's L-finding asked to learn.)
 - The six first runs, all conclusion success (verify exit 0: every link of the upload passed; list read 18:30:40 UTC):
   #7 (a) 18:28:02-18:29:24, #8 (b) push 1 18:28:05-18:29:30, #9 (c) 18:28:08-18:29:32, #10 (d) 18:28:11-18:29:14,
-  #11 (a') 18:28:15-18:29:36, #12 (b') push 1 18:28:17-18:29:57 (created to last update, UTC). The records and the
-  headers files are read in full with the probe after the closes.
+  #11 (a') 18:28:15-18:29:36, #12 (b') push 1 18:28:17-18:29:57 (created to last update, UTC). What was read of the
+  ten test runs: their conclusions (all success, so verify passed every link) and, after the closes, their upload
+  records through the probe: each cleanup's "Delete <id>" lines matched against probe-2's record rows per branch with
+  jq (no new download): (a) 1b3c905e; (a') 672b3d0e, tombstone 2b214ae6 kept; (b) 03630e1d, f1e112f2, f516ed27; (b')
+  6b6415e5, 5ad91df8, ed9c2421, tombstone 5ff46e6d kept: the deleted ids equal the recorded uploads, branch by branch.
+  The ten headers files themselves were not downloaded.
 - Push 2 of (b) and (b'), after each branch's first verify had finished (headers-44370024556 at 18:29:27,
   headers-44370062021 at 18:29:54): `git push` 18:30:19 UTC, cs/pd-three d78dfb4..2244b55, cs/pdt-three
   9ebeeb6..51130dd (both commits hashed before: the approved texts). Runs #13 44370443574 (b) and #14 44370444666
