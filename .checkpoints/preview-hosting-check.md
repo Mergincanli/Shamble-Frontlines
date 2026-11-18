@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 20:58 Amsterdam (19:58 UTC)
+- **Last update:** 2026-11-19 00:01 Amsterdam (2026-11-18 23:01 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -645,6 +645,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      the off reading in the plan's order (untick, re-run without a wait, re-tick with a screenshot).
    - Check-in 19:55 UTC: run #17 still waiting, no reply from him; the 19:23 slot silent too (five missed); probe #3
      (44385645676, 19:56:45Z) all as expected at 1.1-1.4 h after the closes. Waiting on his preview screenshot.
+   - 2026-11-18 22:57 UTC: run #17 still "waiting"; his lane-2 message (22:56:11 UTC) did not answer the screenshot
+     question: asked again in the reply. Meanwhile main b763ba3e merged into this branch (aa02297), his item 1.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
@@ -843,6 +845,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   check (SAFARI-RUN closed with no fix): PM-0006-3 is read on Chrome, Edge and Firefox (and Brave by his checklist);
   the report tells the draft's author that the Safari row was dropped by his decision. Sitting 2 starts now. For
   DECISIONS.md.
+
+- **His lane-2 words** (written 2026-11-18, 23:37 Amsterdam; user message 22:56:11 UTC,
+  81327c70-528e-4e03-bc98-e8a5d163fbd5; byte for byte in `.checkpoints/preview-hosting-check/mustafa-2026-11-18-lane2.md`,
+  3318 bytes, sha256 765226cd4657...): this chat is lane 2 of the build; "The preview hosting check keeps the first
+  place. Whenever a step of sitting 3 or of Day 2 can move, it moves first." Items: 1 main merged in (done, aa02297);
+  2 read Part 15 and his record-file answers; 3 the needs list for issue #59 (its own checkpoint `lane2-needs.md`); 4
+  the order: this check to its report and closing pull request, then step 2.6's plan, no game code before change-set
+  5 is merged; 5 no GLB made by a builder chat; 6 take main in at the start of each unit and before opening a pull
+  request.
 
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
 1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a
