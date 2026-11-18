@@ -59,6 +59,16 @@
   (i) and (iii) (c); Q8 (b) at 400 ms; Q18 (a) with (ii) (d); the rest at :173-198). After the fold: at least +118
   measured tests, +133 bites build, 67 negative cases, 21 pre-runs, disk about 3,727 MiB, planned size about 5,150
   added lines (4,200 to 6,200; his stop past 6,000).
+- **Progress 2026-11-18 (from 00:41 UTC):** L2's draft written (u4f-lead-bound.md); its two reads RUNNING (the
+  advisor: notes advisor-u4f-lead-bound.md; the test-engineer: test-engineer-u4f-lead-bound.md); L1's fold RUNNING (one
+  agent acting as netcode-architect; notes u4f-brief-r33-notes.md); L3 DONE (carry 90 added to u4s-carries.md's U4h
+  section, quoting advisor-u4f-brief.md:258-259, checked equal by a read-only compare). **D3 DONE, with a finding
+  (D3-1, Medium, for the advisor):** U4r's P3 logs hold only `reorder_step_permille` (10, the step's setting), never
+  the measured `reorder_permille` that -20's `reorder` rule reads (judge/src/eval.rs:863-872; SERIES.md:245); only the
+  -3 probe writes it (lab/src/main.rs:131-139), the scenario runner does not (scenario.rs:1401). So -20's judged runs
+  would be INVALID on a build as briefed (the brief's 2.7 says "U4r's"). Fix (to the advisor with the fold's result):
+  U4f's lab writes the measured share for scenario runs (the header param or a `reorder` event, from npt-l1's fate log,
+  as the probe computes it), with a test; D3's bar then reads -20's first short run (p5, p6).
 - **Next, in the advisor's order (:411-419):**
   1. **L2, LEAD-BOUND:** draft its entry by :336-361; the advisor and the test-engineer read it once (one agent each, no
      round); then to him in the next daily message. Nothing that reads the bound is built before his yes.

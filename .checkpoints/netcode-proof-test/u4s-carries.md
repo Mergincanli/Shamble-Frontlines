@@ -595,6 +595,10 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     main session):** "When U4h changes npt-room's HISTORY_MS (it sizes the ring: §4.9; carry 28), it makes the span
     readable outside npt-room (a pub constant or getter), npt-lab's ROOM_HISTORY_MS gives way to it, and the runner
     entries are re-pinned (the advisor's U4r build ruling, point 5)."
+90. **SA-11, the view-time wait under option B (the night's security-auditor check of U4f's brief, SA-11; the advisor's
+    U4f brief ruling, U4F-Q8 (ii) (c), advisor-u4f-brief.md:258-259; added by the main session, its condition L3):**
+    "under option B a stamp-ahead buys input-buffer wait, which §4.9's view-time estimate must cap at the honest lead,
+    not the bound: U4h's carry (SA-11)."
 
 ## U4d2 or the main session (the workspace Cargo.toml, crates/proto/Cargo.toml and check.mjs; wave 2 or later)
 29. **rust 5 (nit):** "The workspace Cargo.toml's libm comment says `arch` gives 'hardware sqrt, floor, ceil, trunc and
