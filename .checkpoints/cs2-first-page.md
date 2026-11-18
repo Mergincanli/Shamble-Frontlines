@@ -168,7 +168,7 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 3. Then steps 3 to 8, the gate after each, a checkpoint after each; the reviews (seven reviewers: three, three, one;
    one round); the verifier; the docs pass with the records of plan section 21; the report; the pull request (draft,
    then ready); stop for his go and his Brave check (the zip through the chat's file tool).
-4. The saver: restarted at the time its line under "Running work" gives; restart again within 110 minutes of it.
+4. The saver: restart it before 23:50 UTC (see "Running work").
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
@@ -205,5 +205,6 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
   `test-engineer-plant-target`; the classifier refused their removal).
 
 ## Running work
-- saver: see the line the next save writes below (restarted after 22:01 UTC).
+- saver: running since 2026-11-18T22:01:17.224Z (its own first line; task belkm5v73; 10-minute interval, stops after 110
+  minutes: restart it before 23:50 UTC).
 - agents: the advisor agent, reading the changed lines (resumed after this session's save of 22:00:50 UTC).
