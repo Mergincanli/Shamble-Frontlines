@@ -57,3 +57,56 @@ Started 16:51 UTC (date -u). One read of kit-change.diff (52 added lines) under 
 - Block 1 done: his words read whole (1542 B file; core lines 10-12); card steps 8-9; kit-change.diff read.
 - Diffs rebuilt by diff -u (header timestamps aside): kit-edit.diff == main(9b4b518) to scratch; kit-edit-as-shown.diff == main to as-shown/ == kit-edit.diff at 3ebe654a (sha256 70756f3d...6ce5, 262 lines); kit-change.diff == as-shown/ to scratch: 52 added, 0 removed. toolchain.yml scratch == as-shown. Kit files in the worktree == origin/main. broken-main-rule-missing.mjs == as-shown/checkpoint.mjs byte for byte; the other two differ from the scratch script in one line each, as described.
 - Tests (node v22.23.4, git 2.43.0): scratch tests vs scratch script 33/33 pass. New test vs broken-main-rule-missing: fails at :610 (step 1, status 1 not 0); vs broken-main-any-content: fails at :620 (step 2, status 0 not 1); vs broken-main-before-plain: fails at :632 (step 3, the list lacks sub/Cargo.lock). Kit's own 27 vs scratch script: 27/27. Scratch tests vs today's kit script: 27 pass, 6 fail (28-33). Each broken copy fails at the step meant for it.
+- Probes (scratchpad/probe/probe.mjs, temp repos; final scratch script vs as-shown): S1 stale origin/main, push back to old main's X: final RELEASED (as-shown held); same after a fetch (main Y): held. S2 main's content at another path: held. S3 link equal on main: held; plain file whose blob equals main's link: held. S4 mode 644->755, main's blob: final released (reading (b)). S6 origin/main ref missing: held. S7 main removed the lockfile, taken in: held (reading (c)). S8 an unpushed local main taken in: held (origin/main is read, not local main).
+- FINDING (new): S5 a lockfile under a root folder named ':' (path ':/Cargo.lock', also ':/package.json') with content NOT on main is RELEASED with no record by the final script: `git ls-tree <ref> -- :/Cargo.lock` reads ':/' as pathspec magic (top) and returns the ROOT Cargo.lock on both sides; the root file equals main's, so the new line releases the other file. As-shown script: held. A release beyond his words ("its content ... equals its content on main": that path has no content on main).
+- S5 widened: final script releases ':/Cargo.lock', ':/package.json', ':/crates/a/Cargo.toml', ':(literal)x/Cargo.lock', ':(top)x/Cargo.lock' with no record when the file git resolves them to equals main's (':(top)/Cargo.lock' held: ls-tree errors). Fix A (scratchpad/probe/fixA.mjs): the new line reads main with git('--literal-pathspecs', 'ls-tree', 'refs/remotes/origin/main', '--', f): all six held; every other probe unchanged; 33/33 scratch tests and the kit's 27/27 pass on it.
+- Drafted test step 4 (scratchpad/probe/checkpoint.test.step4.mjs, +21 lines at the end of test 33, own fixture): vs fixA 33/33 pass; vs the current scratch script test 33 FAILS at :652 (status 0, not 1); vs the three broken copies still fails at :610 / :620 / :632.
+- A copy reading the LOCAL main (scratchpad/probe/broken-local-main.mjs) passes all 33: no test pins origin/main over local main (the code is right: probe S8). A step for it (drafted, fails on that copy at the list match) would take the size over the 300 stop line, so: say "by code reading and the advisor's probe" in the report.
+- Size by git diff --no-index --numstat: script 46, tests 202, rules 10, workflow 12 = 270 (the card says 203 and 13 = 272). With step 4: 291 (stop line 300).
+- His reason's premise: every manifest on main today came in through #2, #5, #48, #58 (git log --first-parent; each go not re-checked). mergeAllowed (routine-guard.mjs:89-100) would let the PR Advisor merge a manifest under docs/ (any of the five names) or a Cargo file under tools/ without his go; none exists. Not this PR (no guard change: his words); one line in the ready report.
+- Known cost: a manifest-named link on main stops every branch that takes main in, with no release but its removal (step 3 asserts it). Safe (the link's target can change unseen, test 31's real.lock); none on main (all 100644).
+
+## Required change 1 (Medium, security): the new code line, read main literally
+In checkpoint.mjs (scratch line 133; kit-change.diff line 24), the new line becomes:
+    const onMain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('--literal-pathspecs', 'ls-tree', 'refs/remotes/origin/main', '--', f).out);
+
+## Required change 2: test 33 gains a fourth step (21 lines, inside test 33, before its closing line)
+
+  // A lockfile in a root folder named ':' is read at its own path, never as git's ':/' (the root Cargo.lock, whose
+  // content equals main's here): held.
+  const magic = fixture(t);
+  const first = sh(magic.origin, 'rev-parse', 'refs/heads/cs/test');
+  sh(magic.repo, 'switch', '--quiet', 'main');
+  writeFileSync(join(magic.repo, 'Cargo.lock'), 'merged\n');
+  sh(magic.repo, 'add', 'Cargo.lock');
+  sh(magic.repo, 'commit', '--quiet', '-m', 'main gains Cargo.lock');
+  sh(magic.repo, 'push', '--quiet', 'origin', 'main');
+  sh(magic.repo, 'switch', '--quiet', 'cs/test');
+  sh(magic.repo, 'merge', '--quiet', '--no-edit', 'main');
+  mkdirSync(join(magic.repo, ':'));
+  writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'not on main\n');
+  sh(magic.repo, 'add', '--', ':(literal):/Cargo.lock');
+  sh(magic.repo, 'commit', '--quiet', '-m', 'a lockfile in a folder named :');
+  note(magic.repo);
+  r = run(magic.repo, 'save', 'test', '-m', 'a folder named :');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /no recorded check: :\/Cargo\.lock\. /);
+  assert.equal(sh(magic.origin, 'rev-parse', 'refs/heads/cs/test'), first);
+
+Show: edited tests vs edited script 33 pass; test 33 vs today's scratch copy (keep it as broken-main-pathspec.mjs) fails at step 4's status line; vs the three broken copies still at steps 1, 2, 3; the kit's 27 vs the edited script pass.
+
+## Rulings on readings
+- (a) inside his words read with his reason; keep; one line in the ready report: a stale clone releases content main had at its last fetch (probe S1).
+- (b) inside; keep (probe S4 mode-only released; S3a/S3b held).
+- (c) inside his literal words (strict); right to ask him as its own decision; recommend for that entry: also pass a file main removed too (absent on main as last fetched and in the push); held until he says so.
+- (d) inside; keep (his sentence, "my" -> "Mustafa's").
+
+## Lows (no push on their own; ride along or report lines)
+- Pre-existing in the text he answered on: the entry read (scratch line 128) has the same pathspec reading, so a record for a ':' path is checked against the resolved file's sha256 (a true sha256sum line never matches: fail-safe). "Everything else stays exactly": not here; STATUS follow-up + one line in the ready report (a security finding left open: needs-mustafa, which tier 2 is anyway).
+- Rule line and header say "a manifest or lockfile"; the code releases plain files only (a link equal to main's stays held). Stricter than the words; optional "(a plain file on both sides)".
+- No test for origin/main over local main, S3b, S4: by code reading and probe, say so.
+- Size count in the card (272 vs 270 by numstat): state the method.
+
+## Verdict
+REVISE: required changes 1 and 2 above (one token in the new line; one test step shown failing on today's scratch copy). Once done and shown, APPROVE without another read from me.
+DONE
