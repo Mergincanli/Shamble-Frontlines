@@ -495,7 +495,7 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      links to him (Brave steps 1-3) and his first build count; `uploads` starts only after that count.
    - Brave steps 1-3: his three screenshots (17:12:23 UTC) show the expected values on all three links (results log);
      his "achieved" words, the first build count and his click count for `round-a` asked.
-   - His question "why can you not check it yourself" (17:16 UTC): answered (the click count read from the run data:
+   - His question "why can you not check it yourself" (17:17:26 UTC, 72cbbbbe-759e-40dd-aae5-03bc8439ddea): answered (the click count read from the run data:
      one approval; the build count is his dashboard reading, no Cloudflare login here and the token never seen; the
      verdict his, or "record them"). His screenshot of the project's Deployments page (17:19:10 UTC): no count shown
      there; the overview and the Metrics tab asked before `uploads` starts.
