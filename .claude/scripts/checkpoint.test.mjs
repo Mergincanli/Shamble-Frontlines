@@ -632,21 +632,22 @@ test('a manifest or lockfile whose content in the push equals its content on mai
   assert.match(r.stdout, /no recorded check: Cargo\.lock, sub\/Cargo\.lock\. /);
   assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
 
-  // A lockfile in a root folder named ':' is read at its own path, never as git's ':/' (the root Cargo.lock, whose
-  // content equals main's here): held.
+  // A lockfile in a root folder named ':' is read at its own path on both sides, never as git's ':/' (the root
+  // Cargo.lock): main holds both with the same content, the push changes the one in the folder: held.
   const magic = fixture(t);
   const first = sh(magic.origin, 'rev-parse', 'refs/heads/cs/test');
   sh(magic.repo, 'switch', '--quiet', 'main');
+  mkdirSync(join(magic.repo, ':'));
   writeFileSync(join(magic.repo, 'Cargo.lock'), 'merged\n');
-  sh(magic.repo, 'add', 'Cargo.lock');
-  sh(magic.repo, 'commit', '--quiet', '-m', 'main gains Cargo.lock');
+  writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'merged\n');
+  sh(magic.repo, 'add', '--', 'Cargo.lock', ':(literal):/Cargo.lock');
+  sh(magic.repo, 'commit', '--quiet', '-m', 'main gains Cargo.lock twice');
   sh(magic.repo, 'push', '--quiet', 'origin', 'main');
   sh(magic.repo, 'switch', '--quiet', 'cs/test');
   sh(magic.repo, 'merge', '--quiet', '--no-edit', 'main');
-  mkdirSync(join(magic.repo, ':'));
   writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'not on main\n');
   sh(magic.repo, 'add', '--', ':(literal):/Cargo.lock');
-  sh(magic.repo, 'commit', '--quiet', '-m', 'a lockfile in a folder named :');
+  sh(magic.repo, 'commit', '--quiet', '-m', 'the lockfile in the folder named : changes');
   note(magic.repo);
   r = run(magic.repo, 'save', 'test', '-m', 'a folder named :');
   assert.equal(r.status, 1, r.stderr + r.stdout);

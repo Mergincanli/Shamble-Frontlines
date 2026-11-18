@@ -130,8 +130,9 @@ function heldDependencyFiles(o, branch, rev) {
     if (!entry.out) return !released.has(`deleted  ${f}`);
     const plain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(entry.out);
     if (!plain) return true;
-    const onMain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('--literal-pathspecs', 'ls-tree', 'refs/remotes/origin/main', '--', f).out);
-    if (onMain && onMain[1] === plain[1]) return false;
+    const blobAt = (ref) => /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('--literal-pathspecs', 'ls-tree', ref, '--', f).out)?.[1];
+    const inPush = blobAt(rev);
+    if (inPush && inPush === blobAt('refs/remotes/origin/main')) return false;
     try {
       const blob = execFileSync('git', ['cat-file', 'blob', plain[1]], { stdio: ['ignore', 'pipe', 'ignore'], shell: false, maxBuffer: 64 << 20 });
       return !released.has(`${createHash('sha256').update(blob).digest('hex')}  ${f}`);
