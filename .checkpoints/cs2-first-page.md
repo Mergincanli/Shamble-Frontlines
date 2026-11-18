@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 22:39 UTC (from the clock)
+- **Last update:** 2026-11-18 23:10 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -221,24 +221,61 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     GitHub MCP tools"); the runs were read with the GitHub tool for workflow runs instead. The scheduled check-in
     for this read (22:40 UTC) was deleted as done.
 
+24. **security-auditor's dependency answer** (`cs2-first-page/security-auditor-deps.md`; the nine files hashed to
+    `deps-sha256.txt` at its start, 22:39 UTC, and its end, 23:04 UTC, by its own lines): **"the dependency change may
+    be committed and built: yes with conditions"**; no condition changes the nine files. Conditions: (1) commit
+    exactly the nine reviewed files; (2) install only with `npm ci --ignore-scripts`, every cargo command with
+    `--locked`; (3) Vite's dev and preview servers never listen beyond 127.0.0.1, and vite stays at 8.3.7 or later
+    (8.3.7 is the fixed version of a Critical advisory on an exposed dev server); (4) its F1 and F2 written into the
+    plan's item 5a before the tool's download, F3 and F4 fixed before its first run. Findings: F1 High and F2 High
+    (the tool's route did not compare the program with his values or carry his "stop and tell me" and "every other
+    file, version or checksum comes back to me": both written in, plan revision 4, 23:08 UTC, before the download);
+    F3 Medium (the expected size and the exact path: `wasm-bindgen-tool.mjs` and `build.mjs`, step 4); F4, F5, F7
+    Low (in the route and the plan); F6 Low (the npm scope `@shamble` is unclaimed: a follow-up); a residual Low
+    (root container: a left-behind process could swap the tool between check and run).
+25. **Step 3 of the plan, the answer applied: commit cc9fc71, pushed through the hold as a2ed2d9** (23:07:36 UTC).
+    The two reviewed diffs applied in the main folder, each of the nine files equal to its reviewed sha256; the
+    release record `cs2-first-page/dependency-check.md` written before the commit; the nine committed by path.
+    After the answer and before the push, all exit 0: `npm ci --ignore-scripts` (54 packages added); `cargo fmt
+    --check`; clippy natively and for wasm32; `cargo test --workspace --locked`; the release tests of sim and
+    protocol; the wasm32 build; the generated types written again with no change; every package's test script as CI
+    runs it (types 7, net 1, sim-worker 25, client 28, e2e 1); CI's two tsc lines; `node tools/gate.mjs --no-smoke`;
+    the map check. The scratch worktree is removed without force. **A refusal, with the route taken:** a hook
+    refused `git restore` in the worktree ("git restore is not allowed here"); its edits were undone by applying the
+    two saved diffs in reverse (`git apply -R`), then `git worktree remove`.
+26. **The tool, by its route** (`cs2-first-page/tool-route.sh`, run 23:09:31 to 23:09:33 UTC; output in
+    `cs2-first-page/wasm-bindgen-cli-check.md`): the archive downloaded (one redirect, status 200), 11860397 bytes,
+    sha256 equal to his; seven lines in the member list (the folder and the six files); only the program taken out
+    into `.gate/tools/wasm-bindgen-0.2.130/`; **8170784 bytes and sha256 ca4df773...6931, equal to his values**;
+    ELF64, x86-64, no interpreter; mode 555. **Not run yet.** The archive stays in
+    `.gate/cs2-first-page/tool-download/`.
+27. **The overflow list checked:** `cargo tree --locked --workspace -e normal,dev,no-proc-macro --target all` names
+    exactly six third-party crates (cfg-if, thiserror, ts-rs, unicode-ident, wasm-bindgen, wasm-bindgen-shared):
+    the six with an overflow block.
+
 ## Current step
-24. **security-auditor's answer on exactly that content** (Opus 5.5, effort max; `cs2-first-page/security-auditor-deps.md`).
-    Until it answers: nothing of the nine files is committed, nothing fetches or builds the new packages, no push by
-    hand.
+28. **Step 4 of the plan:** `packages/client/scripts/wasm-bindgen-tool.mjs` (the tool's expected values, tracked, with
+    his words); `crates/sim-wasm/src/lib.rs` (`Sim`: `new`, `block_ptr`, `block_len`, `input`, `step`, `rebase`
+    returning the due time; the stub test goes); `scripts/build.mjs` (checks the tool's file by `checkCliFile`
+    before any run, runs the exact path, `cargo build --locked --release --target wasm32-unknown-unknown -p
+    sim-wasm`, `wasm-bindgen --target web --out-dir packages/sim-worker/pkg`, the size table, Vite's build, the
+    CSP scan, the 25 MiB limit); `.gitignore`; the first Wasm build (risk 1: `unsafe_code = "deny"` against the
+    macro's expansion); the cost of the overflow overrides (the Wasm's size and the step's time with the lines and
+    without, in a scratch worktree with its own target folder).
 
 ## Next steps
-1. On its yes (step 3 of the plan): check the worktree's nine files against `deps-sha256.txt`; apply the two diffs in
-   the main folder (`git apply`), compare each file's sha256; write `cs2-first-page/dependency-check.md` (one
-   `<sha256>  <path>` line per file, naming the answer's notes file) BEFORE committing the manifests; commit the nine
-   by path; push through `checkpoint.mjs save`. Then `npm ci --ignore-scripts`; the tool by the route of plan section
-   7, item 5a (his exact values above; any difference: stop and tell him); `cargo tree --workspace -e normal,dev`
-   against the six overrides. Take the worktree's edits back with `git restore` and remove it without force.
-2. Step 4: `sim-wasm`'s `Sim` (`rebase` returns the due time), `scripts/build.mjs` (it refuses to run the tool without
-   its expected sha256), the first Wasm build, the cost of the overflow overrides, `.gitignore`. Then steps 5 to 8.
-3. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and the reason `chacha20` 0.10.0 and 0.10.1
-   were withdrawn, read before the crate question goes to him.
-4. Read CI on bc0bef1 (`toolchain` run 202, `gate` run 904). The saver: restart it within 110 minutes of the time under
-   "Running work".
+1. Step 5: `worker.ts` and `index.ts` (the stub `PACKAGE` and its test go), the boundary tests on the built Wasm
+   (`packages/sim-worker/boundary/`). Step 6: the page (`vite.config.mjs` with both servers on 127.0.0.1 only: the
+   security answer's condition 3). Step 7: the browser tests (`tests/skeleton/`, the `chromium` project, the server
+   only when `SHAMBLE_DIST` is set). Step 8: readings, planted defects, the production check, docs, the zip,
+   reviews (seven reviewers: three, three, one), the verifier, the advisor agent on the final head, the report, the
+   pull request (draft, then ready); stop for his go and his Brave check.
+2. Size: 1,880 added lines before step 3 (plan about 2,900; stop line 4,000, accepted by him: "The size as you plan
+   it, about 2,900 lines with the stop line at 4,000, is fine"). Keep the rest tight.
+3. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and why `chacha20` 0.10.0 and 0.10.1 were
+   withdrawn, read before the crate question goes to him. For the report's follow-ups: the npm scope `@shamble`.
+4. Read CI on a2ed2d9, the first run with the new crates (`toolchain`'s time against its 15 minutes).
+5. The saver: restart it within 110 minutes of the time under "Running work".
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
@@ -276,4 +313,4 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 
 ## Running work
 - saver: running since 2026-11-18T22:12:00.211Z (its own first line; task bpbviesk8; 10-minute interval, stops after 110 minutes).
-- agents: security-auditor on the dependency content (started after this session's save of 22:30:20 UTC).
+- agents: none.
