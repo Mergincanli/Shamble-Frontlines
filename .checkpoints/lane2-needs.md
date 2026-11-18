@@ -15,7 +15,7 @@
 1. His item 1: main b763ba3e merged into the branch (plain merge, no conflict: no file changed on both sides since
    4460ef5b), merge commit aa02297; pushed through the checkpoint script with this file.
 
-2. His item 2 done (2026-11-18 about 23:05 UTC): Part 15 read whole (348 lines; his six answers at its top: LANE-SPLIT,
+2. His item 2 done (2026-11-18, before 23:00 UTC; transcript): Part 15 read whole (348 lines; his six answers at its top: LANE-SPLIT,
    RECORD-FILES, VFX-ROUTE, VFX-FIX, VFX-MOMENTS, GUN-FILES, each (a) with additions); DECISIONS.md RECORD-FILES (each
    pull request writes only its own lines, in its docs pass, after taking main in; never rewords, re-wraps or moves
    another lane's lines) and OLD-LINES (lines about merged pull requests may be moved by script, byte for byte, by
@@ -25,9 +25,9 @@
    the look carry, the comparisons, 6 Look, the VFX proof, M, 10 Body, 11 Feel.
 
 ## Current step
-3. The needs list: one agent (engine-architect, model opus, its file's effort xhigh) launched about 23:07 UTC, notes
+3. The needs list: one agent (engine-architect, model opus, its file's effort xhigh) launched 2026-11-18T23:00:26.326Z (transcript), notes
    `.checkpoints/lane2-needs/engine-architect-needs.md`, draft `.checkpoints/lane2-needs/needs-list-draft.md`; the
-   saver `watch lane2-needs` started (background task bvaxw5o8t). Then one advisor-tool consultation checks the list;
+   saver `watch lane2-needs` started (background task bvaxw5o8t; its first line 23:00:26 UTC). Then one advisor-tool consultation checks the list;
    then one comment on issue #59 (naming lane 2, ending with the Claude Code footer), its link to him.
 
 ## Next steps
@@ -45,5 +45,5 @@
 - His lane-2 words of 2026-11-18, 23:37 (the file above): items 1-6.
 
 ## Running work
-- agent engine-architect (needs list), launched 2026-11-18 about 23:07 UTC; notes and draft in `.checkpoints/lane2-needs/`.
-- saver bvaxw5o8t (`watch lane2-needs`), started about 23:07 UTC.
+- agent engine-architect (needs list), launched 2026-11-18T23:00:26.326Z (transcript); notes and draft in `.checkpoints/lane2-needs/`.
+- saver bvaxw5o8t (`watch lane2-needs`), first line 2026-11-18 23:00:26 UTC.
