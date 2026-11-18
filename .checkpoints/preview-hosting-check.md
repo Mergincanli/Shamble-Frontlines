@@ -442,6 +442,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Check-in 2 (fired 16:01:53 UTC): still none; probe.yml registered and active since 14:57:13 UTC. Check-in 3 (the
      last) set for 16:31 UTC.
    - Read by the session at about 16:21 UTC (the GitHub MCP tool): 3 runs in the repository, none of them `probe`.
+   - Check-in 3 (fired 16:31:29 UTC, read 16:31:34): still none. **Finding** (results log): the hourly schedule has not
+     fired in its first two slots (15:23 and 16:23 UTC). No further check-in. A probe run started by hand after
+     `round-a`'s verify.
    - It does not block sitting 1. It blocks sitting 2's closes (consultation 17): the 24-hour reading rests on a script
      that has never run against Cloudflare, so one probe run is read before the clocks start, started by hand
      (`purpose: deletion`) if the schedule still has not fired.

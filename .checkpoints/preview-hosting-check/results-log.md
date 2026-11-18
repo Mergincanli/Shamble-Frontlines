@@ -294,3 +294,16 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - Still no probe run at 2026-11-18 16:02 UTC (total_count 0). The workflow is registered: list_workflows shows
   "probe", .github/workflows/probe.yml, state "active", created 2026-11-18T15:57:13+01:00 (14:57:13 UTC, the merge).
   A last check-in is set for 16:31 UTC, after the 16:23 slot.
+- **Finding: the hourly schedule has not fired in its first two slots.** At 2026-11-18 16:31:34 UTC (check-in 3, the
+  last), the list of probe.yml runs still gives total_count 0. The slots it could fill since the merge put probe.yml on
+  `main` (14:57:11 UTC; workflow created 14:57:13 UTC): 15:23 and 16:23 UTC, both without a run. Why is not known
+  (GitHub's page on the schedule event is not read in this session). Next (consultation 17): one probe run started by
+  hand (`purpose: deletion`) after
+  `round-a`'s verify, so the script has met Cloudflare before sitting 2's 24-hour clocks start. No further check-in.
+
+### Day 1, sitting 1 (the marks start here)
+- `round-a`: deploy run #2, id 44347351522, started by the session (run_workflow, ref `main`, set `round-a`; created
+  2026-11-18 16:26:57 UTC), head 2162db55d93f59cf2ed7e371a3915409f0b5a587. plan green (16:27:00-16:27:07); builds green:
+  production (16:27:09-16:27:16), iso-off (16:27:09-16:27:34), iso-on (16:27:09-16:27:20); the three deploy legs
+  (production, iso-off, iso-on) "waiting" on `preview` from 16:27:34 UTC. His list sent after that; still waiting at
+  16:31:34 UTC.
