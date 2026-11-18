@@ -366,3 +366,13 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   - TE-12 (the page's resource list against the manifest): the build's files the page and worker loaded are all
     in the manifest; "/favicon.ico" is the one extra entry, Brave's own icon request (no such file in the build; not
     fetched by check-headers, which reads the manifest's files).
+- **The build count, first reading (checklist step 4, PM-0006-7)**: his screenshot (no words; 2026-11-18 17:19:10 UTC,
+  e98551a5-b3fa-47c1-973b-4f89cd4e5544) of Cloudflare, "Workers &
+  Pages > shamble-preview-check", tab "Deployments" (tabs: Deployments, Metrics, Custom domains, Settings), transcribed:
+  "Production", "Domains: shamble-preview-check.pages.dev": Production, main, "preview-check run 443473515...",
+  https://0354374e.shamble-preview-check.pages.dev, "16 minutes ago". "All deployments": Production main
+  (0354374e, "16 minutes ago"); Preview iso-off ("preview-check run 443473515...", 6e61a4c4, "16 minutes ago"); Preview
+  iso-on (e48ee07b, "16 minutes ago"); Production main (no message), https://77605f36.shamble-preview-check.pages.dev,
+  "3 days ago" (his first upload when he made the project, plan A4). The setup upload (1f6487e4) is not listed (deleted
+  15:04:38 UTC). **No count of builds is shown on this page.** The overview and the Metrics tab: asked of him before
+  `uploads` starts.
