@@ -1,0 +1,245 @@
+worktree at 1a2ff137625751d87d2ca3bc61938913a1f9df4a, 2026-11-18T13:39:07Z
+
+## 0a-clean-protocol
+command: cargo test -p protocol --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+
+## 0b-clean-client-endpoint
+command: cargo test -p client-endpoint --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+as wanted: yes
+
+## 0c-clean-tsc
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 0 (wanted: pass)
+as wanted: yes
+
+## 1-rename-without-regenerating
+command: cargo test -p protocol --locked
+exit code: 101 (wanted: fail)
+  | packages/types/src/generated/protocol/Snapshot.ts is not what the Rust types give; delete by hand what does not belong there, then write the folder again with SHAMBLE_WRITE_TYPES=1 cargo test -p protocol
+  | failures:
+  | test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+  | test ts_export::generated_types_are_current ... FAILED
+as wanted: yes
+
+## 2-hand-edit-of-Join.ts
+command: cargo test -p protocol --locked
+exit code: 101 (wanted: fail)
+  | packages/types/src/generated/protocol/Join.ts is not what the Rust types give; delete by hand what does not belong there, then write the folder again with SHAMBLE_WRITE_TYPES=1 cargo test -p protocol
+  | failures:
+  | test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+  | test ts_export::generated_types_are_current ... FAILED
+as wanted: yes
+
+## 2b-hand-edit-of-layout.ts
+command: cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  | packages/types/src/generated/block/layout.ts is not what the layout table gives; delete by hand what does not belong there, then write the file again with SHAMBLE_WRITE_TYPES=1 cargo test -p client-endpoint
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+
+## 2c-extra-file-in-generated-protocol
+command: cargo test -p protocol --locked
+exit code: 101 (wanted: fail)
+  | packages/types/src/generated/protocol/Extra.ts is not a generated file; delete by hand what does not belong there, then write the folder again with SHAMBLE_WRITE_TYPES=1 cargo test -p protocol
+  | failures:
+  | test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+  | test ts_export::generated_types_are_current ... FAILED
+as wanted: yes
+
+## 2d-extra-file-in-generated-block
+command: cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  | assertion `left == right` failed: packages/types/src/generated/block must hold the plain file layout.ts and nothing else; delete by hand what does not belong there, then write the file again with SHAMBLE_WRITE_TYPES=1 ca
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+
+## 2e-extra-file-directly-in-generated
+command: cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  | /home/user/Shamble-Frontlines/.gate/cs1-types/plant/crates/client-endpoint/../../packages/types/src/generated holds files of its own: ["stray.ts"]; delete them by hand
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+
+## 2f-doc-comment-with-a-comment-end
+command: cargo test -p protocol --locked
+exit code: 101 (wanted: fail)
+  the output does not hold: a doc comment of its Rust type holds
+  | failures:
+  | test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+  | test ts_export::generated_types_are_current ... FAILED
+as wanted: no
+
+## 3a-rename-and-regenerate
+command: env SHAMBLE_WRITE_TYPES=1 cargo test -p protocol --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+
+## 3b-plain-run-after
+command: cargo test -p protocol --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+  files changed by the regeneration:  M packages/types/src/generated/protocol/Snapshot.ts 
+
+## 3c-tsc-shipped-sources
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.shipped.json
+exit code: 0 (wanted: pass)
+as wanted: yes
+
+## 3d-tsc-with-the-stale-test
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 2 (wanted: fail)
+  | packages/types/src/index.test.ts(41,5): error TS2353: Object literal may only specify known properties, and 'group' does not exist in type 'Snapshot'.
+  | packages/types/src/index.test.ts(41,5): error TS2353: Object literal may only specify known properties, and 'group' does not exist in type 'Snapshot'.
+as wanted: yes
+
+## 3e-tsc-after-the-test-follows
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 0 (wanted: pass)
+as wanted: yes
+
+## 3f-vitest
+command: vitest_types
+exit code: 0 (wanted: pass)
+  |       Tests  7 passed (7)
+as wanted: yes
+
+## 4-layout-change-without-regenerating
+command: cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  | packages/types/src/generated/block/layout.ts is not what the layout table gives; delete by hand what does not belong there, then write the file again with SHAMBLE_WRITE_TYPES=1 cargo test -p client-endpoint
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+  LAYOUT_HASH lines in the failing message (the committed file's, then the changed table's):
+  | export const LAYOUT_HASH = 0x2df78c30;
+  | export const LAYOUT_HASH = 0x5d0e9efb;
+  tests that failed: test layout_ts::generated_layout_is_current ... FAILED test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s 
+
+## 5a-hash-without-its-tag-bytes
+command: cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  | test layout::tests::hash_covers_every_value ... FAILED
+  | failures:
+  | test layout::tests::hash_covers_every_value ... FAILED
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+as wanted: yes
+
+## 5b-hash-skips-later-sections-fields
+command: cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  | test layout::tests::hash_covers_every_value ... FAILED
+  | failures:
+  | test layout::tests::hash_covers_every_value ... FAILED
+  | test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+as wanted: yes
+
+## 6a-binary-run-as-if-from-another-copy
+command: env CARGO_MANIFEST_DIR=/somewhere/else /home/user/Shamble-Frontlines/.gate/cs1-types/plant-target/debug/deps/client_endpoint-bdbcb2c4df73f18c generated_layout_is_current
+exit code: 101 (wanted: fail)
+  | assertion `left == right` failed: run this test through cargo test, from the copy of the repository it was built in (/home/user/Shamble-Frontlines/.gate/cs1-types/plant/crates/client-endpoint), with a target folder that 
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.10s
+as wanted: yes
+
+## 6b-binary-run-without-cargo
+command: env -u CARGO_MANIFEST_DIR /home/user/Shamble-Frontlines/.gate/cs1-types/plant-target/debug/deps/client_endpoint-bdbcb2c4df73f18c generated_layout_is_current
+exit code: 101 (wanted: fail)
+  | assertion `left == right` failed: run this test through cargo test, from the copy of the repository it was built in (/home/user/Shamble-Frontlines/.gate/cs1-types/plant/crates/client-endpoint), with a target folder that 
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.10s
+as wanted: yes
+
+## 6c-write-mode-with-the-tree-missing
+command: env SHAMBLE_WRITE_TYPES=1 cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  | write mode needs /home/user/Shamble-Frontlines/.gate/cs1-types/plant/packages/types/src/generated to exist, with no link in its path
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+as wanted: yes
+  the missing folder was not made again
+
+## 6d-write-mode-with-a-linked-block-folder
+command: env SHAMBLE_WRITE_TYPES=1 cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  | write mode refuses packages/types/src/generated/block: it is a link
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+as wanted: yes
+
+## 6e-write-mode-with-a-linked-protocol-folder
+command: env SHAMBLE_WRITE_TYPES=1 cargo test -p protocol --locked
+exit code: 101 (wanted: fail)
+  | write mode refuses packages/types/src/generated/protocol: it is a link
+  | failures:
+  | test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+  | test ts_export::generated_types_are_current ... FAILED
+as wanted: yes
+  outside the worktree after both: [victim.ts ] (wanted: victim.ts alone)
+
+## 7-hash-read-as-a-signed-number
+command: vitest_types
+exit code: 1 (wanted: fail)
+  |       Tests  1 failed | 6 passed (7)
+as wanted: yes
+
+## 17a-parameter-property
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 2 (wanted: fail)
+  | packages/types/src/generated/bite-parameter-property.ts(2,15): error TS1294: This syntax is not allowed when 'erasableSyntaxOnly' is enabled.
+  | packages/types/src/generated/bite-parameter-property.ts(2,15): error TS1294: This syntax is not allowed when 'erasableSyntaxOnly' is enabled.
+as wanted: yes
+
+## 17b-enum
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 2 (wanted: fail)
+  | packages/types/src/generated/bite-enum.ts(1,13): error TS1294: This syntax is not allowed when 'erasableSyntaxOnly' is enabled.
+  | packages/types/src/generated/bite-enum.ts(1,13): error TS1294: This syntax is not allowed when 'erasableSyntaxOnly' is enabled.
+as wanted: yes
+
+## 17c-declare-enum-recorded
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 0 (wanted: pass)
+as wanted: yes
+
+## 9-clean-again-protocol
+command: cargo test -p protocol --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+
+## 9-clean-again-client-endpoint
+command: cargo test -p client-endpoint --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+as wanted: yes
+
+## the worktree after the runs
+git status --short: [] (empty means every file is back)
+worktree removed (no force)
+
+runs: 30, not as wanted: 1

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # The planted defects of change-set 1 (PM-0002-15, -16, -17), run once in a throwaway worktree and never committed.
 # Run from the repository root:  bash .checkpoints/cs1-types/plant.sh > .checkpoints/cs1-types/plant-results.txt 2>&1
-# It needs the root's node_modules (npm ci --ignore-scripts) and reuses the root's target folder for the registry crates.
+# It needs the root's node_modules (npm ci --ignore-scripts). The worktree builds into a target folder of its own
+# (.gate/cs1-types/plant-target): a target folder shared with the main folder made cargo reuse the other tree's test
+# binaries (round 1's finding), so no two trees share one.
 # Each defect: plant, run, print the command, its exit code and the failing lines, put the file back.
 set -u
 root=$(pwd)
@@ -10,7 +12,7 @@ logs="$root/.gate/cs1-types/plant-logs"
 [ -e "$wt" ] && { echo "$wt exists: remove it first (git worktree remove .gate/cs1-types/plant)"; exit 2; }
 mkdir -p "$logs"
 git worktree add --detach "$wt" HEAD > "$logs/worktree.txt" 2>&1 || { cat "$logs/worktree.txt"; exit 2; }
-export CARGO_TARGET_DIR="$root/target"
+export CARGO_TARGET_DIR="$root/.gate/cs1-types/plant-target"
 cd "$wt" || exit 2
 echo "worktree at $(git rev-parse HEAD), $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 verdicts=0; wrong=0
@@ -86,8 +88,16 @@ printf 'export type Extra = number;\n' > $gen/protocol/Extra.ts
 run "2c-extra-file-in-generated-protocol" fail 'generated/protocol/Extra\.ts is not a generated file' cargo test -p protocol --locked
 rm $gen/protocol/Extra.ts
 printf 'export const extra = 1;\n' > $gen/block/extra.ts
-run "2d-extra-file-in-generated-block" fail 'generated/block must hold layout\.ts and nothing else' cargo test -p client-endpoint --locked
+run "2d-extra-file-in-generated-block" fail 'generated/block must hold the plain file layout\.ts and nothing else' cargo test -p client-endpoint --locked
 rm $gen/block/extra.ts
+printf 'export const stray = 1;\n' > $gen/stray.ts
+run "2e-extra-file-directly-in-generated" fail 'generated holds files of its own' cargo test -p client-endpoint --locked
+rm $gen/stray.ts
+
+# (2f) A doc comment that would end the generated comment early (ts-rs copies it as it is).
+keep $messages; edit $messages "    /// Provisional: its width." "    /// Provisional: its width (see docs/**/*.md)." first
+run "2f-doc-comment-with-a-comment-end" fail 'a doc comment of its Rust type holds' cargo test -p protocol --locked
+back $messages
 
 # (3) The control: the same rename, regenerated. Rust passes; the shipped TypeScript passes; the package's own test, which
 # builds a Snapshot, fails the type check until it follows the rename.
@@ -113,6 +123,44 @@ echo "  LAYOUT_HASH lines in the failing message (the committed file's, then the
 grep -E '^export const LAYOUT_HASH' "$logs/4-layout-change-without-regenerating.txt" | sed 's/^/  | /'
 echo "  tests that failed: $(grep -E '^test .* FAILED' "$logs/4-layout-change-without-regenerating.txt" | tr '\n' ' ')"
 back $layout
+
+# (5) The hash's own tests: the tag bytes left out of the stream; the fields of later sections skipped.
+keep $layout
+edit $layout '        hash = fnv1a(hash, &[SECTION_TAG]);
+' '' first
+edit $layout '            hash = fnv1a(hash, &[FIELD_TAG]);
+' '' first
+run "5a-hash-without-its-tag-bytes" fail 'test layout::tests::hash_covers_every_value \.\.\. FAILED' cargo test -p client-endpoint --locked
+back $layout
+keep $layout
+edit $layout '        while f < fields.len() {' '        while f < fields.len() && s == 0 {' first
+run "5b-hash-skips-later-sections-fields" fail 'test layout::tests::hash_covers_every_value \.\.\. FAILED' cargo test -p client-endpoint --locked
+back $layout
+
+# (6) A test binary that does not run in the copy it was built in (two trees sharing a target folder), and write mode
+# against a missing tree or a linked folder. The binaries are this worktree's own, built by the clean runs above.
+bin_block=$(ls -t "$CARGO_TARGET_DIR"/debug/deps/client_endpoint-* | grep -v '\.d$' | head -1)
+run "6a-binary-run-as-if-from-another-copy" fail 'run this test through cargo test, from the copy of the repository it was built in' env CARGO_MANIFEST_DIR=/somewhere/else "$bin_block" generated_layout_is_current
+run "6b-binary-run-without-cargo" fail 'run this test through cargo test, from the copy of the repository it was built in' env -u CARGO_MANIFEST_DIR "$bin_block" generated_layout_is_current
+mv $gen "$logs/kept-generated"
+run "6c-write-mode-with-the-tree-missing" fail 'write mode needs .* to exist' env SHAMBLE_WRITE_TYPES=1 cargo test -p client-endpoint --locked
+if [ -e $gen ]; then echo "  write mode MADE the missing folder again"; wrong=$((wrong + 1)); else echo "  the missing folder was not made again"; fi
+mv "$logs/kept-generated" $gen
+mkdir -p "$logs/outside" && printf 'export const victim = 1;\n' > "$logs/outside/victim.ts"
+mv $gen/block "$logs/kept-block" && ln -s "$logs/outside" $gen/block
+run "6d-write-mode-with-a-linked-block-folder" fail 'write mode refuses packages/types/src/generated/block: it is a link' env SHAMBLE_WRITE_TYPES=1 cargo test -p client-endpoint --locked
+rm $gen/block && mv "$logs/kept-block" $gen/block
+mv $gen/protocol "$logs/kept-protocol" && ln -s "$logs/outside" $gen/protocol
+run "6e-write-mode-with-a-linked-protocol-folder" fail 'write mode refuses packages/types/src/generated/protocol: it is a link' env SHAMBLE_WRITE_TYPES=1 cargo test -p protocol --locked
+rm $gen/protocol && mv "$logs/kept-protocol" $gen/protocol
+echo "  outside the worktree after both: [$(ls "$logs/outside" | tr '\n' ' ')] (wanted: victim.ts alone)"
+[ "$(ls "$logs/outside" | tr '\n' ' ')" = "victim.ts " ] || wrong=$((wrong + 1))
+rm "$logs/outside/victim.ts" && rmdir "$logs/outside"
+
+# (7) The page's check, read as a signed number.
+keep packages/types/src/layout-check.ts; edit packages/types/src/layout-check.ts "getUint32" "getInt32" first
+run "7-hash-read-as-a-signed-number" fail 'Tests +[0-9]+ failed' vitest_types
+back packages/types/src/layout-check.ts
 
 # PM-0002-17's bites: syntax that is not erasable, in the generated folder, read by the same config.
 printf 'export class Bite {\n  constructor(public readonly x: number) {}\n}\n' > $gen/bite-parameter-property.ts
