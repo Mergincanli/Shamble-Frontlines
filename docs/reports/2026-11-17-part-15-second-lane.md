@@ -60,7 +60,7 @@ DONE: built, reviewed and pushed; it waits for Mustafa's go on the merge.
   main's CI still names 82c605e; #55's row left STATUS in #56's docs pass without an archive row (its merge is still
   recorded in ROADMAP). See OLD-LINES below.
 - This change-set's notes (its plan, the reviewers' notes, the scripts) are deleted in the last commit; the commit
-  before it holds them.
+  before it holds them: 629416b4eedc4ebdb4f21aff3a514bb53adbb8b8.
 
 ## Risks
 1. Lane 2 has Part 15 only once he gives it the file; each of its units starts from the point 15.2 names, and it edits
