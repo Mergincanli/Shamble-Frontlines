@@ -473,3 +473,19 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   (https://shamble-preview-check.pages.dev/ and https://e9a37459.shamble-preview-check.pages.dev/) fail on all 7 paths
   with "production carries X-Robots-Tag noindex", and on nothing else: the bite caught on production's own address.
 - `restore-production` started by the session right after (run_workflow, ref `main`, set `restore-production`).
+- **`restore-production`**: deploy run #6, id 44367096948 (created 18:12:13 UTC); plan, build and deploy green, no
+  wait; deployment de1c3e5e-1abb-4c8c-af5f-fb49165914d7 (record artifact created 18:13:27 UTC). verify (headers-44367096948,
+  artifact 14458520412, zip sha256 67308e8e565f..., equal to its digest; checked_at 18:13:45.151Z): "summary":
+  {"records":1,"pass":1,"fail":1,"no_reading":0}: production's own address passes (no noindex: the bite is gone);
+  the one-off link https://de1c3e5e.shamble-preview-check.pages.dev/ fails on all 7 paths with "production carries
+  X-Robots-Tag noindex": Risk 13 again, as round-a showed. Production carried the planted noindex from the bite's
+  upload (between 18:11:02 and 18:11:13 UTC) to the restore's (by 18:13:27 UTC): about 2 minutes.
+- **Sitting 1's readings in short**: Brave steps 1-3 achieved (his word); PM-0006-2: every header as expected on 12
+  preview links and production's own address, the two planted mistakes caught (COEP on the worker; noindex on
+  production), Risk 13 on production's one-off link (twice); PM-0006-3: Chrome, Edge and Firefox as expected on all
+  five links (bite caught), Safari 1 reading of 15 (script fault, open); PM-0006-4: Chrome 0 bytes on production's
+  second visit, 300 on the no-cache bite (caught), and the header half caught on both links; PM-0006-5: the 26 MiB file
+  flagged by the size check and refused by Wrangler; PM-0006-7: "no count shown" before and after, ten uploads listed.
+  Approvals clicked in sitting 1: 3 (round-a, uploads, bites), one per run whatever its legs; then REVIEWER (b).
+- The hourly probe: the 17:23 UTC slot passed without a scheduled run as well (list of probe.yml runs at about 18:14
+  UTC: only run #1, started by hand). Three slots missed since the merge: 15:23, 16:23, 17:23.

@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:11 Amsterdam (18:11 UTC)
+- **Last update:** 2026-11-18 19:15 Amsterdam (18:15 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -448,6 +448,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - The probe run started by hand (run #1, id 44355175073, 17:08:00-17:08:26 UTC, success; results log): both setup
      links 404 "gone" as expected; production and round-a's links "serve". Step 22's first outcome (nothing to do);
      the script has met Cloudflare. To be saved as done after the next consultation (his rule: before, never after).
+   - The 17:23 UTC slot passed without a scheduled run too (list of probe.yml runs at about 18:14 UTC: only the run
+     started by hand): three slots missed (15:23, 16:23, 17:23).
    - It does not block sitting 1. It blocks sitting 2's closes (consultation 17): the 24-hour reading rests on a script
      that has never run against Cloudflare, so one probe run is read before the clocks start, started by hand
      (`purpose: deletion`) if the schedule still has not fired.
@@ -530,6 +532,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      row stays open; a fix (one Safari session for all its loads) needs its own review and his yes (a new branch or a
      pull request to `main`), proposed after this sitting with an advisor consultation first. `bite-production`
      started at about 18:10:28 UTC (no wait).
+   - `bite-production` (run #5, 44366750977): deployed with no wait (the reviewer off), verify caught noindex on both
+     production links, nothing else. `restore-production` (run #6, 44367096948): production's own address passes
+     again; Risk 13 again on its one-off link. Production carried the bite about 2 minutes. All of sitting 1's runs
+     are done (results log, "Sitting 1's readings in short"); step 23 is saved as done only after the next
+     consultation (his rule).
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.
