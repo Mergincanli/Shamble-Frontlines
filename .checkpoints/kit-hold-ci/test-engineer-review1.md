@@ -40,3 +40,13 @@ never run `save`/`watch` of any copy in this working tree, never commit or push.
 - The test file's only removed line vs main is the import line (`symlinkSync` added); the first 27 tests' bodies
   are untouched (+224 -1, the -1 is line 8's import).
 - Verdict A: HOLDS.
+
+### Block D, part 1 (done 18:17 UTC): five runs
+- `node --test .claude/scripts/checkpoint.test.mjs` x5, one at a time, idle machine (4 cores, load 0.06):
+  33/33 pass every run; walls 22.2, 22.6, 23.3, 23.9, 23.5 s. No flake.
+- Watch tests' durations over the 5 runs (ms): #9 1500-1579, #10 352-390, #15 941-998, #16 790-831,
+  #32 1006-1035. Deadlines are 15 000 ms: margin about 10x. #32 waits for "saved (locally|and pushed)" and then
+  asserts the hold's line, so a slow machine fails it (never passes it falsely).
+- Tools: runner.mjs (runs a test file against N script copies, writes TAP per run), failat.mjs (failing test +
+  the assertion's line from the stack), build-mutants.mjs + mutants.txt (49 one-change copies of the head script,
+  every find matched exactly once, all pass `node --check`).

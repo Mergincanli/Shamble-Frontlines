@@ -42,3 +42,54 @@ Started 2026-11-18 (after 18:04 UTC). Memory read: .claude/agent-memory-local/se
   trimcheck.mjs printed raw " a/Cargo.lock\0.checkpoints/test.md\0" -> after trim+split ["a/Cargo.lock", ...]. JS trim()
   strips U+0009-000D, U+0020, U+00A0, U+1680, U+2000-200A, U+2028/2029, U+202F, U+205F, U+3000, U+FEFF. The NUL at the
   end protects the last path; only the first path (sorted by bytes) is hit.
+- F1 CONFIRMED (harness.mjs '^ws-' on head.mjs): RELEASED with no record (exit 0, "saved and pushed") for a root folder
+  named " a", "\ta", "\na", "\ra", "\va", "\fa" holding Cargo.lock=D when main holds a/Cargo.lock=C (unchanged in the
+  push); also " crates/sim/Cargo.toml" with a new [dependencies] line beside main's crates/sim/Cargo.toml. One record
+  line for a/Cargo.lock (content E) also released the changed " a/Cargo.lock" (one line, two paths and contents).
+  Held: a U+00A0 folder (sorts after .checkpoints/, so not first) and " x/Cargo.lock" when x/Cargo.lock does not exist
+  (but the message names "x/Cargo.lock", and the true sha256sum line cannot release it; only a false
+  "deleted  x/Cargo.lock" line would). Cause: checkpoint.mjs:123 + :127 split run()'s trimmed output (run(): :60-67).
+- Block 3a done (harness, head.mjs; 27 scenarios): HELD as intended, no record: root folder ":" and ":a", "::a",
+  ":(top)a", ":(literal)a", ":(top,literal)a", ":!a", ":(exclude)a", ":(glob)a", ":(icase)a", "*", "?", "[a]" each
+  beside a same-content twin on main; ":a" with its true sha256sum line (known: errs towards holding); rename
+  a/Cargo.lock -> b/Cargo.lock (both named); copy to b/Cargo.lock; merge of another unpushed branch with a lockfile;
+  file -> link (record lines for target, link text and "deleted" all refused); file -> folder (unreleasable even by
+  "deleted"); gitlink (held even with "deleted"); empty lockfile; a 65 MiB lockfile with its true line (maxBuffer:
+  held, unreleasable). PUSHED as intended: take-main-in merge; mode-only change with main's blob (accepted); empty
+  lockfile with e3b0... line; deleted+re-added same content and added+removed (tree to tree: no change, [skip ci]:
+  the intermediate commit is published but CI builds only the head).
+- Block 3b done (24 scenarios): F1b CONFIRMED, same cause class as F1: run() decodes stdout as UTF-8
+  (checkpoint.mjs:62 `encoding: 'utf8'`), so a path byte 0xff becomes U+FFFD. Main holds "�/Cargo.lock"=C, the
+  push adds "\xff/Cargo.lock"=D with no record: RELEASED (ls-tree reads the U+FFFD twin, equal to main). Alone, the
+  \xff folder is held, but the true sha256sum line cannot release it (the message prints U+FFFD).
+- Record forms: CRLF, trailing spaces/tab, leading spaces, BOM, duplicates, a path with two spaces, é/ folder: released
+  as meant. One space, "hash *path" (-b), uppercase hex, "./" prefix: held. Another slug's record: held. The notes
+  folder as a link: held. A record that is a LINK whose target text is a release line, or a FOLDER holding an entry
+  named as a release line: RELEASED (git show prints the link text / the tree listing). Intent-only (the record is
+  trusted by design), but a PR reviewer must check the record is a plain file. L-level.
+- Bases: new branch + origin/main present: held as meant. New branch with origin/main deleted, or with unrelated
+  history (orphan), code only: held with "(what this push changes could not be read)" and the advice to write
+  dependency-check.md, which cannot release it (no names to match); main's script pushed these. Fail-safe; message
+  wording Low (the way out is `git fetch origin main`). Branch on the remote + origin/main deleted + main's lockfile
+  taken in: held (no main release without the ref): fail-safe.
+- Backslash folder a\b/Cargo.lock: sha256sum prints "\<hash>  a\\b/Cargo.lock" (escaped, leading backslash), so the
+  rule's "as sha256sum prints it" cannot release it: held. Same for a newline in the path (split on \n). Fail-safe; the
+  rule line is not exact for such paths (Low). Case variants cargo.lock / Package.json: pushed (by design, five exact
+  names; Linux CI reads neither). A note named .checkpoints/test/Cargo.toml: held (any folder includes the notes).
+- Block 3c done (git failures through a PATH shim, shim/git): with a lockfile NOT on main and no record, every failure
+  ends HELD: rev-parse of the remote branch (falls back to the merge-base), the names diff ("could not be read"),
+  git show of the record, the first ls-tree, the literal ls-tree, cat-file, merge-base (new branch); a hang in
+  cat-file killed after 5 s: nothing pushed. With the lockfile equal to main, failures of rev-parse, git show and
+  cat-file still release it (the main rule needs none of them): correct. No fail-open from a git error found.
+- Block 4 done (Q3, harness '^(q3|...)' on main.mjs and head.mjs): identical outcome, exit code and [skip ci] for:
+  notes only (pushed, skip ci), code ahead foreground (pushed, no skip), new branch notes only (pushed), a secret-
+  flagged note beside a good one (pushed, exit 1, "flagged notes left out"), nothing to save (exit 0), watch with code
+  ahead + SIGTERM (not pushed, exit 0), watch SIGTERM before the first tick (last save pushed, exit 0). The only
+  difference: a new branch whose clone has no refs/remotes/origin/main, or with unrelated history: main's script
+  pushes, the head holds ("could not be read", exit 1). Fail-safe; the first is known (advisor), the orphan case is
+  the same class. Pre-existing in BOTH: a code file moved into .checkpoints/ is pushed WITH [skip ci]
+  (onlyCheckpointsAhead :111 uses `git diff --name-only` with rename detection on; advisor's E7). Not this PR's lines.
+- Race (race.mjs on head.mjs): 45 foreground saves in 15 rounds of 3, racing watch --every 0.01, notes changing:
+  every save exit 1, the origin never received Cargo.lock. Record written: the saver alone did not push in 3 s (code
+  ahead: "push them yourself"); one foreground save then pushed (exit 0). The pushed SHA is always the checked one
+  (push(branch, commit.out), :230), so a race can only choose between checked commits.
