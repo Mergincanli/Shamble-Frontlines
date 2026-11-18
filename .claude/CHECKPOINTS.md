@@ -57,6 +57,16 @@ Copy this template. Keep it short: it is a handoff, not a log.
 - One command commits and pushes the checkpoint folder alone, leaving anything else you staged as it is:
   `node .claude/scripts/checkpoint.mjs save <task-slug> -m "<step>" --trailer "<attribution line>"` (one `--trailer` per
   attribution line the session's instructions give).
+- **A dependency change is held** (Mustafa's DEP-HOLD, 2026-11-18): the script (`save` and the saver alike) never
+  pushes while what it would push changes a manifest or a lockfile (`Cargo.toml`, `Cargo.lock`, `package.json`,
+  `package-lock.json`, `npm-shrinkwrap.json`, in any folder), compared with the remote branch, or with main for a
+  branch not yet pushed. It commits the notes locally, names the files, and `save` exits 1. The hold is released by
+  `.checkpoints/<task-slug>/dependency-check.md`, written after security-auditor's answer on exactly that content and
+  naming that answer's notes file: one line per file, `<sha256>  <path>` as `sha256sum` prints it from the repository
+  root (`deleted  <path>` for a removed file); then `save` again. Until then build nothing that holds the change, and
+  push nothing by hand: a plain `git push` is not held.
+  A manifest or lockfile is not held when its content in the push equals its content on main (`origin/main` as last
+  fetched): that content was merged with Mustafa's go, so a branch that takes main in is not stopped by it.
 - Each step ends with a three-part summary for Mustafa (brief §6): what's done, what's checkpointed (where), what's
   next.
 - **At every update, check the background saver** when agents or a workflow are running, and restart it if it has
@@ -227,3 +237,23 @@ folder for all copies. No rule change: rm -rf stays denied."
   folder's lock lets one build run at a time. The netcode spike keeps one per copy (its `.cargo/config.toml` puts it
   under the copy's `.gate/netcode-proof-test/target`).
 - `rm -rf` stays denied.
+
+## 11. Kept raw logs and the old build cache (Mustafa, 2026-11-15, KEPT-LOGS: a narrow rule)
+His words: "What the rule may cover, and nothing else: 1. The raw-log folder of a run set whose results are committed
+and whose ruling is closed. 2. The one old build cache, .gate/u3c-review-target." It is the narrow kit rule of his
+words of 2026-11-09 ("if it's ever needed, it becomes a narrow kit rule instead"). `rm -rf` stays denied: only
+`node .claude/scripts/kept-logs.mjs` removes either, and its header gives the commands.
+- Who and when: the main session of a day session, in the main folder (the script refuses a routine and a linked
+  worktree), never while a run set or a build runs: packing takes a core from timed runs, the list's commit under
+  `spikes/netcode-proof/` stops a running set, and a build's cache can fill the disk under the archive.
+- A raw-log folder (the netcode proof test's, under `.gate/netcode-proof-test/runs/`), one at a time: `list` writes
+  its list (each file's sha256, size and path) beside the set's committed results; commit it, naming the set's closed
+  ruling (file and line) in the message, and push it. `pack` then packs the folder into one compressed file under
+  `.gate/netcode-proof-test/kept-logs/`, reads every file's hash back from it, walks the folder once more, and removes
+  the folder only if every hash equals the list and the folder still holds exactly the list's files and sizes. If one
+  differs, or the folder no longer matches its list, the folder stays: tell Mustafa, and pack nothing more until he
+  answers.
+- The cache: `cache` removes it only while nothing in it is newer than his words (2026-11-15 07:20 UTC); a later
+  folder at that path is not the old cache and stays.
+- Free space before and after, as the script prints it, goes into the checkpoint with the folder's ruling, and from
+  there into the report. The archives stay, finished or not: nothing here removes one.

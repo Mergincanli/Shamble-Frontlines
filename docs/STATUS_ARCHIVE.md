@@ -156,6 +156,12 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
+| **change-set 1 of the build plan, Types** (foundation step 2.4), by lane 1: the first eight message types in `crates/protocol` (plain types, no codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript generated into `packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's layout-hash check; his go on #57 and his answer OLD-LINES (who may fold old lines in the shared record files) in `docs/DECISIONS.md` by script; report `docs/reports/2026-11-18-cs1-types.md`; its follow-ups, open after it (CI-CUT; the security check's L1, L2 and L4; the lines for change-sets 2, 3 and 4, the 2.3 chat and the drafts' next revision; round 2's Lows): below, "Follow-ups", "From change-set 1, Types (PR #58)" | merged: PR #58 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs1-types`), the build chat on his personal account), 9b4b518, 2026-11-18 15:39:28 UTC (the merge commit's date; `merged_at` 15:39:29), by merge commit, on his go of 15:38:13 UTC for head 1bfe462e339511cfae6b30a1015330d9ff2e718c, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 15:38:13 UTC), after the advisor agent's APPROVE of that head (in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 884 with smoke, id 44338178450; toolchain run 182, id 44338178455; push, on 9b4b518) | done: two review rounds and the verifier's PASS (15:03 UTC); with the merge he accepted the two misses as written (CI built the nine new packages before their security check, Medium, "written down, not waived"; one evidence record did not hold, and the runs were redone), the size as counted (940 hand-written lines against 600 planned, under his stop line of 1,200), round 2's Lows as follow-ups, what was not verified and the checkpoint commits in main's history; his five answers: DEP-HOLD (a) and CI-TYPES (a), and CI-CUT (a) part 1 (the kit hold and the two CI edits: PR #60), LANE-ISSUE (a) (the "Lane requests" issue: #59, opened 15:41:35 UTC) and WATCH-58 (b) (not watched); its merge recorded by #60 | none |
+| **Part 15 of the build plan, "The second lane", to main** with his six answers (all (a), with additions), a docs change of its own (his go for #56): his words of 2026-11-17, 22:10:34 and 22:59:16 UTC, in `docs/DECISIONS.md` by script; Part 15 as he read it, with his answers on top: `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules file's line on gun files (GUN-FILES, AX-R1); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. Then change-set 1, Types (foundation step 2.4), by lane 1; lane 2 (`claude/optimistic-albattani-mdoonz`) works by Part 15, each unit from the point its 15.2 names | merged: PR #57 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/part-15-second-lane`), the build chat on his personal account), 22c6afa, 2026-11-18 11:09:31 UTC (the merge commit's date and `merged_at`), by merge commit, on his go of 11:08:25 UTC for head f26ac5b85396f4b280ba21e57f2a1ea177382d80, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 11:08:25 UTC), after the advisor agent's APPROVE of that head (about 00:17 UTC, in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 866 with smoke, id 44292101495; toolchain run 165, id 44292101705; push, on 22c6afa) | done: report `docs/reports/2026-11-17-part-15-second-lane.md`; docs-keeper's pass, the verifier's PASS (seven Lows, fixed) and the advisor agent's APPROVE at 3e4fea1 (five Lows, fixed); with the merge he accepted his go on #56 as recorded, Part 15's text as he read it (where it differs from his answers, his answers hold), the size as counted (220 written lines against the stop line of 300, and 339 copied), the lines left as found because another lane wrote them, and the checkpoint commits in main's history, and he answered OLD-LINES, who may fold old lines in the shared record files (his go, above); the advisor agent's three Lows on the final head: two in STATUS, fixed by #58's docs pass, and a size recount, left to #58's report; its merge recorded by #58 | none |
+| **change-set 0 of the build plan** (foundation steps 2.4 and 2.5 and Slice 1, built now: his decision of 2026-11-14 and his go of 2026-11-17; the plan carried to main as `docs/reports/2026-11-17-build-plan-slice-1.md` with its appendix): his five messages of 2026-11-14 and 2026-11-17 in `docs/DECISIONS.md` by script (his go says: "No game code is built before change-set 0 is on main."; his CHANGE 2: "Two chats build the game on my personal account.", the second since 2026-11-15, `claude/optimistic-albattani-mdoonz`, Opus 5.5 with Fable 5.2 on its advisor tool, running the preview hosting check in a separate test repository); the model-file rules and the soldier's joint list, on paper, no export through them yet (`docs/research/asset-export-rules.md`, `docs/research/soldier-joint-list.md`; OQ-0005-AS3 and AS4 answered in part; ten new pass marks, PM-0005-47 to -56, first run at the plan's change-set M); his answers where the drafts ask (OQ-0002-6, OQ-0006-18, OQ-0003-1 further in part, the three "do soldiers block" rows, PM-0004-34's row; the register's open questions 98 to 96). Open after it, for "Follow-ups" once merged: the draw cap with a gun from its own file (the rules' O1; PM-0005-54 fails on the rifle file as reported: a question for him with change-set M's plan); the fifth material class's name (O2); the rules' proof by a first real Blender export (change-set M); whether the coat keeps the legacy motion (his call at change-set 10's pictures); the machine lines in ADR 0001, ADR 0003 and SPIKE_PLAN and ADR 0002's "one change-set per step", carried later (the plan report's "Since the plan" names each carrier) | merged: PR #56 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs0-model-rules`), the build chat on his personal account), d7dad97, 2026-11-17 23:00:12 UTC (the merge commit's date; `merged_at` 23:00:13), by merge commit, on his go of 22:59:16 UTC for head cd61b28350c4407d2f19b1b3603ea4beca8b4e30, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-17, 22:59:16 UTC), after the advisor agent's APPROVE of that head; `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 856 with smoke, id 44195404107; toolchain run 155, id 44195404068; push, on d7dad97) | done: 3747bb3, 4a1b0d7, 212f55b, 5f356ef, 65c8fe8, cacea55 (the two research files); two review rounds done (test-engineer, engine-architect, the verifier twice: PASS); the advisor agent approved its content at 47546e9, its conditions met in the last commits; report `docs/reports/2026-11-17-cs0-model-rules.md`; with the merge he accepted that PM-0005-54 stands as written (a fail with today's rifle prototype, not waived), the size as counted, the three things the verifier did not verify, and the checkpoint commits in main's history (his go, above); the open items: the Follow-ups, "From change-set 0 (PR #56) and Part 15 (PR #57)"; its merge recorded by #57 | none |
+| **the night-shift lines: the saver in stints while a night run waits on agents** (his NS-STATUS (a) of 2026-11-16: `.claude/NIGHT_SHIFT.md` step 6, three lines added (+3 −0) and nothing else, their sha256 4e3d1565…; risk tier 2; his yes to the lines, NS-LINES (a), is the exception to KIT-FREEZE-2 for that one change) | merged: PR #54 (`claude/night-shift-stints`, from the netcode proof test's day session, session_0173vVo6igCNyQYBWPvhH36A), 82c605e, 2026-11-17 07:03:03 UTC (`merged_at`; the merge commit is dated 07:03:02), by merge commit (parents 53272a1 and 20f9d59), on Mustafa's go typed in that session's chat at 07:00:54 UTC (his words: `docs/DECISIONS.md`, 2026-11-17, 07:00:54 UTC), after the advisor's and the security-auditor's APPROVE WITH FINDINGS of 20f9d59 and the PR Advisor routine's APPROVE for that head (comment 6941066272); CI green on main (gate run 44035715175, toolchain run 44035715349, push, on 82c605e); its report: the pull request's description | done: his NS-STATUS (a) and NS-LINES (a) (`docs/DECISIONS.md`, 2026-11-16, 20:48:10 and 21:09:27 UTC); one review round (the advisor: five Lows, ADV-NS-L1 to -L5, merge conditions C1-C4; the security-auditor: two Lows, SA-NS-1 and SA-NS-2), the seven Lows deferred in writing by the session with no push (the Follow-ups, "From the night-shift lines"); the gate --no-smoke in a worktree, identical to main's; the kit tests 1,271 (1,270 pass, 1 skipped), as on main; smoke CI's; its merge recorded by DOCS-54 | none |
+| **KEPT-LOGS: a narrow kit rule for kept raw logs and the old build cache** (`.claude/CHECKPOINTS.md` §11, `.claude/scripts/kept-logs.mjs` and its tests, two REPO_MAP rows; 4 files, +671 −0; risk tier 2; his KL-YES is the exception to KIT-FREEZE-2 for this one rule) | merged: PR #53 (`claude/kept-logs-rule`, from the netcode proof test's day session, session_0173vVo6igCNyQYBWPvhH36A), 53272a1, 2026-11-15 19:49:22 UTC (`merged_at`; the merge commit is dated 19:49:21), by merge commit (parents 4460ef5 and a637c7a), on his KL-MERGE (a), typed in that session's chat at 19:46:36 UTC (his words: `docs/DECISIONS.md`, 2026-11-15, 19:46:36 UTC), after the security-auditor's and the test-engineer's APPROVE WITH FINDINGS and the advisor's APPROVE WITH CONDITIONS of a637c7a; CI green on main (gate run 43754558567, toolchain run 43754558678, push, on 53272a1); its report: the pull request's description | done: his KEPT-LOGS (c), KL-YES with one change, KL-CHANGE-YES (a) and his go for the kit files' copy (`docs/DECISIONS.md`, 2026-11-15); the three kit files equal the text he said yes to with the diff applied, compared by script; one review round on a637c7a (SA-KL-1 to -4 and KLT-1 to -8, all Low, accepted by him as left open: the Follow-ups, "From KEPT-LOGS"); the 14 planted bugs, the GNU tar test and the dry runs for the two real folders; its merge recorded by DOCS-54 | none |
+| **foundation 2.3: the first docs pass** (foundation-2-3-docs: his words for #48 and of 2026-11-13 in `docs/DECISIONS.md`, by script; dated pointers; the 2.2 report's fixes M1, L1, L2, L3 and L5; STATUS, ROADMAP and the archive true for main 4d21c1a; docs only, risk tier 1) | merged: PR #52 (`claude/sweet-mayer-grsukw` (for `cs/foundation-2-3-docs`), his personal account), 4460ef5, 2026-11-14 09:06:30 UTC (`merged_at`; the merge commit is dated 09:06:29), by merge commit (parents 4d21c1a and bfd719b), on Mustafa's go, given in foundation 2.3's day session's chat (session_019YNMUWSsyRgaYWxk4auQ5b) at 09:02:29 UTC by the merge commit's message, which quotes it whole (his words: `docs/DECISIONS.md`, 2026-11-14, 09:02:29 UTC), after the advisor agent's APPROVE of bfd719b (its day-session review); CI green on the head (gate runs 43576710810 and 43576714278, toolchain runs 43576710856 and 43576714298, by the merge commit's message) and on main (gate run 43578963868, toolchain run 43578963884, push, on 4460ef5); report `docs/reports/2026-11-13-foundation-2-3-docs.md` | done: two review rounds, the verifier (its FAIL on a1d0317, fixed in 922cadf; its re-run PASS WITH NOTES), the advisor agent's APPROVE of the final head bfd719b and his go; its merge recorded by DOCS-54 | none |
 | **foundation 2.2: the toolchain** (foundation-toolchain, ADR 0002's migration plan step 2.2: the Rust and npm pins, six empty crates and five empty packages, the offline CI job `toolchain` (K1, with its release-test line K1b); the four kit lines on his yes; game symbols +0 −0) | merged: PR #48 (`claude/laughing-pasteur-fwya24` (for `cs/foundation-toolchain`)), 4d21c1a, 2026-11-13 16:20:12 UTC (`merged_at`; the merge commit is dated 16:20:10), by merge commit (parents 2aa5e9c and 9b20b67), on Mustafa's go, given in foundation 2.2's day session's chat (session_019YNMUSc7FA68ujhLgXfEJA) at 16:16:47 UTC by the merge commit's message, which quotes it whole (the chat record's event is stamped 16:16:36 UTC) (his words: `docs/DECISIONS.md`, 2026-11-13, 16:16:47 UTC), after the advisor agent's APPROVE of 9b20b67 (its day-session review); CI green on main (gate run 43461710700, its gate and smoke jobs, and toolchain run 43461710673, push, on 4d21c1a); report `docs/reports/2026-11-12-foundation-2-2.md` | done: steps 1 to 5 and the docs pass; review round 1 (five reviewers, 17 findings) and its fix pass (1de98a9 to 8a4f9b0), round 2 (four reviewers, nothing Critical or High) and its fix pass (790ac31); the verifier PASS on bd44a68; the advisor agent's APPROVE of the final head 9b20b67; his go: ADR-INDEX (a), K1-GO (a), OVERFLOW-ALL (a), four security items accepted as left open (OVERFLOW-PANIC-RULE; SETPRIV-HARDEN, SETUP-NODE-CACHE and CUT-ESCAPE for step 2.3), and the 2.2 report's fixes with his words' entry for step 2.3's first docs pass; its merge recorded by that pass (PR #52) | none |
 | **foundation 2.1b: the move** (foundation-restructure, the second of step 2.1's two pull requests, his SPLIT (a): the five legacy files into `legacy/` with `git mv`, bytes unchanged, in a commit of their own (c090843); the commands in text name the `legacy` folder (1e6f84e); the four kit lines on his yes, KIT-2.1B (a) (b6b3b81); the docs: his words in `docs/DECISIONS.md`, his SCOPE (a) in ADR 0002 and the register, OQ-0002-2 answered in part (REG-TRUE (b)); game symbols +0 −0) | merged: PR #51 (`claude/clever-fermi-oudsfq` (for `cs/foundation-restructure`)), 2aa5e9c, 2026-11-12 13:22:32 UTC (`merged_at`; the merge commit is dated 13:22:31), by merge commit (parents 76b4f7a and 5d50bf2), on Mustafa's go, given in foundation 2.1b's day session's chat (session_019YNMUWdGJZoQFUuuvvBP1Y) at 13:18:42 UTC and quoted whole in the merge commit's message (his words: `docs/DECISIONS.md`, 2026-11-12, 13:18:42 UTC), after the advisor agent's APPROVE of 5d50bf2 (its day-session review); CI green on the head (push run 43130543086 and pull-request run 43130550831) and on main (push run 43226692719, on 2aa5e9c); report `docs/reports/2026-11-11-foundation-2-1b.md` | done: evidence E1-E6 and E8 PASS; review round 1 on the final diff (security-auditor APPROVE WITH LOWS, test-engineer and infra-engineer APPROVE; no Critical or High, so no round 2) and its fix pass (43733e5); the verifier PASS on 43733e5; the advisor agent's REVISE on 3860e3f (two Mediums: two earlier sends of his traced nowhere, and no `docs/DECISIONS.md` entry for his go for #50), fixed in 3828e6a; its APPROVE of the final head 5d50bf2; his REG-CELL (a) and PROMPTS-2.3 (a), his checks on 5d50bf2 on his Windows laptop (the saves backup, the Brave check of both pages, the gate) and his go; 2.1a's IE-2, IE-3, IE-4, IE-7 and SA-L1 closed (its report, "Decisions and deviations"); its merge recorded by foundation 2.2 (PR #48) | none |
 | **foundation 2.1a: the legacy gate and tools read both layouts** (foundation-restructure, the first of step 2.1's two pull requests, his SPLIT (a); replaces #47, his BRANCH-47 (a); gate files and tools only, no game file, no file moved, symbols +0 −0) | merged: PR #50 (`claude/pensive-heisenberg-aazidf` (for `cs/foundation-restructure`)), 76b4f7a, 2026-11-11 18:38:28 UTC (`merged_at`), by merge commit (parents bb2d817 and f6becf5), on Mustafa's go, given in foundation 2.1a's day session's chat (session_019YNMUWLffMoE47SbvkqJ5P) and quoted word for word in the merge commit's message (with his approval of the two gate edits in dd12aeb and the five follow-ups he accepted), after the advisor agent's APPROVE of f6becf5 (its day-session review); CI green on the head (runs 43074627548 and 43074640388) and on main (push run 43079707687, on 76b4f7a); report `docs/reports/2026-11-11-foundation-2-1a.md` | done: the review rounds, the verifier and the report; then the advisor's APPROVE of the final head f6becf5 and his go; its merge recorded by foundation 2.1b (PR #51) | none |
@@ -867,6 +873,182 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       by Mustafa, 2026-11-13, 18:47:55 UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's
       task"); it is Mustafa's and the Advisor's brief (its line 3), one of DOCS-ALIGN's documents, so no session edits
       it [verified 2026-11-13].
+- **From KEPT-LOGS** (PR #53, merged as 53272a1 on 2026-11-15; its one review round on a637c7a; Mustafa accepted
+  these as left open for that pull request, `docs/DECISIONS.md`: the entry "Taken by Mustafa, 2026-11-15, 19:46:36
+  UTC: KL-MERGE (a), merge #53, and the security and test findings accepted as left open"; for the kit's next change
+  after the freeze, queued in `docs/DECISIONS.md`; copied by script from the pull request's description, its lines
+  88-105):
+  - **security-auditor: APPROVE WITH FINDINGS**, four Lows, each needing a second process run at the same moment by the
+    same user, or deliberate misuse; the folder or the archive stays on every tested path:
+    - SA-KL-1: a link swapped into a parent folder between the check and the removal;
+    - SA-KL-2: the script's git calls inherit `GIT_CONFIG_*` from the environment;
+    - SA-KL-3: the old cache is recognised by its path and modification times only;
+    - SA-KL-4: the archive folder is not flushed after the rename, and the rename could replace an archive that
+      appeared after the check.
+  - **test-engineer: APPROVE WITH FINDINGS**, eight Lows. Test 5's child-only preload is sound (no leak, the real pack
+    path, not flaky in four parallel runs). The eight:
+    - KLT-1 (KLC-F2): two branches of the second walk have no test (a late bad name, a folder emptied late); neither
+      can hide a defect that deletes data, so a follow-up is enough;
+    - KLT-2: pack's routine refusal is tested only through `list` and `cache`;
+    - KLT-3: some refusal and failure paths have no test or planted bug (they fail safe on reading);
+    - KLT-4: no test puts a link inside the cache;
+    - KLT-5: the pipe case can drop out silently where `mkfifo` is missing;
+    - KLT-6: the kit tests are not run in CI;
+    - KLT-7: the fingerprint wording (fixed in this report) and no pipefail in the fingerprint pipeline;
+    - KLT-8: the links (fixed in this report).
+- **From the night-shift lines** (PR #54, merged as 82c605e on 2026-11-17; its one review round on 20f9d59; the
+  seven Lows were deferred in writing by the session, and the pull request merged on his go, `docs/DECISIONS.md`:
+  the entry "Taken by Mustafa, 2026-11-17, 07:00:54 UTC: MERGE-54, his go for #54"; ADV-NS-L1 and SA-NS-1 went to
+  him as NS-TRAILER and NS-FIRST, his (b) for both, queued in `docs/DECISIONS.md` for the kit's next change after
+  the freeze; ADV-NS-L5 is carried out by DOCS-54, the docs pass that adds this; copied by script from the pull
+  request's description, its lines 23-27):
+  - **The advisor: APPROVE WITH FINDINGS** on head `20f9d59918eea1e3431ae830f72510f83f6424c7`. Five Lows (ADV-NS-L1 to L5), none needing a push; merge conditions C1-C4.
+  - **The security-auditor: APPROVE WITH FINDINGS.** Two Lows (SA-NS-1, SA-NS-2), both recommended accepted as is.
+  - **C1, the findings:** all seven Lows are deferred in writing, with no push (a Low never triggers one).
+    - Two could be closed only by rewording Mustafa's lines, so they go to him as decisions, with the recommendation to leave the lines as they are: ADV-NS-L1 (the command shows no `--trailer`; a run takes it from CHECKPOINTS.md §5) and SA-NS-1 (the first stint is not tied to a status refresh).
+    - The other five are follow-ups. ADV-NS-L2 and SA-NS-2 (the same point: a run blocked inside a foreground agent call is not woken by a stint's end, which was already true before this change), ADV-NS-L3 (CHECKPOINTS.md §5 still gives 110-minute figures) and ADV-NS-L4 (the guard test's KIT_LINES lacks the stint line) wait for the kit's next change after the freeze. ADV-NS-L5: docs-keeper records his words on main after the merge.
+- **From change-set 0 (PR #56) and Part 15 (PR #57)** (PR #56, merged as d7dad97 on 2026-11-17 on his go of 22:59:16
+  UTC, `docs/DECISIONS.md`; the first five items are copied by script from the end of #56's row in STATUS, each
+  followed by its source; the sixth comes from his answer VFX-ROUTE (a) of 2026-11-17, recorded by #57):
+  - the draw cap with a gun from its own file (the rules' O1; PM-0005-54 fails on the rifle file as reported: a question
+    for him with change-set M's plan). His words of 22:59:16 UTC:
+    "It is not waived. The way out is my call, with the plan for the first-model change-set." The three ways out, none
+    researched further: `docs/research/asset-export-rules.md`, part 7, O1.
+  - the fifth material class's name (O2). ADR 0005 and ADR 0003 name the fifth class differently: the rules' part 7, O2;
+    part 8 gives O1 and O2 to Mustafa, with change-set M's plan.
+  - the rules' proof by a first real Blender export (change-set M). The rules are on paper; the first real export may
+    fail PM-0005-49 or -56 (how the armature is written): the change-set 0 report, risk 1.
+  - whether the coat keeps the legacy motion (his call at change-set 10's pictures). Dropping it removes the four coat
+    joints, a list change that should land before the Blender model is exported: `docs/research/soldier-joint-list.md`,
+    section 6.
+  - the machine lines in ADR 0001, ADR 0003 and SPIKE_PLAN and ADR 0002's "one change-set per step", carried later (the
+    plan report's "Since the plan" names each carrier). The machine lines go with change-set 6's docs pass, when the
+    machines are named (MACHINES); "one change-set per step" with change-set 2's docs pass (SPLIT-25).
+  - For the decision drafts' next revision: ADR 0002's package list and the seventh package. His answer VFX-ROUTE (a) of
+    2026-11-17 is "also my word on a seventh package beside the six the structure draft names" (`docs/DECISIONS.md`,
+    22:10:34 UTC); a dated pointer of 2026-11-17 marks the list (ADR 0002, part 3) and leaves where the package stands
+    in it to the draft's next revision.
+- **From change-set 1, Types (PR #58)** (merged as 9b4b518 on 2026-11-18 on his go of 15:38:13 UTC, `docs/DECISIONS.md`,
+  with which he accepted "Round 2's Lows as follow-ups. The two doc lines that claim more than the code does are
+  corrected in the next pull request that touches those files."; the items below are the report's "Follow-ups",
+  `docs/reports/2026-11-18-cs1-types.md` lines 234-268, copied by script and indented by two spaces; #58's row in "In
+  flight" named them for this section once merged):
+  - **CI-CUT** (security, Medium, in CI, outside this change-set; found by the advisor agent, confirmed and narrowed by
+    security-auditor; not tried on a runner): in the `toolchain` job the network cut separates the network, not the
+    files. Build code runs as the runner's own user and can rewrite the checkout action's file, which the job runs
+    again after the cut with network and the job's cache-write token. Through it a hostile dependency could plant a
+    cache entry that this branch's smoke job later unpacks and runs as its browser. It reaches no secret and not
+    main's cache scope. The fix is a CI edit: decision CI-CUT.
+  - **From the security check:** ts-rs's packages ship no licence file (MIT is declared; no duty while it is
+    test-only); the plan's draft said ts-rs needs Rust 1.88.0, its published manifest says 1.78.0 (both under our
+    1.99.1); the network cut stops IP traffic only (for the gate v2's workflow).
+  - **From round 2 (Lows, not fixed here; the code is as reviewed):**
+    - Two doc lines claim more than holds. Both export tests say write mode "never writes outside the repository":
+      true for a linked generated folder or parent (refused), not when a crate's own folder is a link (security-auditor
+      ran it: write mode then wrote outside the worktree). `Input.commands`'s doc says "consecutive" sequence numbers;
+      the drafts say only that sequences move forward. Each takes a committed link or is a wording matter; fix with the
+      next change to those files.
+    - The doc-comment check catches a comment end inside a `///` line (the only form the message types use). A
+      hand-written `#[doc = "…"]` attribute or a block doc can still put a line of valid TypeScript into a generated
+      file; the fix is to refuse those two forms in `messages.rs`.
+    - The fix pass's new guards have no committed test of their own (the planted script is deleted with the
+      checkpoint): they belong in the gate v2's planted set.
+    - The build-folder check compares path strings: an honest run through a second spelling of the same folder, or a
+      moved clone that kept its build folder, stops until a rebuild, and the message does not say so.
+    - `generated/` may hold a link or a third folder unnoticed; the tag-byte pair has no "must differ" line of its own;
+      on a file system that ignores case a link named `X.TS` would survive write mode's delete loop (reasoned, not run).
+  - **Change-set 2:** an `exports` entry in `packages/types/package.json` before the first import by package name; the
+    block writer takes offsets through a by-name handle that fails the build on a missing name; `Section::align()` in
+    Rust only; the export tests stay native-only; run the layout check on the first block of every Worker start.
+  - **Change-set 3:** the provisional list above; decoders cap every sender-sized field before allocating; `Join` gets
+    a redacting `Debug` once its token is a credential.
+  - **Change-set 4:** the header states each section's row count and byte offset; padding between sections has one
+    owner; the page reads the hash as soon as its four bytes exist; content's export test shares the folder rules.
+  - **The 2.3 chat:** its formatter and linter skip `packages/types/src/generated/**` (the files are compared byte for
+    byte) while the type check still reads it; the gate's own regeneration builds into a build folder of its own.
+  - **The drafts' next revision (his go):** who reads the message types in TypeScript (the page sees only the block);
+    the ADR 0002 pointer on how ts-rs's folder is named.
+  - _Since (the kit hold's docs pass, 2026-11-18):_ CI-CUT's part 1 (no cache in the `toolchain` job) is PR #60's, on
+    his CI-CUT (a); its part 2 (no JavaScript action in the job that runs the cut) waits for the quality gate v2's
+    workflow and stands on his list for that plan (next block). The two doc lines are in
+    `crates/protocol/src/ts_export.rs:76` and `crates/client-endpoint/src/layout_ts.rs:58` ("never writes outside the
+    repository") and `crates/protocol/src/messages.rs:56` (`Input.commands`, "consecutive"); #60 touches none of the
+    three files, so both stay for the next pull request that does [verified 2026-11-18].
+- **From the kit hold and two CI edits (PR #60)** (in flight; one review round: security-auditor and test-engineer on
+  the final kit text, 4877599, infra-engineer on the workflow edit, 94c197f; their notes committed at 18:31:54,
+  18:40:04 and 18:08:01 UTC; nothing Critical or High; by his word of 18:01:08 UTC, `docs/DECISIONS.md`: "A later
+  finding on them that is not Critical or High becomes a follow-up."; the notes stay readable at the checkpoint commit
+  that `docs/reports/2026-11-18-kit-hold-ci.md` names; each reviewer's codes are its own: security-auditor's F1 to F5,
+  test-engineer's F1 to F11 and infra-engineer's L1 to L6 are different findings):
+  - **His list for the quality gate v2's plan** (step 2.3), in his words, from `docs/DECISIONS.md`:
+    - DEP-HOLD (how a dependency change is kept from being built before its security check), his answer of 15:38:13
+      UTC: "The check in CI that option (c) adds is not decided here: put it on the list for the quality gate v2's
+      plan." Option (c), as #58's report put it: "a check that refuses to build when the lockfile gains an entry with
+      no recorded review".
+    - CI-CUT (build code in the `toolchain` job can rewrite an action's file that runs again after the network cut),
+      the same message: "Part 1 now, with the exact text of that same section; part 2 waits for the quality gate v2's
+      workflow." Part 2: no JavaScript action in the job that runs the cut.
+    - KIT-REMOVED (should a manifest that main removed also pass when a branch takes main in), his answer of 18:01:08
+      UTC: "(a). A manifest that main removed stays held. Put the question on the list for the quality gate v2's plan,
+      together with the line of the approved text that still reads a path beginning with ":" as a pattern." That line:
+      `const entry = git('ls-tree', rev, '--', f);` (`.claude/scripts/checkpoint.mjs:128` [verified 2026-11-18]).
+  - **The reviewers' lines for that list** (theirs, not his decisions):
+    - infra-engineer, L1 (Low): if a commit moves `packages/types/src/generated`, the compare step checks nothing (git
+      status on a path that matches nothing prints nothing): a guard for the folder. L5 (Low): an empty file list stops
+      the type-check step with exit 1 and no message. Its lines for part 2 and option (c): the job that runs the cut
+      has no `uses:` step at all (a plain git checkout of the exact commit; a gate test fails if it gains one), so no
+      post step runs after dependency code with the network and the token; the lockfile check runs first in every job
+      that fetches, on push as well as pull request, and fails unless every added or changed lockfile entry is named
+      in a committed review record, reading files only; a workflow linter, if one comes, must accept `cache-mode`.
+    - test-engineer, its F11 (Low): the kit's four test files run in no CI job and not in `tools/gate.mjs`.
+    - security-auditor, the routes the hold does not cover, for his choice when that plan is written (no design): a
+      plain `git push` or the GitHub tools, above all code pushed by hand while a held checkpoint commit sits under it;
+      running the change before any push (`npm install`, `cargo build`, `npx`, `cargo install`); files outside the
+      five names that change what CI fetches or runs (workflows, `rust-toolchain.toml`, `.cargo/config.toml`, `.npmrc`,
+      `.gitmodules`, vendored source) and dropping `--locked` or `npm ci` in a workflow; other lockfile names and letter
+      cases; a dependency added and removed within one push; a stale view of the remote branch or of main; branches
+      and savers still on the old script.
+  - **Open, two Mediums (security-auditor):**
+    - F1: in two corners the hold checks another path than the one it pushes. The script reads the list of changed
+      files through a helper that trims the text and decodes it as UTF-8 (`run()`,
+      `.claude/scripts/checkpoint.mjs:60-67` [verified 2026-11-18]), so a manifest in a root folder whose name begins
+      with a blank character (a space, a tab or another), when it is the first changed file, is checked under the name
+      without the blank; the same for a folder name that is not valid UTF-8 when main holds its look-alike with the
+      same content. Shown in a scratch repository: main holds `a/Cargo.lock`, the push adds ` a/Cargo.lock` with new
+      content and no record: "saved and pushed". No such folder exists, and the workspaces are `crates/*` and
+      `packages/*`, so CI would not build a manifest in such a folder unless a root manifest changed too, which is
+      held. The follow-up: read that list raw (no trim, no decoding), with a test for a root folder " a" beside main's
+      `a/Cargo.lock`.
+    - F3: no rule makes the review of a pull request read the hold's record. The script's comment says "the review of
+      the pull request reads it", but no rule names a reader, and `.claude/CHECKPOINTS.md` section 9 deletes the notes
+      folder, the record with it, before a pull request is marked ready. The follow-up (a kit change, so with his
+      word): the ready report of a pull request that changes a manifest or a lockfile quotes each record (with the
+      commit it was pushed in) and the security answer it names, and the review checks every changed manifest at the
+      head against those lines or main. Until then, with no kit change, change-set 2's report does exactly that.
+  - **security-auditor's Lows:** F2, a record that is a link or a folder still releases (read the record only when it
+    is a plain file); F4, with git's `push.followTags` on (unset here) a save would also push a tag on an in-between
+    commit, and `toolchain` runs on tag pushes (the save's push should pass `--no-follow-tags`); F5, wording where the
+    rule line or the script's header says more or less than the code (the code errs towards holding in each): the
+    message for an unreadable push advises a record, which cannot release it (the way out is `git fetch origin main`);
+    "as sha256sum prints it" is exactly `git show <commit>:<path> | sha256sum`; "with main for a branch not yet pushed"
+    is the point where the branch left `origin/main`; "never pushes" does not hold in F1's corners; a link, a submodule
+    or a file that became a folder can never be released.
+  - **test-engineer's three Mediums** (tests that are missing; the behaviours hold by code reading): F1, no test pins
+    main's side of the "equal to main" comparison read at the exact path (test 33's step 4 pins only the push side);
+    F2, no test pins that a `deleted  <path>` line leaves an existing changed plain manifest held; F3, no test pins that
+    `origin/main`, not a local `main`, is compared (the advisor agent had rated it Low).
+  - **test-engineer's seven Lows:** F4, a plain file with the bytes of a link on main stays held, untested; F5, a
+    mode-only change of a file equal to main's is released, untested; F6, "in any folder" untested for a manifest
+    inside `.checkpoints/` and for a folder name git quotes; F7, "what cannot be read is held" untested (an unpushed
+    branch with no `origin/main`); F8, test 29's look-alike `not-package.json.txt` pins neither name anchor alone (use
+    `package.json.txt` and `old-package.json`); F9, for a branch not on the remote, the merge-base (not main's tip) is
+    untested; F10, the `watch` tests remove their temporary folder before they stop the `watch` child (stop it first).
+  - **infra-engineer's other Lows** (L2, L3, L4, L6), on the report's wording: neither CI check is a control against a
+    hostile dependency (dependency code runs earlier in the same step, as the same user); the executable bit is the
+    only difference that can reach the compare step today; "Cache mode: none" proves the mode the runner received, not
+    that the cache service refuses anything (and until part 2 the post steps of checkout and setup-node still run after
+    the cut, with the network and the read-only token); the job-log endpoint is named as the source of the quoted log
+    lines.
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -1209,5 +1391,18 @@ and the night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); nei
 | Seeded match pairs (240) | tree-face stall windows 1885 -> 0; mean stall 9.12% -> 8.50% | 2026-10-14 | scratch harness (report) |
 | Editor rebuild (Cabana): full-map draw calls boot / 1 / 2 rebuilds | base 1992 / 2406 / 3502 · head 1992 / 1992 / 1992; heap after GC boot / 10 rebuilds: base 42.9 / 119.5 MB · head 42.7 / 44.5 MB | 2026-10-14 | preview.js harness + perf-auditor |
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
+| CI on main, latest (the row below is older) | `gate` with `smoke` (run 884, id 44338178450) and `toolchain` (run 182, id 44338178455) success on 9b4b518, PR #58's merge commit (push) | 2026-11-18 | GitHub Actions runs (API) |
 | CI on main | `gate` and `smoke` success on 44446a5 (PR #44's merge commit) after one re-run: run 42673290304's first attempt lost its `gate` job on GitHub's side (only `smoke` ran, green); attempt 2 green, 06:37 UTC | 2026-11-10 | GitHub Actions runs (API) |
 | Gate (official battery, older) | 0 flagged, 44 editor refs all guarded | 2026-10-10 | battery.js |
+
+## Where STATUS's old sections went (STATUS-DIET, 2026-11-10; old line numbers: `git show 2d22b69:docs/STATUS.md`)
+| STATUS at 2d22b69 (lines) | Now |
+|---|---|
+| The header (2-27), Phase (30-139), In flight (142-185), Targets (188-195), Routines (949-1008), Open bugs and risks (1011-1217), Health (1220-1233) | `docs/STATUS_ARCHIVE.md`, under the same names |
+| Decisions pending: his blocks, the relayed Advisor's, and the queue of his words (198-272, 281-420, 674-799, 813-846, 880-928) | `docs/DECISIONS.md` |
+| Decisions pending: Follow-ups, KIT-ALIGN and DOCS-ALIGN (421-673, 862-879) | `docs/STATUS_ARCHIVE.md`, "Follow-ups" |
+| Decisions pending: the advisor agent's rulings, the carry-forwards, the old ADR lines (273-280, 800-812, 850-861, 929-946) | `docs/STATUS_ARCHIVE.md`, "Decisions pending: the rest" |
+| Decisions pending: Waiting (847-849) | this file, "Waiting on Mustafa" |
+
+_The section above was moved here from `docs/STATUS.md` (its last section) on 2026-11-18 by a script, byte for byte,
+under his OLD-LINES of that day (change-set 1, PR #58, docs pass); in its table "this file" is `docs/STATUS.md`._

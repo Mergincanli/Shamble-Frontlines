@@ -1092,6 +1092,9 @@ Researching it before this record, or leaving it as one shared question: settled
   - *What decides it:* his choice before the netcode proof test, with OQ-0006-1's console check.
   - *Carries:* no research id (the infra review's finding 14 and its question SPIKE-VM-ACCESS).
 - **OQ-0006-18. Must unreleased art stay unseen, or is a preview behind a login enough?**
+  - Answered by Mustafa (2026-11-17): (a), a login on previews is enough: models are committed. His words: "A, once
+    the game is up, I will look to make the repo private later on." (MODEL-PUBLIC;
+    `docs/DECISIONS.md`, the entry of 2026-11-17, 19:10:44 UTC, answer 9)
   - *Why it matters:* the access wall hides previews, but this repository is public, so every model file committed to
     it can be read by anyone once pushed (part 2), and LOOK_V2 §8 allows authored models.
   - *Options:* (a) a login on previews is enough: models are committed, and the wall covers previews only; (b) models

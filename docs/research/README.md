@@ -26,6 +26,8 @@ question carries an "Answered" note; where a file still gives values for 48 and 
 | R5 | Toolchain and quality | `r5-toolchain-quality.md` | test-engineer (CI: infra-engineer) | spot-checked (61 of 115 key claims) |
 | R6 | Infrastructure | `r6-infrastructure.md` | infra-engineer (the security baseline: security-auditor, in its own session before the first online playtest; BASELINE-WHEN (b)) | spot-checked (21 of 42 key claims) |
 | R7 | Legacy harvest | `../LEGACY_INVENTORY.md`, `../LEGACY_TUNING.md` | main session | done (PR #27) |
+| G1, part | The asset pipeline's export and slot-naming part (OQ-0005-AS3, AS4): the rules a model file follows and its ten checks | `asset-export-rules.md` | graphics-engineer | on paper (2026-11-17): no export has gone through its rules yet; spot-checked (35 of 36 key claims) |
+| G1, part | The soldier's joint list for Slice 1: 20 joints, the root, the sockets' axes, the origin and facing check | `soldier-joint-list.md` | engine-architect | a ruling (2026-11-17), upheld by the advisor agent; spot-checked (36 of 36 key claims); its Blender half waits for the first real export |
 
 R1–R6 merged in PR #28 (b6effde, 2026-10-31).
 

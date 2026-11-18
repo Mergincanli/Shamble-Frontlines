@@ -10,6 +10,7 @@ publish = false
 
 # Shared dependency versions, set once here; each enters with the first crate that needs it (ADR 0002 part 3).
 [workspace.dependencies]
+ts-rs = { version = "=12.0.1", default-features = false }
 
 # Every crate opts in with `[lints] workspace = true` (ADR 0002 parts 4 and 7).
 [workspace.lints.rust]

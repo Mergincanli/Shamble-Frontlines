@@ -42,6 +42,9 @@ WHILE WORKING
    running · started HH:MM · Last update HH:MM · Working on: <item>, branch <name> · Checkpoint:
    <branch>:.checkpoints/<slug>.md · Next: <step>". Update it after every commit and at least every 30 minutes. The
    checkpoint on the branch is the handoff if a limit cuts you off; the comment only points to it.
+   While the run waits on agents, nothing else wakes it: run the background saver in stints under 30 minutes
+   (`node .claude/scripts/checkpoint.mjs watch <slug> --every 10 --for 25`, in the background), and at each
+   stint end refresh the status comment, then start the next stint.
 7. Work the unchecked items from top to bottom, each on its own cs/<slug> branch with its own checkpoint: commit and
    push the checkpoint after every step (CHECKPOINTS.md §3; during long agent runs the background saver, checked at
    every update, §5; at most 3 agents at a time, §4). Write shell commands plainly, one per line or joined with `&&`,
