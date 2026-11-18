@@ -57,6 +57,16 @@ Copy this template. Keep it short: it is a handoff, not a log.
 - One command commits and pushes the checkpoint folder alone, leaving anything else you staged as it is:
   `node .claude/scripts/checkpoint.mjs save <task-slug> -m "<step>" --trailer "<attribution line>"` (one `--trailer` per
   attribution line the session's instructions give).
+- **A dependency change is held** (Mustafa's DEP-HOLD, 2026-11-18): the script (`save` and the saver alike) never
+  pushes while what it would push changes a manifest or a lockfile (`Cargo.toml`, `Cargo.lock`, `package.json`,
+  `package-lock.json`, `npm-shrinkwrap.json`, in any folder), compared with the remote branch, or with main for a
+  branch not yet pushed. It commits the notes locally, names the files, and `save` exits 1. The hold is released by
+  `.checkpoints/<task-slug>/dependency-check.md`, written after security-auditor's answer on exactly that content and
+  naming that answer's notes file: one line per file, `<sha256>  <path>` as `sha256sum` prints it from the repository
+  root (`deleted  <path>` for a removed file); then `save` again. Until then build nothing that holds the change, and
+  push nothing by hand: a plain `git push` is not held.
+  A manifest or lockfile is not held when its content in the push equals its content on main (`origin/main` as last
+  fetched): that content was merged with Mustafa's go, so a branch that takes main in is not stopped by it.
 - Each step ends with a three-part summary for Mustafa (brief §6): what's done, what's checkpointed (where), what's
   next.
 - **At every update, check the background saver** when agents or a workflow are running, and restart it if it has
