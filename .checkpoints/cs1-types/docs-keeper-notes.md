@@ -69,3 +69,22 @@ B10. DONE and the answer.
 - B4 finding: #57's PR body :20 "The advisor agent: APPROVE of f26ac5b... (2026-11-18, about 00:17 UTC)"; the verifier
   PASS (seven Low, all fixed); body :24-30 three Lows (1 size recount 223/18 vs 220/15; 2 Last merged pointer "every
   merge: ROADMAP"; 3 Next "Slice 3 waits for #40" vs the proof test's result), "change-set 1's docs pass takes them".
+- B4 decision: line budget. STATUS 120; my net adds ~+7 (Last merged 1 line incl. "every merge: ROADMAP"; Next +1;
+  Waiting +3; cs1 follow-ups +3; #58's row replaces #57's). Room: move #57's row (own) to the archive's In flight
+  (then its cells edited: own line) and move STATUS-DIET's pointer table (STATUS 113-120, #52's lines; it records
+  where merged PR #49 moved STATUS's sections) byte for byte to the archive's end, with a one-line pointer of mine in
+  STATUS (line 85's "the table below" still finds it). Open follow-up ids (83-98) stay (docs-keeper.md: by id).
+  ROADMAP: fold #43 (257) and #44 (241-255) byte for byte after line 88, blank separators, no "- " prefix -> 12 entries
+  after #58's entry. Script: .checkpoints/cs1-types/docs-keeper-move.mjs; list: docs-keeper-moved-lines.md.
+  pre-move blob: docs/STATUS.md worktree 127df6603af418ebe58385fda96b526ed32fe7bb head 127df6603af418ebe58385fda96b526ed32fe7bb main 127df6603af418ebe58385fda96b526ed32fe7bb
+  pre-move blob: docs/STATUS_ARCHIVE.md worktree 4d284ef381a840e6a90a1333f8fb14bb7bc40510 head 4d284ef381a840e6a90a1333f8fb14bb7bc40510 main 4d284ef381a840e6a90a1333f8fb14bb7bc40510
+  pre-move blob: docs/ROADMAP.md worktree ce0626780934b0fb48966d6106f915f983407a50 head ce0626780934b0fb48966d6106f915f983407a50 main ce0626780934b0fb48966d6106f915f983407a50
+  pre-move blob: docs/REPO_MAP.md worktree 9e0117f219aa495366e3d51cb050338e45f467ed head 9e0117f219aa495366e3d51cb050338e45f467ed main 9e0117f219aa495366e3d51cb050338e45f467ed
+- B4 done: docs-keeper-move.mjs --write: 9 checks ok; STATUS 120 -> 111, archive 1272 -> 1282, ROADMAP 257 -> 258.
+  Moved: STATUS:29 -> archive:159; STATUS:113-120 -> archive:1275-1282; ROADMAP:257 -> :90; ROADMAP:241-255 -> :92-106.
+  Pure-move check (result: removed non-blank 25 = added non-blank 25, sorted lists equal; blanks -2 +4):
+    git diff -U0 -- docs/STATUS.md docs/STATUS_ARCHIVE.md docs/ROADMAP.md | node -e 'let rem=[],add=[];for(const l of
+    require("fs").readFileSync(0,"utf8").split("\n")){if(l.startsWith("---")||l.startsWith("+++"))continue;
+    if(l.startsWith("-"))rem.push(l.slice(1));else if(l.startsWith("+"))add.push(l.slice(1));}const ne=a=>a.filter(
+    x=>x!=="");const r=ne(rem).sort(),a=ne(add).sort();console.log(r.length,a.length,JSON.stringify(r)===JSON.stringify(a))'
+  List: docs-keeper-moved-lines.md. Next B5 (STATUS own lines).
