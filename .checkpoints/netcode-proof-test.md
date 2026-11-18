@@ -153,7 +153,10 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **Nothing runs now** (22:44 UTC). The saver bnwkv7xyd was stopped between 22:38 and 22:43 (no agent running); restart it
+- **2026-11-18 about 01:40 UTC: nothing runs.** U4f waits for his LEAD-BOUND answer (posted in the day's message);
+  then L4 at launch (`<base>` and D1, `u4f_fill.py --apply`, the u4r-P3 pack by 8.1 and the shared target's part-clean
+  with D2 before and after) and L6, the build. The saver bghd4yb3e (from 00:41) stopped at about 01:39. Earlier:
+- **Nothing ran at 22:44 UTC.** The saver bnwkv7xyd was stopped between 22:38 and 22:43 (no agent running); restart it
   (`node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background,
   timeout 7200000) whenever an agent starts. The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 stays enabled.
 - The last workflow: wf_b2a20e74-6aa (the fix pass and the advisor's check), done before 22:43 UTC.
