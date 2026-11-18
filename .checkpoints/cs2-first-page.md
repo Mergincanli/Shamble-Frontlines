@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 22:01 UTC (from the clock)
+- **Last update:** 2026-11-18 22:09 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -153,22 +153,33 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 15. **The plan, revision 3** (22:00 UTC; saved as 0d8a838): the verifier's corrections; TOOL-SOURCE; the tool's
     route. The questions as they stand: RNG-CRATE, WB-HEALTH, TOOL-SOURCE, CI-WASM, DEPART-2.
 
+16. **The advisor agent read the changed lines once** (its notes under "Changed lines, read once"): "the questions may
+    go to him: yes, after the five wording fixes" (applied; plan saved as 1d79e8e). Its rulings: the three
+    manifest-free parts of step 2 may be built, tested and committed now, within four limits (import nothing by
+    package name that step 2's manifests bring in: `@shamble/types`, `@shamble/sim-worker`, `three`, its types, the
+    glue; no use of Vite's API yet; commit by path and push only through `checkpoint.mjs save`; CI's `npm test`
+    stays green), with the server's printed address in one constant; TOOL-SOURCE's option (c) is rightly an option.
+    Two notes for later steps are in the plan: the overflow check's command needs the dev edges (before step 3);
+    `build.mjs` refuses to run the tool without its expected checksum (before step 4).
+17. **The five questions were put to Mustafa in chat** (2026-11-18 22:09 UTC): RNG-CRATE, WB-HEALTH, TOOL-SOURCE, DEPART-2,
+    CI-WASM, each with its options and recommendation ((c), (a), (a), (a), (a)). The first, second and fourth hold
+    the dependency step; the third holds the tool's download and first run; the fifth holds nothing.
+
 ## Current step
-16. **The advisor agent reads the changed lines once** (its own condition before the questions go to him), and rules
-    on two things: may the manifest-free parts of step 2 be built while his answers are awaited; is TOOL-SOURCE's
-    option (c) rightly an option.
+18. **The manifest-free parts of step 2**, while his answers are awaited: the small server (`packages/client/serve.mjs`
+    and its tests), then the Worker's pure modules (`pacing`, `block-pool`, `read-block`, `stats`, `messages`, with
+    unit tests), then the build script's pure checks. Each tested with the Vitest already installed, as CI runs it;
+    committed by path; pushed through the checkpoint script.
 
 ## Next steps
-1. On its yes: the five questions go to Mustafa in chat (each self-contained: code, question, why, options,
-   recommendation), with the plan's path. Then, by its ruling, either the manifest-free parts of step 2 or a stop
-   until he answers.
-2. After his answers: step 2 (the one dependency step: the scratch worktree `.gate/cs2-deps`, the manifests, both
-   lockfiles resolved and not built, the diffs to security-auditor), nothing of it committed or built before the
-   answer on exactly that content (plan section 7).
-3. Then steps 3 to 8, the gate after each, a checkpoint after each; the reviews (seven reviewers: three, three, one;
+1. When he answers: copy his message by script into the notes (`words.mjs`), then step 2's manifest part (the scratch
+   worktree `.gate/cs2-deps`, the manifests, both lockfiles resolved and not built, the diffs to security-auditor);
+   nothing of it committed or built before the answer on exactly that content (plan section 7). The tool's download
+   and first run wait for TOOL-SOURCE.
+2. Then steps 3 to 8, the gate after each, a checkpoint after each; the reviews (seven reviewers: three, three, one;
    one round); the verifier; the docs pass with the records of plan section 21; the report; the pull request (draft,
    then ready); stop for his go and his Brave check (the zip through the chat's file tool).
-4. The saver: restart it before 23:50 UTC (see "Running work").
+3. The saver: restart it before 23:50 UTC (see "Running work").
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
@@ -207,4 +218,4 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 ## Running work
 - saver: running since 2026-11-18T22:01:17.224Z (its own first line; task belkm5v73; 10-minute interval, stops after 110
   minutes: restart it before 23:50 UTC).
-- agents: the advisor agent, reading the changed lines (resumed after this session's save of 22:00:50 UTC).
+- agents: none.
