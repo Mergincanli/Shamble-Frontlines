@@ -478,6 +478,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      - His two counts (PM-0006-7) recorded as he gives them, or "no count shown".
    - Reading: headers.json, the records and browser-results.json downloaded to `.gate/preview-hosting-check/day1/` and
      read with jq; log tails kept short.
+   - `round-a` started by the session (run_workflow, ref `main`, set `round-a`; 204 at about 16:26:57 UTC): deploy run
+     #2, id 44347351522, head 2162db55d93f; plan green (16:27:00-16:27:07), the three builds green (production, iso-off,
+     iso-on; done by 16:27:34); the three deploy legs "waiting" on `preview` from 16:27:34 UTC; no other run waits. His
+     list sent next.
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.
