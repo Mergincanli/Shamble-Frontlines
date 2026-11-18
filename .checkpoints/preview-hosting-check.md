@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 18:40 Amsterdam (17:40 UTC)
+- **Last update:** 2026-11-18 18:57 Amsterdam (17:57 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -516,6 +516,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      reviewers" on `preview` for everything but sitting 3", plan.md:1240). Case (d) switches its cleanup off by
      deleting close.yml on its branch (plan.md:228), not by a rejection, so (b) does not touch it. Advisor consultation
      before the answer (moment 4).
+   - `bites` done (his approval at about 17:50:20 UTC, before his question): all three bites caught, nothing else
+     failed (results log); the oversize refusal printed no account data. `browsers` started at about 17:55:39 UTC.
+   - Plan Part 4 leans on the reviewer: "the token sits in `preview`, whose jobs wait for your approval, so a
+     rewritten job gets nothing until you click", and risk 1 ("A rewritten workflow on a test branch sends the token
+     away") is "Limited by your approval". So (b)'s cost is named in the entry. The decision entry REVIEWER-NOW sent.
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.
@@ -876,6 +881,21 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    and cross-checked with the legs' start times; his active time apart from the browser run's wait (he may step away;
    4 and 5 back to back); the oversize leg's log read for the account printout; files read with jq from disk; the probe
    blocks sitting 2's closes; the list kept short.
+
+18. 2026-11-18 17:52:27 UTC (called; transcript time), moment 4 (his question "can't we just automate it?" reopens
+   REVIEWER) · Q: what to answer, and what to recommend? · Changed: a decision entry with both plan branches (a) and
+   (b) (plan.md:1392-1400, :1240), nothing changed until he chooses; first read run #4's state (done: approved, red as
+   planned) and whether the security notes or Part 4 lean on the reviewer (they do: Part 4's risk 1 and "a rewritten
+   job gets nothing until you click"), named as (b)'s cost; the why in three lines (his (a); his only look before a
+   run gets the token, the session cannot approve; sitting 3 tests the gate); both options as clicks from
+   plan.md:572-583, the two merges his either way; (b) gives up his look at each run, mine included, and the clicked
+   tally (the report: "measured on these runs, computed for the rest"); the token's reach as Part 4 has it; if (b): no
+   setting change while a run waits (he approved #4 first; the browser run is the gap), a screenshot after the untick
+   and my go in words, the list still before every sitting as "runs that will start", every run checked against the
+   list after each sitting, a re-tick before sitting 3 with a screenshot (Mergincanli as reviewer, bypass unticked; it
+   blocks sitting 3), Day 2 with the reviewer on (four clicks); his answer saved byte for byte for DECISIONS.md; his
+   words on the approvals kept with times for OQ-0006-13; one line for a click-free preview design in step 2.6; the
+   "Last update" fixed.
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time

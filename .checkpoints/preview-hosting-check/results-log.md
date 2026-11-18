@@ -420,3 +420,24 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   today" and "Observability events today"), and he was not asked twice. So PM-0006-7 reads "no count shown" before
   and after, on the places plan Part 3 C step 3 names; the deployments list shows the ten uploads.
 - `bites` started by the session right after (run_workflow, ref `main`, set `bites`; 204 at about 17:33:50 UTC).
+- `bites` (PM-0006-2's COEP bite, PM-0006-4's header bite, PM-0006-5's size bite): deploy run #4, id 44360058220
+  (created 17:33:49 UTC). plan green; builds green (17:34:15-17:34:40). SIZES lines: bite-oversize "largest:
+  oversize.bin, 27262976 bytes; limit 26214400 bytes; flagged: 1" / "SIZES {"largest":{"path":"oversize.bin","size":
+  27262976},"limit":26214400,"flagged":[{"path":"oversize.bin","size":27262976}],"count":10}" (the size bite caught by
+  the size check). The three deploy legs "waiting" on `preview` from 17:34:40; they started at 17:50:20 (oversize),
+  17:50:21 (nocache) and 17:50:22 (coep) UTC: one approval (his), just before his message of 17:50:30.
+  - bite-oversize: Wrangler refused it, word for word: " ⛅️ wrangler 4.156.0" / "✘ [ERROR] Error: Pages only supports
+    files up to 25 MiB in size" / "  oversize.bin is 26 MiB in size" / "##[error]Process completed with exit code 1."
+    No upload, no record (if-no-files-found: warn). The refusal comes before any call to Cloudflare: the log shows no
+    account name, no account ID and no error code (the account-printout question: nothing printed on this path).
+  - bite-nocache: "✨ Success! Uploaded 1 files (7 already uploaded) (0.99 sec)"; deployment
+    29622b3b-8d8c-4d66-b9d5-2a67e5207523, alias https://bite-nocache.shamble-preview-check.pages.dev, "preview".
+  - bite-coep: "✨ Success! Uploaded 1 files (7 already uploaded) (0.86 sec)"; deployment
+    0b844b60-0458-44ac-a22e-d31ed505691d, alias https://bite-coep.shamble-preview-check.pages.dev, "preview".
+  - verify (17:51:00-17:51:23; headers-44360058220, artifact 14456636722, zip sha256 c3bcd2713ff6..., equal to its
+    digest): "summary: {"records":2,"pass":0,"fail":4,"no_reading":0}", exit 1. bite-coep, both links: only "/worker.js:
+    COEP "", expected "require-corp"" (the COEP bite caught); bite-nocache, both links: only "/content.ef463692.bin:
+    content file Cache-Control "no-cache", expected "immutable"" (the cache bite caught, header half). Nothing else
+    failed. Run conclusion: failure, as planned: all three bites caught.
+- `browsers` started by the session (run_workflow, ref `main`; 204 at about 17:55:39 UTC), after the records showed
+  bite-coep and bite-nocache uploaded; production is still round-a's good build (0354374e).
