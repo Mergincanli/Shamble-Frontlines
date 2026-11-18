@@ -29,9 +29,15 @@ way; both come first.
      on the code having been clean (see CI-CUT under "Follow-ups").
    - Severity Medium (security-auditor and the advisor agent). The advisor agent ruled the build did not need his
      word first; it is his to weigh here.
+   - One more push came before the advisor agent's ruling on the security answer (12:44): at 12:30:22 commit ef9741c
+     (work in progress: the layout table, and the message types not yet compiled) was pushed with the skip mark as the
+     last commit of its own push, by its exact SHA, with the background saver stopped. No CI run followed it: the next
+     runs (`gate` 870, `toolchain` 169) were on 4d2338f, after the ruling.
    - What binds this chat since: for every new or bumped dependency the manifest and lockfile edits stay uncommitted
      (a text patch in the checkpoint folder keeps them), nothing builds the dependency graph that holds them, and
-     other code is committed by path only, until security-auditor has answered. The kit's part is his: DEP-HOLD.
+     other code is committed by path only, until security-auditor has answered. A dependency edit that is committed
+     anyway is not pushed before that answer: a skip mark on a commit that is not the last of its push, or a cancel,
+     protects nothing (this miss's own route). The kit's part is his: DEP-HOLD.
 2. **One evidence record did not hold; a reviewer caught it.** The first record of the 20 generator runs (12:49 UTC)
    hashed files those runs never wrote: the throwaway worktree for the planted defects built into the main folder's
    build folder, cargo reused the worktree's test binary in the main folder, and its compiled-in path pointed at the
@@ -67,11 +73,11 @@ way; both come first.
   `SHAMBLE_WRITE_TYPES=1 cargo test --workspace --locked`.
 - `docs/DECISIONS.md`, by script: his go on the merge of #57 with his answer OLD-LINES (11:08:25 UTC), checked byte
   for byte against merge commit 22c6afa's message; one dated pointer in this lane's entry for RECORD-FILES.
-- `docs/STATUS.md`, `docs/STATUS_ARCHIVE.md`, `docs/ROADMAP.md`, `docs/REPO_MAP.md` (docs-keeper): #57 merged
-  (22c6afa; main's own CI on it green: `gate` with `smoke` run 866, `toolchain` run 165); #58's row and entry; what
-  waits on him; the map's nine new paths. Under his OLD-LINES, 25 lines about merged pull requests were moved by
-  script (the last appendix lists each); under RECORD-FILES every other removed or changed line is this lane's own
-  (the blame check: 34 removed lines, 0 not this lane's and not moved). Lines of other lanes that are now stale were
+- `docs/STATUS.md`, `docs/STATUS_ARCHIVE.md`, `docs/ROADMAP.md`, `docs/REPO_MAP.md` (docs-keeper): #57 merged (22c6afa;
+  main's own CI on it green: `gate` with `smoke` run 866, `toolchain` run 165); #58's row and entry; what waits on him;
+  the map's nine new paths. Under his OLD-LINES, 25 lines about merged pull requests were moved by script (the section
+  "Every line the docs pass moved" lists each); under RECORD-FILES every other removed or changed line is this lane's
+  own (the blame check: 34 removed lines, 0 not this lane's and not moved). Lines of other lanes that are now stale were
   left as found: STATUS's CI line (it names 82c605e) and its Routines block; REPO_MAP's "Last checked" line and its
   words "empty" for `Cargo.toml`'s table, `crates/` and `packages/`; ROADMAP's "v2, next" line.
 
@@ -89,14 +95,15 @@ way; both come first.
   commit are named in the pull request's description.
 - **Planted defects, 30 runs, all as wanted** (a throwaway worktree with a build folder of its own; never committed;
   removed without force):
-  - a field renamed in Rust without regenerating fails and names `Snapshot.ts`; one character changed in `Join.ts`
-    fails and names it; one offset changed in `layout.ts` fails and names it;
+  - a field renamed in Rust without regenerating: `generated_types_are_current` fails with "…Snapshot.ts is not what
+    the Rust types give" (`cargo test -p protocol --locked`, exit 101); one character changed in `Join.ts` fails and
+    names it; one offset changed in `layout.ts` fails and names it;
   - an extra file in either generated folder, or directly in `generated/`, fails; a doc line that holds a comment end
     with other text fails;
   - the control (the rename, regenerated) passes in Rust and in the type check of the shipped sources; the package's
     own test fails the type check until it follows the rename;
-  - a header field added without regenerating fails only the layout's export test; the hash moves from 0x2df78c30 to
-    0x5d0e9efb;
+  - a header field added without regenerating: only `generated_layout_is_current` fails (4 passed, 1 failed, exit
+    101); its message shows the hash moving from 0x2df78c30 to 0x5d0e9efb;
   - the hash without its tag bytes, or skipping later sections, fails the hash test (its known answers bite);
   - `client-endpoint`'s test binary run outside the copy it was built in stops (`protocol`'s was shown the same way
     by two reviewers' own runs); write mode refuses a missing tree and a linked folder (a file planted outside
@@ -137,16 +144,18 @@ way; both come first.
   function; the committed file holds the block's value); refusing write mode when `CI` is set (the CI edit below runs
   it there on purpose); reading the hash before asking for the whole header (both are 8 bytes today; for change-set
   4); one constant for the 16 buttons (optional; for change-set 3).
-- **Two runs of the planted-defect script were not all as wanted; both are kept in the record.** In the first, 3 of
-  18 runs failed for another reason than planned: the script's own backup copies sat in the generated folders and
-  the export tests refused them (that refusal became two more planted defects). In a later one, 1 of 30: a new check
-  for doc comments counted comment starts against comment ends and the planted text held both; it now looks at lines.
-- **Round 2** (on what changed since round 1, 13:42 to 14:18 UTC): engine-architect APPROVE (its Medium closes
-  with this report's sentence for PM-0002-15); rust-reviewer APPROVE (its six Lows closed); test-engineer APPROVE (its
-  High, three Mediums and four Lows closed; it re-derived every known answer with its own implementation and ran the
-  shared-build-folder case again: both trees now stop); security-auditor: nothing at Medium or above, its three Lows
-  closed (it tried the linked-folder cases again: all refused); netcode-architect APPROVE (its Lows closed). Round 2
-  left Lows only; by the review budget they are follow-ups, and the code is as round 2 reviewed it.
+- **Two runs of the planted-defect script were not all as wanted; both are kept in the record.** In the first (12:48
+  UTC), 3 of 18 runs failed for another reason than planned: the script's own backup copies sat in the generated folders
+  and the export tests refused them (that refusal became two more planted defects). In a later one (13:39 UTC), 1 of 30:
+  a new check for doc comments counted comment starts against comment ends and the planted text held both; it now looks
+  at lines.
+- **Round 2** (on what changed since round 1, 13:42 to 14:18 UTC): engine-architect APPROVE (its Medium closes with this
+  report's sentence for PM-0002-15); rust-reviewer APPROVE (its six Lows closed); test-engineer APPROVE (its High, three
+  Mediums and three Lows closed, a fourth for plain files only; it re-derived every known answer with its own
+  implementation and ran the shared-build-folder case again: both trees now stop); security-auditor: nothing at Medium
+  or above, its three Lows closed (the linked-folder cases of round 1 are refused now; a linked crate folder is not:
+  "Follow-ups"); netcode-architect APPROVE (its Lows closed). Round 2 left Lows only; by the review budget they are
+  follow-ups, and the code is as round 2 reviewed it.
 - **The verifier** (effort max): <<VERIFIER>>
 - **The advisor agent on the final head:** its word is in the pull request's description.
 
@@ -186,11 +195,17 @@ way; both come first.
   header). What settles each of 18 items and the checks the decoders must make: `netcode-architect-review2.md`, "For
   change-set 3"; an anti-cheat table per field: `security-auditor-review1.md` (both in the commit named below).
 - **Size:** 940 hand-written lines added (12 removed) against 600 planned (1.57 times; his stop line is twice the plan,
-  1,200), by `git diff --numstat` against main, with generated files, the lockfile and docs left out. What grew: the
-  export tests' folder checks (after round 1), the test tables of the layout rules and of the hash, a doc line per
-  message field, and rustfmt's default line widths (rustfmt settings are the 2.3 chat's).
-- **A refusal, with the route taken:** Claude Code's built-in check refused an `rm` over a shell variable while
-  leftover scratch folders in /tmp were cleaned; the form the check itself names (`"${d:?}"`) was used.
+  1,200), by `git diff --numstat` against main, with generated files, the lockfile and docs left out; 634 of them are
+  tests. What grew: the export tests' folder checks (after round 1), the test tables of the layout rules and of the
+  hash, a doc line per message field, and rustfmt's default line widths (rustfmt settings are the 2.3 chat's).
+- **A refusal, with the route taken:** at 12:49 UTC Claude Code's built-in check refused an `rm` over a shell variable
+  while leftover scratch folders in /tmp were cleaned; the form the check itself names (`"${d:?}"`) was used.
+- **Smaller slips of this chat, from the records:** several times (at least four) a time in its notes was approximate
+  or a few minutes ahead of the clock; each was corrected from the records within minutes (commits 9f0e459 at
+  12:31:04 UTC, d97ab08 at 13:16, ebe5fde at 13:44:52); later times were taken from the session record by script.
+  Once (14:19 UTC) it read CI with the `gh` command line where the GitHub tools are its rule (no effect; told in
+  chat). The advisor agent reports one time ahead of the clock in its own notes (corrected at 14:39 UTC) and three
+  guard refusals, with the routes it took, in its notes.
 - **No "Lane requests" issue exists** (12:28 UTC: the only open issue is the Night queue, #16), so no request of the
   other lane was taken in (LANE-ISSUE below).
 - **The Part 15 change's size:** its report says 220 written lines, as he accepted; a recount on its final head gave
@@ -252,45 +267,7 @@ rustsec.org); the export tests on Windows and macOS; smoke in this container.
 ## Proposed next step
 Change-set 2 of the build plan (the skeleton, foundation step 2.5): its plan first.
 
-## Decisions needed
-**DEP-HOLD: should the checkpoint script itself hold a push that carries a dependency change until its security check
-has answered?** Why it matters: on 2026-11-18 a checkpoint save published the new dependency without the skip mark and
-CI built nine unchecked packages (miss 1); today only each chat's memory prevents a repeat, in either lane and in the
-night shift. Options: (a) a kit change (risk tier 2, from a day session, its exact text shown to you first): when the
-commits to push change a manifest or lockfile, `checkpoint.mjs save` commits locally, does not push, and says why;
-one line in the checkpoint rules and a test; (b) no kit change: the hold stays a written procedure; (c) (a) now, and
-with the next CI change a check that refuses to build when the lockfile gains an entry with no recorded review.
-security-auditor adds to (a): count from the remote branch's tree; cover plain pushes in the guard too; release the
-hold by a recorded review of the exact lockfile; also watch `rust-toolchain.toml`, `.cargo/config.toml`, `.npmrc`,
-workflow files and `.gitmodules`. Recommendation: (c).
-
-**CI-TYPES: may the `toolchain` job get a type check and a regenerate-and-compare step, with the exact text in the
-appendix?** Why it matters: today CI prints only the type checker's version, so the package's type exports and "the
-committed files are what the generators give" (in write mode) are checked by hand. Options: (a) yes, as its own pull
-request (risk tier 2; it commits no tsconfig); (b) no: both wait for the 2.3 chat's gate v2. Recommendation: (a).
-Your rule: every gate and CI edit is asked with its exact text; this is that ask.
-
-**CI-CUT: may the `toolchain` job get the fix for the CI finding above, with the exact text in the appendix?** Why it
-matters: without it a hostile dependency could reach this branch's later runs through the job's cache. Options: (a)
-part 1 now (no cache in this job), in the same pull request as CI-TYPES, and part 2 (no JavaScript action in the job
-that runs the cut) with the gate v2's workflow; (b) both parts now; (c) wait for the gate v2. The text was checked
-against GitHub's documentation only, not on a run: its pull request must show "Cache mode: none" in the job's log.
-Recommendation: (a).
-
-**LANE-ISSUE: who opens the "Lane requests" issue that Part 15 names?** Why it matters: both builder chats are to read
-it at the start of each change-set, and it does not exist. Options: (a) this chat opens it with a two-line body (what
-it is for; only comments from your account count); (b) you open it; (c) no issue: requests go through you.
-Recommendation: (a).
-
-## For Mustafa
-1. The file route for a zip: this chat sent you `shamble-cs1-types-test-archive.zip` (never committed). Save it,
-   unpack it, and say whether that worked. It holds `README.txt`, the nine generated files and `sha256.txt`; the
-   README says how to compare one checksum on Windows.
-2. Answer DEP-HOLD, CI-TYPES, CI-CUT and LANE-ISSUE when it suits you; none blocks this merge.
-3. Your go on merging pull request #58, after the Advisor's check. No Brave check: nothing a player sees. It is
-   needs-mustafa also because two security findings stay open (miss 1 and CI-CUT).
-
-## Appendix: the exact texts asked for
+## The exact texts asked for (decisions CI-TYPES and CI-CUT, below)
 **CI-TYPES**, in `.github/workflows/toolchain.yml`, inside the single-quoted script of the step "Build and test with
 the network cut off". After the line `cargo test --workspace --locked`:
 ```
@@ -306,10 +283,12 @@ In place of the last line, `npx --no -- tsc --version`:
               tests=$(find packages/types/src -name "*.test.ts" | LC_ALL=C sort)
               [ -n "$shipped" ]
               [ -n "$tests" ]
-              npx --no -- tsc $strict $shipped
-              npx --no -- tsc $strict --skipLibCheck $shipped $tests
+              npx --no -- tsc --ignoreConfig $strict $shipped
+              npx --no -- tsc --ignoreConfig $strict --skipLibCheck $shipped $tests
 ```
-Tried here by hand with the tools by their path: exit 0 each. Not tried: git inside the cut.
+Tried here by hand with the tools by their path: exit 0 each. `--ignoreConfig`: TypeScript 6 refuses files given on
+the command line once a `tsconfig.json` stands in the folder or above it (error TS5112; the 2.3 chat's base config
+will add one); tried both ways (the advisor agent's finding). Not tried: git inside the cut.
 
 **CI-CUT**, part 1, in the same file, after the line `timeout-minutes: 15` of the job `toolchain`:
 ```
@@ -329,7 +308,7 @@ Part 2, for the gate v2's workflow, in place of the checkout and setup-node step
 ```
 Both parts are security-auditor's text, checked against GitHub's documentation only.
 
-## Appendix: every line the docs pass moved (his OLD-LINES: "Its report lists each line it moved.")
+## Every line the docs pass moved (his OLD-LINES: "Its report lists each line it moved.")
 Old line numbers are main's (22c6afa); new ones are this branch's. Moved by `docs-keeper-move.mjs` (in the notes), which
 copies bytes and compares each block at both places; `¦` stands for a table's bar.
 - `STATUS.md:29` to `STATUS_ARCHIVE.md`, "In flight": `¦ #57 ¦ Part 15 of the build plan, "The second…`
@@ -358,3 +337,42 @@ copies bytes and compares each block at both places; `¦` stands for a table's b
 - `ROADMAP.md:253` to `ROADMAP.md:104`: `and one fix pass; the verifier's H1 (the rever…`
 - `ROADMAP.md:254` to `ROADMAP.md:105`: `the report 'docs/reports/2026-11-08-kit-v3-4.m…`
 - `ROADMAP.md:255` to `ROADMAP.md:106`: `next change-set, kit-v3-5.`
+
+## Decisions needed
+**DEP-HOLD: should the checkpoint script itself hold a push that carries a dependency change until its security check
+has answered?** Why it matters: on 2026-11-18 a checkpoint save published the new dependency without the skip mark and
+CI built nine unchecked packages (miss 1); today only each chat's memory prevents a repeat, in either lane and in the
+night shift. Options: (a) a kit change (risk tier 2, from a day session, its exact text shown to you first): when the
+commits to push change a manifest or lockfile, `checkpoint.mjs save` commits locally, does not push, and says why; one
+line in the checkpoint rules and a test; (b) no kit change: the hold stays a written procedure; (c) (a) now, and with
+the next CI change a check that refuses to build when the lockfile gains an entry with no recorded review. (a) and (c)
+change the kit, which is frozen (your Part 15 answer: "the kit stays frozen"): they need your exception, as #53 and #54
+had. security-auditor adds to (a): count from the remote branch's tree; cover plain pushes in the guard too; release the
+hold by a recorded review of the exact lockfile; also watch `rust-toolchain.toml`, `.cargo/config.toml`, `.npmrc`,
+workflow files and `.gitmodules`. Recommendation: (c).
+
+**CI-TYPES: may the `toolchain` job get a type check and a regenerate-and-compare step, with the exact text
+above?** Why it matters: today CI prints only the type checker's version, so the package's type exports and "the
+committed files are what the generators give" (in write mode) are checked by hand. Options: (a) yes, as its own pull
+request (risk tier 2; it commits no tsconfig); (b) no: both wait for the 2.3 chat's gate v2. Recommendation: (a).
+Your rule: every gate and CI edit is asked with its exact text; this is that ask.
+
+**CI-CUT: may the `toolchain` job get the fix for the CI finding above, with the exact text above?** Why it
+matters: without it a hostile dependency could reach this branch's later runs through the job's cache. Options: (a)
+part 1 now (no cache in this job), in the same pull request as CI-TYPES, and part 2 (no JavaScript action in the job
+that runs the cut) with the gate v2's workflow; (b) both parts now; (c) wait for the gate v2. The text was checked
+against GitHub's documentation only, not on a run: its pull request must show "Cache mode: none" in the job's log.
+Recommendation: (a).
+
+**LANE-ISSUE: who opens the "Lane requests" issue that Part 15 names?** Why it matters: both builder chats are to read
+it at the start of each change-set, and it does not exist. Options: (a) this chat opens it with a short body (what it is
+for; only comments from your account count; a request is never your word); (b) you open it; (c) no issue: requests go
+through you. Recommendation: (a).
+
+## For Mustafa
+1. The file route for a zip: this chat sent you `shamble-cs1-types-test-archive.zip` (never committed). Save it,
+   unpack it, and say whether that worked. It holds `README.txt`, the nine generated files and `sha256.txt`; the
+   README says how to compare one checksum on Windows.
+2. Answer DEP-HOLD, CI-TYPES, CI-CUT and LANE-ISSUE when it suits you; none blocks this merge.
+3. Your go on merging pull request #58, after the Advisor's check. No Brave check: nothing a player sees. It is
+   needs-mustafa also because two security findings stay open (miss 1 and CI-CUT).
