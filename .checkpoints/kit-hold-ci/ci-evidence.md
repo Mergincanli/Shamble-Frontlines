@@ -72,6 +72,10 @@ The code tree equals 94c197f. All four runs success: `toolchain` push 4435786427
 request 44357881263 (17:22:06 to 17:22:50); `gate` push 44357864589 (17:22:01 to 17:23:10) and pull request
 44357881162 (17:22:06 to 17:31:27).
 
+## 4. The fix: head 4877599a9b85cfcc10b147a69e44a5276df5837e (pushed 18:03:10)
+All four runs success: `toolchain` push 44365431438 (18:03:14 to 18:03:53) and pull request 44365446199 (18:03:18 to
+18:04:00); `gate` push 44365431235 (18:03:14 to 18:09:29) and pull request 44365445961 (18:03:18 to 18:04:13).
+
 ## What these runs prove, and what they do not
 - Proven: the workflow file with `cache-mode: none` is accepted and the job's log prints "Cache mode: none"; git
   works inside the network cut as the runner's user (the compare lines ran: silent on the clean tree, failing on

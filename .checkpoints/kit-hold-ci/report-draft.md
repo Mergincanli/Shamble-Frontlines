@@ -167,7 +167,7 @@ endpoint; the excerpts stand in `ci-evidence.md` in the notes):
 | 94c197f | the clean tree, first run of the new lines | `toolchain` push 44357176860 (job 134988309631, 17:18:27 to 17:19:18); pull request 44357282401 | success; the log prints "Cache mode: none" (17:18:27.9099464Z) |
 | 0c0e271 | the planted change | `toolchain` push 44357616602 (job 134989872637); pull request 44357633651 (job 134989932210) | failed at the compare step: "writing the generated types again changed:" and " M packages/types/src/generated/protocol/Join.ts" (17:21:20) |
 | 415bd73 | the plant taken back (pushed after both plant runs had ended) | `toolchain` push 44357864275, pull request 44357881263; `gate` push 44357864589, pull request 44357881162 | all success |
-| 4877599 | the fix | `toolchain` push 44365431438, pull request 44365446199 | success |
+| 4877599 | the fix | `toolchain` push 44365431438, pull request 44365446199; `gate` push 44365431235, pull request 44365445961 | all success |
 | FINAL-HEAD | this report's head | PENDING | PENDING |
 
 - **The stop rule** for the new CI lines (none had run on a runner before; if the clean run failed on one, or the log

@@ -20,3 +20,14 @@ Scratch: `.gate/kit-hold-ci/verifier/` and the session scratchpad. I edit nothin
    Mustafa's three files word for word.
 
 ## Results (one block per check, written as each finishes)
+
+### Check 1: gate and map (DONE, PASS)
+- `node tools/gate.mjs --no-smoke` (working tree at 308286d; no uncommitted change outside `.checkpoints/`): GATE PASS, exit 0.
+  [1] 5/5 parse · [2] both pages concatenate · [3] core 138 / game 714 / editor 353, +0 -0, duplicates 0/0 · [4] 51 refs,
+  51 guarded, 0 dead, 0 flagged · [5a] SKIP · [5b] 0 problems both pages · [5c] 0 references up · [5d] order OK. Output:
+  `.gate/kit-hold-ci/verifier/gate.out`.
+- Smoke cannot start here, confirmed: the full gate gives "[5a] smoke FAIL Chromium for Playwright could not start:
+  Executable doesn't exist at /opt/pw-browsers/chromium_headless_shell-1194/..."; tools/node_modules playwright-core
+  1.56.1; /opt/pw-browsers holds chromium-1243 and chromium_headless_shell-1243 only. CI's `smoke` job is the check.
+- `node .claude/scripts/repo-map-check.mjs`: "repo map OK: 139 entries cover 109 required paths", exit 0.
+- `git diff --stat 4877599 HEAD -- . ':!.checkpoints'`: empty (later commits touch only `.checkpoints/`).
