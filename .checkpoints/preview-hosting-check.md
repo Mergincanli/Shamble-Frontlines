@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:19 Amsterdam (18:19 UTC)
+- **Last update:** 2026-11-18 19:27 Amsterdam (18:27 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -562,6 +562,24 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      pull request: it would upload with the token); head_branch and head_sha checked before reading; the first
      Windows set counts (written before the run); one entry to him: the reviewed diff, the new branch, the one run.
    - The 18:23 UTC probe slot read.
+   - His decision (18:21:30 UTC): Safari dropped, so the SAFARI-RUN bullet above is void; sitting 2 now.
+   - Prepared (not pushed; local clone /home/user/shamble-preview-check, from `main` 2162db55d93f): cs/pd-one a2cfef9,
+     cs/pd-three d78dfb4 / 2244b55 / 12f71d3 (pushes 1-3), cs/pd-open 236a6d7, cs/pd-off 683e8c0, cs/pdt-one 7370d4b,
+     cs/pdt-three 9ebeeb6 / 51130dd / 6188812. Each adds only `test-prs/<branch>.txt` (git diff --name-status against
+     2162db5); cs/pd-off also deletes .github/workflows/close.yml. Every commit's workflows hashed: deploy 29593af18d34,
+     close 3afdf389d636 (absent on 683e8c0 only), probe f24ad6e81daf, browsers 6791076916ae: the approved texts.
+   - The pull request page (PM-0006-10): github.com answers this container (HTTP 200 for pull request #1), so the
+     session takes the logged-out picture itself with the preinstalled Chromium; he says whether his logged-in page
+     shows the link (one line on his list).
+   - Outcomes → next action: each deploy run green (no wait) → its upload recorded; verify exit 3 → no reading,
+     recorded, the branch's next push waits; a deploy red → the sitting pauses, told to him, no re-run without his
+     word. The closes: (a), (a'), (d) by me; (b), (b') merged by him with "Delete branch"; the 24-hour clocks start at
+     the closes (close times from the pull request data). Cleanup runs expected for (a), (a'), (b), (b') (the
+     tombstone path on cs/pdt-*), each "Uploads found" checked against the records. (d): no cleanup run expected; if
+     one appears it now deletes at once (no reviewer), case (d) is lost and redone later with close.yml switched off in
+     the Actions tab (his click) on a new branch (plan Risk 10). After his merges, `main` re-hashed. If the schedule
+     stays silent: by-hand probes right after the last cleanup and about an hour later (a check-in), the 24-hour one
+     on Day 2 (the mark).
 
 ## Next steps
 1. His answer: sitting 2 tonight or tomorrow; then his list (step 24) and sitting 2.
@@ -744,6 +762,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   administrator bypass unticked; it blocks sitting 3), and it stays on for Day 2. For DECISIONS.md, with his words on
   the approvals and their times (OQ-0006-13's input): "When are we done with these hideous tasks" (17:33:15 UTC), "Why
   do I have to approve these things, can't we just automate it?" (17:50:30 UTC).
+
+- **His browsers decision and "start sitting 2 now"** (user message 2026-11-18 18:21:30 UTC,
+  aff8acbf-a617-472c-a56a-b58822623ae1; byte for byte in `.checkpoints/preview-hosting-check/mustafa-2026-11-18-browsers.md`,
+  150 bytes, sha256 6e83c36e1862...), word for word: "why do you keep talking about safar, focus on brave, chrome,
+  firefox and maybe edge (most used browsers)" / "Also you can start sitting 2 now if possible". So Safari leaves this
+  check (SAFARI-RUN closed with no fix): PM-0006-3 is read on Chrome, Edge and Firefox (and Brave by his checklist);
+  the report tells the draft's author that the Safari row was dropped by his decision. Sitting 2 starts now. For
+  DECISIONS.md.
 
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
 1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a
