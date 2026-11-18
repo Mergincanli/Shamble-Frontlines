@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:31 Amsterdam (18:31 UTC)
+- **Last update:** 2026-11-18 19:34 Amsterdam (18:34 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -590,6 +590,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      `.gate/.../day1/pr-page/pr3.png`); his logged-in look asked in the merges message. The six first runs all success.
      Push 2 of (b) and (b') at 18:30:19 UTC (runs #13 44370443574, #14 44370444666). Next: push 3 after their verify;
      then I close (a), (a'), (d) and he merges (b), (b') with "Delete branch".
+   - Push 3 at 18:31:44 and 18:31:55 UTC; runs #15 and #16 success: all ten uploads passed verify. Closed by me: (a)
+     #3 18:32:51Z, (a') #7 18:32:54Z, (d) #6 18:32:56Z. Cleanup (a) success 18:33:08; (a') running; none for (d).
+     Next: his merges of #4 and #8 ("Delete branch"), his logged-in look at a PR page; then the cleanups of (b) and
+     (b'), `main` re-hashed, a by-hand probe right after the last cleanup and a check-in about an hour later; the
+     24-hour reading from 18:32:51Z on, i.e. Day 2 from 2026-11-19 about 19:35 UTC at the earliest (after his merges).
 
 ## Next steps
 1. His answer: sitting 2 tonight or tomorrow; then his list (step 24) and sitting 2.

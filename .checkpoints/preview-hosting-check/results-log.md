@@ -527,3 +527,15 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   headers-44370062021 at 18:29:54): `git push` 18:30:19 UTC, cs/pd-three d78dfb4..2244b55, cs/pdt-three
   9ebeeb6..51130dd (both commits hashed before: the approved texts). Runs #13 44370443574 (b) and #14 44370444666
   (b'), created 18:30:25, no wait.
+- Push 2 results: run #13 (b) verify done 18:31:23 UTC (headers-44370443574), run #14 (b') 18:31:33
+  (headers-44370444666). Push 3, each after its branch's push-2 verify: cs/pd-three 2244b55..12f71d3 at 18:31:44 UTC,
+  cs/pdt-three 51130dd..6188812 at 18:31:55 UTC (both hashed before: the approved texts).
+- Push 3 results: run #15 (b) 44370706631 success (18:31:50-18:33:08 UTC), run #16 (b') 44370744826 success
+  (18:32:02-18:33:21). **All ten test uploads passed verify** (ten runs, conclusion success).
+- **The closes (the 24-hour clocks start here)**, by the session with the GitHub MCP tool (closed_at from each pull
+  request's data): (a) #3 closed 2026-11-18T18:32:51Z; (a') #7 18:32:54Z; (d) #6 18:32:56Z; none merged, branches
+  kept. (a)'s and (a')'s pushes had finished verify before; (b)'s and (b')'s push-3 runs were still running on other
+  branches.
+- Cleanup runs: close #2 44370905082 for (a) (cs/pd-one), created 18:32:54, success at 18:33:08; close #3 44370914405
+  for (a') (cs/pdt-one), created 18:32:57, running at 18:33:30. **No cleanup run for (d)** (cs/pd-off): close.yml
+  deleted on its branch, as planned (Risk 10 did not happen so far; the close.yml run list holds no cs/pd-off run).
