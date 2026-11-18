@@ -73,6 +73,12 @@
   would be INVALID on a build as briefed (the brief's 2.7 says "U4r's"). Fix (to the advisor with the fold's result):
   U4f's lab writes the measured share for scenario runs (the header param or a `reorder` event, from npt-l1's fate log,
   as the probe computes it), with a test; D3's bar then reads -20's first short run (p5, p6).
+- **L1's fold DONE** (rev 3.3: u4f-brief.md sha256 609bfd16…, 1,827 lines; notes u4f-brief-r33-notes.md); its
+  sent-back items (A3's carry-74 phrase, the unnamed disk ranges, two 9.1 rows, its placement choices), D3-1 and the
+  words check's archive hits are with the advisor now (one read; notes advisor-u4f-fold-check.md). **L4 item 2 DONE:**
+  u4f-run.sh made by u4f_runner.py from u4r-run.sh (e9437ae2…): 117 lines, 6 changed (the header, the log folder
+  .gate/u4f/, the usage line, the log check), sha256 70eb3da5b8ce9a8e2eda582536eeab93f96fb7fbe98e2a74a28e0492ccf6ddae
+  (`<<PV1>>`), `bash -n` exit 0, its diff u4f-run.sh.diff.
 - **Next, in the advisor's order (:411-419):**
   1. **L2, LEAD-BOUND:** draft its entry by :336-361; the advisor and the test-engineer read it once (one agent each, no
      round); then to him in the next daily message. Nothing that reads the bound is built before his yes.

@@ -93,4 +93,90 @@ only as `<<Pn>>`. Add nothing the ruling does not ask (TEST-FIRST rule 3, histor
   "Next" and "Nothing here is ruled" are its own state); the first change-list block "Change list (rev 3.2 to rev 3.3:
   the advisor's ruling)", rows R21-R33, and "Counts at rev 3.3". `git diff --stat 0ad9661 HEAD -- spikes/netcode-proof`
   printed nothing at HEAD 5347170eddccac6c5798adf90f82f9af3288ba88.
-- Next: line-length scan of the new lines; then r31_check.py and adv_words_check.py once each.
+- Line-length scan (Grep `^[^|].{120,}$`): three lines of mine past 120 (5.3's closing paragraph, Q8's why, 12 item
+  6's KL-U4F); fixed by a short line each so rev 3.2's following lines stay byte-identical. The other long lines are
+  rev 3.2's own.
+
+## The checks, run once each after the fold (read-only)
+
+`python3 -I .checkpoints/netcode-proof-test/u4f-r3/r31_check.py`:
+```
+brief sha256 609bfd169bacb08c024c1788e03537586f00ba4b596b44cc56d3bf9dd35bf0d0 lines 1827
+P24 key count: 1 bare words count: 2
+placeholder uses: {'P1': 8, 'P2': 2, 'P3': 3, 'P4': 2, 'P5': 1, 'P6': 2, 'P7': 2, 'P8': 3, 'P9': 2, 'P10': 1, 'P11': 2, 'P12': 1, 'P13': 2, 'P14': 3, 'P15': 12, 'P16': 7, 'P17': 5, 'P18': 4, 'P19': 4, 'P20': 3, 'P21': 8, 'P22': 6, 'P23': 5, 'P24': 2, 'P25': 3, 'P26': 2, 'P27': 5, 'P28': 2, 'P29': 2, 'P30': 3, 'P31': 4, 'P32': 8, 'P33': 3, 'P34': 3, 'P35': 2, 'P36': 4}
+unknown <<P ids: []
+PV1 6 base 34 @@ 4 r3 markers 0
+section 12 item 3: lines 1709 to 1753
+7-word runs outside section 12 item 3: 0
+```
+
+`python3 -I .checkpoints/netcode-proof-test/u4f-r3/adv_words_check.py`:
+```
+history line 414 <- brief lines [818] |     `CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target`, one folder for all copies, created b
+history line 1913 <- brief lines [23] |    merge folded (u4e_fold2.py: 3.1 with carry 61; R27, R28, R38 at d50396a). **The advisor's check of rev 3.2
+history line 2212 <- brief lines [1776, 1777] |       - (a) Yes. I may pack one or two closed, older log folders by the kept-logs rule, never the P0 folders, 
+history line 2309 <- brief lines [14] |   brief rev 2 `git show 34a2e55:.checkpoints/npt-u4f-brief/u4f-brief-draft.md` (1,117 lines; rev 1 at 828e2f4)
+history line 2363 <- brief lines [1304] |   negative snap_incomplete's phrase; NA-CBB-2 no npt-lab log judged before the P2 set (its pre-flight call goe
+history line 2405 <- brief lines [1045] |   against c1935a5b… with a stop on any difference, --commit the full HEAD after the spike-tree check against d
+history line 2487 <- brief lines [1099] |   both P0 folders, fc411116c1f1, fd4612050cd6 or the c-u2 folders without his word. **The report went to Musta
+history line 2495 <- brief lines [393] |   words by script, one review round, his go to merge); -58's two checks go with U4g (the wording yes first; AD
+history line 2536 <- brief lines [1684] |   the parent, diff and kit-equality checks; C4 `node check.mjs --only refs,marks,self,redact` through main-run
+history line 2551 <- brief lines [1684] |   line, marks 81, self 78 of 78, redact 10 of 10 and 305 items, 0 findings; "check: all 4 steps pass"; exit 0:
+history line 2578 <- brief lines [231] |   08:36-08:51 UTC; saved word for word by u3c_held_1_review_full.py: u3c-held-1/advisor-plan-review-full.json,
+history line 2612 <- brief lines [832, 1684] |   test 552 / 632 passed, 0 failed, 0 skipped; refs 1382; marks 81; self 78 of 78; redact 10 of 10, 306 items, 
+history line 2613 <- brief lines [1684] |   findings; deps 137 crate files; wasm 27000 ticks, 0 mismatching both ways; free 5,552 → 5,514 MiB. **Step 8:
+history line 2628 <- brief lines [147] |   u3c-held-1/u3c-held-1-report.md; Open findings updated. **DOCS-54 BUILD STARTED (12:41 UTC):** the
+history line 2702 <- brief lines [94] |   new **U4F-Q18** (option A's past window W = CMD_CATCHUP), the lab tests' scale rule, the build phase in the 
+history line 2703 <- brief lines [99] |   budget, packing only u4r-P3 (a U4f set's own folder only after his yes to KL-U4F). Now: tests +107 / +122, 6
+history line 2707 <- brief lines [1293, 1770] |   them; **KL-U4F** only if D2 shows the room short after the launch pack and part-cleans. **D2 read** at 18:54
+history line 2708 <- brief lines [70, 1685] |   `df -BM` 5,468 MiB free (1,372 above the floor); runs/: u4r-P3-0f066338dd8d 519, u4r-P3-d66e23cd78f2 298,
+history line 2709 <- brief lines [1685] |   u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741, u4r-P2-fc411116c1f1 623, u4r-P0-051995db9cea 3,249,
+history line 2712 <- brief lines [1079] |   target's part-clean (unmeasured; the last dev part-clean gave back 6,125 MiB).
+history line 2728 <- brief lines [1424] |   estimators passes -47's p99 of 5 ms (best, the mean: 6.06 ms with random phases, 8.69 ms with one phase per
+history line 2730 <- brief lines [1427] |   stamp (U4F-Q6 (b)'s reference) the mean passes (2.32 ms; 2.34 with P2's 2 % loss) and the tick-quantised bit
+history line 2741 <- brief lines [58] |   u4f-brief-r3-notes.md, "Revision for round 2"); then Advisor, general-purpose reading main's advisor.md, che
+history line 2947 <- brief lines [603] | where carry 80 (b) and (d) touch how the client files lost ticks. Push it, then add item 7 to issue #16's body
+history line 2977 <- brief lines [11, 12, 1781] | (rev 2 draft, the test-engineer's and the security-auditor's checks), run the recheck at HEAD with his 16:35 a
+history line 3614 <- brief lines [1132, 1193, 1693] |               Recommended too: marks/SERIES.md and marks/README.md. The test at a unit's close: `git diff --st
+history line 3615 <- brief lines [1132, 1193, 1693] |               <base>..<head> -- spikes/netcode-proof/marks/marks.json spikes/netcode-proof/crates/judge`.
+history line 4093 <- brief lines [861] |   - **(3) The one runner change**, c-u4r-runs.mjs and c-u4r-r2.mjs, plan first with the advisor's plan review.
+history line 4873 <- brief lines [1787] |   1 point 1); xhigh; at most three agents at a time, so two batches; **the advisor confirms the panel first**.
+history line 4909 <- brief lines [1036] |   only after the record run of c-u4r-r2.mjs shows 0 on every clean short L1 P0 run; then `npt-judge --only
+history line 5411 <- brief lines [378] | `npt_sim::ticks_for_ms(rtt_ms + jitter_ms).max(1) + 1`, P0 2, P1 3, P2 and B1 5, P3 7, within CMD_CATCHUP 8; c
+history line 5431 <- brief lines [1702] | D6, D8, D10-D12 filled, placeholders P1-P15, section 12 "Left for the main session at launch"; its own slip (a
+history line 6259 <- brief lines [924] |   tell him in three lines (what grew, why, the cheaper option). /compact: ask as before, never wait; if he has
+history line 6315 <- brief lines [805] |   3. RM (carry 67) for any change that moves ES's synthetic recording or the World's outcome on it.
+history line 6398 <- brief lines [1306] |     u3c-held-1/u3c-held-1-report.md). **Its deferred follow-ups (Low; taker: the next change to delay.rs,
+history line 6422 <- brief lines [1302] |     change, U4f, U4g or JDG-ONLY-1; to STATUS with the report):** TE-CBH-3, TE-CBH-4, TE-CBH-6, TE-CBH-7, RR-CB-1 (the
+history lines hit: 36
+```
+
+**Reading of the 36 hits (for the advisor):** the advisor saw 2 at rev 3.2 against 2,232 history lines. history.md
+grew after its check: the old card moved in whole at 22:45 UTC (commit 8a39dc7, history.md:2284-6789), and that text
+is the sessions' own. Mapped against `git diff -U0 8a39dc7 -- u4f-brief.md` (rev 3.2 as committed): only three hit lines
+are lines rev 3.3 touched. :23 ("The advisor's check of rev 3.2", my new block) hits history :1913, the session's own
+record of U4e's brief check (read). :1293 (9.1's KL-U4F row) and :1685 (D2's row) hit on words those rows already had at
+rev 3.2 ("only if D2 shows the room short after", history :2707; D2's df and du figures, :2708-2709). Every other hit
+is on a line rev 3.3 did not change. Spot-read and found to be session text: history :1913, :2947 (the card's night
+narrative, not a paste) and :3614-3615 (the card's c62h-review record). The others (:2309-:6422) are not read one by
+one here; L4 item 10's re-run on rev 3.3 should read them against the larger history.
+
+## Sent back to the advisor (not folded, or folded with a choice to confirm)
+1. **A3, carry 74's option-A reading:** the ruling names "5.3's closing paragraph and D15". Folded in 5.3's closing
+   paragraph. **D15 holds no such phrase** (it reads "1 - `tick.s.cmd_on_time`'s share"): nothing replaced there.
+   **2.2's pass-marks row** (now :378) holds the same old phrase ("the commands that arrived after their stamped tick
+   ran") but is not named: left as rev 3.2 wrote it. So the phrase stood twice in the brief, not once.
+2. **Not restated, outside the places L1 names:** "3,607 to 3,727 MiB" in 5.5's room paragraph (with "about 1,855 MiB
+   short of the sets' 3,607"), in Q2's question, in 12 item 6's KL-U4F draft ("Why it matters") and in NA-5; 9.1's
+   "npt-server `--all-features` compile" row ("if a ruling opens npt-server; else U4h"), now answered by A2; 9.1's
+   readings-PR row, which A1's new reading does not join in the brief (L3 is the main session's commit).
+3. **Placement choices:** A2's "The fix moves or re-gates ..." at the end of section 6 item 4; A1's Q11 (iii) (c) add
+   and E4's walk rule appended to option (iii) (c); A3's ";" after "f34"; A4's "; " join in 2.1; B2's "rev 3.3 (A5):"
+   label; Q12's Ruled line "come to me" read as "come to the advisor"; 5.5's room sentence ("read by D2 after item 2
+   (A6's place)") taken as KL-U4F's trigger; Q5's P25 substitution in section 4 and 12 item 3 and Q6's f1 loss, both as
+   the rulings' words in the places they name.
+
+## Done
+All of A1-A7, the 18 Ruled lines, the conditionals, the counts, SIZE-CHECK, the title, the record and the change list
+are in; E4 (the coordinator's added item) is in. Brief: sha256 609bfd169bacb08c024c1788e03537586f00ba4b596b44cc56d3bf9dd35bf0d0,
+1,827 lines (r31_check.py). No commit (the saver commits this folder).
