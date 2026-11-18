@@ -200,10 +200,10 @@ mod tests {
         }
     }
 
-    const SECOND: Section = section("second", 4, &[field("c", U32, 0)]);
+    const SECOND: Section = section("second", 8, &[field("c", U32, 0)]);
     #[rustfmt::skip]
     const BASE: &[Section] = &[section("first", 8, &[field("a", U32, 0), field("b", U8, 4)]), SECOND];
-    /// `BASE` with one thing changed in each table.
+    /// `BASE` with one thing changed in each table; each is still a table the rules accept.
     #[rustfmt::skip]
     const CHANGED: &[(&str, &[Section])] = &[
         ("section name", &[section("firsu", 8, &[field("a", U32, 0), field("b", U8, 4)]), SECOND]),
@@ -215,14 +215,16 @@ mod tests {
         ("field count",  &[section("first", 8, &[field("a", U32, 0), field("b", U8, 4), field("e", U8, 5)]), SECOND]),
         ("field's section", &[
             section("first", 8, &[field("a", U32, 0)]),
-            section("second", 4, &[field("b", U8, 4), field("c", U32, 0)]),
+            section("second", 8, &[field("b", U8, 4), field("c", U32, 0)]),
         ]),
     ];
 
     #[test]
     fn hash_covers_every_value() {
+        assert_eq!(broken_rule(BASE), None);
         let mut seen = vec![layout_hash(BASE)];
         for (what, table) in CHANGED {
+            assert_eq!(broken_rule(table), None, "the table with a changed {what}");
             let hash = layout_hash(table);
             assert!(
                 !seen.contains(&hash),

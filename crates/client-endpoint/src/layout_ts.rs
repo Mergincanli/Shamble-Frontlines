@@ -44,9 +44,11 @@ fn write_generated(folder: &Path, text: &str) {
     );
     fs::create_dir_all(folder).expect("the generated folder can be made");
     for entry in fs::read_dir(folder).expect("the generated folder can be read") {
-        let path = entry.expect("its entries can be read").path();
-        if path.is_file() && path.extension().is_some_and(|ext| ext == "ts") {
-            fs::remove_file(&path).expect("an old generated file can be deleted");
+        let entry = entry.expect("its entries can be read");
+        // A link counts as a file here: it is deleted, never followed.
+        let is_folder = entry.file_type().is_ok_and(|kind| kind.is_dir());
+        if !is_folder && entry.path().extension().is_some_and(|ext| ext == "ts") {
+            fs::remove_file(entry.path()).expect("an old generated file can be deleted");
         }
     }
     fs::write(folder.join(FILE_NAME), text).expect("the generated file can be written");
