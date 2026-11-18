@@ -1,0 +1,99 @@
+// The build script's checks, each a small function with no side effect beyond reading the file it is given, so
+// each is tested without a build (build-checks.test.mjs). The build itself (scripts/build.mjs) calls them.
+
+import { createHash } from "node:crypto";
+import { lstatSync, readFileSync } from "node:fs";
+import { brotliCompressSync, constants, gzipSync } from "node:zlib";
+
+/** No served file may reach 25 MiB (PM-0002-29's gated clause; a static host's per-file limit). */
+export const MAX_SERVED_BYTES = 26_214_400;
+
+/**
+ * The version of the `wasm-bindgen` crate that `Cargo.lock` records. The command-line tool that writes the glue
+ * must be exactly this version (PM-0002-18; ADR 0002 part 2).
+ */
+export function lockedWasmBindgenVersion(lockText) {
+  const versions = [];
+  for (const block of lockText.split(/^\[\[package\]\]$/m).slice(1)) {
+    if (/^name = "wasm-bindgen"$/m.test(block)) {
+      const version = /^version = "([^"]+)"$/m.exec(block);
+      if (version === null) throw new Error("Cargo.lock: the wasm-bindgen entry has no version line");
+      versions.push(version[1]);
+    }
+  }
+  if (versions.length !== 1) {
+    throw new Error(`Cargo.lock: expected exactly one wasm-bindgen entry, found ${versions.length}`);
+  }
+  return versions[0];
+}
+
+/**
+ * Compares what the tool printed for `--version` with the version in `Cargo.lock`. Throws, with both versions in
+ * the message, unless they are equal; the build then stops before any binding is written.
+ */
+export function checkCli(versionOutput, locked) {
+  const printed = /^wasm-bindgen (\d+\.\d+\.\d+)$/.exec(versionOutput.trim());
+  if (printed === null) {
+    throw new Error(`the wasm-bindgen tool printed no version this script can read: ${JSON.stringify(versionOutput)}`);
+  }
+  if (printed[1] !== locked) {
+    throw new Error(
+      `the wasm-bindgen tool is version ${printed[1]}, and Cargo.lock records the library at ${locked}: ` +
+        "the two must be equal, so no binding is written",
+    );
+  }
+}
+
+/**
+ * Checks the tool's file before it is run at all, `--version` included: a plain file (no link) of the recorded size
+ * and sha256. The tool is a program from the internet that no lockfile covers, and anything that runs as this user
+ * could have replaced it since it was checked. Throws when the expected values are missing: the build never runs a
+ * tool it cannot compare.
+ */
+export function checkCliFile(file, expectedSha256, expectedSize) {
+  if (typeof expectedSha256 !== "string" || !/^[0-9a-f]{64}$/.test(expectedSha256)) {
+    throw new Error("the wasm-bindgen tool's expected sha256 is not given (64 hex digits): the tool is not run");
+  }
+  if (!Number.isInteger(expectedSize) || expectedSize < 1) {
+    throw new Error("the wasm-bindgen tool's expected size is not given: the tool is not run");
+  }
+  const info = lstatSync(file);
+  if (!info.isFile()) throw new Error(`the wasm-bindgen tool at ${file} is not a plain file: it is not run`);
+  if (info.size !== expectedSize) {
+    throw new Error(`the wasm-bindgen tool at ${file} is ${info.size} bytes, not the recorded ${expectedSize}: it is not run`);
+  }
+  const found = createHash("sha256").update(readFileSync(file)).digest("hex");
+  if (found !== expectedSha256) {
+    throw new Error(`the wasm-bindgen tool at ${file} has sha256 ${found}, not the recorded one: it is not run`);
+  }
+}
+
+/**
+ * One row per file: its size raw, with gzip at level 9 and with Brotli at quality 11 (PM-0002-29's settings).
+ * @param {{ name: string, bytes: Uint8Array }[]} files
+ */
+export function sizeTable(files) {
+  return files.map(({ name, bytes }) => ({
+    name,
+    raw: bytes.length,
+    gzip: gzipSync(bytes, { level: 9 }).length,
+    brotli: brotliCompressSync(bytes, {
+      params: { [constants.BROTLI_PARAM_QUALITY]: 11, [constants.BROTLI_PARAM_SIZE_HINT]: bytes.length },
+    }).length,
+  }));
+}
+
+/** The rows of a size table whose file reaches the limit for a served file. */
+export function tooLarge(rows) {
+  return rows.filter((row) => row.raw >= MAX_SERVED_BYTES);
+}
+
+/** The size table as text, for the build's output and the report. */
+export function formatSizeTable(rows) {
+  const width = Math.max(4, ...rows.map((row) => row.name.length));
+  const line = (name, raw, gzip, brotli) =>
+    `${name.padEnd(width)}  ${String(raw).padStart(10)}  ${String(gzip).padStart(10)}  ${String(brotli).padStart(10)}`;
+  return [line("file", "raw", "gzip -9", "brotli 11"), ...rows.map((row) => line(row.name, row.raw, row.gzip, row.brotli))].join(
+    "\n",
+  );
+}
