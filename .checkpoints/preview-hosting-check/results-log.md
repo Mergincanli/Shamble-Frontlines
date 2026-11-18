@@ -539,3 +539,40 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - Cleanup runs: close #2 44370905082 for (a) (cs/pd-one), created 18:32:54, success at 18:33:08; close #3 44370914405
   for (a') (cs/pdt-one), created 18:32:57, running at 18:33:30. **No cleanup run for (d)** (cs/pd-off): close.yml
   deleted on its branch, as planned (Risk 10 did not happen so far; the close.yml run list holds no cs/pd-off run).
+- His message (2026-11-18 18:52:12 UTC, 8cc8eb72-82ae-48ed-ac2a-baaea512ac7a), word for word: "1. I think I do" /
+  "2. merged" / "3. Merged"; then, queued while I worked, a screenshot of pull request #8 (18:52:36 UTC, attachment
+  f154b837-2e59-4a7e-b81f-27873b4c7c97), transcribed: "Merged",
+  "Mergincanli merged in 347d5e0 1 minute ago. Delete the cs/pdt-three branch to tidy up." with the buttons "Delete
+  branch" and "Revert"; the sidebar "Deployments": "preview", "1 minute ago", with an open-link icon. **PM-0006-10,
+  logged in: the page shows the deployment ("Deployments: preview" with a link)**; his words "I think I do".
+- The merges (from the pull requests' data): (b) #4 merged 2026-11-18T18:50:33Z (merge commit 756d33f), (b') #8 merged
+  18:50:43Z (347d5e0), both by Mergincanli. **The branches were not deleted** (git ls-remote at 18:52:58 UTC still
+  lists cs/pd-three 12f71d3 and cs/pdt-three 6188812): his "Delete branch" asked again.
+- `main` re-hashed after the merges (347d5e0): deploy 29593af18d34, close 3afdf389d636, probe f24ad6e81daf, browsers
+  6791076916ae (unchanged); `git diff --name-status 2162db5 347d5e0`: only "A test-prs/pd-three.txt", "A
+  test-prs/pdt-three.txt".
+- The cleanups, word for word from their logs:
+  - (a) close #2 44370905082: "Pull request closed at 2026-11-18T18:32:51Z (merged: false); this job started at
+    2026-11-18T18:33:03Z." / "Uploads of cs/pd-one found: 1" / "Delete 1b3c905e-aa4c-4832-bb02-a0337ea78361
+    (https://1b3c905e.shamble-preview-check.pages.dev): HTTP 200 {"success":true,"errors":[]}" / "This job ended at
+    2026-11-18T18:33:05Z."
+  - (a') close #3 44370914405: the tombstone "✨ Success! Uploaded 1 files (0.90 sec)", deployment
+    2b214ae6-2566-4331-b348-c89e074b3764, alias https://cs-pdt-one.shamble-preview-check.pages.dev, made
+    18:33:22.294Z; "Pull request closed at 2026-11-18T18:32:54Z (merged: false); this job started at
+    2026-11-18T18:33:22Z." / "Uploads of cs/pdt-one found: 2" / "Delete 672b3d0e-d806-45ea-a286-5c2b8229e095
+    (https://672b3d0e.shamble-preview-check.pages.dev): HTTP 200 {"success":true,"errors":[]}" / "Kept (the
+    tombstone): 2b214ae6-2566-4331-b348-c89e074b3764" / "This job ended at 2026-11-18T18:33:23Z."
+  - (b) close #4 44374077151: "Pull request closed at 2026-11-18T18:50:33Z (merged: true); this job started at
+    2026-11-18T18:50:46Z." / "Uploads of cs/pd-three found: 3" / "Delete 03630e1d-0ce2-4de1-a230-0a752eb81165 ...:
+    HTTP 200 ..." / "Delete f1e112f2-eefd-441c-b2c3-ad6d0201a2be ...: HTTP 200 ..." / "Delete
+    f516ed27-3513-4737-a5b1-6a60e51ebd88 ...: HTTP 200 ..." / "This job ended at 2026-11-18T18:50:47Z."
+  - (b') close #5 44374107847: the tombstone "✨ Success! Uploaded 0 files (1 already uploaded) (0.30 sec)",
+    deployment 5ff46e6d-ea01-4c0e-b4e3-c0d46e50dc1c, alias https://cs-pdt-three.shamble-preview-check.pages.dev, made
+    18:51:05.446Z; "Pull request closed at 2026-11-18T18:50:43Z (merged: true); this job started at
+    2026-11-18T18:51:05Z." / "Uploads of cs/pdt-three found: 4" / three deletes, HTTP 200 each (6b6415e5..., 5ad91df8...,
+    ed9c2421...) / "Kept (the tombstone): 5ff46e6d-ea01-4c0e-b4e3-c0d46e50dc1c" / "This job ended at
+    2026-11-18T18:51:08Z."
+  - "Uploads found" against the records (F3/TE-7): (a) 1 = 1 upload; (a') 2 = 1 upload + the tombstone; (b) 3 = 3
+    uploads; (b') 4 = 3 uploads + the tombstone. From close to deletion: (a) 14 s, (a') 29 s, (b) 14 s, (b') 25 s.
+  - No cleanup run for (d). Every cleanup ran at once (no reviewer).
+- A probe started by hand right after the last cleanup (run_workflow, `purpose: deletion`).

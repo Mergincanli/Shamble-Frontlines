@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:34 Amsterdam (18:34 UTC)
+- **Last update:** 2026-11-18 19:55 Amsterdam (18:55 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -595,6 +595,12 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      Next: his merges of #4 and #8 ("Delete branch"), his logged-in look at a PR page; then the cleanups of (b) and
      (b'), `main` re-hashed, a by-hand probe right after the last cleanup and a check-in about an hour later; the
      24-hour reading from 18:32:51Z on, i.e. Day 2 from 2026-11-19 about 19:35 UTC at the earliest (after his merges).
+   - His merges: (b) #4 18:50:33Z (756d33f), (b') #8 18:50:43Z (347d5e0); PM-0006-10 logged in: yes ("Deployments:
+     preview" with a link; his "I think I do"). Branches NOT deleted (ls-remote 18:52:58): "Delete branch" asked again.
+     `main` 347d5e0 re-hashed: the approved workflows, plus only the two text files. All four cleanups success, each
+     "Uploads found" equal to the records ((a) 1, (a') 1+tombstone, (b) 3, (b') 3+tombstone); none for (d). The
+     probe started by hand at about 18:54 UTC. The last close: 18:50:43Z, so the 24-hour reading is due from
+     2026-11-19 18:51 UTC (19:51 Amsterdam).
 
 ## Next steps
 1. His answer: sitting 2 tonight or tomorrow; then his list (step 24) and sitting 2.
