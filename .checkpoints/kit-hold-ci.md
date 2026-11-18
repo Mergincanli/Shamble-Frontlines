@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 18:21 CET (from the clock)
+- **Last update:** 2026-11-18 18:47 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -177,12 +177,42 @@
     mode 100644 to 100755, content unchanged), pushed 17:20:38 UTC. The `gate` run on 94c197f that was still running
     is cancelled by this push (the workflow's own rule).
 
+16. **The plant's runs, both failed at the compare step** (read 17:21 UTC): `toolchain` for the push: run
+    44357616602, job 134989872637: after the write-mode run's last test lines, "writing the generated types again
+    changed:" (17:21:20.1392095Z), " M packages/types/src/generated/protocol/Join.ts" (17:21:20.1392577Z),
+    "##[error]Process completed with exit code 1." (17:21:20.1413830Z); for the pull request: run 44357633651, job
+    134989932210: step 7 "Build and test with the network cut off" failure, 17:21:17 to 17:21:21, job ended
+    17:21:24.
+17. **The take-back**: commit 415bd73b12cf8e9b2efa76e872956ab237320314 (the bit off again; the code tree equals
+    94c197f), pushed 17:21:55 UTC, after both plant runs had ended. Its runs, all success: `toolchain` push
+    44357864275 (17:22:01 to 17:22:45) and pull request 44357881263 (17:22:06 to 17:22:50); `gate` push 44357864589
+    (to 17:23:10) and pull request 44357881162 (to 17:31:27).
+    - The saver on the branch's new script saved and pushed twice by itself (3c34755 at 17:28, 643f915 at 17:38).
+18. **A hole in my changed lines, found after the push** (17:21 to 17:45 UTC). The automated review of the push
+    (Claude Code's security plugin, not his word) flagged the line that reads the file from the push
+    (`git('ls-tree', rev, '--', f)`, a line of the text he approved): git reads a path that starts with ":" as a
+    pattern. The advisor agent had rated that line Low (safe direction). My probe
+    (scratchpad `probe2/probe.mjs`, a scratch repository) shows it is not only safe-direction once my new rule
+    stands beside it: when main already holds a manifest in a root folder named ":" with the same content as the
+    root file, and the push changes the file in that folder, the committed script **releases it with no record**
+    (the text he saw held it). Main holds no such folder, so nothing is exposed today.
+    - The complete fix, on scratch copies only (`.gate/kit-hold-ci/fix2/`; exact text: `kit-hold-ci/kit-fix2.diff`,
+      45 lines, sha256 9197f070...): my two new code lines become three and read BOTH sides at the literal path
+      (script +3 -2); step 4 of test 33 now builds exactly that case (tests +7 -6). No line of the text he saw
+      changes. Run 17:44 to 17:45 UTC: 33 pass; test 33 fails at step 4 (:653) on the committed script (kept as
+      `broken-main-push-read-as-pattern.mjs`) and on the copy before the advisor agent's fix, and still at steps 1,
+      2, 3 on the three older broken copies; the committed tests pass against the fixed script; the probe: held.
+      Size with it: 47 + 224 + 10 + 12 = 293 (stop line 300).
+    - It is a kit edit, so it is asked of him in chat with its exact text (question KIT-FIX); not written before
+      his yes.
+
 ## Current step
-16. (17:21 UTC) Read the plant's `toolchain` runs (push and pull request): they must end failed at the step "Build
-    and test with the network cut off", with the lines "writing the generated types again changed:" and
-    " M packages/types/src/generated/protocol/Join.ts". Only after both have ended: the take-back commit (a new
-    commit: the bit off again) and its clean run. Then reviews (security-auditor, infra-engineer, test-engineer; the
-    engine-architect drafting change-set 2's plan counts toward the three), the verifier, the docs, the report.
+19. (17:47 UTC) **Stopped on the kit lines for his answer to KIT-FIX.** Running meanwhile: infra-engineer reviews
+    the workflow edit (its text is final); engine-architect drafts change-set 2's plan. After his yes: write the
+    two kit files (copies of `.gate/kit-hold-ci/fix2/`), check against `kit-fix2.diff`, the tests, commit, push,
+    CI; then security-auditor and test-engineer on that head (one round with infra-engineer's), the advisor agent
+    on the pushed head, the verifier, the docs (DECISIONS by script: now three messages of his), the report, the
+    pull request ready.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
