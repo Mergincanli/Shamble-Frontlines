@@ -152,8 +152,10 @@
 
 ## Running work
 - **2026-11-18 from 11:4x UTC: U4f's builder runs** (agent a856ba7ccb7d032c3; resume it by SendMessage, or a fresh copy
-  that reads its notes and `git diff` first). Its worktree is under .claude/worktrees/ (path and branch in its notes'
-  Block 0: `.checkpoints/netcode-proof-test/u4f-build.md` in the worktree). **At each check-in:** snapshot it,
+  that reads its notes and `git diff` first). Its worktree: `/home/user/Shamble-Frontlines/.claude/worktrees/agent-a856ba7ccb7d032c3`,
+  branch u4f-build at 827518b (its notes: `.checkpoints/netcode-proof-test/u4f-build.md` there). **Check-in 12:35
+  UTC:** nothing stopped (its runner in block 4's fmt and clippy, logs .gate/u4f/b1-b4 from 12:06); snapshot
+  wip/u4f-build.patch 47ec4a9aecb4d398…, 200,122 bytes, 20 files, on 827518b; its notes copied. **At each check-in:** snapshot it,
   `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree>
   .checkpoints/netcode-proof-test/wip/u4f-build.patch u4f-build` (one snapshot per live worktree; WIP-CLEAN deletes it
   when merged or replaced), then save the card; on a cut, check the worktree against its last snapshot first.
