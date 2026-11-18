@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 18:57 Amsterdam (17:57 UTC)
+- **Last update:** 2026-11-18 19:05 Amsterdam (18:05 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -521,6 +521,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Plan Part 4 leans on the reviewer: "the token sits in `preview`, whose jobs wait for your approval, so a
      rewritten job gets nothing until you click", and risk 1 ("A rewritten workflow on a test branch sends the token
      away") is "Limited by your approval". So (b)'s cost is named in the entry. The decision entry REVIEWER-NOW sent.
+   - His answer (18:04:10 UTC): (b) (Decisions taken). No run waits; the link and the steps sent; next his screenshot
+     after the untick, then my go in words; `bite-production` and `restore-production` then start without waiting,
+     after both browser machines finish (the corrected list lines for #4 and #5 go with my go).
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.
@@ -698,6 +701,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 - **His answers of 2026-11-18 16:10:04 UTC** (d9550773-d802-402d-b2ba-206267f46661), word for word: "1. A / 2. day 1 can be today if possible / 3. I'll do compact afterwards, do you want me to send you specific instructions after I have used /compact? so you know where to go from exactly". So
   TOKEN-SCOPE (a): Read stays on the token for the rest of the check (the report notes that "write only" was never
   measured); Day 1 today, 2026-11-18, if possible; the compaction: he asked whether to send instructions after it.
+
+- **His answer to REVIEWER-NOW** (user message 2026-11-18 18:04:10 UTC, cd546f27-bed3-4291-97d0-174478c77df5; byte for
+  byte in `.checkpoints/preview-hosting-check/mustafa-2026-11-18-reviewer-b.md`, 56 bytes, sha256 67f69e0f5758...),
+  word for word: "B, give me the links for the untick "required reviewers"". So REVIEWER changes from (a) to (b) for
+  the rest of the check: he unticks "Required reviewers" on `preview` now (no run waiting: list of waiting runs, total
+  0, read after his message), ticks it again before sitting 3 (a screenshot with Mergincanli as reviewer and the
+  administrator bypass unticked; it blocks sitting 3), and it stays on for Day 2. For DECISIONS.md, with his words on
+  the approvals and their times (OQ-0006-13's input): "When are we done with these hideous tasks" (17:33:15 UTC), "Why
+  do I have to approve these things, can't we just automate it?" (17:50:30 UTC).
 
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
 1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a
