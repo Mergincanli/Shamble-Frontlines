@@ -6,19 +6,19 @@ Task (main session, 2026-11-18): draft the change-set plan for change-set 2 of t
 No file named like a manifest or lockfile in the notes. Do not open `spikes/` or `/root/.claude/uploads/`.
 
 ## Plan (blocks; mark each DONE when its findings are saved below)
-1. Read REPO_MAP, STATUS (cs1 follow-ups). [ ]
+1. Read REPO_MAP, STATUS (cs1 follow-ups). [DONE]
 2. Read the build plan: Since the plan (l.17 on), Part 1 cs2 (l.242 on), Part 2 step 2.5 done-when, Part 3.1,
-   Part 7, Part 8, Part 13; appendix; Part 15. [ ]
-3. Read the cs1 report (what exists, follow-ups, two misses). [ ]
+   Part 7, Part 8, Part 13; appendix; Part 15. [DONE; appendix not needed beyond Since the plan]
+3. Read the cs1 report (what exists, follow-ups, two misses). [DONE]
 4. Read ADR 0001-0006 where they bind step 2.5; ENGINE_OVERVIEW; DECISIONS (grep cs2, 2.5, three.js, WebGPU,
-   Brave, zip). [ ]
-5. Read the code: crates/, packages/, root Cargo.toml, root package.json, toolchain.yml, CHECKPOINTS.md §3. [ ]
+   Brave, zip). [DONE]
+5. Read the code: crates/, packages/, root Cargo.toml, root package.json, toolchain.yml, CHECKPOINTS.md §3. [DONE]
 6. Check every library version on official registry/doc pages (npm registry, crates.io, three.js docs/releases,
-   Vite docs, wasm-bindgen docs, MDN for browser APIs). [ ]
+   Vite docs, wasm-bindgen docs, MDN for browser APIs). [DONE]
 7. Write the draft: goal, visible result, files and lanes, symbols, libraries, build order with the dependency
    check, risks, change type, evidence with commands, reviewers, Brave steps, planned size, not in it, open
-   questions. [ ]
-8. Self-check the draft against the task's list and the rules; findings on the build plan being wrong/out of date. [ ]
+   questions. [DONE: cs2-plan-draft.md]
+8. Self-check the draft against the task's list and the rules; findings on the build plan being wrong/out of date. [DONE]
 
 ## Findings (one line each, with source; saved as I go)
 - [block 1 DONE] STATUS: cs2 = lane 1, the skeleton, step 2.5 first half; "its plan first, after his go on #58" (docs/STATUS.md:36-37). #58 merged since (checkpoint kit-hold-ci.md:28). Binding rule until DEP-HOLD answer: new dep uncommitted/unbuilt/unpushed (STATUS.md:106-107); now the kit hold replaces it once #60 merges.
@@ -116,3 +116,7 @@ No file named like a manifest or lockfile in the notes. Do not open `spikes/` or
 - Playwright executablePath: "Path to a browser executable to run instead of the bundled one"; "Note that Playwright only works with the bundled Chromium, Firefox or WebKit, use at your own risk" (playwright.dev/docs/api/class-browsertype).
 - PROCESS FINDING: lane 1 has one branch (claude/wonderful-hamilton-jdmlnf) and #60 is open from it; any cs2 commit (code or checkpoint) before #60 merges would join #60, which his words keep to the hold + two CI edits => no cs2 commit on the branch before #60's merge; cs2 notes stay in kit-hold-ci/ until then.
 - [blocks 1-6 DONE] Now block 7: writing the draft to .checkpoints/kit-hold-ci/cs2-plan-draft.md.
+- [block 7 DONE] Draft written: .checkpoints/kit-hold-ci/cs2-plan-draft.md, sections 0-19.
+- [block 8 DONE] Self-check fixes applied by counted replacements (scratchpad fix1-4.py): removed an unsourced claim (wasm-bindgen needs no flags); risk 1 no longer says what the macro emits; OQ "why" lines shortened; trace column honest for vite and @types/three; pkg/ row; steps reordered so dependency-free work (serve.mjs, the Worker's pure modules, the build script's checks) runs during the security wait (steps 0-8, references fixed); the advisor's M2 cited as a paraphrase with its file lines, not as a quote; manifest count fixed (seven manifests + two lockfiles, eight with a generator crate); rand_chacha wording: moved to rust-random/rngs (PR #1658) and a maintainer sees no reason to maintain it, not "removed"; two-instance test owner = lane 2 (Part 15.2). Verified .gitignore is not a guarded file (.claude/hooks/routine-guard.mjs:28-47); .npmrc is guarded at any depth (:38).
+- Open questions in the draft: RNG-CRATE (rec. (c) no generator in cs2, chacha20 in cs3), OVERFLOW-3P (rec. (a) keep "*"), CI-WASM (rec. (a) own PR after merge, curl + pinned sha256), SIZE-2 (rec. (a) stop line stays 4,000). Planned size ~2,900.
+- DONE. Nothing committed; no checkpoint script run.

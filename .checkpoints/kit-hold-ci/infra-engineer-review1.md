@@ -206,3 +206,62 @@ scratch copies of packages/types/src (repo untouched)
   (the report's risk 3 already says so); (d) code that runs earlier in the same step (cargo build scripts, tests,
   vitest's own code) could replace node_modules/.bin/tsc: as for every check inside the cut, a correctness check, not a
   guard against hostile dependencies.
+
+### Q6 (nothing that stood is weakened)
+- `git diff --numstat origin/main`: 12 added, 0 removed. No added line holds a single quote, so the inner script's
+  quoting (opened at :75, closed at :100) is intact; parsed with PyYAML: job keys runs-on, timeout-minutes (15),
+  cache-mode (none), steps; top-level permissions {contents: read}, no job-level permissions; steps in the same order
+  (checkout, setup-node, rustup install, pin check, fetch, cut).
+- The new lines sit inside the cut (after the probe); none needs the network (git status, cargo test --locked on fetched
+  crates, tsc); a network need would fail loudly inside the namespace. `--locked` on the new cargo line; npm ci
+  --offline untouched; `npx --no` cannot install. Timeout untouched; the new work is ~1.2 s of a 44-55 s run.
+- Write mode mutates the checkout only inside the cut; if the compare passes the bytes and modes are unchanged, so the
+  later lines (release tests, wasm build, npm test, tsc) run on the committed bytes; if it fails, the step stops.
+- No intra-binary race: each export test is the only test in its binary that touches files; cargo runs binaries in turn.
+- Provider down: with `none` the job no longer depends on the cache service at all (it never used it). Rollback: revert
+  94c197f; no state to clean (no cache, no setting). Exposure: none added (no secret, no token scope, no new step).
+- S6 GitHub Docs "GitHub Actions billing" https://docs.github.com/en/billing/concepts/product-billing/github-actions
+  (read 2026-11-18): "The use of standard GitHub-hosted runners is free: ... In public repositories"; cache storage "a
+  separate allowance of 10 GB per repository", beyond it "$0.07 USD" per GB per month. Repository is public (gh api
+  repos/...: visibility=public, read 2026-11-18). So cost per run and per month: $0, before and after.
+
+### Q7 (for the gate v2's plan list; no design)
+- CI-CUT part 2: the job that runs the cut holds no `uses:` step at all (no JavaScript action, so no post step runs after
+  dependency code, outside the cut, as the same user, with the runtime token and the network): plain-git checkout of
+  exactly $GITHUB_SHA (checked), Node from the image's tool cache checked against the pin; keep `cache-mode: none`; and a
+  gate test that fails if that job ever gains a `uses:` step (a re-added action would silently bring post steps back).
+- Lockfile-review check: the first step of every job that fetches (toolchain and gate.yml's npm ci), on push AND
+  pull_request (miss 1 came from a push before any PR), before any fetch: diff Cargo.lock and package-lock.json against
+  main's merge-base and fail unless each added or changed entry (name, version, checksum/integrity) is named in a
+  committed review record whose format matches the kit hold's (DEP-HOLD), reading only files, running nothing fetched.
+- Also for that list: if the gate v2 adds a workflow linter, it must accept `cache-mode` (GitHub key since 2026-09-10).
+
+### Evidence spot-check (2026-11-18, read-only)
+- ci-evidence.md's quoted lines are byte-exact in the job-log endpoint (`gh api .../actions/jobs/<id>/logs`): clean job
+  134988309631 lines 26-27 ("Secret source", "Cache mode: none" at .9099464Z), 150 (setup-node at .0868597Z); plant job
+  134989872637 lines 452-454 (message at .1392095Z, " M ...Join.ts" at .1392577Z, exit 1 at .1413830Z). The run archive
+  (`gh run view --log`) shows the same lines with different last digits (.9099460Z, .1392024Z): a re-checker must use
+  the job-log endpoint, so the report should name it as the source.
+- Plant run also shows uid=1001(runner) gid=65534(nogroup) and "the network is cut ... (curl exit 7)" before the compare.
+- Commits: 0c0e271 = mode change 100644 -> 100755 on Join.ts only; 415bd73 = the reverse; `git diff --quiet 94c197f
+  415bd73 -- . ':!.checkpoints'` true. Take-back job log: "Cache mode: none", "Version 6.0.3", no error line.
+
+## Verdict draft: APPROVE, no finding above Low. Findings (ranked) being written to the handback.
+
+## Final: VERDICT APPROVE (no finding above Low). Ranked findings
+L1 toolchain.yml:86 - silent pass after a committed move of packages/types/src/generated: pathspec matches nothing, git
+   status prints nothing, exit 0 (scratch case A, case C). Text is Mustafa's byte for byte, so no change now: gate v2
+   list (guard the folder: `[ -d ... ]` or `git ls-files --error-unmatch`), and one line in the report.
+L2 toolchain.yml:85-99 - both checks are correctness checks, not supply-chain controls: code that runs earlier in the
+   same step (build scripts, proc macros, tests, vitest) owns the checkout and can hide a change from git (commit,
+   core.fileMode=false, assume-unchanged, info/exclude: cases 10-13) or swap node_modules/.bin/tsc. Report: say so.
+L3 report/ci-evidence wording on the plant: the executable bit is the only difference that can reach the compare today
+   (plain run fails first on content, missing, extra, non-plain entries: ts_export.rs:63,138-155; layout_ts.rs:115,133;
+   write mode deletes .ts and rewrites 0644: ts_export.rs:94-102, layout_ts.rs:76-83); untracked/deleted/subfolder rest
+   on git's porcelain behaviour (scratch matrix), not on a run.
+L4 report wording on "Cache mode: none": proves the effective mode received by the runner, not enforcement (no step tries
+   a cache operation; setup-node's npm cache is off without a packageManager field; main's runs used none under
+   "write" either); the edit changes nothing observable today; residual until part 2: post steps of checkout and
+   setup-node still run after the cut with the network and the read-only token.
+L5 toolchain.yml:96-97 - `[ -n ]` stops with exit 1 and no message (polish for gate v2).
+L6 report: name the job-log endpoint as the source of quoted log lines (run archive timestamps differ in last digits).

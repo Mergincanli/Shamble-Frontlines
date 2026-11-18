@@ -1,5 +1,5 @@
---- .claude/scripts/checkpoint.mjs	2026-11-09 23:55:15.008962386 +0000
-+++ .gate/kit-hold-ci/checkpoint.mjs	2026-11-18 17:12:27.588525381 +0000
+--- main
++++ .claude/scripts/checkpoint.mjs
 @@ -14,9 +14,19 @@
  // re-read right before each push; never a force push; a refused push is reported and left alone; staged notes that
  // look like a secret (tokens, keys, credentials in URLs) are not committed. The script alone decides "[skip ci]": only
@@ -29,7 +29,7 @@
  // An escape that can stand just before a key in pasted text: %XX (also %25-chained: %252C), %uXXXX, quoted-printable
  // =XX, and backslash escapes (JSON's \b \f \n \r \t, \v \0, \xXX, \uXXXX). The patterns with a left boundary accept it
  // there, so "q=%20sk-..." or "a\nAKIA..." is still caught. Declared before SECRETS, which uses it at load.
-@@ -101,6 +112,33 @@
+@@ -101,6 +112,34 @@
    return d.ok && d.out.split('\n').filter(Boolean).every((f) => f.startsWith(DIR));
  }
  
@@ -51,8 +51,9 @@
 +    if (!entry.out) return !released.has(`deleted  ${f}`);
 +    const plain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(entry.out);
 +    if (!plain) return true;
-+    const onMain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('--literal-pathspecs', 'ls-tree', 'refs/remotes/origin/main', '--', f).out);
-+    if (onMain && onMain[1] === plain[1]) return false;
++    const blobAt = (ref) => /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('--literal-pathspecs', 'ls-tree', ref, '--', f).out)?.[1];
++    const inPush = blobAt(rev);
++    if (inPush && inPush === blobAt('refs/remotes/origin/main')) return false;
 +    try {
 +      const blob = execFileSync('git', ['cat-file', 'blob', plain[1]], { stdio: ['ignore', 'pipe', 'ignore'], shell: false, maxBuffer: 64 << 20 });
 +      return !released.has(`${createHash('sha256').update(blob).digest('hex')}  ${f}`);
@@ -63,7 +64,7 @@
  // The notes staged in a private index that look like a secret: [path, kind] pairs. Names are read NUL-separated (never
  // quoted); a note that can't be read counts as a hit. The secret itself is never printed.
  function stagedSecrets(ig, head) {
-@@ -177,6 +215,13 @@
+@@ -177,6 +216,13 @@
    const sync = await withLockRetry(() => git('reset', '--quiet', 'HEAD', '--', DIR));
    if (!sync.ok) log(`WARNING: the index's ${DIR} entries are behind HEAD; run: git reset -q HEAD -- ${DIR}`);
    const sha = commit.out.slice(0, 7);
@@ -77,8 +78,8 @@
    if (background && codeAhead) {
      log(`saved locally, NOT pushed ${sha} on ${branch}: the branch has unpushed commits outside ${DIR} (push them yourself)`);
      return 0;
---- .claude/CHECKPOINTS.md	2026-11-17 19:13:43.914036769 +0000
-+++ .gate/kit-hold-ci/CHECKPOINTS.md	2026-11-18 16:44:33.857012574 +0000
+--- main
++++ .claude/CHECKPOINTS.md
 @@ -57,6 +57,16 @@
  - One command commits and pushes the checkpoint folder alone, leaving anything else you staged as it is:
    `node .claude/scripts/checkpoint.mjs save <task-slug> -m "<step>" --trailer "<attribution line>"` (one `--trailer` per
@@ -96,8 +97,8 @@
  - Each step ends with a three-part summary for Mustafa (brief §6): what's done, what's checkpointed (where), what's
    next.
  - **At every update, check the background saver** when agents or a workflow are running, and restart it if it has
---- .claude/scripts/checkpoint.test.mjs	2026-11-09 23:55:15.009247589 +0000
-+++ .gate/kit-hold-ci/checkpoint.test.mjs	2026-11-18 17:12:27.589155539 +0000
+--- main
++++ .claude/scripts/checkpoint.test.mjs
 @@ -4,7 +4,8 @@
  import { test } from 'node:test';
  import assert from 'node:assert/strict';
@@ -108,7 +109,7 @@
  import { tmpdir } from 'node:os';
  import { join, dirname } from 'node:path';
  import { fileURLToPath } from 'node:url';
-@@ -431,3 +432,224 @@
+@@ -431,3 +432,225 @@
    assert.match(leak.stdout, /NOT committed: \.checkpoints\/leak\.md looks like a API key/);
    assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/wt'), sh(wt, 'rev-parse', 'HEAD'));
  });
@@ -312,21 +313,22 @@
 +  assert.match(r.stdout, /no recorded check: Cargo\.lock, sub\/Cargo\.lock\. /);
 +  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
 +
-+  // A lockfile in a root folder named ':' is read at its own path, never as git's ':/' (the root Cargo.lock, whose
-+  // content equals main's here): held.
++  // A lockfile in a root folder named ':' is read at its own path on both sides, never as git's ':/' (the root
++  // Cargo.lock): main holds both with the same content, the push changes the one in the folder: held.
 +  const magic = fixture(t);
 +  const first = sh(magic.origin, 'rev-parse', 'refs/heads/cs/test');
 +  sh(magic.repo, 'switch', '--quiet', 'main');
++  mkdirSync(join(magic.repo, ':'));
 +  writeFileSync(join(magic.repo, 'Cargo.lock'), 'merged\n');
-+  sh(magic.repo, 'add', 'Cargo.lock');
-+  sh(magic.repo, 'commit', '--quiet', '-m', 'main gains Cargo.lock');
++  writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'merged\n');
++  sh(magic.repo, 'add', '--', 'Cargo.lock', ':(literal):/Cargo.lock');
++  sh(magic.repo, 'commit', '--quiet', '-m', 'main gains Cargo.lock twice');
 +  sh(magic.repo, 'push', '--quiet', 'origin', 'main');
 +  sh(magic.repo, 'switch', '--quiet', 'cs/test');
 +  sh(magic.repo, 'merge', '--quiet', '--no-edit', 'main');
-+  mkdirSync(join(magic.repo, ':'));
 +  writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'not on main\n');
 +  sh(magic.repo, 'add', '--', ':(literal):/Cargo.lock');
-+  sh(magic.repo, 'commit', '--quiet', '-m', 'a lockfile in a folder named :');
++  sh(magic.repo, 'commit', '--quiet', '-m', 'the lockfile in the folder named : changes');
 +  note(magic.repo);
 +  r = run(magic.repo, 'save', 'test', '-m', 'a folder named :');
 +  assert.equal(r.status, 1, r.stderr + r.stdout);

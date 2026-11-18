@@ -20,13 +20,14 @@ per source: `kit-hold-ci/engine-architect-cs2-notes.md`._
   8.3.7, which becomes a direct dependency but is already in the lockfile. No random-number crate unless RNG-CRATE says
   so (section 16).
 - **Planned size.** About 2,900 hand-written lines, against the build plan's 2,000. Which stop line holds is SIZE-2.
-- **Steps.** 0 paper and preconditions · 1 the Rust core, with no new crate · 2 the one dependency step and its
-  security answer · 3 the bindings and the build script · 4 the Worker · 5 the page · 6 the small server · 7 the
-  browser tests · 8 readings, planted defects, docs, the zip, reviews.
+- **Steps.** 0 paper and preconditions · 1 the Rust core, with no new crate · 2 the one dependency step, and during
+  its security wait the small server, the Worker's pure modules and the build script's checks · 3 the answer applied
+  and the tool installed · 4 the bindings and the build · 5 the Worker's entry and the boundary tests · 6 the page ·
+  7 the browser tests · 8 readings, planted defects, docs, the zip, reviews.
 - **Open questions for Mustafa:** RNG-CRATE, OVERFLOW-3P, CI-WASM, SIZE-2 (section 16).
 - **Where the build plan is wrong or out of date for change-set 2:** twelve points (section 17). The largest: OQ-0002-7
   (is wasm-bindgen's new home healthy) must be read before wasm-bindgen enters, and the build plan places it nowhere;
-  ADR 0004's random-number crate is being dropped by its own project.
+  the makers of ADR 0004's random-number crate say they see no reason to keep maintaining it.
 
 ## 1. Goal
 Build foundation step 2.5's first half (the build plan, Part 1, change-set 2, lines 298-314; SPLIT-25 (a)): the path
@@ -118,6 +119,7 @@ folder of its own. Lane 2 builds it after `render/` has passed to lane 2, so it 
 | `packages/sim-worker/src/{worker,pacing,block-pool,read-block,messages,stats,index}.ts` | new (`index.ts` rewritten) | the Worker's host; the stub `PACKAGE` and its test go |
 | `packages/sim-worker/src/*.test.ts` | new | unit tests in Node |
 | `packages/sim-worker/boundary/sim-wasm.test.ts` | new | the boundary tests: Vitest in Node on the built Wasm |
+| `packages/sim-worker/pkg/` | build output, ignored | wasm-bindgen's glue, `.d.ts` and `.wasm`: "build output (ignored)" (ADR 0002 part 5) |
 | `packages/client/package.json` | edit | `three`, `@types/three`, the two workspace dependencies |
 | `packages/client/index.html`, `vite.config.mjs`, `serve.mjs`, `serve.test.mjs` | new | the page, the build configuration, the small server and its tests |
 | `packages/client/scripts/build.mjs`, `build.test.mjs` | new | the build script and the tests of its checks |
@@ -229,8 +231,8 @@ declare.
 | `wasm-bindgen` | `=0.2.130` (2026-10-30, Rust 1.81 or newer, MIT OR Apache-2.0) | `sim-wasm` only, normal dependency; the version set once in the root `[workspace.dependencies]` | the control calls the Worker makes are wasm-bindgen's own, with its `.d.ts` (ADR 0002 part 5, option D1); `sim-wasm` is "the wasm-bindgen bindings the Worker loads, and nothing else" (part 3) | declared: `cfg-if`, `wasm-bindgen-macro` and `wasm-bindgen-shared` (both `=0.2.130`), `rustversion` (build); the macro pulls in `wasm-bindgen-macro-support`, which pulls in `bumpalo`, `proc-macro2`, `quote` and `syn` 3 with `visit`, `visit-mut`, `full` and `extra-traits`; `wasm-bindgen-shared` pulls in `unicode-ident`. Already in `Cargo.lock` from ts-rs: `proc-macro2`, `quote`, `syn` 3, `unicode-ident` | §6.2 and §6.9, `sim-wasm`'s row in ADR 0002 part 3 |
 | the wasm-bindgen command-line tool | 0.2.130, the release's `wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz` | a tool, in no manifest: under `.gate/tools/wasm-bindgen-0.2.130/` here, and in CI after CI-WASM | writes the glue and the `.d.ts` from the `.wasm`; it must equal the library in `Cargo.lock` (PM-0002-18; ADR 0002 part 2) | one binary; the release also publishes a `.sha256sum` file and a release attestation | the same as the library |
 | `three` | 0.187.0 (r187, three.js's newest release, 30 October) | `packages/client`, dependency | the renderer the stack settles: one `WebGPURenderer` with its WebGL 2 backend (ADR 0003 parts 1-4) | nothing: no dependencies and no install scripts in its registry entry (MIT, 21,030,536 bytes unpacked) | §6.9 (ADR 0003 part 1's need) |
-| `@types/three` | 0.187.0 | `packages/client`, dev dependency | three.js ships no types; the page is type-checked against them (ADR 0002 part 7), and PM-0002-30 and R5-TSLINT-OQ4 ask how many errors and casts that costs | six packages, by its registry entry: `fflate` ~0.8.3, `@types/webxr` >=0.5.17, `meshoptimizer` ~1.1.1, `@types/stats.js` *, `@tweenjs/tween.js` ~23.1.3, `@dimforge/rapier3d-compat` ~0.12.0 (a physics library, 7,522,790 bytes unpacked, no dependencies, no install scripts). Used for types only: nothing of them is bundled, because nothing imports them | the same as `three` |
-| `vite` | 8.3.7 | root, dev dependency | the build and dev server of the `client` entry (ADR 0002 parts 2 and 5; GLOSSARY §8, "TypeScript with Vite") | nothing new: `vite` 8.3.7 is already in `package-lock.json` as Vitest's peer, with `rolldown` 1.2.18, `lightningcss` 1.33.0 and `postcss` 8.5.32. Only the direct declaration is new. The registry's newest is 8.3.8: that bump is its own change-set, as ADR 0002 part 2 asks of every toolchain bump | GLOSSARY §8, the foundation |
+| `@types/three` | 0.187.0 | `packages/client`, dev dependency | three.js ships no types; the page is type-checked against them (ADR 0002 part 7), and PM-0002-30 and R5-TSLINT-OQ4 ask how many errors and casts that costs | six packages, by its registry entry: `fflate` ~0.8.3, `@types/webxr` >=0.5.17, `meshoptimizer` ~1.1.1, `@types/stats.js` *, `@tweenjs/tween.js` ~23.1.3, `@dimforge/rapier3d-compat` ~0.12.0 (a physics library, 7,522,790 bytes unpacked, no dependencies, no install scripts). Used for types only: nothing of them is bundled, because nothing imports them | ADR 0002 part 7 traces type checking to the foundation (GLOSSARY §8); it serves `three`'s §6.9 use |
+| `vite` | 8.3.7 | root, dev dependency | the build and dev server of the `client` entry (ADR 0002 parts 2 and 5; GLOSSARY §8, "TypeScript with Vite") | nothing new: `vite` 8.3.7 is already in `package-lock.json` as Vitest's peer, with `rolldown` 1.2.18, `lightningcss` 1.33.0 and `postcss` 8.5.32. Only the direct declaration is new. The registry's newest is 8.3.8: that bump is its own change-set, as ADR 0002 part 2 asks of every toolchain bump | ADR 0002 part 2's own trace: the foundation (GLOSSARY §8), not a §6 item; it builds the page that serves §6.9 |
 
 **Not added, with the reason:**
 - **A random-number crate:** see RNG-CRATE. Nothing in change-set 2 draws a random number.
@@ -256,23 +258,24 @@ answer; every cargo command takes `--locked`; the checkpoint script holds a push
 `.checkpoints/<slug>/dependency-check.md` records the check (`.claude/CHECKPOINTS.md` §3, :60-69, from #60).
 
 1. **One dependency step, one answer.** Every manifest edit of the change-set is made at once, in step 2: the
-   dependencies and the `exports`, `test` and workspace-dependency lines alike, because "a manifest edit with no
-   dependency change still takes a security answer" (the advisor agent on #60's plan,
-   `kit-hold-ci/advisor-plan.md`). A manifest edit found later takes its own, smaller answer.
+   dependencies and the `exports`, `test` and workspace-dependency lines alike, because a manifest edit that changes no
+   dependency is held too and still takes security-auditor's short answer (#60's plan, `kit-hold-ci/plan.md` :40-41,
+   and the advisor agent's M2 on it, :112). A manifest edit found later takes its own, smaller answer.
 2. **Prepared off the main folder.** The edits are made in a scratch worktree, `git worktree add .gate/cs2-deps HEAD`,
-   so the main folder keeps building step 1's code during the wait. Nothing is built in that worktree.
+   so the main folder keeps working (step 2's list) during the wait. Nothing is built in that worktree.
 3. **Resolved, not built.** Rust: `cargo update --workspace --dry-run`, then `cargo update --workspace`. Per cargo's
    documentation, `--workspace` updates only workspace packages, other packages "only if they don't already exist in the
    lockfile", and it is "useful for updating Cargo.lock after you've changed version numbers in Cargo.toml". These are
    the change-set's only cargo commands without `--locked`, and they compile nothing. npm: `npm install
    --package-lock-only --ignore-scripts --save-exact` for the new entries, which per npm's documentation uses "only the
    package-lock.json, ignoring node_modules".
-4. **What security-auditor answers on:** the text diff of the five manifests and the two lockfiles (saved as a `.diff`
-   file in the notes, never as files named like manifests), the sha256 of each of those seven files, and the tool's
+4. **What security-auditor answers on:** the text diff of every manifest the step changes (seven by this plan: two
+   `Cargo.toml` and five `package.json`; eight with a generator crate) and of both lockfiles (saved as a `.diff` file in
+   the notes, never as files named like manifests), the sha256 of each of those files, and the tool's
    tarball: its URL, its sha256, the release's published `.sha256sum` and its release attestation. The tool's check is
    recorded in a notes file of its own (`.checkpoints/cs2-first-page/wasm-bindgen-cli-check.md`), because
    `dependency-check.md` takes only manifest and lockfile lines.
-5. **After the answer:** the same diff is applied in the main folder (sha256 compared with the reviewed files),
+5. **After the answer (step 3):** the same diff is applied in the main folder (sha256 compared with the reviewed files),
    `dependency-check.md` is written (one `<sha256>  <path>` line per file, naming the answer's notes file), the files are
    committed by path, and the checkpoint script pushes them, which releases its own hold. Only then: `npm ci
    --ignore-scripts`, the tool's download and unpacking (checked against the recorded sha256), and the first build that
@@ -281,12 +284,13 @@ answer; every cargo command takes `--locked`; the checkpoint script holds a push
    (`CARGO_TARGET_DIR=.gate/cs2-plant-target`). Change-set 1's export tests also stop when they run outside the copy they
    were built in.
 7. **The netcode proof test's three rules,** checked over this change-set's own files: no root `.cargo/config.toml`
-   (none is needed: wasm-bindgen asks for no compiler flags); no `"type"` in the root `package.json`; no tracked file
-   that is not Markdown names the spike's folder.
+   (none is planned: the build script passes its settings on the command line); no `"type"` in the root
+   `package.json`; no tracked file that is not Markdown names the spike's folder. No `.npmrc` is added either: the guard
+   protects that name at any depth (`.claude/hooks/routine-guard.mjs:38`).
 
 ## 8. Build steps, in order
 Each step ends with the checks of section 9 that apply to it, all exit 0, then a commit by path and a checkpoint. A
-step that changes no manifest pushes normally; step 2's push goes through the hold.
+step that changes no manifest pushes normally; step 3's push goes through the hold.
 
 0. **Paper.** The preconditions of section 3. OQ-0002-7's by-day reading: wasm-bindgen's maintenance issue #4533 is
    read (section 19); the guide's governance page is still to read. Its decider "comes before the step that adds
@@ -298,24 +302,41 @@ step that changes no manifest pushes normally; step 2's push goes through the ho
    length; the same seed giving the same hashes, a different seed a different hash; the header's bytes at the table's
    offsets; the padding left zero; the lookups; `align`; the schedule without drift over 1,000,000 ticks, and `rebase`.
    No manifest changes, so this step pushes normally.
-2. **The one dependency step** (section 7). The planned manifest text is below this list. The build waits for the
-   answer. Step 1's review notes can be read in the meantime, and nothing else is built.
-3. **The bindings and the build script.** `sim-wasm`'s `Sim`. `build.mjs` reads wasm-bindgen's version from
-   `Cargo.lock`, refuses any other tool version before it generates bindings (PM-0002-18), runs `cargo build --locked
-   --release --target wasm32-unknown-unknown -p sim-wasm`, then `wasm-bindgen --target web --out-dir
-   packages/sim-worker/pkg`, records the sizes (raw, gzip at level 9 and Brotli at level 11, from Node's own `zlib`),
-   runs Vite's build through its JavaScript API with `VITE_SHAMBLE_COMMIT` and, unless `--production`,
-   `VITE_SHAMBLE_DEVTOOLS=1`, copies `serve.mjs` into `dist/`, and fails if any served file reaches 26,214,400 bytes
-   (PM-0002-29's gated clause). It runs commands as argument arrays (`execFileSync`), never through a shell string.
-   **Risk 1 is settled here:** whether the workspace's `unsafe_code = "deny"` accepts `#[wasm_bindgen]`'s expansion.
-4. **The Worker.** `sim-worker`'s seven modules. Unit tests: the pacer on a fake clock (7 per wake, sleep to the
-   returned due time, pause, rebase, the counters), the pool, the stats. Boundary tests on the built Wasm: a block
+2. **The one dependency step** (section 7), prepared in the scratch worktree; the planned manifest text is below this
+   list. While security-auditor's answer is awaited, the main folder goes on with the work that needs no new package,
+   each part tested with the Vitest already installed and committed by path:
+   - **the small server,** `serve.mjs`, with Node's own modules only, running on Node 18 or newer (Part 8). It binds
+     `127.0.0.1` only and prints `http://127.0.0.1:4173`. It answers `GET` and `HEAD` only, serves files inside its own
+     folder only (paths decoded once and resolved, real paths checked against the folder, so a `..`, an encoded `..`, a
+     backslash or a link that leads outside is refused), sends a fixed table of content types (`application/wasm` for
+     `.wasm`), `X-Content-Type-Options: nosniff` and `Cache-Control: no-store`, refuses a `Host` header that is not its
+     own address (against DNS rebinding), and stops with a clear message if the port is taken. Its tests cover each of
+     these. It is never bundled into the page;
+   - **the Worker's pure modules** (`pacing`, `block-pool`, `read-block`, `stats`, `messages`) and their unit tests: the
+     pacer on a fake clock (7 ticks per wake at most, sleep until the returned due time, pause, rebase, the counters),
+     the pool, the statistics;
+   - **the build script's checks** (`lockedWasmBindgenVersion`, `checkCli`, `sizeTable`) and their tests.
+   Nothing that imports `three`, its types or the Wasm glue is written before the answer: it could not be checked.
+3. **The answer applied.** The reviewed diff is applied in the main folder (each file's sha256 equal to the reviewed
+   one), `dependency-check.md` is written, the files are committed by path, and the checkpoint script pushes them through
+   its hold. Then `npm ci --ignore-scripts`, and the tool's download into `.gate/tools/wasm-bindgen-0.2.130/`, checked
+   against the sha256 the answer recorded.
+4. **The bindings and the build.** `sim-wasm`'s `Sim`. The build path of `build.mjs`: it reads wasm-bindgen's version
+   from `Cargo.lock`, refuses any other tool version before it generates bindings (PM-0002-18), runs `cargo build
+   --locked --release --target wasm32-unknown-unknown -p sim-wasm`, then `wasm-bindgen --target web --out-dir
+   packages/sim-worker/pkg`, records the sizes (raw, gzip at level 9 and Brotli at level 11, PM-0002-29's settings, from
+   Node's own `zlib`), runs Vite's build through its JavaScript API with `VITE_SHAMBLE_COMMIT` and, unless
+   `--production`, `VITE_SHAMBLE_DEVTOOLS=1`, copies `serve.mjs` into `dist/`, and fails if any served file reaches
+   26,214,400 bytes (PM-0002-29's gated clause). It runs commands as argument arrays (`execFileSync`), never through a
+   shell string. **Risk 1 is settled here:** whether the workspace's `unsafe_code = "deny"` accepts `#[wasm_bindgen]`'s
+   expansion.
+5. **The Worker's entry and the boundary tests.** `worker.ts` and `index.ts`. Boundary tests on the built Wasm: a block
    written by Rust passes `checkLayoutHash` (PM-0002-16's page half, which change-set 1 left to this writer); after
    `memory.grow` between two steps, the next block is byte for byte the block of a run without the grow (PM-0002-6); two
    steps advance the tick by two; mode 1 and a 31-byte seed are refused; per tick the host makes exactly two calls,
    `input` and `step`, and a reading of the generated glue shows each call reaching exactly one export (PM-0002-3 is
    counted in full in change-sets 3 and 5).
-5. **The page.** The app shell, `picture.ts`, `render/`, the readout and the copy report, the harness's CPU side,
+6. **The page.** The app shell, `picture.ts`, `render/`, the readout and the copy report, the harness's CPU side,
    `index.html` (with no inline script or style: ADR 0002 part 7, CSP-ready), `styles.css`, and `vite.config.mjs`:
    `base: './'`, `build.assetsInlineLimit: 0` (so the Wasm never becomes a `data:` URL), `worker.format: 'es'` (a module
    Worker; Vite's default is `'iife'`), `server.host` and `preview.host` `127.0.0.1`, `server.fs.allow` narrowed to what
@@ -324,13 +345,6 @@ step that changes no manifest pushes normally; step 2's push goes through the ho
    tests: the report's text, the frame-time statistics, the flags, the Worker link against a fake Worker (the newest
    two blocks kept, the older ones returned on the next frame's post, the layout check refusing a block of another
    layout).
-6. **The small server.** `serve.mjs` with Node's own modules only, running on Node 18 or newer (Part 8). It binds
-   `127.0.0.1` only and prints `http://127.0.0.1:4173`. It answers `GET` and `HEAD` only, serves files inside its own
-   folder only (paths decoded once and resolved, real paths checked against the folder, so a `..`, an encoded `..`, a
-   backslash or a link that leads outside is refused), sends a fixed table of content types (`application/wasm` for
-   `.wasm`), `X-Content-Type-Options: nosniff` and `Cache-Control: no-store`, refuses a `Host` header that is not its
-   own address (against DNS rebinding), and stops with a clear message if the port is taken. Its tests cover each of
-   these. It is never bundled into the page.
 7. **The browser tests.** `playwright.config.ts`: project `node` (`tests/`, no browser; this is what `npm test` runs)
    and project `chromium` (`browser/`, run by path), the small server as `webServer` on the built `dist/`, retries 0,
    `forbidOnly` in CI, the browser's path from `SHAMBLE_CHROMIUM` when set. Specs:
@@ -355,7 +369,8 @@ step that changes no manifest pushes normally; step 2's push goes through the ho
    sent through the chat's file tool. Then the reviews (section 12), the verifier until PASS, and the advisor agent on
    the final head.
 
-**Planned manifest text for step 2** (the exact reviewed content may differ only by the lockfiles' resolution):
+**Planned manifest text for step 2** (fragments, not whole files; the `//` lines are labels, not JSON; the reviewed
+content may differ from these only by the lockfiles' resolution):
 ```toml
 # Cargo.toml (root), [workspace.dependencies], after the ts-rs line:
 # The bindings the Worker loads (ADR 0002 parts 2 and 5), in sim-wasm only. The CLI that writes the glue must equal
@@ -406,7 +421,7 @@ cargo build --locked --target wasm32-unknown-unknown -p sim -p protocol -p room 
 SHAMBLE_WRITE_TYPES=1 cargo test --workspace --locked
 git status --porcelain --untracked-files=all -- packages/types/src/generated      # prints nothing: no generated file changes
 ```
-**The build (from step 3):**
+**The build (from step 4):**
 ```
 SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" node packages/client/scripts/build.mjs
 SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" node packages/client/scripts/build.mjs --production --out-dir .gate/cs2-first-page/dist-prod
@@ -483,9 +498,10 @@ change-set; L1 and the loopback are change-set 3's. **Security:** the dependency
 tests, the readout's `textContent`, the dev server's binding and file allow-list, the build script's argument arrays.
 
 ## 10. Risks
-1. **`unsafe_code = "deny"` against `#[wasm_bindgen]`'s expansion.** The lint names `export_name`, `link_section` and
-   `unsafe` blocks (rustc's lint list), which the macro emits. No source read here says whether rustc reports the lint
-   inside an external proc macro's expansion. Step 3's first build settles it. Fallback: `#[allow(unsafe_code)]` on the
+1. **`unsafe_code = "deny"` against `#[wasm_bindgen]`'s expansion.** The lint catches `unsafe` blocks, `no_mangle`,
+   `export_name` and `link_section` (rustc's lint list), the kind of items exported bindings are made of. No source read
+   here shows what 0.2.130's expansion holds, or whether rustc reports the lint inside an external proc macro's
+   expansion. Step 4's first build settles it. Fallback: `#[allow(unsafe_code)]` on the
    one bindings module, with its written reason and a test, which ADR 0002 part 4 allows. Step 2.2's WASM-ARTIFACT
    follow-up already expected "its `unsafe_code` exception" to "come with the bindings".
 2. **The container's Chromium is not Playwright 1.65.0's build** (1243 installed, 1254 expected; Chrome for Testing 153
@@ -583,7 +599,8 @@ arithmetic on the plan's estimate, not a measurement.
 
 ## 15. Not in it
 - `protocol`'s codec, the loopback, `room`, L1, the replay runner, the panic hook's buffer, the first recording, the
-  maths and stream vectors, the scan test in `sim`, the two-instance test: change-set 3.
+  maths and stream vectors, the scan test in `sim`: change-set 3. The two-instance test: lane 2's comparison, after
+  change-set 3 (Part 15.2).
 - Keyboard and mouse into the newest input, and the key diagram (change-set 3). The input post exists now, with its
   sequence number and view time.
 - The random-number generator, unless RNG-CRATE says (a) or (b).
@@ -597,11 +614,11 @@ arithmetic on the plan's estimate, not a measurement.
 
 ## 16. Open questions for Mustafa
 **RNG-CRATE: which library gives the simulation its random streams, and in which change-set does it enter?**
-- Why it matters: whatever enters is pinned for good, since every recording's hashes rest on it, and the crate ADR
-  0004 names is being dropped by its own makers.
+- Why it matters: it is pinned for good, and the makers of the crate ADR 0004 names see no reason to keep maintaining it.
 - What was found: ADR 0004 part 8 names `rand_chacha`'s `ChaCha8Rng`. rand 0.10.0's changelog says "The dependency on
-  `rand_chacha` has been replaced with a dependency on `chacha20`". The rand project removed `rand_chacha` from its
-  repository on 2026-01-23 (pull request #1658), and its maintainer wrote: "I no longer see a reason to maintain
+  `rand_chacha` has been replaced with a dependency on `chacha20`". On 2026-01-23 the rand project moved `rand_chacha`
+  out of its main repository into its `rngs` repository (pull request #1658, "Source moved: rust-random/rngs#68"). Its
+  maintainer wrote there: "I no longer see a reason to maintain
   `rand_chacha`."
 - Options: (a) `rand_chacha` 0.10.0 in change-set 2, as ADR 0004 and the build plan say: a pinned, frozen copy whose
   tree adds `rand_core`, `ppv-lite86` and `zerocopy`; (b) `chacha20` 0.10.2's `ChaCha8Rng` (feature `rng`) in change-set
@@ -615,10 +632,11 @@ arithmetic on the plan's estimate, not a measurement.
   streams is change-set 3's anyway, and (b) is the crate that is maintained.
 
 **OVERFLOW-3P: do the first third-party crates in a build players run get overflow checks?**
-- Why it matters: your register row OVERFLOW-ALL keeps every dependency at Rust's release default (no overflow checks)
+- Why it matters: change-set 2 puts the first third-party crate into the player's Wasm, and your register row leaves
+  that choice to that moment.
+- What was found: your register row OVERFLOW-ALL keeps every dependency at Rust's release default (no overflow checks)
   through the root profile's `"*"` line. Its follow-up says "the first third-party crate that any workspace crate uses
   decides" between a named override per crate and dropping `"*"` (OVERFLOW-PER-CRATE, STATUS_ARCHIVE :817-831).
-  Change-set 2 puts wasm-bindgen into the player's Wasm.
 - Options: (a) keep `"*"` as it is. wasm-bindgen's runtime code does none of the simulation's arithmetic, and the
   player's Wasm stays at the release profile's optimisation level, where the reuse path the follow-up names (shared
   generic code at opt-level 0, 1, "s" or "z") stays closed. The question comes back when an arithmetic or random-number
@@ -629,8 +647,8 @@ arithmetic on the plan's estimate, not a measurement.
 
 **CI-WASM: how does CI start building and testing the new parts (the Wasm bindings, the Worker's tests on the real
 Wasm, the type check of the two new packages)?**
-- Why it matters: until a CI edit, CI runs none of these, and they are checked by hand, as with change-set 1. You asked
-  that every CI edit be put to you with its exact text (GATE-FOLLOW (b)).
+- Why it matters: until a CI edit, CI runs none of these and they are checked by hand; each CI edit is yours to approve
+  with its exact text (GATE-FOLLOW (b)).
 - Options: (a) a small pull request of its own after change-set 2 merges, as #60 followed #58, with the exact text in
   change-set 2's report (draft in section 18) and the tool downloaded from wasm-bindgen's own release, checked against
   a sha256 written in the workflow; (b) the same edit inside change-set 2's pull request, which makes it risk tier 2;
@@ -640,8 +658,8 @@ Wasm, the type check of the two new packages)?**
 - Recommendation: (a).
 
 **SIZE-2: which stop line holds for change-set 2?**
-- Why it matters: your rule stops a change-set at twice its planned size. The build plan planned 2,000 lines; this
-  plan's own count is about 2,900, most of the difference tests, as in change-set 1 (1.57 times its plan).
+- Why it matters: your rule stops a change-set at twice its plan, and this plan counts about 2,900 lines against the
+  build plan's 2,000 (most of the difference is tests, as in change-set 1, which came in at 1.57 times its plan).
 - Options: (a) the stop line stays at 4,000, twice the build plan's number, with about 2,900 written down as this
   plan's estimate; (b) the plan becomes 2,900 and the stop line 5,800; (c) cut scope toward 2,000 by moving the isolation
   flag, the allocation method, the clock fact and the hidden-tab pause to change-set 3, which saves about 300 lines.
@@ -652,8 +670,9 @@ Wasm, the type check of the two new packages)?**
    (#4533) and the guide's governance page" (ADR 0002 :1085-1093), "comes before the step that adds wasm-bindgen"
    (EMPTY-SLOTS), and `sim-wasm`'s stub says its bindings wait for it (`crates/sim-wasm/src/lib.rs:1-3`). Step 0 does
    the reading.
-2. **ADR 0004's generator crate is leaving its project** (RNG-CRATE). The card's "the seeded random streams" inherits
-   that.
+2. **ADR 0004's generator crate has lost its maintainers' interest** (RNG-CRATE): rand 0.10 itself moved to
+   `chacha20`, and another maintainer proposed an empty `rand_chacha` 0.11 that points users there (proposed, not
+   released: crates.io's newest is 0.10.0). The card's "the seeded random streams" inherits that.
 3. **"A first reading of the hand-off with the block filled to the size of 12 and of 48 soldiers"** (:310-311): no
    source gives a soldier row's size before change-set 4 (the only figures found are ADR 0001 :313's 90-bit and 60-bit
    wire records, which are compressed). The reading becomes a curve over block sizes, and change-sets 4 and 5 read the

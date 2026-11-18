@@ -1,5 +1,5 @@
---- .gate/kit-hold-ci/as-shown/checkpoint.mjs	2026-11-18 16:09:27.273694004 +0000
-+++ .gate/kit-hold-ci/checkpoint.mjs	2026-11-18 17:12:27.588525381 +0000
+--- the text he answered on: checkpoint.mjs
++++ .claude/scripts/checkpoint.mjs
 @@ -20,6 +20,8 @@
  // by .checkpoints/<slug>/dependency-check.md, written after security-auditor's answer and naming its notes file: one
  // line per held file, "<sha256>  <path>" as sha256sum prints it from the repository root ("deleted  <path>" for a
@@ -17,17 +17,18 @@
  function heldDependencyFiles(o, branch, rev) {
    const remote = git('rev-parse', '--verify', '--quiet', `refs/remotes/origin/${branch}`);
    const base = remote.ok ? remote : git('merge-base', 'refs/remotes/origin/main', rev);
-@@ -127,6 +130,8 @@
+@@ -127,6 +130,9 @@
      if (!entry.out) return !released.has(`deleted  ${f}`);
      const plain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(entry.out);
      if (!plain) return true;
-+    const onMain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('--literal-pathspecs', 'ls-tree', 'refs/remotes/origin/main', '--', f).out);
-+    if (onMain && onMain[1] === plain[1]) return false;
++    const blobAt = (ref) => /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('--literal-pathspecs', 'ls-tree', ref, '--', f).out)?.[1];
++    const inPush = blobAt(rev);
++    if (inPush && inPush === blobAt('refs/remotes/origin/main')) return false;
      try {
        const blob = execFileSync('git', ['cat-file', 'blob', plain[1]], { stdio: ['ignore', 'pipe', 'ignore'], shell: false, maxBuffer: 64 << 20 });
        return !released.has(`${createHash('sha256').update(blob).digest('hex')}  ${f}`);
---- .gate/kit-hold-ci/as-shown/CHECKPOINTS.md	2026-11-18 16:09:27.274991732 +0000
-+++ .gate/kit-hold-ci/CHECKPOINTS.md	2026-11-18 16:44:33.857012574 +0000
+--- the text he answered on: CHECKPOINTS.md
++++ .claude/CHECKPOINTS.md
 @@ -65,6 +65,8 @@
    naming that answer's notes file: one line per file, `<sha256>  <path>` as `sha256sum` prints it from the repository
    root (`deleted  <path>` for a removed file); then `save` again. Until then build nothing that holds the change, and
@@ -37,9 +38,9 @@
  - Each step ends with a three-part summary for Mustafa (brief §6): what's done, what's checkpointed (where), what's
    next.
  - **At every update, check the background saver** when agents or a workflow are running, and restart it if it has
---- .gate/kit-hold-ci/as-shown/checkpoint.test.mjs	2026-11-18 16:19:41.296382560 +0000
-+++ .gate/kit-hold-ci/checkpoint.test.mjs	2026-11-18 17:12:27.589155539 +0000
-@@ -587,3 +587,69 @@
+--- the text he answered on: checkpoint.test.mjs
++++ .claude/scripts/checkpoint.test.mjs
+@@ -587,3 +587,70 @@
    assert.match(out, /saved locally, NOT pushed .* no recorded check: Cargo\.lock\. /);
    assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
  });
@@ -88,21 +89,22 @@
 +  assert.match(r.stdout, /no recorded check: Cargo\.lock, sub\/Cargo\.lock\. /);
 +  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
 +
-+  // A lockfile in a root folder named ':' is read at its own path, never as git's ':/' (the root Cargo.lock, whose
-+  // content equals main's here): held.
++  // A lockfile in a root folder named ':' is read at its own path on both sides, never as git's ':/' (the root
++  // Cargo.lock): main holds both with the same content, the push changes the one in the folder: held.
 +  const magic = fixture(t);
 +  const first = sh(magic.origin, 'rev-parse', 'refs/heads/cs/test');
 +  sh(magic.repo, 'switch', '--quiet', 'main');
++  mkdirSync(join(magic.repo, ':'));
 +  writeFileSync(join(magic.repo, 'Cargo.lock'), 'merged\n');
-+  sh(magic.repo, 'add', 'Cargo.lock');
-+  sh(magic.repo, 'commit', '--quiet', '-m', 'main gains Cargo.lock');
++  writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'merged\n');
++  sh(magic.repo, 'add', '--', 'Cargo.lock', ':(literal):/Cargo.lock');
++  sh(magic.repo, 'commit', '--quiet', '-m', 'main gains Cargo.lock twice');
 +  sh(magic.repo, 'push', '--quiet', 'origin', 'main');
 +  sh(magic.repo, 'switch', '--quiet', 'cs/test');
 +  sh(magic.repo, 'merge', '--quiet', '--no-edit', 'main');
-+  mkdirSync(join(magic.repo, ':'));
 +  writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'not on main\n');
 +  sh(magic.repo, 'add', '--', ':(literal):/Cargo.lock');
-+  sh(magic.repo, 'commit', '--quiet', '-m', 'a lockfile in a folder named :');
++  sh(magic.repo, 'commit', '--quiet', '-m', 'the lockfile in the folder named : changes');
 +  note(magic.repo);
 +  r = run(magic.repo, 'save', 'test', '-m', 'a folder named :');
 +  assert.equal(r.status, 1, r.stderr + r.stdout);

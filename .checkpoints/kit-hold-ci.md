@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 19:05 CET (from the clock)
+- **Last update:** 2026-11-18 19:10 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -223,14 +223,38 @@
     - The saver stopped (bhcevffhf) and started again on the fixed script: task **b4bg0wkfu** (18:04 UTC; 2-hour
       limit: restart by about 20:00 UTC).
 
+21. CI on 4877599: `toolchain` push run 44365431438 (18:03:14 to 18:03:53) and pull request run 44365446199
+    (18:03:18 to 18:04:00): success. (`gate` runs: read later.)
+22. **infra-engineer, review 1 of the workflow edit** (17:47 to 18:07 UTC; `kit-hold-ci/infra-engineer-review1.md`):
+    APPROVE, no finding above Low. The text is byte for byte the report's blocks 1 to 3. Its six Lows (report lines
+    or the gate v2's list, no change now): (1) if a commit moves `packages/types/src/generated`, the compare checks
+    nothing (git status on a path that matches nothing is silent): a folder guard for the gate v2; (2) both new
+    checks guard against honest mistakes, not a hostile dependency (dependency code runs earlier in the same step
+    as the same user): the report must not present them as a supply-chain control; (3) the executable bit is the
+    only difference that can reach the compare step today (the plain run fails first on content, a missing, extra or
+    non-plain file; write mode rewrites with 0644), so the plant is the one reachable case; the untracked, deleted
+    and new-subfolder cases rest on git's documented output, shown on a scratch repository, not by a CI run;
+    (4) "Cache mode: none" proves the mode the runner received, not that the cache service refuses anything (no step
+    tries a cache operation; setup-node's npm cache only turns on with a `packageManager` field, which the repository
+    has not); what stays open until part 2: the post steps of checkout and setup-node still run after the cut with the
+    network and the read-only token; (5) an empty file list stops the step with exit 1 and no message; (6) name the
+    job-log endpoint as the source of the quoted log lines. Its gate v2 lines: CI-CUT part 2 (the job that runs the
+    cut has no `uses:` step; plain git checkout of the exact commit; a gate test fails if it gains one); the
+    lockfile check (first in every job that fetches, on push too; fails unless every added or changed lockfile entry
+    is named in a committed review record; reads files only); any workflow linter must accept `cache-mode`.
+    Sources it cites: docs.github.com workflow syntax and dependency caching, GitHub's changelog of 2026-09-10,
+    TypeScript 6.0 release notes and tsc options (all read 2026-11-18).
+    - `kit-edit.diff` (main to the final kit files, 337 lines) and `kit-change.diff` (the text he answered on to
+      the final files, 113 lines: script 6, tests 67, rules 2 added; none removed) regenerated at 18:07 UTC.
+    - `kit-hold-ci/decisions.mjs` now holds his three messages (not run yet).
+
 ## Current step
-21. (18:05 UTC) Review round 1 on the final text: security-auditor (the kit hold and a security read of the CI
-    edits; `kit-hold-ci/security-auditor-review1.md`) and infra-engineer (the workflow;
-    `kit-hold-ci/infra-engineer-review1.md`) are running; test-engineer starts when a slot is free (engine-architect
-    still drafts change-set 2's plan: three agents at most). By his word a finding on the kit lines below High
-    becomes a follow-up. Meanwhile: read CI on 4877599; the record script for his three messages; the report's
-    draft. Then: the advisor agent on the final head, the verifier, docs-keeper (after taking main in), the report,
-    the checkpoint's deletion in the last commit, the pull request ready with the label needs-mustafa.
+23. (18:10 UTC) Review round 1 goes on: security-auditor (since 18:04) and test-engineer (since 18:09) run;
+    engine-architect still drafts change-set 2's plan. Meanwhile the report's draft
+    (`kit-hold-ci/report-draft.md`). Then: fix pass if a High or Critical comes (below that: follow-ups, his word);
+    the advisor agent on the head; the verifier; docs (take main in first; DECISIONS by script; docs-keeper); the
+    report into `docs/reports/`; the checkpoint's deletion in the last commit; the pull request ready, label
+    needs-mustafa.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
@@ -247,8 +271,8 @@
 
 ## Running work
 - saver: background task b4bg0wkfu, started 18:04 UTC on 2026-11-18 on the fixed script (2-hour limit).
-- agents: engine-architect (change-set 2's plan draft, since 17:20 UTC); infra-engineer (review 1, since 17:47
-  UTC); security-auditor (review 1, since 18:04 UTC). To start when a slot is free: test-engineer (review 1).
+- agents: engine-architect (change-set 2's plan draft, since 17:20 UTC); security-auditor (review 1, since 18:04
+  UTC); test-engineer (review 1, since 18:09 UTC). Done: infra-engineer (review 1).
 
 ## For the list of the quality gate v2's plan (his words of 15:38 and 18:01 UTC)
 - A CI check that refuses to build when the lockfile gains an entry with no recorded review (DEP-HOLD's option (c)).
