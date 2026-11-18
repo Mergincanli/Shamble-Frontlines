@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 21:38 UTC (from the clock)
+- **Last update:** 2026-11-18 22:01 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -137,28 +137,38 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     `cs2-first-page/known-answers.py`. Two departures from the plan's symbol list, for the report: `BlockWriter::new`
     returns an `Option` (the padding is capped, because the number comes from outside), and `SEED_BYTES` is public.
 
+12. **CI on step 1's push** (head 2196b7f, read with the GitHub tools): `toolchain` run 200 (id 44403660148) and
+    `gate` run 902 (id 44403660244): success. The `toolchain` run took about half a minute (21:39:05 to 21:39:38 by
+    its record), far from its 15-minute limit.
+13. **The verifier on the web facts** (the advisor agent's condition 4; `cs2-first-page/verifier-claims.md`): FAIL
+    on the first read (two Mediums: the order of two comments on the rand pull request, and one-sided evidence on
+    who maintains `rand_chacha`; two Lows), all four corrected in the plan and the reading; **PASS on the re-check**
+    (21:50:04 UTC by its own line), its three wording Lows fixed too.
+14. **security-auditor on the wasm-bindgen tool's proof of origin** (`cs2-first-page/security-auditor-tool.md`;
+    its small files in `.gate/cs2-first-page/tool-check/`): provable here only in part. The tarball's sha256 is
+    9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f by three agreeing statements (the project's
+    `.sha256sum`, GitHub's digest, GitHub's signed release statement), size 11,860,397; the certificate's chain to
+    GitHub's root cannot be checked here, and no build record exists. By the advisor agent's condition 5 that goes
+    to him: question TOOL-SOURCE. Its fuller unpacking route is in the plan (section 7, item 5a).
+15. **The plan, revision 3** (22:00 UTC; saved as 0d8a838): the verifier's corrections; TOOL-SOURCE; the tool's
+    route. The questions as they stand: RNG-CRATE, WB-HEALTH, TOOL-SOURCE, CI-WASM, DEPART-2.
+
 ## Current step
-12. Two agents are reading (both Opus 5.5 at effort max): **the verifier** on the web facts of RNG-CRATE and of the
-    wasm-bindgen reading (the advisor agent's condition 4; `cs2-first-page/verifier-claims.md`), and
-    **security-auditor** on what the wasm-bindgen tool's release offers as proof of origin and whether it can be
-    checked here before the first run (`cs2-first-page/security-auditor-tool.md`; if it cannot, a question on the
-    tool's source joins the list). Beside them the main session starts **step 1** (the Rust core, no new crate).
+16. **The advisor agent reads the changed lines once** (its own condition before the questions go to him), and rules
+    on two things: may the manifest-free parts of step 2 be built while his answers are awaited; is TOOL-SOURCE's
+    option (c) rightly an option.
 
 ## Next steps
-1. When both agents have answered: work their results into the plan; the advisor agent reads the changed lines of
-   sections 4.1, 16 and 17 once (its own condition); then the questions go to Mustafa: RNG-CRATE, WB-HEALTH,
-   DEPART-2, CI-WASM, and the tool's source if security-auditor's reading makes it one.
-2. Step 1 is done (3833e3e). The advisor agent's words: "Nothing of step 2 starts before two things: Mustafa's
-   answers [...] and conditions 1-4". So the small server, the Worker's pure modules and the build script's checks
-   wait too, unless the advisor agent rules otherwise when it reads the changed lines (the question is put to it
-   then: none of the three edits a manifest or imports a new library).
-3. Step 2 (the one dependency step) only after his answers to RNG-CRATE, WB-HEALTH and DEPART-2, and nothing of it
-   committed or built before security-auditor's answer on exactly that content (plan section 7). During the wait:
-   the small server, the Worker's pure modules, the build script's checks.
-4. Then steps 3 to 8, the gate after each, a checkpoint after each; the reviews (seven reviewers: three, three, one;
+1. On its yes: the five questions go to Mustafa in chat (each self-contained: code, question, why, options,
+   recommendation), with the plan's path. Then, by its ruling, either the manifest-free parts of step 2 or a stop
+   until he answers.
+2. After his answers: step 2 (the one dependency step: the scratch worktree `.gate/cs2-deps`, the manifests, both
+   lockfiles resolved and not built, the diffs to security-auditor), nothing of it committed or built before the
+   answer on exactly that content (plan section 7).
+3. Then steps 3 to 8, the gate after each, a checkpoint after each; the reviews (seven reviewers: three, three, one;
    one round); the verifier; the docs pass with the records of plan section 21; the report; the pull request (draft,
    then ready); stop for his go and his Brave check (the zip through the chat's file tool).
-5. Restart the saver before 22:40 UTC (it stops after 110 minutes).
+4. The saver: restarted at the time its line under "Running work" gives; restart again within 110 minutes of it.
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
@@ -195,6 +205,5 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
   `test-engineer-plant-target`; the classifier refused their removal).
 
 ## Running work
-- saver: running since 2026-11-18 20:54:42 UTC (task bdxyfa5ap; 10-minute interval, stops after 110 minutes).
-- agents: the verifier (web facts; started after this session's save of 21:08:39 UTC) and security-auditor (the
-  tool's proof of origin; started before the plan's revision of 21:34 UTC).
+- saver: see the line the next save writes below (restarted after 22:01 UTC).
+- agents: the advisor agent, reading the changed lines (resumed after this session's save of 22:00:50 UTC).

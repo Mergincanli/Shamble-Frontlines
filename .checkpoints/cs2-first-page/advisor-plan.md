@@ -90,3 +90,7 @@ record-before-commit order is moot (the order is still right); pushes go through
 ## Verdict: APPROVE, with conditions (see the hand-back). Step 1 may start now; step 2 waits for his answers (RNG-CRATE,
 OVERFLOW-3P, DEPART-2, WB-HEALTH) and for conditions 1-5; condition 6 before the download; 7 before the round; 8 before
 the Brave check.
+
+## Changed lines, read once
+Wed Nov 18 22:00:59 UTC 2026
+Plan: read git diff 29da1ca HEAD -- plan.md, the verifier's table, security-auditor's tool notes, sections 16-17 whole; rule on (a) step 2's three manifest-free parts and (b) TOOL-SOURCE (c).
