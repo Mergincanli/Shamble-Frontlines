@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 14:52 Amsterdam (13:52 UTC)
+- **Last update:** 2026-11-18 14:56 Amsterdam (13:56 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -412,6 +412,12 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      (his screenshot, 13:49:17 UTC message): the deploy gate is met. Pull request #2 closed unmerged, the logs deleted.
      Next: the token's window fixed by him (consultation 14 first).
 
+   - Facts for the fix (2026-11-18): GitHub's re-run page (read by a web-fetch agent): a run can be re-run "up to 30
+     days after its initial run", "a maximum of 50 times", not "while the workflow is disabled"; a re-run uses "the same
+     `GITHUB_SHA` ... and `GITHUB_REF`"; nothing about closed pull requests, re-approval or artifacts. The deploy run
+     44171977539 holds three `headers-44171977539` artifacts side by side (attempts 2, 4, 5) and `site-pr` (expires
+     2026-11-24T20:42:04Z): no bin step is needed, and the deploy's "Re-run failed jobs" must come before that expiry.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
@@ -440,6 +446,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   until the browser run: a missing driver shows as "no reading", never as a pass.
 - F-D: the report quotes SA-R3's corrected words (the install step keeps the token out of the scripts' environment,
   not out of their reach), not plan.md:524 and :649 ("install scripts never see it").
+- For step 2.6 (consultation 14): token setup ends with Cloudflare's verify answer (status, not_before, expires_on),
+  not a screenshot of the form; the new form's single-date chip sets a one-day window.
 - Input for step 2.6's setup instructions: two setup steps that needed a change from a default were missed and caught
   only by his screenshots (2026-11-16): `preview`'s administrator bypass left ticked (GitHub's default; plan A6 step
   4), and the token's end date (plan A5 step 5; he asked where to set it, 12:34:49 UTC). Then (2026-11-17): no Account API
@@ -710,6 +718,20 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    the ID's first and last 4 with where he compares them); the run's output copied word for word into the results log
    before any deletion, and deletion his choice; after his yes: push, check the placed hash, check only this workflow
    started and waits, then a one-item list with the run link and head SHA.
+
+14. 2026-11-18 13:52:32 UTC (called; transcript time), moments 4 and 5 (the cause found; the next step) · Q: how to
+   fix the token's window, and what to send him? · Changed: he edits the existing token's expiration to the "7 days"
+   preset, nothing else (Read stays: his decision; that Edit alone is enough stays unmeasured); a new value shown on
+   save goes into the token box only; the preset moves his deadline, so one "Decisions needed" entry, Day 2's last day
+   taken from the check's expires_on, not the preset's label; blocking before any deploy re-run: the measurement (the
+   check re-run: not_before empty or past, C finds the project, D answers), the first record of the end date after
+   saving; the second run on a new list, with his yes again for the reading, copying and log deletion; GitHub's re-run
+   docs read first (fallback: reopening pull request #2); "Enable debug logging" unticked; a row added (the window still
+   starts in the future → a new token, made fresh with the preset); the list in two parts with my "go" in words between
+   them; the deploy run's artifacts read first (several `headers-…` side by side → no bin step); `site-pr` expires
+   2026-11-24 20:42 UTC, after which "Re-run failed jobs" cannot work; to him: the cause in two lines, my miss owned
+   (gate (b) called met on a screenshot of the form, consultation 9), his yes/no on d17d…d8e7; the results-log header
+   corrected; attempt 1 "consistent with"; for step 2.6: token setup ends with the verify answer, not a form screenshot.
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time

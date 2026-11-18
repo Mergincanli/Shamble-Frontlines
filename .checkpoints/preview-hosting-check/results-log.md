@@ -17,6 +17,9 @@ To be checked again before the 24-hour reading.
   date; the "Account API tokens" list (20:29:51) shows the token, "Pages Write", "Last used" empty, created 2 minutes
   earlier. The token is meant to end ten days after it was made (his SA-R3 acceptance, 2026-11-16) and to be deleted
   by him on Day 2; Day 2 stays on or before 2026-11-26 (Amsterdam).
+  Correction, 2026-11-18: the check measured the token's window as not_before 2026-11-26T23:00:00Z, expires_on
+  2026-11-27T22:59:59Z (the token works only on 27 November); "Day 2 by the 26th" is withdrawn until the window is
+  measured again after his fix.
 
 **The test repository (GitHub).**
 - Mergincanli/shamble-preview-check, public; `main` 4a67b83b9ed672c81e1a6e3067f916841c02b4a9 (his README).
@@ -192,8 +195,8 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "cfat_[40 characters][checksum]"), and A answers 200 for this account, so the token is recognised and belongs to the
   account in the ID box. But Cloudflare reports the token's window as not_before 2026-11-26T23:00:00Z and expires_on
   2026-11-27T22:59:59Z: it may be used only on 27 November (Amsterdam time). Every call before then is refused: C and D
-  give 10000, D's lookup 9109, B 1000. That explains all five deploy attempts, the empty "Last used", and why rolling
-  the token (it keeps its settings) and adding Read did not help. The form's chip "Nov 27 GMT+1" (his screenshot of
+  give 10000, D's lookup 9109, B 1000. That explains attempts 2 to 5 (the rolled token), the empty "Last used", and why
+  adding Read did not help; attempt 1 (the token before the roll, whose window was never read) is consistent with it. The form's chip "Nov 27 GMT+1" (his screenshot of
   2026-11-17 20:13:53) set both ends of the window to that one day; the session read that screenshot as "end date 27
   November" and called the choices right: a miss of the session's.
 - After reading (his words of 2026-11-18): pull request #2 closed unmerged at 13:51:27 UTC (list_pull_requests:
