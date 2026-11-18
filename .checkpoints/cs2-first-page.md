@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 22:30 UTC (from the clock)
+- **Last update:** 2026-11-18 22:39 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -191,22 +191,47 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     is added; the build checks have their own module (`build-checks.mjs`), with `build.mjs` to come in step 4;
     `BlockPool.give` returns nothing and the pool counts `refused` beside `misses`.
 
+20. **Mustafa's answers to the five questions** (2026-11-18, 22:34:37 UTC; his label 23:26 Amsterdam):
+    `cs2-first-page/mustafa-2026-11-18-2326-five-answers.md`, whole, by script. In short, and never a substitute for
+    his words: RNG-CRATE (c), with two things to read for change-set 3's question (the rand project's upgrade guide
+    for 0.10, and why `chacha20` 0.10.0 and 0.10.1 were withdrawn); WB-HEALTH (a), keeping what crosses wasm-bindgen
+    as small as the plan has it; TOOL-SOURCE (a) "for this one file only" (the tarball of 11860397 bytes, sha256
+    9687f3bb...227f, by section 7's item 5a; the program inside it has 8170784 bytes and sha256
+    ca4df773020dae87d92b9eadb2b85412bea7a9cf6318ab9999dd119fd9f46931 as the Advisor read it: "If your copy differs
+    in any of these, stop and tell me"; "every other file, version or checksum comes back to me"); DEPART-2 (a), all
+    six; CI-WASM (a), a pull request of its own right after the merge and before change-set 3's build, its exact
+    text to him first, running GitHub's own check before the tool's first run there; the size is fine. The session's
+    model was read again at 22:35 UTC: claude-fable-5-2, also last served.
+21. **Step 2's manifest part, prepared and not committed** (the scratch worktree `.gate/cs2-deps` at b6339d2; nothing
+    built or installed there): seven manifests edited; `cargo update --workspace` added seven entries (wasm-bindgen,
+    its macro, macro-support and shared crates at 0.2.130, bumpalo 3.20.4, cfg-if 1.0.5, rustversion 1.0.23) and
+    removed no line; `npm install --package-lock-only --ignore-scripts` added eight entries (three 0.187.0,
+    @types/three 0.187.0 and its six) and changed 37 existing entries in their `peer` flag only. The lockfile rule is
+    kept (`cs2-first-page/lock-compare.py`, output in `deps-lock-compare.txt`). Six overflow overrides in the root
+    `Cargo.toml`: cfg-if, thiserror, ts-rs, unicode-ident, wasm-bindgen, wasm-bindgen-shared. In the notes:
+    `deps-manifests.diff`, `deps-lockfiles.diff`, `deps-sha256.txt` (the nine files' sha256).
+22. **The e2e package's node project** (commit a68e3da, no manifest): `playwright.config.ts` with the `node` project on
+    `tests/node/`, the stub moved there, so the script `--project=node` finds its project the moment the manifests
+    land. Run both ways: 1 passed.
+
 ## Current step
-20. **Waiting for Mustafa's answers** (asked at 22:09 UTC): RNG-CRATE, WB-HEALTH and DEPART-2 hold step 2's manifest
-    part; TOOL-SOURCE holds the tool's download and first run; CI-WASM holds nothing. Everything the advisor agent's
-    ruling allowed before his answers is built.
+23. **security-auditor's answer on exactly that content** (Opus 5.5, effort max; `cs2-first-page/security-auditor-deps.md`).
+    Until it answers: nothing of the nine files is committed, nothing fetches or builds the new packages, no push by
+    hand.
 
 ## Next steps
-1. When he answers: copy his message by script into the notes (`words.mjs`), then step 2's manifest part (the scratch
-   worktree `.gate/cs2-deps`, the manifests with the overflow overrides, both lockfiles resolved and not built, the
-   diffs to security-auditor); nothing of it committed or built before the answer on exactly that content (plan
-   section 7). The tool's download and first run wait for TOOL-SOURCE. If DEPART-2 refuses the printed address,
-   `HOST`/`addressFor` in `serve.mjs` is the one place to change.
-2. Then steps 3 to 8, the gate after each, a checkpoint after each; the reviews (seven reviewers: three, three, one;
-   one round); the verifier; the docs pass with the records of plan section 21; the report; the pull request (draft,
-   then ready); stop for his go and his Brave check (the zip through the chat's file tool).
-3. Read CI on the head this save pushes (`toolchain`, `gate` with `smoke`).
-4. The saver: restart it within 110 minutes of the time under "Running work".
+1. On its yes (step 3 of the plan): check the worktree's nine files against `deps-sha256.txt`; apply the two diffs in
+   the main folder (`git apply`), compare each file's sha256; write `cs2-first-page/dependency-check.md` (one
+   `<sha256>  <path>` line per file, naming the answer's notes file) BEFORE committing the manifests; commit the nine
+   by path; push through `checkpoint.mjs save`. Then `npm ci --ignore-scripts`; the tool by the route of plan section
+   7, item 5a (his exact values above; any difference: stop and tell him); `cargo tree --workspace -e normal,dev`
+   against the six overrides. Take the worktree's edits back with `git restore` and remove it without force.
+2. Step 4: `sim-wasm`'s `Sim` (`rebase` returns the due time), `scripts/build.mjs` (it refuses to run the tool without
+   its expected sha256), the first Wasm build, the cost of the overflow overrides, `.gitignore`. Then steps 5 to 8.
+3. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and the reason `chacha20` 0.10.0 and 0.10.1
+   were withdrawn, read before the crate question goes to him.
+4. Read CI on the head the last save pushed. The saver: restart it within 110 minutes of the time under
+   "Running work".
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
@@ -244,4 +269,4 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 
 ## Running work
 - saver: running since 2026-11-18T22:12:00.211Z (its own first line; task bpbviesk8; 10-minute interval, stops after 110 minutes).
-- agents: none.
+- agents: security-auditor on the dependency content (started after this session's save of 22:30:20 UTC).
