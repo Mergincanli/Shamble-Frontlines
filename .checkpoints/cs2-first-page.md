@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 23:14 UTC (from the clock)
+- **Last update:** 2026-11-18 23:58 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -265,34 +265,45 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     build; the types written again; the client's tests; the legacy gate; the map check). Departures for the report:
     `input` takes the sequence only; `newest_input` is added; `block_ptr` returns `*const u8`.
 
+29. **Step 4, the rest: the cost of the six overflow overrides** (23:16 UTC; `cs2-first-page/overflow-cost.mjs`; the
+    second build in a scratch worktree with its own build folder, removed without force afterwards). The Wasm after
+    wasm-bindgen: 29,206 bytes with the lines, 28,928 without (+278, about 1 %); gzip -9 11,743 against 11,626;
+    Brotli 11 9,970 against 9,849. One tick (`input` and `step`) in Node 22.23.4 here: median 14.71 ns with the
+    lines, 14.04 ns without (7 runs of 2,000,000 ticks each; the two ranges overlap). A reading, not judged.
+30. **Step 5: commit 015a212** (2026-11-18 23:58 UTC). `packages/sim-worker/src/host.ts` (`SimHost`, `HostSim`, `HostEnv`; 6 tests
+    with a stand-in), `worker.ts` (the entry; the seed drawn there), `index.ts` (types and statistics helpers; the
+    stub and its test are gone); `packages/sim-worker/boundary/sim-wasm.test.mjs` (7 tests on the built Wasm;
+    plain JavaScript because it reads the Wasm with Node's own module); `crates/sim-wasm`: `tick_hz()`. After the
+    rebuild the Wasm is 29,231 bytes (11,759 gzip -9, 10,024 Brotli 11), the glue 9,012. Checks all exit 0 (fmt,
+    both clippy runs, workspace tests, the wasm32 build, every package's test script as CI runs it: types 7, net 1,
+    sim-worker 30, client 28, e2e 1; the boundary tests 7; the legacy gate; the map check). **A reading for the
+    report:** with the lib check on, wasm-bindgen's generated `.d.ts` needs `--lib es2023,webworker,esnext.disposable`
+    (it declares `[Symbol.dispose]`); with that the Worker's shipped files and the `.d.ts` type-check under CI's
+    strict flags, exit 0. **Size so far: 2758 added lines** in `crates/`, `packages/` and `.gitignore` (plan about
+    2,900; stop line 4,000). Departures for the report: `host.ts` is a file of its own beside `worker.ts`; the
+    boundary test is `.mjs`; `tick_hz()` is one more export, called once.
+
 ## Current step
-29. **Step 4, the rest:** the cost of the overflow overrides (the Wasm's size and the step's time with the six lines
-    and without, in a scratch worktree with its own build folder). Then step 5.
-    What step 4 still owes at step 6: the page's build in `build.mjs` (Vite's API, the commit and devtools flags,
-    `serve.mjs` copied in the development flavour only, the CSP scan, the 25 MiB check over every served file).
-    (The plan's text for the old step 4, kept for reference:)
-    **Step 4 of the plan:** `packages/client/scripts/wasm-bindgen-tool.mjs` (the tool's expected values, tracked, with
-    his words); `crates/sim-wasm/src/lib.rs` (`Sim`: `new`, `block_ptr`, `block_len`, `input`, `step`, `rebase`
-    returning the due time; the stub test goes); `scripts/build.mjs` (checks the tool's file by `checkCliFile`
-    before any run, runs the exact path, `cargo build --locked --release --target wasm32-unknown-unknown -p
-    sim-wasm`, `wasm-bindgen --target web --out-dir packages/sim-worker/pkg`, the size table, Vite's build, the
-    CSP scan, the 25 MiB limit); `.gitignore`; the first Wasm build (risk 1: `unsafe_code = "deny"` against the
-    macro's expansion); the cost of the overflow overrides (the Wasm's size and the step's time with the lines and
-    without, in a scratch worktree with its own target folder).
+31. **Step 6: the page.** `packages/client/index.html`, `vite.config.mjs` (base `./`, `assetsInlineLimit: 0`,
+    `worker.format: 'es'`, both servers on 127.0.0.1 only: security-auditor's condition 3; `server.fs.allow`
+    narrowed; COOP and COEP only with `SHAMBLE_ISOLATION=1`), `src/main.ts`, `src/picture.ts`, `src/app/`
+    (`boot`, `worker-link`, `error-hook`, `flags`), `src/render/` (`three-picture`, `empty-scene`: the only folder
+    that imports three), `src/overlay/` (`overlay`, `report`), `src/harness/` (`frame-times`, `run-header`),
+    `styles.css`; the page's part of `build.mjs` (Vite's API, the commit and devtools flags, `serve.mjs` copied in
+    the development flavour only, the CSP scan, the 25 MiB check). The stubs `src/index.ts` and `index.test.ts` go.
+    Keep it tight: the budget left is about 1242 lines to the stop line, and steps 6 and 7 are planned
+    at about 760 and 350.
 
 ## Next steps
-1. Step 5: `worker.ts` and `index.ts` (the stub `PACKAGE` and its test go), the boundary tests on the built Wasm
-   (`packages/sim-worker/boundary/`). Step 6: the page (`vite.config.mjs` with both servers on 127.0.0.1 only: the
-   security answer's condition 3). Step 7: the browser tests (`tests/skeleton/`, the `chromium` project, the server
-   only when `SHAMBLE_DIST` is set). Step 8: readings, planted defects, the production check, docs, the zip,
-   reviews (seven reviewers: three, three, one), the verifier, the advisor agent on the final head, the report, the
-   pull request (draft, then ready); stop for his go and his Brave check.
-2. Size: 1,880 added lines before step 3 (plan about 2,900; stop line 4,000, accepted by him: "The size as you plan
-   it, about 2,900 lines with the stop line at 4,000, is fine"). Keep the rest tight.
-3. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and why `chacha20` 0.10.0 and 0.10.1 were
-   withdrawn, read before the crate question goes to him. For the report's follow-ups: the npm scope `@shamble`.
-4. Read CI on a2ed2d9, the first run with the new crates (`toolchain`'s time against its 15 minutes).
-5. The saver: restart it within 110 minutes of the time under "Running work".
+1. Step 7: the browser tests (`packages/e2e/tests/skeleton/`, the `chromium` project, the server only when
+   `SHAMBLE_DIST` is set; the container's Chromium at `/opt/pw-browsers/chromium`, traces off). Step 8: readings,
+   planted defects, the production check, docs, the zip, reviews (seven reviewers: three, three, one), the verifier,
+   the advisor agent on the final head, the report, the pull request (draft, then ready); stop for his go and his
+   Brave check.
+2. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and why `chacha20` 0.10.0 and 0.10.1 were
+   withdrawn. For the report's follow-ups: the npm scope `@shamble`; the overflow readings; the `.d.ts` reading.
+3. Read CI on the head this save pushes (the first with the bindings; `toolchain`'s time).
+4. The saver: restart it within 110 minutes of the time under "Running work".
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
@@ -329,5 +340,5 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
   `test-engineer-plant-target`; the classifier refused their removal).
 
 ## Running work
-- saver: running since 2026-11-18T22:12:00.211Z (its own first line; task bpbviesk8; 10-minute interval, stops after 110 minutes).
+- saver: running since 2026-11-18T23:54:21.132Z (its own first line; task b9lxaa5m5; 10-minute interval, stops after 110 minutes).
 - agents: none.
