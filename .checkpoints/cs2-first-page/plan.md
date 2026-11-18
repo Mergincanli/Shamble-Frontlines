@@ -35,8 +35,8 @@ working tree on 2026-11-18. His words that order this change-set: `cs2-first-pag
   RNG-CRATE, WB-HEALTH and DEPART-2. CI-WASM holds no step.
 - **Where the build plan is wrong or out of date for change-set 2:** twelve points (section 17). The largest: OQ-0002-7
   (is wasm-bindgen's new home healthy) must be read before wasm-bindgen enters, and the build plan places it nowhere;
-  the project behind ADR 0004's random-number crate has itself moved to another crate, and one of its maintainers
-  wrote that he sees no reason to keep maintaining it.
+  rand itself no longer depends on ADR 0004's random-number crate (rand 0.10 uses `chacha20`); the crate keeps a home
+  and owners in the rand project but has had no release since 0.10.0 (2026-02-02).
 
 ## 1. Goal
 Build foundation step 2.5's first half (the build plan, Part 1, change-set 2, lines 298-314; SPLIT-25 (a)): the path
@@ -742,12 +742,13 @@ arithmetic on the plan's estimate, not a measurement.
 **RNG-CRATE: which library gives the simulation its random streams, and in which change-set does it enter?**
 - Why it matters: it is pinned for good, and rand itself no longer depends on the crate ADR 0004 names.
 - What was found (read again by the main session on 2026-11-18: the changelog and the registry directly, the pull
-  request page through a fetch agent): ADR 0004 part 8 names `rand_chacha`'s `ChaCha8Rng`. rand 0.10.0's changelog
+  request page through a fetch agent; then checked at the sources by the verifier, PASS after four corrections:
+  `cs2-first-page/verifier-claims.md`): ADR 0004 part 8 names `rand_chacha`'s `ChaCha8Rng`. rand 0.10.0's changelog
   says "The dependency on `rand_chacha` has been replaced with a dependency on `chacha20`". The rand project took
   `rand_chacha` out of its main repository (pull request #1658, "Remove rand_chacha", merged on 2026-01-23: "Source
   moved: rust-random/rngs#68"); its newest release, 0.10.0, is of 2026-02-02. One maintainer (dhardy) wrote there on
-  2026-01-20: "I no longer see a reason to maintain `rand_chacha`." Asked by another (vks) whether to make a final
-  release that marks it deprecated, dhardy answered that he sees no need to force people to migrate. After that,
+  2026-01-20: "I no longer see a reason to maintain `rand_chacha`." Asked by vks, a contributor, whether to make a
+  final release that marks it deprecated, dhardy answered that he sees no need to force people to migrate. After that,
   newpavlov proposed an empty 0.11 that points users to `chacha20` ("thus effectively deprecating `rand_chacha`");
   nothing on the page answers that proposal. Against that stand three facts: the `rngs` repository's README says
   "This repository houses extra generators maintained by the project"; `rand_chacha`'s changelog there says "The
@@ -770,7 +771,7 @@ arithmetic on the plan's estimate, not a measurement.
 - Recommendation: (c). A generator nothing calls is code "for later", and the proof of the streams is change-set 3's
   anyway. Which crate it is can then be asked with change-set 3's plan, after both are read side by side; today's
   leaning is (b), because rand 0.10 itself depends on `chacha20` (feature `rng`) and it is the only one of the two
-  released since February (0.10.2, 2026-08-27). If you answer (a) or (b) now, that crate enters in change-set 2.
+  with a release after February (0.10.2, 2026-08-27). If you answer (a) or (b) now, that crate enters in change-set 2.
 
 **WB-HEALTH: wasm-bindgen's project has maintainers but no written release policy. Does the game still build on it?**
 - Why it matters: every call between the simulation and the browser goes through wasm-bindgen, for years, and the

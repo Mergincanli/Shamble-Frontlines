@@ -93,3 +93,35 @@ Plan: read plan.md s6-7 + advisor F2; read the 0.2.130 release page/assets via W
   (one workflow run on one commit); only the crates have a trusted-publishing record, the binary has none.
 - 21:48 S14 docs.rs source view https://docs.rs/crate/wasm-bindgen-cli/0.2.130/source/Cargo.lock (WebFetch list, fetch-model
   transcription; my own count below): the CLI crate's published Cargo.lock.
+- 21:50 S15 my count of the S14 list (scratchpad sec-tool/cli-lock-list.txt): 254 [[package]] entries, 254 unique
+  name+version. By name: 17 proc-macro crates (clap_derive, defmt-macros, displaydoc, jiff-static, openssl-macros,
+  rstest_macros, rustversion, serde_derive, thiserror-impl, walrus-macro, wasm-bindgen-macro, windows-implement,
+  windows-interface, yoke-derive, zerocopy-derive, zerofrom-derive, zerovec-derive); 31 entries are Windows/macOS/other-OS
+  only; dev-only entries too (assert_cmd, predicates*, rstest*, pretty_assertions ...); vendored-openssl-only entries
+  (openssl*, native-tls, foreign-types*, openssl-src = OpenSSL C sources). Already in our Cargo.lock: 5 (proc-macro2,
+  quote, syn x2 (syn 3.0.9 in the CLI lock vs our syn 3.0.10), thiserror, thiserror-impl, unicode-ident).
+  Build scripts: not countable from published metadata without fetching each crate (estimate from known crates: ~30-40,
+  incl. ring's C/assembly build, proc-macro2, quote, serde, serde_json, libc, rustix, anyhow, thiserror, zerocopy,
+  rustversion, httparse, mime_guess, semver, num-traits, crossbeam-utils, rayon-core, portable-atomic, wasm-bindgen,
+  wasm-bindgen-shared, windows_* x8). Exact numbers need `cargo metadata` after a fetch-only step (dependency answer).
+- 21:52 S16 crates/cli/Cargo.toml at c93b8ae (WebFetch restatement, not verbatim): bins wasm-bindgen,
+  wasm-bindgen-test-runner, wasm2es6js; features default = rustls-tls (ureq/rustls), native-tls, openssl, vendored-openssl
+  (both "legacy"); deps anyhow, clap 4 (derive), env_logger 0.11.5, log, native-tls (optional), rouille 3 (no default
+  features), serde (derive), serde_derive, serde_json, shlex, tempfile, ureq 3 (default-features = false; brotli, gzip),
+  walrus 0.27.2, wasm-bindgen-cli-support =0.2.130, wasm-bindgen-test-shared =0.2.130, wasmparser 0.245; no
+  target-specific tables. So `--no-default-features` drops TLS (rustls, ring and its C/assembly build) and the
+  wasm-bindgen bin still works (TLS serves only the test runner's remote webdriver traffic).
+- 21:52 S17 main.yml deploy/release scripts at c93b8ae (WebFetch, quoted): artifacts via actions/download-artifact@v8;
+  `mk()`: `mkdir -p tmp/$name`, removes *.d/*.pdb, `cp README.md LICENSE-MIT LICENSE-APACHE artifacts/$src/wasm* tmp/$name/`,
+  `chmod +x tmp/$name/wasm*`, `tar czvf gh-release/$name.tar.gz -C tmp $name`, sha256sum line. Expected members: folder
+  wasm-bindgen-0.2.130-x86_64-unknown-linux-musl/ + README.md, LICENSE-MIT, LICENSE-APACHE, wasm-bindgen,
+  wasm-bindgen-test-runner, wasm2es6js (whatever matched wasm*). Release job's check: `gh release view ... --jq
+  '.assets[].name' | sort > uploaded; ls gh-release | sort > built; diff built uploaded` = compares NAMES only, not content.
+- 21:53 S18 https://raw.githubusercontent.com/wasm-bindgen/wasm-bindgen/c93b8ae.../Cargo.lock -> 404 (per WebFetch): the repo
+  commits no Cargo.lock and the dist jobs build without --locked, so the release binary's dependency versions were resolved
+  at CI time and are recorded nowhere we can read; the crate's published Cargo.lock (S14) is the only recorded resolution.
+- 21:54 S19 container inventory (no tool run beyond --version of openssl/python/tar): gh at /usr/local/bin/gh (session rule:
+  code search only, so no `gh release verify-asset` / `gh attestation`), openssl 3.0.13, python 3.13.18 (tarfile
+  filter='data' available), GNU tar 1.35, readelf, file, strings; no cosign/sigstore CLI. npm's bundled @sigstore/{bundle,
+  core,protobuf-specs,sign,tuf,verify} exist, but @sigstore/tuf/seeds.json seeds ONLY https://tuf-repo-cdn.sigstore.dev
+  (public-good): GitHub's instance (tuf-repo.github.com) is not seeded, so nothing here can anchor "Fulcio Intermediate l1".
