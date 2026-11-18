@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 15:32 Amsterdam (14:32 UTC)
+- **Last update:** 2026-11-18 15:34 Amsterdam (14:34 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -421,6 +421,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - The second check (results log): the token works now until 2026-11-25T22:59:59Z, C finds the project, D answers
      (outcome row 3). The logs deleted. Next: his "go" for Part 2 (the setup pull request) after consultation 15.
 
+   - Part 2's outcomes → next action (consultation 15): deploy and verify green → he merges; deploy green, verify red →
+     he stops, I read headers.json and say in words whether to merge; deploy red → no merge, no re-run without a new
+     list; no `close` run waiting after the merge → he stops and tells me (plan step 4's question); `close` red → a
+     finding, the uploads that remain recorded. The go sent with the full list.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
@@ -742,6 +747,20 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    2026-11-24 20:42 UTC, after which "Re-run failed jobs" cannot work; to him: the cause in two lines, my miss owned
    (gate (b) called met on a screenshot of the form, consultation 9), his yes/no on d17d…d8e7; the results-log header
    corrected; attempt 1 "consistent with"; for step 2.6: token setup ends with the verify answer, not a form screenshot.
+
+15. 2026-11-18 14:32:34 UTC (called; transcript time), moments 1 and 5 (the second check read; before the setup
+   sitting) · Q: may the go for Part 2 go out? · Changed: yes, on a measurement this time; the state re-read first
+   (`setup` 1619164, pull request #1 open, mergeable_state "unstable" from the failed run, the deploy run at attempt 5);
+   the results-log header given a dated line (Pages Read and Write, the measured window, the rename); outcomes for Part
+   2 (deploy and verify green → merge; deploy green, verify red → he stops, I read headers.json and say whether to
+   merge; deploy red → no merge and no re-run without a new list; no `close` run waiting after the merge → he stops and
+   tells me; `close` red → a finding, the remaining uploads recorded); the full list again in the go (his condition 3),
+   what stays unmeasured (the upload and the cleanup), the open findings before the merge (SA-R3 accepted; SA-R2, SA-R5,
+   SA-R6 deferred; the upload tool's account printout: the rename answers the name, the ID equals the secret so GitHub
+   masks it), the calendar from expires_on (Day 1 by 2026-11-24), the second run's logs deleted on the first run's
+   basis; during the sitting: read each job as it finishes, list the branches after the merge, add `main`'s merge
+   commit to the header, read the first probe run at :23; before sitting 1: the token wider than the plan (Read), Edit
+   alone unmeasured, a choice for him with the rehearsal's result.
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time

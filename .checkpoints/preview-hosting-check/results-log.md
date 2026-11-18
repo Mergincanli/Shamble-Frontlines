@@ -20,6 +20,9 @@ To be checked again before the 24-hour reading.
   Correction, 2026-11-18: the check measured the token's window as not_before 2026-11-26T23:00:00Z, expires_on
   2026-11-27T22:59:59Z (the token works only on 27 November); "Day 2 by the 26th" is withdrawn until the window is
   measured again after his fix.
+  Update, 2026-11-18 (the second check, 14:27 UTC): the token holds "Pages Read" and "Pages Write" (Read added by him on
+  2026-11-17, TOKEN-READ (a)); its window, measured: not_before null, expires_on 2026-11-25T22:59:59Z; the Cloudflare
+  account is renamed "Shamble Frontlines" (his screenshot, 2026-11-18). Day 2's last day: 2026-11-25 (Amsterdam).
 
 **The test repository (GitHub).**
 - Mergincanli/shamble-preview-check, public; `main` 4a67b83b9ed672c81e1a6e3067f916841c02b4a9 (his README).
