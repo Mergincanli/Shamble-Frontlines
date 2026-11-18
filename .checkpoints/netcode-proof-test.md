@@ -175,7 +175,8 @@
   (= d1b24c3 in spikes/ and docs/), the snapshot 3d341c58… applied and checked (29 files, 5,515 added) before any
   edit; its prompt points to the ruling's lines 2-22 (B8's fast clock, B9 in blocks of at most about 400 lines, B10,
   line 5's stop past 6,000); logs `.gate/u4f/w3-*`; worktree `.claude/worktrees/agent-a0825a5a2491eb175`, branch
-  u4f-build3. Snapshot at 18:23 UTC: 5a7090248037c819…. **At each check-in:** `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <its worktree>
+  u4f-build3. Snapshot at the 18:34 check-in: 380,257 B, 29 files (builder 3 past B8's fast clock and B9a, its end
+  check A started 18:34:47; nothing stopped). **At each check-in:** `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <its worktree>
   .checkpoints/netcode-proof-test/wip/u4f-build.patch u4f-build` (the one snapshot then stands for builder 3's worktree,
   builders 1 and 2 in it), then save the card; on a cut, check the worktree against its last snapshot first.
 - The saver bgig20ts2 runs from 18:11 UTC (bmhupn5a8 ran 16:38 to 18:11) (`node .claude/scripts/checkpoint.mjs watch

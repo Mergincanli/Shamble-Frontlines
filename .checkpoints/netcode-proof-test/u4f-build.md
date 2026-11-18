@@ -714,3 +714,118 @@ rev 3.3 (sha256 135325a0...) and the main session's prompt (which wins where the
 - `df -h /home/user` at start: 252G size, 27G used, 12G avail (70 %).
 - Plan by the prompt's item 5: B8f, the fast clock (one block); then B9a, B9b, ... of at most about 400 added lines
   each; SIZE-CHECK after each; at the first block end past 6,000: build nothing more, end checks twice, the stop record.
+
+### B8f: the fast clock (in progress; no plant in place; nothing run yet)
+
+- Design (read from the code): the fast client is slot 0 of `--suite fast-clock`; a fixed-lead endpoint (`with_lead`,
+  so no controller's due rule refuses its commands; it sends no `Ping`: a deviation from 2.6's "its pings come at its
+  steps", `ping_limited` is report-only), a command at every step (`every_step`), its host clock rate 1.0 to the
+  measured start, 1.5 after (the lab's host/sim mapping per client); each new sequence's stamp set in
+  `Behaviour::outgoing` by F1's rule (`fast_stamp`), every copy keeping its sequence's stamp (no kind 3), the view tick
+  clamped to the stamp; an older copy that would break the codec's 255 rule left out (`fast_left_out`, 0 expected).
+  The walk: U4F-Q11 (iii) (c)'s collision-free lane y -1,050 cm, x 2,600 to 3,600 cm (east of the fight vehicles'
+  sweep, r at most 17.71 m; south of building 0; inside the outer loops from 48.3 m; no shot segment of a steady client
+  reaches it: shooters and aim points lie within about 16 m), approached in the warm-up, at [±127, 0] (20 cm a tick).
+- Done (edits, bots/src/lib.rs): consts LANE_Y_CM, LANE_X_CM, LANE_BAND_CM, STAMPS_KEPT; `Kind::Lane`; `Fast` state,
+  `later`, `fast_stamp`; `Behaviour::fast_clock(scene, slot, seed, bound)`, `fast_left_out()`, `lane()`; `outgoing`'s
+  stamp rewrite and encode-or-leave-out loop; `command()`'s `Kind::Lane` walk; tests
+  `f19_the_fast_clocks_stamps_never_fall_and_every_tenth_lies_past_the_bound` and
+  `q11_iii_c_the_fast_clocks_lane_moves_full_walking_speed_every_live_tick` (World, 10 s + 610 s, every tick after the
+  warm-up 20 cm).
+- Next exact step: the lab (scenario.rs): Settings `fast_episode_ns`, `fast_idle_ns`; parse `--fast-clock-episode-s`
+  (60), `--fast-clock-idle-s` (0); params `fast_clock_episode_ns`, `fast_clock_idle_ns`; Client `fast_from` with
+  `host()`/`sim()`; the fast slot's endpoint and behaviour; idle skip; `episodes()` and the `FastClock` tally writing
+  lab-log `fast_clock` events (excess_cmds_count, excess_move_um, lead_refused_count, not_newer_count,
+  move_apart_count, field slot); tests f37, f19 (lab half, hand-made records + a short run), f28 fast-clock A and B;
+  SERIES.md's two new rows; c-u4f-r2.mjs's p3, p9, p16, p20; then build and test through the runner.
+- Done since (edits): scenario.rs Settings `fast_episode_ns`/`fast_idle_ns`, parse and its usage line, params;
+  `Client::fast_from`, `host()`, `sim()`; `episodes()`; `FastClock` with `tick()`; the fast slot's endpoint
+  (`with_lead`) and behaviour; the tally call in the tick loop; the idle skip; the host mapping at the three arrival
+  sites and the next step; logs.rs `MOVE_CM_S` pub(crate); tests f37, f19 (lab), f28 fast-clock A and B (shared
+  `fast_short`); SERIES.md 2 new rows at the end of U4f's subsection; c-u4f-r2.mjs FAST, p3, p9, p16, p20 and its
+  header comment. Next: `df`, then the runner: fmt --check, then `cargo test --locked -p npt-bots -p npt-lab`.
+- w3-b8f-test1.log (`-k`, 18:26:31-18:27:19 UTC; free 11,859 MiB): fmt --check exit 1 (6 diffs, applied by Edit after
+  it); the bots lib test exit 101, E0282 in the lane test (`prev`'s type: fixed, `None::<[i32; 3]>`); npt-lab compiles,
+  f37 passed (exit 0). Next: the bots lib tests f19_ and q11_, then the lab's f19_ and f28 fast-clock tests.
+- **B8f's check** (w3-b8f-test2.log, `-k`, 18:27:52-18:28:16 UTC): fmt --check exit 0; `cargo test --locked -p
+  npt-bots --lib fast_clock` exit 0, 2 passed (f19's stamps; q11 (iii) (c)'s lane: every tick of 610 s after the 10 s
+  warm-up moved exactly 20 cm), 12.21 s for both; `cargo test --locked -p npt-lab --bin npt-lab fast_clock` exit 0, 4
+  passed (f37, f19, f28 fast-clock A and B), 7.62 s.
+- Figures (f19's short run, A, 2 s episodes, P0, 16 clients): per episode excess commands -36 and -36, excess movement
+  -7,387,637 and -7,200,000 µm, lead-bound refusals 24 and 24, not-newer 29 and 30, apart ticks 0. The fast client
+  runs about 0.6 commands a tick under F1's rule: each 10th stamp's jump of 3 past the cap leaves 2 to 3 stamp values
+  never used, so the clean excess sits far below 0 (about -700 a 60 s episode by the same rate). Under
+  not-older-than the held equal stamps (about 15 a second here) run as well: about 1.1 a tick, so a 60 s episode's
+  excess is about +180 (p9 fails it), while a 2 s episode's would stay near -6 (the bound's 12 outweighs it): p9 is
+  read at 5.3's 60 s episode, not at f19's scale. Under B the fast client's lead (up to 12) exceeds the buffer's 8:
+  4 kind-10 refusals in the B run (expected, reported).
+- **SIZE-CHECK after B8f:** 3,273 insertions (20 files) + 2,709 lines in 9 new files (c-u4f-r2.mjs 175) = **5,982**
+  (under 6,000: B9a next, one block of at most about 400 lines, after which the stop applies).
+- clippy (w3-b8f-clippy.log, 18:29:03-18:29:14 UTC): `cargo clippy --locked -p npt-bots -p npt-lab --all-targets -- -D
+  warnings` exit 0, and with `--all-features` exit 0. **B8f done.**
+
+### B9a: the room-whole forgers, kinds 1, 2, 4, 5 and 6, with f15's five cases (in progress; no plant)
+
+- Plan: npt-bots `Behaviour::forger(kind, every, bound)` (`None` for a kind this block does not build: 3, 7 to 11),
+  forging in `outgoing` the newest command of every `every`-th new sequence, only in the first `Input` that carries it
+  (2.6's table: the endpoint stores the honest command, so later copies are honest, repeats of a refused sequence);
+  `take_forged()` for the lab's attribution (B9b); f15's five cases in bots (decoded: only that check's field changed,
+  the rule broken, every other copy and the acknowledgement equal, every forged `Input` decoding). Not in B9a: kinds 3,
+  7 to 11, the lab's suite, `--forge-every`, the twins, the attribution, f16, f22, f23, f33.
+- Edits done (bots/src/lib.rs): `Forge` state, `forged()`, `Behaviour::forger`, `take_forged`, the forger's part of
+  `outgoing`, the helper `f15(kind)` and its five tests. Next: the runner, fmt --check and `cargo test -p npt-bots
+  --lib f15_`.
+- w3-b9a-test1.log (`-k`, 18:32:02-18:32:04 UTC): fmt --check exit 1 (8 diffs, applied by Edit after it); `cargo test
+  --locked -p npt-bots --lib f15_` exit 0, 5 passed (0.01 s). Next: fmt --check, clippy both builds, bots tests whole.
+- w3-b9a-test2.log (`-k`, 18:32:38-18:32:55 UTC): fmt exit 0; both clippy runs exit 101 on one finding,
+  `clippy::manual_is_multiple_of` at `forged()`'s `n % 2 == 0` (x3; fixed by Edit: `n.is_multiple_of(2)` once, as
+  `even`); `cargo test --locked -p npt-bots` exit 0: lib 12 passed, 1 ignored (12.92 s), behaviour 5. Next: fmt and
+  both clippy runs again, then SIZE-CHECK.
+- w3-b9a-test3.log (`-k`, 18:33:23-18:33:28 UTC): fmt exit 0; clippy host and `--all-features` exit 0; f15's five
+  exit 0. **B9a done.**
+- **SIZE-CHECK after B9a:** 3,503 insertions (20 files) + 2,709 lines in 9 new files = **6,212: past 6,000.** Line
+  5's stop: nothing more is built; next, section 6's end checks twice on this tree (`-x`, `df` before each), then the
+  stop record.
+- End check A starting: `df -h /home/user` 11G avail (73 %); one `-x` runner call, log .gate/u4f/w3-end-check-a.log:
+  the six provenance builds (as w2-end-check-a.log's), then `node check.mjs`.
+
+### The stop record (line 5; his size stop past 6,000)
+
+- **The count:** 6,212 added lines (3,503 insertions in 20 files by `git diff --shortstat 5b29296b -- spikes/ docs/`,
+  plus 2,709 lines in 9 new files), at B9a's end: M's 3,000 x 2.07; the brief's 5,150 x 1.21; builder 3 +697 (B8f
+  467, B9a 230).
+- **Each component against SIZE-CHECK's table (brief :927-939),** by `git diff --numstat` and the new files' lines
+  (the rev 3.1, 3.2 and 3.3 rows' items sit inside the crates they touched):
+
+  | Component | Estimate | Now | What it holds |
+  |---|---|---|---|
+  | npt-client | about 700 | 1,421 | lib.rs 349, tests/bites.rs 10, clock.rs 348, carry80.rs 158, trace.rs 556: all built |
+  | npt-room | about 950 | 1,956 | input.rs 431, room.rs 401, lib.rs 13, events.rs 9, tests bites 9, room 26, commands.rs 1,067: all built |
+  | npt-bots | about 650 | 702 | lib.rs 700, tests/behaviour.rs 2: the never-acker, clamp, lag switch, fast clock, 5 of the 11 forgers |
+  | npt-lab | about 1,400 | 1,453 | scenario.rs 1,263, logs.rs 142, tests/bite_homes.rs 48: every suite but `forged` |
+  | npt-sim | about 40 | 48 | world.rs's two bite sites |
+  | SERIES.md | about 25 | 20 | new rows only (U4f's subsection) |
+  | ops/runs/c-u4f-*.mjs | about 600 | 448 | cap 140, r2 175, runs 133: -21's set and the forged rows not yet |
+  | proto, catalogue, server (rev 3.3's U4F-Q6 (b) and P33) | in the 300 | 164 | msg.rs 6, common 1, pong.rs 84, the catalogue 1, pump.rs 2, loopback.rs 8, pump tests 62 |
+  | **Total** | **about 5,150** | **6,212** | |
+
+- **Built, by mark and suite:** -47 (the clock suite, ClockSync, its two bites, f1-f5, f29, f31, p10, p11, p21);
+  -20 (option A and B, the controller, `--brawl-press-every`, every -20 series, f6, f28's -20 halves, f34, f36, f40,
+  redundancy-1, p5, p6, p12); -22 (the never-acker, its suite and series, 2.5's counts at every session end, f14, f21,
+  f35, the cap measured at 1,600: U4F-Q12 with the advisor); -21's room and sim side whole (kinds 1-6, 8 and 10 with
+  their counters and records, option A's run path, the 13 room and sim bites' unit proofs, f7-f13, f17, f38, f39);
+  -21's clamp suite (f18, p2, p8, p15), lag-switch suite (f20, p4, p13, p18, p19) and fast-clock suite (B8f: f19 in
+  bots and lab, f37, f28 A and B, U4F-Q11 (iii) (c)'s test, p3, p9, p16, p20); and B9a, npt-bots' forgers of kinds 1,
+  2, 4, 5 and 6 with f15's five cases.
+- **Not built (the forged suite, -21's last part):** the forgers of kinds 3, 7, 8, 9, 10 and 11 (and f15's six
+  cases); the lab's `--suite forged` (11 forger slots, 37 honest open-loop clients) and `--forge-every` with its header
+  param and row; the attribution by 2.4 item 6's per-kind rules and `event.forged_kind.sent_count`,
+  `.unrejected_count`; the twins and the twin's skip in the lab (`ClientEndpoint::skip_command` exists, unused by the
+  lab), kind 10's and kind 3's twin rows; f16 (24), f22 (2), f23, f33 (13); 5.3's p1, p7, p14, p17; -21's set in
+  c-u4f-runs.mjs (its 24 measured runs, 12 twins with the clamp twins' `--twin-logs`, its 13 bite runs, two judge
+  calls). Also not done: f28's clamp and lag-switch halves under option B (builder 2 folded each A half into f18 (ii)
+  and f20: line 6 asks one per suite and option).
+- **The estimate for the rest:** npt-bots about 250 (six forgers, f15's six cases); npt-lab about 950 to 1,100 (the
+  suite, the attribution, the twins, f16's 24 through one helper, f22, f23, f33's 13 on hand-made records); SERIES.md
+  about 5; c-u4f-r2.mjs about 10; c-u4f-runs.mjs about 150; f28's two B halves about 40: about 1,400 to 1,550, so U4f
+  whole at about 7,600 to 7,800 added lines.

@@ -12,7 +12,7 @@ index 9c58b9a..b160e1a 100644
  | `JoinAccepted` | room → client | control stream | owner | Sender: the room only, once per accepted `Join`, to that client. npt-client: the size; each value in range; a `FullState` follows on a full-state stream | 256 B (proposed: 2 B length + 1 B type + 3 B slot, team and squad + 2 B mode id + 32 B mode hash + 32 B content hash + 4 B server tick + 4 B tick and snapshot rates = 80 B, rounded up) | built in U4 | row 671; part 11:506 (the room assigns team and squad) |
  | `JoinRejected` | room → client | control stream | owner | Sender: the room only; it then closes the connection. It carries a reason code and nothing else (proposed codes: bad token, bind mismatch, roster full, wrong version, wrong content hash). npt-client: the size | 16 B (proposed: 2 B length + 1 B type + 1 B reason = 4 B, rounded up) | built in U4 | row 671; plan §10.3 |
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index 47f91ef..ad357cd 100644
+index 47f91ef..7fc33b6 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
 @@ -23,6 +23,8 @@
@@ -61,7 +61,7 @@ index 47f91ef..ad357cd 100644
  }
  
  /// One client's behaviour (the module text): the brawl or an open-loop script, seeded per slot.
-@@ -109,6 +128,61 @@ pub struct Behaviour {
+@@ -109,6 +128,110 @@ pub struct Behaviour {
      /// The leash's state (the brawl only): steering toward the centre, from past [`LEASH_OUT_CM`] until inside
      /// [`LEASH_IN_CM`].
      steering: bool,
@@ -77,6 +77,55 @@ index 47f91ef..ad357cd 100644
 +    lag: Option<Lag>,
 +    /// -21's fast clock (`fast_clock`).
 +    fast: Option<Fast>,
++    /// -21's forger (`forger`).
++    forge: Option<Forge>,
++}
++
++/// A forger's state (u4f-brief.md 2.4, 2.6): its kind, its interval, the bound (ticks), the new sequences seen as an
++/// `Input`'s newest, the forged count, the newest command seen (honest) and the forged sequences not yet taken.
++#[derive(Clone, Debug, Default)]
++struct Forge {
++    kind: u8,
++    every: u64,
++    bound: u32,
++    seen: u64,
++    sent: u64,
++    last: Option<Command>,
++    forged: Vec<u16>,
++}
++
++/// `c`, the newest command of a new sequence, forged in `kind` (2.6's per-kind table), the `n`-th (from 1), against
++/// `prev`, the honest command of the sequence before it, at the endpoint's newest tick `newest` under the lead bound
++/// `bound`: kind 1 its tick newest + 2 + the bound + k, k from 1 to 100 in turn; kind 2 its tick the previous command's;
++/// kind 4 its move [127, 127] or [-128, -128] in turn; kind 5 its fire press counter moved one edge more than the ticks
++/// it covers; kind 6 its aim's x or y in turn at 20,000 cm (outside ±12,800, inside the grid's ±32,767). A view tick
++/// after the stamp becomes the stamp (the endpoint's own rule). `None` where the kind needs a previous command and has
++/// none, or for a kind built elsewhere.
++fn forged(
++    kind: u8,
++    mut c: Command,
++    prev: Option<Command>,
++    newest: u32,
++    bound: u32,
++    n: u64,
++) -> Option<Command> {
++    let (k, even) = (((n - 1) % 100) as u32 + 1, n.is_multiple_of(2));
++    match (kind, prev) {
++        (1, _) => c.tick = newest.wrapping_add(2 + bound + k),
++        (2, Some(p)) => c.tick = p.tick,
++        (4, _) => c.move_xy = if even { [127, 127] } else { [-128, -128] },
++        (5, Some(p)) => {
++            let covered = c.tick.wrapping_sub(p.tick).min(100) as u8;
++            let fire = &mut c.presses[Command::PRESS_FIRE];
++            *fire = p.presses[Command::PRESS_FIRE].wrapping_add(covered + 1);
++        }
++        (6, _) => c.aim[usize::from(even)] = if even { -20_000 } else { 20_000 },
++        _ => return None,
++    }
++    if later(c.view_tick, c.tick) != c.tick {
++        (c.view_tick, c.view_fraction) = (c.tick, 0);
++    }
++    Some(c)
 +}
 +
 +/// The fast clock's state: the lead bound in ticks, the commands stamped, the last stamp, each recent sequence's stamp
@@ -123,7 +172,7 @@ index 47f91ef..ad357cd 100644
  }
  
  /// splitmix64's step: the bots' one generator, seeded per slot (no clock, no hash map).
-@@ -128,8 +202,8 @@ fn below(word: u64, n: u64) -> u64 {
+@@ -128,8 +251,8 @@ fn below(word: u64, n: u64) -> u64 {
  /// A move vector from (x, y) toward the origin at about full command length, inside the room's x² + y² ≤ 127² check
  /// (so the sim never scales it: world.rs:494-498): each part is 127 times its share of ⌈|(x, y)|⌉, truncated toward 0,
  /// so the vector is never longer than 127 and, at the leash's radii, longer than 125. Integers only. Its inputs are
@@ -134,7 +183,7 @@ index 47f91ef..ad357cd 100644
  fn toward_centre(x: i32, y: i32) -> [i8; 2] {
      let (x, y) = (i64::from(x), i64::from(y));
      let d2 = x * x + y * y;
-@@ -167,7 +241,181 @@ impl Behaviour {
+@@ -167,14 +290,236 @@ impl Behaviour {
              given: 0,
              skipped: 0,
              steering: false,
@@ -144,7 +193,31 @@ index 47f91ef..ad357cd 100644
 +            points: BTreeMap::new(),
 +            lag: None,
 +            fast: None,
++            forge: None,
 +        }
++    }
++
++    /// -21's forger of `kind` (2.4's kinds 1, 2, 4, 5 and 6: the room's checks on a whole command; `None` for another
++    /// kind) under the lead bound `bound` (ticks): the same behaviour, with the newest command of every `every`-th new
++    /// sequence forged in its kind in the first `Input` that carries it (2.6: the endpoint keeps the honest command, so
++    /// every later copy is honest, a repeat of a refused sequence: 2.4 item 2).
++    pub fn forger(mut self, kind: u8, every: u64, bound: u32) -> Option<Behaviour> {
++        [1, 2, 4, 5, 6].contains(&kind).then_some(())?;
++        self.forge = Some(Forge {
++            kind,
++            every: every.max(1),
++            bound,
++            ..Forge::default()
++        });
++        Some(self)
++    }
++
++    /// The sequences the forger forged since the last take (the lab's attribution: 2.4 item 6).
++    pub fn take_forged(&mut self) -> Vec<u16> {
++        self.forge
++            .as_mut()
++            .map(|f| core::mem::take(&mut f.forged))
++            .unwrap_or_default()
 +    }
 +
 +    /// -21's 1.5x clock (u4f-brief.md 2.6; U4F-Q11 (iii) (c) and (v) (b) as F1 amends it): fire held at a seeded point,
@@ -175,7 +248,7 @@ index 47f91ef..ad357cd 100644
 +        let reach = 2 * LANE_BAND_CM;
 +        if (y - LANE_Y_CM).abs() > LANE_BAND_CM || x < x0 - reach || x > x1 + reach {
 +            return toward_centre(x - x0, y - LANE_Y_CM);
-         }
++        }
 +        if x >= x1 {
 +            f.west = true;
 +        } else if x <= x0 {
@@ -244,7 +317,8 @@ index 47f91ef..ad357cd 100644
 +                l.bursts.push(now_ns - at);
 +            }
 +        }
-+        if !self.never_acks && self.points.is_empty() && self.fast.is_none() {
++        if !self.never_acks && self.points.is_empty() && self.fast.is_none() && self.forge.is_none()
++        {
 +            return;
 +        }
 +        let newest = self.last_newest.unwrap_or(0);
@@ -279,6 +353,23 @@ index 47f91ef..ad357cd 100644
 +                        }
 +                    }
 +                }
++                // The forger: an `Input` whose newest command is a new sequence counts it; every `every`-th is forged.
++                if let Some(f) = self.forge.as_mut()
++                    && let Some(&c) = i.commands.first()
++                    && f.last
++                        .is_none_or(|l| (c.seq.wrapping_sub(l.seq) as i16) > 0)
++                {
++                    f.seen += 1;
++                    let prev = i.commands.get(1).copied().or(f.last);
++                    f.last = Some(c);
++                    if f.seen.is_multiple_of(f.every)
++                        && let Some(x) = forged(f.kind, c, prev, newest, f.bound, f.sent + 1)
++                    {
++                        i.commands[0] = x;
++                        f.sent += 1;
++                        f.forged.push(c.seq);
++                    }
++                }
 +                // Every rewritten `Input` encodes: an older copy a past-bound stamp leaves more than 255 ticks below
 +                // (after an idle) is left out, oldest first, so the rest stay consecutive (the codec's two rules).
 +                let mut out = Vec::new();
@@ -295,9 +386,9 @@ index 47f91ef..ad357cd 100644
 +                    *d = out;
 +                }
 +            }
-+        }
-+    }
-+
+         }
+     }
+ 
 +    /// The same behaviour under U4f's tick-lead controller (`ClientEndpoint::with_clock`; u4f-brief.md 2.2): each step
 +    /// gives exactly the commands the endpoint says are due (none, one or two; none before its first stamp is due), so
 +    /// no tick goes without a stamped command but by loss. Each command still moves each press counter by at most one
@@ -313,10 +404,10 @@ index 47f91ef..ad357cd 100644
 +    pub fn with_press_every(mut self, n: u64) -> Behaviour {
 +        self.press_every = n;
 +        self
-     }
- 
++    }
++
      /// The brawl of `slot` in `scene`, from the run's `seed`.
-@@ -175,6 +423,12 @@ impl Behaviour {
+     pub fn brawl(scene: &Scene, slot: u8, seed: u64) -> Behaviour {
          Behaviour::new(Kind::Brawl, scene, slot, seed)
      }
  
@@ -329,7 +420,7 @@ index 47f91ef..ad357cd 100644
      /// The open-loop script named `script` (`presses`, `clamp` or `steady`) of `slot` in `scene`, from `seed`;
      /// `None` for another name.
      pub fn script(scene: &Scene, slot: u8, seed: u64, script: &str) -> Option<Behaviour> {
-@@ -221,6 +475,17 @@ impl Behaviour {
+@@ -221,6 +566,17 @@ impl Behaviour {
          let (Some(newest), Some(_)) = (endpoint.newest_tick(), endpoint.slot()) else {
              return false;
          };
@@ -347,7 +438,7 @@ index 47f91ef..ad357cd 100644
          if !self.every_step && self.last_newest == Some(newest) {
              self.skipped += 1;
              return false;
-@@ -276,7 +541,12 @@ impl Behaviour {
+@@ -276,7 +632,12 @@ impl Behaviour {
          own: Option<([i32; 3], bool)>,
      ) -> Command {
          let k = self.given;
@@ -361,7 +452,7 @@ index 47f91ef..ad357cd 100644
              self.presses[Command::PRESS_FIRE] = self.presses[Command::PRESS_FIRE].wrapping_add(1);
          }
          let aim = match self.kind {
-@@ -286,10 +556,15 @@ impl Behaviour {
+@@ -286,10 +647,15 @@ impl Behaviour {
          let walk = MOVES[((k / TURN_EVERY + self.phase) % MOVES.len() as u64) as usize];
          let walk = match self.kind {
              Kind::Brawl => self.leash(own, walk),
@@ -378,7 +469,7 @@ index 47f91ef..ad357cd 100644
              presses: self.presses,
              move_xy: if self.kind == Kind::Clamp {
                  [0, 0]
-@@ -401,7 +676,7 @@ mod tests {
+@@ -401,7 +767,7 @@ mod tests {
              steer,
              "still outside the inner radius"
          );
@@ -387,7 +478,7 @@ index 47f91ef..ad357cd 100644
          assert_eq!(got, walk, "dead: the walk");
          let (got, walk) = give(None);
          assert_eq!(got, walk, "no complete tick: the walk");
-@@ -466,6 +741,117 @@ mod tests {
+@@ -466,6 +832,332 @@ mod tests {
          }
      }
  
@@ -500,6 +591,221 @@ index 47f91ef..ad357cd 100644
 +                );
 +            }
 +        }
++    }
++
++    /// f19's npt-bots half (F1; TE3-4): at 45 steps to 30 ticks, the fast clock's stamps never fall; every 10th lies 3 +
++    /// the bound past the newest tick (past the room's bound on arrival at P0); every other at most the newest + the
++    /// bound, one past the last while below it, held equal while the newest stands (kind 2's case).
++    #[test]
++    fn f19_the_fast_clocks_stamps_never_fall_and_every_tenth_lies_past_the_bound() {
++        assert_eq!(fast_stamp(1, None, 1_000, 12), 1_001, "the first");
++        assert_eq!(
++            fast_stamp(2, Some(1_002), 1_000, 12),
++            1_003,
++            "below the cap"
++        );
++        assert_eq!(
++            fast_stamp(3, Some(1_012), 1_000, 12),
++            1_012,
++            "held at the cap"
++        );
++        let (mut last, mut newest, mut held) = (None, 1_000u32, 0);
++        for k in 1..=300u64 {
++            newest += u32::from(k % 3 != 0);
++            let t = fast_stamp(k, last, newest, 12);
++            let floor = last.unwrap_or(0);
++            assert!(t >= floor, "{k}: {t} after {last:?}");
++            if k % 10 == 0 {
++                assert_eq!(t, (newest + 15).max(floor), "{k}");
++            } else {
++                assert!(t <= (newest + 12).max(floor), "{k}");
++            }
++            held += u32::from(last == Some(t));
++            last = Some(t);
++        }
++        assert!(held > 50, "equal stamps: {held}");
++    }
++
++    /// U4F-Q11 (iii) (c)'s test (+1; A1; advisor-u4f-lead-bound.md E4): the fast clock's lane is collision-free, so the
++    /// arithmetic reference (its live ticks at full walking speed) equals an honest client's movement on its inputs.
++    /// npt-sim's World from the judged runs' first tick, slot 0 alone driven by the fast clock's walk one command a tick
++    /// (an honest client's rate) on its own position 16 steps old (the largest stamp lead plus a snapshot's way); over a
++    /// judged fast-clock run's window (a 10 s warm-up to reach the lane, then 610 s) every tick after the warm-up moves it
++    /// exactly 20 cm, walking (fire held: no sprint; no crouch), past the static boxes, the doors' and the wall's
++    /// schedules and every vehicle part; the other soldiers stand (soldiers never collide with each other).
++    #[test]
++    fn q11_iii_c_the_fast_clocks_lane_moves_full_walking_speed_every_live_tick() {
++        let scene = Scene::stress().with_stand_ins(StandIns::OFF);
++        let mut world = World::new(&scene, 1, FIRST);
++        let history = HitHistory::for_ms(2_000).expect("a ring");
++        let mut b = Behaviour::fast_clock(&scene, 0, 1, 12);
++        let (warm, window) = (ticks_for_ms(10_000), ticks_for_ms(610_000));
++        let (mut past, mut prev, mut moved) = (VecDeque::new(), None::<[i32; 3]>, 0u32);
++        for k in 0..=warm + window {
++            let t = FIRST.wrapping_add(k);
++            let me = soldiers(&world).into_iter().find(|s| s.0 == 0);
++            let (_, p, dead, _) = me.expect("slot 0's record");
++            assert!(!dead, "tick {t}");
++            if let Some(q) = prev.filter(|_| k > warm) {
++                let d2 = |i: usize| i64::from(p[i] - q[i]).pow(2);
++                assert_eq!(d2(0) + d2(1) + d2(2), 400, "tick {t}: {q:?} to {p:?}");
++                moved += 1;
++            }
++            prev = Some(p);
++            past.push_back(p);
++            if past.len() > 16 {
++                past.pop_front();
++            }
++            let mut c = b.next_command(t, &[], Some((past[0], false)));
++            assert_eq!(c.buttons & (Command::SPRINT | Command::CROUCH), 0);
++            (c.slot, c.tick, c.seq) = (0, t, k as u16);
++            let input = TickInput {
++                tick: t,
++                commands: vec![(c, None)],
++                ..TickInput::default()
++            };
++            world.step(&input, &history);
++        }
++        assert_eq!(moved, window);
++    }
++
++    /// f15's case for one of the room-whole kinds (2.6's per-kind table; TE3-4, SA3-2): the steady script on a fixed-lead
++    /// endpoint, a snapshot each step and no acknowledgement back (so every `Input` re-sends its unacknowledged copies),
++    /// every 3rd new sequence forged. Each forged `Input` decodes, its acknowledgement and every older copy equal to the
++    /// honest datagram's (so each later copy of a forged sequence is honest), and its newest command differs from the
++    /// honest one in the kind's field alone, breaking that check's rule (against the honest previous command and the
++    /// newest tick); each sequence forged once, and at least 30 forged in 120 steps. Its datagram is the same under
++    /// either option (the endpoint reads none).
++    fn f15(kind: u8) {
++        use npt_proto::{Direction, Input, JoinAccepted, Message, Snapshot, decode, encode};
++        let bytes = |m: &Message| {
++            let mut o = Vec::new();
++            encode(m, &mut o).expect("encodes");
++            o
++        };
++        let input = |d: &[u8]| match decode(Direction::ClientToRoom, Channel::Datagram, d) {
++            Ok(Message::Input(i)) => Some(i),
++            _ => None,
++        };
++        let scene = Scene::stress();
++        let mut e = ClientEndpoint::new(npt_proto::Join::default(), 30).with_lead(2);
++        let mut b = Behaviour::script(&scene, 0, 1, "steady")
++            .and_then(|b| b.forger(kind, 3, 12))
++            .expect("a room-whole forger");
++        let ja = Message::JoinAccepted(JoinAccepted {
++            tick: 100,
++            ..JoinAccepted::default()
++        });
++        let (mut rx, mut seqs) = (vec![(Channel::Control, bytes(&ja), 0)], Vec::new());
++        let mut last: Option<Command> = None;
++        for k in 0..120u32 {
++            let now = u64::from(k) * 33_333_333;
++            let s = Snapshot {
++                tick: 101 + k,
++                groups: 1,
++                ..Snapshot::default()
++            };
++            rx.push((Channel::Datagram, bytes(&Message::Snapshot(s)), now));
++            b.step(&mut e, &rx, now, &[]);
++            rx.clear();
++            let honest = e.step().datagrams;
++            let mut forged = honest.clone();
++            b.outgoing(now, &mut forged);
++            assert_eq!(honest.len(), forged.len());
++            let newest = e.newest_tick().expect("a snapshot");
++            for (h, f) in honest.iter().zip(&forged) {
++                let (Some(h), Some(f)): (Option<Input>, Option<Input>) = (input(h), input(f))
++                else {
++                    assert_eq!(h, f, "only an `Input` changes");
++                    continue;
++                };
++                assert_eq!((h.ack_tick, h.ack_groups), (f.ack_tick, f.ack_groups));
++                assert_eq!(
++                    h.commands[1..],
++                    f.commands[1..],
++                    "{kind}: older copies honest"
++                );
++                let (hc, fc) = (h.commands[0], f.commands[0]);
++                let prev = h
++                    .commands
++                    .get(1)
++                    .copied()
++                    .or(last.filter(|l| l.seq != hc.seq));
++                last = Some(hc);
++                if hc == fc {
++                    continue;
++                }
++                assert!(!seqs.contains(&fc.seq), "{kind}: forged once");
++                seqs.push(fc.seq);
++                let same = |a: Command| (a.slot, a.seq, a.buttons, a.view_tick);
++                assert_eq!(same(hc), same(fc), "{kind}");
++                let p = prev.expect("a previous command");
++                assert_eq!(p.seq, hc.seq.wrapping_sub(1), "{kind}: the sequence before");
++                let (x, y) = (i32::from(fc.move_xy[0]), i32::from(fc.move_xy[1]));
++                let fire = Command::PRESS_FIRE;
++                let broken = match kind {
++                    1 => (15..=114).contains(&fc.tick.wrapping_sub(newest)),
++                    2 => fc.tick == p.tick,
++                    4 => x * x + y * y > 127 * 127,
++                    5 => fc.presses[fire].wrapping_sub(p.presses[fire]) > (fc.tick - p.tick) as u8,
++                    _ => fc.aim[..2]
++                        .iter()
++                        .any(|a| a.abs() > 12_800 && a.abs() <= 32_767),
++                };
++                assert!(broken, "{kind}: {fc:?} after {p:?}");
++                let (mut back, mut presses) = (fc, hc.presses);
++                presses[fire] = fc.presses[fire];
++                assert_eq!(presses, fc.presses, "{kind}: only fire's counter");
++                (back.tick, back.move_xy, back.presses, back.aim) =
++                    (hc.tick, hc.move_xy, hc.presses, hc.aim);
++                assert_eq!(back, hc, "{kind}");
++                let changed = [
++                    hc.tick != fc.tick,
++                    hc.move_xy != fc.move_xy,
++                    hc.presses != fc.presses,
++                    hc.aim != fc.aim,
++                ];
++                let want = match kind {
++                    1 | 2 => 0,
++                    4 => 1,
++                    5 => 2,
++                    _ => 3,
++                };
++                assert_eq!(
++                    changed.iter().filter(|c| **c).count(),
++                    1,
++                    "{kind}: one field"
++                );
++                assert!(changed[want], "{kind}: its field");
++            }
++        }
++        assert_eq!(b.take_forged(), seqs);
++        assert!(seqs.len() >= 30, "{kind}: {} forged", seqs.len());
++    }
++
++    #[test]
++    fn f15_the_kind_1_forger_breaks_only_the_lead_bound() {
++        f15(1);
++    }
++
++    #[test]
++    fn f15_the_kind_2_forger_breaks_only_the_newer_tick_rule() {
++        f15(2);
++    }
++
++    #[test]
++    fn f15_the_kind_4_forger_breaks_only_the_move_length() {
++        f15(4);
++    }
++
++    #[test]
++    fn f15_the_kind_5_forger_breaks_only_the_press_edge_rule() {
++        f15(5);
++    }
++
++    #[test]
++    fn f15_the_kind_6_forger_breaks_only_the_aim_bounds() {
++        f15(6);
 +    }
 +
      /// The judged runs' first tick (the run scripts' `--tick-start 63736`).
@@ -1084,7 +1390,7 @@ index 3540ec8..bd617c8 100644
      let bitten = npt_client::grid_with_bite(id).expect("the client plants -17's");
      assert_eq!(bitten, Config::floor_rounding());
 diff --git a/spikes/netcode-proof/crates/lab/src/logs.rs b/spikes/netcode-proof/crates/lab/src/logs.rs
-index c26fccd..9f58745 100644
+index c26fccd..bc2a766 100644
 --- a/spikes/netcode-proof/crates/lab/src/logs.rs
 +++ b/spikes/netcode-proof/crates/lab/src/logs.rs
 @@ -136,7 +136,18 @@ struct RoomTrack {
@@ -1121,7 +1427,7 @@ index c26fccd..9f58745 100644
 +
 +/// npt-sim's soldiers' walking speed, cm/s: a copy of its private `Scene::move_speed` (sim/src/scene.rs:184, :244); the
 +/// test clients never sprint (bots/src/lib.rs:292).
-+const MOVE_CM_S: i64 = 600;
++pub(crate) const MOVE_CM_S: i64 = 600;
 +
 +/// The movement the sim's step gave a soldier between two ticks' records ([x, y, z, health], grid cm), µm (the advisor's
 +/// A1): `None` when it was dead at either (health 0), so a respawn's placement is never counted as movement.
@@ -1326,7 +1632,7 @@ index c26fccd..9f58745 100644
          let logged: Vec<(u64, Vec<bool>)> =
              self.logged.iter().map(|(w, l)| (*w, l.clone())).collect();
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
-index 311e0a9..5c37b62 100644
+index 311e0a9..067f266 100644
 --- a/spikes/netcode-proof/crates/lab/src/scenario.rs
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
 @@ -42,8 +42,12 @@ use npt_l1::{DatagramCounts, L1Net, Profile};
@@ -1595,7 +1901,7 @@ index 311e0a9..5c37b62 100644
              self.owner.remove(&slot);
              self.ended.push((slot, "kicked"));
          }
-@@ -683,10 +828,29 @@ pub(crate) struct Settings {
+@@ -683,10 +828,33 @@ pub(crate) struct Settings {
      /// profile.
      pub(crate) burst_spacing_ns: u64,
      pub(crate) behaviour: String,
@@ -1622,10 +1928,14 @@ index 311e0a9..5c37b62 100644
 +    /// The lag switch's hold and spacing, ms (`--lag-hold-ms`, 200; `--lag-every-ms`, 6,000: 100 bursts in 600 s).
 +    pub(crate) lag_hold_ms: u64,
 +    pub(crate) lag_every_ms: u64,
++    /// The fast clock's episode length and its idle from the measured start, ns of simulated time
++    /// (`--fast-clock-episode-s`, 60; `--fast-clock-idle-s`, 0: 5.3's p20 only).
++    pub(crate) fast_episode_ns: u64,
++    pub(crate) fast_idle_ns: u64,
      pub(crate) record: Option<PathBuf>,
      pub(crate) bytes: Option<PathBuf>,
      /// Whether the run writes its logs (`false`: a runner recording regenerated inside `npt-lab hash`).
-@@ -767,6 +931,23 @@ struct Client {
+@@ -767,6 +935,115 @@ struct Client {
      last_stamp: Option<u32>,
      duplicates: u64,
      bytes_log: Option<std::io::BufWriter<std::fs::File>>,
@@ -1634,6 +1944,98 @@ index 311e0a9..5c37b62 100644
 +    seq: u64,
 +    first_sample_ns: Option<u64>,
 +    read: bool,
++    /// -21's fast clock: the SimClock instant (the measured start) from which its host clock runs at 1.5, continuous.
++    fast_from: Option<u64>,
++}
++
++impl Client {
++    /// The client's host clock at SimClock `ns`: its offset plus `ns`, at rate 1.5 from `fast_from` on.
++    fn host(&self, ns: u64) -> u64 {
++        self.offset_ns
++            + match self.fast_from {
++                Some(m) if ns > m => m + (ns - m) * 3 / 2,
++                _ => ns,
++            }
++    }
++
++    /// The first SimClock instant at which its host clock reads at least `host` (the inverse of [`Client::host`]).
++    fn sim(&self, host: u64) -> u64 {
++        let h = host.saturating_sub(self.offset_ns);
++        match self.fast_from {
++            Some(m) if h > m => m + ((h - m) * 2).div_ceil(3),
++            _ => h,
++        }
++    }
++}
++
++/// The fast clock's episodes (2.6's schedule; f37): the measured window's back-to-back spans of `episode_ns` of
++/// simulated time from its start, whole ones only, each as the room ticks it holds, [first, end) counted from the run's
++/// first tick (tick k is due at `due_ns(k)`).
++pub(crate) fn episodes(warmup_ticks: u64, measured_ticks: u64, episode_ns: u64) -> Vec<(u64, u64)> {
++    let hz = u128::from(npt_sim::TICK_HZ);
++    let at = |ns: u64| (u128::from(ns) * hz).div_ceil(u128::from(SEC)) as u64;
++    let (start, end) = (due_ns(warmup_ticks), due_ns(warmup_ticks + measured_ticks));
++    let e = episode_ns.max(1);
++    (0..(end - start) / e)
++        .map(|i| (at(start + i * e), at(start + (i + 1) * e)))
++        .collect()
++}
++
++/// -21's fast clock's tally (2.6; U4F-Q11 (iii) (c); A1): slot 0's episodes, the room's lead bound in ticks, its
++/// soldier's last record ([x, y, z, health]), its kind-1 and kind-2 refusal counts after the last tick and at the
++/// episode's start, and the episode's sums: commands run, movement (µm), live ticks and ticks counted apart.
++#[derive(Default)]
++struct FastClock {
++    episodes: Vec<(u64, u64)>,
++    bound: i64,
++    prev: Option<[i32; 4]>,
++    refused: [u64; 2],
++    base: [u64; 2],
++    sums: [i64; 4],
++}
++
++impl FastClock {
++    /// Room tick `k` ran: `me` the fast client's soldier record, `run` its commands run, `refused` its kind-1 and kind-2
++    /// counts. At an episode's last tick, that episode's record: excess commands (run less the episode's ticks and the
++    /// bound), excess movement (moved less the honest arithmetic, the live ticks plus the bound at full walking speed:
++    /// U4F-Q11 (iii) (c)), the episode's refusals (SA-6) and the ticks counted apart (dead at the start or the end: A1).
++    fn tick(
++        &mut self,
++        k: u64,
++        me: Option<[i32; 4]>,
++        run: u32,
++        refused: [u64; 2],
++    ) -> Option<EventRecord> {
++        let moved = self
++            .prev
++            .zip(me)
++            .and_then(|(a, b)| crate::logs::moved_um(a, b));
++        self.prev = me;
++        let before = std::mem::replace(&mut self.refused, refused);
++        let &(a, b) = self.episodes.iter().find(|(a, b)| (*a..*b).contains(&k))?;
++        if k == a {
++            (self.sums, self.base) = ([0; 4], before);
++        }
++        self.sums[0] += i64::from(run);
++        match moved {
++            Some(m) => (self.sums[1], self.sums[2]) = (self.sums[1] + m as i64, self.sums[2] + 1),
++            None => self.sums[3] += 1,
++        }
++        if k + 1 < b {
++            return None;
++        }
++        let top = crate::logs::MOVE_CM_S * 10_000 / i64::from(npt_sim::TICK_HZ);
++        let [cmds, moved, live, apart] = self.sums;
++        Some(
++            EventRecord::new("fast_clock", Phase::Measured)
++                .with("slot", 0)
++                .with("excess_cmds_count", cmds - ((b - a) as i64 + self.bound))
++                .with("excess_move_um", moved - (live + self.bound) * top)
++                .with("lead_refused_count", refused[0] - self.base[0])
++                .with("not_newer_count", refused[1] - self.base[1])
++                .with("move_apart_count", apart),
++        )
++    }
 +}
 +
 +/// A fresh endpoint of `slot` for a run: its fixed lead or U4f's controller, its starts and its bite.
@@ -1649,7 +2051,7 @@ index 311e0a9..5c37b62 100644
  }
  
  /// One burst of B1 for one client: (start, return), its heal, and what -18's record carries beside it.
-@@ -871,6 +1052,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -871,6 +1148,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          s.arm_tick,
          &s.bites,
      );
@@ -1661,7 +2063,7 @@ index 311e0a9..5c37b62 100644
      let quant = s.bites.quant();
      let mut schedule = s.bites.schedule();
      let net = s.bites.net(s.seed);
-@@ -891,17 +1077,28 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -891,17 +1173,39 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          s.bites.whole_as_lost,
      )
      .map_err(fail)?;
@@ -1670,6 +2072,14 @@ index 311e0a9..5c37b62 100644
      let mut rng = s.seed ^ 0x6c61_622d_6f66_6673;
      let order = connect_order(n, &s.bites);
      let mut clients: Vec<Client> = Vec::new();
++    // -21's 1.5x clock (2.6): slot 0 on a fixed-lead endpoint (its stamps are its own rule's), its host clock at 1.5
++    // from the measured start.
++    let fast_from = (s.suite == "fast-clock").then(|| due_ns(s.warmup_ticks));
++    let mut fast = fast_from.map(|_| FastClock {
++        episodes: episodes(s.warmup_ticks, s.measured_ticks, s.fast_episode_ns),
++        bound: i64::from(server.room.lead_bound().1),
++        ..FastClock::default()
++    });
      for &slot in &order {
          let link = net.connect(s.profile.clone(), MAX_DATAGRAM, 0);
 -        let endpoint = ClientEndpoint::new(join_of(s.seed, slot), npt_sim::TICK_HZ)
@@ -1678,7 +2088,10 @@ index 311e0a9..5c37b62 100644
 -        let endpoint = s.bites.client(endpoint);
 -        let behaviour = if s.behaviour == "brawl" {
 -            Behaviour::brawl(&scene, slot, s.seed)
-+        let endpoint = endpoint_of(s, slot);
++        let endpoint = match fast_from {
++            Some(_) if slot == 0 => endpoint_of(s, slot).with_lead(s.lead),
++            _ => endpoint_of(s, slot),
++        };
 +        let behaviour = if s.suite == "clock" {
 +            Behaviour::never_fires(&scene, slot, s.seed)
 +        } else if s.suite == "clamp" && slot == 0 {
@@ -1696,7 +2109,7 @@ index 311e0a9..5c37b62 100644
          } else {
              Behaviour::script(&scene, slot, s.seed, &s.behaviour)
                  .ok_or_else(|| Failure::Usage(format!("--behaviour {:?}", s.behaviour)))?
-@@ -911,6 +1108,21 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -911,6 +1215,24 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          } else {
              behaviour
          };
@@ -1712,19 +2125,23 @@ index 311e0a9..5c37b62 100644
 +        } else if s.suite == "lag-switch" && slot == 0 {
 +            // -21's lag switch (2.6): slot 0's `Input`s held, then sent in a burst.
 +            behaviour.lag_switch(s.lag_hold_ms * 1_000_000, s.lag_every_ms * 1_000_000)
++        } else if fast_from.is_some() && slot == 0 {
++            // A command at every step, its lane's walk, its stamps by U4F-Q11 (v) (b) as F1 amends it.
++            Behaviour::fast_clock(&scene, slot, s.seed, server.room.lead_bound().1)
 +        } else {
 +            behaviour
 +        };
          let bytes_log = match &s.bytes {
              None => None,
              Some(dir) => {
-@@ -933,8 +1145,13 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -933,8 +1255,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              last_stamp: None,
              duplicates: 0,
              bytes_log,
 +            seq: u64::from(slot),
 +            first_sample_ns: None,
 +            read: false,
++            fast_from: fast_from.filter(|_| slot == 0),
          });
      }
 +    // The clock suite's connects begun (each slot's first, then one per reconnect).
@@ -1732,7 +2149,7 @@ index 311e0a9..5c37b62 100644
      clients.sort_by_key(|c| c.slot);
      let digest = order_digest(&order);
      let mut mirror = Mirror::new(scene.slots(), scene.effect_rows(), scene.name() == "ES");
-@@ -969,6 +1186,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -969,6 +1297,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      let measured_end = s.warmup_ticks + s.measured_ticks;
      let last_measured = logs.wide(s.tick_start.wrapping_add((measured_end.max(1) - 1) as u32));
      let mut events_stamped: u64 = 0;
@@ -1740,7 +2157,7 @@ index 311e0a9..5c37b62 100644
      let mut inputs: Vec<i64> = Vec::new();
      // The link-lost-overstated bite: the slots whose record it has written (bites builds only).
      #[cfg(feature = "bites")]
-@@ -1003,10 +1221,16 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1003,10 +1332,16 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  )));
              }
              logs.admit(slot, session, tick, phase(k)).map_err(fail)?;
@@ -1757,7 +2174,7 @@ index 311e0a9..5c37b62 100644
          // (3) the server tick, if due.
          for _ in 0..woke.to_run {
              let ph = phase(k);
-@@ -1017,6 +1241,43 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1017,6 +1352,59 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              }
              let records = npt_sim::SimCore::entity_records(server.room.sim()).to_vec();
              let index = Records::new(&records);
@@ -1798,10 +2215,26 @@ index 311e0a9..5c37b62 100644
 +                    .refused
 +                    .extend(rep.refusals.iter().filter(|x| x.slot == 0).map(|x| x.seq));
 +            }
++            // -21's fast clock: slot 0's episode sums, each episode's record at its end (lab log).
++            if let Some(f) = fast.as_mut() {
++                let me = records
++                    .iter()
++                    .find(|r| r.kind == npt_sim::EntityKind::Soldier && r.index == 0)
++                    .map(|r| [r.grid[0], r.grid[1], r.grid[2], r.grid[6]]);
++                let c = server.room.client(0);
++                let run = c.map_or(0, |c| c.commands_run());
++                let refused = c.map_or([0; 2], |c| {
++                    [c.counters().lead_refused, c.counters().not_newer]
++                });
++                if let Some(mut e) = f.tick(k, me, run, refused) {
++                    e.t = Some(logs.wide(t));
++                    logs.lab_event(&e).map_err(fail)?;
++                }
++            }
              let mut sizes = vec![Vec::new(); usize::from(n)];
              let mut sets = vec![SetStats::default(); usize::from(n)];
              let mut link = vec![0u32; usize::from(n)];
-@@ -1102,6 +1363,8 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1102,6 +1490,8 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              for (slot, _) in std::mem::take(&mut server.ended) {
                  logs.gone(slot);
              }
@@ -1810,7 +2243,7 @@ index 311e0a9..5c37b62 100644
              if s.logs {
                  events_stamped += logs
                      .room_tick(&server.room, t, ph, &sets, &sizes, &inputs, &link)
-@@ -1112,7 +1375,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1112,7 +1502,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  .world_hashes
                  .push((t, npt_sim::SimCore::state_hash(server.room.sim())));
              k += 1;
@@ -1819,7 +2252,18 @@ index 311e0a9..5c37b62 100644
                  for c in &clients {
                      if !logs.started(c.slot) {
                          return Err(fail(format!(
-@@ -1137,19 +1400,58 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1128,28 +1518,71 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+             if c.next_step_ns > now {
+                 continue;
+             }
+-            let host = now + c.offset_ns;
++            let host = c.host(now);
+             let mut received = std::mem::take(&mut c.inbox);
+             while let Some(r) = c.link.poll_recv(now) {
+-                received.push((r.channel, r.bytes, r.arrival_ns + c.offset_ns));
++                received.push((r.channel, r.bytes, c.host(r.arrival_ns)));
+             }
+             if let Some(w) = c.bytes_log.as_mut() {
                  write_step(w, host, &received).map_err(fail)?;
              }
              c.endpoint.input(None, &received, host);
@@ -1860,7 +2304,11 @@ index 311e0a9..5c37b62 100644
                  view.clear();
              }
 -            if c.behaviour.step(&mut c.endpoint, &[], host, &view) {
-+            if c.behaviour.step(&mut c.endpoint, &[], host, &view) && !s.controller {
++            // 5.3's p20: the fast client gives no command for the idle's span from the measured start.
++            let idle = c
++                .fast_from
++                .is_some_and(|m| (m..m + s.fast_idle_ns).contains(&now));
++            if !idle && c.behaviour.step(&mut c.endpoint, &[], host, &view) && !s.controller {
                  let stamp = c.endpoint.newest_tick().map(|t| t.wrapping_add(s.lead));
                  if stamp.is_some() && stamp == c.last_stamp {
                      c.duplicates += 1;
@@ -1880,7 +2328,7 @@ index 311e0a9..5c37b62 100644
              for d in &out.datagrams {
                  if matches!(
                      npt_proto::decode(Direction::ClientToRoom, Channel::Datagram, d),
-@@ -1162,7 +1464,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1162,7 +1595,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              for (ch, b) in &out.reliable {
                  c.link.send_reliable(*ch, b, now);
              }
@@ -1891,7 +2339,24 @@ index 311e0a9..5c37b62 100644
              for w in &out.wraps {
                  let t = c.endpoint.newest_tick().unwrap_or(s.tick_start);
                  logs.wrapped(w, t, phase(k)).map_err(fail)?;
-@@ -1256,21 +1560,50 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1192,13 +1627,13 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+                     logs.lab_event(&e).map_err(fail)?;
+                 }
+             }
+-            c.next_step_ns = out.next_due_ns.saturating_sub(c.offset_ns).max(now + 1);
++            c.next_step_ns = c.sim(out.next_due_ns).max(now + 1);
+         }
+         // Every client link's arrivals into its inbox (the socket's buffer), stamped on its host clock.
+         for c in &mut clients {
+             while let Some(r) = c.link.poll_recv(now) {
+-                c.inbox
+-                    .push((r.channel, r.bytes, r.arrival_ns + c.offset_ns));
++                let at = c.host(r.arrival_ns);
++                c.inbox.push((r.channel, r.bytes, at));
+             }
+         }
+         logs.flush().map_err(fail)?;
+@@ -1256,21 +1691,50 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          summary.buffer_full += k.buffer_full;
          summary.rewinds_refused += k.rewinds_refused;
          summary.stale += c.endpoint.stale();
@@ -1949,7 +2414,7 @@ index 311e0a9..5c37b62 100644
      summary.audit = mirror.audit.clone();
      last.push(
          EventRecord::new("fate_log", Phase::After).with("sha256", summary.fate_log_sha256.clone()),
-@@ -1332,6 +1665,55 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1332,6 +1796,55 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      Ok(summary)
  }
  
@@ -2005,7 +2470,7 @@ index 311e0a9..5c37b62 100644
  /// Which burst of the profile starts at `start` (its index, 0 to 9).
  fn bursts_index(p: &Profile, start: u64) -> usize {
      p.bursts_ns.iter().position(|b| b.0 == start).unwrap_or(0)
-@@ -1367,8 +1749,23 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1367,8 +1880,23 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
      let mut p: BTreeMap<String, Value> = BTreeMap::new();
      let w = s.scene.weapon();
      p.insert("suite".into(), suite.into());
@@ -2031,7 +2496,7 @@ index 311e0a9..5c37b62 100644
      p.insert("tick_start".into(), s.tick_start.into());
      p.insert(
          "ticks_below_wrap".into(),
-@@ -1388,7 +1785,20 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1388,7 +1916,26 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
      p.insert("soldier_health_count".into(), s.scene.health().into());
      p.insert("warmup_ticks_count".into(), s.warmup_ticks.into());
      p.insert("measured_ticks_count".into(), s.measured_ticks.into());
@@ -2041,6 +2506,12 @@ index 311e0a9..5c37b62 100644
 +    if s.suite == "lag-switch" {
 +        p.insert("lag_hold_ns".into(), (s.lag_hold_ms * 1_000_000).into());
 +        p.insert("lag_every_ns".into(), (s.lag_every_ms * 1_000_000).into());
++    }
++    if s.suite == "fast-clock" {
++        p.insert("fast_clock_episode_ns".into(), s.fast_episode_ns.into());
++        if s.fast_idle_ns > 0 {
++            p.insert("fast_clock_idle_ns".into(), s.fast_idle_ns.into());
++        }
 +    }
 +    if s.suite == "clock" {
 +        p.insert("connects_count".into(), s.connects.into());
@@ -2053,18 +2524,18 @@ index 311e0a9..5c37b62 100644
      p.insert(
          "features".into(),
          Value::Array(if cfg!(feature = "bites") {
-@@ -1422,7 +1832,9 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
+@@ -1422,7 +1969,9 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
  [--twin <run>] [--suite <name>] [--clients <n>] [--tick-start <n>] [--event-start <n>] [--cmd-start <n>] \
  [--warmup-s <s>] [--measured-s <s>] [--after-max-s <s>] [--behaviour brawl|presses|clamp|steady] [--bursts <n>] \
  [--burst-first-s <s>] [--burst-every-s <s>] [--bite <id> [--arm-tick <n>]] [--record <file>] [--bytes <folder>] \
 -[--every-step 1] [--lead <1..8>] [--logs 0 (with --record)]";
 +[--every-step 1] [--lead <1..8>] [--logs 0 (with --record)] [--cmd-timing A|B] [--controller 0|1] \
 +[--brawl-press-every <n> (the brawl)] [--event-cap <n>] [--connects <n> (with --suite clock)] \
-+[--twin-logs <folder> (the clamp twin)]";
++[--twin-logs <folder> (the clamp twin)] [--fast-clock-episode-s <s>] [--fast-clock-idle-s <s>] (with --suite fast-clock)";
  
  /// B1's burst starts (u4r-brief.md 7.1, -18's row): `count` bursts, the first `first_s` after the measured phase's
  /// first tick and one every `every_s`, each starting a seeded offset in [0, 1 tick) after its tick boundary.
-@@ -1529,6 +1941,10 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -1529,6 +2078,10 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
              "--behaviour {behaviour:?}: brawl, presses, clamp or steady"
          ));
      }
@@ -2075,7 +2546,7 @@ index 311e0a9..5c37b62 100644
      let bursts = num(take("bursts"), "bursts", 10)?;
      let burst_first_s = num(take("burst-first-s"), "burst-first-s", 30)?;
      let burst_every_s = num(take("burst-every-s"), "burst-every-s", 60)?;
-@@ -1549,6 +1965,40 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -1549,6 +2102,48 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
          Some("0") => false,
          Some(v) => return Err(format!("--logs {v:?}: 0 or 1")),
      };
@@ -2101,6 +2572,14 @@ index 311e0a9..5c37b62 100644
 +    if lag_hold_ms >= lag_every_ms || lag_hold_ms.max(lag_every_ms) > 3_600_000 {
 +        return Err("--lag-hold-ms below --lag-every-ms, each at most an hour".to_owned());
 +    }
++    let fast_episode_s = num(take("fast-clock-episode-s"), "fast-clock-episode-s", 60)?;
++    let fast_idle_s = num(take("fast-clock-idle-s"), "fast-clock-idle-s", 0)?;
++    if fast_episode_s == 0 || fast_episode_s.max(fast_idle_s) > 3_600 {
++        return Err(
++            "--fast-clock-episode-s from 1 and --fast-clock-idle-s, each at most an hour"
++                .to_owned(),
++        );
++    }
 +    let connects = num(take("connects"), "connects", 0)?;
 +    if (suite == "clock") != (connects > 0) {
 +        return Err("--suite clock and --connects <n> (from 1) go together".to_owned());
@@ -2116,7 +2595,7 @@ index 311e0a9..5c37b62 100644
      let lead_override = take("lead")
          .map(|v| {
              v.parse::<u32>()
-@@ -1669,10 +2119,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -1669,10 +2264,22 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
          after_max_ticks,
          burst_spacing_ns,
          behaviour,
@@ -2134,10 +2613,12 @@ index 311e0a9..5c37b62 100644
 +        twin_logs,
 +        lag_hold_ms,
 +        lag_every_ms,
++        fast_episode_ns: fast_episode_s * SEC,
++        fast_idle_ns: fast_idle_s * SEC,
          record,
          bytes,
          logs,
-@@ -1722,7 +2182,12 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
+@@ -1722,7 +2329,12 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
          } else {
              ""
          },
@@ -2151,7 +2632,7 @@ index 311e0a9..5c37b62 100644
          o.commands,
          o.skipped,
          o.duplicates,
-@@ -2987,4 +3452,504 @@ pub(crate) mod tests {
+@@ -2987,4 +3599,617 @@ pub(crate) mod tests {
              "L from the counts, never the written record"
          );
      }
@@ -2620,6 +3101,119 @@ index 311e0a9..5c37b62 100644
 +        let c = crate::contract::check(&logs, include_str!("../../../marks/SERIES.md"));
 +        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
 +        assert!(names.is_empty(), "{names:?}");
++    }
++
++    /// f37 (TE3-6, TE31-10): the lab's own episode function at the judged settings (a 10 s warm-up, 610 s measured)
++    /// gives 10 back-to-back episodes of 60 s, the first from the measured start, all inside the measured window; at
++    /// 5.3's (10 s, 70 s), 1.
++    #[test]
++    fn f37_the_fast_clocks_judged_schedule_is_ten_episodes_of_60_s() {
++        let tick = |ms: u32| u64::from(npt_sim::ticks_for_ms(ms));
++        let (w, e) = (tick(10_000), tick(60_000));
++        let want: Vec<(u64, u64)> = (0..10).map(|i| (w + i * e, w + (i + 1) * e)).collect();
++        assert_eq!(episodes(w, tick(610_000), 60 * SEC), want);
++        assert!(want[9].1 <= w + tick(610_000));
++        assert_eq!(episodes(w, tick(70_000), 60 * SEC), vec![(w, w + e)]);
++    }
++
++    /// The fast-clock suite's short run (2.10's scale: 16 clients, P0, 2 s + 4 s, 2 s episodes), option `timing`,
++    /// slot 0 the 1.5x clock and the rest the steady script under the controller: made once per test process and
++    /// option, read by f19 and f28's fast-clock half.
++    fn fast_short(timing: &'static str) -> &'static [npt_log::Log] {
++        static RUNS: [std::sync::OnceLock<Vec<npt_log::Log>>; 2] =
++            [std::sync::OnceLock::new(), std::sync::OnceLock::new()];
++        RUNS[usize::from(timing == "B")].get_or_init(|| {
++            let name = format!("u4f-fast-{timing}");
++            let dir = scratch(&name);
++            let s = settings(
++                &dir,
++                &format!(
++                    "--seed 1 --profile P0 --clients 16 --warmup-s 2 --measured-s 4 --after-max-s 10 \
++                     --controller 1 --cmd-timing {timing} --suite fast-clock --behaviour steady \
++                     --fast-clock-episode-s 2"
++                ),
++            );
++            let o = run(&s).unwrap_or_else(|e| panic!("{name}: {e:?}"));
++            println!("{name}: {}", summary_line(&s, &o));
++            crate::contract::read(&dir).expect("its logs")
++        })
++    }
++
++    /// One fast-clock record's field, signed.
++    fn field(e: &npt_log::EventRecord, k: &str) -> i64 {
++        e.f.get(k).and_then(|v| v.as_i64()).expect("a field")
++    }
++
++    /// f19 (SA-6; A1): the tally on hand-made records (a walk, a death, a respawn: the two ticks with health 0 at
++    /// their start or end move nothing and are counted apart, the respawn's placement no movement), then the short
++    /// fast-clock run under A: each of its two 2 s episodes has lead-bound and not-newer refusals above 0, its excess
++    /// commands at most 0 and its excess movement at most 0.
++    #[test]
++    fn f19_the_fast_clock_runs_within_the_bound_and_is_refused_by_kinds_1_and_2_each_episode() {
++        let mut f = FastClock {
++            episodes: vec![(1, 4)],
++            bound: 12,
++            ..FastClock::default()
++        };
++        let at = |x: i32, health: i32| Some([x, 0, 0, health]);
++        assert!(f.tick(0, at(0, 100), 1, [0, 0]).is_none());
++        assert!(f.tick(1, at(20, 100), 1, [1, 0]).is_none());
++        assert!(f.tick(2, at(20, 0), 1, [1, 2]).is_none());
++        let e = f
++            .tick(3, at(5_000, 100), 1, [3, 2])
++            .expect("the episode's end");
++        let got = [
++            "excess_cmds_count",
++            "excess_move_um",
++            "lead_refused_count",
++            "not_newer_count",
++            "move_apart_count",
++        ]
++        .map(|k| field(&e, k));
++        assert_eq!(got, [3 - 15, 200_000 - 13 * 200_000, 3, 2, 2]);
++        let ep: Vec<&npt_log::EventRecord> = fast_short("A")[2]
++            .events
++            .iter()
++            .filter(|e| e.ev == "fast_clock")
++            .collect();
++        println!("u4f f19: {:?}", ep.iter().map(|e| &e.f).collect::<Vec<_>>());
++        assert_eq!(ep.len(), 2);
++        for e in ep {
++            assert!(field(e, "lead_refused_count") > 0 && field(e, "not_newer_count") > 0);
++            assert!(field(e, "excess_cmds_count") <= 0 && field(e, "excess_move_um") <= 0);
++        }
++    }
++
++    /// f28's fast-clock half, one option: every name the short fast-clock run writes has its row (the contract
++    /// checker's (b)), its header holds the 2 s episode, and its lab log one `fast_clock` record per episode.
++    fn f28_fast(timing: &'static str) {
++        let logs = fast_short(timing);
++        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
++        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
++        assert!(names.is_empty(), "{timing}: {names:?}");
++        let p = &logs[0].header.params;
++        assert_eq!(
++            p.get("fast_clock_episode_ns").and_then(|v| v.as_u64()),
++            Some(2 * SEC)
++        );
++        assert_eq!(
++            logs[2]
++                .events
++                .iter()
++                .filter(|e| e.ev == "fast_clock")
++                .count(),
++            2
++        );
++    }
++
++    #[test]
++    fn f28_option_a_the_fast_clock_suite_writes_each_name_with_its_row() {
++        f28_fast("A");
++    }
++
++    #[test]
++    fn f28_option_b_the_fast_clock_suite_writes_each_name_with_its_row() {
++        f28_fast("B");
 +    }
 +
 +    /// F2: npt-sim's two -21 check bites (`World::CHECK_BITES`, a list apart from `World::BITES`) are accepted by
@@ -4450,10 +5044,10 @@ index d3bddd8..8302434 100644
                  self.reports.ammunition += 1;
                  self.refuse(c, RefusalKind::Ammunition);
 diff --git a/spikes/netcode-proof/marks/SERIES.md b/spikes/netcode-proof/marks/SERIES.md
-index 34a0189..4d95789 100644
+index 34a0189..40fee27 100644
 --- a/spikes/netcode-proof/marks/SERIES.md
 +++ b/spikes/netcode-proof/marks/SERIES.md
-@@ -369,6 +369,24 @@ are written once at the run's end, after the measured phase. No mark reads them
+@@ -369,6 +369,26 @@ are written once at the run's end, after the measured phase. No mark reads them
  |---|---|---|---|---|
  | `tick.s.in_building_slot_area` | pairs (slot, area) | npt-lab (from npt-sim's Soldier records' `area`) | the room log, on every logged tick (any phase) where a soldier's feet are in a building area: each such soldier's slot, then its area (building i is area i + 1: the greybox's area rule, half-open on each footprint), in slot order; absent on a tick with none. The run's summary line prints the measured total as "in a building: N slot-ticks (slots ...)" | none (recorded) |
  
@@ -4474,6 +5068,8 @@ index 34a0189..4d95789 100644
 +| `tick.s.cmd_ran_early_count` | count (ticks), signed | npt-lab (from npt-room's `ClientSlot::ran_early`) | the room log, every room tick: under option A one entry per command run this tick (slot order, each slot's in its run order), its stamp less this tick (positive: run before its stamp; U4F-Q3 (c), reported beside `second.s.buffer_depth_count`, which is 0 under A); empty under option B | none (reported) |
 +| `second.s.event_queue_max_count` | count | npt-lab (from npt-room: the event cap less `ClientSlot::headroom`) | the room log, each second, one per client slot (the run's `clients` entries; 0 for a slot with no joined client): the most gameplay events queued for that client at once in the second, before an overflow resync cleared them (2.8's high-water marks, per 30 s bin and per burst: carry 58; read by ops/runs/c-u4f-cap.mjs) | none (reported) |
 +| `event.reorder.permille`, `.up_permille`, `.down_permille` | permille | npt-lab (L1, from npt-l1's fate log) | once per scenario run, at its end: the measured reorder share as the -3 probe computes it (each direction's RFC 4737 reordered datagrams per 1000 delivered; `permille` the lower), the event route the `reorder` rule already reads (the row `header.params.reorder_permille / event reorder (permille)` names it) | the `reorder` rule (no change to it) |
++| `header.params.fast_clock_episode_ns`, `.fast_clock_idle_ns` | ns | npt-lab | present on a fast-clock run (`--suite fast-clock`): its episode length (`--fast-clock-episode-s`: 60 s in the judged runs; 2.6's schedule, the measured window's back-to-back whole episodes from its start), and, only when above 0, how long from the measured start the fast client gives no command (`--fast-clock-idle-s`: 5.3's p20) | none (recorded) |
++| `event.fast_clock.lead_refused_count`, `.not_newer_count`, `.move_apart_count` | count | npt-lab (from npt-room's counters and npt-sim's Soldier records) | per fast-clock episode (field `slot`), beside its excess records: the room's kind-1 (lead-bound) and kind-2 (not-newer) refusals of the fast client's commands in the episode (SA-6), and its ticks with the soldier dead at the tick's start or end (a respawn places it: the advisor's A1), counted apart with no movement | none (reported) |
 +
  ## Series read only by figures (19)
  
@@ -6923,10 +7519,10 @@ index 0000000..d00fe9d
 +}
 diff --git a/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs b/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs
 new file mode 100644
-index 0000000..b1f4c74
+index 0000000..969b181
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs
-@@ -0,0 +1,168 @@
+@@ -0,0 +1,175 @@
 +#!/usr/bin/env node
 +// U4f's short pre-runs (u4f-brief.md 5.3; carry 86; U4R-Q4), on c-u4r-r2.mjs's model, re-made from a commit (the merge
 +// commit: r2's record rule, c-u4r-r2.mjs:2-4) before -20's, -21's and -47's judged sets:
@@ -6949,7 +7545,7 @@ index 0000000..b1f4c74
 +//   (never overwritten): one folder per row, <key>-verdict.json beside it, the copies of marks.json and SERIES.md (their
 +//   sha256s in r2.txt's head), r2.txt; spikes/netcode-proof re-checked before r2.txt is written.
 +// - B6 holds 5.3's p5, p6, p10, p11, p12 and p21, B7 the clamp's p2, p8 and p15, B8 the lag switch's p4, p13, p18
-+//   and p19; -21's other rows (p1, p3, p7, p9, p14, p16, p17, p20) join with their suites.
++//   and p19 and the fast clock's p3, p9, p16 and p20; the forged suite's rows (p1, p7, p14, p17) join with it.
 +// - Its helpers are exported (c-u4f-runs.mjs reads them); main runs only when this file is the entry module.
 +
 +import { spawnSync } from "node:child_process";
@@ -6975,7 +7571,10 @@ index 0000000..b1f4c74
 +const P21 = `${SHORT} --profile P0 --controller 1 --behaviour steady`;
 +/** The lag switch at P1, slot 0 holding its `Input`s 200 ms every 6 s (3 bursts in 20 s: 5.3). */
 +const LAG = `${SHORT} --profile P1 --controller 1 --behaviour steady --suite lag-switch`;
-+const CLAMP_SAYS = "'clamp: 1,000 points beyond reach per weapon kind the sim has' fails by length and the twin check reads a Gap (no twin in 5.3)";
++/** The fast clock at P0, 70 s measured: one whole 60 s episode from the measured start and 10 s (5.3; 2.6's schedule). */
++const FAST = "--scene SS --seed 1 --warmup-s 10 --profile P0 --controller 1 --behaviour steady --suite fast-clock";
++const FAST_SAYS = "'fast clock: 10 runs of 60 s' fails by length (1 episode); the episode's excess, lead-bound and not-newer refusals reported (event.fast_clock)";
++const CLAMP_SAYS ="'clamp: 1,000 points beyond reach per weapon kind the sim has' fails by length and the twin check reads a Gap (no twin in 5.3)";
 +
 +/** 5.3's rows: `build` the npt-lab build (`lab` measured, `bites`), `args` the scenario's settings, `marks` its header's. */
 +export const RUNS = [
@@ -6986,6 +7585,10 @@ index 0000000..b1f4c74
 +  { key: "p13", build: "bites", args: `${LAG} --cmd-timing A --role bite --bite PM-0001-21/no-catchup-cap`, marks: M21, expect: "'lag switch: no tick moves further than the catch-up cap allows' still PASSES (TE-7: it cannot fail at 200 ms); tick.v.lagswitch_cmds_count's max reported (at most 7 expected: D13)" },
 +  { key: "p18", build: "lab", args: `${LAG} --cmd-timing B`, marks: M21, expect: "as p4, under option B (U4F-Q11 (iv))" },
 +  { key: "p19", build: "lab", args: `${LAG} --cmd-timing A --lag-hold-ms 400`, marks: M21, expect: "unjudged (U4F-Q15 (c)): a 400 ms hold, about 12 commands; reported: the commands dropped late by W (about 3 or 4), the input_limited datagrams (about 4), kind-10 refusals 0, tick.v.lagswitch_cmds_count's max at most 8" },
++  { key: "p3", build: "lab", args: `${FAST} --measured-s 70 --cmd-timing A`, marks: M21, expect: `every PM-0001-2 check and the shot band pass; 'fast clock: at most the server's ticks plus the lead bound of commands' and 'fast clock: moves no further than the honest client plus that many ticks of movement' pass; ${FAST_SAYS}` },
++  { key: "p9", build: "bites", args: `${FAST} --measured-s 70 --cmd-timing A --role bite --bite PM-0001-21/not-older-than`, marks: M21, expect: `'fast clock: at most the server's ticks plus the lead bound of commands' FAILS (excess above 0; it passes on p3), the movement check may fail too; ${FAST_SAYS}` },
++  { key: "p16", build: "lab", args: `${FAST} --measured-s 70 --cmd-timing B`, marks: M21, expect: "as p3, under option B (U4F-Q11 (iv))" },
++  { key: "p20", build: "lab", args: `${FAST} --measured-s 130 --cmd-timing A --fast-clock-idle-s 60`, marks: M21, expect: "unjudged (SA3-1; U4F-Q18 (a)): no command for the measured window's first 60 s, then one 60 s episode at 1.5x; reported: the two episodes' excess commands and movement (at most 0), the commands dropped late, the lead-bound refusals (F1's every 10th stamp past the bound closes the bank within 10 commands)" },
 +  { key: "p5", build: "lab", args: `${P20} --cmd-timing A`, marks: M20, expect: "every PM-0001-2 check and the shot band pass; -20's 'at least 99.9 % of commands reach the server before their tick runs' and 'missing inputs at most 0.1 % of player-ticks' pass by name (carry 86; TE3-1); the reorder rule holds (D3)" },
 +  { key: "p6", build: "lab", args: `${P20} --cmd-timing B`, marks: M20, expect: "as p5, under option B (TE-3)" },
 +  { key: "p10", build: "bites", args: `${CLOCK} --role bite --bite PM-0001-47/newest-sample`, marks: "PM-0001-47", expect: "'offset error at most 5 ms after 2 s of samples' FAILS; '1,000 connects' fails by length; it passes on p21" },
