@@ -5,7 +5,7 @@
   **Base:** main last merged in at 3f2fa21 (main 82c605e, PR #54). Main is now 22c6afa (PRs #55, #56, #57: docs/ only,
   `git diff --stat HEAD origin/main -- .claude/ CLAUDE.md AGENTS.md .github/ tools/` empty, 2026-11-18 before 11:44 UTC):
   not taken in; MAIN-52 takes main in when main changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-18 11:44 UTC: U4f's brief filled at launch; the builder next (below).
+- **Last update:** 2026-11-18 11:50 UTC: U4f's brief filled at launch; L4 item 10 re-run; the builder RUNNING.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -76,10 +76,18 @@
   r31_check.py on the result: no unknown id, 0 rev-3 markers, the `<<P`, `<base>` and `@@` left are the name-only
   mentions the fill lists (:125, :151, :164, :266, :275) and item 3's own list (its "P3 to P13" names P4-P12 as a
   range, so the checker's "NOT USED" lines for them are its pre-fill meaning).
-- **Next: (5)** the check-in re-enabled, the saver restarted; **(6)** the builder: one Agent (general-purpose, opus,
-  xhigh, isolation worktree) by the filled brief. Its prompt names the launch head (the brief's commit) for section 1
-  item 1, as U4r's correction did (u4r-build.md:5-15): main's docs-only #55-#57 make origin/main no ancestor of this
-  branch, so a worktree made at origin/main cannot fast-forward and takes the brief's `git switch -c` form.
+  L4 item 10 at launch: D6's diff (7cfae88..`<base>`) prints only carries (+4, entry 90; its cites re-walked by the
+  fill) and the new list under results/ (rows 43 and 50 still hold); stamps_anchors.py: P1-P36 each found once, plan
+  and plan.md unchanged; adv_words_check.py: 37 hit lines, all pass by the fold check's rule (§3): 34 outside his
+  quoted words, :2212 as ruled there, and :6797 and :6799 (his LEAD-BOUND answer) quote rev 3.3's own text back (brief
+  :1510 and :541-542, both in 06d419d4 at 01:17:17 UTC, before his message reached the chat at 11:10:41).
+- **(5) DONE 11:44 UTC:** the check-in re-enabled (next 12:34 UTC), the saver restarted. **(6) LAUNCHED 11:4x UTC
+  (before 11:49):** the builder, one Agent (general-purpose, opus, xhigh, isolation worktree), told to build by the
+  filled brief; its prompt names the launch head 827518bde465cf208e461da5fb605993c2bb3220 (`<base>` plus this card and
+  the filled brief only) for section 1 item 1, as U4r's correction did (u4r-build.md:5-15), since main's docs-only
+  #55-#57 make origin/main no ancestor of this branch; and points to his LEAD-BOUND yes and his two stops at
+  history.md:6801, :6803. SIZE-CHECK (brief :921-943): the plan's M is about 3,000 added lines; the brief's estimate
+  about 5,150 (4,200 to 6,200); his stop past 6,000.
 - **After the build:** the panel in two batches (brief 12 item 8); merge; 5.3's 21 pre-runs; the part-clean at A6's
   place; the sets one at a time (-47, -22, -20, -21: about 6-8 h of runs); U4f's report, with A1's movement reading in
   a line of its own naming who reviewed it (the advisor's A1; read by the advisor and the test-engineer), and every
@@ -143,10 +151,15 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **2026-11-18 11:44 UTC: nothing runs yet;** the builder starts after this save. The saver (`node
-  .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout
-  7200000) restarts with it; the 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (PAUSED at 04:38 UTC, no agent running)
-  is re-enabled with it (update_trigger enabled=true).
+- **2026-11-18 from 11:4x UTC: U4f's builder runs** (agent a856ba7ccb7d032c3; resume it by SendMessage, or a fresh copy
+  that reads its notes and `git diff` first). Its worktree is under .claude/worktrees/ (path and branch in its notes'
+  Block 0: `.checkpoints/netcode-proof-test/u4f-build.md` in the worktree). **At each check-in:** snapshot it,
+  `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree>
+  .checkpoints/netcode-proof-test/wip/u4f-build.patch u4f-build` (one snapshot per live worktree; WIP-CLEAN deletes it
+  when merged or replaced), then save the card; on a cut, check the worktree against its last snapshot first.
+- The saver bnvncmf4z runs from 11:44 UTC (`node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
+  "Claude-Session: …"`, run_in_background, timeout 7200000: it ends by 13:44, restart it while agents run). The 2-hour
+  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (11:44 UTC; next 12:34); pause it when no agent runs.
 - The last workflow: wf_b2a20e74-6aa (the fix pass and the advisor's check), done before 22:43 UTC on 2026-11-17.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
