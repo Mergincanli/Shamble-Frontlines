@@ -119,7 +119,7 @@
    If an agent is lost: start it again with the brief in this step; its notes file says where it was.
 
    **Round 1 so far** (no code edit until all five reviewers are done: they read the working tree):
-   - rust-reviewer, back 13:08 UTC: APPROVE, six Lows (`cs1-types/rust-reviewer-review1.md`): (1) no test fails when
+   - rust-reviewer (12:51:12 to 13:07:27 UTC, from the session record): APPROVE, six Lows (`cs1-types/rust-reviewer-review1.md`): (1) no test fails when
      the hash's tag bytes are removed: add its pair of tables A and B (both keep the rules; one stream without tags)
      to `hash_covers_every_value`; (2) a section name that is a JavaScript reserved word passes the rules but breaks
      `export const <name>`; (3) `broken_rule`'s additions can overflow: `checked_add`; (4) the scratch folder's loop
@@ -129,7 +129,7 @@
      `Section::align()` for the block writer (cs2); decoders cap sender-sized fields, `Join` gets a redacting Debug
      (cs3); the export tests trap on wasm32 if a wasm32 test run is ever added. Its scratch copy `.gate/rr-cs1`
      (gitignored, 32 MB) can go.
-   - test-engineer, back 13:13 UTC: REVISE (`cs1-types/test-engineer-review1.md`). **High 1: the 20-runs record of
+   - test-engineer (12:51:37 to 13:14:19 UTC): REVISE (`cs1-types/test-engineer-review1.md`). **High 1: the 20-runs record of
      step 7 does not hold.** `plant.sh` pointed the worktree at the main folder's `target`; cargo then reused the
      worktree's test binary in the main folder, and its compiled-in `CARGO_MANIFEST_DIR` pointed at the worktree. So
      the 20 runs wrote into `.gate/cs1-types/plant/` (made again by write mode's `create_dir_all`) and hashed main's
@@ -148,7 +148,7 @@
      own 13 defects: 8 caught, 5 missed (T1, T2, T3, T11, T13; T4 passes by design: a width change never reaches
      TypeScript). Its CI edit text is in its notes (write mode over the workspace then `git status --porcelain`
      through an assignment; two tsc calls, one without `--skipLibCheck`; `find` instead of a glob).
-   - engine-architect (since 13:08 UTC), security-auditor (since 12:51 UTC) and netcode-architect (since 13:14 UTC)
+   - engine-architect (since 13:07:58 UTC), security-auditor (since 12:52:01 UTC) and netcode-architect (since 13:15:48 UTC)
      are running.
    - **The fix pass, when all five are back** (then the planted defects and the 20 runs again, with a target folder
      of their own, never shared with the main folder, and a check that every file is newer than each run's start).
@@ -240,5 +240,5 @@
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
   stopped at 12:30:03 UTC for the code push).
-- agents (3 of 3): security-auditor (since 12:51 UTC), engine-architect (since 13:08 UTC), netcode-architect (since
-  13:14 UTC), round 1.
+- agents (3 of 3): security-auditor (since 12:52:01 UTC), engine-architect (since 13:07:58 UTC), netcode-architect
+  (since 13:15:48 UTC), round 1. Times from the session record.
