@@ -196,3 +196,6 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   the token (it keeps its settings) and adding Read did not help. The form's chip "Nov 27 GMT+1" (his screenshot of
   2026-11-17 20:13:53) set both ends of the window to that one day; the session read that screenshot as "end date 27
   November" and called the choices right: a miss of the session's.
+- After reading (his words of 2026-11-18): pull request #2 closed unmerged at 13:51:27 UTC (list_pull_requests:
+  state closed, merged false); the run's logs deleted (delete_workflow_run_logs: "204 No Content"; get_job_logs for job
+  134760377971 then answered 404). No run started on the close (the run list holds the same two runs).

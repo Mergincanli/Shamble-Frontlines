@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 12:11 Amsterdam (11:11 UTC)
+- **Last update:** 2026-11-18 14:52 Amsterdam (13:52 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -403,6 +403,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      yes), pull request #2, run 44292323566 with its one job waiting on `preview` from 11:11:00 UTC; no other run
      started. His one-item list sent. Next: after his approval, read the run, copy its output word for word into the
      results log, close pull request #2 unmerged, delete the run's logs (his words), then the outcome row's next action.
+
+   - **The check's answer (results log, word for word): the token's window is not_before 2026-11-26T23:00:00Z,
+     expires_on 2026-11-27T22:59:59Z**, so it works only on 27 November (Amsterdam); A answered 200 "active" for this
+     account (so the token is recognised and the ID is its account's); B 401/1000, C 401/10000, D exit 1 with 10000 and
+     9109. Cause of all five failures found: the form's "Nov 27" chip set a one-day window. The session read his
+     screenshot of 20:13:53 UTC as "end date 27 November" and called it right: its miss, told to him. The rename is done
+     (his screenshot, 13:49:17 UTC message): the deploy gate is met. Pull request #2 closed unmerged, the logs deleted.
+     Next: the token's window fixed by him (consultation 14 first).
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
