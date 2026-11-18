@@ -289,3 +289,5 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   approval.
 - The rehearsal is complete: deploy, verify and cleanup ran end to end. Still to read: the first `probe` run on `main`
   (schedule ":23"; none had run at 15:04:41 UTC, the cleanup run's last update).
+- The first probe: none yet at 2026-11-18 15:39 UTC (list of probe.yml runs: total_count 0; the merge put probe.yml
+  on `main` at 14:57:11, so the 15:23 slot was the first it could fill). Read again by a check-in at about 16:00 UTC.

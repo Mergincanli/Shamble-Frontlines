@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 16:23 Amsterdam (15:23 UTC)
+- **Last update:** 2026-11-18 16:40 Amsterdam (15:40 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -437,6 +437,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    prepared. The probe's outcomes → next action (consultation 16): green with both setup links gone → nothing to do;
    green with a link still serving → a cleanup finding; red → its results file read; a fix needs a pull request to
    `main`, so he disables the workflow meanwhile. He is told a red "probe" mail could arrive before it is read.
+   - Check-in 1 (fired 15:39:20 UTC): no probe run yet (total_count 0). Check-in 2 scheduled for about 16:00 UTC; a
+     last one at 16:30 UTC if needed, after which "the schedule has not fired" is a finding.
 
 ## Next steps
 1. The probe's first run (step 22) read and recorded.
