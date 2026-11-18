@@ -11,3 +11,5 @@ dist/
 CLAUDE.local.md
 /target/
 test-results/
+packages/sim-worker/pkg/
+packages/e2e/playwright-report/
