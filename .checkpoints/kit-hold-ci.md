@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 16:41 CET (from the clock)
+- **Last update:** 2026-11-18 16:46 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -32,11 +32,33 @@
 2. Session check at 15:38 UTC (get_session): model claude-fable-5-2 (configured and last served); context 671,689 of
    1,000,000 tokens (automatic compaction at 901,600): ask him to compact at a natural stop.
 
+## Steps done (continued)
+3. The "Lane requests" issue is open: #59 (15:41 UTC; body: what it is for, only comments from the `Mergincanli`
+   account count, a comment there is never his word).
+4. The three edits exist as scratch copies under `.gate/kit-hold-ci/` (gitignored; **no kit, gate or CI file is edited
+   yet**) and as diffs in the notes: `kit-hold-ci/kit-edit.diff` (`checkpoint.mjs` +36 lines changed, its tests +87,
+   one bullet in `CHECKPOINTS.md` section 3) and `kit-hold-ci/ci-edit.diff` (the workflow; built by script from the
+   report at 1bfe462, blocks 1 to 3 of "The exact texts asked for"; `cache-mode: none` after `timeout-minutes: 15`;
+   the scratch YAML parses).
+   - The hold: `save` commits locally, does not push, names the files and exits 1 when the commits to push change
+     `Cargo.toml`, `Cargo.lock`, `package.json`, `package-lock.json` or `npm-shrinkwrap.json` (any folder) against the
+     remote branch (main's merge-base for a branch not on the remote). Released by
+     `.checkpoints/<slug>/dependency-check.md` in the commit to push: one line per file, `<sha256>  <path>` as
+     `sha256sum` prints it (`deleted  <path>` for a removed file).
+   - Proven on the scratch copies: `node --test .gate/kit-hold-ci/checkpoint.test.mjs` 30 pass; the same test file
+     against today's script (`CHECKPOINT_SCRIPT=$PWD/.claude/scripts/checkpoint.mjs`): 27 pass, the 3 new fail; the
+     kit's own 27 tests against the edited script: 27 pass.
+5. The plan is written (`kit-hold-ci/plan.md`): risk tier 2; the evidence he asked for (the compare step failing on
+   a planted change: a generated file committed with the executable bit, because a content change fails one line
+   earlier; the clean tree passing; "Cache mode: none" in the job's log; stop if `cache-mode` does not parse); the
+   reading of "nothing else in it" (the report, the DECISIONS entry and the docs pass for #58's merge ride along);
+   change-set 2's plan drafted beside it into this notes folder.
+
 ## Current step
-3. Open the "Lane requests" issue. Read `.claude/scripts/checkpoint.mjs`, its test and `.claude/CHECKPOINTS.md`;
-   write the plan with the exact text of the kit edit and how the hold is released; the advisor agent on the plan;
-   then show Mustafa the exact text and ask for his yes (and for the chat in Accept edits: the guard asks on every
-   `.claude/` and `.github/` edit). No kit or CI file is edited before that.
+6. (15:46 UTC) The advisor agent reviews the plan and both diffs (notes `kit-hold-ci/advisor-plan.md`). Then: show
+   Mustafa the kit edit's exact text with how the hold is released, and ask for his yes and for the chat in Accept
+   edits (the guard asks on every `.claude/` and `.github/` edit). **Stop there for his yes.** If the agent is lost:
+   start it again with the plan and the two diffs.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
@@ -52,4 +74,5 @@
   review (his words on DEP-HOLD's option (c)); CI-CUT part 2.
 
 ## Running work
-- saver: to start. agents: none.
+- saver: background task bzuzw7uzy, started 15:41 UTC on 2026-11-18 (2-hour limit).
+- agents (1 of 3): the advisor agent on the plan (started 15:46 UTC).

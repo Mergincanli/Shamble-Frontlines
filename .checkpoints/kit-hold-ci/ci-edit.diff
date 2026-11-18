@@ -1,0 +1,31 @@
+--- .github/workflows/toolchain.yml	2026-11-14 13:58:03.809585022 +0000
++++ .gate/kit-hold-ci/toolchain.yml	2026-11-18 15:45:08.804011375 +0000
+@@ -29,6 +29,8 @@
+   toolchain:
+     runs-on: ubuntu-24.04
+     timeout-minutes: 15
++    # No cache in this job, restored or saved: code planted for a later step cannot reach another run through it.
++    cache-mode: none
+     steps:
+       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+         with:
+@@ -80,9 +82,19 @@
+                 *) echo "probe inconclusive: curl exit $rc"; exit 1 ;;
+               esac
+               cargo test --workspace --locked
++              SHAMBLE_WRITE_TYPES=1 cargo test --workspace --locked
++              changed=$(git status --porcelain --untracked-files=all -- packages/types/src/generated)
++              [ -z "$changed" ] || { echo "writing the generated types again changed:"; echo "$changed"; exit 1; }
+               cargo test --release -p sim -p protocol --locked
+               cargo build --locked --target wasm32-unknown-unknown -p sim -p protocol -p room -p client-endpoint -p sim-wasm
+               npm ci --offline --ignore-scripts --no-audit --no-fund
+               npm test --workspaces
+               npx --no -- tsc --version
++              strict="--noEmit --strict --noUncheckedIndexedAccess --exactOptionalPropertyTypes --noImplicitOverride --noFallthroughCasesInSwitch --noImplicitReturns --isolatedModules --verbatimModuleSyntax --erasableSyntaxOnly --allowImportingTsExtensions --module preserve --target es2023 --lib es2023"
++              shipped=$(find packages/types/src -name "*.ts" ! -name "*.test.ts" | LC_ALL=C sort)
++              tests=$(find packages/types/src -name "*.test.ts" | LC_ALL=C sort)
++              [ -n "$shipped" ]
++              [ -n "$tests" ]
++              npx --no -- tsc --ignoreConfig $strict $shipped
++              npx --no -- tsc --ignoreConfig $strict --skipLibCheck $shipped $tests
+             '
