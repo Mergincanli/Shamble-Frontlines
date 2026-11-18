@@ -148,9 +148,10 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 1. When both agents have answered: work their results into the plan; the advisor agent reads the changed lines of
    sections 4.1, 16 and 17 once (its own condition); then the questions go to Mustafa: RNG-CRATE, WB-HEALTH,
    DEPART-2, CI-WASM, and the tool's source if security-auditor's reading makes it one.
-2. Step 1 is done (3833e3e). While the answers are awaited, the parts of step 2 that need no new package and no
-   manifest edit may be built: the small server, the Worker's pure modules, the build script's checks (but the
-   server's printed address waits for DEPART-2: build it with the plan's `127.0.0.1` and change it if he says no).
+2. Step 1 is done (3833e3e). The advisor agent's words: "Nothing of step 2 starts before two things: Mustafa's
+   answers [...] and conditions 1-4". So the small server, the Worker's pure modules and the build script's checks
+   wait too, unless the advisor agent rules otherwise when it reads the changed lines (the question is put to it
+   then: none of the three edits a manifest or imports a new library).
 3. Step 2 (the one dependency step) only after his answers to RNG-CRATE, WB-HEALTH and DEPART-2, and nothing of it
    committed or built before security-auditor's answer on exactly that content (plan section 7). During the wait:
    the small server, the Worker's pure modules, the build script's checks.

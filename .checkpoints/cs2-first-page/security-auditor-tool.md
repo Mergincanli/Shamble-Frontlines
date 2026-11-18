@@ -41,3 +41,13 @@ Plan: read plan.md s6-7 + advisor F2; read the 0.2.130 release page/assets via W
   "eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEiLCAic3ViamVjdCI6W3sidXJpIjoicGtnOmdpdGh1Yi93YXNtLWJpbmRnZW4vd2"
   = in-toto Statement v1, first subject uri "pkg:github/wasm-bindgen/w...". No Rekor entry + TSA timestamp = the shape of
   GitHub's own Sigstore instance (as for private-repo attestations), not public-good Sigstore. To confirm from the cert.
+- 21:40 S8 attestation payload, transcribed through WebFetch into .gate/cs2-first-page/tool-check/attestation-payload.webfetch.b64
+  (3,560 b64 chars -> 2,670 B, sha256 53314ce3...e536; decodes to valid JSON; decoder kept in the session scratchpad
+  sec-tool/decode_payload.py, run with python3 -I): in-toto Statement v1, predicateType
+  "https://in-toto.io/attestation/release/v0.2", predicate {purl pkg:github/wasm-bindgen/wasm-bindgen@0.2.130, repository
+  wasm-bindgen/wasm-bindgen, repositoryId 114685405, ownerId 220058222, databaseId 428706067, tag 0.2.130}; 15 subjects:
+  the purl with sha1 c93b8ae848d4d9e6beaeaf9516e18a7cadd818a2 (the tag's commit) + the 14 binary/.sha256sum assets with
+  sha256. musl tarball subject 9687f3bb...227f = .sha256sum content = GitHub-shown digest; .sha256sum subject e7ae0bd6...93f8
+  = local sha256 of the curl'd file. Source-code archives are not subjects (GitHub docs S6: made on request).
+  So the attestation BINDS: tag -> commit -> asset name -> sha256. It says NOTHING about how the binary was built (no
+  workflow, runner or source-to-binary link). Signature not yet checked (needs exact bytes + trust root).
