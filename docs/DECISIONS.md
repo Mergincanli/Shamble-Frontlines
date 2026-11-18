@@ -127,6 +127,35 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-18, 11:08:25 UTC: his go on the merge of #57 (Part 15 of the build plan, "The second
+  lane", with his six answers), what he accepts with it, his answer OLD-LINES, and what comes after** (the build chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-18, 11:31 (Amsterdam
+  time)"; extracted by script from the session's transcript, message 16653b82-ec18-4cb3-acb1-73f6a294381e, whole). The
+  same words stand byte for byte in the message of merge commit 22c6afa0341c36c40479f671736a569adfdb2663 (2026-11-18,
+  11:09:31 UTC; parents d7dad97 and f26ac5b). Before the merge the session read the head again
+  (f26ac5b85396f4b280ba21e57f2a1ea177382d80) and `gate`, `smoke` and `toolchain` on it: green. The question OLD-LINES
+  stands in `docs/reports/2026-11-17-part-15-second-lane.md`, "Decisions needed"; his answer adds to his answer
+  RECORD-FILES (the entry of 2026-11-17, 22:10:34 UTC, below; a dated pointer marks it). Copied by script and checked
+  byte for byte against that merge commit's message:
+> My words of 2026-11-18, 11:31 (Amsterdam time): my go on the merge of pull request #57, and my answer to OLD-LINES.
+>
+> Merge pull request #57 (Part 15 of the build plan, "The second lane", with my six answers; docs only) into main by a merge commit, at head f26ac5b85396f4b280ba21e57f2a1ea177382d80. Put these words in the merge message.
+>
+> Before you merge:
+> - Read gate, smoke and toolchain on that head once more. All three are green, or you stop and tell me.
+> - If the head is not f26ac5b85396f4b280ba21e57f2a1ea177382d80, stop. A later push needs the advisor agent's review and my go again.
+>
+> What I accept with this merge:
+> - My go on the merge of #56 is recorded in docs/DECISIONS.md by this change, as you read my "Keep it to" sentence.
+> - Part 15's text stands as I read it, not edited. Where it differs from my answers, my answers hold.
+> - The size as counted: 220 written lines against the stop line of 300, and 339 copied.
+> - The lines you left as found because another lane wrote them.
+> - As with #56, the checkpoint commits enter main's history with this merge.
+>
+> OLD-LINES (who may fold old lines in the shared record files): (a), for lines about merged pull requests. A docs pass of either lane may move those lines by script, byte for byte, never reworded, also when another lane wrote them. Its report lists each line it moved. Every other line stays with the lane that wrote it, as my answer RECORD-FILES says.
+>
+> After the merge:
+> - Change-set 1, Types (foundation step 2.4): its plan, its review, the build and its pull request, then stop for my go.
 - **Taken by Mustafa, 2026-11-17, 22:59:16 UTC: his go on the merge of #56 (change-set 0 of the build plan), what he
   accepts with it, and what comes after** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account;
   his label: "My words of 2026-11-17, 23:57 (Amsterdam time)"; extracted by script from the session's transcript,
@@ -160,7 +189,9 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`, "Decisions needed". Its answer LANE-SPLIT changes "one pull
   request at a time" in his words of 2026-11-14 (the entry of 13:58:05 UTC, below) to one at a time per lane. Its answer
   VFX-ROUTE is also his word on a seventh package beside the six that ADR 0002 names (a dated pointer marks that list).
-  Copied by script and checked byte for byte against `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`, P1:
+  Pointer, 2026-11-18, change-set 1 (not his words): his answer OLD-LINES of 2026-11-18 (the entry of 11:08:25 UTC,
+  above) adds to its answer RECORD-FILES: "(a), for lines about merged pull requests." Copied by script and checked byte
+  for byte against `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`, P1:
 > My words of 2026-11-17, 23:06 (Amsterdam time): my answers to Part 15's six questions, on revision 2 of the file you sent me, and two small things.
 >
 > 1. LANE-SPLIT (is the split of 15.2 to 15.4 the one the two chats work by): (a), as Part 15 has it. That is my yes to three things:
