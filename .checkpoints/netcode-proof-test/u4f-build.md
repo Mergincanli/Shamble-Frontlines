@@ -797,6 +797,32 @@ rev 3.3 (sha256 135325a0...) and the main session's prompt (which wins where the
 - w3-doc.log (`-x`, 18:35:50-18:36:20 UTC): `node check.mjs --only fmt,doc`: fmt PASS, doc PASS (both builds, host
   and wasm32), exit 0. `df -h /home/user` before end check A: 6.4G avail (84 %). End check A (w3-end-check-a2.log)
   starting.
+- **End check A** (.gate/u4f/w3-end-check-a2.log, `-x`, 18:36:2x-18:50:00 UTC; free 6,503 MiB at the start; HEAD
+  07289a4, diff 54cb6faa..., untracked e8dc3663...; the run spanned the org's spend-limit cut at 18:47 and ended on
+  its own): the six provenance builds exit 0; fmt 0.6 s, clippy 10.0 s, clippy-wasm32 1.8 s, doc 4.0 s, **test 692.1
+  s: measured 630 passed (base 552: +78; builder 2's 619: +11), bites 727 (base 632: +95; builder 2's 716: +11), 0
+  failed, 0 reported a skip**; deps 3.0 s (143 crate files); wasm 41.2 s (27,000 ticks, 0 mismatching both ways;
+  hash-map and std-sin caught as before); refs 1468; marks 81; self 78 of 78; redact 10 of 10, 316 items, 0 findings;
+  **"check: all 11 steps pass"**, exit 0. Provenance: npt-client, npt-room, npt-bots, npt-lab "Compiling ... (<this
+  worktree>/spikes/netcode-proof/crates/...)" in both `--no-run` builds. The test step 692.1 s against 1,207 s: under.
+  The main session confirmed the tree's two hashes unchanged after it (its message). `df -h /home/user` before end
+  check B: 5.3G avail (87 %).
+- **End check B** (.gate/u4f/w3-end-check-b.log, `-x`, 22:4x-22:59:25 UTC; free 5,349 MiB at the start; HEAD 07289a4,
+  diff 54cb6faa..., untracked e8dc3663...: equal to A's, no edit between): the six provenance builds exit 0; fmt 1.1
+  s, clippy 37.5 s, clippy-wasm32 6.1 s, doc 17.7 s, **test 685.6 s: 630 and 727 passed, 0 failed, 0 skipped**; deps
+  3.8 s (143 crate files); wasm 43.9 s (27,000 ticks, 0 mismatching both ways); refs 1468; marks 81; self 78 of 78;
+  redact 316 items, 0 findings; **"check: all 11 steps pass"**, exit 0.
+- Builder 3's test deltas: measured +11 and bites +11 (the same tests in both builds): bots +7 (f19's stamps, U4F-Q11
+  (iii) (c)'s lane test, f15 x5), lab +4 (f37, f19, f28 fast-clock A and B). Negative cases among them: f15 x5, f19
+  (lab) = 6 (builder 2's 6 before: 12 of 2.10's 67 by its own count, plus builder 1's).
+- **The time rule, each new test alone** (.gate/u4f/w3-times.log, `-x -k`, 22:59-23:00:51 UTC, "finished in"): the
+  reference `c62hb_p2_short_every_measured_lost_tick_is_explained` 11.41 s, so the line is 22.82 s; lab f19 7.19, f28
+  fast-clock A 6.99, B 7.17, f37 0.00; bots q11 (iii) (c)'s lane 12.18, f19's stamps 0.00, f15 kinds 1, 2, 4, 5, 6 0.00
+  each. Every one under the line; the test step 692.1 s and 685.6 s, under 1,207 s.
+- D10, the bars line: `git diff --numstat 5b29296b -- spikes/netcode-proof/marks spikes/netcode-proof/crates/judge`
+  prints only `20 0 spikes/netcode-proof/marks/SERIES.md` (builder 3: +2 rows, both new, in U4f's subsection);
+  marks.json, README and the judge unchanged. crates/sim: world.rs 48 added, 3 removed (unchanged by builder 3).
+- **Builder 3 returns here** (the size stop, line 5): nothing more built after B9a.
 
 ### The stop record (line 5; his size stop past 6,000)
 
