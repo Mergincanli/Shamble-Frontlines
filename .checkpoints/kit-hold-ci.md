@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 19:10 CET (from the clock)
+- **Last update:** 2026-11-18 19:20 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -248,12 +248,31 @@
       the final files, 113 lines: script 6, tests 67, rules 2 added; none removed) regenerated at 18:07 UTC.
     - `kit-hold-ci/decisions.mjs` now holds his three messages (not run yet).
 
+23. engine-architect's draft of change-set 2's plan is written (17:20 to about 18:09 UTC):
+    `kit-hold-ci/cs2-plan-draft.md` (777 lines) and its notes; nothing built, no library fetched. Its summary: the
+    Rust simulation as WebAssembly in one Worker at 30 ticks a second, one block per tick to the page, an empty lit
+    ground with a 1 m grid, the backend named, the small server for Brave. New libraries: wasm-bindgen =0.2.130 (and
+    its command-line tool), three 0.187.0, @types/three 0.187.0, vite 8.3.7 declared directly. Planned size about
+    2,900 lines (the build plan says 2,000). Open questions for Mustafa: RNG-CRATE, OVERFLOW-3P, CI-WASM, SIZE-2;
+    twelve points where the build plan is wrong or out of date. NOT reviewed yet: it goes to the advisor agent
+    after #60 is merged, and is taken up from the last checkpoint commit before the deletion.
+24. The replay of change-set 1's miss against the final script (18:12:10 to 18:12:16 UTC; `kit-hold-ci/replay-miss.sh`,
+    results in `replay-miss-results.txt`): the final script holds it (exit 1, names `Cargo.lock, Cargo.toml,
+    crates/protocol/Cargo.toml`, nothing pushed); main's script pushes it (exit 0). The probe of the fixed hole is
+    kept as `kit-hold-ci/probe-colon-folder.mjs`.
+    - A slip (18:11:32 UTC): the first try of the replay script made its scratch clone inside the repository's
+      folder (`run-final-GbS2`, untracked); removed 20 seconds later; nothing committed.
+25. The report's draft is written: `kit-hold-ci/report-draft.md` (the parts that wait for the reviews are marked
+    PENDING). The questions were put to him at 16:23:55 UTC (KIT-TEXT) and 17:48:13 UTC (KIT-FIX, KIT-REMOVED,
+    WATCH-60), by the session's record.
+
 ## Current step
-23. (18:10 UTC) Review round 1 goes on: security-auditor (since 18:04) and test-engineer (since 18:09) run;
-    engine-architect still drafts change-set 2's plan. Meanwhile the report's draft
-    (`kit-hold-ci/report-draft.md`). Then: fix pass if a High or Critical comes (below that: follow-ups, his word);
-    the advisor agent on the head; the verifier; docs (take main in first; DECISIONS by script; docs-keeper); the
-    report into `docs/reports/`; the checkpoint's deletion in the last commit; the pull request ready, label
+26. (18:20 UTC) Running: security-auditor (since 18:04), test-engineer (since 18:09), the verifier (since 18:19; on
+    the code, the evidence and the draft's finished sections). When they are in: follow-ups into the draft (a High
+    or Critical on the kit lines would need a fix and his word; below that: follow-ups, his word of 18:01); then
+    docs (main is still 9b4b518: fetched 18:08; DECISIONS by `decisions.mjs`; docs-keeper for STATUS, ROADMAP, the
+    archive, the map), the report into `docs/reports/2026-11-18-kit-hold-ci.md`, the advisor agent on the head, the
+    checkpoint's deletion in the last commit (no skip mark), CI on that head, the pull request ready with the label
     needs-mustafa.
 
 ## Next steps
@@ -271,8 +290,8 @@
 
 ## Running work
 - saver: background task b4bg0wkfu, started 18:04 UTC on 2026-11-18 on the fixed script (2-hour limit).
-- agents: engine-architect (change-set 2's plan draft, since 17:20 UTC); security-auditor (review 1, since 18:04
-  UTC); test-engineer (review 1, since 18:09 UTC). Done: infra-engineer (review 1).
+- agents: security-auditor (review 1, since 18:04 UTC); test-engineer (review 1, since 18:09 UTC); the verifier
+  (since 18:19 UTC). Done: infra-engineer (review 1), engine-architect (change-set 2's plan draft).
 
 ## For the list of the quality gate v2's plan (his words of 15:38 and 18:01 UTC)
 - A CI check that refuses to build when the lockfile gains an entry with no recorded review (DEP-HOLD's option (c)).
