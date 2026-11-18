@@ -17,10 +17,10 @@ way; both come first.
    before the first build).
    - The record: the commit that added the new dependency (566d1d1, 12:04:33 UTC) carried the skip-CI mark; the
      checkpoint commit made on top of it (da22f96, the same second) did not, because the checkpoint script leaves the
-     mark out when a code commit is ahead, and GitHub reads only the last commit of a push. Both were pushed at
-     12:04:37. `toolchain` run 44300471741 built the nine new packages on a GitHub runner from 12:04:55 to 12:05:07;
-     the cancel, sent at 12:05:01, landed after the build. Nothing was compiled on this machine. Mustafa was told in
-     chat at 12:06:24.
+     mark out when a code commit is ahead, and GitHub reads only the last commit of a push. Both were pushed at 12:04:36
+     (GitHub's record). `toolchain` run 44300471741 built the nine new packages on a GitHub runner from 12:04:55 to
+     12:05:07; the cancel, sent at 12:05:01, landed after the build. Nothing was compiled on this machine. Mustafa was
+     told in chat at 12:06:24.
    - The security check answered at 12:27: all nine packages are clean (checksums equal crates.io's by two routes; no
      advisory; the three build scripts only start the compiler and write in their own output folder; the two macros
      only transform code).
@@ -29,10 +29,10 @@ way; both come first.
      on the code having been clean (see CI-CUT under "Follow-ups").
    - Severity Medium (security-auditor and the advisor agent). The advisor agent ruled the build did not need his
      word first; it is his to weigh here.
-   - One more push came before the advisor agent's ruling on the security answer (12:44): at 12:30:22 commit ef9741c
-     (work in progress: the layout table, and the message types not yet compiled) was pushed with the skip mark as the
-     last commit of its own push, by its exact SHA, with the background saver stopped. No CI run followed it: the next
-     runs (`gate` 870, `toolchain` 169) were on 4d2338f, after the ruling.
+   - One more push came before the advisor agent's ruling on the security answer (12:44): at 12:30:24 commit ef9741c
+     (committed 12:30:22; work in progress: the layout table, and the message types not yet compiled) was pushed with
+     the skip mark as the last commit of its own push, by its exact SHA, with the background saver stopped. No CI run
+     followed it: the next runs (`gate` 870, `toolchain` 169) were on 4d2338f, after the ruling.
    - What binds this chat since: for every new or bumped dependency the manifest and lockfile edits stay uncommitted
      (a text patch in the checkpoint folder keeps them), nothing builds the dependency graph that holds them, and
      other code is committed by path only, until security-auditor has answered. A dependency edit that is committed
@@ -75,21 +75,22 @@ way; both come first.
   for byte against merge commit 22c6afa's message; one dated pointer in this lane's entry for RECORD-FILES.
 - `docs/STATUS.md`, `docs/STATUS_ARCHIVE.md`, `docs/ROADMAP.md`, `docs/REPO_MAP.md` (docs-keeper): #57 merged (22c6afa;
   main's own CI on it green: `gate` with `smoke` run 866, `toolchain` run 165); #58's row and entry; what waits on him;
-  the map's nine new paths. Under his OLD-LINES, 25 lines about merged pull requests were moved by script (the section
-  "Every line the docs pass moved" lists each); under RECORD-FILES every other removed or changed line is this lane's
-  own (the blame check: 34 removed lines, 0 not this lane's and not moved). Lines of other lanes that are now stale were
-  left as found: STATUS's CI line (it names 82c605e) and its Routines block; REPO_MAP's "Last checked" line and its
-  words "empty" for `Cargo.toml`'s table, `crates/` and `packages/`; ROADMAP's "v2, next" line.
+  the map's ten new rows (nine paths and this report). Under his OLD-LINES, 25 lines about merged pull requests were
+  moved by script (the section "Every line the docs pass moved" lists each); under RECORD-FILES every other removed or
+  changed line is this lane's own (the blame check: 34 removed lines, 0 not this lane's and not moved). Lines of other
+  lanes that are now stale were left as found: STATUS's CI line (it names 82c605e) and its Routines block; REPO_MAP's
+  "Last checked" line and its words "empty" for `Cargo.toml`'s table, `crates/` and `packages/`; ROADMAP's "v2, next"
+  line.
 
 ## Evidence
-- **Checks by hand on the final code (65a7b13), from an empty build folder, all exit 0:** `cargo fmt --all --check`;
-  clippy on the workspace, all targets, `-D warnings`, host and wasm32; `cargo test --workspace --locked`
-  (`client-endpoint` 5 tests, `protocol` 2); the release tests of `sim` and `protocol`; the wasm32 build of the five
-  crates; pedantic clippy and `-W missing_docs` on both crates (0 warnings); the type check (below); Vitest in
-  `packages/types` (7 tests); `node tools/gate.mjs --no-smoke` PASS; the repository map check; the netcode proof
-  test's three rules (no root `.cargo/config.toml`; no "type" in the root `package.json`; no non-Markdown file of the
-  set names the spike's folder). Smoke cannot start in this container (Chromium build 1194 wanted, 1243 installed):
-  CI runs it.
+- **Checks by hand on the final code (65a7b13), all exit 0** (the build folder was emptied before the fix pass's checks;
+  the verifier ran them all again): `cargo fmt --all --check`; clippy on the workspace, all targets, `-D warnings`, host
+  and wasm32; `cargo test --workspace --locked` (`client-endpoint` 5 tests, `protocol` 2); the release tests of `sim`
+  and `protocol`; the wasm32 build of the five crates; pedantic clippy and `-W missing_docs` on both crates (0
+  warnings); the type check (below); Vitest in `packages/types` (7 tests); `node tools/gate.mjs --no-smoke` PASS; the
+  repository map check; the netcode proof test's three rules (no root `.cargo/config.toml`; no "type" in the root
+  `package.json`; no non-Markdown file of the set names the spike's folder). Smoke cannot start in this container
+  (Chromium build 1194 wanted, 1243 installed): CI runs it.
 - **CI:** on fe49935, which holds the final code and this change-set's DECISIONS entry: `gate` with `smoke` (runs 874
   and 875) and `toolchain` (runs 172 and 173) green, for the push and for the pull request. The runs on the last
   commit are named in the pull request's description.
@@ -104,7 +105,8 @@ way; both come first.
     own test fails the type check until it follows the rename;
   - a header field added without regenerating: only `generated_layout_is_current` fails (4 passed, 1 failed, exit
     101); its message shows the hash moving from 0x2df78c30 to 0x5d0e9efb;
-  - the hash without its tag bytes, or skipping later sections, fails the hash test (its known answers bite);
+  - the hash without its tag bytes fails the hash test at a known answer; the hash skipping later sections' fields fails
+    it at a changed table;
   - `client-endpoint`'s test binary run outside the copy it was built in stops (`protocol`'s was shown the same way
     by two reviewers' own runs); write mode refuses a missing tree and a linked folder (a file planted outside
     survives); the page's check with a signed read fails in Vitest.
@@ -138,7 +140,7 @@ way; both come first.
   REVISE (the High of miss 2; three Mediums: write mode made a missing folder tree again; one Vitest test that only
   the type check can fail; blind spots in the hash test; four Lows); security-auditor: nothing at Medium or above on
   this change-set's files, three Lows; engine-architect REVISE (the same High; one Medium on this report's word for
-  PM-0002-15; Lows); netcode-architect APPROVE, seven Lows, all doc lines.
+  PM-0002-15; Lows); netcode-architect APPROVE, seven Lows: six doc lines and one optional constant.
 - **The fix pass** (13:30 to 13:41 UTC, commits 1a2ff13 and 65a7b13): every finding taken, except four with a written
   reason: a literal copy of the block's own hash in Rust (known answers from a second implementation hold the hash
   function; the committed file holds the block's value); refusing write mode when `CI` is set (the CI edit below runs
@@ -154,9 +156,14 @@ way; both come first.
   Mediums and three Lows closed, a fourth for plain files only; it re-derived every known answer with its own
   implementation and ran the shared-build-folder case again: both trees now stop); security-auditor: nothing at Medium
   or above, its three Lows closed (the linked-folder cases of round 1 are refused now; a linked crate folder is not:
-  "Follow-ups"); netcode-architect APPROVE (its Lows closed). Round 2 left Lows only; by the review budget they are
-  follow-ups, and the code is as round 2 reviewed it.
-- **The verifier** (effort max): <<VERIFIER>>
+  "Follow-ups"); netcode-architect APPROVE (its six doc-line Lows closed; the optional constant is left for change-set
+  3). Round 2 left Lows only; by the review budget they are follow-ups, and the code is as round 2 reviewed it.
+- **The verifier** (effort max, 14:36 to 15:03 UTC): **PASS**, on this report as it stood at commit 07b58fc and the code
+  65a7b13. It ran the gate without smoke, every hand check, the 30 planted runs and the 20 generator runs again itself
+  (the same set of files), re-derived the hashes with an implementation of its own, compared the public symbols and
+  tests with the plan's list, and checked this report's claims against their records. Nine Lows, all wording of this
+  report, all corrected here (among them: the push times now follow GitHub's record; "about 620" lines of tests, where
+  an earlier count said 634; the checks' build folder).
 - **The advisor agent on the final head:** its word is in the pull request's description.
 
 ## Decisions and deviations
@@ -170,8 +177,9 @@ way; both come first.
      a reserved word would have broken a constant per section, and `align` was the one value the hash did not cover.
 - **Added beside the plan's symbol list:** public `ElementType::name()` and `ElementType::size()`, and the derives
   `Debug, Clone, Copy, PartialEq, Eq` on the three table types; private: the tag constants, a compile-time check that
-  the hash is not 0 (a block of zero bytes can never pass), the tests' helpers and tables. Removed as planned: the two
-  stubs (`stub_builds`, `PACKAGE`).
+  the hash is not 0 (a block of zero bytes can never pass), the tests' helpers and tables; two Vitest tests beyond the
+  plan's (a block of zero bytes; values of the eight message types). Removed as planned: the two stubs (`stub_builds`,
+  `PACKAGE`).
 - **A departure from ADR 0002's words, decided by the build plan:** the draft has ts-rs write "through
   `TS_RS_EXPORT_DIR` in `.cargo/config.toml`". Here the export test names the folder itself: no `#[ts(export)]`, no
   `TS_RS_EXPORT_DIR`, no `.cargo/config.toml` (the netcode proof test's rule bars a root one; `set_var` is unsafe in
@@ -184,19 +192,20 @@ way; both come first.
   writer. R5-TSLINT-OQ3 (does generated TypeScript pass `erasableSyntaxOnly`?): yes for ts-rs's default output and
   for ours, with one exception: ts-rs's `repr(enum)` attribute prints a TypeScript `enum`, so no exported type may
   use it; wasm-bindgen's files are answered in change-set 2.
-- **The provisional fields, for change-set 3's plan** (each marked in its doc line): the join token's format; the
-  widths of `protocol_version`, `slot`, `team`, `squad`, both rates, both `group` fields, `sequence`, `presses`,
-  `move_x` and `move_y`; the move vector's scale; how squads are numbered; what `mode_hash` hashes; which buttons
-  exist (16 is a capacity); `AimPoint` as a whole (its 1 cm step and widths are borrowed from the snapshot encoding of
-  positions; which axis is up); `ViewTime`'s fraction; the form and the width of `Snapshot`'s two command
-  acknowledgements (a sequence or a tick); the order of `Input`'s commands, and whether their sequence numbers must
-  be consecutive (the doc line says "consecutive"; the drafts say only that sequences move forward: netcode-architect,
-  round 2, a Low); the anchor of `Input`'s 16-bit tick offsets (the drafts give the full tick only to the snapshot
-  header). What settles each of 18 items and the checks the decoders must make: `netcode-architect-review2.md`, "For
-  change-set 3"; an anti-cheat table per field: `security-auditor-review1.md` (both in the commit named below).
+- **The provisional fields, for change-set 3's plan** (each marked in its doc line, except the last, which no field
+  carries): the join token's format; the widths of `protocol_version`, `slot`, `team`, `squad`, both rates, both `group`
+  fields, `sequence`, `presses`, `move_x` and `move_y`; the move vector's scale; how squads are numbered; what
+  `mode_hash` hashes; which buttons exist (16 is a capacity); `AimPoint` as a whole (its 1 cm step and widths are
+  borrowed from the snapshot encoding of positions; which axis is up); `ViewTime`'s fraction; the form and the width of
+  `Snapshot`'s two command acknowledgements (a sequence or a tick); the order of `Input`'s commands, and whether their
+  sequence numbers must be consecutive (the doc line says "consecutive"; the drafts say only that sequences move
+  forward: netcode-architect, round 2, a Low); the anchor of `Input`'s 16-bit tick offsets (the drafts give the full
+  tick only to the snapshot header). What settles each of 18 items and the checks the decoders must make:
+  `netcode-architect-review2.md`, "For change-set 3"; an anti-cheat table per field: `security-auditor-review1.md` (both
+  in the commit named below).
 - **Size:** 940 hand-written lines added (12 removed) against 600 planned (1.57 times; his stop line is twice the plan,
-  1,200), by `git diff --numstat` against main, with generated files, the lockfile and docs left out; 634 of them are
-  tests. What grew: the export tests' folder checks (after round 1), the test tables of the layout rules and of the
+  1,200), by `git diff --numstat` against main, with generated files, the lockfile and docs left out; about 620 of them
+  are tests. What grew: the export tests' folder checks (after round 1), the test tables of the layout rules and of the
   hash, a doc line per message field, and rustfmt's default line widths (rustfmt settings are the 2.3 chat's).
 - **A refusal, with the route taken:** at 12:49 UTC Claude Code's built-in check refused an `rm` over a shell variable
   while leftover scratch folders in /tmp were cleaned; the form the check itself names (`"${d:?}"`) was used.
@@ -209,7 +218,7 @@ way; both come first.
 - **No "Lane requests" issue exists** (12:28 UTC: the only open issue is the Night queue, #16), so no request of the
   other lane was taken in (LANE-ISSUE below).
 - **The Part 15 change's size:** its report says 220 written lines, as he accepted; a recount on its final head gave
-  223 (the advisor agent's Low).
+  223 (a Low from the review of #57's final head).
 - **This report's length:** the plan said about 60 lines. The two misses, the pass marks' exact words, the advisor
   agent's conditions and the three exact texts for his decisions made it several times that.
 - This change-set's notes (the plan, the reviewers' notes, the scripts and their results) are deleted in the last
@@ -370,9 +379,9 @@ for; only comments from your account count; a request is never your word); (b) y
 through you. Recommendation: (a).
 
 ## For Mustafa
-1. The file route for a zip: this chat sent you `shamble-cs1-types-test-archive.zip` (never committed). Save it,
-   unpack it, and say whether that worked. It holds `README.txt`, the nine generated files and `sha256.txt`; the
-   README says how to compare one checksum on Windows.
+1. The file route for a zip: this chat sent you `shamble-cs1-types-test-archive.zip` at 15:04 UTC (never committed).
+   Save it, unpack it, and say whether that worked. It holds `README.txt`, the nine generated files and `sha256.txt`;
+   the README says how to compare one checksum on Windows.
 2. Answer DEP-HOLD, CI-TYPES, CI-CUT and LANE-ISSUE when it suits you; none blocks this merge.
 3. Your go on merging pull request #58, after the Advisor's check. No Brave check: nothing a player sees. It is
    needs-mustafa also because two security findings stay open (miss 1 and CI-CUT).

@@ -141,13 +141,13 @@ next change-set, kit-v3-5.
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Change-set 1 of the build plan, Types [2026-11-18, PR #58: draft]** — cs1-types (foundation step 2.4), by lane 1,
-on his words of 2026-11-18 with his go on #57: the first eight message types in `crates/protocol` (plain types, no
-codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript generated into
-`packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's layout-hash check.
-Two review rounds; report `docs/reports/2026-11-18-cs1-types.md`, which tells two misses first (CI built the new
-dependency before its security check; an evidence record withdrawn and redone). Next: the verifier, the advisor
-agent, then his go.
+**Change-set 1 of the build plan, Types [2026-11-18, PR #58: ready, waits for his go]** — cs1-types (foundation step
+2.4), by lane 1, on his words of 2026-11-18 with his go on #57: the first eight message types in `crates/protocol`
+(plain types, no codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript
+generated into `packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's
+layout-hash check. Two review rounds; report `docs/reports/2026-11-18-cs1-types.md`, which tells two misses first (CI
+built the new dependency before its security check; an evidence record withdrawn and redone). The verifier: PASS (15:03
+UTC); the advisor agent: APPROVE (its word on the final head is in #58's description). Next: his go.
 
 **Part 15 of the build plan, the second lane, to main [2026-11-17 to 11-18, MERGED]** — part-15-second-lane, by
 his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
