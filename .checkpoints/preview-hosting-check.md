@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 18:20 Amsterdam (17:20 UTC)
+- **Last update:** 2026-11-18 18:23 Amsterdam (17:23 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -499,6 +499,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      one approval; the build count is his dashboard reading, no Cloudflare login here and the token never seen; the
      verdict his, or "record them"). His screenshot of the project's Deployments page (17:19:10 UTC): no count shown
      there; the overview and the Metrics tab asked before `uploads` starts.
+   - His "achieved" (17:21:40 UTC): Brave steps 1-3 achieved (his word). The Metrics tab: no count shown. The overview:
+     asked once more (the last place plan Part 3 C step 3 names); `uploads` starts on his answer.
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.

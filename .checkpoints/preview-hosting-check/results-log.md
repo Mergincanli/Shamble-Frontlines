@@ -376,3 +376,12 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "3 days ago" (his first upload when he made the project, plan A4). The setup upload (1f6487e4) is not listed (deleted
   15:04:38 UTC). **No count of builds is shown on this page.** The overview and the Metrics tab: asked of him before
   `uploads` starts.
+- His message "achieved" with a screenshot (2026-11-18 17:21:40 UTC, 001061fb-f067-456c-b4f2-bfad995c4127):
+  - **Hosting checklist steps 1, 2 and 3: "achieved"** (his word, in answer to "Reply "achieved" for steps 1 to 3, or
+    name any that are "not yet"").
+  - The Metrics tab, transcribed: selector "Production", range "Last 24 hours"; Requests "Success 0", "Errors 0", "No
+    data is available for this time range"; Subrequests 0; Errors: Internal 0, Script Threw Exception 0, Exceeded CPU
+    Time Limits 0, Exceeded Memory 0, Client Disconnected 0; Median CPU Time and Request duration: every percentile 0.
+    **No count of builds is shown on this tab.** (Requests 0 although production was fetched many times today: what
+    this tab counts is not documented here; recorded, not explained.)
+  - The Workers & Pages overview: not yet seen; asked of him before `uploads` starts (plan Part 3 C step 3 names it).
