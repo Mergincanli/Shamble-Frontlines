@@ -511,3 +511,19 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   44370034770 (c) cs/pd-open (236a6d7, PR 5, 18:28:08), #10 44370043893 (d) cs/pd-off (683e8c0, PR 6, 18:28:11), #11
   44370054922 (a') cs/pdt-one (7370d4b, PR 7, 18:28:15), #12 44370062021 (b') cs/pdt-three push 1 (9ebeeb6, PR 8,
   18:28:17). No other workflow started (no close run).
+- **PM-0006-10 (does GitHub show the preview link on the pull request's page?): yes, logged out.** The session's
+  picture of pull request #3's public page (headless Chromium, no login, 2026-11-18 18:29:33 UTC, HTTP 200;
+  `.gate/preview-hosting-check/day1/pr-page/pr3.png`, 2560x2284, kept out of the repository; its text in pr3.json),
+  transcribed: in the timeline, "Mergincanli deployed to preview now — with GitHub Actions" and a "View deployment"
+  button; below, "This branch was successfully deployed", "1 active deployment", "Show environments". The page's links
+  "preview" and "View deployment" both point to https://cs-pd-one.shamble-preview-check.pages.dev/ (the branch link,
+  the deploy job's environment url). His logged-in page: asked of him (one line). (The deploy job holds no
+  `deployments: write`: the link shows without it, as the security-auditor's L-finding asked to learn.)
+- The six first runs, all conclusion success (verify exit 0: every link of the upload passed; list read 18:30:40 UTC):
+  #7 (a) 18:28:02-18:29:24, #8 (b) push 1 18:28:05-18:29:30, #9 (c) 18:28:08-18:29:32, #10 (d) 18:28:11-18:29:14,
+  #11 (a') 18:28:15-18:29:36, #12 (b') push 1 18:28:17-18:29:57 (created to last update, UTC). The records and the
+  headers files are read in full with the probe after the closes.
+- Push 2 of (b) and (b'), after each branch's first verify had finished (headers-44370024556 at 18:29:27,
+  headers-44370062021 at 18:29:54): `git push` 18:30:19 UTC, cs/pd-three d78dfb4..2244b55, cs/pdt-three
+  9ebeeb6..51130dd (both commits hashed before: the approved texts). Runs #13 44370443574 (b) and #14 44370444666
+  (b'), created 18:30:25, no wait.

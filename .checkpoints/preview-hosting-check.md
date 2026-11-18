@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:30 Amsterdam (18:30 UTC)
+- **Last update:** 2026-11-18 19:31 Amsterdam (18:31 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -585,6 +585,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      44370062021), none waiting. Next: each run's records and verify; the PR-page picture after (a)'s deploy
      (script `.../scratchpad/prpage/shot.js`, output under `.gate/preview-hosting-check/day1/pr-page/`); then push 2 of
      (b) and (b') after their first verify.
+   - PM-0006-10: yes, logged out (pull request #3's public page: "deployed to preview", "View deployment" to
+     https://cs-pd-one.shamble-preview-check.pages.dev/, "This branch was successfully deployed"; picture
+     `.gate/.../day1/pr-page/pr3.png`); his logged-in look asked in the merges message. The six first runs all success.
+     Push 2 of (b) and (b') at 18:30:19 UTC (runs #13 44370443574, #14 44370444666). Next: push 3 after their verify;
+     then I close (a), (a'), (d) and he merges (b), (b') with "Delete branch".
 
 ## Next steps
 1. His answer: sitting 2 tonight or tomorrow; then his list (step 24) and sitting 2.
