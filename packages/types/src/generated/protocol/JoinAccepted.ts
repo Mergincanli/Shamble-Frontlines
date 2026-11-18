@@ -5,7 +5,8 @@
  */
 export type JoinAccepted = { 
 /**
- * The player's slot in the room. Provisional: its width.
+ * The player's slot in the room, which is the soldier's index in the simulation (ADR 0004 part 2). Provisional:
+ * its width follows the wire's entity index.
  */
 slot: number, 
 /**
@@ -13,7 +14,7 @@ slot: number,
  */
 team: number, 
 /**
- * Provisional: its width.
+ * Provisional: its width, and whether squads are numbered per team or across the room.
  */
 squad: number, 
 /**
@@ -33,10 +34,12 @@ content_hash: [number, number, number, number, number, number, number, number, n
  */
 server_tick: number, 
 /**
- * Ticks per second. Provisional: its width.
+ * Ticks per second. The rate is fixed when the game is built (ADR 0004 part 4): the client checks this against
+ * its own and never sets its clock from it. Provisional: its width.
  */
 tick_rate_hz: number, 
 /**
- * Snapshots per second. Provisional: its width.
+ * Snapshots per second, a nominal rate: under pressure the room sends fewer (ADR 0001 part 10), so the client
+ * takes the time between snapshots from their ticks. Provisional: its width.
  */
 snapshot_rate_hz: number, };

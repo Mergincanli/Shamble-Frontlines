@@ -11,7 +11,7 @@ export type Command = {
  */
 tick: number, 
 /**
- * Moves forward only and wraps.
+ * Moves forward only and wraps. Provisional: its width (the drafts say 16 bits or narrower).
  */
 sequence: number, 
 /**
@@ -27,6 +27,15 @@ move_y: number,
  */
 buttons: number, 
 /**
- * A press counter per button, so a resent command neither loses nor doubles a press. Provisional: its width.
+ * A press counter per button, so a resent command neither loses nor doubles a press; each wraps. Provisional:
+ * its width.
  */
-presses: [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number], aim: AimPoint, view_time: ViewTime, };
+presses: [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number], 
+/**
+ * The world point the player aims at.
+ */
+aim: AimPoint, 
+/**
+ * The time the player's view showed when the command was made.
+ */
+view_time: ViewTime, };

@@ -13,11 +13,13 @@ server_tick: number,
  */
 baseline_tick: number | null, 
 /**
- * The sequence of the newest command the room received, which ends its repeats. Provisional: its form.
+ * The sequence of the newest command the room received, which ends its repeats; none before the first.
+ * Provisional: its form (a sequence or a tick) and its width.
  */
 newest_command_received: number | null, 
 /**
- * The sequence of the last command the room ran, where the client's replay starts. Provisional: its form.
+ * The sequence of the last command the room ran, where the client's replay starts; none before the first.
+ * Provisional: its form (a sequence or a tick) and its width.
  */
 last_processed_command: number | null, 
 /**

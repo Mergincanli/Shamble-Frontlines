@@ -1,9 +1,10 @@
 import { expect, test } from "vitest";
-import { LAYOUT_HASH, header } from "./generated/block/layout.ts";
+import { BLOCK_LAYOUT, LAYOUT_HASH } from "./generated/block/layout.ts";
 import { checkLayoutHash } from "./layout-check.ts";
 
 // The hash sits at byte 4 of every block, whatever else the layout holds (the Rust test layout_rules_hold pins it).
 const HASH_AT = 4;
+const header = BLOCK_LAYOUT.header;
 
 /** A block of the header's size with these four bytes where the hash sits. */
 function blockWith(bytes: readonly [number, number, number, number], byteLength: number = header.stride): ArrayBuffer {
@@ -23,12 +24,24 @@ test("a block that carries the generated hash passes", () => {
 });
 
 test("a hash one bit off fails and names both values", () => {
-  const found = (LAYOUT_HASH ^ 1) >>> 0;
-  expect(checkLayoutHash(blockWith(lowestFirst(found)))).toEqual({
+  // The lowest bit, then the highest: a read as a signed number would report the second as a negative value.
+  for (const bit of [0, 31]) {
+    const found = (LAYOUT_HASH ^ (1 << bit)) >>> 0;
+    expect(checkLayoutHash(blockWith(lowestFirst(found)))).toEqual({
+      ok: false,
+      reason: "layout-hash",
+      expected: LAYOUT_HASH,
+      found,
+    });
+  }
+});
+
+test("a block of zero bytes fails", () => {
+  expect(checkLayoutHash(new ArrayBuffer(header.stride))).toEqual({
     ok: false,
     reason: "layout-hash",
     expected: LAYOUT_HASH,
-    found,
+    found: 0,
   });
 });
 

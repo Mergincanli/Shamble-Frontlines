@@ -6,4 +6,13 @@ import type { SnapshotAck } from "./SnapshotAck.ts";
  * Client to room, every tick: the newest snapshot the client decoded per entity group, and every command the room
  * has not acknowledged yet, up to a cap that is data (ADR 0001 part 5).
  */
-export type Input = { acks: Array<SnapshotAck>, commands: Array<Command>, };
+export type Input = { 
+/**
+ * One per entity group the client has decoded a snapshot of.
+ */
+acks: Array<SnapshotAck>, 
+/**
+ * The commands not acknowledged yet, their sequence numbers consecutive. Provisional: their order (which end
+ * is the newest) comes with the codec, which codes each repeat against the newer command beside it.
+ */
+commands: Array<Command>, };

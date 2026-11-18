@@ -4,11 +4,12 @@
 
 export const LAYOUT_HASH = 0x2df78c30;
 
-export const header = {
-  stride: 8,
-  align: 4,
-  fields: {
-    tick: { offset: 0, type: "u32" },
-    layout_hash: { offset: 4, type: "u32" },
+export const BLOCK_LAYOUT = {
+  header: {
+    stride: 8,
+    fields: {
+      tick: { offset: 0, type: "u32" },
+      layout_hash: { offset: 4, type: "u32" },
+    },
   },
 } as const;

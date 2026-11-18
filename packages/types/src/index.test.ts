@@ -4,14 +4,16 @@ import type { AimPoint, Command, Input, Join, JoinAccepted } from "./index.ts";
 import type { LayoutCheck, Snapshot, SnapshotAck, ViewTime } from "./index.ts";
 
 test("the package exports the layout, its hash and the check", () => {
-  expect(Object.keys(types).sort()).toEqual(["LAYOUT_HASH", "checkLayoutHash", "header"]);
-  expect(types.header.fields.layout_hash).toEqual({ offset: 4, type: "u32" });
+  expect(Object.keys(types).sort()).toEqual(["BLOCK_LAYOUT", "LAYOUT_HASH", "checkLayoutHash"]);
+  expect(Object.keys(types.BLOCK_LAYOUT)).toEqual(["header"]);
+  expect(types.BLOCK_LAYOUT.header.fields.layout_hash).toEqual({ offset: 4, type: "u32" });
   const check: LayoutCheck = types.checkLayoutHash(new ArrayBuffer(0));
   expect(check.ok).toBe(false);
 });
 
-// The type check (tsc) is what proves these: each message type is exported and has the shape the Rust type gives.
-test("the package exports the eight message types", () => {
+// Only the type check (tsc) proves what this test is for: that each message type is exported and has the shape its
+// Rust type gives. Vitest strips types, so here it can only fail on the three values checked at the end.
+test("values of the eight message types build (their shapes are proven by tsc, not by this run)", () => {
   const hash = Array.from({ length: 32 }, () => 0) as Join["content_hash"];
   const join: Join = { token: [1, 2, 3], protocol_version: 1, content_hash: hash };
   const accepted: JoinAccepted = {

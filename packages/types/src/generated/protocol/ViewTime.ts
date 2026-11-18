@@ -3,7 +3,11 @@
 /**
  * The time the player's view showed: the interpolation tick plus a fraction of a tick.
  */
-export type ViewTime = { tick: number, 
+export type ViewTime = { 
+/**
+ * The interpolation tick.
+ */
+tick: number, 
 /**
  * In 1/65,536 of a tick. Provisional: the simulation's time unit is set with the skeleton.
  */

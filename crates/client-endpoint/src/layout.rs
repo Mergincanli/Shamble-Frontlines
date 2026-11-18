@@ -6,7 +6,9 @@
 /// The element type of a field. A variant enters with its first use.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ElementType {
+    /// One byte, unsigned.
     U8,
+    /// Four bytes, unsigned, little-endian.
     U32,
 }
 
@@ -33,16 +35,22 @@ impl ElementType {
 /// One value of a row: its name, its type and its offset in bytes from the row's start.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Field {
+    /// The field's name, unique in its section: lower-case letters, digits and `_`, a letter first.
     pub name: &'static str,
+    /// Its element type.
     pub ty: ElementType,
+    /// Its offset in bytes from the row's start, a multiple of its type's size.
     pub offset: u32,
 }
 
 /// One section of the block: rows of `stride` bytes, each holding `fields`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Section {
+    /// The section's name, unique in the table, formed like a field's name.
     pub name: &'static str,
+    /// The size of one row in bytes, a multiple of the section's largest field.
     pub stride: u32,
+    /// The row's fields; none overlaps another.
     pub fields: &'static [Field],
 }
 
@@ -60,10 +68,15 @@ pub const BLOCK_LAYOUT: &[Section] = &[
 /// The hash of `BLOCK_LAYOUT`, written into every block's header and printed into the generated TypeScript.
 pub const LAYOUT_HASH: u32 = layout_hash(BLOCK_LAYOUT);
 
+// A block of zero bytes must never pass the page's check.
+const _: () = assert!(LAYOUT_HASH != 0);
+
 const FNV_OFFSET_BASIS: u32 = 0x811C_9DC5;
 const FNV_PRIME: u32 = 0x0100_0193;
-/// The byte in front of each section's and each field's bytes in the hashed stream: no two tables give one stream.
+/// The byte in front of each section's bytes in the hashed stream. With it and `FIELD_TAG` the stream reads one way
+/// only, so two tables that keep the layout rules (no 0x00 in a name) never give one stream.
 const SECTION_TAG: u8 = 0x02;
+/// The byte in front of each field's bytes in the hashed stream.
 const FIELD_TAG: u8 = 0x01;
 
 /// FNV-1a, 32 bits (RFC 9923), over one byte stream that states every value of the table. Per section: the section
@@ -74,20 +87,26 @@ pub const fn layout_hash(sections: &[Section]) -> u32 {
     let mut hash = FNV_OFFSET_BASIS;
     let mut s = 0;
     while s < sections.len() {
-        let section = &sections[s];
+        // Every member is named in these two patterns: one added to the table later does not compile until it is
+        // hashed here, or left out here in plain sight.
+        let Section {
+            name,
+            stride,
+            fields,
+        } = sections[s];
         hash = fnv1a(hash, &[SECTION_TAG]);
-        hash = fnv1a(hash, section.name.as_bytes());
+        hash = fnv1a(hash, name.as_bytes());
         hash = fnv1a(hash, &[0]);
-        hash = fnv1a(hash, &section.stride.to_le_bytes());
+        hash = fnv1a(hash, &stride.to_le_bytes());
         let mut f = 0;
-        while f < section.fields.len() {
-            let field = &section.fields[f];
+        while f < fields.len() {
+            let Field { name, ty, offset } = fields[f];
             hash = fnv1a(hash, &[FIELD_TAG]);
-            hash = fnv1a(hash, field.name.as_bytes());
+            hash = fnv1a(hash, name.as_bytes());
             hash = fnv1a(hash, &[0]);
-            hash = fnv1a(hash, field.ty.name().as_bytes());
+            hash = fnv1a(hash, ty.name().as_bytes());
             hash = fnv1a(hash, &[0]);
-            hash = fnv1a(hash, &field.offset.to_le_bytes());
+            hash = fnv1a(hash, &offset.to_le_bytes());
             f += 1;
         }
         s += 1;
@@ -128,8 +147,8 @@ mod tests {
     }
 
     /// The rules every table keeps, or the first one broken. Names are plain (`[a-z][a-z0-9_]*`: no 0x00 for the
-    /// hash's stream, and printable as TypeScript names) and unique; a field sits at a multiple of its size, inside
-    /// the row, on no other field; a row's size is a multiple of its largest field, so typed-array views bind.
+    /// hash's stream, and printable as TypeScript property names) and unique; a field sits at a multiple of its size,
+    /// inside the row, on no other field; a row's size is a multiple of its largest field, so typed-array views bind.
     fn broken_rule(sections: &[Section]) -> Option<String> {
         for (i, section) in sections.iter().enumerate() {
             let name = section.name;
@@ -139,9 +158,7 @@ mod tests {
             let (stride, sizes) = (section.stride, section.fields.iter().map(|f| f.ty.size()));
             let align = sizes.max().unwrap_or(1);
             if stride == 0 || stride % align != 0 {
-                return Some(format!(
-                    "{name}: stride {stride} is not a multiple of {align}"
-                ));
+                return Some(format!("{name}: stride {stride} is no multiple of {align}"));
             }
             for (j, field) in section.fields.iter().enumerate() {
                 let (own, at, size) = (field.name, field.offset, field.ty.size());
@@ -151,13 +168,19 @@ mod tests {
                         "{name}: field name {own:?} is not plain or not unique"
                     ));
                 }
-                if at % size != 0 || at + size > stride {
-                    return Some(format!("{name}.{own}: unaligned or outside the row"));
+                // An earlier field's end cannot overflow: it passed this check in its own turn.
+                let Some(end) = at.checked_add(size).filter(|end| *end <= stride) else {
+                    return Some(format!("{name}.{own}: it ends outside the row"));
+                };
+                if at % size != 0 {
+                    return Some(format!(
+                        "{name}.{own}: offset {at} is no multiple of {size}"
+                    ));
                 }
-                let end = |other: &Field| other.offset + other.ty.size();
+                let ends = |other: &Field| other.offset + other.ty.size();
                 if earlier
                     .iter()
-                    .any(|other| at < end(other) && other.offset < at + size)
+                    .any(|other| at < ends(other) && other.offset < end)
                 {
                     return Some(format!("{name}.{own}: it overlaps another field"));
                 }
@@ -172,15 +195,17 @@ mod tests {
     /// One table per rule, each breaking only that rule.
     #[rustfmt::skip]
     const BAD: &[(&str, &[Section])] = &[
-        ("a name with a capital",        &[section("Row", 4, &[])]),
-        ("an empty name",                &[section("row", 4, &[field("", U8, 0)])]),
-        ("a section name used twice",    &[section("row", 4, &[]), section("row", 4, &[])]),
-        ("a field name used twice",      &[section("row", 4, &[field("a", U8, 0), field("a", U8, 1)])]),
-        ("a stride of 0",                &[section("row", 0, &[])]),
-        ("a stride off its alignment",   &[section("row", 6, &[field("a", U32, 0)])]),
-        ("an unaligned field",           &[section("row", 8, &[field("a", U32, 2)])]),
-        ("a field past the row's end",   &[section("row", 4, &[field("a", U8, 4)])]),
-        ("two fields on the same bytes", &[section("row", 8, &[field("a", U32, 0), field("b", U8, 3)])]),
+        ("a name with a capital",         &[section("Row", 4, &[])]),
+        ("an empty name",                 &[section("row", 4, &[field("", U8, 0)])]),
+        ("a section name used twice",     &[section("row", 4, &[]), section("row", 4, &[])]),
+        ("a field name used twice",       &[section("row", 4, &[field("a", U8, 0), field("a", U8, 1)])]),
+        ("a stride of 0",                 &[section("row", 0, &[])]),
+        ("a stride off its alignment",    &[section("row", 6, &[field("a", U32, 0)])]),
+        ("an unaligned field",            &[section("row", 8, &[field("a", U32, 2)])]),
+        ("a field past the row's end",    &[section("row", 4, &[field("a", U8, 4)])]),
+        ("an offset past the u32 range",  &[section("row", 8, &[field("a", U32, 0xFFFF_FFFC)])]),
+        ("a narrow field on a wide one",  &[section("row", 8, &[field("a", U32, 0), field("b", U8, 3)])]),
+        ("a wide field on a narrow one",  &[section("row", 8, &[field("a", U8, 1), field("b", U32, 0)])]),
     ];
 
     #[test]
@@ -200,9 +225,9 @@ mod tests {
         }
     }
 
+    const FIRST: Section = section("first", 8, &[field("a", U32, 0), field("b", U8, 4)]);
     const SECOND: Section = section("second", 8, &[field("c", U32, 0)]);
-    #[rustfmt::skip]
-    const BASE: &[Section] = &[section("first", 8, &[field("a", U32, 0), field("b", U8, 4)]), SECOND];
+    const BASE: &[Section] = &[FIRST, SECOND];
     /// `BASE` with one thing changed in each table; each is still a table the rules accept.
     #[rustfmt::skip]
     const CHANGED: &[(&str, &[Section])] = &[
@@ -217,6 +242,16 @@ mod tests {
             section("first", 8, &[field("a", U32, 0)]),
             section("second", 8, &[field("b", U8, 4), field("c", U32, 0)]),
         ]),
+        ("field in the second section", &[FIRST, section("second", 8, &[field("c", U8, 0)])]),
+        ("section order",               &[SECOND, FIRST]),
+        ("section count, one more",     &[FIRST, SECOND, section("third", 4, &[])]),
+        ("section count, one less",     &[FIRST]),
+    ];
+    /// Two tables that keep the rules and would give one byte stream without the tag bytes.
+    #[rustfmt::skip]
+    const TAG_PAIR: [&[Section]; 2] = [
+        &[section("a", 0xFFFF_FFFF, &[field("b", U8, 0x7A79_7800), field("c", U8, 0)])],
+        &[section("a", 0xFFFF_FFFF, &[]), section("b", 0x0000_3875, &[field("xyzc", U8, 0)])],
     ];
 
     #[test]
@@ -232,7 +267,16 @@ mod tests {
             );
             seen.push(hash);
         }
-        assert_eq!(LAYOUT_HASH, layout_hash(BLOCK_LAYOUT));
+
+        // Known answers, from a second implementation of the byte stream this file's doc describes (a script, not
+        // this code): they hold the function itself still, whatever the block's own table becomes.
+        assert_eq!(layout_hash(BASE), 0x9adb_ecc7);
+        assert_eq!(layout_hash(&[]), FNV_OFFSET_BASIS);
+        for table in TAG_PAIR {
+            assert_eq!(broken_rule(table), None);
+        }
+        assert_eq!(layout_hash(TAG_PAIR[0]), 0x4265_359c);
+        assert_eq!(layout_hash(TAG_PAIR[1]), 0xbd51_cd2f);
     }
 
     /// The test values of RFC 9923 for FNV-1a, 32 bits.
