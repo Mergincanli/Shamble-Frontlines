@@ -625,3 +625,16 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   gone (1.1); (c) control 2 rows serves; (d) bite 2 rows serves (1.4); the by-hand previews 19 rows serves;
   production 4 rows serves (its own address as expected; three one-off links unjudged); the rehearsal 2 rows gone
   (4.99). No row "not as expected" (as_expected false: 0). Nothing to tell him (the check-in's rule).
+- His screenshot of `preview` with "approved the run also: https://github.com/Mergincanli/shamble-preview-check/actions/runs/44377870587"
+  (2026-11-18 23:15:46 UTC, e6d8a826-ad3a-412f-be18-8ec09bc13788), transcribed: "Environments / Configure preview";
+  "Required reviewers" ticked, "Add up to 5 more reviewers", Mergincanli listed; "Prevent self-review" unticked; "Wait
+  timer" unticked; "Allow administrators to bypass configured protection rules" unticked; "No restriction"; secrets
+  CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, "yesterday"; "This environment has no variables." So the reviewer
+  was on when run #17 started (he ticked it after my list of about 19:06 UTC; when exactly, no record shows). The
+  reviewer-off window (his untick 18:08 UTC) closed at that tick, at some time between 18:51:11 (the last run that ran
+  without waiting) and 19:12:20 UTC (run #17's wait).
+- **The control (PM-0006-32's first row): run #17's deploy job waited on `preview` from 19:12:20 UTC, he approved it,
+  and it ran at 23:15:23 UTC**, word for word: "B9-MARKER: the rewritten deploy job ran at 2026-11-18T23:15:23Z" /
+  "secret: present" (the env block shows "TOKEN: ***": the value masked). So with the reviewer on, a rewritten job
+  waits, and after the approval it reaches the token. Sitting 3 now goes in the plan's order (untick, re-run without a
+  wait, re-tick; SA-R4's re-run must wait and he rejects it; then cs/b9-prod).

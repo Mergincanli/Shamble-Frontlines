@@ -28,3 +28,9 @@ new), WISH where no Slice-1 source asks. Draft: `needs-list-draft.md` in this fo
 - VFX digest (git show d2c4caa:.checkpoints/part-15/shamble-vfx-digest.md, cited by part-15.md:14-15): :18 player.start(id,{seed,nowMs,faction,relation,viewerDistanceM,inputs:{origin,target}}); :60 C7 "each shot, each hit per surface, each blast"; :68 bridge: origin/target from sim's fixed points + cosmetic spread, faction, relation; :90 no input change after start (tracer the hit event corrects).
 - Legacy sounds: sfxShot(w) own :1473; sfxEnemyShot in sound radius :854,:1633,:1646; sfxImpact world hit :1023; sfxBoom blast :1080; sfxReload start :1412 / end :2688; sfxTick hit marker :2495; sfxKill :1536; sfxStep own :2782; sfxClank swap :1382.
 - Sources done; next: advisor check of approach, then write needs-list-draft.md.
+- Draft: header, legend, fields F1-F13 and events E1-E6 written to needs-list-draft.md (legacy cites re-pinned with grep -n; blast FX corrected to G:1079-1084).
+- Draft: wishes W1-W5, left-out list, gaps G1-G9 and counts written.
+- Cites spot-checked (Plan:857, :388, P15:93-94, 0001:313, 0002:293, 0002:301, 0003:313, :445, LOOK_V2:18-24, LOOP_V2:119); fixed LOOP_V2 sprint-to-fire to :125. Next: advisor check before DONE.
+- Advisor check 2 folded in: "Card N (named)" vs "(implied)" status split; "implied by" tags on F6, F8, F11, F12, F13, E2, E6, E5's kind/owner; P15:131-132 added to E3, E4, E5 and P15:131 to F2, F3; gap 3 reworded as P15 vs 0004:545 conflict; gap 10 added (page reads content tables: recoil, reload time, walk/sprint speeds); F4 snap note moved into F4; F2 adds M; F5 cites Plan:339-340; angle units marked as legacy's (0001:280 gives bit widths); header rows H1 (tick, in the block) and H2 (row counts, Card 1 moved to cs4) added since P15:117-118 hands the picture the blocks themselves.
+- Recount from the file: 15 fields (H1-H2, F1-F13), 6 events, 5 wishes, 10 gaps.
+DONE

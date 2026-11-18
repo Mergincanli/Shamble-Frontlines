@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 00:01 Amsterdam (2026-11-18 23:01 UTC)
+- **Last update:** 2026-11-19 00:17 Amsterdam (2026-11-18 23:17 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -647,6 +647,12 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      (44385645676, 19:56:45Z) all as expected at 1.1-1.4 h after the closes. Waiting on his preview screenshot.
    - 2026-11-18 22:57 UTC: run #17 still "waiting"; his lane-2 message (22:56:11 UTC) did not answer the screenshot
      question: asked again in the reply. Meanwhile main b763ba3e merged into this branch (aa02297), his item 1.
+   - His screenshot (23:15:46 UTC): the reviewer on (Mergincanli, self-review and bypass off): his tick came after my
+     list; the off window closed between 18:51:11 and 19:12:20 UTC. He approved run #17: "secret: present" at
+     23:15:23 UTC (the control). Now the plan's order: step 2 (he unticks; I re-run #17 with rerun_workflow_run: no
+     wait, "secret: present"; he re-ticks with a screenshot), SA-R4 (a re-run must wait; he rejects), then cs/b9-prod
+     (refused; production "No restriction", re-run, present; restored with `main`, re-run, refused), then SA-R8.
+     Open window when he unticks: "reviewer off" (from his "unticked" to his re-tick screenshot).
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
