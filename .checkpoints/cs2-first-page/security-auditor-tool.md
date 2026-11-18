@@ -125,3 +125,16 @@ Plan: read plan.md s6-7 + advisor F2; read the 0.2.130 release page/assets via W
   filter='data' available), GNU tar 1.35, readelf, file, strings; no cosign/sigstore CLI. npm's bundled @sigstore/{bundle,
   core,protobuf-specs,sign,tuf,verify} exist, but @sigstore/tuf/seeds.json seeds ONLY https://tuf-repo-cdn.sigstore.dev
   (public-good): GitHub's instance (tuf-repo.github.com) is not seeded, so nothing here can anchor "Fulcio Intermediate l1".
+- 21:57 S20 RFC 3161 timestamp (bundle's rfc3161Timestamps[0].signedTimestamp, WebFetch chunks: 967 chars, one char lost in
+  transcription after the TSTInfo; the aligned first 400 chars decoded; walker sec-tool/derwalk.py): TimeStampResp status 0;
+  SignedData; TSTInfo: policy 1.3.6.1.4.1.57264.2, messageImprint sha256 0003a6a0...e521 = sha256 of the DSSE signature I
+  verified (S10), genTime 20261030061601Z (= release publication 06:16), accuracy 1 s, tsa "O=GitHub, Inc., CN=TSA
+  Timestamping"; signer issuer "O=GitHub, Inc., CN=TSA intermediate", serial 17:33:db:d6:...; SignedData certificates field
+  EMPTY: the TSA cert is not in the bundle, so the TSA signature can only be checked with GitHub's trusted root.
+- 21:58 S21 GitHub docs, verify attestations offline https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/verify-attestations-offline :
+  "Artifact attestations uses the Sigstore public good instance for public repositories, and GitHub's Sigstore instance for
+  private repositories."; "gh attestation trusted-root > trusted_root.jsonl" gets both roots; offline verify with
+  `gh attestation verify <file> -R <owner/repo> --bundle <bundle.jsonl> --custom-trusted-root trusted_root.jsonl`; root
+  "does not have a built-in expiration date"; keys rotate "a few times per year"; "You will not know if key material has
+  been revoked since you last generated the trusted root file." Page says nothing on release attestations; it does not
+  mention TUF. The release attestation here is GitHub's instance even though the repo is public (S9, S20).
