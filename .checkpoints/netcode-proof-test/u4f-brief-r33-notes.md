@@ -176,6 +176,45 @@ one here; L4 item 10's re-run on rev 3.3 should read them against the larger his
    (A6's place)") taken as KL-U4F's trigger; Q5's P25 substitution in section 4 and 12 item 3 and Q6's f1 loss, both as
    the rulings' words in the places they name.
 
+## The advisor's fold-check edits (N/advisor-u4f-fold-check.md; still rev 3.3)
+
+Plan, in order (each old phrase found once by the Edit tool; a miss is listed here, never forced):
+- 1 (a): E1 2.2's pass-marks row; E2-E4 R23's three pieces.
+- 1 (b): E5-E6 5.5's room paragraph; E7 Q2's question; E8 12 item 6's KL-U4F "Why it matters"; E9 NA-5; E10 9.1's
+  npt-server row; E11 9.1's readings-PR row (third cell); E12 R34 after R33.
+- 2 (D3-1): E13 2.7's -20 series row; E14 f40 after f39; E15 the counts (+118 -> +119, +133 -> +134, four each; "the
+  measured 118"; "f1-f39"; f40 in "Made firm ..."); E16 B9 after B8; E17 5.6's "So:"; E18 D3's row whole; E19 12 item
+  13; E20 R35 after R34.
+- Then r31_check.py once, quoted below.
+
+Progress:
+- 1 (a) done: E1 (2.2's row; the phrase now stands nowhere else), E2-E4 (R23).
+- 1 (b) done: E5, E6 (5.5's room paragraph, line breaks kept where they were), E7 (Q2), E8 (12 item 6, rewrapped),
+  E9 (NA-5), E10 (9.1's npt-server row), E11 (9.1's readings-PR third cell, whole), E12 (R34). R35 (E20) put in with
+  R34. rev 3.2's own counts block (:77, "3,607") left, as the check says.
+- 2 done: E13 (2.7's -20 row), E14 (f40 after f39), E15 (+118 -> +119 and +133 -> +134, four each, the first with
+  "f40 (D3-1)"; "the measured 119"; "f1-f40"; "f40 (+1, D3-1); f38"; Grep finds no +118, +133 or f1-f39 left), E16 (B9
+  after B8), E17 (5.6's "So:", matched across its line break), E18 (D3's row whole), E19 (12 item 13, rewrapped), E20
+  (R35). Every edit applied; none failed to match (E17's first try, on one line, did not match; its wrapped form did).
+- Rewraps, whitespace only: 12 item 6's "Why it matters" lines and 12 item 13; a short line in the rev 3.3 counts block,
+  in 2.10's paragraph and in 5.6's "So:", so the lines after them stay as they were.
+- Counts now: at least +119 measured (f40 added), +134 bites, 67 negative cases (T-6's +5 only if contract.rs is
+  edited; P33's moved test -1 +1); 21 pre-runs; disk about 3,727 MiB; SIZE-CHECK unchanged (about 5,150, 4,200 to
+  6,200).
+
+`python3 -I .checkpoints/netcode-proof-test/u4f-r3/r31_check.py` (once, after these edits):
+```
+brief sha256 50530a825b5877d73aca479b55f7449bb1cf2e776a5b87e196da86efffa74ccb lines 1835
+P24 key count: 1 bare words count: 2
+placeholder uses: {'P1': 8, 'P2': 2, 'P3': 3, 'P4': 2, 'P5': 1, 'P6': 2, 'P7': 2, 'P8': 3, 'P9': 2, 'P10': 1, 'P11': 2, 'P12': 1, 'P13': 2, 'P14': 3, 'P15': 12, 'P16': 7, 'P17': 5, 'P18': 4, 'P19': 4, 'P20': 3, 'P21': 8, 'P22': 6, 'P23': 5, 'P24': 2, 'P25': 3, 'P26': 2, 'P27': 5, 'P28': 2, 'P29': 2, 'P30': 3, 'P31': 4, 'P32': 8, 'P33': 3, 'P34': 3, 'P35': 2, 'P36': 4}
+unknown <<P ids: []
+PV1 6 base 34 @@ 4 r3 markers 0
+section 12 item 3: lines 1716 to 1760
+7-word runs outside section 12 item 3: 0
+```
+Brief now: sha256 50530a825b5877d73aca479b55f7449bb1cf2e776a5b87e196da86efffa74ccb, 1,835 lines (rev 3.3 with the
+fold-check edits). Placeholder uses equal the first run's.
+
 ## Done
 All of A1-A7, the 18 Ruled lines, the conditionals, the counts, SIZE-CHECK, the title, the record and the change list
 are in; E4 (the coordinator's added item) is in. Brief: sha256 609bfd169bacb08c024c1788e03537586f00ba4b596b44cc56d3bf9dd35bf0d0,

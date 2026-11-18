@@ -73,9 +73,14 @@
   would be INVALID on a build as briefed (the brief's 2.7 says "U4r's"). Fix (to the advisor with the fold's result):
   U4f's lab writes the measured share for scenario runs (the header param or a `reorder` event, from npt-l1's fate log,
   as the probe computes it), with a test; D3's bar then reads -20's first short run (p5, p6).
-- **L1's fold DONE** (rev 3.3: u4f-brief.md sha256 609bfd16…, 1,827 lines; notes u4f-brief-r33-notes.md); its
-  sent-back items (A3's carry-74 phrase, the unnamed disk ranges, two 9.1 rows, its placement choices), D3-1 and the
-  words check's archive hits are with the advisor now (one read; notes advisor-u4f-fold-check.md). **L4 item 2 DONE:**
+- **L1 DONE: the brief is final at rev 3.3** (u4f-brief.md sha256 50530a825b5877d73aca479b55f7449bb1cf2e776a5b87e196da86efffa74ccb,
+  1,835 lines; notes u4f-brief-r33-notes.md). The advisor's fold check (advisor-u4f-fold-check.md): ACCEPT with 20
+  exact edits, all applied (A3 in 2.2 too; the disk figures restated at 3,727 MiB; 9.1's two rows; **D3-1 confirmed and
+  ruled: a `reorder` event at the run's end, its SERIES.md rows as B9, test f40**, not a bar change, a choice by its
+  ruling named in the day's message); the words check passes on his words alone (the other hits are the archived
+  card). Counts: at least +119 measured, +134 bites build, 67 negative cases; 21 pre-runs; disk about 3,727 MiB;
+  planned size about 5,150 lines. **The fill script RUNNING** (one agent: u4f_fill.py, dry run only, its output
+  u4f-fill-dryrun.md, notes u4f-fill-notes.md); `--apply` is the main session's at launch. **L4 item 2 DONE:**
   u4f-run.sh made by u4f_runner.py from u4r-run.sh (e9437ae2…): 117 lines, 6 changed (the header, the log folder
   .gate/u4f/, the usage line, the log check), sha256 70eb3da5b8ce9a8e2eda582536eeab93f96fb7fbe98e2a74a28e0492ccf6ddae
   (`<<PV1>>`), `bash -n` exit 0, its diff u4f-run.sh.diff.
