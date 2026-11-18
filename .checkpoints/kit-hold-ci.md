@@ -336,6 +336,11 @@
     UTC). Against main the pull request now changes ten files: the four kit and CI files, DECISIONS, STATUS, the
     archive, ROADMAP, the map, the report.
 
+    - CI on e4156f1, read 19:05 UTC (the session's record): `toolchain` push 44376519102 success (19:05:02), pull
+      request 44376533634 success (19:05:04); `gate` workflow, push 44376519103: `gate` and `smoke` success (19:05:10);
+      pull request 44376533569: `gate` success, `smoke` still running then. Sent to the advisor agent; my message to
+      it says "19:06", ten seconds ahead of the clock (noted 19:06:14 UTC).
+
 ## Current step
 37. (19:05 UTC, from the clock) Running: the advisor agent on head e4156f1 (started 19:04 UTC; its notes:
     `kit-hold-ci/advisor-final.md`). CI on e4156f1 at 19:05: both `gate` jobs success, the push's `toolchain`

@@ -15,3 +15,6 @@ Started 2026-11-18 19:04 UTC (date -u). Base main 9b4b518. Work from main's advi
 11. Verdict.
 
 ## Findings (one line each, time from date -u)
+- 19:06 Block 1 done: card read (steps 1-36); his three files read whole; each body equals its stated size and sha256 (1542 / 779 / 2618 B; the trailing newline aside); the merge-58 body stands byte for byte in 9b4b518's message.
+- 19:06 G (from the main session, 19:06): on e4156f1 toolchain push 44376519102 + PR 44376533634 success; gate push 44376519103 gate + smoke success; gate PR 44376533569 gate success, smoke still running. The branch head moved on to a checkpoint commit (notes only, skip mark): no checks on it; the runs are on e4156f1.
+- 19:06 Raw diff vs main: no link (120000) or submodule (160000); outside .checkpoints/ exactly 4 kit/CI files + DECISIONS, REPO_MAP, ROADMAP, STATUS, STATUS_ARCHIVE, the report. Commits touching code: 8bf4bee (3 kit), 94c197f (workflow), 0c0e271/415bd73 (plant + take-back of Join.ts), 4877599 (fix), a18a62b (DECISIONS), e4156f1 (docs + report).
