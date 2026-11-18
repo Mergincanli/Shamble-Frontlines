@@ -127,14 +127,14 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
-- **Taken by Mustafa, 2026-11-18, 18:01:08 UTC: his answers to three questions about the checkpoint script's hold, and
-  the size accepted: KIT-FIX (may a fix to the lines changed after his first answer be written with the exact text
-  shown: yes, as shown), KIT-REMOVED (should a manifest that main removed also pass when a branch takes main in: no, it
-  stays held, and the question goes on the list for the quality gate v2's plan) and WATCH-60 (should the build chat
-  watch pull request #60: no)** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label:
-  "My words of 2026-11-18, 18:52 (Amsterdam time)"; extracted by script from the session's transcript, message
-  1eed5c8d-349d-471c-a9e3-106bfb012cc0, whole). The text he said yes to is `.checkpoints/kit-hold-ci/kit-fix2.diff` at
-  commit f7e232fbfb78d41ec06f72f6444a8973096a1685 (45 lines, sha256
+- **Taken by Mustafa, 2026-11-18, 18:01:08 UTC: his answers to three questions of the build chat, and the size accepted:
+  KIT-FIX (may a fix to the checkpoint script's hold, in the lines changed after his first answer, be written with the
+  exact text shown: yes, as shown), KIT-REMOVED (should a manifest that main removed also pass the hold when a branch
+  takes main in: no, it stays held, and the question goes on the list for the quality gate v2's plan) and WATCH-60
+  (should the build chat watch pull request #60: no)** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his
+  personal account; his label: "My words of 2026-11-18, 18:52 (Amsterdam time)"; extracted by script from the session's
+  transcript, message 1eed5c8d-349d-471c-a9e3-106bfb012cc0, whole). The text he said yes to is
+  `.checkpoints/kit-hold-ci/kit-fix2.diff` at commit f7e232fbfb78d41ec06f72f6444a8973096a1685 (45 lines, sha256
   9197f070e456ac628703f4211380174ccdc037e8bcd4eb1a950da252b7a4d7f9); the three questions as asked, and that text, stand
   in `docs/reports/2026-11-18-kit-hold-ci.md`. Copied by script (779 bytes, sha256
   9c9815fa59e1ea2cdea4cf0e044d27662af43df3514391dd7f86900d40607316):
