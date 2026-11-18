@@ -395,3 +395,18 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - **The first reading of the build count: "no count shown"** on all three places plan Part 3 C step 3 names (the
   project's Deployments page, its Metrics tab, the Workers & Pages overview).
 - `uploads` started by the session right after (run_workflow, ref `main`, set `uploads`; 204 at about 17:23:55 UTC).
+- `uploads` (PM-0006-7's 10 deploys): deploy run #3, id 44358217862 (created 17:23:54 UTC). plan green (17:23:58-17:24:16),
+  build green (17:24:18-17:24:26; SIZES line identical to round-a's: "flagged":[], "count":9); the deploy job "waiting"
+  on `preview` from 17:24:26; his message "approved and deployed" (2026-11-18 17:29:32 UTC,
+  49b34555-967c-4301-89ab-9481638129cf); the deploy job's log runs 17:27:42-17:28:54 UTC (his approval just before
+  17:27:42; one approval, one job).
+  - The 10 uploads to branch `uploads`, each "✨ Success! Uploaded 0 files (8 already uploaded)" (0.22 to 0.40 sec),
+    alias https://uploads.shamble-preview-check.pages.dev, environment "preview", marker 2162db55d93f...: 1 c28fc449
+    (made 17:28:10.728Z), 2 deb45872 (17:28:14.759Z), 3 5b57fa5a (17:28:19.971Z), 4 f512e84d (17:28:24.211Z), 5
+    283bba70 (17:28:30.563Z), 6 a845d2e3 (17:28:34.429Z), 7 37ac53a6 (17:28:38.498Z), 8 51e10edc (17:28:42.226Z), 9
+    ff3ec055 (17:28:46.114Z), 10 44dd439a (17:28:52.521Z) (full IDs in deployment-record-44358217862-uploads, artifact
+    14451668742).
+  - verify (17:28:59-17:29:23; headers-44358217862, artifact 14453018448, zip sha256 1f38f9088428..., equal to its
+    digest): "summary: {"records":10,"pass":20,"fail":0,"no_reading":0}", exit 0: every upload passes on its one-off
+    link and on the branch link (the branch link read once per record), X-Check-Rule "version-host" on all.
+  - Run conclusion: success. The second build-count reading asked of him now.
