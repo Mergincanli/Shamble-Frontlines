@@ -174,10 +174,10 @@
   is not on the remote yet, resume at step 5. Anything else: the advisor rules. (The review: agent a43d2f5b263b6c069,
   23:25-23:40 UTC, APPROVE WITH CONDITIONS C1-C6; the stop ruling's agent ad617f46f49185e8c ended 23:18.) Then R3
   (iii)'s four hand runs.
-- The saver b4p5xbtmj runs from 22:39 UTC (bgig20ts2 ran 18:11 to about 20:01, its window) (`node
-  .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout
-  7200000; its window ends about 00:29: restart it while agents run). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-  is enabled (next about 00:34 UTC); pause it when no agent runs.
+- The saver b4p5xbtmj STOPPED 23:39 UTC for MAIN-60 (C2; its last save 286d9d5 committed, not pushed: C2 (c)'s
+  foreground save pushes it). Restart it after step 6 with both attribution lines as trailers (ADV-M60-8; `node
+  .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: …" --trailer "Claude-Session: …"`,
+  run_in_background, timeout 7200000). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 stays enabled (next 00:34).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and its end (the 19:46 one).
