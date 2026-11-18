@@ -592,3 +592,7 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   deploy runs #7-#16 (six first pushes, two second, two third), the four cleanup runs #2-#5 ((a), (a'), (b), (b')),
   the by-hand probe #2; with the ten runs before sitting 2, 25. No cleanup run for (d), no scheduled probe, nothing
   else. All by Mergincanli.
+- His message "I have deleted both branches 4 and 8," / "You can do sitting 3" (2026-11-18 18:58:58 UTC,
+  49c5e112-f261-48e8-9b31-ee3d56bf008b):
+  git ls-remote at 18:59:29 UTC lists no cs/pd-three and no cs/pdt-three (deleted); cs/pd-one, cs/pd-off, cs/pd-open,
+  cs/pdt-one, check-token, setup and main (347d5e0) remain. Case (b) and (b'): merged, branch deleted, as planned.

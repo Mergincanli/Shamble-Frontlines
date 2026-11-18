@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:57 Amsterdam (18:57 UTC)
+- **Last update:** 2026-11-18 20:01 Amsterdam (19:01 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -606,6 +606,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      trig_013vUKHaNSSNDvcRH4hA6UiE (19:55 UTC, a by-hand probe, the hourly stand-in) and trig_01Fd2yqXX6LL2QP4hLnrCuu6
      (2026-11-19 18:55 UTC, the 24-hour probe). Open in sitting 2: his "Delete branch" on #4 and #8; then step 24 is
      saved as done after a consultation.
+   - His message (18:58:58 UTC, 49c5e112-f261-48e8-9b31-ee3d56bf008b): "I have deleted both branches 4 and 8," / "You
+     can do sitting 3". ls-remote 18:59:29: cs/pd-three and cs/pdt-three gone. Sitting 2's acts are all done.
+   - Sitting 3 prepared (not pushed; from `main` 347d5e0): cs/b9-edit 7f3a684 (deploy.yml = the approved variant
+     fd3dc4c6029b; close, probe, browsers unchanged), cs/b9-prod 9965630 (deploy.yml = 8b745631a278); each changes only
+     deploy.yml. Consultation next (step 24 done; sitting 3's approach), then his list.
 
 ## Next steps
 1. His answer: sitting 2 tonight or tomorrow; then his list (step 24) and sitting 2.
