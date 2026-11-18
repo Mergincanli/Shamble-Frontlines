@@ -115,3 +115,94 @@ only 94c197f touches the file in origin/main..HEAD.
 - Cost/side effects: none measurable (see times above); gate.yml unaffected; no cache existed to lose. One future
   side effect: if a later edit adds `cache: npm` or a packageManager field to this job, the cache silently does nothing
   (informational message only, S1/S2), which is the intent but can puzzle a reader; the comment line explains it.
+
+### Q3 + Q4 local matrix (2026-11-18; git 2.43.0 here, runner git 2.56.1 per main's log 44338178455)
+Scripts (outside the repo): scratchpad/q3/matrix.sh, matrix-root.sh (outputs matrix-out.txt, matrix-root-out.txt), extra.sh.
+The two compare lines copied byte for byte, run in `env -i HOME=... PATH=... LANG=C.UTF-8 bash --norc --noprofile -euo
+pipefail -c`, setpriv --regid=nogroup --clear-groups --no-new-privs. Running as uid 1001 was impossible here (the
+scratchpad's parents are mode 700: git as 1001 printed "fatal: failed to stat ...: Permission denied", exit 128, which
+itself shows an unreachable repo stops the step); a private bind mount was refused by the permission system (not
+retried). So the matrix runs as root on a root-owned repo (euid == owner, the runner's condition); uid 1001 inside the
+real cut is proven by the plant's CI run instead (it printed " M ...Join.ts" inside the cut).
+Results (exit 1 = step fails with the message; 0 = silent pass; 128 = git fails, set -e stops the step):
+ 1 clean -> 0 | 2 content -> " M", 1 | 3 chmod +x -> " M", 1 | 4 the plant (100755 committed, deleted and rewritten 0644)
+ -> " M", 1 | 5 new untracked -> "??", 1 | 6 new file in new subfolder -> "?? .../other/deep/X.ts", 1 (default -unormal
+ would print "?? .../gen3/", also non-empty) | 7 deleted -> " D", 1 | 8 CRLF rewrite under `* text=auto eol=lf` -> " M",
+ 1 (size changed) | 9 new *.log (matches .gitignore) -> 0 HIDDEN | 10 .git/info/exclude pattern -> 0 HIDDEN | 11
+ core.fileMode=false in .git/config -> 0 HIDDEN | 12 assume-unchanged -> 0 HIDDEN | 13 change committed by earlier code
+ -> 0 HIDDEN | 14 folder moved in the worktree only -> " D" x3, 1 | A folder moved IN A COMMIT (pathspec matches
+ nothing) -> 0 SILENT | C `git status -- no/such/path` -> exit 0 | 15 dubious ownership -> 128 | 16 index.lock held ->
+ " M", 1 (status skips the index write, output still right) | 17 no repository -> 128.
+
+### Q3 conclusion (git inside the cut)
+- safe.directory/ownership: git compares the repository's owner with the effective uid; setpriv keeps uid 1001 (the
+  checkout's owner) and changes only the group, so the check passes; if it did not, git exits 128 and set -e stops the
+  step (case 15). Missing repo: 128, stops (17). Index refresh that cannot write: status still reports (16).
+  `changed=$(...)`: a failing command substitution in a plain assignment gives the assignment its status, so -e stops
+  the step; no pipeline inside, so pipefail plays no part. git missing from PATH: 127, stops.
+- Silent passes: (a) a committed move/rename of packages/types/src/generated (case A: pathspec matches nothing, exit 0);
+  (b) anything that tampers with .git before the compare (cases 10-13): only code that runs earlier in the same step can
+  do that, i.e. a hostile dependency's build script, proc macro or test (same uid, the checkout is writable). So the
+  compare is a correctness check on honest output, not a supply-chain control; (c) ignored files (9): generators write
+  only .ts, no ignore rule matches .ts today.
+- Proven on the runner by the real runs: git works inside the cut as 1001/nogroup (the plant's run printed the change),
+  core.fileMode is on there, SHAMBLE_WRITE_TYPES=1 survives `env -i` (set on the cargo line itself) and write mode really
+  rewrites the folder (it reset the bit).
+
+### Q4 conclusion (which changes the compare catches; the plant)
+- git catches content, mode, new untracked (also in a new subfolder, file names shown thanks to -uall), deleted, CRLF.
+- But what reaches the compare at all: the plain run one line above (compare mode) already fails on content, a missing
+  generated file, an extra file in protocol/ (ts_export.rs:150-155), anything not a plain file in protocol/
+  (files_in :63), anything but layout.ts in block/ and any file directly in generated/ (layout_ts.rs, entries_of +
+  "stray" check). Write mode deletes only `.ts` entries directly in the two folders (ts_export.rs:94-100) and rewrites
+  with fs::write (new file, mode 0666&~umask = 0644). So today the ONLY difference both tests leave to the compare is the
+  executable bit; the compare is otherwise a net for a future asymmetry between write and compare mode, or another test
+  writing into the folder.
+- Not caught by anything: a hand-made third folder under generated/ (e.g. generated/x/y.ts): no generator owns it, the
+  layout test checks only files directly in generated/; write mode leaves it, so git sees no change. Not this edit's
+  defect (tests of change-set 1); REPO_MAP:26 says "the tests compare every file byte for byte": true for the two folders
+  only. A follow-up for test-engineer, not a finding on the workflow.
+- The plant is fair and is in fact the only kind of change that can reach the compare today; Mustafa said yes to it
+  (17:30 message). It proves: the compare runs inside the cut, git works there as 1001/nogroup, core.fileMode is on, the
+  write-mode variable reaches the tests and write mode rewrites the files, the message and exit 1 come out and fail the
+  job. It leaves unproven by a real run: untracked/deleted/content cases (git's documented porcelain; shown here on a
+  scratch repo; content and missing/extra cannot reach the step), and it proves nothing against hostile code.
+
+### Sources read for Q5 (2026-11-18)
+- S4 TypeScript 6.0 release notes https://www.typescriptlang.org/docs/handbook/release-notes/typescript-6-0.html
+  (read 2026-11-18): heading "Specifying Command-Line Files When `tsconfig.json` Exists is Now an Error": "error TS5112:
+  tsconfig.json is present but will not be loaded if files are specified on commandline. Use '--ignoreConfig' to skip
+  this error." / "If it is the case that you wanted to ignore the `tsconfig.json` and just compile `foo.ts` with
+  TypeScript's defaults, you can use the new `--ignoreConfig` flag." Also "`types` now defaults to `[]`" ("Packages you
+  import in your source still resolve normally"), "`strict` is now `true` by default", module default esnext, target
+  default es2025, noUncheckedSideEffectImports true. None of the flags used is deprecated there.
+- S5 tsc CLI Options https://www.typescriptlang.org/docs/handbook/compiler-options.html (read 2026-11-18): `--ignoreConfig`
+  boolean, "Ignore the tsconfig found and build with commandline options and files."; `--skipLibCheck` "Skip type
+  checking all .d.ts files." Note: the same page still says "When input files are specified on the command line,
+  `tsconfig.json` files are ignored." (the pre-6.0 wording; S4 is the 6.0 behaviour).
+
+### Q5 local runs (scratchpad/q5/tsc-lines2.sh -> out.txt; tsc-more.sh), tsc 6.0.3 from the repo's node_modules by path,
+scratch copies of packages/types/src (repo untouched)
+- 1a words as committed: 18 flag words + 11 shipped files; run 2 adds --skipLibCheck and the 2 test files. Correct.
+- 1b / 3c a shipped name with a space: split into "packages/types/src/layout" + "check.ts"; real tsc: TS6053 + TS6231,
+  exit 2 -> loud, never a silent pass. Glob characters in a name ([ * ?) would be pathname-expanded (no set -f); a match
+  could swap the file for another silently. Not reachable with ts-rs names; no finding.
+- 1c no test file: `[ -n "$tests" ]` -> exit 1 with NO message (the log ends at "Process completed with exit code 1").
+- 1d src missing: find fails, pipefail fails the assignment -> exit 1 with find's message.
+- 2a clean -> 0; 2b error in a shipped file -> exit 2 (run 1); 2c error in a test file -> exit 2 (run 2).
+- 2d/3a a root tsconfig.json that FAILS when loaded (types: a missing package; `tsc -p .` -> TS2688, exit 2) passes with
+  --ignoreConfig (exit 0): the flag keeps the config out, as S4/S5 say; plain `tsc file` with that tsconfig -> TS5112.
+- No tsconfig is tracked today (git ls-files), so --ignoreConfig is a guard for the 2.3 base config (S4).
+- Test files import from "vitest" (ships its own types): unaffected by `types: []` (S4). @types/node is not installed.
+
+### Q5 conclusion
+- Unquoted on purpose: fine for the flag string and for file lists with plain names; a space breaks the run loudly (exit
+  2); an empty list is stopped by the two `[ -n ]` lines (silently: exit 1, no message); a missing folder stops at find.
+- --ignoreConfig does what is meant with 6.0.3 (S4, S5, shown with a failing config).
+- Can both pass while checking nothing? No: both lists are non-empty by guard, every listed file is a .ts root file,
+  and a planted error fails each run (2b, 2c). Limits worth one line in the report: (a) only packages/types/src is checked,
+  not the other workspaces; (b) run 2's --skipLibCheck skips every .d.ts (vitest's); run 1 checks lib files with no
+  skip; (c) the flags are the CI's own, not the future tsconfig's (by design; S4), so they can drift from the 2.3 config
+  (the report's risk 3 already says so); (d) code that runs earlier in the same step (cargo build scripts, tests,
+  vitest's own code) could replace node_modules/.bin/tsc: as for every check inside the cut, a correctness check, not a
+  guard against hostile dependencies.
