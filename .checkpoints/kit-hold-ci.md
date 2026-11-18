@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 19:35 CET (from the clock)
+- **Last update:** 2026-11-18 19:33 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -262,6 +262,8 @@
     kept as `kit-hold-ci/probe-colon-folder.mjs`.
     - A slip of mine in this card (corrected 18:16 UTC from the session's record): step 26 first named 18:19 and
       18:20 UTC, times ahead of the clock (it was 18:15), and gave test-engineer's start as 18:09 (it was 18:07:41).
+    - The same slip again at 18:33 UTC (step 29 first said 18:35 and "about 18:34"); corrected at 18:33 UTC. From
+      here on every time in this card is printed by `date -u` or read from the session's record in the same command.
     - A slip (18:11:32 UTC): the first try of the replay script made its scratch clone inside the repository's
       folder (`run-final-GbS2`, untracked); removed 20 seconds later; nothing committed.
 25. The report's draft is written: `kit-hold-ci/report-draft.md` (the parts that wait for the reviews are marked
@@ -286,7 +288,7 @@
     Main was fetched before it: still 9b4b518.
 
 ## Current step
-29. (18:35 UTC) Running: test-engineer (since 18:07:41), the verifier (since 18:15:22), docs-keeper (STATUS,
+29. (18:33 UTC, from the clock) Running: test-engineer (since 18:07:41), the verifier (since 18:15:22), docs-keeper (STATUS,
     ROADMAP, the map, the archive; its notes `kit-hold-ci/docs-keeper-notes.md`, its moved lines
     `docs-keeper-moved-lines.md`). The verifier and test-engineer were told that `docs/` changes in the working tree
     and that they compare commits. When they are in: test-engineer's follow-up lines to docs-keeper (a second short
@@ -311,7 +313,7 @@
 ## Running work
 - saver: background task b4bg0wkfu, started 18:04 UTC on 2026-11-18 on the fixed script (2-hour limit).
 - agents: test-engineer (review 1, since 18:07:41 UTC); the verifier (since 18:15:22 UTC); docs-keeper (since
-  about 18:34 UTC). Done: infra-engineer, engine-architect (change-set 2's plan draft), security-auditor.
+  18:33:06 UTC, the session's record). Done: infra-engineer, engine-architect (change-set 2's plan draft), security-auditor.
 
 ## For the list of the quality gate v2's plan (his words of 15:38 and 18:01 UTC)
 - A CI check that refuses to build when the lockfile gains an entry with no recorded review (DEP-HOLD's option (c)).
