@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 14:44 CET (from the clock)
+- **Last update:** 2026-11-18 15:02 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -259,6 +259,29 @@
       "$tests" ]`, `npx --no -- tsc $strict $shipped`, `npx --no -- tsc $strict --skipLibCheck $shipped $tests`
       (test-engineer's form, round 1). Not tried: git inside the cut.
 
+    Round 2 so far (times from the session record):
+    - engine-architect (13:42:59 to 13:59:20 UTC): APPROVE, nothing at Medium or above in the code
+      (`cs1-types/engine-architect-review2.md`). Its round-1 High closed; its Medium 2 closes when the report uses its
+      sentence for PM-0002-15 ("shown, not met": its first clause runs in CI, the planted defects ran here). New Lows,
+      none needs a push: L1 the report lists the public additions (`ElementType::name()`, `size()`, the derives); L2
+      the only TypeScript reader of the message types the drafts name is the test plan's "TypeScript decoders"; L3
+      `index.test.ts` pins the section list to `["header"]` (change-set 4: "header first"); L4 the folder rules are
+      copied in both export tests (content's test should share them); L5 the export tests stay native-only. It gave
+      the report's sentences for each mark, O2, the two open questions and the follow-ups: they are in the report
+      draft (`cs1-types/report-draft.md`).
+    - rust-reviewer (13:43:17 to 14:00:16 UTC): APPROVE, all six round-1 Lows closed
+      (`cs1-types/rust-reviewer-review2.md`). Four new Lows, all follow-ups: L2-1 the build-folder check fails an
+      honest run when one checkout is reached by two path spellings (never a wrong pass; fix later: compare the
+      canonical paths); L2-2 the doc-comment check has two gaps (a doc line of exactly `/` through `#[doc = "/"]`
+      spills; a Rust block doc is refused though valid); L2-3 on a case-insensitive file system a link named
+      `X.TS` survives the delete loop (reasoned, not run; fix later: `create_new`); L2-4 the "no file of its own"
+      check counts plain files only. Its scratch copies `.gate/rr-cs1` and `.gate/rr-cs1-r2` can go; it saw a
+      leftover `/tmp/shamble-types-protocol-19942-0` that is not its own.
+    - security-auditor round 2 started 13:59:40 UTC; netcode-architect round 2
+      started 14:01:47 UTC; test-engineer round 2 (since 13:42:42 UTC) is still running.
+    - The report's draft is written (`cs1-types/report-draft.md`), with marked gaps for round 2, the verifier, the
+      final head, CI and the size.
+
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
   "[skip ci]", but the checkpoint commit pushed on top of it (da22f96, 12:04:37 UTC) did not: `checkpoint.mjs` leaves
@@ -346,5 +369,4 @@
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
   stopped at 12:30:03 UTC for the code push).
-- agents (3 of 3): round 2: test-engineer, engine-architect, rust-reviewer (started 13:42 to 13:43 UTC); then
-  security-auditor and netcode-architect.
+- agents (3 of 3): round 2: test-engineer, security-auditor, netcode-architect (times in step 10).
