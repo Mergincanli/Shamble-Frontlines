@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 13:01 CET (from the clock)
+- **Last update:** 2026-11-18 13:04 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -30,9 +30,57 @@
    ts-rs; planted defect (2b), a hand edit of `layout.ts`) and nine Lows to fold in. All taken into `plan.md`
    ("After the advisor agent's review"). O1 to O5 confirmed.
 
+5. Build, step A (12:02 UTC): the first edits outside `.checkpoints/`. `Cargo.toml` (workspace table: `ts-rs = { version
+   = "=12.0.1", default-features = false }`), `crates/protocol/Cargo.toml` (`[dev-dependencies] ts-rs = { workspace =
+   true }`), then `cargo fetch` (download only, exit 0). `Cargo.lock` gained nine entries: proc-macro2 1.0.107, quote
+   1.0.47, syn 2.0.119 (asked by ts-rs-macros), syn 3.0.10 (asked by thiserror-impl), thiserror 2.0.21, thiserror-impl
+   2.0.21, ts-rs 12.0.1, ts-rs-macros 12.0.1, unicode-ident 1.0.27. Sources unpacked under
+   `~/.cargo/registry/src/index.crates.io-*/`. Committed with "[skip ci]" (both workflows run on every push, and CI's
+   `cargo test` would compile ts-rs before the security check). NOTHING has been compiled yet.
+
 ## Current step
-5. (12:05 UTC) Build, step A: the two manifest lines and `cargo fetch`; security-auditor on the new lockfile entries;
-   meanwhile the code that does not compile ts-rs (`client-endpoint`'s table, hash and generator).
+6. (12:04 UTC) Two things at once:
+   - security-auditor (Opus 5.5, effort max; started 12:03 UTC; notes `cs1-types/security-auditor-deps.md`) checks
+     the nine lockfile entries: source and checksum, licence, advisories, build-script and proc-macro code, what
+     ts-rs writes at test time, its API facts (`Config`, `with_out_dir`, `with_import_extension`, `export_all`), reach
+     (`cargo tree -e normal`). Until its answer says CLEAR TO BUILD, no command that compiles ts-rs runs (so no
+     `cargo test/check/clippy` on `protocol` or on `--workspace`); a finding at Medium or above stops the build and
+     goes to the advisor agent. If the agent is lost, start a fresh one from its notes file with the same brief.
+   - the main session writes `client-endpoint` (no ts-rs there: `cargo test -p client-endpoint` is safe to run).
+   Mustafa, 12:03 UTC (two messages while this ran): "Save your progress I'm going to run the compact command" and
+   "Same for the agents": this save; the agent was told to save its notes at once and carry on.
+
+## Build notes (the main session's design choices, to carry out and to list in the report's deviations)
+- `crates/client-endpoint/src/layout.rs`: `ElementType { U8, U32 }` with `const fn name()` ("u8", "u32") and `const fn
+  size()` (1, 4); `Field { name, ty, offset }`, `Section { name, stride, fields }`, all fields `pub`, derives `Debug,
+  Clone, Copy, PartialEq, Eq`; `BLOCK_LAYOUT` (one section `header`, stride 8: `tick` u32 at 0, `layout_hash` u32 at
+  4; ADR 0002 part 5: "a header (tick, layout hash, counts per entity kind)", no count yet, O2); `LAYOUT_HASH`;
+  `pub const fn layout_hash`; a private `const fn fnv1a(hash: u32, bytes: &[u8]) -> u32` (basis 0x811C9DC5, prime
+  0x01000193; `while` loops, no `usize` cast).
+- **Deviation 1 (hash stream made unambiguous):** the draft's stream is per section name, 0x00, stride u32 LE; per
+  field name, 0x00, type name, 0x00, offset u32 LE. The build puts a tag byte in front of each entry: 0x02 before a
+  section, 0x01 before a field. Why: without it a field entry and the next section's entry cannot be told apart for
+  some strides (two tables could give one stream). The rules test also requires names to be `[a-z][a-z0-9_]*`
+  (no 0x00 in a name; safe to print as TypeScript identifiers), unique sections, unique fields per section.
+- **Deviation 2 (client-endpoint's export test compares in memory):** `render_typescript` is pure and returns the
+  file's text, so `generated_layout_is_current` compares that text with the committed `generated/block/layout.ts` and
+  checks the folder holds exactly that one file; no scratch folder is needed there (the card says "regenerates into a
+  scratch folder"; `protocol`'s test does, because ts-rs writes files). Write mode (`SHAMBLE_WRITE_TYPES=1`): check
+  the folder's path ends with `packages/types/src/generated/block`, delete only `*.ts` files directly in it, write.
+- `layout_ts.rs` output: a two-line "generated, do not edit" comment naming its source and the regenerate command;
+  `export const LAYOUT_HASH = 0x%08x;`; per section `export const <name> = { stride, align, fields: { <field>: {
+  offset, type: "u32" }, … } } as const;` (align = the largest field size).
+- Tests in `layout.rs`: `layout_rules_hold`, `hash_covers_every_value` (fixture tables as literals: changed section
+  name, stride, field name, type, offset, an added field, a field moved to the next section), `fnv1a_matches_rfc_9923`
+  ("" 0x811c9dc5, "a" 0xe40c292c, "foobar" 0xbf9cf968; the RFC number comes from engine-architect's source S13, the
+  datatracker page of draft-eastlake-fnv, "later published as RFC 9923"); in `layout_ts.rs`:
+  `generated_layout_is_current`, `typescript_carries_the_hash`. `stub_builds` goes.
+- Then `protocol` (after the security answer): `messages.rs` with the eight types of the draft's section 4 (doc lines
+  mark every provisional field, the two acknowledgement fields of `Snapshot` included, and the module doc names
+  OQ-0001-6, OQ-0001-7, R2-XU-OQ4, the mode hash and the join token's format); `ts_export.rs`
+  (`generated_types_are_current`: scratch folder `temp_dir()/shamble-types-protocol-<pid>`, cleared first).
+- Then `packages/types` (`layout-check.ts`, its test, `index.ts`, `index.test.ts`, the package's description line),
+  section 6's checks, the planted defects (1), (2), (2b), (3), (4) in `.gate/cs1-types/plant`, the 20 runs.
 
 ## Next steps
 6. Build (Rust: the first message types of `protocol`, the block's layout table in `client-endpoint`, our own small
@@ -67,4 +115,4 @@
 
 ## Running work
 - saver: background task b98z35xsq, started 11:11 UTC on 2026-11-18.
-- agents (0 of 3).
+- agents (1 of 3): security-auditor on the nine lockfile entries (started 12:03 UTC).
