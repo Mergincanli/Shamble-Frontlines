@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 14:56 Amsterdam (13:56 UTC)
+- **Last update:** 2026-11-18 15:32 Amsterdam (14:32 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -418,6 +418,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      44171977539 holds three `headers-44171977539` artifacts side by side (attempts 2, 4, 5) and `site-pr` (expires
      2026-11-24T20:42:04Z): no bin step is needed, and the deploy's "Re-run failed jobs" must come before that expiry.
 
+   - The second check (results log): the token works now until 2026-11-25T22:59:59Z, C finds the project, D answers
+     (outcome row 3). The logs deleted. Next: his "go" for Part 2 (the setup pull request) after consultation 15.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
@@ -582,6 +585,13 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   a re-run, or a push to `check-token` after that commit, needs a new list first; "Delete the run's logs after you have
   read them." ID-ENDS yes (that run may print the ID's first and last 4; he compares them with Account Details). "No
   deploy run of any kind starts before you have my screenshot of the renamed Cloudflare account."
+
+- **His answers after the cause was found** (user message 8b31c945-c07d-4b1b-8b62-185f409e0a0e, 2026-11-18 14:30:11
+  UTC), word for word: "Step 1 done, the api token is still the same, I have also set it to 7 days expiration" / "The
+  rerun went well tool" / "ran the check a 2nd time, which also ran properly." / "Yes, cloudflare account id begins with
+  that and ends with d8e7". So TOKEN-WINDOW (a) "7 days", done by him (Cloudflare: "November 25, 2026 (7 days)"; the
+  check: expires_on 2026-11-25T22:59:59Z, not_before null); CHECK-RERUN done by him (the re-run is his act; the reading,
+  the word-for-word copy and the log deletion followed as asked in the request); ID-ENDS compared: they match.
 
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
 1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a

@@ -251,3 +251,5 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   method refuses an account token, consistent with both runs). The ID's ends d17d...d8e7 match Account Details (his
   words). Day 2's last day: 2026-11-25 (Amsterdam), from expires_on. The deploy's "Re-run failed jobs" must come before
   `site-pr` expires (2026-11-24T20:42:04Z).
+- After reading: the run's logs deleted again (delete_workflow_run_logs, "204 No Content"); the run list unchanged (the
+  deploy run still at attempt 5).
