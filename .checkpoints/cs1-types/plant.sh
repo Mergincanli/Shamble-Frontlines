@@ -31,8 +31,10 @@ run() {
   verdicts=$((verdicts + 1)); [ "$ok" = yes ] || wrong=$((wrong + 1))
   echo "as wanted: $ok"
 }
-keep() { cp "$1" "$1.kept"; }                # before a plant
-back() { cp "$1.kept" "$1" && rm "$1.kept"; }  # after it
+# The copies live outside the worktree: a stray file in a generated folder fails the export tests (run 1 showed it).
+kept() { echo "$logs/kept/$(echo "$1" | tr / _)"; }
+keep() { mkdir -p "$logs/kept" && cp "$1" "$(kept "$1")"; }       # before a plant
+back() { cp "$(kept "$1")" "$1" && rm "$(kept "$1")"; }           # after it
 edit() { python3 - "$@" <<'EOF'
 import sys
 path, old, new, which = sys.argv[1:5]
@@ -79,6 +81,14 @@ keep $gen/block/layout.ts; edit $gen/block/layout.ts "layout_hash: { offset: 4,"
 run "2b-hand-edit-of-layout.ts" fail 'generated/block/layout\.ts is not what the layout table gives' cargo test -p client-endpoint --locked
 back $gen/block/layout.ts
 
+# (2c) PM-0002-15: a file added by hand to a generated folder, one per generator.
+printf 'export type Extra = number;\n' > $gen/protocol/Extra.ts
+run "2c-extra-file-in-generated-protocol" fail 'generated/protocol/Extra\.ts is not a generated file' cargo test -p protocol --locked
+rm $gen/protocol/Extra.ts
+printf 'export const extra = 1;\n' > $gen/block/extra.ts
+run "2d-extra-file-in-generated-block" fail 'generated/block must hold layout\.ts and nothing else' cargo test -p client-endpoint --locked
+rm $gen/block/extra.ts
+
 # (3) The control: the same rename, regenerated. Rust passes; the shipped TypeScript passes; the package's own test, which
 # builds a Snapshot, fails the type check until it follows the rename.
 keep $messages; keep $gen/protocol/Snapshot.ts; keep packages/types/src/index.test.ts
@@ -119,6 +129,8 @@ run "9-clean-again-protocol" pass - cargo test -p protocol --locked
 run "9-clean-again-client-endpoint" pass - cargo test -p client-endpoint --locked
 echo; echo "## the worktree after the runs"
 echo "git status --short: [$(git status --short | tr '\n' ' ')] (empty means every file is back)"
+# A failed export test leaves its scratch folder to be looked at; the planted runs' folders go, file by file.
+for d in /tmp/shamble-types-protocol-*; do [ -d "$d" ] && rm "${d:?}"/*.ts && rmdir "${d:?}"; done
 cd "$root" || exit 2
 if git worktree remove .gate/cs1-types/plant; then echo "worktree removed (no force)"; else echo "worktree NOT removed"; wrong=$((wrong + 1)); fi
 echo; echo "runs: $verdicts, not as wanted: $wrong"

@@ -1,0 +1,139 @@
+worktree at 4d2338f9c8eb1f54a512a910bb8e64371f2e39c1, 2026-11-18T12:48:23Z
+
+## 0a-clean-protocol
+command: cargo test -p protocol --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+
+## 0b-clean-client-endpoint
+command: cargo test -p client-endpoint --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+as wanted: yes
+
+## 0c-clean-tsc
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 0 (wanted: pass)
+as wanted: yes
+
+## 1-rename-without-regenerating
+command: cargo test -p protocol --locked
+exit code: 101 (wanted: fail)
+  | packages/types/src/generated/protocol/Snapshot.ts is not what the Rust types give; write the folder again with SHAMBLE_WRITE_TYPES=1 cargo test -p protocol
+  | failures:
+  | test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+  | test ts_export::generated_types_are_current ... FAILED
+as wanted: yes
+
+## 2-hand-edit-of-Join.ts
+command: cargo test -p protocol --locked
+exit code: 101 (wanted: fail)
+  | packages/types/src/generated/protocol/Join.ts is not what the Rust types give; write the folder again with SHAMBLE_WRITE_TYPES=1 cargo test -p protocol
+  | failures:
+  | test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+  | test ts_export::generated_types_are_current ... FAILED
+as wanted: yes
+
+## 2b-hand-edit-of-layout.ts
+command: cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  the output does not hold: generated/block/layout\.ts is not what the layout table gives
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: no
+
+## 3a-rename-and-regenerate
+command: env SHAMBLE_WRITE_TYPES=1 cargo test -p protocol --locked
+exit code: 101 (wanted: pass)
+  | failures:
+  | test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+  | test ts_export::generated_types_are_current ... FAILED
+as wanted: no
+
+## 3b-plain-run-after
+command: cargo test -p protocol --locked
+exit code: 101 (wanted: pass)
+  | failures:
+  | test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+  | test ts_export::generated_types_are_current ... FAILED
+as wanted: no
+  files changed by the regeneration:  M packages/types/src/generated/protocol/Snapshot.ts ?? packages/types/src/generated/protocol/Snapshot.ts.kept 
+
+## 3c-tsc-shipped-sources
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.shipped.json
+exit code: 0 (wanted: pass)
+as wanted: yes
+
+## 3d-tsc-with-the-stale-test
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 2 (wanted: fail)
+  | packages/types/src/index.test.ts(39,5): error TS2353: Object literal may only specify known properties, and 'group' does not exist in type 'Snapshot'.
+  | packages/types/src/index.test.ts(39,5): error TS2353: Object literal may only specify known properties, and 'group' does not exist in type 'Snapshot'.
+as wanted: yes
+
+## 3e-tsc-after-the-test-follows
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 0 (wanted: pass)
+as wanted: yes
+
+## 3f-vitest
+command: vitest_types
+exit code: 0 (wanted: pass)
+  |       Tests  6 passed (6)
+as wanted: yes
+
+## 4-layout-change-without-regenerating
+command: cargo test -p client-endpoint --locked
+exit code: 101 (wanted: fail)
+  | packages/types/src/generated/block/layout.ts is not what the layout table gives; write it again with SHAMBLE_WRITE_TYPES=1 cargo test -p client-endpoint
+  | failures:
+  | test layout_ts::generated_layout_is_current ... FAILED
+  | test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+  LAYOUT_HASH lines in the failing message (the committed file's, then the changed table's):
+  | export const LAYOUT_HASH = 0x2df78c30;
+  | export const LAYOUT_HASH = 0x5d0e9efb;
+  tests that failed: test layout_ts::generated_layout_is_current ... FAILED test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s 
+
+## 17a-parameter-property
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 2 (wanted: fail)
+  | packages/types/src/generated/bite-parameter-property.ts(2,15): error TS1294: This syntax is not allowed when 'erasableSyntaxOnly' is enabled.
+  | packages/types/src/generated/bite-parameter-property.ts(2,15): error TS1294: This syntax is not allowed when 'erasableSyntaxOnly' is enabled.
+as wanted: yes
+
+## 17b-enum
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 2 (wanted: fail)
+  | packages/types/src/generated/bite-enum.ts(1,13): error TS1294: This syntax is not allowed when 'erasableSyntaxOnly' is enabled.
+  | packages/types/src/generated/bite-enum.ts(1,13): error TS1294: This syntax is not allowed when 'erasableSyntaxOnly' is enabled.
+as wanted: yes
+
+## 17c-declare-enum-recorded
+command: tsc /home/user/Shamble-Frontlines/.gate/cs1-types/tsconfig.plant.json
+exit code: 0 (wanted: pass)
+as wanted: yes
+
+## 9-clean-again-protocol
+command: cargo test -p protocol --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+as wanted: yes
+
+## 9-clean-again-client-endpoint
+command: cargo test -p client-endpoint --locked
+exit code: 0 (wanted: pass)
+  | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  | test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+as wanted: yes
+
+## the worktree after the runs
+git status --short: [] (empty means every file is back)
+worktree removed (no force)
+
+runs: 18, not as wanted: 3
