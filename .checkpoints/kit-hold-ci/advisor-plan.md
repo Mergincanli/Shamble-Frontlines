@@ -42,3 +42,17 @@ DONE
 - Low: no test pins the hold in front of the saver's push (q3) or --no-renames (q7): add short tests or say "by code reading" in the report. Size: 168 non-blank added lines = 181 by git diff --numstat; state the method.
 - Verdict: REVISE (one line + comment in the test file); with that fix and the plant shown failing, APPROVE without another pass from me.
 DONE
+
+# The one change after his KIT-TEXT answer (2026-11-18)
+Started 16:51 UTC (date -u). One read of kit-change.diff (52 added lines) under main's advisor.md (9b4b518).
+
+## Plan of this read
+1. Read his words (mustafa-2026-11-18-1730-kit-text.md), kit-change.diff, the resume card steps 8-9.
+2. Rebuild the three diffs from the scratch copies; check only lines were added.
+3. Read the code in place; probe the edge cases of question 5 in scratch clones (temp folder).
+4. Run the three test commands; check each broken copy fails at its own step.
+5. Rule on readings (a)-(d); verdict.
+
+## Findings (one line each)
+- Block 1 done: his words read whole (1542 B file; core lines 10-12); card steps 8-9; kit-change.diff read.
+- Diffs rebuilt by diff -u (header timestamps aside): kit-edit.diff == main(9b4b518) to scratch; kit-edit-as-shown.diff == main to as-shown/ == kit-edit.diff at 3ebe654a (sha256 70756f3d...6ce5, 262 lines); kit-change.diff == as-shown/ to scratch: 52 added, 0 removed. toolchain.yml scratch == as-shown. Kit files in the worktree == origin/main. broken-main-rule-missing.mjs == as-shown/checkpoint.mjs byte for byte; the other two differ from the scratch script in one line each, as described.
