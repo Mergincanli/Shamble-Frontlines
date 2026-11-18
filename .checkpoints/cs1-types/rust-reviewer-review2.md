@@ -19,3 +19,9 @@ Round 1: APPROVE with six Lows L-a..L-f (rust-reviewer-review1.md).
 ## Findings (one line each, as found)
 
 ## Commands run (exit codes)
+- Main folder (own target; code = 65a7b13, HEAD d34cfc5 only adds docs): fmt --check 0; clippy native -D warnings 0;
+  clippy wasm32 -D warnings 0; pedantic protocol+client-endpoint native 0 and wasm32 0, no warnings; test --workspace 0
+  (ce 5, protocol 2, others stubs); test --release -p protocol -p client-endpoint 0 (5 + 2); wasm32 build of 5 crates 0;
+  cargo tree -p protocol -e normal (host, wasm32, all) = protocol alone, 0; -i ts-rs = dev-dep of protocol only;
+  cargo doc -D warnings 0 (target-dir .gate/rr-cs1-r2/target-doc-main); cargo rustc --lib -W missing_docs both crates
+  0 warnings (target-dir .gate/rr-cs1-r2/target-md-main). Scratch copy .gate/rr-cs1-r2 = git archive 65a7b13, own target.
