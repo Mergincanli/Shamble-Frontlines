@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 20:39 UTC (from the clock)
+- **Last update:** 2026-11-18 20:40 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -84,8 +84,13 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
    `cs2-first-page/engine-architect-plan-notes.md` (122 lines, its sources). Also: his message as saved by script,
    and `words.mjs`.
 
+3. Main after the merge, read with the GitHub tools (2026-11-18 20:40 UTC): `gate` run 900 (its `gate` and `smoke` jobs; run
+   44391809186, ended 20:38:33 UTC) and `toolchain` run 198 (run 44391809357, ended 20:31:35 UTC) on b763ba3: success.
+4. The test zip of change-set 1 was sent to him again with its steps (`.gate/cs1-types/archive/`, 6,480 bytes, sha256
+   7138ea42...; 20:40 UTC by the session's record of the save that followed).
+
 ## Current step
-3. **Stopped for his compaction** (his words: "Then stop and tell me the path of its resume card: I compact this chat
+5. **Stopped for his compaction** (his words: "Then stop and tell me the path of its resume card: I compact this chat
    before you go on."). Nothing of change-set 2 is started beyond this card.
 
 ## Next steps (after the compaction)
