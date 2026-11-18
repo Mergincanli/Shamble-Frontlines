@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:55 Amsterdam (18:55 UTC)
+- **Last update:** 2026-11-18 19:57 Amsterdam (18:57 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -601,6 +601,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      "Uploads found" equal to the records ((a) 1, (a') 1+tombstone, (b) 3, (b') 3+tombstone); none for (d). The
      probe started by hand at about 18:54 UTC. The last close: 18:50:43Z, so the 24-hour reading is due from
      2026-11-19 18:51 UTC (19:51 Amsterdam).
+   - Probe #2 (44374666257, 18:54:22Z): (a), (a'), (b), (b') all gone already; (c), (d) and the by-hand previews
+     serve; every judged row as expected. Runs tallied: 25 in the repository, nothing off the list. Check-ins set:
+     trig_013vUKHaNSSNDvcRH4hA6UiE (19:55 UTC, a by-hand probe, the hourly stand-in) and trig_01Fd2yqXX6LL2QP4hLnrCuu6
+     (2026-11-19 18:55 UTC, the 24-hour probe). Open in sitting 2: his "Delete branch" on #4 and #8; then step 24 is
+     saved as done after a consultation.
 
 ## Next steps
 1. His answer: sitting 2 tonight or tomorrow; then his list (step 24) and sitting 2.

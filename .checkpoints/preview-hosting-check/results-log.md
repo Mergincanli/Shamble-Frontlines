@@ -576,3 +576,19 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
     uploads; (b') 4 = 3 uploads + the tombstone. From close to deletion: (a) 14 s, (a') 29 s, (b) 14 s, (b') 25 s.
   - No cleanup run for (d). Every cleanup ran at once (no reviewer).
 - A probe started by hand right after the last cleanup (run_workflow, `purpose: deletion`).
+- **The probe right after the cleanups**: probe run #2, id 44374666257 (by hand, `purpose: deletion`, head 347d5e0),
+  created 18:53:54 UTC, success 18:54:34; probe-results-44374666257 (artifact 14461031992, zip sha256 db8b83a018fe...,
+  equal to its digest), probed_at 2026-11-18T18:54:22.157Z, read with jq from `.gate/preview-hosting-check/day1/probe-2/`.
+  By case: (a) 2 rows, gone 2; (a') tombstone 3 rows, gone 3; (b) 4 rows, gone 4; (b') tombstone 5 rows, gone 5; (c)
+  control 2 rows, serves 2; (d) bite 2 rows, serves 2; the by-hand previews 19 rows, serves 19; the rehearsal 2 rows,
+  gone 2; production 4 rows, serves 4 (its own address as expected; the one-off links of the three production uploads
+  0354374e, e9a37459 (the noindex bite) and de1c3e5e still serve, "expected" null: no row judges them). Every judged
+  row as expected. So 22 to 3 minutes after their closes, every link of (a), (a'), (b) and (b') is already gone; the
+  mark itself is read at 24 hours.
+- The hourly schedule: the 18:23 UTC slot passed without a scheduled run as well (four slots missed: 15:23, 16:23,
+  17:23, 18:23). Stand-ins: a by-hand probe about an hour later (check-in at 19:55 UTC) and the 24-hour probe (check-in
+  at 2026-11-19 18:55 UTC, after the last close's 24-hour mark, 18:50:43Z).
+- **Sitting 2's runs against its list** (all runs of the repository, total_count 25 at about 18:56 UTC): the ten
+  deploy runs #7-#16 (six first pushes, two second, two third), the four cleanup runs #2-#5 ((a), (a'), (b), (b')),
+  the by-hand probe #2; with the ten runs before sitting 2, 25. No cleanup run for (d), no scheduled probe, nothing
+  else. All by Mergincanli.
