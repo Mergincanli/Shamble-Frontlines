@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 15:07 CET (from the clock)
+- **Last update:** 2026-11-18 15:35 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -327,6 +327,24 @@
     - **Round 2 is complete (14:18 UTC): five answers, nothing at Medium or above. The code stays 65a7b13.**
       All round-2 Lows are in the report's "Follow-ups" (draft) and go to STATUS.
 
+    - docs-keeper (14:07:22 to about 14:34 UTC; `cs1-types/docs-keeper-notes.md`): STATUS (120 lines), the archive,
+      ROADMAP (12 recent entries) and REPO_MAP (139 entries, the check passes) are done and committed (500757c). 25
+      lines moved under OLD-LINES by its script (`docs-keeper-move.mjs`; list `docs-keeper-moved-lines.md`); its
+      blame check (`docs-keeper-blame-check.mjs`): 34 removed lines, 0 not this lane's and not moved. It corrected
+      one fact: main's own runs on 22c6afa are `gate` 866 and `toolchain` 165 (867 and 166 were this branch's push of
+      the same commit). Other lanes' stale lines it left are listed in the report.
+    - CI on fe49935 (the final code with DECISIONS and the report's draft): `gate` 874 (push) and 875 (pull request),
+      `toolchain` 172 and 173, all success.
+    - The report is complete at `docs/reports/2026-11-18-cs1-types.md` (360 lines) but for the verifier's result and
+      the notes' commit; committed. The test archive is built: `.gate/cs1-types/archive/
+      shamble-cs1-types-test-archive.zip` (6,480 bytes, 11 files, zip sha256 7138ea42…6f3e), to send with the file
+      tool when the report is final.
+    - **Now (14:35 UTC): the verifier (effort max) and the advisor agent on the final content, at the same time.**
+      Their notes: `cs1-types/verifier.md`, `cs1-types/advisor-final.md`. Then: fix what they find (Medium or above;
+      a High or a FAIL goes back to them), fill the report's two gaps, save the notes (that commit's SHA goes into
+      the report), delete `.checkpoints/cs1-types*` in the last commit, push, read CI, ask the advisor agent for its
+      word on the final head, write #58's description, mark it ready, send the archive, stop for his go.
+
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
   "[skip ci]", but the checkpoint commit pushed on top of it (da22f96, 12:04:37 UTC) did not: `checkpoint.mjs` leaves
@@ -414,4 +432,4 @@
 ## Running work
 - saver: background task bx7rdhkl7, started 14:07 UTC on 2026-11-18 (2-hour limit; the one before it, bafnij7xk, ran
   from 12:30 and was stopped just before).
-- agents (1 of 3): docs-keeper (since 14:07:22 UTC). Round 2 is back.
+- agents (2 of 3): the verifier and the advisor agent on the final content (started 14:35 UTC).

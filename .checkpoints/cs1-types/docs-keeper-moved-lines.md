@@ -34,6 +34,13 @@ Check run after the script (a moved line must reappear byte for byte; result: re
   git diff -U0 -- docs/STATUS.md docs/STATUS_ARCHIVE.md docs/ROADMAP.md | node -e '<collect "-" and "+" lines, drop
   blanks, sort, compare>'   (the full one-liner is in docs-keeper-notes.md)
 
+RECORD-FILES proof, after all edits: `node .checkpoints/cs1-types/docs-keeper-blame-check.mjs` (beside this file). For
+every line removed or changed in the four record files (working tree against origin/main 22c6afa) it blames main's
+line and accepts it only as this lane's (a commit of #56, c94c81b..cd61b28, or #57, d7dad97..f26ac5b) or as moved
+byte for byte (it reappears as an added line). Result: "34 removed lines checked; 0 not this lane's and not moved":
+own 8 (STATUS:5, :13, :29, :36, :39, :40 by 1aaa067 and d5529ca; ROADMAP:125, :129 by 1aaa067), moved 24 (the four
+blocks above), blank separators 2. STATUS_ARCHIVE and REPO_MAP: lines added only.
+
 Not moved, though about merged pull requests: STATUS's open follow-up ids from #49, #50, #51 and #48 (STATUS:83-98 on
 main) stay, since docs-keeper keeps open follow-ups by id in STATUS; ROADMAP's #46 entry and newer stay (12 entries
 after #58's).

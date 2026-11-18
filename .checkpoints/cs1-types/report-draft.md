@@ -67,7 +67,13 @@ way; both come first.
   `SHAMBLE_WRITE_TYPES=1 cargo test --workspace --locked`.
 - `docs/DECISIONS.md`, by script: his go on the merge of #57 with his answer OLD-LINES (11:08:25 UTC), checked byte
   for byte against merge commit 22c6afa's message; one dated pointer in this lane's entry for RECORD-FILES.
-- <<DOCS-KEEPER>>
+- `docs/STATUS.md`, `docs/STATUS_ARCHIVE.md`, `docs/ROADMAP.md`, `docs/REPO_MAP.md` (docs-keeper): #57 merged
+  (22c6afa; main's own CI on it green: `gate` with `smoke` run 866, `toolchain` run 165); #58's row and entry; what
+  waits on him; the map's nine new paths. Under his OLD-LINES, 25 lines about merged pull requests were moved by
+  script (the last appendix lists each); under RECORD-FILES every other removed or changed line is this lane's own
+  (the blame check: 34 removed lines, 0 not this lane's and not moved). Lines of other lanes that are now stale were
+  left as found: STATUS's CI line (it names 82c605e) and its Routines block; REPO_MAP's "Last checked" line and its
+  words "empty" for `Cargo.toml`'s table, `crates/` and `packages/`; ROADMAP's "v2, next" line.
 
 ## Evidence
 - **Checks by hand on the final code (65a7b13), from an empty build folder, all exit 0:** `cargo fmt --all --check`;
@@ -78,7 +84,9 @@ way; both come first.
   test's three rules (no root `.cargo/config.toml`; no "type" in the root `package.json`; no non-Markdown file of the
   set names the spike's folder). Smoke cannot start in this container (Chromium build 1194 wanted, 1243 installed):
   CI runs it.
-- **CI on the final head:** <<CI>>
+- **CI:** on fe49935, which holds the final code and this change-set's DECISIONS entry: `gate` with `smoke` (runs 874
+  and 875) and `toolchain` (runs 172 and 173) green, for the push and for the pull request. The runs on the last
+  commit are named in the pull request's description.
 - **Planted defects, 30 runs, all as wanted** (a throwaway worktree with a build folder of its own; never committed;
   removed without force):
   - a field renamed in Rust without regenerating fails and names `Snapshot.ts`; one character changed in `Join.ts`
@@ -136,9 +144,9 @@ way; both come first.
 - **Round 2** (on what changed since round 1, 13:42 to 14:18 UTC): engine-architect APPROVE (its Medium closes
   with this report's sentence for PM-0002-15); rust-reviewer APPROVE (its six Lows closed); test-engineer APPROVE (its
   High, three Mediums and four Lows closed; it re-derived every known answer with its own implementation and ran the
-  shared-build-folder case again: both trees now stop). security-auditor: nothing at Medium or above, its three Lows closed (it tried
-  the linked-folder cases again: all refused); netcode-architect APPROVE (its Lows closed). Round 2 left Lows only; by the review budget they
-  are follow-ups, and the code is as round 2 reviewed it.
+  shared-build-folder case again: both trees now stop); security-auditor: nothing at Medium or above, its three Lows
+  closed (it tried the linked-folder cases again: all refused); netcode-architect APPROVE (its Lows closed). Round 2
+  left Lows only; by the review budget they are follow-ups, and the code is as round 2 reviewed it.
 - **The verifier** (effort max): <<VERIFIER>>
 - **The advisor agent on the final head:** its word is in the pull request's description.
 
@@ -177,7 +185,7 @@ way; both come first.
   round 2, a Low); the anchor of `Input`'s 16-bit tick offsets (the drafts give the full tick only to the snapshot
   header). What settles each of 18 items and the checks the decoders must make: `netcode-architect-review2.md`, "For
   change-set 3"; an anti-cheat table per field: `security-auditor-review1.md` (both in the commit named below).
-- **Size:** <<SIZE>> hand-written lines added against 600 planned (<<RATIO>> times; his stop line is twice the plan,
+- **Size:** 940 hand-written lines added (12 removed) against 600 planned (1.57 times; his stop line is twice the plan,
   1,200), by `git diff --numstat` against main, with generated files, the lockfile and docs left out. What grew: the
   export tests' folder checks (after round 1), the test tables of the layout rules and of the hash, a doc line per
   message field, and rustfmt's default line widths (rustfmt settings are the 2.3 chat's).
@@ -187,6 +195,8 @@ way; both come first.
   other lane was taken in (LANE-ISSUE below).
 - **The Part 15 change's size:** its report says 220 written lines, as he accepted; a recount on its final head gave
   223 (the advisor agent's Low).
+- **This report's length:** the plan said about 60 lines. The two misses, the pass marks' exact words, the advisor
+  agent's conditions and the three exact texts for his decisions made it several times that.
 - This change-set's notes (the plan, the reviewers' notes, the scripts and their results) are deleted in the last
   commit; the commit before it holds them: <<NOTES-SHA>>.
 
@@ -318,3 +328,33 @@ Part 2, for the gate v2's workflow, in place of the checkout and setup-node step
           echo "$bin" >> "$GITHUB_PATH"
 ```
 Both parts are security-auditor's text, checked against GitHub's documentation only.
+
+## Appendix: every line the docs pass moved (his OLD-LINES: "Its report lists each line it moved.")
+Old line numbers are main's (22c6afa); new ones are this branch's. Moved by `docs-keeper-move.mjs` (in the notes), which
+copies bytes and compares each block at both places; `¦` stands for a table's bar.
+- `STATUS.md:29` to `STATUS_ARCHIVE.md`, "In flight": `¦ #57 ¦ Part 15 of the build plan, "The second…`
+  (this lane's own row of #57: moved, then put in the archive's merged form, so not byte for byte)
+- `STATUS.md:113` to `STATUS_ARCHIVE.md:1275`: `## Where STATUS's old sections went (STATUS-DI…`
+- `STATUS.md:114` to `STATUS_ARCHIVE.md:1276`: `¦ STATUS at 2d22b69 (lines) ¦ Now ¦`
+- `STATUS.md:115` to `STATUS_ARCHIVE.md:1277`: `¦---¦---¦`
+- `STATUS.md:116` to `STATUS_ARCHIVE.md:1278`: `¦ The header (2-27), Phase (30-139), In flight…`
+- `STATUS.md:117` to `STATUS_ARCHIVE.md:1279`: `¦ Decisions pending: his blocks, the relayed A…`
+- `STATUS.md:118` to `STATUS_ARCHIVE.md:1280`: `¦ Decisions pending: Follow-ups, KIT-ALIGN and…`
+- `STATUS.md:119` to `STATUS_ARCHIVE.md:1281`: `¦ Decisions pending: the advisor agent's rulin…`
+- `STATUS.md:120` to `STATUS_ARCHIVE.md:1282`: `¦ Decisions pending: Waiting (847-849) ¦ this …`
+- `ROADMAP.md:257` to `ROADMAP.md:90`: `**The VFX editor and private-match XP [2026-11…`
+- `ROADMAP.md:241` to `ROADMAP.md:92`: `**Kit v3.4, the review policy [2026-11-07 to 1…`
+- `ROADMAP.md:242` to `ROADMAP.md:93`: `merge commit, on Mustafa's go ("merge #44") af…`
+- `ROADMAP.md:243` to `ROADMAP.md:94`: `one re-run; A4 on Mustafa's list and A4's addi…`
+- `ROADMAP.md:244` to `ROADMAP.md:95`: `the advisor's APPROVE WITH CONDITIONS (13); hi…`
+- `ROADMAP.md:245` to `ROADMAP.md:96`: `CLAUDE.md's protocol takes risk tiers 0-3 (a P…`
+- `ROADMAP.md:246` to `ROADMAP.md:97`: `no 'needs-mustafa' trigger; docs that record h…`
+- `ROADMAP.md:247` to `ROADMAP.md:98`: `third only for an open Critical or High; the g…`
+- `ROADMAP.md:248` to `ROADMAP.md:99`: `day session reverts the merge that broke main …`
+- `ROADMAP.md:249` to `ROADMAP.md:100`: `tiers mapped onto 'ready' and 'needs-mustafa',…`
+- `ROADMAP.md:250` to `ROADMAP.md:101`: `'.claude/CHECKPOINTS.md' §10, disk hygiene (b8…`
+- `ROADMAP.md:251` to `ROADMAP.md:102`: `0006, his XP-TERM (a) and LOOK (a), #43's Low …`
+- `ROADMAP.md:252` to `ROADMAP.md:103`: `pass with main's counts; gate PASS. The review…`
+- `ROADMAP.md:253` to `ROADMAP.md:104`: `and one fix pass; the verifier's H1 (the rever…`
+- `ROADMAP.md:254` to `ROADMAP.md:105`: `the report 'docs/reports/2026-11-08-kit-v3-4.m…`
+- `ROADMAP.md:255` to `ROADMAP.md:106`: `next change-set, kit-v3-5.`

@@ -88,3 +88,46 @@ B10. DONE and the answer.
     if(l.startsWith("-"))rem.push(l.slice(1));else if(l.startsWith("+"))add.push(l.slice(1));}const ne=a=>a.filter(
     x=>x!=="");const r=ne(rem).sort(),a=ne(add).sort();console.log(r.length,a.length,JSON.stringify(r)===JSON.stringify(a))'
   List: docs-keeper-moved-lines.md. Next B5 (STATUS own lines).
+- B5 done: STATUS own-line edits: :5 Last updated; :13 Last merged (#57, 22c6afa, 11:09:31 UTC, his go; CI green on
+  main; "every merge: ROADMAP." back: Low 2 of #57's final head); #58's row (new :29; holds "Open after it, for
+  Follow-ups once merged" as #56's row did; ready when the verifier and the advisor agent are through); Next :36-37
+  ("Slice 3 waits for the netcode proof test's result": Low 3; then change-set 2, its plan first, after his go on #58);
+  Waiting: #58's go, the test zip, DEP-HOLD, CI-TYPES, CI-CUT, LANE-ISSUE (4 lines) + Part 15's items in their words (2
+  lines); Follow-ups: the dependency hold (2 lines); pointer heading for the moved table (last line). STATUS = 120 lines.
+  Over 120 chars: :23 (#55's line, URL), table rows :28 (#40) and :29 (#58; one line per PR). Next B6 (archive).
+- B6 done: archive :159 (#57's moved row, own) edited into four cells (5 pipes, like the header): bold title; Branch
+  cell "merged: PR #57 (...), 22c6afa, 2026-11-18 11:09:31 UTC (commit date and merged_at), by merge commit, on his go
+  of 11:08:25 UTC for head f26ac5b..., after the advisor agent's APPROVE of that head (about 00:17 UTC); CI green on main
+  (gate 866 with smoke, id 44292101495; toolchain 165, id 44292101705)"; State "done: report; reviews; what he accepted
+  (DECISIONS:148-153, paraphrased, no quotes); OLD-LINES; the three Lows (two fixed here, the size recount left to #58's
+  report); its merge recorded by #58"; Waiting "none". Archive end: a note line of mine after the moved table ("this
+  file" = STATUS). Not touched: Health "CI on main" row (3f98c0b, #52; dated 2026-11-10): stale, listed. #58's
+  follow-ups and risks go to the archive when it merges (as #56's did). Next B7 (ROADMAP).
+- B7 done: ROADMAP: new #58 entry (144-150, 7 lines: draft; two review rounds; the report tells two misses first;
+  next the verifier, the advisor agent, his go); #57's entry (own) -> [2026-11-17 to 11-18, MERGED] (title line was
+  122 chars, now 113), its 145-147 unchanged, its last line replaced by 4 lines (the verifier PASS; report; merged PR
+  #57, 22c6afa, 11:09:31 UTC, on his go after the advisor agent's APPROVE of f26ac5b; CI green on main gate 866 with
+  smoke, toolchain 165; OLD-LINES pointer). Recent work = 12 entries. Folded #43 (:90) and #44 (:92-106) keep their
+  bytes (two lines over 120 inside them: 1913 and 122 chars, not re-wrapped). Not touched: ROADMAP :120 "v2, next"
+  (#55's, 9660197). Next B8 (REPO_MAP).
+- B8 done: REPO_MAP: 10 new rows of mine, nothing removed or changed: after `crates/` (4: messages.rs, ts_export.rs,
+  layout.rs, layout_ts.rs), after `packages/` (5: generated/ with the regenerate command and the target-folder rule,
+  generated/protocol/, generated/block/layout.ts, layout-check.ts, index.ts), after #57's report (1: the cs1 report).
+  Verified: layout.rs:61-66 (header stride 8, tick u32 at 0, layout_hash u32 at 4), :74-82 FNV-1a 32 bits;
+  Cargo.toml [workspace.dependencies] holds only ts-rs; index.test.ts tests the exports. Map check: "repo map OK: 139
+  entries cover 109 required paths", exit 0. Stale, other lanes', left: REPO_MAP :6 "Last checked: 2026-11-17" (#55,
+  9660197); :16 `Cargo.toml` "[workspace.dependencies], empty for now" (#48, 550856a; now holds ts-rs); :18 `crates/`
+  "each still an empty stub with one test" (#48, 790ac31); :21 `packages/` "each empty with one stub test" (#48,
+  550856a). Next B9 (checks and the blame proof).
+- B9 done: checks after all edits. STATUS 120 lines; no own prose line over 120 chars in the four files (table rows
+  and moved lines aside); STATUS #58 row 6 pipes (5 cells), archive #57 row 5 pipes (4 cells); repo-map-check "repo map
+  OK: 139 entries cover 109 required paths" exit 0; RECORD-FILES proof: node .checkpoints/cs1-types/docs-keeper-blame-
+  check.mjs -> "34 removed lines checked; 0 not this lane's and not moved" (own 8, moved 24, blank 2), exit 0. Added
+  "OLD-LINES, who may fold old lines in the shared record files" where my lines name it (STATUS row, archive row,
+  ROADMAP #57 entry). numstat: STATUS +14 -14 (120), archive +13 -0 (1285), ROADMAP +33 -20 (270), REPO_MAP +10 -0
+  (165). Untouched: DECISIONS, the report, ADRs, code, kit. origin/main still 22c6afa (fetched again).
+- For the main session after the verifier: nothing of mine has a gap; the report's <<DOCS-KEEPER>> line (report :73)
+  is the main session's to fill from this pass. Tell the caller: main's CI on 22c6afa is gate 866 / toolchain 165
+  (867/166 ran for this branch's push of the same commit); if the verdict makes #58 "ready", only the #58 row's State
+  cell and the ROADMAP #58 entry's last sentence change.
+DONE
