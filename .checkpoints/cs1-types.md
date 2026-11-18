@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 15:02 CET (from the clock)
+- **Last update:** 2026-11-18 15:07 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -282,6 +282,37 @@
     - The report's draft is written (`cs1-types/report-draft.md`), with marked gaps for round 2, the verifier, the
       final head, CI and the size.
 
+    - test-engineer round 2 (13:42:42 to 14:05:21 UTC): APPROVE (`cs1-types/test-engineer-review2.md`). Its High,
+      three Mediums and Lows 5, 6, 8 closed; 7 closed for plain files. It accepts that the block's hash is not pinned
+      as a literal in Rust. Six new Lows, all follow-ups: L1 the new guards are held by no committed test (its N1,
+      N2, H4b pass `cargo test`): they belong in the gate v2's planted set; L2 the doc check accepts `*/` alone on a
+      line (a hand-written multi-line `#[doc]`) and refuses an honest block doc; L3 the build-folder check compares
+      path strings (a link to the same tree, a moved clone that kept its target: exit 101, no way out in the
+      message); L4 `generated/` may hold a link or a third folder; L5 the tag pair lacks an `assert_ne!`; L6 record
+      wording. **Its conditions on the report** (else High): the doc check "fails a line that holds `*/` with other
+      text"; planted run 5a: "the known answers bite"; its words per mark (as engine-architect's; PM-0002-63 "not
+      met"). All taken in the report's draft. Its build folder `.gate/cs1-types/te-target` can go. Outside its lane:
+      the commits' trailer names Fable 5.2 while CLAUDE.md says Opus 5.5 (his decision of 2026-11-14 in DECISIONS
+      covers this chat; tell the advisor agent).
+    - **Decision by the main session: the code stays as round 2 reviewed it (65a7b13).** Round 2 left Lows only; by
+      the review budget they are follow-ups (in the report and, by docs-keeper, in STATUS). No code edit follows
+      unless the verifier or the advisor agent finds something at Medium or above.
+    - Pull request #58 opened as a draft at 14:05:52 UTC (base main, head this branch).
+    - The report stands at `docs/reports/2026-11-18-cs1-types.md` as a draft with marked gaps (`<<…>>`: docs-keeper's
+      line, the final code and head, CI, the 20 runs' numbers, round 2's end and the last two answers, the verifier,
+      the size, the notes' commit). It is 309 lines: tighten it while filling the gaps (work on
+      `cs1-types/report-draft.md`, copy over when docs-keeper is done; it reads the report's "Follow-ups").
+    - docs-keeper started 14:07:22 UTC (STATUS, STATUS_ARCHIVE, ROADMAP, REPO_MAP under
+      RECORD-FILES and OLD-LINES; notes `cs1-types/docs-keeper-notes.md`, moved lines in
+      `cs1-types/docs-keeper-moved-lines.md`); security-auditor round 2 (since 13:59:40) and netcode-architect round 2
+      (since 14:01:47) are still running.
+    - Then: fill the report; the test archive (a zip in `.gate/cs1-types/`, sent with the file tool, never
+      committed: `README.txt`, the nine generated files, `sha256.txt`); the verifier (Opus 5.5, effort max) on the
+      head with the report, with section 4's symbol list and the report's "added" line; the advisor agent on the
+      final head (tell it: the Fable trailer is his decision of 2026-11-14; P1 and CI-CUT stay open, so
+      needs-mustafa); delete `.checkpoints/cs1-types*` in the last commit (the report names the commit before it;
+      no skip mark on it); update #58's description, mark it ready; ask whether to watch it; stop for his go.
+
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
   "[skip ci]", but the checkpoint commit pushed on top of it (da22f96, 12:04:37 UTC) did not: `checkpoint.mjs` leaves
@@ -367,6 +398,6 @@
   to Part 15, all (a), 22:10:34 UTC.
 
 ## Running work
-- saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
-  stopped at 12:30:03 UTC for the code push).
-- agents (3 of 3): round 2: test-engineer, security-auditor, netcode-architect (times in step 10).
+- saver: background task bx7rdhkl7, started 14:07 UTC on 2026-11-18 (2-hour limit; the one before it, bafnij7xk, ran
+  from 12:30 and was stopped just before).
+- agents (3 of 3): security-auditor round 2, netcode-architect round 2, docs-keeper (times in step 10).
