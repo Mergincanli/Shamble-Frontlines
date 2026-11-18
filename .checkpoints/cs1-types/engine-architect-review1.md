@@ -20,3 +20,15 @@ Memory: no engine-architect memory file exists (.claude/agent-memory-local/ hold
 
 ## Findings (a line each, as found)
 
+- (info, check 6) cargo tree --locked --offline: client-endpoint has no edge of any kind (-e normal,build,dev --target
+  all); protocol has no normal or build edge on any target; ts-rs is reached only as protocol's dev-dependency (-i
+  ts-rs -e all --target all); wasm32 normal edges: the six crates alone. packages/types imports only its own files
+  (index.ts, layout-check.ts, generated/protocol siblings) and vitest in tests; its package.json has no dependencies.
+- (info) tsc 6.0.3 by path: .gate/cs1-types/tsconfig.json exit 0, tsconfig.shipped.json exit 0 (lists the 9 generated
+  files, layout-check.ts, index.ts). Both configs carry A2:421-426's flags plus noEmit, allowImportingTsExtensions,
+  module preserve, target/lib es2023, types []; tests config adds skipLibCheck.
+- (info) symbols: everything in plan-draft s4 and plan 5(g) is built under its planned name; added public items are
+  ElementType::name(), ElementType::size() and the derives (Debug, Clone, Copy, PartialEq, Eq) on the three table
+  types; added private: fnv1a, FNV consts, SECTION_TAG/FIELD_TAG (deviation 1), test helpers (field, section,
+  name_is_plain, broken_rule, GOOD, BAD, BASE, SECOND, CHANGED), write_generated x2, new_scratch_folder, files_in,
+  GENERATED_FOLDER/FILE_NAME. Removed as planned: stub_builds, PACKAGE. Missing: none. Renamed: none.
