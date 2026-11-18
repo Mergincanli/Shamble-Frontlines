@@ -12,3 +12,10 @@ Rules: cargo --locked (and --offline), no cargo update, no npm scripts/npx, noth
 - B6 Verdict, findings ranked, memory update, DONE.
 
 ## Notes
+### B0 Read: DONE
+- Code at HEAD 554ebe1 == 65a7b13 for crates, packages, Cargo.toml/lock, rust-toolchain.toml (git diff --stat empty). Diff 82142fa..65a7b13 in my scope: 6 files +288/-120 (ts_export.rs, layout_ts.rs, layout.rs, lib.rs, messages.rs docs, layout-check.ts). fix-pass-1.md read; plant.sh runs 2f, 6a-6e read with results (all "as wanted"; plant run at 65a7b13, own target plant-target, 30 runs, 0 not as wanted).
+- ts-rs facts re-read (registry src, 12.0.1): format_docs lib.rs:1188-1213 has TWO forms: one doc entry holding '\n' -> raw `/**{doc}*/` (lib.rs:1194); otherwise `/**` + per entry " *"+entry + "\n */" (:1197-1210). ts-rs-macros utils.rs:167-174 extract_docs takes every #[doc = expr] verbatim (no trim); field docs prefixed "\n" (named.rs:150-154). messages.rs: 52 `///` lines, no `/**`, no #[doc, no include_str (grep exit 1).
+### B3 S3: CLOSED
+- layout-check.ts:9-17 now says: drift check, not a security check; a passing block still has every count and offset checked against its length; never throws given an ArrayBuffer; the caller makes sure it has one. All three parts of my S3 met. `const header = BLOCK_LAYOUT.header` change: no effect in my lane.
+### B1a S1 second clause (refuse write mode when CI is set), not taken: ACCEPTED
+- The drafted CI edit (docs/reports/2026-11-18-cs1-types.md:271-279) runs plain `cargo test --workspace --locked` first, then write mode, then `git status --porcelain --untracked-files=all -- packages/types/src/generated` and fails on any output. The comparison is with the commit, so an injected SHAMBLE_WRITE_TYPES (e.g. a committed .cargo/config.toml [env]) cannot silence it: modified, deleted and new untracked files all show. A CI refusal would break that design (env -i passes CI). Condition: keep the git status form (git diff --exit-code alone misses new untracked files). Nit for that tier-2 PR: add --ignored (no ignore rule matches generated/ today: git check-ignore exit 1), so a later ignore line cannot hide a regenerated file.
