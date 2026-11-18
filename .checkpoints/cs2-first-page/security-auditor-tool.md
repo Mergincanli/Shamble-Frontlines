@@ -86,3 +86,10 @@ Plan: read plan.md s6-7 + advisor F2; read the 0.2.130 release page/assets via W
   openssl (dep:native-tls), vendored-openssl ["openssl","native-tls/vendored"]. Timeline: assets uploaded 06:11:06-07Z,
   crate published 06:15:16Z, release published 06:16: one tag run. The prebuilt Linux binaries are built with
   --features vendored-openssl ON TOP of default rustls (OpenSSL C sources compiled in); `cargo install` default = rustls only.
+- 21:48 S13 crates.io API https://crates.io/api/v1/crates/wasm-bindgen/0.2.130 (WebFetch): created_at 2026-10-30T06:15:04.504224Z,
+  checksum a0181c14ddd6c7b8b0b0132a5f1ea2f32be0d893cd3ea97b6e3b28886b8a3d1c (= plan :836's a0181c14...3d1c), crate_size
+  81,643, published_by null, trustpub_data {github, wasm-bindgen/wasm-bindgen, run_id 41011884567, sha c93b8ae...} = the
+  SAME run and commit as the CLI crate and the release tag. So library, CLI crate and release binary share one origin
+  (one workflow run on one commit); only the crates have a trusted-publishing record, the binary has none.
+- 21:48 S14 docs.rs source view https://docs.rs/crate/wasm-bindgen-cli/0.2.130/source/Cargo.lock (WebFetch list, fetch-model
+  transcription; my own count below): the CLI crate's published Cargo.lock.

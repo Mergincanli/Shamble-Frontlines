@@ -39,8 +39,8 @@ The agent's whole answer is in this session's record; the quotes here are the pa
 - D, what the project has done (not a promise): twelve releases between 2026-03-31 (0.2.117) and 2026-10-30
   (0.2.130), the last five on 2026-06-24, 2026-08-08, 2026-09-04, 2026-09-25 and 2026-10-30. 0.2.130 is the newest
   and is marked "Latest" on C.
-- ADR 0002's own text says compatibility broke twice in 2026, in 0.2.123 and 0.2.128 (:1086-1088). Nothing read today
-  says that will not happen again.
+- ADR 0002's own text says wasm-bindgen "broke compatibility at least twice in 2026, in 0.2.123 and 0.2.128"
+  (:1086-1087). Nothing read today says that will not happen again.
 
 ## Anything that says unmaintained, deprecated or moving again
 - Nothing found. A records the move of July 2025 to the new organisation (the Rust and WebAssembly Working Group

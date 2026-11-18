@@ -621,7 +621,8 @@ tests, the readout's `textContent`, the dev server's binding and file allow-list
    choose then: a small local declaration file for the handful of three.js names change-set 2 uses, which loses
    PM-0002-30's reading until the real types return.
 6. **The zip route:** proven on 2026-11-18 (section 3, item 6). No longer a risk.
-7. **wasm-bindgen broke compatibility in 0.2.123 and 0.2.128** (OQ-0002-7's text, ADR 0002 :1086-1088). The exact pin
+7. **wasm-bindgen broke compatibility "at least twice in 2026, in 0.2.123 and 0.2.128"** (OQ-0002-7's text, ADR 0002
+   :1086-1087). The exact pin
    and the tool check hold it. Each bump is its own change-set.
 8. **CI runs none of the Wasm build, the boundary tests or the new packages' type check until CI-WASM's edit merges,**
    and no browser until after change-set 3. Until then those marks are "shown", not "met". Adding the build to the
@@ -739,27 +740,37 @@ arithmetic on the plan's estimate, not a measurement.
 
 ## 16. Open questions for Mustafa
 **RNG-CRATE: which library gives the simulation its random streams, and in which change-set does it enter?**
-- Why it matters: it is pinned for good, and the project that makes the crate ADR 0004 names has itself moved off it.
+- Why it matters: it is pinned for good, and rand itself no longer depends on the crate ADR 0004 names.
 - What was found (read again by the main session on 2026-11-18: the changelog and the registry directly, the pull
   request page through a fetch agent): ADR 0004 part 8 names `rand_chacha`'s `ChaCha8Rng`. rand 0.10.0's changelog
   says "The dependency on `rand_chacha` has been replaced with a dependency on `chacha20`". The rand project took
   `rand_chacha` out of its main repository (pull request #1658, "Remove rand_chacha", merged on 2026-01-23: "Source
   moved: rust-random/rngs#68"); its newest release, 0.10.0, is of 2026-02-02. One maintainer (dhardy) wrote there on
-  2026-01-20: "I no longer see a reason to maintain `rand_chacha`." Another (newpavlov) proposed an empty 0.11 that
-  points users to `chacha20`; dhardy answered that he sees no need to force people to move. Nothing on that page says
-  who maintains `rand_chacha` from here on. `chacha20` 0.10.2 (2026-08-27, from RustCrypto; 0.10.0 and 0.10.1 were
-  yanked) has the feature `rng` with its own `ChaCha8Rng`; its docs do not say that its output equals `rand_chacha`'s,
-  so change-set 3's 10,000-output vectors pin whichever crate is chosen.
+  2026-01-20: "I no longer see a reason to maintain `rand_chacha`." Asked by another (vks) whether to make a final
+  release that marks it deprecated, dhardy answered that he sees no need to force people to migrate. After that,
+  newpavlov proposed an empty 0.11 that points users to `chacha20` ("thus effectively deprecating `rand_chacha`");
+  nothing on the page answers that proposal. Against that stand three facts: the `rngs` repository's README says
+  "This repository houses extra generators maintained by the project"; `rand_chacha`'s changelog there says "The
+  crate was moved from the rand repo ([rand#1658]) to the rngs repo ([#92])"; and crates.io lists as its owners
+  dhardy and the team `github:rust-random:maintainers`. So the crate has a home and owners in the rand project; what
+  it has not had is a release since 0.10.0. `chacha20` 0.10.2 (2026-08-27, from RustCrypto; 0.10.0 and 0.10.1 were
+  yanked) has the feature `rng` with its own `ChaCha8Rng`. rand's changelog says of its own 12-round generator that
+  after the move "the output remains the same"; nothing read says the same of `ChaCha8Rng`, and `chacha20`'s docs
+  do not say that its output equals `rand_chacha`'s. Change-set 3's 10,000-output vectors pin whichever crate is
+  chosen.
 - Options: (a) `rand_chacha` 0.10.0 in change-set 2, as ADR 0004 and the build plan say: a pinned, frozen copy whose
   tree adds `rand_core`, `ppv-lite86` and `zerocopy`; (b) `chacha20` 0.10.2's `ChaCha8Rng` (feature `rng`) in change-set
   2: the RustCrypto crate that rand 0.10 itself uses, with the same algorithm and the same calls for the seed, the
-  stream and the position, and a smaller tree (`cfg-if`, `rand_core`, and `cpufeatures` on x86 only). This changes ADR
+  stream and the position, and a smaller tree (`cfg-if`, `rand_core`, and `cpufeatures` on x86 only) when taken with
+  `default-features = false` (its default feature `cipher` adds the `cipher` crate). This changes ADR
   0004's crate name, recorded by a dated pointer at the drafts' next revision; (c) no generator in change-set 2:
   nothing there draws a random number, so the change-set carries only the seed path (the Worker draws 32 bytes, the world
   keeps them, the state hash covers them). The generator enters in change-set 3 beside its 10,000-output test vectors
   (PM-0004-27), with (a) or (b) answered by then.
-- Recommendation: (c), with (b) for change-set 3. A generator nothing calls is code "for later", the proof of the
-  streams is change-set 3's anyway, and (b) is the crate the rand project itself now builds on.
+- Recommendation: (c). A generator nothing calls is code "for later", and the proof of the streams is change-set 3's
+  anyway. Which crate it is can then be asked with change-set 3's plan, after both are read side by side; today's
+  leaning is (b), because rand 0.10 itself depends on `chacha20` (feature `rng`) and it is the only one of the two
+  released since February (0.10.2, 2026-08-27). If you answer (a) or (b) now, that crate enters in change-set 2.
 
 **WB-HEALTH: wasm-bindgen's project has maintainers but no written release policy. Does the game still build on it?**
 - Why it matters: every call between the simulation and the browser goes through wasm-bindgen, for years, and the
@@ -769,7 +780,7 @@ arithmetic on the plan's estimate, not a measurement.
   change, and has made about one release a month through 2026 (the newest, 0.2.130, on 2026-10-30). Its guide and its
   maintenance issue hold no release schedule and no promise that a new release keeps working with older code; the one
   policy found is a 2-year rule for the Rust version a release needs. The engine draft itself notes that
-  compatibility broke twice in 2026 (0.2.123 and 0.2.128).
+  compatibility broke "at least twice in 2026, in 0.2.123 and 0.2.128" (ADR 0002 :1086-1087).
 - Options: (a) go on, behind the exact pin (`=0.2.130`), with the build refusing a command-line tool of any other
   version and every bump as its own change-set. This is the engine draft's option for this question, and the only one
   it researched; (b) stop before step 2 and research another way to bind Rust to the browser first (none is researched;
@@ -833,10 +844,11 @@ Wasm, the type check of the two new packages)?**
    (#4533) and the guide's governance page" (ADR 0002 :1085-1093), "comes before the step that adds wasm-bindgen"
    (EMPTY-SLOTS), and `sim-wasm`'s stub says its bindings wait for it (`crates/sim-wasm/src/lib.rs:1-3`). Step 0 does
    the reading.
-2. **The project behind ADR 0004's generator crate has moved off it** (RNG-CRATE): rand 0.10 itself depends on
-   `chacha20`; one maintainer wrote that he sees no reason to maintain `rand_chacha`, and another proposed an empty
-   0.11 that points users to `chacha20` (proposed, not released: crates.io's newest is 0.10.0, and the first answered
-   that he sees no need to force a move). The card's "the seeded random streams" inherits that.
+2. **The project behind ADR 0004's generator crate has moved off it as a dependency** (RNG-CRATE): rand 0.10 itself
+   depends on `chacha20`; one maintainer wrote that he sees no reason to maintain `rand_chacha`, and another proposed
+   an empty 0.11 that points users to `chacha20` (proposed, not answered, not released: crates.io's newest is
+   0.10.0). The crate still has a home in the project's `rngs` repository and the project's team among its owners.
+   The card's "the seeded random streams" inherits that.
 3. **"A first reading of the hand-off with the block filled to the size of 12 and of 48 soldiers"** (:310-311): no
    source gives a soldier row's size before change-set 4 (the only figures found are ADR 0001 :313's 90-bit and 60-bit
    wire records, which are compressed). The reading becomes a curve over block sizes, and change-sets 4 and 5 read the
