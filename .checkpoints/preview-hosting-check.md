@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 23:52 Amsterdam (22:52 UTC)
+- **Last update:** 2026-11-18 12:11 Amsterdam (11:11 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -398,6 +398,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      exposure he accepted; ID-ENDS its own yes entry (compared on Account Details; GitHub hides only the whole value).
      Point 5: the deploy.yml gap is Medium (personal data in a public log), a gate before the next deploy run of any
      kind; his decision (rename) answers it, the ID can still print in that case.
+
+   - The token check placed (his yes of 2026-11-18): branch `check-token` (863b639d128a..., the file's hash equal to his
+     yes), pull request #2, run 44292323566 with its one job waiting on `preview` from 11:11:00 UTC; no other run
+     started. His one-item list sent. Next: after his approval, read the run, copy its output word for word into the
+     results log, close pull request #2 unmerged, delete the run's logs (his words), then the outcome row's next action.
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and

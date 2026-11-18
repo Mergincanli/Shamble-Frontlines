@@ -133,3 +133,12 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   debug logging" box (his screenshot of the dialog, not run); GitHub's re-run page: it applies to "the re-run". No
   repository secret or variable ACTIONS_STEP_DEBUG (his words: "I have not done such thing"), so the empty "Repository
   secrets" condition stands on his screenshot of 2026-11-16 and these words.
+
+### The token check (his yes of 2026-11-18; one run; outside the marks)
+- Branch `check-token` made from `main` 4a67b83; one commit 863b639d128a994a47752fece88632d54344188e adding
+  .github/workflows/check-token.yml (80 lines; `git show HEAD:` sha256 0ad66aa0f2b36f7469bc3bdd57a4a05b7945e0037f96b19059000e0ca9b5aa71,
+  equal to his yes); pushed 2026-11-18 about 11:10 UTC (the push's own time is not in a record; the run below was
+  created 11:10:59). Pull request https://github.com/Mergincanli/shamble-preview-check/pull/2.
+- Run: `check-token` #1, id 44292323566, event pull_request, head 863b639d128a..., actor and triggering actor
+  Mergincanli, created 11:10:59; job `check` (id 134760377971) "waiting" on `preview` from 11:11:00. No other run
+  started (the run list holds only this one and the setup pull request's deploy run).
