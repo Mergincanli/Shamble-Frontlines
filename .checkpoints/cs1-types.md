@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 13:28 CET (from the clock)
+- **Last update:** 2026-11-18 13:30 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -39,7 +39,12 @@
    `cargo test` would compile ts-rs before the security check). NOTHING has been compiled yet.
 
 ## Current step
-6. Build, in the working tree only (NO code commit before the security answer; see the rule below). State at 12:26 UTC:
+6. Build. The work so far is committed as ef9741c (12:30 UTC, "work in progress", the head of its own push, with
+   the skip mark; pushed by its exact SHA with the saver stopped; checked at 12:31 UTC: no CI run started, the newest
+   runs on the branch are still 168 and 869 on da22f96). It also holds `packages/types/src/index.ts`, `index.test.ts`
+   (they wait for the generated message files) and the package's new description line. No "Lane requests" issue
+   exists (12:28 UTC: the only open issue is the Night queue, #16). Earlier note, kept:
+   Build, in the working tree only (NO code commit before the security answer; see the rule below). State at 12:26 UTC:
    - DONE, uncommitted: `crates/client-endpoint/src/layout.rs` (243 lines), `layout_ts.rs` (141), `lib.rs` (8);
      `packages/types/src/generated/block/layout.ts` written by write mode (`LAYOUT_HASH = 0x2df78c30`);
      `packages/types/src/layout-check.ts` and `layout-check.test.ts`. Checks run on them: `cargo fmt --all --check`
@@ -78,8 +83,10 @@
   before the first build) is missed for that one CI run. security-auditor was told at 12:06 UTC and adds to its
   answer what that run could reach and the miss's severity; the miss goes to Mustafa (told in chat), to the advisor
   agent with the security answer, and into the report.
-- **Rule until the security answer says CLEAR TO BUILD:** no code commit (working-tree edits only), so every push is a
-  checkpoint-only push and carries "[skip ci]".
+- **Rule until the advisor agent's APPROVE on the security answer:** nothing that compiles ts-rs runs here, and no push
+  may start CI: a code commit is pushed only as the head of its own push with "[skip ci]" in its message, by its exact
+  SHA (`git push origin <sha>:refs/heads/<branch>`), with the saver stopped first (TaskStop) and started again after.
+  A foreground `checkpoint.mjs save` is run only when no code commit is ahead of the remote.
 
 ## Build notes (the main session's design choices, to carry out and to list in the report's deviations)
 - `crates/client-endpoint/src/layout.rs`: `ElementType { U8, U32 }` with `const fn name()` ("u8", "u32") and `const fn
@@ -152,6 +159,7 @@
   to Part 15, all (a), 22:10:34 UTC.
 
 ## Running work
-- saver: background task b98z35xsq, started 11:11 UTC on 2026-11-18.
+- saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
+  stopped at 12:29 UTC for the code push).
 - agents (1 of 3): the advisor agent on the security answer and the CI miss (started 12:28 UTC). security-auditor
   finished its notes at 12:27 UTC (DONE).
