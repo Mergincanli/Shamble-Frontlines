@@ -70,3 +70,10 @@ B11. DONE and the answer.
   2026-11-18T17:18:51Z, head 2dff689, no label yet. Issue #59 "Lane requests": open, created 2026-11-18T15:41:35Z by
   Mergincanli. Code commits on the branch: 8bf4bee (kit, 17:18:10), 94c197f (workflow, 17:18:10), 0c0e271 (plant,
   17:20:38), 415bd73 (take-back, 17:21:54), 4877599 (KIT-FIX, 18:03:10 committer date).
+- Coordinator's second message (received after B3): test-engineer's review is in; its follow-up lines go into
+  Follow-ups now, named with the reviewer (its own F1-F11, not security-auditor's F1-F5). Read
+  test-engineer-review1.md :190-205: F1-F3 Medium (missing tests: main's side of the equal-to-main read at the literal
+  path; `deleted  <path>` leaving an existing plain file held; origin/main over a local main), F4-F10 Low (missing
+  tests F4-F7, F9; F8 test 29's look-alike name; F10 the watch tests' clean-up order), F11 for the gate v2 list (the
+  kit's four test files run in no CI job and not in the gate). Verdict :180-188: proven as stated; no High; nothing
+  changes in the kit files. DECISIONS committed as a18a62b; still not mine.
