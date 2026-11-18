@@ -385,3 +385,13 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
     **No count of builds is shown on this tab.** (Requests 0 although production was fetched many times today: what
     this tab counts is not documented here; recorded, not explained.)
   - The Workers & Pages overview: not yet seen; asked of him before `uploads` starts (plan Part 3 C step 3 names it).
+- His screenshot of the Workers & Pages overview (no words; 2026-11-18 17:23:36 UTC,
+  33658e3d-8f06-4af5-ad77-4e4fae9bcbb4), transcribed: account "Shamble Frontlines"; "Workers & Pages", one application,
+  shamble-preview-check (shamble-preview-check.pages.dev), "21m ago", "No Git connection", "Showing 1 - 1 of 1"; panel
+  "Usage" (Today): "Requests today 0 / 100,000", "Observability events today 0 / 200,000"; "Account details": the
+  account ID (shown in full on his screen, not copied here; its first and last 4 are d17d...d8e7, as the token check
+  printed) and the workers.dev subdomain (not copied here); "Cloudflare Access": "Set up Zero Trust before requiring
+  Access sign-in for Workers on this account." **No count of builds is shown.**
+- **The first reading of the build count: "no count shown"** on all three places plan Part 3 C step 3 names (the
+  project's Deployments page, its Metrics tab, the Workers & Pages overview).
+- `uploads` started by the session right after (run_workflow, ref `main`, set `uploads`; 204 at about 17:23:55 UTC).
