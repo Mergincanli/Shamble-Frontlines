@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 14:30 CET (from the clock)
+- **Last update:** 2026-11-18 14:42 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -110,7 +110,6 @@
      the leftover scratch folders in /tmp (a variable that could be empty); the whole command was not run. Route:
      the form the check itself names, `rm "${d:?}"/*.ts`; the script uses it too.
 
-## Current step
 8. (12:50 UTC) Round 1 of the reviews on the final diff (`git diff origin/main...HEAD -- . ':!.checkpoints'`), all
    Opus 5.5 at effort max, at most 3 at a time: batch 1 rust-reviewer, test-engineer, security-auditor; batch 2
    engine-architect, netcode-architect. Notes: `cs1-types/<agent>-review1.md`. Then one fix pass, the planted
@@ -200,6 +199,40 @@
      defects and the 20 runs again with a target folder of their own (never shared with the main folder; every
      file newer than each run's start), CI on the pushed head, round 2 on what changed (test-engineer and
      engine-architect, whose verdicts were REVISE, and rust-reviewer for the changed Rust), the verifier.
+9. The fix pass after round 1 (13:30 to 13:41 UTC; commits 1a2ff13 and 65a7b13; every finding and what it got:
+   `cs1-types/fix-pass-1.md`). In short: the export tests stop when they do not run in the copy they were built in;
+   write mode makes no folder above its own and refuses a linked path; the generated layout is one object
+   `BLOCK_LAYOUT` without `align` (`index.ts` exports `BLOCK_LAYOUT` where it exported `header`: **deviation 4**); the
+   hash test has known answers from a second implementation, the tag-byte pair and four more tables; overlap both
+   ways; checked arithmetic; the message types' doc lines after the netcode review; a signed read and a zero block
+   tried in Vitest. Not taken, with reasons: a literal pin of the block's own hash in Rust; refusing write mode when
+   `CI` is set; reading the hash before the whole header (for change-set 4); one constant for the 16 buttons.
+   - The main `target` was removed (`cargo clean`) and every hand check was run again, all exit 0, on 65a7b13: fmt,
+     clippy host and wasm32, `cargo test --workspace --locked` (client-endpoint 5, protocol 2), the release tests,
+     the wasm32 build, pedantic clippy on both crates, `-W missing_docs` 0 warnings, tsc with both scratch configs,
+     Vitest 7 passed, the gate without smoke, the repository map check, the three rules of the netcode proof test.
+   - The planted defects again (`plant-results.txt`, on 65a7b13, the worktree with a target folder of its own): 30
+     runs, all as wanted. New: 2e (a file directly in `generated/`), 2f (a doc comment that ends the generated
+     comment), 5a (the hash without its tag bytes), 5b (later sections' fields skipped), 6a and 6b (a test binary
+     run outside the copy it was built in), 6c (write mode with the tree missing: not made again), 6d and 6e (write
+     mode with a linked folder: refused, the file outside survives), 7 (the hash read as a signed number). The run
+     before it is kept as `plant-results-run2.txt`: 1 of 30 not as wanted (2f): the first form of that check counted
+     comment starts against comment ends and the planted text held both; commit 65a7b13 looks at lines.
+   - The 20 generator runs again (`runs20-results.txt`, on 65a7b13, the main folder alone, 1 worktree): 20 runs, all
+     nine files rewritten in each (newer than the run's start), one set (set sha256 07cd492f…4bc8), no difference
+     from the committed files. **This replaces step 7's record, which did not hold.**
+   - Size on 65a7b13 against main (generated files and the lockfile left out): 940 lines added, 12 removed: 1.57
+     times the plan of 600. **The stop line is 1,200: round 2's fixes must stay small; past it, stop and tell him
+     in three lines (what grew, why, the cheaper option).** What grew in the fix pass (+183): the folder checks of
+     both export tests (the build-folder check, write mode's link refusal) and the tests' new tables.
+
+## Current step
+10. (13:42 UTC) The push of 65a7b13 (this save; CI runs `gate` and `toolchain`). Then round 2 on what changed
+    (`git diff 82142fa..65a7b13 -- . ':!.checkpoints'`), at effort max: test-engineer and engine-architect (their
+    verdicts were REVISE), rust-reviewer and security-auditor for the changed Rust and write mode (two batches if
+    needed, at most 3 at a time). Notes: `cs1-types/<agent>-review2.md`. Then the verifier on the final head, the
+    docs pass (docs-keeper; `node .checkpoints/cs1-types/decisions.mjs` first, after taking main in), the report,
+    the advisor agent on the final head, the pull request, stop for his go.
 
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried

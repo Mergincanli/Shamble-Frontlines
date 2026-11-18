@@ -1,4 +1,4 @@
-# Change-set 1, the fix pass after round 1 (2026-11-18, 13:30 to 13:45 UTC, the main session)
+# Change-set 1, the fix pass after round 1 (2026-11-18, 13:30 to 13:40 UTC, the main session)
 
 Round 1: rust-reviewer APPROVE (six Lows), test-engineer REVISE (one High, three Mediums, four Lows), security-auditor
 no finding at Medium or above on the diff (three Lows; A1 confirmed for CI, outside this diff), engine-architect REVISE
@@ -11,7 +11,7 @@ NA = netcode-architect.
   export tests now stop when the folder `cargo test` runs them in (`CARGO_MANIFEST_DIR` at run time) is not the folder
   they were built in (`repository_root` in `layout_ts.rs` and `ts_export.rs`). `plant.sh` builds into a target folder
   of its own (`.gate/cs1-types/plant-target`); no brief tells a reviewer to share the main `target` again. The main
-  `target` was removed with `cargo clean` (13:36 UTC) and every hand check was run again from an empty build folder.
+  `target` was removed with `cargo clean` (between 13:33 and 13:37 UTC) and every hand check was run again from an empty build folder.
   `runs20.sh` counts a run only when every generated file is newer than the run's start, and prints the worktree count.
   The leftover folder `.gate/cs1-types/plant/` was deleted file by file (13:16 UTC). New planted runs 6a and 6b.
 - **TE Medium 2 (write mode made a missing tree again).** Write mode makes the one generated folder if it is missing and
@@ -43,8 +43,9 @@ NA = netcode-architect.
 - **RR 4, SA's nit.** The scratch folder's loop goes on only after `AlreadyExists`; any other error stops with the path
   and the reason; the temporary folder must be an absolute path.
 - **RR 6.** Every public item has a doc line (`-W missing_docs`: 0 warnings); the tag constants' doc says what holds.
-- **SA S2.** The export test of `protocol` fails when a generated file has more `*/` than `/**` (a doc comment that
-  would end the comment early). Planted run 2f.
+- **SA S2.** The export test of `protocol` fails when a generated file holds `*/` anywhere but on a comment's own last
+  line (a doc comment that would end the comment early). The first form, a count of `/**` against `*/`, was fooled by
+  the planted run 2f (a glob that holds both); commit 65a7b13 looks at lines.
 - **SA S3.** `checkLayoutHash`'s doc: a drift check, not a security check; "never throws" holds for an `ArrayBuffer`.
 - **NA 1 to 6.** Doc lines in `messages.rs`: `AimPoint` is provisional as a whole (its step and widths are borrowed
   from E3; PM-0001-51 sets them; the encoder clamps); counters wrap at their wire width and are compared wrap-aware;
