@@ -92,13 +92,16 @@
              bash --norc --noprofile -euo pipefail -c '
                id; ip -o link; rustc --version
                getent hosts github.com || echo "getent: no answer (printed, not judged)"
-@@ -97,4 +161,25 @@
+@@ -97,4 +161,28 @@
                [ -n "$tests" ]
                npx --no -- tsc --ignoreConfig $strict $shipped
                npx --no -- tsc --ignoreConfig $strict --skipLibCheck $shipped $tests
 +              echo "== the page as players get it, then the development page the browser tests need"
 +              node packages/client/scripts/build.mjs --production --out-dir "$PWD/.gate/dist-production"
 +              node packages/client/scripts/build.mjs --out-dir "$PWD/.gate/dist-development"
++              echo "== the Wasm built here, and the builder paths it carries (RR-F5: printed, not judged)"
++              sha256sum packages/sim-worker/pkg/sim_wasm_bg.wasm
++              grep -ao "/[A-Za-z0-9._/+-]*/\.cargo/registry/src/[A-Za-z0-9._/+-]*\.rs" packages/sim-worker/pkg/sim_wasm_bg.wasm || echo "no registry path in the Wasm"
 +              echo "== the boundary tests, on the built Wasm"
 +              npx --no -- vitest run --root packages/sim-worker --dir packages/sim-worker/boundary
 +              echo "== the type checks of the Worker and the page: shipped files with the lib check, then with their tests"

@@ -664,3 +664,133 @@ take-back commit's tree must equal the clean head's tree, as #60 checked):
 - What the plants do not prove: that every browser assertion can fail (one is planted); anything about a real GPU or
   WebGPU; that GitHub's check would catch a changed archive with the same sha256 (not possible to plant).
 - Block 7 done; next: Block 8 (CI side of RR-F5, SA-DIST, E2E-TYPES, TE-NT6).
+
+## Block 8. The CI side of the follow-ups (DONE)
+Read: docs/STATUS_ARCHIVE.md:1073-1083 (the group "For the CI pull request (CI-WASM)"); test-engineer's notes
+(.checkpoints/ci-wasm/test-engineer-followups.md, its plan and B1-B2 lines) so as not to duplicate: it owns the test
+side of TE-NT6, RR-N4, E2E-TYPES (it is trying a declaration shim, te-node-shim.d.ts), SA-TREE.
+- **RR-F5** ("the Wasm carries the builder's registry path (a panic location inside wasm-bindgen), so one commit gives
+  other Wasm bytes and sizes on another machine"). Found here: the built Wasm (sha256 c4935aca...2c31, 28987 bytes;
+  pkg/, the production and the development copies are byte-identical) carries exactly one absolute builder path,
+  "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wasm-bindgen-0.2.130/src/externref.rs"; the workspace
+  crates appear by relative path (crates/client-endpoint/src/block.rs, ...), the standard library as
+  /rustc/58cf8f9c.../library/... (the same on every machine for one toolchain). On the runner the path starts
+  "/home/runner/.cargo" (seen in the 2026-11-18 log's paths), 7 characters longer than "/root", so the runner's Wasm
+  will differ in bytes and probably in size (prediction, not verified). **CI side, now in the proposed text (3
+  lines, after the builds, printed and not judged):** `sha256sum packages/sim-worker/pkg/sim_wasm_bg.wasm` and a
+  `grep -ao` of any ".cargo/registry/src/....rs" path (else "no registry path in the Wasm"); run here as the YAML gives
+  them: exit 0, the sha256 line and the /root/... path. They make the difference visible on every run and give the
+  later fix its evidence. **What CI should compare, later:** once the build removes the path (rust-reviewer's fix,
+  e.g. build.mjs passing `--remap-path-prefix` through cargo's `--config` on its command line, never a root
+  `.cargo/config.toml`, which the repository forbids), CI can compare the Wasm's sha256 with this container's build of
+  the same commit (one equal hash = reproducible across machines), and change-set 3's size table becomes
+  machine-independent. Not proposed now: a judged comparison would fail today by design.
+- **SA-DIST** (".gitignore covers dist/ but not the dist-<something> folders build.mjs --out-dir accepts"): one line
+  `dist-*/` after `dist/`: `.checkpoints/ci-wasm/gitignore-edit.diff` (scratch copy `.gate/ci-wasm/proposed/.gitignore`;
+  `git apply --check` passes). Tried in a throwaway repository (.gate/ci-wasm/infra-engineer-dry/gi): `git check-ignore
+  -v` gives ".gitignore:4:dist-*/ packages/client/dist-x/a", leaves the plain file packages/client/dist-file.txt
+  unignored; no tracked file today lies under a dist-* folder (`git ls-files` count 0). `.gitignore` is not a CI, kit or
+  gate file (cs2-plan s18: "not a protected file"), so it needs no yes on exact text; it rides in this pull request as
+  STATUS placed it. CI itself does not need it (CI builds into .gate/).
+- **E2E-TYPES**: no flag makes it pass today (Block 5 note: 11 errors, all "install type definitions for node": process,
+  node:fs, node:path, node:url). The CI side is one line, added when the test side has Node's types (either
+  `@types/node`, a new dependency with the hold and security-auditor's answer, or test-engineer's declaration file):
+  `npx --no -- tsc --ignoreConfig $common --lib es2023,dom,dom.iterable --types node --skipLibCheck $e2e` (with a
+  `find packages/e2e -name "*.ts" ! -path "*/node_modules/*" ! -path "*/test-results/*"` list; with a shim file, drop
+  `--types node` and include the file). Not in this text: it would fail.
+- **TE-NT6, the CI settings only** (the test side is test-engineer's): in the proposed text: `--workers=1` (Playwright's
+  CI advice; the default is half the cores = 2 on the 4-vCPU public runner, which put two software-rendered browsers on
+  the CPU together: test-engineer's F2); `--retries=0` (equal to the config, written in CI so a later config change
+  cannot hide a flake there); `--global-timeout=300000` (5 min, 4.4 x the 68 s measured with one worker); the reporter
+  `list` (each test named with its time in the log); `CI=true` already reaches Playwright inside the cut, so
+  `forbidOnly` holds. Not set by CI: the per-test timeout (30 s default; test-engineer's F1 shows `running()`'s 60 s wait
+  can never be reached: a config change, the test side). Measured with one worker here: the allocation window had 36
+  frames (floor 20), 247 blocks (floor 200), last block 351 (ceiling 420). Evidence on runners comes for free: each
+  pushed head runs `toolchain` twice (push and pull request), so the clean head and the take-back heads give at least
+  four runner runs of the 12 tests; any red among them is a stop (Block 7, item 3).
+- Block 5 RE-DONE for RR-F5 (17:0x UTC): proposed file sha256 99f9720f...a6f8; ci-edit.diff 123 lines, sha256
+  672dbcc8...919e, `git apply --check` passes; **88 added, 0 removed**; YAML parses, all `bash -n` pass, no apostrophe
+  in the inner script. Table row added: 13b | the 3 RR-F5 lines (echo, sha256sum, grep -ao ... or echo) | RR-F5 made
+  visible each run, printed not judged | yes: exit 0, "c4935aca...2c31  packages/sim-worker/pkg/sim_wasm_bg.wasm" and
+  the /root/.cargo/registry/... path.
+- Block 8 done; next: the end sections (size, questions, Not verified), then DONE.
+
+## End: the planned size and what would make it grow
+- `.github/workflows/toolchain.yml`: **+88, -0** (`.checkpoints/ci-wasm/ci-edit.diff`, 123 lines, sha256
+  672dbcc82e43cb24960725e0eec488b8d5567d95174a5d3ca6aa8d74ca1a919e; proposed file
+  `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml`, sha256 99f9720f9671c39831b9bf8fa7e676a7e58aca7909ee4a391f68fa039aafa6f8).
+  By hunk (counted from the diff): header comment +4; the job's `env:` block +12 (the key, 4 comment lines, 7 values);
+  the three tool steps +47 (archive 17, GitHub's check 10, the program 17, each with its comment lines; 3 blank lines); the
+  cut's `env -i` list +1; the end of the cut +24 (builds 3, RR-F5 3, boundary 2, type checks 11, browser 5).
+- `.gitignore`: **+1, -0** (`.checkpoints/ci-wasm/gitignore-edit.diff`).
+- `.github/workflows/gate.yml`: unchanged. No source file, kit or gate file changes.
+- Total: **89 added lines, 0 removed**. Grows if: PERM-ATT (b) (+3: a job-level `permissions:` block naming
+  `contents: read` and `attestations: read`); CHROME-SOURCE (b) (+3 to +5: an install step and the path) or (c) (+10
+  to +15: curl, size, sha256, unzip, path; and a second ask for the values); FIREFOX-TESTS now (+6 to +12 CI lines, plus
+  a Playwright config edit); E2E-TYPES once Node's types exist (+2); a fix after a stop (e.g. a browser flag or an env
+  line inside the cut: +1 to +3); the plant P1 (+2, taken back: net 0).
+
+## End: open questions for Mustafa
+- **CI-TEXT:** may CI run the exact text in ci-edit.diff (88 added lines, nothing removed, sha256 672dbcc8...919e)?
+  Why: his standing rule, no CI edit without his yes on its exact text. Options: (a) yes, as shown; (b) yes, with
+  changes he names; (c) no. Recommendation: (a).
+- **CHROME-SOURCE:** which browser runs the browser tests in CI? Why: a browser CI downloads is code from the internet,
+  and its version decides what the tests prove. Options: (a) the Google Chrome already in GitHub's ubuntu-24.04 image
+  (157.0.8103.50 in image 20261111.370.1, from Google's deb at image build), nothing downloaded, the version follows
+  the image and is printed every run; (b) Playwright 1.65.0's own Chrome for Testing 158.0.8127.18 (headless shell +
+  ffmpeg 1013) from cdn.playwright.dev on every run, pinned by version but not by any checksum, and Playwright's
+  installer runs with the network before the cut; (c) the same Chrome for Testing archive fetched by curl and checked
+  against a size and sha256 he says yes to after one run prints them (two steps, about 170 MB per run, no cache).
+  Recommendation: (a).
+- **FIREFOX-TESTS:** when do the browser tests also run in Firefox? Why: his words, the game has to work in Firefox;
+  today only his own checks cover it. Options: (a) in this pull request; (b) with change-set 3; (c) its own small pull
+  request right after this one merges. It needs Playwright's patched Firefox 159.0 (revision 1572,
+  firefox-ubuntu-24.04.zip from Microsoft's Playwright mirrors, about 187 MB installed, no checksum; the image's
+  branded Firefox cannot be driven), a `firefox` project in the Playwright config, 11 of the 12 tests (the allocation
+  test is Chromium only), about 1 to 2 minutes more per run; it cannot be tried in this container first.
+  Recommendation: (c).
+- **PERM-ATT:** should the job's token get `attestations: read` beside `contents: read` up front? Why: GitHub's check
+  reads another repository's release attestation; the docs say fine-grained tokens need that permission but are silent
+  on the job token for a public repository. Options: (a) no, keep `contents: read` only; the first run (and plant P1)
+  shows whether it is enough, and if not the one change comes back to him; (b) yes, now (harmless: this repository has
+  no attestations; saves a round if it is needed). Recommendation: (a).
+- **PLANTS:** which planted changes run once on a runner, each taken back in the next commit? Why: they show the new
+  checks fail visibly there, as #60's did. Options: (a) P1 (GitHub's check given a file that is not the release's
+  asset: 2 lines of CI text, so his yes covers them too) and P2 (one committed render count 3 -> 4: a browser test
+  fails inside the cut and nothing retries it); (b) P1 only; (c) none. Recommendation: (a).
+
+## End: Not verified
+- GitHub's own check never ran (not here: network, this session's credentials, and this container's gh 2.89.0 is
+  inside CVE-2026-48501's range): its exact output, exit code, the permission question (PERM-ATT), the hosts it reaches
+  and its time. Its strings come from cli/cli's trunk source read through a fetch model, not from gh 2.103.3.
+- The download on a runner (the same route ran here on 2026-11-18 23:09: one redirect to
+  release-assets.githubusercontent.com, 200, the values his).
+- `sudo -n install` on a runner (the same `install` ran here as root without sudo).
+- The browser tests inside the real cut (`unshare --net`, `setpriv --no-new-privs`, loopback only): never tried; only
+  the environment half (`env -i` with the cut's list) ran here.
+- Google Chrome 157 (the image's): never ran the tests; the container's Chromium 153 did. Its WebGPU adapter, its speed
+  with SwiftShader on a runner (TE-NT6) and Playwright 1.65.0 against it are unproven (the docs say Playwright supports
+  the Stable and Beta channels current at its release).
+- The runner's timings: estimated from here (cold Wasm release build 34.4 s, both page builds 7 s warm, type checks
+  9 s, browser tests 68 s with one worker); today's job time after change-set 2 is unknown (26 s before it, 2026-11-18).
+- The Wasm's bytes on a runner: expected to differ (RR-F5: "/home/runner" vs "/root" in one path), not seen.
+- The `npx --no --` route of the new lines (refused here; `node <bin>` ran the same programs at the same versions).
+- The runner-images readme (main, image 20261111.370.1) and the gh source pages were read through WebFetch's model;
+  the image a run gets may be newer (the job log's "Runner Image" group says which).
+- E2E-TYPES: not solvable by a flag (11 errors, Node's types missing); the CI line is drafted, not run.
+- The planted changes P1 and P2: predicted from the source (gh's error path; skeleton.spec.ts:63), not run.
+
+## Findings worth the plan's attention (ranked)
+1. Medium: the old draft's boundary line (`vitest run --root packages/sim-worker --dir boundary`) finds no test and
+   exits 1 ("No test files found"); fixed in the text (`--dir packages/sim-worker/boundary`). It would have failed
+   visibly, not silently.
+2. Medium: the old draft's Worker type-check line (`--types vite/client`, no `esnext.disposable`) fails with the lib
+   check on (cs2 report :280, :319; reproduced: TS2550 in sim_wasm.d.ts without esnext.disposable); fixed in the text.
+3. Medium: Playwright's browser download (option b) is checked by no hash (S3.3), and its installer would be the
+   first package code with the network in `toolchain`; hence CHROME-SOURCE (a).
+4. Low: this container's gh (2.89.0) is inside CVE-2026-48501's range; harmless here (not used for the check), noted
+   so no one runs GitHub's check from here with this session's token.
+5. Low: build.mjs would refuse any environment name starting `WASM_BINDGEN_`; the job's values are named `WB_*` and do
+   not enter the cut anyway (`env -i`), so nothing collides.
+- End sections written.
+DONE
