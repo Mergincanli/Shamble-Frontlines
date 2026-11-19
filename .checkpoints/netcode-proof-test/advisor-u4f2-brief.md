@@ -100,7 +100,7 @@ those three (ADV-U4F2B-9). One standing follow-up the brief's own carries trigge
   item 1 :1167; return list :1199, :1217). C-U4F2-7 edits it, so the bars become +124 and +139 and U4f2 adds T-6's five
   doctored cases (ADV-U4F2B-1). With them: 133 against 124, 150 against 139.
 - **The base for U4f2's own deltas** is not named: U4f's rules count on 5b29296b's 552 and 632 (u4f-brief.md section 4
-  rule 5, :876-880); U4f2's own are on 25d316e's 634 and 731 (u4f-report.md:232) (ADV-U4F2B-7).
+  rule 5, :848-852); U4f2's own are on 25d316e's 634 and 731 (u4f-report.md:232) (ADV-U4F2B-7).
 - Tests beyond the share that the carries add (f28's two B halves, `skip_command`'s unit test, C-U4F2-1's parser case,
   C-U4F2-5's sim-only test, C-U4F2-7's test, Q4's case below): fine as extras; the report names each with its `--list`
   line.
@@ -152,5 +152,139 @@ those three (ADV-U4F2B-9). One standing follow-up the brief's own carries trigge
   cautious reading.
 - **Reading:** above about 1,500, so it goes to him before the build, as the brief says, with the stop past 3,000
   unchanged. The brief's reading needs two fixes for his message: the figures (above), and the riders named as such
-  (ADV-U4F2B-9): C-U4F2-7 with T-6, C-U4F2-8 and ADV-U4FP-3, about 85-215 lines together, ride by my rulings because the
+  (ADV-U4F2B-9): C-U4F2-7 with T-6, C-U4F2-8 and ADV-U4FP-3, about 80-215 lines together, ride by my rulings because the
   lane opens their files; they are not what his (a) sent.
+
+## 6. The lane and the rules that stand (DONE)
+- **Bars:** "Nothing in marks.json, the judge or an existing SERIES.md row changes" with his (a)'s words quoted exactly
+  (brief :82-83 against history.md:6903), and a build that needs one stops for him: right. U4f's line 22
+  (advisor-u4f-build1.md:242-246) also names marks/README.md; it stands through section 4's reuse. C-U4F2-7 changes the
+  lab's contract checker, not the judge: the contract is the lab's pre-run check (contract.rs:1-5: "the judge's own half
+  ... is `npt-judge --only`"), no verdict reads it (r2 :126), and the clock suite carries no PM-0001-2 precondition, so
+  "not applied" there loosens no bar. PM-0001-2's own shot check stays in marks.json (:287-300) and the judge.
+- **LEAD-BOUND** 400 ms frozen (history.md:6791-6806: "never changed to fit a run's result"): kept. **The event cap**
+  1,600 (advisor-u4f-stop.md:14; u4-build-plan.md:362-366): kept; "unless -20's set read moves it first" is R2's own
+  route (an honest overflow resync comes to me, the value re-set by the same rule), not a new one.
+- **The lane** (brief :80-81): npt-bots, npt-lab, ops/runs, SERIES.md new rows, npt-room for C-U4F2-3 and -8, npt-client
+  for C-U4F2-2's doc and ADV-U4FP-3. Two gaps: C-U4F2-2's `skip_command` unit test needs npt-client too (ADV-U4F2B-6);
+  crates/sim is rightly shut, but the "51 lines" pointer reaches into it (ADV-U4F2B-11). Forgers 8-11 sit in npt-bots by
+  2.6 (u4f-brief.md:502-504: decoded and re-encoded through npt-proto), so no client hook is planned; if one is needed,
+  it is a lane stop (section 1 item 5).
+- **The builder's numbers:** section 4 reuses U4f's rules, but section 1 (base, runner, stops) is not in the brief's read
+  list (:11-19), and the stops as written there are U4f's: "your added lines past 6,000" (u4f-brief.md:323), counts as
+  deltas on 5b29296b's (:848-852, :1166-1168), the test step against 5b29296b's 1.5 times or line 22's 1,207 s. U4f2's
+  are: past 3,000 at a block end (his SIZE-CHECK on his (a)'s figure), deltas on 25d316e's 634 and 731, and a named
+  test-step line (ADV-U4F2B-7).
+- **Agents and writes:** one builder, Opus 5.5 at xhigh (netcode: CLAUDE.md Models), at most three agents, the Write/Edit
+  sentence word for word (brief :86-88): right.
+
+## 7. C-U4F2-5's fix: what it reaches (DONE; feeds Q1, Q5)
+- `steady`'s walk is `MOVES[((k / TURN_EVERY + phase) % len)]` with `k = self.given` (bots/src/lib.rs:638, :651), and the
+  `_ => walk` arm (:655) serves Kind::Steady, Kind::NoFire (the -47 clock suite: `never_fires`, :522-524; scenario.rs:1213-1214),
+  Kind::Presses and Kind::Clamp (whose move is [0, 0], :664-668). Kind::Brawl leashes that same MOVES walk (:653).
+- So a fix made in MOVES, TURN_EVERY or the shared arm changes -47's script (judged PASS on 25d316e's code, results
+  committed), and through MOVES the brawl of -20 (running now at 350677f, equal to 25d316e's spike outside results/:
+  u4f-report.md:589-591) and -22 (next), whose set may also re-run by R2's cap rule (u4-build-plan.md:362-366). Their
+  runs would no longer re-run the same from U4f2's tree.
+- The plan's twin rule: "every client of the forged and clamp suites runs an open-loop seeded script (commands a function
+  of seed, slot and tick only), so nothing it decodes feeds back into what it sends" (u4-build-plan.md:411-412); 2.6's
+  forged row and 2.12 say the same (u4f-brief.md:533, :774-776). A leash reads the decoded position (:608-613): option
+  (a) breaks that rule for the forged and clamp suites, and -21's honest clients run one script (U4F-Q11 (ii) (a)).
+- BRAWL-1's sim-only model feeds the World EveryTick, Skips (a skipped tick re-runs the last command, option B's take)
+  and Bursts (:1187-1198), for 48 brawlers (:1250-1262). F1 showed only under option A at P1 (p4, p13, p19), never under
+  option B or at P0 (advisor-u4f-r2.md:65-71), so a test on today's patterns may pass with today's walk: TE-B1-1's lesson
+  (brawl1-review-r1-full.md:30-32) is that a plant must bite.
+
+## Rulings on U4F2-Q1 to Q5 (DONE)
+- **U4F2-Q1, C-U4F2-5's fix: (b), or (c) if (b) cannot be shown; never (a).** (a) is out for every -21 suite: a leash feeds
+  the decoded position back into the commands, against u4-build-plan.md:411-412 and u4f-brief.md:533, :774-776, which the
+  twin figure rests on; a closed loop would need a plan change brought to me first, and none is asked. The brief's
+  reason for (b) ("runs whose decoded positions differ by the skipped command") is replaced by that rule. Under (b) or (c):
+  1. only Kind::Steady's `move_xy` changes: its fire, aim and presses stay (the shot band, carry 86), and MOVES, TURN_EVERY
+     and the Brawl, NoFire, Presses, Clamp and Lane arms stay as at 25d316e (the report shows it from `git diff 25d316e
+     -- crates/bots/src/lib.rs` outside the test module);
+  2. the content stays a function of seed, slot and step (2.12's rule), so the twin's skip leaves later commands equal
+     (f16 shows it);
+  3. the sim-only test, on BRAWL-1's model with the script as its parameter: option B's patterns as today plus an
+     option-A pattern at P1 (each slot's commands run in the tick they arrive: several in one tick, none in another, from
+     P1's one-way 25 ms ± 5 ms and the controller's lead), all 48 slots on `steady` (the 11 forgers' base walk
+     included, since PM-0001-2's in-view check reads every slot); 610 s, seeds 1 to 3, in release (`--ignored`), with a
+     short copy in the debug test step; **the plant is today's walk, and it must read in a building above 0 in at
+     least one pattern and seed**. If no pattern makes today's walk enter, the test cannot show the fix: the build stops
+     on it and comes to me with the figures.
+- **U4F2-Q2, the size: confirmed above about 1,500, so it goes to him before the build; the stop past 3,000 stays.** The
+  figure is corrected to about 1,700 to 2,250 (up to about 2,700 at U4f's 1.2), and the message names the riders apart
+  (condition 6). The card writes the size line with its source before the first snapshot (advisor-u4f-stop.md:86-88).
+- **U4F2-Q3, C-U4F2-7's form: (a).** Keyed on the header's `params.suite` = `clock` (scenario.rs:1902; the one suite on
+  `never_fires`, :1213-1214), printing "not applied (suite clock: its clients never fire)". The band stays applied to
+  every other 48-client run, the forged suite's included (carry 86 asks it of -21's option-A suites). The test: a
+  48-client clock record with shots 0 reads "not applied" and no failure; a 48-client record of another suite with shots
+  0 still fails (e). The plant (the band applied to `clock`) fails the first by name. T-6's contract half rides in the
+  same edit (condition 1).
+- **U4F2-Q4, honest kind-10 refusals and the attribution: confirmed.** `unrejected_count` counts forged items failing
+  their rule (2.4 item 6, u4f-brief.md:440-456; SERIES.md:159), the items being the forger's own (slot, seq) from
+  `take_forged` (bots/src/lib.rs:321-327), so an honest refusal never enters it; and the forged suite runs at P0 with no
+  honest hold (2.6's row, u4f-brief.md:533). One case guards the forger's own slot, where kind 10's forger makes its own
+  hold (2.6's kind-10 row, u4f-brief.md:526: "after holding 8 steps"): in f33, on hand-made records, a kind-10 refusal record naming a
+  (slot, seq) the forger did not forge, on the forger's slot and on an honest one, changes neither `sent_count` nor
+  `unrejected_count`. +1 test, a negative case beyond the 13 (f33, not f16: hand-made records, line 15's rule).
+- **U4F2-Q5, the clock suite's open walk: no change in U4f2.** -47 is judged on 25d316e's code and has no in-view
+  precondition (advisor-u4f-r2.md:81-82; u4f-report.md:584-588); U4f2's report names it beside C-U4F2-5's fix. Q1's
+  point 1 keeps NoFire's commands as they are, so the two stay apart.
+
+## Escalation check (item 8)
+Nothing in the brief or in these rulings touches a pass mark, the judge, marks.json, an existing SERIES.md row, money or
+main. C-U4F2-7 edits the lab's contract checker, which no verdict reads, for a suite with no PM-0001-2 precondition. The
+size is his figure, so it goes to him as U4F2-SIZE under TEST-FIRST rule 2 ("the stops ... your plan gives me"); it is
+not an ESCALATE of a bar.
+
+## Verdict: APPROVE WITH CONDITIONS
+The scope is whole against all four lists, the existing carries are kept by number, the share's arithmetic holds,
+section 5's figures equal the run, and the lane and the frozen values stand. The conditions below are text fixes for
+rev 1.1, made by the main session before launch; no new check of rev 1.1 is needed unless a condition cannot be met as
+written. The build waits for his U4F2-SIZE answer.
+
+| Id | Sev | Where | What goes wrong | The fix |
+|---|---|---|---|---|
+| ADV-U4F2B-1 | Medium | u4f2-brief.md:45-47, :70-72, :110-126 | C-U4F2-7 edits lab/src/contract.rs, the first edit since U4r (71ee13d), which triggers T-6's contract half: five doctored cases and 2.10's "+5 if contract.rs is edited" (advisor-u4r-r1-full.md:122; u4f-brief.md:658, :1167, :1309, :1958-1960). Not carried, not counted, not sized. | condition 1 |
+| ADV-U4F2B-2 | Medium | u4f2-brief.md:146-150 | Q1's fallback (a), a leash on `steady`, feeds the decoded position back, against the plan's twin rule for the forged and clamp suites (u4-build-plan.md:411-412; u4f-brief.md:533, :774-776); the reason given for (b) is not the plan's. | Q1 as ruled (condition 2) |
+| ADV-U4F2B-3 | Medium | u4f2-brief.md:37-38, :49-50, :65-67 | C-U4F2-5's fix is not confined: MOVES and the `_ => walk` arm (bots/src/lib.rs:651-656) also serve NoFire (-47, judged), Presses, Clamp and the brawl's walk (-20 running, -22 next). And BRAWL-1's sim-only patterns (:1187-1198) lack option A's, where F1 alone showed, so the test may pass with today's walk. | Q1's points 1-3 (condition 2) |
+| ADV-U4F2B-4 | Medium | u4f2-brief.md:35-36 | C-U4F2-1's proof restated without "of its own kind" and without its setting ("on the steady script at P0 into a `Room<World>`": advisor-u4f-r1.md:70-72): looser than the carry. | condition 3 |
+| ADV-U4F2B-5 | Medium | u4f2-brief.md:40-41, :97-102 | The corrected premise lives on in c-u4f-r2.mjs:64's p19 `expect` ("about 3 or 4", "about 4", "kind-10 refusals 0") and 5.3's row (u4f-brief.md:1037); no block rewords it, so -21's 5.3 record would carry an expect known false and route p19 to me by the brief's own rule (:56-57). | condition 4 |
+| ADV-U4F2B-6 | Low | u4f2-brief.md:80-81 | npt-client opens "for C-U4F2-2's doc and ADV-U4FP-3 only", but C-U4F2-2 includes `skip_command`'s own unit test (advisor-u4f-r1.md:76-78), which the size table puts in client (:119). | condition 5 |
+| ADV-U4F2B-7 | Medium | u4f2-brief.md:11-19, :80-90 | The builder's numbers are U4f's: section 1 is not in the read list, and its stop reads "past 6,000" (u4f-brief.md:323), counts are deltas on 5b29296b's (:848-852, :1166-1168), the test step's line unnamed. His size stop would act at the wrong figure. | condition 5 |
+| ADV-U4F2B-8 | Low | u4f2-brief.md:59-77 | RR-CB-2's docs and RR-B1-7 (1), left by U4f "for their next taker" (u4f-build.md:557-559), sit in scenario.rs and logs.rs, which U4f2 opens; the brief names neither. | condition 7 |
+| ADV-U4F2B-9 | Medium | u4f2-brief.md:126-131, :165-166 | The estimate misses T-6's cases and the wider sim-only test (my figure about 1,700-2,250; up to about 2,700 at U4f's 1.2), and "the carries since ... are review fixes his (a) sends with the unit" is not so for C-U4F2-7, -8 and ADV-U4FP-3, which ride by my rulings. The message to him would frame his own decision too widely. | condition 6 |
+| ADV-U4F2B-10 | Low | u4f2-brief.md:39 | ADV-U4FP-3 also names `plan()`'s short doc line (advisor-u4f-pass.md:95-96); block 7 names :360 only. | condition 7 |
+| ADV-U4F2B-11 | Low | u4f2-brief.md:29-30, :120 | "51 lines name `Refusal`" counts 12 in crates/sim naming the sim's own struct (seam.rs:498), which stays and is outside the lane; the room's enum has 39 (input.rs 22, room.rs 16, lib.rs 1). | condition 7 |
+
+**Rulings:** Q1 (b), else (c), never (a); Steady's move only, open loop, an option-A sim-only pattern whose plant bites,
+else stop. Q2 confirmed above 1,500, to him before the build, stop past 3,000 unchanged, figures corrected. Q3 (a),
+keyed on `params.suite` = `clock`, with both cases and T-6 riding. Q4 confirmed, with one f33 case on the forger's own
+slot. Q5 no change in U4f2, kept apart by Q1's point 1.
+
+**Conditions (rev 1.1, before launch):**
+1. T-6's contract half rides with C-U4F2-7: section 3 names it with its source (advisor-u4r-r1-full.md:122; u4f-brief.md
+   P34 :1958-1960, 9.2 :1309); section 2's share reads +51 measured and +51 bites (T-6's five beside the 46; the 22
+   negatives unchanged), the sum against +124 and +139 (2.10's +5) and 67; the size table gains its row (about 60-150).
+2. Section 9 and section 3's C-U4F2-5 line carry U4F2-Q1 as ruled above, points 1 to 3 whole, with its stop.
+3. Block 6 states C-U4F2-1's proof word for word (advisor-u4f-r1.md:70-72), or names it by number with no restatement.
+4. Block 8 rewords p19's `expect` in c-u4f-r2.mjs:64 to section 5's reading (unjudged, reported: W's late drops, the
+   bucket's limited datagrams, the cap's kind-10 refusals under option A, the per-tick max at most 8; no fixed counts),
+   and section 5 names u4f-brief.md:1037 beside :1620-1624 as superseded.
+5. Section 4 gains: the builder's start and stops are u4f-brief.md section 1's (added to section 0's read list), with
+   "past 6,000" read as past 3,000 added lines at a block end (line 5's procedure: build nothing more, end checks,
+   return), counts as deltas on 25d316e's 634 measured and 731 bites (u4f-report.md:232), and the test step's stop line
+   named (line 22's 1,207 s stands); and the npt-client lane reads "for C-U4F2-2 (`skip_command`'s unit test,
+   `twin_left_out`'s doc) and ADV-U4FP-3".
+6. Section 6 and "What goes to Mustafa": the figure about 1,700 to 2,250 (about 2,700 at U4f's 1.2), the stop past 3,000
+   unchanged, the riders (C-U4F2-7 with T-6, C-U4F2-8, ADV-U4FP-3: about 80-215 lines) named as my rulings riding the
+   lane, with leaving them for the next unit that opens those files as his cheaper option; first line "stopped on you".
+7. The Lows in the same rev: C-U4F2-3's pointer reads "39 lines in crates/room; the sim's struct `Refusal` stays"; block
+   7 names `plan()`'s doc line with :360; section 3 names RR-CB-2's docs and RR-B1-7 (1) as taken or left by line 15's
+   rule (advisor-u4f-build1.md:215-220).
+8. Q3's and Q4's rulings go into blocks 7 and 6 as written above.
+
+**What goes to Mustafa:** U4F2-SIZE only: U4f2's estimate is about 1,700 to 2,250 added lines (up to about 2,700 at
+U4f's overrun) against his 1,500; the stop past 3,000 stays; lean: build it whole; the cheaper option: leave the three
+riders (about 80-215 lines) to a later unit. Nothing on a pass mark, the judge, marks.json, money or main.
