@@ -222,7 +222,7 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
 - The planted defects, subset: background task b1470gqk1, started 20:00 UTC in the worktree `.gate/ci-wasm-plants`
   (detached at c934fc0, its own `node_modules` and `target/`); it binds 127.0.0.1:4173, so no other browser test
   runs until it ends. When it is done the worktree is removed with `git worktree remove` (not forced).
-- Agents for change-set 3's plan (both Opus 5.5 at effort max, in the background, started 20:03 UTC; they build
+- Agents for change-set 3's plan (both Opus 5.5 at effort max, in the background, started 20:02 UTC; they build
   nothing and run no browser test): netcode-architect, part "cs3" (notes `ci-wasm/netcode-architect-cs3.md`: the
   messages, the room, the endpoint, the step's order, the replay runner, L1); engine-architect, part "cs3" (notes
   `ci-wasm/engine-architect-cs3.md`: the boundaries, the page's key diagram, the rule tests, the build order). Both
