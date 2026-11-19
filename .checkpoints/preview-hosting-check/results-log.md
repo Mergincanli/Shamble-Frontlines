@@ -687,3 +687,8 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   administrators to bypass configured protection rules" unticked; "Deployment branches and tags": "No restriction";
   secret CANARY, "3 days ago". **Window opened: production's branch rule off.** Step 5: run #18's failed job re-run by
   the session (rerun_failed_jobs): "secret: present" expected.
+- **The branch-rule bite (PM-0002-66's row, in PM-0006-32): run #18 attempt 2** (rerun_failed_jobs, about 00:19:45
+  UTC): `b9-production` (135238126711) started 00:19:48, completed 00:19:51, success; its log, word for word:
+  "B9-MARKER: the production job ran at 2026-11-19T00:19:49Z" / "secret: present" ("CANARY: ***"). So with
+  production's branch rule set to "No restriction", a pull-request job reaches production's secret. His restore asked
+  now (the window stays open until his screenshot shows `main`).

@@ -676,6 +676,7 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      from his word until his restore screenshot with `main`); I re-run the failed job: "secret: present" expected.
    - **WINDOW OPEN: production's branch rule off since his "open" (00:19:35 UTC)**; closes at his restore screenshot
      showing `main`. Run #18's failed job re-run at about 00:19:48 UTC (attempt 2).
+   - Step 5 measured: attempt 2's `b9-production` ran 00:19:48-00:19:51, "secret: present". Restore asked now.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
