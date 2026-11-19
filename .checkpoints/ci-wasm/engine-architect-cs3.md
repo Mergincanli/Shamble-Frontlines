@@ -198,3 +198,193 @@ Task: change-set 3 ("The loop closes"), the boundary and rule-test half of its p
   test with the URL; I state no count.
 - DESIGN NOTE (vectors home): inputs read at RUN TIME (std::fs in native tests, passed in from JS in Wasm), never
   include_bytes!, so the compiler cannot fold the operations at build time with its own float code.
+- cs2 plan's folder table (git show 929b146:.checkpoints/cs2-first-page/plan.md :95-123): `src/input/` = "input capture
+  into the newest input", lane 1, created in cs3; `src/overlay/` = HTML readout and counters (lane 1); `src/dev/` = cs5.
+  => key capture in packages/client/src/input/, key diagram + counters in src/overlay/ (dev builds only).
+- generator read (layout_ts.rs: one table -> packages/types/src/generated/block/layout.ts; types index.ts exports
+  BLOCK_LAYOUT, LAYOUT_HASH, checkLayoutHash). A second generated table would need the generator parameterised.
+- B6-2 update: "the table of build options" is most likely ADR 0002 part 4's Wasm size readings across build options
+  (opt-level "s" vs "z", wasm-opt on/off: :270-274); rust-reviewer's note says "beside the build-option table". wasm-opt
+  is a new tool (not installed; TOOL-SOURCE applies) -> its column cannot be read without his word.
+- Block 1 DONE (all named sources read). Next: Block 2 (boundaries), written below as its own section.
+
+## Block 2. The boundaries after change-set 3 (DONE)
+
+### 2.1 Who owns each piece of state (EA-F9)
+| State | Today | After cs3 | File |
+|---|---|---|---|
+| the World (tick, seed; streams when a phase first draws) | `sim_wasm::Sim.world` | the authority: `room::Room` (netcode-architect designs Room) | crates/room/src/lib.rs (+ room.rs) |
+| block writer, local schedule, the newest post (held bits, 16 press totals), endpoint counters, join state | `Sim.writer`, `.schedule`, `.newest_input` | `client_endpoint::ClientEndpoint` (new) | crates/client-endpoint/src/endpoint.rs |
+| the loopback's two byte queues | none | `protocol` (its loopback backend; netcode) | crates/protocol/src/ |
+| the panic text buffer (one per module instance) | none | `sim-wasm` (Wasm build) | crates/sim-wasm/src/panic.rs |
+| the composition: three fields and the step in ADR 0002 part 6's order (:402-407) | logic + state in `Sim` | `Sim` = wrapper: `{ endpoint, room, link }`, about 25 lines; the order itself is netcode's | crates/sim-wasm/src/lib.rs |
+| host-input checks (seed length, mode, pad cap) + `CreateError` | `Sim::create` | stay in sim-wasm as the wrapper's boundary checks (pad cap stays in `BlockWriter::new`) | crates/sim-wasm/src/lib.rs |
+Composition home, options: (A, recommended) the wrapper stays in sim-wasm as a pub plain-Rust `LocalMatch<T: Transport>`
+(no bindgen attributes; `Sim` wraps `LocalMatch<Loopback>`); devtools uses `LocalMatch<L1>` natively through sim-wasm's
+rlib (crate-type already ["cdylib","rlib"]), so L1's tests and the recording run the Worker's own step order, not a
+copy. Edge devtools -> sim-wasm is allowed (ADR 0002 :194 "anything"); devtools needs wasm-bindgen anyway for its test
+module (Block 4). (B) a new crate `local-match` (deps client-endpoint, room, protocol, sim): cleaner wording, but a
+crate ADR 0002 part 3 does not list (his go). (C) the composition in room or client-endpoint: refused, they may not
+depend on each other (ADR 0002 :189-190). Two-instance seam: the loopback carries ENCODED bytes (the real messages), so
+lane 2's two-instance patch splits LocalMatch into an authority type and an endpoint type and moves the order into the
+host (ADR 0002 :407 "with two instances ... the host makes its calls in the same order") without touching room or
+client-endpoint.
+
+### 2.2 The wasm-bindgen surface after cs3 (WB-HEALTH (a): "one type, plain numbers on every tick")
+| Export | Today | After cs3 | Called |
+|---|---|---|---|
+| class `Sim` | yes | yes: still the one type | |
+| `Sim::new(seed, mode, pad_bytes, now_ms)` | yes | `new(seed, mode, pad_bytes)`: `now_ms` dropped (EA-F13: the anchor's two writers; the Pacer's first `rebase(now)` is the one writer) | once |
+| `block_ptr()`, `block_len()` | yes | unchanged | once |
+| `input(sequence: u32)` | yes | `input(post, held, presses_0_3, presses_4_7, presses_8_11, presses_12_15)`, all u32: post number, held bitmask (16 bits used), 16 press totals (u8, wrapping) packed four per word, counter k in byte k%4 of word k/4 (LE) | per tick |
+| `newest_input()` | tests only | DROPPED (EA-F10); tests read the echo in the block | - |
+| `step() -> f64` | yes | `step(now_ms) -> f64` if netcode adopts NA-N1 (ADR 0002 :333-335 host's time) | per tick |
+| `rebase(now_ms) -> f64` | yes | unchanged | start, pause, drop |
+| `tick_hz()` | yes | unchanged | once |
+| `panic_buffer() -> *const u8` | no | NEW free fn (the hook is per module instance, not per Sim) | once at start |
+| `__wbindgen_start` via `#[wasm_bindgen(start)]` | no | NEW: installs the hook at instantiation; the glue calls it inside init(), the host never does | at init |
+Per tick: 2 Wasm calls (input, step), 0 glue allocations (no string/array/object crosses); R1-BND-REC1 mark 2's four
+and PM-0002-3's count hold. Why six plain numbers and not an input area in linear memory: 18 bytes of post now; no new
+export, no second layout table, no second generated file, the glue's simplest form (WB-HEALTH (a)). The input area
+(the block's mirror, generated layout + hash) is the right form when variable-length data crosses: online datagrams
+with arrival times (ADR 0002 :331-334), Slice 3. Not built now. Packing slip guard: a boundary test presses button
+k = 0..15 once each and reads k's echo.
+
+### 2.3 Worker <-> page messages (EA-F8)
+- packages/sim-worker/src/messages.ts: `PageToWorker.input` = `{type:"input", post, held, p0, p1, p2, p3, returned}`
+  (flat numbers; the page packs its 16 counters, no inner array per frame); `isPageToWorker` checks post/p0..p3 as
+  counts and held <= 0xFFFF. NEW `isWorkerToPage(value): value is WorkerToPage` and `isWorkerStats` beside it (every
+  WorkerStats field a finite number or boolean), exported through index.ts; `WorkerLink.onMessage` switches on the
+  narrowed type with an exhaustive `never` default. WorkerToPage keeps four kinds; the trap's text rides `error.message`.
+
+### 2.4 "The match is over": one owner (EA-N3)
+- Worker: SimHost guards EVERY Wasm call after construction through one private `#call(fn)` (today only `#pacer.wake`
+  is guarded; `resume()` -> `rebase` at host.ts:97 / pacing.ts:123 is not): on a throw it sets `#failed`, clears the
+  timer, reads the panic text through a fresh view (never another export call), posts ONE error, and makes no Wasm call
+  again. worker.ts `start()` (init + constructor) uses the same reader. New file packages/sim-worker/src/panic-message.ts
+  (`readPanicMessage(memory, ptr): string`, about 20 lines).
+- Page: `WorkerLink` owns the end: constructor takes `terminate: () => void`; `end(reason): boolean` sets `failure`
+  once, terminates once, returns true on the first call; onMessage's failures call it; boot.ts's Worker `error`
+  listener calls `link.end(...)` and shows the notice only when it returns true; frame()/requestReport() already stop on
+  `failure`. boot.ts keeps the notice and the error count; the decision lives in the link.
+- What the page shows in every build: the notice "The match stopped: the simulation stopped: panicked at
+  crates/<file>:<line>:<col>: <message>" (textContent); dev readout: errors 1 (last: the same, one line, 300 chars).
+
+### 2.5 The glue check by the build's own chunk (EA-N6, VF-L7)
+- build.mjs `buildPage`: an inline Vite worker plugin (`worker.plugins`, merged with vite.config.mjs) records, in
+  `generateBundle`, the file name of the one entry chunk whose `facadeModuleId` is packages/sim-worker/src/worker.ts;
+  the build refuses when it finds none or more than one.
+- build-checks.mjs `bundleProblems(files, production, workerEntry)`: page = every .js but exactly `workerEntry`; the
+  glue and the name WebAssembly are refused everywhere else, a lazily loaded page module named worker-... included
+  (VF-L7's plant becomes a test case in build-checks.test.mjs).
+- Fallback if the pinned Vite does not merge `worker.plugins` as read: disjoint names set in vite.config.mjs (worker
+  `assets/sim-worker-[hash].js`, page chunks `assets/page-[name]-[hash].js`), the check reading the same exported
+  constant. Not verified which works.
+
+### 2.6 The panic hook
+- crates/sim-wasm/src/panic.rs (new): `#[wasm_bindgen(start)]` -> `std::panic::set_hook` (no extra crate, ADR 0004
+  :578-579). One static buffer of 1,024 bytes: bytes 0-3 the text's length (u32 LE, 0 = no panic), 4-7 the text's
+  capacity (1,016), 8.. the UTF-8 text "panicked at <file>:<line>:<col>:\n<message>", cut at a char boundary, written
+  by a `core::fmt::Write` that never allocates (a panic may come from a failed allocation). No `unsafe`
+  (unsafe_code = "deny"): rust-reviewer picks the form (a lock-guarded static array or atomics). Self-describing
+  header, so TypeScript copies no capacity constant (my cs2 F5's lesson).
+- Read: `panic_buffer()` once at start; after a trap, a fresh `Uint8Array(memory.buffer, ptr, 8 + len)`, `TextDecoder`
+  non-fatal; no export call after a trap (a lock or a half-written state may be left).
+- Wasm bytes: unknown; measured in cs3 from the build's own size table (raw, gzip, brotli) with and without the hook, on
+  one named machine (RR-F5).
+- Tests: native unit tests of the writer (cut, char boundary, length word) in `cargo test -p sim-wasm`; in Wasm through
+  the devtools test module (Block 4: a planted overflow traps, the buffer holds "attempt to add with overflow" and a
+  location); host.test.ts: a stand-in throwing a RuntimeError with a fake memory holding a text -> one error post.
+
+### 2.7 The block after cs3 (seam with netcode's F-ECHO)
+- client-endpoint layout.rs: two sections join the header (tick @0, layout_hash @4 never move): `echo` (1 row: held
+  u32, presses_0_3..presses_12_15 u32: the authority's applied input for the local slot, decoded from the snapshot,
+  same packing as the post) and `link` (1 row: sent u32, received u32, refused u32: the endpoint's message counters).
+  Field names final with netcode's snapshot owner section. LAYOUT_HASH changes; layout.ts regenerated; the page's
+  startup check covers drift. Embryo of ADR 0002 :290-292's owner-only section.
+
+### 2.8 Follow-ups: in or out of cs3
+| Id | In/out | Lines (est.) | Why |
+|---|---|---|---|
+| EA-F8 | in | +95 (45 code, 50 test) | cs3 changes the post and the readout's inputs; a parser before more kinds come |
+| EA-F9 | in | move ~60 out of sim-wasm; ~40 into client-endpoint (rest is netcode's endpoint) | the card's endpoint and room land here |
+| EA-F10 | in | -25 | the input reaches a command (my cs2 condition); Ring.clear, BlockPool.free, the percentile re-export go |
+| EA-F13 | in, all 4 | +30 | (1) WorkerLink fields -> getters; (2) one writer of the anchor; (3) report.ts states its own pause shape (no app import); (4) @shamble/types -> devDependencies of sim-worker (rides cs3's manifest hold) |
+| EA-N3 | in | +50 (20 code, 30 test) | cs3 adds the trap path; its text must reach the link on every path |
+| EA-N5 | out -> cs5 | 0 | render/ fact; my cs2 words: "when render/ changes hands" |
+| EA-N6 + VF-L7 | in | +50 (20 build, 30 test) | cs3 builds a second Wasm module; the check must be exact first |
+| VF-L4 | in | +10 test | serve.test.mjs is edited for FAVICON |
+| GE-N1, GE-N4, GE-N5, GE-N6 | out -> cs5 | 0 | render/ items; lane 1 closes them before render/ changes hands (cs5), with EA-N5 |
+| TE-NT3 | in | +25 test | trap texts carry newlines: the cleaning now matters |
+| TE-NT4 | in | +15 test | host.ts is rewritten |
+| TE-NT5 | in | +5 | the loop spec reads the same reports |
+| TE-NT7 + PA-N2 | in | +20 | cs3 adds per-frame code (post with counters, key diagram): the allocation test must cover the listener and start after warm-up |
+| PA-L2 | out -> cs5 | 0 | blocks grow at 12/48 soldiers; the pool is sized with the bench |
+| TE-L | in | +50 test | its items sit in files cs3 edits (serve tests, build-check plants, one-Worker check, scratch-buffer test) |
+| SA-ENV | in | +6 | new specs may read env |
+| FAVICON | in | +3 code, +8 test | serve.mjs answers /favicon.ico with 204 (no icon, no look decision); a console 404 would trip G12 later |
+| SA-TREE | in | +52 (test-engineer's estimate) | lands with or without an RNG library; with own ChaCha8 its plants use fixtures only |
+| RR-F5 | in, if rust-reviewer confirms the mechanism | +10, +10 test | the size table must not depend on the builder's home; candidate: `cargo build --config build.rustflags=[--remap-path-prefix=<cargo home>/registry/src=/cargo/registry]` from build.mjs (argv, not env); Not verified |
+| __pycache__/ in .gitignore | in | +1 | his words, 2026-11-19 14:28:25 UTC |
+| FPS-LINE, NEG-ZERO | in | +25 | Block 3 |
+| BR-GAP README steps | in (zip README text) | docs | his words, 16:08:04 UTC |
+| VF-L5, RR-N4, TE-NT6, E2E-TYPES, SA-DIST | out (taken by #62) | 0 | CI-WASM's own group |
+| NA-N1..N7 | netcode's part | - | |
+- B2 DONE. Next: Block 3 (the page, alive).
+
+## Block 3. The page, alive (DONE)
+
+### 3.1 Owners and folders (Part 15.2 :90-95; cs2 plan's folder table)
+All lane 1: `packages/client/src/input/` (new: key capture into the newest post), `src/overlay/` (the key diagram and
+the counters, development builds only, behind `__SHAMBLE_DEVTOOLS__` like the readout), `src/harness/frame-times.ts`
+(FPS-LINE; the CPU half stays lane 1's after cs5), `src/app/` (wiring), `packages/e2e/tests/skeleton/` (the loop spec).
+`src/picture.ts` (the interface file) does NOT change: the diagram is HTML, so lane 2's picture never learns of it.
+
+### 3.2 The input path, key to command (nothing else changes on the page side: one post per drawn frame)
+1. `src/input/keyboard.ts` (new, `KeyboardInput`): keydown/keyup on window by `KeyboardEvent.code` (layout-free
+   physical keys): KeyW 0, KeyA 1, KeyS 2, KeyD 3, Space 4, ShiftLeft/ShiftRight 5 (the six keys change-set 4 walks
+   with; the other 10 of the 16 bits enter with their systems, as messages.rs:83 says). keydown, not `repeat`, bit not
+   yet held: set the held bit and add 1 (wrapping at 256) to that button's press total; keyup clears the bit; window
+   blur and a hidden tab clear every held bit (NA-N2's page half); press totals never go back. Space's default (scroll)
+   is prevented. State: one 16-bit mask and a 16-byte array viewed as four LE words; no allocation per key or frame
+   beyond the browser's own event objects.
+2. `app/boot.ts` frame loop: `link.frame(keyboard)` once per drawn frame; WorkerLink posts `{type:"input", post, held,
+   p0, p1, p2, p3, returned}`; `post` is the page's per-frame post number (NA-N5's rename of `sequence`).
+3. Worker host: keeps the newest post's six numbers (a superseded post loses no press: running totals, ADR 0002
+   :321-322); per tick `sim.input(post, held, p0, p1, p2, p3)` then `sim.step(...)`.
+4. Rust (netcode's order): the endpoint builds T's Command (held -> buttons; totals -> presses, at most one edge per
+   button per tick, its F-PRESS), the loopback, the room runs T and records the applied input in hashed state (its
+   F-ECHO), the snapshot's owner part carries it back, the endpoint decodes it and writes the block's `echo` section
+   and its `link` section (sent, received, refused, and `post_used`: the post number tick T's command was built from,
+   so the page can read PM-0002-64's "every tick on the newest post" in Chromium).
+5. Page: the diagram reads the newest block's `echo` at most once per frame, only when a new block arrived (30 Hz),
+   toggling a class on six elements made once (no per-frame allocation; textContent only).
+Behaviour of the diagram (plain, development-only; not the look): a key is lit while the ECHOED held bit is set, and
+for 150 ms after each echoed press, so a tap shorter than a frame still shows. Its pure part (echo -> six booleans)
+is a function with a Vitest test; the DOM wiring is covered by the loop spec in Chromium (no DOM library is added).
+
+### 3.3 What the readout and "Copy report" gain
+- Readout lines: `messages: sent N · received N · refused 0` (block `link`); `presses: N made · N echoed · 0 lost`,
+  where made = the page's own count per button (u32), echoed = the sum of wrap-aware deltas of the echoed u8 totals
+  per block, and lost = made - echoed counted only once the newest press is 0.5 s old (until then "(counting)").
+- Report rows: messages.sent, messages.received, messages.refused, presses.made, presses.echoed, presses.lost,
+  keys.bound ("W A S D Space Shift"), postUsed, and `fps` redefined (below). The tally is a small pure module
+  `src/app/press-tally.ts` with its own test. DEV_MARKERS (build-checks.mjs) gains one marker of the diagram, so the
+  production scan proves the diagram is cut out.
+- FPS-LINE (in): `FrameTimes.fps()` = frames over the time they took: held deltas' count / their sum x 1000, through a
+  new `Ring.mean()` (computed at readout time, 4 times a second); test: deltas 4, 4, 4, 4, 20 ms give 138.9, where the
+  median rule gives 250.
+- NEG-ZERO (in): one helper prints a value that rounds to zero without a sign ("0.00"), used by `ms()` and the report's
+  `toFixed(3)` path; test: -0.001 prints "0.00 ms".
+- Both belong here: cs3 edits these files for its own counters, and his cs3 check reads these lines.
+
+### 3.4 What he sees in his browser (five plain lines)
+1. The same grid page, now with a small box of six keys (W, A, S, D, Space, Shift) beside the readout.
+2. Pressing a key lights its box a moment later: the light comes back from the local server through the real messages.
+3. A quick tap flashes its box; holding keeps it lit; letting go darkens it.
+4. The readout counts ticks (30 a second), messages sent and received (climbing with the ticks) and presses made,
+   echoed and lost (lost stays 0).
+5. The frame-rate line now equals frames counted over time (Firefox included), and no reading shows "-0.00".
+(The zip's README keeps the Brave and Firefox steps and adds his BR-GAP steps: the window in front and uncovered for
+the first run, then one step with the window covered on purpose.)
+- B3 DONE. Next: Block 4 (the rule tests).
