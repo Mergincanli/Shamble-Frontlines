@@ -694,7 +694,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      in it, (c) serving with its marker is the proof that the wall was still off.
    - Before Day 2's list: a consultation; the list and outcome rows written first; the 18:55 check-in sends that list.
      Before the go for the wall: what else still needs the links readable without a login written down.
-   - A compaction asked of him before Day 2 (get_session first), with a resume line.
+   - A compaction asked of him before Day 2 (get_session at 2026-11-19 00:28 UTC: 814,699 of 1,000,000 tokens;
+     automatic at 901,600), with the resume line "Continue the preview hosting check from your checkpoint: Day 2 (step
+     26), starting with the 24-hour probe."
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
