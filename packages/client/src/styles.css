@@ -1,0 +1,49 @@
+/* Placeholder styling for the first page. Nothing here is the look: LOOK_V2 owns that. */
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #20242a;
+  color: #e8e8e8;
+  font: 14px/1.4 system-ui, sans-serif;
+}
+
+#view {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#notice {
+  position: fixed;
+  inset: 40% 10% auto;
+  text-align: center;
+}
+
+#notice[hidden] {
+  display: none;
+}
+
+/* The development readout: only present in development builds. */
+#overlay {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  padding: 8px 10px;
+  background: rgb(0 0 0 / 70%);
+  font: 12px/1.35 ui-monospace, monospace;
+}
+
+#overlay pre,
+#overlay textarea {
+  margin: 0 0 6px;
+  font: inherit;
+  color: inherit;
+}
+
+#overlay textarea {
+  width: 40em;
+  height: 12em;
+  background: #111;
+}

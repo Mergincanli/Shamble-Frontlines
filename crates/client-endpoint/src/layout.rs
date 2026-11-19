@@ -54,6 +54,25 @@ pub struct Section {
     pub fields: &'static [Field],
 }
 
+impl Section {
+    /// The alignment of the section's rows in bytes: the size of its largest field, or 1 when it has none. A
+    /// section starts at a multiple of it and its stride is a multiple of it, so the page's typed-array views bind
+    /// with no copy (ADR 0002 part 5).
+    #[must_use]
+    pub const fn align(self) -> u32 {
+        let mut align = 1;
+        let mut f = 0;
+        while f < self.fields.len() {
+            let size = self.fields[f].ty.size();
+            if size > align {
+                align = size;
+            }
+            f += 1;
+        }
+        align
+    }
+}
+
 /// The block's sections, in the order they are written. The header is first and has one row; `tick` at 0 and
 /// `layout_hash` at 4 never move, because the page reads the hash before it trusts any other offset. Each entity
 /// section adds its row count to the header when it enters.
@@ -70,6 +89,53 @@ pub const LAYOUT_HASH: u32 = layout_hash(BLOCK_LAYOUT);
 
 // A block of zero bytes must never pass the page's check.
 const _: () = assert!(LAYOUT_HASH != 0);
+
+/// The section of `BLOCK_LAYOUT` with this name, or `None`. The block writer takes every section through it with
+/// `expect` in a `const`, where a name the table does not hold stops the build instead of the match; nothing here
+/// can panic at run time.
+#[must_use]
+pub const fn section(name: &str) -> Option<Section> {
+    let mut s = 0;
+    while s < BLOCK_LAYOUT.len() {
+        if same(BLOCK_LAYOUT[s].name, name) {
+            return Some(BLOCK_LAYOUT[s]);
+        }
+        s += 1;
+    }
+    None
+}
+
+/// The field of that name in that section of `BLOCK_LAYOUT`, or `None`; for the block writer's offsets, as `section`.
+#[must_use]
+pub const fn field(section_name: &str, field_name: &str) -> Option<Field> {
+    let Some(section) = section(section_name) else {
+        return None;
+    };
+    let mut f = 0;
+    while f < section.fields.len() {
+        if same(section.fields[f].name, field_name) {
+            return Some(section.fields[f]);
+        }
+        f += 1;
+    }
+    None
+}
+
+/// Whether two names are equal, byte for byte; `==` on `str` is not usable in a `const fn`.
+const fn same(a: &str, b: &str) -> bool {
+    let (a, b) = (a.as_bytes(), b.as_bytes());
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut i = 0;
+    while i < a.len() {
+        if a[i] != b[i] {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
 
 const FNV_OFFSET_BASIS: u32 = 0x811C_9DC5;
 const FNV_PRIME: u32 = 0x0100_0193;
@@ -155,8 +221,7 @@ mod tests {
             if !name_is_plain(name) || sections[..i].iter().any(|other| other.name == name) {
                 return Some(format!("section name {name:?} is not plain or not unique"));
             }
-            let (stride, sizes) = (section.stride, section.fields.iter().map(|f| f.ty.size()));
-            let align = sizes.max().unwrap_or(1);
+            let (stride, align) = (section.stride, section.align());
             if stride == 0 || stride % align != 0 {
                 return Some(format!("{name}: stride {stride} is no multiple of {align}"));
             }
@@ -279,11 +344,51 @@ mod tests {
         assert_eq!(layout_hash(TAG_PAIR[1]), 0xbd51_cd2f);
     }
 
+    const EMPTY: Section = section("empty", 4, &[]);
+    const BYTES: Section = section("bytes", 2, &[field("a", U8, 0), field("b", U8, 1)]);
+    const WIDE_LAST: Section = section("wide_last", 8, &[field("a", U8, 0), field("b", U32, 4)]);
+
+    #[test]
+    fn align_is_the_largest_field() {
+        assert_eq!(EMPTY.align(), 1);
+        assert_eq!(BYTES.align(), 1);
+        assert_eq!(GOOD[0].align(), 4);
+        assert_eq!(super::section("header").map(Section::align), Some(4));
+        // The widest field is not the first one: the answer is the largest size, not the first.
+        assert_eq!(WIDE_LAST.align(), 4);
+    }
+
+    /// The lookups by name find what the table holds; the tests' own `section` and `field` above build tables, so
+    /// the lookups are named by their path here.
+    #[test]
+    fn lookups_by_name_find_the_table_s_entries() {
+        assert_eq!(super::section("header"), Some(BLOCK_LAYOUT[0]));
+        assert_eq!(super::field("header", "tick"), Some(field("tick", U32, 0)));
+        assert_eq!(
+            super::field("header", "layout_hash"),
+            Some(field("layout_hash", U32, 4))
+        );
+        for section in BLOCK_LAYOUT {
+            assert_eq!(super::section(section.name), Some(*section));
+            for own in section.fields {
+                assert_eq!(super::field(section.name, own.name), Some(*own));
+            }
+        }
+        // A name the table does not hold gives nothing, at run time without a panic.
+        assert_eq!(super::section("headers"), None);
+        assert_eq!(super::field("header", "ticks"), None);
+        assert_eq!(super::field("headers", "tick"), None);
+        assert!(same("tick", "tick") && same("", ""));
+        assert!(!same("tick", "tics") && !same("tick", "ticks") && !same("ticks", "tick"));
+    }
+
     /// The test values of RFC 9923 for FNV-1a, 32 bits.
     #[test]
     fn fnv1a_matches_rfc_9923() {
         assert_eq!(fnv1a(FNV_OFFSET_BASIS, b""), 0x811c_9dc5);
         assert_eq!(fnv1a(FNV_OFFSET_BASIS, b"a"), 0xe40c_292c);
         assert_eq!(fnv1a(FNV_OFFSET_BASIS, b"foobar"), 0xbf9c_f968);
+        // The RFC's fourth string is the only one with bytes above 0x7F.
+        assert_eq!(fnv1a(FNV_OFFSET_BASIS, b"Hello!\x01\xFF\xED"), 0xfd9d_3881);
     }
 }

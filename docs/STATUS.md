@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-18 (the kit hold and two CI edits, PR #60, after #58's merge; main 9b4b518)._
+_Last updated: 2026-11-19 (change-set 2, the first page, PR #61, after #60's merge; main b763ba3)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -10,7 +10,7 @@ _Last updated: 2026-11-18 (the kit hold and two CI edits, PR #60, after #58's me
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged:** Types (PR #58, 9b4b518, 2026-11-18 15:39:28 UTC, his go; CI green on main); every merge: ROADMAP.
+- **Last merged:** the kit hold and two CI edits (#60, b763ba3, 2026-11-18 20:30:46 UTC, his go; CI green); see ROADMAP.
 - **The kit:** KIT-FREEZE-2, what he meant by it (FREEZE-FDN) and his exceptions (two more since, for #53 and #54):
   `docs/DECISIONS.md`, "Queued"; his two additions of 2026-11-11 for the foundation chat: `docs/DECISIONS.md`. His words
   of 2026-11-13 for step 2.3:
@@ -26,18 +26,18 @@ _Last updated: 2026-11-18 (the kit hold and two CI edits, PR #60, after #58's me
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4r merged (71ee13d), its judged runs closed, and BRAWL-1 merged (b30314a); C62H-BOUND approved by Mustafa, its build next; main 53272a1 merged in (its checkpoint, 2026-11-15) | its units, runs and report; his OK of each run's plan and cost cap |
-| #60 | the kit hold and two CI edits, by lane 1, on his words of 2026-11-18, 15:38:13 UTC ("One small pull request with the kit hold and the two CI edits, nothing else in it."): the checkpoint script holds a push that changes a manifest or a lockfile until its security check is recorded (`.claude/scripts/checkpoint.mjs`, six new tests, one rule line in `.claude/CHECKPOINTS.md` §3; his answer DEP-HOLD (a), written on his yes to its exact text: KIT-TEXT, yes with one change, then KIT-FIX, the fix of a hole in the changed lines); the `toolchain` job runs with no cache (his CI-CUT (a), part 1), writes the generated types again and compares them, and type-checks `packages/types` with strict flags (his CI-TYPES (a)); his three messages of the day in `docs/DECISIONS.md` by script; 293 added lines, accepted by his word of 18:01:08 UTC; report `docs/reports/2026-11-18-kit-hold-ci.md`. Meanwhile, in his words: "No new library of change-set 2 is committed before that pull request is merged." Open after it, for "Follow-ups" once merged (their text: the archive's "Follow-ups", "From the kit hold and two CI edits (PR #60)"), each below High and so a follow-up by his word of 18:01:08: security-auditor's two Mediums, F1 (in two corners the hold checks another path than the one it pushes: a root folder whose name begins with a blank character, or is not valid UTF-8) and F3 (no rule makes the review of a pull request read the hold's record; until a kit change, change-set 2's report quotes each record and the security answer it names), and its three Lows; test-engineer's three Mediums (behaviours no test pins: main's side of the "equal to main" comparison read at the exact path, a `deleted  <path>` line leaving an existing file held, `origin/main` over a local `main`) and seven Lows; infra-engineer's six Lows (two for his list for the quality gate v2's plan, four on the report's wording) | `claude/wonderful-hamilton-jdmlnf` (stands in for `cs/kit-hold-ci`) | the four files written on his yes at 17:15 UTC, two of them again at 18:01 UTC (commits 8bf4bee and 94c197f, pushed 17:18:16 UTC; 4877599, pushed 18:03:10 UTC); the new CI lines on real runs from 17:18 to 17:23 UTC ("Cache mode: none" in the job's log; the compare step failing on a planted change, then passing on the clean tree); one review round, its notes committed at 18:08:01 (infra-engineer), 18:31:54 (security-auditor) and 18:40:04 UTC (test-engineer): nothing Critical or High; the verifier's verdict: the report; the advisor agent's: the pull request's description | the Advisor's check of its ready report, then his go (risk tier 2: kit and CI files); no Brave check |
+| #61 | change-set 2 of the build plan, "First page" (foundation step 2.5, first half), by lane 1: the Rust simulation (a tick counter and the match seed; no random-number library yet, his RNG-CRATE (c)), built as WebAssembly with wasm-bindgen `=0.2.130`, runs in one module Web Worker at 30 ticks a second and hands the page one block per tick (so far its header: the tick and the layout's hash); the page, which makes no Wasm call, draws an empty lit ground with a 1 m grid on three.js 0.187.0's WebGPU renderer (WebGL 2 as the fallback), names its backend and has a development readout with "Copy report"; `packages/client/serve.mjs` serves a built page to this computer only, under a strict content security policy; `packages/client/scripts/build.mjs` builds the Wasm and the page and checks the tool's file (size and sha256) before every run; browser tests in `packages/e2e` (CI does not run them yet: his CI-WASM (a)); his six messages of 2026-11-18 and 2026-11-19 in `docs/DECISIONS.md` by script; report `docs/reports/2026-11-19-cs2-first-page.md` (the size: there). Follow-ups (their text: the archive's "Follow-ups", "From change-set 2, the first page (PR #61)"): for the CI pull request TE-NT6, RR-N4, RR-F5, E2E-TYPES, SA-TREE, SA-DIST; for change-set 3 NA-N1 to NA-N7, EA-F8, EA-F9, EA-F10, EA-F13, EA-N3, EA-N5, EA-N6, GE-N1, GE-N4, GE-N5, GE-N6, TE-NT3, TE-NT4, TE-NT5, TE-NT7, PA-N2, PA-L2, TE-L, SA-ENV, FAVICON; for change-sets 5 and 6 GE-F7, PA-L4; for the quality gate step SA-F6 (the npm scope `@shamble`), SA-SWAP, TE-NT2; for the drafts' next revision EA-F6, EA-F12 | `claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs2-first-page`) | opened as a draft 2026-11-19 11:01:27 UTC; the eight build steps in (3833e3e, 784ae3e, 4c32a06, a7f785a, a68e3da, cc9fc71 (the dependency step, pushed through the hold), 6e76f30, 015a212, de63a30, c4a12eb, 74a0c24), then the fix passes 29378dd and d257bb6; round 2's fix pass: the report; two review rounds (seven reviewers, then six on what the fixes changed): no Critical, no High open; the verifier's verdict: the report; the advisor agent's: the pull request's description. **Not verified anywhere yet:** WebGPU itself (this container has no WebGPU adapter: every run here was on the WebGL 2 fallback with software rendering, in Chromium), Brave, Firefox, Safari, a real GPU | the Advisor's check of its ready report, then his browser check, in Brave and once in Firefox (his words of 2026-11-19, 13:36:37 UTC; the zip `shamble-v2-02-first-page.zip`, sent in the chat; steps: the report's "For Mustafa") and his go (risk tier 1: new dependencies, something a player sees) |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs
    change-set: UNITS.md §0 and LOOP_V2), then the Slice 1 note of 2026-11-10, each in a fresh chat. His words:
    `docs/DECISIONS.md`, "Queued".
 2. v2: the netcode proof test (#40); the foundation (his order of 2026-11-11): #49, #50, #51, #48 and #52 merged; step
-   2.3: the 2.3 chat stays stopped for now; then change-set 2 (lane 1, the skeleton, step 2.5: its drafted plan goes to
-   the advisor agent after #60's merge) and lane 2's work; Slice 3 waits for the netcode proof test's result.
+   2.3: the 2.3 chat stays stopped for now; #61 waits for his go; after it, the CI-WASM pull request (its exact text to
+   him first), change-set 3 (its plan asks him RNG-CRATE) and lane 2's work; Slice 3 waits for the netcode proof test.
 
 ## Waiting on Mustafa
-- His go for #60 after the Advisor's check of its ready report; did #58's test zip save and unpack on his laptop?
+- His browser check (Brave, once Firefox) and go on #61, after the Advisor's check of its report ("For Mustafa").
 - From Part 15 (its "Lane requests" issue: #59): give lane 2 Part 15 and ask for its needs from the block; tell lane 2
   which chat on his PC makes the model files; the VFX chat's exports; pass the VFX findings on.
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's
@@ -98,11 +98,11 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
   NODE-26; later: OVERFLOW-PER-CRATE (with the first third-party crate), PACKAGE-ENTRIES, EMPTY-SLOTS, OQ-0002-8-TEST,
   BRIEF-STALE. Accepted as left open (his go for #48, item 5): SETPRIV-HARDEN, SETUP-NODE-CACHE, CUT-ESCAPE (step 2.3,
   each a CI edit that asks him); OVERFLOW-PANIC-RULE (with the first code in the room crate or a server crate).
-- **From change-sets 0 and 1 (PRs #56, #58) and Part 15:** the rules' O1 (PM-0005-54) and O2, his calls with change-set
-  M's plan; the first real export; the coat's motion; the carried lines; ADR 0002's package list; #58's other follow-ups
-  and round 2 Lows, with two doc lines (`ts_export.rs`, `layout_ts.rs`, `messages.rs`) for the next PR touching them.
-- **His list for the quality gate v2's plan** (15:38:13 and 18:01:08 UTC): a CI check on unreviewed lockfile entries,
-  the CI cut's part 2, whether a manifest main removed may pass, a ":" path read as a pattern; the reviewers' lines.
+- **From change-sets 0 and 1 (PRs #56, #58) and Part 15:** O1 (PM-0005-54) and O2, his calls with change-set M's plan;
+  the first real export; the coat's motion; the machine lines; ADR 0002's package list; #58's other follow-ups and Lows.
+- **From #60 (Mediums: with the quality gate step's kit changes, his go):** security-auditor's F1-F5, test-engineer's
+  F1-F11, infra-engineer's L1-L6; his list for that plan: a CI lockfile check, the cut's part 2, KIT-REMOVED, ":" paths.
+- **From change-set 2 (#61):** the ids in its row above, and his four things of 2026-11-19: the archive's block for #61.
 - **Binding this chat:** `.claude/CHECKPOINTS.md` §3's hold; the advisor agent's ruling of #58: manifest and lockfile
   edits stay uncommitted and unbuilt, other code is committed by path only, until security-auditor answers.
 

@@ -127,6 +127,140 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-19, 13:36:37 UTC: his answer to SIZE-STOP-2 in his own words ((a): the stop line of
+  change-set 2 moves to 4,700 added lines, and it is the last move of that line), the night lost to an approval prompt
+  accepted as the report writes it down, and four things for the change-sets after this one: SLICE-FEEL (aiming down
+  sights and the sprint-to-fire delay are game rules of Slice 1; both are priced and placed in change-set 4's plan),
+  PROJ-DRAW ((a): in change-set 9 lane 1 draws grenades and arrows in flight plainly, and they pass to lane 2 when
+  change-set 9 is merged), lane 2's first list of needs on the "Lane requests" issue #59 (answered row by row in
+  change-set 4's plan; its wishes W1 and W4 are now needs), and his browser check of the first page (his own browser and
+  once Firefox; the game has to work in Chrome, the Chromium-based browsers and Firefox; Safari and Mac come later)**
+  (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-19, 12:00
+  (Amsterdam time)"; extracted by script from the session's transcript, message d436904b-c45e-4767-95c0-efc1882ec346,
+  whole). Its first paragraph is about the chat's compaction: the resume card it names had by then been folded into
+  `docs/reports/2026-11-19-cs2-first-page.md` and deleted (commit 29ab052), and stays readable at commit 929b146. His
+  one letter of 11:07:48 UTC, the entry below, was read as (a) on SIZE-STOP-2; these words give that answer themselves.
+  When they came the change-set stood at 4,477 added lines, with both review rounds and the verifier done. The question
+  PROJ-DRAW as lane 2 put it, with its options, is not in this lane's records; the comment he names on #59 (issue
+  comment 6994614989; a comment there is never his word) asks under its gap 4 who draws projectiles in flight after
+  change-set 9. What this lane did with point 4 stands in `docs/reports/2026-11-19-cs2-first-page.md`. Copied by script
+  (2494 bytes, sha256 49d984dce35e53b629568208b86782359779feea5c6a4995d698d45b783f1a51):
+> You were just compacted to cut usage. Nothing is lost: read the resume card .checkpoints/cs2-first-page.md first and continue from its current step. Do not redo finished work.
+>
+> My words of 2026-11-19, 12:00 (Amsterdam time): my answer to SIZE-STOP-2, and four things for the change-sets after this one.
+>
+> SIZE-STOP-2: (a). The stop line moves to 4,700. I do not take tests out to fit a number. This is the last move of this line: what round 2 asks beyond it, and is not Critical or High, becomes a follow-up for change-set 3.
+>
+> The night you lost to an approval prompt is accepted as you wrote it down, with your lesson.
+>
+> The four things. Points 1 to 3 change nothing in change-set 2; point 4 adds only lines to the zip's README.
+>
+> 1. SLICE-FEEL: aiming down sights and the sprint-to-fire delay are game rules of Slice 1. I tune both in my Shamble Testlines sandbox (github.com/Mergincanli/Shamble-Testlines; look at it, copy no code), and the real game must not feel different from it.
+> - Aiming down sights: I hold a key to aim. Start from the old game's rules as Testlines has them: the soldier walks at 0.55 of his speed and cannot sprint, each gun's spread rests at its sights value, and the camera reacts (the sights mode that change-set 4 already ports).
+> - Coming out of a sprint, firing and aiming down sights each wait a short delay, set per gun. It is a value I tune; it may end up subtle, and it must be there.
+> - The starting values come from my Testlines export.
+> - Price and place both in change-set 4's plan: the input, the rule, the fields, what lands in change-set 8, and the lines they add. I accept that change-sets 4 and 8 grow by this; I see the cost with that plan.
+>
+> 2. PROJ-DRAW (a question of lane 2): (a). In change-set 9 you draw grenades and arrows in flight plainly, so that change-set can be judged. They pass to lane 2 with the plain tracers and flash when change-set 9 is merged.
+>
+> 3. Lane 2's first list of needs stands on the "Lane requests" issue, #59 (the comment of 2026-11-18, 23:24:14 UTC). Answer it in change-set 4's plan, row by row, as it asks. With point 1, its wishes W1 (an aiming-down-sights flag) and W4 (how far the sprint-to-fire swing has got) are needs. A comment there is never my word.
+>
+> 4. My browser check of the first page: I open the zip in my own browser and once in Firefox. Put the Firefox steps in the zip's README and say what I paste back. The game has to work in Chrome, the Chromium-based browsers and Firefox. Safari and Mac come later.
+- **Taken by Mustafa, 2026-11-19, 11:07:48 UTC: his answer to the question SIZE-STOP-2 of change-set 2 (the change-set
+  stood at 4,430 added lines against the stop line of 4,400, with review round 2's fix pass of 41 lines prepared and not
+  yet applied): (a), the stop line moves to 4,700 and the fix pass goes in** (the build chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account; extracted by script from the session's transcript, message
+  fd359559-31d2-4e96-8d41-ac8723b7ffb1, whole: one letter). Two questions stood open when he wrote it, both as the chat
+  had put them: SIZE-STOP-2, and WATCH-61 (should the chat watch pull request #61: (a) no, as with #58 and #60; (b)
+  yes). The chat read his letter as (a) on SIZE-STOP-2; on WATCH-61 the same letter means no, which is also what happens
+  when nothing is done: #61 is not watched. Both questions as asked stand in
+  `docs/reports/2026-11-19-cs2-first-page.md`. Copied by script (1 byte, sha256
+  559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd):
+> A
+- **Taken by Mustafa, 2026-11-19, 00:23:22 UTC: for the night, the build chat need not ask his permission until 7 am and
+  goes on with its work as it is** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; sent
+  while a turn was running and recorded in the session's transcript as a queued command, uuid
+  9c97c1e4-c16b-497b-bac5-376f8fad67a3, whole). How the chat read it, and what it did not take it for (a go on a merge,
+  an edit to a kit, gate or CI file, or other code from the internet), stands in
+  `docs/reports/2026-11-19-cs2-first-page.md`; the window ended at 7 am Amsterdam time (06:00 UTC) on 2026-11-19. Copied
+  by script (150 bytes, sha256 1497e77f6a6761da497f37fa3d36670f23741359f88a86c01720016b2b3e8701):
+> You don't need to ask permission anymore until 7 am (I am going to sleep), I'll see in the morning what you've done
+> Continue with your work as you are
+- **Taken by Mustafa, 2026-11-19, 00:18:21 UTC: his answer to the question SIZE-STOP of change-set 2 (the change-set
+  stood at 3,964 added lines against the stop line of 4,000, with four small browser test files unwritten): (a), the
+  stop line moves to 4,400 and the four files are written as planned** (the build chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account; sent while a turn was running and recorded in the session's
+  transcript as a queued command, uuid 08191595-0b56-4531-a60e-2720c6028109, whole). The question as it was put to him
+  at 00:17 UTC, with its two options, stands in `docs/reports/2026-11-19-cs2-first-page.md`: it was the only decision
+  open at that moment. Copied by script (1 byte, sha256
+  559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd):
+> A
+- **Taken by Mustafa, 2026-11-18, 22:34:37 UTC: his answers to the five questions of change-set 2 (the first page,
+  foundation step 2.5), and the size: RNG-CRATE (which random-number library, and when: none now, the library enters in
+  change-set 3 and he is asked which with that plan), WB-HEALTH (go on with wasm-bindgen or not: go on, pinned to
+  exactly 0.2.130, what crosses it kept small), TOOL-SOURCE (where the wasm-bindgen tool comes from: the ready-built
+  file he names, this one file only), DEPART-2 (the plan's six departures from the decision drafts: all six) and CI-WASM
+  (when CI builds the Wasm: a small pull request of its own right after change-set 2 is merged, its exact text to him
+  first)** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of
+  2026-11-18, 23:26 (Amsterdam time)"; extracted by script from the session's transcript, message
+  d6abf351-4175-4bc2-bb81-9db74fc152fb, whole). The five questions as asked stand in the plan he answered on,
+  `.checkpoints/cs2-first-page/plan.md` at commit 1d79e8e4, section 16, and in
+  `docs/reports/2026-11-19-cs2-first-page.md`. Copied by script (2261 bytes, sha256
+  f7c64f7a527396f904fc6926d9edf8f756956293fd0d6bb0f900773f1ab75ba3):
+> My words of 2026-11-18, 23:26 (Amsterdam time): my answers to the five questions of change-set 2 (the first page), on your plan as it stands at commit 1d79e8e4.
+>
+> RNG-CRATE: (c). No random-number library now. Change-set 2 carries only the match seed. The library enters in change-set 3 beside its test vectors, and you ask me which one with that plan. For that question also read two things: the rand project's upgrade guide for 0.10 (rust-random.github.io/book/update-0.10.html), which speaks of the output of the like-named generators in chacha20, and why chacha20's releases 0.10.0 and 0.10.1 were withdrawn.
+>
+> WB-HEALTH: (a). Go on with wasm-bindgen, pinned to exactly 0.2.130, with the build refusing any other version of its tool and every version bump as its own change-set. Keep what crosses it as small as the plan has it (one type, plain numbers on every tick): that keeps a later move off it cheap.
+>
+> TOOL-SOURCE: (a), for this one file only: wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz, 11860397 bytes, sha256 9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f, by the route of your plan's section 7, item 5a. This is my yes to run that ready-built program on the proof you have. My rule on unreviewed code from the internet stands as it is: every other file, version or checksum comes back to me.
+> The Advisor downloaded the same file over another network route and read the same size, the same checksum and the same six members. Inside it the program wasm-bindgen has 8170784 bytes and sha256 ca4df773020dae87d92b9eadb2b85412bea7a9cf6318ab9999dd119fd9f46931. If your copy differs in any of these, stop and tell me. GitHub's own check could not be run there either.
+>
+> DEPART-2: (a), all six. The hand-off reading at the size of 12 and of 48 soldiers is made in change-sets 4 and 5, as your section 17 says.
+>
+> CI-WASM: (a). A small pull request of its own, opened right after change-set 2 is merged and merged before change-set 3's build starts; change-set 3's plan may be written beside it. Its exact text comes to me first. It runs GitHub's own check on the tool's file before the tool's first run there, and its report quotes that check's output.
+>
+> The size as you plan it, about 2,900 lines with the stop line at 4,000, is fine.
+- **Taken by Mustafa, 2026-11-18, 20:20:09 UTC: his go on the merge of #60 (the kit hold and the two CI edits), what he
+  accepts with it, his answers to WRITE-MODE (the chat's mode at the two kit writes: accepted as made; from now on the
+  mode is read right before each kit write) and REC-OLD (may a docs pass correct older lines of the shared record files:
+  yes, with one limit), and what comes after** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal
+  account; his label: "My words of 2026-11-18, 20:59 (Amsterdam time)"; extracted by script from the session's
+  transcript, message 8d566988-02ff-489c-a370-7ffd79f49dae, whole: its first lines are his own, typed above the
+  Advisor's block: his answer "REC-OLD: A", the chat's question about the test zip of #58 quoted back, and his request
+  for the zip's steps). The two questions as asked stand in `docs/reports/2026-11-18-kit-hold-ci.md`. His words from the
+  line "My words of 2026-11-18, 20:59 (Amsterdam time)" to the end stand byte for byte in the message of merge commit
+  b763ba3e5f34c67fc4f875cfbd9266167fb095f3. Copied by script (2579 bytes, sha256
+  7516d302bdca3aff7be007fce427967c1f494b9b798f82537699c3d9bb9882af):
+> REC-OLD: A
+>
+> 4. Still open from #58: did its test zip save and unpack on your laptop?
+>
+> I must have missed the zip test, can you give me the instructions again?
+>
+> from advisor: 
+> My words of 2026-11-18, 20:59 (Amsterdam time): my go on the merge of pull request #60, and my answers to WRITE-MODE and REC-OLD.
+>
+> Merge pull request #60 (the kit hold and the two CI edits: the checkpoint script holds a dependency change; the toolchain job gets no cache, a regenerate-and-compare step and a strict type check) into main by a merge commit, at head e5ca7358d5a3f8cc68ee07cd59d7bbf2c45e253d. Put these words in the merge message.
+>
+> Before you merge:
+> - Read gate, smoke and toolchain on that head once more. All are green, or you stop and tell me.
+> - If the head is not e5ca7358d5a3f8cc68ee07cd59d7bbf2c45e253d, stop. A later push needs the advisor agent's review and my go again.
+>
+> What I accept with this merge:
+> - The four things that went wrong, as the report writes them down: the hole that stood on the branch for 45 minutes, the chat's mode at the two kit writes, the count that was off by one, and the two times ahead of the clock.
+> - The five Medium findings as follow-ups. They are fixed with the kit changes of the quality gate step. Until then every ready report of a pull request that changes a manifest or a lockfile quotes each release record and the security answer it names.
+> - The two wording slips left in the report, named in the pull request's description.
+> - The size: 293 added lines in the four kit and CI files against the stop line of 300.
+> - As before, the checkpoint commits enter main's history with this merge.
+>
+> WRITE-MODE: (a). I accept both kit writes as they were made. From now on you read the chat's mode right before each kit write and stop unless it is Accept edits.
+>
+> REC-OLD: (a), with one limit. A docs pass may correct a line of the shared record files that describes code, also a line another lane wrote, when that code has changed; its report lists each with the old and the new text. A line that records what happened or what I decided is never reworded: it gets a dated pointer. The three map rows for the files this pull request changed are corrected in change-set 2's docs pass.
+>
+> After the merge:
+> - Open change-set 2's checkpoint (the first page, foundation step 2.5), with the plan draft carried over from the notes at commit f167f061a9b0b694836c272e397c90c815d7829f. Then stop and tell me the path of its resume card: I compact this chat before you go on.
+> - Then change-set 2: its plan, its review, the build and its pull request, then stop for my go.
 - **Taken by Mustafa, 2026-11-18, 18:01:08 UTC: his answers to three questions of the build chat, and the size accepted:
   KIT-FIX (may a fix to the checkpoint script's hold, in the lines changed after his first answer, be written with the
   exact text shown: yes, as shown), KIT-REMOVED (should a manifest that main removed also pass the hold when a branch

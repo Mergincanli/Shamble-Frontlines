@@ -118,6 +118,15 @@ High) and its fix pass (08423ce: routine-guard 1107/1107); the verifier's re-che
 `docs/reports/2026-11-10-kit-v3-5.md`. Merged: PR #46, 2d22b69, 2026-11-10 16:05 UTC, by merge commit, on Mustafa's
 go after the advisor's APPROVE WITH NOTES of 0573db3; the PR Advisor routine re-enabled at 16:07 UTC.
 
+**STATUS-DIET with LANE-RULES [2026-11-10 to 11-11, MERGED]** — status-diet (Mustafa's queue of 2026-11-10, items 2
+and 3, with ACCOUNTS and his Models addition): STATUS (1233 lines) split by a line-range script into STATUS (109 lines:
+the phase, in flight, next, waiting on Mustafa, the routines, pointers), `docs/DECISIONS.md` (his decisions word for
+word, newest first, and the queue of his words) and `docs/STATUS_ARCHIVE.md` (the rest; Follow-ups and Open bugs and
+risks stay live); every moved line byte for byte, no decision id lost. CLAUDE.md: the read list, "Lanes and accounts"
+and the Fable 5.2 advisor-tool exception, his words quoted; docs-keeper.md follows the split; #46 recorded as merged.
+Report `docs/reports/2026-11-10-status-diet.md`. Merged: PR #49, bb2d817, 2026-11-11 09:03 UTC, by merge commit, on
+Mustafa's go after the advisor's APPROVE of 2e6e5d2; CI green on main (run 42991918886).
+
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
 
@@ -154,14 +163,26 @@ go after the advisor's APPROVE WITH NOTES of 0573db3; the PR Advisor routine re-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**The kit hold and two CI edits [2026-11-18, PR #60, in flight]** — kit-hold-ci, by lane 1, on his words of
+**Change-set 2 of the build plan, First page [2026-11-18 to 11-19, PR #61, in flight]** — cs2-first-page (foundation
+step 2.5, first half), by lane 1: the Rust simulation (a tick counter and the match seed), built as WebAssembly with
+wasm-bindgen 0.2.130, runs in one module Web Worker at 30 ticks a second and hands the page one block per tick; the
+page makes no Wasm call, draws an empty lit ground with a 1 m grid on three.js 0.187.0's WebGPU renderer (WebGL 2 as
+the fallback), names its backend and has a development readout; a small server for a built page on this computer
+only; the build checks the wasm-bindgen tool's file before every run; browser tests in `packages/e2e` (not in CI
+yet). Two review rounds, no Critical or High open; report `docs/reports/2026-11-19-cs2-first-page.md`. WebGPU itself,
+Brave and a real GPU are not verified yet. Next: the Advisor's check of its ready report, his Brave check and his go.
+
+**The kit hold and two CI edits [2026-11-18, MERGED]** — kit-hold-ci, by lane 1, on his words of
 2026-11-18 with his go on #58 (risk tier 2, kit and CI): the checkpoint script holds a push that changes a manifest or
 a lockfile until its security check is recorded (his answer DEP-HOLD (a): `.claude/scripts/checkpoint.mjs`, six new
 tests, one rule line in `.claude/CHECKPOINTS.md` §3), written on his yes to its exact text, once with one change of
 his and once more for the fix of a hole in the changed lines; the `toolchain` job runs with no cache, writes the
 generated types again and compares them, and type-checks `packages/types` (his CI-CUT (a), part 1, and CI-TYPES (a)),
 shown on real runs; 293 added lines, accepted by his word. One review round, nothing Critical or High; report
-`docs/reports/2026-11-18-kit-hold-ci.md`. Next: the Advisor's check of its ready report, then his go.
+`docs/reports/2026-11-18-kit-hold-ci.md`. Merged: PR #60, b763ba3, 2026-11-18 20:30:46 UTC, by merge commit, on his go
+after the advisor agent's APPROVE of e5ca735; CI green on main (gate run 900 with smoke, toolchain run 198). With the
+merge he accepted the four things that went wrong and the five Mediums as follow-ups, and answered WRITE-MODE (a) and
+REC-OLD (a), with one limit (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC).
 
 **Change-set 1 of the build plan, Types [2026-11-18, MERGED]** — cs1-types (foundation step
 2.4), by lane 1, on his words of 2026-11-18 with his go on #57: the first eight message types in `crates/protocol`
@@ -271,12 +292,3 @@ move directions and their bases recorded raw; gate PASS. PR #50 replaces #47 (hi
 WITH NOTES; report `docs/reports/2026-11-11-foundation-2-1a.md`. Merged:
 PR #50, 76b4f7a, 2026-11-11 18:38 UTC, by merge commit, on Mustafa's go after the advisor's APPROVE of f6becf5; CI
 green on main (run 43079707687).
-
-**STATUS-DIET with LANE-RULES [2026-11-10 to 11-11, MERGED]** — status-diet (Mustafa's queue of 2026-11-10, items 2
-and 3, with ACCOUNTS and his Models addition): STATUS (1233 lines) split by a line-range script into STATUS (109 lines:
-the phase, in flight, next, waiting on Mustafa, the routines, pointers), `docs/DECISIONS.md` (his decisions word for
-word, newest first, and the queue of his words) and `docs/STATUS_ARCHIVE.md` (the rest; Follow-ups and Open bugs and
-risks stay live); every moved line byte for byte, no decision id lost. CLAUDE.md: the read list, "Lanes and accounts"
-and the Fable 5.2 advisor-tool exception, his words quoted; docs-keeper.md follows the split; #46 recorded as merged.
-Report `docs/reports/2026-11-10-status-diet.md`. Merged: PR #49, bb2d817, 2026-11-11 09:03 UTC, by merge commit, on
-Mustafa's go after the advisor's APPROVE of 2e6e5d2; CI green on main (run 42991918886).
