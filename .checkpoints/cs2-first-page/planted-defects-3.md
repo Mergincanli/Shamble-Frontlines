@@ -113,3 +113,14 @@ exit 1: FAILED as it must, at the line that names the defect
 ## 14b. a Worker's error is not cancelled, so the window counts it a second time
 check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
 exit 1: FAILED as it must, at the line that names the defect 
+        > 107 |     expect((await report(page)).errors).toBe(1);
+
+## 15. the page does something its content security policy refuses (an inline style)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 57 |     expect(later.errors).toBe(0);
+        > 57 |     expect(later.errors).toBe(0);
+
+## 13. the page imports the Wasm's glue itself
+check: node packages/client/scripts/build.mjs
+exit 1: FAILED as it must, at the line that names the defect 
