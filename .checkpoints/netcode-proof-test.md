@@ -190,6 +190,8 @@
 - **U4f's panel, round 1, ENDED** 14:32 UTC (wf_a011d9f2-abf: 5 of 5 results); **the advisor's ruling ENDED** about
   14:52 UTC (agent abf879016ff011b9c). **Part-clean before builder 4 DONE** (P27's six cleans and checks in one
   main-run.sh call, .gate/u4f-b4/clean-shared.log, exit 0, 14:53 UTC): free 5,054 → 11,784 MiB.
+- **MAIN-61** (main f5030a3, PR #61, in; PR #40 un-mergeable since 15:11 UTC, STATUS.md the one conflict): plan
+  main-61-plan.md; **the advisor's review RUNNING** from 15:2x UTC (agent a5e4ea7a63dfed426; advisor-main-61.md).
 - **Builder 4 (the fix pass) RUNNING** from 14:57 UTC (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
