@@ -699,3 +699,26 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   **Window closed: production's branch rule was off from 00:19:35 to about 00:21:51 UTC**; only run #18's attempt 2
   ran in it. The measurement: run #18 re-run (rerun_workflow_run, 201, about 00:22:00 UTC): attempt 3, its
   `b9-production` must be refused again.
+- **The measurement after the restore: run #18 attempt 3** (re-run about 00:22:00 UTC): `b9-production` (135239185962)
+  created 00:22:02, completed 00:22:06, conclusion "failure", no runner; the public run page for attempt 3 (logged
+  out, 00:22:39 UTC; picture `.gate/preview-hosting-check/day1/sitting3/run18-attempt3.png`), "Annotations: 2 errors",
+  word for word: "Branch "refs/pull/10/merge" is not allowed to deploy to production due to environment protection
+  rules." / "The deployment was rejected or didn't satisfy other protection rules." So with `main` back, the
+  pull-request job is refused again.
+- **Sitting 3 in short (PM-0006-32 and SA-R4, SA-R8):** reviewer on: the rewritten job waited, approved, "secret:
+  present" (#17 attempt 1); reviewer off: no wait, "secret: present" (attempt 2); reviewer on again: it waited and
+  was rejected (attempt 3, no runner); a pull-request job naming production: refused at once (#18 attempt 1); the
+  branch rule off: "secret: present" (attempt 2); `main` back: refused again (attempt 3); no repository secrets. Two
+  windows, each closed by his screenshot: the reviewer off 00:10:53-00:13:42 UTC, production's rule off
+  00:19:35-00:21:51 UTC. State left: `preview` with the reviewer (Mergincanli) on, `production` with `main` only;
+  pull requests #5 (c), #9 (cs/b9-edit) and #10 (cs/b9-prod) open, for Day 2.
+- **The schedule fired once**: probe run #4, id 44413340706, event "schedule", created 2026-11-18 22:37:26 UTC (the
+  22:23 slot, 14 minutes late), success 22:37:53; probe-results-44413340706 (artifact 14478546185, zip sha256
+  f497337be4af..., equal to its digest), probed_at 2026-11-18T22:37:46.669Z, read with jq from
+  `.gate/preview-hosting-check/day1/probe-4/`: (a) 2 rows gone (hours_since_close 4.08); (a') 3 gone (4.08); (b) 4
+  gone (3.79); (b') 5 gone (3.78); (c) 2 serves; (d) 2 serves (4.08); the by-hand previews 19 serves; production 4
+  serves; the rehearsal 2 gone (7.68); no row not as expected. The slots 15:23 to 21:23 UTC (seven) had no run; the
+  23:23 slot had none by 2026-11-19 00:23 UTC (29 runs in all).
+- **Sitting 3's runs against its list** (29 runs at about 00:23 UTC): run #17 (cs/b9-edit, three attempts: the
+  control, the reviewer bite, SA-R4's rejected one), run #18 (cs/b9-prod, three attempts: refused, the branch-rule
+  bite, refused), the by-hand probe #3 and the scheduled probe #4; nothing else.

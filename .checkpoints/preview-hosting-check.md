@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 01:22 Amsterdam (00:22 UTC)
+- **Last update:** 2026-11-19 01:24 Amsterdam (00:24 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -679,6 +679,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Step 5 measured: attempt 2's `b9-production` ran 00:19:48-00:19:51, "secret: present". Restore asked now.
    - His restore screenshot (00:21:51 UTC): "Selected branches and tags", `main`: **window closed** (00:19:35-00:21:51).
      Attempt 3 started about 00:22:00: refusal expected.
+   - Attempt 3 refused (00:22:06 UTC; the same two annotations). Sitting 3's measurements all done (results log,
+     "Sitting 3 in short"); runs tallied (29; nothing off the list). The schedule fired once: probe #4 at 22:37:26 UTC
+     (the 22:23 slot), all as expected. Step 25 saved as done only after a consultation.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
