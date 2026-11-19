@@ -169,13 +169,22 @@
 
 ## Running work
 - The -20 set (background, from 20:07 UTC); the saver buovbuxl2 (window to about 21:32 UTC: restart before then); the
-  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled while the sets run (a cut stops a set as it stops an agent). **The
-  advisor's check of U4f2's brief** running from about 20:20 UTC (general-purpose, main's advisor.md, xhigh; read only,
-  no heavy commands during the set; writes advisor-u4f2-brief.md).
-- **Written during the set:** -47's report in u4f-report.md ("After the merge", items 1-5); **U4f2's brief rev 1
-  drafted** (u4f2-brief.md, 167 lines: blocks, share +46/+46/22, C-U4F2-5 to -8 numbered, p19 restated, estimate about
-  1,610-2,010 against his 1,500, so to him before the build, U4F2-Q1 to Q5); to the advisor after the sets. -20's first
-  run (A s1): overflow 0, queue high-water 866 (margin 1.85; scratchpad queue_hw.py).
+  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled while the sets run (a cut stops a set as it stops an agent). The
+  advisor's check of U4f2's brief ran 20:20-20:36 UTC (returned; no agent running now).
+- **Written during the set:** -47's report in u4f-report.md ("After the merge", items 1-5). -20's first run (A s1):
+  overflow 0, queue high-water 866 (margin 1.85; scratchpad queue_hw.py).
+- **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
+  Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
+  whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
+  -10, -11; rulings Q1 (b) else (c) never (a), Q2 to him, Q3 (a), Q4 confirmed +1 f33 case, Q5 no change). **Rev 1.1
+  written** (u4f2-brief.md, 222 lines: conditions 1-8 met; no new check needed unless one cannot be met, :244-245).
+  **U4f2's size line** (SIZE-CHECK, written before its first snapshot): his (a)'s about 1,500 added lines
+  (history.md:6896-6903, on advisor-u4f-stop.md:36-38), the stop past 3,000 (history.md:2048-2051;
+  advisor-u4f-merge-head.md:133-142); the brief's estimate about 1,700-2,250 (up to about 2,700 at 1.2;
+  advisor-u4f2-brief.md:149-156), so **U4F2-SIZE goes to him** in the next day's message (2026-11-20 Amsterdam, after
+  23:00 UTC; the 11-19 one was SIZE-U4F at 00:2x), first line "stopped on you"; lean: build it whole; his cheaper
+  option: leave the four riders (C-U4F2-7 with T-6, C-U4F2-8, ADV-U4FP-3: about 80-215) to a later unit. The build
+  waits for his answer.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-19 16:00:10 to about 17:45 UTC (builder 4; the session too):** "You've hit your org's monthly spend limit
