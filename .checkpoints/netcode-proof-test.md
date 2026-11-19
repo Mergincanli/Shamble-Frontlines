@@ -171,8 +171,9 @@
 - **U4f-F1's builder** from 23:15 UTC (general-purpose, opus, xhigh, isolation worktree:
   .claude/worktrees/agent-ad5f72ed146da5f93, made at origin/main f5030a3; its step 0 fast-forwards to cb7e374 and
   records it; notes in its copy of u4f-f1-build.md; logs .gate/u4f/f1-*). A first launch at 23:14 was stopped at once
-  (its brief lacked step 0; its worktree, unchanged, was removed). The saver bdhc8uudx from 22:42 UTC (window to about
-  00:32: restart before then). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (an agent runs).
+  (its brief lacked step 0; its worktree, unchanged, was removed). Cut by the 23:18 container restart (Cuts, below) and
+  resumed by SendMessage at 23:22. The saver bzii1zoox from 23:22 UTC (window to about 01:12). The check-in
+  trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (an agent runs).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
@@ -187,6 +188,12 @@
   waits for his answer.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
+- **2026-11-19 23:18:18 to about 23:22 UTC (a container restart: U4f-F1's builder and the saver):** "The container was
+  restarted. The following background tasks were running and are now stopped: - Restart the background checkpoint
+  saver (task bdhc8uudx) - Build U4f-F1 in a worktree (task ad5f72ed146da5f93) Re-create them if still needed." (the
+  system's notice; the container up from 23:18:27 by /proc/uptime; the builder's last transcript entry 23:18:18.152Z).
+  Checked at 23:21: the builder's worktree at cb7e374 (its step 0 done), `git status` empty, no notes, no f1-* log, no
+  cargo or npt-* process: no half edit, no plant. The saver restarted; the builder resumed by SendMessage.
 - **2026-11-19 20:53:34 to 22:40:41 UTC (the advisor's -20 ruling; the session too):** "You've hit your org's monthly
   spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:40pm (UTC)" (the agent's transcript,
   its last entry 20:53:34.410Z; the session's transcript has nothing from 20:52:49 to 22:40:57). Checked at 22:41: the
