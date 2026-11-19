@@ -1,0 +1,47 @@
+diff --git a/packages/e2e/tests/skeleton/allocation.spec.ts b/packages/e2e/tests/skeleton/allocation.spec.ts
+index b2ed0a3..2ea8d07 100644
+--- a/packages/e2e/tests/skeleton/allocation.spec.ts
++++ b/packages/e2e/tests/skeleton/allocation.spec.ts
+@@ -6,10 +6,11 @@
+ // planted 64-byte typed array per frame or per block.
+ //
+ // What this method cannot do, found by perf-auditor: once the browser optimises the page's code it charges an
+-// inlined function to its caller, and the sums by name fall towards 0. That happens after some hundreds of calls
+-// (a 60 Hz display reaches it within this run); it does not happen in a slow headless container. So each sum also
+-// has a floor: a run in which the names were lost fails instead of passing blind. Change-set 5 measures the mark
+-// itself another way (the whole page's bytes with the hand-off on and off, and memory outside the heap).
++// inlined function to its caller, and the sums by name fall towards 0. The message listener reaches that after
++// about 470 blocks (the same count on every run in the container), a frame callback after some hundreds of
++// frames. So the window is taken early, before that point, and each sum also has a floor: a run in which the
++// names were lost fails instead of passing blind. Change-set 5 measures the mark itself another way (the whole
++// page's bytes with the hand-off on and off, and memory outside the heap).
+ import { expect, test } from "@playwright/test";
+ import { needsBuild, report, running } from "./report.ts";
+ 
+@@ -26,7 +27,7 @@ const under = (node: Node, name: string): number =>
+ test("the sampling heap profile attributes the hand-off's allocations by function", async ({ page }) => {
+   needsBuild();
+   await page.goto("/");
+-  await running(page, 300);
++  await running(page); // from block 90: the 8 s window ends near block 340, before the listener is optimised
+   const session = await page.context().newCDPSession(page);
+   await session.send("HeapProfiler.enable");
+   await session.send("HeapProfiler.startSampling", {
+@@ -52,12 +53,13 @@ test("the sampling heap profile attributes the hand-off's allocations by functio
+   expect(frames).toBeGreaterThan(20);
+   expect(blocks).toBeGreaterThan(200);
+   // The clean page allocates the input message per frame (about 65 bytes) and, per block, the message event's own
+-  // data and one view (about 300 bytes). Each limit sits between that and one planted 64-byte typed array more
+-  // (about 170 bytes with its header); each floor tells a blind run (the names lost to inlining) from a clean one.
++  // data and one view (about 505 bytes before the listener is optimised). Each limit sits between that and one
++  // planted 64-byte typed array more (about 170 bytes more per frame, about 215 per block); each floor tells a run
++  // that lost the names to inlining, in part or whole, from a clean one.
+   expect(perFrame).toBeGreaterThan(25);
+   expect(perFrame).toBeLessThan(170);
+-  expect(perBlock).toBeGreaterThan(150);
+-  expect(perBlock).toBeLessThan(390);
++  expect(perBlock).toBeGreaterThan(430);
++  expect(perBlock).toBeLessThan(610);
+   // PM-0002-7's own rate, far above what this page does: under 0.1 MB a second.
+   expect(rate).toBeLessThan(100_000);
+ });

@@ -451,7 +451,7 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     9f28a87 (which holds d257bb6): success; on a98de9a (which holds 29378dd): `toolchain` 212 and `gate` 914:
     success.
 
-50. **The zip's route, tried** (`cs2-first-page/make-zip.py`; 08:15 to 08:17 UTC): a development build at ae47239fb
+50. **The zip's route, tried** (`cs2-first-page/make-zip.py`; 08:15 to 08:16 UTC): a development build at ae47239fb
     (the tree clean), staged with a README (his Brave steps, the commit) and `SHA256SUMS.txt`, zipped with
     `python3 -I -m zipfile -c` (245,166 bytes, 10 files), unpacked again and every file equal to its line in the
     list; the browser tests against the unpacked copy (`SHAMBLE_DIST`): 10 passed. A trial only: the zip he gets
