@@ -233,8 +233,10 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   `ci-wasm/plants-subset-output.txt`, script `ci-wasm/plants-subset.py`. Its worktree `.gate/ci-wasm-plants` was
   removed with `git worktree remove` (not forced).
 - Agents for change-set 3's plan (both Opus 5.5 at effort max, in the background, started 20:02 UTC; they build
-  nothing and run no browser test): netcode-architect, part "cs3" (notes `ci-wasm/netcode-architect-cs3.md`: the
-  messages, the room, the endpoint, the step's order, the replay runner, L1); engine-architect, part "cs3" (notes
+  nothing and run no browser test): netcode-architect, part "cs3": **done** (notes
+  `ci-wasm/netcode-architect-cs3.md`, ending DONE: the symbols crate by crate, tests T1 to T10, its part about 3,090
+  lines so the change-set is likely 4,000 to 4,300 against the card's 2,700; its two questions for him: SIZE-3 and
+  PRESS-PACE; no new dependency); engine-architect, part "cs3": still running (notes
   `ci-wasm/engine-architect-cs3.md`: the boundaries, the page's key diagram, the rule tests, the build order). Both
   were given `ci-wasm/cs3-context.md`. A restart gives each the same task again.
 - Done: infra-engineer "ci-plan", test-engineer "followups", rust-reviewer "cs3-rng",

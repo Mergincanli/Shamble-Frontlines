@@ -388,3 +388,137 @@ is a function with a Vitest test; the DOM wiring is covered by the loop spec in 
 (The zip's README keeps the Brave and Firefox steps and adds his BR-GAP steps: the window in front and uncovered for
 the first run, then one step with the window covered on purpose.)
 - B3 DONE. Next: Block 4 (the rule tests).
+
+## Block 4. The rule tests (DONE)
+
+### 4.0 One Wasm route for every rule test: the devtools test module (never shipped)
+- `crates/devtools`: crate-type ["cdylib","rlib"]; deps sim, room, protocol, client-endpoint, sim-wasm (for
+  `LocalMatch` and the real panic hook), wasm-bindgen (workspace; already in Cargo.lock): no third-party crate joins.
+  `src/rules/` = pure runners (no I/O, Wasm-buildable); `src/wasm.rs` (about 60 lines) = the exports:
+  `f32_vectors(inputs: &[u8]) -> String`, `chacha8_words(seed: &[u8], stream: u64, start_word: u64, count: u32) ->
+  Vec<u32>`, `plant_u16_add(a: u16, b: u16) -> u16`, `plant_u16_wrapping_add(a, b) -> u16`, and netcode's
+  `replay(recording: &[u8]) -> Vec<u64>` (per-tick hashes); `panic_buffer()` comes linked from sim-wasm.
+- Built by `node packages/client/scripts/build.mjs --devtools-wasm` (new mode): cargo for wasm32 `-p devtools` in release
+  AND dev profile, the same checks as the player's build (the tool's checksum and version, environment overrides
+  refused), wasm-bindgen --target web into `packages/sim-worker/pkg-devtools/{release,dev}/` (gitignored, +1 line);
+  never imported by the page, never in dist.
+- Run in Node by `packages/sim-worker/boundary/rules.test.mjs` (CI's boundary step after #62 picks it up by folder), and
+  in Chromium by `packages/e2e/tests/rules/wasm-rules.spec.ts`: Playwright routes a fake origin (http://rules.invalid/)
+  to the module's files and the vector files and runs the three checks in the page's engine (CI's Playwright step
+  picks it up). Both need the module built first: CI edit E2 (Block 5).
+- Why not exports in sim-wasm (rust-reviewer's suggested route): WB-HEALTH (a) and EA-F10 keep test members out of the
+  player's Wasm. Why not wasm-bindgen-test (the drafts' named tool, R5-TEST-REC1, PM-0004-22): new crates, a CI edit
+  to unpack `wasm-bindgen-test-runner` (today's step refuses every member but `wasm-bindgen`), and a runner variable
+  (no root .cargo/config.toml while the netcode proof test's rules hold, build plan :955-957). Question WASM-TEST-ROUTE.
+- Reading to state in the plan: the Wasm halves run the same crates compiled with the player's target, profile and
+  flags, inside another module; the player's file itself exposes no hash, vector or plant by design (state_hash.rs:2-3:
+  the hash covers the seed and never leaves the Worker).
+
+### 4.1 (a) Every allow-listed float operation and sqrt, bit for bit
+- Ops (f32 only: part 7 :261 "f32 for every real-valued quantity"; f64 is in no sim code): + - * /, negation; < <= > >=
+  == != and total_cmp; sqrt, floor, ceil, round, trunc, fract; mul_add; abs, copysign; `as` casts f32 -> i8 u8 i16 u16
+  i32 u32 i64 u64, i32 u32 i64 u64 -> f32, f32 <-> f64; is_finite, is_nan (to_bits/from_bits are the harness's own
+  I/O). About 37 operations.
+- Inputs: `crates/devtools/vectors/f32-inputs.bin`, 10,000 cases of (a, b, c) bit patterns, LE = 120,000 bytes: an edge
+  table first (all ordered pairs of about 26 values: +-0, +-smallest and largest subnormal, +-smallest normal, +-0.5,
+  +-1, +-1.5, +-2.5, values just below 0.5, around 2^23, 2^24, 2^31, 2^32 for the casts, +-max, +-inf), then seeded
+  values (uniform over non-NaN bit patterns, and uniform in game magnitudes). >= 10,000 per op meets PM-0004-22's count
+  for sqrt. NaN never as an input (part 7 :285); a NaN result is normalised to 0x7FC00000 before comparison (Wasm's NaN
+  payload and sign are not deterministic; what must agree is which cases give NaN). Integer-to-float casts read a's
+  (or a,b's) bits as the integer.
+- Expected: a correctly rounded reference from an independent generator, `crates/devtools/vectors/make_f32_vectors.py`
+  (Python 3 standard library: struct, fractions.Fraction, math.isqrt; exact rational result rounded once to f32
+  nearest-even; round = half away from zero; Rust's saturating casts; Rust's total_cmp order), self-checked on
+  hand-known answers. So "sqrt equals a correctly rounded reference" (PM-0004-22) holds by construction, and native
+  and Wasm must each equal the reference, hence each other. Why it matters: on baseline x86-64 floor/ceil/trunc/round
+  and mul_add are library calls and in Wasm instructions or Rust's own libm port (my reading of how LLVM lowers them;
+  to be confirmed by rust-reviewer), so two implementations meet here.
+- Committed form (recommended): `f32-expected.txt`, one line per op (name, count, width, NaN count, FNV-1a 64 of the
+  normalised outputs): about 40 lines, about 3 KB; the generator's `--full` mode writes every output for a diagnosis
+  (the first differing index). FNV-1a 64 changes on any single changed byte (each step is a bijection of the state).
+  The alternative, every output committed: about 1,230,000 bytes (sum of the widths over 10,000 cases).
+- Runner: `crates/devtools/src/rules/f32_ops.rs`; inputs read at run time (std::fs natively; passed from JS in Wasm),
+  never include_bytes!, so no compiler folds the ops with its own float code.
+- Native: `crates/devtools/tests/f32_vectors.rs` (dev in today's `cargo test --workspace`; release needs E1).
+
+### 4.2 (b) The first 10,000 outputs of each stream (recommended: own ChaCha8 in sim)
+- Streams that exist now: none (World = tick + seed, world.rs:16-19). cs3 adds the generator, not the purposes:
+  `crates/sim/src/rng.rs` (`ChaCha8`: 32-byte key, 64-bit stream id, 64-bit block counter, 16-word buffer; next_u32;
+  next_u64 = two consecutive words, low first; position get/set; the stream state's canonical bytes at fixed width, no
+  usize). No stream joins World in cs3, so the state bytes, the hash and the recording format are untouched. The five
+  purposes of part 8 (:323-325) wait for their first draw: weapon spread (cs8 Shoot), match setup (the first phase that
+  draws), bot decisions (Slice 2), ability procs and upgrade offers (later slices); each one's id and its 10,000 words
+  join the file in its own change-set, with its sampling functions' vectors (PM-0004-27 "and of the sim's own sampling
+  functions on them").
+- Pinned now: a public test key (the Strombergson draft's TC8 key), stream ids 0, 1, 2^32 and 2^64-1 (both halves of
+  the id's two state words); per id 10,000 next_u32 from word 0; next_u64 checked as pairs of the same words; one
+  save-and-restore at word 1,001 (next 1,000 words equal); one window of 96 words across the 2^32-block carry (one id).
+  File `crates/devtools/vectors/chacha8-words.bin` = 4 x 40,000 + 384 = 160,384 bytes, with `chacha8.manifest.txt`
+  (key hex, ids, counts, starts, SHA-256 per section, generator name). Generator `make_chacha8_vectors.py` grown from
+  rr-chacha-ref.py (which matches all 48 draft vectors), self-checked on the 48 before it writes.
+- In sim itself: the draft's 8 vectors at 8 rounds and 256-bit keys (2 blocks each, 1,024 bytes) as hex in rng.rs's
+  unit tests: native dev and release through today's lines.
+- Native cross-target file test: `crates/devtools/tests/stream_vectors.rs` (first differing index); Wasm:
+  `chacha8_words` in the test module, Node and Chromium as 4.0.
+- Not in cs3: ChaCha8's cost per tick at N = 48 (PM-0004-27's reading): no draw per tick until spread (cs8).
+- If he picks a library: the same files, generator and tests; rng.rs becomes a thin `Stream` over the library's
+  ChaCha8Rng with the order from_seed -> set_stream -> set_word_pos and no get_block_pos (rust-reviewer's conditions);
+  for chacha20 0.10.2 two more native runs with `--cfg chacha20_backend="soft"` and `"sse2"` (rustflags: a CI edit E4,
+  since build.mjs refuses RUSTFLAGS from the environment for the shipped build); overflow overrides (chacha20, rand_core,
+  cpufeatures; rand_chacha: four), SA-TREE's check proving itself on that addition; security-auditor's answer on the
+  exact manifest first; ADR 0004 part 8's crate name changes. With own code, part 8's "only from rand_chacha's
+  ChaCha8Rng" (:309) changes to our own ChaCha8 (a decision-draft line: his go).
+
+### 4.3 (c) The scan test (interim, under the advisor's three conditions, build plan :949-953)
+- File `crates/sim/tests/rules_scan.rs`; scans exactly `crates/sim/src/**/*.rs` (from CARGO_MANIFEST_DIR, sorted).
+  Runs in today's CI test job (`cargo test --workspace`, and `cargo test --release -p sim`): condition 2, no CI edit.
+- Condition 1: two lists in the test: ALLOWED = part 7's methods word for word (total_cmp, sqrt, floor, ceil, round,
+  trunc, fract, mul_add, abs, copysign, is_finite, is_nan, to_bits, from_bits; operators, comparisons and `as` are
+  syntax); STD = every inherent method of std 1.99.1's f32 and f64 pages (read by the build session from
+  doc.rust-lang.org, URL and date in the file; no rust-src in the pinned toolchain). BANNED = STD - ALLOWED. The test
+  asserts ALLOWED is inside STD and BANNED holds part 7's named ones (powi, hypot, cbrt, to_degrees, to_radians, min,
+  max, clamp, rem_euclid, div_euclid, sin, cos, atan2, powf, exp, algebraic_*).
+- Fails on: (1) a BANNED name as a method call `.name(` or as `f32::name(`/`f64::name(` (a text scan cannot see types,
+  so integer code in sim uses the path form on an integer type, `Ord::min(a, b)` or `u32::min(a, b)`; the failure
+  message says so); (2) HashMap, HashSet, hash_map, hash_set, RandomState, DefaultHasher, unless the item carries
+  part 9's escape (`#[allow(clippy::disallowed_types, reason = "...")]`, ADR 0004 :340-342); (3) Instant, SystemTime,
+  UNIX_EPOCH and any `std::time` path (the tick is the only clock, part 4). Comments and string/char literals are
+  stripped first (a small lexer: nested block comments, raw strings, char literals against lifetimes). Not caught, as
+  part 7 says (:282-283): the float `%` operator.
+- Bites in the same file (PM-0004-23's list :1144): a HashMap field, x.sin(), deg.to_radians(), a.min(b),
+  f32::powi(x, 2), Instant::now(), std::time::Duration; controls: x.abs(), x.fract(), x.sqrt(), the escape on a
+  lookup-only map, cmp::min(a, b), a comment and a string that name HashMap and .sin(.
+- Out of its scope: room and client-endpoint (their clock ban is G5's, ADR 0002 :209-210); extending the clock pattern
+  to them is beyond the ruling (only with the advisor's word).
+- The report says "interim" and names the ruling it replaces (the 2.3 plan's: the float ban merges before any float
+  arithmetic enters sim). Note: with own ChaCha8, cs3 brings no float arithmetic into sim; the interim matters from cs4.
+- Open in the draft: part 7's "such as is_finite, is_nan, to_bits and from_bits" (:267-268) is not a closed list; the
+  scan takes exactly those four (B6).
+
+### 4.4 (d) PM-0002-53, the planted overflow (4 of 4)
+- Native dev + release: sim/src/lib.rs's `overflow_checks_are_on` becomes the mark's u16 counter (`black_box(u16::MAX) +
+  1` should_panic "attempt to add with overflow") plus `wrapping_add` giving 0; today's `cargo test --workspace` and
+  `cargo test --release -p sim` run both: no CI edit.
+- Wasm dev + release: the test module's two builds; `plant_u16_add(65535, 1)` throws WebAssembly.RuntimeError and the
+  real hook's buffer holds "attempt to add with overflow" with its location; `plant_u16_wrapping_add(65535, 1)` is 0 in
+  both, as natively. A fresh instance per case (a trapped one is never called again). This also proves the panic hook
+  in Wasm (ADR 0004 S20's check).
+- Reading (B6): the mark's "a committed test in sim" holds natively; in Wasm the planted counter is devtools' code
+  under the same workspace profile (`[profile.release] overflow-checks = true` for every member, root Cargo.toml).
+  Literal "in sim" in Wasm needs wasm-bindgen-test or a test item in sim's shipped code. Its cost clause ("with the
+  tick bench's method") waits for the tick bench (devtools; not built in cs3).
+
+### 4.5 (e) The two-instance test
+- Owner: lane 2, after cs3 merges, never merged (Part 15 :78-80, :105; LANE-SPLIT (a)); the card :327-331 is older (B6).
+- Design: the same Worker instantiates the same compiled module twice (two linear memories): instance A the authority
+  (room + sim), instance B the client endpoint; the host copies the encoded datagrams between the two memories and calls
+  them in ADR 0002 part 6's order (:407). The patch adds two exported types (authority-only, endpoint-only) and a
+  test-only trigger that makes the endpoint panic.
+- What it shows: after the planted trap in B, A's tick keeps rising for 10 s and its per-tick hashes equal a run with no
+  trap, and B restarts and joins again; in the game's one-instance layout the same trap ends the match (the authority
+  lived in the trapped instance). Informs OQ-0002-3 and OQ-0004-7. Counts, time and memory at 12 and 48: cs5.
+- Cost: Part 3.2 "half a day, twice" (:558); my estimate of the patch about 300 lines (two constructors and the split
+  about 80, the host's two-instance driver about 120, the test about 80, a build variant about 20). Kept as a patch file
+  in its report and a build (Part 3.2 :551-553). First to move out if cs3 nears twice its size (the card): with Part
+  15 it is already outside; cs3 keeps only the seam (2.1: the loopback carries bytes).
+- B4 DONE. Next: Block 5 (size and order).

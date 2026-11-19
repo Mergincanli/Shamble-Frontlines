@@ -437,3 +437,87 @@ lost/doubled counters (the card row's "zero lost presses"); the join exchange; t
 shared prefix and start tick (NA-N4, NA-N6); NA-N1, N2, N5, N7 (a few lines each). Shrinking tests is not a cut
 (CLAUDE.md: never shrink evidence).
 - B4 DONE. Next: Block 5 (where the plan or drafts are wrong; questions).
+- FINDING F-PM12 (read in Block 5): ADR 0002 :1283 PM-0002-12 "Presses are never lost or doubled": 0 lost/doubled
+  presses AND releases over 10,000 scripted presses, some shorter than one tick; a seeded shim on the page's posting side
+  delays each post 0-100 ms and sends 10 % twice (reordering most neighbours); the Worker counts presses and releases it
+  applies through the edge counters; bites: a Worker that reads only the held bitmask, or "takes the last post to
+  arrive rather than the newest by sequence number (a reordered older post rolls the running totals back)". The build
+  plan places it at change-set 3 (:584 "PM-0002-12 | 3"; :541 with PM-0002-13's first reading), though its Step 2.5
+  table (:463-476) does not list it. So the Worker must keep the newest post BY POST NUMBER (wrap-aware u32), ignore and
+  count older ones, and count releases too. Releases need no counter of their own: per command, releases r = p + h0 - h1
+  (p = press edges, h0/h1 = held before/after), always >= 0 for a consistent page; the echo check (presses + held bits
+  equal to what was sent) covers releases.
+- FINDING F-PM13: ADR 0002 :1284 PM-0002-13 (key event to the start of the tick that applies it <= 50.00 ms at p95,
+  local) has its first reading at 3 (build plan :541, :585): it needs the tick's START on the shared clock (cs2's block
+  message carries doneAt, the step's end: messages.ts:29-32) and which post a tick ran (my Readout.post_ran). The pacer
+  delays the second of two presses inside one tick by a tick; the reading shows whether that touches p95.
+- FINDING F-JITTER: reordering breaks the jitter band if delay is read from delivery times: at P1 (one-way +-5 ms,
+  variance 8.33 ms^2), 1 % of packets held one 33.3 ms send gap adds about 0.01 x 0.99 x 33.3^2 = 11.0 ms^2, so the
+  measured standard deviation grows from 2.89 to about 4.4 ms (+52 %). PM-0002-49 must read delay and jitter from the
+  drawn (base) delay; L1's docs state it.
+
+## BLOCK 5. Where the build plan or the drafts are wrong or out of date for cs3; questions for Mustafa
+Amendments to my Block 2 from F-PM12 (read after B2 was written; they replace B2 where they differ):
+- host.ts and LocalMatch::set_post keep the newest post BY POST NUMBER (wrap-aware u32: (a - b) mod 2^32 in [1, 2^31)),
+  never the last to arrive; an older or repeated post is ignored and counted (Readout.stale_posts; WorkerStats too).
+- PressPacer::next ignores a page count that goes backwards (press_edges as i8 < 0) and counts it, so a stray old post
+  can never add 255 presses.
+- Readout gains releases_sent and releases_confirmed (r = p + h0 - h1 per command); no release counter on the wire.
+- The host stamps each tick's start on the shared clock in the block message (startAt beside doneAt), for PM-0002-13's
+  first reading; +~5 TS lines. Block 4's totals move by about +30 lines (to about 3,090).
+Out of date or wrong (file:line):
+1. Build plan :318: room's "timers that count ticks": no duration exists in cs3; the join deadline is the server's wall
+   time (ADR 0001 :454; ADR 0002 :466-469). The property holds (no clock in room); the first tick-counted timer comes
+   with the room's phases (ADR 0001 part 11).
+2. Build plan :249 and :316-323: the echo and "zero lost presses" need what the card does not list: the World keeps the
+   applied command (one player record), MatchSetup with a start tick, the shared prefix (sim); an own-state section in
+   Snapshot (messages.rs:118-134 holds a header only); held buttons, move and press counts in the page's post
+   (messages.ts:18 carries one number). F-ECHO, F-PRESS.
+3. Build plan :463-476 (Step 2.5 table) omits PM-0002-12 and PM-0002-13's first reading, which its Part 3 places at 3
+   (:541, :584-585). The plan must carry both (F-PM12, F-PM13).
+4. ADR 0002 :1338 (PM-0002-64) and :1283 (PM-0002-12) say "the newest ... by sequence number": after NA-N5 that is the
+   post number (the page's per-frame count), not the protocol's command sequence.
+5. ADR 0002 :1323 (PM-0002-49): a relative 5 % band has no width at P0 (read exactly 0); B1 is judged on P2's bands plus
+   an exact burst check; delay and jitter must be read from the drawn delay, not delivery times (F-P0, F-B1, F-JITTER).
+6. ADR 0001 :220-224 adopts delta-coded repeats (U2) "from the start"; cs3 sends commands whole (U1): no cost on the
+   loopback, but at the cap the Input is about 277 B (8 + 38 + 7 x 33), above ADR 0001 :728's 200 B per datagram; the
+   16 per-button 8-bit press counters are 16 of a command's 38 B. U2 and the counter width (R2-XU-OQ4, PM-0001-51) must
+   land before online play. A departure to record.
+7. ADR 0001 :221 says the redundancy cap is data; with no content crate until cs4, REDUNDANCY_CAP, CATCH_UP_CAP (2) and
+   LEAD_MAX_TICKS (8) are Rust constants in cs3 and move into data with the content crate. Departure to record.
+8. cs2 report :471-472 and state_hash.rs:5-7: PM-0004-21's report (the hash function, its cost per tick) must precede
+   the first recording's commit; the card (:316-333) does not list it. A precondition of T7, for the sim's owner.
+9. ADR 0002 :506-510 (Wasm determinism on the exact shipped file) against EA-F10 (STATUS_ARCHIVE :1094-1096): the
+   replay entry point must ship (F-SHIPPED-REPLAY); the plan says so, so EA-F10 does not take it out.
+10. ADR 0002 :330-334 puts the host's current time in "the input call"; NA-N1 and this design pass it with the step;
+   two calls per tick either way. Wording to reconcile at acceptance (Low).
+11. Build plan :322 "L1 behind the loopback": L1 is a second backend of the same interface (the step runs unchanged on
+   either), not a layer inside the loopback. Wording.
+12. ADR 0001 :1781, build plan :466 name four messages; the room's refusals need a fifth, JoinRejected (small).
+13. CI (toolchain.yml:84-91): no clippy, so ADR 0002 :470's decoder lints are inert until 2.3; the release test line
+   (:88) covers only sim and protocol. Proposed text in Block 3.
+14. No draft gives L1 a duplication rate (ADR 0001 part 13's profiles have none; ADR 0002 :521 lists it as a
+   capability): cs3 proposes 1 % for a DUP profile used by T4 only (proposed).
+Questions for Mustafa (plain words):
+- SIZE-3: How big may change-set 3 be? Why: the plan must state its size and stop line; the card says 2,700 lines for
+  everything. My part is about 3,090 lines (about half tests); with engine-architect's, likely 4,000-4,300, about 1.5x
+  the card, under its own stop line (5,400). Change-set 2 ran 1.54x for the same reason. Options: (a) one change-set,
+  the plan restated at about 4,000-4,300, stop line 5,400 unchanged, first to move if it nears it: the two-instance test
+  and the build options (the card's rule), then L1's rate limit and duplication; (b) split: the network simulator (about
+  600 lines) and maybe the first recording (about 300) become change-set 3b, before change-set 4; (c) cut tests to fit
+  2,700: not a real option (evidence never shrinks). Recommendation: (a): the loop and its proof are reviewed together
+  and one browser check covers them; a split adds a review cycle without lowering risk.
+- PRESS-PACE: A key tapped twice within one game tick (1/30 s): the second tap is applied one tick (33 ms) later, never
+  dropped. Why: it decides how fast tapping feels, and the draft's anti-cheat rule allows one press per button per tick.
+  Options: (a) delay it to the next tick (nothing lost); (b) drop it (simpler, loses a press); (c) count several presses
+  in one tick (needs the draft's anti-cheat rule changed: turbo macros get through). Recommendation: (a): people rarely
+  tap one key more than about 10 times a second, so it almost never shows, and no press is ever lost.
+- (RNG-CRATE comes first in the plan, from rust-reviewer's notes; not reopened here.)
+Not verified: nothing built or run (no cargo, no tests, no browser: another run holds the test port); every line count
+is an estimate (+-30 %); L1's statistics runtime (6-12 s debug, ~1 s release) is estimated, not measured; the recording
+(57,650 B) and Input (about 277 B at the cap) sizes are arithmetic from the proposed formats; ts-rs's output for the
+changed types, wasm-bindgen with seven u32 parameters and a Vec<u8> return, and the GAT-based TransportPair on Rust
+1.99.1 are expected to work, not compiled; engine-architect's notes were not read (the split of block.rs, the panic hook
+and the page's keys is assumed as the task describes); the ADR sections were read by grep, not whole.
+- B5 DONE.
+DONE
