@@ -89,25 +89,23 @@
   or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
   brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
   with its source before its first snapshot). -21 is judged only after U4f2.
-- **Round 1 RETURNED and RULED** (13:50-14:32 UTC on builder 3's worktree, read only): **u4f-review-r1-full.md** (333
-  lines, 6747175e…, word for word by u4f_review_r1_full.py; read in full): five APPROVE WITH FINDINGS, 4 Medium
-  (NC-U4F-1, TE-U4F-1, TE-U4F-2, RR-U4F-1), 25 Low, no Critical or High. **The advisor's ruling** (advisor-u4f-r1.md,
-  407 lines, 07c1bcd5…, read in full): APPROVE WITH CONDITIONS: one fix pass FP1-FP19 in its order (:156-273), each
-  with its acceptance check; FP20 the main session's at the close (:275-281); no round 2 by default (the 2026-11-17
-  choice, history.md:6818-6819, checked), its check of the pass instead (:311-323); nothing to him; U4f2 takes
-  C-U4F2-1 to -4 and C-U4F2-SEC-1 (:65-87); the later carries C-U5-1, C-U6-17, C-U6-18, C-U7-3, C-U7-4 (:137-154) go
-  into plan.md's rows at the merge; its guard: past 500 added lines in the pass, the builder stops and comes back.
-- **The fix pass, builder 4:** a fresh worktree on the lane's head plus the snapshot (its runner hashes must equal
-  54cb6faa…/e8dc3663… before any edit); logs .gate/u4f/w4-*; notes u4f-build.md "## Fix pass (round 1): builder 4";
-  end checks of section 6 in both builds, FP6's two hand runs; the main session snapshots it at check-ins
-  (worktree_patch.py). The reviewed snapshot 74ae26aa stays at 7a59d7a:wip/u4f-build.patch.
-- **After the pass:** the advisor's check of it (:315-320); the merge on M1-M9 (:325-358): one commit with plan §4.7's
-  cap text, the U4f and U4f2 entries, §4.1's rows, the carries in plan.md's rows and u4f-report.md (A1's movement
-  reading in its own line naming the advisor and the test-engineer; the D10 line; the rest as M8 lists); then 5.3's 21
-  pre-runs, the part-clean at A6's place, the sets -47, -20, -22 (-20's 10-minute P3 runs read for honest overflow
-  first); the set reports with NC-U4F-5 and C-OQ6-SEC-1 (-20) and N1 (-22).
+
+- **U4f MERGED at 25d316e** (pushed c26ff6a, CI green; records moved to history.md:6999-7058, card_trim_1119h.py):
+  6,425 added in 29 files; M1-M9 with C1-C3 met; report u4f-report.md; **the advisor's head check APPROVE WITH
+  FINDINGS** (advisor-u4f-merge-head.md: ADV-U4FMH-1 the card's size, fixed by that trim; -2 `cmd_timing` to U4f2;
+  -3 gate.txt's head, corrected). Builders 1-4's worktrees kept until the sets end (then LEFTOVER-DELETE). **Next:**
+  5.3's 17 pre-runs (c-u4f-r2.mjs from the lane head; its spike tree f7ed90ad… equals 25d316e's: name both), the
+  part-clean before the first set (D2 then), the sets -47, -20, -22 one per call (-20's 10-minute runs read for
+  overflow before -22's), the set reports; then U4f2's short brief to the advisor. Disk 5,318 MiB free (19:3x UTC).
+  **The r2 record run (U4r's rule, history.md:4481-4484):** this card saved and pushed right before; the saver
+  stopped; no agent running; `bash .checkpoints/netcode-proof-test/main-run.sh /home/user/Shamble-Frontlines/.gate/u4f-merge/r2.log node ops/runs/c-u4f-r2.mjs --date 2026-11-19`
+  (lock exclusive) in the background. **Until r2.txt is written: no commit and no edit to any tracked file in the main
+  folder (this card included; a check-in's save waits).** Then the saver again, and the card.
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
+- **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
+  no caller) stays public and goes to U4f2's lane by number, its lean a caller (the lab writes `params.cmd_timing` from
+  the live room, f6 asserts it), else removed (ADV-U4FMH-2). Why: no behaviour change; undone in U4f2.
 - **2026-11-18's three** (D3-1's fix, the fill's form, the build-1 rulings; each named in its day's message): word for
   word at history.md:6935-6946 (card_trim_1119f.py); MAIN-60's done line at :6947-6949.
 - **2026-11-19 (named in that day's message):** the advisor's stop rulings (advisor-u4f-stop.md R2-R4): the event cap
@@ -170,48 +168,6 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **Builders 1 and 2 ENDED** (13:13 and 17:59 UTC): their worktrees `.claude/worktrees/agent-a856ba7ccb7d032c3`
-  (u4f-build, 827518b) and `.claude/worktrees/agent-aa8301a8782f8f434` (u4f-build2, d1b24c3), uncommitted, kept as
-  backups; builder 2's is the snapshot 3d341c58… (builder 1's work in it). The advisor ENDED about 13:40 UTC.
-- **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
-  `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
-  final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,363 bytes (ADV-U4FP-1), 29 files: the one snapshot until the merge.
-- **Builder 4 DONE 18:08 UTC:** FP1-FP19 each met its check, no departure; end checks A2 and B all 11 steps (634 / 731,
-  +82 / +99; negatives 46 of 45; test step 882.8 and 834.0 s); items 4 and 5 done; 6,425 added (the pass +212); notes
-  at u4f-build.md:867-1170; final snapshot wip/u4f-build.patch **286aac60…** (base b25b96a, 29 files; hashes 2f07abc2…
-  / 1a767d5b…; 394,400 B, ADV-U4FP-1). **The advisor's check of the pass: APPROVE WITH CONDITIONS C1-C3**
-  (advisor-u4f-pass.md; all 19 items as named, no round 2, nothing to him; Lows ADV-U4FP-1 to -4). **U4f's merge, in
-  order (advisor-u4f-r1.md:325-358 with C1-C3):** P27's part-clean first (free 4,362 < 4,600: C1); M3/M4 `git apply
-  --check` then `git apply` of wip/u4f-build.patch in the main folder, the 29 files cmp-equal to builder 4's worktree
-  (kept until then), the runner hashes 2f07abc2…/1a767d5b…; M5 one counted run (the end checks' seven commands) via
-  main-run.sh in the background, timeout 7200000 (C2); M6 a failing test stops, to the advisor; M7 the gate
-  --no-smoke; the D10 read; M8 one commit (the files, `git rm` of the wip patch, plan §4.7's cap text, the U4f and U4f2
-  entries, §4.1's rows, the carries into plan.md's rows, u4f-build.md's merge section, u4f-report.md with M8's list,
-  FP20 and C3's lines); M9 the push, the saver, CI, the card; then 5.3's 21 pre-runs, the part-clean, the sets.
-  **Done 18:27-18:3x UTC:** the part-clean (.gate/u4f-merge/clean-shared.log, exit 0: free 4,360 -> 11,663 MiB); M3
-  `git apply --check` exit 0 and M4 `git apply` of 286aac60 in the main folder (uncommitted), its 29 files byte-equal
-  to builder 4's worktree (scratchpad cmp_files.py). **M5 PASSED** (.gate/u4f-merge/m5-check.log, 18:27:42-18:46:38
-  UTC, exit 0: hashes 2f07abc2…/1a767d5b…; all 11 steps; 634 / 731, 0 failed; test step 865.9 s; wasm 27,000 ticks,
-  0 mismatching; marks 81, rows unchanged; refs 1,569). M6: nothing failed. **M7 gate --no-smoke PASS. D10 empty**
-  (`git diff --stat 5b29296b -- marks.json crates/judge marks/README.md`). **Next, M8's papers:** u4f-report.md and
-  u4f-merge-edits.md (the plan's edits as old -> new) drafted by an agent into notes, read in full, the edits applied
-  by Edit; then the one commit (the files as applied, `git rm` of the wip patch). **If cut:** the applied files stay
-  uncommitted in the main folder; resume at M8. **The papers DRAFTED** (19:1x UTC): u4f-report.md (553 lines) and
-  u4f-merge-edits.md (328 lines: edits 1-7 M8's, 8 a no-change record, 9-10 proposed). Settled: the cap text and the
-  public-item rows go to u4-build-plan.md (§4.7, §4.1: the brief's "plan"); the carries to plan.md §12.1; 5.3's
-  pre-runs are 17 until U4f2 (p1, p7, p14, p17 come with it); M7's output kept at .gate/u4f-merge/gate.txt; M2 re-read
-  19:1x (main still f5030a3); `Room::cmd_timing()` (public, no consumer) to the advisor's head check. U4f2's stop past
-  3,000 is his SIZE-CHECK rule ("more than twice the plan", history.md:2049), not a new stop. **Edits read in full and
-  applied** (apply_u4f_merge_edits.py, word for word, each old text once: plan.md, u4-build-plan.md, u4s-carries.md).
-  Report read in full (five lines corrected: M2, M7's log, M8's form, cmd_timing's route). **U4f MERGED at 25d316e**
-  (19:2x UTC: the 29 files and `git rm` of the wip patch; D10 empty on the commit; the papers by checkpoint saves).
-  Pushed at c26ff6a (19:17 UTC); **CI green** on it (check_suite.completed 19:21); the saver b02f5nmep from 19:17
-  (window to about 21:07). **The advisor's check of the pushed head RUNNING** from 19:22 (agent a0ee17a6ebc8cbc7a;
-  N/advisor-u4f-merge-head.md). **Next (M9):** this save pushes it; CI on it; the advisor's check of the pushed head (with `Room::cmd_timing()`); then
-  5.3's 17 pre-runs (`node ops/runs/c-u4f-r2.mjs --date <day>` from 25d316e), the part-clean at A6's place, the sets
-  -47, -20, -22 (u4f-report.md, "What comes next"). Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
-  worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
-  SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
 
 - **MAIN-61 DONE** (its record at history.md:6951-6997, card_trim_1119g.py): main f5030a3 in at a6acc8a, pushed at
   631edf3; CI green (six check runs); the advisor's head check APPROVE WITH FINDINGS (advisor-main-61-head.md: ADV-M61H-1
