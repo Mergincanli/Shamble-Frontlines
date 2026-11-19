@@ -68,39 +68,19 @@
   or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
   brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
   with its source before its first snapshot). -21 is judged only after U4f2.
+- **U4f's after-merge record** (history.md:7090-7122, card_trim_1119j.py; U4f's report, "After the merge", items
+  1-5): merged at 25d316e (pushed c26ff6a, CI green; the advisor's head check APPROVE WITH FINDINGS); r2 done and read
+  (advisor-u4f-r2.md: 14 of 17 as expected; p4, p13, p19 to U4f2 as C-U4F2-5 to -7); the part-clean (D2 5,204 ->
+  11,552 MiB); **-47 PASS** (p99 2.597 / 2.516 / 2.638 ms against 5; both bites shown; a4cac39). Builders 1-4's
+  worktrees kept until the sets end (then LEFTOVER-DELETE).
+- **-20 DONE** (20:07:24-20:48 UTC, exit 0, at 350677f; results/u4f/350677f0aef2/pm-0001-20/, committed 1840e68):
+  PM-0001-2 SS PASS (6 of 6 valid); **PM-0001-20 option A PASS; option B FAIL, "0 presses lost" 3, 1 and 2** (seeds
+  1-3; late 142, 114, 123; A's late 0); bite redundancy-1 shown. Overflow resyncs 0 on all seven runs. **The queue's
+  10-minute high-water:** 866 / 1,117 / 1,083 (A), 1,001 / 683 / 1,045 (B); the largest 1,117 (A s2, slot 27, measured
+  second 52): **margin 1.43, under 1.5, named for U4g** (advisor-u4f-stop.md:132-134); 1,600 stands. **The B FAIL goes
+  to the advisor** for the OQ-0001-6 reading (room.rs:352-355: the sim takes one edge per command run, so late drops
+  spanning two presses lose one; ADR 0001:1156-1167; plan.md:846-848). **-22 next:** its condition is met.
 
-- **U4f MERGED at 25d316e** (pushed c26ff6a, CI green; records moved to history.md:6999-7058, card_trim_1119h.py):
-  6,425 added in 29 files; M1-M9 with C1-C3 met; report u4f-report.md; **the advisor's head check APPROVE WITH
-  FINDINGS** (advisor-u4f-merge-head.md: ADV-U4FMH-1 the card's size, fixed by that trim; -2 `cmd_timing` to U4f2;
-  -3 gate.txt's head, corrected). Builders 1-4's worktrees kept until the sets end (then LEFTOVER-DELETE). **Next:**
-  5.3's 17 pre-runs (c-u4f-r2.mjs from the lane head; its spike tree f7ed90ad… equals 25d316e's: name both), the
-  part-clean before the first set (D2 then), the sets -47, -20, -22 one per call (-20's 10-minute runs read for
-  overflow before -22's), the set reports; then U4f2's short brief to the advisor. Disk 5,318 MiB free (19:3x UTC).
-  **The r2 record run (U4r's rule, history.md:4481-4484):** this card saved and pushed right before; the saver
-  stopped; no agent running; `bash .checkpoints/netcode-proof-test/main-run.sh /home/user/Shamble-Frontlines/.gate/u4f-merge/r2.log node ops/runs/c-u4f-r2.mjs --date 2026-11-19`
-  (lock exclusive) in the background. **Until r2.txt is written: no commit and no edit to any tracked file in the main
-  folder (this card included; a check-in's save waits).** Then the saver again, and the card.
-  **The r2 record run DONE** (19:35-19:42:17 UTC, exit 0; .gate/u4f-merge/r2.log; r2.txt at
-  .gate/netcode-proof-test/u4f-r2-d502f54de6d5/r2.txt, 330 lines; from d502f54, whose spike tree equals 25d316e's).
-  **The advisor's read of the rows** (N/advisor-u4f-r2.md; Mediums read in full): 14 of 17 as expected; p4, p13, p19
-  (-21's lag switch under option A) not: PM-0001-2's in-view precondition fails (honest slot 24 in building area 3).
-  They hold -21's set only (U4f2's). **The sets -47, -20, -22 may run**, after the part-clean (D2 before and after).
-  Routes: **C-U4F2-5** (F1, Medium: the `steady` script has no leash; before -21's set every -21 suite's honest
-  clients stay out of buildings for 610 s at P0 and P1 under both options, a sim-only test with a plant, U4f2's record
-  run reading "in a building: 0"; the fix's choice comes to the advisor); **C-U4F2-6** (F2, Medium: p19's figures
-  restated, Q15 (c)'s sentence corrected; -20's report names it in the OQ-0001-6 reading); **C-U4F2-7** (F4: the
-  clock suite's shot-band contract fails by construction; -47's report names it, the fix in U4f2); -20's report also
-  F6 (which late figure: 13 or 12) and NC-U4F-5 and C-OQ6-SEC-1. Watch: overflow 0 on all 17; the queue's high-water
-  at P3 in 20 s 488 / 689 / 625 against 1,600; -47's p99 2.60 ms against 5. To name in the next day's message: F1's
-  route, Q15 (c)'s correction, the redundancy-1 bite reaching "0 presses lost" (F5). The saver buovbuxl2 from 19:42
-  (window to about 21:32). **The part-clean DONE** (.gate/u4f-merge/clean-shared-2.log, all 16 steps exit 0); **D2:**
-  5,204 -> 11,552 MiB free (20:0x UTC). **The -47 set RUNNING** from 20:0x UTC: `flock -x .gate/shared-target/.lane.lock
-  node spikes/netcode-proof/ops/runs/c-u4f-runs.mjs 47 --date 2026-11-19` (repo root, CARGO_TARGET_DIR unset; results
-  under results/u4f/<commit12>/pm-0001-47/; it re-checks spikes/netcode-proof unchanged before each judge call, so card
-  saves are safe). **-47 DONE** (20:0x-20:1x UTC, exit 0): **PM-0001-47 PASS** (L1 P2, 1,000 connects, seeds 1-3
-  valid); bites newest-sample and tick-quantised **shown**; results/u4f/b57221ed139d/pm-0001-47/ committed. For -47's
-  report: seed 2's 1,916 building slot-ticks (no -47 precondition), F4's shot band. **The -20 set RUNNING** from 20:07
-  UTC (same form, `20`; background, about 80 minutes); then -22 after reading -20's six runs for honest overflow resyncs.
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,

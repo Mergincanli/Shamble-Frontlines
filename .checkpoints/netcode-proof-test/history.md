@@ -7086,3 +7086,37 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   631edf3; CI green (six check runs); the advisor's head check APPROVE WITH FINDINGS (advisor-main-61-head.md: ADV-M61H-1
   Medium fixed by that trim, -2 to -4 folded in, -5 nothing). The saver b3e3qzz16 from 17:44 UTC, both trailers (window
   to about 19:34); the check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (next 18:34).
+
+## Card blocks moved 2026-11-19 after U4f's -20 set (card_trim_1119j.py; from 'Now: U4f')
+- **U4f MERGED at 25d316e** (pushed c26ff6a, CI green; records moved to history.md:6999-7058, card_trim_1119h.py):
+  6,425 added in 29 files; M1-M9 with C1-C3 met; report u4f-report.md; **the advisor's head check APPROVE WITH
+  FINDINGS** (advisor-u4f-merge-head.md: ADV-U4FMH-1 the card's size, fixed by that trim; -2 `cmd_timing` to U4f2;
+  -3 gate.txt's head, corrected). Builders 1-4's worktrees kept until the sets end (then LEFTOVER-DELETE). **Next:**
+  5.3's 17 pre-runs (c-u4f-r2.mjs from the lane head; its spike tree f7ed90ad… equals 25d316e's: name both), the
+  part-clean before the first set (D2 then), the sets -47, -20, -22 one per call (-20's 10-minute runs read for
+  overflow before -22's), the set reports; then U4f2's short brief to the advisor. Disk 5,318 MiB free (19:3x UTC).
+  **The r2 record run (U4r's rule, history.md:4481-4484):** this card saved and pushed right before; the saver
+  stopped; no agent running; `bash .checkpoints/netcode-proof-test/main-run.sh /home/user/Shamble-Frontlines/.gate/u4f-merge/r2.log node ops/runs/c-u4f-r2.mjs --date 2026-11-19`
+  (lock exclusive) in the background. **Until r2.txt is written: no commit and no edit to any tracked file in the main
+  folder (this card included; a check-in's save waits).** Then the saver again, and the card.
+  **The r2 record run DONE** (19:35-19:42:17 UTC, exit 0; .gate/u4f-merge/r2.log; r2.txt at
+  .gate/netcode-proof-test/u4f-r2-d502f54de6d5/r2.txt, 330 lines; from d502f54, whose spike tree equals 25d316e's).
+  **The advisor's read of the rows** (N/advisor-u4f-r2.md; Mediums read in full): 14 of 17 as expected; p4, p13, p19
+  (-21's lag switch under option A) not: PM-0001-2's in-view precondition fails (honest slot 24 in building area 3).
+  They hold -21's set only (U4f2's). **The sets -47, -20, -22 may run**, after the part-clean (D2 before and after).
+  Routes: **C-U4F2-5** (F1, Medium: the `steady` script has no leash; before -21's set every -21 suite's honest
+  clients stay out of buildings for 610 s at P0 and P1 under both options, a sim-only test with a plant, U4f2's record
+  run reading "in a building: 0"; the fix's choice comes to the advisor); **C-U4F2-6** (F2, Medium: p19's figures
+  restated, Q15 (c)'s sentence corrected; -20's report names it in the OQ-0001-6 reading); **C-U4F2-7** (F4: the
+  clock suite's shot-band contract fails by construction; -47's report names it, the fix in U4f2); -20's report also
+  F6 (which late figure: 13 or 12) and NC-U4F-5 and C-OQ6-SEC-1. Watch: overflow 0 on all 17; the queue's high-water
+  at P3 in 20 s 488 / 689 / 625 against 1,600; -47's p99 2.60 ms against 5. To name in the next day's message: F1's
+  route, Q15 (c)'s correction, the redundancy-1 bite reaching "0 presses lost" (F5). The saver buovbuxl2 from 19:42
+  (window to about 21:32). **The part-clean DONE** (.gate/u4f-merge/clean-shared-2.log, all 16 steps exit 0); **D2:**
+  5,204 -> 11,552 MiB free (20:0x UTC). **The -47 set RUNNING** from 20:0x UTC: `flock -x .gate/shared-target/.lane.lock
+  node spikes/netcode-proof/ops/runs/c-u4f-runs.mjs 47 --date 2026-11-19` (repo root, CARGO_TARGET_DIR unset; results
+  under results/u4f/<commit12>/pm-0001-47/; it re-checks spikes/netcode-proof unchanged before each judge call, so card
+  saves are safe). **-47 DONE** (20:0x-20:1x UTC, exit 0): **PM-0001-47 PASS** (L1 P2, 1,000 connects, seeds 1-3
+  valid); bites newest-sample and tick-quantised **shown**; results/u4f/b57221ed139d/pm-0001-47/ committed. For -47's
+  report: seed 2's 1,916 building slot-ticks (no -47 precondition), F4's shot band. **The -20 set RUNNING** from 20:07
+  UTC (same form, `20`; background, about 80 minutes); then -22 after reading -20's six runs for honest overflow resyncs.
