@@ -9,7 +9,7 @@
   `.checkpoints/preview-hosting-check/mustafa-2026-11-18-lane2.md`, 3318 bytes, sha256 765226cd4657...)
 - **Branch:** claude/optimistic-albattani-mdoonz (shared with the preview hosting check, which keeps the first place:
   whenever a step of sitting 3 or of Day 2 can move, it moves first) · **Base:** main b763ba3e, merged in at aa02297
-- **Last update:** 2026-11-19 00:25 Amsterdam (2026-11-18 23:25 UTC)
+- **Last update:** 2026-11-19 01:05 Amsterdam (00:05 UTC)
 
 ## Steps done
 1. His item 1: main b763ba3e merged into the branch (plain merge, no conflict: no file changed on both sides since
@@ -66,6 +66,19 @@
 
 ## Decisions taken
 - His lane-2 words of 2026-11-18, 23:37 (the file above): items 1-6.
+- **His answers of 2026-11-19, 00:59** (byte for byte in `.checkpoints/preview-hosting-check/mustafa-2026-11-19-answers.md`,
+  2196 bytes, sha256 7a0965c1fe8b...): PROJ-DRAW (a): lane 1 draws grenades and arrows in flight plainly in
+  change-set 9; they pass to lane 2 with the plain tracers and flash at change-set 9's merge, and from then on lane 2
+  reads the block's projectile section. AIM-STATE (a) as far as the block goes: lane 2 asks for no aiming flag and
+  plans Slice 1's poses without one; the rule for the poses is not "fired recently" and is not settled now; "Aiming and
+  firing" in the Art lead's sheet is the pose of a gun that is ready, not aiming down sights; his Shamble Testlines
+  sandbox (github.com/Mergincanli/Shamble-Testlines: look at it, copy nothing) shows the aiming pose whenever the
+  soldier is not sprinting and the sprint pose while he sprints: change-set 10's plan starts from that and brings him
+  the idle pose as a proposal with pictures; "A first shot never leaves a gun that points away from its target."
+  Whether aiming down sights and the sprint-to-fire delay become game rules in Slice 1 is a separate decision of his,
+  for lane 1 ("You hear it from me"). "The list on issue #59 stands as posted. The Advisor read it against Part 15.2
+  and checked a sample of its citations." For DECISIONS.md in lane 2's next docs pass (RECORD-FILES: its own lines);
+  not posted on #59 (a comment there is never his word; lane 1 hears his decisions from him).
 
 ## Running work
 - agent engine-architect (needs list), launched 2026-11-18T23:00:26.326Z (transcript): DONE (hand-back after 23:15 UTC).

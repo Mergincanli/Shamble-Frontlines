@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 00:17 Amsterdam (2026-11-18 23:17 UTC)
+- **Last update:** 2026-11-19 01:05 Amsterdam (00:05 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -653,6 +653,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      wait, "secret: present"; he re-ticks with a screenshot), SA-R4 (a re-run must wait; he rejects), then cs/b9-prod
      (refused; production "No restriction", re-run, present; restored with `main`, re-run, refused), then SA-R8.
      Open window when he unticks: "reviewer off" (from his "unticked" to his re-tick screenshot).
+   - His words of 2026-11-19 00:59 (Decisions taken): sitting 3 goes on at his "unticked"; until then the reviewer
+     stays ticked. The public environments API is refused by this session's proxy (403), so the screenshots stay for
+     the re-tick, production's restore and SA-R8.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
@@ -666,6 +669,7 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    browsers decision included); step 2.6's plan with the locked install and one line on a click-free preview design.
 
 ## For the report (the checkpoint is deleted at the end)
+- Step 2.6's plan: previews without his click per preview, showing what keeps the token safe then (his words of 2026-11-19, 00:59); he decides with that plan.
 - His point 3 of 2026-11-16, to carry into step 2.6's plan: "For step 2.6, not for this check: plan a locked install (a
   committed lockfile, install scripts off) and bring it to me with step 2.6's plan."
 - SA-R3 accepted in his words (point 2 of the same message).
@@ -860,6 +864,20 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   the order: this check to its report and closing pull request, then step 2.6's plan, no game code before change-set
   5 is merged; 5 no GLB made by a builder chat; 6 take main in at the start of each unit and before opening a pull
   request.
+
+- **His words of 2026-11-19, 00:59 Amsterdam** (user message 2026-11-19 00:01:25 UTC,
+  8ccb05f4-fbaa-4495-90b3-6595ea781e91; byte for byte in `.checkpoints/preview-hosting-check/mustafa-2026-11-19-answers.md`,
+  2196 bytes, sha256 7a0965c1fe8b...): on this check, "without dropping or loosening any pass mark or reviewer's
+  condition": (1) "Sitting 3 goes on when I write "unticked". Until then "Required reviewers" stays ticked." (2) read
+  a setting from GitHub's public API in place of his screenshot where it shows it
+  (https://api.github.com/repos/Mergincanli/shamble-preview-check/environments; "updated_at" is not the time of a rule
+  change); a screenshot from him only where no API I can reach shows the thing. Tried 2026-11-19 00:02:26 UTC: HTTP
+  403 from this session's proxy, "Access to this GitHub API path is not permitted through this proxy." (the session's
+  own rule: no direct GitHub API access), so no API is reachable here and his screenshots stay where a setting must be
+  shown: the re-tick (reviewer listed, bypass unticked), production's restored `main` rule, and SA-R8's empty
+  repository secrets. (3) For step 2.6's plan: "I do not want to click for each preview. Design the previews without
+  a click from me and show what keeps the token safe then. I decide on it with that plan." His PROJ-DRAW and AIM-STATE
+  answers in the same message: `lane2-needs.md`.
 
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
 1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a
