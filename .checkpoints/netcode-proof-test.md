@@ -89,10 +89,12 @@
   or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
   brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
   with its source before its first snapshot). -21 is judged only after U4f2.
-- **Round 1, the panel** (brief 12 item 8; u4f-panel-brief.md): five seats at xhigh, at most three at a time (netcode,
-  security, test; then rust, arch), on builder 3's worktree read-only (the runner takes only .claude/worktrees/ paths;
-  its hashes re-checked equal at 13:44 UTC, .gate/u4f/review-pre.log), the snapshot's `git apply --check` on the lane's
-  head passing (13:43 UTC). Notes u4f-review-<seat>.md; runner logs .gate/u4f/review-<seat>/.
+- **Round 1 RETURNED** (13:50-14:32 UTC; u4f-panel-brief.md; builder 3's worktree read-only, its hashes equal at 13:44,
+  the snapshot's `git apply --check` on the lane's head passing): **u4f-review-r1-full.md** (333 lines, sha256
+  6747175e…, by u4f_review_r1_full.py, word for word from the journal; read in full). Five APPROVE WITH FINDINGS;
+  **4 Medium** (NC-U4F-1 the controller never skips after a clock jump or stall; TE-U4F-1 f5's B1 budget 3 % unruled;
+  TE-U4F-2 U4F-Q9 (a)'s flood test missing, negatives 44 of 45; RR-U4F-1 drop_unencodable's tick-step rule), 25 Low,
+  no Critical or High; S1-S7 and N1 agreed (N1: slot 0, the never-acker). Next: the advisor's ruling (advisor-u4f-r1.md).
 - **After the panel:** the results word for word by script (u4f-review-r1-full.md); every Medium or higher read in full;
   the advisor's ruling (the fix list); the fix pass in a fresh worktree from the lane's head with the snapshot applied
   (the Lows that ride: S4 USAGE's `--lag-*`, S5 SERIES.md's subsection title, S6 c-u4f-runs.mjs:7's order); round 2
@@ -178,9 +180,9 @@
 - **MAIN-60 DONE** (its record at history.md's end, card_trim_1119c.py): main b763ba3 in at 0f12d9e; CI green on
   bb7a5ed; the advisor's head check APPROVE WITH FINDINGS (advisor-main-60-head.md: six Lows, no push). R3 (iii)'s
   four hand runs done (.gate/u4f/w3-hand.log: each exit 0, contract PASS). The lane goes on from this head.
-- **U4f's panel, round 1, RUNNING** (13:50 UTC on): workflow **wf_a011d9f2-abf** (task wqvgdvk83; script
-  workflows/scripts/u4f-review-r1-wf_a011d9f2-abf.js under the session's folder), five seats, three at a time. **If
-  cut:** `Workflow({scriptPath, resumeFromRunId: "wf_a011d9f2-abf"})`; a seat's notes file holds its progress.
+- **U4f's panel, round 1, ENDED** 14:32 UTC (workflow wf_a011d9f2-abf: 5 of 5 results, 0 errors; 393 tool uses).
+  **The advisor's ruling on it RUNNING** (from about 14:35 UTC; general agent on main's advisor.md, xhigh; its file
+  advisor-u4f-r1.md). **If cut:** SendMessage to it to continue from its file, or a fresh advisor reading the file.
 - **The saver bde01r5pv** (13:49 UTC on, both attribution lines as trailers; ADV-M60-8; its window ends about 15:39:
   restart it while agents run, run_in_background, timeout 7200000). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
   ENABLED again at 13:49 UTC (next 14:34); pause it when no agent runs.
