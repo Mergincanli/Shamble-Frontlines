@@ -766,6 +766,20 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      row). So the 24-hour reading is not spoiled so far; steps 5-7 do not count (no wall: step 5's login page cannot
      have shown) and are redone after the wall; the wall step needs the Zero Trust onboarding (ACCESS-CARD (a)) first,
      after the reading. Results log, "Day 2". Next: consultation 23 (an unexpected event; his early act), then my reply.
+   - After consultation 23 (14:13:09 UTC): the check-in's prompt rewritten (update_trigger 14:15:17 UTC): on the exact
+     pass row the go's first act is look-only (screenshots of the access-policy row, the Zero Trust page, his billing or
+     subscriptions page; he presses nothing until I answer; ACCESS-CARD (a) covers only the Zero Trust Free plan, and
+     "try for free" may be a trial); a guard check-in trig_01Vefw38oabFrJRC65BsQjUy at 16:30 UTC repeats the outside look
+     on (c) and iso-off. Row added: the wall seen before the reading → stop and consult; the mark reads at 24 h or more,
+     so it can be taken late once the wall is off; the only removal route the plan names is Zero Trust, Access,
+     Applications (E2). A web-fetch agent (model opus, effort high, launched about 14:15 UTC, background) reads
+     Cloudflare's docs on two points: whether a person signed in to the dashboard passes the Cloudflare identity
+     provider's login unseen (if so, tonight's step 5 adds a private-window open of iso-off), and what Zero Trust's
+     first screen offers (the Free plan, a trial, payment details).
+   - My reply to him (after this save): the wall did not go on, nothing is spoiled; Cloudflare not opened at all until my
+     go; four questions from memory (a login page at step 5? the "try for free" screen's words? a payment screen? his
+     Brave version); steps 5-8 redone after the wall; the four runs unchanged; my miss owned (tonight's steps sent too
+     early; from now on a step that must wait travels only inside the go).
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
@@ -1239,6 +1253,19 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    setting); the 24-hour reading asserted with jq, a fresh control probe if the go comes over an hour later, and only
    the exact pass row covered by this consultation; lane2-needs.md's change-set 10 line labelled as this session's
    reading; a get_session reading.
+
+23. 2026-11-19 14:13:09 UTC (called; answer 14:14:36 UTC; transcript times), moment 4 (an unexpected event: his press at
+   the access-policy step and his Brave steps 5-7 before the reading and my go) · Q: is my reading right (no wall, the
+   reading intact, steps 5-7 void), and what goes to him and into tonight's go? · Changed: the reading confirmed; its
+   miss named: consultation 22's advice to send the full list at once put runnable steps before him five hours early,
+   so a step that must wait now travels only inside the go; the reply short and without blame, the result first; one
+   rule: Cloudflare not opened at all until the go (no look-only screenshot now: the page is one click from the wall);
+   only questions he can answer from memory (a login page at step 5, the "try for free" screen's words, a payment
+   screen, Brave's version); the check-in's go rewritten to start look-only (the access-policy row, the Zero Trust page,
+   billing or subscriptions) since "try for free" may be a trial and ACCESS-CARD (a) covers only the Free plan; no
+   onboarding clicks written from memory or docs alone; a mid-afternoon outside look; the row "the wall seen before the
+   reading → stop and consult" (late reading allowed; Zero Trust, Access, Applications the only named removal); for
+   step 5, whether a signed-in Cloudflare session passes the wall unseen (if so, a private-window open of iso-off).
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time
