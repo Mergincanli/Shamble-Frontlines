@@ -86,8 +86,9 @@
   sprint-to-fire delay are game rules of Slice 1 by his decision of 2026-11-19; lane 1 prices and places them in
   change-set 4's plan. Lane 2's wishes W1 (aiming down sights, yes or no, for each soldier) and W4 (how far the
   sprint-to-fire swing has got) on issue #59 are needs now; the comment stays as it is ("lane 1 has this from me").
-  AIM-STATE of 2026-11-19, 00:59 stands for the poses. So change-set 10's plan still starts from AIM-STATE's rule for
-  the poses (the idle pose as a proposal with pictures), and plans how W1 and W4 are read. For DECISIONS.md in lane 2's
+  AIM-STATE of 2026-11-19, 00:59 stands for the poses. (This session's reading, not his words: change-set 10's plan
+  still starts from AIM-STATE's rule for the poses, the idle pose as a proposal with pictures, and plans how lane 2
+  reads W1 and W4; to be checked with him when that plan is written.) For DECISIONS.md in lane 2's
   docs pass: lane 2's own lines only (RECORD-FILES); whether lane 1 has already recorded the game-rule decision itself is
   checked then.
 

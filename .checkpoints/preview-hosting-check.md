@@ -712,30 +712,51 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      PM-0006-4 and -5 read in sitting 1; PM-0006-10 read on github.com (outside the wall); no mark has an open "no
      reading" on a preview link. After the wall no verify or browser run can read a preview link, so no preview deploy
      follows it except `revoked` (which must fail before any upload); production stays outside the wall.
-   - Day 2's list (draft for consultation 22; not sent): the sitting after my 24-hour reading, about 20:00 Amsterdam,
-     about 1 h 30 min with an hour's wait he may step away for. Runs that wait, in order: (1) `close` on cs/pd-open (c)
-     #5: approve; (2) `close` on cs/b9-edit #9: reject; (3) `close` on cs/b9-prod #10: reject; (4) deploy `revoked`:
-     approve (it must fail at Cloudflare's sign-in). His acts besides: Brave's version (one line); the wall (Settings,
-     General, "Enable access policy"; ACCESS-CARD (a): the Free plan if asked, stop at any charge or paid plan; the time
-     it went on); Brave steps 5-8 (links: iso-off for step 5, iso-on for step 6, production for step 7); the revoke
-     after (c)'s cleanup is read (Delete; Roll then delete if no Delete); the times.
-   - Outcome rows (draft): the 24-hour probe: (a), (a'), (b), (b') gone at 24 h or more, (c) and (d) serving,
-     production's own address serving → PREV-DELETE passes without the tombstone ((a') and (b') gone as well), go for
-     the wall in words; an (a) or (b) row serving with (a') and (b') gone → "gone only with the workaround" (pass, written
-     down), go for the wall; (a) and (a') or (b) and (b') serving → the mark fails (Risk 1), told to him, the wall and
-     the revoke still go ahead as measurements; (c) not serving → stop: no wall, ask him whether anything changed in
-     Cloudflare (the reading has no control); a no-reading row (exit 3) → one more probe, started by me. The wall
-     sweeps (10 min and 1 h after his time): production's own address serves and every other judged row gives no
-     build (wall, gone or other), the wall seen on 2 or more open branches' stable links → PM-0006-8 met at 1 h (the
-     10-minute sweep reported); a preview row serving at 1 h → not met (the wall does not cover every preview: told,
-     for OQ-0006-4); production walled → not met ("not production" fails); a payment or plan screen he does not accept →
-     PM-0006-8 and steps 5-8 "not run" (ACCESS-CARD (b)'s words need his word that the check may end without them).
-     The closes: (c)'s cleanup approved → "Uploads of cs/pd-open found: 1" (17d45ef9) deleted with HTTP 200; #9 and #10
-     rejected → "failure", no runner; (c)'s cleanup red → no revoke until its log is read (the leftover recorded; the
-     project's deletion in E2 removes it). The revoke: `revoked`'s deploy fails at Cloudflare's sign-in (an
-     authentication error, no upload) → PM-0006-32's record; it uploads → the token is alive: he deletes it again at
-     once, a finding, `revoked` again on a new list; it fails before Wrangler signs in → no reading, a new run on a new
-     list.
+   - Day 2's list (after consultation 22; sent now, not by the check-in): the sitting after my 24-hour reading, about
+     20:00 Amsterdam, about 1 h 30 min in two short visits about an hour apart; last possible day 2026-11-25. Runs that
+     wait, in order: (1) `close` on cs/pd-open (c) #5: approve; (2) `close` on cs/b9-edit #9: reject; (3) `close` on
+     cs/b9-prod #10: reject; (4) deploy `revoked`: approve (it must fail at Cloudflare's sign-in). Three red mails
+     expected (the two rejections, `revoked`). His acts besides: Brave's version now (one line, for PM-0006-1 before
+     the reading); the wall (Settings, General, "Enable access policy"; ACCESS-CARD (a): the Free plan if asked, stop at
+     any charge or paid plan; a screenshot of the setting once on, the time, whether a plan or payment screen
+     appeared); Brave steps 5-8 (iso-off for step 5, iso-on for step 6, production for step 7, iso-off again for step
+     8); the revoke after (c)'s cleanup is read (Delete; Roll then delete if no Delete; the time and a screenshot of
+     the list). The go for the wall: a separate message in words after the reading; "nothing in Cloudflare until my
+     go" at the top of both. I close (c) alone first and send that run's link; #9 and #10 only after (c)'s cleanup is
+     read (three look-alike runs never wait together).
+   - Outcome rows (written before the reading; consultation 22's go covers only the exact pass row: any other row is
+     consulted on before he is told): the 24-hour probe, with jq asserting hours_since_close of 24 or more on every
+     closed-case row: (a), (a'), (b), (b') gone, (c) and (d) serving, production's own address serving → PREV-DELETE
+     passes without the tombstone ((a') and (b') gone as well), go for the wall in words; if the go comes more than
+     about an hour after that probe, a fresh `deletion` probe first (the control with the wall off). An (a) or (b) row
+     serving with (a') and (b') gone → "gone only with the workaround" (pass, written down); (a) and (a') or (b) and (b')
+     serving → the mark fails (Risk 1); (c) not serving → stop, no wall, ask whether anything changed in Cloudflare (the
+     reading has no control); a no-reading row (exit 3) → one more probe, started by me.
+   - The wall sweeps (`purpose: wall`, 10 min and 1 h after his time; the 1-hour one counts): production's own address
+     serves and every other judged row gives no build (wall, gone or other) → PM-0006-8 met (the 10-minute sweep
+     reported); no build but not classed `wall` (a 200 login page or a 403, so "the wall seen on ... N open branches"
+     prints 0) → judged by the mark's words, status and location recorded verbatim; a preview row serving at 1 h → not
+     met (for OQ-0006-4); production walled → not met; a sweep cancelled (the `probe` concurrency group: a newer pending
+     run replaces an older pending one) → started again at once, timed by probed_at; scheduled probes after the wall run
+     as `deletion` and show unexpected rows → labelled off the marks in the tally; his login fails or another screen
+     shows → step 5 "not yet" with a screenshot, nothing changed in Zero Trust; a plan or payment screen he does not
+     accept → PM-0006-8 and steps 5-8 "not run" (ACCESS-CARD (b): the check may end without them only on his word).
+   - The closes: (c) #5 alone first; its cleanup approved → "Uploads of cs/pd-open found: 1" (17d45ef9), deleted with
+     HTTP 200 (the token's last proof of life before the revoke); then #9 and #10, both rejected → "failure", no runner;
+     (c)'s cleanup red → no revoke until its log is read (the leftover recorded; E2's project deletion removes it).
+   - The revoke: `revoked` (branch `revoked`, not production, so Wrangler's `pages deploy` is the first step that uses
+     the token; the upload step's records upload is `if: always()` with `if-no-files-found: warn`; verify runs after a
+     failed deploy and exits 3 on no records). Its colour proves nothing (with the wall on, a live token's upload would
+     still end red at verify). The proof, three things: the upload step's Cloudflare authentication refusal word for
+     word (template: the rehearsal's attempt 1, "Authentication error [code: 10000]" on
+     /accounts/***/pages/projects/shamble-preview-check, then "Invalid access token [code: 9109]" on /accounts); no
+     `deployment-record` artifact ("No files were found with the provided path: records/"); and (c)'s cleanup's HTTP
+     200 minutes earlier as the "alive" control. Rows: refusal and no record → PM-0006-32's record (the token dead); a
+     record artifact (an upload made) → the token alive: he deletes it again at once, a finding, `revoked` again on a
+     new list; a step before the upload fails (the download, the server-code check, Wrangler's install) → no reading
+     (the token never presented), a new run on a new list.
+   - get_session before the list (2026-11-19 13:48:47 UTC, transcript time): 106,253 of 1,000,000 tokens; the account's seven-day
+     limit shows "allowed_warning", resetting 2026-11-24 19:00 UTC (a usage-limit risk for Day 2: Risk 9; told to him).
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
@@ -1195,6 +1216,20 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    "gone"; no documented off switch; the delete waits for (c)'s cleanup); Day 2 prep: get_session and a compaction ask
    with a resume line, Day 2's list with a consultation first, sent by the 18:55 check-in; (c) serving proves the
    wall still off; what else needs the links without a login, written before the wall.
+
+22. 2026-11-19 13:45:19 UTC (called; answer 13:47:48 UTC; transcript times), moment 1 (Day 2's approach, before the
+   list goes to him) · Q: are Day 2's list and outcome rows right, and when does the list go? · Changed: the list goes
+   now (he is here and plans his evening), with the go for the wall as a separate message in words after the reading
+   and "nothing in Cloudflare until my go" at the top; the shape told (two short visits about an hour apart, three red
+   mails, last day 2026-11-25); Brave's version asked now, so the header is complete before the reading; the plan's
+   order kept ((c) open through the 1-hour sweep, so the control and the sweep read the same links) and no new
+   decision on #9 and #10; (c) closed alone first, #9 and #10 only after its cleanup is read; `revoked` judged on three
+   things, not its colour (the upload step's refusal word for word, no record artifact, (c)'s cleanup as the alive
+   control), the "before Wrangler signs in" row checked against deploy.yml at 347d5e0; wall rows added (no build but
+   not classed `wall`; a cancelled sweep; scheduled probes off the marks; his login failing; his evidence of the
+   setting); the 24-hour reading asserted with jq, a fresh control probe if the go comes over an hour later, and only
+   the exact pass row covered by this consultation; lane2-needs.md's change-set 10 line labelled as this session's
+   reading; a get_session reading.
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time
