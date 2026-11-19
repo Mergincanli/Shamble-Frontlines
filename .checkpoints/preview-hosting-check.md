@@ -759,6 +759,13 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      limit shows "allowed_warning", resetting 2026-11-24 19:00 UTC (a usage-limit risk for Day 2: Risk 9; told to him).
    - The check-in's prompt updated (update_trigger, 13:50:24 UTC): it now reads this step's rows first, asserts the 24 h
      with jq, gives the go for the wall only on the exact pass row, and consults the advisor tool on any other row.
+   - Day 2's list sent 13:51:09 UTC (transcript time). **His message of 14:09:28 UTC** (5d646c04-...), before the reading
+     and before my go: he pressed "try for free" at the access-policy step and was sent to the dashboard's home; he did
+     Brave steps 5-7 ("Achieved"; the iso-off page loaded; no word of a login page). Measured at once: no wall (curl
+     14:10:11-24 UTC, every preview link 200 with its marker; probe #7, 14:11:37 UTC, 43 rows as expected, no `wall`
+     row). So the 24-hour reading is not spoiled so far; steps 5-7 do not count (no wall: step 5's login page cannot
+     have shown) and are redone after the wall; the wall step needs the Zero Trust onboarding (ACCESS-CARD (a)) first,
+     after the reading. Results log, "Day 2". Next: consultation 23 (an unexpected event; his early act), then my reply.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the

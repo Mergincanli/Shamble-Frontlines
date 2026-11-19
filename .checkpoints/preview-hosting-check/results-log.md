@@ -787,3 +787,27 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
     2026-11-19 00:10:53-00:13:42 UTC (closed by his screenshot); `production`'s branch rule off 00:19:35-00:21:51 UTC
     (closed by his screenshot). State by his last screenshots: `preview` with reviewer
     Mergincanli (self-review and bypass off) since 00:13:42 UTC; `production` with `main` only since 00:21:51 UTC.
+- **His message of 2026-11-19 14:09:28 UTC** (5d646c04-ecaf-4795-be37-ec9e201d024c), sent before the 24-hour reading
+  and before my go for the wall (my list, sent 13:51:09 UTC by the transcript, put both visits "after my go"). His own lines, word for word
+  (my quoted steps left out; the address's account ID not copied here): "Done:" / "I pressed try for free and got
+  redirected to this page:" / "https://dash.cloudflare.com/<his account ID>/home" / "also done:" / "step 6: done, no
+  second login" / "step 7: done, also load without any login" / "Achieved". One screenshot: the iso-off test page,
+  Build marker 2162db55d93f59cf2ed7e371a3915409f0b5a587, Build mode preview, crossOriginIsolated (page) false and
+  (worker) false, WebAssembly "ran (2 + 3 = 5)", Content file "content.ef463692.bin (65536 bytes)", Status done;
+  resources page "/", "/page.css", "/page.js", "/manifest.json", "/favicon.ico", "/content.ef463692.bin",
+  "/worker.js", worker "/worker.js", "/tiny.wasm". Not sent: a screenshot of the setting, the time, whether a login
+  page appeared at step 5; step 8 not reported; his Brave version not sent.
+- **Looked at from outside right after** (this container, curl with the probe's User-Agent, no cookies, 14:10:11-14:10:24
+  UTC, transcript times): iso-off, iso-on, cs-pd-open (c), cs-pd-off (d), production, and the one-off links 6e61a4c4
+  (iso-off) and 17d45ef9 (c): each HTTP 200 with no redirect, each page carrying its build marker (iso-off, iso-on,
+  6e61a4c4: 2162db55...; (c) and 17d45ef9: 4a2b70464ed9...; (d): 5b965331aba9...). The access policy was not in
+  effect for a stranger.
+- **Probe run #7** (by hand, `purpose: deletion`, id 44541037774, head 347d5e0, created 14:11:20 UTC):
+  probe-results-44541037774 (artifact 14539176107, zip sha256 a58091efb2ff..., equal to its digest), probed_at
+  2026-11-19T14:11:37.363Z, `.gate/preview-hosting-check/day2/probe7/`: 43 rows, no `wall` row. (a) 2 gone (19.65 h);
+  (a') 3 gone (19.65); (b) 4 gone (19.35); (b') 5 gone (19.35); (c) 2 serves; (d) 2 serves (19.64); the by-hand
+  previews 19 serves; production 4 serves; the rehearsal 2 gone (23.24). Unexpected 0, no reading 0.
+- Reading: the wall did not go on, so the 24-hour reading is not spoiled so far (its own (c) row stays the proof at
+  18:55 UTC). His Brave steps 5 to 7 ran with no wall, so they are not the checklist's steps 5 to 7 (step 5 expects a
+  Cloudflare login page first); they are done again once the wall is on. Whether his "try for free" made a Zero Trust
+  organization, and what the project's access-policy setting shows now: not known.
