@@ -799,6 +799,12 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Guard check-in (trig_01Vefw38oabFrJRC65BsQjUy, fired 16:30:19 UTC): outside look 16:30:44-46 UTC (curl, the probe's
      User-Agent, no cookies): (c) cs-pd-open HTTP/2 200, no redirect, marker 4a2b70464ed9...; iso-off HTTP/2 200, no
      redirect, marker 2162db55d93f.... No wall; nothing to tell him. No answer from him yet to the four questions.
+   - **The 24-hour reading: PASS** (check-in fired 18:55:35 UTC; probe #8, 44593002877, probed_at 18:56:36.575Z;
+     results log): jq asserted all 18 closed-case rows at 24.1 h or more; (a), (a'), (b), (b') gone, (c) and (d) serving,
+     production's own address serving, no wall, no reading missing: exactly the pass row of consultation 22, so the go
+     goes out now, look-only first (the check-in's words). The hourly series fell short (3 scheduled runs in 28 slots;
+     4 by-hand probes): a method departure for the report, not a pass condition. If the wall is pressed more than about
+     an hour after 18:56:36 UTC, a fresh `deletion` probe first (the control with the wall off).
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the

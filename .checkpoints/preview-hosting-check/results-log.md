@@ -811,3 +811,29 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   18:55 UTC). His Brave steps 5 to 7 ran with no wall, so they are not the checklist's steps 5 to 7 (step 5 expects a
   Cloudflare login page first); they are done again once the wall is on. Whether his "try for free" made a Zero Trust
   organization, and what the project's access-policy setting shows now: not known.
+- Guard check-in (fired 16:30:19 UTC): outside look 16:30:44-46 UTC, (c) and iso-off HTTP/2 200 with their markers,
+  no redirect: no wall.
+- **The 24-hour reading (PM-0006-6, PREV-DELETE)**: probe run #8, id 44593002877, started by the session (run_workflow,
+  after the check-in trig_01Fd2yqXX6LL2QP4hLnrCuu6 fired at 18:55:35 UTC), `purpose: deletion`, head 347d5e0, created
+  18:56:04 UTC, success 18:56:52; runner image ubuntu-24.04 version 20261116.133.1 (Ubuntu 24.04.5), Node v22.23.5;
+  "Records found: 21"; probe-results-44593002877 (artifact 14564068902, zip sha256 a48470714d37..., equal to its digest
+  and to the log's "SHA256 digest of uploaded artifact"), probed_at 2026-11-19T18:56:36.575Z, read with jq from
+  `.gate/preview-hosting-check/day2/probe8-24h/` (the run's logs beside it). jq assertion: 18 closed-case rows, the
+  smallest hours_since_close 24.1, all 24 or more: true. By case: (a) 2 rows, gone 2 (404, 404; 24.4 h); (a')
+  tombstone 3, gone 3 (the stable link and the tombstone's one-off 2b214ae6 answer 200 without the marker, the deleted
+  upload's one-off 672b3d0e 404; 24.4 h); (b) 4, gone 4 (404 each; 24.1 h); (b') tombstone 5, gone 5 (24.1 h); (c)
+  control 2, serves 2 (200 with its marker, so the wall was off); (d) bite 2, serves 2 (24.39 h); the by-hand previews
+  19, serves 19; production 4, serves 4 (its own address expected "serves"; the one-off links of 0354374e, e9a37459 and
+  de1c3e5e not judged); the rehearsal 2, gone 2 (27.99 h). Unexpected 0, no reading 0, no `wall` row, every row 1 try.
+  The log's last line: "probed 43 links for deletion; unexpected: 0; no reading: 0". An outside look from this
+  container at 18:56:39 UTC (curl): (c), (d) and iso-off 200, no redirect.
+- **PM-0006-6 read:** "24 hours after each test pull request closes, none of its links (the stable branch link and the
+  one-off link of every upload it ever had) answers with that build": met for (a) and (b) without the tombstone, and
+  for (a') and (b') with it; the control (c) still serves; the bite (d), closed with its cleanup switched off, still
+  serves (it bites: without the cleanup a closed pull request's links stay up). Outcome: "all gone (pass)". The series
+  behind it: probes #2 (by hand, 3 to 22 minutes after the closes), #3 (by hand, 1.1-1.4 h), #4 (scheduled, 3.8-4.1 h),
+  #5 (scheduled, 9.4-9.7 h), #6 (scheduled, 18.7-19.0 h), #7 (by hand, 19.4-19.7 h) and #8 (by hand, 24.1-24.4 h):
+  every closed case gone at each, (c) and (d) serving at each. A departure in the method, for the report: the draft's
+  "a cookie-less probe every hour from the close to 24 h after" was not achieved; GitHub's hourly schedule fired 3
+  times in the 28 slots from 2026-11-18 15:23 to 2026-11-19 18:23 UTC (none from 14:23 on), and 4 by-hand probes stood
+  in. The 24-hour reading itself never rested on the schedule (plan Part 1.1, PM-0006-6, change (1)).
