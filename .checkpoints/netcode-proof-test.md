@@ -108,18 +108,8 @@
   first); the set reports with NC-U4F-5 and C-OQ6-SEC-1 (-20) and N1 (-22).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
-- **2026-11-18 (named in that day's message):** D3-1's fix by the advisor's ruling (advisor-u4f-fold-check.md): U4f's
-  lab writes a `reorder` event at a run's end (B9, test f40) so -20's existing reorder rule can read the measured share.
-  Why: no bar text, judge file or marks.json changes; undone by dropping B9 before the build merges.
-- **2026-11-18 (named 2026-11-19):** the fill's form by the advisor's fill ruling (advisor-u4f-fold-check.md
-  section 4, on rule 3): each of his 36 quoted passages copied once, in the brief's 12 item 3 list, with 102 pointers
-  elsewhere. Why: rule 3's "does not repeat them"; the words are his, byte for byte; undone by refilling from rev 3.3.
-- **2026-11-18 (named that day, 13:45 UTC; the worktrees 2026-11-19):** the advisor's build-1 rulings (advisor-u4f-build1.md): the lead bound
-  counts from the tick the room runs next, 2.4's anchor (its one line :57-58; the value stays 400 ms); the fast clock's
-  every 10th stamp at newest + 3 + the bound (F1); `--brawl-press-every` as a new setting with its own new row instead
-  of a new value under SERIES.md:348's row (F4); f6 and f28 one test per option (R1). Why: inside the plan; no pass
-  mark, bar text, judge file or existing SERIES.md row changes; each undone before the merge. Also builder 2's and
-  builder 3's fresh worktrees (above), an operational choice.
+- **2026-11-18's three** (D3-1's fix, the fill's form, the build-1 rulings; each named in its day's message): word for
+  word at history.md:6935-6946 (card_trim_1119f.py); MAIN-60's done line at :6947-6949.
 - **2026-11-19 (named in that day's message):** the advisor's stop rulings (advisor-u4f-stop.md R2-R4): the event cap
   1,600, no longer provisional; -20's set before -22's (order -47, -20, -22, -21), its 10-minute P3 runs read for
   honest overflow resyncs first; the fast-clock cheat sends no pings (a recorded deviation); main b763ba3 taken in now,
@@ -184,9 +174,6 @@
 - **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
   `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
   final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,276 B, 29 files: the one snapshot until the merge.
-- **MAIN-60 DONE** (its record at history.md's end, card_trim_1119c.py): main b763ba3 in at 0f12d9e; CI green on
-  bb7a5ed; the advisor's head check APPROVE WITH FINDINGS (advisor-main-60-head.md: six Lows, no push). R3 (iii)'s
-  four hand runs done (.gate/u4f/w3-hand.log: each exit 0, contract PASS). The lane goes on from this head.
 - **U4f's panel, round 1, ENDED** 14:32 UTC (wf_a011d9f2-abf: 5 of 5 results); **the advisor's ruling ENDED** about
   14:52 UTC (agent abf879016ff011b9c). **Part-clean before builder 4 DONE** (P27's six cleans and checks in one
   main-run.sh call, .gate/u4f-b4/clean-shared.log, exit 0, 14:53 UTC): free 5,054 → 11,784 MiB.

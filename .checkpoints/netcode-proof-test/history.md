@@ -6930,3 +6930,20 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   14:06:56 that added SERIES.md's `header.params.connects_count` row whole). Checked at 16:37: no plant in place
   (room.rs 8d7ad78f…, client lib.rs 1f932bd5…, its notes' clean sha256s), no half edit; snapshot taken; resumed by
   SendMessage about 16:38 UTC. The 14:35 and 16:34 check-ins reached the session only at 16:36 (handled together).
+
+## Card blocks moved 2026-11-19 during MAIN-61's review (card_trim_1119f.py; from the card's 'Choices taken without him' and 'Running work')
+- **2026-11-18 (named in that day's message):** D3-1's fix by the advisor's ruling (advisor-u4f-fold-check.md): U4f's
+  lab writes a `reorder` event at a run's end (B9, test f40) so -20's existing reorder rule can read the measured share.
+  Why: no bar text, judge file or marks.json changes; undone by dropping B9 before the build merges.
+- **2026-11-18 (named 2026-11-19):** the fill's form by the advisor's fill ruling (advisor-u4f-fold-check.md
+  section 4, on rule 3): each of his 36 quoted passages copied once, in the brief's 12 item 3 list, with 102 pointers
+  elsewhere. Why: rule 3's "does not repeat them"; the words are his, byte for byte; undone by refilling from rev 3.3.
+- **2026-11-18 (named that day, 13:45 UTC; the worktrees 2026-11-19):** the advisor's build-1 rulings (advisor-u4f-build1.md): the lead bound
+  counts from the tick the room runs next, 2.4's anchor (its one line :57-58; the value stays 400 ms); the fast clock's
+  every 10th stamp at newest + 3 + the bound (F1); `--brawl-press-every` as a new setting with its own new row instead
+  of a new value under SERIES.md:348's row (F4); f6 and f28 one test per option (R1). Why: inside the plan; no pass
+  mark, bar text, judge file or existing SERIES.md row changes; each undone before the merge. Also builder 2's and
+  builder 3's fresh worktrees (above), an operational choice.
+- **MAIN-60 DONE** (its record at history.md's end, card_trim_1119c.py): main b763ba3 in at 0f12d9e; CI green on
+  bb7a5ed; the advisor's head check APPROVE WITH FINDINGS (advisor-main-60-head.md: six Lows, no push). R3 (iii)'s
+  four hand runs done (.gate/u4f/w3-hand.log: each exit 0, contract PASS). The lane goes on from this head.
