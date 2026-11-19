@@ -5,8 +5,8 @@
   **Base:** main b763ba3 merged in at 0f12d9e (MAIN-60, 2026-11-18 23:41 UTC: #55-#60, the first v2 code, DEP-HOLD,
   a CI workflow; one conflict, docs/STATUS.md: this branch's #40 row kept beside main's #60 row), which clears PR #40's
   conflict. MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-18 23:43 UTC: U4f AT HIS SIZE STOP (6,213 added; snapshot 74ae26aa); SIZE-U4F sent to him;
-  MAIN-60 BUILT: main b763ba3 merged in at 0f12d9e, every check passing; pushed with this save; CI and step 7 next.
+- **Last update:** 2026-11-19 00:02 UTC: U4f AT HIS SIZE STOP (6,213 added; snapshot 74ae26aa); SIZE-U4F with him;
+  MAIN-60 DONE (main b763ba3 in at 0f12d9e; CI green; the advisor's head check APPROVE WITH FINDINGS). Waiting on him.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -135,8 +135,8 @@
 - **Carried past U4 (the old card's Open findings, history.md:6430-6464):** the advisor's U2 carries C1-C5 and its
   Note; C-U7-1; the U1 carries (C4, C6, A3, the results ledger, Q13, Q23); C6 widened (U6, before R3); JITTER-ORDER
   (parked: to him before R3 only if C6 shows the model's reordering moves a WebTransport result).
-- **At the next main take-in:** docs/STATUS.md :28-29 conflicts: keep this branch's #40 row and main's #55 row
-  (DOCS-54's C3; history.md:6388-6394).
+- **For PR #40's ready head** (the advisor's MAIN-60 head check): CI's green is bb7a5ed's; the head marked ready needs
+  its own run. STATUS.md's #40 row still reads "main 53272a1 merged in": PR #40's closing docs pass (ADV-M60-7).
 
 ## After the close (TEST-FIRST rule 1's list: found on the way, outside the plan)
 - NS-TRAILER and NS-FIRST: the night-shift lines' attribution option and status refresh, for the kit's next change
@@ -174,16 +174,19 @@
   b763ba3); kit = main's, spikes/ unchanged, the rest = main's but the six docs, H0..HEAD = main's 49; gate PASS, repo
   map OK, checkpoint tests 33/33, light.log refs 1498, redact 307, all 4 pass (.gate/main-60/). Pushed 23:43 UTC with
   the card (bb7a5ed); the saver restarted with both trailers (bpcoh9gqm). CI green on bb7a5ed (gate 44423167627 and
-  44423174642, toolchain 44423167841 and 44423174707: success); PR #40 no longer "dirty". Step 7, the advisor's head
-  check, from 23:54 UTC (agent a955ebc155f2f46bb; its file advisor-main-60-head.md; on a cut: SendMessage).
+  44423174642, toolchain 44423167841 and 44423174707: success); PR #40 no longer "dirty". **Step 7: the advisor's
+  head check APPROVE WITH FINDINGS** (advisor-main-60-head.md; agent a955ebc155f2f46bb, 23:54-00:02 UTC): C1-C6 met;
+  the merge's tree, the 81 marks' rows and the counts re-checked; six Lows, none a push; the lane goes on from this
+  head (U4f's snapshot passes `git apply --check` on it). It wrote one scratch file by a shell redirect (outside the
+  repository, unused). The saver's stop (C2 (b)): its output ended "[killed]", the reflog showed 286d9d5, no watch left.
 - **R3 (iii)'s four hand runs DONE** (.gate/u4f/w3-hand.log, 23:44:39-23:45:53 UTC, `-x -k`, builder 3's tree, diff
   54cb6faa…): p3, p9 (bites, not-older-than), p16 (B) and p20 (idle 2 s) at 4-6 s with 2 s episodes, 48 clients,
   each exit 0; contract PASS on p3 (129 names) and p20 (130), none without a row; p16's 8 buffer-full, as builder 3
   wrote.
-- The saver b4p5xbtmj STOPPED 23:39 UTC for MAIN-60 (C2; its last save 286d9d5 committed, not pushed: C2 (c)'s
-  foreground save pushes it). Restart it after step 6 with both attribution lines as trailers (ADV-M60-8; `node
+- The saver bpcoh9gqm runs from 23:43 UTC with both attribution lines as trailers (ADV-M60-8; `node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: …" --trailer "Claude-Session: …"`,
-  run_in_background, timeout 7200000). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 stays enabled (next 00:34).
+  run_in_background, timeout 7200000; its window ends about 01:33: restart it while agents run). The 2-hour check-in
+  trig_01EKqNqwZrQTVJ6caAyRrug5 is PAUSED from 2026-11-19 00:02 UTC (no agent runs); enable it when agents run again.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and its end (the 19:46 one).
