@@ -1,6 +1,6 @@
 # Change-set 3 ("The loop closes"): the context for its plan, gathered beside the CI-WASM pull request
 
-_Written by the main session, 2026-11-19, 16:20 UTC (from the clock). The plan is drafted beside the CI-WASM pull
+_Written by the main session, 2026-11-19, 17:33 UTC (from the clock). The plan is drafted beside the CI-WASM pull
 request and built only after that pull request is merged (his CI-WASM (a)). This file moves into change-set 3's own
 checkpoint when that opens. It is a list of pointers: the files it names hold the text._
 
