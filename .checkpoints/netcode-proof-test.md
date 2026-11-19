@@ -84,11 +84,26 @@
   7192607d99a1/pm-0001-22/, committed 2dae645): **PM-0001-22 PASS** (L1, one never-acker among 48, seeds 1-3 valid);
   bite unbounded **shown**; 5.2's load report (never counted) PM-0001-2 FAIL at 47 connected against 48, as designed
   (marks.json:5227). Each run: overflow resyncs 1, rewinds refused 33 / 39 / 37 (N1: whose); the bite 0 and 55,138.
-  **All three sets have run.** Next: the advisor's -20 ruling (running), then the set reports (-20, -22) and his
-  message after 23:00 UTC.
+  **All three sets have run.**
+- **The advisor's -20 ruling** (advisor-u4f-20.md, 170 lines, read in full): the count is honest, the cause is the
+  stand-in: **ADV-U4F20-1 High**, npt-sim's one-edge rule (sim/src/world.rs:1340-1346, U4d's) loses a press that ADR
+  0001 part 5 keeps (:226, :234-237) once U4f's kind 5 (room/src/input.rs:285-300) accepts a 2-edge command after late
+  drops; fix: every edge taken through its checks, the room's count from the same rule, two tests; **-20's L1 set
+  re-runs on the fixed commit** (that verdict is -20's record; 350677f's folder the defect's). **-22 stands**; 1,600
+  stands (no honest overflow resync); margin 1.43 named for U4g. **ADV-U4F20-2 Medium:** marks.json's reorder report
+  row (:4786-4790; -58's :4263-4267) reads a header param L1 never writes: his, "After the close". ADV-U4F20-3 Low: in
+  the report. The OQ-0001-6 reading: the B FAIL is not evidence against (b); -20 separates the options by buffer depth
+  only. The set reports for -20 and -22 are in u4f-report.md ("After the merge", items 5-6).
+- **U4f-F1 next** (my lean, U4FF1-Q3: its own step before U4f2, which waits for his U4F2-SIZE answer and keeps
+  crates/sim shut): plan u4f-f1-plan.md (size S, about 60-150; T1, T2 with plants; the -20 re-run), **the advisor's
+  plan review running** (writes advisor-u4f-f1-plan.md). Then a builder in a worktree, one review round, the merge, -20.
 
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
+- **2026-11-19 evening (to name in the next day's message):** by the advisor's -20 ruling (advisor-u4f-20.md R20-Q1,
+  ADV-U4F20-1), the stand-in sim is fixed to take every press edge and -20's L1 set re-runs on the fix (7 runs, no
+  money); by my lean, that fix is its own step, U4f-F1, before U4f2 (U4f2 waits for his size answer). Why: a defect
+  found by a judged run, fixed inside the plan; the bar and marks.json stay; undoable.
 - **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
   no caller) stays public and goes to U4f2's lane by number, its lean a caller (the lab writes `params.cmd_timing` from
   the live room, f6 asserts it), else removed (ADV-U4FMH-2). Why: no behaviour change; undone in U4f2.
@@ -132,6 +147,9 @@
   its own run. STATUS.md's #40 row still reads "main 53272a1 merged in": PR #40's closing docs pass (ADV-M60-7).
 
 ## After the close (TEST-FIRST rule 1's list: found on the way, outside the plan)
+- ADV-U4F20-2 (Medium, his: a marks.json change): PM-0001-20's "measured reorder share" report row
+  (marks.json:4786-4790) and -58's (:4263-4267) read `header.params.reorder_permille`, which L1 scenario runs never write
+  (the share is the lab's `reorder` event since D3-1); reports state the event's figures by hand until he rules.
 - NS-TRAILER and NS-FIRST: the night-shift lines' attribution option and status refresh, for the kit's next change
   after the freeze (his RECS-1043 (b), history.md:2217).
 - For STATUS (the advisor's U4f L3): the hold-time cap's -21 counter (U4F-Q14 (b): a follow-up for the first unit that
@@ -154,9 +172,9 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **The advisor's -20 ruling** (general-purpose, main's advisor.md, xhigh; its brief u4f-20-read.md, R20-Q1 to Q5;
-  writes advisor-u4f-20.md): cut at 20:53:34 before writing anything, resumed by SendMessage at 22:4x UTC. The saver
-  bdhc8uudx from 22:42 UTC (window to about 00:32). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (an agent runs).
+- **The advisor's review of U4f-F1's plan** (general-purpose, main's advisor.md, xhigh; from about 22:58 UTC; writes
+  advisor-u4f-f1-plan.md). The -20 ruling returned 22:5x (cut 20:53-22:40, resumed by SendMessage). The saver bdhc8uudx
+  from 22:42 UTC (window to about 00:32). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (an agent runs).
 - **Written during the set:** -47's report in u4f-report.md ("After the merge", items 1-5). -20's first run (A s1):
   overflow 0, queue high-water 866 (margin 1.85; scratchpad queue_hw.py).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:

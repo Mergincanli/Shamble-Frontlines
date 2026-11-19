@@ -587,9 +587,75 @@ and a half edit, none found, and each notice recorded word for word where cited)
      - -47's part has no in-view precondition (advisor-u4f-r2.md:81-82), so the run stays valid and the verdict stands.
      - Carry 49's "holding every very large unit" reads 0.9938 on that run and 1.0000 on the others. It is a report
        figure.
-5. **-20's set: running** since 20:07:24 UTC, at 350677f. Its spikes/netcode-proof differs from 25d316e's only by
-   -47's results: `git diff --quiet 25d316e 350677f -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'`
-   exits 0.
+5. **-20's set: done at 350677f; option B's FAIL is a stand-in defect, so the set re-runs on the fix**
+   (u4f-20-read.md; the advisor's ruling advisor-u4f-20.md, read in full).
+   - **The run:** `… c-u4f-runs.mjs 20 --date 2026-11-19`, 20:07:24 to about 20:48 UTC, exit 0, at 350677f, whose
+     spikes/netcode-proof differs from 25d316e's only by -47's results (`git diff --quiet … ':(exclude)…/results'` exit
+     0). Results in results/u4f/350677f0aef2/pm-0001-20/, committed at 1840e68.
+   - **The verdicts:**
+     - PM-0001-2's SS part PASSES on all six runs.
+     - PM-0001-20 under option A PASSES: on time 0.999843, 0.99987 and 0.999861; missing 0.000157, 0.00013 and
+       0.000139; 0 lost, 0 doubled.
+     - PM-0001-20 under option B FAILS on one check only, "0 presses lost": 3, 1 and 2. Its on-time and missing shares
+       equal A's per seed.
+     - The bite redundancy-1 is shown.
+   - **The cause (ADV-U4F20-1, High):** every lost press comes on a tick where one client's command runs after its
+     previous 2 or 3 commands missed their ticks. There are six such ticks (13594, 13824, 17417; 4441; 4446, 4955), two
+     of them checked by hand by the advisor.
+     - Option B drops the late commands, so the next command's press counter is two edges on.
+     - U4f's kind 5 accepts that (room/src/input.rs:285-300: one edge per covered tick).
+     - npt-sim takes one edge per changed counter (sim/src/world.rs:1340-1346, U4d's). Its premise, "the room allows
+       one per button per tick", stopped holding with U4f.
+     - ADR 0001 part 5 keeps the press across a dropped command (:226, :234-237). So the loss is the stand-in's, not
+       option (b)'s.
+     - **Route** (the advisor's R20-Q1): npt-sim takes every edge through its own cooldown, ammunition and reload
+       checks, and the room's lost count comes from the same rule. Two tests: an option-B room test where two late
+       drops leave lost 0 and seen 2, and a sim test that the state hash is unchanged. Then -20's L1 set re-runs whole on
+       the fixed commit, and that verdict is -20's L1 record. The 350677f folder stays as the defect's record.
+   - **The OQ-0001-6 reading** (with NC-U4F-5 and C-OQ6-SEC-1):
+     - The 350677f B FAIL is not evidence against (b). After dropped late commands, (b) runs a command whose counters
+       carry several edges, and the authority must take each one; (a) meets the same case after a command lost in all
+       eight copies (about 0.05^8 per command at P3).
+     - -20 separates the options by buffer depth only: A 0 (median and max); B median 2 and max 5 ticks. That depth is
+       the controller's padded target with its three terms (NC-U4F-5).
+     - C-OQ6-SEC-1, a design property, not a finding (ruled by U4F-Q18 (a); u4f-review-r1-full.md:89): the sim
+       advances movement, the weapon clock and the reload once per command run (world.rs:1409-1417). So under option A
+       a burst after an idle squeezes up to W + bound = 20 ticks of all three into about 3 ticks (f38's bound); under
+       option B it stays one command a tick.
+     - F2's p19 reading (C-U4F2-6) is an early, unjudged read: under option A an honest 400 ms hold can reach the
+       per-tick cap and lose 7 commands under kind 10. No B-side 400 ms run exists.
+     - The pick stays R3's (plan.md:846-848; ADR 0001:1164-1166).
+   - **The other figures:**
+     - **Overflow resyncs:** 0 on every client of all seven runs, so 1,600 stands.
+     - **The queue's 10-minute high-water mark:** A 866, 1,117 and 1,083; B 1,001, 683 and 1,045. The largest, 1,117 (A
+       seed 2, slot 27), is at the run's second 52, the 43rd measured second. Every run's maximum falls in the run's
+       seconds 30 to 53. Beside it, the 60 s figures (cap.txt) reach 1,045. **The margin is 1,600 / 1,117 = 1.43,
+       under 1.5, so it is named for U4g** (advisor-u4f-stop.md:132-134).
+     - **F6:** carry 74's B reading uses the session counters against the commands sent: 142 / 879,392 = 0.0161 %, 114
+       / 879,452 = 0.0130 % and 123 / 879,387 = 0.0140 %, far under 1 %. The counters cover the whole run: the warm-up's
+       6, 2 and 3 are included, and the measured sums are 136, 112 and 120. Option A by its own reading (not on time by
+       stamp) reads 0.0157 %, 0.0130 % and 0.0139 %.
+     - **Option A's presses:** 432,003, 432,003 and 432,009, against the scripted 432,000. Option A counts a press by
+       the tick its command runs, so commands stamped in the warm-up run inside measured tick 300. This is the window's
+       edge, not doubling (ADV-U4F20-3).
+     - **The measured reorder share:** the report row prints "not available", because it reads a header param that
+       L1 runs never write (ADV-U4F20-2, Medium: marks.json:4786-4790, and -58's row :4263-4267, his to change, on the
+       after-close list). By hand from the lab's `reorder` event, the lower share is 100, 101 and 101 per mille (up
+       160, 161 and 160; down 100, 101 and 101), A and B alike. Validity holds through that event.
+6. **-22's set: done. PM-0001-22 PASSES.**
+   - **The run:** `… c-u4f-runs.mjs 22 --date 2026-11-19`, 20:51 to 21:17 UTC, exit 0, at 7192607, the same spike
+     tree outside results/. Results in results/u4f/7192607d99a1/pm-0001-22/, committed at 2dae645.
+   - **The verdicts:**
+     - The part "L1, one never-acker among 48": 3 of 3 runs valid, PASS.
+     - The bite PM-0001-22/unbounded: shown (headroom -3,922 against == 0).
+   - **The load each run carried** (5.2's report call, never counted): PM-0001-2's checks over the measured folder
+     pass except "a connected snapshot-receiving client on every soldier" = 47 on each run. That is the never-acker's
+     designed drop (marks.json:5227). Overflow resyncs per client: slot 0 has 1 (its forced resync before the kick);
+     every other slot has 0. `rss_bytes` is "not available" on L1, by design (NA-2).
+   - **N1:** the refused rewinds (33, 39 and 37), the overflow resync and the kick are all slot 0's, the never-acker's
+     (lab/src/scenario.rs:851-852, :1242-1244). No check reads them.
+   - **Untouched by ADV-U4F20-1:** -22's bots press no button (no `--brawl-press-every`; bots/src/lib.rs:639-645), so
+     the set stands and does not re-run.
 
 ## Decisions needed
 None.
