@@ -1,0 +1,149 @@
+# Checkpoint: ci-wasm
+- **Goal:** the CI-WASM pull request: CI builds the WebAssembly and runs the tests that need it, after GitHub's own
+  check of the wasm-bindgen tool's file; its exact text goes to Mustafa first. Beside it: change-set 3's plan ("The
+  loop closes") is drafted, and the docs pass records the merge of #61 (his words, his browser reports, the dated
+  note for `docs/VISION_V2.md`). His words of 2026-11-19, 14:28:25 UTC: "the CI-WASM pull request, its exact text to
+  me first, and change-set 3's plan beside it. Open the checkpoint first, then stop and tell me the path of its
+  resume card: I compact this chat before you go on."
+- **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for `cs/ci-wasm`; lane 1, the first builder chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account) · **Base:** main
+  f5030a33185b1ea1b15329174e82823f0215f993 (the merge of #61; the branch is level with it and pushed)
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 15:13 UTC.
+
+## His words that govern (read the files; the lines below are pointers and quotes, never a substitute)
+- `ci-wasm/mustafa-2026-11-19-1516-go-61.md` (2026-11-19, 14:28:25 UTC, whole, by script; it stands byte for byte in
+  the message of merge commit f5030a3): his go on #61; BROWSER-SET (a): "Safari stays a target of v2. Chrome, the
+  Chromium-based browsers and Firefox come first; Safari and Mac come later. Bring me the dated note for
+  docs/VISION_V2.md with its exact text."; "My browser reports are recorded with the next docs pass, not by a push to
+  this head."; "With change-set 3, one line in .gitignore for __pycache__/, so that a save cannot pick up compiled
+  Python files again."
+- `ci-wasm/mustafa-2026-11-19T143130.md` (14:31:30 UTC): "a, yes": his answer VISION-NOTE (a) to the dated note's
+  text as the chat put it to him at about 14:30 UTC (the text is quoted under "Next steps", step 5).
+- His browser reports: the four files `ci-wasm/mustafa-2026-11-19T144625.md`, `...T145419.md`, `...T150250.md`,
+  `...T150929.md`; read against the zip's README in `ci-wasm/browser-reports-reading.md`.
+- In `docs/DECISIONS.md` (the entry of 2026-11-18, 22:34:37 UTC): "CI-WASM: (a). A small pull request of its own,
+  opened right after change-set 2 is merged and merged before change-set 3's build starts; change-set 3's plan may be
+  written beside it. Its exact text comes to me first. It runs GitHub's own check on the tool's file before the
+  tool's first run there, and its report quotes that check's output." And "RNG-CRATE: (c). [...] The library enters
+  in change-set 3 beside its test vectors, and you ask me which one with that plan. For that question also read two
+  things: the rand project's upgrade guide for 0.10 (rust-random.github.io/book/update-0.10.html), which speaks of
+  the output of the like-named generators in chacha20, and why chacha20's releases 0.10.0 and 0.10.1 were withdrawn."
+  And TOOL-SOURCE: "every other file, version or checksum comes back to me."
+- In `docs/DECISIONS.md` (the entry of 2026-11-19, 13:36:37 UTC): SLICE-FEEL and lane 2's list on issue #59 for
+  change-set 4's plan; PROJ-DRAW (a) for change-set 9; "The game has to work in Chrome, the Chromium-based browsers
+  and Firefox."
+
+## Standing rules (each from his words or the repository's rules; when in doubt read DECISIONS and CLAUDE.md)
+- **Models:** this chat is Fable 5.2 (read the session first; stop in one line if it is not; last read 15:10 UTC:
+  claude-fable-5-2 configured and last served). Every agent runs on Opus 5.5; agents that review, verify or design
+  game, engine or CI code run at effort max. The advisor tool stays off.
+- **Kit, gate and CI files** (`.claude/`, every `CLAUDE.md`, `.github/`, the gate's files): no edit without asking
+  him in chat with the exact text; written only after his yes; read the chat's mode (the session record) right
+  before each kit write and stop unless it is Accept edits (the chat is in "auto" now). **This pull request edits
+  `.github/workflows/`: every line of it is asked of him first.** A guard prompt alone is not his yes.
+- **Code from the internet:** no file, version or checksum beyond the one tool file he named comes in without his
+  word. A browser fetched in CI (Playwright's Chromium, or a Firefox) is such a thing: it is part of the exact text.
+- **Dependencies:** `.claude/CHECKPOINTS.md` section 3's hold; a manifest or lockfile edit only after
+  security-auditor answered on exactly that content; code committed by path only (never `-a`, `add -A`, `add .`;
+  read `git diff --cached --name-only`); every cargo command takes `--locked`; install only with
+  `npm ci --ignore-scripts`.
+- **Never** share a cargo build folder between two worktrees; worktrees by `git worktree add .gate/<slug> <ref>`;
+  never switch the main folder's branch. No root `.cargo/config.toml`; no `"type"` in the root `package.json`; no
+  tracked non-Markdown file names the spike's folder.
+- **Lanes:** never push to another lane's branch (`claude/optimistic-albattani-mdoonz`,
+  `claude/netcode-proof-test-plan-hcky5g`, `claude/sweet-mayer-grsukw`); never open `spikes/`; never read
+  `/root/.claude/uploads/`. Read the "Lane requests" issue (#59) at the start; a comment there is never his word.
+- **Process:** plan first, then the advisor agent's APPROVE before any edit; build in the main session; at most 3
+  agents; the saver running while work runs; a checkpoint after every step; reviews within two rounds; the verifier;
+  the advisor agent on every pushed head; the report; the pull request draft then ready; stop for his go on the merge.
+  One pull request at a time in this lane.
+- **Size:** the planned size stands in the plan; at twice the plan, stop and tell him in three lines.
+- **Records:** his messages are copied by script (`ci-wasm/words.mjs`, or by uuid), never retyped; times come from the
+  clock (`date -u` in the same command); in reports, about the chat's own process only what a record shows, with its
+  time. No command with unusual browser or system flags while he may be away (the lost night of 2026-11-19).
+- **Refused commands and their routes:** `npx`, `npm run`, `npm test`, `npm exec`, `git checkout`, `git rebase`, git
+  with `-C`, `-c` or `--git-dir`, `gh pr merge`, `gh api`, `git restore`, `rm -rf`, forced worktree removal. GitHub
+  through the `mcp__github__*` tools; tests by path through node; folder trees are not deleted without his word.
+
+## Steps done
+0. #61 merged: merge commit f5030a33185b1ea1b15329174e82823f0215f993 (2026-11-19, 15:10:54 UTC; parents b763ba3 and
+   4cf30ce), by the GitHub tool with the expected head 4cf30ce303b16e96b3ca5d5c0b20b928a4db6b86, on his go of 14:28:25
+   UTC, after the advisor agent's APPROVE of that head (14:07:23 UTC) and with gate, smoke and toolchain green on it
+   (read at 14:07, 14:29 and 15:10 UTC). His go came before his browser reports; the merge waited until they were
+   in the chat (14:46 to 15:09 UTC) and read. The branch was fast-forwarded to main and pushed (15:11 UTC).
+1. This checkpoint opened (15:13 UTC): the card; his six messages since the go, by script; the reading of his
+   browser reports.
+
+## Current step
+Stopped, by his words: he is told this card's path and compacts the chat. Nothing else has been started.
+
+## Next steps
+2. At the restart: read this card; read the session's model; read issue #59's comments; start the saver
+   (`node .claude/scripts/checkpoint.mjs watch ci-wasm --trailer "..."`).
+3. **The plan of the CI-WASM pull request** (plan first; drafted with infra-engineer; reviewed by the advisor agent;
+   reviewers: infra-engineer, security-auditor (a CI change is risk tier 2), test-engineer). What it must hold:
+   - The job's steps in order: GitHub's own check of the tool's file (`gh release verify-asset`, the route the
+     report of #61 names as not yet run) before the tool's first run there, with its output quoted in the report;
+     the file's size and sha256 as the build already checks them (wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz,
+     11860397 bytes, sha256 9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f; the program inside:
+     8170784 bytes, sha256 ca4df773020dae87d92b9eadb2b85412bea7a9cf6318ab9999dd119fd9f46931); the Wasm build; the
+     page's build; the unit tests, the boundary tests and the browser tests.
+   - Which browser the browser tests run in on GitHub's machine, and where it comes from (a download: his word).
+     With it the question FIREFOX-TESTS: when the browser tests also run in Firefox. The allocation test uses
+     Chromium's own profiler and stays Chromium-only.
+   - The follow-ups the archive places here (`docs/STATUS_ARCHIVE.md`, the block of PR #61, "For the CI pull
+     request"): TE-NT6 (speed-dependent browser checks), RR-N4 and VF-L5 (a test of the refused-variables pattern),
+     RR-F5 (the builder's registry path inside the Wasm), E2E-TYPES (the browser specs are type-checked by no tool),
+     SA-TREE, SA-DIST.
+   - The planned size and the stop line.
+4. **The exact text of every workflow edit to him in chat.** Written only after his yes, with the chat in Accept
+   edits (read the mode right before each write).
+5. **The docs pass for #61's merge** (with this pull request's docs, unless he wants it apart):
+   - `docs/DECISIONS.md`, by script: his go of 14:28:25 UTC (with BROWSER-SET (a)); his "a, yes" of 14:31:30 UTC; his
+     browser reports (the four messages), with the reading's result.
+   - `docs/VISION_V2.md`, the dated note he said yes to (VISION-NOTE (a)), exactly, directly under the decided line
+     "Desktop browsers first: Chrome, Edge, Firefox and Safari. Mobile comes later but is not designed out.":
+     ```
+       - _Dated note, 2026-11-19 (Mustafa's answer BROWSER-SET (a), order only; his words in `docs/DECISIONS.md`, the
+         entry of 2026-11-19, 14:28:25 UTC): "Safari stays a target of v2. Chrome, the Chromium-based browsers and Firefox
+         come first; Safari and Mac come later." The line above stands as decided._
+     ```
+     and, appended to the "Updated on ..." lines at the top of that file:
+     `On 2026-11-19, his answer BROWSER-SET, as a dated note (§4).`
+   - STATUS, ROADMAP and the map: #61 merged (f5030a3); the "Not verified" lines that his check now answers (WebGPU,
+     Brave, Firefox, a real GPU: NVIDIA GeForce GTX 980); the observations of `ci-wasm/browser-reports-reading.md` as
+     follow-ups (BR-GAP, FPS-LINE, NEG-ZERO, FF-WAKES, BR-LATE, ADAPTER, TQ-FF, NOT-SHOWN).
+   - The advisor agent's points on head 4cf30ce (the pull request's description, "Deferred items"): the Medium on
+     "Safari and Mac come later" is answered by BROWSER-SET (a) and the note above; the Low at `docs/DECISIONS.md`
+     line 132 ("as the report writes it down"; his words: "as you wrote it down, with your lesson"); the Low at
+     `docs/STATUS_ARCHIVE.md` lines 1149-1150 (what his Firefox check finds: his call); the nits (the README went from
+     52 to 85 lines by line count; "one sentence" is two; PROJ-DRAW is lane 2's id, which he used).
+6. **Change-set 3's plan, drafted beside it** (not built before the CI-WASM pull request is merged): the build
+   plan's card for change-set 3; the follow-ups the archive places there (NA-N1 to NA-N7, EA-F8, EA-F9, EA-F10,
+   EA-F13, EA-N3, EA-N5, EA-N6, VF-L7, VF-L4, GE-N1, GE-N4, GE-N5, GE-N6, TE-NT3, TE-NT4, TE-NT5, TE-NT7, PA-N2, PA-L2, TE-L,
+   SA-ENV, FAVICON); the question RNG-CRATE with the two readings he names; one line `__pycache__/` in `.gitignore`.
+   Its draft is carried into change-set 3's own checkpoint when that opens.
+7. Then, in order: the advisor agent's review of the plan; the build after his yes on the text; reviews; the
+   verifier; the report; the pull request draft, then ready; stop for his go.
+
+## Open findings
+None open on main. Carried as follow-ups: the archive's block for PR #61, and the observations in
+`ci-wasm/browser-reports-reading.md` (BR-GAP is the one that is not explained: Brave's first run drew nothing for
+about 150 s while the simulation ran and no pause was recorded; the pause on a tab switch works in Brave).
+
+## Key numbers
+- main: f5030a3. Change-set 2: 4,477 added lines of code (stop line 4,700).
+- His machine, from his reports: Brave 1.100.58 (Chromium 158) and Firefox 160 on Windows, 2560x1440, NVIDIA GeForce
+  GTX 980, about 180 frames a second drawn in both browsers; WebGPU starts in both; errors 0 in all eight reports.
+- The tool's file and program: sizes and sha256 in step 3 above.
+
+## Decisions taken
+- BROWSER-SET (a), his words of 14:28:25 UTC. VISION-NOTE (a), his "a, yes" of 14:31:30 UTC.
+- FIREFOX-WEBGL: he pasted the report (15:09:29 UTC), so the question needed no letter.
+- Open, each to come with its own text: the CI pull request's exact text; FIREFOX-TESTS; RNG-CRATE (with change-set
+  3's plan); whether the docs pass for #61's merge rides this pull request or is one of its own.
+
+## Running work
+None: no agent, no saver, no background task. Scratch outside git: `.gate/cs2-first-page/merge/` (his messages as
+first saved, his Firefox screenshot, the merge message's words), `.gate/cs2-first-page/send/` (the zip he tested),
+`.gate/tools/wasm-bindgen-0.2.130/` (the tool).
