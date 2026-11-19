@@ -7120,3 +7120,27 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   valid); bites newest-sample and tick-quantised **shown**; results/u4f/b57221ed139d/pm-0001-47/ committed. For -47's
   report: seed 2's 1,916 building slot-ticks (no -47 precondition), F4's shot band. **The -20 set RUNNING** from 20:07
   UTC (same form, `20`; background, about 80 minutes); then -22 after reading -20's six runs for honest overflow resyncs.
+
+## Card blocks moved 2026-11-19 after the advisor's -20 ruling (card_trim_1119k.py; from 'Now: U4f', 'Running work' and 'Cuts')
+- **-20 DONE** (20:07:24-20:48 UTC, exit 0, at 350677f; results/u4f/350677f0aef2/pm-0001-20/, committed 1840e68):
+  PM-0001-2 SS PASS (6 of 6 valid); **PM-0001-20 option A PASS; option B FAIL, "0 presses lost" 3, 1 and 2** (seeds
+  1-3; late 142, 114, 123; A's late 0); bite redundancy-1 shown. Overflow resyncs 0 on all seven runs. **The queue's
+  10-minute high-water:** 866 / 1,117 / 1,083 (A), 1,001 / 683 / 1,045 (B); the largest 1,117 (A s2, slot 27, measured
+  second 52): **margin 1.43, under 1.5, named for U4g** (advisor-u4f-stop.md:132-134); 1,600 stands. **The B FAIL goes
+  to the advisor** for the OQ-0001-6 reading (room.rs:352-355: the sim takes one edge per command run, so late drops
+  spanning two presses lose one; ADR 0001:1156-1167; plan.md:846-848). **-22 next:** its condition is met.
+- **-22 DONE** (20:51-21:17 UTC, exit 0, at 7192607, spikes/ equal to 25d316e's outside results/; results/u4f/
+  7192607d99a1/pm-0001-22/, committed 2dae645): **PM-0001-22 PASS** (L1, one never-acker among 48, seeds 1-3 valid);
+  bite unbounded **shown**; 5.2's load report (never counted) PM-0001-2 FAIL at 47 connected against 48, as designed
+  (marks.json:5227). Each run: overflow resyncs 1, rewinds refused 33 / 39 / 37 (N1: whose); the bite 0 and 55,138.
+  **All three sets have run.**
+- **Written during the set:** -47's report in u4f-report.md ("After the merge", items 1-5). -20's first run (A s1):
+  overflow 0, queue high-water 866 (margin 1.85; scratchpad queue_hw.py).
+- **2026-11-19 16:00:10 to about 17:45 UTC (builder 4; the session too):** "You've hit your org's monthly spend limit
+  · ask your admin for a higher limit · your 5-hour limit resets 5:40pm (UTC)" (16:00:10.105, builder 4's transcript,
+  one second after its end check A2 ended: .gate/u4f/w4-end-check-a2.log, 15:43:29-16:00:09 UTC, exit 0, all 11 steps,
+  634 measured / 731 bites, test step 882.8 s). Mustafa's own limit cut the session too ("I hit my usage limit while
+  you were working, but it has reset now", reached about 17:42); the worker restarted, ending the saver bbe44e8id; the
+  16:34 check-in reached the session at 17:42. Checked at 17:43: no process left; no plant (its notes at 15:39); no
+  half edit (the worktree's runner hashes equal A2's start, 2f07abc2… and 1a767d5b…, rebuilt from the 15:43 snapshot);
+  w4-end-check-a.log (15:32) was cut off after its doc step, then re-run as A2. Resumed by SendMessage about 17:45.

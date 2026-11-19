@@ -73,18 +73,9 @@
   (advisor-u4f-r2.md: 14 of 17 as expected; p4, p13, p19 to U4f2 as C-U4F2-5 to -7); the part-clean (D2 5,204 ->
   11,552 MiB); **-47 PASS** (p99 2.597 / 2.516 / 2.638 ms against 5; both bites shown; a4cac39). Builders 1-4's
   worktrees kept until the sets end (then LEFTOVER-DELETE).
-- **-20 DONE** (20:07:24-20:48 UTC, exit 0, at 350677f; results/u4f/350677f0aef2/pm-0001-20/, committed 1840e68):
-  PM-0001-2 SS PASS (6 of 6 valid); **PM-0001-20 option A PASS; option B FAIL, "0 presses lost" 3, 1 and 2** (seeds
-  1-3; late 142, 114, 123; A's late 0); bite redundancy-1 shown. Overflow resyncs 0 on all seven runs. **The queue's
-  10-minute high-water:** 866 / 1,117 / 1,083 (A), 1,001 / 683 / 1,045 (B); the largest 1,117 (A s2, slot 27, measured
-  second 52): **margin 1.43, under 1.5, named for U4g** (advisor-u4f-stop.md:132-134); 1,600 stands. **The B FAIL goes
-  to the advisor** for the OQ-0001-6 reading (room.rs:352-355: the sim takes one edge per command run, so late drops
-  spanning two presses lose one; ADR 0001:1156-1167; plan.md:846-848). **-22 next:** its condition is met.
-- **-22 DONE** (20:51-21:17 UTC, exit 0, at 7192607, spikes/ equal to 25d316e's outside results/; results/u4f/
-  7192607d99a1/pm-0001-22/, committed 2dae645): **PM-0001-22 PASS** (L1, one never-acker among 48, seeds 1-3 valid);
-  bite unbounded **shown**; 5.2's load report (never counted) PM-0001-2 FAIL at 47 connected against 48, as designed
-  (marks.json:5227). Each run: overflow resyncs 1, rewinds refused 33 / 39 / 37 (N1: whose); the bite 0 and 55,138.
-  **All three sets have run.**
+- **-20 and -22 DONE, all three sets run** (records at history.md:7124-7146, card_trim_1119k.py; u4f-report.md items
+  5-6): -20 at 350677f (1840e68): PM-0001-2 PASS; PM-0001-20 A PASS, B FAIL "0 presses lost" 3/1/2; overflow 0;
+  high-water 1,117 (margin 1.43). -22 at 7192607 (2dae645): PM-0001-22 PASS, bite shown, load report as designed.
 - **The advisor's -20 ruling** (advisor-u4f-20.md, 170 lines, read in full): the count is honest, the cause is the
   stand-in: **ADV-U4F20-1 High**, npt-sim's one-edge rule (sim/src/world.rs:1340-1346, U4d's) loses a press that ADR
   0001 part 5 keeps (:226, :234-237) once U4f's kind 5 (room/src/input.rs:285-300) accepts a 2-edge command after late
@@ -175,8 +166,6 @@
 - **The advisor's review of U4f-F1's plan** (general-purpose, main's advisor.md, xhigh; from about 22:58 UTC; writes
   advisor-u4f-f1-plan.md). The -20 ruling returned 22:5x (cut 20:53-22:40, resumed by SendMessage). The saver bdhc8uudx
   from 22:42 UTC (window to about 00:32). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (an agent runs).
-- **Written during the set:** -47's report in u4f-report.md ("After the merge", items 1-5). -20's first run (A s1):
-  overflow 0, queue high-water 866 (margin 1.85; scratchpad queue_hw.py).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
@@ -197,13 +186,6 @@
   -22 set ran on through the cut and ended 21:17 UTC, exit 0 (committed 2dae645); the saver buz1b7gec's window ended at
   22:40 (restarted as bdhc8uudx, 22:42); the agent had written no notes (advisor-u4f-20.md absent), resumed by
   SendMessage at 22:4x; the 22:35 check-in reached the session at 22:40.
-- **2026-11-19 16:00:10 to about 17:45 UTC (builder 4; the session too):** "You've hit your org's monthly spend limit
-  · ask your admin for a higher limit · your 5-hour limit resets 5:40pm (UTC)" (16:00:10.105, builder 4's transcript,
-  one second after its end check A2 ended: .gate/u4f/w4-end-check-a2.log, 15:43:29-16:00:09 UTC, exit 0, all 11 steps,
-  634 measured / 731 bites, test step 882.8 s). Mustafa's own limit cut the session too ("I hit my usage limit while
-  you were working, but it has reset now", reached about 17:42); the worker restarted, ending the saver bbe44e8id; the
-  16:34 check-in reached the session at 17:42. Checked at 17:43: no process left; no plant (its notes at 15:39); no
-  half edit (the worktree's runner hashes equal A2's start, 2f07abc2… and 1a767d5b…, rebuilt from the 15:43 snapshot);
-  w4-end-check-a.log (15:32) was cut off after its doc step, then re-run as A2. Resumed by SendMessage about 17:45.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
-  of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py).
+  of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
+  one (builder 4) at history.md:7124-7146 (card_trim_1119k.py).
