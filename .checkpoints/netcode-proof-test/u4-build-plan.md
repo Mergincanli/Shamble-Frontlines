@@ -185,16 +185,21 @@ the critics'.
 | npt-sim | `Recording` (with `GENERATOR`, `encode`, `decode` and `synthetic`), `StateDump`, `replay::Replayer` and its methods | RQ5's field diff; U4-REPLAY; A12's one driver; W1-PUB: `synthetic` is in the library because U4d2 regenerates the recordings (§4.15) |
 | npt-sim | `World::predict`, `World::load_movers`, `World::ray_cast`; `Scene::estimate`, `Scene::course`, `Scene::targets` beside `Scene::stress` | ADR 0004:166-178; ADR 0001:258-260; ADR 0001:1470-1482 |
 | npt-sim | `EntityKind::ALL` and `EntityKind::layout`; `grid::Field::integer`; `full_state_ack_ticks_at`; `HitHistory::for_ms` in place of `HitHistory::new`; bites builds only: `grid::Config::floor_rounding`, `OWN_COPY_SNAP_BITES` and `own_copy_snap_with_bite`. Removed: bites-only `grid::Config::BITES` and `grid::Config::with_bite` (the advisor's U4s ruling, condition 1 (a)) | u4s-carries.md carry 30: arch F2 (one home for the per-kind field order; one type for a layout's fields); rust 1 (each derived constant is `<name>_at(TICK_HZ)`); netcode F6, A5; arch F1 |
+| npt-sim | U4f, bites builds only: `World::CHECK_BITES` (PM-0001-21's two sim-side check bites, no-cooldown and refuse-not-clamp, each planted through `World::with_bite`) | a list apart from `World::BITES`, which npt-hash-wasm's replayer indexes and npt-sim's tests pin (NA-9, U4F-Q1 (a); the advisor's U4f build-1 ruling, R2 (d)); the sites' five inert lines outside the `bites` gate accepted as built (EA-U4F-3; the advisor's U4f round-1 ruling) |
 | npt-proto | `RoomControl` (unfeatured; N5) | catalogue item 6 (:253); U5's fuzz target (catalogue :280) |
 | npt-proto | `Wrap` (one compare per width, called with its counter's name) | -58's per-counter bites (§4.14) |
 | npt-proto | `client_hash`; the `EntityRecord` ↔ wire mapping | -17 (§4.6); A18 |
 | npt-proto | dependencies on npt-sim (grid, seam types) and npt-link (`Channel`) | U4-OWNSNAP, A18; catalogue item 2 (arch F37); leaf to leaf |
 | npt-proto | `Message`, `Direction`, `DecodeError`, `EncodeError`; the message and control types' field types (`EndReason`, `ProfileId`, `StepResult`, `TokenKind`); `Limits`' constants and `TYPES`; `Quant`'s `encode` and `decode`; `Wrap`'s compares and `widen16`; `EntityDelta`; `Class` and the two `GROUPS` tables; the catalogue audit's name and variant helpers; bites builds only: `BITES`, `Quant::with_bite`, `Wrap::plain_lt` | the signatures and fields of plan §4.7's items; §5 U4a's layout table; catalogue items 2, 3 and 6 (the advisor's W1-PUB ruling) |
+| npt-proto | U4f: `Pong::server_ns` (the answering end's time at the `Pong`'s send, 8 B; the catalogue's Pong row, docs/design/netcode-proof-messages.md:92) | ClockSync's exact server time (U4F-Q6 (b); u4f-brief.md 2.1): the room's `Pong` sets it, a client's sets 0 and the room never reads it |
 | npt-client | a dependency on npt-link, for `Channel`; `StepOut`'s fields (`datagrams`, `reliable`, `next_due_ns`, `hashes`, `lost`, `wraps`); `ClientEndpoint`'s methods (`new`, `input`, `step`, `with_starts`, `with_lead`, `slot`, `newest_tick`, `last_run_command`, `wrong_channel`, `refused`, `stale`, `duplicates`); bites builds only, `BITES` (3 ids), `grid_with_bite` and `ClientEndpoint::with_bite` | as above; u4s-carries.md carry 30: arch F1; plan.md:486 (`StepOut`); carries 24, 61 (b) and (c); U4E-Q2, U4E-Q7; -58's counter wraps; carry 74 (`with_lead`, set by U4r's lab); the advisor's U4e brief ruling, A5 (the bites-only constructor); the advisor's U4e round-1 ruling, R2 (A5) |
+| npt-client | U4f: `ClockSample` (its fields `offset_ns`, `rtt_ns`, `at_ns`, `tick`, `server_ns`); the public methods of plan.md §4.7's `ClockSync`: `offset_ns`, `samples` and `resets`, and `new`, `period_ns`, `ping_every_ns`, `unknown_pongs`, `next_tick_at` and `one_way_hi_ns`, these six trimmed by C-U7-4; `ClientEndpoint`'s methods `with_clock`, `clock`, `commands_due`, `stamps_skipped`, `lead_now`, `not_due`, `unencodable_commands`, `unknown_pongs` (public since U4f), the unfeatured `with_quant`, and, built ahead for U4f2, `skip_command` and `twin_left_out`; bites builds only, `BITES` (6 ids) | u4f-brief.md 2.1 (ClockSync), 2.2 and U4F-Q7 (the controller, its due and skip counts), 2.9 (c), 2.12 (the twin's skip); the -47 read (`clock`); the lab's `client_counts` (`lead_now`, `unknown_pongs`, `stamps_skipped`, `unencodable_commands`); f36 (ii) (`not_due`); P33 (`with_quant`: npt-server's tests pass npt-proto's planted `Quant`; the advisor's U4f build-1 ruling, R2 (e)); C-U4F2-2 (the built-ahead pair); C-U7-4 (ClockSync's surface trimmed when it becomes the Worker's); the advisor's U4f round-1 ruling (EA-U4F-1, EA-U4F-2; `join_tick` removed by its FP12) |
 | npt-room | `Room<S: SimCore>`; `InputBuffer::CMD_CATCHUP` and `buffer_depth_ticks`; `ClientCounters` (the type `ClientSlot::counters` returns, its fields the per-client counts); `Room`'s methods (`new`, `join`, `leave`, `receive`, `pump_report`, `tick`, `take_datagrams`, `take_control` handing out each reliable message's bytes, `client`, `last_tick`, `sim`, `roster`, `script`, `tick_input`, `reports`, `event_cap`, `with_event_cap`, `with_event_start`, `with_hashes`, `with_cover`); `ClientSlot`'s getters (`slot`, `counters`, `server_hash`, `burst_eviction`, `baseline_age`, `groups`, `bytes`, `budget`, `last_acked`, `own_section`, `overflow_resync`, `wraps`, `rewinds_refused`, `queue`, `headroom`, `buffer_depth_ticks`, `kicked`); `Roster::live` and `is_live`; bites builds only: `BITES` and `Room::with_bite` | U4-SEAM; RQ6; U4E-Q3 (the advisor's W1-PUB ruling); §4.2 (`script`, `reports`), §4.5 (`burst_eviction`, the window's pair), §4.9 (`with_cover`), §4.11 (`with_bite`); U4E-Q6, U4E-Q7, U4E-Q11, U4E-Q12; carries 23, 40, 54, 56, 57 and 61 (a); plan.md:508-509 (`take_control`: encoding stays on the tick); the advisor's U4e round-1 ruling, R2 (A1, A4, A5) |
+| npt-room | U4f: `CmdTiming` and `Refusal` with `kind()` (to be renamed `CommandRefusal`, its records in the sim's struct form, by C-U4F2-3); `Room`'s `LEAD_BOUND_MS` (400 ms, frozen), `with_cmd_timing`, `set_cmd_timing`, `cmd_timing`, `with_lead_bound_ms`, `lead_bound`, `refusals`, and, built ahead for U4f2, `refusals_dropped`; `ClientCounters`' fields `lead_refused`, `not_newer`, `seq_refused`, `move_refused`, `aim_refused`, `seq_outside_window`, `rejoin_overlap`; `ClientSlot`'s getters `on_time`, `presses`, `ran_early`, `commands_run`; bites builds only, `BITES` (16 ids) | u4f-brief.md 2.3 (option A beside B), 2.4 (the checks' order, kinds and counters), U4F-Q8 (i) (b) (the lead bound as room data, in ms; Mustafa's LEAD-BOUND (a), history.md:6791-6806), U4F-Q9 (the refusal records); `set_cmd_timing` for the lab, which holds the room inside its server; the per-tick values -20's series and U4F-Q3 (c) read (`on_time`, `presses`, `ran_early`, `commands_run`); C-U4F2-2 and C-U4F2-SEC-1 (`refusals_dropped`); the advisor's U4f round-1 ruling (EA-U4F-1, EA-U4F-2; `InputBuffer::KEPT_WINDOW` made crate-private by its FP12) |
 | npt-server | `Decoder::pump` (the I/O step over `&mut dyn Link`, injected `now`, the ping sender, per-client RTT and bytes sent); `Schedule`, `Due`; `Dropped`, `LoopCounters`, `next_due_ns`, `counters`, `tick_hz`, `catchup`; `Decoder`'s methods (`new` taking an `RttSource`, `counters`, `is_closed`, `accept`, `reject`, `take_sent_bytes`, `rtt_ns`); `RttSource` (`Link`, `Pings`); `ConnLimits::new`, `input_refill_per_second`, `hold_cap_ns`; `Counters`' fields; the modules private, each item at the crate root; bites builds only: `Schedule::with_bite`, `BITES` | U4-SERVER; §4.3; A6, A7; the advisor's W1-PUB ruling; §4.9 (`RttSource`: the RTT by the session's kind), §4.10 (`Counters`, U4f's -21 series); carry 39's 30 and 60 Hz pins; the advisor's U4e round-1 ruling, R2 (A2, A5) |
 | npt-l1 | `L1Net::next_event_ns` | C1' makes L1 event-driven |
 | npt-bots (library) | `Behaviour` (the brawl, the open-loop scripts, the target-course shooter, the cheats, the never-acker), clock-injected | E12; U4-SERVER |
+| npt-bots (library) | U4f: `Behaviour`'s `controlled`, `with_press_every`, `never_fires`, `never_acks`, `with_points`, `lag_switch` and `take_bursts`, `fast_clock` and `fast_left_out`, `outgoing` (the cheats' hook on the endpoint's datagrams), and, built ahead for U4f2, `forger` and `take_forged` | u4f-brief.md 2.2 (the controller runs' command rule), 2.6 (the cheats and the never-acker), U4F-Q4 (b) (the no-fire clock script), U4F-Q11 (i) (a) as the advisor's U4f build-1 ruling F4 set it (`with_press_every`); `outgoing` and `take_bursts` beyond 2.13's words (the host order: C-U6-18); `fast_left_out` written by the lab as `event.fast_clock.left_out_count` (its FP12); C-U4F2-2 (`forger`, `take_forged`); the advisor's U4f round-1 ruling (EA-U4F-1, EA-U4F-2) |
 | npt-lab | subcommands `scenario` (with `--record`), `replay` and `hash` (`hash` with its modes: the two native legs, `compare`, `vectors` and `bites`); in the library, `HashCompare` (its constructor `of` and its variants `Equal`, `Empty` and `Mismatch`) and `TickHash` (the per-tick entry `of` takes); in the run header, the param `fate_log_v1_datagram_sha256` | plan.md:590-591; the advisor's condition 2 (`HashCompare` is U4r's -30 comparer, so it lives in the library and reads no file); §4.6's "0 compared fails" (`Empty`, as npt-judge's `eval::Outcome::Empty`); carry 66 (the v1 datagram hash, for §5 U4c's L-c8); the advisor's U4d2 round-1 ruling (EA-7) |
 | npt-log | `TickRecord.hs`, with `TickRecord::set_hashes` and `TickRecord::hashes` | marks/README.md:147-148 (since U4j, README §1's `hs`) |
 | npt-judge | `marks::Mark::ws_bound_line`, `marks::Check::ws_bound` and `marks::BoundNumber` (PM-0001-18's WebSocket bound, its line held verbatim); `marks::Rule::WsPractice` (the `ws-practice` rule); `eval::Outcome::Empty`, `eval::Outcome::fails` and `figures::Lack::Empty` (0 compared fails, never passes) | Q20 and the advisor's ws-docs R3-R12 (-18's split, `ws-practice`); the advisor's U4j FX-6 (g) (A19); §4.6's "0 compared fails" |
@@ -334,6 +339,32 @@ the critics'.
   drops the client (net F119). Event numbers are 16-bit on the wire, rebuilt to 32 bits by `Wrap`.
 - The cap: the stress scene's measured rate of relevant gameplay events x (B1's 1 s + RTT + a margin), recorded. At
   about 350 hit events per second (net F121), a cap below about 400 would resync all 48 clients on every burst.
+  - **Set at U4f: 1,600, no longer provisional** (u4f-brief.md 2.8; U4F-Q12 (b), advisor-u4f-brief.md:278-282; the
+    advisor's stop ruling R2, advisor-u4f-stop.md:107-137): the room's default `EventQueue::CAP`
+    (room/src/events.rs), with `event_queue_cap_provisional` false in every header. The formula above is not used: at
+    EVQ-LOAD's rate it gives at most about 1,008 for any margin up to about 0.73 s, while 1,024 already overflowed at
+    P3 without a burst (NA-3; P32's 27 forced resyncs).
+  - **The measure:** the largest per-client high-water mark of queued gameplay events, per 30 s bin
+    (`second.s.event_queue_max_count`) and per burst (`event.burst_heal.queue_max_count`), over nine short runs by
+    ops/runs/c-u4f-cap.mjs: SS, 48 clients, the brawl under U4f's controller, option B, P2, P3 and B1 (two bursts),
+    seeds 1 to 3, a 10 s warm-up and 60 s measured, the cap opened to 8,192 so that no overflow resync cuts the marks;
+    every run exit 0 with 0 overflow resyncs (.gate/u4f/w2-cap/cap.txt; u4f-build.md:414-449).
+  - **The lower bound, the honest need with a stated margin:** the largest mark, 1,045 (P3 seed 3, bin 0), x 1.5 =
+    1,567.5, rounded up to a multiple of 64: 1,600.
+  - **The upper bound** (carry 50; NA-12): a never-acker's events expire once older than 255 ticks
+    (room/src/events.rs:19-20), so a cap above the lowest client's mean queued rate x 255 / 30 is never reached and
+    -22's headroom check would fail a correct build: 509.2 a second (P3 seed 2) x 8.5 = 4,328. 1,600 lies below it.
+  - **The figures** (per-client high-water marks, bin 0 / bin 1, seeds 1 to 3): P2 161 / 156, 166 / 152, 157 / 188;
+    P3 689 / 1,001, 683 / 449, 1,045 / 935; B1 747 / 651, 669 / 695, 739 / 633, its bursts 615 to 727. Room-wide
+    reliable events 503.4 to 572.5 a second (bin means); the clients' mean queued rates 509.2 to 554.7 a second
+    (cap.txt:2-44).
+  - **Not measured:** P0, where each acknowledgement returns within a step, so an honest queue empties at each step
+    (advisor-u4f-stop.md:115-117), and 10-minute windows. -20's judged set (six 10-minute P3 runs) is the check: an
+    honest client with any overflow resync there comes to the advisor before -22's set, the need is measured again
+    with the cap opened, the value re-set by the same rule under carry 50's bound and -20's set re-run at it; with
+    none, 1,600 stands, and -20's set report states the 10-minute high-water mark and the margin it leaves, a margin
+    under 1.5 named for U4g (advisor-u4f-stop.md:126-134). The judged -20, -21 and -22 runs all run at this value.
+  - The cap is a design constant -22's headroom check reads, not a bar (marks.json:5227; u4f-brief.md 5.6 B4).
 
 ### 4.8 Clocks and time on the client (Q19)
 - As rev 1: the command clock (server-time offset from the client's own pings, ADR 0001:239-242's filter) and the
@@ -804,16 +835,48 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
 
 ### U4f, clock and commands (depends on U4r; size M; its own brief)
 - **Builds:** `ClockSync` (§4.8); the client's tick-lead controller (net F104); `InputBuffer` option A; every other
-  room-side check with its -21 counter; the server-side checks' -21 counters and judged runs on U4e's pump (U4e builds
-  and unit-tests the checks: U4E-Q11); the cheats' `Behaviour`s (the 11 forged kinds per §4.10, the clamp points, the
-  1.5x clock, the lag switch, the never-acker).
+  room-side check with its -21 counter; the server-side checks' -21 counters on U4e's pump (U4e builds and unit-tests
+  the checks: U4E-Q11); -21's room and sim side whole, and three of -21's four suites (clamp, lag switch, fast clock)
+  with the cheats' `Behaviour`s they run (the clamp points, the 1.5x clock, the lag switch); the never-acker; and the
+  forgers of kinds 1, 2, 4, 5 and 6, built ahead for U4f2's forged suite (Mustafa's SIZE-U4F (a), history.md:6896-6903;
+  the advisor's stop ruling, advisor-u4f-stop.md:72-99).
 - **Marks moved** (build, merge, then the judged runs): -47 (1,000 connects at P2; bites newest-raw-sample and
-  tick-quantised receive times); -20 (P3, both options; bite redundancy-1); -21's 8 parts with their twins (§4.10) and
-  13 bites, each bite run in the suite and option §4.14 or marks.json's notes name; -22 (one never-acker among 48 for
-  10 min, no precondition (README §4 states the exception: U4j); its runs still log PM-0001-2's series (shots,
-  projectiles, vehicles, teams, portals), and U4f's report states the load each run carried (the advisor's condition
-  4); bite unbounded over a full S30).
-- **Reviewers:** netcode-architect, security-auditor (hostile input), test-engineer, rust-reviewer.
+  tick-quantised receive times); -20 (P3, both options; bite redundancy-1); -22 (one never-acker among 48 for 10 min, no
+  precondition (README §4 states the exception: U4j); its runs still log PM-0001-2's series (shots, projectiles,
+  vehicles, teams, portals), and U4f's report states the load each run carried (the advisor's condition 4); bite
+  unbounded over a full S30). The sets run -47, -20, then -22, -20's 10-minute P3 runs read for honest overflow
+  resyncs before -22's set starts (advisor-u4f-stop.md:126-134). -21's eight parts move to U4f2: U4f's c-u4f-r2.mjs
+  rows for -21 are an early read of the built suites, not -21's record (advisor-u4f-stop.md:90-94).
+- **Size:** M (about 3,000 added lines: SIZE-CHECK, history.md:2048-2051); 6,213 at its size stop, closed by
+  SIZE-U4F (a) (history.md:6896-6903); 6,425 after its round-1 fix pass (u4f-report.md).
+- **Reviewers:** netcode-architect, security-auditor (hostile input), test-engineer, rust-reviewer; round 1 also
+  seated engine-architect (u4f-review-r1-full.md).
+
+### U4f2, -21's forged-command suite and -21's runs (depends on U4f; size: about 1,500 added lines; its own short brief)
+- **Why a unit of its own:** Mustafa's SIZE-U4F (a) (history.md:6896-6903), on the advisor's stop ruling R1
+  (advisor-u4f-stop.md:72-99): U4f closed as built, and the rest of the forged-command test with all of -21's runs comes
+  here, sized and reviewed apart.
+- **Builds** (advisor-u4f-stop.md:80-89, which stands): npt-bots' forgers of kinds 3, 7, 8, 9, 10 and 11 with f15's
+  six cases (kinds 1, 2, 4, 5 and 6 were built ahead in U4f); npt-lab's `--suite forged` (11 forger slots, 37 honest
+  open-loop clients) and `--forge-every` with its header param and SERIES.md row; the attribution by u4f-brief.md 2.4
+  item 6 and `event.forged_kind.*`; the twins and the twin's skip in the lab (kind 10's and kind 3's rows); f16 (24),
+  f22 (2), f23 and f33 (13); 5.3's p1, p7, p14 and p17; -21's set in c-u4f-runs.mjs; f28's clamp and lag-switch B
+  halves as its first block (the stop ruling R3 (ii)); its own end checks (u4f-brief.md section 6, items 1 to 5). Its
+  brief is short (TEST-FIRST rule 3): what it builds and tests, pointing to U4f's brief sections, to
+  advisor-u4f-build1.md's 22 lines and to the stop ruling; it goes to the advisor before its build.
+- **Carries, by number:** C-U4F2-1 to -4 and C-U4F2-SEC-1 (advisor-u4f-r1.md:65-87); ADV-U4FP-3, beside C-U4F2-2
+  (advisor-u4f-pass.md:95-98); and U4f's not-met -21 carries, 46's lab twins and 86's forged rows
+  (advisor-u4f-stop.md:97).
+- **Marks moved** (build, merge, then the judged runs): -21's 8 parts with their twins (§4.10) and 13 bites, each bite
+  run in the suite and option §4.14 or marks.json's notes name. c-u4f-r2.mjs runs whole again from U4f2's merge commit
+  (all 21 rows: 5.3's record), then -21's set: 24 measured, 12 twins and 13 bites in two judge calls
+  (advisor-u4f-stop.md:90-94). -21 is judged only after U4f2 merges.
+- **Size:** about 1,500 added lines (builder 3's estimate, about 1,400 to 1,550: u4f-build.md:863-866), so past its
+  plan at more than 3,000 (twice the plan, by SIZE-CHECK: history.md:2048-2051); the card writes it, with that source,
+  before its first snapshot (advisor-u4f-stop.md:86-88). Its report states its own counts and the sum with U4f's
+  against u4f-brief.md 2.10's minimums (advisor-u4f-stop.md:95-96).
+- **Reviewers:** netcode-architect, security-auditor (hostile input), test-engineer, rust-reviewer (U4f's:
+  advisor-u4f-stop.md:88-89).
 
 ### U4g, prediction, interpolation and events (depends on U4f; size M; its own brief)
 - **Builds:** `Predictor` (reset to the server's state for the last command run, newer commands replayed through
@@ -879,8 +942,8 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   crates/lab, its Cargo.toml included; U4e's tests live in its own crates (Loopback as a dev dependency: npt-server's
   tests, through its npt-link and the dev dependency on npt-client U4s adds), never in crates/lab (the advisor's
   condition 10 (b)).
-- **Then** U4r (after U4c, U4d2, U4e, U4j) and its runs; then U4f, U4g and U4h in order (they share the room's and the
-  client's files: never two at once).
+- **Then** U4r (after U4c, U4d2, U4e, U4j) and its runs; then U4f, U4f2, U4g and U4h in order (they share the room's
+  and the client's files: never two at once).
 - After each merge the next lane's base moves: its brief's counts are deltas, and the merge step recomputes the
   absolute counts on the merged tree.
 - **Reviewers count toward the 3-agent limit** and run at effort xhigh, as netcode work (the advisor's condition

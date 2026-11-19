@@ -200,9 +200,11 @@
   u4f-merge-edits.md (328 lines: edits 1-7 M8's, 8 a no-change record, 9-10 proposed). Settled: the cap text and the
   public-item rows go to u4-build-plan.md (§4.7, §4.1: the brief's "plan"); the carries to plan.md §12.1; 5.3's
   pre-runs are 17 until U4f2 (p1, p7, p14, p17 come with it); M7's output kept at .gate/u4f-merge/gate.txt; M2 re-read
-  19:1x (main still f5030a3); `Room::cmd_timing()` (public, no consumer) to the advisor's head check. **Next:** read
-  both papers in full; apply edits 1-7 and 9-10 by Edit; u4f-build.md's merge section; then M8's one commit, the D10
-  read on it, the push (M9), CI, the advisor's check of the pushed head. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+  19:1x (main still f5030a3); `Room::cmd_timing()` (public, no consumer) to the advisor's head check. U4f2's stop past
+  3,000 is his SIZE-CHECK rule ("more than twice the plan", history.md:2049), not a new stop. **Edits read in full and
+  applied** (apply_u4f_merge_edits.py, word for word, each old text once: plan.md, u4-build-plan.md, u4s-carries.md).
+  **Next:** read u4f-report.md in full; u4f-build.md's merge section; then M8's one commit, the D10 read on it, the
+  push (M9), CI, the advisor's check of the pushed head. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
 

@@ -538,6 +538,14 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     -21's option-A suites and -20's P3 option A, with every PM-0001-2 check passing, not only resolving, and the shot
     band, before -20's and -21's marks count; a suite that fails comes to the advisor first.
 
+## U4f2 (-21's forged-command suite and -21's runs; after U4f)
+- From U4f's section above, by number (advisor-u4f-stop.md:97; u4f-report.md, "Carries"): 46's lab half (-21's twins,
+  u4f-brief.md 2.12, f16), and 86 for the forged suite's option-A rows (5.3's p1, p7, p14, p17) and -21's 5.3 record
+  from U4f2's merge commit. The rest of 46, 80 and 86 is met by U4f.
+- The advisor's U4f carries for U4f2, word for word at advisor-u4f-r1.md:69-85: C-U4F2-1 (SEC-U4F-1's parser half),
+  C-U4F2-SEC-1, C-U4F2-2 (the built-ahead items), C-U4F2-3 (`CommandRefusal`), C-U4F2-4 (FP8's line reworded); and
+  ADV-U4FP-3, beside C-U4F2-2 (advisor-u4f-pass.md:95-98).
+
 ## U4g (prediction, interpolation and events)
 47. **A-M2, the predicting World's reset (advisor-u4-wave1.md:240-247; the advisor's W1-U4D ruling):** "The predicting
     World's reset: an npt-sim entry that sets one slot's soldier from the decoded own-state records (its SOLDIER record
