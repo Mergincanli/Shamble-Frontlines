@@ -6874,3 +6874,21 @@ Build U4f. My size stop stays: past 6,000 added lines the build stops and I get 
   (notes u4f-build.md :310-690; return in the chat): B1 (the ruling's fixes), B2 (-20's rest; plants f26 x2, f27, D14),
   B3 (the cap), B4 (-47), B5 (-22; 2.5's counts at every session end), B6 (c-u4f-r2.mjs, c-u4f-runs.mjs, their lines by
   hand), B7 (-21's clamp), B8's lag switch; not built (notes :680-690): the fast clock, B9's forged suite, B10.
+
+## Card blocks moved 2026-11-19 after MAIN-60 closed (card_trim_1119c.py; from the card's 'Running work')
+- **MAIN-60 BUILT (23:39-23:43 UTC; advisor-main-60.md's C1-C6 met):** H0 64a0e28 (HEAD = the remote, after C2 (c)'s
+  save); every pre-check as expected; light-base.log refs 1474, marks 81 unchanged, self 78/78, redact 307, all 4 pass;
+  `git merge origin/main` exit 1, STATUS.md its one CONFLICT, 49 status lines (UU 1, A 24, M 24); STATUS.md resolved
+  by Edit (1 line from main's: the #40 row); `git commit --no-edit`: **merge commit 0f12d9ec75f192d1…** (parents H0,
+  b763ba3); kit = main's, spikes/ unchanged, the rest = main's but the six docs, H0..HEAD = main's 49; gate PASS, repo
+  map OK, checkpoint tests 33/33, light.log refs 1498, redact 307, all 4 pass (.gate/main-60/). Pushed 23:43 UTC with
+  the card (bb7a5ed); the saver restarted with both trailers (bpcoh9gqm). CI green on bb7a5ed (gate 44423167627 and
+  44423174642, toolchain 44423167841 and 44423174707: success); PR #40 no longer "dirty". **Step 7: the advisor's
+  head check APPROVE WITH FINDINGS** (advisor-main-60-head.md; agent a955ebc155f2f46bb, 23:54-00:02 UTC): C1-C6 met;
+  the merge's tree, the 81 marks' rows and the counts re-checked; six Lows, none a push; the lane goes on from this
+  head (U4f's snapshot passes `git apply --check` on it). It wrote one scratch file by a shell redirect (outside the
+  repository, unused). The saver's stop (C2 (b)): its output ended "[killed]", the reflog showed 286d9d5, no watch left.
+- **R3 (iii)'s four hand runs DONE** (.gate/u4f/w3-hand.log, 23:44:39-23:45:53 UTC, `-x -k`, builder 3's tree, diff
+  54cb6faa…): p3, p9 (bites, not-older-than), p16 (B) and p20 (idle 2 s) at 4-6 s with 2 s episodes, 48 clients,
+  each exit 0; contract PASS on p3 (129 names) and p20 (130), none without a row; p16's 8 buffer-full, as builder 3
+  wrote.
