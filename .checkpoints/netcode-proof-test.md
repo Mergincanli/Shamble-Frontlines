@@ -168,9 +168,11 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **The advisor's review of U4f-F1's plan** (general-purpose, main's advisor.md, xhigh; from about 22:58 UTC; writes
-  advisor-u4f-f1-plan.md). The -20 ruling returned 22:5x (cut 20:53-22:40, resumed by SendMessage). The saver bdhc8uudx
-  from 22:42 UTC (window to about 00:32). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (an agent runs).
+- **U4f-F1's builder** from 23:15 UTC (general-purpose, opus, xhigh, isolation worktree:
+  .claude/worktrees/agent-ad5f72ed146da5f93, made at origin/main f5030a3; its step 0 fast-forwards to cb7e374 and
+  records it; notes in its copy of u4f-f1-build.md; logs .gate/u4f/f1-*). A first launch at 23:14 was stopped at once
+  (its brief lacked step 0; its worktree, unchanged, was removed). The saver bdhc8uudx from 22:42 UTC (window to about
+  00:32: restart before then). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (an agent runs).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
