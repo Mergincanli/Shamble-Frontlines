@@ -48,7 +48,10 @@ Brave check ("For Mustafa").
 6. **Step 0 of the plan ran before the advisor agent's APPROVE:** the reading of wasm-bindgen's health (two web
    pages, read by a fetch agent between 21:04:49 and 21:07:52 UTC on 2026-11-18) was made as reading and notes only.
    Its result (no written release policy) became the question WB-HEALTH.
-7. **One time in the resume card was typed about half a minute ahead of the clock** (a run that ended at about
+7. **Two fetch agents were started without a stated effort** (they read web pages for step 0 and for the plan's
+   sources; CLAUDE.md wants the effort always stated). Two compiled Python files of the notes' scripts entered the
+   notes through two autosaves (39664c2, e9f31f0); they left with the notes folder and stay in the branch's history.
+8. **One time in the resume card was typed about half a minute ahead of the clock** (a run that ended at about
    08:16:35 UTC written as "to 08:17"); corrected in the next save.
 
 ## Plan and approval
@@ -123,7 +126,10 @@ stop line, moved twice by his word: 4,700.
 **Manifests and lockfiles** (cc9fc71, pushed through the hold): the nine files of the release record below.
 `.gitignore`: `packages/sim-worker/pkg/`, `packages/e2e/playwright-report/`.
 
-**Departures from the plan's symbol lists** (each small; none changes what crosses a boundary): `BlockWriter::new`
+**Departures from the plan's symbol lists** (each small). Five of them change what crosses the Wasm boundary from the
+plan's list, all inside his WB-HEALTH words ("one type, plain numbers on every tick"): `Sim::input` takes the sequence
+number only, `mode` is a `u32`, `rebase` returns the next due time, and two exports are added, `newest_input` (read
+by tests only) and `tick_hz()` (called once). The whole list: `BlockWriter::new`
 returns an `Option` (the padding is capped, because the number comes from outside); `SEED_BYTES` is public; `rebase`
 returns the next due time; `Sim::input` takes the sequence number only, and `newest_input` and `tick_hz()` are added;
 `block_ptr` returns `*const u8`; `mode` is a `u32`; the lookups return `Option`; `isPageToWorker`, `host.ts` (a file
@@ -136,8 +142,8 @@ boundary test is `.mjs`; `BlockPool.give` returns nothing and the pool counts `r
 `serve.mjs` `HOST`, `DEFAULT_PORT`, `addressFor`, `CONTENT_SECURITY_POLICY` and `listen` (the planned
 `createServer({root, port})` became `createServer({root})` plus `listen`); in the build's checks `MAX_SERVED_BYTES`,
 `tooLarge`, `formatSizeTable`, `cspProblems`, `bundleProblems`, `checkOutDir`; in `build.mjs` `buildWasm` and
-`buildPage`. Planned and not built as a symbol: `copyReport` (folded into `Overlay`). The verifier: "What crosses
-the Wasm boundary matches the plan exactly."
+`buildPage`. Planned and not built as a symbol: `copyReport` (folded into `Overlay`). The verifier's notes on the Wasm's
+exports: "= plan section 5 + the draft's listed departures exactly".
 
 ## The new dependencies: the release record and the security answer it names
 His words (2026-11-18, 20:20:09 UTC): "every ready report of a pull request that changes a manifest or a lockfile
@@ -173,6 +179,9 @@ its closing lines, quoted):
 > - End: all nine files still hash to deps-sha256.txt (diff empty); worktree shows only the nine modified files; no target/, no node_modules/, nothing ignored created there.
 > - ANSWER: yes with conditions. Every new entry's lock checksum/integrity equals its registry's (crates: API + sparse index + sha256 of the .crate + WebFetch; npm: registry dist + sha512 of the tarball + registry ECDSA signature over the lock's integrity). None yanked/deprecated; no install scripts; build-time code read (rustversion, wasm-bindgen, wasm-bindgen-shared build scripts; rustversion + wasm-bindgen-macro proc macros) - nothing reaches the network or writes outside OUT_DIR; wasm-bindgen-shared spawns `git rev-parse HEAD`. No advisory for the exact versions (OSV, RustSec, GitHub repo pages, npm bulk feed, npm audit); bumpalo 3.20.4 and vite 8.3.7 are themselves the fixed versions of fresh repo advisories the feeds don't carry yet. Q5 harmless; Q6 list right, low risk; Q7 route lacks his program-hash compare + stop-and-tell (F1 High) and his "comes back to me" rule (F2 High); F3 Medium; F4-F7 Low.
 > - Conditions: (1) commit exactly the nine reviewed files (sha256 as deps-sha256.txt) by plan item 5; (2) npm ci --ignore-scripts, cargo --locked; (3) vite dev/preview never beyond 127.0.0.1, vite >= 8.3.7; (4) F1+F2 into 5a before the tool download, F3+F4 before its first run.
+
+(The release record words the answer as "the dependency change may be committed and built: yes with conditions":
+that is the agent's answer to the main session; its notes say it as quoted above, "ANSWER: yes with conditions".)
 
 How its four conditions were met: (1) the nine files were committed by path, each equal to its reviewed sha256 (cc9fc71);
 (2) every install was `npm ci --ignore-scripts` and every cargo command took `--locked`; (3) Vite's dev and preview
@@ -224,7 +233,7 @@ development page served by `serve.mjs`): 12 passed, three runs in a row. What th
 - the isolation flag under Vite's dev and preview servers: `crossOriginIsolated` true with the flag and false without,
   on the page and in the Worker;
 - the allocation method of PM-0002-7 (a sampling heap profile by function): about 40 to 90 bytes per frame posting
-  the input, about 480 to 520 bytes per block received (the message event's own data and one view), about 16 KB a
+  the input, about 480 to 530 bytes per block received (the message event's own data and one view), about 16 KB a
   second; the mark itself is judged in change-set 5;
 - two facts recorded: Playwright's clock does not reach the Worker (it kept ticking on real time), and opened as a
   file the page does not run in Chromium ("blocked by CORS policy") and the plain line shows.
@@ -276,8 +285,8 @@ two Highs of round 1 are fixed and closed; nothing High in round 2. A third roun
 |---|---|---|
 | engine-architect | Mediums F1 (the app imported the renderer around the interface file), F2 (after a page-side failure the Worker ran on); Lows F3 to F14 | all fixed ones closed; no wrong-way crossing. New: Medium N1 (a Worker that cannot load: silent), Lows N2 to N6 |
 | graphics-engineer | Medium F1 (a lost device or WebGPU error did not reach "errors"); Lows F2 to F7 | F1 to F5 closed, F6 partly. Its reading of three 0.187.0: nothing on the WebGPU path needs what the page's policy refuses. New: Lows N1 to N6 |
-| rust-reviewer | High F3 (his WB-HEALTH words in a comment had lost a ")"); Medium F1 (the build read the Wasm from `target/` whatever the environment said); Lows | F1, F2, F3, F6, F7 closed; "APPROVE on my ground". New: Lows N1 to N4 |
-| security-auditor | Mediums S1 (a broken-off download left its file open), S3 (blocks piled up after a failure), S5 (`--out-dir` could empty any folder); Lows | S1 to S7 closed ("The small server lets no file out of its folder and answers no other site"). New: Lows N1 to N3 |
+| rust-reviewer | High F3 (his WB-HEALTH words in a comment had lost a ")"); Medium F1 (the build read the Wasm from `target/` whatever the environment said); Lows | F1, F2, F3, F6, F7 closed; it approves on its ground. New: Lows N1 to N4 |
+| security-auditor | Mediums S1 (a broken-off download left its file open), S3 (blocks piled up after a failure), S5 (`--out-dir` could empty any folder); Lows | S1 to S7 closed. New: Lows N1 to N3 |
 | perf-auditor | Mediums P1 (fractional timer sleeps made about half the ticks start about 4 ms late), A1 (the allocation test went blind once the code was optimised); Lows L1 to L5 | P1, A1, L1, L5 closed. New: Medium N1 (the allocation test's per-block window straddled the point where the browser optimises the listener), Lows N2, N3 |
 | test-engineer | Highs F1 (the memory-growth proof did not cover the host), F2 (the hidden-tab test was flaky and judged the wrong count); Mediums F3 to F7 | F1 to F7 closed. New: Medium NT1 (the failure routes had no test), Lows NT2 to NT8 |
 | netcode-architect | nothing above Low; seven Lows for change-set 3's plan | (its ground did not change beyond the timer's rounding, read by perf-auditor and test-engineer) |
@@ -315,9 +324,34 @@ reviews the head this report is part of).
   stop line to 4,400); 00:23:22 UTC (no permission needed until 7 am); 11:07:48 UTC ("A": the stop
   line to 4,700; pull request #61 is not watched). His message of 20:44:29 UTC,
   "the zip saved and unpacked", closes the open point of #58 (STATUS).
-- **How "no permission until 7 am" was read:** no stop-and-ask until 06:00 UTC for the work of this change-set. Not
+- **How "You don't need to ask permission anymore until 7 am" was read:** no stop-and-ask until 06:00 UTC for the work of this change-set. Not
   read as a go for a merge, for an edit to a kit, gate or CI file, or for any other file, version or checksum of code
   from the internet. In that window nothing of the kind was done; the window passed in the stall of point 1.
+- **The two questions he answered with one letter, as the chat put them** (the advisor agent's M1; `docs/DECISIONS.md`
+  points here). The first stood alone when he wrote "A". The second message held two questions, each with (a)
+  recommended; his "A" was read as (a) on SIZE-STOP-2, and on WATCH-61 the same letter means no, which is also what
+  happens when nothing is done: #61 is not watched.
+
+_The chat's message of 2026-11-19T00:17:47.071Z (uuid 21a2eb1c-b43a-429c-b95c-494835b1ce0c), from its heading "Decisions needed" to its heading "For Mustafa", copied by script:_
+
+> ## Decisions needed
+> **SIZE-STOP: the change-set is at 3,964 of 4,000 lines with four small browser test files still unwritten. Which way?**
+> - Why it matters: your rule stops a change-set at its stop line, and each of the four files would pass it.
+> - Options:
+>   - (a) The stop line moves to 4,400 and I write the four files as planned (about 200 lines). Review fixes also need a little room.
+>   - (b) The four files move to change-set 3. Change-set 2 ends at about 3,970 lines plus docs. This leaves the build plan's placement of two marks (the isolation flag, PM-0002-20, and the allocation method, PM-0002-7) at change-set 2, so it is one more departure for you to accept. Review fixes that add lines would still need a small allowance.
+> - Recommendation: (a). The overrun is tests, nothing is outside the plan's scope, and moving them only shifts the same lines into change-set 3.
+
+_The chat's message of 2026-11-19T11:07:44.577Z (uuid 51730207-9558-44cc-84eb-206f0ddc250f), from its heading "Decisions needed" to its heading "For Mustafa", copied by script:_
+
+> ## Decisions needed
+> - **SIZE-STOP-2: may the stop line move from 4,400 to 4,700 added lines?** The change-set stands at 4,430; round 2's fix pass, already proven in a scratch copy, would bring it to 4,471.
+>   - (a) Yes, the fix pass goes in as proven. **Recommended.**
+>   - (b) No: about 70 lines of round-1 test additions and the two new Worker-failure tests move to change-set 3, and the fixes go in with less proof.
+> - **WATCH-61: should this chat watch pull request #61 for GitHub activity?**
+>   - (a) No, as with #58 and #60. **Recommended.**
+>   - (b) Yes.
+
 - **The six departures from the build plan's text** (his DEPART-2 (a)): the hand-off read as a curve over block sizes
   instead of at "12 and 48 soldiers" (no source gives a soldier's row size before change-set 4; that reading is made
   in change-sets 4 and 5); the server prints `http://127.0.0.1:4173`, not `localhost`; the unit vectors in Wasm start
@@ -514,7 +548,7 @@ None. The next questions come with their own texts: the CI-WASM pull request's e
 answer CI-WASM (a)), and the random-number library with change-set 3's plan (his answer RNG-CRATE (c)).
 
 ## For Mustafa
-1. **The Brave check** (about 18 minutes, 9 of them waiting). The zip `shamble-v2-02-first-page.zip` was sent in the
+1. **The Brave check** (about 18 minutes, 10 of them waiting; the zip's README says 9). The zip `shamble-v2-02-first-page.zip` was sent in the
    chat (245,260 bytes, sha256 b458b7ca734ac0fa20027818f41da7b9946fd0134f0bcc61ba1427df3c93e8ab; built from commit
    7d8e2de2e, whose code is this pull request's final code; its README has the same steps). You need Node 18 or
    newer (`node --version` in PowerShell).
