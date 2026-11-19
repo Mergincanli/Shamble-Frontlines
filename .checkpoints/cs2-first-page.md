@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 00:27 UTC (from the clock)
+- **Last update:** 2026-11-19 07:14 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -339,16 +339,48 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     own slow frame, not the block's size; tick start lateness 3.7 to 3.8 ms at p50, 6.7 to 9.2 ms at p99; at most
     1 tick per wake; 0 drops; 4 to 11 pool misses (the page returns buffers once per slow frame).
 
+37. **The planted defects: every one caught, and the clean tree passes** (00:30:15 to 00:34:54 UTC by the run's own
+    lines; `cs2-first-page/plants.py`, results in `cs2-first-page/planted-defects.md`; the throwaway worktree
+    `.gate/cs2-plants` at 30a5a13 with its own packages and build folder, still there for the reviewers). Twelve
+    plants (1, 2, 3, 4, 4.5, 5, 6, 7, 8, 8.5, 9, 10 of the plan's list), each failing its named check.
+38. **The production check found the development code inside the production bundle** (00:31 UTC): the readout's and
+    report's chunks and the test hook were built in, though the page did not show them, because the build's switch
+    was read as `import.meta.env["..."]`, which Vite does not fold. **Fix, not yet committed** (`boot.ts`,
+    `vite.config.mjs`): the two constants are written into the code by Vite's `define`
+    (`__SHAMBLE_DEVTOOLS__`, `__SHAMBLE_COMMIT__`). After it: the production build has 5 files, no marker, no
+    `serve.mjs`; the development build has each marker; the production page runs in Chromium with one Worker and no
+    error (`cs2-first-page/production-check.mjs`, `production-check.txt`: PASS).
+39. **Readings:** the page's type check with TypeScript 6.0.3 and `--ignoreConfig` (warm, 3 runs each, while three
+    agents ran): 5.42, 5.16, 4.46 s with the lib check on; 1.31, 1.29, 1.36 s with `--skipLibCheck`. Two casts
+    against `@types/three`, both in `three-picture.ts`.
+40. **The first three reviewers finished** (their notes: `cs2-first-page/engine-architect-review1.md` 00:43 UTC,
+    `graphics-engineer-review1.md` 00:51, `rust-reviewer-review1.md` 00:53; each "findings to fix before the
+    merge"). engine-architect: F1 Medium (`boot.ts` imports `render/three-picture.ts` around the interface file:
+    one named entry `render/index.ts`), F2 Medium (after a page-side failure the Worker runs on and the page counts
+    one error per block: note once and stop the Worker), Lows F3 to F14. graphics-engineer: F1 Medium (a lost
+    device or an uncaptured WebGPU error does not reach "errors": route three's error console into the page's
+    hook before `init`), Lows F2 to F7 (add `programs` to the counts; read the fallback's renderer string; say
+    forced or fallen back; a failure line when no backend starts). rust-reviewer: F3 High by the scale (his
+    WB-HEALTH words in `sim-wasm/src/lib.rs` lost a ")": quote them exactly), F1 Medium (`build.mjs` reads the
+    Wasm from `target/` whatever `CARGO_TARGET_DIR` says: pass `--target-dir`), Lows F2 (`mode: u8` cuts 256 to
+    0: take `u32`), F4 to F7, three test additions. It also showed equal results natively and in wasm32 for the
+    world's hashes and the schedule's due times.
+41. **The night was lost to an unanswered approval prompt.** At about 00:33 UTC a command of the main session (one
+    try of WebGPU on a software adapter: the test browser started with `--enable-unsafe-webgpu` and SwiftShader
+    flags; an optional reading of the plan) asked for an approval. He had gone to sleep ten minutes before, having
+    written that no permission was needed until 7 am; a prompt of the harness is not something his words can
+    answer. The session sat until the worker restarted (seen at 07:13 UTC). Nothing was lost: HEAD equalled the
+    pushed branch (the saver's autosaves 45537a3, d019d82, 41d4dd9 hold the reviewers' notes), the two uncommitted
+    files were intact. **The try was not made and is not made again without him at the keyboard.** Lesson: no
+    command with unusual browser or system flags in an unattended stretch; such readings go last, or to him.
+
 ## Current step
-37. **Step 8.** The first three reviewers read the code (engine-architect, graphics-engineer, rust-reviewer; Opus 5.5
-    at effort max; one round is all seven). Beside them the main session: the planted defects (a throwaway
-    worktree `.gate/cs2-plants` with its own build folder), the production check, the remaining readings (tsc times
-    with the lib check on and off; a try of WebGPU on the software adapter). Then the next three reviewers
-    (perf-auditor, security-auditor, test-engineer), then netcode-architect; one fix pass; the verifier; the docs
-    pass (docs-keeper; the records of plan section 21, his messages of 20:20:09, 22:34:37, 00:18:21 and 00:23:22
-    UTC by script); the zip; the advisor agent on the final head; the report; the pull request (draft, then ready,
-    with the checkpoint folded into the report and deleted in the last commit); then stop for his go and his Brave
-    check.
+42. **Review round 1, second half, and the fix pass.** Next three reviewers on the same head, reading and running
+    in the worktree `.gate/cs2-plants` (30a5a13, built): perf-auditor, security-auditor, test-engineer; then
+    netcode-architect. Meanwhile the main session fixes the first three reviewers' findings in the main folder
+    (and commits the production fix). Then the remaining findings, the gate, round 2 on what changed, the verifier,
+    the docs pass, the zip, the advisor agent on the final head, the report, the pull request; stop for his go and
+    his Brave check.
 
 ## Next steps
 1. See "Current step". No reviewer runs the browser project or `build.mjs` in the main folder while the main session
@@ -393,5 +425,5 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
   `test-engineer-plant-target`; the classifier refused their removal).
 
 ## Running work
-- saver: running since 2026-11-18T23:54:21.132Z (its own first line; task b9lxaa5m5; 10-minute interval, stops after 110 minutes).
-- agents: none.
+- saver: running since 2026-11-19T07:13:40.814Z (its own first line; task b9vzms3oh; 10-minute interval, stops after 110 minutes).
+- agents: see "Current step".
