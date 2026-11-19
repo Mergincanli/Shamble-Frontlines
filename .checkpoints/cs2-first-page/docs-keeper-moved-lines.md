@@ -110,7 +110,9 @@ New:
   Medium findings as follow-ups.", copied from his message's notes file and checked with grep -F; rewrapped). New:
   the dated pointer in change-set 0's block (SPLIT-25's pointer, 2cedb9c); the pointer in #58's block (section 2,
   plus: change-set 2 touches none of the three files with the two doc lines; the five change-set 2 lines its code has);
-  the block "From change-set 2, the first page (PR #61)".
+  the block "From change-set 2, the first page (PR #61)". In "Health": the row "CI on main, latest" (#60's docs pass)
+  now names b763ba3's runs (gate run 900 with smoke, toolchain run 198); new: a row pointing at the report for change-set
+  2's readings.
 - `docs/ROADMAP.md`: #60's entry (title in flight -> MERGED; its last sentence "Next: ..." -> the merge line). New:
   change-set 2's entry, first under "Recent work" (12 entries after the fold).
 - `docs/REPO_MAP.md`: the row of `crates/client-endpoint/src/layout.rs` (500757c, #58's docs pass; extended with
