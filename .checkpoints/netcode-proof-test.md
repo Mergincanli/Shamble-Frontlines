@@ -179,8 +179,15 @@
 - **Builder 4 DONE 18:08 UTC:** FP1-FP19 each met its check, no departure; end checks A2 and B all 11 steps (634 / 731,
   +82 / +99; negatives 46 of 45; test step 882.8 and 834.0 s); items 4 and 5 done; 6,425 added (the pass +212); notes
   at u4f-build.md:867-1170; final snapshot wip/u4f-build.patch **286aac60…** (base b25b96a, 29 files; hashes 2f07abc2…
-  / 1a767d5b…). **The advisor's check of the pass RUNNING** (agent a3e21b47cc9e7c11e; advisor-u4f-pass.md), then the
-  merge on M1-M9. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+  / 1a767d5b…; 394,400 B, ADV-U4FP-1). **The advisor's check of the pass: APPROVE WITH CONDITIONS C1-C3**
+  (advisor-u4f-pass.md; all 19 items as named, no round 2, nothing to him; Lows ADV-U4FP-1 to -4). **U4f's merge, in
+  order (advisor-u4f-r1.md:325-358 with C1-C3):** P27's part-clean first (free 4,362 < 4,600: C1); M3/M4 `git apply
+  --check` then `git apply` of wip/u4f-build.patch in the main folder, the 29 files cmp-equal to builder 4's worktree
+  (kept until then), the runner hashes 2f07abc2…/1a767d5b…; M5 one counted run (the end checks' seven commands) via
+  main-run.sh in the background, timeout 7200000 (C2); M6 a failing test stops, to the advisor; M7 the gate
+  --no-smoke; the D10 read; M8 one commit (the files, `git rm` of the wip patch, plan §4.7's cap text, the U4f and U4f2
+  entries, §4.1's rows, the carries into plan.md's rows, u4f-build.md's merge section, u4f-report.md with M8's list,
+  FP20 and C3's lines); M9 the push, the saver, CI, the card; then 5.3's 21 pre-runs, the part-clean, the sets. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
 
