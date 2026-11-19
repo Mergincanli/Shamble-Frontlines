@@ -207,7 +207,7 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   GTX 980, about 180 frames a second drawn in both browsers; WebGPU starts in both; errors 0 in all eight reports.
 - The tool's file and program: sizes and sha256 in step 3 above.
 
-- CI on c934fc0 (today's workflow, no CI file changed; read 20:09 UTC): `gate` and `smoke` success for the push (run
+- CI on c934fc0 (today's workflow, no CI file changed; read 20:08 UTC): `gate` and `smoke` success for the push (run
   44603988667) and the pull request (44604056505); `toolchain` success for the push (44603989027) and the pull
   request (44604056424).
 - The CI text as put to him at 20:03 UTC: 93 added lines, `ci-edit.diff` sha256
