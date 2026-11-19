@@ -38,7 +38,7 @@ Brave check ("For Mustafa").
    built page: errors 2, nothing shown). Fixed in round 2's fix pass, with two browser tests that fail without it.
 4. **The size ran over its plan twice.** Planned about 2,900 added lines with a stop line at 4,000. At 3,964 the
    session stopped and told him (SIZE-STOP; his answer "A": the line moved to 4,400). At 4,430, after round 1's
-   fixes, it stopped again (SIZE-STOP-2) ⟦his answer⟧. What grew: tests and checks the reviewers asked for (the
+   fixes, it stopped again (SIZE-STOP-2; his answer "A": the line moved to 4,700; round 2's fix pass then made it 4,471). What grew: tests and checks the reviewers asked for (the
    small server's tests 230 lines, the build's checks and their tests 366, the Worker's tests 636), not features.
 5. **Two planted defects were first caught by a timeout, not by their check** (test-engineer, round 1). The planted
    defects were rewritten so that a plant only counts when the output shows the line that names it, and rerun twice.
@@ -73,9 +73,10 @@ Brave check ("For Mustafa").
   fine."
 
 ## What changed
-⟦FINAL-SIZE⟧ added lines in `crates/`, `packages/`, `.gitignore` and the two root manifests (the lockfiles and the
-five-line fixture `render-counts.json` not counted), by `git diff --numstat origin/main...HEAD`: client ⟦n⟧,
-sim-worker ⟦n⟧, client-endpoint ⟦n⟧, e2e ⟦n⟧, sim-wasm ⟦n⟧, sim ⟦n⟧, root 27, types 3.
+**4,471 added lines** in `crates/`, `packages/`, `.gitignore` and the two root manifests (the lockfiles and the
+five-line fixture `render-counts.json` not counted), by `git diff --numstat origin/main...HEAD`: client 2,059,
+sim-worker 1,223, e2e 342, client-endpoint 335, sim-wasm 263, sim 219, root 27, types 3. Planned: about 2,900; the
+stop line, moved twice by his word: 4,700.
 
 **Rust** (commits 3833e3e, 6e76f30, 015a212, 29378dd)
 - `crates/sim`: `world.rs` (the world: a `u32` tick and the 32-byte match seed; `authority_step` with `checked_add`;
@@ -105,7 +106,7 @@ sim-worker ⟦n⟧, client-endpoint ⟦n⟧, e2e ⟦n⟧, sim-wasm ⟦n⟧, sim 
   builds only), `src/harness/` (frame times, the run's header), `src/styles.css`, `vite.config.mjs`.
 - `serve.mjs` (the small server: 127.0.0.1 only; GET and HEAD only; only files of its own folder, of five types; a
   request whose Host header is not its own address gets 421; a strict content security policy on every answer) and
-  its 16 tests. ⟦count⟧
+  its 16 tests.
 - `scripts/build.mjs`, `build-checks.mjs`, `wasm-bindgen-tool.mjs` (the build: the tool's file is compared with its
   recorded size and sha256 before every run; the tool's version must equal the lockfile's; build settings from the
   environment are refused; the served files are scanned for what the policy would refuse; a production bundle may
@@ -133,12 +134,35 @@ His words (2026-11-18, 20:20:09 UTC): "every ready report of a pull request that
 quotes each release record and the security answer it names." One record: `cs2-first-page/dependency-check.md`, quoted
 whole between the lines:
 
-⟦RELEASE-RECORD⟧
+> # The release record of change-set 2's dependency change (.claude/CHECKPOINTS.md, section 3)
+>
+> Written by the main session on 2026-11-18 23:05:50 UTC (from the clock), after security-auditor's answer and before the manifests were
+> committed. The answer: `.checkpoints/cs2-first-page/security-auditor-deps.md` (security-auditor, Opus 5.5 at effort
+> max, 2026-11-18; the nine files hashed to these values when it started, 22:39 UTC, and when it ended, 23:04 UTC, by
+> its own lines): "the dependency change may be committed and built: yes with conditions"; none of its four conditions
+> changes these nine files. What it read: `deps-manifests.diff`, `deps-lockfiles.diff` and `deps-lock-compare.txt`
+> beside this file. Mustafa's answers that this content rests on (RNG-CRATE (c): no random-number crate; WB-HEALTH (a):
+> wasm-bindgen pinned to exactly 0.2.130): `mustafa-2026-11-18-2326-five-answers.md`.
+>
+> One line per file, as `sha256sum` prints it from the repository's root:
+>
+> bb922d81c97080164f9050238c1f8fa91ccd4a6e9015505feb869d78f370cf27  Cargo.toml
+> 75739f3b45f70bbc9f7d9c28fef61a6d68a17d3ff342aed472179a927d4e7705  Cargo.lock
+> 9966d554ff23ccc742caeb19574028a08a7046f7e72f0ce4b9dde59e6dad3058  crates/sim-wasm/Cargo.toml
+> 90fd46b681fec81c7e4615b2d4074739f547bc562d4bbf7a30b6be9b2ef7f9ad  package.json
+> 212bf01fbee136cc9d69f23747d0b13a3fe3d2adec7b53c59cab08b6ef67eae5  package-lock.json
+> e4433f6b9fb3997145064cf519326fd1ae7d23ce720e3835c382d82fad83dfcd  packages/client/package.json
+> 5baa670b42f7f116828db481c9ab0b003f96cdc4c10e02f84656a42333bf7ff5  packages/e2e/package.json
+> 72884f0ffdabde0cea61976ddd65b5a45dacb214ba5ead09dce4b01d887d5a6e  packages/sim-worker/package.json
+> 80994f0db606a4fb096832c20c5cea6df886e6feee09f7a76c73389b9bc2a0d6  packages/types/package.json
 
 **The security answer it names** (`cs2-first-page/security-auditor-deps.md`, security-auditor, Opus 5.5 at effort max;
 its closing lines, quoted):
 
-⟦SECURITY-ANSWER⟧
+> ## 23:04:33 UTC END hash check + answer summary
+> - End: all nine files still hash to deps-sha256.txt (diff empty); worktree shows only the nine modified files; no target/, no node_modules/, nothing ignored created there.
+> - ANSWER: yes with conditions. Every new entry's lock checksum/integrity equals its registry's (crates: API + sparse index + sha256 of the .crate + WebFetch; npm: registry dist + sha512 of the tarball + registry ECDSA signature over the lock's integrity). None yanked/deprecated; no install scripts; build-time code read (rustversion, wasm-bindgen, wasm-bindgen-shared build scripts; rustversion + wasm-bindgen-macro proc macros) - nothing reaches the network or writes outside OUT_DIR; wasm-bindgen-shared spawns `git rev-parse HEAD`. No advisory for the exact versions (OSV, RustSec, GitHub repo pages, npm bulk feed, npm audit); bumpalo 3.20.4 and vite 8.3.7 are themselves the fixed versions of fresh repo advisories the feeds don't carry yet. Q5 harmless; Q6 list right, low risk; Q7 route lacks his program-hash compare + stop-and-tell (F1 High) and his "comes back to me" rule (F2 High); F3 Medium; F4-F7 Low.
+> - Conditions: (1) commit exactly the nine reviewed files (sha256 as deps-sha256.txt) by plan item 5; (2) npm ci --ignore-scripts, cargo --locked; (3) vite dev/preview never beyond 127.0.0.1, vite >= 8.3.7; (4) F1+F2 into 5a before the tool download, F3+F4 before its first run.
 
 How its four conditions were met: (1) the nine files were committed by path, each equal to its reviewed sha256 (cc9fc71);
 (2) every install was `npm ci --ignore-scripts` and every cargo command took `--locked`; (3) Vite's dev and preview
@@ -161,19 +185,19 @@ check (`gh release verify-asset`) could not be run here either; by his CI-WASM a
 first run there. No other file, version or checksum of outside code was taken.
 
 ## Evidence
-⟦All on the final head FINAL-SHA unless a line says otherwise.⟧
+All on the final code, commit e4f4bf4, unless a line says otherwise.
 
-**Checks, all exit 0** ⟦time⟧: `cargo fmt --all --check`; clippy `--workspace --all-targets --locked -- -D warnings`
+**Checks, all exit 0** (2026-11-19, 11:08 to 11:12 UTC): `cargo fmt --all --check`; clippy `--workspace --all-targets --locked -- -D warnings`
 natively and for `wasm32-unknown-unknown`; `cargo test --workspace --locked` (client-endpoint 15, sim 9, sim-wasm 6,
-⟦others⟧); the release tests of sim and protocol; the wasm32 build of the five crates; the generated types written
+protocol 2, room 1, devtools 1); the release tests of sim and protocol; the wasm32 build of the five crates; the generated types written
 again with no change; tsc with CI's strict flags on the page's and the Worker's shipped files with the lib check on
 (0 errors against @types/three 0.187.0; two casts, both in `three-picture.ts`); the unit tests as CI's `npm test` runs
-them (types 7, net 1, sim-worker 30, client ⟦48⟧, e2e's node project 1); the boundary tests on the built Wasm (7);
+them (types 7, net 1, sim-worker 30, client 48, e2e's node project 1); the boundary tests on the built Wasm (7);
 the development and the production build; `node tools/gate.mjs --no-smoke` (GATE PASS; the smoke check cannot start
 in this container and runs in CI); `node .claude/scripts/repo-map-check.mjs`. CI on the pushed head: ⟦runs⟧.
 
 **The browser tests** (the container's Chromium 153, headless, software rendering; `--project=chromium` on the built
-development page served by `serve.mjs`): ⟦12⟧ passed, ⟦n⟧ runs in a row. What they hold:
+development page served by `serve.mjs`): 12 passed, three runs in a row. What they hold:
 - the page on the default backend and with `?backend=webgl`: the backend is named on the page and in the readout; one
   block per tick, each transferred (none left attached); about one wake per tick; the input posted once per drawn
   frame; errors 0; **zero calls into WebAssembly by the page** (every entry point on the page replaced by one that
@@ -195,8 +219,9 @@ development build has each marker (the control); the production page runs with o
 the build makes this check itself.
 
 **The planted defects** (`cs2-first-page/plants.py`; a throwaway worktree with its own build folder; a plant counts
-only when the output shows the line that names it): ⟦22⟧ plants, each "FAILED as it must, at the line that names the
-defect", and the clean tree passes the same checks (⟦run, times, file⟧). They are: the page calling into WebAssembly;
+only when the output shows the line that names it): 22 plants, each "FAILED as it must, at the line that names the
+defect", and the clean tree passes the same checks (`planted-defects-3.md`, 11:00:59 to 11:08:17 UTC, on a tree equal to
+e4f4bf4 file for file). They are: the page calling into WebAssembly;
 a block posted without its transfer list; a copy, and a host, that keeps a view of the Wasm's memory across a growth
 (two plants); a header field added in Rust without regenerating (the export test, and the page refusing the block: two
 plants); the tool's recorded version one patch off; the tool's recorded sha256 one digit off (the file is not run); a
@@ -212,7 +237,7 @@ return is caught by the drop count).
 
 **Readings in this container, reported and not judged** (software rendering, 3 to 8 frames a second; a laptop will
 differ):
-- The Wasm file: 28,987 bytes (11,655 gzip -9, 9,955 Brotli 11); its glue ⟦n⟧. The page's script: about 825 KB (222 KB
+- The Wasm file: 28,987 bytes (11,655 gzip -9, 9,955 Brotli 11); its glue 9,177 bytes. The page's script: about 825 KB (222 KB
   gzip, 180 KB Brotli), nearly all three.js's WebGPU build.
 - The six overflow overrides cost 278 bytes of Wasm (about 1 %) and nothing measurable per tick (median 14.71 ns
   against 14.04 ns for `input` and `step` in Node, 7 runs of 2,000,000 ticks, the ranges overlapping).
@@ -242,7 +267,7 @@ two Highs of round 1 are fixed and closed; nothing High in round 2. A third roun
 | test-engineer | Highs F1 (the memory-growth proof did not cover the host), F2 (the hidden-tab test was flaky and judged the wrong count); Mediums F3 to F7 | F1 to F7 closed. New: Medium NT1 (the failure routes had no test), Lows NT2 to NT8 |
 | netcode-architect | nothing above Low; seven Lows for change-set 3's plan | (its ground did not change beyond the timer's rounding, read by perf-auditor and test-engineer) |
 
-**Round 2's three Mediums, all fixed in ⟦FIX-SHA⟧:** the allocation test now samples before the listener is optimised
+**Round 2's three Mediums, all fixed in e4f4bf4:** the allocation test now samples before the listener is optimised
 (blocks 90 to about 360; per block a floor of 430 and a limit of 610; clean 478 to 518 over fourteen runs, the plant
 684 to 711); the Worker's error event is cancelled and its missing message replaced, with two browser tests that fail
 without the fix; a refusal by the content security policy is now counted as an error, so the readout and every
@@ -254,7 +279,8 @@ The advisor agent on the final head: ⟦verdict⟧. The verifier: ⟦verdict⟧.
 ## Decisions and deviations
 - **His decisions in this change-set** (whole, by script, in `docs/DECISIONS.md`): 2026-11-18, 20:20:09 UTC (his go on
   #60; WRITE-MODE; REC-OLD; the order of work); 22:34:37 UTC (the five answers); 2026-11-19, 00:18:21 UTC ("A": the
-  stop line to 4,400); 00:23:22 UTC (no permission needed until 7 am) ⟦; SIZE-STOP-2⟧. His message of 20:44:29 UTC,
+  stop line to 4,400); 00:23:22 UTC (no permission needed until 7 am); 11:07:48 UTC ("A": the stop
+  line to 4,700; pull request #61 is not watched). His message of 20:44:29 UTC,
   "the zip saved and unpacked", closes the open point of #58 (STATUS).
 - **How "no permission until 7 am" was read:** no stop-and-ask until 06:00 UTC for the work of this change-set. Not
   read as a go for a merge, for an edit to a kit, gate or CI file, or for any other file, version or checksum of code
@@ -266,13 +292,13 @@ The advisor agent on the final head: ⟦verdict⟧. The verifier: ⟦verdict⟧.
   (the reading of wasm-bindgen's health; how its tool reaches the container); under RNG-CRATE (c) the seeded random
   streams move to change-set 3 and this change-set carries the seed only.
 - **No kit, gate or CI file was edited.** `git diff --stat origin/main...HEAD -- .claude .github tools CLAUDE.md` is
-  empty ⟦check⟧.
+  empty; no root `.cargo/config.toml`; no `"type"` in the root `package.json`.
 - **Refusals, with the route taken:** a hook refused `gh api -X GET repos/.../actions/runs` (route: the GitHub tool
   for workflow runs); a hook refused `git restore` in a scratch worktree (route: the saved diffs applied in reverse
   with `git apply -R`, then `git worktree remove` without force).
 - **Round 2's fixes were prepared in a scratch worktree** while SIZE-STOP-2 was open (no code changed in the
   change-set until his answer), then applied as one diff (`round2-fixes.diff`).
-- **The session's model** was read at 20:5x, 22:35 UTC on 2026-11-18 and ⟦time⟧: claude-fable-5-2, configured and last
+- **The session's model** was read at 20:54 and 22:35 UTC on 2026-11-18 and at 11:08 UTC on 2026-11-19: claude-fable-5-2, configured and last
   served. The advisor tool stayed off.
 
 ## Not verified
