@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 07:14 UTC (from the clock)
+- **Last update:** 2026-11-19 07:23 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -374,8 +374,28 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     files were intact. **The try was not made and is not made again without him at the keyboard.** Lesson: no
     command with unusual browser or system flags in an unattended stretch; such readings go last, or to him.
 
+42. **The production fix and the first half of round 1's fix pass: commit 29378dd** (2026-11-19 07:23 UTC); 19 files. Fixed:
+    rust-reviewer F3 (his words exact), F1 (`--target-dir`), F2 (`mode: u32`), F6 (cargo settings from the
+    environment refused), F7 (lookups return `Option`), its three test additions; engine-architect F1
+    (`render/index.ts`, `CreatePicture`), F2 (a failure counted once, the Worker terminated, said on the page), F3,
+    F4 (the view time leaves the input message), F5 (tick offset from the generated layout; the cap asserted
+    against `tick_hz`), F7, F11, F14; graphics-engineer F1 (`THREE.setConsoleFunction` sends three's errors to
+    the page's error event), F2 (`programs`, 6 on the fallback), F3 (the fallback's adapter name), F4 (the readout
+    says why a fallback runs), F5, F6. **Left as follow-ups (Low):** rust-reviewer F4 (the DECISIONS pointer lands
+    with the docs pass), F5 (the builder's registry path inside the Wasm: for the CI pull request and change-set
+    3's size table); engine-architect F6 (record: the block has a fixed size for a Sim's life; ADR 0002 part 5
+    pointer), F8 (`isWorkerToPage`), F9 (the endpoint's state belongs in `client-endpoint` from change-set 3), F10
+    (`newest_input` goes at change-set 3; three unused exports), F12 (decide and record: the Worker's counters ship
+    in production as monitoring candidates), F13 (nits); graphics-engineer F7 (MSAA memory, for change-set 6), its
+    text on the software renderer and lines for the report. Checks all exit 0: fmt; both clippy runs; workspace
+    tests (client-endpoint 15, sim 9, sim-wasm 6); tsc on both packages; unit tests (sim-worker 30, client 44);
+    boundary 7; browser tests 10 passed, twice; the production check PASS. The Wasm is 28,987 bytes now (11,655
+    gzip -9, 9,955 Brotli 11). The readout names the adapter: here "ANGLE (Google, Vulkan 1.3.0 (SwiftShader
+    Device (Subzero) ...), SwiftShader driver)", so software rendering is confirmed. **Size: 4,257 added lines**
+    (stop line 4,400: 143 lines of room for the other four reviewers' findings).
+
 ## Current step
-42. **Review round 1, second half, and the fix pass.** Next three reviewers on the same head, reading and running
+43. **Review round 1, second half.** Next three reviewers on the same head, reading and running
     in the worktree `.gate/cs2-plants` (30a5a13, built): perf-auditor, security-auditor, test-engineer; then
     netcode-architect. Meanwhile the main session fixes the first three reviewers' findings in the main folder
     (and commits the production fix). Then the remaining findings, the gate, round 2 on what changed, the verifier,
