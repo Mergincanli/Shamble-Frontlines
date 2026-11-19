@@ -722,3 +722,29 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - **Sitting 3's runs against its list** (29 runs at about 00:23 UTC): run #17 (cs/b9-edit, three attempts: the
   control, the reviewer bite, SA-R4's rejected one), run #18 (cs/b9-prod, three attempts: refused, the branch-rule
   bite, refused), the by-hand probe #3 and the scheduled probe #4; nothing else.
+- **Direct records (logged-out public pages, 2026-11-19 00:26-00:27 UTC, pictures in
+  `.gate/preview-hosting-check/day1/sitting3/`):** run #17 attempt 1: "Deployment protection rules" / "Mergincanli" /
+  "approved" / "preview"; attempt 2: no "Deployment protection rules" section at all (no approval event: nobody
+  clicked); attempt 3: "Mergincanli" / "rejected" / "preview", annotation "The deployment was rejected or didn't
+  satisfy other protection rules." **The environments' deployment history for the token tests**, as the pull request
+  pages show it (the repository's deployments pages answer 404 when logged out): #9 (cs/b9-edit): "Mergincanli
+  deployed to preview — with GitHub Actions Active" (twice), then "Mergincanli had a problem deploying to preview —
+  with GitHub Actions Failure"; #10 (cs/b9-prod): "Mergincanli had a problem deploying to production — with GitHub
+  Actions Failure", "Mergincanli deployed to production — with GitHub Actions Active", "Mergincanli had a problem
+  deploying to production — with GitHub Actions Failure" (attempts 1, 2, 3 in that order).
+- **PM-0006-32 clause by clause** (ADR 0006 :1379; plan.md:103 and :130):
+  - "a test pull request ... whose deploy job is edited to print a marker gets no secret until the `preview`
+    environment's required reviewer approves it (the job prints only whether the secret is set, never its value)":
+    met (#17 attempt 1 waited 19:12:20 to 23:15, approved, "secret: present"; nothing printed but presence).
+  - "a job in a pull request that names the `production` environment is refused by its `main`-only deployment-branch
+    rule": met (#18 attempt 1, and again attempt 3 after the restore).
+  - "2 of 2": both met. Control (after approval, "secret set"): met. Bite (reviewer removed, "secret set"): met
+    (attempt 2, no approval event). The plan's added PM-0002-66 bite (the rule removed, "present"): met (#18 attempt 2).
+  - Reported, not a pass condition: a production deploy with the `preview` environment's token is NOT refused: round-a's
+    production leg (deploy job in `preview`) made production deployment 0354374e (environment "production") on
+    2026-11-18 17:02:25 UTC, as part 13 expected; for OQ-0006-13.
+  - Recorded: how the rule treats a pull request's merge ref: it judges the ref "refs/pull/10/merge" and refuses it
+    ("Branch "refs/pull/10/merge" is not allowed to deploy to production ...").
+  - Evidence asked: each run's log (in this file) and the environments' deployment history (the pull request pages
+    above). Still open for Day 2: "Mustafa's revocation of the test token when the check ends" (the revoke and the
+    `revoked` run).

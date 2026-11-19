@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 01:24 Amsterdam (00:24 UTC)
+- **Last update:** 2026-11-19 01:30 Amsterdam (00:30 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -613,7 +613,6 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Closed 2026-11-18 after consultation 20: sitting 2 done (results log); the results-log line on the ten runs reworded
      to what was read (conclusions, and the cleanups' deleted ids matched to the probe's records with jq).
 
-## Current step
 25. Sitting 3, the token tests (PM-0006-32), in consultation 20's order (the reviewer starts off under REVIEWER (b)):
    1. push cs/b9-edit (7f3a684) and open its pull request with the reviewer off: its deploy job must run without
       asking and print "secret: present" (the plan's step 2, the reviewer bite);
@@ -682,17 +681,28 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Attempt 3 refused (00:22:06 UTC; the same two annotations). Sitting 3's measurements all done (results log,
      "Sitting 3 in short"); runs tallied (29; nothing off the list). The schedule fired once: probe #4 at 22:37:26 UTC
      (the 22:23 slot), all as expected. Step 25 saved as done only after a consultation.
+   - Closed 2026-11-19 after consultation 21: PM-0006-32 matched clause by clause (results log); the direct records
+     read (attempt 1 "approved", attempt 2 no event, attempt 3 "rejected"); the environments' deployment history
+     from the pull request pages; the revoke stays open for Day 2.
+
+## Current step
+26. Day 2 (plan Part 3 D), prepared next; nothing in Cloudflare changes before the 24-hour reading is recorded.
+   - Rule for him (sent 2026-11-19 about 00:30 UTC): no access policy and no token delete until I write that the
+     24-hour reading is recorded. Why: the wall reads as "gone" for the probe, so an early wall spoils (c) and (d), and
+     the policy has no documented off switch (plan Risk 11); the delete waits for (c)'s cleanup, which needs the token.
+   - The 24-hour probe: check-in trig_01Fd2yqXX6LL2QP4hLnrCuu6 at 2026-11-19 18:55 UTC (the last close 18:50:43Z + 24 h);
+     in it, (c) serving with its marker is the proof that the wall was still off.
+   - Before Day 2's list: a consultation; the list and outcome rows written first; the 18:55 check-in sends that list.
+     Before the go for the wall: what else still needs the links readable without a login written down.
+   - A compaction asked of him before Day 2 (get_session first), with a resume line.
 
 ## Next steps
-1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
-2. Check-ins already set: trig_013vUKHaNSSNDvcRH4hA6UiE (2026-11-18 19:55 UTC, a by-hand probe, the hourly stand-in);
-   trig_01Fd2yqXX6LL2QP4hLnrCuu6 (2026-11-19 18:55 UTC, the 24-hour probe for PREV-DELETE).
-3. Day 2 (plan Part 3 D) from 2026-11-19 18:51 UTC (the last close + 24 h) and by 2026-11-25 (the token ends
-   2026-11-25T22:59:59Z): the 24-hour reading, the login wall, Brave steps 5-8, the closes of (c) and the two
-   token-test pull requests ((c)'s cleanup approved, the other two rejected: the reviewer is on again after sitting 3),
-   the revoke, the `revoked` run.
-4. Then the report and the closing docs pull request (DECISIONS.md: his answers word for word, REVIEWER (b) and the
-   browsers decision included); step 2.6's plan with the locked install and one line on a click-free preview design.
+1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
+   wall, Brave steps 5-8, the closes of (c) #5, #9 and #10 ((c)'s cleanup approved; the other two rejected), the
+   revoke and the `revoked` run, by 2026-11-25 (the token ends 2026-11-25T22:59:59Z).
+2. Then the report and the closing docs pull request (DECISIONS.md: his answers word for word, REVIEWER (b), the
+   browsers decision, PROJ-DRAW and AIM-STATE from lane2-needs.md); the checkpoints of both tasks folded and deleted;
+   step 2.6's plan: the locked install, and previews without his click per preview, showing what keeps the token safe.
 
 ## For the report (the checkpoint is deleted at the end)
 - Step 2.6's plan: previews without his click per preview, showing what keeps the token safe then (his words of 2026-11-19, 00:59); he decides with that plan.
@@ -724,6 +734,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   is read on Chrome, Edge and Firefox; the hourly schedule silent in its first four slots (15:23-18:23 UTC); the build
   count "no count shown" before and after ten uploads; old production uploads keep serving on their one-off links
   (0354374e, e9a37459 the noindex bite, de1c3e5e); Risk 13 (production's one-off link carries noindex).
+
+- For the report (consultation 21): the early tick: consultation 20's reorder assumed the reviewer still off; it was
+  on (he ticked it after my list of 19:06 UTC; no record shows when), and the outcome row "the off run waits" caught
+  it; the order then went back to the plan's. The click tally as it happened, per sitting, for OQ-0006-13 (counted
+  in the report from the results log). A note for step 2.6, not a design: sitting 3 measured both facts a click-free
+  preview rests on: with no reviewer a pull request's job gets the token; a `main`-only rule refuses it. The hourly
+  schedule: seven silent slots (15:23-21:23 UTC), one fire 14 minutes late (22:37:26 for 22:23), none at 23:23 by
+  00:23 UTC.
 
 ## Open findings
 - The advisor agent's F-A (2026-11-16): rewriting "Current step" at each update lost steps 11, 12, 14 and 16 from this
@@ -806,11 +824,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   all IP addresses can use the token." (the new form's "Allow" box: not described).
 
 ## Key numbers
-- Test repository Mergincanli/shamble-preview-check (public): `main` 347d5e044871... since 2026-11-18 18:50:43 UTC
-  (merges of #4 756d33f and #8 347d5e0 on top of 2162db5, the setup merge; workflows unchanged, plus two text
-  files); branches `setup`, `check-token`, cs/pd-one, cs/pd-off, cs/pd-open, cs/pdt-one (cs/pd-three and
-  cs/pdt-three deleted by him); pull requests: #1 merged, #2 closed, #3 (a) / #6 (d) / #7 (a') closed unmerged, #4
-  (b) / #8 (b') merged, #5 (c) open. Runs: 25 at the end of sitting 2.
+- Test repository Mergincanli/shamble-preview-check (public): `main` 347d5e044871... (merges of #4 756d33f and #8
+  347d5e0 on 2162db5; workflows unchanged); branches `setup`, `check-token`, cs/pd-one, cs/pd-off, cs/pd-open,
+  cs/pdt-one, cs/b9-edit (7f3a684), cs/b9-prod (9965630); pull requests: #1, #4, #8 merged; #2, #3, #6, #7 closed
+  unmerged; #5 (c), #9 (cs/b9-edit), #10 (cs/b9-prod) open. Runs: 29 at 2026-11-19 00:23 UTC. `preview`: reviewer
+  Mergincanli on (since 00:13:42 UTC), self-review and bypass off; `production`: `main` only (since 00:21:51 UTC).
 - Workflows at `main` (sha256 prefixes, re-hashed 2026-11-18): deploy.yml 29593af18d34, close.yml 3afdf389d636,
   probe.yml f24ad6e81daf, browsers.yml 6791076916ae; token-test variants (not placed) fd3dc4c6029b, 8b745631a278;
   check-token.yml 0ad66aa0f2b3 (on `check-token` only).
@@ -1125,6 +1143,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    go), one line on his list for "plan order"; outcome rows before the first push; the refusal's words from the public
    run page; rerun_workflow_run for b9-edit; production's restore shown with `main`; open windows written into Current
    step; get_session first; the red mails said.
+
+21. 2026-11-19 00:23:51 UTC (called; transcript time), moment 5 (before step 25 was saved as done) · Q: may sitting
+   3 close, and what goes into tonight's message? · Changed: PM-0006-32 matched clause by clause against the six
+   readings (the revoke open for Day 2); a direct record that no one clicked on attempt 2 (the run pages: "approved",
+   no event, "rejected"); the environments' deployment history from the pull request pages; the stale sections
+   rewritten (Next steps, Key numbers, the schedule line); for the report: the early tick, the click tally, a note
+   for step 2.6; tonight's message: no change in Cloudflare until the 24-hour reading is recorded (the wall reads as
+   "gone"; no documented off switch; the delete waits for (c)'s cleanup); Day 2 prep: get_session and a compaction ask
+   with a resume line, Day 2's list with a consultation first, sent by the 18:55 check-in; (c) serving proves the
+   wall still off; what else needs the links without a login, written before the wall.
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time
