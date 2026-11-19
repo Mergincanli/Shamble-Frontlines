@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 01:30 Amsterdam (00:30 UTC)
+- **Last update:** 2026-11-19 14:55 Amsterdam (13:55 UTC): resumed after his compaction; Day 2 prep (step 26)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -697,13 +697,53 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - A compaction asked of him before Day 2 (get_session at 2026-11-19 00:28 UTC: 814,699 of 1,000,000 tokens;
      automatic at 901,600), with the resume line "Continue the preview hosting check from your checkpoint: Day 2 (step
      26), starting with the 24-hour probe."
+   - Resumed after his compaction (his message 2026-11-19 13:36:08 UTC, 88036370-e3fe-47f4-a3b4-fa570aeacd0a: the
+     resume line plus his words of 12:00 Amsterdam on aiming down sights, byte for byte in `mustafa-2026-11-19-ads.md`,
+     663 bytes, sha256 121999261bcd...; recorded in `lane2-needs.md`, Decisions taken; "no work now").
+   - Read 2026-11-19 13:37-13:45 UTC: the check-in trig_01Fd2yqXX6LL2QP4hLnrCuu6 enabled, run_once_at 18:55:00Z
+     (get_trigger); the schedule fired twice more (probe #5 04:15:59, #6 13:29:10 UTC): every row as expected at
+     9.4-9.7 h and 18.7-19.0 h after the closes, (c) and (d) serving (results log, "Day 2"); PM-0006-1's header checked
+     again (results log): all as recorded, `main` 347d5e0 with the four approved hashes; **one gap: his Brave version
+     is not recorded** (the header's "every browser's version"), asked on Day 2's list before the wall.
+   - What else needs the links readable without a login, before the wall (written 2026-11-19 about 13:50 UTC):
+     (1) the 24-hour PREV-DELETE reading, which is also PM-0006-8's control (the same sweep with the wall off;
+     probe.mjs: "with the wall off, that is PM-0006-8's control"); (2) nothing else found: Brave steps 1-3 achieved
+     (2026-11-18 17:21:40 UTC); PM-0006-2 read on every upload's verify; PM-0006-3 on Windows 51 of 51 (Safari dropped);
+     PM-0006-4 and -5 read in sitting 1; PM-0006-10 read on github.com (outside the wall); no mark has an open "no
+     reading" on a preview link. After the wall no verify or browser run can read a preview link, so no preview deploy
+     follows it except `revoked` (which must fail before any upload); production stays outside the wall.
+   - Day 2's list (draft for consultation 22; not sent): the sitting after my 24-hour reading, about 20:00 Amsterdam,
+     about 1 h 30 min with an hour's wait he may step away for. Runs that wait, in order: (1) `close` on cs/pd-open (c)
+     #5: approve; (2) `close` on cs/b9-edit #9: reject; (3) `close` on cs/b9-prod #10: reject; (4) deploy `revoked`:
+     approve (it must fail at Cloudflare's sign-in). His acts besides: Brave's version (one line); the wall (Settings,
+     General, "Enable access policy"; ACCESS-CARD (a): the Free plan if asked, stop at any charge or paid plan; the time
+     it went on); Brave steps 5-8 (links: iso-off for step 5, iso-on for step 6, production for step 7); the revoke
+     after (c)'s cleanup is read (Delete; Roll then delete if no Delete); the times.
+   - Outcome rows (draft): the 24-hour probe: (a), (a'), (b), (b') gone at 24 h or more, (c) and (d) serving,
+     production's own address serving → PREV-DELETE passes without the tombstone ((a') and (b') gone as well), go for
+     the wall in words; an (a) or (b) row serving with (a') and (b') gone → "gone only with the workaround" (pass, written
+     down), go for the wall; (a) and (a') or (b) and (b') serving → the mark fails (Risk 1), told to him, the wall and
+     the revoke still go ahead as measurements; (c) not serving → stop: no wall, ask him whether anything changed in
+     Cloudflare (the reading has no control); a no-reading row (exit 3) → one more probe, started by me. The wall
+     sweeps (10 min and 1 h after his time): production's own address serves and every other judged row gives no
+     build (wall, gone or other), the wall seen on 2 or more open branches' stable links → PM-0006-8 met at 1 h (the
+     10-minute sweep reported); a preview row serving at 1 h → not met (the wall does not cover every preview: told,
+     for OQ-0006-4); production walled → not met ("not production" fails); a payment or plan screen he does not accept →
+     PM-0006-8 and steps 5-8 "not run" (ACCESS-CARD (b)'s words need his word that the check may end without them).
+     The closes: (c)'s cleanup approved → "Uploads of cs/pd-open found: 1" (17d45ef9) deleted with HTTP 200; #9 and #10
+     rejected → "failure", no runner; (c)'s cleanup red → no revoke until its log is read (the leftover recorded; the
+     project's deletion in E2 removes it). The revoke: `revoked`'s deploy fails at Cloudflare's sign-in (an
+     authentication error, no upload) → PM-0006-32's record; it uploads → the token is alive: he deletes it again at
+     once, a finding, `revoked` again on a new list; it fails before Wrangler signs in → no reading, a new run on a new
+     list.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
    wall, Brave steps 5-8, the closes of (c) #5, #9 and #10 ((c)'s cleanup approved; the other two rejected), the
    revoke and the `revoked` run, by 2026-11-25 (the token ends 2026-11-25T22:59:59Z).
 2. Then the report and the closing docs pull request (DECISIONS.md: his answers word for word, REVIEWER (b), the
-   browsers decision, PROJ-DRAW and AIM-STATE from lane2-needs.md); the checkpoints of both tasks folded and deleted;
+   browsers decision, PROJ-DRAW and AIM-STATE from lane2-needs.md, and his words of 2026-11-19 12:00 there, lane 2's
+   lines only under RECORD-FILES); the checkpoints of both tasks folded and deleted;
    step 2.6's plan: the locked install, and previews without his click per preview, showing what keeps the token safe.
 
 ## For the report (the checkpoint is deleted at the end)

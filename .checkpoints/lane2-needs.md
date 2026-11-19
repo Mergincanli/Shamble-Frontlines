@@ -9,7 +9,7 @@
   `.checkpoints/preview-hosting-check/mustafa-2026-11-18-lane2.md`, 3318 bytes, sha256 765226cd4657...)
 - **Branch:** claude/optimistic-albattani-mdoonz (shared with the preview hosting check, which keeps the first place:
   whenever a step of sitting 3 or of Day 2 can move, it moves first) · **Base:** main b763ba3e, merged in at aa02297
-- **Last update:** 2026-11-19 01:05 Amsterdam (00:05 UTC)
+- **Last update:** 2026-11-19 14:45 Amsterdam (13:45 UTC): his words of 12:00 recorded (Decisions taken)
 
 ## Steps done
 1. His item 1: main b763ba3e merged into the branch (plain merge, no conflict: no file changed on both sides since
@@ -79,6 +79,17 @@
   for lane 1 ("You hear it from me"). "The list on issue #59 stands as posted. The Advisor read it against Part 15.2
   and checked a sample of its citations." For DECISIONS.md in lane 2's next docs pass (RECORD-FILES: its own lines);
   not posted on #59 (a comment there is never his word; lane 1 hears his decisions from him).
+- **His words of 2026-11-19, 12:00 Amsterdam** (user message 2026-11-19 13:36:08 UTC, transcript time,
+  88036370-e3fe-47f4-a3b4-fa570aeacd0a; the whole message byte for byte in
+  `.checkpoints/preview-hosting-check/mustafa-2026-11-19-ads.md`, 663 bytes, sha256 121999261bcd...; its first paragraph
+  is the resume line after the compaction): "one thing for lane 2, no work now." Aiming down sights and the
+  sprint-to-fire delay are game rules of Slice 1 by his decision of 2026-11-19; lane 1 prices and places them in
+  change-set 4's plan. Lane 2's wishes W1 (aiming down sights, yes or no, for each soldier) and W4 (how far the
+  sprint-to-fire swing has got) on issue #59 are needs now; the comment stays as it is ("lane 1 has this from me").
+  AIM-STATE of 2026-11-19, 00:59 stands for the poses. So change-set 10's plan still starts from AIM-STATE's rule for
+  the poses (the idle pose as a proposal with pictures), and plans how W1 and W4 are read. For DECISIONS.md in lane 2's
+  docs pass: lane 2's own lines only (RECORD-FILES); whether lane 1 has already recorded the game-rule decision itself is
+  checked then.
 
 ## Running work
 - agent engine-architect (needs list), launched 2026-11-18T23:00:26.326Z (transcript): DONE (hand-back after 23:15 UTC).
