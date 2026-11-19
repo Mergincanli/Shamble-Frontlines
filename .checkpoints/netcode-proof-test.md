@@ -85,9 +85,14 @@
   row (:4786-4790; -58's :4263-4267) reads a header param L1 never writes: his, "After the close". ADV-U4F20-3 Low: in
   the report. The OQ-0001-6 reading: the B FAIL is not evidence against (b); -20 separates the options by buffer depth
   only. The set reports for -20 and -22 are in u4f-report.md ("After the merge", items 5-6).
-- **U4f-F1 next** (my lean, U4FF1-Q3: its own step before U4f2, which waits for his U4F2-SIZE answer and keeps
-  crates/sim shut): plan u4f-f1-plan.md (size S, about 60-150; T1, T2 with plants; the -20 re-run), **the advisor's
-  plan review running** (writes advisor-u4f-f1-plan.md). Then a builder in a worktree, one review round, the merge, -20.
+- **U4f-F1** (its own step before U4f2: U4FF1-Q3 ruled so): plan u4f-f1-plan.md rev 1.1 (size S, about 60-150, stop
+  past 300); **the advisor's plan review APPROVE WITH CONDITIONS 1-10** (advisor-u4f-f1-plan.md, 235 lines, read in
+  full: Mediums ADV-U4FF1-1 the throw and melee, -2 one shot per command and the clock once, -3 a session's first
+  command (to U4f2), -4 the shared fn's contract, -5 the re-run compared tick by tick with 350677f's logs, -6
+  security-auditor joins, -9 T2 in the d10 twin form; Lows -7, -8). **The builder next** (one, xhigh, isolated
+  worktree; notes in its copy of u4f-f1-build.md; runner u4f-run.sh with logs under .gate/u4f/f1-*); then the round
+  (rust-reviewer, netcode-architect, test-engineer, security-auditor: two batches), the merge, -20's re-run; then
+  condition 10 (U4f2's brief rebased on F1's merge, C-U4F2-9 = ADV-U4FF1-3 added).
 
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)

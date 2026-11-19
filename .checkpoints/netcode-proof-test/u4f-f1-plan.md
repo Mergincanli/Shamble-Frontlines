@@ -1,4 +1,12 @@
-# U4f-F1: the stand-in takes every press edge (ADV-U4F20-1), then -20's L1 set again (plan rev 1, 2026-11-19)
+# U4f-F1: the stand-in takes every press edge (ADV-U4F20-1), then -20's L1 set again (plan rev 1.1, 2026-11-19)
+**Rev 1.1:** the advisor's review APPROVE WITH CONDITIONS 1-10 (advisor-u4f-f1-plan.md: findings :173-184, rulings
+:155-171, conditions :186-225, read in full). Conditions 1-9 bind the build as written there (they replace this
+plan's text where they differ: all four press counters in today's order, one shot per command, the shared fn's
+contract, T1's sim half, T2 in the d10 twin form with cases (a)-(f) and two plants, the re-run compared tick by tick
+with 350677f's kept logs, security-auditor in the round, a session's first command named and carried to U4f2, the four
+doc sites, the wording of item 3); condition 10 (U4f2's brief rebased on F1's merge, with condition 7's item) is the
+main session's after the merge. Rulings: Q1 one integer-only `pub fn` in sim/src/seam.rs, called by npt-room; Q2 no
+change; Q3 F1 first, before U4f2.
 **For the advisor's plan review before any edit.** Short by TEST-FIRST rule 3: what it changes, how it is tested,
 what is open. Source: the advisor's -20 ruling (advisor-u4f-20.md, R20-Q1 :114-140, ADV-U4F20-1 :162), on the
 main session's read (u4f-20-read.md). Inside plan rev 3.3 by that ruling (TEST-FIRST rule 2; R20-Q2 :141-145): no
