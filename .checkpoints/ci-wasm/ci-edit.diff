@@ -30,7 +30,7 @@
      steps:
        - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
          with:
-@@ -54,6 +70,53 @@
+@@ -54,6 +70,56 @@
            case "$v" in "rustc $pin "*) echo "rustc equals the pin $pin" ;; *) echo "rustc is not the pin $pin"; exit 1 ;; esac
            cargo --version; node --version; npm --version
  
@@ -59,8 +59,9 @@
 +          GH_TOKEN: ${{ github.token }}
 +        run: |
 +          gh --version
-+          printf '%s\n' 2.93.0 "$(gh --version | awk 'NR == 1 { print $3 }')" | sort -V -C \
-+            || { echo "gh is older than 2.93.0"; exit 1; }
++          gh_version=$(gh --version | awk 'NR == 1 { print $3 }')
++          case "$gh_version" in "" | *[!0-9.]*) echo "gh printed no version of the form x.y.z: $gh_version"; exit 1 ;; esac
++          printf '%s\n' 2.93.0 "$gh_version" | sort -V -C || { echo "gh is older than 2.93.0"; exit 1; }
 +          gh release verify-asset "$WB_VERSION" "$RUNNER_TEMP/wasm-bindgen/$WB_NAME.tar.gz" --repo wasm-bindgen/wasm-bindgen
 +
 +      - name: The tool's one program (the member list, then only wasm-bindgen taken out, installed root-owned, checked)
@@ -77,14 +78,16 @@
 +          [ "$(ls -A "$dl/x")" = wasm-bindgen ] || { echo "more than the one program came out"; exit 1; }
 +          sudo -n install -D -o root -g root -m 0555 "$dl/x/wasm-bindgen" "$WB_TOOL"
 +          [ -f "$WB_TOOL" ] && [ ! -L "$WB_TOOL" ] || { echo "$WB_TOOL is not a plain file"; exit 1; }
-+          stat -c 'mode %a, owner %U:%G, %s bytes, %n' "$WB_TOOL" "${WB_TOOL%/*}"
++          stat -c 'mode %a, owner %U:%G, %s bytes, %n' "$WB_TOOL" "${WB_TOOL%/*}" /opt
++          [ -z "$(find "${WB_TOOL%/*}" /opt -maxdepth 0 \( ! -user root -o -perm /022 \))" ] \
++            || { echo "${WB_TOOL%/*} or /opt is not owned by root, or others than root may write in it"; exit 1; }
 +          [ "$(stat -c %s "$WB_TOOL")" = "$WB_PROGRAM_BYTES" ] || { echo "the program is not $WB_PROGRAM_BYTES bytes"; exit 1; }
 +          printf '%s  %s\n' "$WB_PROGRAM_SHA256" "$WB_TOOL" | sha256sum -c -
 +
        - name: Fetch every dependency (the last step with the network)
          run: |
            cargo fetch --locked
-@@ -72,6 +135,7 @@
+@@ -72,6 +138,7 @@
              env -i HOME="$HOME" PATH="$PATH" USER="$USER" CI=true LANG=C.UTF-8 PROBE_IP="$probe_ip" \
                CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}" RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}" \
                RUSTUP_AUTO_INSTALL=0 npm_config_update_notifier=false \
@@ -92,7 +95,7 @@
              bash --norc --noprofile -euo pipefail -c '
                id; ip -o link; rustc --version
                getent hosts github.com || echo "getent: no answer (printed, not judged)"
-@@ -97,4 +161,30 @@
+@@ -97,4 +164,30 @@
                [ -n "$tests" ]
                npx --no -- tsc --ignoreConfig $strict $shipped
                npx --no -- tsc --ignoreConfig $strict --skipLibCheck $shipped $tests
@@ -104,7 +107,7 @@
 +              grep -ao "/[A-Za-z0-9._/+-]*/\.cargo/registry/src/[A-Za-z0-9._/+-]*\.rs" packages/sim-worker/pkg/sim_wasm_bg.wasm || echo "no registry path in the Wasm"
 +              echo "== the boundary tests, on the built Wasm"
 +              npx --no -- vitest run --root packages/sim-worker --dir packages/sim-worker/boundary
-+              echo "== the type checks: the Worker's and the page's shipped files with the lib check, then with their tests; then the browser specs"
++              echo "== the type checks: the shipped files of the Worker and the page with the lib check, then with their tests; then the browser specs"
 +              common="${strict% --lib es2023}"
 +              worker=$(find packages/sim-worker/src -name "*.ts" ! -name "*.test.ts" | LC_ALL=C sort)
 +              worker_tests=$(find packages/sim-worker/src -name "*.test.ts" | LC_ALL=C sort)

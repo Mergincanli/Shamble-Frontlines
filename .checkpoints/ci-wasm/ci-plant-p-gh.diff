@@ -1,9 +1,9 @@
 --- a/.github/workflows/toolchain.yml
 +++ b/.github/workflows/toolchain.yml
-@@ -97,6 +97,8 @@
-           gh --version
-           printf '%s\n' 2.93.0 "$(gh --version | awk 'NR == 1 { print $3 }')" | sort -V -C \
-             || { echo "gh is older than 2.93.0"; exit 1; }
+@@ -98,6 +98,8 @@
+           gh_version=$(gh --version | awk 'NR == 1 { print $3 }')
+           case "$gh_version" in "" | *[!0-9.]*) echo "gh printed no version of the form x.y.z: $gh_version"; exit 1 ;; esac
+           printf '%s\n' 2.93.0 "$gh_version" | sort -V -C || { echo "gh is older than 2.93.0"; exit 1; }
 +          printf 'not an asset of the release\n' > "$RUNNER_TEMP/planted.tar.gz"
 +          gh release verify-asset "$WB_VERSION" "$RUNNER_TEMP/planted.tar.gz" --repo wasm-bindgen/wasm-bindgen
            gh release verify-asset "$WB_VERSION" "$RUNNER_TEMP/wasm-bindgen/$WB_NAME.tar.gz" --repo wasm-bindgen/wasm-bindgen
