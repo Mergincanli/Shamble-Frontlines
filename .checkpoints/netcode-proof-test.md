@@ -103,8 +103,18 @@
   folder (this card included; a check-in's save waits).** Then the saver again, and the card.
   **The r2 record run DONE** (19:35-19:42:17 UTC, exit 0; .gate/u4f-merge/r2.log; r2.txt at
   .gate/netcode-proof-test/u4f-r2-d502f54de6d5/r2.txt, 330 lines; from d502f54, whose spike tree equals 25d316e's).
-  **The advisor's read of the rows RUNNING** from 19:43 UTC (agent a770b42c4cef4a947; N/advisor-u4f-r2.md); the saver
-  buovbuxl2 from 19:42 (window to about 21:32). **Then:** the part-clean, D2, the sets -47, -20, -22.
+  **The advisor's read of the rows** (N/advisor-u4f-r2.md; Mediums read in full): 14 of 17 as expected; p4, p13, p19
+  (-21's lag switch under option A) not: PM-0001-2's in-view precondition fails (honest slot 24 in building area 3).
+  They hold -21's set only (U4f2's). **The sets -47, -20, -22 may run**, after the part-clean (D2 before and after).
+  Routes: **C-U4F2-5** (F1, Medium: the `steady` script has no leash; before -21's set every -21 suite's honest
+  clients stay out of buildings for 610 s at P0 and P1 under both options, a sim-only test with a plant, U4f2's record
+  run reading "in a building: 0"; the fix's choice comes to the advisor); **C-U4F2-6** (F2, Medium: p19's figures
+  restated, Q15 (c)'s sentence corrected; -20's report names it in the OQ-0001-6 reading); **C-U4F2-7** (F4: the
+  clock suite's shot-band contract fails by construction; -47's report names it, the fix in U4f2); -20's report also
+  F6 (which late figure: 13 or 12) and NC-U4F-5 and C-OQ6-SEC-1. Watch: overflow 0 on all 17; the queue's high-water
+  at P3 in 20 s 488 / 689 / 625 against 1,600; -47's p99 2.60 ms against 5. To name in the next day's message: F1's
+  route, Q15 (c)'s correction, the redundancy-1 bite reaching "0 presses lost" (F5). The saver buovbuxl2 from 19:42
+  (window to about 21:32).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
