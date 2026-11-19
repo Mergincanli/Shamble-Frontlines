@@ -1099,6 +1099,11 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     - EA-N5: why a fallback runs is worked out in the app shell, not reported by the picture (engine-architect: or when
       `render/` changes hands, change-set 5).
     - EA-N6: the build's glue check finds the Worker's chunk by a name prefix.
+    - VF-L7 (the verifier's re-check): the same name prefix lets a lazily loaded page module named `worker-...` go
+      unscanned by the build's WebAssembly check (its second plant passed both builds): scan every script but the
+      Worker's entry chunk, named by the build itself. With EA-N6.
+    - VF-L4, VF-L5 (the verifier): the policy header is asserted on the 200 answer only; the build's refusal of
+      environment settings has no test (with RR-N4).
     - GE-N1: the lost-device and lost-context route has no test.
     - GE-N4: each renderer error prints twice, with three's doubled prefix.
     - GE-N5: after a lost device the page says nothing outside the development readout (with ADR 0003's loss
