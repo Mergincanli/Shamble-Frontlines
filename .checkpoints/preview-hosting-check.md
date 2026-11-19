@@ -821,6 +821,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      reject #9's and #10's; delete the token (time, screenshot); approve `revoked`. Why again, in one line: steps 1-3
      checked the pages open with no wall; 5-8 check the wall stops strangers and lets him in; this afternoon's link
      opened an advert page, so no wall.
+   - Control probe #9 (44615090897, probed_at 21:05:01.930Z): all 43 rows as expected, no wall (results log). After
+     consultation 24 the list goes out with: Restrict previews pressed with every option left at its default; a
+     screenshot of each Zero Trust screen as he goes, without waiting, stopping only at a price above $0 or the word
+     "trial" (if it switches on with no plan screen: a plan or billing screenshot afterwards); his screenshot and time
+     sent before Brave, then on without waiting; the private window as his own stop rule (the test page opening there
+     with no login = no wall: he stops and tells me) and production opened in that same private window (step 7's
+     private half); part D as one line only, its steps (the token delete among them) sent when it is time. On his
+     switch-on message: an outside look at once, both `wall` sweeps scheduled with send_later (10 min and 1 h after his
+     time; if his report comes later than 10 minutes, the first sweep at once, its real offset recorded); afterwards
+     the run list checked for any deploy or cleanup between the control and his switch-on.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
@@ -1307,6 +1317,19 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    onboarding clicks written from memory or docs alone; a mid-afternoon outside look; the row "the wall seen before the
    reading → stop and consult" (late reading allowed; Zero Trust, Access, Applications the only named removal); for
    step 5, whether a signed-in Cloudflare session passes the wall unseen (if so, a private-window open of iso-off).
+
+24. 2026-11-19 21:05:23 UTC (called; answer 21:07:00 UTC; transcript times), moment 1 (the wall's clicks, now from his
+   screen) · Q: may the refreshed list go out, and in what shape? · Changed: the fresh control probe read first (done:
+   all as expected); the token-delete clicks taken out of part D (the one later step he could run early, stranding
+   the control's cleanup), D sent as one line with its steps at the time; the look-only Zero Trust and billing
+   screenshots dropped (his screenshot settled "try for free"): he screenshots each Zero Trust screen as he goes and
+   stops only at a price above $0 or "trial", with a plan or billing screenshot afterwards if no plan screen shows;
+   the control's "about an hour" dropped as a gate (it holds if no deploy or cleanup ran between it and the
+   switch-on; the run list checked afterwards); the private window as his stop rule, with production opened in the
+   same private window; defaults only, nothing else touched in Zero Trust; his screenshot and time before Brave, then
+   on without waiting; on that message an outside look and both sweeps scheduled with send_later (the first at once if
+   his report is late, its real offset recorded); the wall and Brave offered tonight (about 20 minutes), D tonight or
+   any evening up to the 25th; plain words, one line of why, the numbered list as "For Mustafa".
 
 ## Running work
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner

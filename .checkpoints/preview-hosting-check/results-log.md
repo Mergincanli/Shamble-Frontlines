@@ -858,3 +858,10 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
     No plan, trial or payment screen appears in his account of it. The Brave version completes PM-0006-1's header.
 - **PM-0006-1, the header's Brave line** (from his message above): Brave 1.100.58, Chromium 158.0.8127.42 (Official
   Build) (64-bit), on his Windows PC.
+- **The control with the wall off, before his switch-on (PM-0006-8's control)**: probe run #9, id 44615090897, by hand,
+  `purpose: deletion`, head 347d5e0, created 21:04:39 UTC, success 21:05:15; probe-results-44615090897 (artifact
+  14574710921, zip sha256 ab7ee830af75..., equal to its digest), probed_at 2026-11-19T21:05:01.930Z,
+  `.gate/preview-hosting-check/day2/probe9-control/`: 43 rows, no `wall` row; (a) 2 gone (26.54 h); (a') 3 gone
+  (26.54); (b) 4 gone (26.24); (b') 5 gone (26.24); (c) 2 serves; (d) 2 serves (26.53); the by-hand previews 19
+  serves; production 4 serves; the rehearsal 2 gone (30.13). Unexpected 0, no reading 0. The control holds if no
+  deploy or cleanup run starts between it and his switch-on time (the run list is checked afterwards).
