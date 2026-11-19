@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 11:13 UTC (from the clock)
+- **Last update:** 2026-11-19 11:20 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -508,10 +508,15 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     other byte of main's file unchanged). **The verifier started on e4f4bf4** at about 11:13 UTC (notes
     `verifier-final.md`; it has the scratch worktree and port 4173 until it answers).
 
+59. **The docs pass is done and committed: 0adb003** (docs-keeper's four record files; STATUS 120 lines; its list of
+    every moved and corrected line: `docs-keeper-moved-lines.md`, 119 lines, which the report embeds by script; one
+    word of STATUS's row corrected by the main session: "five messages"). The map check fails on one line until the
+    report exists (`docs/reports/2026-11-19-cs2-first-page.md`), on purpose. The report's draft is filled where the
+    numbers are final; open places: the outcome, the notes' commit, CI's runs, the two verdicts, the docs list,
+    "Decisions needed", "For Mustafa".
+
 ## Current step
-59. **The docs pass is running** (docs-keeper; it edits STATUS, the archive, ROADMAP and the map in the main folder:
-    its files are committed by path when it answers; its notes `docs-keeper-notes.md`, its list
-    `docs-keeper-moved-lines.md`). **Next, in order:** (1) the verifier's answer (running; until PASS); (2) done (step 58); (3) read CI on the pushed head with the GitHub tools; (4) the zip: a clean
+60. **The verifier is running on e4f4bf4** (it has the scratch worktree and port 4173 until it answers). **Next, in order:** (1) the verifier's answer (running; until PASS); (2) done (step 58); (3) read CI on the pushed head with the GitHub tools; (4) the zip: a clean
     development build at the final code head, then `python3 -I .checkpoints/cs2-first-page/make-zip.py
     packages/client/dist .gate/cs2-first-page/zip`, the browser tests against its unpacked copy, sent with the
     chat's file tool; (5) the report: fill `report-draft.md`'s double-bracket places (its numbers are in step 57
