@@ -1,0 +1,106 @@
+[
+  {
+    "mark": "PM-0001-47",
+    "title": "The client's clock is right",
+    "verdict": "NOT-RUN",
+    "why": [
+      "bite PM-0001-47/newest-sample: no run yet",
+      "bite PM-0001-47/tick-quantised: no run yet"
+    ],
+    "parts": [
+      {
+        "name": "L1 P2, 1,000 connects",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-47-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "1,000 connects with random true offsets",
+                "outcome": "pass",
+                "value": "1000",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "offset error at most 5 ms after 2 s of samples (p99 of |estimate - true|)",
+                "outcome": "pass",
+                "value": "2596690",
+                "needs": "<= 5000000"
+              }
+            ]
+          },
+          {
+            "run": "l1-47-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "1,000 connects with random true offsets",
+                "outcome": "pass",
+                "value": "1000",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "offset error at most 5 ms after 2 s of samples (p99 of |estimate - true|)",
+                "outcome": "pass",
+                "value": "2516086",
+                "needs": "<= 5000000"
+              }
+            ]
+          },
+          {
+            "run": "l1-47-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "1,000 connects with random true offsets",
+                "outcome": "pass",
+                "value": "1000",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "offset error at most 5 ms after 2 s of samples (p99 of |estimate - true|)",
+                "outcome": "pass",
+                "value": "2638079",
+                "needs": "<= 5000000"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-47/newest-sample",
+        "status": "not_run",
+        "runs": []
+      },
+      {
+        "id": "PM-0001-47/tick-quantised",
+        "status": "not_run",
+        "runs": []
+      }
+    ],
+    "report": [
+      {
+        "name": "offset error max",
+        "part": "L1 P2, 1,000 connects",
+        "run": "l1-47-s1",
+        "value": "3279911"
+      },
+      {
+        "name": "offset error max",
+        "part": "L1 P2, 1,000 connects",
+        "run": "l1-47-s2",
+        "value": "3907257"
+      },
+      {
+        "name": "offset error max",
+        "part": "L1 P2, 1,000 connects",
+        "run": "l1-47-s3",
+        "value": "3841668"
+      }
+    ]
+  }
+]
