@@ -80,6 +80,12 @@
   second 52): **margin 1.43, under 1.5, named for U4g** (advisor-u4f-stop.md:132-134); 1,600 stands. **The B FAIL goes
   to the advisor** for the OQ-0001-6 reading (room.rs:352-355: the sim takes one edge per command run, so late drops
   spanning two presses lose one; ADR 0001:1156-1167; plan.md:846-848). **-22 next:** its condition is met.
+- **-22 DONE** (20:51-21:17 UTC, exit 0, at 7192607, spikes/ equal to 25d316e's outside results/; results/u4f/
+  7192607d99a1/pm-0001-22/, committed 2dae645): **PM-0001-22 PASS** (L1, one never-acker among 48, seeds 1-3 valid);
+  bite unbounded **shown**; 5.2's load report (never counted) PM-0001-2 FAIL at 47 connected against 48, as designed
+  (marks.json:5227). Each run: overflow resyncs 1, rewinds refused 33 / 39 / 37 (N1: whose); the bite 0 and 55,138.
+  **All three sets have run.** Next: the advisor's -20 ruling (running), then the set reports (-20, -22) and his
+  message after 23:00 UTC.
 
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
@@ -148,9 +154,9 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- The -20 set (background, from 20:07 UTC); the saver buovbuxl2 (window to about 21:32 UTC: restart before then); the
-  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled while the sets run (a cut stops a set as it stops an agent). The
-  advisor's check of U4f2's brief ran 20:20-20:36 UTC (returned; no agent running now).
+- **The advisor's -20 ruling** (general-purpose, main's advisor.md, xhigh; its brief u4f-20-read.md, R20-Q1 to Q5;
+  writes advisor-u4f-20.md): cut at 20:53:34 before writing anything, resumed by SendMessage at 22:4x UTC. The saver
+  bdhc8uudx from 22:42 UTC (window to about 00:32). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (an agent runs).
 - **Written during the set:** -47's report in u4f-report.md ("After the merge", items 1-5). -20's first run (A s1):
   overflow 0, queue high-water 866 (margin 1.85; scratchpad queue_hw.py).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
@@ -167,6 +173,12 @@
   waits for his answer.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
+- **2026-11-19 20:53:34 to 22:40:41 UTC (the advisor's -20 ruling; the session too):** "You've hit your org's monthly
+  spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:40pm (UTC)" (the agent's transcript,
+  its last entry 20:53:34.410Z; the session's transcript has nothing from 20:52:49 to 22:40:57). Checked at 22:41: the
+  -22 set ran on through the cut and ended 21:17 UTC, exit 0 (committed 2dae645); the saver buz1b7gec's window ended at
+  22:40 (restarted as bdhc8uudx, 22:42); the agent had written no notes (advisor-u4f-20.md absent), resumed by
+  SendMessage at 22:4x; the 22:35 check-in reached the session at 22:40.
 - **2026-11-19 16:00:10 to about 17:45 UTC (builder 4; the session too):** "You've hit your org's monthly spend limit
   · ask your admin for a higher limit · your 5-hour limit resets 5:40pm (UTC)" (16:00:10.105, builder 4's transcript,
   one second after its end check A2 ended: .gate/u4f/w4-end-check-a2.log, 15:43:29-16:00:09 UTC, exit 0, all 11 steps,
