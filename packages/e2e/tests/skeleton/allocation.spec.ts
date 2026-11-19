@@ -1,9 +1,15 @@
 // The method of PM-0002-7 ("the boundary makes no garbage on the page"): a sampling heap profile through the Chrome
 // DevTools Protocol that also counts objects already collected, with allocations attributed by function. The mark
 // itself is judged in change-set 5, over a 10-minute match on a named machine; here the method runs for a few
-// seconds, prints what it attributes to the page's hand-off code (WorkerLink's `onMessage` and `frame`, with all
-// they call), and must be able to see a small leak: the limits below sit between the clean page and one planted
-// 64-byte typed array per frame or per block.
+// seconds, prints what it attributes to the page's hand-off code (WorkerLink's `receive`, which unpacks the
+// message event, and `frame`, with all they call), and must be able to see a small leak: the upper limits below sit between the clean page and one
+// planted 64-byte typed array per frame or per block.
+//
+// What this method cannot do, found by perf-auditor: once the browser optimises the page's code it charges an
+// inlined function to its caller, and the sums by name fall towards 0. That happens after some hundreds of calls
+// (a 60 Hz display reaches it within this run); it does not happen in a slow headless container. So each sum also
+// has a floor: a run in which the names were lost fails instead of passing blind. Change-set 5 measures the mark
+// itself another way (the whole page's bytes with the hand-off on and off, and memory outside the heap).
 import { expect, test } from "@playwright/test";
 import { needsBuild, report, running } from "./report.ts";
 
@@ -23,20 +29,21 @@ test("the sampling heap profile attributes the hand-off's allocations by functio
   await running(page, 300);
   const session = await page.context().newCDPSession(page);
   await session.send("HeapProfiler.enable");
-  const before = await report(page);
   await session.send("HeapProfiler.startSampling", {
     samplingInterval: 64,
     includeObjectsCollectedByMajorGC: true,
     includeObjectsCollectedByMinorGC: true,
   });
+  // The counts are read inside the sampled window, as close to its two ends as a call can be.
+  const before = await report(page);
   await page.waitForTimeout(8000);
-  const { profile } = (await session.send("HeapProfiler.stopSampling")) as { profile: { head: Node } };
   const after = await report(page);
+  const { profile } = (await session.send("HeapProfiler.stopSampling")) as { profile: { head: Node } };
   const frames = after.frames - before.frames;
   const blocks = after.blocks - before.blocks;
   const perFrame = under(profile.head, "frame") / frames;
-  const perBlock = under(profile.head, "onMessage") / blocks;
-  const rate = (under(profile.head, "frame") + under(profile.head, "onMessage")) / 8;
+  const perBlock = under(profile.head, "receive") / blocks;
+  const rate = (under(profile.head, "frame") + under(profile.head, "receive")) / 8;
   console.log(
     `allocation in the page's hand-off code: ${perFrame.toFixed(0)} bytes per frame posting the input, ` +
       `${perBlock.toFixed(0)} bytes per block received, ${rate.toFixed(0)} bytes a second ` +
@@ -44,9 +51,13 @@ test("the sampling heap profile attributes the hand-off's allocations by functio
   );
   expect(frames).toBeGreaterThan(20);
   expect(blocks).toBeGreaterThan(200);
-  // The clean page allocates the input message per frame and one view per block: well under these limits.
+  // The clean page allocates the input message per frame (about 65 bytes) and, per block, the message event's own
+  // data and one view (about 300 bytes). Each limit sits between that and one planted 64-byte typed array more
+  // (about 170 bytes with its header); each floor tells a blind run (the names lost to inlining) from a clean one.
+  expect(perFrame).toBeGreaterThan(25);
   expect(perFrame).toBeLessThan(170);
-  expect(perBlock).toBeLessThan(170);
+  expect(perBlock).toBeGreaterThan(150);
+  expect(perBlock).toBeLessThan(390);
   // PM-0002-7's own rate, far above what this page does: under 0.1 MB a second.
   expect(rate).toBeLessThan(100_000);
 });

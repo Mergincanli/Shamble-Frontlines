@@ -18,7 +18,17 @@ import { copyFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as viteBuild } from "vite";
-import { checkCli, checkCliFile, cspProblems, formatSizeTable, lockedWasmBindgenVersion, sizeTable, tooLarge } from "./build-checks.mjs";
+import {
+  bundleProblems,
+  checkCli,
+  checkCliFile,
+  checkOutDir,
+  cspProblems,
+  formatSizeTable,
+  lockedWasmBindgenVersion,
+  sizeTable,
+  tooLarge,
+} from "./build-checks.mjs";
 import { WASM_BINDGEN_TOOL } from "./wasm-bindgen-tool.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -26,8 +36,8 @@ const clientDir = path.join(root, "packages/client");
 const pkgDir = path.join(root, "packages/sim-worker/pkg");
 const targetDir = path.join(root, "target");
 const wasmFile = path.join(targetDir, "wasm32-unknown-unknown/release/sim_wasm.wasm");
-/** Variables through which cargo's settings can be changed from outside with no diff in the repository. */
-const CARGO_OVERRIDES = /^(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC_WRAPPER|RUSTC|CARGO_(BUILD|PROFILE|TARGET)_.*)$/;
+/** Variables through which cargo's or the tool's settings can be changed from outside with no diff in the repository. */
+const CARGO_OVERRIDES = /^(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC_WRAPPER|RUSTC|CARGO_(BUILD|PROFILE|TARGET)_.*|WASM_BINDGEN_.*|RUST_LOG)$/;
 
 /** The tool's absolute path, after its file was compared with the recorded values. */
 function checkedTool() {
@@ -49,7 +59,7 @@ export function buildWasm() {
   // The Wasm players get is built with the manifests' settings alone (the overflow checks, the optimisation level,
   // the target's features), and into this repository's own target folder, which is where it is read from below.
   const overrides = Object.keys(process.env).filter((name) => CARGO_OVERRIDES.test(name));
-  if (overrides.length > 0) throw new Error(`cargo settings from the environment are refused: unset ${overrides.join(", ")}`);
+  if (overrides.length > 0) throw new Error(`build settings from the environment are refused: unset ${overrides.join(", ")}`);
   execFileSync(
     "cargo",
     ["build", "--locked", "--release", "--target", "wasm32-unknown-unknown", "-p", "sim-wasm", "--target-dir", targetDir],
@@ -102,7 +112,11 @@ export async function buildPage({ production, outDir }) {
     .filter((name) => name !== "serve.mjs")
     .map((name) => ({ name, bytes: readFileSync(path.join(outDir, name)) }));
   const rows = sizeTable(files);
-  const problems = [...tooLarge(rows).map((row) => `${row.name}: a served file reaches 25 MiB`), ...cspProblems(files)];
+  const problems = [
+    ...tooLarge(rows).map((row) => `${row.name}: a served file reaches 25 MiB`),
+    ...cspProblems(files),
+    ...bundleProblems(files, production),
+  ];
   if (problems.length > 0) throw new Error(`the built page is refused:\n  ${problems.join("\n  ")}`);
   return rows;
 }
@@ -113,6 +127,7 @@ async function main() {
   const outDir = at === -1 ? path.join(clientDir, "dist") : path.resolve(args[at + 1] ?? "");
   const unknown = args.filter((arg, i) => !["--wasm-only", "--production", "--out-dir"].includes(arg) && i !== at + 1);
   if (unknown.length > 0 || (at !== -1 && args[at + 1] === undefined)) throw new Error(`unknown or unfinished option: ${args.join(" ")}`);
+  checkOutDir(outDir, path.join(clientDir, "dist"));
   console.log(formatSizeTable(buildWasm()));
   if (args.includes("--wasm-only")) return;
   const production = args.includes("--production");

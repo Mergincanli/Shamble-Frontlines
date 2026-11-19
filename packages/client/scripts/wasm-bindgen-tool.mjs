@@ -1,7 +1,7 @@
 // The one wasm-bindgen command-line tool this repository's build may run, by its exact values. The tool is a
 // ready-built program from the internet that no lockfile covers, so these values are its lock: the build compares
 // the program's size and sha256 with them before every run, `--version` included (build-checks.mjs, checkCliFile),
-// and CI's own download checks the archive's.
+// and the CI edit that brings the tool to CI (a pull request of its own) checks the archive's.
 //
 // Mustafa's words of 2026-11-18 (docs/DECISIONS.md, TOOL-SOURCE): "(a), for this one file only:
 // wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz, 11860397 bytes, sha256

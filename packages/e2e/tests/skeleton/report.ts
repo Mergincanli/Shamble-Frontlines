@@ -12,7 +12,15 @@ export interface Report {
   errors: number;
   pauses: number;
   lastPause: { ticksWhileHidden: number } | null;
-  worker: { ticks: number; undetached: number; maxTicksInOneWake: number; crossOriginIsolated: boolean } | null;
+  worker: {
+    ticks: number;
+    wakes: number;
+    drops: number;
+    pauses: number;
+    undetached: number;
+    maxTicksInOneWake: number;
+    crossOriginIsolated: boolean;
+  } | null;
 }
 type Hooked = { __shambleReport?(): Report };
 

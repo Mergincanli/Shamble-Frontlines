@@ -12,7 +12,8 @@ export function installErrorHook(target: Window): { readonly log: ErrorLog; note
   const log: ErrorLog = { count: 0, last: "" };
   const note = (message: string): void => {
     log.count += 1;
-    log.last = message;
+    // One line of bounded length: what is shown and copied stays one labelled value, whatever the message holds.
+    log.last = message.replace(/[\u0000-\u001f\u007f]+/g, " ").slice(0, 300);
   };
   target.addEventListener("error", (event) => note(event.message));
   target.addEventListener("unhandledrejection", (event) => {

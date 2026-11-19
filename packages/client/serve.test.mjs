@@ -1,13 +1,13 @@
 // The small server's rules, each tested on a real server bound to this computer (serve.mjs). Requests are sent with
 // Node's http client, not fetch: fetch tidies ".." out of an address before it is sent, and these tests must send it.
 
-import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { request } from 'node:http';
 import { connect } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { addressFor, createServer, DEFAULT_PORT, HOST, listen } from './serve.mjs';
+import { addressFor, CONTENT_SECURITY_POLICY, createServer, DEFAULT_PORT, HOST, listen } from './serve.mjs';
 
 const SECRET = 'outside the served folder';
 let base;
@@ -27,9 +27,11 @@ beforeAll(async () => {
   writeFileSync(path.join(root, 'sub', 'index.html'), '<!doctype html><title>sub</title>');
   writeFileSync(path.join(root, 'notes.md'), 'a type that is not in the table\n');
   writeFileSync(path.join(root, 'serve.mjs'), '// the server never serves its own source\n');
+  writeFileSync(path.join(root, 'big.js'), Buffer.alloc(8 * 1024 * 1024, '/'));
   writeFileSync(path.join(base, 'outside.js'), SECRET);
   try {
     symlinkSync(path.join(base, 'outside.js'), path.join(root, 'leak.js'));
+    symlinkSync(path.join(root, 'serve.mjs'), path.join(root, 'alias.js'));
   } catch {
     linkMade = false; // a system that does not let this user make links
   }
@@ -68,6 +70,9 @@ describe('what it serves', () => {
     expect(answer.headers['content-type']).toBe('text/html; charset=utf-8');
     expect(answer.headers['x-content-type-options']).toBe('nosniff');
     expect(answer.headers['cache-control']).toBe('no-store');
+    expect(answer.headers['content-security-policy']).toBe(CONTENT_SECURITY_POLICY);
+    expect(CONTENT_SECURITY_POLICY).toContain("default-src 'none'");
+    expect(CONTENT_SECURITY_POLICY).not.toMatch(/'unsafe-inline'|'unsafe-eval'|blob:|data:/);
     expect(answer.headers['content-length']).toBe(String(answer.body.length));
   });
 
@@ -147,6 +152,30 @@ describe('what it refuses', () => {
     for (const requestPath of ['/notes.md', '/serve.mjs']) {
       expect((await send({ path: requestPath })).status, requestPath).toBe(404);
     }
+  });
+
+  test('a link with a served ending to a file of another type', async () => {
+    if (!linkMade) return;
+    const answer = await send({ path: '/alias.js' });
+    expect(answer.status).toBe(404);
+    expect(answer.body.toString()).not.toContain('never serves its own source');
+  });
+
+  test('a download that is broken off leaves no file open', async () => {
+    if (!existsSync('/proc/self/fd')) return; // the count of open files is read where the system shows it
+    const open = () => readdirSync('/proc/self/fd').length;
+    const before = open();
+    for (let i = 0; i < 20; i += 1) {
+      await new Promise((resolve) => {
+        const outgoing = request({ host: HOST, port, path: '/big.js', headers: { Host: addressFor(port) } }, (incoming) => {
+          incoming.once('data', () => incoming.destroy());
+          incoming.once('close', resolve);
+        });
+        outgoing.end();
+      });
+    }
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    expect(open() - before).toBeLessThan(5);
   });
 
   test('a folder without its closing slash, and a file that is not there', async () => {

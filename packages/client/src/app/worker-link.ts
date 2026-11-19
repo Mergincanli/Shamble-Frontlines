@@ -64,6 +64,11 @@ export class WorkerLink {
     this.#port.postMessage({ type: "start", padBytes }, []);
   }
 
+  /** The Worker's message event. Unpacking it is part of the hand-off's cost, so it happens in here, by name. */
+  receive(event: { readonly data: unknown }): string {
+    return this.onMessage(event.data);
+  }
+
   /**
    * A message from the Worker. Returns the text of an error the page should count, or an empty string. After the
    * first failure the match is over: the caller stops the Worker, and whatever still arrives is ignored, so one

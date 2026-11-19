@@ -13,6 +13,7 @@ import { createReadStream, realpathSync } from 'node:fs';
 import { realpath, stat } from 'node:fs/promises';
 import { createServer as createHttpServer } from 'node:http';
 import path from 'node:path';
+import { pipeline } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 
 /** The only address the server binds: this computer. */
@@ -34,7 +35,20 @@ const CONTENT_TYPES = new Map([
   ['.wasm', 'application/wasm'],
 ]);
 
-const COMMON_HEADERS = { 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store' };
+/**
+ * The strict content security policy the page is built to run under (ADR 0002 part 7): everything comes from this
+ * server's own files, the Wasm may be compiled, nothing is inline, and no other page may frame it. Sent with every
+ * answer, because a Worker takes its policy from its own script's response.
+ */
+export const CONTENT_SECURITY_POLICY =
+  "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; " +
+  "style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'";
+
+const COMMON_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Cache-Control': 'no-store',
+  'Content-Security-Policy': CONTENT_SECURITY_POLICY,
+};
 
 function refuse(response, status, text, extra = {}) {
   const body = `${text}\n`;
@@ -67,8 +81,6 @@ async function fileFor(realRoot, requestUrl) {
   const joined = path.join(realRoot, relative);
   const fromRoot = path.relative(realRoot, joined);
   if (fromRoot === '' || fromRoot.startsWith('..') || path.isAbsolute(fromRoot)) return { status: 404 };
-  const type = CONTENT_TYPES.get(path.extname(joined).toLowerCase());
-  if (type === undefined) return { status: 404 };
   let real;
   let info;
   try {
@@ -79,6 +91,9 @@ async function fileFor(realRoot, requestUrl) {
   }
   const realFromRoot = path.relative(realRoot, real);
   if (realFromRoot.startsWith('..') || path.isAbsolute(realFromRoot) || !info.isFile()) return { status: 404 };
+  // The type is the real file's, so a link with a served ending cannot hand out a file of another kind.
+  const type = CONTENT_TYPES.get(path.extname(real).toLowerCase());
+  if (type === undefined) return { status: 404 };
   return { status: 200, file: real, size: info.size, type };
 }
 
@@ -87,7 +102,9 @@ async function fileFor(realRoot, requestUrl) {
  * @param {{ root: string }} options
  */
 export function createServer({ root }) {
-  const realRoot = realpathSync(root);
+  // The system's own resolution, as each request's path gets (on Windows the two can differ for a short name or a
+  // mapped drive, and every request would then miss).
+  const realRoot = realpathSync.native(root);
   const server = createHttpServer((request, response) => {
     handle(server, realRoot, request, response).catch(() => {
       if (!response.headersSent) refuse(response, 500, 'The server could not answer this request.');
@@ -117,9 +134,8 @@ async function handle(server, realRoot, request, response) {
     response.end();
     return;
   }
-  const stream = createReadStream(found.file);
-  stream.on('error', () => response.destroy());
-  stream.pipe(response);
+  // pipeline closes the file when the answer ends for any reason, a download the client broke off among them.
+  pipeline(createReadStream(found.file), response, () => {});
 }
 
 /**

@@ -54,6 +54,8 @@ test("after the memory grows between two steps, the next block is the block of a
   const plain = new Sim(SEED, 0, 1024, 0);
   grown.step();
   plain.step();
+  // One copy before the growth, so a host that keeps its first view is caught here whatever ran before.
+  expect(tickOf(blockOf(grown))).toBe(1);
   const kept = new Uint8Array(wasm.memory.buffer, grown.block_ptr(), grown.block_len());
   wasm.memory.grow(1);
   grown.step();
@@ -121,9 +123,12 @@ test("the host on the real Wasm: two calls per tick, one transferred block per t
   host.start();
   host.onMessage({ type: "input", sequence: 9, returned: [] });
   for (let i = 0; i < 30; i += 1) {
+    // Half-way the memory grows: the host itself must copy through a fresh view from then on (PM-0002-6).
+    if (i === 15) wasm.memory.grow(1);
     clock.now = timer.at;
     timer.run();
   }
+  expect(posts.filter((post) => post.type === "error")).toEqual([]);
   const blocks = posts.filter((post) => post.type === "block");
   expect(blocks.map((block) => tickOf(block.buffer))).toEqual(Array.from({ length: 30 }, (_, i) => i + 1));
   for (const block of blocks) expect(checkLayoutHash(block.buffer)).toEqual({ ok: true });

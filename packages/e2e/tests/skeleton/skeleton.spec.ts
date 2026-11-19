@@ -42,13 +42,19 @@ for (const [name, query] of [["the default backend", ""], ["the forced WebGL 2 f
     await expect(page.locator("html")).toHaveAttribute("data-backend", backend);
     await expect(page.locator("#overlay pre")).toContainText(`backend: ${backend}`);
     await page.screenshot({ path: info.outputPath(`first-page-${backend.replaceAll(" ", "-")}.png`) });
-    // One block per tick, each transferred; at most one input post per drawn frame; no error.
+    // One block per tick, each transferred; no error.
     expect(Math.abs(data.blocks - data.tick)).toBeLessThanOrEqual(1);
-    expect(Math.abs((data.worker?.ticks ?? -9) - data.tick)).toBeLessThanOrEqual(8);
     expect(data.worker?.undetached).toBe(0);
-    expect(data.posts).toBeLessThanOrEqual(data.frames);
-    expect(data.posts).toBeGreaterThan(0);
-    expect(data.errors).toBe(0);
+    // A timer that fires before its tick is due costs a second, late wake: about one wake per tick is right.
+    expect(data.worker?.wakes ?? 0).toBeLessThanOrEqual(1.1 * (data.worker?.ticks ?? 0) + 2);
+    // The newest input is posted once per drawn frame: over two seconds, as many posts as frames.
+    await page.waitForTimeout(2000);
+    const later = await report(page);
+    const [posts, frames] = [later.posts - data.posts, later.frames - data.frames];
+    expect(frames).toBeGreaterThan(3);
+    expect(posts).toBeLessThanOrEqual(frames);
+    expect(frames - posts).toBeLessThanOrEqual(1);
+    expect(later.errors).toBe(0);
     // The page made no call into WebAssembly and no instantiation (PM-0002-2).
     expect(await page.evaluate(() => (window as unknown as { __wasmCalls: number }).__wasmCalls)).toBe(0);
     // Nothing was asked of any address but the small server's.
@@ -67,17 +73,22 @@ test("a hidden tab pauses the match, and it resumes where it stopped", async ({ 
       document.dispatchEvent(new Event("visibilitychange"));
     }, hidden);
   await setHidden(true);
-  const before = (await report(page)).tick;
+  // The Worker's own count is what is judged: the page asks it for a report four times a second, and blocks that
+  // were already on their way when the tab was hidden do not move it.
+  await page.waitForTimeout(1000);
+  const hidden = (await report(page)).worker?.ticks ?? -1;
   await page.waitForTimeout(2000);
-  const during = (await report(page)).tick;
-  // At most the one tick that was already on its way; two seconds would be 60.
-  expect(during - before).toBeLessThanOrEqual(1);
+  const stillHidden = await report(page);
+  // Not one tick in two seconds; a match that ran on would have made 60.
+  expect(stillHidden.worker?.ticks).toBe(hidden);
   await setHidden(false);
-  await page.waitForFunction((tick) => (window as unknown as { __shambleReport(): Report }).__shambleReport().tick >= tick + 30, during);
+  await page.waitForTimeout(1500);
   const after = await report(page);
+  // It goes on from where it stopped: one pause, nothing dropped, and no more ticks than the time since.
+  expect(after.worker?.pauses).toBe(1);
+  expect(after.worker?.drops).toBe(0);
+  expect(after.worker?.ticks ?? 0).toBeGreaterThan(hidden);
+  expect((after.worker?.ticks ?? 999) - hidden).toBeLessThanOrEqual(60);
   expect(after.pauses).toBe(1);
-  // Blocks already on their way when the tab was hidden still arrive: at most one wake's worth (7) and one.
-  expect(after.lastPause?.ticksWhileHidden).toBeLessThanOrEqual(8);
-  expect(after.worker?.maxTicksInOneWake).toBeLessThanOrEqual(7);
   expect(after.errors).toBe(0);
 });

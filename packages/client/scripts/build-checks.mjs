@@ -118,10 +118,45 @@ export function cspProblems(files) {
     if (/data:(application\/wasm|text\/javascript|application\/javascript)/i.test(text)) {
       problems.push(`${name}: a script or the Wasm in a data: URL`);
     }
-    if (name.endsWith(".js") && /new Worker\(\s*(URL\.createObjectURL|["'`]blob:)/.test(text)) {
-      problems.push(`${name}: a Worker from a blob: URL`);
+    if (name.endsWith(".js")) {
+      // None of these is in the page today; each would need a looser policy than the one serve.mjs sends.
+      for (const [what, pattern] of [["eval", /\beval\(/], ["new Function", /\bnew Function\(/], ["a blob: URL", /createObjectURL|blob:/]]) {
+        if (pattern.test(text)) problems.push(`${name}: ${what}`);
+      }
     }
   }
   return problems;
+}
+
+/** Text that only the development readout, its report and the tests' hook hold. */
+const DEV_MARKERS = ["Copy report", "__shambleReport", "ticks while hidden", "first page: report"];
+
+/**
+ * Two rules of the built page, one line per breach. The Wasm's glue is in the Worker's chunk and in no other (the
+ * page never touches the Wasm); and a production build holds none of the development-only code, while a
+ * development build holds all of it (so the markers themselves are known to be right).
+ * @param {{ name: string, bytes: Uint8Array }[]} files
+ */
+export function bundleProblems(files, production) {
+  const scripts = files.filter(({ name }) => name.endsWith(".js")).map(({ name, bytes }) => ({ name, text: Buffer.from(bytes).toString("utf8") }));
+  const problems = scripts
+    .filter(({ name, text }) => !/(^|\/)worker-[^/]*\.js$/.test(name) && /__wbindgen|__wbg_/.test(text))
+    .map(({ name }) => `${name}: the Wasm's glue outside the Worker's chunk`);
+  for (const marker of DEV_MARKERS) {
+    const found = scripts.filter(({ text }) => text.includes(marker)).map(({ name }) => name);
+    if (production && found.length > 0) problems.push(`${found.join(", ")}: development code in a production build (${JSON.stringify(marker)})`);
+    if (!production && found.length === 0) problems.push(`a development build without ${JSON.stringify(marker)}: the marker list is out of date`);
+  }
+  return problems;
+}
+
+/**
+ * Refuses an output folder the build must not empty. Vite clears the folder it builds into, so the folder is either
+ * the page's own `dist` or one whose name starts with `dist-`: a mistyped `--out-dir` cannot wipe sources or notes.
+ */
+export function checkOutDir(outDir, defaultDir) {
+  if (outDir !== defaultDir && !/^dist-[\w.-]+$/.test(outDir.split(/[\\/]/).pop() ?? "")) {
+    throw new Error(`--out-dir must be a folder named dist-<something>, because the build empties it: ${outDir}`);
+  }
 }
 

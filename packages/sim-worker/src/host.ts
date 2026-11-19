@@ -27,7 +27,10 @@ export interface HostEnv {
   readonly crossOriginIsolated: boolean;
 }
 
-/** Buffers in the pool: the page keeps the two newest blocks, one is on its way and one is being filled. */
+/**
+ * Buffers in the pool: the page keeps the two newest blocks, one is on its way and one is being filled. Enough while
+ * frames come at least as often as ticks; a slower page or a catch-up wake takes more, and each miss is counted.
+ */
 const POOL_SIZE = 4;
 const COPY_SAMPLES = 600;
 
@@ -131,16 +134,18 @@ export class SimHost {
       this.#env.post({ type: "error", message: error instanceof Error ? error.message : String(error) }, []);
       return;
     }
-    if (sleep !== null) this.#timer = this.#env.setTimer(this.#wake, sleep);
+    // A whole number of milliseconds, rounded up: a timer cuts a fraction off, fires before the tick is due, and
+    // the short second sleep that follows is stretched to about 4 ms by the browser, so the tick starts late.
+    if (sleep !== null) this.#timer = this.#env.setTimer(this.#wake, Math.ceil(sleep));
   };
 
   readonly #afterTick = (): void => {
     const buffer = this.#pool.take();
     const before = this.#env.now();
     copyBlock(this.#env.memory, this.#blockPtr, this.#blockBytes, buffer);
-    const doneAt = this.#env.now();
-    this.#copyMs.push(doneAt - before);
-    this.#env.post({ type: "block", buffer, doneAt: this.#env.timeOrigin + doneAt }, [buffer]);
+    this.#copyMs.push(this.#env.now() - before);
+    // The hand-off's clock starts when the step returned, before the copy.
+    this.#env.post({ type: "block", buffer, doneAt: this.#env.timeOrigin + before }, [buffer]);
     // A transferred buffer is detached, so its length is 0 here; anything else means it was copied (PM-0002-6).
     if (buffer.byteLength !== 0) this.#undetached += 1;
   };

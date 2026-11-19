@@ -56,7 +56,7 @@ export async function boot(): Promise<void> {
     fail(`The match stopped: ${problem}`);
   };
   worker.addEventListener("message", (event: MessageEvent<unknown>) => {
-    const problem = link.onMessage(event.data);
+    const problem = link.receive(event);
     if (problem !== "") stop(problem);
   });
   worker.addEventListener("error", (event) => stop(event.message === "" ? "the Worker failed" : event.message), { once: true });

@@ -40,6 +40,7 @@ function setUp(options: { transfer?: boolean; blockBytes?: number } = {}) {
   };
   const posts: WorkerToPage[] = [];
   let timer: { run: () => void; at: number } | undefined;
+  const delays: number[] = [];
   const env: HostEnv = {
     memory,
     now: () => clock.now,
@@ -48,6 +49,7 @@ function setUp(options: { transfer?: boolean; blockBytes?: number } = {}) {
       posts.push(options.transfer === false ? message : structuredClone(message, { transfer }));
     },
     setTimer(run, delayMs) {
+      delays.push(delayMs);
       timer = { run, at: clock.now + delayMs };
       return 1;
     },
@@ -69,21 +71,24 @@ function setUp(options: { transfer?: boolean; blockBytes?: number } = {}) {
   };
   const blocks = () => posts.flatMap((post) => (post.type === "block" ? [post] : []));
   const tickOf = (buffer: ArrayBuffer) => new DataView(buffer).getUint32(0, true);
-  return { host, sim, calls, posts, clock, runTimer, blocks, tickOf, hasTimer: () => timer !== undefined };
+  return { host, sim, calls, posts, clock, delays, runTimer, blocks, tickOf, hasTimer: () => timer !== undefined };
 }
 
 test("it says ready, then posts one transferred block per tick with two calls per tick", () => {
-  const { host, calls, posts, runTimer, blocks, tickOf } = setUp();
+  const { host, calls, posts, delays, runTimer, blocks, tickOf } = setUp();
   host.start();
   expect(posts[0]).toEqual({ type: "ready", blockBytes: 8, tickHz: 30 });
   for (let i = 0; i < 90; i += 1) expect(runTimer()).toBe(true);
+  // Every sleep is a whole number of milliseconds, so no timer fires before its tick is due: one wake, one tick.
+  expect(delays.every((delay) => Number.isInteger(delay) && delay >= 33)).toBe(true);
+  expect(host.stats().wakes).toBe(91);
   expect(blocks().map((block) => tickOf(block.buffer))).toEqual(Array.from({ length: 90 }, (_, i) => i + 1));
   // Exactly one input call and one step call per tick; the block's place and length were asked once, and the
   // schedule was set once, at the start (no pause, no drop).
   expect(calls).toEqual({ input: 90, step: 90, rebase: 1, block_ptr: 1, block_len: 1 });
   expect(host.stats()).toMatchObject({ ticks: 90, maxTicksInOneWake: 1, drops: 0, undetached: 0, blockBytes: 8 });
-  // The time is on the clock the page shares.
-  expect(blocks()[0]?.doneAt).toBeCloseTo(5_000_000 + 1000 + PERIOD, 6);
+  // The time is on the clock the page shares: the first wake came 34 ms after the start (33.33 rounded up).
+  expect(blocks()[0]?.doneAt).toBe(5_000_000 + 1000 + Math.ceil(PERIOD));
 });
 
 test("the newest input reaches the simulation, and returned buffers are used again", () => {

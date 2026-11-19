@@ -4,8 +4,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import {
+  bundleProblems,
   checkCli,
   checkCliFile,
+  checkOutDir,
   cspProblems,
   formatSizeTable,
   lockedWasmBindgenVersion,
@@ -168,11 +170,35 @@ describe("the page stays ready for a strict content security policy", () => {
       "a style attribute": file("index.html", '<p style="color:red">x</p>'),
       "an inline event handler": file("index.html", '<body onload="boot()">'),
       "a script or the Wasm in a data: URL": file("assets/a.js", 'fetch("data:application/wasm;base64,AGFzbQ==")'),
-      "a Worker from a blob: URL": file("assets/b.js", "new Worker(URL.createObjectURL(blob))"),
+      "a blob: URL": file("assets/b.js", "const u = URL.createObjectURL(blob); new Worker(u)"),
+      eval: file("assets/c.js", "x = eval(source)"),
+      "new Function": file("assets/d.js", "f = new Function(body)"),
     };
     for (const [problem, broken] of Object.entries(bad)) {
       expect(cspProblems([...good, broken]), problem).toEqual([`${broken.name}: ${problem}`]);
     }
   });
+});
+
+test("the build empties only its own dist or a folder named dist-<something>", () => {
+  const own = "/repo/packages/client/dist";
+  for (const good of [own, "/repo/.gate/cs2/dist-prod", "/tmp/dist-1.2"]) expect(() => checkOutDir(good, own)).not.toThrow();
+  for (const bad of ["/repo", "/repo/.gate", "/repo/packages/client/src", "/repo/packages/client/dist2", "/repo/dist-", "/"]) {
+    expect(() => checkOutDir(bad, own), bad).toThrow("because the build empties it");
+  }
+});
+
+test("the glue stays in the Worker's chunk, and development code stays out of a production build", () => {
+  const file = (name, text) => ({ name, bytes: Buffer.from(text) });
+  const worker = file("assets/worker-abc.js", "wasm.__wbindgen_malloc(1); imports.__wbg_Error_1 = 0;");
+  const page = file("assets/index-abc.js", "boot()");
+  const dev = file("assets/report-abc.js", 'x("Copy report", window.__shambleReport, "ticks while hidden", "first page: report")');
+  expect(bundleProblems([worker, page], true)).toEqual([]);
+  expect(bundleProblems([worker, page, dev], false)).toEqual([]);
+  expect(bundleProblems([worker, file("assets/index-abc.js", "__wbg_init()")], true)).toEqual([
+    "assets/index-abc.js: the Wasm's glue outside the Worker's chunk",
+  ]);
+  expect(bundleProblems([worker, page, dev], true)).toHaveLength(4);
+  expect(bundleProblems([worker, page], false)).toHaveLength(4);
 });
 

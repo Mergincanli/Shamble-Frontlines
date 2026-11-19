@@ -17,5 +17,6 @@ test("the built page opened as a file either runs or says how to serve it", asyn
   info.annotations.push({ type: "opened as a file", description: result });
   console.log(`opened as a file: ${result}`);
   if (ran) await expect(notice).toBeHidden();
-  else await expect(notice).toContainText('run "node serve.mjs"');
+  else await expect(notice).toBeVisible();
+  if (!ran) await expect(notice).toContainText('run "node serve.mjs"');
 });
