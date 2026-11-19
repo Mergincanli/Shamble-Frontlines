@@ -2,9 +2,9 @@
 - **Goal:** the netcode proof test (SPIKE_PLAN item 1) under its approved plan `.checkpoints/netcode-proof-test/plan.md`,
   rev 3.3 (the advisor and Mustafa, 2026-11-06; verdict advisor-verdict.md) · PR #40 (draft).
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`).
-  **Base:** main b763ba3 merged in at 0f12d9e (MAIN-60, 2026-11-18 23:41 UTC: #55-#60, the first v2 code, DEP-HOLD,
-  a CI workflow; one conflict, docs/STATUS.md: this branch's #40 row kept beside main's #60 row), which clears PR #40's
-  conflict. MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
+  **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
+  conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
+  before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
 - **Last update:** 2026-11-19 15:0x UTC: SIZE-U4F ANSWERED (a) (history.md:6896-6903); round 1 returned and ruled
   (advisor-u4f-r1.md); builder 4's fix pass next. Disk 11,784 MiB free (14:53 UTC, after the part-clean).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
@@ -121,6 +121,8 @@
   controller (NC-U4F-2); f5 is measured as the brief writes it, late apart from missing, the unruled 3 % dropped
   (TE-U4F-1; no bar changes); no second review round on the fix pass (the 2026-11-17 choice), the advisor's check of
   it instead. Why: inside the plan, undoable, no pass mark, judge file, marks.json or existing SERIES.md row changes.
+- **2026-11-19 (to name in the next day's message):** main f5030a3 taken in now, while builder 4 runs, plan first
+  (MAIN-61; advisor-main-61.md C1-C6). Why: his MAIN-52 rule; inside the plan, undoable; nothing on main changes.
 
 ## Next steps (plan rev 3.3; units ahead)
 1. U4f (above), then U4f2 (-21's forged suite and runs; its short brief to the advisor; its size line on the card before
@@ -184,6 +186,31 @@
   diff --name-only --diff-filter=U` names docs/STATUS.md, resume at step 3; otherwise resume at step 3's checks before
   the commit (C2 (b)), then step 4. If HEAD^2 is f5030a3 and HEAD is not on the remote yet, resume at step 5. Builder
   4's notes and this card may show unstaged: leave them; step 6's card save takes them. Anything else: the advisor rules.
+  **Step 1 (15:3x-15:4x UTC):** the saver bsf862iz2 stopped by TaskStop; the proof used (C5 (b)): its output ends
+  "[killed]" with no save logged since 14:57:30, and `pgrep -af "checkpoint.mjs watch"` finds no process (exit 1);
+  its last save 52f9f4e (holding this resume line) equals the remote, so no foreground save ran (C5 (c)). **H0 =
+  52f9f4ea10f4681a748b48b5ce47b9d8c5855798.** `git fetch origin`: main unmoved. Pre-checks all pass: status clean;
+  origin/main f5030a3; base b763ba3; the guard's pathspec empty; merge-tree's one conflict docs/STATUS.md; main's CI on
+  f5030a3 green (push runs gate 44551896122, toolchain 44551894194: completed, success). The base light run RUNNING in
+  the background (task brz7ok5bs; .gate/main-61/light-base.log). No save until the push (C2 (c)).
+  **Steps 1-5c DONE:** the base run passed C1 (a)'s bar (N0 1,515, M0 307); `git merge origin/main` exit 1, STATUS.md
+  the one CONFLICT; resolved by Edit (the #40 row ours, #61 main's); C2 (b)'s checks equal; **merge commit a6acc8a**
+  (git's message); step 4's checks and C1 (c)'s three all as stated; gate PASS, repo map 170/110, checkpoint tests
+  33/33 (.gate/main-61/step5-outputs.txt). **Step 5d PASSED** (.gate/main-61/light.log, 15:42:17-15:42:21 UTC, exit 0,
+  HEAD a6acc8a, hashes e3b0c442…: refs 1,565 = N0 + 50 with the exception line; the full marks line; self 78 of 78;
+  redact 10 of 10, 307 items, 0 findings). **Step 6:** this card save pushes a6acc8a; then the saver, CI on the pushed
+  head, the advisor's head check (step 7). Free disk 4,508 MiB at 15:42 (builder 4's cold end checks).
+  **15:5x UTC, Mustafa (92 % usage): "make sure to save your progress (Same for the agents)".** Pushed: everything to
+  52f9f4e. Local only: merge commit a6acc8a and these card lines (no push before 5d, C2 (c)); 5d waits for builder 4's
+  lane lock (no log yet). Builder 4 told by SendMessage to bring its notes block up to date. **If cut:** the resume line
+  above (HEAD^2 = f5030a3 and HEAD not on the remote: step 5, so 5d again in the background, then step 6, the saver,
+  then builder 4's snapshot by worktree_patch.py).
+  **Builder 4 at 15:39 UTC** (its message): FP1-FP19 done, each with its log line; no plant in place (FP4's and FP15's
+  restored, sha256 equal); SIZE-CHECK 6,425 (the pass +212); end check A running (-x, .gate/u4f/w4-end-check-a.log,
+  cold), then B, --list, times, items 4 and 5. **Its notes are in its worktree's copy**
+  (.claude/worktrees/agent-a5b1297a320917dfb/.checkpoints/netcode-proof-test/u4f-build.md: :1-866 equal to the main
+  folder's, then its block): the harness keeps an isolated agent in its worktree. After the push, copy that block to
+  the main folder's file by script, word for word, then snapshot its worktree.
 - **Builder 4 (the fix pass) RUNNING** from 14:57 UTC (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
