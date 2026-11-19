@@ -101,6 +101,9 @@
   stopped; no agent running; `bash .checkpoints/netcode-proof-test/main-run.sh /home/user/Shamble-Frontlines/.gate/u4f-merge/r2.log node ops/runs/c-u4f-r2.mjs --date 2026-11-19`
   (lock exclusive) in the background. **Until r2.txt is written: no commit and no edit to any tracked file in the main
   folder (this card included; a check-in's save waits).** Then the saver again, and the card.
+  **The r2 record run DONE** (19:35-19:42:17 UTC, exit 0; .gate/u4f-merge/r2.log; r2.txt at
+  .gate/netcode-proof-test/u4f-r2-d502f54de6d5/r2.txt, 330 lines; from d502f54, whose spike tree equals 25d316e's).
+  **Next:** the advisor reads each row against its `expect` (advisor-u4f-r2.md); then the part-clean, the sets.
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
