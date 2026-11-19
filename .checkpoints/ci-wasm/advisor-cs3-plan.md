@@ -92,3 +92,6 @@ Then DONE.
 **Decisions needed:** none from me beyond the plan's own questions, after the fixes. **For Mustafa:** nothing yet; the revised plan goes to him.
 - B12 done.
 DONE
+
+## Re-read of draft 2 (cs3-plan.md at bf6ec3e, 350 lines; draft 1 at 8c2e36d)
+Plan: R1 diff 8c2e36d..bf6ec3e and read draft 2 whole; R2 check conditions 1-12 against section 14's places; R3 judge the three new choices (5.1 hash route + DEPART-3; presses.spec.ts size/run time; section 9 table additions); R4 the four questions as written; R5 the answer (max 20 lines), then DONE.
