@@ -21,14 +21,14 @@ This agent has no Edit tool: the notes file is rewritten whole with Write each t
   --numstat`), no `unsafe`, floats only in tests (lab scenario.rs tests, client trace.rs), no HashMap/HashSet, no clock
   read (grep of the patch's added lines; patch sha256 74ae26aa29c229d6).
 - Room hostile-value walk (input.rs:34-36 `dist`, :210-345 offer/filter/check, :350-391 due/take/drain; room.rs:920-1030
-  receive_input, :1057-1100 fill_input, :1330-1372 run_one): every tick compare goes through `dist` (i64 of
+  receive_input, :1057-1110 fill_input, :1330-1372 run_one): every tick compare goes through `dist` (i64 of
   `wrapping_sub as i32`); kind 4 squares i8 widened to i32 (max 2 x 128^2 = 32,768); kind 5 u8 wrapping_sub into i64;
   `take`'s `before - len` follows a retain; `kept_stamps[slot]` / `run_presses[slot]` cannot go out of bounds (both
   `vec![..; slots.max(1)]` like `clients`, and `slot` already passed `clients.get_mut`; `join` checks `i <
   clients.len()`); counters are u64 += 1; per-tick press sums are u32 reset each tick (at most 4 x 255 x 32). No panic
   or overflow found from network values in npt-room.
-- Room per-tick allocation after warm-up: none new. `drained` is taken and put back (room.rs:1068, :1105), `ran_early`,
-  `wraps`, `rewinds_refused` cleared with capacity kept, `incoming`/`refusals` swapped (room.rs:1039-1040), `kept` <= 16,
+- Room per-tick allocation after warm-up: none new. `drained` is taken and put back (room.rs:1066, :1108), `ran_early`,
+  `wraps`, `rewinds_refused` cleared with capacity kept, `incoming`/`refusals` swapped (room.rs:1032-1033), `kept` <= 16,
   `stamps` <= 64, `buffered` <= 8 (32 in bites builds), `refusals` <= 4,096 (more counted in `refusals_dropped`).
   The only heap case: `canonical`'s stable sort (room.rs:444-445, sort_by_key) above about 102 commands in a tick
   (element 40 B: Command 32 B + Option<Rewind> 8 B; std's stable sort keeps a 4 KiB stack scratch, heap above it), so
@@ -45,7 +45,7 @@ This agent has no Edit tool: the notes file is rewritten whole with Write each t
   outage with lost commands, or the controller after >= 128 steps with no page command while old commands sit
   unacknowledged; no judged profile reaches it (B1's bursts are 1 s: l1/src/lib.rs:197-200). f25 (carry80.rs:82-99)
   tests the aim case only. npt-bots' own rewrite gets this right by trial-encoding and popping the oldest
-  (bots/src/lib.rs:479-489).
+  (bots/src/lib.rs:478-489).
 - RR-U4F-2 (Low): clock.rs:163 `i64::try_from(offset).unwrap_or(i64::MAX)`: an offset below i64::MIN (server_ns =
   u64::MAX with echo = arrival = 0: offset about -1.8e19) is stored as +i64::MAX, a sign flip. Only a `Pong` matching an
   outstanding (id, echo) pair reaches it, so only a broken or hostile server; saturate by sign.
@@ -72,8 +72,8 @@ This agent has no Edit tool: the notes file is rewritten whole with Write each t
 ## Lines the brief asks for
 - Identical results on Wasm and native: A2 (w3-end-check-a2.log:198) and B (w3-end-check-b.log:185) wasm step PASS,
   native leg 1 vs native leg 2 and vs Wasm leg 1: 27,000 ticks each, 0 mismatching, h2 equal; clippy-wasm32 PASS on the
-  measured and bites builds; deps: no fma, simd128 or relaxed-simd. U4f's sim change (world.rs:595-609, :944-951,
-  :1315-1322, :1426-1460) is bites-only: in the measured build `refuse_far` is the constant false and `ready` unchanged,
+  measured and bites builds; deps: no fma, simd128 or relaxed-simd. U4f's sim change (world.rs:595-612, :947-951,
+  :1318-1322, :1429-1457) is bites-only: in the measured build `refuse_far` is the constant false and `ready` unchanged,
   so the fire rule reads as before. npt-client's and npt-room's new code is integer-only with no usize-width-dependent
   result (all `len()` casts widen), so it is target-independent by the language's integer semantics; the wasm step
   runs npt-sim only, so that part is by reading, not by a run.
@@ -91,7 +91,7 @@ APPROVE WITH FINDINGS: one Medium (RR-U4F-1), four Lows. No Critical or High.
 
 | Id | Severity | Where | Fix |
 |---|---|---|---|
-| RR-U4F-1 | Medium | client/src/lib.rs:751-774 (and the claim at :697-698) | after the per-command retain, keep the longest newest prefix of `unacked` that encodes whole (at most 8 trial encodes, rare path), as bots/src/lib.rs:479-489 does, or truncate at the first pair whose `u8::try_from(newer.tick.wrapping_sub(older.tick))` fails; count the rest `left_out`. Test: fixed-lead endpoint, one command left unacknowledged, newest moved +300, one more command: today the `Input` holds 0 commands; after the fix it holds the newest one and `twin_left_out()` (or the counter used) rose by 1 |
+| RR-U4F-1 | Medium | client/src/lib.rs:751-774 (and the claim at :697-698) | after the per-command retain, keep the longest newest prefix of `unacked` that encodes whole (at most 8 trial encodes, rare path), as bots/src/lib.rs:478-489 does, or truncate at the first pair whose `u8::try_from(newer.tick.wrapping_sub(older.tick))` fails; count the rest `left_out`. Test: fixed-lead endpoint, one command left unacknowledged, newest moved +300, one more command: today the `Input` holds 0 commands; after the fix it holds the newest one and the left-out count rose by 1 |
 | RR-U4F-2 | Low | client/src/clock.rs:163 | `offset.clamp(i128::from(i64::MIN), i128::from(i64::MAX)) as i64`; a unit case with server_ns = u64::MAX |
 | RR-U4F-3 | Low | client/src/lib.rs:690-707 | encode `Message::Input(input)` by value; on error build a fresh `Input { ack_tick, ack_groups, commands }` from `unacked` after `drop_unencodable` |
 | RR-U4F-4 | Low | room/tests (new case) | the seeded property test above (splitmix64 as commands.rs:411-418, both options, about 10,000 datagrams) |
@@ -106,5 +106,4 @@ APPROVE WITH FINDINGS: one Medium (RR-U4F-1), four Lows. No Critical or High.
   (unmeasured, likely small).
 - Test files (commands.rs, trace.rs, carry80.rs, pong.rs, lab tests) were read for the hostile-value cases only, not
   for counts or assertion strength (the test seat's); ops/runs/*.mjs not read (not Rust).
-- The lab's logic (episodes, attribution-free tallies, -47's read instant) beyond overflow and panics: the netcode and
-  test seats'.
+- The lab's logic (episodes, tallies, -47's read instant) beyond overflow and panics: the netcode and test seats'.
