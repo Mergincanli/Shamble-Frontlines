@@ -185,15 +185,16 @@ index b2ed0a3..b82a27d 100644
    expect(rate).toBeLessThan(100_000);
  });
 diff --git a/packages/e2e/tests/skeleton/skeleton.spec.ts b/packages/e2e/tests/skeleton/skeleton.spec.ts
-index fafa371..a7b2bb7 100644
+index fafa371..10117b9 100644
 --- a/packages/e2e/tests/skeleton/skeleton.spec.ts
 +++ b/packages/e2e/tests/skeleton/skeleton.spec.ts
-@@ -92,3 +92,18 @@ test("a hidden tab pauses the match, and it resumes where it stopped", async ({
+@@ -92,3 +92,19 @@ test("a hidden tab pauses the match, and it resumes where it stopped", async ({
    expect(after.pauses).toBe(1);
    expect(after.errors).toBe(0);
  });
 +
-+for (const [name, body] of [["cannot be loaded", null], ["throws as it starts", 'throw new Error("boom");']] as const) {
++const broken = [["cannot be loaded", null, "the Worker failed"], ["throws as it starts", 'throw new Error("boom");', "boom"]] as const;
++for (const [name, body, said] of broken) {
 +  test(`a Worker that ${name} stops the match once and says so on the page`, async ({ page }) => {
 +    const thrown: string[] = [];
 +    page.on("pageerror", (error) => thrown.push(error.message));
@@ -201,7 +202,7 @@ index fafa371..a7b2bb7 100644
 +      body === null ? route.fulfill({ status: 404, body: "" }) : route.fulfill({ contentType: "text/javascript", body }),
 +    );
 +    await page.goto("/");
-+    await expect(page.locator("#notice")).toContainText("The match stopped");
++    await expect(page.locator("#notice")).toHaveText(new RegExp(`^The match stopped: .*${said}`));
 +    await page.waitForFunction(() => "__shambleReport" in window);
 +    expect((await report(page)).errors).toBe(1);
 +    expect(thrown).toEqual([]);

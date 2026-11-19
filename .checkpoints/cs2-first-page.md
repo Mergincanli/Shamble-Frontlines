@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 10:59 UTC (from the clock)
+- **Last update:** 2026-11-19 11:06 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -473,8 +473,20 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     the Worker's script answered 404 says "The match stopped: the Worker failed" with errors 1 (before: errors 2,
     nothing shown). The worktree `.gate/cs2-plants` holds the diff applied.
 
+53. **The candidate grew by one test and one guard, and its planted defects run** (`round2-fixes.diff` is now 9 files,
+    +61 -20, size would be 4,471): the Worker-failure test reads the reason on the page (so a missing message passed
+    on fails it); the allocation window must end before block 420. `plants.py` is at its third version (patterns
+    anchored on the failing line's mark; plants 14, 14b, 15 for round 2's fixes; the tree must end as it started);
+    its run on the scratch worktree with the candidate applied started 11:00:59 UTC (`planted-defects-3.md`).
+54. **Pull request #61 opened as a draft** (https://github.com/Mergincanli/Shamble-Frontlines/pull/61; about 11:0x
+    UTC by the GitHub tool's answer), so that the docs can cite it. Not watched (as #58 and #60).
+55. **The docs pass started** (docs-keeper, Opus 5.5 at effort high, on STATUS, the archive, ROADMAP and the map; its
+    notes `docs-keeper-notes.md`, its list `docs-keeper-moved-lines.md`). By the main session, by script: ADR 0002's
+    dated pointer for SPLIT-25 (`adr-pointer.mjs`; written into `docs/adr/0002-...md`, 6 lines, not committed
+    yet). The report's draft: `report-draft.md` (its open places are marked with double brackets).
+
 ## Current step
-53. **Waiting for his answer to SIZE-STOP-2** (asked 07:57 UTC; no code is added or changed until then). On (a):
+56. **Waiting for his answer to SIZE-STOP-2** (asked 07:57 UTC; no code is added or changed until then). On (a):
     apply `round2-fixes.diff` in the main folder (`git apply`), update `plants.py` (plant 7b's line is now
     `toBeLessThan\(610\)`; anchor the patterns as test-engineer's NT2 says; add the Worker-failure plant), run every
     check, commit by path, save. Then: the planted defects once more on that head, the verifier until PASS, the docs

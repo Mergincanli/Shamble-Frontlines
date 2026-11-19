@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""The planted defects of change-set 2 (plan section 9), second version (2026-11-19), after test-engineer's review:
+"""Third version (2026-11-19, after round 2): the patterns of the browser plants are anchored on the failing line's
+own mark (test-engineer's NT2: Playwright prints the neighbouring lines too, and a passing test's title); plant 7b
+names the new limit; plants 14, 14b and 15 cover round 2's fixes (a Worker that cannot load, a Worker's error counted
+twice, a refusal by the page's policy that no test saw); the tree must end as it started (it may hold a candidate
+diff that is not committed).
+The planted defects of change-set 2 (plan section 9), second version (2026-11-19), after test-engineer's review:
 each plant now names the line its check must print (`must`), so a plant that is caught by a timeout or by another
 test's failure does not count; plants 1, 3, 8 and 8.5 are the sharper ones it asked for; new plants cover the
 build's own checks, the growth through the host, a post on every other frame and an allocation in the listener.
@@ -18,6 +23,7 @@ def e2e(spec): return f"node node_modules/@playwright/test/cli.js test -c packag
 BOUNDARY = "cd packages/sim-worker && node ../../node_modules/vitest/vitest.mjs run --dir boundary"
 CLIENT = "cd packages/client && node ../../node_modules/vitest/vitest.mjs run"
 
+def at(pattern): return r"^\s*>\s*\d+ \|.*" + pattern  # the line Playwright marks as the one that failed
 def sh(cmd):
     p = subprocess.run(cmd, shell=True, env=ENV, capture_output=True, text=True)
     return p.returncode, p.stdout + p.stderr
@@ -34,9 +40,9 @@ LAYOUT_NEW = """    Section { name: "header", stride: 12, fields: &[
 BOOT = "packages/client/src/app/boot.ts"; LINK = "packages/client/src/app/worker-link.ts"; HOST = "packages/sim-worker/src/host.ts"
 PACING = "packages/sim-worker/src/pacing.ts"; READ = "packages/sim-worker/src/read-block.ts"; SERVE = "packages/client/serve.mjs"
 PLANTS = [
- dict(n="1", what="the page calls into WebAssembly after it has started (PM-0002-2's own bite)", prep=[BUILD], check=e2e("skeleton.spec"), must=r"__wasmCalls\)\)\.toBe\(0\)",
+ dict(n="1", what="the page calls into WebAssembly after it has started (PM-0002-2's own bite)", prep=[BUILD], check=e2e("skeleton.spec"), must=at(r"__wasmCalls\)\)\.toBe\(0\)"),
       edits=[(BOOT, "  link.start(flags.padBytes);", "  link.start(flags.padBytes);\n  try {\n    WebAssembly.validate(new Uint8Array(8));\n  } catch {\n    // counted by the test's stand-in\n  }")]),
- dict(n="2", what="a block posted without its transfer list (PM-0002-6)", prep=[BUILD], check=e2e("skeleton.spec"), must=r"undetached\)\.toBe\(0\)",
+ dict(n="2", what="a block posted without its transfer list (PM-0002-6)", prep=[BUILD], check=e2e("skeleton.spec"), must=at(r"undetached\)\.toBe\(0\)"),
       edits=[(HOST, "doneAt: this.#env.timeOrigin + before }, [buffer]);", "doneAt: this.#env.timeOrigin + before }, []);")]),
  dict(n="3", what="a copy that keeps its view of memory.buffer (PM-0002-6): the copy test alone", prep=[], check=BOUNDARY + " -t 'after the memory grows'", must=r"after the memory grows",
       edits=[(READ, "  new Uint8Array(into).set(new Uint8Array(memory.buffer, ptr, len));", "  kept ??= new Uint8Array(memory.buffer, ptr, len);\n  new Uint8Array(into).set(kept);"),
@@ -54,28 +60,34 @@ PLANTS = [
       edits=[("packages/client/scripts/wasm-bindgen-tool.mjs", 'sha256: "ca4df773', 'sha256: "da4df773')]),
  dict(n="6", what="a misspelt field name in the writer's lookup", prep=[], check="cargo build -p client-endpoint --locked", must=r"the header has a tick field",
       edits=[("crates/client-endpoint/src/block.rs", 'layout::field("header", "tick")', 'layout::field("header", "tik")')]),
- dict(n="7", what="a 64-byte typed array allocated per frame in the page's hand-off code (PM-0002-7's bite)", prep=[BUILD], check=e2e("allocation.spec"), must=r"expect\(perFrame\)\.toBeLessThan\(170\)",
+ dict(n="7", what="a 64-byte typed array allocated per frame in the page's hand-off code (PM-0002-7's bite)", prep=[BUILD], check=e2e("allocation.spec"), must=at(r"expect\(perFrame\)\.toBeLessThan\(170\)"),
       edits=[(LINK, "    const returned = this.#returned;\n", "    const returned = this.#returned;\n    this.scratch = new Uint8Array(64);\n"),
              (LINK, "  pauses = 0;\n", "  pauses = 0;\n  scratch: Uint8Array | null = null;\n")]),
- dict(n="7b", what="a 64-byte typed array allocated per block where the message event is unpacked", prep=[BUILD], check=e2e("allocation.spec"), must=r"expect\(perBlock\)\.toBeLessThan\(390\)",
+ dict(n="7b", what="a 64-byte typed array allocated per block where the message event is unpacked", prep=[BUILD], check=e2e("allocation.spec"), must=at(r"expect\(perBlock\)\.toBeLessThan\(610\)"),
       edits=[(LINK, "    return this.onMessage(event.data);", "    this.scratch = new Uint8Array(64);\n    return this.onMessage(event.data);"),
              (LINK, "  pauses = 0;\n", "  pauses = 0;\n  scratch: Uint8Array | null = null;\n")]),
- dict(n="8", what="a Worker that ignores the hidden tab and runs on (PM-0004-70's bite)", prep=[BUILD], check=e2e("skeleton.spec"), must=r"stillHidden\.worker\?\.ticks\)\.toBe\(hidden\)",
+ dict(n="8", what="a Worker that ignores the hidden tab and runs on (PM-0004-70's bite)", prep=[BUILD], check=e2e("skeleton.spec"), must=at(r"stillHidden\.worker\?\.ticks\)\.toBe\(hidden\)"),
       edits=[(HOST, "        if (data.hidden) {\n          this.#pacer.pause();\n          this.#clearTimer();\n        } else if", "        if (data.hidden) {\n          // ignored\n        } else if")]),
- dict(n="8b", what="a Worker that runs the hidden gap on the tab's return instead of dropping it (the 7-tick cap kept)", prep=[BUILD], check=e2e("skeleton.spec"), must=r"worker\?\.drops\)\.toBe\(0\)",
+ dict(n="8b", what="a Worker that runs the hidden gap on the tab's return instead of dropping it (the 7-tick cap kept)", prep=[BUILD], check=e2e("skeleton.spec"), must=at(r"worker\?\.drops\)\.toBe\(0\)"),
       edits=[(PACING, "      this.#pauses += 1;\n      this.#nextDueMs = this.#sim.rebase(now);", "      this.#pauses += 1;")]),
  dict(n="9", what="a small server that lets a path out of its folder", prep=[], check=CLIENT, must=r"leaves the folder|leads outside",
       edits=[(SERVE, "  if (fromRoot === '' || fromRoot.startsWith('..') || path.isAbsolute(fromRoot)) return { status: 404 };", "  if (fromRoot === '') return { status: 404 };"),
              (SERVE, "  if (realFromRoot.startsWith('..') || path.isAbsolute(realFromRoot) || !info.isFile()) return { status: 404 };", "  if (!info.isFile()) return { status: 404 };")]),
  dict(n="9b", what="a small server that leaves the file of a broken-off download open", prep=[], check=CLIENT, must=r"leaves no file open",
       edits=[(SERVE, "  pipeline(createReadStream(found.file), response, () => {});", "  createReadStream(found.file).pipe(response);")]),
- dict(n="10", what="an isolation flag that sets COOP but not COEP (PM-0002-20's own bite)", prep=[BUILD], check=e2e("isolation.spec"), must=r"with the flag on .*crossOriginIsolated is true",
+ dict(n="10", what="an isolation flag that sets COOP but not COEP (PM-0002-20's own bite)", prep=[BUILD], check=e2e("isolation.spec"), must=r"✘.*with the flag on .*crossOriginIsolated is true",
       edits=[("packages/client/vite.config.mjs", '    ? { "Cross-Origin-Opener-Policy": "same-origin", "Cross-Origin-Embedder-Policy": "require-corp" }', '    ? { "Cross-Origin-Opener-Policy": "same-origin" }')]),
- dict(n="11", what="the page posts its input on every other frame only", prep=[BUILD], check=e2e("skeleton.spec"), must=r"frames - posts\)\.toBeLessThanOrEqual\(1\)",
+ dict(n="11", what="the page posts its input on every other frame only", prep=[BUILD], check=e2e("skeleton.spec"), must=at(r"frames - posts\)\.toBeLessThanOrEqual\(1\)"),
       edits=[(BOOT, "    link.frame(sequence);", "    if (sequence % 2 === 0) link.frame(sequence);")]),
  dict(n="12", what="the build's switch is not folded in: development code in a production build", prep=[], check=BUILD + " --production --out-dir .gate/dist-prod", must=r"development code in a production build",
       edits=[(BOOT, "  if (__SHAMBLE_DEVTOOLS__ && frames !== null) {", "  if ((globalThis as { __never?: boolean }).__never !== true && frames !== null) {"),
              (BOOT, "  const frames = __SHAMBLE_DEVTOOLS__ ? new FrameTimes() : null;", "  const frames = new FrameTimes();")]),
+ dict(n="14", what="a Worker whose script cannot be loaded: its error event has no message, and the page passes that on", prep=[BUILD], check=e2e("skeleton.spec"), must=at(r"The match stopped: "),
+      edits=[(BOOT, '    stop(event.message || "the Worker failed");', "    stop(event.message);")]),
+ dict(n="14b", what="a Worker's error is not cancelled, so the window counts it a second time", prep=[BUILD], check=e2e("skeleton.spec"), must=at(r"errors\)\.toBe\(1\)"),
+      edits=[(BOOT, "    event.preventDefault();\n", "")]),
+ dict(n="15", what="the page does something its content security policy refuses (an inline style)", prep=[BUILD], check=e2e("skeleton.spec"), must=at(r"later\.errors\)\.toBe\(0\)"),
+      edits=[(BOOT, "  link.start(flags.padBytes);", '  link.start(flags.padBytes);\n  document.head.append(Object.assign(document.createElement("style"), { textContent: "body{}" }));')]),
  dict(n="13", what="the page imports the Wasm's glue itself", prep=[], check=BUILD, must=r"the Wasm's glue outside the Worker's chunk",
       edits=[(BOOT, 'import { WorkerLink } from "./worker-link.ts";', 'import { WorkerLink } from "./worker-link.ts";\nimport { tick_hz } from "../../../sim-worker/pkg/sim_wasm.js";'),
              (BOOT, "  link.start(flags.padBytes);", "  link.start(flags.padBytes);\n  console.info(tick_hz);")]),
@@ -85,6 +97,8 @@ def stamp(): return time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
 def lines(out, show): return [l.rstrip()[:220] for l in out.splitlines() if re.search(show, l)][:4]
 
 print(f"# planted defects, started {stamp()}")
+START = sh("git diff -- crates packages")[1]
+print(f"the tree at the start: HEAD {sh('git rev-parse HEAD')[1].strip()}, with {len(START.splitlines())} lines of uncommitted diff in crates/ and packages/")
 bad = 0
 for plant in PLANTS:
     saved = {}
@@ -107,7 +121,7 @@ for plant in PLANTS:
     for l in named: print(f"    {l}")
     if not caught:
         for l in out.splitlines()[-12:]: print(f"    | {l.rstrip()[:200]}")
-assert sh("git status --short -- crates packages")[1].strip() == "", "the tree is not clean after the plants"
+assert sh("git diff -- crates packages")[1] == START, "the tree is not as it started after the plants"
 print(f"\n# control: the clean tree, {stamp()}")
 for cmd in [BUILD, "cargo test --workspace --locked", BOUNDARY, CLIENT, e2e(""), BUILD + " --production --out-dir .gate/dist-prod"]:
     code, out = sh(cmd)
