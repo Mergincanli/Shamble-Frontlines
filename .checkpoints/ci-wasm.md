@@ -145,7 +145,13 @@
    crate; DEPART-3; section 5.1 (which of the two designs wins on three symbols; the replay on the shipped file
    through one new read-only hash number); the follow-up table; the pass-mark table. Sizes now: 3a about 2,050, 3b
    about 3,800. Questions for him: RNG-SOURCE, SIZE-3, PRESS-PACE, DEPART-3; ruled by the advisor agent:
-   WASM-TEST-ROUTE (a), CI-LOOP (a) for E1 only. The advisor agent re-reads draft 2 (asked 21:01 UTC).
+   WASM-TEST-ROUTE (a), CI-LOOP (a) for E1 only.
+4d. The advisor agent's re-read of draft 2 (handed back 21:05 UTC): **APPROVE with six conditions** (two Medium,
+   four Low; it does not review again for them). **Draft 3** (21:06 UTC) makes all six: the 10-minute run outside
+   CI's specs and a possible CI limit raise before 3b; SIZE-3 (b) names everything that moves; the hash number's
+   wording in DEPART-3 and how its 64 bits cross; the import list of the player's own Wasm; `picture.ts` gains the
+   blend-fraction sentence; wording. **The plan may go to him** with its four questions (RNG-SOURCE, SIZE-3,
+   PRESS-PACE, DEPART-3) and the two rulings.
 
 ## Current step
 Step 5: the exact text and the three questions (CHROME-SOURCE, CI-TEXT, FIREFOX-TESTS) go to him in chat, with the
@@ -258,8 +264,7 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   the card's 2,700, so the plan must offer a split; notes
   `ci-wasm/engine-architect-cs3.md`: the boundaries, the page's key diagram, the rule tests, the build order). Both
   were given `ci-wasm/cs3-context.md`. A restart gives each the same task again.
-- The advisor agent, part "cs3-plan" (Opus 5.5, effort max, in the background): resumed at 21:01 UTC for the
-  re-read of draft 2; notes `ci-wasm/advisor-cs3-plan.md` ("Re-read of draft 2").
+- No agent is running (21:06 UTC). Done, besides those below: the advisor agent "cs3-plan" with its re-read.
 - Done: infra-engineer "ci-plan", test-engineer "followups", rust-reviewer "cs3-rng",
   security-auditor "ci-text", the advisor agent "plan" (with its re-read): every notes file ends with DONE.
 - Scratch outside git: `.gate/ci-wasm/` (`hist/`, `proposed/`, `proposed-plant/`, `docs-try/`, `security/`, `mutant/`,

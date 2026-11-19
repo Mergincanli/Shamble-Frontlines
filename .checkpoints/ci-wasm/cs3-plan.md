@@ -1,9 +1,12 @@
-# Plan (draft 2): change-set 3, "The loop closes", proposed as two change-sets, 3a and 3b
+# Plan (draft 3): change-set 3, "The loop closes", proposed as two change-sets, 3a and 3b
 
 _Draft 1 written by the main session, 2026-11-19, 20:35 UTC; **draft 2, 21:00 UTC (from the clock)**, after the
 advisor agent's review of draft 1 (`advisor-cs3-plan.md`: REVISE, twelve conditions, no Critical; all twelve are
-worked in here and listed in section 14). Written beside the CI-WASM pull request (#62), as his answer CI-WASM (a)
-allows ("change-set 3's plan may be written beside it"). Nothing of it is built before #62 is merged, before the
+worked in here and listed in section 14). **Draft 3, 21:06 UTC:** the advisor agent's re-read of draft 2:
+**APPROVE with six conditions** (two Medium, four Low, nothing High; "Re-read of draft 2" in its notes), all six
+made here; it does not need to review again for them. Written beside the CI-WASM pull request (#62), as his answer
+CI-WASM (a) allows ("change-set 3's plan may be written beside it"). Nothing of it is built before #62 is merged,
+before the
 advisor agent's APPROVE of this plan, and before his answers to section 12. It moves into change-set 3's own
 checkpoint when that opens. Drafted from three notes in this folder, each ending DONE: `netcode-architect-cs3.md`
 (the messages, the room, the endpoint, the step, the replay runner, the link simulator), `engine-architect-cs3.md`
@@ -35,8 +38,10 @@ or minus 30 %)._
 - **Not in either:** the two-instance comparison (Part 15 gives it to lane 2, after 3b merges, never merged);
   soldiers, movement, content (change-set 4); Firefox in CI (question FIREFOX-TESTS, with #62).
 - **Lane 1's pull requests, in order, one at a time on its one branch:** #62 (CI-WASM); the Firefox CI pull request,
-  if he answers FIREFOX-TESTS (c); 3a; one CI line (E1, section 6); 3b; 3c only if a part moves out of 3b
-  (section 5); then change-set 4. If he answers FIREFOX-TESTS (b), "with change-set 3", Firefox joins E1's CI pull
+  if he answers FIREFOX-TESTS (c); 3a; one CI line (E1, section 6); only if the presses test would push CI's
+  browser run past its 5 minutes, a small CI pull request that raises that limit, its text to him first; 3b; 3c
+  only if a part moves out of 3b (section 5); then change-set 4. If he answers FIREFOX-TESTS (b), "with change-set 3",
+  Firefox joins E1's CI pull
   request after 3a.
 
 ## 1. Goal
@@ -81,7 +86,7 @@ Lane 1 throughout (Part 15: `overlay/`, `app/`, `scripts/`, `packages/sim-worker
 | 4 | **If RNG-SOURCE (c):** our own ChaCha8 with the published test vectors inside its tests; the 10,000-word vectors at four edge stream ids; their generator script. **If (a) or (b):** the library enters in step 3's batch instead (the hold; four or three more overflow-override lines; with (b) a CI line that runs the vectors on each of its code paths, asked of him with its text), and this step keeps only the vectors and their test: about 190 lines fewer | `crates/sim/src/rng.rs`, `crates/devtools/tests/stream_vectors.rs`, `make_chacha8_vectors.py`, `chacha8-words.bin` (160,384 bytes, data) | 430 |
 | 5 | The float vectors: about 37 operations of the allow-list and `sqrt`, 120,000 bytes of inputs, expected results as digests, an exact reference generator | `crates/devtools/src/rules/f32_ops.rs`, `tests/f32_vectors.rs`, `make_f32_vectors.py`, `f32-inputs.bin` (data) | 340 |
 | 6 | The panic hook that keeps a trap's message (a fixed 1,024-byte buffer the host reads once), the Worker's one guard around every WebAssembly call, the page's notice with the message | `crates/sim-wasm/src/panic.rs`, `packages/sim-worker/src/host.ts`, `panic-message.ts` | 235 |
-| 7 | The test-only WebAssembly module, built by the development build into its ignored folder (so CI, which already runs that build, needs no new line and 3a is green alone); the vectors, the planted overflow in debug and release, the hook's text, and the built Wasm's import list (no clock import: PM-0004-10) run in Node and in Chromium. A test never skips because its module is missing | `crates/devtools/src/wasm.rs`, `packages/client/scripts/build.mjs`, `packages/sim-worker/boundary/rules.test.mjs`, `packages/e2e/tests/rules/wasm-rules.spec.ts` | 230 |
+| 7 | The test-only WebAssembly module, built by the development build into its ignored folder (so CI, which already runs that build, needs no new line and 3a is green alone); the vectors, the planted overflow in debug and release, the hook's text, and the import list of the player's Wasm file (no clock import: PM-0004-10) run in Node and in Chromium. A test never skips because its module is missing | `crates/devtools/src/wasm.rs`, `packages/client/scripts/build.mjs`, `packages/sim-worker/boundary/rules.test.mjs`, `packages/e2e/tests/rules/wasm-rules.spec.ts` | 230 |
 | 8 | The build refuses a runtime crate with no overflow override, and compares the simulation's feature list across its builds (SA-TREE; PM-0004-74); the builder's path out of the WebAssembly (RR-F5, by rust-reviewer's mechanism; no root `.cargo/config.toml`) | `packages/client/scripts/build-checks.mjs`, `build.mjs`, the root `Cargo.toml` | 95 |
 **3a's planned size: about 2,050 lines, stop line 4,100.** A cut never takes a test out by itself (his words of
 2026-11-19, 13:36:37 UTC: "I do not take tests out to fit a number"): it moves a whole part, with its tests, to a
@@ -117,14 +122,15 @@ moves to E1's CI pull request. He is told when a part moves.
 
 ## 5. Change-set 3b, "The loop closes"
 Lane 1 throughout (`input/`, `overlay/`, `app/`, `packages/sim-worker/`, the crates, `packages/e2e/tests/skeleton/`;
-`render/` and `picture.ts` unchanged). Symbols, wire formats and tests in full: `netcode-architect-cs3.md`, blocks 2
+`render/` unchanged; `picture.ts` gains one sentence on who picks the blend fraction). Symbols, wire formats and tests
+in full: `netcode-architect-cs3.md`, blocks 2
 and 3; `engine-architect-cs3.md`, block 3.
 | Step | What | Main files | Lines (about) |
 |---|---|---|---|
 | 1 | `protocol`: a bounds-checked reader and writers; wrap-aware compares (`checked_sub`, never a plain minus); the codec of `Join`, `JoinAccepted`, `JoinRejected`, `Input`, `Snapshot` with decoders that return errors and never panic; the transport interface and the loopback (fixed buffers, nothing allocated per tick) | `crates/protocol/src/wire.rs`, `wrap.rs`, `messages.rs`, `codec.rs`, `transport.rs`, `loopback.rs` | 785 |
 | 2 | `sim`: the match setup with a start tick, the applied command of the one player, the state as tick, player record, then the seed last, so that the shared state is a prefix | `crates/sim/src/world.rs` | 100 |
 | 3 | `room`: one slot, the checks and refusals, the command queue; `client-endpoint`: the join exchange, the command built from the newest post with its press counters (by his answer PRESS-PACE), the snapshot decoder, the endpoint's state moved out of `sim-wasm` | `crates/room/src/`, `crates/client-endpoint/src/endpoint.rs`, `press.rs`, `post.rs` | 815 |
-| 4 | The Worker's one step in the draft's order (the command for tick T reaches the local server before it runs T); what crosses the bindings (section 5.1); the block's two new sections (the echo, the link's counters); who picks the blend fraction stays one sentence until change-set 4 gives the block its field | `crates/sim-wasm/src/local_match.rs`, `lib.rs`, `crates/client-endpoint/src/layout.rs`, `block.rs` | 400 |
+| 4 | The Worker's one step in the draft's order (the command for tick T reaches the local server before it runs T); what crosses the bindings (section 5.1); the block's two new sections (the echo, the link's counters); who picks the blend fraction is said in one sentence added to `picture.ts`, until change-set 4 gives the block its field | `crates/sim-wasm/src/local_match.rs`, `lib.rs`, `crates/client-endpoint/src/layout.rs`, `block.rs` | 400 |
 | 5 | The Worker and the page's messages: the newest post kept by post number, an older one ignored and counted; held keys cleared on a hidden tab; a due time that is not finite throws; each tick's start stamped for PM-0002-13's first reading | `packages/sim-worker/src/messages.ts`, `host.ts`, `pacing.ts` | 190 |
 | 6 | The page, alive: the keyboard by physical key, running press totals, held keys cleared on blur; the key diagram lit from the server's echo; the readout's new rows; the browser test of the loop (a 1-minute local match); PM-0002-12's own test: a seeded shim on the page's posting side delays each post by 0 to 100 ms and sends 10 % twice, 10,000 scripted presses, some shorter than a tick, 0 lost and 0 doubled presses and releases; the allocation spec covers the new per-frame code | `packages/client/src/input/keyboard.ts`, `overlay/keys.ts`, `app/press-tally.ts`, `overlay/report.ts`, `packages/e2e/tests/skeleton/loop.spec.ts`, `presses.spec.ts`, `allocation.spec.ts` | 640 |
 | 7 | `devtools`: the replay runner (one state hash per tick), the comparer (the first differing tick, shown on one planted divergence), the first recording (1,800 ticks, under 58 KB, data) replayed natively in three processes and in WebAssembly, in Node and in Chromium, on the file players get (section 5.1) | `crates/devtools/src/replay.rs`, `compare.rs`, `crates/devtools/recordings/first-loop.rec`, `packages/sim-worker/boundary/sim-wasm.test.mjs` | 275 |
@@ -148,7 +154,9 @@ step's order, the shared prefix and the start tick.
   (`input`, `step`) and one new read-only number, the state's hash. No call that takes a block of bytes is added to
   the shipped file (the netcode design had one, which goes beyond his WB-HEALTH (a) words, "one type, plain numbers
   on every tick"), and the replay is not moved into the test-only module (the boundary design had that, which
-  leaves ADR 0002's line 509, determinism on the exact shipped file, unmet). The one new number is asked in DEPART-3.
+  leaves ADR 0002's line 509, determinism on the exact shipped file, unmet). The hash has 64 bits: it crosses as
+  two 32-bit numbers, or as one large integer read only during a replay (settled at step 4; either is a plain
+  number, and a live tick still makes two calls). The one new number is asked in DEPART-3.
 - **Evidence (netcode: deterministic tests with injected latency, jitter and loss; netcode-architect's T1 to T10):**
   the exchange through the Worker's own step with L1 at each profile, 1,800 ticks each, 0 decode errors and 0
   refusals (ADR 0001's milestone, headless); the same seed gives the same packet-fate log and hashes, and over
@@ -160,7 +168,8 @@ step's order, the shared prefix and the start tick.
   PM-0002-12 by its own method (step 6), with its two bites (a Worker that reads only the held bits; a Worker that
   takes the last post to arrive instead of the newest); a 1-minute local match with 0 Wasm calls and 0 network
   messages by the page (PM-0002-64's Chromium half); once, a 10-minute run with 0 errors and 18,000 ticks
-  (PM-0002-5's reading, in the report). Each new check shown failing on a planted defect.
+  (PM-0002-5's reading, in the report), started from a script of its own and never from a spec that CI picks up
+  (CI runs every spec under `packages/e2e/tests/` within 5 minutes). Each new check shown failing on a planted defect.
 - **Reviewers** (Opus 5.5, effort max): netcode-architect, engine-architect, rust-reviewer; then test-engineer,
   security-auditor (the decoders, the page's key handling), perf-auditor (nothing allocated per tick or per frame
   on the hot path). The verifier until PASS; the advisor agent on every pushed head; docs-keeper.
@@ -199,19 +208,20 @@ step's order, the shared prefix and the start tick.
   difference); the tools crate linked with the bindings crate in one test module; six numbers per call with no
   allocation in the glue; Vite taking the Worker's chunk name from the build; the path remap for RR-F5; the
   development build also building the test module.
-- **The browser tests grow** by PM-0002-12's 10,000 scripted presses (a minute or more): the run's time on a runner
-  is read against #62's 5-minute limit before the limit is touched (a CI edit, his yes).
+- **The browser tests grow** by PM-0002-12's 10,000 scripted presses (a minute or more). Their time is measured
+  here first. If CI's whole browser run would pass #62's 5-minute limit, the limit is raised by a small CI pull
+  request right before 3b (a CI edit: its text to him first), so that 3b is not red on its own.
 
 ## 8. The follow-ups, each placed
 | Id (from `docs/STATUS_ARCHIVE.md`, the block of #61, and his browser check) | Where |
 |---|---|
-| EA-F8, EA-F10 (TypeScript part), EA-F13, EA-N3, EA-N6 with VF-L7, VF-L4, TE-L, SA-ENV, FAVICON, TE-NT3, TE-NT4, TE-NT5, FPS-LINE, NEG-ZERO, SA-TREE, RR-F5, the `__pycache__/` line | 3a |
-| NA-N1 (the step gets the host's time), NA-N2 (held keys cleared on hide; the pause from the mode waits for online play), NA-N4, NA-N5, NA-N6, NA-N7, EA-F9, EA-F10 (the bindings part), TE-NT7 and PA-N2 (the allocation spec covers the new per-frame code), FF-WAKES (a reading with the pacing) | 3b |
-| NA-N3 (who picks the blend fraction): one sentence stays in 3b; the field comes with the block's soldier section | change-set 4 |
-| BR-GAP, BR-LATE, NOT-SHOWN (his first check): read again by 3a's browser check, steps 2 to 5 | 3a's check |
+| EA-F8, EA-F10 (TypeScript part), EA-F13 (but for its one-writer item), EA-N3, EA-N6 with VF-L7, VF-L4, TE-L, SA-ENV, FAVICON, TE-NT3, TE-NT4, TE-NT5, FPS-LINE, NEG-ZERO, SA-TREE, RR-F5, the `__pycache__/` line | 3a |
+| NA-N1 (the step gets the host's time), NA-N2 (held keys cleared on hide; the pause from the mode waits for online play), NA-N4, NA-N5, NA-N6, NA-N7, EA-F9, EA-F10 (the bindings part), EA-F13's one-writer item (the anchor), TE-NT7 and PA-N2 (the allocation spec covers the new per-frame code), FF-WAKES (a reading with the pacing) | 3b |
+| NA-N3 (who picks the blend fraction): 3b adds one sentence to `picture.ts`; the field comes with the block's soldier section | change-set 4 |
+| BR-GAP, BR-LATE, and NOT-SHOWN's two parts on Brave Shields and the double-click: read again by 3a's browser check, steps 2 to 5. NOT-SHOWN's third part, a single 6-minute hidden stretch, stays with PM-0002-26's reading | 3a's check |
 | ADAPTER, TQ-FF (what Brave and Firefox do not report about the graphics card): recorded; they matter to the GPU half of the measurement harness | change-sets 5 and 6 (lane 2's harness) |
 | EA-N5, GE-N1, GE-N4, GE-N5, GE-N6, PA-L2 (all Low; the picture's loss handling and pool size): before `render/` changes hands. The advisor agent allowed the move; change-set 2's report already listed two of them for change-sets 5 and 6 | change-set 5 |
-| VF-L5, RR-N4, TE-NT6, E2E-TYPES, SA-DIST | done in #62 |
+| VF-L5, RR-N4, TE-NT6, E2E-TYPES, SA-DIST | taken by #62 once it merges |
 | "The table of build options" (the card, line 330; defined nowhere; one likely column needs a new tool) | a follow-up of its own, by the card's rule |
 
 ## 9. The pass marks and done-when lines placed at change-set 3, each with its step and test
@@ -224,7 +234,7 @@ step's order, the shared prefix and the start tick.
 | PM-0002-12: presses and releases never lost or doubled | 3b step 6, `presses.spec.ts`, by the mark's own method | Chromium here; Firefox and WebKit when CI runs them |
 | PM-0002-13: a press reaches its tick quickly | 3b steps 5 and 6: a first reading printed by `loop.spec.ts`, not judged | a reading; the mark in change-set 5 on a named machine |
 | PM-0002-26 (PM-0004-68 to -70): the Worker's pacing | the readout's pacing numbers in both browser checks (with FF-WAKES) | a reading |
-| PM-0002-5: one build runs 10 minutes with 0 errors | 3b: one 10-minute run in Chromium here, in the report | a reading; the browsers and machines later |
+| PM-0002-5: one build runs 10 minutes with 0 errors | 3b: one 10-minute run in Chromium here, from a script of its own (not a spec CI runs), in the report | a reading; the browsers and machines later |
 | PM-0002-49: L1's fate log and its 5 % bands | 3b step 8 | met headless, read as DEPART-3 says |
 | PM-0002-53: a planted counter overflow panics in the four builds | 3a step 2 (natively, debug and release), step 7 (WebAssembly, debug and release, in the test module) | met but for its cost clause, which waits for the tick bench |
 | PM-0002-64: a 1-minute local match in three engines | 3b step 6, `loop.spec.ts` | Chromium here; Firefox and WebKit when CI runs them |
@@ -233,7 +243,7 @@ step's order, the shared prefix and the start tick.
 | PM-0004-21: a divergence is caught at its tick; the hash function fixed | the hash report (section 3, item 5); the comparer shown on one planted divergence (3b step 7) | the report and one of the three plants; the rest with the suite |
 | PM-0004-22: the maths functions and `sqrt`, bit for bit | 3a step 5 | natively, Node and Chromium here |
 | PM-0004-27: the random streams replay exactly | 3a step 4 | natively, Node and Chromium here; ChaCha8's cost per tick when soldiers exist |
-| PM-0004-23 with -10 and -74: the rules enforced by the build | 3a step 2 (the scan), step 7 (no clock import in the built Wasm), step 8 (one feature set) | interim, until the 2.3 chat's lints |
+| PM-0004-23 with -10 and -74: the rules enforced by the build | 3a step 2 (the scan), step 7 (no clock import in the player's Wasm file), step 8 (one feature set) | interim, until the 2.3 chat's lints |
 
 ## 10. Change type and risk tier
 Game and engine code, tests, the page: risk tier 1 for 3a and 3b, his go on each merge after his browser check. E1
@@ -266,9 +276,9 @@ The two-instance comparison (lane 2, after 3b merges); soldiers, movement, conte
      two libraries at 12 rounds only; nothing upstream checks the 8 rounds we would use. The withdrawn releases:
      taken back on 2026-08-27 because one fast path used a processor instruction it had not checked for ("The
      yanked versions contain UB in SSE2 backend, see #580"), not for wrong output; the maintainers also wrote that
-     the tests of the generator's 64-bit counter are weak (their open issue #582). One difference between the two
-     libraries in the order the stream and the position must be set: neither the guide nor either change log says
-     so.
+     the tests of the generator's 64-bit counter are weak (their open issue #582). The two libraries also differ in
+     the order in which the stream and the position must be set; neither the guide nor either change log mentions
+     it.
    - What (a) or (b) would add to 3a: the dependency hold with security-auditor's answer on the exact manifest,
      four or three overflow-override lines, with (b) one more CI line for his yes, and about 190 lines fewer of our
      own.
@@ -279,7 +289,8 @@ The two-instance comparison (lane 2, after 3b merges); soldiers, movement, conte
    - (a) One change-set, planned at about 5,850 lines, stop line 11,700.
    - (b) Two: 3a, the rules and boundaries (about 2,050 lines, stop line 4,100, a 6-minute browser check), then 3b,
      the loop (about 3,800 lines, stop line 7,600, the 15-minute check). With it, his yes in advance to the two
-     ladders: in 3a, the hygiene items move to 3b, then the overflow-override check moves to E1's pull request; in
+     ladders: in 3a, the hygiene items move to 3b, then step 8 (the overflow-override check, the feature-list
+     compare and the builder-path fix, about 95 lines) moves to E1's pull request; in
      3b from 4,900 lines, L1's rate limit and duplication, then L1 as a whole, then the first recording, each with
      its tests, move to a change-set 3c before change-set 4. A part moves whole; no test is dropped; he is told.
    - (c) Three from the start: the rules (about 2,050, stop line 4,100), the loop without L1 and the recording
@@ -305,7 +316,9 @@ The two-instance comparison (lane 2, after 3b merges); soldiers, movement, conte
      and the transport, and the tools crate becomes a second WebAssembly module for tests only (part 3, line 191);
      the calls that cross the bindings (part 5, lines 330-334): `input` with six numbers, the time passed with the
      step, the panic buffer, **and one new read-only number on the file players get, the state's hash**, so that a
-     recording can be replayed on that exact file (line 509) with no call that takes a block of bytes; "the newest
+     recording can be replayed on that exact file (line 509) with no call that takes a block of bytes; it stays
+     within his WB-HEALTH (a), one type and plain numbers, and it is read only when a recording is replayed, never
+     on a live tick; "the newest
      by sequence number" read as the page's post number (PM-0002-12, PM-0002-64); PM-0002-49's 5 % band read as
      exactly 0 at the clean profile, the burst profile judged by its own check, delay and jitter read from the
      drawn delay; a 1 % duplication profile, which no draft sets; PM-0002-53's "a test in sim" met in WebAssembly by
@@ -327,8 +340,10 @@ covers them); the generator scripts and the committed data on four conditions (s
 ## 13. Not verified
 Nothing of this plan is built or run. Every line count is an estimate. The libraries' own 8-round output was read
 from their code, not run. The points of section 7, "Not yet tried". The choices of section 5.1 are the main
-session's between two designs; netcode-architect and engine-architect have not read them yet. The advisor agent has
-read draft 1, not this draft.
+session's between two designs; netcode-architect and engine-architect have not read them yet: they confirm them at
+3b's step 4, and if either rejects one, it goes back to the advisor agent, and to him if DEPART-3's line on the hash
+number changes. The advisor agent read draft 2 and approved it with six conditions; it has not read their wording
+here.
 
 ## 14. The advisor agent's twelve conditions on draft 1, and where each is met
 1. A new code for the random-number question, his sentence quoted, (c) named as outside "which one", step 4
