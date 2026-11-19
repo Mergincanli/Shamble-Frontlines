@@ -118,3 +118,12 @@ Task: change-set 3 ("The loop closes"), the boundary and rule-test half of its p
   overlay/overlay.ts 46 (pre + Copy report button, textContent); overlay/report.ts 103 (ReportData, readoutLines,
   formatReport; "fps" toFixed; frames line `frames: ${fps.toFixed(1)} a second · frame time ...`); picture.ts 68 = the
   interface file (PictureFrame{newest, previous, timeMs}; "Events join when the first change-set has some").
+- Build files read: build.mjs 141 (buildWasm: cargo build --release wasm32 -p sim-wasm into root target/, checked
+  wasm-bindgen --target web into packages/sim-worker/pkg; refusedBuildSettings; buildPage via Vite; flags --wasm-only,
+  --production, --out-dir); build-checks.mjs 180 (bundleProblems: `page = scripts.filter(name !~ /(^|\/)worker-[^/]*\.js$/)`
+  = EA-N6/VF-L7's name prefix; DEV_MARKERS list; cspProblems). vite.config.mjs: worker.format "es", no manifest, no
+  worker entryFileNames (Vite's default asset naming gives `assets/worker-<hash>.js` from the file name `worker.ts`).
+- STATUS_ARCHIVE :1084-1121 read (the cs3 list, verbatim ids). EA-N6 :1101 "finds the Worker's chunk by a name prefix";
+  VF-L7 :1102-1104 "scan every script but the Worker's entry chunk, named by the build itself". EA-F10 :1094-1096 also
+  names TS test-only members: `Ring.clear`, `BlockPool.free`, the `percentile` re-export. EA-F6/EA-F12 (:1133-1135) are
+  for the drafts' next revision, NOT cs3. VF-L5 is in the context's list though the brief omits it (with RR-N4).

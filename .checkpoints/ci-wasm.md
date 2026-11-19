@@ -207,6 +207,15 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   GTX 980, about 180 frames a second drawn in both browsers; WebGPU starts in both; errors 0 in all eight reports.
 - The tool's file and program: sizes and sha256 in step 3 above.
 
+- CI on c934fc0 (today's workflow, no CI file changed; read 20:09 UTC): `gate` and `smoke` success for the push (run
+  44603988667) and the pull request (44604056505); `toolchain` success for the push (44603989027) and the pull
+  request (44604056424).
+- The CI text as put to him at 20:03 UTC: 93 added lines, `ci-edit.diff` sha256
+  240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673; P-GH's two lines, `ci-plant-p-gh.diff` sha256
+  e4f21ab359bc9fd911c663a4fcbc892133195fefe44e88ad7ec51b50e3d0b1ac; the proposed file's sha256
+  d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c, with the plant
+  12b9024966abc4907b27c8c2b4c6cdccfa56ceea3d27d94c060b9ab2ca1f12ef.
+
 ## Decisions taken
 - BROWSER-SET (a), his words of 14:28:25 UTC. VISION-NOTE (a), his "a, yes" of 14:31:30 UTC.
 - FIREFOX-WEBGL: he pasted the report (15:09:29 UTC), so the question needed no letter.
