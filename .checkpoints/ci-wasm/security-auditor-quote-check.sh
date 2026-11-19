@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# security-auditor, part ci-text (2026-11-19): how the outer shell hands the cut's script (proposed toolchain.yml lines
-# 139-190) to `bash -c`. The privileged prefix (sudo, unshare, setpriv, env -i) is replaced by a function that only
-# prints the arguments it gets; the script `bash -c` would receive is then only PARSED (`bash -n`), never run.
+# security-auditor, part ci-text (2026-11-19): how the outer shell hands the cut's script (in the proposed
+# toolchain.yml: from the `bash ... -c '` line, 139, to the file's last line, 190) to `bash -c`. The privileged prefix
+# (sudo, unshare, setpriv, env -i) is replaced by a function that only prints the arguments it gets; the script
+# `bash -c` would receive is then only PARSED (`bash -n`), never run.
 # Run from the repository's root: bash .checkpoints/ci-wasm/security-auditor-quote-check.sh [file]
 set -u
 F="${1:-.gate/ci-wasm/proposed/.github/workflows/toolchain.yml}"
-inner=$(sed -n '139,190p' "$F")
-case "$inner" in *"bash --norc --noprofile -euo pipefail -c '"*) ;; *) echo "line 139 is not the cut's bash -c line"; exit 2 ;; esac
+start=$(grep -n "bash --norc --noprofile -euo pipefail -c '\$" "$F" | cut -d: -f1)
+[ -n "$start" ] && [ "$(printf '%s\n' "$start" | wc -l)" -eq 1 ] || { echo "no single cut line in $F"; exit 2; }
+inner=$(sed -n "${start},\$p" "$F")
+echo "cut script: lines $start to $(wc -l < "$F") of $F"
 show_fn='show() { while [ "$#" -gt 0 ] && [ "$1" != "-c" ]; do shift; done; shift
   printf "bash -c gets %s argument(s) after -c\n" "$#"
   printf "  the script ends with: %s\n" "$(printf "%s" "$1" | tail -c 60 | tr "\n" " ")"
