@@ -198,8 +198,11 @@
   (git's message); step 4's checks and C1 (c)'s three all as stated; gate PASS, repo map 170/110, checkpoint tests
   33/33 (.gate/main-61/step5-outputs.txt). **Step 5d PASSED** (.gate/main-61/light.log, 15:42:17-15:42:21 UTC, exit 0,
   HEAD a6acc8a, hashes e3b0c442…: refs 1,565 = N0 + 50 with the exception line; the full marks line; self 78 of 78;
-  redact 10 of 10, 307 items, 0 findings). **Step 6:** this card save pushes a6acc8a; then the saver, CI on the pushed
-  head, the advisor's head check (step 7). Free disk 4,508 MiB at 15:42 (builder 4's cold end checks).
+  redact 10 of 10, 307 items, 0 findings). **Step 6 DONE:** pushed at 631edf3 (15:43 UTC); the saver bbe44e8id
+  restarted 15:43 (both trailers; window to about 17:33); builder 4's notes copied (copy_b4_notes.py, 866 -> 1,104
+  lines) and its worktree snapshotted (wip/u4f-build.patch, base b25b96a, 394,313 B, 29 files), pushed 549ed77.
+  **Next:** CI on the pushed head (gate, smoke, toolchain; red stops the lane), then step 7, the advisor's head check.
+  Free disk 4,508 MiB at 15:42 (builder 4's cold end checks; the runner stops under 4,096).
   **15:5x UTC, Mustafa (92 % usage): "make sure to save your progress (Same for the agents)".** Pushed: everything to
   52f9f4e. Local only: merge commit a6acc8a and these card lines (no push before 5d, C2 (c)); 5d waits for builder 4's
   lane lock (no log yet). Builder 4 told by SendMessage to bring its notes block up to date. **If cut:** the resume line
