@@ -8,7 +8,7 @@
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for `cs/ci-wasm`; lane 1, the first builder chat,
   session_019YNMUV9LFhASseJ9EP12kL, on his personal account) · **Base:** main
   f5030a33185b1ea1b15329174e82823f0215f993 (the merge of #61; the branch is level with it and pushed)
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 17:53 UTC.
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 20:00 UTC.
 
 ## His words that govern (read the files; the lines below are pointers and quotes, never a substitute)
 - `ci-wasm/mustafa-2026-11-19-1516-go-61.md` (2026-11-19, 14:28:25 UTC, whole, by script; it stands byte for byte in
@@ -114,11 +114,30 @@
    stop line 880); the tier-2 evidence. security-auditor was asked (18:11 UTC, by message) to confirm the gh
    advisory's id and the 2.93.0 floor.
 
+3d. security-auditor's reading of the CI text (handed back 18:31 UTC; `ci-wasm/security-auditor-ci-text.md`): one High
+   (F-QUOTE: an echo line the main session had added to the cut's single-quoted script held two apostrophes; it
+   would have ended the script on the first runner run, failing closed) and two Lows (F-FLOOR: the gh version test;
+   F-OPT: the tool's folder and `/opt` checked as root-owned); all three taken. The text has 93 added lines:
+   `ci-wasm/ci-edit.diff` sha256 240c7db7...2673; the proposed file 193 lines, sha256 d1dbcb53...975c; P-GH's diff
+   sha256 e4f21ab3...b1ac. It confirmed GitHub's advisory (GHSA-8xvp-7hj6-mcj9, CVE-2026-48501, patched v2.93.0).
+   The advisor agent re-read the changed lines (`ci-wasm/advisor-plan.md`, "Re-read"): "APPROVE holds for sha256
+   240c7db7...", and it withdrew its ruling on FIREFOX-TESTS (the archive on main promises him that question).
+   The plan is at revision 3 (19:58 UTC).
+4. **The plan's steps 1 to 3 built, no CI file:** code 3cddb55 (RR-N4's test; TE-NT6's edits; `node-names.d.ts`;
+   `.gitignore`'s `dist-*/`); the docs pass c934fc0 (DECISIONS, the browser-check record, the vision's note, each by
+   its script; every check "yes"). Pushed 19:59 UTC. **Pull request #62 opened as a draft** (19:59 UTC). Evidence so
+   far: the client's unit tests 49 passed; the browser tests 12 passed three times with one worker (18:28 to 18:31
+   UTC); the new in-cut lines as one script exit 0 (19:44 to 19:45 UTC); the new test fails on a broken copy; the
+   build with RUSTFLAGS set exits 1; the legacy gate passes. A container restart at about 19:57 UTC lost nothing
+   (the tree, `.gate/` and the local ignore were intact; the saver was started again).
+
 ## Current step
-Step 4 of the card = the plan's steps 1 to 3 (no CI file): RR-N4's test, TE-NT6's edits, `node-names.d.ts`,
-`.gitignore`'s `dist-*/`, then the docs pass's scripts run for real; local evidence; commits by path. Meanwhile
-security-auditor's reading of the CI text is awaited (`ci-wasm/security-auditor-ci-text.md`); when it is in, the
-text (changed only if it asks) and the two questions go to him, with the PYC record.
+Step 5: the exact text and the three questions (CHROME-SOURCE, CI-TEXT, FIREFOX-TESTS) go to him in chat, with the
+advisor agent's three rulings (PERM-ATT (a), PLANTS both, PYCACHE-NOW (b)) and the record of the compiled Python
+file. Then wait for his yes and for the chat's mode (Accept edits) before any line under `.github/` is written.
+Meanwhile: change-set 2's ten planted defects on the two edited specs run in a worktree of their own
+(`.gate/ci-wasm-plants`, at c934fc0; output `.gate/ci-wasm/plants-subset.out`; script `ci-wasm/plants-subset.py`);
+CI's runs on c934fc0 (today's workflow) are read; change-set 3's plan is drafted (`ci-wasm/cs3-context.md`).
 
 ## Next steps
 3. **The plan of the CI-WASM pull request** (plan first; drafted with infra-engineer; reviewed by the advisor agent;
@@ -196,18 +215,16 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   3's plan).
 
 ## Running work
-- Saver: background task bxshyzuei · output
-  `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/bxshyzuei.output` · started
-  17:59 UTC · stops by 19:49 UTC (110 minutes on) · last check 17:59 UTC: ok (its first line read). The first saver
-  (bpduzpt3j, 16:08:58 UTC) ended at 17:59:01 UTC with "watch stopped: time is up" after "nothing to save".
-- Agents (both Opus 5.5 at effort max, in the background, started 17:54 UTC): the advisor agent, part "plan" (the
-  plan review; notes `ci-wasm/advisor-plan.md`); security-auditor, part "ci-text" (the CI text before it goes to
-  him; notes `ci-wasm/security-auditor-ci-text.md`). A restart gives each the same task again.
-- Done and not running: infra-engineer "ci-plan", test-engineer "followups", rust-reviewer "cs3-rng" (notes end
-  with DONE).
-- Scratch outside git: `.gate/ci-wasm/hist/` (change-set 2's deleted plan, tool route and notes, from history at
-  29ab052^ and 4cf30ce^), `.gate/ci-wasm/proposed/` (the proposed workflow file), `.gate/ci-wasm/proposed-plant/`
-  (the same with P-GH's two lines), `.gate/ci-wasm/docs-try/` (the docs scripts' scratch outputs),
-  `.gate/ci-wasm/dist-*` and test-engineer's and infra-engineer's scratch builds, `.gate/cs2-first-page/merge/` (his
-  messages as first saved, his Firefox screenshot), `.gate/cs2-first-page/send/` (the zip he tested),
-  `.gate/tools/wasm-bindgen-0.2.130/` (the tool).
+- Saver: background task bgdn004k8 · output
+  `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/bgdn004k8.output` · started
+  19:57:35 UTC · stops by 21:47 UTC (110 minutes on) · last check 19:57 UTC: ok (its first line read). The second
+  saver (bxshyzuei, 17:59 UTC) was lost with the container's restart at about 19:57 UTC.
+- The planted defects, subset: background task b1470gqk1, started 20:00 UTC in the worktree `.gate/ci-wasm-plants`
+  (detached at c934fc0, its own `node_modules` and `target/`); it binds 127.0.0.1:4173, so no other browser test
+  runs until it ends. When it is done the worktree is removed with `git worktree remove` (not forced).
+- No agent is running. Done: infra-engineer "ci-plan", test-engineer "followups", rust-reviewer "cs3-rng",
+  security-auditor "ci-text", the advisor agent "plan" (with its re-read): every notes file ends with DONE.
+- Scratch outside git: `.gate/ci-wasm/` (`hist/`, `proposed/`, `proposed-plant/`, `docs-try/`, `security/`, `mutant/`,
+  the dry runs' outputs, `dist-*` builds), `.gate/dist-production` and `.gate/dist-development` (the dry run's
+  builds), `.gate/cs2-first-page/merge/` (his messages as first saved, his Firefox screenshot),
+  `.gate/cs2-first-page/send/` (the zip he tested), `.gate/tools/wasm-bindgen-0.2.130/` (the tool).
