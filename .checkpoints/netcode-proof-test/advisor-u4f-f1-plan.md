@@ -26,7 +26,7 @@ ADR 0001 part 5, the tests and pins that read refusal counts, SERIES.md, history
   - **Four press counters, not three checks.** `edge` is used at world.rs:1419 (reload), :1443, :1452, :1457, :1466
     (fire, bites included) and **:1484 (throw)**; the plan's range :1408-1466 and its "(cooldown, ammunition, reload)"
     leave the throw out, and melee (seam.rs:69-71) the sim reads from no one. The throw is the one press whose extra
-    edges change state: each edge throws while the pool has room (world.rs:1500-1505), so a 2-edge throw is two
+    edges change state: each edge throws while the pool has room (world.rs:1502-1507), so a 2-edge throw is two
     grenades, not a refusal. Not state-neutral, and correct by ADR 0001:236-237 (each edge meets the server's own state;
     the stand-in's throw has no cooldown). ADV-U4FF1-1.
   - **The fire edge after a shot.** Today a command fires at most once (`fired`, one bool: world.rs:1466; returned to
@@ -138,3 +138,98 @@ ADR 0001 part 5, the tests and pins that read refusal counts, SERIES.md, history
       lost 3,614 going to 0 by design (losing commands no longer loses presses);
     - the reorder report row still "not available" (ADV-U4F20-2, his; the report states the event's figures by hand).
   - Any other difference stops the record: it goes back to the advisor before the verdict counts. ADV-U4FF1-5.
+
+## Block 4: what touches Mustafa's (TEST-FIRST, history.md:2234-2282)
+- **Pass marks:** none changes. "0 presses lost" keeps its bar and its series. After the fix its count is still what
+  the sim does not take, and the plant shows it can fail. The fix makes ADR 0001:226 ("a resent command can neither
+  lose nor double a press") true of the stand-in; it does not relax the check. The bite's "fails the 99.9 %"
+  (marks.json:4795) still holds; its lost figure falling to 0 is the fix, not a change to the bite.
+- **Judge, marks.json, README, SERIES rows:** untouched (Block 3). **Money:** none (local L1, about 41 min). **Main:**
+  nothing. **The plan's stops:** the size stop (300) stands. -20's re-run is the planned set my R20-Q2 placed inside the
+  plan (advisor-u4f-20.md:141-145; 350677f's set ran without him).
+- **Rule 2's four hold:** inside plan rev 3.3, undoable, no pass mark, no money and nothing on main. So it is no
+  ESCALATE: recorded with its reason and named in the next day's message.
+- **Later, not now:** if U4f2's ruling on a session's first command (ADV-U4FF1-3) needs a new forged kind or check in
+  marks.json, that is his then.
+
+## Rulings
+- **U4FF1-Q1: yes, in npt-sim's seam, and npt-room calls it.** One `pub fn` in sim/src/seam.rs beside `Command`'s
+  press indices (seam.rs:46-72: "the one home the sim, the client and the bots read"). The seam is the room-sim type
+  module (seam.rs:1-7), and npt-room depends on npt-sim for it (room/Cargo.toml:18-21). It is integer-only (npt-room is
+  float-free), its doc cites ADR 0001:226, :234-237, and its contract is condition 2's. A second copy anywhere is the
+  drift the rule exists to stop.
+- **U4FF1-Q2: confirmed, no change.** `claimed` takes the command's counters (world.rs:1346) before the dead-or-plate
+  return (:1348-1350): a dead or plate soldier's edges are taken by the rule, have no effect and count no refusal, as
+  today. The room counts them seen with lost 0; today a 2-edge advance there counted lost 1. A slot beyond the soldiers
+  returns before `claimed` (:1336-1338), also as today.
+- **U4FF1-Q3: U4f-F1 first, as its own step, before U4f2.**
+  - U4f2 waits on his U4F2-SIZE answer; F1 does not (card :177-183).
+  - U4f2's lane keeps crates/sim shut (u4f2-brief.md:132), and its size is already near his stop (about 1,700-2,250
+    against 3,000: advisor-u4f2-brief.md:149-156). Folding F1 in would widen both.
+  - -21's judged runs then run on the fixed sim (R20-Q1, advisor-u4f-20.md:132-133).
+  - Before U4f2 builds, its brief rebases on F1's merge: its base and its count baseline become F1's merge and F1's end
+    counts, not 25d316e's 634 and 731 (u4f2-brief.md:15, :128). It also takes ADV-U4FF1-3's carry.
+
+## Findings
+| Id | Severity | Where | What goes wrong | Fix |
+|---|---|---|---|---|
+| ADV-U4FF1-1 | Medium | u4f-f1-plan.md:15-18, :31; world.rs:1484, :1502-1507; seam.rs:69-71 | The plan names three checks (cooldown, ammunition, reload) and "reload or ability"; the throw edge (:1484) and melee are not named. The throw is the one press whose extra edges change state (two grenades) | Condition 1: all four counters named with their rule; throw not state-neutral by design, shown by T2 (f) |
+| ADV-U4FF1-2 | Medium | u4f-f1-plan.md:15-18; world.rs:1407-1417, :1466, :1171-1172; seam.rs:167 | The rule for a fire edge after the command's shot, the weapon clock (once, not per edge) and the button order are unnamed. A re-read of `ready` fires twice in one command when the interval is below one tick (FireInterval clamps to 1 µs), which no code path does today | Condition 1: one clock tick per command; reload, fire, throw at today's places; at most one shot per command as today, further fire edges refused (Ammunition if empty, else Cooldown) |
+| ADV-U4FF1-3 | Medium | room/src/input.rs:287; room.rs:507-509, :829; world.rs:678-679 | A session's first command is not kind-5 checked, and the counters it is measured against outlive the session. Its advance (up to 255 per button) is taken whole under the new rule: state-neutral for fire and reload, a pool of grenades in one tick for throw (the old rule took 1). No -20 or -22 run meets it | Condition 7: named in the plan and the build notes; kind 5 unchanged in F1; carried into U4f2's brief for -21 (netcode-architect, security-auditor there); a marks.json need is his |
+| ADV-U4FF1-4 | Medium | u4f-f1-plan.md:19-23, :27-28 | The shared fn's contract is open: if it returns only the advance, the room's lost is 0 by its own code, the old-rule plant needs two edits, and the room cannot see a sim that skips the fn | Conditions 2 and 3: the fn gives the edges taken; the sim loops that count; the room's lost = advance - taken; T1 also asserts the sim's refusal for the second edge; the plant edits the fn only |
+| ADV-U4FF1-5 | Medium | u4f-f1-plan.md:36-38 | The re-run's expectation is loose, though L1's determinism (scenario.rs:2582-2604) and the wire-free refusals let it prove the state-neutral claim at full scale | Condition 5: Block 3's expected figures; summary lines (but wall time) and per-tick `h` compared with 350677f's kept logs; any other difference stops for the advisor |
+| ADV-U4FF1-6 | Medium | u4f-f1-plan.md:43-44 | The reviewers miss security-auditor on a change to how the server takes client input (CLAUDE.md step 5: "server"; U4f had it: u4f-report.md:64), with an unbounded first-command reach | Condition 6: add it to the one round, scoped to the hostile-input reach |
+| ADV-U4FF1-7 | Low | world.rs:33-38, :1340-1341; room.rs:352-356, :1326-1329 | The plan corrects only world.rs:1340-1341; three more docs state the one-edge rule | Condition 8: correct all four |
+| ADV-U4FF1-8 | Low | u4f-f1-plan.md:24 | "every honest command today but the six" is narrower than the code's multi-edge cases (Block 2's list) | Condition 9: "a 1-edge advance runs as now", with the list and "none pinned" |
+| ADV-U4FF1-9 | Medium | u4f-f1-plan.md:29-32 | T2 compares one state hash from one state; my -20 ruling asked for the claim to be proven (advisor-u4f-20.md:75-78, :127-128) | Condition 4: the d10 twin form (equal hashes and events every tick), cases (a)-(f), exact refusal lists, two plants |
+
+## Conditions
+1. **The rule per counter, in today's order** (ADV-U4FF1-1, -2), per command:
+   - the weapon's clock advances once (world.rs:1407-1417);
+   - then the reload edges, then the fire edges, then the throw edges (authority only), each group at today's place;
+   - **reload:** each edge through :1419-1428's check against the state the edge before it left;
+   - **fire:** the command fires at most one shot, as today; each further fire edge is refused and counted,
+     Ammunition if the magazine is empty, else Cooldown (:1457-1464's kind test);
+   - **throw:** each edge throws or is refused as PoolFull (two grenades from one command is the rule: not
+     state-neutral);
+   - **melee:** taken, no effect, as today.
+   A 1-edge advance runs today's code path exactly, bites included (World::BITES and its pins unchanged). What a bite
+   does on an extra edge is written in the build notes.
+2. **The one rule** (Q1, ADV-U4FF1-4): one integer-only `pub fn` in sim/src/seam.rs beside `Command`'s press indices.
+   It gives the edges the sim takes from one counter's advance (last, now, as u8; the fix: `now.wrapping_sub(last)`).
+   `run_command` loops exactly that count per button. `run_one` counts seen += advance, lost += advance - taken, and
+   doubled += taken on a repeat.
+3. **T1** as planned (option B, two late drops, a 2-edge command: seen 2, lost 0, doubled 0), plus the sim's side: the
+   second edge's refusal in `reports().refusals` with that command's seq. Its plant edits the shared fn only
+   (taken = min(advance, 1)) and fails T1 by name.
+4. **T2** (ADV-U4FF1-9) in the d10 twin form (`course_stream` with one step named twice, against its twin; `twins`
+   asserts equal state hashes and event lists every tick):
+   - cases (a) fire held, ready; (b) not held, ready; (c) in the cooldown; (d) on the last round; (e) reload; each with
+     its refusal list exact and its count +1;
+   - (f) throw, apart: two projectiles with the command's seq, or one and a PoolFull with one slot left;
+   - two plants: the old rule (the count half fails), and a second shot or a per-edge clock (the twin half fails),
+     each by name.
+5. **The re-run** (ADV-U4FF1-5): expected as Block 3 states. Its report compares each run's summary line (but wall
+   time), the per-tick `h` of every room log, and `press_lost_count` with 350677f's kept logs. Any other difference
+   stops for the advisor before the verdict counts. 350677f's folder stays.
+6. **Reviewers** (ADV-U4FF1-6): security-auditor joins the one round, scoped to the loop's bounds, a session's first
+   command and the path with no-press-edge bitten. The round is still one (batches of at most three).
+7. **A session's first command** (ADV-U4FF1-3): the plan and the build notes name it and its F1 behaviour. F1 does not
+   change kind 5. It goes into U4f2's brief as a named item for -21, decided there.
+8. **Docs** (ADV-U4FF1-7): correct world.rs:33-38 and :1340-1341, and room.rs:352-356 and :1326-1329.
+9. **Wording** (ADV-U4FF1-8): "a 1-edge advance runs as now", with Block 2's list of today's multi-edge cases and "none
+   of them is pinned".
+10. **U4f2's brief rebases on F1's merge** (Q3): its base and its count baseline (u4f2-brief.md:15, :128), and it takes
+    condition 7's item.
+The main session writes these into the plan (rev 1.1) or the builder's brief; no new plan review unless one cannot be
+met. Lane, size and stop, builder setup and the round budget stand as planned.
+
+## Verdict
+**APPROVE WITH CONDITIONS (1-10).** The fix is R20-Q1's shape, inside the lane, with no pass mark, judge, marks.json,
+money or main in it. The conditions name what the plan left open (all four counters, the clock and the one-shot rule,
+the shared fn's contract, a session's first command) and make T1, T2 and the re-run prove the state-neutral claim
+rather than assume it.
+
+**To Mustafa:** nothing to decide. One line in the next day's message (TEST-FIRST rule 2): "U4f-F1: the stand-in sim
+now takes every press edge, through its own checks; -20's L1 set re-runs on it (no money); the advisor approved the
+plan with conditions; the edge check skips a session's first command, so that case goes to U4f2."
