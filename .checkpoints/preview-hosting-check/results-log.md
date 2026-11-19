@@ -649,3 +649,9 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - **Window opened: the reviewer off on `preview`** from his "unticked" (00:10:53 UTC). Step 2 (the reviewer bite):
   run #17 re-run by the session with rerun_workflow_run (201 Created, about 00:11 UTC): attempt 2; its deploy job must
   run without waiting and print "secret: present".
+- **The reviewer bite (PM-0006-32's second row): run #17 attempt 2** (re-run 00:11:09 UTC): plan green
+  (00:11:13-00:11:32), build green (00:11:34-00:11:48); the deploy job 135234549298 created 00:12:06, status "queued"
+  (never "waiting"), started 00:12:13, completed 00:12:15, success; its log, word for word: "B9-MARKER: the rewritten
+  deploy job ran at 2026-11-19T00:12:14Z" / "secret: present" ("TOKEN: ***" in the env block). So with the reviewer
+  off, a rewritten job reaches the token without anyone's click. Next: his re-tick (the window closes at its
+  screenshot), then SA-R4's re-run, which must wait and which he rejects.

@@ -663,6 +663,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      re-tick screenshot (Mergincanli listed, bypass off). Run #17 re-run (attempt 2, about 00:11 UTC): no wait and
      "secret: present" expected. His words on SA-R8 ("This repository has no secrets") came without a screenshot: the
      screenshot asked for with the re-tick.
+   - Step 2 measured: attempt 2's deploy job never waited (queued 00:12:06, ran 00:12:13-00:12:15), "secret: present".
+     Re-tick asked of him now (window still open).
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
