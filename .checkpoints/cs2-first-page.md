@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 11:12 UTC (from the clock)
+- **Last update:** 2026-11-19 11:13 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -504,12 +504,14 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     (`planted-defects-3.md`, 11:00:59 to 11:08:17 UTC: 22 plants, each "FAILED as it must, at the line that names
     the defect"; the control passes). ADR 0002's pointer: commit 2cedb9c.
 
+58. **His five messages are in `docs/DECISIONS.md`, by script: commit 88225ee** (`decisions.mjs`: every check yes; every
+    other byte of main's file unchanged). **The verifier started on e4f4bf4** at about 11:13 UTC (notes
+    `verifier-final.md`; it has the scratch worktree and port 4173 until it answers).
+
 ## Current step
-58. **The docs pass is running** (docs-keeper; it edits STATUS, the archive, ROADMAP and the map in the main folder:
+59. **The docs pass is running** (docs-keeper; it edits STATUS, the archive, ROADMAP and the map in the main folder:
     its files are committed by path when it answers; its notes `docs-keeper-notes.md`, its list
-    `docs-keeper-moved-lines.md`). **Next, in order:** (1) the verifier on e4f4bf4 (Opus 5.5, effort max; notes
-    `verifier-final.md`) until PASS; (2) `node .checkpoints/cs2-first-page/decisions.mjs` (five messages into
-    DECISIONS; commit by path); (3) read CI on the pushed head with the GitHub tools; (4) the zip: a clean
+    `docs-keeper-moved-lines.md`). **Next, in order:** (1) the verifier's answer (running; until PASS); (2) done (step 58); (3) read CI on the pushed head with the GitHub tools; (4) the zip: a clean
     development build at the final code head, then `python3 -I .checkpoints/cs2-first-page/make-zip.py
     packages/client/dist .gate/cs2-first-page/zip`, the browser tests against its unpacked copy, sent with the
     chat's file tool; (5) the report: fill `report-draft.md`'s double-bracket places (its numbers are in step 57
