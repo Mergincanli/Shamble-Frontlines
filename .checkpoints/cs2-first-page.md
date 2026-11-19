@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 00:13 UTC (from the clock)
+- **Last update:** 2026-11-19 00:17 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -306,11 +306,25 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     **Size: 3,847 added lines** (`git diff --numstat origin/main...HEAD -- crates packages .gitignore Cargo.toml
     package.json`), against about 2,900 planned and the stop line of 4,000.
 
+32. **Step 7, its core: commit c4a12eb** (2026-11-19 00:17 UTC). `packages/e2e/playwright.config.ts` (the `chromium` project; the
+    server only with `SHAMBLE_DIST`; `ADDRESS`), `tests/skeleton/skeleton.spec.ts` (3 tests: the page on the default
+    backend and with `?backend=webgl`; a hidden tab through the page's own handler), `tests/skeleton/render-counts.json`
+    (WebGL 2 fallback: 3 draw calls, 3 triangles, 62 lines, 3 geometries, 3 textures; WebGPU: none yet). In the
+    container's Chromium: 3 passed, three runs in a row; the `node` project as CI runs it: 1 passed. The readout's
+    pause line now reads "ticks while hidden: N (a match that ran on: about M)", because blocks already on their way
+    when the tab is hidden still arrive (3 in this slow container); the test allows 8. **Size: 3,964 added lines**
+    without the fixture (client 1,790; sim-worker 1,203; client-endpoint 342; sim-wasm 253; sim 217; e2e 134;
+    types 3; root manifests and `.gitignore` the rest), against about 2,900 planned and the stop line of 4,000.
+
 ## Current step
-32. **The size is at the stop line.** Step 7 (the browser tests, planned at about 350 lines) would pass 4,000. His
-    rule: "when one passes twice its plan while it is built, stop and tell me in three lines: what grew, why, and
-    the cheaper option." Told in chat; the answer decides how step 7 is cut. Until then: no new code lines beyond
-    what fits under 4,000.
+33. **Stopped at the size's stop line, and told him in three lines** (his rule). Not built, because each would pass
+    4,000: the four remaining specs of step 7 (`isolation`: the flag's four Chromium cases and its planted failure,
+    PM-0002-20; `allocation`: the method of PM-0002-7; `clock`: does Playwright's clock reach the Worker,
+    R5-TEST-OQ1; `file-url`: the built page opened as a file, OQ-0002-1), about 200 lines. Question SIZE-STOP is
+    with him: (a) the stop line moves to 4,400 and the four specs are written as planned; (b) the four move to
+    change-set 3 and change-set 2 ends near 3,970 lines of code plus its docs.
+    **What goes on meanwhile, adding no code line:** step 8's readings and planted defects (scratch runs, recorded
+    in the notes), the production check, the docs pass's records, the zip for his Brave check.
 
 ## Next steps
 1. Step 7 by his answer: the browser tests in `packages/e2e/tests/skeleton/` (the `chromium` project; the server only
