@@ -190,9 +190,13 @@
   FP20 and C3's lines); M9 the push, the saver, CI, the card; then 5.3's 21 pre-runs, the part-clean, the sets.
   **Done 18:27-18:3x UTC:** the part-clean (.gate/u4f-merge/clean-shared.log, exit 0: free 4,360 -> 11,663 MiB); M3
   `git apply --check` exit 0 and M4 `git apply` of 286aac60 in the main folder (uncommitted), its 29 files byte-equal
-  to builder 4's worktree (scratchpad cmp_files.py). **M5 RUNNING** in the background (task bkyuv3xx1;
-  .gate/u4f-merge/m5-check.log). **If cut:** the main folder holds the applied files uncommitted; the saver commits
-  .checkpoints/ only; re-run M5 by the same command, then M6 onward. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+  to builder 4's worktree (scratchpad cmp_files.py). **M5 PASSED** (.gate/u4f-merge/m5-check.log, 18:27:42-18:46:38
+  UTC, exit 0: hashes 2f07abc2…/1a767d5b…; all 11 steps; 634 / 731, 0 failed; test step 865.9 s; wasm 27,000 ticks,
+  0 mismatching; marks 81, rows unchanged; refs 1,569). M6: nothing failed. **M7 gate --no-smoke PASS. D10 empty**
+  (`git diff --stat 5b29296b -- marks.json crates/judge marks/README.md`). **Next, M8's papers:** u4f-report.md and
+  u4f-merge-edits.md (the plan's edits as old -> new) drafted by an agent into notes, read in full, the edits applied
+  by Edit; then the one commit (the files as applied, `git rm` of the wip patch). **If cut:** the applied files stay
+  uncommitted in the main folder; resume at M8. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
 
