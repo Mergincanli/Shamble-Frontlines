@@ -37,7 +37,7 @@ test("the readout names the backend, the ticks, the errors, the last pause and t
     "ticks: 900 at 30 a second · blocks: 900 of 8 bytes",
     "frames: 60.0 a second · frame time 16.67 ms (p99 17.20 ms)",
     "errors: 0",
-    "last pause: 61.2 s hidden · ticks while hidden: 0",
+    "last pause: 61.2 s hidden · ticks while hidden: 0 (a match that ran on: about 1837)",
     "isolation: no · commit: abc1234",
   ]);
   const webgpu = readoutLines({ ...DATA, picture: { backend: "WebGPU", adapter: "intel, gen-12", timestampQuery: true }, lastPause: null });

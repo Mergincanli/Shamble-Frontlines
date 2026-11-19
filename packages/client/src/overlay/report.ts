@@ -38,7 +38,7 @@ export function readoutLines(data: ReportData): string[] {
     `errors: ${data.errors}${data.lastError === "" ? "" : ` (last: ${data.lastError})`}`,
     pause === null
       ? "last pause: none yet"
-      : `last pause: ${(pause.hiddenMs / 1000).toFixed(1)} s hidden · ticks while hidden: ${pause.ticksWhileHidden}`,
+      : `last pause: ${(pause.hiddenMs / 1000).toFixed(1)} s hidden · ticks while hidden: ${pause.ticksWhileHidden} (a match that ran on: about ${Math.round((pause.hiddenMs / 1000) * data.tickHz)})`,
     `isolation: ${data.header.crossOriginIsolated ? "yes" : "no"} · commit: ${data.header.commit}`,
   ];
 }

@@ -9,7 +9,7 @@ export interface WorkerPort {
 /** One pause of the match while the tab was hidden. */
 export interface PauseRecord {
   readonly hiddenMs: number;
-  /** Ticks that ran between hiding and showing; 0 when the match paused as it should. */
+  /** Ticks the page saw arrive between hiding and showing: 0, or the few that were already on their way. */
   readonly ticksWhileHidden: number;
 }
 
