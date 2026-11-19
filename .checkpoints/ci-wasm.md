@@ -8,7 +8,7 @@
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for `cs/ci-wasm`; lane 1, the first builder chat,
   session_019YNMUV9LFhASseJ9EP12kL, on his personal account) · **Base:** main
   f5030a33185b1ea1b15329174e82823f0215f993 (the merge of #61; the branch is level with it and pushed)
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 16:08 UTC.
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 17:53 UTC.
 
 ## His words that govern (read the files; the lines below are pointers and quotes, never a substitute)
 - `ci-wasm/mustafa-2026-11-19-1516-go-61.md` (2026-11-19, 14:28:25 UTC, whole, by script; it stands byte for byte in
@@ -92,11 +92,22 @@
    13:36:37 UTC; always rebuilt from main's copy). Both tried into scratch files under `.gate/ci-wasm/docs-try/`
    with `--out`: every check "yes". A later message of his (his yes on the CI text) is one more entry in the list.
 
+3. The plan's inputs (16:13 to 16:53 UTC by the agents' own run times): infra-engineer's notes
+   (`ci-wasm/infra-engineer-ci-plan.md`: GitHub's check, the browser's source, the shape, the dry run, the stop rule,
+   the plants) and its draft text; test-engineer's notes (`ci-wasm/test-engineer-followups.md`: TE-NT6's twenty
+   timing points, RR-N4's test, E2E-TYPES, SA-TREE for change-set 3); rust-reviewer's reading for change-set 3's
+   question RNG-CRATE (`ci-wasm/rust-reviewer-cs3-rng.md`: it recommends our own ChaCha8 in `sim`; block 6 holds
+   the question's entry for him). All three notes end with DONE.
+3b. **The plan, revision 1** (`ci-wasm/plan.md`, 17:53 UTC) and the final CI text: `ci-wasm/ci-edit.diff` (90 added
+   lines, 0 removed, sha256 282890b7...3290e), the whole file as a scratch copy at
+   `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml` (sha256 76bfed6e...96d8). It is infra-engineer's draft
+   plus the specs' type-check line (tried here: exit 0).
+
 ## Current step
-Step 3: the plan of the CI-WASM pull request. Before the first agent starts he is told, in two lines, that the card
-and its notes folder are complete and that the saver runs. Then: issue #59's comments read; infra-engineer drafts
-the CI facts (its notes: `ci-wasm/infra-engineer-ci-plan.md`); the main session writes the plan
-(`ci-wasm/plan.md`).
+Step 3c: the advisor agent reviews the plan (`ci-wasm/advisor-plan.md`) and security-auditor reads the CI text
+(`ci-wasm/security-auditor-ci-text.md`), both started after this save. Then the exact text and the six questions
+(CI-TEXT, CHROME-SOURCE, FIREFOX-TESTS, PERM-ATT, PLANTS, PYCACHE-NOW) go to him; while he reads, the plan's steps
+1 to 3 (no CI file) are built once the plan is approved.
 
 ## Next steps
 3. **The plan of the CI-WASM pull request** (plan first; drafted with infra-engineer; reviewed by the advisor agent;
@@ -149,7 +160,14 @@ the CI facts (its notes: `ci-wasm/infra-engineer-ci-plan.md`); the main session 
    verifier; the report; the pull request draft, then ready; stop for his go.
 
 ## Open findings
-None open on main. Carried as follow-ups: the archive's block for PR #61, and the observations in
+- **PYC-AGAIN (what went wrong, to tell him and to record in the report):** one compiled Python file,
+  `.checkpoints/ci-wasm/__pycache__/rr-chacha-ref.cpython-313.pyc` (7,356 bytes; made 16:34 UTC when rust-reviewer's
+  check script was run), was committed and pushed by the saver's autosave b7325df at 16:39:06 UTC. Found 17:33 UTC,
+  removed from the notes 17:35 UTC; it stays in the branch's history (no history is rewritten). His words placed the
+  `.gitignore` line "With change-set 3". Guard since 17:35 UTC: `.git/info/exclude` of this container lists
+  `__pycache__/` and `*.pyc` (local, untracked; a new container loses it), and agents are told to run Python with
+  `-B`. Question PYCACHE-NOW in the plan.
+- None open on main. Carried as follow-ups: the archive's block for PR #61, and the observations in
 `ci-wasm/browser-reports-reading.md` (BR-GAP is the one that is not explained: Brave's first run drew nothing for
 about 150 s while the simulation ran and no pause was recorded; the pause on a tab switch works in Brave).
 

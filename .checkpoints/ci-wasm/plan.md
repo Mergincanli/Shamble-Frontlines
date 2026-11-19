@@ -1,6 +1,6 @@
 # Plan: the CI-WASM pull request (CI builds the WebAssembly and runs the tests that need it), with the docs pass for #61's merge
 
-_Revision 1, written by the main session, 2026-11-19, 17:45 UTC (from the clock), from infra-engineer's notes
+_Revision 1, written by the main session, 2026-11-19, 17:53 UTC (from the clock), from infra-engineer's notes
 (`infra-engineer-ci-plan.md`), test-engineer's notes (`test-engineer-followups.md`) and the card (`../ci-wasm.md`).
 Nothing outside `.checkpoints/` and `.gate/` is edited before the advisor agent's APPROVE; no line under `.github/`
 is written before Mustafa's yes on its exact text, with the chat in Accept edits._
