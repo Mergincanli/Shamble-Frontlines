@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 11:20 UTC (from the clock)
+- **Last update:** 2026-11-19 11:45 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -515,17 +515,36 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     numbers are final; open places: the outcome, the notes' commit, CI's runs, the two verdicts, the docs list,
     "Decisions needed", "For Mustafa".
 
+60. **The verifier on e4f4bf4: PASS** (`verifier-final.md`; every check run by itself with the card's counts; the tool's
+    file and the release record's nine hashes equal; the server probed; three plants of the list caught, the two new
+    tests fail without the fix). Two Mediums, six Lows. **M1:** its own plant (a `WebAssembly.validate` call in the
+    page's visibility handler) was caught by nothing. **Fixed: commit b27323a** (the build refuses a page chunk that
+    names `WebAssembly`; the verifier's plant makes the build exit 1; both clean builds pass; client unit tests 48;
+    **size 4,477**). **M2** (report text): the list of departures from the plan's symbols is incomplete: add
+    `Sim::block`, `CreateError::message`; the types BackendName, CreatePicture, WorkerPort, PauseRecord, ErrorLog,
+    Flags, RunHeader, ReportData, PacedSim, PacerCounters, LinearMemory; `readoutLines`; serve.mjs's HOST,
+    DEFAULT_PORT, addressFor, CONTENT_SECURITY_POLICY, `listen` (the planned `createServer({root, port})` became
+    `createServer({root})` plus `listen`); build-checks' MAX_SERVED_BYTES, tooLarge, formatSizeTable, cspProblems,
+    bundleProblems, checkOutDir; build.mjs's buildWasm and buildPage; planned but gone: `copyReport` (folded into
+    Overlay). Lows for the report: L1 one cast, not two (`three-picture.ts:43`); L2 allocation per frame 39 to 88
+    bytes over all runs; L3 add to "Not verified": the zero-Wasm proof read by two tests only (now also the
+    build's scan), CI type-checks only `packages/types`, CI cannot run the boundary tests, GitHub's own check of
+    the tool not run, the server ran on Linux only, a tab hidden while the Wasm loads has no test; L4 the policy
+    header is asserted on the 200 answer only (a follow-up); L5 the refused-variables check has no test (a
+    follow-up); L6 the Worker's type check runs without `--types vite/client` (the plan's printed command has it and
+    fails with the lib check on).
+
 ## Current step
-60. **The verifier is running on e4f4bf4** (it has the scratch worktree and port 4173 until it answers). **Next, in order:** (1) the verifier's answer (running; until PASS); (2) done (step 58); (3) read CI on the pushed head with the GitHub tools; (4) the zip: a clean
-    development build at the final code head, then `python3 -I .checkpoints/cs2-first-page/make-zip.py
-    packages/client/dist .gate/cs2-first-page/zip`, the browser tests against its unpacked copy, sent with the
-    chat's file tool; (5) the report: fill `report-draft.md`'s double-bracket places (its numbers are in step 57
-    and `round2-summary.md`; the docs pass's list; "For Mustafa" = the README steps in `make-zip.py`), write it to
-    `docs/reports/2026-11-19-cs2-first-page.md`; (6) the advisor agent on the final head (it reads main's
-    `.claude/agents/advisor.md`); its verdict goes into the pull request's description; (7) the last commit deletes
-    `.checkpoints/cs2-first-page*` (the report names the commit that still holds the notes) and carries no skip
-    mark; mark #61 ready; (8) **stop for his Brave check and his go.** Not to forget: remove the worktree
-    `.gate/cs2-plants` without force (its edits undone first with `git apply -R` of `round2-fixes.diff`).
+61. **The verifier re-checks M1 on b27323a** (in the scratch worktree, whose code equals b27323a file for file; no
+    browser runs). **The main session meanwhile:** the zip at the pushed head (a clean development build, then
+    `make-zip.py`, the browser tests against the unpacked copy), then the report (fill `report-draft.md`: the
+    outcome, the notes' commit, CI's runs, the verdicts, the docs list by script from
+    `docs-keeper-moved-lines.md`, M2's symbols, L1 to L3 and L6, "Decisions needed": none, "For Mustafa": the Brave
+    steps of the README and his go), written to `docs/reports/2026-11-19-cs2-first-page.md` (then the map check
+    passes); then the advisor agent on the final head; its verdict into the pull request's description; the last
+    commit deletes `.checkpoints/cs2-first-page*` and carries no skip mark; mark #61 ready; **stop for his Brave
+    check and his go.** Then remove the worktree `.gate/cs2-plants` without force (undo its edits first with
+    `git apply -R`).
 
 ## Next steps
 1. See "Current step". No reviewer runs the browser project or `build.mjs` in the main folder while the main session
