@@ -595,14 +595,21 @@ enum Bite {
     Speed,
     /// PM-0001-41/server-quant-differs: the authority step's own-copy snap on the grid `own_copy_snap_with_bite` gives.
     Quant,
+    /// PM-0001-21/no-cooldown (U4f; NA-9): a fire edge in the weapon's cooldown fires, unrefused.
+    NoCooldown,
+    /// PM-0001-21/refuse-not-clamp (U4f; NA-9): a shot at a point beyond the reach is refused and counted (as a fire
+    /// edge in the cooldown is: no new seam kind) in place of the clamp.
+    RefuseNotClamp,
 }
 
 #[cfg(feature = "bites")]
-const BITE_IDS: [(&str, Bite); 4] = [
+const BITE_IDS: [(&str, Bite); 6] = [
     ("PM-0004-21/hash-map", Bite::HashMap),
     ("PM-0004-21/std-sin", Bite::StdSin),
     ("PM-0001-41/server-speed-1pct", Bite::Speed),
     (crate::OWN_COPY_SNAP_BITES[0], Bite::Quant),
+    ("PM-0001-21/no-cooldown", Bite::NoCooldown),
+    ("PM-0001-21/refuse-not-clamp", Bite::RefuseNotClamp),
 ];
 
 /// PM-0004-21/hash-map's planted iteration: a std `HashMap` of `keys` keys, iterated once, its whole order folded by
@@ -936,6 +943,12 @@ impl World {
     #[cfg(feature = "bites")]
     pub const BITES: [&'static str; 4] =
         [BITE_IDS[0].0, BITE_IDS[1].0, BITE_IDS[2].0, BITE_IDS[3].0];
+
+    /// PM-0001-21's two sim-side check bites (U4f; NA-9, U4F-Q1 (a)): the cooldown check removed, and a refusal in
+    /// place of the clamp (bites builds only), each planted through [`World::with_bite`]. A list apart from
+    /// [`World::BITES`], which npt-hash-wasm's replayer indexes and npt-sim's tests pin.
+    #[cfg(feature = "bites")]
+    pub const CHECK_BITES: [&'static str; 2] = [BITE_IDS[4].0, BITE_IDS[5].0];
 
     /// A world with one planted defect by its id (bites builds only), armed from the step that runs `arm_tick` on
     /// (at or after `first_tick`); `None` for an id it does not plant. PM-0001-41/server-quant-differs takes its
@@ -1302,6 +1315,11 @@ impl World {
             wire.to_grid(POSITION_Z, (o[2] + d[2] * k) as f32),
         ];
         if authority {
+            // PM-0001-21/refuse-not-clamp: no clamp report; the shot is refused in its place (`run_command`).
+            #[cfg(feature = "bites")]
+            if self.bitten(Bite::RefuseNotClamp) {
+                return point;
+            }
             self.reports.clamps.push(ClampReport {
                 slot: c.slot,
                 seq: c.seq,
@@ -1408,8 +1426,35 @@ impl World {
                 s.reload_left = i64::from(w.reload_ms) * 1_000 * i64::from(TICK_HZ);
             }
         }
-        let ready = s.reload_left == 0 && s.ammo > 0 && s.wait <= 0;
-        if edge[Command::PRESS_FIRE] && !ready && authority {
+        #[allow(
+            unused_mut,
+            reason = "PM-0001-21/no-cooldown relaxes it in bites builds"
+        )]
+        let mut ready = s.reload_left == 0 && s.ammo > 0 && s.wait <= 0;
+        #[allow(
+            unused_mut,
+            reason = "PM-0001-21/refuse-not-clamp sets it in bites builds"
+        )]
+        let mut refuse_far = false;
+        #[cfg(feature = "bites")]
+        if authority {
+            // PM-0001-21/no-cooldown: the cooldown check removed, so a fire edge in it fires, unrefused.
+            if self.bitten(Bite::NoCooldown)
+                && edge[Command::PRESS_FIRE]
+                && s.reload_left == 0
+                && s.ammo > 0
+            {
+                ready = true;
+            }
+            // PM-0001-21/refuse-not-clamp: a point beyond the reach (the clamp moved it) is refused, not clamped.
+            refuse_far = point != c.aim && self.bitten(Bite::RefuseNotClamp);
+        }
+        if refuse_far && ready && (fire_held || edge[Command::PRESS_FIRE]) {
+            self.reports.cooldown += 1;
+            self.refuse(c, RefusalKind::Cooldown);
+        }
+        let ready = ready && !refuse_far;
+        if edge[Command::PRESS_FIRE] && !ready && !refuse_far && authority {
             if s.ammo == 0 {
                 self.reports.ammunition += 1;
                 self.refuse(c, RefusalKind::Ammunition);

@@ -136,7 +136,18 @@ struct RoomTrack {
     late: Vec<u64>,
     refused: Vec<[u64; 4]>,
     events_at: Option<usize>,
-    second: Option<(u64, Phase, [i64; 6])>,
+    second: Option<Second>,
+}
+
+/// One second's sums so far, and its per-client samples: each joined client's input buffer depth at its last tick
+/// (`second.s.buffer_depth_count`, -20) and each slot's most events queued at once (`second.s.event_queue_max_count`,
+/// 2.8's high-water series).
+struct Second {
+    sec: u64,
+    ph: Phase,
+    acc: [i64; 6],
+    depth: Vec<i64>,
+    queue_max: Vec<i64>,
 }
 
 /// The run's logs (the module text).
@@ -172,6 +183,26 @@ pub(crate) struct Logs {
     #[cfg(feature = "bites")]
     bitten_at: Vec<Option<u64>>,
     pub(crate) counts: Counts,
+    /// -22's never-acker's slot (the never-ack suite), and whether its kick is written.
+    pub(crate) starved: Option<u8>,
+    starved_kicked: bool,
+    /// -21's lag-switch client's slot (the lag-switch suite), and its soldier's last record ([x, y, z, health]).
+    pub(crate) lag: Option<u8>,
+    lag_prev: Option<[i32; 4]>,
+}
+
+/// npt-sim's soldiers' walking speed, cm/s: a copy of its private `Scene::move_speed` (sim/src/scene.rs:184, :244); the
+/// test clients never sprint (bots/src/lib.rs:292).
+pub(crate) const MOVE_CM_S: i64 = 600;
+
+/// The movement the sim's step gave a soldier between two ticks' records ([x, y, z, health], grid cm), µm (the advisor's
+/// A1): `None` when it was dead at either (health 0), so a respawn's placement is never counted as movement.
+pub(crate) fn moved_um(before: [i32; 4], after: [i32; 4]) -> Option<u64> {
+    if before[3] == 0 || after[3] == 0 {
+        return None;
+    }
+    let d2: i64 = (0..3).map(|i| i64::from(after[i] - before[i]).pow(2)).sum();
+    Some((d2.unsigned_abs() * 100_000_000).isqrt())
 }
 
 /// The run's running totals, for its summary line and the lab log's last records.
@@ -236,6 +267,10 @@ impl Logs {
             #[cfg(feature = "bites")]
             bitten_at: vec![None; n],
             counts: Counts::default(),
+            starved: None,
+            starved_kicked: false,
+            lag: None,
+            lag_prev: None,
         })
     }
 
@@ -561,10 +596,32 @@ impl Logs {
         self.track.late.resize(n, 0);
         self.track.refused.resize(n, [0; 4]);
         let mut refused_events = Vec::new();
+        // -20's series (U4f; NA-14 and the advisor's A3): per joined client from its first accepted stamp on, whether
+        // the command stamped for this tick arrived before it ran (`cmd_on_time`; `input_missing` its complement); and
+        // the press edges the commands run this tick carried, lost and doubled (shared with -58).
+        let (mut on_time, mut missing, mut presses) = (Vec::new(), Vec::new(), [0i64; 3]);
+        // U4F-Q3 (c): under option A each command run's stamp less the tick; -20's depth per client (0 under A); 2.8's
+        // most events queued at once this tick per slot (the cap less the tick's lowest headroom: before an overflow
+        // resync cleared the queue).
+        let (mut ran_early, mut depth, mut queue_max) = (Vec::new(), Vec::new(), vec![0i64; n]);
+        let cap = i64::from(room.event_cap().0);
         for (s, h) in server.iter_mut().enumerate() {
             let Some(c) = room.client(s as u8) else {
                 continue;
             };
+            if !c.kicked() {
+                if let Some(b) = c.on_time() {
+                    on_time.push(i64::from(b));
+                    missing.push(i64::from(!b));
+                }
+                let (seen, lost, doubled) = c.presses();
+                for (p, x) in presses.iter_mut().zip([seen, lost, doubled]) {
+                    *p += i64::from(x);
+                }
+                ran_early.extend(c.ran_early().iter().map(|&x| i64::from(x)));
+                depth.push(i64::from(c.buffer_depth_ticks()));
+                queue_max[s] = cap - c.headroom();
+            }
             *h = c.server_hash();
             if h.is_some() {
                 self.logged.entry(w).or_insert_with(|| vec![false; n])[s] = true;
@@ -607,6 +664,51 @@ impl Logs {
             effects.values().copied().max().unwrap_or(0),
         );
         v.insert("late_count".into(), late as i64);
+        v.insert("press_count".into(), presses[0]);
+        v.insert("press_lost_count".into(), presses[1]);
+        v.insert("press_doubled_count".into(), presses[2]);
+        rec.s.insert("cmd_on_time".into(), on_time);
+        rec.s.insert("input_missing".into(), missing);
+        rec.s.insert("cmd_ran_early_count".into(), ran_early);
+        // -22 (2.7's row): the never-acker's queue headroom on every room tick record (the cap while no slot of its is
+        // held), and `ack_starved` each time the room resolves it: `dropped` 0 at a forced resync, 1 at its kick.
+        let mut starved = None;
+        if let Some(s) = self.starved {
+            let c = room.client(s);
+            rec.v.insert(
+                "ack_starved_headroom_count".into(),
+                c.map_or(cap, |c| c.headroom()),
+            );
+            if let Some(c) = c {
+                if c.kicked() && !self.starved_kicked {
+                    self.starved_kicked = true;
+                    starved = Some((s, 1));
+                } else if c.overflow_resync() {
+                    starved = Some((s, 0));
+                }
+            }
+        }
+        // -21's lag switch (2.7's row; A1): the lag client's commands run this tick, its movement by the sim's step less
+        // `CMD_CATCHUP` ticks of top-speed walking (signed: 0 or less passes), and a tick with a death or a respawn
+        // counted apart (`lagswitch_move_apart` 1, its movement 0).
+        if let Some(s) = self.lag {
+            let me = records
+                .iter()
+                .find(|r| r.kind == EntityKind::Soldier && r.index == u16::from(s))
+                .map(|r| [r.grid[0], r.grid[1], r.grid[2], r.grid[6]]);
+            let moved = self.lag_prev.zip(me).and_then(|(a, b)| moved_um(a, b));
+            self.lag_prev = me;
+            let top = MOVE_CM_S * 10_000 / i64::from(npt_sim::TICK_HZ)
+                * npt_room::InputBuffer::CMD_CATCHUP as i64;
+            let run = room.client(s).map_or(0, |c| c.commands_run());
+            rec.v.insert("lagswitch_cmds_count".into(), i64::from(run));
+            rec.v.insert(
+                "lagswitch_excess_move_um".into(),
+                moved.map_or(0, |m| m as i64) - top,
+            );
+            rec.v
+                .insert("lagswitch_move_apart".into(), i64::from(moved.is_none()));
+        }
         let flags: Vec<i64> = (0..n)
             .map(|s| i64::from(sets.get(s).is_some_and(|x| x.everyone)))
             .collect();
@@ -656,6 +758,13 @@ impl Logs {
             }
         }
         self.room.tick(&rec).map_err(io)?;
+        if let Some((s, dropped)) = starved {
+            let mut e = EventRecord::new("ack_starved", ph)
+                .with("slot", s)
+                .with("dropped", dropped);
+            e.t = Some(w);
+            self.room.event(&e).map_err(io)?;
+        }
         for (s, kind) in refused_events {
             let mut e = EventRecord::new("snap_refused", ph)
                 .with("slot", s)
@@ -664,7 +773,7 @@ impl Logs {
             e.t = Some(w);
             self.room.event(&e).map_err(io)?;
         }
-        self.room_second(world, t, ph, records)
+        self.room_second(world, t, ph, records, depth, queue_max)
     }
 
     /// The per-second counts: shots, gameplay events (hits and kills) and projectile spawns from the World's own event
@@ -675,6 +784,8 @@ impl Logs {
         t: u32,
         ph: Phase,
         records: &[npt_sim::EntityRecord],
+        depth: Vec<i64>,
+        queue_max: Vec<i64>,
     ) -> Result<u64, String> {
         let (events, shots, reliable) = dump_events(world, &mut self.track.events_at)?;
         let mut portal = 0i64;
@@ -723,24 +834,43 @@ impl Logs {
             stand_in_spawns,
         ];
         match &mut self.track.second {
-            Some((s, p, acc)) if *s == sec => {
-                *p = ph;
-                for (a, x) in acc.iter_mut().zip(add) {
-                    *a += x;
+            Some(x) if x.sec == sec => {
+                x.ph = ph;
+                for (a, v) in x.acc.iter_mut().zip(add) {
+                    *a += v;
+                }
+                x.depth = depth;
+                for (m, q) in x.queue_max.iter_mut().zip(queue_max) {
+                    *m = (*m).max(q);
                 }
             }
             _ => {
-                if let Some((s, p, acc)) = self.track.second.take() {
-                    self.write_second(s, p, acc)?;
+                if let Some(x) = self.track.second.take() {
+                    self.write_second(x)?;
                 }
-                self.track.second = Some((sec, ph, add));
+                self.track.second = Some(Second {
+                    sec,
+                    ph,
+                    acc: add,
+                    depth,
+                    queue_max,
+                });
             }
         }
         Ok(events as u64)
     }
 
-    fn write_second(&mut self, sec: u64, ph: Phase, acc: [i64; 6]) -> Result<(), String> {
+    fn write_second(&mut self, x: Second) -> Result<(), String> {
+        let Second {
+            sec,
+            ph,
+            acc,
+            depth,
+            queue_max,
+        } = x;
         let mut r = SecondRecord::new(sec, ph);
+        r.s.insert("buffer_depth_count".to_owned(), depth);
+        r.s.insert("event_queue_max_count".to_owned(), queue_max);
         for (name, v) in [
             "shots_count",
             "portal_changes_count",
@@ -766,8 +896,8 @@ impl Logs {
     /// decided lost (the module text), every complete tick written, then the footers. `ended` is `Clean`, or `Crash`
     /// when a hash came after its tick was written (never silently dropped).
     pub(crate) fn finish(mut self, ended: Ended, last: &[EventRecord]) -> Result<Counts, String> {
-        if let Some((s, p, acc)) = self.track.second.take() {
-            self.write_second(s, p, acc)?;
+        if let Some(x) = self.track.second.take() {
+            self.write_second(x)?;
         }
         let logged: Vec<(u64, Vec<bool>)> =
             self.logged.iter().map(|(w, l)| (*w, l.clone())).collect();

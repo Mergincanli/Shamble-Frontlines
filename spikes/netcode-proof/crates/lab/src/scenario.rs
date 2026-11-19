@@ -42,8 +42,8 @@ use npt_l1::{DatagramCounts, L1Net, Profile};
 use npt_link::{Channel, Link, LinkState, Listener};
 use npt_log::{Ended, EventRecord, Phase};
 use npt_proto::{Direction, Join, Kick, Message, Quant};
-use npt_room::Room;
-use npt_server::{Decoder, RttSource, Schedule, due_ticks};
+use npt_room::{ClientCounters, CmdTiming, Room};
+use npt_server::{Counters, Decoder, RttSource, Schedule, due_ticks};
 use npt_sim::replay::Recording;
 use npt_sim::{Placement, Scene, StandIns, World};
 use serde_json::Value;
@@ -51,6 +51,18 @@ use serde_json::Value;
 use crate::hash::Failure;
 use crate::logs::{Logs, Meta};
 use crate::mirror::{Mirror, Records, SetStats};
+
+/// U4f's controller setting for every endpoint of a controller run (u4f-brief.md 2.2): the lead bound's 12 ticks less
+/// a margin, and at most 9; one setting under both options (f6). The cap of 9 keeps every honest command inside option
+/// B's buffer of 8 only while the up delay is at least about 2 ticks whenever the cap binds, which L1's bounded jitter
+/// always gives; other links are C-U6-17's (NC-U4F-3).
+const CONTROLLER_MAX_LEAD: u32 = 9;
+// EA-U4F-5: the cap at most option B's buffer plus one, and below the room's lead bound in ticks.
+const _: () = assert!(
+    CONTROLLER_MAX_LEAD as usize <= npt_room::InputBuffer::CMD_CATCHUP + 1
+        && CONTROLLER_MAX_LEAD
+            < npt_sim::ticks_for_ms_at(npt_sim::TICK_HZ, Room::<Sim>::LEAD_BOUND_MS)
+);
 
 /// The simulation the lab's rooms run (advisor-u4r-r1, EA-U4R-2; U4-SEAM: npt-lab names `npt_sim::World` once, here;
 /// hash.rs's bite list and dump checks name npt-sim's World as the tool they check, not a room's).
@@ -228,7 +240,6 @@ impl Bites {
         let proto = npt_proto::BITES.contains(&id);
         let b = Bites {
             id: Some(id.to_owned()),
-            world: Sim::BITES.contains(&id),
             room: npt_room::BITES.contains(&id) || proto,
             client: npt_client::BITES.contains(&id) || proto,
             decoder: proto,
@@ -246,6 +257,8 @@ impl Bites {
             )
             .with_bite(id)
             .is_some(),
+            // npt-sim's two -21 check bites are a list apart from `World::BITES`, planted the same way (F2).
+            world: Sim::BITES.contains(&id) || Sim::CHECK_BITES.contains(&id),
             whole_as_lost: LAB_BITES[0] == id,
             late_command: LAB_BITES[1] == id,
             link_lost_overstated: LAB_BITES[2] == id,
@@ -345,6 +358,89 @@ impl Bites {
     }
 }
 
+/// One counted field: its event name and its reader.
+type Field<T> = (&'static str, fn(&T) -> u64);
+
+/// The room's per-client counters a session's counts write (2.5; SA-5): every refusal field of `ClientCounters` (the
+/// kinds, the repeats, the late and the window's, the acknowledgement's, the resync and the kick's) and its queue's.
+const ROOM_COUNTS: [Field<ClientCounters>; 20] = [
+    ("late_count", |k| k.late),
+    ("press_refused_count", |k| k.press_refused),
+    ("buffer_full_count", |k| k.buffer_full),
+    ("rewinds_refused_count", |k| k.rewinds_refused),
+    ("events_queued_count", |k| k.events_queued),
+    ("overflow_resyncs_count", |k| k.overflow_resyncs),
+    ("lead_refused_count", |k| k.lead_refused),
+    ("not_newer_count", |k| k.not_newer),
+    ("seq_refused_count", |k| k.seq_refused),
+    ("move_refused_count", |k| k.move_refused),
+    ("aim_refused_count", |k| k.aim_refused),
+    ("ack_refused_count", |k| k.ack_refused),
+    ("ack_refused_commands_count", |k| k.ack_refused_commands),
+    ("acks_old_count", |k| k.acks_old),
+    ("seq_outside_window_count", |k| k.seq_outside_window),
+    ("rejoin_overlap_count", |k| k.rejoin_overlap),
+    ("commands_repeat_count", |k| k.commands_repeat),
+    ("resyncs_dropped_count", |k| k.resyncs_dropped),
+    ("resyncs_limited_count", |k| k.resyncs_limited),
+    ("kicked_count", |k| k.kicked),
+];
+
+/// Every refusal field of npt-server's per-session `Counters` (2.5), each written `pump_<field>_count`.
+const PUMP_COUNTS: [Field<Counters>; 21] = [
+    ("pump_too_large_count", |d| d.too_large),
+    ("pump_truncated_count", |d| d.truncated),
+    ("pump_bad_length_count", |d| d.bad_length),
+    ("pump_unknown_type_count", |d| d.unknown_type),
+    ("pump_wrong_direction_count", |d| d.wrong_direction),
+    ("pump_wrong_channel_count", |d| d.wrong_channel),
+    ("pump_trailing_bytes_count", |d| d.trailing_bytes),
+    ("pump_unknown_field_count", |d| d.unknown_field),
+    ("pump_out_of_range_count", |d| d.out_of_range),
+    ("pump_malformed_count", |d| d.malformed),
+    ("pump_before_join_count", |d| d.before_join),
+    ("pump_input_limited_count", |d| d.input_limited),
+    ("pump_ping_limited_count", |d| d.ping_limited),
+    ("pump_pong_unknown_count", |d| d.pong_unknown),
+    ("pump_first_not_join_count", |d| d.first_not_join),
+    ("pump_joining_dropped_count", |d| d.joining_dropped),
+    ("pump_stream_malformed_count", |d| d.stream_malformed),
+    ("pump_join_deadline_count", |d| d.join_deadline),
+    ("pump_wrong_version_count", |d| d.wrong_version),
+    ("pump_wrong_content_hash_count", |d| d.wrong_content_hash),
+    ("pump_join_again_count", |d| d.join_again),
+];
+
+/// `e` with a session's counts: the room slot's (`ROOM_COUNTS`) and the pump's (`PUMP_COUNTS`), each when given.
+pub(crate) fn counts(
+    mut e: EventRecord,
+    room: Option<&ClientCounters>,
+    pump: Option<&Counters>,
+) -> EventRecord {
+    for (name, get) in ROOM_COUNTS {
+        if let Some(k) = room {
+            e = e.with(name, get(k));
+        }
+    }
+    for (name, get) in PUMP_COUNTS {
+        if let Some(d) = pump {
+            e = e.with(name, get(d));
+        }
+    }
+    e
+}
+
+/// One session's counts at its end (2.5; NA-15), read before the room frees its slot or its `Decoder` drops: how it
+/// ended (`replaced`, `left`, `closed`, `kicked`), its room slot's counters (none when another session holds the slot)
+/// and its pump's.
+#[derive(Clone, Debug)]
+pub(crate) struct SessionEnd {
+    pub(crate) slot: u8,
+    pub(crate) ended: &'static str,
+    pub(crate) room: Option<ClientCounters>,
+    pub(crate) pump: Counters,
+}
+
 /// One server-side session: its link, its decoder and, once joined, its slot.
 pub(crate) struct Session {
     pub(crate) id: u64,
@@ -370,6 +466,8 @@ pub(crate) struct Server {
     pub(crate) admitted: Vec<(u8, u64, u32)>,
     /// Each session ended since the last take: (slot, why).
     pub(crate) ended: Vec<(u8, &'static str)>,
+    /// Each joined session's counts at its end since the last take (2.5), for the lab log's `session_end`.
+    pub(crate) session_ends: Vec<SessionEnd>,
     /// The sessions the room's slots are held by (r8 reads which).
     pub(crate) owner: BTreeMap<u8, u64>,
     /// The pump's planted defect every session's decoder takes (`Bites::pump`; bites builds only).
@@ -419,6 +517,7 @@ impl Server {
             next_id: 0,
             admitted: Vec::new(),
             ended: Vec::new(),
+            session_ends: Vec::new(),
             owner: BTreeMap::new(),
             decoder_bite: None,
         }
@@ -455,7 +554,16 @@ impl Server {
         id
     }
 
-    fn drop_slot(&mut self, slot: u8, keep: u64, why: &'static str, now: u64) {
+    /// Drops every other session on `slot` (a replacement), its counts kept first (2.5): `room` is the slot's counters
+    /// read before the replacing join reset them.
+    fn drop_slot(
+        &mut self,
+        slot: u8,
+        keep: u64,
+        why: &'static str,
+        now: u64,
+        room: Option<ClientCounters>,
+    ) {
         for s in &mut self.sessions {
             let Some(x) = s else { continue };
             if x.slot == Some(slot) && x.id != keep {
@@ -465,6 +573,12 @@ impl Server {
                         x.link.send_reliable(Channel::Control, &out, now);
                     }
                 }
+                self.session_ends.push(SessionEnd {
+                    slot,
+                    ended: why,
+                    room: room.clone(),
+                    pump: x.decoder.counters().clone(),
+                });
                 *s = None;
                 self.ended.push((slot, why));
             }
@@ -489,6 +603,14 @@ impl Server {
                     match (&m, x.slot) {
                         (Message::Join(j), _) => {
                             joined = true;
+                            // A replacing join resets its slot's counters: each held slot's, read first (2.5).
+                            let held: Vec<(u8, ClientCounters)> = self
+                                .owner
+                                .keys()
+                                .filter_map(|&s| {
+                                    self.room.client(s).map(|c| (s, c.counters().clone()))
+                                })
+                                .collect();
                             match self.room.join(j) {
                                 Ok((slot, r)) => {
                                     x.decoder.accept();
@@ -496,7 +618,9 @@ impl Server {
                                     self.admitted.push((slot, x.id, tick));
                                     self.owner.insert(slot, x.id);
                                     if r {
-                                        replaced = Some((slot, x.id));
+                                        let old =
+                                            held.into_iter().find(|h| h.0 == slot).map(|h| h.1);
+                                        replaced = Some((slot, x.id, old));
                                     }
                                 }
                                 Err(r) => x.decoder.reject(x.link.as_mut(), r, now),
@@ -511,6 +635,15 @@ impl Server {
                             }
                             x.routed += 1;
                             left = matches!(m, Message::Leave(_));
+                            if left {
+                                // 2.5: its counts before its `Leave` frees the room's slot.
+                                self.session_ends.push(SessionEnd {
+                                    slot,
+                                    ended: "left",
+                                    room: self.room.client(slot).map(|c| c.counters().clone()),
+                                    pump: x.decoder.counters().clone(),
+                                });
+                            }
                             self.room.receive(slot, &m);
                             if left {
                                 break;
@@ -519,9 +652,9 @@ impl Server {
                         _ => {}
                     }
                 }
-                if let Some((slot, keep)) = replaced {
+                if let Some((slot, keep, old)) = replaced {
                     // Carry 76: the old session is told and dropped before anything else is routed.
-                    self.drop_slot(slot, keep, "replaced", now);
+                    self.drop_slot(slot, keep, "replaced", now, old);
                 }
                 if left {
                     let slot = self.sessions[i].as_ref().and_then(|x| x.slot);
@@ -543,6 +676,18 @@ impl Server {
             // the session, and the room's slot is freed when this session holds it (`Room::leave`: "a closed link").
             if x.decoder.is_closed() || x.link.state() == LinkState::Closed {
                 let (id, slot) = (x.id, x.slot);
+                if let Some(slot) = slot {
+                    // 2.5: its counts before `Room::leave` frees the slot and the `Decoder` drops.
+                    let holds = self.owner.get(&slot) == Some(&id);
+                    self.session_ends.push(SessionEnd {
+                        slot,
+                        ended: "closed",
+                        room: holds
+                            .then(|| self.room.client(slot).map(|c| c.counters().clone()))
+                            .flatten(),
+                        pump: x.decoder.counters().clone(),
+                    });
+                }
                 self.sessions[i] = None;
                 if let Some(slot) = slot {
                     if self.owner.get(&slot) == Some(&id) {
@@ -590,10 +735,18 @@ impl Server {
             x.link.send_reliable(stream_of(b, quant)?, b, now);
         }
         if kicked {
-            self.sessions
-                .iter_mut()
-                .filter(|s| s.as_ref().is_some_and(|x| x.slot == Some(slot)))
-                .for_each(|s| *s = None);
+            // 2.5: a kicked slot keeps its `ClientSlot`, so its counts are read at the kick, with its pump's.
+            let room = self.room.client(slot).map(|c| c.counters().clone());
+            for s in &mut self.sessions {
+                if let Some(x) = s.take_if(|x| x.slot == Some(slot)) {
+                    self.session_ends.push(SessionEnd {
+                        slot,
+                        ended: "kicked",
+                        room: room.clone(),
+                        pump: x.decoder.counters().clone(),
+                    });
+                }
+            }
             self.owner.remove(&slot);
             self.ended.push((slot, "kicked"));
         }
@@ -683,10 +836,33 @@ pub(crate) struct Settings {
     /// profile.
     pub(crate) burst_spacing_ns: u64,
     pub(crate) behaviour: String,
+    /// The brawl's fire press on every n-th command (`--brawl-press-every`; U4F-Q11 (i) (a): 2 in -20's runs); 0 off.
+    pub(crate) brawl_press_every: u64,
     pub(crate) every_step: bool,
     pub(crate) bites: Bites,
     pub(crate) arm_tick: u32,
     pub(crate) lead: u32,
+    /// OQ-0001-6's option (`--cmd-timing`), recorded as `params.cmd_timing` (README :191-192).
+    pub(crate) cmd_timing: CmdTiming,
+    /// U4f's tick-lead controller on every endpoint (`--controller 1`); else the fixed lead `lead` (U4F-Q7 (i)).
+    pub(crate) controller: bool,
+    /// The room's event cap set as data (`--event-cap`: 2.8's measurement, and a short never-ack test); else the room's.
+    pub(crate) event_cap: Option<u32>,
+    /// The run's suite (`--suite`, `params.suite`): `clock` (-47) reconnects its clients, `never-ack` (-22) makes slot
+    /// 0 the never-acker.
+    pub(crate) suite: String,
+    /// -47's connects (`--connects`, the clock suite's), counted over every slot's sessions.
+    pub(crate) connects: u64,
+    /// The clamp twin's source (`--twin-logs`, with `--twin` and role twin): the clamp run's folder, whose room log's
+    /// clamp reports give the twin's points (2.12).
+    pub(crate) twin_logs: Option<PathBuf>,
+    /// The lag switch's hold and spacing, ms (`--lag-hold-ms`, 200; `--lag-every-ms`, 6,000: 100 bursts in 600 s).
+    pub(crate) lag_hold_ms: u64,
+    pub(crate) lag_every_ms: u64,
+    /// The fast clock's episode length and its idle from the measured start, ns of simulated time
+    /// (`--fast-clock-episode-s`, 60; `--fast-clock-idle-s`, 0: 5.3's p20 only).
+    pub(crate) fast_episode_ns: u64,
+    pub(crate) fast_idle_ns: u64,
     pub(crate) record: Option<PathBuf>,
     pub(crate) bytes: Option<PathBuf>,
     /// Whether the run writes its logs (`false`: a runner recording regenerated inside `npt-lab hash`).
@@ -767,6 +943,120 @@ struct Client {
     last_stamp: Option<u32>,
     duplicates: u64,
     bytes_log: Option<std::io::BufWriter<std::fs::File>>,
+    /// The clock suite (-47): this connect's number in the run, the host instant of its first clock sample, and whether
+    /// its estimate was read (its slot then reconnects while connects remain).
+    seq: u64,
+    first_sample_ns: Option<u64>,
+    read: bool,
+    /// -21's fast clock: the SimClock instant (the measured start) from which its host clock runs at 1.5, continuous.
+    fast_from: Option<u64>,
+}
+
+impl Client {
+    /// The client's host clock at SimClock `ns`: its offset plus `ns`, at rate 1.5 from `fast_from` on.
+    fn host(&self, ns: u64) -> u64 {
+        self.offset_ns
+            + match self.fast_from {
+                Some(m) if ns > m => m + (ns - m) * 3 / 2,
+                _ => ns,
+            }
+    }
+
+    /// The first SimClock instant at which its host clock reads at least `host` (the inverse of [`Client::host`]).
+    fn sim(&self, host: u64) -> u64 {
+        let h = host.saturating_sub(self.offset_ns);
+        match self.fast_from {
+            Some(m) if h > m => m + ((h - m) * 2).div_ceil(3),
+            _ => h,
+        }
+    }
+}
+
+/// The fast clock's episodes (2.6's schedule; f37): the measured window's back-to-back spans of `episode_ns` of
+/// simulated time from its start, whole ones only, each as the room ticks it holds, [first, end) counted from the run's
+/// first tick (tick k is due at `due_ns(k)`).
+pub(crate) fn episodes(warmup_ticks: u64, measured_ticks: u64, episode_ns: u64) -> Vec<(u64, u64)> {
+    let hz = u128::from(npt_sim::TICK_HZ);
+    let at = |ns: u64| (u128::from(ns) * hz).div_ceil(u128::from(SEC)) as u64;
+    let (start, end) = (due_ns(warmup_ticks), due_ns(warmup_ticks + measured_ticks));
+    let e = episode_ns.max(1);
+    (0..(end - start) / e)
+        .map(|i| (at(start + i * e), at(start + (i + 1) * e)))
+        .collect()
+}
+
+/// -21's fast clock's tally (2.6; U4F-Q11 (iii) (c); A1): slot 0's episodes, the room's lead bound in ticks, its
+/// soldier's last record ([x, y, z, health]), its kind-1 and kind-2 refusal counts and its copies left out after the
+/// last tick and at the episode's start, and the episode's sums: commands run, movement (µm), live ticks and ticks
+/// counted apart.
+#[derive(Default)]
+struct FastClock {
+    episodes: Vec<(u64, u64)>,
+    bound: i64,
+    prev: Option<[i32; 4]>,
+    refused: [u64; 3],
+    base: [u64; 3],
+    sums: [i64; 4],
+}
+
+impl FastClock {
+    /// Room tick `k` ran: `me` the fast client's soldier record, `run` its commands run, `refused` its kind-1 and kind-2
+    /// counts and its copies left out (`Behaviour::fast_left_out`). At an episode's last tick, that episode's record:
+    /// excess commands (run less the episode's ticks and the bound), excess movement (moved less the honest arithmetic,
+    /// the live ticks plus the bound at full walking speed: U4F-Q11 (iii) (c)), the episode's refusals (SA-6), its copies
+    /// left out (0 expected at P0: EA-U4F-1) and the ticks counted apart (dead at the start or the end: A1).
+    fn tick(
+        &mut self,
+        k: u64,
+        me: Option<[i32; 4]>,
+        run: u32,
+        refused: [u64; 3],
+    ) -> Option<EventRecord> {
+        let moved = self
+            .prev
+            .zip(me)
+            .and_then(|(a, b)| crate::logs::moved_um(a, b));
+        self.prev = me;
+        let before = std::mem::replace(&mut self.refused, refused);
+        let &(a, b) = self.episodes.iter().find(|(a, b)| (*a..*b).contains(&k))?;
+        if k == a {
+            (self.sums, self.base) = ([0; 4], before);
+        }
+        self.sums[0] += i64::from(run);
+        match moved {
+            Some(m) => (self.sums[1], self.sums[2]) = (self.sums[1] + m as i64, self.sums[2] + 1),
+            None => self.sums[3] += 1,
+        }
+        if k + 1 < b {
+            return None;
+        }
+        let top = crate::logs::MOVE_CM_S * 10_000 / i64::from(npt_sim::TICK_HZ);
+        let [cmds, moved, live, apart] = self.sums;
+        // RR-U4F-5 (1): never an underflow, should a counter restart inside an episode.
+        let episode = [0, 1, 2].map(|i| refused[i].saturating_sub(self.base[i]));
+        Some(
+            EventRecord::new("fast_clock", Phase::Measured)
+                .with("slot", 0)
+                .with("excess_cmds_count", cmds - ((b - a) as i64 + self.bound))
+                .with("excess_move_um", moved - (live + self.bound) * top)
+                .with("lead_refused_count", episode[0])
+                .with("not_newer_count", episode[1])
+                .with("left_out_count", episode[2])
+                .with("move_apart_count", apart),
+        )
+    }
+}
+
+/// A fresh endpoint of `slot` for a run: its fixed lead or U4f's controller, its starts and its bite.
+fn endpoint_of(s: &Settings, slot: u8) -> ClientEndpoint {
+    let e = ClientEndpoint::new(join_of(s.seed, slot), npt_sim::TICK_HZ)
+        .with_lead(s.lead)
+        .with_starts(s.cmd_start, s.event_start);
+    s.bites.client(if s.controller {
+        e.with_clock(CONTROLLER_MAX_LEAD)
+    } else {
+        e
+    })
 }
 
 /// One burst of B1 for one client: (start, return), its heal, and what -18's record carries beside it.
@@ -871,6 +1161,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
         s.arm_tick,
         &s.bites,
     );
+    // OQ-0001-6's option, before any join (a start-up setting); the event cap opened for 2.8's measurement.
+    server.room.set_cmd_timing(s.cmd_timing);
+    if let Some(cap) = s.event_cap {
+        server.room = server.room.clone().with_event_cap(cap);
+    }
     let quant = s.bites.quant();
     let mut schedule = s.bites.schedule();
     let net = s.bites.net(s.seed);
@@ -884,6 +1179,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
         .insert("event_queue_cap_count".into(), cap.into());
     meta.params
         .insert("event_queue_cap_provisional".into(), provisional.into());
+    // LEAD-BOUND (Mustafa, 2026-11-18): the bound the room runs, in ms (12 ticks at 30 Hz), report-only (5.6 B2), read
+    // from the live room (SEC-U4F-2).
+    let lead_bound_ms = server.room.lead_bound().0;
+    meta.params
+        .insert("lead_bound_ms".into(), lead_bound_ms.into());
     let mut logs = Logs::open(
         s.logs.then_some(s.out.as_path()),
         &meta,
@@ -891,23 +1191,63 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
         s.bites.whole_as_lost,
     )
     .map_err(fail)?;
+    logs.starved = (s.suite == "never-ack").then_some(0);
+    logs.lag = (s.suite == "lag-switch").then_some(0);
     let mut rng = s.seed ^ 0x6c61_622d_6f66_6673;
     let order = connect_order(n, &s.bites);
     let mut clients: Vec<Client> = Vec::new();
+    // -21's 1.5x clock (2.6): slot 0 on a fixed-lead endpoint (its stamps are its own rule's), its host clock at 1.5
+    // from the measured start.
+    let fast_from = (s.suite == "fast-clock").then(|| due_ns(s.warmup_ticks));
+    let mut fast = fast_from.map(|_| FastClock {
+        episodes: episodes(s.warmup_ticks, s.measured_ticks, s.fast_episode_ns),
+        bound: i64::from(server.room.lead_bound().1),
+        ..FastClock::default()
+    });
     for &slot in &order {
         let link = net.connect(s.profile.clone(), MAX_DATAGRAM, 0);
-        let endpoint = ClientEndpoint::new(join_of(s.seed, slot), npt_sim::TICK_HZ)
-            .with_lead(s.lead)
-            .with_starts(s.cmd_start, s.event_start);
-        let endpoint = s.bites.client(endpoint);
-        let behaviour = if s.behaviour == "brawl" {
-            Behaviour::brawl(&scene, slot, s.seed)
+        let endpoint = match fast_from {
+            Some(_) if slot == 0 => endpoint_of(s, slot).with_lead(s.lead),
+            _ => endpoint_of(s, slot),
+        };
+        let behaviour = if s.suite == "clock" {
+            Behaviour::never_fires(&scene, slot, s.seed)
+        } else if s.suite == "clamp" && slot == 0 {
+            // -21's clamp cheat (2.6): slot 0's open-loop script aims beyond reach inside the map; its twin takes the
+            // clamp run's reported points (2.12).
+            let points = match &s.twin_logs {
+                Some(dir) => twin_points(dir, slot).map_err(fail)?,
+                None => BTreeMap::new(),
+            };
+            Behaviour::script(&scene, slot, s.seed, "clamp")
+                .expect("a script")
+                .with_points(points)
+        } else if s.behaviour == "brawl" {
+            Behaviour::brawl(&scene, slot, s.seed).with_press_every(s.brawl_press_every)
         } else {
             Behaviour::script(&scene, slot, s.seed, &s.behaviour)
                 .ok_or_else(|| Failure::Usage(format!("--behaviour {:?}", s.behaviour)))?
         };
         let behaviour = if s.every_step {
             behaviour.every_step()
+        } else {
+            behaviour
+        };
+        // Under the controller each step gives the commands the endpoint says are due (U4F-Q7 (iii) (c)).
+        let behaviour = if s.controller {
+            behaviour.controlled()
+        } else {
+            behaviour
+        };
+        // -22's suite: slot 0 brawls and never acknowledges (2.6), every other client brawls.
+        let behaviour = if s.suite == "never-ack" && slot == 0 {
+            behaviour.never_acks()
+        } else if s.suite == "lag-switch" && slot == 0 {
+            // -21's lag switch (2.6): slot 0's `Input`s held, then sent in a burst.
+            behaviour.lag_switch(s.lag_hold_ms * 1_000_000, s.lag_every_ms * 1_000_000)
+        } else if fast_from.is_some() && slot == 0 {
+            // A command at every step, its lane's walk, its stamps by U4F-Q11 (v) (b) as F1 amends it.
+            Behaviour::fast_clock(&scene, slot, s.seed, server.room.lead_bound().1)
         } else {
             behaviour
         };
@@ -933,8 +1273,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
             last_stamp: None,
             duplicates: 0,
             bytes_log,
+            seq: u64::from(slot),
+            first_sample_ns: None,
+            read: false,
+            fast_from: fast_from.filter(|_| slot == 0),
         });
     }
+    // The clock suite's connects begun (each slot's first, then one per reconnect).
+    let mut connects = u64::from(n);
     clients.sort_by_key(|c| c.slot);
     let digest = order_digest(&order);
     let mut mirror = Mirror::new(scene.slots(), scene.effect_rows(), scene.name() == "ES");
@@ -969,6 +1315,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
     let measured_end = s.warmup_ticks + s.measured_ticks;
     let last_measured = logs.wide(s.tick_start.wrapping_add((measured_end.max(1) - 1) as u32));
     let mut events_stamped: u64 = 0;
+    let mut clamp = ClampTally::default();
     let mut inputs: Vec<i64> = Vec::new();
     // The link-lost-overstated bite: the slots whose record it has written (bites builds only).
     #[cfg(feature = "bites")]
@@ -1003,10 +1350,16 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                 )));
             }
             logs.admit(slot, session, tick, phase(k)).map_err(fail)?;
+            // U4F-Q4 (b): the clock suite files no client hash, so no slot waits on one.
+            if s.suite == "clock" {
+                logs.gone(slot);
+            }
         }
         for (slot, _) in woke.ended {
             logs.gone(slot);
         }
+        let ends = std::mem::take(&mut server.session_ends);
+        session_ends(&mut logs, ends, server.room.last_tick(), phase(k)).map_err(fail)?;
         // (3) the server tick, if due.
         for _ in 0..woke.to_run {
             let ph = phase(k);
@@ -1017,6 +1370,61 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
             }
             let records = npt_sim::SimCore::entity_records(server.room.sim()).to_vec();
             let index = Records::new(&records);
+            // -21's clamp (2.4's last row): every clamp report in the room log; the clamp suite's cheat's tally.
+            let rep = server.room.reports();
+            for r in &rep.clamps {
+                if s.logs {
+                    let um = |cm: i32| i64::from(cm) * 10_000;
+                    let mut e = EventRecord::new("clamp_report", ph)
+                        .with("slot", r.slot)
+                        .with("seq", r.seq)
+                        .with("x_um", um(r.point[0]))
+                        .with("y_um", um(r.point[1]))
+                        .with("z_um", um(r.point[2]));
+                    e.t = Some(logs.wide(t));
+                    logs.room_event(&e).map_err(fail)?;
+                }
+                if s.suite == "clamp" && r.slot == 0 && !clamp.reported.insert(r.seq) {
+                    clamp.reruns += 1;
+                }
+            }
+            if s.suite == "clamp" {
+                let reach = i64::from(scene.weapon().reach_cm);
+                let me = records
+                    .iter()
+                    .find(|r| r.kind == npt_sim::EntityKind::Soldier && r.index == 0);
+                for (c, _) in server.room.tick_input().commands.iter() {
+                    // Beyond reach of slot 0's fire origin (140 cm above its feet: npt-sim's private CHEST_CM).
+                    let d = me.map(|m| [0, 1, 2].map(|i| i64::from(c.aim[i] - m.grid[i])));
+                    if c.slot == 0
+                        && let Some([x, y, z]) = d
+                        && x * x + y * y + (z - 140) * (z - 140) > reach * reach
+                    {
+                        clamp.sent.insert(c.seq);
+                    }
+                }
+                clamp
+                    .refused
+                    .extend(rep.refusals.iter().filter(|x| x.slot == 0).map(|x| x.seq));
+            }
+            // -21's fast clock: slot 0's episode sums, each episode's record at its end (lab log).
+            if let Some(f) = fast.as_mut() {
+                let me = records
+                    .iter()
+                    .find(|r| r.kind == npt_sim::EntityKind::Soldier && r.index == 0)
+                    .map(|r| [r.grid[0], r.grid[1], r.grid[2], r.grid[6]]);
+                let c = server.room.client(0);
+                let run = c.map_or(0, |c| c.commands_run());
+                let me0 = clients.iter().find(|c| c.slot == 0);
+                let left = me0.map_or(0, |c| c.behaviour.fast_left_out());
+                let refused = c.map_or([0, 0, left], |c| {
+                    [c.counters().lead_refused, c.counters().not_newer, left]
+                });
+                if let Some(mut e) = f.tick(k, me, run, refused) {
+                    e.t = Some(logs.wide(t));
+                    logs.lab_event(&e).map_err(fail)?;
+                }
+            }
             let mut sizes = vec![Vec::new(); usize::from(n)];
             let mut sets = vec![SetStats::default(); usize::from(n)];
             let mut link = vec![0u32; usize::from(n)];
@@ -1102,6 +1510,8 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
             for (slot, _) in std::mem::take(&mut server.ended) {
                 logs.gone(slot);
             }
+            session_ends(&mut logs, std::mem::take(&mut server.session_ends), t, ph)
+                .map_err(fail)?;
             if s.logs {
                 events_stamped += logs
                     .room_tick(&server.room, t, ph, &sets, &sizes, &inputs, &link)
@@ -1112,7 +1522,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                 .world_hashes
                 .push((t, npt_sim::SimCore::state_hash(server.room.sim())));
             k += 1;
-            if k == s.warmup_ticks {
+            if k == s.warmup_ticks && s.suite != "clock" {
                 for c in &clients {
                     if !logs.started(c.slot) {
                         return Err(fail(format!(
@@ -1128,28 +1538,71 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
             if c.next_step_ns > now {
                 continue;
             }
-            let host = now + c.offset_ns;
+            let host = c.host(now);
             let mut received = std::mem::take(&mut c.inbox);
             while let Some(r) = c.link.poll_recv(now) {
-                received.push((r.channel, r.bytes, r.arrival_ns + c.offset_ns));
+                received.push((r.channel, r.bytes, c.host(r.arrival_ns)));
             }
             if let Some(w) = c.bytes_log.as_mut() {
                 write_step(w, host, &received).map_err(fail)?;
             }
             c.endpoint.input(None, &received, host);
+            if s.suite == "clock" && !c.read {
+                let clock = c.endpoint.clock();
+                if c.first_sample_ns.is_none() && !clock.samples().is_empty() {
+                    c.first_sample_ns = Some(host);
+                }
+                if let (Some(f), Some(est)) = (c.first_sample_ns, clock.offset_ns())
+                    && host >= f + 2 * SEC
+                {
+                    // -47 (2.1's read instant): |estimate - true| at this connect's first step at or after 2 s from its
+                    // first sample; the true offset is the host clock's seeded one.
+                    let mut e = EventRecord::new("connect_clock", phase(k))
+                        .with("slot", c.slot)
+                        .with("seq", c.seq)
+                        .with("offset_err_ns", est.abs_diff(c.offset_ns as i64));
+                    e.ns = Some(now);
+                    logs.lab_event(&e).map_err(fail)?;
+                    c.read = true;
+                    if connects < s.connects {
+                        // The slot's next connect: a fresh link (the old one dropped, so the room frees the slot),
+                        // endpoint and host offset.
+                        c.link = net.connect(s.profile.clone(), MAX_DATAGRAM, 0);
+                        c.endpoint = endpoint_of(s, c.slot);
+                        c.offset_ns = below(mix(&mut rng), 1_000 * SEC);
+                        c.inbox.clear();
+                        (c.seq, c.first_sample_ns, c.read) = (connects, None, false);
+                        connects += 1;
+                        c.next_step_ns = now + 1;
+                        continue;
+                    }
+                }
+            }
             if let Some(newest) = c.endpoint.newest_tick() {
                 mirror.view(c.slot, newest, &mut view);
             } else {
                 view.clear();
             }
-            if c.behaviour.step(&mut c.endpoint, &[], host, &view) {
+            // 5.3's p20: the fast client gives no command for the idle's span from the measured start.
+            let idle = c
+                .fast_from
+                .is_some_and(|m| (m..m + s.fast_idle_ns).contains(&now));
+            if !idle && c.behaviour.step(&mut c.endpoint, &[], host, &view) && !s.controller {
                 let stamp = c.endpoint.newest_tick().map(|t| t.wrapping_add(s.lead));
                 if stamp.is_some() && stamp == c.last_stamp {
                     c.duplicates += 1;
                 }
                 c.last_stamp = stamp;
             }
-            let out = c.endpoint.step();
+            let mut out = c.endpoint.step();
+            c.behaviour.outgoing(host, &mut out.datagrams);
+            for held in c.behaviour.take_bursts() {
+                let mut e = EventRecord::new("lag_burst", phase(k))
+                    .with("slot", c.slot)
+                    .with("held_ns", held);
+                e.ns = Some(now);
+                logs.lab_event(&e).map_err(fail)?;
+            }
             for d in &out.datagrams {
                 if matches!(
                     npt_proto::decode(Direction::ClientToRoom, Channel::Datagram, d),
@@ -1162,7 +1615,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
             for (ch, b) in &out.reliable {
                 c.link.send_reliable(*ch, b, now);
             }
-            logs.filed(c.slot, &out.hashes, &out.lost);
+            if s.suite != "clock" {
+                logs.filed(c.slot, &out.hashes, &out.lost);
+            }
             for w in &out.wraps {
                 let t = c.endpoint.newest_tick().unwrap_or(s.tick_start);
                 logs.wrapped(w, t, phase(k)).map_err(fail)?;
@@ -1192,13 +1647,13 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                     logs.lab_event(&e).map_err(fail)?;
                 }
             }
-            c.next_step_ns = out.next_due_ns.saturating_sub(c.offset_ns).max(now + 1);
+            c.next_step_ns = c.sim(out.next_due_ns).max(now + 1);
         }
         // Every client link's arrivals into its inbox (the socket's buffer), stamped on its host clock.
         for c in &mut clients {
             while let Some(r) = c.link.poll_recv(now) {
-                c.inbox
-                    .push((r.channel, r.bytes, r.arrival_ns + c.offset_ns));
+                let at = c.host(r.arrival_ns);
+                c.inbox.push((r.channel, r.bytes, at));
             }
         }
         logs.flush().map_err(fail)?;
@@ -1256,21 +1711,50 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
         summary.buffer_full += k.buffer_full;
         summary.rewinds_refused += k.rewinds_refused;
         summary.stale += c.endpoint.stale();
-        let mut e = EventRecord::new("client_counts", Phase::After)
+        let e = EventRecord::new("client_counts", Phase::After)
             .with("slot", c.slot)
             .with("commands_count", c.behaviour.given())
             .with("steps_without_command_count", c.behaviour.skipped())
             .with("duplicate_stamps_count", c.duplicates)
-            .with("late_count", k.late)
-            .with("press_refused_count", k.press_refused)
-            .with("buffer_full_count", k.buffer_full)
-            .with("rewinds_refused_count", k.rewinds_refused)
             .with("stale_count", c.endpoint.stale())
-            .with("events_queued_count", k.events_queued)
-            .with("overflow_resyncs_count", k.overflow_resyncs);
+            // U4f: the endpoint's controller counts, at the stop.
+            .with("stamps_skipped_count", c.endpoint.stamps_skipped())
+            .with(
+                "unencodable_commands_count",
+                c.endpoint.unencodable_commands(),
+            )
+            .with("lead_now_count", c.endpoint.lead_now().unwrap_or(-1))
+            .with("unknown_pongs_count", c.endpoint.unknown_pongs());
+        // 2.5 (SA-5): the room's refusal fields, and the live session's pump counters, at the stop.
+        let d = server.session(c.slot).map(|x| x.decoder.counters().clone());
+        let mut e = counts(e, Some(&k), d.as_ref());
         e.t = Some(logs.wide(server.room.last_tick()));
         last.push(e);
     }
+    // -21's clamp kind (2.7; the sim's one weapon kind, hitscan): the cheat's points beyond reach run, of them those
+    // with any sim refusal record (0 expected: it holds fire, no press edge), and option B's rerun reports (SA-10).
+    if s.suite == "clamp" && s.meta.role != "twin" {
+        last.push(
+            EventRecord::new("clamp_kind", Phase::After)
+                .with("sent_count", clamp.sent.len())
+                .with(
+                    "counted_count",
+                    clamp.sent.intersection(&clamp.refused).count(),
+                )
+                .with("rerun_reports_count", clamp.reruns),
+        );
+    }
+    // D3-1 (f40): the run's measured reorder share from npt-l1's fate log, as the -3 probe computes it (main.rs's
+    // `permille`): each direction's reordered x 1000 / delivered, floored; `permille` the lower of the two.
+    let [up, down] = net.with_fate_log(|l| l.reorder_counts());
+    let permille =
+        |(delivered, reordered): (u64, u64)| (reordered * 1000).checked_div(delivered).unwrap_or(0);
+    last.push(
+        EventRecord::new("reorder", Phase::After)
+            .with("permille", permille(up).min(permille(down)))
+            .with("up_permille", permille(up))
+            .with("down_permille", permille(down)),
+    );
     summary.audit = mirror.audit.clone();
     last.push(
         EventRecord::new("fate_log", Phase::After).with("sha256", summary.fate_log_sha256.clone()),
@@ -1332,6 +1816,55 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
     Ok(summary)
 }
 
+/// The clamp twin's points (2.12): each clamp report of `slot`'s in the clamp run's room log in `dir`, by its
+/// sequence, in grid cm (the report's µm / 10,000; a rerun's first).
+fn twin_points(dir: &std::path::Path, slot: u8) -> Result<BTreeMap<u16, [i32; 3]>, String> {
+    let path = dir.join("room.jsonl");
+    let file = std::fs::File::open(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let log = npt_log::read_log(std::io::BufReader::new(file))
+        .map_err(|e| format!("{}: {e}", path.display()))?;
+    let mut out = BTreeMap::new();
+    for e in log.events.iter().filter(|e| e.ev == "clamp_report") {
+        let get = |k: &str| e.f.get(k).and_then(Value::as_i64);
+        if let (Some(s), Some(seq), Some(x), Some(y), Some(z)) = (
+            get("slot"),
+            get("seq"),
+            get("x_um"),
+            get("y_um"),
+            get("z_um"),
+        ) && s == i64::from(slot)
+        {
+            let cm = |um: i64| (um / 10_000) as i32;
+            out.entry(seq as u16).or_insert([cm(x), cm(y), cm(z)]);
+        }
+    }
+    Ok(out)
+}
+
+/// The clamp suite's tally of its cheat's commands (slot 0; 2.4's last row, line 12 of the advisor's ruling): the
+/// sequences run with a point beyond reach, those with any sim refusal record (whatever its kind), those the sim
+/// reported clamped, and the reports of a sequence already reported (option B's reruns: SA-10).
+#[derive(Default)]
+struct ClampTally {
+    sent: std::collections::BTreeSet<u16>,
+    refused: std::collections::BTreeSet<u16>,
+    reported: std::collections::BTreeSet<u16>,
+    reruns: u64,
+}
+
+/// The lab log's `session_end` records (2.5; SA-5): each ended session's counts, at the room's tick `t`.
+fn session_ends(logs: &mut Logs, ends: Vec<SessionEnd>, t: u32, ph: Phase) -> Result<(), String> {
+    for x in ends {
+        let e = EventRecord::new("session_end", ph)
+            .with("slot", x.slot)
+            .with("ended", x.ended);
+        let mut e = counts(e, x.room.as_ref(), Some(&x.pump));
+        e.t = Some(logs.wide(t));
+        logs.lab_event(&e)?;
+    }
+    Ok(())
+}
+
 /// Which burst of the profile starts at `start` (its index, 0 to 9).
 fn bursts_index(p: &Profile, start: u64) -> usize {
     p.bursts_ns.iter().position(|b| b.0 == start).unwrap_or(0)
@@ -1367,8 +1900,21 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
     let mut p: BTreeMap<String, Value> = BTreeMap::new();
     let w = s.scene.weapon();
     p.insert("suite".into(), suite.into());
-    p.insert("cmd_timing".into(), "B".into());
-    p.insert("lead_ticks_count".into(), s.lead.into());
+    let timing = match s.cmd_timing {
+        CmdTiming::A => "A",
+        CmdTiming::B => "B",
+    };
+    p.insert("cmd_timing".into(), timing.into());
+    // The one lead every client stamps with, only where `with_lead` fixes it (U4F-Q7 (i); TE-20); under U4f's
+    // controller each client's lead is its own (`event.client_counts.lead_now_count`), and the cap it works under.
+    if s.controller {
+        p.insert(
+            "controller_max_lead_count".into(),
+            CONTROLLER_MAX_LEAD.into(),
+        );
+    } else {
+        p.insert("lead_ticks_count".into(), s.lead.into());
+    }
     p.insert("tick_start".into(), s.tick_start.into());
     p.insert(
         "ticks_below_wrap".into(),
@@ -1388,7 +1934,26 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
     p.insert("soldier_health_count".into(), s.scene.health().into());
     p.insert("warmup_ticks_count".into(), s.warmup_ticks.into());
     p.insert("measured_ticks_count".into(), s.measured_ticks.into());
-    p.insert("behaviour".into(), s.behaviour.clone().into());
+    // The clock suite's clients run npt-bots' never-firing script, which `behaviour`'s row does not list (F4's rule):
+    // the suite and its connect count name it.
+    if s.suite == "lag-switch" {
+        p.insert("lag_hold_ns".into(), (s.lag_hold_ms * 1_000_000).into());
+        p.insert("lag_every_ns".into(), (s.lag_every_ms * 1_000_000).into());
+    }
+    if s.suite == "fast-clock" {
+        p.insert("fast_clock_episode_ns".into(), s.fast_episode_ns.into());
+        if s.fast_idle_ns > 0 {
+            p.insert("fast_clock_idle_ns".into(), s.fast_idle_ns.into());
+        }
+    }
+    if s.suite == "clock" {
+        p.insert("connects_count".into(), s.connects.into());
+    } else {
+        p.insert("behaviour".into(), s.behaviour.clone().into());
+    }
+    if s.brawl_press_every > 0 {
+        p.insert("brawl_press_every_count".into(), s.brawl_press_every.into());
+    }
     p.insert(
         "features".into(),
         Value::Array(if cfg!(feature = "bites") {
@@ -1422,7 +1987,10 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
 [--twin <run>] [--suite <name>] [--clients <n>] [--tick-start <n>] [--event-start <n>] [--cmd-start <n>] \
 [--warmup-s <s>] [--measured-s <s>] [--after-max-s <s>] [--behaviour brawl|presses|clamp|steady] [--bursts <n>] \
 [--burst-first-s <s>] [--burst-every-s <s>] [--bite <id> [--arm-tick <n>]] [--record <file>] [--bytes <folder>] \
-[--every-step 1] [--lead <1..8>] [--logs 0 (with --record)]";
+[--every-step 1] [--lead <1..8>] [--logs 0 (with --record)] [--cmd-timing A|B] [--controller 0|1] \
+[--brawl-press-every <n> (the brawl)] [--event-cap <n>] [--connects <n> (with --suite clock)] \
+[--twin-logs <folder> (the clamp twin)] [--fast-clock-episode-s <s>] [--fast-clock-idle-s <s>] (with --suite fast-clock) \
+[--lag-hold-ms <ms>] [--lag-every-ms <ms>] (with --suite lag-switch)";
 
 /// B1's burst starts (u4r-brief.md 7.1, -18's row): `count` bursts, the first `first_s` after the measured phase's
 /// first tick and one every `every_s`, each starting a seeded offset in [0, 1 tick) after its tick boundary.
@@ -1529,6 +2097,10 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
             "--behaviour {behaviour:?}: brawl, presses, clamp or steady"
         ));
     }
+    let brawl_press_every = num(take("brawl-press-every"), "brawl-press-every", 0)?;
+    if brawl_press_every > 0 && behaviour != "brawl" {
+        return Err("--brawl-press-every is the brawl's (--behaviour brawl)".to_owned());
+    }
     let bursts = num(take("bursts"), "bursts", 10)?;
     let burst_first_s = num(take("burst-first-s"), "burst-first-s", 30)?;
     let burst_every_s = num(take("burst-every-s"), "burst-every-s", 60)?;
@@ -1549,6 +2121,48 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
         Some("0") => false,
         Some(v) => return Err(format!("--logs {v:?}: 0 or 1")),
     };
+    let cmd_timing = match take("cmd-timing").as_deref() {
+        None | Some("B") => CmdTiming::B,
+        Some("A") => CmdTiming::A,
+        Some(v) => return Err(format!("--cmd-timing {v:?}: A or B")),
+    };
+    let controller = match take("controller").as_deref() {
+        None | Some("0") => false,
+        Some("1") => true,
+        Some(v) => return Err(format!("--controller {v:?}: 0 or 1")),
+    };
+    let twin_logs = take("twin-logs").map(PathBuf::from);
+    if twin_logs.is_some() && (twin.is_none() || role.as_str() != "twin" || suite != "clamp") {
+        return Err(
+            "--twin-logs is the clamp twin's: with --suite clamp, --twin and --role twin"
+                .to_owned(),
+        );
+    }
+    let lag_hold_ms = num(take("lag-hold-ms"), "lag-hold-ms", 200)?;
+    let lag_every_ms = num(take("lag-every-ms"), "lag-every-ms", 6_000)?;
+    if lag_hold_ms >= lag_every_ms || lag_hold_ms.max(lag_every_ms) > 3_600_000 {
+        return Err("--lag-hold-ms below --lag-every-ms, each at most an hour".to_owned());
+    }
+    let fast_episode_s = num(take("fast-clock-episode-s"), "fast-clock-episode-s", 60)?;
+    let fast_idle_s = num(take("fast-clock-idle-s"), "fast-clock-idle-s", 0)?;
+    if fast_episode_s == 0 || fast_episode_s.max(fast_idle_s) > 3_600 {
+        return Err(
+            "--fast-clock-episode-s from 1 and --fast-clock-idle-s, each at most an hour"
+                .to_owned(),
+        );
+    }
+    let connects = num(take("connects"), "connects", 0)?;
+    if (suite == "clock") != (connects > 0) {
+        return Err("--suite clock and --connects <n> (from 1) go together".to_owned());
+    }
+    let event_cap = take("event-cap")
+        .map(|v| {
+            v.parse::<u32>()
+                .ok()
+                .filter(|c| *c >= 1)
+                .ok_or(format!("--event-cap {v:?}: a whole number from 1"))
+        })
+        .transpose()?;
     let lead_override = take("lead")
         .map(|v| {
             v.parse::<u32>()
@@ -1669,10 +2283,22 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
         after_max_ticks,
         burst_spacing_ns,
         behaviour,
+        brawl_press_every,
         every_step,
         bites,
         arm_tick,
         lead,
+        cmd_timing,
+        // The clock suite's estimate is ClockSync's, which runs only under the controller.
+        controller: controller || suite == "clock",
+        event_cap,
+        suite: suite.clone(),
+        connects,
+        twin_logs,
+        lag_hold_ms,
+        lag_every_ms,
+        fast_episode_ns: fast_episode_s * SEC,
+        fast_idle_ns: fast_idle_s * SEC,
         record,
         bytes,
         logs,
@@ -1722,7 +2348,12 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
         } else {
             ""
         },
-        s.lead,
+        // A controller run has no one lead: the controller's cap (F10).
+        if s.controller {
+            format!("the controller's, at most {CONTROLLER_MAX_LEAD}")
+        } else {
+            s.lead.to_string()
+        },
         o.commands,
         o.skipped,
         o.duplicates,
@@ -2986,5 +3617,660 @@ pub(crate) mod tests {
             o.link_lost, clean.link_lost,
             "L from the counts, never the written record"
         );
+    }
+
+    /// U4f's short controller run (u4f-brief.md 2.10's scale: 16 clients, P2_SHORT's lengths) on P3 under option
+    /// `timing`, the brawl with a press every second command: made once per test process and option, its three logs
+    /// (room, client, lab) read by every test that shares it (the advisor's F11); its folder removed once read.
+    fn u4f_short(timing: &'static str) -> &'static [npt_log::Log] {
+        static RUNS: [std::sync::OnceLock<Vec<npt_log::Log>>; 2] =
+            [std::sync::OnceLock::new(), std::sync::OnceLock::new()];
+        RUNS[usize::from(timing == "B")].get_or_init(|| {
+            let name = format!("u4f-short-{timing}");
+            let dir = scratch(&name);
+            let s = settings(
+                &dir,
+                &format!(
+                    "--seed 1 --profile P3 --clients 16 --warmup-s 6 --measured-s 4 --after-max-s 10 \
+                     --controller 1 --cmd-timing {timing} --brawl-press-every 2"
+                ),
+            );
+            let o = run(&s).unwrap_or_else(|e| panic!("{name}: {e:?}"));
+            println!("{name}: {}", summary_line(&s, &o));
+            crate::contract::read(&dir).expect("its logs")
+        })
+    }
+
+    /// f6 (TE-14), one option: the lab builds the endpoints with the one controller setting (the header records the
+    /// option, the controller's cap and LEAD-BOUND's 400 ms, and no `lead_ticks_count`: TE-20), and npt-client reads
+    /// no `cmd_timing` (README :191-192 makes it the room's and the scenario's).
+    fn f6(timing: &'static str) {
+        let p = &u4f_short(timing)[0].header.params;
+        assert_eq!(p.get("cmd_timing").and_then(|v| v.as_str()), Some(timing));
+        assert_eq!(
+            p.get("controller_max_lead_count").and_then(|v| v.as_u64()),
+            Some(u64::from(CONTROLLER_MAX_LEAD))
+        );
+        assert!(!p.contains_key("lead_ticks_count"), "TE-20");
+        assert_eq!(p.get("lead_bound_ms").and_then(|v| v.as_u64()), Some(400));
+        for src in [
+            include_str!("../../client/src/lib.rs"),
+            include_str!("../../client/src/clock.rs"),
+        ] {
+            assert!(!src.contains("cmd_timing"));
+        }
+    }
+
+    #[test]
+    fn f6_option_a_takes_the_one_controller_setting_and_the_client_reads_no_cmd_timing() {
+        f6("A");
+    }
+
+    #[test]
+    fn f6_option_b_takes_the_one_controller_setting_and_the_client_reads_no_cmd_timing() {
+        f6("B");
+    }
+
+    /// f28's -20 half (and f34's lab half), one option: the contract checker on the run's logs against SERIES.md finds
+    /// no failure (every written name has its row: F3), `lead_ticks_count` is absent (TE-20), every client's pump
+    /// counters (`input_limited` among them) are written, -20's series are written by stamp (`tick.s.cmd_on_time` and
+    /// `tick.s.input_missing`, one entry each per eligible client, complements) with the press series, presses seen;
+    /// P3's on-time share on this short run is reported and above 99 % (f36 holds the 99.9 %).
+    fn f28_20(timing: &'static str) {
+        let logs = u4f_short(timing);
+        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
+        assert_eq!(c.failures, Vec::<String>::new(), "{timing}: {:?}", c.lines);
+        assert!(!logs[0].header.params.contains_key("lead_ticks_count"));
+        let counts = logs[2].events.iter().filter(|e| e.ev == "client_counts");
+        assert_eq!(
+            counts
+                .filter(|e| e.f.contains_key("pump_input_limited_count"))
+                .count(),
+            16
+        );
+        let (mut on, mut miss, mut presses, mut lost) = (0u64, 0u64, 0i64, 0i64);
+        for t in logs[0].ticks.iter().filter(|r| r.ph == Phase::Measured) {
+            let a = t.s.get("cmd_on_time").expect("gap: cmd_on_time");
+            let b = t.s.get("input_missing").expect("gap: input_missing");
+            assert_eq!(a.len(), b.len(), "tick {}", t.t);
+            assert!(a.iter().zip(b).all(|(x, y)| x + y == 1));
+            on += a.iter().filter(|x| **x == 1).count() as u64;
+            miss += b.iter().filter(|x| **x == 1).count() as u64;
+            presses += t.v.get("press_count").copied().unwrap_or(0);
+            lost += t.v.get("press_lost_count").copied().unwrap_or(0);
+        }
+        let share = on as f64 / (on + miss).max(1) as f64;
+        println!(
+            "u4f f28 {timing}: on time {on} of {}, {share:.5}; presses {presses}, lost {lost}",
+            on + miss
+        );
+        assert!(on + miss > 16 * 100 && share > 0.99, "{timing}: {share}");
+        assert!(presses > 0);
+        // U4F-Q3 (c): the depth per client each second, 0 under A; the ticks each command ran before its stamp, A only.
+        let depth: Vec<i64> = logs[0]
+            .seconds
+            .iter()
+            .flat_map(|s| {
+                s.s.get("buffer_depth_count")
+                    .expect("gap: buffer_depth_count")
+            })
+            .copied()
+            .collect();
+        let early: Vec<i64> = logs[0]
+            .ticks
+            .iter()
+            .flat_map(|t| t.s.get("cmd_ran_early_count").expect("gap: cmd_ran_early"))
+            .copied()
+            .collect();
+        assert!(!depth.is_empty());
+        assert_eq!(depth.iter().all(|d| *d == 0), timing == "A");
+        assert_eq!(early.is_empty(), timing == "B");
+    }
+
+    #[test]
+    fn f28_option_a_a_controller_run_writes_20s_series_each_with_its_row() {
+        f28_20("A");
+    }
+
+    #[test]
+    fn f28_option_b_a_controller_run_writes_20s_series_each_with_its_row() {
+        f28_20("B");
+    }
+
+    /// The clock suite's short run at f29's scale (2.10: 16 slots, 32 connects, two rounds) on P2, made once per test
+    /// process and read by f29 and f28's -47 half.
+    fn clock_short() -> &'static [npt_log::Log] {
+        static RUN: std::sync::OnceLock<Vec<npt_log::Log>> = std::sync::OnceLock::new();
+        RUN.get_or_init(|| {
+            let dir = scratch("u4f-clock-short");
+            let s = settings(
+                &dir,
+                "--seed 1 --profile P2 --clients 16 --warmup-s 1 --measured-s 8 --after-max-s 10 --suite clock \
+                 --connects 32",
+            );
+            let o = run(&s).unwrap_or_else(|e| panic!("clock: {e:?}"));
+            println!("u4f clock short: {}", summary_line(&s, &o));
+            crate::contract::read(&dir).expect("its logs")
+        })
+    }
+
+    /// f29 (-47; U4F-Q4 (b), NA-16): the clock suite at 16 slots and 32 connects writes one `connect_clock` event per
+    /// connect (each connect number once, its error read at 2 s), every connect admitted (32 `admit` events, the run
+    /// ends clean, so no admission met carry 75's bound), no event stamped (no shot, hit or kill in any second) and no
+    /// client hash filed.
+    #[test]
+    fn f29_the_clock_suite_reads_each_connect_once_and_stamps_no_event() {
+        let logs = clock_short();
+        let read: Vec<&npt_log::EventRecord> = logs[2]
+            .events
+            .iter()
+            .filter(|e| e.ev == "connect_clock")
+            .collect();
+        let seqs: std::collections::BTreeSet<u64> = read
+            .iter()
+            .filter_map(|e| e.f.get("seq").and_then(|v| v.as_u64()))
+            .collect();
+        let mut errs: Vec<u64> = read
+            .iter()
+            .filter_map(|e| e.f.get("offset_err_ns").and_then(|v| v.as_u64()))
+            .collect();
+        errs.sort_unstable();
+        println!("u4f f29: {} reads, errors (ns) {errs:?}", read.len());
+        assert_eq!((read.len(), seqs, errs.len()), (32, (0..32).collect(), 32));
+        let admits = logs[0].events.iter().filter(|e| e.ev == "admit").count();
+        assert_eq!(admits, 32);
+        assert!(logs[0].seconds.iter().all(|s| {
+            s.v.get("shots_count") == Some(&0) && s.v.get("reliable_events_count") == Some(&0)
+        }));
+        assert!(logs[1].ticks.is_empty(), "no client hash filed");
+    }
+
+    /// f28's -47 half: every name the clock suite's run writes has its SERIES.md row (the contract checker's (b); its
+    /// one-admit rule does not hold for a suite that reconnects), the header holds `connects_count` and no `behaviour`.
+    #[test]
+    fn f28_the_clock_suite_writes_each_name_with_its_row() {
+        let logs = clock_short();
+        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
+        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
+        assert!(names.is_empty(), "{names:?}");
+        let p = &logs[0].header.params;
+        assert_eq!(p.get("connects_count").and_then(|v| v.as_u64()), Some(32));
+        assert!(!p.contains_key("behaviour"));
+    }
+
+    /// The never-ack suite's short run (2.10's scale: 16 clients, P0, 2 s + 8 s, U4f's controller as -22's set:
+    /// NC-U4F-2), its event cap 256 so the never-acker (slot 0) meets it within seconds; made once per test process and
+    /// read by f21, f14 (iii) and f28's -22 half.
+    fn never_ack_short() -> &'static [npt_log::Log] {
+        static RUN: std::sync::OnceLock<Vec<npt_log::Log>> = std::sync::OnceLock::new();
+        RUN.get_or_init(|| {
+            let dir = scratch("u4f-never-ack-short");
+            let s = settings(
+                &dir,
+                "--seed 1 --profile P0 --controller 1 --clients 16 --warmup-s 2 --measured-s 8 --after-max-s 10 \
+                 --suite never-ack --event-cap 256",
+            );
+            let o = run(&s).unwrap_or_else(|e| panic!("never-ack: {e:?}"));
+            println!("u4f never-ack short: {}", summary_line(&s, &o));
+            crate::contract::read(&dir).expect("its logs")
+        })
+    }
+
+    /// f21 (-22; TE-17): the never-acker's headroom, on every room tick record, reaches 0 and never goes below; the room
+    /// resolves it twice, one forced resync (`ack_starved` dropped 0) and then `Kick(overflow)` (dropped 1) within
+    /// `FULL_STATE_ACK_TICKS` of it (its later datagrams reaching no room call is r9's, kept).
+    #[test]
+    fn f21_the_never_acker_reaches_the_cap_resyncs_once_then_is_kicked() {
+        let room = &never_ack_short()[0];
+        let h: Vec<i64> = room
+            .ticks
+            .iter()
+            .map(|t| {
+                t.v.get("ack_starved_headroom_count")
+                    .copied()
+                    .expect("gap: headroom")
+            })
+            .collect();
+        assert_eq!(h.iter().min(), Some(&0), "{h:?}");
+        let starved: Vec<(u64, Option<u64>)> = room
+            .events
+            .iter()
+            .filter(|e| e.ev == "ack_starved")
+            .map(|e| {
+                (
+                    e.t.unwrap_or(0),
+                    e.f.get("dropped").and_then(|v| v.as_u64()),
+                )
+            })
+            .collect();
+        println!("u4f f21: ack_starved {starved:?}");
+        assert_eq!(starved.len(), 2, "{starved:?}");
+        assert_eq!((starved[0].1, starved[1].1), (Some(0), Some(1)));
+        assert!(starved[1].0 - starved[0].0 <= u64::from(npt_sim::FULL_STATE_ACK_TICKS));
+    }
+
+    /// f14 (SA-5), the room's struct: `counts` writes every refusal field of `ClientCounters` under its own name and with
+    /// its own value (each field set apart, 1 to 20, in `ROOM_COUNTS`' order).
+    #[test]
+    fn f14_every_refusal_field_of_client_counters_is_written() {
+        let k = ClientCounters {
+            late: 1,
+            press_refused: 2,
+            buffer_full: 3,
+            rewinds_refused: 4,
+            events_queued: 5,
+            overflow_resyncs: 6,
+            lead_refused: 7,
+            not_newer: 8,
+            seq_refused: 9,
+            move_refused: 10,
+            aim_refused: 11,
+            ack_refused: 12,
+            ack_refused_commands: 13,
+            acks_old: 14,
+            seq_outside_window: 15,
+            rejoin_overlap: 16,
+            commands_repeat: 17,
+            resyncs_dropped: 18,
+            resyncs_limited: 19,
+            kicked: 20,
+            ..ClientCounters::default()
+        };
+        let e = counts(EventRecord::new("t", Phase::After), Some(&k), None);
+        let got: Vec<u64> = ROOM_COUNTS
+            .iter()
+            .filter_map(|(n, _)| e.f.get(*n).and_then(|v| v.as_u64()))
+            .collect();
+        assert_eq!((got, e.f.len()), ((1..=20).collect(), 20));
+    }
+
+    /// f14 (SA-5), the pump's struct: `counts` writes every refusal field of npt-server's `Counters` (all but the pings
+    /// and pongs sent), each `pump_<field>_count` with its own value (1 to 21, in `PUMP_COUNTS`' order).
+    #[test]
+    fn f14_every_refusal_field_of_the_pumps_counters_is_written() {
+        let d = Counters {
+            too_large: 1,
+            truncated: 2,
+            bad_length: 3,
+            unknown_type: 4,
+            wrong_direction: 5,
+            wrong_channel: 6,
+            trailing_bytes: 7,
+            unknown_field: 8,
+            out_of_range: 9,
+            malformed: 10,
+            before_join: 11,
+            input_limited: 12,
+            ping_limited: 13,
+            pong_unknown: 14,
+            first_not_join: 15,
+            joining_dropped: 16,
+            stream_malformed: 17,
+            join_deadline: 18,
+            wrong_version: 19,
+            wrong_content_hash: 20,
+            join_again: 21,
+            ..Counters::default()
+        };
+        let e = counts(EventRecord::new("t", Phase::After), None, Some(&d));
+        let got: Vec<u64> = PUMP_COUNTS
+            .iter()
+            .filter_map(|(n, _)| e.f.get(*n).and_then(|v| v.as_u64()))
+            .collect();
+        assert_eq!((got, e.f.len()), ((1..=21).collect(), 21));
+    }
+
+    /// f14 (iii) (SA-5) and f28's -22 half: the kicked never-acker's counts are written once, at its kick (a
+    /// `session_end` of slot 0, `kicked`, its room counts with the kick and the forced resync); every name the run
+    /// writes has its SERIES.md row (the contract checker's (b)).
+    #[test]
+    fn f14_a_kicked_sessions_counts_are_written_at_its_kick() {
+        let logs = never_ack_short();
+        let ends: Vec<&npt_log::EventRecord> = logs[2]
+            .events
+            .iter()
+            .filter(|e| e.ev == "session_end")
+            .collect();
+        assert_eq!(ends.len(), 1, "{ends:?}");
+        let f = |k: &str| ends[0].f.get(k).cloned();
+        assert_eq!(f("slot"), Some(0.into()));
+        assert_eq!(f("ended"), Some("kicked".into()));
+        assert_eq!(
+            (f("kicked_count"), f("overflow_resyncs_count")),
+            (Some(1.into()), Some(1.into()))
+        );
+        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
+        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
+        assert!(names.is_empty(), "{names:?}");
+    }
+
+    /// f35 (NA-15): a session that sends `Leave`, one whose link closes and one replaced: each one's counts are kept
+    /// once, at its end, with the room slot's counters as they were before the room freed the slot (its commands
+    /// buffered) and its pump's (its datagrams' `Input`s decoded), never after.
+    #[test]
+    fn f35_each_ended_sessions_counts_are_kept_once_before_its_slot_is_freed() {
+        let mut server = lab_room(4);
+        let mut now = 1_000;
+        let mut live = Vec::new();
+        for (slot, how) in [(0u8, "left"), (1, "closed"), (2, "replaced")] {
+            let (mut c, mut e, _) = joined(&mut server, slot, &mut now);
+            now += 33_000_000;
+            send_input(&mut c, &mut e, now);
+            server.io(now + 1);
+            let before = server.room.client(slot).map(|x| x.counters().clone());
+            assert!(
+                before.as_ref().is_some_and(|k| k.commands_buffered == 1),
+                "{how}"
+            );
+            now += 2;
+            match how {
+                "left" => {
+                    send_leave(&mut c, now);
+                    server.io(now + 1);
+                }
+                "closed" => {
+                    drop(c);
+                    server.io(now + 1);
+                }
+                _ => {
+                    live.push(join_only(&mut server, slot, &mut now));
+                    live.push((c, e, 0));
+                }
+            }
+            let ends: Vec<&SessionEnd> = server
+                .session_ends
+                .iter()
+                .filter(|x| x.slot == slot)
+                .collect();
+            assert_eq!(ends.len(), 1, "{how}");
+            assert_eq!((ends[0].ended, &ends[0].room), (how, &before), "{how}");
+            assert_eq!(ends[0].pump.too_large + ends[0].pump.malformed, 0, "{how}");
+            now += 1;
+        }
+        assert!(server.room.client(0).is_none() && server.room.client(1).is_none());
+        assert!(
+            server.room.client(2).is_some(),
+            "the replacing session holds slot 2"
+        );
+    }
+
+    /// f18 (ii), line 12 of the advisor's ruling and f28's clamp half: a short clamp run (16 clients, P0, 2 s + 4 s,
+    /// option A, slot 0 the cheat and the rest the steady script) counts its cheat's points beyond reach (`sent_count`
+    /// above 0) with no sim refusal on them (`counted_count` 0: it holds fire, no press edge) and no rerun report; every
+    /// name it writes has its row; its twin, sending the run's clamp reports' points (`--twin-logs`), hashes the same
+    /// ticks to the same state hashes.
+    #[test]
+    fn f18_a_clamp_run_and_its_twin_give_equal_hashes_and_count_no_refusal() {
+        let args = "--seed 1 --profile P0 --clients 16 --warmup-s 2 --measured-s 4 --after-max-s 10 \
+                    --controller 1 --cmd-timing A --suite clamp --behaviour steady";
+        let dir = scratch("u4f-clamp");
+        run(&settings(&dir, args)).expect("the clamp run");
+        let twin = scratch("u4f-clamp-twin");
+        let t = format!("{args} --role twin --twin t --twin-logs {}", dir.display());
+        run(&settings(&twin, &t)).expect("its twin");
+        let hashes = |d: &Path| -> Vec<(u64, Option<String>)> {
+            read(d, "room")
+                .ticks
+                .iter()
+                .map(|r| (r.t, r.h.clone()))
+                .collect()
+        };
+        assert_eq!(hashes(&dir), hashes(&twin), "the twin's state hashes");
+        let lab = read(&dir, "lab");
+        let k = lab
+            .events
+            .iter()
+            .find(|e| e.ev == "clamp_kind")
+            .expect("clamp_kind");
+        let f = |n: &str| k.f.get(n).and_then(|v| v.as_u64());
+        let reports = read(&dir, "room")
+            .events
+            .iter()
+            .filter(|e| {
+                e.ev == "clamp_report" && e.f.get("slot").and_then(|v| v.as_u64()) == Some(0)
+            })
+            .count();
+        println!("u4f f18: {:?}; slot 0's clamp reports {reports}", k.f);
+        assert!(f("sent_count") > Some(0) && reports > 0);
+        assert_eq!(
+            (f("counted_count"), f("rerun_reports_count")),
+            (Some(0), Some(0))
+        );
+        let logs = crate::contract::read(&dir).expect("its logs");
+        let c = crate::contract::check(&logs, include_str!("../../../marks/SERIES.md"));
+        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
+        assert!(names.is_empty(), "{names:?}");
+    }
+
+    /// f20 (2.6; U4F-Q15 (c); A1) and f28's lag-switch half: a short lag-switch run at P1 (16 clients, 2 s + 6 s, option
+    /// A, a hold every 2 s) writes its bursts (each hold at least the 200 ms), runs at most `CMD_CATCHUP` commands a
+    /// tick for the lag client, whose movement stays within the catch-up cap's (excess at most 0), and every name it
+    /// writes has its row; a respawn's placement is no movement (`moved_um` on hand-made records: alive to alive 20 cm is
+    /// 200,000 µm, a death or a respawn none, so the tick is counted apart).
+    #[test]
+    fn f20_the_lag_switch_runs_at_most_the_cap_a_tick_and_moves_within_it() {
+        let alive = |x: i32, health: i32| [x, 0, 0, health];
+        assert_eq!(
+            crate::logs::moved_um(alive(0, 100), alive(20, 100)),
+            Some(200_000)
+        );
+        assert_eq!(crate::logs::moved_um(alive(0, 0), alive(5_000, 100)), None);
+        assert_eq!(crate::logs::moved_um(alive(0, 100), alive(10, 0)), None);
+        let dir = scratch("u4f-lag-switch");
+        let s = settings(
+            &dir,
+            "--seed 1 --profile P1 --clients 16 --warmup-s 2 --measured-s 6 --after-max-s 10 --controller 1 \
+             --cmd-timing A --suite lag-switch --behaviour steady --lag-every-ms 2000",
+        );
+        run(&s).expect("the run");
+        let held: Vec<u64> = read(&dir, "lab")
+            .events
+            .iter()
+            .filter(|e| e.ev == "lag_burst")
+            .filter_map(|e| e.f.get("held_ns").and_then(|v| v.as_u64()))
+            .collect();
+        let room = read(&dir, "room");
+        let most = |k: &str| room.ticks.iter().filter_map(|t| t.v.get(k).copied()).max();
+        println!(
+            "u4f f20: bursts held {held:?}; commands a tick at most {:?}; excess at most {:?}",
+            most("lagswitch_cmds_count"),
+            most("lagswitch_excess_move_um")
+        );
+        assert!(held.len() >= 3 && held.iter().all(|h| *h >= 200_000_000));
+        let cap = npt_room::InputBuffer::CMD_CATCHUP as i64;
+        assert!(most("lagswitch_cmds_count").is_some_and(|m| (1..=cap).contains(&m)));
+        assert!(most("lagswitch_excess_move_um").is_some_and(|m| m <= 0));
+        let logs = crate::contract::read(&dir).expect("its logs");
+        let c = crate::contract::check(&logs, include_str!("../../../marks/SERIES.md"));
+        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
+        assert!(names.is_empty(), "{names:?}");
+    }
+
+    /// f37 (TE3-6, TE31-10): the lab's own episode function at the judged settings (a 10 s warm-up, 610 s measured)
+    /// gives 10 back-to-back episodes of 60 s, the first from the measured start, all inside the measured window; at
+    /// 5.3's (10 s, 70 s), 1.
+    #[test]
+    fn f37_the_fast_clocks_judged_schedule_is_ten_episodes_of_60_s() {
+        let tick = |ms: u32| u64::from(npt_sim::ticks_for_ms(ms));
+        let (w, e) = (tick(10_000), tick(60_000));
+        let want: Vec<(u64, u64)> = (0..10).map(|i| (w + i * e, w + (i + 1) * e)).collect();
+        assert_eq!(episodes(w, tick(610_000), 60 * SEC), want);
+        assert!(want[9].1 <= w + tick(610_000));
+        assert_eq!(episodes(w, tick(70_000), 60 * SEC), vec![(w, w + e)]);
+    }
+
+    /// The fast-clock suite's short run (2.10's scale: 16 clients, P0, 2 s + 4 s, 2 s episodes), option `timing`,
+    /// slot 0 the 1.5x clock and the rest the steady script under the controller: made once per test process and
+    /// option, read by f19 and f28's fast-clock half.
+    fn fast_short(timing: &'static str) -> &'static [npt_log::Log] {
+        static RUNS: [std::sync::OnceLock<Vec<npt_log::Log>>; 2] =
+            [std::sync::OnceLock::new(), std::sync::OnceLock::new()];
+        RUNS[usize::from(timing == "B")].get_or_init(|| {
+            let name = format!("u4f-fast-{timing}");
+            let dir = scratch(&name);
+            let s = settings(
+                &dir,
+                &format!(
+                    "--seed 1 --profile P0 --clients 16 --warmup-s 2 --measured-s 4 --after-max-s 10 \
+                     --controller 1 --cmd-timing {timing} --suite fast-clock --behaviour steady \
+                     --fast-clock-episode-s 2"
+                ),
+            );
+            let o = run(&s).unwrap_or_else(|e| panic!("{name}: {e:?}"));
+            println!("{name}: {}", summary_line(&s, &o));
+            crate::contract::read(&dir).expect("its logs")
+        })
+    }
+
+    /// One fast-clock record's field, signed.
+    fn field(e: &npt_log::EventRecord, k: &str) -> i64 {
+        e.f.get(k).and_then(|v| v.as_i64()).expect("a field")
+    }
+
+    /// f19 (SA-6; A1): the tally on hand-made records (a walk, a death, a respawn: the two ticks with health 0 at
+    /// their start or end move nothing and are counted apart, the respawn's placement no movement), then the short
+    /// fast-clock run under A: each of its two 2 s episodes has lead-bound and not-newer refusals above 0, its excess
+    /// commands at most 0, its excess movement at most 0 and no copy left out (EA-U4F-1).
+    #[test]
+    fn f19_the_fast_clock_runs_within_the_bound_and_is_refused_by_kinds_1_and_2_each_episode() {
+        let mut f = FastClock {
+            episodes: vec![(1, 4)],
+            bound: 12,
+            ..FastClock::default()
+        };
+        let at = |x: i32, health: i32| Some([x, 0, 0, health]);
+        assert!(f.tick(0, at(0, 100), 1, [0, 0, 0]).is_none());
+        assert!(f.tick(1, at(20, 100), 1, [1, 0, 0]).is_none());
+        assert!(f.tick(2, at(20, 0), 1, [1, 2, 0]).is_none());
+        let e = f
+            .tick(3, at(5_000, 100), 1, [3, 2, 1])
+            .expect("the episode's end");
+        let got = [
+            "excess_cmds_count",
+            "excess_move_um",
+            "lead_refused_count",
+            "not_newer_count",
+            "left_out_count",
+            "move_apart_count",
+        ]
+        .map(|k| field(&e, k));
+        assert_eq!(got, [3 - 15, 200_000 - 13 * 200_000, 3, 2, 1, 2]);
+        let ep: Vec<&npt_log::EventRecord> = fast_short("A")[2]
+            .events
+            .iter()
+            .filter(|e| e.ev == "fast_clock")
+            .collect();
+        println!("u4f f19: {:?}", ep.iter().map(|e| &e.f).collect::<Vec<_>>());
+        assert_eq!(ep.len(), 2);
+        for e in ep {
+            assert!(field(e, "lead_refused_count") > 0 && field(e, "not_newer_count") > 0);
+            assert!(field(e, "excess_cmds_count") <= 0 && field(e, "excess_move_um") <= 0);
+            assert_eq!(field(e, "left_out_count"), 0);
+        }
+    }
+
+    /// f28's fast-clock half, one option: every name the short fast-clock run writes has its row (the contract
+    /// checker's (b)), its header holds the 2 s episode, and its lab log one `fast_clock` record per episode.
+    fn f28_fast(timing: &'static str) {
+        let logs = fast_short(timing);
+        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
+        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
+        assert!(names.is_empty(), "{timing}: {names:?}");
+        let p = &logs[0].header.params;
+        assert_eq!(
+            p.get("fast_clock_episode_ns").and_then(|v| v.as_u64()),
+            Some(2 * SEC)
+        );
+        assert_eq!(
+            logs[2]
+                .events
+                .iter()
+                .filter(|e| e.ev == "fast_clock")
+                .count(),
+            2
+        );
+    }
+
+    #[test]
+    fn f28_option_a_the_fast_clock_suite_writes_each_name_with_its_row() {
+        f28_fast("A");
+    }
+
+    #[test]
+    fn f28_option_b_the_fast_clock_suite_writes_each_name_with_its_row() {
+        f28_fast("B");
+    }
+
+    /// F2: npt-sim's two -21 check bites (`World::CHECK_BITES`, a list apart from `World::BITES`) are accepted by
+    /// `--bite` and routed to the world alone (bites builds only); named here by their literal ids (TE-U4F-7), so an id
+    /// dropped from that list fails by name.
+    #[cfg(feature = "bites")]
+    #[test]
+    fn f2_the_sims_check_bites_are_routed_to_the_world_alone() {
+        for id in ["PM-0001-21/no-cooldown", "PM-0001-21/refuse-not-clamp"] {
+            let b = Bites::of(id).unwrap_or_else(|e| panic!("{id}: {e}"));
+            assert!(b.world, "{id}");
+            assert!(
+                !(b.room || b.client || b.decoder || b.l1 || b.schedule || b.pump),
+                "{id}"
+            );
+        }
+    }
+
+    /// f40 (D3-1): a short L1 P3 run's lab log holds one `reorder` event whose `permille` is above 0 and is the lower
+    /// of its two directions' shares (npt-l1's fate log, as the -3 probe computes them).
+    #[test]
+    fn f40_a_p3_run_writes_its_measured_reorder_share_as_an_event() {
+        let lab = &u4f_short("B")[2];
+        let r: Vec<&npt_log::EventRecord> =
+            lab.events.iter().filter(|e| e.ev == "reorder").collect();
+        assert_eq!(r.len(), 1);
+        let f = |k: &str| r[0].f.get(k).and_then(|v| v.as_u64()).expect("a field");
+        println!(
+            "u4f f40: permille {}, up {}, down {}",
+            f("permille"),
+            f("up_permille"),
+            f("down_permille")
+        );
+        assert!(f("permille") > 0);
+        assert_eq!(f("permille"), f("up_permille").min(f("down_permille")));
+    }
+
+    /// EA-U4F-6: the two -21 movement checks' copy of npt-sim's walk (`logs::MOVE_CM_S`) against the sim itself. TC's
+    /// shooter (slot 0, in the open field 60 m west of the centre) walks west at full length, no button held, for 1 s of
+    /// `World` steps: it moves exactly `MOVE_CM_S` (600 cm), so a change to the sim's walk fails here by name.
+    #[test]
+    fn ea_u4f_6_one_second_of_the_sims_full_walk_is_move_cm_s() {
+        use npt_sim::{EntityKind, HitHistory, SimCore, TickInput};
+        let mut world = World::new(&Scene::targets(), 1, 100);
+        let history = HitHistory::for_ms(2_000).expect("a ring");
+        let me = |w: &World| {
+            let r = w
+                .entity_records()
+                .iter()
+                .find(|r| r.kind == EntityKind::Soldier && r.index == 0);
+            r.map(|r| [r.grid[0], r.grid[1], r.grid[2], r.grid[6]])
+                .expect("slot 0's soldier")
+        };
+        let start = me(&world);
+        for k in 0..npt_sim::TICK_HZ {
+            let tick = world.next_tick();
+            let c = npt_sim::Command {
+                tick,
+                seq: k as u16,
+                move_xy: [-127, 0],
+                view_tick: tick.wrapping_sub(1),
+                ..npt_sim::Command::default()
+            };
+            let input = TickInput {
+                tick,
+                commands: vec![(c, None)],
+                ..TickInput::default()
+            };
+            world.step(&input, &history);
+        }
+        let want = crate::logs::MOVE_CM_S as u64 * 10_000;
+        let moved = crate::logs::moved_um(start, me(&world));
+        assert_eq!(moved, Some(want), "{start:?}");
     }
 }

@@ -62,6 +62,10 @@ pub struct Pong {
     pub tick: u32,
     /// The hold time from the ping's arrival to this answer, in µs (the room counts at most one tick period of it).
     pub hold_us: u16,
+    /// The answering end's time at this `Pong`'s send, in ns on its own clock (U4F-Q6 (b)): the room's gives the
+    /// client's ClockSync the server's exact time, never only its tick. A client's `Pong` carries 0, and the room
+    /// never reads it there.
+    pub server_ns: u64,
 }
 
 /// `Join`: a connection's first control-stream message (catalogue §2, with its notes on `bind`). Its `Debug` shows the
@@ -345,6 +349,7 @@ impl Quant {
                     w.put(m.echo_ns, 64);
                     w.put(u64::from(m.tick), 32);
                     w.put(u64::from(m.hold_us), 16);
+                    w.put(m.server_ns, 64);
                 }
                 Message::Join(m) => {
                     w.bytes(&m.token);
@@ -436,6 +441,7 @@ impl Quant {
                 echo_ns: r.u64()?,
                 tick: r.u32()?,
                 hold_us: r.u16()?,
+                server_ns: r.u64()?,
             }),
             7 => Message::Join(Join {
                 token: r.array()?,

@@ -368,6 +368,7 @@ impl Gen {
                 echo_ns: self.u64(),
                 tick: self.u32(),
                 hold_us: self.u16(),
+                server_ns: self.u64(),
             }),
             7 => Message::Join(Join {
                 token: self.bytes(),

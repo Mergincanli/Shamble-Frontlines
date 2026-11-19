@@ -278,6 +278,7 @@ fn e10_the_hold_time_counts_one_tick_period_and_unknown_pongs_are_dropped() {
             echo_ns: p.sent_ns,
             tick: 0,
             hold_us,
+            server_ns: 0,
         }))
     };
     c.send_unreliable(&pong(p.id.wrapping_add(77), 0), at);
@@ -312,6 +313,7 @@ fn one_sample<L: Link>(mut s: L, c: &mut Loopback, rtt: RttSource, wait_ns: u64)
         echo_ns: p.sent_ns,
         tick: 0,
         hold_us: 0,
+        server_ns: SERVER_NS.with(|v| v.get()),
     };
     c.send_unreliable(&bytes(&Message::Pong(pong)), at);
     d.pump(&mut s, at + wait_ns, 7, &mut out);
@@ -321,6 +323,66 @@ fn one_sample<L: Link>(mut s: L, c: &mut Loopback, rtt: RttSource, wait_ns: u64)
         "the Pong is the ping's: one sample"
     );
     (d, s)
+}
+
+thread_local! {
+    /// The `server_ns` the client's `Pong` in `one_sample` carries (0 but in the negative case below).
+    static SERVER_NS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// U4F-Q6 (b), the negative case (SA3-6 (4)): the room never reads the new field in a client's `Pong`: a `Pong`
+/// carrying u64::MAX there gives the same one RTT sample as one carrying 0.
+#[test]
+fn u4f_the_room_ignores_the_server_time_field_in_a_clients_pong() {
+    let mut rtts = Vec::new();
+    for v in [0, u64::MAX] {
+        SERVER_NS.with(|c| c.set(v));
+        let (s, mut c) = Loopback::pair(1_200);
+        let (d, s) = one_sample(NoRtt(s), &mut c, RttSource::Pings, 0);
+        rtts.push(d.rtt_ns(&s));
+    }
+    SERVER_NS.with(|c| c.set(0));
+    assert_eq!(rtts, [Some(100_000_000), Some(100_000_000)]);
+}
+
+/// U4F-Q6 (b), the advisor's A2: the room's `Pong` carries the server's time at its send, the pump's injected `now`
+/// (in the instant the client's `Ping` is answered), beside the next tick to run.
+#[test]
+fn u4f_the_rooms_pong_carries_the_servers_time_at_its_send() {
+    let (s, mut c) = Loopback::pair(1_200);
+    let mut s = NoRtt(s);
+    let mut d = Decoder::new(Quant::default(), 30, 0, VERSION, CONTENT, RttSource::Pings);
+    c.send_reliable(Channel::Control, &bytes(&Message::Join(join(0))), 0);
+    let mut out = Vec::new();
+    d.pump(&mut s, 0, 0, &mut out);
+    d.accept();
+    let sent = 5_000_000;
+    c.send_unreliable(
+        &bytes(&Message::Ping(Ping {
+            id: 9,
+            sent_ns: 123,
+        })),
+        sent,
+    );
+    let now = sent + 7_777;
+    d.pump(&mut s, now, 42, &mut out);
+    let pongs: Vec<Pong> = received(&mut c, now)
+        .into_iter()
+        .filter_map(|m| match m {
+            Message::Pong(p) => Some(p),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(pongs.len(), 1, "one answer");
+    assert_eq!(
+        (
+            pongs[0].id,
+            pongs[0].echo_ns,
+            pongs[0].tick,
+            pongs[0].server_ns
+        ),
+        (9, 123, 42, now)
+    );
 }
 
 /// NC-M3 (advisor-u4e-r1 R2): the RTT sample is taken at the `Pong`'s arrival, not when the pump runs: a `Pong` sent

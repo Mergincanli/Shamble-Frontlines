@@ -17,6 +17,15 @@ fn the_rooms_bites_are_pinned_and_every_pm_id_is_marks_jsons() {
             "PM-0001-62/server-echo",
             "PM-0001-22/unbounded",
             OWNER_TO_ALL,
+            "PM-0001-21/no-lead-bound",
+            "PM-0001-21/no-newer-tick",
+            "PM-0001-21/no-seq-forward",
+            "PM-0001-21/no-move-length",
+            "PM-0001-21/no-press-edge",
+            "PM-0001-21/no-aim-bounds",
+            "PM-0001-21/no-ack-sent",
+            "PM-0001-21/no-catchup-cap",
+            "PM-0001-21/not-older-than",
         ]
     );
     let marks = include_str!("../../../marks/marks.json");

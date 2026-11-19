@@ -458,11 +458,13 @@ impl Decoder {
                 (State::Joined, Message::Ping(p)) => {
                     if self.limits.ping.take(now_ns) {
                         let hold = now_ns.saturating_sub(r.arrival_ns) / 1_000;
+                        // The server's time at this send (U4F-Q6 (b)): the injected `now`, the instant it is sent.
                         let pong = Pong {
                             id: p.id,
                             echo_ns: p.sent_ns,
                             tick,
                             hold_us: u16::try_from(hold).unwrap_or(u16::MAX),
+                            server_ns: now_ns,
                         };
                         self.send_datagram(link, &Message::Pong(pong), now_ns);
                         self.counters.pongs_sent += 1;

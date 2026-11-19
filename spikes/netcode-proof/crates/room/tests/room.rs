@@ -230,13 +230,25 @@ fn e8_a_room_of_world_is_send() {
     send::<Room<World>>();
 }
 
-/// Carry 21: commands received in two orders give one `TickInput` (the canonical order) and one state.
+/// Carry 21: commands received in two orders give one `TickInput` (the canonical order) and one state, under both of
+/// OQ-0001-6's options. Under option A the room takes each tick's commands in arrival order, so this test fails with
+/// the sort removed (carry 80 (a); u4f-brief.md f9's plant).
 #[test]
 fn carry_21_commands_received_in_two_orders_give_one_tick_input() {
+    for timing in [npt_room::CmdTiming::B, npt_room::CmdTiming::A] {
+        carry_21_case(timing);
+    }
+}
+
+fn carry_21_case(timing: npt_room::CmdTiming) {
     let scene = Scene::stress();
     let script = recorded(&scene, 3, 500, 80);
-    let mut a = world_room(&scene, 3, 500, 48);
-    let mut b = world_room(&scene, 3, 500, 48);
+    let rooms = || {
+        room_with(World::new(&scene, 3, 500), &scene, 48, |r| {
+            r.with_cmd_timing(timing)
+        })
+    };
+    let (mut a, mut b) = (rooms(), rooms());
     for _ in 0..60 {
         let next = a.last_tick().wrapping_add(1);
         let inputs: Vec<(u8, Input)> = (0..48u8)
@@ -1123,10 +1135,11 @@ fn never_acker(
 fn carry_57_a_never_acker_overflows_once_then_a_second_overflow_kicks() {
     let scene = Scene::stress();
     let script = recorded(&scene, 4, 400, 400);
+    // U4f's measured cap (2.8 item 5): the room's default, no longer provisional (it was 1,024, provisional).
     assert_eq!(
         world_room(&scene, 4, 400, 1).event_cap(),
-        (1_024, true),
-        "the provisional cap"
+        (1_600, false),
+        "the measured cap"
     );
     let mut room = room_with(World::new(&scene, 4, 400), &scene, 8, |r| {
         r.with_event_cap(48)
@@ -1256,8 +1269,9 @@ fn wrap_case(mut room: Room<World>) -> (npt_room::ClientCounters, Vec<&'static s
         let next = room.last_tick().wrapping_add(1);
         let mut presses = [0; 4];
         presses[Command::PRESS_MELEE] = 250u8.wrapping_add(k as u8);
+        // Stamped one tick ahead: a first stamp at the join's own tick is kind 2 (the join anchor, U4F-Q18; f13 (iv)).
         let cmd = Command {
-            tick: next,
+            tick: next.wrapping_add(1),
             seq: 65_520u16.wrapping_add(k),
             presses,
             view_tick: next.wrapping_sub(1),
@@ -1344,7 +1358,12 @@ mod bites {
             1,
             "PM-0001-58/lt-cmd-seq",
         ));
-        assert!(k.commands_repeat >= 1 && k.commands_buffered < 40, "{k:?}");
+        // A post-wrap sequence the plain `<` reads as not forward has no command kept under it: since U4f's kept window
+        // (U4F-Q9 (a)) it is counted outside the window, not as a repeat; either way it never runs.
+        assert!(
+            k.commands_repeat + k.seq_outside_window >= 1 && k.commands_buffered < 40,
+            "{k:?}"
+        );
     }
 
     #[test]

@@ -20,8 +20,9 @@ pub(crate) struct Queued {
 pub(crate) const MAX_EVENT_AGE: u32 = u8::MAX as u32;
 
 /// One client's queue of unacknowledged gameplay events (u4-build-plan.md §4.7). Its cap is data: the room's setting,
-/// provisional until U4f measures the rate (U4E-Q6 (a): 1,024 from net F121's example). An overflow is the room's
-/// signal to force one resync; under PM-0001-22/unbounded (bites builds only) the queue keeps every event past its cap.
+/// `EventQueue::CAP` by U4f's measurement (it was a provisional 1,024 from net F121's example: U4E-Q6 (a)). An
+/// overflow is the room's signal to force one resync; under PM-0001-22/unbounded (bites builds only) the queue keeps
+/// every event past its cap.
 #[derive(Clone, Debug)]
 pub struct EventQueue {
     cap: u32,
@@ -35,9 +36,12 @@ pub struct EventQueue {
 pub(crate) struct Overflow;
 
 impl EventQueue {
-    /// The provisional cap (U4E-Q6 (a): net F121's example, above the about 400 a B1 burst adds); U4f records §4.7's
-    /// value before -22's runs.
-    pub(crate) const PROVISIONAL_CAP: u32 = 1_024;
+    /// The cap, measured (u4f-brief.md 2.8; U4F-Q12 (b); carry 57): the largest per-client high-water mark of nine short
+    /// runs (SS, 48 clients, the brawl with U4f's controller, P2, P3 and B1 with 2 bursts, seeds 1 to 3, the cap opened
+    /// to 8,192), 1,045 at P3 seed 3, times a margin of 1.5, rounded up to 64: 1,600; below carry 50's bound, the
+    /// lowest client's mean queued rate (509.2 a second) x 255 / 30 = 4,328, so a never-acker meets it before its
+    /// events expire (ops/runs/c-u4f-cap.mjs; a design constant -22 reads, no bar: 5.6 B4).
+    pub(crate) const CAP: u32 = 1_600;
 
     pub(crate) fn new(cap: u32, unbounded: bool) -> EventQueue {
         EventQueue {

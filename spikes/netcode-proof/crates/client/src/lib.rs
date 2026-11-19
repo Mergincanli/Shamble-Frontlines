@@ -14,22 +14,36 @@ use std::collections::VecDeque;
 
 use npt_link::Channel;
 use npt_proto::{
-    DecodeError, Direction, EntityDelta, FullState, Input, Join, Limits, Message, Pong, Quant,
-    Snapshot, Wrap, client_hash,
+    DecodeError, Direction, EntityDelta, FullState, Input, Join, Limits, Message, Ping, Pong,
+    Quant, Snapshot, Wrap, client_hash,
 };
 use npt_sim::grid::{Config, Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW};
 use npt_sim::{Command, EntityKind, EntityRecord, SimEvent};
 
+mod clock;
+
+pub use clock::{ClockSample, ClockSync};
+
 /// The bite ids this crate plants (bites builds only). u4-build-plan.md §4.14 plants each bite where its code lives:
 /// PM-0001-17/client-rounding's site is the client's call into the wire grid, so its id lives here and not in npt-sim's
 /// grid; the endpoint takes the grid for its every call into it from [`grid_with_bite`]. PM-0001-58/lt-tick-offset and
-/// PM-0001-58/lt-event-seq are the endpoint's two rebuilds (carry 24).
+/// PM-0001-58/lt-event-seq are the endpoint's two rebuilds (carry 24). U4f's three (u4f-brief.md 2.11): -47's two in
+/// ClockSync (an estimate that is the newest raw sample; each sample timed at the step that reads it, not at its
+/// arrival) and -20's redundancy cap of 1 in the endpoint's `Input`.
 #[cfg(feature = "bites")]
-pub const BITES: [&str; 3] = [
+pub const BITES: [&str; 6] = [
     "PM-0001-17/client-rounding",
     "PM-0001-58/lt-tick-offset",
     "PM-0001-58/lt-event-seq",
+    "PM-0001-47/newest-sample",
+    "PM-0001-47/tick-quantised",
+    "PM-0001-20/redundancy-1",
 ];
+
+/// The signed distance of tick `a` from tick `b` (positive: `a` after `b`), wrap-aware.
+fn dist(a: u32, b: u32) -> i64 {
+    i64::from(a.wrapping_sub(b) as i32)
+}
 
 /// The grid a client with the planted defect `bite` uses for its every call into it (bites builds only): for
 /// PM-0001-17/client-rounding ("a client quantiser that rounds differently from the server's") the grid's one defect,
@@ -187,7 +201,7 @@ fn signature(bytes: &[u8]) -> u64 {
 /// count), and the counters that wrapped by their `Wrap` names (-58's `event.counter_wrap`).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct StepOut {
-    /// The datagrams to send, in order (the `Input`, then the `Pong`s).
+    /// The datagrams to send, in order (the `Input`, then the `Pong`s, then under the controller its clock's `Ping`).
     pub datagrams: Vec<Vec<u8>>,
     /// The reliable messages, each with its channel (the `Join`).
     pub reliable: Vec<(Channel, Vec<u8>)>,
@@ -240,6 +254,27 @@ pub struct ClientEndpoint {
     duplicates: u64,
     unknown_pongs: u64,
     out: StepOut,
+    /// The command clock (U4f): it pings only under the controller.
+    clock: ClockSync,
+    /// The tick-lead controller (U4F-Q7 (b) with (iii) (c)): `Some(max lead)` when on, else the fixed `lead`.
+    controller: Option<u32>,
+    /// The tick `JoinAccepted` named: no command is stamped at or before it (the join anchor).
+    join_tick: Option<u32>,
+    /// The controller's plan for this step: made at the step's first `input`, its commands due, its target, the last
+    /// stamp given and the lead it set (target less the estimated current tick).
+    planned: bool,
+    due: u32,
+    target: Option<u32>,
+    last_stamp: Option<u32>,
+    lead_now: Option<i64>,
+    stamps_skipped: u64,
+    not_due: u64,
+    unencodable: u64,
+    left_out: u64,
+    /// The `Input`'s redundancy (the redundancy cap; 1 under PM-0001-20/redundancy-1).
+    redundancy: usize,
+    /// PM-0001-47/tick-quantised: each `Pong` timed at the step's time, not at its arrival.
+    tick_quantised: bool,
 }
 
 /// A Soldier record's flags field, the sixth of its layout (npt-sim seam.rs's `SOLDIER`: x, y, z, yaw, pitch, flags,
@@ -290,13 +325,42 @@ impl ClientEndpoint {
             duplicates: 0,
             unknown_pongs: 0,
             out: StepOut::default(),
+            clock: ClockSync::new(tick_hz),
+            controller: None,
+            join_tick: None,
+            planned: false,
+            due: 0,
+            target: None,
+            last_stamp: None,
+            lead_now: None,
+            stamps_skipped: 0,
+            not_due: 0,
+            unencodable: 0,
+            left_out: 0,
+            redundancy: Limits::REDUNDANCY_CAP,
+            tick_quantised: false,
         }
     }
 
-    /// The same endpoint stamping each command `lead` ticks after the newest tick it holds (the option-B buffer's
-    /// lead; U4f's controller replaces it).
+    /// The same endpoint stamping each command `lead` ticks after the newest tick it holds: a fixed lead, kept as a
+    /// lab-only setting for U4r's suites and the -30 pre-check (U4F-Q7 (i)); U4f's controller ([`Self::with_clock`])
+    /// is the honest client's.
     pub fn with_lead(mut self, lead: u32) -> ClientEndpoint {
         self.lead = lead;
+        self.controller = None;
+        self
+    }
+
+    /// The same endpoint with the tick-lead controller (U4F-Q7 (b), (iii) (c); u4f-brief.md 2.2): it pings, keeps
+    /// ClockSync, and stamps each command for the server's tick it estimates the command arrives before, at most
+    /// `max_lead` ticks ahead of the server's current tick (the room's lead bound less a margin, and at most 9, which
+    /// keeps every honest command inside option B's buffer of 8 only while the up delay is at least about 2 ticks
+    /// whenever the cap binds: L1's bounded jitter always gives it, other links are C-U6-17's (NC-U4F-3); the lab
+    /// passes 9 under both options: f6). Its stamps are contiguous: a step's commands due are every stamp from the last
+    /// one + 1 up to its target, at most 2 a step ([`Self::commands_due`]). A goal more than the redundancy cap past the target (a clock reset or a host stall) moves the target at once,
+    /// the stamps between skipped and counted ([`Self::stamps_skipped`]).
+    pub fn with_clock(mut self, max_lead: u32) -> ClientEndpoint {
+        self.controller = Some(max_lead.max(1));
         self
     }
 
@@ -305,6 +369,14 @@ impl ClientEndpoint {
     pub fn with_starts(mut self, start: u32, event_start: u32) -> ClientEndpoint {
         self.next_cmd = start;
         self.event_near = event_start;
+        self
+    }
+
+    /// The same endpoint decoding and encoding with `quant` (outside bites builds the only `Quant` is the wire's
+    /// default; in one, npt-proto's planted `Quant::with_bite`, which a caller whose bites feature turns on npt-proto's
+    /// but not npt-client's can pass: npt-server's tests).
+    pub fn with_quant(mut self, quant: Quant) -> ClientEndpoint {
+        self.quant = quant;
         self
     }
 
@@ -319,6 +391,12 @@ impl ClientEndpoint {
             self.wrap = Wrap::plain_lt(TICK_OFFSET);
         } else if bite == BITES[2] {
             self.wrap = Wrap::plain_lt(EVENT_SEQ);
+        } else if bite == BITES[3] {
+            self.clock = self.clock.with_newest_sample();
+        } else if bite == BITES[4] {
+            self.tick_quantised = true;
+        } else if bite == BITES[5] {
+            self.redundancy = 1;
         } else {
             self.quant = Quant::with_bite(bite)?;
         }
@@ -400,13 +478,53 @@ impl ClientEndpoint {
         self.duplicates
     }
 
-    /// `Pong`s whose ping id is not one of the client's own (it sends none at U4e), dropped.
-    #[allow(
-        dead_code,
-        reason = "no consumer yet (advisor-u4e-r1 R2, A5): crate-private until a unit needs it public"
-    )]
-    pub(crate) fn unknown_pongs(&self) -> u64 {
-        self.unknown_pongs
+    /// `Pong`s whose ping id is not one of the client's own outstanding pings, dropped (the endpoint pings only under
+    /// the controller; ClockSync counts the unknown ones of its own pings too).
+    pub fn unknown_pongs(&self) -> u64 {
+        self.unknown_pongs + self.clock.unknown_pongs()
+    }
+
+    /// The command clock: its offset estimate (host minus server, ns), its samples and counters (-47's read).
+    pub fn clock(&self) -> &ClockSync {
+        &self.clock
+    }
+
+    /// Under the controller, the commands due at this step (0 to 2): every stamp from the last one + 1 up to the
+    /// controller's target, planned at the step's first `input` call; 0 before the first stamp is due (a snapshot, a
+    /// clock estimate and a target above the join's tick). Under a fixed lead, 1 once a snapshot is held.
+    pub fn commands_due(&self) -> u32 {
+        match self.controller {
+            Some(_) => self.due,
+            None => u32::from(self.newest.is_some() && self.slot.is_some()),
+        }
+    }
+
+    /// The lead the controller set at its last plan: its target less the server's current tick as estimated, ticks.
+    pub fn lead_now(&self) -> Option<i64> {
+        self.lead_now
+    }
+
+    /// Stamps the controller left unused because its target lay more than the redundancy cap past the last stamp (a
+    /// clock reset or a host stall): 0 expected on an honest run.
+    pub fn stamps_skipped(&self) -> u64 {
+        self.stamps_skipped
+    }
+
+    /// Page commands given at a step with none due under the controller (a hold): not stamped.
+    pub fn not_due(&self) -> u64 {
+        self.not_due
+    }
+
+    /// Commands the `Input` codec could not encode (carry 80 (c)): dropped and counted, the acknowledgement kept.
+    pub fn unencodable_commands(&self) -> u64 {
+        self.unencodable
+    }
+
+    /// Unacknowledged commands left out of later `Input`s, by either cause: a skipped index newer than them (the twin's
+    /// skip: [`Self::skip_command`]), or the `Input` codec's pair rules (carry 80 (c): a sequence gap an unencodable
+    /// command left, or an older tick more than 255 below its newer neighbour); 0 expected at P0.
+    pub fn twin_left_out(&self) -> u64 {
+        self.left_out
     }
 
     /// The page's command for the next step (its slot, tick and sequence are the endpoint's to stamp; `None`: no new
@@ -420,28 +538,142 @@ impl ClientEndpoint {
         self.now_ns = now_ns;
         self.base_ns.get_or_insert(now_ns);
         for (channel, bytes, arrival_ns) in received {
-            self.receive(*channel, bytes, *arrival_ns);
-        }
-        if let (Some(c), Some(slot)) = (command, self.slot) {
-            let index = self.next_cmd;
-            self.next_cmd = index.wrapping_add(1);
-            self.cmd_sent = true;
-            let tick = self.newest.map_or(0, |n| n.wrapping_add(self.lead));
-            let mut c = Command {
-                slot,
-                tick,
-                seq: index as u16,
-                ..c
+            // PM-0001-47/tick-quantised: each message timed at the step that reads it, not at its arrival.
+            let at = if self.tick_quantised {
+                now_ns
+            } else {
+                *arrival_ns
             };
-            // A view time the wire cannot carry (after the command's tick, or more than 65,535 ticks before it: the
-            // `Input` codec's view offset) is taken as the command's own tick, so every `Input` encodes.
-            if tick.wrapping_sub(c.view_tick) > u32::from(u16::MAX) {
-                c.view_tick = tick;
-                c.view_fraction = 0;
-            }
-            self.unacked.push_front((index, c));
-            self.unacked.truncate(Limits::REDUNDANCY_CAP);
+            self.receive(*channel, bytes, at);
         }
+        if self.controller.is_some() && !self.planned {
+            self.plan(now_ns);
+        }
+        let (Some(c), Some(slot)) = (command, self.slot) else {
+            return;
+        };
+        if let Some(tick) = self.next_stamp() {
+            self.stamp(c, slot, tick);
+        }
+    }
+
+    /// The twin's skip (U4F-Q13 (b); u4f-brief.md 2.12): the next command's sequence index and stamp are used and
+    /// nothing is made or sent for them, so the commands that run keep the forged run's sequence numbers; every
+    /// unacknowledged command is older than the skipped index and so leaves the `Input`s (its sequences stay
+    /// consecutive), counted in [`Self::twin_left_out`].
+    pub fn skip_command(&mut self) {
+        if self.slot.is_none() || self.next_stamp().is_none() {
+            return;
+        }
+        self.next_cmd = self.next_cmd.wrapping_add(1);
+        self.cmd_sent = true;
+        self.left_out += self.unacked.len() as u64;
+        self.unacked.clear();
+    }
+
+    /// The stamp for the next command: under the controller the next one due (none at a hold: counted), else the
+    /// newest tick plus the fixed lead.
+    fn next_stamp(&mut self) -> Option<u32> {
+        if self.controller.is_none() {
+            return Some(self.newest.map_or(0, |n| n.wrapping_add(self.lead)));
+        }
+        if self.due == 0 {
+            self.not_due += 1;
+            return None;
+        }
+        self.due -= 1;
+        let t = self.last_stamp.map_or(0, |s| s.wrapping_add(1));
+        self.last_stamp = Some(t);
+        Some(t)
+    }
+
+    /// Stamps the page's command `c` for `tick` with the next sequence and keeps it for the `Input`s.
+    fn stamp(&mut self, c: Command, slot: u8, tick: u32) {
+        let index = self.next_cmd;
+        self.next_cmd = index.wrapping_add(1);
+        self.cmd_sent = true;
+        let mut c = Command {
+            slot,
+            tick,
+            seq: index as u16,
+            ..c
+        };
+        // A view time the wire cannot carry (after the command's tick, or more than 65,535 ticks before it: the
+        // `Input` codec's view offset) is taken as the command's own tick, so every `Input` encodes.
+        if tick.wrapping_sub(c.view_tick) > u32::from(u16::MAX) {
+            c.view_tick = tick;
+            c.view_fraction = 0;
+        }
+        self.unacked.push_front((index, c));
+        self.unacked.truncate(self.redundancy);
+    }
+
+    /// The controller's plan for this step, at its first `input` (U4F-Q7 (b) with (iii) (c); u4f-brief.md 2.2): the
+    /// clock steps; the goal is the server's next tick to run when this step's command arrives at the latest (the
+    /// clock's upper one-way estimate), at least the server's next tick now and at most `max_lead` past its current
+    /// one; the target follows the goal, never down (the lead falls only by holding) and at most 2 up a step (the lead
+    /// moves at most 1 a step), but a goal more than the redundancy cap past it (a clock reset or a host stall) moves it
+    /// at once; the commands due are every stamp from the last + 1 to the target, at most 2. A target more than the
+    /// redundancy cap past the last stamp leaves the stamps between unused, counted. No
+    /// command is due before a snapshot, a clock estimate and a target above the join's tick; the first stamp is the
+    /// target itself, never counted up from 0 or from the join.
+    fn plan(&mut self, now_ns: u64) {
+        self.planned = true;
+        self.due = 0;
+        let Some(max_lead) = self.controller else {
+            return;
+        };
+        self.clock.step(now_ns);
+        let (Some(join), Some(_)) = (self.join_tick, self.newest) else {
+            return;
+        };
+        let (Some(next), Some(up)) = (self.clock.next_tick_at(now_ns), self.clock.one_way_hi_ns())
+        else {
+            return;
+        };
+        // The margin: one tick period beyond the clock's upper one-way estimate, so the command's second copy (the next
+        // step's `Input`) still arrives in time when the first is lost (f36: 0.2 % late at P3 without it).
+        let margin = self.clock.period_ns();
+        let Some(arrive) = self
+            .clock
+            .next_tick_at(now_ns.saturating_add(up).saturating_add(margin))
+        else {
+            return;
+        };
+        let current = next.wrapping_sub(1);
+        let cap = current.wrapping_add(max_lead);
+        let goal = if dist(arrive, cap) > 0 {
+            cap
+        } else if dist(arrive, next) < 0 {
+            next
+        } else {
+            arrive
+        };
+        let target = match self.target {
+            None => goal,
+            Some(t) if dist(goal, t) < 0 => t,
+            // NC-U4F-1: a goal past the redundancy cap (a clock reset or a host stall) moves the target at once; the
+            // stamps between are skipped below, counted.
+            Some(t) if dist(goal, t) > Limits::REDUNDANCY_CAP as i64 => goal,
+            Some(t) if dist(goal, t) > 2 => t.wrapping_add(2),
+            Some(_) => goal,
+        };
+        self.target = Some(target);
+        self.lead_now = Some(dist(target, current));
+        if dist(target, join) <= 0 {
+            return;
+        }
+        let last = *self.last_stamp.get_or_insert(target.wrapping_sub(1));
+        let mut owed = dist(target, last);
+        if owed <= 0 {
+            return;
+        }
+        if owed > Limits::REDUNDANCY_CAP as i64 {
+            self.stamps_skipped += (owed - 2) as u64;
+            self.last_stamp = Some(target.wrapping_sub(2));
+            owed = 2;
+        }
+        self.due = owed.min(2) as u32;
     }
 
     /// The step: the `Join` first, then each tick the `Input` (the newest command and every unacknowledged one, and the
@@ -458,13 +690,29 @@ impl ClientEndpoint {
         if self.slot.is_some() && !self.closed {
             let (ack_tick, ack_groups) = self.ack.map_or((0, 0), |(t, m)| (t as u16, m));
             if ack_groups != 0 || !self.unacked.is_empty() {
-                let input = Input {
-                    ack_tick,
-                    ack_groups,
-                    commands: self.unacked.iter().map(|(_, c)| *c).collect(),
+                let input = |commands: Vec<Command>| {
+                    Message::Input(Input {
+                        ack_tick,
+                        ack_groups,
+                        commands,
+                    })
                 };
                 let mut out = Vec::new();
-                if npt_proto::encode(&Message::Input(input), &mut out).is_ok() {
+                let commands = self.unacked.iter().map(|(_, c)| *c).collect();
+                if npt_proto::encode(&input(commands), &mut out).is_err() {
+                    // Carry 80 (c): a command the codec cannot encode is dropped and counted, never the whole `Input`
+                    // with its acknowledgement. The codec's two rules: each command encodes alone (its aim and view
+                    // offset in range), and each older command has the sequence just before its newer neighbour's
+                    // and a tick 0 to 255 below it; the newest run of the rest that keeps both is sent.
+                    self.drop_unencodable();
+                    out.clear();
+                    let commands = self.unacked.iter().map(|(_, c)| *c).collect();
+                    if npt_proto::encode(&input(commands), &mut out).is_err() {
+                        out.clear();
+                        let _ = npt_proto::encode(&input(Vec::new()), &mut out);
+                    }
+                }
+                if !out.is_empty() {
                     self.out.datagrams.push(out);
                 }
             }
@@ -475,13 +723,29 @@ impl ClientEndpoint {
                     echo_ns,
                     tick: self.newest.unwrap_or(0),
                     hold_us: u16::try_from(hold).unwrap_or(u16::MAX),
+                    // The endpoint reads no clock and the room never reads this field in a client's `Pong`.
+                    server_ns: 0,
                 };
                 let mut out = Vec::new();
                 if npt_proto::encode(&Message::Pong(pong), &mut out).is_ok() {
                     self.out.datagrams.push(out);
                 }
             }
+            // The controller's own pings (ClockSync's samples), at the first step at or after each interval.
+            if self.controller.is_some()
+                && let Some(id) = self.clock.ping(self.now_ns)
+            {
+                let mut out = Vec::new();
+                let ping = Ping {
+                    id,
+                    sent_ns: self.now_ns,
+                };
+                if npt_proto::encode(&Message::Ping(ping), &mut out).is_ok() {
+                    self.out.datagrams.push(out);
+                }
+            }
         }
+        self.planned = false;
         self.steps += 1;
         let base = self.base_ns.unwrap_or(self.now_ns);
         let since = u128::from(self.steps) * 1_000_000_000 / u128::from(self.tick_hz);
@@ -489,11 +753,41 @@ impl ClientEndpoint {
         core::mem::take(&mut self.out)
     }
 
+    /// Drops each unacknowledged command the `Input` codec cannot encode alone (counted), then keeps the longest newest
+    /// run that encodes whole (the codec's pair rules: consecutive sequences, each older tick 0 to 255 below its newer
+    /// neighbour), the rest counted as left out, so the `Input` keeps its acknowledgement (carry 80 (c); at most 8 trial
+    /// encodes, on a rare path, as npt-bots' `outgoing`).
+    fn drop_unencodable(&mut self) {
+        let encodes = |commands: Vec<Command>| {
+            let mut out = Vec::new();
+            npt_proto::encode(
+                &Message::Input(Input {
+                    commands,
+                    ..Input::default()
+                }),
+                &mut out,
+            )
+            .is_ok()
+        };
+        let before = self.unacked.len();
+        self.unacked.retain(|(_, c)| encodes(vec![*c]));
+        self.unencodable += (before - self.unacked.len()) as u64;
+        let mut run = self.unacked.len();
+        while run > 1 && !encodes(self.unacked.iter().take(run).map(|(_, c)| *c).collect()) {
+            run -= 1;
+        }
+        self.left_out += (self.unacked.len() - run) as u64;
+        self.unacked.truncate(run);
+    }
+
     fn receive(&mut self, channel: Channel, bytes: &[u8], arrival_ns: u64) {
         match self.quant.decode(Direction::RoomToClient, channel, bytes) {
             Ok(Message::Snapshot(s)) => self.group(s, bytes),
             Ok(Message::FullState(f)) => self.full_state(f),
-            Ok(Message::JoinAccepted(a)) => self.slot = Some(a.slot),
+            Ok(Message::JoinAccepted(a)) => {
+                self.slot = Some(a.slot);
+                self.join_tick = Some(a.tick);
+            }
             Ok(Message::JoinRejected(_) | Message::Kick(_) | Message::RoomEnded(_)) => {
                 self.closed = true
             }
@@ -501,6 +795,10 @@ impl ClientEndpoint {
                 if self.pings.len() < PINGS_HELD {
                     self.pings.push((p.id, p.sent_ns, arrival_ns));
                 }
+            }
+            Ok(Message::Pong(p)) if self.controller.is_some() => {
+                self.clock
+                    .pong(p.id, p.echo_ns, p.tick, p.hold_us, p.server_ns, arrival_ns)
             }
             Ok(Message::Pong(_)) => self.unknown_pongs += 1,
             Ok(_) => {}
@@ -518,6 +816,14 @@ impl ClientEndpoint {
                     && let Some(t) = bytes.get(1..5)
                 {
                     let t = u32::from_le_bytes([t[0], t[1], t[2], t[3]]);
+                    // Carry 80 (b), by U4F-Q16 (b): a refused header moves the newest tick by at most the ring
+                    // (`ACK_RING_TICKS`); one further ahead is dropped (counted in `refused` above), no sentinel.
+                    if self
+                        .newest
+                        .is_some_and(|n| dist(t, n) > i64::from(npt_sim::ACK_RING_TICKS))
+                    {
+                        return;
+                    }
                     self.sentinel(t);
                 }
             }
@@ -814,10 +1120,6 @@ impl ClientEndpoint {
         }
         self.see(t);
         let i = self.slot_for(t);
-        if self.ring[i].got != 0 {
-            self.duplicates += 1;
-            return;
-        }
         let grid = self.grid;
         let mut frame = Frame {
             entities: f.entities.iter().map(|r| Held::of(*r, grid)).collect(),
@@ -828,6 +1130,18 @@ impl ClientEndpoint {
         let entities: Vec<EntityRecord> = frame.entities.iter().map(|h| h.hashed(grid)).collect();
         let own: Vec<EntityRecord> = frame.own.iter().map(|h| h.hashed(grid)).collect();
         let hash = client_hash(t, &entities, &own, &[]);
+        if self.ring[i].got != 0 {
+            // Carry 80 (e): a tick already received, filed with another hash, gets the sentinel (carry 61 (b) in this
+            // order too); the same hash is a duplicate.
+            match self.ring[i].filed {
+                Filed::Hash(h) if h != hash => {
+                    self.ring[i].filed = Filed::Sentinel;
+                    self.out.hashes.push((t, 0));
+                }
+                _ => self.duplicates += 1,
+            }
+            return;
+        }
         let e = &mut self.ring[i];
         e.frame = frame;
         e.groups = 1;

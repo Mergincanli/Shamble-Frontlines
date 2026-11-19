@@ -7,10 +7,18 @@ use npt_sim::grid::{Config, POSITION_XY};
 #[test]
 fn pm_0001_17_client_rounding_is_planted_here_alone_and_moves_about_half_of_all_positions() {
     let id = "PM-0001-17/client-rounding";
-    // U4e's endpoint adds its two rebuilds' ids (carry 24); the grid's defect stays -17's alone.
+    // U4e's endpoint adds its two rebuilds' ids (carry 24), U4f its clock's two and the redundancy's; the grid's defect
+    // stays -17's alone.
     assert_eq!(
         npt_client::BITES,
-        [id, "PM-0001-58/lt-tick-offset", "PM-0001-58/lt-event-seq"]
+        [
+            id,
+            "PM-0001-58/lt-tick-offset",
+            "PM-0001-58/lt-event-seq",
+            "PM-0001-47/newest-sample",
+            "PM-0001-47/tick-quantised",
+            "PM-0001-20/redundancy-1",
+        ]
     );
     let bitten = npt_client::grid_with_bite(id).expect("the client plants -17's");
     assert_eq!(bitten, Config::floor_rounding());

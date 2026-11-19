@@ -226,11 +226,12 @@ fn b5_the_brawl_aims_at_an_enemy_in_view_never_a_teammate() {
             "command {i} aims at slot 20, raised into its box"
         );
     }
+    // U4f's clamp cheat (u4f-brief.md 2.6, NA-8): beyond the reach yet inside the map (U4r's 32,000 cm lay outside).
     let clamp = commands(Behaviour::script(&scene, 0, 9, "clamp").expect("clamp"), 5);
     assert!(
         clamp
             .iter()
-            .all(|c| c.aim[0].abs() == 32_000 && c.aim[1].abs() == 32_000),
+            .all(|c| c.aim[0].abs() == 11_000 && c.aim[1].abs() == 11_000),
         "the clamp script aims far beyond the reach"
     );
 }

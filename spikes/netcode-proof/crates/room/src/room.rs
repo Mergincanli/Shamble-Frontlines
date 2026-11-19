@@ -18,7 +18,7 @@ use crate::encoder::{
     DATAGRAM_OVERHEAD, Encoder, Packer, Section, delta_bits, event_bits, group_bytes, view,
 };
 use crate::events::{EventQueue, Queued};
-use crate::input::{CMD_SEQ, InputBuffer, Offered, PRESS};
+use crate::input::{CMD_SEQ, Checks, CmdTiming, InputBuffer, Offered, PRESS, Refusal, Relax, dist};
 use crate::interest::{AreaFlood, InterestGrid, Priority};
 use crate::rewind::rewind_at;
 use crate::roster::Roster;
@@ -31,6 +31,8 @@ const RADIUS_CM: i32 = 6_400;
 const CELL_CM: i32 = 1_600;
 /// The hit history's span, ms: provisional until U4h measures its test cap (u4-build-plan.md §4.9).
 const HISTORY_MS: u32 = 2_000;
+/// Refusal records held between two ticks, at most (a bound on memory; more are counted in `refusals_dropped`).
+const REFUSALS_HELD: usize = 4_096;
 
 /// The room's planted defects (bites builds only), chosen per instance by [`Room::with_bite`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -42,6 +44,15 @@ enum RoomBite {
     ServerEcho,
     Unbounded,
     OwnerToAll,
+    NoLeadBound,
+    NoNewerTick,
+    NoSeqForward,
+    NoMoveLength,
+    NoPressEdge,
+    NoAimBounds,
+    NoAckSent,
+    NoCatchupCap,
+    NotOlderThan,
 }
 
 #[cfg(feature = "bites")]
@@ -55,6 +66,15 @@ impl RoomBite {
             RoomBite::ServerEcho,
             RoomBite::Unbounded,
             RoomBite::OwnerToAll,
+            RoomBite::NoLeadBound,
+            RoomBite::NoNewerTick,
+            RoomBite::NoSeqForward,
+            RoomBite::NoMoveLength,
+            RoomBite::NoPressEdge,
+            RoomBite::NoAimBounds,
+            RoomBite::NoAckSent,
+            RoomBite::NoCatchupCap,
+            RoomBite::NotOlderThan,
         ];
         crate::BITES.iter().position(|b| *b == id).map(|i| all[i])
     }
@@ -110,17 +130,36 @@ pub struct ClientCounters {
     pub resyncs_limited: u64,
     /// `Kick(overflow)`s sent: the client was dropped (§4.7).
     pub kicked: u64,
-    /// Commands accepted into the input buffer.
+    /// Commands accepted (buffered for their tick under option B, held for the coming tick under option A).
     pub commands_buffered: u64,
-    /// Commands whose sequence was not after the newest received: not run again.
+    /// Redundant copies: a sequence not after the newest received whose kept command is equal, or was refused: not
+    /// run again, never forged.
     pub commands_repeat: u64,
-    /// Commands refused by the press-edge compare.
+    /// Kind 1: commands stamped more than the lead bound ahead of the room's next tick.
+    pub lead_refused: u64,
+    /// Kind 2: commands not strictly newer than the newest accepted (on a fresh slot: at or before the join's tick).
+    pub not_newer: u64,
+    /// Kind 3: resent copies, with changed content, of a command the room accepted.
+    pub seq_refused: u64,
+    /// Kind 4: commands whose move vector is longer than 1.
+    pub move_refused: u64,
+    /// Kind 5: commands refused by the press-edge compare.
     pub press_refused: u64,
-    /// Commands stamped for a tick already run (or already buffered): dropped as late.
+    /// Kind 6: commands aiming outside the map's x and y extent.
+    pub aim_refused: u64,
+    /// Commands stamped for a tick already run (option B), or more than `CMD_CATCHUP` ticks before the tick they
+    /// would run at (option A's past window): dropped as late, never forged.
     pub late: u64,
-    /// Commands refused because the buffer held `CMD_CATCHUP` already.
+    /// Kind 10: commands refused by the catch-up cap (option B: the buffer held `CMD_CATCHUP` already; option A:
+    /// `CMD_CATCHUP` were held for the coming tick).
     pub buffer_full: u64,
-    /// Datagrams whose acknowledgement named no snapshot sent to this client: their commands refused.
+    /// A sequence not after the newest received with no command kept under it (older than the kept window, or a
+    /// gap): dropped, never forged.
+    pub seq_outside_window: u64,
+    /// A fresh session's command after its join's tick but at or before the slot's newest stamp from an earlier
+    /// session: dropped, never forged (U4F-Q18 (ii) (d)).
+    pub rejoin_overlap: u64,
+    /// Kind 8: datagrams whose acknowledgement named no snapshot sent to this client: their commands refused.
     pub ack_refused: u64,
     /// The commands those datagrams carried.
     pub ack_refused_commands: u64,
@@ -153,6 +192,14 @@ struct TickValues {
     wraps: Vec<&'static str>,
     rewinds_refused: Vec<u16>,
     skipped: u32,
+    /// Whether a command stamped for this tick had arrived before it ran (`None` before the first accepted stamp).
+    on_time: Option<bool>,
+    /// Press edges the commands run this tick carried, of them lost, and doubled (-20's and -58's press series).
+    presses: [u32; 3],
+    /// Option A: for each command run this tick, its stamp's signed distance from the tick (ticks run before it).
+    ran_early: Vec<i32>,
+    /// Commands handed to the sim for this client this tick (option B's repeat included).
+    cmds_run: u32,
 }
 
 /// One client's slot in the room: its session's ring, queue, buffer, encoder and priorities, its outbox, and what the
@@ -296,6 +343,33 @@ impl ClientSlot {
         self.kicked
     }
 
+    /// The last tick's `tick.s.cmd_on_time` (and `tick.s.input_missing`, its complement), by stamp (NA-14; the
+    /// advisor's A3): `None` until the client's first accepted stamp is at or before the tick, then whether a command
+    /// stamped for that tick had arrived before it ran (a command lost in every copy, or late, gives `false`).
+    pub fn on_time(&self) -> Option<bool> {
+        self.t.on_time
+    }
+
+    /// The last tick's press edges: (seen, lost, doubled), over the commands run (-20's and -58's
+    /// `tick.v.press_count`, `.press_lost_count`, `.press_doubled_count`). Seen: each button's counter advance over the
+    /// last command run on this slot; lost: the edges beyond the one the sim takes from a changed counter (npt-sim
+    /// world.rs: an edge is a counter that differs from the one it last claimed); doubled: an edge on option B's repeat.
+    pub fn presses(&self) -> (u32, u32, u32) {
+        (self.t.presses[0], self.t.presses[1], self.t.presses[2])
+    }
+
+    /// Option A: for each command the last tick ran, its stamp less the tick (positive: run before its stamp; U4F-Q3
+    /// (c)'s report). Empty under option B.
+    pub fn ran_early(&self) -> &[i32] {
+        &self.t.ran_early
+    }
+
+    /// The commands the last tick handed the sim for this client (option B's repeat included): the lag switch's
+    /// `tick.v.lagswitch_cmds_count`.
+    pub fn commands_run(&self) -> u32 {
+        self.t.cmds_run
+    }
+
     fn begin_tick(&mut self) {
         self.t.server_hash = None;
         self.t.burst_eviction = false;
@@ -309,6 +383,10 @@ impl ClientSlot {
         self.t.own_state_changed = false;
         self.t.overflow_resync = false;
         self.t.skipped = 0;
+        self.t.on_time = None;
+        self.t.presses = [0; 3];
+        self.t.ran_early.clear();
+        self.t.cmds_run = 0;
         self.t.rewinds_refused.clear();
         self.t.wraps.clear();
         self.t.wraps.append(&mut self.pending_wraps);
@@ -359,13 +437,12 @@ fn dist2(a: [i32; 2], b: [i32; 2]) -> i64 {
 }
 
 /// Sorts a tick's commands into the canonical order (seam.rs `TickInput::commands`; carry 21): slot ascending, then
-/// command tick ascending within a slot, wrap-aware, so every arrival order gives one `TickInput`.
-pub(crate) fn canonical(commands: &mut [(Command, Option<Rewind>)]) {
-    commands.sort_by(|(a, _), (b, _)| {
-        a.slot
-            .cmp(&b.slot)
-            .then_with(|| (b.tick.wrapping_sub(a.tick) as i32).cmp(&0).reverse())
-    });
+/// within a slot by the command tick's signed distance from the tick `t` being run, so every arrival order gives one
+/// `TickInput`. The key is total (U4F-Q17 (a); carry 80 (a)): it orders any set of u32 ticks, even ticks 2^31 or more
+/// apart, so the sort never meets a non-total order, and for ticks within 2^31 of `t` it is the wrap-aware order. The
+/// sort is stable, so commands equal in both keys keep their arrival order.
+pub(crate) fn canonical(commands: &mut [(Command, Option<Rewind>)], t: u32) {
+    commands.sort_by_key(|(c, _)| (c.slot, c.tick.wrapping_sub(t) as i32));
 }
 
 /// The tick's records by (kind, index), and the records interest places by a point or by their hull or area.
@@ -417,9 +494,35 @@ pub struct Room<S: SimCore> {
     stamped: Vec<(u32, u32, SimEvent)>,
     reports: InputReports,
     index: Index,
+    /// OQ-0001-6's option, a start-up setting.
+    timing: CmdTiming,
+    /// The lead bound in ms (a room setting: LEAD-BOUND) and in ticks at the room's rate (`ticks_for_ms_at`).
+    lead_bound_ms: u32,
+    lead_bound: u32,
+    /// The map's x and y extent, cm ([x0, y0, x1, y1]): kind 6's bounds.
+    extent: [i32; 4],
+    /// Per slot index, the newest accepted stamp across join, replace, leave and kick (U4F-Q18 (ii) (d)): a fixed
+    /// array of the room's slots, never keyed by client data.
+    kept_stamps: Vec<Option<u32>>,
+    /// Per slot index, the press counters of the last command run (the sim's own claimed counters, which outlive a
+    /// session): the press series' reference.
+    run_presses: Vec<[u8; 4]>,
+    /// The refusal records (slot, seq, kind) of the receives since the last tick began (`incoming`), and those of the
+    /// receives before it (`refusals`, what [`Room::refusals`] gives).
+    incoming: Vec<(u8, u16, Refusal)>,
+    refusals: Vec<(u8, u16, Refusal)>,
+    refusals_dropped: u64,
+    /// Option A's arrival numbers (its run order before `canonical`), and the tick's scratch list.
+    arrivals: u64,
+    drained: Vec<(u64, Command)>,
 }
 
 impl<S: SimCore> Room<S> {
+    /// The lead bound's value, in ms: Mustafa's LEAD-BOUND (a), 400 ms (history.md, 2026-11-18 11:31), frozen: 12 ticks
+    /// at 30 Hz, 24 at 60 Hz (`ticks_for_ms_at`). A command stamped more than this ahead of the room's next tick is
+    /// refused and counted as kind 1.
+    pub const LEAD_BOUND_MS: u32 = 400;
+
     /// A room over `sim` running `scene`, its static graph read from `greybox` (`areas()` and `portals()`: the
     /// tests pass `World::greybox()`), a roster of `tokens` admitting at most `n` sessions, at `tick_hz` ticks a second
     /// (production callers pass `npt_sim::TICK_HZ`: the window's rate is an argument, the F2 ruling). Its first tick
@@ -457,8 +560,8 @@ impl<S: SimCore> Room<S> {
             tick_hz,
             next_tick,
             next_event: 0,
-            event_cap: EventQueue::PROVISIONAL_CAP,
-            event_cap_provisional: true,
+            event_cap: EventQueue::CAP,
+            event_cap_provisional: false,
             cover: CoverVariant::Rewound,
             grid: InterestGrid::new(extent, CELL_CM),
             flood,
@@ -472,7 +575,80 @@ impl<S: SimCore> Room<S> {
             stamped: Vec::new(),
             reports: InputReports::default(),
             index: Index::default(),
+            timing: CmdTiming::B,
+            lead_bound_ms: Room::<S>::LEAD_BOUND_MS,
+            lead_bound: npt_sim::ticks_for_ms_at(tick_hz, Room::<S>::LEAD_BOUND_MS),
+            extent,
+            kept_stamps: vec![None; slots.max(1)],
+            run_presses: vec![[0; 4]; slots.max(1)],
+            incoming: Vec::new(),
+            refusals: Vec::new(),
+            refusals_dropped: 0,
+            arrivals: 0,
+            drained: Vec::new(),
             sim,
+        }
+    }
+
+    /// The same room under OQ-0001-6's option `timing` (a start-up setting: set before any join, never in a run).
+    pub fn with_cmd_timing(mut self, timing: CmdTiming) -> Room<S> {
+        self.timing = timing;
+        self
+    }
+
+    /// The same room with its lead bound set as data, in ms, turned into ticks at the room's rate (carry 39's pattern:
+    /// `ticks_for_ms_at` with the rate passed in). The judged runs keep [`Room::LEAD_BOUND_MS`].
+    pub fn with_lead_bound_ms(mut self, ms: u32) -> Room<S> {
+        self.lead_bound_ms = ms;
+        self.lead_bound = npt_sim::ticks_for_ms_at(self.tick_hz, ms);
+        self
+    }
+
+    /// [`Room::with_cmd_timing`] in place, for a caller that holds the room inside its own server (npt-lab): a start-up
+    /// setting, given before any join.
+    ///
+    /// # Panics
+    /// In a debug or test build, once any slot has joined (the option never changes in a run: F7).
+    pub fn set_cmd_timing(&mut self, timing: CmdTiming) {
+        debug_assert!(
+            self.clients.iter().all(Option::is_none),
+            "the command-timing option is set before any join"
+        );
+        self.timing = timing;
+    }
+
+    /// The room's command-timing option.
+    pub fn cmd_timing(&self) -> CmdTiming {
+        self.timing
+    }
+
+    /// The lead bound: (ms, ticks at the room's rate), for the run's header.
+    pub fn lead_bound(&self) -> (u32, u32) {
+        (self.lead_bound_ms, self.lead_bound)
+    }
+
+    /// The refusal records of the commands received before the last tick began, as (slot, seq, kind), one per refused
+    /// command (kind 8: one per command of the refused datagram), in arrival order (plan §4.2 :246-247's form).
+    pub fn refusals(&self) -> &[(u8, u16, Refusal)] {
+        &self.refusals
+    }
+
+    /// Refusal records not kept because more than 4,096 came between two ticks (their counters still count them).
+    pub fn refusals_dropped(&self) -> u64 {
+        self.refusals_dropped
+    }
+
+    /// The checks a planted -21 bite relaxes (none outside bites builds).
+    fn relax(&self) -> Relax {
+        Relax {
+            no_lead_bound: self.bitten(RoomBite::NoLeadBound),
+            no_newer_tick: self.bitten(RoomBite::NoNewerTick),
+            not_older_than: self.bitten(RoomBite::NotOlderThan),
+            no_seq_forward: self.bitten(RoomBite::NoSeqForward),
+            no_move_length: self.bitten(RoomBite::NoMoveLength),
+            no_press_edge: self.bitten(RoomBite::NoPressEdge),
+            no_aim_bounds: self.bitten(RoomBite::NoAimBounds),
+            no_catchup_cap: self.bitten(RoomBite::NoCatchupCap),
         }
     }
 
@@ -650,7 +826,7 @@ impl<S: SimCore> Room<S> {
             team: self.teams.get(i).copied().unwrap_or(0),
             ack,
             queue: EventQueue::new(self.event_cap, self.bitten(RoomBite::Unbounded)),
-            input: InputBuffer::default(),
+            input: InputBuffer::new(self.timing, self.next_tick, self.kept_stamps[i]),
             encoder: Encoder::new(self.tick_hz, self.quant),
             priority: Priority::default(),
             full_state_due: Some(false),
@@ -743,6 +919,23 @@ impl<S: SimCore> Room<S> {
 
     fn receive_input(&mut self, slot: u8, input: &Input) {
         let w = self.wrap();
+        let mut checks = Checks {
+            next_tick: self.next_tick,
+            lead_bound: self.lead_bound,
+            extent: self.extent,
+            arrival: self.arrivals,
+            relax: self.relax(),
+        };
+        let no_ack_sent = self.bitten(RoomBite::NoAckSent);
+        let records = &mut self.incoming;
+        let dropped = &mut self.refusals_dropped;
+        let mut record = |seq: u16, kind: Refusal| {
+            if records.len() < REFUSALS_HELD {
+                records.push((slot, seq, kind));
+            } else {
+                *dropped += 1;
+            }
+        };
         let Some(c) = self
             .clients
             .get_mut(usize::from(slot))
@@ -780,24 +973,53 @@ impl<S: SimCore> Room<S> {
                     }
                 }
                 Acked::Old => c.counters.acks_old += 1,
-                Acked::NeverSent => {
-                    // The acknowledgement names a snapshot never sent: the datagram's commands are refused (§4.14 :471).
+                Acked::NeverSent if !no_ack_sent => {
+                    // Kind 8: the acknowledgement names a snapshot never sent: the datagram's commands are refused
+                    // whole (§4.14 :471), counted by datagram, each command recorded.
                     c.counters.ack_refused += 1;
                     c.counters.ack_refused_commands += input.commands.len() as u64;
+                    for cmd in input.commands.iter().rev() {
+                        record(cmd.seq, Refusal::AckNeverSent);
+                    }
                     return;
                 }
+                // PM-0001-21/no-ack-sent: the check removed, the commands go on.
+                Acked::NeverSent => {}
             }
         }
+        // Per command, oldest first (2.4 item 2).
         for cmd in input.commands.iter().rev() {
             let cmd = Command { slot, ..*cmd };
-            match c.input.offer(cmd, w, &mut c.pending_wraps) {
-                Offered::Buffered => c.counters.commands_buffered += 1,
-                Offered::Repeat => c.counters.commands_repeat += 1,
-                Offered::PressRefused => c.counters.press_refused += 1,
-                Offered::Late => c.counters.late += 1,
-                Offered::Full => c.counters.buffer_full += 1,
+            let k = &mut c.counters;
+            match c.input.offer(cmd, w, &mut c.pending_wraps, &checks) {
+                Offered::Accepted => {
+                    k.commands_buffered += 1;
+                    let kept = &mut self.kept_stamps[usize::from(slot)];
+                    if kept.is_none_or(|s| dist(cmd.tick, s) > 0) {
+                        *kept = Some(cmd.tick);
+                    }
+                }
+                Offered::Repeat => k.commands_repeat += 1,
+                Offered::OutsideWindow => k.seq_outside_window += 1,
+                Offered::RejoinOverlap => k.rejoin_overlap += 1,
+                Offered::Late => k.late += 1,
+                Offered::Refused(r) => {
+                    match r {
+                        Refusal::LeadBound => k.lead_refused += 1,
+                        Refusal::NotNewer => k.not_newer += 1,
+                        Refusal::SeqNotForward => k.seq_refused += 1,
+                        Refusal::MoveLength => k.move_refused += 1,
+                        Refusal::PressEdge => k.press_refused += 1,
+                        Refusal::AimBounds => k.aim_refused += 1,
+                        Refusal::Catchup => k.buffer_full += 1,
+                        Refusal::AckNeverSent => k.ack_refused_commands += 1,
+                    }
+                    record(cmd.seq, r);
+                }
             }
+            checks.arrival += 1;
         }
+        self.arrivals = checks.arrival;
     }
 
     /// Runs one tick: the commands, the step, the history, the flood, the reports, interest, the events and every
@@ -807,6 +1029,8 @@ impl<S: SimCore> Room<S> {
         for c in self.clients.iter_mut().flatten() {
             c.begin_tick();
         }
+        self.refusals.clear();
+        core::mem::swap(&mut self.incoming, &mut self.refusals);
         self.fill_input(t);
         // Carry 26: the step's events are copied (stamped with the tick and their 32-bit numbers: carry 23) before
         // anything else is read from the sim.
@@ -826,8 +1050,10 @@ impl<S: SimCore> Room<S> {
         self.next_tick = t.wrapping_add(1);
     }
 
-    /// The tick's `TickInput`: the script waiting for it, and per joined client the command option B runs (its slot
-    /// the session's), with its Rewind when it holds or presses fire, in the canonical order.
+    /// The tick's `TickInput`: the script waiting for it, and per joined client the commands its option runs (option B:
+    /// the one stamped for the tick, or the last again; option A: every command accepted since the last tick, taken
+    /// in arrival order), each with its slot the session's and its Rewind when it holds or presses fire, then the
+    /// canonical order. Before it, each client's `tick.s.cmd_on_time` by stamp.
     fn fill_input(&mut self, t: u32) {
         self.input.tick = t;
         self.input.spawns.clear();
@@ -837,9 +1063,15 @@ impl<S: SimCore> Room<S> {
         self.input.attributes.clear();
         self.input.attributes.append(&mut self.scripted_attributes);
         self.input.commands.clear();
-        let fire = Command::FIRE;
+        let mut drained = core::mem::take(&mut self.drained);
+        drained.clear();
         for c in self.clients.iter_mut().flatten() {
             if c.kicked {
+                continue;
+            }
+            c.t.on_time = c.input.due(t);
+            if self.timing == CmdTiming::A {
+                c.input.drain(t, &mut drained);
                 continue;
             }
             let taken = c.input.take(t);
@@ -852,29 +1084,29 @@ impl<S: SimCore> Room<S> {
             } else {
                 c.counters.commands_run += 1;
             }
-            let press = cmd.presses[Command::PRESS_FIRE];
-            let pressed = c.fire_presses.is_some_and(|p| p != press)
-                || (c.fire_presses.is_none() && press != 0);
-            c.fire_presses = Some(press);
-            let rewind = if cmd.buttons & fire != 0 || pressed {
-                let r = rewind_at(&cmd, &self.history, self.cover);
-                if r.is_none() {
-                    c.counters.rewinds_refused += 1;
-                    c.t.rewinds_refused.push(cmd.seq);
-                }
-                r
-            } else {
-                None
-            };
-            self.input.commands.push((
-                Command {
-                    slot: c.slot,
-                    ..cmd
-                },
-                rewind,
-            ));
+            let presses = &mut self.run_presses[usize::from(c.slot)];
+            let run = run_one(c, cmd, taken.repeated, presses, &self.history, self.cover);
+            self.input.commands.push(run);
         }
-        canonical(&mut self.input.commands);
+        // Option A: the commands in the order they arrived (the arrival numbers are unique), each slot's in its
+        // accepted order; `canonical` then gives every arrival order one list.
+        drained.sort_unstable_by_key(|(arrival, _)| *arrival);
+        for &(_, cmd) in &drained {
+            let Some(c) = self
+                .clients
+                .get_mut(usize::from(cmd.slot))
+                .and_then(Option::as_mut)
+            else {
+                continue;
+            };
+            c.counters.commands_run += 1;
+            c.t.ran_early.push(cmd.tick.wrapping_sub(t) as i32);
+            let presses = &mut self.run_presses[usize::from(c.slot)];
+            let run = run_one(c, cmd, false, presses, &self.history, self.cover);
+            self.input.commands.push(run);
+        }
+        self.drained = drained;
+        canonical(&mut self.input.commands, t);
     }
 
     fn index_records(&mut self) {
@@ -1090,6 +1322,53 @@ impl<S: SimCore> Room<S> {
             snapshot(c, t, records, &own, no_fallback);
         }
     }
+}
+
+/// One command run for `c` this tick (option B's repeat when `repeated`): its press edges counted against the slot's
+/// last run counters `presses` (seen, lost beyond the one edge the sim takes, doubled on a repeat), the fire-press
+/// tracking, and its Rewind when it holds or presses fire.
+fn run_one(
+    c: &mut ClientSlot,
+    cmd: Command,
+    repeated: bool,
+    presses: &mut [u8; 4],
+    history: &HitHistory,
+    cover: CoverVariant,
+) -> (Command, Option<Rewind>) {
+    for (k, &p) in cmd.presses.iter().enumerate() {
+        let edges = u32::from(p.wrapping_sub(presses[k]));
+        if repeated {
+            c.t.presses[2] += edges;
+        } else {
+            c.t.presses[0] += edges;
+            c.t.presses[1] += edges.saturating_sub(1);
+        }
+    }
+    if !repeated {
+        *presses = cmd.presses;
+    }
+    c.t.cmds_run += 1;
+    let press = cmd.presses[Command::PRESS_FIRE];
+    let pressed =
+        c.fire_presses.is_some_and(|p| p != press) || (c.fire_presses.is_none() && press != 0);
+    c.fire_presses = Some(press);
+    let rewind = if cmd.buttons & Command::FIRE != 0 || pressed {
+        let r = rewind_at(&cmd, history, cover);
+        if r.is_none() {
+            c.counters.rewinds_refused += 1;
+            c.t.rewinds_refused.push(cmd.seq);
+        }
+        r
+    } else {
+        None
+    };
+    (
+        Command {
+            slot: c.slot,
+            ..cmd
+        },
+        rewind,
+    )
 }
 
 /// Sends `c` a full state at tick `t`: its own-state records and its relevant records whole (catalogue §3's
@@ -1403,11 +1682,82 @@ mod tests {
         let mut a = vec![cmd(3, 1), cmd(0, 7), cmd(3, u32::MAX), cmd(1, 5), cmd(3, 0)];
         let mut b = a.clone();
         b.reverse();
-        canonical(&mut a);
-        canonical(&mut b);
+        canonical(&mut a, 0);
+        canonical(&mut b, 0);
         assert_eq!(a, b);
         let order: Vec<(u8, u32)> = a.iter().map(|(c, _)| (c.slot, c.tick)).collect();
         assert_eq!(order, [(0, 7), (1, 5), (3, u32::MAX), (3, 0), (3, 1)]);
+    }
+
+    /// f8 (carry 80 (a)): one slot's commands 2^31 ticks apart sort to one order in both arrival orders, with no panic
+    /// (the wrap-aware comparator had no order for them: U4F-Q17).
+    #[test]
+    fn f8_one_slots_commands_2_pow_31_ticks_apart_sort_to_one_order() {
+        for t in [0u32, 1, 1 << 31, u32::MAX] {
+            let mut a = vec![cmd(2, t), cmd(2, t.wrapping_add(1 << 31)), cmd(1, t)];
+            let mut b = a.clone();
+            b.reverse();
+            canonical(&mut a, t);
+            canonical(&mut b, t);
+            assert_eq!(a, b, "at {t}");
+            assert_eq!(
+                a[1].0.tick,
+                t.wrapping_add(1 << 31),
+                "the far tick first: -2^31 from t"
+            );
+        }
+    }
+
+    /// f8 (carry 80 (a); U4F-Q17 (a)), the property half: 10,000 seeded random triples of one slot's u32 ticks (any
+    /// distance apart, 2^31 included), each in all six arrival orders, sort to one order with no panic, and that
+    /// order is by signed distance from the tick run. Seeded splitmix64 (seed 0x5eed_00f8), 10,000 cases.
+    #[test]
+    fn f8_one_slots_random_u32_ticks_sort_to_one_order_in_every_arrival_order() {
+        let mut s: u64 = 0x5eed_00f8;
+        let mut next = || {
+            s = s.wrapping_add(0x9e37_79b9_7f4a_7c15);
+            let mut z = s;
+            z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+            z ^ (z >> 31)
+        };
+        let perms = [
+            [0, 1, 2],
+            [0, 2, 1],
+            [1, 0, 2],
+            [1, 2, 0],
+            [2, 0, 1],
+            [2, 1, 0],
+        ];
+        for case in 0..10_000 {
+            let t = next() as u32;
+            // Every fourth case a triple with two ticks exactly 2^31 apart (no wrap-aware order exists there).
+            let a = next() as u32;
+            let b = if case % 4 == 0 {
+                a.wrapping_add(1 << 31)
+            } else {
+                next() as u32
+            };
+            let ticks = [a, b, next() as u32];
+            let mut first: Option<Vec<u32>> = None;
+            for p in perms {
+                let mut list: Vec<(Command, Option<Rewind>)> =
+                    p.iter().map(|&i| cmd(4, ticks[i])).collect();
+                canonical(&mut list, t);
+                let got: Vec<u32> = list.iter().map(|(c, _)| c.tick).collect();
+                let keys: Vec<i32> = got.iter().map(|x| x.wrapping_sub(t) as i32).collect();
+                assert!(
+                    keys.windows(2).all(|w| w[0] <= w[1]),
+                    "case {case}: {got:?} at {t}"
+                );
+                match &first {
+                    None => first = Some(got),
+                    Some(f) => {
+                        assert_eq!(f, &got, "case {case}: one order for every arrival order")
+                    }
+                }
+            }
+        }
     }
 
     /// Carry 23: the room stamps each event with the `TickInput::tick` it ran and consecutive 32-bit numbers, across a
