@@ -662,3 +662,11 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   messages), and only run #17's attempt 2 ran in it (the session pushed nothing else).
 - SA-R4 (the re-tick proven by a wait): run #17 re-run again by the session (rerun_workflow_run, 201 Created, about
   00:13:54 UTC): attempt 3; its deploy job must wait on `preview`, and he rejects it.
+- **SA-R8**: his screenshot of "Actions secrets and variables" (queued 2026-11-19 00:14:02 UTC, attachment
+  7f9bc63e-b2cf-4669-9886-807ca00a3403), transcribed: "Environment secrets": CANARY (production, "3 days ago"),
+  CLOUDFLARE_ACCOUNT_ID (preview, "yesterday"), CLOUDFLARE_API_TOKEN (preview, "yesterday"); "Repository secrets":
+  "This repository has no secrets." Met: no secret outside the two environments.
+- **SA-R4 measured: run #17 attempt 3** (re-run 00:13:52 UTC): plan green (00:13:56-00:14:11), build green
+  (00:14:13-00:14:37); the deploy job 135235739456 created 00:14:38, read "queued" once in the jobs list, then
+  "status":"waiting" (get_workflow_job, about 00:14:45 UTC). So after his re-tick a rewritten job waits again. His
+  rejection asked next.

@@ -668,6 +668,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - His re-tick screenshot (00:13:42 UTC): reviewer Mergincanli, self-review and bypass off: **window closed**
      (00:10:53-00:13:42 UTC; only attempt 2 ran in it). SA-R4: attempt 3 started about 00:13:54 UTC: must wait; he
      rejects. Still due from him: the SA-R8 screenshot (repository secrets).
+   - SA-R8 met (his screenshot 00:14:02 UTC: no repository secrets; three environment secrets). Attempt 3's deploy job
+     "waiting" (00:14:38): SA-R4 measured; his rejection asked. Then cs/b9-prod.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
