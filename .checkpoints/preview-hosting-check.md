@@ -796,6 +796,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      appears only as a button label under Cloudflare One on https://www.cloudflare.com/plans/free/ (no date), next to an
      "Activate" link to dash.cloudflare.com/sign-up/teams, unexplained. A reading, not a fact: a sign-up address sending
      a signed-in owner to the dashboard's home would fit what he saw; tonight's look-only screenshots decide.
+   - Guard check-in (trig_01Vefw38oabFrJRC65BsQjUy, fired 16:30:19 UTC): outside look 16:30:44-46 UTC (curl, the probe's
+     User-Agent, no cookies): (c) cs-pd-open HTTP/2 200, no redirect, marker 4a2b70464ed9...; iso-off HTTP/2 200, no
+     redirect, marker 2162db55d93f.... No wall; nothing to tell him. No answer from him yet to the four questions.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
