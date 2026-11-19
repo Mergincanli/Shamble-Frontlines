@@ -42,6 +42,12 @@ const copied = (w) => `Copied by script (${Buffer.byteLength(w)} ${Buffer.byteLe
 /** Newest first. `key` is the text that must not yet stand in DECISIONS.md; `head(words)` is the entry's lead. */
 const ENTRIES = [
   {
+    file: 'mustafa-2026-11-19-size-stop-2.md',
+    key: '2026-11-19, 11:07:48 UTC: his answer to the question SIZE-STOP-2',
+    head: (w) =>
+      `- **Taken by Mustafa, 2026-11-19, 11:07:48 UTC: his answer to the question SIZE-STOP-2 of change-set 2 (the change-set stood at 4,430 added lines against the stop line of 4,400, with review round 2's fix pass of 41 lines prepared and not yet applied): (a), the stop line moves to 4,700 and the fix pass goes in** (${SESSION}; extracted by script from the session's transcript, message fd359559-31d2-4e96-8d41-ac8723b7ffb1, whole: one letter). Two questions stood open when he wrote it, both as the chat had put them: SIZE-STOP-2, and WATCH-61 (should the chat watch pull request #61: (a) no, as with #58 and #60; (b) yes). The chat read his letter as (a) on SIZE-STOP-2; on WATCH-61 the same letter means no, which is also what happens when nothing is done: #61 is not watched. Both questions as asked stand in \`${REPORT}\`. ${copied(w)}`,
+  },
+  {
     file: 'mustafa-2026-11-19-until-7am.md',
     key: '2026-11-19, 00:23:22 UTC: for the night',
     head: (w) =>

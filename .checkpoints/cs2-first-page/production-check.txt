@@ -1,10 +1,10 @@
 development (the control): 8 files; serve.mjs present
   "Copy report": in assets/overlay--eYwvZFu.js
-  "__shambleReport": in assets/index-DtM1bobo.js
-  "ticks while hidden": in assets/report-D9SesppA.js
-  "first page: report": in assets/report-D9SesppA.js
-  "frame time": in assets/report-D9SesppA.js
-  "colorDepth": in assets/index-DtM1bobo.js
+  "__shambleReport": in assets/index-EPVDJ2Dt.js
+  "ticks while hidden": in assets/report-D6SeR0nu.js
+  "first page: report": in assets/report-D6SeR0nu.js
+  "frame time": in assets/report-D6SeR0nu.js
+  "colorDepth": in assets/index-EPVDJ2Dt.js
 production: 5 files; serve.mjs absent
   "Copy report": not found
   "__shambleReport": not found
@@ -12,5 +12,5 @@ production: 5 files; serve.mjs absent
   "first page: report": not found
   "frame time": not found
   "colorDepth": not found
-the production page in Chromium: {"backend":"WebGL 2 fallback","commit":"30a5a13be+changes","overlay":0,"hook":"undefined","noticeHidden":true}; Workers: 1; page errors: 0
+the production page in Chromium: {"backend":"WebGL 2 fallback","commit":"5eaa09b6b+changes","overlay":0,"hook":"undefined","noticeHidden":true}; Workers: 1; page errors: 0
 PASS: the production build holds no development marker, and the control finds each

@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 11:06 UTC (from the clock)
+- **Last update:** 2026-11-19 11:12 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -485,14 +485,40 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     dated pointer for SPLIT-25 (`adr-pointer.mjs`; written into `docs/adr/0002-...md`, 6 lines, not committed
     yet). The report's draft: `report-draft.md` (its open places are marked with double brackets).
 
+56. **His answer to SIZE-STOP-2: "A"** (2026-11-19T11:07:48.758Z; `cs2-first-page/mustafa-2026-11-19-size-stop-2.md`,
+    by script, with the two questions as they stood): (a), the stop line is 4,700 and the fix pass goes in. The same
+    letter on WATCH-61 means no: pull request #61 is not watched. The session's model read at 11:08 UTC:
+    claude-fable-5-2, configured and last served. The chat's context stood at 822,709 of 1,000,000 tokens: he is
+    asked to compact.
+57. **Round 2's fix pass: commit e4f4bf4** (2026-11-19 11:12 UTC), nine files, `round2-fixes.diff` applied with `git apply`,
+    committed by path. Checks on it in the main folder, all exit 0 (11:08 to 11:12 UTC): fmt; clippy natively and
+    for wasm32; `cargo test --workspace --locked` (client-endpoint 15, devtools 1, protocol 2, room 1, sim 9,
+    sim-wasm 6); the release tests of sim and protocol; the wasm32 build of the five crates; the generated types
+    written again with no change; tsc on the page and the Worker; unit tests (types 7, net 1, client 48, sim-worker
+    30, e2e's node project 1); boundary 7; the development build (page script 825,212 bytes, 221,820 gzip, 179,924
+    Brotli; Wasm 28,987 / 11,655 / 9,955; Worker chunk 8,226) and the production build; the production check PASS
+    (`production-check.txt`); browser tests 12 passed, three runs in a row (allocation: 51 to 70 bytes per frame,
+    494 to 496 per block, 28 to 30 frames); `node tools/gate.mjs --no-smoke` GATE PASS; the map check OK.
+    **Size: 4,471 added lines** (stop line 4,700). `crates/` and `packages/` at e4f4bf4 equal the scratch
+    worktree's file for file (`diff -rq`), so **the planted defects' third run holds for this head**
+    (`planted-defects-3.md`, 11:00:59 to 11:08:17 UTC: 22 plants, each "FAILED as it must, at the line that names
+    the defect"; the control passes). ADR 0002's pointer: commit 2cedb9c.
+
 ## Current step
-56. **Waiting for his answer to SIZE-STOP-2** (asked 07:57 UTC; no code is added or changed until then). On (a):
-    apply `round2-fixes.diff` in the main folder (`git apply`), update `plants.py` (plant 7b's line is now
-    `toBeLessThan\(610\)`; anchor the patterns as test-engineer's NT2 says; add the Worker-failure plant), run every
-    check, commit by path, save. Then: the planted defects once more on that head, the verifier until PASS, the docs
-    pass (docs-keeper; `decisions.mjs`), the zip (`make-zip.py`), the advisor agent on the final head, the report
-    (with test-engineer's three conditions, `round2-summary.md`), the pull request; stop for his go and his Brave
-    check. On (b): the three test additions come out first; then the same fixes where they still apply.
+58. **The docs pass is running** (docs-keeper; it edits STATUS, the archive, ROADMAP and the map in the main folder:
+    its files are committed by path when it answers; its notes `docs-keeper-notes.md`, its list
+    `docs-keeper-moved-lines.md`). **Next, in order:** (1) the verifier on e4f4bf4 (Opus 5.5, effort max; notes
+    `verifier-final.md`) until PASS; (2) `node .checkpoints/cs2-first-page/decisions.mjs` (five messages into
+    DECISIONS; commit by path); (3) read CI on the pushed head with the GitHub tools; (4) the zip: a clean
+    development build at the final code head, then `python3 -I .checkpoints/cs2-first-page/make-zip.py
+    packages/client/dist .gate/cs2-first-page/zip`, the browser tests against its unpacked copy, sent with the
+    chat's file tool; (5) the report: fill `report-draft.md`'s double-bracket places (its numbers are in step 57
+    and `round2-summary.md`; the docs pass's list; "For Mustafa" = the README steps in `make-zip.py`), write it to
+    `docs/reports/2026-11-19-cs2-first-page.md`; (6) the advisor agent on the final head (it reads main's
+    `.claude/agents/advisor.md`); its verdict goes into the pull request's description; (7) the last commit deletes
+    `.checkpoints/cs2-first-page*` (the report names the commit that still holds the notes) and carries no skip
+    mark; mark #61 ready; (8) **stop for his Brave check and his go.** Not to forget: remove the worktree
+    `.gate/cs2-plants` without force (its edits undone first with `git apply -R` of `round2-fixes.diff`).
 
 ## Next steps
 1. See "Current step". No reviewer runs the browser project or `build.mjs` in the main folder while the main session

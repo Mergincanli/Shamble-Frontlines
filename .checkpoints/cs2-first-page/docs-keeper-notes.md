@@ -16,3 +16,4 @@ Started 2026-11-19T11:04:00Z (date -u). Base main b763ba3 (merge of #60). Branch
 
 ## Log
 - 11:08:47Z moves written by docs-keeper-move.mjs (STATUS 29 -> archive 159; ROADMAP 275-282 -> 121-128; zip pointer archive 978-983).
+- 11:09:48Z archive: #60 row reshaped to merged (159); #58 block pointer extended; #60 block header merged (989-993).
