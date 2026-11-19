@@ -249,6 +249,8 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   the card's 2,700, so the plan must offer a split; notes
   `ci-wasm/engine-architect-cs3.md`: the boundaries, the page's key diagram, the rule tests, the build order). Both
   were given `ci-wasm/cs3-context.md`. A restart gives each the same task again.
+- The advisor agent, part "cs3-plan" (Opus 5.5, effort max, in the background, started 20:36 UTC): the plan review
+  of `ci-wasm/cs3-plan.md`; notes `ci-wasm/advisor-cs3-plan.md`. A restart gives it the same task again.
 - Done: infra-engineer "ci-plan", test-engineer "followups", rust-reviewer "cs3-rng",
   security-auditor "ci-text", the advisor agent "plan" (with its re-read): every notes file ends with DONE.
 - Scratch outside git: `.gate/ci-wasm/` (`hist/`, `proposed/`, `proposed-plant/`, `docs-try/`, `security/`, `mutant/`,
