@@ -4,7 +4,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3
-- **Reopened:** 2026-11-19 13:43 UTC (from the clock). **Last update:** 2026-11-19 13:48 UTC (from the clock).
+- **Reopened:** 2026-11-19 13:43 UTC (from the clock). **Last update:** 2026-11-19 13:50 UTC (from the clock).
 
 ## Why this card exists again
 The first card was folded into the report and deleted in commit 29ab052 (`.claude/CHECKPOINTS.md` section 9). It and
@@ -39,7 +39,7 @@ His earlier words: `docs/DECISIONS.md` (five entries of this change-set, by scri
 - Head 5172dfba8a423869f2e0b7b67c5384f738db7b31, pushed, tree clean. Code final since b27323a (the zip's commit
   7d8e2de2e holds the same code). Pull request #61: draft.
 - The advisor agent (task a9aa7e61d3ebfb467, Opus 5.5, effort max) answered on 5172dfb (its hand-back reached the
-  main session after 13:43 UTC): APPROVE for that head once CI's gate, smoke and toolchain are green on it; all
+  main session at 13:43:25 UTC): APPROVE for that head once CI's gate, smoke and toolchain are green on it; all
   eight findings of its review of 29ab052 closed; two Low wording fixes ride this pass (report: "two autosaves
   (39664c2, e9f31f0)" becomes "two checkpoint saves"; the bullet on the two questions names the three asks of
   SIZE-STOP-2: 07:57:10, 11:07:17 and 11:07:44 UTC). Both are applied in the working tree. It reads the delta from
@@ -63,10 +63,13 @@ His earlier words: `docs/DECISIONS.md` (five entries of this change-set, by scri
    Firefox was read, not run: `cs2-first-page/firefox-reading.md`.
 3. [x] `docs/DECISIONS.md`: his words of 13:36:37 UTC as the newest entry, by script
    (`cs2-first-page/decisions-2.mjs`, 13:45:48 UTC; all seven checks yes). Not committed yet.
-4. [ ] The follow-ups from his points 1 to 4 into `docs/STATUS_ARCHIVE.md` (the block of PR #61) and STATUS's
-   "For Mustafa" line (Brave and once Firefox).
-5. [ ] The report: outcome, decisions, not verified (Firefox was not run here), follow-ups, the new zip's size and
-   sha256, the Firefox steps in "For Mustafa".
+4. [x] The follow-ups from his points 1 to 4 in `docs/STATUS_ARCHIVE.md` (the last group of PR #61's block:
+   SLICE-FEEL, LANE2-LIST, PROJ-DRAW, FIREFOX) and three lines of STATUS (still 120 lines). Issue #59's comment
+   6994614989 was read once for it (16 fields, 6 events, 5 wishes, 10 gaps or questions); nothing was answered there.
+5. [x] The report: outcome, decisions (the last pass), not verified (Firefox read, not run), follow-ups, risks, the
+   new zip's size and sha256, the Firefox steps in "For Mustafa", and section 5 of its list of changed lines. The
+   advisor agent's two Low wordings applied. Checks at 13:50 UTC: repo map OK (161 entries, 109 paths); gate PASS
+   (`--no-smoke`). Not committed yet: DECISIONS, STATUS, the archive and the report go in with the last commit.
 6. [ ] Commit by path, push by hand. The advisor agent reads the delta 5172dfb..new head.
 7. [ ] Fold this card into the report, delete `.checkpoints/cs2-first-page*` in the last commit (no "[skip ci]"),
    push; the advisor agent's verdict on that head; CI green on it (gate with smoke, toolchain).
@@ -75,7 +78,8 @@ His earlier words: `docs/DECISIONS.md` (five entries of this change-set, by scri
    browser checks and his go.
 
 ## Current step
-Steps 4 and 5 (the archive's follow-ups, STATUS, the report); the report's edits are under way, uncommitted.
+Steps 6 and 7 as one: the last commit holds the four docs files and deletes this card and its notes (no
+"[skip ci]"); push by hand; then the advisor agent reads the delta from 5172dfb to that head.
 
 ## Open findings
 None above Low.
