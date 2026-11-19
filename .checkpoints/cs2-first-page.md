@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 23:58 UTC (from the clock)
+- **Last update:** 2026-11-19 00:13 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -283,27 +283,49 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     2,900; stop line 4,000). Departures for the report: `host.ts` is a file of its own beside `worker.ts`; the
     boundary test is `.mjs`; `tick_hz()` is one more export, called once.
 
+31. **Step 6, the page: commit de63a30** (2026-11-19 00:13 UTC). `packages/client`: `index.html`, `vite.config.mjs`, `src/main.ts`,
+    `src/picture.ts` (`Picture`: start, loop, draw, counters, resize, stop), `src/styles.css`, `src/app/` (`boot`,
+    `worker-link` with 6 tests, `error-hook`, `flags` with 4 tests), `src/render/` (`three-picture`, `empty-scene`),
+    `src/overlay/` (`overlay`, `report` with 2 tests), `src/harness/` (`frame-times` with 2 tests, `run-header`);
+    `scripts/build.mjs` (the page's build: `buildPage`, `--production`, `--out-dir`), `scripts/build-checks.mjs`
+    (`cspProblems`, 2 tests). The stubs are gone. First page build (development flavour): the page's script 824,565
+    bytes raw (221,498 gzip -9, 179,793 Brotli 11: three.js's WebGPU build), the Worker's 8,281, the Wasm 29,231,
+    the style 495, the readout and report chunks 617 and 1,992, `index.html` 570. In the container's Chromium
+    (headless; `/opt/pw-browsers/chromium`; a scratch script, not yet a test): backend "WebGL 2 fallback" on the
+    default run and with `?backend=webgl` (no WebGPU adapter here: "No available adapters"), blocks equal ticks,
+    errors 0, undetached 0, at most 1 tick per wake, 0 drops; the renderer's counters: 3 draw calls, 3 triangles, 62
+    lines, 3 geometries, 3 textures; about 8 frames a second (software rendering), so the pool of 4 buffers counts
+    misses here. **Two things found and fixed:** three.js resets its counters in its own loop, so read from our own
+    animation frame they were 0: the frame loop now runs on `setAnimationLoop` (`Picture.loop`); and the software
+    renderer does not draw a line that crosses behind the camera, so the ground (30 m) ends in front of it. One
+    request gets a 404: the browser's own ask for `/favicon.ico`. Type checks, all exit 0 with CI's strict flags:
+    the three packages' shipped files with the lib check on (the page: 0 errors against `@types/three` 0.187.0, two
+    casts, both in `three-picture.ts`, for `backend.isWebGPUBackend` and `backend.device.adapterInfo`; libs
+    `es2023,dom,dom.iterable,esnext.disposable`, `--types vite/client`) and their tests with `--skipLibCheck`. Tests
+    as CI runs them: types 7, net 1, sim-worker 30, client 43, e2e 1; boundary 7; the legacy gate; the map check.
+    **Size: 3,847 added lines** (`git diff --numstat origin/main...HEAD -- crates packages .gitignore Cargo.toml
+    package.json`), against about 2,900 planned and the stop line of 4,000.
+
 ## Current step
-31. **Step 6: the page.** `packages/client/index.html`, `vite.config.mjs` (base `./`, `assetsInlineLimit: 0`,
-    `worker.format: 'es'`, both servers on 127.0.0.1 only: security-auditor's condition 3; `server.fs.allow`
-    narrowed; COOP and COEP only with `SHAMBLE_ISOLATION=1`), `src/main.ts`, `src/picture.ts`, `src/app/`
-    (`boot`, `worker-link`, `error-hook`, `flags`), `src/render/` (`three-picture`, `empty-scene`: the only folder
-    that imports three), `src/overlay/` (`overlay`, `report`), `src/harness/` (`frame-times`, `run-header`),
-    `styles.css`; the page's part of `build.mjs` (Vite's API, the commit and devtools flags, `serve.mjs` copied in
-    the development flavour only, the CSP scan, the 25 MiB check). The stubs `src/index.ts` and `index.test.ts` go.
-    Keep it tight: the budget left is about 1242 lines to the stop line, and steps 6 and 7 are planned
-    at about 760 and 350.
+32. **The size is at the stop line.** Step 7 (the browser tests, planned at about 350 lines) would pass 4,000. His
+    rule: "when one passes twice its plan while it is built, stop and tell me in three lines: what grew, why, and
+    the cheaper option." Told in chat; the answer decides how step 7 is cut. Until then: no new code lines beyond
+    what fits under 4,000.
 
 ## Next steps
-1. Step 7: the browser tests (`packages/e2e/tests/skeleton/`, the `chromium` project, the server only when
-   `SHAMBLE_DIST` is set; the container's Chromium at `/opt/pw-browsers/chromium`, traces off). Step 8: readings,
-   planted defects, the production check, docs, the zip, reviews (seven reviewers: three, three, one), the verifier,
-   the advisor agent on the final head, the report, the pull request (draft, then ready); stop for his go and his
-   Brave check.
-2. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and why `chacha20` 0.10.0 and 0.10.1 were
-   withdrawn. For the report's follow-ups: the npm scope `@shamble`; the overflow readings; the `.d.ts` reading.
-3. Read CI on the head this save pushes (the first with the bindings; `toolchain`'s time).
-4. The saver: restart it within 110 minutes of the time under "Running work".
+1. Step 7 by his answer: the browser tests in `packages/e2e/tests/skeleton/` (the `chromium` project; the server only
+   when `SHAMBLE_DIST` is set; `/opt/pw-browsers/chromium`; traces off): `skeleton` (the backend named on both
+   runs, zero Wasm calls by the page, blocks equal ticks within 1, one post per frame, no buffer left attached,
+   errors 0, the render counts against `render-counts.json`, no request leaving 127.0.0.1), `isolation`, `clock`,
+   `allocation`, `file-url`. The scratch script of the first look is in this session's scratchpad (`try-page.mjs`).
+2. Step 8: readings (the hand-off curve over five block sizes; pacing; sizes), the planted defects, the production
+   check (`dist-prod` scanned for the development markers), the docs pass with the records of plan section 21, the
+   zip, the reviews (seven reviewers: three, three, one), the verifier, the advisor agent on the final head, the
+   report, the pull request (draft, then ready); stop for his go and his Brave check.
+3. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and why `chacha20` 0.10.0 and 0.10.1 were
+   withdrawn. For the report's follow-ups: the npm scope `@shamble`; the favicon 404; the overflow readings; the
+   `.d.ts` reading.
+4. Read CI on the head this save pushes. The saver: restart it within 110 minutes of the time under "Running work".
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
