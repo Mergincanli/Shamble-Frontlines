@@ -164,6 +164,12 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/bpduzpt3j.output` · started
   16:08:58 UTC · stops by 17:58 UTC (110 minutes on) · last check 16:09 UTC: ok (its first line: "watching
   .checkpoints/ on claude/wonderful-hamilton-jdmlnf every 10 min for 110 min").
-- No agent yet. Scratch outside git: `.gate/cs2-first-page/merge/` (his messages as
+- Agents (started 16:13 UTC, both Opus 5.5 at effort max, in the background; at most 3 at a time):
+  infra-engineer, part "ci-plan" (notes `ci-wasm/infra-engineer-ci-plan.md`; it writes the proposed workflow files
+  as scratch copies under `.gate/ci-wasm/proposed/` and the diff as `ci-wasm/ci-edit.diff`; it alone runs the build
+  and the browser tests); test-engineer, part "followups" (notes `ci-wasm/test-engineer-followups.md`). Both were
+  given `ci-wasm/brief-context.md`. A restart gives each the same task again: it continues from its notes.
+- Scratch outside git: `.gate/ci-wasm/hist/` (change-set 2's deleted plan, tool route and security note, taken from
+  history at 29ab052^), `.gate/cs2-first-page/merge/` (his messages as
 first saved, his Firefox screenshot, the merge message's words), `.gate/cs2-first-page/send/` (the zip he tested),
 `.gate/tools/wasm-bindgen-0.2.130/` (the tool).
