@@ -170,6 +170,10 @@
 ## Running work
 - The -20 set (background, from 20:07 UTC); the saver buovbuxl2 (window to about 21:32 UTC: restart before then); the
   check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled while the sets run (a cut stops a set as it stops an agent). No agent.
+- **Written during the set:** -47's report in u4f-report.md ("After the merge", items 1-5); **U4f2's brief rev 1
+  drafted** (u4f2-brief.md, 167 lines: blocks, share +46/+46/22, C-U4F2-5 to -8 numbered, p19 restated, estimate about
+  1,610-2,010 against his 1,500, so to him before the build, U4F2-Q1 to Q5); to the advisor after the sets. -20's first
+  run (A s1): overflow 0, queue high-water 866 (margin 1.85; scratchpad queue_hw.py).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-19 16:00:10 to about 17:45 UTC (builder 4; the session too):** "You've hit your org's monthly spend limit

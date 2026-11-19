@@ -542,6 +542,55 @@ and a half edit, none found, and each notice recorded word for word where cited)
    size line on the card, with its source, before its first snapshot (advisor-u4f-stop.md:84-88). -21 is judged only
    after U4f2 merges.
 
+## After the merge: the pre-runs, the part-clean and the judged sets (items 1 to 5 above)
+1. **The push and CI: done.** 25d316e pushed at c26ff6a; CI green. The advisor's head check: APPROVE WITH FINDINGS
+   (advisor-u4f-merge-head.md): ADV-U4FMH-1, the card's size, fixed by card_trim_1119h.py; -2, `Room::cmd_timing()`,
+   goes to U4f2's lane by number; -3, gate.txt's head, corrected to de3e9e4.
+2. **5.3's pre-runs: done.** `node ops/runs/c-u4f-r2.mjs --date 2026-11-19` through main-run.sh (lock exclusive),
+   19:35-19:42:17 UTC, exit 0 (.gate/u4f-merge/r2.log). It ran at d502f54, whose spikes/netcode-proof tree is
+   25d316e's (f7ed90ad…; `git rev-parse` of both). r2.txt: .gate/netcode-proof-test/u4f-r2-d502f54de6d5/r2.txt, 330
+   lines.
+   - The advisor's read (advisor-u4f-r2.md): 14 of the 17 rows came as expected. p4, p13 and p19 (-21's lag switch
+     under option A) did not: PM-0001-2's in-view precondition fails, because honest slot 24 sits in building area 3
+     from tick 205 to the end (:62-71). Those rows hold only -21's set, which is U4f2's, so -47, -20 and -22 could run.
+   - Its findings go to U4f2's brief by number: F1 as C-U4F2-5 (Medium: the `steady` script has no leash); F2 as
+     C-U4F2-6 (Medium: p19 contradicts U4F-Q15 (c)'s arithmetic); F4 as C-U4F2-7 (Low: the clock suite's shot band,
+     item 4 below). F3 and F5 go into U4f2's record lines, and F6 into -20's report (item 5).
+3. **The part-clean: done.** P27's six `cargo clean` calls and their guards ran in one main-run.sh call, with no lane
+   running (.gate/u4f-merge/clean-shared-2.log, all 16 steps exit 0). D2: 5,204 MiB free before, 11,552 after (about
+   20:00 UTC).
+4. **-47's set: done. PM-0001-47 PASSES.**
+   - **The run:** `flock -x .gate/shared-target/.lane.lock node spikes/netcode-proof/ops/runs/c-u4f-runs.mjs 47 --date
+     2026-11-19`, from the repo root with CARGO_TARGET_DIR unset. 20:00:55-20:06:40 UTC, exit 0, at b57221e
+     (spikes/netcode-proof tree f7ed90ad…, 25d316e's). The results are in
+     spikes/netcode-proof/results/u4f/b57221ed139d/pm-0001-47/ (runs.txt, verdict.json, verdict-bites.json), committed
+     at a4cac39. The binaries: npt-lab sha256 3f21c27b…, the bites build 7b9ce9b2…, npt-judge d8b8c91e…; marks.json
+     c1935a5b…. The set projected 53 MiB against 11,551 MiB free.
+   - **The part** (L1 P2, suite clock, 1,000 connects, a 10 s warm-up and 120 s measured, seeds 1 to 3): all three runs
+     valid. The p99 of |estimate - true| reads 2.597, 2.516 and 2.638 ms against the bar of at most 5 ms, each about
+     1.9 times under it (r2's p21 read 2.60 ms). The reported maximum reads 3.280, 3.907 and 3.842 ms.
+   - **The bites** (seed 1, both runs valid): newest-sample shown (p99 9.246 ms); tick-quantised shown (p99 11.962 ms).
+   - **The rest of each run's line** (runs.txt): overflow resyncs 0, heals 0, measured incomplete 0, press refused 0,
+     buffer full 0, rewinds refused 0, stale 0, 0 audit breaches. Late 11, 6 and 5. The lead is the controller's, at
+     most 9. Wall times 59.3 to 62.1 s.
+   - **F4 (C-U4F2-7), named here as the advisor routes it (advisor-u4f-r2.md:123-129):** every -47 run reads "shots
+     per measured second 0".
+     - Why: the clock suite's clients never fire (`Behaviour::never_fires`, lab/src/scenario.rs:1213-1214;
+       bots/src/lib.rs:658-662).
+     - The lab contract's shot band applies by client count alone (lab/src/contract.rs:227), so it fails on this suite
+       by construction.
+     - No verdict reads the contract, and c-u4f-runs.mjs runs none, so -47's verdict stands. The fix ("not applied" for
+       a never-firing suite) rides U4f2's lane.
+   - **Seed 2: 1,916 slot-ticks in a building (2 slots).**
+     - Why: the clock suite's walk is open loop. Only `Kind::Brawl` takes BRAWL-1's leash (bots/src/lib.rs:651-656),
+       F1's cause too.
+     - -47's part has no in-view precondition (advisor-u4f-r2.md:81-82), so the run stays valid and the verdict stands.
+     - Carry 49's "holding every very large unit" reads 0.9938 on that run and 1.0000 on the others. It is a report
+       figure.
+5. **-20's set: running** since 20:07:24 UTC, at 350677f. Its spikes/netcode-proof differs from 25d316e's only by
+   -47's results: `git diff --quiet 25d316e 350677f -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'`
+   exits 0.
+
 ## Decisions needed
 None.
 
