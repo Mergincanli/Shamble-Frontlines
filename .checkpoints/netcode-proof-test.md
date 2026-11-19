@@ -170,7 +170,9 @@
 - **MAIN-60 DONE** (its record at history.md's end, card_trim_1119c.py): main b763ba3 in at 0f12d9e; CI green on
   bb7a5ed; the advisor's head check APPROVE WITH FINDINGS (advisor-main-60-head.md: six Lows, no push). R3 (iii)'s
   four hand runs done (.gate/u4f/w3-hand.log: each exit 0, contract PASS). The lane goes on from this head.
-- The saver bpcoh9gqm runs from 23:43 UTC with both attribution lines as trailers (ADV-M60-8; `node
+- The saver bpcoh9gqm (23:43 UTC on) ended at a container restart, found at 00:54 UTC (tree clean, HEAD f046f5d = the
+  remote, worktrees and .gate/ intact); not restarted while no agent runs. Restart it with the next agent, with both
+  attribution lines as trailers (ADV-M60-8; `node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: …" --trailer "Claude-Session: …"`,
   run_in_background, timeout 7200000; its window ends about 01:33: restart it while agents run). The 2-hour check-in
   trig_01EKqNqwZrQTVJ6caAyRrug5 is PAUSED from 2026-11-19 00:02 UTC (no agent runs); enable it when agents run again.
