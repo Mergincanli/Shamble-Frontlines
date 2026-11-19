@@ -42,3 +42,26 @@ No agent memory found (.claude/agent-memory-local/test-engineer absent).
 - F-n (planned chunk scan missing): plan 4.3 says the page-imports-no-glue rule "is checked at run time (PM-0002-2) and by a scan of the built page's chunks (no glue in any chunk but the Worker's)". No such scan exists (build-checks.mjs has cspProblems only; grep for glue/__wbg in scripts: none). By hand today: __wbg/sim_wasm/initSync markers only in assets/worker-*.js. Medium if the report repeats the claim.
 - Main folder's fix pass 29378dd (read only) changes block.rs, layout.rs (lookups return Option, expect in const), sim-wasm, build.mjs, boot.ts, worker-link.ts, messages.ts (viewTime leaves), vite.config.mjs, render-counts.json (programs 6), host.test.ts, boundary test: every plant's target file except serve.mjs and read-block.ts/pacing.ts changes, so every plant must be re-run on the final head; plants.py asserts each edit string matches once, so stale strings stop it loudly (7's worker-link strings and 10's vite.config string are at risk).
 - F-f CONFIRMED (slow.exp.ts on the reviewed build, own server, output .gate/test-engineer-cs2/slow.out, 07:40-07:41Z, container loaded by other reviewers): at CPU throttling 1 (fps 5.0): worst |worker.ticks - tick| over 12 reads = 12 (skeleton.spec.ts:125 allows 8); ticksWhileHidden over 3 hides [0,6,10] (:158 allows 8); the Worker's own counters: pauses 3, drops 0 (the claim holds). Throttling 3 and 6 (fps 4.3, 4.0): worst 12 and 12; hides [2,7,7] and [2,8,9]. Both bounds can fail on a slow machine while the claim is true: flake risk, Medium.
+
+### Line-number correction (07:44Z): several numbers above came from multi-file cat -n (numbering runs on across files). Correct numbers, by grep -n per file:
+- pacing.ts: wake :87, drop rebase :104, sleep return :106, pause :110, resume rebase :123, resume return :125.
+- host.ts: hidden branch :90-92 (pause :91, clearTimer :92), resume test :93, copyBlock :140, doneAt :141, post :143.
+- boot.ts: readFlags :28, installErrorHook :29, message listener :40-41, readout request :90-91, link.frame :99.
+- worker-link.ts: hiddenAt :123, ticksWhileHidden :126 (these were right).
+- skeleton.spec.ts: request listener :14, stub list :22, running :30, overlay text :43, blocks~tick :46, worker.ticks~tick :47, undetached :48, posts :49-50, __wasmCalls :53, baseline :57, during-before :74, ticksWhileHidden :80, cap :81.
+- report.ts running timeout :30. allocation.spec.ts: under :17, perFrame :37, perBlock :38, frames>20 :45, limits :48-49. file-url.spec.ts: wait :13, else-branch :20.
+- host.test.ts: memory stand-in :10, post stand-in :46, undetached test :102, hidden test :109. worker-link.test.ts fake port :17. pacing.test.ts pause test :113.
+- schedule.rs: no-drift test :73, rebase test :89. world.rs :109, :148 (right). sim-wasm lib.rs :240 (right). serve.mjs :56, :69, :81 (right). Boundary test lines (single file) right.
+- F-f DEMONSTRATED AS A FLAKE (07:45Z): the reviewed build, the unchanged skeleton.spec (scratch copy, port 4373), --repeat-each=4 --workers=2 (07:44:44-07:45:43Z, output .gate/test-engineer-cs2/repeat.out): 2 failed, 10 passed; both failures at skeleton.spec.ts:80 ticksWhileHidden <= 8, Received 10 and 9. The Worker paused each time (slow.exp.ts: pauses 3, drops 0). Raised to High: a red result with no defect, which a session hits now and CI will hit once CI-WASM adds the browser project.
+
+## Verdict and ranked findings (2026-11-19T07:47Z)
+Findings to fix before the merge.
+1. High (F-d): PM-0002-6's grow clause not proven for the host (boundary/sim-wasm.test.mjs:49-62; host.test.ts:10).
+2. High (F-f, demonstrated flake): skeleton.spec.ts:80 red 2 of 4 on the unchanged build (10, 9); :47 worst 12 at 5 fps; also passes a 7-tick resume (F-c).
+3. Medium (F-e): pacing.ts:106,125 fractional sleep -> early wake -> clamped 4 ms; host.test.ts:49-50, pacing.test.ts:61 fire exactly; E1 numbers.
+4. Medium (F-a, F-b): plants 1 and 8 caught by timeouts; 8.5 also removes the cap; plant 3's other failures are another Sim's ticks; record says "each failing its named check".
+5. Medium (F-h): allocation.spec.ts:17,37-38 misses boot.ts:40-41's listener.
+6. Medium (F-g): skeleton.spec.ts:49-50 does not prove "each frame".
+7. Medium (production + F-n): no committed check for the production build's dev code, and plan 4.3's glue chunk scan does not exist.
+8-10. Low: serve.mjs:56,69,81 refusals without cases, serve.test.mjs:140 silent return; zero-Wasm stub notes (iframe count, unstubbed Global/Table/Tag, one-Worker assert); Rust proxies (world.rs:148, sim-wasm lib.rs:240), host.ts:141 doneAt, file-url.spec.ts:20, worker-link.test.ts:17.
+Worktree left clean (git status --short empty; test-results ignored). Scratch: .gate/test-engineer-cs2/ (tree, rs, dist-*, *.out).

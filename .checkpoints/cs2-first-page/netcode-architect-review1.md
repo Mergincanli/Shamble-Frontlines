@@ -4,3 +4,4 @@ Plan (2026-11-19T07:41:20Z): read plan.md s5 and s15, the resume card (steps 11,
 
 ## Findings (written as made)
 
+- 2026-11-19T07:44:17Z runs: cargo test --workspace --locked --offline (own target .gate/netcode-review1-target): client-endpoint 15, sim 9, sim-wasm 6, protocol 2, room 1, devtools 1, all ok; clippy -D warnings native and wasm32: exit 0; sim-worker vitest --dir src: 30 passed. My files equal 29378dd at HEAD c3b6843 and in the working tree.
