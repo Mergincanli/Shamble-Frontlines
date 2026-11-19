@@ -638,3 +638,14 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "secret: present" (the env block shows "TOKEN: ***": the value masked). So with the reviewer on, a rewritten job
   waits, and after the approval it reaches the token. Sitting 3 now goes in the plan's order (untick, re-run without a
   wait, re-tick; SA-R4's re-run must wait and he rejects it; then cs/b9-prod).
+- His message (2026-11-19 00:10:53 UTC, 5682ca4d-c2ca-4cca-924f-3d1539190ac9), word for word in part: "I have unticked
+  Required Reviewers and saved it" / ""Repository secrets" list says  "This repository has no secrets"." (his words; no
+  screenshot of that list came with it: SA-R8 asks for a screenshot, asked for with the re-tick) / "Open
+  https://claude.ai/customize/connectors. I have opened it and the connection to shamble frontlines is working"; his
+  screenshot is of claude.ai's GitHub plugin page ("GitHub account connected"; "Claude GitHub App", "Cloud sessions
+  only", Mergincanli "Installed"; "Check repository status": "Claude Code cloud sessions can work in
+  Mergincanli/Shamble-Frontlines"; "Connectors: This plugin doesn't include any connectors."): the main GitHub
+  connection, not a way past the proxy's 403.
+- **Window opened: the reviewer off on `preview`** from his "unticked" (00:10:53 UTC). Step 2 (the reviewer bite):
+  run #17 re-run by the session with rerun_workflow_run (201 Created, about 00:11 UTC): attempt 2; its deploy job must
+  run without waiting and print "secret: present".

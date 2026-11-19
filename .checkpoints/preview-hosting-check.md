@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 01:05 Amsterdam (00:05 UTC)
+- **Last update:** 2026-11-19 01:12 Amsterdam (00:12 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -659,6 +659,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - His "you can try again to connect" (2026-11-19 about 00:04 UTC): retried at 00:04:15 UTC: HTTP 403 again, the same
      proxy message. The second GitHub connector (the engineering plugin's) reconnected but asks for a sign-in, which
      only he can give in his claude.ai connector settings; not connected, no tools. So the screenshots stay as above.
+   - **WINDOW OPEN: the reviewer off on `preview` since his "unticked" (2026-11-19 00:10:53 UTC)**; it closes at his
+     re-tick screenshot (Mergincanli listed, bypass off). Run #17 re-run (attempt 2, about 00:11 UTC): no wait and
+     "secret: present" expected. His words on SA-R8 ("This repository has no secrets") came without a screenshot: the
+     screenshot asked for with the re-tick.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
