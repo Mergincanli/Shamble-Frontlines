@@ -198,6 +198,9 @@ test("the glue stays in the Worker's chunk, and development code stays out of a 
   expect(bundleProblems([worker, file("assets/index-abc.js", "__wbg_init()")], true)).toEqual([
     "assets/index-abc.js: the Wasm's glue outside the Worker's chunk",
   ]);
+  expect(bundleProblems([worker, file("assets/index-abc.js", "WebAssembly.validate(b)")], true)).toEqual([
+    "assets/index-abc.js: the page's code names WebAssembly",
+  ]);
   expect(bundleProblems([worker, page, dev], true)).toHaveLength(4);
   expect(bundleProblems([worker, page], false)).toHaveLength(4);
 });

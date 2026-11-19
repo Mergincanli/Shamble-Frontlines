@@ -139,9 +139,12 @@ const DEV_MARKERS = ["Copy report", "__shambleReport", "ticks while hidden", "fi
  */
 export function bundleProblems(files, production) {
   const scripts = files.filter(({ name }) => name.endsWith(".js")).map(({ name, bytes }) => ({ name, text: Buffer.from(bytes).toString("utf8") }));
-  const problems = scripts
-    .filter(({ name, text }) => !/(^|\/)worker-[^/]*\.js$/.test(name) && /__wbindgen|__wbg_/.test(text))
-    .map(({ name }) => `${name}: the Wasm's glue outside the Worker's chunk`);
+  const page = scripts.filter(({ name }) => !/(^|\/)worker-[^/]*\.js$/.test(name));
+  const problems = [
+    ...page.filter(({ text }) => /__wbindgen|__wbg_/.test(text)).map(({ name }) => `${name}: the Wasm's glue outside the Worker's chunk`),
+    // The page never touches WebAssembly (PM-0002-2): its chunks do not even name it, wherever a call would sit.
+    ...page.filter(({ text }) => text.includes("WebAssembly")).map(({ name }) => `${name}: the page's code names WebAssembly`),
+  ];
   for (const marker of DEV_MARKERS) {
     const found = scripts.filter(({ text }) => text.includes(marker)).map(({ name }) => name);
     if (production && found.length > 0) problems.push(`${found.join(", ")}: development code in a production build (${JSON.stringify(marker)})`);
