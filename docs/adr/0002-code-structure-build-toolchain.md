@@ -1498,6 +1498,12 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
       one block per tick and draws an empty scene from it,
       naming its backend (ADR 0003's milestone); the page makes zero Wasm calls; the first recording's per-tick hashes
       match natively twice and in Wasm (ADR 0004's milestone).
+      _Pointer (2026-11-19, change-set 2 of the build plan): for this step, "one change-set per step" above is changed
+      by Mustafa's answer SPLIT-25 of 2026-11-17 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-17, 19:10:44
+      UTC: his go on the build plan", answer 1): "(a). Step 2.5 is built as two change-sets." They are the build plan's
+      change-sets 2 ("First page": the path from the simulation to the screen, with one block per tick, the empty scene,
+      its named backend and zero Wasm calls from the page) and 3 ("The loop closes": the messages over the loopback and
+      the first recording). The "Done when" above is unchanged, and it is met only when both have landed._
    6. *Previews.* After ADR 0006's preview hosting check, with B9's interim position in place (ADR 0006, part 13): the
       build, deploy, close and sweep workflows, the production deploy job and the generated header sets. *Done when:* a
       same-repository pull request has its link within 5 minutes after the build job ends, or after the reviewer's

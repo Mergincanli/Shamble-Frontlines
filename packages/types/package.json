@@ -5,6 +5,9 @@
   "description": "Types generated from Rust (ADR 0002 part 5): the message types, the block's layout and its hash, and the check of that hash.",
   "license": "UNLICENSED",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "test": "vitest run"
   }

@@ -156,6 +156,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
+| **the kit hold and two CI edits** (kit-hold-ci), by lane 1, on his words of 2026-11-18, 15:38:13 UTC ("One small pull request with the kit hold and the two CI edits, nothing else in it."): the checkpoint script holds a push that changes a manifest or a lockfile until its security check is recorded (`.claude/scripts/checkpoint.mjs`, six new tests, one rule line in `.claude/CHECKPOINTS.md` §3; his answer DEP-HOLD (a), written on his yes to its exact text: KIT-TEXT, yes with one change, then KIT-FIX, the fix of a hole in the changed lines); the `toolchain` job runs with no cache (his CI-CUT (a), part 1), writes the generated types again and compares them, and type-checks `packages/types` with strict flags (his CI-TYPES (a)); his three messages of the day in `docs/DECISIONS.md` by script; 293 added lines, accepted by his word of 18:01:08 UTC; report `docs/reports/2026-11-18-kit-hold-ci.md`. Meanwhile, in his words: "No new library of change-set 2 is committed before that pull request is merged." Open after it, as follow-ups (below, "Follow-ups", "From the kit hold and two CI edits (PR #60)"), each below High and so a follow-up by his word of 18:01:08: security-auditor's two Mediums, F1 (in two corners the hold checks another path than the one it pushes: a root folder whose name begins with a blank character, or is not valid UTF-8) and F3 (no rule makes the review of a pull request read the hold's record; until a kit change, change-set 2's report quotes each record and the security answer it names), and its three Lows; test-engineer's three Mediums (behaviours no test pins: main's side of the "equal to main" comparison read at the exact path, a `deleted  <path>` line leaving an existing file held, `origin/main` over a local `main`) and seven Lows; infra-engineer's six Lows (two for his list for the quality gate v2's plan, four on the report's wording) | merged: PR #60 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/kit-hold-ci`), lane 1's first builder chat), b763ba3, 2026-11-18 20:30:46 UTC (the merge commit's date; `merged_at` 20:30:47), by merge commit (parents 9b4b518 and e5ca735), on his go of 20:20:09 UTC for head e5ca7358d5a3f8cc68ee07cd59d7bbf2c45e253d, his words in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC), after the advisor agent's APPROVE of that head (in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 900 with smoke, id 44391809186; toolchain run 198, id 44391809357; push, on b763ba3) | done: the four files written on his yes at 17:15 UTC, two of them again at 18:01 UTC (commits 8bf4bee and 94c197f, pushed 17:18:16 UTC; 4877599, pushed 18:03:10 UTC); the new CI lines on real runs from 17:18 to 17:23 UTC ("Cache mode: none" in the job's log; the compare step failing on a planted change, then passing on the clean tree); one review round, its notes committed at 18:08:01 (infra-engineer), 18:31:54 (security-auditor) and 18:40:04 UTC (test-engineer): nothing Critical or High; the verifier's verdict: the report; the advisor agent's: the pull request's description; with the merge he accepted the four things that went wrong as the report writes them down, the five Medium findings as follow-ups ("They are fixed with the kit changes of the quality gate step. Until then every ready report of a pull request that changes a manifest or a lockfile quotes each release record and the security answer it names."), the two wording slips left in the report, the size (293 added lines against the stop line of 300) and the checkpoint commits in main's history; his answers WRITE-MODE (a) and REC-OLD (a), with one limit; its merge recorded by #61 | none |
 | **change-set 1 of the build plan, Types** (foundation step 2.4), by lane 1: the first eight message types in `crates/protocol` (plain types, no codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript generated into `packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's layout-hash check; his go on #57 and his answer OLD-LINES (who may fold old lines in the shared record files) in `docs/DECISIONS.md` by script; report `docs/reports/2026-11-18-cs1-types.md`; its follow-ups, open after it (CI-CUT; the security check's L1, L2 and L4; the lines for change-sets 2, 3 and 4, the 2.3 chat and the drafts' next revision; round 2's Lows): below, "Follow-ups", "From change-set 1, Types (PR #58)" | merged: PR #58 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs1-types`), the build chat on his personal account), 9b4b518, 2026-11-18 15:39:28 UTC (the merge commit's date; `merged_at` 15:39:29), by merge commit, on his go of 15:38:13 UTC for head 1bfe462e339511cfae6b30a1015330d9ff2e718c, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 15:38:13 UTC), after the advisor agent's APPROVE of that head (in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 884 with smoke, id 44338178450; toolchain run 182, id 44338178455; push, on 9b4b518) | done: two review rounds and the verifier's PASS (15:03 UTC); with the merge he accepted the two misses as written (CI built the nine new packages before their security check, Medium, "written down, not waived"; one evidence record did not hold, and the runs were redone), the size as counted (940 hand-written lines against 600 planned, under his stop line of 1,200), round 2's Lows as follow-ups, what was not verified and the checkpoint commits in main's history; his five answers: DEP-HOLD (a) and CI-TYPES (a), and CI-CUT (a) part 1 (the kit hold and the two CI edits: PR #60), LANE-ISSUE (a) (the "Lane requests" issue: #59, opened 15:41:35 UTC) and WATCH-58 (b) (not watched); its merge recorded by #60 | none |
 | **Part 15 of the build plan, "The second lane", to main** with his six answers (all (a), with additions), a docs change of its own (his go for #56): his words of 2026-11-17, 22:10:34 and 22:59:16 UTC, in `docs/DECISIONS.md` by script; Part 15 as he read it, with his answers on top: `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules file's line on gun files (GUN-FILES, AX-R1); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. Then change-set 1, Types (foundation step 2.4), by lane 1; lane 2 (`claude/optimistic-albattani-mdoonz`) works by Part 15, each unit from the point its 15.2 names | merged: PR #57 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/part-15-second-lane`), the build chat on his personal account), 22c6afa, 2026-11-18 11:09:31 UTC (the merge commit's date and `merged_at`), by merge commit, on his go of 11:08:25 UTC for head f26ac5b85396f4b280ba21e57f2a1ea177382d80, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 11:08:25 UTC), after the advisor agent's APPROVE of that head (about 00:17 UTC, in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 866 with smoke, id 44292101495; toolchain run 165, id 44292101705; push, on 22c6afa) | done: report `docs/reports/2026-11-17-part-15-second-lane.md`; docs-keeper's pass, the verifier's PASS (seven Lows, fixed) and the advisor agent's APPROVE at 3e4fea1 (five Lows, fixed); with the merge he accepted his go on #56 as recorded, Part 15's text as he read it (where it differs from his answers, his answers hold), the size as counted (220 written lines against the stop line of 300, and 339 copied), the lines left as found because another lane wrote them, and the checkpoint commits in main's history, and he answered OLD-LINES, who may fold old lines in the shared record files (his go, above); the advisor agent's three Lows on the final head: two in STATUS, fixed by #58's docs pass, and a size recount, left to #58's report; its merge recorded by #58 | none |
 | **change-set 0 of the build plan** (foundation steps 2.4 and 2.5 and Slice 1, built now: his decision of 2026-11-14 and his go of 2026-11-17; the plan carried to main as `docs/reports/2026-11-17-build-plan-slice-1.md` with its appendix): his five messages of 2026-11-14 and 2026-11-17 in `docs/DECISIONS.md` by script (his go says: "No game code is built before change-set 0 is on main."; his CHANGE 2: "Two chats build the game on my personal account.", the second since 2026-11-15, `claude/optimistic-albattani-mdoonz`, Opus 5.5 with Fable 5.2 on its advisor tool, running the preview hosting check in a separate test repository); the model-file rules and the soldier's joint list, on paper, no export through them yet (`docs/research/asset-export-rules.md`, `docs/research/soldier-joint-list.md`; OQ-0005-AS3 and AS4 answered in part; ten new pass marks, PM-0005-47 to -56, first run at the plan's change-set M); his answers where the drafts ask (OQ-0002-6, OQ-0006-18, OQ-0003-1 further in part, the three "do soldiers block" rows, PM-0004-34's row; the register's open questions 98 to 96). Open after it, for "Follow-ups" once merged: the draw cap with a gun from its own file (the rules' O1; PM-0005-54 fails on the rifle file as reported: a question for him with change-set M's plan); the fifth material class's name (O2); the rules' proof by a first real Blender export (change-set M); whether the coat keeps the legacy motion (his call at change-set 10's pictures); the machine lines in ADR 0001, ADR 0003 and SPIKE_PLAN and ADR 0002's "one change-set per step", carried later (the plan report's "Since the plan" names each carrier) | merged: PR #56 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs0-model-rules`), the build chat on his personal account), d7dad97, 2026-11-17 23:00:12 UTC (the merge commit's date; `merged_at` 23:00:13), by merge commit, on his go of 22:59:16 UTC for head cd61b28350c4407d2f19b1b3603ea4beca8b4e30, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-17, 22:59:16 UTC), after the advisor agent's APPROVE of that head; `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 856 with smoke, id 44195404107; toolchain run 155, id 44195404068; push, on d7dad97) | done: 3747bb3, 4a1b0d7, 212f55b, 5f356ef, 65c8fe8, cacea55 (the two research files); two review rounds done (test-engineer, engine-architect, the verifier twice: PASS); the advisor agent approved its content at 47546e9, its conditions met in the last commits; report `docs/reports/2026-11-17-cs0-model-rules.md`; with the merge he accepted that PM-0005-54 stands as written (a fail with today's rifle prototype, not waived), the size as counted, the three things the verifier did not verify, and the checkpoint commits in main's history (his go, above); the open items: the Follow-ups, "From change-set 0 (PR #56) and Part 15 (PR #57)"; its merge recorded by #57 | none |
@@ -924,6 +925,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - the machine lines in ADR 0001, ADR 0003 and SPIKE_PLAN and ADR 0002's "one change-set per step", carried later (the
     plan report's "Since the plan" names each carrier). The machine lines go with change-set 6's docs pass, when the
     machines are named (MACHINES); "one change-set per step" with change-set 2's docs pass (SPLIT-25).
+    _Since (change-set 2's docs pass, 2026-11-19):_ "one change-set per step" has its dated pointer of 2026-11-19 in
+    ADR 0002 (commit 2cedb9c, PR #61, in flight); the machine lines still wait for change-set 6's docs pass.
   - For the decision drafts' next revision: ADR 0002's package list and the seventh package. His answer VFX-ROUTE (a) of
     2026-11-17 is "also my word on a seventh package beside the six the structure draft names" (`docs/DECISIONS.md`,
     22:10:34 UTC); a dated pointer of 2026-11-17 marks the list (ADR 0002, part 3) and leaves where the package stands
@@ -974,12 +977,24 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     `crates/protocol/src/ts_export.rs:76` and `crates/client-endpoint/src/layout_ts.rs:58` ("never writes outside the
     repository") and `crates/protocol/src/messages.rs:56` (`Input.commands`, "consecutive"); #60 touches none of the
     three files, so both stay for the next pull request that does [verified 2026-11-18].
-- **From the kit hold and two CI edits (PR #60)** (in flight; one review round: security-auditor and test-engineer on
-  the final kit text, 4877599, infra-engineer on the workflow edit, 94c197f; their notes committed at 18:31:54,
-  18:40:04 and 18:08:01 UTC; nothing Critical or High; by his word of 18:01:08 UTC, `docs/DECISIONS.md`: "A later
-  finding on them that is not Critical or High becomes a follow-up."; the notes stay readable at the checkpoint commit
-  that `docs/reports/2026-11-18-kit-hold-ci.md` names; each reviewer's codes are its own: security-auditor's F1 to F5,
-  test-engineer's F1 to F11 and infra-engineer's L1 to L6 are different findings):
+  - _Since (change-set 2's docs pass, 2026-11-19):_ the question whether #58's test zip saved and unpacked on his
+    laptop (STATUS, "Waiting on Mustafa", until this pass) is answered, his message of 2026-11-18, 20:44:29 UTC, with
+    a screenshot: "the zip saved and unpacked" (copied by script into change-set 2's notes,
+    `.checkpoints/cs2-first-page/mustafa-2026-11-18-zip-saved.md`, kept at the commit change-set 2's report names). As
+    the build chat read his screenshot, the SHA256 PowerShell printed for `packages\types\src\generated\block\layout.ts`
+    equals the expected one. Change-set 2 (PR #61) touches none of the three files with the two doc lines either
+    (`git diff --stat origin/main...HEAD -- crates`), so they still wait [verified 2026-11-19]. Of the five lines for
+    change-set 2 above, PR #61's code has each: the `exports` entry; the block writer's offsets through
+    `layout::section` and `layout::field`, read in constants, so a missing name stops the build; `Section::align()`
+    in Rust only; the export tests still in `#[cfg(test)]` modules; the layout check on the first block after each
+    Worker start (`packages/client/src/app/worker-link.ts`) [verified 2026-11-19, PR #61 not merged yet].
+- **From the kit hold and two CI edits (PR #60)** (merged as b763ba3 on 2026-11-18 on his go of 20:20:09 UTC,
+  `docs/DECISIONS.md`, with which he accepted "The five Medium findings as follow-ups."; one review round:
+  security-auditor and test-engineer on the final kit text, 4877599, infra-engineer on the workflow edit, 94c197f; their
+  notes committed at 18:31:54, 18:40:04 and 18:08:01 UTC; nothing Critical or High; by his word of 18:01:08 UTC,
+  `docs/DECISIONS.md`: "A later finding on them that is not Critical or High becomes a follow-up."; the notes stay
+  readable at the checkpoint commit that `docs/reports/2026-11-18-kit-hold-ci.md` names; each reviewer's codes are its
+  own: security-auditor's F1 to F5, test-engineer's F1 to F11 and infra-engineer's L1 to L6 are different findings):
   - **His list for the quality gate v2's plan** (step 2.3), in his words, from `docs/DECISIONS.md`:
     - DEP-HOLD (how a dependency change is kept from being built before its security check), his answer of 15:38:13
       UTC: "The check in CI that option (c) adds is not decided here: put it on the list for the quality gate v2's
@@ -1049,6 +1064,90 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     that the cache service refuses anything (and until part 2 the post steps of checkout and setup-node still run after
     the cut, with the network and the read-only token); the job-log endpoint is named as the source of the quoted log
     lines.
+- **From change-set 2, the first page (PR #61)** (in flight; two review rounds, seven reviewers on its first head and
+  six on what the fixes changed, each Opus 5.5 at effort max: no Critical, no High open; every finding below is Low;
+  round 2's three Mediums and its fix pass: `docs/reports/2026-11-19-cs2-first-page.md`; the reviewers' notes stay
+  readable at the checkpoint commit that report names. The ids are this docs pass's: a prefix for the reviewer (EA
+  engine-architect, GE graphics-engineer, NA netcode-architect, PA perf-auditor, RR rust-reviewer, SA security-auditor,
+  TE test-engineer) and the reviewer's own code where it has one; reviewers' codes overlap between them):
+  - **For the CI pull request (CI-WASM), right after the merge:**
+    - TE-NT6: the browser checks that depend on the machine's speed (the frame count in the allocation window, the
+      hidden-tab waits) are tuned on this container only.
+    - RR-N4: the pattern that refuses cargo's settings from the environment in `packages/client/scripts/build.mjs` has
+      no test of its own.
+    - RR-F5: the Wasm carries the builder's registry path (a panic location inside wasm-bindgen), so one commit gives
+      other Wasm bytes and sizes on another machine (also for change-set 3's size table).
+    - E2E-TYPES: the browser specs in `packages/e2e/tests/` are run by Playwright but type-checked by no tool.
+    - SA-TREE: the list of third-party crates with an overflow override (root `Cargo.toml`) is checked by hand
+      (`cargo tree`); a test would stop a new runtime crate from shipping without its override.
+    - SA-DIST: `.gitignore` covers `dist/` but not the `dist-<something>` folders `build.mjs --out-dir` accepts.
+  - **For change-set 3, "The loop closes":**
+    - NA-N1 to NA-N7 (netcode-architect, all Low): the step gets the host's time; the pause on a hidden tab comes from
+      the mode once online play lands, and held buttons are cleared on hide; who picks the blend fraction between two
+      blocks (one sentence in `picture.ts` now, a field at change-set 4; events read from every block); the seed as an
+      authority-only section written last, so the shared state is a prefix; the page's per-frame number is not the
+      protocol's command sequence (name it the post number); a start tick in the authority's match setup; the Pacer
+      throws on a due time that is not finite. Its answers for that plan: `checked_sub` or wrap-aware compares on
+      decoded ticks, never a plain minus.
+    - EA-F8: the Worker-to-page messages are parsed by hand (an `isWorkerToPage` beside `isPageToWorker`).
+    - EA-F9: the endpoint's state lives in `sim-wasm`; it belongs in `client-endpoint` from change-set 3.
+    - EA-F10: `newest_input`, which only tests call, ships in the player's Wasm (drop it when the input reaches a
+      command), and test-only members ship in the TypeScript (`Ring.clear`, `BlockPool.free`, the `percentile`
+      re-export).
+    - EA-F13: nits on ownership and small couplings.
+    - EA-N3: "the match is over" has two owners, and the Worker's error event does not tell the link.
+    - EA-N5: why a fallback runs is worked out in the app shell, not reported by the picture (engine-architect: or when
+      `render/` changes hands, change-set 5).
+    - EA-N6: the build's glue check finds the Worker's chunk by a name prefix.
+    - VF-L7 (the verifier's re-check): the same name prefix lets a lazily loaded page module named `worker-...` go
+      unscanned by the build's WebAssembly check (its second plant passed both builds): scan every script but the
+      Worker's entry chunk, named by the build itself. With EA-N6.
+    - VF-L4, VF-L5 (the verifier): the policy header is asserted on the 200 answer only; the build's refusal of
+      environment settings has no test (with RR-N4).
+    - GE-N1: the lost-device and lost-context route has no test.
+    - GE-N4: each renderer error prints twice, with three's doubled prefix.
+    - GE-N5: after a lost device the page says nothing outside the development readout (with ADR 0003's loss
+      handling).
+    - GE-N6: "because WebGPU did not start" cannot say why (no adapter, or the device request failed).
+    - TE-NT3, TE-NT4, TE-NT5, TE-NT7: no test for the cleaning of the error text, or for the hand-off time read before
+      the copy; one equality in the browser test also holds on stale reports; the listener's own body is outside the
+      allocation sums.
+    - PA-N2: on a fast machine the per-frame allocation window can fall partly before the browser optimises the code.
+    - PA-L2: the pool's size assumes one tick per frame and one per wake (a pool of 9 once blocks grow).
+    - TE-L: four branches of the small server without a test case of their own; `skipIf` for the link cases; more
+      `WebAssembly` names in the test stand-ins; one Worker only; the scratch-buffer test.
+    - SA-ENV: the isolation spec sets two variables in the test process and never restores them (no later spec reads
+      them today).
+    - FAVICON: the browser's own request for `/favicon.ico` gets a 404.
+  - **For change-sets 5 and 6 (the picture and the look):** GE-F7, the memory cost of multisampling (an estimate of
+    about 125 MB at 1920x1080; three's memory count leaves the samples out); PA-L4, the readout's frame time is the
+    interval between animation frames, not the frame callback's own work time (both change-set 6).
+  - **For the quality gate step (2.3):**
+    - SA-F6: the npm scope `@shamble` is unclaimed: someone who claims it could publish `@shamble/types@0.0.0` for an
+      install that resolves without the lockfile (ours follow it); the options: claim the scope (an act of his own
+      account) or a check that every `@shamble/*` lockfile entry is a link into `packages/`.
+    - SA-SWAP: in the root container a process left behind could swap the wasm-bindgen tool between its check and its
+      run (residual).
+    - TE-NT2: the planted-defect script matches a failure by its text, not by the failing line's mark; the planted set
+      belongs in the gate v2's.
+  - **For the decision drafts' next revision (his go):** EA-F6, the block has one fixed size for a Sim's life, which
+    ADR 0002 part 5 does not decide (record it there); EA-F12, decide and record whether the Worker's counters ship in
+    production as monitoring candidates.
+  - **From his words of 2026-11-19, 13:36:37 UTC** (whole in `docs/DECISIONS.md`, the entry of that time; the ids
+    SLICE-FEEL and PROJ-DRAW are his, LANE2-LIST and FIREFOX this pass's):
+    - SLICE-FEEL, for change-set 4's plan: aiming down sights and the sprint-to-fire delay are game rules of Slice 1.
+      That plan prices and places both: the input, the rule, the fields, what lands in change-set 8, and the lines
+      they add. The starting values come from his Testlines export (his sandbox: look at it, copy no code).
+    - LANE2-LIST, for change-set 4's plan: lane 2's first list of needs on the "Lane requests" issue #59 (issue comment
+      6994614989 of 2026-11-18, 23:24:14 UTC: 16 fields, 6 events, 5 wishes, 10 gaps or questions, by its own count)
+      is answered there row by row; with SLICE-FEEL its wishes W1 and W4 are needs. A comment there is never his word.
+    - PROJ-DRAW, for change-set 9's plan: lane 1 draws grenades and arrows in flight plainly; they pass to lane 2 with
+      the plain tracers and flash when change-set 9 is merged.
+    - FIREFOX, from now on: the game has to work in Chrome, the Chromium-based browsers and Firefox (Safari and Mac
+      come later). The browser tests run in Chromium only (one browser project; the allocation test uses Chromium's
+      own profiler). A Firefox run needs a Firefox build from the internet: the question goes to him with the CI pull
+      request's text. His check of #61 in Firefox is the page's first Firefox run; what it finds is a fix before the
+      merge or a follow-up here.
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -1391,7 +1490,8 @@ and the night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); nei
 | Seeded match pairs (240) | tree-face stall windows 1885 -> 0; mean stall 9.12% -> 8.50% | 2026-10-14 | scratch harness (report) |
 | Editor rebuild (Cabana): full-map draw calls boot / 1 / 2 rebuilds | base 1992 / 2406 / 3502 · head 1992 / 1992 / 1992; heap after GC boot / 10 rebuilds: base 42.9 / 119.5 MB · head 42.7 / 44.5 MB | 2026-10-14 | preview.js harness + perf-auditor |
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
-| CI on main, latest (the row below is older) | `gate` with `smoke` (run 884, id 44338178450) and `toolchain` (run 182, id 44338178455) success on 9b4b518, PR #58's merge commit (push) | 2026-11-18 | GitHub Actions runs (API) |
+| v2, the first page (change-set 2, PR #61, in flight): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
+| CI on main, latest (the row below is older) | `gate` with `smoke` (run 900, id 44391809186) and `toolchain` (run 198, id 44391809357) success on b763ba3, PR #60's merge commit (push) | 2026-11-18 | GitHub Actions runs (API) |
 | CI on main | `gate` and `smoke` success on 44446a5 (PR #44's merge commit) after one re-run: run 42673290304's first attempt lost its `gate` job on GitHub's side (only `smoke` ran, green); attempt 2 green, 06:37 UTC | 2026-11-10 | GitHub Actions runs (API) |
 | Gate (official battery, older) | 0 flagged, 44 editor refs all guarded | 2026-10-10 | battery.js |
 

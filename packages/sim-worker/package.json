@@ -2,10 +2,17 @@
   "name": "@shamble/sim-worker",
   "version": "0.0.0",
   "private": true,
-  "description": "Hosts sim-wasm, paces the tick and runs the local match (ADR 0002 parts 3 and 5). Empty until the skeleton step.",
+  "description": "Hosts sim-wasm, paces the tick and runs the local match (ADR 0002 parts 3 and 5).",
   "license": "UNLICENSED",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./worker": "./src/worker.ts"
+  },
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run --dir src"
+  },
+  "dependencies": {
+    "@shamble/types": "0.0.0"
   }
 }

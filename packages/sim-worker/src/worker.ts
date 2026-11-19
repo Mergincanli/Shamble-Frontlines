@@ -1,0 +1,57 @@
+// The Worker's entry: it loads the Wasm, draws the match seed and hands everything else to the host (host.ts). The
+// page never touches the Wasm: it starts this Worker, posts its newest input each frame and receives one block per
+// tick (ADR 0002 part 5).
+import init, { Sim, tick_hz } from "../pkg/sim_wasm.js";
+import { SimHost } from "./host.ts";
+import { isPageToWorker, MODE_LOCAL, type WorkerToPage } from "./messages.ts";
+
+let host: SimHost | undefined;
+let starting = false;
+let hiddenWhileLoading = false;
+
+function tell(message: WorkerToPage, transfer: ArrayBuffer[] = []): void {
+  postMessage(message, transfer);
+}
+
+async function start(padBytes: number): Promise<void> {
+  const wasm = await init();
+  // The seed is drawn here and goes nowhere else: no message carries it and nothing logs it (ADR 0004 part 8).
+  const seed = crypto.getRandomValues(new Uint8Array(32));
+  const sim = new Sim(seed, MODE_LOCAL, padBytes, performance.now());
+  seed.fill(0);
+  host = new SimHost(
+    sim,
+    {
+      memory: wasm.memory,
+      now: () => performance.now(),
+      timeOrigin: performance.timeOrigin,
+      post: tell,
+      setTimer: (run, delayMs) => setTimeout(run, delayMs),
+      clearTimer: (id) => clearTimeout(id),
+      hardwareConcurrency: navigator.hardwareConcurrency,
+      crossOriginIsolated,
+    },
+    tick_hz(),
+  );
+  host.start();
+  if (hiddenWhileLoading) host.onMessage({ type: "visibility", hidden: true });
+}
+
+addEventListener("message", (event: MessageEvent<unknown>) => {
+  const data = event.data;
+  if (host !== undefined) {
+    host.onMessage(data);
+    return;
+  }
+  if (!isPageToWorker(data)) {
+    tell({ type: "error", message: "the Worker got a message it does not know" });
+  } else if (data.type === "start" && !starting) {
+    starting = true;
+    start(data.padBytes).catch((error: unknown) => {
+      tell({ type: "error", message: error instanceof Error ? error.message : String(error) });
+    });
+  } else if (data.type === "visibility") {
+    // The tab may be hidden while the Wasm loads: the match then starts paused.
+    hiddenWhileLoading = data.hidden;
+  }
+});
