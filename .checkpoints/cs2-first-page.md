@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 00:17 UTC (from the clock)
+- **Last update:** 2026-11-19 00:27 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -316,30 +316,47 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     without the fixture (client 1,790; sim-worker 1,203; client-endpoint 342; sim-wasm 253; sim 217; e2e 134;
     types 3; root manifests and `.gitignore` the rest), against about 2,900 planned and the stop line of 4,000.
 
+33. **The size's stop line was reached and he was told in three lines** (00:17 UTC; 3,964 of 4,000). **His answer
+    to SIZE-STOP: "A"** (2026-11-19T00:18:21.961Z; `cs2-first-page/mustafa-2026-11-19-size-stop.md`, by script):
+    option (a), the stop line moves to 4,400 and the four remaining specs are written as planned.
+34. **His message of 2026-11-19T00:23:22.833Z** (`cs2-first-page/mustafa-2026-11-19-until-7am.md`, by script): "You
+    don't need to ask permission anymore until 7 am (I am going to sleep), I'll see in the morning what you've done
+    Continue with your work as you are". Read as: no stop-and-ask until 7 am his time (06:00 UTC) for the work of
+    this change-set. Not read as a go for what his standing rules keep for his explicit word: a merge (and no
+    merge of visual work before his Brave check), a kit, gate or CI edit, any other file, version or checksum of
+    code from the internet.
+35. **Step 7, the rest: commit 74a0c24** (2026-11-19 00:27 UTC). `packages/e2e/tests/skeleton/`: `isolation.spec.ts` (4 cases),
+    `allocation.spec.ts`, `clock.spec.ts`, `file-url.spec.ts`, `report.ts` (shared), `skeleton.spec.ts` (uses it).
+    In the container's Chromium: 10 passed, four runs in a row. Facts: Playwright's clock does not reach the Worker
+    (ticks 22, 83, 85: it ran on real time while the page's clock stood still); opened as a file the page does not
+    run in Chromium ("Access to script at 'file:///...' from origin 'null' has been blocked by CORS policy") and the
+    plain line shows; the hand-off's page code allocates 63 to 81 bytes per frame and 113 to 129 bytes per block
+    (four runs), about 4,400 bytes a second. **Size: 4,126 added lines** (stop line 4,400).
+36. **Readings in the container's Chromium** (00:18 to 00:19 UTC; `cs2-first-page/readings.mjs`; Chromium 153
+    headless, WebGL 2 fallback, about 8.6 frames a second from software rendering): for block sizes of 8, 1,032,
+    4,104, 16,392 and 65,544 bytes the Worker's copy is 0.000 ms at p50 and 0.100 ms at p99 (the Worker's clock
+    steps by 0.1 ms here); delivery to the page 58 to 63 ms at p50 and 112 to 119 ms at p95, which is the page's
+    own slow frame, not the block's size; tick start lateness 3.7 to 3.8 ms at p50, 6.7 to 9.2 ms at p99; at most
+    1 tick per wake; 0 drops; 4 to 11 pool misses (the page returns buffers once per slow frame).
+
 ## Current step
-33. **Stopped at the size's stop line, and told him in three lines** (his rule). Not built, because each would pass
-    4,000: the four remaining specs of step 7 (`isolation`: the flag's four Chromium cases and its planted failure,
-    PM-0002-20; `allocation`: the method of PM-0002-7; `clock`: does Playwright's clock reach the Worker,
-    R5-TEST-OQ1; `file-url`: the built page opened as a file, OQ-0002-1), about 200 lines. Question SIZE-STOP is
-    with him: (a) the stop line moves to 4,400 and the four specs are written as planned; (b) the four move to
-    change-set 3 and change-set 2 ends near 3,970 lines of code plus its docs.
-    **What goes on meanwhile, adding no code line:** step 8's readings and planted defects (scratch runs, recorded
-    in the notes), the production check, the docs pass's records, the zip for his Brave check.
+37. **Step 8.** The first three reviewers read the code (engine-architect, graphics-engineer, rust-reviewer; Opus 5.5
+    at effort max; one round is all seven). Beside them the main session: the planted defects (a throwaway
+    worktree `.gate/cs2-plants` with its own build folder), the production check, the remaining readings (tsc times
+    with the lib check on and off; a try of WebGPU on the software adapter). Then the next three reviewers
+    (perf-auditor, security-auditor, test-engineer), then netcode-architect; one fix pass; the verifier; the docs
+    pass (docs-keeper; the records of plan section 21, his messages of 20:20:09, 22:34:37, 00:18:21 and 00:23:22
+    UTC by script); the zip; the advisor agent on the final head; the report; the pull request (draft, then ready,
+    with the checkpoint folded into the report and deleted in the last commit); then stop for his go and his Brave
+    check.
 
 ## Next steps
-1. Step 7 by his answer: the browser tests in `packages/e2e/tests/skeleton/` (the `chromium` project; the server only
-   when `SHAMBLE_DIST` is set; `/opt/pw-browsers/chromium`; traces off): `skeleton` (the backend named on both
-   runs, zero Wasm calls by the page, blocks equal ticks within 1, one post per frame, no buffer left attached,
-   errors 0, the render counts against `render-counts.json`, no request leaving 127.0.0.1), `isolation`, `clock`,
-   `allocation`, `file-url`. The scratch script of the first look is in this session's scratchpad (`try-page.mjs`).
-2. Step 8: readings (the hand-off curve over five block sizes; pacing; sizes), the planted defects, the production
-   check (`dist-prod` scanned for the development markers), the docs pass with the records of plan section 21, the
-   zip, the reviews (seven reviewers: three, three, one), the verifier, the advisor agent on the final head, the
-   report, the pull request (draft, then ready); stop for his go and his Brave check.
-3. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and why `chacha20` 0.10.0 and 0.10.1 were
+1. See "Current step". No reviewer runs the browser project or `build.mjs` in the main folder while the main session
+   builds there (the small server's port and the build's output folders are shared).
+2. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and why `chacha20` 0.10.0 and 0.10.1 were
    withdrawn. For the report's follow-ups: the npm scope `@shamble`; the favicon 404; the overflow readings; the
-   `.d.ts` reading.
-4. Read CI on the head this save pushes. The saver: restart it within 110 minutes of the time under "Running work".
+   `.d.ts` reading; the software renderer and lines that cross behind the camera.
+3. Read CI on the head this save pushes. The saver: restart it within 110 minutes of the time under "Running work".
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
