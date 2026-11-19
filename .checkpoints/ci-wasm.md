@@ -8,7 +8,7 @@
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for `cs/ci-wasm`; lane 1, the first builder chat,
   session_019YNMUV9LFhASseJ9EP12kL, on his personal account) · **Base:** main
   f5030a33185b1ea1b15329174e82823f0215f993 (the merge of #61; the branch is level with it and pushed)
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 15:13 UTC.
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 16:08 UTC.
 
 ## His words that govern (read the files; the lines below are pointers and quotes, never a substitute)
 - `ci-wasm/mustafa-2026-11-19-1516-go-61.md` (2026-11-19, 14:28:25 UTC, whole, by script; it stands byte for byte in
@@ -21,6 +21,13 @@
   text as the chat put it to him at about 14:30 UTC (the text is quoted under "Next steps", step 5).
 - His browser reports: the four files `ci-wasm/mustafa-2026-11-19T144625.md`, `...T145419.md`, `...T150250.md`,
   `...T150929.md`; read against the zip's README in `ci-wasm/browser-reports-reading.md`.
+- `ci-wasm/mustafa-2026-11-19-1638-two-notes.md` (sent 16:08:04 UTC, whole, by script): the restart after the
+  compaction ("Before the first agent starts, tell me in two lines that the card and its notes folder are complete
+  and that the background saver runs."), and two notes: "The docs pass that records the merge of #61 stays with the
+  CI pull request, as you put it. In its report keep the workflow text apart from the docs, so that it can be
+  compared with the text I say yes to." And: "For change-set 3's browser check: the README asks me to keep the
+  browser's window in front and uncovered during the first run, and has one step with the window covered on
+  purpose, so that BR-GAP is read and not guessed."
 - In `docs/DECISIONS.md` (the entry of 2026-11-18, 22:34:37 UTC): "CI-WASM: (a). A small pull request of its own,
   opened right after change-set 2 is merged and merged before change-set 3's build starts; change-set 3's plan may be
   written beside it. Its exact text comes to me first. It runs GitHub's own check on the tool's file before the
@@ -74,12 +81,17 @@
 1. This checkpoint opened (15:13 UTC): the card; his six messages since the go, by script; the reading of his
    browser reports.
 
+2. The restart after his compaction (16:08 UTC): the card read; the session's model read (16:08 UTC:
+   claude-fable-5-2 configured and last served; the chat's mode: auto); his message of 16:08:04 UTC saved by script;
+   every saved message's bytes checked against the sha256 in its header (7 of 7 match); the saver started.
+
 ## Current step
-Stopped, by his words: he is told this card's path and compacts the chat. Nothing else has been started.
+Step 3: the plan of the CI-WASM pull request. Before the first agent starts he is told, in two lines, that the card
+and its notes folder are complete and that the saver runs. Then: issue #59's comments read; infra-engineer drafts
+the CI facts (its notes: `ci-wasm/infra-engineer-ci-plan.md`); the main session writes the plan
+(`ci-wasm/plan.md`).
 
 ## Next steps
-2. At the restart: read this card; read the session's model; read issue #59's comments; start the saver
-   (`node .claude/scripts/checkpoint.mjs watch ci-wasm --trailer "..."`).
 3. **The plan of the CI-WASM pull request** (plan first; drafted with infra-engineer; reviewed by the advisor agent;
    reviewers: infra-engineer, security-auditor (a CI change is risk tier 2), test-engineer). What it must hold:
    - The job's steps in order: GitHub's own check of the tool's file (`gh release verify-asset`, the route the
@@ -98,7 +110,8 @@ Stopped, by his words: he is told this card's path and compacts the chat. Nothin
    - The planned size and the stop line.
 4. **The exact text of every workflow edit to him in chat.** Written only after his yes, with the chat in Accept
    edits (read the mode right before each write).
-5. **The docs pass for #61's merge** (with this pull request's docs, unless he wants it apart):
+5. **The docs pass for #61's merge** (with this pull request, by his words of 16:08:04 UTC; **the report keeps the
+   workflow text apart from the docs**, so that he can compare it with the text he said yes to):
    - `docs/DECISIONS.md`, by script: his go of 14:28:25 UTC (with BROWSER-SET (a)); his "a, yes" of 14:31:30 UTC; his
      browser reports (the four messages), with the reading's result.
    - `docs/VISION_V2.md`, the dated note he said yes to (VISION-NOTE (a)), exactly, directly under the decided line
@@ -121,7 +134,9 @@ Stopped, by his words: he is told this card's path and compacts the chat. Nothin
 6. **Change-set 3's plan, drafted beside it** (not built before the CI-WASM pull request is merged): the build
    plan's card for change-set 3; the follow-ups the archive places there (NA-N1 to NA-N7, EA-F8, EA-F9, EA-F10,
    EA-F13, EA-N3, EA-N5, EA-N6, VF-L7, VF-L4, GE-N1, GE-N4, GE-N5, GE-N6, TE-NT3, TE-NT4, TE-NT5, TE-NT7, PA-N2, PA-L2, TE-L,
-   SA-ENV, FAVICON); the question RNG-CRATE with the two readings he names; one line `__pycache__/` in `.gitignore`.
+   SA-ENV, FAVICON); the question RNG-CRATE with the two readings he names; one line `__pycache__/` in `.gitignore`;
+   **in the browser check's README (his words of 16:08:04 UTC): he keeps the browser's window in front and uncovered
+   during the first run, and one step has the window covered on purpose, so that BR-GAP is read and not guessed.**
    Its draft is carried into change-set 3's own checkpoint when that opens.
 7. Then, in order: the advisor agent's review of the plan; the build after his yes on the text; reviews; the
    verifier; the report; the pull request draft, then ready; stop for his go.
@@ -140,10 +155,15 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
 ## Decisions taken
 - BROWSER-SET (a), his words of 14:28:25 UTC. VISION-NOTE (a), his "a, yes" of 14:31:30 UTC.
 - FIREFOX-WEBGL: he pasted the report (15:09:29 UTC), so the question needed no letter.
+- The docs pass for #61's merge rides this pull request (his words of 16:08:04 UTC).
 - Open, each to come with its own text: the CI pull request's exact text; FIREFOX-TESTS; RNG-CRATE (with change-set
-  3's plan); whether the docs pass for #61's merge rides this pull request or is one of its own.
+  3's plan).
 
 ## Running work
-None: no agent, no saver, no background task. Scratch outside git: `.gate/cs2-first-page/merge/` (his messages as
+- Saver: background task bpduzpt3j · output
+  `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/bpduzpt3j.output` · started
+  16:08:58 UTC · stops by 17:58 UTC (110 minutes on) · last check 16:09 UTC: ok (its first line: "watching
+  .checkpoints/ on claude/wonderful-hamilton-jdmlnf every 10 min for 110 min").
+- No agent yet. Scratch outside git: `.gate/cs2-first-page/merge/` (his messages as
 first saved, his Firefox screenshot, the merge message's words), `.gate/cs2-first-page/send/` (the zip he tested),
 `.gate/tools/wasm-bindgen-0.2.130/` (the tool).
