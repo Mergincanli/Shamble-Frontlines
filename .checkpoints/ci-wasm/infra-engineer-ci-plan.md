@@ -325,3 +325,164 @@ taken; that no other step sees GH_TOKEN (the log shows env per step: GH_TOKEN ap
   the Chrome for Testing JSON into /usr/local/share/chromedriver-linux64; Chromium = a SNAPSHOT build from
   chromium-browser-snapshots into /usr/local/share/chromium (/usr/bin/chromium): a developer build, not a release.
   The deb installs into /opt/google/chrome/ (the package's own layout). Sure: medium-high.
+- S3.9 docs.github.com ".../runners/github-hosted-runners" (read 2026-11-19): public repositories: "Linux | 4 | 16 GB
+  | 14 GB | x64 | ubuntu-latest, ubuntu-24.04, ..."; private: 2 CPU, 8 GB; "Use of the standard GitHub-hosted
+  runners is free and unlimited on public repositories."; "The Linux and macOS virtual machines both run using
+  passwordless `sudo`." This container: 4 CPUs, 17 GB (close to the public runner). Cost per run: 0 (public repo).
+
+## Block 3. Which browser runs the browser tests on the runner (DONE)
+**What the specs need from the browser** (Block 1): WebGL 2 without a GPU (SwiftShader; Playwright passes
+`--enable-unsafe-swiftshader`, S3.4); a module Worker and Wasm in it; CDP `HeapProfiler` (allocation.spec.ts: Chromium
+only); `page.clock` (clock.spec.ts); `page.route` on the Worker's script (skeleton.spec.ts); a file:// page
+(file-url.spec.ts); COOP/COEP isolation from Vite's servers on 127.0.0.1 (isolation.spec.ts); real timers and enough
+speed for the speed-bound assertions (allocation: > 20 frames and > 200 blocks in 8 s, ends before block 420;
+TE-NT6). No external address: everything on 127.0.0.1, so the browser can run inside the network cut.
+
+**(a) Playwright 1.65.0's own Chromium** (S3.1-S3.3, S3.5, S3.6):
+- `playwright install chromium` at 1.65.0 fetches three archives: Chrome for Testing 158.0.8127.18 (revision 1254)
+  `https://cdn.playwright.dev/builds/cft/158.0.8127.18/linux64/chrome-linux64.zip`; Chrome Headless Shell
+  158.0.8127.18 `.../linux64/chrome-headless-shell-linux64.zip` (same host); ffmpeg revision 1013
+  `builds/ffmpeg/1013/ffmpeg-linux.zip` from the first answering of cdn.playwright.dev/dbazure/download/playwright,
+  playwright.download.prss.microsoft.com/dbazure/download/playwright, cdn.playwright.dev. `--only-shell` drops the
+  full Chromium (headless shell + ffmpeg only). Sizes: not read (no download here; the docs' example: 281 MB
+  installed for Chromium); to be read on a run if chosen.
+- No hash check of any archive (S3.3): HTTP 200 + Content-Length only; the version is pinned by the lockfile
+  (1.65.0 -> revision 1254), the bytes are not.
+- It needs Playwright's installer (npm code) to run WITH the network before the cut: the first dependency code that
+  would run with the network in the `toolchain` job (today only `npm ci --ignore-scripts` and `cargo fetch` run
+  there, neither runs package code). Against the job's design.
+- `install-deps` = apt with sudo (S3.5); likely unnecessary on the image (Chrome's libraries are installed with the
+  Chrome deb) but unproven.
+- Cache: `toolchain` has `cache-mode: none` on purpose (no channel between runs); Playwright itself says caching
+  browsers is not recommended (S3.6). So a fresh download every run.
+- Without `SHAMBLE_CHROMIUM`, headless runs use the headless SHELL (old headless): a different binary and mode from
+  the container's runs (full chrome, new headless, S3.4). To match, `SHAMBLE_CHROMIUM` would point at the downloaded
+  `chrome-linux64/chrome` (the full archive is then needed, not `--only-shell`).
+
+**(b) The image's Google Chrome through `SHAMBLE_CHROMIUM=/opt/google/chrome/chrome`** (S2.5, S3.4, S3.7, S3.8):
+- No download in the job; no package code with the network; nothing new from the internet beyond the runner image
+  we already run (GitHub builds it; Chrome comes from Google's stable deb on dl.google.com at image-build time;
+  update cron and apt source removed, so it does not change during a run).
+- Version: Google Chrome 157.0.8103.50 in image 20261111.370.1; it MOVES with the image (weekly images). Playwright
+  1.65.0 "will support Stable and Beta channels" of branded Chrome at its release (S3.5); 157 is one behind its
+  bundled 158. A later image with a much newer Chrome could break Playwright 1.65.0: a visible failure, fixed by a
+  Playwright bump (a dependency change, with its security answer). The job prints the version every run.
+- Headless mode: Playwright passes `--headless` to the given binary = Chrome's NEW headless mode, the real browser
+  (S3.4, S3.5); the same mode as every container run of change-set 2 (full CfT binary through SHAMBLE_CHROMIUM).
+- CDP profiler: available (Playwright drives Chrome over CDP through `--remote-debugging-pipe`). WebGL 2 fallback:
+  SwiftShader through `--enable-unsafe-swiftshader`, as here. WebGPU: unknown on the runner (here "No available
+  adapters"); either backend passes skeleton's first test (WebGPU's counts are null, not compared).
+- It is branded Chrome: the browser his words name first ("Chrome, the Chromium-based browsers and Firefox").
+- Sandbox: Playwright passes `--no-sandbox` (S3.4), so no user namespace or setuid helper is needed under
+  `setpriv --no-new-privs` inside `unshare --net`.
+
+**(c) Other options considered:**
+- (c1) Playwright's CfT archive fetched by curl with a recorded size + sha256 (like the tool): pinned bytes, no
+  package code with the network; but the values are unknown until a run prints them, then his yes on the values,
+  then a second CI edit; ~170 MB download every run with no cache. Better for reproducibility, more steps.
+- (c2) Playwright's Docker image pinned by digest: ~2 GB, Docker inside the cut (docker group dropped): no.
+- (c3) The image's Chromium snapshot (/usr/bin/chromium): a developer snapshot, not a release: no.
+
+**Recommendation: (b), the image's Google Chrome**, with the job printing `/opt/google/chrome/chrome --version` before
+the cut. Exact list for his yes: "nothing is downloaded for the browser tests; they run in the Google Chrome that
+GitHub's ubuntu-24.04 image already holds at /opt/google/chrome/chrome (157.0.8103.50 in image 20261111.370.1;
+the version follows the image and is printed in every run)". If he wants pinned bytes instead: (c1), in two steps.
+
+**FIREFOX-TESTS** (his words of 13:36:37: "The game has to work in Chrome, the Chromium-based browsers and Firefox"):
+- What it takes: Playwright's own patched Firefox (S3.5: branded Firefox does not work, so the image's Firefox 160 is
+  no use): Firefox 159.0, revision 1572, `builds/firefox/1572/firefox-ubuntu-24.04.zip` from the three Microsoft
+  mirrors above (S3.2), no hash check (S3.3), installed by Playwright's installer with the network (or by curl with
+  recorded values, as c1); about 187 MB installed (docs example); its system libraries through `install-deps
+  firefox` (apt with sudo) unless the image already has them (likely, since branded Firefox is installed; unproven).
+- A `firefox` project in `packages/e2e/playwright.config.ts` (a source edit, the test side, not CI text), ignoring
+  allocation.spec.ts (CDP is Chromium only). Specs that can run there: skeleton 5, clock 1, file-url 1 (records
+  either outcome), isolation 4 (its own comment: "Firefox and WebKit run in CI later") = 11 of 12. Unknowns only a
+  run answers: WebGL 2 in headless Firefox without a GPU; `page.route` on a module Worker's script in Firefox;
+  render counts equal to the committed ones; speed.
+- Added time: about 1 minute of tests with one worker, plus the download (seconds) and maybe install-deps (30-60 s).
+- Cannot be dry-run here: no Firefox in this container, none may be fetched.
+- Options: (i) now, in this pull request (one more download for his yes, a config edit, a second unknown on the first
+  runner run; a Firefox failure would hold CI-WASM, which must merge before change-set 3's build starts); (ii) with
+  change-set 3 (mixes a CI and test-config change into a feature change-set); (iii) later: its own small pull request
+  right after this one merges, built beside change-set 3's plan (one new unknown per first run).
+- Recommendation: (iii), right after this one. His Brave/Firefox checks stay the gate for Firefox until then.
+- Block 3 done; next: Block 4 (the shape).
+- Finding: `.gitignore` ignores `.gate/`, `dist/`, `test-results/`, `packages/sim-worker/pkg/`, not `dist-*/` (SA-DIST).
+  A CI build into `packages/client/dist-*` would show as untracked under `packages/` and make build.mjs's
+  `commitName()` (git status over crates, packages, ...) print "+changes" on the second build. CI builds into
+  `.gate/dist-production` and `.gate/dist-development` instead (ignored, outside that pathspec).
+
+## Block 4. The shape (DONE; the timeout value is revisited after Block 6's timings)
+**Recommendation: everything in the one `toolchain` job; the downloads and GitHub's check before the cut, every new
+line that runs package or repository code inside the existing cut, in this order:** build (production, then
+development), boundary tests, type checks, browser tests. No second job.
+
+Why one job and not two:
+- **What must stay inside the cut:** the build that makes what players get (cargo build scripts, Vite and its plugins
+  are dependency code), and with it everything else that runs package code: vitest, tsc, Playwright and the browser.
+  Today's rule of this job is exactly that (only `rustup`, `cargo fetch`, `npm ci --ignore-scripts` run with the
+  network; none runs package code). The browser tests need nothing outside 127.0.0.1, so they fit inside it.
+- **A second job would need the build again** (a second download, a second GitHub check, a second Rust compile) or an
+  artifact hand-off (actions/upload-artifact + download-artifact: two more `uses:` steps, a store that keeps the
+  build for days, and a second cut to keep Playwright off the network). Both cost more and add surface. The browser
+  job could not start before the build anyway (`needs:`), so no time is saved.
+- **The cost of one job:** a red `toolchain` check no longer says by its name which part failed; the log does (each
+  part starts with an `echo "== ..."` line), and the cut is one step. Accepted for a small pull request; the gate
+  v2's workflow (step 2.3) can split it.
+
+**Chromium inside `unshare --net` + `setpriv --no-new-privs`, loopback only** (S3.4): Playwright starts Chromium with
+`--no-sandbox` (no user namespace, no setuid helper needed: no_new_privs would block the setuid helper anyway),
+`--disable-dev-shm-usage` (no /dev/shm size issue), `--headless` (no display). Its profile goes to a temporary folder
+under /tmp (TMPDIR is not passed by `env -i`). The page is served by `serve.mjs` on 127.0.0.1:4173 (the config's
+`webServer`), the isolation spec's Vite servers bind 127.0.0.1 (vite.config.mjs `server.host`/`preview.host`), and
+loopback is up inside the cut (toolchain.yml:70). The skeleton spec asserts that no request leaves 127.0.0.1, so the
+cut changes nothing for a passing page. D-Bus and XDG runtime folders are absent: Chromium logs warnings and goes on
+(to be read on the first runner run). Sure: medium-high; this is the main new unknown, and it cannot be tried here
+(no `unshare` in this container); Block 6 runs the tests under `env -i` with the cut's variable list instead, which
+covers the environment half.
+
+**Where the tool's download and GitHub's check sit:** in new steps between "Fetch every dependency" and the cut, so
+the order is: fetch (cargo, npm: unchanged) -> the tool's archive (download, size, sha256) -> GitHub's own check
+(`gh release verify-asset`, the only step with the token) -> the member list, the one program taken out and installed
+root-owned, its size and sha256 -> the cut. The tool's first run is build.mjs's `--version` inside the cut, after
+GitHub's check (his CI-WASM (a)). Three steps rather than one, so the token sits on the one step that needs it and the
+log shows GitHub's check as a step of its own (easy to quote).
+
+**Root-owned tool** (new, closes security-auditor's Low "a process left behind by a build script could swap the tool
+between the check and the run"): the program is copied with `sudo -n install -D -o root -g root -m 0555` to
+`/opt/wasm-bindgen-0.2.130/wasm-bindgen` (folder root-owned 0755, under root-owned /opt). Inside the cut the runner's
+uid has no groups and no_new_privs, so no process there can replace, rename or chmod the file or its folder. build.mjs
+still checks it before each run. One line; the job already uses `sudo -n` for the cut.
+
+**Least privilege:** `permissions: contents: read` unchanged (PERM-ATT is the only open point); `GH_TOKEN` on one step
+only; `persist-credentials: false` unchanged; no new `uses:` step (no cache action, no artifact actions), so CI-CUT
+part 2 gets no worse; `cache-mode: none` unchanged (no planted file crosses runs); actions stay pinned by full SHA
+(none added). The values of the tool are literals in the workflow (his values, changeable only by a CI edit, which
+needs his yes) and are compared line for line with `wasm-bindgen-tool.mjs` before the download (Block 5).
+Not run before the cut: any repository or package code (the values are read as text, never by importing the module).
+
+**Runtime** (estimate, refined in Block 6): new work = download + checks (about 5-10 s), GitHub's check (about 3-10 s:
+API + TUF), a cold release build of sim-wasm for wasm32 (measured in Block 6), wasm-bindgen twice (about 1 s each),
+two Vite builds (about 5-15 s each), boundary tests (about 2-5 s), five or six tsc runs (about 10-20 s together), the
+browser tests with one worker (49.4 s here for 12 tests; slower on a busy runner). About +3 to +4 minutes per run.
+Cost per run: 0 (standard runner, public repository: S3.9). The job's timeout (15 min today) is revisited with the
+measured numbers; the browser tests get a global timeout below it so Playwright stops first (S3.6).
+
+**Provider down / rollback:** if GitHub's release download, its API or its TUF host is down, the job fails at that
+step, visibly, before anything runs; a re-run later fixes it (the download and the check live on the same GitHub that
+runs CI). Google is not contacted at run time (Chrome is in the image). Rollback = revert the pull request: nothing
+outside the repository is created (no cache, no artifact, no secret, no setting).
+- Block 4 done; next: Block 5 (the exact text: proposed files + diff + table).
+- Type-check lines tried 2026-11-19 (TypeScript 6.0.3, warm, this container; `common` = toolchain.yml:93's `strict`
+  minus ` --lib es2023`): Worker shipped `--lib es2023,webworker,esnext.disposable $worker pkg/sim_wasm.d.ts`: exit 0
+  (1.1 s); control without esnext.disposable: exit 2, "sim_wasm.d.ts(9,13): error TS2550: Property 'dispose' does
+  not exist on type 'SymbolConstructor'"; Worker shipped + 6 tests `--skipLibCheck`: exit 0 (1.3 s); page shipped
+  (13 files) `--lib es2023,dom,dom.iterable,esnext.disposable --types vite/client`: exit 0 (7.4 s); page shipped + 4
+  tests `--skipLibCheck`: exit 0 (2.0 s).
+- E2E-TYPES tried: the 8 e2e .ts files with `--lib es2023,dom,dom.iterable --skipLibCheck`: exit 2, 11 errors, all
+  TS2591 "Cannot find name 'process'" / "'node:fs'|'node:path'|'node:url'. Do you need to install type definitions
+  for node?" (playwright.config.ts:9,10,15; file-url.spec.ts:4,5; isolation.spec.ts:4,5,18,19; report.ts:44;
+  skeleton.spec.ts:2). `node_modules/@types/` has chai, deep-eql, estree, stats.js, three, webxr: no node. So NO
+  flag makes it pass: it needs Node's type declarations (`@types/node`, a new dependency: the hold, security-auditor,
+  his yes) or a hand-written declaration file in packages/e2e (test side). Not in this CI text; the line to add later:
+  `npx --no -- tsc --ignoreConfig $common --lib es2023,dom,dom.iterable --types node --skipLibCheck $e2e`.

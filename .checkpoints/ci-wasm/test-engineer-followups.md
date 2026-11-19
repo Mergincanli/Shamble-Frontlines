@@ -150,3 +150,130 @@ so it writes neither `target/` nor `pkg/`): `RUSTFLAGS=-Coverflow-checks=off SHA
 packages/client/scripts/build.mjs --wasm-only` must exit 1 with "build settings from the environment are refused: unset
 RUSTFLAGS" (proves the wiring the unit test does not see). Not run by me (no build in this pass).
 - B3 DONE (section written above). Next: B4 (E2E-TYPES: run tsc on the e2e specs).
+- B4 finding: tsc 6.0.3 on the 7 e2e .ts files + playwright.config.ts with CI's strict flags as they are (--lib es2023): 569 errors (te-tsc-run1.txt); with --lib es2023,dom,dom.iterable: 151 (140 in node_modules .d.ts: Buffer, node: modules, Symbol.asyncDispose; 11 in ours, all missing Node names: process x6, node:path x2, node:url x2, node:fs x1) (te-tsc-run2.txt). @types/node is NOT installed (node_modules/@types: chai, deep-eql, estree, stats.js, three, webxr).
+- B4 finding: + --skipLibCheck + a 15-line hand declaration of the Node names the specs use (te-node-shim.d.ts): 0 errors, exit 0, 1.33 s wall (te-tsc-run3.txt). Lib check on + shim + esnext.disposable: 129 errors, all in node_modules (Buffer and node: modules in playwright-core's and vite's types), 0 in ours (te-tsc-run4.txt): the lib check needs @types/node.
+- B4 finding: planted type errors on a copy (.gate/ci-wasm/te-types-plant, script te-types-plants.mjs): clean copy passes; 6 of 6 plants caught (misspelt field read with `?? 0`, which passes at run time; Report field type change; CDP option type; config value type; misspelt page-side global; a removed export); copy passes again after.
+- B4 finding: a later `--lib` replaces an earlier one in tsc 6.0.3 (tested: `$strict --lib es2023,dom,dom.iterable` exits 0; the reverse order shows the DOM names missing), so CI's `$strict` can be reused with one more `--lib`.
+- B4 finding (Low, cs3): e2e's `Report` (report.ts:4-24) is a hand copy of the page's ReportData (packages/client/src/overlay/report.ts); a type check cannot see a drift between them. A renamed page field shows at run time today only when the read is not defaulted. With cs3: `import type` the page's own type.
+
+## Block 4. E2E-TYPES: a type check of the browser specs (DONE)
+
+**What the specs need, found by running it** (tsc 6.0.3, `--ignoreConfig`, CI's strict flags, the 7 `.ts` files of
+`packages/e2e/tests/` and `playwright.config.ts`):
+- the DOM library: the code inside `page.evaluate` runs in the page (`window`, `document`, `WebAssembly`, `Event`,
+  `crossOriginIsolated`), and `import.meta.url`/`URL` come from it too: `--lib es2023,dom,dom.iterable`;
+- Node's names: `process.env` (config, report.ts, isolation), `node:fs`, `node:path`, `node:url`. `@types/node` is not a
+  dependency of the workspace (not installed), and Playwright's and Vite's own type files use `Buffer` and `node:`
+  modules, so the lib check cannot pass without it (129 errors, all inside node_modules, with the lib check on).
+
+Today's state: 569 errors with CI's flags as they are; 11 in our files with the DOM library (all missing Node names);
+**0 errors** with the DOM library, `--skipLibCheck` and a 15-line declaration of the four Node names the specs use. So
+the specs hold no type error today; the check is a guard for what comes.
+
+**Two ways, the smaller recommended:**
+- (B, recommended for this pull request) a committed `packages/e2e/node-names.d.ts`, 15 lines (the scratch
+  `te-node-shim.d.ts`, which declares `readFileSync(path, "utf8")`, `path.join`, `pathToFileURL`, `fileURLToPath` and
+  `process.env`), and the lib check off for this one check (the shipped code's checks keep it on). No new dependency.
+  A spec that uses another Node name fails the check until the file grows: loud, never silent. Its weakness: types in
+  Playwright's own files that reach Node's (`Buffer` in `route.fulfill`'s body, the screenshot's result) are not checked.
+- (A) `@types/node` (exact, 22.x) as a devDependency: two new packages from the internet (it brings `undici-types`),
+  which means a security answer and his yes on new dependencies: not "small". Worth it when the e2e package needs more
+  of Node (the network simulator of a later change-set): then the lib check can go on as well (with
+  `esnext.disposable` for Playwright's types).
+
+**The line for CI** (infra-engineer places it in the network-cut script after the existing `tsc` lines; tested here:
+exit 0 in 1.3 s; a later `--lib` replaces the one inside `$strict`, tested):
+```
+e2e=$(find packages/e2e/tests -name "*.ts" | LC_ALL=C sort)
+[ -n "$e2e" ]
+npx --no -- tsc --ignoreConfig $strict --lib es2023,dom,dom.iterable --skipLibCheck packages/e2e/node-names.d.ts packages/e2e/playwright.config.ts $e2e
+```
+(or with infra's `$common`, the strict flags without `--lib`, if its text defines one). The `[ -n "$e2e" ]` line makes an
+empty file list fail instead of checking nothing.
+
+**What it would catch** (6 plants on a copy, 6 caught, with the line): a misspelt field read with a default
+(`data.worker?.undetachd ?? 0`, which PASSES in Playwright, since Playwright strips types without checking them: a test
+that cannot fail), a field of `Report` changing type, a wrong option type in a CDP call, a wrong config value, a
+misspelt page-side global, an import of a name that is gone. What it cannot catch: a drift between e2e's hand-written
+`Report` and the page's `ReportData` (Low, for change-set 3: `import type` the page's own type).
+
+**Added lines:** `packages/e2e/node-names.d.ts` +15; CI +3 (infra's file; counted in block 7 under CI text).
+- B4 DONE (section written above). Next: B5 (SA-TREE).
+- B5 source (read 2026-11-19): doc.rust-lang.org/cargo/commands/cargo-tree.html: `-e` takes normal/build/dev/all and `no-proc-macro` ("Do not include procedural macro dependencies"); default normal,build,dev; `--prefix none` = flat list; `(*)` marks de-duplicated packages; `--target all` includes all targets; `--locked` errors if the lock would change; `--offline` "Prevents Cargo from accessing the network"; without it cargo "will stop with an error if it needs to access the network and the network is not available"; `--frozen` = both. No sentence on the text output's stability (cargo metadata's JSON is the machine interface). Sure: high.
+- B5 finding: here (cargo 1.99.1), `cargo tree --locked --offline -p sim-wasm --target wasm32-unknown-unknown -e normal --prefix none` lists 13 packages incl. the proc-macro subtree (proc-macro2, quote, syn, bumpalo, wasm-bindgen-macro(-support)) that runs on the build machine; with `-e normal,no-proc-macro`: sim-wasm, sim, client-endpoint (members) + cfg-if, unicode-ident, wasm-bindgen, wasm-bindgen-shared: all four have overrides (Cargo.toml:38-54). 0.77 s wall.
+- B5 finding: the whole workspace's runtime crates (`--workspace --target all -e normal,dev,no-proc-macro`): cfg-if, thiserror, ts-rs, unicode-ident, wasm-bindgen, wasm-bindgen-shared = exactly the six overrides; the Cargo.toml comment's policy ("compiled into our libraries and tests") is the wider set; the shipped Wasm is the narrower one. `--prefix none` with several roots prints a blank line between trees (filter it).
+- B5 finding: draft check (te-overrides-try.mjs) on today's tree: missing = []; plants caught: an override removed (wasm-bindgen-shared), an override set to false (cfg-if), a new runtime crate (rand_core); a `(proc-macro)` line is refused (guards a dropped `no-proc-macro`). cargo tree 103 ms warm (0.77 s the first time), cargo metadata 113 ms.
+
+## Block 5. SA-TREE: every runtime crate of the shipped Wasm has its overflow override (DONE)
+
+**Today, by hand:** the root `Cargo.toml` (lines 25-54) turns overflow checks on for release, off for every non-member
+(`"*"`), and back on by name for six third-party crates; its comment says a new third-party crate "joins this list in
+the change that adds it". The shipped Wasm's runtime crates today (`cargo tree --locked -p sim-wasm --target
+wasm32-unknown-unknown -e normal,no-proc-macro --prefix none`, run here): cfg-if, unicode-ident, wasm-bindgen,
+wasm-bindgen-shared (plus the members sim-wasm, sim, client-endpoint, which `[profile.release]` covers). All four are
+listed. The whole workspace with its tests (`--workspace --target all -e normal,dev,no-proc-macro`): the same plus
+thiserror and ts-rs: exactly the six.
+
+**Design (the build refuses, the unit test proves the rule without cargo):**
+- How it reads the tree: `cargo tree` with `-e normal,no-proc-macro` (cargo's docs: "no-proc-macro — Do not include
+  procedural macro dependencies"; `-e normal` already leaves build scripts' dependencies out): exactly what is compiled
+  for wasm32 and linked into the Wasm. Without `no-proc-macro` the tree also lists proc-macro2, quote, syn, bumpalo and
+  the macro crates, which run on the build machine only and stay at `"*"` by the file's own rule. `cargo metadata
+  --format-version 1` is the documented machine interface and gives the same set with about 15 more lines of graph
+  walking; the tree's flat list is enough and is the command the file's comment already names.
+- How it reads the overrides: `[profile.release.package.<name>]` blocks of the root `Cargo.toml` whose lines hold
+  `overflow-checks = true` (`"*"` is not a name; a block set to `false` does not count).
+- Where: three pure functions in `packages/client/scripts/build-checks.mjs` (`runtimeCrates(treeText)`,
+  `overriddenCrates(cargoToml)`, `missingOverflowOverrides(treeText, cargoToml)`), called by `buildWasm()` in
+  `build.mjs` before `cargo build` (one `execFileSync("cargo", ["tree", ...])`, then a refusal naming the crate and the
+  two lines to add). The unit test in `build-checks.test.mjs` feeds today's tree text as a fixture and the real root
+  `Cargo.toml`, plus the plants: an override removed, one set to `false`, a new crate in the tree, a member's path line
+  skipped, a `(proc-macro)` line refused. CI runs the unit test through `npm test --workspaces` (no new line) and the
+  real check at every Wasm build (CI-WASM's build step, and every local build).
+- Time: cargo tree 0.1 s warm, 0.8 s cold, once per build; the unit test under 10 ms.
+- Inside CI's network cut: yes, by reasoning, not by a run: `cargo tree --locked` needs only Cargo.lock and the fetched
+  manifests, a subset of what the cut's `cargo build --locked --target wasm32-unknown-unknown -p sim-wasm` already needs
+  (green on main); with no network cargo stops with an error rather than waiting (cargo's docs for `--offline`).
+- Lines: build-checks.mjs about +25, build.mjs +5, build-checks.test.mjs about +22: about +52.
+
+**Recommendation: with change-set 3.** It adds the random-number crate and so its override in the same change: the check
+then proves itself on a real addition (plant: that new override removed, the build refuses, naming the crate). No
+runtime crate joins between CI-WASM and change-set 3, so nothing ships uncovered meanwhile, and CI-WASM stays about CI.
+A shell line in CI instead is not recommended: it would check the header only (not `= true`), and every such line is
+CI text for his exact-text yes. Later, when the server binary ships, the same function runs on `-p room` natively.
+- B5 DONE (section written above). Next: B6 (RR-F5, SA-DIST).
+- B6 finding: the built Wasm here (packages/sim-worker/pkg/sim_wasm_bg.wasm, 28,987 bytes, built 2026-11-19 12:08) holds ONE registry path, `<HOME>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wasm-bindgen-0.2.130/src/externref.rs` (HOME is /root here; GitHub's image puts cargo's home under /home/runner, 7 characters longer: not verified on a runner); std's paths are already remapped to /rustc/<commit>/library/... (same on every machine with the pinned toolchain). So size and sha256 differ between this container and a runner for the same commit.
+- B6 finding: .gitignore (15 lines) ignores `dist/` (line 3) and `.gate/` (line 2) but not `dist-*`: `git check-ignore` matches nothing for packages/client/dist-x/index.html. No tracked path contains "dist-". No test depends on it; one behaviour does: build.mjs commitName() (build.mjs:90-94) runs `git status --porcelain -- ... packages ...`, so an untracked packages/**/dist-x/ folder marks every later build's commit as "+changes". No spec reads the commit marker.
+- B6 source (read 2026-11-19): raw.githubusercontent.com/actions/runner-images/main/images/ubuntu/scripts/build/install-rust.sh: `export RUSTUP_HOME=/etc/skel/.rustup`, `export CARGO_HOME=/etc/skel/.cargo`, PATH gets `$HOME/.cargo/bin`; /etc/skel is the template of a new user's home, so on the runner cargo's home is most likely /home/runner/.cargo (toolchain.yml also falls back to `$HOME/.cargo`). Sure: medium (the image script, not a runner run): the path inside the runner's Wasm is to be read on the first run.
+
+## Block 6. RR-F5 and SA-DIST (DONE)
+
+**RR-F5 (the builder's path inside the Wasm).** Found here: one path, `<HOME>/.cargo/registry/src/index.crates.io-
+1949cf8c6b5b557f/wasm-bindgen-0.2.130/src/externref.rs` (a panic location in wasm-bindgen); std's own paths are already
+`/rustc/<commit>/...`, the same everywhere. On the runner `<HOME>` is most likely `/home/runner` (runner-images' Rust
+script installs into `/etc/skel/.cargo`), 7 characters longer than `/root`, so the same commit gives a Wasm a few bytes
+larger with another sha256.
+- Print (useful, 1 to 2 CI lines after the build): the size table (build.mjs prints it already), `sha256sum` of
+  `packages/sim-worker/pkg/sim_wasm_bg.wasm` and of the glue, and optionally `grep -a -c 'cargo/registry'` on the Wasm
+  (the count of builder paths, 1 today).
+- What the report can then say, from readings and with no extra build: the push run and the pull-request run build on
+  two runners of the same image: equal sha256 there shows the build repeats on the same image; the container's 28,987
+  bytes against the runner's shows the path's cost.
+- Assert: nothing new in this pull request. A real "same bytes twice" check needs a second clean build into another
+  target folder (doubles the build's time): a decision for change-set 3 with rust-reviewer's fix for the path (a
+  remap from the repository's own settings: the build refuses `RUSTFLAGS` from the environment, so it cannot come from
+  there).
+- Must NOT be asserted: a fixed sha256 or a fixed byte size of the Wasm or the glue (machine-dependent today); equality
+  between the container's and a runner's build; exact gzip or Brotli sizes; a size budget tighter than a few bytes of
+  path. Change-set 3's size table must name the machine it was read on (or wait for the remap).
+
+**SA-DIST.** `.gitignore` ignores `dist/` and `.gate/` but not `dist-*` (checked: `git check-ignore` matches nothing for
+`packages/client/dist-x/index.html`; no tracked path contains `dist-`). The line: `dist-*/` after `dist/` (line 3), +1.
+No test depends on it. One behaviour does: `commitName()` (build.mjs:90-94) asks `git status --porcelain` about
+`packages`, so an untracked `packages/**/dist-x/` folder marks every later build "+changes" (no spec reads the marker).
+In this pull request: one line, no risk, and CI's own build may use a `dist-` folder.
+- B6 DONE (section written above). Next: B7 (what proven means; recommendations; totals), then open questions, Not verified, DONE.
+- B7 source (read 2026-11-19): playwright.dev/docs/ci: "We recommend setting workers to "1" in CI environments to prioritize stability and reproducibility." Reason: "Running tests sequentially ensures each test gets the full system resources, avoiding potential conflicts." Example: `workers: process.env.CI ? 1 : undefined`. Sure: high (official docs). Supports TE-NT6 row 13.
+- B7 note: infra-engineer's plan (read its Blocks 3-4 only, not duplicated): one `toolchain` job, all new lines inside the cut (build production then development into `.gate/dist-production` / `.gate/dist-development`, boundary tests, type checks, browser tests); browser = the image's Google Chrome via SHAMBLE_CHROMIUM=/opt/google/chrome/chrome (157.0.8103.50 in image 20261111.370.1, moves with the image): NOT the container's Chromium 153 nor Playwright's 158 (TE-NT6 row 16 applies); "the browser tests with one worker" assumed; a global timeout below the job's. Its E2E-TYPES finding matches mine (11 errors, needs Node's declarations); it proposes @types/node later; I propose the 15-line declaration file now (test side). CI builds into .gate/, so SA-DIST is local hygiene only.
+- B7 finding: vitest 5.1.0 with no test files (`--root packages/sim-worker --dir no-such-dir`) exits 1 ("No test files found"; its default exclude is only **/node_modules/**, **/.git/**). Playwright 1.65.0 with no matching test (`--grep zzz...`, no SHAMBLE_DIST, own --output) prints "Error: No tests found" and exits 1. `--list`: "Total: 12 tests in 5 files". So a mistyped path or project in the new CI lines fails loudly, not silently.
+- B7 note: TE-NT6 readings can be one line per test: `console.log(JSON.stringify(report))` prints the whole development report (run header with userAgent = browser version and hardwareConcurrency, fps, frame p50/p99, delivery p50/p95, the Worker's ticks, wakes, drops, lateness p50/p99/max), with no change to report.ts's interface; the header holds nothing private (run-header.ts: commit, label, userAgent, cores, display, isolation, time).
