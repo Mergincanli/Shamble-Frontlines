@@ -185,19 +185,17 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   3's plan).
 
 ## Running work
-- Saver: background task bpduzpt3j · output
-  `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/bpduzpt3j.output` · started
-  16:08:58 UTC · stops by 17:58 UTC (110 minutes on) · last check 16:09 UTC: ok (its first line: "watching
-  .checkpoints/ on claude/wonderful-hamilton-jdmlnf every 10 min for 110 min").
-- Agents (started 16:13 UTC, both Opus 5.5 at effort max, in the background; at most 3 at a time):
-  infra-engineer, part "ci-plan" (notes `ci-wasm/infra-engineer-ci-plan.md`; it writes the proposed workflow files
-  as scratch copies under `.gate/ci-wasm/proposed/` and the diff as `ci-wasm/ci-edit.diff`; it alone runs the build
-  and the browser tests); test-engineer, part "followups" (notes `ci-wasm/test-engineer-followups.md`). Both were
-  given `ci-wasm/brief-context.md`. A restart gives each the same task again: it continues from its notes.
-  Third, started 16:15 UTC (Opus 5.5, effort max): rust-reviewer, part "cs3-rng", for change-set 3's plan: the
-  question RNG-CRATE with the two readings he names (notes `ci-wasm/rust-reviewer-cs3-rng.md`; it downloads and
-  builds nothing).
-- Scratch outside git: `.gate/ci-wasm/hist/` (change-set 2's deleted plan, tool route and security note, taken from
-  history at 29ab052^), `.gate/cs2-first-page/merge/` (his messages as
-first saved, his Firefox screenshot, the merge message's words), `.gate/cs2-first-page/send/` (the zip he tested),
-`.gate/tools/wasm-bindgen-0.2.130/` (the tool).
+- Saver: background task bpduzpt3j, started 16:08:58 UTC, stops by 17:58 UTC (110 minutes on); last check 17:34 UTC:
+  running, its last line "saved and pushed 1817b8a" (16:59:12 UTC). **It must be started again after 17:58 UTC**
+  (the same command; record the new task id here).
+- Agents (both Opus 5.5 at effort max, in the background, started 17:54 UTC): the advisor agent, part "plan" (the
+  plan review; notes `ci-wasm/advisor-plan.md`); security-auditor, part "ci-text" (the CI text before it goes to
+  him; notes `ci-wasm/security-auditor-ci-text.md`). A restart gives each the same task again.
+- Done and not running: infra-engineer "ci-plan", test-engineer "followups", rust-reviewer "cs3-rng" (notes end
+  with DONE).
+- Scratch outside git: `.gate/ci-wasm/hist/` (change-set 2's deleted plan, tool route and notes, from history at
+  29ab052^ and 4cf30ce^), `.gate/ci-wasm/proposed/` (the proposed workflow file), `.gate/ci-wasm/proposed-plant/`
+  (the same with P-GH's two lines), `.gate/ci-wasm/docs-try/` (the docs scripts' scratch outputs),
+  `.gate/ci-wasm/dist-*` and test-engineer's and infra-engineer's scratch builds, `.gate/cs2-first-page/merge/` (his
+  messages as first saved, his Firefox screenshot), `.gate/cs2-first-page/send/` (the zip he tested),
+  `.gate/tools/wasm-bindgen-0.2.130/` (the tool).
