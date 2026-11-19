@@ -136,7 +136,16 @@
    boundaries" (about 2,050; stop line 4,100) and 3b "The loop closes" (about 3,700; stop line 7,400; parts move out
    at 4,800). Its questions for him: RNG-CRATE (recommended: our own ChaCha8), SIZE-3 (two change-sets),
    WASM-TEST-ROUTE (a test-only build of our own tools crate), CI-LOOP (a small CI pull request after 3a),
-   PRESS-PACE (a second tap inside one tick lands a tick later). Not yet reviewed by the advisor agent.
+   PRESS-PACE (a second tap inside one tick lands a tick later).
+4c. The advisor agent's review of draft 1 (handed back 20:57 UTC; `ci-wasm/advisor-cs3-plan.md`): **REVISE**, twelve
+   conditions, no Critical (five High: the random-number question reused his code RNG-CRATE; the cut ladders took
+   tests out; PM-0002-12 mislabelled and without its own test; 3a would be red in CI; the draft departures not
+   asked). **Draft 2** (21:00 UTC, 350 lines, commit bf6ec3e) works all twelve in: RNG-SOURCE; ladders that move
+   whole parts; `presses.spec.ts`; the development build makes the test module, E2 dropped, E1 once with every
+   crate; DEPART-3; section 5.1 (which of the two designs wins on three symbols; the replay on the shipped file
+   through one new read-only hash number); the follow-up table; the pass-mark table. Sizes now: 3a about 2,050, 3b
+   about 3,800. Questions for him: RNG-SOURCE, SIZE-3, PRESS-PACE, DEPART-3; ruled by the advisor agent:
+   WASM-TEST-ROUTE (a), CI-LOOP (a) for E1 only. The advisor agent re-reads draft 2 (asked 21:01 UTC).
 
 ## Current step
 Step 5: the exact text and the three questions (CHROME-SOURCE, CI-TEXT, FIREFOX-TESTS) go to him in chat, with the
@@ -249,8 +258,8 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   the card's 2,700, so the plan must offer a split; notes
   `ci-wasm/engine-architect-cs3.md`: the boundaries, the page's key diagram, the rule tests, the build order). Both
   were given `ci-wasm/cs3-context.md`. A restart gives each the same task again.
-- The advisor agent, part "cs3-plan" (Opus 5.5, effort max, in the background, started 20:36 UTC): the plan review
-  of `ci-wasm/cs3-plan.md`; notes `ci-wasm/advisor-cs3-plan.md`. A restart gives it the same task again.
+- The advisor agent, part "cs3-plan" (Opus 5.5, effort max, in the background): resumed at 21:01 UTC for the
+  re-read of draft 2; notes `ci-wasm/advisor-cs3-plan.md` ("Re-read of draft 2").
 - Done: infra-engineer "ci-plan", test-engineer "followups", rust-reviewer "cs3-rng",
   security-auditor "ci-text", the advisor agent "plan" (with its re-read): every notes file ends with DONE.
 - Scratch outside git: `.gate/ci-wasm/` (`hist/`, `proposed/`, `proposed-plant/`, `docs-try/`, `security/`, `mutant/`,
