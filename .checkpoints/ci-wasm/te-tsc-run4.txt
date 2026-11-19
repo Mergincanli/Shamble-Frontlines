@@ -1,0 +1,6 @@
+te-tsc-run4 (test-engineer, block 4; the full output was 30 KB, cut to this summary 2026-11-19):
+Same files plus te-node-shim.d.ts, --lib es2023,esnext.disposable,dom,dom.iterable, lib check ON: 129 errors, 0 in
+ours; all inside node_modules: 111 "Cannot find name 'Buffer'", node:http x2, stream, node:zlib, node:tls,
+node:stream, node:net, node:https, node:events, fs (playwright-core's and vite's type files). So the lib check needs
+@types/node; our files are clean.
+(run3, the same with --skipLibCheck and --lib es2023,dom,dom.iterable: 0 errors, exit 0, 1.33 s wall.)

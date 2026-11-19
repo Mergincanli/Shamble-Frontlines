@@ -163,3 +163,18 @@ export function checkOutDir(outDir, defaultDir) {
   }
 }
 
+/**
+ * Variables through which cargo's or the tool's settings can be changed from outside with no diff in the repository.
+ * Not refused: the two that name the build folder, which the build's `--target-dir` overrides. Not covered: cargo's
+ * config files outside the repository (the quality gate's flag check).
+ */
+export const CARGO_OVERRIDES = new RegExp(
+  "^(?!CARGO_(BUILD_)?TARGET_DIR$)(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC|RUSTC_(WORKSPACE_)?WRAPPER|RUSTUP_TOOLCHAIN|" +
+    "CARGO_(BUILD|PROFILE|TARGET)_.*|WASM_BINDGEN_.*|RUST_LOG)$",
+);
+
+/** The names in `env` that the Wasm build refuses, in the environment's order. Only names are read, never a value. */
+export function refusedBuildSettings(env) {
+  return Object.keys(env).filter((name) => CARGO_OVERRIDES.test(name));
+}
+

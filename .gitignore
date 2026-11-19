@@ -1,6 +1,7 @@
 node_modules/
 .gate/
 dist/
+dist-*/
 .env
 .env.*
 !.env.example

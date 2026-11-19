@@ -20,6 +20,10 @@ export default defineConfig({
       name: "chromium",
       testDir: "./tests",
       testIgnore: "node/**",
+      // One browser at a time: the checks that depend on the machine's speed were tuned with no second browser
+      // beside them. And a test's own limit above the 60 s wait in report.ts, so that the wait's bound is the real one.
+      workers: 1,
+      timeout: 90_000,
       use: { baseURL: ADDRESS, launchOptions: browser === undefined ? {} : { executablePath: browser } },
     },
   ],

@@ -8,7 +8,8 @@ test("whether Playwright's clock reaches the Worker is recorded", async ({ page 
   await page.clock.install();
   await page.goto("/");
   // The page's own timers and frames now stand still; blocks arrive as messages, which no clock holds back.
-  await page.waitForFunction(() => (window as unknown as { __shambleReport?(): Report }).__shambleReport !== undefined);
+  // The first block, not only the report's hook: the hook stands before the Worker has loaded the Wasm.
+  await page.waitForFunction(() => ((window as unknown as { __shambleReport?(): Report }).__shambleReport?.().tick ?? 0) >= 1);
   const start = (await report(page)).tick;
   await page.waitForTimeout(2000);
   const afterRealTime = (await report(page)).tick;

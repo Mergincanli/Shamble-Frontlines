@@ -37,8 +37,10 @@ test("the sampling heap profile attributes the hand-off's allocations by functio
   });
   // The counts are read inside the sampled window, as close to its two ends as a call can be.
   const before = await report(page);
+  const started = Date.now();
   await page.waitForTimeout(8000);
   const after = await report(page);
+  const windowMs = Date.now() - started;
   const { profile } = (await session.send("HeapProfiler.stopSampling")) as { profile: { head: Node } };
   const frames = after.frames - before.frames;
   const blocks = after.blocks - before.blocks;
@@ -48,7 +50,8 @@ test("the sampling heap profile attributes the hand-off's allocations by functio
   console.log(
     `allocation in the page's hand-off code: ${perFrame.toFixed(0)} bytes per frame posting the input, ` +
       `${perBlock.toFixed(0)} bytes per block received, ${rate.toFixed(0)} bytes a second ` +
-      `(${frames} frames, blocks ${before.blocks} to ${after.blocks}, ${total(profile.head)} bytes sampled on the whole page)`,
+      `(${frames} frames in ${windowMs} ms, blocks ${before.blocks} to ${after.blocks}, ${after.worker?.drops} drops, ` +
+      `${total(profile.head)} bytes sampled on the whole page)`,
   );
   // The window must end before the browser optimises the listener (about block 470), or the sums below mean less.
   expect(after.blocks).toBeLessThan(420);
