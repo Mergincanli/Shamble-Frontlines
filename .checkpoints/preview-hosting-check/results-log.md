@@ -655,3 +655,10 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   deploy job ran at 2026-11-19T00:12:14Z" / "secret: present" ("TOKEN: ***" in the env block). So with the reviewer
   off, a rewritten job reaches the token without anyone's click. Next: his re-tick (the window closes at its
   screenshot), then SA-R4's re-run, which must wait and which he rejects.
+- **His re-tick**: screenshot (2026-11-19 00:13:42 UTC, ed9f3bac-f2e0-4cf1-a61b-05a1fd4c4dc0), transcribed: banner
+  "Environment "preview" updated."; "Required reviewers" ticked, Mergincanli listed; "Prevent self-review" unticked;
+  "Wait timer" unticked; "Allow administrators to bypass configured protection rules" unticked; "No restriction";
+  the two secrets, "yesterday". **Window closed: the reviewer was off from 00:10:53 to about 00:13:42 UTC** (his two
+  messages), and only run #17's attempt 2 ran in it (the session pushed nothing else).
+- SA-R4 (the re-tick proven by a wait): run #17 re-run again by the session (rerun_workflow_run, 201 Created, about
+  00:13:54 UTC): attempt 3; its deploy job must wait on `preview`, and he rejects it.
