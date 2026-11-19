@@ -100,7 +100,7 @@
   per-block floor ~430 and limit ~610 (clean cold 482-514 in 6 runs, plant 718-727), per-frame floor 25 / limit 170 as
   they are; or (CS5) sum under a frame the JIT cannot inline: WorkerLink.handleEvent registered as the listener object
   (the browser calls it, so it is always a physical frame; the listener's total held 520-540 B per block in every tier).
-- 2026-11-19T08:36:40Z console texts (scratch .gate/perf-auditor-r2-console.mjs, copy here; 12 s): "No available adapters",
+- 2026-11-19T08:33:45Z console texts (scratch .gate/perf-auditor-r2-console.mjs, copy here; 12 s): "No available adapters",
   three's "WebGPU is not available, running under WebGL2 backend" (the only message through three's hook), the backend
   info line, 4 x Chrome's "GPU stall due to ReadPixels" (then "will no longer repeat"; the renderer runs with
   --disable-gpu-compositing, so the WebGL canvas is read back every frame for the software compositor: part of why the
@@ -117,3 +117,18 @@
   listener's tier-up; fix above); Low: per-frame has the same partial band on a 20-60 fps machine (floor 25 trips below
   ~40 % visible, plant 7 is missed below ~68 %); Low: PM-0004-68 readings need the one-line rounding note; L2/L4 stay
   follow-ups; nothing in the fixes allocates more or runs slower per tick or per frame.
+
+## Done 2026-11-19T08:36:09Z
+Verdict: round 2: open or new findings. P1 closed (improvement: wakes 1.64 -> 1.001 per tick, real-page lateness p50
+3.70 -> 0.83, p99 7.57 -> 4.30 ms; idle p99 4.30 -> 1.87). A1 closed for the fully blind case (floors trip after warm-up).
+L1, L5 closed; L3 fixed in readings.mjs; L2 comment corrected, size a follow-up; L4 a follow-up.
+New: N1 Medium (per-block window straddles the listener's tier-up at block ~470; clean cold ~505 B > 390 limit; works only
+while the switch stays within blocks ~442-499; fix: running(page, 90), per-block floor ~430 / limit ~610, comment fixed;
+cs5: sum under a frame the browser calls itself). N2 Low (per-frame partial band on fast machines, note). N3 Low (the
+readings' write-up: up to 1 ms of each tick start is the whole-ms timer by design). Nothing slower, nothing new allocated.
+Tolerance arithmetic: visible fraction must be 0.54-0.77 (390/725 .. 390/505); floor 150 trips below 0.30.
+Not verified: real GPU / Brave / WebGPU / isolated build; the proposed N1 limits on a run of the changed spec (derived from
+9 cold windows: clean 482-514, plant 718-727); the production build; online pacing.
+Memory updated: .claude/agent-memory-local/perf-auditor/MEMORY.md (d257bb6 baselines and the straddle trap).
+Scratch: this folder's perf-auditor-r2-*.mjs (run copies under .gate/; .gate/perf-auditor-r2-dist-7b is the patched build
+copy, .gate/perf-auditor-r2-src-a and -b the two source sets of the Node A/B: all removable).
