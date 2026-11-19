@@ -85,6 +85,13 @@
    claude-fable-5-2 configured and last served; the chat's mode: auto); his message of 16:08:04 UTC saved by script;
    every saved message's bytes checked against the sha256 in its header (7 of 7 match); the saver started.
 
+2b. Prepared for the docs pass, in the notes only (16:17 to 16:20 UTC; nothing under `docs/` is edited before the
+   plan's APPROVE): `ci-wasm/browser-check-record.mjs` (writes `docs/reports/2026-11-19-cs2-browser-check.md`: the
+   reading and his four report messages whole) and `ci-wasm/decisions-3.mjs` (his go of 14:28:25, his "a, yes" of
+   14:31:30, a pointer to the browser check, his two notes of 16:08:04, and the dated pointer under the entry of
+   13:36:37 UTC; always rebuilt from main's copy). Both tried into scratch files under `.gate/ci-wasm/docs-try/`
+   with `--out`: every check "yes". A later message of his (his yes on the CI text) is one more entry in the list.
+
 ## Current step
 Step 3: the plan of the CI-WASM pull request. Before the first agent starts he is told, in two lines, that the card
 and its notes folder are complete and that the saver runs. Then: issue #59's comments read; infra-engineer drafts

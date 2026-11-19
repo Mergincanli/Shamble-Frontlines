@@ -60,10 +60,11 @@ and a rounded name on WebGL.
 
 ## Observations for the follow-ups (ids are this note's; none is an error count above 0)
 - **BR-GAP.** Brave's first run drew 46,382 frames while it ticked for 410 s: an average of 113 a second, where every
-  other Brave run averages 180 (frames over ticks: 185.0, 180.3 and 180.1 in the three short runs, 180.1 and 182.7 in the re-checks). So for about 150 s
-  the page drew nothing while the simulation ran on, and no pause was recorded. Not explained by the reports: the
-  window may have been covered or the screen off. The pause on a tab switch works in Brave (the re-check). To read
-  again with change-set 3's browser check: what the page is told when Brave's window is covered.
+  other Brave run averages 180 (frames over ticks: 185.0, 180.3 and 180.1 in the three short runs, 180.1 and 182.7 in
+  the re-checks). So for about 150 s the page drew nothing while the simulation ran on, and no pause was recorded.
+  Not explained by the reports: the window may have been covered or the screen off. The pause on a tab switch works
+  in Brave (the re-check). To read again with change-set 3's browser check: what the page is told when Brave's
+  window is covered.
 - **FPS-LINE.** The readout's "frames a second" is worked out from the usual gap between two frames. In Firefox it
   says 239.2 where the run's average is 179.9 (40,295 frames in 224 s; 6,128 in 34.1 s). The line should be a count
   over time.
