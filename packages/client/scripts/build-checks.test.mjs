@@ -6,6 +6,7 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import {
   checkCli,
   checkCliFile,
+  cspProblems,
   formatSizeTable,
   lockedWasmBindgenVersion,
   MAX_SERVED_BYTES,
@@ -147,3 +148,31 @@ describe("the size table", () => {
     expect(tooLarge(rows)).toEqual([]);
   });
 });
+
+describe("the page stays ready for a strict content security policy", () => {
+  const file = (name, text) => ({ name, bytes: Buffer.from(text) });
+  const good = [
+    file("index.html", '<!doctype html><link rel="stylesheet" href="./assets/a.css"><script type="module" src="./assets/a.js"></script>'),
+    file("assets/a.js", 'new Worker(new URL("./worker-abc.js", import.meta.url), { type: "module" }); const style = "x"; onload = 1;'),
+    file("assets/sim_wasm_bg.wasm", "data:application/wasm is only text inside a binary here"),
+  ];
+
+  test("a page whose scripts, styles, Worker and Wasm are all files passes", () => {
+    expect(cspProblems(good)).toEqual([]);
+  });
+
+  test("each way to break it is named", () => {
+    const bad = {
+      "an inline script": file("index.html", "<script>boot()</script>"),
+      "an inline style element": file("index.html", "<style>body{}</style>"),
+      "a style attribute": file("index.html", '<p style="color:red">x</p>'),
+      "an inline event handler": file("index.html", '<body onload="boot()">'),
+      "a script or the Wasm in a data: URL": file("assets/a.js", 'fetch("data:application/wasm;base64,AGFzbQ==")'),
+      "a Worker from a blob: URL": file("assets/b.js", "new Worker(URL.createObjectURL(blob))"),
+    };
+    for (const [problem, broken] of Object.entries(bad)) {
+      expect(cspProblems([...good, broken]), problem).toEqual([`${broken.name}: ${problem}`]);
+    }
+  });
+});
+

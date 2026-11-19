@@ -1,0 +1,59 @@
+import * as THREE from "three/webgpu";
+import type { Picture, PictureInfo, RenderCounters } from "../picture.ts";
+import { buildEmptyScene } from "./empty-scene.ts";
+
+/** The adapter as the browser names it, when the WebGPU device gives it (not every browser does). */
+function adapterText(renderer: THREE.WebGPURenderer): string {
+  const backend = renderer.backend as { device?: { adapterInfo?: { vendor?: string; architecture?: string; description?: string } } };
+  const info = backend.device?.adapterInfo;
+  return info === undefined ? "" : [info.vendor, info.architecture, info.description].filter((part) => part).join(", ");
+}
+
+/**
+ * The picture on three.js's WebGPU renderer, which falls back to WebGL 2 by itself (ADR 0003 parts 1 to 4). It
+ * waits for `renderer.init()` before the first frame and reports the backend that really runs.
+ */
+export function createThreePicture(): Picture {
+  const { scene, camera } = buildEmptyScene();
+  let renderer: THREE.WebGPURenderer | null = null;
+  return {
+    async start(canvas, options): Promise<PictureInfo> {
+      renderer = new THREE.WebGPURenderer({ canvas, antialias: true, forceWebGL: options.forceWebGL });
+      await renderer.init();
+      const webgpu = (renderer.backend as { isWebGPUBackend?: boolean }).isWebGPUBackend === true;
+      return {
+        backend: webgpu ? "WebGPU" : "WebGL 2 fallback",
+        adapter: webgpu ? adapterText(renderer) : "",
+        timestampQuery: renderer.hasFeature("timestamp-query"),
+      };
+    },
+    loop(frame): void {
+      void renderer?.setAnimationLoop(frame);
+    },
+    draw(): void {
+      // The empty scene has nothing a block moves yet; soldiers arrive with change-set 4.
+      renderer?.render(scene, camera);
+    },
+    counters(): RenderCounters {
+      const info = renderer?.info;
+      return {
+        drawCalls: info?.render.drawCalls ?? 0,
+        triangles: info?.render.triangles ?? 0,
+        lines: info?.render.lines ?? 0,
+        geometries: info?.memory.geometries ?? 0,
+        textures: info?.memory.textures ?? 0,
+      };
+    },
+    resize(width, height, pixelRatio): void {
+      renderer?.setPixelRatio(pixelRatio);
+      renderer?.setSize(width, height, false);
+      camera.aspect = width / Math.max(1, height);
+      camera.updateProjectionMatrix();
+    },
+    stop(): void {
+      void renderer?.setAnimationLoop(null);
+      renderer?.dispose();
+      renderer = null;
+    },
+  };
+}

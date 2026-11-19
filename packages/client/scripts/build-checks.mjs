@@ -97,3 +97,31 @@ export function formatSizeTable(rows) {
     "\n",
   );
 }
+
+/**
+ * What in a built page would stop a strict content security policy (ADR 0002 part 7: "the built HTML holds no
+ * inline script or style, and the Worker and the Wasm load as files, never from `blob:` or `data:` URLs"). It
+ * stands in for the gate's check (G8) until the gate v2 has one. Returns one line per problem.
+ * @param {{ name: string, bytes: Uint8Array }[]} files
+ */
+export function cspProblems(files) {
+  const problems = [];
+  for (const { name, bytes } of files) {
+    if (!/\.(html|js|css)$/.test(name)) continue;
+    const text = Buffer.from(bytes).toString("utf8");
+    if (name.endsWith(".html")) {
+      if (/<script(?![^>]*\ssrc=)[^>]*>/i.test(text)) problems.push(`${name}: an inline script`);
+      if (/<style[\s>]/i.test(text)) problems.push(`${name}: an inline style element`);
+      if (/<[^>]+\sstyle\s*=/i.test(text)) problems.push(`${name}: a style attribute`);
+      if (/<[^>]+\son[a-z]+\s*=/i.test(text)) problems.push(`${name}: an inline event handler`);
+    }
+    if (/data:(application\/wasm|text\/javascript|application\/javascript)/i.test(text)) {
+      problems.push(`${name}: a script or the Wasm in a data: URL`);
+    }
+    if (name.endsWith(".js") && /new Worker\(\s*(URL\.createObjectURL|["'`]blob:)/.test(text)) {
+      problems.push(`${name}: a Worker from a blob: URL`);
+    }
+  }
+  return problems;
+}
+

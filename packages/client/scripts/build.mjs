@@ -1,9 +1,12 @@
 // The build of the player's page, from the repository's root:
 //
-//   SHAMBLE_WASM_BINDGEN=<absolute path of the wasm-bindgen tool> node packages/client/scripts/build.mjs [--wasm-only]
+//   SHAMBLE_WASM_BINDGEN=<absolute path of the wasm-bindgen tool> node packages/client/scripts/build.mjs
+//       [--wasm-only] [--production] [--out-dir <folder>]
 //
 // It builds the simulation as WebAssembly and writes its bindings into packages/sim-worker/pkg/ (build output,
-// ignored by git). Every command runs as a list of arguments, never through a shell.
+// ignored by git), then builds the page with Vite into packages/client/dist/ (or --out-dir). Without --production
+// the page is the development flavour: it has the readout and the copy report, and the zip's small server is
+// copied beside it. Every command runs as a list of arguments, never through a shell.
 //
 // The wasm-bindgen tool is a ready-built program from the internet. Before it is run at all, `--version` included,
 // its file must be the one wasm-bindgen-tool.mjs records (a plain file of that size and sha256), and its version
@@ -11,13 +14,15 @@
 // run: the tool is never looked up by name.
 
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkCli, checkCliFile, formatSizeTable, lockedWasmBindgenVersion, sizeTable, tooLarge } from "./build-checks.mjs";
+import { build as viteBuild } from "vite";
+import { checkCli, checkCliFile, cspProblems, formatSizeTable, lockedWasmBindgenVersion, sizeTable, tooLarge } from "./build-checks.mjs";
 import { WASM_BINDGEN_TOOL } from "./wasm-bindgen-tool.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+const clientDir = path.join(root, "packages/client");
 const pkgDir = path.join(root, "packages/sim-worker/pkg");
 const wasmFile = path.join(root, "target/wasm32-unknown-unknown/release/sim_wasm.wasm");
 
@@ -56,21 +61,60 @@ export function buildWasm() {
   return rows;
 }
 
-function main() {
+/** The commit the page is built from, marked when the tree holds changes that are not committed. */
+function commitName() {
+  const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
+  const changed = git("status", "--porcelain", "--", "crates", "packages", "Cargo.toml", "Cargo.lock", "package.json", "package-lock.json");
+  return git("rev-parse", "--short=9", "HEAD") + (changed === "" ? "" : "+changes");
+}
+
+/** Every file of a folder, as paths from it with forward slashes. */
+function filesOf(folder, prefix = "") {
+  return readdirSync(folder, { withFileTypes: true })
+    .sort((a, b) => (a.name < b.name ? -1 : 1))
+    .flatMap((entry) =>
+      entry.isDirectory() ? filesOf(path.join(folder, entry.name), `${prefix}${entry.name}/`) : [`${prefix}${entry.name}`],
+    );
+}
+
+/** Builds the page into `outDir` and checks every served file. Returns their size table. */
+export async function buildPage({ production, outDir }) {
+  process.env["VITE_SHAMBLE_COMMIT"] = commitName();
+  if (production) delete process.env["VITE_SHAMBLE_DEVTOOLS"];
+  else process.env["VITE_SHAMBLE_DEVTOOLS"] = "1";
+  await viteBuild({
+    root: clientDir,
+    configFile: path.join(clientDir, "vite.config.mjs"),
+    logLevel: "warn",
+    build: { outDir, emptyOutDir: true },
+  });
+  // The zip's small server is a development tool: it is not part of a production build.
+  if (!production) copyFileSync(path.join(clientDir, "serve.mjs"), path.join(outDir, "serve.mjs"));
+  const files = filesOf(outDir)
+    .filter((name) => name !== "serve.mjs")
+    .map((name) => ({ name, bytes: readFileSync(path.join(outDir, name)) }));
+  const rows = sizeTable(files);
+  const problems = [...tooLarge(rows).map((row) => `${row.name}: a served file reaches 25 MiB`), ...cspProblems(files)];
+  if (problems.length > 0) throw new Error(`the built page is refused:\n  ${problems.join("\n  ")}`);
+  return rows;
+}
+
+async function main() {
   const args = process.argv.slice(2);
-  const unknown = args.filter((arg) => arg !== "--wasm-only");
-  if (unknown.length > 0) throw new Error(`unknown option: ${unknown.join(" ")}`);
+  const at = args.indexOf("--out-dir");
+  const outDir = at === -1 ? path.join(clientDir, "dist") : path.resolve(args[at + 1] ?? "");
+  const unknown = args.filter((arg, i) => !["--wasm-only", "--production", "--out-dir"].includes(arg) && i !== at + 1);
+  if (unknown.length > 0 || (at !== -1 && args[at + 1] === undefined)) throw new Error(`unknown or unfinished option: ${args.join(" ")}`);
   console.log(formatSizeTable(buildWasm()));
-  if (!args.includes("--wasm-only")) {
-    throw new Error("the page's build joins this script with the page (step 6): use --wasm-only until then");
-  }
+  if (args.includes("--wasm-only")) return;
+  const production = args.includes("--production");
+  console.log(`\n${production ? "production" : "development"} page in ${path.relative(root, outDir)}:`);
+  console.log(formatSizeTable(await buildPage({ production, outDir })));
 }
 
 if (process.argv[1] !== undefined && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  try {
-    main();
-  } catch (error) {
+  main().catch((error) => {
     console.error(`build: ${error instanceof Error ? error.message : String(error)}`);
     process.exit(1);
-  }
+  });
 }
