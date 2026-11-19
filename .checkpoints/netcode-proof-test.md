@@ -118,7 +118,10 @@
   5,204 -> 11,552 MiB free (20:0x UTC). **The -47 set RUNNING** from 20:0x UTC: `flock -x .gate/shared-target/.lane.lock
   node spikes/netcode-proof/ops/runs/c-u4f-runs.mjs 47 --date 2026-11-19` (repo root, CARGO_TARGET_DIR unset; results
   under results/u4f/<commit12>/pm-0001-47/; it re-checks spikes/netcode-proof unchanged before each judge call, so card
-  saves are safe). Then -20, then -22.
+  saves are safe). **-47 DONE** (20:0x-20:1x UTC, exit 0): **PM-0001-47 PASS** (L1 P2, 1,000 connects, seeds 1-3
+  valid); bites newest-sample and tick-quantised **shown**; results/u4f/b57221ed139d/pm-0001-47/ committed. For -47's
+  report: seed 2's 1,916 building slot-ticks (no -47 precondition), F4's shot band. **The -20 set next** (same form,
+  `20`), then -22 after reading -20's six runs for honest overflow resyncs.
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
