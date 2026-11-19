@@ -236,7 +236,10 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   nothing and run no browser test): netcode-architect, part "cs3": **done** (notes
   `ci-wasm/netcode-architect-cs3.md`, ending DONE: the symbols crate by crate, tests T1 to T10, its part about 3,090
   lines so the change-set is likely 4,000 to 4,300 against the card's 2,700; its two questions for him: SIZE-3 and
-  PRESS-PACE; no new dependency); engine-architect, part "cs3": still running (notes
+  PRESS-PACE; no new dependency); engine-architect, part "cs3": **done** (its half about 2,800 lines: the
+  boundaries, the page's key diagram, the rule tests through one test-only Wasm module, the build order in eleven
+  steps; its questions: WASM-TEST-ROUTE, CI-LOOP, SIZE-3; both halves together are about 5,900 lines, above twice
+  the card's 2,700, so the plan must offer a split; notes
   `ci-wasm/engine-architect-cs3.md`: the boundaries, the page's key diagram, the rule tests, the build order). Both
   were given `ci-wasm/cs3-context.md`. A restart gives each the same task again.
 - Done: infra-engineer "ci-plan", test-engineer "followups", rust-reviewer "cs3-rng",

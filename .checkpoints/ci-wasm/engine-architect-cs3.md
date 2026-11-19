@@ -522,3 +522,142 @@ the first run, then one step with the window covered on purpose.)
   in its report and a build (Part 3.2 :551-553). First to move out if cs3 nears twice its size (the card): with Part
   15 it is already outside; cs3 keeps only the seam (2.1: the loopback carries bytes).
 - B4 DONE. Next: Block 5 (size and order).
+
+## Block 5. Size and order (DONE)
+
+### 5.1 Lines added, my half (estimates; no code written; hand-written lines as the plan counts them)
+Rust (about 1,200): sim-wasm lib.rs +90 (rewritten; about 120 removed), local.rs +25 (struct and seam; the order is
+netcode's), panic.rs +75; client-endpoint endpoint.rs +40 (the moved state; the rest netcode's), layout.rs +12,
+block.rs +60; sim rng.rs +270 (150 code, 120 tests), lib.rs +15, tests/rules_scan.rs +280; devtools lib.rs and
+rules/mod.rs +10, rules/f32_ops.rs +130, plants +10, wasm.rs +60, tests/f32_vectors.rs +50, tests/stream_vectors.rs +60;
+Cargo.toml files +14.
+Python generators (about 250): make_f32_vectors.py +150, make_chacha8_vectors.py +100.
+TypeScript, JS, CSS, config (about 1,360): sim-worker messages.ts +55 / test +50, host.ts +30 / test +60,
+panic-message.ts +20 / test +30, worker.ts +8, index.ts +1, stats.ts +8 / test +8, block-pool test +6; client
+input/keyboard.ts +70 / test +70, overlay/keys.ts +50 / test +40, overlay/report.ts +25 / test +30, app/press-tally.ts
++40 / test +50, app/worker-link.ts +40 / test +45, app/boot.ts +20, app/error-hook.test.ts +25, harness/frame-times.ts
++6 / test +10, styles.css +15; scripts build.mjs +53, build-checks.mjs +40 / test +62, serve.mjs +3 / test +48;
+boundary/sim-wasm.test.mjs +45, boundary/rules.test.mjs +90; e2e tests/skeleton/loop.spec.ts +90,
+tests/rules/wasm-rules.spec.ts +80, allocation.spec.ts +20, skeleton/isolation specs +11; .gitignore +2, package.json 1.
+My half: about 2,800 lines. Vector files (fixtures, not counted): f32-inputs.bin 120,000 bytes; f32-expected.txt about
+3 KB (or every output: about 1,230,000 bytes); chacha8-words.bin 160,384 bytes; two manifests, about 2 KB.
+=> The card's 2,700 (:249) is about my half alone; with netcode's half (codec, room, endpoint logic, step, replay, L1)
+the change-set nears or passes twice its plan (5,400). The plan must total both halves before the advisor's review.
+
+### 5.2 Build order of the whole change-set (each step ends green: cargo dev+release, npm, boundary, e2e, gate)
+0. #62 merged and taken in; his answers RNG-CRATE and WASM-TEST-ROUTE; CI edits asked with exact text.
+1. Follow-ups needing nothing new: EA-F8, EA-F10 (TS part), EA-F13 (1)(3), EA-N3 (page half), EA-N6+VF-L7, FAVICON,
+   VF-L4, TE-L, SA-ENV, TE-NT3/4/5, FPS-LINE, NEG-ZERO, `__pycache__/` in .gitignore.
+2. The scan test and PM-0002-53's native half (sim only; no manifest change).
+3. ONE manifest batch (the hold: security-auditor answers on exactly this content; one release record): devtools
+   (crate-type, deps), sim-wasm, room, client-endpoint, protocol path deps, sim-worker's @shamble/types to dev; with a
+   library (RNG-CRATE (a)/(b)) its lines and overflow overrides here too.
+4. ChaCha8 in sim with the published vectors; the stream generator and file; devtools' native stream test. (Needs
+   RNG-CRATE.)
+5. Float vectors: generator, inputs, expected digests, devtools' runner and native test.
+6. The panic hook (sim-wasm panic.rs, panic_buffer), the Worker's guard and panic-message.ts (EA-N3 Worker half).
+7. The devtools test module and `build.mjs --devtools-wasm`; boundary/rules.test.mjs (vectors, plants dev+release,
+   the hook's text). (Needs WASM-TEST-ROUTE; runs in CI after E2.)
+8. Netcode's core in its order (codec + loopback, room, ClientEndpoint with EA-F9's move, the step), the block's echo
+   and link sections, sim-wasm's new surface (input with six numbers; newest_input and now_ms dropped), the host and
+   page messages, boundary/sim-wasm.test.mjs updated.
+9. The page alive: input/, press tally, key diagram, readout and report rows, loop.spec.ts, the allocation spec
+   (TE-NT7, PA-N2).
+10. Netcode's replay runner, the first recording, native twice, `replay` in the test module (Node, and Chromium through
+    wasm-rules.spec.ts); L1 and its statistics.
+11. SA-TREE's check; RR-F5's remap (rust-reviewer's mechanism); the size table (with and without the hook; the build
+    options table) on one named machine. Then reviews, verifier, report, the zip with Brave, Firefox and BR-GAP steps.
+CI edits (each asked of him with its exact text; recommended in a small CI pull request right after cs3, as CI-WASM, so
+cs3 stays risk tier 1 (.github/ is tier 2); the scan test and every new native test already run in today's
+`cargo test --workspace`, the L1 tests too):
+- E1, toolchain.yml :88: `cargo test --release -p sim -p protocol --locked` -> `cargo test --release -p sim -p protocol
+  -p devtools --locked` (vectors, replay and L1 in release; netcode may add -p room).
+- E2, inside the cut before the boundary step: `node packages/client/scripts/build.mjs --devtools-wasm` (the Wasm-side
+  vector run, the plants and the Chromium rules spec then run in the existing boundary and Playwright steps).
+- E4, only with chacha20: the native vector tests again with `--config 'build.rustflags=["--cfg",
+  "chacha20_backend=\"soft\""]'` and with "sse2".
+- No gate edit (`tools/gate.mjs` is legacy-only and untouched).
+
+### 5.3 What moves out first if it grows (after the card's two: the two-instance test, already lane 2's, and the build
+options table)
+1. Hygiene not needed by cs3's own changes: TE-L, VF-L4, FAVICON, SA-ENV, TE-NT5 (about 85) -> a small follow-up.
+2. SA-TREE and RR-F5 (about 95) -> the CI pull request after cs3.
+3. TE-NT7 + PA-N2 (about 20) -> cs5's bench.
+4. The vectors' Chromium run (about 40; the replay's Chromium run stays: the Step 2.5 table :470 asks it here).
+5. The scan's literal stripping (about 40): strip comments only; a string literal naming a banned call then fails.
+Never cut: the scan test, the vectors natively and in Node, PM-0002-53, the panic hook, EA-F8/F9/F10/N3, the page alive.
+- B5 DONE. Next: Block 6.
+
+## Block 6. Where the build plan or the drafts are wrong or out of date for cs3; questions for him (DONE)
+
+### 6.1 Out of date or wrong (file:line)
+1. Two-instance test owner: build plan :327-331 puts it in cs3; Part 15 :78-80 and :105 (his LANE-SPLIT (a), newer)
+   give "the comparisons that stay" to lane 2, built after cs3 merges, never merged. The plan follows Part 15 and says
+   so (a stated reading; a question only if the advisor wants one).
+2. "The table of build options" (:330) is defined nowhere else; most likely ADR 0002 part 4's Wasm size readings
+   (:270-274: opt-level "s" against "z", with and without wasm-opt). wasm-opt is a new tool (TOOL-SOURCE applies): its
+   column cannot be read without his word.
+3. ADR 0004 part 8 :309 "The sim draws only from rand_chacha's ChaCha8Rng, pinned": rand's own guide now says
+   rand_chacha "is likely to be discontinued" (rust-reviewer F2.1); the line changes with any RNG-CRATE answer
+   (decision-draft text: his go).
+4. ADR 0004 PM-0004-22 :1143 (and PM-0004-27's method) name "unit vectors in cargo test and wasm-bindgen-test
+   (R5-TEST-REC1)"; with WASM-TEST-ROUTE (a) the Wasm halves run through devtools' test module in Node and Chromium.
+5. ADR 0002 PM-0002-53 :1327 "a committed test in sim run in the four builds": the Wasm halves run a planted counter in
+   devtools' module under the same workspace profile; literal "in sim" in Wasm needs wasm-bindgen-test. Its cost clause
+   needs the tick bench (not built in cs3).
+6. ADR 0004 part 7 :267-268 "the exact non-arithmetic methods the rules themselves use, such as is_finite, is_nan,
+   to_bits and from_bits": an open list; the interim scan takes exactly those four (closing it is a draft line).
+7. ADR 0002 part 3 :191 (sim-wasm: "the wasm-bindgen bindings ... and nothing else"): with option (A) it also holds
+   the 25-line composition `LocalMatch` and devtools depends on it and becomes a cdylib using wasm-bindgen (:194 allows
+   "anything", but no row says so). A note for the drafts' next revision.
+8. ADR 0002 part 5 :330-332 (the control API list): cs3's input call takes six plain numbers, `now_ms` leaves create,
+   `panic_buffer()` and the start function join, `load the content bundle` waits for cs4. Same next revision (with
+   EA-F6 and EA-F12, STATUS_ARCHIVE :1133-1135).
+9. Build plan card :324-326 "the first 10,000 outputs of each random stream": no stream exists (world.rs:16-19) and
+   none is drawn in cs3; the plan reads it as the generator at four edge ids, each purpose's stream joining with its
+   first draw (spread first, cs8).
+10. Build plan :446-447 "CI files are the 2.3 chat's" and every "2.3 after 3" in the Step 2.5 table (:466-475): out of
+    date by Part 15 :174 (lane 1 owns toolchain.yml while the 2.3 chat is stopped); "2.3 after 3" becomes lane 1's CI
+    pull request after cs3.
+11. Build plan :939 ("the unit vectors in Wasm | 2"): they did not land in cs2; they land in cs3, in devtools' module.
+12. ADR 0002 part 6 :397-399 ("whether a second instance is worth its cost ... is measured in the boundary spike"): now
+    lane 2's comparison after cs3 (Part 15).
+13. test-engineer-followups.md :239-241 (SA-TREE "adds the random-number crate"): true only for a library; with own
+    ChaCha8 no runtime crate joins, its plants use fixtures only.
+14. The card's size (:249, 2,700 lines) against my half's estimate of about 2,800 (5.1).
+
+### 6.2 Questions for Mustafa (self-contained, plain words)
+- RNG-CRATE (his own question; first): Where do the game's random numbers come from? Why it matters: bot choices,
+  weapon spread and upgrade offers must come out the same on the server and in every browser for years. Options: (a)
+  rand_chacha 0.10.0, the library the engine draft names (four outside packages; its makers expect to discontinue it);
+  (b) chacha20 0.10.2, the library the rand project moved to (two outside packages, three on the server; the server
+  picks one of three fast paths by its processor; two earlier releases were withdrawn in August for undefined
+  behaviour on old processors, with no report of wrong numbers); (c) our own small ChaCha8 in the simulation (about
+  270 lines with its tests, checked against published test numbers; nothing from outside enters). Recommendation: (c),
+  with rust-reviewer: the only option where server and browsers run the very same code.
+- WASM-TEST-ROUTE: How do the rule tests run inside WebAssembly? Why it matters: it decides whether new outside code
+  enters, and how literally two pass marks are met. Options: (a) a test-only build of our own tools crate, made with
+  the bindings tool you already approved, run in the test steps that exist (no new outside code; the marks' wording
+  "wasm-bindgen-test" and "a test in sim" change in the drafts); (b) the drafts' named tool, wasm-bindgen-test (new
+  outside packages, and CI must unpack a second program from the archive you approved). Recommendation: (a).
+- CI-LOOP: Where do change-set 3's two CI edits go (E1: the release test line also runs our tools crate; E2: one line
+  that builds the test-only WebAssembly before the tests)? Why it matters: a CI edit makes a pull request the higher
+  risk tier. Options: (a) a small CI pull request right after change-set 3, as with CI-WASM; (b) inside change-set
+  3's pull request. Recommendation: (a); the exact text goes to you with the plan.
+- SIZE-3 (only if the two halves together pass about 4,000 lines): The card plans 2,700 lines; our estimates are higher.
+  Why it matters: past twice the plan the work stops and asks you. Options: (a) one pull request with a new planned
+  size and stop line; (b) two pull requests: 3a, the rule tests and boundaries (nothing new to see), then 3b, the loop
+  with your browser check; (c) keep 2,700 and move the listed items (5.3) out. Recommendation: (b): the rules settle
+  before the loop rests on them, which is the card's own order.
+- B6 DONE. Next: DONE, then the answer.
+
+## Not verified (for the answer)
+- Every line count (no code written); the panic hook's Wasm bytes; the std 1.99.1 f32/f64 method list (to be read).
+- That Vite merges an inline `worker.plugins` with vite.config.mjs (EA-N6's route; the fallback is named).
+- How LLVM lowers floor/ceil/trunc/round/mul_add on baseline x86-64 and wasm32 (my reading; rust-reviewer to confirm).
+- That a Playwright-routed page (http://rules.invalid/) loads the module's ES glue and Wasm; that devtools linking
+  sim-wasm's rlib brings its exports and start function into the test module without a clash; that six u32 params
+  pass with no glue allocation (as today's u32 param does).
+- RR-F5's remap through `cargo --config build.rustflags` (rust-reviewer's call).
+- Nothing was built, run or opened in a browser (the brief's rules).
+DONE
