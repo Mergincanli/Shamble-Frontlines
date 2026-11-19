@@ -6892,3 +6892,28 @@ Build U4f. My size stop stays: past 6,000 added lines the build stops and I get 
   54cb6faa…): p3, p9 (bites, not-older-than), p16 (B) and p20 (idle 2 s) at 4-6 s with 2 s episodes, 48 clients,
   each exit 0; contract PASS on p3 (129 names) and p20 (130), none without a row; p16's 8 buffer-full, as builder 3
   wrote.
+
+## Decision: Mustafa, 2026-11-19 12:00 Amsterdam by his own label (it reached this chat at 13:36:25 UTC), SIZE-U4F (a): close U4f with what is built; the forged-command test's rest and -21's runs a unit of their own
+- **Mustafa, typed into this chat (transcript 2026-11-19T13:36:25.198Z, uuid 19e5482e-9d16-49cd-84e2-b3b9ecc139a4), verbatim** (the whole message, unchanged, in the fence below):
+
+```text
+You were just compacted to cut usage. Read the resume card in .checkpoints/netcode-proof-test.md first and continue from its next steps. Do not redo finished work.
+
+My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with what is built. The three finished cheat tests stay in it and are reviewed with it; the forged-command test, its six missing cheats and all of -21's runs become a small unit of their own next, with its own size line and review. No pass mark, judge rule, marks.json text or run count changes.
+```
+
+## Card blocks moved 2026-11-19 after SIZE-U4F's answer (card_trim_1119d.py; from the card's 'Now: U4f')
+- **Builder 3 (18:10-22:59 UTC): AT HIS SIZE STOP** (notes u4f-build.md :692-866; its stop record :827-866; return in
+  the chat): built B8's fast clock (f19, f37, U4F-Q11 (iii) (c)'s test, p3, p9, p16, p20) and B9a (npt-bots' forgers
+  of kinds 1, 2, 4, 5, 6; f15's five). **6,213 added**, 307 removed (final snapshot 74ae26aa…, `git apply --numstat`;
+  its 6,212 predates its one-line doc fix, bots lib.rs 700 → 701): M's 3,000 x 2.07. Not built: the forged suite's rest
+  (six forgers, the lab's suite, the attribution, the twins, f16, f22, f23, f33, p1, p7, p14, p17, -21's set) and f28's
+  clamp and lag-switch B halves: about 1,400-1,550 more (U4f whole about 7,600-7,800). End checks A2 and B
+  (w3-end-check-a2.log, -b.log, to 18:50:00 and 22:59:25 UTC): all 11 steps pass on one tree (diff 54cb6faa…),
+  measured 630, bites 727, test step 692.1 and 685.6 s; SERIES.md +20 / -0 (its 2 new rows report-only, read in full).
+  **The advisor's stop ruling** (advisor-u4f-stop.md, 247 lines, 38821ebd…, read in full): R1 the lean (a) confirmed
+  (the built -21 parts stay in U4f's merge; the forged suite's rest, f28's B halves and all of -21's runs to a new
+  unit); R2 the cap 1,600 APPROVED (condition: -20's set before -22's, read for honest overflow); R3 the fast clock's
+  no pings a recorded deviation, p3, p9, p16, p20 by hand before the panel, USAGE's two options in the fix pass; R4
+  MAIN-52 now, plan first; Lows S1-S7, note N1. SIZE-U4F sent to him in the day's message (2026-11-19, 00:2x
+  Amsterdam); the panel waits for his answer (R4).

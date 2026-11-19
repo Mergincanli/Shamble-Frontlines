@@ -5,8 +5,8 @@
   **Base:** main b763ba3 merged in at 0f12d9e (MAIN-60, 2026-11-18 23:41 UTC: #55-#60, the first v2 code, DEP-HOLD,
   a CI workflow; one conflict, docs/STATUS.md: this branch's #40 row kept beside main's #60 row), which clears PR #40's
   conflict. MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-19 00:02 UTC: U4f AT HIS SIZE STOP (6,213 added; snapshot 74ae26aa); SIZE-U4F with him;
-  MAIN-60 DONE (main b763ba3 in at 0f12d9e; CI green; the advisor's head check APPROVE WITH FINDINGS). Waiting on him.
+- **Last update:** 2026-11-19 13:5x UTC: SIZE-U4F ANSWERED (a) (history.md:6896-6903): U4f closes with what is built;
+  its review panel's round 1 next, on builder 3's tree (snapshot 74ae26aa). Disk 5,067 MiB free (13:44 UTC).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -79,24 +79,28 @@
   at most about 400 lines. R4 build to his 6,000 stop; at the first block end past it, nothing more but the end checks;
   the three lines then, in that day's message, first line "stopped on you": (a) split U4f (close at -20, -47 and -22;
   -21 its own unit) or (b) go on; the advisor's provisional lean (a). Its 22 lines (:162-246) are builder 2's.
-- **Builder 3 (18:10-22:59 UTC): AT HIS SIZE STOP** (notes u4f-build.md :692-866; its stop record :827-866; return in
-  the chat): built B8's fast clock (f19, f37, U4F-Q11 (iii) (c)'s test, p3, p9, p16, p20) and B9a (npt-bots' forgers
-  of kinds 1, 2, 4, 5, 6; f15's five). **6,213 added**, 307 removed (final snapshot 74ae26aa…, `git apply --numstat`;
-  its 6,212 predates its one-line doc fix, bots lib.rs 700 → 701): M's 3,000 x 2.07. Not built: the forged suite's rest
-  (six forgers, the lab's suite, the attribution, the twins, f16, f22, f23, f33, p1, p7, p14, p17, -21's set) and f28's
-  clamp and lag-switch B halves: about 1,400-1,550 more (U4f whole about 7,600-7,800). End checks A2 and B
-  (w3-end-check-a2.log, -b.log, to 18:50:00 and 22:59:25 UTC): all 11 steps pass on one tree (diff 54cb6faa…),
-  measured 630, bites 727, test step 692.1 and 685.6 s; SERIES.md +20 / -0 (its 2 new rows report-only, read in full).
-  **The advisor's stop ruling** (advisor-u4f-stop.md, 247 lines, 38821ebd…, read in full): R1 the lean (a) confirmed
-  (the built -21 parts stay in U4f's merge; the forged suite's rest, f28's B halves and all of -21's runs to a new
-  unit); R2 the cap 1,600 APPROVED (condition: -20's set before -22's, read for honest overflow); R3 the fast clock's
-  no pings a recorded deviation, p3, p9, p16, p20 by hand before the panel, USAGE's two options in the fix pass; R4
-  MAIN-52 now, plan first; Lows S1-S7, note N1. SIZE-U4F sent to him in the day's message (2026-11-19, 00:2x
-  Amsterdam); the panel waits for his answer (R4).
-- **After the build:** the panel in two batches (brief 12 item 8); merge; 5.3's 21 pre-runs; the part-clean at A6's
-  place; the sets one at a time (-47, -22, -20, -21: about 6-8 h of runs); U4f's report, with A1's movement reading in
-  a line of its own naming who reviewed it (the advisor's A1; read by the advisor and the test-engineer), and every
-  marks.json or judge change's reviewer named in its own line (his 13:35 rule).
+- **Builder 3 stopped at his size stop** (its record moved to history.md:6905-6919, card_trim_1119d.py): 6,213 added,
+  307 removed, 29 files; end checks A2 and B pass on one tree (630 measured, 727 bites); hand runs p3, p9, p16, p20 done.
+  The advisor's stop ruling: advisor-u4f-stop.md (R1-R4; Lows S1-S7, note N1 at :198-210).
+- **SIZE-U4F ANSWERED: (a)** (Mustafa, 2026-11-19 12:00 Amsterdam by his label; reached the chat 13:36:25 UTC; word for
+  word at history.md:6896-6903 by record_size_u4f.py): U4f closes with what is built; the three finished cheat tests
+  stay in it and are reviewed with it; the forged-command test, its six missing cheats and all of -21's runs become a
+  small unit of their own next, **U4f2**, with its own size line and review; no pass mark, judge rule, marks.json text
+  or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
+  brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
+  with its source before its first snapshot). -21 is judged only after U4f2.
+- **Round 1, the panel** (brief 12 item 8; u4f-panel-brief.md): five seats at xhigh, at most three at a time (netcode,
+  security, test; then rust, arch), on builder 3's worktree read-only (the runner takes only .claude/worktrees/ paths;
+  its hashes re-checked equal at 13:44 UTC, .gate/u4f/review-pre.log), the snapshot's `git apply --check` on the lane's
+  head passing (13:43 UTC). Notes u4f-review-<seat>.md; runner logs .gate/u4f/review-<seat>/.
+- **After the panel:** the results word for word by script (u4f-review-r1-full.md); every Medium or higher read in full;
+  the advisor's ruling (the fix list); the fix pass in a fresh worktree from the lane's head with the snapshot applied
+  (the Lows that ride: S4 USAGE's `--lag-*`, S5 SERIES.md's subsection title, S6 c-u4f-runs.mjs:7's order); round 2
+  only on what changed; merge, with plan §4.7's cap text and the plan's U4f and U4f2 entries (stop ruling :98-99);
+  5.3's 21 pre-runs; the part-clean at A6's place; the sets -47, -20, -22 (-20's six 10-minute P3 runs read for honest
+  overflow resyncs before -22's); U4f's report: A1's movement reading in a line of its own naming who reviewed it (the
+  advisor's A1; read by the advisor and the test-engineer), every marks.json or judge change's reviewer in its own line
+  (none so far), the fast clock's no pings, f28's B halves moved, the five forgers built ahead for U4f2.
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-18 (named in that day's message):** D3-1's fix by the advisor's ruling (advisor-u4f-fold-check.md): U4f's
@@ -115,9 +119,13 @@
   1,600, no longer provisional; -20's set before -22's (order -47, -20, -22, -21), its 10-minute P3 runs read for
   honest overflow resyncs first; the fast-clock cheat sends no pings (a recorded deviation); main b763ba3 taken in now,
   plan first (MAIN-60). Why: inside the plan, undoable, no pass mark, bar text, judge file or marks.json changes.
+- **2026-11-19 after his answer (to name in the next day's message):** f28's clamp and lag-switch B halves go to U4f2
+  with the rest of -21 (the advisor's R3 (ii); his (a) lists the forged test, its six cheats and -21's runs). Why:
+  inside the plan, undoable, no pass mark; neither half is built, and no -21 run counts before U4f2 merges.
 
 ## Next steps (plan rev 3.3; units ahead)
-1. U4f (above). 2. U4g (prediction, interpolation and events; M) and U4h (lag compensation and aim; M), each with a
+1. U4f (above), then U4f2 (-21's forged suite and runs; its short brief to the advisor; its size line on the card before
+   its first snapshot). 2. U4g (prediction, interpolation and events; M) and U4h (lag compensation and aim; M), each with a
    short brief (TEST-FIRST rule 3) to the advisor before its build; U4g's carry holds ADV-CBR-1 and C62HB-Q4 (b)'s two
    -58 lost-tick checks. 3. U4's other row groups as u4-build-plan.md places them, then U4's report (it folds U4r's);
    JDG-ONLY-1 at npt-judge's next change, as its own change-set. 4. U5 (S), U6 (M), U7 (M), U8 (S): plan.md §12.1
