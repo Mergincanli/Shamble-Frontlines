@@ -478,8 +478,8 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     on fails it); the allocation window must end before block 420. `plants.py` is at its third version (patterns
     anchored on the failing line's mark; plants 14, 14b, 15 for round 2's fixes; the tree must end as it started);
     its run on the scratch worktree with the candidate applied started 11:00:59 UTC (`planted-defects-3.md`).
-54. **Pull request #61 opened as a draft** (https://github.com/Mergincanli/Shamble-Frontlines/pull/61; about 11:0x
-    UTC by the GitHub tool's answer), so that the docs can cite it. Not watched (as #58 and #60).
+54. **Pull request #61 opened as a draft** (https://github.com/Mergincanli/Shamble-Frontlines/pull/61; created
+    2026-11-19T11:01:27Z by GitHub's record), so that the docs can cite it. Not watched (as #58 and #60).
 55. **The docs pass started** (docs-keeper, Opus 5.5 at effort high, on STATUS, the archive, ROADMAP and the map; its
     notes `docs-keeper-notes.md`, its list `docs-keeper-moved-lines.md`). By the main session, by script: ADR 0002's
     dated pointer for SPLIT-25 (`adr-pointer.mjs`; written into `docs/adr/0002-...md`, 6 lines, not committed
