@@ -6947,3 +6947,51 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
 - **MAIN-60 DONE** (its record at history.md's end, card_trim_1119c.py): main b763ba3 in at 0f12d9e; CI green on
   bb7a5ed; the advisor's head check APPROVE WITH FINDINGS (advisor-main-60-head.md: six Lows, no push). R3 (iii)'s
   four hand runs done (.gate/u4f/w3-hand.log: each exit 0, contract PASS). The lane goes on from this head.
+
+## Card blocks moved 2026-11-19 after MAIN-61's head check (card_trim_1119g.py; from the card's 'Running work')
+- **U4f's panel, round 1, ENDED** 14:32 UTC (wf_a011d9f2-abf: 5 of 5 results); **the advisor's ruling ENDED** about
+  14:52 UTC (agent abf879016ff011b9c). **Part-clean before builder 4 DONE** (P27's six cleans and checks in one
+  main-run.sh call, .gate/u4f-b4/clean-shared.log, exit 0, 14:53 UTC): free 5,054 → 11,784 MiB.
+- **MAIN-61** (main f5030a3, PR #61, in; PR #40 un-mergeable since 15:11 UTC, STATUS.md the one conflict): plan
+  main-61-plan.md, **APPROVED WITH CONDITIONS C1-C6** (advisor-main-61.md, 201 lines, read in full; "As approved" in
+  the plan). MAIN-61 approved (advisor-main-61.md), running steps 1-7. If `git rev-parse -q --verify MERGE_HEAD` prints
+  f5030a33185b1ea1b15329174e82823f0215f993, the merge is in progress: no save, no `git merge --abort`, no reset. If `git
+  diff --name-only --diff-filter=U` names docs/STATUS.md, resume at step 3; otherwise resume at step 3's checks before
+  the commit (C2 (b)), then step 4. If HEAD^2 is f5030a3 and HEAD is not on the remote yet, resume at step 5. Builder
+  4's notes and this card may show unstaged: leave them; step 6's card save takes them. Anything else: the advisor rules.
+  **Step 1 (15:3x-15:4x UTC):** the saver bsf862iz2 stopped by TaskStop; the proof used (C5 (b)): its output ends
+  "[killed]" with no save logged since 14:57:30, and `pgrep -af "checkpoint.mjs watch"` finds no process (exit 1);
+  its last save 52f9f4e (holding this resume line) equals the remote, so no foreground save ran (C5 (c)). C5 (b)'s
+  second form holds too (the advisor's head check, ADV-M61H-2): 52f9f4e is the (terminated) autosave, on the remote by
+  the 15:31:00 fetch. **H0 =
+  52f9f4ea10f4681a748b48b5ce47b9d8c5855798.** `git fetch origin`: main unmoved. Pre-checks all pass: status clean;
+  origin/main f5030a3; base b763ba3; the guard's pathspec empty; merge-tree's one conflict docs/STATUS.md; main's CI on
+  f5030a3 green (push runs gate 44551896122, toolchain 44551894194: completed, success). The base light run RUNNING in
+  the background (task brz7ok5bs; .gate/main-61/light-base.log). No save until the push (C2 (c)).
+  **Steps 1-5c DONE:** the base run passed C1 (a)'s bar (N0 1,515, M0 307); `git merge origin/main` exit 1, STATUS.md
+  the one CONFLICT; resolved by Edit (the #40 row ours, #61 main's); C2 (b)'s checks equal; **merge commit a6acc8a**
+  (git's message); step 4's checks and C1 (c)'s three all as stated; gate PASS, repo map 170/110, checkpoint tests
+  33/33 (.gate/main-61/step5-outputs.txt). **Step 5d PASSED** (.gate/main-61/light.log, 15:42:17-15:42:21 UTC, exit 0,
+  HEAD a6acc8a, hashes e3b0c442…: refs 1,565 = N0 + 50 with the exception line; the full marks line; self 78 of 78;
+  redact 10 of 10, 307 items, 0 findings). **Step 6 DONE:** pushed at 631edf3 (15:43 UTC); the saver bbe44e8id
+  restarted 15:43 (both trailers; window to about 17:33); builder 4's notes copied (copy_b4_notes.py, 866 -> 1,104
+  lines) and its worktree snapshotted (wip/u4f-build.patch, base b25b96a, 394,313 B, 29 files), pushed 549ed77.
+  CI: check_suite.completed on 631edf3 at 15:47 UTC (no suite running or failed). **Step 7 RUNNING** from 17:45 UTC:
+  the advisor's head check (agent aed5b19b068559f68; advisor-main-61-head.md). Builder 4 resumed 17:44 (end check B,
+  --list, times, items 4 and 5); the saver b3e3qzz16 from 17:44 (window to about 19:34).
+  Free disk 4,508 MiB at 15:42 (builder 4's cold end checks; the runner stops under 4,096).
+  **15:37:55 UTC (the transcript), Mustafa (92 % usage): "make sure to save your progress (Same for the agents)".** Pushed: everything to
+  52f9f4e. Local only: merge commit a6acc8a and these card lines (no push before 5d, C2 (c)); 5d waits for builder 4's
+  lane lock (no log yet). Builder 4 told by SendMessage to bring its notes block up to date. **If cut:** the resume line
+  above (HEAD^2 = f5030a3 and HEAD not on the remote: step 5, so 5d again in the background, then step 6, the saver,
+  then builder 4's snapshot by worktree_patch.py).
+  **Builder 4 at 15:39 UTC** (its message): FP1-FP19 done, each with its log line; no plant in place (FP4's and FP15's
+  restored, sha256 equal); SIZE-CHECK 6,425 (the pass +212); end check A running (-x, .gate/u4f/w4-end-check-a.log,
+  cold), then B, --list, times, items 4 and 5. **Its notes are in its worktree's copy**
+  (.claude/worktrees/agent-a5b1297a320917dfb/.checkpoints/netcode-proof-test/u4f-build.md: :1-866 equal to the main
+  folder's, then its block): the harness keeps an isolated agent in its worktree. After the push, copy that block to
+  the main folder's file by script, word for word, then snapshot its worktree.
+- **The saver** restarted about 14:58 UTC (bde01r5pv stopped then, by TaskStop, a foreground save after it), both
+  attribution lines as trailers (ADV-M60-8); its window ends about 16:48: restart it while agents run
+  (run_in_background, timeout 7200000). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
+  ENABLED again at 13:49 UTC (next 14:34); pause it when no agent runs.

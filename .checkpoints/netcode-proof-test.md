@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-19 15:0x UTC: SIZE-U4F ANSWERED (a) (history.md:6896-6903); round 1 returned and ruled
-  (advisor-u4f-r1.md); builder 4's fix pass next. Disk 11,784 MiB free (14:53 UTC, after the part-clean).
+- **Last update:** 2026-11-19 17:5x UTC: MAIN-61 done (main f5030a3 in at a6acc8a; head check APPROVE WITH FINDINGS);
+  builder 4's fix pass at its end checks (A2 passed). Disk 4,505 MiB free (17:4x UTC; the runner's floor 4,096).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -144,7 +144,7 @@
 - **Carried past U4 (the old card's Open findings, history.md:6430-6464):** the advisor's U2 carries C1-C5 and its
   Note; C-U7-1; the U1 carries (C4, C6, A3, the results ledger, Q13, Q23); C6 widened (U6, before R3); JITTER-ORDER
   (parked: to him before R3 only if C6 shows the model's reordering moves a WebTransport result).
-- **For PR #40's ready head** (the advisor's MAIN-60 head check): CI's green is bb7a5ed's; the head marked ready needs
+- **For PR #40's ready head** (the advisor's MAIN-60 head check): CI's green is 631edf3's (MAIN-61); the head marked ready needs
   its own run. STATUS.md's #40 row still reads "main 53272a1 merged in": PR #40's closing docs pass (ADV-M60-7).
 
 ## After the close (TEST-FIRST rule 1's list: found on the way, outside the plan)
@@ -176,53 +176,14 @@
 - **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
   `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
   final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,276 B, 29 files: the one snapshot until the merge.
-- **U4f's panel, round 1, ENDED** 14:32 UTC (wf_a011d9f2-abf: 5 of 5 results); **the advisor's ruling ENDED** about
-  14:52 UTC (agent abf879016ff011b9c). **Part-clean before builder 4 DONE** (P27's six cleans and checks in one
-  main-run.sh call, .gate/u4f-b4/clean-shared.log, exit 0, 14:53 UTC): free 5,054 → 11,784 MiB.
-- **MAIN-61** (main f5030a3, PR #61, in; PR #40 un-mergeable since 15:11 UTC, STATUS.md the one conflict): plan
-  main-61-plan.md, **APPROVED WITH CONDITIONS C1-C6** (advisor-main-61.md, 201 lines, read in full; "As approved" in
-  the plan). MAIN-61 approved (advisor-main-61.md), running steps 1-7. If `git rev-parse -q --verify MERGE_HEAD` prints
-  f5030a33185b1ea1b15329174e82823f0215f993, the merge is in progress: no save, no `git merge --abort`, no reset. If `git
-  diff --name-only --diff-filter=U` names docs/STATUS.md, resume at step 3; otherwise resume at step 3's checks before
-  the commit (C2 (b)), then step 4. If HEAD^2 is f5030a3 and HEAD is not on the remote yet, resume at step 5. Builder
-  4's notes and this card may show unstaged: leave them; step 6's card save takes them. Anything else: the advisor rules.
-  **Step 1 (15:3x-15:4x UTC):** the saver bsf862iz2 stopped by TaskStop; the proof used (C5 (b)): its output ends
-  "[killed]" with no save logged since 14:57:30, and `pgrep -af "checkpoint.mjs watch"` finds no process (exit 1);
-  its last save 52f9f4e (holding this resume line) equals the remote, so no foreground save ran (C5 (c)). **H0 =
-  52f9f4ea10f4681a748b48b5ce47b9d8c5855798.** `git fetch origin`: main unmoved. Pre-checks all pass: status clean;
-  origin/main f5030a3; base b763ba3; the guard's pathspec empty; merge-tree's one conflict docs/STATUS.md; main's CI on
-  f5030a3 green (push runs gate 44551896122, toolchain 44551894194: completed, success). The base light run RUNNING in
-  the background (task brz7ok5bs; .gate/main-61/light-base.log). No save until the push (C2 (c)).
-  **Steps 1-5c DONE:** the base run passed C1 (a)'s bar (N0 1,515, M0 307); `git merge origin/main` exit 1, STATUS.md
-  the one CONFLICT; resolved by Edit (the #40 row ours, #61 main's); C2 (b)'s checks equal; **merge commit a6acc8a**
-  (git's message); step 4's checks and C1 (c)'s three all as stated; gate PASS, repo map 170/110, checkpoint tests
-  33/33 (.gate/main-61/step5-outputs.txt). **Step 5d PASSED** (.gate/main-61/light.log, 15:42:17-15:42:21 UTC, exit 0,
-  HEAD a6acc8a, hashes e3b0c442…: refs 1,565 = N0 + 50 with the exception line; the full marks line; self 78 of 78;
-  redact 10 of 10, 307 items, 0 findings). **Step 6 DONE:** pushed at 631edf3 (15:43 UTC); the saver bbe44e8id
-  restarted 15:43 (both trailers; window to about 17:33); builder 4's notes copied (copy_b4_notes.py, 866 -> 1,104
-  lines) and its worktree snapshotted (wip/u4f-build.patch, base b25b96a, 394,313 B, 29 files), pushed 549ed77.
-  CI: check_suite.completed on 631edf3 at 15:47 UTC (no suite running or failed). **Step 7 RUNNING** from 17:45 UTC:
-  the advisor's head check (agent aed5b19b068559f68; advisor-main-61-head.md). Builder 4 resumed 17:44 (end check B,
-  --list, times, items 4 and 5); the saver b3e3qzz16 from 17:44 (window to about 19:34).
-  Free disk 4,508 MiB at 15:42 (builder 4's cold end checks; the runner stops under 4,096).
-  **15:5x UTC, Mustafa (92 % usage): "make sure to save your progress (Same for the agents)".** Pushed: everything to
-  52f9f4e. Local only: merge commit a6acc8a and these card lines (no push before 5d, C2 (c)); 5d waits for builder 4's
-  lane lock (no log yet). Builder 4 told by SendMessage to bring its notes block up to date. **If cut:** the resume line
-  above (HEAD^2 = f5030a3 and HEAD not on the remote: step 5, so 5d again in the background, then step 6, the saver,
-  then builder 4's snapshot by worktree_patch.py).
-  **Builder 4 at 15:39 UTC** (its message): FP1-FP19 done, each with its log line; no plant in place (FP4's and FP15's
-  restored, sha256 equal); SIZE-CHECK 6,425 (the pass +212); end check A running (-x, .gate/u4f/w4-end-check-a.log,
-  cold), then B, --list, times, items 4 and 5. **Its notes are in its worktree's copy**
-  (.claude/worktrees/agent-a5b1297a320917dfb/.checkpoints/netcode-proof-test/u4f-build.md: :1-866 equal to the main
-  folder's, then its block): the harness keeps an isolated agent in its worktree. After the push, copy that block to
-  the main folder's file by script, word for word, then snapshot its worktree.
-- **Builder 4 (the fix pass) RUNNING** from 14:57 UTC (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+- **Builder 4 (the fix pass) RUNNING** from 14:57 UTC, cut 16:00:10-17:44 (A2 passed; B, items 4 and 5 next) (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
-- **The saver** restarted about 14:58 UTC (bde01r5pv stopped then, by TaskStop, a foreground save after it), both
-  attribution lines as trailers (ADV-M60-8); its window ends about 16:48: restart it while agents run
-  (run_in_background, timeout 7200000). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-  ENABLED again at 13:49 UTC (next 14:34); pause it when no agent runs.
+
+- **MAIN-61 DONE** (its record at history.md:6951-6997, card_trim_1119g.py): main f5030a3 in at a6acc8a, pushed at
+  631edf3; CI green (six check runs); the advisor's head check APPROVE WITH FINDINGS (advisor-main-61-head.md: ADV-M61H-1
+  Medium fixed by that trim, -2 to -4 folded in, -5 nothing). The saver b3e3qzz16 from 17:44 UTC, both trailers (window
+  to about 19:34); the check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (next 18:34).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-19 16:00:10 to about 17:45 UTC (builder 4; the session too):** "You've hit your org's monthly spend limit
