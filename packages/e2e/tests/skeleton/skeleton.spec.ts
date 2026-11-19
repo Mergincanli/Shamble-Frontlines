@@ -2,26 +2,11 @@
 import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { ADDRESS } from "../../playwright.config.ts";
+import { needsBuild, report, running, type Report } from "./report.ts";
 
-interface Report {
-  picture: { backend: string };
-  counters: Record<string, number>;
-  tick: number;
-  blocks: number;
-  posts: number;
-  frames: number;
-  errors: number;
-  pauses: number;
-  lastPause: { ticksWhileHidden: number } | null;
-  worker: { ticks: number; undetached: number; maxTicksInOneWake: number } | null;
-}
 const baseline = JSON.parse(readFileSync(new URL("./render-counts.json", import.meta.url), "utf8")) as Record<string, unknown>;
-const report = (page: Page): Promise<Report> =>
-  page.evaluate(() => (window as unknown as { __shambleReport(): Report }).__shambleReport());
 
-test.beforeAll(() => {
-  if (process.env["SHAMBLE_DIST"] === undefined) throw new Error("set SHAMBLE_DIST to the built page's folder");
-});
+test.beforeAll(() => void needsBuild());
 
 /** Opens the page with every WebAssembly entry point on the page replaced by one that counts and throws. */
 async function open(page: Page, query: string): Promise<string[]> {
@@ -42,8 +27,7 @@ async function open(page: Page, query: string): Promise<string[]> {
     }
   });
   await page.goto(`/${query}`);
-  await page.waitForFunction(() => (window as unknown as { __shambleReport?(): Report }).__shambleReport?.().worker != null);
-  await page.waitForFunction(() => (window as unknown as { __shambleReport(): Report }).__shambleReport().blocks >= 90);
+  await running(page);
   return outside;
 }
 
