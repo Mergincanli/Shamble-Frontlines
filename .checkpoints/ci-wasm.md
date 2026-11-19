@@ -8,7 +8,7 @@
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for `cs/ci-wasm`; lane 1, the first builder chat,
   session_019YNMUV9LFhASseJ9EP12kL, on his personal account) · **Base:** main
   f5030a33185b1ea1b15329174e82823f0215f993 (the merge of #61; the branch is level with it and pushed)
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 20:00 UTC.
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 21:44 UTC.
 
 ## His words that govern (read the files; the lines below are pointers and quotes, never a substitute)
 - `ci-wasm/mustafa-2026-11-19-1516-go-61.md` (2026-11-19, 14:28:25 UTC, whole, by script; it stands byte for byte in
@@ -153,63 +153,50 @@
    blend-fraction sentence; wording. **The plan may go to him** with its four questions (RNG-SOURCE, SIZE-3,
    PRESS-PACE, DEPART-3) and the two rulings.
 
-## Current step
-Step 5: the exact text and the three questions (CHROME-SOURCE, CI-TEXT, FIREFOX-TESTS) go to him in chat, with the
-advisor agent's three rulings (PERM-ATT (a), PLANTS both, PYCACHE-NOW (b)) and the record of the compiled Python
-file. Then wait for his yes and for the chat's mode (Accept edits) before any line under `.github/` is written.
-Meanwhile: change-set 2's ten planted defects on the two edited specs run in a worktree of their own
-(`.gate/ci-wasm-plants`, at c934fc0; output `.gate/ci-wasm/plants-subset.out`; script `ci-wasm/plants-subset.py`);
-CI's runs on c934fc0 (today's workflow) are read; change-set 3's plan is drafted (`ci-wasm/cs3-context.md`).
+4e. The plan of change-set 3 (draft 3) and its four questions were put to him in chat at about 21:07 UTC, with the
+   three questions of #62 still open.
 
-## Next steps
-3. **The plan of the CI-WASM pull request** (plan first; drafted with infra-engineer; reviewed by the advisor agent;
-   reviewers: infra-engineer, security-auditor (a CI change is risk tier 2), test-engineer). What it must hold:
-   - The job's steps in order: GitHub's own check of the tool's file (`gh release verify-asset`, the route the
-     report of #61 names as not yet run) before the tool's first run there, with its output quoted in the report;
-     the file's size and sha256 as the build already checks them (wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz,
-     11860397 bytes, sha256 9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f; the program inside:
-     8170784 bytes, sha256 ca4df773020dae87d92b9eadb2b85412bea7a9cf6318ab9999dd119fd9f46931); the Wasm build; the
-     page's build; the unit tests, the boundary tests and the browser tests.
-   - Which browser the browser tests run in on GitHub's machine, and where it comes from (a download: his word).
-     With it the question FIREFOX-TESTS: when the browser tests also run in Firefox. The allocation test uses
-     Chromium's own profiler and stays Chromium-only.
-   - The follow-ups the archive places here (`docs/STATUS_ARCHIVE.md`, the block of PR #61, "For the CI pull
-     request"): TE-NT6 (speed-dependent browser checks), RR-N4 and VF-L5 (a test of the refused-variables pattern),
-     RR-F5 (the builder's registry path inside the Wasm), E2E-TYPES (the browser specs are type-checked by no tool),
-     SA-TREE, SA-DIST.
-   - The planned size and the stop line.
-4. **The exact text of every workflow edit to him in chat.** Written only after his yes, with the chat in Accept
-   edits (read the mode right before each write).
-5. **The docs pass for #61's merge** (with this pull request, by his words of 16:08:04 UTC; **the report keeps the
-   workflow text apart from the docs**, so that he can compare it with the text he said yes to):
-   - `docs/DECISIONS.md`, by script: his go of 14:28:25 UTC (with BROWSER-SET (a)); his "a, yes" of 14:31:30 UTC; his
-     browser reports (the four messages), with the reading's result.
-   - `docs/VISION_V2.md`, the dated note he said yes to (VISION-NOTE (a)), exactly, directly under the decided line
-     "Desktop browsers first: Chrome, Edge, Firefox and Safari. Mobile comes later but is not designed out.":
-     ```
-       - _Dated note, 2026-11-19 (Mustafa's answer BROWSER-SET (a), order only; his words in `docs/DECISIONS.md`, the
-         entry of 2026-11-19, 14:28:25 UTC): "Safari stays a target of v2. Chrome, the Chromium-based browsers and Firefox
-         come first; Safari and Mac come later." The line above stands as decided._
-     ```
-     and, appended to the "Updated on ..." lines at the top of that file:
-     `On 2026-11-19, his answer BROWSER-SET, as a dated note (§4).`
-   - STATUS, ROADMAP and the map: #61 merged (f5030a3); the "Not verified" lines that his check now answers (WebGPU,
-     Brave, Firefox, a real GPU: NVIDIA GeForce GTX 980); the observations of `ci-wasm/browser-reports-reading.md` as
-     follow-ups (BR-GAP, FPS-LINE, NEG-ZERO, FF-WAKES, BR-LATE, ADAPTER, TQ-FF, NOT-SHOWN).
-   - The advisor agent's points on head 4cf30ce (the pull request's description, "Deferred items"): the Medium on
-     "Safari and Mac come later" is answered by BROWSER-SET (a) and the note above; the Low at `docs/DECISIONS.md`
-     line 132 ("as the report writes it down"; his words: "as you wrote it down, with your lesson"); the Low at
-     `docs/STATUS_ARCHIVE.md` lines 1149-1150 (what his Firefox check finds: his call); the nits (the README went from
-     52 to 85 lines by line count; "one sentence" is two; PROJ-DRAW is lane 2's id, which he used).
-6. **Change-set 3's plan, drafted beside it** (not built before the CI-WASM pull request is merged): the build
-   plan's card for change-set 3; the follow-ups the archive places there (NA-N1 to NA-N7, EA-F8, EA-F9, EA-F10,
-   EA-F13, EA-N3, EA-N5, EA-N6, VF-L7, VF-L4, GE-N1, GE-N4, GE-N5, GE-N6, TE-NT3, TE-NT4, TE-NT5, TE-NT7, PA-N2, PA-L2, TE-L,
-   SA-ENV, FAVICON); the question RNG-CRATE with the two readings he names; one line `__pycache__/` in `.gitignore`;
-   **in the browser check's README (his words of 16:08:04 UTC): he keeps the browser's window in front and uncovered
-   during the first run, and one step has the window covered on purpose, so that BR-GAP is read and not guessed.**
-   Its draft is carried into change-set 3's own checkpoint when that opens.
-7. Then, in order: the advisor agent's review of the plan; the build after his yes on the text; reviews; the
-   verifier; the report; the pull request draft, then ready; stop for his go.
+## Current step
+**PAUSED by his words of 2026-11-19, 21:44:09 UTC** (`ci-wasm/mustafa-2026-11-19-pause.md`, by script): "Finish the
+current tasks that you're working on and then pause. I will let you know when you can continue again". Everything in
+hand was finished: no agent runs, the saver is stopped, the tree is clean and pushed. **Nothing is started until he
+says to continue.** When he does: read this card; read the session's model; start the saver again; then go on by
+his answers.
+
+Waiting on him, two sets of questions, each put to him in chat with its options:
+- For pull request #62 (put 20:03 UTC): CHROME-SOURCE (recommended (a), the runner image's Chrome), CI-TEXT (one yes
+  for five things: `ci-edit.diff` sha256 240c7db7...2673, `ci-plant-p-gh.diff` sha256 e4f21ab3...b1ac, P-BROWSER,
+  the stop rule, the tool's second route), FIREFOX-TESTS (recommended (c)). With a yes on CI-TEXT the chat must be
+  in Accept edits; the mode is read right before each of the three CI writes.
+- For change-set 3's plan (put 21:07 UTC; `ci-wasm/cs3-plan.md`, draft 3): RNG-SOURCE (recommended (c), our own
+  ChaCha8), SIZE-3 (recommended (b), 3a then 3b, with the two ladders), PRESS-PACE (recommended (a)), DEPART-3
+  (recommended (a)). Told to him as the advisor agent's rulings: WASM-TEST-ROUTE (a), CI-LOOP (a) for E1 only; and
+  for #62: PERM-ATT (a), PLANTS both, PYCACHE-NOW (b).
+
+## Next steps (only after he says to continue)
+1. **#62, after his answers:** his words copied by script into the notes and added to `ci-wasm/decisions-3.mjs` as
+   entries. With CI-TEXT (a) and the chat in Accept edits (read from the session record right before the write):
+   write `.github/workflows/toolchain.yml` from `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml`, compare
+   its sha256 (d1dbcb53...975c), commit that one file, push; **the first runner run under the stop rule** (plan
+   section 9). If `.gate/` was lost with a container, rebuild the proposed file by applying `ci-wasm/ci-edit.diff`
+   to main's file and check the sha256.
+2. The two plants, one per push, each taken back in the next commit: P-GH (`ci-wasm/ci-plant-p-gh.diff`; the mode
+   read before its write and before its take-back; sha256 of the planted file 12b90249...12ef), then P-BROWSER (one
+   render count 3 to 4 in `packages/e2e/tests/skeleton/render-counts.json`). After the last take-back the tree
+   equals step 1's tree.
+3. Review round 1 on the final diff (security-auditor, infra-engineer, test-engineer; at most two rounds), fixes;
+   the tier-2 evidence (the kit's three test files' counts on main and on the head; the before/after table of the
+   workflow's rule sentences); the verifier; the advisor agent on every pushed head.
+4. docs-keeper (STATUS within 120 lines, ROADMAP, the map, the archive: plan section 7, item 4); his later messages
+   into DECISIONS by `ci-wasm/decisions-3.mjs`; the report `docs/reports/2026-11-19-ci-wasm.md` with the workflow
+   text kept apart from the docs; the checkpoint folded and deleted in the last commit; #62 marked ready; stop for
+   his go (risk tier 2).
+5. **Change-set 3, after #62 is merged and after his answers to its four questions:** open its own checkpoint (per
+   part: 3a first), move `ci-wasm/cs3-plan.md`, `cs3-context.md`, the three design notes and
+   `advisor-cs3-plan.md` into it, and build 3a by the plan's section 4. If he answers FIREFOX-TESTS (c), the
+   Firefox CI pull request comes between #62 and 3a, with its download and exact text to him first.
+6. Later: change-set 4's plan prices SLICE-FEEL and answers lane 2's list on issue #59 row by row; PROJ-DRAW in
+   change-set 9.
 
 ## Open findings
 - **PYC-AGAIN (what went wrong, to tell him and to record in the report):** one compiled Python file,
@@ -246,10 +233,8 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   3's plan).
 
 ## Running work
-- Saver: background task bgdn004k8 · output
-  `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/bgdn004k8.output` · started
-  19:57:35 UTC · stops by 21:47 UTC (110 minutes on) · last check 19:57 UTC: ok (its first line read). The second
-  saver (bxshyzuei, 17:59 UTC) was lost with the container's restart at about 19:57 UTC.
+- **Nothing runs.** The saver (bgdn004k8, started 19:57:35 UTC) was stopped with TaskStop at 21:44 UTC for the
+  pause; start it again when work goes on (`node .claude/scripts/checkpoint.mjs watch ci-wasm --trailer "..."`).
 - The planted defects, subset: done (20:00:29 to 20:08:18 UTC): ten of ten caught on the edited specs, each at the
   line that names it (1, 2, 7, 7b, 8, 8b, 11, 14, 14b, 15), and the control on the clean tree passes; output
   `ci-wasm/plants-subset-output.txt`, script `ci-wasm/plants-subset.py`. Its worktree `.gate/ci-wasm-plants` was
@@ -264,7 +249,7 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   the card's 2,700, so the plan must offer a split; notes
   `ci-wasm/engine-architect-cs3.md`: the boundaries, the page's key diagram, the rule tests, the build order). Both
   were given `ci-wasm/cs3-context.md`. A restart gives each the same task again.
-- No agent is running (21:06 UTC). Done, besides those below: the advisor agent "cs3-plan" with its re-read.
+- No agent is running (since 21:05 UTC). Done, besides those below: the advisor agent "cs3-plan" with its re-read.
 - Done: infra-engineer "ci-plan", test-engineer "followups", rust-reviewer "cs3-rng",
   security-auditor "ci-text", the advisor agent "plan" (with its re-read): every notes file ends with DONE.
 - Scratch outside git: `.gate/ci-wasm/` (`hist/`, `proposed/`, `proposed-plant/`, `docs-try/`, `security/`, `mutant/`,
