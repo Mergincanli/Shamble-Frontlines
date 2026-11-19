@@ -131,6 +131,13 @@
    build with RUSTFLAGS set exits 1; the legacy gate passes. A container restart at about 19:57 UTC lost nothing
    (the tree, `.gate/` and the local ignore were intact; the saver was started again).
 
+4b. **Change-set 3's plan, draft 1** (`ci-wasm/cs3-plan.md`, 20:35 UTC; 238 lines), from the three design notes. The
+   designs come to about 5,700 lines against the card's 2,700, so the plan proposes two change-sets: 3a "Rules and
+   boundaries" (about 2,050; stop line 4,100) and 3b "The loop closes" (about 3,700; stop line 7,400; parts move out
+   at 4,800). Its questions for him: RNG-CRATE (recommended: our own ChaCha8), SIZE-3 (two change-sets),
+   WASM-TEST-ROUTE (a test-only build of our own tools crate), CI-LOOP (a small CI pull request after 3a),
+   PRESS-PACE (a second tap inside one tick lands a tick later). Not yet reviewed by the advisor agent.
+
 ## Current step
 Step 5: the exact text and the three questions (CHROME-SOURCE, CI-TEXT, FIREFOX-TESTS) go to him in chat, with the
 advisor agent's three rulings (PERM-ATT (a), PLANTS both, PYCACHE-NOW (b)) and the record of the compiled Python
