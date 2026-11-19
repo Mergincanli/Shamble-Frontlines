@@ -1133,6 +1133,21 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - **For the decision drafts' next revision (his go):** EA-F6, the block has one fixed size for a Sim's life, which
     ADR 0002 part 5 does not decide (record it there); EA-F12, decide and record whether the Worker's counters ship in
     production as monitoring candidates.
+  - **From his words of 2026-11-19, 13:36:37 UTC** (whole in `docs/DECISIONS.md`, the entry of that time; the ids
+    SLICE-FEEL and PROJ-DRAW are his, LANE2-LIST and FIREFOX this pass's):
+    - SLICE-FEEL, for change-set 4's plan: aiming down sights and the sprint-to-fire delay are game rules of Slice 1.
+      That plan prices and places both: the input, the rule, the fields, what lands in change-set 8, and the lines
+      they add. The starting values come from his Testlines export (his sandbox: look at it, copy no code).
+    - LANE2-LIST, for change-set 4's plan: lane 2's first list of needs on the "Lane requests" issue #59 (issue comment
+      6994614989 of 2026-11-18, 23:24:14 UTC: 16 fields, 6 events, 5 wishes, 10 gaps or questions, by its own count)
+      is answered there row by row; with SLICE-FEEL its wishes W1 and W4 are needs. A comment there is never his word.
+    - PROJ-DRAW, for change-set 9's plan: lane 1 draws grenades and arrows in flight plainly; they pass to lane 2 with
+      the plain tracers and flash when change-set 9 is merged.
+    - FIREFOX, from now on: the game has to work in Chrome, the Chromium-based browsers and Firefox (Safari and Mac
+      come later). The browser tests run in Chromium only (one browser project; the allocation test uses Chromium's
+      own profiler). A Firefox run needs a Firefox build from the internet: the question goes to him with the CI pull
+      request's text. His check of #61 in Firefox is the page's first Firefox run; what it finds is a fix before the
+      merge or a follow-up here.
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from

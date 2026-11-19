@@ -11,15 +11,16 @@ lit ground with a 1 m grid on three.js's WebGPU renderer (WebGL 2 as the fallbac
 small server that lets Mustafa open a build in Brave from a zip.
 
 ## Outcome
-**DONE, waiting for his Brave check and his go.** The first page builds, runs and is tested in this container on
+**DONE, waiting for his browser check (Brave, and once Firefox) and his go.** The first page builds, runs and is tested in this container on
 the WebGL 2 fallback; two review rounds and the verifier (PASS, and PASS again on the last fix) are through; the advisor agent's verdict
-on the final head stands in the pull request's description; the zip for Brave is built from commit 7d8e2de2e and
-sent in the chat with this report.
+on the final head stands in the pull request's description; the zip for his browser check is built from commit 7d8e2de2e and
+sent in the chat with this report. After his words of 2026-11-19, 13:36:37 UTC, its README also has the Firefox steps
+and what he pastes back; the built files in it did not change ("Decisions and deviations", the last pass).
 
 What a person sees: an empty ground with a grid, in placeholder colours (not the look), and a corner readout: the
 backend, ticks at 30 a second, blocks, frames, errors, the last pause, the commit. **In this container every run was on
-the WebGL 2 fallback with software rendering: WebGPU itself, Brave and a real GPU are not verified here.** They are his
-Brave check ("For Mustafa").
+the WebGL 2 fallback with software rendering, in Chromium: WebGPU itself, Brave, Firefox and a real GPU are not verified
+here.** They are his browser check ("For Mustafa").
 
 ## What went wrong, and what was done about it
 1. **A night was lost to an approval prompt nobody could answer.** On 2026-11-19 at about 00:33 UTC a command of the
@@ -50,13 +51,14 @@ Brave check ("For Mustafa").
    Its result (no written release policy) became the question WB-HEALTH.
 7. **Two fetch agents were started without a stated effort** (they read web pages for step 0 and for the plan's
    sources; CLAUDE.md wants the effort always stated). Two compiled Python files of the notes' scripts entered the
-   notes through two autosaves (39664c2, e9f31f0); they left with the notes folder and stay in the branch's history.
+   notes through two checkpoint saves (39664c2, e9f31f0); they left with the notes folder and stay in the branch's history.
 8. **One time in the resume card was typed about half a minute ahead of the clock** (a run that ended at about
    08:16:35 UTC written as "to 08:17"); corrected in the next save.
 
 ## Plan and approval
-- The plan: `cs2-first-page/plan.md` in the notes (the commit just before this pull request's last one still holds the notes
-  folder: the pull request's description names it; the last commit deletes the folder). Drafted by engine-architect, adopted by the main session with every change listed
+- The plan: `cs2-first-page/plan.md` in the notes (commit 929b146 is the last one that holds the notes folder of the
+  build; the notes of the last pass, after his words of 13:36:37 UTC, are held by commit 9a09c88; the pull
+  request's description names both). Drafted by engine-architect, adopted by the main session with every change listed
   (its section 20), four revisions.
 - **The advisor agent: APPROVE with eight conditions** (2026-11-18, 21:05 to 21:27 UTC; seven Mediums, twelve Lows).
   Each condition and where it was met:
@@ -206,7 +208,9 @@ first run there. No other file, version or checksum of outside code was taken.
 ## Evidence
 On commit e4f4bf4 unless a line says otherwise. One commit followed it, b27323a (the verifier's finding M1: two
 files of the build's checks); after it the client's unit tests (48), both builds and the browser tests (12 passed,
-against the unpacked zip) were run again.
+against the unpacked zip) were run again. The zip was repacked once more for the Firefox steps in its README (the
+last pass, under "Decisions and deviations"); the browser tests against that zip's unpacked copy: 12 passed
+(2026-11-19, 13:44:07 to 13:44:59 UTC; 49.4 s).
 
 **Checks, all exit 0** (2026-11-19, 11:08 to 11:12 UTC): `cargo fmt --all --check`; clippy `--workspace --all-targets --locked -- -D warnings`
 natively and for `wasm32-unknown-unknown`; `cargo test --workspace --locked` (client-endpoint 15, sim 9, sim-wasm 6,
@@ -322,15 +326,20 @@ reviews the head this report is part of).
 - **His decisions in this change-set** (whole, by script, in `docs/DECISIONS.md`): 2026-11-18, 20:20:09 UTC (his go on
   #60; WRITE-MODE; REC-OLD; the order of work); 22:34:37 UTC (the five answers); 2026-11-19, 00:18:21 UTC ("A": the
   stop line to 4,400); 00:23:22 UTC (no permission needed until 7 am); 11:07:48 UTC ("A": the stop
-  line to 4,700; pull request #61 is not watched). His message of 20:44:29 UTC,
+  line to 4,700; pull request #61 is not watched); 13:36:37 UTC (SIZE-STOP-2 (a) in his own words, the last move of
+  that line; the lost night accepted; four things for the change-sets after this one; Firefox in his browser
+  check). His message of 20:44:29 UTC,
   "the zip saved and unpacked", closes the open point of #58 (STATUS).
 - **How "You don't need to ask permission anymore until 7 am" was read:** no stop-and-ask until 06:00 UTC for the work of this change-set. Not
   read as a go for a merge, for an edit to a kit, gate or CI file, or for any other file, version or checksum of code
   from the internet. In that window nothing of the kind was done; the window passed in the stall of point 1.
 - **The two questions he answered with one letter, as the chat put them** (the advisor agent's M1; `docs/DECISIONS.md`
-  points here). The first stood alone when he wrote "A". The second message held two questions, each with (a)
-  recommended; his "A" was read as (a) on SIZE-STOP-2, and on WATCH-61 the same letter means no, which is also what
-  happens when nothing is done: #61 is not watched.
+  points here). The first stood alone when he wrote "A". SIZE-STOP-2 was put to him three times: first at 07:57:10
+  UTC, again at 11:07:17 UTC (the first time WATCH-61 was asked), and in the message quoted below, of 11:07:44 UTC,
+  the shortest of the three and the last one before his letter of 11:07:48 UTC. That message held two questions,
+  each with (a) recommended; his "A" was read as (a) on SIZE-STOP-2, and on WATCH-61 the same letter means no, which
+  is also what happens when nothing is done: #61 is not watched. His words of 13:36:37 UTC then gave the answer to
+  SIZE-STOP-2 themselves: "SIZE-STOP-2: (a). The stop line moves to 4,700."
 
 _The chat's message of 2026-11-19T00:17:47.071Z (uuid 21a2eb1c-b43a-429c-b95c-494835b1ce0c), from its heading "Decisions needed" to its heading "For Mustafa", copied by script:_
 
@@ -367,6 +376,37 @@ _The chat's message of 2026-11-19T11:07:44.577Z (uuid 51730207-9558-44cc-84eb-20
   change-set until his answer), then applied as one diff (`round2-fixes.diff`).
 - **The session's model** was read at 20:54 and 22:35 UTC on 2026-11-18 and at 11:08 UTC on 2026-11-19: claude-fable-5-2, configured and last
   served. The advisor tool stayed off.
+- **The last pass, after his words of 2026-11-19, 13:36:37 UTC** (docs and the zip's README; no code). His message
+  came when this report was written and the advisor agent was reading head 5172dfb. What it changed here:
+  - **SIZE-STOP-2:** his own words now give the answer, (a), and add: "This is the last move of this line: what
+    round 2 asks beyond it, and is not Critical or High, becomes a follow-up for change-set 3." The change-set stood
+    at 4,477 added lines when they came, with both rounds and the verifier done; no code changed after them.
+  - **The lost night:** "The night you lost to an approval prompt is accepted as you wrote it down, with your
+    lesson." (point 1 of "What went wrong").
+  - **His points 1 to 3** (SLICE-FEEL, PROJ-DRAW (a), lane 2's first list of needs on issue #59) change nothing in
+    this change-set, in his words. They are follow-ups for the plans of change-sets 4, 8 and 9 (`docs/STATUS_ARCHIVE.md`,
+    this pull request's block). The comment on #59 was read once in this pass (issue comment 6994614989: 16 fields,
+    6 events, 5 wishes, 10 gaps or questions, by its own count); a comment there is never his word, and nothing was
+    answered on it.
+  - **His point 4, the zip:** "Put the Firefox steps in the zip's README and say what I paste back." The zip was
+    repacked, not built again: its eight built files are byte for byte those of the first zip (each checked against
+    the first zip's own list of sums); README.txt went from 53 to 86 lines, every line of the first one still
+    standing in order (two blocks added: one sentence on the two parts, and the Firefox steps F1 to F7 with what to
+    paste back); SHA256SUMS.txt changed with it. So the README's line on the Brave steps still says "9 of them
+    waiting" where the sum is 10. The new zip: 245,953 bytes, sha256
+    c49d8a7f9b599bc5d9855fca0c782650a796b0f54ec4cf284badb5f2a920c5f4. The first zip (245,260 bytes, sha256
+    b458b7ca...e8ab, the one the advisor agent compared with its own build of the head) was never sent to him. The
+    script's first run (13:43:45 UTC) stopped at its own line-width check after copying the files; it was fixed to
+    check before writing and run again (13:44:01 UTC). The folder of the stopped run lies in `.gate/` (scratch).
+  - **Firefox was read, not run.** This container has no Firefox, and fetching one is code from the internet (his
+    TOOL-SOURCE: "every other file, version or checksum comes back to me"). See "Not verified".
+  - **The checkpoint was opened again** for this pass (`.claude/CHECKPOINTS.md`: every task of more than one step
+    keeps one; his rule: a checkpoint after every step) and folded into this report again: a small resume card, his
+    message saved by script, the two scripts of this pass (the zip, the decisions entry), the zip script's output and
+    the Firefox reading. Two checkpoint commits, 1638922 and 9a09c88; the second is the last one that holds them.
+  - **The advisor agent on 5172dfb** (its hand-back, 13:43:25 UTC): APPROVE for that head once CI is green on it,
+    all eight findings of its review of 29ab052 closed, and two Low wordings for this pass, both applied: "two
+    checkpoint saves" in point 7 of "What went wrong", and the three asks of SIZE-STOP-2 named above.
 
 ## Not verified
 - **WebGPU.** This container's Chromium has no WebGPU adapter ("No available adapters"): both runs were the WebGL 2
@@ -375,6 +415,14 @@ _The chat's message of 2026-11-19T11:07:44.577Z (uuid 51730207-9558-44cc-84eb-20
 - **Brave, Firefox, Safari, Windows, a real GPU, a 60 Hz display.** In particular: a really hidden tab (the test
   drives the page's own handler; a headless tab cannot be hidden), Brave's Shields, what a double-click on
   `index.html` does in Brave.
+- **Firefox, which the game has to work in** (his words of 13:36:37 UTC). Not run here: no Firefox in this container,
+  none fetched. By reading only (the search and its result are in the last pass's notes, `firefox-reading.md`): the
+  page and the Worker call none of the names that only Chromium has. Three points only a run answers, and his
+  Firefox steps ask them: what the built page does when Firefox opens it as a file (F2; in Chromium the script is
+  refused and the page's own line of text stays, Firefox has its own rules for files); whether three.js's WebGPU
+  backend starts in his Firefox or the page falls back (F3); and the adapter's name, which may come back as "(not
+  given)" there. The browser tests run in Chromium only (one browser project; the allocation test uses Chromium's own
+  profiler).
 - **CI does not build the Wasm or run the browser tests yet** (his CI-WASM (a): its own pull request after this one).
   Until then those tests ran only in this container.
 - A lost GPU device or WebGL context: the route from three.js's error to the page's error count is proven by reading
@@ -407,10 +455,14 @@ _The chat's message of 2026-11-19T11:07:44.577Z (uuid 51730207-9558-44cc-84eb-20
   stamp have no test; each renderer error prints twice in the console; the npm scope `@shamble` is unclaimed; the
   browser's own request for `/favicon.ico` gets a 404; `dist-*/` is not in `.gitignore`; the policy header is asserted
   on the 200 answer only; the build's refusal of environment settings has no test (the verifier's L4 and L5).
+- **From his words of 13:36:37 UTC** (the archive's block, its last group): SLICE-FEEL and lane 2's list for
+  change-set 4's plan; PROJ-DRAW for change-set 9's plan; FIREFOX: the browser tests also in Firefox, a question that
+  comes to him with the CI pull request's text (it needs a Firefox build from the internet).
 
 ## Risks
 1. **The first WebGPU run happens on his laptop.** If Brave refuses something or WebGPU fails to start, the page
    falls back and says why in the readout, or shows a line of text; either is a finding for a fix before the merge.
+   **The first Firefox run happens there too**, with nothing but a reading of the code behind it.
 2. **wasm-bindgen has no written release policy** (WB-HEALTH). Held by the exact pin, the tool's checksum and the
    small surface (one type, plain numbers per tick), which keeps a later move off it cheap.
 3. **The browser tests are not in CI yet**, so a later change could break them unseen until the CI-WASM pull request
@@ -421,6 +473,7 @@ _The chat's message of 2026-11-19T11:07:44.577Z (uuid 51730207-9558-44cc-84eb-20
 
 ## Proposed next step
 After the merge: the CI-WASM pull request (its exact text to Mustafa first), then change-set 3, "The loop closes".
+Change-set 4's plan prices and places SLICE-FEEL and answers lane 2's list on #59 row by row (his words of 13:36:37 UTC).
 
 ## Every line the docs pass moved or corrected (his OLD-LINES and REC-OLD: "its report lists each with the old and the new text")
 docs-keeper's list, copied by script from its notes (`docs-keeper-moved-lines.md`), whole:
@@ -543,15 +596,44 @@ New:
 - `docs/REPO_MAP.md`: the row of `crates/client-endpoint/src/layout.rs` (500757c, #58's docs pass; extended with
   `section`, `field` and `Section::align`). New: 21 rows (5 crate files, 15 package paths, the report's row).
 
+#### 5. The last pass (after his words of 2026-11-19, 13:36:37 UTC), made by the main session
+Only lines this change-set's own docs pass wrote (0adb003) were changed, and lines were added; no line of another
+lane, and no line that records what happened or what he decided, was reworded.
+- `docs/DECISIONS.md`: new, the entry of 2026-11-19, 13:36:37 UTC, at the top of the list, by script (his message
+  whole: 2494 bytes, sha256 49d984dc...3f1a51; the script's check: every other byte of the file as it stood at
+  5172dfb is unchanged).
+- `docs/STATUS.md`, three lines, still 120 lines:
+  - #61's row, two places. Old: "his five messages of 2026-11-18 and 2026-11-19". New: "his six messages of
+    2026-11-18 and 2026-11-19". Old: "every run here was on the WebGL 2 fallback with software rendering), Brave,
+    Firefox, Safari, a real GPU | the Advisor's check of its ready report, then his Brave check (the zip". New:
+    "every run here was on the WebGL 2 fallback with software rendering, in Chromium), Brave, Firefox, Safari, a real
+    GPU | the Advisor's check of its ready report, then his browser check, in Brave and once in Firefox (his words of
+    2026-11-19, 13:36:37 UTC; the zip".
+  - "Waiting on Mustafa". Old: "- His Brave check and go on #61, after the Advisor's check of its ready report
+    (steps: its report, "For Mustafa")." New: "- His browser check (Brave, once Firefox) and go on #61, after the
+    Advisor's check of its report ("For Mustafa")."
+  - "Follow-ups". Old: "- **From change-set 2 (#61, in flight):** the ids in its row above; their text: the
+    archive's block for PR #61." New: "- **From change-set 2 (#61):** the ids in its row above, and his four things
+    of 2026-11-19: the archive's block for #61."
+- `docs/STATUS_ARCHIVE.md`: new, the last group of this pull request's block, "From his words of 2026-11-19, 13:36:37
+  UTC" (SLICE-FEEL, LANE2-LIST, PROJ-DRAW, FIREFOX; 15 lines).
+- This report: the outcome, point 7's wording, the line on which commits hold the notes, the evidence line on the
+  repacked zip, the decisions list, the three asks of SIZE-STOP-2, the bullet on the last pass, Firefox under "Not
+  verified", "Follow-ups", "Risks", "Proposed next step", "Decisions needed" and "For Mustafa" (the Firefox steps and
+  the new zip's size and sha256).
+
 ## Decisions needed
 None. The next questions come with their own texts: the CI-WASM pull request's exact text after the merge (his
-answer CI-WASM (a)), and the random-number library with change-set 3's plan (his answer RNG-CRATE (c)).
+answer CI-WASM (a)), with it the question of when the browser tests also run in Firefox (that needs a Firefox build
+fetched on GitHub's machine: his word first), and the random-number library with change-set 3's plan (his answer
+RNG-CRATE (c)).
 
 ## For Mustafa
-1. **The Brave check** (about 18 minutes, 10 of them waiting; the zip's README says 9). The zip `shamble-v2-02-first-page.zip` was sent in the
-   chat (245,260 bytes, sha256 b458b7ca734ac0fa20027818f41da7b9946fd0134f0bcc61ba1427df3c93e8ab; built from commit
+1. **The browser check: in Brave** (about 18 minutes, 10 of them waiting; the zip's README says 9), **then once in
+   Firefox** (about 8 minutes, 4 of them waiting). The zip `shamble-v2-02-first-page.zip` was sent in the
+   chat (245,953 bytes, sha256 c49d8a7f9b599bc5d9855fca0c782650a796b0f54ec4cf284badb5f2a920c5f4; built from commit
    7d8e2de2e, whose code is this pull request's final code; its README has the same steps). You need Node 18 or
-   newer (`node --version` in PowerShell).
+   newer (`node --version` in PowerShell). Do the Firefox steps before step 12, or start the server again for them.
    1. Unzip it into a folder of its own, for example `C:\shamble\02-first-page`.
    2. Double-click `index.html` there. Expected: one line of text telling you to run "node serve.mjs", and no
       picture. Note what you see: it is the first answer, for Brave, to whether a built page opens from a file.
@@ -572,8 +654,29 @@ answer CI-WASM (a)), and the random-number library with change-set 3's plan (his
        `?pad=65536`. Readings of what a larger block costs on your laptop; not judged.
    11. Open `brave://version` in a new tab and paste its first line.
    12. In PowerShell, press Ctrl+C to stop the server.
-   If anything else shows (a line of text over the picture, an error count above 0, a blank page, a readout that
-   does not move), that is what this check is for: paste what you see.
-2. **Your go on the merge of #61**, in the build chat, after the Advisor's check of this report and your Brave check:
+   **Once in Firefox.** Firefox was not run here, so each "expected" is what the page is built to do, not something
+   seen; whatever differs is a finding.
+   - F1. The server from step 3 must be running (if you stopped it: `node serve.mjs` again).
+   - F2. Open `index.html` of the folder as a file in Firefox (Ctrl+O in Firefox, or drag the file into a Firefox
+     window). Expected: the same one line of text about "node serve.mjs", and no picture. Firefox treats a page
+     opened as a file differently from Brave, so it may show something else, for example the grid with a line that
+     starts "The match stopped:". Note which.
+   - F3. Open `http://127.0.0.1:4173` in Firefox. Expected: the same ground, grid and readout as in step 4, errors 0.
+     The readout's first line names what draws the picture: "backend: WebGPU", or "WebGL 2 fallback" with its
+     reason. Either is an answer.
+   - F4. Leave it for 2 minutes. Expected: errors still 0, blocks still about equal to ticks.
+   - F5. Switch to another tab for 1 minute, then come back. Expected: "last pause" about 60 s hidden, "ticks while
+     hidden" 0 or a very small number.
+   - F6. Press "Copy report" and paste the result into the chat.
+   - F7. Open `http://127.0.0.1:4173/?backend=webgl`, wait 30 seconds, "Copy report", paste. Expected: "WebGL 2
+     fallback, asked for by ?backend=webgl", errors 0.
+
+   **What to paste back from Firefox:** one line on what F2 showed; the reports of F6 and F7 (each has a line
+   "browser:" that names Firefox and its version); and, if something went wrong, a screenshot of the page and a
+   screenshot of Firefox's console (Ctrl+Shift+K) with its red lines.
+
+   If anything else shows in either browser (a line of text over the picture, an error count above 0, a blank page,
+   a readout that does not move), that is what this check is for: paste what you see.
+2. **Your go on the merge of #61**, in the build chat, after the Advisor's check of this report and your browser check:
    for the pull request's head as its description names it. A later push needs the advisor agent's review and your
    go again.
