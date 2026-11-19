@@ -127,6 +127,77 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-19, 16:08:04 UTC: two notes for the work after #61: the docs pass that records the merge
+  of #61 stays with the CI-WASM pull request, whose report keeps the workflow text apart from the docs; and for
+  change-set 3's browser check the README asks him to keep the browser's window in front and uncovered during the first
+  run and has one step with the window covered on purpose, so that BR-GAP is read and not guessed** (the build chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-19, 16:38 (Amsterdam
+  time)"; extracted by script from the session's transcript, message e02d3ad1-8f0c-4b6a-a30a-5b267f681630, whole: its
+  first paragraph is his instruction to the chat after a compaction). BR-GAP is the one unexplained reading of his
+  browser check: `docs/reports/2026-11-19-cs2-browser-check.md`. Copied by script (880 bytes, sha256
+  d468d8d3e21b852e841e7443f50d5719d1e76b9a7435eac681150c8d77332595):
+> You were just compacted to cut usage. Nothing is lost: pull request #61 is merged (main f5030a3) and its report is on main. Read the resume card .checkpoints/ci-wasm.md first and continue from its "Next steps". Do not redo finished work. Before the first agent starts, tell me in two lines that the card and its notes folder are complete and that the background saver runs.
+>
+> My words of 2026-11-19, 16:38 (Amsterdam time): two notes for the work ahead.
+> - The docs pass that records the merge of #61 stays with the CI pull request, as you put it. In its report keep the workflow text apart from the docs, so that it can be compared with the text I say yes to.
+> - For change-set 3's browser check: the README asks me to keep the browser's window in front and uncovered during the first run, and has one step with the window covered on purpose, so that BR-GAP is read and not guessed.
+- _A pointer, not a decision: **his browser check of the first page (#61), 2026-11-19, 14:46:25 to 15:09:29 UTC.** Four
+  chat messages (14:46:25, 14:54:19, 15:02:50 and 15:09:29 UTC) with eight "Copy report" texts, from his own browser
+  (Brave 1.100.58) and from Firefox 160 on his Windows computer, and one picture. His go below says: "My browser reports
+  are recorded with the next docs pass, not by a push to this head." They stand whole, copied by script, in
+  `docs/reports/2026-11-19-cs2-browser-check.md`, Appendix A, with the build chat's reading of them against the zip's
+  README. His first Brave report read "last pause: none yet" where the README expects a recorded pause; by his go's
+  condition ("If your reading of them shows a line that is not as your README expects, stop and tell me before you
+  merge.") the chat told him at 14:50:49 UTC (its message 7e4ded94-23e4-459c-ad2a-6d1fdcb3d7d8 in the session's
+  transcript), before any merge, and his re-check of 15:02:50 UTC showed the pause (45.0 s hidden, 0 ticks while
+  hidden)._
+- **Taken by Mustafa, 2026-11-19, 14:31:30 UTC: his answer to the question VISION-NOTE ((a): the dated note for
+  `docs/VISION_V2.md` is right as the chat wrote it)** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his
+  personal account; extracted by script from the session's transcript, message 94cf4e6c-e46b-48a4-b48e-3270856870be,
+  whole). The question, as the chat put it to him at 14:29:51 UTC under the note's exact text (the chat's message
+  699736ec-f365-4458-aceb-592bba842d59, copied by script): "VISION-NOTE: is the dated note's text right as written
+  above?", with the options "(a) Yes, as written." and "(b) Change it: tell me the wording." The text it showed is the
+  dated note now in `docs/VISION_V2.md` §4 and the sentence added to that file's "Updated on" lines, both written by
+  this docs pass from that message, byte for byte. His second sentence asks for the instructions again; the chat
+  answered with the browser check's steps at 14:31:56 UTC. Copied by script (103 bytes, sha256
+  8c15eeaeb638a66519884a9200d6c86e20270c82934f8e756bea29775659ec04):
+> a, yes
+>
+> also can you give me the instructions again of what needs to be done exactly? I'm not following
+- **Taken by Mustafa, 2026-11-19, 14:28:25 UTC: his go on the merge of pull request #61 (change-set 2, the first page)
+  into main by a merge commit at head 4cf30ce303b16e96b3ca5d5c0b20b928a4db6b86, what he accepts with that merge, his
+  answer BROWSER-SET ((a), order only: Safari stays a target of v2; Chrome, the Chromium-based browsers and Firefox come
+  first; Safari and Mac come later), and what comes after the merge (the CI-WASM pull request, its exact text to him
+  first, with change-set 3's plan beside it; with change-set 3, one line in `.gitignore` for `__pycache__/`)** (the
+  build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-19, 15:16
+  (Amsterdam time)"; extracted by script from the session's transcript, message 65801ff7-6e9d-4343-b384-16a67118bc87,
+  whole; the same bytes stand in the message of the merge commit f5030a3). When these words came, no browser report was
+  in the chat; the merge waited for his reports (the pointer above) and was made at 15:10:54 UTC, at that head, with
+  `gate`, `smoke` and `toolchain` green on it (read at 15:10 UTC). The dated note he asks for stands in
+  `docs/VISION_V2.md` §4 (his answer VISION-NOTE, the entry above). Copied by script (2104 bytes, sha256
+  67f98d3a76c8f5de73081f6cb4d089b5baa4244f4ed69eb043b1f5c7bc760f20):
+> My words of 2026-11-19, 15:16 (Amsterdam time): my go on the merge of pull request #61, and my answer to BROWSER-SET.
+>
+> My browser check is done: my reports from my own browser and from Firefox are in this chat. If your reading of them shows a line that is not as your README expects, stop and tell me before you merge.
+>
+> Merge pull request #61 (change-set 2, the first page: the simulation as WebAssembly in a Web Worker, an empty lit ground with a grid, the small server) into main by a merge commit, at head 4cf30ce303b16e96b3ca5d5c0b20b928a4db6b86. Put these words in the merge message.
+>
+> Before you merge:
+> - Read gate, smoke and toolchain on that head once more. All are green, or you stop and tell me.
+> - If the head is not 4cf30ce303b16e96b3ca5d5c0b20b928a4db6b86, stop. A later push needs the advisor agent's review and my go again. My browser reports are recorded with the next docs pass, not by a push to this head.
+>
+> What I accept with this merge:
+> - The things that went wrong, as the report writes them down, the lost night and the two compiled Python files in the branch's history among them.
+> - The size: 4,477 added lines against the stop line of 4,700.
+> - That CI does not build the WebAssembly or run the browser tests yet. Until the CI-WASM pull request is merged, those tests ran in your container only.
+> - The follow-ups below High, as the report lists them, and the advisor agent's wording points for the next docs pass.
+> - As before, the checkpoint commits enter main's history with this merge.
+>
+> BROWSER-SET: (a), order only. Safari stays a target of v2. Chrome, the Chromium-based browsers and Firefox come first; Safari and Mac come later. Bring me the dated note for docs/VISION_V2.md with its exact text.
+>
+> After the merge:
+> - As my answers of 2026-11-18 have it: the CI-WASM pull request, its exact text to me first, and change-set 3's plan beside it. Open the checkpoint first, then stop and tell me the path of its resume card: I compact this chat before you go on.
+> - With change-set 3, one line in .gitignore for __pycache__/, so that a save cannot pick up compiled Python files again.
 - **Taken by Mustafa, 2026-11-19, 13:36:37 UTC: his answer to SIZE-STOP-2 in his own words ((a): the stop line of
   change-set 2 moves to 4,700 added lines, and it is the last move of that line), the night lost to an approval prompt
   accepted as the report writes it down, and four things for the change-sets after this one: SLICE-FEEL (aiming down
@@ -166,6 +237,9 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. Lane 2's first list of needs stands on the "Lane requests" issue, #59 (the comment of 2026-11-18, 23:24:14 UTC). Answer it in change-set 4's plan, row by row, as it asks. With point 1, its wishes W1 (an aiming-down-sights flag) and W4 (how far the sprint-to-fire swing has got) are needs. A comment there is never my word.
 >
 > 4. My browser check of the first page: I open the zip in my own browser and once in Firefox. Put the Firefox steps in the zip's README and say what I paste back. The game has to work in Chrome, the Chromium-based browsers and Firefox. Safari and Mac come later.
+  _Dated pointer, 2026-11-19 (the docs pass after #61's merge; the advisor agent's wording point on head 4cf30ce): where
+  the header of this entry says the lost night is "accepted as the report writes it down", his words above are "is
+  accepted as you wrote it down, with your lesson."_
 - **Taken by Mustafa, 2026-11-19, 11:07:48 UTC: his answer to the question SIZE-STOP-2 of change-set 2 (the change-set
   stood at 4,430 added lines against the stop line of 4,400, with review round 2's fix pass of 41 lines prepared and not
   yet applied): (a), the stop line moves to 4,700 and the fix pass goes in** (the build chat,
