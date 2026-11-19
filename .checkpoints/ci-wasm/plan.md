@@ -12,8 +12,16 @@ read before each of the three CI writes; the dated note and the quoted question 
 chat's message; two lead texts corrected; the stop rule widened; the docs get a size and a stop line; the tier-2
 evidence added; the record of the compiled Python file completed._
 
+_Revision 3, 19:58 UTC (from the clock): security-auditor's reading of the CI text (`security-auditor-ci-text.md`: one
+High, two Lows, all three taken) and the advisor agent's re-read of the changed lines (`advisor-plan.md`, "Re-read":
+"APPROVE holds for sha256 240c7db7...", with two fixes to this plan, both made here). The text has 93 added lines
+now. The High was the main session's own fault: an echo line it added to the cut's single-quoted script held two
+apostrophes, which would have ended the script there on the first runner run (it fails closed). FIREFOX-TESTS goes
+to him as a question again: the advisor agent withdrew its ruling, because the archive on main says that question
+"goes to him with the CI pull request's text"._
+
 ## 0. In one screen
-- **What:** `.github/workflows/toolchain.yml` gains 90 lines and loses none. Before the network cut the job fetches
+- **What:** `.github/workflows/toolchain.yml` gains 93 lines and loses none. Before the network cut the job fetches
   the one wasm-bindgen archive Mustafa named, checks its size and sha256, runs GitHub's own check of it
   (`gh release verify-asset`), and installs the one program root-owned. Inside the cut it builds the page twice
   (production, development), runs the boundary tests, type-checks the Worker, the page and the browser specs, and
@@ -27,9 +35,10 @@ evidence added; the record of the compiled Python file completed._
   edit to `gate.yml`, the kit or the gate, anything a player sees.
 - **Risk tier 2** (a CI file). Reviews: the advisor agent and security-auditor, with infra-engineer and
   test-engineer. Merge: his go, in this day session.
-- **Planned size:** about 155 added lines outside the docs (90 of them the workflow); stop line 310.
-- **Questions for Mustafa (section 16):** CHROME-SOURCE, then CI-TEXT. The advisor agent ruled on four more
-  (PERM-ATT, PLANTS, FIREFOX-TESTS, PYCACHE-NOW); he is told each ruling and can object.
+- **Planned size:** about 155 added lines outside the docs; stop line 310. As built so far: 186 (93 of them the
+  workflow).
+- **Questions for Mustafa (section 16):** CHROME-SOURCE, CI-TEXT, FIREFOX-TESTS. The advisor agent ruled on three
+  more (PERM-ATT, PLANTS, PYCACHE-NOW); he is told each ruling and can object.
 
 ## 1. Goal
 After this pull request, a push or a pull request cannot go green unless the Wasm builds with the checked tool, the
@@ -59,7 +68,7 @@ own check, the two builds and "12 passed". The report quotes GitHub's check's ou
 All are lane 1's (Part 15: `packages/e2e/tests/skeleton/` is lane 1's folder; lane 2's `render/` is not touched).
 | File | Change | Protected |
 |---|---|---|
-| `.github/workflows/toolchain.yml` | +90, -0 (section 5) | yes: CI; his yes on the text |
+| `.github/workflows/toolchain.yml` | +93, -0 (section 5) | yes: CI; his yes on the text |
 | `.gitignore` | +1 `dist-*/` (SA-DIST); the `__pycache__/` line stays with change-set 3 (PYCACHE-NOW (b)) | no |
 | `packages/client/scripts/build-checks.mjs` | `CARGO_OVERRIDES` moved in; new `refusedBuildSettings(env)` | no |
 | `packages/client/scripts/build.mjs` | the pattern out; one call changed | no |
@@ -71,11 +80,13 @@ All are lane 1's (Part 15: `packages/e2e/tests/skeleton/` is lane 1's folder; la
 `gate.yml`, `tools/`, `.claude/`, every `CLAUDE.md`, every manifest and lockfile: unchanged.
 
 ## 5. The CI text (kept apart from everything else, as his words of 16:08:04 UTC ask)
-- **The exact text:** `ci-edit.diff` in this folder (125 lines; 90 added, 0 removed; sha256
-  282890b716f767d01e910a5a18dd2f454a9787abe4ecdee61e8521ce2df3290e), made by `diff -u` of main's file against the
-  scratch copy `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml` (190 lines, sha256
-  76bfed6e345e77bb8d5799c05994df27c5edbd721352f10bf9466a59ddff96d8; it parses as YAML: one job, nine steps,
-  `permissions: contents: read`, `cache-mode: none`, 15 minutes). It is infra-engineer's draft (88 lines) plus two
+- **The exact text:** `ci-edit.diff` in this folder (128 lines; 93 added, 0 removed; sha256
+  240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673), made by `diff -u` of main's file against the
+  scratch copy `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml` (193 lines, sha256
+  d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c; it parses as YAML: one job, nine steps,
+  `permissions: contents: read`, `cache-mode: none`, 15 minutes; the script the cut's `bash -c` receives is one
+  argument and parses). The text reviewed in revision 1 was 90 lines (sha256 282890b7...3290e, at commit 8a55e83);
+  security-auditor's three changes made it 93. It is infra-engineer's draft (88 lines) plus two
   lines and two changed lines from the main session for the specs' type check (test-engineer's block 4).
 - **What it does, in order:**
   1. The job gets seven values (`WB_*`): the tool's version, the archive's name, size and sha256, the program's size
@@ -83,14 +94,17 @@ All are lane 1's (Part 15: `packages/e2e/tests/skeleton/` is lane 1's folder; la
   2. Step "the archive": each value must stand as an exact line in `packages/client/scripts/wasm-bindgen-tool.mjs`
      (read as text, never imported: no repository code runs with the network); then the download (https only, at
      most two redirects, at most 12,000,000 bytes), its size, then its sha256, before any tar call.
-  3. Step "GitHub's own check": the only step that holds the job's token. It prints `gh --version`, refuses a `gh`
-     older than 2.93.0 (which stopped sending the token to the TUF mirrors, CVE-2026-48501; the image lists
-     2.103.3), then runs `gh release verify-asset 0.2.130 <archive> --repo wasm-bindgen/wasm-bindgen`. It proves
+  3. Step "GitHub's own check": the only step that holds the job's token. It prints `gh --version`, refuses a
+     version that is not digits and dots, and refuses a `gh` older than 2.93.0 (which stopped sending the token to
+     the TUF mirrors: GitHub's advisory GHSA-8xvp-7hj6-mcj9, CVE-2026-48501, affected "<= v2.92.0", patched
+     "v2.93.0", read by security-auditor on 2026-11-19; the image lists 2.103.3), then runs `gh release verify-asset
+     0.2.130 <archive> --repo wasm-bindgen/wasm-bindgen`. It proves
      the file is byte for byte an asset GitHub recorded and signed for that immutable release; it does not prove how
      the program was built (security-auditor's reading of 2026-11-18 stands).
   4. Step "the one program": the member list must be the folder and its six files; no link, no name with a space,
-     nothing above 64 MiB; only `wasm-bindgen` is taken out, installed owned by root with mode 0555 (so nothing
-     inside the cut can swap it), then its size and sha256 are checked.
+     nothing above 64 MiB; only `wasm-bindgen` is taken out, installed owned by root with mode 0555; the step
+     prints the program, its folder and `/opt` and refuses unless the folder and `/opt` are owned by root and not
+     writable by anyone else (so nothing inside the cut can swap the program); then its size and sha256 are checked.
   5. "Fetch every dependency" stays the last step with the network, unchanged.
   6. Inside the cut the tool's path enters the bare environment (`SHAMBLE_WASM_BINDGEN`), and after today's lines:
      the production build and the development build (into `.gate/dist-production` and `.gate/dist-development`),
@@ -102,7 +116,11 @@ All are lane 1's (Part 15: `packages/e2e/tests/skeleton/` is lane 1's folder; la
   the value, size, sha256 and member checks pass and each fails on its broken copy; both builds under the cut's
   variable list; boundary tests 7 passed; the four type-check lines exit 0; browser tests 12 passed in 68 s with
   one worker. The fifth type-check line: exit 0 in 1.2 s (the main session, 17:37 UTC, with the scratch declaration
-  file).
+  file). After the three changes the new in-cut lines were run again as one script, as `bash -c` receives it, under
+  the cut's bare variable list (the main session, 19:44 to 19:45 UTC, `node <path>` for `npx` and the container's
+  Chromium for Chrome): exit 0; both builds, "Tests 7 passed", the five type-check lines, "12 passed (1.1m)".
+  security-auditor tried the stricter version test and the `/opt` check on scratch folders; the advisor agent tried
+  both again.
 - **Never run anywhere yet** (read on the first runner run, under the stop rule of section 9): GitHub's check
   itself (its output, exit code, time, and whether `contents: read` is enough: PERM-ATT); the download through
   GitHub's redirect on a runner; `sudo -n install`; Chrome 157 of the image inside `unshare --net` with
@@ -215,7 +233,8 @@ The netcode proof test's rules: no new manifest or config file; no root `.cargo/
   lines until the report is in, not only the first. The main session stops and tells him, with the log's lines and
   before any fix, push or re-run, if: a new step or line fails; or the log lacks a final address on GitHub's
   release-asset host, the archive's "size: 11860397" and ": OK", a gh of 2.93.0 or later and its success line naming
-  release 0.2.130, the seven members, "mode 555, owner root:root, 8170784 bytes" and the program's ": OK", "the
+  release 0.2.130, the seven members, "mode 555, owner root:root, 8170784 bytes", the lines for the program's folder
+  and for `/opt` with owner root:root, and the program's ": OK", "the
   network is cut", the two size tables, "Tests 7 passed", Chrome's version line, "Running 12 tests using 1 worker"
   and "12 passed"; or a browser test fails once (nothing is re-run into green); or the job takes more than 10 of
   its 15 minutes; or a planted run fails anywhere but at its own step, or without its expected line (P-GH: gh's
@@ -224,7 +243,10 @@ The netcode proof test's rules: no new manifest or config file; no root `.cargo/
   Wasm's bytes differing from here (expected: RR-F5); which backend the runner's Chrome starts.
 - **Planted changes** (PLANTS): P-GH, GitHub's check is given a file that is not the release's asset (two lines of
   CI text before the real check, so his yes covers them and their removal): the step must fail with gh's own line
-  and nothing after it runs; it also answers PERM-ATT. P-BROWSER, one committed render count changed from 3 to 4:
+  and nothing after it runs. It answers PERM-ATT only if that line is gh's "does not contain subject" line: a "no
+  attestations found" line can hide a refused permission. It shows the check is live; it does not reach the
+  signature check, because gh compares the file with the statement's list first (security-auditor's F-PGH). P-BROWSER,
+  one committed render count changed from 3 to 4:
   a browser test must fail inside the cut, with no retry. Shown here instead of on a runner, with the same
   commands: a boundary test with a wrong value, and a spec with a type error that Playwright lets pass.
 - **What this cannot show:** Firefox and WebKit; WebGPU and a real GPU; Brave; any timed mark on a named machine;
@@ -260,12 +282,12 @@ Nothing: no build of the game changes. His part: the answers of section 16, the 
 ## 14. Planned size
 | Part | Added lines |
 |---|---|
-| `.github/workflows/toolchain.yml` | 90 |
+| `.github/workflows/toolchain.yml` | 90 planned; 93 with security-auditor's three changes |
 | `build-checks.mjs`, `build.mjs`, `build-checks.test.mjs` | about 35 (9 of them moved) |
 | `playwright.config.ts` and the three specs | about 15 |
 | `packages/e2e/node-names.d.ts` | 15 |
 | `.gitignore` | 1 |
-| **Outside the docs** | **about 155; stop line 310** |
+| **Outside the docs** | **about 155 planned; stop line 310. As built at revision 3: 186** (the workflow 93; the build checks and their test 37; the config and the specs with their readings lines 39; the declaration file 16; `.gitignore` 1) |
 **The docs, counted apart** (his words copied by script and the quoted workflow diff do not count: his SIZE-0,
 "copied lines do not count"): about 440 written lines, stop line 880. By file: the DECISIONS headers about 45; the
 browser-check record's own text about 95 (of its 609 lines, about 510 are his quoted words); the report about 250;
@@ -278,21 +300,22 @@ Firefox or WebKit in CI; a required-check change; a cache; a second job; `@types
 RR-F5; any change to `gate.yml` or the `smoke` job; change-set 3 (its plan is drafted beside this: `cs3-context.md`,
 `rust-reviewer-cs3-rng.md`).
 
-## 16. Open questions for Mustafa (two), and the advisor agent's rulings on four more
+## 16. Open questions for Mustafa (three), and the advisor agent's rulings on three more
 1. **CHROME-SOURCE: which browser runs the browser tests in CI?** Why: the browser's version decides what the tests
    prove. Options: (a) the Google Chrome already in GitHub's runner image (157.0.8103.50 in today's image). It
-   brings nothing in from the internet, so his rule on such code is untouched; what he accepts is a browser version
-   that moves with GitHub's image, as gh, curl, tar and Node in this job already do, and that is printed in every
-   run. (c) Playwright 1.65.0's Chrome for Testing 158.0.8127.18, fetched by curl and checked against a size and
-   sha256 he approves after one run prints them: pinned bytes, about 170 MB per run, and a second text for his yes.
-   Recommendation: (a). (Not offered, by the advisor agent's condition: Playwright's own installer, which would be
-   the first package code to run with the network in this job and whose download nothing checks.)
+   brings nothing in from the internet, so his rule on such code is untouched; what he accepts is a browser whose
+   version and bytes change whenever GitHub updates its image, with no pin or review by us, as gh, curl, tar and
+   Node in this job already do; it is printed in every run and only ever sees 127.0.0.1. (c) Playwright 1.65.0's
+   Chrome for Testing 158.0.8127.18, fetched by curl and checked against a size and sha256 he approves after one
+   run prints them: pinned bytes, about 170 MB per run, and a second text for his yes. Recommendation: (a). (Not
+   offered, by the advisor agent's condition: Playwright's own installer, which would be the first package code to
+   run with the network in this job and whose download nothing checks.)
 2. **CI-TEXT: one yes for the CI text, covering five things.** Why: no CI file is edited without his yes on its
    exact text, and #60 put its stop rule and its plant to him too.
-   - `ci-edit.diff`: 125 lines, 90 added, none removed, sha256
-     282890b716f767d01e910a5a18dd2f454a9787abe4ecdee61e8521ce2df3290e.
+   - `ci-edit.diff`: 128 lines, 93 added, none removed, sha256
+     240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673.
    - `ci-plant-p-gh.diff`: the two lines of the planted change for GitHub's check, sha256
-     fe2004ac3d0f5b39086a096c077d5b707fcddae29a2a9df8d554a4856fb290a1, written in one commit and taken out in the
+     e4f21ab359bc9fd911c663a4fcbc892133195fefe44e88ad7ec51b50e3d0b1ac, written in one commit and taken out in the
      next.
    - The second planted change: one committed render count in
      `packages/e2e/tests/skeleton/render-counts.json` changed from 3 to 4, and taken back.
@@ -300,15 +323,21 @@ RR-F5; any change to `gate.yml` or the `smoke` job; change-set 3 (its plan is dr
    - That the one tool file he named now also comes by a second route: the runner's curl line, with the limits of
      the route he approved (https only, the size limit, size and sha256 before any unpacking).
    Options: (a) yes to all five as shown; (b) yes with changes he names; (c) no. Recommendation: (a).
+3. **FIREFOX-TESTS: when do the browser tests also run in Firefox?** Why: his words, "The game has to work in
+   Chrome, the Chromium-based browsers and Firefox"; today only his own check covers Firefox, and the archive on
+   main promised him this question with the CI text. What it takes: Playwright's own patched Firefox 159.0 (about
+   187 MB, from Playwright's servers, with no published checksum; the Firefox on the runner cannot be driven by
+   Playwright), a second browser project, 11 of the 12 tests (the allocation test uses Chrome's own profiler), 1 to
+   2 minutes more per run; it cannot be tried in this container first. Whichever option he picks, that download
+   and its exact text come back to him first. Options: (a) in this pull request; (b) with change-set 3; (c) a small
+   pull request of its own right after this one, while change-set 3's plan is with him. Recommendation: (c): he
+   called this pull request small, each first run should bring one new unknown, and this pull request must not
+   wait on a Firefox question before change-set 3's build may start.
 
 **Ruled by the advisor agent** (plan review, `advisor-plan.md`; he can overrule any of them):
 - **PERM-ATT: (a).** The job's token keeps `contents: read` only. If GitHub's check is refused for lack of a
   permission, the run stops there and the one line comes back to him.
 - **PLANTS: both run.** P-BROWSER is evidence, the advisor agent's call; P-GH's lines are part of CI-TEXT.
-- **FIREFOX-TESTS: (c).** Not in this pull request (he called it small; one new unknown per first run) and not
-  inside change-set 3: a small pull request of its own after this one, with its download and its exact text for
-  his yes. He is told, so that he can object: the archive's line of 13:36:37 UTC promised him this question with
-  the CI text.
 - **PYCACHE-NOW: (b).** The `.gitignore` line stays with change-set 3, where his words put it; the local ignore and
   `-B` guard until then.
 
