@@ -11,13 +11,14 @@ const { createServer, listen } = await import(pathToFileURL(path.join(dist, "ser
 const server = createServer({ root: dist });
 const port = await listen(server, 0);
 const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
-console.log(`browser: ${browser.version()} (headless), viewport 1280x720`);
+console.log(`browser: ${browser.version()} (headless), viewport 1280x720; read after 1,200 blocks, the report asked every 500 ms`);
 console.log("pad bytes | block bytes | backend | ticks | copy p50 / p99 ms | delivery p50 / p95 ms | lateness p50 / p99 / max ms | most ticks in a wake | drops | pool misses | fps | frame p50 / p99 ms");
 for (const pad of [0, 1024, 4096, 16384, 65536]) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   await page.goto(`http://127.0.0.1:${port}/?pad=${pad}&run=container-pad-${pad}`);
-  await page.waitForFunction(() => window.__shambleReport?.().blocks >= 600, null, { timeout: 120000 });
-  await page.waitForTimeout(600);
+  // Asked twice a second, not every frame: building the report costs the page time, and that would be in the reading.
+  // Read after 1,200 blocks, so the rings (600 samples) hold no start-up.
+  await page.waitForFunction(() => window.__shambleReport?.().blocks >= 1200, null, { timeout: 240000, polling: 500 });
   const d = await page.evaluate(() => window.__shambleReport());
   const w = d.worker;
   const f = (v) => (Number.isFinite(v) ? v.toFixed(3) : "n/a");

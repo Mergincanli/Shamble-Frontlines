@@ -1,0 +1,10 @@
+# readings, started 2026-11-19 08:09:30 UTC; load before: 2.63 2.28 2.00; code d257bb6, the development build of 07:50 UTC
+browser: 153.0.8010.12 (headless), viewport 1280x720; read after 1,200 blocks, the report asked every 500 ms
+pad bytes | block bytes | backend | ticks | copy p50 / p99 ms | delivery p50 / p95 ms | lateness p50 / p99 / max ms | most ticks in a wake | drops | pool misses | fps | frame p50 / p99 ms
+0 | 8 | WebGL 2 fallback | 1211 | 0.000 / 0.100 | 135.300 / 288.700 | 0.767 / 9.467 / 21.167 | 1 | 0 | 587 | 4.0 | 250.000 / 433.400
+  run header: {"commit":"81e916d38+changes","label":"container-pad-0","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36","hardwareConcurrency":4,"display":"1280x720 at 1x, 24 bit","crossOriginIsolated":false,"at":"2026-11-19T08:10:12.553Z"}; hardwareConcurrency in the Worker 4; timestampQuery false; counters {"drawCalls":3,"triangles":3,"lines":62,"geometries":3,"textures":3,"programs":6}
+1024 | 1032 | WebGL 2 fallback | 1215 | 0.000 / 0.100 | 165.700 / 409.000 | 0.767 / 10.767 / 43.900 | 2 | 0 | 679 | 3.3 | 300.000 / 583.300
+4096 | 4104 | WebGL 2 fallback | 1210 | 0.000 / 0.100 | 103.800 / 212.900 | 0.933 / 6.933 / 36.167 | 2 | 0 | 458 | 5.0 | 200.100 / 400.000
+16384 | 16392 | WebGL 2 fallback | 1213 | 0.000 / 0.100 | 100.500 / 204.300 | 0.867 / 5.600 / 8.267 | 1 | 0 | 430 | 5.0 | 200.000 / 349.900
+65536 | 65544 | WebGL 2 fallback | 1222 | 0.000 / 0.200 | 96.400 / 196.000 | 0.900 / 5.600 / 8.567 | 1 | 0 | 404 | 5.0 | 199.900 / 266.700
+# finished 08:12:59 UTC; load after: 3.08 2.94 2.34

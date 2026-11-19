@@ -47,3 +47,82 @@ exit 1: FAILED as it must, at the line that names the defect
 ## 6. a misspelt field name in the writer's lookup
 check: cargo build -p client-endpoint --locked
 exit 101: FAILED as it must, at the line that names the defect 
+    error[E0080]: evaluation panicked: the header has a tick field
+    9 | const TICK: Field = layout::field("header", "tik").expect("the header has a tick field");
+
+## 7. a 64-byte typed array allocated per frame in the page's hand-off code (PM-0002-7's bite)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off allocation.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 58 |   expect(perFrame).toBeLessThan(170);
+
+## 7b. a 64-byte typed array allocated per block where the message event is unpacked
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off allocation.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 60 |   expect(perBlock).toBeLessThan(390);
+
+## 8. a Worker that ignores the hidden tab and runs on (PM-0004-70's bite)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 83 |   expect(stillHidden.worker?.ticks).toBe(hidden);
+
+## 8b. a Worker that runs the hidden gap on the tab's return instead of dropping it (the 7-tick cap kept)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 89 |   expect(after.worker?.drops).toBe(0);
+
+## 9. a small server that lets a path out of its folder
+check: cd packages/client && node ../../node_modules/vitest/vitest.mjs run
+exit 1: FAILED as it must, at the line that names the defect 
+         × a path that leaves the folder, however it is written 12ms
+         × a link inside the folder that leads outside it 5ms
+     FAIL  serve.test.mjs > what it refuses > a path that leaves the folder, however it is written
+     FAIL  serve.test.mjs > what it refuses > a link inside the folder that leads outside it
+
+## 9b. a small server that leaves the file of a broken-off download open
+check: cd packages/client && node ../../node_modules/vitest/vitest.mjs run
+exit 1: FAILED as it must, at the line that names the defect 
+         × a download that is broken off leaves no file open 274ms
+     FAIL  serve.test.mjs > what it refuses > a download that is broken off leaves no file open
+
+## 10. an isolation flag that sets COOP but not COEP (PM-0002-20's own bite)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off isolation.spec
+exit 1: FAILED as it must, at the line that names the defect 
+      ✘  1 [chromium] › packages/e2e/tests/skeleton/isolation.spec.ts:15:5 › with the flag on under Vite's dev server, crossOriginIsolated is true on the page and in the Worker (4.4s)
+      ✘  3 [chromium] › packages/e2e/tests/skeleton/isolation.spec.ts:15:5 › with the flag on under Vite's preview server, crossOriginIsolated is true on the page and in the Worker (3.4s)
+      1) [chromium] › packages/e2e/tests/skeleton/isolation.spec.ts:15:5 › with the flag on under Vite's dev server, crossOriginIsolated is true on the page and in the Worker
+      2) [chromium] › packages/e2e/tests/skeleton/isolation.spec.ts:15:5 › with the flag on under Vite's preview server, crossOriginIsolated is true on the page and in the Worker
+
+## 11. the page posts its input on every other frame only
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 56 |     expect(frames - posts).toBeLessThanOrEqual(1);
+        > 56 |     expect(frames - posts).toBeLessThanOrEqual(1);
+
+## 12. the build's switch is not folded in: development code in a production build
+check: node packages/client/scripts/build.mjs --production --out-dir .gate/dist-prod
+exit 1: FAILED as it must, at the line that names the defect 
+      assets/overlay--eYwvZFu.js: development code in a production build ("Copy report")
+      assets/index-IQURuNvG.js: development code in a production build ("__shambleReport")
+      assets/report-D6SeR0nu.js: development code in a production build ("ticks while hidden")
+      assets/report-D6SeR0nu.js: development code in a production build ("first page: report")
+
+## 13. the page imports the Wasm's glue itself
+check: node packages/client/scripts/build.mjs
+exit 1: FAILED as it must, at the line that names the defect 
+      assets/index-Tf0hWHgX.js: the Wasm's glue outside the Worker's chunk
+
+# control: the clean tree, 2026-11-19 08:08:14 UTC
+exit 0: node packages/client/scripts/build.mjs
+    
+exit 0: cargo test --workspace --locked
+    test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0: cd packages/sim-worker && node ../../node_modules/vitest/vitest.mjs run --dir boundary
+    Test Files  1 passed (1) | Tests  7 passed (7)
+exit 0: cd packages/client && node ../../node_modules/vitest/vitest.mjs run
+    Test Files  6 passed (6) | Tests  48 passed (48)
+exit 0: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off 
+    10 passed (50.0s)
+exit 0: node packages/client/scripts/build.mjs --production --out-dir .gate/dist-prod
+    
+
+# finished 2026-11-19 08:09:14 UTC: every defect was caught and the clean tree passes

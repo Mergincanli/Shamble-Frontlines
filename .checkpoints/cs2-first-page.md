@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 08:05 UTC (from the clock)
+- **Last update:** 2026-11-19 08:13 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -434,8 +434,25 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     change-set 3; two kept blocks is the right number; nothing needs tearing out beyond what is recorded.
     **Round 1 is complete: seven reviewers.**
 
+47. **The planted defects, second version: every one caught at the line that names it** (`cs2-first-page/plants.py`,
+    results `planted-defects-2.md`; in the worktree `.gate/cs2-plants` at 9f28a87, 08:03:59 to 08:09:14 UTC): 19
+    plants (1, 2, 3, 3b, 4, 4b, 5, 5b, 6, 7, 7b, 8, 8b, 9, 9b, 10, 11, 12, 13), each "FAILED as it must, at the line
+    that names the defect"; the control (the clean tree: development build, cargo tests, boundary 7, client 48,
+    browser 10 passed, production build) passes. Plants 1 and 8, which a timeout had caught in the first run, now
+    fail at their own assertions (skeleton.spec lines 59 and 83).
+48. **The readings again after the timer fix** (`cs2-first-page/readings.mjs`, now asked every 500 ms and read after
+    1,200 blocks; `readings-2.txt`; 08:09:30 to 08:12:59 UTC, load 2.6 before and 3.1 after, three reviewers
+    running beside it; the development build of 07:50 UTC, whose content is d257bb6's): the tick's lateness p50
+    0.77 to 0.93 ms (before the fix: 3.7), p99 5.6 to 10.8 ms, max 8.3 to 43.9 ms; the copy p50 0.000, p99 0.1 to
+    0.2 ms at every block size from 8 bytes to 65,544; no drops; at most 2 ticks in one wake; the picture on the
+    software renderer at 3.3 to 5.0 frames a second (frame p50 200 to 300 ms), so the delivery times (p50 96 to
+    166 ms) are the page's frame gaps, not the hand-off. Reported, never judged.
+49. **CI on the pushed head** read at 08:08 UTC with the GitHub tools: `toolchain` run 213 and `gate` run 915 on
+    9f28a87 (which holds d257bb6): success; on a98de9a (which holds 29378dd): `toolchain` 212 and `gate` 914:
+    success.
+
 ## Current step
-47. **Round 2, on what the fixes changed** (`git diff 30a5a13..d257bb6`): security-auditor, perf-auditor and
+50. **Round 2, on what the fixes changed** (`git diff 30a5a13..d257bb6`): security-auditor, perf-auditor and
     rust-reviewer are reading (notes `*-review2.md`); then engine-architect, graphics-engineer and test-engineer
     (test-engineer after the planted defects' second run, which it must read). **The planted defects, second
     version** (`cs2-first-page/plants.py`: 19 plants, each must fail at the assertion that names it; results in
