@@ -169,6 +169,9 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   as scratch copies under `.gate/ci-wasm/proposed/` and the diff as `ci-wasm/ci-edit.diff`; it alone runs the build
   and the browser tests); test-engineer, part "followups" (notes `ci-wasm/test-engineer-followups.md`). Both were
   given `ci-wasm/brief-context.md`. A restart gives each the same task again: it continues from its notes.
+  Third, started 16:15 UTC (Opus 5.5, effort max): rust-reviewer, part "cs3-rng", for change-set 3's plan: the
+  question RNG-CRATE with the two readings he names (notes `ci-wasm/rust-reviewer-cs3-rng.md`; it downloads and
+  builds nothing).
 - Scratch outside git: `.gate/ci-wasm/hist/` (change-set 2's deleted plan, tool route and security note, taken from
   history at 29ab052^), `.gate/cs2-first-page/merge/` (his messages as
 first saved, his Firefox screenshot, the merge message's words), `.gate/cs2-first-page/send/` (the zip he tested),
