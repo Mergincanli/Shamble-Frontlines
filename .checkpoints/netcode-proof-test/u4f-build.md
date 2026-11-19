@@ -1168,3 +1168,15 @@ the main folder's file twice); one check.mjs partial call ran under the shared l
 (FP9); end check A's first attempt was stopped by my 600 s background limit, re-run whole as A2. Not done: no
 snapshot with worktree_patch.py (not in my prompt), no judge call on the hand runs (FP6 names none), FP20 (the main
 session's).
+
+## Merge (the main session, 2026-11-19 18:27-19:2x UTC; advisor-u4f-r1.md:325-358 with advisor-u4f-pass.md's C1-C3)
+- C1: P27's part-clean first (.gate/u4f-merge/clean-shared.log, exit 0; free 4,360 -> 11,663 MiB). M1: the snapshot
+  wip/u4f-build.patch 286aac60…, 394,400 bytes (ADV-U4FP-1: the "394,313 B" labels are character counts). M2: main
+  f5030a3, unmoved (re-read 19:1x UTC). M3 `git apply --check` exit 0; M4 `git apply`, the 29 files byte-equal to
+  builder 4's worktree (scratchpad cmp_files.py). M5 (.gate/u4f-merge/m5-check.log, 18:27:42-18:46:38 UTC, exit 0,
+  hashes 2f07abc2…/1a767d5b…): all 11 steps, 634 / 731, 0 failed, test step 865.9 s. M6 nothing failed. M7 gate
+  --no-smoke PASS (.gate/u4f-merge/gate.txt). D10 empty on the merged files, read again on the commit.
+- M8: the merge commit holds the 29 files and `git rm` of the wip patch; the plan's edits went in by checkpoint save
+  fca16a9 (apply_u4f_merge_edits.py, from u4f-merge-edits.md word for word); the report is u4f-report.md. EA-U4F-3's
+  correction: this file's "bites builds only" (:42, :132, :239) holds for the two bites' effects and
+  `World::CHECK_BITES`, not for their sites' five inert lines in `World::step` (u4f-report.md, "The deviations").

@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-19 17:5x UTC: MAIN-61 done (main f5030a3 in at a6acc8a; head check APPROVE WITH FINDINGS);
-  builder 4's fix pass at its end checks (A2 passed). Disk 4,505 MiB free (17:4x UTC; the runner's floor 4,096).
+- **Last update:** 2026-11-19 19:2x UTC: **U4f MERGED at 25d316e** (M1-M8 met; the advisor's pass check APPROVE WITH
+  CONDITIONS, met); next: CI, the advisor's head check, 5.3's 17 pre-runs, the sets. Disk 11,6xx MiB free (18:27 UTC).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -175,7 +175,7 @@
   backups; builder 2's is the snapshot 3d341c58… (builder 1's work in it). The advisor ENDED about 13:40 UTC.
 - **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
   `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
-  final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,276 B, 29 files: the one snapshot until the merge.
+  final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,363 bytes (ADV-U4FP-1), 29 files: the one snapshot until the merge.
 - **Builder 4 DONE 18:08 UTC:** FP1-FP19 each met its check, no departure; end checks A2 and B all 11 steps (634 / 731,
   +82 / +99; negatives 46 of 45; test step 882.8 and 834.0 s); items 4 and 5 done; 6,425 added (the pass +212); notes
   at u4f-build.md:867-1170; final snapshot wip/u4f-build.patch **286aac60…** (base b25b96a, 29 files; hashes 2f07abc2…
@@ -203,8 +203,11 @@
   19:1x (main still f5030a3); `Room::cmd_timing()` (public, no consumer) to the advisor's head check. U4f2's stop past
   3,000 is his SIZE-CHECK rule ("more than twice the plan", history.md:2049), not a new stop. **Edits read in full and
   applied** (apply_u4f_merge_edits.py, word for word, each old text once: plan.md, u4-build-plan.md, u4s-carries.md).
-  **Next:** read u4f-report.md in full; u4f-build.md's merge section; then M8's one commit, the D10 read on it, the
-  push (M9), CI, the advisor's check of the pushed head. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+  Report read in full (five lines corrected: M2, M7's log, M8's form, cmd_timing's route). **U4f MERGED at 25d316e**
+  (19:2x UTC: the 29 files and `git rm` of the wip patch; D10 empty on the commit; the papers by checkpoint saves).
+  **Next (M9):** this save pushes it; CI on it; the advisor's check of the pushed head (with `Room::cmd_timing()`); then
+  5.3's 17 pre-runs (`node ops/runs/c-u4f-r2.mjs --date <day>` from 25d316e), the part-clean at A6's place, the sets
+  -47, -20, -22 (u4f-report.md, "What comes next"). Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
 

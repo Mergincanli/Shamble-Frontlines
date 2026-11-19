@@ -129,7 +129,8 @@ Each accepted as built; nothing re-run for it.
 - **M2:** spikes/netcode-proof and docs/design at the lane's head equal 07289a4's and b25b96a's (`git diff --quiet`,
   exit 0 both, my run at 9eb4abe); every commit since 549ed77 touches .checkpoints/ only (`git log 549ed77..HEAD --
   spikes docs .claude .github`: empty, my run). Main: f5030a3, already in at a6acc8a (MAIN-61; the local origin/main is
-  an ancestor of HEAD, my run). The main session's re-read of main just before the apply is not in my sources.
+  an ancestor of HEAD, my run). The main session re-read main at 19:1x UTC, after the apply and before the commit
+  (`git fetch origin main`: unmoved, f5030a3).
 - **M3 and M4:** `git apply --check` exit 0, then `git apply` (the card, "Running work"); the 29 files byte-equal to
   builder 4's worktree (the main session's cmp_files.py: the card; my own `cmp` of the 29: 0 differ); the runner's two
   hashes from spikes/netcode-proof, diff 2f07abc2… and untracked 1a767d5b… (m5-check.log:3), equal to end check B's
@@ -150,15 +151,17 @@ Each accepted as built; nothing re-run for it.
   - The counts as deltas on 5b29296b's 552 and 632 (u4f-build.md:19-21): +82 and +99, as in builder 4's end checks A2
     and B (u4f-build.md:1108, :1121).
 - **M6:** no test failed; nothing was re-run.
-- **M7:** `node tools/gate.mjs --no-smoke` PASS (the main session's run: the card, "Running work"). No log of it is
-  kept under .gate/u4f-merge/ (my `ls`; see "What was not verified"). CI's gate and toolchain jobs run on the pushed
+- **M7:** `node tools/gate.mjs --no-smoke` PASS (the main session's run; its output kept at .gate/u4f-merge/gate.txt,
+  copied from the session's tool result, as ADV-F1H-2's lesson asks). CI's gate and toolchain jobs run on the pushed
   head (M9).
 - **D10:** its own line above.
 - **DEP-HOLD:** no Cargo.toml, Cargo.lock, package*.json or .npmrc among the 29 files (my grep of the numstat), and the
   9 new files are mode 100644 (the patch's 9 `new file mode 100644` lines; advisor-u4f-pass.md:127).
-- **M8:** this commit: the 29 files as applied; `git rm` of wip/u4f-build.patch (WIP-CLEAN); u4-build-plan.md's
-  §4.7 cap text (2.8 item 5), its §5 U4f entry and the new U4f2 entry, its §4.1 rows; plan.md's §12.1 rows with the
-  five later carries; u4f-build.md's merge section; this report (the drafts: u4f-merge-edits.md).
+- **M8:** the merge commit holds the 29 files as applied and `git rm` of wip/u4f-build.patch (WIP-CLEAN). The papers
+  are .checkpoints/ files, which the checkpoint script commits on its own, so they went in by its saves around the merge
+  commit: u4-build-plan.md's §4.7 cap text (2.8 item 5), its §5 U4f entry and the new U4f2 entry, its §4.1 rows, and
+  plan.md's §12.1 rows with the five later carries (fca16a9, by apply_u4f_merge_edits.py from u4f-merge-edits.md, word
+  for word); u4f-build.md's merge section and this report (the save that pushes the merge commit).
 - **M9 (after the push):** the saver restarted, CI green, the card updated; then "What comes next". The merge into the
   lane needs no go of his (his (a), as U4r's: history.md:4659-4662); PR #40 keeps its own go.
 
@@ -505,12 +508,9 @@ and a half edit, none found, and each notice recorded word for word where cited)
   "Cuts by the spend limit").
 
 ## What was not verified
-- **The gate's log:** M7's `gate --no-smoke` PASS is the main session's word on the card; no output of it is kept under
-  .gate/u4f-merge/ (my `ls`), while ADV-F1H-2's lesson asks such runs' output kept under .gate/<slug>/
-  (u4r-report.md:352-356). I did not run it.
-- **`Room::cmd_timing()`** has no consumer anywhere in spikes/netcode-proof (my grep), and round 1's EA-U4F-1 list does
-  not name it. Its reason is 2.3's setting; whether it stays public, goes pub(crate) or waits for U4f2's lane (which
-  opens npt-room for C-U4F2-3) is not ruled.
+- **`Room::cmd_timing()`** has no consumer anywhere in spikes/netcode-proof (the drafter's grep), and round 1's EA-U4F-1
+  list does not name it. Its reason is 2.3's setting; whether it stays public, goes pub(crate) or waits for U4f2's lane
+  (which opens npt-room for C-U4F2-3) goes to the advisor's check of the pushed head.
 - I built, ran and timed nothing. Every pass and count is read from the logs named, whose headers tie them to the
   final tree's hashes. My own runs were read only: sha256sum, `wc -c`, `git apply --numstat`, `git diff`, `git log`,
   the `cmp` of the 29 files against builder 4's worktree, and greps.
