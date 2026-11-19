@@ -11,7 +11,9 @@ lit ground with a 1 m grid on three.js's WebGPU renderer (WebGL 2 as the fallbac
 small server that lets Mustafa open a build in Brave from a zip.
 
 ## Outcome
-⟦DONE / PARTIAL⟧ ⟦one sentence, at the end⟧
+**DONE, waiting for his Brave check and his go.** The first page builds, runs and is tested in this container on
+the WebGL 2 fallback; two review rounds, the verifier (PASS) and the advisor agent are through; the zip for Brave is
+built from commit 7d8e2de2e and sent in the chat.
 
 What a person sees: an empty ground with a grid, in placeholder colours (not the look), and a corner readout: the
 backend, ticks at 30 a second, blocks, frames, errors, the last pause, the commit. **In this container every run was on
@@ -38,7 +40,7 @@ Brave check ("For Mustafa").
    built page: errors 2, nothing shown). Fixed in round 2's fix pass, with two browser tests that fail without it.
 4. **The size ran over its plan twice.** Planned about 2,900 added lines with a stop line at 4,000. At 3,964 the
    session stopped and told him (SIZE-STOP; his answer "A": the line moved to 4,400). At 4,430, after round 1's
-   fixes, it stopped again (SIZE-STOP-2; his answer "A": the line moved to 4,700; round 2's fix pass then made it 4,471). What grew: tests and checks the reviewers asked for (the
+   fixes, it stopped again (SIZE-STOP-2; his answer "A": the line moved to 4,700; round 2's fix pass and the verifier's fix then made it 4,477). What grew: tests and checks the reviewers asked for (the
    small server's tests 230 lines, the build's checks and their tests 366, the Worker's tests 636), not features.
 5. **Two planted defects were first caught by a timeout, not by their check** (test-engineer, round 1). The planted
    defects were rewritten so that a plant only counts when the output shows the line that names it, and rerun twice.
@@ -49,8 +51,8 @@ Brave check ("For Mustafa").
    08:16:35 UTC written as "to 08:17"); corrected in the next save.
 
 ## Plan and approval
-- The plan: `cs2-first-page/plan.md` in the notes (commit ⟦NOTES-SHA⟧ still holds the notes folder; the last commit of
-  this pull request deletes it). Drafted by engine-architect, adopted by the main session with every change listed
+- The plan: `cs2-first-page/plan.md` in the notes (the commit just before this pull request's last one still holds the notes
+  folder: the pull request's description names it; the last commit deletes the folder). Drafted by engine-architect, adopted by the main session with every change listed
   (its section 20), four revisions.
 - **The advisor agent: APPROVE with eight conditions** (2026-11-18, 21:05 to 21:27 UTC; seven Mediums, twelve Lows).
   Each condition and where it was met:
@@ -73,8 +75,8 @@ Brave check ("For Mustafa").
   fine."
 
 ## What changed
-**4,471 added lines** in `crates/`, `packages/`, `.gitignore` and the two root manifests (the lockfiles and the
-five-line fixture `render-counts.json` not counted), by `git diff --numstat origin/main...HEAD`: client 2,059,
+**4,477 added lines** in `crates/`, `packages/`, `.gitignore` and the two root manifests (the lockfiles and the
+five-line fixture `render-counts.json` not counted), by `git diff --numstat origin/main...HEAD`: client 2,065,
 sim-worker 1,223, e2e 342, client-endpoint 335, sim-wasm 263, sim 219, root 27, types 3. Planned: about 2,900; the
 stop line, moved twice by his word: 4,700.
 
@@ -127,7 +129,14 @@ returns the next due time; `Sim::input` takes the sequence number only, and `new
 of its own beside `worker.ts`) and `build-checks.mjs` (the build's checks as a module of their own) are added; the
 boundary test is `.mjs`; `BlockPool.give` returns nothing and the pool counts `refused` beside `misses`;
 `render/index.ts` with `createPicture` (engine-architect's F1); `WorkerLink.receive`; the Vite constants
-`__SHAMBLE_DEVTOOLS__` and `__SHAMBLE_COMMIT__`.
+`__SHAMBLE_DEVTOOLS__` and `__SHAMBLE_COMMIT__`. Also not in the plan's lists (the verifier's M2): in Rust `Sim::block`
+(for native tests) and `CreateError::message`; the types `BackendName`, `CreatePicture`, `WorkerPort`, `PauseRecord`,
+`ErrorLog`, `Flags`, `RunHeader`, `ReportData`, `PacedSim`, `PacerCounters`, `LinearMemory`; `readoutLines`; in
+`serve.mjs` `HOST`, `DEFAULT_PORT`, `addressFor`, `CONTENT_SECURITY_POLICY` and `listen` (the planned
+`createServer({root, port})` became `createServer({root})` plus `listen`); in the build's checks `MAX_SERVED_BYTES`,
+`tooLarge`, `formatSizeTable`, `cspProblems`, `bundleProblems`, `checkOutDir`; in `build.mjs` `buildWasm` and
+`buildPage`. Planned and not built as a symbol: `copyReport` (folded into `Overlay`). The verifier: "What crosses
+the Wasm boundary matches the plan exactly."
 
 ## The new dependencies: the release record and the security answer it names
 His words (2026-11-18, 20:20:09 UTC): "every ready report of a pull request that changes a manifest or a lockfile
@@ -185,16 +194,21 @@ check (`gh release verify-asset`) could not be run here either; by his CI-WASM a
 first run there. No other file, version or checksum of outside code was taken.
 
 ## Evidence
-All on the final code, commit e4f4bf4, unless a line says otherwise.
+On commit e4f4bf4 unless a line says otherwise. One commit followed it, b27323a (the verifier's finding M1: two
+files of the build's checks); after it the client's unit tests (48), both builds and the browser tests (12 passed,
+against the unpacked zip) were run again.
 
 **Checks, all exit 0** (2026-11-19, 11:08 to 11:12 UTC): `cargo fmt --all --check`; clippy `--workspace --all-targets --locked -- -D warnings`
 natively and for `wasm32-unknown-unknown`; `cargo test --workspace --locked` (client-endpoint 15, sim 9, sim-wasm 6,
 protocol 2, room 1, devtools 1); the release tests of sim and protocol; the wasm32 build of the five crates; the generated types written
 again with no change; tsc with CI's strict flags on the page's and the Worker's shipped files with the lib check on
-(0 errors against @types/three 0.187.0; two casts, both in `three-picture.ts`); the unit tests as CI's `npm test` runs
+(0 errors against @types/three 0.187.0; one cast, `three-picture.ts:43`; the Worker's check runs without
+`--types vite/client`); the unit tests as CI's `npm test` runs
 them (types 7, net 1, sim-worker 30, client 48, e2e's node project 1); the boundary tests on the built Wasm (7);
 the development and the production build; `node tools/gate.mjs --no-smoke` (GATE PASS; the smoke check cannot start
-in this container and runs in CI); `node .claude/scripts/repo-map-check.mjs`. CI on the pushed head: ⟦runs⟧.
+in this container and runs in CI); `node .claude/scripts/repo-map-check.mjs`. CI on 7d8e2de (which holds the final code, b27323a), read at 11:47 UTC: `toolchain` runs 222 (push) and
+223 (pull request) and `gate` run 925 (pull request; its gate and smoke jobs): success; `gate` run 924 (push) was still
+running. CI on this pull request's last head: the pull request's description.
 
 **The browser tests** (the container's Chromium 153, headless, software rendering; `--project=chromium` on the built
 development page served by `serve.mjs`): 12 passed, three runs in a row. What they hold:
@@ -208,7 +222,7 @@ development page served by `serve.mjs`): 12 passed, three runs in a row. What th
 - a Worker that cannot be loaded, and one that throws as it starts: the match stops once and the page says why;
 - the isolation flag under Vite's dev and preview servers: `crossOriginIsolated` true with the flag and false without,
   on the page and in the Worker;
-- the allocation method of PM-0002-7 (a sampling heap profile by function): about 40 to 70 bytes per frame posting
+- the allocation method of PM-0002-7 (a sampling heap profile by function): about 40 to 90 bytes per frame posting
   the input, about 480 to 520 bytes per block received (the message event's own data and one view), about 16 KB a
   second; the mark itself is judged in change-set 5;
 - two facts recorded: Playwright's clock does not reach the Worker (it kept ticking on real time), and opened as a
@@ -268,13 +282,28 @@ two Highs of round 1 are fixed and closed; nothing High in round 2. A third roun
 | netcode-architect | nothing above Low; seven Lows for change-set 3's plan | (its ground did not change beyond the timer's rounding, read by perf-auditor and test-engineer) |
 
 **Round 2's three Mediums, all fixed in e4f4bf4:** the allocation test now samples before the listener is optimised
-(blocks 90 to about 360; per block a floor of 430 and a limit of 610; clean 478 to 518 over fourteen runs, the plant
+(blocks 90 to about 360; per block a floor of 430 and a limit of 610; clean 478 to 518 over twenty runs, the plant
 684 to 711); the Worker's error event is cancelled and its missing message replaced, with two browser tests that fail
 without the fix; a refusal by the content security policy is now counted as an error, so the readout and every
 browser test show one. Also in that pass (Lows that rode along): two more refused build variables and the build-folder
 variable no longer refused; `Cross-Origin-Resource-Policy: same-origin` on the small server; three comments made true.
 
-The advisor agent on the final head: ⟦verdict⟧. The verifier: ⟦verdict⟧.
+**The verifier: PASS on e4f4bf4** (`verifier-final.md`; Opus 5.5 at effort max; every check run by itself, with the
+same counts; the tool's file and the release record's nine hashes equal; the small server probed with 29 requests;
+three plants of the list caught at their lines; both new tests fail when the fix is taken out; his quoted words in
+the code byte-equal). Two Mediums and six Lows:
+- **M1, fixed in b27323a:** the verifier planted a `WebAssembly.validate` call in the page's visibility handler, and
+  nothing caught it: only the two first-page tests read the count of calls, at one moment, and the build scanned the
+  page's chunks for the Wasm's glue only. The build now refuses any page chunk that names `WebAssembly` (today none
+  does); the verifier's plant makes the build exit 1. ⟦RECHECK⟧
+- **M2, fixed in this report:** the list of departures from the plan's symbols was incomplete (now whole, above).
+- Lows: three wordings of this report corrected (one cast, not two; the allocation per frame; the "Not verified"
+  list); the policy header is asserted on the 200 answer only, and the build's refusal of environment settings has
+  no test (two follow-ups); the Worker's type check runs without `--types vite/client` (the plan's printed command
+  has it and fails with the lib check on, because Vite's client types need `SharedWorker`).
+
+**The advisor agent on the final head:** its verdict stands in the pull request's description, as for #58 and #60 (it
+reviews the head this report is part of).
 
 ## Decisions and deviations
 - **His decisions in this change-set** (whole, by script, in `docs/DECISIONS.md`): 2026-11-18, 20:20:09 UTC (his go on
@@ -312,7 +341,14 @@ The advisor agent on the final head: ⟦verdict⟧. The verifier: ⟦verdict⟧.
   Until then those tests ran only in this container.
 - A lost GPU device or WebGL context: the route from three.js's error to the page's error count is proven by reading
   the code, not by a test (graphics-engineer N1, a follow-up).
-- The e2e specs are run by Playwright but type-checked by no tool.
+- The e2e specs are run by Playwright but type-checked by no tool. CI type-checks only `packages/types`: the page's
+  and the Worker's type checks ran only here. CI cannot run the boundary tests either (it does not build the Wasm).
+- The proof of "zero Wasm calls by the page" is read by the two first-page tests at one moment; since b27323a the
+  build also refuses page code that names `WebAssembly`. A call hidden from both (a name built at run time) would
+  pass: nobody writes that by accident.
+- GitHub's own check of the tool's file (`gh release verify-asset`) was not run; it comes with the CI-WASM pull request.
+- The small server has run on Linux only; the zip route is Windows (his check). A tab hidden while the Wasm is still
+  loading has no test.
 - The named machines of the pass marks (MACHINES): none of this change-set's readings is on one.
 
 ## Follow-ups (each below High; their text is in `docs/STATUS_ARCHIVE.md`, "Follow-ups", "From change-set 2")
@@ -330,7 +366,8 @@ The advisor agent on the final head: ⟦verdict⟧. The verifier: ⟦verdict⟧.
   when blocks grow; what the page says after a lost device (with ADR 0003's loss handling).
 - **Small:** four server branches without a test of their own; the error text's cleaning and the hand-off's time
   stamp have no test; each renderer error prints twice in the console; the npm scope `@shamble` is unclaimed; the
-  browser's own request for `/favicon.ico` gets a 404; `dist-*/` is not in `.gitignore`.
+  browser's own request for `/favicon.ico` gets a 404; `dist-*/` is not in `.gitignore`; the policy header is asserted
+  on the 200 answer only; the build's refusal of environment settings has no test (the verifier's L4 and L5).
 
 ## Risks
 1. **The first WebGPU run happens on his laptop.** If Brave refuses something or WebGPU fails to start, the page
@@ -347,10 +384,157 @@ The advisor agent on the final head: ⟦verdict⟧. The verifier: ⟦verdict⟧.
 After the merge: the CI-WASM pull request (its exact text to Mustafa first), then change-set 3, "The loop closes".
 
 ## Every line the docs pass moved or corrected (his OLD-LINES and REC-OLD: "its report lists each with the old and the new text")
-⟦DOCS-LINES⟧
+docs-keeper's list, copied by script from its notes (`docs-keeper-moved-lines.md`), whole:
+
+_Written 2026-11-19 11:18 UTC (date -u) by docs-keeper. Base: main b763ba3. Proof: `docs-keeper-move.mjs` (the moves, with
+their checks) and `docs-keeper-blame-check.mjs` (every removed or changed line of the four files blamed on main:
+this lane's, moved byte for byte, or a REC-OLD correction listed below; 0 others)._
+
+#### 1. Moved byte for byte by script (OLD-LINES: lines about merged pull requests), 9 lines in 2 blocks
+- `docs/STATUS.md` line 29 (the row of #60, merged as b763ba3) -> `docs/STATUS_ARCHIVE.md` line 159, first row of
+  "In flight" (sha256/16 6f5c161248a425d7 at both places). Then its own cells (this lane's line, written by #60's
+  commits) were reshaped to the archive's four columns and updated to merged, as for #58's row: the PR cell dropped,
+  "**the kit hold and two CI edits** (kit-hold-ci)" in bold, the follow-ups pointer changed from "the archive's
+  'Follow-ups'" to "below", the merge cell added (b763ba3, 2026-11-18 20:30:46 UTC, his go of 20:20:09 UTC for
+  e5ca735, CI green on main: gate run 900, toolchain run 198), "done: " plus what he accepted with the merge, waiting
+  on: none.
+- `docs/ROADMAP.md` lines 274-282 (a blank and STATUS-DIET's entry, the oldest of 13 in "Recent work") -> lines
+  120-128 in "Build history", after kit-v3-5's folded entry (sha256/16 c3d7f2bec92a36bd at both places).
+
+#### 2. Copied by script (his words, never retyped), 1 quote
+- His message of 2026-11-18, 20:44:29 UTC, "the zip saved and unpacked" (26 bytes, sha256 6616a05d...84585, checked),
+  from `.checkpoints/cs2-first-page/mustafa-2026-11-18-zip-saved.md` into a new dated pointer of this lane in
+  `docs/STATUS_ARCHIVE.md` ("Follow-ups", block "From change-set 1, Types (PR #58)", its last item), which closes
+  the question STATUS's "Waiting on Mustafa" held.
+
+#### 3. Corrected under REC-OLD (a) (Mustafa, 2026-11-18, 20:20:09 UTC): rows of `docs/REPO_MAP.md` that describe code
+that has changed, also rows another lane wrote; 8 rows, old and new text whole
+The three his words name ("The three map rows for the files this pull request changed") are 3.6 to 3.8. The row of
+`.claude/scripts/checkpoint.test.mjs` ("Its tests: `node --test .claude/scripts/checkpoint.test.mjs`") describes
+only the command, which #60 did not change: left as it is. 3.1 to 3.5 are rows change-set 2's code made untrue.
+Blame on main: Cargo.toml, package.json, packages/, .gitignore, checkpoint.mjs and toolchain.yml rows 550856a
+(foundation-toolchain, #48); crates/ row 790ac31 (also #48); CHECKPOINTS.md row 9660197 (DOCS-54).
+
+##### 3.1 `Cargo.toml`
+Old:
+
+    | `Cargo.toml` | The v2 Rust workspace, a virtual one (ADR 0002 parts 2-4 and 7): members `crates/*`, resolver 3, edition 2024, `rust-version` equal to the pin, `publish = false`; `[workspace.dependencies]`, empty for now, where each shared version enters with the first crate that needs it; the workspace lints (`unsafe_code` denied, clippy's `all` at warn), which every crate opts into; overflow checks in every profile for every workspace crate (`[profile.release] overflow-checks = true`, dependencies at the release default, the register row OVERFLOW-ALL) |
+
+New:
+
+    | `Cargo.toml` | The v2 Rust workspace, a virtual one (ADR 0002 parts 2-4 and 7): members `crates/*`, resolver 3, edition 2024, `rust-version` equal to the pin, `publish = false`; `[workspace.dependencies]`, where each shared version enters with the first crate that needs it (so far ts-rs `=12.0.1` and wasm-bindgen `=0.2.130`); the workspace lints (`unsafe_code` denied, clippy's `all` at warn), which every crate opts into; overflow checks in every profile for every workspace crate (`[profile.release] overflow-checks = true`) and, by a named override each, for the six third-party crates compiled into our libraries and tests (cfg-if, thiserror, ts-rs, unicode-ident, wasm-bindgen, wasm-bindgen-shared); `"*"` keeps the other dependencies (proc-macros, build scripts) at the release default (the register row OVERFLOW-ALL; a new third-party crate joins the list in the change that adds it) |
+
+##### 3.2 `crates/`
+Old:
+
+    | `crates/` | The v2 Rust crates (ADR 0002 part 3), each still an empty stub with one test: `sim` (the simulation: state, phases, tick, the navigation runtime), `protocol` (message types, the codec, decoders that never panic, the loopback transport), `room` (the room's match logic, with no I/O and no clock), `client-endpoint` (prediction and reconciliation, interpolation, snapshot decoding, the aim cast, the block writer and its layout table), `sim-wasm` (the wasm-bindgen bindings the Worker loads; none until the boundary spike), `devtools` (the replay runner, hash comparer, tick bench, legacy-golden reader, headless protocol clients). The tests in `sim` and `protocol` pass only while overflow checks are on |
+
+New:
+
+    | `crates/` | The v2 Rust crates (ADR 0002 part 3): `sim` (the simulation: state, phases, tick, the navigation runtime; so far the world, its step and its state hash), `protocol` (message types, the codec, decoders that never panic, the loopback transport; so far the first eight message types), `room` (the room's match logic, with no I/O and no clock; still an empty stub with one test), `client-endpoint` (prediction and reconciliation, interpolation, snapshot decoding, the aim cast, the block writer and its layout table; so far the layout table, the block writer and the local schedule), `sim-wasm` (the wasm-bindgen bindings the Worker loads, change-set 2), `devtools` (the replay runner, hash comparer, tick bench, legacy-golden reader, headless protocol clients; still an empty stub with one test). The tests in `sim` and `protocol` pass only while overflow checks are on |
+
+##### 3.3 `package.json`
+Old:
+
+    | `package.json` | The v2 npm workspaces (`packages/*`; ADR 0002 parts 2 and 3), private, exact versions only: TypeScript, Vitest and @playwright/test as dev dependencies, Node 22 in `engines`; no `"type"` field. The legacy toolkit keeps its own `tools/package.json` |
+
+New:
+
+    | `package.json` | The v2 npm workspaces (`packages/*`; ADR 0002 parts 2 and 3), private, exact versions only: TypeScript, Vitest, Vite and @playwright/test as dev dependencies, Node 22 in `engines`; no `"type"` field. The legacy toolkit keeps its own `tools/package.json` |
+
+##### 3.4 `packages/`
+Old:
+
+    | `packages/` | The v2 TypeScript packages (ADR 0002 part 3), each empty with one stub test (`npm test --workspaces`): `client` (`@shamble/client`, the player entry: input, camera, HUD, rendering), `sim-worker` (hosts `sim-wasm`, paces the tick, runs the local match), `net` (the browser's two transport backends, WebTransport and WebSocket), `types` (types generated from Rust), `e2e` (end-to-end tests with Playwright Test) |
+
+New:
+
+    | `packages/` | The v2 TypeScript packages (ADR 0002 part 3), each with its tests (`npm test --workspaces`, which CI's `toolchain` job runs: Vitest in `client`, `sim-worker`, `net` and `types`; Playwright's `node` project in `e2e`): `client` (`@shamble/client`, the player entry: the app shell, the overlay and rendering; change-set 2's page, below), `sim-worker` (hosts `sim-wasm`, paces the tick, runs the local match; below), `net` (the browser's two transport backends, WebTransport and WebSocket; still empty with one stub test), `types` (types generated from Rust), `e2e` (end-to-end tests with Playwright Test; below) |
+
+##### 3.5 `.gitignore`
+Old:
+
+    | `.gitignore` | node_modules; `.gate/` (generated output: renders, exports, builds); `dist/`, `*.log`, `.env*`, local Claude settings and agent memory; `/target/` (cargo's build folder) and `test-results/` (Playwright Test's output) |
+
+New:
+
+    | `.gitignore` | node_modules; `.gate/` (generated output: renders, exports, builds); `dist/`, `*.log`, `.env*`, local Claude settings and agent memory; `/target/` (cargo's build folder) and `test-results/` (Playwright Test's output); `packages/sim-worker/pkg/` (the Wasm and its glue, written by the build) and `packages/e2e/playwright-report/` |
+
+##### 3.6 `.claude/CHECKPOINTS.md`
+Old:
+
+    | `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit. For every session: at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan first and saves each block as it goes, and a restart trusts the blocks its notes mark done (§4); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked at every update while agents run, and restarted if it has stopped (§3, §5); disk hygiene (§10); kept raw logs and the old build cache, removed only by `kept-logs.mjs` (§11) |
+
+New:
+
+    | `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit. For every session: at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan first and saves each block as it goes, and a restart trusts the blocks its notes mark done (§4); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked at every update while agents run, and restarted if it has stopped (§3, §5); a dependency change held: the script never pushes a change to a manifest or a lockfile until `.checkpoints/<task-slug>/dependency-check.md` records security-auditor's answer on that content, and nothing that holds the change is built or pushed by hand meanwhile (§3, Mustafa's DEP-HOLD, PR #60); disk hygiene (§10); kept raw logs and the old build cache, removed only by `kept-logs.mjs` (§11) |
+
+##### 3.7 `.claude/scripts/checkpoint.mjs`
+Old:
+
+    | `.claude/scripts/checkpoint.mjs` | Commits and pushes `.checkpoints/` only: `save`, and `watch` (background saver) |
+
+New:
+
+    | `.claude/scripts/checkpoint.mjs` | Commits and pushes `.checkpoints/` only: `save`, and `watch` (background saver). Both hold a push that changes a manifest or a lockfile (`Cargo.toml`, `Cargo.lock`, `package.json`, `package-lock.json`, `npm-shrinkwrap.json`, in any folder) against the remote branch (or main's merge-base for a branch not pushed yet), unless `dependency-check.md` names each file's sha256 or the file equals `origin/main`'s; a held `save` commits locally and exits 1 (PR #60) |
+
+##### 3.8 `.github/workflows/toolchain.yml`
+Old:
+
+    | `.github/workflows/toolchain.yml` | Job `toolchain` (foundation step 2.2) on every push and pull request: installs the pinned Rust toolchain with rustup, checks `rustc` against the pin, runs `cargo fetch --locked` and `npm ci` (the last steps with the network), then builds and tests with the network cut off (its own network namespace; a TCP probe must fail inside): `cargo test --workspace --locked`, the release overflow tests of `sim` and `protocol`, the `wasm32-unknown-unknown` build of five crates, `npm ci --offline`, `npm test --workspaces`. Step 2.3 replaces it with the gate v2's workflow |
+
+New:
+
+    | `.github/workflows/toolchain.yml` | Job `toolchain` (foundation step 2.2) on every push and pull request, with no cache restored or saved (`cache-mode: none`, PR #60): installs the pinned Rust toolchain with rustup, checks `rustc` against the pin, runs `cargo fetch --locked` and `npm ci` (the last steps with the network), then builds and tests with the network cut off (its own network namespace; a TCP probe must fail inside): `cargo test --workspace --locked`; the generated types written again (`SHAMBLE_WRITE_TYPES=1`) and compared with git, failing on any change in `packages/types/src/generated`; the release overflow tests of `sim` and `protocol`, the `wasm32-unknown-unknown` build of five crates, `npm ci --offline`, `npm test --workspaces`; then `packages/types` type-checked with strict flags (`tsc --ignoreConfig`: the shipped files, then the shipped files and their tests with `--skipLibCheck`). Step 2.3 replaces it with the gate v2's workflow |
+
+#### 4. This lane's own lines, updated (RECORD-FILES: each pull request writes its own lines)
+- `docs/STATUS.md`: line 5 (Last updated), 13 (Last merged: #60), 36-37 (Next, item 2's end), 40 (Waiting: his
+  Brave check and go on #61, replacing #60's go and the zip question), 101-105 (Follow-ups: change-sets 0 and 1
+  shortened, "the carried lines" now "the machine lines" since the SPLIT-25 pointer of 2cedb9c; #60's ids with
+  his list for the quality gate plan; a pointer for #61). New: #61's row in "In flight".
+- `docs/STATUS_ARCHIVE.md`: #60's block header in "Follow-ups" (in flight -> merged, with his words "The five
+  Medium findings as follow-ups.", copied from his message's notes file and checked with grep -F; rewrapped). New:
+  the dated pointer in change-set 0's block (SPLIT-25's pointer, 2cedb9c); the pointer in #58's block (section 2,
+  plus: change-set 2 touches none of the three files with the two doc lines; the five change-set 2 lines its code has);
+  the block "From change-set 2, the first page (PR #61)". In "Health": the row "CI on main, latest" (#60's docs pass)
+  now names b763ba3's runs (gate run 900 with smoke, toolchain run 198); new: a row pointing at the report for change-set
+  2's readings.
+- `docs/ROADMAP.md`: #60's entry (title in flight -> MERGED; its last sentence "Next: ..." -> the merge line). New:
+  change-set 2's entry, first under "Recent work" (12 entries after the fold).
+- `docs/REPO_MAP.md`: the row of `crates/client-endpoint/src/layout.rs` (500757c, #58's docs pass; extended with
+  `section`, `field` and `Section::align`). New: 21 rows (5 crate files, 15 package paths, the report's row).
 
 ## Decisions needed
-⟦DECISIONS⟧
+None. The next questions come with their own texts: the CI-WASM pull request's exact text after the merge (his
+answer CI-WASM (a)), and the random-number library with change-set 3's plan (his answer RNG-CRATE (c)).
 
 ## For Mustafa
-⟦FOR-MUSTAFA⟧
+1. **The Brave check** (about 18 minutes, 9 of them waiting). The zip `shamble-v2-02-first-page.zip` was sent in the
+   chat (245,260 bytes, sha256 b458b7ca734ac0fa20027818f41da7b9946fd0134f0bcc61ba1427df3c93e8ab; built from commit
+   7d8e2de2e, whose code is this pull request's final code; its README has the same steps). You need Node 18 or
+   newer (`node --version` in PowerShell).
+   1. Unzip it into a folder of its own, for example `C:\shamble\02-first-page`.
+   2. Double-click `index.html` there. Expected: one line of text telling you to run "node serve.mjs", and no
+      picture. Note what you see: it is the first answer, for Brave, to whether a built page opens from a file.
+   3. In that folder, click the File Explorer's address bar, type `powershell`, press Enter; then type
+      `node serve.mjs` and press Enter. Expected: "Shamble Frontlines: serving this folder at http://127.0.0.1:4173".
+   4. Open `http://127.0.0.1:4173` in Brave, Shields at your usual setting (note it). Expected: an empty ground with
+      a grid of 1 m squares, lit from above, in placeholder colours, and a corner readout: "backend: WebGPU" (or
+      "WebGL 2 fallback" with its reason), ticks counting up "at 30 a second", blocks equal to ticks (within 1),
+      frames at your screen's rate, "errors: 0", "last pause: none yet", and the commit 7d8e2de2e.
+   5. Leave it for 2 minutes. Expected: errors still 0, blocks still about equal to ticks.
+   6. Switch to another tab for 1 minute, then come back. Expected: "last pause" says about 60 s hidden and "ticks
+      while hidden" 0 or a very small number (a match that ran on would show about 1800); the ticks count on.
+   7. The same with 6 minutes away: about 360 s hidden, ticks while hidden 0 or a very small number.
+   8. Press "Copy report" and paste the result into the chat.
+   9. Open `http://127.0.0.1:4173/?backend=webgl`. Expected: "WebGL 2 fallback, asked for by ?backend=webgl", the same
+      scene, errors 0. Press "Copy report" and paste that too.
+   10. Open `http://127.0.0.1:4173/?pad=4096`, wait 30 seconds, "Copy report", paste; then the same with
+       `?pad=65536`. Readings of what a larger block costs on your laptop; not judged.
+   11. Open `brave://version` in a new tab and paste its first line.
+   12. In PowerShell, press Ctrl+C to stop the server.
+   If anything else shows (a line of text over the picture, an error count above 0, a blank page, a readout that
+   does not move), that is what this check is for: paste what you see.
+2. **Your go on the merge of #61**, in the build chat, after the Advisor's check of this report and your Brave check:
+   for the pull request's head as its description names it. A later push needs the advisor agent's review and your
+   go again.
