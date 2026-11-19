@@ -181,8 +181,8 @@
   bb7a5ed; the advisor's head check APPROVE WITH FINDINGS (advisor-main-60-head.md: six Lows, no push). R3 (iii)'s
   four hand runs done (.gate/u4f/w3-hand.log: each exit 0, contract PASS). The lane goes on from this head.
 - **U4f's panel, round 1, ENDED** 14:32 UTC (workflow wf_a011d9f2-abf: 5 of 5 results, 0 errors; 393 tool uses).
-  **The advisor's ruling on it RUNNING** (from about 14:35 UTC; general agent on main's advisor.md, xhigh; its file
-  advisor-u4f-r1.md). **If cut:** SendMessage to it to continue from its file, or a fresh advisor reading the file.
+  **The advisor's ruling on it RUNNING** (from 14:33 UTC; agent abf879016ff011b9c, general on main's advisor.md, xhigh;
+  its file advisor-u4f-r1.md). **If cut:** SendMessage to it to continue from its file, or a fresh advisor reading it.
 - **The saver bde01r5pv** (13:49 UTC on, both attribution lines as trailers; ADV-M60-8; its window ends about 15:39:
   restart it while agents run, run_in_background, timeout 7200000). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
   ENABLED again at 13:49 UTC (next 14:34); pause it when no agent runs.
