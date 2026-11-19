@@ -196,7 +196,8 @@
   (`git diff --stat 5b29296b -- marks.json crates/judge marks/README.md`). **Next, M8's papers:** u4f-report.md and
   u4f-merge-edits.md (the plan's edits as old -> new) drafted by an agent into notes, read in full, the edits applied
   by Edit; then the one commit (the files as applied, `git rm` of the wip patch). **If cut:** the applied files stay
-  uncommitted in the main folder; resume at M8. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+  uncommitted in the main folder; resume at M8. **The drafting agent RUNNING** from 18:48 UTC (agent a3aba4dc6af975951;
+  writes N/u4f-report.md and N/u4f-merge-edits.md only). Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
 
