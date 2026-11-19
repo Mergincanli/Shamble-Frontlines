@@ -656,6 +656,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - His words of 2026-11-19 00:59 (Decisions taken): sitting 3 goes on at his "unticked"; until then the reviewer
      stays ticked. The public environments API is refused by this session's proxy (403), so the screenshots stay for
      the re-tick, production's restore and SA-R8.
+   - His "you can try again to connect" (2026-11-19 about 00:04 UTC): retried at 00:04:15 UTC: HTTP 403 again, the same
+     proxy message. The second GitHub connector (the engineering plugin's) reconnected but asks for a sign-in, which
+     only he can give in his claude.ai connector settings; not connected, no tools. So the screenshots stay as above.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
