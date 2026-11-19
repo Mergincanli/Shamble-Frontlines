@@ -780,6 +780,22 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      go; four questions from memory (a login page at step 5? the "try for free" screen's words? a payment screen? his
      Brave version); steps 5-8 redone after the wall; the four runs unchanged; my miss owned (tonight's steps sent too
      early; from now on a step that must wait travels only inside the go).
+   - The web-fetch agent's hand-back (model opus, effort high; after my reply; dates are the pages' dateModified):
+     (1) whether a person signed in to the dashboard passes the Cloudflare identity provider's login unseen: NOT FOUND
+     (cloudflare-one/integrations/identity-providers/cloudflare/, 2026-06-19: Access "verifies their Cloudflare account
+     membership and grants or denies access based on your policy configuration", default for new organizations "with
+     **Restrict to account members** enabled"; session-management, 2026-11-10: "If the global token has also expired, the
+     user will be prompted to re-authenticate with the IdP."). So tonight's step 5 keeps the checklist's normal-window
+     open (he reports exactly what shows) and adds one private-window open of iso-off, where no cookie can help: a
+     Cloudflare login page must show (a screenshot; no login needed there). (2) Zero Trust's first screen:
+     cloudflare-one/setup (2026-10-12): "On the onboarding screen, choose a team name." / "Complete your onboarding by
+     selecting a subscription plan and entering your payment details." / "If you chose the **Zero Trust Free plan**,
+     this step is still needed but you will not be charged."; getting-started FAQ (2026-04-30): "Go to **Zero Trust**,
+     choose a team name and a payment plan"; account-limits (2026-11-17): Free-plan limits listed are 50 custom
+     applications, 10 DEX tests, 100 remote captures a day (no user count). No trial of a paid plan found; "Try for free"
+     appears only as a button label under Cloudflare One on https://www.cloudflare.com/plans/free/ (no date), next to an
+     "Activate" link to dash.cloudflare.com/sign-up/teams, unexplained. A reading, not a fact: a sign-up address sending
+     a signed-in owner to the dashboard's home would fit what he saw; tonight's look-only screenshots decide.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
@@ -1268,6 +1284,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    step 5, whether a signed-in Cloudflare session passes the wall unseen (if so, a private-window open of iso-off).
 
 ## Running work
+- agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
+  and on Zero Trust's first screen · launched 2026-11-19 about 14:15 UTC (after the save 4396e0a's edits) · DONE; its
+  answers in step 26.
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time
   limit at 22:52:16 UTC ("watch stopped: terminated"; its last cycle: "nothing to save"); no agent runs now, so it
   stays off until the next agents start. The branch is clean at a66bcc0.
