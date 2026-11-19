@@ -201,7 +201,9 @@
   redact 10 of 10, 307 items, 0 findings). **Step 6 DONE:** pushed at 631edf3 (15:43 UTC); the saver bbe44e8id
   restarted 15:43 (both trailers; window to about 17:33); builder 4's notes copied (copy_b4_notes.py, 866 -> 1,104
   lines) and its worktree snapshotted (wip/u4f-build.patch, base b25b96a, 394,313 B, 29 files), pushed 549ed77.
-  **Next:** CI on the pushed head (gate, smoke, toolchain; red stops the lane), then step 7, the advisor's head check.
+  CI: check_suite.completed on 631edf3 at 15:47 UTC (no suite running or failed). **Step 7 RUNNING** from 17:45 UTC:
+  the advisor's head check (agent aed5b19b068559f68; advisor-main-61-head.md). Builder 4 resumed 17:44 (end check B,
+  --list, times, items 4 and 5); the saver b3e3qzz16 from 17:44 (window to about 19:34).
   Free disk 4,508 MiB at 15:42 (builder 4's cold end checks; the runner stops under 4,096).
   **15:5x UTC, Mustafa (92 % usage): "make sure to save your progress (Same for the agents)".** Pushed: everything to
   52f9f4e. Local only: merge commit a6acc8a and these card lines (no push before 5d, C2 (c)); 5d waits for builder 4's
