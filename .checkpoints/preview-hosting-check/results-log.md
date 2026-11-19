@@ -670,3 +670,15 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   (00:14:13-00:14:37); the deploy job 135235739456 created 00:14:38, read "queued" once in the jobs list, then
   "status":"waiting" (get_workflow_job, about 00:14:45 UTC). So after his re-tick a rewritten job waits again. His
   rejection asked next.
+- His "rejected" (2026-11-19 00:15:52 UTC, 193acd50-d5b0-4df0-9bec-25a5e4c23951): attempt 3's deploy job completed
+  00:15:49 UTC, conclusion "failure", runner_id 0 (it never reached a runner). SA-R4 done.
+- Step 4 (the refusal): cs/b9-prod 9965630 pushed 00:16:15 UTC (deploy.yml = the approved variant 8b745631a278; the
+  other three workflows unchanged); pull request #10 "Token test: cs/b9-prod, a pull-request job that names
+  production" opened right after. Its job `b9-production` must be refused at once (production admits `main` only).
+- **The refusal (PM-0006-32's third row): run #18** (44427671656, created 00:16:27 UTC): the job `b9-production`
+  (135236608357) completed 00:16:31 UTC, conclusion "failure", no runner (refused before any step; no log); its check
+  run's output empty. The public run page, logged out (headless Chromium, 2026-11-19 00:17:28 UTC, HTTP 200; picture
+  `.gate/preview-hosting-check/day1/sitting3/run18.png`), "Annotations: 2 errors", word for word: "b9-production" /
+  "Branch "refs/pull/10/merge" is not allowed to deploy to production due to environment protection rules." /
+  "b9-production" / "The deployment was rejected or didn't satisfy other protection rules." So a pull-request job
+  that names `production` is refused at once; nothing waited for him.

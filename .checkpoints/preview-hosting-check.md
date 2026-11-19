@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 01:14 Amsterdam (00:14 UTC)
+- **Last update:** 2026-11-19 01:18 Amsterdam (00:18 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -670,6 +670,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      rejects. Still due from him: the SA-R8 screenshot (repository secrets).
    - SA-R8 met (his screenshot 00:14:02 UTC: no repository secrets; three environment secrets). Attempt 3's deploy job
      "waiting" (00:14:38): SA-R4 measured; his rejection asked. Then cs/b9-prod.
+   - His "rejected" (00:15:52 UTC): attempt 3 ended "failure", no runner. cs/b9-prod pushed 00:16:15, PR #10, run #18:
+     `b9-production` refused at 00:16:31 ("Branch "refs/pull/10/merge" is not allowed to deploy to production due to
+     environment protection rules."). Next: step 5, he sets production to "No restriction" (window "production open"
+     from his word until his restore screenshot with `main`); I re-run the failed job: "secret: present" expected.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
