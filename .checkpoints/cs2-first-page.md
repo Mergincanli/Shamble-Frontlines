@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 08:13 UTC (from the clock)
+- **Last update:** 2026-11-19 08:16 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -451,14 +451,19 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     9f28a87 (which holds d257bb6): success; on a98de9a (which holds 29378dd): `toolchain` 212 and `gate` 914:
     success.
 
+50. **The zip's route, tried** (`cs2-first-page/make-zip.py`; 08:15 to 08:17 UTC): a development build at ae47239fb
+    (the tree clean), staged with a README (his Brave steps, the commit) and `SHA256SUMS.txt`, zipped with
+    `python3 -I -m zipfile -c` (245,166 bytes, 10 files), unpacked again and every file equal to its line in the
+    list; the browser tests against the unpacked copy (`SHAMBLE_DIST`): 10 passed. A trial only: the zip he gets
+    is made at the final head. Also written for the docs pass: `cs2-first-page/decisions.mjs` (his four messages
+    into DECISIONS by script; the answer to SIZE-STOP-2 joins its list when it comes).
+
 ## Current step
-50. **Round 2, on what the fixes changed** (`git diff 30a5a13..d257bb6`): security-auditor, perf-auditor and
-    rust-reviewer are reading (notes `*-review2.md`); then engine-architect, graphics-engineer and test-engineer
-    (test-engineer after the planted defects' second run, which it must read). **The planted defects, second
-    version** (`cs2-first-page/plants.py`: 19 plants, each must fail at the assertion that names it; results in
-    `planted-defects-2.md`), run in the worktree `.gate/cs2-plants` at 9f28a87 since about the last save. Then the
-    readings again (the timer fix), the verifier, the docs pass, the zip, the advisor agent on the final head, the
-    report, the pull request; stop for his go and his Brave check.
+51. **Round 2, on what the fixes changed** (`git diff 30a5a13..d257bb6`): security-auditor, perf-auditor and
+    rust-reviewer are reading since about 08:02 UTC (notes `*-review2.md`); then engine-architect,
+    graphics-engineer and test-engineer (which must read `planted-defects-2.md`). Then the verifier, the docs
+    pass, the zip, the advisor agent on the final head, the report, the pull request; stop for his go and his
+    Brave check. **SIZE-STOP-2 is open with him: no code is added until he answers.**
 
 ## Next steps
 1. See "Current step". No reviewer runs the browser project or `build.mjs` in the main folder while the main session
