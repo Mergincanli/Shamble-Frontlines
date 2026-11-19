@@ -223,5 +223,13 @@
   ENABLED again at 13:49 UTC (next 14:34); pause it when no agent runs.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
+- **2026-11-19 16:00:10 to about 17:45 UTC (builder 4; the session too):** "You've hit your org's monthly spend limit
+  · ask your admin for a higher limit · your 5-hour limit resets 5:40pm (UTC)" (16:00:10.105, builder 4's transcript,
+  one second after its end check A2 ended: .gate/u4f/w4-end-check-a2.log, 15:43:29-16:00:09 UTC, exit 0, all 11 steps,
+  634 measured / 731 bites, test step 882.8 s). Mustafa's own limit cut the session too ("I hit my usage limit while
+  you were working, but it has reset now", reached about 17:42); the worker restarted, ending the saver bbe44e8id; the
+  16:34 check-in reached the session at 17:42. Checked at 17:43: no process left; no plant (its notes at 15:39); no
+  half edit (the worktree's runner hashes equal A2's start, 2f07abc2… and 1a767d5b…, rebuilt from the 15:43 snapshot);
+  w4-end-check-a.log (15:32) was cut off after its doc step, then re-run as A2. Resumed by SendMessage about 17:45.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py).
