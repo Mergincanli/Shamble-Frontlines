@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 07:56 UTC (from the clock)
+- **Last update:** 2026-11-19 08:05 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -418,11 +418,30 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     now reads about 65 bytes per frame and about 300 per block (the message event counted).
     **Size: 4,430 added lines, 30 over the stop line of 4,400.**
 
+45. **Stopped adding code at the stop line and told him in three lines** (07:57 UTC). Question SIZE-STOP-2 is with
+    him: (a) the stop line moves to 4,700; (b) it stays at 4,400 and three test additions (the build's own check of
+    a production build, the wider allocation attribution, the post-per-frame check; about 70 lines) are taken back
+    out and carried to change-set 3. No code is added until he answers.
+46. **The seventh reviewer, netcode-architect** (`cs2-first-page/netcode-architect-review1.md`, on 29378dd): "no finding
+    above Low"; seven Lows, all for change-set 3's plan unless cheap: (1) who picks the blend fraction between two
+    blocks (one sentence in `picture.ts` now, a field at change-set 4; events must be read from every block, not
+    only the two kept); (2) the pause on a hidden tab must come from the mode once online lands, and held buttons
+    are cleared on hide; (3) the seed as an authority-only section written last, so the shared state is a prefix;
+    (4) the step gets the host's time (`step(nowMs)`); (5) the page's per-frame number is not the protocol's
+    command sequence: rename it the post number; (6) the Pacer should throw on a due time that is not finite; (7)
+    a start tick in the authority's match setup. Its answers: the checked tick is right for the authority; a plain
+    minus on decoded ticks would be a panic from network input, so `checked_sub` or wrap-aware compares in
+    change-set 3; two kept blocks is the right number; nothing needs tearing out beyond what is recorded.
+    **Round 1 is complete: seven reviewers.**
+
 ## Current step
-45. **Stopped adding code at the stop line, told him in three lines.** Still out: netcode-architect's review (its
-    findings add lines), round 2 on what changed, the verifier. **Going on meanwhile, adding no code line:** the
-    planted defects again on the new head with test-engineer's sharper versions and its rule (a plant counts only
-    when an assertion line shows it); the readings again after the timer fix; the docs pass's preparation.
+47. **Round 2, on what the fixes changed** (`git diff 30a5a13..d257bb6`): security-auditor, perf-auditor and
+    rust-reviewer are reading (notes `*-review2.md`); then engine-architect, graphics-engineer and test-engineer
+    (test-engineer after the planted defects' second run, which it must read). **The planted defects, second
+    version** (`cs2-first-page/plants.py`: 19 plants, each must fail at the assertion that names it; results in
+    `planted-defects-2.md`), run in the worktree `.gate/cs2-plants` at 9f28a87 since about the last save. Then the
+    readings again (the timer fix), the verifier, the docs pass, the zip, the advisor agent on the final head, the
+    report, the pull request; stop for his go and his Brave check.
 
 ## Next steps
 1. See "Current step". No reviewer runs the browser project or `build.mjs` in the main folder while the main session
