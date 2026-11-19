@@ -7056,3 +7056,33 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
 - **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
   `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
   final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,363 bytes (ADV-U4FP-1), 29 files: the one snapshot until the merge.
+
+## Card blocks moved 2026-11-19 during U4f's judged sets (card_trim_1119i.py; from 'Now: U4f' and 'Running work')
+- **The brief, filled for the build:** `.checkpoints/netcode-proof-test/u4f-brief.md`, sha256
+  135325a0bb524104bba9144b366b9ec52525851f5db140b1aca93ba4681a502f, 2,040 lines: rev 3.3 (50530a82…, 1,835 lines) filled
+  by `u4f_fill.py --apply` (20dbb02b…, 449 lines) at 11:3x UTC with `<base>` 5b29296b03f4e116c0afac8b89d9bc15cc1adaf7.
+  Its path: rev 2 (34a2e55), rev 3 (e1508bc), round 1 (3 Highs), rev 3.1 (9f76a02), round 2 (7 Medium), rev 3.2
+  (8ca5ede), the advisor's APPROVE WITH CONDITIONS L1-L6 (advisor-u4f-brief.md: findings :65-172, rulings :173-198,
+  bars :325-367, conditions :369-419), rev 3.3 by the fold (u4f-brief-r33-notes.md) and its check
+  (advisor-u4f-fold-check.md: ACCEPT, 20 edits applied; D3-1 ruled: a `reorder` event at the run's end, SERIES.md rows
+  as B9, test f40; section 4: the fill's form). Counts: at least +119 measured, +134 bites build, 67 negative cases; 21
+  pre-runs; disk about 3,727 MiB; planned size about 5,150 added lines (his stop past 6,000). Runner u4f-run.sh
+  70eb3da5b8ce9a8e2eda582536eeab93f96fb7fbe98e2a74a28e0492ccf6ddae (u4f_runner.py from u4r-run.sh e9437ae2…; 6 lines
+  changed; `bash -n` exit 0; u4f-run.sh.diff). Carry 90 (SA-11, U4h's section, :598-601) added by L3.
+- **The advisor's ruling** (advisor-u4f-build1.md, 283 lines, sha256 da98295e0d0eae7c…, read in full): **APPROVE the
+  continuation with conditions.** R2 (g): the room counts from the tick it runs next, 2.4's anchor, so the frozen value
+  and its meaning hold (nothing to him; the row quotes the frozen sentence, line 8). New Mediums: F1 the fast clock's
+  past-bound stamp never reaches kind 1 (every 10th at newest + 3 + the bound); F2 `World::CHECK_BITES` unrouted in
+  `Bites::of`; F3 f28 runs no contract check; F4 `brawl-presses` widens SERIES.md:348's closed list (`brawl` plus a new
+  `--brawl-press-every` with its own row). Lows F5-F11. R1 split f6 and f28 per option. R3 blocks B1 fixes, B2 -20's
+  rest, B3 the cap's measurement, B4 -47, B5 -22, B6 scripts and one counted check, B7-B9 -21, B10 end checks, each
+  at most about 400 lines. R4 build to his 6,000 stop; at the first block end past it, nothing more but the end checks;
+  the three lines then, in that day's message, first line "stopped on you": (a) split U4f (close at -20, -47 and -22;
+  -21 its own unit) or (b) go on; the advisor's provisional lean (a). Its 22 lines (:162-246) are builder 2's.
+- **Builder 3 stopped at his size stop** (its record moved to history.md:6905-6919, card_trim_1119d.py): 6,213 added,
+  307 removed, 29 files; end checks A2 and B pass on one tree (630 measured, 727 bites); hand runs p3, p9, p16, p20 done.
+  The advisor's stop ruling: advisor-u4f-stop.md (R1-R4; Lows S1-S7, note N1 at :198-210).
+- **MAIN-61 DONE** (its record at history.md:6951-6997, card_trim_1119g.py): main f5030a3 in at a6acc8a, pushed at
+  631edf3; CI green (six check runs); the advisor's head check APPROVE WITH FINDINGS (advisor-main-61-head.md: ADV-M61H-1
+  Medium fixed by that trim, -2 to -4 folded in, -5 nothing). The saver b3e3qzz16 from 17:44 UTC, both trailers (window
+  to about 19:34); the check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (next 18:34).

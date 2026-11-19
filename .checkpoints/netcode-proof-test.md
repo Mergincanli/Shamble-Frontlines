@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-19 19:2x UTC: **U4f MERGED at 25d316e** (M1-M8 met; the advisor's pass check APPROVE WITH
-  CONDITIONS, met); next: CI, the advisor's head check, 5.3's 17 pre-runs, the sets. Disk 11,6xx MiB free (18:27 UTC).
+- **Last update:** 2026-11-19 20:1x UTC: U4f merged (25d316e); r2 done and read; part-clean done; **-47 PASS**
+  (committed); **the -20 set running** (from 20:07 UTC); then -22; card trimmed (card_trim_1119i.py).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -51,17 +51,9 @@
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
 ## Now: U4f (clock and commands; u4-build-plan.md §5 :805-816; size M)
-- **The brief, filled for the build:** `.checkpoints/netcode-proof-test/u4f-brief.md`, sha256
-  135325a0bb524104bba9144b366b9ec52525851f5db140b1aca93ba4681a502f, 2,040 lines: rev 3.3 (50530a82…, 1,835 lines) filled
-  by `u4f_fill.py --apply` (20dbb02b…, 449 lines) at 11:3x UTC with `<base>` 5b29296b03f4e116c0afac8b89d9bc15cc1adaf7.
-  Its path: rev 2 (34a2e55), rev 3 (e1508bc), round 1 (3 Highs), rev 3.1 (9f76a02), round 2 (7 Medium), rev 3.2
-  (8ca5ede), the advisor's APPROVE WITH CONDITIONS L1-L6 (advisor-u4f-brief.md: findings :65-172, rulings :173-198,
-  bars :325-367, conditions :369-419), rev 3.3 by the fold (u4f-brief-r33-notes.md) and its check
-  (advisor-u4f-fold-check.md: ACCEPT, 20 edits applied; D3-1 ruled: a `reorder` event at the run's end, SERIES.md rows
-  as B9, test f40; section 4: the fill's form). Counts: at least +119 measured, +134 bites build, 67 negative cases; 21
-  pre-runs; disk about 3,727 MiB; planned size about 5,150 added lines (his stop past 6,000). Runner u4f-run.sh
-  70eb3da5b8ce9a8e2eda582536eeab93f96fb7fbe98e2a74a28e0492ccf6ddae (u4f_runner.py from u4r-run.sh e9437ae2…; 6 lines
-  changed; `bash -n` exit 0; u4f-run.sh.diff). Carry 90 (SA-11, U4h's section, :598-601) added by L3.
+- **Moved to history.md:7060-7088** (card_trim_1119i.py, 20:1x UTC): U4f's filled brief (u4f-brief.md, sha256
+  135325a0…, 2,040 lines, `<base>` 5b29296b), the advisor's build-1 ruling (advisor-u4f-build1.md), builder 3's stop
+  line and MAIN-61's done line (a6acc8a, pushed 631edf3, CI green; advisor-main-61-head.md).
 - **LEAD-BOUND ANSWERED: (a) 400 ms, frozen** (Mustafa, 2026-11-18 11:31 Amsterdam by his label; reached the chat
   11:10:41 UTC; word for word at history.md's end, "## Decision: Mustafa, 2026-11-18 11:31 Amsterdam", by
   record_lead_bound.py): the entry u4f-lead-bound.md equal to 9ad2effb's (sha256 57c588ec43bae7b7…), its fenced value's
@@ -69,19 +61,6 @@
   report names it in a line of its own with who reviewed it** (the advisor's A1; read by the advisor and the
   test-engineer); no marks.json, judge file or existing SERIES.md row may change: if the build needs one, stop and ask
   him; "Build U4f"; his size stop past 6,000 added lines stays.
-- **The advisor's ruling** (advisor-u4f-build1.md, 283 lines, sha256 da98295e0d0eae7c…, read in full): **APPROVE the
-  continuation with conditions.** R2 (g): the room counts from the tick it runs next, 2.4's anchor, so the frozen value
-  and its meaning hold (nothing to him; the row quotes the frozen sentence, line 8). New Mediums: F1 the fast clock's
-  past-bound stamp never reaches kind 1 (every 10th at newest + 3 + the bound); F2 `World::CHECK_BITES` unrouted in
-  `Bites::of`; F3 f28 runs no contract check; F4 `brawl-presses` widens SERIES.md:348's closed list (`brawl` plus a new
-  `--brawl-press-every` with its own row). Lows F5-F11. R1 split f6 and f28 per option. R3 blocks B1 fixes, B2 -20's
-  rest, B3 the cap's measurement, B4 -47, B5 -22, B6 scripts and one counted check, B7-B9 -21, B10 end checks, each
-  at most about 400 lines. R4 build to his 6,000 stop; at the first block end past it, nothing more but the end checks;
-  the three lines then, in that day's message, first line "stopped on you": (a) split U4f (close at -20, -47 and -22;
-  -21 its own unit) or (b) go on; the advisor's provisional lean (a). Its 22 lines (:162-246) are builder 2's.
-- **Builder 3 stopped at his size stop** (its record moved to history.md:6905-6919, card_trim_1119d.py): 6,213 added,
-  307 removed, 29 files; end checks A2 and B pass on one tree (630 measured, 727 bites); hand runs p3, p9, p16, p20 done.
-  The advisor's stop ruling: advisor-u4f-stop.md (R1-R4; Lows S1-S7, note N1 at :198-210).
 - **SIZE-U4F ANSWERED: (a)** (Mustafa, 2026-11-19 12:00 Amsterdam by his label; reached the chat 13:36:25 UTC; word for
   word at history.md:6896-6903 by record_size_u4f.py): U4f closes with what is built; the three finished cheat tests
   stay in it and are reviewed with it; the forged-command test, its six missing cheats and all of -21's runs become a
@@ -120,8 +99,8 @@
   under results/u4f/<commit12>/pm-0001-47/; it re-checks spikes/netcode-proof unchanged before each judge call, so card
   saves are safe). **-47 DONE** (20:0x-20:1x UTC, exit 0): **PM-0001-47 PASS** (L1 P2, 1,000 connects, seeds 1-3
   valid); bites newest-sample and tick-quantised **shown**; results/u4f/b57221ed139d/pm-0001-47/ committed. For -47's
-  report: seed 2's 1,916 building slot-ticks (no -47 precondition), F4's shot band. **The -20 set next** (same form,
-  `20`), then -22 after reading -20's six runs for honest overflow resyncs.
+  report: seed 2's 1,916 building slot-ticks (no -47 precondition), F4's shot band. **The -20 set RUNNING** from 20:07
+  UTC (same form, `20`; background, about 80 minutes); then -22 after reading -20's six runs for honest overflow resyncs.
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
@@ -189,11 +168,8 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-
-- **MAIN-61 DONE** (its record at history.md:6951-6997, card_trim_1119g.py): main f5030a3 in at a6acc8a, pushed at
-  631edf3; CI green (six check runs); the advisor's head check APPROVE WITH FINDINGS (advisor-main-61-head.md: ADV-M61H-1
-  Medium fixed by that trim, -2 to -4 folded in, -5 nothing). The saver b3e3qzz16 from 17:44 UTC, both trailers (window
-  to about 19:34); the check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (next 18:34).
+- The -20 set (background, from 20:07 UTC); the saver buovbuxl2 (window to about 21:32 UTC: restart before then); the
+  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled while the sets run (a cut stops a set as it stops an agent). No agent.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-19 16:00:10 to about 17:45 UTC (builder 4; the session too):** "You've hit your org's monthly spend limit
