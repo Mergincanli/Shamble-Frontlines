@@ -187,7 +187,12 @@
   main-run.sh in the background, timeout 7200000 (C2); M6 a failing test stops, to the advisor; M7 the gate
   --no-smoke; the D10 read; M8 one commit (the files, `git rm` of the wip patch, plan §4.7's cap text, the U4f and U4f2
   entries, §4.1's rows, the carries into plan.md's rows, u4f-build.md's merge section, u4f-report.md with M8's list,
-  FP20 and C3's lines); M9 the push, the saver, CI, the card; then 5.3's 21 pre-runs, the part-clean, the sets. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+  FP20 and C3's lines); M9 the push, the saver, CI, the card; then 5.3's 21 pre-runs, the part-clean, the sets.
+  **Done 18:27-18:3x UTC:** the part-clean (.gate/u4f-merge/clean-shared.log, exit 0: free 4,360 -> 11,663 MiB); M3
+  `git apply --check` exit 0 and M4 `git apply` of 286aac60 in the main folder (uncommitted), its 29 files byte-equal
+  to builder 4's worktree (scratchpad cmp_files.py). **M5 RUNNING** in the background (task bkyuv3xx1;
+  .gate/u4f-merge/m5-check.log). **If cut:** the main folder holds the applied files uncommitted; the saver commits
+  .checkpoints/ only; re-run M5 by the same command, then M6 onward. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
 
