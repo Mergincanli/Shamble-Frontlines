@@ -151,3 +151,177 @@ specs + `report.ts` + `render-counts.json`, cs2 report "Evidence" (:208-281) and
   commands for verifying GitHub Release attestations."; "a release attestation provides a signed, timestamped binding
   between a release, its git tag, and any associated assets."; usage "gh release verify-asset v1.2.3 my-asset.zip".
   So the command exists from gh 2.81.0; the image ships 2.103.3 (S2.5). Sure: high.
+- S2.7 github.com/cli/cli/security/advisories/GHSA-8xvp-7hj6-mcj9 (read 2026-11-19; CVE-2026-48501), published
+  2026-05-27: `gh attestation`, `gh release verify`, `gh release verify-asset` sent the Authorization header to TUF
+  mirrors; affected "<= v2.92.0", patched v2.93.0. Hosts these commands contact in normal operation: TUF metadata
+  from tuf-repo.github.com and tuf-repo-cdn.sigstore.dev, artifact bundles from Azure Blob Storage
+  (tmaproduction.blob.core.windows.net); plus the GitHub API itself. github.com users' token went to
+  tuf-repo.github.com (GitHub Pages). => On the runner: gh must be >= 2.93.0 (image: 2.103.3), and the token it holds
+  should be the job's short-lived `contents: read` token only. Sure: high (primary advisory).
+- S2.8 cli/cli trunk `pkg/cmd/release/verify-asset/verify_asset.go` (raw.githubusercontent.com, read 2026-11-19,
+  fetch-model quotes; trunk, not necessarily = 2.103.3): stdout on success: "Calculated digest for %s: %s",
+  "Resolved tag %s to %s", "Loaded attestation from GitHub API", then green "%s Verification succeeded! %s is
+  present in release %s" (with the success icon). Nothing to stderr directly; errors are returned to the top level:
+  "you must specify an asset filepath"; "failed to determine base repository: %w"; "no attestations found for tag %s
+  (%s)" (GetByDigest failure, underlying error dropped); "error parsing attestations for tag %s: %w"; "no
+  attestations found for release %s in %s/%s"; "error parsing attestations for digest %s: %w"; "attestation for %s
+  does not contain subject %s" (= digest mismatch); "failed to verify attestation for tag %s: %w". Digest: sha256
+  of the file (`artifact.NewDigestedArtifact(..., "sha256")`). Flow: tag -> commit SHA (`shared.FetchRefSHA`) ->
+  attestations by that commit digest with PredicateType "release", Initiator "github", Limit 100 -> filter by tag ->
+  the file's sha256 must be a subject -> `AttVerifier.VerifyAttestation` (signature against the trusted root). No
+  tag given = latest release (`FetchLatestRelease`): so the workflow MUST pass the tag. `--format json` replaces the
+  text output. Sure: medium-high (source on trunk via fetch model; exact strings to be read on the first run).
+- S2.9 cli.github.com/manual/gh_help_exit-codes (read 2026-11-19): 0 success; 1 failed; 2 cancelled; 4 requires
+  authentication; commands may define more. So verify-asset: 0 on "Verification succeeded!", 1 on any returned
+  error (no attestation, digest mismatch, bad signature, API error), 4 when no token is found. Sure: high for the
+  general table; per-case codes to be read on the first run (the planted run gives exit 1).
+- S2.10 docs.github.com "use GitHub CLI in workflows" (read 2026-11-19): "GitHub CLI is preinstalled on all
+  GitHub-hosted runners."; each step that calls it "must set an environment variable called `GH_TOKEN`"; examples
+  use `GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}`; no permission list. Sure: high.
+- S2.11 cli/cli trunk `pkg/cmd/release/shared/attestation.go` (read 2026-11-19, fetch-model quotes): policy SAN must
+  match `^https://dotcom\.releases\.github\.com$` (trust domain "dotcom" by default); issuer: any ("No issuer
+  extension"); `NoPublicGood: true` (only GitHub's own Sigstore instance is trusted); trusted root from the
+  attestation client's trust domain. Matches security-auditor's S9 (cert SAN https://dotcom.releases.github.com,
+  issuer "GitHub, Inc., Fulcio Intermediate l1") and S20 (GitHub TSA). Sure: medium-high.
+- S2.12 docs.github.com/en/rest/repos/attestations (read 2026-11-19): list attestations by subject digest: "when
+  using a fine-grained access token the attestations:read permission is required"; caller needs read access to the
+  repository; `predicate_type` accepts provenance, sbom, release or free text; page silent on unauthenticated access
+  for public repos and on GITHUB_TOKEN. Sure: high on what it says; the GITHUB_TOKEN case is OPEN.
+- S2.13 docs.github.com workflow syntax, `permissions` (read 2026-11-19, first 100000 chars): keys include
+  "attestations: read|write|none" ("Work with artifact attestations."), "contents: read|write|none"; "If you specify
+  the access for any of these permissions, all of those that are not specified are set to `none`." So today's
+  `contents: read` leaves `attestations: none` on our token. Top-level `cache-mode` entry exists (read, write,
+  write-only, none). Sure: high.
+- S2.14 RE-READ 2026-11-19 github.com/wasm-bindgen/wasm-bindgen/releases/tag/0.2.130 (WebFetch): "released this 30
+  Oct 06:16" by github-actions, commit c93b8ae848d4d9e6beaeaf9516e18a7cadd818a2, badge text "Immutable release. Only
+  release title and notes can be modified.", "Assets 17". And .../releases/expanded_assets/0.2.130: entry 13
+  wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz, 11.3 MB, 2026-10-30T06:11:06Z, sha256
+  9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f (= his value; GitHub's server-side digest,
+  fetch-model transcription); entry 17 "Release attestation (json)" -> /wasm-bindgen/wasm-bindgen/attestations/
+  61631161/download, 2026-10-30T05:45:20Z. => CONFIRMED from public pages today: immutable, with a release
+  attestation (security-auditor's S1/S2 of 2026-11-18 stand). Sure: high.
+- Finding: gh's permissions on the job token are not documented for another public repository's attestations
+  (S2.12 says attestations:read "is required" for fine-grained tokens; the job token is a GitHub App installation
+  token). Open; see Block 2's write-up for the choice.
+- S2.15 cli/cli trunk `pkg/cmd/release/verify/verify.go` (read 2026-11-19, fetch-model quotes): prints "Resolved tag
+  %s to %s", "Loaded attestation from GitHub API", "%s Release %s verified!", then an "Assets" table (Name, Digest)
+  of every subject; errors include "no attestations for tag %s (%s)", "no attestations found for release %s in %s",
+  "duplicate attestations found for release %s in %s", "failed to verify attestations for tag %s: %w". It does NOT
+  check immutability itself (no such field read); it relies on the release attestation existing.
+
+## Block 2. GitHub's own check of the tool's file (DONE)
+**The command** (for the downloaded archive `$dl/wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz`):
+    GH_TOKEN: ${{ github.token }}   (in that step's env only)
+    gh release verify-asset 0.2.130 "$dl/wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz" --repo wasm-bindgen/wasm-bindgen
+The tag must be given: without it gh checks against the LATEST release (S2.1, S2.8). `--repo` is required on the
+runner (the checkout is our repository).
+
+**What it proves** (S2.1, S2.3, S2.4, S2.8, S2.11; security-auditor S8-S10, S20): the file's sha256 is a subject of
+the release attestation of tag 0.2.130 in wasm-bindgen/wasm-bindgen, whose tag resolves to commit c93b8ae...; the
+attestation's signature verifies against GitHub's own Sigstore trusted root (public-good refused, `NoPublicGood:
+true`), signer certificate SAN `https://dotcom.releases.github.com`. In plain words: the file is byte for byte an
+asset GitHub recorded and signed when that immutable release was published. This is the step that this container
+could not do (security-auditor: the chain to GitHub's root and the timestamp were "not proved here").
+**What it does not prove:** how the program was built (no build provenance is published: security-auditor S11, S18;
+the release jobs build without `--locked`, with actions pinned by tag); that the source at c93b8ae is benign; that
+the file equals HIS values (our own size + sha256 lines do that; they are the binding check, gh is the origin
+anchor); anything about the program inside the archive beyond the archive's bytes (the member list and the
+program's own size + sha256 do that). It trusts GitHub (its API, its signing service, its TUF root).
+
+**What it needs on a runner:**
+- gh >= 2.81.0 for the command (S2.6); >= 2.93.0 so the token is not sent to TUF mirrors (S2.7, CVE-2026-48501).
+  The ubuntu-24.04 image lists gh 2.103.3 (S2.5, image 20261111.370.1). Preinstalled on every GitHub-hosted runner
+  (S2.10). The text prints `gh --version` and refuses a gh older than 2.93.0 (one line; cheap belt).
+- `GH_TOKEN` set to the job's token on that one step (S2.10); with no token gh exits 4 (S2.9). Not passed into the
+  cut (`env -i` drops it) and not set on any other step.
+- `permissions:` today's `contents: read` (workflow level). The attestations REST page says fine-grained tokens need
+  `attestations:read` (S2.12), and today's block sets every unnamed permission to none (S2.13). For ANOTHER public
+  repository the job token's need is undocumented; the release's attestation file itself is public (WebFetch read it
+  unauthenticated, security-auditor S7). Recommendation: keep `contents: read` only (least privilege) and read the
+  answer on the first runner run; if it fails for lack of permission, the stop rule fires and the one-line fix
+  (`attestations: read` on the job, harmless: our repository has no attestations) comes to him as exact text. This
+  is question PERM-ATT below, so he can choose to include it up front and save a round.
+- Hosts (S2.7): the GitHub API (api.github.com: the tag ref, the attestations by digest), TUF metadata from
+  tuf-repo.github.com (GitHub's trusted root; and tuf-repo-cdn.sigstore.dev per the advisory), attestation bundles
+  possibly from tmaproduction.blob.core.windows.net. All before the cut; GitHub-hosted runners have open egress.
+
+**Output and exit codes** (S2.8, S2.9; trunk source, exact text to be read on the first run):
+- success, exit 0: "Calculated digest for <file>: sha256:9687f3bb...227f", "Resolved tag 0.2.130 to
+  sha1:c93b8ae8...", "Loaded attestation from GitHub API", "✓ Verification succeeded! <file> is present in release
+  0.2.130".
+- no attestation / no release attestation for the tag: "no attestations found for tag 0.2.130 (<digest>)" or "no
+  attestations found for release 0.2.130 in wasm-bindgen/wasm-bindgen"; exit 1. (The first form drops the API's own
+  error, so an authorization refusal may look the same: PERM-ATT.)
+- digest mismatch (a file that is not an asset): "attestation for <file> does not contain subject sha256:<hex>"
+  (wording per source: "attestation for %s does not contain subject %s"); exit 1.
+- bad signature / wrong signer: "failed to verify attestation for tag 0.2.130: <reason>"; exit 1.
+- no token: gh's "gh auth login ... populate the GH_TOKEN environment variable" message; exit 4 (S2.9).
+- The step runs under `bash -e` (defaults.run.shell: bash = `bash --noprofile --norc -eo pipefail {0}`), so any
+  non-zero exit stops the job there, before anything is unpacked.
+
+**`gh release verify 0.2.130 -R wasm-bindgen/wasm-bindgen`:** not a separate proof. It checks the same attestation
+(signature + tag) and prints every subject's digest (S2.15); it does not check immutability itself. verify-asset
+already verifies the attestation AND that our file is a subject. Not proposed (one more API round, 15 lines of
+output, nothing new proved). Could be added for the report's quote if he wants the attested digest table.
+
+**Immutable / attested:** YES, re-read today from public pages (S2.14): badge "Immutable release. Only release title
+and notes can be modified."; asset "Release attestation (json)" (id 61631161); the musl archive's GitHub digest =
+his sha256. security-auditor's reading stands.
+
+**The lines the report quotes** (his "its report quotes that check's output"): from the job log of the first clean
+run, the step's output as printed: `gh --version`'s first line, the four lines above (digest, tag, attestation
+loaded, "Verification succeeded!"), with the run id, job id and the log timestamps; from the planted run, gh's
+failure line and "Process completed with exit code 1."
+
+**To be read on the first runner run (Block 2's part):** the image version and gh version actually used; whether
+`contents: read` suffices (PERM-ATT); the exact printed lines and the file-name form; exit code on success; time
+taken; that no other step sees GH_TOKEN (the log shows env per step: GH_TOKEN appears masked only on that step).
+- Block 2 done; next: Block 3 (browser on the runner; FIREFOX-TESTS).
+## Block 3 sources (saved as read; Block 3 NOT yet done)
+- S3.1 local `node_modules/playwright-core/browsers.json` (1.65.0, read 2026-11-19): chromium revision 1254 =
+  "Chrome for Testing" 158.0.8127.18; chromium-headless-shell 1254 = 158.0.8127.18; firefox 1572 = Firefox 159.0;
+  webkit 2388 = 27.2; ffmpeg 1013 (all `installByDefault: true`). The container's /opt/pw-browsers holds
+  chromium-1243 (Chromium 153 per cs2 report), chromium_headless_shell-1243, ffmpeg-1011: an older Playwright's set,
+  not 1.65.0's.
+- S3.2 local `node_modules/playwright-core/lib/coreBundle.js` (1.65.0): DOWNLOAD_PATHS for ubuntu24.04-x64:
+  chromium = `https://cdn.playwright.dev/builds/cft/158.0.8127.18/linux64/chrome-linux64.zip` (cftUrl: only mirror
+  cdn.playwright.dev); chromium-headless-shell = `https://cdn.playwright.dev/builds/cft/158.0.8127.18/linux64/
+  chrome-headless-shell-linux64.zip`; ffmpeg = `builds/ffmpeg/1013/ffmpeg-linux.zip` and firefox =
+  `builds/firefox/1572/firefox-ubuntu-24.04.zip`, each tried on PLAYWRIGHT_CDN_MIRRORS in turn:
+  https://cdn.playwright.dev/dbazure/download/playwright, https://playwright.download.prss.microsoft.com/dbazure/
+  download/playwright, https://cdn.playwright.dev; up to 5 attempts. Cache dir default `~/.cache/ms-playwright`.
+- S3.3 same bundle, browserFetcher.ts + oopDownloadBrowserMain.ts: NO hash check of a browser download (no sha/
+  integrity/checksum/createHash in either); it checks HTTP 200 and bytes = Content-Length (when not chunked), then
+  unzips and chmods the executable. => Option (a)'s only integrity is TLS to the CDN (as `smoke` today).
+- S3.4 same bundle, chromium `_innerDefaultArgs`: headless => plain `--headless` (+ --hide-scrollbars, --mute-audio,
+  --blink-settings...); `--no-sandbox` unless `chromiumSandbox: true` (default false); chromiumSwitches include
+  `--enable-unsafe-swiftshader` (WebGL on SwiftShader without a GPU), `--disable-dev-shm-usage`,
+  `--disable-background-networking`, `--disable-component-update`, features off: OptimizationHints,
+  NetworkTimeServiceQuerying, AimEnabled, PreconnectToSearch. With `executablePath` the given binary runs with
+  these args; `--headless` on a full chrome binary (Chrome >= 132) is the NEW headless mode, on
+  chrome-headless-shell it is the old headless implementation. The container's runs (SHAMBLE_CHROMIUM=
+  /opt/pw-browsers/chromium -> chromium-1243/chrome-linux64/chrome) were the FULL binary in new headless.
+- S3.5 playwright.dev/docs/browsers (read 2026-11-19): "Playwright ships a regular Chromium build for headed
+  operations and a separate chromium headless shell for headless mode."; `--only-shell` avoids the full Chromium for
+  headless-only CI; "You can opt into the new headless mode by using `'chromium'` channel."; Playwright "can operate
+  against the branded Google Chrome and Microsoft Edge browsers available on the machine"; "the current Playwright
+  version will support Stable and Beta channels of these browsers."; new headless "can behave differently ... expect
+  different behavior in some cases"; "By default, Playwright downloads browsers from Microsoft's CDN."; Linux cache
+  `~/.cache/ms-playwright`; `PLAYWRIGHT_BROWSERS_PATH` (0 = hermetic in node_modules/playwright-core/.local-browsers);
+  `install-deps` installs system dependencies (tries to become root); Firefox: "Playwright's Firefox version matches
+  the recent Firefox Stable build." and "Playwright doesn't work with the branded version of Firefox since it relies
+  on patches."; sizes "a few hundred megabytes" (example 281M Chromium, 187M Firefox, 180M WebKit, one machine).
+- S3.6 playwright.dev/docs/ci (read 2026-11-19): "Caching browser binaries is not recommended" (restore time about
+  equal to download time); "We recommend setting workers to "1" in CI environments" (example `workers:
+  process.env.CI ? 1 : undefined`); GitHub Actions example `npx playwright install --with-deps`; a job timeout, if
+  set, "comfortably above `globalTimeout`, so Playwright stops first"; browsers launch headless by default.
+- S3.7 local bundle: Playwright's `chrome` channel on Linux = `/opt/google/chrome/chrome` (the binary, not the
+  `/usr/bin/google-chrome` wrapper script).
+- S3.8 runner-images `images/ubuntu/scripts/build/install-google-chrome.sh` on main (read 2026-11-19, fetch-model
+  quotes): Chrome from `https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb` by
+  `download_with_retry`, `apt-get install "$chrome_deb_path" -f` (a local file: no apt signature check by the
+  script; integrity = HTTPS to dl.google.com at image build time); `CHROME_BIN=/usr/bin/google-chrome` set in
+  /etc/environment; the Google apt source and the daily cron are removed (no update at run time); ChromeDriver from
+  the Chrome for Testing JSON into /usr/local/share/chromedriver-linux64; Chromium = a SNAPSHOT build from
+  chromium-browser-snapshots into /usr/local/share/chromium (/usr/bin/chromium): a developer build, not a release.
+  The deb installs into /opt/google/chrome/ (the package's own layout). Sure: medium-high.

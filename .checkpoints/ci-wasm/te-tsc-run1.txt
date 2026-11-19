@@ -1,0 +1,569 @@
+node_modules/@rolldown/pluginutils/dist/filter/index.d.mts(86,26): error TS2304: Cannot find name 'URLSearchParams'.
+node_modules/playwright-core/types/structs.d.ts(50,43): error TS2304: Cannot find name 'Node'.
+node_modules/playwright-core/types/structs.d.ts(51,49): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/structs.d.ts(51,88): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(17,30): error TS2591: Cannot find name 'child_process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(18,26): error TS2591: Cannot find name 'stream'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(19,28): error TS2591: Cannot find name 'fs'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(339,21): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(350,77): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(350,90): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(360,22): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(369,47): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(369,60): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(403,25): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(403,98): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(436,27): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(436,40): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(436,54): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(436,67): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(469,25): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(469,93): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(502,22): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(502,35): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(502,49): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(502,62): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(533,26): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(533,99): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(563,28): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(563,41): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(563,55): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(563,68): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(593,26): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(593,94): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(623,23): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(623,36): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(623,50): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(623,63): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(747,35): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(791,107): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(791,120): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(835,35): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(879,102): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(879,115): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(2130,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(2178,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(2265,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(2391,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(2558,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(2640,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(2707,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(2917,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(2956,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(2997,43): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(3056,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3441,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3489,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3557,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3657,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3701,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3737,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3778,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3814,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3856,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3893,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(3929,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(4245,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(4334,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(4367,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(4504,46): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(4585,55): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(4591,56): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(4684,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(4769,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(4808,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(4910,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(4925,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(4942,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5071,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5116,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5177,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5260,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5291,48): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(5334,138): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5355,160): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5375,138): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5395,143): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5403,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5409,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5415,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5430,158): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5435,148): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5440,148): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5445,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5450,137): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5466,144): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5495,138): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5502,146): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5521,152): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5527,154): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5533,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5538,152): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5544,143): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5589,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5636,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5653,43): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(5702,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5748,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5795,51): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(5804,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(5923,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(6174,21): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6189,77): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6189,90): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6204,22): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6218,47): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6218,60): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6252,25): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6252,98): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6285,27): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6285,40): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6285,54): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6285,67): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6318,25): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6318,93): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6351,22): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6351,35): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6351,49): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6351,62): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6382,26): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6382,99): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6412,28): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6412,41): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6412,55): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6412,68): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6442,26): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6442,94): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6472,23): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6472,36): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6472,50): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6472,63): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6592,35): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6636,107): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6636,120): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6680,35): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(6724,102): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(6724,115): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(6846,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(6961,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7085,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7167,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7220,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7311,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7350,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7439,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7822,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7917,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7961,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(7997,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8038,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8074,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8116,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8153,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8186,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8378,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8484,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8569,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8608,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8663,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(8678,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(8695,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8785,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8830,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8891,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(8974,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(9036,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(9082,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(9099,43): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(9141,51): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(9150,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10462,46): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(10545,44): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(10832,48): error TS2304: Cannot find name 'URL'.
+node_modules/playwright-core/types/types.d.ts(10856,147): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10864,158): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10885,160): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10907,143): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10915,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10923,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10930,148): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10937,148): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10944,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10973,137): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10980,142): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10988,141): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(10999,146): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(11012,152): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(11020,154): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(11027,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(11034,150): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(11040,149): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(11066,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(11371,14): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(11381,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(11391,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(11870,26): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(11883,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(12060,142): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(12065,160): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(12196,26): error TS2304: Cannot find name 'Node'.
+node_modules/playwright-core/types/types.d.ts(12224,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(12242,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(12403,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(12455,34): error TS2304: Cannot find name 'Node'.
+node_modules/playwright-core/types/types.d.ts(12464,21): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12473,77): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12473,90): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12483,22): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12492,47): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12492,60): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12527,25): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12527,98): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12561,27): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12561,40): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12561,54): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12561,67): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12595,25): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12595,93): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12629,22): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12629,35): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12629,49): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12629,62): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12671,26): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12671,99): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12712,28): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12712,41): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12712,55): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12712,68): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12753,26): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12753,94): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12794,23): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12794,36): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12794,50): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12794,63): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12831,35): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12867,116): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12867,129): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(12903,35): error TS2304: Cannot find name 'HTMLElementTagNameMap'.
+node_modules/playwright-core/types/types.d.ts(12939,111): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(12939,124): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(13045,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13148,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13256,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13365,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13460,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13622,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13717,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13738,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(13765,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13862,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13901,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(13974,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14021,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(14036,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(14053,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14132,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14194,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14266,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14316,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14369,30): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(14369,43): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(14369,57): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(14369,70): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(14369,174): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14403,36): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(14403,49): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(14403,63): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(14403,76): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(14403,180): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14431,33): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(14431,46): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(14431,60): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(14431,73): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(14471,34): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(14471,47): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(14471,61): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(14471,74): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(14471,180): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14480,56): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14480,94): error TS2304: Cannot find name 'SVGElement'.
+node_modules/playwright-core/types/types.d.ts(14480,107): error TS2304: Cannot find name 'HTMLElement'.
+node_modules/playwright-core/types/types.d.ts(14643,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14711,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14736,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14783,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14882,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(14941,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(15057,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(15199,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(15314,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(15379,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(15474,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(15489,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(15513,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(15577,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(15669,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(15715,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16129,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16162,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16194,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16236,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16272,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16308,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16346,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16382,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16633,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16694,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16732,59): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(16752,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16857,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16892,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(16970,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(17043,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(17058,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(17075,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(17156,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(17194,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(17241,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(17319,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(17391,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(17741,14): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(17751,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(17761,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(18438,44): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(18708,41): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(18784,24): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(18791,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(18828,31): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(19324,128): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(19346,160): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(19352,139): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(19360,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(19534,14): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(19544,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(19554,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(19886,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(19899,54): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(19931,17): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(19945,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(19951,56): error TS2304: Cannot find name 'URLSearchParams'.
+node_modules/playwright-core/types/types.d.ts(19962,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(20028,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20041,54): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20079,17): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20093,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20099,56): error TS2304: Cannot find name 'URLSearchParams'.
+node_modules/playwright-core/types/types.d.ts(20110,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(20157,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20170,54): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20202,17): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20216,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20222,56): error TS2304: Cannot find name 'URLSearchParams'.
+node_modules/playwright-core/types/types.d.ts(20233,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(20254,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20267,54): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20299,17): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20313,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20319,56): error TS2304: Cannot find name 'URLSearchParams'.
+node_modules/playwright-core/types/types.d.ts(20330,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(20351,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20364,54): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20396,17): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20410,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20416,56): error TS2304: Cannot find name 'URLSearchParams'.
+node_modules/playwright-core/types/types.d.ts(20427,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(20490,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20503,54): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20535,17): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20549,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20555,56): error TS2304: Cannot find name 'URLSearchParams'.
+node_modules/playwright-core/types/types.d.ts(20566,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(20587,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20600,54): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20632,17): error TS2304: Cannot find name 'FormData'.
+node_modules/playwright-core/types/types.d.ts(20646,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(20652,56): error TS2304: Cannot find name 'URLSearchParams'.
+node_modules/playwright-core/types/types.d.ts(20663,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(20732,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(20790,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(21532,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(21672,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(21687,13): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(21704,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(22730,26): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(22923,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(23154,23): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(23247,23): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(23308,23): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(23319,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(23361,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(23981,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(23991,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24011,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24021,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24041,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24051,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24071,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24081,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24101,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24111,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24131,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24141,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24162,148): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(24171,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24172,64): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(24176,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24181,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24191,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24192,64): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(24196,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24201,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(24207,148): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(25006,27): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25525,21): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25544,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25588,35): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25663,156): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(25668,160): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(25708,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(25787,40): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25797,42): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25807,49): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25817,52): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25827,41): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25837,53): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25849,15): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(25851,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/playwright-core/types/types.d.ts(26198,12): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(26231,12): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(26320,12): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(26330,11): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(26340,11): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright-core/types/types.d.ts(26793,12): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(26840,12): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright-core/types/types.d.ts(26951,12): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(2390,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright/types/test.d.ts(2561,12): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright/types/test.d.ts(9492,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9533,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9563,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9591,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9618,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9646,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9672,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9699,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9738,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9778,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9832,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9906,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9946,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(9981,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10016,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10051,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10079,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10122,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10149,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10183,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10211,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10240,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10271,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10365,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10471,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10558,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10591,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10630,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10660,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10695,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10790,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10828,50): error TS2304: Cannot find name 'URL'.
+node_modules/playwright/types/test.d.ts(10842,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10872,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(10907,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/playwright/types/test.d.ts(11176,19): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/playwright/types/test.d.ts(11398,12): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/rolldown/dist/filter-index.d.mts(88,26): error TS2304: Cannot find name 'URLSearchParams'.
+node_modules/rolldown/dist/shared/define-config-u93KkixF.d.mts(1442,11): error TS2550: Property 'asyncDispose' does not exist on type 'SymbolConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'esnext' or later.
+node_modules/rolldown/dist/shared/define-config-u93KkixF.d.mts(2036,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/rolldown/dist/shared/define-config-u93KkixF.d.mts(2041,14): error TS2304: Cannot find name 'AbortSignal'.
+node_modules/vite/dist/node/chunks/moduleRunnerTransport.d.ts(88,27): error TS2304: Cannot find name 'WebSocket'.
+node_modules/vite/dist/node/index.d.ts(1,23): error TS2688: Cannot find type definition file for 'node'.
+node_modules/vite/dist/node/index.d.ts(14,23): error TS2591: Cannot find name 'node:http'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(15,94): error TS2591: Cannot find name 'node:http'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(16,35): error TS2591: Cannot find name 'node:http2'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(17,30): error TS2591: Cannot find name 'node:events'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(18,21): error TS2591: Cannot find name 'node:fs'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(19,76): error TS2591: Cannot find name 'node:https'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(20,22): error TS2591: Cannot find name 'node:net'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(21,47): error TS2591: Cannot find name 'node:stream'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(23,38): error TS2591: Cannot find name 'node:tls'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(24,32): error TS2591: Cannot find name 'node:url'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(25,29): error TS2591: Cannot find name 'node:zlib'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(491,35): error TS2503: Cannot find namespace 'NodeJS'.
+node_modules/vite/dist/node/index.d.ts(561,9): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(569,23): error TS2304: Cannot find name 'URL'.
+node_modules/vite/dist/node/index.d.ts(574,76): error TS2304: Cannot find name 'URL'.
+node_modules/vite/dist/node/index.d.ts(642,18): error TS2304: Cannot find name 'fetch'.
+node_modules/vite/dist/node/index.d.ts(650,20): error TS2304: Cannot find name 'RequestInit'.
+node_modules/vite/dist/node/index.d.ts(652,38): error TS2304: Cannot find name 'RequestInit'.
+node_modules/vite/dist/node/index.d.ts(654,32): error TS2304: Cannot find name 'Response'.
+node_modules/vite/dist/node/index.d.ts(677,105): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(678,122): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1553,40): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1585,72): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1590,64): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1593,74): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1598,66): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1601,73): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1606,65): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1609,64): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1614,56): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1617,67): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1622,59): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1632,18): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1632,41): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1636,24): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1636,47): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1640,39): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1640,48): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1664,25): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1695,20): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1695,29): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(1755,79): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(2591,13): error TS2304: Cannot find name 'Console'.
+node_modules/vite/dist/node/index.d.ts(2772,61): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/dist/node/index.d.ts(3807,26): error TS2304: Cannot find name 'Request'.
+node_modules/vite/dist/node/index.d.ts(3807,44): error TS2304: Cannot find name 'Response'.
+node_modules/vite/dist/node/index.d.ts(3807,56): error TS2304: Cannot find name 'Response'.
+node_modules/vite/dist/node/index.d.ts(3814,26): error TS2304: Cannot find name 'Request'.
+node_modules/vite/dist/node/index.d.ts(3814,44): error TS2304: Cannot find name 'Response'.
+node_modules/vite/dist/node/index.d.ts(3870,96): error TS2591: Cannot find name 'Buffer'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+node_modules/vite/types/customEvent.d.ts(38,14): error TS2304: Cannot find name 'WebSocket'.
+packages/e2e/playwright.config.ts(9,14): error TS2591: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/playwright.config.ts(10,17): error TS2591: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/playwright.config.ts(15,15): error TS2591: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/tests/skeleton/allocation.spec.ts(48,3): error TS2584: Cannot find name 'console'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+packages/e2e/tests/skeleton/clock.spec.ts(11,37): error TS2304: Cannot find name 'window'.
+packages/e2e/tests/skeleton/clock.spec.ts(25,3): error TS2584: Cannot find name 'console'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+packages/e2e/tests/skeleton/file-url.spec.ts(4,18): error TS2591: Cannot find name 'node:path'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/tests/skeleton/file-url.spec.ts(5,31): error TS2591: Cannot find name 'node:url'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/tests/skeleton/file-url.spec.ts(18,3): error TS2584: Cannot find name 'console'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+packages/e2e/tests/skeleton/isolation.spec.ts(4,18): error TS2591: Cannot find name 'node:path'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/tests/skeleton/isolation.spec.ts(5,31): error TS2591: Cannot find name 'node:url'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/tests/skeleton/isolation.spec.ts(10,34): error TS2304: Cannot find name 'URL'.
+packages/e2e/tests/skeleton/isolation.spec.ts(10,69): error TS2339: Property 'url' does not exist on type 'ImportMeta'.
+packages/e2e/tests/skeleton/isolation.spec.ts(18,7): error TS2591: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/tests/skeleton/isolation.spec.ts(19,7): error TS2591: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/tests/skeleton/isolation.spec.ts(30,42): error TS2304: Cannot find name 'crossOriginIsolated'.
+packages/e2e/tests/skeleton/report.ts(28,24): error TS2304: Cannot find name 'window'.
+packages/e2e/tests/skeleton/report.ts(34,21): error TS2304: Cannot find name 'window'.
+packages/e2e/tests/skeleton/report.ts(44,16): error TS2591: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/tests/skeleton/skeleton.spec.ts(2,30): error TS2591: Cannot find name 'node:fs'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node` and then add 'node' to the types field in your tsconfig.
+packages/e2e/tests/skeleton/skeleton.spec.ts(7,46): error TS2304: Cannot find name 'URL'.
+packages/e2e/tests/skeleton/skeleton.spec.ts(7,86): error TS2339: Property 'url' does not exist on type 'ImportMeta'.
+packages/e2e/tests/skeleton/skeleton.spec.ts(19,19): error TS2304: Cannot find name 'window'.
+packages/e2e/tests/skeleton/skeleton.spec.ts(21,18): error TS2304: Cannot find name 'WebAssembly'.
+packages/e2e/tests/skeleton/skeleton.spec.ts(59,39): error TS2304: Cannot find name 'window'.
+packages/e2e/tests/skeleton/skeleton.spec.ts(72,29): error TS2584: Cannot find name 'document'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+packages/e2e/tests/skeleton/skeleton.spec.ts(73,7): error TS2584: Cannot find name 'document'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.
+packages/e2e/tests/skeleton/skeleton.spec.ts(73,34): error TS2304: Cannot find name 'Event'.
+packages/e2e/tests/skeleton/skeleton.spec.ts(106,59): error TS2304: Cannot find name 'window'.
