@@ -692,3 +692,10 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "B9-MARKER: the production job ran at 2026-11-19T00:19:49Z" / "secret: present" ("CANARY: ***"). So with
   production's branch rule set to "No restriction", a pull-request job reaches production's secret. His restore asked
   now (the window stays open until his screenshot shows `main`).
+- **His restore**: screenshot (2026-11-19 00:21:51 UTC, c31773fa-3a4e-4172-b55f-1d158e4557f1), transcribed: banner
+  "Deployment branch rule "main" saved successfully."; "Configure production": "Required reviewers", "Wait timer" and
+  "Allow administrators to bypass configured protection rules" unticked; "Deployment branches and tags": "Selected
+  branches and tags", "1 branch and 0 tags allowed", rule `main`, "Currently applies to 1 branch"; secret CANARY.
+  **Window closed: production's branch rule was off from 00:19:35 to about 00:21:51 UTC**; only run #18's attempt 2
+  ran in it. The measurement: run #18 re-run (rerun_workflow_run, 201, about 00:22:00 UTC): attempt 3, its
+  `b9-production` must be refused again.

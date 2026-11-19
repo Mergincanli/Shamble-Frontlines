@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 01:18 Amsterdam (00:18 UTC)
+- **Last update:** 2026-11-19 01:22 Amsterdam (00:22 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -674,9 +674,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      `b9-production` refused at 00:16:31 ("Branch "refs/pull/10/merge" is not allowed to deploy to production due to
      environment protection rules."). Next: step 5, he sets production to "No restriction" (window "production open"
      from his word until his restore screenshot with `main`); I re-run the failed job: "secret: present" expected.
-   - **WINDOW OPEN: production's branch rule off since his "open" (00:19:35 UTC)**; closes at his restore screenshot
+   - (closed 00:21:51 UTC, see below) Production's branch rule off since his "open" (00:19:35 UTC); closes at his restore screenshot
      showing `main`. Run #18's failed job re-run at about 00:19:48 UTC (attempt 2).
    - Step 5 measured: attempt 2's `b9-production` ran 00:19:48-00:19:51, "secret: present". Restore asked now.
+   - His restore screenshot (00:21:51 UTC): "Selected branches and tags", `main`: **window closed** (00:19:35-00:21:51).
+     Attempt 3 started about 00:22:00: refusal expected.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.
