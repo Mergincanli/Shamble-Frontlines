@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 08:16 UTC (from the clock)
+- **Last update:** 2026-11-19 10:59 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -458,12 +458,29 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     is made at the final head. Also written for the docs pass: `cs2-first-page/decisions.mjs` (his four messages
     into DECISIONS by script; the answer to SIZE-STOP-2 joins its list when it comes).
 
+51. **Round 2 is complete: six reviewers, no Critical, no High, three Mediums** (`cs2-first-page/round2-summary.md`;
+    each reviewer's notes `*-review2.md`; security-auditor, rust-reviewer and perf-auditor finished by 08:36 UTC,
+    engine-architect and graphics-engineer by about 09:36, test-engineer by about 10:33). Every round-1 finding that
+    was fixed is closed. The Mediums: perf N1 (the allocation test's per-block window straddles the point where
+    Chromium optimises the listener), engine N1 (a Worker whose script does not load: the fix pass's own
+    `message.replace` throws, the Worker is not stopped, the page says nothing: a regression of d257bb6), test NT1
+    (the failure routes have no test). graphics-engineer read three 0.187.0: nothing on the WebGPU path needs what
+    the page's policy refuses. **A third round is not due.**
+52. **Round 2's fix pass is prepared and proven in the scratch worktree only** (`cs2-first-page/round2-fixes.diff`: 9
+    files, +60 -20; it would bring the size to 4,470). It waits for his answer to SIZE-STOP-2. Checks there, all
+    passing: fmt, clippy, tsc, unit tests (48, 30, 7, 6), both builds, browser tests 12 of 12 twice, the stress run
+    30 of 30 (27 to 30 frames against the check's 20); the two new tests fail without the fix; the built page with
+    the Worker's script answered 404 says "The match stopped: the Worker failed" with errors 1 (before: errors 2,
+    nothing shown). The worktree `.gate/cs2-plants` holds the diff applied.
+
 ## Current step
-51. **Round 2, on what the fixes changed** (`git diff 30a5a13..d257bb6`): security-auditor, perf-auditor and
-    rust-reviewer are reading since about 08:02 UTC (notes `*-review2.md`); then engine-architect,
-    graphics-engineer and test-engineer (which must read `planted-defects-2.md`). Then the verifier, the docs
-    pass, the zip, the advisor agent on the final head, the report, the pull request; stop for his go and his
-    Brave check. **SIZE-STOP-2 is open with him: no code is added until he answers.**
+53. **Waiting for his answer to SIZE-STOP-2** (asked 07:57 UTC; no code is added or changed until then). On (a):
+    apply `round2-fixes.diff` in the main folder (`git apply`), update `plants.py` (plant 7b's line is now
+    `toBeLessThan\(610\)`; anchor the patterns as test-engineer's NT2 says; add the Worker-failure plant), run every
+    check, commit by path, save. Then: the planted defects once more on that head, the verifier until PASS, the docs
+    pass (docs-keeper; `decisions.mjs`), the zip (`make-zip.py`), the advisor agent on the final head, the report
+    (with test-engineer's three conditions, `round2-summary.md`), the pull request; stop for his go and his Brave
+    check. On (b): the three test additions come out first; then the same fixes where they still apply.
 
 ## Next steps
 1. See "Current step". No reviewer runs the browser project or `build.mjs` in the main folder while the main session
@@ -508,5 +525,5 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
   `test-engineer-plant-target`; the classifier refused their removal).
 
 ## Running work
-- saver: running since 2026-11-19T07:13:40.814Z (its own first line; task b9vzms3oh; 10-minute interval, stops after 110 minutes).
+- saver: restarted 2026-11-19 at about 10:59 UTC (task bq7o9d613; 10-minute interval, stops after 110 minutes: restart it before 12:45 UTC).
 - agents: see "Current step".
