@@ -114,7 +114,11 @@
   F6 (which late figure: 13 or 12) and NC-U4F-5 and C-OQ6-SEC-1. Watch: overflow 0 on all 17; the queue's high-water
   at P3 in 20 s 488 / 689 / 625 against 1,600; -47's p99 2.60 ms against 5. To name in the next day's message: F1's
   route, Q15 (c)'s correction, the redundancy-1 bite reaching "0 presses lost" (F5). The saver buovbuxl2 from 19:42
-  (window to about 21:32).
+  (window to about 21:32). **The part-clean DONE** (.gate/u4f-merge/clean-shared-2.log, all 16 steps exit 0); **D2:**
+  5,204 -> 11,552 MiB free (20:0x UTC). **The -47 set RUNNING** from 20:0x UTC: `flock -x .gate/shared-target/.lane.lock
+  node spikes/netcode-proof/ops/runs/c-u4f-runs.mjs 47 --date 2026-11-19` (repo root, CARGO_TARGET_DIR unset; results
+  under results/u4f/<commit12>/pm-0001-47/; it re-checks spikes/netcode-proof unchanged before each judge call, so card
+  saves are safe). Then -20, then -22.
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
