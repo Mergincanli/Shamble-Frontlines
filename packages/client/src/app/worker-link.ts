@@ -1,5 +1,5 @@
 import { Ring, type PageToWorker, type WorkerStats } from "@shamble/sim-worker";
-import { checkLayoutHash } from "@shamble/types";
+import { BLOCK_LAYOUT, checkLayoutHash } from "@shamble/types";
 
 /** How the link reaches the Worker: the Worker's own `postMessage`, or a stand-in in tests. */
 export interface WorkerPort {
@@ -64,8 +64,13 @@ export class WorkerLink {
     this.#port.postMessage({ type: "start", padBytes }, []);
   }
 
-  /** A message from the Worker. Returns the text of an error the page should count, or an empty string. */
+  /**
+   * A message from the Worker. Returns the text of an error the page should count, or an empty string. After the
+   * first failure the match is over: the caller stops the Worker, and whatever still arrives is ignored, so one
+   * cause is one error.
+   */
   onMessage(data: unknown): string {
+    if (this.failure !== "") return "";
     if (typeof data !== "object" || data === null || !("type" in data)) return this.#fail("the Worker sent no message");
     const message = data as { type: unknown; [key: string]: unknown };
     if (message.type === "ready" && typeof message["blockBytes"] === "number" && typeof message["tickHz"] === "number") {
@@ -98,7 +103,7 @@ export class WorkerLink {
     this.#previous = this.#newest;
     this.#newest = buffer;
     this.blocks += 1;
-    this.tick = new DataView(buffer).getUint32(0, true);
+    this.tick = new DataView(buffer).getUint32(BLOCK_LAYOUT.header.fields.tick.offset, true);
     return "";
   }
 
@@ -108,11 +113,11 @@ export class WorkerLink {
   }
 
   /** Once per drawn frame: the newest input, with the buffers the page is done with riding back to the pool. */
-  frame(sequence: number, viewTime: number): void {
+  frame(sequence: number): void {
     if (!this.ready || this.failure !== "") return;
     const returned = this.#returned;
     this.#returned = [];
-    this.#port.postMessage({ type: "input", sequence, viewTime, returned }, returned);
+    this.#port.postMessage({ type: "input", sequence, returned }, returned);
     this.posts += 1;
   }
 

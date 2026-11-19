@@ -23,7 +23,7 @@ function setUp() {
 test("it starts the Worker, and posts no input before the Worker is ready", () => {
   const { link, sent, ready } = setUp();
   link.start(4096);
-  link.frame(1, 0);
+  link.frame(1);
   expect(sent.map((entry) => entry.message)).toEqual([{ type: "start", padBytes: 4096 }]);
   expect(ready()).toBe("");
   expect(link).toMatchObject({ ready: true, blockBytes: 8, tickHz: 30 });
@@ -36,30 +36,41 @@ test("it keeps the two newest blocks and sends the older ones back with the next
   expect(link).toMatchObject({ blocks: 4, tick: 4 });
   expect(link.newest).toBe(blocks[3]);
   expect(link.previous).toBe(blocks[2]);
-  link.frame(7, 123.5);
+  link.frame(7);
   expect(sent.at(-1)).toEqual({
-    message: { type: "input", sequence: 7, viewTime: 123.5, returned: [blocks[0], blocks[1]] },
+    message: { type: "input", sequence: 7, returned: [blocks[0], blocks[1]] },
     transfer: [blocks[0], blocks[1]],
   });
   // One message per frame, and a returned buffer goes back once.
-  link.frame(8, 140);
-  expect(sent.at(-1)?.message).toEqual({ type: "input", sequence: 8, viewTime: 140, returned: [] });
+  link.frame(8);
+  expect(sent.at(-1)?.message).toEqual({ type: "input", sequence: 8, returned: [] });
   expect(link.posts).toBe(2);
   expect(link.delivery.count).toBe(4);
   expect(link.delivery.max()).toBe(2);
 });
 
-test("a first block of another layout is refused, and so is every block after it", () => {
+test("the first block of every Worker start is checked, also after blocks were accepted", () => {
+  const { link, ready, deliver } = setUp();
+  ready();
+  deliver(1);
+  // The Worker starts again (a reload of the Worker, later a rejoin): its first block is checked anew.
+  ready();
+  expect(link.onMessage({ type: "block", buffer: block(1, 0), doneAt: 0 })).toContain("layout-hash");
+  expect(link.blocks).toBe(1);
+});
+
+test("a first block of another layout is refused, and the failure is said once", () => {
   const { link, sent, ready } = setUp();
   ready();
   const reason = link.onMessage({ type: "block", buffer: block(1, LAYOUT_HASH ^ 1), doneAt: 0 });
   expect(reason).toContain("layout-hash");
   expect(link).toMatchObject({ blocks: 0, newest: null, failure: reason });
-  link.frame(1, 0);
+  link.frame(1);
   expect(sent).toHaveLength(0);
-  // A new Worker start is checked again.
-  ready();
-  expect(link.onMessage({ type: "block", buffer: block(1, 0), doneAt: 0 })).toContain("layout-hash");
+  // One cause is one error: what still arrives after the failure is ignored, a good block too.
+  expect(link.onMessage({ type: "block", buffer: block(2, LAYOUT_HASH ^ 1), doneAt: 0 })).toBe("");
+  expect(link.onMessage({ type: "block", buffer: block(3), doneAt: 0 })).toBe("");
+  expect(link).toMatchObject({ blocks: 0, newest: null, failure: reason });
 });
 
 test("a block of the wrong length, an error from the Worker and an unknown message each stop the match", () => {

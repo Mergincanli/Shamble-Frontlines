@@ -7,6 +7,7 @@ import { checkLayoutHash, LAYOUT_HASH } from "@shamble/types";
 import { beforeAll, expect, test } from "vitest";
 import { initSync, Sim, tick_hz } from "../pkg/sim_wasm.js";
 import { SimHost } from "../src/host.ts";
+import { MAX_TICKS_PER_WAKE } from "../src/pacing.ts";
 import { copyBlock } from "../src/read-block.ts";
 
 const SEED = new Uint8Array(32).fill(7);
@@ -28,6 +29,8 @@ const tickOf = (buffer) => new DataView(buffer).getUint32(0, true);
 test("a block written by Rust passes the page's layout check, from tick 0 on", () => {
   const sim = new Sim(SEED, 0, 0, 0);
   expect(tick_hz()).toBe(30);
+  // The host's cap is a quarter of a second of the simulation's own tick rate (ADR 0004 part 5).
+  expect(Math.floor(0.25 * tick_hz())).toBe(MAX_TICKS_PER_WAKE);
   expect(sim.block_len()).toBe(8);
   expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
   expect(tickOf(blockOf(sim))).toBe(0);
@@ -71,6 +74,8 @@ test("padding makes the block longer and it still passes the check", () => {
 test("a bad seed, mode or padding is refused with a plain reason", () => {
   expect(() => new Sim(new Uint8Array(31), 0, 0, 0)).toThrow("the match seed must be 32 bytes and is 31");
   expect(() => new Sim(SEED, 1, 0, 0)).toThrow("only local play (0)");
+  // The whole number counts: 256 must not be cut down to 0, which is local play.
+  expect(() => new Sim(SEED, 256, 0, 0)).toThrow("mode 256 does not exist");
   expect(() => new Sim(SEED, 0, 0xffff_ffff, 0)).toThrow("above the writer's cap");
 });
 
@@ -86,7 +91,7 @@ test("in the glue, each per-tick call reaches exactly one export", () => {
 
 test("the host on the real Wasm: two calls per tick, one transferred block per tick, each passing the check", () => {
   const sim = new Sim(SEED, 0, 0, 1000);
-  const calls = { input: 0, step: 0, block_ptr: 0, block_len: 0 };
+  const calls = { input: 0, step: 0, rebase: 0, block_ptr: 0, block_len: 0 };
   const counted = Object.fromEntries(
     ["input", "step", "rebase", "block_ptr", "block_len"].map((name) => [
       name,
@@ -114,7 +119,7 @@ test("the host on the real Wasm: two calls per tick, one transferred block per t
     tick_hz(),
   );
   host.start();
-  host.onMessage({ type: "input", sequence: 9, viewTime: 0, returned: [] });
+  host.onMessage({ type: "input", sequence: 9, returned: [] });
   for (let i = 0; i < 30; i += 1) {
     clock.now = timer.at;
     timer.run();
@@ -122,7 +127,7 @@ test("the host on the real Wasm: two calls per tick, one transferred block per t
   const blocks = posts.filter((post) => post.type === "block");
   expect(blocks.map((block) => tickOf(block.buffer))).toEqual(Array.from({ length: 30 }, (_, i) => i + 1));
   for (const block of blocks) expect(checkLayoutHash(block.buffer)).toEqual({ ok: true });
-  expect(calls).toEqual({ input: 30, step: 30, block_ptr: 1, block_len: 1 });
+  expect(calls).toEqual({ input: 30, step: 30, rebase: 1, block_ptr: 1, block_len: 1 });
   expect(sim.newest_input()).toBe(9);
   expect(host.stats()).toMatchObject({ ticks: 30, undetached: 0, maxTicksInOneWake: 1, drops: 0 });
 });

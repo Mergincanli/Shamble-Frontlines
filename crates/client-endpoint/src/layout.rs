@@ -90,39 +90,35 @@ pub const LAYOUT_HASH: u32 = layout_hash(BLOCK_LAYOUT);
 // A block of zero bytes must never pass the page's check.
 const _: () = assert!(LAYOUT_HASH != 0);
 
-/// The section of `BLOCK_LAYOUT` with this name. The block writer takes every section through it, in a `const`,
-/// where a name the table does not hold stops the build instead of the match.
-///
-/// # Panics
-/// When the table has no section of this name.
+/// The section of `BLOCK_LAYOUT` with this name, or `None`. The block writer takes every section through it with
+/// `expect` in a `const`, where a name the table does not hold stops the build instead of the match; nothing here
+/// can panic at run time.
 #[must_use]
-pub const fn section(name: &str) -> Section {
+pub const fn section(name: &str) -> Option<Section> {
     let mut s = 0;
     while s < BLOCK_LAYOUT.len() {
         if same(BLOCK_LAYOUT[s].name, name) {
-            return BLOCK_LAYOUT[s];
+            return Some(BLOCK_LAYOUT[s]);
         }
         s += 1;
     }
-    panic!("the block's layout has no section of this name")
+    None
 }
 
-/// The field of that name in that section of `BLOCK_LAYOUT`, for the block writer's offsets; as `section`, in a
-/// `const` a missing name stops the build.
-///
-/// # Panics
-/// When the table has no such section, or the section no such field.
+/// The field of that name in that section of `BLOCK_LAYOUT`, or `None`; for the block writer's offsets, as `section`.
 #[must_use]
-pub const fn field(section_name: &str, field_name: &str) -> Field {
-    let fields = section(section_name).fields;
+pub const fn field(section_name: &str, field_name: &str) -> Option<Field> {
+    let Some(section) = section(section_name) else {
+        return None;
+    };
     let mut f = 0;
-    while f < fields.len() {
-        if same(fields[f].name, field_name) {
-            return fields[f];
+    while f < section.fields.len() {
+        if same(section.fields[f].name, field_name) {
+            return Some(section.fields[f]);
         }
         f += 1;
     }
-    panic!("the section has no field of this name")
+    None
 }
 
 /// Whether two names are equal, byte for byte; `==` on `str` is not usable in a `const fn`.
@@ -350,46 +346,40 @@ mod tests {
 
     const EMPTY: Section = section("empty", 4, &[]);
     const BYTES: Section = section("bytes", 2, &[field("a", U8, 0), field("b", U8, 1)]);
+    const WIDE_LAST: Section = section("wide_last", 8, &[field("a", U8, 0), field("b", U32, 4)]);
 
     #[test]
     fn align_is_the_largest_field() {
         assert_eq!(EMPTY.align(), 1);
         assert_eq!(BYTES.align(), 1);
         assert_eq!(GOOD[0].align(), 4);
-        assert_eq!(super::section("header").align(), 4);
+        assert_eq!(super::section("header").map(Section::align), Some(4));
+        // The widest field is not the first one: the answer is the largest size, not the first.
+        assert_eq!(WIDE_LAST.align(), 4);
     }
 
     /// The lookups by name find what the table holds; the tests' own `section` and `field` above build tables, so
     /// the lookups are named by their path here.
     #[test]
     fn lookups_by_name_find_the_table_s_entries() {
-        let header = super::section("header");
-        assert_eq!(header, BLOCK_LAYOUT[0]);
-        assert_eq!(super::field("header", "tick"), field("tick", U32, 0));
+        assert_eq!(super::section("header"), Some(BLOCK_LAYOUT[0]));
+        assert_eq!(super::field("header", "tick"), Some(field("tick", U32, 0)));
         assert_eq!(
             super::field("header", "layout_hash"),
-            field("layout_hash", U32, 4)
+            Some(field("layout_hash", U32, 4))
         );
         for section in BLOCK_LAYOUT {
-            assert_eq!(super::section(section.name), *section);
+            assert_eq!(super::section(section.name), Some(*section));
             for own in section.fields {
-                assert_eq!(super::field(section.name, own.name), *own);
+                assert_eq!(super::field(section.name, own.name), Some(*own));
             }
         }
+        // A name the table does not hold gives nothing, at run time without a panic.
+        assert_eq!(super::section("headers"), None);
+        assert_eq!(super::field("header", "ticks"), None);
+        assert_eq!(super::field("headers", "tick"), None);
         assert!(same("tick", "tick") && same("", ""));
         assert!(!same("tick", "tics") && !same("tick", "ticks") && !same("ticks", "tick"));
-    }
-
-    #[test]
-    #[should_panic(expected = "no section of this name")]
-    fn a_missing_section_is_refused() {
-        let _ = super::section("headers");
-    }
-
-    #[test]
-    #[should_panic(expected = "no field of this name")]
-    fn a_missing_field_is_refused() {
-        let _ = super::field("header", "ticks");
     }
 
     /// The test values of RFC 9923 for FNV-1a, 32 bits.
@@ -398,5 +388,7 @@ mod tests {
         assert_eq!(fnv1a(FNV_OFFSET_BASIS, b""), 0x811c_9dc5);
         assert_eq!(fnv1a(FNV_OFFSET_BASIS, b"a"), 0xe40c_292c);
         assert_eq!(fnv1a(FNV_OFFSET_BASIS, b"foobar"), 0xbf9c_f968);
+        // The RFC's fourth string is the only one with bytes above 0x7F.
+        assert_eq!(fnv1a(FNV_OFFSET_BASIS, b"Hello!\x01\xFF\xED"), 0xfd9d_3881);
     }
 }

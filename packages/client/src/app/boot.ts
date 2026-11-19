@@ -2,15 +2,17 @@ import SimWorker from "@shamble/sim-worker/worker?worker";
 import { FrameTimes } from "../harness/frame-times.ts";
 import { runHeader } from "../harness/run-header.ts";
 import type { ReportData } from "../overlay/report.ts";
-import { createThreePicture } from "../render/three-picture.ts";
+import { createPicture } from "../render/index.ts";
 import { installErrorHook } from "./error-hook.ts";
 import { readFlags } from "./flags.ts";
 import { WorkerLink } from "./worker-link.ts";
 
-// Set by the build (scripts/build.mjs). In a production build the first is false, and everything behind it,
-// the readout and the report among it, is left out of the bundle.
-const DEVTOOLS = import.meta.env["VITE_SHAMBLE_DEVTOOLS"] === "1";
-const COMMIT: string = import.meta.env["VITE_SHAMBLE_COMMIT"] ?? "unknown";
+// Written into the code by the build (vite.config.mjs, `define`). In a production build the first is the literal
+// `false`, so everything behind it, the readout and the report among it, is cut out of the bundle; a scan of the
+// built files checks that (the production check).
+declare const __SHAMBLE_DEVTOOLS__: boolean;
+declare const __SHAMBLE_COMMIT__: string;
+const COMMIT = __SHAMBLE_COMMIT__;
 
 /** The readout is rewritten this often, never every frame. */
 const READOUT_EVERY_MS = 250;
@@ -23,13 +25,22 @@ const READOUT_EVERY_MS = 250;
 export async function boot(): Promise<void> {
   const notice = document.getElementById("notice");
   if (notice !== null) notice.hidden = true;
+  // A failure the page cannot go on from is said on the page itself, in every build, in plain text.
+  const fail = (text: string): void => {
+    if (notice === null) return;
+    notice.textContent = text;
+    notice.hidden = false;
+  };
   const canvas = document.getElementById("view");
   if (!(canvas instanceof HTMLCanvasElement)) throw new Error("the page has no canvas to draw on");
-  const flags = readFlags(location.search, DEVTOOLS);
+  const flags = readFlags(location.search, __SHAMBLE_DEVTOOLS__);
   const errors = installErrorHook(window);
 
-  const picture = createThreePicture();
-  const info = await picture.start(canvas, { forceWebGL: flags.forceWebGL });
+  const picture = createPicture();
+  const info = await picture.start(canvas, { forceWebGL: flags.forceWebGL }).catch((error: unknown) => {
+    fail(`This page could not start drawing: ${error instanceof Error ? error.message : String(error)}`);
+    throw error;
+  });
   // The backend that really runs is named in the log and on the page itself, in every build (ADR 0003 part 4).
   console.info(`Shamble Frontlines ${COMMIT}: backend ${info.backend}${info.adapter === "" ? "" : ` (${info.adapter})`}`);
   document.documentElement.dataset["backend"] = info.backend;
@@ -37,15 +48,22 @@ export async function boot(): Promise<void> {
 
   const worker = new SimWorker();
   const link = new WorkerLink(worker, () => performance.timeOrigin + performance.now());
+  // The first problem ends the match: it is counted once, the Worker is stopped (it would run on and fill memory
+  // with blocks nobody takes), and the page says why.
+  const stop = (problem: string): void => {
+    errors.note(problem);
+    worker.terminate();
+    fail(`The match stopped: ${problem}`);
+  };
   worker.addEventListener("message", (event: MessageEvent<unknown>) => {
     const problem = link.onMessage(event.data);
-    if (problem !== "") errors.note(problem);
+    if (problem !== "") stop(problem);
   });
-  worker.addEventListener("error", (event) => errors.note(event.message === "" ? "the Worker failed" : event.message));
+  worker.addEventListener("error", (event) => stop(event.message === "" ? "the Worker failed" : event.message), { once: true });
   link.start(flags.padBytes);
 
-  const frames = DEVTOOLS ? new FrameTimes() : null;
-  const resize = (): void => picture.resize(window.innerWidth, window.innerHeight, Math.min(window.devicePixelRatio, 2));
+  const frames = __SHAMBLE_DEVTOOLS__ ? new FrameTimes() : null;
+  const resize = (): void => picture.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
   window.addEventListener("resize", resize);
   resize();
   document.addEventListener("visibilitychange", () => {
@@ -55,7 +73,7 @@ export async function boot(): Promise<void> {
   if (document.hidden) link.visibility(true);
 
   let readout: ((timeMs: number) => void) | null = null;
-  if (DEVTOOLS && frames !== null) {
+  if (__SHAMBLE_DEVTOOLS__ && frames !== null) {
     const [{ Overlay }, { formatReport, readoutLines }] = await Promise.all([
       import("../overlay/overlay.ts"),
       import("../overlay/report.ts"),
@@ -63,6 +81,8 @@ export async function boot(): Promise<void> {
     const data = (): ReportData => ({
       header: runHeader(window, COMMIT, flags.runLabel),
       picture: info,
+      forceWebGL: flags.forceWebGL,
+      webgpuOffered: "gpu" in navigator,
       counters: picture.counters(),
       tick: link.tick,
       tickHz: link.tickHz,
@@ -96,7 +116,7 @@ export async function boot(): Promise<void> {
   let sequence = 0;
   picture.loop((timeMs) => {
     sequence = (sequence + 1) >>> 0;
-    link.frame(sequence, timeMs);
+    link.frame(sequence);
     picture.draw({ newest: link.newest, previous: link.previous, timeMs });
     frames?.push(timeMs);
     readout?.(timeMs);

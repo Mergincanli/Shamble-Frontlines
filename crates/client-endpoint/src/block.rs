@@ -4,10 +4,11 @@
 
 use crate::layout::{self, ElementType, Field, LAYOUT_HASH, Section};
 
-// Taken by name, in constants: a name the table does not hold stops the build (`layout::section`, `layout::field`).
-const HEADER: Section = layout::section("header");
-const TICK: Field = layout::field("header", "tick");
-const HASH: Field = layout::field("header", "layout_hash");
+// Taken by name, in constants: a name the table does not hold stops the build here, at the `expect`.
+const HEADER: Section = layout::section("header").expect("the block's layout has a header section");
+const TICK: Field = layout::field("header", "tick").expect("the header has a tick field");
+const HASH: Field =
+    layout::field("header", "layout_hash").expect("the header has a layout_hash field");
 
 // `put_u32` writes four bytes: a field of another type at one of these names stops the build too.
 const _: () = assert!(matches!(TICK.ty, ElementType::U32));

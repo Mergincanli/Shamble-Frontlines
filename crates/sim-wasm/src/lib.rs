@@ -2,9 +2,10 @@
 //! the simulation and the client endpoint. The page never calls it. Per tick the Worker's host makes two calls,
 //! `input` and `step`; both take and return plain numbers, so neither makes the glue call back into JavaScript.
 //!
-//! What crosses this boundary is kept this small on purpose (Mustafa, 2026-11-18, WB-HEALTH: "one type, plain numbers
-//! on every tick: that keeps a later move off it cheap"). The checks live in plain Rust (`Sim::create`), tested
-//! natively; the bindings below are a thin wrapper, because the glue's own types only work inside Wasm.
+//! What crosses this boundary is kept this small on purpose. Mustafa, 2026-11-18, on WB-HEALTH: "Keep what crosses
+//! it as small as the plan has it (one type, plain numbers on every tick): that keeps a later move off it cheap."
+//! The checks live in plain Rust (`Sim::create`), tested natively; the bindings below are a thin wrapper, because
+//! the glue's own types only work inside Wasm.
 
 use client_endpoint::block::BlockWriter;
 use client_endpoint::schedule::LocalSchedule;
@@ -12,7 +13,7 @@ use sim::{SEED_BYTES, TICK_HZ, World};
 use wasm_bindgen::prelude::*;
 
 /// Local play: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far.
-pub const MODE_LOCAL: u8 = 0;
+pub const MODE_LOCAL: u32 = 0;
 
 /// Ticks per second, for the host's readout: the simulation's own build-time constant, asked once.
 #[wasm_bindgen]
@@ -27,7 +28,7 @@ pub enum CreateError {
     /// The seed is not `SEED_BYTES` long; it holds this many bytes.
     SeedLength(usize),
     /// A mode that does not exist yet.
-    Mode(u8),
+    Mode(u32),
     /// More padding than the block writer takes.
     PadBytes(u32),
 }
@@ -65,7 +66,12 @@ impl Sim {
     ///
     /// # Errors
     /// A seed of the wrong length, a mode that does not exist, or too much padding.
-    pub fn create(seed: &[u8], mode: u8, pad_bytes: u32, now_ms: f64) -> Result<Self, CreateError> {
+    pub fn create(
+        seed: &[u8],
+        mode: u32,
+        pad_bytes: u32,
+        now_ms: f64,
+    ) -> Result<Self, CreateError> {
         let seed =
             <[u8; SEED_BYTES]>::try_from(seed).map_err(|_| CreateError::SeedLength(seed.len()))?;
         if mode != MODE_LOCAL {
@@ -91,13 +97,14 @@ impl Sim {
 
 #[wasm_bindgen]
 impl Sim {
-    /// Creates the match. `seed` is 32 bytes the Worker drew; `mode` is `MODE_LOCAL`; `pad_bytes` pads the block for
+    /// Creates the match. `seed` is 32 bytes the Worker drew; `mode` is `MODE_LOCAL` (a `u32`, so that the glue cuts
+    /// nothing off the number the host passes); `pad_bytes` pads the block for
     /// the hand-off readings (the game passes 0); `now_ms` is the host's time now.
     ///
     /// # Errors
     /// As `Sim::create`, as a JavaScript `Error` with the reason in plain words.
     #[wasm_bindgen(constructor)]
-    pub fn new(seed: &[u8], mode: u8, pad_bytes: u32, now_ms: f64) -> Result<Sim, JsError> {
+    pub fn new(seed: &[u8], mode: u32, pad_bytes: u32, now_ms: f64) -> Result<Sim, JsError> {
         Self::create(seed, mode, pad_bytes, now_ms).map_err(|error| JsError::new(&error.message()))
     }
 
@@ -224,6 +231,8 @@ mod tests {
             Some(CreateError::SeedLength(0))
         );
         assert_eq!(refused(&SEED, 1, 0), Some(CreateError::Mode(1)));
+        // The mode is compared as the whole number the host passed: 256 is not local play.
+        assert_eq!(refused(&SEED, 256, 0), Some(CreateError::Mode(256)));
         assert_eq!(
             refused(&SEED, MODE_LOCAL, u32::MAX),
             Some(CreateError::PadBytes(u32::MAX))

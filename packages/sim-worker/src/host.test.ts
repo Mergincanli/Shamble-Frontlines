@@ -9,7 +9,7 @@ function setUp(options: { transfer?: boolean; blockBytes?: number } = {}) {
   const blockBytes = options.blockBytes ?? 8;
   const memory = { buffer: new ArrayBuffer(1024) };
   const clock = { now: 1000 };
-  const calls = { input: 0, step: 0, block_ptr: 0, block_len: 0 };
+  const calls = { input: 0, step: 0, rebase: 0, block_ptr: 0, block_len: 0 };
   let tick = 0;
   let anchor = 0;
   let since = 0;
@@ -30,6 +30,7 @@ function setUp(options: { transfer?: boolean; blockBytes?: number } = {}) {
       return anchor + (since + 1) * PERIOD;
     },
     rebase(nowMs) {
+      calls.rebase += 1;
       anchor = nowMs;
       since = 0;
       return nowMs + PERIOD;
@@ -77,8 +78,9 @@ test("it says ready, then posts one transferred block per tick with two calls pe
   expect(posts[0]).toEqual({ type: "ready", blockBytes: 8, tickHz: 30 });
   for (let i = 0; i < 90; i += 1) expect(runTimer()).toBe(true);
   expect(blocks().map((block) => tickOf(block.buffer))).toEqual(Array.from({ length: 90 }, (_, i) => i + 1));
-  // Exactly one input call and one step call per tick; the block's place and length were asked once.
-  expect(calls).toEqual({ input: 90, step: 90, block_ptr: 1, block_len: 1 });
+  // Exactly one input call and one step call per tick; the block's place and length were asked once, and the
+  // schedule was set once, at the start (no pause, no drop).
+  expect(calls).toEqual({ input: 90, step: 90, rebase: 1, block_ptr: 1, block_len: 1 });
   expect(host.stats()).toMatchObject({ ticks: 90, maxTicksInOneWake: 1, drops: 0, undetached: 0, blockBytes: 8 });
   // The time is on the clock the page shares.
   expect(blocks()[0]?.doneAt).toBeCloseTo(5_000_000 + 1000 + PERIOD, 6);
@@ -92,8 +94,8 @@ test("the newest input reaches the simulation, and returned buffers are used aga
   runTimer();
   // Five blocks out and none returned: the fifth had to be allocated.
   expect(host.stats().poolMisses).toBe(1);
-  host.onMessage({ type: "input", sequence: 41, viewTime: 1, returned: blocks().slice(0, 3).map((block) => block.buffer) });
-  host.onMessage({ type: "input", sequence: 42, viewTime: 2, returned: [] });
+  host.onMessage({ type: "input", sequence: 41, returned: blocks().slice(0, 3).map((block) => block.buffer) });
+  host.onMessage({ type: "input", sequence: 42, returned: [] });
   for (let i = 0; i < 3; i += 1) runTimer();
   expect(sim.newest()).toBe(42);
   expect(host.stats()).toMatchObject({ poolMisses: 1, poolRefused: 0 });

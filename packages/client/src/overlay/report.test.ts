@@ -12,7 +12,9 @@ const DATA: ReportData = {
     at: "2026-11-19T00:00:00.000Z",
   },
   picture: { backend: "WebGL 2 fallback", adapter: "", timestampQuery: false },
-  counters: { drawCalls: 2, triangles: 2, lines: 202, geometries: 2, textures: 0 },
+  forceWebGL: false,
+  webgpuOffered: false,
+  counters: { drawCalls: 2, triangles: 2, lines: 202, geometries: 2, textures: 0, programs: 2 },
   tick: 900,
   tickHz: 30,
   blocks: 900,
@@ -33,7 +35,7 @@ const DATA: ReportData = {
 
 test("the readout names the backend, the ticks, the errors, the last pause and the commit", () => {
   expect(readoutLines(DATA)).toEqual([
-    "backend: WebGL 2 fallback",
+    "backend: WebGL 2 fallback, because this browser offers no WebGPU",
     "ticks: 900 at 30 a second · blocks: 900 of 8 bytes",
     "frames: 60.0 a second · frame time 16.67 ms (p99 17.20 ms)",
     "errors: 0",
@@ -42,6 +44,14 @@ test("the readout names the backend, the ticks, the errors, the last pause and t
   ]);
   const webgpu = readoutLines({ ...DATA, picture: { backend: "WebGPU", adapter: "intel, gen-12", timestampQuery: true }, lastPause: null });
   expect(webgpu[0]).toBe("backend: WebGPU (intel, gen-12)");
+  // A fallback that was asked for, and one the browser fell back to, read differently; the adapter follows.
+  const fallback = { ...DATA, picture: { ...DATA.picture, adapter: "ANGLE (SwiftShader)" } };
+  expect(readoutLines({ ...fallback, forceWebGL: true, webgpuOffered: true })[0]).toBe(
+    "backend: WebGL 2 fallback, asked for by ?backend=webgl (ANGLE (SwiftShader))",
+  );
+  expect(readoutLines({ ...fallback, webgpuOffered: true })[0]).toBe(
+    "backend: WebGL 2 fallback, because WebGPU did not start (ANGLE (SwiftShader))",
+  );
   expect(webgpu[4]).toBe("last pause: none yet");
   expect(readoutLines({ ...DATA, errors: 2, lastError: "boom" })[3]).toBe("errors: 2 (last: boom)");
 });
@@ -59,6 +69,8 @@ test("the report is plain text with one named value per line", () => {
     "browser: TestBrowser/1.0",
     "backend: WebGL 2 fallback",
     "adapter: (not given)",
+    "forceWebGL: false",
+    "webgpuOffered: false",
     "render.drawCalls: 2",
     "deliveryP95: no reading yet",
     "lastPauseTicksWhileHidden: 0",

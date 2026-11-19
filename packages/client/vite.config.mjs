@@ -14,6 +14,12 @@ const isolation =
 export default defineConfig({
   // Relative addresses, so the built page works from any folder a server serves.
   base: "./",
+  // The build's two constants, written into the code as literals (scripts/build.mjs sets the two variables). A
+  // literal `false` lets the bundler cut the development-only code out of a production build.
+  define: {
+    __SHAMBLE_DEVTOOLS__: JSON.stringify(process.env["VITE_SHAMBLE_DEVTOOLS"] === "1"),
+    __SHAMBLE_COMMIT__: JSON.stringify(process.env["VITE_SHAMBLE_COMMIT"] ?? "unknown"),
+  },
   build: {
     // No file is ever inlined: the Wasm and the Worker load as files, never from data: URLs (CSP-ready).
     assetsInlineLimit: 0,

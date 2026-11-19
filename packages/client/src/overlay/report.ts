@@ -7,6 +7,10 @@ import type { PictureInfo, RenderCounters } from "../picture.ts";
 export interface ReportData {
   readonly header: RunHeader;
   readonly picture: PictureInfo;
+  /** `?backend=webgl` was given. */
+  readonly forceWebGL: boolean;
+  /** The browser has `navigator.gpu` at all; without it the fallback is the only way. */
+  readonly webgpuOffered: boolean;
   readonly counters: RenderCounters;
   readonly tick: number;
   readonly tickHz: number;
@@ -28,11 +32,24 @@ export interface ReportData {
 
 const ms = (value: number): string => (Number.isFinite(value) ? `${value.toFixed(2)} ms` : "no reading yet");
 
+/** Why this backend runs: a fallback that was asked for reads differently from one the browser fell back to. */
+function backendLine(data: ReportData): string {
+  const why =
+    data.picture.backend === "WebGPU"
+      ? ""
+      : data.forceWebGL
+        ? ", asked for by ?backend=webgl"
+        : data.webgpuOffered
+          ? ", because WebGPU did not start"
+          : ", because this browser offers no WebGPU";
+  return `backend: ${data.picture.backend}${why}${data.picture.adapter === "" ? "" : ` (${data.picture.adapter})`}`;
+}
+
 /** The readout's lines: what a person checks by eye. */
 export function readoutLines(data: ReportData): string[] {
   const pause = data.lastPause;
   return [
-    `backend: ${data.picture.backend}${data.picture.adapter === "" ? "" : ` (${data.picture.adapter})`}`,
+    backendLine(data),
     `ticks: ${data.tick} at ${data.tickHz} a second · blocks: ${data.blocks} of ${data.blockBytes} bytes`,
     `frames: ${data.fps.toFixed(1)} a second · frame time ${ms(data.frameP50)} (p99 ${ms(data.frameP99)})`,
     `errors: ${data.errors}${data.lastError === "" ? "" : ` (last: ${data.lastError})`}`,
@@ -55,6 +72,8 @@ export function formatReport(data: ReportData): string {
     ["crossOriginIsolated", data.header.crossOriginIsolated],
     ["backend", data.picture.backend],
     ["adapter", data.picture.adapter === "" ? "(not given)" : data.picture.adapter],
+    ["forceWebGL", data.forceWebGL],
+    ["webgpuOffered", data.webgpuOffered],
     ["timestampQuery", data.picture.timestampQuery],
     ...Object.entries(data.counters).map(([name, value]): [string, number] => [`render.${name}`, value]),
     ["tick", data.tick],

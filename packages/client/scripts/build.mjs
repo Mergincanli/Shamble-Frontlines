@@ -24,7 +24,10 @@ import { WASM_BINDGEN_TOOL } from "./wasm-bindgen-tool.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const clientDir = path.join(root, "packages/client");
 const pkgDir = path.join(root, "packages/sim-worker/pkg");
-const wasmFile = path.join(root, "target/wasm32-unknown-unknown/release/sim_wasm.wasm");
+const targetDir = path.join(root, "target");
+const wasmFile = path.join(targetDir, "wasm32-unknown-unknown/release/sim_wasm.wasm");
+/** Variables through which cargo's settings can be changed from outside with no diff in the repository. */
+const CARGO_OVERRIDES = /^(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC_WRAPPER|RUSTC|CARGO_(BUILD|PROFILE|TARGET)_.*)$/;
 
 /** The tool's absolute path, after its file was compared with the recorded values. */
 function checkedTool() {
@@ -43,10 +46,15 @@ export function buildWasm() {
     throw new Error(`Cargo.lock records wasm-bindgen ${locked} and wasm-bindgen-tool.mjs the tool ${WASM_BINDGEN_TOOL.version}`);
   }
   checkCli(execFileSync(checkedTool(), ["--version"], { encoding: "utf8" }), locked);
-  execFileSync("cargo", ["build", "--locked", "--release", "--target", "wasm32-unknown-unknown", "-p", "sim-wasm"], {
-    cwd: root,
-    stdio: "inherit",
-  });
+  // The Wasm players get is built with the manifests' settings alone (the overflow checks, the optimisation level,
+  // the target's features), and into this repository's own target folder, which is where it is read from below.
+  const overrides = Object.keys(process.env).filter((name) => CARGO_OVERRIDES.test(name));
+  if (overrides.length > 0) throw new Error(`cargo settings from the environment are refused: unset ${overrides.join(", ")}`);
+  execFileSync(
+    "cargo",
+    ["build", "--locked", "--release", "--target", "wasm32-unknown-unknown", "-p", "sim-wasm", "--target-dir", targetDir],
+    { cwd: root, stdio: "inherit" },
+  );
   mkdirSync(pkgDir, { recursive: true });
   // Checked again: the cargo build above ran build scripts as this same user.
   execFileSync(checkedTool(), ["--target", "web", "--out-dir", pkgDir, wasmFile], { cwd: root, stdio: "inherit" });

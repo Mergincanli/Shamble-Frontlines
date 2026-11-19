@@ -11,10 +11,11 @@ export type PageToWorker =
   /** Start the match. `padBytes` pads the block for the hand-off readings; the game itself sends 0. */
   | { readonly type: "start"; readonly padBytes: number }
   /**
-   * The newest input, once per drawn frame: its sequence number, the view time of the frame the page drew, and the
-   * buffers the page is done with, which ride this post back to the pool (they are in its transfer list).
+   * The newest input, once per drawn frame: its sequence number, and the buffers the page is done with, which ride
+   * this post back to the pool (they are in its transfer list). The view time of the drawn frame joins with the
+   * change-set that uses it, as a tick and a fraction, never as the page's milliseconds.
    */
-  | { readonly type: "input"; readonly sequence: number; readonly viewTime: number; readonly returned: ArrayBuffer[] }
+  | { readonly type: "input"; readonly sequence: number; readonly returned: ArrayBuffer[] }
   /** The tab was hidden or shown: a hidden tab pauses the local match. */
   | { readonly type: "visibility"; readonly hidden: boolean }
   /** Ask for the Worker's statistics. */
@@ -77,8 +78,6 @@ export function isPageToWorker(value: unknown): value is PageToWorker {
     case "input":
       return (
         isCount(value["sequence"]) &&
-        typeof value["viewTime"] === "number" &&
-        Number.isFinite(value["viewTime"]) &&
         Array.isArray(value["returned"]) &&
         value["returned"].every((buffer) => buffer instanceof ArrayBuffer)
       );
