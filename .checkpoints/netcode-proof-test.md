@@ -196,8 +196,13 @@
   (`git diff --stat 5b29296b -- marks.json crates/judge marks/README.md`). **Next, M8's papers:** u4f-report.md and
   u4f-merge-edits.md (the plan's edits as old -> new) drafted by an agent into notes, read in full, the edits applied
   by Edit; then the one commit (the files as applied, `git rm` of the wip patch). **If cut:** the applied files stay
-  uncommitted in the main folder; resume at M8. **The drafting agent RUNNING** from 18:48 UTC (agent a3aba4dc6af975951;
-  writes N/u4f-report.md and N/u4f-merge-edits.md only). Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+  uncommitted in the main folder; resume at M8. **The papers DRAFTED** (19:1x UTC): u4f-report.md (553 lines) and
+  u4f-merge-edits.md (328 lines: edits 1-7 M8's, 8 a no-change record, 9-10 proposed). Settled: the cap text and the
+  public-item rows go to u4-build-plan.md (§4.7, §4.1: the brief's "plan"); the carries to plan.md §12.1; 5.3's
+  pre-runs are 17 until U4f2 (p1, p7, p14, p17 come with it); M7's output kept at .gate/u4f-merge/gate.txt; M2 re-read
+  19:1x (main still f5030a3); `Room::cmd_timing()` (public, no consumer) to the advisor's head check. **Next:** read
+  both papers in full; apply edits 1-7 and 9-10 by Edit; u4f-build.md's merge section; then M8's one commit, the D10
+  read on it, the push (M9), CI, the advisor's check of the pushed head. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
 
