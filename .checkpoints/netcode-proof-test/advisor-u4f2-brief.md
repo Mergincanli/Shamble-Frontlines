@@ -55,7 +55,7 @@ those three (ADV-U4F2B-9). One standing follow-up the brief's own carries trigge
 ## 2. The carries (DONE)
 - **Existing, by number** (u4s-carries.md:541-547; advisor-u4f-r1.md:69-85; advisor-u4f-pass.md:95-98): 46's lab half, 86's
   forged rows and -21's 5.3 record, C-U4F2-1, SEC-1, -2, -3, -4, ADV-U4FP-3: all listed (brief :60-62). Each route kept,
-  with two slips in the brief's own restatements:
+  with these slips in the brief's own restatements:
   - **C-U4F2-1** (r1 :70-72): "`forger(2, ·)` and `forger(5, ·)` at the judged interval, on the steady script at P0 into a
     `Room<World>`, leave no forged sequence without a refusal record **of its own kind**." Block 6 (brief :35-36) drops
     "of its own kind" and the "steady script at P0 into a `Room<World>`" setting. The kind is the proof's point: kinds 2
@@ -251,7 +251,7 @@ written. The build waits for his U4F2-SIZE answer.
 | ADV-U4F2B-3 | Medium | u4f2-brief.md:37-38, :49-50, :65-67 | C-U4F2-5's fix is not confined: MOVES and the `_ => walk` arm (bots/src/lib.rs:651-656) also serve NoFire (-47, judged), Presses, Clamp and the brawl's walk (-20 running, -22 next). And BRAWL-1's sim-only patterns (:1187-1198) lack option A's, where F1 alone showed, so the test may pass with today's walk. | Q1's points 1-3 (condition 2) |
 | ADV-U4F2B-4 | Medium | u4f2-brief.md:35-36 | C-U4F2-1's proof restated without "of its own kind" and without its setting ("on the steady script at P0 into a `Room<World>`": advisor-u4f-r1.md:70-72): looser than the carry. | condition 3 |
 | ADV-U4F2B-5 | Medium | u4f2-brief.md:40-41, :97-102 | The corrected premise lives on in c-u4f-r2.mjs:64's p19 `expect` ("about 3 or 4", "about 4", "kind-10 refusals 0") and 5.3's row (u4f-brief.md:1037); no block rewords it, so -21's 5.3 record would carry an expect known false and route p19 to me by the brief's own rule (:56-57). | condition 4 |
-| ADV-U4F2B-6 | Low | u4f2-brief.md:80-81 | npt-client opens "for C-U4F2-2's doc and ADV-U4FP-3 only", but C-U4F2-2 includes `skip_command`'s own unit test (advisor-u4f-r1.md:76-78), which the size table puts in client (:119). | condition 5 |
+| ADV-U4F2B-6 | Low | u4f2-brief.md:80-81 | npt-client opens "for C-U4F2-2's doc and ADV-U4FP-3 only", but C-U4F2-2 includes `skip_command`'s own unit test (advisor-u4f-r1.md:76-80), which the size table puts in client (:119). | condition 5 |
 | ADV-U4F2B-7 | Medium | u4f2-brief.md:11-19, :80-90 | The builder's numbers are U4f's: section 1 is not in the read list, and its stop reads "past 6,000" (u4f-brief.md:323), counts are deltas on 5b29296b's (:848-852, :1166-1168), the test step's line unnamed. His size stop would act at the wrong figure. | condition 5 |
 | ADV-U4F2B-8 | Low | u4f2-brief.md:59-77 | RR-CB-2's docs and RR-B1-7 (1), left by U4f "for their next taker" (u4f-build.md:557-559), sit in scenario.rs and logs.rs, which U4f2 opens; the brief names neither. | condition 7 |
 | ADV-U4F2B-9 | Medium | u4f2-brief.md:126-131, :165-166 | The estimate misses T-6's cases and the wider sim-only test (my figure about 1,700-2,250; up to about 2,700 at U4f's 1.2), and "the carries since ... are review fixes his (a) sends with the unit" is not so for C-U4F2-7, -8 and ADV-U4FP-3, which ride by my rulings. The message to him would frame his own decision too widely. | condition 6 |
