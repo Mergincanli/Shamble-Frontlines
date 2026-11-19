@@ -805,6 +805,22 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      goes out now, look-only first (the check-in's words). The hourly series fell short (3 scheduled runs in 28 slots;
      4 by-hand probes): a method departure for the report, not a pass condition. If the wall is pressed more than about
      an hour after 18:56:36 UTC, a fresh `deletion` probe first (the control with the wall off).
+   - The go sent 18:58:40 UTC (after the save a294d6d). **His answer, 21:02:51 UTC** (fb9888dc-...; results log): Brave
+     1.100.58 (Chromium 158.0.8127.42): PM-0006-1's header now complete; screenshot 1 is the right row: "Preview access"
+     with the button **"Restrict previews"** (the plan's "Enable access policy", renamed), still off; the row's "Cloudflare
+     Access" link opens cloudflare.com/products/access/ with "Try it for free" (screenshot 2): this afternoon's press,
+     not the setting. No Zero Trust page or billing screenshot; his words "I had done these steps yesterday idk why I
+     have to do them again" and "Give me a refreshed list of things that needs to be done, step by step, strong explained
+     straight to the point". A fresh control probe (`deletion`, wall off) started at about 21:05 UTC, since the 24-hour
+     probe is over an hour old.
+   - The refreshed list (draft for consultation 24): A, the wall: Restrict previews (not the link); Zero Trust set-up if
+     asked: any team name, the Free plan ($0), payment details if asked; stop at any price or trial; a screenshot of the
+     row once on and the time. B, Brave: step 5 (normal window, report what shows, log in if asked), the extra private
+     window open of iso-off (a login page, screenshot, no login), step 6 (iso-on), step 7 (production, then private),
+     step 8 (restart, iso-off). C, an hour's wait (my sweeps at 10 min and 1 h). D, when I say: approve #5's cleanup;
+     reject #9's and #10's; delete the token (time, screenshot); approve `revoked`. Why again, in one line: steps 1-3
+     checked the pages open with no wall; 5-8 check the wall stops strangers and lets him in; this afternoon's link
+     opened an advert page, so no wall.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the

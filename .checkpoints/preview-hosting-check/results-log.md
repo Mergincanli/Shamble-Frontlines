@@ -837,3 +837,24 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "a cookie-less probe every hour from the close to 24 h after" was not achieved; GitHub's hourly schedule fired 3
   times in the 28 slots from 2026-11-18 15:23 to 2026-11-19 18:23 UTC (none from 14:23 on), and 4 by-hand probes stood
   in. The 24-hour reading itself never rested on the schedule (plan Part 1.1, PM-0006-6, change (1)).
+- **His answer to the go** (user message 2026-11-19 21:02:51 UTC, fb9888dc-68fd-4cb1-b747-8e1b0ec5c949; two
+  screenshots), his words: "My brave version: 1.100.58 Chromium: 158.0.8127.42 (Official Build) (64-bit)" / (on the
+  first screenshot asked) "I don't understand this one" / "When I press the link in the preview access it sends me to a
+  page where it says try for free" / "I had done these steps yesterday idk why I have to do them again" / "Give me a
+  refreshed list of things that needs to be done, step by step, strong explained straight to the point".
+  - Screenshot 1, transcribed: the project's Settings tab (Deployments, Metrics, Custom domains, Settings), "General":
+    Name shamble-preview-check; Production branch main; Notifications; **"Preview access"**: "Preview deployments are
+    public by default. Restrict previews with Cloudflare Access so visitors must sign in before viewing them." / "You
+    can customize who is allowed in Zero Trust." / "This protects preview deployment URLs only. Production pages.dev and
+    custom domains are managed separately in Zero Trust.", with "Cloudflare Access" shown as a link and a button
+    **"Restrict previews"** on the right; then the project's Delete row. Above: Runtime (Placement Default,
+    Compatibility date 2026-11-15, Fail open). So the setting the plan calls "Enable access policy" (preview-deployments
+    page as read 2026-11-15) is now "Preview access" with "Restrict previews"; it is still off.
+  - Screenshot 2, transcribed: cloudflare.com/products/access/, Cloudflare's product page for Access ("Zero trust
+    network access (ZTNA) for your self-hosted and SaaS applications"), buttons "Try it for free" and "View
+    documentation". (His browser's bookmarks bar shows in it; not copied here.)
+  - Reading: this afternoon's "try for free" was the product page's button, reached through the row's "Cloudflare
+    Access" link, not the "Restrict previews" button; pressing it sent him, already signed in, to the dashboard's home.
+    No plan, trial or payment screen appears in his account of it. The Brave version completes PM-0006-1's header.
+- **PM-0006-1, the header's Brave line** (from his message above): Brave 1.100.58, Chromium 158.0.8127.42 (Official
+  Build) (64-bit), on his Windows PC.
