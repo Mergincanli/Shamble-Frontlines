@@ -277,3 +277,88 @@ In this pull request: one line, no risk, and CI's own build may use a `dist-` fo
 - B7 note: infra-engineer's plan (read its Blocks 3-4 only, not duplicated): one `toolchain` job, all new lines inside the cut (build production then development into `.gate/dist-production` / `.gate/dist-development`, boundary tests, type checks, browser tests); browser = the image's Google Chrome via SHAMBLE_CHROMIUM=/opt/google/chrome/chrome (157.0.8103.50 in image 20261111.370.1, moves with the image): NOT the container's Chromium 153 nor Playwright's 158 (TE-NT6 row 16 applies); "the browser tests with one worker" assumed; a global timeout below the job's. Its E2E-TYPES finding matches mine (11 errors, needs Node's declarations); it proposes @types/node later; I propose the 15-line declaration file now (test side). CI builds into .gate/, so SA-DIST is local hygiene only.
 - B7 finding: vitest 5.1.0 with no test files (`--root packages/sim-worker --dir no-such-dir`) exits 1 ("No test files found"; its default exclude is only **/node_modules/**, **/.git/**). Playwright 1.65.0 with no matching test (`--grep zzz...`, no SHAMBLE_DIST, own --output) prints "Error: No tests found" and exits 1. `--list`: "Total: 12 tests in 5 files". So a mistyped path or project in the new CI lines fails loudly, not silently.
 - B7 note: TE-NT6 readings can be one line per test: `console.log(JSON.stringify(report))` prints the whole development report (run header with userAgent = browser version and hardwareConcurrency, fps, frame p50/p99, delivery p50/p95, the Worker's ticks, wakes, drops, lateness p50/p99/max), with no change to report.ts's interface; the header holds nothing private (run-header.ts: commit, label, userAgent, cores, display, isolation, time).
+
+## Block 7. What "proven" means for this pull request (DONE)
+
+**Runs that must be green on a runner** (the pull request's head; infra-engineer's shape: one `toolchain` job, the new
+parts inside the existing cut, in its order):
+1. `toolchain`, both events (push and pull request: two runs, two runners): the existing parts as today, then the tool
+   (download, size, sha256, GitHub's own check, member list, the program's size and sha256), the production and the
+   development build, the boundary tests (7), the type checks (Worker, page, and the specs if E2E-TYPES is in), the
+   browser tests (12, one worker, retries 0, `--reporter=list`). It proves: CI builds the Wasm with the checked tool
+   inside the cut; the boundary tests hold on CI's own Wasm; the specs type-check; the 12 browser tests pass in the
+   image's Chrome on a runner, inside the cut. Twice, on two machines: two sets of readings.
+2. `gate` and `smoke` (gate.yml): unchanged and green.
+3. Inside `npm test --workspaces`: the client's 49 unit tests (48 + RR-N4's), the node project's 1.
+His #60 stop rule applies: none of the new lines has run on a runner; a red clean run stops the pull request and goes
+to him; nothing is re-run into green (one failure is a defect to root-cause). The readings printed before each test's
+expects make that stop cheap: the next commit would quote them.
+
+**Planted changes, each its own commit and runner run, taken back in the next commit (whose run is green):**
+- P1, the browser step: one expect inverted, e.g. `skeleton.spec.ts:57` `expect(later.errors).toBe(1)`: `toolchain`
+  red in the browser part, at that line, with the test's name; the other 11 still run (a third set of readings).
+- P2, the boundary step: `sim-wasm.test.mjs:31` `expect(tick_hz()).toBe(31)`: red in the boundary part, at that line.
+- P3, the specs' type check: `skeleton.spec.ts:47` `expect(data.worker?.undetachd ?? 0).toBe(0)`, which Playwright
+  passes (it strips types): red at the e2e `tsc` line, TS2551 at that line.
+(One plant per run: the cut's script stops at its first failure, so a combined plant would show only the first.)
+Not needed on a runner (shown here or in the build step, never committed): RR-N4's lookahead dropped (the new unit test
+goes red; 7 of 7 mutants caught by the scratch); the build's refusal end to end (`RUSTFLAGS=... build.mjs --wasm-only`:
+exit 1 with its message); the six e2e type plants (6 of 6 caught); a zero-test run of each runner (vitest and
+Playwright both exit 1, checked here); and, for TE-NT6's edits, cs2's plants that touch the edited specs re-run once
+after them (the Worker that ignores the hidden tab; the one that runs the hidden gap on return; the input on every
+other frame; 64 bytes per frame and per block; a Worker's error counted twice; a missing error message): every one
+still "FAILED as it must", so no edit weakened a test (cs2's script: `git show 29ab052^:.checkpoints/cs2-first-page/plants.py`).
+
+**What the report quotes:** GitHub's own check's output, whole (his CI-WASM (a)); the tool's size and sha256 lines; the
+image version and the browser's version line; "Running 12 tests using 1 worker", each test's line with its duration,
+"12 passed"; the size table and the Wasm's sha256 of both runs against the container's 28,987 bytes (RR-F5's reading);
+"7 passed" (boundary), "49 passed" (client); a table of each speed-bound assertion's reading against its bound, for both
+clean runs and P1's (allocation frames vs > 20, blocks vs > 200, end block vs < 420, bytes per frame and per block vs
+their windows, first-page frames vs > 3, hidden-tab ticks since showing vs the measured bound, clock ticks vs >= 30);
+each plant's commit, red part, failing line as printed, and its take-back's green run; each part's time and the job's
+total (for the timeout); what stays unverified (Firefox, WebGPU, a real GPU, Brave).
+
+**Recommendation per follow-up** (the pull request stays small: tests and two config lines; no new dependency):
+
+| Follow-up | Where | Files and symbols | Added lines |
+|---|---|---|---|
+| TE-NT6 | here | `playwright.config.ts` chromium project `workers: 1`, `timeout: 60_000`; `skeleton.spec.ts` hidden tab (4-new-frames waits after hiding and after showing, the bound from measured seconds, its readings line), first page (window ms + one readings line), broken Worker (`{ timeout: 20_000 }` on the notice, ms line); `clock.spec.ts` (wait for tick >= 1); `allocation.spec.ts` (window ms and drops in its line) | +15, 4 changed |
+| RR-N4 + VF-L5 | here | `build-checks.mjs` `CARGO_OVERRIDES` (moved), `refusedBuildSettings(env)`; `build.mjs` (const out, import, :68); `build-checks.test.mjs` one test | +35 -9 (9 moved): net +26 |
+| E2E-TYPES | here | `packages/e2e/node-names.d.ts` (new, option B); CI +3 lines (infra) | +15 (+3 CI) |
+| SA-DIST | here | `.gitignore` `dist-*/` | +1 |
+| RR-F5 | here, a print only | CI: `sha256sum` of the Wasm and glue after the build (infra); nothing asserted | 0 (+1 CI) |
+| SA-TREE | change-set 3 | `build-checks.mjs` `runtimeCrates`, `overriddenCrates`, `missingOverflowOverrides`; the call in `buildWasm`; a test | about +52 there |
+
+**Total here:** about +66 lines added and 9 removed (all 9 moved), 4 changed, in 9 files (4 test files, 2 build
+scripts, the e2e config, one new declaration file, `.gitignore`); plus about 4 lines and one flag in infra's CI text.
+If it must be smaller, E2E-TYPES is the one to move (to change-set 3), at the price of a second CI text for his yes.
+- B7 DONE (section written above). Next: open questions, Not verified, DONE.
+- B7 check: cs2's plants.py (git show 29ab052^:.checkpoints/cs2-first-page/plants.py) anchors each plant on its failing line's text: 7 `expect(perFrame).toBeLessThan(170)`, 7b `expect(perBlock).toBeLessThan(610)`, 8 `stillHidden.worker?.ticks).toBe(hidden)`, 8b `worker?.drops).toBe(0)`, 11 `frames - posts).toBeLessThanOrEqual(1)`, 14 `The match stopped: `. TE-NT6's edits leave every one of those lines' text in place (row 10 only adds `{ timeout: 20_000 }` to plant 14's line, which still matches; that plant then fails after 20 s instead of 5 s, at the expect's own line, inside the 60 s test timeout). No plant anchors on :91, the one line row 9 changes.
+
+## Open questions for Mustafa
+None from the test side. The choices in this part are technical and stay inside his existing rules: E2E-TYPES takes the
+declaration file (option B), which needs no new dependency; if the main session prefers `@types/node` (option A), that
+is a new dependency and becomes his question then (two packages from the internet, with security-auditor's answer).
+The Firefox question is infra-engineer's FIREFOX-TESTS; the test side adds only two facts for it: 11 of the 12 specs
+can run there (the allocation spec uses Chromium's own profiler), and file-url.spec.ts's fixed 3 s wait is a race in a
+browser that does run the page from a file.
+
+## Not verified
+- No runner run: every runner claim is by reading or reasoning (the runner's speed; the image's Chrome 157 and its V8
+  against the allocation windows tuned on Chromium 153; the cold Vite cache; cargo's home under /home/runner, from
+  runner-images' Rust script; `cargo tree` inside the cut; Chrome inside `unshare --net`).
+- The browser tests were not run by me (by instruction): TE-NT6's edits are designed and their lines counted, not
+  applied or run; the "4 new frames" wait is reasoned from boot.ts:112-116, not measured; the time `workers: 1` adds
+  (about 20 to 40 s) is an estimate.
+- RR-N4's test was run as a scratch script against the pattern read from build.mjs (PASS; 7 of 7 mutants caught), not
+  as a vitest file in the repository; the end-to-end refusal (`RUSTFLAGS=... build.mjs --wasm-only`) was not run (no
+  build in this pass).
+- E2E-TYPES' declaration file was tried from the notes folder (te-node-shim.d.ts), not at its proposed path
+  `packages/e2e/node-names.d.ts` (same content). Option A (`@types/node`) not tried (nothing downloaded).
+- SA-TREE's check is a scratch draft (te-overrides-try.mjs) run here on today's tree and three plants, not code in the
+  repository.
+- The registry path's length on the runner and so the size difference (about 7 bytes) are inferred, not read.
+- Whether the runner's Chrome offers a WebGPU adapter: unknown (WebGPU's render counts are null and skipped).
+- The Windows case-insensitivity aside (B3) is from reasoning, not tested.
+
+DONE

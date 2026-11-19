@@ -486,3 +486,181 @@ outside the repository is created (no cache, no artifact, no secret, no setting)
   flag makes it pass: it needs Node's type declarations (`@types/node`, a new dependency: the hold, security-auditor,
   his yes) or a hand-written declaration file in packages/e2e (test side). Not in this CI text; the line to add later:
   `npx --no -- tsc --ignoreConfig $common --lib es2023,dom,dom.iterable --types node --skipLibCheck $e2e`.
+
+## Block 5. The exact text (DONE; re-done after Block 6 only if a run shows a wrong line)
+- Proposed file (whole): `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml` (sha256 9a58a3ac...fc4 at
+  writing). gate.yml: unchanged (not copied).
+- Diff: `.checkpoints/ci-wasm/ci-edit.diff` (`diff -u`, labels a/.github/workflows/toolchain.yml and b/..., 125
+  lines, sha256 d4defe3d...9cf at writing); `git apply --check` passes on today's file (sha256 8b581adf...016).
+  Size: 87 added, 1 removed (`git diff --no-index --numstat`).
+- Checks on the proposed file: PyYAML parses it; each step's `run:` and the cut's inner single-quoted script pass
+  `bash -n`; no apostrophe inside the inner script; the unchanged steps compare equal to today's (checkout,
+  setup-node, rustup, pin check, fetch); three steps NEW; the cut step CHANGED (one env line + 25 lines at the end).
+- Order inside the job: checkout, setup-node, rustup, pin check, [NEW] the archive, [NEW] GitHub's check, [NEW] the
+  one program, fetch ("the last step with the network": still true, so its name is kept), the cut (+ the build,
+  boundary, type checks, browser tests at its end).
+- Build flavours: both. `--production` first: the page players get, with the build's own checks for it (no dev
+  marker, CSP, 25 MiB); then the development page, which the browser tests need (`__shambleReport`, `serve.mjs`) and
+  whose build is the control of the marker list. The second build's cargo step is a no-op; wasm-bindgen runs again
+  (checked again). Out dirs `.gate/dist-production`, `.gate/dist-development` (ignored by git; outside build.mjs's
+  `git status` pathspec, so no "+changes" commit name).
+- Drift between the workflow and wasm-bindgen-tool.mjs: the values are written once in the workflow (his values; a
+  change is a CI edit, which needs his yes) and the module must contain each value's exact code line (`grep -qxF`),
+  checked before the download; build.mjs checks the program against the module before every run. Why not read the
+  values from the module with node: importing it would run repository code WITH the network, before the cut, for the
+  first time in this job; and the values could then change with no CI edit. A plain `grep -F` of the values would not
+  do either: the module's comment quotes his words with the same numbers, so it would pass even if a code value
+  changed. The line match fails closed on a reformatting (visible, fixed by a CI edit).
+
+**Table: each new line or group -> why -> tried here** (R-numbers are Block 6's runs)
+| # | New line(s) | Why | Tried here |
+|---|---|---|---|
+| 1 | header comment (4 lines) | says what the CI-WASM lines do, in the file's style | n/a (comment) |
+| 2 | `timeout-minutes: 25` (was 15) + comment | the job gains about 3-4 min; Playwright's global limit (10 min) must end before the job's (playwright.dev/docs/ci) | no: runner only; timings in R6-R10 |
+| 3 | job `env:` WB_* (7 values) + comment | his TOOL-SOURCE values, once, in a file only his yes changes; one place for the three steps | R1 (values vs the module) |
+| 4 | the 7-line drift loop (`grep -qxF`) | the workflow and the module must name the same tool | R1 (+ negative control) |
+| 5 | `mkdir` + `curl --fail -L --max-redirs 2 --proto '=https' --proto-redir '=https' --max-filesize 12000000` + final address with the query cut | the route of tool-route.sh: https only, at most 2 redirects, a size cap; the address recorded | no: downloads are refused here (the route's own run of 2026-11-18 23:09 is the record: 1 redirect to release-assets.githubusercontent.com, 200) |
+| 6 | size, then `sha256sum -c` | his values, before any tar call | R2 (on the archive kept from the route) |
+| 7 | `gh --version` + floor 2.93.0 + `gh release verify-asset 0.2.130 <archive> --repo wasm-bindgen/wasm-bindgen`, `GH_TOKEN` on this step only | his CI-WASM (a): GitHub's own check before the tool's first run; the floor keeps the token off TUF mirrors | the floor's `sort -V -C` only (R11); the check itself no: network + this session's credentials + this container's gh 2.89.0 is in the CVE range |
+| 8 | member list: `tar -tzf` sorted vs the expected seven names (`diff`) | the route's step 3 | R3, R4 (+ negative controls) |
+| 9 | `tar -tvzf` + awk: plain files and one folder, 6 fields (no link, no space), each <= 64 MiB | the route's step 3 | R3, R4 (+ negative controls) |
+| 10 | only `$WB_NAME/wasm-bindgen` extracted, `--no-same-owner --no-same-permissions --strip-components=1`; the folder holds exactly it | the route's step 4 | R5 |
+| 11 | `sudo -n install -D -o root -g root -m 0555` to `/opt/wasm-bindgen-0.2.130/wasm-bindgen` | closes the swap between check and run for code inside the cut (security-auditor's Low) | R5 without sudo (this container runs as root), into a folder under .gate/ci-wasm/ |
+| 12 | plain file, `stat`, size, `sha256sum -c` of the installed program | his program values, on the file that will run | R5 |
+| 13 | env line `SHAMBLE_WASM_BINDGEN="$WB_TOOL"` | build.mjs needs the absolute path inside `env -i` | R6 (under `env -i` with the cut's list) |
+| 14 | `build.mjs --production --out-dir .gate/dist-production` then `build.mjs --out-dir .gate/dist-development` | the page players get (its checks), then the page the browser tests need | R6 (+ R7: a cold release Wasm build's time) |
+| 15 | boundary tests: `vitest run --root packages/sim-worker --dir packages/sim-worker/boundary` | the 7 boundary tests on the built Wasm; the old draft's `--dir boundary` with `--root` finds no file and exits 1 | R8 (+ the old form: exit 1, "No test files found") |
+| 16 | `common=...`, four file lists, empty-list loop | the strict flags without `--lib`; a message when a list is empty | R9 |
+| 17 | 4 tsc lines (Worker shipped / + tests; page shipped / + tests) | the type checks of the two new packages (CI-TYPES style) | R9 |
+| 18 | `/opt/google/chrome/chrome --version` | the browser's version in every log (it moves with the image) | no: no Google Chrome here (/opt/pw-browsers/chromium is used instead) |
+| 19 | `SHAMBLE_DIST=... SHAMBLE_CHROMIUM=/opt/google/chrome/chrome npx --no -- playwright test -c ... --project=chromium --workers=1 --retries=0 --reporter=list --global-timeout=600000` | the 12 browser tests; one worker (Playwright's CI advice, speed-bound tests), never retried, each test named in the log, a global limit | R10 (with the container's Chromium 153, under `env -i` with the cut's list) |
+- Block 5 done; next: Block 6 (dry run here: R1-R11).
+
+## Block 6 runs (saved as made; Block 6 NOT yet done)
+- Calibration (a `toolchain` job log of 2026-11-18 12:04:41 UTC left in this session's scratch folder, before #60 and
+  change-set 2): image ubuntu-24.04 20261111.370.1 (= S2.5), "Cache mode: write" then; inside the cut "uid=1001(runner)
+  gid=65534(nogroup) groups=65534(nogroup)" and "the network is cut ... (curl exit 7)"; rustup install 9.5 s, fetch
+  2 s, the cut 12 s (test profile compiled in 3.64 s, release in 3.75 s); the whole job 26 s. Today's job (with
+  change-set 2's crates) is longer; its time is to be read on the first runner run.
+- R1+R2 (16:40:03 UTC; step 1's text verbatim from the proposed file, the 3 curl lines replaced by `cp` of the archive
+  kept from the route's run of 2026-11-18 23:09; `bash --noprofile --norc -eo pipefail` as GitHub runs `shell: bash`;
+  the WB_* values exported from the proposed job env): output "size: 11860397", "<rt>/wasm-bindgen/wasm-bindgen-
+  0.2.130-x86_64-unknown-linux-musl.tar.gz: OK"; exit 0; 0.70 s. The drift loop passed silently (all 7 lines found).
+- R1-neg: the module copy with `    bytes: 8170785,` (scratch root): "packages/client/scripts/wasm-bindgen-tool.mjs lacks
+  this line of the workflow:     bytes: 8170784,", exit 1. R2-neg size (one byte short): "size: 11860396", "the
+  archive is 11860396 bytes, not 11860397", exit 1. R2-neg sha256 (last byte flipped, same size): "...: FAILED",
+  "sha256sum: WARNING: 1 computed checksum did NOT match", exit 1.
+- R3-R5 (16:41:12 UTC; step 3's text verbatim, only `sudo -n ` dropped (this container runs as root), WB_TOOL moved to
+  .gate/ci-wasm/infra-engineer-dry/opt/wasm-bindgen-0.2.130/wasm-bindgen, RUNNER_TEMP = R1's folder): the member diff
+  silent (equal), the `tar -tvzf` listing printed (7 lines, as wasm-bindgen-cli-check.md: folder + LICENSE-APACHE
+  10847, LICENSE-MIT 1057, wasm2es6js 5795136, wasm-bindgen 8170784, README.md 5549, wasm-bindgen-test-runner
+  19316480; owner runner/runner, 2026-10-30 06:10), then "mode 555, owner root:root, 8170784 bytes, .../wasm-bindgen",
+  "mode 755, owner root:root, 4096 bytes, .../wasm-bindgen-0.2.130", ".../wasm-bindgen: OK"; exit 0; 1.12 s.
+- R3-neg (crafted archive: the 7 names + `evil.sh`): diff "> wasm-bindgen-0.2.130-x86_64-unknown-linux-musl/evil.sh",
+  "the archive's member list is not the expected one", exit 1. R4-neg (crafted: the 7 names, `wasm-bindgen` a link to
+  /bin/sh): the listing shows "lrw-r--r-- ... wasm-bindgen -> /bin/sh", then "a member is not a plain file or folder,
+  has a name with a space, or is above 64 MiB", exit 1. Neither extracted anything (no opt folder made).
+- R7 (16:42:21 UTC): a COLD release build of sim-wasm for wasm32 into a fresh target folder, under `env -i` with the
+  cut's list, `--offline`: compiles wasm-bindgen-shared, proc-macro2, quote, rustversion, bumpalo, cfg-if,
+  wasm-bindgen, sim, syn, client-endpoint, wasm-bindgen-macro(-support), sim-wasm; "Finished `release` profile
+  [optimized] target(s) in 34.38s" (real 34.4 s, user 15.3 s). This is the new compile work a runner with no cache
+  pays once per run (the cut's existing wasm32 build is the debug profile).
+- R6-R10 (16:43:06 to 16:44:31 UTC, exit 0, real 1 m 24.9 s): the cut's new lines verbatim (from the proposed file:
+  the `strict` line + the 21 new lines) under `env -i` with exactly the cut's variable list + SHAMBLE_WASM_BINDGEN =
+  R5's root-owned copy + (dry run only) CARGO_NET_OFFLINE=true. Substitutions, all listed: `npx --no -- vitest|tsc|
+  playwright` -> `node node_modules/vitest/vitest.mjs | typescript/bin/tsc | @playwright/test/cli.js` (npx is
+  refused here); out dirs -> `.gate/ci-wasm/infra-engineer-out/dist-production` (parent did NOT exist: Vite made it, so
+  CI's `.gate/dist-production` on a fresh checkout needs no mkdir) and `.gate/ci-wasm/dist-infra-engineer-development`;
+  `/opt/google/chrome/chrome` -> `/opt/pw-browsers/chromium` (no Google Chrome here); a `date` before each echo.
+  - R6 builds (7 s, warm cargo): "Finished `release` profile [optimized] target(s) in 0.09s"; pkg/sim_wasm.js 9177
+    raw, pkg/sim_wasm_bg.wasm 28987 raw (11655 gzip -9, 9955 brotli 11); production page: index-*.js 822196, css 495,
+    wasm 28987, worker-*.js 8226, index.html 570 (5 files; no "Copy report" marker, no serve.mjs); development page:
+    index-*.js 825204, overlay 617, report 2325 + the same css/wasm/worker/html, serve.mjs copied. Vite warns "Some
+    chunks are larger than 500 kB after minification" (three.js; printed, not an error). The built page's commit name
+    is "b7325dfb3" with no "+changes" (building into .gate/ keeps it clean).
+  - R8 boundary: "boundary/sim-wasm.test.mjs (7 tests) 18ms", "Test Files 1 passed (1)", "Tests 7 passed (7)" (about
+    1 s). The old draft's form (`--root packages/sim-worker --dir boundary`, run at 16:34): "No test files found,
+    exiting with code 1".
+  - R9 type checks: the empty-list loop silent; the four tsc lines silent (exit 0); 9 s together.
+  - R10 browser tests: "Google Chrome for Testing 153.0.8010.12" (the container's Chromium, not Chrome 157); "Running
+    12 tests using 1 worker"; all 12 "✓" with times: allocation 13.8 s ("64 bytes per frame ..., 472 bytes per block
+    received, 14859 bytes a second (36 frames, blocks 104 to 351, ...)"), clock 3.0 s ("no: the Worker kept ticking on
+    real time ... (ticks 0, 59, 78)"), file-url 3.3 s ("the page did not run from a file; the browser said: Access to
+    CSS stylesheet at 'file:///...' from origin ..."), isolation 3.8/2.9/2.1/2.9 s, skeleton default backend 8.9 s,
+    WebGL 2 fallback 9.5 s, hidden tab 9.7 s, Worker 404 2.5 s, Worker throws 2.2 s; "12 passed (1.1m)" (68 s).
+    Margins of the speed-bound test with one worker: 36 frames (floor 20), 247 blocks (floor 200), last block 351
+    (ceiling 420).
+- Block 5 RE-DONE after R6-R10 (16:47 UTC): the measured new work is about 2 to 2.5 min on a cold runner (R7 34 s
+  cold build here + builds 7 s + boundary 1 s + tsc 9 s + browser 68 s + tool steps about 2 s + GitHub's check), so
+  today's `timeout-minutes: 15` STAYS (the change to 25 and its comment are gone) and the browser run gets
+  `--global-timeout=300000` (5 min, 4.4 x the measured 68 s), so Playwright stops first and names what hung; the
+  echo line says so. Proposed file now sha256 f18aae3f...19ee; `.checkpoints/ci-wasm/ci-edit.diff` now 120 lines,
+  sha256 d93d823d...23b3, `git apply --check` passes; size **85 added, 0 removed**: every line that stands today
+  stays byte for byte (the cut gains one env line and 21 lines at its end). Validated again: YAML parses; every
+  `run:` and the inner cut script pass `bash -n`; no apostrophe in the inner script. Against what R6-R10 ran, the
+  inner lines differ only in that echo text and 600000 -> 300000. Table rows changed: row 2 (no timeout change now:
+  the job limit stays 15; the browser limit is row 19's `--global-timeout=300000`), row 19 (300000).
+
+## Block 6. Dry run here (DONE)
+| Run | What (the proposed text, substitutions listed above) | Result | Time |
+|---|---|---|---|
+| R1 | drift loop: the 7 workflow lines found in wasm-bindgen-tool.mjs | pass; neg (bytes 8170785): "lacks this line ... bytes: 8170784," exit 1 | <0.1 s |
+| R2 | archive size, then sha256 (archive kept from 2026-11-18) | "size: 11860397", ": OK"; neg short: exit 1; neg flipped byte: "FAILED", exit 1 | 0.7 s |
+| R3/R4 | member list (`diff`) and `tar -tvzf` awk check | pass; neg extra `evil.sh`: exit 1; neg link: exit 1 (nothing extracted) | with R5 |
+| R5 | one member out, `install -D -o root -g root -m 0555` (no sudo: root here), size + sha256 | "mode 555, owner root:root, 8170784 bytes", ": OK" | 1.1 s |
+| R6 | build.mjs --production, then development, under `env -i` + the cut's list | pass; 5 and 7+serve.mjs files; Wasm 28987 B; commit name clean | 7 s warm |
+| R7 | cold release Wasm build (fresh target folder, offline) | "Finished `release` ... in 34.38s" | 34.4 s |
+| R8 | boundary tests (`--root ... --dir packages/sim-worker/boundary`) | 7 passed; old form: "No test files found", exit 1 | 1 s |
+| R9 | 4 tsc lines + empty-list loop | all exit 0 (control without esnext.disposable: exit 2) | 9 s |
+| R10 | browser tests, `--workers=1 --retries=0 --reporter=list` (container Chromium 153) | "12 passed (1.1m)" | 68 s |
+| R11 | gh floor `sort -V -C` | 2.103.3 -> 0, 2.92.0 -> 1, 2.93.0 -> 0 | <0.1 s |
+Not run here, for the first runner run: the download (refused here); `gh release verify-asset` (network, this
+session's credentials, and this container's gh is 2.89.0, inside the CVE range); `sudo -n install` (no sudo here; the
+same `install` ran as root); the cut itself (`unshare`, refused here: the browser under the network namespace and
+no_new_privs is unproven); `/opt/google/chrome/chrome` (absent here: the container's Chromium 153 stood in, so Chrome
+157's behaviour, WebGPU adapter and speed are unproven); `npx --no --` (refused here; `node <bin>` ran the same
+programs); the 15-minute limit with the new lines (estimate only).
+- Block 6 done; next: Block 7 (stop rule, planted changes).
+
+## Block 7. The first runner run (DONE)
+**Stop rule for the new lines** (in #60's form; none of them has run on a runner): on the first clean run (push and
+pull request), the main session stops and tells Mustafa, with the job's log lines and before any fix, push or re-run,
+if:
+1. any new step or new line fails; or
+2. the log lacks any of these: in the archive step "size: 11860397" and the archive's ": OK" (and a final address on
+   GitHub's release-asset host); in GitHub's check a gh version of 2.93.0 or later and gh's success line naming release
+   0.2.130 ("Verification succeeded! ... is present in release 0.2.130"); in the program step the seven members, "mode
+   555, owner root:root, 8170784 bytes" and the program's ": OK"; inside the cut, after "the network is cut", the two
+   builds' size tables, "Tests 7 passed (7)", the Chrome version line, "Running 12 tests using 1 worker" and "12
+   passed"; or
+3. a browser test fails once (nothing is re-run to get a green check: retries stay 0, and a red-then-green run is a
+   flake to report, not a pass); or
+4. the job takes more than 10 of its 15 minutes (the estimate is about 4 to 7).
+What is NOT a stop, only recorded: the Wasm's size or sha256 differing from this container's 28987 bytes (expected:
+RR-F5, the builder's paths inside the Wasm differ), WebGPU or WebGL 2 as the default backend, Vite's chunk-size warning.
+
+**Planted changes** (each pushed once after the clean runs end, its runs read, then taken back in the next commit; the
+take-back commit's tree must equal the clean head's tree, as #60 checked):
+- **P1, GitHub's check refuses a file that is not the release's asset.** Two lines put in the GitHub-check step,
+  before the real check (CI text, so its exact text goes to him with the rest):
+      printf 'not an asset of the release\n' > "$RUNNER_TEMP/planted.tar.gz"
+      gh release verify-asset "$WB_VERSION" "$RUNNER_TEMP/planted.tar.gz" --repo wasm-bindgen/wasm-bindgen
+  Expected: that step fails with gh's line "attestation for planted.tar.gz does not contain subject sha256:..." (by the
+  source; exact wording read from the log) and "Process completed with exit code 1."; no later step runs (the tool is
+  never unpacked or run). Proves: the check is live and fails visibly at its own step; and since gh reaches the subject
+  comparison only after fetching and verifying the release's attestation, it also shows the job token as proposed
+  (`contents: read`) is enough (answers PERM-ATT). Our own size and sha256 lines cannot let such a file through first,
+  which is why the plant goes into the GitHub-check step itself and not into the archive.
+- **P2, a browser test fails visibly inside the cut, and nothing retries it.** One value in
+  `packages/e2e/tests/skeleton/render-counts.json`: "WebGL 2 fallback" "drawCalls" 3 -> 4 (source, tier 1; no CI
+  text). Expected: "the first page on the forced WebGL 2 fallback" fails with the toEqual diff (drawCalls 4 expected, 3
+  received), and "the first page on the default backend" too if the runner's default is the fallback; "1 failed" or
+  "2 failed"; no "retry #1" line; exit 1 at the browser tests, after the builds, boundary tests and type checks passed.
+  Proves: the browser tests run on the runner inside the cut and judge the page, a wrong committed value fails the job,
+  and no retry hides it. By the spec's code (skeleton.spec.ts:63) the failure is certain; to be tried first in a
+  worktree of the main session's, as #60 did.
+- Not proposed: a plant of the drift, size, sha256 or member checks on a runner (each shown failing here: R1-neg,
+  R2-neg, R3-neg, R4-neg; on a runner they would add no new fact).
+- What the plants do not prove: that every browser assertion can fail (one is planted); anything about a real GPU or
+  WebGPU; that GitHub's check would catch a changed archive with the same sha256 (not possible to plant).
+- Block 7 done; next: Block 8 (CI side of RR-F5, SA-DIST, E2E-TYPES, TE-NT6).
