@@ -119,3 +119,11 @@ exit 0: node packages/client/scripts/build.mjs
     
 exit 0: cargo test --workspace --locked
     test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s | test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0: cd packages/sim-worker && node ../../node_modules/vitest/vitest.mjs run --dir boundary
+    Test Files  1 passed (1) | Tests  7 passed (7)
+exit 0: cd packages/client && node ../../node_modules/vitest/vitest.mjs run
+    Test Files  6 passed (6) | Tests  43 passed (43)
+exit 0: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off 
+    10 passed (36.9s)
+
+# finished 2026-11-19 00:34:54 UTC: every defect was caught and the clean tree passes
