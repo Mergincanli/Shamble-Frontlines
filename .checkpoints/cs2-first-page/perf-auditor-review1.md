@@ -62,3 +62,114 @@ iterator in host.ts:87). So beyond the two views and the message object, each ti
 boxed while unoptimized). 30 Hz x ~280 B = ~8 KB/s in the Worker: harmless (not PM-0002-7's scope, which is the page).
 Cheap trims if ever wanted: one reused transfer array and message object (postMessage serializes synchronously).
 Pool: 120,336 ticks, 0 misses when the page returns each buffer within a tick (stub).
+- A1 confirmed on the real page (07:34:17Z; scratch .gate/perf-auditor-alloc-warm.mjs, copy here; the spec's
+  exact method, worktree dist): after the spec's wait (106 frames so far) 74 B per frame under "frame", 115 B per block
+  under "onMessage"; after 150 s more (942 frames so far) 0 B per frame under "frame", 95 B per block under onMessage.
+  The listener boot.ts:40-41 (index-DaT5vCul.js:541:48354, e=>{let t=u.onMessage(e.data)...}) holds 92,596 / 88,352 B
+  self per 8 s window (~270-360 B per block: event.data's deserialization, plus ~32 report messages), outside the sum.
+  So the spec counts ~30 % of the boundary's per-block bytes (~370-415 B per block, ~11-12 KB/s at 30 Hz; PM-0002-7's
+  0.1 MB/s is still ~8x away).
+- Side reading (three's own per-frame allocation, WebGL 2 fallback, empty scene): whole page 211,928 B/s at 5.75 fps
+  before tier-up (~37 KB per frame; top: multiplyMatrices, invert, applyMatrix4, getMaxScaleOnAxis) and 77,000 B/s at
+  5.9 fps after (~13 KB per frame; getCacheKey, _bindUniforms, updateForRender). At 60 fps that is ~0.8 MB/s from a
+  3-draw scene: a number for cs4/cs6 to track per object, not a cs2 finding.
+
+### Q4 readings: the shared clock holds; the per-copy reading cannot resolve the copy (07:35:48Z)
+Scratch .gate/perf-auditor-clock.mjs (copy here), Chromium 153, blank page, not isolated: 400 Worker stamps 5 ms apart,
+page minus Worker on timeOrigin + now(): min 0.000, p50 0.100, p95 0.400, max 4.700 ms, 0 negative; both clocks step
+0.100 ms. So no offset between the two contexts; the method's error is about +-0.2 ms, far under PM-0002-8's 16.7 ms.
+The copy's real cost, batch-timed in a Worker (both views made each time, 5 batches): 8 B 76 ns, 1,032 B 67 ns, 4,104 B
+94 ns, 16,392 B 400 ns, 65,544 B 1,510 ns. The readings' "copy 0.000 p50 / 0.100 p99 ms at every size" is the clock's
+step, not the curve: report it as "below 0.1 ms (the clock's step)", and take the curve by batch timing or on the
+isolated build (5 us steps).
+- L1 (Low) host.ts:139-143 / messages.ts:28-29: doneAt is stamped after the copy, while PM-0002-8 starts the clock when
+  the step returns, before the copy, and messages.ts says "when the Worker finished the step". Numerically nil today
+  (copy <= 1.5 us at 64 KiB); fix: post timeOrigin + before (or stamp in Pacer.wake right after step()).
+
+### Q7: Ring.percentile cost (same time)
+Scratch .gate/perf-auditor-ring.mjs and -readout.mjs (copies here). Node 22 (V8 12.4): Ring(600).percentile 37.8 us
+per call (36.2-39.2, 7 batches of 20,000); Ring(18,000) 1,808 us. Chromium 153: copy + sort of 600 doubles 25.1 us
+(24.2-28.2); the page's whole report function (boot.ts data(): 5 percentiles, runHeader, counters) 66.0 us (61-72).
+Per readout update: ~0.1 ms of JS on the page, ~0.1 ms in the Worker (4 sorts in stats()), 4 times a second: fine.
+At a full run's 18,000 samples a sort costs ~1.8 ms: compute it once at the end, or keep a 0.1 ms-bin histogram.
+
+### Q6: overflow-cost.mjs A/A (07:36:22Z)
+The main session's script, unchanged, run 5 times with the same built Wasm in both arms (two folder copies, sha256
+f4758211... for both; wrapper .gate/perf-auditor-aa.mjs, copy here; load average ~2 on 4 vCPU, other reviewers' browsers
+running): "with" minus "without" medians +0.02, -0.51, +0.60, -0.14, +0.20 ns (17.3-18.7 ns per tick; per-run maxima up
+to 28 ns). The reported +0.67 ns (14.71 vs 14.04, +4.8 %) is the size of the method's own A/A spread (+-0.6 ns, ~3.4 %),
+so "nothing measurable" is the right reading; the honest form adds the floor: "below this method's resolution, about
+0.6 ns of ~15-18 ns per tick (an A/A run of the same script)". The absolute per-tick time moved ~20 % between sessions
+with machine load, so only the paired difference inside one run means anything. The tick timed is two JS-to-Wasm calls
+through the glue in Node's V8, not Chrome's; a resolution claim would need ~20 interleaved pairs with an A/A control.
+
+### Q5 runs: allocation.spec x3 in the worktree (07:37:52Z)
+67 / 79 / 61 B per frame, 118 / 117 / 125 B per block, 4,163 / 4,195 / 4,289 B/s; 44 / 47 / 44 frames (5.5-5.9 fps with
+other browsers running), 253-257 blocks; 3 passed. Per-frame sampling noise ~ 67 B / sqrt(45) ~ 10 B (1 sd), so 170 sits
+~10 sd above clean and the plant (261) ~9 sd above 170: statistically sound where nothing tiers up. Flakiness sources:
+frames > 20 needs >= 2.6 fps over 8 s (2x margin at 5.5 fps; three parallel browsers could break it); the counts are
+read outside the sampled window (253-257 blocks for "8 s" = ~8.5 s), so per-frame and per-block read ~6 % low (read
+the report after startSampling and before stopSampling); and A1 (fail-open once callers tier up).
+
+### L2 (Low) the pool's size reasons from one tick per frame and one tick per wake (07:39:36Z)
+host.ts:30-31 (POOL_SIZE 4: "the page keeps the two newest blocks, one is on its way and one is being filled") holds while
+the page draws at least one frame per ~2 ticks and the Worker runs one tick per wake. A catch-up wake runs up to 7
+(pacing.ts:7) and a long page frame piles blocks into #returned until the next frame. Model with the real BlockPool
+(scratch .gate/perf-auditor-pool-sim.mjs, copy here; the page's keep-two / return-next-frame rule; blocks taken at the
+end of the page's busy part): misses per 600 ticks 160.1 at 5.5 fps, 0.2 at 8.6, 0.0-0.1 from 12 to 144 fps; one 250 ms
+hitch every 5 s gives 13.9 (30 fps) and 15.8 (60 fps), 0.2 with a pool of 8. Matches the real page: 175 misses per 617
+ticks at 5.5 fps (P1 run) and the card's 4-11 at 8.6 fps (frame-time jitter). So 4 is right at steady frame rates, and
+the container's misses say "frames slower than ~3 ticks", not "pool too small". Each miss is a new ArrayBuffer of the
+block's size in the Worker, dropped again when the free list is full: harmless at 8 B, real churn at cs4/cs5 block sizes
+during hitches. Fix when blocks grow: size 9 (2 kept + 7 per wake) or keep what misses made up to that cap; correct the
+comment either way.
+
+### Q3 reading: per-frame allocation in a production build
+Beyond the input message (the {type, sequence, viewTime, returned} object): the fresh empty array each frame
+(worker-link.ts:114; ~16 B), the PictureFrame literal (boot.ts:100; ~28 B, outside allocation.spec's sum), and three's own
+render allocations (~37 KB per frame before tier-up, ~13 KB after, in the WebGL 2 fallback's empty scene; see A1's side
+reading). The cold sum under frame() is 61-79 B (x6 runs). Both small ones could go (reuse the array after the post,
+since postMessage serializes synchronously; pass the PictureFrame fields or reuse one object), but at ~45 B per frame
+they are not worth a push on their own.
+
+### Q2: the definition is right; the biases (07:40:51Z)
+Tick start minus its due time from step() (pacing.ts:93) is PM-0004-68's "scheduled and actual start" read against the
+Worker's own schedule. Biases: (1) P1, dominant and self-inflicted; with it fixed W2 reads p99 1.40-1.47 ms here, so the
+head's numbers would wrongly point to OQ-0002-4's W3 fallback; (2) the ring keeps 600 ticks (20 s) and readings.mjs reads
+at 600-618 blocks, so start-up ticks sit in the window and latenessMax is the window's worst, not the run's (PM-0004-68
+wants the 17,820th of 18,000: log every start or keep a 0.1 ms histogram); (3) ticks dropped by a rebase never enter the
+ring (a stall reads as drops, not lateness): print drops beside p99; (4) clock step 0.1 ms and the readout's own work
+(~0.1 ms of sorts in stats(), 4 times a second; input posts as Worker tasks): negligible.
+
+### L3 (Low) the readings' windows and polling
+readings.mjs and report.ts's running() wait with page.waitForFunction (Playwright's default polling is every animation
+frame), so boot.ts's data() (66 us, 5 sorts, a few KB of objects and strings) runs every frame while readings are taken,
+and the 600-sample rings still hold start-up. Poll every 500-1000 ms and read after 1,200 blocks (or clear the rings).
+
+### L4 (Low, cs6 note) "frame time" is the rAF interval
+FrameTimes.push gets three's rAF timestamp (Animation.js update(time) -> boot.ts:97-101), so the readout's "frame time"
+is the time between presented frames: pinned at 16.67 ms on a 60 Hz panel until a frame is missed, blind to headroom.
+CS6's frame-time marks need the callback's own work time (performance.now() at its start and end) beside it.
+
+### L5 (Low) allocation.spec reads its counts outside the sampled window
+allocation.spec.ts:26-34: report() before startSampling and after stopSampling, so frames and blocks include the CDP round
+trips (253-257 blocks in an "8 s" window): per-frame and per-block read ~6 % low. Read after start, before stop.
+
+### Q8 (what cs3 and cs5 should measure first)
+cs3: retake pacing after P1 (wakes per tick ~1.0; every tick start logged over 18,000 ticks with the display-rate input
+posts running: 60/120/144 Hz); the Worker's time per tick (input + step + copy + post: median, p95, p99) as the baseline
+PM-0002-25/28 grow from; calls per tick with the glue, rebase included (PM-0002-3); press-to-tick latency (PM-0002-13);
+the state hash's cost per tick at the new state size (PM-0004-21). cs5: PM-0002-7 with a method that survives tier-up
+(A/B with the hand-off off on whole-page bytes, or caller-level sums checked after 10 minutes) plus an off-heap count; the
+copy curve by batch timing (here 0.07-1.5 us for 8 B-64 KiB) or the isolated build; delivery with the 16 ms busy-wait
+and doneAt at the step's return; pool misses during hitches at real block sizes; three's own per-frame bytes per object.
+Note for cs5's mark reading: PM-0002-7's "0 ArrayBuffer and 0 typed-array allocations per frame" can only mean backing
+stores under B2, since every transferred block arrives as a new ArrayBuffer object and the page binds new views on it.
+
+## Done 2026-11-19T07:42:11Z: verdict = findings to fix before the merge (P1 Medium, A1 Medium; L1-L5 Low)
+Not checked: WebGPU (no adapter here), a real GPU, headed or Brave runs; the P1 fix and A1's floor on the real page (no
+rebuild; P1's fix tried on the pacer's logic in a scratch Worker); the Worker's tick allocation inside Chromium (Node's V8
+instead); a build without the overflow overrides (A/A only); the readout's DOM and layout cost; GC pauses and memory over
+10 minutes; the production build. Baselines saved to .claude/agent-memory-local/perf-auditor/MEMORY.md.
+Scratch scripts: this folder's perf-auditor-*.mjs (run copies under .gate/; .gate/perf-auditor-pkg-a and -b are the A/A's
+two copies of the built pkg, removable).
