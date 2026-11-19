@@ -190,9 +190,12 @@
 - **U4f's panel, round 1, ENDED** 14:32 UTC (wf_a011d9f2-abf: 5 of 5 results); **the advisor's ruling ENDED** about
   14:52 UTC (agent abf879016ff011b9c). **Part-clean before builder 4 DONE** (P27's six cleans and checks in one
   main-run.sh call, .gate/u4f-b4/clean-shared.log, exit 0, 14:53 UTC): free 5,054 → 11,784 MiB.
-- **Builder 4 (the fix pass): LAUNCHING** (its agent, worktree and start time written here once it starts).
-- **The saver bde01r5pv** (13:49 UTC on, both attribution lines as trailers; ADV-M60-8; its window ends about 15:39:
-  restart it while agents run, run_in_background, timeout 7200000). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
+- **Builder 4 (the fix pass) RUNNING** from 14:57 UTC (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+  worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
+  SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
+- **The saver** restarted about 14:58 UTC (bde01r5pv stopped then, by TaskStop, a foreground save after it), both
+  attribution lines as trailers (ADV-M60-8); its window ends about 16:48: restart it while agents run
+  (run_in_background, timeout 7200000). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
   ENABLED again at 13:49 UTC (next 14:34); pause it when no agent runs.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
