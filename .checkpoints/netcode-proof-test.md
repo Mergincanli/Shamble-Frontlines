@@ -178,7 +178,12 @@
   14:52 UTC (agent abf879016ff011b9c). **Part-clean before builder 4 DONE** (P27's six cleans and checks in one
   main-run.sh call, .gate/u4f-b4/clean-shared.log, exit 0, 14:53 UTC): free 5,054 → 11,784 MiB.
 - **MAIN-61** (main f5030a3, PR #61, in; PR #40 un-mergeable since 15:11 UTC, STATUS.md the one conflict): plan
-  main-61-plan.md; **the advisor's review RUNNING** from 15:2x UTC (agent a5e4ea7a63dfed426; advisor-main-61.md).
+  main-61-plan.md, **APPROVED WITH CONDITIONS C1-C6** (advisor-main-61.md, 201 lines, read in full; "As approved" in
+  the plan). MAIN-61 approved (advisor-main-61.md), running steps 1-7. If `git rev-parse -q --verify MERGE_HEAD` prints
+  f5030a33185b1ea1b15329174e82823f0215f993, the merge is in progress: no save, no `git merge --abort`, no reset. If `git
+  diff --name-only --diff-filter=U` names docs/STATUS.md, resume at step 3; otherwise resume at step 3's checks before
+  the commit (C2 (b)), then step 4. If HEAD^2 is f5030a3 and HEAD is not on the remote yet, resume at step 5. Builder
+  4's notes and this card may show unstaged: leave them; step 6's card save takes them. Anything else: the advisor rules.
 - **Builder 4 (the fix pass) RUNNING** from 14:57 UTC (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.

@@ -1,5 +1,17 @@
 # MAIN-61: take main f5030a3 into the netcode branch (plan, 2026-11-19 15:2x UTC)
 
+## As approved
+The advisor's review (advisor-main-61.md, 201 lines, read in full; 15:20-15:35 UTC): **APPROVE WITH CONDITIONS C1-C6**
+on this plan's first text (sha256 6c2defd9c8bdb8f9…, in b846828). Applied word for word, they need no new review; step
+7 (the advisor's check of the pushed head) stays. In short: C1 MAIN-60's C4 kept whole (the base run's full bar, the
+full marks line at 5d, three whole-tree checks after the commit); C2 the notes allowance covers the card, the index is
+checked before the commit, nothing staged but docs/STATUS.md and nothing committed or pushed by hand from TaskStop to
+the push (the web Stop hook's ask, the check-in, builder 4's handback), one retry on `.git/index.lock`; C3 both light
+runs in the background (timeout 7200000), exits 3, 4 and 5 mean no check ran; C4 `git fetch origin` and main's CI read
+in step 1, before the merge; C5 MAIN-60's C2 in this take-in's words (the resume line word for word, the saver's end
+proved, at most one foreground save, H0 named in the chat); C6 the text fixes below. **The conditions' own words
+(advisor-main-61.md:19-104) govern where this plan is shorter or differs.**
+
 ## Why
 MAIN-52, Mustafa's words (history.md:2055-2057; the reading :2082-2086; TEST-FIRST's "main taken in when it changes
 code, CI or rules"): main moved from b763ba3 (MAIN-60's) to f5030a3, PR #61 (change-set 2, the first page: v2 code in
@@ -11,8 +23,11 @@ built in, and its head check (advisor-main-60-head.md) after the push.
 
 ## Facts checked (15:1x-15:2x UTC, read only)
 - origin/main f5030a33185b1ea1b15329174e82823f0215f993; merge base b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (MAIN-60's
-  second parent); HEAD = the remote branch at the plan (b25b96a and the saver's later checkpoint-only commits). H0 is
+  second parent); HEAD = the remote branch: 424f2a2 when the plan was written (15:1x UTC), b846828 (the plan's own
+  commit, 15:15:40) and 36b0983 at the review (15:16:20); every commit since b25b96a touches .checkpoints/ only. H0 is
   read at step 1 (C1).
+- Marks (MAIN-60's F15): main adds 6 lines to ADR 0002, which holds no mark, and changes no mark's row; the 81 rows (63
+  in ADR 0001, 1 in 0004, 17 in 0006) hash to marks.json's values on HEAD, origin/main and merge-tree's tree.
 - `git diff --name-status b763ba3 origin/main`: 78 files, +5,621 / -106: 53 added, 21 modified, 3 deleted
   (packages/client/src/index.ts, its test, packages/sim-worker/src/index.test.ts), 1 renamed at 100 %
   (packages/e2e/tests/stub.spec.ts to tests/node/). So the tracked-file count after the merge is N0 + 50.
@@ -27,8 +42,9 @@ built in, and its head check (advisor-main-60-head.md) after the push.
   REPO_MAP.md and STATUS_ARCHIVE.md merge on their own (this branch changed them since b763ba3: `git diff --stat
   b763ba3 HEAD -- docs/`).
 - The conflict: since b763ba3 this branch changed one STATUS.md line, the #40 row (its 2026-11-15 text, kept at
-  MAIN-60); main kept its #40 row at the 2026-11-14 text, replaced the #60 row with #61's and changed five lines
-  elsewhere (the date line, Last merged, Next item 2, Waiting on Mustafa, the follow-up lines).
+  MAIN-60); main kept its #40 row at the 2026-11-14 text and changed ten lines in five places (11 removed and 11
+  added, the #60-to-#61 row among them: the date line, Last merged, the row, Next item 2, Waiting on Mustafa, the
+  follow-ups).
 - DEP-HOLD: `git diff --stat b763ba3 HEAD -- Cargo.toml Cargo.lock package.json package-lock.json crates packages
   .gitignore` is empty, so every manifest and lockfile comes in equal to main's and the hold holds nothing.
 - refs: `git grep -n -I "spikes/" origin/main -- crates packages Cargo.toml Cargo.lock package.json package-lock.json
@@ -52,7 +68,8 @@ built in, and its head check (advisor-main-60-head.md) after the push.
 2. (C4) `git merge origin/main`, alone. Expected: exit 1; "CONFLICT (content): Merge conflict in docs/STATUS.md" and no
    other CONFLICT line. `git status --short`: `UU docs/STATUS.md`, with main's other 77 paths staged (A 53, M 20, D 3,
    R 1). Nothing else, beyond unstaged .checkpoints/netcode-proof-test/ lines.
-3. Resolve docs/STATUS.md by Edit. Main's side of every hunk is taken, except the conflict block. The block becomes this
+3. Resolve docs/STATUS.md by Edit. Only the conflict block (merged lines 28-34, from `<<<<<<< HEAD` to `>>>>>>>
+   origin/main`) is edited; every other line stays as git merged it. The block becomes this
    branch's #40 row (its text, the newer of the two), then main's #61 row, each word for word from its side; the #60
    row stays out, as main took it out. No other line changes. Grep for `^<<<<<<<|^=======|^>>>>>>>`: none. Then
    `git add docs/STATUS.md`.
@@ -68,7 +85,7 @@ built in, and its head check (advisor-main-60-head.md) after the push.
      empty (the code and manifests equal main's).
 5. Checks on the merge commit before any push; outputs under .gate/main-61/, saved by Write where a command prints:
    a. `node tools/gate.mjs --no-smoke`: GATE PASS (smoke is CI's job, on the pushed head).
-   b. `node .claude/scripts/repo-map-check.mjs`: OK.
+   b. `node .claude/scripts/repo-map-check.mjs`: "repo map OK: 170 entries cover 110 required paths".
    c. `node --test .claude/scripts/checkpoint.test.mjs`: 33 pass, 0 fail.
    d. `bash .checkpoints/netcode-proof-test/main-run.sh /home/user/Shamble-Frontlines/.gate/main-61/light.log node
       check.mjs --only refs,marks,self,redact`. Pass bar:
@@ -99,7 +116,14 @@ built in, and its head check (advisor-main-60-head.md) after the push.
 ## Risks
 - Medium: from step 2 to step 4 the main folder holds a merge in progress; the steps run back to back. Builder 4 keeps
   writing its notes then; they stay unstaged and are saved by step 6's card save.
-- Low: the light runs wait on builder 4's cargo runs (main-run.sh's lock and its idle wait, at most 60 minutes).
+- Low: the light runs wait on builder 4's cargo runs: the lock wait has no limit, and the 60 minutes is the idle wait
+  after it (C3). The saver stays off from step 1 to the push, so builder 4's notes are on disk only for that time, as
+  its code in its worktree already is.
+- After the push: if gate, smoke or toolchain is red on the pushed head, the lane takes no further step on that head
+  (no U4f merge) until the advisor rules.
+- The record: under "Choices taken without him", "main f5030a3 taken in now, while builder 4 runs, plan first
+  (MAIN-61)", named in that day's message, as MAIN-60 was. The card save's message cites MAIN-52 (history.md:2055-2057)
+  and says why the merge commit keeps git's own message without attribution lines (ADV-M60H-5).
 - Low: from the merge on, the lane holds main's v2 workspace. The spike's workspace and check.mjs do not build it, and
   CI's toolchain job does, as on main.
 
