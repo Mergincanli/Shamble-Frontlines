@@ -205,7 +205,9 @@
   applied** (apply_u4f_merge_edits.py, word for word, each old text once: plan.md, u4-build-plan.md, u4s-carries.md).
   Report read in full (five lines corrected: M2, M7's log, M8's form, cmd_timing's route). **U4f MERGED at 25d316e**
   (19:2x UTC: the 29 files and `git rm` of the wip patch; D10 empty on the commit; the papers by checkpoint saves).
-  **Next (M9):** this save pushes it; CI on it; the advisor's check of the pushed head (with `Room::cmd_timing()`); then
+  Pushed at c26ff6a (19:17 UTC); **CI green** on it (check_suite.completed 19:21); the saver b02f5nmep from 19:17
+  (window to about 21:07). **The advisor's check of the pushed head RUNNING** from 19:22 (agent a0ee17a6ebc8cbc7a;
+  N/advisor-u4f-merge-head.md). **Next (M9):** this save pushes it; CI on it; the advisor's check of the pushed head (with `Room::cmd_timing()`); then
   5.3's 17 pre-runs (`node ops/runs/c-u4f-r2.mjs --date <day>` from 25d316e), the part-clean at A6's place, the sets
   -47, -20, -22 (u4f-report.md, "What comes next"). Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
