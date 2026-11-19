@@ -674,6 +674,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      `b9-production` refused at 00:16:31 ("Branch "refs/pull/10/merge" is not allowed to deploy to production due to
      environment protection rules."). Next: step 5, he sets production to "No restriction" (window "production open"
      from his word until his restore screenshot with `main`); I re-run the failed job: "secret: present" expected.
+   - **WINDOW OPEN: production's branch rule off since his "open" (00:19:35 UTC)**; closes at his restore screenshot
+     showing `main`. Run #18's failed job re-run at about 00:19:48 UTC (attempt 2).
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.

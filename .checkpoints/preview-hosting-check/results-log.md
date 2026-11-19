@@ -682,3 +682,8 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "Branch "refs/pull/10/merge" is not allowed to deploy to production due to environment protection rules." /
   "b9-production" / "The deployment was rejected or didn't satisfy other protection rules." So a pull-request job
   that names `production` is refused at once; nothing waited for him.
+- His "open" with a screenshot (2026-11-19 00:19:35 UTC, 66a03064-486c-4491-9c5e-8bf4639d2ac9): banner "Environment changes successfully saved: all
+  branches can deploy."; "Configure production": "Required reviewers" unticked, "Wait timer" unticked, "Allow
+  administrators to bypass configured protection rules" unticked; "Deployment branches and tags": "No restriction";
+  secret CANARY, "3 days ago". **Window opened: production's branch rule off.** Step 5: run #18's failed job re-run by
+  the session (rerun_failed_jobs): "secret: present" expected.
