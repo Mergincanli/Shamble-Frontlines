@@ -757,6 +757,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      (the token never presented), a new run on a new list.
    - get_session before the list (2026-11-19 13:48:47 UTC, transcript time): 106,253 of 1,000,000 tokens; the account's seven-day
      limit shows "allowed_warning", resetting 2026-11-24 19:00 UTC (a usage-limit risk for Day 2: Risk 9; told to him).
+   - The check-in's prompt updated (update_trigger, 13:50:24 UTC): it now reads this step's rows first, asserts the 24 h
+     with jq, gives the go for the wall only on the exact pass row, and consults the advisor tool on any other row.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
