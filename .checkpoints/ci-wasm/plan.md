@@ -5,6 +5,13 @@ _Revision 1, written by the main session, 2026-11-19, 17:53 UTC (from the clock)
 Nothing outside `.checkpoints/` and `.gate/` is edited before the advisor agent's APPROVE; no line under `.github/`
 is written before Mustafa's yes on its exact text, with the chat in Accept edits._
 
+_Revision 2, 18:14 UTC (from the clock): the advisor agent's verdict on revision 1 is **APPROVE with conditions**
+(`advisor-plan.md`; no Critical or High finding; steps 1 to 3 may be built). Its eight conditions are worked in:
+two questions go to him instead of six, and its rulings on the other four stand in section 16; the chat's mode is
+read before each of the three CI writes; the dated note and the quoted question are copied by script from the
+chat's message; two lead texts corrected; the stop rule widened; the docs get a size and a stop line; the tier-2
+evidence added; the record of the compiled Python file completed._
+
 ## 0. In one screen
 - **What:** `.github/workflows/toolchain.yml` gains 90 lines and loses none. Before the network cut the job fetches
   the one wasm-bindgen archive Mustafa named, checks its size and sha256, runs GitHub's own check of it
@@ -21,7 +28,8 @@ is written before Mustafa's yes on its exact text, with the chat in Accept edits
 - **Risk tier 2** (a CI file). Reviews: the advisor agent and security-auditor, with infra-engineer and
   test-engineer. Merge: his go, in this day session.
 - **Planned size:** about 155 added lines outside the docs (90 of them the workflow); stop line 310.
-- **Questions for Mustafa (section 16):** CI-TEXT, CHROME-SOURCE, FIREFOX-TESTS, PERM-ATT, PLANTS, PYCACHE-NOW.
+- **Questions for Mustafa (section 16):** CHROME-SOURCE, then CI-TEXT. The advisor agent ruled on four more
+  (PERM-ATT, PLANTS, FIREFOX-TESTS, PYCACHE-NOW); he is told each ruling and can object.
 
 ## 1. Goal
 After this pull request, a push or a pull request cannot go green unless the Wasm builds with the checked tool, the
@@ -37,9 +45,14 @@ own check, the two builds and "12 passed". The report quotes GitHub's check's ou
 ## 3. Before any edit
 1. The advisor agent's APPROVE of this plan (its notes: `advisor-plan.md`); security-auditor reads the CI text once
    before it goes to him (`security-auditor-ci-text.md`).
-2. His yes on the exact text (`ci-edit.diff`, section 5) and his answers to section 16; the chat in Accept edits,
-   read from the session record right before the write. Until then only the non-CI steps are built (section 8,
-   steps 1 to 3): they do not depend on his answers.
+2. His yes on the exact text (`ci-edit.diff`, section 5) and his answers to section 16. The chat's mode is read
+   from the session record **right before each of the three CI writes** (the file; P-GH's two lines; their
+   take-back), and the main session stops unless it is Accept edits (his WRITE-MODE: "right before each kit
+   write"). After each write the file's sha256 is compared with its scratch copy: the proposed file, then the
+   proposed file with the plant, then the proposed file again. Until his yes only the non-CI steps are built
+   (section 8, steps 1 to 3). One of them depends on his answer: if he refuses CI-TEXT or changes it so that the
+   specs' type-check line goes, `packages/e2e/node-names.d.ts` is removed again, or kept with its reason in the
+   report.
 3. No manifest, lockfile or dependency changes: `.claude/CHECKPOINTS.md` section 3's hold is not touched.
 
 ## 4. Files, with their lane
@@ -47,7 +60,7 @@ All are lane 1's (Part 15: `packages/e2e/tests/skeleton/` is lane 1's folder; la
 | File | Change | Protected |
 |---|---|---|
 | `.github/workflows/toolchain.yml` | +90, -0 (section 5) | yes: CI; his yes on the text |
-| `.gitignore` | +1 `dist-*/` (SA-DIST); +1 `__pycache__/` if PYCACHE-NOW (a) | no |
+| `.gitignore` | +1 `dist-*/` (SA-DIST); the `__pycache__/` line stays with change-set 3 (PYCACHE-NOW (b)) | no |
 | `packages/client/scripts/build-checks.mjs` | `CARGO_OVERRIDES` moved in; new `refusedBuildSettings(env)` | no |
 | `packages/client/scripts/build.mjs` | the pattern out; one call changed | no |
 | `packages/client/scripts/build-checks.test.mjs` | one test | no |
@@ -144,9 +157,14 @@ The netcode proof test's rules: no new manifest or config file; no root `.cargo/
    reports against the zip's README, and his four report messages whole (609 lines, about 500 of them his quoted
    words). His go: "My browser reports are recorded with the next docs pass". The picture he sent is not in the
    repository (it shows a folder path of his computer).
-3. `docs/VISION_V2.md`: the dated note he said yes to (VISION-NOTE (a)), exactly as the card quotes it, directly
-   under the decided browser line of section 4, which stays unchanged; and the sentence appended to the "Updated
-   on" lines.
+3. `docs/VISION_V2.md`, by `vision-note.mjs`: the dated note he said yes to (VISION-NOTE (a)), copied by script
+   from the chat's own message of 14:29:51 UTC in the session's transcript (uuid
+   699736ec-f365-4458-aceb-592bba842d59, saved whole as `chat-2026-11-19T142951-vision-note.md`: 2433 bytes, sha256
+   6bf347a2...c423), never typed from the card; directly under the decided browser line of section 4, which stays
+   unchanged; and the sentence appended to the "Updated on" lines. The question and its two options quoted in the
+   DECISIONS entry come from the same message by the same script. Compared at 18:12 UTC: the card's copy of the
+   note equals the chat's byte for byte (309 bytes, sha256 7bf61530...4f92), and so does the sentence (61 bytes);
+   the report says so.
 4. docs-keeper, after the build: `docs/STATUS.md` (at most 120 lines: #61 merged at f5030a3; this pull request in
    flight; "Waiting on Mustafa"), `docs/ROADMAP.md`, `docs/REPO_MAP.md` (CI's new parts; the new files),
    `docs/STATUS_ARCHIVE.md` (the block of #61: the group "For the CI pull request" marked item by item as done here
@@ -155,8 +173,10 @@ The netcode proof test's rules: no new manifest or config file; no root `.cargo/
    Firefox check found; the advisor agent's nits on head 4cf30ce).
 5. The report `docs/reports/2026-11-19-ci-wasm.md` (`/advisor-report`): section "The workflow text" holds the
    merged diff of `.github/workflows/toolchain.yml` whole, with the sha256 of the text he said yes to and a line
-   saying whether the two are byte-equal; the docs pass has its own section; GitHub's check's output is quoted from
-   the job log with the run and job ids.
+   saying whether the two are byte-equal; P-GH's two lines, the commit that wrote them and the commit that took
+   them out, and the take-back's tree shown equal to step 4's tree; and a before/after table of every rule
+   sentence of the workflow file (each new or stricter; a looser one would need his exact words). The docs pass has
+   its own section. GitHub's check's output is quoted from the job log with the run and job ids.
 
 ## 8. Build steps, in order
 1. (No CI file.) RR-N4: move the pattern, add the function and the test. Client unit tests: 49 passed.
@@ -165,11 +185,12 @@ The netcode proof test's rules: no new manifest or config file; no root `.cargo/
    edited specs run again (each must still fail).
 3. The docs pass, items 1 to 3 of section 7. Gate; commit by path (code and docs in separate commits); push; the
    pull request opens as a draft. CI runs today's workflow on it (the new unit test included).
-4. After his yes and with the chat in Accept edits: write `.github/workflows/toolchain.yml` from the scratch copy,
-   compare its sha256 with the proposed file's, commit that one file, push. **The first runner run, under the stop
-   rule.**
-5. The planted changes he allows (PLANTS), one per push, each taken back in the next commit; after the last
-   take-back the tree must equal step 4's tree.
+4. After his yes: read the chat's mode (stop unless Accept edits); write `.github/workflows/toolchain.yml` from
+   the scratch copy; compare its sha256 with the proposed file's; commit that one file; push. **The first runner
+   run, under the stop rule.**
+5. The two planted changes, one per push, each taken back in the next commit. P-GH is a CI write: the mode is read
+   before its two lines are written and again before they are taken out, with the sha256 compared each time.
+   P-BROWSER is one value in `render-counts.json`. After the last take-back the tree must equal step 4's tree.
 6. Review round 1 on the final diff (security-auditor, infra-engineer, test-engineer; at most two rounds), fixes;
    the verifier; the advisor agent on every pushed head; docs-keeper; the report; the checkpoint folded and deleted;
    the pull request marked ready; stop for his go.
@@ -184,16 +205,23 @@ The netcode proof test's rules: no new manifest or config file; no root `.cargo/
 - **CI, on the runner:** `gate`, `smoke` and `toolchain` green on the head, push and pull request, read by hand.
   From the first clean run the report quotes: GitHub's check's whole output; the tool's size and sha256 lines; the
   image's, gh's and Chrome's versions; "Tests 7 passed"; "Running 12 tests using 1 worker" with each test's
-  duration and "12 passed"; the Wasm's sha256 on both runners against this container's 28,987 bytes; the job's
-  time.
-- **The stop rule for the new lines** (as #60's: none has run on a runner). On the first clean run the main session
-  stops and tells him, with the log's lines and before any fix, push or re-run, if: a new step or line fails; or
-  the log lacks the archive's "size: 11860397" and ": OK", a gh of 2.93.0 or later and its success line naming
+  duration and "12 passed"; the Wasm's size and sha256 on both runners against this container's (28,987 bytes
+  here, its sha256 printed by the same line); the job's time.
+- **Risk tier 2's own evidence:** the kit's three test files (`.claude/hooks/routine-guard.test.mjs`,
+  `.claude/hooks/settings.test.mjs`, `.claude/scripts/checkpoint.test.mjs`) pass with the same counts on main and
+  on the head; the before/after table of the workflow's rule sentences (section 7, item 5); security-auditor's
+  review with each finding addressed or deferred in writing.
+- **The stop rule for the new lines** (as #60's: none has run on a runner). It holds on **every** run of the new
+  lines until the report is in, not only the first. The main session stops and tells him, with the log's lines and
+  before any fix, push or re-run, if: a new step or line fails; or the log lacks a final address on GitHub's
+  release-asset host, the archive's "size: 11860397" and ": OK", a gh of 2.93.0 or later and its success line naming
   release 0.2.130, the seven members, "mode 555, owner root:root, 8170784 bytes" and the program's ": OK", "the
   network is cut", the two size tables, "Tests 7 passed", Chrome's version line, "Running 12 tests using 1 worker"
   and "12 passed"; or a browser test fails once (nothing is re-run into green); or the job takes more than 10 of
-  its 15 minutes. Not a stop, only recorded: the Wasm's bytes differing from here (expected: RR-F5); which backend
-  the runner's Chrome starts.
+  its 15 minutes; or a planted run fails anywhere but at its own step, or without its expected line (P-GH: gh's
+  line that the file is not a subject of the release's statement, not a permission line and not "no attestations
+  found"; P-BROWSER: the test's own difference of 4 against 3, with no retry line). Not a stop, only recorded: the
+  Wasm's bytes differing from here (expected: RR-F5); which backend the runner's Chrome starts.
 - **Planted changes** (PLANTS): P-GH, GitHub's check is given a file that is not the release's asset (two lines of
   CI text before the real check, so his yes covers them and their removal): the step must fail with gh's own line
   and nothing after it runs; it also answers PERM-ATT. P-BROWSER, one committed render count changed from 3 to 4:
@@ -236,10 +264,12 @@ Nothing: no build of the game changes. His part: the answers of section 16, the 
 | `build-checks.mjs`, `build.mjs`, `build-checks.test.mjs` | about 35 (9 of them moved) |
 | `playwright.config.ts` and the three specs | about 15 |
 | `packages/e2e/node-names.d.ts` | 15 |
-| `.gitignore` | 1 or 2 |
+| `.gitignore` | 1 |
 | **Outside the docs** | **about 155; stop line 310** |
-The docs are counted apart: DECISIONS about +75 and one entry per later message of his; the browser-check record
-609 (about 500 his quoted words); the report about 250; STATUS stays within 120.
+**The docs, counted apart** (his words copied by script and the quoted workflow diff do not count: his SIZE-0,
+"copied lines do not count"): about 440 written lines, stop line 880. By file: the DECISIONS headers about 45; the
+browser-check record's own text about 95 (of its 609 lines, about 510 are his quoted words); the report about 250;
+STATUS (within its 120 lines), ROADMAP, the map and the archive about 50; the vision's note 4.
 What would make it grow: PERM-ATT (b) +3; CHROME-SOURCE (c) +10 to +15 and a second ask; FIREFOX-TESTS (a) +6 to
 +12 CI lines and a config edit; a fix after a stop.
 
@@ -248,42 +278,46 @@ Firefox or WebKit in CI; a required-check change; a cache; a second job; `@types
 RR-F5; any change to `gate.yml` or the `smoke` job; change-set 3 (its plan is drafted beside this: `cs3-context.md`,
 `rust-reviewer-cs3-rng.md`).
 
-## 16. Open questions for Mustafa
-1. **CI-TEXT: may `toolchain.yml` get exactly the 90 lines of `ci-edit.diff`?** Why: no CI file is edited without
-   his yes on its exact text. Options: (a) yes, as shown; (b) yes, with changes he names; (c) no. Recommendation:
-   (a).
-2. **CHROME-SOURCE: which browser runs the browser tests in CI?** Why: a browser that CI downloads is code from the
-   internet, and its version decides what the tests prove. Options: (a) the Google Chrome already in GitHub's
-   runner image (157.0.8103.50 in today's image): nothing is downloaded; its version follows the image and is
-   printed in every run; (b) Playwright 1.65.0's own Chrome for Testing 158.0.8127.18, downloaded on every run from
-   Playwright's servers, pinned by version but checked by no checksum, and Playwright's installer would run with
-   the network; (c) that same build fetched by curl and checked against a size and sha256 he approves after one run
-   prints them (about 170 MB per run; a second text). Recommendation: (a).
-3. **FIREFOX-TESTS: when do the browser tests also run in Firefox?** Why: his words, "The game has to work in
-   Chrome, the Chromium-based browsers and Firefox"; today only his own check covers Firefox. What it takes:
-   Playwright's own patched Firefox 159.0 (about 187 MB, from Playwright's servers, no published checksum; the
-   Firefox on the runner cannot be driven), a second browser project, 11 of the 12 tests (the allocation test uses
-   Chrome's own profiler), 1 to 2 minutes more per run; it cannot be tried in this container first. Options: (a) in
-   this pull request; (b) with change-set 3; (c) a small pull request of its own right after this one, while
-   change-set 3's plan is with him. Recommendation: (c): one new unknown per first run, and this pull request must
-   not wait on a Firefox question before change-set 3's build may start.
-4. **PERM-ATT: does the job's token get `attestations: read` beside `contents: read` from the start?** Why:
-   GitHub's check reads another project's signed release statement; GitHub's pages do not say whether the job's
-   token needs that permission for a public project. Options: (a) no: the first run shows it, and if it is needed
-   the one line comes back to him; (b) yes, now (harmless: this repository has no such statements; saves a round
-   if it is needed). Recommendation: (a), the smaller permission.
-5. **PLANTS: which planted changes run once on a runner, each taken back in the next commit?** Why: they show that
-   the new checks fail visibly there, as #60's did. Options: (a) two: GitHub's check given a file that is not the
-   release's asset (two CI lines, shown in the text), and one committed render count changed from 3 to 4; (b) only
-   the first; (c) none. Recommendation: (a).
-6. **PYCACHE-NOW: may the `.gitignore` line for `__pycache__/` go into this pull request instead of change-set 3?**
-   Why: his words place it "With change-set 3", and it happened again before that: at 16:39 UTC the saver pushed
-   one compiled Python file from an agent's check script (found 17:33 UTC, removed from the notes; a local ignore
-   now guards this container). Options: (a) yes, here, beside the `dist-*/` line; (b) no, with change-set 3 as
-   said. Recommendation: (a): this pull request merges first.
+## 16. Open questions for Mustafa (two), and the advisor agent's rulings on four more
+1. **CHROME-SOURCE: which browser runs the browser tests in CI?** Why: the browser's version decides what the tests
+   prove. Options: (a) the Google Chrome already in GitHub's runner image (157.0.8103.50 in today's image). It
+   brings nothing in from the internet, so his rule on such code is untouched; what he accepts is a browser version
+   that moves with GitHub's image, as gh, curl, tar and Node in this job already do, and that is printed in every
+   run. (c) Playwright 1.65.0's Chrome for Testing 158.0.8127.18, fetched by curl and checked against a size and
+   sha256 he approves after one run prints them: pinned bytes, about 170 MB per run, and a second text for his yes.
+   Recommendation: (a). (Not offered, by the advisor agent's condition: Playwright's own installer, which would be
+   the first package code to run with the network in this job and whose download nothing checks.)
+2. **CI-TEXT: one yes for the CI text, covering five things.** Why: no CI file is edited without his yes on its
+   exact text, and #60 put its stop rule and its plant to him too.
+   - `ci-edit.diff`: 125 lines, 90 added, none removed, sha256
+     282890b716f767d01e910a5a18dd2f454a9787abe4ecdee61e8521ce2df3290e.
+   - `ci-plant-p-gh.diff`: the two lines of the planted change for GitHub's check, sha256
+     fe2004ac3d0f5b39086a096c077d5b707fcddae29a2a9df8d554a4856fb290a1, written in one commit and taken out in the
+     next.
+   - The second planted change: one committed render count in
+     `packages/e2e/tests/skeleton/render-counts.json` changed from 3 to 4, and taken back.
+   - The stop rule of section 9.
+   - That the one tool file he named now also comes by a second route: the runner's curl line, with the limits of
+     the route he approved (https only, the size limit, size and sha256 before any unpacking).
+   Options: (a) yes to all five as shown; (b) yes with changes he names; (c) no. Recommendation: (a).
+
+**Ruled by the advisor agent** (plan review, `advisor-plan.md`; he can overrule any of them):
+- **PERM-ATT: (a).** The job's token keeps `contents: read` only. If GitHub's check is refused for lack of a
+  permission, the run stops there and the one line comes back to him.
+- **PLANTS: both run.** P-BROWSER is evidence, the advisor agent's call; P-GH's lines are part of CI-TEXT.
+- **FIREFOX-TESTS: (c).** Not in this pull request (he called it small; one new unknown per first run) and not
+  inside change-set 3: a small pull request of its own after this one, with its download and its exact text for
+  his yes. He is told, so that he can object: the archive's line of 13:36:37 UTC promised him this question with
+  the CI text.
+- **PYCACHE-NOW: (b).** The `.gitignore` line stays with change-set 3, where his words put it; the local ignore and
+  `-B` guard until then.
 
 ## 17. Records due
 His words of 14:28:25, 14:31:30 and 16:08:04 UTC and his browser reports (section 7); his answers to section 16
-when they come (by script, never retyped); what went wrong, with times from records (the compiled Python file:
-created 16:34 UTC, pushed by the saver's autosave b7325df at 16:39:06 UTC, found 17:33 UTC, removed 17:35 UTC; it
-stays in the branch's history); the refused commands and their routes, if any.
+when they come (by script, never retyped); the refused commands and their routes, if any; and what went wrong,
+with times from records. **The compiled Python file** (`.checkpoints/ci-wasm/__pycache__/rr-chacha-ref.cpython-313.pyc`,
+7,356 bytes): made at 16:34 UTC (the file's own time, read by `ls -la` at 17:33:58 UTC); added by the saver's
+autosave b7325df (committed 16:39:03 UTC, pushed 16:39:06 UTC by the saver's log); found at 17:33:58 UTC and removed
+from the folder at 17:35:06 UTC (the clock lines of the main session's two commands); the removal committed by the
+autosave 395a370 (17:39:12 UTC). It stays in the branch's history and enters main's history with the merge, so his
+go can accept it, as his go on #61 accepted change-set 2's two. He is told in the same message as the questions.

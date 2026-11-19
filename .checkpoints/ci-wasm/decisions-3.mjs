@@ -6,6 +6,8 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
+// The question VISION-NOTE and its options, copied by script from the chat's message of 14:29:51 UTC (never retyped).
+import { OPTION_A, OPTION_B, QUESTION } from './vision-note.mjs';
 
 const DEC = 'docs/DECISIONS.md';
 const at = process.argv.indexOf('--out');
@@ -55,13 +57,13 @@ const ENTRIES = [
   {
     key: 'his browser check of the first page (#61), 2026-11-19, 14:46:25 to 15:09:29 UTC',
     lead: () =>
-      `- _A pointer, not a decision: **his browser check of the first page (#61), 2026-11-19, 14:46:25 to 15:09:29 UTC.** Four chat messages (14:46:25, 14:54:19, 15:02:50 and 15:09:29 UTC) with eight "Copy report" texts, from his own browser (Brave 1.100.58) and from Firefox 160 on his Windows computer, and one picture. His go below says: "My browser reports are recorded with the next docs pass, not by a push to this head." They stand whole, copied by script, in \`${RECORD}\`, Appendix A, with the build chat's reading of them against the zip's README. His first Brave report read "last pause: none yet" where the README expects a recorded pause; by his go's condition ("If your reading of them shows a line that is not as your README expects, stop and tell me before you merge.") the chat told him before merging, and his re-check showed the pause (45.0 s hidden, 0 ticks while hidden)._`,
+      `- _A pointer, not a decision: **his browser check of the first page (#61), 2026-11-19, 14:46:25 to 15:09:29 UTC.** Four chat messages (14:46:25, 14:54:19, 15:02:50 and 15:09:29 UTC) with eight "Copy report" texts, from his own browser (Brave 1.100.58) and from Firefox 160 on his Windows computer, and one picture. His go below says: "My browser reports are recorded with the next docs pass, not by a push to this head." They stand whole, copied by script, in \`${RECORD}\`, Appendix A, with the build chat's reading of them against the zip's README. His first Brave report read "last pause: none yet" where the README expects a recorded pause; by his go's condition ("If your reading of them shows a line that is not as your README expects, stop and tell me before you merge.") the chat told him at 14:50:49 UTC (its message 7e4ded94-23e4-459c-ad2a-6d1fdcb3d7d8 in the session's transcript), before any merge, and his re-check of 15:02:50 UTC showed the pause (45.0 s hidden, 0 ticks while hidden)._`,
   },
   {
     key: '2026-11-19, 14:31:30 UTC: his answer to the question VISION-NOTE',
     file: 'mustafa-2026-11-19T143130.md',
     lead: (m) =>
-      `- **Taken by Mustafa, 2026-11-19, 14:31:30 UTC: his answer to the question VISION-NOTE ((a): the dated note for \`docs/VISION_V2.md\` is right as the chat wrote it)** (${SESSION}; extracted by script from the session's transcript, message 94cf4e6c-e46b-48a4-b48e-3270856870be, whole). The question, as the chat put it to him at 14:29:51 UTC under the note's exact text: "VISION-NOTE: is the dated note's text right as written above?", with the options "(a) Yes, as written." and "(b) Change it: tell me the wording." The text it showed is the dated note now in \`docs/VISION_V2.md\` §4 and the sentence added to that file's "Updated on" lines, both written by this docs pass. His second sentence asks for the steps of the browser check again; the chat gave them at 14:31:56 UTC. ${by(m)}`,
+      `- **Taken by Mustafa, 2026-11-19, 14:31:30 UTC: his answer to the question VISION-NOTE ((a): the dated note for \`docs/VISION_V2.md\` is right as the chat wrote it)** (${SESSION}; extracted by script from the session's transcript, message 94cf4e6c-e46b-48a4-b48e-3270856870be, whole). The question, as the chat put it to him at 14:29:51 UTC under the note's exact text (the chat's message 699736ec-f365-4458-aceb-592bba842d59, copied by script): "${QUESTION}", with the options "${OPTION_A}" and "${OPTION_B}" The text it showed is the dated note now in \`docs/VISION_V2.md\` §4 and the sentence added to that file's "Updated on" lines, both written by this docs pass from that message, byte for byte. His second sentence asks for the instructions again; the chat answered with the browser check's steps at 14:31:56 UTC. ${by(m)}`,
   },
   {
     key: '2026-11-19, 14:28:25 UTC: his go on the merge of pull request #61',

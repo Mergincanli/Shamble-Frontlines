@@ -103,11 +103,22 @@
    `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml` (sha256 76bfed6e...96d8). It is infra-engineer's draft
    plus the specs' type-check line (tried here: exit 0).
 
+3c. **The advisor agent's plan review: APPROVE with conditions** (handed back 18:11 UTC; `ci-wasm/advisor-plan.md`;
+   no Critical or High; steps 1 to 3 may be built). Its eight conditions are in the plan's revision 2 (18:14 UTC):
+   two questions to him (CHROME-SOURCE with (a) and (c); CI-TEXT as one yes for five things: `ci-edit.diff`,
+   `ci-plant-p-gh.diff`, P-BROWSER, the stop rule, the tool's second route), and its rulings PERM-ATT (a), PLANTS
+   both, FIREFOX-TESTS (c) (told to him), PYCACHE-NOW (b); the mode read before each of the three CI writes with a
+   sha256 compare after each; the dated note and the question copied by script from the chat's message of 14:29:51
+   UTC (`ci-wasm/vision-note.mjs`; the card's copy equals it byte for byte); two lead texts corrected in
+   `ci-wasm/decisions-3.mjs`; the stop rule on every run and for plants; the docs' size (about 440 written lines,
+   stop line 880); the tier-2 evidence. security-auditor was asked (18:11 UTC, by message) to confirm the gh
+   advisory's id and the 2.93.0 floor.
+
 ## Current step
-Step 3c: the advisor agent reviews the plan (`ci-wasm/advisor-plan.md`) and security-auditor reads the CI text
-(`ci-wasm/security-auditor-ci-text.md`), both started after this save. Then the exact text and the six questions
-(CI-TEXT, CHROME-SOURCE, FIREFOX-TESTS, PERM-ATT, PLANTS, PYCACHE-NOW) go to him; while he reads, the plan's steps
-1 to 3 (no CI file) are built once the plan is approved.
+Step 4 of the card = the plan's steps 1 to 3 (no CI file): RR-N4's test, TE-NT6's edits, `node-names.d.ts`,
+`.gitignore`'s `dist-*/`, then the docs pass's scripts run for real; local evidence; commits by path. Meanwhile
+security-auditor's reading of the CI text is awaited (`ci-wasm/security-auditor-ci-text.md`); when it is in, the
+text (changed only if it asks) and the two questions go to him, with the PYC record.
 
 ## Next steps
 3. **The plan of the CI-WASM pull request** (plan first; drafted with infra-engineer; reviewed by the advisor agent;
