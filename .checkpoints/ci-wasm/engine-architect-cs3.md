@@ -127,3 +127,74 @@ Task: change-set 3 ("The loop closes"), the boundary and rule-test half of its p
   VF-L7 :1102-1104 "scan every script but the Worker's entry chunk, named by the build itself". EA-F10 :1094-1096 also
   names TS test-only members: `Ring.clear`, `BlockPool.free`, the `percentile` re-export. EA-F6/EA-F12 (:1133-1135) are
   for the drafts' next revision, NOT cs3. VF-L5 is in the context's list though the brief omits it (with RR-N4).
+- My cs2 findings re-read (git show 929b146:.checkpoints/cs2-first-page/engine-architect-review1.md :71-114 and
+  review2.md :18-31). F8: worker-link.ts parses WorkerToPage ad hoc, `stats as WorkerStats` unchecked -> fix
+  `isWorkerToPage` beside `isPageToWorker` + a switch on the narrowed type. F9: Sim composes World+BlockWriter+
+  LocalSchedule+newest_input with checks in Sim::create; "the composition belongs in client-endpoint (writer, schedule,
+  newest input) and room (the authority's World), with sim-wasm a wrapper". F10: newest_input test-only; TS dead code
+  Ring.clear (stats.ts), BlockPool.free, `percentile` re-export (index.ts:4). F13 four nits: (1) WorkerLink's state public
+  + writable (ready, blockBytes, tickHz, blocks, tick, posts, failure, stats, lastPause, pauses); (2) the schedule's
+  anchor has two writers (Sim::new(now_ms) then Pacer ctor `rebase(now())`); (3) folder cycle by types app/boot.ts ->
+  overlay/report.ts -> app/worker-link.ts (PauseRecord); (4) sim-worker declares @shamble/types used only by the
+  boundary test. N3: "match over" has two owners (boot.ts stop() vs WorkerLink.failure); the Worker `error` event path
+  (e.g. a trap in `rebase` on resume, outside host.ts's try) never sets failure, so frame()/requestReport() keep
+  posting. Fix: one owner (`WorkerLink.end(reason)` called by stop(), or the link owns stop with terminate passed in).
+  N5: `webgpuOffered` probed in boot.ts -> a fallback reason in PictureInfo when render/ changes hands (cs5). N6: name
+  the Worker's chunk from the build (the page's `new URL("worker-...js")` reference or a Vite manifest entry).
+  F14 (rebase counted) is already fixed in the boundary test (calls expect rebase: 1).
+- NOTE: host.ts's try/catch wraps only `#pacer.wake`; `resume()` (visibility) calls `sim.rebase` OUTSIDE it (host.ts:97
+  -> pacing.ts:123): a trap there is an uncaught Worker error -> boot.ts's `error` listener -> stop(); the link is not
+  told (N3). The panic hook's message must reach the page on BOTH paths (B2 design).
+- test-engineer-followups.md block 5 (SA-TREE, :207-244): three pure functions in build-checks.mjs (`runtimeCrates`,
+  `overriddenCrates`, `missingOverflowOverrides`) fed by `cargo tree --locked -p sim-wasm --target wasm32-unknown-unknown
+  -e normal,no-proc-macro --prefix none`, called by buildWasm() before cargo build; unit test with fixture + plants;
+  about +52 lines; "Recommendation: with change-set 3. It adds the random-number crate and so its override in the same
+  change" (premise: a library; with our own ChaCha8 no runtime crate joins -> the plant uses fixtures only). Block 6
+  (RR-F5, :249-268): one builder path in the Wasm (wasm-bindgen's externref.rs panic location under <HOME>/.cargo/
+  registry/src/...); fix = "a remap from the repository's own settings" (env RUSTFLAGS refused), rust-reviewer's fix;
+  "Change-set 3's size table must name the machine it was read on (or wait for the remap)". SA-DIST: `dist-*/` line.
+- rust-reviewer-cs3-rng.md read whole (97 lines, DONE). Recommends (c) own ChaCha8 in `sim` (~100-150 lines + ~200
+  test lines; 16-word buffer gives the same word sequence; next_u64 = two consecutive words low first). Vectors (its
+  block 5): a committed generator SCRIPT (Python or Node, independent of both crates), self-checked against the 8
+  published 8-round/256-bit vectors of draft-strombergson-chacha-test-vectors-01 (+12/20-round free), writes per stream:
+  10,000 next_u32 from word 0; 10,000 next_u64 from word 1; one save/restore at a mid-block word (next 1,000 words);
+  one window across the 2^32-block carry (96 words from block 2^32-1); fixed public test seed (draft TC8 key), each
+  stream id. Format raw LE binary, 40,000 B per stream u32 view (+80,000 u64 view); 5 streams x 120,000 B ~ 600 KB, or
+  ~200 KB u32-only; text manifest with SHA-256 per section. Its Wasm route: "one exported call in sim-wasm (seed,
+  stream id, start word, count -> the words)" + a boundary test. CONFLICT with EA-F10 / WB-HEALTH (a): a test-only
+  export on the shipped surface (I design a test-only Wasm module instead; B2/B4). If a library is picked: (b)
+  chacha20 =0.10.2 features ["rng"], set_stream before any draw and before set_word_pos, never get_block_pos, native
+  vectors also with --cfg chacha20_backend="soft" and "sse2" (needs RUSTFLAGS -> refused by build.mjs's env rule:
+  a test-only exception or cargo --config), 3 overflow overrides, security-auditor first; (a) 4 crates, last choice.
+- rr-chacha-ref.py exists in this folder (independent ChaCha, matches all 48 draft vectors): the seed of the generator
+  script (moves to a committed tools path in cs3; it is Python: CI runs Python? -> the vector FILE is committed, the
+  script is run by hand/by the test only as a regeneration check; B4).
+- netcode-architect-cs3.md read (B1 done at 78 lines; B2 design next). Seams with mine: (1) its F-ECHO: authority holds
+  the slot's applied input (buttons + press totals) in hashed state, snapshot carries it in a minimal owner section ->
+  the block's echo section (layout table + writer = client-endpoint, my boundary); (2) its F-PRESS: the page counts
+  presses per button cumulatively (keydown, not repeat) and posts running totals; the endpoint paces at most one edge
+  per button per tick (ADR 0001 :235) -> the page's post shape is mine (B3), the pacing rule is its; (3) the step order
+  (ADR 0002 part 6 :402-407, its) vs where the composition lives (mine, B2); (4) NA-N1 step gets host time, NA-N7 Pacer
+  non-finite due time (sim-worker files I also touch for EA-F8/EA-N3: coordinate one edit per file); (5) its F-P0/F-B1
+  on PM-0002-49 (not mine). It reads the lints at ADR 0002 :462-474 (protocol decoders deny unwrap/expect/indexing).
+- browser-reports-reading.md read. FPS-LINE (:68-70): readout fps = 1000 / median frame gap (harness/frame-times.ts:25-28
+  `fps()`); Firefox showed 239.2 where the run's average was 179.9 -> "The line should be a count over time". Fix:
+  fps = held deltas' count / their sum x 1000 (frames over the time they took, the ring's window; a `Ring.sum()` or
+  `mean()`), ~6 lines + test. NEG-ZERO (:71-72): "deliveryP50: -0.00 ms" from report.ts `ms()` = toFixed(2) of a tiny
+  negative (two rounded clocks). Fix: a value that rounds to zero prints "0.00" (no sign); ~2 lines + test. Both in
+  files cs3 edits anyway (lane 1: overlay + CPU harness stay lane 1's; only the GPU half of the harness moves at cs5)
+  -> IN. BR-GAP: his words: README asks window in front during first run + one step covered on purpose (README text, not
+  code). FF-WAKES/BR-LATE: readings for the pacing marks (no code). ADAPTER/TQ-FF/NOT-SHOWN: not code for cs3.
+- ADR 0004 part 20 read (:562-590): Wasm "installs a small panic hook of its own (`std::panic::set_hook`, no extra
+  crate) that writes the message and location into a fixed buffer in linear memory before the abort, and the Worker's
+  host reads it after the trap and attaches it to the report"; "the Wasm build is S20's to check"; local-play recovery
+  after a trap "is not researched (OQ-0004-7)". => cs3: hook installed by `#[wasm_bindgen(start)]` (no host call), a
+  static fixed buffer (u32 length + N bytes) written by a non-allocating truncating fmt::Write; ONE new free export
+  `panic_buffer() -> *const u8` read once at start; after a trap the host NEVER calls an export again (a lock or state
+  left mid-panic), it reads the bytes through a fresh view. No `static mut` (unsafe_code deny): a `Mutex<[u8;N]>`-style
+  static (no_threads Mutex on wasm32) or atomics; rust-reviewer to pick the unsafe-free form.
+- No rust-src in the pinned toolchain (sysroot has no lib/rustlib/src): the scan's complete list of std f32/f64
+  methods must be read from doc.rust-lang.org/1.99.1 (std's f32 and f64 pages) by the build session and pinned in the
+  test with the URL; I state no count.
+- DESIGN NOTE (vectors home): inputs read at RUN TIME (std::fs in native tests, passed in from JS in Wasm), never
+  include_bytes!, so the compiler cannot fold the operations at build time with its own float code.
