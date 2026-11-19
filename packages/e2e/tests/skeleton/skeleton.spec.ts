@@ -92,3 +92,19 @@ test("a hidden tab pauses the match, and it resumes where it stopped", async ({ 
   expect(after.pauses).toBe(1);
   expect(after.errors).toBe(0);
 });
+
+const broken = [["cannot be loaded", null, "the Worker failed"], ["throws as it starts", 'throw new Error("boom");', "boom"]] as const;
+for (const [name, body, said] of broken) {
+  test(`a Worker that ${name} stops the match once and says so on the page`, async ({ page }) => {
+    const thrown: string[] = [];
+    page.on("pageerror", (error) => thrown.push(error.message));
+    await page.route("**/assets/worker-*.js", (route) =>
+      body === null ? route.fulfill({ status: 404, body: "" }) : route.fulfill({ contentType: "text/javascript", body }),
+    );
+    await page.goto("/");
+    await expect(page.locator("#notice")).toHaveText(new RegExp(`^The match stopped: .*${said}`));
+    await page.waitForFunction(() => "__shambleReport" in window);
+    expect((await report(page)).errors).toBe(1);
+    expect(thrown).toEqual([]);
+  });
+}

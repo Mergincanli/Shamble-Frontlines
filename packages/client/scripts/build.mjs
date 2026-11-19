@@ -36,8 +36,15 @@ const clientDir = path.join(root, "packages/client");
 const pkgDir = path.join(root, "packages/sim-worker/pkg");
 const targetDir = path.join(root, "target");
 const wasmFile = path.join(targetDir, "wasm32-unknown-unknown/release/sim_wasm.wasm");
-/** Variables through which cargo's or the tool's settings can be changed from outside with no diff in the repository. */
-const CARGO_OVERRIDES = /^(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC_WRAPPER|RUSTC|CARGO_(BUILD|PROFILE|TARGET)_.*|WASM_BINDGEN_.*|RUST_LOG)$/;
+/**
+ * Variables through which cargo's or the tool's settings can be changed from outside with no diff in the repository.
+ * Not refused: the two that name the build folder, which `--target-dir` below overrides. Not covered: cargo's config
+ * files outside the repository (the quality gate's flag check).
+ */
+const CARGO_OVERRIDES = new RegExp(
+  "^(?!CARGO_(BUILD_)?TARGET_DIR$)(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC|RUSTC_(WORKSPACE_)?WRAPPER|RUSTUP_TOOLCHAIN|" +
+    "CARGO_(BUILD|PROFILE|TARGET)_.*|WASM_BINDGEN_.*|RUST_LOG)$",
+);
 
 /** The tool's absolute path, after its file was compared with the recorded values. */
 function checkedTool() {
@@ -56,7 +63,7 @@ export function buildWasm() {
     throw new Error(`Cargo.lock records wasm-bindgen ${locked} and wasm-bindgen-tool.mjs the tool ${WASM_BINDGEN_TOOL.version}`);
   }
   checkCli(execFileSync(checkedTool(), ["--version"], { encoding: "utf8" }), locked);
-  // The Wasm players get is built with the manifests' settings alone (the overflow checks, the optimisation level,
+  // The Wasm players get is built with no setting from the environment (the overflow checks, the optimisation level,
   // the target's features), and into this repository's own target folder, which is where it is read from below.
   const overrides = Object.keys(process.env).filter((name) => CARGO_OVERRIDES.test(name));
   if (overrides.length > 0) throw new Error(`build settings from the environment are refused: unset ${overrides.join(", ")}`);

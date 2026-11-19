@@ -70,6 +70,7 @@ describe('what it serves', () => {
     expect(answer.headers['content-type']).toBe('text/html; charset=utf-8');
     expect(answer.headers['x-content-type-options']).toBe('nosniff');
     expect(answer.headers['cache-control']).toBe('no-store');
+    expect(answer.headers['cross-origin-resource-policy']).toBe('same-origin');
     expect(answer.headers['content-security-policy']).toBe(CONTENT_SECURITY_POLICY);
     expect(CONTENT_SECURITY_POLICY).toContain("default-src 'none'");
     expect(CONTENT_SECURITY_POLICY).not.toMatch(/'unsafe-inline'|'unsafe-eval'|blob:|data:/);

@@ -35,12 +35,15 @@ export interface RenderCounters {
   readonly lines: number;
   readonly geometries: number;
   readonly textures: number;
-  /** Compiled shader programs (pipelines), which the rendering draft's counts gate names too. */
+  /** Compiled shader stages (three counts a pipeline's vertex and fragment stage as two); the counts gate names it. */
   readonly programs: number;
 }
 
 export interface Picture {
-  /** Sets the renderer up on the canvas; resolves once it can draw (`await renderer.init()`). */
+  /**
+   * Sets the renderer up on the canvas; resolves once it can draw (`await renderer.init()`). From then on the
+   * picture reports its renderer's errors (a lost device among them) as error events on the window.
+   */
   start(canvas: HTMLCanvasElement, options: { readonly forceWebGL: boolean }): Promise<PictureInfo>;
   /**
    * Runs `frame` once per display frame, on the renderer's own loop, with the frame's time (`performance.now()`).

@@ -97,9 +97,10 @@ impl Sim {
 
 #[wasm_bindgen]
 impl Sim {
-    /// Creates the match. `seed` is 32 bytes the Worker drew; `mode` is `MODE_LOCAL` (a `u32`, so that the glue cuts
-    /// nothing off the number the host passes); `pad_bytes` pads the block for
-    /// the hand-off readings (the game passes 0); `now_ms` is the host's time now.
+    /// Creates the match. `seed` is 32 bytes the Worker drew; `mode` is `MODE_LOCAL` (a `u32`: a whole number below
+    /// 2^32 arrives as the host passed it, and JavaScript turns anything else into one first, so the host passes the
+    /// constant); `pad_bytes` pads the block for the hand-off readings (the game passes 0); `now_ms` is the host's
+    /// time now.
     ///
     /// # Errors
     /// As `Sim::create`, as a JavaScript `Error` with the reason in plain words.

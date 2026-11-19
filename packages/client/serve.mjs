@@ -47,6 +47,7 @@ export const CONTENT_SECURITY_POLICY =
 const COMMON_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
   'Cache-Control': 'no-store',
+  'Cross-Origin-Resource-Policy': 'same-origin',
   'Content-Security-Policy': CONTENT_SECURITY_POLICY,
 };
 

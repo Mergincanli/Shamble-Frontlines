@@ -59,7 +59,11 @@ export async function boot(): Promise<void> {
     const problem = link.receive(event);
     if (problem !== "") stop(problem);
   });
-  worker.addEventListener("error", (event) => stop(event.message === "" ? "the Worker failed" : event.message), { once: true });
+  worker.addEventListener("error", (event) => {
+    // A script that does not load gives an event with no message. Cancelled, so the window does not count it again.
+    event.preventDefault();
+    stop(event.message || "the Worker failed");
+  }, { once: true });
   link.start(flags.padBytes);
 
   const frames = __SHAMBLE_DEVTOOLS__ ? new FrameTimes() : null;
