@@ -1102,3 +1102,69 @@ item 5's hand lines and `node --check`.
   at 14:57 and 8.6G at 15:31; the shared target now holds 7,195 MiB by `du -sm`, after the cold rebuild of both
   builds' tests, both release labs and both wasm builds). Above the floor, so A starts; B starts only if `df` then
   shows at least 4,096 MiB, else I stop and report (brief section 4 rule 6: no clean, pack or delete is mine).
+- **End check A** (.gate/u4f/w4-end-check-a2.log, `-x`, 15:43:29-16:00:09 UTC, exit 0; free 4,540 MiB at the start;
+  HEAD b25b96a; diff 2f07abc2275887936f014184e1aa0c96289f321b6f78b591db66dadbf2803fad, untracked
+  1a767d5b4a3febbc8886e11f2c340db7f94382ae3bca9bbe7623847890bee5de): the six builds exit 0; fmt 0.9 s, clippy 4.6 s,
+  clippy-wasm32 1.1 s, doc 6.3 s, **test 882.8 s: measured 634 passed (base 552: +82), bites 731 (base 632: +99), 0
+  failed, 0 reported a skip**; deps 1.7 s (143 crate files; "no bite id is in two crates' sources"); wasm 54.5 s
+  (27,000 ticks, 0 mismatching both ways; hash-map and std-sin caught); refs 1512 tracked files; marks 81; self 78 of
+  78; redact 10 of 10, 316 items, 0 findings; **"check: all 11 steps pass"**. Provenance: every npt-* crate "Compiling
+  ... (/home/user/Shamble-Frontlines/.claude/worktrees/agent-a5b1297a320917dfb/spikes/netcode-proof/crates/...)"
+  (npt-bots, -client, -lab, -room 4 each). The test step 882.8 s against 1,207 s: under (builder 3's A and B: 692.1
+  and 685.6 s). The run ended 1 s before the org's spend-limit cut (16:00:10 UTC); resumed 17:43 UTC by the
+  coordinator, who checked: no process left, the worktree's runner hashes equal A2's start, no plant in place, 4,509
+  MiB free.
+- End check B starting (17:4x UTC): `df -BM /home/user` 4,509 MiB available (413 above the floor); one `-x` call,
+  .gate/u4f/w4-end-check-b.log, the same seven commands, a 3,600 s background limit. No edit while it runs.
+- **End check B** (.gate/u4f/w4-end-check-b.log, `-x`, 17:44:46-18:04:57 UTC, exit 0; free 4,507 MiB at the start;
+  HEAD b25b96a; diff 2f07abc2..., untracked 1a767d5b...: equal to A's, no edit between): the six builds exit 0; fmt
+  0.8 s, clippy 38.2 s, clippy-wasm32 4.8 s, doc 16.4 s, **test 834.0 s: 634 and 731 passed, 0 failed, 0 skipped**;
+  deps 2.5 s ("no bite id is in two crates' sources"); wasm 53.4 s (27,000 ticks, 0 mismatching both ways); refs 1512;
+  marks 81; self 78 of 78; redact 316 items, 0 findings; **"check: all 11 steps pass"**. Provenance as A's (every
+  npt-* crate compiled from this worktree's crates/). Test step 834.0 s against 1,207 s: under.
+- **Counts against U4f's share** (deltas on 5b29296b's 552 and 632): measured +82 against +73; bites +99 against +88.
+  The pass's own +4 in both builds (builder 3's +78 and +95 before): f25 (ii), U4F-Q9 (a)'s flood test, f15's
+  interval case, EA-U4F-6's walk test. **Negative cases, by row: 46 against the share's 45:** f3 2, f4 1, f7 1, f8 3,
+  f10 8, f11 2, f12 5, f13 4, f14 3, f15 5, f19 1, f20 1, f21 1, f24 1, **f25 2** (f25 and the pass's f25 (ii)), f26
+  1, f27 1, f35 1, f39 1, U4F-Q6 (b)'s Pong field 1, **U4F-Q9 (a) 1** (the pass's flood test). Not counted as negative:
+  f15's interval case (the forger's own parameter, no hostile input to the room); f4's negative half is U4e's e9
+  (pump.rs:193-212), named in f4's doc, not a new test.
+- **`--list` lines** (.gate/u4f/w4-list.log, `-x -k`, 18:05 UTC, every call exit 0): "f25_ii_an_older_command_past_the_
+  codecs_tick_step_is_left_out: test" (client carry80, 5 tests); "input::tests::q9_a_the_kept_window_never_holds_
+  more_than_k_under_a_flood_of_new_sequences: test" (room lib, 24 tests); "tests::f15_a_forgers_interval_below_2_is_
+  refused: test" (bots lib, 14 tests); "scenario::tests::ea_u4f_6_one_second_of_the_sims_full_walk_is_move_cm_s: test"
+  (lab bin 80 tests, and with `--features bites` 91).
+- **Each new test alone** (.gate/u4f/w4-times.log, `-x -k`, 18:05-18:06 UTC, measured build, "finished in"): the
+  reference `c62hb_p2_short_every_measured_lost_tick_is_explained` 13.59 s, so the line is 27.18 s; f25 (ii) 0.00 s;
+  q9_a 0.00; f15's interval case 0.00; EA-U4F-6's walk 0.00. Changed, for the record: f32 (ii) with its stall run
+  0.03 s, f5 0.16 s, f21 (its never-ack run now under the controller) 11.69 s, lab f19 8.64 s. All under the line.
+- **Item 4** (.gate/u4f/w4-item4.log, `-x`, 18:07 UTC, exit 0): `cargo test --locked -p npt-server --all-features`:
+  lib 0, main 0, gap 6, loopback 6, pump 20, schedule 17 passed, 0 failed.
+- **Item 5** (.gate/u4f/w4-hand.log, `-x -k`, 18:08 UTC, every command exit 0): s22 (`... --profile P0 --controller 1
+  --suite never-ack --role measured --marks PM-0001-2,PM-0001-22`, release): "hand-s22 SS P0 seed 1: 180 ticks; lead
+  the controller's, at most 9; ... rewinds refused 33; ... overflow resyncs 1"; s22b (bites, `--role bite --bite
+  PM-0001-22/unbounded`): "hand-s22b SS P0 seed 1: 1080 ticks (900 after, ...); lead the controller's, at most 9; ...
+  rewinds refused 1018; ... overflow resyncs 0"; `node --check` of c-u4f-runs.mjs and c-u4f-r2.mjs exit 0.
+  FP6's checks: both room.jsonl headers hold `"controller_max_lead_count":9` (and `lead_bound_ms` 400,
+  `event_queue_cap_count` 1600), and no header of the four (room and lab, both runs) holds `lead_ticks_count` (grep -c
+  0). s22: `ack_starved_headroom_count` reaches 0 once (t 91), never below; one `overflow_resync` (slot 0, t 91), then
+  `session_end` `"ended":"kicked"` (slot 0, t 152, `overflow_resyncs_count` 1, `kicked_count` 1). s22b: no
+  `overflow_resync` and no `session_end` (its lab log's kinds: class_audit, client_counts x48, fate_log, reorder,
+  run_lengths); its headroom runs below 0 (to -3,765), the unbounded queue being the bite.
+- D10's read: `git diff --numstat b25b96a6 -- spikes/netcode-proof/marks spikes/netcode-proof/crates/judge` prints
+  only `20 0 spikes/netcode-proof/marks/SERIES.md` (U4f's new lines; the pass's three edits are inside them).
+- Final tree: runner hashes (B's header) diff 2f07abc2275887936f014184e1aa0c96289f321b6f78b591db66dadbf2803fad,
+  untracked 1a767d5b4a3febbc8886e11f2c340db7f94382ae3bca9bbe7623847890bee5de; `git status --short`: the 20 modified
+  files under spikes/ and docs/ as at the start, plus this notes file, and the 9 untracked new files (as at the
+  start). No plant in place. Disk 4,388 MiB free at 18:08 UTC.
+
+### Return (builder 4, 18:10 UTC)
+
+Every FP item FP1-FP19 done as named, with its acceptance check met; the items' lines above hold the files and logs.
+Departures: none from a named fix. Notes on means: FP7 writes the header param in `run()` (the room exists only
+there); FP2's stall case sits inside f32 (ii) (+0 tests) and the trace harness lets the host make its overdue steps
+at once after a stall; FP5's case is a new test (+1). Process notes: the notes are in W's copy (the harness refused
+the main folder's file twice); one check.mjs partial call ran under the shared lock and was re-run under `-x`
+(FP9); end check A's first attempt was stopped by my 600 s background limit, re-run whole as A2. Not done: no
+snapshot with worktree_patch.py (not in my prompt), no judge call on the hand runs (FP6 names none), FP20 (the main
+session's).

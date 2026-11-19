@@ -176,7 +176,11 @@
 - **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
   `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
   final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,276 B, 29 files: the one snapshot until the merge.
-- **Builder 4 (the fix pass) RUNNING** from 14:57 UTC, cut 16:00:10-17:44 (A2 passed; B, items 4 and 5 next) (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
+- **Builder 4 DONE 18:08 UTC:** FP1-FP19 each met its check, no departure; end checks A2 and B all 11 steps (634 / 731,
+  +82 / +99; negatives 46 of 45; test step 882.8 and 834.0 s); items 4 and 5 done; 6,425 added (the pass +212); notes
+  at u4f-build.md:867-1170; final snapshot wip/u4f-build.patch **286aac60…** (base b25b96a, 29 files; hashes 2f07abc2…
+  / 1a767d5b…). **The advisor's check of the pass RUNNING** (agent a3e21b47cc9e7c11e; advisor-u4f-pass.md), then the
+  merge on M1-M9. Earlier: builder 4 RUNNING from 14:57 UTC, cut 16:00:10-17:44 (agent a5b1297a320917dfb, general, opus, xhigh; its isolation
   worktree under .claude/worktrees/, branch u4f-fix1 from b25b96a plus the snapshot; logs .gate/u4f/w4-*). **If cut:**
   SendMessage to it; first check its worktree's runner hashes and plants against its notes block.
 
