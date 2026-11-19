@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 11:45 UTC (from the clock)
+- **Last update:** 2026-11-19 11:51 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -534,17 +534,20 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     follow-up); L6 the Worker's type check runs without `--types vite/client` (the plan's printed command has it and
     fails with the lib check on).
 
+61. **The verifier's re-check on b27323a: PASS** (M1 closed for its case; a new Low L7: the build tells the Worker's
+    chunk by its file name; a follow-up, in the archive's block as VF-L7). **The zip:** built from 7d8e2de2e (245,260
+    bytes, sha256 b458b7ca734ac0fa20027818f41da7b9946fd0134f0bcc61ba1427df3c93e8ab; `.gate/cs2-first-page/zip/`),
+    the browser tests 12 passed against its unpacked copy (11:46 UTC). CI on 7d8e2de: toolchain 222 and 223, gate
+    925: success (gate 924 was still running at 11:47 UTC). **The report: commit 7f2a2a9**
+    (`docs/reports/2026-11-19-cs2-first-page.md`; the map check and the gate pass).
+
 ## Current step
-61. **The verifier re-checks M1 on b27323a** (in the scratch worktree, whose code equals b27323a file for file; no
-    browser runs). **The main session meanwhile:** the zip at the pushed head (a clean development build, then
-    `make-zip.py`, the browser tests against the unpacked copy), then the report (fill `report-draft.md`: the
-    outcome, the notes' commit, CI's runs, the verdicts, the docs list by script from
-    `docs-keeper-moved-lines.md`, M2's symbols, L1 to L3 and L6, "Decisions needed": none, "For Mustafa": the Brave
-    steps of the README and his go), written to `docs/reports/2026-11-19-cs2-first-page.md` (then the map check
-    passes); then the advisor agent on the final head; its verdict into the pull request's description; the last
-    commit deletes `.checkpoints/cs2-first-page*` and carries no skip mark; mark #61 ready; **stop for his Brave
-    check and his go.** Then remove the worktree `.gate/cs2-plants` without force (undo its edits first with
-    `git apply -R`).
+62. **Finishing:** this save is the commit that still holds the notes. Then by hand: the last commit deletes
+    `.checkpoints/cs2-first-page*` (no skip mark) and is pushed with `git push -u origin
+    claude/wonderful-hamilton-jdmlnf`; the advisor agent reviews that head (the notes read with `git show` from
+    this commit); its verdict and the notes' commit go into pull request #61's description; CI on that head is
+    read; #61 is marked ready; the zip and a screenshot are sent in the chat; **stop for his Brave check and his
+    go** (merge only with the GitHub tool, on his go in chat for that head, after the advisor agent's APPROVE).
 
 ## Next steps
 1. See "Current step". No reviewer runs the browser project or `build.mjs` in the main folder while the main session

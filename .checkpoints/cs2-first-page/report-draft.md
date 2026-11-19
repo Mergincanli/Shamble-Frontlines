@@ -12,8 +12,9 @@ small server that lets Mustafa open a build in Brave from a zip.
 
 ## Outcome
 **DONE, waiting for his Brave check and his go.** The first page builds, runs and is tested in this container on
-the WebGL 2 fallback; two review rounds, the verifier (PASS) and the advisor agent are through; the zip for Brave is
-built from commit 7d8e2de2e and sent in the chat.
+the WebGL 2 fallback; two review rounds and the verifier (PASS, and PASS again on the last fix) are through; the advisor agent's verdict
+on the final head stands in the pull request's description; the zip for Brave is built from commit 7d8e2de2e and
+sent in the chat with this report.
 
 What a person sees: an empty ground with a grid, in placeholder colours (not the look), and a corner readout: the
 backend, ticks at 30 a second, blocks, frames, errors, the last pause, the commit. **In this container every run was on
@@ -295,7 +296,10 @@ the code byte-equal). Two Mediums and six Lows:
 - **M1, fixed in b27323a:** the verifier planted a `WebAssembly.validate` call in the page's visibility handler, and
   nothing caught it: only the two first-page tests read the count of calls, at one moment, and the build scanned the
   page's chunks for the Wasm's glue only. The build now refuses any page chunk that names `WebAssembly` (today none
-  does); the verifier's plant makes the build exit 1. ⟦RECHECK⟧
+  does); the verifier's plant makes the build exit 1. **Its re-check on b27323a: PASS**, M1 closed
+  for the case it reported (both builds refuse its plant). One new Low (L7): the build tells the Worker's chunk by
+  its file name (`worker-*`), so a lazily loaded page module named worker-something is not scanned (its second
+  plant passed both builds): a follow-up for change-set 3, with engine-architect's N6.
 - **M2, fixed in this report:** the list of departures from the plan's symbols was incomplete (now whole, above).
 - Lows: three wordings of this report corrected (one cast, not two; the allocation per frame; the "Not verified"
   list); the policy header is asserted on the 200 answer only, and the build's refusal of environment settings has
@@ -344,8 +348,9 @@ reviews the head this report is part of).
 - The e2e specs are run by Playwright but type-checked by no tool. CI type-checks only `packages/types`: the page's
   and the Worker's type checks ran only here. CI cannot run the boundary tests either (it does not build the Wasm).
 - The proof of "zero Wasm calls by the page" is read by the two first-page tests at one moment; since b27323a the
-  build also refuses page code that names `WebAssembly`. A call hidden from both (a name built at run time) would
-  pass: nobody writes that by accident.
+  build also refuses page code that names `WebAssembly`. Two ways still pass both: a name
+  built at run time (a reviewer would see it at once), and a page module whose file name starts with `worker-`,
+  loaded lazily (the verifier's L7 above; a follow-up).
 - GitHub's own check of the tool's file (`gh release verify-asset`) was not run; it comes with the CI-WASM pull request.
 - The small server has run on Linux only; the zip route is Windows (his check). A tab hidden while the Wasm is still
   loading has no test.
@@ -358,7 +363,7 @@ reviews the head this report is part of).
 - **For change-set 3's plan:** netcode-architect's seven Lows (who picks the blend fraction; the hidden-tab rule from
   the mode once online lands; the seed as an authority-only section written last; `step(nowMs)`; the page's per-frame
   number renamed; the Pacer throws on a due time that is not finite; a start tick); engine-architect's (one owner
-  for "the match is over"; the endpoint's state into `client-endpoint`; `newest_input` goes; `isWorkerToPage`; the
+  for "the match is over"; the build's two checks tell the Worker's chunk by its name (the verifier's L7); the endpoint's state into `client-endpoint`; `newest_input` goes; `isWorkerToPage`; the
   Worker's counters in production: decide and record); the random-number library question (his words: read rand's
   upgrade guide for 0.10 and why `chacha20` 0.10.0 and 0.10.1 were withdrawn).
 - **For change-sets 5 and 6:** the allocation mark measured on a named machine and another way (the whole page's
