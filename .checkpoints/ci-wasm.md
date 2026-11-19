@@ -185,9 +185,10 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   3's plan).
 
 ## Running work
-- Saver: background task bpduzpt3j, started 16:08:58 UTC, stops by 17:58 UTC (110 minutes on); last check 17:34 UTC:
-  running, its last line "saved and pushed 1817b8a" (16:59:12 UTC). **It must be started again after 17:58 UTC**
-  (the same command; record the new task id here).
+- Saver: background task bxshyzuei · output
+  `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/bxshyzuei.output` · started
+  17:59 UTC · stops by 19:49 UTC (110 minutes on) · last check 17:59 UTC: ok (its first line read). The first saver
+  (bpduzpt3j, 16:08:58 UTC) ended at 17:59:01 UTC with "watch stopped: time is up" after "nothing to save".
 - Agents (both Opus 5.5 at effort max, in the background, started 17:54 UTC): the advisor agent, part "plan" (the
   plan review; notes `ci-wasm/advisor-plan.md`); security-auditor, part "ci-text" (the CI text before it goes to
   him; notes `ci-wasm/security-auditor-ci-text.md`). A restart gives each the same task again.
