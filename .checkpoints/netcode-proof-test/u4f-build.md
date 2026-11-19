@@ -864,3 +864,241 @@ rev 3.3 (sha256 135325a0...) and the main session's prompt (which wins where the
   suite, the attribution, the twins, f16's 24 through one helper, f22, f23, f33's 13 on hand-made records); SERIES.md
   about 5; c-u4f-r2.mjs about 10; c-u4f-runs.mjs about 150; f28's two B halves about 40: about 1,400 to 1,550, so U4f
   whole at about 7,600 to 7,800 added lines.
+
+## Fix pass (round 1): builder 4
+
+Task: U4f's fourth builder, the fix pass after review round 1: FP1 to FP19 of the advisor's ruling
+(advisor-u4f-r1.md:156-273), in its order, each with its named acceptance check; the end checks (:287-299, brief
+section 6). Commit nothing, push nothing.
+
+**Where these notes live (a departure, for the main session):** the prompt says to append to the main folder's
+u4f-build.md by its absolute path. The harness refused that Edit ("This agent is isolated in the worktree ... Edit the
+worktree copy of this file instead of the shared-checkout path"). I did not route around it with a shell write (the
+prompt's Write/Edit-only rule). So this block is in W's copy,
+/home/user/Shamble-Frontlines/.claude/worktrees/agent-a5b1297a320917dfb/.checkpoints/netcode-proof-test/u4f-build.md,
+which was byte-equal (`cmp`) to the main folder's file before this block (80,449 bytes, :1-866): the block can be
+copied over whole. It is outside spikes/netcode-proof, so the runner's tree hashes do not see it.
+
+### Start (done, 14:58 UTC)
+
+- Worktree W: /home/user/Shamble-Frontlines/.claude/worktrees/agent-a5b1297a320917dfb. `git merge --ff-only
+  b25b96a6...`: fast-forwarded (b763ba3..b25b96a, exit 0); `git switch -c u4f-fix1 b25b96a6...`: "Switched to a new
+  branch 'u4f-fix1'"; `git log -1 --format=%H`: b25b96a63f1f06aff73f4b1e6ab767e8f0a68df5 (LANE).
+- wip/u4f-build.patch sha256 74ae26aa29c229d64e884c8fa2b88c45678cb3c919448b6a7ae20c7b747eadb1 (matches); `git apply
+  --check` exit 0; `git apply` exit 0 (the one git write).
+- Runner hashes before any edit (.gate/u4f/w4-start.log:3): diff 54cb6faaf0dac1ce..., untracked e8dc3663a8f3df5e...:
+  equal to review-pre.log:3. Free 11,748 MiB.
+- Read whole: the ruling advisor-u4f-r1.md (407 lines) and u4f-review-r1-full.md (332 lines); advisor-u4f-build1.md
+  :155-246; u4f-run.sh; the brief's sections 1, 2.10 and 6.
+- Size at start: 3,504 insertions (20 files, `git diff --shortstat b25b96a6 -- spikes/ docs/`) + 2,709 lines in 9 new
+  files = 6,213 (as the prompt). The guard: past 500 added in the pass (about 6,713), stop at that item's end.
+- `df -h /home/user` at start: 12G avail (71 %).
+
+### Plan
+
+FP1 to FP19 in the ruling's order, one item at a time: read the sites; where the ruling asks, a fails-first runner
+call on the reviewed code (its log kept: the new test added first, run, then the fix); the fix by Edit; its
+acceptance run; fmt --check and clippy on the crates touched; then its line here and SIZE-CHECK. Plants (FP4, FP15)
+by Edit in place, one `-x -k` call, restored by Edit, sha256 checked against the pre-plant hash. Then the end checks
+on one tree: check.mjs twice (`df` first, one `-x` call in w3-end-check-a2.log's form), each new test alone, item 4,
+item 5's hand lines and `node --check`.
+
+### Items
+
+- **FP1 (RR-U4F-1, RR-U4F-3), done 15:01 UTC.** Files: client/src/lib.rs (`step()` encodes the `Input` by value
+  through one closure, rebuilt only on the error path, no `input.clone()`; the comment states the codec's two rules;
+  `drop_unencodable` keeps the longest newest run that encodes whole by trial encodes, the rest counted in `left_out`;
+  `twin_left_out`'s doc names both causes), client/tests/carry80.rs (new
+  `f25_ii_an_older_command_past_the_codecs_tick_step_is_left_out`). Fails first: .gate/u4f/w4-fp1-first.log (15:00
+  UTC, exit 101): "assertion `left == right` failed: Input { ack_tick: 405, ack_groups: 1, commands: [] }, left: (405,
+  0), right: (405, 1)". Acceptance: .gate/u4f/w4-fp1.log (15:01 UTC, exit 0): fmt --check 0; carry80 "5 passed; 0
+  failed" (f25 and f25 (ii) ok); clippy `-D warnings` both builds 0. Added in the item: +23 (lib.rs +7 net, carry80
+  +16). SIZE-CHECK: 3,511 insertions + 2,725 new-file lines = **6,236** (pass +23).
+- **FP2 (NC-U4F-1), done 15:06 UTC.** Files: client/src/lib.rs (`plan()`'s arm `Some(t) if dist(goal, t) >
+  Limits::REDUNDANCY_CAP as i64 => goal` before the 2-a-step arm; `plan()`'s, `with_clock`'s and `stamps_skipped`'s
+  docs: a goal past the cap, a clock reset or a host stall, moves the target at once), client/tests/trace.rs (the
+  trace's `run` gains `stall` (no input or step for a span, then the host makes the steps due at once:
+  `host = next_due_ns.max(host)`, unchanged for every other run, whose next due time is always later) and
+  `check_from` (the lead and each stamp's first arrival checked from the n-th step at or after a host time, by
+  sequence: the n-th command given is sequence n); f32 (ii) asserts, after its 12 s jump, `stamps_skipped() > 0`, the
+  least lead from 2 s plus 10 steps after it at least 1, and every stamp first arriving from then on before its tick;
+  a stall run in the same test (P0, 1 s at 10 s, seed 32) asserts skipped above 0 and every stamp from the third step
+  after the stall on time; +0 tests). Fails first: .gate/u4f/w4-fp2-first.log (15:05 UTC, exit 101): "f32 (ii): most
+  ahead 7, resets 20, skipped 0, least lead Some(-287), late 340 of 340; stall: skipped 0, late 24 of 296" (both cases
+  fail; both runs made before the asserts). Acceptance: .gate/u4f/w4-fp2b.log (15:06 UTC, exit 0): fmt 0; trace "7
+  passed; 0 failed": "f32 (ii): ... skipped 339, least lead Some(3), late 0 of 170; stall: skipped 29, late 0 of 269";
+  f36 "skipped 0"; f32 (i) passed (asserts skipped 0 over its 1,000 cases); clippy both builds 0. f5 asserts no
+  `stamps_skipped` (the seat read that it did): FP3 prints it per profile. w4-fp2.log (15:05 UTC): the same trace
+  figures and `cargo test -p npt-client` whole exit 0, fmt exit 1 there (two diffs, rewritten shorter by Edit).
+  Added in the item: +64 (lib.rs +6, trace.rs +58). SIZE-CHECK: 3,517 + 2,783 = **6,300** (pass +87).
+- **FP3 (TE-U4F-1), done 15:07 UTC.** File: client/tests/trace.rs (f5: late = arrived after its tick, counted apart
+  from missing; late at most 1 % on all six profiles; the combined share (not on time) at most 1 % on the five
+  without a burst; the line prints late, missing, not on time and `stamps_skipped` per profile; the 0.03 literal gone
+  (Grep `0\.03|budget`: 0); the doc says what the code checks). Acceptance: .gate/u4f/w4-fp3b.log (15:07 UTC, exit
+  0): fmt 0, f5 passed, clippy both builds 0; per profile (late, missing, not on time, skipped): P0 0.00000, 0,
+  0.00000, 0; P1 0.00000, 0, 0.00000, 0; P2 0.00000, 0, 0.00000, 0; **B1 0.00336, 23, 0.01879, 0**; P3 0.00000, 0,
+  0.00000, 0; P4 0.00067, 0, 0.00067, 0 (so f5 keeps `stamps_skipped` 0 after FP2, by its line). w4-fp3.log: the same
+  figures, fmt exit 1 (one diff, rewritten shorter by Edit). Added: +4. SIZE-CHECK: 3,517 + 2,787 = **6,304** (pass
+  +91).
+- **FP4 (TE-U4F-2), done 15:09 UTC.** Files: room/src/input.rs (new in-crate test
+  `q9_a_the_kept_window_never_holds_more_than_k_under_a_flood_of_new_sequences`: 10,000 new sequences from 60,000,
+  across the u16 wrap, `kept.len() <= KEPT_WINDOW` after each and equal from the 16th on; +1 test in both builds, a
+  negative case), room/tests/commands.rs (f12 (iv): with 1 to 20 offered, a changed copy of seq 5 is kind 3 and one
+  of seq 4 is `seq_outside_window`, forged `[0, 0, 1, 0, 0, 0, 0, 0]` and outside 1, under both options; +0).
+  Acceptance: .gate/u4f/w4-fp4b.log (15:08 UTC, exit 0): fmt 0; q9_a "1 passed" measured and `--all-features`; f12
+  "5 passed" in both builds; clippy both builds 0 (w4-fp4.log: the same passes, fmt exit 1, one diff rewritten by
+  Edit). Plant: input.rs sha256 before ea382f2700d92812dbd0478885ee719c30f841b7373c765cd8d02d13ee0b4e1b; the three
+  lines of `pop_front` (offer's `if self.kept.len() >= InputBuffer::KEPT_WINDOW { self.kept.pop_front(); }`) removed
+  by Edit; .gate/u4f/w4-fp4-plant.log (`-x -k`, 15:08:56-15:08:57 UTC, exit 101): "test
+  input::tests::q9_a_the_kept_window_never_holds_more_than_k_under_a_flood_of_new_sequences ... FAILED", panic "16:
+  17"; restored by Edit, sha256 after ea382f27...e0b4e1b (equal). Added: +20 (input.rs +16, commands.rs +4).
+  SIZE-CHECK: 3,533 + 2,791 = **6,324** (pass +111).
+- **FP5 (SEC-U4F-1), done 15:10 UTC.** File: bots/src/lib.rs (`forger` returns `None` for `every < 2`, in place of
+  `every.max(1)`; its doc states the precondition: kinds 2 and 5 forge against the previous command, which must have
+  been accepted, which every interval of 2 or more gives on a lossless profile; new test
+  `tests::f15_a_forgers_interval_below_2_is_refused` in f15's module: `forger(k, 1, 12)` None and `forger(k, 2, 12)`
+  Some for kinds 1, 2, 4, 5, 6: +1 test in both builds; no caller passes 1: Grep `\.forger\(`). Acceptance:
+  .gate/u4f/w4-fp5.log (15:10 UTC, exit 0): fmt 0; `cargo test -p npt-bots --lib f15_` "6 passed; 0 failed" (the new
+  case and the five kinds); clippy both builds 0. Added: +14. SIZE-CHECK: 3,547 + 2,791 = **6,338** (pass +125).
+- **FP6 (NC-U4F-2), done 15:12 UTC (its hand lines at the end checks, item 5).** Files: ops/runs/c-u4f-runs.mjs
+  (SETS[22].args `["--profile", "P0", "--controller", "1", "--suite", "never-ack"]`, so its bite run, which takes
+  `set.args` too, runs it as well; the header's -22 sentence names U4f's controller and that the bite runs under it),
+  lab/src/scenario.rs (`never_ack_short`'s settings gain `--controller 1`, its doc says why). Check:
+  .gate/u4f/w4-fp6.log (15:11-15:12 UTC, exit 0): fmt 0; `node --check ops/runs/c-u4f-runs.mjs` 0; f21 and f14 (iii)
+  (= f28's -22 half) "2 passed" in the measured build, 12.23 s; the short run's summary "lead the controller's, at
+  most 9 ... overflow resyncs 1". Both builds' end checks and the two hand lines follow. Added: +2. SIZE-CHECK: 3,548
+  + 2,792 = **6,340** (pass +127).
+- **FP7 (SEC-U4F-2 = TE-U4F-6, EA-U4F-5's header half), done 15:14 UTC.** Files: lab/src/scenario.rs (the header's
+  `lead_bound_ms` is written in `run()` from `server.room.lead_bound().0`, beside `event_queue_cap_count` (also read
+  from the live room), and no longer in `params()`, which runs at parse time before the room exists; the means of the
+  named fix, not a departure), marks/SERIES.md (U4f's new row: its "Written by" cell reads "npt-lab (from the room's
+  `lead_bound()`)"; its meaning cell unchanged). Acceptance: .gate/u4f/w4-fp7.log (15:13 UTC, exit 0): fmt 0; f6 A and
+  B "2 passed" (each asserts `lead_bound_ms` 400, scenario.rs:3639); clippy both builds 0; Grep `LEAD_BOUND_MS` in
+  scenario.rs: 0 matches. Added: +3 net (6 in, 3 out). SIZE-CHECK: 3,551 + 2,792 = **6,343** (pass +130).
+- **FP8 (EA-U4F-8), done 15:14 UTC.** File: ops/runs/c-u4f-r2.mjs (the header comment's bullet, two physical lines,
+  and r2.txt's head line in `lines`, both reading "-21's rows (p2-p4, p8, p9, p13, p15, p16, p18-p20) from a commit
+  before U4f2's merge are an early read of the built suites, not -21's 5.3 record (advisor-u4f-stop.md:90-94)").
+  Acceptance: .gate/u4f/w4-fp8.log (15:14 UTC, exit 0): `node --check` 0; `grep -n "early read"` finds :24 (header)
+  and :145 (r2.txt's head). Added: +3. SIZE-CHECK: 3,551 + 2,795 = **6,346** (pass +133).
+- **FP9 (S4, S5, S6), done 15:16 UTC.** Files: lab/src/scenario.rs (S4: USAGE gains `[--lag-hold-ms <ms>]
+  [--lag-every-ms <ms>] (with --suite lag-switch)`), marks/SERIES.md (S5: U4f's subsection title now reads "...
+  report-only rows that no check reads, but the `event.reorder.*` row, which the existing `reorder` rule reads"; a
+  title in U4f's own new subsection, no existing row touched), ops/runs/c-u4f-runs.mjs (S6: :7 reads "in R2's order
+  (advisor-u4f-stop.md:126-127: -47, -20, -22, then -21's)"). Acceptance: .gate/u4f/w4-fp9.log (15:15 UTC, exit 0):
+  fmt 0, `node --check` 0, the three greps hit (scenario.rs:1978, SERIES.md:372, c-u4f-runs.mjs:7); `node check.mjs
+  --only refs,marks` PASS (refs 1512 tracked files; marks 81). That check.mjs call ran under the shared lock, against
+  u4f-run.sh's rule (`-x` for a check.mjs run), so it was re-run under `-x`: .gate/u4f/w4-fp9-check.log (15:15:40 UTC,
+  exit 0) "check: all 2 steps pass". From here on every check.mjs and clippy call is `-x`. Added: +2. SIZE-CHECK:
+  3,552 + 2,796 = **6,348** (pass +135).
+- **FP10 (NC-U4F-3's docs), done 15:17 UTC.** Docs only: lab/src/scenario.rs (`CONTROLLER_MAX_LEAD`'s doc),
+  client/src/lib.rs (`with_clock`'s doc), room/src/input.rs (the kind-10 comment above :321-323's refusal): each says
+  the cap of 9 keeps every honest command inside option B's 8 only while the up delay is at least about 2 ticks
+  whenever the cap binds, which L1's bounded jitter always gives, other links C-U6-17's. Check: .gate/u4f/w4-fp10.log
+  (15:16 UTC, exit 0): fmt 0 on the three crates; grep `C-U6-17` hits scenario.rs:50, lib.rs:358, input.rs:317 (the
+  doc step runs at the end checks). Added: +5. SIZE-CHECK: 3,557 + 2,796 = **6,353** (pass +140).
+- **FP11 (EA-U4F-5's tie), done 15:18 UTC.** File: lab/src/scenario.rs (`CONTROLLER_MAX_LEAD` and its doc moved below
+  the `use` lines; `const _: () = assert!(CONTROLLER_MAX_LEAD as usize <= npt_room::InputBuffer::CMD_CATCHUP + 1 &&
+  CONTROLLER_MAX_LEAD < npt_sim::ticks_for_ms_at(npt_sim::TICK_HZ, Room::<Sim>::LEAD_BOUND_MS))`). Acceptance:
+  .gate/u4f/w4-fp11b.log (`-x`, 15:18 UTC, exit 0): fmt 0, `cargo build -p npt-lab` both builds 0, clippy `-D
+  warnings` both builds 0 (w4-fp11.log: the same builds and clippy 0, fmt exit 1 on the assert's line, rustfmt's
+  split applied by Edit). Added: +6. SIZE-CHECK: 3,563 + 2,796 = **6,359** (pass +146).
+- **FP12 (EA-U4F-1 in the open files), done 15:21 UTC.** Files: client/src/lib.rs (`ClientEndpoint::join_tick()`
+  removed; `plan()` reads the field; Grep `join_tick\(\)`: no caller), room/src/input.rs (`InputBuffer::KEPT_WINDOW`
+  pub(crate)), bots/src/lib.rs (f36 (ii) asserts `e.not_due()` 0, its doc names 2.2's bot rule: `not_due()` stays
+  public with this consumer), lab/src/scenario.rs (`FastClock` carries the fast behaviour's `fast_left_out()` beside
+  the kind-1 and kind-2 counts and writes each episode's `left_out_count`; the call site reads slot 0's
+  `Behaviour::fast_left_out`; f19's hand-made records check it (1) and its short run asserts it 0 in both episodes:
+  `fast_left_out()` stays public with this consumer), marks/SERIES.md (U4f's own `event.fast_clock.*` row gains
+  `.left_out_count`, its source and meaning). Acceptance: .gate/u4f/w4-fp12b.log (`-x`, 15:20-15:21 UTC, exit 0): fmt
+  0; clippy `-D warnings` on npt-client, npt-room, npt-bots, npt-lab, both builds, 0; f36 (ii) passed; `cargo test -p
+  npt-client` whole 0. w4-fp12.log (`-x`, 15:20 UTC): the same clippy 0; f19 and f28 fast-clock A and B "3 passed"
+  (f19's run: both episodes `"left_out_count": Number(0)`; f28's contract check finds the name's row); fmt exit 1 (one
+  diff in bots, the message shortened by Edit). Added: +4 net. SIZE-CHECK: 3,567 + 2,796 = **6,363** (pass +150).
+- **FP13 (EA-U4F-4), done 15:22 UTC.** File: bots/src/lib.rs (f18 and f15's kind-6 case read the extent the room
+  reads, `World::new(&scene, 1, FIRST).greybox().areas().rects[0]` as room.rs:544 does; f18 asserts each clamp point
+  inside it, f15's kind 6 that the forged aim lies outside it and inside the grid's ±32,767; FAR_CM's doc names f18).
+  Acceptance: .gate/u4f/w4-fp13.log (`-x`, 15:22 UTC): fmt 0; f18 and f15 kind 6 "2 passed"; clippy both builds 0;
+  `grep -n "12_800" crates/bots/src/lib.rs` exit 1, no match (so the runner's exit is 1, grep's). Added: +0 net.
+  SIZE-CHECK: 3,567 + 2,796 = **6,363** (pass +150).
+- **FP14 (EA-U4F-6), done 15:25 UTC.** File: lab/src/scenario.rs (new test
+  `scenario::tests::ea_u4f_6_one_second_of_the_sims_full_walk_is_move_cm_s`: TC's slot 0, whose home lies 60 m west
+  of the centre, clear of every box, building and plate (greybox.rs:92-150; scene.rs:262, :339-343), walks [-127, 0]
+  with no button for 30 `World` steps (1 s at 30 Hz); `logs::moved_um` of its start and end records equals
+  `MOVE_CM_S` x 10,000 µm (600 cm); +1 test in both builds). Acceptance: .gate/u4f/w4-fp14b.log (`-x`, 15:25 UTC,
+  exit 0): fmt 0; the test "ok" in the measured and bites builds (0.00 s); clippy both builds 0 (w4-fp14.log: the same
+  passes, fmt exit 1, two diffs, applied by Edit). Added: +38. SIZE-CHECK: 3,605 + 2,796 = **6,401** (pass +188).
+- **FP15 (TE-U4F-3), done 15:26 UTC.** File: room/tests/commands.rs (`bites::pm_0001_21_not_older_than_...` also
+  sends, on a bitten room under A, seq 1 at j + 2, a tick, then seq 2 at j + 1, a tick, and asserts the refusal
+  records read `[(2, 2)]`: still kind 2 under the bite; +0 tests). Acceptance: .gate/u4f/w4-fp15.log (`-x`, 15:25
+  UTC, exit 0): fmt 0; the ten -21 room and sim bite proofs `--all-features` "10 passed"; clippy `--all-features` 0.
+  Plant: input.rs sha256 before 50ee780a59a67c194c6bb1f16dc7cce1434ba0de4bcd2f09fc1dc14cff7454e6; :272 read as `let
+  newer = if r.not_older_than { true } else { d > 0 };` by Edit; .gate/u4f/w4-fp15-plant.log (`-x -k`,
+  15:26:06-15:26:07 UTC, exit 101): "test bites::pm_0001_21_not_older_than_lets_an_equal_tick_command_run ...
+  FAILED" (left `[]`, right `[(2, 2)]`), while `pm_0001_21_no_newer_tick_...` stays ok: the proof tells the two bites
+  apart; restored by Edit, sha256 after 50ee780a...7454e6 (equal). Added: +7. SIZE-CHECK: 3,605 + 2,803 = **6,408**
+  (pass +195).
+- **FP16 (TE-U4F-4), done 15:27 UTC.** File: client/tests/carry80.rs (f24, from the newest 130: a refused header at
+  newest + 33 is dropped, `refused()` + 1, the newest unchanged, no hash; one at newest + 32 is taken, the sentinel
+  `(162, 0)` filed, the newest 162; so a bound of 31 or 33 fails it; +0 tests). Acceptance: .gate/u4f/w4-fp16.log
+  (`-x`, 15:26 UTC, exit 0): fmt 0; f24 ok; clippy 0. Added: +9. SIZE-CHECK: 3,605 + 2,812 = **6,417** (pass +204).
+- **FP17 (TE-U4F-7), done 15:27 UTC.** File: lab/src/scenario.rs (`f2_the_sims_check_bites_are_routed_to_the_world_alone`
+  loops over the two literal ids `["PM-0001-21/no-cooldown", "PM-0001-21/refuse-not-clamp"]`, not
+  `Sim::CHECK_BITES`; its doc says why). Acceptance: .gate/u4f/w4-fp17.log (`-x`, 15:27 UTC, exit 0): fmt 0; the test
+  ok in the bites build; clippy `--all-features` 0. The literals sit in scenario.rs's `#[cfg(test)] pub(crate) mod
+  tests` (:2414), which check.mjs's one-home rule does not read (check.mjs:925-945): .gate/u4f/w4-fp17-deps.log (`-x`,
+  exit 0) `node check.mjs --only deps` PASS. Added: +1. SIZE-CHECK: 3,606 + 2,812 = **6,418** (pass +205).
+- **FP18 (TE-U4F-8, TE-U4F-5's phrase), done 15:29 UTC.** Docs only, client/tests/trace.rs: f4 "Seed 4", and its
+  negative half named, "U4e's e9 (server/tests/pump.rs:193-212)" (e9's head read there: :192-194); f5 "Seed 5"; f32
+  (ii) "Seed 32, both runs" (written in FP2); f32 (iii) "Seed 33"; f36 (i) "Seed 36"; the bites newest-sample "Seed
+  47", tick-quantised "Seed 48", redundancy-1 "Seed 20"; f30 "Seed 30, both". Acceptance: .gate/u4f/w4-fp18.log
+  (`-x`, 15:28 UTC, exit 0): fmt 0; the grep finds all ten lines (:402-403, :414, :462, :499, :518, :550, :569, :591,
+  :608); clippy `--all-features` 0. Added: +4. SIZE-CHECK: 3,606 + 2,816 = **6,422** (pass +209).
+- **FP19 (RR-U4F-5 (1), (2), (5)), done 15:30 UTC.** Files: lab/src/scenario.rs (`FastClock::tick`'s three episode
+  differences, kind 1, kind 2 and FP12's left-out, by `saturating_sub`, computed once as `episode`), bots/src/lib.rs
+  (the lag switch's `now_ns - first` and `now_ns - at` by `saturating_sub`; `toward_centre`'s doc says `lane` passes
+  offsets from decoded positions, x - x0 and y - LANE_Y_CM, and why the i64 arithmetic still cannot overflow). No new
+  test. Check: .gate/u4f/w4-fp19b.log (`-x`, 15:30 UTC, exit 0): fmt 0; clippy npt-bots and npt-lab both builds 0;
+  lab f19, f20 (the lag switch) and f28 fast-clock A "3 passed". w4-fp19.log (`-x`, 15:29 UTC): `cargo test -p
+  npt-bots` whole 0 (lib 13 passed, 1 ignored; behaviour 5), f19 and f20 passed, clippy 0; fmt exit 1 (one diff,
+  rewritten by Edit). Added: +3. SIZE-CHECK: 3,609 + 2,816 = **6,425** (pass +212).
+- **The pass's own diff** (`git diff --no-index --shortstat` of builder 3's tree, the reviewed one, against W's
+  spikes/netcode-proof): 10 files, 330 insertions, 121 deletions (a changed line counts in both); docs/design
+  untouched. By the notes' counting rule: 6,213 to 6,425, +212 (the 3 more than 330 - 121 are lane-head lines FP1
+  rewrote, which moved the deletions from 307 to 310). Under the advisor's 500.
+
+### End checks (on one tree, after FP19)
+
+- Pre-check (not counted): .gate/u4f/w4-pre-doc.log (`-x`, 15:31 UTC): `node check.mjs --only
+  fmt,doc,clippy,clippy-wasm32` "check: all 4 steps pass" (doc 38.4 s), so no counted run is spent on a doc link.
+  Tree hashes there: diff 2f07abc2275887936f014184e1aa0c96289f321b6f78b591db66dadbf2803fad, untracked
+  1a767d5b4a3febbc8886e11f2c340db7f94382ae3bca9bbe7623847890bee5de.
+- End check A starting 15:32 UTC: `df -h /home/user` 8.6G avail (78 %); one `-x` call, .gate/u4f/w4-end-check-a.log,
+  in w3-end-check-a2.log's form (the two `--no-run` test builds, the two release lab builds, the two wasm hash
+  builds, `node check.mjs`).
+
+### State at 15:39 UTC (the coordinator's usage check, 92 %)
+
+- **Where:** the main folder's u4f-build.md was tried again by Edit at 15:39 and refused by the harness again ("This
+  agent is isolated in the worktree ..."), so this block stays in W's copy (this file), byte-equal to the main
+  folder's :1-866 above it.
+- **Done:** FP1 to FP19, each with its line above (acceptance log, fails-first or plant log, added lines).
+- **No plant in place.** Both plants are restored and checked: FP4's (input.rs, pre-plant sha256 ea382f27...e0b4e1b,
+  equal after) and FP15's (input.rs, pre-plant 50ee780a...7454e6, equal after).
+- **SIZE-CHECK so far:** 6,425 (3,609 insertions + 2,816 new-file lines): the pass +212 by the notes' rule; the
+  pass's own diff against the reviewed tree 330 insertions, 121 deletions.
+- **Current step:** end check A, running in the background since 15:32 UTC (`-x`, w4-end-check-a.log; at 15:33 still in
+  its second `--no-run` build, cold). No edit is made while it runs.
+- **Next steps:** read end check A's result; `df`; end check B (.gate/u4f/w4-end-check-b.log, the same seven
+  commands); then, in `-x` calls: the `--list` lines of the four new tests' binaries; each new test alone with the
+  C62H-BOUND reference (.gate/u4f/w4-times.log); item 4 `cargo test --locked -p npt-server --all-features`; item 5's
+  hand lines s22 and s22b with `--controller 1` (`-x -k`, out .gate/u4f/w4-hand/) and their header and line checks,
+  and `node --check` of both run scripts; then the return.
+- **End check A's first attempt stopped (not a counted check, no failure):** I gave the background call a 600 s
+  limit, and the Bash tool killed it at about 15:42 UTC, inside check.mjs's test step. The log
+  (.gate/u4f/w4-end-check-a.log) holds the six builds exit 0 and fmt, clippy, clippy-wasm32 and doc PASS, then nothing
+  (no `--- end` line). `ps` after it: no cargo, rustc, check.mjs, runner or toucher process left. My error (the limit),
+  not the tree's. Re-run whole as end check A, .gate/u4f/w4-end-check-a2.log, with a 3,600 s background limit.
+- Disk before it (15:45 UTC): `df -BM /home/user` 4,541 MiB available (445 above the 4,096 MiB floor; it was 11,748
+  at 14:57 and 8.6G at 15:31; the shared target now holds 7,195 MiB by `du -sm`, after the cold rebuild of both
+  builds' tests, both release labs and both wasm builds). Above the floor, so A starts; B starts only if `df` then
+  shows at least 4,096 MiB, else I stop and report (brief section 4 rule 6: no clean, pack or delete is mine).
