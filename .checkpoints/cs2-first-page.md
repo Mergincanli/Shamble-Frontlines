@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-19 07:23 UTC (from the clock)
+- **Last update:** 2026-11-19 07:56 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -394,13 +394,35 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     Device (Subzero) ...), SwiftShader driver)", so software rendering is confirmed. **Size: 4,257 added lines**
     (stop line 4,400: 143 lines of room for the other four reviewers' findings).
 
+43. **The other three reviewers of round 1** (on 30a5a13 in the worktree `.gate/cs2-plants`; each "findings to fix
+    before the merge"): security-auditor (`cs2-first-page/security-auditor-review1.md`: Mediums S1 a broken-off
+    download left its file open, S3 blocks piled up after a failure, S5 `--out-dir` could empty any folder; Lows S2,
+    S4, S6, S7 and two more; "The small server lets no file out of its folder and answers no other site. The tool
+    route holds: F1 to F5 are closed as built."); perf-auditor (`perf-auditor-review1.md`: Mediums P1 fractional
+    timer sleeps made about half the ticks start about 4 ms late, A1 the allocation test goes blind once the code
+    is optimised; Lows L1 to L5); test-engineer (`test-engineer-review1.md`: Highs F1 the memory-growth proof did
+    not cover the host, F2 the hidden-tab test was flaky and judged the wrong count; Mediums F3 (= P1), F4 plants 1
+    and 8 were caught by a timeout and not by their check, F5 the message event outside the allocation sums, F6 a
+    post per frame not proven, F7 two build claims with no committed check; Lows).
+44. **Round 1's fix pass, second half: commit d257bb6** (2026-11-19 07:56 UTC); 16 files. Fixed: S1, S2, S4, S5, S6, S7, the
+    comment, the tool's variables refused; S3 by the first half; P1 (whole-millisecond sleeps, rounded up, in
+    `host.ts`; a wake-count guard in the browser test), A1 (floors; the spec says what it cannot do), L1, L5; F1
+    (the host's memory grown half-way on the real Wasm; a copy before the growth), F2 (the Worker's own count), F5
+    (`WorkerLink.receive`), F6, F7 (`bundleProblems` in the build), the file case's visible notice. **Left as
+    follow-ups:** perf L2 (a pool of 9 when blocks grow), L3 (the readings' polling: fixed in the notes' script,
+    not in code), L4 (the frame callback's own work time, for change-set 6); test-engineer's Lows (four server
+    branches without a case of their own, `skipIf` for links, more `WebAssembly` names in the stubs, one Worker
+    only, the scratch-buffer test); the security follow-ups (the `cargo tree` list as a test, `dist-*/` in
+    `.gitignore`, the env restored in the isolation spec). Checks all exit 0: unit tests (sim-worker 30, client
+    48), boundary 7, tsc on both packages, both builds, browser tests 10 passed three runs in a row. Allocation
+    now reads about 65 bytes per frame and about 300 per block (the message event counted).
+    **Size: 4,430 added lines, 30 over the stop line of 4,400.**
+
 ## Current step
-43. **Review round 1, second half.** Next three reviewers on the same head, reading and running
-    in the worktree `.gate/cs2-plants` (30a5a13, built): perf-auditor, security-auditor, test-engineer; then
-    netcode-architect. Meanwhile the main session fixes the first three reviewers' findings in the main folder
-    (and commits the production fix). Then the remaining findings, the gate, round 2 on what changed, the verifier,
-    the docs pass, the zip, the advisor agent on the final head, the report, the pull request; stop for his go and
-    his Brave check.
+45. **Stopped adding code at the stop line, told him in three lines.** Still out: netcode-architect's review (its
+    findings add lines), round 2 on what changed, the verifier. **Going on meanwhile, adding no code line:** the
+    planted defects again on the new head with test-engineer's sharper versions and its rule (a plant counts only
+    when an assertion line shows it); the readings again after the timer fix; the docs pass's preparation.
 
 ## Next steps
 1. See "Current step". No reviewer runs the browser project or `build.mjs` in the main folder while the main session
