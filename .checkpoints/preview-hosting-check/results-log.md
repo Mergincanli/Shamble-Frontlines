@@ -750,8 +750,8 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
     `revoked` run).
 
 ### Day 2 (plan Part 3 D)
-- **The schedule fired twice more overnight** (probe.yml's runs listed with the GitHub MCP tool, 2026-11-19 about
-  13:38 UTC, total_count 6; zips downloaded 13:39 UTC, read with jq):
+- **The schedule fired twice more overnight** (probe.yml's runs listed with the GitHub MCP tool, 2026-11-19
+  13:39:21 UTC, transcript time, total_count 6; zips downloaded 13:39 UTC by the files' times, read with jq):
   - probe run #5, id 44457125198, event "schedule", head 347d5e0, created 2026-11-19 04:15:59 UTC, success 04:16:29;
     probe-results-44457125198 (artifact 14498371957, zip sha256 356c906a5d62..., equal to its digest), probed_at
     2026-11-19T04:16:20.864Z, `.gate/preview-hosting-check/day2/probe5/`: 43 rows. (a) 2 rows, gone 2
@@ -767,9 +767,9 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   - The hourly schedule so far: 3 scheduled runs (created 2026-11-18 22:37:26, 2026-11-19 04:15:59 and 13:29:10 UTC)
     in the 23 slots from 2026-11-18 15:23 to 2026-11-19 13:23 UTC. The run data names no slot, so which slot each run
     stands for is not recorded.
-- **PM-0006-1: the header checked again before the 24-hour reading** (2026-11-19 about 13:45 UTC):
+- **PM-0006-1: the header checked again before the 24-hour reading** (2026-11-19 13:41-13:43 UTC, transcript times):
   - The test project: its production link serves (probes #5 and #6: its own address "serves", expected "serves").
-  - The test repository: `main` is 347d5e04487189be05dd2bc3a2c397bed8415e4b (git ls-remote, 2026-11-19 about 13:43 UTC):
+  - The test repository: `main` is 347d5e04487189be05dd2bc3a2c397bed8415e4b (git ls-remote, 2026-11-19 13:41:31 UTC):
     the merges of (b) #4 and (b') #8 on 2162db5, which differ from it only by `test-prs/pd-three.txt` and
     `test-prs/pdt-three.txt` (git diff --name-status 2162db5 347d5e0). The four workflows at 347d5e0, re-hashed:
     deploy.yml 29593af18d34, close.yml 3afdf389d636, probe.yml f24ad6e81daf, browsers.yml 6791076916ae, equal to the

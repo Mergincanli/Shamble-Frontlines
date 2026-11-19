@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 14:55 Amsterdam (13:55 UTC): resumed after his compaction; Day 2 prep (step 26)
+- **Last update:** 2026-11-19 14:44 Amsterdam (13:44 UTC, save 87547f6): resumed after his compaction; Day 2 prep (step 26)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -700,12 +700,12 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Resumed after his compaction (his message 2026-11-19 13:36:08 UTC, 88036370-e3fe-47f4-a3b4-fa570aeacd0a: the
      resume line plus his words of 12:00 Amsterdam on aiming down sights, byte for byte in `mustafa-2026-11-19-ads.md`,
      663 bytes, sha256 121999261bcd...; recorded in `lane2-needs.md`, Decisions taken; "no work now").
-   - Read 2026-11-19 13:37-13:45 UTC: the check-in trig_01Fd2yqXX6LL2QP4hLnrCuu6 enabled, run_once_at 18:55:00Z
+   - Read 2026-11-19 13:39-13:43 UTC (transcript times): the check-in trig_01Fd2yqXX6LL2QP4hLnrCuu6 enabled, run_once_at 18:55:00Z
      (get_trigger); the schedule fired twice more (probe #5 04:15:59, #6 13:29:10 UTC): every row as expected at
      9.4-9.7 h and 18.7-19.0 h after the closes, (c) and (d) serving (results log, "Day 2"); PM-0006-1's header checked
      again (results log): all as recorded, `main` 347d5e0 with the four approved hashes; **one gap: his Brave version
      is not recorded** (the header's "every browser's version"), asked on Day 2's list before the wall.
-   - What else needs the links readable without a login, before the wall (written 2026-11-19 about 13:50 UTC):
+   - What else needs the links readable without a login, before the wall (written 2026-11-19 before 13:44:32 UTC, save 87547f6):
      (1) the 24-hour PREV-DELETE reading, which is also PM-0006-8's control (the same sweep with the wall off;
      probe.mjs: "with the wall off, that is PM-0006-8's control"); (2) nothing else found: Brave steps 1-3 achieved
      (2026-11-18 17:21:40 UTC); PM-0006-2 read on every upload's verify; PM-0006-3 on Windows 51 of 51 (Safari dropped);
