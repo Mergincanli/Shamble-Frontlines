@@ -85,7 +85,7 @@
    claude-fable-5-2 configured and last served; the chat's mode: auto); his message of 16:08:04 UTC saved by script;
    every saved message's bytes checked against the sha256 in its header (7 of 7 match); the saver started.
 
-2b. Prepared for the docs pass, in the notes only (16:17 to 16:20 UTC; nothing under `docs/` is edited before the
+2b. Prepared for the docs pass, in the notes only (16:16 to 16:18 UTC, from the clock; nothing under `docs/` is edited before the
    plan's APPROVE): `ci-wasm/browser-check-record.mjs` (writes `docs/reports/2026-11-19-cs2-browser-check.md`: the
    reading and his four report messages whole) and `ci-wasm/decisions-3.mjs` (his go of 14:28:25, his "a, yes" of
    14:31:30, a pointer to the browser check, his two notes of 16:08:04, and the dated pointer under the entry of

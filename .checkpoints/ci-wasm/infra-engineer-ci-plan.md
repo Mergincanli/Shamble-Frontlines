@@ -137,3 +137,17 @@ specs + `report.ts` + `render-counts.json`, cs2 report "Evidence" (:208-281) and
   and release assets."; title, notes, pre-release/latest status still editable; a deleted immutable release's tag
   cannot be reused. Nothing on signer, format or Sigstore instance (security-auditor's S9/S20 read it from the
   bundle: GitHub's own Sigstore instance, cert "GitHub, Inc./Attester", SAN https://dotcom.releases.github.com).
+- S2.5 runner-images `images/ubuntu/Ubuntu2404-Readme.md` on main (raw.githubusercontent.com, read 2026-11-19 via
+  WebFetch, fetch-model quotes): "Image Version: 20261111.370.1"; "GitHub CLI 2.103.3"; "Google Chrome
+  157.0.8103.50"; "ChromeDriver 157.0.8103.50"; "Chromium 157.0.8103.0"; "Mozilla Firefox 160.0"; "Geckodriver
+  0.37.1"; "Microsoft Edge 157.0.4341.46"; "Node.js 22.23.4"; "Rust 1.99.1", "Rustup 1.29.3"; curl
+  8.5.0-2ubuntu10.16; tar 1.35+dfsg-3ubuntu0.4; env CHROMEWEBDRIVER /usr/local/share/chromedriver-linux64,
+  GECKOWEBDRIVER /usr/local/share/gecko_driver; no CHROME_BIN, no Playwright listed. Announcement: "`ubuntu-latest`
+  label will use Ubuntu 26.04 in November 2026" (we pin `ubuntu-24.04`: no effect). Caveat: the readme on main is
+  the NEXT/CURRENT image description; the image a run gets is printed in the job log's "Runner Image" group (to be
+  read on the first runner run). Sure: medium-high (official file, fetch-model transcription).
+- S2.6 github.com/cli/cli/releases/tag/v2.81.0 (read 2026-11-19): "GitHub CLI 2.81.0", "01 Oct 20:22" (year not
+  shown; 2025 by the release order); "This release introduces the `release verify` and `release verify-asset`
+  commands for verifying GitHub Release attestations."; "a release attestation provides a signed, timestamped binding
+  between a release, its git tag, and any associated assets."; usage "gh release verify-asset v1.2.3 my-asset.zip".
+  So the command exists from gh 2.81.0; the image ships 2.103.3 (S2.5). Sure: high.
