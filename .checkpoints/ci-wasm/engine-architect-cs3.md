@@ -92,3 +92,29 @@ Task: change-set 3 ("The loop closes"), the boundary and rule-test half of its p
   index.ts exports types + stats only. boundary/sim-wasm.test.mjs 138: built Wasm in Node via Vitest `initSync` (the
   Wasm-side route for vectors), includes a glue test "each per-tick call reaches exactly one export" and uses
   `newest_input()` twice (EA-F10's test-only member). package.json test = `vitest run --dir src` (boundary/ excluded).
+- CI after PR #62 (ci-edit.diff): toolchain job builds the page (--production, dev) with the pinned wasm-bindgen
+  program (ONLY `wasm-bindgen` is extracted from the archive; `wasm-bindgen-test-runner` is in the archive but refused by
+  the "more than the one program came out" check), runs `vitest run --root packages/sim-worker --dir
+  packages/sim-worker/boundary` (=> any new *.test.mjs in boundary/ runs in CI with NO CI edit, if what it loads is
+  built by a command CI already runs), tsc on worker/page/specs, Playwright in Chrome (/opt/google/chrome/chrome).
+- DESIGN NOTE (Wasm route for rule tests): ADR 0004 PM-0004-22 names "unit vectors in `cargo test` and
+  wasm-bindgen-test (R5-TEST-REC1)". wasm-bindgen-test = NEW dependency crates + a CI edit to extract the runner + a
+  runner env var (no root .cargo/config.toml allowed while the netcode proof rules hold). Cheaper route W2: one
+  test-only cdylib crate using only the already-pinned `wasm-bindgen`, built by build.mjs into a gitignored folder,
+  loaded by boundary/*.test.mjs in Node (and by one Playwright spec in Chromium). Test-only exports never touch the
+  shipped `sim-wasm` (WB-HEALTH (a), EA-F10). Needs: a new workspace member (manifest -> security-auditor's answer on
+  the exact content; no new third-party crate), a departure from ADR 0002 part 3's crate list (B6), and either one CI
+  line or the dev build building it.
+- CI today (toolchain.yml :84-91): `cargo test --workspace --locked` (=> scan test, native vectors, L1 tests, native
+  PM-0002-53 dev half run with NO CI edit), `cargo test --release -p sim -p protocol --locked` (=> PM-0002-53 native
+  release half, if the test is in sim), `cargo build --target wasm32 -p sim -p protocol -p room -p client-endpoint -p
+  sim-wasm`, `npm test --workspaces`. A NEW crate is in `--workspace` automatically but in neither the release-test
+  nor the wasm32 build line (each would be a CI edit if wanted).
+- Code read (client): app/boot.ts 128 (boot order; WorkerLink; `stop(problem)` terminates the Worker + notice; frame loop
+  `sequence=(sequence+1)>>>0; link.frame(sequence); picture.draw(...)`; devtools-only overlay + `__shambleReport`);
+  app/worker-link.ts 144 (`onMessage(data: unknown)` = an ad-hoc parser of WorkerToPage inline, casting `stats` with
+  `as WorkerStats` unchecked = EA-F8's target; `failure` string = "match over" state on the page side; `frame(sequence)`
+  posts {type:"input", sequence, returned}); error-hook.ts (bounded one-line `note`); flags.ts (devtools-only pad/run);
+  overlay/overlay.ts 46 (pre + Copy report button, textContent); overlay/report.ts 103 (ReportData, readoutLines,
+  formatReport; "fps" toFixed; frames line `frames: ${fps.toFixed(1)} a second · frame time ...`); picture.ts 68 = the
+  interface file (PictureFrame{newest, previous, timeMs}; "Events join when the first change-set has some").

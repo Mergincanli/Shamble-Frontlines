@@ -1,0 +1,70 @@
+# planted defects, started 2026-11-19 20:00:29 UTC
+the tree at the start: HEAD c934fc0a2724e3655449fc655fa6435ad901c2ba, with 0 lines of uncommitted diff in crates/ and packages/
+
+## 1. the page calls into WebAssembly after it has started (PM-0002-2's own bite)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect (the build itself failed: exit 1: build: the built page is refused:)
+        > 63 |     expect(await page.evaluate(() => (window as unknown as { __wasmCalls: number }).__wasmCalls)).toBe(0);
+        > 63 |     expect(await page.evaluate(() => (window as unknown as { __wasmCalls: number }).__wasmCalls)).toBe(0);
+
+## 2. a block posted without its transfer list (PM-0002-6)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 49 |     expect(data.worker?.undetached).toBe(0);
+        > 49 |     expect(data.worker?.undetached).toBe(0);
+
+## 7. a 64-byte typed array allocated per frame in the page's hand-off code (PM-0002-7's bite)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off allocation.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 65 |   expect(perFrame).toBeLessThan(170);
+
+## 7b. a 64-byte typed array allocated per block where the message event is unpacked
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off allocation.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 67 |   expect(perBlock).toBeLessThan(610);
+
+## 8. a Worker that ignores the hidden tab and runs on (PM-0004-70's bite)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 91 |   expect(stillHidden.worker?.ticks).toBe(hidden);
+
+## 8b. a Worker that runs the hidden gap on the tab's return instead of dropping it (the 7-tick cap kept)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 102 |   expect(after.worker?.drops).toBe(0);
+
+## 11. the page posts its input on every other frame only
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 60 |     expect(frames - posts).toBeLessThanOrEqual(1);
+        > 60 |     expect(frames - posts).toBeLessThanOrEqual(1);
+
+## 14. a Worker whose script cannot be loaded: its error event has no message, and the page passes that on
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 120 |     await expect(page.locator("#notice")).toHaveText(new RegExp(`^The match stopped: .*${said}`), { timeout: 20_000 });
+
+## 14b. a Worker's error is not cancelled, so the window counts it a second time
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 123 |     expect((await report(page)).errors).toBe(1);
+
+## 15. the page does something its content security policy refuses (an inline style)
+check: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off skeleton.spec
+exit 1: FAILED as it must, at the line that names the defect 
+        > 61 |     expect(later.errors).toBe(0);
+        > 61 |     expect(later.errors).toBe(0);
+
+# control: the clean tree, 2026-11-19 20:07:06 UTC
+exit 0: node packages/client/scripts/build.mjs
+    
+exit 0: cd packages/sim-worker && node ../../node_modules/vitest/vitest.mjs run --dir boundary
+    Test Files  1 passed (1) | Tests  7 passed (7)
+exit 0: cd packages/client && node ../../node_modules/vitest/vitest.mjs run
+    Test Files  6 passed (6) | Tests  49 passed (49)
+exit 0: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off 
+    12 passed (1.1m)
+
+# finished 2026-11-19 20:08:18 UTC: every defect was caught and the clean tree passes
+exit 0
+Thu Nov 19 20:08:18 UTC 2026

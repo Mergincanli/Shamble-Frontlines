@@ -219,9 +219,10 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
   `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/bgdn004k8.output` · started
   19:57:35 UTC · stops by 21:47 UTC (110 minutes on) · last check 19:57 UTC: ok (its first line read). The second
   saver (bxshyzuei, 17:59 UTC) was lost with the container's restart at about 19:57 UTC.
-- The planted defects, subset: background task b1470gqk1, started 20:00 UTC in the worktree `.gate/ci-wasm-plants`
-  (detached at c934fc0, its own `node_modules` and `target/`); it binds 127.0.0.1:4173, so no other browser test
-  runs until it ends. When it is done the worktree is removed with `git worktree remove` (not forced).
+- The planted defects, subset: done (20:00:29 to 20:08:18 UTC): ten of ten caught on the edited specs, each at the
+  line that names it (1, 2, 7, 7b, 8, 8b, 11, 14, 14b, 15), and the control on the clean tree passes; output
+  `ci-wasm/plants-subset-output.txt`, script `ci-wasm/plants-subset.py`. Its worktree `.gate/ci-wasm-plants` was
+  removed with `git worktree remove` (not forced).
 - Agents for change-set 3's plan (both Opus 5.5 at effort max, in the background, started 20:02 UTC; they build
   nothing and run no browser test): netcode-architect, part "cs3" (notes `ci-wasm/netcode-architect-cs3.md`: the
   messages, the room, the endpoint, the step's order, the replay runner, L1); engine-architect, part "cs3" (notes
