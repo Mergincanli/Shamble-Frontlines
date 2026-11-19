@@ -7144,3 +7144,17 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   16:34 check-in reached the session at 17:42. Checked at 17:43: no process left; no plant (its notes at 15:39); no
   half edit (the worktree's runner hashes equal A2's start, 2f07abc2… and 1a767d5b…, rebuilt from the 15:43 snapshot);
   w4-end-check-a.log (15:32) was cut off after its doc step, then re-run as A2. Resumed by SendMessage about 17:45.
+
+## Card blocks moved 2026-11-19 after the 23:18 restart's record (card_trim_1119l.py; from 'Cuts' and 'Choices taken without him')
+- **2026-11-19 20:53:34 to 22:40:41 UTC (the advisor's -20 ruling; the session too):** "You've hit your org's monthly
+  spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:40pm (UTC)" (the agent's transcript,
+  its last entry 20:53:34.410Z; the session's transcript has nothing from 20:52:49 to 22:40:57). Checked at 22:41: the
+  -22 set ran on through the cut and ended 21:17 UTC, exit 0 (committed 2dae645); the saver buz1b7gec's window ended at
+  22:40 (restarted as bdhc8uudx, 22:42); the agent had written no notes (advisor-u4f-20.md absent), resumed by
+  SendMessage at 22:4x; the 22:35 check-in reached the session at 22:40.
+- **2026-11-18's three** (D3-1's fix, the fill's form, the build-1 rulings; each named in its day's message): word for
+  word at history.md:6935-6946 (card_trim_1119f.py); MAIN-60's done line at :6947-6949.
+- **2026-11-19 (named in that day's message):** the advisor's stop rulings (advisor-u4f-stop.md R2-R4): the event cap
+  1,600, no longer provisional; -20's set before -22's (order -47, -20, -22, -21), its 10-minute P3 runs read for
+  honest overflow resyncs first; the fast-clock cheat sends no pings (a recorded deviation); main b763ba3 taken in now,
+  plan first (MAIN-60). Why: inside the plan, undoable, no pass mark, bar text, judge file or marks.json changes.

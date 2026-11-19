@@ -103,12 +103,6 @@
 - **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
   no caller) stays public and goes to U4f2's lane by number, its lean a caller (the lab writes `params.cmd_timing` from
   the live room, f6 asserts it), else removed (ADV-U4FMH-2). Why: no behaviour change; undone in U4f2.
-- **2026-11-18's three** (D3-1's fix, the fill's form, the build-1 rulings; each named in its day's message): word for
-  word at history.md:6935-6946 (card_trim_1119f.py); MAIN-60's done line at :6947-6949.
-- **2026-11-19 (named in that day's message):** the advisor's stop rulings (advisor-u4f-stop.md R2-R4): the event cap
-  1,600, no longer provisional; -20's set before -22's (order -47, -20, -22, -21), its 10-minute P3 runs read for
-  honest overflow resyncs first; the fast-clock cheat sends no pings (a recorded deviation); main b763ba3 taken in now,
-  plan first (MAIN-60). Why: inside the plan, undoable, no pass mark, bar text, judge file or marks.json changes.
 - **2026-11-19 after his answer (to name in the next day's message):** f28's clamp and lag-switch B halves go to U4f2
   with the rest of -21 (the advisor's R3 (ii); his (a) lists the forged test, its six cheats and -21's runs). Why:
   inside the plan, undoable, no pass mark; neither half is built, and no -21 run counts before U4f2 merges.
@@ -194,12 +188,7 @@
   system's notice; the container up from 23:18:27 by /proc/uptime; the builder's last transcript entry 23:18:18.152Z).
   Checked at 23:21: the builder's worktree at cb7e374 (its step 0 done), `git status` empty, no notes, no f1-* log, no
   cargo or npt-* process: no half edit, no plant. The saver restarted; the builder resumed by SendMessage.
-- **2026-11-19 20:53:34 to 22:40:41 UTC (the advisor's -20 ruling; the session too):** "You've hit your org's monthly
-  spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:40pm (UTC)" (the agent's transcript,
-  its last entry 20:53:34.410Z; the session's transcript has nothing from 20:52:49 to 22:40:57). Checked at 22:41: the
-  -22 set ran on through the cut and ended 21:17 UTC, exit 0 (committed 2dae645); the saver buz1b7gec's window ended at
-  22:40 (restarted as bdhc8uudx, 22:42); the agent had written no notes (advisor-u4f-20.md absent), resumed by
-  SendMessage at 22:4x; the 22:35 check-in reached the session at 22:40.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
-  one (builder 4) at history.md:7124-7146 (card_trim_1119k.py).
+  one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
+  and the session) and the choices of 2026-11-18 and of 11-19 named that day at history.md:7148-7160 (card_trim_1119l.py).
