@@ -5,8 +5,8 @@
   **Base:** main b763ba3 merged in at 0f12d9e (MAIN-60, 2026-11-18 23:41 UTC: #55-#60, the first v2 code, DEP-HOLD,
   a CI workflow; one conflict, docs/STATUS.md: this branch's #40 row kept beside main's #60 row), which clears PR #40's
   conflict. MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-19 13:5x UTC: SIZE-U4F ANSWERED (a) (history.md:6896-6903): U4f closes with what is built;
-  its review panel's round 1 next, on builder 3's tree (snapshot 74ae26aa). Disk 5,067 MiB free (13:44 UTC).
+- **Last update:** 2026-11-19 15:0x UTC: SIZE-U4F ANSWERED (a) (history.md:6896-6903); round 1 returned and ruled
+  (advisor-u4f-r1.md); builder 4's fix pass next. Disk 11,784 MiB free (14:53 UTC, after the part-clean).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -89,20 +89,23 @@
   or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
   brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
   with its source before its first snapshot). -21 is judged only after U4f2.
-- **Round 1 RETURNED** (13:50-14:32 UTC; u4f-panel-brief.md; builder 3's worktree read-only, its hashes equal at 13:44,
-  the snapshot's `git apply --check` on the lane's head passing): **u4f-review-r1-full.md** (333 lines, sha256
-  6747175e…, by u4f_review_r1_full.py, word for word from the journal; read in full). Five APPROVE WITH FINDINGS;
-  **4 Medium** (NC-U4F-1 the controller never skips after a clock jump or stall; TE-U4F-1 f5's B1 budget 3 % unruled;
-  TE-U4F-2 U4F-Q9 (a)'s flood test missing, negatives 44 of 45; RR-U4F-1 drop_unencodable's tick-step rule), 25 Low,
-  no Critical or High; S1-S7 and N1 agreed (N1: slot 0, the never-acker). Next: the advisor's ruling (advisor-u4f-r1.md).
-- **After the panel:** the results word for word by script (u4f-review-r1-full.md); every Medium or higher read in full;
-  the advisor's ruling (the fix list); the fix pass in a fresh worktree from the lane's head with the snapshot applied
-  (the Lows that ride: S4 USAGE's `--lag-*`, S5 SERIES.md's subsection title, S6 c-u4f-runs.mjs:7's order); round 2
-  only on what changed; merge, with plan §4.7's cap text and the plan's U4f and U4f2 entries (stop ruling :98-99);
-  5.3's 21 pre-runs; the part-clean at A6's place; the sets -47, -20, -22 (-20's six 10-minute P3 runs read for honest
-  overflow resyncs before -22's); U4f's report: A1's movement reading in a line of its own naming who reviewed it (the
-  advisor's A1; read by the advisor and the test-engineer), every marks.json or judge change's reviewer in its own line
-  (none so far), the fast clock's no pings, f28's B halves moved, the five forgers built ahead for U4f2.
+- **Round 1 RETURNED and RULED** (13:50-14:32 UTC on builder 3's worktree, read only): **u4f-review-r1-full.md** (333
+  lines, 6747175e…, word for word by u4f_review_r1_full.py; read in full): five APPROVE WITH FINDINGS, 4 Medium
+  (NC-U4F-1, TE-U4F-1, TE-U4F-2, RR-U4F-1), 25 Low, no Critical or High. **The advisor's ruling** (advisor-u4f-r1.md,
+  407 lines, 07c1bcd5…, read in full): APPROVE WITH CONDITIONS: one fix pass FP1-FP19 in its order (:156-273), each
+  with its acceptance check; FP20 the main session's at the close (:275-281); no round 2 by default (the 2026-11-17
+  choice, history.md:6818-6819, checked), its check of the pass instead (:311-323); nothing to him; U4f2 takes
+  C-U4F2-1 to -4 and C-U4F2-SEC-1 (:65-87); the later carries C-U5-1, C-U6-17, C-U6-18, C-U7-3, C-U7-4 (:137-154) go
+  into plan.md's rows at the merge; its guard: past 500 added lines in the pass, the builder stops and comes back.
+- **The fix pass, builder 4:** a fresh worktree on the lane's head plus the snapshot (its runner hashes must equal
+  54cb6faa…/e8dc3663… before any edit); logs .gate/u4f/w4-*; notes u4f-build.md "## Fix pass (round 1): builder 4";
+  end checks of section 6 in both builds, FP6's two hand runs; the main session snapshots it at check-ins
+  (worktree_patch.py). The reviewed snapshot 74ae26aa stays at 7a59d7a:wip/u4f-build.patch.
+- **After the pass:** the advisor's check of it (:315-320); the merge on M1-M9 (:325-358): one commit with plan §4.7's
+  cap text, the U4f and U4f2 entries, §4.1's rows, the carries in plan.md's rows and u4f-report.md (A1's movement
+  reading in its own line naming the advisor and the test-engineer; the D10 line; the rest as M8 lists); then 5.3's 21
+  pre-runs, the part-clean at A6's place, the sets -47, -20, -22 (-20's 10-minute P3 runs read for honest overflow
+  first); the set reports with NC-U4F-5 and C-OQ6-SEC-1 (-20) and N1 (-22).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-18 (named in that day's message):** D3-1's fix by the advisor's ruling (advisor-u4f-fold-check.md): U4f's
@@ -124,6 +127,10 @@
 - **2026-11-19 after his answer (to name in the next day's message):** f28's clamp and lag-switch B halves go to U4f2
   with the rest of -21 (the advisor's R3 (ii); his (a) lists the forged test, its six cheats and -21's runs). Why:
   inside the plan, undoable, no pass mark; neither half is built, and no -21 run counts before U4f2 merges.
+- **2026-11-19 by the advisor's round-1 ruling (to name in the next day's message):** -22's judged set runs U4f's
+  controller (NC-U4F-2); f5 is measured as the brief writes it, late apart from missing, the unruled 3 % dropped
+  (TE-U4F-1; no bar changes); no second review round on the fix pass (the 2026-11-17 choice), the advisor's check of
+  it instead. Why: inside the plan, undoable, no pass mark, judge file, marks.json or existing SERIES.md row changes.
 
 ## Next steps (plan rev 3.3; units ahead)
 1. U4f (above), then U4f2 (-21's forged suite and runs; its short brief to the advisor; its size line on the card before
@@ -180,23 +187,14 @@
 - **MAIN-60 DONE** (its record at history.md's end, card_trim_1119c.py): main b763ba3 in at 0f12d9e; CI green on
   bb7a5ed; the advisor's head check APPROVE WITH FINDINGS (advisor-main-60-head.md: six Lows, no push). R3 (iii)'s
   four hand runs done (.gate/u4f/w3-hand.log: each exit 0, contract PASS). The lane goes on from this head.
-- **U4f's panel, round 1, ENDED** 14:32 UTC (workflow wf_a011d9f2-abf: 5 of 5 results, 0 errors; 393 tool uses).
-  **The advisor's ruling on it RUNNING** (from 14:33 UTC; agent abf879016ff011b9c, general on main's advisor.md, xhigh;
-  its file advisor-u4f-r1.md). **If cut:** SendMessage to it to continue from its file, or a fresh advisor reading it.
+- **U4f's panel, round 1, ENDED** 14:32 UTC (wf_a011d9f2-abf: 5 of 5 results); **the advisor's ruling ENDED** about
+  14:52 UTC (agent abf879016ff011b9c). **Part-clean before builder 4 DONE** (P27's six cleans and checks in one
+  main-run.sh call, .gate/u4f-b4/clean-shared.log, exit 0, 14:53 UTC): free 5,054 → 11,784 MiB.
+- **Builder 4 (the fix pass): LAUNCHING** (its agent, worktree and start time written here once it starts).
 - **The saver bde01r5pv** (13:49 UTC on, both attribution lines as trailers; ADV-M60-8; its window ends about 15:39:
   restart it while agents run, run_in_background, timeout 7200000). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
   ENABLED again at 13:49 UTC (next 14:34); pause it when no agent runs.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
-- Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and its end (the 19:46 one).
-- **2026-11-18 18:47:03 to about 22:39 UTC (builder 3):** "You've hit your org's monthly spend limit · ask your admin
-  for a higher limit · your 5-hour limit resets 9:30pm (UTC)" (18:47:03.951, builder 3's transcript, while it waited on
-  end check A2, which went on and passed at 18:50:00). Checked at 22:38: no process left; no plant (its notes: none in
-  B8f or B9a); no half edit (the worktree's runner hashes equal A2's start, 54cb6faa… and e8dc3663…); snapshot taken;
-  resumed by SendMessage about 22:39. The 20:34 check-in reached the session at 22:36 with the 22:34 one; the worker
-  restarted twice; the saver ended at its window.
-- **2026-11-18 14:06:57 to 16:38 UTC (builder 2):** "You've hit your org's monthly spend limit · ask your admin for a
-  higher limit · your 5-hour limit resets 4:10pm (UTC)" (14:06:57.143, builder 2's transcript, right after its Edit at
-  14:06:56 that added SERIES.md's `header.params.connects_count` row whole). Checked at 16:37: no plant in place
-  (room.rs 8d7ad78f…, client lib.rs 1f932bd5…, its notes' clean sha256s), no half edit; snapshot taken; resumed by
-  SendMessage about 16:38 UTC. The 14:35 and 16:34 check-ins reached the session only at 16:36 (handled together).
+- Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
+  of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py).

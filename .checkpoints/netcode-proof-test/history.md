@@ -6917,3 +6917,16 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   no pings a recorded deviation, p3, p9, p16, p20 by hand before the panel, USAGE's two options in the fix pass; R4
   MAIN-52 now, plan first; Lows S1-S7, note N1. SIZE-U4F sent to him in the day's message (2026-11-19, 00:2x
   Amsterdam); the panel waits for his answer (R4).
+
+## Card blocks moved 2026-11-19 before builder 4 (card_trim_1119e.py; from the card's 'Cuts by the spend limit')
+- **2026-11-18 18:47:03 to about 22:39 UTC (builder 3):** "You've hit your org's monthly spend limit · ask your admin
+  for a higher limit · your 5-hour limit resets 9:30pm (UTC)" (18:47:03.951, builder 3's transcript, while it waited on
+  end check A2, which went on and passed at 18:50:00). Checked at 22:38: no process left; no plant (its notes: none in
+  B8f or B9a); no half edit (the worktree's runner hashes equal A2's start, 54cb6faa… and e8dc3663…); snapshot taken;
+  resumed by SendMessage about 22:39. The 20:34 check-in reached the session at 22:36 with the 22:34 one; the worker
+  restarted twice; the saver ended at its window.
+- **2026-11-18 14:06:57 to 16:38 UTC (builder 2):** "You've hit your org's monthly spend limit · ask your admin for a
+  higher limit · your 5-hour limit resets 4:10pm (UTC)" (14:06:57.143, builder 2's transcript, right after its Edit at
+  14:06:56 that added SERIES.md's `header.params.connects_count` row whole). Checked at 16:37: no plant in place
+  (room.rs 8d7ad78f…, client lib.rs 1f932bd5…, its notes' clean sha256s), no half edit; snapshot taken; resumed by
+  SendMessage about 16:38 UTC. The 14:35 and 16:34 check-ins reached the session only at 16:36 (handled together).
