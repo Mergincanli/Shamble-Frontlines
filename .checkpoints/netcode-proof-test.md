@@ -188,7 +188,12 @@
   notes u4f2-review-<seat>.md): batch 1 netcode, security, test from ~17:41 UTC, xhigh. **Security DONE 17:55:
   APPROVE WITH FINDINGS** (SA-U4F2-1 to -3, all Low: `--forge-every` unbounded multiply; kind 7 unsound at
   `--forge-every 2`; kind 8/9/11 `saturating_sub`; no security defect; F-B's record gap confirmed, its fix the netcode
-  seat's; it caught my brief's hash typo, fixed). **Rust (batch 2) from 17:55.** **Lesson:** never `cd` into an agent's worktree: the
+  seat's; it caught my brief's hash typo, fixed). **Rust (batch 2) from 17:55.** **Test DONE ~17:59: REQUEST CHANGES**
+  (read in full, :127-209): TE-U4F2-1 High (F-B confirmed in code, world.rs:1351-1355 and :1192-1202; owed: a
+  death/revive unit test failing on today's code, then 610 s forged pairs under A and B); Mediums -2 (no twin test for
+  kinds 1, 2, 4, 5, 6: plant 9), -3 (slot filters unpinned), -4 (f16's shared pair), -5 (F-A), -6 (F-C: bite runs
+  669/668 against 665), -7 (hand runs and judge calls on the pre-F-D tree), -8 (82 s margin under a 75.6 s noise);
+  Lows -9 to -15. **Lesson:** never `cd` into an agent's worktree: the
   harness moved this session's main folder to it (16:19; back at once, branch unchanged); read it with Read/Grep.
   Check-in re-enabled 14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bzkhq2f75 from
   17:56 UTC (to about 19:46); the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the
