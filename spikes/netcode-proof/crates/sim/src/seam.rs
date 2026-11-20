@@ -69,6 +69,16 @@ impl Command {
     /// The melee button's press counter: named for the catalogue's action starts (fire, reload, throw, melee); the
     /// stand-in sim has no melee and reads no press from it.
     pub const PRESS_MELEE: usize = 3;
+
+    /// The press edges the sim takes from one counter's advance, from `last` (the counter of the last command run for
+    /// the slot) to `now`, wrapping: every edge of it, since a command dropped (or late) passes its presses to the next
+    /// one's counter and a resent command can neither lose nor double a press (ADR 0001:226). `World` runs each edge
+    /// through its own check against the server's state (:234-237), and npt-room's press series counts with this one
+    /// rule (lost: the advance less these), so the room's count and the rule cannot drift; the room does not read the
+    /// sim's take, which T1 and T2 test. Integers only.
+    pub const fn edges_taken(last: u8, now: u8) -> u8 {
+        now.wrapping_sub(last)
+    }
 }
 
 /// R-10's two cover variants (OQ-0001-9; plan.md:1382): the state a lag-compensated shot sees cover items in.

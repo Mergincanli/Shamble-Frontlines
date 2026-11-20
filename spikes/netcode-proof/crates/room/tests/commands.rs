@@ -609,6 +609,40 @@ fn f17_a_forged_press_stream_and_its_twin_give_equal_state_hashes_on_every_tick(
     assert_eq!(forged_hashes, twin_hashes);
 }
 
+/// U4f-F1's T1 (ADV-U4F20-1; ADR 0001:226, :234-237): under option B two commands that arrive late (their ticks run, B
+/// repeating the last) each carry a fire press, so the next on-time command's counter is 2 edges on from the last
+/// command run (kind 5 accepts it: it covers 3 ticks from the newest accepted). Its two edges are seen, none lost and
+/// none doubled, and the sim takes both: the first fires, the second (one shot per command) is refused as Cooldown
+/// with that command's sequence.
+#[test]
+fn t1_under_option_b_two_late_drops_then_a_command_two_edges_on_lose_no_press() {
+    let (mut r, j) = room(CmdTiming::B, 100);
+    send(&mut r, &[cmd(1, j + 1)]);
+    let mut ran = Vec::new();
+    for _ in 0..4 {
+        ran.extend(tick(&mut r));
+    }
+    assert_eq!(ran, [1, 1, 1], "j + 1 runs it, j + 2 and j + 3 repeat it");
+    let pressed = |seq: u16, fire: u8| {
+        let mut c = cmd(seq, j + u32::from(seq));
+        c.presses[Command::PRESS_FIRE] = fire;
+        c.aim = [400, 0, 100];
+        c
+    };
+    send(&mut r, &[pressed(2, 1), pressed(3, 2), pressed(4, 2)]);
+    assert_eq!(tick(&mut r), [4]);
+    assert_eq!(counters(&r).late, 2, "the commands for j + 2 and j + 3");
+    // The sim's side first (TE-F1-3): the room's count below uses the same rule, so only this shows the sim's take.
+    let second = npt_sim::Refusal {
+        slot: 0,
+        seq: 4,
+        kind: npt_sim::RefusalKind::Cooldown,
+    };
+    assert_eq!(r.reports().refusals, [second], "the second edge, refused");
+    let presses = r.client(0).map(|c| c.presses());
+    assert_eq!(presses, Some((2, 0, 0)), "seen, lost, doubled");
+}
+
 /// f34 (NA-14; the advisor's A3): under option A a trace whose commands arrive bunched (two in one tick, none the next)
 /// gives `cmd_on_time` 1 for every tick whose stamped command arrived before it ran; a stamped command that never
 /// arrived, and one that arrived after its tick, give 0; under both options.

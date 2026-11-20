@@ -28,14 +28,17 @@
 //!   toward one: [`Rewind`]'s rule) is counted and the command then runs exactly as with `None`: one rule for both
 //!   (carry 10).
 //! - **Refused input leaves no trace in the state** (the advisor's condition 1): a fire press in the cooldown or with
-//!   no ammunition, a reload press the weapon refuses, a throw into a full pool and a Rewind outside the ring are
-//!   counted in [`InputReports`], each listed there as a [`crate::Refusal`] (slot, sequence, kind) for the tick, and
-//!   change nothing hashed; a clamped aim point is reported there and the shot uses the clamped point. The world's one
-//!   piece of per-slot input bookkeeping is the press counters of the last command it ran for that slot: a press edge
-//!   is a counter that differs from them, and a refused press's edge is consumed there and changes nothing hashed. They
-//!   stay outside the hash and the dump (a twin's counters differ by design) and are a function of the command stream
-//!   alone. A refused press's twin is the same stream with that press removed: that button's counter one lower from
-//!   the refused command on, every other field equal (the advisor's W1-U4D ruling).
+//!   no ammunition (or beyond its command's one shot), a reload press the weapon refuses, a throw into a full pool and
+//!   a Rewind outside the ring are counted in [`InputReports`], each listed there as a [`crate::Refusal`] (slot,
+//!   sequence, kind) for the tick, and change nothing hashed; a clamped aim point is reported there and the shot uses
+//!   the clamped point. The world's one piece of per-slot input bookkeeping is the press counters of the last command
+//!   it ran for that slot: a counter's advance over them is that many press edges ([`Command::edges_taken`]; ADR
+//!   0001:226, :234-237), each through its own check, so a press a dropped command carried is taken from the next
+//!   one's counter; a command fires at most one shot, so each further fire edge is refused. A refused press's edge is
+//!   consumed there and changes nothing hashed. They stay outside the hash and the dump (a twin's counters differ by
+//!   design) and are a function of the command stream alone. A refused press's twin is the same stream with that
+//!   press removed: that button's counter one lower from the refused command on, every other field equal (the
+//!   advisor's W1-U4D ruling).
 //! - Integers come in widened before any arithmetic (`move_xy` to i32, `aim` to f64), so no recorded command trips an
 //!   overflow check (carry 15); every float the state holds is finite, asserted each tick in debug builds (D-4).
 //! - `HitVolumes::tick` is the world's own tick counter, never `TickInput::tick` (carry 15).
@@ -1337,12 +1340,14 @@ impl World {
         if slot >= self.soldiers.len() {
             return false;
         }
-        // The press edges: a counter that changed is one press (the room allows one per button per tick); the counter
-        // seen is the client's claim, kept outside the state.
-        let mut edge = [false; 4];
-        for (k, e) in edge.iter_mut().enumerate() {
-            *e = c.presses[k] != self.claimed[slot][k];
+        // The press edges: every edge of each counter's advance over the one last claimed ([`Command::edges_taken`]),
+        // each through its own check below, reload's, then fire's, then throw's; a button's first edge runs the
+        // one-edge code (`edge`). The counter seen is the client's claim, kept outside the state.
+        let mut edges = [0u8; 4];
+        for (k, e) in edges.iter_mut().enumerate() {
+            *e = Command::edges_taken(self.claimed[slot][k], c.presses[k]);
         }
+        let edge = edges.map(|n| n > 0);
         self.claimed[slot] = c.presses;
         let mut s = self.soldiers[slot];
         if !s.alive || self.scene.is_plate(c.slot) {
@@ -1416,7 +1421,9 @@ impl World {
                 s.ammo = w.magazine;
             }
         }
-        if edge[Command::PRESS_RELOAD] {
+        // Each reload edge against the state the edge before it left: the first may start a reload, which refuses the
+        // rest.
+        for _ in 0..edges[Command::PRESS_RELOAD] {
             if s.reload_left > 0 || s.ammo >= w.magazine {
                 if authority {
                     self.reports.reload += 1;
@@ -1477,12 +1484,28 @@ impl World {
                 });
             }
         }
+        // A command fires at most one shot: each fire edge beyond the first is refused and counted, by the kind test
+        // above against the weapon the shot (or the first edge's refusal) left.
+        if authority {
+            for _ in 1..edges[Command::PRESS_FIRE] {
+                if s.ammo == 0 {
+                    self.reports.ammunition += 1;
+                    self.refuse(c, RefusalKind::Ammunition);
+                } else {
+                    self.reports.cooldown += 1;
+                    self.refuse(c, RefusalKind::Cooldown);
+                }
+            }
+        }
         if s.reload_left > 0 {
             s.flags |= FLAG_RELOADING;
         }
         self.soldiers[slot] = s;
-        if edge[Command::PRESS_THROW] && authority {
-            self.throw(c, origin, d);
+        // Each throw edge throws, or is refused when the pool is full.
+        if authority {
+            for _ in 0..edges[Command::PRESS_THROW] {
+                self.throw(c, origin, d);
+            }
         }
         fired
     }

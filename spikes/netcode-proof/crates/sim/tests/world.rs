@@ -1806,6 +1806,134 @@ fn d10_a_rewind_outside_the_ring_leaves_no_trace() {
     assert!(rt.refusals.is_empty());
 }
 
+/// U4f-F1's T2 (ADV-U4F20-1; ADR 0001:226, :234-237), the d10 twin form: the forged stream is `press` with button
+/// `k`'s step `at` named twice, so its command there is 2 edges on; the twin names it once. `twins` asserts equal state
+/// hashes and event lists on every tick (the second edge is refused and leaves no trace). Returns both runs' reports
+/// and the forged run's shots.
+fn two_edges(
+    n: u32,
+    held: impl Fn(u32) -> u16 + Copy,
+    press: &[(usize, u32)],
+    (k, at): (usize, u32),
+) -> (InputReports, InputReports, Vec<usize>) {
+    let twin = course_stream(n, held, press);
+    let forged = course_stream(n, held, &[press, &[(k, at)][..]].concat());
+    let (rf, rt, _) = twins(&Scene::course(), &forged, &twin, |_, _| {});
+    (rf, rt, shots_of(&forged))
+}
+
+#[test]
+fn t2_a_two_fire_edges_with_fire_held_and_the_weapon_ready_fire_once() {
+    // Fire held from 10 (ready), the fire counter 2 edges on at 10: one shot, the second edge refused as Cooldown.
+    let held = |k: u32| if k >= 10 { Command::FIRE } else { 0 };
+    let (rf, rt, shots) = two_edges(40, held, &[(0, 10)], (0, 10));
+    assert_eq!(shots[..2], [10, 13]);
+    assert_eq!((rf.cooldown, rt.cooldown), (1, 0));
+    assert_eq!(rf.refusals, [refusal(10, RefusalKind::Cooldown)]);
+    assert!(rt.refusals.is_empty());
+}
+
+#[test]
+fn t2_b_two_fire_edges_with_the_weapon_ready_fire_once() {
+    let (rf, rt, shots) = two_edges(40, |_| 0, &[(0, 10), (0, 20)], (0, 10));
+    assert_eq!(shots, [10, 20]);
+    assert_eq!((rf.cooldown, rt.cooldown), (1, 0));
+    assert_eq!(rf.refusals, [refusal(10, RefusalKind::Cooldown)]);
+    assert!(rt.refusals.is_empty());
+}
+
+#[test]
+fn t2_c_two_fire_edges_in_the_cooldown_are_both_refused() {
+    let (rf, rt, shots) = two_edges(40, |_| 0, &[(0, 10), (0, 11), (0, 20)], (0, 11));
+    assert_eq!(shots, [10, 20]);
+    assert_eq!((rf.cooldown, rt.cooldown), (2, 1));
+    let cooldown = refusal(11, RefusalKind::Cooldown);
+    assert_eq!(rf.refusals, [cooldown, cooldown]);
+    assert_eq!(rt.refusals, [cooldown]);
+}
+
+#[test]
+fn t2_d_two_fire_edges_on_the_last_round_fire_it_and_refuse_as_ammunition() {
+    // Fire held from 0 to 84 spends 29 of the 30 rounds; 2 edges at 100 fire the last, then meet an empty magazine;
+    // the reload at 105 runs and the press at 170 fires in both.
+    let held = |k: u32| if k < 85 { Command::FIRE } else { 0 };
+    let (rf, rt, shots) = two_edges(200, held, &[(0, 100), (1, 105), (0, 170)], (0, 100));
+    assert_eq!((shots.len(), &shots[28..]), (31, &[84, 100, 170][..]));
+    assert_eq!((rf.ammunition, rt.ammunition), (1, 0));
+    assert_eq!(rf.refusals, [refusal(100, RefusalKind::Ammunition)]);
+    assert!(rt.refusals.is_empty());
+}
+
+#[test]
+fn t2_e_two_reload_edges_start_one_reload_and_refuse_the_second() {
+    // Fire held from 0 to 29 spends ten rounds; 2 reload edges at 50: one reload (to 110), the second refused; the
+    // press at 120 fires in both.
+    let held = |k: u32| if k < 30 { Command::FIRE } else { 0 };
+    let (rf, rt, shots) = two_edges(140, held, &[(1, 50), (0, 120)], (1, 50));
+    assert_eq!(shots.last(), Some(&120));
+    assert_eq!((rf.reload, rt.reload), (1, 0));
+    assert_eq!(rf.refusals, [refusal(50, RefusalKind::Reload)]);
+    assert!(rt.refusals.is_empty());
+}
+
+/// The dump word named exactly `name`, if the dump has one.
+fn word_if(d: &StateDump, name: &str) -> Option<u32> {
+    (0..d.words().len())
+        .find(|&i| d.field(i).as_deref() == Some(name))
+        .map(|i| d.words()[i])
+}
+
+/// The command sequences of `world`'s live projectiles, in pool order (the dump's `projectile[i].live` and `.seq`).
+fn live_seqs(world: &World) -> Vec<u32> {
+    let d = world.dump();
+    (0..)
+        .map_while(|i| word_if(&d, &format!("projectile[{i}].live")).map(|live| (i, live)))
+        .filter(|&(_, live)| live == 1)
+        .map(|(i, _)| word(&d, &format!("projectile[{i}].seq")))
+        .collect()
+}
+
+#[test]
+fn t2_f_each_throw_edge_throws_or_meets_a_full_pool() {
+    // What the lists below pin (TE-F1-6), read through the World (the scene's fields are the crate's own): the
+    // course's pool holds 16 (scene.rs:234), and a grenade's fuse (scene.rs:232) outlasts the stream's 20 ticks.
+    let mut world = World::new(&Scene::course(), 5, 0);
+    let d = world.dump();
+    let pool = (0..).take_while(|i| word_if(&d, &format!("projectile[{i}].live")).is_some());
+    assert_eq!(pool.count(), 16, "Scene::course()'s projectile_capacity");
+    let throw = course_stream(1, |_| 0, &[(2, 0)]);
+    room_tick(&mut world, &mut ring(), &throw[0]);
+    let fuse = word(&world.dump(), "projectile[0].fuse");
+    assert!(
+        fuse > 20,
+        "Scene::course()'s grenade fuse, {fuse} ticks, outlasts the stream's 20"
+    );
+    // Apart from the twin form (each edge is a grenade, by the rule): 2 throw edges at 10 into an empty pool of 16
+    // throw two of that command's sequence; after one throw at each of 0 to 14, 2 edges at 15 fill the last slot and
+    // the second is refused as PoolFull.
+    let fill: Vec<(usize, u32)> = (0..=15).map(|s| (2, s)).collect();
+    for (press, seqs, refused) in [
+        (vec![(2, 10), (2, 10)], vec![10, 10], vec![]),
+        (
+            [&fill[..], &[(2, 15)][..]].concat(),
+            (0..=15).collect(),
+            vec![refusal(15, RefusalKind::PoolFull)],
+        ),
+    ] {
+        let stream = course_stream(20, |_| 0, &press);
+        let mut world = World::new(&Scene::course(), 5, 0);
+        let mut history = ring();
+        let mut refusals = Vec::new();
+        for t in &stream {
+            room_tick(&mut world, &mut history, t);
+            refusals.extend_from_slice(&world.reports().refusals);
+        }
+        assert_eq!(live_seqs(&world), seqs, "{press:?}");
+        assert_eq!(refusals, refused, "{press:?}");
+        assert_eq!(world.reports().pool_full, refused.len() as u64);
+    }
+}
+
 #[test]
 fn carry7_tick_view_tick_and_view_fraction_never_reach_the_state() {
     // Two streams that differ only in each command's tick, view_tick and view_fraction (equal Rewinds) step to equal

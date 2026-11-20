@@ -576,6 +576,22 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
     assert_ne!(POSITION_XY, VELOCITY, "one range, two kinds");
 }
 
+/// U4f-F1's FP-2 (RR-F1-2, TE-F1-2): the one press rule takes every edge of a counter's advance across the u8 wrap
+/// (ADR 0001:226; PM-0001-58's wrapping counters), none on an unchanged counter.
+#[test]
+fn f1_edges_taken_is_the_wrapping_advance() {
+    for (last, now, edges) in [
+        (255, 1, 2),
+        (254, 0, 2),
+        (1, 0, 255),
+        (0, 255, 255),
+        (7, 7, 0),
+        (0, 1, 1),
+    ] {
+        assert_eq!(Command::edges_taken(last, now), edges, "{last} to {now}");
+    }
+}
+
 /// The share of position values from 0 to 20 m, in sixteenths of a centimetre, on which `a` and `b` differ.
 #[cfg(feature = "bites")]
 fn differing_share(a: impl Fn(f32) -> f32, b: impl Fn(f32) -> f32) -> f64 {

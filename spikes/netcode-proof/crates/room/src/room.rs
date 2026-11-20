@@ -352,8 +352,9 @@ impl ClientSlot {
 
     /// The last tick's press edges: (seen, lost, doubled), over the commands run (-20's and -58's
     /// `tick.v.press_count`, `.press_lost_count`, `.press_doubled_count`). Seen: each button's counter advance over the
-    /// last command run on this slot; lost: the edges beyond the one the sim takes from a changed counter (npt-sim
-    /// world.rs: an edge is a counter that differs from the one it last claimed); doubled: an edge on option B's repeat.
+    /// last command run on this slot; lost: the advance less the edges npt-sim's one rule takes from it
+    /// ([`Command::edges_taken`]), counted here with that rule and not read from the sim, so 0 while the rule takes
+    /// every edge; doubled: an edge taken on option B's repeat.
     pub fn presses(&self) -> (u32, u32, u32) {
         (self.t.presses[0], self.t.presses[1], self.t.presses[2])
     }
@@ -1325,8 +1326,10 @@ impl<S: SimCore> Room<S> {
 }
 
 /// One command run for `c` this tick (option B's repeat when `repeated`): its press edges counted against the slot's
-/// last run counters `presses` (seen, lost beyond the one edge the sim takes, doubled on a repeat), the fire-press
-/// tracking, and its Rewind when it holds or presses fire.
+/// last run counters `presses` (seen: each counter's advance; lost: the advance less the edges npt-sim's one rule
+/// [`Command::edges_taken`] takes, counted here with that rule and not read from the sim, so 0 while the rule takes
+/// every edge; doubled: the edges taken on a repeat), the fire-press tracking, and its Rewind when it holds or presses
+/// fire.
 fn run_one(
     c: &mut ClientSlot,
     cmd: Command,
@@ -1336,12 +1339,13 @@ fn run_one(
     cover: CoverVariant,
 ) -> (Command, Option<Rewind>) {
     for (k, &p) in cmd.presses.iter().enumerate() {
-        let edges = u32::from(p.wrapping_sub(presses[k]));
+        let advance = u32::from(p.wrapping_sub(presses[k]));
+        let taken = u32::from(Command::edges_taken(presses[k], p));
         if repeated {
-            c.t.presses[2] += edges;
+            c.t.presses[2] += taken;
         } else {
-            c.t.presses[0] += edges;
-            c.t.presses[1] += edges.saturating_sub(1);
+            c.t.presses[0] += advance;
+            c.t.presses[1] += advance.saturating_sub(taken);
         }
     }
     if !repeated {
