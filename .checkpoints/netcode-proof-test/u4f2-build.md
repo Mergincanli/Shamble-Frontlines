@@ -121,3 +121,33 @@
   u4f2-b7-t.log: whole lab bin 131 passed, 1 ignored, 246.73 s (debug, measured); u4f2-b7-lint.log: fmt clean, clippy
   both builds exit 0, contract:: 10, client endpoint 12, bots f15 12 passed.
   SIZE-CHECK: +1658 -151 tracked + forged.rs 362 new = 2,020 added.
+- Block 8 DONE (the scripts): c-u4f-r2.mjs gains p1, p7, p14, p17 (FORGED = P21 + `--suite forged --forge-every
+  12`), C-U4F2-4's reworded FP8 line (header comment and r2.txt's head: "-21's 5.3 record only from U4f2's merge commit
+  or a later one"), F5 (a) p4 "5 bursts in 30 s", F5 (b) p12 "89.5 % on U4f's early read", F5 (c) p12 "'0 presses lost'
+  fails too, reached by the bite", p19's expect reworded to section 5's reading (no fixed counts); 21 rows.
+  c-u4f-runs.mjs gains set 21 (PARTS_21, NO_STAR; `plan` takes parts, a twin right after its measured run, each naming
+  the other in `--twin`, the clamp twin's `--twin-logs @run` placed by main; 24 measured + 12 twins in the measured call,
+  13 bites under A in the second; usage 47|22|20|21; STOP_NOTE names the twins). Node check: plans 47 5, 22 4, 20 7
+  (unchanged), 21 49 (36 + 13).
+- Section 6 item 5, by hand (release, `-x`, the worktree's tree, commit 0376c76 named): u4f2-hand-a.log: the 8
+  measured lines and 4 twin lines of set 21 at seed 1 (10 s + 5 s) and r2's p1, p14, p17 (10 s + 20 s), all exit 0;
+  u4f2-hand-b.log: the 13 bite lines and p7, all exit 0, and the two judge calls in 5.4's form (`--only
+  PM-0001-2,PM-0001-21`, measured+twins, then bites), both exit 0. The measured call: every PM-0001-2 check passes on
+  every run (shots 700.8 on the clamp runs); -21 fails only by length (1,000 a kind; 1,000 points; 10 runs of 60 s;
+  100 bursts), the fast clock's two checks a gap (no episode in 5 s); the twin checks of forged and clamp PASS on
+  both options. Bites: 13 shown; each forged no-* bite's own kind unrejected (36, kind 10's 32).
+- FINDING F-D (fixed, my construction, High had it gone to the set): the kind-7 forger's fire edges lay inside its own
+  reload, where `PM-0001-21/no-cooldown` (world.rs:1449-1455: relaxes only outside a reload) cannot reach them: on the
+  bite run kind 7 read unrejected 0, so the bite would not fail its check at the judged length. Rebuilt kind 7
+  (bots `RELOAD_ITEMS` 40, `FIRE_REST` 3): fire items (fire released 3 commands, an honest press that fires the rested
+  weapon, the forged press in its cooldown) and every 40th item (index 2) a reload item (honest reload edge, forged
+  reload edge inside it). f15's kind-7 test rewritten (`f15_the_kind_7_forger_presses_where_the_sim_refuses`); f15 12,
+  f16 + forged:: 39 passed (u4f2-b8-k7.log). No-cooldown bite run (u4f2-hand2): kind 7 31 of 36 unrejected: reached.
+- FINDING F-B measured (open, for the advisor before -21's set; High for that set): a judged-length forged run (10 s +
+  600 s, seed 1, option A, release): every kind sent at least 1,000 (1,523; kind 10 1,656) and unrejected 0 but kind 7.
+  Kind 7: first shape 41 of 1,270 (u4f2-hand-long.log), new shape 18 of 1,523 (u4f2-hand-long2.log). By my reading
+  (not verified: no death series is logged), a forged edge while the forger is dead gets no sim record
+  (world.rs:1353), and a respawn resets the weapon so an item next to it can fire or start a reload. -21's check
+  "forged: every forged command rejected and counted" would then fail. Shots per measured second 677 and 685 (band
+  665-735): F-C, a thin margin on seed 1.
+  SIZE-CHECK: +1718 -175 tracked + forged.rs 362 = 2,080 added.
