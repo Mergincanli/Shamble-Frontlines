@@ -213,3 +213,23 @@
   --workspace` exit 0, the same `--all-features` exit 0, `cargo fmt --check` exit 0.
 - End check A2 started 16:21 UTC (`df -h` 9.1G before; `-x`; u4f2-end-a2.log): the two provenance builds, then
   `node check.mjs`.
+- End check A2's result (16:44:49 UTC, exit 1, "check: 1 step(s) failed"): provenance builds exit 0 (`--no-run` and
+  `--all-features --no-run`; every npt-* crate "Compiling" from this worktree, 2 each). fmt PASS 0.9 s; clippy PASS
+  13.1 s; clippy-wasm32 PASS 6.3 s; doc PASS 7.3 s; **test PASS 1,157.8 s: measured 702 passed (642 + 60), bites
+  799 (739 + 60), 0 failed, 0 skipped** (the stop line 1,207 s: 49 s left; 1faf894's counted check 931.9 s, so +226
+  s); **deps FAIL**: "crates/bots/src/lib.rs:156 sets CATCHUP_HOLD from `npt_proto::Limits::REDUNDANCY_CAP as u32 -
+  2`: a tick-counted value is a const fn of npt_sim::TICK_HZ, never a literal" (check.mjs:760 `TICK_NAMED =
+  /_TICKS$|CATCHUP/`: the name alone makes it a tick count); wasm PASS 105.2 s (27,000 ticks native-native and
+  native-Wasm, 0 mismatching; h2 equal; the hash-map and std-sin catches as before); refs PASS (1,630 files); marks
+  PASS (81 marks); self PASS 78 of 78; redact PASS 10 of 10, 330 items, 0 findings. check.mjs wrote its failed step's
+  output to the worktree's .gate/netcode-proof-test/failed-steps/deps.log (its own path, gitignored).
+- Fix (a rename, no build): `CATCHUP_HOLD` -> `HOLD_STEPS` (bots/src/lib.rs, 7 sites; the public `forger` doc names it
+  as plain text, rewrapped). Carry 39's form for the advisor: name HOLD_STEPS; definition
+  `npt_proto::Limits::REDUNDANCY_CAP as u32 - 2` client steps with no command around kind 10's burst, so the 8
+  accepted commands over the episode's 8 steps leave the forger's lead as it was; value 6 at 30 Hz and 6 at 60 Hz
+  (a count of steps against a count of commands, rate-free: at either rate the client steps once a tick); site
+  bots/src/lib.rs:156. Not verified by a build or check yet.
+- **STOP (disk), 16:45 UTC:** `df -h /home/user` 3.3G available after A2 (the debug refill), under the 4 GB floor
+  before a check.mjs run (u4f-brief.md:853-855). Not run: check.mjs on the renamed tree (end check A3) and the second
+  (B), each needing 4 GB first; the `--list` counts (A2's test step gives 702 and 799 by check.mjs's measure). Nothing
+  cleaned or deleted.

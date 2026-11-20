@@ -1,5 +1,5 @@
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index b40d2dd..cbf4cce 100644
+index b40d2dd..2604eb5 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
 @@ -144,17 +144,250 @@ pub struct Behaviour {
@@ -17,7 +17,7 @@ index b40d2dd..cbf4cce 100644
 +const FIRE_REST: u64 = 3;
 +/// Kind 10's hold, in steps without a command: the burst's 8 accepted commands less its own two steps, so the
 +/// forger's lead is the same after an episode as before it (a count of steps, with no time in it).
-+const CATCHUP_HOLD: u32 = npt_proto::Limits::REDUNDANCY_CAP as u32 - 2;
++const HOLD_STEPS: u32 = npt_proto::Limits::REDUNDANCY_CAP as u32 - 2;
 +
 +/// A forger's state (u4f-brief.md 2.4, 2.6, 2.12): its kind, interval and the bound (ticks); whether it is the twin
 +/// (the same script with only the forged part made honest); kind 10's option (A: hold, then burst; B: burst, then
@@ -256,7 +256,7 @@ index b40d2dd..cbf4cce 100644
  }
  
  /// `c`, the newest command of a new sequence, forged in `kind` (2.6's per-kind table), the `n`-th (from 1), against
-@@ -301,14 +534,21 @@ impl Behaviour {
+@@ -301,14 +534,22 @@ impl Behaviour {
          }
      }
  
@@ -277,15 +277,16 @@ index b40d2dd..cbf4cce 100644
 +    /// turn); kind 11: a `Ping` on the control stream beside it. Kind 10: an episode every `every` x 8 (A) or x 4 (B)
 +    /// commands, 16 (A) or 12 (B) commands in two datagrams sent in one step, stamped on from its last accepted stamp +
 +    /// 1, so all but the first 8 are refused by the catch-up cap (A) or the full buffer (B), 6 steps without a command
-+    /// (the crate's `CATCHUP_HOLD`) before (A) or after (B) the burst keeping its lead. `None` for `every` below 2: kinds 2 and 5 forge against the previous command, so it must have
-+    /// been accepted (SEC-U4F-1), which every interval of 2 or more gives on a lossless profile (P0).
++    /// (the crate's `HOLD_STEPS`) before (A) or after (B) the burst keeping its lead. `None` for `every` below 2:
++    /// kinds 2 and 5 forge against the previous command, so it must have been accepted (SEC-U4F-1), which every
++    /// interval of 2 or more gives on a lossless profile (P0).
      pub fn forger(mut self, kind: u8, every: u64, bound: u32) -> Option<Behaviour> {
 -        ([1, 2, 4, 5, 6].contains(&kind) && every >= 2).then_some(())?;
 +        ((1..=11).contains(&kind) && every >= 2).then_some(())?;
          self.forge = Some(Forge {
              kind,
              every,
-@@ -318,7 +558,28 @@ impl Behaviour {
+@@ -318,7 +559,28 @@ impl Behaviour {
          Some(self)
      }
  
@@ -315,7 +316,7 @@ index b40d2dd..cbf4cce 100644
      pub fn take_forged(&mut self) -> Vec<u16> {
          self.forge
              .as_mut()
-@@ -326,6 +587,27 @@ impl Behaviour {
+@@ -326,6 +588,27 @@ impl Behaviour {
              .unwrap_or_default()
      }
  
@@ -343,7 +344,7 @@ index b40d2dd..cbf4cce 100644
      /// -21's 1.5x clock (u4f-brief.md 2.6; U4F-Q11 (iii) (c) and (v) (b) as F1 amends it): fire held at a seeded point,
      /// the lane's walk at full length, a command at every step once the endpoint holds a snapshot (its host clock's rate
      /// is the lab's), each stamped by the crate's `fast_stamp` under the lead bound `bound` (ticks) in
-@@ -424,11 +706,14 @@ impl Behaviour {
+@@ -424,11 +707,14 @@ impl Behaviour {
                  l.bursts.push(now_ns.saturating_sub(at));
              }
          }
@@ -361,7 +362,7 @@ index b40d2dd..cbf4cce 100644
          for d in datagrams.iter_mut() {
              if let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
              {
-@@ -460,23 +745,6 @@ impl Behaviour {
+@@ -460,23 +746,6 @@ impl Behaviour {
                          }
                      }
                  }
@@ -385,7 +386,7 @@ index b40d2dd..cbf4cce 100644
                  // Every rewritten `Input` encodes: an older copy a past-bound stamp leaves more than 255 ticks below
                  // (after an idle) is left out, oldest first, so the rest stay consecutive (the codec's two rules).
                  let mut out = Vec::new();
-@@ -585,11 +853,134 @@ impl Behaviour {
+@@ -585,11 +854,134 @@ impl Behaviour {
              self.skipped += 1;
              return false;
          }
@@ -461,7 +462,7 @@ index b40d2dd..cbf4cce 100644
 +    }
 +
 +    /// Kind 10's step ([`Behaviour::forger`]): an episode once every `every` x its refused count commands (A: 8,
-+    /// B: 4): under A, [`CATCHUP_HOLD`] steps with no command, then 8 commands (their `Input` held), then 8 more (both
++    /// B: 4): under A, [`HOLD_STEPS`] steps with no command, then 8 commands (their `Input` held), then 8 more (both
 +    /// `Input`s sent in this step); under B the 8, then 4 more, then the hold. The twin gives none of the burst's
 +    /// refused commands (generated, never made: their indices skipped at its next step).
 +    fn catchup_step(
@@ -481,7 +482,7 @@ index b40d2dd..cbf4cce 100644
 +            f.episode = 1;
 +        }
 +        let (first, second) = if f.option_a {
-+            (CATCHUP_HOLD + 1, CATCHUP_HOLD + 2)
++            (HOLD_STEPS + 1, HOLD_STEPS + 2)
 +        } else {
 +            (1, 2)
 +        };
@@ -493,7 +494,7 @@ index b40d2dd..cbf4cce 100644
 +            _ => 0,
 +        };
 +        if step > 0 {
-+            f.episode = if step == CATCHUP_HOLD + 2 {
++            f.episode = if step == HOLD_STEPS + 2 {
 +                0
 +            } else {
 +                step + 1
@@ -520,7 +521,7 @@ index b40d2dd..cbf4cce 100644
      /// The decision function (crate-private; `step` calls it, and so do this crate's tests): the next command from
      /// `newest`, `view` and `own`, the own soldier as the endpoint decoded it (`ClientEndpoint::own_soldier`: its grid
      /// position and dead bit), counted as given.
-@@ -652,6 +1043,10 @@ impl Behaviour {
+@@ -652,6 +1044,10 @@ impl Behaviour {
          let walk = match self.kind {
              Kind::Brawl => self.leash(own, walk),
              Kind::Lane => self.lane(own),
@@ -531,7 +532,7 @@ index b40d2dd..cbf4cce 100644
              _ => walk,
          };
          Command {
-@@ -1170,10 +1565,344 @@ mod tests {
+@@ -1170,10 +1566,344 @@ mod tests {
      fn f15_a_forgers_interval_below_2_is_refused() {
          let scene = Scene::stress();
          let steady = || Behaviour::script(&scene, 0, 1, "steady").expect("a script");
@@ -812,7 +813,7 @@ index b40d2dd..cbf4cce 100644
 +    /// f15's kind-10 case under both options (2.6's row; SA3-8, SA31-4 (c)): each episode sends two `Input`s in one
 +    /// step, the first 8 new commands, the second 8 more new (A) or the first's last 4 again and 4 new (B), stamped
 +    /// one apart on from the forger's last accepted stamp, every view tick at most its own tick, each `Input` encoding;
-+    /// the forged sequences are the second's new ones; [`CATCHUP_HOLD`] steps with no new command come before (A) or
++    /// the forged sequences are the second's new ones; [`HOLD_STEPS`] steps with no new command come before (A) or
 +    /// after (B) the burst; the twin sends the first `Input` and then the same commands again (repeats only), and its
 +    /// later commands keep the forger's sequences.
 +    #[test]
@@ -860,7 +861,7 @@ index b40d2dd..cbf4cce 100644
 +            assert_eq!(forged, want, "a: {a}");
 +            assert!(bursts >= 2, "a: {a}: {bursts}");
 +            quiet_runs.push(quiet);
-+            let held = quiet_runs.iter().filter(|q| **q >= CATCHUP_HOLD).count();
++            let held = quiet_runs.iter().filter(|q| **q >= HOLD_STEPS).count();
 +            assert!(held >= bursts, "a: {a}: {quiet_runs:?}");
 +            let seqs = |s: &Side| -> BTreeMap<u16, ()> {
 +                let all = s.steps.iter().flat_map(|x| inputs(&x[1]));
@@ -877,7 +878,7 @@ index b40d2dd..cbf4cce 100644
      }
  
      /// The judged runs' first tick (the run scripts' `--tick-start 63736`).
-@@ -1196,6 +1925,12 @@ mod tests {
+@@ -1196,6 +1926,12 @@ mod tests {
          /// ten burst starts, the first 30 s into the measured phase (after the 10 s warm-up) and then every 60 s (the
          /// run scripts' B1 settings).
          Bursts,
@@ -890,7 +891,7 @@ index b40d2dd..cbf4cce 100644
      }
  
      /// One run's record: soldier-ticks in a building and the first; the largest distance from the centre (its square in
-@@ -1242,19 +1977,32 @@ mod tests {
+@@ -1242,19 +1978,32 @@ mod tests {
              .collect()
      }
  
@@ -930,7 +931,7 @@ index b40d2dd..cbf4cce 100644
          let mut last: Vec<Option<Command>> = vec![None; n];
          let mut seq = vec![0u16; n];
          let mut rng = seed ^ 0x736b_6970_7300_0000;
-@@ -1310,9 +2058,31 @@ mod tests {
+@@ -1310,9 +2059,31 @@ mod tests {
              let burst = bursts.iter().any(|&(a, b)| (a..b).contains(&k));
              let mut commands = Vec::with_capacity(n);
              for s in 0..n {
@@ -963,7 +964,7 @@ index b40d2dd..cbf4cce 100644
                          Pattern::Bursts => burst,
                          Pattern::Skips => {
                              r.chances += 1;
-@@ -1369,8 +2139,20 @@ mod tests {
+@@ -1369,8 +2140,20 @@ mod tests {
      /// rate per 1000 are the skip pattern's alone (ADV-PT-L1); every pattern prints its skipped ticks and longest
      /// streak.
      fn printed(seed: u64, ms: u32, pattern: Pattern) -> Record {
@@ -985,7 +986,7 @@ index b40d2dd..cbf4cce 100644
              Pattern::EveryTick => format!("skipped {}", r.skipped),
              Pattern::Skips => format!(
                  "skipped {} of {} chances ({} per 1000)",
-@@ -1381,7 +2163,7 @@ mod tests {
+@@ -1381,7 +2164,7 @@ mod tests {
              Pattern::Bursts => format!("skipped {} in its bursts", r.skipped),
          };
          println!(
@@ -994,7 +995,7 @@ index b40d2dd..cbf4cce 100644
               distance from the centre {} cm (slot {}, tick {}, at {}, {}); {skips}, longest streak {}; dead {} \
               soldier-ticks; stuck (slot, tick, x, y): {:?}",
              ticks_for_ms(ms),
-@@ -1411,6 +2193,46 @@ mod tests {
+@@ -1411,6 +2194,46 @@ mod tests {
          }
      }
  
