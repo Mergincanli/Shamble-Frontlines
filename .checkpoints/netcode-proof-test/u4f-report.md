@@ -588,7 +588,8 @@ and a half edit, none found, and each notice recorded word for word where cited)
      - Carry 49's "holding every very large unit" reads 0.9938 on that run and 1.0000 on the others. It is a report
        figure.
 5. **-20's set: done at 350677f; option B's FAIL is a stand-in defect, so the set re-runs on the fix**
-   (u4f-20-read.md; the advisor's ruling advisor-u4f-20.md, read in full).
+   (u4f-20-read.md; the advisor's ruling advisor-u4f-20.md, read in full). **Re-run on U4f-F1's merge: PASS** (46ca143;
+   -20's L1 record, at this item's end; F1's report u4f-f1-report.md).
    - **The run:** `… c-u4f-runs.mjs 20 --date 2026-11-19`, 20:07:24 to about 20:48 UTC, exit 0, at 350677f, whose
      spikes/netcode-proof differs from 25d316e's only by -47's results (`git diff --quiet … ':(exclude)…/results'` exit
      0). Results in results/u4f/350677f0aef2/pm-0001-20/, committed at 1840e68.
@@ -642,6 +643,41 @@ and a half edit, none found, and each notice recorded word for word where cited)
        L1 runs never write (ADV-U4F20-2, Medium: marks.json:4786-4790, and -58's row :4263-4267, his to change, on the
        after-close list). By hand from the lab's `reorder` event, the lower share is 100, 101 and 101 per mille (up
        160, 161 and 160; down 100, 101 and 101), A and B alike. Validity holds through that event.
+   - **-20's L1 record: the re-run on U4f-F1's merge (2026-11-20).** The 350677f folder stays as the defect's record.
+     - **The run:** `flock -x .gate/shared-target/.lane.lock node spikes/netcode-proof/ops/runs/c-u4f-runs.mjs 20 --date
+       2026-11-20`, about 02:22 to 03:07 UTC, exit 0, under the lane lock, CARGO_TARGET_DIR unset, no uncommitted
+       tracked file. HEAD 96de6ac (a card save); its header's spikes/netcode-proof tree is
+       d4f6cd41b8d789a7d9ad00f729f3a32224d123c4, the same as 1faf894's (`git rev-parse` of both). Results in
+       results/u4f/96de6acf8223/pm-0001-20/, committed at 46ca143.
+     - **The verdicts:** PM-0001-2's SS part PASSES, 6 of 6 valid. PM-0001-20 L1 option A PASSES 3 of 3 and option B
+       PASSES 3 of 3; the mark's headline reads NOT-RUN because its L2 parts are not run yet. The bite redundancy-1 is
+       shown.
+     - **Held to the advisor's expected figures** (advisor-u4f-f1-plan.md:119-140; r1 :191-205; head check condition
+       3), all equal: the seven summary lines equal to 350677f's but wall time (npt-lab's two binary sha256s new;
+       npt-judge's and marks.json's unchanged); the per-tick world hash equal on all 18,335 ticks of all seven runs
+       (the scratchpad's compare_20.py on both raw-log folders); presses lost 0 and doubled 0 everywhere; presses B
+       432,000 each, A 432,003, 432,003 and 432,009; on time per seed 0.999843, 0.99987 and 0.999861, A and B alike;
+       the bite at 0.894544, its lost 3,614 to 0; the reorder row "not available" (ADV-U4F20-2, his; the event's
+       figures above stand). A leaf-by-leaf diff of the verdicts finds 14 of 593 measured leaves and 2 of 65 bite leaves
+       changed, all of them the lost check and its reasons.
+     - **(i)** "'0 presses lost' is 0 by the press-counter design after U4f-F1: npt-room counts with the rule npt-sim
+       runs (`Command::edges_taken`), as '0 presses doubled' has been 0 by design since U4f; it guards that rule against
+       the room's own wrapping difference, not the sim's take. The sim's take of every edge is proven by T1 and T2 and
+       their planted bugs. The run's evidence that no scripted press went missing is presses = 432,000 per option-B
+       run, the scripted count (48 x 18,000 / 2); the per-tick state hashes equal to 350677f's show the 1-edge path
+       unchanged and the extra fire edge state-neutral at run scale." (advisor-u4f-f1-r1.md:67-72)
+     - **(ii)** Wasm, by reading only: the rule is integer-only and an extra throw runs the single throw's float path;
+       the wasm step's 27,000 ticks are not shown to hold a multi-edge command.
+     - **(iii)** The stand-in's throw has no cooldown, so neither T2 (f) nor any -21 figure shows ADR 0001:236's
+       ability check; a press bank of up to 127 throw edges bursts in one tick.
+     - **(iv)** SA-F1-1 (Medium) stays open until C-U6-19 closes it, before -19's runs; no -20, -21 or -22 client rejoins
+       or throws. RR-F1-1: no action (bounded, no allocation; its large reach leaves with C-U6-19; kind 5 caps a command
+       at 127 edges in a session).
+     - **(v)** The advisor's plan review's premise (advisor-u4f-f1-plan.md:143-145) is corrected: the count is what the
+       one rule does not take, not what the sim does not take; T1 and T2's count halves tie the sim's take to the rule.
+       r1's FP-3 restore hash 63057544…16499 was the pre-FP-1 file; "as before" is 901bb546…4c90.
+     - **ADV-U4FF1H-1's correction:** 1faf894's commit message calls the advisor's check of F1's pass "APPROVE"; the
+       verdict was APPROVE WITH CONDITIONS (advisor-u4f-f1-pass.md:181).
 6. **-22's set: done. PM-0001-22 PASSES.**
    - **The run:** `… c-u4f-runs.mjs 22 --date 2026-11-19`, 20:51 to 21:17 UTC, exit 0, at 7192607, the same spike
      tree outside results/. Results in results/u4f/7192607d99a1/pm-0001-22/, committed at 2dae645.
