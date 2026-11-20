@@ -1,0 +1,39 @@
+# U4f2's build: -21's forged-command suite and the code for all of -21's runs (builder 1)
+
+## Step 0 (2026-11-20)
+- Worktree /home/user/Shamble-Frontlines/.claude/worktrees/agent-aa62d31b6fa5b9807 started at f5030a3 (origin/main);
+  `git merge --ff-only 0376c76` fast-forwarded it: HEAD 0376c7697440bd2c78c6ce7c4d10adbcbe5ded25.
+- `git rev-parse HEAD:spikes/netcode-proof` = 2b7647ffc3c1927e0bb8d6269bbf240217b8f6db (the brief's 2b7647ffc3c1927e…).
+- `git diff --quiet a289def HEAD -- spikes/netcode-proof`: exit 0 (spikes/ equals `<base>`'s).
+- Slip, said at the top as the rules ask (u4f-brief.md section 4, Commands): my first two Bash calls (step 0 itself)
+  used `cd <worktree> && ...` with `;` and `|` in one call, against P17's one-command form. Read-only git commands and
+  a `merge --ff-only`; no file written by them. Every later call is one command, from the worktree.
+- `df -h /home/user` at start: 9.9G free.
+
+## Plan (blocks in u4f2-brief.md section 1's order; each at most about 400 added lines, compiling with its tests
+## passing before the next; SIZE-CHECK `git diff --stat a289def -- spikes/` after each)
+1. f28's clamp and lag-switch halves under option B (one test per suite and option).
+2. npt-bots: forgers of kinds 3, 7, 8, 9, 10 and 11, f15's six cases.
+3. npt-lab: `--suite forged` (11 forger slots, 37 honest open-loop), `--forge-every` with header param and SERIES.md
+   row; C-U4F2-1's parser half (below 2 a usage error).
+4. npt-lab attribution: C-U4F2-3 first (room `Refusal` enum -> `CommandRefusal`, records `{ slot, seq, kind }`), then
+   `event.forged_kind.sent_count` / `.unrejected_count`; C-U4F2-SEC-1 (`refusals_dropped` logged).
+5. npt-lab twins: skip through `ClientEndpoint::skip_command`, kind 10 and kind 3 twin rows, clamp twins'
+   `--twin-logs`; C-U4F2-2's `skip_command` unit test, `twin_left_out` doc and row.
+6. Tests f16 (24), f22 (2), f23, f33 (13) + U4F2-Q4's case + C-U4F2-10's case; C-U4F2-1's proof.
+7. C-U4F2-5 (Steady's move by Q1 (b)/(c), sim-only test with option-A pattern and the plant), C-U4F2-7 with T-6's
+   five cases, C-U4F2-8, ADV-U4FP-3.
+8. Scripts: c-u4f-r2.mjs p1, p7, p14, p17 (C-U4F2-4, F5, p19's expect); c-u4f-runs.mjs -21's set.
+9. End checks (u4f-brief.md section 6 items 1-5).
+
+## Log (one line per block, plant, finding)
+- Finding (time budget, 14:2x UTC): 1faf894's counted check (.gate/u4f/f1-b5-check2.log) has the test step at 931.9 s
+  against the 1,207 s stop line: about 275 s of room. c62hb_p2_short alone 13.59 s (w4-times.log); a 16-client 2+4 s
+  run about 8-9 s in debug (f19 8.64 s). 22 separate f16 pairs (one forger, 15 honest: 2.10's scale text) would add
+  about 190 s of wall to the step; so f16 shares one forged pair per option (11 forgers + 5 honest at 16 clients) by
+  line 6's sharing rule, and the clamp pair per option is shared by f18, f28 and f16 (a departure from 2.10's "one
+  forger, 15 honest", named for the report).
+- Block 1 DONE (f28's clamp and lag-switch B halves): `pair(suite, timing)` (OnceLock, the clamp run and its twin),
+  f18 rewritten on pair("clamp","A") (+ every tick's world hash), f28_option_b_the_clamp_suite_..., `lag_short`, f20 on
+  it, f28_option_b_the_lag_switch_suite_..., `unnamed`. u4f2-b1-t.log: 6 passed (f18, f20, f28 B x4) in 34.39 s.
+  SIZE-CHECK: +93 -36.

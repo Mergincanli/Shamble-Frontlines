@@ -1,0 +1,169 @@
+diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
+index 7f54e46..2ba5933 100644
+--- a/spikes/netcode-proof/crates/lab/src/scenario.rs
++++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
+@@ -3994,36 +3994,63 @@ pub(crate) mod tests {
+         );
+     }
+ 
+-    /// f18 (ii), line 12 of the advisor's ruling and f28's clamp half: a short clamp run (16 clients, P0, 2 s + 4 s,
+-    /// option A, slot 0 the cheat and the rest the steady script) counts its cheat's points beyond reach (`sent_count`
+-    /// above 0) with no sim refusal on them (`counted_count` 0: it holds fire, no press edge) and no rerun report; every
+-    /// name it writes has its row; its twin, sending the run's clamp reports' points (`--twin-logs`), hashes the same
+-    /// ticks to the same state hashes.
++    /// One short run's three logs (room, client, lab) and its summary.
++    pub(crate) struct Ran {
++        pub(crate) logs: Vec<npt_log::Log>,
++        pub(crate) sum: Summary,
++    }
++
++    /// -21's short pair of `suite` (`clamp`) under option `timing` (2.10's scale: 16 clients, P0, 2 s + 4 s, U4f's
++    /// controller, slot 0 the cheat and the rest the steady script): the run and its twin (role twin, its points from
++    /// the run's clamp reports: `--twin-logs`), made once per test process, suite and option, read by every test that
++    /// shares it (line 6); the folders removed once read.
++    pub(crate) fn pair(suite: &'static str, timing: &'static str) -> &'static [Ran; 2] {
++        static PAIRS: [std::sync::OnceLock<[Ran; 2]>; 2] = [const { std::sync::OnceLock::new() }; 2];
++        PAIRS[usize::from(timing == "B")].get_or_init(|| {
++            let args = format!(
++                "--seed 1 --profile P0 --clients 16 --warmup-s 2 --measured-s 4 --after-max-s 10 --controller 1 \
++                 --cmd-timing {timing} --suite {suite} --behaviour steady"
++            );
++            let one = |name: String, args: &str| {
++                let dir = scratch(&name);
++                let s = settings(&dir, args);
++                let sum = run(&s).unwrap_or_else(|e| panic!("{name}: {e:?}"));
++                println!("{name}: {}", summary_line(&s, &sum));
++                let logs = crate::contract::read(&dir).expect("its logs");
++                (dir, Ran { logs, sum })
++            };
++            let (dir, a) = one(format!("u4f2-{suite}-{timing}"), &args);
++            let twin = format!("{args} --role twin --twin t --twin-logs {}", dir.display());
++            let (_twin_dir, b) = one(format!("u4f2-{suite}-{timing}-twin"), &twin);
++            [a, b]
++        })
++    }
++
++    /// The names a run writes that have no SERIES.md row (the contract checker's (b)).
++    fn unnamed(logs: &[npt_log::Log]) -> Vec<String> {
++        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
++        c.failures.into_iter().filter(|f| f.starts_with("(b)")).collect()
++    }
++
++    /// f18 (ii), line 12 of the advisor's ruling and f28's clamp half under option A: the short clamp pair (option A)
++    /// counts its cheat's points beyond reach (`sent_count` above 0) with no sim refusal on them (`counted_count` 0: it
++    /// holds fire, no press edge) and no rerun report; every name it writes has its row; its twin, sending the run's
++    /// clamp reports' points (`--twin-logs`), hashes the same ticks to the same state hashes.
+     #[test]
+     fn f18_a_clamp_run_and_its_twin_give_equal_hashes_and_count_no_refusal() {
+-        let args = "--seed 1 --profile P0 --clients 16 --warmup-s 2 --measured-s 4 --after-max-s 10 \
+-                    --controller 1 --cmd-timing A --suite clamp --behaviour steady";
+-        let dir = scratch("u4f-clamp");
+-        run(&settings(&dir, args)).expect("the clamp run");
+-        let twin = scratch("u4f-clamp-twin");
+-        let t = format!("{args} --role twin --twin t --twin-logs {}", dir.display());
+-        run(&settings(&twin, &t)).expect("its twin");
+-        let hashes = |d: &Path| -> Vec<(u64, Option<String>)> {
+-            read(d, "room")
+-                .ticks
+-                .iter()
+-                .map(|r| (r.t, r.h.clone()))
+-                .collect()
++        let [run, twin] = pair("clamp", "A");
++        let hashes = |r: &Ran| -> Vec<(u64, Option<String>)> {
++            r.logs[0].ticks.iter().map(|t| (t.t, t.h.clone())).collect()
+         };
+-        assert_eq!(hashes(&dir), hashes(&twin), "the twin's state hashes");
+-        let lab = read(&dir, "lab");
+-        let k = lab
++        assert_eq!(hashes(run), hashes(twin), "the twin's state hashes");
++        assert_eq!(run.sum.world_hashes, twin.sum.world_hashes, "every tick's");
++        let k = run.logs[2]
+             .events
+             .iter()
+             .find(|e| e.ev == "clamp_kind")
+             .expect("clamp_kind");
+         let f = |n: &str| k.f.get(n).and_then(|v| v.as_u64());
+-        let reports = read(&dir, "room")
++        let reports = run.logs[0]
+             .events
+             .iter()
+             .filter(|e| {
+@@ -4036,10 +4063,21 @@ pub(crate) mod tests {
+             (f("counted_count"), f("rerun_reports_count")),
+             (Some(0), Some(0))
+         );
+-        let logs = crate::contract::read(&dir).expect("its logs");
+-        let c = crate::contract::check(&logs, include_str!("../../../marks/SERIES.md"));
+-        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
+-        assert!(names.is_empty(), "{names:?}");
++        assert_eq!(unnamed(&run.logs), Vec::<String>::new());
++    }
++
++    /// f28's clamp half under option B (R3 (ii); line 6: one test per suite and option): every name the short clamp
++    /// pair's run (option B) writes has its SERIES.md row, its header names the suite and option B, and its lab log one
++    /// `clamp_kind` record.
++    #[test]
++    fn f28_option_b_the_clamp_suite_writes_each_name_with_its_row() {
++        let logs = &pair("clamp", "B")[0].logs;
++        assert_eq!(unnamed(logs), Vec::<String>::new());
++        let p = &logs[0].header.params;
++        let s = |k: &str| p.get(k).and_then(|v| v.as_str());
++        assert_eq!((s("suite"), s("cmd_timing")), (Some("clamp"), Some("B")));
++        let kinds = logs[2].events.iter().filter(|e| e.ev == "clamp_kind");
++        assert_eq!(kinds.count(), 1);
+     }
+ 
+     /// f20 (2.6; U4F-Q15 (c); A1) and f28's lag-switch half: a short lag-switch run at P1 (16 clients, 2 s + 6 s, option
+@@ -4056,13 +4094,7 @@ pub(crate) mod tests {
+         );
+         assert_eq!(crate::logs::moved_um(alive(0, 0), alive(5_000, 100)), None);
+         assert_eq!(crate::logs::moved_um(alive(0, 100), alive(10, 0)), None);
+-        let dir = scratch("u4f-lag-switch");
+-        let s = settings(
+-            &dir,
+-            "--seed 1 --profile P1 --clients 16 --warmup-s 2 --measured-s 6 --after-max-s 10 --controller 1 \
+-             --cmd-timing A --suite lag-switch --behaviour steady --lag-every-ms 2000",
+-        );
+-        run(&s).expect("the run");
++        let dir = lag_short("A");
+         let held: Vec<u64> = read(&dir, "lab")
+             .events
+             .iter()
+@@ -4081,9 +4113,34 @@ pub(crate) mod tests {
+         assert!(most("lagswitch_cmds_count").is_some_and(|m| (1..=cap).contains(&m)));
+         assert!(most("lagswitch_excess_move_um").is_some_and(|m| m <= 0));
+         let logs = crate::contract::read(&dir).expect("its logs");
+-        let c = crate::contract::check(&logs, include_str!("../../../marks/SERIES.md"));
+-        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
+-        assert!(names.is_empty(), "{names:?}");
++        assert_eq!(unnamed(&logs), Vec::<String>::new());
++    }
++
++    /// The lag-switch suite's short run (f20's settings: 16 clients, P1, 2 s + 6 s, a hold every 2 s) under `timing`.
++    fn lag_short(timing: &str) -> Scratch {
++        let dir = scratch(&format!("u4f-lag-switch-{timing}"));
++        let s = settings(
++            &dir,
++            &format!(
++                "--seed 1 --profile P1 --clients 16 --warmup-s 2 --measured-s 6 --after-max-s 10 --controller 1 \
++                 --cmd-timing {timing} --suite lag-switch --behaviour steady --lag-every-ms 2000"
++            ),
++        );
++        run(&s).expect("the run");
++        dir
++    }
++
++    /// f28's lag-switch half under option B (R3 (ii); line 6): every name the short lag-switch run (option B) writes
++    /// has its SERIES.md row, its header holds the hold and spacing, and its lab log the bursts.
++    #[test]
++    fn f28_option_b_the_lag_switch_suite_writes_each_name_with_its_row() {
++        let dir = lag_short("B");
++        let logs = crate::contract::read(&dir).expect("its logs");
++        assert_eq!(unnamed(&logs), Vec::<String>::new());
++        let p = &logs[0].header.params;
++        assert_eq!(p.get("cmd_timing").and_then(|v| v.as_str()), Some("B"));
++        assert!(p.contains_key("lag_hold_ns") && p.contains_key("lag_every_ns"));
++        assert!(logs[2].events.iter().any(|e| e.ev == "lag_burst"));
+     }
+ 
+     /// f37 (TE3-6, TE31-10): the lab's own episode function at the judged settings (a 10 s warm-up, 610 s measured)
