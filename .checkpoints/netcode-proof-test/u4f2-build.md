@@ -206,3 +206,10 @@
   runs' logs under .gate/u4f/u4f2-hand*/ (two 610 s 48-client runs, about 53 MiB each, and 33 short ones). Left to do
   on resume: rustdoc both builds (the doc fix), fmt check, then section 6's end checks: check.mjs twice (`-x`, df
   first), with the provenance builds; npt-server's tests are untouched (item 4 not triggered).
+- RESUMED 16:19 UTC (the main session's message: P27's second form, dev and release cleaned, 9,820 MiB free). Checked
+  first: `df -h` 9.6G; no cargo, rustc, npt-lab or check.mjs process; `git status --short` the 13 tracked files, the
+  notes and forged.rs. Nothing built beyond the doc fix.
+- Doc fix verified (u4f2-doc2.log, shared lock, free 9,819 MiB): `RUSTDOCFLAGS=-Dwarnings cargo doc --locked --no-deps
+  --workspace` exit 0, the same `--all-features` exit 0, `cargo fmt --check` exit 0.
+- End check A2 started 16:21 UTC (`df -h` 9.1G before; `-x`; u4f2-end-a2.log): the two provenance builds, then
+  `node check.mjs`.
