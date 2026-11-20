@@ -172,7 +172,10 @@
   the advisor first). Then R2-R5, round 2 (netcode, test, rust; xhigh; read only) on the fix pass's diff, then R6
   (check.mjs twice). The advisor's stop past 2,700 added at an FP end; his past 3,000. About four part-cleans (P27's
   second form, no lane running). **msg-2026-11-21.md drafted** (F-B-COUNT, a stop; U4G-Q1, not a stop; three
-  choices): send it at the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx). **Lesson:** never `cd` into an agent's
+  choices): send it at the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx). **While his Advisor answers
+  (KEEP-PROGRESSING, about two days):** U4h's brief drafter RUNNING from ~21:45 UTC (netcode-architect, xhigh; out
+  u4h-brief.md rev 1 and u4h-brief-notes.md; then the advisor's check); U4g's build only after U4f2's merge
+  (u4-build-plan.md:951-952, "never two at once"); U4G-Q2's text later, before -58's set. **Lesson:** never `cd` into an agent's
   worktree (the harness moved this session's main folder to it at 16:19; back at once); read it with Read/Grep.
   Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bh8edyqwv from 21:10 UTC (to about 23:00). Main f5030a3.
 
