@@ -170,7 +170,9 @@
   equal but wall, h equal on all 18,335 ticks x 7, lost 0, doubled 0, presses B 432,000, A 432,003/432,003/432,009,
   bite 0.894544 with lost 3,614 -> 0, reorder "not available"; 14 of 593 and 2 of 65 verdict leaves differ, all the
   lost check). Saver bh2qi25le from 04:12 UTC. **F1's report written** (u4f-f1-report.md: FP-5 (i)-(v), ADV-U4FF1H-1's
-  correction, SA-F1-1 open) and **-20's L1 record** (u4f-report.md item 5's end, the same lines). Next: condition 10.
+  correction, SA-F1-1 open) and **-20's L1 record** (u4f-report.md item 5's end, the same lines). **Condition 10 done:
+  u4f2-brief.md rev 1.2** (base 1faf894, counts 642/739, C-U4F2-9 and -10, T1's `npt_sim::Refusal` beside C-U4F2-3;
+  no new check by :224-225). Next: the advisor reads the -20 record and F1's report (its condition 3), then F1 closes.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,

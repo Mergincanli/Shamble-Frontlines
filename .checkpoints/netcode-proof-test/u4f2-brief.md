@@ -1,4 +1,4 @@
-# U4f2's brief, rev 1.1 (2026-11-19, after the advisor's check; the build waits for his U4F2-SIZE answer)
+# U4f2's brief, rev 1.2 (2026-11-20, rebased on U4f-F1's merge; the build waits for his U4F2-SIZE answer)
 **The unit:** -21's forged-command suite and all of -21's runs, cut from U4f by Mustafa's SIZE-U4F (a) (2026-11-19
 12:00 Amsterdam, word for word at history.md:6896-6903). The plan entry is u4-build-plan.md:855-879. This brief is
 short by TEST-FIRST rule 3 (history.md:2234-2282): it says what U4f2 builds, how it is tested and what is open, and it
@@ -11,10 +11,19 @@ blocks 7, sections 2, 3 and 6; 2 (Q1 as ruled) in block 7 and section 3; 3 (C-U4
 figure, the riders) in section 6 and the last section; 7 (the Lows) in blocks 4 and 7 and section 3; 8 (Q3, Q4) in
 blocks 6 and 7. The advisor needs no new check of rev 1.1 unless a condition cannot be met as written (:244-245).
 
+**Rev 1.1 to rev 1.2:** condition 10 of the advisor's U4f-F1 plan review (advisor-u4f-f1-plan.md:222-225: "U4f2's brief
+rebases on F1's merge"), with the round ruling's two carries (advisor-u4f-f1-r1.md:126-130, :159-165): the base and the
+count baseline move to U4f-F1's merge 1faf894 (sections 0 and 4); C-U4F2-9 and C-U4F2-10 join (section 3, block 6,
+section 2); block 4 names F1's T1 beside C-U4F2-3. The lane, the stop, the estimate and U4F2-SIZE stand (r1 :128-130).
+No new check: condition 10 needs none unless it cannot be met as written (:224-225).
+
 ## 0. Where things are (stamps at rev 1: sha256's first 16 hex, lines; each re-checked by the advisor at :19-28)
-- **The base:** U4f's merge 25d316e (spikes/netcode-proof tree f7ed90ad…). `<base>` is the lane head at launch, filled
-  by the main session in U4f's fill form (u4f-brief.md section 12), with the spike tree outside results/ named equal to
-  25d316e's or each difference listed.
+- **The base (rev 1.2):** U4f-F1's merge 1faf894 (spikes/netcode-proof tree d4f6cd41…). Outside results/ it is U4f's
+  merge 25d316e (tree f7ed90ad…) plus F1's six files, +239 -24 (crates/room: src/room.rs, tests/commands.rs;
+  crates/sim: src/seam.rs, src/world.rs, tests/seam.rs, tests/world.rs); crates/bots, lab and client and ops/ are
+  unchanged (`git diff --stat 25d316e 1faf894`). `<base>` is the lane head at launch, filled by the main session in
+  U4f's fill form (u4f-brief.md section 12), with the spike tree outside results/ named equal to 1faf894's or each
+  difference listed.
 - **Read, never retyped:** u4f-brief.md (135325a0bb524104, 2,040: **section 1, the start and the stops, :288-355**;
   2.4 item 6, 2.6, 2.7, 2.10, 2.12, section 4's build rules :831-958, 5.1-5.4, section 6's end checks :1163-1183,
   section 7's return list :1187-1222); the stop ruling advisor-u4f-stop.md (38821ebd2c870ca9, 247: U4f2's list :80-89,
@@ -24,7 +33,10 @@ blocks 6 and 7. The advisor needs no new check of rev 1.1 unless a condition can
   merge head check advisor-u4f-merge-head.md (5b1e95b4e0400bdf, 242: ADV-U4FMH-2 :41-66; U4f2's stop :133-142);
   u4-build-plan.md (d3e3ddbbc04e0411, 1,163); u4s-carries.md (4ef5909df8e14079, 694: U4f2's section :541-547); builder
   3's record u4f-build.md (1ef1e1d71e4432b8, 1,182: what is not built :855-866); U4f's report u4f-report.md
-  (e7fe7afbdb0516d7, 602: the share :228-244); **this brief's check advisor-u4f2-brief.md** (290 lines).
+  (e7fe7afbdb0516d7, 602: the share :228-244); **this brief's check advisor-u4f2-brief.md** (290 lines). **At rev 1.2**
+  also U4f-F1's round ruling advisor-u4f-f1-r1.md (C-U4F2-9 :126-127, C-U4F2-10 :159-165, U4f2's share :128-130) and its
+  report u4f-f1-report.md; u4s-carries.md (F1's carries, :548-552) and u4f-report.md (the sets, -20's L1 record) have
+  grown since rev 1, so their stamps are refilled with `<base>` at launch.
 
 ## 1. What U4f2 builds, in blocks (each at most about 400 added lines, as the build ruling's line 4)
 1. **f28's clamp and lag-switch halves under option B** (the stop ruling's R3 (ii), advisor-u4f-stop.md:147-150;
@@ -36,7 +48,9 @@ blocks 6 and 7. The advisor needs no new check of rev 1.1 unless a condition can
 4. **npt-lab, the attribution** (2.4 item 6) with `event.forged_kind.sent_count` and `.unrejected_count`. C-U4F2-3
    comes first: npt-room's `Refusal` enum renamed `CommandRefusal`, its records in the sim's struct form `{ slot, seq,
    kind }` (39 lines in crates/room name the enum: input.rs 22, room.rs 16, lib.rs 1; its records' one consumer is
-   room/tests/commands.rs:82; **the sim's own struct `Refusal` stays**, crates/sim being outside the lane). Then
+   room/tests/commands.rs:82; **the sim's own struct `Refusal` stays**, crates/sim being outside the lane; at 1faf894
+   the counts hold (`git grep -c -w Refusal`), and U4f-F1's T1 names that struct, room/tests/commands.rs:636
+   `npt_sim::Refusal`, which the rename leaves alone). Then
    C-U4F2-SEC-1 (`Room::refusals_dropped()` logged beside the records the attribution reads).
 5. **npt-lab, the twins** (2.12; carry 46's lab half): the twin's skip through the built-ahead
    `ClientEndpoint::skip_command`, kind 10's and kind 3's twin rows, the clamp twins' `--twin-logs`; C-U4F2-2's unit
@@ -46,7 +60,9 @@ blocks 6 and 7. The advisor needs no new check of rev 1.1 unless a condition can
    steady script at P0 into a `Room<World>`, leave no forged sequence without a refusal record of its own kind."
    **U4F2-Q4's case** (advisor-u4f2-brief.md:224-230): in f33, on hand-made records, a kind-10 refusal record naming a
    (slot, seq) the forger did not forge, on the forger's slot and on an honest one, changes neither `sent_count` nor
-   `unrejected_count` (+1 test, a negative case beyond the 13).
+   `unrejected_count` (+1 test, a negative case beyond the 13). **C-U4F2-10's case** (section 3): in f16 or f33, one
+   case under PM-0001-21/no-press-edge whose forged kind-5 sequences carry sim Cooldown records and still count in
+   `unrejected_count`, with its plant ("any kind matches") failing it by name (+1 test).
 7. **The routes from the r2 read and the head check:**
    - **C-U4F2-5** by U4F2-Q1 as ruled (section 3 gives its three points whole, with its stop).
    - **C-U4F2-7** by U4F2-Q3 as ruled (advisor-u4f2-brief.md:218-223): (a), keyed on the header's `params.suite` =
@@ -75,7 +91,8 @@ blocks 6 and 7. The advisor needs no new check of rev 1.1 unless a condition can
   with U4f's (+82, +99, 46) against 2.10's **+124 and +139** (its +119 and +134, plus "+5 if contract.rs is edited":
   u4f-brief.md:658, :1167) and **67** (advisor-u4f-stop.md:95-96). The 22 negatives are a floor with no slack
   (advisor-u4f2-brief.md:96-98). The extras the carries add (f28's halves, `skip_command`'s test, C-U4F2-1's parser
-  case, C-U4F2-5's sim-only test, C-U4F2-7's two cases, Q4's f33 case) are named in the report with their `--list` lines.
+  case, C-U4F2-5's sim-only test, C-U4F2-7's two cases, Q4's f33 case, C-U4F2-10's case) are named in the report with
+  their `--list` lines.
 - **Plants:** every new check and every new bite site fails by name under a plant, restored with the file's sha256
   (U4f's return list item 4, u4f-brief.md:1202-1204); C-U4F2-5's and C-U4F2-7's plants as their rulings give them.
 - **The end checks:** u4f-brief.md section 6, items 1 to 5 (:1165-1182), as they apply: check.mjs twice with all 11
@@ -113,6 +130,19 @@ blocks 6 and 7. The advisor needs no new check of rev 1.1 unless a condition can
   - **C-U4F2-8** = ADV-U4FMH-2 (Low), advisor-u4f-merge-head.md:57-64: the lab writes the header's `params.cmd_timing`
     from the live room (`server.room.cmd_timing()`) and f6's header assert pins it, else the getter goes; §4.1's
     npt-room row updated in U4f2's merge either way.
+- **Two numbers from U4f-F1's round** (rev 1.2; advisor-u4f-f1-r1.md, already in u4s-carries.md's U4f2 section
+  :548-552; they replace the F1 plan review's condition 7 item, which the round ruling moved to U6 as C-U6-19, r1
+  :98-122):
+  - **C-U4F2-9** (ADV-U4FF1-3 with NC-F1-2's reach; a record line, no build), :126-127: "-21's report names kind 5's
+    first-command bypass (input.rs:287), that no -21 forger rejoins or throws, and C-U6-19 as its closure."
+  - **C-U4F2-10** (SA-F1-2, Low), :159-165, word for word: "C-U4F2-1's 'a refusal record of its own kind'
+    (u4f2-brief.md:44-46) stays exact after C-U4F2-3 puts the room's records in the sim's struct form (room and sim
+    kinds kept distinct); f16 or f33 gains one case under PM-0001-21/no-press-edge whose forged kind-5 sequences carry
+    sim Cooldown records and still count in `unrejected_count`, with a plant ("any kind matches") failing it by name.
+    Its option-B kind-7 note (a late forged edge's record names the next honest sequence) is a record line: the forged
+    suite runs at P0, with no late command (u4f-brief.md:533). About 10-20 lines, inside the f33 row's range: no size
+    change. The own-kind rule itself is not changed (it would be his: TEST-FIRST)." (The cited :44-46 is rev 1.1's
+    C-U4F2-1 proof, block 6.)
 - **Into U4f2's record lines (no number):** F3, p20's episode (advisor-u4f-r2.md:114-122); F5 (a) and (b), the
   wording slips (:130-137); F5 (c), 5.3's list gaining "0 presses lost" as reached by the redundancy-1 bite (:138-141).
 - **Two deferred Lows U4f left "for their next taker"** (u4f-build.md:557-559): RR-CB-2's docs and RR-B1-7 (1)'s
@@ -125,7 +155,9 @@ blocks 6 and 7. The advisor needs no new check of rev 1.1 unless a condition can
   - "your added lines past 6,000" (:323) reads **past 3,000 added lines at a block end** (his SIZE-CHECK on his (a)'s
     figure), by the build ruling's line 5 (advisor-u4f-build1.md:178-181): build nothing more, run the end checks on
     the tree as it stands, write the count and the estimate for the rest, return;
-  - the counts are deltas on **25d316e's 634 measured and 731 bites** (u4f-report.md:232), not 5b29296b's;
+  - the counts are deltas on **1faf894's 642 measured and 739 bites** (rev 1.2: U4f-F1's merge, its main-folder
+    check.mjs run, .gate/u4f-f1-merge/m5-check.log; that is 25d316e's 634 and 731, u4f-report.md:232, plus F1's own +8
+    and +8, which count in neither U4f's share nor U4f2's), not 5b29296b's or 25d316e's;
   - the test step's stop line is **line 22's 1,207 s**, which stands (advisor-u4f-build1.md:242).
 - U4f's build rules (u4f-brief.md section 4), with U4f2's lane: npt-bots, npt-lab, ops/runs, SERIES.md (its new rows
   only), npt-room for C-U4F2-3 and C-U4F2-8 only, **npt-client for C-U4F2-2 (`skip_command`'s unit test,
@@ -184,6 +216,8 @@ blocks 6 and 7. The advisor needs no new check of rev 1.1 unless a condition can
 | **Rider:** ADV-U4FP-3 (two doc lines) | client | about 2 |
 | **Total** | | **about 1,700 to 2,240** |
 
+- **U4f-F1's two carries** (rev 1.2): C-U4F2-9 about 3 report lines; C-U4F2-10 about 10-20 lines inside the f33 row's
+  range. The total and the figure stay (advisor-u4f-f1-r1.md:128-130).
 - **The figure for him:** about **1,700 to 2,250** added lines (midpoint about 1,970); at U4f's overall 1.2
   (advisor-u4f-stop.md:104-105), up to about **2,700**. Both under the stop past 3,000, which stays.
 - **What his (a) sends and what rides:** blocks 1-6, 8, C-U4F2-1 to -4, SEC-1, -5 and -6 are the forged-command test
@@ -215,7 +249,8 @@ reviewer's read, and none is planned.
   report names it beside C-U4F2-5's fix.
 
 ## What goes to Mustafa from this brief
-- **U4F2-SIZE**, in the next day's message, first line "stopped on you": U4f2's estimate is about 1,700 to 2,250 added
+- **U4F2-SIZE**, sent in the 2026-11-20 message (msg-2026-11-20.md:39-48; his answer pending), first line "stopped on
+  you": U4f2's estimate is about 1,700 to 2,250 added
   lines (up to about 2,700 at U4f's 1.2 overrun) against the 1,500 of his (a); the stop past 3,000 stays. My lean (and
   the advisor's): build it whole. His cheaper option: leave the four riders (about 80 to 215 lines) for the next unit
   that opens those files. The build waits for his answer.
