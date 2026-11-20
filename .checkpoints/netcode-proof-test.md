@@ -83,6 +83,14 @@
   count is a marks.json change, his, on "After the close"; the first-command gap F1 widened (a pool of grenades per
   rejoin, an honest restart's phantom presses) goes to U6 as C-U6-19, closed before -19 runs. Why: inside the plan,
   undoable, no pass mark, judge or marks.json change.
+- **2026-11-20 by the advisor's U4g brief check (to name in the 2026-11-21 message; advisor-u4g-brief.md:135-186):**
+  U4G-Q3 the scenes (-45 on SS with the brawl's load, its B1 set serving -17's and -18's B1 parts; -55 on SS with one
+  client and printed contact ticks; -60 and -62 on CO, -60's soldier moving and firing); Q4 -60 under both options, +3
+  short runs (no run dropped, no bar moved); Q5 the three bite sites; Q6 the client traces corrections, the room's
+  records the test oracle; Q7 the cap read on U4g's own B1 and P4 pre-runs, 1,600 stands; Q8 the door-gap margin printed
+  on every B1 run; Q9 -45's share read on slot 0, its bound on any slot, every slot printed (a per-slot series would be
+  marks.json text: after the close); NC-U4R-4 by the lab's `tick` record. Why: inside the plan, undoable, no pass mark,
+  judge or marks.json change.
 - The choices of 2026-11-19 named in msg-2026-11-20.md: history.md:7177-7193 (card_trim_1120c.py).
 
 ## Next steps (plan rev 3.3; units ahead)
@@ -150,8 +158,17 @@
   about 3,200-5,500 (top about 6,600 at U4f's overrun), so **U4G-Q1 (size; lean: split into U4g, prediction and cues,
   and U4g2, interpolation and events) is his**; **U4G-Q2** (-58's two lost-tick checks: his C62HB-Q4 (b) stands, the
   exact marks.json wording needs his yes; the draft's (c) "not now" would re-ask it) his; Q3-Q8 the advisor's; 75
-  measured + 14 bite runs. **The advisor's check running** from 04:4x UTC (out: advisor-u4g-brief.md). Both questions
-  go in the 2026-11-21 message after its check. Saver bfwo06d6a from 04:24 UTC. Main still f5030a3; 10,124 MiB free.
+  measured + 14 bite runs. **The advisor's check: REVISE** (advisor-u4g-brief.md, 285 lines, read in full): ADV-U4GB-1
+  High, the B1 work its U4r build ruling 3 sent to U4g (recovery after an eviction, -17/-18 L1 B1 parts, -18's bite
+  run, ack.rs) never reached the register or the plan (ruling 3's tasks (a) and (c), history.md:4964-4974); -2 High,
+  Q2's (c) re-asks his C62HB-Q4 (b); Mediums -3 (Q2 route A unproven; before -58's set, not the build), -4 (size: U4f's
+  whole scope ran about 1.5x; whole 3,350-5,850, 5,000-8,800 at 1.5), -5 (NC-U4R-4), -6 (-45's flags in a 48-client
+  log), -7 (-55 diluted, -60 vacuous); Lows -8 to -11. **Its item 7 done by me:** u4s-carries.md (78 amended; new 91
+  ack.rs, 92 NC-U4R-4, 93 U4h's ES hit rule; 77 (b) amended), u4-build-plan.md (U4g's "Moved in from U4r", §9 -60 6
+  and totals 199/288, §11 gains ruling 3's heal-reading line, also missed). **Next: rev 2 by the drafter** (items 1-6),
+  then the advisor on sections 1-4, 6, 8 and the last only. U4G-Q1 (split; paste-ready at advisor-u4g-brief.md:205-219;
+  not a stop) goes in the 2026-11-21 message after rev 2; U4G-Q2 later, before -58's set only, its text drafted and read
+  first. Saver bfwo06d6a from 04:24 UTC. Main still f5030a3; 10,124 MiB free.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,

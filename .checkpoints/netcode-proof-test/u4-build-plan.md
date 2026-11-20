@@ -892,6 +892,12 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   P0 and P3, every counter a few steps below its wrap, 3 seeds per part; its six bites, §4.14), judged after U4g
   merges: its untraced-corrections check and lt-tick-offset's failing check read the Predictor (the advisor's W1-N2
   ruling and U4E-Q2).
+- **Moved in from U4r** (the advisor's U4r build ruling 3, point 1, advisor-u4r-build3-full.md:13-15; filed 2026-11-20
+  by its U4g brief check, ADV-U4GB-1): -17's and -18's L1 B1 parts and -18's no-fallback bitten judged run, with carry 78
+  widened to the room's recovery after an eviction (target: PM-0001-2's everyone-in-view share at least 0.99 on B1 at
+  10 bursts in 600 s, at most 18 flag-0 ticks per client per burst on average; shown first on a short B1 suite of
+  U4g's build); point 4's ack.rs fix (carry 91); NC-U4R-4's `tick` wrap record (carry 92); -60 under both OQ-0001-6
+  options, 6 runs (the advisor's U4G-Q4 ruling, advisor-u4g-brief.md:148-152).
 - **Reviewers:** netcode-architect, test-engineer, rust-reviewer.
 
 ### U4h, lag compensation and aim (depends on U4g and on U4c's C2; size M; its own brief)
@@ -1022,11 +1028,11 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
 - **Change type:** netcode (protocol, simulation, room, client, the L1 model), plus a judge change.
 - **Evidence rule:** deterministic tests with injected latency, jitter and loss: L1's P0 to P4 and B1 on simulated time,
   fixed seeds, 3 seeds per part, each bite failing; verdicts by npt-judge; same-seed identity by the twin tests.
-- **The run count (T21), by marks.json's `min` and §5:** about 196 measured L1 runs (-17 12, -58 6, -18 3, -20 6, -21
-  24 plus 12 twins, -22 3, -41 30 with both options, -42 18, -60 3, -45 9, -47 3, -61 3, -62 3, -48 24, -49's P4 test
+- **The run count (T21), by marks.json's `min` and §5:** about 199 measured L1 runs (-17 12, -58 6, -18 3, -20 6, -21
+  24 plus 12 twins, -22 3, -41 30 with both options, -42 18, -60 6 with both options (U4G-Q4, 2026-11-20), -45 9, -47 3, -61 3, -62 3, -48 24, -49's P4 test
   cap 6 beyond -48's, -50 7, -51 12, -54 3, -55 3, the pre-check 6); 12 calibration runs (U4h); 44 bite runs (46 bites
   less the two carried); 35 for -3's re-run (U2's whole set: 15 measured runs, 15 twins, 4 bites and the clock-seed
-  twin: checkpoint :269-271; nit a): about 285 in all. Each brief gives its exact list.
+  twin: checkpoint :269-271; nit a): about 288 in all. Each brief gives its exact list.
 - **Gate:** check.mjs green on both builds with the stated counts; clippy host and wasm32 on both builds; fmt;
   `node tools/gate.mjs --no-smoke` (symbols +0 -0); Cargo.lock changed only by named dependencies; all under §7.1.
 
@@ -1161,3 +1167,7 @@ its ruling on U4r's r2 run, step 2 (advisor-u4r-r2run-full.md): "PM-0001-17's L1
 loses no group (no client-tick left incomplete)': the measured sum of tick.s.snap_incomplete == 0, so a lost group on
 P0 FAILs -17 (stricter; it was a report only), with its bite PM-0001-17/whole-as-lost (carry 62 (h); the advisor's U4r
 build ruling 4, further finding; r2 at e59ece9 shows 0 on the six clean short L1 P0 suites)".
+Added 2026-11-20 (the same ruling 3's further finding, advisor-u4r-build3-full.md:69, missed at that edit; found by the
+advisor's U4g brief check): "whether 'a loss burst heals' should also bound the time until each client's set holds
+every relevant soldier again. Recommendation: keep the precondition as the check that catches it, and decide on a new
+check only once U4g's fix shows the recovered time."
