@@ -1,13 +1,15 @@
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index b40d2dd..7418d0b 100644
+index b40d2dd..57722f4 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
-@@ -142,19 +142,272 @@ pub struct Behaviour {
+@@ -142,19 +142,274 @@ pub struct Behaviour {
      fast: Option<Fast>,
      /// -21's forger (`forger`).
      forge: Option<Forge>,
 +    /// Kind 7's rest for the scene's weapon at the build's rate ([`fire_rest_at`]).
 +    fire_rest: Option<u64>,
++    /// The lane walk's way (west), the fast clock's and the lag switch's (FP-4).
++    lane_west: bool,
  }
  
 -/// A forger's state (u4f-brief.md 2.4, 2.6): its kind, its interval, the bound (ticks), the new sequences seen as an
@@ -278,11 +280,30 @@ index b40d2dd..7418d0b 100644
  }
  
  /// `c`, the newest command of a new sequence, forged in `kind` (2.6's per-kind table), the `n`-th (from 1), against
-@@ -298,27 +551,64 @@ impl Behaviour {
+@@ -192,8 +447,7 @@ fn forged(
+ }
+ 
+ /// The fast clock's state: the lead bound in ticks, the commands stamped, the last stamp, each recent sequence's stamp
+-/// (every copy keeps it, so no copy differs: kind 3), the copies left out of an `Input` that would not encode, and the
+-/// lane's way (west).
++/// (every copy keeps it, so no copy differs: kind 3), and the copies left out of an `Input` that would not encode.
+ #[derive(Clone, Debug, Default)]
+ struct Fast {
+     bound: u32,
+@@ -201,7 +455,6 @@ struct Fast {
+     last: Option<u32>,
+     stamps: std::collections::VecDeque<(u16, u32)>,
+     left_out: u64,
+-    west: bool,
+ }
+ 
+ /// The later of two ticks, wrap-aware.
+@@ -298,27 +551,65 @@ impl Behaviour {
              lag: None,
              fast: None,
              forge: None,
 +            fire_rest: fire_rest_at(npt_sim::TICK_HZ, scene.weapon().interval_us),
++            lane_west: false,
          }
      }
  
@@ -351,7 +372,7 @@ index b40d2dd..7418d0b 100644
      pub fn take_forged(&mut self) -> Vec<u16> {
          self.forge
              .as_mut()
-@@ -326,6 +616,27 @@ impl Behaviour {
+@@ -326,6 +617,27 @@ impl Behaviour {
              .unwrap_or_default()
      }
  
@@ -379,7 +400,45 @@ index b40d2dd..7418d0b 100644
      /// -21's 1.5x clock (u4f-brief.md 2.6; U4F-Q11 (iii) (c) and (v) (b) as F1 amends it): fire held at a seeded point,
      /// the lane's walk at full length, a command at every step once the endpoint holds a snapshot (its host clock's rate
      /// is the lab's), each stamped by the crate's `fast_stamp` under the lead bound `bound` (ticks) in
-@@ -424,11 +735,14 @@ impl Behaviour {
+@@ -344,11 +656,11 @@ impl Behaviour {
+         self.fast.as_ref().map_or(0, |f| f.left_out)
+     }
+ 
+-    /// The fast clock's walk (U4F-Q11 (iii) (c)): by its decoded position, toward the lane's west end until inside the
+-    /// lane's band, then along the lane at full length (20 cm a tick), turning at each end; no complete tick yet, or a
+-    /// dead soldier, stands (the sim moves no dead soldier).
++    /// The lane walk (U4F-Q11 (iii) (c); the fast clock's, and since FP-4 the lag switch's): by its decoded position,
++    /// toward the lane's west end until inside the lane's band, then along the lane at full length (20 cm a tick),
++    /// turning at each end; no complete tick yet, or a dead soldier, stands (the sim moves no dead soldier).
+     fn lane(&mut self, own: Option<([i32; 3], bool)>) -> [i8; 2] {
+-        let (Some(([x, y, _], false)), Some(f)) = (own, self.fast.as_mut()) else {
++        let Some(([x, y, _], false)) = own else {
+             return [0, 0];
+         };
+         let [x0, x1] = LANE_X_CM;
+@@ -357,11 +669,18 @@ impl Behaviour {
+             return toward_centre(x - x0, y - LANE_Y_CM);
+         }
+         if x >= x1 {
+-            f.west = true;
++            self.lane_west = true;
+         } else if x <= x0 {
+-            f.west = false;
++            self.lane_west = false;
+         }
+-        if f.west { [-127, 0] } else { [127, 0] }
++        if self.lane_west { [-127, 0] } else { [127, 0] }
++    }
++
++    /// -21's lag-switch client's script (FP-4, NC-U4F2-3): fire held at a seeded point and the fast clock's lane walk
++    /// on the fixed-lead rule, so its movement can show a burst's commands run (the standing steady script moved
++    /// nothing); closed loop, as the suite has no twin. [`Behaviour::lag_switch`] goes on it.
++    pub fn lane_walk(scene: &Scene, slot: u8, seed: u64) -> Behaviour {
++        Behaviour::new(Kind::Lane, scene, slot, seed)
+     }
+ 
+     /// -21's lag switch (2.6; U4F-Q15 (c)): the same behaviour, its `Input` datagrams held `hold_ns` (200 ms in the
+@@ -424,11 +743,14 @@ impl Behaviour {
                  l.bursts.push(now_ns.saturating_sub(at));
              }
          }
@@ -397,7 +456,7 @@ index b40d2dd..7418d0b 100644
          for d in datagrams.iter_mut() {
              if let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
              {
-@@ -460,23 +774,6 @@ impl Behaviour {
+@@ -460,23 +782,6 @@ impl Behaviour {
                          }
                      }
                  }
@@ -421,7 +480,7 @@ index b40d2dd..7418d0b 100644
                  // Every rewritten `Input` encodes: an older copy a past-bound stamp leaves more than 255 ticks below
                  // (after an idle) is left out, oldest first, so the rest stay consecutive (the codec's two rules).
                  let mut out = Vec::new();
-@@ -585,11 +882,133 @@ impl Behaviour {
+@@ -585,11 +890,133 @@ impl Behaviour {
              self.skipped += 1;
              return false;
          }
@@ -555,7 +614,7 @@ index b40d2dd..7418d0b 100644
      /// The decision function (crate-private; `step` calls it, and so do this crate's tests): the next command from
      /// `newest`, `view` and `own`, the own soldier as the endpoint decoded it (`ClientEndpoint::own_soldier`: its grid
      /// position and dead bit), counted as given.
-@@ -652,6 +1071,10 @@ impl Behaviour {
+@@ -652,6 +1079,10 @@ impl Behaviour {
          let walk = match self.kind {
              Kind::Brawl => self.leash(own, walk),
              Kind::Lane => self.lane(own),
@@ -566,7 +625,7 @@ index b40d2dd..7418d0b 100644
              _ => walk,
          };
          Command {
-@@ -1165,14 +1588,584 @@ mod tests {
+@@ -1165,14 +1596,584 @@ mod tests {
      }
  
      /// SEC-U4F-1: each room-whole forger refuses an interval below 2 (kinds 2 and 5 forge against the previous command,
@@ -1154,7 +1213,7 @@ index b40d2dd..7418d0b 100644
          }
      }
  
-@@ -1196,6 +2189,12 @@ mod tests {
+@@ -1196,6 +2197,12 @@ mod tests {
          /// ten burst starts, the first 30 s into the measured phase (after the 10 s warm-up) and then every 60 s (the
          /// run scripts' B1 settings).
          Bursts,
@@ -1167,7 +1226,7 @@ index b40d2dd..7418d0b 100644
      }
  
      /// One run's record: soldier-ticks in a building and the first; the largest distance from the centre (its square in
-@@ -1242,19 +2241,32 @@ mod tests {
+@@ -1242,19 +2249,32 @@ mod tests {
              .collect()
      }
  
@@ -1207,7 +1266,7 @@ index b40d2dd..7418d0b 100644
          let mut last: Vec<Option<Command>> = vec![None; n];
          let mut seq = vec![0u16; n];
          let mut rng = seed ^ 0x736b_6970_7300_0000;
-@@ -1310,9 +2322,31 @@ mod tests {
+@@ -1310,9 +2330,31 @@ mod tests {
              let burst = bursts.iter().any(|&(a, b)| (a..b).contains(&k));
              let mut commands = Vec::with_capacity(n);
              for s in 0..n {
@@ -1240,7 +1299,7 @@ index b40d2dd..7418d0b 100644
                          Pattern::Bursts => burst,
                          Pattern::Skips => {
                              r.chances += 1;
-@@ -1369,8 +2403,20 @@ mod tests {
+@@ -1369,8 +2411,20 @@ mod tests {
      /// rate per 1000 are the skip pattern's alone (ADV-PT-L1); every pattern prints its skipped ticks and longest
      /// streak.
      fn printed(seed: u64, ms: u32, pattern: Pattern) -> Record {
@@ -1262,7 +1321,7 @@ index b40d2dd..7418d0b 100644
              Pattern::EveryTick => format!("skipped {}", r.skipped),
              Pattern::Skips => format!(
                  "skipped {} of {} chances ({} per 1000)",
-@@ -1381,7 +2427,7 @@ mod tests {
+@@ -1381,7 +2435,7 @@ mod tests {
              Pattern::Bursts => format!("skipped {} in its bursts", r.skipped),
          };
          println!(
@@ -1271,7 +1330,7 @@ index b40d2dd..7418d0b 100644
               distance from the centre {} cm (slot {}, tick {}, at {}, {}); {skips}, longest streak {}; dead {} \
               soldier-ticks; stuck (slot, tick, x, y): {:?}",
              ticks_for_ms(ms),
-@@ -1411,6 +2457,46 @@ mod tests {
+@@ -1411,6 +2465,46 @@ mod tests {
          }
      }
  
@@ -1670,7 +1729,7 @@ index dcd2e4e..85e69ae 100644
  mod logs;
  mod machine;
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
-index 7f54e46..c09efa4 100644
+index 7f54e46..6b2f931 100644
 --- a/spikes/netcode-proof/crates/lab/src/scenario.rs
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
 @@ -48,6 +48,7 @@ use npt_sim::replay::Recording;
@@ -1742,7 +1801,17 @@ index 7f54e46..c09efa4 100644
              _ => endpoint_of(s, slot),
          };
          let behaviour = if s.suite == "clock" {
-@@ -1248,6 +1271,26 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1222,6 +1245,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+             Behaviour::script(&scene, slot, s.seed, "clamp")
+                 .expect("a script")
+                 .with_points(points)
++        } else if s.suite == "lag-switch" && slot == 0 {
++            // FP-4 (NC-U4F2-3): the lag client walks the fast clock's lane, so its movement can fail the cap's check.
++            Behaviour::lane_walk(&scene, slot, s.seed)
+         } else if s.behaviour == "brawl" {
+             Behaviour::brawl(&scene, slot, s.seed).with_press_every(s.brawl_press_every)
+         } else {
+@@ -1248,6 +1274,26 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          } else if fast_from.is_some() && slot == 0 {
              // A command at every step, its lane's walk, its stamps by U4F-Q11 (v) (b) as F1 amends it.
              Behaviour::fast_clock(&scene, slot, s.seed, server.room.lead_bound().1)
@@ -1769,7 +1838,7 @@ index 7f54e46..c09efa4 100644
          } else {
              behaviour
          };
-@@ -1316,6 +1359,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1316,6 +1362,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      let last_measured = logs.wide(s.tick_start.wrapping_add((measured_end.max(1) - 1) as u32));
      let mut events_stamped: u64 = 0;
      let mut clamp = ClampTally::default();
@@ -1781,7 +1850,7 @@ index 7f54e46..c09efa4 100644
      let mut inputs: Vec<i64> = Vec::new();
      // The link-lost-overstated bite: the slots whose record it has written (bites builds only).
      #[cfg(feature = "bites")]
-@@ -1407,6 +1455,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1407,6 +1458,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                      .refused
                      .extend(rep.refusals.iter().filter(|x| x.slot == 0).map(|x| x.seq));
              }
@@ -1792,7 +1861,7 @@ index 7f54e46..c09efa4 100644
              // -21's fast clock: slot 0's episode sums, each episode's record at its end (lab log).
              if let Some(f) = fast.as_mut() {
                  let me = records
-@@ -1521,7 +1573,33 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1521,7 +1576,33 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              summary
                  .world_hashes
                  .push((t, npt_sim::SimCore::state_hash(server.room.sim())));
@@ -1826,7 +1895,7 @@ index 7f54e46..c09efa4 100644
              if k == s.warmup_ticks && s.suite != "clock" {
                  for c in &clients {
                      if !logs.started(c.slot) {
-@@ -1596,6 +1674,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1596,6 +1677,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              }
              let mut out = c.endpoint.step();
              c.behaviour.outgoing(host, &mut out.datagrams);
@@ -1838,7 +1907,7 @@ index 7f54e46..c09efa4 100644
              for held in c.behaviour.take_bursts() {
                  let mut e = EventRecord::new("lag_burst", phase(k))
                      .with("slot", c.slot)
-@@ -1695,6 +1778,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1695,6 +1781,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      }
      summary.ticks = k;
      summary.fate_log_sha256 = fate_sha256(&net);
@@ -1853,7 +1922,7 @@ index 7f54e46..c09efa4 100644
      let mut last = Vec::new();
      for c in &mut clients {
          if let Some(w) = c.bytes_log.as_mut() {
-@@ -1725,6 +1816,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1725,6 +1819,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              )
              .with("lead_now_count", c.endpoint.lead_now().unwrap_or(-1))
              .with("unknown_pongs_count", c.endpoint.unknown_pongs());
@@ -1868,7 +1937,7 @@ index 7f54e46..c09efa4 100644
          // 2.5 (SA-5): the room's refusal fields, and the live session's pump counters, at the stop.
          let d = server.session(c.slot).map(|x| x.decoder.counters().clone());
          let mut e = counts(e, Some(&k), d.as_ref());
-@@ -1744,6 +1843,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1744,6 +1846,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  .with("rerun_reports_count", clamp.reruns),
          );
      }
@@ -1879,7 +1948,7 @@ index 7f54e46..c09efa4 100644
      // D3-1 (f40): the run's measured reorder share from npt-l1's fate log, as the -3 probe computes it (main.rs's
      // `permille`): each direction's reordered x 1000 / delivered, floored; `permille` the lower of the two.
      let [up, down] = net.with_fate_log(|l| l.reorder_counts());
-@@ -1900,11 +2003,7 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1900,11 +2006,7 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
      let mut p: BTreeMap<String, Value> = BTreeMap::new();
      let w = s.scene.weapon();
      p.insert("suite".into(), suite.into());
@@ -1892,7 +1961,7 @@ index 7f54e46..c09efa4 100644
      // The one lead every client stamps with, only where `with_lead` fixes it (U4F-Q7 (i); TE-20); under U4f's
      // controller each client's lead is its own (`event.client_counts.lead_now_count`), and the cap it works under.
      if s.controller {
-@@ -1946,6 +2045,9 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1946,6 +2048,9 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
              p.insert("fast_clock_idle_ns".into(), s.fast_idle_ns.into());
          }
      }
@@ -1902,7 +1971,7 @@ index 7f54e46..c09efa4 100644
      if s.suite == "clock" {
          p.insert("connects_count".into(), s.connects.into());
      } else {
-@@ -1990,7 +2092,7 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
+@@ -1990,7 +2095,7 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
  [--every-step 1] [--lead <1..8>] [--logs 0 (with --record)] [--cmd-timing A|B] [--controller 0|1] \
  [--brawl-press-every <n> (the brawl)] [--event-cap <n>] [--connects <n> (with --suite clock)] \
  [--twin-logs <folder> (the clamp twin)] [--fast-clock-episode-s <s>] [--fast-clock-idle-s <s>] (with --suite fast-clock) \
@@ -1911,7 +1980,7 @@ index 7f54e46..c09efa4 100644
  
  /// B1's burst starts (u4r-brief.md 7.1, -18's row): `count` bursts, the first `first_s` after the measured phase's
  /// first tick and one every `every_s`, each starting a seeded offset in [0, 1 tick) after its tick boundary.
-@@ -2155,6 +2257,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -2155,6 +2260,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
      if (suite == "clock") != (connects > 0) {
          return Err("--suite clock and --connects <n> (from 1) go together".to_owned());
      }
@@ -1932,7 +2001,7 @@ index 7f54e46..c09efa4 100644
      let event_cap = take("event-cap")
          .map(|v| {
              v.parse::<u32>()
-@@ -2299,6 +2415,7 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -2299,6 +2418,7 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
          lag_every_ms,
          fast_episode_ns: fast_episode_s * SEC,
          fast_idle_ns: fast_idle_s * SEC,
@@ -1940,7 +2009,7 @@ index 7f54e46..c09efa4 100644
          record,
          bytes,
          logs,
-@@ -3642,7 +3759,8 @@ pub(crate) mod tests {
+@@ -3642,7 +3762,8 @@ pub(crate) mod tests {
      }
  
      /// f6 (TE-14), one option: the lab builds the endpoints with the one controller setting (the header records the
@@ -1950,7 +2019,7 @@ index 7f54e46..c09efa4 100644
      /// no `cmd_timing` (README :191-192 makes it the room's and the scenario's).
      fn f6(timing: &'static str) {
          let p = &u4f_short(timing)[0].header.params;
-@@ -3994,36 +4112,77 @@ pub(crate) mod tests {
+@@ -3994,36 +4115,77 @@ pub(crate) mod tests {
          );
      }
  
@@ -2050,7 +2119,7 @@ index 7f54e46..c09efa4 100644
              .events
              .iter()
              .filter(|e| {
-@@ -4036,10 +4195,21 @@ pub(crate) mod tests {
+@@ -4036,15 +4198,27 @@ pub(crate) mod tests {
              (f("counted_count"), f("rerun_reports_count")),
              (Some(0), Some(0))
          );
@@ -2076,7 +2145,14 @@ index 7f54e46..c09efa4 100644
      }
  
      /// f20 (2.6; U4F-Q15 (c); A1) and f28's lag-switch half: a short lag-switch run at P1 (16 clients, 2 s + 6 s, option
-@@ -4056,13 +4226,7 @@ pub(crate) mod tests {
+     /// A, a hold every 2 s) writes its bursts (each hold at least the 200 ms), runs at most `CMD_CATCHUP` commands a
+-    /// tick for the lag client, whose movement stays within the catch-up cap's (excess at most 0), and every name it
++    /// tick for the lag client, whose movement stays within the catch-up cap's (excess at most 0) while a burst tick
++    /// moves it (FP-4: it walks the lane, never into a building), and every name it
+     /// writes has its row; a respawn's placement is no movement (`moved_um` on hand-made records: alive to alive 20 cm is
+     /// 200,000 µm, a death or a respawn none, so the tick is counted apart).
+     #[test]
+@@ -4056,13 +4230,7 @@ pub(crate) mod tests {
          );
          assert_eq!(crate::logs::moved_um(alive(0, 0), alive(5_000, 100)), None);
          assert_eq!(crate::logs::moved_um(alive(0, 100), alive(10, 0)), None);
@@ -2091,9 +2167,24 @@ index 7f54e46..c09efa4 100644
          let held: Vec<u64> = read(&dir, "lab")
              .events
              .iter()
-@@ -4081,9 +4245,365 @@ pub(crate) mod tests {
+@@ -4080,10 +4248,380 @@ pub(crate) mod tests {
+         let cap = npt_room::InputBuffer::CMD_CATCHUP as i64;
          assert!(most("lagswitch_cmds_count").is_some_and(|m| (1..=cap).contains(&m)));
          assert!(most("lagswitch_excess_move_um").is_some_and(|m| m <= 0));
++        // FP-4: the lag client walks the lane, so a burst tick moves it: its excess above the standing value (no
++        // movement less 8 ticks at full speed), and it never enters a building.
++        let standing = -(crate::logs::MOVE_CM_S * 10_000 / i64::from(npt_sim::TICK_HZ) * cap);
++        let v = |t: &npt_log::TickRecord, k: &str| t.v.get(k).copied().unwrap_or(0);
++        let ticks = room.ticks.iter();
++        let burst = ticks.filter(|t| v(t, "lagswitch_cmds_count") >= 2);
++        let burst = burst.map(|t| v(t, "lagswitch_excess_move_um")).max();
++        println!("u4f f20: standing {standing}; a burst tick's excess at most {burst:?}");
++        assert!(burst.is_some_and(|m| m > standing), "a burst tick moves");
++        let inside = room.ticks.iter().filter(|t| {
++            let pairs = t.s.get("in_building_slot_area");
++            pairs.is_some_and(|p| p.chunks(2).any(|x| x[0] == 0))
++        });
++        assert_eq!(inside.count(), 0, "the lag client in a building");
          let logs = crate::contract::read(&dir).expect("its logs");
 -        let c = crate::contract::check(&logs, include_str!("../../../marks/SERIES.md"));
 -        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();

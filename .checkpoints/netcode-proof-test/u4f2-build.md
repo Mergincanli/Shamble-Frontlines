@@ -344,4 +344,17 @@
   pass), every one naming the culprit: "forged K A: the first state hash that differs: (13, …) / (13, …); Soldier
   records differ there on ["slot 3 (kind 4)"]" (B: tick 14, the same slot). Restored by Edit, efadaeb2… equal. Clean
   scenario.rs 7e0d3430….
-- SIZE-CHECK after FP-7: +2,032 -177 tracked; forged.rs 380: about 2,412 added (+30).
+- SIZE-CHECK after FP-7: +2,032 -177 tracked; forged.rs 380: about 2,412 added (+30). Snapshot taken (170,870 B).
+- **FP-4 (NC-U4F2-3 = TE-U4F2-5): DONE.** bots lib.rs: the lane's `west` moved from `Fast` to `Behaviour::lane_west`;
+  `lane()` no longer needs `self.fast` (the fast clock always has it, so its walk is unchanged); new `pub fn
+  lane_walk(scene, slot, seed)` (`Kind::Lane` on the fixed-lead rule). The lab (scenario.rs `run`): the lag-switch
+  suite's slot 0 is `Behaviour::lane_walk`, then the same `every_step`, controller and `lag_switch` wraps as before.
+  f20 adds: the largest excess on a burst tick (`lagswitch_cmds_count` >= 2) above the standing value (-(600 x 10,000
+  / 30 x 8) = -1,600,000 µm), and no room tick with slot 0 in `in_building_slot_area`; its doc says so.
+  u4f2-fp4-tests2.log: fmt exit 0; f20 PASS 12.84 s alone (bursts 4 of 200 ms; commands a tick at most 7; excess at
+  most -200,000 µm, on a burst tick too: 7 ticks' walk less 8); the fast clock's tests unchanged and passing (bots
+  q11_iii_c + f19 17.65 s; lab f19 + f28 x 8 30.98 s).
+- FP-4's plant (the lag client back on the steady script): u4f2-fp4-plant.log, f20 FAILS by name at
+  scenario.rs:4258, "a burst tick moves" (excess -1,600,000 on every tick). Restored by Edit, 212c6ed8… equal (then
+  f20's doc lines only). Clean bots lib.rs a8217faa….
+- SIZE-CHECK after FP-4: +2,069 -188 tracked; forged.rs 380: about 2,449 added (+37).
