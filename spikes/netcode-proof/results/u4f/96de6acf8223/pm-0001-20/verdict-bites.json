@@ -1,0 +1,144 @@
+[
+  {
+    "mark": "PM-0001-2",
+    "title": "The load is the stress scene",
+    "verdict": "NOT-RUN",
+    "why": [
+      "SS runs: 0 of 3 valid runs",
+      "ES runs: 0 of 3 valid runs",
+      "SS N=24 (PM-0001-10's scale step): 0 of 3 valid runs",
+      "SS N=36 (PM-0001-10's scale step): 0 of 3 valid runs",
+      "bite PM-0001-2/fire-stops: no run yet"
+    ],
+    "parts": [
+      {
+        "name": "SS runs",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS runs: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "ES runs",
+        "verdict": "NOT-RUN",
+        "why": [
+          "ES runs: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=24 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=24 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=36 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=36 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-2/fire-stops",
+        "status": "not_run",
+        "runs": []
+      }
+    ]
+  },
+  {
+    "mark": "PM-0001-20",
+    "title": "Commands arrive in time and count once",
+    "verdict": "NOT-RUN",
+    "why": [
+      "L1 P3 option A: 0 of 3 valid runs",
+      "L1 P3 option B: 0 of 3 valid runs",
+      "L2 P3 option A: 0 of 1 valid runs",
+      "L2 P3 option B: 0 of 1 valid runs"
+    ],
+    "parts": [
+      {
+        "name": "L1 P3 option A",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P3 option A: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P3 option B",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P3 option B: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P3 option A",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P3 option A: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P3 option B",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P3 option B: 0 of 1 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-20/redundancy-1",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-redundancy-1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "at least 99.9 % of commands reach the server before their tick runs",
+                "outcome": "fail",
+                "value": "0.894544",
+                "needs": ">= 0.999"
+              },
+              {
+                "name": "missing inputs at most 0.1 % of player-ticks",
+                "outcome": "fail",
+                "value": "0.105456",
+                "needs": "<= 0.001"
+              },
+              {
+                "name": "10,000 scripted presses",
+                "outcome": "pass",
+                "value": "431998",
+                "needs": ">= 10000"
+              },
+              {
+                "name": "0 presses lost",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "0 presses doubled",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

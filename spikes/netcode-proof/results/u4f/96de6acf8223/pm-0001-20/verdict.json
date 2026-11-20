@@ -1,0 +1,970 @@
+[
+  {
+    "mark": "PM-0001-2",
+    "title": "The load is the stress scene",
+    "verdict": "NOT-RUN",
+    "why": [
+      "ES runs: 0 of 3 valid runs",
+      "SS N=24 (PM-0001-10's scale step): 0 of 3 valid runs",
+      "SS N=36 (PM-0001-10's scale step): 0 of 3 valid runs",
+      "bite PM-0001-2/fire-stops: no run yet"
+    ],
+    "parts": [
+      {
+        "name": "SS runs",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-20-a-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "48 soldiers on every measured tick",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "three teams of 16",
+                "outcome": "pass",
+                "value": "16",
+                "needs": ">= 16"
+              },
+              {
+                "name": "a connected snapshot-receiving client on every soldier",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "15 big vehicles",
+                "outcome": "pass",
+                "value": "15",
+                "needs": ">= 15"
+              },
+              {
+                "name": "4 very large units of at least 20 parts",
+                "outcome": "pass",
+                "value": "4",
+                "needs": ">= 4"
+              },
+              {
+                "name": "300 live projectiles",
+                "outcome": "pass",
+                "value": "300",
+                "needs": ">= 300"
+              },
+              {
+                "name": "700 shots per second, run mean at least -5 %",
+                "outcome": "pass",
+                "value": "693.636667",
+                "needs": ">= 665"
+              },
+              {
+                "name": "700 shots per second, run mean at most +5 %",
+                "outcome": "pass",
+                "value": "693.636667",
+                "needs": "<= 735"
+              },
+              {
+                "name": "portal changes 1 per second, mean at least -5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.95"
+              },
+              {
+                "name": "portal changes 1 per second, mean at most +5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "<= 1.05"
+              },
+              {
+                "name": "everyone in view on at least 99 % of each client's snapshots",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.99"
+              }
+            ]
+          },
+          {
+            "run": "l1-20-a-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "48 soldiers on every measured tick",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "three teams of 16",
+                "outcome": "pass",
+                "value": "16",
+                "needs": ">= 16"
+              },
+              {
+                "name": "a connected snapshot-receiving client on every soldier",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "15 big vehicles",
+                "outcome": "pass",
+                "value": "15",
+                "needs": ">= 15"
+              },
+              {
+                "name": "4 very large units of at least 20 parts",
+                "outcome": "pass",
+                "value": "4",
+                "needs": ">= 4"
+              },
+              {
+                "name": "300 live projectiles",
+                "outcome": "pass",
+                "value": "300",
+                "needs": ">= 300"
+              },
+              {
+                "name": "700 shots per second, run mean at least -5 %",
+                "outcome": "pass",
+                "value": "693.545",
+                "needs": ">= 665"
+              },
+              {
+                "name": "700 shots per second, run mean at most +5 %",
+                "outcome": "pass",
+                "value": "693.545",
+                "needs": "<= 735"
+              },
+              {
+                "name": "portal changes 1 per second, mean at least -5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.95"
+              },
+              {
+                "name": "portal changes 1 per second, mean at most +5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "<= 1.05"
+              },
+              {
+                "name": "everyone in view on at least 99 % of each client's snapshots",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.99"
+              }
+            ]
+          },
+          {
+            "run": "l1-20-a-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "48 soldiers on every measured tick",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "three teams of 16",
+                "outcome": "pass",
+                "value": "16",
+                "needs": ">= 16"
+              },
+              {
+                "name": "a connected snapshot-receiving client on every soldier",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "15 big vehicles",
+                "outcome": "pass",
+                "value": "15",
+                "needs": ">= 15"
+              },
+              {
+                "name": "4 very large units of at least 20 parts",
+                "outcome": "pass",
+                "value": "4",
+                "needs": ">= 4"
+              },
+              {
+                "name": "300 live projectiles",
+                "outcome": "pass",
+                "value": "300",
+                "needs": ">= 300"
+              },
+              {
+                "name": "700 shots per second, run mean at least -5 %",
+                "outcome": "pass",
+                "value": "693.535",
+                "needs": ">= 665"
+              },
+              {
+                "name": "700 shots per second, run mean at most +5 %",
+                "outcome": "pass",
+                "value": "693.535",
+                "needs": "<= 735"
+              },
+              {
+                "name": "portal changes 1 per second, mean at least -5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.95"
+              },
+              {
+                "name": "portal changes 1 per second, mean at most +5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "<= 1.05"
+              },
+              {
+                "name": "everyone in view on at least 99 % of each client's snapshots",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.99"
+              }
+            ]
+          },
+          {
+            "run": "l1-20-b-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "48 soldiers on every measured tick",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "three teams of 16",
+                "outcome": "pass",
+                "value": "16",
+                "needs": ">= 16"
+              },
+              {
+                "name": "a connected snapshot-receiving client on every soldier",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "15 big vehicles",
+                "outcome": "pass",
+                "value": "15",
+                "needs": ">= 15"
+              },
+              {
+                "name": "4 very large units of at least 20 parts",
+                "outcome": "pass",
+                "value": "4",
+                "needs": ">= 4"
+              },
+              {
+                "name": "300 live projectiles",
+                "outcome": "pass",
+                "value": "300",
+                "needs": ">= 300"
+              },
+              {
+                "name": "700 shots per second, run mean at least -5 %",
+                "outcome": "pass",
+                "value": "693.646667",
+                "needs": ">= 665"
+              },
+              {
+                "name": "700 shots per second, run mean at most +5 %",
+                "outcome": "pass",
+                "value": "693.646667",
+                "needs": "<= 735"
+              },
+              {
+                "name": "portal changes 1 per second, mean at least -5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.95"
+              },
+              {
+                "name": "portal changes 1 per second, mean at most +5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "<= 1.05"
+              },
+              {
+                "name": "everyone in view on at least 99 % of each client's snapshots",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.99"
+              }
+            ]
+          },
+          {
+            "run": "l1-20-b-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "48 soldiers on every measured tick",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "three teams of 16",
+                "outcome": "pass",
+                "value": "16",
+                "needs": ">= 16"
+              },
+              {
+                "name": "a connected snapshot-receiving client on every soldier",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "15 big vehicles",
+                "outcome": "pass",
+                "value": "15",
+                "needs": ">= 15"
+              },
+              {
+                "name": "4 very large units of at least 20 parts",
+                "outcome": "pass",
+                "value": "4",
+                "needs": ">= 4"
+              },
+              {
+                "name": "300 live projectiles",
+                "outcome": "pass",
+                "value": "300",
+                "needs": ">= 300"
+              },
+              {
+                "name": "700 shots per second, run mean at least -5 %",
+                "outcome": "pass",
+                "value": "693.476667",
+                "needs": ">= 665"
+              },
+              {
+                "name": "700 shots per second, run mean at most +5 %",
+                "outcome": "pass",
+                "value": "693.476667",
+                "needs": "<= 735"
+              },
+              {
+                "name": "portal changes 1 per second, mean at least -5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.95"
+              },
+              {
+                "name": "portal changes 1 per second, mean at most +5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "<= 1.05"
+              },
+              {
+                "name": "everyone in view on at least 99 % of each client's snapshots",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.99"
+              }
+            ]
+          },
+          {
+            "run": "l1-20-b-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "48 soldiers on every measured tick",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "three teams of 16",
+                "outcome": "pass",
+                "value": "16",
+                "needs": ">= 16"
+              },
+              {
+                "name": "a connected snapshot-receiving client on every soldier",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "15 big vehicles",
+                "outcome": "pass",
+                "value": "15",
+                "needs": ">= 15"
+              },
+              {
+                "name": "4 very large units of at least 20 parts",
+                "outcome": "pass",
+                "value": "4",
+                "needs": ">= 4"
+              },
+              {
+                "name": "300 live projectiles",
+                "outcome": "pass",
+                "value": "300",
+                "needs": ">= 300"
+              },
+              {
+                "name": "700 shots per second, run mean at least -5 %",
+                "outcome": "pass",
+                "value": "693.49",
+                "needs": ">= 665"
+              },
+              {
+                "name": "700 shots per second, run mean at most +5 %",
+                "outcome": "pass",
+                "value": "693.49",
+                "needs": "<= 735"
+              },
+              {
+                "name": "portal changes 1 per second, mean at least -5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.95"
+              },
+              {
+                "name": "portal changes 1 per second, mean at most +5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "<= 1.05"
+              },
+              {
+                "name": "everyone in view on at least 99 % of each client's snapshots",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.99"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ES runs",
+        "verdict": "NOT-RUN",
+        "why": [
+          "ES runs: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=24 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=24 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=36 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=36 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-2/fire-stops",
+        "status": "not_run",
+        "runs": []
+      }
+    ],
+    "report": [
+      {
+        "name": "effects per soldier, max",
+        "part": "SS runs",
+        "run": "l1-20-a-s1",
+        "value": "8"
+      },
+      {
+        "name": "effects per soldier, max",
+        "part": "SS runs",
+        "run": "l1-20-a-s2",
+        "value": "8"
+      },
+      {
+        "name": "effects per soldier, max",
+        "part": "SS runs",
+        "run": "l1-20-a-s3",
+        "value": "8"
+      },
+      {
+        "name": "effects per soldier, max",
+        "part": "SS runs",
+        "run": "l1-20-b-s1",
+        "value": "8"
+      },
+      {
+        "name": "effects per soldier, max",
+        "part": "SS runs",
+        "run": "l1-20-b-s2",
+        "value": "8"
+      },
+      {
+        "name": "effects per soldier, max",
+        "part": "SS runs",
+        "run": "l1-20-b-s3",
+        "value": "8"
+      },
+      {
+        "name": "stand-in entity changes per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-a-s1",
+        "value": "0"
+      },
+      {
+        "name": "stand-in entity changes per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-a-s2",
+        "value": "0"
+      },
+      {
+        "name": "stand-in entity changes per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-a-s3",
+        "value": "0"
+      },
+      {
+        "name": "stand-in entity changes per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-b-s1",
+        "value": "0"
+      },
+      {
+        "name": "stand-in entity changes per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-b-s2",
+        "value": "0"
+      },
+      {
+        "name": "stand-in entity changes per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-b-s3",
+        "value": "0"
+      },
+      {
+        "name": "stand-in entity spawns per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-a-s1",
+        "value": "74.823333"
+      },
+      {
+        "name": "stand-in entity spawns per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-a-s2",
+        "value": "74.638333"
+      },
+      {
+        "name": "stand-in entity spawns per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-a-s3",
+        "value": "74.458333"
+      },
+      {
+        "name": "stand-in entity spawns per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-b-s1",
+        "value": "74.823333"
+      },
+      {
+        "name": "stand-in entity spawns per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-b-s2",
+        "value": "74.638333"
+      },
+      {
+        "name": "stand-in entity spawns per second, mean",
+        "part": "SS runs",
+        "run": "l1-20-b-s3",
+        "value": "74.458333"
+      }
+    ]
+  },
+  {
+    "mark": "PM-0001-20",
+    "title": "Commands arrive in time and count once",
+    "verdict": "NOT-RUN",
+    "why": [
+      "L2 P3 option A: 0 of 1 valid runs",
+      "L2 P3 option B: 0 of 1 valid runs",
+      "bite PM-0001-20/redundancy-1: no run yet"
+    ],
+    "parts": [
+      {
+        "name": "L1 P3 option A",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-20-a-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "at least 99.9 % of commands reach the server before their tick runs",
+                "outcome": "pass",
+                "value": "0.999843",
+                "needs": ">= 0.999"
+              },
+              {
+                "name": "missing inputs at most 0.1 % of player-ticks",
+                "outcome": "pass",
+                "value": "0.000157",
+                "needs": "<= 0.001"
+              },
+              {
+                "name": "10,000 scripted presses",
+                "outcome": "pass",
+                "value": "432003",
+                "needs": ">= 10000"
+              },
+              {
+                "name": "0 presses lost",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "0 presses doubled",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              }
+            ]
+          },
+          {
+            "run": "l1-20-a-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "at least 99.9 % of commands reach the server before their tick runs",
+                "outcome": "pass",
+                "value": "0.99987",
+                "needs": ">= 0.999"
+              },
+              {
+                "name": "missing inputs at most 0.1 % of player-ticks",
+                "outcome": "pass",
+                "value": "0.00013",
+                "needs": "<= 0.001"
+              },
+              {
+                "name": "10,000 scripted presses",
+                "outcome": "pass",
+                "value": "432003",
+                "needs": ">= 10000"
+              },
+              {
+                "name": "0 presses lost",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "0 presses doubled",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              }
+            ]
+          },
+          {
+            "run": "l1-20-a-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "at least 99.9 % of commands reach the server before their tick runs",
+                "outcome": "pass",
+                "value": "0.999861",
+                "needs": ">= 0.999"
+              },
+              {
+                "name": "missing inputs at most 0.1 % of player-ticks",
+                "outcome": "pass",
+                "value": "0.000139",
+                "needs": "<= 0.001"
+              },
+              {
+                "name": "10,000 scripted presses",
+                "outcome": "pass",
+                "value": "432009",
+                "needs": ">= 10000"
+              },
+              {
+                "name": "0 presses lost",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "0 presses doubled",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "L1 P3 option B",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-20-b-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "at least 99.9 % of commands reach the server before their tick runs",
+                "outcome": "pass",
+                "value": "0.999843",
+                "needs": ">= 0.999"
+              },
+              {
+                "name": "missing inputs at most 0.1 % of player-ticks",
+                "outcome": "pass",
+                "value": "0.000157",
+                "needs": "<= 0.001"
+              },
+              {
+                "name": "10,000 scripted presses",
+                "outcome": "pass",
+                "value": "432000",
+                "needs": ">= 10000"
+              },
+              {
+                "name": "0 presses lost",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "0 presses doubled",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              }
+            ]
+          },
+          {
+            "run": "l1-20-b-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "at least 99.9 % of commands reach the server before their tick runs",
+                "outcome": "pass",
+                "value": "0.99987",
+                "needs": ">= 0.999"
+              },
+              {
+                "name": "missing inputs at most 0.1 % of player-ticks",
+                "outcome": "pass",
+                "value": "0.00013",
+                "needs": "<= 0.001"
+              },
+              {
+                "name": "10,000 scripted presses",
+                "outcome": "pass",
+                "value": "432000",
+                "needs": ">= 10000"
+              },
+              {
+                "name": "0 presses lost",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "0 presses doubled",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              }
+            ]
+          },
+          {
+            "run": "l1-20-b-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "at least 99.9 % of commands reach the server before their tick runs",
+                "outcome": "pass",
+                "value": "0.999861",
+                "needs": ">= 0.999"
+              },
+              {
+                "name": "missing inputs at most 0.1 % of player-ticks",
+                "outcome": "pass",
+                "value": "0.000139",
+                "needs": "<= 0.001"
+              },
+              {
+                "name": "10,000 scripted presses",
+                "outcome": "pass",
+                "value": "432000",
+                "needs": ">= 10000"
+              },
+              {
+                "name": "0 presses lost",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "0 presses doubled",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "L2 P3 option A",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P3 option A: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P3 option B",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P3 option B: 0 of 1 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-20/redundancy-1",
+        "status": "not_run",
+        "runs": []
+      }
+    ],
+    "report": [
+      {
+        "name": "input buffer depth per client, median (ticks)",
+        "part": "L1 P3 option A",
+        "run": "l1-20-a-s1",
+        "value": "0"
+      },
+      {
+        "name": "input buffer depth per client, median (ticks)",
+        "part": "L1 P3 option A",
+        "run": "l1-20-a-s2",
+        "value": "0"
+      },
+      {
+        "name": "input buffer depth per client, median (ticks)",
+        "part": "L1 P3 option A",
+        "run": "l1-20-a-s3",
+        "value": "0"
+      },
+      {
+        "name": "input buffer depth per client, max (ticks)",
+        "part": "L1 P3 option A",
+        "run": "l1-20-a-s1",
+        "value": "0"
+      },
+      {
+        "name": "input buffer depth per client, max (ticks)",
+        "part": "L1 P3 option A",
+        "run": "l1-20-a-s2",
+        "value": "0"
+      },
+      {
+        "name": "input buffer depth per client, max (ticks)",
+        "part": "L1 P3 option A",
+        "run": "l1-20-a-s3",
+        "value": "0"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P3 option A",
+        "run": "l1-20-a-s1",
+        "value": "not available: run l1-20-a-s1: no values for header.params.reorder_permille"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P3 option A",
+        "run": "l1-20-a-s2",
+        "value": "not available: run l1-20-a-s2: no values for header.params.reorder_permille"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P3 option A",
+        "run": "l1-20-a-s3",
+        "value": "not available: run l1-20-a-s3: no values for header.params.reorder_permille"
+      },
+      {
+        "name": "input buffer depth per client, median (ticks)",
+        "part": "L1 P3 option B",
+        "run": "l1-20-b-s1",
+        "value": "2"
+      },
+      {
+        "name": "input buffer depth per client, median (ticks)",
+        "part": "L1 P3 option B",
+        "run": "l1-20-b-s2",
+        "value": "2"
+      },
+      {
+        "name": "input buffer depth per client, median (ticks)",
+        "part": "L1 P3 option B",
+        "run": "l1-20-b-s3",
+        "value": "2"
+      },
+      {
+        "name": "input buffer depth per client, max (ticks)",
+        "part": "L1 P3 option B",
+        "run": "l1-20-b-s1",
+        "value": "5"
+      },
+      {
+        "name": "input buffer depth per client, max (ticks)",
+        "part": "L1 P3 option B",
+        "run": "l1-20-b-s2",
+        "value": "5"
+      },
+      {
+        "name": "input buffer depth per client, max (ticks)",
+        "part": "L1 P3 option B",
+        "run": "l1-20-b-s3",
+        "value": "5"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P3 option B",
+        "run": "l1-20-b-s1",
+        "value": "not available: run l1-20-b-s1: no values for header.params.reorder_permille"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P3 option B",
+        "run": "l1-20-b-s2",
+        "value": "not available: run l1-20-b-s2: no values for header.params.reorder_permille"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P3 option B",
+        "run": "l1-20-b-s3",
+        "value": "not available: run l1-20-b-s3: no values for header.params.reorder_permille"
+      }
+    ]
+  }
+]
