@@ -37,3 +37,21 @@
   f18 rewritten on pair("clamp","A") (+ every tick's world hash), f28_option_b_the_clamp_suite_..., `lag_short`, f20 on
   it, f28_option_b_the_lag_switch_suite_..., `unnamed`. u4f2-b1-t.log: 6 passed (f18, f20, f28 B x4) in 34.39 s.
   SIZE-CHECK: +93 -36.
+- Block 2 DONE (npt-bots: the forgers of kinds 3, 7, 8, 9, 10, 11 and every twin, f15's six): `forger` takes kinds
+  1-11; `twin()`, `catchup_under_a()`, `take_copies()`, `forge_unencodable()`, `reliable()` (kind 11's control-stream
+  message) are new public items; `Forge::outgoing`/`forge_input`/`restamp`; `forge_step`, `catchup_step`. Constructions:
+  kind 3 the previous command's copy (move turned 90 degrees, or aim x +100 cm, in turn), in place or added; kind 7 an
+  honest reload edge on the command before a due one, then fire and reload edges in turn inside it (window
+  `ticks_for_ms(reload_ms - RELOAD_MARGIN_MS)` = 54 at 30 Hz / 108 at 60 Hz; next reload after
+  `ticks_for_ms(reload_ms + RELOAD_MARGIN_MS)` = 66 / 132; RELOAD_MARGIN_MS 200 ms, carry 39's form: a ms constant
+  through npt-sim's ticks_for_ms, site bots/src/lib.rs Forge::reload); kind 8 ack tick + 1,000; kind 9 a trailing 0 byte
+  or byte 27's top pad bit in turn; kind 10 restamped contiguous from its last accepted stamp + 1, episodes every
+  every x 8 (A) / x 4 (B) commands: A 6 hold steps + 8 (held) + 8 (refused by the cap), B 8 + 4 (refused, buffer full)
+  then 6 hold steps (CATCHUP_HOLD = REDUNDANCY_CAP - 2: a step count, keeps the lead); kind 11 a control-framed `Ping`
+  (WrongChannel). Twins: 1, 2, 4, 5, 6 `skip_command` at the due step; 10's skips at the next step; 3 the honest copy; 7
+  without the edge; 8, 9 header only with the previous ack; 11 `ClientSettings { delay: 0 }`. The old in-loop forger
+  code moved into `Forge::outgoing` (due set at the step by the given count, = the old `seen` at one command a step).
+  u4f2-b2-t3.log, u4f2-b2-fmt.log: f15 12 passed; whole npt-bots lib 18 + the new passed in u4f2-b2-t.log but kind 10
+  (fixed: last hold run, sequence set); clippy both builds bots+lab exit 0 (u4f2-b2-clippy.log), fmt clean.
+  SIZE-CHECK: +861 -68 (bots +796: above the block's ~400 and the brief's ~250 for bots; the twins' bots half, block 5's
+  in the brief, is in it). Finding: the estimate for bots ran about 3 times; the rest must stay lean.

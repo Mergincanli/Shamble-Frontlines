@@ -1,8 +1,890 @@
+diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
+index b40d2dd..4dc40cd 100644
+--- a/spikes/netcode-proof/crates/bots/src/lib.rs
++++ b/spikes/netcode-proof/crates/bots/src/lib.rs
+@@ -142,19 +142,254 @@ pub struct Behaviour {
+     fast: Option<Fast>,
+     /// -21's forger (`forger`).
+     forge: Option<Forge>,
++    /// The scene's weapon's reload, ms (kind 7's forger reloads on purpose).
++    reload_ms: u32,
+ }
+ 
+-/// A forger's state (u4f-brief.md 2.4, 2.6): its kind, its interval, the bound (ticks), the new sequences seen as an
+-/// `Input`'s newest, the forged count, the newest command seen (honest) and the forged sequences not yet taken.
++/// Kind 7's margin, ms, inside the weapon's reload on each side (a time, turned into ticks by npt-sim's
++/// `ticks_for_ms`: carry 39): a forged edge is given only while the forger's own reload has more than this left, and a
++/// new reload starts only this long after the last one ended (6 ticks at 30 Hz, 12 at 60 Hz).
++const RELOAD_MARGIN_MS: u32 = 200;
++/// Kind 10's hold, in steps without a command: the burst's 8 accepted commands less its own two steps, so the
++/// forger's lead is the same after an episode as before it (a count of steps, with no time in it).
++const CATCHUP_HOLD: u32 = npt_proto::Limits::REDUNDANCY_CAP as u32 - 2;
++
++/// A forger's state (u4f-brief.md 2.4, 2.6, 2.12): its kind, interval and the bound (ticks); whether it is the twin
++/// (the same script with only the forged part made honest); kind 10's option (A: hold, then burst; B: burst, then
++/// hold); the forged count, the newest command seen (honest), the forged sequences and kind 3's forged copies not
++/// yet taken; whether this step's command is the forged one; the last `Input`'s acknowledgement; kind 7's reload
++/// (its start's command index, the forged edges' window and the next start's distance, in commands at one a tick);
++/// kind 10's episode step, held datagram, kept stamps and next stamp; the twin's skips owed; kind 11's message; the
++/// forged `Input`s that would not encode (0 expected).
+ #[derive(Clone, Debug, Default)]
+ struct Forge {
+     kind: u8,
+     every: u64,
+     bound: u32,
+-    seen: u64,
++    twin: bool,
++    option_a: bool,
+     sent: u64,
+     last: Option<Command>,
+     forged: Vec<u16>,
++    copies: Vec<Command>,
++    due: bool,
++    ack: (u16, u8),
++    reload_at: Option<u64>,
++    reload: [u64; 2],
++    episode: u32,
++    held: Vec<Vec<u8>>,
++    stamps: std::collections::VecDeque<(u16, u32)>,
++    next_stamp: Option<u32>,
++    skips: u32,
++    message: Option<Vec<u8>>,
++    unencodable: u64,
++    burst: u8,
++    resume: Option<u32>,
++}
++
++/// How kind 9 leaves an `Input` undecodable: a trailing byte, or a set pad bit (the newest command's last byte's top
++/// bit: its 180 bits end 4 bits into its 23rd byte, the header's 5 B before it: proto/src/input.rs:9-10).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++enum Undecodable {
++    Trailing,
++    Pad,
++}
++
++/// The byte holding the newest command's pad bits in an `Input` datagram (5 B header, 23 B whole command).
++const PAD_BYTE: usize = 5 + 22;
++
++/// Kind 10's commands accepted in a burst (the per-tick cap and B's buffer: 8) and the burst's commands under each
++/// option (A 16, B 12: the buffer's 8 and 4 more inside the bound).
++const BURST_KEPT: u32 = npt_proto::Limits::REDUNDANCY_CAP as u32;
++
++impl Forge {
++    /// Kind 10's forged commands per episode (A 8, B 4), so an episode comes every `every` times that many commands.
++    fn burst_refused(&self) -> u32 {
++        if self.option_a {
++            BURST_KEPT
++        } else {
++            BURST_KEPT / 2
++        }
++    }
++
++    /// Each command of `i` (oldest first) takes its kept stamp, or, as a new sequence, the next one (contiguous from
++    /// the forger's first stamp, the endpoint's own); a view tick after the stamp is the stamp (the endpoint's rule).
++    /// Returns the new sequences.
++    fn restamp(&mut self, i: &mut npt_proto::Input) -> Vec<u16> {
++        let mut new = Vec::new();
++        for c in i.commands.iter_mut().rev() {
++            let kept = self.stamps.iter().find(|(s, _)| *s == c.seq).map(|x| x.1);
++            c.tick = kept.unwrap_or_else(|| {
++                let t = *self.next_stamp.get_or_insert(c.tick);
++                self.next_stamp = Some(t.wrapping_add(1));
++                self.stamps.push_back((c.seq, t));
++                if self.stamps.len() > STAMPS_KEPT {
++                    self.stamps.pop_front();
++                }
++                new.push(c.seq);
++                t
++            });
++            if later(c.view_tick, c.tick) != c.tick {
++                (c.view_tick, c.view_fraction) = (c.tick, 0);
++            }
++        }
++        new
++    }
++
++    /// Kind 11's message on the control stream: the forger's a `Ping` (a datagram type) framed for that stream, which
++    /// the pump refuses as the wrong channel; the twin's a `ClientSettings` repeating the current delay (0: no `Interp`
++    /// yet), which changes nothing (2.12).
++    fn message(&self, now_ns: u64) -> Option<Vec<u8>> {
++        use npt_proto::{ClientSettings, Message, Ping, encode};
++        let mut out = Vec::new();
++        if self.twin {
++            encode(
++                &Message::ClientSettings(ClientSettings { delay: 0 }),
++                &mut out,
++            )
++            .ok()?;
++            return Some(out);
++        }
++        let ping = Message::Ping(Ping {
++            id: self.sent as u8,
++            sent_ns: now_ns,
++        });
++        encode(&ping, &mut out).ok()?;
++        let mut framed = u16::try_from(out.len()).ok()?.to_le_bytes().to_vec();
++        framed.append(&mut out);
++        Some(framed)
++    }
++
++    /// One item forged: counted, and its sequence kept for the lab.
++    fn record(&mut self, seq: u16) {
++        self.sent += 1;
++        self.forged.push(seq);
++    }
++
++    /// The forged part of one `Input` whose newest command `c` is new and due, `prev` the command before it, `ack` the
++    /// previous `Input`'s acknowledgement (2.6's per-kind table; the twin's rows, 2.12). Returns kind 9's way.
++    fn forge_input(
++        &mut self,
++        i: &mut npt_proto::Input,
++        c: Command,
++        prev: Option<Command>,
++        newest: u32,
++        ack: (u16, u8),
++    ) -> Option<Undecodable> {
++        let (n, twin) = (self.sent + 1, self.twin);
++        match self.kind {
++            1 | 2 | 4 | 5 | 6 => {
++                i.commands[0] = forged(self.kind, c, prev, newest, self.bound, n)?;
++                self.record(c.seq);
++            }
++            3 => {
++                let p = prev.filter(|p| p.seq == c.seq.wrapping_sub(1))?;
++                let mut copy = p;
++                if !twin {
++                    if n % 2 == 1 {
++                        copy.move_xy = [p.move_xy[1], p.move_xy[0].saturating_neg()];
++                    } else {
++                        copy.aim[0] = p.aim[0].saturating_add(100);
++                    }
++                    self.record(p.seq);
++                    self.copies.push(copy);
++                }
++                match i.commands.get_mut(1) {
++                    Some(x) => *x = copy,
++                    None => i.commands.push(copy),
++                }
++            }
++            8 | 9 if twin && (self.kind == 9 || i.ack_groups != 0) => {
++                i.commands.clear();
++                (i.ack_tick, i.ack_groups) = ack;
++            }
++            8 if i.ack_groups != 0 => {
++                i.ack_tick = i.ack_tick.wrapping_add(1_000);
++                self.record(c.seq);
++            }
++            9 => {
++                self.record(c.seq);
++                return Some(if n % 2 == 1 {
++                    Undecodable::Trailing
++                } else {
++                    Undecodable::Pad
++                });
++            }
++            7 | 11 if !twin => self.record(c.seq),
++            _ => {}
++        }
++        None
++    }
++
++    /// The forger's hook on what its endpoint sends at its step (2.6: the honest datagrams, decoded and re-encoded with
++    /// only the kind's change; kind 9's left undecodable on purpose; kind 10's restamped, its burst's first `Input`
++    /// held and sent ahead of the second's). An `Input` whose forged form would not encode goes honest, counted.
++    fn outgoing(&mut self, newest: u32, datagrams: &mut Vec<Vec<u8>>) {
++        use npt_proto::{Direction, Message, decode, encode};
++        let (due, burst) = (
++            core::mem::take(&mut self.due),
++            core::mem::take(&mut self.burst),
++        );
++        let input = |d: &Vec<u8>| {
++            matches!(
++                decode(Direction::ClientToRoom, Channel::Datagram, d),
++                Ok(Message::Input(_))
++            )
++        };
++        for d in datagrams.iter_mut() {
++            let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
++            else {
++                continue;
++            };
++            let honest = i.clone();
++            let ack = core::mem::replace(&mut self.ack, (i.ack_tick, i.ack_groups));
++            let fresh = i.commands.first().copied().filter(|c| {
++                self.last
++                    .is_none_or(|l| (c.seq.wrapping_sub(l.seq) as i16) > 0)
++            });
++            if self.kind == 10 {
++                let new = self.restamp(&mut i);
++                if burst == 1 {
++                    self.resume = self.next_stamp;
++                } else if burst == 2 {
++                    self.next_stamp = self.resume;
++                    let twin = self.twin;
++                    for s in new.into_iter().filter(|_| !twin) {
++                        self.record(s);
++                    }
++                }
++            }
++            let mut way = None;
++            if let Some(c) = fresh {
++                let prev = i.commands.get(1).copied().or(self.last);
++                self.last = Some(c);
++                if due {
++                    way = self.forge_input(&mut i, c, prev, newest, ack);
++                }
++            }
++            if i == honest && way.is_none() {
++                continue;
++            }
++            let mut out = Vec::new();
++            if encode(&Message::Input(i), &mut out).is_err() {
++                self.unencodable += 1;
++                continue;
++            }
++            match way {
++                Some(Undecodable::Trailing) => out.push(0),
++                Some(Undecodable::Pad) => out[PAD_BYTE] |= 0x80,
++                None => {}
++            }
++            *d = out;
++        }
++        if burst == 1 {
++            self.held.extend(datagrams.extract_if(.., |d| input(d)));
++        } else if burst == 2 {
++            let mut both = core::mem::take(&mut self.held);
++            both.append(datagrams);
++            *datagrams = both;
++        }
++    }
+ }
+ 
+ /// `c`, the newest command of a new sequence, forged in `kind` (2.6's per-kind table), the `n`-th (from 1), against
+@@ -298,27 +533,62 @@ impl Behaviour {
+             lag: None,
+             fast: None,
+             forge: None,
++            reload_ms: scene.weapon().reload_ms,
+         }
+     }
+ 
+-    /// -21's forger of `kind` (2.4's kinds 1, 2, 4, 5 and 6: the room's checks on a whole command; `None` for another
+-    /// kind) under the lead bound `bound` (ticks): the same behaviour, with the newest command of every `every`-th new
+-    /// sequence forged in its kind in the first `Input` that carries it (2.6: the endpoint keeps the honest command, so
+-    /// every later copy is honest, a repeat of a refused sequence: 2.4 item 2). `None` for `every` below 2: kinds 2 and
+-    /// 5 forge against the previous command, so it must have been accepted (SEC-U4F-1), which every interval of 2 or
+-    /// more gives on a lossless profile (P0).
++    /// -21's forger of `kind` (2.4's 11 kinds; `None` for another) under the lead bound `bound` (ticks), on a
++    /// fixed-lead endpoint at one command a step (2.6's per-kind table): the same behaviour with one forged item per
++    /// `every` commands given, in 2.4's unit. Kinds 1, 2, 4, 5 and 6: the `every`-th command's newest copy forged in
++    /// the first `Input` that carries it (the endpoint keeps the honest command, so every later copy is a repeat of a
++    /// refused sequence: 2.4 item 2). Kind 3: that `Input` carries the previous command's copy with its move or aim
++    /// changed. Kind 7: the command itself carries a fire or a reload edge (in turn) inside a reload the forger started
++    /// with an honest reload edge, where the sim refuses it. Kind 8: that `Input`'s acknowledgement names a tick never
++    /// sent; kind 9: it takes a trailing byte or a set pad bit (in turn); kind 11: a `Ping` on the control stream beside
++    /// it. Kind 10: an episode every `every` x 8 (A) or x 4 (B) commands, 16 (A) or 12 (B) commands in two datagrams
++    /// sent in one step, stamped on from its last accepted stamp + 1, so all but the first 8 are refused by the catch-up
++    /// cap (A) or the full buffer (B), [`CATCHUP_HOLD`] steps without a command before (A) or after (B) the burst
++    /// keeping its lead. `None` for `every` below 2: kinds 2 and 5 forge against the previous command, so it must have
++    /// been accepted (SEC-U4F-1), which every interval of 2 or more gives on a lossless profile (P0).
+     pub fn forger(mut self, kind: u8, every: u64, bound: u32) -> Option<Behaviour> {
+-        ([1, 2, 4, 5, 6].contains(&kind) && every >= 2).then_some(())?;
++        ((1..=11).contains(&kind) && every >= 2).then_some(())?;
++        let reload = self.reload_ms;
++        let ticks = |ms: u32| u64::from(npt_sim::ticks_for_ms(ms));
+         self.forge = Some(Forge {
+             kind,
+             every,
+             bound,
++            reload: [
++                ticks(reload.saturating_sub(RELOAD_MARGIN_MS)),
++                ticks(reload + RELOAD_MARGIN_MS),
++            ],
+             ..Forge::default()
+         });
+         Some(self)
+     }
+ 
+-    /// The sequences the forger forged since the last take (the lab's attribution: 2.4 item 6).
++    /// The forger's twin (2.12): the same script and the same commands given, with only the forged part made honest:
++    /// kinds 1, 2, 4, 5, 6 and 10's refused commands never made (their sequence index and stamp used by
++    /// `ClientEndpoint::skip_command`, at the next step, once the acknowledgement emptied the endpoint's copies); kind
++    /// 3's copy with its honest content; kind 7's command without the forged edge; kinds 8's and 9's `Input` the header
++    /// only, its acknowledgement the previous `Input`'s; kind 11's message a `ClientSettings` repeating the delay.
++    pub fn twin(mut self) -> Behaviour {
++        if let Some(f) = self.forge.as_mut() {
++            f.twin = true;
++        }
++        self
++    }
++
++    /// Kind 10's option A shape (hold, then burst; a burst of 16): the room's option, which the lab gives it.
++    pub fn catchup_under_a(mut self) -> Behaviour {
++        if let Some(f) = self.forge.as_mut() {
++            f.option_a = true;
++        }
++        self
++    }
++
++    /// The sequences the forger forged since the last take (the lab's attribution: 2.4 item 6): kind 3's the copy's,
++    /// kind 10's the refused burst's, every other kind's the forged command's (kinds 8, 9 and 11: its step's newest).
+     pub fn take_forged(&mut self) -> Vec<u16> {
+         self.forge
+             .as_mut()
+@@ -326,6 +596,27 @@ impl Behaviour {
+             .unwrap_or_default()
+     }
+ 
++    /// Kind 3's forged copies since the last take, each as sent (the attribution's "no command with the forged copy's
++    /// content runs").
++    pub fn take_copies(&mut self) -> Vec<Command> {
++        self.forge
++            .as_mut()
++            .map(|f| core::mem::take(&mut f.copies))
++            .unwrap_or_default()
++    }
++
++    /// The forger's `Input`s whose forged form would not encode, sent honest instead (0 expected: TE3-4, SA3-2).
++    pub fn forge_unencodable(&self) -> u64 {
++        self.forge.as_ref().map_or(0, |f| f.unencodable)
++    }
++
++    /// Kind 11's hook on what the endpoint sends reliably at its step: the step's message onto the control stream.
++    pub fn reliable(&mut self, out: &mut Vec<(Channel, Vec<u8>)>) {
++        if let Some(m) = self.forge.as_mut().and_then(|f| f.message.take()) {
++            out.push((Channel::Control, m));
++        }
++    }
++
+     /// -21's 1.5x clock (u4f-brief.md 2.6; U4F-Q11 (iii) (c) and (v) (b) as F1 amends it): fire held at a seeded point,
+     /// the lane's walk at full length, a command at every step once the endpoint holds a snapshot (its host clock's rate
+     /// is the lab's), each stamped by the crate's `fast_stamp` under the lead bound `bound` (ticks) in
+@@ -424,11 +715,14 @@ impl Behaviour {
+                 l.bursts.push(now_ns.saturating_sub(at));
+             }
+         }
+-        if !self.never_acks && self.points.is_empty() && self.fast.is_none() && self.forge.is_none()
+-        {
++        let newest = self.last_newest.unwrap_or(0);
++        if let Some(f) = self.forge.as_mut() {
++            f.outgoing(newest, datagrams);
++            return;
++        }
++        if !self.never_acks && self.points.is_empty() && self.fast.is_none() {
+             return;
+         }
+-        let newest = self.last_newest.unwrap_or(0);
+         for d in datagrams.iter_mut() {
+             if let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
+             {
+@@ -460,23 +754,6 @@ impl Behaviour {
+                         }
+                     }
+                 }
+-                // The forger: an `Input` whose newest command is a new sequence counts it; every `every`-th is forged.
+-                if let Some(f) = self.forge.as_mut()
+-                    && let Some(&c) = i.commands.first()
+-                    && f.last
+-                        .is_none_or(|l| (c.seq.wrapping_sub(l.seq) as i16) > 0)
+-                {
+-                    f.seen += 1;
+-                    let prev = i.commands.get(1).copied().or(f.last);
+-                    f.last = Some(c);
+-                    if f.seen.is_multiple_of(f.every)
+-                        && let Some(x) = forged(f.kind, c, prev, newest, f.bound, f.sent + 1)
+-                    {
+-                        i.commands[0] = x;
+-                        f.sent += 1;
+-                        f.forged.push(c.seq);
+-                    }
+-                }
+                 // Every rewritten `Input` encodes: an older copy a past-bound stamp leaves more than 255 ticks below
+                 // (after an idle) is left out, oldest first, so the rest stay consecutive (the codec's two rules).
+                 let mut out = Vec::new();
+@@ -585,11 +862,133 @@ impl Behaviour {
+             self.skipped += 1;
+             return false;
+         }
++        if self.forge.is_some() {
++            return self.forge_step(endpoint, newest, view, now_ns);
++        }
+         let command = self.next_command(newest, view, endpoint.own_soldier());
+         endpoint.input(Some(command), &[], now_ns);
+         true
+     }
+ 
++    /// A forger's step once its newest tick moved ([`Behaviour::forger`], [`Behaviour::twin`]): the twin's skips owed
++    /// first, then this step's command, each forged part marked for [`Behaviour::outgoing`] (kind 7's edges put on
++    /// the command itself, kind 11's message for [`Behaviour::reliable`]). Returns whether a command was given.
++    fn forge_step(
++        &mut self,
++        e: &mut ClientEndpoint,
++        newest: u32,
++        view: &[(u8, [i32; 3])],
++        now_ns: u64,
++    ) -> bool {
++        let own = e.own_soldier();
++        let n = self.given + 1;
++        let Some(f) = self.forge.as_mut() else {
++            return false;
++        };
++        for _ in 0..core::mem::take(&mut f.skips) {
++            e.skip_command();
++        }
++        if f.kind == 10 {
++            return self.catchup_step(e, newest, view, own, now_ns);
++        }
++        let mut due = n.is_multiple_of(f.every);
++        if f.kind == 7 {
++            // The forged edge only inside the forger's own reload (the sim refuses a fire or reload edge there); an
++            // honest reload edge on the command before a due one the running reload does not cover, once the last
++            // reload is over and a shot has emptied a round (never the first command: a full magazine refuses it).
++            let ([inside, over], at) = (f.reload, f.reload_at);
++            let covered = |m: u64| at.is_some_and(|r| m - r <= inside);
++            due &= covered(n);
++            if (n + 1).is_multiple_of(f.every)
++                && !covered(n + 1)
++                && n >= 2
++                && at.is_none_or(|r| n - r >= over)
++            {
++                f.reload_at = Some(n);
++                let r = &mut self.presses[Command::PRESS_RELOAD];
++                *r = r.wrapping_add(1);
++            }
++            if due && !f.twin {
++                let b = if f.sent % 2 == 0 {
++                    Command::PRESS_FIRE
++                } else {
++                    Command::PRESS_RELOAD
++                };
++                self.presses[b] = self.presses[b].wrapping_add(1);
++            }
++        }
++        let skip = due && f.twin && [1, 2, 4, 5, 6].contains(&f.kind);
++        f.due = due && !(f.twin && f.kind == 7) && !skip;
++        if due && f.kind == 11 {
++            f.message = f.message(now_ns);
++        }
++        let command = self.next_command(newest, view, own);
++        if skip {
++            // The twin of a room-whole kind: the refused command is never made (U4F-Q13 (b)).
++            e.skip_command();
++            return false;
++        }
++        e.input(Some(command), &[], now_ns);
++        true
++    }
++
++    /// Kind 10's step ([`Behaviour::forger`]): an episode once every `every` x its refused count commands (A: 8,
++    /// B: 4): under A, [`CATCHUP_HOLD`] steps with no command, then 8 commands (their `Input` held), then 8 more (both
++    /// `Input`s sent in this step); under B the 8, then 4 more, then the hold. The twin gives none of the burst's
++    /// refused commands (generated, never made: their indices skipped at its next step).
++    fn catchup_step(
++        &mut self,
++        e: &mut ClientEndpoint,
++        newest: u32,
++        view: &[(u8, [i32; 3])],
++        own: Option<([i32; 3], bool)>,
++        now_ns: u64,
++    ) -> bool {
++        let given = self.given;
++        let Some(f) = self.forge.as_mut() else {
++            return false;
++        };
++        let period = f.every * u64::from(f.burst_refused());
++        if f.episode == 0 && given > 0 && given.is_multiple_of(period) {
++            f.episode = 1;
++        }
++        let (first, second) = if f.option_a {
++            (CATCHUP_HOLD + 1, CATCHUP_HOLD + 2)
++        } else {
++            (1, 2)
++        };
++        let step = f.episode;
++        let give = match step {
++            0 => 1,
++            s if s == first => BURST_KEPT,
++            s if s == second => f.burst_refused(),
++            _ => 0,
++        };
++        if step > 0 {
++            f.episode = if step == CATCHUP_HOLD + 2 {
++                0
++            } else {
++                step + 1
++            };
++            f.burst = if step == first {
++                1
++            } else {
++                2 * u8::from(step == second)
++            };
++        }
++        let unmade = step == second && f.twin;
++        if unmade {
++            f.skips = give;
++        }
++        for _ in 0..give {
++            let c = self.next_command(newest, view, own);
++            if !unmade {
++                e.input(Some(c), &[], now_ns);
++            }
++        }
++        give > 0 && !unmade
++    }
++
+     /// The decision function (crate-private; `step` calls it, and so do this crate's tests): the next command from
+     /// `newest`, `view` and `own`, the own soldier as the endpoint decoded it (`ClientEndpoint::own_soldier`: its grid
+     /// position and dead bit), counted as given.
+@@ -1170,10 +1569,343 @@ mod tests {
+     fn f15_a_forgers_interval_below_2_is_refused() {
+         let scene = Scene::stress();
+         let steady = || Behaviour::script(&scene, 0, 1, "steady").expect("a script");
+-        for k in [1, 2, 4, 5, 6] {
++        for k in 1..=11 {
+             assert!(steady().forger(k, 1, 12).is_none(), "{k}");
+             assert!(steady().forger(k, 2, 12).is_some(), "{k}");
+         }
++        assert!(steady().forger(12, 2, 12).is_none(), "no kind 12");
++    }
++
++    /// One side of f15's run for kinds 3, 7, 8, 9, 10 and 11: a forger or its twin, its endpoint, the newest
++    /// sequence it sent (the acknowledgement fed back) and, per step, its endpoint's datagrams before and after
++    /// `outgoing` and its reliable messages.
++    struct Side {
++        b: Behaviour,
++        e: ClientEndpoint,
++        sent: Option<u16>,
++        steps: Vec<[Vec<Vec<u8>>; 3]>,
++    }
++
++    /// The steady script on a fixed-lead endpoint, forging kind `kind` every 3rd command (kind 10 under option A when
++    /// `a`), and its twin, fed the same snapshot ticks for 300 steps, each acknowledging the newest command its side
++    /// sent (as at P0; for kind 3 every 5th acknowledges nothing, so some `Input`s carry the copy already).
++    fn sides(kind: u8, a: bool) -> [Side; 2] {
++        use npt_proto::{JoinAccepted, Message, Snapshot, encode};
++        let bytes = |m: &Message| {
++            let mut o = Vec::new();
++            encode(m, &mut o).expect("encodes");
++            o
++        };
++        let scene = Scene::stress();
++        let mut sides = [false, true].map(|twin| {
++            let b = Behaviour::script(&scene, 0, 1, "steady")
++                .and_then(|b| b.forger(kind, 3, 12))
++                .expect("a forger");
++            let b = if a { b.catchup_under_a() } else { b };
++            Side {
++                b: if twin { b.twin() } else { b },
++                e: ClientEndpoint::new(npt_proto::Join::default(), 30).with_lead(2),
++                sent: None,
++                steps: Vec::new(),
++            }
++        });
++        let ja = bytes(&Message::JoinAccepted(JoinAccepted {
++            tick: 100,
++            ..JoinAccepted::default()
++        }));
++        for k in 0..300u32 {
++            let now = u64::from(k) * 33_333_333;
++            for s in &mut sides {
++                let snap = Snapshot {
++                    tick: 101 + k,
++                    groups: 1,
++                    newest_received: s.sent.filter(|_| kind != 3 || k % 5 != 4),
++                    ..Snapshot::default()
++                };
++                let mut rx = vec![(Channel::Datagram, bytes(&Message::Snapshot(snap)), now)];
++                if k == 0 {
++                    rx.insert(0, (Channel::Control, ja.clone(), 0));
++                }
++                s.b.step(&mut s.e, &rx, now, &[]);
++                let out = s.e.step();
++                let mut sent = out.datagrams.clone();
++                s.b.outgoing(now, &mut sent);
++                let mut reliable = Vec::new();
++                s.b.reliable(&mut reliable);
++                for i in sent.iter().filter_map(|d| decoded(d).ok()) {
++                    s.sent = i.commands.first().map(|c| c.seq).or(s.sent);
++                }
++                let reliable = reliable.into_iter().map(|r| r.1).collect();
++                s.steps.push([out.datagrams, sent, reliable]);
++            }
++        }
++        for s in &sides {
++            assert_eq!(
++                (s.b.forge_unencodable(), s.e.unencodable_commands()),
++                (0, 0)
++            );
++            assert_eq!(s.e.twin_left_out(), 0, "the twin left out no command");
++        }
++        sides
++    }
++
++    /// One datagram as an `Input`.
++    fn decoded(d: &[u8]) -> Result<npt_proto::Input, npt_proto::DecodeError> {
++        use npt_proto::{Direction, Message, decode};
++        match decode(Direction::ClientToRoom, Channel::Datagram, d)? {
++            Message::Input(i) => Ok(i),
++            _ => Err(npt_proto::DecodeError::UnknownType),
++        }
++    }
++
++    /// The `Input`s of one step's datagrams.
++    fn inputs(ds: &[Vec<u8>]) -> Vec<npt_proto::Input> {
++        ds.iter().filter_map(|d| decoded(d).ok()).collect()
++    }
++
++    /// f15's case for kinds 3, 8, 9 and 11 (2.6's per-kind table; TE3-4, SA3-2): each forged `Input` differs from the
++    /// honest one in the kind's part alone (kind 3: the previous command's copy, its move or aim changed, in place or
++    /// added; kind 8: the acknowledgement's tick, never sent; kind 9: a trailing byte or a set pad bit in turn, so it
++    /// does not decode; kind 11: its datagrams unchanged, a `Ping` on the control stream refused as the wrong channel),
++    /// at least 30 forged in 300 steps, each sequence once, and the twin's datagram in its slot by 2.12's row (kind 3:
++    /// the copy honest; kinds 8 and 9: the header only, the previous `Input`'s acknowledgement; kind 11: a
++    /// `ClientSettings` repeating the delay).
++    fn f15_datagram(kind: u8) {
++        use npt_proto::{ClientSettings, DecodeError, Direction, Message, decode};
++        let [mut f, t] = sides(kind, false);
++        let (mut seen, mut ways, mut prev_ack) = (Vec::new(), [0u32; 2], (0u16, 0u8));
++        for (k, ([honest, forged, msg], [_, twin, tmsg])) in
++            f.steps.iter().zip(&t.steps).enumerate()
++        {
++            let (h, tw) = (inputs(honest), inputs(twin));
++            if kind == 11 {
++                assert_eq!(honest, forged, "{k}");
++                assert_eq!(msg.len(), tmsg.len(), "{k}: the twin's message in its slot");
++                for (m, tm) in msg.iter().zip(tmsg) {
++                    let ctl = |b: &[u8]| decode(Direction::ClientToRoom, Channel::Control, b);
++                    assert_eq!(ctl(m), Err(DecodeError::WrongChannel), "{k}");
++                    let ping = decode(Direction::ClientToRoom, Channel::Datagram, &m[2..]);
++                    assert!(matches!(ping, Ok(Message::Ping(_))), "{k}: {ping:?}");
++                    let want = Ok(Message::ClientSettings(ClientSettings { delay: 0 }));
++                    assert_eq!(ctl(tm), want, "{k}");
++                    seen.push(h[0].commands[0].seq);
++                }
++                continue;
++            }
++            for (j, (hd, fd)) in honest.iter().zip(forged).enumerate() {
++                let hi = decoded(hd).expect("the honest Input");
++                let ack = core::mem::replace(&mut prev_ack, (hi.ack_tick, hi.ack_groups));
++                if hd == fd {
++                    continue;
++                }
++                let c = hi.commands[0];
++                match kind {
++                    3 => {
++                        let fi = decoded(fd).expect("a forged copy encodes");
++                        assert_eq!(fi.commands[0], c, "{k}: the new command honest");
++                        let (x, y) = (fi.commands[1], tw[j].commands[1]);
++                        assert_eq!((x.seq, x.tick), (y.seq, y.tick), "{k}");
++                        assert_eq!(x.seq, c.seq.wrapping_sub(1), "{k}: the copy one below");
++                        let moved = [x.move_xy != y.move_xy, x.aim != y.aim];
++                        assert_eq!(moved.iter().filter(|m| **m).count(), 1, "{k}: {x:?} {y:?}");
++                        let (mut back, mut honest) = (x, y);
++                        (back.move_xy, back.aim, honest.move_xy, honest.aim) =
++                            ([0; 2], [0; 3], [0; 2], [0; 3]);
++                        assert_eq!(back, honest, "{k}: only its move or aim");
++                        assert_eq!(fi.commands[2..], hi.commands[2.min(hi.commands.len())..]);
++                        ways[usize::from(hi.commands.len() > 1)] += 1;
++                        seen.push(x.seq);
++                    }
++                    8 => {
++                        let fi = decoded(fd).expect("a forged ack encodes");
++                        assert_eq!(fi.ack_tick, hi.ack_tick.wrapping_add(1_000), "{k}");
++                        assert_eq!((fi.ack_groups, &fi.commands), (hi.ack_groups, &hi.commands));
++                        seen.push(c.seq);
++                    }
++                    _ => {
++                        let way = usize::from(decoded(fd) == Err(DecodeError::UnknownField));
++                        ways[way] += 1;
++                        if way == 0 {
++                            assert_eq!(
++                                (decoded(fd), &fd[..hd.len()]),
++                                (Err(DecodeError::TrailingBytes), &hd[..])
++                            );
++                            assert_eq!(fd.len(), hd.len() + 1, "{k}: one trailing byte");
++                        } else {
++                            let diff: Vec<u8> = hd.iter().zip(fd).map(|(a, b)| a ^ b).collect();
++                            let mut want = vec![0u8; hd.len()];
++                            want[PAD_BYTE] = 0x80;
++                            assert_eq!(diff, want, "{k}: the newest command's top pad bit");
++                        }
++                        assert!(ways[0].abs_diff(ways[1]) <= 1, "in turn");
++                        seen.push(c.seq);
++                    }
++                }
++                if kind != 3 {
++                    let ti = &tw[j];
++                    assert!(ti.commands.is_empty(), "{k}: the twin's header only");
++                    assert_eq!((ti.ack_tick, ti.ack_groups), ack, "{k}: the previous ack");
++                }
++            }
++        }
++        assert_eq!(
++            f.b.take_forged(),
++            seen,
++            "{kind}: each forged once, in order"
++        );
++        if kind == 3 {
++            assert_eq!(f.b.take_copies().len(), seen.len());
++            assert!(
++                ways[0] > 0 && ways[1] > 0,
++                "kind 3: added {} and in place {}",
++                ways[0],
++                ways[1]
++            );
++        }
++        assert!(seen.len() >= 30, "{kind}: {} forged", seen.len());
++    }
++
++    #[test]
++    fn f15_the_kind_3_forger_breaks_only_the_sequence_forward_rule() {
++        f15_datagram(3);
++    }
++
++    #[test]
++    fn f15_the_kind_8_forger_acknowledges_only_a_tick_never_sent() {
++        f15_datagram(8);
++    }
++
++    #[test]
++    fn f15_the_kind_9_forger_sends_trailing_bytes_and_a_set_pad_bit_in_turn() {
++        f15_datagram(9);
++    }
++
++    #[test]
++    fn f15_the_kind_11_forger_sends_a_known_type_on_the_wrong_channel() {
++        f15_datagram(11);
++    }
++
++    /// f15's kind-7 case (SA-15; 2.6's row: the endpoint stores the forged command): its datagrams unchanged; each
++    /// forged command carries one edge, fire and reload in turn, against the command before it (inside kind 5's rule),
++    /// within the weapon's reload less the margin of the honest reload edge before it, which sits on the command
++    /// before a due one and at least the reload plus the margin after the last; the twin gives the same commands with
++    /// only the forged edges taken off (its counters one lower from each on: carry 46).
++    #[test]
++    fn f15_the_kind_7_forger_presses_fire_and_reload_edges_inside_its_own_reload() {
++        let [mut f, t] = sides(7, false);
++        let [inside, over] = f.b.forge.as_ref().expect("a forger").reload;
++        let forged = f.b.take_forged();
++        let (mut cmds, mut tcmds) = (Vec::new(), Vec::new());
++        for ([honest, sent, _], [_, tsent, _]) in f.steps.iter().zip(&t.steps) {
++            assert_eq!(honest, sent, "the datagrams unchanged");
++            let new = |ds: &[Vec<u8>], v: &mut Vec<Command>| {
++                for c in inputs(ds).iter().flat_map(|i| i.commands.iter().rev()) {
++                    if v.last().is_none_or(|l: &Command| c.seq > l.seq) {
++                        v.push(*c);
++                    }
++                }
++            };
++            new(sent, &mut cmds);
++            new(tsent, &mut tcmds);
++        }
++        assert_eq!(cmds.len(), tcmds.len(), "one command a step on both");
++        let (fire, reload) = (Command::PRESS_FIRE, Command::PRESS_RELOAD);
++        let (mut last_reload, mut taken, mut items) = (None::<usize>, [0u8; 2], 0usize);
++        for (n, w) in cmds.windows(2).enumerate().map(|(i, w)| (i + 1, w)) {
++            let edges = |b: usize| w[1].presses[b].wrapping_sub(w[0].presses[b]);
++            let (ef, er) = (edges(fire), edges(reload));
++            assert!(ef + er <= 1, "{n}: one edge at most");
++            if forged.contains(&w[1].seq) {
++                let want = if items % 2 == 0 { (1, 0) } else { (0, 1) };
++                assert_eq!((ef, er), want, "{n}: fire and reload in turn");
++                let r = last_reload.expect("an honest reload before");
++                assert!(
++                    (n - r) as u64 <= inside,
++                    "{n}: inside the reload begun at {r}"
++                );
++                taken[usize::from(er == 1)] += 1;
++                items += 1;
++            } else if er == 1 {
++                assert!(
++                    last_reload.is_none_or(|r| (n - r) as u64 >= over),
++                    "{n}: after the last"
++                );
++                last_reload = Some(n);
++            }
++            let mut twin = w[1];
++            twin.presses[fire] = twin.presses[fire].wrapping_sub(taken[0]);
++            twin.presses[reload] = twin.presses[reload].wrapping_sub(taken[1]);
++            assert_eq!(tcmds[n], twin, "{n}: the twin's command");
++        }
++        assert_eq!(items, forged.len());
++        assert!(taken[0] >= 5 && taken[1] >= 5, "{taken:?}");
++    }
++
++    /// f15's kind-10 case under both options (2.6's row; SA3-8, SA31-4 (c)): each episode sends two `Input`s in one
++    /// step, the first 8 new commands, the second 8 more new (A) or the first's last 4 again and 4 new (B), stamped
++    /// one apart on from the forger's last accepted stamp, every view tick at most its own tick, each `Input` encoding;
++    /// the forged sequences are the second's new ones; [`CATCHUP_HOLD`] steps with no new command come before (A) or
++    /// after (B) the burst; the twin sends the first `Input` and then the same commands again (repeats only), and its
++    /// later commands keep the forger's sequences.
++    #[test]
++    fn f15_the_kind_10_forger_sends_more_commands_in_one_tick_than_the_cap() {
++        for a in [true, false] {
++            let [mut f, t] = sides(10, a);
++            let forged = f.b.take_forged();
++            let (mut bursts, mut quiet, mut want) = (0, 0u32, Vec::new());
++            let (mut quiet_runs, mut newest) = (Vec::new(), None::<u16>);
++            for ([_, sent, _], [_, tsent, _]) in f.steps.iter().zip(&t.steps) {
++                let (fi, ti) = (inputs(sent), inputs(tsent));
++                let s: Vec<&Command> = fi.iter().flat_map(|i| i.commands.iter()).collect();
++                assert!(s.iter().all(|c| later(c.view_tick, c.tick) == c.tick));
++                let top = s.iter().map(|c| c.seq).max();
++                if top.is_some_and(|x| newest.is_none_or(|n| x > n)) {
++                    quiet_runs.push(core::mem::take(&mut quiet));
++                    newest = top;
++                } else {
++                    quiet += 1;
++                }
++                if fi.len() < 2 {
++                    continue;
++                }
++                bursts += 1;
++                let (one, two) = (&fi[0].commands, &fi[1].commands);
++                assert_eq!(one.len(), 8, "a: {a}");
++                let new = if a { 8 } else { 4 };
++                assert_eq!(
++                    &two[two.len() - (8 - new)..],
++                    &one[..8 - new],
++                    "a: {a}: the repeats"
++                );
++                let all: Vec<&Command> = two[..new].iter().chain(one).collect();
++                for p in all.windows(2) {
++                    assert_eq!(
++                        (p[0].seq.wrapping_sub(1), p[0].tick - 1),
++                        (p[1].seq, p[1].tick)
++                    );
++                }
++                want.extend(two[..new].iter().rev().map(|c| c.seq));
++                assert_eq!(ti.len(), 2, "the twin's two in that step");
++                assert_eq!(&ti[0].commands, one, "the twin's first: the accepted ones");
++                assert_eq!(&ti[1].commands, one, "the twin's second: repeats only");
++            }
++            assert_eq!(forged, want, "a: {a}");
++            assert!(bursts >= 2, "a: {a}: {bursts}");
++            quiet_runs.push(quiet);
++            let held = quiet_runs.iter().filter(|q| **q >= CATCHUP_HOLD).count();
++            assert!(held >= bursts, "a: {a}: {quiet_runs:?}");
++            let seqs = |s: &Side| -> BTreeMap<u16, ()> {
++                let all = s.steps.iter().flat_map(|x| inputs(&x[1]));
++                all.flat_map(|i| i.commands).map(|c| (c.seq, ())).collect()
++            };
++            let mut kept = seqs(&f);
++            kept.retain(|s, _| !forged.contains(s));
++            assert_eq!(
++                kept,
++                seqs(&t),
++                "a: {a}: the twin sends the same sequences but the refused"
++            );
++        }
+     }
+ 
+     /// The judged runs' first tick (the run scripts' `--tick-start 63736`).
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
-index 7f54e46..2ba5933 100644
+index 7f54e46..4c5aadd 100644
 --- a/spikes/netcode-proof/crates/lab/src/scenario.rs
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
-@@ -3994,36 +3994,63 @@ pub(crate) mod tests {
+@@ -3994,36 +3994,67 @@ pub(crate) mod tests {
          );
      }
  
@@ -22,7 +904,8 @@ index 7f54e46..2ba5933 100644
 +    /// the run's clamp reports: `--twin-logs`), made once per test process, suite and option, read by every test that
 +    /// shares it (line 6); the folders removed once read.
 +    pub(crate) fn pair(suite: &'static str, timing: &'static str) -> &'static [Ran; 2] {
-+        static PAIRS: [std::sync::OnceLock<[Ran; 2]>; 2] = [const { std::sync::OnceLock::new() }; 2];
++        static PAIRS: [std::sync::OnceLock<[Ran; 2]>; 2] =
++            [const { std::sync::OnceLock::new() }; 2];
 +        PAIRS[usize::from(timing == "B")].get_or_init(|| {
 +            let args = format!(
 +                "--seed 1 --profile P0 --clients 16 --warmup-s 2 --measured-s 4 --after-max-s 10 --controller 1 \
@@ -46,7 +929,10 @@ index 7f54e46..2ba5933 100644
 +    /// The names a run writes that have no SERIES.md row (the contract checker's (b)).
 +    fn unnamed(logs: &[npt_log::Log]) -> Vec<String> {
 +        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
-+        c.failures.into_iter().filter(|f| f.starts_with("(b)")).collect()
++        c.failures
++            .into_iter()
++            .filter(|f| f.starts_with("(b)"))
++            .collect()
 +    }
 +
 +    /// f18 (ii), line 12 of the advisor's ruling and f28's clamp half under option A: the short clamp pair (option A)
@@ -88,7 +974,7 @@ index 7f54e46..2ba5933 100644
              .events
              .iter()
              .filter(|e| {
-@@ -4036,10 +4063,21 @@ pub(crate) mod tests {
+@@ -4036,10 +4067,21 @@ pub(crate) mod tests {
              (f("counted_count"), f("rerun_reports_count")),
              (Some(0), Some(0))
          );
@@ -114,7 +1000,7 @@ index 7f54e46..2ba5933 100644
      }
  
      /// f20 (2.6; U4F-Q15 (c); A1) and f28's lag-switch half: a short lag-switch run at P1 (16 clients, 2 s + 6 s, option
-@@ -4056,13 +4094,7 @@ pub(crate) mod tests {
+@@ -4056,13 +4098,7 @@ pub(crate) mod tests {
          );
          assert_eq!(crate::logs::moved_um(alive(0, 0), alive(5_000, 100)), None);
          assert_eq!(crate::logs::moved_um(alive(0, 100), alive(10, 0)), None);
@@ -129,7 +1015,7 @@ index 7f54e46..2ba5933 100644
          let held: Vec<u64> = read(&dir, "lab")
              .events
              .iter()
-@@ -4081,9 +4113,34 @@ pub(crate) mod tests {
+@@ -4081,9 +4117,34 @@ pub(crate) mod tests {
          assert!(most("lagswitch_cmds_count").is_some_and(|m| (1..=cap).contains(&m)));
          assert!(most("lagswitch_excess_move_um").is_some_and(|m| m <= 0));
          let logs = crate::contract::read(&dir).expect("its logs");
