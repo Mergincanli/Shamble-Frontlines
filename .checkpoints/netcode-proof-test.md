@@ -180,7 +180,12 @@
   all 11 steps** (u4f2-end-a3.log, 16:48-17:11:38; test 1,124.2 s, 83 s under the line; 702/799, 0 failed; deps PASS;
   tree 4a9dde09…; an fmt fix after the rename, by Edit; snapshot e9a0ae3e…; 2,077 added). **Third clean 17:12**: dev
   27,623 files 7.0 GiB, release 972, 259.0 MiB; guards pass; free 3,548,110,848 → 10,116,452,352 bytes. **Resumed
-  17:13 for B** on the same tree; if B fails, the builder stops and reports, with no fix without my word. **Lesson:** never `cd` into an agent's worktree: the
+  17:13 for B** on the same tree; if B fails, the builder stops and reports, with no fix without my word. **BUILD
+  DONE ~17:36: B PASS, all 11 steps** (u4f2-end-b.log; test 1,125.1 s); section 6 met by A3 and B on tree 4a9dde09…;
+  final snapshot wip/u4f2-build.patch sha256 e9a0ae3e3f48af18… (checked, saved 6ea345e); 2,077 added. **Fourth clean
+  ~17:39** (no lane running; dev 27,615 files 7.0 GiB, release 972, 259.0 MiB; guards pass; free 3,548,807,168 →
+  10,115,317,760 bytes; for the merge's check). **Review round 1 RUNNING** (u4f2-panel-brief.md; each seat reads only,
+  notes u4f2-review-<seat>.md): batch 1 netcode, security, test from ~17:41 UTC, xhigh; batch 2 rust when a seat ends. **Lesson:** never `cd` into an agent's worktree: the
   harness moved this session's main folder to it (16:19; back at once, branch unchanged); read it with Read/Grep.
   Check-in re-enabled 14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver b22ct2zom from
   16:05 UTC; the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the
