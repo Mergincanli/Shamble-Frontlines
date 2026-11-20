@@ -171,7 +171,11 @@
   the room never read the sim); NC-F1-2 and SA-F1-1 carried widened to **U6 as C-U6-19** (gated before -19, PM-0004-61
   online, any throwing or rejoining hostile client); U4f2 gets C-U4F2-9 (a record line) and -10; **U4F2-SIZE unchanged**.
   FP-5's carries filed (u4s-carries.md U4f2, U4g, U4h, U5; plan.md:1253 C-U6-19). **The fix pass (FP-1 to FP-4) by the
-  builder, resumed 00:5x** (expected 642 / 739). The saver b1d4cn50i from 00:50 UTC (window to about 02:40).
+  builder**: stopped at 00:49 by the runner's 4 GB floor (3,850 MiB free; FP-1 done, FP-2 to FP-4 written, not run);
+  **the shared target part-cleaned 00:53** (P27's six `cargo clean --target-dir` commands run directly under the lane
+  lock, main-run.sh's own floor refusing them: dev 7.3 GiB, release 258.8 MiB, doc 12.8 MiB, wasm32 134.5 / 37.3 / 8.7
+  MiB; guards hold; 10,576 MiB free); the builder resumed (expected 642 / 739). A second part-clean before the merge's
+  counted run, and a third before -20's re-run, if the disk needs them. The saver b1d4cn50i (window to about 02:40).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
