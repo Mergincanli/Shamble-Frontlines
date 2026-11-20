@@ -249,3 +249,18 @@
 - **STOP (disk), 17:12 UTC:** `df -h` 3.4G after A3, under the 4 GB floor before end check B (check.mjs's second
   counted run, on this same tree 4a9dde09…, unchanged: `git diff a289def -- spikes/ | sha256sum` after A3 equal).
   Nothing cleaned or deleted.
+- RESUMED about 17:13 UTC (the main session's third clean: 9,648 MiB free). Before B: tree 4a9dde09… (equal to A3's);
+  no build process (only my own A3 log monitor, stopped); `df -h` 9.5G. End check B started (`-x`; u4f2-end-b.log),
+  exactly as A3.
+- **End check B: PASS, all 11 steps (the second counted run)**, 17:13-17:36:51 UTC, exit 0. Runner header: free
+  9,647 MiB, HEAD 0376c76, diff 4a9dde09… (A3's), untracked f1b8a21b… (A3's). Provenance builds exit 0 (17:14:00,
+  17:15:13); every npt-* crate "Compiling" from this worktree, 2 each. check.mjs: fmt PASS 1.1 s; clippy PASS 48.7 s;
+  clippy-wasm32 PASS 6.7 s; doc PASS 9.2 s; **test PASS 1,125.1 s: measured 702 passed, bites 799, 0 failed, 0
+  skipped** (82 s under 1,207 s); deps PASS 2.0 s; wasm PASS 93.8 s (27,000 ticks, 0 mismatching; h2 equal); refs
+  PASS; marks PASS (81); self PASS 78 of 78; redact PASS 10 of 10, 330 items, 0 findings. Tree after B 4a9dde09…
+  (unchanged); `df -h` 3.4G after.
+- **Section 6 met:** item 1 check.mjs twice with all 11 steps on the final tree (A3, B); item 2 both clippy targets and
+  item 3 fmt inside them; item 4 not triggered (npt-server's tests untouched); item 5 the run scripts' lines by hand
+  (u4f2-hand-a.log, u4f2-hand-b.log, both judge calls in 5.4's form). Counts as deltas: +60 measured (642 -> 702), +60
+  bites (739 -> 799). Test step: A3 1,124.2 s, B 1,125.1 s (1faf894's 931.9 s; line 1,207 s).
+- END. Final tree: `git diff a289def -- spikes/ | sha256sum` 4a9dde09…, plus the new lab/src/forged.rs (7919200c…).
