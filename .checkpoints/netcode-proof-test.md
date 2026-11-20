@@ -171,8 +171,10 @@
   builder**: stopped at 00:49 by the runner's 4 GB floor (3,850 MiB free; FP-1 done, FP-2 to FP-4 written, not run);
   **the shared target part-cleaned 00:53** (P27's six `cargo clean --target-dir` commands run directly under the lane
   lock, main-run.sh's own floor refusing them: dev 7.3 GiB, release 258.8 MiB, doc 12.8 MiB, wasm32 134.5 / 37.3 / 8.7
-  MiB; guards hold; 10,576 MiB free); the builder resumed (expected 642 / 739). A second part-clean before the merge's
-  counted run, and a third before -20's re-run, if the disk needs them. The saver b1d4cn50i (window to about 02:40).
+  MiB; guards hold; 10,576 MiB free). **The pass DONE** (01:44 UTC): FP-1 to FP-4 in, plants by name, check.mjs 1b and
+  2 all 11 pass, 642 / 739 (+8); 239 of 300; snapshot d0a66a68… (6 files); departures: FP-4 through the World, seam.rs
+  restored to its post-FP-1 hash 901bb546…, a rustfmt layout. **Part-clean 2** (01:45: 3,865 -> 10,574 MiB). **The
+  advisor's check of the pass running** (advisor-u4f-f1-pass.md); then the merge. The saver bii6uxhfc.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,

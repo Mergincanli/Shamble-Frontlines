@@ -182,3 +182,15 @@
 - SIZE-CHECK after FP-2 to FP-4 run and formatted: 239 insertions, 24 deletions, 6 files; no new file. 239 of 300.
 - f1-b5-clippy.log: clippy -p npt-sim -p npt-room --all-targets, measured and --all-features, -D warnings: both exit 0.
 - check.mjs pass run 1 started 00:55 UTC (background, -x): .gate/u4f/f1-b5-check1.log; 10,269 MiB free at start.
+- That run was CUT by a container restart at about 01:01 UTC: f1-b5-check1.log ends after fmt, clippy, clippy-wasm32
+  and doc PASS (00:56), with no test step and no last line. Kept as it is.
+- Resumed 2026-11-20: 7,527 MiB free; seam.rs 901bb546...4c90, world.rs 4a4e138c...c041 (no plant left); no cargo.
+  New runs: f1-b5-check1b.log, then f1-b5-check2.log.
+- Run 1b (to 01:27:15 UTC, diff d0a66a68..., exit 0): "check: all 11 steps pass"; every step PASS; test: measured 642
+  passed, 0 failed, 0 skip; bites 739 passed, 0 failed, 0 skip (+8 and +8 on 634 and 731); wasm 27000 ticks, 0
+  mismatching. Free after: 4,264 MiB (above the runner's 4,096 floor): run 2 started.
+- Run 2 (to 01:44:19 UTC, the same diff d0a66a68..., exit 0): "check: all 11 steps pass"; every step PASS; test:
+  measured 642, bites 739, 0 failed, 0 skip (+8, +8); wasm 27000 ticks, 0 mismatching. Free after: 3,865 MiB (under
+  the runner's floor again; the next runner call would stop).
+- B5 done. Final SIZE-CHECK: 239 insertions, 24 deletions, 6 files (room.rs 20, commands.rs 34, seam.rs 10, world.rs
+  55, tests/seam.rs 16, tests/world.rs 128 changed lines); no new file. 239 of 300.
