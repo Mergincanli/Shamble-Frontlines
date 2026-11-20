@@ -146,9 +146,12 @@
   the lost counts; FP-5 (i)-(v) and the correction found; condition 10 met). Its three Lows fixed by Edit:
   ADV-U4FF1C-1 (u4f-report.md's Security section names SA-F1-1), -2 (seam.rs:582-593), -3 (compare_20.py and jdiff.py
   copied beside the reports, hashes equal to its 65e29b45… and 3c836ef8…). PR #40 stays draft and needs-mustafa.
-- **Running from 04:20 UTC, resumed 04:26 after the restart:** **U4g's brief, draft rev 1** by a drafter (notes
-  u4g-brief-notes.md, draft u4g-brief.md; to the advisor before U4g's build, after U4f2). Saver bfwo06d6a from 04:24
-  UTC. Main still f5030a3 (fetched 04:19); 10,124 MiB free.
+- **U4g's brief, draft rev 1 DONE** (u4g-brief.md, 247 lines, read in full; notes u4g-brief-notes.md; 8e89a72): size
+  about 3,200-5,500 (top about 6,600 at U4f's overrun), so **U4G-Q1 (size; lean: split into U4g, prediction and cues,
+  and U4g2, interpolation and events) is his**; **U4G-Q2** (-58's two lost-tick checks: his C62HB-Q4 (b) stands, the
+  exact marks.json wording needs his yes; the draft's (c) "not now" would re-ask it) his; Q3-Q8 the advisor's; 75
+  measured + 14 bite runs. **The advisor's check running** from 04:4x UTC (out: advisor-u4g-brief.md). Both questions
+  go in the 2026-11-21 message after its check. Saver bfwo06d6a from 04:24 UTC. Main still f5030a3; 10,124 MiB free.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
