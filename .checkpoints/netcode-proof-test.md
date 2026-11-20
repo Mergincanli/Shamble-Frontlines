@@ -70,14 +70,8 @@
   with its source before its first snapshot). -21 is judged only after U4f2.
 - **The advisor's -20 ruling** (ADV-U4F20-1 High: npt-sim's one-edge rule; fix U4f-F1, -20 re-run) and U4f-F1's
   build line: history.md:7195-7206 (card_trim_1120d.py).
-- **-20 and -22 DONE, all three sets run** (records at history.md:7124-7146, card_trim_1119k.py; u4f-report.md items
-  5-6): -20 at 350677f (1840e68): PM-0001-2 PASS; PM-0001-20 A PASS, B FAIL "0 presses lost" 3/1/2; overflow 0;
-  high-water 1,117 (margin 1.43). -22 at 7192607 (2dae645): PM-0001-22 PASS, bite shown, load report as designed.
-- **U4f-F1** (its own step before U4f2: U4FF1-Q3 ruled so): plan u4f-f1-plan.md rev 1.1 (size S, about 60-150, stop
-  past 300); **the advisor's plan review APPROVE WITH CONDITIONS 1-10** (advisor-u4f-f1-plan.md, read in full: the
-  four counters in today's order, one shot per command, the fn's contract, T1/T2 with plants, the re-run compared tick
-  by tick with 350677f's logs, security-auditor joins, the first command to U4f2). After the round: the merge, -20's
-  re-run, then condition 10 (U4f2's brief rebased on F1's merge, C-U4F2-9 = ADV-U4FF1-3 with NC-F1-2's reach).
+- **-20 and -22's first set records and U4f-F1's plan line:** history.md:7209-7216 (card_trim_1120e.py). **-20's L1
+  now PASSES on F1's fix** (46ca143; its record at u4f-report.md item 5's end; F1's report u4f-f1-report.md).
 
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
@@ -145,37 +139,12 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **U4f-F1's round CLOSED** (four seats APPROVE WITH FINDINGS: u4f-f1-review-<seat>.md; **the advisor's ruling
-  APPROVE WITH CONDITIONS FP-1 to FP-5**, advisor-u4f-f1-r1.md, 266 lines, read in full; no round 2, its check of the
-  pass instead): TE-F1-1 = NC-F1-1 keep the code, bind the wording ("0 presses lost" holds by design, as "doubled" did;
-  the room never read the sim); NC-F1-2 and SA-F1-1 carried widened to **U6 as C-U6-19** (gated before -19, PM-0004-61
-  online, any throwing or rejoining hostile client); U4f2 gets C-U4F2-9 (a record line) and -10; **U4F2-SIZE unchanged**.
-  FP-5's carries filed (u4s-carries.md U4f2, U4g, U4h, U5; plan.md:1253 C-U6-19). **The fix pass (FP-1 to FP-4) by the
-  builder**: stopped at 00:49 by the runner's 4 GB floor (3,850 MiB free; FP-1 done, FP-2 to FP-4 written, not run);
-  **the shared target part-cleaned 00:53** (P27's six `cargo clean --target-dir` commands run directly under the lane
-  lock, main-run.sh's own floor refusing them: dev 7.3 GiB, release 258.8 MiB, doc 12.8 MiB, wasm32 134.5 / 37.3 / 8.7
-  MiB; guards hold; 10,576 MiB free). **The pass DONE** (01:44 UTC): FP-1 to FP-4 in, plants by name, check.mjs 1b and
-  2 all 11 pass, 642 / 739 (+8); 239 of 300; snapshot d0a66a68… (6 files); departures: FP-4 through the World, seam.rs
-  restored to its post-FP-1 hash 901bb546…, a rustfmt layout. **Part-clean 2** (01:45: 3,865 -> 10,574 MiB). **The
-  advisor's check of the pass: APPROVE WITH CONDITIONS** (advisor-u4f-f1-pass.md, 201 lines: merge, no round 2; its
-  Lows ADV-U4FF1P-1 to -4 fixed in the records). **U4f-F1 MERGED at 1faf894** (pushed 02:14:10 UTC): the snapshot applied
-  on ba3fa68 (`git diff HEAD -- spikes/` = d0a66a68…, 6 files, +239 -24); gate --no-smoke PASS
-  (.gate/u4f-f1-merge/gate.txt); M5 check.mjs all 11 steps pass, 642 / 739, wasm 0 mismatches, marks 81 unchanged
-  (.gate/u4f-f1-merge/m5-check.log, 01:54:18-02:13:49 UTC). **Part-clean 3** (02:15: dev 5.3 GiB and the rest; 10,570
-  MiB free). **CI green on 1faf894** (gate, smoke, toolchain). **The advisor's head check APPROVE WITH FINDINGS**
-  (advisor-u4f-f1-head.md: -1 the commit message says "(APPROVE)" for the pass check, APPROVE WITH CONDITIONS, fixed in
-  F1's report; -2 two times, fixed here). **-20's L1 re-run DONE, committed 46ca143** (`c-u4f-runs.mjs 20 --date
-  2026-11-20` at 96de6ac, 02:22-03:07 UTC; spike tree d4f6cd41… = 1faf894's): PM-0001-2 SS PASS 6/6; PM-0001-20 L1 A
-  and B PASS 3/3 (headline NOT-RUN: L2 not run); every expected figure held (compare_20.py and jdiff.py: summary lines
-  equal but wall, h equal on all 18,335 ticks x 7, lost 0, doubled 0, presses B 432,000, A 432,003/432,003/432,009,
-  bite 0.894544 with lost 3,614 -> 0, reorder "not available"; 14 of 593 and 2 of 65 verdict leaves differ, all the
-  lost check); CI green on 199c82d, its push (04:20:55 UTC). Saver bh2qi25le from 04:12 UTC. **F1's report written** (u4f-f1-report.md: FP-5 (i)-(v), ADV-U4FF1H-1's
-  correction, SA-F1-1 open) and **-20's L1 record** (u4f-report.md item 5's end, the same lines). **Condition 10 done:
-  u4f2-brief.md rev 1.2** (base 1faf894, counts 642/739, C-U4F2-9 and -10, T1's `npt_sim::Refusal` beside C-U4F2-3;
-  no new check by :224-225). **Running from 04:20 UTC:** the advisor's read of the -20 record and F1's report (its
-  condition 3; out: advisor-u4f-f1-close.md), then F1 closes; and **U4g's brief, draft rev 1** by a drafter (notes
-  u4g-brief-notes.md, draft u4g-brief.md; to the advisor before U4g's build, which follows U4f2). Main still f5030a3
-  (fetched 04:19); 10,124 MiB free.
+- **U4f-F1 DONE but the advisor's close read:** its round, pass, merge (1faf894), the -20 re-run (PASS, 46ca143; CI
+  green on 199c82d), F1's report and -20's record, and condition 10 (u4f2-brief.md rev 1.2): history.md:7217-7247
+  (card_trim_1120e.py). **Running from 04:20 UTC, resumed 04:26 after the restart:** the advisor's read of the -20
+  record and F1's report (its condition 3; out: advisor-u4f-f1-close.md), then F1 closes; **U4g's brief, draft rev 1**
+  by a drafter (notes u4g-brief-notes.md, draft u4g-brief.md; to the advisor before U4g's build, after U4f2). Saver
+  bfwo06d6a from 04:24 UTC. Main still f5030a3 (fetched 04:19); 10,124 MiB free.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
@@ -197,13 +166,8 @@
   /proc/uptime; my last save 04:22:05, d79ea65). Checked at 04:24: `git status` clean; both agents read-only, their
   notes committed (advisor-u4f-f1-close.md 04:19:39, u4g-brief-notes.md 04:21:19; no u4g-brief.md yet). The saver
   restarted; both agents resumed by SendMessage.
-- **2026-11-20 about 01:01 to 01:05 UTC (a container restart: the F1 pass's first check.mjs and the saver):** "The
-  container was restarted. The following background tasks were running and are now stopped: - Restart the background
-  checkpoint saver (task b1d4cn50i) - Run check.mjs, first run of the fix pass (task bp98t6o2k) Re-create them if still
-  needed." (up since 01:01:16 by /proc/uptime). Checked at 01:04: FP-2 to FP-4 run with their plants restored (seam.rs
-  901bb546…4c90, the post-FP-1 hash; world.rs 4a4e138c…), no plant left, no process; f1-b5-check1.log cut at 00:56;
-  7,528 MiB free. The saver restarted; the builder resumed by SendMessage to re-run check.mjs twice.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
   one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
-  and the session) and the 11-18/11-19 choices at :7148-7160 (1119l); the 23:18 restart at :7169-7175 (1120b).
+  and the session) and the 11-18/11-19 choices at :7148-7160 (1119l); the 23:18 restart at :7169-7175 (1120b); the
+  01:01 restart at :7248-7253 (1120e).
