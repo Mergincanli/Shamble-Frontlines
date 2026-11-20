@@ -166,7 +166,12 @@
   MiB; guards hold; 10,576 MiB free). **The pass DONE** (01:44 UTC): FP-1 to FP-4 in, plants by name, check.mjs 1b and
   2 all 11 pass, 642 / 739 (+8); 239 of 300; snapshot d0a66a68… (6 files); departures: FP-4 through the World, seam.rs
   restored to its post-FP-1 hash 901bb546…, a rustfmt layout. **Part-clean 2** (01:45: 3,865 -> 10,574 MiB). **The
-  advisor's check of the pass running** (advisor-u4f-f1-pass.md); then the merge. The saver bii6uxhfc.
+  advisor's check of the pass: APPROVE WITH CONDITIONS** (advisor-u4f-f1-pass.md, 201 lines: merge, no round 2; its
+  Lows ADV-U4FF1P-1 to -4 fixed in the records). **The merge RUNNING:** the snapshot applied on ba3fa68, `git diff HEAD
+  -- spikes/` = d0a66a68… (6 files, +239 -24); gate --no-smoke PASS (.gate/u4f-f1-merge/gate.txt); M5 check.mjs via
+  main-run.sh in the background from about 01:56 (.gate/u4f-f1-merge/m5-check.log; expected 642 / 739). Until it ends:
+  no commit of spikes/ and no edit to tracked files outside .checkpoints/. Then the commit, push, CI, the advisor's
+  head check, a part-clean if needed, -20's re-run. The saver bii6uxhfc.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
