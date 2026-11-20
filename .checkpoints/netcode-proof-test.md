@@ -82,27 +82,8 @@
 
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
-- **2026-11-20 (to name in the next day's message, 2026-11-21 Amsterdam; advisor-u4f-f1-r1.md:207-221, ADV-U4FF1P-4):**
-  U4f-F1's one review round (four seats, all APPROVE WITH FINDINGS) and its small fix pass (doc wording, one new test,
-  two test touches), checked by the advisor, no second round; after F1, "0 presses lost" in -20 and -58 holds by the
-  press counters' design, as "0 presses doubled" did (the room counts with the rule the sim runs; T1/T2 and their
-  plants prove the take; the runs show presses equal to the scripted 432,000 per option-B run); a judged check of that
-  count is a marks.json change, his, on "After the close"; the first-command gap F1 widened (a pool of grenades per
-  rejoin, an honest restart's phantom presses) goes to U6 as C-U6-19, closed before -19 runs. Why: inside the plan,
-  undoable, no pass mark, judge or marks.json change.
-- **2026-11-20 by the advisor's U4g brief check (to name in the 2026-11-21 message; advisor-u4g-brief.md:135-186):**
-  U4G-Q3 the scenes (-45 on SS with the brawl's load, its B1 set serving -17's and -18's B1 parts; -55 on SS with one
-  client and printed contact ticks; -60 and -62 on CO, -60's soldier moving and firing); Q4 -60 under both options, +3
-  short runs (no run dropped, no bar moved); Q5 the three bite sites; Q6 the client traces corrections, the room's
-  records the test oracle; Q7 the cap read on U4g's own B1 and P4 pre-runs, 1,600 stands; Q8 the door-gap margin printed
-  on every B1 run; Q9 -45's share read on slot 0, its bound on any slot, every slot printed (a per-slot series would be
-  marks.json text: after the close); NC-U4R-4 by the lab's `tick` record. Why: inside the plan, undoable, no pass mark,
-  judge or marks.json change.
-- **2026-11-20 by the advisor's U4f2 round-1 ruling (to name in the 2026-11-21 message; advisor-u4f2-r1.md:331-344,
-  its paste-ready text in msg-2026-11-21.md, choice 3):** the fix pass FP-1 and FP-3 to FP-9; the builder's five
-  departures accepted (`HOLD_STEPS` in a line of its own); the test-step line read on the builder's two counted runs;
-  a second round on what changed; U4f2's size after it about 2,320-2,490, told to him, not asked. Why: inside the
-  plan, undoable, no pass mark, judge, marks.json or existing SERIES.md row change, no money, nothing on main.
+- The choices of 2026-11-20 (U4f-F1's round; the advisor's U4g brief rulings; the advisor's U4f2 round-1 ruling),
+  named in msg-2026-11-21.md (choices 1-3): history.md:7412-7433 (card_trim_1120i.py).
 - The choices of 2026-11-19 named in msg-2026-11-20.md: history.md:7177-7193 (card_trim_1120c.py).
 
 ## Next steps (plan rev 3.3; units ahead)

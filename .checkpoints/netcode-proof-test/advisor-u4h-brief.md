@@ -138,3 +138,72 @@ changes no marks.json text, the size arithmetic, the U4g dependency. What does n
   U4c's C2 (u4-build-plan.md:145, :903), met at U4c's merge. -48's report name "the run's largest measured rewind,
   rounded up" (marks.json:9413) predates T14: on rule 1's after-close list. -54's "differs" defined (the same landing
   tick and a bit-equal point, both from trajectory_at).
+
+## Rulings on U4H-Q1 to Q12 (mine under TEST-FIRST rule 2 except Q4; the main session records each with its reason and
+## names it in the day's message that carries U4H-SIZE)
+- **U4H-Q1, the margin: (b), 3 ticks.** A larger margin costs only ring (one tick at most 4,536 B: under 14 KB for
+  three, far under -7's 1 MB) and loosens no bar: the test cap clips, it does not judge. With ADV-U4HB-10's figure (the
+  larger of the max honest rewind and the max rewind used for honest shots, per profile and option), ceil to ticks,
+  plus 3; the ring holds the cap plus the margin plus one tick for the blend. A judged run with `clipped` above 0 still
+  comes to me before its set counts; never re-run into a pass.
+- **U4H-Q2, where the cap and span live: (a), with these terms.** (1) The room's cap is never off: `--cap` takes `open`
+  (the default), `test` with its tick count, and later `rule`; `open` clips at the ring's reach (the span less the
+  blend tick) and counts, so a correct room's Rewind is always held. Every header records `params.cap`,
+  `rewind_cap_ticks_count` and `history_ticks_count`; the `cap` row's Values cell (SERIES.md:450) gains `open` in U4h's
+  one SERIES.md edit (Q7). (2) HISTORY_MS stays 2,000 as the default span, made readable outside npt-room, and the
+  lab's ROOM_HISTORY_MS gives way to it (carry 89's first two parts); the TC sets pass the test span. (3) The TC B1 seed
+  3 entry is recorded at the default (`open`, 2,000 ms), so hash.rs:370-376's check stays as it is and the manifest
+  schema does not change. (4) "No existing runner entry is re-pinned" is struck: det-u4 regenerates SS-P2-s1 and
+  ES-P3-s2 on U4h's build; any whose SHA-256 moves is re-pinned with its reason (carry 89's third part), under RR4-L1's
+  cap. (5) Rev 2 states the announced delay the room assumes for a client that sent no ClientSettings, and whether the
+  brawl sends its own; a short SS P2 brawl row in c-u4h-r2.mjs prints the replaced and clipped shares, and a replaced
+  share above 1 % there, in carry 93's ES runs or in carry 88's pre-check comes to me before any of them counts.
+  (6) R2's run plan takes the test span for -7 (plan.md:724), named in U4h's report. No code commit sits between the
+  calibration and the sets.
+- **U4H-Q3, no RTT yet: (a), with one term.** The TC shooter and both cheats fire only in the measured window, and the
+  warm-up holds every client's first RTT sample, the delay's settling and every admission; -48's checks read window
+  `all` (marks.json:9378, :9390; README.md:145), so the contract case shows 0 no-RTT shots in every TC run's whole log.
+  SS and ES clients' early shots run at the present, counted apart under a new SERIES.md name. (c) would hand a fresh
+  session unchecked rewind; (b) invents an RTT.
+- **U4H-Q4, -50's honest twin: his** (it decides the mark's verdict; text below). The build makes both figures:
+  `event.edge_cheat_shot.gain_ns` and `event.pong_cheat_shot.gain_ns` under (a), the honest reference taken with the
+  link's RTT (the true RTT) even on the ws leg, so the ws report shows what the inflated ping RTT buys; the real-twin
+  figure printed beside it. His answer only picks which goes in the series; only -50's judged set waits.
+- **U4H-Q5, -50's runs: as written, with these terms.** (1) The edge stamper announces the largest allowed delay (the
+  clamp's top: ADR 0001:1647). (2) The tolerance's ns value and comparison are stated so the largest accepted edge gain
+  is at most 33,330,000 ns (ADR 0001:363: "at most one snapshot interval ... data"), with a boundary unit test (accepted
+  at the value, replaced one step past it). (3) The pre-run's short P1 edge run expects every edge shot accepted (0
+  replaced) and its gains within one view-time step (1/256 tick, about 130 µs) of the edge; a weaker stamper comes to
+  me. (4) The bite's alternating setting runs clean too in the pre-runs: the beyond-edge shots replaced, the max gain at
+  most 33.33 ms. (5) The pong delayer stamps as a client that believed its ping RTT would (older by its hold), so P0 and
+  P1 show the transport RTT's defence and the ws leg (P1, every session on `RttSource::Pings`, reported only) records
+  the extra rewind it buys, held by the cap. Slot 0 the stamper, slot 1 the sprinting delayer: no scene change for -50.
+- **U4H-Q6, -54's kinds: yes, both, 1,000 each, with a named source for the stand-ins.** A throw makes a grenade only
+  (world.rs:1522-1545), so the `throws` suite turns TC's stand-in spawner on at a rate recorded in the header (scene
+  data, no sim code), the client comparing each live projectile's landing with the server's; a stand-in kind with fewer
+  than 1,000 a run comes to me. `event.throw_kind.throws_count` per kind, min >= 1,000 (marks.json:10659-10664).
+- **U4H-Q7, the pong gap's sign: (a), mine.** Every word and number of -50 (the check's "gap between", 145 = 150 - 5,
+  ADR 0001:1647) needs ping minus transport for a delayer that inflates the ping RTT; SERIES.md:86's order makes the
+  check unpassable by any build. The cell is corrected in U4h's lane with test-engineer's read; no check, number or
+  marks.json text changes. The same edit takes SERIES.md:396's writer cell (U4r build ruling 3 (e), history.md:4976)
+  and Q2's `open`; :153 and :187 change only by his U4H-Q4 answer.
+- **U4H-Q8, the TC shooter's aim: (c), with one term.** The offset band straddling the box edge is fixed in rev 2 and
+  recorded in the header, never tuned after a run; each run prints its view hits and view misses (about 1,000 and 500 at
+  2,000 shots), and a part whose run holds fewer than 400 view misses comes to me. (a) leaves the false-hit figure a gap.
+- **U4H-Q9, the cover record: (b), on SS, not TC.** TC's lines of fire meet no cover item: no vehicles (scene.rs:226-
+  228), the doors ring the centre 22 m out (greybox.rs:91) and TC stands at x -60 to -63 m (scene.rs:262, :341). So
+  three SS P2 brawl runs under `--cover present` beside three under rewound, the same settings, each printing shots,
+  rays that met cover and hits per variant (or carry 93's frozen-value ES runs as the rewound half, three present runs
+  beside them); recorded, never judged. (a) widens the sim and doubles the shot's cast for a record.
+- **U4H-Q10, det-u4's 240 s: (a), amended to settle first (ADV-U4HB-11).** A c-u4h-r2.mjs row measures the TC
+  runner's rate and the hash leg on a short TC B1 run; the entry's length is chosen so the projected non-cargo sum is at
+  most about 230 s, with at least one burst inside and within RR4-L1's 36,000 ticks; then record, then one det-u4 run
+  with `uptime` first. Over 240 s comes to me whole, never retried. RR-L4 is weighed in one line: it acts on the Wasm
+  leg, 2.5 s of 223.7.
+- **U4H-Q11, the bite sites: as listed.** -48's two and -50's in npt-room; -51 in npt-sim's shot phase in
+  `CHECK_BITES`' form, armed in the authority's World only, apart from `World::BITES` (npt-hash-wasm's index); -54 in
+  `npt_client::BITES`; no id in two crates' lists (carry 24), each in lab/tests/bite_homes.rs.
+- **U4H-Q12, JDG-ONLY-1: in the same judge change as the figures, not a change-set of its own.** Its home is npt-judge's
+  next change (history.md:4611-4614); no U4h mark carries `pre:PM-0001-2`, so nothing orders it first; one change, one
+  read by test-engineer and rust-reviewer, one yes from him (U4H-JUDGE names it). Its own block and fixture (the
+  interim rule's case).
