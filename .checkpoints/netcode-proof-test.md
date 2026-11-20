@@ -190,6 +190,13 @@
   waits for his answer.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
+- **2026-11-20 about 04:22:05 to 04:24 UTC (a container restart: the saver, the advisor's F1 close read, U4g's
+  drafter):** "The container was restarted. The following background tasks were running and are now stopped: - Restart
+  the background checkpoint saver (task bh2qi25le) - Advisor reads F1's close records (task ab6e23b921ab12806) - Draft
+  U4g's short build brief (task a1e01e6c83e873551) Re-create them if still needed." (up since about 04:22:12 by
+  /proc/uptime; my last save 04:22:05, d79ea65). Checked at 04:24: `git status` clean; both agents read-only, their
+  notes committed (advisor-u4f-f1-close.md 04:19:39, u4g-brief-notes.md 04:21:19; no u4g-brief.md yet). The saver
+  restarted; both agents resumed by SendMessage.
 - **2026-11-20 about 01:01 to 01:05 UTC (a container restart: the F1 pass's first check.mjs and the saver):** "The
   container was restarted. The following background tasks were running and are now stopped: - Restart the background
   checkpoint saver (task b1d4cn50i) - Run check.mjs, first run of the fix pass (task bp98t6o2k) Re-create them if still
