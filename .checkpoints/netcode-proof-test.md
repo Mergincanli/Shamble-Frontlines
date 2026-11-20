@@ -176,7 +176,10 @@
   400-900), Lows -10 to -13; rulings Q1-Q3, Q5-Q12 (mine to name in the message that carries U4H-SIZE); **U4H-Q4,
   U4H-SIZE and U4H-JUDGE are his, in the first day's message after rev 2 is checked and U4G-Q1 is answered (2026-11-22
   at the earliest), none a stop**; the eight register lines (item 1, :212-235) are mine, before U4h's launch. **Rev 2
-  RUNNING from ~22:28** (the drafter resumed; back to the advisor for sections 1-4, 6 and 8); U4g's build only after U4f2's merge
+  DONE ~22:37** (369 lines; saved ee43ae6: TC's own weapon and health, press-edge shots, the room-side wait cap
+  min(400 ms, RTT + 3 ticks), npt-sim's two pub items, the judge as its own change J1-J3; U4h about 2,100-3,850, U4h2
+  about 750-1,500, J1-J3 about 400-900; open for the advisor: Q6's scene builder, Q7's :211 cell); **the advisor's
+  rev-2 check RUNNING from ~22:38** (sections 1-4, 6, 8 and 9; its "## Rev 2 check" block); U4g's build only after U4f2's merge
   (u4-build-plan.md:951-952, "never two at once"); U4G-Q2's text later, before -58's set. **Lesson:** never `cd` into an agent's
   worktree (the harness moved this session's main folder to it at 16:19; back at once); read it with Read/Grep.
   Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bh8edyqwv from 21:10 UTC (to about 23:00). Main f5030a3.
