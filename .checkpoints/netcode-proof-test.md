@@ -171,7 +171,8 @@
   Lows -5, -6. **Rust APPROVE WITH FINDINGS** (its file complete at the cut, read in full :1-14, :150-198): RR-U4F2-1
   Medium (`FIRE_REST` a literal: kind 7 breaks at 60 Hz and at `--forge-every 2`; fix `fire_rest_at`, about 15-25
   lines), Lows -2 (16-bit sequence key past one lap), -3 (P0 precondition unchecked), -4 (field docs). **All four
-  seats DONE; next: the advisor's round ruling** (advisor-u4f2-r1.md). **Next:** their verdicts (every Medium or higher read in full), then the advisor's round
+  seats DONE; the advisor's round ruling RUNNING from 21:12 UTC** (advisor-u4f2-r1.md; general agent on main's
+  advisor.md, xhigh): F-B's route and whether (a) is his, every finding, the departures, the fix pass, round 2, his line. **Next:** their verdicts (every Medium or higher read in full), then the advisor's round
   ruling on all four files (F-B's fix inside the plan; a fix touching what counts as rejected, or the shot band, is
   his), the fix pass in the builder's worktree, round 2 on what changed, the merge, the r2 rows and -21's set.
   **Lesson:** never `cd` into an agent's worktree: the harness moved this session's main folder to it (16:19; back at
