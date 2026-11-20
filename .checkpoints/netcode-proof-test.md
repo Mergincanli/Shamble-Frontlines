@@ -161,8 +161,14 @@
   11 steps on tree 4a9dde09…; snapshot wip/u4f2-build.patch e9a0ae3e3f48af18…; 2,077 added; the builder's worktree
   .claude/worktrees/agent-aa62d31b6fa5b9807 stays for the fix pass; free 10,115,317,760 bytes after the fourth clean.
   **Round 1** (u4f2-panel-brief.md; notes u4f2-review-<seat>.md): security APPROVE WITH FINDINGS (3 Lows); test
-  REQUEST CHANGES (TE-U4F2-1 High = F-B; Mediums -2 to -8, read in full; Lows -9 to -15); netcode (from ~17:41) and
-  rust (from 17:55) RUNNING. **Next:** their verdicts (every Medium or higher read in full), then the advisor's round
+  REQUEST CHANGES (TE-U4F2-1 High = F-B; Mediums -2 to -8, read in full; Lows -9 to -15); **netcode REQUEST CHANGES
+  ~18:05** (read in full, :24-157, :201-218): NC-U4F2-1 High (F-B's cause: the standing forger dies about every 70 s on
+  a held line of fire, 29 commands run dead, no record; a revive's full magazine can also break the twin hash; fix (a)
+  leave dead-window kind-7 items out, counted apart in a new report-only `dead_left_out_count`, (b) `RELOAD_ITEMS` about
+  400; **(a) is a reading of "forged command": the advisor's, on his readings list; his if it changes SERIES.md:158's
+  `sent_count` row**); Mediums -2 (`FIRE_REST` a literal tick count: kind 7 breaks at 60 Hz), -3 (F-A: fix (i) the lag
+  client on the fast clock's lane, else (ii) a record line), -4 (plant 9 likely never sent the honest command under A);
+  Lows -5, -6. Rust (from 17:55) RUNNING. **Next:** their verdicts (every Medium or higher read in full), then the advisor's round
   ruling on all four files (F-B's fix inside the plan; a fix touching what counts as rejected, or the shot band, is
   his), the fix pass in the builder's worktree, round 2 on what changed, the merge, the r2 rows and -21's set.
   **Lesson:** never `cd` into an agent's worktree: the harness moved this session's main folder to it (16:19; back at
