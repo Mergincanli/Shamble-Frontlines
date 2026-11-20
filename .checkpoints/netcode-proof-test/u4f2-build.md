@@ -264,3 +264,50 @@
   (u4f2-hand-a.log, u4f2-hand-b.log, both judge calls in 5.4's form). Counts as deltas: +60 measured (642 -> 702), +60
   bites (739 -> 799). Test step: A3 1,124.2 s, B 1,125.1 s (1faf894's 931.9 s; line 1,207 s).
 - END. Final tree: `git diff a289def -- spikes/ | sha256sum` 4a9dde09…, plus the new lab/src/forged.rs (7919200c…).
+
+## Block 9: the fix pass (part A: FP-1, FP-3, FP-5, FP-6, FP-7, FP-4, FP-8 by advisor-u4f2-r1.md; FP-2 waits for F-B-COUNT)
+- Started 21:40 UTC. Read whole: advisor-u4f2-r1.md (422 lines) and the four seats' files. Checked first: `git status
+  --short` the 13 tracked files, this notes file and forged.rs; no plant left; sha256 forged.rs 7919200c…, bots lib.rs
+  f5d72e9a…, scenario.rs edb4b289…, contract.rs a39f39b9…, the snapshot e9a0ae3e… (all as left). Free 10,103,402,496
+  B.
+- **FP-1 (NC-U4F2-1 reload half, TE-U4F2-1 twin half): DONE.** bots lib.rs `forge_step`: `rest` now also covers the
+  command before every item (`ahead(k) && (k == 1 || !reload(n + k))`), so a reload item's honest d - 1 releases fire
+  (the twin's the same: `rest` has no twin guard); the constants' doc and the reload comment say why. f15's kind-7 case
+  asserts the reload item's one rested command. New: `sides_at(kind, a, every, steps)` (`sides` = 3, 300) and T-K7
+  `t_k7_kind_7_items_next_to_a_death_and_a_revive_through_the_world` (two SS Worlds, forger and twin at the judged 12,
+  640 steps; slot 6 teleported to (3,000, -1,800), the 47 others on an 8 m ring holding fire at it; kill 1 with the
+  script started so item 2's d - 1 is the first command after the sim's respawn; kill 2 with a test-picked spawn at a
+  fire item's d, 10+ ticks after the death). u4f2-fp1-tests3.log: kills at ticks 43 and 623, script from 51, spawn at
+  638; cases (alive both 46, d dead 2, fire d - 1 dead 1, reload after a revive 1, reload alive 1); the dead-window items
+  printed: (n 12, d dead), (576, d dead), (588, d - 1 dead and d alive, no record): FP-2's three; PASS, 1.70 s alone;
+  f15 12 PASS.
+- FP-1's plant (fire held on a reload item's d - 1, the old `rest`), on the final test code: u4f2-fp1-plant2.log, T-K7
+  FAILS by name: missing records [(24, seq 23, reload), (84, 83, fire)] and the first differing hash at tick 74 (item
+  24's run: the unrecorded reload the twin lacks); f15 kind 7 FAILS (lib.rs:1835, the rested command). Restored by Edit,
+  sha256 ed9880c7… equal (then one comment line changed: 8463e72b…). (An earlier plant run, u4f2-fp1-plant.log, on the
+  pre-fmt test, failed the same way; restored equal 4b60a97f….)
+- FINDING F-G (new, for the advisor): T-K7's first form at f15's interval 3 (u4f2-fp1-tests.log) failed on the hash at
+  the spawn tick 257: at an interval no greater than the rest (3 = `FIRE_REST`), every command is a rest of the next
+  item, so an item d holds no fire; a fire item whose d - 1 ran dead and d alive fires by its forged edge from the fresh
+  weapon, and the twin's d (no edge, no held fire) does not: a twin difference, not only a missing record. At the judged
+  12, d holds fire and the twin fires the same shot (T-K7 PASS). FP-3's acceptance as ruled takes 3 for kind 7 at 30 Hz;
+  closing F-G would need `every` above the rest (4 at 30 Hz, 6 at 60 Hz). Not built: the ruling's text stands.
+- SIZE-CHECK after FP-1: `git diff --shortstat a289def -- spikes/` 13 files, +1,916 -175; forged.rs 362: 2,278 added
+  (+201 from 2,077; T-K7 about 180 of it). Snapshot taken (worktree_patch.py: patch 163,114 B, 14 files).
+- **FP-3 (NC-U4F2-2 = RR-U4F2-1, SA-U4F2-2): DONE.** bots lib.rs: `FIRE_REST` removed; `pub const fn
+  fire_rest_at(tick_hz, interval_us) -> Option<u64>` (cost = interval x rate; `cost.div_ceil(10^6)` from 2,000,000 up,
+  else `None`), its doc "at least two ticks"; `Behaviour::fire_rest` set in `new` from `scene.weapon().interval_us` and
+  `npt_sim::TICK_HZ`; `Forge::rest`; `forger(7, every, _)` `None` when the rest is `None` or `every` is below it;
+  `forge_step` rests `f.rest` commands. f15's kind-7 case runs at SS's rest (`sides_at(7, false, rest, 300)`: 3 at 30
+  Hz, as before) and checks `rest` rested commands. The lab (scenario.rs `run`): the forger's usage error now reads
+  "--forge-every N: kind K's forger refuses it (kind 7's rest: R)". Tests: new `fp3_kind_7s_rest_comes_from_the_weapon_
+  and_the_rate` (SS 3 at 30 Hz and 5 at 60 Hz; 66,666 µs `None`, 66,667 µs 3; `forger(7, rest - 1)` `None`, `forger(7,
+  rest)` taken, no rest refuses any interval); `f15_a_forgers_interval_below_2_is_refused` skips kind 7 at 2;
+  `c_u4f2_1` adds the run at `--forge-every 2`: `Failure::Usage("--forge-every 2: kind 7's forger refuses it (kind 7's
+  rest: 3)")`, the parse at 2 still taken (the floor of 2 unchanged). u4f2-fp3-tests2.log: fmt exit 0; fp3 PASS 0.00 s;
+  f15 12 PASS; T-K7 PASS 1.69 s; c_u4f2_1 PASS 4.25 s alone (was 0.00 s: the refused run builds the server before slot
+  6's forger).
+- FP-3's plant (`fire_rest_at` returning `Some(3)` from two ticks up): u4f2-fp3-plant.log, fp3 FAILS by name at
+  lib.rs:1609, left [Some(3), Some(3)], right [Some(3), Some(5)] (the 60 Hz pin). Restored by Edit, a7134ea0… equal.
+  Clean scenario.rs a9855195….
+- SIZE-CHECK after FP-3: +1,982 -177 tracked; forged.rs 362: 2,344 added (+66).

@@ -1,36 +1,57 @@
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index b40d2dd..36ea092 100644
+index b40d2dd..2831e82 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
-@@ -144,17 +144,250 @@ pub struct Behaviour {
+@@ -142,19 +142,271 @@ pub struct Behaviour {
+     fast: Option<Fast>,
+     /// -21's forger (`forger`).
      forge: Option<Forge>,
++    /// Kind 7's rest for the scene's weapon at the build's rate ([`fire_rest_at`]).
++    fire_rest: Option<u64>,
  }
  
 -/// A forger's state (u4f-brief.md 2.4, 2.6): its kind, its interval, the bound (ticks), the new sequences seen as an
 -/// `Input`'s newest, the forged count, the newest command seen (honest) and the forged sequences not yet taken.
 +/// Kind 7's items, every one a press edge where the sim refuses it (SA-15, both kinds): item i (the i-th due
-+/// command) is a reload item when i % [`RELOAD_ITEMS`] is 2 (an honest reload edge on the command before starts a
-+/// reload, which refuses the forged reload edge), else a fire item: fire released for [`FIRE_REST`] commands before it
-+/// (so the weapon is ready), an honest fire press on the command before (it fires), and the forged press on the next,
-+/// in the weapon's cooldown (its interval is more than a tick: SS's 68,571 µs). Counts of items and commands, no time.
++/// command) is a reload item when i % [`RELOAD_ITEMS`] is 2 (an honest reload edge on the command before, with fire
++/// released there, starts a reload, which refuses the forged reload edge; on a soldier revived just before, the full
++/// magazine refuses both, and nothing fires to leave it short: FP-1), else a fire item: fire released for the rest
++/// ([`fire_rest_at`]) commands before it (so the weapon is ready), an honest fire press on the command before (it
++/// fires), and the forged press on the next, in the weapon's cooldown (its interval is at least two ticks). A count
++/// of items, no time.
 +const RELOAD_ITEMS: u64 = 40;
-+const FIRE_REST: u64 = 3;
++
++/// Kind 7's rest at `tick_hz` for a weapon of `interval_us` (FP-3; carry 39: the rate an argument, pinned at 30 and
++/// 60 Hz): the commands a fire item's weapon rests before its honest press, so a shot's cost (`interval_us` x
++/// `tick_hz` units, falling 10^6 a command: npt-sim world.rs:1415-1416) has run out, `ceil(cost / 10^6)`. `None`
++/// under two ticks (a cost below 2 x 10^6): the clock carries at most one tick's remainder, so the press one command
++/// after the honest shot could find the weapon ready. SS's 68,571 µs: 3 at 30 Hz, 5 at 60 Hz.
++pub const fn fire_rest_at(tick_hz: u32, interval_us: u32) -> Option<u64> {
++    let cost = interval_us as u64 * tick_hz as u64;
++    if cost >= 2_000_000 {
++        Some(cost.div_ceil(1_000_000))
++    } else {
++        None
++    }
++}
++
 +/// Kind 10's hold, in steps without a command: the burst's 8 accepted commands less its own two steps, so the
 +/// forger's lead is the same after an episode as before it (a count of steps, with no time in it).
 +const HOLD_STEPS: u32 = npt_proto::Limits::REDUNDANCY_CAP as u32 - 2;
 +
-+/// A forger's state (u4f-brief.md 2.4, 2.6, 2.12): its kind, interval and the bound (ticks); whether it is the twin
-+/// (the same script with only the forged part made honest); kind 10's option (A: hold, then burst; B: burst, then
-+/// hold); the forged count, the newest command seen (honest), the forged sequences and kind 3's forged copies not
-+/// yet taken; whether this step's command is the forged one; the last `Input`'s acknowledgement; kind 10's episode
-+/// step, held datagram, kept stamps and next stamp; the twin's skips owed; kind 11's message; the forged `Input`s that
-+/// would not encode (0 expected).
++/// A forger's state (u4f-brief.md 2.4, 2.6, 2.12): its kind, interval, the bound (ticks) and kind 7's rest; whether
++/// it is the twin (the same script with only the forged part made honest); kind 10's option (A: hold, then burst;
++/// B: burst, then hold); the forged count, the newest command seen (honest), the forged sequences and kind 3's
++/// forged copies not yet taken; whether this step's command is the forged one; the last `Input`'s acknowledgement;
++/// kind 10's episode step, held datagram, kept stamps and next stamp; the twin's skips owed; kind 11's message; the
++/// forged `Input`s that would not encode (0 expected).
  #[derive(Clone, Debug, Default)]
  struct Forge {
      kind: u8,
      every: u64,
      bound: u32,
 -    seen: u64,
++    rest: u64,
 +    twin: bool,
 +    option_a: bool,
      sent: u64,
@@ -256,7 +277,11 @@ index b40d2dd..36ea092 100644
  }
  
  /// `c`, the newest command of a new sequence, forged in `kind` (2.6's per-kind table), the `n`-th (from 1), against
-@@ -301,14 +534,22 @@ impl Behaviour {
+@@ -298,27 +550,64 @@ impl Behaviour {
+             lag: None,
+             fast: None,
+             forge: None,
++            fire_rest: fire_rest_at(npt_sim::TICK_HZ, scene.weapon().interval_us),
          }
      }
  
@@ -279,14 +304,23 @@ index b40d2dd..36ea092 100644
 +    /// 1, so all but the first 8 are refused by the catch-up cap (A) or the full buffer (B), 6 steps without a command
 +    /// (the crate's `HOLD_STEPS`) before (A) or after (B) the burst keeping its lead. `None` for `every` below 2:
 +    /// kinds 2 and 5 forge against the previous command, so it must have been accepted (SEC-U4F-1), which every
-+    /// interval of 2 or more gives on a lossless profile (P0).
++    /// interval of 2 or more gives on a lossless profile (P0); and for kind 7 when the scene's weapon has no rest at
++    /// the build's rate or `every` is below it (`fire_rest_at`: SS's 3 at 30 Hz, FP-3).
      pub fn forger(mut self, kind: u8, every: u64, bound: u32) -> Option<Behaviour> {
 -        ([1, 2, 4, 5, 6].contains(&kind) && every >= 2).then_some(())?;
 +        ((1..=11).contains(&kind) && every >= 2).then_some(())?;
++        let rest = match self.fire_rest {
++            Some(r) if kind == 7 && every >= r => r,
++            _ if kind == 7 => return None,
++            _ => 0,
++        };
          self.forge = Some(Forge {
              kind,
              every,
-@@ -318,7 +559,28 @@ impl Behaviour {
+             bound,
++            rest,
+             ..Forge::default()
+         });
          Some(self)
      }
  
@@ -316,7 +350,7 @@ index b40d2dd..36ea092 100644
      pub fn take_forged(&mut self) -> Vec<u16> {
          self.forge
              .as_mut()
-@@ -326,6 +588,27 @@ impl Behaviour {
+@@ -326,6 +615,27 @@ impl Behaviour {
              .unwrap_or_default()
      }
  
@@ -344,7 +378,7 @@ index b40d2dd..36ea092 100644
      /// -21's 1.5x clock (u4f-brief.md 2.6; U4F-Q11 (iii) (c) and (v) (b) as F1 amends it): fire held at a seeded point,
      /// the lane's walk at full length, a command at every step once the endpoint holds a snapshot (its host clock's rate
      /// is the lab's), each stamped by the crate's `fast_stamp` under the lead bound `bound` (ticks) in
-@@ -424,11 +707,14 @@ impl Behaviour {
+@@ -424,11 +734,14 @@ impl Behaviour {
                  l.bursts.push(now_ns.saturating_sub(at));
              }
          }
@@ -362,7 +396,7 @@ index b40d2dd..36ea092 100644
          for d in datagrams.iter_mut() {
              if let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
              {
-@@ -460,23 +746,6 @@ impl Behaviour {
+@@ -460,23 +773,6 @@ impl Behaviour {
                          }
                      }
                  }
@@ -386,7 +420,7 @@ index b40d2dd..36ea092 100644
                  // Every rewritten `Input` encodes: an older copy a past-bound stamp leaves more than 255 ticks below
                  // (after an idle) is left out, oldest first, so the rest stay consecutive (the codec's two rules).
                  let mut out = Vec::new();
-@@ -585,11 +854,130 @@ impl Behaviour {
+@@ -585,11 +881,133 @@ impl Behaviour {
              self.skipped += 1;
              return false;
          }
@@ -421,11 +455,13 @@ index b40d2dd..36ea092 100644
 +        }
 +        let due = n.is_multiple_of(f.every);
 +        // Kind 7 ([`RELOAD_ITEMS`]): the due command `d`'s item kind, by its index d / every (reload item i % 40 == 2:
-+        // d is at least 4, so a shot has left the magazine short of full by its honest edge at d - 1).
++        // d is at least 4, so a shot has left the magazine short of full by its honest edge at d - 1, unless a revive
++        // filled it, and then the full magazine refuses both edges).
 +        let (every, kind) = (f.every, f.kind);
 +        let reload = |d: u64| (d / every) % RELOAD_ITEMS == 2;
 +        let ahead = |k: u64| kind == 7 && (n + k).is_multiple_of(every);
-+        let rest = (1..=FIRE_REST).any(|k| ahead(k) && !reload(n + k));
++        // Fire released on the command before every item, and for the rest before a fire item (FP-1, FP-3).
++        let rest = (1..=f.rest).any(|k| ahead(k) && (k == 1 || !reload(n + k)));
 +        if ahead(1) {
 +            let b = if reload(n + 1) {
 +                Command::PRESS_RELOAD
@@ -449,7 +485,8 @@ index b40d2dd..36ea092 100644
 +        }
 +        let mut command = self.next_command(newest, view, own);
 +        if rest {
-+            // Kind 7's fire item: the weapon rests (fire released) so the honest press before the forged one fires.
++            // Kind 7: before a fire item the weapon rests (fire released) so the honest press before the forged one
++            // fires; before a reload item nothing fires, so a magazine a revive filled stays full (FP-1).
 +            command.buttons &= !Command::FIRE;
 +        }
 +        if skip {
@@ -517,7 +554,7 @@ index b40d2dd..36ea092 100644
      /// The decision function (crate-private; `step` calls it, and so do this crate's tests): the next command from
      /// `newest`, `view` and `own`, the own soldier as the endpoint decoded it (`ClientEndpoint::own_soldier`: its grid
      /// position and dead bit), counted as given.
-@@ -652,6 +1040,10 @@ impl Behaviour {
+@@ -652,6 +1070,10 @@ impl Behaviour {
          let walk = match self.kind {
              Kind::Brawl => self.leash(own, walk),
              Kind::Lane => self.lane(own),
@@ -528,16 +565,42 @@ index b40d2dd..36ea092 100644
              _ => walk,
          };
          Command {
-@@ -1170,10 +1562,344 @@ mod tests {
+@@ -1165,14 +1587,565 @@ mod tests {
+     }
+ 
+     /// SEC-U4F-1: each room-whole forger refuses an interval below 2 (kinds 2 and 5 forge against the previous command,
+-    /// which must have been accepted) and takes 2.
++    /// which must have been accepted) and takes 2 (kind 7 its rest: the fp3 test).
+     #[test]
      fn f15_a_forgers_interval_below_2_is_refused() {
          let scene = Scene::stress();
          let steady = || Behaviour::script(&scene, 0, 1, "steady").expect("a script");
 -        for k in [1, 2, 4, 5, 6] {
 +        for k in 1..=11 {
              assert!(steady().forger(k, 1, 12).is_none(), "{k}");
-             assert!(steady().forger(k, 2, 12).is_some(), "{k}");
-         }
+-            assert!(steady().forger(k, 2, 12).is_some(), "{k}");
++            assert!(k == 7 || steady().forger(k, 2, 12).is_some(), "{k}");
++        }
 +        assert!(steady().forger(12, 2, 12).is_none(), "no kind 12");
++    }
++
++    /// FP-3 (NC-U4F2-2 = RR-U4F2-1, SA-U4F2-2): kind 7's rest from the weapon and the rate, SS's pinned at 30 and 60
++    /// Hz (3 and 5) and `None` under two ticks; kind 7's forger refuses an interval below its rest (2 at 30 Hz) and
++    /// takes the rest (3), and refuses any interval on a weapon with none.
++    #[test]
++    fn fp3_kind_7s_rest_comes_from_the_weapon_and_the_rate() {
++        let scene = Scene::stress();
++        let ss = scene.weapon().interval_us;
++        assert_eq!([30, 60].map(|hz| fire_rest_at(hz, ss)), [Some(3), Some(5)]);
++        let two_ticks = [66_666, 66_667].map(|i| fire_rest_at(30, i));
++        assert_eq!(two_ticks, [None, Some(3)], "1,999,980 and 2,000,010 units");
++        let rest = fire_rest_at(npt_sim::TICK_HZ, ss).expect("SS's rest");
++        let steady = || Behaviour::script(&scene, 6, 1, "steady").expect("a script");
++        assert!(steady().forger(7, rest - 1, 12).is_none(), "below the rest");
++        assert!(steady().forger(7, rest, 12).is_some(), "the rest");
++        let mut none = steady();
++        none.fire_rest = None;
++        assert!(none.forger(7, 1_000, 12).is_none(), "no rest");
 +    }
 +
 +    /// One side of f15's run for kinds 3, 7, 8, 9, 10 and 11: a forger or its twin, its endpoint, the newest
@@ -554,6 +617,11 @@ index b40d2dd..36ea092 100644
 +    /// `a`), and its twin, fed the same snapshot ticks for 300 steps, each acknowledging the newest command its side
 +    /// sent (as at P0; for kind 3 every 5th acknowledges nothing, so some `Input`s carry the copy already).
 +    fn sides(kind: u8, a: bool) -> [Side; 2] {
++        sides_at(kind, a, 3, 300)
++    }
++
++    /// [`sides`] at the interval `every` for `steps` steps.
++    fn sides_at(kind: u8, a: bool, every: u64, steps: u32) -> [Side; 2] {
 +        use npt_proto::{JoinAccepted, Message, Snapshot, encode};
 +        let bytes = |m: &Message| {
 +            let mut o = Vec::new();
@@ -563,7 +631,7 @@ index b40d2dd..36ea092 100644
 +        let scene = Scene::stress();
 +        let mut sides = [false, true].map(|twin| {
 +            let b = Behaviour::script(&scene, 0, 1, "steady")
-+                .and_then(|b| b.forger(kind, 3, 12))
++                .and_then(|b| b.forger(kind, every, 12))
 +                .expect("a forger");
 +            let b = if a { b.catchup_under_a() } else { b };
 +            Side {
@@ -577,7 +645,7 @@ index b40d2dd..36ea092 100644
 +            tick: 100,
 +            ..JoinAccepted::default()
 +        }));
-+        for k in 0..300u32 {
++        for k in 0..steps {
 +            let now = u64::from(k) * 33_333_333;
 +            for s in &mut sides {
 +                let snap = Snapshot {
@@ -752,11 +820,14 @@ index b40d2dd..36ea092 100644
 +    /// f15's kind-7 case (SA-15; 2.6's row: the endpoint stores the forged command): its datagrams unchanged; each
 +    /// forged command carries one edge against the command before it (inside kind 5's rule), on the item's button
 +    /// (reload every [`RELOAD_ITEMS`]-th item, at index 2, else fire), right after an honest edge of the same button;
-+    /// a fire item's three commands before it hold no fire (the rest that readies the weapon); the twin gives the
-+    /// same commands with only the forged edges taken off (its counters one lower from each on: carry 46).
++    /// a fire item's rest before it holds no fire (SS's at the build's rate, its interval: 3 at 30 Hz), nor a reload
++    /// item's one command before it (FP-1); the twin gives the same commands with only the forged edges taken off (its
++    /// counters one lower from each on: carry 46).
 +    #[test]
 +    fn f15_the_kind_7_forger_presses_where_the_sim_refuses() {
-+        let [mut f, t] = sides(7, false);
++        let rest = fire_rest_at(npt_sim::TICK_HZ, Scene::stress().weapon().interval_us);
++        let rest = rest.expect("SS's rest");
++        let [mut f, t] = sides_at(7, false, rest, 300);
 +        let forged = f.b.take_forged();
 +        let (mut cmds, mut tcmds) = (Vec::new(), Vec::new());
 +        for ([honest, sent, _], [_, tsent, _]) in f.steps.iter().zip(&t.steps) {
@@ -789,12 +860,11 @@ index b40d2dd..36ea092 100644
 +                    1,
 +                    "{n}: an honest edge before"
 +                );
-+                if b == 0 {
-+                    let rested = cmds[n.saturating_sub(3)..n]
-+                        .iter()
-+                        .all(|c| c.buttons & Command::FIRE == 0);
-+                    assert!(rested, "{n}: the weapon rests three commands");
-+                }
++                let before = if b == 0 { rest as usize } else { 1 };
++                let rested = cmds[n.saturating_sub(before)..n]
++                    .iter()
++                    .all(|c| c.buttons & Command::FIRE == 0);
++                assert!(rested, "{n}: {before} rested before item {items}");
 +                taken[b] += 1;
 +            }
 +            let mut twin = w[1];
@@ -804,6 +874,197 @@ index b40d2dd..36ea092 100644
 +        }
 +        assert_eq!(items, forged.len() as u64);
 +        assert!(taken[0] >= 30 && taken[1] >= 2, "{taken:?}");
++    }
++
++    /// T-K7 (FP-1; TE-U4F2-1's proof of NC-U4F2-1): a kind-7 forger and its twin at the judged interval
++    /// ([`sides_at`], every 12th command, 640 steps), each run in a World of SS, with the same killers and placements
++    /// in both (at an interval of 3, the rest, every command is a rest, so an item d holds no fire and, after a revive
++    /// at d, its forged edge fires a shot the twin's d does not). The forger's soldier (slot 6, the judged runs' kind-7
++    /// slot) is teleported to an open point (35 m out: past the fight vehicles' parts, inside the outer loops' and 13
++    /// m from the nearest building), the 47 others onto a ring 8 m round it, holding fire at its chest (radial rays,
++    /// 107 cm apart at the ring). Kill 1: the forger stands idle until it dies, then its script starts so that item 2's
++    /// command before (a reload item's d - 1) is the first it runs after the sim's own respawn (`ticks_for_ms(1_000)`
++    /// later, SS's respawn: npt-sim scene.rs:186); its earlier commands run dead. It runs alive past item 42 (a reload
++    /// item, alive); kill 2 teleports it back and kills it again, and a spawn the test picks revives it at a fire
++    /// item's d, at least 10 ticks after the death, so that item's d - 1 ran dead. Asserts: every item whose d - 1 and
++    /// d ran alive carries its own record (fire: Cooldown, reload: Reload) under its sequence; every tick's state hash
++    /// equal between the two Worlds; the set-up reached each case. The items with d or d - 1 run dead are printed
++    /// (FP-2's to count). Its plant: fire held on a reload item's d - 1 (the shape before FP-1).
++    #[test]
++    fn t_k7_kind_7_items_next_to_a_death_and_a_revive_through_the_world() {
++        use npt_sim::RefusalKind;
++        const SLOT: u8 = 6;
++        const C: [i32; 3] = [3_000, -1_800, 0];
++        let [mut f, t] = sides_at(7, false, 12, 640);
++        let forged = f.b.take_forged();
++        let commands = |s: &Side| {
++            let mut v: Vec<Command> = Vec::new();
++            let all = s.steps.iter().flat_map(|x| inputs(&x[1]));
++            for c in all.flat_map(|i| i.commands.into_iter().rev()) {
++                if v.last().is_none_or(|l| c.seq > l.seq) {
++                    v.push(c);
++                }
++            }
++            v
++        };
++        let (fc, tc) = (commands(&f), commands(&t));
++        assert_eq!(fc.len(), tc.len(), "one command a step on both");
++        // Each item (from 1): its command's index, and whether it is a reload item.
++        let index: BTreeMap<u16, usize> = (0..).zip(&fc).map(|(j, c)| (c.seq, j)).collect();
++        let items: Vec<(usize, bool)> = (1..)
++            .zip(&forged)
++            .map(|(i, s)| (index[s], i % RELOAD_ITEMS == 2))
++            .collect();
++        assert!(items[1].1 && items[41].1 && !items[43].1);
++        let scene = Scene::stress().with_stand_ins(StandIns::OFF);
++        let mut worlds = [World::new(&scene, 1, FIRST), World::new(&scene, 1, FIRST)];
++        let history = HitHistory::for_ms(2_000).expect("a ring");
++        // A soldier killed at tick D runs its next commands dead and the one at D + this alive.
++        let respawn = ticks_for_ms(1_000) as usize;
++        assert!(respawn > items[1].0);
++        let others = f64::from(scene.slots() - 1);
++        let ring: Vec<Placement> = (0..scene.slots())
++            .filter(|s| *s != SLOT)
++            .enumerate()
++            .map(|(i, slot)| {
++                let a = core::f64::consts::TAU * i as f64 / others;
++                let at = |c: i32, v: f64| c + (800.0 * v).round() as i32;
++                Placement {
++                    slot,
++                    position: [at(C[0], a.cos()), at(C[1], a.sin()), 0],
++                }
++            })
++            .collect();
++        let here = Placement {
++            slot: SLOT,
++            position: C,
++        };
++        let kill_2 = items[43].0 + 1;
++        // The killers firing; the script's first tick; the spawn's tick; the last command run.
++        let (mut firing, mut start, mut spawn, mut last) = (true, None, None, None);
++        let (mut dead, mut kills, mut first_diff) = (false, Vec::new(), None);
++        let mut ran_dead: Vec<Option<bool>> = vec![None; fc.len()];
++        let mut records: BTreeMap<u16, Vec<RefusalKind>> = BTreeMap::new();
++        for k in 0..fc.len() + 400 {
++            let j = start.and_then(|s| k.checked_sub(s));
++            if j.is_some_and(|j| j >= fc.len() || last.is_some_and(|l| j > l)) {
++                break;
++            }
++            let tick = FIRST.wrapping_add(k as u32);
++            let mut input = TickInput {
++                tick,
++                ..TickInput::default()
++            };
++            if k == 0 {
++                input.teleports = ring.clone();
++            }
++            if k == 0 || j == Some(kill_2) {
++                input.teleports.push(here);
++                firing = true;
++            }
++            if spawn == Some(k) {
++                input.spawns.push(here);
++            }
++            if let Some(j) = j {
++                ran_dead[j] = Some(dead && spawn != Some(k));
++            }
++            let mut both = [Vec::new(), Vec::new()];
++            for slot in 0..scene.slots() {
++                for (out, side) in both.iter_mut().zip([&fc, &tc]) {
++                    if let Some(j) = j.filter(|_| slot == SLOT) {
++                        let mut c = side[j];
++                        (c.slot, c.tick) = (slot, tick);
++                        out.push((c, None));
++                    } else if firing && slot != SLOT {
++                        let c = Command {
++                            slot,
++                            tick,
++                            seq: k as u16,
++                            buttons: Command::FIRE,
++                            aim: [C[0], C[1], 140],
++                            view_tick: tick,
++                            ..Command::default()
++                        };
++                        out.push((c, None));
++                    }
++                }
++            }
++            for (w, commands) in worlds.iter_mut().zip(both) {
++                w.step(
++                    &TickInput {
++                        commands,
++                        ..input.clone()
++                    },
++                    &history,
++                );
++            }
++            let [w, tw] = &worlds;
++            if first_diff.is_none() && w.state_hash() != tw.state_hash() {
++                first_diff = Some(k);
++            }
++            for r in w.reports().refusals.iter().filter(|r| r.slot == SLOT) {
++                records.entry(r.seq).or_default().push(r.kind);
++            }
++            dead = soldiers(w).iter().any(|x| x.0 == SLOT && x.2);
++            if firing && dead {
++                firing = false;
++                kills.push(k);
++                match start {
++                    None => start = Some(k + respawn + 1 - items[1].0),
++                    Some(s) => {
++                        let (jd, _) = *items
++                            .iter()
++                            .find(|&&(jd, r)| !r && s + jd > k + 10)
++                            .expect("a fire item left");
++                        spawn = Some(s + jd);
++                        last = Some(jd + 10);
++                    }
++                }
++            }
++        }
++        assert_eq!(kills.len(), 2, "two kills: {kills:?}");
++        // The cases: both runs alive; d dead; a fire item's d - 1 dead and d alive; a reload item's d - 1 the first
++        // live command; a reload item with d - 2 to d alive.
++        let (mut cases, mut missing, mut left_out) = ([0u32; 5], Vec::new(), Vec::new());
++        for &(j, reload) in &items {
++            let Some(at_d) = ran_dead[j] else {
++                continue;
++            };
++            let before = ran_dead[j - 1].expect("d - 1 ran before d");
++            let got = records.get(&fc[j].seq).cloned().unwrap_or_default();
++            let want = if reload {
++                RefusalKind::Reload
++            } else {
++                RefusalKind::Cooldown
++            };
++            if !at_d && !before {
++                cases[0] += 1;
++                if !got.contains(&want) {
++                    missing.push((j + 1, fc[j].seq, reload, got.clone()));
++                }
++                if reload {
++                    cases[3 + usize::from(ran_dead[j - 2] == Some(false))] += 1;
++                }
++            } else {
++                cases[if at_d { 1 } else { 2 }] += u32::from(at_d || !reload);
++                left_out.push((j + 1, fc[j].seq, reload, before, at_d, got));
++            }
++        }
++        println!(
++            "t-k7: kills at ticks {kills:?}, script from tick {start:?}, spawn at tick {spawn:?}; cases (alive, d \
++             dead, fire d - 1 dead, reload after a revive, reload alive) {cases:?}; items run dead at d or d - 1 \
++             (n, seq, reload, d - 1 dead, d dead, records): {left_out:?}"
++        );
++        assert_eq!(
++            (missing, first_diff),
++            (Vec::new(), None),
++            "kind-7 items alive at d - 1 and d without their record (n, seq, reload, records), and the first tick \
++             whose state hash differs between the forger's World and the twin's"
++        );
++        assert!(
++            cases[0] >= 40 && cases[1..].iter().all(|c| *c >= 1),
++            "the set-up reached every case: {cases:?}"
++        );
 +    }
 +
 +    /// f15's kind-10 case under both options (2.6's row; SA3-8, SA31-4 (c)): each episode sends two `Input`s in one
@@ -870,11 +1131,10 @@ index b40d2dd..36ea092 100644
 +                seqs(&t),
 +                "a: {a}: the twin sends the same sequences but the refused"
 +            );
-+        }
+         }
      }
  
-     /// The judged runs' first tick (the run scripts' `--tick-start 63736`).
-@@ -1196,6 +1922,12 @@ mod tests {
+@@ -1196,6 +2169,12 @@ mod tests {
          /// ten burst starts, the first 30 s into the measured phase (after the 10 s warm-up) and then every 60 s (the
          /// run scripts' B1 settings).
          Bursts,
@@ -887,7 +1147,7 @@ index b40d2dd..36ea092 100644
      }
  
      /// One run's record: soldier-ticks in a building and the first; the largest distance from the centre (its square in
-@@ -1242,19 +1974,32 @@ mod tests {
+@@ -1242,19 +2221,32 @@ mod tests {
              .collect()
      }
  
@@ -927,7 +1187,7 @@ index b40d2dd..36ea092 100644
          let mut last: Vec<Option<Command>> = vec![None; n];
          let mut seq = vec![0u16; n];
          let mut rng = seed ^ 0x736b_6970_7300_0000;
-@@ -1310,9 +2055,31 @@ mod tests {
+@@ -1310,9 +2302,31 @@ mod tests {
              let burst = bursts.iter().any(|&(a, b)| (a..b).contains(&k));
              let mut commands = Vec::with_capacity(n);
              for s in 0..n {
@@ -960,7 +1220,7 @@ index b40d2dd..36ea092 100644
                          Pattern::Bursts => burst,
                          Pattern::Skips => {
                              r.chances += 1;
-@@ -1369,8 +2136,20 @@ mod tests {
+@@ -1369,8 +2383,20 @@ mod tests {
      /// rate per 1000 are the skip pattern's alone (ADV-PT-L1); every pattern prints its skipped ticks and longest
      /// streak.
      fn printed(seed: u64, ms: u32, pattern: Pattern) -> Record {
@@ -982,7 +1242,7 @@ index b40d2dd..36ea092 100644
              Pattern::EveryTick => format!("skipped {}", r.skipped),
              Pattern::Skips => format!(
                  "skipped {} of {} chances ({} per 1000)",
-@@ -1381,7 +2160,7 @@ mod tests {
+@@ -1381,7 +2407,7 @@ mod tests {
              Pattern::Bursts => format!("skipped {} in its bursts", r.skipped),
          };
          println!(
@@ -991,7 +1251,7 @@ index b40d2dd..36ea092 100644
               distance from the centre {} cm (slot {}, tick {}, at {}, {}); {skips}, longest streak {}; dead {} \
               soldier-ticks; stuck (slot, tick, x, y): {:?}",
              ticks_for_ms(ms),
-@@ -1411,6 +2190,46 @@ mod tests {
+@@ -1411,6 +2437,46 @@ mod tests {
          }
      }
  
@@ -1390,7 +1650,7 @@ index dcd2e4e..85e69ae 100644
  mod logs;
  mod machine;
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
-index 7f54e46..31503c3 100644
+index 7f54e46..03f1e6c 100644
 --- a/spikes/netcode-proof/crates/lab/src/scenario.rs
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
 @@ -48,6 +48,7 @@ use npt_sim::replay::Recording;
@@ -1459,14 +1719,24 @@ index 7f54e46..31503c3 100644
              _ => endpoint_of(s, slot),
          };
          let behaviour = if s.suite == "clock" {
-@@ -1248,6 +1268,16 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1248,6 +1268,26 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          } else if fast_from.is_some() && slot == 0 {
              // A command at every step, its lane's walk, its stamps by U4F-Q11 (v) (b) as F1 amends it.
              Behaviour::fast_clock(&scene, slot, s.seed, server.room.lead_bound().1)
 +        } else if let Some(kind) = forger(slot) {
++            // FP-3: kind 7's forger needs the interval at least its rest (the weapon's interval in commands).
++            let rest = npt_bots::fire_rest_at(npt_sim::TICK_HZ, scene.weapon().interval_us)
++                .map_or("none (an interval under two ticks)".to_owned(), |r| {
++                    r.to_string()
++                });
 +            let b = Behaviour::script(&scene, slot, s.seed, "steady")
 +                .and_then(|b| b.forger(kind, s.forge_every, server.room.lead_bound().1))
-+                .ok_or_else(|| Failure::Usage(format!("--forge-every {}", s.forge_every)))?;
++                .ok_or_else(|| {
++                    Failure::Usage(format!(
++                        "--forge-every {}: kind {kind}'s forger refuses it (kind 7's rest: {rest})",
++                        s.forge_every
++                    ))
++                })?;
 +            let b = if s.cmd_timing == CmdTiming::A {
 +                b.catchup_under_a()
 +            } else {
@@ -1476,7 +1746,7 @@ index 7f54e46..31503c3 100644
          } else {
              behaviour
          };
-@@ -1316,6 +1346,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1316,6 +1356,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      let last_measured = logs.wide(s.tick_start.wrapping_add((measured_end.max(1) - 1) as u32));
      let mut events_stamped: u64 = 0;
      let mut clamp = ClampTally::default();
@@ -1488,7 +1758,7 @@ index 7f54e46..31503c3 100644
      let mut inputs: Vec<i64> = Vec::new();
      // The link-lost-overstated bite: the slots whose record it has written (bites builds only).
      #[cfg(feature = "bites")]
-@@ -1407,6 +1442,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1407,6 +1452,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                      .refused
                      .extend(rep.refusals.iter().filter(|x| x.slot == 0).map(|x| x.seq));
              }
@@ -1499,7 +1769,7 @@ index 7f54e46..31503c3 100644
              // -21's fast clock: slot 0's episode sums, each episode's record at its end (lab log).
              if let Some(f) = fast.as_mut() {
                  let me = records
-@@ -1522,6 +1561,24 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1522,6 +1571,24 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  .world_hashes
                  .push((t, npt_sim::SimCore::state_hash(server.room.sim())));
              k += 1;
@@ -1524,7 +1794,7 @@ index 7f54e46..31503c3 100644
              if k == s.warmup_ticks && s.suite != "clock" {
                  for c in &clients {
                      if !logs.started(c.slot) {
-@@ -1596,6 +1653,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1596,6 +1663,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              }
              let mut out = c.endpoint.step();
              c.behaviour.outgoing(host, &mut out.datagrams);
@@ -1536,7 +1806,7 @@ index 7f54e46..31503c3 100644
              for held in c.behaviour.take_bursts() {
                  let mut e = EventRecord::new("lag_burst", phase(k))
                      .with("slot", c.slot)
-@@ -1695,6 +1757,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1695,6 +1767,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      }
      summary.ticks = k;
      summary.fate_log_sha256 = fate_sha256(&net);
@@ -1551,7 +1821,7 @@ index 7f54e46..31503c3 100644
      let mut last = Vec::new();
      for c in &mut clients {
          if let Some(w) = c.bytes_log.as_mut() {
-@@ -1725,6 +1795,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1725,6 +1805,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              )
              .with("lead_now_count", c.endpoint.lead_now().unwrap_or(-1))
              .with("unknown_pongs_count", c.endpoint.unknown_pongs());
@@ -1566,7 +1836,7 @@ index 7f54e46..31503c3 100644
          // 2.5 (SA-5): the room's refusal fields, and the live session's pump counters, at the stop.
          let d = server.session(c.slot).map(|x| x.decoder.counters().clone());
          let mut e = counts(e, Some(&k), d.as_ref());
-@@ -1744,6 +1822,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1744,6 +1832,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  .with("rerun_reports_count", clamp.reruns),
          );
      }
@@ -1577,7 +1847,7 @@ index 7f54e46..31503c3 100644
      // D3-1 (f40): the run's measured reorder share from npt-l1's fate log, as the -3 probe computes it (main.rs's
      // `permille`): each direction's reordered x 1000 / delivered, floored; `permille` the lower of the two.
      let [up, down] = net.with_fate_log(|l| l.reorder_counts());
-@@ -1900,11 +1982,7 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1900,11 +1992,7 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
      let mut p: BTreeMap<String, Value> = BTreeMap::new();
      let w = s.scene.weapon();
      p.insert("suite".into(), suite.into());
@@ -1590,7 +1860,7 @@ index 7f54e46..31503c3 100644
      // The one lead every client stamps with, only where `with_lead` fixes it (U4F-Q7 (i); TE-20); under U4f's
      // controller each client's lead is its own (`event.client_counts.lead_now_count`), and the cap it works under.
      if s.controller {
-@@ -1946,6 +2024,9 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1946,6 +2034,9 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
              p.insert("fast_clock_idle_ns".into(), s.fast_idle_ns.into());
          }
      }
@@ -1600,7 +1870,7 @@ index 7f54e46..31503c3 100644
      if s.suite == "clock" {
          p.insert("connects_count".into(), s.connects.into());
      } else {
-@@ -1990,7 +2071,7 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
+@@ -1990,7 +2081,7 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
  [--every-step 1] [--lead <1..8>] [--logs 0 (with --record)] [--cmd-timing A|B] [--controller 0|1] \
  [--brawl-press-every <n> (the brawl)] [--event-cap <n>] [--connects <n> (with --suite clock)] \
  [--twin-logs <folder> (the clamp twin)] [--fast-clock-episode-s <s>] [--fast-clock-idle-s <s>] (with --suite fast-clock) \
@@ -1609,7 +1879,7 @@ index 7f54e46..31503c3 100644
  
  /// B1's burst starts (u4r-brief.md 7.1, -18's row): `count` bursts, the first `first_s` after the measured phase's
  /// first tick and one every `every_s`, each starting a seeded offset in [0, 1 tick) after its tick boundary.
-@@ -2155,6 +2236,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -2155,6 +2246,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
      if (suite == "clock") != (connects > 0) {
          return Err("--suite clock and --connects <n> (from 1) go together".to_owned());
      }
@@ -1630,7 +1900,7 @@ index 7f54e46..31503c3 100644
      let event_cap = take("event-cap")
          .map(|v| {
              v.parse::<u32>()
-@@ -2299,6 +2394,7 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -2299,6 +2404,7 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
          lag_every_ms,
          fast_episode_ns: fast_episode_s * SEC,
          fast_idle_ns: fast_idle_s * SEC,
@@ -1638,7 +1908,7 @@ index 7f54e46..31503c3 100644
          record,
          bytes,
          logs,
-@@ -3642,7 +3738,8 @@ pub(crate) mod tests {
+@@ -3642,7 +3748,8 @@ pub(crate) mod tests {
      }
  
      /// f6 (TE-14), one option: the lab builds the endpoints with the one controller setting (the header records the
@@ -1648,7 +1918,7 @@ index 7f54e46..31503c3 100644
      /// no `cmd_timing` (README :191-192 makes it the room's and the scenario's).
      fn f6(timing: &'static str) {
          let p = &u4f_short(timing)[0].header.params;
-@@ -3994,36 +4091,77 @@ pub(crate) mod tests {
+@@ -3994,36 +4101,77 @@ pub(crate) mod tests {
          );
      }
  
@@ -1748,7 +2018,7 @@ index 7f54e46..31503c3 100644
              .events
              .iter()
              .filter(|e| {
-@@ -4036,10 +4174,21 @@ pub(crate) mod tests {
+@@ -4036,10 +4184,21 @@ pub(crate) mod tests {
              (f("counted_count"), f("rerun_reports_count")),
              (Some(0), Some(0))
          );
@@ -1774,7 +2044,7 @@ index 7f54e46..31503c3 100644
      }
  
      /// f20 (2.6; U4F-Q15 (c); A1) and f28's lag-switch half: a short lag-switch run at P1 (16 clients, 2 s + 6 s, option
-@@ -4056,13 +4205,7 @@ pub(crate) mod tests {
+@@ -4056,13 +4215,7 @@ pub(crate) mod tests {
          );
          assert_eq!(crate::logs::moved_um(alive(0, 0), alive(5_000, 100)), None);
          assert_eq!(crate::logs::moved_um(alive(0, 100), alive(10, 0)), None);
@@ -1789,7 +2059,7 @@ index 7f54e46..31503c3 100644
          let held: Vec<u64> = read(&dir, "lab")
              .events
              .iter()
-@@ -4081,9 +4224,338 @@ pub(crate) mod tests {
+@@ -4081,9 +4234,346 @@ pub(crate) mod tests {
          assert!(most("lagswitch_cmds_count").is_some_and(|m| (1..=cap).contains(&m)));
          assert!(most("lagswitch_excess_move_um").is_some_and(|m| m <= 0));
          let logs = crate::contract::read(&dir).expect("its logs");
@@ -1828,7 +2098,8 @@ index 7f54e46..31503c3 100644
 +
 +    /// C-U4F2-1's parser half (SEC-U4F-1's rest): `--forge-every` below 2 (or not a number) is a usage error naming
 +    /// it, so is the option without the forged suite or the suite without it, and so is a forged suite with fewer
-+    /// clients than forgers; 2 is taken and lands in the header.
++    /// clients than forgers; 2 is taken and lands in the header, and the run then refuses it, a usage error naming kind
++    /// 7's rest (FP-3: the parser's floor stays 2).
 +    #[test]
 +    fn c_u4f2_1_a_forge_interval_below_2_is_a_usage_error() {
 +        let dir = scratch("u4f2-forge-every");
@@ -1858,6 +2129,13 @@ index 7f54e46..31503c3 100644
 +            .get("forge_every_count")
 +            .and_then(|v| v.as_u64());
 +        assert_eq!((s.forge_every, p), (2, Some(2)));
++        // FP-3: the run refuses it as a usage error, kind 7's forger needing its rest (3 at 30 Hz).
++        let rest = npt_bots::fire_rest_at(npt_sim::TICK_HZ, s.scene.weapon().interval_us);
++        let want = format!(
++            "--forge-every 2: kind 7's forger refuses it (kind 7's rest: {})",
++            rest.expect("SS's rest")
++        );
++        assert_eq!(run(&s).err(), Some(Failure::Usage(want)));
 +    }
 +
 +    /// One client's `client_counts` record in a run's lab log, by slot.
