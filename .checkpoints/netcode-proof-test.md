@@ -172,7 +172,11 @@
   set, and -13, the short B1 suite at 18 flag-0 ticks per client per burst, not 0.99; Lows -14, -15; the drafter's
   figures go to him). **All five met by Edit: u4g-brief.md rev 2.1** (conditions 1-4) and u4s-carries.md (carry 59's
   pointer to 93; carry 77 (b)'s reading marked mine); no new check needed. **U4g's brief is ready**; U4G-Q1's final text
-  for the 2026-11-21 message: advisor-u4g-brief.md:360-374 (lean (b), split). U4G-Q2 later, before -58's set. U4G-Q1 (split; paste-ready at advisor-u4g-brief.md:205-219;
+  for the 2026-11-21 message: advisor-u4g-brief.md:360-374 (lean (b), split). U4G-Q2 later, before -58's set.
+- **Idle until his answers** (05:15 UTC): no agent or set runs. The 2-hour check-in (trig_01EKqNqwZrQTVJ6caAyRrug5)
+  **paused** (it runs while agents run; re-enable when a builder or a set starts); a one-shot reminder at 23:05 UTC
+  (trig_01YRVLwWYgbgKS1DLsHeCcGx) wakes the session for the 2026-11-21 message (msg-2026-11-21.md). The saver bfwo06d6a
+  ends about 06:15 UTC; restart it with the next work. U4G-Q1 (split; paste-ready at advisor-u4g-brief.md:205-219;
   not a stop) goes in the 2026-11-21 message after rev 2; U4G-Q2 later, before -58's set only, its text drafted and read
   first. Saver bfwo06d6a from 04:24 UTC. Main still f5030a3; 10,124 MiB free.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
