@@ -7251,3 +7251,21 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   needed." (up since 01:01:16 by /proc/uptime). Checked at 01:04: FP-2 to FP-4 run with their plants restored (seam.rs
   901bb546…4c90, the post-FP-1 hash; world.rs 4a4e138c…), no plant left, no process; f1-b5-check1.log cut at 00:56;
   7,528 MiB free. The saver restarted; the builder resumed by SendMessage to re-run check.mjs twice.
+
+## Decision: Mustafa, 2026-11-20 15:10 Amsterdam (it reached this chat at 14:10:29 UTC), U4F2-SIZE (a): build U4f2 whole
+- **Mustafa, typed into this chat (transcript 2026-11-20T14:10:29.509Z, uuid 11fc896d-a8c0-4716-9932-1cfb49495518, origin human), verbatim** (the whole message, unchanged, in the fence below):
+
+```text
+A
+```
+
+- **The question it answers** (the main session's words, its chat reply of about 11:00 UTC, quoted so the record says what "A" chose; not his words):
+
+```text
+**U4F2-SIZE** (stopped on you; already in the 2026-11-20 message): how much to build in U4f2, the separate unit for the forged-command test and -21's runs. It matters because U4f2's build, the next step, waits for this answer.
+  - (a) Build it whole: about 1,700 to 2,250 added lines, against the 1,500 your answer assumed. The stop at 3,000 lines stays.
+  - (b) Leave four small add-ons (about 80 to 215 lines) to a later unit.
+  - My lean, and the advisor's: (a).
+```
+
+- **Read as** (the main session's reading, not his words): U4F2-SIZE (a). U4f2 is built whole by u4f2-brief.md rev 1.2: about 1,700 to 2,250 added lines (up to about 2,700 at U4f's 1.2), its four riders included (C-U4F2-7 with T-6, C-U4F2-8, ADV-U4FP-3); the stop past 3,000 added lines at a block end stays (his SIZE-CHECK, history.md:2048-2051); no pass mark, judge rule, marks.json text or run count changes (his SIZE-U4F (a), history.md:6896-6903).

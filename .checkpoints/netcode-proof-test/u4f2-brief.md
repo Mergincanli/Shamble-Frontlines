@@ -24,6 +24,14 @@ No new check: condition 10 needs none unless it cannot be met as written (:224-2
   unchanged (`git diff --stat 25d316e 1faf894`). `<base>` is the lane head at launch, filled by the main session in
   U4f's fill form (u4f-brief.md section 12), with the spike tree outside results/ named equal to 1faf894's or each
   difference listed.
+- **Filled at launch (2026-11-20 14:1x UTC, after his U4F2-SIZE (a), history.md:7255-7271):** `<base>` =
+  **a289def7d2cc45941a1ebeb335a05fd7bfd7dc78**, spikes/netcode-proof tree 2b7647ffc3c1927e…: outside results/ equal to
+  1faf894's d4f6cd41… (`git diff --quiet 1faf894 a289def -- spikes/netcode-proof ':(exclude)…/results'` exit 0; the
+  only spike change since is 46ca143's results/u4f/96de6acf8223/), so its counts are 1faf894's by D1's rule: **642
+  measured and 739 bites**, 0 failed, 0 skipped (.gate/u4f-f1-merge/m5-check.log). The builder's copy is the lane head
+  that holds this fill (its spikes/ equal to `<base>`'s). Stamps refilled: u4s-carries.md 7ce55632082f0042 (738 lines),
+  u4f-report.md 5aeef4009e47e81b (708); u4f-brief.md 135325a0bb524104 (2,040) unchanged; the runner u4f-run.sh
+  70eb3da5b8ce9a8e… unchanged (its logs under .gate/u4f/, this unit's named u4f2-*).
 - **Read, never retyped:** u4f-brief.md (135325a0bb524104, 2,040: **section 1, the start and the stops, :288-355**;
   2.4 item 6, 2.6, 2.7, 2.10, 2.12, section 4's build rules :831-958, 5.1-5.4, section 6's end checks :1163-1183,
   section 7's return list :1187-1222); the stop ruling advisor-u4f-stop.md (38821ebd2c870ca9, 247: U4f2's list :80-89,
@@ -249,7 +257,8 @@ reviewer's read, and none is planned.
   report names it beside C-U4F2-5's fix.
 
 ## What goes to Mustafa from this brief
-- **U4F2-SIZE**, sent in the 2026-11-20 message (msg-2026-11-20.md:39-48; his answer pending), first line "stopped on
+- **U4F2-SIZE: ANSWERED (a), build it whole** (Mustafa, 2026-11-20 14:10:29 UTC, word for word at history.md:7255-7271).
+  As sent in the 2026-11-20 message (msg-2026-11-20.md:39-48), first line "stopped on
   you": U4f2's estimate is about 1,700 to 2,250 added
   lines (up to about 2,700 at U4f's 1.2 overrun) against the 1,500 of his (a); the stop past 3,000 stays. My lean (and
   the advisor's): build it whole. His cheaper option: leave the four riders (about 80 to 215 lines) for the next unit

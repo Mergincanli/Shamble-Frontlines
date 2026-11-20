@@ -68,6 +68,10 @@
   or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
   brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
   with its source before its first snapshot). -21 is judged only after U4f2.
+- **U4F2-SIZE ANSWERED: (a), build U4f2 whole** (Mustafa, 2026-11-20 14:10:29 UTC; word for word at
+  history.md:7255-7271 by record_u4f2_size.py): **U4f2's size line** (SIZE-CHECK): about 1,700 to 2,250 added lines (up
+  to about 2,700 at 1.2), the four riders included; **the stop past 3,000 at a block end**. Brief u4f2-brief.md rev 1.2,
+  filled at launch (`<base>` a289def, counts 642/739). **The build starts now.**
 - **The advisor's -20 ruling** (ADV-U4F20-1 High: npt-sim's one-edge rule; fix U4f-F1, -20 re-run) and U4f-F1's
   build line: history.md:7195-7206 (card_trim_1120d.py).
 - **-20 and -22's first set records and U4f-F1's plan line:** history.md:7209-7216 (card_trim_1120e.py). **-20's L1
