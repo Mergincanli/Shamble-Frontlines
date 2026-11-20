@@ -6,34 +6,26 @@ to. U4f's brief stays the reference for the start and stops (u4f-brief.md sectio
 (section 4, :831-958), the pre-runs, judge calls, disk and bars (5.3-5.6, :997-1162), the end checks (section 6,
 :1163-1183) and the return list (section 7, :1187-1225). **Three questions are his, none a stop now** (section 8):
 U4H-Q4 (what -50's "honest twin" is), U4H-SIZE (split or not) and U4H-JUDGE (the judge's computations as their own
-change), all in the first day's message after this rev is checked and his U4G-Q1 answer is in (2026-11-22 at the
-earliest: advisor-u4h-brief.md:327-330).
+change), in the first day's message after this rev is checked and U4G-Q1 is answered (2026-11-22 at the earliest).
 
 **Rev 1 to rev 2** (the advisor's check, REVISE, one High: advisor-u4h-brief.md, 361 lines; its list :332-343):
-- Item 1, ADV-U4HB-1 (High): TC's own weapon (spread 0, a magazine and reload the shooter meets) and, mine beside it,
-  TC's health (CO's 100 kills the sprinting target every 10 hits: world.rs:1694-1701); header, test, crates/sim's lane
-  (1.2, 1.3, block 1, section 3).
-- Item 2, ADV-U4HB-2: the shot id, press-edge firing, reruns and refused presses counted, the contract case (block 6,
-  block 7, section 3). Item 3, ADV-U4HB-3, -4, -7: Q2, Q5, Q6 folded (blocks 2, 6, 7, 11-13; section 2).
-- Item 4, ADV-U4HB-5: the room-side wait cap stated with its two tests (block 2, section 3). Item 5, ADV-U4HB-6:
-  crates/sim's two pub items and A19's list by crate (1.4, block 1).
-- Item 6, ADV-U4HB-8, -9: section 6 recomputed item by item; section 8's three texts as the advisor wrote them, with
-  the recomputed figures; the judge's blocks a change of their own (J1-J3), the lag half's last block (9) keeping the
-  no-answer line. Item 7: rulings folded, one "Ruled" line each (section 8). Item 8: Lows -10 to -13 (Q1's figure,
-  1.1's second dependency, block 4, the disk table, block 6's frame wait, section 9's after-close line, -54's
-  "differs"). The register lines are the main session's, before launch: listed in section 9, u4s-carries.md untouched.
+- Item 1, ADV-U4HB-1 (High): TC's own weapon (spread 0, a magazine and reload the shooter meets), and, mine beside it,
+  TC's health (CO's 100 kills the sprinting target every 10 hits: world.rs:1694-1701): 1.2, 1.3, block 1, section 3.
+- Item 2, ADV-U4HB-2: the shot id, press-edge firing, reruns and refused presses: blocks 6-7, section 3. Item 3, -3, -4,
+  -7: Q2, Q5, Q6 folded: blocks 2, 6-8, 13, section 2. Item 4, -5: the wait cap, block 2, section 3. Item 5, -6: 1.4.
+- Item 6, -8, -9: section 6 recomputed; section 8's three texts with its figures; J1-J3 a change of their own; block 9
+  keeps the no-answer line. Item 7: one "Ruled" line each (section 8). Item 8, Lows: -10 the calibration's figure
+  (section 2); -11 Q10; -12 section 9; -13 block 4's hand-off, block 7's frame wait, Q1's figure, the disk table's
+  runs, 1.1's C2, section 9's after-close line, block 11's "differs". u4s-carries.md untouched: section 9 lists its lines.
 
 ## 0. Where things are
 - **`<base>`:** the spike branch's head at launch, after U4g's (or U4g2's) merge and its sets, filled by the main
   session in U4f's fill form (u4f-brief.md section 12, :1724); every count here is a delta on it. Every "there now"
   below was read at 33dabe8, whose spikes/ equals U4f2's base a289def (the advisor re-read it at f1a7f73: :22-23).
   U4f2, U4g and U4g2 open crates/room, client, bots, lab and sim before U4h, so those lines move and are re-read.
-- **Read, never retyped** (stamps refilled at `<base>`): u4-build-plan.md (§4.2 :223-254, §4.3 :263, §4.9 :374-389,
-  §4.14 :498, §4.15 :527-532, §5 U4h :903-918, §9 :1031-1035); plan.md (E11 :470, E12 :471, the PM rows :724, :729,
-  :742-746); u4s-carries.md (U4h's section :609-651); marks/marks.json (-7 :2646, -48 :9137, -49 :9441, -50 :9986, -51
-  :10111, -54 :10626, -56 :10745); marks/SERIES.md; u4f-brief.md; u4g-brief.md (rev 2.1); advisor-u4h-brief.md;
-  u4r-report.md; docs/adr/0001-multiplayer-netcode.md (PM-0001-50's row :1647); the catalogue's ClientSettings row
-  (docs/design/netcode-proof-messages.md:96).
+- **Read, never retyped** (stamps refilled at `<base>`): u4-build-plan.md, plan.md, u4s-carries.md (U4h's section
+  :609-651), marks/marks.json, marks/SERIES.md, u4f-brief.md, u4g-brief.md (rev 2.1), advisor-u4h-brief.md,
+  u4r-report.md, ADR 0001 (-50's row :1647), the catalogue's ClientSettings row (netcode-proof-messages.md:96).
 - **One cite drift for the main session's next plan edit (Low):** u4-build-plan.md:125 and :152 cite plan.md:696 for
   -7's sizing; the line is now plan.md:724.
 
@@ -220,10 +212,8 @@ marks.json's sha256 before and after (history.md:2127). Only U4h's judged sets w
   rejoining hostile client and no client restarted mid-run** (-50's cheats only stamp view times or hold pongs; -54's
   thrower is honest). 93 (:612-617); 28 (:618-619); 45 (:620-622); 81 (:623-628); 87 as amended (:629-635); 88
   (:636-643: Q3, the re-run above); 89 (:644-647: Q2's terms 2 and 4); 90 (:648-651: block 2).
-- **Outside the register, eight items** (section 9 lists them for the main session's carries edit), each met here:
-  N2-L3 (b) (block 5); INF-U4R-6 with INF-R2-2 (block 8, Q10); `pump_report`'s RTT (block 4); EA-U4R-4 and EA-B1-1's
-  later half (1.4); SERIES.md:396's writer cell (Q7's edit); `cross_arch_mismatch_count`'s two kinds (J2); JDG-ONLY-1
-  (J3); TC's weapon (block 1).
+- **Outside the register, eight items**, each met here (block 5, block 8, block 4, 1.4, Q7's edit, J2, J3, block 1);
+  section 9 lists them for the main session's carries edit before launch.
 - **Already taken elsewhere:** N2-1, EA-U4R-1 and -2, RR4-L1 (BRAWL-1's Part 1: u4r-report.md:275-280); T-6 (U4f2);
   npt-server's tests compiling (U4f; still end check item 4); the 1 MB bound (carry 43, U4d's). RR-5's encode-path wins
   (advisor-u4e-r1.md:211-217) are not taken: U4h does not edit the encode path.
