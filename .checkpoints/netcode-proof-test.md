@@ -167,12 +167,13 @@
   2 all 11 pass, 642 / 739 (+8); 239 of 300; snapshot d0a66a68… (6 files); departures: FP-4 through the World, seam.rs
   restored to its post-FP-1 hash 901bb546…, a rustfmt layout. **Part-clean 2** (01:45: 3,865 -> 10,574 MiB). **The
   advisor's check of the pass: APPROVE WITH CONDITIONS** (advisor-u4f-f1-pass.md, 201 lines: merge, no round 2; its
-  Lows ADV-U4FF1P-1 to -4 fixed in the records). **U4f-F1 MERGED at 1faf894** (pushed 02:15 UTC): the snapshot applied
+  Lows ADV-U4FF1P-1 to -4 fixed in the records). **U4f-F1 MERGED at 1faf894** (pushed 02:14:10 UTC): the snapshot applied
   on ba3fa68 (`git diff HEAD -- spikes/` = d0a66a68…, 6 files, +239 -24); gate --no-smoke PASS
   (.gate/u4f-f1-merge/gate.txt); M5 check.mjs all 11 steps pass, 642 / 739, wasm 0 mismatches, marks 81 unchanged
-  (.gate/u4f-f1-merge/m5-check.log, 01:56-02:13:49 UTC). **Part-clean 3** (02:15: dev 5.3 GiB and the rest; 10,570
-  MiB free). **CI green on 1faf894** (check suite completed 02:18 UTC, none running or failed). **Running:** the
-  advisor's head check (advisor-u4f-f1-head.md). **Then -20's L1 re-run**
+  (.gate/u4f-f1-merge/m5-check.log, 01:54:18-02:13:49 UTC). **Part-clean 3** (02:15: dev 5.3 GiB and the rest; 10,570
+  MiB free). **CI green on 1faf894** (gate, smoke, toolchain). **The advisor's head check APPROVE WITH FINDINGS**
+  (advisor-u4f-f1-head.md: -1 the commit message says "(APPROVE)" for the pass check, APPROVE WITH CONDITIONS, fixed in
+  F1's report; -2 two times, fixed here); the run's spike tree must be named equal to 1faf894's. **-20's L1 re-run**
   (`c-u4f-runs.mjs 20`) from the head, compared tick by tick with 350677f's kept logs (advisor-u4f-f1-plan.md:119-140).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
