@@ -403,3 +403,17 @@
   and `cat` on .gate/u4f/ logs, worktree_patch.py and bots clippy.toml) where the rules ask the Read and Grep tools;
   one `git -C` refused by the guard and re-run plainly. Every write was by Edit; no shell write, no `cargo fmt` write,
   nothing cleaned or deleted, nothing committed.
+
+### Part A2: F-G and the early runs (advisor-u4f2-parta.md, read whole)
+- Rules from that ruling: one plant at a time (restore, hash, then the next); logs read with the Read and Grep tools;
+  the advisor's stop now past 2,800 added at an FP or fix end, Mustafa's past 3,000 stands; the runner's floor stops.
+- **F-G: DONE.** bots lib.rs `forger`: kind 7 taken only when `every > r` (4 at 30 Hz, 6 at 60 Hz); its doc and the
+  kind-7 constant's doc say why (the forged command is then no rest and holds fire, so a revived soldier fires by the
+  held trigger, as the twin does). The lab's usage error reads "--forge-every N: kind K's forger refuses it (kind 7
+  needs an interval above its rest, R)". fp3: `[rest - 1, rest, rest + 1]` give `[false, false, true]` ("2 and 3
+  refused at 30 Hz", 4 taken); f15's kind-7 case runs at `rest + 1` (its rested count unchanged); c_u4f2_1's run at 2
+  expects the new message, its parse at 2 still taken (the floor of 2 unchanged). u4f2-fg-tests2.log: fmt exit 0;
+  bots fp3 + f15 x 12 + T-K7: 14 PASS (1.83 s); c_u4f2_1 PASS 4.26 s.
+- F-G's plant (the old `every >= r`): u4f2-fg-plant.log, fp3 FAILS by name at lib.rs:1631, "2 and 3 refused at 30
+  Hz", left [false, true, true]. Restored by Edit, c99a6e0a… equal (clean scenario.rs 501d7984…).
+- SIZE-CHECK after F-G: +2,144 -190 tracked; forged.rs 422: about 2,566 added (+4).
