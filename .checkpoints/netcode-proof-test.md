@@ -68,18 +68,11 @@
   or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
   brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
   with its source before its first snapshot). -21 is judged only after U4f2.
+- **The advisor's -20 ruling** (ADV-U4F20-1 High: npt-sim's one-edge rule; fix U4f-F1, -20 re-run) and U4f-F1's
+  build line: history.md:7195-7206 (card_trim_1120d.py).
 - **-20 and -22 DONE, all three sets run** (records at history.md:7124-7146, card_trim_1119k.py; u4f-report.md items
   5-6): -20 at 350677f (1840e68): PM-0001-2 PASS; PM-0001-20 A PASS, B FAIL "0 presses lost" 3/1/2; overflow 0;
   high-water 1,117 (margin 1.43). -22 at 7192607 (2dae645): PM-0001-22 PASS, bite shown, load report as designed.
-- **The advisor's -20 ruling** (advisor-u4f-20.md, 170 lines, read in full): the count is honest, the cause is the
-  stand-in: **ADV-U4F20-1 High**, npt-sim's one-edge rule (sim/src/world.rs:1340-1346, U4d's) loses a press that ADR
-  0001 part 5 keeps (:226, :234-237) once U4f's kind 5 (room/src/input.rs:285-300) accepts a 2-edge command after late
-  drops; fix: every edge taken through its checks, the room's count from the same rule, two tests; **-20's L1 set
-  re-runs on the fixed commit** (that verdict is -20's record; 350677f's folder the defect's). **-22 stands**; 1,600
-  stands (no honest overflow resync); margin 1.43 named for U4g. **ADV-U4F20-2 Medium:** marks.json's reorder report
-  row (:4786-4790; -58's :4263-4267) reads a header param L1 never writes: his, "After the close". ADV-U4F20-3 Low: in
-  the report. The OQ-0001-6 reading: the B FAIL is not evidence against (b); -20 separates the options by buffer depth
-  only. The set reports for -20 and -22 are in u4f-report.md ("After the merge", items 5-6).
 - **U4f-F1** (its own step before U4f2: U4FF1-Q3 ruled so): plan u4f-f1-plan.md rev 1.1 (size S, about 60-150, stop
   past 300); **the advisor's plan review APPROVE WITH CONDITIONS 1-10** (advisor-u4f-f1-plan.md, read in full: the
   four counters in today's order, one shot per command, the fn's contract, T1/T2 with plants, the re-run compared tick
@@ -152,8 +145,6 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **U4f-F1 BUILT** (00:0x UTC; 37d87a10…, 205 of 300): `edges_taken` seam.rs:78; T1 commands.rs:618; T2
-  sim/tests/world.rs:1813-1920; plants by name; check.mjs x2 all 11 pass, 641 / 738 (f1-b4-check1/2.log, read).
 - **U4f-F1's round CLOSED** (four seats APPROVE WITH FINDINGS: u4f-f1-review-<seat>.md; **the advisor's ruling
   APPROVE WITH CONDITIONS FP-1 to FP-5**, advisor-u4f-f1-r1.md, 266 lines, read in full; no round 2, its check of the
   pass instead): TE-F1-1 = NC-F1-1 keep the code, bind the wording ("0 presses lost" holds by design, as "doubled" did;

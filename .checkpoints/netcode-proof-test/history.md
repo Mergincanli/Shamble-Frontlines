@@ -7191,3 +7191,16 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   it instead. Why: inside the plan, undoable, no pass mark, judge file, marks.json or existing SERIES.md row changes.
 - **2026-11-19 (to name in the next day's message):** main f5030a3 taken in now, while builder 4 runs, plan first
   (MAIN-61; advisor-main-61.md C1-C6). Why: his MAIN-52 rule; inside the plan, undoable; nothing on main changes.
+
+## Card blocks moved 2026-11-20 during -20's re-run (card_trim_1120d.py; from 'Now: U4f' and 'Running work')
+- **The advisor's -20 ruling** (advisor-u4f-20.md, 170 lines, read in full): the count is honest, the cause is the
+  stand-in: **ADV-U4F20-1 High**, npt-sim's one-edge rule (sim/src/world.rs:1340-1346, U4d's) loses a press that ADR
+  0001 part 5 keeps (:226, :234-237) once U4f's kind 5 (room/src/input.rs:285-300) accepts a 2-edge command after late
+  drops; fix: every edge taken through its checks, the room's count from the same rule, two tests; **-20's L1 set
+  re-runs on the fixed commit** (that verdict is -20's record; 350677f's folder the defect's). **-22 stands**; 1,600
+  stands (no honest overflow resync); margin 1.43 named for U4g. **ADV-U4F20-2 Medium:** marks.json's reorder report
+  row (:4786-4790; -58's :4263-4267) reads a header param L1 never writes: his, "After the close". ADV-U4F20-3 Low: in
+  the report. The OQ-0001-6 reading: the B FAIL is not evidence against (b); -20 separates the options by buffer depth
+  only. The set reports for -20 and -22 are in u4f-report.md ("After the merge", items 5-6).
+- **U4f-F1 BUILT** (00:0x UTC; 37d87a10…, 205 of 300): `edges_taken` seam.rs:78; T1 commands.rs:618; T2
+  sim/tests/world.rs:1813-1920; plants by name; check.mjs x2 all 11 pass, 641 / 738 (f1-b4-check1/2.log, read).
