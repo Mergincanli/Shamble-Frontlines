@@ -359,3 +359,16 @@ My lean, and the advisor's: (b). Only U4h's judged runs wait for it.
 
 ## For Mustafa
 Nothing now from this check: the three questions ride a later day's message, after rev 2.
+
+## Rev 2 check
+### Plan
+1. Read u4h-brief.md rev 2 whole (its change list first) and the notes' "## Rev 2" block.
+2. Check sections 1-4, 6 and 8 against my list (:299-311 of this file), section 9's eight register items, and the
+   drafter's added change (TC's own health) against world.rs.
+3. Rule the two open points: (a) Q6's stand-in source (a scene builder in crates/sim or TC's own data); (b) SERIES.md:211's
+   writer cell.
+4. Check the new cites and figures (the wait cap, section 6's sums, section 8's texts).
+5. Verdict, findings ADV-U4HB-14 on, the texts' finality and day, the eight register lines word for word.
+
+### Notes (as I go)
+
