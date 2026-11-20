@@ -173,8 +173,9 @@
   (.gate/u4f-f1-merge/m5-check.log, 01:54:18-02:13:49 UTC). **Part-clean 3** (02:15: dev 5.3 GiB and the rest; 10,570
   MiB free). **CI green on 1faf894** (gate, smoke, toolchain). **The advisor's head check APPROVE WITH FINDINGS**
   (advisor-u4f-f1-head.md: -1 the commit message says "(APPROVE)" for the pass check, APPROVE WITH CONDITIONS, fixed in
-  F1's report; -2 two times, fixed here); the run's spike tree must be named equal to 1faf894's. **-20's L1 re-run**
-  (`c-u4f-runs.mjs 20`) from the head, compared tick by tick with 350677f's kept logs (advisor-u4f-f1-plan.md:119-140).
+  F1's report; -2 two times, fixed here). **-20's L1 re-run RUNNING** from about 02:22 UTC (`c-u4f-runs.mjs 20 --date
+  2026-11-20`, at 96de6ac, spike tree d4f6cd41… = 1faf894's; saver bhdijr3a1), to compare with 350677f's kept logs by
+  scratchpad compare_20.py (advisor-u4f-f1-plan.md:119-140).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
