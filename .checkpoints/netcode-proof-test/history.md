@@ -7165,3 +7165,11 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   (advisor-u4f-r2.md: 14 of 17 as expected; p4, p13, p19 to U4f2 as C-U4F2-5 to -7); the part-clean (D2 5,204 ->
   11,552 MiB); **-47 PASS** (p99 2.597 / 2.516 / 2.638 ms against 5; both bites shown; a4cac39). Builders 1-4's
   worktrees kept until the sets end (then LEFTOVER-DELETE).
+
+## Card blocks moved 2026-11-20 after the 01:01 restart's record (card_trim_1120b.py; from 'Cuts')
+- **2026-11-19 23:18:18 to about 23:22 UTC (a container restart: U4f-F1's builder and the saver):** "The container was
+  restarted. The following background tasks were running and are now stopped: - Restart the background checkpoint
+  saver (task bdhc8uudx) - Build U4f-F1 in a worktree (task ad5f72ed146da5f93) Re-create them if still needed." (the
+  system's notice; the container up from 23:18:27 by /proc/uptime; the builder's last transcript entry 23:18:18.152Z).
+  Checked at 23:21: the builder's worktree at cb7e374 (its step 0 done), `git status` empty, no notes, no f1-* log, no
+  cargo or npt-* process: no half edit, no plant. The saver restarted; the builder resumed by SendMessage.

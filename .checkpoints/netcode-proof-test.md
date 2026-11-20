@@ -193,13 +193,7 @@
   needed." (up since 01:01:16 by /proc/uptime). Checked at 01:04: FP-2 to FP-4 run with their plants restored (seam.rs
   901bb546…4c90, the post-FP-1 hash; world.rs 4a4e138c…), no plant left, no process; f1-b5-check1.log cut at 00:56;
   7,528 MiB free. The saver restarted; the builder resumed by SendMessage to re-run check.mjs twice.
-- **2026-11-19 23:18:18 to about 23:22 UTC (a container restart: U4f-F1's builder and the saver):** "The container was
-  restarted. The following background tasks were running and are now stopped: - Restart the background checkpoint
-  saver (task bdhc8uudx) - Build U4f-F1 in a worktree (task ad5f72ed146da5f93) Re-create them if still needed." (the
-  system's notice; the container up from 23:18:27 by /proc/uptime; the builder's last transcript entry 23:18:18.152Z).
-  Checked at 23:21: the builder's worktree at cb7e374 (its step 0 done), `git status` empty, no notes, no f1-* log, no
-  cargo or npt-* process: no half edit, no plant. The saver restarted; the builder resumed by SendMessage.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
   one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
-  and the session) and the choices of 2026-11-18 and of 11-19 named that day at history.md:7148-7160 (card_trim_1119l.py).
+  and the session) and the 11-18/11-19 choices at :7148-7160 (1119l); the 23:18 restart at :7169-7175 (1120b).
