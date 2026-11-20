@@ -75,3 +75,16 @@
   `twin_left_out_count` and `forge_unencodable_count` on the forged suite. Two new SERIES.md rows. f33's 13 + Q4 + C-U4F2-10
   in forged.rs. u4f2-b4-t.log: npt-room all passed (24+1+27+19), lab 18 passed (15 forged:: + f22 x2 + f23).
   SIZE-CHECK: +1100 -110 tracked, + forged.rs 320 new = 1,420 added.
+- Block 5 DONE (the twins in the lab, C-U4F2-2): the twins themselves are block 2's bots half (role twin -> `twin()`,
+  kind 10's and kind 3's rows) and block 3's wiring; the clamp twins' `--twin-logs` stands (U4f's). New:
+  client/tests/endpoint.rs `c_u4f2_2_skip_command_uses_the_index_and_stamp_and_sends_nothing` (+1 extra): before the
+  join nothing, joined index used and nothing sent, an unacknowledged copy left out and counted. `twin_left_out`'s doc
+  already names both causes (FP1); its row (both causes) is block 4's. u4f2-b5-t.log: 1 passed.
+- Block 6 DONE (f16, with f22, f23, f33 from blocks 3-4): `Summary::fates` (test builds only: each fate entry's first
+  32 canonical bytes), f16(suite, kind, timing) + its 24 tests on the shared pairs: fates entry by entry, snapshot
+  datagrams, room-log tick hashes, every tick's state hash, no command left out, no forged `Input` unencodable, the
+  kind's forged_kind (measured >= 1; kind 10 >= 8 A / 4 B), unrejected 0, refusals dropped 0, the forger's link alike;
+  clamp: clamp_kind sent >= 1, counted 0. C-U4F2-1's proof: f16 kinds 2 and 5 at the judged interval 12, steady, P0,
+  Room<World>: 13 items each, unrejected 0. u4f2-b6-t.log: 24 passed in 66.18 s (8 runs). Per-kind items at 2+4 s:
+  13 (kinds 1-6, 8, 9, 11; 9 measured), kind 7 11 (7), kind 10 8 A / 12 B (8).
+  SIZE-CHECK: +1339 -110 tracked + forged.rs 320 = 1,659 added.

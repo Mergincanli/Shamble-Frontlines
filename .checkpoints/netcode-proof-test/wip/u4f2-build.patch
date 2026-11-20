@@ -880,6 +880,58 @@ index b40d2dd..4dc40cd 100644
      }
  
      /// The judged runs' first tick (the run scripts' `--tick-start 63736`).
+diff --git a/spikes/netcode-proof/crates/client/tests/endpoint.rs b/spikes/netcode-proof/crates/client/tests/endpoint.rs
+index 5690535..d1c68fd 100644
+--- a/spikes/netcode-proof/crates/client/tests/endpoint.rs
++++ b/spikes/netcode-proof/crates/client/tests/endpoint.rs
+@@ -487,6 +487,47 @@ fn brawl1_own_soldier_compares_ticks_by_the_endpoint_s_wrap_rule() {
+     );
+ }
+ 
++/// The commands of a step's `Input`s, newest first.
++fn sent(out: &StepOut) -> Vec<Command> {
++    out.datagrams
++        .iter()
++        .filter_map(|d| match decode(Direction::ClientToRoom, Channel::Datagram, d) {
++            Ok(Message::Input(i)) => Some(i.commands),
++            _ => None,
++        })
++        .flatten()
++        .collect()
++}
++
++/// C-U4F2-2 (EA-U4F-1's built-ahead `skip_command`, the twin's skip: U4F-Q13 (b)): before the join it does nothing;
++/// joined (a fixed lead of 2), it uses the next command's sequence index and stamp and sends nothing for them, so the
++/// next command takes the index after and the stamp the lead gives; an unacknowledged older copy leaves the `Input`s
++/// (the sequences stay consecutive), counted in `twin_left_out`; with no copy held a skip leaves out nothing.
++#[test]
++fn c_u4f2_2_skip_command_uses_the_index_and_stamp_and_sends_nothing() {
++    let mut e = endpoint().with_lead(2);
++    e.skip_command();
++    let mut e = joined(e, 10);
++    e.skip_command();
++    e.input(Some(Command::default()), &[], 0);
++    let first = sent(&e.step());
++    assert_eq!(
++        first.iter().map(|c| (c.seq, c.tick)).collect::<Vec<_>>(),
++        [(1, 12)],
++        "the pre-join skip did nothing; the joined skip used index 0"
++    );
++    assert_eq!(e.twin_left_out(), 0, "no copy held");
++    e.skip_command();
++    assert_eq!(e.twin_left_out(), 1, "the unacknowledged command 1 left out");
++    e.input(Some(Command::default()), &[], 0);
++    let next = sent(&e.step());
++    assert_eq!(
++        next.iter().map(|c| (c.seq, c.tick)).collect::<Vec<_>>(),
++        [(3, 12)],
++        "index 2 used and never sent; only command 3 rides"
++    );
++}
++
+ /// npt-client's planted defects (bites builds only), each in wave 1's two parts: a bites-only twin asserting the clean
+ /// test's check fails on the bitten endpoint.
+ #[cfg(feature = "bites")]
 diff --git a/spikes/netcode-proof/crates/lab/src/main.rs b/spikes/netcode-proof/crates/lab/src/main.rs
 index dcd2e4e..85e69ae 100644
 --- a/spikes/netcode-proof/crates/lab/src/main.rs
@@ -893,7 +945,7 @@ index dcd2e4e..85e69ae 100644
  mod logs;
  mod machine;
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
-index 7f54e46..52b989d 100644
+index 7f54e46..9dc863c 100644
 --- a/spikes/netcode-proof/crates/lab/src/scenario.rs
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
 @@ -48,6 +48,7 @@ use npt_sim::replay::Recording;
@@ -922,7 +974,19 @@ index 7f54e46..52b989d 100644
      pub(crate) record: Option<PathBuf>,
      pub(crate) bytes: Option<PathBuf>,
      /// Whether the run writes its logs (`false`: a runner recording regenerated inside `npt-lab hash`).
-@@ -1204,10 +1209,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1100,6 +1105,11 @@ pub(crate) struct Summary {
+     pub(crate) order_digest: u64,
+     /// A bite run whose after phase reached its cap with measured ticks unresolved (carry 73).
+     pub(crate) after_capped: bool,
++    /// f16's view of the fate log (test builds only): each entry's canonical first 32 bytes (link, direction, flow,
++    /// outcome, overtaken flag, index in its flow, send time and arrival), its size, resends and stream fields left out
++    /// (TE3-5: -21's twins differ in size by design).
++    #[cfg(test)]
++    pub(crate) fates: Vec<[u8; 32]>,
+ }
+ 
+ fn sha256_hex(bytes: &[u8]) -> String {
+@@ -1204,10 +1214,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          bound: i64::from(server.room.lead_bound().1),
          ..FastClock::default()
      });
@@ -937,7 +1001,7 @@ index 7f54e46..52b989d 100644
              _ => endpoint_of(s, slot),
          };
          let behaviour = if s.suite == "clock" {
-@@ -1248,6 +1257,16 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1248,6 +1262,16 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          } else if fast_from.is_some() && slot == 0 {
              // A command at every step, its lane's walk, its stamps by U4F-Q11 (v) (b) as F1 amends it.
              Behaviour::fast_clock(&scene, slot, s.seed, server.room.lead_bound().1)
@@ -954,7 +1018,7 @@ index 7f54e46..52b989d 100644
          } else {
              behaviour
          };
-@@ -1316,6 +1335,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1316,6 +1340,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      let last_measured = logs.wide(s.tick_start.wrapping_add((measured_end.max(1) - 1) as u32));
      let mut events_stamped: u64 = 0;
      let mut clamp = ClampTally::default();
@@ -966,7 +1030,7 @@ index 7f54e46..52b989d 100644
      let mut inputs: Vec<i64> = Vec::new();
      // The link-lost-overstated bite: the slots whose record it has written (bites builds only).
      #[cfg(feature = "bites")]
-@@ -1407,6 +1431,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1407,6 +1436,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                      .refused
                      .extend(rep.refusals.iter().filter(|x| x.slot == 0).map(|x| x.seq));
              }
@@ -977,7 +1041,7 @@ index 7f54e46..52b989d 100644
              // -21's fast clock: slot 0's episode sums, each episode's record at its end (lab log).
              if let Some(f) = fast.as_mut() {
                  let me = records
-@@ -1522,6 +1550,21 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1522,6 +1555,21 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  .world_hashes
                  .push((t, npt_sim::SimCore::state_hash(server.room.sim())));
              k += 1;
@@ -999,7 +1063,7 @@ index 7f54e46..52b989d 100644
              if k == s.warmup_ticks && s.suite != "clock" {
                  for c in &clients {
                      if !logs.started(c.slot) {
-@@ -1596,6 +1639,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1596,6 +1644,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              }
              let mut out = c.endpoint.step();
              c.behaviour.outgoing(host, &mut out.datagrams);
@@ -1011,7 +1075,22 @@ index 7f54e46..52b989d 100644
              for held in c.behaviour.take_bursts() {
                  let mut e = EventRecord::new("lag_burst", phase(k))
                      .with("slot", c.slot)
-@@ -1725,6 +1773,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1695,6 +1748,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+     }
+     summary.ticks = k;
+     summary.fate_log_sha256 = fate_sha256(&net);
++    #[cfg(test)]
++    net.with_fate_log(|l| {
++        l.for_each_canonical(|b| {
++            if let Some(head) = b.get(..32).filter(|_| b.len() >= 40) {
++                summary.fates.push(head.try_into().expect("32 bytes"));
++            }
++        });
++    });
+     let mut last = Vec::new();
+     for c in &mut clients {
+         if let Some(w) = c.bytes_log.as_mut() {
+@@ -1725,6 +1786,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              )
              .with("lead_now_count", c.endpoint.lead_now().unwrap_or(-1))
              .with("unknown_pongs_count", c.endpoint.unknown_pongs());
@@ -1026,7 +1105,7 @@ index 7f54e46..52b989d 100644
          // 2.5 (SA-5): the room's refusal fields, and the live session's pump counters, at the stop.
          let d = server.session(c.slot).map(|x| x.decoder.counters().clone());
          let mut e = counts(e, Some(&k), d.as_ref());
-@@ -1744,6 +1800,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1744,6 +1813,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  .with("rerun_reports_count", clamp.reruns),
          );
      }
@@ -1037,7 +1116,7 @@ index 7f54e46..52b989d 100644
      // D3-1 (f40): the run's measured reorder share from npt-l1's fate log, as the -3 probe computes it (main.rs's
      // `permille`): each direction's reordered x 1000 / delivered, floored; `permille` the lower of the two.
      let [up, down] = net.with_fate_log(|l| l.reorder_counts());
-@@ -1946,6 +2006,9 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1946,6 +2019,9 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
              p.insert("fast_clock_idle_ns".into(), s.fast_idle_ns.into());
          }
      }
@@ -1047,7 +1126,7 @@ index 7f54e46..52b989d 100644
      if s.suite == "clock" {
          p.insert("connects_count".into(), s.connects.into());
      } else {
-@@ -1990,7 +2053,7 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
+@@ -1990,7 +2066,7 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
  [--every-step 1] [--lead <1..8>] [--logs 0 (with --record)] [--cmd-timing A|B] [--controller 0|1] \
  [--brawl-press-every <n> (the brawl)] [--event-cap <n>] [--connects <n> (with --suite clock)] \
  [--twin-logs <folder> (the clamp twin)] [--fast-clock-episode-s <s>] [--fast-clock-idle-s <s>] (with --suite fast-clock) \
@@ -1056,7 +1135,7 @@ index 7f54e46..52b989d 100644
  
  /// B1's burst starts (u4r-brief.md 7.1, -18's row): `count` bursts, the first `first_s` after the measured phase's
  /// first tick and one every `every_s`, each starting a seeded offset in [0, 1 tick) after its tick boundary.
-@@ -2155,6 +2218,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -2155,6 +2231,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
      if (suite == "clock") != (connects > 0) {
          return Err("--suite clock and --connects <n> (from 1) go together".to_owned());
      }
@@ -1077,7 +1156,7 @@ index 7f54e46..52b989d 100644
      let event_cap = take("event-cap")
          .map(|v| {
              v.parse::<u32>()
-@@ -2299,6 +2376,7 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -2299,6 +2389,7 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
          lag_every_ms,
          fast_episode_ns: fast_episode_s * SEC,
          fast_idle_ns: fast_idle_s * SEC,
@@ -1085,7 +1164,7 @@ index 7f54e46..52b989d 100644
          record,
          bytes,
          logs,
-@@ -3994,36 +4072,77 @@ pub(crate) mod tests {
+@@ -3994,36 +4085,77 @@ pub(crate) mod tests {
          );
      }
  
@@ -1185,7 +1264,7 @@ index 7f54e46..52b989d 100644
              .events
              .iter()
              .filter(|e| {
-@@ -4036,10 +4155,21 @@ pub(crate) mod tests {
+@@ -4036,10 +4168,21 @@ pub(crate) mod tests {
              (f("counted_count"), f("rerun_reports_count")),
              (Some(0), Some(0))
          );
@@ -1211,7 +1290,7 @@ index 7f54e46..52b989d 100644
      }
  
      /// f20 (2.6; U4F-Q15 (c); A1) and f28's lag-switch half: a short lag-switch run at P1 (16 clients, 2 s + 6 s, option
-@@ -4056,13 +4186,7 @@ pub(crate) mod tests {
+@@ -4056,13 +4199,7 @@ pub(crate) mod tests {
          );
          assert_eq!(crate::logs::moved_um(alive(0, 0), alive(5_000, 100)), None);
          assert_eq!(crate::logs::moved_um(alive(0, 100), alive(10, 0)), None);
@@ -1226,7 +1305,7 @@ index 7f54e46..52b989d 100644
          let held: Vec<u64> = read(&dir, "lab")
              .events
              .iter()
-@@ -4081,9 +4205,119 @@ pub(crate) mod tests {
+@@ -4081,9 +4218,304 @@ pub(crate) mod tests {
          assert!(most("lagswitch_cmds_count").is_some_and(|m| (1..=cap).contains(&m)));
          assert!(most("lagswitch_excess_move_um").is_some_and(|m| m <= 0));
          let logs = crate::contract::read(&dir).expect("its logs");
@@ -1346,6 +1425,191 @@ index 7f54e46..52b989d 100644
 +        assert_eq!((n("kicked_count"), n("pump_stream_malformed_count")), (0, 0));
 +        let ends = logs[2].events.iter().filter(|e| e.ev == "session_end");
 +        assert_eq!(ends.count(), 0, "every session kept");
++    }
++
++    /// One lab-log record's field as a number.
++    fn num(e: &npt_log::EventRecord, k: &str) -> u64 {
++        e.f.get(k).and_then(|v| v.as_u64()).unwrap_or_else(|| panic!("{k}"))
++    }
++
++    /// f16 (TE3-5, TE31-5; 2.12; C-U4F2-1 at the judged interval for kinds 2 and 5), one kind (`suite` forged: 1 to 11
++    /// on slot kind - 1; `clamp`: slot 0) under option `timing`, on the short pair (2.10's scale, P0): the run and its
++    /// twin give equal fate logs entry by entry (link, direction, flow, outcome, overtaken flag, index in its flow, send
++    /// time and arrival; size and resends left out), the first difference named; equal snapshot datagram counts; the
++    /// same ticks hashed to the same hashes in the room log and in every tick's state hash; every endpoint left out no
++    /// command and every forged `Input` encodes; and the pair carries its kind: inside the measured window at least one
++    /// forged item (kind 10: one whole episode, 8 under A, 4 under B; the clamp: one point beyond reach), none of them
++    /// unrejected, no refusal record dropped, and the forger's own link's entries in both runs alike.
++    fn f16(suite: &'static str, kind: u8, timing: &'static str) {
++        let [run, twin] = pair(suite, timing);
++        let (a, b) = (&run.sum.fates, &twin.sum.fates);
++        if let Some(i) = (0..a.len().min(b.len())).find(|&i| a[i] != b[i]) {
++            panic!("{suite} {kind} {timing}: fate entry {i} differs: {:?} / {:?}", a[i], b[i]);
++        }
++        assert_eq!(a.len(), b.len(), "{suite} {kind} {timing}: fate entries");
++        assert_eq!(run.sum.link_sent, twin.sum.link_sent, "snapshot datagrams");
++        let hashes = |r: &Ran| -> Vec<(u64, Option<String>)> {
++            r.logs[0].ticks.iter().map(|t| (t.t, t.h.clone())).collect()
++        };
++        assert_eq!(hashes(run), hashes(twin), "the ticks hashed and their hashes");
++        if let Some(t) = run
++            .sum
++            .world_hashes
++            .iter()
++            .zip(&twin.sum.world_hashes)
++            .find(|(x, y)| x != y)
++        {
++            panic!("{suite} {kind} {timing}: the first state hash that differs: {t:?}");
++        }
++        let slot = if suite == "clamp" { 0 } else { kind - 1 };
++        let link = |f: &[[u8; 32]]| f.iter().filter(|e| e[..4] == u32::from(slot).to_le_bytes()).count();
++        assert!(link(a) > 0 && link(a) == link(b), "the forger's link alike");
++        if suite == "clamp" {
++            let k = run.logs[2].events.iter().find(|e| e.ev == "clamp_kind").expect("clamp_kind");
++            assert!(num(k, "sent_count") >= 1 && num(k, "counted_count") == 0);
++            return;
++        }
++        for r in [run, twin] {
++            for e in r.logs[2].events.iter().filter(|e| e.ev == "client_counts") {
++                let k = ["twin_left_out_count", "forge_unencodable_count", "unencodable_commands_count"];
++                assert_eq!(k.map(|k| num(e, k)), [0; 3], "slot {}", num(e, "slot"));
++            }
++        }
++        let f = run.logs[2]
++            .events
++            .iter()
++            .find(|e| e.ev == "forged_kind" && num(e, "kind") == u64::from(kind))
++            .expect("its forged_kind record");
++        println!("u4f2 f16 {kind} {timing}: {:?}", f.f);
++        let least = match (kind, timing) {
++            (10, "A") => 8,
++            (10, _) => 4,
++            _ => 1,
++        };
++        assert_eq!(num(f, "slot"), u64::from(slot));
++        assert!(num(f, "measured_sent_count") >= least && num(f, "sent_count") >= least);
++        assert_eq!((num(f, "unrejected_count"), num(f, "refusals_dropped_count")), (0, 0));
++        assert!(!twin.logs[2].events.iter().any(|e| e.ev == "forged_kind"), "a twin forges nothing");
++    }
++
++    #[test]
++    fn f16_option_a_kind_1_and_its_twin_match() {
++        f16("forged", 1, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_1_and_its_twin_match() {
++        f16("forged", 1, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_2_and_its_twin_match() {
++        f16("forged", 2, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_2_and_its_twin_match() {
++        f16("forged", 2, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_3_and_its_twin_match() {
++        f16("forged", 3, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_3_and_its_twin_match() {
++        f16("forged", 3, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_4_and_its_twin_match() {
++        f16("forged", 4, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_4_and_its_twin_match() {
++        f16("forged", 4, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_5_and_its_twin_match() {
++        f16("forged", 5, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_5_and_its_twin_match() {
++        f16("forged", 5, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_6_and_its_twin_match() {
++        f16("forged", 6, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_6_and_its_twin_match() {
++        f16("forged", 6, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_7_and_its_twin_match() {
++        f16("forged", 7, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_7_and_its_twin_match() {
++        f16("forged", 7, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_8_and_its_twin_match() {
++        f16("forged", 8, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_8_and_its_twin_match() {
++        f16("forged", 8, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_9_and_its_twin_match() {
++        f16("forged", 9, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_9_and_its_twin_match() {
++        f16("forged", 9, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_10_and_its_twin_match() {
++        f16("forged", 10, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_10_and_its_twin_match() {
++        f16("forged", 10, "B");
++    }
++
++    #[test]
++    fn f16_option_a_kind_11_and_its_twin_match() {
++        f16("forged", 11, "A");
++    }
++
++    #[test]
++    fn f16_option_b_kind_11_and_its_twin_match() {
++        f16("forged", 11, "B");
++    }
++
++    #[test]
++    fn f16_option_a_the_clamp_and_its_twin_match() {
++        f16("clamp", 0, "A");
++    }
++
++    #[test]
++    fn f16_option_b_the_clamp_and_its_twin_match() {
++        f16("clamp", 0, "B");
      }
  
      /// f37 (TE3-6, TE31-10): the lab's own episode function at the judged settings (a 10 s warm-up, 610 s measured)
