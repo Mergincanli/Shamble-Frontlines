@@ -172,7 +172,10 @@
   lost check). Saver bh2qi25le from 04:12 UTC. **F1's report written** (u4f-f1-report.md: FP-5 (i)-(v), ADV-U4FF1H-1's
   correction, SA-F1-1 open) and **-20's L1 record** (u4f-report.md item 5's end, the same lines). **Condition 10 done:
   u4f2-brief.md rev 1.2** (base 1faf894, counts 642/739, C-U4F2-9 and -10, T1's `npt_sim::Refusal` beside C-U4F2-3;
-  no new check by :224-225). Next: the advisor reads the -20 record and F1's report (its condition 3), then F1 closes.
+  no new check by :224-225). **Running from 04:20 UTC:** the advisor's read of the -20 record and F1's report (its
+  condition 3; out: advisor-u4f-f1-close.md), then F1 closes; and **U4g's brief, draft rev 1** by a drafter (notes
+  u4g-brief-notes.md, draft u4g-brief.md; to the advisor before U4g's build, which follows U4f2). Main still f5030a3
+  (fetched 04:19); 10,124 MiB free.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
