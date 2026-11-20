@@ -173,8 +173,12 @@
   (check.mjs twice). The advisor's stop past 2,700 added at an FP end; his past 3,000. About four part-cleans (P27's
   second form, no lane running). **msg-2026-11-21.md drafted** (F-B-COUNT, a stop; U4G-Q1, not a stop; three
   choices): send it at the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx). **While his Advisor answers
-  (KEEP-PROGRESSING, about two days):** U4h's brief drafter RUNNING from ~21:45 UTC (netcode-architect, xhigh; out
-  u4h-brief.md rev 1 and u4h-brief-notes.md; then the advisor's check); U4g's build only after U4f2's merge
+  (KEEP-PROGRESSING, about two days):** **U4h's brief rev 1 DONE ~21:59** (u4h-brief.md, 296 lines, read
+  :192-297; notes u4h-brief-notes.md; saved 5e0f6d0): whole about 2,800-5,200 (about even to pass 6,000 at 1.5), a
+  split U4h/U4h2 offered; U4H-Q1 to Q12 for the advisor; **U4H-SIZE and U4H-JUDGE (the judge gains four planned
+  figures) are his**, neither a stop now (a later day's message, after the advisor's check); three items sent to U4h
+  never reached the register (N2-L3 (b), INF-U4R-6 with det-u4's 240 s, pump_report's RTT). **The advisor's check
+  RUNNING from ~22:02 UTC** (advisor-u4h-brief.md); U4g's build only after U4f2's merge
   (u4-build-plan.md:951-952, "never two at once"); U4G-Q2's text later, before -58's set. **Lesson:** never `cd` into an agent's
   worktree (the harness moved this session's main folder to it at 16:19; back at once); read it with Read/Grep.
   Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bh8edyqwv from 21:10 UTC (to about 23:00). Main f5030a3.
