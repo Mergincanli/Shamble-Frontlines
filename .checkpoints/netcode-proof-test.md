@@ -193,6 +193,10 @@
   waits for his answer.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
+- **2026-11-20 between about 06:16 and 10:57:41 UTC (a usage cut while idle):** no system notice reached the chat; his
+  words on resuming: "usage was reached, continue" (10:57 UTC). Nothing was running (no agent, set or saver since the
+  saver's window ended about 06:14); `git status` clean at 10:57; no queued notification; the 23:05 UTC day-message
+  reminder still pending. Nothing to restore.
 - **2026-11-20 about 04:22:05 to 04:24 UTC (a container restart: the saver, the advisor's F1 close read, U4g's
   drafter):** "The container was restarted. The following background tasks were running and are now stopped: - Restart
   the background checkpoint saver (task bh2qi25le) - Advisor reads F1's close records (task ab6e23b921ab12806) - Draft
