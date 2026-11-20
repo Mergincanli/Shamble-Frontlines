@@ -185,10 +185,13 @@
   final snapshot wip/u4f2-build.patch sha256 e9a0ae3e3f48af18… (checked, saved 6ea345e); 2,077 added. **Fourth clean
   ~17:39** (no lane running; dev 27,615 files 7.0 GiB, release 972, 259.0 MiB; guards pass; free 3,548,807,168 →
   10,115,317,760 bytes; for the merge's check). **Review round 1 RUNNING** (u4f2-panel-brief.md; each seat reads only,
-  notes u4f2-review-<seat>.md): batch 1 netcode, security, test from ~17:41 UTC, xhigh; batch 2 rust when a seat ends. **Lesson:** never `cd` into an agent's worktree: the
+  notes u4f2-review-<seat>.md): batch 1 netcode, security, test from ~17:41 UTC, xhigh. **Security DONE 17:55:
+  APPROVE WITH FINDINGS** (SA-U4F2-1 to -3, all Low: `--forge-every` unbounded multiply; kind 7 unsound at
+  `--forge-every 2`; kind 8/9/11 `saturating_sub`; no security defect; F-B's record gap confirmed, its fix the netcode
+  seat's; it caught my brief's hash typo, fixed). **Rust (batch 2) from 17:55.** **Lesson:** never `cd` into an agent's worktree: the
   harness moved this session's main folder to it (16:19; back at once, branch unchanged); read it with Read/Grep.
-  Check-in re-enabled 14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver b22ct2zom from
-  16:05 UTC; the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the
+  Check-in re-enabled 14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bzkhq2f75 from
+  17:56 UTC (to about 19:46); the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the
   named choices; U4F2-SIZE answered). U4G-Q1 (split; final text advisor-u4g-brief.md:360-374; not a stop); U4G-Q2
   later, before -58's set only, its text drafted and read first. Main still f5030a3 (16:06 UTC).
 
