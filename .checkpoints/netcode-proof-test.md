@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-19 20:1x UTC: U4f merged (25d316e); r2 done and read; part-clean done; **-47 PASS**
-  (committed); **the -20 set running** (from 20:07 UTC); then -22; card trimmed (card_trim_1119i.py).
+- **Last update:** 2026-11-20 04:2x UTC: U4f-F1 merged (1faf894); **-20's L1 re-run PASS** (46ca143); next F1's
+  report, -20's record in u4f-report.md, then condition 10 (U4f2's brief on F1's merge).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -164,9 +164,12 @@
   (.gate/u4f-f1-merge/m5-check.log, 01:54:18-02:13:49 UTC). **Part-clean 3** (02:15: dev 5.3 GiB and the rest; 10,570
   MiB free). **CI green on 1faf894** (gate, smoke, toolchain). **The advisor's head check APPROVE WITH FINDINGS**
   (advisor-u4f-f1-head.md: -1 the commit message says "(APPROVE)" for the pass check, APPROVE WITH CONDITIONS, fixed in
-  F1's report; -2 two times, fixed here). **-20's L1 re-run RUNNING** from about 02:22 UTC (`c-u4f-runs.mjs 20 --date
-  2026-11-20`, at 96de6ac, spike tree d4f6cd41… = 1faf894's; saver bhdijr3a1), to compare with 350677f's kept logs by
-  scratchpad compare_20.py (advisor-u4f-f1-plan.md:119-140).
+  F1's report; -2 two times, fixed here). **-20's L1 re-run DONE, committed 46ca143** (`c-u4f-runs.mjs 20 --date
+  2026-11-20` at 96de6ac, 02:22-03:07 UTC; spike tree d4f6cd41… = 1faf894's): PM-0001-2 SS PASS 6/6; PM-0001-20 L1 A
+  and B PASS 3/3 (headline NOT-RUN: L2 not run); every expected figure held (compare_20.py and jdiff.py: summary lines
+  equal but wall, h equal on all 18,335 ticks x 7, lost 0, doubled 0, presses B 432,000, A 432,003/432,003/432,009,
+  bite 0.894544 with lost 3,614 -> 0, reorder "not available"; 14 of 593 and 2 of 65 verdict leaves differ, all the
+  lost check). Saver bh2qi25le from 04:12 UTC. Next: F1's report, -20's record, condition 10.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
