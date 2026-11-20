@@ -55,3 +55,23 @@
   (fixed: last hold run, sequence set); clippy both builds bots+lab exit 0 (u4f2-b2-clippy.log), fmt clean.
   SIZE-CHECK: +861 -68 (bots +796: above the block's ~400 and the brief's ~250 for bots; the twins' bots half, block 5's
   in the brief, is in it). Finding: the estimate for bots ran about 3 times; the rest must stay lean.
+- Block 3 DONE (npt-lab's forged suite): `--suite forged` with `--forge-every <n>` (C-U4F2-1's parser half: below 2 or
+  not a number a usage error; the two go together; at least 11 clients), `FORGERS` = 11 (slot s < 11 forges kind s + 1
+  on a fixed-lead endpoint, steady script; `catchup_under_a()` under A; `twin()` under role twin), the honest clients
+  on the run's behaviour under the controller; `header.params.forge_every_count` + its SERIES.md row (new U4f2
+  subsection); `Behaviour::reliable` wired into the client step; USAGE names the option; `pair("forged", t)` at the
+  judged interval 12. Tests: c_u4f2_1_a_forge_interval_below_2_is_a_usage_error (+1 extra), f22 A and B (2, neg), f23
+  (1, neg). u4f2-b3-t.log: 4 passed, 24.88 s (4 short runs: A buffer full 8 = one episode; B 12 = three; twins 0; press
+  refused 14 forged, 0 twin). SIZE-CHECK: +1000 -69.
+- Block 4 DONE (C-U4F2-3 first, then the attribution and SEC-1): npt-room's enum `Refusal` renamed `CommandRefusal`
+  (input.rs, room.rs, lib.rs), its records the struct `RefusalRecord { slot, seq, kind }` (room.rs; exported), the
+  one consumer room/tests/commands.rs:82 updated; npt-sim's `Refusal` untouched (crates/sim shut). New lab/src/forged.rs
+  (`Attribution`: per forger, items by seq with kind 3's copy, own-kind room records (kinds 1-6, 10), sim
+  Cooldown/Reload (kind 7), runs per seq and copy runs, kinds 8/9/11 by count at the cutoff). Wired in `run`: items
+  taken at every client step, counted before the cutoff = measured end - the room's lead bound (12 ticks); each tick
+  the room's records, the sim's and the TickInput; kinds 8/9/11's counters (ack_refused; trailing + unknown_field;
+  wrong_channel) at k == cutoff; at the end one `forged_kind` record per kind (not on a twin) with `slot`, `kind`,
+  `sent_count`, `measured_sent_count`, `unrejected_count`, `refusals_dropped_count`; client_counts gains
+  `twin_left_out_count` and `forge_unencodable_count` on the forged suite. Two new SERIES.md rows. f33's 13 + Q4 + C-U4F2-10
+  in forged.rs. u4f2-b4-t.log: npt-room all passed (24+1+27+19), lab 18 passed (15 forged:: + f22 x2 + f23).
+  SIZE-CHECK: +1100 -110 tracked, + forged.rs 320 new = 1,420 added.
