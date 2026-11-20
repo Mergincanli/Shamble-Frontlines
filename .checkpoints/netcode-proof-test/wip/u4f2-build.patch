@@ -1,8 +1,8 @@
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index b40d2dd..2831e82 100644
+index b40d2dd..7418d0b 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
-@@ -142,19 +142,271 @@ pub struct Behaviour {
+@@ -142,19 +142,272 @@ pub struct Behaviour {
      fast: Option<Fast>,
      /// -21's forger (`forger`).
      forge: Option<Forge>,
@@ -162,7 +162,8 @@ index b40d2dd..2831e82 100644
 +    ) -> Option<Undecodable> {
 +        let (n, twin) = (self.sent + 1, self.twin);
 +        match self.kind {
-+            1 | 2 | 4 | 5 | 6 => {
++            // The twin never forges these (FP-5): its refused commands are never made (`forge_step`'s skip).
++            1 | 2 | 4 | 5 | 6 if !twin => {
 +                i.commands[0] = forged(self.kind, c, prev, newest, self.bound, n)?;
 +                self.record(c.seq);
 +            }
@@ -277,7 +278,7 @@ index b40d2dd..2831e82 100644
  }
  
  /// `c`, the newest command of a new sequence, forged in `kind` (2.6's per-kind table), the `n`-th (from 1), against
-@@ -298,27 +550,64 @@ impl Behaviour {
+@@ -298,27 +551,64 @@ impl Behaviour {
              lag: None,
              fast: None,
              forge: None,
@@ -350,7 +351,7 @@ index b40d2dd..2831e82 100644
      pub fn take_forged(&mut self) -> Vec<u16> {
          self.forge
              .as_mut()
-@@ -326,6 +615,27 @@ impl Behaviour {
+@@ -326,6 +616,27 @@ impl Behaviour {
              .unwrap_or_default()
      }
  
@@ -378,7 +379,7 @@ index b40d2dd..2831e82 100644
      /// -21's 1.5x clock (u4f-brief.md 2.6; U4F-Q11 (iii) (c) and (v) (b) as F1 amends it): fire held at a seeded point,
      /// the lane's walk at full length, a command at every step once the endpoint holds a snapshot (its host clock's rate
      /// is the lab's), each stamped by the crate's `fast_stamp` under the lead bound `bound` (ticks) in
-@@ -424,11 +734,14 @@ impl Behaviour {
+@@ -424,11 +735,14 @@ impl Behaviour {
                  l.bursts.push(now_ns.saturating_sub(at));
              }
          }
@@ -396,7 +397,7 @@ index b40d2dd..2831e82 100644
          for d in datagrams.iter_mut() {
              if let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
              {
-@@ -460,23 +773,6 @@ impl Behaviour {
+@@ -460,23 +774,6 @@ impl Behaviour {
                          }
                      }
                  }
@@ -420,7 +421,7 @@ index b40d2dd..2831e82 100644
                  // Every rewritten `Input` encodes: an older copy a past-bound stamp leaves more than 255 ticks below
                  // (after an idle) is left out, oldest first, so the rest stay consecutive (the codec's two rules).
                  let mut out = Vec::new();
-@@ -585,11 +881,133 @@ impl Behaviour {
+@@ -585,11 +882,133 @@ impl Behaviour {
              self.skipped += 1;
              return false;
          }
@@ -554,7 +555,7 @@ index b40d2dd..2831e82 100644
      /// The decision function (crate-private; `step` calls it, and so do this crate's tests): the next command from
      /// `newest`, `view` and `own`, the own soldier as the endpoint decoded it (`ClientEndpoint::own_soldier`: its grid
      /// position and dead bit), counted as given.
-@@ -652,6 +1070,10 @@ impl Behaviour {
+@@ -652,6 +1071,10 @@ impl Behaviour {
          let walk = match self.kind {
              Kind::Brawl => self.leash(own, walk),
              Kind::Lane => self.lane(own),
@@ -565,7 +566,7 @@ index b40d2dd..2831e82 100644
              _ => walk,
          };
          Command {
-@@ -1165,14 +1587,565 @@ mod tests {
+@@ -1165,14 +1588,584 @@ mod tests {
      }
  
      /// SEC-U4F-1: each room-whole forger refuses an interval below 2 (kinds 2 and 5 forge against the previous command,
@@ -1131,10 +1132,29 @@ index b40d2dd..2831e82 100644
 +                seqs(&t),
 +                "a: {a}: the twin sends the same sequences but the refused"
 +            );
++        }
++    }
++
++    /// FP-5 (NC-U4F2-4, TE-U4F2-2): U4F-Q13 (b)'s twin of the room-whole kinds 1, 2, 4, 5 and 6 never makes a
++    /// refused command: it sends no forged sequence, and its commands are the forger's honest ones less the forged
++    /// (the kind-10 case's pattern), at least 30 forged in 300 steps.
++    #[test]
++    fn fp5_the_room_whole_kinds_twin_never_makes_the_refused_command() {
++        for kind in [1, 2, 4, 5, 6] {
++            let [mut f, t] = sides(kind, false);
++            let forged = f.b.take_forged();
++            let by_seq = |s: &Side, k: usize| -> BTreeMap<u16, Command> {
++                let all = s.steps.iter().flat_map(|x| inputs(&x[k]));
++                all.flat_map(|i| i.commands).map(|c| (c.seq, c)).collect()
++            };
++            let mut kept = by_seq(&f, 0);
++            kept.retain(|s, _| !forged.contains(s));
++            assert!(forged.len() >= 30, "{kind}: {} forged", forged.len());
++            assert_eq!(kept, by_seq(&t, 1), "{kind}: the twin's commands");
          }
      }
  
-@@ -1196,6 +2169,12 @@ mod tests {
+@@ -1196,6 +2189,12 @@ mod tests {
          /// ten burst starts, the first 30 s into the measured phase (after the 10 s warm-up) and then every 60 s (the
          /// run scripts' B1 settings).
          Bursts,
@@ -1147,7 +1167,7 @@ index b40d2dd..2831e82 100644
      }
  
      /// One run's record: soldier-ticks in a building and the first; the largest distance from the centre (its square in
-@@ -1242,19 +2221,32 @@ mod tests {
+@@ -1242,19 +2241,32 @@ mod tests {
              .collect()
      }
  
@@ -1187,7 +1207,7 @@ index b40d2dd..2831e82 100644
          let mut last: Vec<Option<Command>> = vec![None; n];
          let mut seq = vec![0u16; n];
          let mut rng = seed ^ 0x736b_6970_7300_0000;
-@@ -1310,9 +2302,31 @@ mod tests {
+@@ -1310,9 +2322,31 @@ mod tests {
              let burst = bursts.iter().any(|&(a, b)| (a..b).contains(&k));
              let mut commands = Vec::with_capacity(n);
              for s in 0..n {
@@ -1220,7 +1240,7 @@ index b40d2dd..2831e82 100644
                          Pattern::Bursts => burst,
                          Pattern::Skips => {
                              r.chances += 1;
-@@ -1369,8 +2383,20 @@ mod tests {
+@@ -1369,8 +2403,20 @@ mod tests {
      /// rate per 1000 are the skip pattern's alone (ADV-PT-L1); every pattern prints its skipped ticks and longest
      /// streak.
      fn printed(seed: u64, ms: u32, pattern: Pattern) -> Record {
@@ -1242,7 +1262,7 @@ index b40d2dd..2831e82 100644
              Pattern::EveryTick => format!("skipped {}", r.skipped),
              Pattern::Skips => format!(
                  "skipped {} of {} chances ({} per 1000)",
-@@ -1381,7 +2407,7 @@ mod tests {
+@@ -1381,7 +2427,7 @@ mod tests {
              Pattern::Bursts => format!("skipped {} in its bursts", r.skipped),
          };
          println!(
@@ -1251,7 +1271,7 @@ index b40d2dd..2831e82 100644
               distance from the centre {} cm (slot {}, tick {}, at {}, {}); {skips}, longest streak {}; dead {} \
               soldier-ticks; stuck (slot, tick, x, y): {:?}",
              ticks_for_ms(ms),
-@@ -1411,6 +2437,46 @@ mod tests {
+@@ -1411,6 +2457,46 @@ mod tests {
          }
      }
  

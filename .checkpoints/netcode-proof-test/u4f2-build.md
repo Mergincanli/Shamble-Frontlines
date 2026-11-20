@@ -310,4 +310,18 @@
 - FP-3's plant (`fire_rest_at` returning `Some(3)` from two ticks up): u4f2-fp3-plant.log, fp3 FAILS by name at
   lib.rs:1609, left [Some(3), Some(3)], right [Some(3), Some(5)] (the 60 Hz pin). Restored by Edit, a7134ea0… equal.
   Clean scenario.rs a9855195….
-- SIZE-CHECK after FP-3: +1,982 -177 tracked; forged.rs 362: 2,344 added (+66).
+- SIZE-CHECK after FP-3: +1,982 -177 tracked; forged.rs 362: 2,344 added (+66). Snapshot taken (167,260 B).
+- **FP-5 (NC-U4F2-4, TE-U4F2-2): DONE.** bots lib.rs `forge_input`: the 1, 2, 4, 5, 6 arm now `if !twin` (a comment
+  names `forge_step`'s skip). New bots case `fp5_the_room_whole_kinds_twin_never_makes_the_refused_command` (`sides(k,
+  false)` for each of the five kinds: the forger's honest commands by sequence, less the forged ones, equal the twin's
+  sent commands by sequence; at least 30 forged): u4f2-fp5-tests.log PASS 0.13 s alone; fmt exit 0; f15 12 PASS.
+  u4f2-fp5-f16.log: f16 24 PASS on the clean tree (58.08 s, the shared pairs).
+- Plant 9 in its right form (bots `forge_step`: `skip` false and the twin's `due` false for kinds 1, 2, 4, 5, 6: the
+  twin sends the refused command's honest content): u4f2-fp5-plant9.log, fp5 FAILS by name (lib.rs:2168, the twin's
+  commands); f16: 22 FAIL, the clamp's 2 pass. Option A: all 11 kinds of the shared pair fail on "the ticks hashed and
+  their hashes", the hashes differing from tick 13 on (one command more run). **Option B fails too**, unlike the
+  ruling's expectation: its hashes differ at single ticks (50, 62, 74, 122, 134, 146, …) and agree again the tick
+  after; by my reading (not verified) the honest command's own sequence in its tick's Shot event, where option B's
+  re-run names the last command's (the event list is hashed). So F-E (the first plant 9's pass) was the plant making the
+  twin forge, as NC-U4F2-4 read it, and holds under neither option. Restored by Edit, 82496f21… equal.
+- SIZE-CHECK after FP-5: +2,002 -177 tracked; forged.rs 362: 2,364 added (+20). Free 8,789 MiB at the f16 run.
