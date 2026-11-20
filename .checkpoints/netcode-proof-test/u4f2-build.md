@@ -325,3 +325,23 @@
   re-run names the last command's (the event list is hashed). So F-E (the first plant 9's pass) was the plant making the
   twin forge, as NC-U4F2-4 read it, and holds under neither option. Restored by Edit, 82496f21… equal.
 - SIZE-CHECK after FP-5: +2,002 -177 tracked; forged.rs 362: 2,364 added (+20). Free 8,789 MiB at the f16 run.
+  Snapshot taken (168,411 B).
+- **FP-6 (TE-U4F2-3): DONE.** forged.rs: new case `fp6_an_own_kind_record_on_another_slot_rejects_nothing` (room kind
+  10 on SLOT + 1 naming item 2; the sim's Cooldown on SLOT + 1 naming kind 7's item 2; each leaves item 2 unrejected:
+  (2, 1)). u4f2-fp6-tests.log: fmt exit 0; PASS 0.00 s (forged:: 16 in 0.00 s; the `fp6_` filter also runs an older
+  replay test of that name, 1.42 s together). Plants: (a) the room loop's slot filter removed (forged.rs:81):
+  u4f2-fp6-plant-a.log, fp6 FAILS by name at forged.rs:365 ("the room's", left (2, 0)); (b) the sim loop's (:86):
+  u4f2-fp6-plant-b.log, FAILS at :368 ("the sim's", (2, 0)). Slip: plant b was put in before plant a's restore was
+  hashed; checked after b's restore: c7ba5f38… equal to the clean file, so both restores held.
+- SIZE-CHECK after FP-6: +2,002 -177 tracked; forged.rs 380 lines by `wc -l` (363 before FP-6 by the same count; the
+  2,077 base counted it 362): about 2,382 added. Snapshot taken (169,171 B).
+- **FP-7 (TE-U4F2-4): DONE.** scenario.rs: `Summary::soldiers` (test builds only: each tick's Soldier records, slot
+  and grid, pushed beside `world_hashes`); f16 names the culprit: a differing fate entry by its link ("slot S (kind
+  K)", "slot 0 (the clamp)" or "slot S (honest)"), and the first differing state hash (now checked before the room
+  log's list) with the slots whose Soldier records differ there; the doc says so. u4f2-fp7-tests.log: fmt exit 0; f16
+  24 PASS (58.81 s, the shared pairs, as before: 0 s added).
+- Plant 10 re-run (room input.rs kind 4's check off: `if false && …`): u4f2-fp7-plant10.log, 22 FAIL (the clamp's 2
+  pass), every one naming the culprit: "forged K A: the first state hash that differs: (13, …) / (13, …); Soldier
+  records differ there on ["slot 3 (kind 4)"]" (B: tick 14, the same slot). Restored by Edit, efadaeb2… equal. Clean
+  scenario.rs 7e0d3430….
+- SIZE-CHECK after FP-7: +2,032 -177 tracked; forged.rs 380: about 2,412 added (+30).

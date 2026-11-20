@@ -1670,7 +1670,7 @@ index dcd2e4e..85e69ae 100644
  mod logs;
  mod machine;
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
-index 7f54e46..03f1e6c 100644
+index 7f54e46..c09efa4 100644
 --- a/spikes/netcode-proof/crates/lab/src/scenario.rs
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
 @@ -48,6 +48,7 @@ use npt_sim::replay::Recording;
@@ -1699,7 +1699,7 @@ index 7f54e46..03f1e6c 100644
      pub(crate) record: Option<PathBuf>,
      pub(crate) bytes: Option<PathBuf>,
      /// Whether the run writes its logs (`false`: a runner recording regenerated inside `npt-lab hash`).
-@@ -1100,6 +1105,11 @@ pub(crate) struct Summary {
+@@ -1100,6 +1105,14 @@ pub(crate) struct Summary {
      pub(crate) order_digest: u64,
      /// A bite run whose after phase reached its cap with measured ticks unresolved (carry 73).
      pub(crate) after_capped: bool,
@@ -1708,10 +1708,13 @@ index 7f54e46..03f1e6c 100644
 +    /// (TE3-5: -21's twins differ in size by design).
 +    #[cfg(test)]
 +    pub(crate) fates: Vec<[u8; 32]>,
++    /// f16's culprit (FP-7; test builds only): each tick's Soldier records, by slot, their grid fields.
++    #[cfg(test)]
++    pub(crate) soldiers: Vec<Vec<(u16, [i32; npt_sim::EntityRecord::FIELDS])>>,
  }
  
  fn sha256_hex(bytes: &[u8]) -> String {
-@@ -1184,6 +1194,12 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1184,6 +1197,12 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      let lead_bound_ms = server.room.lead_bound().0;
      meta.params
          .insert("lead_bound_ms".into(), lead_bound_ms.into());
@@ -1724,7 +1727,7 @@ index 7f54e46..03f1e6c 100644
      let mut logs = Logs::open(
          s.logs.then_some(s.out.as_path()),
          &meta,
-@@ -1204,10 +1220,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1204,10 +1223,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          bound: i64::from(server.room.lead_bound().1),
          ..FastClock::default()
      });
@@ -1739,7 +1742,7 @@ index 7f54e46..03f1e6c 100644
              _ => endpoint_of(s, slot),
          };
          let behaviour = if s.suite == "clock" {
-@@ -1248,6 +1268,26 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1248,6 +1271,26 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          } else if fast_from.is_some() && slot == 0 {
              // A command at every step, its lane's walk, its stamps by U4F-Q11 (v) (b) as F1 amends it.
              Behaviour::fast_clock(&scene, slot, s.seed, server.room.lead_bound().1)
@@ -1766,7 +1769,7 @@ index 7f54e46..03f1e6c 100644
          } else {
              behaviour
          };
-@@ -1316,6 +1356,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1316,6 +1359,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      let last_measured = logs.wide(s.tick_start.wrapping_add((measured_end.max(1) - 1) as u32));
      let mut events_stamped: u64 = 0;
      let mut clamp = ClampTally::default();
@@ -1778,7 +1781,7 @@ index 7f54e46..03f1e6c 100644
      let mut inputs: Vec<i64> = Vec::new();
      // The link-lost-overstated bite: the slots whose record it has written (bites builds only).
      #[cfg(feature = "bites")]
-@@ -1407,6 +1452,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1407,6 +1455,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                      .refused
                      .extend(rep.refusals.iter().filter(|x| x.slot == 0).map(|x| x.seq));
              }
@@ -1789,9 +1792,18 @@ index 7f54e46..03f1e6c 100644
              // -21's fast clock: slot 0's episode sums, each episode's record at its end (lab log).
              if let Some(f) = fast.as_mut() {
                  let me = records
-@@ -1522,6 +1571,24 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1521,7 +1573,33 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+             summary
                  .world_hashes
                  .push((t, npt_sim::SimCore::state_hash(server.room.sim())));
++            #[cfg(test)]
++            summary.soldiers.push(
++                npt_sim::SimCore::entity_records(server.room.sim())
++                    .iter()
++                    .filter(|r| r.kind == npt_sim::EntityKind::Soldier)
++                    .map(|r| (r.index, r.grid))
++                    .collect(),
++            );
              k += 1;
 +            // Kinds 8, 9 and 11 by count at the cutoff: every item before it was received by now (P0), none after.
 +            if let Some(a) = attribution.as_mut().filter(|_| k == cutoff) {
@@ -1814,7 +1826,7 @@ index 7f54e46..03f1e6c 100644
              if k == s.warmup_ticks && s.suite != "clock" {
                  for c in &clients {
                      if !logs.started(c.slot) {
-@@ -1596,6 +1663,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1596,6 +1674,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              }
              let mut out = c.endpoint.step();
              c.behaviour.outgoing(host, &mut out.datagrams);
@@ -1826,7 +1838,7 @@ index 7f54e46..03f1e6c 100644
              for held in c.behaviour.take_bursts() {
                  let mut e = EventRecord::new("lag_burst", phase(k))
                      .with("slot", c.slot)
-@@ -1695,6 +1767,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1695,6 +1778,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
      }
      summary.ticks = k;
      summary.fate_log_sha256 = fate_sha256(&net);
@@ -1841,7 +1853,7 @@ index 7f54e46..03f1e6c 100644
      let mut last = Vec::new();
      for c in &mut clients {
          if let Some(w) = c.bytes_log.as_mut() {
-@@ -1725,6 +1805,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1725,6 +1816,14 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              )
              .with("lead_now_count", c.endpoint.lead_now().unwrap_or(-1))
              .with("unknown_pongs_count", c.endpoint.unknown_pongs());
@@ -1856,7 +1868,7 @@ index 7f54e46..03f1e6c 100644
          // 2.5 (SA-5): the room's refusal fields, and the live session's pump counters, at the stop.
          let d = server.session(c.slot).map(|x| x.decoder.counters().clone());
          let mut e = counts(e, Some(&k), d.as_ref());
-@@ -1744,6 +1832,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1744,6 +1843,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  .with("rerun_reports_count", clamp.reruns),
          );
      }
@@ -1867,7 +1879,7 @@ index 7f54e46..03f1e6c 100644
      // D3-1 (f40): the run's measured reorder share from npt-l1's fate log, as the -3 probe computes it (main.rs's
      // `permille`): each direction's reordered x 1000 / delivered, floored; `permille` the lower of the two.
      let [up, down] = net.with_fate_log(|l| l.reorder_counts());
-@@ -1900,11 +1992,7 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1900,11 +2003,7 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
      let mut p: BTreeMap<String, Value> = BTreeMap::new();
      let w = s.scene.weapon();
      p.insert("suite".into(), suite.into());
@@ -1880,7 +1892,7 @@ index 7f54e46..03f1e6c 100644
      // The one lead every client stamps with, only where `with_lead` fixes it (U4F-Q7 (i); TE-20); under U4f's
      // controller each client's lead is its own (`event.client_counts.lead_now_count`), and the cap it works under.
      if s.controller {
-@@ -1946,6 +2034,9 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1946,6 +2045,9 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
              p.insert("fast_clock_idle_ns".into(), s.fast_idle_ns.into());
          }
      }
@@ -1890,7 +1902,7 @@ index 7f54e46..03f1e6c 100644
      if s.suite == "clock" {
          p.insert("connects_count".into(), s.connects.into());
      } else {
-@@ -1990,7 +2081,7 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
+@@ -1990,7 +2092,7 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
  [--every-step 1] [--lead <1..8>] [--logs 0 (with --record)] [--cmd-timing A|B] [--controller 0|1] \
  [--brawl-press-every <n> (the brawl)] [--event-cap <n>] [--connects <n> (with --suite clock)] \
  [--twin-logs <folder> (the clamp twin)] [--fast-clock-episode-s <s>] [--fast-clock-idle-s <s>] (with --suite fast-clock) \
@@ -1899,7 +1911,7 @@ index 7f54e46..03f1e6c 100644
  
  /// B1's burst starts (u4r-brief.md 7.1, -18's row): `count` bursts, the first `first_s` after the measured phase's
  /// first tick and one every `every_s`, each starting a seeded offset in [0, 1 tick) after its tick boundary.
-@@ -2155,6 +2246,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -2155,6 +2257,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
      if (suite == "clock") != (connects > 0) {
          return Err("--suite clock and --connects <n> (from 1) go together".to_owned());
      }
@@ -1920,7 +1932,7 @@ index 7f54e46..03f1e6c 100644
      let event_cap = take("event-cap")
          .map(|v| {
              v.parse::<u32>()
-@@ -2299,6 +2404,7 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -2299,6 +2415,7 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
          lag_every_ms,
          fast_episode_ns: fast_episode_s * SEC,
          fast_idle_ns: fast_idle_s * SEC,
@@ -1928,7 +1940,7 @@ index 7f54e46..03f1e6c 100644
          record,
          bytes,
          logs,
-@@ -3642,7 +3748,8 @@ pub(crate) mod tests {
+@@ -3642,7 +3759,8 @@ pub(crate) mod tests {
      }
  
      /// f6 (TE-14), one option: the lab builds the endpoints with the one controller setting (the header records the
@@ -1938,7 +1950,7 @@ index 7f54e46..03f1e6c 100644
      /// no `cmd_timing` (README :191-192 makes it the room's and the scenario's).
      fn f6(timing: &'static str) {
          let p = &u4f_short(timing)[0].header.params;
-@@ -3994,36 +4101,77 @@ pub(crate) mod tests {
+@@ -3994,36 +4112,77 @@ pub(crate) mod tests {
          );
      }
  
@@ -2038,7 +2050,7 @@ index 7f54e46..03f1e6c 100644
              .events
              .iter()
              .filter(|e| {
-@@ -4036,10 +4184,21 @@ pub(crate) mod tests {
+@@ -4036,10 +4195,21 @@ pub(crate) mod tests {
              (f("counted_count"), f("rerun_reports_count")),
              (Some(0), Some(0))
          );
@@ -2064,7 +2076,7 @@ index 7f54e46..03f1e6c 100644
      }
  
      /// f20 (2.6; U4F-Q15 (c); A1) and f28's lag-switch half: a short lag-switch run at P1 (16 clients, 2 s + 6 s, option
-@@ -4056,13 +4215,7 @@ pub(crate) mod tests {
+@@ -4056,13 +4226,7 @@ pub(crate) mod tests {
          );
          assert_eq!(crate::logs::moved_um(alive(0, 0), alive(5_000, 100)), None);
          assert_eq!(crate::logs::moved_um(alive(0, 100), alive(10, 0)), None);
@@ -2079,7 +2091,7 @@ index 7f54e46..03f1e6c 100644
          let held: Vec<u64> = read(&dir, "lab")
              .events
              .iter()
-@@ -4081,9 +4234,346 @@ pub(crate) mod tests {
+@@ -4081,9 +4245,365 @@ pub(crate) mod tests {
          assert!(most("lagswitch_cmds_count").is_some_and(|m| (1..=cap).contains(&m)));
          assert!(most("lagswitch_excess_move_um").is_some_and(|m| m <= 0));
          let logs = crate::contract::read(&dir).expect("its logs");
@@ -2230,18 +2242,46 @@ index 7f54e46..03f1e6c 100644
 +    /// same ticks hashed to the same hashes in the room log and in every tick's state hash; every endpoint left out no
 +    /// command and every forged `Input` encodes; and the pair carries its kind: inside the measured window at least one
 +    /// forged item (kind 10: one whole episode, 8 under A, 4 under B; the clamp: one point beyond reach), none of them
-+    /// unrejected, no refusal record dropped, and the forger's own link's entries in both runs alike.
++    /// unrejected, no refusal record dropped, and the forger's own link's entries in both runs alike. A failure names
++    /// its culprit (FP-7): a differing fate entry's link (slot and kind), or at the first differing state hash the
++    /// slots whose Soldier records differ.
 +    fn f16(suite: &'static str, kind: u8, timing: &'static str) {
 +        let [run, twin] = pair(suite, timing);
 +        let (a, b) = (&run.sum.fates, &twin.sum.fates);
++        // FP-7: a failure names the culprit, the slot and its forged kind (the shared pair carries all 11).
++        let culprit = |s: u32| match s {
++            _ if suite == "clamp" && s == 0 => "slot 0 (the clamp)".to_owned(),
++            _ if suite == "forged" && s < u32::from(FORGERS) => {
++                format!("slot {s} (kind {})", s + 1)
++            }
++            _ => format!("slot {s} (honest)"),
++        };
 +        if let Some(i) = (0..a.len().min(b.len())).find(|&i| a[i] != b[i]) {
++            let link = u32::from_le_bytes([a[i][0], a[i][1], a[i][2], a[i][3]]);
 +            panic!(
-+                "{suite} {kind} {timing}: fate entry {i} differs: {:?} / {:?}",
-+                a[i], b[i]
++                "{suite} {kind} {timing}: fate entry {i} differs, on {}'s link: {:?} / {:?}",
++                culprit(link),
++                a[i],
++                b[i]
 +            );
 +        }
 +        assert_eq!(a.len(), b.len(), "{suite} {kind} {timing}: fate entries");
 +        assert_eq!(run.sum.link_sent, twin.sum.link_sent, "snapshot datagrams");
++        let (w, tw) = (&run.sum.world_hashes, &twin.sum.world_hashes);
++        if let Some(i) = (0..w.len().min(tw.len())).find(|&i| w[i] != tw[i]) {
++            let (x, y) = (&run.sum.soldiers[i], &twin.sum.soldiers[i]);
++            let differ: Vec<String> = x
++                .iter()
++                .zip(y)
++                .filter(|(p, q)| p != q)
++                .map(|(p, _)| culprit(u32::from(p.0)))
++                .collect();
++            panic!(
++                "{suite} {kind} {timing}: the first state hash that differs: {:?} / {:?}; Soldier records differ \
++                 there on {differ:?}",
++                w[i], tw[i]
++            );
++        }
 +        let hashes = |r: &Ran| -> Vec<(u64, Option<String>)> {
 +            r.logs[0].ticks.iter().map(|t| (t.t, t.h.clone())).collect()
 +        };
@@ -2250,15 +2290,6 @@ index 7f54e46..03f1e6c 100644
 +            hashes(twin),
 +            "the ticks hashed and their hashes"
 +        );
-+        if let Some(t) = run
-+            .sum
-+            .world_hashes
-+            .iter()
-+            .zip(&twin.sum.world_hashes)
-+            .find(|(x, y)| x != y)
-+        {
-+            panic!("{suite} {kind} {timing}: the first state hash that differs: {t:?}");
-+        }
 +        let slot = if suite == "clamp" { 0 } else { kind - 1 };
 +        let link = |f: &[[u8; 32]]| {
 +            f.iter()
@@ -2911,10 +2942,10 @@ index c4bdeff..05fd00d 100644
      const secs = ((Date.now() - t0) / 1000).toFixed(1);
 diff --git a/spikes/netcode-proof/crates/lab/src/forged.rs b/spikes/netcode-proof/crates/lab/src/forged.rs
 new file mode 100644
-index 0000000..abf044c
+index 0000000..c592fcd
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/forged.rs
-@@ -0,0 +1,363 @@
+@@ -0,0 +1,380 @@
 +//! -21's attribution (u4f-brief.md 2.4 item 6; TE3-2, SA-4): each forger's items, in 2.4's unit, counted rejected only
 +//! by its kind's rule, against every tick's records and `TickInput` (`event.forged_kind`, one record per kind at the
 +//! run's end, SERIES.md:158-159):
@@ -3266,6 +3297,23 @@ index 0000000..abf044c
 +        });
 +        assert_eq!(base, (2, 0));
 +        assert_eq!(one(10, &other, &[], &[]), base);
++    }
++
++    /// FP-6 (TE-U4F2-3, neg): an own-kind record on another slot that names a forged sequence leaves the item
++    /// unrejected: room kind 10 on SLOT + 1 for item 2, and the sim's Cooldown on SLOT + 1 for kind 7's item 2.
++    #[test]
++    fn fp6_an_own_kind_record_on_another_slot_rejects_nothing() {
++        let rooms = [
++            room(1, kind(10)),
++            RefusalRecord {
++                slot: SLOT + 1,
++                ..room(2, kind(10))
++            },
++        ];
++        assert_eq!(one(10, &rooms, &[], &[]), (2, 1), "the room's");
++        let mut sims = [sim(1, RefusalKind::Cooldown), sim(2, RefusalKind::Cooldown)];
++        sims[1].slot = SLOT + 1;
++        assert_eq!(one(7, &[], &sims, &[1, 2]), (2, 1), "the sim's");
 +    }
 +
 +    /// C-U4F2-10 (neg, beyond the 13): under PM-0001-21/no-press-edge the room takes kind 5's forged commands and the
