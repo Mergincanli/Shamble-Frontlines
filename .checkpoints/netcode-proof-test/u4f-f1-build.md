@@ -116,3 +116,15 @@
 ## B4: the end checks (check.mjs twice)
 - Run 1 started (background, -x): log .gate/u4f/f1-b4-check1.log. Expected test-step counts: 634 + 7 = 641 measured,
   731 + 7 = 738 bites (T1 and T2's six, none feature-gated).
+- Run 1 (23:34:58-23:52:57 UTC, diff 37d87a10..., exit 0): last line "check: all 11 steps pass"; every step PASS (fmt,
+  clippy, clippy-wasm32, doc, test, deps, wasm, refs, marks, self, redact); test: "measured build: 641 tests passed, 0
+  failed, 0 reported a skip; bites build: 738 tests passed, 0 failed, 0 reported a skip" = +7 on 634 and +7 on 731;
+  wasm: 27000 ticks native-native and native-Wasm, 0 mismatching; std-sin caught at SS-s1 tick 2 as the scan found.
+- Run 2 (to 00:07:50 UTC, the same diff 37d87a10..., exit 0): last line "check: all 11 steps pass"; every step PASS;
+  test: measured 641 passed, 0 failed, 0 skip; bites 738 passed, 0 failed, 0 skip (+7, +7); wasm 27000 ticks, 0
+  mismatching.
+- B4 done. Final SIZE-CHECK: 205 insertions, 24 deletions, 5 files under spikes/ (room.rs 19, commands.rs 33,
+  seam.rs 9, world.rs 55, tests/world.rs 113 changed lines); no new file under spikes/. 205 of 300.
+- Not verified here (the main session's, after the merge): -20's L1 re-run (`c-u4f-runs.mjs 20`) and its comparison
+  with 350677f's kept logs (condition 5); the gate and CI; the reviewers' round. Clippy on the workspace ran inside
+  check.mjs only.

@@ -162,6 +162,12 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
+- **U4f-F1 BUILT** (builder done 00:0x UTC 11-20; notes u4f-f1-build.md copied; final snapshot
+  wip/u4f-f1-build.patch sha256 37d87a10bed52b81…, 17,495 B, base cb7e374, 5 files in crates/sim and crates/room):
+  205 added, 24 removed (of the 300 stop); `Command::edges_taken` at seam.rs:78; T1 commands.rs:618; T2
+  sim/tests/world.rs:1813-1920 (a-f); plants by name (f1-b2-plant.log, f1-b3-plant1/2.log; restored sha256s as
+  before); check.mjs x2 all 11 steps pass, 641 / 738 (+7 / +7), wasm 27000 ticks 0 mismatches (f1-b4-check1/2.log,
+  read). **Next: the review round** (rust-reviewer, netcode-architect, test-engineer; then security-auditor).
 - **U4f-F1's builder** from 23:15 UTC (general-purpose, opus, xhigh, isolation worktree:
   .claude/worktrees/agent-ad5f72ed146da5f93, made at origin/main f5030a3; its step 0 fast-forwards to cb7e374 and
   records it; notes in its copy of u4f-f1-build.md; logs .gate/u4f/f1-*). A first launch at 23:14 was stopped at once
