@@ -53,5 +53,13 @@
 - u4f-brief.md:1202-1204 (return item 4, plants), :1163-1183 (end checks 1-6) verified; advisor-u4f-build1.md (da98295e…): line 4 blocks <= ~400 :174-177, line 5 stop :178-181, line 15 ride :213-217, line 22 :240-244.
 - DONE: u4g-brief.md draft rev 1 written (about 245 lines); cites re-checked after writing (u4f2-brief lane :162-165; u4f-report -22 load :691-694, size :704-706, ADV-U4F20-2 :644-647; u4f-brief 5,150 at :1221; stop R2 route :129-131; history ADV-CBR-1 :6425-6429, C62H Lows :6421-6424; scene.rs CO :218-250).
 - Questions in the draft: U4G-Q1 size (his), Q2 -58's two checks (his), Q3 scenes, Q4 -60 options (his only if +3 is a run-count change), Q5 bite sites, Q6 correction trace source, Q7 cap at 1,600 (EVQ-LOAD, 1.43, P4 unmeasured), Q8 door gap.
-- NEXT: hand back the reply (<= 20 lines).
+- NEXT: hand back the reply (<= 20 lines). DONE (rev 1 handed back).
+
+## Rev 2 (the advisor's REVISE, advisor-u4g-brief.md, 285 lines)
+### Plan
+1. Read advisor-u4g-brief.md whole (done: findings -1 to -11 at :63-131; rulings Q3-Q9 + NC-U4R-4 :133-192; size :194-211; Q1 wording :213-229; Q2 drafting and wording :231-258; rev 2 list :260-277).
+2. Re-read item 7's main-session edits: u4s-carries.md (carry 78 "Amended", 91, 92, 93, carry 77 "(b) amended"); u4-build-plan.md (U4g "Moved in from U4r", §9 -60 6 / 199 / 288, §11 heal line); advisor-u4r-build3-full.md :13-16, :34-36; history.md:4950-4979.
+3. Rewrite the brief as rev 2 (Write, whole), items 1-6, keeping it short.
+### Log
+- advisor-u4g-brief.md read whole (sha256 to stamp below). Verdict REVISE; Highs -1 (B1 scope from U4r ruling 3) and -2 (Q2's "not now").
 - results/u4r/*/runs.txt: SS P0 wall 239-293 s; P2 325-351 s; P3 318-340 s; B1 322-324 s. Logs on disk: P2 measured 628.2 MiB/3 = 209 MiB/run (8ee453c22882), P3 ~297 MiB/3 = 99 MiB; runner's plan bytes P2 260 MiB/run. Range to quote: 60-210 MiB per SS 10-min run.
