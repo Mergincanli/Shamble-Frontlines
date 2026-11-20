@@ -164,8 +164,14 @@
   :192-297; notes u4h-brief-notes.md; saved 5e0f6d0): whole about 2,800-5,200 (about even to pass 6,000 at 1.5), a
   split U4h/U4h2 offered; U4H-Q1 to Q12 for the advisor; **U4H-SIZE and U4H-JUDGE (the judge gains four planned
   figures) are his**, neither a stop now (a later day's message, after the advisor's check); three items sent to U4h
-  never reached the register (N2-L3 (b), INF-U4R-6 with det-u4's 240 s, pump_report's RTT). **The advisor's check
-  RUNNING from ~22:00 UTC** (advisor-u4h-brief.md); U4g's build only after U4f2's merge
+  never reached the register (N2-L3 (b), INF-U4R-6 with det-u4's 240 s, pump_report's RTT). **The advisor's check:
+  REVISE ~22:26** (advisor-u4h-brief.md, 361 lines; read in full :58-142, :332-361): ADV-U4HB-1 High (TC inherits
+  CO's 5,000 µrad spread: -51 fails and -48 loses registration on a correct build; fix: TC's own weapon, spread 0),
+  Mediums -2 (shot id, press-edge firing) to -9 (size: U4h about 2,100-3,850, U4h2 about 750-1,550, the judge apart
+  400-900), Lows -10 to -13; rulings Q1-Q3, Q5-Q12 (mine to name in the message that carries U4H-SIZE); **U4H-Q4,
+  U4H-SIZE and U4H-JUDGE are his, in the first day's message after rev 2 is checked and U4G-Q1 is answered (2026-11-22
+  at the earliest), none a stop**; the eight register lines (item 1, :212-235) are mine, before U4h's launch. **Rev 2
+  RUNNING from ~22:28** (the drafter resumed; back to the advisor for sections 1-4, 6 and 8); U4g's build only after U4f2's merge
   (u4-build-plan.md:951-952, "never two at once"); U4G-Q2's text later, before -58's set. **Lesson:** never `cd` into an agent's
   worktree (the harness moved this session's main folder to it at 16:19; back at once); read it with Read/Grep.
   Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bh8edyqwv from 21:10 UTC (to about 23:00). Main f5030a3.

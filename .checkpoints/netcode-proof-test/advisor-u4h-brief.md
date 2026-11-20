@@ -16,6 +16,7 @@ check.mjs, npt-lab or judge run; no commit.
 5. Item 2: size; item 3: the U4g dependency and U4G-Q1; item 4: disk and run counts.
 6. Item 5: rule U4H-Q1 to Q12; item 6: Q4 and Q7 against marks' meaning; item 7: U4H-SIZE and U4H-JUDGE for him.
 7. Findings ADV-U4HB-n, verdict, what I did not check, Decisions needed, For Mustafa.
+STATUS: all blocks done (2026-11-20). Verdict REVISE; rev 2 comes back for sections 1-4, 6 and 8.
 
 ## Notes (one line per check, written as I go)
 - Head f1a7f73; `git diff --stat a289def HEAD -- spikes/netcode-proof` empty (the brief's 33dabe8 reading holds);
@@ -191,7 +192,7 @@ changes no marks.json text, the size arithmetic, the U4g dependency. What does n
   recorded in the header, never tuned after a run; each run prints its view hits and view misses (about 1,000 and 500 at
   2,000 shots), and a part whose run holds fewer than 400 view misses comes to me. (a) leaves the false-hit figure a gap.
 - **U4H-Q9, the cover record: (b), on SS, not TC.** TC's lines of fire meet no cover item: no vehicles (scene.rs:226-
-  228), the doors ring the centre 22 m out (greybox.rs:91) and TC stands at x -60 to -63 m (scene.rs:262, :341). So
+  228), the doors ring the centre 22 m out (greybox.rs:91) and TC stands at x -57 to -63 m (scene.rs:262, :341). So
   three SS P2 brawl runs under `--cover present` beside three under rewound, the same settings, each printing shots,
   rays that met cover and hits per variant (or carry 93's frozen-value ES runs as the rewound half, three present runs
   beside them); recorded, never judged. (a) widens the sim and doubles the shot's cast for a record.
@@ -207,3 +208,154 @@ changes no marks.json text, the size arithmetic, the U4g dependency. What does n
   next change (history.md:4611-4614); no U4h mark carries `pre:PM-0001-2`, so nothing orders it first; one change, one
   read by test-engineer and rust-reviewer, one yes from him (U4H-JUDGE names it). Its own block and fixture (the
   interim rule's case).
+
+## Item 1: completeness, and how the unregistered items get on the register
+- **Against the plan:** every "Builds" and "Marks moved" item of §5 U4h (u4-build-plan.md:903-918) is in the blocks,
+  with T14's order; §4.12's contract, §4.14's two -48 bites and §4.15's third runner recording are in. Missing in
+  substance: TC's weapon (ADV-U4HB-1) and the sim entry points AimCast needs (ADV-U4HB-6), both crates/sim.
+- **Against the carries:** u4s-carries.md:609-651 met by number; carry 59's pointer to 93 is in (:284-285).
+- **On the register, by the main session before U4h's launch** (u4s-carries.md's U4h section, the next free numbers,
+  each quoting its source as ruling 3's task (a) did; the plan's U4h entry needs no line, as all fall under its
+  "Builds"):
+  1. N2-L3 (b): "U4h must blend composed boxes or interpolate hull yaw wrap-aware" (u4d-round2-netcode.md:81-82;
+     routed by advisor-u4d-close.md:305-306); met by ADV-U4HB-6's shared blend.
+  2. INF-U4R-6 with INF-R2-2: advisor-u4r-r1-full.md:289's line and advisor-u4r-r2-full.md:45's base and route words;
+     met by U4H-Q10 as ruled.
+  3. `pump_report`'s RTT: advisor-u4e-r1.md:662-664; with ADV-U4HB-13's site and U6's TickLoop line.
+  4. EA-U4R-4 (advisor-u4r-r1-full.md:185) and EA-B1-1's later half (u4r-report.md:1164-1165), "the next lane that
+     opens crates/sim": U4h's if U4g's report does not list them.
+  5. SERIES.md's everyone_in_view writer cell (now :396), U4r build ruling 3 (e) (history.md:4976): U4h's SERIES.md
+     edit.
+  6. cross_arch_mismatch_count's shot and throw kinds (SERIES.md:265, "U4h"): the judge change.
+  7. JDG-ONLY-1 (history.md:4611-4614): the judge change (U4H-Q12).
+  8. ADV-U4HB-1, TC's weapon: a carry line of its own, so U4h2 (if split) and R3's TC runs inherit it.
+- **Nothing else found** in the files I searched (every advisor-*.md line naming U4h, u4r-report.md's follow-ups,
+  u4s-carries.md, the plan, history.md's ruling-3 tasks). Taken already: the next npt-lab lane's items (BRAWL-1),
+  T-6 (U4f2), npt-server's tests compiling (U4f); RR-5's encode wins are optional.
+
+## Item 2: the size
+- Rev 1's table is sound item by item on the code's shape; its sums hold. With the findings: ADV-U4HB-9's figures. U4f
+  ran about 1.5 whole and 2.0 on client and room (advisor-u4g-brief.md:94-97); U4f2 about 1.35 (2,077 against about
+  1,550: history.md:7350-7351; u4-build-plan.md:874). The room is the largest item and where U4f ran 2.0: at the top
+  of the range, the room (about 1,150) at 2.0 and the rest (about 2,700) at 1.5, the first half could reach about
+  6,300 (my arithmetic). That is what the stop is for; raising the figure to make room would set the plan to the
+  overrun.
+- The lean (b) stands, as for U4g: the cheaper option in his sense is the one that keeps each half under its stop.
+  And the judge's part as its own change (U4H-JUDGE (b)) is what keeps the first half under 6,000 at 1.5.
+
+## Item 3: the dependency on U4g, and U4G-Q1
+- Section 1.1 is right: U4h needs `Interp`'s published set and render time, the ClientSettings send and clamp, and the
+  delay's adaptation (the honest rewind the calibration measures); not `Predictor` or `CueLog` (the shooter stands at
+  its spawn). Add the brawl's view stamp (Q2 term 5) as an interface item U4g's report states.
+- Under U4G-Q1 (a) U4h launches after U4g's merge and its sets; under (b) after U4g2's merge and its sets, since all
+  three items land in U4g2 (u4g-brief.md:86-93). Unanswered, it moves U4h's launch, never its content. A later change to
+  Interp's delay rule re-runs the calibration first (1.1's last line): it stands.
+
+## Item 4: the disk and the run lists
+- **Judged and calibration (L1, TC):** -48 24, -49 P4 6, -50 7, -51 12, -54 3 = 52 measured; 5 bites; 12 calibration;
+  69 in all, as §9 (u4-build-plan.md:1031-1035). **Recorded beside them:** the TC B1 seed 3 recording (1), Q9's cover
+  runs (6 on SS, or 3 with carry 93's), carry 93's ES runs (6-9), carry 88's pre-check (6, plus a re-record if needed),
+  the pre-runs. About 85-95 runs.
+- **Logs:** TC about 0.15-0.7 GiB (unmeasured), Q9 on SS about 0.4-1.3 GiB (62-210 MiB a run), ES 0.4-1.9 GiB,
+  pre-check about 0.1 GiB: about 1.0 to 4.0 GiB in all. The build's disk dance holds as U4f2 ran it (about 10.1 GB free
+  after each part-clean, a counted run leaving about 3.5 GB: history.md:7338-7353). D2 at launch against the 4,096 MiB
+  floor; a set past it waits for a pack of a closed set (c62h-bound-brief.md 8.1 :485; KEPT-LOGS). Rev 2's table adds
+  the recorded runs.
+
+## Item 6: do Q4 or Q7 change a mark's meaning?
+- **Q4: yes, his.** marks.json's note and SERIES.md:153 define the gain against "an honest twin shot"; a real honest
+  shot carries the frame-to-tick wait (0 to 1 tick, which the estimate only centres) and the jitter, so a room built to
+  ADR 0001 reads up to about 50 ms against the 33.33 ms bar, and about 100 ms more if the twin announced a normal
+  delay while the cheat announces the largest. Reading (a) is the only one under which -50 can pass, so the reading
+  decides the verdict: that is a pass mark's meaning (TEST-FIRST rule 2, "any change to a pass mark").
+- **Q7: no, mine.** The SERIES.md cell's order contradicts the check's own words and number; correcting it makes the
+  series measure what marks.json and the ADR row already say.
+
+## For Mustafa, paste-ready (not 2026-11-21's message)
+```text
+U4H-Q4: what "an honest twin" means in the cheat test PM-0001-50 (a cheat cannot buy rewind). A cheating test client
+claims the largest view delay the server allows and stamps its shots at the very edge of what the server accepts. The
+test passes if each such shot gets at most 33.33 ms more rewind than "an honest client at the same RTT"; marks.json's
+note says the lab pairs each cheat shot with "an honest twin shot".
+(a) The honest twin is the server's own estimate for an honest client at the same true RTT and the same announced
+    delay; the gain is the cheat's rewind minus that. A server built as ADR 0001 says passes; the planted bug (no
+    tolerance check) fails by about 100 ms.
+(b) The honest twin is a real honest shot from the same moment. A real shot also carries the wait from its drawn frame
+    to the next tick and the network jitter, which the server's estimate can only centre, so a server built exactly as
+    ADR 0001 says reads up to about 50 ms (about 100 ms if the honest player announced a normal delay): -50 would then
+    fail unless its bar changed, which would be a separate decision of yours.
+Under (a), marks.json keeps its words, the series file's two lines for the gain say what is measured, the reading goes
+on the readings list, and (b)'s figure is printed beside it in every run's report, never judged. Only -50's judged
+runs wait for this.
+My lean, and the advisor's: (a).
+```
+```text
+U4H-SIZE: the size of unit U4h (hits as the shooter saw them, the rewind cap, the rewind cheats, aiming at height,
+thrown projectiles). It is planned as a medium unit (about 3,000 lines; your stop at 6,000). Our estimate is about
+2,850 to 5,350 lines, not counting the judge's new computations (U4H-JUDGE). U4f, the last medium unit, came to about
+1.5 times its estimate in all, so U4h built whole stands about even to pass 6,000 and stop mid-build.
+(a) Build it whole as planned: one review, one merge. The stop past 6,000 stays; if it is hit, you get three lines then.
+(b) Split it in two, each with its own review and merge: U4h, lag compensation (hits as the shooter saw them, the
+    rewind cap, the two rewind cheats: about 2,100 to 3,850 lines; stop past 6,000), then U4h2, aiming at height,
+    thrown projectiles, the cover record and the busy-scene hit rule (about 750 to 1,550 lines; planned about 1,150,
+    stop past 2,300). No pass mark, judge rule or marks.json text changes, and no run is dropped.
+The cheaper option is (b): one more review and merge, and no mid-build stop waiting on you. The build starts with the
+lag-compensation half either way, so nothing waits for this answer until that half is done.
+My lean, and the advisor's: (b).
+```
+```text
+U4H-JUDGE: the judge gains the computations U4h's tests need, and one fix. marks.json already names figures the judge
+cannot compute yet: the share of shots that hit in the shooter's view and that the server registered; the share of
+view misses the server counted as hits; whether the later rule cap equals its rule; and the thrown projectiles whose
+flight differs from the server's. Their formulas are written in the series file (marks/SERIES.md), with the parts for
+the later network runs, where a difference seen only on the Arm load machine is reported and decides nothing; those
+parts are built now too, tested on made-up logs only. The same change fixes JDG-ONLY-1: the judge's option that
+narrows a run to some marks can skip a precondition mark (today a rule of use covers it). This changes the judge's
+code, not marks.json, a pass mark or a number. Each computation gets pass, fail and gap test files, and the
+test-engineer and the rust-reviewer read every judge line.
+(a) Yes, built inside U4h, after the rest of its build (its first half then reaches about 7,100 lines at U4f's 1.5,
+    past your 6,000).
+(b) Yes, as its own small change (the judge only, about 400 to 900 lines; stop past 1,300), reviewed and merged before
+    U4h's judged runs. It shares no file with U4h, so it need not wait for U4h's build.
+(c) No: the hit-registration and throw checks stay not-run at this stage, and JDG-ONLY-1's fix comes back to you
+    alone.
+My lean, and the advisor's: (b). Only U4h's judged runs wait for it.
+```
+- **Whose:** all three his under TEST-FIRST: Q4 a pass mark's meaning, U4H-JUDGE "any change ... to the judge", U4H-SIZE
+  a change of the plan's units (rule 2's four conditions fail on "inside your approved plan"). The figures are mine,
+  rounded; rev 2's recomputed sums replace them in the texts if they differ, nothing else changes.
+- **Which day:** not 2026-11-21's (it already carries F-B-COUNT and U4G-Q1; his U4G-Q1 answer frames U4H-SIZE, and
+  rev 2's figures are not in). The first day's message after rev 2 is checked and his U4G-Q1 answer is in: 2026-11-22 at
+  the earliest, all three together, with my Q1-Q3 and Q5-Q12 rulings named under its choices. Nothing of U4h waits for
+  them before U4g (or U4g2) is merged and its sets are done; an answer by then lets U4H-JUDGE (b) be built first.
+
+## What rev 2 must change (REVISE: the exact changes)
+1. ADV-U4HB-1: TC's own weapon (spread 0; magazine and reload met), its header, its test; crates/sim's lane gains it.
+2. ADV-U4HB-2: the shot id, press-edge firing, reruns and refused presses counted, the contract case.
+3. ADV-U4HB-3, -4, -7: U4H-Q2, Q5 and Q6 folded as ruled.
+4. ADV-U4HB-5: the room-side wait cap, stated, with its two tests.
+5. ADV-U4HB-6: crates/sim's two pub items (the shared blend-and-cast, the fire-origin height), A19's list.
+6. ADV-U4HB-8, -9: section 6 recomputed; section 8's three texts as above (figures from the recomputation); blocks
+   reordered so the judge's block is a change of its own under U4H-JUDGE (b), and the lag half's last block keeps the
+   no-answer line.
+7. Rulings Q1-Q3, Q5-Q12 folded, one "Ruled" line each pointing here; Q4 "his, text: advisor-u4h-brief.md".
+8. Lows -10 to -13 in the same pass. Item 1's register lines are the main session's, before launch.
+9. Rev 2 comes back to me for sections 1-4, 6 and 8 only.
+
+## What I did not check
+- I ran nothing. The spread's effect is arithmetic on world.rs's formula and scene.rs's positions, not a run; the
+  brawl's replaced share under U4h depends on a default rev 2 must state; my size figures are rounded judgements.
+- Whether TC's lines of fire cross any door or the wall stand-in exactly (I read the greybox's building ring only);
+  whether U4g's build takes EA-U4R-4 or changes the brawl's stamp; every stamp's sha256 beyond marks.json and
+  SERIES.md; u4f-brief.md's sections the brief points to beyond their cites.
+
+## Decisions needed
+- **U4H-Q4** (his): what -50's "honest twin" is. Lean (a), the server's own estimate for an honest client at the same
+  true RTT and announced delay. Text above.
+- **U4H-SIZE** (his): split U4h in two or build it whole. Lean (b), split. Text above.
+- **U4H-JUDGE** (his): the judge's computations for U4h and JDG-ONLY-1's fix, inside U4h, as their own small change, or
+  not now. Lean (b), their own change. Text above.
+- All three in the first day's message after rev 2 and his U4G-Q1 answer (2026-11-22 at the earliest), none a stop.
+
+## For Mustafa
+Nothing now from this check: the three questions ride a later day's message, after rev 2.
