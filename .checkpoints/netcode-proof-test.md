@@ -159,12 +159,9 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **U4f-F1 BUILT** (builder done 00:0x UTC 11-20; notes u4f-f1-build.md copied; final snapshot
-  wip/u4f-f1-build.patch sha256 37d87a10bed52b81…, 17,495 B, base cb7e374, 5 files in crates/sim and crates/room):
-  205 added, 24 removed (of the 300 stop); `Command::edges_taken` at seam.rs:78; T1 commands.rs:618; T2
-  sim/tests/world.rs:1813-1920 (a-f); plants by name (f1-b2-plant.log, f1-b3-plant1/2.log; restored sha256s as
-  before); check.mjs x2 all 11 steps pass, 641 / 738 (+7 / +7), wasm 27000 ticks 0 mismatches (f1-b4-check1/2.log,
-  read). **Next: the review round** (rust-reviewer, netcode-architect, test-engineer; then security-auditor).
+- **U4f-F1 BUILT** (00:0x UTC; snapshot wip/u4f-f1-build.patch 37d87a10…, base cb7e374, 5 files, 205 added of 300):
+  `Command::edges_taken` seam.rs:78; T1 commands.rs:618; T2 sim/tests/world.rs:1813-1920; plants by name; check.mjs x2
+  all 11 pass, 641 / 738 (+7), wasm 0 mismatches (.gate/u4f/f1-b4-check1/2.log, read).
 - **U4f-F1's round CLOSED** (four seats APPROVE WITH FINDINGS: u4f-f1-review-<seat>.md; **the advisor's ruling
   APPROVE WITH CONDITIONS FP-1 to FP-5**, advisor-u4f-f1-r1.md, 266 lines, read in full; no round 2, its check of the
   pass instead): TE-F1-1 = NC-F1-1 keep the code, bind the wording ("0 presses lost" holds by design, as "doubled" did;
