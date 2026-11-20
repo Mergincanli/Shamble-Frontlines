@@ -357,4 +357,49 @@
 - FP-4's plant (the lag client back on the steady script): u4f2-fp4-plant.log, f20 FAILS by name at
   scenario.rs:4258, "a burst tick moves" (excess -1,600,000 on every tick). Restored by Edit, 212c6ed8… equal (then
   f20's doc lines only). Clean bots lib.rs a8217faa….
-- SIZE-CHECK after FP-4: +2,069 -188 tracked; forged.rs 380: about 2,449 added (+37).
+- SIZE-CHECK after FP-4: +2,069 -188 tracked; forged.rs 380: about 2,449 added (+37). Snapshot taken (176,054 B).
+- **FP-8: DONE.** (SA-U4F2-1 = TE-U4F2-15) scenario.rs `parse`: `--forge-every` 2 to 1,000,000 ("a whole number from
+  2 to 1000000"), USAGE says so; bots `forger` `None` when `every.checked_mul(8)` fails (its doc says so). (RR-U4F2-3
+  with NC-U4F2-5's usage half) `--suite forged` with a profile other than P0 or with `--lead`: "--suite forged runs at
+  --profile P0 on its forgers' fixed lead (no --lead)". (SA-U4F2-3) forged.rs `records`: `counted_count` on kinds 8, 9
+  and 11's records; SERIES.md's U4f2 subsection one new row (`event.forged_kind.counted_count`); f16 asserts it equals
+  `sent_count` for those kinds. (RR-U4F2-2) forged.rs: `Forger::reused` (an `insert` that found the sequence) added to
+  `unrejected_count`; the module text names the one-lap limit (65,536 commands a forger, about 36 min at 30 Hz).
+  (RR-U4F2-4) room.rs `RefusalRecord`'s three field docs. (NC-U4F2-6) bots `twin()`'s doc names both skip timings
+  (kinds 1, 2, 4, 5, 6 at the due step, kind 10's at the next step). (TE-U4F2-9) forged.rs case: `records(3)` carries
+  3 on each record. (TE-U4F2-10) c-u4f-r2.mjs: after RUNS, every -21 row (marks M21, the 15 rows p1 to p20) gets
+  "; the summary's 'in a building: 0 slot-ticks'" in its expect. (TE-U4F2-11) c-u4f-runs.mjs: `BYTES_10MIN_21 =
+  65_188_828` (hand-long2's `du -sb`) for set 21's projection, the header comment says so. (TE-U4F2-12) f16: in the run,
+  every client's `client_counts` refusal fields (ROOM_COUNTS and PUMP_COUNTS, less `events_queued_count` and
+  `commands_repeat_count`, the traffic) are 0 but a forger's own kind's (1 lead_refused, 2 not_newer, 3 seq_refused, 4
+  move_refused, 5 press_refused, 6 aim_refused, 7 none, 8 ack_refused and ack_refused_commands, 9 pump trailing and
+  unknown field, 10 buffer_full, 11 pump wrong_channel): no nonzero count found.
+- New tests: c_u4f2_1 adds "1000001" and "18446744073709551615" refused, "1000000" taken, P1 and `--lead 5` refused
+  with the message; f15_a_forgers adds `forger(k, u64::MAX / 8 + 1)` `None` for every kind; forged.rs
+  `fp8_a_sequence_forged_again_counts_unrejected` ((sent 1, unrejected 1)) and `fp8_every_record_carries_the_dropped_
+  count_and_kinds_8_9_11_their_counter`. u4f2-fp8-tests4.log: fmt exit 0; f15_a_forgers PASS 0.00 s; forged:: 18 PASS
+  0.00 s; c_u4f2_1 PASS 4.17 s; f16 24 PASS 57.87 s (the shared pairs: 0 s added). `node --check` on both run scripts:
+  exit 0. Four fmt rounds (rustfmt's splits applied by Edit, u4f2-fp8-tests.log to -tests3.log).
+- FP-8's plants: (a) `counted_count` written as sent + 1: u4f2-fp8-plant-a.log, f16 kinds 8, 9, 11 under A and B FAIL
+  by name at scenario.rs:4552 ("counted": 14 against 13), and the fp8 record case (1 against 5). (b) the dropped count
+  written as 0: u4f2-fp8-plant-b.log, `fp8_every_record_…` FAILS at forged.rs:408 (0 against 3). Each restored by
+  Edit, 9cedb01b… equal. Clean scenario.rs 8b0cb63a…, bots lib.rs c573f3f2….
+- SIZE-CHECK after FP-8: +2,140 -190 tracked; forged.rs 422 (`wc -l`): about 2,562 added, under the advisor's 2,700.
+  Snapshot taken (184,164 B).
+- **Part A's end checks** (u4f2-fp-end.log, `-x -k`, 22:21-22:22 UTC, free 8,783 MiB; u4f2-fp-end2.log): `cargo fmt
+  --check` exit 0; clippy `--workspace --all-targets -D warnings` measured exit 0 and `--all-features` exit 0; clippy
+  wasm32 (check.mjs's WASM_CRATES) measured exit 0 and `--all-features` exit 0; `RUSTDOCFLAGS=-Dwarnings cargo doc
+  --no-deps --workspace` exit 0, `--all-features` exit 0, wasm32 exit 0, wasm32 `--all-features` exit 0. Tree: the
+  runner's `git diff HEAD -- .` 6e91cf5b91c697a0c00b3be828f8f528c85512131f315066000777537e12dd75, untracked
+  83a612c8a9e4ec25d1154d68216b5b2311e6fc70f7ab82c1379de6186f22f72c (HEAD 0376c76).
+- New tests' time alone (debug, measured build): T-K7 1.70 s; fp3 0.00 s; fp5 0.13 s; fp6 0.00 s; the two fp8 cases
+  0.00 s; c_u4f2_1 4.17 s (was 0.00 s); f20 12.84 s (its run unchanged in length, FP-4 changes its slot 0's script;
+  no earlier time alone recorded); f16 x 24 57.87 s together (as before, 58.08 s). About 6 s a build added, 12 s over
+  both: inside the 30 s. Not run: the whole test step (R6's), nor `Summary::soldiers`' per-tick cost on the other lab
+  tests (test builds only), which R6's step time reads.
+- Not built (FP-2, waiting for F-B-COUNT); the disk's floor was not met in part A (free above 8.7 GB throughout; no
+  clean asked).
+- Slips in part A (no effect on any file): logs and two small files read through the shell (`grep`, `sed -n`, `head`
+  and `cat` on .gate/u4f/ logs, worktree_patch.py and bots clippy.toml) where the rules ask the Read and Grep tools;
+  one `git -C` refused by the guard and re-run plainly. Every write was by Edit; no shell write, no `cargo fmt` write,
+  nothing cleaned or deleted, nothing committed.
