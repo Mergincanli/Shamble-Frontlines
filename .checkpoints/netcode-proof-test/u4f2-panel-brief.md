@@ -8,7 +8,7 @@
   T-6, C-U4F2-8, ADV-U4FP-3).
 - **The diff:** 13 tracked files, +1,715 -175, plus the new `spikes/netcode-proof/crates/lab/src/forged.rs` (362):
   2,077 added, under the 3,000 stop. Read it as the patch `.checkpoints/netcode-proof-test/wip/u4f2-build.patch`
-  (sha256 e9a0ae3e3f48af18a7a947fdf9aba849061fa32fbd91876a948c46f3046406b). The base files are the main folder's
+  (sha256 e9a0ae3e3f48af18ea7a947fdf9aba849061fa32fbd91876a948c46f3046406b). The base files are the main folder's
   `spikes/` (equal to a289def's). The built tree is the builder's worktree
   `/home/user/Shamble-Frontlines/.claude/worktrees/agent-aa62d31b6fa5b9807`: read its files with the Read, Grep and
   Glob tools at their absolute paths; never `cd` into it.
