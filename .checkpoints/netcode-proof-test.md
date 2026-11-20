@@ -187,6 +187,12 @@
   waits for his answer.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
+- **2026-11-20 about 01:01 to 01:05 UTC (a container restart: the F1 pass's first check.mjs and the saver):** "The
+  container was restarted. The following background tasks were running and are now stopped: - Restart the background
+  checkpoint saver (task b1d4cn50i) - Run check.mjs, first run of the fix pass (task bp98t6o2k) Re-create them if still
+  needed." (up since 01:01:16 by /proc/uptime). Checked at 01:04: FP-2 to FP-4 run with their plants restored (seam.rs
+  901bb546…4c90, the post-FP-1 hash; world.rs 4a4e138c…), no plant left, no process; f1-b5-check1.log cut at 00:56;
+  7,528 MiB free. The saver restarted; the builder resumed by SendMessage to re-run check.mjs twice.
 - **2026-11-19 23:18:18 to about 23:22 UTC (a container restart: U4f-F1's builder and the saver):** "The container was
   restarted. The following background tasks were running and are now stopped: - Restart the background checkpoint
   saver (task bdhc8uudx) - Build U4f-F1 in a worktree (task ad5f72ed146da5f93) Re-create them if still needed." (the
