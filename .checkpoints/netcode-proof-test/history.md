@@ -7158,3 +7158,10 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   1,600, no longer provisional; -20's set before -22's (order -47, -20, -22, -21), its 10-minute P3 runs read for
   honest overflow resyncs first; the fast-clock cheat sends no pings (a recorded deviation); main b763ba3 taken in now,
   plan first (MAIN-60). Why: inside the plan, undoable, no pass mark, bar text, judge file or marks.json changes.
+
+## Card blocks moved 2026-11-20 after U4f-F1's round ruling (card_trim_1120a.py; from 'Now: U4f')
+- **U4f's after-merge record** (history.md:7090-7122, card_trim_1119j.py; U4f's report, "After the merge", items
+  1-5): merged at 25d316e (pushed c26ff6a, CI green; the advisor's head check APPROVE WITH FINDINGS); r2 done and read
+  (advisor-u4f-r2.md: 14 of 17 as expected; p4, p13, p19 to U4f2 as C-U4F2-5 to -7); the part-clean (D2 5,204 ->
+  11,552 MiB); **-47 PASS** (p99 2.597 / 2.516 / 2.638 ms against 5; both bites shown; a4cac39). Builders 1-4's
+  worktrees kept until the sets end (then LEFTOVER-DELETE).

@@ -68,11 +68,6 @@
   or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
   brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
   with its source before its first snapshot). -21 is judged only after U4f2.
-- **U4f's after-merge record** (history.md:7090-7122, card_trim_1119j.py; U4f's report, "After the merge", items
-  1-5): merged at 25d316e (pushed c26ff6a, CI green; the advisor's head check APPROVE WITH FINDINGS); r2 done and read
-  (advisor-u4f-r2.md: 14 of 17 as expected; p4, p13, p19 to U4f2 as C-U4F2-5 to -7); the part-clean (D2 5,204 ->
-  11,552 MiB); **-47 PASS** (p99 2.597 / 2.516 / 2.638 ms against 5; both bites shown; a4cac39). Builders 1-4's
-  worktrees kept until the sets end (then LEFTOVER-DELETE).
 - **-20 and -22 DONE, all three sets run** (records at history.md:7124-7146, card_trim_1119k.py; u4f-report.md items
   5-6): -20 at 350677f (1840e68): PM-0001-2 PASS; PM-0001-20 A PASS, B FAIL "0 presses lost" 3/1/2; overflow 0;
   high-water 1,117 (margin 1.43). -22 at 7192607 (2dae645): PM-0001-22 PASS, bite shown, load report as designed.
