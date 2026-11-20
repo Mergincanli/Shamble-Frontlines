@@ -88,22 +88,15 @@
 
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
-- **2026-11-19 evening (to name in the next day's message):** by the advisor's -20 ruling (advisor-u4f-20.md R20-Q1,
-  ADV-U4F20-1), the stand-in sim is fixed to take every press edge and -20's L1 set re-runs on the fix (7 runs, no
-  money); by my lean, that fix is its own step, U4f-F1, before U4f2 (U4f2 waits for his size answer). Why: a defect
-  found by a judged run, fixed inside the plan; the bar and marks.json stay; undoable.
-- **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
-  no caller) stays public and goes to U4f2's lane by number, its lean a caller (the lab writes `params.cmd_timing` from
-  the live room, f6 asserts it), else removed (ADV-U4FMH-2). Why: no behaviour change; undone in U4f2.
-- **2026-11-19 after his answer (to name in the next day's message):** f28's clamp and lag-switch B halves go to U4f2
-  with the rest of -21 (the advisor's R3 (ii); his (a) lists the forged test, its six cheats and -21's runs). Why:
-  inside the plan, undoable, no pass mark; neither half is built, and no -21 run counts before U4f2 merges.
-- **2026-11-19 by the advisor's round-1 ruling (to name in the next day's message):** -22's judged set runs U4f's
-  controller (NC-U4F-2); f5 is measured as the brief writes it, late apart from missing, the unruled 3 % dropped
-  (TE-U4F-1; no bar changes); no second review round on the fix pass (the 2026-11-17 choice), the advisor's check of
-  it instead. Why: inside the plan, undoable, no pass mark, judge file, marks.json or existing SERIES.md row changes.
-- **2026-11-19 (to name in the next day's message):** main f5030a3 taken in now, while builder 4 runs, plan first
-  (MAIN-61; advisor-main-61.md C1-C6). Why: his MAIN-52 rule; inside the plan, undoable; nothing on main changes.
+- **2026-11-20 (to name in the next day's message, 2026-11-21 Amsterdam; advisor-u4f-f1-r1.md:207-221, ADV-U4FF1P-4):**
+  U4f-F1's one review round (four seats, all APPROVE WITH FINDINGS) and its small fix pass (doc wording, one new test,
+  two test touches), checked by the advisor, no second round; after F1, "0 presses lost" in -20 and -58 holds by the
+  press counters' design, as "0 presses doubled" did (the room counts with the rule the sim runs; T1/T2 and their
+  plants prove the take; the runs show presses equal to the scripted 432,000 per option-B run); a judged check of that
+  count is a marks.json change, his, on "After the close"; the first-command gap F1 widened (a pool of grenades per
+  rejoin, an honest restart's phantom presses) goes to U6 as C-U6-19, closed before -19 runs. Why: inside the plan,
+  undoable, no pass mark, judge or marks.json change.
+- The choices of 2026-11-19 named in msg-2026-11-20.md: history.md:7177-7193 (card_trim_1120c.py).
 
 ## Next steps (plan rev 3.3; units ahead)
 1. U4f (above), then U4f2 (-21's forged suite and runs; its short brief to the advisor; its size line on the card before
@@ -123,8 +116,8 @@
 - **For the readings PR before R5 (plan :970-983):** A1's reading of ADR 0001:1611's "moves" (the advisor's U4f ruling,
   :78-85); the items the old card lists (history.md:6458-6461: Q15 (a), WS-RECONNECT-BAR (b), the PM-0001-31 pointer);
   from U4f-F1's round (advisor-u4f-f1-r1.md:153-169): NC-F1-3 (part 5's per-command order, one shot per command,
-  collapsed throws), SA-F1-3's v2 rule (every press action has server-side rate state), and C-U6-19's session-start
-  sentence.
+  collapsed throws), SA-F1-3's v2 rule (every press action has server-side rate state, or takes at most one edge per
+  command), and C-U6-19's session-start sentence.
 - **Carried past U4 (the old card's Open findings, history.md:6430-6464):** the advisor's U2 carries C1-C5 and its
   Note; C-U7-1; the U1 carries (C4, C6, A3, the results ledger, Q13, Q23); C6 widened (U6, before R3); JITTER-ORDER
   (parked: to him before R3 only if C6 shows the model's reordering moves a WebTransport result).

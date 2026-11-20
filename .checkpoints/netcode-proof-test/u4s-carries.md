@@ -577,7 +577,8 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     the room count, per client, the cosmetic events sent for that client's own shots (0 in a correct build; above 0
     under PM-0001-62/server-echo), with a test under the bite."
 - From U4f-F1's round (advisor-u4f-f1-r1.md): TE-F1-5 by id beside carry 47, two bites-build 2-edge twins for
-  PM-0001-21/no-cooldown and refuse-not-clamp, taken only if open and cheap (:147-150); NC-F1-4 named beside 47, a
+  PM-0001-21/no-cooldown and refuse-not-clamp, taken only if open and cheap, else left for crates/sim's next opener
+  (:147-150); NC-F1-4 named beside 47, a
   replay without its reset reads a backwards step as up to 255 edges (:156-158); -58 reaches the press counters' wrap
   without a first command carrying more edges than the ticks it covers from the slot's references (:123-125); and the
   brief states in one line that its runs hold no throwing or rejoining hostile client and no client restarted

@@ -7173,3 +7173,21 @@ My words of 2026-11-19, 12:00 (Amsterdam time): SIZE-U4F: (a). Close U4f with wh
   system's notice; the container up from 23:18:27 by /proc/uptime; the builder's last transcript entry 23:18:18.152Z).
   Checked at 23:21: the builder's worktree at cb7e374 (its step 0 done), `git status` empty, no notes, no f1-* log, no
   cargo or npt-* process: no half edit, no plant. The saver restarted; the builder resumed by SendMessage.
+
+## Card blocks moved 2026-11-20: the choices named in msg-2026-11-20.md (card_trim_1120c.py; from 'Choices taken without him')
+- **2026-11-19 evening (to name in the next day's message):** by the advisor's -20 ruling (advisor-u4f-20.md R20-Q1,
+  ADV-U4F20-1), the stand-in sim is fixed to take every press edge and -20's L1 set re-runs on the fix (7 runs, no
+  money); by my lean, that fix is its own step, U4f-F1, before U4f2 (U4f2 waits for his size answer). Why: a defect
+  found by a judged run, fixed inside the plan; the bar and marks.json stay; undoable.
+- **2026-11-19 by the advisor's merge head check (to name in the next day's message):** `Room::cmd_timing()` (public,
+  no caller) stays public and goes to U4f2's lane by number, its lean a caller (the lab writes `params.cmd_timing` from
+  the live room, f6 asserts it), else removed (ADV-U4FMH-2). Why: no behaviour change; undone in U4f2.
+- **2026-11-19 after his answer (to name in the next day's message):** f28's clamp and lag-switch B halves go to U4f2
+  with the rest of -21 (the advisor's R3 (ii); his (a) lists the forged test, its six cheats and -21's runs). Why:
+  inside the plan, undoable, no pass mark; neither half is built, and no -21 run counts before U4f2 merges.
+- **2026-11-19 by the advisor's round-1 ruling (to name in the next day's message):** -22's judged set runs U4f's
+  controller (NC-U4F-2); f5 is measured as the brief writes it, late apart from missing, the unruled 3 % dropped
+  (TE-U4F-1; no bar changes); no second review round on the fix pass (the 2026-11-17 choice), the advisor's check of
+  it instead. Why: inside the plan, undoable, no pass mark, judge file, marks.json or existing SERIES.md row changes.
+- **2026-11-19 (to name in the next day's message):** main f5030a3 taken in now, while builder 4 runs, plan first
+  (MAIN-61; advisor-main-61.md C1-C6). Why: his MAIN-52 rule; inside the plan, undoable; nothing on main changes.
