@@ -26,7 +26,7 @@
   hashes when the weapon fires once; edges in the cooldown or on the last round are refused as Cooldown or Ammunition;
   two reload edges start one reload; each throw edge throws or meets a full pool, the pool of 16 and the fuse longer
   than the test's 20 ticks pinned first (FP-4). Two plants fail by name.
-- **FP-2** (sim/tests/seam.rs:582-596): the rule across the u8 wrap: (255, 1) 2, (254, 0) 2, (1, 0) 255, (0, 255) 255,
+- **FP-2** (sim/tests/seam.rs:582-593): the rule across the u8 wrap: (255, 1) 2, (254, 0) 2, (1, 0) 255, (0, 255) 255,
   (7, 7) 0, (0, 1) 1. Plant `now.saturating_sub(last)`: fails by name at :591.
 - **check.mjs**, all 11 steps: twice in the builder's copy on the final snapshot, and once in the main folder on the
   merged tree (01:54:18-02:13:49 UTC, .gate/u4f-f1-merge/m5-check.log): 642 measured and 739 bites tests, 0 failed,

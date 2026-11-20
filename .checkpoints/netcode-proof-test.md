@@ -139,12 +139,16 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **U4f-F1 DONE but the advisor's close read:** its round, pass, merge (1faf894), the -20 re-run (PASS, 46ca143; CI
-  green on 199c82d), F1's report and -20's record, and condition 10 (u4f2-brief.md rev 1.2): history.md:7217-7247
-  (card_trim_1120e.py). **Running from 04:20 UTC, resumed 04:26 after the restart:** the advisor's read of the -20
-  record and F1's report (its condition 3; out: advisor-u4f-f1-close.md), then F1 closes; **U4g's brief, draft rev 1**
-  by a drafter (notes u4g-brief-notes.md, draft u4g-brief.md; to the advisor before U4g's build, after U4f2). Saver
-  bfwo06d6a from 04:24 UTC. Main still f5030a3 (fetched 04:19); 10,124 MiB free.
+- **U4f-F1 CLOSED** (04:3x UTC): its round, pass, merge (1faf894), the -20 re-run (PASS, 46ca143; CI green on
+  199c82d), F1's report and -20's record, and condition 10 (u4f2-brief.md rev 1.2): history.md:7217-7247
+  (card_trim_1120e.py). **The advisor's close read: APPROVE WITH FINDINGS** (advisor-u4f-f1-close.md, 187 lines: -20's
+  L1 verdict counts; every expected figure held, re-run by it, and all 21 raw logs equal to 350677f's but headers and
+  the lost counts; FP-5 (i)-(v) and the correction found; condition 10 met). Its three Lows fixed by Edit:
+  ADV-U4FF1C-1 (u4f-report.md's Security section names SA-F1-1), -2 (seam.rs:582-593), -3 (compare_20.py and jdiff.py
+  copied beside the reports, hashes equal to its 65e29b45… and 3c836ef8…). PR #40 stays draft and needs-mustafa.
+- **Running from 04:20 UTC, resumed 04:26 after the restart:** **U4g's brief, draft rev 1** by a drafter (notes
+  u4g-brief-notes.md, draft u4g-brief.md; to the advisor before U4g's build, after U4f2). Saver bfwo06d6a from 04:24
+  UTC. Main still f5030a3 (fetched 04:19); 10,124 MiB free.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,

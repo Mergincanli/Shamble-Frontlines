@@ -81,3 +81,107 @@ their figures below are from those runs, read back from my session. Resumed 04:2
   431,998 (pass), the same at both commits. It is the bite, not an option-B run, so (i)'s "432,000 per option-B run"
   is untouched; I name it so no reader takes the bite's figure for a missing press.
 - The kernel change (Block 2) is outside my list (header lines, not summary lines) and moves nothing.
+
+### Block 4: FP-5 (i)-(v) and ADV-U4FF1H-1's correction, in both records (DONE: all found)
+Where: the -20 L1 record is u4f-report.md:646-680 (item 5's last sub-bullet; the item's heading line :592-593 says "Re-run
+on U4f-F1's merge: PASS (46ca143; -20's L1 record, at this item's end; F1's report u4f-f1-report.md)"). F1's report is
+u4f-f1-report.md:57-78 (its FP-5 section) and :44-46 (the correction).
+| Line | Source | -20 L1 record | F1's report |
+|---|---|---|---|
+| (i) Block 1's sentence | r1:67-72 (inside :65-72) | :663-668: word for word (a python compare, whitespace folded: equal) | :58-63: word for word (equal) |
+| (ii) Wasm | r1:142-144 | :669-670: the same words ("Wasm, by reading only: ...") | :64-66, plus RR-F1-4 = TE-F1-4's reason |
+| (iii) the throw's rate state | r1:166-169 | :671-672: the same words | :67-69, plus the v2 rule to the readings PR |
+| (iv) SA-F1-1 open as C-U6-19; RR-F1-1 no action | r1:136-139 (RR-F1-1), :131-133 (SA-F1-1) | :673-675: SA-F1-1 (Medium) open until C-U6-19, before -19; RR-F1-1 no action with its reason, shortened (it drops "or a bites build" and the T2 (f) reason) | :70-73 with the whole reason; and its own Security section :97-101 |
+| (v) the premise corrected; the hash | r1:44-47; pass :175-176 | :676-678: both | :74-78: both, with blob b757470 and the cite |
+| ADV-U4FF1H-1 | head check :119-121 | :679-680 | :44-46; 46ca143's message carries it too (`git log -1 46ca143`) |
+- The record's "no -20, -21 or -22 client rejoins or throws" holds by reading: -20's bots press fire only
+  (bots/src/lib.rs:643-646 at 1faf894: `presses[PRESS_FIRE]` alone), -22's press nothing, -21's forgers neither throw nor
+  rejoin (r1:90-93, u4f-brief.md:533, :1402, which I did not re-open).
+- NC's "High then" (r1:72-73) does not fire: neither record offers the PASS as run-scale evidence of the sim's take. Both
+  say the opposite ((i); F1's report :115-116, "What was not verified").
+- One gap, a Low: r1:132-133 has "F1's record and U4's report name it [SA-F1-1] in a line of its own". F1's report does
+  (:97-101). U4's report "folds" u4f-report.md (its :8), whose own Security section (:467-468, "for PR #40's report")
+  still reads "No security finding stays open on U4f"; SA-F1-1 appears there only inside item 5's (iv). See
+  ADV-U4FF1C-1.
+- Code cites in F1's report spot-checked at 1faf894: seam.rs:73-80 (FP-1's doc, `edges_taken` at :79), world.rs:1338
+  `run_command` with the rule at :1348, room.rs:1333 `run_one` with the rule at :1343, room.rs:352-357 `presses()`,
+  room.rs:1327-1331, commands.rs:617-618 (T1), sim/tests/world.rs:1825-1921 (T2), input.rs:287 (`if let Some(prev)`):
+  all as stated. sim/tests/seam.rs's FP-2 test runs :581-593, not "582-596" (:594-596 are the next item's blank line
+  and doc); its assert at :591 is right. ADV-U4FF1C-2.
+- Other cites read: r1:223-239 (the ruling table), pass :181 (the verdict), history.md:6818-6819 (the 2026-11-17 choice):
+  as stated.
+- The run's start: c-u4f-r2.mjs:116-123's `committed()` refuses any uncommitted tracked file and reads HEAD once at the
+  start. HEAD 96de6ac (02:21:50 UTC); the card's "running" save 9f288d1 came at 02:22:21 and the run folder at 02:22:42,
+  so the runner started between them and the card was committed while it built: only .checkpoints/ moved, the spike
+  tree did not (Block 1). As the record says.
+
+### Block 5: condition 10, U4f2's brief rev 1.2 (DONE: met as written, no new check)
+Condition 10 (plan :222-223): "U4f2's brief rebases on F1's merge (Q3): its base and its count baseline
+(u4f2-brief.md:15, :128), and it takes condition 7's item." With r1's two carries and my pass check's condition 4.
+- **The base:** section 0 (:21-26) names 1faf894 (tree d4f6cd41...) and says outside results/ it is 25d316e plus F1's six
+  files, +239 -24. `git diff --stat 25d316e 1faf894 -- spikes/netcode-proof ':(exclude)…/results'`: exactly those six
+  files, 239 insertions, 24 deletions; crates/bots, lab, client and ops/ untouched. `<base>` filled at launch with the
+  tree outside results/ named equal to 1faf894's or each difference listed: right, since the lane head now also carries
+  -20's new results (46ca143).
+- **The count baseline:** section 4 (:158-160): deltas on 1faf894's 642 measured and 739 bites (m5-check.log), that is
+  634/731 plus F1's +8/+8, "which count in neither U4f's share nor U4f2's". Matches my head check's figures (642/739).
+- **Condition 7's item:** r1 (:98-127) moved it to U6 as C-U6-19 and left U4f2 a record line, C-U4F2-9; section 3
+  (:133-135) says so, citing r1 :98-122. Met as revised by my own ruling.
+- **C-U4F2-9** (:136-137): word for word r1:126-127 (python compare, whitespace folded: equal).
+- **C-U4F2-10** (:138-145): word for word r1:159-165; the only change is the inner quote marks ('a refusal record of its
+  own kind' inside the outer quote), the right nesting. Its note that r1's ":44-46" is rev 1.1's block-6 line is right.
+  Block 6 (:63-66) carries the case and its plant, +1 test; section 2 (:94) names it among the extras; section 6 (:219-220)
+  keeps the total and the figure, as r1:128-130 ruled ("no size change", "U4F2-SIZE ... does not change").
+- **Block 4's T1 line** (:51-53): at 1faf894 `git grep -c -w Refusal` in crates/room/src gives input.rs 22, room.rs 16,
+  lib.rs 1 (39), and room/tests/commands.rs:636 is `npt_sim::Refusal {`: as stated; the rename leaves it alone.
+- **u4s-carries.md's U4f2 section** (:548-552) holds both numbers with their r1 cites: the brief's section 0 and 3
+  stamps point there.
+- Nothing in rev 1.2 touches the lane, the stop, a pass mark, marks.json or the judge; U4F2-SIZE stays his and pending.
+So condition 10 is met as written; no new check of rev 1.2 is needed (plan :224-225).
+
+### Block 6: findings (CLAUDE.md's scale)
+- **ADV-U4FF1C-1, Low (due before U4's report is assembled)**, u4f-report.md:467-468: its Security section ("for PR #40's
+  report"; U4's report folds this file, :8) still reads "No security finding stays open on U4f". After F1, SA-F1-1
+  (Medium, kind 5's first-command bypass at input.rs:287, which F1 widened) is open until C-U6-19, and my ruling asked
+  that "F1's record and U4's report name it in a line of its own" (r1:132-133). Today it sits only inside item 5's (iv)
+  and F1's own Security section. Fix by Edit at the next save: one line under :467-472, e.g. "After U4f-F1 (1faf894):
+  SA-F1-1 (Medium) stays open until C-U6-19, before -19's runs: a session's first command is not edge-checked
+  (input.rs:287); PR #40 stays needs-mustafa (u4f-f1-report.md, Security)." No effect on -20's verdict or F1's close;
+  PR #40 is needs-mustafa either way.
+- **ADV-U4FF1C-2, Low**, u4f-f1-report.md:29: "sim/tests/seam.rs:582-596" should be :582-593 (the test's fn line to its
+  close; :594-596 are the next item's). Fix by Edit.
+- **ADV-U4FF1C-3, Low**, u4f-report.md:657-658 ("the scratchpad's compare_20.py"), with jdiff.py behind the leaf count:
+  the session scratchpad can be cleared by a reboot, so the record's method could not be re-run from the record (this
+  morning's restart spared them). Fix: copy both read-only scripts into .checkpoints/netcode-proof-test/
+  (CHECKPOINTS.md §3: small scripts in the notes folder; compare_20.py sha256 65e29b45...c47d7, 51 lines; jdiff.py
+  3c836ef8...fd06, 25 lines) and point the record's line there.
+- Observations, no finding: (a) the raw log headers record a newer container kernel (6.18.44-fc-v653 -> -v726) and the
+  logs are byte-equal anyway, which adds to the determinism the expected list rests on; the record need not name it.
+  (b) The bite's scripted presses read 431,998 at both commits (Block 3): unchanged, not an option-B run.
+None is a High or a Medium; none needs a push of its own or a re-check by me; the main session fixes the three by Edit
+at its next checkpoint save (ADV-U4FF1C-1 before U4's report).
+
+## Verdict
+**APPROVE WITH FINDINGS: -20's L1 verdict counts, and U4f-F1 closes.**
+- The run is tied to F1's merge by tree (d4f6cd41... at 96de6ac and 1faf894) and every result file to the run folder
+  (byte-equal).
+- Every item of my expected list is met, and no other difference exists: every byte of the 21 raw logs equals
+  350677f's except the header lines (commit, binary sha256, date, kernel) and `press_lost_count` on the lost ticks (3, 1,
+  2 and the bite's 3,331 lines); the verdicts differ in 14 of 593 and 2 of 65 leaves, all the lost check and its reasons.
+- PM-0001-2's SS part PASS 6 of 6; PM-0001-20 L1 options A and B PASS 3 of 3 each, its headline NOT-RUN (L2 not run);
+  the bite shown at 0.894544, lost 3,614 to 0 by design.
+- FP-5 (i)-(v) and ADV-U4FF1H-1's correction are in both records; (i) word for word; NC's "High then" does not fire.
+- Condition 10 is met as written (Block 5).
+- PR #40 stays a draft and needs-mustafa: SA-F1-1 is an open security finding until C-U6-19 (advisor.md step 4).
+- The three Lows are record fixes by Edit (ADV-U4FF1C-1 before U4's report is assembled).
+
+## Not checked by me
+- I ran no cargo, check.mjs, npt-lab, judge or gate (not asked, and nothing but results and records changed since my
+  head check of 1faf894). The reorder row's "not available" is by reading the row's series against the headers, not by
+  the judge's report call.
+- The run's exit 0 and the lane lock: no console log of the run is kept that I found; the verdicts written last
+  (03:07:46), the full logs and 46ca143 stand for a run that ended. CARGO_TARGET_DIR unset: by runs.txt:2's "the main
+  folder's own cache" only.
+- FP-5 (ii)'s Wasm line is by reading (as ruled); u4f-brief.md:533 and :1402 behind (iv)'s "no client rejoins or throws"
+  were not reopened (r1 read them); -20's bots pressing fire only was read at bots/src/lib.rs:643-646.
+- The card (.checkpoints/netcode-proof-test.md, modified in the working tree) was not re-read beyond its F1 lines.

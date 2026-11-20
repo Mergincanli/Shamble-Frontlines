@@ -465,7 +465,9 @@ hardening as the Worker's).
   :692-866 and :827-866 (history.md:6906), and the card holds neither old cite nor the old "confirms" line (my grep).
 
 ## Security (for PR #40's report)
-No security finding stays open on U4f (advisor-u4f-r1.md:23-24): SEC-U4F-1's guard (FP5) and SEC-U4F-2's header (FP7)
+**After U4f-F1 (1faf894): SA-F1-1 (Medium) stays open until C-U6-19, before -19's runs: a session's first command is
+not edge-checked (room/src/input.rs:287); PR #40 stays needs-mustafa (u4f-f1-report.md, Security; ADV-U4FF1C-1).**
+No security finding stays open on U4f's own round (advisor-u4f-r1.md:23-24): SEC-U4F-1's guard (FP5) and SEC-U4F-2's header (FP7)
 are fixed; SEC-U4F-1's parser half is C-U4F2-1, and C-U4F2-SEC-1 is the security seat's carry; N-SEC-1 needs no
 action; C-OQ6-SEC-1 is a recorded design property for the OQ-0001-6 reading (u4f-review-r1-full.md:89). The seat's
 read: every structure a client sizes is bounded (kept window 16, stamps 64, buffer 8, refusal records 4,096 a tick,
@@ -655,10 +657,12 @@ and a half edit, none found, and each notice recorded word for word where cited)
      - **Held to the advisor's expected figures** (advisor-u4f-f1-plan.md:119-140; r1 :191-205; head check condition
        3), all equal: the seven summary lines equal to 350677f's but wall time (npt-lab's two binary sha256s new;
        npt-judge's and marks.json's unchanged); the per-tick world hash equal on all 18,335 ticks of all seven runs
-       (the scratchpad's compare_20.py on both raw-log folders); presses lost 0 and doubled 0 everywhere; presses B
+       (compare_20.py on both raw-log folders, kept beside this report: sha256 65e29b45…c47d7, ADV-U4FF1C-3); presses
+       lost 0 and doubled 0 everywhere; presses B
        432,000 each, A 432,003, 432,003 and 432,009; on time per seed 0.999843, 0.99987 and 0.999861, A and B alike;
        the bite at 0.894544, its lost 3,614 to 0; the reorder row "not available" (ADV-U4F20-2, his; the event's
-       figures above stand). A leaf-by-leaf diff of the verdicts finds 14 of 593 measured leaves and 2 of 65 bite leaves
+       figures above stand). A leaf-by-leaf diff of the verdicts (jdiff.py, kept beside this report: sha256
+       3c836ef8…fd06) finds 14 of 593 measured leaves and 2 of 65 bite leaves
        changed, all of them the lost check and its reasons.
      - **(i)** "'0 presses lost' is 0 by the press-counter design after U4f-F1: npt-room counts with the rule npt-sim
        runs (`Command::edges_taken`), as '0 presses doubled' has been 0 by design since U4f; it guards that rule against
