@@ -167,8 +167,12 @@
   ack.rs, 92 NC-U4R-4, 93 U4h's ES hit rule; 77 (b) amended), u4-build-plan.md (U4g's "Moved in from U4r", §9 -60 6
   and totals 199/288, §11 gains ruling 3's heal-reading line, also missed). **Rev 2 DONE** (u4g-brief.md, 270 lines,
   6e93586; read: top, sections 2, 6, 8, last): 78 measured + 15 bites; whole about 3,300-5,800; halves 2,100-3,700 and
-  1,150-2,100 (the drafter's, against the advisor's 1,250-2,200). **The advisor's rev-2 check running** (05:1x UTC; it
-  appends "## Rev 2 check" to advisor-u4g-brief.md, with U4G-Q1's final text). U4G-Q1 (split; paste-ready at advisor-u4g-brief.md:205-219;
+  1,150-2,100 (the drafter's, against the advisor's 1,250-2,200). **The advisor's rev-2 check: APPROVE WITH CONDITIONS
+  1-5** (advisor-u4g-brief.md:287-378, read in full; Mediums ADV-U4GB-12, the bitten B1 run's validity read before the B1
+  set, and -13, the short B1 suite at 18 flag-0 ticks per client per burst, not 0.99; Lows -14, -15; the drafter's
+  figures go to him). **All five met by Edit: u4g-brief.md rev 2.1** (conditions 1-4) and u4s-carries.md (carry 59's
+  pointer to 93; carry 77 (b)'s reading marked mine); no new check needed. **U4g's brief is ready**; U4G-Q1's final text
+  for the 2026-11-21 message: advisor-u4g-brief.md:360-374 (lean (b), split). U4G-Q2 later, before -58's set. U4G-Q1 (split; paste-ready at advisor-u4g-brief.md:205-219;
   not a stop) goes in the 2026-11-21 message after rev 2; U4G-Q2 later, before -58's set only, its text drafted and read
   first. Saver bfwo06d6a from 04:24 UTC. Main still f5030a3; 10,124 MiB free.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:

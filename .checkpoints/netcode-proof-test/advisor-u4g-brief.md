@@ -283,3 +283,96 @@ My lean, and the advisor's: (a). Only this test's judged runs wait for your answ
 
 ## For Mustafa
 Nothing now from this check: U4G-Q1 rides the next day's message after rev 2; U4G-Q2 follows when its text is ready.
+
+## Rev 2 check
+Seat and rules as above; head 5359ceb (rev 2 at 6e93586, 270 lines; item 7 at 5ff1081). Read: u4g-brief.md whole
+(sections 1-4, 6, 8 and the last section checked; the header's rev paragraph read), `git diff 9e01aa9 5ff1081` of
+u4s-carries.md and u4-build-plan.md, their sources (advisor-u4r-build3-full.md:13-23, :34-36, :66-70;
+advisor-u4r-r1-full.md:75), the stamps of section 0, the code lines rev 2 adds (room.rs:1444-1455), and every cite
+into this file. Nothing run.
+
+### What holds
+- **Items 1-6 of my list are met where the rev paragraph (:11-24) says.** The B1 work is in blocks 8 and 10, section 2's
+  -17/-18 row (served by -45's three B1 runs, "0 more"), -18's bite, the pre-runs, section 3's rows (carry 78 and the
+  recovery, carry 91, the B1 pre-runs) and section 4's first block; section 2's PM-0001-2 sentence corrected; counts 78
+  measured and 15 bites, the B1 runs counted once. U4G-Q2 has no "not now", waits only for -58's set, and points to my
+  drafting order and wording. The blocks are reordered, the prediction-and-cues half first. NC-U4R-4 is in block 5,
+  section 3 and section 4. Rulings Q3-Q9 and NC-U4R-4's route are folded, one "Ruled" line each, every cite into this
+  file landing on its ruling (:137-186, :205-219, :221-247). Lows -8 to -11 met.
+- **Section 6's arithmetic:** each column sums to its total (prediction half 2,115-3,690; second half 1,165-2,110; whole
+  3,280-5,800), and the 1.5 figures follow (5,535; 3,165; 4,920-8,700).
+- **Stamps** (section 0, at 9d491fb): u4s-carries.md ea1913c9… 735, u4-build-plan.md 9186c15b… 1,173,
+  advisor-u4r-build3-full.md 78ebb5af… 235, c62h-bound-brief.md 7936074c… 663 (8.1 at :485), history.md 1c763b77…
+  7,253, this file ea692318… 285: all equal. New cites hold: room.rs:1446-1454 (the defaults fallback), :1449-1450
+  (no-fallback), plan :951-952, :975, u4f-brief.md:326 (TE31-10).
+- **Item 7:** carry 78's amendment quotes ruling 3's task line word for word (:15) and paraphrases the rest faithfully;
+  carry 91 quotes :36 word for word; carry 92 quotes advisor-u4r-r1-full.md:75 word for word with the ruled route;
+  carry 93 quotes :22's task text word for word and sits in U4h's section; carry 77 (b)'s second case is :36's words.
+  The plan's U4g bullet matches ruling 3 and my rulings; §9's 196 → 199 and 285 → 288 add exactly -60's three runs
+  (-18's bite was already among the 46 bites, so the bite count rightly stays); §11's added line is :69's words
+  exactly, and Q22's share line was already there (:1163-1166).
+
+### Findings
+- **ADV-U4GB-12 (Medium): the bitten B1 judged run may be INVALID, and nothing in rev 2 would catch it before the set.**
+  A bite run shows its bite only on a run that holds its validity rules (marks/README.md §5), and -18's L1 B1 part
+  carries pre:PM-0001-2. U4r's short bitten run read INVALID at 0.453333 (u4r-report.md:312), its clients blind until a
+  full state (max heal 1.69 s). If that blindness stays after U4g's fixes, a judged bitten run at 10 bursts in 600 s
+  exceeds ruling 3's 18 flag-0 ticks per client per burst (about 50 per burst at 1.69 s: my arithmetic), so it is
+  INVALID and -18's bite unshown; rev 2's short bitten run expects only "no heal within 500 ms" (section 2 :117-118,
+  section 3 :156). **Fix:** the short bitten B1 run also prints each client's flag-0 ticks per burst and the share; if
+  the bitten run would not hold pre:PM-0001-2 at the judged setting, it comes to me with those figures before the B1
+  set (a setting for the bite run, such as its burst count with -18's max check named as the failing one, is mine to
+  rule; anything that needs a validity-rule change is his).
+- **ADV-U4GB-13 (Medium): the short B1 suite's expectation is the wrong measure, and the wording is mine.** Ruling 3's
+  target is "on B1 with 10 bursts in 600 s ... at least 0.99, which allows at most 18 flag-0 ticks per client per burst
+  on average". A short suite (r2's form: 30 s measured, 2 bursts, c-u4r-r2.mjs:64) at 0.99 allows about 4.5 flag-0
+  ticks a burst, so it can fail a correct fix. My item 1 wrote "share at least 0.99" for it; rev 2 copied it (section 2
+  :117, section 3 :156). **Fix:** the short B1 suite's expect reads "at most 18 flag-0 ticks per client per burst on
+  average (ruling 3's target), in a building 0, door-gap margins printed", with the share printed beside it; 0.99 stays
+  the judged runs' bar.
+- **ADV-U4GB-14 (Low):** section 5 (:197-198) reads "past each half's figure"; the stop is past twice it: "past 6,000
+  for U4g and past 3,200 for U4g2". And rev 2 does not say what happens if his answer is not in when block 6 is done:
+  the builder runs the end checks on the tree as it stands and returns (the size stop's form); the main session goes
+  on by his answer.
+- **ADV-U4GB-15 (Low), item 7:** carry 93 says "Carry 59 points here", but carry 59 (u4s-carries.md:274-283) gained no
+  pointer (ruling 3, point 2's task 2): U4h's business, the next carries edit. Carry 77 (b)'s "(b)'s counting apart
+  ends there (:34)" is the main session's reading, not :34's words; mark it so then.
+
+### The deviation: the second half's figures
+**The drafter's figures go to him: about 1,150 to 2,100 lines, planned about 1,600, stop past 3,200.** Mine (1,250 to
+2,200, planned 1,700) were rounded additions to rev 1's split, and I said the drafter would recompute the table
+(:197-198). Rev 2's figures are the sums of an itemized table that holds every item I named, so they are the better
+estimate, and the stop is his rule applied to the plan's figure (twice it), as for U4f2. Said plainly here, not to him:
+at U4f's whole-scope 1.5 the second half's top is about 3,150, just under 3,200; at U4f's 2.0 on client and room it
+could reach about 3,550 (my arithmetic). That is what the stop is for; raising the figure to make room would be
+setting the plan to the overrun. The whole and the first half also take rev 2's figures (3,300-5,800; 2,100-3,700).
+
+### Verdict: APPROVE WITH CONDITIONS
+No Critical or High. The conditions are small edits by the main session; none needs a new check by me if met as written:
+1. ADV-U4GB-12: section 2's pre-runs and section 3's B1 row gain the bitten run's flag-0 per burst and share, and the
+   route to me before the B1 set.
+2. ADV-U4GB-13: the short B1 suite's expect as above, in section 2 and section 3.
+3. ADV-U4GB-14: section 5's stop wording; the no-answer line at the end of block 6.
+4. Section 8's Q1 pointer names this block's text as the final one.
+5. ADV-U4GB-15 rides the main session's next carries edit (no push of its own).
+U4G-Q1's text below is final whatever these edits do: none of them touches it.
+
+### U4G-Q1, final (for the 2026-11-21 message)
+```text
+U4G-Q1: the size of the next unit, U4g (prediction, drawing other players, event timing). It is planned as a medium
+unit (about 3,000 lines; your stop at 6,000). Our estimate is about 3,300 to 5,800 lines. U4f, the last medium unit,
+came to about 1.5 times its estimate in all, so U4g built whole would more likely than not pass 6,000 and stop
+mid-build, as U4f did.
+(a) Build it whole as planned: one review, one merge. The stop past 6,000 stays; if it is hit, you get three lines then.
+(b) Split it now in two, each with its own review and merge: U4g, prediction and own-shot cues (about 2,100 to 3,700
+    lines; stop past 6,000), then U4g2, drawing other players, event timing and the server's recovery after a loss
+    burst (about 1,150 to 2,100 lines; planned about 1,600, stop past 3,200). No pass mark, judge rule or marks.json
+    text changes, and no run is dropped.
+The cheaper option is (b): one more review and merge, and no mid-build stop waiting on you. The build starts with the
+prediction half either way, so nothing waits for this answer until that half is done.
+My lean, and the advisor's: (b).
+```
+
+### What I did not check (rev 2)
+Nothing run; ADV-U4GB-12's 50 ticks a burst and ADV-U4GB-13's 4.5 are arithmetic on U4r's figures, not runs; sections
+0, 5 and 7 only where they touch the items above; the section 6 table's item estimates themselves (only their sums).

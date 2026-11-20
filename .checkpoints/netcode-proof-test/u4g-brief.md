@@ -1,4 +1,4 @@
-# U4g's brief, rev 2
+# U4g's brief, rev 2.1 (rev 2 with the advisor's rev-2 conditions 1-4 applied; APPROVE WITH CONDITIONS, advisor-u4g-brief.md:350-358)
 **The unit:** prediction, interpolation and events, u4-build-plan.md:881-900 (plan rev 3.3, with the "Moved in from U4r"
 bullet :895-900). It builds after U4f2 merges and -21's runs are done (one lane at a time: :951-952). Short by
 TEST-FIRST rule 3 (history.md:2264-2267; his message :2236-2282): what U4g builds, how it is tested, what is open; the
@@ -80,6 +80,8 @@ U4G-Q2 (-58's two checks' wording) waits only for -58's judged set (section 8).
    as `CHECK_BITES` go; the contract cases (§4.12 :443-446).
 6. **ops/runs, its half:** c-u4g-r2.mjs's rows (each suite short; -58's route-A rows: Q2; the P4 cap read: Q7) and
    c-u4g-runs.mjs's sets for -41, -42, -55, -58, -60 and -62 (c-u4f-runs.mjs's form, ops/runs/c-u4f-runs.mjs:44-52).
+   **If his U4G-Q1 answer is not in when block 6 is done** (ADV-U4GB-14): the builder runs the end checks on the tree as
+   it stands and returns (the size stop's form); the main session goes on by his answer.
 
 **The interpolation, events and B1 half** (U4g2 under U4G-Q1 (b)):
 7. **npt-client, `Interp`** (§4.8 :369-372; plan.md:468): its own clock, integer ns, 7 slots, the delay 3 intervals
@@ -114,8 +116,12 @@ U4G-Q2 (-58's two checks' wording) waits only for -58's judged set (section 8).
   once. The plan's §9 reads -60 6 and totals 199 and 288 (u4-build-plan.md:1031-1035).
 - **The pre-runs** (c-u4g-r2.mjs, before the sets): each new suite short with its contract case; -58's route-A rows
   (Q2 step 2); short P4 brawl runs with the cap opened, before -42's set (Q7); on the tree with carry 78's reorder and
-  the recovery, **the short B1 suite** (share at least 0.99, "in a building: 0", door-gap margins printed) with the B1
-  cap read, and **the short bitten B1 run** under -18/no-fallback (no heal within 500 ms: carry 91). A row other than
+  the recovery, **the short B1 suite** (at most 18 flag-0 ticks per client per burst on average, ruling 3's target; "in
+  a building: 0"; door-gap margins printed; the share printed beside it, 0.99 staying the judged runs' bar: ADV-U4GB-13)
+  with the B1 cap read, and **the short bitten B1 run** under -18/no-fallback (no heal within 500 ms: carry 91; it also
+  prints each client's flag-0 ticks per burst and the share, and if the bitten run would not hold pre:PM-0001-2 at the
+  judged setting, it comes to the advisor with those figures before the B1 set: a setting for the bite run is the
+  advisor's, a validity-rule change his: ADV-U4GB-12). A row other than
   its `expect` comes to the advisor before any set.
 - **Judge calls:** two per set (u4f-brief.md 5.4, :1053-1079). The B1 set's calls name PM-0001-2, -17, -18 and -45:
   -17's and -18's B1 parts carry `pre:PM-0001-2`. On the other SS sets PM-0001-2 runs as the load report, never counted
@@ -153,7 +159,7 @@ U4G-Q2 (-58's two checks' wording) waits only for -58's judged set (section 8).
 | -61 | remote events in the first block whose delayed time reaches them; own events in their tick's block | on-arrival |
 | carry 78 and the recovery | a backlog larger than a snapshot's remainder still sends the nearest 8; after an evicted baseline under SS load, the first frames hold every relevant soldier | today's order |
 | carry 91 | the ring takes the stale copy when a tick becomes last_acked (a ring unit test) | the copy taken only on overwrite |
-| B1 runs (pre-runs) | the short B1 suite: share >= 0.99, in a building 0; the short bitten B1 run: no heal within 500 ms | (the room's fix itself; never re-run into a pass) |
+| B1 runs (pre-runs) | the short B1 suite: at most 18 flag-0 ticks per client per burst on average, in a building 0, door-gap margins and the share printed (ADV-U4GB-13); the short bitten B1 run: no heal within 500 ms, each client's flag-0 ticks per burst and the share printed, to the advisor before the B1 set if it would not hold pre:PM-0001-2 at the judged setting (ADV-U4GB-12) | (the room's fix itself; never re-run into a pass) |
 | the contract | every new suite's checks resolve, every name has its row | a renamed series |
 - **Plants:** every new check and bite site fails by name under a plant, restored with the file's sha256 (u4f-brief.md
   :1202-1204). Counts as deltas on `<base>`'s; negative cases counted; the report states its own.
@@ -195,7 +201,8 @@ U4G-Q2 (-58's two checks' wording) waits only for -58's judged set (section 8).
 
 ## 5. The rules that stand
 - Start and stops: u4f-brief.md section 1 (:288-355), read for U4g: the block-end size stop is the one his U4G-Q1 answer
-  sets (past 6,000 whole; past each half's figure under (b)), by advisor-u4f-build1.md:178-181's form; counts are deltas
+  sets (past 6,000 whole; under (b) past 6,000 for U4g and past 3,200 for U4g2: ADV-U4GB-14), by
+  advisor-u4f-build1.md:178-181's form; counts are deltas
   on `<base>`'s; the test step's stop is 1.5 times `<base>`'s measured test step (TE31-10, u4f-brief.md:326), written
   in the fill form at launch (1,207 s was 5b29296b's).
 - U4f's build rules (section 4, :831-958) with 1.1's lane; the shared target and its lock; one builder in an isolated
@@ -237,8 +244,8 @@ read before it goes to him (TEST-FIRST, "a reviewer's read on every change to ma
    drawing other players, event timing and the server's recovery after a loss burst (about 1,150 to 2,100; planned
    about 1,600, stop past 3,200); no pass mark, judge rule or marks.json text changes, no run dropped. The cheaper
    option is (b): one more review and merge, and no mid-build stop waiting on him. The build starts with the
-   prediction half either way. **Lean (b), the advisor's too.** Paste-ready: advisor-u4g-brief.md:205-219, its figures
-   replaced by section 6's.
+   prediction half either way. **Lean (b), the advisor's too.** Paste-ready, final: advisor-u4g-brief.md:360-374 (its
+   rev 2 check, with section 6's figures).
 2. **U4G-Q2 (his, later; only -58's judged set waits).** Yes to the exact wording of -58's two lost-tick checks: (a)
    yes, (b) change it. No "not now": he chose (b) "with U4g" (history.md:2216, :2204-2227). The making, in order
    (advisor-u4g-brief.md:223-232): the main session copies -17's two entries (marks.json:3983-4004) by script onto
