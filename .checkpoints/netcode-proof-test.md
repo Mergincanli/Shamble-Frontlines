@@ -171,7 +171,8 @@
   on ba3fa68 (`git diff HEAD -- spikes/` = d0a66a68…, 6 files, +239 -24); gate --no-smoke PASS
   (.gate/u4f-f1-merge/gate.txt); M5 check.mjs all 11 steps pass, 642 / 739, wasm 0 mismatches, marks 81 unchanged
   (.gate/u4f-f1-merge/m5-check.log, 01:56-02:13:49 UTC). **Part-clean 3** (02:15: dev 5.3 GiB and the rest; 10,570
-  MiB free). **Running:** CI on 1faf894; the advisor's head check (advisor-u4f-f1-head.md). **Then -20's L1 re-run**
+  MiB free). **CI green on 1faf894** (check suite completed 02:18 UTC, none running or failed). **Running:** the
+  advisor's head check (advisor-u4f-f1-head.md). **Then -20's L1 re-run**
   (`c-u4f-runs.mjs 20`) from the head, compared tick by tick with 350677f's kept logs (advisor-u4f-f1-plan.md:119-140).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
