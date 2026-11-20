@@ -170,9 +170,15 @@
   16:16-16:19**, no lane running (four pgreps empty), P27's second form (main-run.sh refuses under 4 GB): `--profile
   dev` (22,565 files, 6.3 GiB) and `--release` (996, 271.3 MiB) on the shared root, under the lock, offline; guards
   pass; doc and wasm32 kept; free 4,019,650,560 → 10,297,077,760 bytes. **Resumed 16:20** by SendMessage (its item
-  10, then section 6); a check.mjs run refills about 7.7 GiB (u4r-disk-plan.md:73-74), so expect one more floor stop
-  before its second run: the same clean. **Lesson:** never `cd` into an agent's worktree: the harness moved this
-  session's main folder to it (16:19; back at once, branch unchanged); read a worktree with Read/Grep or ask its agent.
+  10, then section 6). **16:45: second floor stop** (3.3G) after end check A2 (u4f2-end-a2.log, 16:21-16:45): 10 of 11
+  steps PASS (test 1,157.8 s, 49 s under the 1,207 s line; measured 702, bites 799; wasm 27,000 ticks, 0 mismatching;
+  marks 81; self 78/78; redact 330); **deps FAIL** (check.mjs:760's name rule took `CATCHUP_HOLD` for a tick count);
+  the builder renamed it `HOLD_STEPS` (7 sites; not yet built; **a departure for the advisor**: a name change to fit the
+  gate's rule); snapshot caee92af…, 2,081 added. **Second clean ~16:50**, no lane running: dev 27,713 files 7.1 GiB,
+  release 972 files 259.0 MiB; guards pass; free 3,507,441,664 → 10,135,818,240 bytes. **Resumed** for A3 and B: the
+  two counted runs are A3 and B on the final tree, all 11 steps each (u4f2-brief.md:106; A2 not counted); a run uses
+  about 6.3 GB, so expect a third stop before B: the same clean. **Lesson:** never `cd` into an agent's worktree: the
+  harness moved this session's main folder to it (16:19; back at once, branch unchanged); read it with Read/Grep.
   Check-in re-enabled 14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver b22ct2zom from
   16:05 UTC; the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the
   named choices; U4F2-SIZE answered). U4G-Q1 (split; final text advisor-u4g-brief.md:360-374; not a stop); U4G-Q2
