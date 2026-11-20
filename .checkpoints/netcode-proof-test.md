@@ -176,8 +176,11 @@
   the builder renamed it `HOLD_STEPS` (7 sites; not yet built; **a departure for the advisor**: a name change to fit the
   gate's rule); snapshot caee92af…, 2,081 added. **Second clean ~16:46**, no lane running: dev 27,713 files 7.1 GiB,
   release 972 files 259.0 MiB; guards pass; free 3,507,441,664 → 10,135,818,240 bytes. **Resumed** for A3 and B: the
-  two counted runs are A3 and B on the final tree, all 11 steps each (u4f2-brief.md:106; A2 not counted); a run uses
-  about 6.3 GB, so expect a third stop before B: the same clean. **Lesson:** never `cd` into an agent's worktree: the
+  two counted runs are A3 and B on the final tree, all 11 steps each (u4f2-brief.md:106; A2 not counted). **A3 PASS,
+  all 11 steps** (u4f2-end-a3.log, 16:48-17:11:38; test 1,124.2 s, 83 s under the line; 702/799, 0 failed; deps PASS;
+  tree 4a9dde09…; an fmt fix after the rename, by Edit; snapshot e9a0ae3e…; 2,077 added). **Third clean 17:12**: dev
+  27,623 files 7.0 GiB, release 972, 259.0 MiB; guards pass; free 3,548,110,848 → 10,116,452,352 bytes. **Resumed
+  17:13 for B** on the same tree; if B fails, the builder stops and reports, with no fix without my word. **Lesson:** never `cd` into an agent's worktree: the
   harness moved this session's main folder to it (16:19; back at once, branch unchanged); read it with Read/Grep.
   Check-in re-enabled 14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver b22ct2zom from
   16:05 UTC; the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the

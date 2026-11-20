@@ -233,3 +233,19 @@
   before a check.mjs run (u4f-brief.md:853-855). Not run: check.mjs on the renamed tree (end check A3) and the second
   (B), each needing 4 GB first; the `--list` counts (A2's test step gives 702 and 799 by check.mjs's measure). Nothing
   cleaned or deleted.
+- RESUMED 16:47 UTC (the main session's second clean: 9,666 MiB free). Two counted runs on the final tree are owed (A2
+  does not count). `df -h` 9.5G; no process; tree 5403256c… as handed back. fmt on the renamed tree FAILED
+  (u4f2-fmt3.log: the shorter name lets `f.episode = if step == HOLD_STEPS + 2 { 0 } else { step + 1 };` fit one
+  line); rustfmt's diff applied by Edit; u4f2-fmt4.log exit 0. Tree for A3: `git diff a289def -- spikes/ | sha256sum`
+  4a9dde09…. End check A3 started about 16:48 UTC (`df -h` 9.5G before; `-x`; u4f2-end-a3.log).
+- **End check A3: PASS, all 11 steps (the first counted run)**, 16:48-17:11:38 UTC, exit 0. Runner header: free
+  9,665 MiB, HEAD 0376c76, diff 4a9dde09…, untracked f1b8a21b…. Provenance builds `--no-run` exit 0 (16:48:59) and
+  `--all-features --no-run` exit 0 (16:50:07); every npt-* crate "Compiling" from this worktree, 2 each (room,
+  client, bots, lab among them). check.mjs: fmt PASS 1.0 s; clippy PASS 43.1 s; clippy-wasm32 PASS 6.3 s; doc PASS
+  8.2 s; **test PASS 1,124.2 s: measured 702 passed (642 + 60), bites 799 (739 + 60), 0 failed, 0 skipped** (83 s
+  under the 1,207 s line); deps PASS 2.0 s; wasm PASS 94.4 s (27,000 ticks native-native and native-Wasm, 0
+  mismatching; h2 equal); refs PASS; marks PASS (81); self PASS 78 of 78; redact PASS 10 of 10, 330 items, 0
+  findings. "check: all 11 steps pass".
+- **STOP (disk), 17:12 UTC:** `df -h` 3.4G after A3, under the 4 GB floor before end check B (check.mjs's second
+  counted run, on this same tree 4a9dde09…, unchanged: `git diff a289def -- spikes/ | sha256sum` after A3 equal).
+  Nothing cleaned or deleted.

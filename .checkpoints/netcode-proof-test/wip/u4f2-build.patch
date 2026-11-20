@@ -1,5 +1,5 @@
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index b40d2dd..2604eb5 100644
+index b40d2dd..36ea092 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
 @@ -144,17 +144,250 @@ pub struct Behaviour {
@@ -386,7 +386,7 @@ index b40d2dd..2604eb5 100644
                  // Every rewritten `Input` encodes: an older copy a past-bound stamp leaves more than 255 ticks below
                  // (after an idle) is left out, oldest first, so the rest stay consecutive (the codec's two rules).
                  let mut out = Vec::new();
-@@ -585,11 +854,134 @@ impl Behaviour {
+@@ -585,11 +854,130 @@ impl Behaviour {
              self.skipped += 1;
              return false;
          }
@@ -494,11 +494,7 @@ index b40d2dd..2604eb5 100644
 +            _ => 0,
 +        };
 +        if step > 0 {
-+            f.episode = if step == HOLD_STEPS + 2 {
-+                0
-+            } else {
-+                step + 1
-+            };
++            f.episode = if step == HOLD_STEPS + 2 { 0 } else { step + 1 };
 +            f.burst = if step == first {
 +                1
 +            } else {
@@ -521,7 +517,7 @@ index b40d2dd..2604eb5 100644
      /// The decision function (crate-private; `step` calls it, and so do this crate's tests): the next command from
      /// `newest`, `view` and `own`, the own soldier as the endpoint decoded it (`ClientEndpoint::own_soldier`: its grid
      /// position and dead bit), counted as given.
-@@ -652,6 +1044,10 @@ impl Behaviour {
+@@ -652,6 +1040,10 @@ impl Behaviour {
          let walk = match self.kind {
              Kind::Brawl => self.leash(own, walk),
              Kind::Lane => self.lane(own),
@@ -532,7 +528,7 @@ index b40d2dd..2604eb5 100644
              _ => walk,
          };
          Command {
-@@ -1170,10 +1566,344 @@ mod tests {
+@@ -1170,10 +1562,344 @@ mod tests {
      fn f15_a_forgers_interval_below_2_is_refused() {
          let scene = Scene::stress();
          let steady = || Behaviour::script(&scene, 0, 1, "steady").expect("a script");
@@ -878,7 +874,7 @@ index b40d2dd..2604eb5 100644
      }
  
      /// The judged runs' first tick (the run scripts' `--tick-start 63736`).
-@@ -1196,6 +1926,12 @@ mod tests {
+@@ -1196,6 +1922,12 @@ mod tests {
          /// ten burst starts, the first 30 s into the measured phase (after the 10 s warm-up) and then every 60 s (the
          /// run scripts' B1 settings).
          Bursts,
@@ -891,7 +887,7 @@ index b40d2dd..2604eb5 100644
      }
  
      /// One run's record: soldier-ticks in a building and the first; the largest distance from the centre (its square in
-@@ -1242,19 +1978,32 @@ mod tests {
+@@ -1242,19 +1974,32 @@ mod tests {
              .collect()
      }
  
@@ -931,7 +927,7 @@ index b40d2dd..2604eb5 100644
          let mut last: Vec<Option<Command>> = vec![None; n];
          let mut seq = vec![0u16; n];
          let mut rng = seed ^ 0x736b_6970_7300_0000;
-@@ -1310,9 +2059,31 @@ mod tests {
+@@ -1310,9 +2055,31 @@ mod tests {
              let burst = bursts.iter().any(|&(a, b)| (a..b).contains(&k));
              let mut commands = Vec::with_capacity(n);
              for s in 0..n {
@@ -964,7 +960,7 @@ index b40d2dd..2604eb5 100644
                          Pattern::Bursts => burst,
                          Pattern::Skips => {
                              r.chances += 1;
-@@ -1369,8 +2140,20 @@ mod tests {
+@@ -1369,8 +2136,20 @@ mod tests {
      /// rate per 1000 are the skip pattern's alone (ADV-PT-L1); every pattern prints its skipped ticks and longest
      /// streak.
      fn printed(seed: u64, ms: u32, pattern: Pattern) -> Record {
@@ -986,7 +982,7 @@ index b40d2dd..2604eb5 100644
              Pattern::EveryTick => format!("skipped {}", r.skipped),
              Pattern::Skips => format!(
                  "skipped {} of {} chances ({} per 1000)",
-@@ -1381,7 +2164,7 @@ mod tests {
+@@ -1381,7 +2160,7 @@ mod tests {
              Pattern::Bursts => format!("skipped {} in its bursts", r.skipped),
          };
          println!(
@@ -995,7 +991,7 @@ index b40d2dd..2604eb5 100644
               distance from the centre {} cm (slot {}, tick {}, at {}, {}); {skips}, longest streak {}; dead {} \
               soldier-ticks; stuck (slot, tick, x, y): {:?}",
              ticks_for_ms(ms),
-@@ -1411,6 +2194,46 @@ mod tests {
+@@ -1411,6 +2190,46 @@ mod tests {
          }
      }
  
