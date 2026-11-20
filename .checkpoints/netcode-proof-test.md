@@ -168,15 +168,27 @@
   400; **(a) is a reading of "forged command": the advisor's, on his readings list; his if it changes SERIES.md:158's
   `sent_count` row**); Mediums -2 (`FIRE_REST` a literal tick count: kind 7 breaks at 60 Hz), -3 (F-A: fix (i) the lag
   client on the fast clock's lane, else (ii) a record line), -4 (plant 9 likely never sent the honest command under A);
-  Lows -5, -6. Rust (from 17:55) RUNNING. **Next:** their verdicts (every Medium or higher read in full), then the advisor's round
+  Lows -5, -6. **Rust APPROVE WITH FINDINGS** (its file complete at the cut, read in full :1-14, :150-198): RR-U4F2-1
+  Medium (`FIRE_REST` a literal: kind 7 breaks at 60 Hz and at `--forge-every 2`; fix `fire_rest_at`, about 15-25
+  lines), Lows -2 (16-bit sequence key past one lap), -3 (P0 precondition unchecked), -4 (field docs). **All four
+  seats DONE; next: the advisor's round ruling** (advisor-u4f2-r1.md). **Next:** their verdicts (every Medium or higher read in full), then the advisor's round
   ruling on all four files (F-B's fix inside the plan; a fix touching what counts as rejected, or the shot band, is
   his), the fix pass in the builder's worktree, round 2 on what changed, the merge, the r2 rows and -21's set.
   **Lesson:** never `cd` into an agent's worktree: the harness moved this session's main folder to it (16:19; back at
-  once, branch unchanged); read it with Read/Grep. Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bzkhq2f75 from
-  17:56 UTC (to about 19:46); the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) for the 2026-11-21 message
+  once, branch unchanged); read it with Read/Grep. Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bh8edyqwv from
+  21:10 UTC (to about 23:00); the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) for the 2026-11-21 message
   (U4G-Q1, final text advisor-u4g-brief.md:360-374, lean (b) split, not a stop; the named choices). Main f5030a3.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
+- **2026-11-20 18:12:22 to 21:09:44 UTC (a spend-limit cut during U4f2's round 1):** the notice, word for word
+  (transcript line 63943, 18:12:22.988; the same text again at 18:34:48, 19:46:06-07 and 20:35:28-30, each time a
+  turn tried to start): "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour
+  limit resets 8:50pm (UTC)". It ended the rust seat's task (an API error on the same text: rate_limit, HTTP 429)
+  after its file was complete (verdict, four findings, Mustafa's section; in the saver's 18:16 save d96777a), so the
+  seat was not resumed. The saver ended on its own time at 19:46:05 (exit 0); the 18:34 and 20:34 check-ins waited
+  unread. His words on resuming (21:09:44 UTC): "I hit my usage limit while you were working, but it has reset now.
+  Please continue from where you left off." The worker restarted at 21:09:44. Checked at 21:10: `git status` clean;
+  no build or lane running (the panel reads only); the saver restarted (bh8edyqwv, 21:10 UTC).
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
   one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
