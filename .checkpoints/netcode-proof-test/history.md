@@ -7431,3 +7431,14 @@ Things that are very important which needs an answer: you can ask me
   departures accepted (`HOLD_STEPS` in a line of its own); the test-step line read on the builder's two counted runs;
   a second round on what changed; U4f2's size after it about 2,320-2,490, told to him, not asked. Why: inside the
   plan, undoable, no pass mark, judge, marks.json or existing SERIES.md row change, no money, nothing on main.
+
+## Card block moved 2026-11-20 about 22:35 UTC: the 18:12:22-21:09:44 UTC cut's record (card_trim_1120j.py; from 'Cuts by the spend limit')
+- **2026-11-20 18:12:22 to 21:09:44 UTC (a spend-limit cut during U4f2's round 1):** the notice, word for word
+  (transcript line 63943, 18:12:22.988; the same text again at 18:34:48, 19:46:06-07 and 20:35:28-30, each time a
+  turn tried to start): "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour
+  limit resets 8:50pm (UTC)". It ended the rust seat's task (an API error on the same text: rate_limit, HTTP 429)
+  after its file was complete (verdict, four findings, Mustafa's section; in the saver's 18:16 save d96777a), so the
+  seat was not resumed. The saver ended on its own time at 19:46:05 (exit 0); the 18:34 and 20:34 check-ins waited
+  unread. His words on resuming (21:09:44 UTC): "I hit my usage limit while you were working, but it has reset now.
+  Please continue from where you left off." The worker restarted at 21:09:44. Checked at 21:10: `git status` clean;
+  no build or lane running (the panel reads only); the saver restarted (bh8edyqwv, 21:10 UTC).
