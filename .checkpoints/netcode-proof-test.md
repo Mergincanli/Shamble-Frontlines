@@ -177,10 +177,15 @@
   figures go to him). **All five met by Edit: u4g-brief.md rev 2.1** (conditions 1-4) and u4s-carries.md (carry 59's
   pointer to 93; carry 77 (b)'s reading marked mine); no new check needed. **U4g's brief is ready**; U4G-Q1's final text
   for the 2026-11-21 message: advisor-u4g-brief.md:360-374 (lean (b), split). U4G-Q2 later, before -58's set.
-- **Idle until his answers** (05:15 UTC): no agent or set runs. The 2-hour check-in (trig_01EKqNqwZrQTVJ6caAyRrug5)
-  **paused** (it runs while agents run; re-enable when a builder or a set starts); a one-shot reminder at 23:05 UTC
-  (trig_01YRVLwWYgbgKS1DLsHeCcGx) wakes the session for the 2026-11-21 message (msg-2026-11-21.md). The saver bfwo06d6a
-  ends about 06:15 UTC; restart it with the next work. U4G-Q1 (split; paste-ready at advisor-u4g-brief.md:205-219;
+- **U4f2's BUILD RUNNING** from 14:16 UTC: one builder (Opus 5.5, xhigh) in an isolated worktree, step 0 to the lane
+  head 0376c76 (spikes/ = `<base>` a289def's); notes in its copy of u4f2-build.md; snapshots at block ends to
+  wip/u4f2-build.patch (with its notes copied beside); runner u4f-run.sh, logs .gate/u4f/u4f2-*.log; stop past 3,000
+  added at a block end; the test step's line 1,207 s. **On a restart:** check its worktree (`git status`, no plant left:
+  the notes name each plant and its restore sha256), then resume it by SendMessage. **Disk:** 10,111 MiB free at 14:15,
+  the shared target empty; a full build fills about 7 GiB, so the runner's 4 GB floor will likely stop it once: then
+  part-clean (P27's six `cargo clean --target-dir` commands under the lane lock) and resume it. Check-in re-enabled
+  14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver b4e3iyalc from 14:15 UTC; the 23:05 UTC reminder
+  (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the named choices; U4F2-SIZE answered). U4G-Q1 (split; paste-ready at advisor-u4g-brief.md:205-219;
   not a stop) goes in the 2026-11-21 message after rev 2; U4G-Q2 later, before -58's set only, its text drafted and read
   first. Saver bfwo06d6a from 04:24 UTC. Main still f5030a3; 10,124 MiB free.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
