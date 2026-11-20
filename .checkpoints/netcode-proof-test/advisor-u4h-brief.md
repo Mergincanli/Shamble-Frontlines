@@ -36,7 +36,7 @@ check.mjs, npt-lab or judge run; no commit.
 - The server's shot casts against f32 boxes blended at the fraction (world.rs:1574-1610), private; `World::ray_cast`
   takes integer HitVolumes; the fire origin is npt-sim's private CHEST_CM (world.rs:82; lab copy scenario.rs:84-86).
 - -50's bar 33,330,000 ns (marks.json:10045); one interval at 30 Hz is 33,333,333 ns. The ADR row's cheat "announces
-  the largest allowed delay" (ADR 0001:1647; r2-netcode.md:2186-2188). SERIES.md:153 and :187 define the gain against
+  the largest allowed delay" (ADR 0001:1647; r2-netcode.md:2188-2190). SERIES.md:153 and :187 define the gain against
   "its honest twin shot"; marks.json:10108 "pairs each cheat shot with an honest twin shot at the same RTT".
 - SERIES.md:86's sign is the reverse of the check's (min >= 145 ms on a delayer that inflates the ping RTT).
 - The brawl stamps view_tick = its newest snapshot tick, fraction 0 (bots/src/lib.rs:22-24); U4g's brief does not

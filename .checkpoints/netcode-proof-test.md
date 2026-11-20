@@ -168,7 +168,13 @@
   verdicts, the ruling's summary) is word for word at history.md:7324-7367 and :7369-7400 (card_trim_1120g/h.py). The
   round-2 base is snapshot e9a0ae3e3f48af18… (2,077 added); the fix pass is in the builder's worktree
   .claude/worktrees/agent-aa62d31b6fa5b9807. **The ruling** (advisor-u4f2-r1.md): REQUEST CHANGES. Part A: FP-1, 3, 5,
-  6, 7, 4, 8, then fmt/clippy/doc, then the builder stops. **FP-2 only on his F-B-COUNT answer** (on (b) or (c), to
+  6, 7, 4, 8, then fmt/clippy/doc, then the builder stops. **Part A DONE ~22:20** (u4f2-build.md Block 9; logs
+  .gate/u4f/u4f2-fp*.log): each FP's tests pass and its plant fails by name; fmt, clippy (host, wasm32, both builds)
+  and doc pass; about 2,562 added (FP-2 would take it to about 2,620-2,660, near the advisor's 2,700); about 12 s more
+  test time; snapshot 23c5f78816f33e48… (checked); free 8,368,844,800 bytes. **New for the advisor** (resumed ~22:25,
+  out advisor-u4f2-parta.md): F-G (at `--forge-every` 3, a death between d-1 and d breaks the twin hash; require
+  every above the rest, or keep 3 as a limit); FP-5's plant 9 fails f16 under B too (F-E holds under neither option);
+  may R4 and R5 run now, before FP-2. **FP-2 only on his F-B-COUNT answer** (on (b) or (c), to
   the advisor first). Then R2-R5, round 2 (netcode, test, rust; xhigh; read only) on the fix pass's diff, then R6
   (check.mjs twice). The advisor's stop past 2,700 added at an FP end; his past 3,000. About four part-cleans (P27's
   second form, no lane running). **msg-2026-11-21.md drafted** (F-B-COUNT, a stop; U4G-Q1, not a stop; three
