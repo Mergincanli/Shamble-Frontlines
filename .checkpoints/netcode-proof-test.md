@@ -156,49 +156,19 @@
   APPROVE WITH CONDITIONS 1-5, all met: **u4g-brief.md rev 2.1 is ready**; **U4G-Q1's final text for the 2026-11-21
   message: advisor-u4g-brief.md:360-374**, lean (b) split; U4G-Q2 before -58's set only), U4f2's brief check
   (:7300-7311; APPROVE WITH CONDITIONS, rev 1.1, then rev 1.2 at launch; its size line, now answered).
-- **U4f2's BUILD RUNNING** from 14:16 UTC: one builder (Opus 5.5, xhigh) in an isolated worktree, step 0 to the lane
-  head 0376c76 (spikes/ = `<base>` a289def's); notes in its copy of u4f2-build.md; snapshots at block ends to
-  wip/u4f2-build.patch (with its notes copied beside); runner u4f-run.sh, logs .gate/u4f/u4f2-*.log; stop past 3,000
-  added at a block end; the test step's line 1,207 s. **On a restart:** check its worktree (`git status`, no plant left:
-  the notes name each plant and its restore sha256), then resume it by SendMessage. **Disk:** 10,111 MiB free at 14:15,
-  the shared target empty; a full build fills about 7 GiB, so the runner's 4 GB floor will likely stop it once: then,
-  with no lane running (P27: "Between waves, with no lane running"), part-clean (P27's six `cargo clean --target-dir`
-  commands under the lane lock) and resume it. **16:14 UTC: stopped on the floor** (3,834 MiB), as expected: blocks 1-8,
-  11 plants and section 6 item 5 done (2,080 added; 60 new tests; snapshot 225d8020…; hand-back items 8-9: four
-  departures, F-A Medium, F-B High for -21's set, F-C, F-E, all for the review round and the advisor; F-D fixed); end
-  check A failed at its doc step (bots lib.rs:542, :547 linked private items; fixed, not re-run). **Part-clean
-  16:16-16:19**, no lane running (four pgreps empty), P27's second form (main-run.sh refuses under 4 GB): `--profile
-  dev` (22,565 files, 6.3 GiB) and `--release` (996, 271.3 MiB) on the shared root, under the lock, offline; guards
-  pass; doc and wasm32 kept; free 4,019,650,560 → 10,297,077,760 bytes. **Resumed 16:20** by SendMessage (its item
-  10, then section 6). **16:45: second floor stop** (3.3G) after end check A2 (u4f2-end-a2.log, 16:21-16:45): 10 of 11
-  steps PASS (test 1,157.8 s, 49 s under the 1,207 s line; measured 702, bites 799; wasm 27,000 ticks, 0 mismatching;
-  marks 81; self 78/78; redact 330); **deps FAIL** (check.mjs:760's name rule took `CATCHUP_HOLD` for a tick count);
-  the builder renamed it `HOLD_STEPS` (7 sites; not yet built; **a departure for the advisor**: a name change to fit the
-  gate's rule); snapshot caee92af…, 2,081 added. **Second clean ~16:46**, no lane running: dev 27,713 files 7.1 GiB,
-  release 972 files 259.0 MiB; guards pass; free 3,507,441,664 → 10,135,818,240 bytes. **Resumed** for A3 and B: the
-  two counted runs are A3 and B on the final tree, all 11 steps each (u4f2-brief.md:106; A2 not counted). **A3 PASS,
-  all 11 steps** (u4f2-end-a3.log, 16:48-17:11:38; test 1,124.2 s, 83 s under the line; 702/799, 0 failed; deps PASS;
-  tree 4a9dde09…; an fmt fix after the rename, by Edit; snapshot e9a0ae3e…; 2,077 added). **Third clean 17:12**: dev
-  27,623 files 7.0 GiB, release 972, 259.0 MiB; guards pass; free 3,548,110,848 → 10,116,452,352 bytes. **Resumed
-  17:13 for B** on the same tree; if B fails, the builder stops and reports, with no fix without my word. **BUILD
-  DONE ~17:36: B PASS, all 11 steps** (u4f2-end-b.log; test 1,125.1 s); section 6 met by A3 and B on tree 4a9dde09…;
-  final snapshot wip/u4f2-build.patch sha256 e9a0ae3e3f48af18… (checked, saved 6ea345e); 2,077 added. **Fourth clean
-  ~17:39** (no lane running; dev 27,615 files 7.0 GiB, release 972, 259.0 MiB; guards pass; free 3,548,807,168 →
-  10,115,317,760 bytes; for the merge's check). **Review round 1 RUNNING** (u4f2-panel-brief.md; each seat reads only,
-  notes u4f2-review-<seat>.md): batch 1 netcode, security, test from ~17:41 UTC, xhigh. **Security DONE 17:55:
-  APPROVE WITH FINDINGS** (SA-U4F2-1 to -3, all Low: `--forge-every` unbounded multiply; kind 7 unsound at
-  `--forge-every 2`; kind 8/9/11 `saturating_sub`; no security defect; F-B's record gap confirmed, its fix the netcode
-  seat's; it caught my brief's hash typo, fixed). **Rust (batch 2) from 17:55.** **Test DONE ~17:59: REQUEST CHANGES**
-  (read in full, :127-209): TE-U4F2-1 High (F-B confirmed in code, world.rs:1351-1355 and :1192-1202; owed: a
-  death/revive unit test failing on today's code, then 610 s forged pairs under A and B); Mediums -2 (no twin test for
-  kinds 1, 2, 4, 5, 6: plant 9), -3 (slot filters unpinned), -4 (f16's shared pair), -5 (F-A), -6 (F-C: bite runs
-  669/668 against 665), -7 (hand runs and judge calls on the pre-F-D tree), -8 (82 s margin under a 75.6 s noise);
-  Lows -9 to -15. **Lesson:** never `cd` into an agent's worktree: the
-  harness moved this session's main folder to it (16:19; back at once, branch unchanged); read it with Read/Grep.
-  Check-in re-enabled 14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bzkhq2f75 from
-  17:56 UTC (to about 19:46); the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the
-  named choices; U4F2-SIZE answered). U4G-Q1 (split; final text advisor-u4g-brief.md:360-374; not a stop); U4G-Q2
-  later, before -58's set only, its text drafted and read first. Main still f5030a3 (16:06 UTC).
+- **U4f2: BUILD DONE, review round 1 RUNNING.** The build's record (its four floor stops and part-cleans, end checks
+  A3 and B, the first two verdicts) is word for word at history.md:7324-7367 (card_trim_1120g.py). A3 and B pass all
+  11 steps on tree 4a9dde09…; snapshot wip/u4f2-build.patch e9a0ae3e3f48af18…; 2,077 added; the builder's worktree
+  .claude/worktrees/agent-aa62d31b6fa5b9807 stays for the fix pass; free 10,115,317,760 bytes after the fourth clean.
+  **Round 1** (u4f2-panel-brief.md; notes u4f2-review-<seat>.md): security APPROVE WITH FINDINGS (3 Lows); test
+  REQUEST CHANGES (TE-U4F2-1 High = F-B; Mediums -2 to -8, read in full; Lows -9 to -15); netcode (from ~17:41) and
+  rust (from 17:55) RUNNING. **Next:** their verdicts (every Medium or higher read in full), then the advisor's round
+  ruling on all four files (F-B's fix inside the plan; a fix touching what counts as rejected, or the shot band, is
+  his), the fix pass in the builder's worktree, round 2 on what changed, the merge, the r2 rows and -21's set.
+  **Lesson:** never `cd` into an agent's worktree: the harness moved this session's main folder to it (16:19; back at
+  once, branch unchanged); read it with Read/Grep. Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bzkhq2f75 from
+  17:56 UTC (to about 19:46); the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) for the 2026-11-21 message
+  (U4G-Q1, final text advisor-u4g-brief.md:360-374, lean (b) split, not a stop; the named choices). Main f5030a3.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
