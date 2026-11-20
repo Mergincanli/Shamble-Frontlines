@@ -174,7 +174,7 @@
   steps PASS (test 1,157.8 s, 49 s under the 1,207 s line; measured 702, bites 799; wasm 27,000 ticks, 0 mismatching;
   marks 81; self 78/78; redact 330); **deps FAIL** (check.mjs:760's name rule took `CATCHUP_HOLD` for a tick count);
   the builder renamed it `HOLD_STEPS` (7 sites; not yet built; **a departure for the advisor**: a name change to fit the
-  gate's rule); snapshot caee92af…, 2,081 added. **Second clean ~16:50**, no lane running: dev 27,713 files 7.1 GiB,
+  gate's rule); snapshot caee92af…, 2,081 added. **Second clean ~16:46**, no lane running: dev 27,713 files 7.1 GiB,
   release 972 files 259.0 MiB; guards pass; free 3,507,441,664 → 10,135,818,240 bytes. **Resumed** for A3 and B: the
   two counted runs are A3 and B on the final tree, all 11 steps each (u4f2-brief.md:106; A2 not counted); a run uses
   about 6.3 GB, so expect a third stop before B: the same clean. **Lesson:** never `cd` into an agent's worktree: the
