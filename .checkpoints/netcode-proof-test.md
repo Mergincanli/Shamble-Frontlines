@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-20 04:2x UTC: U4f-F1 merged (1faf894); **-20's L1 re-run PASS** (46ca143); next F1's
-  report, -20's record in u4f-report.md, then condition 10 (U4f2's brief on F1's merge).
+- **Last update:** 2026-11-20 16:2x UTC: U4f2's build at its end checks, resumed 16:20 after the floor stop and a
+  part-clean (Running work); next its end checks, hand-back, then the review round.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -151,32 +151,11 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **U4f-F1 CLOSED** (04:3x UTC): its round, pass, merge (1faf894), the -20 re-run (PASS, 46ca143; CI green on
-  199c82d), F1's report and -20's record, and condition 10 (u4f2-brief.md rev 1.2): history.md:7217-7247
-  (card_trim_1120e.py). **The advisor's close read: APPROVE WITH FINDINGS** (advisor-u4f-f1-close.md, 187 lines: -20's
-  L1 verdict counts; every expected figure held, re-run by it, and all 21 raw logs equal to 350677f's but headers and
-  the lost counts; FP-5 (i)-(v) and the correction found; condition 10 met). Its three Lows fixed by Edit:
-  ADV-U4FF1C-1 (u4f-report.md's Security section names SA-F1-1), -2 (seam.rs:582-593), -3 (compare_20.py and jdiff.py
-  copied beside the reports, hashes equal to its 65e29b45… and 3c836ef8…). PR #40 stays draft and needs-mustafa.
-- **U4g's brief, draft rev 1 DONE** (u4g-brief.md, 247 lines, read in full; notes u4g-brief-notes.md; 8e89a72): size
-  about 3,200-5,500 (top about 6,600 at U4f's overrun), so **U4G-Q1 (size; lean: split into U4g, prediction and cues,
-  and U4g2, interpolation and events) is his**; **U4G-Q2** (-58's two lost-tick checks: his C62HB-Q4 (b) stands, the
-  exact marks.json wording needs his yes; the draft's (c) "not now" would re-ask it) his; Q3-Q8 the advisor's; 75
-  measured + 14 bite runs. **The advisor's check: REVISE** (advisor-u4g-brief.md, 285 lines, read in full): ADV-U4GB-1
-  High, the B1 work its U4r build ruling 3 sent to U4g (recovery after an eviction, -17/-18 L1 B1 parts, -18's bite
-  run, ack.rs) never reached the register or the plan (ruling 3's tasks (a) and (c), history.md:4964-4974); -2 High,
-  Q2's (c) re-asks his C62HB-Q4 (b); Mediums -3 (Q2 route A unproven; before -58's set, not the build), -4 (size: U4f's
-  whole scope ran about 1.5x; whole 3,350-5,850, 5,000-8,800 at 1.5), -5 (NC-U4R-4), -6 (-45's flags in a 48-client
-  log), -7 (-55 diluted, -60 vacuous); Lows -8 to -11. **Its item 7 done by me:** u4s-carries.md (78 amended; new 91
-  ack.rs, 92 NC-U4R-4, 93 U4h's ES hit rule; 77 (b) amended), u4-build-plan.md (U4g's "Moved in from U4r", §9 -60 6
-  and totals 199/288, §11 gains ruling 3's heal-reading line, also missed). **Rev 2 DONE** (u4g-brief.md, 270 lines,
-  6e93586; read: top, sections 2, 6, 8, last): 78 measured + 15 bites; whole about 3,300-5,800; halves 2,100-3,700 and
-  1,150-2,100 (the drafter's, against the advisor's 1,250-2,200). **The advisor's rev-2 check: APPROVE WITH CONDITIONS
-  1-5** (advisor-u4g-brief.md:287-378, read in full; Mediums ADV-U4GB-12, the bitten B1 run's validity read before the B1
-  set, and -13, the short B1 suite at 18 flag-0 ticks per client per burst, not 0.99; Lows -14, -15; the drafter's
-  figures go to him). **All five met by Edit: u4g-brief.md rev 2.1** (conditions 1-4) and u4s-carries.md (carry 59's
-  pointer to 93; carry 77 (b)'s reading marked mine); no new check needed. **U4g's brief is ready**; U4G-Q1's final text
-  for the 2026-11-21 message: advisor-u4g-brief.md:360-374 (lean (b), split). U4G-Q2 later, before -58's set.
+- **Moved to history.md:7273-7311** (card_trim_1120f.py, 16:2x UTC): U4f-F1 CLOSED (:7274-7280; the advisor's close
+  read APPROVE WITH FINDINGS, its three Lows fixed), U4g's brief from rev 1 to rev 2.1 (:7281-7299; REVISE, then
+  APPROVE WITH CONDITIONS 1-5, all met: **u4g-brief.md rev 2.1 is ready**; **U4G-Q1's final text for the 2026-11-21
+  message: advisor-u4g-brief.md:360-374**, lean (b) split; U4G-Q2 before -58's set only), U4f2's brief check
+  (:7300-7311; APPROVE WITH CONDITIONS, rev 1.1, then rev 1.2 at launch; its size line, now answered).
 - **U4f2's BUILD RUNNING** from 14:16 UTC: one builder (Opus 5.5, xhigh) in an isolated worktree, step 0 to the lane
   head 0376c76 (spikes/ = `<base>` a289def's); notes in its copy of u4f2-build.md; snapshots at block ends to
   wip/u4f2-build.patch (with its notes copied beside); runner u4f-run.sh, logs .gate/u4f/u4f2-*.log; stop past 3,000
@@ -184,41 +163,25 @@
   the notes name each plant and its restore sha256), then resume it by SendMessage. **Disk:** 10,111 MiB free at 14:15,
   the shared target empty; a full build fills about 7 GiB, so the runner's 4 GB floor will likely stop it once: then,
   with no lane running (P27: "Between waves, with no lane running"), part-clean (P27's six `cargo clean --target-dir`
-  commands under the lane lock) and resume it. **16:05 UTC:** blocks 1-8 and section 6 item 5 done (2,080 added; its
-  notes :124-153: F-A Medium, F-B High for -21's set, both for the advisor; F-C; F-D fixed); end check A failed at its
-  doc step (two doc links to private items, bots lib.rs:542, :547: the builder's fix); free 3,836 MiB (shared target
-  6,053, debug 5,731): under the floor, so its next check.mjs run stops it (u4f-brief.md:853-855, "stop and report");
-  then part-clean and resume. Check-in re-enabled 14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver b22ct2zom from
+  commands under the lane lock) and resume it. **16:14 UTC: stopped on the floor** (3,834 MiB), as expected: blocks 1-8,
+  11 plants and section 6 item 5 done (2,080 added; 60 new tests; snapshot 225d8020…; hand-back items 8-9: four
+  departures, F-A Medium, F-B High for -21's set, F-C, F-E, all for the review round and the advisor; F-D fixed); end
+  check A failed at its doc step (bots lib.rs:542, :547 linked private items; fixed, not re-run). **Part-clean
+  16:16-16:19**, no lane running (four pgreps empty), P27's second form (main-run.sh refuses under 4 GB): `--profile
+  dev` (22,565 files, 6.3 GiB) and `--release` (996, 271.3 MiB) on the shared root, under the lock, offline; guards
+  pass; doc and wasm32 kept; free 4,019,650,560 → 10,297,077,760 bytes. **Resumed 16:20** by SendMessage (its item
+  10, then section 6); a check.mjs run refills about 7.7 GiB (u4r-disk-plan.md:73-74), so expect one more floor stop
+  before its second run: the same clean. **Lesson:** never `cd` into an agent's worktree: the harness moved this
+  session's main folder to it (16:19; back at once, branch unchanged); read a worktree with Read/Grep or ask its agent.
+  Check-in re-enabled 14:15 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5); saver b22ct2zom from
   16:05 UTC; the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the
   named choices; U4F2-SIZE answered). U4G-Q1 (split; final text advisor-u4g-brief.md:360-374; not a stop); U4G-Q2
   later, before -58's set only, its text drafted and read first. Main still f5030a3 (16:06 UTC).
-- **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
-  Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
-  whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
-  -10, -11; rulings Q1 (b) else (c) never (a), Q2 to him, Q3 (a), Q4 confirmed +1 f33 case, Q5 no change). **Rev 1.1
-  written** (u4f2-brief.md, 222 lines: conditions 1-8 met; no new check needed unless one cannot be met, :244-245).
-  **U4f2's size line** (SIZE-CHECK, written before its first snapshot): his (a)'s about 1,500 added lines
-  (history.md:6896-6903, on advisor-u4f-stop.md:36-38), the stop past 3,000 (history.md:2048-2051;
-  advisor-u4f-merge-head.md:133-142); the brief's estimate about 1,700-2,250 (up to about 2,700 at 1.2;
-  advisor-u4f2-brief.md:149-156), so **U4F2-SIZE goes to him** in the next day's message (2026-11-20 Amsterdam, after
-  23:00 UTC; the 11-19 one was SIZE-U4F at 00:2x), first line "stopped on you"; lean: build it whole; his cheaper
-  option: leave the four riders (C-U4F2-7 with T-6, C-U4F2-8, ADV-U4FP-3: about 80-215) to a later unit. The build
-  waits for his answer.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
-- **2026-11-20 between about 06:16 and 10:57:41 UTC (a usage cut while idle):** no system notice reached the chat; his
-  words on resuming: "usage was reached, continue" (10:57 UTC). Nothing was running (no agent, set or saver since the
-  saver's window ended about 06:14); `git status` clean at 10:57; no queued notification; the 23:05 UTC day-message
-  reminder still pending. Nothing to restore.
-- **2026-11-20 about 04:22:05 to 04:24 UTC (a container restart: the saver, the advisor's F1 close read, U4g's
-  drafter):** "The container was restarted. The following background tasks were running and are now stopped: - Restart
-  the background checkpoint saver (task bh2qi25le) - Advisor reads F1's close records (task ab6e23b921ab12806) - Draft
-  U4g's short build brief (task a1e01e6c83e873551) Re-create them if still needed." (up since about 04:22:12 by
-  /proc/uptime; my last save 04:22:05, d79ea65). Checked at 04:24: `git status` clean; both agents read-only, their
-  notes committed (advisor-u4f-f1-close.md 04:19:39, u4g-brief-notes.md 04:21:19; no u4g-brief.md yet). The saver
-  restarted; both agents resumed by SendMessage.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
   one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
   and the session) and the 11-18/11-19 choices at :7148-7160 (1119l); the 23:18 restart at :7169-7175 (1120b); the
-  01:01 restart at :7248-7253 (1120e).
+  01:01 restart at :7248-7253 (1120e); 2026-11-20's idle usage cut (06:16-10:57:41) at :7312-7315 and its 04:22
+  container restart at :7316-7322 (1120f).
