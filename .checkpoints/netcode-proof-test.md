@@ -170,7 +170,8 @@
   0 by construction after F1, so -20's and -58's checks no longer bite at run scale; 5 Lows); netcode APPROVE WITH
   FINDINGS (**NC-F1-1 Medium** = TE-F1-1, with an in-lane fix: the sim reports the edges it took, the room's lost = seen
   - those; **NC-F1-2 Medium**: the first command is also an honest rejoin's path, to U4f2 with a per-session offset; 2
-  Lows); security-auditor (batch 2) running. Then the advisor's round ruling. The builder's worktree
+  Lows); security APPROVE WITH FINDINGS (**SA-F1-1 Medium**: the first command buys a pool of grenades at one point,
+  repeatable per rejoin, to U4f2 widened; 2 Lows). **The advisor's round ruling running** (advisor-u4f-f1-r1.md). The builder's worktree
   .claude/worktrees/agent-ad5f72ed146da5f93 kept (at cb7e374 plus the diff). The saver bzii1zoox (window to about
   01:12 UTC). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (agents run).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
