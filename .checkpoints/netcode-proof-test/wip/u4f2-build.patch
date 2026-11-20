@@ -1,5 +1,5 @@
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index b40d2dd..a412728 100644
+index b40d2dd..cbf4cce 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
 @@ -144,17 +144,250 @@ pub struct Behaviour {
@@ -271,13 +271,13 @@ index b40d2dd..a412728 100644
 +    /// `every` commands given, in 2.4's unit. Kinds 1, 2, 4, 5 and 6: the `every`-th command's newest copy forged in
 +    /// the first `Input` that carries it (the endpoint keeps the honest command, so every later copy is a repeat of a
 +    /// refused sequence: 2.4 item 2). Kind 3: that `Input` carries the previous command's copy with its move or aim
-+    /// changed. Kind 7: the command itself carries a fire edge in the weapon's cooldown, or (every [`RELOAD_ITEMS`]-th
-+    /// item) a reload edge inside a reload an honest edge started, where the sim refuses it. Kind 8: that `Input`'s acknowledgement names a tick never
-+    /// sent; kind 9: it takes a trailing byte or a set pad bit (in turn); kind 11: a `Ping` on the control stream beside
-+    /// it. Kind 10: an episode every `every` x 8 (A) or x 4 (B) commands, 16 (A) or 12 (B) commands in two datagrams
-+    /// sent in one step, stamped on from its last accepted stamp + 1, so all but the first 8 are refused by the catch-up
-+    /// cap (A) or the full buffer (B), [`CATCHUP_HOLD`] steps without a command before (A) or after (B) the burst
-+    /// keeping its lead. `None` for `every` below 2: kinds 2 and 5 forge against the previous command, so it must have
++    /// changed. Kind 7: the command itself carries a fire edge in the weapon's cooldown, or (every 40th item, the
++    /// crate's `RELOAD_ITEMS`) a reload edge inside a reload an honest edge started, where the sim refuses it. Kind 8:
++    /// that `Input`'s acknowledgement names a tick never sent; kind 9: it takes a trailing byte or a set pad bit (in
++    /// turn); kind 11: a `Ping` on the control stream beside it. Kind 10: an episode every `every` x 8 (A) or x 4 (B)
++    /// commands, 16 (A) or 12 (B) commands in two datagrams sent in one step, stamped on from its last accepted stamp +
++    /// 1, so all but the first 8 are refused by the catch-up cap (A) or the full buffer (B), 6 steps without a command
++    /// (the crate's `CATCHUP_HOLD`) before (A) or after (B) the burst keeping its lead. `None` for `every` below 2: kinds 2 and 5 forge against the previous command, so it must have
 +    /// been accepted (SEC-U4F-1), which every interval of 2 or more gives on a lossless profile (P0).
      pub fn forger(mut self, kind: u8, every: u64, bound: u32) -> Option<Behaviour> {
 -        ([1, 2, 4, 5, 6].contains(&kind) && every >= 2).then_some(())?;
@@ -2616,10 +2616,10 @@ index c4bdeff..05fd00d 100644
      const secs = ((Date.now() - t0) / 1000).toFixed(1);
 diff --git a/spikes/netcode-proof/crates/lab/src/forged.rs b/spikes/netcode-proof/crates/lab/src/forged.rs
 new file mode 100644
-index 0000000..199c06d
+index 0000000..abf044c
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/forged.rs
-@@ -0,0 +1,362 @@
+@@ -0,0 +1,363 @@
 +//! -21's attribution (u4f-brief.md 2.4 item 6; TE3-2, SA-4): each forger's items, in 2.4's unit, counted rejected only
 +//! by its kind's rule, against every tick's records and `TickInput` (`event.forged_kind`, one record per kind at the
 +//! run's end, SERIES.md:158-159):
@@ -2975,10 +2975,11 @@ index 0000000..199c06d
 +
 +    /// C-U4F2-10 (neg, beyond the 13): under PM-0001-21/no-press-edge the room takes kind 5's forged commands and the
 +    /// sim refuses their extra edges (Cooldown records of those sequences): they still count unrejected (room and sim
-+    /// kinds kept apart).
++    /// kinds kept apart). Item 1 ran, as under the bite; item 2's record stands alone, so its count rests on the kinds'
++    /// separation only (a rule matching any kind would count it rejected).
 +    #[test]
 +    fn c_u4f2_10_kind_5_items_with_only_sim_cooldown_records_count_unrejected() {
 +        let s = [sim(1, RefusalKind::Cooldown), sim(2, RefusalKind::Cooldown)];
-+        assert_eq!(one(5, &[], &s, &[1, 2]), (2, 2));
++        assert_eq!(one(5, &[], &s, &[1]), (2, 2));
 +    }
 +}

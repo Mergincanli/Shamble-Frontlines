@@ -151,3 +151,58 @@
   "forged: every forged command rejected and counted" would then fail. Shots per measured second 677 and 685 (band
   665-735): F-C, a thin margin on seed 1.
   SIZE-CHECK: +1718 -175 tracked + forged.rs 362 = 2,080 added.
+- Plants (each Edit, one `-x -k` runner call, restored by Edit, sha256 checked; clean sha256s: forged.rs 7884e8d8…
+  then 7919200c… after the C-U4F2-10 case change below, scenario.rs edb4b289…, contract.rs a39f39b9…, bots lib.rs
+  0c8c6d21…, client lib.rs 76b507ad…, room input.rs efadaeb2…):
+  1. forged.rs `tick`, any kind matches (C-U4F2-10's plant): u4f2-plant1.log fails only f33_a_forged_command_refused_
+     under_another_kind; c_u4f2_10 PASSED under it (its items ran, and a run item counts unrejected whatever the
+     records): FINDING, fixed: the case now runs item 1 only, item 2's sim Cooldown record alone (forged.rs, clean sha
+     7919200c…); u4f2-plant1b.log: c_u4f2_10_kind_5_items_with_only_sim_cooldown_records_count_unrejected and f33_a_
+     forged_command_refused_under_another_kind_counts_unrejected FAIL by name. Restored, 7919200c… equal.
+  2. forged.rs kind 3's copy rule off: u4f2-plant2.log fails f33_a_planted_copy_that_ran_counts_unrejected_1 and
+     f33_kind_3_counts_its_copy_rejected_with_the_honest_original_run. Restored, equal.
+  3. forged.rs a record of an unforged sequence made an item (Q4's plant): u4f2-plant3.log fails
+     q4_an_honest_kind_10_refusal_changes_neither_count. Restored (slip: plant 4 was put in before re-checking the
+     sha256; checked after 4's restore: 7919200c… equal, so both restores held).
+  4. forged.rs kinds 8, 9, 11's counts ignored: u4f2-plant4.log fails f33_kind_8_…, f33_kind_9_…, f33_kind_11_….
+     Restored, equal.
+  5. scenario.rs `--forge-every` 1 taken: u4f2-plant5.log fails c_u4f2_1_a_forge_interval_below_2_is_a_usage_error.
+     Restored, edb4b289… equal.
+  6. scenario.rs the header's option fixed at B, not the live room's (C-U4F2-8): u4f2-plant6.log fails
+     f6_option_a_takes_the_one_controller_setting_…. Restored, equal.
+  7. contract.rs the band applied to the clock suite (C-U4F2-7's plant): u4f2-plant7.log fails
+     c_u4f2_7_the_shot_band_is_not_applied_to_the_clock_suite (the other case passes). Restored, a39f39b9… equal.
+  8. bots `Kind::Steady => walk` (today's walk, C-U4F2-5's plant) on the debug short copy: u4f2-plant8.log fails
+     c_u4f2_5_sim_short_no_steady_soldier_enters_a_building (Skips 8,433 soldier-ticks). Restored, 0c8c6d21… equal.
+  9. bots: the room-whole kinds' twin makes the refused command's honest content instead of skipping it:
+     u4f2-plant9.log, f16_option_a_* 12 PASS under it. FINDING F-E (Medium, for the advisor): with the standing steady
+     script (C-U4F2-5 (c)) every honest command repeats the last one's effect, so f16 (and -21's twin figure) cannot
+     tell "never made" from "made honest" for kinds 1, 2, 4, 5, 6; the claim it tests (the forged content had no
+     effect) still holds and bites (plant 10). Restored, 0c8c6d21… equal.
+  10. room input.rs kind 4's check removed: u4f2-plant10.log fails f16_option_a_kind_4_… and f16_option_b_kind_4_…
+      by name ("the ticks hashed and their hashes"; the filter also ran f16 A kinds 1, 10, 11, which share the pair
+      and failed with it). Restored, efadaeb2… equal.
+  11. client `skip_command` not using the index: u4f2-plant11.log fails c_u4f2_2_skip_command_uses_the_index_and_….
+      Restored, 76b507ad… equal.
+- Each new test alone (TE31-10; `-x`, debug, measured build): u4f2-times-f16.log: c62hb_p2_short 16.73 s (the
+  yardstick in the same call; limit 33.46 s); f16's 24 from 19.42 to 21.47 s. u4f2-times-rest.log: f28 B clamp 20.25,
+  f28 B lag 12.61, c_u4f2_1 0.00, f22 A 19.83, B 19.84, f23 19.36, c_u4f2_7 x2 29.87 / 29.24, t6 carry-60 30.15,
+  class-audit 29.99, duplicate-admit 31.94 (the closest: U4r's shared 48-client short run), refused-log 0.00, usage
+  0.00, forged:: 15 in 0.00, f15 x6 0.01-0.03, c_u4f2_5_sim_short 23.61, c_u4f2_2 0.00 s. None past the limit.
+- New tests, 60 (each in both builds; none bites-only): bots 7 (f15 kinds 3, 7, 8, 9, 10, 11; c_u4f2_5_sim_short;
+  plus c_u4f2_5_sim_full, ignored, release by name), client 1 (c_u4f2_2), lab scenario 30 (f28 B x2, c_u4f2_1, f22 x2,
+  f23, f16 x24), lab forged 15 (f33 x13, q4, c_u4f2_10), lab contract 7 (c_u4f2_7 x2, t6 x5). Expected counts:
+  642 + 60 = 702 measured, 739 + 60 = 799 bites. Share: 2.10's 51 (f15 6, f16 24, f22 2, f23 1, f33 13, T-6 5) + 9
+  extras; negatives 22 (f15 6, f22 2, f23 1, f33 13) + Q4 and C-U4F2-10 beyond.
+- End check A (u4f2-end-a.log, 16:03 UTC, `-x`, df 7.6 G before): provenance builds `cargo test --locked --workspace
+  --no-run` exit 0, `--all-features` exit 0; `node check.mjs`: fmt PASS, clippy PASS, clippy-wasm32 PASS, **doc FAIL**
+  ("public documentation for `forger` links to private item `RELOAD_ITEMS`"; `CATCHUP_HOLD` the same). Stopped by me
+  during the test step (the run could not pass; no cargo, rustc or node left: pgrep empty). Fix: `forger`'s doc names
+  the two constants as plain text ("every 40th item, the crate's `RELOAD_ITEMS`"; "6 steps ... `CATCHUP_HOLD`"),
+  rewrapped. NOT re-verified: the rustdoc call (u4f2-doc.log, 16:14 UTC) was refused by the runner.
+- **STOP (disk), 16:14 UTC:** the runner refused: "free 3834 MiB ... STOP: under 4 GB free" (u4f2-doc.log); `df -h
+  /home/user`: 3.8G avail. Nothing cleaned or deleted. What grew since the start (9.9G): the shared target's release
+  builds of npt-lab (measured and bites, twice) and npt-judge for the hand runs, the debug test builds, and the hand
+  runs' logs under .gate/u4f/u4f2-hand*/ (two 610 s 48-client runs, about 53 MiB each, and 33 short ones). Left to do
+  on resume: rustdoc both builds (the doc fix), fmt check, then section 6's end checks: check.mjs twice (`-x`, df
+  first), with the provenance builds; npt-server's tests are untouched (item 4 not triggered).
