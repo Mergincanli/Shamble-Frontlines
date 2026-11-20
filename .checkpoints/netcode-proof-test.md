@@ -168,12 +168,10 @@
   sim/tests/world.rs:1813-1920 (a-f); plants by name (f1-b2-plant.log, f1-b3-plant1/2.log; restored sha256s as
   before); check.mjs x2 all 11 steps pass, 641 / 738 (+7 / +7), wasm 27000 ticks 0 mismatches (f1-b4-check1/2.log,
   read). **Next: the review round** (rust-reviewer, netcode-architect, test-engineer; then security-auditor).
-- **U4f-F1's builder** from 23:15 UTC (general-purpose, opus, xhigh, isolation worktree:
-  .claude/worktrees/agent-ad5f72ed146da5f93, made at origin/main f5030a3; its step 0 fast-forwards to cb7e374 and
-  records it; notes in its copy of u4f-f1-build.md; logs .gate/u4f/f1-*). A first launch at 23:14 was stopped at once
-  (its brief lacked step 0; its worktree, unchanged, was removed). Cut by the 23:18 container restart (Cuts, below) and
-  resumed by SendMessage at 23:22. The saver bzii1zoox from 23:22 UTC (window to about 01:12). The check-in
-  trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (an agent runs).
+- **U4f-F1's review round, batch 1** from 00:10 UTC: rust-reviewer, netcode-architect, test-engineer (xhigh; brief
+  u4f-f1-panel-brief.md; files u4f-f1-review-<seat>.md); security-auditor in batch 2. The builder's worktree
+  .claude/worktrees/agent-ad5f72ed146da5f93 kept (at cb7e374 plus the diff). The saver bzii1zoox (window to about
+  01:12 UTC). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (agents run).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,
