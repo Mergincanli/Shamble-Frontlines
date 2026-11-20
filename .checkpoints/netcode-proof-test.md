@@ -126,7 +126,10 @@
   C62H-BOUND's judge Lows (JDG-ONLY-1), TE-CBH-5 = NA-CBB-1 (c-u4r-runs.mjs's next change), U3C-HELD-1's eight
   (npt-net's next change: u3c-held-1/build.md:116-122), CHECK-NFF-1 (check.mjs's next owner), ADV-CBR-1 (U4g).
 - **For the readings PR before R5 (plan :970-983):** A1's reading of ADR 0001:1611's "moves" (the advisor's U4f ruling,
-  :78-85); the items the old card lists (history.md:6458-6461: Q15 (a), WS-RECONNECT-BAR (b), the PM-0001-31 pointer).
+  :78-85); the items the old card lists (history.md:6458-6461: Q15 (a), WS-RECONNECT-BAR (b), the PM-0001-31 pointer);
+  from U4f-F1's round (advisor-u4f-f1-r1.md:153-169): NC-F1-3 (part 5's per-command order, one shot per command,
+  collapsed throws), SA-F1-3's v2 rule (every press action has server-side rate state), and C-U6-19's session-start
+  sentence.
 - **Carried past U4 (the old card's Open findings, history.md:6430-6464):** the advisor's U2 carries C1-C5 and its
   Note; C-U7-1; the U1 carries (C4, C6, A3, the results ledger, Q13, Q23); C6 widened (U6, before R3); JITTER-ORDER
   (parked: to him before R3 only if C6 shows the model's reordering moves a WebTransport result).
@@ -137,6 +140,8 @@
 - ADV-U4F20-2 (Medium, his: a marks.json change): PM-0001-20's "measured reorder share" report row
   (marks.json:4786-4790) and -58's (:4263-4267) read `header.params.reorder_permille`, which L1 scenario runs never write
   (the share is the lab's `reorder` event since D3-1); reports state the event's figures by hand until he rules.
+  Beside it (NC-F1-1; advisor-u4f-f1-r1.md:220-221, his): a judged "presses seen equal the scripted count" check for -20
+  and -58, since "0 presses lost" holds by design after U4f-F1.
 - NS-TRAILER and NS-FIRST: the night-shift lines' attribution option and status refresh, for the kit's next change
   after the freeze (his RECS-1043 (b), history.md:2217).
 - For STATUS (the advisor's U4f L3): the hold-time cap's -21 counter (U4F-Q14 (b): a follow-up for the first unit that
@@ -165,15 +170,13 @@
   sim/tests/world.rs:1813-1920 (a-f); plants by name (f1-b2-plant.log, f1-b3-plant1/2.log; restored sha256s as
   before); check.mjs x2 all 11 steps pass, 641 / 738 (+7 / +7), wasm 27000 ticks 0 mismatches (f1-b4-check1/2.log,
   read). **Next: the review round** (rust-reviewer, netcode-architect, test-engineer; then security-auditor).
-- **U4f-F1's review round** (brief u4f-f1-panel-brief.md; files u4f-f1-review-<seat>.md; Mediums read in full):
-  rust APPROVE WITH FINDINGS (RR-F1-1 to -4 Low); test APPROVE WITH FINDINGS (**TE-F1-1 Medium**: "0 presses lost" is
-  0 by construction after F1, so -20's and -58's checks no longer bite at run scale; 5 Lows); netcode APPROVE WITH
-  FINDINGS (**NC-F1-1 Medium** = TE-F1-1, with an in-lane fix: the sim reports the edges it took, the room's lost = seen
-  - those; **NC-F1-2 Medium**: the first command is also an honest rejoin's path, to U4f2 with a per-session offset; 2
-  Lows); security APPROVE WITH FINDINGS (**SA-F1-1 Medium**: the first command buys a pool of grenades at one point,
-  repeatable per rejoin, to U4f2 widened; 2 Lows). **The advisor's round ruling running** (advisor-u4f-f1-r1.md). The builder's worktree
-  .claude/worktrees/agent-ad5f72ed146da5f93 kept (at cb7e374 plus the diff). The saver bzii1zoox (window to about
-  01:12 UTC). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (agents run).
+- **U4f-F1's round CLOSED** (four seats APPROVE WITH FINDINGS: u4f-f1-review-<seat>.md; **the advisor's ruling
+  APPROVE WITH CONDITIONS FP-1 to FP-5**, advisor-u4f-f1-r1.md, 266 lines, read in full; no round 2, its check of the
+  pass instead): TE-F1-1 = NC-F1-1 keep the code, bind the wording ("0 presses lost" holds by design, as "doubled" did;
+  the room never read the sim); NC-F1-2 and SA-F1-1 carried widened to **U6 as C-U6-19** (gated before -19, PM-0004-61
+  online, any throwing or rejoining hostile client); U4f2 gets C-U4F2-9 (a record line) and -10; **U4F2-SIZE unchanged**.
+  FP-5's carries filed (u4s-carries.md U4f2, U4g, U4h, U5; plan.md:1253 C-U6-19). **The fix pass (FP-1 to FP-4) by the
+  builder, resumed 00:5x** (expected 642 / 739). The saver b1d4cn50i from 00:50 UTC (window to about 02:40).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
   Mediums ADV-U4F2B-1 T-6 rides, -2 and -3 Q1's fix confined to Steady's open-loop move with an option-A sim pattern
   whose plant bites, -4 C-U4F2-1 word for word, -5 p19's `expect`, -7 the builder's numbers, -9 the size; Lows -6, -8,

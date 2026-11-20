@@ -545,6 +545,11 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
 - The advisor's U4f carries for U4f2, word for word at advisor-u4f-r1.md:69-85: C-U4F2-1 (SEC-U4F-1's parser half),
   C-U4F2-SEC-1, C-U4F2-2 (the built-ahead items), C-U4F2-3 (`CommandRefusal`), C-U4F2-4 (FP8's line reworded); and
   ADV-U4FP-3, beside C-U4F2-2 (advisor-u4f-pass.md:95-98).
+- After U4f's merge, by number (each text stays where it is): C-U4F2-5 (advisor-u4f-r2.md:87-97), C-U4F2-6 (:110-113),
+  C-U4F2-7 (:127-129), C-U4F2-8 (advisor-u4f-merge-head.md:57-64); from U4f-F1's round (advisor-u4f-f1-r1.md):
+  C-U4F2-9, a record line: -21's report names kind 5's first-command bypass (input.rs:287), that no -21 forger rejoins
+  or throws, and C-U6-19 as its closure (:126-127); C-U4F2-10, the attribution's own kind kept after C-U4F2-3, with one
+  f16 or f33 case under PM-0001-21/no-press-edge and its plant "any kind matches" (:159-165).
 
 ## U4g (prediction, interpolation and events)
 47. **A-M2, the predicting World's reset (advisor-u4-wave1.md:240-247; the advisor's W1-U4D ruling):** "The predicting
@@ -571,8 +576,16 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     event it sends (`cosmetic_sent`), not those sent to a shooter for its own shots. Before -62's judged runs U4g has
     the room count, per client, the cosmetic events sent for that client's own shots (0 in a correct build; above 0
     under PM-0001-62/server-echo), with a test under the bite."
+- From U4f-F1's round (advisor-u4f-f1-r1.md): TE-F1-5 by id beside carry 47, two bites-build 2-edge twins for
+  PM-0001-21/no-cooldown and refuse-not-clamp, taken only if open and cheap (:147-150); NC-F1-4 named beside 47, a
+  replay without its reset reads a backwards step as up to 255 edges (:156-158); -58 reaches the press counters' wrap
+  without a first command carrying more edges than the ticks it covers from the slot's references (:123-125); and the
+  brief states in one line that its runs hold no throwing or rejoining hostile client and no client restarted
+  mid-run, or brings C-U6-19 first (:120-122).
 
 ## U4h (lag compensation and aim)
+- From U4f-F1's round (advisor-u4f-f1-r1.md:120-122): the brief states in one line that its runs hold no throwing or
+  rejoining hostile client and no client restarted mid-run, or brings C-U6-19 first.
 28. **netcode F6 / rust 3:** "The ring's span is U4h's test cap plus its margin in ms, recorded; the room builds it with
     `HitHistory::for_ms(span_ms)` (no tick count is ever written for it), and the recording header carries the span."
 45. **NF-D4's U4h line (the advisor's U4s ruling, "Rulings (U4s)", NF-D4; added by the main session, the conditions
@@ -673,6 +686,8 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     `EntityKind::layout` (advisor-u4.md:268-270)."
 
 ## U5 (fuzzing and the counting allocator)
+- From U4f-F1's round (advisor-u4f-f1-r1.md:120-122): the brief states in one line that its runs hold no throwing or
+  rejoining hostile client and no client restarted mid-run, or brings C-U6-19 first.
 48. **C13, carry 13's second half (advisor-u4-wave1.md:269-277; the advisor's W1-U4D ruling):** "Carry 13's second
     half: with PM-0001-34's counting allocator, a test that a push into a full `HitHistory` allocates nothing
     (u4s-carries.md entry 13; W1-U4D)." (U5's plan states where its allocator's `unsafe` lives under ADR 0002:264-265.)
