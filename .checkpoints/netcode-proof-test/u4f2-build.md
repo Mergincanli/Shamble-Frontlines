@@ -88,3 +88,36 @@
   Room<World>: 13 items each, unrejected 0. u4f2-b6-t.log: 24 passed in 66.18 s (8 runs). Per-kind items at 2+4 s:
   13 (kinds 1-6, 8, 9, 11; 9 measured), kind 7 11 (7), kind 10 8 A / 12 B (8).
   SIZE-CHECK: +1339 -110 tracked + forged.rs 320 = 1,659 added.
+- Block 7 DONE (the routes):
+  - C-U4F2-5 by U4F2-Q1: BRAWL-1's sim-only model takes the script as its parameter (`sim_script`, `printed_script`)
+    and gains `Pattern::OptionA` (P1: each slot's client step at a seeded phase, one-way 20-30 ms uniform per command,
+    run at the first tick at or after arrival, lead `ticks_for_ms(60) + 1` = 3; no re-run on an empty tick). Today's
+    walk (the plant, the tree as at 25d316e for Steady): u4f2-b7-walk-today.log, every pattern enters: seed 1 EveryTick
+    11,355 / Skips 53,211 / OptionA 2,828 / Bursts 21,658 soldier-ticks; seed 2 0 / 82,088 / 10,245 / 18,705; seed 3 9 /
+    57,207 / 0 / 15,278. (b) tried, a 1/32-length circle: still enters (u4f2-b7-walk-fix.log: seed 1 EveryTick 4,362,
+    OptionA 2,282; seed 2 Skips 2,220): (b) not shown. My reading (not verified by a position log): a walking soldier
+    that meets a passing vehicle part is set at the part's face (world.rs collide, :1260-1268), whatever its speed, so
+    any open-loop walk is carried. (c) built: `Kind::Steady => [0, 0]` (its fire, aim, presses kept; MOVES, TURN_EVERY,
+    Brawl, NoFire, Presses, Clamp and Lane arms unchanged). u4f2-b7-stand.log: all 12 (seed, pattern) 0 in a building
+    (largest distance 1,414 cm = the spawn grid's corner), the short copy passes; whole bots lib 20 passed.
+    FINDING F-A (for the advisor, Medium): the lag-switch suite's lag client (slot 0) wraps the run's `steady`
+    behaviour, so it now stands: `tick.v.lagswitch_excess_move_um` = 0 - 8 x full speed on every tick, and -21's lag
+    check "no tick moves further than the catch-up cap allows" can no longer fail by movement (TE-7 already had it not
+    failing at 200 ms). An option outside my lane's rule (point 1 keeps the arms, not the lab's wiring): the lag client on
+    the Lane walk (full speed, collision-free, closed loop allowed since that suite has no twin). Not built.
+    FINDING F-B (Medium, for -21's set): the sim-only steady runs show 5,300-6,200 dead soldier-ticks per 610 s (fixed
+    blind aims cross standing soldiers); a kind-7 item run while its forger is dead gets no sim record (run_command
+    returns at `!s.alive`, world.rs:1353) and counts unrejected; a respawn refills the magazine, so a reload edge just
+    after it is refused as an honest one. The short f16 runs show none; the 48-client 10-minute set may. To measure on
+    a hand run (block 8/9).
+  - kind 3's move change is now `move_xy[0] + 1` (wrapping) in place of a 90-degree turn (the standing walk is [0, 0]).
+  - C-U4F2-7 (Q3 (a)): contract.rs's band keyed on `params.suite` = `clock`, line "not applied (suite clock: its
+    clients never fire)"; tests c_u4f2_7_the_shot_band_is_not_applied_to_the_clock_suite and
+    ..._still_fails_another_suite_with_no_shots (+2 extras). T-6's five: t6_a_missing_carry_60_header_param_...,
+    t6_a_missing_class_audit_event_..., t6_a_duplicate_admit_..., t6_a_log_the_reader_refuses_is_exit_1,
+    t6_a_usage_error_is_exit_2 (+5). r2's short run now a OnceLock shared by r2 and these.
+  - C-U4F2-8: `params.cmd_timing` written by `run` from `server.room.cmd_timing()`, no longer by `params()`; f6 pins it.
+  - ADV-U4FP-3: client lib.rs `with_clock`'s long line and `plan()`'s short line rewrapped (docs only).
+  u4f2-b7-t.log: whole lab bin 131 passed, 1 ignored, 246.73 s (debug, measured); u4f2-b7-lint.log: fmt clean, clippy
+  both builds exit 0, contract:: 10, client endpoint 12, bots f15 12 passed.
+  SIZE-CHECK: +1658 -151 tracked + forged.rs 362 new = 2,020 added.
