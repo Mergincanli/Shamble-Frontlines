@@ -128,3 +128,57 @@
 - Not verified here (the main session's, after the merge): -20's L1 re-run (`c-u4f-runs.mjs 20`) and its comparison
   with 350677f's kept logs (condition 5); the gate and CI; the reviewers' round. Clippy on the workspace ran inside
   check.mjs only.
+
+## B5: the fix pass (advisor-u4f-f1-r1.md's table :241-249, FP-1 to FP-4; FP-5 is the main session's)
+- Start (2026-11-20): HEAD cb7e374, `git diff cb7e374 -- spikes/ | sha256sum` 37d87a10...e3d7 (the reviewed tree).
+- Plan: FP-1 the three `///` docs (seam.rs:73-77, room.rs:353-357, :1328-1331), only doc lines in src; FP-2 one test
+  of `edges_taken` in sim/tests/seam.rs over the six pairs, plant `now.saturating_sub(last)`; FP-3 T1's refusal
+  assert before its presses assert, the old-rule plant re-run once; FP-4 t2_f's two scene asserts first. SIZE-CHECK
+  after each. Then check.mjs twice (642 / 739 expected).
+- FP-1 done: seam.rs:73-78 (`edges_taken`'s doc: "counts with this one rule ..., so the room's count and the rule
+  cannot drift; the room does not read the sim's take, which T1 and T2 test"), room.rs:353-357 (`presses()`: lost
+  "counted here with that rule and not read from the sim, so 0 while the rule takes every edge") and room.rs:1328-1332
+  (`run_one`: the same words). Check: the changed lines of the reviewed patch (wip/u4f-f1-build.patch, sha256
+  37d87a10...e3d7) against `git diff cb7e374 -- spikes/` now (scratchpad f1-pass.patch): the only differing lines are
+  those three `///` docs (3, 4 and 3 lines). SIZE-CHECK: 207 insertions, 24 deletions; no new file. 207 of 300.
+- FP-2 written, NOT RUN: sim/tests/seam.rs `f1_edges_taken_is_the_wrapping_advance` (after s6, before the bites-only
+  part), the six pairs (255, 1) 2, (254, 0) 2, (1, 0) 255, (0, 255) 255, (7, 7) 0, (0, 1) 1, a message per pair.
+  SIZE-CHECK: 221 of 300 (with the loop's array laid out one tuple a line, as rustfmt lays out seam.rs:560-567).
+- **STOP (environment), 00:49 UTC:** the runner refused the first FP-2 run: .gate/u4f/f1-b5-fp2.log "STOP: under 4
+  GB free" (free 3849 MiB; exit 3). `df /home/user`: 3.8 G available of 252 G (35 G used: a limit outside this
+  container). No cargo, rustc or check.mjs process ran; nothing of mine is large (worktree 77 M; my logs and
+  scratchpad small). I deleted nothing (not mine: .gate/netcode-proof-test 13 G, .gate/shared-target 6.6 G, others).
+  Free space was 10,468 MiB at 23:28 and 9,854 MiB at 23:34 UTC.
+- FP-3 written, NOT RUN: commands.rs:635-643, T1's refusal assert moved before the presses assert, with one comment
+  line ("The sim's side first (TE-F1-3): the room's count below uses the same rule, so only this shows the sim's
+  take.").
+- FP-4 written, NOT RUN: sim/tests/world.rs, a helper `word_if(d, name) -> Option<u32>` (the file's `word` panics on a
+  missing name); `live_seqs` uses it for `.live` and `word` for `.seq`; t2_f first builds a course World and asserts
+  the dump's projectile pool count is 16 ("Scene::course()'s projectile_capacity") and, after one throw, that
+  `projectile[0].fuse` is above 20 ("Scene::course()'s grenade fuse, {fuse} ticks, outlasts the stream's 20").
+  **Departure from the ruling's text:** `projectile_capacity` and `grenade_fuse_ms` are `pub(crate)` (scene.rs:123,
+  :134), so the test reads them through the World Scene::course() builds (world.rs:865 sizes the pool from
+  `projectile_capacity`; :1556 sets a grenade's fuse from `ticks_for_ms(grenade_fuse_ms)`), not as fields: a public
+  accessor would change code tokens in src, which FP-1's check and the ruling's Block 4 exclude.
+- SIZE-CHECK after FP-2 to FP-4 written: 235 insertions, 24 deletions, 6 files; no new file. 235 of 300.
+- Not yet run (waiting for 4 GB free): FP-2's pass and its plant (`now.saturating_sub(last)`), FP-3's pass and its
+  old-rule plant re-run, FP-4's pass, `cargo fmt --check`, clippy, and check.mjs twice (expected 642 / 739).
+- Resumed: the main session freed the disk at 00:53 UTC (shared target cleaned, so the next build is cold): 10,576
+  MiB free. The coordinator accepts FP-4's route through the World (the departure above).
+- Finding: FP-1 changed seam.rs's doc, so seam.rs's sha256 before any F1-pass plant is now
+  901bb546c2bff638eb1fdd8667bd1e4f3676c5ac318f24e1e08da31834fe4c90, not 63057544...16499 (B1's, before FP-1).
+  Restoring to 63057544 would undo FP-1; each plant here is restored to 901bb546 instead, the hash "as before".
+- Passes: f1-b5-pass.log (-k): seam tests 9 passed (f1_edges_taken_is_the_wrapping_advance ok); t2_ 6 passed;
+  commands 27 passed (T1 ok); `cargo fmt --check` exit 1 on t2_f's two new lines (world.rs:1901-): rustfmt's
+  layout applied by Edit (the throw's stream named `throw`, so `room_tick` fits one line; the assert! split as rustfmt
+  gives it). f1-b5-pass2.log: t2_ 6 passed, fmt --check exit 0.
+- FP-2 plant (seam.rs:80 `now.saturating_sub(last)`): f1-b5-fp2-plant.log exit 101, `f1_edges_taken_is_the_wrapping_
+  advance` FAILED by name at sim/tests/seam.rs:591 "255 to 1": left 0, right 2. Restored by Edit: seam.rs sha256
+  901bb546c2bff638eb1fdd8667bd1e4f3676c5ac318f24e1e08da31834fe4c90.
+- FP-3 plant (seam.rs `edges_taken` = min(advance, 1), as B2): f1-b5-fp3-plant.log exit 101, T1 FAILED by name at
+  commands.rs:641 "the second edge, refused": left [], right [Refusal { slot: 0, seq: 4, kind: Cooldown }] (the
+  refusal assert now first). Restored by Edit: seam.rs sha256 901bb546...4c90.
+- FP-4 passes (t2_f ok in both pass logs).
+- SIZE-CHECK after FP-2 to FP-4 run and formatted: 239 insertions, 24 deletions, 6 files; no new file. 239 of 300.
+- f1-b5-clippy.log: clippy -p npt-sim -p npt-room --all-targets, measured and --all-features, -D warnings: both exit 0.
+- check.mjs pass run 1 started 00:55 UTC (background, -x): .gate/u4f/f1-b5-check1.log; 10,269 MiB free at start.
