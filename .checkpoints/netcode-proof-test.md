@@ -155,12 +155,12 @@
   test time; snapshot 23c5f78816f33e48… (checked); free 8,368,844,800 bytes. **New for the advisor** (resumed ~22:25,
   out advisor-u4f2-parta.md): F-G (at `--forge-every` 3, a death between d-1 and d breaks the twin hash; require
   every above the rest, or keep 3 as a limit); FP-5's plant 9 fails f16 under B too (F-E holds under neither option);
-  may R4 and R5 run now, before FP-2. **The advisor's part-A ruling ~22:32** (advisor-u4f2-parta.md, read :70-154):
+  may R4 and R5 run now, before FP-2. **The advisor's part-A ruling ~22:29** (advisor-u4f2-parta.md, read :70-154):
   F-G fixed now (kind 7 needs `every` above its rest: 4 at 30 Hz, 6 at 60 Hz); then R0 (the test step's new cost), R4
   (counts), R5 (its non-forged lines count; forged lines a smoke), R2-pre and R3-pre (a pre-read, only above 6.5 GB
   free); after FP-2: R5's forged lines, R2 and R3 whole, the lag-switch A line again (its logs equal the early run's);
   F-E closed under both options; **the advisor's stop moves to 2,800** (his past 3,000 stands); msg-2026-11-21.md's
-  size lines corrected (about 2,630-2,670). **The builder resumed ~22:35** for F-G and the early runs. **FP-2 only on his F-B-COUNT answer** (on (b) or (c), to
+  size lines corrected (about 2,630-2,670). **The builder resumed ~22:30** for F-G and the early runs. **FP-2 only on his F-B-COUNT answer** (on (b) or (c), to
   the advisor first). Then R2-R5, round 2 (netcode, test, rust; xhigh; read only) on the fix pass's diff, then R6
   (check.mjs twice). The advisor's stop past 2,700 added at an FP end; his past 3,000. About four part-cleans (P27's
   second form, no lane running). **msg-2026-11-21.md drafted** (F-B-COUNT, a stop; U4G-Q1, not a stop; three
