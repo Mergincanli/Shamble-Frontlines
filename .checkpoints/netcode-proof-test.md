@@ -165,8 +165,10 @@
   whole scope ran about 1.5x; whole 3,350-5,850, 5,000-8,800 at 1.5), -5 (NC-U4R-4), -6 (-45's flags in a 48-client
   log), -7 (-55 diluted, -60 vacuous); Lows -8 to -11. **Its item 7 done by me:** u4s-carries.md (78 amended; new 91
   ack.rs, 92 NC-U4R-4, 93 U4h's ES hit rule; 77 (b) amended), u4-build-plan.md (U4g's "Moved in from U4r", §9 -60 6
-  and totals 199/288, §11 gains ruling 3's heal-reading line, also missed). **Next: rev 2 by the drafter** (items 1-6),
-  then the advisor on sections 1-4, 6, 8 and the last only. U4G-Q1 (split; paste-ready at advisor-u4g-brief.md:205-219;
+  and totals 199/288, §11 gains ruling 3's heal-reading line, also missed). **Rev 2 DONE** (u4g-brief.md, 270 lines,
+  6e93586; read: top, sections 2, 6, 8, last): 78 measured + 15 bites; whole about 3,300-5,800; halves 2,100-3,700 and
+  1,150-2,100 (the drafter's, against the advisor's 1,250-2,200). **The advisor's rev-2 check running** (05:1x UTC; it
+  appends "## Rev 2 check" to advisor-u4g-brief.md, with U4G-Q1's final text). U4G-Q1 (split; paste-ready at advisor-u4g-brief.md:205-219;
   not a stop) goes in the 2026-11-21 message after rev 2; U4G-Q2 later, before -58's set only, its text drafted and read
   first. Saver bfwo06d6a from 04:24 UTC. Main still f5030a3; 10,124 MiB free.
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
