@@ -7365,3 +7365,36 @@ A
   17:56 UTC (to about 19:46); the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) stays for the 2026-11-21 message (U4G-Q1 and the
   named choices; U4F2-SIZE answered). U4G-Q1 (split; final text advisor-u4g-brief.md:360-374; not a stop); U4G-Q2
   later, before -58's set only, its text drafted and read first. Main still f5030a3 (16:06 UTC).
+
+## Card block moved 2026-11-20 about 21:40 UTC after the advisor's U4f2 round-1 ruling (card_trim_1120h.py; from 'Running work')
+- **U4f2: BUILD DONE, review round 1 RUNNING.** The build's record (its four floor stops and part-cleans, end checks
+  A3 and B, the first two verdicts) is word for word at history.md:7324-7367 (card_trim_1120g.py). A3 and B pass all
+  11 steps on tree 4a9dde09…; snapshot wip/u4f2-build.patch e9a0ae3e3f48af18…; 2,077 added; the builder's worktree
+  .claude/worktrees/agent-aa62d31b6fa5b9807 stays for the fix pass; free 10,115,317,760 bytes after the fourth clean.
+  **Round 1** (u4f2-panel-brief.md; notes u4f2-review-<seat>.md): security APPROVE WITH FINDINGS (3 Lows); test
+  REQUEST CHANGES (TE-U4F2-1 High = F-B; Mediums -2 to -8, read in full; Lows -9 to -15); **netcode REQUEST CHANGES
+  ~18:05** (read in full, :24-157, :201-218): NC-U4F2-1 High (F-B's cause: the standing forger dies about every 70 s on
+  a held line of fire, 29 commands run dead, no record; a revive's full magazine can also break the twin hash; fix (a)
+  leave dead-window kind-7 items out, counted apart in a new report-only `dead_left_out_count`, (b) `RELOAD_ITEMS` about
+  400; **(a) is a reading of "forged command": the advisor's, on his readings list; his if it changes SERIES.md:158's
+  `sent_count` row**); Mediums -2 (`FIRE_REST` a literal tick count: kind 7 breaks at 60 Hz), -3 (F-A: fix (i) the lag
+  client on the fast clock's lane, else (ii) a record line), -4 (plant 9 likely never sent the honest command under A);
+  Lows -5, -6. **Rust APPROVE WITH FINDINGS** (its file complete at the cut, read in full :1-14, :150-198): RR-U4F2-1
+  Medium (`FIRE_REST` a literal: kind 7 breaks at 60 Hz and at `--forge-every 2`; fix `fire_rest_at`, about 15-25
+  lines), Lows -2 (16-bit sequence key past one lap), -3 (P0 precondition unchecked), -4 (field docs). **All four
+  seats DONE.** **The advisor's round ruling: REQUEST CHANGES, round 2 on what changed** (advisor-u4f2-r1.md, 422
+  lines; read in full: blocks 4-6 :251-372 and the tables :373-422): FP-1 to FP-9 (FP-1 kind 7's reload item releases
+  fire on d-1, with a World-level death test T-K7; FP-3 `fire_rest_at`; FP-4 the lag client on the Lane walk; FP-5 the
+  twin guard and plant 9 redone; FP-6 the slot filters; FP-7 f16 names the culprit; FP-8 the Lows; FP-9 record lines);
+  **FP-2 (F-B's dead half, route (a)) only on his F-B-COUNT answer**; all five departures accepted; size about 240-410
+  more (U4f2 about 2,320-2,490), **the advisor's stop past 2,700**, his past 3,000; runs R1-R6 (R2 the 610 s pairs,
+  R3 bite-no-lead-bound, R4 FP-4's power, R5 section 6 item 5 again, R6 check.mjs twice); round 2 after part B and
+  R1-R5: netcode, test, rust; about four part-cleans. **Part A RUNNING from ~21:33 UTC** (the builder resumed: FP-1,
+  3, 5, 6, 7, 4, 8, then fmt/clippy/doc, then it stops). **msg-2026-11-21.md drafted** (F-B-COUNT, stop; U4G-Q1, not
+  a stop; three choices): sent at the 23:05 UTC reminder. **Next:** their verdicts (every Medium or higher read in full), then the advisor's round
+  ruling on all four files (F-B's fix inside the plan; a fix touching what counts as rejected, or the shot band, is
+  his), the fix pass in the builder's worktree, round 2 on what changed, the merge, the r2 rows and -21's set.
+  **Lesson:** never `cd` into an agent's worktree: the harness moved this session's main folder to it (16:19; back at
+  once, branch unchanged); read it with Read/Grep. Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bh8edyqwv from
+  21:10 UTC (to about 23:00); the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) for the 2026-11-21 message
+  (U4G-Q1, final text advisor-u4g-brief.md:360-374, lean (b) split, not a stop; the named choices). Main f5030a3.

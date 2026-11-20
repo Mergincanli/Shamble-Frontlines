@@ -109,8 +109,8 @@ Each block is added below as it finishes.
      carried in u4f2-brief.md:173-175.
   3. The precedent is exact: A1 read "moves" in the same ADR row, leaving dead and respawn ticks out and counting them
      apart; it went to him and he said yes in his own words (history.md:6799). And it would be made after a judged-length
-     run failed the check, the pattern his LEAD-BOUND and C62H-BOUND freezes guard against ("never changed to fit a
-     run's result").
+     run failed the check, the pattern his freezes guard against (LEAD-BOUND, history.md:6797: "It is never changed to
+     fit a run's result, and a change comes back to me").
   4. NC's own alternative test ("if the advisor reads it as changing what SERIES.md:158's row means, it is his") is met.
 - **My lean for him: (a).** It keeps the kind-7 rule exact (a record of its own kind), keeps every refused item's
   evidence, reports what it leaves out beside the check, leaves the 1,000-per-kind check on what remains (about 1,500 a
@@ -192,7 +192,8 @@ Each block is added below as it finishes.
   - SA-U4F2-1 = TE-U4F2-15 (`--forge-every` unbounded, kind 10's multiply): **fix, FP-8**, with RR's refinement
     (`forger` returns `None` when `every.checked_mul(8)` fails) and a top bound in the parser (at most 1,000,000).
   - SA-U4F2-2: **fixed by FP-3** (2 refused for kind 7 at 30 Hz).
-  - SA-U4F2-3 (kinds 8, 9, 11's silent clip, the attribution's one false-pass path): **fix, FP-8** (`counted_count` on
+  - SA-U4F2-3 (kinds 8, 9, 11's silent clip: with RR-U4F2-2's lap, one of the attribution's two false-pass paths, none
+    reached today): **fix, FP-8** (`counted_count` on
     their `forged_kind` records, a new row in U4f2's SERIES.md subsection, f16 asserting it equals `sent_count` at P0).
   - RR-U4F2-2 (the 16-bit key past one lap, a false pass at intervals dividing 65,536): **fix, FP-8** (a reused
     sequence counts unrejected; the module text names the one-lap limit; one f33 case).
@@ -268,11 +269,13 @@ Each block is added below as it finishes.
   6. R6, check.mjs twice on the final tree. Then the merge into the lane as planned (the main session's).
   Running R6 after round 2 saves up to two check.mjs runs and their cleans if round 2 asks for changes.
 - **Size:** FP-1 about 40-70 added lines, FP-2 60-100, FP-3 20-35, FP-4 30-50, FP-5 20-30, FP-6 8-15, FP-7 10-30, FP-8
-  50-80: about **240-410**, so U4f2 ends at about **2,320-2,490** added (2,077 now), inside his size line's "up to
-  about 2,700" (U4F2-SIZE, history.md:7271) and under the stop past 3,000 at a block end, which stands. At the bots
-  part's 3x overrun on FP-1, FP-4 and FP-5 alone it would reach about 2,700. **My stop beside his:** past 2,700 added at
-  an FP end, the builder stops and reports (so a figure above the one he was given reaches him in the next message
-  before more is built); past 3,000 his stop applies as written.
+  50-80: about **240-410**, so U4f2 ends at about **2,320-2,490** added (2,077 now): above the 1,700 to 2,250 of the
+  option he chose (history.md:7266, "(a) Build it whole: about 1,700 to 2,250 added lines ... The stop at 3,000 lines
+  stays"), inside the card's size line read from it (history.md:7271, the main session's reading: up to about 2,700 at
+  U4f's 1.2), and under the stop past 3,000 at a block end, which stands and is his. Not a stop, so it is told to him
+  (block 6), not asked. At the bots part's 3x overrun on FP-1, FP-4 and FP-5 alone it would reach about 2,700. **My
+  stop beside his:** past 2,700 added at an FP end, the builder stops and reports to me, before more is built; past
+  3,000 his stop applies as written.
 - **The runs owed before the merge** (each in the record with its log path; figures as found, none fitted):
   - **R1, per FP (debug):** the FP's tests alone (each new test's wall time, the brief's rule) and its plant.
   - **R2, the 610 s forged pairs** (release measured build; seed 1; options A and B; 10 s warm-up + 600 s; each
@@ -331,12 +334,14 @@ Each block is added below as it finishes.
      > and the tick rate, so it holds at 60 ticks a second too, and intervals the weapon cannot meet refused at start;
      > the lag-switch bot walks a clear lane again, so the lag check's movement can fail; a missing twin test for five
      > kinds, and a dozen smaller fixes and record lines. The builder's five departures accepted: one shared test pair
-     > per option, the cheaters on a fixed lead, the standing honest bots (your earlier route), kind 7's rebuild, and a
+     > per option, the cheaters on a fixed lead, the honest bots standing still (the advisor's earlier route for keeping
+     > them out of buildings), kind 7's rebuild, and a
      > constant renamed (HOLD_STEPS) because the checker read its old name as a tick count, which two reviewers checked
      > it is not. The test step's time limit read on the builder's own two counted runs. A second review round on what
-     > the fixes change. U4f2's size after them: about 2,320 to 2,490 added lines, inside your "up to about 2,700"; the
-     > stop past 3,000 stands. Why: all inside the plan and undoable; no pass mark, judge, marks.json or existing
-     > SERIES.md row changes; no money; nothing on main.
+     > the fixes change. U4f2's size after them: about 2,320 to 2,490 added lines in all, above the 1,700 to 2,250 your
+     > (a) was given (the review's fixes add about 240 to 410), and under the stop at 3,000, which stays and is not
+     > reached. Why: all inside the plan and undoable; no pass mark, judge, marks.json or existing SERIES.md row
+     > changes; no money; nothing on main.
 - **The question, paste-ready, in plain words:**
 
 > **F-B-COUNT** (stopped on you: U4f2's merge, and so -21's runs, wait for it). How should the forged-command check
@@ -364,3 +369,54 @@ Each block is added below as it finishes.
 - **Nothing else is his:** no pass mark, judge, marks.json text, existing SERIES.md row (FP-8's `counted_count` and
   FP-2's `dead_left_out_count` are new rows in U4f2's own subsection), money or main. No security finding of this
   round is left open (SA-U4F2-1 to -3 are fixed in the pass).
+
+## The ruling per finding (each seat's severity kept)
+| Id | Sev | Ruling | Why (evidence) |
+|---|---|---|---|
+| NC-U4F2-1 = TE-U4F2-1 | High | **cause confirmed; FP-1 (the reload half, by construction: mine); FP-2 (the dead half, route (a)) only on his F-B-COUNT answer**; NC's (b) not taken | world.rs:1351-1355, :1192-1203; forged.rs:86-91, :117; bots lib.rs:892 (fire held on a reload item's d-1); lab.jsonl:58 (18 of 1,523); (a) narrows ADR 0001:1611's "every forged command" and SERIES.md:158's `sent_count`: his by TEST-FIRST, LEAD-BOUND's row rule and A1's precedent (Block 1) |
+| NC-U4F2-2 = RR-U4F2-1 | Medium | **fix: FP-3** | world.rs:1415-1416, :1440; bots lib.rs:147-153: sound only for an interval of 2 to the rest in ticks; at 60 Hz or `--forge-every 2` fire items go unrecorded; carry 39, plan A5/RQ6 |
+| NC-U4F2-3 = TE-U4F2-5 | Medium | **fix: FP-4** (route (i)); Q1 point 1 not in the way | scenario.rs:1265-1267, logs.rs:699-706, scenario.rs:4225: a standing lag client makes the check unable to fail; at 200 ms a walking one still catches a doubled run |
+| NC-U4F2-4, TE-U4F2-2 | Medium | **fix: FP-5** | bots lib.rs:279-282 (no twin guard), :909-910; plant9.log:20-34; room.rs:1085-1087 |
+| NC-U4F2-5 | Low | **usage half: FP-8** (with RR-U4F2-3); header param not taken: **record line (FP-9)** | scenario.rs:1230, :1988-1995; the suite runs at P0 only |
+| NC-U4F2-6 | Low | **fix: FP-8** (doc) | bots lib.rs:562-566 against :909-923 |
+| SA-U4F2-1 = TE-U4F2-15 | Low | **fix: FP-8**, with RR's `checked_mul` in `forger` | bots lib.rs:944; scenario.rs:2240-2247; Cargo.toml:116-120 |
+| SA-U4F2-2 | Low | **fixed by FP-3** | at 2 the honest press drifts into the cooldown (RR block 1's arithmetic) |
+| SA-U4F2-3 | Low | **fix: FP-8** (a false-pass path, unreached today) | forged.rs:116 |
+| TE-U4F2-3 | Medium | **fix: FP-6** | forged.rs:81, :86, :345-349 |
+| TE-U4F2-4 | Medium | **departure accepted; fix: FP-7** | scenario.rs:4105, :4364-4420; plant10.log:21-25 |
+| TE-U4F2-6 | Medium | **no code; R2 and R3 state the shots; under 670 to me before the set** | hand-a 680-688, hand-long 677/685, hand-b 669, p7 668; the band is his |
+| TE-U4F2-7 | Medium | **fix: R5** (section 6 item 5 whole on the final tree) | hand-a.log:3 d211149a… against end-b.log:3 4a9dde09… |
+| TE-U4F2-8 | Medium | **ruled: the line reads the builder's two counted worktree runs; the pass adds at most 30 s; past either, to me** | u4f-brief.md:678-680; 931.9 s against 1,007.5 s on equal tests |
+| TE-U4F2-9 | Low | **fix: FP-8** | forged.rs:136-148 |
+| TE-U4F2-10 | Low | **fix: FP-8** | c-u4f-r2.mjs:61-75; u4f2-brief.md:110 |
+| TE-U4F2-11 | Low | **fix: FP-8** | c-u4f-runs.mjs:80; hand-long2's 65,188,828 B |
+| TE-U4F2-12 | Low | **fix: FP-8** | scenario.rs:4408-4416; u4f-brief.md:487 |
+| TE-U4F2-13 | Low | **no code: record line and a follow-up by id** (first unit that skips on a controlled endpoint) | no -21 client skips under the controller |
+| TE-U4F2-14 | Low | **doc: FP-8; records: FP-9** | the plants' file:line; the short copy's pass of (b)'s walk; the hash slip already fixed |
+| RR-U4F2-2 | Low | **fix: FP-8** | forged.rs:28-34, :66-69 |
+| RR-U4F2-3 | Low | **fix: FP-8** | scenario.rs:2240-2266 |
+| RR-U4F2-4 | Low | **fix: FP-8** | room.rs:42-46 |
+
+## The fix pass (the builder, in its worktree; FP-9 the builder's record and the main session's report)
+| FP | Finding | The change | Acceptance check and plant |
+|---|---|---|---|
+| FP-1 | NC-U4F2-1 (reload half), TE-U4F2-1 (twin half) | bots `forge_step`: a kind-7 reload item's honest command d-1 releases fire (`buttons &= !FIRE`), the twin's d-1 the same; f15's kind-7 case to the new shape; a World-level death test (T-K7): a kind-7 forger's commands and its twin's, each into a World, the forger's soldier killed and revived (an opposing soldier's fire, or a set-up the test picks) so items fall with d or d-1 run dead, one reload item has d-1 as the first live command, others run alive | T-K7 passes, at most about 5 s alone in debug: every item whose d-1 and d ran alive carries its Cooldown or Reload record; the reload item after the revive carries a Reload record; every tick's state hash equal between the two Worlds; the dead-window items printed. Plant: fire held on a reload item's d-1 (today's) fails T-K7 by name (an unrecorded reload and a hash difference) |
+| FP-2 | NC-U4F2-1 (a), TE-U4F2-1 | **only on his (a):** forged.rs: per forger, the alive flag of its soldier (the server's World, before the tick's command phase) at each run of its last few sequences; an item left out of `sent_count` and `unrejected_count` when the soldier was dead at the run of d or of d-1 (an item whose d-1 never ran is not left out); `dead_left_out_count` on every `forged_kind` record (0 for kinds other than 7); the module text; scenario.rs passes the flags; one new SERIES.md row in U4f2's subsection | an f33 case on hand-made inputs: dead at d's run out; dead at d-1's, alive at d's, out; alive at both with no record unrejected; alive with a record rejected; d-1 never ran, not out: passes. T-K7 extended: its attribution reads unrejected 0 with the dead-window items counted apart. Plant: the window ignored (today's rule) fails both by name. R2: every kind's `unrejected_count` 0 under A and B. -21's report: the reading in a line of its own, with who reviewed it; the readings PR's list |
+| FP-3 | NC-U4F2-2 = RR-U4F2-1, SA-U4F2-2 | `fire_rest_at(tick_hz, interval_us) -> Option<u64>`: (interval_us x tick_hz).div_ceil(10^6) when interval_us x tick_hz is at least 2,000,000, else `None`; the rest held on `Behaviour` from the scene's weapon and `npt_sim::TICK_HZ`; `forger(7, every, _)` `None` when the rest is `None` or `every` is below it (the lab's usage error names kind 7's rest); the doc reads "at least two ticks" | a test pins SS at 3 (30 Hz) and 5 (60 Hz) and `None` for an interval under 2 ticks; a case (beside c_u4f2_1, or on `forger` itself) shows a forged suite at `--forge-every 2` refused as a usage error and 3 taken (30 Hz), the parser's floor of 2 unchanged; plant: the rest fixed at 3 fails the 60 Hz pin by name; R2's kind 7 at 12 as before |
+| FP-4 | NC-U4F2-3 = TE-U4F2-5 | the lag-switch suite's slot 0 on the Lane walk (closed loop, no twin), its lag switch unchanged; the Lane's `west` moved out of `Fast` so a non-fast client can hold it, the fast clock's logic unchanged | f20 asserts `lagswitch_excess_move_um` above its standing value (minus 8 ticks of full speed) on some burst tick and at most 0 on every tick, and the lag client's in-a-building count 0; plant: the lag client back on the standing script fails f20 by name; the fast clock's tests pass unchanged; R5's fast-clock tick hashes equal hand-a's; R4's excess above 0 |
+| FP-5 | NC-U4F2-4, TE-U4F2-2 | `if !twin` on `forge_input`'s 1, 2, 4, 5, 6 arm; a bots case on `sides(k, false)` for those kinds (the kind-10 case's pattern, bots lib.rs:1891-1901) | the case passes: the twin sends no forged sequence, its sequences are the forger's less the forged ones, every other command equal; plant 9 in its right form (the twin sends the refused command's honest content, `due` false) fails the case by name, and under it f16 option A kinds 1, 2, 4, 5, 6 fail and option B passes (both logged: F-E recorded as option B's limit) |
+| FP-6 | TE-U4F2-3 | in q4 or a new f33 case: an own-kind record on another slot naming a forged sequence (room kind 10 on SLOT + 1 for seq 2; a sim Cooldown on SLOT + 1 for a kind-7 item) leaves the item unrejected | passes; plants: each slot filter removed (forged.rs:81, :86), each fails it by name |
+| FP-7 | TE-U4F2-4 | f16's failure names the culprit: on a fate-entry difference its link's slot and kind; on a hash difference the forger slots whose Soldier records differ at the first differing tick | plant 10 re-run (kind 4's room check removed): the failure names kind 4 (slot 3) |
+| FP-8 | SA-U4F2-1 = TE-U4F2-15, SA-U4F2-3, RR-U4F2-2, RR-U4F2-3 with NC-U4F2-5's usage half, RR-U4F2-4, NC-U4F2-6, TE-U4F2-9, -10, -11, -12 | the parser's top bound (at most 1,000,000) and `forger` `None` when `every.checked_mul(8)` fails; `counted_count` on kinds 8, 9, 11's records (a new SERIES.md row) with f16's equality at P0; a reused sequence counted unrejected and the one-lap limit in the module text; `--suite forged` off P0 or with `--lead` a usage error; `RefusalRecord`'s field docs; `twin()`'s doc on both skip timings; f33 asserts a nonzero dropped count is carried; "in a building: 0" in every -21 row's `expect`; set 21's projection from the measured 65.2 MB; f16 asserts every forger's refusal counters but its own kind's, and every honest client's, 0 | each new case passes: "18446744073709551615" and "1000001" refused, "1000000" taken; f16's `counted_count` equality (plant: the counter read as sent + 1 fails it by name); a reused-sequence f33 case; P1 and `--lead` refused (two cases); the dropped count (plant: written as 0 fails it by name); f16's zeros (a nonzero count is a finding for me, never a looser test); the docs, rows and projection by reading |
+| FP-9 | TE-U4F2-13, -14, NC-U4F2-5, the departures | record lines in the build record and U4f2's report: each plant's file:line (old and new); the short C-U4F2-5 copy's pass of (b)'s walk; the forgers' fixed lead of 2 and P0's in-order assumption; `skip_command`'s controller half untested, with its follow-up; the five departures as ruled (block 3), `HOLD_STEPS` in a line of its own; C-U4F2-9's lines; F-C's figures | the main session reads each line before the merge |
+End checks (R1-R6, block 4): every FP's tests and plants; R2's pairs, R3's bite, R4, R5 before round 2; R6 (check.mjs twice, all 11 steps, the counts and each test step under 1,207 s in the worktree) after it.
+
+## The round decision
+**Round 2, on what changed**, after part B and R1-R5: netcode-architect, test-engineer and rust-reviewer in one batch of
+three, xhigh, read only (round 1 left a High; FP-2 changes what a judged check counts). security-auditor only if a
+round-2 finding has a security side. A third round only for a Critical or High still open after round 2. **Verdict on
+round 1: REQUEST CHANGES, FP-1 to FP-9**, with FP-2 waiting for his F-B-COUNT answer and nothing else waiting.
+
+## To Mustafa, in one line
+**F-B-COUNT** in the 2026-11-21 message, first line "stopped on you" (paste-ready in block 6; lean (a)), plus one entry
+under "Choices taken without him" (block 6); only FP-2 and what follows it wait; nothing else is his.

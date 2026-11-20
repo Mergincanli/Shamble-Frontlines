@@ -95,6 +95,11 @@
   on every B1 run; Q9 -45's share read on slot 0, its bound on any slot, every slot printed (a per-slot series would be
   marks.json text: after the close); NC-U4R-4 by the lab's `tick` record. Why: inside the plan, undoable, no pass mark,
   judge or marks.json change.
+- **2026-11-20 by the advisor's U4f2 round-1 ruling (to name in the 2026-11-21 message; advisor-u4f2-r1.md:331-344,
+  its paste-ready text in msg-2026-11-21.md, choice 3):** the fix pass FP-1 and FP-3 to FP-9; the builder's five
+  departures accepted (`HOLD_STEPS` in a line of its own); the test-step line read on the builder's two counted runs;
+  a second round on what changed; U4f2's size after it about 2,320-2,490, told to him, not asked. Why: inside the
+  plan, undoable, no pass mark, judge, marks.json or existing SERIES.md row change, no money, nothing on main.
 - The choices of 2026-11-19 named in msg-2026-11-20.md: history.md:7177-7193 (card_trim_1120c.py).
 
 ## Next steps (plan rev 3.3; units ahead)
@@ -156,29 +161,17 @@
   APPROVE WITH CONDITIONS 1-5, all met: **u4g-brief.md rev 2.1 is ready**; **U4G-Q1's final text for the 2026-11-21
   message: advisor-u4g-brief.md:360-374**, lean (b) split; U4G-Q2 before -58's set only), U4f2's brief check
   (:7300-7311; APPROVE WITH CONDITIONS, rev 1.1, then rev 1.2 at launch; its size line, now answered).
-- **U4f2: BUILD DONE, review round 1 RUNNING.** The build's record (its four floor stops and part-cleans, end checks
-  A3 and B, the first two verdicts) is word for word at history.md:7324-7367 (card_trim_1120g.py). A3 and B pass all
-  11 steps on tree 4a9dde09…; snapshot wip/u4f2-build.patch e9a0ae3e3f48af18…; 2,077 added; the builder's worktree
-  .claude/worktrees/agent-aa62d31b6fa5b9807 stays for the fix pass; free 10,115,317,760 bytes after the fourth clean.
-  **Round 1** (u4f2-panel-brief.md; notes u4f2-review-<seat>.md): security APPROVE WITH FINDINGS (3 Lows); test
-  REQUEST CHANGES (TE-U4F2-1 High = F-B; Mediums -2 to -8, read in full; Lows -9 to -15); **netcode REQUEST CHANGES
-  ~18:05** (read in full, :24-157, :201-218): NC-U4F2-1 High (F-B's cause: the standing forger dies about every 70 s on
-  a held line of fire, 29 commands run dead, no record; a revive's full magazine can also break the twin hash; fix (a)
-  leave dead-window kind-7 items out, counted apart in a new report-only `dead_left_out_count`, (b) `RELOAD_ITEMS` about
-  400; **(a) is a reading of "forged command": the advisor's, on his readings list; his if it changes SERIES.md:158's
-  `sent_count` row**); Mediums -2 (`FIRE_REST` a literal tick count: kind 7 breaks at 60 Hz), -3 (F-A: fix (i) the lag
-  client on the fast clock's lane, else (ii) a record line), -4 (plant 9 likely never sent the honest command under A);
-  Lows -5, -6. **Rust APPROVE WITH FINDINGS** (its file complete at the cut, read in full :1-14, :150-198): RR-U4F2-1
-  Medium (`FIRE_REST` a literal: kind 7 breaks at 60 Hz and at `--forge-every 2`; fix `fire_rest_at`, about 15-25
-  lines), Lows -2 (16-bit sequence key past one lap), -3 (P0 precondition unchecked), -4 (field docs). **All four
-  seats DONE; the advisor's round ruling RUNNING from 21:12 UTC** (advisor-u4f2-r1.md; general agent on main's
-  advisor.md, xhigh): F-B's route and whether (a) is his, every finding, the departures, the fix pass, round 2, his line. **Next:** their verdicts (every Medium or higher read in full), then the advisor's round
-  ruling on all four files (F-B's fix inside the plan; a fix touching what counts as rejected, or the shot band, is
-  his), the fix pass in the builder's worktree, round 2 on what changed, the merge, the r2 rows and -21's set.
-  **Lesson:** never `cd` into an agent's worktree: the harness moved this session's main folder to it (16:19; back at
-  once, branch unchanged); read it with Read/Grep. Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bh8edyqwv from
-  21:10 UTC (to about 23:00); the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx) for the 2026-11-21 message
-  (U4G-Q1, final text advisor-u4g-brief.md:360-374, lean (b) split, not a stop; the named choices). Main f5030a3.
+- **U4f2: round 1 RULED; fix pass part A RUNNING from ~21:33 UTC.** Its record so far (the build, the four seats'
+  verdicts, the ruling's summary) is word for word at history.md:7324-7367 and :7369-7400 (card_trim_1120g/h.py). The
+  round-2 base is snapshot e9a0ae3e3f48af18… (2,077 added); the fix pass is in the builder's worktree
+  .claude/worktrees/agent-aa62d31b6fa5b9807. **The ruling** (advisor-u4f2-r1.md): REQUEST CHANGES. Part A: FP-1, 3, 5,
+  6, 7, 4, 8, then fmt/clippy/doc, then the builder stops. **FP-2 only on his F-B-COUNT answer** (on (b) or (c), to
+  the advisor first). Then R2-R5, round 2 (netcode, test, rust; xhigh; read only) on the fix pass's diff, then R6
+  (check.mjs twice). The advisor's stop past 2,700 added at an FP end; his past 3,000. About four part-cleans (P27's
+  second form, no lane running). **msg-2026-11-21.md drafted** (F-B-COUNT, a stop; U4G-Q1, not a stop; three
+  choices): send it at the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx). **Lesson:** never `cd` into an agent's
+  worktree (the harness moved this session's main folder to it at 16:19; back at once); read it with Read/Grep.
+  Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bh8edyqwv from 21:10 UTC (to about 23:00). Main f5030a3.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-20 18:12:22 to 21:09:44 UTC (a spend-limit cut during U4f2's round 1):** the notice, word for word
