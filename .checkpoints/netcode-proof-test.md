@@ -168,8 +168,12 @@
   sim/tests/world.rs:1813-1920 (a-f); plants by name (f1-b2-plant.log, f1-b3-plant1/2.log; restored sha256s as
   before); check.mjs x2 all 11 steps pass, 641 / 738 (+7 / +7), wasm 27000 ticks 0 mismatches (f1-b4-check1/2.log,
   read). **Next: the review round** (rust-reviewer, netcode-architect, test-engineer; then security-auditor).
-- **U4f-F1's review round, batch 1** from 00:10 UTC: rust-reviewer, netcode-architect, test-engineer (xhigh; brief
-  u4f-f1-panel-brief.md; files u4f-f1-review-<seat>.md); security-auditor in batch 2. The builder's worktree
+- **U4f-F1's review round** (brief u4f-f1-panel-brief.md; files u4f-f1-review-<seat>.md; Mediums read in full):
+  rust APPROVE WITH FINDINGS (RR-F1-1 to -4 Low); test APPROVE WITH FINDINGS (**TE-F1-1 Medium**: "0 presses lost" is
+  0 by construction after F1, so -20's and -58's checks no longer bite at run scale; 5 Lows); netcode APPROVE WITH
+  FINDINGS (**NC-F1-1 Medium** = TE-F1-1, with an in-lane fix: the sim reports the edges it took, the room's lost = seen
+  - those; **NC-F1-2 Medium**: the first command is also an honest rejoin's path, to U4f2 with a per-session offset; 2
+  Lows); security-auditor (batch 2) running. Then the advisor's round ruling. The builder's worktree
   .claude/worktrees/agent-ad5f72ed146da5f93 kept (at cb7e374 plus the diff). The saver bzii1zoox (window to about
   01:12 UTC). The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 enabled (agents run).
 - **U4f2's brief: the advisor's check APPROVE WITH CONDITIONS** (advisor-u4f2-brief.md, 290 lines, read in full:
