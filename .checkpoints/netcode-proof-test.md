@@ -159,9 +159,8 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **U4f-F1 BUILT** (00:0x UTC; snapshot wip/u4f-f1-build.patch 37d87a10…, base cb7e374, 5 files, 205 added of 300):
-  `Command::edges_taken` seam.rs:78; T1 commands.rs:618; T2 sim/tests/world.rs:1813-1920; plants by name; check.mjs x2
-  all 11 pass, 641 / 738 (+7), wasm 0 mismatches (.gate/u4f/f1-b4-check1/2.log, read).
+- **U4f-F1 BUILT** (00:0x UTC; 37d87a10…, 205 of 300): `edges_taken` seam.rs:78; T1 commands.rs:618; T2
+  sim/tests/world.rs:1813-1920; plants by name; check.mjs x2 all 11 pass, 641 / 738 (f1-b4-check1/2.log, read).
 - **U4f-F1's round CLOSED** (four seats APPROVE WITH FINDINGS: u4f-f1-review-<seat>.md; **the advisor's ruling
   APPROVE WITH CONDITIONS FP-1 to FP-5**, advisor-u4f-f1-r1.md, 266 lines, read in full; no round 2, its check of the
   pass instead): TE-F1-1 = NC-F1-1 keep the code, bind the wording ("0 presses lost" holds by design, as "doubled" did;
