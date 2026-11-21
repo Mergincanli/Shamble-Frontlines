@@ -7487,3 +7487,19 @@ Things that are very important which needs an answer: you can ask me
   (u4-build-plan.md:951-952, "never two at once"); U4G-Q2's text later, before -58's set. **Lesson:** never `cd` into an agent's
   worktree (the harness moved this session's main folder to it at 16:19; back at once); read it with Read/Grep.
   Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bvyb8q0li from 02:38 UTC 11-21 (to about 04:28). Main f5030a3.
+
+## Card blocks moved 2026-11-21 about 05:10 UTC: LEAD-BOUND's and SIZE-U4F's answer lines (card_trim_1121b.py; from 'Now: U4f')
+- **LEAD-BOUND ANSWERED: (a) 400 ms, frozen** (Mustafa, 2026-11-18 11:31 Amsterdam by his label; reached the chat
+  11:10:41 UTC; word for word at history.md's end, "## Decision: Mustafa, 2026-11-18 11:31 Amsterdam", by
+  record_lead_bound.py): the entry u4f-lead-bound.md equal to 9ad2effb's (sha256 57c588ec43bae7b7…), its fenced value's
+  sha256 4717cd895d9834154d3179f397859096b5a30f7ec290ea03f30148b912e53a2b; A1's movement reading: yes, and **U4f's
+  report names it in a line of its own with who reviewed it** (the advisor's A1; read by the advisor and the
+  test-engineer); no marks.json, judge file or existing SERIES.md row may change: if the build needs one, stop and ask
+  him; "Build U4f"; his size stop past 6,000 added lines stays.
+- **SIZE-U4F ANSWERED: (a)** (Mustafa, 2026-11-19 12:00 Amsterdam by his label; reached the chat 13:36:25 UTC; word for
+  word at history.md:6896-6903 by record_size_u4f.py): U4f closes with what is built; the three finished cheat tests
+  stay in it and are reviewed with it; the forged-command test, its six missing cheats and all of -21's runs become a
+  small unit of their own next, **U4f2**, with its own size line and review; no pass mark, judge rule, marks.json text
+  or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
+  brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
+  with its source before its first snapshot). -21 is judged only after U4f2.

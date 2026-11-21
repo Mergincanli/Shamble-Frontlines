@@ -57,20 +57,9 @@
 - **Moved to history.md:7060-7088** (card_trim_1119i.py, 20:1x UTC): U4f's filled brief (u4f-brief.md, sha256
   135325a0…, 2,040 lines, `<base>` 5b29296b), the advisor's build-1 ruling (advisor-u4f-build1.md), builder 3's stop
   line and MAIN-61's done line (a6acc8a, pushed 631edf3, CI green; advisor-main-61-head.md).
-- **LEAD-BOUND ANSWERED: (a) 400 ms, frozen** (Mustafa, 2026-11-18 11:31 Amsterdam by his label; reached the chat
-  11:10:41 UTC; word for word at history.md's end, "## Decision: Mustafa, 2026-11-18 11:31 Amsterdam", by
-  record_lead_bound.py): the entry u4f-lead-bound.md equal to 9ad2effb's (sha256 57c588ec43bae7b7…), its fenced value's
-  sha256 4717cd895d9834154d3179f397859096b5a30f7ec290ea03f30148b912e53a2b; A1's movement reading: yes, and **U4f's
-  report names it in a line of its own with who reviewed it** (the advisor's A1; read by the advisor and the
-  test-engineer); no marks.json, judge file or existing SERIES.md row may change: if the build needs one, stop and ask
-  him; "Build U4f"; his size stop past 6,000 added lines stays.
-- **SIZE-U4F ANSWERED: (a)** (Mustafa, 2026-11-19 12:00 Amsterdam by his label; reached the chat 13:36:25 UTC; word for
-  word at history.md:6896-6903 by record_size_u4f.py): U4f closes with what is built; the three finished cheat tests
-  stay in it and are reviewed with it; the forged-command test, its six missing cheats and all of -21's runs become a
-  small unit of their own next, **U4f2**, with its own size line and review; no pass mark, judge rule, marks.json text
-  or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
-  brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
-  with its source before its first snapshot). -21 is judged only after U4f2.
+- **LEAD-BOUND (a), 400 ms frozen, and SIZE-U4F (a), U4f2 its own unit:** their answer lines word for word at
+  history.md:7492-7505 (card_trim_1121b.py, 05:1x UTC); his words at history.md:6791 on (LEAD-BOUND) and :6896-6903
+  (SIZE-U4F).
 - **U4F2-SIZE ANSWERED: (a), build U4f2 whole** (Mustafa, 2026-11-20 14:10:29 UTC; word for word at
   history.md:7255-7271 by record_u4f2_size.py): **U4f2's size line** (SIZE-CHECK): about 1,700 to 2,250 added lines (up
   to about 2,700 at 1.2), the four riders included; **the stop past 3,000 at a block end**. Brief u4f2-brief.md rev 1.2,
@@ -82,6 +71,11 @@
 
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
+- **2026-11-21 by the advisor's U5 brief check (advisor-u5-brief.md:157-203; to name in the message that carries
+  U5-SIZE):** U5-Q1 (a) the three other fuzz targets run as -34's parts, reported beside it; Q2 (a) -35's tool at U5,
+  its one counted run after U6's merge, the strict count; Q3 (a) npt-alloc the fourth unsafe exception; Q5 ASan if the
+  runs fit, else coverage only; Q6 `NPT_BITE` in the bites build only; Q7 the fuzz crate under check.mjs. Why: inside
+  the plan, undoable, no pass mark, judge, marks.json or money; nothing on main.
 - **2026-11-21 by the advisor's U4h brief checks (to name in the message that carries U4H-SIZE; advisor-u4h-brief.md
   :143-211, :397-407):** U4H-Q1 a 3-tick margin; Q2 the cap `open` by default, the span readable, re-pins allowed; Q3
   shots only in the measured window; Q5 -50's runs with five terms; Q6 both throw kinds by one stand-in builder; Q7
@@ -124,6 +118,8 @@
   (the share is the lab's `reorder` event since D3-1); reports state the event's figures by hand until he rules.
   Beside it (NC-F1-1; advisor-u4f-f1-r1.md:220-221, his): a judged "presses seen equal the scripted count" check for -20
   and -58, since "0 presses lost" holds by design after U4f-F1.
+- U5-Q1 term 3 (his, a marks.json item; advisor-u5-brief.md:163-165): -34's notes name "plan §4.7's npt-proto
+  messages", which include SessionStatus, while its parts do not.
 - NS-TRAILER and NS-FIRST: the night-shift lines' attribution option and status refresh, for the kit's next change
   after the freeze (his RECS-1043 (b), history.md:2217).
 - For STATUS (the advisor's U4f L3): the hold-time cap's -21 counter (U4F-Q14 (b): a follow-up for the first unit that
@@ -170,10 +166,12 @@
   Edits; register entries 94-101 at u4s-carries.md:618-659). **U4H-Q4, U4H-SIZE and U4H-JUDGE** (final, section 8)
   go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop. **msg-2026-11-21.md
   SENT ~02:42 UTC** (F-B-COUNT, U4G-Q1, choices 1-3; held by the cut).
-- **U5's brief rev 1 DRAFTED (KEEP-PROGRESSING, saved 04:45 UTC at 2db0976; u5-brief.md, sources in u5-brief-notes.md): with the
-  advisor for its check** (general-purpose, opus, xhigh; advisor-u5-brief.md). U5 builds after U4's close. U5-Q1 to
-  Q7 are the advisor's; U5-SIZE is his (not a stop) in the first day's message after the check. S's letter for
-  SIZE-CHECK: U4b 701 lines (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
+- **U5's brief (KEEP-PROGRESSING; U5 builds after U4's close):** rev 1 (2db0976) REVISE by the advisor ~05:05 UTC
+  (advisor-u5-brief.md, 322 lines: 2 High, 5 Medium, 7 Low; its list :289-305). **Rev 2 written** (u5-brief.md) but for
+  option (a)'s per-type bars, which the test-engineer is computing from the code (u5-alloc-bounds.md); then the
+  advisor's check of the changed parts (1.4's Blocks 0, 3, 4, 7; sections 2-6, 8). **U5-ALLOC and U5-SIZE are his**
+  (texts in section 8; neither a stop) for the first day's message after that check. S's letter: U4b 701 (411eeee),
+  U4f-F1 239 (u4f-f1-report.md:104).
 - **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
   16:19; back at once); read it with Read/Grep. **Check-in re-enabled 04:46 UTC** for the U5 advisor
   (trig_01EKqNqwZrQTVJ6caAyRrug5; paused 03:12-04:46; next 06:34); saver bvyb8q0li ended 04:28:56 (nothing to save);
