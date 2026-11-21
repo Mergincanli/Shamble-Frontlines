@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 16:02 UTC: guard rev 3 (GUARD-7, E1-E5) written, tests 40/40, in the auditor's diff-only
-  re-read (B10); U5's builder on Block 1; F-B-COUNT explained to him (he decides next).
+- **Last update:** 2026-11-21 19:48 UTC: F-B-COUNT ANSWERED (a) at 19:42 (history.md:7544-7551); U4f2's builder resumed
+  19:46 for part B (FP-2 and the re-runs) after P27; check-in on; U5 paused at its S line (U5-SIZE, tonight's message).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -154,10 +154,13 @@
 ## Running work
 - **Moved to history.md:7273-7311** (card_trim_1120f.py): U4f-F1 CLOSED (:7274-7280); U4g's brief to rev 2.1 (:7281-7299;
   U4G-Q1 now answered (b); U4G-Q2 before -58's set only); U4f2's brief check (:7300-7311; rev 1.2 at launch).
-- **U4f2: part A2 DONE (~03:10 UTC); FP-2 waits for F-B-COUNT** (explained to him in plain words 14:3x; he decides).
-  Its part-A record (the advisor's part-A ruling; R0, R4, R5 and the pre-reads; about 2,566 added) is word for word at
-  history.md:7519-7533 (card_trim_1121c.py). After FP-2: R5's forged lines, R2 and R3 whole, lag-switch A again, round
-  2 (netcode, test, rust), R6, the merge, the r2 rows and -21's set; any U5 builder yields first (U5-EARLY cond. 6).
+- **U4f2: F-B-COUNT ANSWERED (a)** (Mustafa, 19:42:15 UTC, a queued message; word for word at history.md:7544-7551 by
+  record_fbcount.py; his words restate the advisor's (a), advisor-u4f2-r1.md:357-361, so no new check). **Part B RUNNING
+  from 19:46** (builder resumed by SendMessage: FP-2 as :404, fmt/clippy/doc, R5's forged lines, R2 and R3 whole, the
+  lag-switch A line again, then it stops; notes "Block 10" in u4f2-build.md). P27 at 19:45 (U5's debug, 1.1 GiB; free
+  8,594,862,080 B). Part A's record: history.md:7519-7533. Then round 2 (netcode, test, rust; xhigh; the netcode seat
+  reads FP-2's window against his words), R6, the merge, the r2 rows and -21's set, whose report prints
+  `dead_left_out_count` beside the check for every run (his words); U5's builder stays stopped (U5-EARLY cond. 6).
 - **U4h's brief rev 2.1 READY** (u4h-brief.md; rev-2 check's conditions met; register 94-101, u4s-carries.md:618-659).
   **U4H-Q4, U4H-SIZE, U4H-JUDGE** (section 8) are in the 2026-11-22 message's draft (msg-2026-11-22.md); none a stop.
 - **U6's brief rev 2.1 READY 18:2x** (u6-brief.md; facts u6-facts.md; advisor-u6-brief.md: rev 1 APPROVE WITH
@@ -169,6 +172,7 @@
   blocks 1-4 pass workspace-wide (655/756 = +13/+17; 8 plants fail by name; clippy and fmt clean); 2,053 lines; snapshot
   wip/u4g-early.patch a78e2853… (103,162 B, 11 files, in lane). Re-base (cond. 8) after U4f2's merge and -21's set: -58's
   3 counters, F4 room.rs:1033-1034. **U4G-Q1 (b) split** (history.md:7511-7516): U4g 1-6 (stop 6,000), U4g2 7-11 (stop 3,200).
+  U4g2's C-U6-19 line (U6-Q21; ADV-U6B-10) appended at u4g-brief.md's end 19:4x, so no cited line moved.
 - **U5-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u5-early.md; u5-brief.md §10 filled: `<base>` 40e20fd, 642/739,
   runner u5-run.sh e69b0fa7…; register 102-111). **U5's size line: the S line, past about 1,400 added lines at a block
   end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Copy agent-a60a432d4564f4cc7 (u5-build.md): 8 files
@@ -180,21 +184,16 @@
   279,895/s none; free 7.54 GB; cargo-fuzz makes an empty fuzz/artifacts/input/ before -artifact_prefix (guard-header carry).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
-  **Check-in PAUSED 18:22 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; no agent runs; on again with the next one); saver bdituvkdn
-  from 17:47 (to about 19:47); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38; unchanged at 18:22).
+  **Check-in ON again 19:46 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; U4f2's builder runs); saver brt2rde11 from 19:47 (to about
+  21:37; bdituvkdn ended 19:37, time up); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf; its draft
+  updated for F-B-COUNT's answer 19:4x). Main f5030a3 (06:38; unchanged at 19:39).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
-- **2026-11-21 16:12:40 to 17:41:37 UTC (a spend-limit cut: U5's builder in Block 2's fmt check, Block 1 done; the
-  U6 facts scan; my guard rev 4 step):** the notice, word for word (transcript line 68468, 16:14:55.013; the same text
-  at 16:34:46 as the 16:34 check-in tried; the facts scan's at 16:12:40.551, the builder's at 16:12:46.047): "You've
-  hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 5:40pm (UTC)".
-  Both agents' tasks ended on it (rate_limit, HTTP 429); the saver ran on (byihocm9i; last save 43cf1f7, 16:13:37).
-  Resumed at 17:41:37 (his message): no cargo or rustc running; the builder's copy as u5-build.md says (Block 1 DONE,
-  no plant left), its last fmt check exit 0; the 8 files the harness flagged were only touched by u5-run.sh:73.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
   one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
   and the session) and the 11-18/11-19 choices at :7148-7160 (1119l); the 23:18 restart at :7169-7175 (1120b); the
   01:01 restart at :7248-7253 (1120e); 2026-11-20's idle usage cut (06:16-10:57:41) at :7312-7315 and its 04:22
   container restart at :7316-7322 (1120f); its 18:12:22-21:09:44 spend-limit cut at :7435-7444 (1120j);
-  2026-11-20's 22:39:36-02:37:53 one at history.md:7535-7542 (1121d).
+  2026-11-20's 22:39:36-02:37:53 one at history.md:7535-7542 (1121d);
+  2026-11-21's 16:12:40-17:41:37 one at history.md:7553-7559 (1121e).

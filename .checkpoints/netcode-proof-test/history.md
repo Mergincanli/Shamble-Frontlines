@@ -7540,3 +7540,20 @@ U4G-Q1: the advisor's: split (with two halves and with a review + merge each).
   23:05 day-message trigger and the 00:34 check-in waited unread. Resumed at 02:37:53 (the 02:35 check-in): `git
   status` clean; the saver restarted (bvyb8q0li, 02:38); both agents resumed by SendMessage, the builder first checking
   its worktree (no plant left, its last edit whole, the tree compiling); the day message sent about 02:40.
+
+## Decision: Mustafa, 2026-11-21 20:42 Amsterdam (it reached this chat at 19:42:15 UTC), in this chat: F-B-COUNT (a) (word for word)
+- **Mustafa, typed into this chat (transcript 2026-11-21T19:42:15.771Z, a queued message during a turn, uuid db7781ba-863b-41bb-9adb-734fb9e728dd, origin human), verbatim** (the whole message, unchanged, in the fence below):
+
+```text
+F-B-COUNT: (a). Leave kind 7's presses out of that count when the server's own state shows its soldier dead as that command or the one before it ran; report the number left out beside the check on every run.
+```
+
+- **Read as** (the main session's reading, not his words): F-B-COUNT's option (a) as the advisor's paste-ready text words it (advisor-u4f2-r1.md:357-361), which his words restate: kind 7's presses are left out of its `sent_count` and `unrejected_count` when the server's World shows the forger's soldier dead at the run of that command (d) or of the one before it (d-1); an item whose d-1 never ran is not left out; the number left out, `dead_left_out_count`, is written on every `forged_kind` record of every run (0 for the other kinds), and -21's set report prints it beside the check for every run. FP-2 builds it as the ruling specifies (:404); then R5's forged lines, R2 and R3 whole, the lag-switch A line again (advisor-u4f2-parta.md), round 2 (netcode, test, rust; xhigh; the netcode seat reads FP-2's window against these words: :313), R6, the merge, the r2 rows and -21's set. The reading joins A1's on the readings list, and -21's report names it in a line of its own with who reviewed it (:366-367). It narrows ADR 0001:1611's "every forged command" and what SERIES.md:158's `sent_count` counts for kind 7 (his, :376); no pass mark, judge rule, marks.json text or existing SERIES.md row text changes; one new SERIES.md row, `dead_left_out_count`, in U4f2's own subsection (:369-370).
+## Moved from the card 2026-11-21 ~19:5x UTC (card_trim_1121e.py): the 2026-11-21 16:12:40-17:41:37 cut's entry, word for word
+- **2026-11-21 16:12:40 to 17:41:37 UTC (a spend-limit cut: U5's builder in Block 2's fmt check, Block 1 done; the
+  U6 facts scan; my guard rev 4 step):** the notice, word for word (transcript line 68468, 16:14:55.013; the same text
+  at 16:34:46 as the 16:34 check-in tried; the facts scan's at 16:12:40.551, the builder's at 16:12:46.047): "You've
+  hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 5:40pm (UTC)".
+  Both agents' tasks ended on it (rate_limit, HTTP 429); the saver ran on (byihocm9i; last save 43cf1f7, 16:13:37).
+  Resumed at 17:41:37 (his message): no cargo or rustc running; the builder's copy as u5-build.md says (Block 1 DONE,
+  no plant left), its last fmt check exit 0; the 8 files the harness flagged were only touched by u5-run.sh:73.

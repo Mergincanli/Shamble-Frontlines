@@ -306,3 +306,7 @@ read before it goes to him (TEST-FIRST, "a reviewer's read on every change to ma
   the prediction-and-cues half, blocks 1-6 (about 2,100 to 3,700; the stop past 6,000; blocks 1-4 built early, 2,053
   lines); U4g2 is the interpolation, events and B1 half, blocks 7-11 (about 1,150 to 2,100, planned about 1,600; the
   stop past 3,200: section 5); each half its own review panel and its own merge (section 7).
+- **C-U6-19's line for U4g2** (U6-Q21, register 119: advisor-u6-brief.md:220-224; ADV-U6B-10, :262-265; added
+  2026-11-21 after the split): **U4g2's runs hold no hostile client, so none throws or rejoins as one, and no client is
+  restarted mid-run** (section 4's line, :187-188, written before the split for all eleven blocks, holds for both
+  halves).
