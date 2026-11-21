@@ -12,8 +12,8 @@ units came to). The advisor ruled U5-Q1 to Q3 and Q5 to Q7 (section 8).
 **Rev 1 to rev 2** (the advisor's check, REVISE, 2 High, 5 Medium, 7 Low: advisor-u5-brief.md, 322 lines; its list
 :289-305):
 - ADV-U5B-1 (High): U5-Q4 is his, U5-ALLOC; Block 3 records each decode's largest allocation and total and counts by
-  the bar his answer picks; option (a)'s bar per type from the code, with the test-engineer's read (u5-alloc-bounds.md):
-  Block 3, section 8. ADV-U5B-2 (High): every copy's cargo call, the nightly fuzz builds included, in the shared
+  the bar his answer picks; option (a)'s bar per type worked out from the code by the test-engineer, its sizes and
+  capacities measured at rustc 1.99.1 (u5-alloc-bounds.md, 254 lines; summary :224-245): Blocks 1, 3 and 4, section 8. ADV-U5B-2 (High): every copy's cargo call, the nightly fuzz builds included, in the shared
   target: sections 2 and 5.
 - ADV-U5B-3 and -4: Block 0 lists every manifest and lock by path; the fuzz lock seeded from the workspace lock, kept
   equal by a check, both locks audited; the root lock by an offline minimal resolve; a later manifest change stops for
@@ -60,9 +60,13 @@ units came to). The advisor ruled U5-Q1 to Q3 and Q5 to Q7 (section 8).
   name at Block 4. DelayStream's request and frame scanner: `Scanner` in crates/net/src/l2/ws_frame.rs (pub(crate),
   :101; `client(max_payload, max_head)` :116, `server()` :132, `scan(&mut self, input)` :170), already with a seeded
   test (:607) and a seeded differential against tungstenite (:517-572).
-- **What the decoders allocate** (advisor-u5-brief.md:39-45; measured in u5-alloc-bounds.md): Input reserves
-  `Vec::with_capacity(count)` for up to 8 commands (input.rs:208-212); Snapshot grows its entity vector by push
-  (snapshot.rs:589-612); a decoded message takes more memory than its wire bytes, which is why U5-ALLOC is his.
+- **What the decoders allocate** (u5-alloc-bounds.md, measured at rustc 1.99.1): Input reserves 8 x 32 B before
+  reading a command (input.rs:212); SessionControl's note up to 480 B (control.rs:285); RoomControl's peer list 16 x
+  17 B (control.rs:436); Snapshot's entity vector grows by push to 512 x 104 B (snapshot.rs:599-608) and the client
+  copies its held frame twice and regrows one copy (client lib.rs:1065, :1074, :135/:145); FullState's grows to
+  16,384 x 104 B (snapshot.rs:705-708) and the client collects it at 152 B a record (lib.rs:1125); the other types and
+  the scanner allocate nothing. Every decoder refuses an over-limit input before any allocation (msg.rs:403, :411;
+  control.rs:602-604). A decoded message takes more memory than its wire bytes, which is why U5-ALLOC is his.
 - **The room and the sim:** `Room::receive(&mut self, slot: u8, msg: &Message)` (room.rs:890);
   `HitHistory::push(&mut self, volumes: &HitVolumes)` (history.rs:59); `Recording::decode` caps its reserve at what the
   bytes can hold (replay.rs:323-326).
@@ -112,7 +116,9 @@ units came to). The advisor ruled U5-Q1 to Q3 and Q5 to Q7 (section 8).
    GlobalAlloc` over `System`, with one `#[allow(unsafe_code, reason = "...")]` on it; each inner unsafe block is one
    operation with a SAFETY comment, under the two clippy denies npt-tcpinfo's lib.rs holds (:37-38). The invariant: it
    returns exactly System's pointers and forwards every dealloc and realloc with the same layout, and counting never
-   allocates (const-initialised thread-locals without Drop). The allocator only counts. check.mjs: `crates/alloc/` in
+   allocates (const-initialised thread-locals without Drop). The allocator only counts, and counts a `realloc` as one
+   request of its new size (every push-grown vector reaches its largest size by realloc: u5-alloc-bounds.md:105-107).
+   check.mjs: `crates/alloc/` in
    UNSAFE_EXCEPTIONS and EXCEPTION_LEVELS (deny), a placed-allow list like TCPINFO_UNSAFE_FNS, the table (allow, deny,
    deny, deny); fuzz/'s .rs files and Cargo.toml read as crates/ are, and its `[lints]` compared with the workspace's;
    the two locks' equal-versions check. check.test.mjs plants (an unsafe block outside the impl, a second allow, an
@@ -125,18 +131,35 @@ units came to). The advisor ruled U5-Q1 to Q3 and Q5 to Q7 (section 8).
    debug test build; no panic, exactly one counter per offered command, held at most 8, refusals at most 4,096 a tick,
    the kept window at most 16.
 3. **The fuzz crate's core and 14 targets:** the shared check records, per decode call, the largest single allocation
-   and the total bytes, and counts allocations above the bar his U5-ALLOC answer picks (option (a)'s bars, one per
-   type, in a const table from u5-alloc-bounds.md, printed in each run's header); an input longer than its limit must
-   allocate nothing before its refusal (catalogue item 3's half). The over-limit decision, its message and the abort
-   happen in the harness after the decode returns, never inside `alloc`. A seed generator writes valid encodings of each
-   type as the starting corpus (corpora stay under .gate/, never committed). Targets for `Input`, `Resync`, `Ping`,
-   `Pong`, `Join`, `JoinAccepted`, `JoinRejected`, `ClientSettings`, `RoomEnded`, `Leave`, `Kick`, `SessionControl`,
-   `SessionStatus` and `RoomControl`, each through the decode its receiver runs, on its own direction and channel. The
-   builder measures inputs a second on Input and on FullState through the client (the slowest), with and without ASan
-   (U5-Q5).
-4. **The three targets with state:** `Snapshot` and `FullState` through npt-client's receive path from a fixed joined
-   state (a `JoinAccepted` and a `FullState` of the scene u5-alloc-bounds.md names), so the group decode against
-   baselines is fuzzed, not only the framing; DelayStream's scanner, client and server directions, as a differential
+   and the total bytes, and counts allocations above the bar his U5-ALLOC answer picks; an input longer than its limit
+   must allocate nothing before its refusal (catalogue item 3's half). Option (a)'s bars (u5-alloc-bounds.md:224-245),
+   one per type in a const table printed in each run's header: Input 256 B; SessionControl 480; RoomControl 272;
+   Snapshot and FullState as Block 4; the other twelve targets 0. **Each target pins its message's type byte** (the
+   harness writes the framing and the type byte, the fuzzer the rest), so it meets its own type's path only: with the
+   byte free, a Join input would reach a 104 B note and a Ping 256 B or 832 B (u5-alloc-bounds.md:51-54, :121-136).
+   Ping and Pong run on both receivers' ways, the room's and the client's. The counting window holds the decode call
+   only: the harness's own copy of the input sits outside it. The over-limit decision, its message and the abort happen
+   in the harness after the decode returns, never inside `alloc`. The bars were measured at rustc 1.99.1 (std's sort
+   scratch computed); the counted builds use the nightly, so Block 3 re-measures them there from the harness's own
+   records, and a bar that differs comes to the advisor before the first counted run. A seed generator writes valid
+   encodings of each type as the starting corpus (corpora stay under .gate/, never committed). Targets for `Input`,
+   `Resync`, `Ping`, `Pong`, `Join`, `JoinAccepted`, `JoinRejected`, `ClientSettings`, `RoomEnded`, `Leave`, `Kick`,
+   `SessionControl`, `SessionStatus` and `RoomControl`, each through the decode its receiver runs, on its own direction
+   and channel. The builder measures inputs a second on Input and on FullState through the client (the slowest), with
+   and without ASan (U5-Q5).
+4. **The three targets with state:** `Snapshot` and `FullState` through npt-client's receive path
+   (`ClientEndpoint::input`, lib.rs:532-558, :783-831) from a fixed joined state: the stress scene's slot 0, its
+   `JoinAccepted` and the room's `FullState` for it at the join tick (room.rs:1380-1398), built once at the harness's
+   start, the largest held state any proof run gives a client (u5-alloc-bounds.md:211-222). Per input, a clone of that
+   endpoint is made outside the counting window, then one `input` call inside it, so the group decode against baselines
+   and the client's copies of its held world are fuzzed, not only the framing. **Their bars:** Snapshot through the
+   client 304 x L_e bytes for a held frame of L_e >= 238 entity records (the first insert regrows a copied list to
+   twice its length at 152 B a record), 155,952 at the stress scene's upper bound of 513 (lib.rs:135/:145); the harness
+   prints L_e and computes the bar by u5-alloc-bounds.md's Block 15 rule (:184-187); the decoder alone 53,248.
+   FullState through the client 2,213,272 (14,561 door records fit in 65,536 B; lib.rs:1125, its sort scratch at :1128
+   the same size, computed); the decoder alone 1,703,936. After a decoder's refusal the client still allocates at most
+   256 B for its bookkeeping (lib.rs:806-829), so catalogue item 3's half is checked on the decoder, not on the whole
+   `input` call. DelayStream's scanner, client and server directions (bar 0: it never allocates), as a differential
    (S2, u3c-review-result.txt:396): on every input its head length equals tungstenite's (tungstenite is already in
    npt-net's tree).
 5. **The record and the runner:** an npt-lab subcommand writing one log per run through npt-log (process `fuzz`, as
@@ -192,9 +215,10 @@ units came to). The advisor ruled U5-Q1 to Q3 and Q5 to Q7 (section 8).
   decided in the brief. The runner refuses under 4 GiB free, as u4f-run.sh does.
 
 ## 3. How it is tested
-- **npt-alloc and check.mjs:** a counted allocation, the largest single allocation, zero inside allocation-free code,
-  two threads' windows apart; plants (dealloc counted as an allocation; the largest one off by one) each fail by name;
-  check.test.mjs's plants as Block 1.
+- **npt-alloc and check.mjs:** a counted allocation, the largest single allocation, a realloc counted at its new size,
+  zero inside allocation-free code, two threads' windows apart; plants (dealloc counted as an allocation; a realloc
+  counted at its old size or not at all; the largest one off by one) each fail by name; check.test.mjs's plants as
+  Block 1.
 - **Carry 48, T2-L2 and C-U5-1:** as Block 2; plants (a push that grows its storage; a reserve that trusts the header's
   tick count; a counter skipped; each bound off by one) each fail by name.
 - **The fuzz harness:** the over-limit count shown on a planted decoder that allocates by an unchecked length;
@@ -311,13 +335,15 @@ U5-ALLOC: what counts as "an allocation above the size limits" in the decoder te
 The test feeds each message type 10 million random and broken inputs and passes with 0 crashes and "0 allocations
 above the size limits". The size limits are counted in bytes on the wire. Once decoded, a message takes more memory
 than its wire bytes, so read word for word (any one memory request larger than the wire limit) a correct decoder
-fails: an Input of 6 to 8 commands asks for [TE] bytes against its 166-byte limit, and a Snapshot carrying [TE] or
-more changes asks for about [TE] bytes against its 1,150. What the test is for is a decoder that believes a forged
+fails: an Input of 6 to 8 commands asks for 192 to 256 bytes against its 166-byte limit, and a Snapshot carrying 9 or
+more changes asks for about 1,660 bytes against its 1,150. What the test is for is a decoder that believes a forged
 length and asks for far more memory than any real message could need.
 (a) Each type's bar is the most memory a message within its limit can make that code ask for at once, worked out from
-    the code and the fixed test scene, written in the series file and printed in every run (Input [TE] bytes;
-    Snapshot [TE]; FullState [TE]; the rest in the table). A message over its limit must also be refused before any
-    memory is asked for. No number chosen by us.
+    the code and the test scene (the stress scene) and measured where it could be, written in the series file and
+    printed in every run: Input 256 bytes; SessionControl 480; RoomControl 272; Snapshot 155,952 (the client copies
+    the world it holds, so the scene sets this; the decoder alone 53,248); FullState 2,213,272 (one 65,536-byte full
+    state can carry 14,561 small records; the decoder alone 1,703,936); every other type 0. A message over its limit
+    must also be refused before any memory is asked for, which every decoder already does. No number chosen by us.
 (b) A fixed multiple of each limit (for example 64 times): simpler, but a new number.
 (c) Keep the words as they stand, and rebuild the decoded message types so that no single request passes the wire
     limit: a large change across the protocol, room and client code before the runs.
