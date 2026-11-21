@@ -167,9 +167,10 @@
   go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop. **msg-2026-11-21.md
   SENT ~02:42 UTC** (F-B-COUNT, U4G-Q1, choices 1-3; held by the cut).
 - **U5's brief (KEEP-PROGRESSING; U5 builds after U4's close):** rev 1 (2db0976) REVISE by the advisor ~05:05 UTC
-  (advisor-u5-brief.md, 322 lines: 2 High, 5 Medium, 7 Low; its list :289-305). **Rev 2 written** (u5-brief.md) but for
-  option (a)'s per-type bars, which the test-engineer is computing from the code (u5-alloc-bounds.md); then the
-  advisor's check of the changed parts (1.4's Blocks 0, 3, 4, 7; sections 2-6, 8). **U5-ALLOC and U5-SIZE are his**
+  (advisor-u5-brief.md, 322 lines: 2 High, 5 Medium, 7 Low; its list :289-305). **Rev 2 complete** (u5-brief.md, 385
+  lines, 2cfa592 at 05:23 UTC), with option (a)'s per-type bars from the test-engineer's read (u5-alloc-bounds.md, 254
+  lines, measured at rustc 1.99.1: Input 256, SessionControl 480, RoomControl 272, Snapshot 155,952 through the
+  client, FullState 2,213,272, the rest 0); **with the advisor for its rev-2 check now.** **U5-ALLOC and U5-SIZE are his**
   (texts in section 8; neither a stop) for the first day's message after that check. S's letter: U4b 701 (411eeee),
   U4f-F1 239 (u4f-f1-report.md:104).
 - **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
