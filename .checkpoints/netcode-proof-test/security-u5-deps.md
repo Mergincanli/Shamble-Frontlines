@@ -293,3 +293,67 @@ Task: security-auditor DEP-HOLD dependency read for U5's early start (netcode pr
   3117b9305e1ebbf8ed4d802ab3689a6f4296067275e66d84fd8d7b9e66bbf1fd  spikes/netcode-proof/fuzz/Cargo.lock
 
 DONE
+
+### B8 (S2: the read of SEC-U5D-4's guard, u5-fuzz-guard.sh) DONE
+- Read: .checkpoints/netcode-proof-test/u5-fuzz-guard.sh, sha256 2edc7b13512f053d004822a68705ba2c922fd161596d51a8726247463fb88563
+  (109 lines, read whole; matches the coordinator's hash); the runner u5-run.sh (e69b0fa7..., 117 lines: cds to the
+  copy's spikes/netcode-proof, exports CARGO_TARGET_DIR=$M/.gate/shared-target and CARGO_NET_OFFLINE=true, flock -x/-s);
+  the ruling advisor-u5-early.md:316-338 and S1-S4 :348-355; dependency-check.md (c5b68489...). Against cargo-fuzz
+  0.13.2's own option code (the .crate in the registry cache: src/options.rs, options/build.rs, options/run.rs,
+  project.rs). Nothing run.
+- What holds (as ruled): both fuzz hashes read from dependency-check.md by anchored exact-path lines, exactly one each,
+  from the main folder's file, never the copy's (:41-44; a missing, doubled or CRLF line refuses); CUSTOM_LIBFUZZER_PATH,
+  CUSTOM_LIBFUZZER_STD_CXX, RUSTFLAGS, CARGO_ENCODED_RUSTFLAGS unset (:93-96; RUSTFLAGS is right to refuse, cargo-fuzz
+  appends it to its own, project.rs:304-308); CARGO_TARGET_DIR = the shared target (:97; it outranks the spike's
+  .cargo/config.toml target-dir); subcommand build or run only (:74-78); hash check, then `cargo +1.99.1 tree --locked
+  --offline` (cannot write the lock), then the call, then the hashes again with exit 65 and the void message
+  (:98-107). Order sound: every refusal comes before the call. With no --fuzz-dir, cargo-fuzz finds the project by
+  walking up from cwd to the first non-fuzz Cargo.toml ($S) and builds $S/fuzz/Cargo.toml (project.rs find_package,
+  :999-1001): the file the guard hashes. Everything after `--` is libFuzzer's (clap `last(true)`, options/run.rs; for
+  `build` a token after `--` is only a positional target name), so not parsing it is right for the lock.
+- GUARD-1 (Medium): `--fuzz-dir` is not refused. Both subcommands flatten FuzzDirWrapper (options.rs:267-270
+  `#[arg(long)] fuzz_dir`; options/build.rs, options/run.rs: `FuzzProject::new(self.fuzz_dir_wrapper.fuzz_dir)`), and
+  the manifest built is `<fuzz_dir>/Cargo.toml` (project.rs:999-1001). Exploit sketch: `... build --fuzz-dir /x/fuzz`
+  builds another manifest and lock (unread, re-resolved without --locked) while the guard's pre and post hashes both
+  look at the unchanged $F and pass. It defeats the fix itself. Fix: refuse `--fuzz-dir` in every form.
+- GUARD-2 (Medium): dependency features are not refused, and the pre-check proves the lock only for default features.
+  `--features npt-net/wt-wtransport` (or `npt-net/wt-wtq`, `libfuzzer-sys/arbitrary-derive`) turns on an optional
+  dependency the fuzz lock does not hold; wtransport 0.7.2 and web-transport-quinn 0.13.6 sit in the registry cache, so
+  even offline the build re-resolves the lock and runs those packages' build scripts and proc macros before the post
+  check voids the outputs: "build nothing that holds the change" is broken for that call. Fix: allow `--features` only
+  as `bites` (refuse any value with `/`), or run the tree check with the call's own feature arguments.
+- GUARD-3 (Low; fails closed today): the refused-option scan reads only long and separate forms. It misses `-c`
+  (careful's short, options.rs:97 `#[arg(short, long = "careful")]`), grouped shorts (`-Oc`, `-Os memory`), attached
+  values (`-smemory`, `-s=memory`, `-Z=build-std`, `-vZbuild-std`); careful and the memory sanitizer imply -Zbuild-std
+  (project.rs:171-175). Today -Zbuild-std fails: no rust-src in the minimal profile and CARGO_NET_OFFLINE under the
+  runner (it would be Medium the day rust-src is added). Fix for GUARD-1..3 at once: an allow-list before `--` (the
+  tokens U5 uses: -O/--release, -D/--dev, -a/--debug-assertions, -v, --features bites, -s/--sanitizer address|none in
+  separate or `=` form, --codegen-units N, -j/--jobs N for run, a target name among the 17 bins, corpus paths under
+  .gate/), refusing every other token that begins with `-`, and every `-Z`.
+- GUARD-4 (Low): the guard trusts its caller for two things it could check in one line each: CARGO_NET_OFFLINE=true
+  (only the runner sets it; called directly, a re-resolve could download) and the cargo-fuzz binary's identity (all
+  this reasoning is 0.13.2's; `cargo +nightly-2026-11-01 fuzz --version` = 0.13.2). Also the tree check runs on 1.99.1
+  cargo while nightly cargo resolves at the build: add `cargo +nightly-2026-11-01 tree --locked --offline` too (a
+  nightly-only lock rewrite now shows only after the build, voided). And a cargo config `[env]` table could set
+  CUSTOM_LIBFUZZER_PATH past the env check (the spike's .cargo/config.toml holds only build.target-dir today; an
+  operator route, memory: Low).
+- GUARD-5 (Low): outputs. `cargo fuzz run` creates fuzz/corpus/<t> and fuzz/artifacts/<t>/ in the copy and passes
+  `-artifact_prefix=` there (project.rs:1017-1038, :343-347); `git check-ignore` matches neither path, so corpus and
+  crash inputs land as untracked files beside the manifest, against dependency-check.md:6 ("fuzz outputs under
+  .gate/", S4). Fix: corpus positionals under .gate/u5/ and a later `-artifact_prefix=<.gate path>` after `--` (the
+  empty dirs still appear), or the guard fails when files exist under $F/corpus or $F/artifacts; snapshots never take
+  them.
+- Plant test (:55-71): it cannot leave the manifest changed in the normal flow: clean start checked (:56), backup made
+  by cp -p before the change (:57-58; a failure refuses before any change), the restore is mv on the same filesystem
+  (.gate/u5 and the worktree are both on /dev/vda: a rename), then both hashes re-checked (:63), and the refusal it
+  shows is the same hashes_match the real path uses (:98). GUARD-6 (Low): no trap, so a kill between :59 and :62
+  (milliseconds), or a failed mv, leaves the extra byte, and the FAILED line does not name the backup file. Fix: a
+  trap that moves $backup back on EXIT/INT/TERM, set right after the cp, and $backup printed in the failure line. (A
+  concurrent guard call during the plant only refuses: fail safe. A check-to-call race needs a concurrent edit that is
+  reverted before the post-check: Low, accepted.)
+- Verdict: the guard meets the ruling's checks, order, void path and plant, but its option scan does not meet my fix
+  yet: GUARD-1 lets a call build a manifest the guard never hashed, and GUARD-2 builds unread packages before the
+  post-check. Both Medium: fix before the first cargo-fuzz call (the allow-list closes GUARD-1..3), new sha256 on the
+  card, then a short re-read of the diff. GUARD-4..6 Low: fold in now or carry as follow-ups.
+
+DONE

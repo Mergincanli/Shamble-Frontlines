@@ -176,7 +176,7 @@
   end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Block 0 DONE (agent-a60a432d4564f4cc7's copy, ~260 lines);
   fetch clean (u5-deps-facts.md); security read: all 8 CLEARED (security-u5-deps.md); dependency-check.md written 15:3x.
   Builder on Block 1 (+S1's check.mjs pins) and 2's sim half, stop before 3; SEC-U5D ruling APPROVE S1-S4 (:267-356);
-  guard u5-fuzz-guard.sh 2edc7b13… with security-auditor's read; then the nightly and cargo-fuzz installs (mine).
+  guard rev 1 (2edc7b13…) failed the read (GUARD-1/-2 Medium: B8); rev 2 768f6055… (allow-list) in its re-read; then installs.
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
   **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver byg2iirg5
