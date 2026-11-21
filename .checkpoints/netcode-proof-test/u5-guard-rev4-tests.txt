@@ -1,0 +1,59 @@
+PASS | A1 worktree outside .claude/worktrees | exit 64 | GUARD REFUSED: the worktree must be under /home/user/Shamble-Frontlines/.claude/worktrees/ (got: /tmp/x)
+PASS | A2 worktree with .. | exit 64 | GUARD REFUSED: the worktree path holds '..' (/home/user/Shamble-Frontlines/.claude/worktrees/../x)
+PASS | A3 E3 empty token | exit 64 | GUARD REFUSED: an empty argument
+PASS | A4 E2 build with -- | exit 64 | GUARD REFUSED: build takes no '--' (libFuzzer flags are for run only)
+PASS | A5 GUARD-1 --fuzz-dir | exit 64 | GUARD REFUSED: option '--fuzz-dir' is not on the allow-list (-O, --release, -a, --debug-assertions, -s/--sanitizer address|none, --features bites, --bite <id>)
+PASS | A6 E1 bare token after -- | exit 64 | GUARD REFUSED: libFuzzer flag '/tmp/x' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -malloc_limit_mb=, -timeout=, -rss_limit_mb=, -print_final_stats=, -use_value_profile=, -detect_leaks=)
+PASS | A7 E1 -jobs | exit 64 | GUARD REFUSED: libFuzzer flag '-jobs=4' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -malloc_limit_mb=, -timeout=, -rss_limit_mb=, -print_final_stats=, -use_value_profile=, -detect_leaks=)
+PASS | A8 E1 -collect_data_flow | exit 64 | GUARD REFUSED: libFuzzer flag '-collect_data_flow=/bin/sh' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -malloc_limit_mb=, -timeout=, -rss_limit_mb=, -print_final_stats=, -use_value_profile=, -detect_leaks=)
+PASS | A9 E1 -features_dir | exit 64 | GUARD REFUSED: libFuzzer flag '-features_dir=/tmp' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -malloc_limit_mb=, -timeout=, -rss_limit_mb=, -print_final_stats=, -use_value_profile=, -detect_leaks=)
+PASS | A10 E1 non-digit value | exit 64 | GUARD REFUSED: libFuzzer flag '-runs=1e9': the value must be 1 to 9 digits
+PASS | A11 E1 empty value | exit 64 | GUARD REFUSED: libFuzzer flag '-runs=': the value must be 1 to 9 digits
+PASS | A12 E1 negative value | exit 64 | GUARD REFUSED: libFuzzer flag '-runs=-1': the value must be 1 to 9 digits
+PASS | A13 E1 flag 0/1 only | exit 64 | GUARD REFUSED: libFuzzer flag '-detect_leaks=2' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -malloc_limit_mb=, -timeout=, -rss_limit_mb=, -print_final_stats=, -use_value_profile=, -detect_leaks=)
+PASS | A14 E3 empty token after -- | exit 64 | GUARD REFUSED: an empty argument
+PASS | A15 second -- after -- | exit 64 | GUARD REFUSED: libFuzzer flag '--' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -malloc_limit_mb=, -timeout=, -rss_limit_mb=, -print_final_stats=, -use_value_profile=, -detect_leaks=)
+PASS | A16 run without -artifact_prefix | exit 64 | GUARD REFUSED: run needs -artifact_prefix=<a folder under .gate/>/ after -- (else artifacts go to fuzz/artifacts/)
+PASS | A17 -exact_artifact_path outside .gate | exit 64 | GUARD REFUSED: '-exact_artifact_path=/tmp/a' is not under .gate/
+PASS | A18 corpus outside .gate | exit 64 | GUARD REFUSED: corpus '/tmp/c' is not an absolute path under /home/user/Shamble-Frontlines/.gate/ or /home/user/Shamble-Frontlines/.claude/worktrees/agent-a60a432d4564f4cc7/.gate/
+PASS | A19 unknown target | exit 64 | GUARD REFUSED: target 'nosuch' is not a [[bin]] name in fuzz/Cargo.toml
+PASS | A20 build with two targets | exit 64 | GUARD REFUSED: build takes one target (extra: 'ping')
+PASS | A21 sanitizer memory | exit 64 | GUARD REFUSED: sanitizer 'memory': only address or none
+PASS | A22 features other than bites | exit 64 | GUARD REFUSED: features 'x': only bites
+PASS | A23 subcommand alias b | exit 64 | GUARD REFUSED: subcommand 'b': only build or run
+PASS | A24 valid run, no runner environment | exit 64 | GUARD REFUSED: CARGO_TARGET_DIR is '', not the shared target /home/user/Shamble-Frontlines/.gate/shared-target
+PASS | A28 RUSTFLAGS set in the runner environment | exit 64 | GUARD REFUSED: RUSTFLAGS is set
+PASS | A29 CARGO_NET_OFFLINE not true | exit 64 | GUARD REFUSED: CARGO_NET_OFFLINE is 'false', not true
+PASS | A30 R3-1 --bite without --features bites | exit 64 | GUARD REFUSED: --bite needs --features bites
+PASS | A31 R3-1 --bite on build | exit 64 | GUARD REFUSED: --bite is for run only
+PASS | A32 R3-1 bad bite id | exit 64 | GUARD REFUSED: bite id 'x;id' is not PM-NNNN-N/<name> (lower-case letters, digits and -)
+PASS | A33 R3-1 two --bite | exit 64 | GUARD REFUSED: one --bite only
+PASS | A34 R3-1 --bite with no id | exit 64 | GUARD REFUSED: '--bite' needs a bite id
+PASS | A35 R3-1 --bite with a dash value | exit 64 | GUARD REFUSED: bite id '--release' is not PM-NNNN-N/<name> (lower-case letters, digits and -)
+PASS | A36 R3-4 -rss_limit_mb=0 | exit 64 | GUARD REFUSED: libFuzzer flag '-rss_limit_mb=0': the value must be 1 to 9 digits and not 0 (0 turns the limit off)
+PASS | A37 R3-4 -timeout=0 | exit 64 | GUARD REFUSED: libFuzzer flag '-timeout=0': the value must be 1 to 9 digits and not 0 (0 turns the limit off)
+PASS | A38 R3-4 ten digits | exit 64 | GUARD REFUSED: libFuzzer flag '-runs=1000000000': the value must be 1 to 9 digits
+PASS | A39 R3-4 nine digits pass the flag check | exit 64 | GUARD REFUSED: CARGO_TARGET_DIR is '', not the shared target /home/user/Shamble-Frontlines/.gate/shared-target
+PASS | B1 the real file | exit 0 | MATCH 8
+PASS | B2 indented comment and spaces-only line | exit 0 | MATCH 8
+PASS | B3 one space between hash and path | exit 64 | GUARD REFUSED: dependency-check.md line '0000000000000000000000000000000000000000000000000000000000000000 spikes/netcode-proof/x' is not '<sha256>  <path>' or 'deleted  <path>'
+PASS | B4 a second fuzz/Cargo.toml line | exit 64 | GUARD REFUSED: dependency-check.md must hold exactly one fuzz/Cargo.toml line (holds 2)
+PASS | B5 an extra older line for one path | exit 0 | MATCH 8
+PASS | B6 that path's only line wrong | exit 0 | DIFF spikes/netcode-proof/crates/net/Cargo.toml (afd0952b15865881f763b1cba9d0feac715d2cf104dc4b2c6d13d3ab87f7b265)
+PASS | B7 a listed file missing | exit 0 | DIFF spikes/netcode-proof/crates/nosuch/Cargo.toml (missing)
+PASS | B8 a path with .. | exit 64 | GUARD REFUSED: dependency-check.md line '0000000000000000000000000000000000000000000000000000000000000000  spikes/netcode-proof/../x' holds '..'
+PASS | B9 CRLF line ends (the refusal's \r splits the printed line) | exit 64 | ': the path is not plain
+PASS | B10 no fuzz/Cargo.lock line | exit 64 | GUARD REFUSED: dependency-check.md must hold exactly one fuzz/Cargo.lock line (holds 0)
+PASS | B11 R3-2 a hash line outside the spike is skipped | exit 0 | MATCH 8
+PASS | B12 R3-2 a deleted spike file, absent | exit 0 | MATCH 9
+PASS | B13 R3-2 a deleted-only spike file, present | exit 0 | DIFF spikes/netcode-proof/crates/room/Cargo.toml (e923c077d99e472b39c2246e3439dc7f80b5e011649c769a0a9462095bde9627)
+PASS | B14 R3-2 a deleted line outside the spike is skipped | exit 0 | MATCH 8
+PASS | B15 a spike path with a space | exit 64 | GUARD REFUSED: dependency-check.md line '0000000000000000000000000000000000000000000000000000000000000000  spikes/netcode-proof/a b': the path is not plain
+PASS | B16 deleted with one space | exit 64 | GUARD REFUSED: dependency-check.md line 'deleted spikes/netcode-proof/x' is not '<sha256>  <path>' or 'deleted  <path>'
+PASS | C1 valid run: every check passes, stops before the call | exit 0 | GUARD GRAPH: 10 path crates; 5 listed in dependency-check.md; 5 held to the copy's HEAD: spikes/netcode-proof/crates/client/Cargo.toml spikes/netcode-proof/crates/l1/Cargo.toml spikes/netcode-proof/crates/link/Cargo.toml spikes/netcode-proof/crates/room/Cargo.toml spikes/netcode-proof/crates/tcpinfo/Cargo.toml || TEST STOP before the call: pass=run input /home/user/Shamble-Frontlines/.gate/u5/corp
+PASS | C2 valid build -O -s address | exit 0 | GUARD GRAPH: 10 path crates; 5 listed in dependency-check.md; 5 held to the copy's HEAD: spikes/netcode-proof/crates/client/Cargo.toml spikes/netcode-proof/crates/l1/Cargo.toml spikes/netcode-proof/crates/link/Cargo.toml spikes/netcode-proof/crates/room/Cargo.toml spikes/netcode-proof/crates/tcpinfo/Cargo.toml || TEST STOP before the call: pass=build -O -s address input NPT_BITE=unset env=env -i P
+PASS | C3 valid build --features=bites, all targets | exit 0 | GUARD GRAPH: 10 path crates; 5 listed in dependency-check.md; 5 held to the copy's HEAD: spikes/netcode-proof/crates/client/Cargo.toml spikes/netcode-proof/crates/l1/Cargo.toml spikes/netcode-proof/crates/link/Cargo.toml spikes/netcode-proof/crates/room/Cargo.toml spikes/netcode-proof/crates/tcpinfo/Cargo.toml || TEST STOP before the call: pass=build --features=bites NPT_BITE=unset env=env -i PATH
+PASS | C4 R3-1 a bite run: --bite dropped from the args, NPT_BITE set | exit 0 | GUARD GRAPH: 10 path crates; 5 listed in dependency-check.md; 5 held to the copy's HEAD: spikes/netcode-proof/crates/client/Cargo.toml spikes/netcode-proof/crates/l1/Cargo.toml spikes/netcode-proof/crates/link/Cargo.toml spikes/netcode-proof/crates/room/Cargo.toml spikes/netcode-proof/crates/tcpinfo/Cargo.toml || TEST STOP before the call: pass=run --features bites input /home/user/Shamble-Frontli
+PASS | C5 R3-3 an unlisted path crate's manifest differs from HEAD | exit 64 | GUARD REFUSED: spikes/netcode-proof/crates/room/Cargo.toml is not listed in dependency-check.md and differs from the copy's HEAD (file 0000000000000000000000000000000000000000, HEAD 300951a410d94f29a1a8cc1398907d7a34b3cbb6)
+PASS | C6 R3-3 a listed path is checked by its hash line, not HEAD | exit 0 | GUARD GRAPH: 10 path crates; 5 listed in dependency-check.md; 5 held to the copy's HEAD: spikes/netcode-proof/crates/client/Cargo.toml spikes/netcode-proof/crates/l1/Cargo.toml spikes/netcode-proof/crates/link/Cargo.toml spikes/netcode-proof/crates/room/Cargo.toml spikes/netcode-proof/crates/tcpinfo/Cargo.toml || TEST STOP before the call: pass=build input NPT_BITE=unset env=env -i PATH=/root/.car
+58 of 58 PASS

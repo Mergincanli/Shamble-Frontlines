@@ -160,11 +160,100 @@ Read in the main folder on 2026-11-21 (wc -l). Workspace members include server,
 
 ## 3. Build blocks (proposed grouping, sizes, split)
 
-(pending)
+Sizes are rough added lines (code + tests), scaled on comparable files read in section 2. Size rule: M about 3,000
+added lines, the stop past 6,000 (SIZE-CHECK, history.md:2048-2051, as u4g-brief.md:217 quotes it).
+- **T1 WtServer, both crates, on L2 loopback** (row:1; E6): Listener + Link over each crate's session (datagrams,
+  control and FullState streams), handshake failures counted per reason; C-U6-12's stream cap and control-message
+  limit. crates/net (l2/wt.rs, new wt server file, tests). ~400 + ~350 tests: wt.rs (232) already builds the endpoints;
+  wt_tests.rs (595) is the test scale.
+- **T2 WtClient + WsClient** (plan.md:602; E12 bots ride them). crates/net. ~350: thin Link adapters on existing
+  configs.
+- **T3 WsServer accept path** (row:16-19): TCP -> TLS (ws_config.rs `acceptor`) -> DelayStream or plain ->
+  tungstenite from one `&L2Config` (S5 a); Join deadline covers TLS (S5 b); accept cap 0.31 MB per DelayStream
+  connection + fixed (F7); Origin check (plan.md:1132-1135); -25's never-joining sessions and the wrapper (row:15).
+  crates/net. ~400: ws_config.rs (83) and DelayStream exist; this is the glue plus its loopback tests.
+- **T4 WsServer send path, fix 1** (row:1-8, :11, :21): `TickWriter` per connection, `gate_inputs()` once per tick
+  (F11), owed = tungstenite buffer + rustls unsent, plain path via tcp_kernel.rs, free value stated (S5 d), the whole
+  tick snapshot through Link (W18), where the per-tick syscalls run, shutdown error after peer close (C1c); tests:
+  writer properties, test (c), queueing bite re-run, plain-path SIOCOUTQ check. crates/net. ~300 + ~400 tests:
+  ws_gate.rs (160) holds the logic; siocoutq_probe.rs (669) shows the plain-path test's weight.
+- **T5 L2 extras + reader stamp** (row:5-7, :9, :12, :20, :22): npt-net `bites` feature with ws-budget-x2 (R11);
+  SetProfile on a DelayStream connection (no method exists today); B1 burst range check before `add_burst` (S7, F1);
+  header fields (wrapper on, `Scene::weapon`/`health`, carry 60); pool reset or one run per process; the reader stamp
+  at delay.rs's closing `wake_all` (:1907) with identity test, misattribution bite and the loopback self-test's four
+  parts. crates/net (delay.rs, delay_tests.rs, Cargo.toml). ~400.
+- **T6 Link gains `loss`, send-buffer space, `+ Send` on L2 links** (plan.md:577-579; u4-build-plan.md:964-966).
+  crates/link, its Loopback, npt-l1's L1Net, callers. ~150.
+- **S1 TickLoop on Loopback** (plan.md:600; E2 :461; register 96; C-U6-16 (c)): tokio runtime, tick thread alone,
+  bounded channels, `Decoder::pump` per session on the I/O side, `due_ticks`, `pump_report` with RTT, control bytes
+  sent by a channel npt-proto or the room gives (no `stream_of` copy), panic catch -> RoomEnded(crash), non-zero exit;
+  `PhaseTimers`. crates/server (new tick_loop file, lib.rs, tests). ~400 + ~350 tests: pump.rs (519) and the test host
+  common/mod.rs (403) are the scale.
+- **S2 the session and `JoinAccepted` changes, paired** (C-U6-13, -14, -16, -19; row:37-40, :45 ":103-105, :111"):
+  event base and run press counters on the wire (npt-proto msg.rs:98, catalogue), client and bots start from them,
+  kind-5 first-command check (input.rs:287), the Resync limit's form outside `ClientSlot`, session generation or a test
+  that no closed session's message reaches the room, `Kick(replaced)` then close, (b) the rate form, (d) the pump's
+  wrong-direction case. crates/proto, room, client, bots, server, docs/design catalogue. ~400 + ~400 tests (each plant
+  failing by name).
+- **S3 C-U6-15 and C-U6-17/-18**: the room's cheap wins, each with the bench before and after (room.rs, encoder.rs;
+  the judged bench itself is on R2); the controller's cap off L1 (client); one entry point for a Behaviour's host order
+  (bots). ~400 + ~200.
+- **S4 instrumentation and header** (E18 plan.md:477; carry 60; C-U6-4): per-thread CPU/RSS per second, queue
+  lengths, UDP-level bytes, steal, clock resolution, header through npt-log. crates/server, log. ~400.
+- **S5 metrics and logs** (E22 plan.md:481): metrics exporter on RS's IPv4, bounded labels, tracing JSON lines with
+  client strings cut or hashed, canaries; PM-0006-20's allocator twin (register 104 (4)). crates/server, Cargo.toml,
+  Cargo.lock. ~350.
+- **S6 AddrTable, handshake cap, per-reason refusals, slow-loris deadlines, rate limits** (E6 plan.md:465, :515;
+  u4-build-plan.md:965). crates/server, net. ~350 incl. the 100,000-address test.
+- **S7 ControlSocket, roster tokens, capabilities** (§10.2-10.3 plan.md:1066-1114): per-slot Unix socket,
+  `SO_PEERCRED`, size-limited panic-free parse of `RoomControl`, token and capability minting, session-control gate,
+  per-peer-set L2 settings. crates/server, room (roster.rs). ~400 + ~300 tests.
+- **S8 npt-server binary + WT dev certificate** (main.rs; §8.5 plan.md:991-996): settings (`cmd_timing`, `cc`,
+  transport), certificate made at start, lifecycle. ~300.
+- **P1 the -3 probe** (C-U6-1 to -7, row:24-30): poller task on the server runtime, one ImpairSocket per leg, the fate
+  log's drain, steal, the judged E's producer with SERIES.md names, rate and composition, observer calls; tests (T1 and
+  T2 re-run, fixed fate entries). crates/server or lab (home not fixed), SERIES.md. ~400 + ~350.
+- **P2 C-U6-8's stamp tests** (row:31; socket.rs:501, :503, :726; socket_tests.rs:904, :1263-1265). crates/net. ~150.
+- **J1 judge-side carries C-U6-9 to -11** (row:32-34), after register 64's follow-ups (u4s-carries.md:455-457):
+  figures.rs, fixtures, SERIES.md rows. crates/judge. ~400.
+- **H1 npt-host page server** (§10.4 plan.md:1116-1135; E21). crates/host. ~400 + ~250 tests.
+- **H2 instant-acme client behind `npt-cert`** (plan.md:960-969). crates/host, Cargo.toml/lock. ~250.
+- **H3 npt-super** (plan.md:395, :1078-1081; E16). crates/super. ~300.
+- **H4 systemd template unit, `npt-ctl`/`npt-cert` wrappers, sudoers list** (plan.md:1078-1082, :1137-1141,
+  :1162-1165). ops/ (new). ~250 of text, checked at stop B (plan.md:1267-1270).
+
+**Total:** about 9,500-10,000 added lines for the blocks above. Not counted, scope to confirm (section 7): npt-bots'
+npt-net glue and npt-load (~600, u4-build-plan.md:966-967) and the 20 judge figures labelled "U6" (figures.rs:866-966;
+~1,000-1,500 with fixtures).
+**Natural splits:** three sub-units do not each fit under about 3,000 at these estimates; four do:
+- U6a transports on loopback: T1-T6 (~2,900).
+- U6b room process core: S1, S2, S3, S8 (~2,850); S2 carries C-U6-19's gate on other briefs (row:45).
+- U6c control plane, instrumentation, process control: S4-S7, H3, H4 (~2,700).
+- U6d probe, judge, host: P1, P2, J1, H1, H2 (~2,200).
+Order constraints seen: S1 can run on Loopback before T1-T4; T4 and P1 need S1's runtime (row:24 "spawned on
+npt-server's multi-thread runtime"); J1 waits on register 64 (u4s-carries.md:457); H1-H4 feed stop B (plan.md:1267).
 
 ## 4. Marks and runs
 
-(pending)
+marks.json (12,630 lines, 81 marks) gives each mark a `where` list; plan §6.2 (plan.md:713-757) the run per mark.
+- **Container rows U6's own tests touch:** -30's C part "C: loopback, 3 recordings x 2 transports" (marks.json:6575;
+  where R3, C; bites wallclock, late-command); register 88 "-30 stays NOT-RUN until U6" (u4s-carries.md:682);
+  u4-build-plan.md:964 "-30's marked C part on both real transports". -35 (where C only, marks.json:7226; "once, after
+  the swap", :7321): its one counted run follows U6's merge on U5's tool (row:46; entries 110-111). Bites U6 builds:
+  PM-0001-18/ws-budget-x2 (marks.json:4472; row:5, R11; today only a `#[cfg(test)]` `Bite::BudgetX2`,
+  net/src/ws_gate.rs:60-69, and npt-net has no `bites` feature, net/Cargo.toml:12-15); PM-0006-20/planted-format;
+  the host's 404 bite (plan.md:1131); the control-plane bites (plan.md:1094-1095).
+- **Judged runs that need U6 merged first:** -3's L2 parts (process `probe`, marks.json:626ff.; R1 and the start of
+  every L2 block, plan.md:723; U3 row "judged on RS at R1 (U8)", plan.md:1250); -18's ws part and -31 through
+  DelayStream with U6's reader stamp (U8 row, plan.md:1255); -19 (R3, R7, ML*; marks.json:4486; gated by C-U6-11,
+  -13, -16, -19: row:34, :37, :40, :45); PM-0004-61's online half (not a marks.json row; ADR 0004:1182; row:40);
+  PM-0001-4 (R2) after C-U6-15's bench (row:39); -35's counted run (row:46); every run with a throwing or rejoining
+  hostile client or a client restarted mid-run (C-U6-19's gate, row:45); any honest client off L1 (C-U6-17, row:42).
+- **VM runs vs container:** C rows are 26 (-1, -3, -17, -57, -58, -18, -20, -21, -22, -30, -34, -35, -41, -42, -60,
+  -45, -61, -47, -48, -49, -50, -51, -62, -54, -55, -56); VM run counts by `where`: R1 10, R2 22, R3 21, R4 15, R5 14,
+  R6 7, R7 24 (node read of marks.json). Runs R1-R7 and their blocks: plan.md:815-834. U6-built figures (20, section
+  2) are all VM-run marks: -10, -12, -13, -15, -24 (R2/R3), -27 (R5), -33 (R7), -38, -59 (R3), PM-0006-17, -19, -20
+  (R2); -25 (R4), -28, -29, PM-0006-15, -25 to -27 (R4/ML*/MAC) need npt-host, AddrTable and the certificates.
 
 ## 5. New dependencies
 
@@ -210,8 +299,76 @@ B and before every run, network-facing advisories block (plan.md:643-649).
 
 ## 6. Overlap with lanes in flight (U4f2, U4g, U4g2, U4h, U5)
 
-(pending)
+- **U4f2** (u4f2-brief.md, 266 lines): lane npt-bots, npt-lab, ops/runs, SERIES.md new rows (:170); names
+  room/src/input.rs, room/tests/commands.rs, lab contract.rs/scenario.rs, bots/src/lib.rs (block list :49-94).
+  Overlap with U6: crates/bots (U6's npt-bots glue and npt-load, u4-build-plan.md:966-967) and crates/room/src/input.rs
+  (C-U6-19's first-command check sits where kind 5 skips it, input.rs:287; U4f2 records the bypass, C-U4F2-9,
+  u4f2-brief.md:142-145).
+- **U4g** (u4g-brief.md, 308): open crates/client, sim, room (room.rs packing/recovery :1437-1519, ack.rs), lab,
+  bots, ops/runs, SERIES.md new rows; shut proto, server, net, judge, Cargo.toml/lock, check.mjs (:43-50). Overlap:
+  room/src/room.rs (C-U6-14's generation, -16's limit and slot clock, -19's `JoinAccepted` counters, -13's event base,
+  C-U6-15's cheap wins all touch room.rs), client/src/lib.rs (C-U6-13/-19 the client starting from `JoinAccepted`),
+  crates/bots.
+- **U4g2** (no brief file yet; scope per msg-2026-11-21.md:86-89: drawing other players, event timing, the server's
+  recovery after a loss burst, about 1,600 lines): likely room.rs and client again; its files are not yet listed.
+- **U4h** (u4h-brief.md, 386): open crates/sim, room, server ("one accessor and its tests": the ping-estimate accessor
+  in pump.rs, block 4 :111-114), client, proto (one pub item: aim widths, proto/src/input.rs:53-54), bots, lab;
+  crates/judge only under U4H-JUDGE (a) (:53-63). Overlap: crates/server/src/pump.rs and tests/common/mod.rs,
+  loopback.rs (U6's TickLoop takes the same RTT hand-off, register 96; u4h-brief.md:114, :377); room.rs; npt-proto
+  (U6 changes `JoinAccepted`, msg.rs:98); judge/src/figures.rs (U6's C-U6-9/-10 and its 20 planned figures, if
+  U4H-JUDGE (a)).
+- **U5** (u5-brief.md, 438): new fuzz/ and crates/alloc; crates/lab; ops/runs; check.mjs and check.test.mjs;
+  crates/proto (the -34 bite); crates/net (the scanner's fuzz entry in l2/ws_frame.rs and a `fuzz` feature in
+  crates/net/Cargo.toml, :57, :66, :110); manifests and locks of Block 0 (Cargo.toml, Cargo.lock, crates/*/Cargo.toml
+  incl. server and net); SERIES.md header rows (:55-59). Overlap: crates/net/Cargo.toml (U6 adds a `bites` feature and
+  normal deps), Cargo.toml/Cargo.lock (U6's new crates, section 5), check.mjs (U6's deps-step entries, e.g. npt-host
+  and npt-super reach checks at check.mjs:99-102), crates/alloc (U6's PM-0006-20 normal dep). U5's -35 tool counts
+  every changed path outside crates/net (u5-brief.md:197), which fixes U6's swap form (entry 111).
+- **Shared by all:** SERIES.md (U6 adds C-U6-5's names, -9's row text, the reader-stamp parts); README's status line.
 
 ## 7. Open questions (no answers)
 
-(pending)
+1. Size: the blocks come to about 9,500-10,000 added lines against M's about 3,000 and the stop past 6,000
+   (history.md:2048-2051). Split into sub-units (section 3), and is that Mustafa's call as U4F2-SIZE and U5-SIZE were
+   (history.md:7271; u5-brief.md:1-31)?
+2. Scope: npt-bots' npt-net glue and npt-load are U6's by u4-build-plan.md:966-967 and the stubs
+   (bots/src/bin/npt-load.rs:1), but the U6 row (row:1) does not name them. In U6 or a later unit?
+3. Scope: 20 judge figures say unit "U6" (judge/src/figures.rs:866-966), none in the U6 row. U6's, or each run's
+   unit (U8 and the runs)?
+4. "Interest under load" (row:1): what does U6 build beyond npt-room's interest code (interest.rs) for -8/-9/-10/-12,
+   which are R2 runs (plan.md:724-725)?
+5. C-U6-3: which drain cadence, per second with 1-2 s capacity, or one pre-faulted log per leg (row:26)?
+6. C-U6-16 (a): which limit form, the bucket kept in the roster entry or every full state counted against the
+   downstream window (row:40); chosen with the advisor before -19's runs.
+7. C-U6-16 (c): the control bytes' channel from a public read of a framed message's channel, or each message's
+   `Limits::TYPES` row beside its bytes (row:40)? `Room::take_control` returns bare `Vec<Vec<u8>>` (room.rs:784).
+8. C-U6-19: `JoinAccepted`'s counters, or the room-only form if every session's counters start at 0, with the netcode
+   and security seats' read (row:45)?
+9. C-U6-14: a session generation checked in `receive`/`leave`, or a test that no closed session's message reaches the
+   room; and does npt-server's library need an end-session call (row:38)?
+10. C-U6-11: how does a client admitted mid-run start its span (row:34)? And does J1 wait on register 64's judge
+    follow-ups landing first ("at the latest before U6 builds -19's figure", u4s-carries.md:457)?
+11. C-U6-6: does -3's sends plus echoes give 10,000 per direction through the probe's socket? If not, the advisor
+    before R1's run plan (row:29; ADR 0001:1590).
+12. The probe's home: row:24 puts its poller on npt-server's runtime; §4.7 lists npt-lab's `probe` subcommand (U2,
+    plan.md:612) and no probe item in npt-server (plan.md:600-601). Which crate?
+13. -35's swap "inside crates/net (npt-net's own selection)" (row:46): today the crate is chosen by npt-net features
+    (net/Cargo.toml:12-15) that a dependent must turn on, and U5's tool counts "only crates/server/Cargo.toml changed"
+    as a change outside (u5-brief.md:202). How does U6 make the selection npt-net's own?
+14. Drift: the reader stamp's site is cited as delay.rs:1884 (row:22); the pump's closing `wake_all` is now delay.rs:1907
+    (`poll` at :1709). Same site, moved?
+15. C-U6-15: the room-tick bench is "measured on R2" (row:39), a VM run; are the cheap wins (code) inside U6 and the
+    bench a pre-run step of R2's plan?
+16. The systemd unit and the `npt-ctl`/`npt-cert` wrappers: U6's row names them (row:1), U8 builds the run package
+    (plan.md:1255), and §4.1's ops/ lists cloud-init/, firewall/, runs/, operator/, checklists/ only (plan.md:399-403).
+    Where do they live, and `User=npt-room-NN` or `DynamicUser` (plan.md:1078)?
+17. §8.5's WT dev certificate: made by "the room server or supervisor" (plan.md:992). Which?
+18. instant-acme: propose the 90-day fallback now (needs security-auditor's and the advisor's OK at U6,
+    plan.md:969), or not? Which root store for hyper-rustls (section 5)?
+19. Row:20: one measured run per server process, or the POOL reset at each run's start (delay.rs:195)? Row:15: do
+    -25's never-joining sessions get a DelayStream?
+20. Carry 60: weapon and health go in npt-log's `Header` (no such field today) or in params (row:9; u4s-carries.md:285-290)?
+21. C-U6-19's gate: U4g, U4h and U5 state "no throwing or rejoining hostile client" (u4g-brief.md:187,
+    u4h-brief.md:228, u5-brief.md:256-282 section); U4g2 has no brief yet. Does U4g2's brief need the same line?
+
+DONE

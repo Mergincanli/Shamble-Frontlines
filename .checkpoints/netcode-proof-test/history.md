@@ -7531,3 +7531,12 @@ U4G-Q1: the advisor's: split (with two halves and with a review + merge each).
   kind 1 unrejected 1,523, kind 7 10. About 2,566 added; free 7,712,194,560 B. **Nothing else in U4f2 moves before
   FP-2.** **FP-2 on his Advisor's F-B-COUNT answer** (KEEP-PROGRESSING: about two days from 2026-11-20 21:37 UTC);
   then round 2 (netcode, test, rust), R6, the merge, the r2 rows and -21's set.
+## Moved from the card 2026-11-21 ~17:4x UTC (card_trim_1121d.py): the 2026-11-20 22:39:36-02:37:53 cut's entry, word for word
+- **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in
+  its rev-2 check):** the notice, word for word (transcript line 64727, 22:39:36.282; the same text at 23:00:24,
+  23:05:59-23:06:01 as the day-message trigger tried, and 00:37:13-19 as the 00:34 check-in tried): "You've hit your
+  org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 2am (UTC)". Both agents'
+  tasks ended on it (rate_limit, HTTP 429). The saver ended on its own time at 23:00:23 (exit 0) after 6419c2b; the
+  23:05 day-message trigger and the 00:34 check-in waited unread. Resumed at 02:37:53 (the 02:35 check-in): `git
+  status` clean; the saver restarted (bvyb8q0li, 02:38); both agents resumed by SendMessage, the builder first checking
+  its worktree (no plant left, its last edit whole, the tree compiling); the day message sent about 02:40.

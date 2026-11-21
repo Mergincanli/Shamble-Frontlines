@@ -173,27 +173,27 @@
 - **U5-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u5-early.md, 265 lines, read whole; its High ADV-U5E-1 met by
   cond. 2): fill u5-brief.md §10 (`<base>` 40e20fd, 642/739, 1,207 s; runner u5-run.sh e69b0fa7…; pointer on its line 5);
   register 102-111 and plan.md's U5/U6 rows done. **U5's size line: the S line, past about 1,400 added lines at a block
-  end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Block 0 DONE (agent-a60a432d4564f4cc7's copy, ~260 lines);
-  fetch clean (u5-deps-facts.md); security read: all 8 CLEARED (security-u5-deps.md); dependency-check.md written 15:3x.
-  Builder on Block 1 (+S1's check.mjs pins) and 2's sim half, stop before 3; SEC-U5D ruling APPROVE S1-S4 (:267-356);
-  guard rev 2 768f6055… READY (B9); rev 3 8466a42e… (GUARD-7, E1-E5; tests 40/40) in its re-read (B10); then installs.
+  end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Copy agent-a60a432d4564f4cc7: Blocks 0-1 DONE (1,177
+  added, u5-build.md); 8 files CLEARED (security-u5-deps.md; dependency-check.md); SEC-U5D APPROVE S1-S4 (:267-356). 17:5x:
+  P27 (4.5 GiB) + main release clean (707.6 MiB); nightly-2026-11-01 and cargo-fuzz 0.13.2 (38ef01cf…) installed; free 9.36 GB;
+  builder resumed on Block 2's sim half, stop before 3. Guard rev 4 7413834d… (R3-1-4; tests 58/58) in its re-read (B11); rev 3 8466a42e… READY (B10).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
-  **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver byihocm9i
-  from 16:03 (to about 18:03); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38).
+  **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver bdituvkdn
+  from 17:47 (to about 19:47); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
-- **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in
-  its rev-2 check):** the notice, word for word (transcript line 64727, 22:39:36.282; the same text at 23:00:24,
-  23:05:59-23:06:01 as the day-message trigger tried, and 00:37:13-19 as the 00:34 check-in tried): "You've hit your
-  org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 2am (UTC)". Both agents'
-  tasks ended on it (rate_limit, HTTP 429). The saver ended on its own time at 23:00:23 (exit 0) after 6419c2b; the
-  23:05 day-message trigger and the 00:34 check-in waited unread. Resumed at 02:37:53 (the 02:35 check-in): `git
-  status` clean; the saver restarted (bvyb8q0li, 02:38); both agents resumed by SendMessage, the builder first checking
-  its worktree (no plant left, its last edit whole, the tree compiling); the day message sent about 02:40.
+- **2026-11-21 16:12:40 to 17:41:37 UTC (a spend-limit cut: U5's builder in Block 2's fmt check, Block 1 done; the
+  U6 facts scan; my guard rev 4 step):** the notice, word for word (transcript line 68468, 16:14:55.013; the same text
+  at 16:34:46 as the 16:34 check-in tried; the facts scan's at 16:12:40.551, the builder's at 16:12:46.047): "You've
+  hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 5:40pm (UTC)".
+  Both agents' tasks ended on it (rate_limit, HTTP 429); the saver ran on (byihocm9i; last save 43cf1f7, 16:13:37).
+  Resumed at 17:41:37 (his message): no cargo or rustc running; the builder's copy as u5-build.md says (Block 1 DONE,
+  no plant left), its last fmt check exit 0; the 8 files the harness flagged were only touched by u5-run.sh:73.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
   one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
   and the session) and the 11-18/11-19 choices at :7148-7160 (1119l); the 23:18 restart at :7169-7175 (1120b); the
   01:01 restart at :7248-7253 (1120e); 2026-11-20's idle usage cut (06:16-10:57:41) at :7312-7315 and its 04:22
-  container restart at :7316-7322 (1120f); its 18:12:22-21:09:44 spend-limit cut at :7435-7444 (1120j).
+  container restart at :7316-7322 (1120f); its 18:12:22-21:09:44 spend-limit cut at :7435-7444 (1120j);
+  2026-11-20's 22:39:36-02:37:53 one at history.md:7535-7542 (1121d).
