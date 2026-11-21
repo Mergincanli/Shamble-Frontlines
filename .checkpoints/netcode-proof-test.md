@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 09:24 UTC: U4g's blocks 1-4 built, all pass workspace-wide (8 plants fail by name); P27
-  dev part-clean 09:23 (4.8 GiB; free 9.37 GB); the stop's workspace clippy cycle resumed. F4: room.rs:1033-1034 at the re-base.
+- **Last update:** 2026-11-21 09:27 UTC: U4g's early half DONE (blocks 1-4; clippy and fmt clean; snapshot a78e2853…);
+  last P27 clean 09:26 (free 9.36 GB); check-in paused (no agent runs). U4f2 still waits on F-B-COUNT (his Advisor).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -174,13 +174,13 @@
   **U5-ALLOC and U5-SIZE are his** (final texts, section 8; neither a stop): in the next day's message (2026-11-22's),
   with the U4H texts if his U4G-Q1 answer has come. Register lines before U5's launch (section 9). S's letter: U4b 701
   (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
-- **U4G-EARLY APPROVED W/ CONDITIONS 1-10** (advisor-u4g-early.md): builder in .claude/worktrees/agent-abc25909b7dd4ad30
-  (ff to b25ee7d; fill u4g-brief.md §9: `<base>` 8f9d97d, 642/739, 1,207 s). Blocks 1-4 done (655/756 = +13/+17; 2,053
-  lines, under 2,900); snapshot wip/u4g-early.patch a78e2853… (103,162 B, 11 files, in lane); -58's counters to re-base. **Size line:**
-  prediction half ~2,100-3,700 (stop 6,000); blocks 1-4 ~1,120-1,920 (past ~2,900: advisor). F-B-COUNT: stop it, clean.
+- **U4G-EARLY's half DONE 09:2x** (advisor-u4g-early.md; worktree .claude/worktrees/agent-abc25909b7dd4ad30, kept by cond. 6):
+  blocks 1-4 pass workspace-wide (655/756 = +13/+17; 8 plants fail by name); the stop's clippy (both targets) and fmt clean;
+  2,053 lines (under 2,900); snapshot wip/u4g-early.patch a78e2853… (103,162 B, 11 files, in lane). Re-base (cond. 8) after
+  U4f2's merge and -21's set: -58's 3 counters then; F4 room.rs:1033-1034. **Size line:** prediction half ~2,100-3,700 (stop 6,000).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
-  **Check-in on again 06:43 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver bd076oo6q from
+  **Check-in paused 09:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; on again when an agent starts); saver bd076oo6q from
   08:34 (to about 10:34); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)

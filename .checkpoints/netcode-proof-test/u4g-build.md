@@ -110,6 +110,13 @@ Task: U4g's early builder (PR #40, lane claude/netcode-proof-test-plan-hcky5g), 
 
 - Snapshot after block 4: wip/u4g-early.patch 103,162 B, 11 files, sha256 a78e285361b7183e423783fdbf98dab607ac41bd02dabff91829db340e368a3f. df at the stop: 4,440,199,168 B.
 
+## Resume 5: the stop's clippy (coordinator: P27 09:23 UTC, 4.8 GiB; snapshot a78e2853… checked)
+- df before: 9,365,266,432 B. Host, runner -x -k: `cargo clippy --locked --workspace --all-targets -- -D warnings` exit 0 (09:24:19-09:24:36 UTC), then with `--all-features` exit 0 (to 09:25:10); log .gate/u4f/u4g-early-stop-clippy-host.log. df after: 8,529,100,800 B.
+- wasm32, runner -x -k, check.mjs's WASM_ARGS (`--target wasm32-unknown-unknown -p npt-link -p npt-l1 -p npt-sim -p npt-proto -p npt-room -p npt-client -p npt-log -p npt-hash-wasm -p npt-tcpinfo`): exit 0, then with `--all-features` exit 0 (09:25:23-09:25:34 UTC; each of the 9 crates checked in both, provenance 2 each); log .gate/u4f/u4g-early-stop-clippy-wasm32.log. df after: 8,447,733,760 B.
+- No code change needed, so no re-run of tests and no further block-end run (the whole-workspace end checks run on the re-based tree: condition 7). fmt clean since u4g-early-b4-fmt2.log. STOP REACHED: blocks 1-4 built and tested, clippy (both targets, both builds) and fmt clean; final snapshot; return.
+
+- Final snapshot: wip/u4g-early.patch 103,162 B, 11 files, sha256 a78e285361b7183e423783fdbf98dab607ac41bd02dabff91829db340e368a3f (unchanged from block 4's: no code change since). df at the stop: 8,447,676,416 B.
+
 ## Findings (one line each)
 - F4: room.rs:1033-1034 (old lines; `self.refusals.clear()` and the `incoming`/`refusals` swap) are unchanged context of block 3's `hold_pre_change` call (inserted after old :1035). B2 lists no U4f2 change there (the fields are retyped, not renamed), so the 3-way apply should take it; if round 2 rewrites those two lines, that hunk is the one to resolve by hand at the re-base.
 - F3: an own-state change's first correction was also counted, as misplaced, in an older change still open (the move-speed change counted the fire-interval change's); fixed in `own_changes` (the snapshot that opens a change gives its correction to it alone). A judged -60 run with two kinds open at once would have failed "at most one correction per change" on a correct build.
