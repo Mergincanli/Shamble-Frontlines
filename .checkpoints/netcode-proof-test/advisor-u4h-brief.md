@@ -17,6 +17,7 @@ check.mjs, npt-lab or judge run; no commit.
 6. Item 5: rule U4H-Q1 to Q12; item 6: Q4 and Q7 against marks' meaning; item 7: U4H-SIZE and U4H-JUDGE for him.
 7. Findings ADV-U4HB-n, verdict, what I did not check, Decisions needed, For Mustafa.
 STATUS: all blocks done (2026-11-20). Verdict REVISE; rev 2 comes back for sections 1-4, 6 and 8.
+Rev 2 check done (2026-11-21, the block at the end): APPROVE WITH CONDITIONS 1-4.
 
 ## Notes (one line per check, written as I go)
 - Head f1a7f73; `git diff --stat a289def HEAD -- spikes/netcode-proof` empty (the brief's 33dabe8 reading holds);
@@ -389,7 +390,7 @@ u4s-carries.md unchanged since: last commit to them ee43ae6; 369 and 738 lines.)
   (max RTT less half the min: client lib.rs:634-646) is RTT/2 + 1.5J, under the RTT while J <= RTT/3: P1 to P4 and B1
   hold (P1's slack about 10 ms); at P0 the honest wait can reach the cap's 3 periods exactly.
 - Q6: Scene's fields are crate-private (scene.rs:100-135); `with_stand_ins` (:328-331) is the builder precedent. The
-  interest radius is 64 m (advisor-u4e-r1.md:660); TC stands about 60 m from the centre field.
+  interest radius is 64 m (advisor-u4e-r1.md:659); TC stands about 60 m from the centre field.
 - Q7: -49's frame-wait report reads `from.process` room (marks.json:9961-9969); on L2 the room cannot write it.
 - u4s-carries.md's last entry is 93; the eight lines take 94 to 101.
 
@@ -422,7 +423,7 @@ u4s-carries.md unchanged since: last commit to them ee43ae6; 369 and 738 lines.)
   the cap), and what a stamp-ahead can buy at most per profile (the cap less the honest wait, held by the final cap), for
   the security-auditor's read; the P0 pre-rows print capped waits too.
 
-### Verdict: APPROVE WITH CONDITIONS
+### Verdict: APPROVE WITH CONDITIONS (2026-11-21)
 No Critical or High; every item of my list is met. The conditions are small edits by the main session, none needing a
 new check by me if met as written:
 1. ADV-U4HB-14: block 1, 1.3 and section 3 as its fix says.
