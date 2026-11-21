@@ -174,7 +174,8 @@
 - **U5-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u5-early.md, 265 lines, read whole; its High ADV-U5E-1 met by
   cond. 2): fill u5-brief.md §10 (`<base>` 40e20fd, 642/739, 1,207 s; runner u5-run.sh e69b0fa7…; pointer on its line 5);
   register 102-111 and plan.md's U5/U6 rows done. **U5's size line: the S line, past about 1,400 added lines at a block
-  end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Builder from 14:48 (agent-a60a432d4564f4cc7): Block 0 to DEP-HOLD.
+  end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Block 0 DONE (agent-a60a432d4564f4cc7's copy, ~260 lines);
+  fetch clean, 0 shared versions changed (u5-deps-facts.md); security read running (security-u5-deps.md) before any install.
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
   **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver byg2iirg5
