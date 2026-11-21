@@ -152,11 +152,8 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **Moved to history.md:7273-7311** (card_trim_1120f.py, 16:2x UTC): U4f-F1 CLOSED (:7274-7280; the advisor's close
-  read APPROVE WITH FINDINGS, its three Lows fixed), U4g's brief from rev 1 to rev 2.1 (:7281-7299; REVISE, then
-  APPROVE WITH CONDITIONS 1-5, all met: **u4g-brief.md rev 2.1 is ready**; **U4G-Q1's final text for the 2026-11-21
-  message: advisor-u4g-brief.md:360-374**, lean (b) split; U4G-Q2 before -58's set only), U4f2's brief check
-  (:7300-7311; APPROVE WITH CONDITIONS, rev 1.1, then rev 1.2 at launch; its size line, now answered).
+- **Moved to history.md:7273-7311** (card_trim_1120f.py): U4f-F1 CLOSED (:7274-7280); U4g's brief to rev 2.1 (:7281-7299;
+  U4G-Q1 now answered (b); U4G-Q2 before -58's set only); U4f2's brief check (:7300-7311; rev 1.2 at launch).
 - **U4f2: part A2 DONE (~03:10 UTC); FP-2 waits for F-B-COUNT** (explained to him in plain words 14:3x; he decides).
   Its part-A record (the advisor's part-A ruling; R0, R4, R5 and the pre-reads; about 2,566 added) is word for word at
   history.md:7519-7533 (card_trim_1121c.py). After FP-2: R5's forged lines, R2 and R3 whole, lag-switch A again, round
@@ -165,14 +162,10 @@
   Edits; register entries 94-101 at u4s-carries.md:618-659). **U4H-Q4, U4H-SIZE and U4H-JUDGE** (final, section 8)
   go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop. **msg-2026-11-21.md
   SENT ~02:42 UTC** (F-B-COUNT, U4G-Q1, choices 1-3; held by the cut).
-- **U5's brief rev 2.1 READY** (u5-brief.md; KEEP-PROGRESSING; U5 builds after U4's close): rev 1 (2db0976) REVISE
-  (advisor-u5-brief.md:1-322: 2 High, 5 Medium, 7 Low); rev 2 (2cfa592) with option (a)'s per-type bars from the
-  test-engineer's read (u5-alloc-bounds.md, 254 lines, measured at rustc 1.99.1: Input 256, SessionControl 480,
-  RoomControl 272, Snapshot at most 155,952 through the client, FullState 2,213,272, the rest 0); the advisor's rev-2
-  check APPROVE WITH CONDITIONS (:324-430: 3 Medium, 3 Low), all met by my Edits ~05:3x UTC (no new check needed).
-  **U5-ALLOC and U5-SIZE are his** (final texts, section 8; neither a stop): in the next day's message (2026-11-22's),
-  with the U4H texts if his U4G-Q1 answer has come. Register lines done 14:4x (entries 102-111). S's letter: U4b 701
-  (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
+- **U5's brief rev 2.1** (u5-brief.md): rev 1 REVISE (advisor-u5-brief.md:1-322), rev 2 with option (a)'s per-type bars
+  (u5-alloc-bounds.md at rustc 1.99.1: Input 256, SessionControl 480, RoomControl 272, Snapshot at most 155,952 through
+  the client, FullState 2,213,272, the rest 0), rev 2.1 by the rev-2 check (:324-430). **U5-ALLOC and U5-SIZE are his**
+  (section 8): in the 2026-11-22 message with the U4H texts. S letter: U4b 701 (411eeee), U4f-F1 239.
 - **U4G-EARLY's half DONE 09:2x** (advisor-u4g-early.md; worktree .claude/worktrees/agent-abc25909b7dd4ad30, kept):
   blocks 1-4 pass workspace-wide (655/756 = +13/+17; 8 plants fail by name; clippy and fmt clean); 2,053 lines; snapshot
   wip/u4g-early.patch a78e2853… (103,162 B, 11 files, in lane). Re-base (cond. 8) after U4f2's merge and -21's set: -58's
