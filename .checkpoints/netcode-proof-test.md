@@ -82,6 +82,12 @@
 
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
+- **2026-11-21 by the advisor's U4h brief checks (to name in the message that carries U4H-SIZE; advisor-u4h-brief.md
+  :143-211, :397-407):** U4H-Q1 a 3-tick margin; Q2 the cap `open` by default, the span readable, re-pins allowed; Q3
+  shots only in the measured window; Q5 -50's runs with five terms; Q6 both throw kinds by one stand-in builder; Q7
+  SERIES.md's cells corrected in one edit; Q8 half the shots at an edge band; Q9 the cover record on SS; Q10 det-u4
+  measured before recording; Q11 the bite sites; Q12 JDG-ONLY-1 inside the judge's change; TC's own weapon (spread 0,
+  damage 0). Why: inside the plan, undoable, no pass mark, judge, marks.json or money; nothing on main.
 - The choices of 2026-11-20 (U4f-F1's round; the advisor's U4g brief rulings; the advisor's U4f2 round-1 ruling),
   named in msg-2026-11-21.md (choices 1-3): history.md:7412-7433 (card_trim_1120i.py).
 - The choices of 2026-11-19 named in msg-2026-11-20.md: history.md:7177-7193 (card_trim_1120c.py).
@@ -145,44 +151,21 @@
   APPROVE WITH CONDITIONS 1-5, all met: **u4g-brief.md rev 2.1 is ready**; **U4G-Q1's final text for the 2026-11-21
   message: advisor-u4g-brief.md:360-374**, lean (b) split; U4G-Q2 before -58's set only), U4f2's brief check
   (:7300-7311; APPROVE WITH CONDITIONS, rev 1.1, then rev 1.2 at launch; its size line, now answered).
-- **U4f2: round 1 RULED; fix pass part A RUNNING from ~21:33 UTC.** Its record so far (the build, the four seats'
-  verdicts, the ruling's summary) is word for word at history.md:7324-7367 and :7369-7400 (card_trim_1120g/h.py). The
-  round-2 base is snapshot e9a0ae3e3f48af18… (2,077 added); the fix pass is in the builder's worktree
-  .claude/worktrees/agent-aa62d31b6fa5b9807. **The ruling** (advisor-u4f2-r1.md): REQUEST CHANGES. Part A: FP-1, 3, 5,
-  6, 7, 4, 8, then fmt/clippy/doc, then the builder stops. **Part A DONE ~22:20** (u4f2-build.md Block 9; logs
-  .gate/u4f/u4f2-fp*.log): each FP's tests pass and its plant fails by name; fmt, clippy (host, wasm32, both builds)
-  and doc pass; about 2,562 added (FP-2 would take it to about 2,620-2,660, near the advisor's 2,700); about 12 s more
-  test time; snapshot 23c5f78816f33e48… (checked); free 8,368,844,800 bytes. **New for the advisor** (resumed ~22:25,
-  out advisor-u4f2-parta.md): F-G (at `--forge-every` 3, a death between d-1 and d breaks the twin hash; require
-  every above the rest, or keep 3 as a limit); FP-5's plant 9 fails f16 under B too (F-E holds under neither option);
-  may R4 and R5 run now, before FP-2. **The advisor's part-A ruling ~22:29** (advisor-u4f2-parta.md, read :70-154):
-  F-G fixed now (kind 7 needs `every` above its rest: 4 at 30 Hz, 6 at 60 Hz); then R0 (the test step's new cost), R4
-  (counts), R5 (its non-forged lines count; forged lines a smoke), R2-pre and R3-pre (a pre-read, only above 6.5 GB
-  free); after FP-2: R5's forged lines, R2 and R3 whole, the lag-switch A line again (its logs equal the early run's);
-  F-E closed under both options; **the advisor's stop moves to 2,800** (his past 3,000 stands); msg-2026-11-21.md's
-  size lines corrected (about 2,630-2,670). **The builder resumed ~22:30** for F-G and the early runs. **FP-2 only on his F-B-COUNT answer** (on (b) or (c), to
-  the advisor first). Then R2-R5, round 2 (netcode, test, rust; xhigh; read only) on the fix pass's diff, then R6
-  (check.mjs twice). The advisor's stop past 2,700 added at an FP end; his past 3,000. About four part-cleans (P27's
-  second form, no lane running). **msg-2026-11-21.md SENT ~02:40 UTC 2026-11-21** (F-B-COUNT, a stop; U4G-Q1,
-  not a stop; choices 1-3 named; its 23:05 trigger fired during the cut). **While his Advisor answers
-  (KEEP-PROGRESSING, about two days):** **U4h's brief rev 1 DONE ~21:59** (u4h-brief.md, 296 lines, read
-  :192-297; notes u4h-brief-notes.md; saved 5e0f6d0): whole about 2,800-5,200 (about even to pass 6,000 at 1.5), a
-  split U4h/U4h2 offered; U4H-Q1 to Q12 for the advisor; **U4H-SIZE and U4H-JUDGE (the judge gains four planned
-  figures) are his**, neither a stop now (a later day's message, after the advisor's check); three items sent to U4h
-  never reached the register (N2-L3 (b), INF-U4R-6 with det-u4's 240 s, pump_report's RTT). **The advisor's check:
-  REVISE ~22:26** (advisor-u4h-brief.md, 361 lines; read in full :58-142, :332-361): ADV-U4HB-1 High (TC inherits
-  CO's 5,000 µrad spread: -51 fails and -48 loses registration on a correct build; fix: TC's own weapon, spread 0),
-  Mediums -2 (shot id, press-edge firing) to -9 (size: U4h about 2,100-3,850, U4h2 about 750-1,550, the judge apart
-  400-900), Lows -10 to -13; rulings Q1-Q3, Q5-Q12 (mine to name in the message that carries U4H-SIZE); **U4H-Q4,
-  U4H-SIZE and U4H-JUDGE are his, in the first day's message after rev 2 is checked and U4G-Q1 is answered (2026-11-22
-  at the earliest), none a stop**; the eight register lines (item 1, :212-235) are mine, before U4h's launch. **Rev 2
-  DONE ~22:37** (369 lines; saved ee43ae6: TC's own weapon and health, press-edge shots, the room-side wait cap
-  min(400 ms, RTT + 3 ticks), npt-sim's two pub items, the judge as its own change J1-J3; U4h about 2,100-3,850, U4h2
-  about 750-1,500, J1-J3 about 400-900; open for the advisor: Q6's scene builder, Q7's :211 cell); **the advisor's
-  rev-2 check RUNNING from ~22:38** (sections 1-4, 6, 8 and 9; its "## Rev 2 check" block); U4g's build only after U4f2's merge
-  (u4-build-plan.md:951-952, "never two at once"); U4G-Q2's text later, before -58's set. **Lesson:** never `cd` into an agent's
-  worktree (the harness moved this session's main folder to it at 16:19; back at once); read it with Read/Grep.
-  Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bvyb8q0li from 02:38 UTC 11-21 (to about 04:28). Main f5030a3.
+- **U4f2: fix pass part A2 RUNNING; FP-2 waits for F-B-COUNT.** The record from round 1's ruling to now is word for
+  word at history.md:7324-7367, :7369-7400 and :7446-7489 (card_trim_1120g/h, 1121a). Part A built (FP-1, 3, 5, 6, 7,
+  4, 8; about 2,562 added; snapshot 23c5f788…). The advisor's part-A ruling (advisor-u4f2-parta.md): F-G fixed
+  (`every` above kind 7's rest); R0, R4 and R5 now (R5's forged lines a smoke), R2-pre and R3-pre only above 6.5 GB
+  free; after FP-2, R5's forged lines, R2 and R3 whole, and the lag-switch A line again; **its stop past 2,800**, his
+  past 3,000. The builder resumed at 02:38 after the cut, checking its worktree first (no plant left, its last edit
+  whole). **FP-2 on his Advisor's F-B-COUNT answer** (KEEP-PROGRESSING: about two days from 2026-11-20 21:37 UTC);
+  then round 2 (netcode, test, rust), R6, the merge, the r2 rows and -21's set.
+- **U4h's brief rev 2.1 READY** (u4h-brief.md; the advisor's rev-2 check APPROVE WITH CONDITIONS, all met by my
+  Edits; register entries 94-101 at u4s-carries.md:618-659). **U4H-Q4, U4H-SIZE and U4H-JUDGE** (final, section 8)
+  go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop. **msg-2026-11-21.md
+  SENT ~02:42 UTC** (F-B-COUNT, U4G-Q1, choices 1-3; held by the cut).
+- **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
+  16:19; back at once); read it with Read/Grep. Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bvyb8q0li from
+  02:38 UTC (to about 04:28). Main f5030a3.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in

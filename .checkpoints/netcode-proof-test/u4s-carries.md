@@ -615,6 +615,48 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     band, the everyone-in-view share at least 0.99), on U4h's build with lag compensation; frozen in the code with its
     measurement cited; SS's brawl unchanged and its suites equal figure for figure; before any ES run of PM-0001-12
     counts" (:22). Carry 59 points here; U4h's brief names the carry and opens crates/bots/src for it (:22).
+94. **N2-L3 (b), the hull's blend (u4d-round2-netcode.md:81-82; routed by the advisor's U4d close ruling,
+    advisor-u4d-close.md:305-306; filed 2026-11-21, ADV-U4HB-12):** "U4h must blend composed boxes or interpolate hull
+    yaw wrap-aware" (:81-82). Met by one npt-sim function over two HitVolumes at the Rewind's fraction, which the
+    server's shot phase and the client's AimCast both call (u4h-brief.md 1.4, block 5).
+95. **INF-U4R-6 with INF-R2-2's base, det-u4's 240 s line (the advisor's U4r round-1 ruling, advisor-u4r-r1-full.md:289;
+    its round-2 ruling, advisor-u4r-r2-full.md:45; filed 2026-11-21, ADV-U4HB-12):** "det-u4.mjs prints its own
+    non-cargo sum and the line 'over 240 s: to the advisor (ruling 1 point 1)', without changing wasmStep's default
+    print" (r1 :289); "Adding a runner entry to det-recordings.json will cross 240 s, so U4h's plan settles the route
+    (RR-L4 weighed first) before recording" (r2 :45; the base 223.7 s of 240). Route ruled: U4H-Q10
+    (advisor-u4h-brief.md:199-203), the TC entry's length set from a measured runner-rate row before recording.
+96. **`pump_report`'s RTT (the advisor's U4e round-1 ruling, advisor-u4e-r1.md:662-664; filed 2026-11-21,
+    ADV-U4HB-12):** "The room's per-tick report from the pump (`pump_report`) carries the bytes sent and the link's
+    largest datagram, not the RTT, which U4h's tolerance will read" (:663-664). U4h's callers (the lab, scenario.rs:704;
+    npt-server's tests, common/mod.rs:290, loopback.rs:213) pass each session's `Decoder::rtt_ns`; U6's TickLoop makes
+    the same hand-off.
+97. **EA-U4R-4 and EA-B1-1's later half, npt-sim's pub items (the advisor's U4r round-1 ruling,
+    advisor-u4r-r1-full.md:185; BRAWL-1's round-1 ruling as u4r-report.md:1164-1165 records it; filed 2026-11-21,
+    ADV-U4HB-12):** "make the clamp bound (or the fire-origin height) a pub npt-sim item, read by npt-lab" (:185);
+    "npt-sim exposes the flags index and the dead bit as pub items. The home: the next lane that opens crates/sim
+    (beside EA-U4R-4), U6 at the latest" (:1164-1165). U4g opens crates/sim first; what U4g's report does not list as
+    met, U4h takes (u4h-brief.md 1.4).
+98. **The everyone_in_view row's writer cell (the advisor's U4r build ruling 3, task (e), as history.md:4976 records
+    it; filed 2026-11-21, ADV-U4HB-12):** "(e) SERIES.md:368's writer at the next SERIES.md edit." The row is now
+    SERIES.md:396 (`tick.s.everyone_in_view`, writer "npt-room"), which U4r's lab computes from its mirror
+    (advisor-u4r-build3.md:20); U4f's SERIES.md edit (25d316e) did not take it. U4h's one SERIES.md edit corrects the
+    cell (U4H-Q7, with test-engineer's read).
+99. **cross_arch_mismatch_count's two later kinds (SERIES.md:265, the figure's row; filed 2026-11-21, ADV-U4HB-8):**
+    "The shot view test's and the throw landing's kinds join with the figures that read them (U4h:
+    view_hit_registered_share, false_hit_share, throw_desync_count)". Built on fixtures with those figures and their L2
+    Arm-rule halves (SERIES.md:274, :295, :299) in the judge's change (J1, J2), as Mustafa's U4H-JUDGE answer places it.
+100. **JDG-ONLY-1, the judge's `--only` before `pre:` (the advisor's carry 62 (h) ruling, advisor-u4r-c62h-full.md, as
+     history.md:4609-4614 records it; filed 2026-11-21, ADV-U4HB-8):** "the judge narrows marks with --only before
+     Rule::Pre looks for PM-0001-2 (main.rs:94, eval.rs:958-962)"; "Home: npt-judge's next change, before PR #40 is
+     marked ready at the latest and before any such bite; interim rule: every npt-judge --only that names a mark
+     carrying pre:PM-0001-2 also names PM-0001-2." Rides the judge's change (J3) with the interim rule's fixture
+     (U4H-Q12); under his U4H-JUDGE (c) it comes back to him alone.
+101. **TC's own weapon (the advisor's U4h brief check, ADV-U4HB-1 and -14; advisor-u4h-brief.md:66-75; filed
+     2026-11-21):** TC inherits CO's weapon (scene.rs:263, :236-243), whose 5,000 µrad spread the authority draws from
+     its own stream (world.rs:1622-1631): up to 15 cm a side on the plates at 30 m, which no client can reproduce, so
+     -48 and -51 could not pass. TC gets its own weapon: spread 0, damage 0 (every Hit kept, nobody dies; HEALTH holds
+     only 0 to 1,023: seam.rs:224), a magazine covering the run, all in every header (carry 60). It binds U4h2 if split
+     and every later TC run.
 28. **netcode F6 / rust 3:** "The ring's span is U4h's test cap plus its margin in ms, recorded; the room builds it with
     `HitHistory::for_ms(span_ms)` (no tick count is ever written for it), and the recording header carries the span."
 45. **NF-D4's U4h line (the advisor's U4s ruling, "Rulings (U4s)", NF-D4; added by the main session, the conditions

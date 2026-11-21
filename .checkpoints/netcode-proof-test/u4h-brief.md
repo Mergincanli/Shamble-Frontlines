@@ -1,4 +1,4 @@
-# U4h's brief, rev 2 (2026-11-20; rev 1 with the advisor's REVISE applied, advisor-u4h-brief.md:332-343)
+# U4h's brief, rev 2.1 (2026-11-21; rev 2 with the advisor's conditions met, advisor-u4h-brief.md:426-432)
 **The unit:** lag compensation and aim, u4-build-plan.md:903-918 (plan rev 3.3; size M). It builds after U4g, or after
 U4g2 if U4G-Q1 splits U4g, and after that unit's judged sets (one lane at a time: :951-952). Short by TEST-FIRST rule 3
 (history.md:2264-2267; his message :2236-2282): what U4h builds, how it is tested, what is open; the rest is pointed
@@ -17,6 +17,12 @@ change), in the first day's message after this rev is checked and U4G-Q1 is answ
   keeps the no-answer line. Item 7: one "Ruled" line each (section 8). Item 8, Lows: -10 the calibration's figure
   (section 2); -11 Q10; -12 section 9; -13 block 4's hand-off, block 7's frame wait, Q1's figure, the disk table's
   runs, 1.1's C2, section 9's after-close line, block 11's "differs". u4s-carries.md untouched: section 9 lists its lines.
+
+**Rev 2 to rev 2.1** (the advisor's rev-2 check, APPROVE WITH CONDITIONS, advisor-u4h-brief.md:364-483; the main
+session's edits, no new check needed if met as written): ADV-U4HB-14 (Medium), TC's health of 30,000 cannot ride the
+soldier record, so TC's weapon has damage 0, health stays 100 and the magazine covers the run (1.2, 1.3, block 1);
+Q6 and Q7 as ruled on rev 2 (block 13, section 8 items 6 and 7, section 9's after-close line); ADV-U4HB-15 (the
+judge's block), -16 (1.2), -17 (block 2's margin); the register's eight lines added (u4s-carries.md:618-659).
 
 ## 0. Where things are
 - **`<base>`:** the spike branch's head at launch, after U4g's (or U4g2's) merge and its sets, filled by the main
@@ -45,12 +51,13 @@ change), in the first day's message after this rev is checked and U4G-Q1 is answ
   before any set counts.
 
 ### 1.2 The lane
-- **Open:** crates/sim (TC's weapon and health in scene.rs; the two pub items of 1.4; -51's site; at most one
-  `with_*` scene builder by Q6); crates/room; crates/server (one accessor and its tests); crates/client (AimCast; the
+- **Open:** crates/sim (TC's weapon in scene.rs; the two pub items of 1.4; -51's site; one `with_*` scene builder
+  by Q6); crates/room; crates/server (one accessor and its tests); crates/client (AimCast; the
   flight and -54's site); crates/proto (one pub item: the aim's widths, private at proto/src/input.rs:53-54);
   crates/bots; crates/lab (recordings.json and det-recordings.json included); ops/runs (new c-u4h-*.mjs; det-u4.mjs's
-  print, INF-U4R-6); marks/SERIES.md (new rows, and the cells of Q2 and Q7). **crates/judge is not U4h's:** its blocks
-  J1-J3 are a change of their own under U4H-JUDGE (b), sharing no file with U4h.
+  print, INF-U4R-6); marks/SERIES.md (new rows, and the cells of Q2 and Q7). **crates/judge is not U4h's under U4H-JUDGE
+  (b)**, the lean: J1-J3 are then a change of their own, sharing no file with U4h; under (a) it is U4h's (the judge's
+  block, inside U4h between blocks 8 and 9: ADV-U4HB-16).
 - **Shut:** l1, link, net, log, client-wasm, hash-wasm; marks.json, marks/README.md, every other existing SERIES.md row;
   ADR 0001 and the catalogue (a word that changes goes on the readings-PR list); check.mjs; Cargo.toml, Cargo.lock. A
   file outside the lane stops the build for the main session.
@@ -58,7 +65,7 @@ change), in the first day's message after this rev is checked and U4G-Q1 is answ
 ### 1.3 What is there and what is new (read at 33dabe8)
 | Item | There now | New in U4h |
 |---|---|---|
-| TC | shooter, sprinting target, three plates (scene.rs:252-265), with CO's weapon (spread 5,000 µrad, 30 rounds, 2 s reload) and health 100 (:236-246, :263); the plates 30 m out (:338-342), the target about 20 m | TC's own weapon (spread 0) and health; the suites; no TC run exists yet |
+| TC | shooter, sprinting target, three plates (scene.rs:252-265), with CO's weapon (spread 5,000 µrad, 30 rounds, 2 s reload) and health 100 (:236-246, :263); the plates 30 m out (:338-342), the target about 20 m | TC's own weapon (spread 0, damage 0, a magazine covering the run; health stays 100); the suites; no TC run exists yet |
 | The ring | `HitHistory::for_ms`, at most 220 ticks (one tick at most 4,536 B) (sim/src/history.rs:23-39); `HISTORY_MS` 2,000, private (room.rs:33, :550); the lab's copy (scenario.rs:78-80) | the default made readable, the TC sets' test span (Q2) |
 | `rewind_at` | the integer half: the claim or `None`, counted (room/src/rewind.rs:13-33; room.rs:1359-1368) | the estimate, the tolerance, the cap (open, test, rule), each replacement and clip counted; the shot log |
 | The RTT | `Decoder::rtt_ns` by `RttSource` (server/src/pump.rs:183-190, :339-344); `pump_report` has none (room.rs:877-885), called by the lab (scenario.rs:704) and npt-server's tests (common/mod.rs:290, loopback.rs:213) | the RTT through `pump_report` from those callers; one accessor for a Link session's ping estimate |
@@ -73,24 +80,29 @@ change), in the first day's message after this rev is checked and U4G-Q1 is answ
   the client's AimCast both call (ADV-U4HB-6); the fire-origin height (`CHEST_CM` made pub, the lab's copy and
   `PLACEMENT_Z_BOUND_CM` giving way: EA-U4R-4, advisor-u4r-r1-full.md:182-186); the flags index and the dead bit
   (EA-B1-1's later half, u4r-report.md:1164-1165) if U4g's report does not list them; bites builds only, -51's list in
-  `CHECK_BITES`' form; a `with_*` scene builder only if Q6 needs one.
+  `CHECK_BITES`' form; Q6's one `with_*` stand-in builder.
 - **npt-room:** the default span made readable (carry 89); the cap setting (open, test with ticks, rule); `pump_report`
   gaining the RTT. **npt-server:** the ping-estimate accessor. **npt-client:** AimCast; the landing compare; `BITES`
   gains -54's id. **npt-proto:** the aim's widths. **npt-bots:** the new `Behaviour`s.
 
 ### 1.5 Blocks (each compiling with its tests passing before the next; at most about 400 added lines, a larger one split)
 **The lag-compensation half** (U4h under either answer to U4H-SIZE):
-1. **npt-sim:** TC's own weapon, spread 0, its interval, reach and damage as CO's, a magazine and reload the shooter
-   meets (it reads its own-state record: fires only with ammunition and no reload left, reloads at 0), and a health
-   the target never exhausts in a run (above damage x the run's shots: 30,000 at 3,000), both in every header (carry
-   60); the two pub items of 1.4; recordings.json's synthetic TC entry re-pinned only if its SHA-256 moves, with the
-   reason.
+1. **npt-sim:** TC's own weapon: spread 0 and damage 0 (the Hit is pushed before the damage is taken,
+   world.rs:1687-1696, so every hit still registers and nobody dies, the cheats and the target included), its interval
+   and reach as CO's, and a magazine that covers the run (AMMO holds up to 65,535: seam.rs:240), so no reload; TC
+   keeps CO's health 100 (HEALTH holds only 0 to 1,023: seam.rs:224; ADV-U4HB-14); the weapon's values in every header
+   (carry 60); the two pub items of 1.4; recordings.json's synthetic TC entry re-pinned only if its SHA-256 moves, with
+   the reason.
 2. **npt-room, the estimate:** the pump's RTT + the announced delay (U4g's clamp; for a session that sent no
    ClientSettings, `Interp`'s starting 3 intervals, u4g-brief.md:88) + the input-buffer wait, capped room-side at
    **min(LEAD-BOUND's 400 ms, the session's RTT + 3 tick periods)**, from the pump's RTT, the tick period and
    LEAD-BOUND alone, never a client figure (carry 90: an honest controller aims to arrive one period after its upper
    one-way estimate, which lies inside the RTT, then rounds up a tick and holds its target: client/src/lib.rs:634-646)
-   + half a tick; each capped wait counted (a new SERIES.md name). A session with no RTT yet: Q3.
+   + half a tick; each capped wait counted (a new SERIES.md name). A session with no RTT yet: Q3. **The cap's margin**
+   (ADV-U4HB-17): it holds an honest wait while the round trip's jitter is at most a third of it (true on P1 to P4
+   and B1, P1's slack about 10 ms; P0's slack 0, so "capped" means above the cap); the most a stamp-ahead can buy is
+   the cap less the honest wait, stated per profile for the security-auditor's read; the P0 pre-rows print capped
+   waits too.
 3. **npt-room, the rules:** the tolerance `TOLERANCE_NS` = 33,330,000 (data, ADR 0001:363), a claim within it of the
    estimate (inclusive) accepted, else replaced and counted; then the cap: `open` (the default) clips at the ring's
    reach (the span less the blend tick), `test` at its ticks, `rule` later, each clip counted; every run of a command
@@ -128,8 +140,11 @@ change), in the first day's message after this rev is checked and U4G-Q1 is answ
     a bit-equal point (both from `trajectory_at`); -54/step-1-60's site.
 12. **npt-bots:** the plate shooter (ground, 2.5 m, 4 m; press edges), the thrower, the brawl's ES-only seeded hit rule
     (carry 93).
-13. **npt-lab and ops:** the suites `aim-height` and `throws` (TC's stand-in spawner on at a rate in the header: Q6),
-    `--cover` on SS (Q9), their writers and contract cases, carry 93's ES rows, the sets.
+13. **npt-lab and ops:** the suites `aim-height` and `throws` (the stand-in spawn rate set by Q6's one `with_*`
+    builder in `with_stand_ins`' form, scene.rs:328-331, used by `throws` alone, its values in the header, so TC's data
+    stays as it is for -48, -50, -51 and the synthetic TC entry; the pre-run prints each kind's compared count, the
+    stand-ins spawning inside the TC client's 64 m set), `--cover` on SS (Q9), their writers and contract cases, carry
+    93's ES rows, the sets.
 14. **The end checks** (section 3), after each half if split.
 
 **The judge's change** (J1-J3; its own small change under U4H-JUDGE (b), the lean; inside U4h between blocks 8 and 9
@@ -138,7 +153,9 @@ under (a); not built under (c)): **J1** `view_hit_registered_share` and `false_h
 route, u4-build-plan.md:435-436); **J2** `cross_arch_mismatch_count`'s shot view-test and throw-landing kinds
 (SERIES.md:265), on fixtures; **J3** JDG-ONLY-1's fix with its interim rule's fixture (history.md:4611-4614). PASS,
 FAIL and gap fixtures for each; the test-engineer's and rust-reviewer's read of every line, named in the report with
-marks.json's sha256 before and after (history.md:2127). Only U4h's judged sets wait for it.
+marks.json's sha256 before and after (history.md:2127). Only U4h's judged sets wait for it. The judge's change writes
+no SERIES.md line: the shot id's row is U4h's (block 7), and J1's fixtures follow its wording, (shooter slot, firing
+command's sequence), whichever merges first (ADV-U4HB-15).
 
 ## 2. Marks moved and the runs (the main session's, after the merge, in the main folder)
 | Mark (marks.json) | L1 parts (`min`) | Suite, scene | Measured | Bites (site; run) | What it reads |
@@ -239,7 +256,7 @@ marks.json's sha256 before and after (history.md:2127). Only U4h's judged sets w
 | room: estimate, wait cap 20-50, rules, open cap 30-70, shot id 20-50, reruns, no-RTT, span, shot log, sites, tests / plates' error writer | 620-1,120 | 60-120 |
 | server: the accessor 10-30 and the tests' hand-off | 30-90 | 0 |
 | client: AimCast on the shared cast, tests / landing compare, -54's site, tests | 120-250 | 100-200 |
-| sim and proto: TC weapon and health 20-60, the pub items 30-80 / -51's site, aim widths, a scene builder 5-20 | 50-140 | 50-140 |
+| sim and proto: TC weapon 20-60, the pub items 30-80 / -51's site, aim widths, a scene builder 5-20 | 50-140 | 50-140 |
 | bots: shooter, sprint, edges 10-30, cheats' forms 15-35, the brawl's stamp 15-40, tests / plate shooter, thrower, ES rule, tests | 390-705 | 150-300 |
 | lab: suites, calibration, rewind-cheat, ws, params, shot id 20-50, prints 15-35, hand-off, re-pins, recording, contract, tests / two suites, cover on SS 15-40, writers, ES rows | 645-1,115 | 315-590 |
 | ops: both scripts, det-u4's print, Q3/Q8 rows 20-40, Q10's row 10-20, the brawl row 10-20 / their rows, cover rows 10-30 | 210-380 | 70-150 |
@@ -279,13 +296,12 @@ U4H-SIZE; each folded above):
    `TOLERANCE_NS` 33,330,000 with the boundary test; the short P1 edge run expects 0 replaced and gains within one
    view-time step (about 130 µs) of the edge (it may read the room's estimate through the lab: the strongest cheat);
    the bite's alternating setting run clean in the pre-runs; the delayer stamps as a client that believed its ping RTT.
-6. **U4H-Q6, -54's kinds. Ruled** (:182-185): both, 1,000 each; `throws` turns TC's stand-in spawner on at a rate in
-   the header; a kind with fewer than 1,000 a run comes to the advisor. **For the advisor's check:** Scene's fields are
-   crate-private (scene.rs:100-135), so a rate for one suite needs one builder in `with_stand_ins`' form (:328-331), a
-   few lines of sim code; else the rate becomes TC's own data in every TC run.
-7. **U4H-Q7, the pong gap's sign. Ruled** (:186-190): (a); the one SERIES.md edit corrects :86, :396's writer cell and
-   :450's `cap` values. **For the advisor's check:** :211's writer cell (npt-room) for `frame_wait_ns`, which the lab
-   writes from the shooter's frame record (block 7), would join the same edit.
+6. **U4H-Q6, -54's kinds. Ruled** (:182-185, and on rev 2 :398-403): both, 1,000 each; the stand-in spawn rate set by
+   one `with_*` builder in `with_stand_ins`' form (scene.rs:328-331), used by `throws` alone, its values in the header
+   (block 13); a kind with fewer than 1,000 a run comes to the advisor.
+7. **U4H-Q7, the pong gap's sign. Ruled** (:186-190, and on rev 2 :404-406): (a); the one SERIES.md edit corrects :86,
+   :396's writer cell, :450's `cap` values and :211's writer cell for `frame_wait_ns` (npt-lab writing into the room
+   log's shot event, L1), with test-engineer's read.
 8. **U4H-Q8, the TC shooter's aim. Ruled** (:191-193): (c): half the presses at the target box's centre, half at a
    seeded offset uniform within ±2 half-widths of it across the line of fire (half of those miss: about 1,500 view hits
    and 500 view misses a 2,000-shot run), the band recorded in the header (a new name), never tuned after a run.
@@ -352,8 +368,8 @@ My lean, and the advisor's: (b). Only U4h's judged runs wait for it.
 - Nothing else is his: no money, nothing on main, no run day (all runs are L1 in this container).
 
 ## 9. For the main session before launch
-- **The register** (advisor-u4h-brief.md:217-231; u4s-carries.md's U4h section, the next free numbers, each quoting
-  its source as ruling 3's task (a) did; the plan's U4h entry needs no line):
+- **The register: DONE 2026-11-21** (u4s-carries.md:618-659, entries 94-101, copied word for word from
+  advisor-u4h-brief.md:441-482 by add_u4h_register.py; the list below is what they cover):
   1. N2-L3 (b), "U4h must blend composed boxes or interpolate hull yaw wrap-aware" (u4d-round2-netcode.md:81-82; routed
      by advisor-u4d-close.md:305-306); met by the shared blend-and-cast.
   2. INF-U4R-6 with INF-R2-2 (advisor-u4r-r1-full.md:289; advisor-u4r-r2-full.md:45, its base and route words); met by
@@ -366,4 +382,5 @@ My lean, and the advisor's: (b). Only U4h's judged runs wait for it.
   7. JDG-ONLY-1 (history.md:4611-4614): the judge's change (J3; U4H-Q12).
   8. ADV-U4HB-1, TC's weapon: a carry line of its own, so U4h2 (if split) and R3's TC runs inherit it.
 - **After the close (rule 1's list):** -48's report row "the run's largest measured rewind, rounded up" (marks.json:9413)
-  predates T14's calibration; its wording is marks.json text, his.
+  predates T14's calibration; its wording is marks.json text, his. Beside it (Q7 on rev 2): -49's frame-wait report
+  reads process `room` (marks.json:9961-9969), which on L2 no room can write: marks.json text, his.
