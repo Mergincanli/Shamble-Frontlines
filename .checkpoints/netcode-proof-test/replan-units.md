@@ -3,7 +3,7 @@ Rule: Mustafa's NPT-TRIM (history.md:7561-7593), over plan rev 3.3 where they di
 tests); "likely" = the estimate x 1.35-1.5 (u6-brief.md:109). `row` = plan.md:1253 (U6's row).
 
 ## 0. Plan (a restart continues after the last block marked DONE)
-1 U6 cut DONE · 2 one WT crate DONE · 3 certificate PENDING · 4 U7 PENDING · 5 U8 PENDING · 6 promote PENDING ·
+1 U6 cut DONE · 2 one WT crate DONE · 3 certificate DONE · 4 U7 PENDING · 5 U8 PENDING · 6 promote PENDING ·
 7 path to R1 PENDING.
 
 ## 1. U6, cut (DONE)
@@ -82,8 +82,45 @@ SIZE-CHECK's 6,000 at 1.5x.
   u6-facts.md:126-128). wtransport's self-signed helper is not needed: rcgen is in the lock (u6-facts.md:286-287).
 - **What stays built:** the `wt-wtransport` feature and U3's tests as they are; U6 builds nothing new on it.
 - **Must a kept run compare both?** No. -30 compares WebTransport with WebSocket (`params.transport`, row C-U6-9), not
-  crates. PM-0001-28 runs on ML*, MAC-r and R4 (marks.json `where`), none kept; -35 moves with U5 (NPT-TRIM).
+  crates. PM-0001-28 runs on ML*, MAC-r and R4 (marks.json `where`), none of R1, R2, R3, R5; -35 moves with U5.
 - **PM-0001-28 and R2-TRN-OQ1:** -28's text needs both crates in every browser (ADR 0001:1620), so one crate cannot pass
   it here: it MOVES to the real game's transport change-set, unchanged, and R2-TRN-OQ1 stays open until it runs there.
   Every header names the crate, and R1's smoke results go to that change-set as evidence, not a verdict. PM-0001-35
   (:1627) moves with U5.
+
+## 3. The certificate behind the firewall: DNS-01 by hand (DONE)
+**Sources.** HTTP-01 "can only be done on port 80", TLS-ALPN-01 runs "via TLS on port 443", DNS-01 is a TXT record at
+`_acme-challenge.<domain>` and suits servers "not exposed to the public internet"; DNS API credentials on a server raise
+"the impact if that web server is hacked" (https://letsencrypt.org/docs/challenge-types/). Let's Encrypt does not
+"publish a list of IP addresses we use to validate, and these IP addresses may change at any time", and validates "from
+multiple network perspectives" (https://letsencrypt.org/docs/faq/). `shortlived`: ~160 h, authorizations reused 7 h,
+still a CRL URL (https://letsencrypt.org/docs/profiles/). Cloudflare TXT records "are always DNS-only"
+(https://developers.cloudflare.com/dns/proxy-status/). instant-acme 0.8.5 gives the TXT value
+(`KeyAuthorization::dns_value`, https://docs.rs/instant-acme/0.8.5/instant_acme/struct.KeyAuthorization.html).
+`serverCertificateHashes`: X.509v3, ECDSA P-256, no RSA, "a validity period of less than 2 weeks", secure contexts only
+(https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/WebTransport); Chrome and Edge 100, Firefox 125, Safari
+26.4 (https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/WebTransport.json; spec:
+https://www.w3.org/TR/webtransport/#certificate-hashes). The WebSocket constructor has no hash option (URL and
+protocols only: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket). All high confidence.
+**Weighed.** HTTP-01 or TLS-ALPN-01: unlisted, changing validators mean port 80 (or 443) open to every address per
+order, so `fw-rs` keeps "TCP 80 from any" with nftables gating it (plan.md:913, :961), plus a root wrapper editing
+nftables and a responder: automatic, but a hole to the world and more code. DNS-01 with an API token: a secret on RS or
+the laptop (plan.md:986 rejects it; no session handles secrets). `serverCertificateHashes` alone: WebTransport only, and
+it needs an HTTPS page, so the page and `wss` still need a browser-trusted certificate; it stays for the WT leg
+(plan.md:991-996). DNS-01 by hand (plan.md:989's fallback, promoted): nothing inbound opens; the only credential is his
+own Cloudflare login with two-factor (plan.md:869), which no session sees; the TXT value is public by nature.
+**Recommendation: DNS-01 by hand; the HTTP-01 window is the fallback.** Inbound: nothing opens; `fw-rs` loses TCP 80
+(plan.md:922). Outbound: `npt-cert issue` (root wrapper, no free arguments) opens npt-host's egress to the ACME host and
+DNS for one order and closes it after (plan.md:961's window, minus the port). Per order:
+1. Laptop session: the CT ledger check (plan.md:976-981); `sudo npt-cert issue staging|production` on RS, which opens a
+   fresh ACME account (no secret kept: plan.md:975) and prints the TXT name `_acme-challenge.rs.nt` and its value.
+2. Mustafa, in Cloudflare: add that TXT record, TTL 1 min (about 2 minutes).
+3. The wrapper polls Cloudflare's authoritative servers directly until they show the value (at most 30 min, no retry
+   loop: plan.md:949-951, :972-973), readies the challenge, requires `shortlived` in production (fails closed:
+   plan.md:966-967), writes the key 0640 and the chain, closes egress, prints serial and hash for the ledger.
+4. Mustafa deletes the TXT record; the laptop session confirms its absence over DNS-over-HTTPS (as plan.md:898-899).
+R1: staging, then production (two edits inside its 0.25 h block, plan.md:818); R2, R3, R5: one each at bring-up, when
+he is there to create the VMs (plan.md:879-886). No `revoke`: the key faces no stranger, lives 6 days, dies with the
+VM, and the DNS record goes at teardown. The WT certificate: made by the room at start (U6-Q17, u6-brief.md:183), ECDSA
+P-256, valid 13 days (MDN reads "less than 2 weeks"; plan.md:992's "at most 14" sits on the edge), its hash in
+`/npt/cert-hash.json` over the trusted name (plan.md:994-995).
