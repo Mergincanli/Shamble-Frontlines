@@ -486,3 +486,41 @@
 - End of part A2: free 7,712,194,560 B; size +2,144 -190 tracked, forged.rs 422: about 2,566 added (under the
   advisor's 2,800). No code changed after F-G's snapshot (eb7c42c6…); the reader script is scratch in this folder.
   FP-2 not built.
+
+## Block 10: part B (FP-2 and the re-runs)
+- Mustafa's F-B-COUNT answer, (a) (history.md:7544-7551, 2026-11-21 19:42:15 UTC, as the coordinator quotes it): "Leave
+  kind 7's presses out of that count when the server's own state shows its soldier dead as that command or the one
+  before it ran; report the number left out beside the check on every run." FP-2 by advisor-u4f2-r1.md:404.
+- Checked first (2026-11-21): `git status --short` the 13 tracked files, the notes, the reader script and forged.rs;
+  no plant in place (bots lib.rs c99a6e0a…, scenario.rs 501d7984…, forged.rs 9cedb01b…, room input.rs efadaeb2…, each
+  its last restore hash); the snapshot eb7c42c6… as taken. Free 8,594,583,552 B. The shared target's debug profile was
+  cleaned by the main session (about 19:50 UTC), so the first debug build starts empty.
+- One design point, said before the build: T-K7 lives in npt-bots, which cannot reach npt-lab's attribution (npt-lab
+  is a binary crate that depends on npt-bots). So the window's rule is one pure function in npt-bots
+  (`kind_7_left_out`), which npt-lab's attribution calls (as it already calls `npt_bots::fire_rest_at`) and T-K7
+  applies to its own World flags: one plant on that function ("the window ignored") fails both the f33 case and T-K7.
+- **FP-2: DONE.**
+  - bots lib.rs: `pub const fn kind_7_left_out(dead_at_d: bool, dead_before: Option<bool>) -> bool` (`dead_at_d ||
+    dead_before == Some(true)`; `None` when d - 1 never ran), its doc quoting his words. T-K7 now classifies each item
+    by it (`ran_dead[j - 1]` as an `Option`), asserts every item outside the window carries its record (unrejected 0)
+    and prints `dead_left_out`; its doc names both plants.
+  - forged.rs: per forger `recent` (kind 7's last 4 runs, each (seq, dead before that tick's command phase), the first
+    run of a sequence only) and `left_out`; `tick` takes `dead: &[u8]`; at a kind-7 command's first run, an item is
+    left out when `kind_7_left_out(dead now, the run of seq - 1)`; `unrejected` for kind 7 skips left-out items;
+    `sent_count` = items less left-out; `dead_left_out_count` on every record (0 for the others); the module text.
+    `measured_sent_count` is unchanged (the ruling leaves out of `sent_count` and `unrejected_count` only).
+  - scenario.rs `run`: `dead_before` (the forger slots whose Soldier record reads health 0 after each tick, so before
+    the next tick's command phase; empty at the start) passed to `tick`; f16 asserts `dead_left_out_count` 0 beside the
+    unrejected and dropped counts.
+  - SERIES.md: one new row in U4f2's subsection, `event.forged_kind.dead_left_out_count`; no existing row changed.
+  - New lab test `fp2_kind_7_items_run_dead_at_d_or_d_minus_1_are_left_out_and_counted_apart` (items 2, 4, 6, 8, 10;
+    dead at the runs of 2 and 3; 9 never runs; records on 8 and 10): sent 3, unrejected 1, left out 2.
+- R1 (u4f2-fp2-tests.log, `-x -k`, tree diff 4e15fbde…): fmt exit 0; the fp2 case alone PASS 0.00 s; T-K7 alone
+  PASS 1.83 s ("dead_left_out 3": n 12 and 576 dead at d, n 588 dead at d - 1; cases unchanged [46, 2, 1, 1, 1]);
+  forged:: 19 PASS; f16 x 24 + f28 x 7: 31 PASS (77.38 s).
+- FP-2's plant (the window ignored: `false && (…)` in `kind_7_left_out`): u4f2-fp2-plant.log, one `-x -k` call: the
+  fp2 case FAILS by name at forged.rs:463 ("sent, unrejected, out": [5, 3, 0] against [3, 1, 2]); T-K7 FAILS by name
+  at lib.rs:2101 (unrejected outside the window: n 12, 576, 588). Restored by Edit, 61733681… equal (clean forged.rs
+  9145856b…, scenario.rs f1e1166d…).
+- SIZE-CHECK after FP-2: +2,168 -190 tracked; forged.rs 475 (`wc -l`): about 2,643 added (+77), under the advisor's
+  2,800 and Mustafa's 3,000.
