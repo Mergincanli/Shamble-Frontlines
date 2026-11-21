@@ -180,8 +180,8 @@
   U4f2's merge and -21's set: -58's 3 counters then; F4 room.rs:1033-1034. **Size line:** prediction half ~2,100-3,700 (stop 6,000).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
-  **Check-in paused 09:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; on again when an agent starts); saver bd076oo6q from
-  08:34 (to about 10:34); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38).
+  **Check-in paused 09:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; on again when an agent starts); saver stopped
+  10:24 (no agent runs; restart it with the next one); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in
