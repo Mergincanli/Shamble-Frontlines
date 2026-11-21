@@ -175,13 +175,13 @@
   **U5-ALLOC and U5-SIZE are his** (final texts, section 8; neither a stop): in the next day's message (2026-11-22's),
   with the U4H texts if his U4G-Q1 answer has come. Register lines before U5's launch (section 9). S's letter: U4b 701
   (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
-- **U4G-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u4g-early.md, read whole): blocks 1-4 now; fill u4g-brief.md §9
-  (`<base>` 8f9d97d, 1faf894's code, 642/739, 1,207 s). **Size line:** prediction half ~2,100-3,700 (stop past 6,000);
-  blocks 1-4 ~1,120-1,920 (past ~2,900: advisor). Builder 07:00 (agent-abc25909b7dd4ad30); at F-B-COUNT stop it first.
-- **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
-  16:19; back at once); read it with Read/Grep. **Check-in on again 06:43 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause
-  it when no agent runs); saver bqiy6tzo9 from 06:43 (to about 08:43); the 2026-11-22 message at 23:05 UTC
-  (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38 UTC).
+- **U4G-EARLY APPROVED W/ CONDITIONS 1-10** (advisor-u4g-early.md): builder from 07:00 in .claude/worktrees/agent-abc25909b7dd4ad30
+  (ff to b25ee7d 07:03); fill u4g-brief.md §9 (`<base>` 8f9d97d, 1faf894's code, 642/739, 1,207 s). **Size line:**
+  prediction half ~2,100-3,700 (stop past 6,000); blocks 1-4 ~1,120-1,920 (past ~2,900: advisor). F-B-COUNT: stop it first.
+- **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
+  main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
+  **Check-in on again 06:43 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver bqiy6tzo9 from
+  06:43 (to about 08:43); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in
