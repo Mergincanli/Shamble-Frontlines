@@ -74,7 +74,7 @@ Task: security-auditor DEP-HOLD dependency read for U5's early start (netcode pr
   depends on the advisor's ruling on SEC-U5D-1 below (if he counts fuzz_target!'s no_mangle as a fifth exception the
   sentence changes, again a comment-only re-read).
 
-### B2 (item 2: libfuzzer-sys 0.4.13) IN PROGRESS
+### B2 (item 2: libfuzzer-sys 0.4.13) DONE
 - Manifest (registry src Cargo.toml): edition 2018; license "(MIT OR Apache-2.0) AND NCSA"; deps arbitrary "1";
   build-dep cc 1.0.83 features ["parallel"]; features default = ["link_libfuzzer"]; dev-deps flate2, rand (not
   resolved for a dependent). .cargo_vcs_info sha1 719e4efb9b8857ebaa782ae59376c8cbb78fed0f.
@@ -117,3 +117,95 @@ Task: security-auditor DEP-HOLD dependency read for U5's early start (netcode pr
   expand `#[export_name] pub unsafe fn` with from_raw_parts(_mut) on raw pointers INTO THE CALLER'S CRATE, also silent
   under the forbid. Not needed by U5's targets. Fix: U5 uses fuzz_target! only; check.mjs's fuzz/ scan (U5-Q7 term 1)
   refuses `fuzz_mutator!`/`fuzz_crossover!` (and any other libfuzzer_sys macro) by name.
+- Sources for SEC-U5D-1 (read 2026-11-21): (1) rustc book, allowed-by-default lints, unsafe-code: "The `unsafe_code`
+  lint catches usage of `unsafe` code and other potentially unsound constructs like `no_mangle`, `export_name`, and
+  `link_section`." https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html (high). (2) rustc source,
+  rustc_lint_defs/src/builtin.rs:5671-5708 (nightly docs): `pub UNSAFE_CODE, Allow, "...", @eval_always = true`, no
+  report_in_external_macro. https://doc.rust-lang.org/nightly/nightly-rustc/src/rustc_lint_defs/builtin.rs.html
+  (high). (3) rustc_middle/src/lint.rs:441-476 (emit_lint_base_impl): a lint whose primary span is in an external
+  macro returns without emitting unless future-incompatible (non-edition), report_in_external_macro or find_attr; the
+  level (deny/forbid) is not consulted. https://doc.rust-lang.org/nightly/nightly-rustc/src/rustc_middle/lint.rs.html
+  (high). (4) Lint struct doc: report_in_external_macro "`true` if this lint is reported even inside expansions of
+  external macros." https://doc.rust-lang.org/nightly/nightly-rustc/rustc_lint_defs/struct.Lint.html (high).
+  That the no_mangle check reports at the attribute's span (inside the expansion) and that the 2018-edition tokens pass
+  edition 2024's unsafe-attribute rule: medium confidence (reasoned from rustc's span rules, not run: no build allowed
+  here); Block 3's `cargo check` of a target shows both.
+- libfuzzer-sys's own dependencies: arbitrary 1.5.0 (B3) and the build-side cc 1.11.1, jobserver 0.1.35, libc, shlex,
+  find-msvc-tools: all already in the workspace lock at the same checksums (cc already builds ring's C here).
+- Verdict item 2: CLEARED WITH CONDITIONS: CUSTOM_LIBFUZZER_PATH / CUSTOM_LIBFUZZER_STD_CXX unset for every fuzz
+  build; RUST_LIBFUZZER_DEBUG_PATH and libFuzzer's artifact/corpus output kept under .gate/ or the fuzz crate's
+  gitignored dirs (never the public notes folder); fuzz_target! only (SEC-U5D-3); SEC-U5D-1 to the advisor before Block 3.
+
+### B3 (item 3: arbitrary 1.5.0) DONE
+- Manifest: edition 2021, rust-version 1.71.0, license "MIT OR Apache-2.0", `build = false` (no build script; no
+  build.rs in the package), one optional dependency derive_arbitrary ~1.5.0 behind feature `derive` (OFF: not in the
+  fuzz lock, and libfuzzer-sys's `arbitrary-derive` feature is not requested), dev-dep exhaustigen (not resolved). So
+  no proc-macro runs at compile time.
+- unsafe: 5 sites, all inside its own crate with SAFETY comments: CString::from_vec_unchecked after removing NULs
+  (src/foreign/alloc/ffi/c_str.rs:16), str::from_utf8_unchecked on a valid_up_to() prefix (src/foreign/core/str.rs:25),
+  array building over MaybeUninit with a drop guard (src/foreign/core/array.rs:32, :53, :59). No #[macro_export], no
+  no_mangle/export_name/extern "C"/link_section, no std::fs/std::env/std::process; std::net only for Arbitrary impls of
+  address types (src/foreign/std/net.rs:3), no socket use. Nothing expands into the caller's crate.
+- Verdict item 3: CLEARED.
+
+### B4 (item 4: the tools) DONE
+- Integrity: each .crate in the registry cache hashes (sha256sum) to the crates.io index's cksum (index cache parsed
+  by scratchpad idx.py), none yanked: cargo-fuzz 0.13.2 5acfd019...00e2, cargo-deny 0.22.0 8372c38e...1446,
+  cargo-audit 0.23.0 956f85ae...6446 (also libfuzzer-sys a9fd2f41..., arbitrary 3bc62ac9..., not yanked).
+- cargo-fuzz 0.13.2 (MIT OR Apache-2.0; edition 2021; `build = false`; vcs 984c861c8dfe...). Published Cargo.lock: v4,
+  101 packages, all crates.io with checksums, 10 also in the workspace lock (same checksum), 91 new; no cc/cmake/-sys
+  crate: no native C at install; build scripts are the rustc-probe kind (proc-macro2, serde/serde_core/serde_json,
+  libc, rustix, anyhow, thiserror, num-traits/autocfg, ...); proc macros clap_derive, serde_derive, thiserror-impl.
+  No HTTP client in the graph: no network at run time. Its own source has no unsafe. Run time (src/project.rs): spawns
+  `cargo build/run --manifest-path fuzz/Cargo.toml --target <host> --release --config profile.release.debug=...`
+  (:137-175) with RUSTFLAGS = its sancov flags + `--cfg fuzzing` + (if not release) -Cdebug-assertions, then the
+  caller's RUSTFLAGS appended (:176-308); `rustc --print sysroot` (:1097-1098), `cargo metadata --no-deps` (:1142),
+  the target binaries, llvm-profdata/llvm-cov for coverage. Default sanitizer = address (src/options.rs:82-84:
+  -Zsanitizer=address on nightly; runtime ships in rust-std). `cargo fuzz init/add` write templates and APPEND a
+  [[bin]] to fuzz/Cargo.toml (project.rs:120-134).
+- FINDING SEC-U5D-4 (Medium): cargo-fuzz 0.13.2 never passes --locked (project.rs:137-175: no locked option in
+  BuildOptions, src/options.rs:55-135), and cargo has no config or env key for --locked (cargo config reference: only
+  net.offline / CARGO_NET_OFFLINE, which is --offline; read 2026-11-21, https://doc.rust-lang.org/cargo/reference/config.html,
+  high). So fuzz/Cargo.toml:2-3's "with --locked" does not hold for `cargo fuzz build/run`: after any fuzz manifest
+  edit, cargo re-resolves fuzz/Cargo.lock silently (offline from the registry cache under the runner, online
+  outside it) and builds it before any read; DEP-HOLD's script catches the lock only at push. Exploit sketch: a
+  manifest edit (or `cargo fuzz add`) during Block 3+ builds an unread dependency into the fuzz binaries. Fix: the
+  runner, before every cargo-fuzz call, asserts fuzz/Cargo.toml's and fuzz/Cargo.lock's sha256 equal
+  dependency-check.md's lines and that `cargo +1.99.1 tree --locked --offline --manifest-path fuzz/Cargo.toml` exits 0,
+  and re-hashes the lock after; or builds the targets with plain `cargo +nightly-2026-11-01 build --locked` and
+  cargo-fuzz's flags. Never `cargo fuzz init` / `cargo fuzz add` (they write the manifest).
+- Also for cargo-fuzz: never --build-std / --careful / --sanitizer=memory (they pass -Zbuild-std: std's own crates.io
+  dependencies, outside both locks and this read, plus rust-src, which the minimal profile lacks); --target-dir under
+  .gate/ or the shared target (default would be fuzz/target inside the repo); corpus and artifacts outside the public
+  notes folder.
+- Verdict cargo-fuzz 0.13.2: CLEARED WITH CONDITIONS (SEC-U5D-4's runner check; the flags above).
+- cargo-deny 0.22.0 (MIT OR Apache-2.0; edition 2024, rust-version 1.95.0; `build = false`; bin src/cargo-deny/main.rs;
+  scripts/ not built). Published Cargo.lock: v4, 188 packages, all crates.io with checksums, 88 in the workspace lock
+  (same checksum), 100 new. Native at install: ring 0.17.14 (a direct dependency: C + asm via cc 1.11.2; the same ring
+  version the workspace locks) and zstd-sys 2.1.3+zstd.1.5.7 (via spdx's detection features -> zstd: compiles zstd C
+  with cc, may probe pkg-config). ureq/rustls/webpki-roots are dev-dependencies only (not built by install); tame-index
+  default-features off (no HTTP). Own unsafe: from_utf8_unchecked and an mmap (src/bans/*.rs, src/advisories/helpers/
+  db.rs:332, src/lib.rs:76): its own crate, a tool. Run time: spawns `cargo metadata` (src/cargo-deny/common.rs:449)
+  and the `git` CLI for the advisory DB (src/git.rs:69,:138,:165): `git clone --depth=1 --branch <b>` of
+  https://github.com/RustSec/advisory-db (src/advisories/helpers/db.rs:11) or, if present, `git -C <db> reset --hard`
+  + `fetch --depth=1` + `reset --hard FETCH_HEAD` in the DB folder; `--disable-fetch` skips it. Our deny.toml sets no
+  db-path/db-urls (defaults under CARGO_HOME). Condition: never point db-path at a folder in the repository or a
+  worktree (the tool runs `git reset --hard` there).
+- Verdict cargo-deny 0.22.0: CLEARED (for Block 8), with the db-path condition.
+- cargo-audit 0.23.0 (Apache-2.0 OR MIT; edition 2024, rust-version 1.88; `build = false`; default feature
+  binary-scanning: object, rustc-demangle, syn 3). Published Cargo.lock: v4, 363 packages, all crates.io with
+  checksums, 119 in the workspace lock (same checksum), 244 new: the largest surface here. Native at install:
+  aws-lc-sys 0.45.0 (AWS-LC C + asm; by aws-lc-rs 1.18.1 <- rustls 0.23.46's default provider, quinn-proto 0.11.18,
+  rustls-webpki 0.103.16; its builder uses cc on x86_64 Linux, cmake only as fallback, pregenerated bindings; probes
+  `nasm -version`, `bindgen --version`; docs.rs source of builder/main.rs read 2026-11-21, helper modules not read:
+  medium) and ring 0.17.14. Network graph: rustsec 0.34.0 -> gix 0.90 (git over HTTPS via reqwest 0.13.5 + rustls +
+  rustls-platform-verifier) and tame-index 0.26.3 (crates.io sparse index via reqwest); quinn 0.11.12 in the graph
+  through reqwest. Run time: fetches the advisory DB by git (default on; `--no-fetch`, src/commands/audit.rs:118-124;
+  `--db <path>`, :88; `--url`, :145; staleness check unless `--stale`, :126-128) and, for the yanked check, updates
+  the crates.io index (src/auditor.rs:77-96; `--no-yanked` skips, :114-116). No secrets sent (a User-Agent naming the
+  tool). Condition: install only for Block 8 (condition 3 as ruled), one install at a time with its build directory
+  under .gate/ or removed after (N4: AWS-LC's build is the largest; same disk as the repo).
+- Verdict cargo-audit 0.23.0: CLEARED (for Block 8), pending B6's advisory check of its lock (aws-lc-sys 0.45.0,
+  rustls-webpki 0.103.16, quinn-proto 0.11.18 are older than or equal to the workspace's).
+- Next: B5 (nightly), B6 (advisories: shallow clone of advisory-db into the scratchpad, data only, then a version match
+  of every package in the 2 spike locks and the 3 tool locks).
