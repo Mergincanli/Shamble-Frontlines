@@ -148,3 +148,6 @@ U5's early builder, first stint: Block 0 only (u5-brief.md :101-120, narrowed by
 - Block 2's sim half DONE (17:57 UTC). Added lines 1,322 (Block 1's 1,177 + 145; fuzz lock apart), under the S line
   (about 1,400). Next: snapshot 2, then STOP before Block 3 (it waits for SEC-U5D-4's guard rev 4 and its plant test,
   the main session's) and return.
+- Snapshot 2 (17:58 UTC): wip/u5-early.patch, base bd88fa7, 146,889 B, 13 files, notes copied; sha256
+  303972b91a95ede8503cfcaf68736d996a7eba27ee82d2382241a873aa32ff12 (replaces snapshot 1's 7d19c5e3… at that path).
+  df at the stop 8,966,193,152 B. STOPPED before Block 3.
