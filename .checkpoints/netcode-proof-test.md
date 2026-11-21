@@ -20,8 +20,8 @@
   without him" and named in that day's message. Still his: pass marks, the judge, marks.json, money, main, the plan's
   stops and run days. This card at most 200 lines; a workflow only for the rules' review rounds and truly parallel
   work; a brief says what is built, how it is tested, what is open, and points to the rest. Ultracode off; effort max.
-- **KEEP-PROGRESSING, 2026-11-20 22:37 Amsterdam (history.md:7402-7410):** while F-B-COUNT waits (his Advisor answers
-  in about two days), all plan work that does not wait on it goes on; a very important question that needs his answer
+- **KEEP-PROGRESSING, 2026-11-20 22:37 Amsterdam (history.md:7402-7410):** while F-B-COUNT waits (his Advisor: out of
+  usage until Tuesday, his words of 2026-11-21 13:17 UTC at :7507-7509), all plan work that does not wait on it goes on; a very important question that needs his answer
   may go to him in the chat when it arises; everything else stays in the day's one message.
 - **Kept exactly (TEST-FIRST):** every pass mark and its number; the judge and marks.json; the planted-bug checks; a
   reviewer's read on every marks.json or judge change; at most two review rounds (a third only for a Critical or High);

@@ -7503,3 +7503,7 @@ Things that are very important which needs an answer: you can ask me
   or run count changes. U4f2 holds advisor-u4f-stop.md:80-89's list (f28's two B halves with it: R3 (ii)); its short
   brief goes to the advisor before its build; its size line by SIZE-CHECK (its plan entry states it; the card writes it
   with its source before its first snapshot). -21 is judged only after U4f2.
+
+## Mustafa, 2026-11-21 about 13:17 UTC (14:17 Amsterdam), in this chat: his personal account is out of usage until Tuesday (word for word)
+I am out of usage in my personal account, hence the reason I can't answer until Tuesday. 
+Is it possible for you to continue working further, or is this a hard checkpoint?
