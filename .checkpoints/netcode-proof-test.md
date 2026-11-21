@@ -160,24 +160,24 @@
   2 (netcode, test, rust), R6, the merge, the r2 rows and -21's set; any U5 builder yields first (U5-EARLY cond. 6).
 - **U4h's brief rev 2.1 READY** (u4h-brief.md; rev-2 check's conditions met; register 94-101, u4s-carries.md:618-659).
   **U4H-Q4, U4H-SIZE, U4H-JUDGE** (section 8) are in the 2026-11-22 message's draft (msg-2026-11-22.md); none a stop.
-- **U6's brief rev 1 written 17:5x** (u6-brief.md; facts u6-facts.md, 369 lines): ~9,500-10,000 lines, so four sub-units
-  U6a-U6d + U6j (judge); U6-SIZE and U6-JUDGE his (texts in its section 8); to the advisor's check next.
-- **U5's brief rev 2.1** (u5-brief.md): rev 1 REVISE (advisor-u5-brief.md:1-322), rev 2 with option (a)'s per-type bars
-  (u5-alloc-bounds.md at rustc 1.99.1: Input 256, SessionControl 480, RoomControl 272, Snapshot at most 155,952 through
-  the client, FullState 2,213,272, the rest 0), rev 2.1 by the rev-2 check (:324-430). **U5-ALLOC and U5-SIZE are his**
-  (section 8): in the 2026-11-22 message with the U4H texts. S letter: U4b 701 (411eeee), U4f-F1 239.
+- **U6's brief rev 2 written 18:1x** (u6-brief.md; facts u6-facts.md; rev 1's check advisor-u6-brief.md: APPROVE WITH
+  CONDITIONS 1-9, ADV-U6B-1 High met by the recount: 11,200-12,450 in U6a-U6d + U6j; rulings filed as register 112-119);
+  its sections 1, 6, 8 to the advisor's short check (condition 9); U6-SIZE and U6-JUDGE his, a day's message after it.
+- **U5's brief rev 2.1** (u5-brief.md; rev-2 check advisor-u5-brief.md:324-430; option (a)'s bars, u5-alloc-bounds.md).
+  **U5-ALLOC and U5-SIZE are his** (section 8), in the 2026-11-22 message's draft (msg-2026-11-22.md).
 - **U4G-EARLY's half DONE 09:2x** (advisor-u4g-early.md; worktree .claude/worktrees/agent-abc25909b7dd4ad30, kept):
   blocks 1-4 pass workspace-wide (655/756 = +13/+17; 8 plants fail by name; clippy and fmt clean); 2,053 lines; snapshot
   wip/u4g-early.patch a78e2853… (103,162 B, 11 files, in lane). Re-base (cond. 8) after U4f2's merge and -21's set: -58's
   3 counters, F4 room.rs:1033-1034. **U4G-Q1 (b) split** (history.md:7511-7516): U4g 1-6 (stop 6,000), U4g2 7-11 (stop 3,200).
-- **U5-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u5-early.md, 265 lines, read whole; its High ADV-U5E-1 met by
-  cond. 2): fill u5-brief.md §10 (`<base>` 40e20fd, 642/739, 1,207 s; runner u5-run.sh e69b0fa7…; pointer on its line 5);
-  register 102-111 and plan.md's U5/U6 rows done. **U5's size line: the S line, past about 1,400 added lines at a block
+- **U5-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u5-early.md; u5-brief.md §10 filled: `<base>` 40e20fd, 642/739,
+  runner u5-run.sh e69b0fa7…; register 102-111). **U5's size line: the S line, past about 1,400 added lines at a block
   end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Copy agent-a60a432d4564f4cc7 (u5-build.md): 8 files
   CLEARED (security-u5-deps.md; dependency-check.md); SEC-U5D APPROVE S1-S4 (:267-356); Blocks 0-2 (sim half) DONE 17:5x,
   1,322 added, snapshot 2 303972b9…. 17:5x: P27 (4.5 GiB) + main release clean (707.6 MiB); nightly-2026-11-01 + cargo-fuzz
   0.13.2 (38ef01cf…) installed. Guard rev 4 7413834d… READY (B11; 58/58; R4-1/R4-2 Low carried to the re-base's guard change,
-  R4-2 before a dependency-check.md lacking the root manifest); plant PASSED 18:02:38; Block 3 launched 18:0x (stop past 1,400).
+  R4-2 before a dependency-check.md lacking the root manifest); plant PASSED 18:02:38. **Block 3a DONE 18:1x, 1,658 added:
+  STOPPED at the S line for U5-SIZE** (3b and on wait); snapshot 3 afd767ac…; S1's two points hold; Input 58,999/s ASan,
+  279,895/s none; free 7.54 GB; cargo-fuzz makes an empty fuzz/artifacts/input/ before -artifact_prefix (guard-header carry).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
   **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver bdituvkdn
