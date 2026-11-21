@@ -151,8 +151,9 @@
 - **Agents running; cut 20:20:20-23:08 UTC, all three resumed by SendMessage at 23:08 (FP-2 DONE before it; P27 at
   23:07, 1.9 GiB; saver bihoj5rh5 from 23:08); after a cut, resume each by SendMessage, reading its file first:** U4f2's builder aa62d31b6fa5b9807 (worktree
   .claude/worktrees/agent-aa62d31b6fa5b9807; notes u4f2-build.md "Block 10" with its "Resume here:" line; snapshot
-  wip/u4f2-build.patch, 19:55 then fresh; check no plant left); the marks agent a48b206e6324455a1 (test-engineer; out
-  replan-marks.md, 11.5 KB at 20:19); the units agent a347235186edd9d84 (netcode-architect; out replan-units.md, 9.4 KB
+  wip/u4f2-build.patch, 19:55 then fresh; check no plant left); the marks agent a48b206e6324455a1 DONE 23:1x
+  (replan-marks.md, 214 lines: 48 kept, 24 moved, 9 flagged, F1-F13 with leans, by leans 52/29; its key claim
+  checked: room.rs:32-33's 2 s hit history and rewind.rs's per-shot rewind exist, no rewind_ns/size_bytes writer yet); the units agent a347235186edd9d84 (netcode-architect; out replan-units.md, 9.4 KB
   at 20:17). Each file holds its own "Resume here:" line. Then: round 2 (netcode, test) on U4f2; my re-plan screen.
 - **Moved or stopped by NPT-TRIM (what is built stays, for reference):** U4g's early half (blocks 1-4, 2,053 lines;
   snapshot wip/u4g-early.patch a78e2853…; worktree agent-abc25909b7dd4ad30 kept); U4g2's client half and U4h (briefs
