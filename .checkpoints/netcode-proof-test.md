@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 14:26 UTC: his Advisor is out until Tuesday (history.md:7507-7509); no reply to my waiting
-  plan by 14:21, so its lean (a) began: U5-EARLY with the advisor (advisor-u5-early.md). U4f2 waits on F-B-COUNT.
+- **Last update:** 2026-11-21 14:3x UTC: his WAIT-PLAN (a) and U4G-Q1 (b) split (history.md:7511-7516); F-B-COUNT
+  explained to him in plain words (he decides next); U5-EARLY with the advisor (advisor-u5-early.md). U4f2 waits.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -174,10 +174,10 @@
   **U5-ALLOC and U5-SIZE are his** (final texts, section 8; neither a stop): in the next day's message (2026-11-22's),
   with the U4H texts if his U4G-Q1 answer has come. Register lines before U5's launch (section 9). S's letter: U4b 701
   (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
-- **U4G-EARLY's half DONE 09:2x** (advisor-u4g-early.md; worktree .claude/worktrees/agent-abc25909b7dd4ad30, kept by cond. 6):
-  blocks 1-4 pass workspace-wide (655/756 = +13/+17; 8 plants fail by name); the stop's clippy (both targets) and fmt clean;
-  2,053 lines (under 2,900); snapshot wip/u4g-early.patch a78e2853… (103,162 B, 11 files, in lane). Re-base (cond. 8) after
-  U4f2's merge and -21's set: -58's 3 counters then; F4 room.rs:1033-1034. **Size line:** prediction half ~2,100-3,700 (stop 6,000).
+- **U4G-EARLY's half DONE 09:2x** (advisor-u4g-early.md; worktree .claude/worktrees/agent-abc25909b7dd4ad30, kept):
+  blocks 1-4 pass workspace-wide (655/756 = +13/+17; 8 plants fail by name; clippy and fmt clean); 2,053 lines; snapshot
+  wip/u4g-early.patch a78e2853… (103,162 B, 11 files, in lane). Re-base (cond. 8) after U4f2's merge and -21's set: -58's
+  3 counters, F4 room.rs:1033-1034. **U4G-Q1 (b) split** (history.md:7511-7516): U4g 1-6 (stop 6,000), U4g2 7-11 (stop 3,200).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
   **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver byg2iirg5

@@ -302,3 +302,7 @@ read before it goes to him (TEST-FIRST, "a reviewer's read on every change to ma
 - **U4g's size line** (SIZE-CHECK; on the card before the first snapshot): the prediction half about 2,100 to 3,700
   added lines (section 6), the stop past 6,000 under either U4G-Q1 answer; blocks 1-4 about 1,120 to 1,920; past about
   2,900 at the early stop, the count and a re-estimate come to the advisor before block 5 (condition 9).
+- **U4G-Q1 ANSWERED: (b), split** (Mustafa, 2026-11-21 about 14:31 UTC; word for word at history.md:7511-7516): U4g is
+  the prediction-and-cues half, blocks 1-6 (about 2,100 to 3,700; the stop past 6,000; blocks 1-4 built early, 2,053
+  lines); U4g2 is the interpolation, events and B1 half, blocks 7-11 (about 1,150 to 2,100, planned about 1,600; the
+  stop past 3,200: section 5); each half its own review panel and its own merge (section 7).

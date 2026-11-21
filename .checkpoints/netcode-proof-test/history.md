@@ -7507,3 +7507,10 @@ Things that are very important which needs an answer: you can ask me
 ## Mustafa, 2026-11-21 about 13:17 UTC (14:17 Amsterdam), in this chat: his personal account is out of usage until Tuesday (word for word)
 I am out of usage in my personal account, hence the reason I can't answer until Tuesday. 
 Is it possible for you to continue working further, or is this a hard checkpoint?
+
+## Decision: Mustafa, 2026-11-21 about 14:31 UTC (15:31 Amsterdam), in this chat: WAIT-PLAN (a); U4G-Q1 (b), split; F-B-COUNT to be explained in plain words (word for word)
+F-B-COUNT: Elaborate it to me in laymen terms on what it is and how it affects the project
+
+WAIT-PLAN A
+
+U4G-Q1: the advisor's: split (with two halves and with a review + merge each).
