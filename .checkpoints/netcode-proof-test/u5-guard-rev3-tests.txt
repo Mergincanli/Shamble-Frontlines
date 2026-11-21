@@ -1,0 +1,41 @@
+PASS | A1 worktree outside .claude/worktrees | exit 64 | GUARD REFUSED: the worktree must be under /home/user/Shamble-Frontlines/.claude/worktrees/ (got: /tmp/x)
+PASS | A2 worktree with .. | exit 64 | GUARD REFUSED: the worktree path holds '..' (/home/user/Shamble-Frontlines/.claude/worktrees/../x)
+PASS | A3 E3 empty token | exit 64 | GUARD REFUSED: an empty argument
+PASS | A4 E2 build with -- | exit 64 | GUARD REFUSED: build takes no '--' (libFuzzer flags are for run only)
+PASS | A5 GUARD-1 --fuzz-dir | exit 64 | GUARD REFUSED: option '--fuzz-dir' is not on the allow-list (-O, --release, -a, --debug-assertions, -s/--sanitizer address|none, --features bites)
+PASS | A6 E1 bare token after -- | exit 64 | GUARD REFUSED: libFuzzer flag '/tmp/x' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -timeout=, -rss_li
+PASS | A7 E1 -jobs | exit 64 | GUARD REFUSED: libFuzzer flag '-jobs=4' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -timeout=, -rss_l
+PASS | A8 E1 -collect_data_flow | exit 64 | GUARD REFUSED: libFuzzer flag '-collect_data_flow=/bin/sh' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=
+PASS | A9 E1 -features_dir | exit 64 | GUARD REFUSED: libFuzzer flag '-features_dir=/tmp' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -timeo
+PASS | A10 E1 non-digit value | exit 64 | GUARD REFUSED: libFuzzer flag '-runs=1e9': the value must be 1 to 10 digits
+PASS | A11 E1 empty value | exit 64 | GUARD REFUSED: libFuzzer flag '-runs=': the value must be 1 to 10 digits
+PASS | A12 E1 negative value | exit 64 | GUARD REFUSED: libFuzzer flag '-runs=-1': the value must be 1 to 10 digits
+PASS | A13 E1 flag 0/1 only | exit 64 | GUARD REFUSED: libFuzzer flag '-detect_leaks=2' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -timeout=
+PASS | A14 E3 empty token after -- | exit 64 | GUARD REFUSED: an empty argument
+PASS | A15 second -- after -- | exit 64 | GUARD REFUSED: libFuzzer flag '--' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -timeout=, -rss_limit_
+PASS | A16 run without -artifact_prefix | exit 64 | GUARD REFUSED: run needs -artifact_prefix=<a folder under .gate/>/ after -- (else artifacts go to fuzz/artifacts/)
+PASS | A17 -exact_artifact_path outside .gate | exit 64 | GUARD REFUSED: '-exact_artifact_path=/tmp/a' is not under .gate/
+PASS | A18 corpus outside .gate | exit 64 | GUARD REFUSED: corpus '/tmp/c' is not an absolute path under /home/user/Shamble-Frontlines/.gate/ or /home/user/Shamble-Frontlines/.claude/worktrees/agent-a60a432d4564f4c
+PASS | A19 unknown target | exit 64 | GUARD REFUSED: target 'nosuch' is not a [[bin]] name in fuzz/Cargo.toml
+PASS | A20 build with two targets | exit 64 | GUARD REFUSED: build takes one target (extra: 'ping')
+PASS | A21 sanitizer memory | exit 64 | GUARD REFUSED: sanitizer 'memory': only address or none
+PASS | A22 features other than bites | exit 64 | GUARD REFUSED: features 'x': only bites
+PASS | A23 subcommand alias b | exit 64 | GUARD REFUSED: subcommand 'b': only build or run
+PASS | A24 valid run, no runner environment | exit 64 | GUARD REFUSED: CARGO_TARGET_DIR is '', not the shared target /home/user/Shamble-Frontlines/.gate/shared-target
+PASS | A25 valid run, runner environment (passes the walk) | exit 64 | GUARD REFUSED: toolchain nightly-2026-11-01 is not installed under /root/.rustup/toolchains
+PASS | A26 valid build -O -s address (passes the walk) | exit 64 | GUARD REFUSED: toolchain nightly-2026-11-01 is not installed under /root/.rustup/toolchains
+PASS | A27 valid build --features=bites, all targets | exit 64 | GUARD REFUSED: toolchain nightly-2026-11-01 is not installed under /root/.rustup/toolchains
+PASS | A28 RUSTFLAGS set in the runner environment | exit 64 | GUARD REFUSED: RUSTFLAGS is set
+PASS | A29 CARGO_NET_OFFLINE not true | exit 64 | GUARD REFUSED: CARGO_NET_OFFLINE is 'false', not true
+PASS | B1 the real file | exit 0 | MATCH 8
+PASS | B2 indented comment and spaces-only line | exit 0 | MATCH 8
+PASS | B3 one space between hash and path | exit 64 | GUARD REFUSED: dependency-check.md line '0000000000000000000000000000000000000000000000000000000000000000 spikes/netcode-proof/x' is not '<sha256>  spikes/netcode-proof/<
+PASS | B4 a second fuzz/Cargo.toml line | exit 64 | GUARD REFUSED: dependency-check.md must hold exactly one fuzz/Cargo.toml line (holds 2)
+PASS | B5 an extra older line for one path | exit 0 | MATCH 8
+PASS | B6 that path's only line wrong | exit 0 | DIFF spikes/netcode-proof/crates/net/Cargo.toml (afd0952b15865881f763b1cba9d0feac715d2cf104dc4b2c6d13d3ab87f7b265)
+PASS | B7 a listed file missing | exit 0 | DIFF spikes/netcode-proof/crates/nosuch/Cargo.toml (missing)
+PASS | B8 a path with .. | exit 64 | GUARD REFUSED: dependency-check.md line '0000000000000000000000000000000000000000000000000000000000000000  spikes/netcode-proof/../x' holds '..'
+PASS | B9 CRLF line ends (the refusal's \r splits the printed line) | exit 64 | GUARD REFUSED: dependency-check.md line '3bf4d76008175aa7e779d2c1f504b09c5979a5e0e49ddcded8380b7045383b04  spikes/netcode-proof/Cargo.toml
+PASS | B10 no fuzz/Cargo.lock line | exit 64 | GUARD REFUSED: dependency-check.md must hold exactly one fuzz/Cargo.lock line (holds 0)
+PASS | B11 a path outside the spike | exit 64 | GUARD REFUSED: dependency-check.md line '0000000000000000000000000000000000000000000000000000000000000000  legacy/index.html' is not '<sha256>  spikes/netcode-proof/<path
+40 of 40 PASS

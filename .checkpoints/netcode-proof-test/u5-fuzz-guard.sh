@@ -1,27 +1,37 @@
 #!/usr/bin/env bash
-# U5's cargo-fuzz guard, rev 2 (the advisor's SEC-U5D-4 ruling, advisor-u5-early.md:316-338, condition S2; the
-# dependency read, security-u5-deps.md:167-184; rev 1's holes GUARD-1 to GUARD-6, security-u5-deps.md block B8, closed
-# here: an allow-list before `--`, the run's outputs under .gate/, the offline and version checks, the plant test's trap).
+# U5's cargo-fuzz guard, rev 3 (the advisor's SEC-U5D-4 ruling, advisor-u5-early.md:316-338, condition S2; the
+# dependency read, security-u5-deps.md:167-184; rev 1's holes GUARD-1 to GUARD-6, closed in rev 2, block B8; rev 2's
+# Lows GUARD-7 and E1-E5, block B9, closed here: every cargo call under `env -i` with a fixed environment, no cargo config
+# but the spike's pinned one, an allow-list after `--`, no `--` for build, no empty token, the exact version, and every
+# file dependency-check.md lists hashed before and after the call).
 # Every build-time cargo-fuzz call runs as the command of a u5-run.sh call, never directly:
 #   bash u5-run.sh [-x] <worktree> <log> bash <this guard> <worktree> build [options] [target]
 #   bash u5-run.sh [-x] <worktree> <log> bash <this guard> <worktree> run [options] <target> <corpus...> -- <libFuzzer flags>
 # Allowed before `--`, and nothing else: -O, --release, -a, --debug-assertions, -s/--sanitizer address|none (a separate
 # value, or --sanitizer=address|none), --features bites (or --features=bites); one target, a [[bin]] of fuzz/Cargo.toml;
 # for run, one or more corpus folders under <repo>/.gate/ or <worktree>/.gate/ (absolute, no ".."). Every other dash
-# token (--fuzz-dir, --target-dir, -Z, -c, --careful, --build-std, attached forms such as -saddress) is refused. After
-# `--` (libFuzzer's own flags) run needs -artifact_prefix=<a folder under .gate/>/, and -exact_artifact_path= must be
-# under .gate/ too.
-# Before the call: the environment (CUSTOM_LIBFUZZER_PATH, CUSTOM_LIBFUZZER_STD_CXX, RUSTFLAGS, CARGO_ENCODED_RUSTFLAGS
-# unset; no cargo config file names CUSTOM_LIBFUZZER; CARGO_TARGET_DIR the shared target; CARGO_NET_OFFLINE=true); the
-# installed cargo-fuzz is 0.13.2; fuzz/Cargo.toml's and fuzz/Cargo.lock's sha256 equal dependency-check.md's lines (read
-# from the file, never retyped); `cargo tree --locked --offline` on the fuzz manifest, with the call's features, passes on
-# 1.99.1 and on the nightly. Then `cargo +nightly-2026-11-01 fuzz <the same args>` runs from the copy's
-# spikes/netcode-proof, and both files are hashed again.
+# token (--fuzz-dir, --target-dir, -Z, -c, --careful, --build-std, attached forms such as -saddress) and every empty
+# token is refused; build takes no `--`. After `--` (run only: libFuzzer's own flags) only these -name=value forms:
+# -artifact_prefix= (required, under .gate/), -exact_artifact_path= (under .gate/), -max_total_time=, -runs=, -seed=,
+# -max_len=, -timeout=, -rss_limit_mb=, -malloc_limit_mb= (digits), -print_final_stats=, -use_value_profile= and
+# -detect_leaks= (0 or 1). A bare token (libFuzzer would take it as its first corpus, the one it writes into) is refused.
+# Before the call: the runner's environment (CUSTOM_LIBFUZZER_PATH, CUSTOM_LIBFUZZER_STD_CXX, RUSTFLAGS,
+# CARGO_ENCODED_RUSTFLAGS unset; CARGO_TARGET_DIR the shared target; CARGO_NET_OFFLINE=true); no cargo config file
+# (.cargo/config.toml or .cargo/config) in any folder from the spike folder up to /, in /root/.cargo or in fuzz/.cargo,
+# but the spike's own .cargo/config.toml at its known sha256 (build.target-dir only); both toolchains installed (so rustup
+# never tries a download); the installed cargo-fuzz reports exactly "cargo-fuzz 0.13.2"; every file dependency-check.md
+# lists (read from the file, never retyped) has one of its listed sha256 under the worktree, and the fuzz manifest and
+# lock have exactly one line each; `cargo tree --locked --offline` on the fuzz manifest, with the call's features, passes
+# on 1.99.1 and on the nightly. Every cargo call (the version, both trees, the fuzz call) runs under `env -i` with only
+# PATH, HOME, CARGO_HOME, RUSTUP_HOME, CARGO_TARGET_DIR and CARGO_NET_OFFLINE set, so no other CARGO_*, RUSTC*, RUSTUP_*
+# or CUSTOM_LIBFUZZER_* setting from the runner's environment reaches cargo (the guard never lists that environment).
+# Then `cargo +nightly-2026-11-01 fuzz <the same args>` runs from the copy's spikes/netcode-proof, and every listed file
+# is hashed again.
 # Plant test (shown once before the first cargo-fuzz call, inside one exclusive runner call):
 #   bash u5-run.sh -x <worktree> <log> bash <this guard> --plant-test <worktree>
-# appends one byte to fuzz/Cargo.toml, expects the hash check to refuse, restores the file (a cp -p backup moved back,
-# with a trap that moves it back if the script is stopped between the change and the restore) and checks both hashes
-# equal dependency-check.md's again; it runs no cargo-fuzz.
+# appends one byte to fuzz/Cargo.toml, expects the hash check to refuse it, restores the file (a cp -p backup moved back,
+# with a trap that moves it back if the script is stopped between the change and the restore) and checks every listed
+# file again; it runs no cargo-fuzz.
 # Exit codes: cargo-fuzz's own after a passed check; 64 a refused call (nothing ran); 65 a hash mismatch after the call
 # (its outputs are void: the main session cleans the fuzz builds' folder and the case goes to the advisor); 66 a failed
 # plant test (not refused, or not restored; the backup's path is printed).
@@ -31,6 +41,11 @@ DC=$M/.checkpoints/netcode-proof-test/dependency-check.md
 T=$M/.gate/shared-target
 NIGHTLY=nightly-2026-11-01
 FUZZ_VERSION=0.13.2
+# The spike's .cargo/config.toml (build.target-dir only), read 2026-11-21: equal in the main folder and the builder's copy.
+SPIKE_CFG_SHA=9ff1aa86e4f2366197a220b20e1c0e47f39c0575a08b55becb3d99a80db7e30a
+TC=/root/.rustup/toolchains
+CE=(env -i PATH=/root/.cargo/bin:/usr/local/bin:/usr/bin:/bin HOME=/root CARGO_HOME=/root/.cargo RUSTUP_HOME=/root/.rustup
+    "CARGO_TARGET_DIR=$T" CARGO_NET_OFFLINE=true)
 refuse() { echo "GUARD REFUSED: $*"; exit 64; }
 
 plant=0
@@ -55,34 +70,62 @@ under_gate() {
   case "$1" in "$M"/.gate/*|"$W"/.gate/*) return 0 ;; *) return 1 ;; esac
 }
 
-want_toml=$(grep -E '^[0-9a-f]{64}  spikes/netcode-proof/fuzz/Cargo\.toml$' "$DC" | cut -d' ' -f1)
-want_lock=$(grep -E '^[0-9a-f]{64}  spikes/netcode-proof/fuzz/Cargo\.lock$' "$DC" | cut -d' ' -f1)
-[ "$(printf '%s\n' "$want_toml" | grep -c .)" = 1 ] || refuse "dependency-check.md must hold exactly one fuzz/Cargo.toml line"
-[ "$(printf '%s\n' "$want_lock" | grep -c .)" = 1 ] || refuse "dependency-check.md must hold exactly one fuzz/Cargo.lock line"
+# dependency-check.md: every line is blank, a '#' comment, or '<sha256>  spikes/netcode-proof/<path>' (no "..").
+dc_lines=()
+dc_paths=()
+while IFS= read -r l || [ -n "$l" ]; do
+  [[ "$l" =~ ^[[:space:]]*$ ]] && continue
+  [[ "$l" =~ ^[[:space:]]*# ]] && continue
+  [[ "$l" =~ ^[0-9a-f]{64}\ \ spikes/netcode-proof/[A-Za-z0-9_./-]+$ ]] \
+    || refuse "dependency-check.md line '$l' is not '<sha256>  spikes/netcode-proof/<path>'"
+  case "$l" in *..*) refuse "dependency-check.md line '$l' holds '..'" ;; esac
+  dc_lines+=("$l")
+  p="${l#*  }"
+  case " ${dc_paths[*]+"${dc_paths[*]}"} " in *" $p "*) ;; *) dc_paths+=("$p") ;; esac
+done < "$DC"
+n_toml=0
+n_lock=0
+for l in "${dc_lines[@]+"${dc_lines[@]}"}"; do
+  case "$l" in
+    *"  spikes/netcode-proof/fuzz/Cargo.toml") n_toml=$((n_toml + 1)) ;;
+    *"  spikes/netcode-proof/fuzz/Cargo.lock") n_lock=$((n_lock + 1)) ;;
+  esac
+done
+[ $n_toml -eq 1 ] || refuse "dependency-check.md must hold exactly one fuzz/Cargo.toml line (holds $n_toml)"
+[ $n_lock -eq 1 ] || refuse "dependency-check.md must hold exactly one fuzz/Cargo.lock line (holds $n_lock)"
 
-hashes() {
-  have_toml=$(sha256sum "$F/Cargo.toml" | cut -d' ' -f1)
-  have_lock=$(sha256sum "$F/Cargo.lock" | cut -d' ' -f1)
-}
+# Each listed path's file under the worktree must have one of the sha256 listed for that path (DEP-HOLD's exact-line rule).
 hashes_match() {
-  hashes
-  [ "$have_toml" = "$want_toml" ] && [ "$have_lock" = "$want_lock" ]
+  local p have l ok
+  bad=""
+  for p in "${dc_paths[@]}"; do
+    have=$(sha256sum "$W/$p" 2>/dev/null | cut -d' ' -f1)
+    ok=0
+    for l in "${dc_lines[@]}"; do
+      [ "$l" = "$have  $p" ] && ok=1
+    done
+    [ $ok -eq 1 ] || bad="$bad $p (${have:-missing})"
+  done
+  [ -z "$bad" ]
 }
 
 if [ $plant -eq 1 ]; then
-  hashes_match || refuse "plant test needs a clean start: fuzz/Cargo.toml $have_toml, fuzz/Cargo.lock $have_lock"
+  hashes_match || refuse "plant test needs a clean start; differing from dependency-check.md:$bad"
   backup=$(mktemp "$M/.gate/u5/guard-plant.XXXXXX") || refuse "cannot make the backup"
   cp -p "$F/Cargo.toml" "$backup" || refuse "cannot back up fuzz/Cargo.toml"
   trap 'mv -f "$backup" "$F/Cargo.toml" 2>/dev/null' EXIT
   trap 'mv -f "$backup" "$F/Cargo.toml" 2>/dev/null; echo "PLANT TEST STOPPED (restore attempted from $backup)"; exit 66' INT TERM HUP
   printf ' ' >> "$F/Cargo.toml"
-  if hashes_match; then planted="NOT REFUSED"; else planted="REFUSED"; fi
-  echo "plant: fuzz/Cargo.toml with one byte appended is $have_toml; the hash check $planted it"
+  planted="NOT REFUSED"
+  if ! hashes_match; then
+    case "$bad" in *" spikes/netcode-proof/fuzz/Cargo.toml ("*) planted="REFUSED" ;; esac
+  fi
+  echo "plant: fuzz/Cargo.toml with one byte appended; the hash check $planted it (differing:${bad:- none})"
   mv -f "$backup" "$F/Cargo.toml"
   mvrc=$?
   trap - EXIT INT TERM HUP
   if [ $mvrc -eq 0 ] && hashes_match; then restored="restored"; else restored="NOT RESTORED (backup $backup)"; fi
-  echo "after restore: fuzz/Cargo.toml $have_toml, fuzz/Cargo.lock $have_lock: $restored"
+  echo "after restore: all ${#dc_paths[@]} listed files checked, differing:${bad:- none}: $restored"
   if [ "$planted" = "REFUSED" ] && [ "$restored" = "restored" ]; then
     echo "PLANT TEST PASSED"
     exit 0
@@ -107,12 +150,15 @@ seen_dd=0
 while [ $# -gt 0 ]; do
   a="$1"
   shift
+  [ -n "$a" ] || refuse "an empty argument"
   if [ $seen_dd -eq 1 ]; then
     lf+=("$a")
     continue
   fi
   case "$a" in
-    --) seen_dd=1 ;;
+    --)
+      [ "$sub" = "run" ] || refuse "build takes no '--' (libFuzzer flags are for run only)"
+      seen_dd=1 ;;
     -O|--release|-a|--debug-assertions) ;;
     -s|--sanitizer)
       [ $# -ge 1 ] || refuse "'$a' needs a value"
@@ -153,6 +199,10 @@ if [ "$sub" = "run" ]; then
     case "$x" in
       -artifact_prefix=*) ap="${x#-artifact_prefix=}" ;;
       -exact_artifact_path=*) under_gate "${x#-exact_artifact_path=}" || refuse "'$x' is not under .gate/" ;;
+      -max_total_time=*|-runs=*|-seed=*|-max_len=*|-timeout=*|-rss_limit_mb=*|-malloc_limit_mb=*)
+        [[ "${x#*=}" =~ ^[0-9]{1,10}$ ]] || refuse "libFuzzer flag '$x': the value must be 1 to 10 digits" ;;
+      -print_final_stats=0|-print_final_stats=1|-use_value_profile=0|-use_value_profile=1|-detect_leaks=0|-detect_leaks=1) ;;
+      *) refuse "libFuzzer flag '$x' is not on the allow-list (-artifact_prefix=, -exact_artifact_path=, -max_total_time=, -runs=, -seed=, -max_len=, -timeout=, -rss_limit_mb=, -malloc_limit_mb=, -print_final_stats=, -use_value_profile=, -detect_leaks=)" ;;
     esac
   done
   [ -n "$ap" ] || refuse "run needs -artifact_prefix=<a folder under .gate/>/ after -- (else artifacts go to fuzz/artifacts/)"
@@ -165,28 +215,46 @@ fi
 [ -z "${CARGO_ENCODED_RUSTFLAGS+x}" ] || refuse "CARGO_ENCODED_RUSTFLAGS is set"
 [ "${CARGO_TARGET_DIR:-}" = "$T" ] || refuse "CARGO_TARGET_DIR is '${CARGO_TARGET_DIR:-}', not the shared target $T"
 [ "${CARGO_NET_OFFLINE:-}" = "true" ] || refuse "CARGO_NET_OFFLINE is '${CARGO_NET_OFFLINE:-}', not true"
-for cfg in "$F/.cargo/config.toml" "$F/.cargo/config" "$S/.cargo/config.toml" "$S/.cargo/config" \
-           "$W/.cargo/config.toml" "$W/.cargo/config" "${HOME:-/root}/.cargo/config.toml" "${HOME:-/root}/.cargo/config"; do
-  if [ -f "$cfg" ] && grep -q "CUSTOM_LIBFUZZER" "$cfg"; then
-    refuse "$cfg names CUSTOM_LIBFUZZER"
+cd "$S" || refuse "cannot cd to $S"
+SP=$(pwd -P)
+d=$SP
+while :; do
+  for n in config.toml config; do
+    cfg="${d%/}/.cargo/$n"
+    if [ -e "$cfg" ] || [ -L "$cfg" ]; then
+      if [ "$cfg" = "$SP/.cargo/config.toml" ] && [ -f "$cfg" ] && [ ! -L "$cfg" ] \
+         && [ "$(sha256sum "$cfg" | cut -d' ' -f1)" = "$SPIKE_CFG_SHA" ]; then
+        :
+      else
+        refuse "cargo config $cfg is not allowed (only $SP/.cargo/config.toml at sha256 $SPIKE_CFG_SHA)"
+      fi
+    fi
+  done
+  [ "$d" = / ] && break
+  d=$(dirname "$d")
+done
+for cfg in /root/.cargo/config.toml /root/.cargo/config "$F/.cargo/config.toml" "$F/.cargo/config"; do
+  if [ -e "$cfg" ] || [ -L "$cfg" ]; then
+    refuse "cargo config $cfg exists"
   fi
 done
-fv=$(cargo "+$NIGHTLY" fuzz --version 2>/dev/null) || refuse "cargo +$NIGHTLY fuzz --version failed (is cargo-fuzz installed?)"
-case "$fv" in *"cargo-fuzz $FUZZ_VERSION"*) ;; *) refuse "cargo-fuzz is '$fv', not $FUZZ_VERSION" ;; esac
-hashes_match || refuse "fuzz/Cargo.toml $have_toml / fuzz/Cargo.lock $have_lock differ from dependency-check.md ($want_toml / $want_lock)"
+[ -d "$TC/1.99.1-x86_64-unknown-linux-gnu" ] || refuse "toolchain 1.99.1 is not installed under $TC"
+[ -d "$TC/$NIGHTLY-x86_64-unknown-linux-gnu" ] || refuse "toolchain $NIGHTLY is not installed under $TC"
+fv=$("${CE[@]}" cargo "+$NIGHTLY" fuzz --version 2>/dev/null) || refuse "cargo +$NIGHTLY fuzz --version failed (is cargo-fuzz installed?)"
+[ "$fv" = "cargo-fuzz $FUZZ_VERSION" ] || refuse "cargo-fuzz reports '$fv', not exactly 'cargo-fuzz $FUZZ_VERSION'"
+hashes_match || refuse "differing from dependency-check.md:$bad"
 tf=()
 [ -n "$features" ] && tf=(--features "$features")
-cargo +1.99.1 tree --locked --offline "${tf[@]+"${tf[@]}"}" --manifest-path "$F/Cargo.toml" >/dev/null \
+"${CE[@]}" cargo +1.99.1 tree --locked --offline "${tf[@]+"${tf[@]}"}" --manifest-path "$F/Cargo.toml" >/dev/null \
   || refuse "cargo +1.99.1 tree --locked --offline ${tf[*]+"${tf[*]}"} failed on $F/Cargo.toml"
-cargo "+$NIGHTLY" tree --locked --offline "${tf[@]+"${tf[@]}"}" --manifest-path "$F/Cargo.toml" >/dev/null \
+"${CE[@]}" cargo "+$NIGHTLY" tree --locked --offline "${tf[@]+"${tf[@]}"}" --manifest-path "$F/Cargo.toml" >/dev/null \
   || refuse "cargo +$NIGHTLY tree --locked --offline ${tf[*]+"${tf[*]}"} failed on $F/Cargo.toml"
-echo "GUARD PASSED: $fv; fuzz/Cargo.toml $have_toml, fuzz/Cargo.lock $have_lock; running cargo +$NIGHTLY fuzz ${orig[*]}"
-cd "$S" || refuse "cannot cd to $S"
-cargo "+$NIGHTLY" fuzz "${orig[@]}"
+echo "GUARD PASSED: $fv; all ${#dc_paths[@]} files dependency-check.md lists match; running cargo +$NIGHTLY fuzz ${orig[*]}"
+"${CE[@]}" cargo "+$NIGHTLY" fuzz "${orig[@]}"
 rc=$?
 if ! hashes_match; then
-  echo "GUARD VOID: after the call fuzz/Cargo.toml is $have_toml and fuzz/Cargo.lock is $have_lock (dependency-check.md: $want_toml / $want_lock); the call's outputs are void: the main session cleans the fuzz builds' folder and the case goes to the advisor"
+  echo "GUARD VOID: after the call these differ from dependency-check.md:$bad; the call's outputs are void: the main session cleans the fuzz builds' folder and the case goes to the advisor"
   exit 65
 fi
-echo "GUARD AFTER: both fuzz files unchanged; cargo-fuzz exit $rc"
+echo "GUARD AFTER: all ${#dc_paths[@]} listed files unchanged; cargo-fuzz exit $rc"
 exit $rc

@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 14:5x UTC: his WAIT-PLAN (a) and U4G-Q1 (b) split (history.md:7511-7516); F-B-COUNT
-  explained to him (he decides next); U5-EARLY APPROVED WITH CONDITIONS 1-10, launch items done, its builder next.
+- **Last update:** 2026-11-21 16:02 UTC: guard rev 3 (GUARD-7, E1-E5) written, tests 40/40, in the auditor's diff-only
+  re-read (B10); U5's builder on Block 1; F-B-COUNT explained to him (he decides next).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -176,7 +176,7 @@
   end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Block 0 DONE (agent-a60a432d4564f4cc7's copy, ~260 lines);
   fetch clean (u5-deps-facts.md); security read: all 8 CLEARED (security-u5-deps.md); dependency-check.md written 15:3x.
   Builder on Block 1 (+S1's check.mjs pins) and 2's sim half, stop before 3; SEC-U5D ruling APPROVE S1-S4 (:267-356);
-  guard rev 1 (2edc7b13…) failed the read (GUARD-1/-2 Medium: B8); rev 2 768f6055… (allow-list) in its re-read; then installs.
+  guard rev 2 768f6055… READY (B9); rev 3 8466a42e… (GUARD-7, E1-E5; tests 40/40) in its re-read (B10); then installs.
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
   **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver byg2iirg5
