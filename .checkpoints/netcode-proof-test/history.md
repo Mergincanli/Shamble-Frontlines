@@ -7557,3 +7557,37 @@ F-B-COUNT: (a). Leave kind 7's presses out of that count when the server's own s
   Both agents' tasks ended on it (rate_limit, HTTP 429); the saver ran on (byihocm9i; last save 43cf1f7, 16:13:37).
   Resumed at 17:41:37 (his message): no cargo or rustc running; the builder's copy as u5-build.md says (Block 1 DONE,
   no plant left), its last fmt check exit 0; the 8 files the harness flagged were only touched by u5-run.sh:73.
+
+## Decision: Mustafa, 2026-11-21 (it reached this chat at 20:01:05 UTC), in this chat: NPT-TRIM (word for word)
+- **Mustafa, typed into this chat (transcript 2026-11-21T20:01:05.731Z, uuid d2a1f1bf-df9f-44f5-bd16-1178db6c7901), verbatim** (the whole message, unchanged, in the fence below):
+
+```text
+NPT-TRIM, my decision of 21 November, written with my stand-in Advisor. It changes plan rev 3.3 and TEST-FIRST where they differ. F-B-COUNT (a) stands.
+
+Why: this test exists to answer what the real game cannot answer cheaply before Slice 3: does our server carry 48 players at 30 ticks a second within budget on the planned machine, and do WebTransport and the WebSocket fallback hold up from real browsers over real networks. Netcode the real game builds anyway is not built a second time here. Quality stays where it counts: the judge, marks.json, the bites, and any code we promote.
+
+KEEP (the critical path to the server runs):
+1. U4f2: finish FP-2 with F-B-COUNT (a), its review, the merge and -21's set; then close U4 with its report. Of U4's other rows, keep only those about the wire and the server, such as -18's bursts and the server's recovery after a loss burst.
+2. U6, cut to what the kept runs need: the WebTransport and WebSocket server, interest under load, instrumentation and metrics, the certificate, and enough of the host for several rooms on one VM. The VMs' firewall admits only our own machines (my home address and the load generators), apart from what certificate issuance needs (say how you handle that). So hardening that only shields throwaway code from the open internet goes; name what you cut. Carry one WebTransport crate unless the runs must compare both; say which and why.
+3. U7, cut to a plain browser client: it connects over WebTransport and WebSocket, sends presses, receives snapshots and shows its counters. No sim in Wasm, no prediction, no drawing, no hash check: the real game runs the sim as Wasm since change-set 2 and checks its determinism in change-set 3.
+4. U8, the run package, without the Safari leg.
+5. The runs: R1 without Safari, R2, R3 without the rewind rows, and R5 at N = 48 with the 8-room soak.
+
+MOVE TO THE REAL GAME (nothing dropped or loosened: as in my rule of 14 November, each mark is measured on the real game at the first build that can show it):
+- Prediction, interpolation, events and lag compensation (U4g, U4g2's client half, U4h) and R7, the human run, with their marks (-41, -42, -60; -45, -47, -61, -62; -48 to -51): Slice 1's change-sets 7 (Lag) and 8 (Shoot), then Slice 3. U4g's built half stays as its patch, for reference. If a kept density mark needs lag compensation's server cost, keep only the smallest piece that carries that cost, and say so.
+- U5 stops where it is; what is built stays. -34 and -35 move to the real protocol and its dependency checks.
+- R4, hostile input: the security baseline before the first online playtest.
+- R6 and the N = 36 and N = 18 searches: slice 6, on the real sim.
+- Safari: later, by BROWSER-SET (a).
+
+THE RE-PLAN (next; nothing new is built before it, except FP-2 and its review):
+- One screen: the kept units with sizes, the runs with hours and cost caps, and R1's date. Aim: R1 on or before Wednesday 2 December; if that can't hold, tell me why in three lines.
+- A table of all 81 marks: kept (which unit or run) or moved (which change-set or slice of the real game). The judge reports a moved mark as MOVED, never as PASS; that marks.json change gets its reviewer's read.
+- What you would promote into the real crates (the judge, the link models and the lab look like candidates) and what stays in spikes/.
+- One advisor-agent review, then it comes to me. This answers U5-SIZE, U5-ALLOC, U4H-Q4, U4H-SIZE, U4H-JUDGE, U6-SIZE and U6-JUDGE: drop them from the day's messages.
+
+HOW YOU WORK FROM NOW ON (less paper, same quality):
+- One review round per unit, with the reviewers its risk needs (netcode and test by default; security only for code that faces the internet in a run). A second round only for an open Critical or High.
+- Each unit's brief gets one advisor-agent check, with no re-check unless it finds a Critical or High. Choices inside a brief go by your lean, one line each in the day's message.
+- Papers are for resuming after a cut and for the reports. Stop writing papers whose only reader is other papers (card-trim scripts, copies of the transcript, restated rulings). The day's message stays one screen.
+```
