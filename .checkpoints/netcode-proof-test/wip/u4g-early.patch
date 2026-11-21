@@ -1,0 +1,974 @@
+diff --git a/spikes/netcode-proof/crates/sim/src/world.rs b/spikes/netcode-proof/crates/sim/src/world.rs
+index 1faee05..c45a926 100644
+--- a/spikes/netcode-proof/crates/sim/src/world.rs
++++ b/spikes/netcode-proof/crates/sim/src/world.rs
+@@ -603,16 +603,25 @@ enum Bite {
+     /// PM-0001-21/refuse-not-clamp (U4f; NA-9): a shot at a point beyond the reach is refused and counted (as a fire
+     /// edge in the cooldown is: no new seam kind) in place of the clamp.
+     RefuseNotClamp,
++    /// PM-0001-55/vehicle-snap (U4g; U4G-Q5): the authority step's push out of a vehicle part puts the soldier
++    /// [`VEHICLE_SNAP_M`] further from it ("a vehicle collision that snaps"); `predict`'s push is the plain one.
++    VehicleSnap,
+ }
+ 
++/// PM-0001-55/vehicle-snap's extra push out of a vehicle part, m: twice -55's 5 cm flag, so one blocked tick parts the
++/// authority from the prediction by more than the flag.
+ #[cfg(feature = "bites")]
+-const BITE_IDS: [(&str, Bite); 6] = [
++const VEHICLE_SNAP_M: f32 = 0.1;
++
++#[cfg(feature = "bites")]
++const BITE_IDS: [(&str, Bite); 7] = [
+     ("PM-0004-21/hash-map", Bite::HashMap),
+     ("PM-0004-21/std-sin", Bite::StdSin),
+     ("PM-0001-41/server-speed-1pct", Bite::Speed),
+     (crate::OWN_COPY_SNAP_BITES[0], Bite::Quant),
+     ("PM-0001-21/no-cooldown", Bite::NoCooldown),
+     ("PM-0001-21/refuse-not-clamp", Bite::RefuseNotClamp),
++    ("PM-0001-55/vehicle-snap", Bite::VehicleSnap),
+ ];
+ 
+ /// PM-0004-21/hash-map's planted iteration: a std `HashMap` of `keys` keys, iterated once, its whole order folded by
+@@ -948,10 +957,12 @@ impl World {
+         [BITE_IDS[0].0, BITE_IDS[1].0, BITE_IDS[2].0, BITE_IDS[3].0];
+ 
+     /// PM-0001-21's two sim-side check bites (U4f; NA-9, U4F-Q1 (a)): the cooldown check removed, and a refusal in
+-    /// place of the clamp (bites builds only), each planted through [`World::with_bite`]. A list apart from
+-    /// [`World::BITES`], which npt-hash-wasm's replayer indexes and npt-sim's tests pin.
++    /// place of the clamp (bites builds only), each planted through [`World::with_bite`]; and U4g's
++    /// PM-0001-55/vehicle-snap (U4G-Q5: armed in the authority's step only, as -41's speed bite). A list apart from
++    /// [`World::BITES`], which npt-hash-wasm's replayer indexes and npt-sim's tests pin; npt-lab's bite router takes
++    /// every id of it alike.
+     #[cfg(feature = "bites")]
+-    pub const CHECK_BITES: [&'static str; 2] = [BITE_IDS[4].0, BITE_IDS[5].0];
++    pub const CHECK_BITES: [&'static str; 3] = [BITE_IDS[4].0, BITE_IDS[5].0, BITE_IDS[6].0];
+ 
+     /// A world with one planted defect by its id (bites builds only), armed from the step that runs `arm_tick` on
+     /// (at or after `first_tick`); `None` for an id it does not plant. PM-0001-41/server-quant-differs takes its
+@@ -1067,6 +1078,72 @@ impl World {
+         fired
+     }
+ 
++    /// The predicting world's reset (carry 47, A-M2; u4-build-plan.md §4.2; ADR 0001 part 4): the soldier of slot
++    /// `soldier.index` set from its decoded own-state records, its soldier record and its owner-only record `own`
++    /// (W1-S1), and the slot's press counters set to `presses`, those of the client's own command at the snapshot's
++    /// last-run sequence, as the authority held them after that command. Without them a replay reads a counter that
++    /// moved back as up to 255 edges (NC-F1-4). Every value comes from the records' grid integers through the wire grid,
++    /// which is where the authority's own-copy snap left them, so a world reset from the authority's records at tick T
++    /// predicts the authority's next commands bit for bit (D-3's rule from a reset, not from a clone: carry 47's test).
++    /// Alive or dead comes from the dead flag, the generation from the records; a dead soldier's respawn countdown is
++    /// the authority's alone (the predicting world runs no respawn: 0). The slot's two records are refreshed. Returns
++    /// false, changing nothing, unless the two records are a soldier record and an own-state record of one slot this
++    /// world has.
++    pub fn reset_slot(&mut self, soldier: &EntityRecord, own: &EntityRecord, presses: [u8; 4]) -> bool {
++        let slot = usize::from(soldier.index);
++        if soldier.kind != EntityKind::Soldier
++            || own.kind != EntityKind::OwnState
++            || own.index != soldier.index
++            || slot >= self.soldiers.len()
++        {
++            return false;
++        }
++        let wire = Config::default();
++        let (g, o) = (&soldier.grid, &own.grid);
++        // Each integer field holds only what its layout allows (seam.rs): flags 8 bits, health 10, ammunition 16.
++        let flags = g[SOLDIER_FLAGS].clamp(0, 255) as u8;
++        let s = &mut self.soldiers[slot];
++        s.alive = flags & FLAG_DEAD == 0;
++        s.respawn_left = 0;
++        s.generation = soldier.generation;
++        s.health = g[6].clamp(0, 1_023) as u16;
++        s.pos = [
++            wire.from_grid(POSITION_XY, g[0]),
++            wire.from_grid(POSITION_XY, g[1]),
++            wire.from_grid(POSITION_Z, g[2]),
++        ];
++        s.yaw = wire.from_grid(YAW, g[3]);
++        s.pitch = wire.from_grid(PITCH, g[4]);
++        s.flags = flags;
++        s.vel = [o[0], o[1], o[2]].map(|k| wire.from_grid(VELOCITY, k));
++        s.ammo = o[3].clamp(0, i32::from(u16::MAX)) as u16;
++        s.wait = i64::from(o[4]);
++        s.reload_left = i64::from(o[5]);
++        s.move_speed = o[6].clamp(0, MOVE_SPEED_MAX_CM_S as i32) as u32;
++        s.fire_interval = o[7].clamp(1, FIRE_INTERVAL_MAX_US as i32) as u32;
++        self.pre[slot] = PreSnap::of(s);
++        self.claimed[slot] = presses;
++        if let Some([a, b]) = self.slot_records(slot as u8) {
++            for r in &mut self.records {
++                match r.kind {
++                    EntityKind::Soldier if r.index == soldier.index => *r = a,
++                    EntityKind::OwnState if r.index == soldier.index => *r = b,
++                    _ => {}
++                }
++            }
++        }
++        true
++    }
++
++    /// Slot `slot`'s two own-state records as the world holds them now: its soldier record and its owner-only record
++    /// (W1-S1), each built afresh (what [`World::predict`] and [`World::reset_slot`] leave in the read-out); `None` for
++    /// a slot the world has not. The predicting client keeps them per command, for the bitwise skip and its
++    /// corrections (ADR 0001 part 4).
++    pub fn slot_records(&self, slot: u8) -> Option<[EntityRecord; 2]> {
++        let slot = usize::from(slot);
++        (slot < self.soldiers.len()).then(|| [self.soldier_record(slot), self.own_state_record(slot)])
++    }
++
+     /// Loads the movers the soldiers collide with from records (a client: its last decoded snapshot's; the authority:
+     /// its own, each tick): each hull's transform and each part's transform relative to its hull, each door open or
+     /// closed and the wall standing or down, from the records' grid integers; each part's box is then its hull
+@@ -1245,8 +1322,9 @@ impl World {
+ 
+     /// Where a soldier at `pos` moving by `delta` (m, x and y) ends: each axis in turn, stopped at the face of the
+     /// first box in its way (the static world, closed doors, the standing wall, the vehicle parts); a box it starts
+-    /// inside does not block it. Also returns which axes were stopped.
+-    fn collide(&self, pos: [f32; 3], delta: [f32; 2]) -> ([f32; 3], [bool; 2]) {
++    /// inside does not block it. A vehicle part's face stops it `snap_out` m further out (0 but under
++    /// PM-0001-55/vehicle-snap). Also returns which axes were stopped.
++    fn collide(&self, pos: [f32; 3], delta: [f32; 2], snap_out: f32) -> ([f32; 3], [bool; 2]) {
+         let mut p = pos;
+         let mut blocked = [false; 2];
+         for axis in 0..2 {
+@@ -1257,27 +1335,27 @@ impl World {
+             let mut q = p;
+             q[axis] = p[axis] + delta[axis];
+             let want = q;
+-            let mut test = |min: [f32; 3], max: [f32; 3]| {
++            let mut test = |min: [f32; 3], max: [f32; 3], out: f32| {
+                 if !overlaps(start, min, max, INSIDE) && overlaps(q, min, max, SKIN) {
+                     q[axis] = if delta[axis] > 0.0 {
+-                        min[axis] - RADIUS
++                        min[axis] - RADIUS - out
+                     } else {
+-                        max[axis] + RADIUS
++                        max[axis] + RADIUS + out
+                     };
+                     blocked[axis] = true;
+                 }
+             };
+             for b in &self.greybox.solids {
+-                test(b.min, b.max);
++                test(b.min, b.max, 0.0);
+             }
+             for (b, closed) in self.greybox.doors.iter().zip(&self.movers.doors_closed) {
+                 if *closed {
+-                    test(b.min, b.max);
++                    test(b.min, b.max, 0.0);
+                 }
+             }
+             if self.movers.wall_standing {
+                 let Aabb { min, max, .. } = self.greybox.wall;
+-                test(min, max);
++                test(min, max, 0.0);
+             }
+             let step = delta[axis].abs();
+             for (v, centre) in self.vehicles.iter().zip(&self.movers.vehicles) {
+@@ -1287,7 +1365,7 @@ impl World {
+                     continue;
+                 }
+                 for &(min, max) in self.movers.boxes.get(v.parts.clone()).unwrap_or(&[]) {
+-                    test(min, max);
++                    test(min, max, snap_out);
+                 }
+             }
+             p = q;
+@@ -1365,7 +1443,16 @@ impl World {
+             gain = 1.01;
+         }
+         let (v, crouch, sprint) = move_velocity(s.move_speed, c.buttons, c.move_xy, gain);
+-        let (pos, blocked) = self.collide(s.pos, [v[0] * DT, v[1] * DT]);
++        #[allow(
++            unused_mut,
++            reason = "PM-0001-55/vehicle-snap sets it in bites builds"
++        )]
++        let mut snap_out = 0.0;
++        #[cfg(feature = "bites")]
++        if authority && self.bitten(Bite::VehicleSnap) {
++            snap_out = VEHICLE_SNAP_M;
++        }
++        let (pos, blocked) = self.collide(s.pos, [v[0] * DT, v[1] * DT], snap_out);
+         let vel = [
+             if blocked[0] { 0.0 } else { v[0] },
+             if blocked[1] { 0.0 } else { v[1] },
+diff --git a/spikes/netcode-proof/crates/client/src/predict.rs b/spikes/netcode-proof/crates/client/src/predict.rs
+new file mode 100644
+index 0000000..331e5ee
+--- /dev/null
++++ b/spikes/netcode-proof/crates/client/src/predict.rs
+@@ -0,0 +1,413 @@
++//! Prediction and reconciliation (u4-build-plan.md §5 U4g: `Predictor`; plan.md E8; ADR 0001 part 4). The client's
++//! own soldier is predicted through npt-sim's [`World::predict`], one call per command it stamps. At each snapshot it
++//! applies (a complete tick newer than the last applied), the world is reset to the server's state for the last
++//! command the server ran ([`World::reset_slot`], carry 47) and the newer commands are replayed, unless the prediction
++//! it stored for that command already equals the server's state bit for bit (the skip, off in suite `cues`).
++//!
++//! **A correction** is the present prediction before that reset and replay against after it: it fades over
++//! [`FADE_MS`], snaps at [`SNAP_UM`] (how the client knows a teleport: carry 70 counts them apart) and clears on a
++//! respawn. **Tracing** is the client's alone (U4G-Q6 (a)): a command is known in time when a header shows the room
++//! had it before its stamped tick ran (the header of an earlier tick names it received, or the header of its tick or a
++//! later one names it run with a stamp not before that tick); a correction is traced when a command due by the
++//! snapshot's tick and newer than the one the last applied snapshot named as run is not known in time (late or lost:
++//! PM-0001-41's notes). The scripted own-state changes (PM-0001-60) are the decoded own-state record's move-speed and
++//! fire-interval fields changing; each is closed when that field changes again. Every rate-derived count takes the
++//! predictor's rate (carry 6's pattern: `ticks_for_ms_at`, no constant derived from the tick rate).
++
++use std::collections::VecDeque;
++
++use npt_sim::{Attribute, Command, EntityKind, EntityRecord, Scene, World};
++
++use crate::{SOLDIER_DEAD, SOLDIER_FLAGS, dist};
++
++/// A correction this large or larger snaps (ADR 0001 part 4: 2 m, proposed), µm.
++pub const SNAP_UM: u64 = 2_000_000;
++/// PM-0001-41's line: corrections above 1 mm, µm (`tick.v.corrections_count`).
++pub const TRACE_UM: u64 = 1_000;
++/// PM-0001-42's and -55's flag: a correction above 5 cm, µm (`second.s.snap_corr_over_5cm`).
++pub const FLAG_UM: u64 = 50_000;
++/// The fade's length, ms (ADR 0001 part 4: 100 ms, proposed): 3 ticks at 30 Hz, 6 at 60 Hz.
++pub const FADE_MS: u32 = 100;
++/// The commands the predictor holds, ms of them at one a tick: 2 s (60 at 30 Hz, 120 at 60 Hz), past the lead bound
++/// (400 ms) plus a round trip and the input buffer; a snapshot naming a command older than every one held is skipped.
++pub const HELD_MS: u32 = 2_000;
++
++/// The own-state record's move-speed and fire-interval fields (npt-sim seam.rs's `OWN_STATE`: velocity x, y and z,
++/// ammunition, fire timer, reload left, move speed, fire interval; private there).
++const OWN_ATTRIBUTES: [(usize, Attribute); 2] = [(6, Attribute::MoveSpeed), (7, Attribute::FireInterval)];
++
++/// How a correction was taken.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum CorrectionKind {
++    /// Faded over [`FADE_MS`].
++    Fade,
++    /// Snapped: [`SNAP_UM`] or more, the client's sign of a teleport (carry 70: counted apart); the fade cleared.
++    Snap,
++    /// The soldier's generation or its dead flag changed (a respawn or a death): the fade cleared, counted apart.
++    Respawn,
++}
++
++/// One correction: the present prediction before a snapshot's reset and replay against after it.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct Correction {
++    /// How far the soldier's position moved, µm (0 when only its other fields changed, such as its weapon's).
++    pub size_um: u64,
++    /// How it was taken.
++    pub kind: CorrectionKind,
++    /// Whether a command due by the snapshot's tick, newer than the one the last applied snapshot named as run, is
++    /// not known to have reached the room in time (late or lost: the module text).
++    pub traced: bool,
++}
++
++/// One snapshot the predictor applied.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct Applied {
++    /// The snapshot's tick.
++    pub tick: u32,
++    /// The client's command its header named as the last run (32 bits, rebuilt by the endpoint).
++    pub last_run: u32,
++    /// Commands replayed after the reset (0 when skipped).
++    pub replayed: u32,
++    /// The bitwise skip held: the prediction stored for the last command run equalled the server's state.
++    pub skipped: bool,
++    /// The correction it made; `None` for none, and for the first snapshot (it starts the prediction).
++    pub correction: Option<Correction>,
++}
++
++impl Applied {
++    /// A correction above 1 mm (`tick.v.corrections_count`).
++    pub fn corrected(&self) -> bool {
++        self.correction.is_some_and(|c| c.size_um > TRACE_UM)
++    }
++
++    /// A faded correction above 1 mm not traced to a late or lost command (`tick.v.untraced_corrections_count`;
++    /// snaps and respawns are counted apart: carry 70).
++    pub fn untraced(&self) -> bool {
++        self.correction
++            .is_some_and(|c| c.size_um > TRACE_UM && !c.traced && c.kind == CorrectionKind::Fade)
++    }
++
++    /// A correction above 5 cm (`second.s.snap_corr_over_5cm`: one per snapshot applied).
++    pub fn over_5cm(&self) -> bool {
++        self.correction.is_some_and(|c| c.size_um > FLAG_UM)
++    }
++}
++
++/// One own-state change the client met (PM-0001-60's `own_change` event), closed when that field changes again or by
++/// [`Predictor::close`].
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct OwnChange {
++    /// Which attribute.
++    pub attribute: Attribute,
++    /// Its value before, in the attribute's unit (move speed cm/s, fire interval µs) ...
++    pub from: u32,
++    /// ... and after.
++    pub to: u32,
++    /// The tick of the first snapshot that carried it.
++    pub tick: u32,
++    /// That snapshot's correction's size, µm (0: none).
++    pub first_size_um: u64,
++    /// Faded corrections not traced to a late or lost command while it lasted, the first snapshot's included.
++    pub corrections: u32,
++    /// Of them, those after the first snapshot.
++    pub misplaced: u32,
++    /// Of those, the ones above 1 mm.
++    pub later_over_1mm: u32,
++    /// The time the client predicted without it: the commands replayed at its first snapshot, in ns at the rate.
++    pub blind_ns: u64,
++}
++
++/// One command the predictor holds: the client's 32-bit index, its stamp, the command, whether the room is known to
++/// have had it in time, and the slot's two records after predicting it.
++#[derive(Clone, Copy, Debug)]
++struct Step {
++    index: u32,
++    stamp: u32,
++    command: Command,
++    in_time: bool,
++    after: [EntityRecord; 2],
++}
++
++/// The prediction of one client's own soldier (the module text).
++#[derive(Clone, Debug)]
++pub struct Predictor {
++    world: World,
++    slot: Option<u8>,
++    tick_ns: u64,
++    fade_ticks: u32,
++    held_max: usize,
++    skip: bool,
++    held: VecDeque<Step>,
++    /// The slot's two records after the newest prediction or reset.
++    present: Option<[EntityRecord; 2]>,
++    /// The last snapshot applied: its tick and the command it named as run.
++    applied_tick: Option<u32>,
++    last_run: Option<u32>,
++    /// The drawn correction at its last start, m, and the ticks of its fade left.
++    offset: [f32; 3],
++    fade_left: u32,
++    attributes: Option<[i32; 2]>,
++    changes: [Option<OwnChange>; 2],
++    applied: Vec<Applied>,
++    closed: Vec<OwnChange>,
++}
++
++/// Whether two of the slot's records hold the same state: kind, index, generation and grid integers (the decoded
++/// records carry no area and no values before the snap).
++fn same(a: &[EntityRecord; 2], b: &[EntityRecord; 2]) -> bool {
++    a.iter().zip(b).all(|(x, y)| {
++        (x.kind, x.index, x.generation, x.grid) == (y.kind, y.index, y.generation, y.grid)
++    })
++}
++
++impl Predictor {
++    /// A predictor over a world of `scene` from `seed` (the predicting world draws from no random stream), at
++    /// `tick_hz` ticks a second (production callers pass `npt_sim::TICK_HZ`).
++    pub fn new(scene: &Scene, seed: u64, tick_hz: u32) -> Predictor {
++        let hz = tick_hz.max(1);
++        Predictor {
++            world: World::new(scene, seed, 0),
++            slot: None,
++            tick_ns: 1_000_000_000 / u64::from(hz),
++            fade_ticks: npt_sim::ticks_for_ms_at(hz, FADE_MS).max(1),
++            held_max: npt_sim::ticks_for_ms_at(hz, HELD_MS).max(1) as usize,
++            skip: true,
++            held: VecDeque::new(),
++            present: None,
++            applied_tick: None,
++            last_run: None,
++            offset: [0.0; 3],
++            fade_left: 0,
++            attributes: None,
++            changes: [None, None],
++            applied: Vec::new(),
++            closed: Vec::new(),
++        }
++    }
++
++    /// The same predictor with the bitwise skip off: a replay at every snapshot applied (suite `cues`, as PM-0001-44's
++    /// forced replays: ADR 0001:1650).
++    pub fn with_replay_always(mut self) -> Predictor {
++        self.skip = false;
++        self
++    }
++
++    /// The client's slot (`JoinAccepted`'s): nothing is predicted before it.
++    pub fn set_slot(&mut self, slot: u8) {
++        self.slot = Some(slot);
++    }
++
++    /// The fade's length in ticks, and the most commands held, at the predictor's rate.
++    pub fn counts(&self) -> (u32, usize) {
++        (self.fade_ticks, self.held_max)
++    }
++
++    /// The client stamped its command `index` (its 32-bit counter) for tick `stamp`: predicted at once, from the
++    /// present prediction, against the movers last loaded.
++    pub fn command(&mut self, index: u32, stamp: u32, command: &Command) {
++        let Some(slot) = self.slot else {
++            return;
++        };
++        let c = Command { slot, ..*command };
++        self.world.predict(&c);
++        let Some(after) = self.world.slot_records(slot) else {
++            return;
++        };
++        if self.held.len() >= self.held_max {
++            self.held.pop_front();
++        }
++        self.held.push_back(Step {
++            index,
++            stamp,
++            command: c,
++            in_time: false,
++            after,
++        });
++        self.present = Some(after);
++    }
++
++    /// What one header of tick `tick` says of the client's commands (any group, complete or not): the room had every
++    /// command up to `newest_received` before the tick after `tick` ran, and had run every command up to `last_run`
++    /// by `tick` (each rebuilt to 32 bits by the endpoint).
++    pub fn received(&mut self, tick: u32, newest_received: Option<u32>, last_run: Option<u32>) {
++        for s in &mut self.held {
++            let had = newest_received.is_some_and(|n| dist(n, s.index) >= 0) && dist(s.stamp, tick) > 0;
++            let ran = last_run.is_some_and(|r| dist(r, s.index) >= 0) && dist(s.stamp, tick) >= 0;
++            s.in_time |= had || ran;
++        }
++    }
++
++    /// A complete snapshot of tick `tick`: the command its header names as the last run (`last_run`), its own-state
++    /// section `own` and its entities `entities` (the movers' records). Applied once per tick newer than the last
++    /// applied (the module text); one naming a command older than every one held is skipped.
++    pub fn snapshot(
++        &mut self,
++        tick: u32,
++        last_run: u32,
++        own: &[EntityRecord],
++        entities: &[EntityRecord],
++    ) {
++        let Some(slot) = self.slot else {
++            return;
++        };
++        if self.applied_tick.is_some_and(|a| dist(tick, a) <= 0) {
++            return;
++        }
++        let find = |kind| {
++            own.iter()
++                .find(|r| r.kind == kind && r.index == u16::from(slot))
++                .copied()
++        };
++        let (Some(soldier), Some(state)) = (find(EntityKind::Soldier), find(EntityKind::OwnState)) else {
++            return;
++        };
++        // The command run last: held, or newer than every command held (only a wrong rebuild names one: none replayed).
++        let (start, presses, found) = match self.held.iter().position(|s| s.index == last_run) {
++            Some(i) => (i + 1, self.held[i].command.presses, true),
++            None if self.held.back().is_none_or(|s| dist(s.index, last_run) < 0) => (
++                self.held.len(),
++                self.held.back().map_or([0; 4], |s| s.command.presses),
++                false,
++            ),
++            None => return,
++        };
++        self.applied_tick = Some(tick);
++        let previous = self.last_run.replace(last_run);
++        let server = [soldier, state];
++        self.world.load_movers(entities);
++        let skipped = self.skip && previous.is_some() && found && same(&self.held[start - 1].after, &server);
++        let before = self.present;
++        let mut replayed = 0;
++        if !skipped {
++            self.world.reset_slot(&soldier, &state, presses);
++            self.present = Some(server);
++            for s in self.held.iter_mut().skip(start) {
++                self.world.predict(&s.command);
++                if let Some(a) = self.world.slot_records(slot) {
++                    s.after = a;
++                    self.present = Some(a);
++                }
++                replayed += 1;
++            }
++        }
++        let correction = match (previous, before, self.present) {
++            (Some(_), Some(b), Some(a)) if !skipped && !same(&b, &a) => Some(self.correct(&b, &a, tick, previous)),
++            _ => None,
++        };
++        self.own_changes(&state, tick, correction, replayed);
++        self.applied.push(Applied {
++            tick,
++            last_run,
++            replayed,
++            skipped,
++            correction,
++        });
++    }
++
++    /// The correction from `b` to `a` at the snapshot of `tick` (the module text), and its fade, snap or clear.
++    fn correct(
++        &mut self,
++        b: &[EntityRecord; 2],
++        a: &[EntityRecord; 2],
++        tick: u32,
++        previous: Option<u32>,
++    ) -> Correction {
++        let d = [0, 1, 2].map(|i| i64::from(b[0].grid[i]) - i64::from(a[0].grid[i]));
++        let cm2 = d.iter().map(|x| x * x).sum::<i64>();
++        let size_um = ((cm2 as f64).sqrt() * 10_000.0).round() as u64;
++        let dead = |r: &EntityRecord| r.grid[SOLDIER_FLAGS] & SOLDIER_DEAD != 0;
++        let kind = if b[0].generation != a[0].generation || dead(&b[0]) != dead(&a[0]) {
++            CorrectionKind::Respawn
++        } else if size_um >= SNAP_UM {
++            CorrectionKind::Snap
++        } else {
++            CorrectionKind::Fade
++        };
++        let traced = self.held.iter().any(|s| {
++            !s.in_time && dist(tick, s.stamp) >= 0 && previous.is_none_or(|p| dist(s.index, p) > 0)
++        });
++        if kind == CorrectionKind::Fade {
++            let now = self.offset();
++            self.offset = [0, 1, 2].map(|i| now[i] + d[i] as f32 / 100.0);
++            self.fade_left = self.fade_ticks;
++        } else {
++            self.offset = [0.0; 3];
++            self.fade_left = 0;
++        }
++        Correction {
++            size_um,
++            kind,
++            traced,
++        }
++    }
++
++    /// PM-0001-60's changes: each attribute field of the decoded own-state record `state` that differs from the last
++    /// applied snapshot's opens a change (closing the open one); this snapshot's faded untraced correction counts in
++    /// every open change.
++    fn own_changes(&mut self, state: &EntityRecord, tick: u32, c: Option<Correction>, replayed: u32) {
++        let now = OWN_ATTRIBUTES.map(|(field, _)| state.grid[field]);
++        if let Some(old) = self.attributes.replace(now) {
++            for (k, &(_, attribute)) in OWN_ATTRIBUTES.iter().enumerate() {
++                if old[k] == now[k] {
++                    continue;
++                }
++                if let Some(done) = self.changes[k].take() {
++                    self.closed.push(done);
++                }
++                self.changes[k] = Some(OwnChange {
++                    attribute,
++                    from: old[k].max(0) as u32,
++                    to: now[k].max(0) as u32,
++                    tick,
++                    first_size_um: c.map_or(0, |c| c.size_um),
++                    corrections: 0,
++                    misplaced: 0,
++                    later_over_1mm: 0,
++                    blind_ns: u64::from(replayed) * self.tick_ns,
++                });
++            }
++        }
++        let Some(c) = c.filter(|c| !c.traced && c.kind == CorrectionKind::Fade) else {
++            return;
++        };
++        for open in self.changes.iter_mut().flatten() {
++            open.corrections += 1;
++            if open.tick != tick {
++                open.misplaced += 1;
++                open.later_over_1mm += u32::from(c.size_um > TRACE_UM);
++            }
++        }
++    }
++
++    /// One tick of the fade (the endpoint calls it at each step).
++    pub fn advance(&mut self) {
++        self.fade_left = self.fade_left.saturating_sub(1);
++    }
++
++    /// The drawn correction still to fade, m (x, y, z): added to the present prediction's position, it starts where the
++    /// prediction stood before the correction and reaches 0 after [`FADE_MS`].
++    pub fn offset(&self) -> [f32; 3] {
++        let k = self.fade_left as f32 / self.fade_ticks as f32;
++        self.offset.map(|x| x * k)
++    }
++
++    /// The slot's two records as predicted now (its soldier record and its own-state record).
++    pub fn present(&self) -> Option<[EntityRecord; 2]> {
++        self.present
++    }
++
++    /// Closes every open own-state change (at a run's end).
++    pub fn close(&mut self) {
++        self.closed.extend(self.changes.iter_mut().filter_map(Option::take));
++    }
++
++    /// The snapshots applied since the last call.
++    pub fn take_applied(&mut self) -> Vec<Applied> {
++        core::mem::take(&mut self.applied)
++    }
++
++    /// The own-state changes closed since the last call.
++    pub fn take_own_changes(&mut self) -> Vec<OwnChange> {
++        core::mem::take(&mut self.closed)
++    }
++}
+diff --git a/spikes/netcode-proof/crates/sim/tests/predict.rs b/spikes/netcode-proof/crates/sim/tests/predict.rs
+new file mode 100644
+index 0000000..0b40505
+--- /dev/null
++++ b/spikes/netcode-proof/crates/sim/tests/predict.rs
+@@ -0,0 +1,356 @@
++//! U4g's tests of the predicting world (u4g-brief.md 1.3, block 1): carry 47's reset from the authority's records,
++//! with NC-F1-4 beside it (u4s-carries.md:561-566, :601-604); in bites builds PM-0001-55/vehicle-snap's unit proof
++//! (U4G-Q5) and TE-F1-5's two 2-edge twins (advisor-u4f-f1-r1.md:147-150).
++
++use npt_sim::{
++    Attribute, AttributeChange, Command, EntityKind, EntityRecord, HitHistory, Placement, Scene,
++    SimCore, StateDump, TickInput, World,
++};
++
++fn ring() -> HitHistory {
++    HitHistory::for_ms(2_000).expect("2 s of ticks")
++}
++
++/// One room tick: step on the lent ring, then push the new volumes into it.
++fn room_tick(world: &mut World, history: &mut HitHistory, input: &TickInput) {
++    world.step(input, history);
++    history.push(world.hit_volumes());
++}
++
++/// Slot 0's record of `kind`.
++fn record_of(world: &World, kind: EntityKind) -> EntityRecord {
++    *world
++        .entity_records()
++        .iter()
++        .find(|r| r.kind == kind && r.index == 0)
++        .expect("slot 0 has a record of each soldier kind")
++}
++
++/// The dump's words whose names start with `prefix`, by index.
++fn named(d: &StateDump, prefix: &str) -> Vec<usize> {
++    (0..d.words().len())
++        .filter(|&i| d.field(i).is_some_and(|f| f.starts_with(prefix)))
++        .collect()
++}
++
++/// Slot 0 of `client` equals slot 0 of `authority`: both records' grid integers, area and generation (and with `raw`,
++/// their values before the own-copy snap: a reset has none of its own, a predicted command has), and every state word.
++fn same(client: &World, authority: &World, raw: bool, at: &str) {
++    for kind in [EntityKind::Soldier, EntityKind::OwnState] {
++        let (c, a) = (record_of(client, kind), record_of(authority, kind));
++        if raw {
++            assert_eq!(c, a, "{at}: {kind:?} record");
++        } else {
++            assert_eq!(
++                (c.grid, c.area, c.generation),
++                (a.grid, a.area, a.generation),
++                "{at}: {kind:?} record"
++            );
++        }
++    }
++    let (c, a) = (client.dump(), authority.dump());
++    for i in named(&a, "soldier[0].") {
++        assert_eq!(c.words()[i], a.words()[i], "{at}: {:?}", a.field(i));
++    }
++}
++
++/// Slot 0's scripted command number `k`, made when its feet were at `at` (cm): a new heading every 20 commands, aimed
++/// 8 m ahead at chest height, fire held by stretches, a fire press every 7 commands and a reload press every 31.
++fn command(k: u32, at: [i32; 3], presses: &mut [u8; 4]) -> Command {
++    const HEADINGS: [[i8; 2]; 4] = [[127, 0], [0, 127], [-127, 0], [0, -127]];
++    let h = HEADINGS[((k / 20) % 4) as usize];
++    if k % 7 == 3 {
++        presses[Command::PRESS_FIRE] = presses[Command::PRESS_FIRE].wrapping_add(1);
++    }
++    if k % 31 == 17 {
++        presses[Command::PRESS_RELOAD] = presses[Command::PRESS_RELOAD].wrapping_add(1);
++    }
++    Command {
++        slot: 0,
++        seq: k as u16,
++        buttons: if (k / 10) % 3 == 1 { Command::FIRE } else { 0 },
++        presses: *presses,
++        move_xy: h,
++        aim: [
++            at[0] + i32::from(h[0]) * 6,
++            at[1] + i32::from(h[1]) * 6,
++            at[2] + 140,
++        ],
++        ..Command::default()
++    }
++}
++
++/// Carry 47 (A-M2) and NC-F1-4: a predicting world, never a clone of the authority (its own seed and first tick), keeps
++/// predicting `LEAD` commands ahead of the authority from whatever it holds, then is reset from the authority's records
++/// after its last command and that command's press counters, and predicts the next `RUN` commands against the movers
++/// the authority used (D-3's rule from a reset): slot 0 equal bit for bit after each. Between rounds the authority
++/// alone teleports the soldier or changes its move speed or fire interval, which the client meets only in the next
++/// reset's records. Without the counters (NC-F1-4's plant: the reset leaves them) a press inside the window ahead reads
++/// as up to 255 edges after the reset, and the next predicted command parts from the authority.
++#[test]
++fn carry_47_a_world_reset_from_the_authoritys_records_predicts_its_next_commands_bit_for_bit() {
++    const LEAD: usize = 5;
++    const RUN: usize = 4;
++    let (mut checked, mut pressed_ahead, mut reloads) = (0u32, 0u32, 0u32);
++    for scene in [Scene::course(), Scene::stress()] {
++        let mut authority = World::new(&scene, 7, 500);
++        let mut history = ring();
++        let mut client = World::new(&scene, 8, 0);
++        let mut presses = [0u8; 4];
++        let mut made: Vec<Command> = Vec::new();
++        let (mut ran, mut last) = (0usize, [0u8; 4]);
++        for round in 0..150u32 {
++            while made.len() < ran + LEAD {
++                let g = record_of(&authority, EntityKind::Soldier).grid;
++                made.push(command(made.len() as u32, [g[0], g[1], g[2]], &mut presses));
++            }
++            for c in &made[ran..ran + LEAD] {
++                client.predict(c);
++            }
++            pressed_ahead += u32::from(made[ran..ran + LEAD].iter().any(|c| c.presses != last));
++            let at = format!("{} round {round}", scene.name());
++            let (soldier, own) = (
++                record_of(&authority, EntityKind::Soldier),
++                record_of(&authority, EntityKind::OwnState),
++            );
++            assert!(client.reset_slot(&soldier, &own, last), "{at}: reset");
++            same(&client, &authority, false, &format!("{at}, reset"));
++            for _ in 0..RUN {
++                let mut c = made[ran];
++                c.tick = authority.next_tick();
++                let t = TickInput {
++                    tick: c.tick,
++                    commands: vec![(c, None)],
++                    ..TickInput::default()
++                };
++                room_tick(&mut authority, &mut history, &t);
++                (last, ran) = (c.presses, ran + 1);
++                client.load_movers(authority.entity_records());
++                client.predict(&made[ran - 1]);
++                same(&client, &authority, true, &format!("{at}, command {}", ran - 1));
++                reloads += u32::from(record_of(&authority, EntityKind::OwnState).grid[5] > 0);
++                checked += 1;
++            }
++            // The authority's own change, on a tick of no command: the client learns it from the next reset alone.
++            let feet = record_of(&authority, EntityKind::Soldier).grid;
++            let mut t = TickInput {
++                tick: authority.next_tick(),
++                ..TickInput::default()
++            };
++            match round % 3 {
++                0 => t.teleports.push(Placement {
++                    slot: 0,
++                    position: [feet[0] + 150 - 100 * (round % 4) as i32, feet[1] - 120, 0],
++                }),
++                1 => t.attributes.push(AttributeChange {
++                    slot: 0,
++                    attribute: Attribute::MoveSpeed,
++                    value: 500 + 40 * (round % 5),
++                }),
++                _ => t.attributes.push(AttributeChange {
++                    slot: 0,
++                    attribute: Attribute::FireInterval,
++                    value: 80_000 + 10_000 * (round % 4),
++                }),
++            }
++            room_tick(&mut authority, &mut history, &t);
++        }
++    }
++    // Not vacuous: 1,200 commands checked, most rounds' windows ahead held a press, and reloads ran.
++    assert_eq!(checked, 2 * 150 * 4);
++    assert!(pressed_ahead > 150, "{pressed_ahead} rounds pressed ahead");
++    assert!(reloads > 20, "{reloads} commands checked while reloading");
++}
++
++/// The reset refuses two records that are not one slot's soldier and own-state records, and changes nothing then.
++#[test]
++fn carry_47_the_reset_refuses_records_of_another_kind_or_slot() {
++    let scene = Scene::stress();
++    let world = World::new(&scene, 7, 0);
++    let (soldier, own) = (
++        record_of(&world, EntityKind::Soldier),
++        record_of(&world, EntityKind::OwnState),
++    );
++    let other = EntityRecord { index: 1, ..own };
++    let far = EntityRecord {
++        index: 64,
++        ..soldier
++    };
++    let mut w = world.clone();
++    for (a, b) in [(own, soldier), (soldier, other), (far, EntityRecord { index: 64, ..own })] {
++        assert!(!w.reset_slot(&a, &b, [9; 4]));
++    }
++    assert_eq!(w.dump(), world.dump());
++    assert_eq!(w.slot_records(64), None);
++    assert_eq!(w.slot_records(0), Some([soldier, own]));
++}
++
++#[cfg(feature = "bites")]
++mod bites {
++    //! In bites builds: PM-0001-55/vehicle-snap's unit proof and TE-F1-5's two 2-edge twins.
++
++    use npt_sim::{InputReports, Refusal, RefusalKind, SimEvent};
++
++    use super::*;
++
++    /// PM-0001-55/vehicle-snap's unit proof (U4G-Q5): slot 0 of SS, put 4.5 m east of a looping very large unit every
++    /// 30 ticks (on a tick of its own), walks west into it; each step the client predicts it from a clone taken
++    /// before the step, against the movers the step used. Bitten, a blocked move ends at least 5 cm apart between the
++    /// authority's step and predict; clean, never apart. Both met the hull (a blocked move: x velocity 0).
++    #[test]
++    fn pm_0001_55_vehicle_snap_parts_the_authority_from_predict_against_a_moving_hull() {
++        let scene = Scene::stress();
++        let mut seen = Vec::new();
++        for bite in [None, Some("PM-0001-55/vehicle-snap")] {
++            let mut world = match bite {
++                Some(b) => World::with_bite(&scene, 3, 0, b, 0).expect("npt-sim plants it"),
++                None => World::new(&scene, 3, 0),
++            };
++            let mut history = ring();
++            let (mut most, mut blocked) = (0i32, 0u32);
++            for k in 0..240u32 {
++                let tick = world.next_tick();
++                if k % 30 == 0 {
++                    let hull = world
++                        .entity_records()
++                        .iter()
++                        .find(|r| r.kind == EntityKind::Vehicle && r.index == 0)
++                        .expect("SS's first hull")
++                        .grid;
++                    let t = TickInput {
++                        tick,
++                        teleports: vec![Placement {
++                            slot: 0,
++                            position: [hull[0] + 450, hull[1], 0],
++                        }],
++                        ..TickInput::default()
++                    };
++                    room_tick(&mut world, &mut history, &t);
++                    continue;
++                }
++                let feet = record_of(&world, EntityKind::Soldier).grid;
++                let c = Command {
++                    slot: 0,
++                    tick,
++                    seq: k as u16,
++                    move_xy: [-127, 0],
++                    aim: [feet[0] - 1_000, feet[1], 140],
++                    ..Command::default()
++                };
++                let mut client = world.clone();
++                let t = TickInput {
++                    tick,
++                    commands: vec![(c, None)],
++                    ..TickInput::default()
++                };
++                room_tick(&mut world, &mut history, &t);
++                client.load_movers(world.entity_records());
++                client.predict(&c);
++                let (a, p) = (
++                    record_of(&world, EntityKind::Soldier).grid,
++                    record_of(&client, EntityKind::Soldier).grid,
++                );
++                most = most.max((a[0] - p[0]).abs().max((a[1] - p[1]).abs()));
++                blocked += u32::from(record_of(&world, EntityKind::OwnState).grid[0] == 0);
++            }
++            seen.push((most, blocked));
++        }
++        println!("vehicle-snap: (most apart cm, blocked moves) clean {:?}, bitten {:?}", seen[0], seen[1]);
++        assert!(seen[0].1 > 10 && seen[1].1 > 10, "the soldier met the hull: {seen:?}");
++        assert_eq!(seen[0].0, 0, "clean: predict equals the step");
++        assert!(seen[1].0 >= 5, "bitten: at least 5 cm apart: {seen:?}");
++    }
++
++    /// Slot 0's course stream of `n` steps: still, aimed 5 m north (or at `far` at step `far_at`), the fire counter one
++    /// up at each step `press` names (twice: two edges).
++    fn stream(n: u32, press: &[u32], far_at: Option<(u32, [i32; 3])>) -> Vec<TickInput> {
++        let mut fire = 0u8;
++        (0..n)
++            .map(|k| {
++                fire = fire.wrapping_add(press.iter().filter(|&&p| p == k).count() as u8);
++                let aim = match far_at {
++                    Some((at, far)) if at == k => far,
++                    _ => [0, -500, 140],
++                };
++                let c = Command {
++                    slot: 0,
++                    tick: k,
++                    seq: k as u16,
++                    presses: [fire, 0, 0, 0],
++                    aim,
++                    ..Command::default()
++                };
++                TickInput {
++                    tick: k,
++                    commands: vec![(c, None)],
++                    ..TickInput::default()
++                }
++            })
++            .collect()
++    }
++
++    /// The d10 twin form on two worlds bitten with `id`: equal events, hashes and dumps on every tick. Returns the
++    /// forged run's and the twin's refusals, and the steps the forged run shot at.
++    fn bitten_twins(
++        id: &str,
++        forged: &[TickInput],
++        twin: &[TickInput],
++    ) -> (Vec<Refusal>, Vec<Refusal>, Vec<usize>) {
++        let scene = Scene::course();
++        let make = || World::with_bite(&scene, 5, 0, id, 0).expect("npt-sim plants it");
++        let (mut f, mut t) = (make(), make());
++        let (mut hf, mut ht) = (ring(), ring());
++        let (mut rf, mut rt, mut shots) = (Vec::new(), Vec::new(), Vec::new());
++        for (k, (a, b)) in forged.iter().zip(twin).enumerate() {
++            let ef = f.step(a, &hf).to_vec();
++            hf.push(f.hit_volumes());
++            let et = t.step(b, &ht).to_vec();
++            ht.push(t.hit_volumes());
++            assert_eq!(ef, et, "{id} step {k}: the event lists");
++            assert_eq!(f.state_hash(), t.state_hash(), "{id} step {k}: the state hashes");
++            assert_eq!(f.dump(), t.dump(), "{id} step {k}: the dumps");
++            let reports: [&InputReports; 2] = [f.reports(), t.reports()];
++            rf.extend_from_slice(&reports[0].refusals);
++            rt.extend_from_slice(&reports[1].refusals);
++            if ef.iter().any(|e| matches!(e, SimEvent::Shot { slot: 0, .. })) {
++                shots.push(k);
++            }
++        }
++        (rf, rt, shots)
++    }
++
++    fn cooldown(seq: u16) -> Refusal {
++        Refusal {
++            slot: 0,
++            seq,
++            kind: RefusalKind::Cooldown,
++        }
++    }
++
++    /// TE-F1-5, PM-0001-21/no-cooldown on an extra edge: the course weapon fires every 3 ticks; 2 fire edges at 11, in
++    /// the cooldown after the shot at 10, fire one shot (the bite lets the first edge through) and the second edge is
++    /// refused as Cooldown; the twin (one edge at 11) steps alike.
++    #[test]
++    fn te_f1_5_no_cooldown_fires_the_first_edge_and_refuses_the_extra_one() {
++        let forged = stream(30, &[10, 11, 11, 20], None);
++        let twin = stream(30, &[10, 11, 20], None);
++        let (rf, rt, shots) = bitten_twins("PM-0001-21/no-cooldown", &forged, &twin);
++        assert_eq!(shots, [10, 11, 20], "the cooldown edge at 11 fired");
++        assert_eq!(rf, [cooldown(11)]);
++        assert!(rt.is_empty());
++    }
++
++    /// TE-F1-5, PM-0001-21/refuse-not-clamp on an extra edge: 2 fire edges at 10 aimed 120 m off (beyond the 60 m
++    /// reach) are both refused as Cooldown, with no clamp report; the twin (no edge at 10) steps alike, and the press
++    /// at 20 fires in both.
++    #[test]
++    fn te_f1_5_refuse_not_clamp_refuses_both_edges_of_a_far_aim() {
++        let far = Some((10, [12_000, 0, 100]));
++        let forged = stream(30, &[10, 10, 20], far);
++        let twin = stream(30, &[20], far);
++        let (rf, rt, shots) = bitten_twins("PM-0001-21/refuse-not-clamp", &forged, &twin);
++        assert_eq!(shots, [20]);
++        assert_eq!(rf, [cooldown(10), cooldown(10)]);
++        assert!(rt.is_empty());
++    }
++}
