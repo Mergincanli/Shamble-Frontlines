@@ -320,3 +320,16 @@ either way, and it belongs with the dependency checks.
 ## For Mustafa
 Nothing now from this check: the two questions ride a later day's message, after rev 2.
 DONE
+
+## Rev 2 check
+### Plan
+1. Read u5-brief.md rev 2 whole (385 lines) and u5-alloc-bounds.md (254 lines; summary :224-245, open points :247-254).
+2. Check sections 1.4 (Blocks 0, 1, 3, 4, 7), 2, 3, 4, 5, 6 and 8 against my list (:289-305) and my rulings' terms
+   (:157-203).
+3. Check the coordinator's additions: type byte pinned, Ping/Pong both ways, realloc counted as one request, the window
+   on the decode call only, item 3 on the decoder, the nightly re-measure, section 6's stop rule.
+4. Spot-check the bounds' arithmetic against the code (Snapshot through the client 304 x L_e; FullState 14,561 doors).
+5. Section 8's two texts: accuracy and plain words.
+6. Verdict, findings ADV-U5B-15 on, conditions.
+
+### Notes (as I go)
