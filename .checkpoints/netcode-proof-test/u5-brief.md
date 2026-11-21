@@ -2,7 +2,7 @@
 **The unit:** plan.md §12.1's U5 row (:1252; size S): fuzzing (-34), the dependency and swap checks (-35), the audits
 (§4.8), with the counting allocator and the allocation half of catalogue item 3 (u4-build-plan.md:961-962), C-U5-1
 (plan.md:1252) and carry 48 (u4s-carries.md:762-764). It builds after U4's close (U4h's merge and sets, then U4's
-report), in plan §12.1's order (section 1.1 says why not sooner). Short by TEST-FIRST rule 3 (history.md:2264-2267): what
+report), in plan §12.1's order (section 1.1 says why not sooner). **U5-EARLY (2026-11-21): the blocks and files of advisor-u5-early.md's condition 1 build early, under its conditions 1-10 (SIZE-CHECK's S line until his U5-SIZE answer; the early fill is section 10, at this brief's end); :4, :33 and :51-54 stand for the rest.** Short by TEST-FIRST rule 3 (history.md:2264-2267): what
 U5 builds, how it is tested, what is open; the rest is pointed to. U4f's brief stays the reference for the start and
 stops (u4f-brief.md section 1, :288-355), the build rules (section 4, :831-958), the end checks (section 6,
 :1163-1183) and the return list (section 7, :1187-1225). **Two questions are his, neither a stop now** (section 8):
@@ -49,7 +49,7 @@ window on over-limit inputs (Blocks 3 to 5, section 3); the register lines befor
 ## 1. What U5 builds
 ### 1.1 Its place and lane
 - **After U4's close, one lane:** one builder (general-purpose, Opus 5.5, xhigh) in an isolated worktree. Not beside
-  U4g or U4h: both open crates/lab, where U5's two writers go, and check.mjs may move with them; the nightly fuzz builds
+  U4g or U4h: both open crates/lab, where U5's two writers go (check.mjs is shut in both and outside U4f2's lane, so it is U5's alone: ADV-U5E-6); the nightly fuzz builds
   (proto, client, room, sim and net, instrumented) add to the shared target, which the disk floor of 4 GiB cannot carry
   beside a U4 lane's sets (U4f2's R2-pre and R3-pre wanted 6.5 GB free).
 - **Its files:** a new `fuzz/` (cargo-fuzz's crate, outside the workspace); a new `crates/alloc` (U5-Q3); crates/lab
@@ -397,7 +397,7 @@ either way, and it belongs with the dependency checks.
 
 ## 9. For the main session before launch
 - Fill `<base>` and the counts; re-read every "there now" line in crates/room, client, lab and sim, and the per-type
-  bars (u5-alloc-bounds.md) if U4g or U4h changed a decoder.
+  bars (u5-alloc-bounds.md) if U4g or U4h changed a decoder or the client's receive path (ADV-U5E-7).
 - The register (u4s-carries.md, the next free numbers, each quoting its source): U5's section gains U5-Q1 to Q3 and Q5
   to Q7 with their terms, T2-L2 and S2; U6's section gains -35's counted run after U6's merge and the swap-form carry;
   :764's cite becomes ADR 0002:269.

@@ -1,0 +1,37 @@
+--- .checkpoints/netcode-proof-test/u4f-run.sh
++++ .checkpoints/netcode-proof-test/u5-run.sh
+@@ -1,19 +1,19 @@
+ #!/usr/bin/env bash
+-# U4f's runner (u4f-brief.md section 4; W1-TARGET, advisor-u4-wave1.md; u4d2-run.sh copied, advisor-u4d2-m9.md): one
+-# command, or a sequence, in the U4f builder's worktree, with the shared target. It takes the shared target's lane lock
++# U5's runner, copied from u4f-run.sh for U5-EARLY (advisor-u5-early.md condition 10) (u4f-brief.md section 4; W1-TARGET, advisor-u4-wave1.md; u4d2-run.sh copied, advisor-u4d2-m9.md): one
++# command, or a sequence, in the U5 builder's worktree, with the shared target. It takes the shared target's lane lock
+ # (`-x`: exclusive, for a counted run, a check.mjs run, a `--list` or clippy confirmation, each bite run and each
+ # scratch switch or plant; otherwise shared), waits until no other cargo or rustc runs, checks 4 GB free, touches every
+ # file under the copy's crates/ first and every 2 s while the commands run (the loop starts and stops here), and runs
+ # each command from the copy's spikes/netcode-proof with CARGO_TARGET_DIR on the shared target and
+ # CARGO_NET_OFFLINE=true. Everything goes to the log file, which must be under
+-# /home/user/Shamble-Frontlines/.gate/u4f/; each command's exit code and, at the end, the provenance lines
++# /home/user/Shamble-Frontlines/.gate/u5/; each command's exit code and, at the end, the provenance lines
+ # (Compiling/Checking/Documenting npt-*) are appended. The sequence stops at the first command that fails, and the
+ # script exits with that command's code; with `-k` (given after `-x` when both are) every command runs even after one
+ # fails, each exit code logged, and the script exits with the first non-zero code. It stops with exit 5 before taking
+ # the lock if the shared target has no CACHEDIR.TAG, and before any command if the lock's file cannot be opened or the
+ # lock taken (INF2-4: advisor-u4d2-m9.md, Block 2); no runner ever makes the shared target's folder. A run's result is
+ # that exit code and the test runner's own summary lines, read from the log.
+-# Usage: bash u4f-run.sh [-x] [-k] <worktree> <log file> <command...> [:: <command...>]...
++# Usage: bash u5-run.sh [-x] [-k] <worktree> <log file> <command...> [:: <command...>]...
+ set -u
+ M=/home/user/Shamble-Frontlines
+ T=$M/.gate/shared-target
+@@ -38,8 +38,8 @@
+   *) echo "STOP: the worktree must be under $M/.claude/worktrees/ (got: $W)"; exit 2 ;;
+ esac
+ case "$log" in
+-  "$M"/.gate/u4f/*) ;;
+-  *) echo "STOP: the log must be under $M/.gate/u4f/ (got: $log)"; exit 2 ;;
++  "$M"/.gate/u5/*) ;;
++  *) echo "STOP: the log must be under $M/.gate/u5/ (got: $log)"; exit 2 ;;
+ esac
+ S=$W/spikes/netcode-proof
+ [ -d "$S/crates" ] || { echo "STOP: no $S/crates"; exit 2; }
