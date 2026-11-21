@@ -3,8 +3,14 @@ Rule: Mustafa's NPT-TRIM (history.md:7561-7593), over plan rev 3.3 where they di
 tests); "likely" = the estimate x 1.35-1.5 (u6-brief.md:109). `row` = plan.md:1253 (U6's row).
 
 ## 0. Plan (a restart continues after the last block marked DONE)
-1 U6 cut DONE · 2 one WT crate DONE · 3 certificate DONE · 4 U7 PENDING · 5 U8 PENDING · 6 promote PENDING ·
+1 U6 cut DONE · 2 one WT crate DONE · 3 certificate DONE · 4 U7 DONE · 5 U8 PENDING · 6 promote PENDING ·
 7 path to R1 PENDING.
+**Resume here (22:4x UTC, after the 20:20-22:40 cut):** blocks 1-4 done; next 5, 6, 7. Notes already gathered:
+- 5: U8 row plan.md:1255; Stop B :1267-1280; laptop session §12.3 :1295-1343; Mustafa's checks §11 :1213-1241.
+- 6: ADR 0002's crate list still to read (docs/adr/0002-code-structure-build-toolchain.md, around :180-200).
+- 7: merges 11-10..11-14 about 38,000 lines in 5 days; 11-15..11-21 about 8,000 in 7 (git log of crates/); U4f2 built
+  since 11-20 14:10, part B still running 11-21 evening; daily spend-limit cuts (card :163-171); one cargo lane on the
+  shared target; disk about 8.6 GB free, floor 4 GiB (card :147-148). No web/ or package.json exists yet (ls).
 
 ## 1. U6, cut (DONE)
 **Test applied:** the firewall admits only his home IPv4 and the LGs (block 3 covers issuance), so code whose only job
@@ -124,3 +130,34 @@ he is there to create the VMs (plan.md:879-886). No `revoke`: the key faces no s
 VM, and the DNS record goes at teardown. The WT certificate: made by the room at start (U6-Q17, u6-brief.md:183), ECDSA
 P-256, valid 13 days (MDN reads "less than 2 weeks"; plan.md:992's "at most 14" sits on the edge), its hash in
 `/npt/cert-hash.json` over the trusted name (plan.md:994-995).
+
+## 4. U7, a plain browser client (DONE)
+**What R1 asks of it:** the smoke check, "WebTransport · Playing" then "WebSocket · Playing" in Brave, Chrome, Edge and
+Firefox (plan.md:1214-1220); -36's `event.mds_read.size_bytes` from process `browser`, at least 61 reads over 10 min,
+three browsers at once (marks.json PM-0001-36 checks; plan.md:739, :818); -14's ML browser parts (marks.json).
+**Decoding: a Wasm build of npt-client's endpoint, not a TypeScript twin.** `ClientEndpoint` (client/src/lib.rs,
+1,210 lines, with clock.rs 348) already holds the codec, the ack ring, ClockSync and the tick-lead controller that
+stamps commands (`with_clock`, :354-365; `input`, :532-558); the bots run it, so browser and LG speak through one
+reviewed implementation. It uses npt-sim's grid and record types only and steps no World (lib.rs:20-21), so "no sim in
+Wasm" holds in meaning; even npt-proto alone depends on npt-sim for the wire grid (plan.md:426-428), so no Wasm codec
+avoids that crate. A TypeScript twin would be a second bit layout and clock to prove equal (golden vectors), with no
+cargo saved (the vectors need it).
+**It needs:** npt-client-wasm's exports, create, input, step and one counters read (client-wasm/src/lib.rs is a stub;
+wasm-bindgen is not in Cargo.toml: a new dependency, DEP-HOLD); a Worker holding Wasm and transport: WebTransport with
+`serverCertificateHashes` from `/npt/cert-hash.json` and a 1.5 s timeout, then `wss` (plan.md:495-496), arrival stamps,
+`maxDatagramSize` read at start and every 10 s; a timer from `next_due_ns`, at most 7 ticks a wake (plan.md:497); a fixed
+press script (buttons and press counters, no aim from a cursor); acknowledgements come from the endpoint's ring; a page
+of counters by `textContent` (transport, state, snapshots and bytes per second each way, refused, stale, RTT, size
+reads); records as npt-log JSON lines kept in page memory for the WebDriver spec to collect (U8).
+**Goes:** render.ts and three.js itself, block.ts, the overlay's form and record.ts, connect.ts (-28 moved), AimCast,
+BlockWriter, `/iso/`, the Worker restart and rejoin after a trap (PM-0004-61's online half moved), the hash check.
+**Carries:** C-U7-1 (wasm-opt hash check) and C-U7-2 (npt-hash-wasm in Chromium) GO with the hash check (NPT-TRIM:
+change-set 3 checks determinism). C-U7-3 KEEPS: the endpoint takes the previous step's send time and ClockSync stamps
+each `Ping` with it; the cap's source: my lean is the room's bound compiled into the same commit's Wasm (`with_clock`
+takes it as a number, lib.rs:362; LEAD-BOUND is frozen), no wire change; else the ruling's `JoinAccepted` field in
+U6d's S2 (plan.md:1254). C-U7-4 KEEPS: ClockSync's clamps and trimmed surface, now that it runs in a Worker.
+**Flag for the mark table:** -52's R1 parts (ML hit feedback, marks.json) need drawing and hit feedback, which this
+client does not have: move them with change-set 8 (Shoot).
+**Size:** Rust (exports and their tests 200, C-U7-3 60, C-U7-4 100) 360; TypeScript (net 350, Worker host 150, page and
+counters 120, records 120, press script and smoke 80, config with exact pins 60, Node tests with a fake transport 200)
+1,080. About 1,450 estimate, likely 1,950-2,200. Its Wasm build needs the cargo lane; the TypeScript does not.

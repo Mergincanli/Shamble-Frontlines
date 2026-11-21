@@ -523,4 +523,59 @@
   at lib.rs:2101 (unrejected outside the window: n 12, 576, 588). Restored by Edit, 61733681… equal (clean forged.rs
   9145856b…, scenario.rs f1e1166d…).
 - SIZE-CHECK after FP-2: +2,168 -190 tracked; forged.rs 475 (`wc -l`): about 2,643 added (+77), under the advisor's
-  2,800 and Mustafa's 3,000.
+  2,800 and Mustafa's 3,000. Snapshot taken: e33d14f0d9d5fd51052cbb2923e8f787e7b962ee3b66876a4e71c1f3970e8c10
+  (190,233 B).
+- **Step 2: fmt, clippy and doc: PASS** (u4f2-fp2-end.log, `-x -k`, 19:54-19:56:38 UTC, tree diff 4e15fbde…, free
+  7,356 MiB): `cargo fmt --check` exit 0; clippy `--workspace --all-targets -D warnings` measured and `--all-features`
+  exit 0; clippy wasm32 (check.mjs's WASM_CRATES) measured and `--all-features` exit 0; `RUSTDOCFLAGS=-Dwarnings
+  cargo doc --no-deps` host measured and `--all-features`, wasm32 measured and `--all-features`, each exit 0.
+- **R5's forged lines, measured half** (u4f2-r5b.log, `-x -k`, 19:57-19:59:29 UTC, tree 4e15fbde…, free 6,554 MiB at
+  its start): the measured release build, set 21's forged A and B, measured and twin (10 s + 5 s;
+  .gate/u4f/u4f2-r5b/measured/), r2's p1, p14, p17 (.gate/u4f/u4f2-r5b/r2/), all exit 0, in a building 0. Shots
+  forged A 691 (twin 691), B 698 (698); p1 689, p14 689, p17 696. Every run's fate log equals its early run's
+  (forged A c1f687af…, A twin 802f1443…, B bf110be8…, B twin db3c1ebc…, p1 = p14 b717b5ab…, p17 d8a046cb…): FP-2
+  moved no datagram. Judge call (measured folder, verdict.json, exit 0): PM-0001-21 FAIL by length ("1,000 commands
+  of every kind" 32 and 36), "every forged command rejected and counted" 0 and the twin check 0 on both options;
+  PM-0001-2's band checks pass (691.8, 698.8; PM-0001-2 NOT-RUN, 2 of 3 seeds). The reader: kind 7 `sent_count` 36,
+  `dead_left_out_count` 0, unrejected 0 on both options (no death in 15 s). The measured call read only the new
+  folder; the early non-forged lines' verdicts stand in u4f2-r5/verdict.json.
+- **R5's forged lines, bites half** (u4f2-r5b-bites.log, `-x -k`, 19:59-20:02:02 UTC, free 6,538 MiB at its start): the
+  bites release build, the 11 forged no-* bites (.gate/u4f/u4f2-r5b/bites/) and r2's p7, all exit 0, in a building 0;
+  shots no-lead-bound 679, the next five 693, the last five 691, p7 677 (as in the early run). Judge call (bites
+  folder, verdict-bites.json, exit 0): all 11 forged bites "shown" (by length at 5 s, as before); the clamp and
+  fast-clock bites "not_run" here (not re-run: their early runs stand in u4f2-r5/verdict-bites.json).
+- **R2: DONE, counted, every figure on the ruling's lines** (u4f2-r2.log, `-x -k`, background, 20:02-20:21:43 UTC,
+  tree 4e15fbde…, free 6,517 MiB at its start; it ended before the spend-limit cut): seed 1's 610 s forged pairs
+  under A and B, measured then twin (.gate/u4f/u4f2-r2/measured/), all exit 0, in a building 0; judged in 5.4's form
+  (verdict.json, exit 0; PM-0001-2 and PM-0001-21 NOT-RUN overall: 2 of 3 and 1 of 3 seeds, by design here).
+  - Every kind's `unrejected_count` **0 under A and B**; the judge's "every forged command rejected and counted"
+    PASSES with 0 on both runs.
+  - **Kind 7's `dead_left_out_count`: A 18, B 8** (every other kind 0 on every record): the very counts R2-pre read as
+    unrejected, so every one of them was a dead-window item, as the ruling's proof asks.
+  - Sent: kind 7 1,505 (A) and 1,515 (B) after the left-out items, every other kind 1,523 (kind 10 1,656, 1,660):
+    "1,000 commands of every kind" PASSES (1,505 and 1,515, the least).
+  - **Twin mismatch 0** on both: the judge's twin check 0, and every one of 18,300 ticks' hashes equal (the reader).
+  - Shots: **A 685.77, B 691.52** (PM-0001-2's band checks pass on each run).
+  - Slot 6 under B: 0 of 18,000 measured ticks with its command missing (`input_missing`); `commands_repeat_count` 0.
+  - `counted_count` 1,523 = `sent_count` for kinds 8, 9 and 11 on both runs; `refusals_dropped_count` 0.
+- Resumed 2026-11-21 after the second cut (the worker restarted at about 22:40 UTC): `git status --short` as before;
+  no plant (bots lib.rs 61733681…, forged.rs 9145856b…, scenario.rs f1e1166d…); the last edit whole; free
+  8,292,446,208 B; the debug profile cleaned again (about 23:10 UTC). The coordinator's message placed me at step 2;
+  the record above shows step 2, R5's forged lines and R2 done before the cut.
+- Snapshot after the resume check: e33d14f0d9d5fd51052cbb2923e8f787e7b962ee3b66876a4e71c1f3970e8c10 (unchanged code).
+- **The lag-switch A proof: the logs equal** (u4f2-r5-lagproof.log, `-x -k`, 23:08-23:09:10 UTC, tree 4e15fbde…):
+  the measured release build, then set 21's lag-switch A line with the early run's arguments but `--out`
+  (.gate/u4f/u4f2-r5c/measured/l1-21-lag-switch-a-s1), exit 0, shots 701. Its lab log's `fate_log` sha256
+  0576dea2de31df67172f515e5887c60832ba7cb789f5be11064f300bac25ebc7 equals the early run's (u4f2-r5, the same 64 hex),
+  and the reader finds its room log's per-tick hashes "equal: 481 ticks" with the early run's.
+- **FP-2's diff scope, against the ruling's letter** (advisor-u4f2-parta.md:103-104: "only forged.rs, scenario.rs's
+  attribution wiring and SERIES.md"): it also touches bots lib.rs: the new `pub const fn kind_7_left_out` (the
+  window's one rule, which no npt-bots path calls outside its tests; npt-lab's attribution calls it) and T-K7's lines
+  (its classification by the rule, its print, its messages and doc). scenario.rs's part is the attribution's
+  wiring (`dead_before`, its fill after each tick, the `tick` call) and f16's added `dead_left_out_count` assertion.
+  So the scope reads wider than the letter by the one predicate (my design choice, written before the build, so one
+  plant fails both the f33 case and T-K7). The proof's hashes and fate log are equal, and every forged line of R5
+  also kept its early fate log (u4f2-r5b.log). For the advisor: whether R4 and R5's non-forged lines need a re-run on
+  that account (my reading: no; none of their code changed).
+- Resume here: R3 (bite-no-lead-bound at 610 s, bites release build; log u4f2-r3.log), then step 4 (snapshot,
+  report, stop).
