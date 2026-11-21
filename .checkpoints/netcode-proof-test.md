@@ -180,8 +180,8 @@
   279,895/s none; free 7.54 GB; cargo-fuzz makes an empty fuzz/artifacts/input/ before -artifact_prefix (guard-header carry).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
-  **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver bdituvkdn
-  from 17:47 (to about 19:47); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38).
+  **Check-in PAUSED 18:22 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; no agent runs; on again with the next one); saver bdituvkdn
+  from 17:47 (to about 19:47); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38; unchanged at 18:22).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-21 16:12:40 to 17:41:37 UTC (a spend-limit cut: U5's builder in Block 2's fmt check, Block 1 done; the
