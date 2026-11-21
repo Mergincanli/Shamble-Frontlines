@@ -45,6 +45,27 @@ Task: U4g's early builder (PR #40, lane claude/netcode-proof-test-plan-hcky5g), 
 
 - Snapshot at the stop: wip/u4g-early.patch 61,743 B, 5 files, sha256 a842de672bd6a254c5a184825f3fde6427d7918793fd97d834e0d763e450251e. `df -B1` at the stop: 3,793,887,232 B. Added lines in spikes/ so far: block 1 457 (world.rs +101, sim/tests/predict.rs 356); block 2a uncompiled 776 (client predict.rs 413, lib.rs +6, client/tests/predict.rs 357). Clippy and fmt not run (the runner refuses any command under 4 GB; condition 6 forbids build calls under 5.5 GB).
 
+## Resume 1 (coordinator: P27 dev part-clean ~07:50 UTC, 5.4 GiB; snapshot a842de67… checked; U4G-DISK (a))
+- Worktree as left (`git status`: the same 6 entries). df before the 2a compile call: 9,372,377,088 B.
+
+- 2a compile call 1 (.gate/u4f/u4g-early-b2a-client2.log, exit 101 both builds): 5 of 6 pass; p60_each_own_change failed: the MoveSpeed change counted the fire-interval change's first correction (corrections 2, misplaced 1). Fix (finding F3): a snapshot that opens a change gives its correction to that change only (`own_changes`). df after: 9,184,997,376 B.
+- 2a compile call 2 (u4g-early-b2a-client3.log): 6 passed in each build, exit 0. df after: 9,132,306,432 B. Clean predict.rs sha256 524819710a45df235affe6200470bc5c328f6e7ce9531ff0a90aa14efb40d71f.
+- Plants, one at a time, each runner -x -k, measured build, restored by Edit and the hash checked equal to 52481971… after each:
+  - "every correction taken as traced" (`let traced = true || …`): FAILED by name fade_snap_and_clear_and_the_5_cm_flag (predict.rs:335) and p60_each_own_change (:292); log u4g-early-b2a-plant-traced.log.
+  - "the fade off" (`self.fade_left = 0` at a fade): FAILED fade_snap_and_clear… (:338); log u4g-early-b2a-plant-fade.log.
+  - "the clear skipped" (the snap/respawn branch removed): FAILED fade_snap_and_clear… (:350, the snap's clear); log u4g-early-b2a-plant-clear.log.
+  - "the threshold moved" (FLAG_UM 50_000 -> 30_000): FAILED fade_snap_and_clear… (:345, the 4 cm case); log u4g-early-b2a-plant-flag.log.
+
+- fmt: u4g-early-b2a-fmt.log exit 1 (rustfmt's line breaks in client predict.rs, client/tests/predict.rs, sim world.rs, sim/tests/predict.rs): the diff applied by Edit; u4g-early-b2a-fmt2.log exit 0. df after: 9,133,453,312 B.
+- Pre-lint (not the stop's): `cargo clippy --locked -p npt-sim -p npt-client --all-targets -- -D warnings`, both builds, exit 0 (u4g-early-b2a-clippy-pre.log). df after: 9,056,931,840 B. Then the 2a block-end workspace run (df before it: 9,056,931,840 B).
+
+- 2a block-end workspace run (condition 7): .gate/u4f/u4g-early-b2a-ws.log, runner -k, exit 0 both: measured 650 passed, 0 failed, 15 ignored (to 08:01:20 UTC); bites 750 passed, 0 failed, 15 ignored (to 08:10:43). Deltas on 642/739: +8 measured (sim 2, client 6), +11 bites (sim 5, client 6). df after: 4,524,601,344 B (the run took about 4.53 GB).
+- BLOCK 2a DONE. Added lines in spikes/ now: tracked +109 (world.rs +104, lib.rs +5 by `git diff --stat 8f9d97d`), new files 1,227 (client predict.rs 431, client/tests/predict.rs 418, sim/tests/predict.rs 378): 1,336 in all; block 1 482 (after fmt), block 2a 854 (the Predictor alone 431: past ~400).
+- STOP (condition 6): 4,524,601,344 B free, under 5.5 GB: no build call; snapshot; return. Next cycle (after a part-clean): 2b as planned under "On resume" (endpoint wiring + its tests at client/tests/predict.rs's end), then blocks 3 and 4.
+
+- Snapshot after block 2a: wip/u4g-early.patch 63,277 B, 5 files, sha256 2ec04263c31fcd169557ff2e0e77290c213b97c9661ff6cbe8313de44d070ba5. df at the stop: 4,524,601,344 B.
+
 ## Findings (one line each)
+- F3: an own-state change's first correction was also counted, as misplaced, in an older change still open (the move-speed change counted the fire-interval change's); fixed in `own_changes` (the snapshot that opens a change gives its correction to it alone). A judged -60 run with two kinds open at once would have failed "at most one correction per change" on a correct build.
 - F2 (disk): one whole-workspace test pass in both builds at a fresh worktree path costs about 3.8 GB of the shared target (07:24-07:41 UTC: 7,565,500,416 B free before, 3,794,055,168 B after), so condition 6's 6.5 GB launch line leaves room for one block end, not four. Each remaining block end needs a part-clean (P27, the main session's, no builder running) or a decision to run block ends on the touched crates only (condition 7 says workspace-wide: not mine to change).
 - F1: -58's three command counters (`tick.v.cmd_refused_count`, `.cmd_lost_count`, `.cmd_doubled_count`) MOVED to the re-base, beside block 5's `wrap` suite (condition 3): the refused count's site is the refusal path room.rs:930-1019 or `Room::refusals()` (B2 ranges 930-938, 980-986, 1006-1019; names `refusals`, `Refusal`), and what it counts (forged kinds only, or late/outside-window drops too) rides C-U4F2-3's record form. Lost and doubled would fit (run path, run_one room.rs:1333-1376), but the rule builds the three early only if all fit.
