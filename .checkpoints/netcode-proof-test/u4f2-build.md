@@ -459,3 +459,30 @@
   fast clock's commands where they were. Count: clamp A/B and twins, fast-clock A/B, lag-switch A/B, the two non-forged
   bites, the proof; smoke: forged A/B and twins, the 11 forged bites, p1, p7, p14, p17.
 - Free after R0, R4 and R5: 8,035,160,064 B, above 6.5 GB: R2-pre and R3-pre run.
+- **R2-pre: DONE, a pre-read that does not count, no stop met** (u4f2-r2pre.log, `-x -k`, run in the background,
+  02:45-03:04:41 UTC, tree a9027b71…; free 7,662 MiB at its start): the measured release build, then seed 1's 610 s
+  forged pairs (10 s + 600 s, P0, `--forge-every 12`) under A and B, each measured run then its twin
+  (.gate/u4f/u4f2-r2pre/measured/), all exit 0, in a building 0; judged in 5.4's form (verdict.json, exit 0).
+  - **Twin mismatch 0 on both options**: the judge's "0 effect beyond the valid part" passes with 0 under A and B, and
+    the reader finds every tick's state hash equal ("equal: 18300 ticks") between each measured run and its twin.
+  - **Shots**: A 685.77, B 691.52 a measured second (PM-0001-2's band checks pass on each run; PM-0001-2 itself
+    NOT-RUN: 2 of the 3 seeds it needs).
+  - **Unrejected: kind 7 only** (A 18, B 8; dead-window items expected, unproven until FP-2); every other kind 0.
+    The judge's "every forged command rejected and counted" FAILS on that (18, 8), as expected before FP-2.
+  - Sent: 1,523 each kind (kind 10: 1,656 A, 1,660 B), measured 1,499 each (kind 10: 1,632, 1,636): "1,000 commands
+    of every kind" passes (1,523); `counted_count` 1,523 = `sent_count` for kinds 8, 9 and 11 under both options;
+    `refusals_dropped_count` 0.
+  - Slot 6 under B: 0 of 18,000 measured ticks with its command missing (`input_missing`), `commands_repeat_count` 0,
+    so option B re-ran none of its commands. (`commands_rerun_count` is not a name the lab writes; the reader counts
+    `input_missing` instead.) Slot 6's client_counts read the same under A.
+- Free after R2-pre: 7,777,468,416 B.
+- **R3-pre: DONE, a pre-read that does not count, no stop met** (u4f2-r3pre.log, `-x -k`, in the background,
+  03:05-03:10:17 UTC, tree a9027b71…): the bites release build, then bite-no-lead-bound at 610 s (seed 1, option A,
+  .gate/u4f/u4f2-r3pre/bites/), exit 0, in a building 0. **Shots 673 a measured second** (the summary line; above the
+  670 line by 3, the thinnest of all runs, as TE-U4F2-6 foresaw). Unrejected: **kind 1, the bite's own, 1,523 of 1,523**;
+  kind 7 10 (dead-window items expected before FP-2); every other kind 0. Sent 1,523 each (kind 10 1,656);
+  `counted_count` = `sent_count` for 8, 9, 11. So the bite reaches its own kind at length, and only kind 7's dead
+  items stand beside it until FP-2. Not judged (the ruling asks the figures, not a verdict).
+- End of part A2: free 7,712,194,560 B; size +2,144 -190 tracked, forged.rs 422: about 2,566 added (under the
+  advisor's 2,800). No code changed after F-G's snapshot (eb7c42c6…); the reader script is scratch in this folder.
+  FP-2 not built.
