@@ -2,17 +2,9 @@
 Rule: Mustafa's NPT-TRIM (history.md:7561-7593), over plan rev 3.3 where they differ. Sizes are added lines (code and
 tests); "likely" = the estimate x 1.35-1.5 (u6-brief.md:109). `row` = plan.md:1253 (U6's row).
 
-## 0. Plan (a restart continues after the last block marked DONE)
-1 U6 cut DONE · 2 one WT crate DONE · 3 certificate DONE · 4 U7 DONE · 5 U8 PENDING · 6 promote PENDING ·
-7 path to R1 PENDING.
-**Resume here (22:4x UTC, after the 20:20-22:40 cut):** blocks 1-4 done; next 5, 6, 7. Notes already gathered:
-- 5: U8 row plan.md:1255; Stop B :1267-1280; laptop session §12.3 :1295-1343; Mustafa's checks §11 :1213-1241.
-- 6: ADR 0002's crate list still to read (docs/adr/0002-code-structure-build-toolchain.md, around :180-200).
-- 7: merges 11-10..11-14 about 38,000 lines in 5 days; 11-15..11-21 about 8,000 in 7 (git log of crates/); U4f2 built
-  since 11-20 14:10, part B still running 11-21 evening; daily spend-limit cuts (card :163-171); one cargo lane on the
-  shared target; disk about 8.6 GB free, floor 4 GiB (card :147-148). No web/ or package.json exists yet (ls).
+## 0. Plan: blocks 1-7 DONE (2026-11-21, resumed after the 20:20-22:40 UTC cut)
 
-## 1. U6, cut (DONE)
+## 1. U6, cut
 **Test applied:** the firewall admits only his home IPv4 and the LGs (block 3 covers issuance), so code whose only job
 is stopping strangers goes; what keeps an honest run correct, measured or bounded stays.
 **Cut** (each moves to the security baseline before the first online playtest, NPT-TRIM's R4 line, unless noted):
@@ -31,9 +23,8 @@ is stopping strangers goes; what keeps an honest run correct, measured or bounde
   and a run admitting one stays INVALID (plan.md:1113-1114).
 - Per-session controls (SetProfile, BlockUdp, TriggerBurst, the form) with their gate and bites (plan.md:1083-1095):
   R3 is unattended (plan.md:820), so L2 settings go per peer set through the control socket only.
-- -25's "do never-joining sessions get a DelayStream" (row; R4); the host's 404 bite and `/iso/` COOP/COEP path
-  (PM-0001-43/-44 are R7/ML: moved); robots and noindex (plan.md:1126-1131). The host keeps exact-path matching, which
-  has no traversal by construction.
+- -25's "do never-joining sessions get a DelayStream" (row; R4); the host's 404 bite, `/iso/` COOP/COEP path
+  (PM-0001-43/-44: R7/ML, moved), robots and noindex (plan.md:1126-1131); exact-path matching has no traversal anyway.
 - systemd template units per slot user, ProtectSystem, the empty CapabilityBoundingSet, per-slot 0700 dirs and the
   room-unit sudo controls (plan.md:1078-1082, :1139-1144): npt-super starts rooms as its own children under one
   unprivileged user and SIGKILLs them itself (-27 needs the kill, not systemd). security-auditor confirms at Stop B.
@@ -43,10 +34,9 @@ is stopping strangers goes; what keeps an honest run correct, measured or bounde
 the 2 s Join deadline covering TLS (a stuck own client must not hold a slot: plan.md:515); socket size limits and
 panic-free decode (built in npt-proto and pump.rs's Decoder: u6-facts.md:78); the control socket's size-limited parse;
 E22's no-verbatim-client-string logs and PM-0006-21's canaries (R5); `redact-check`.
-
 **Carries** (row):
-- C-U6-1 to -7 KEEP: R1's L2 probe block and ImpairSocket's R1 self-test (plan.md:818, :1255). C-U6-8 KEEP: the probe's
-  stamps claim only what a test proves (150 lines).
+- C-U6-1 to -7 KEEP: R1's L2 probe block and ImpairSocket's R1 self-test (plan.md:818, :1255). C-U6-8 KEEP: the
+  probe's stamps claim only what a test proves (150 lines).
 - C-U6-9 KEEP (U6j): -30's twin form (R3, C). C-U6-10 KEEP (U6j): PM-0006-20 (R2). C-U6-11 KEEP for LG clients (-19,
   R3); its ML-browser `decoded_hash` writer MOVES with -19's R7/ML parts (the plain client has no hash).
 - C-U6-12 CUT (one full-state stream, control-message limit: hostile only) -> baseline.
@@ -74,7 +64,7 @@ E22's no-verbatim-client-string logs and PM-0006-21's canaries (R5); `redact-che
 U6a-U6e: about 9,200-9,450 (was 11,200-12,450). R1 needs U6a-U6c: 5,830, likely 7,850-8,750. Each piece stays under
 SIZE-CHECK's 6,000 at 1.5x.
 
-## 2. One WebTransport crate: web-transport-quinn 0.13.x (DONE)
+## 2. One WebTransport crate: web-transport-quinn 0.13.x
 - **Why it:** it is built for a caller-made quinn endpoint (`Server::new(endpoint)`, public `Request::accept(conn)`:
   u3-scout-wt.md:29), which ImpairSocket needs; wtransport reaches that only through its `quinn` feature and keeps its
   endpoint private (:24-26, :46). Its `Session` derefs to `quinn::Connection`, so `datagram_send_buffer_space` (ADR
@@ -86,28 +76,27 @@ SIZE-CHECK's 6,000 at 1.5x.
   `[::]:0` with `unwrap` (u3-scout-wt.md:47: npt-load uses `Client::new(endpoint, config)`); its default provider is
   aws-lc-rs, so rustls is built with `builder_with_provider(ring)` (u3-verify-wt.md:43, as l2/wt.rs does per crate:
   u6-facts.md:126-128). wtransport's self-signed helper is not needed: rcgen is in the lock (u6-facts.md:286-287).
-- **What stays built:** the `wt-wtransport` feature and U3's tests as they are; U6 builds nothing new on it.
+  The `wt-wtransport` feature and U3's tests stay as built; U6 builds nothing new on it.
 - **Must a kept run compare both?** No. -30 compares WebTransport with WebSocket (`params.transport`, row C-U6-9), not
   crates. PM-0001-28 runs on ML*, MAC-r and R4 (marks.json `where`), none of R1, R2, R3, R5; -35 moves with U5.
 - **PM-0001-28 and R2-TRN-OQ1:** -28's text needs both crates in every browser (ADR 0001:1620), so one crate cannot pass
   it here: it MOVES to the real game's transport change-set, unchanged, and R2-TRN-OQ1 stays open until it runs there.
-  Every header names the crate, and R1's smoke results go to that change-set as evidence, not a verdict. PM-0001-35
-  (:1627) moves with U5.
+  Every header names the crate; R1's smoke results go there as evidence, not a verdict. PM-0001-35 (:1627) moves with U5.
 
-## 3. The certificate behind the firewall: DNS-01 by hand (DONE)
-**Sources.** HTTP-01 "can only be done on port 80", TLS-ALPN-01 runs "via TLS on port 443", DNS-01 is a TXT record at
-`_acme-challenge.<domain>` and suits servers "not exposed to the public internet"; DNS API credentials on a server raise
-"the impact if that web server is hacked" (https://letsencrypt.org/docs/challenge-types/). Let's Encrypt does not
-"publish a list of IP addresses we use to validate, and these IP addresses may change at any time", and validates "from
-multiple network perspectives" (https://letsencrypt.org/docs/faq/). `shortlived`: ~160 h, authorizations reused 7 h,
-still a CRL URL (https://letsencrypt.org/docs/profiles/). Cloudflare TXT records "are always DNS-only"
-(https://developers.cloudflare.com/dns/proxy-status/). instant-acme 0.8.5 gives the TXT value
+## 3. The certificate behind the firewall: DNS-01 by hand
+**Sources** (high confidence). HTTP-01 "can only be done on port 80", TLS-ALPN-01 runs "via TLS on port 443", DNS-01 is
+a TXT record at `_acme-challenge.<domain>` for servers "not exposed to the public internet"; DNS API credentials on a
+server raise "the impact if that web server is hacked" (https://letsencrypt.org/docs/challenge-types/). Let's Encrypt
+does not "publish a list of IP addresses we use to validate, and these IP addresses may change at any time", and
+validates "from multiple network perspectives" (https://letsencrypt.org/docs/faq/). `shortlived`: ~160 h,
+authorizations reused 7 h, still a CRL URL (https://letsencrypt.org/docs/profiles/). Cloudflare TXT records "are always
+DNS-only" (https://developers.cloudflare.com/dns/proxy-status/). instant-acme 0.8.5 gives the TXT value
 (`KeyAuthorization::dns_value`, https://docs.rs/instant-acme/0.8.5/instant_acme/struct.KeyAuthorization.html).
 `serverCertificateHashes`: X.509v3, ECDSA P-256, no RSA, "a validity period of less than 2 weeks", secure contexts only
 (https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/WebTransport); Chrome and Edge 100, Firefox 125, Safari
 26.4 (https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/WebTransport.json; spec:
-https://www.w3.org/TR/webtransport/#certificate-hashes). The WebSocket constructor has no hash option (URL and
-protocols only: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket). All high confidence.
+https://www.w3.org/TR/webtransport/#certificate-hashes). The WebSocket constructor has no hash option (URL and protocols
+only: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket).
 **Weighed.** HTTP-01 or TLS-ALPN-01: unlisted, changing validators mean port 80 (or 443) open to every address per
 order, so `fw-rs` keeps "TCP 80 from any" with nftables gating it (plan.md:913, :961), plus a root wrapper editing
 nftables and a responder: automatic, but a hole to the world and more code. DNS-01 with an API token: a secret on RS or
@@ -125,39 +114,109 @@ DNS for one order and closes it after (plan.md:961's window, minus the port). Pe
    loop: plan.md:949-951, :972-973), readies the challenge, requires `shortlived` in production (fails closed:
    plan.md:966-967), writes the key 0640 and the chain, closes egress, prints serial and hash for the ledger.
 4. Mustafa deletes the TXT record; the laptop session confirms its absence over DNS-over-HTTPS (as plan.md:898-899).
-R1: staging, then production (two edits inside its 0.25 h block, plan.md:818); R2, R3, R5: one each at bring-up, when
-he is there to create the VMs (plan.md:879-886). No `revoke`: the key faces no stranger, lives 6 days, dies with the
-VM, and the DNS record goes at teardown. The WT certificate: made by the room at start (U6-Q17, u6-brief.md:183), ECDSA
+R1: staging, then production (two edits inside its 0.25 h block, plan.md:818); R2, R3, R5: one each at bring-up, when he
+is there to create the VMs (plan.md:879-886). No `revoke`: the key faces no stranger, lives 6 days, dies with the VM,
+and the DNS record goes at teardown. The WT certificate: made by the room at start (U6-Q17, u6-brief.md:183), ECDSA
 P-256, valid 13 days (MDN reads "less than 2 weeks"; plan.md:992's "at most 14" sits on the edge), its hash in
 `/npt/cert-hash.json` over the trusted name (plan.md:994-995).
 
-## 4. U7, a plain browser client (DONE)
+## 4. U7, a plain browser client
 **What R1 asks of it:** the smoke check, "WebTransport · Playing" then "WebSocket · Playing" in Brave, Chrome, Edge and
-Firefox (plan.md:1214-1220); -36's `event.mds_read.size_bytes` from process `browser`, at least 61 reads over 10 min,
-three browsers at once (marks.json PM-0001-36 checks; plan.md:739, :818); -14's ML browser parts (marks.json).
-**Decoding: a Wasm build of npt-client's endpoint, not a TypeScript twin.** `ClientEndpoint` (client/src/lib.rs,
-1,210 lines, with clock.rs 348) already holds the codec, the ack ring, ClockSync and the tick-lead controller that
-stamps commands (`with_clock`, :354-365; `input`, :532-558); the bots run it, so browser and LG speak through one
-reviewed implementation. It uses npt-sim's grid and record types only and steps no World (lib.rs:20-21), so "no sim in
-Wasm" holds in meaning; even npt-proto alone depends on npt-sim for the wire grid (plan.md:426-428), so no Wasm codec
-avoids that crate. A TypeScript twin would be a second bit layout and clock to prove equal (golden vectors), with no
-cargo saved (the vectors need it).
-**It needs:** npt-client-wasm's exports, create, input, step and one counters read (client-wasm/src/lib.rs is a stub;
-wasm-bindgen is not in Cargo.toml: a new dependency, DEP-HOLD); a Worker holding Wasm and transport: WebTransport with
-`serverCertificateHashes` from `/npt/cert-hash.json` and a 1.5 s timeout, then `wss` (plan.md:495-496), arrival stamps,
-`maxDatagramSize` read at start and every 10 s; a timer from `next_due_ns`, at most 7 ticks a wake (plan.md:497); a fixed
-press script (buttons and press counters, no aim from a cursor); acknowledgements come from the endpoint's ring; a page
-of counters by `textContent` (transport, state, snapshots and bytes per second each way, refused, stale, RTT, size
-reads); records as npt-log JSON lines kept in page memory for the WebDriver spec to collect (U8).
-**Goes:** render.ts and three.js itself, block.ts, the overlay's form and record.ts, connect.ts (-28 moved), AimCast,
-BlockWriter, `/iso/`, the Worker restart and rejoin after a trap (PM-0004-61's online half moved), the hash check.
-**Carries:** C-U7-1 (wasm-opt hash check) and C-U7-2 (npt-hash-wasm in Chromium) GO with the hash check (NPT-TRIM:
-change-set 3 checks determinism). C-U7-3 KEEPS: the endpoint takes the previous step's send time and ClockSync stamps
-each `Ping` with it; the cap's source: my lean is the room's bound compiled into the same commit's Wasm (`with_clock`
-takes it as a number, lib.rs:362; LEAD-BOUND is frozen), no wire change; else the ruling's `JoinAccepted` field in
-U6d's S2 (plan.md:1254). C-U7-4 KEEPS: ClockSync's clamps and trimmed surface, now that it runs in a Worker.
-**Flag for the mark table:** -52's R1 parts (ML hit feedback, marks.json) need drawing and hit feedback, which this
-client does not have: move them with change-set 8 (Shoot).
-**Size:** Rust (exports and their tests 200, C-U7-3 60, C-U7-4 100) 360; TypeScript (net 350, Worker host 150, page and
-counters 120, records 120, press script and smoke 80, config with exact pins 60, Node tests with a fake transport 200)
-1,080. About 1,450 estimate, likely 1,950-2,200. Its Wasm build needs the cargo lane; the TypeScript does not.
+Firefox (plan.md:1214-1220); -36's `event.mds_read.size_bytes` from process `browser`, at least 61 reads in 10 min,
+three browsers at once (marks.json PM-0001-36; plan.md:739, :818); -14's ML browser parts (marks.json).
+**Decoding: a Wasm build of npt-client's endpoint, not a TypeScript twin.** `ClientEndpoint` (client/src/lib.rs 1,210
+lines, clock.rs 348) already holds the codec, the ack ring, ClockSync and the tick-lead controller that stamps commands
+(`with_clock` :354-365, `input` :532-558), and the bots run it: one reviewed implementation on both sides. It uses
+npt-sim's grid and record types and steps no World (lib.rs:20-21), so "no sim in Wasm" holds in meaning; npt-proto
+itself depends on npt-sim for the wire grid (plan.md:426-428), so no Wasm codec avoids that crate. A TypeScript twin
+would be a second bit layout and clock to prove equal by golden vectors, which need cargo anyway.
+**It needs:** npt-client-wasm's exports create, input, step and one counters read (client-wasm/src/lib.rs is a stub;
+wasm-bindgen is new: DEP-HOLD); a Worker holding Wasm and transport: WebTransport with `serverCertificateHashes` from
+`/npt/cert-hash.json` and a 1.5 s timeout, then `wss` (plan.md:495-496), arrival stamps, `maxDatagramSize` at start and
+every 10 s; a timer from `next_due_ns`, at most 7 ticks a wake (plan.md:497); a fixed press script; acknowledgements from
+the endpoint's ring; a counters page by `textContent`; records as npt-log JSON lines in page memory for WebDriver (U8).
+**Goes:** render.ts and three.js itself, block.ts, the form and record.ts, connect.ts (-28 moved), AimCast, BlockWriter,
+`/iso/`, the Worker restart and rejoin after a trap (PM-0004-61's online half moved), the hash check.
+**Carries:** C-U7-1 (wasm-opt hash check) and C-U7-2 (npt-hash-wasm in Chromium) GO with the hash check (change-set 3
+checks determinism: NPT-TRIM). C-U7-3 KEEPS: the endpoint takes the previous step's send time and ClockSync stamps each
+`Ping` with it; the cap's source, my lean: the room's bound compiled into the same commit's Wasm (`with_clock` takes a
+number, lib.rs:362; LEAD-BOUND is frozen), no wire change; else the ruling's `JoinAccepted` field (plan.md:1254) in S2.
+C-U7-4 KEEPS: ClockSync's clamps and trimmed surface, now that it runs in a Worker.
+**Flag for the mark table:** -52's R1 parts (ML hit feedback, marks.json) need hit feedback this client lacks: move
+them with change-set 8 (Shoot).
+**Size:** Rust 360 (exports and tests 200, C-U7-3 60, C-U7-4 100); TypeScript 1,080 (net 350, Worker host 150, page 120,
+records 120, press script and smoke 80, pinned config 60, Node tests with a fake transport 200). About 1,450, likely
+1,950-2,200. The Wasm half needs the cargo lane; the TypeScript half does not.
+
+## 5. U8, the run package without Safari
+**Stays** (plan.md:1255; §10.5 :1136-1182): cloud-init `rs.yaml` and `lg.yaml` with the 32 KiB check (users: `npt`,
+`npt-build`, one `npt-room`, `npt-host`; `npt-load` on LG); the firewall lists rewritten: RS's game ports from his home
+IPv4 /32 and each LG's /32 (placeholders; his address typed only in the console: plan.md:1190-1192), 9100 from LG, 22
+from the laptop, no TCP 80; nftables mirrors them (an option for Stop B: `npt-ctl peers` takes the home address from the
+SSH connection itself, never typed or recorded); R1's run plan with S14's veth and netem check under TCP-FREEZE,
+DelayStream's loaded self-test sized (C-U8-3), ImpairSocket's R1 self-test and C-U8-1, -2, -4, -5, -6; the operator
+`settings.json`, `rules.md`, `PROMPT-R1.md` (§12.3 :1307-1325); the pre-push hook with `redact-check` (:1333); the sudo
+wrappers `npt-ctl peers`, `npt-cert issue`, the capture wrapper and the user-data read (H4, shell); the WebdriverIO specs
+for Chrome, Edge and Firefox on the laptop (smoke; -36's 10 minutes, three at once), fresh profiles, logs in `.gate/`
+(:1337); the operations checklist (PM-0006-12's ping, PM-0006-18's costs: plan.md:1223-1224, :1238-1239). R2's, R3's
+and R5's plans and prompts follow R1 (each needs his OK: plan.md:815), off R1's path.
+**Goes:** W-PR's workflow file, its review, approval, go and branch (plan.md:1005-1044, :1266, :1279); the Safari spec
+and runner token (:1027-1033); R1's "Safari runner conditions" 0.3 h (:818); the netcode checklist (R7, :1225-1237);
+R4's, R6's, R7's plans; the room-unit wrappers and `npt-cert revoke`.
+**Size:** cloud-init 370, firewall 40, R1.md 200, operator files 180, hook 20, wrappers 150, specs and config 250,
+checklist 40, checks and tests 110: about 1,360, likely 1,850-2,050; no cargo lane.
+**Stop B** (plan.md:1267-1280), before any VM and after U6c (it reads the page host and control plane):
+security-auditor and infra-engineer read the run package, U6c's host, the wrappers against GTFOBins and `redact-check`
+(W-PR's file out); the laptop's four-attempt guard check and the tree hash; his explicit OK of `settings.json` and
+`PROMPT-R1.md`; the Limits tab; his OK of R1's plan, cap and delete-by time. My lean: that read is U8's one round.
+
+## 6. Promote or keep (ADR 0002:184-195's crates; never an import from spikes/: :145; each promotion its own change-set
+on main, entering with the first slice that needs it: :182-183)
+- **npt-judge, npt-log, marks/** PROMOTE to `devtools` (:194) when the first MOVED mark is measured (change-set 7):
+  serde-only, pass, fail and gap fixtures; the results-log contract the real game's marks need.
+- **npt-l1** PROMOTE to `devtools`: seeded, simulated-time latency, jitter, loss and reorder with a fate log, which
+  every netcode change-set's evidence needs (CLAUDE.md step 4, "netcode").
+- **npt-net's ImpairSocket** PROMOTE to `devtools`, a test dependency of `server`: impairment under quinn's real socket
+  (:194, "network and soak layers"). **DelayStream and tcp_model** KEEP until R1's S14 check: under TCP-FREEZE netem
+  wins a disagreement (plan.md:1255), and they are about 7,200 lines (u6-facts.md:112-113).
+- **ws_gate.rs (fix 1) and npt-tcpinfo** PROMOTE to `server` with its WebSocket path (:192; ADR 0001 part 10) after
+  R3's WebSocket rows; tcpinfo keeps its unsafe exception's invariant and tests.
+- **schedule.rs** (`due_ticks`, PM-0004-67's loop policy: u6-facts.md:79) PROMOTE to `server` after R2; TickLoop after
+  R2 shows the budget. **npt-load** (calibration, LG spread): candidate for `devtools`' soak clients after R5.
+- **npt-link:** reference for `protocol`'s transport interface and loopback backend (:188); change-set 7 sets the shape.
+- **npt-lab** KEEP: scenario.rs (4,276 lines, u6-facts.md:85) is bound to the stand-in sim and room; `devtools`
+  rebuilds its role on the real sim, keeping its step order and seeds as design.
+- **KEEP in spikes/:** npt-sim, npt-proto, npt-room, npt-client, npt-bots' Behaviours, npt-super (ADR 0006's own),
+  npt-host, npt-hash-wasm, npt-client-wasm, check.mjs. `redact-check.mjs`: a `tools/` candidate if main commits results.
+
+## 7. The path to R1
+**Order** (one cargo lane; three agents at most; one round per unit, netcode and test; one advisor check per brief):
+| Day (UTC) | Cargo lane | Off-lane builder | Third seat |
+|---|---|---|---|
+| Sun 22 | U4f2: part B, round 2, fixes, merge; -21's 49 runs overnight (~8 h at 10 min: u4f2-brief.md:244) | | re-plan's advisor review, then him; U6a's brief and check; one DEP-HOLD read of every R1-path dependency (futures-util, rcgen direct, instant-acme with hyper, wasm-bindgen, the npm set) |
+| Mon 23 | U4's report; U6a build | U8 build | U6b's brief check |
+| Tue 24 | U6a round, fixes, merge; U6b starts | U8; U7's TypeScript | |
+| Wed 25-Thu 26 | U6b build, round, merge | U7's TypeScript; U8 but R1.md's numbers | U6c's brief check |
+| Fri 27-Sat 28 | U6c build, round, merge | | U7's brief check |
+| Sun 29 | U7's Rust half; U7's round over both halves; headless Chromium against a loopback server, both transports | | |
+| Mon 30 | Stop B's read as U8's round; fixes | | |
+| Tue 1 Dec | his Stop B steps (guard check, settings and prompt, Limits, R1's plan, cap, delete-by); -36's loopback legs if the laptop builds the server (R-7) | | |
+| Wed 2 Dec | **R1** (him present ~2 h; two TXT edits) | | |
+After R1, toward R2, R3, R5: U4's wire and server rows (-18's bursts, recovery after a loss burst) and its close; U6d;
+U6e; U6j with the MOVED judge change (a reviewer's read); R2's, R3's, R5's plans.
+**Earliest honest R1: Wednesday 2 December, with no slack.** The cargo lane carries about 8,350-9,250 likely lines
+(U6a-U6c, U7's Rust) in 7 days, about 1,300 a day merged. 15-21 Nov merged about 1,175 a day under heavy paper and built
+about 2,000 (git log of crates/; card :151-156); 10-14 Nov merged about 7,600 a day. So it holds only if NPT-TRIM's
+cuts to paper show at once, U4f2 merges Sunday with -21's set done Monday morning, he OKs the re-plan by Monday morning,
+every unit closes in one round, and no day is lost to the spend limit. One lost day makes it Thursday 3 December: I
+would plan for the 3rd and aim at the 2nd.
+**If the 2nd cannot hold:** (1) four cargo units in series plus Stop B leave no slack, and spend-limit cuts took 1.5 to
+4 hours on most recent days (card :163-171). (2) Closer: usage headroom for the week; Stop B's security and infra read
+folded into U6c's round. (3) Closer still: split R1, its server blocks on Mon 30 (U6a-U6c only, him not needed) and its
+browser blocks with U7 later (one more bring-up, 0.9 h, about EUR 0.15: plan.md:807, :818).
+**Risks:** the spend limit and usage cuts; disk (-21's set adds 2.4-3.0 GiB to about 8.6 GB free against the 4 GiB
+floor, card :147-148, before new dependencies and wasm32 builds; packing needs his yes, card :43-46); the DEP-HOLD reads
+and npm installs through the proxy, unproven here; the first browser contact if Chromium cannot be installed in this
+container (history.md:69-70), then the laptop or R1 itself; Firefox's hashes (from 125) untested here; C-U7-3's cap
+source if the advisor keeps the `JoinAccepted` field (S2's part then joins U6a); the laptop's OS for R-7 and WebDriver
+(ROUTE, plan.md:1331-1332); R-PR #41's merge state not checked here (plan.md:1263-1264).

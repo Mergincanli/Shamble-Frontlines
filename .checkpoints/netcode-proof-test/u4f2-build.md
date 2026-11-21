@@ -577,5 +577,14 @@
   plant fails both the f33 case and T-K7). The proof's hashes and fate log are equal, and every forged line of R5
   also kept its early fate log (u4f2-r5b.log). For the advisor: whether R4 and R5's non-forged lines need a re-run on
   that account (my reading: no; none of their code changed).
-- Resume here: R3 (bite-no-lead-bound at 610 s, bites release build; log u4f2-r3.log), then step 4 (snapshot,
-  report, stop).
+- **R3: DONE, counted, on the ruling's lines** (u4f2-r3.log, `-x -k`, background, 23:09-23:14:42 UTC, tree
+  4e15fbde…, free 7,905 MiB at its start): the bites release build, then bite-no-lead-bound at 610 s (seed 1, option
+  A; .gate/u4f/u4f2-r3/bites/), exit 0, in a building 0. **Shots 673** a measured second (the summary line: above
+  670, the thinnest run, as in R3-pre). Unrejected: **kind 1 only, 1,523 of 1,523** (the bite's own); kind 7
+  unrejected 0 with **`dead_left_out_count` 10** (sent 1,513); every other kind 0; `counted_count` = `sent_count` for
+  8, 9, 11; slot 6's command missing on 0 of 18,000 ticks. Judge (verdict-bites.json, exit 0): no-lead-bound "shown":
+  "1,000 commands of every kind" 1,513 passes and "every forged command rejected and counted" FAILS at 1,523, kind
+  1's alone now that kind 7's dead items are left out.
+- End of part B: free 8,223,191,040 B; size +2,168 -190 tracked, forged.rs 475: about 2,643 added. No code changed
+  after FP-2's snapshot (e33d14f0…). Round 2, R6 and the merge are the main session's next steps (not started).
+- Resume here: nothing left in part B; step 4 is the snapshot and the report.
