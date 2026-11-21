@@ -263,3 +263,94 @@ met as written. ADV-U5E-1 (High) is met by condition 2; the Mediums by condition
   profile is from memory. Whether the fuzz core reaches the S line inside Block 3 or at its end is section 6's estimate.
   F-B-COUNT's answer and its day.
 DONE
+
+## Ruling on the dependency read's findings (SEC-U5D-1, -4, -2), 2026-11-21 ~15:4x UTC
+### Plan
+1. Read security-u5-deps.md (295 lines), dependency-check.md (18), u5-deps-facts.md (39) whole; the builder's
+   fuzz/Cargo.toml and the root comment (worktree agent-a60a432d4564f4cc7, by Read). 2. Rule SEC-U5D-1. 3. Rule SEC-U5D-4.
+   4. Rule SEC-U5D-2. 5. Conditions.
+### Notes
+- The read cleared all eight Block-0 files at the hashes dependency-check.md holds (:11-18 = security-u5-deps.md:286-293).
+- The expansion as read (security-u5-deps.md:96-108): per target, `#[no_mangle] pub extern "C" fn LLVMFuzzerInitialize`
+  and `rust_fuzzer_test_input`, plus a safe `__libfuzzer_sys_run`; no unsafe block, unsafe fn or extern block enters
+  npt-fuzz; libfuzzer-sys's own unsafe stays in its crate (:105-108). Two points are reasoned, not run (:130-132): the
+  forbid stays silent, and edition 2024 accepts the bare `#[no_mangle]` from 2018-edition tokens.
+- fuzz/Cargo.toml:24-28 already says the macro expands an exported entry in the crate and that rustc does not lint
+  another crate's macro; it does not name the two symbols. The root comment (Cargo.toml:83-110) counts "Four crates" as
+  ADR 0002:269's exceptions, each with an `#[allow]` with its reason, and says a forbid lets no `#[allow]` compile (E0453).
+- The ADR's form (an invariant, a test, an `#[allow]` with its reason) cannot be met here: under forbid an `#[allow]` is
+  E0453, and under deny one would be inert, since the lint is never raised inside the expansion: a false record.
+- Writing the two exports by hand instead (with real `#[allow]`s) would copy libfuzzer-sys's private contract: more
+  unsafe by our hand than the read macro, so worse.
+- cargo-fuzz's own flags (sancov passes, `--cfg fuzzing`, the sanitizer: security-u5-deps.md:160-165) copied into a
+  plain `cargo build --locked` would tie our scripts to its internals; a missed flag silently weakens the
+  instrumentation, and nothing would fail. That is a quiet loss of -34's evidence; plan §4.8 names cargo-fuzz.
+
+### SEC-U5D-1: a recorded dependency-macro case, not a fifth ADR 0002:269 exception
+- **Form:** recorded beside the four, not counted among them (they are crates whose own code holds unsafe under a
+  reasoned `#[allow]`; none can exist here). The root comment's "Four crates" stays true. npt-fuzz keeps forbid for its
+  own code, the stricter state. Mine under U5-Q7 term 3 and TEST-FIRST rule 2: cargo-fuzz is plan §4.8's tool, and
+  `fuzz_target!` is its harness; ADR 0002's text does not change.
+- **Invariant:** each target bin holds exactly the two exports `fuzz_target!` expands (LLVMFuzzerInitialize,
+  rust_fuzzer_test_input), from libfuzzer-sys 0.4.13 as read; one `fuzz_target!` per bin, so no symbol twice in a binary;
+  no unsafe block or unsafe fn, and no hand-written `no_mangle`, `export_name`, `link_section` or `extern` anywhere in
+  fuzz/.
+- **Tests:** in check.mjs, before Block 3's first cargo-fuzz build (in Block 1 if still open), each with a
+  check.test.mjs plant that fails by name:
+  - fuzz/Cargo.lock's libfuzzer-sys entry is exactly one, at 0.4.13, from crates.io, with its full checksum copied from
+    the lock (not retyped from the read's prefix). arbitrary 1.5.0 is pinned likewise, and no derive_arbitrary package
+    is in the lock (no proc macro arrives unread);
+  - every fuzz_targets/*.rs calls `fuzz_target!` exactly once, and fuzz/ uses no other libfuzzer_sys macro: fuzz_mutator!,
+    fuzz_crossover! and any other refused by name (SEC-U5D-3). No glob, renamed or `macro_use` import of libfuzzer_sys
+    (the check reads text);
+  - none of the hand-written attributes above (fuzz/ read as crates/ is: U5-Q7 term 1).
+- **At the site:** the fuzz crate's shared module doc names the two exports, the read (security-u5-deps.md:96-115) and
+  check.mjs's rule; one comment line above each `fuzz_target!` call points there (the reason where an `#[allow]` would
+  stand).
+- **Block 3's first `cargo check` of a target** records in the notes the two reasoned points. If the forbid does fire,
+  it comes to me: no `#[allow]` and no lowering of the lint.
+- **Recorded:** under "Choices taken without him", and named in the day's message. "After the close" gains his
+  ADR-text item: ADR 0002:269's three-part form does not cover the exports a dependency's macro expands. U5's report
+  names the case in a line of its own, with security-auditor and the advisor as its readers.
+
+### SEC-U5D-4: the lock check around every cargo-fuzz call, in a guard of its own; not plain cargo
+- **The form:** before every cargo-fuzz call:
+  - fuzz/Cargo.toml's and fuzz/Cargo.lock's sha256 equal dependency-check.md's lines (read from the file, never
+    retyped);
+  - `cargo +1.99.1 tree --locked --offline --manifest-path <worktree>/spikes/netcode-proof/fuzz/Cargo.toml` exits 0;
+  - CUSTOM_LIBFUZZER_PATH and CUSTOM_LIBFUZZER_STD_CXX are unset;
+  - the subcommand is `build` or `run` only, never init or add; never --build-std, --careful or the memory sanitizer;
+  - the target dir is the shared target.
+
+  After the call, both files are hashed again. A mismatch voids the call's outputs: the main session cleans the fuzz
+  builds' folder, and it comes to me. Plain `cargo +nightly build --locked` with copied flags is refused (notes,
+  last line).
+- **Where it lives:**
+  - u5-run.sh stays a names-only copy of u4f-run.sh. The check is one small script of its own in the notes folder,
+    written by the main session, its sha256 on the card. Every build-time cargo-fuzz call runs as the command of a
+    runner call, `bash u5-run.sh [-x] <wt> <log> bash <guard> <wt> <cargo-fuzz args>`, never directly.
+  - security-auditor reads the script before its first use (a short read of its own finding's fix). Its refusal is
+    shown once on a planted one-byte manifest change, restored and re-hashed inside the same exclusive runner call.
+  - The builder's brief says that cargo-fuzz is never called outside the guard.
+- **The counted runs** (c-u5-fuzz.mjs, Block 5, in the repository and under U5's review) carry the same check in their own
+  form: both fuzz files equal to the commit's tracked content and `cargo tree --locked --offline` exit 0 before each
+  cargo-fuzz call, the lock re-hashed after; tested on canned cases. .checkpoints/ will be gone by then.
+- Any later fuzz manifest change is a second read (Block 0's rule). The guard then passes only on the new lines.
+
+### SEC-U5D-2: `=0.4.13` at the re-base, in one read with the comment, unless an earlier read comes first
+- The caret's only gap (a re-resolve after a lost lock) is shut twice: by the guard before every cargo-fuzz call, and by
+  check.mjs's pin at every end check. Pinning now would cost a second read and re-hashes for a Low these already cover.
+  Never pinning would leave the spike's own exact-version rule (root Cargo.toml:51) broken.
+- At the re-base (or with any earlier fuzz manifest change and its read): `libfuzzer-sys = "=0.4.13"`, fuzz/Cargo.toml's
+  lints comment naming the two exports and check.mjs's pin, and the root comment's fuzz sentence pointing to it. All
+  comment-and-pin, in one read, dependency-check.md's two lines replaced.
+
+### Verdict on the read's conditions: APPROVE, with these conditions (S1-S4)
+- **S1:** SEC-U5D-1 as above: the check.mjs rules and their plants before Block 3's first cargo-fuzz build; the first
+  `cargo check` records the two reasoned points.
+- **S2:** SEC-U5D-4's guard as above, read by security-auditor and shown on a plant before Block 3's first cargo-fuzz
+  call. The installs may go ahead after Block 1 as planned: an install runs no cargo-fuzz on our crate.
+- **S3:** SEC-U5D-2 at the re-base, or at an earlier fuzz manifest read.
+- **S4:** the read's other conditions stand as dependency-check.md:4-10 lists them. The lines S1 adds count toward the
+  S line (condition 2).
+DONE (SEC-U5D ruling)

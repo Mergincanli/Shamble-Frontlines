@@ -68,6 +68,10 @@
   records and F1's plan line: :7209-7216. **-20's L1 now PASSES on F1's fix** (46ca143; u4f-report.md item 5's end).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
+- **2026-11-21 by the advisor's SEC-U5D ruling (advisor-u5-early.md:267-356; to name in the 2026-11-22 message):**
+  fuzz_target!'s two exports a recorded dependency-macro case beside the four unsafe exceptions, not a fifth (no
+  `#[allow]` can exist under forbid), with check.mjs pins and plants; SEC-U5D-4's guard (u5-fuzz-guard.sh 2edc7b13…);
+  SEC-U5D-2's `=0.4.13` at the re-base. Why: inside the plan, undoable, no pass mark, judge, marks.json or money.
 - **2026-11-21 by the advisor's U5-EARLY ruling (advisor-u5-early.md:203-206; to name in the 2026-11-22 message by its
   section 7 line, :196-201):** U5's build begins now beside U4f2's wait, under its conditions 1-10 (the S line until
   U5-SIZE; Block 7 only on U5-SIZE (a); C-U5-1 and the shared files at the re-base). Why: inside the plan, undoable, no
@@ -124,6 +128,8 @@
   and -58, since "0 presses lost" holds by design after U4f-F1.
 - U5-Q1 term 3 (his, a marks.json item; advisor-u5-brief.md:163-165): -34's notes name "plan §4.7's npt-proto
   messages", which include SessionStatus, while its parts do not.
+- His ADR-text item (the advisor's SEC-U5D-1 ruling, advisor-u5-early.md:312-314): ADR 0002:269's three-part form does
+  not cover the exports a dependency's macro expands.
 - NS-TRAILER and NS-FIRST: the night-shift lines' attribution option and status refresh, for the kit's next change
   after the freeze (his RECS-1043 (b), history.md:2217).
 - For STATUS (the advisor's U4f L3): the hold-time cap's -21 counter (U4F-Q14 (b): a follow-up for the first unit that
@@ -176,7 +182,8 @@
   register 102-111 and plan.md's U5/U6 rows done. **U5's size line: the S line, past about 1,400 added lines at a block
   end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Block 0 DONE (agent-a60a432d4564f4cc7's copy, ~260 lines);
   fetch clean (u5-deps-facts.md); security read: all 8 CLEARED (security-u5-deps.md); dependency-check.md written 15:3x.
-  Builder on Block 1 + 2's sim half (stop before 3); advisor ruling SEC-U5D-1 (5th exception?) and SEC-U5D-4 (no --locked).
+  Builder on Block 1 (+S1's check.mjs pins) and 2's sim half, stop before 3; SEC-U5D ruling APPROVE S1-S4 (:267-356);
+  guard u5-fuzz-guard.sh 2edc7b13… with security-auditor's read; then the nightly and cargo-fuzz installs (mine).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
   **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver byg2iirg5
