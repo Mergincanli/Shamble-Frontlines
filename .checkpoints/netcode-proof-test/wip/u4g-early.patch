@@ -1,5 +1,5 @@
 diff --git a/spikes/netcode-proof/crates/client/src/lib.rs b/spikes/netcode-proof/crates/client/src/lib.rs
-index e88e3ea..8c1b750 100644
+index e88e3ea..4a93548 100644
 --- a/spikes/netcode-proof/crates/client/src/lib.rs
 +++ b/spikes/netcode-proof/crates/client/src/lib.rs
 @@ -21,8 +21,13 @@ use npt_sim::grid::{Config, Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW
@@ -16,6 +16,173 @@ index e88e3ea..8c1b750 100644
  
  /// The bite ids this crate plants (bites builds only). u4-build-plan.md §4.14 plants each bite where its code lives:
  /// PM-0001-17/client-rounding's site is the client's call into the wire grid, so its id lives here and not in npt-sim's
+@@ -170,6 +175,9 @@ struct Tick {
+     frame: Frame,
+     events: Vec<(u32, SimEvent)>,
+     filed: Filed,
++    /// Its header's last-run sequence, rebuilt to the client's 32-bit command counter (where the predictor's replay
++    /// starts).
++    last_run: Option<u32>,
+ }
+ 
+ impl Tick {
+@@ -213,6 +221,11 @@ pub struct StepOut {
+     pub lost: Vec<(u32, u32)>,
+     /// The counters that wrapped since the last step.
+     pub wraps: Vec<&'static str>,
++    /// U4g: each snapshot the predictor applied since the last step (PM-0001-41's corrections and their tracing,
++    /// -42's and -55's 5 cm flag), when the endpoint predicts ([`ClientEndpoint::with_predictor`]).
++    pub applied: Vec<Applied>,
++    /// U4g: each own-state change the predictor closed since the last step (PM-0001-60's `own_change`).
++    pub own_changes: Vec<OwnChange>,
+ }
+ 
+ /// The client endpoint (plan.md:486-489): `input` with the page's command and every message received since the last
+@@ -275,6 +288,8 @@ pub struct ClientEndpoint {
+     redundancy: usize,
+     /// PM-0001-47/tick-quantised: each `Pong` timed at the step's time, not at its arrival.
+     tick_quantised: bool,
++    /// U4g's prediction of the client's own soldier, when the host gives one ([`ClientEndpoint::with_predictor`]).
++    predictor: Option<Predictor>,
+ }
+ 
+ /// A Soldier record's flags field, the sixth of its layout (npt-sim seam.rs's `SOLDIER`: x, y, z, yaw, pitch, flags,
+@@ -339,6 +354,7 @@ impl ClientEndpoint {
+             left_out: 0,
+             redundancy: Limits::REDUNDANCY_CAP,
+             tick_quantised: false,
++            predictor: None,
+         }
+     }
+ 
+@@ -403,6 +419,31 @@ impl ClientEndpoint {
+         Some(self)
+     }
+ 
++    /// The same endpoint predicting its own soldier with `predictor` (U4g; ADR 0001 part 4): each command it stamps is
++    /// predicted at once, each header tells the predictor which commands the room had and ran, each complete tick
++    /// newer than the last applied resets and replays from the header's last-run sequence (rebuilt through the
++    /// endpoint's `Wrap`, so PM-0001-58/lt-tick-offset moves where the replay starts), and each step runs one tick of
++    /// the fade and hands out what the predictor applied ([`StepOut::applied`], [`StepOut::own_changes`]).
++    pub fn with_predictor(mut self, mut predictor: Predictor) -> ClientEndpoint {
++        if let Some(slot) = self.slot {
++            predictor.set_slot(slot);
++        }
++        self.predictor = Some(predictor);
++        self
++    }
++
++    /// The predictor, when the endpoint has one.
++    pub fn predictor(&self) -> Option<&Predictor> {
++        self.predictor.as_ref()
++    }
++
++    /// Closes the predictor's open own-state changes into the next step's output (a run's end).
++    pub fn close_prediction(&mut self) {
++        if let Some(p) = &mut self.predictor {
++            p.close();
++        }
++    }
++
+     /// The slot `JoinAccepted` gave, once joined.
+     pub fn slot(&self) -> Option<u8> {
+         self.slot
+@@ -606,6 +647,9 @@ impl ClientEndpoint {
+         }
+         self.unacked.push_front((index, c));
+         self.unacked.truncate(self.redundancy);
++        if let Some(p) = &mut self.predictor {
++            p.command(index, tick, &c);
++        }
+     }
+ 
+     /// The controller's plan for this step, at its first `input` (U4F-Q7 (b) with (iii) (c); u4f-brief.md 2.2): the
+@@ -745,6 +789,11 @@ impl ClientEndpoint {
+                 }
+             }
+         }
++        if let Some(p) = &mut self.predictor {
++            p.advance();
++            self.out.applied.extend(p.take_applied());
++            self.out.own_changes.extend(p.take_own_changes());
++        }
+         self.planned = false;
+         self.steps += 1;
+         let base = self.base_ns.unwrap_or(self.now_ns);
+@@ -787,6 +836,9 @@ impl ClientEndpoint {
+             Ok(Message::JoinAccepted(a)) => {
+                 self.slot = Some(a.slot);
+                 self.join_tick = Some(a.tick);
++                if let Some(p) = &mut self.predictor {
++                    p.set_slot(a.slot);
++                }
+             }
+             Ok(Message::JoinRejected(_) | Message::Kick(_) | Message::RoomEnded(_)) => {
+                 self.closed = true
+@@ -1006,6 +1058,24 @@ impl ClientEndpoint {
+         }
+     }
+ 
++    /// A header's two command sequences rebuilt to the client's 32-bit command counter for the predictor: what
++    /// [`Self::rebuild_sequences`] rebuilds, through the same `Wrap`, without its records; `None` before the first
++    /// command.
++    fn widened(
++        &self,
++        newest_received: Option<u16>,
++        last_run: Option<u16>,
++    ) -> (Option<u32>, Option<u32>) {
++        if !self.cmd_sent {
++            return (None, None);
++        }
++        let near = self.next_cmd.wrapping_sub(1);
++        (
++            newest_received.map(|low| self.wrap.widen16(CMD_SEQ, near, low)),
++            last_run.map(|low| self.wrap.widen16(TICK_OFFSET, near, low)),
++        )
++    }
++
+     /// An event's 32-bit number from its 16 bits, nearest the newest number the client knows (`Wrap::widen16`).
+     fn event_number(&mut self, low: u16) -> u32 {
+         let n = self.wrap.widen16(EVENT_SEQ, self.event_near, low);
+@@ -1101,6 +1171,13 @@ impl ClientEndpoint {
+         self.ring[i] = tick;
+         self.acknowledge(t, s.group);
+         self.rebuild_sequences(s.newest_received, s.last_run);
++        let (got, run) = self.widened(s.newest_received, s.last_run);
++        if run.is_some() {
++            self.ring[i].last_run = run;
++        }
++        if let Some(p) = &mut self.predictor {
++            p.received(t, got, run);
++        }
+         if self.ring[i].complete() {
+             let e = &self.ring[i];
+             let grid = self.grid;
+@@ -1109,6 +1186,9 @@ impl ClientEndpoint {
+             let own: Vec<EntityRecord> = e.frame.own.iter().map(|h| h.hashed(grid)).collect();
+             let hash = client_hash(t, &entities, &own, &e.events);
+             self.file(i, hash);
++            if let (Some(p), Some(r)) = (&mut self.predictor, self.ring[i].last_run) {
++                p.snapshot(t, r, &own, &entities);
++            }
+         }
+     }
+ 
+@@ -1150,6 +1230,14 @@ impl ClientEndpoint {
+         self.file(i, hash);
+         self.acknowledge(t, 0);
+         self.rebuild_sequences(None, f.last_run);
++        let (_, run) = self.widened(None, f.last_run);
++        self.ring[i].last_run = run;
++        if let Some(p) = &mut self.predictor {
++            p.received(t, None, run);
++            if let Some(r) = run {
++                p.snapshot(t, r, &own, &entities);
++            }
++        }
+     }
+ }
+ 
 diff --git a/spikes/netcode-proof/crates/sim/src/world.rs b/spikes/netcode-proof/crates/sim/src/world.rs
 index 1faee05..7f3fb5d 100644
 --- a/spikes/netcode-proof/crates/sim/src/world.rs
@@ -651,10 +818,10 @@ index 0000000..318ee8b
 +}
 diff --git a/spikes/netcode-proof/crates/client/tests/predict.rs b/spikes/netcode-proof/crates/client/tests/predict.rs
 new file mode 100644
-index 0000000..94a31dc
+index 0000000..f22b68a
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/client/tests/predict.rs
-@@ -0,0 +1,418 @@
+@@ -0,0 +1,533 @@
 +//! U4g's tests of the `Predictor` (u4g-brief.md 1.3, block 2; section 3's rows for -41's trace, the fade, snap and
 +//! clear, -42's and -55's flag, and -60): an authority `World` on the course stands in for the room (option B: at a
 +//! late command's tick it runs the last command again), its records as a snapshot carries them, delivered `delay` ticks
@@ -1072,6 +1239,121 @@ index 0000000..94a31dc
 +            .filter(|a| a.tick > 230)
 +            .all(|a| a.skipped)
 +    );
++}
++
++mod endpoint {
++    //! The endpoint's half (block 2's wiring): the authority's full state of each tick, encoded with npt-proto as the
++    //! room sends it, fed to a real `ClientEndpoint` (fixed lead 2, predicting) at the next tick; the authority runs
++    //! each command the endpoint's `Input`s carried at its stamp.
++
++    use std::collections::BTreeMap;
++
++    use npt_client::ClientEndpoint;
++    use npt_link::Channel;
++    use npt_proto::{Direction, FullState, Join, JoinAccepted, Message, decode, encode};
++
++    use super::*;
++
++    fn bytes(m: &Message) -> Vec<u8> {
++        let mut out = Vec::new();
++        encode(m, &mut out).unwrap_or_else(|e| panic!("{}: {e}", m.name()));
++        out
++    }
++
++    /// Runs `ticks` ticks of `e`, made predicting here, against an authority on the course: every snapshot its
++    /// predictor applied.
++    fn run(e: ClientEndpoint, ticks: u32) -> Vec<Applied> {
++        let scene = Scene::course();
++        let mut authority = World::new(&scene, 1, FIRST);
++        let mut history = HitHistory::for_ms(2_000).expect("2 s of ticks");
++        let mut e = e.with_lead(2).with_predictor(Predictor::new(&scene, 2, 30));
++        let accepted = JoinAccepted {
++            slot: 0,
++            tick: FIRST,
++            ..JoinAccepted::default()
++        };
++        let mut inbox = vec![(
++            Channel::Control,
++            bytes(&Message::JoinAccepted(accepted)),
++            0u64,
++        )];
++        let mut stamped: BTreeMap<u32, Command> = BTreeMap::new();
++        let (mut presses, mut last_run, mut applied) = ([0u8; 4], None, Vec::new());
++        for k in 0..ticks {
++            let t = authority.next_tick();
++            let c = (k > 0).then(|| command(k, true, &mut presses));
++            e.input(c, &inbox, u64::from(k) * 33_333_333);
++            let out = e.step();
++            applied.extend(out.applied);
++            for d in &out.datagrams {
++                if let Ok(Message::Input(i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
++                {
++                    for c in i.commands {
++                        stamped.entry(c.tick).or_insert(c);
++                    }
++                }
++            }
++            let mut input = TickInput {
++                tick: t,
++                ..TickInput::default()
++            };
++            if let Some(c) = stamped.remove(&t) {
++                last_run = Some(c.seq);
++                input.commands.push((c, None));
++            }
++            authority.step(&input, &history);
++            history.push(authority.hit_volumes());
++            let (own, entities): (Vec<EntityRecord>, Vec<EntityRecord>) =
++                authority.entity_records().iter().map(wire).partition(|r| {
++                    r.index == 0 && matches!(r.kind, EntityKind::Soldier | EntityKind::OwnState)
++                });
++            let full = FullState {
++                tick: t,
++                last_run,
++                own,
++                entities,
++            };
++            inbox = vec![(Channel::FullState, bytes(&Message::FullState(full)), 0)];
++        }
++        applied
++    }
++
++    /// The endpoint predicts each command it stamps and applies each full state from its header's last-run sequence:
++    /// every command in time, so after the first every snapshot is skipped and none corrects.
++    #[test]
++    fn the_endpoint_predicts_and_applies_its_snapshots_with_no_correction() {
++        let applied = run(ClientEndpoint::new(Join::default(), 30), 120);
++        assert!(applied.len() > 100, "{} applied", applied.len());
++        assert!(applied.iter().all(|a| a.correction.is_none()));
++        assert!(applied[1..].iter().all(|a| a.skipped));
++    }
++
++    /// PM-0001-58/lt-tick-offset's replay half (u4-build-plan.md §4.14 :501; section 3's row): commands start 6 below
++    /// the 16-bit sequence wrap and the replay starts after the rebuilt last-run sequence, so a clean endpoint corrects
++    /// nothing across the wrap; under the bite (a plain `<` on that rebuild) the replay starts at the wrong command, an
++    /// untraced correction.
++    #[test]
++    fn pm_0001_58_lt_tick_offset_moves_where_the_replay_starts_across_the_wrap() {
++        let start = 65_530;
++        let clean = run(
++            ClientEndpoint::new(Join::default(), 30).with_starts(start, 0),
++            40,
++        );
++        assert!(clean.len() > 30 && clean.iter().all(|a| a.correction.is_none()));
++        assert!(
++            clean.iter().any(|a| a.last_run >= 65_536),
++            "the replay start crossed the wrap"
++        );
++        #[cfg(feature = "bites")]
++        {
++            let e = ClientEndpoint::new(Join::default(), 30)
++                .with_starts(start, 0)
++                .with_bite("PM-0001-58/lt-tick-offset")
++                .expect("npt-client plants it");
++            let bitten = run(e, 40);
++            assert!(bitten.iter().any(Applied::untraced), "{bitten:?}");
++        }
++    }
 +}
 diff --git a/spikes/netcode-proof/crates/sim/tests/predict.rs b/spikes/netcode-proof/crates/sim/tests/predict.rs
 new file mode 100644

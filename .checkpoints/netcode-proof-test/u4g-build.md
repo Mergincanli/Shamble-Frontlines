@@ -65,6 +65,21 @@ Task: U4g's early builder (PR #40, lane claude/netcode-proof-test-plan-hcky5g), 
 
 - Snapshot after block 2a: wip/u4g-early.patch 63,277 B, 5 files, sha256 2ec04263c31fcd169557ff2e0e77290c213b97c9661ff6cbe8313de44d070ba5. df at the stop: 4,524,601,344 B.
 
+## Resume 2 (coordinator: P27 dev part-clean 08:12 UTC, 4.7 GiB; snapshot 2ec04263… checked; U4G-CYCLES (a); block 4's cycle runs the stop's clippy before its block end)
+- df at resume: 9,370,238,976 B. Worktree as left.
+- 2b written: lib.rs: Tick `last_run`; StepOut `applied`, `own_changes`; ClientEndpoint `predictor`, `with_predictor`, `predictor()`, `close_prediction`; JoinAccepted -> `set_slot`; `stamp` -> `command`; `step` -> `advance` + outputs; `widened` (through `self.wrap`); `group` -> `received` each header, `snapshot` at completion; `full_state` -> both. Old-file positions all outside B2's client ranges (357-364, 614-622). Tests: `mod endpoint` at client/tests/predict.rs's end: the_endpoint_predicts_and_applies_its_snapshots_with_no_correction, pm_0001_58_lt_tick_offset_moves_where_the_replay_starts_across_the_wrap (clean half in both builds, bitten half in bites builds).
+- 2b call 1 (df before 9,369,952,256 B): `cargo test --locked -p npt-client` both builds (u4g-early-b2b-client1.log): measured 38 passed, bites 48 passed, 0 failed, exit 0. df after: 9,007,755,264 B.
+- Plant "the replay start not rebuilt through the endpoint's Wrap" (`widened`'s last_run via `Wrap::default()`), bites build, runner -x -k: FAILED by name endpoint::pm_0001_58_lt_tick_offset… (predict.rs:532); log u4g-early-b2b-plant-wrap.log; restored, lib.rs sha256 389cd02efc3bc420df9c46598e4de889734d968f64bc50597295437924be3892 = clean.
+
+- fmt: u4g-early-b2b-fmt.log exit 1 (lib.rs `widened`'s signature; two breaks in the test's `run`), applied by Edit; u4g-early-b2b-fmt2.log exit 0. df after: 8,980,660,224 B.
+- Pre-lint: `cargo clippy --locked -p npt-client --all-targets -- -D warnings`, both builds, exit 0 (u4g-early-b2b-clippy-pre.log). df after: 8,925,593,600 B. Then the 2b block-end workspace run (df before: 8,925,593,600 B).
+
+- 2b block-end workspace run (condition 7): .gate/u4f/u4g-early-b2b-ws.log, runner -k, exit 0 both: measured 652 passed, 0 failed, 15 ignored (to 08:24:43 UTC); bites 752 passed, 0 failed, 15 ignored (to 08:34:16). Deltas on 642/739: +10 measured (sim 2, client 8), +13 bites (sim 5, client 8). df after: 4,506,898,432 B (the run took about 4.42 GB).
+- BLOCK 2b DONE (block 2 whole). Added lines in spikes/: tracked +192 (world.rs +104, client lib.rs +88), new files 1,342 (client predict.rs 431, client/tests/predict.rs 533, sim/tests/predict.rs 378): 1,534 in all; block 2b 198 (lib.rs +83, tests +115).
+- STOP (condition 6): 4,506,898,432 B free, under 5.5 GB: no build call; snapshot; return. Next cycle: block 3 (room) as planned above.
+
+- Snapshot after block 2b: wip/u4g-early.patch 74,922 B, 5 files, sha256 66cf18809e49dcafe54ff77dff1da2fc54dc71149b05ec10cb4a1ed4db929d22. df at the stop: 4,506,898,432 B.
+
 ## Findings (one line each)
 - F3: an own-state change's first correction was also counted, as misplaced, in an older change still open (the move-speed change counted the fire-interval change's); fixed in `own_changes` (the snapshot that opens a change gives its correction to it alone). A judged -60 run with two kinds open at once would have failed "at most one correction per change" on a correct build.
 - F2 (disk): one whole-workspace test pass in both builds at a fresh worktree path costs about 3.8 GB of the shared target (07:24-07:41 UTC: 7,565,500,416 B free before, 3,794,055,168 B after), so condition 6's 6.5 GB launch line leaves room for one block end, not four. Each remaining block end needs a part-clean (P27, the main session's, no builder running) or a decision to run block ends on the touched crates only (condition 7 says workspace-wide: not mine to change).
