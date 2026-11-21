@@ -1,6 +1,6 @@
 # U4g's brief, rev 2.1 (rev 2 with the advisor's rev-2 conditions 1-4 applied; APPROVE WITH CONDITIONS, advisor-u4g-brief.md:350-358)
 **The unit:** prediction, interpolation and events, u4-build-plan.md:881-900 (plan rev 3.3, with the "Moved in from U4r"
-bullet :895-900). It builds after U4f2 merges and -21's runs are done (one lane at a time: :951-952). Short by
+bullet :895-900). It builds after U4f2 merges and -21's runs are done (one lane at a time: :951-952). **U4G-EARLY (2026-11-21): blocks 1-4 build early by advisor-u4g-early.md (its conditions 1-10; the early fill is section 9, at this brief's end); u4-build-plan.md:951-952 and u4f-brief.md:292 stand for every other unit and for blocks 5 on.** Short by
 TEST-FIRST rule 3 (history.md:2264-2267; his message :2236-2282): what U4g builds, how it is tested, what is open; the
 rest is pointed to. U4f's brief stays the reference for the start and stops (u4f-brief.md section 1, :288-355), the
 build rules (section 4, :831-958), the pre-runs, judge calls, disk and bars (5.3-5.6, :997-1162), the end checks
@@ -275,3 +275,30 @@ read before it goes to him (TEST-FIRST, "a reviewer's read on every change to ma
   waits for it.
 - Ruled by the advisor and named in the day's message: U4G-Q3 to Q9 and NC-U4R-4's route. Nothing else: no money,
   nothing on main.
+
+## 9. The early fill (U4G-EARLY: advisor-u4g-early.md, condition 7; filled 2026-11-21 at 06:58 UTC)
+- **The early `<base>`** = **8f9d97d1ed86bc2767e9d16de4b60fd8c0e5f853** (the lane head: the saver's commit that holds
+  the ruling), spikes/netcode-proof tree 2b7647ffc3c1927e…, the tree U4f2 launched from (u4f2-brief.md:27-31): outside
+  results/ equal to 1faf894's d4f6cd41… (`git diff --quiet 1faf894 8f9d97d -- spikes/netcode-proof
+  ':(exclude)spikes/netcode-proof/results'` exit 0), so its counts are 1faf894's by D1's rule: **642 measured and 739
+  bites**, 0 failed, 0 skipped (.gate/u4f-f1-merge/m5-check.log). The test step's stop line: **1,207 s**. The builder's
+  copy is the lane head that holds this fill (its spikes/ equal to `<base>`'s).
+- **Disk at the fill:** 7,673,417,728 B free (`df -B1`, 06:58 UTC), above condition 6's 6.5 GB launch line.
+- **The runner:** u4f-run.sh 70eb3da5b8ce9a8e… unchanged; this unit's logs under .gate/u4f/, named u4g-early-*. Its
+  lock is the lane's, shared with U4f2's builder (a call that cannot take it exits 5: u4f-brief.md:838-842), which is
+  why the two never run at once (condition 5).
+- **Stamps refilled at `<base>`** (sha256's first 16 hex, lines; stamps_u4g_early.py). Changed since 9d491fb:
+  advisor-u4g-brief.md e63703f9c1da72cf (378), u4s-carries.md feacf0c4cecee337 (780; U4g's section now :560-608),
+  u4f2-brief.md 9d2c0551ebc0de15 (266), history.md b3c4bdb40e338f45 (7,505). New: advisor-u4g-early.md
+  85004dd63c381725 (207); U4f2's patch wip/u4f2-build.patch eb7c42c62adf46cc (3,553; F-G's snapshot, whose room and
+  client hunks condition 3 keeps clear: advisor-u4g-early.md:45-71). Unchanged: advisor-u4r-build3-full.md,
+  u4-build-plan.md, plan.md, u4f-brief.md, advisor-u4f-stop.md, u4f-report.md, u4r-report.md, advisor-u4f-f1-r1.md,
+  advisor-u4f-build1.md (283 lines), u4g-brief-carry.md, advisor-brawl1-sets-p3-full.md, c62h-bound-brief.md,
+  marks.json, SERIES.md, ADR 0001.
+- **The early half:** blocks 1-4 of 1.3 only, under advisor-u4g-early.md's conditions 1-10 (:163-203): crates/lab,
+  crates/bots, ops/runs, SERIES.md and room/src/input.rs shut besides 1.1's list; the stop after block 4 with its
+  snapshot wip/u4g-early.patch (its sha256 on the card); then the re-base and the real `<base>` by condition 8, and
+  blocks 5 on by this brief as written.
+- **U4g's size line** (SIZE-CHECK; on the card before the first snapshot): the prediction half about 2,100 to 3,700
+  added lines (section 6), the stop past 6,000 under either U4G-Q1 answer; blocks 1-4 about 1,120 to 1,920; past about
+  2,900 at the early stop, the count and a re-estimate come to the advisor before block 5 (condition 9).

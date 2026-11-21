@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 06:4x UTC: U4f2 waits on F-B-COUNT (his Advisor); U5's brief rev 2.1 READY; U4G-EARLY
-  (U4g's blocks 1-4 now, beside U4f2's wait) with the advisor (Running work).
+- **Last update:** 2026-11-21 06:5x UTC: U4f2 waits on F-B-COUNT (his Advisor); U5's brief rev 2.1 READY; U4G-EARLY
+  APPROVED WITH CONDITIONS 1-10, U4g's blocks 1-4 builder next (Running work).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -64,13 +64,14 @@
   history.md:7255-7271 by record_u4f2_size.py): **U4f2's size line** (SIZE-CHECK): about 1,700 to 2,250 added lines (up
   to about 2,700 at 1.2), the four riders included; **the stop past 3,000 at a block end**. Brief u4f2-brief.md rev 1.2,
   filled at launch (`<base>` a289def, counts 642/739). **The build starts now.**
-- **The advisor's -20 ruling** (ADV-U4F20-1 High: npt-sim's one-edge rule; fix U4f-F1, -20 re-run) and U4f-F1's
-  build line: history.md:7195-7206 (card_trim_1120d.py).
-- **-20 and -22's first set records and U4f-F1's plan line:** history.md:7209-7216 (card_trim_1120e.py). **-20's L1
-  now PASSES on F1's fix** (46ca143; its record at u4f-report.md item 5's end; F1's report u4f-f1-report.md).
-
+- **Pointers:** the advisor's -20 ruling (ADV-U4F20-1 High: npt-sim's one-edge rule) and U4f-F1's build line at
+  history.md:7195-7206 (card_trim_1120d.py); -20 and -22's first set records and F1's plan line at :7209-7216 (1120e).
+  **-20's L1 now PASSES on F1's fix** (46ca143; its record at u4f-report.md item 5's end; u4f-f1-report.md).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
+- **2026-11-21 by the advisor's U4G-EARLY ruling (advisor-u4g-early.md:156-158; to name in the 2026-11-22 message by
+  B7's line, :151-154):** U4g's blocks 1-4 now, beside U4f2's wait, under its conditions 1-10. Why: inside the plan,
+  undoable, no pass mark, judge, marks.json or money; nothing on main.
 - **2026-11-21 by the advisor's U5 brief check (advisor-u5-brief.md:157-203; to name in the message that carries
   U5-SIZE):** U5-Q1 (a) the three other fuzz targets run as -34's parts, reported beside it; Q2 (a) -35's tool at U5,
   its one counted run after U6's merge, the strict count; Q3 (a) npt-alloc the fourth unsafe exception; Q5 ASan if the
@@ -174,9 +175,9 @@
   **U5-ALLOC and U5-SIZE are his** (final texts, section 8; neither a stop): in the next day's message (2026-11-22's),
   with the U4H texts if his U4G-Q1 answer has come. Register lines before U5's launch (section 9). S's letter: U4b 701
   (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
-- **U4G-EARLY with the advisor** (asked 06:43 UTC; advisor-u4g-early.md): U4g's blocks 1-4 (sim, Predictor, room's
-  half, CueLog) now, in their own worktree from 762e001 (spike code = 1faf894's), lab/bots/ops shut until a re-base
-  after U4f2's merge and -21's set; my lean yes. msg-2026-11-21.md:28-30 said the opposite: a line on 2026-11-22.
+- **U4G-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u4g-early.md, read whole): blocks 1-4 now; fill u4g-brief.md §9
+  (`<base>` 8f9d97d, 1faf894's code, 642/739, 1,207 s). **Size line:** prediction half ~2,100-3,700 (stop past 6,000);
+  blocks 1-4 ~1,120-1,920 (past ~2,900: to the advisor). Builder: its start time here; yields at F-B-COUNT (cond. 5).
 - **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
   16:19; back at once); read it with Read/Grep. **Check-in on again 06:43 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause
   it when no agent runs); saver bqiy6tzo9 from 06:43 (to about 08:43); the 2026-11-22 message at 23:05 UTC
