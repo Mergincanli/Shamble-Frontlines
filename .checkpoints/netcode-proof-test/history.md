@@ -7514,3 +7514,20 @@ F-B-COUNT: Elaborate it to me in laymen terms on what it is and how it affects t
 WAIT-PLAN A
 
 U4G-Q1: the advisor's: split (with two halves and with a review + merge each).
+
+## Card blocks moved 2026-11-21 about 14:50 UTC: U4f2's part-A record (card_trim_1121c.py; from 'Running work')
+- **U4f2: fix pass part A2 RUNNING; FP-2 waits for F-B-COUNT.** The record from round 1's ruling to now is word for
+  word at history.md:7324-7367, :7369-7400 and :7446-7489 (card_trim_1120g/h, 1121a). Part A built (FP-1, 3, 5, 6, 7,
+  4, 8; about 2,562 added; snapshot 23c5f788…). The advisor's part-A ruling (advisor-u4f2-parta.md): F-G fixed
+  (`every` above kind 7's rest); R0, R4 and R5 now (R5's forged lines a smoke), R2-pre and R3-pre only above 6.5 GB
+  free; after FP-2, R5's forged lines, R2 and R3 whole, and the lag-switch A line again; **its stop past 2,800**, his
+  past 3,000. The builder resumed at 02:38 after the cut, checking its worktree first (no plant left, its last edit
+  whole). **Part A2 DONE ~03:10** (Block 9 "Part A2"; logs u4f2-fg-*, u4f2-r0/r4/r5/r2pre/r3pre-*.log): F-G fixed
+  (`every > r`; fp3 [false, false, true]; its plant fails by name); R0 the two timed tests 2 s faster (no narrowing);
+  R4 excess 600,000 µm above 0 (counts); R5 all exit 0, in a building 0, the fast-clock proof equal over 450 ticks,
+  both judge calls' twin checks 0 (counts, its forged lines a smoke); R2-pre twin mismatch 0 under A and B, shots
+  685.77 and 691.52, unrejected kind 7 only (18 A, 8 B: FP-2's), counted = sent for 8, 9, 11, slot 6's `input_missing`
+  0 under B (the lab writes no `commands_rerun_count`: a note for round 2); R3-pre shots 673 (3 above the 670 line),
+  kind 1 unrejected 1,523, kind 7 10. About 2,566 added; free 7,712,194,560 B. **Nothing else in U4f2 moves before
+  FP-2.** **FP-2 on his Advisor's F-B-COUNT answer** (KEEP-PROGRESSING: about two days from 2026-11-20 21:37 UTC);
+  then round 2 (netcode, test, rust), R6, the merge, the r2 rows and -21's set.

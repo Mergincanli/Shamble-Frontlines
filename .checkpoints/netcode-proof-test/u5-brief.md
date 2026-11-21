@@ -405,3 +405,34 @@ either way, and it belongs with the dependency checks.
 - The card: S's letter record (section 6) before U5's first snapshot; U5-ALLOC's and U5-SIZE's answers; "After the
   close" gains U5-Q1 term 3's marks.json item (his).
 - The disk: free space before Block 3 and before the counted runs (the part-clean between waves, P27, if needed).
+
+## 10. The early fill (U5-EARLY: advisor-u5-early.md, conditions 8 and 10; filled 2026-11-21 at 14:45 UTC)
+- **The early `<base>`** = **40e20fdfcc4bde320cfe9a9ddca902c962befb5c** (the lane head), spikes/netcode-proof tree
+  2b7647ffc3c1927e…, the tree U4f2 and U4g's early half launched from: outside results/ equal to 1faf894's d4f6cd41…
+  (`git diff --quiet 1faf894 40e20fd -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'` exit 0), so its
+  counts are 1faf894's by D1's rule: **642 measured and 739 bites**, 0 failed, 0 skipped
+  (.gate/u4f-f1-merge/m5-check.log); the test step's stop line **1,207 s**. The builder's copy is the lane head that
+  holds this fill (its spikes/ equal to `<base>`'s); its first step is `git merge --ff-only <that head>`
+  (u4f-brief.md:292-295).
+- **Disk at the fill:** 9,356,955,648 B free (`df -B1`, 14:4x UTC); the shared target 463,304,857 B (the advisor's
+  `du -sb`, 14:3x).
+- **The runner:** u5-run.sh e69b0fa7c5a03c2788e1789dac429deeb63afcd6434aadb2c6147befcd30f545 (117 lines; `bash -n`
+  exit 0), made by make_u5_run.py from u4f-run.sh 70eb3da5… with the lane's names only (header, builder, log folder
+  .gate/u5/, usage line; u5-run.sh.diff, 6 changes). Its lock is the lane's (the shared target's .lane.lock), so it
+  never runs beside a U4 lane's call (condition 6).
+- **Stamps refilled at `<base>`** (sha256's first 16 hex, lines; stamps_u5_early.py): plan.md 9b53796c1205d1a1 (1,525;
+  the U5 and U6 rows' -35 lines added today), u4-build-plan.md 9186c15ba24fecaf (1,173), u4s-carries.md
+  e23904d824ed3ea3 (840; entries 102-111 added today: U5's section :759-815, U6's :817-824), marks.json
+  c1935a5b996fb0aa (12,630), SERIES.md 7f11afbee31b1bd7 (823), marks/README.md f3c3c804c4e4d078 (340),
+  docs/design/netcode-proof-messages.md e4ebf1f2459b5721 (316), Cargo.toml 5ebfbedfdf3015e1 (120), deny.toml
+  9c02cfd84dad21a3 (21), check.mjs 6dcc4752b4ab7fe1 (2,705), u0-probes.md a9de4bd659c42af6 (18), .claude/CHECKPOINTS.md
+  744bf409ae4aabff (259; equal to main's), advisor-u5-brief.md 392b47e288f4e19e (430), u5-alloc-bounds.md
+  a216295392098bea (254), advisor-u5-early.md b7796fa1dcb40a27 (265).
+- **The early half:** advisor-u5-early.md's conditions 1-10 (:211-258): Blocks 0, 1, 2's sim half (carry 48, T2-L2),
+  3, 4 (the scanner; the client targets in fuzz/ only if they need no client edit), 5, 6, 8; Block 7 only on his
+  U5-SIZE (a); C-U5-1, any client edit, SERIES.md's rows, README's line and results/ at the re-base after U4's close;
+  section 5's file and hunk rule; the networked steps (the fuzz lock's resolve and fetch before the read; the nightly
+  and cargo-fuzz installs after dependency-check.md) are the main session's.
+- **U5's size line** (SIZE-CHECK; on the card before the first snapshot): **the S line, past about 1,400 added lines at
+  a block end, until his U5-SIZE answer** (condition 2; section 6's count, the fuzz lock apart); his answer then sets
+  the stop (about 5,750 whole; about 4,800 for U5 split).

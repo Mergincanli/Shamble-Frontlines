@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 14:3x UTC: his WAIT-PLAN (a) and U4G-Q1 (b) split (history.md:7511-7516); F-B-COUNT
-  explained to him in plain words (he decides next); U5-EARLY with the advisor (advisor-u5-early.md). U4f2 waits.
+- **Last update:** 2026-11-21 14:5x UTC: his WAIT-PLAN (a) and U4G-Q1 (b) split (history.md:7511-7516); F-B-COUNT
+  explained to him (he decides next); U5-EARLY APPROVED WITH CONDITIONS 1-10, launch items done, its builder next.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -68,6 +68,10 @@
   records and F1's plan line: :7209-7216. **-20's L1 now PASSES on F1's fix** (46ca143; u4f-report.md item 5's end).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
+- **2026-11-21 by the advisor's U5-EARLY ruling (advisor-u5-early.md:203-206; to name in the 2026-11-22 message by its
+  section 7 line, :196-201):** U5's build begins now beside U4f2's wait, under its conditions 1-10 (the S line until
+  U5-SIZE; Block 7 only on U5-SIZE (a); C-U5-1 and the shared files at the re-base). Why: inside the plan, undoable, no
+  pass mark, judge, marks.json or money; nothing on main.
 - **2026-11-21 by the advisor's U4G-EARLY ruling (advisor-u4g-early.md:156-158; to name in the 2026-11-22 message by
   B7's line, :151-154):** U4g's blocks 1-4 now, beside U4f2's wait, under its conditions 1-10. Why: inside the plan,
   undoable, no pass mark, judge, marks.json or money; nothing on main.
@@ -147,21 +151,10 @@
   APPROVE WITH CONDITIONS 1-5, all met: **u4g-brief.md rev 2.1 is ready**; **U4G-Q1's final text for the 2026-11-21
   message: advisor-u4g-brief.md:360-374**, lean (b) split; U4G-Q2 before -58's set only), U4f2's brief check
   (:7300-7311; APPROVE WITH CONDITIONS, rev 1.1, then rev 1.2 at launch; its size line, now answered).
-- **U4f2: fix pass part A2 RUNNING; FP-2 waits for F-B-COUNT.** The record from round 1's ruling to now is word for
-  word at history.md:7324-7367, :7369-7400 and :7446-7489 (card_trim_1120g/h, 1121a). Part A built (FP-1, 3, 5, 6, 7,
-  4, 8; about 2,562 added; snapshot 23c5f788…). The advisor's part-A ruling (advisor-u4f2-parta.md): F-G fixed
-  (`every` above kind 7's rest); R0, R4 and R5 now (R5's forged lines a smoke), R2-pre and R3-pre only above 6.5 GB
-  free; after FP-2, R5's forged lines, R2 and R3 whole, and the lag-switch A line again; **its stop past 2,800**, his
-  past 3,000. The builder resumed at 02:38 after the cut, checking its worktree first (no plant left, its last edit
-  whole). **Part A2 DONE ~03:10** (Block 9 "Part A2"; logs u4f2-fg-*, u4f2-r0/r4/r5/r2pre/r3pre-*.log): F-G fixed
-  (`every > r`; fp3 [false, false, true]; its plant fails by name); R0 the two timed tests 2 s faster (no narrowing);
-  R4 excess 600,000 µm above 0 (counts); R5 all exit 0, in a building 0, the fast-clock proof equal over 450 ticks,
-  both judge calls' twin checks 0 (counts, its forged lines a smoke); R2-pre twin mismatch 0 under A and B, shots
-  685.77 and 691.52, unrejected kind 7 only (18 A, 8 B: FP-2's), counted = sent for 8, 9, 11, slot 6's `input_missing`
-  0 under B (the lab writes no `commands_rerun_count`: a note for round 2); R3-pre shots 673 (3 above the 670 line),
-  kind 1 unrejected 1,523, kind 7 10. About 2,566 added; free 7,712,194,560 B. **Nothing else in U4f2 moves before
-  FP-2.** **FP-2 on his Advisor's F-B-COUNT answer** (KEEP-PROGRESSING: about two days from 2026-11-20 21:37 UTC);
-  then round 2 (netcode, test, rust), R6, the merge, the r2 rows and -21's set.
+- **U4f2: part A2 DONE (~03:10 UTC); FP-2 waits for F-B-COUNT** (explained to him in plain words 14:3x; he decides).
+  Its part-A record (the advisor's part-A ruling; R0, R4, R5 and the pre-reads; about 2,566 added) is word for word at
+  history.md:7519-7533 (card_trim_1121c.py). After FP-2: R5's forged lines, R2 and R3 whole, lag-switch A again, round
+  2 (netcode, test, rust), R6, the merge, the r2 rows and -21's set; any U5 builder yields first (U5-EARLY cond. 6).
 - **U4h's brief rev 2.1 READY** (u4h-brief.md; the advisor's rev-2 check APPROVE WITH CONDITIONS, all met by my
   Edits; register entries 94-101 at u4s-carries.md:618-659). **U4H-Q4, U4H-SIZE and U4H-JUDGE** (final, section 8)
   go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop. **msg-2026-11-21.md
@@ -172,12 +165,16 @@
   RoomControl 272, Snapshot at most 155,952 through the client, FullState 2,213,272, the rest 0); the advisor's rev-2
   check APPROVE WITH CONDITIONS (:324-430: 3 Medium, 3 Low), all met by my Edits ~05:3x UTC (no new check needed).
   **U5-ALLOC and U5-SIZE are his** (final texts, section 8; neither a stop): in the next day's message (2026-11-22's),
-  with the U4H texts if his U4G-Q1 answer has come. Register lines before U5's launch (section 9). S's letter: U4b 701
+  with the U4H texts if his U4G-Q1 answer has come. Register lines done 14:4x (entries 102-111). S's letter: U4b 701
   (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
 - **U4G-EARLY's half DONE 09:2x** (advisor-u4g-early.md; worktree .claude/worktrees/agent-abc25909b7dd4ad30, kept):
   blocks 1-4 pass workspace-wide (655/756 = +13/+17; 8 plants fail by name; clippy and fmt clean); 2,053 lines; snapshot
   wip/u4g-early.patch a78e2853… (103,162 B, 11 files, in lane). Re-base (cond. 8) after U4f2's merge and -21's set: -58's
   3 counters, F4 room.rs:1033-1034. **U4G-Q1 (b) split** (history.md:7511-7516): U4g 1-6 (stop 6,000), U4g2 7-11 (stop 3,200).
+- **U5-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u5-early.md, 265 lines, read whole; its High ADV-U5E-1 met by
+  cond. 2): fill u5-brief.md §10 (`<base>` 40e20fd, 642/739, 1,207 s; runner u5-run.sh e69b0fa7…; pointer on its line 5);
+  register 102-111 and plan.md's U5/U6 rows done. **U5's size line: the S line, past about 1,400 added lines at a block
+  end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Builder: next; its Block 0 ends at DEP-HOLD's stop.
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
   **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver byg2iirg5
