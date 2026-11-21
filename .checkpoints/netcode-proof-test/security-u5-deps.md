@@ -509,3 +509,86 @@ DONE
   card and a diff-only re-read.
 
 DONE
+
+### B11 (the diff-only re-read of guard rev 4, u5-fuzz-guard.sh 7413834d...) DONE
+- Read: .checkpoints/netcode-proof-test/u5-fuzz-guard.sh rev 4, sha256
+  7413834d3a8d8d4e664631c1463cb66d5b85b0243876e082c7c90471e1d9edb4 (349 lines, read whole). u5-fuzz-guard-rev4.diff (313
+  lines): its body equals `diff -u` of git d10fd11's rev 3 (8466a42e...) against rev 4 (same sha256 f42c15a1... after
+  the two header lines). u5-guard-rev4-tests.txt: 58 of 58 PASS (A refusals on the real guard; B parser cases; C valid
+  cases on a scratch copy stopped before the call: C1 shows "10 path crates; 5 listed; 5 held").
+- Not run by me: the guard, cargo, rustup or cargo-fuzz. The git reads I made from the main folder: no partial clone
+  (extensions.partialclone unset), no refs/replace, no .git/info/grafts, the copy's .git file points at
+  $M/.git/worktrees/agent-a60a432d4564f4cc7, and there is no nested .git in the copy's spikes/ or spikes/netcode-proof/.
+  HEAD:spikes/netcode-proof/crates/sim/Cargo.toml:4-10 inherits `version.workspace`, edition, rust-version, publish
+  and `[lints] workspace = true` from the spike's root manifest.
+- R3-1 to R3-4 are closed:
+  - R3-1: `--bite` (:208-215) takes one id that must match `^PM-[0-9]{4}-[0-9]{1,3}/[a-z0-9][a-z0-9-]{0,63}$` (no
+    space, newline or shell character; bash's `$` is end of string), only with run and `--features bites` (:244-247).
+    It is never put into `pass`. NPT_BITE is added to the fuzz call's env -i alone (:335-338) and printed in the pass
+    line (:337). `pass` (:187-242) is the original argument list minus `--bite <id>`, in order: every accepted branch
+    appends its tokens, every other branch refuses. After `--`, a `--bite` token reaches the libFuzzer allow-list and is
+    refused. Without --bite, NPT_BITE is unset, which is U5-Q6's "clears it".
+  - R3-2: `deleted  <path>` lines (:94-96) are read, and hashes_match requires that spike file to be absent
+    (:130-134). Lines outside the spike are skipped and counted (:97-100). A spike path must be plain with no ".."
+    (:101-102). A deleted line for a fuzz file counts toward n_toml/n_lock, but the present file then has no hash line
+    and is refused: fail closed (tests B11-B16).
+  - R3-3: the graph check (:309-328, then :344-347 after the call).
+  - R3-4: 1 to 9 digits, and -timeout and -rss_limit_mb from 1 (:263-267); 9 digits stay below 2^31, so no int wrap.
+- (1) The tree parse is sound:
+  - `{p}` prints a package as "name vX" plus " (source)" when the source is not crates.io. A path source prints its
+    absolute directory; cargo builds path-dependency source ids from the lexically normalised joined path, and C1's
+    output shows the copy's crates/* paths.
+  - The regex `\(/[^)]*\)` (:314) takes only groups that start with "(/". "(proc-macro)", "(*)", a git "(https…#rev)"
+    or "(registry …)" are left out; the fuzz lock holds only crates.io and path sources (B1).
+  - `--prefix none` changes only the indentation, and dedup "(*)" lines still carry the path group, so `sort -u` sees
+    every path crate.
+  - `-e normal,build` matches what cargo-fuzz compiles (bins only, no dev targets). The default `--target` is the host,
+    the same triple cargo-fuzz passes. `-e` is a display filter only, so `--locked` still checks the whole resolve.
+  - Fail-closed edges: a path outside the copy (:318), a ".." (:319), a ")" inside a path (it truncates the group, the
+    HEAD lookup then fails, :323), and a crate that is not in HEAD (:323). The fuzz root itself is the listed
+    fuzz/Cargo.toml.
+- (2) The baseline is sound for its purpose. HEAD's blob plus "HEAD is an ancestor of the pushed lane ref" means the
+  manifest content was pushed, so it went through the lane's reads and DEP-HOLD's check (unless pushed by hand, which
+  the rule forbids).
+  - `git hash-object --no-filters` hashes the raw file without writing an object (no -w), with no clean filter. A
+    CRLF-converted file would refuse: strict, fails closed.
+  - `rev-parse --verify --quiet HEAD:<path>` reads only the tree (the path is root-relative, correct from cwd $S).
+  - `merge-base --is-ancestor` reads commits only.
+  - None of the three runs a hook, a filter, a pager (output is captured, not a tty) or fsmonitor (no index refresh).
+    Aliases cannot shadow builtins. No network: no remote operation, and the repo is not a partial clone.
+  - Config that is still read: the repository's (shared with every worktree) and the global/system files under HOME=/root.
+    Nothing in them changes what these three commands compute, except object replacement below.
+- R4-1 (Low; deliberate local routes, none present today): what git reads can still be redirected.
+  - refs/replace/* objects (honoured by default; env -i also strips GIT_NO_REPLACE_OBJECTS) and a .git/info/grafts file
+    change what `HEAD:<path>` and `merge-base` see.
+  - A nested `.git` planted under spikes/ or spikes/netcode-proof/ would capture repository discovery from $S.
+  - The remote-tracking ref is a local ref, so `git update-ref` moves it without a push.
+  - Each one needs a deliberate local act (memory: Low). Fix (cheap): add GIT_NO_REPLACE_OBJECTS=1 to GE (:61), and
+    check that `git rev-parse --show-toplevel` equals the copy's physical path and that `--git-common-dir` equals
+    $M/.git before the graph check.
+- R4-2 (Low; a future release file, not today): the spike's root manifest is an input of the fuzz build, because the
+  path crates inherit from it (`version.workspace = true`, `[lints] workspace = true`, `<dep>.workspace = true`:
+  HEAD:spikes/netcode-proof/crates/sim/Cargo.toml:4-10). It is not a path crate, so the graph check (:317-328) never
+  holds it.
+  - Today it is hashed by its dependency-check.md line. A later release file that lists only the fuzz pair would leave
+    it neither hashed nor held.
+  - A version or new-dependency change there would still fail `tree --locked`. A feature change on an already-locked
+    dependency in `[workspace.dependencies]` would not.
+  - Fix: when spikes/netcode-proof/Cargo.toml is not listed, hold it to HEAD like the unlisted path crates (and so
+    anything that holds `[workspace.dependencies]` for a path crate).
+- (3) Regressions against rev 3: none.
+  - The same allow-list, corpus, prefix and libFuzzer checks; env -i; the config walk; the pinned spike config.
+  - The plant test is unchanged (hash lines only, both forms; traps as before).
+  - The new order (:305-334) still runs every check before the call (:338).
+  - The 1.99.1 tree now carries `--prefix none --format '{p}' -e normal,build` (display only) and is captured; the
+    nightly tree is unchanged.
+  - Held manifests are re-checked after the call with exit 65 (:344-347).
+  - New, availability only: the guard refuses when the copy's HEAD is not on the pushed lane ref (:312-313). It is
+    expected, and fails closed.
+- Out of the guard's scope, no finding: source files such as an auto-discovered build.rs in a path crate are code, not
+  dependencies (check.mjs refuses build scripts at the end checks).
+- Verdict: READY FOR FIRST USE, bite runs included. R3-1 to R3-4 are closed, and no finding of Medium or higher is
+  open. R4-1 and R4-2 are Low: fold them in (a few lines, then a new sha256 and a diff-only re-read) or carry them as
+  follow-ups.
+
+DONE

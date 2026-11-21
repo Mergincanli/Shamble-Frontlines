@@ -173,11 +173,11 @@
 - **U5-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u5-early.md, 265 lines, read whole; its High ADV-U5E-1 met by
   cond. 2): fill u5-brief.md §10 (`<base>` 40e20fd, 642/739, 1,207 s; runner u5-run.sh e69b0fa7…; pointer on its line 5);
   register 102-111 and plan.md's U5/U6 rows done. **U5's size line: the S line, past about 1,400 added lines at a block
-  end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Copy agent-a60a432d4564f4cc7: Blocks 0-1 DONE (1,177
-  added, u5-build.md); 8 files CLEARED (security-u5-deps.md; dependency-check.md); SEC-U5D APPROVE S1-S4 (:267-356). 17:5x:
-  P27 (4.5 GiB) + main release clean (707.6 MiB); nightly-2026-11-01 and cargo-fuzz 0.13.2 (38ef01cf…) installed; free 9.36 GB;
-  Block 2's sim half DONE 17:5x (1,322 added; snapshot 2 303972b9…, 13 files; free 8.97 GB); stopped before Block 3.
-  Guard rev 4 7413834d… (R3-1-4; tests 58/58) in its re-read (B11); then the plant test, then Block 3 (its end passes 1,400).
+  end, until his U5-SIZE answer** (S letter: U4b 701, U4f-F1 239). Copy agent-a60a432d4564f4cc7 (u5-build.md): 8 files
+  CLEARED (security-u5-deps.md; dependency-check.md); SEC-U5D APPROVE S1-S4 (:267-356); Blocks 0-2 (sim half) DONE 17:5x,
+  1,322 added, snapshot 2 303972b9…. 17:5x: P27 (4.5 GiB) + main release clean (707.6 MiB); nightly-2026-11-01 + cargo-fuzz
+  0.13.2 (38ef01cf…) installed. Guard rev 4 7413834d… READY (B11; 58/58; R4-1/R4-2 Low carried to the re-base's guard change,
+  R4-2 before a dependency-check.md lacking the root manifest); plant PASSED 18:02:38; Block 3 launched 18:0x (stop past 1,400).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
   **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver bdituvkdn
