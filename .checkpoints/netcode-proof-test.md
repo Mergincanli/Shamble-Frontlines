@@ -148,6 +148,12 @@
   8,594,862,080 B). Part A's record: history.md:7519-7533. Then round 2 (netcode, test, rust; xhigh; the netcode seat
   reads FP-2's window against his words), R6, the merge, the r2 rows and -21's set, whose report prints
   `dead_left_out_count` beside the check for every run (his words); U5's builder stays stopped (U5-EARLY cond. 6).
+- **Agents running at 20:19 UTC; all told to save at 20:19 (Mustafa at 95% usage); after a cut, resume each by
+  SendMessage, reading its file first (SPEND-LIMIT (a)):** U4f2's builder aa62d31b6fa5b9807 (worktree
+  .claude/worktrees/agent-aa62d31b6fa5b9807; notes u4f2-build.md "Block 10" with its "Resume here:" line; snapshot
+  wip/u4f2-build.patch, 19:55 then fresh; check no plant left); the marks agent a48b206e6324455a1 (test-engineer; out
+  replan-marks.md, 11.5 KB at 20:19); the units agent a347235186edd9d84 (netcode-architect; out replan-units.md, 9.4 KB
+  at 20:17). Each file holds its own "Resume here:" line. Then: round 2 (netcode, test) on U4f2; my re-plan screen.
 - **Moved or stopped by NPT-TRIM (what is built stays, for reference):** U4g's early half (blocks 1-4, 2,053 lines;
   snapshot wip/u4g-early.patch a78e2853…; worktree agent-abc25909b7dd4ad30 kept); U4g2's client half and U4h (briefs
   u4g-brief.md rev 2.1, u4h-brief.md rev 2.1 kept for the real game); U5 stopped after Block 3a (1,658 lines; snapshot
