@@ -357,3 +357,67 @@ DONE
   card, then a short re-read of the diff. GUARD-4..6 Low: fold in now or carry as follow-ups.
 
 DONE
+
+### B9 (the re-read of guard rev 2, u5-fuzz-guard.sh 768f6055...) DONE
+- Read whole: .checkpoints/netcode-proof-test/u5-fuzz-guard.sh rev 2, sha256
+  768f6055fbbc1b412b85cf3bae0356ae2360adb2e46e18e628cd22e6533942ae (192 lines; matches the coordinator's hash). Checked
+  again against cargo-fuzz 0.13.2's source in the registry cache (src/main.rs, src/options.rs, options/build.rs,
+  options/run.rs, src/project.rs) and cargo's config reference. Nothing run. Environment names seen (names only):
+  CARGO_HTTP_CAINFO, RUSTUP_HOME, RUST_BACKTRACE; the only .cargo folder on the cwd's ancestry is the spike's
+  ($S/.cargo/config.toml: build.target-dir only).
+- Closed:
+  - GUARD-1: --fuzz-dir is refused (the dash allow-list, :114-130). With no --fuzz-dir the project is
+    find_package()+"fuzz" from cwd $S (project.rs:1079-1084) = the hashed $F; no cargo-fuzz environment variable picks
+    the folder (its env reads are RUSTFLAGS, ASAN_OPTIONS, TSAN_OPTIONS, RUSTC, RUSTC_BOOTSTRAP only); the target dir is
+    None without coverage (project.rs:352-371), so CARGO_TARGET_DIR applies. Subcommand aliases b/r (main.rs) are
+    refused: only the literal build or run passes.
+  - GUARD-2: features only `bites` (:123-129), and both tree checks run with the call's features (:177-182). bites
+    turns on npt-proto/bites -> npt-sim/bites, plain features with no optional dependency (B1). The build therefore uses
+    the cleared lock with the cleared features.
+  - GUARD-3: -c, grouped shorts, attached values, -Z and --target-dir all start with a dash and are not exact
+    allow-list tokens, so they are refused. Value consumption agrees with clap: the guard takes the next token after -s,
+    --sanitizer and --features and refuses anything but address/none/bites, and clap rejects a dash-led value anyway.
+  - GUARD-4: CARGO_NET_OFFLINE=true checked (:167); version checked (:174-175); tree on 1.99.1 and the nightly; configs
+    scanned for CUSTOM_LIBFUZZER (:168-173). GUARD-5: run needs corpora and -artifact_prefix under .gate/ with no ".."
+    (:145-159). GUARD-6: traps right after the cp (:76-77), cleared after the mv (:83); a signal after the mv only runs
+    a failed, silent mv; the backup is named on failure (:84). Only a SIGKILL in that millisecond window is left.
+- GUARD-7 (Low under the recorded threat model; the one GUARD-1-kind route left): the guard checks the environment
+  and cargo configs by a deny-list, so routes that point cargo at another lock or other sources stay open, and every
+  check then passes. (a) `resolver.lockfile-path` is stable since cargo 1.97, environment variable
+  CARGO_RESOLVER_LOCKFILE_PATH (cargo config reference, read 2026-11-21: "Specifies the path to the lockfile to use
+  when resolving dependencies", "MSRV: Requires 1.97+", high). Set, both tree checks and the build use that other lock
+  while the guard hashes $F/Cargo.lock. (b) A config `paths` override or a `[source]` replacement builds other source
+  code under an unchanged lock. (c) `[unstable] build-std` or CARGO_UNSTABLE_* turns on build-std without a flag (fails
+  closed today). (d) CARGO_HOME points at another config and registry; RUSTC sets another compiler. The config scan
+  reads 4 folders, but cargo reads every .cargo/ from cwd up to / plus $CARGO_HOME, and it looks only for
+  CUSTOM_LIBFUZZER. Why Low: each route needs a deliberate environment variable or config file, and none is set on
+  this machine today (memory: environment and config routes are the operator's machine). Recommended before first use
+  anyway, since it is the guard's own subject and costs a few lines: an environment allow-list (refuse any CARGO_* or
+  RUSTC* name except CARGO_TARGET_DIR, CARGO_NET_OFFLINE, CARGO_HTTP_CAINFO), and a config check walking every
+  directory from $S to / plus ${CARGO_HOME:-$HOME/.cargo}: no config file may exist but $S/.cargo/config.toml, and that
+  one must equal its known sha256 or hold only build.target-dir.
+- Parsing edge cases (all Low; none builds something other than the cleared manifest and lock):
+  - E1: after `--` the guard checks only -artifact_prefix and -exact_artifact_path. A token there with no leading dash
+    is a libFuzzer input, and cargo-fuzz places it before the guard's validated corpora (`-- -artifact_prefix=... <args>
+    <corpora>`: project.rs:343-347, :512-530), so it becomes libFuzzer's first corpus folder, the one it writes into,
+    anywhere: GUARD-5 bypassed for outputs. Other libFuzzer flags write files elsewhere (-features_dir=,
+    -mutation_graph_file=, -merge_control_file=; -jobs/-fork write fuzz-N.log into cwd $S) or run a named program
+    (-collect_data_flow=). Fix: after `--` accept only `-name=value` tokens from a short list (-max_total_time, -runs,
+    -seed, -max_len, -timeout, -rss_limit_mb, -malloc_limit_mb, -print_final_stats, -use_value_profile, plus the two
+    checked path flags), and refuse any token with no leading dash.
+  - E2: for build, tokens after `--` are not checked. clap makes the first one Build's positional target when none came
+    before `--`, which skips the [[bin]] check, and cargo then fails on `--bin <odd name>`. Fix: refuse `--` for build.
+  - E3: an empty token "" is neither a dash token nor a recorded target (the `-z` test stays true), while clap takes it
+    as the target; cargo then fails on `--bin ""`. Fix: refuse empty tokens.
+  - E4: the version test is a substring (`*"cargo-fuzz 0.13.2"*` also matches 0.13.20) and self-reported. Fix: exact
+    equality; optionally the installed binary's sha256 on the card, compared.
+  - E5 (carried): the fuzz build also compiles the path crates (alloc, client, link, net, proto, room, sim). A change
+    to one of their manifests that needs no lock change (a `build =` key, say) passes `tree --locked` and gets built.
+    The workspace's own runner builds have the same exposure (DEP-HOLD's push check and check.mjs back it). Cheap fix:
+    check every line of dependency-check.md before the call, not only the two fuzz ones.
+  - Symlinks under .gate/ named as a corpus or prefix could point back into the repository: deliberate, Low.
+- Verdict: READY FOR FIRST USE. GUARD-1 and GUARD-2 are closed and no Medium or higher is open. GUARD-7 and E1-E5 are
+  Low: GUARD-7 and E1 are worth folding in before the plant and first call (a few lines each, then a new sha256 and a
+  diff-only re-read); otherwise they carry as follow-ups.
+
+DONE
