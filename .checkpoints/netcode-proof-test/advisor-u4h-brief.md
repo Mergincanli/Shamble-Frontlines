@@ -369,6 +369,120 @@ Nothing now from this check: the three questions ride a later day's message, aft
    writer cell.
 4. Check the new cites and figures (the wait cap, section 6's sums, section 8's texts).
 5. Verdict, findings ADV-U4HB-14 on, the texts' finality and day, the eight register lines word for word.
+(Cut by a spend limit at about 22:39 UTC on 2026-11-20 after the plan; resumed 2026-11-21. The brief, its notes and
+u4s-carries.md unchanged since: last commit to them ee43ae6; 369 and 738 lines.)
 
 ### Notes (as I go)
+- My list's items 1-8 (:332-343) are met where rev 2's change list (:11-19) says: TC's weapon (block 1, 1.3, section 3);
+  press edges, the shot id, reruns and refused presses (blocks 6-7, section 3); Q2's six terms, Q5's five, Q6 (blocks
+  2-3, 6-8, 13, section 2); the room-side wait cap (block 2, section 3); the two sim pub items and A19's list (1.4); section
+  6 recomputed, J1-J3 apart, block 9's no-answer line; one "Ruled" line each, every cite into this file landing on its
+  ruling (:145-210); Lows -10 to -13.
+- Section 6's sums hold: lag 2,080-3,850, aim 750-1,515, whole 2,830-5,365; at 1.5 U4h 5,775, U4h2 2,273 (stop 2,300),
+  whole 4,245-8,048; the judge's change planned about 650, stop past 1,300; with it inside, about 7,100.
+- Section 8's three texts equal mine (:274-323) but U4h2's top, 1,550 to 1,500 (the column's 1,515): right.
+- **TC's health as rev 2 sets it does not fit the wire.** The soldier record's HEALTH field holds 0 to 1,023
+  (sim/src/seam.rs:224, in SOLDIER's layout :259); block 1's "30,000 at 3,000" cannot be encoded. `damage()` pushes the
+  Hit before it subtracts (world.rs:1687-1696), so a TC weapon of damage 0 keeps every Hit and kills nobody, at CO's
+  health 100. AMMO holds up to 65,535 (seam.rs:240), so a magazine covering the run needs no reload at all.
+- The wait cap: L1's jitter is on the round trip (l1/src/lib.rs:156), so an honest controller's upper one-way estimate
+  (max RTT less half the min: client lib.rs:634-646) is RTT/2 + 1.5J, under the RTT while J <= RTT/3: P1 to P4 and B1
+  hold (P1's slack about 10 ms); at P0 the honest wait can reach the cap's 3 periods exactly.
+- Q6: Scene's fields are crate-private (scene.rs:100-135); `with_stand_ins` (:328-331) is the builder precedent. The
+  interest radius is 64 m (advisor-u4e-r1.md:660); TC stands about 60 m from the centre field.
+- Q7: -49's frame-wait report reads `from.process` room (marks.json:9961-9969); on L2 the room cannot write it.
+- u4s-carries.md's last entry is 93; the eight lines take 94 to 101.
+
+### Rulings on the two open points and the added change
+- **(a) Q6, the stand-ins' source: the builder.** One `with_*` builder in `with_stand_ins`' form (scene.rs:328-331),
+  setting the stand-in spawn rate (and the pool's capacity if the rate needs it), used by the `throws` suite alone, its
+  values in the header. My "no sim code" was written without knowing the fields are crate-private; a few lines in a file
+  the lane already opens are the smaller change in effect: TC's data stays as it is for -48, -50 and -51 and for the
+  synthetic TC entry. The pre-run prints each kind's compared count; the stand-ins must spawn inside the TC client's set
+  (64 m; TC is about 60 m from the centre field).
+- **(b) Q7, SERIES.md:211: yes, in the same edit.** The cell names npt-lab writing into the room log's shot event (L1),
+  test-engineer's read with the rest. Section 9's after-close list gains: -49's frame-wait report reads process `room`
+  (marks.json:9961-9969), which on L2 no room can write; marks.json text, his.
+- **The added change, TC's health: right aim, wrong form** (ADV-U4HB-14 below).
+
+### Findings (rev 2)
+- **ADV-U4HB-14 (Medium): TC's health of 30,000 does not fit the soldier record.** HEALTH holds 0 to 1,023
+  (seam.rs:224, :259); the encoder cannot carry it. **Fix:** TC's weapon has damage 0 (the Hit is pushed before the
+  subtraction, world.rs:1687-1696, so registration is unchanged and nobody dies, the cheats and the target included) and
+  TC keeps health 100; prefer a magazine that covers the run (AMMO to 65,535: seam.rs:240) over the shooter reading its
+  own-state record, which lags a round trip and turns presses into refusals. Section 3's TC row stands ("the target lives
+  through a run's shots"); both values in every header (carry 60).
+- **ADV-U4HB-15 (Low): "shares no file with U4h" needs one line.** The shot id's SERIES.md row is U4h's (block 7); the
+  judge's change writes no SERIES.md line and its fixtures follow rev 2's wording, (shooter slot, firing command's
+  sequence), whichever merges first. Say so in the judge's block; Mustafa's text stays true.
+- **ADV-U4HB-16 (Low):** 1.2 says "crates/judge is not U4h's"; under U4H-JUDGE (a) it is (the judge's block, "inside U4h
+  between blocks 8 and 9"). One clause.
+- **ADV-U4HB-17 (Low): the wait cap's margin, stated.** Block 2 gains: the cap holds an honest wait while the round
+  trip's jitter is at most a third of it (true on P1 to P4 and B1; P1's slack about 10 ms; P0's 0: "capped" means above
+  the cap), and what a stamp-ahead can buy at most per profile (the cap less the honest wait, held by the final cap), for
+  the security-auditor's read; the P0 pre-rows print capped waits too.
+
+### Verdict: APPROVE WITH CONDITIONS
+No Critical or High; every item of my list is met. The conditions are small edits by the main session, none needing a
+new check by me if met as written:
+1. ADV-U4HB-14: block 1, 1.3 and section 3 as its fix says.
+2. Q6 and Q7 as ruled above: block 13 and section 8 items 6 and 7; section 9's after-close line.
+3. ADV-U4HB-15 to -17 in the same pass.
+4. The register lines below, added to u4s-carries.md's U4h section before U4h's launch; section 9 points to them.
+
+### The three texts for Mustafa
+Final as they stand in rev 2 (u4h-brief.md:303-351); none of the conditions touches them. They go together, with my
+U4H-Q1 to Q3 and Q5 to Q12 rulings named under its choices, in the first day's message after this check and his U4G-Q1
+answer (2026-11-21's message carries U4G-Q1): 2026-11-22's at the earliest. None is a stop.
+
+### The register lines (u4s-carries.md, U4h section, after entry 93; word for word)
+```text
+94. **N2-L3 (b), the hull's blend (u4d-round2-netcode.md:81-82; routed by the advisor's U4d close ruling,
+    advisor-u4d-close.md:305-306; filed 2026-11-21, ADV-U4HB-12):** "U4h must blend composed boxes or interpolate hull
+    yaw wrap-aware" (:81-82). Met by one npt-sim function over two HitVolumes at the Rewind's fraction, which the
+    server's shot phase and the client's AimCast both call (u4h-brief.md 1.4, block 5).
+95. **INF-U4R-6 with INF-R2-2's base, det-u4's 240 s line (the advisor's U4r round-1 ruling, advisor-u4r-r1-full.md:289;
+    its round-2 ruling, advisor-u4r-r2-full.md:45; filed 2026-11-21, ADV-U4HB-12):** "det-u4.mjs prints its own
+    non-cargo sum and the line 'over 240 s: to the advisor (ruling 1 point 1)', without changing wasmStep's default
+    print" (r1 :289); "Adding a runner entry to det-recordings.json will cross 240 s, so U4h's plan settles the route
+    (RR-L4 weighed first) before recording" (r2 :45; the base 223.7 s of 240). Route ruled: U4H-Q10
+    (advisor-u4h-brief.md:199-203), the TC entry's length set from a measured runner-rate row before recording.
+96. **`pump_report`'s RTT (the advisor's U4e round-1 ruling, advisor-u4e-r1.md:662-664; filed 2026-11-21,
+    ADV-U4HB-12):** "The room's per-tick report from the pump (`pump_report`) carries the bytes sent and the link's
+    largest datagram, not the RTT, which U4h's tolerance will read" (:663-664). U4h's callers (the lab, scenario.rs:704;
+    npt-server's tests, common/mod.rs:290, loopback.rs:213) pass each session's `Decoder::rtt_ns`; U6's TickLoop makes
+    the same hand-off.
+97. **EA-U4R-4 and EA-B1-1's later half, npt-sim's pub items (the advisor's U4r round-1 ruling,
+    advisor-u4r-r1-full.md:185; BRAWL-1's round-1 ruling as u4r-report.md:1164-1165 records it; filed 2026-11-21,
+    ADV-U4HB-12):** "make the clamp bound (or the fire-origin height) a pub npt-sim item, read by npt-lab" (:185);
+    "npt-sim exposes the flags index and the dead bit as pub items. The home: the next lane that opens crates/sim
+    (beside EA-U4R-4), U6 at the latest" (:1164-1165). U4g opens crates/sim first; what U4g's report does not list as
+    met, U4h takes (u4h-brief.md 1.4).
+98. **The everyone_in_view row's writer cell (the advisor's U4r build ruling 3, task (e), as history.md:4976 records
+    it; filed 2026-11-21, ADV-U4HB-12):** "(e) SERIES.md:368's writer at the next SERIES.md edit." The row is now
+    SERIES.md:396 (`tick.s.everyone_in_view`, writer "npt-room"), which U4r's lab computes from its mirror
+    (advisor-u4r-build3.md:20); U4f's SERIES.md edit (25d316e) did not take it. U4h's one SERIES.md edit corrects the
+    cell (U4H-Q7, with test-engineer's read).
+99. **cross_arch_mismatch_count's two later kinds (SERIES.md:265, the figure's row; filed 2026-11-21, ADV-U4HB-8):**
+    "The shot view test's and the throw landing's kinds join with the figures that read them (U4h:
+    view_hit_registered_share, false_hit_share, throw_desync_count)". Built on fixtures with those figures and their L2
+    Arm-rule halves (SERIES.md:274, :295, :299) in the judge's change (J1, J2), as Mustafa's U4H-JUDGE answer places it.
+100. **JDG-ONLY-1, the judge's `--only` before `pre:` (the advisor's carry 62 (h) ruling, advisor-u4r-c62h-full.md, as
+     history.md:4609-4614 records it; filed 2026-11-21, ADV-U4HB-8):** "the judge narrows marks with --only before
+     Rule::Pre looks for PM-0001-2 (main.rs:94, eval.rs:958-962)"; "Home: npt-judge's next change, before PR #40 is
+     marked ready at the latest and before any such bite; interim rule: every npt-judge --only that names a mark
+     carrying pre:PM-0001-2 also names PM-0001-2." Rides the judge's change (J3) with the interim rule's fixture
+     (U4H-Q12); under his U4H-JUDGE (c) it comes back to him alone.
+101. **TC's own weapon (the advisor's U4h brief check, ADV-U4HB-1 and -14; advisor-u4h-brief.md:66-75; filed
+     2026-11-21):** TC inherits CO's weapon (scene.rs:263, :236-243), whose 5,000 µrad spread the authority draws from
+     its own stream (world.rs:1622-1631): up to 15 cm a side on the plates at 30 m, which no client can reproduce, so
+     -48 and -51 could not pass. TC gets its own weapon: spread 0, damage 0 (every Hit kept, nobody dies; HEALTH holds
+     only 0 to 1,023: seam.rs:224), a magazine covering the run, all in every header (carry 60). It binds U4h2 if split
+     and every later TC run.
+```
+
+### What I did not check (rev 2)
+Nothing run. Sections 0, 5 and 7 only where they touch the items above; the wait cap's margin is arithmetic on L1's
+profile table and the controller's code, not a run; where the stand-in spawner places its projectiles in TC (the
+pre-run's count shows it).
 
