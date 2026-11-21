@@ -1,14 +1,16 @@
 diff --git a/spikes/netcode-proof/crates/client/src/lib.rs b/spikes/netcode-proof/crates/client/src/lib.rs
-index e88e3ea..4a93548 100644
+index e88e3ea..64994e9 100644
 --- a/spikes/netcode-proof/crates/client/src/lib.rs
 +++ b/spikes/netcode-proof/crates/client/src/lib.rs
-@@ -21,8 +21,13 @@ use npt_sim::grid::{Config, Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW
+@@ -21,23 +21,32 @@ use npt_sim::grid::{Config, Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW
  use npt_sim::{Command, EntityKind, EntityRecord, SimEvent};
  
  mod clock;
++mod cues;
 +mod predict;
  
  pub use clock::{ClockSample, ClockSync};
++pub use cues::{CueKind, OwnCue};
 +pub use predict::{
 +    Applied, Correction, CorrectionKind, FADE_MS, FLAG_UM, HELD_MS, OwnChange, Predictor, SNAP_UM,
 +    TRACE_UM,
@@ -16,7 +18,26 @@ index e88e3ea..4a93548 100644
  
  /// The bite ids this crate plants (bites builds only). u4-build-plan.md §4.14 plants each bite where its code lives:
  /// PM-0001-17/client-rounding's site is the client's call into the wire grid, so its id lives here and not in npt-sim's
-@@ -170,6 +175,9 @@ struct Tick {
+ /// grid; the endpoint takes the grid for its every call into it from [`grid_with_bite`]. PM-0001-58/lt-tick-offset and
+ /// PM-0001-58/lt-event-seq are the endpoint's two rebuilds (carry 24). U4f's three (u4f-brief.md 2.11): -47's two in
+ /// ClockSync (an estimate that is the newest raw sample; each sample timed at the step that reads it, not at its
+-/// arrival) and -20's redundancy cap of 1 in the endpoint's `Input`.
++/// arrival) and -20's redundancy cap of 1 in the endpoint's `Input`. U4g's: -62's cues written from the replays, in
++/// the predictor's cue log (carry 24's U4g half).
+ #[cfg(feature = "bites")]
+-pub const BITES: [&str; 6] = [
++pub const BITES: [&str; 7] = [
+     "PM-0001-17/client-rounding",
+     "PM-0001-58/lt-tick-offset",
+     "PM-0001-58/lt-event-seq",
+     "PM-0001-47/newest-sample",
+     "PM-0001-47/tick-quantised",
+     "PM-0001-20/redundancy-1",
++    "PM-0001-62/cues-from-replay",
+ ];
+ 
+ /// The signed distance of tick `a` from tick `b` (positive: `a` after `b`), wrap-aware.
+@@ -170,6 +179,9 @@ struct Tick {
      frame: Frame,
      events: Vec<(u32, SimEvent)>,
      filed: Filed,
@@ -26,7 +47,7 @@ index e88e3ea..4a93548 100644
  }
  
  impl Tick {
-@@ -213,6 +221,11 @@ pub struct StepOut {
+@@ -213,6 +225,13 @@ pub struct StepOut {
      pub lost: Vec<(u32, u32)>,
      /// The counters that wrapped since the last step.
      pub wraps: Vec<&'static str>,
@@ -35,27 +56,45 @@ index e88e3ea..4a93548 100644
 +    pub applied: Vec<Applied>,
 +    /// U4g: each own-state change the predictor closed since the last step (PM-0001-60's `own_change`).
 +    pub own_changes: Vec<OwnChange>,
++    /// U4g: each own cue key and kind the predictor closed since the last step (PM-0001-62's `own_cue`).
++    pub cues: Vec<OwnCue>,
  }
  
  /// The client endpoint (plan.md:486-489): `input` with the page's command and every message received since the last
-@@ -275,6 +288,8 @@ pub struct ClientEndpoint {
+@@ -275,6 +294,11 @@ pub struct ClientEndpoint {
      redundancy: usize,
      /// PM-0001-47/tick-quantised: each `Pong` timed at the step's time, not at its arrival.
      tick_quantised: bool,
 +    /// U4g's prediction of the client's own soldier, when the host gives one ([`ClientEndpoint::with_predictor`]).
 +    predictor: Option<Predictor>,
++    /// PM-0001-62/cues-from-replay, planted in the predictor whenever it is given (bites builds only).
++    #[cfg(feature = "bites")]
++    cues_from_replay: bool,
  }
  
  /// A Soldier record's flags field, the sixth of its layout (npt-sim seam.rs's `SOLDIER`: x, y, z, yaw, pitch, flags,
-@@ -339,6 +354,7 @@ impl ClientEndpoint {
+@@ -339,6 +363,9 @@ impl ClientEndpoint {
              left_out: 0,
              redundancy: Limits::REDUNDANCY_CAP,
              tick_quantised: false,
 +            predictor: None,
++            #[cfg(feature = "bites")]
++            cues_from_replay: false,
          }
      }
  
-@@ -403,6 +419,31 @@ impl ClientEndpoint {
+@@ -397,12 +424,46 @@ impl ClientEndpoint {
+             self.tick_quantised = true;
+         } else if bite == BITES[5] {
+             self.redundancy = 1;
++        } else if bite == BITES[6] {
++            self.cues_from_replay = true;
++            if let Some(p) = &mut self.predictor {
++                p.plant_cues_from_replay();
++            }
+         } else {
+             self.quant = Quant::with_bite(bite)?;
+         }
          Some(self)
      }
  
@@ -68,6 +107,10 @@ index e88e3ea..4a93548 100644
 +        if let Some(slot) = self.slot {
 +            predictor.set_slot(slot);
 +        }
++        #[cfg(feature = "bites")]
++        if self.cues_from_replay {
++            predictor.plant_cues_from_replay();
++        }
 +        self.predictor = Some(predictor);
 +        self
 +    }
@@ -77,7 +120,7 @@ index e88e3ea..4a93548 100644
 +        self.predictor.as_ref()
 +    }
 +
-+    /// Closes the predictor's open own-state changes into the next step's output (a run's end).
++    /// Closes the predictor's open own-state changes and cue keys into the next step's output (a run's end).
 +    pub fn close_prediction(&mut self) {
 +        if let Some(p) = &mut self.predictor {
 +            p.close();
@@ -87,7 +130,7 @@ index e88e3ea..4a93548 100644
      /// The slot `JoinAccepted` gave, once joined.
      pub fn slot(&self) -> Option<u8> {
          self.slot
-@@ -606,6 +647,9 @@ impl ClientEndpoint {
+@@ -606,6 +667,9 @@ impl ClientEndpoint {
          }
          self.unacked.push_front((index, c));
          self.unacked.truncate(self.redundancy);
@@ -97,7 +140,7 @@ index e88e3ea..4a93548 100644
      }
  
      /// The controller's plan for this step, at its first `input` (U4F-Q7 (b) with (iii) (c); u4f-brief.md 2.2): the
-@@ -745,6 +789,11 @@ impl ClientEndpoint {
+@@ -745,6 +809,12 @@ impl ClientEndpoint {
                  }
              }
          }
@@ -105,11 +148,12 @@ index e88e3ea..4a93548 100644
 +            p.advance();
 +            self.out.applied.extend(p.take_applied());
 +            self.out.own_changes.extend(p.take_own_changes());
++            self.out.cues.extend(p.take_cues());
 +        }
          self.planned = false;
          self.steps += 1;
          let base = self.base_ns.unwrap_or(self.now_ns);
-@@ -787,6 +836,9 @@ impl ClientEndpoint {
+@@ -787,6 +857,9 @@ impl ClientEndpoint {
              Ok(Message::JoinAccepted(a)) => {
                  self.slot = Some(a.slot);
                  self.join_tick = Some(a.tick);
@@ -119,7 +163,7 @@ index e88e3ea..4a93548 100644
              }
              Ok(Message::JoinRejected(_) | Message::Kick(_) | Message::RoomEnded(_)) => {
                  self.closed = true
-@@ -1006,6 +1058,24 @@ impl ClientEndpoint {
+@@ -1006,6 +1079,24 @@ impl ClientEndpoint {
          }
      }
  
@@ -144,7 +188,7 @@ index e88e3ea..4a93548 100644
      /// An event's 32-bit number from its 16 bits, nearest the newest number the client knows (`Wrap::widen16`).
      fn event_number(&mut self, low: u16) -> u32 {
          let n = self.wrap.widen16(EVENT_SEQ, self.event_near, low);
-@@ -1101,6 +1171,13 @@ impl ClientEndpoint {
+@@ -1101,6 +1192,13 @@ impl ClientEndpoint {
          self.ring[i] = tick;
          self.acknowledge(t, s.group);
          self.rebuild_sequences(s.newest_received, s.last_run);
@@ -158,7 +202,7 @@ index e88e3ea..4a93548 100644
          if self.ring[i].complete() {
              let e = &self.ring[i];
              let grid = self.grid;
-@@ -1109,6 +1186,9 @@ impl ClientEndpoint {
+@@ -1109,6 +1207,9 @@ impl ClientEndpoint {
              let own: Vec<EntityRecord> = e.frame.own.iter().map(|h| h.hashed(grid)).collect();
              let hash = client_hash(t, &entities, &own, &e.events);
              self.file(i, hash);
@@ -168,7 +212,7 @@ index e88e3ea..4a93548 100644
          }
      }
  
-@@ -1150,6 +1230,14 @@ impl ClientEndpoint {
+@@ -1150,6 +1251,14 @@ impl ClientEndpoint {
          self.file(i, hash);
          self.acknowledge(t, 0);
          self.rebuild_sequences(None, f.last_run);
@@ -183,6 +227,29 @@ index e88e3ea..4a93548 100644
      }
  }
  
+diff --git a/spikes/netcode-proof/crates/client/tests/bites.rs b/spikes/netcode-proof/crates/client/tests/bites.rs
+index bd617c8..5be20e2 100644
+--- a/spikes/netcode-proof/crates/client/tests/bites.rs
++++ b/spikes/netcode-proof/crates/client/tests/bites.rs
+@@ -7,8 +7,8 @@ use npt_sim::grid::{Config, POSITION_XY};
+ #[test]
+ fn pm_0001_17_client_rounding_is_planted_here_alone_and_moves_about_half_of_all_positions() {
+     let id = "PM-0001-17/client-rounding";
+-    // U4e's endpoint adds its two rebuilds' ids (carry 24), U4f its clock's two and the redundancy's; the grid's defect
+-    // stays -17's alone.
++    // U4e's endpoint adds its two rebuilds' ids (carry 24), U4f its clock's two and the redundancy's, U4g the cue log's;
++    // the grid's defect stays -17's alone.
+     assert_eq!(
+         npt_client::BITES,
+         [
+@@ -18,6 +18,7 @@ fn pm_0001_17_client_rounding_is_planted_here_alone_and_moves_about_half_of_all_
+             "PM-0001-47/newest-sample",
+             "PM-0001-47/tick-quantised",
+             "PM-0001-20/redundancy-1",
++            "PM-0001-62/cues-from-replay",
+         ]
+     );
+     let bitten = npt_client::grid_with_bite(id).expect("the client plants -17's");
 diff --git a/spikes/netcode-proof/crates/room/src/lib.rs b/spikes/netcode-proof/crates/room/src/lib.rs
 index 954d8d1..5c1bc29 100644
 --- a/spikes/netcode-proof/crates/room/src/lib.rs
@@ -545,12 +612,119 @@ index 1faee05..7f3fb5d 100644
          let vel = [
              if blocked[0] { 0.0 } else { v[0] },
              if blocked[1] { 0.0 } else { v[1] },
+diff --git a/spikes/netcode-proof/crates/client/src/cues.rs b/spikes/netcode-proof/crates/client/src/cues.rs
+new file mode 100644
+index 0000000..ade3fdc
+--- /dev/null
++++ b/spikes/netcode-proof/crates/client/src/cues.rs
+@@ -0,0 +1,101 @@
++//! The client's own cues (u4-build-plan.md §5 U4g: `CueLog`; ADR 0001 part 4; R1-ABL-REC4): an own shot's muzzle flash
++//! and sound, keyed by (entity, weapon, command sequence), play once however often the replay runs the command that
++//! fired it. The room never sends a client its own cosmetic shot events (part 6), so these cues come from the client's
++//! own predictions alone. PM-0001-62's `own_cue` event: one per key and cue kind, written when the key's window closes
++//! (the room ran its command, so no replay can reach it again), with how often it played.
++//!
++//! **PM-0001-62/cues-from-replay** (bites builds only, per instance): the log written from the replays too, so each
++//! replayed shot plays again (u4-build-plan.md §4.14 :504).
++
++use std::collections::VecDeque;
++
++use crate::dist;
++
++/// A cue an own shot plays.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum CueKind {
++    /// The muzzle flash.
++    Flash,
++    /// The shot's sound.
++    Sound,
++}
++
++/// One own cue key and kind, closed (PM-0001-62's `own_cue` event).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct OwnCue {
++    /// The entity: the client's soldier, by its slot.
++    pub entity: u16,
++    /// The weapon id (the soldier record's weapon field).
++    pub weapon: u8,
++    /// The command that fired, by the client's 32-bit command counter.
++    pub seq: u32,
++    /// Which cue.
++    pub kind: CueKind,
++    /// How often it played.
++    pub plays: u32,
++}
++
++/// The open keys, oldest first: (command index, entity, weapon, plays), at most `held` (the predictor's command history).
++#[derive(Clone, Debug, Default)]
++pub(crate) struct CueLog {
++    open: VecDeque<(u32, u16, u8, u32)>,
++    from_replay: bool,
++    closed: Vec<OwnCue>,
++}
++
++impl CueLog {
++    /// PM-0001-62/cues-from-replay: the log written from the replays too.
++    #[cfg(feature = "bites")]
++    pub(crate) fn plant_from_replay(&mut self) {
++        self.from_replay = true;
++    }
++
++    /// A prediction of command `index` fired a shot of `entity`'s weapon `weapon`; `replay` when a replay ran it. A key
++    /// plays at the first prediction that fires it, never again (but under the bite); the oldest key closes early when
++    /// `held` are open.
++    pub(crate) fn fired(&mut self, index: u32, entity: u16, weapon: u8, replay: bool, held: usize) {
++        if let Some(open) = self.open.iter_mut().find(|o| o.0 == index) {
++            if replay && self.from_replay {
++                open.3 += 1;
++            }
++            return;
++        }
++        if self.open.len() >= held {
++            self.close_oldest();
++        }
++        self.open.push_back((index, entity, weapon, 1));
++    }
++
++    /// The room ran the client's command `last_run`: every key at or before it closes.
++    pub(crate) fn close_through(&mut self, last_run: u32) {
++        while self.open.front().is_some_and(|o| dist(last_run, o.0) >= 0) {
++            self.close_oldest();
++        }
++    }
++
++    /// Every open key closes (a run's end).
++    pub(crate) fn close_all(&mut self) {
++        while !self.open.is_empty() {
++            self.close_oldest();
++        }
++    }
++
++    fn close_oldest(&mut self) {
++        if let Some((seq, entity, weapon, plays)) = self.open.pop_front() {
++            for kind in [CueKind::Flash, CueKind::Sound] {
++                self.closed.push(OwnCue {
++                    entity,
++                    weapon,
++                    seq,
++                    kind,
++                    plays,
++                });
++            }
++        }
++    }
++
++    /// The cues closed since the last call.
++    pub(crate) fn take(&mut self) -> Vec<OwnCue> {
++        core::mem::take(&mut self.closed)
++    }
++}
 diff --git a/spikes/netcode-proof/crates/client/src/predict.rs b/spikes/netcode-proof/crates/client/src/predict.rs
 new file mode 100644
-index 0000000..318ee8b
+index 0000000..1f598d9
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/client/src/predict.rs
-@@ -0,0 +1,431 @@
+@@ -0,0 +1,472 @@
 +//! Prediction and reconciliation (u4-build-plan.md §5 U4g: `Predictor`; plan.md E8; ADR 0001 part 4). The client's
 +//! own soldier is predicted through npt-sim's [`World::predict`], one call per command it stamps. At each snapshot it
 +//! applies (a complete tick newer than the last applied), the world is reset to the server's state for the last
@@ -571,7 +745,11 @@ index 0000000..318ee8b
 +
 +use npt_sim::{Attribute, Command, EntityKind, EntityRecord, Scene, World};
 +
++use crate::cues::{CueLog, OwnCue};
 +use crate::{SOLDIER_DEAD, SOLDIER_FLAGS, dist};
++
++/// The soldier record's weapon field (npt-sim seam.rs's `SOLDIER`: x, y, z, yaw, pitch, flags, health, weapon).
++const SOLDIER_WEAPON: usize = 7;
 +
 +/// A correction this large or larger snaps (ADR 0001 part 4: 2 m, proposed), µm.
 +pub const SNAP_UM: u64 = 2_000_000;
@@ -704,6 +882,8 @@ index 0000000..318ee8b
 +    changes: [Option<OwnChange>; 2],
 +    applied: Vec<Applied>,
 +    closed: Vec<OwnChange>,
++    /// The own shots' cues (block 4: `CueLog`).
++    cues: CueLog,
 +}
 +
 +/// Whether two of the slot's records hold the same state: kind, index, generation and grid integers (the decoded
@@ -736,7 +916,25 @@ index 0000000..318ee8b
 +            changes: [None, None],
 +            applied: Vec::new(),
 +            closed: Vec::new(),
++            cues: CueLog::default(),
 +        }
++    }
++
++    /// The same predictor with one planted defect by its id (bites builds only; per instance):
++    /// PM-0001-62/cues-from-replay ([`crate::BITES`]' entry), its cue log written from the replays too; `None` for any
++    /// other id.
++    #[cfg(feature = "bites")]
++    pub fn with_bite(mut self, bite: &str) -> Option<Predictor> {
++        (bite == crate::BITES[6]).then(|| {
++            self.plant_cues_from_replay();
++            self
++        })
++    }
++
++    /// PM-0001-62/cues-from-replay planted in place (bites builds only): the endpoint's form of [`Self::with_bite`].
++    #[cfg(feature = "bites")]
++    pub(crate) fn plant_cues_from_replay(&mut self) {
++        self.cues.plant_from_replay();
 +    }
 +
 +    /// The same predictor with the bitwise skip off: a replay at every snapshot applied (suite `cues`, as PM-0001-44's
@@ -763,10 +961,15 @@ index 0000000..318ee8b
 +            return;
 +        };
 +        let c = Command { slot, ..*command };
-+        self.world.predict(&c);
++        let fired = self.world.predict(&c);
 +        let Some(after) = self.world.slot_records(slot) else {
 +            return;
 +        };
++        if fired {
++            let weapon = after[0].grid[SOLDIER_WEAPON].clamp(0, 255) as u8;
++            self.cues
++                .fired(index, u16::from(slot), weapon, false, self.held_max);
++        }
 +        if self.held.len() >= self.held_max {
 +            self.held.pop_front();
 +        }
@@ -828,6 +1031,7 @@ index 0000000..318ee8b
 +            None => return,
 +        };
 +        self.applied_tick = Some(tick);
++        self.cues.close_through(last_run);
 +        let previous = self.last_run.replace(last_run);
 +        let server = [soldier, state];
 +        self.world.load_movers(entities);
@@ -839,10 +1043,15 @@ index 0000000..318ee8b
 +            self.world.reset_slot(&soldier, &state, presses);
 +            self.present = Some(server);
 +            for s in self.held.iter_mut().skip(start) {
-+                self.world.predict(&s.command);
++                let fired = self.world.predict(&s.command);
 +                if let Some(a) = self.world.slot_records(slot) {
 +                    s.after = a;
 +                    self.present = Some(a);
++                    if fired {
++                        let weapon = a[0].grid[SOLDIER_WEAPON].clamp(0, 255) as u8;
++                        self.cues
++                            .fired(s.index, u16::from(slot), weapon, true, self.held_max);
++                    }
 +                }
 +                replayed += 1;
 +            }
@@ -966,10 +1175,16 @@ index 0000000..318ee8b
 +        self.present
 +    }
 +
-+    /// Closes every open own-state change (at a run's end).
++    /// Closes every open own-state change and every open cue key (at a run's end).
 +    pub fn close(&mut self) {
 +        self.closed
 +            .extend(self.changes.iter_mut().filter_map(Option::take));
++        self.cues.close_all();
++    }
++
++    /// The own cues closed since the last call (PM-0001-62's `own_cue`: one per key and kind).
++    pub fn take_cues(&mut self) -> Vec<OwnCue> {
++        self.cues.take()
 +    }
 +
 +    /// The snapshots applied since the last call.
@@ -984,10 +1199,10 @@ index 0000000..318ee8b
 +}
 diff --git a/spikes/netcode-proof/crates/client/tests/predict.rs b/spikes/netcode-proof/crates/client/tests/predict.rs
 new file mode 100644
-index 0000000..f22b68a
+index 0000000..834e124
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/client/tests/predict.rs
-@@ -0,0 +1,533 @@
+@@ -0,0 +1,598 @@
 +//! U4g's tests of the `Predictor` (u4g-brief.md 1.3, block 2; section 3's rows for -41's trace, the fade, snap and
 +//! clear, -42's and -55's flag, and -60): an authority `World` on the course stands in for the room (option B: at a
 +//! late command's tick it runs the last command again), its records as a snapshot carries them, delivered `delay` ticks
@@ -1519,6 +1734,71 @@ index 0000000..f22b68a
 +            let bitten = run(e, 40);
 +            assert!(bitten.iter().any(Applied::untraced), "{bitten:?}");
 +        }
++    }
++}
++
++mod cues {
++    //! Block 4: the own shots' cues (`CueLog`), on the stand-in room above.
++
++    use npt_client::{CueKind, OwnCue};
++
++    use super::*;
++
++    /// Fire held and a replay forced at every snapshot (the skip off: suite `cues`), each command replayed 4 times;
++    /// every cue closed by the run's end.
++    fn cues(prep: impl FnOnce(Predictor) -> Predictor) -> Vec<OwnCue> {
++        let mut lab = Lab::new(3, 2, |p| prep(p.with_replay_always()));
++        lab.fire = true;
++        lab.run(200);
++        lab.client.close();
++        lab.client.take_cues()
++    }
++
++    /// -62 at unit scale (section 3's row): each own shot's flash and sound play once, though every shot is replayed 4
++    /// times; one cue per key and kind, both kinds for every key, keyed by the command that fired (entity 0, weapon 0).
++    /// The course weapon's magazine (30) bounds the shots.
++    #[test]
++    fn p62_a_replayed_shot_plays_its_cues_once() {
++        let cues = cues(|p| p);
++        let of = |kind| -> Vec<u32> {
++            cues.iter()
++                .filter(|c| c.kind == kind)
++                .map(|c| c.seq)
++                .collect()
++        };
++        let (flashes, sounds) = (of(CueKind::Flash), of(CueKind::Sound));
++        println!(
++            "-62 at unit scale: {} shots, {} cues",
++            flashes.len(),
++            cues.len()
++        );
++        assert!(flashes.len() >= 25, "{} shots", flashes.len());
++        assert_eq!(flashes, sounds);
++        assert!(flashes.windows(2).all(|w| w[0] < w[1]), "one key a command");
++        assert!(
++            cues.iter()
++                .all(|c| c.plays == 1 && c.entity == 0 && c.weapon == 0),
++            "{cues:?}"
++        );
++    }
++
++    /// PM-0001-62/cues-from-replay's unit proof (§4.14 :504): the same run with the cue log written from the replays
++    /// plays a replayed shot again (5 plays: the first prediction and 4 replays); the endpoint takes the id too.
++    #[cfg(feature = "bites")]
++    #[test]
++    fn pm_0001_62_cues_from_replay_plays_a_replayed_shot_again() {
++        let cues = cues(|p| {
++            p.with_bite("PM-0001-62/cues-from-replay")
++                .expect("npt-client plants it")
++        });
++        let doubled = cues.iter().filter(|c| c.plays > 1).count();
++        assert!(doubled >= 40, "{doubled} doubled: {cues:?}");
++        assert_eq!(cues.iter().map(|c| c.plays).max(), Some(5));
++        assert!(
++            npt_client::ClientEndpoint::new(npt_proto::Join::default(), 30)
++                .with_bite("PM-0001-62/cues-from-replay")
++                .is_some()
++        );
 +    }
 +}
 diff --git a/spikes/netcode-proof/crates/room/tests/prediction.rs b/spikes/netcode-proof/crates/room/tests/prediction.rs
