@@ -148,8 +148,8 @@
   8,594,862,080 B). Part A's record: history.md:7519-7533. Then round 2 (netcode, test, rust; xhigh; the netcode seat
   reads FP-2's window against his words), R6, the merge, the r2 rows and -21's set, whose report prints
   `dead_left_out_count` beside the check for every run (his words); U5's builder stays stopped (U5-EARLY cond. 6).
-- **Agents running at 20:19 UTC; all told to save at 20:19 (Mustafa at 95% usage); after a cut, resume each by
-  SendMessage, reading its file first (SPEND-LIMIT (a)):** U4f2's builder aa62d31b6fa5b9807 (worktree
+- **Agents running; cut 20:20:20-23:08 UTC, all three resumed by SendMessage at 23:08 (FP-2 DONE before it; P27 at
+  23:07, 1.9 GiB; saver bihoj5rh5 from 23:08); after a cut, resume each by SendMessage, reading its file first:** U4f2's builder aa62d31b6fa5b9807 (worktree
   .claude/worktrees/agent-aa62d31b6fa5b9807; notes u4f2-build.md "Block 10" with its "Resume here:" line; snapshot
   wip/u4f2-build.patch, 19:55 then fresh; check no plant left); the marks agent a48b206e6324455a1 (test-engineer; out
   replan-marks.md, 11.5 KB at 20:19); the units agent a347235186edd9d84 (netcode-architect; out replan-units.md, 9.4 KB
@@ -167,6 +167,9 @@
   updated for F-B-COUNT's answer 19:4x). Main f5030a3 (06:38; unchanged at 19:39).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
+- **2026-11-21 20:20:20 to 23:08 UTC** (all three agents; the worker restarted twice): "You've hit your org's monthly
+  spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:40pm (UTC)". Resumed 23:08 by
+  SendMessage after the 23:05 trigger: no cargo running, tree clean (saver's last push 28e0ad2), builder's FP-2 whole.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
   one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
