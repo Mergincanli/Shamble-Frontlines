@@ -151,7 +151,8 @@ Task: security-auditor DEP-HOLD dependency read for U5's early start (netcode pr
 ### B4 (item 4: the tools) DONE
 - Integrity: each .crate in the registry cache hashes (sha256sum) to the crates.io index's cksum (index cache parsed
   by scratchpad idx.py), none yanked: cargo-fuzz 0.13.2 5acfd019...00e2, cargo-deny 0.22.0 8372c38e...1446,
-  cargo-audit 0.23.0 956f85ae...6446 (also libfuzzer-sys a9fd2f41..., arbitrary 3bc62ac9..., not yanked).
+  cargo-audit 0.23.0 956f85ae...6446 (also libfuzzer-sys a9fd2f41..., arbitrary 3bc62ac9..., not yanked). All five
+  are the newest version in today's index cache (15:09 UTC).
 - cargo-fuzz 0.13.2 (MIT OR Apache-2.0; edition 2021; `build = false`; vcs 984c861c8dfe...). Published Cargo.lock: v4,
   101 packages, all crates.io with checksums, 10 also in the workspace lock (same checksum), 91 new; no cc/cmake/-sys
   crate: no native C at install; build scripts are the rustc-probe kind (proc-macro2, serde/serde_core/serde_json,
@@ -177,7 +178,9 @@ Task: security-auditor DEP-HOLD dependency read for U5's early start (netcode pr
 - Also for cargo-fuzz: never --build-std / --careful / --sanitizer=memory (they pass -Zbuild-std: std's own crates.io
   dependencies, outside both locks and this read, plus rust-src, which the minimal profile lacks); --target-dir under
   .gate/ or the shared target (default would be fuzz/target inside the repo); corpus and artifacts outside the public
-  notes folder.
+  notes folder. Info: cargo-fuzz's `--cfg fuzzing` reaches every crate; in the fuzz graph quinn-proto 0.11.19 and
+  tokio 1.54.1 hold cfg(fuzzing) code, the spike's crates none (grep: 0); not on the listed targets' paths
+  (test-engineer's call; `--no-cfg-fuzzing` exists).
 - Verdict cargo-fuzz 0.13.2: CLEARED WITH CONDITIONS (SEC-U5D-4's runner check; the flags above).
 - cargo-deny 0.22.0 (MIT OR Apache-2.0; edition 2024, rust-version 1.95.0; `build = false`; bin src/cargo-deny/main.rs;
   scripts/ not built). Published Cargo.lock: v4, 188 packages, all crates.io with checksums, 88 in the workspace lock
@@ -207,5 +210,86 @@ Task: security-auditor DEP-HOLD dependency read for U5's early start (netcode pr
   under .gate/ or removed after (N4: AWS-LC's build is the largest; same disk as the repo).
 - Verdict cargo-audit 0.23.0: CLEARED (for Block 8), pending B6's advisory check of its lock (aws-lc-sys 0.45.0,
   rustls-webpki 0.103.16, quinn-proto 0.11.18 are older than or equal to the workspace's).
-- Next: B5 (nightly), B6 (advisories: shallow clone of advisory-db into the scratchpad, data only, then a version match
-  of every package in the 2 spike locks and the 3 tool locks).
+
+### B5 (item 5: nightly-2026-11-01, minimal profile) DONE
+- What it installs: rustup's minimal profile = rustc, rust-std, cargo ("as few components as possible to get a working
+  compiler (`rustc`, `rust-std`, and `cargo`)": https://rust-lang.github.io/rustup/concepts/profiles.html, read
+  2026-11-21, high). For the host x86_64-unknown-linux-gnu: rustc 1.101.0-nightly (f9ceb4a4d 2026-10-31), its cargo,
+  rust-std (which carries the ASan runtime cargo-fuzz's default sanitizer links). No clippy, rustfmt, rust-src or
+  wasm32 target (fmt and clippy of the fuzz crate stay on stable 1.99.1, U5-Q7 term 2). Date mapping recorded at U0:
+  u0-probes.md:9.
+- Trust: the official distribution (static.rust-lang.org) over HTTPS, as 1.99.1 and stable already on this machine
+  (rustup 1.29.3). rustup "performs all downloads over HTTPS, but does not yet validate signatures of downloads"
+  (https://rust-lang.github.io/rustup/security.html, read 2026-11-21, high); it checks each component against the
+  channel manifest's sha256 (rustup's behaviour, not stated on that page: medium). Accepted risk, the same as every
+  toolchain the spike already uses (Low, no new finding).
+- Footprint: ~/.rustup, the same disk as the repository (N4: 9,309,110,272 B free at 15:2x UTC by `df -B1`).
+- Conditions: `rustup toolchain install nightly-2026-11-01 --profile minimal` exactly; no `rustup default` or
+  override change, rust-toolchain.toml (the repo's and the spike's) untouched; used only as `+nightly-2026-11-01` for
+  cargo-fuzz's builds and runs.
+- Verdict item 5: CLEARED WITH CONDITIONS (as above).
+
+### B6 (item 6: RustSec advisories) DONE
+- Source: RustSec advisory-db, shallow clone into the scratchpad (data only), HEAD 55e1c3dfbd834237a05bbbf7b50ba3b5be27b662
+  (2026-11-21T10:28:03+01:00), 1,028 crate folders, 1,536 crate advisories; https://github.com/rustsec/advisory-db
+  (high: the database cargo-audit and cargo-deny read). Matched by scratchpad advmatch.py (RustSec's rule: affected =
+  matches no `patched` and no `unaffected` requirement; withdrawn skipped); spot-checked against 5 advisories by hand
+  (rustls-webpki RUSTSEC-2026-0382, aws-lc-sys RUSTSEC-2026-0048, zstd-sys RUSTSEC-2026-0410, quinn-proto
+  RUSTSEC-2026-0343, pin-utils RUSTSEC-2026-0441): matcher agrees.
+- The five crates themselves: no advisory folder for libfuzzer-sys, arbitrary, cargo-fuzz, cargo-deny or cargo-audit
+  (rustsec's only advisory, RUSTSEC-2020-0051, is not 0.34's). The rust/ folder holds no 2026 toolchain advisory.
+- fuzz/Cargo.lock (130 packages): 0 matches. Workspace Cargo.lock (243): 1, pin-utils 0.1.1 RUSTSEC-2026-0441
+  (unmaintained, 2026-10-01), through loom 0.7.2 (a cfg(loom) graph edge); already on main, not part of this change,
+  not in the fuzz lock. Heads-up for Block 8: deny.toml's `ignore = []` and `[graph] all-features = true` will report it.
+- Tool locks (what `cargo install --locked` builds):
+  - cargo-fuzz (101): anyhow 1.0.102 RUSTSEC-2026-0190 (unsound: Error::downcast_mut after context; patched >=1.0.103);
+    crossbeam-epoch 0.9.18 RUSTSEC-2026-0204 (fmt::Pointer of a null Atomic/Shared derefs it; patched >=0.9.20);
+    rustix 1.1.4 RUSTSEC-2026-0486 (unsound: xattr functions with a zero-length buffer; patched >=1.1.6).
+  - cargo-deny (188): 0 matches.
+  - cargo-audit (363): heapless 0.8.0 RUSTSEC-2026-0574..0582 (9 unsound, 2026-11-18, via faster-hex 0.10.1 <- gix;
+    patched >=0.9.4); quinn-proto 0.11.18 RUSTSEC-2026-0523 (MAX_STREAM_DATA opens streams past the limit: server
+    side DoS) and RUSTSEC-2026-0524 (long Retry token panics/exhausts a QUIC client), patched >=0.11.19; quinn-udp
+    0.5.15 RUSTSEC-2026-0538 (receive spin on Apple/BSD/illumos targets only, not Linux); rustix 1.1.5
+    RUSTSEC-2026-0486.
+- FINDING SEC-U5D-5 (Low): the tools' published locks carry these advisories, and `--locked` installs exactly them
+  (no newer release exists today to move to; installing without --locked would build unread code instead). None is
+  reachable in our use: the tools run locally on our own inputs; anyhow's downcast_mut, crossbeam-epoch's Pointer fmt,
+  rustix's xattr and heapless's listed APIs are not the tools' paths (not traced call by call: medium); quinn-udp's bug
+  is not on Linux; quinn-proto is only reached through reqwest's HTTP/3, which reqwest enables only by its `http3`
+  feature, and http3 also pulls h3 and h3-quinn, which are absent from cargo-audit's lock (docs.rs reqwest 0.13.5
+  feature list, read 2026-11-21: "http3: dep:h3, dep:h3-quinn, dep:quinn, rustls"; why quinn is in that lock without
+  h3 I could not settle without a download: medium). Accepted for developer tools that never ship; cargo-audit's own
+  HTTPS goes to github.com and index.crates.io only.
+- Not checked: GitHub Security Advisories / OSV beyond RustSec; advisories against the C sources (libFuzzer from LLVM,
+  AWS-LC, zstd, ring's BoringSSL-derived code) that are not filed in RustSec; the tool locks' code beyond the native
+  builds and the packages named above (91 + 100 + 244 new packages, read only by lock entry, checksum and advisory).
+
+### B7 (answer) DONE
+- Item 1, the 8 manifests and locks: CLEARED as hashed (root comment acceptable as final; SEC-U5D-2 Low, follow-up).
+- Item 2, libfuzzer-sys 0.4.13: CLEARED WITH CONDITIONS (CUSTOM_LIBFUZZER_* unset; outputs kept out of the notes
+  folder; fuzz_target! only, SEC-U5D-3). SEC-U5D-1 (Medium): fuzz_target! adds two #[no_mangle] extern "C" fns per
+  target past the silent forbid: a fifth exception to the advisor before Block 3 (U5-Q7 term 3). Recommendation for
+  his ruling: record it as a dependency-macro exception (no #[allow] is writable inside the macro), with the invariant
+  "exactly LLVMFuzzerInitialize and rust_fuzzer_test_input per bin, from libfuzzer-sys 0.4.13, nothing else unsafe",
+  and as its test check.mjs pinning libfuzzer-sys's fuzz-lock entry (0.4.13, checksum a9fd2f41...) and refusing other
+  libfuzzer_sys macros, so a new expansion cannot arrive unread.
+- Item 3, arbitrary 1.5.0: CLEARED.
+- Item 4: cargo-fuzz 0.13.2 CLEARED WITH CONDITIONS (SEC-U5D-4 Medium: the runner's lock check around every cargo-fuzz
+  call, or plain cargo --locked; no init/add; no build-std/careful/memory; target dir and outputs outside the repo's
+  tracked tree); cargo-deny 0.22.0 CLEARED for Block 8 (db-path never in the repo); cargo-audit 0.23.0 CLEARED for
+  Block 8 (SEC-U5D-5 Low accepted; DB fetch a networked step; build dir under .gate/ or removed, N4).
+- Item 5, the nightly: CLEARED WITH CONDITIONS (minimal profile exactly; no default/override change).
+- Item 6: no advisory on the five crates or the fuzz lock; tool-lock advisories as SEC-U5D-5; limits listed in B6.
+- Conditions on the save: none that change content. On the installs: `cargo install --locked --version 0.13.2
+  cargo-fuzz` (exact, the read's lock), then `cargo fuzz --version` = 0.13.2; deny and audit likewise at Block 8 only.
+- dependency-check.md lines (read and cleared, paths from the repository root as the lane will hold them):
+  3bf4d76008175aa7e779d2c1f504b09c5979a5e0e49ddcded8380b7045383b04  spikes/netcode-proof/Cargo.toml
+  31c2c7ea9fdf04f78391b0e6d90165f14b74483c87f235c5daf4ad5f8993a7a8  spikes/netcode-proof/Cargo.lock
+  fb5324f1ac53251ef03accb89a9182d62506eb98d074aed6165c00cc49efebf1  spikes/netcode-proof/crates/alloc/Cargo.toml
+  b5385fcdaa5dcc2344c41177b5afec923cea9d2004512245fc6d776a2f0c329a  spikes/netcode-proof/crates/sim/Cargo.toml
+  670914131fb08661aafdf8299bea21c18a15e2e7a33f754c295b1bbd61ea1b12  spikes/netcode-proof/crates/proto/Cargo.toml
+  afd0952b15865881f763b1cba9d0feac715d2cf104dc4b2c6d13d3ab87f7b265  spikes/netcode-proof/crates/net/Cargo.toml
+  7606244c186ebb95c486c2ef8c100740383cdcdf81f9e985b9495c1e328a369d  spikes/netcode-proof/fuzz/Cargo.toml
+  3117b9305e1ebbf8ed4d802ab3689a6f4296067275e66d84fd8d7b9e66bbf1fd  spikes/netcode-proof/fuzz/Cargo.lock
+
+DONE
