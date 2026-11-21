@@ -416,4 +416,46 @@
   bots fp3 + f15 x 12 + T-K7: 14 PASS (1.83 s); c_u4f2_1 PASS 4.26 s.
 - F-G's plant (the old `every >= r`): u4f2-fg-plant.log, fp3 FAILS by name at lib.rs:1631, "2 and 3 refused at 30
   Hz", left [false, true, true]. Restored by Edit, c99a6e0a… equal (clean scenario.rs 501d7984…).
-- SIZE-CHECK after F-G: +2,144 -190 tracked; forged.rs 422: about 2,566 added (+4).
+- SIZE-CHECK after F-G: +2,144 -190 tracked; forged.rs 422: about 2,566 added (+4). Snapshot taken: patch
+  eb7c42c62adf46cc861453b0231610a22cea51cbb050608610ba7f53184fe865 (184,639 B); the runner's tree for every early run:
+  diff a9027b71fc6b0bb1b5b5249e617bcd4982ec491476e8a2e8ff01f210403b5a2a, untracked 83a612c8… (HEAD 0376c76).
+- A reader script for the early runs' logs (scratch, in this notes folder, reads and prints only):
+  .checkpoints/netcode-proof-test/u4f2-read.mjs (`hashes` two room logs' per-tick (t, h); `lag` the lag client's
+  series; `forged` a run's forged_kind records, slot 6's client_counts and its measured ticks in `input_missing`).
+- **R0: DONE, no rise** (u4f2-r0-times.log, `-x`, measured build, each alone): c62hb_p2_short 16.38 s (16.73 s before
+  `Summary::soldiers`), t6_a_duplicate_admit 30.23 s (31.94 s): together 46.61 s against 48.67 s, so no narrowing of
+  `Summary::soldiers` (the ruling's line: +1 s).
+- **R5, measured half: run** (u4f2-r5-measured.log, `-x -k`, 22:36-22:39:26 UTC, free 7,978 MiB at the start): the
+  release build (`-p npt-lab -p npt-judge`) exit 0, then set 21's lines at hand-a's short settings (10 s + 5 s; the
+  same `--run`, `--set u4f2-hand`, date and commit as hand-a, only `--out` new: .gate/u4f/u4f2-r5/measured/) and r2's
+  p1, p14, p17 (.gate/u4f/u4f2-r5/r2/), every one exit 0, in a building 0 on every run. Shots per measured second:
+  forged A 691 (twin 691), B 698 (698); clamp A 700 (700), B 700 (700); fast-clock A 694, B 700; lag-switch A 701, B
+  700; p1 689, p14 689 (fate log b717b5abed339a2e, equal to p1's: TE-24), p17 696.
+- **Resumed 2026-11-21 after the spend-limit cut** (cut at about 22:39 UTC, just after R5's measured half ended:
+  its log's last line "--- end 22:39:26 UTC, exit 0"). Checked first: `git status --short` the 13 tracked files, the
+  notes, forged.rs and the reader script; no plant in place: bots lib.rs c99a6e0a… (F-G's clean, equal to its plant's
+  restore), scenario.rs 501d7984…, forged.rs 9cedb01b…, room input.rs efadaeb2… (all their last restore hashes); the
+  snapshot eb7c42c6… as taken. F-G's edits to the lab's usage error and c_u4f2_1's expected message are whole and
+  agree ("kind 7 needs an interval above its rest, R"; u4f2-fg-tests2.log PASS), and the tree compiled (R5's release
+  build on diff a9027b71…). Free 8,079,323,136 B. The coordinator's message placed my stop at F-G's lab edits; the
+  record above shows F-G, R0 and R5's measured half done before the cut.
+- **R4: DONE, counts** (u4f2-r4-bite.log, `-x -k`, tree a9027b71…): the bites release build exit 0; p19's form (P1,
+  option A, 10 s + 20 s, `--lag-hold-ms 400`) under PM-0001-21/no-catchup-cap, unjudged, exit 0 (shots 699, in a
+  building 0). The reader on its room log: 927 tick records, `lagswitch_excess_move_um` max **600,000 µm, above 0** on 3
+  ticks (194: 11 commands run, 600,000; 374: 9, 200,000; 554: 11, 600,000), `lagswitch_cmds_count` max 11 (the cap
+  removed): the lag check's power shown (FP-4).
+- **R5: DONE** (the measured half above; u4f2-r5-bites.log, `-x -k`, tree a9027b71…): the bites build exit 0; the 11
+  forged no-* bites (smoke), bite-refuse-not-clamp and bite-not-older-than (count), r2's p7 (smoke), every one exit 0,
+  in a building 0. Shots: no-lead-bound 679, no-newer-tick to no-aim-bounds 693 each, no-cooldown to no-channel 691
+  each, refuse-not-clamp 686, not-older-than 702, p7 677. Both judge calls in 5.4's form exit 0: measured
+  (verdict.json) PM-0001-2 NOT-RUN (no ES run), PM-0001-21 FAIL by length as at hand-a ("1,000 commands of every kind"
+  32; clamp 447 and 445 points; fast clock 0 episodes, its two checks gaps; lag switch 2 bursts), and **the twin checks
+  PASS on both options: forged A and B "0 effect beyond the valid part" 0, clamp A and B "state hash equals the twin's"
+  0**; forged A and B "every forged command rejected and counted" 0; lag switch "no tick moves further than the
+  catch-up cap allows" PASS, A -200,000 (the walking client) and B -1,397,516. Bites (verdict-bites.json): all 13
+  "shown" (by length at 5 s, as at hand-b); refuse-not-clamp's "never refused or counted" FAILS at 447 (its own check
+  reached); not-older-than's checks are gaps at 5 s (no 60 s episode; its power is p9's at 70 s). **The fast-clock
+  tick-hash proof: A and B "equal: 450 ticks"** against hand-a's runs (.gate/u4f/u4f2-hand/measured/), so FP-4 left the
+  fast clock's commands where they were. Count: clamp A/B and twins, fast-clock A/B, lag-switch A/B, the two non-forged
+  bites, the proof; smoke: forged A/B and twins, the 11 forged bites, p1, p7, p14, p17.
+- Free after R0, R4 and R5: 8,035,160,064 B, above 6.5 GB: R2-pre and R3-pre run.
