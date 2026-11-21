@@ -160,8 +160,8 @@
   2 (netcode, test, rust), R6, the merge, the r2 rows and -21's set; any U5 builder yields first (U5-EARLY cond. 6).
 - **U4h's brief rev 2.1 READY** (u4h-brief.md; the advisor's rev-2 check APPROVE WITH CONDITIONS, all met by my
   Edits; register entries 94-101 at u4s-carries.md:618-659). **U4H-Q4, U4H-SIZE and U4H-JUDGE** (final, section 8)
-  go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop. **msg-2026-11-21.md
-  SENT ~02:42 UTC** (F-B-COUNT, U4G-Q1, choices 1-3; held by the cut).
+  go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop.
+- **U6's brief STARTED 16:0x** (WAIT-PLAN (a) part 2): a read-only facts scan writes u6-facts.md; then u6-brief.md.
 - **U5's brief rev 2.1** (u5-brief.md): rev 1 REVISE (advisor-u5-brief.md:1-322), rev 2 with option (a)'s per-type bars
   (u5-alloc-bounds.md at rustc 1.99.1: Input 256, SessionControl 480, RoomControl 272, Snapshot at most 155,952 through
   the client, FullState 2,213,272, the rest 0), rev 2.1 by the rev-2 check (:324-430). **U5-ALLOC and U5-SIZE are his**
@@ -179,8 +179,8 @@
   guard rev 2 768f6055… READY (B9); rev 3 8466a42e… (GUARD-7, E1-E5; tests 40/40) in its re-read (B10); then installs.
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
-  **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver byg2iirg5
-  from 14:26 (to about 16:26); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38).
+  **Check-in on again 14:26 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver byihocm9i
+  from 16:03 (to about 18:03); the 2026-11-22 message at 23:05 UTC (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in

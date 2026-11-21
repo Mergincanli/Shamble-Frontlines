@@ -421,3 +421,91 @@ DONE
   diff-only re-read); otherwise they carry as follow-ups.
 
 DONE
+
+### B10 (the diff-only re-read of guard rev 3, u5-fuzz-guard.sh 8466a42e...) DONE
+- Read: .checkpoints/netcode-proof-test/u5-fuzz-guard.sh rev 3, sha256
+  8466a42e7bd87a50adba90479fb484ef280f42397037d74d56b2d6e772ac2386 (260 lines, read whole, not just the diff);
+  u5-fuzz-guard-rev3.diff (234 lines; its body equals `diff -u` of git 18c7625's rev 2 (768f6055...) against rev 3:
+  same sha256 64ba4ba0... after the two header lines); u5-guard-rev3-tests.txt (40 of 40 PASS: A1-A29 refusals, B1-B11
+  parser cases; no positive end-to-end, since the nightly is not installed yet). Checked against cargo-fuzz 0.13.2's
+  source (src/project.rs, src/main.rs, src/options*.rs), libFuzzer's FuzzerFlags.def and FuzzerDriver.cpp (libfuzzer-sys
+  0.4.13 in the registry), cargo's config reference and rustup's environment-variable page. Read-only: no cargo, rustup
+  or cargo-fuzz command, no environment listing. The spike's .cargo/config.toml hashes to SPIKE_CFG_SHA 9ff1aa86... in
+  both the main folder and the copy; /root/.cargo holds no config; /root/.rustup/toolchains holds 1.99.1 and stable
+  (the nightly to come).
+- (1) `env -i` (:47-48, used at :243, :248, :250, :253). Nothing the build needs is lost:
+  - cargo-fuzz's own environment reads (RUSTFLAGS, ASAN_OPTIONS, TSAN_OPTIONS, RUSTC, RUSTC_BOOTSTRAP) fall back to its
+    defaults: RUSTFLAGS = its own flags only; ASAN_OPTIONS = `detect_odr_violation=0` (project.rs:304-320); `rustc`
+    from PATH.
+  - The nested `cargo` that cargo-fuzz spawns gets the nightly through rustup's proxy environment.
+    RUSTUP_TOOLCHAIN_SOURCE is "Set by rustup to tell proxied tools how `RUSTUP_TOOLCHAIN` was determined"
+    (https://rust-lang.github.io/rustup/environment-variables.html, read 2026-11-21; medium that RUSTUP_TOOLCHAIN
+    itself is passed on). If it were not, the toolchain file's 1.99.1 would refuse the nightly-only sanitizer flags:
+    fail closed, and the same as rev 2. rust-toolchain.toml and rustup directory overrides lose to `+toolchain`.
+  - libfuzzer-sys's build script and cc: no CC/CXX/CFLAGS/AR set, so cc uses `c++` and `ar` from PATH (/usr/bin). No
+    cc, c++, gcc, g++, clang, clang++, ar, ld, cargo or rustc sits in /usr/local/bin, which comes first. cargo itself
+    hands build scripts OUT_DIR, TARGET and its jobserver.
+  - TMPDIR unset means /tmp (same disk as before, inside the runner's 4 GB check).
+  - Cosmetic losses only: RUST_BACKTRACE and an ASan symbolizer path.
+  - Closed by env -i: CARGO_RESOLVER_LOCKFILE_PATH, CARGO_HOME, CARGO_UNSTABLE_*, every other CARGO_* config key,
+    RUSTC/RUSTC_WRAPPER, RUSTUP_TOOLCHAIN, CC/CXX/CFLAGS, LD_PRELOAD, RUST_LIBFUZZER_DEBUG_PATH.
+  - Routes left: PATH's directories, the registry's extracted sources and the installed binaries. These are the
+    operator's machine (memory: Low); no new finding.
+- (2) The config walk (:218-240) is exactly what cargo reads here:
+  - Cargo probes the current directory and every parent, then $CARGO_HOME/config.toml, and reads `.cargo/config`
+    without the extension too. Source: cargo config reference, "Hierarchical structure", read 2026-11-21, high.
+  - `cd "$S"` (:218) now comes before the version check, both trees and the call, so all four read the same configs.
+  - cargo-fuzz sets no current_dir on its cargo commands (project.rs: `env::current_dir` reads only, no
+    `.current_dir(`), so its child cargo and the target inherit $S.
+  - `pwd -P` is getcwd, which is what cargo uses.
+  - The docs say nothing about --manifest-path. If cargo ever probed from the manifest's folder instead, fuzz/.cargo
+    (:236-240) plus the same ancestry covers it.
+  - CARGO_HOME is pinned to /root/.cargo and checked.
+  - A config `include` could only come through the pinned file, which holds none.
+  - Environment config keys are gone under env -i except the three set.
+- (3) -detect_leaks=0|1 (:204) is safe:
+  - It is an int flag (FuzzerFlags.def:164-165, default 1) that writes no file and starts no process. With 1, a leak
+    becomes a leak- artifact under the checked -artifact_prefix; 0 only narrows what is found (the header records
+    it, u5-brief.md:180; test-engineer's call).
+  - libFuzzer matches a flag by its exact name followed by '=' (FuzzerDriver.cpp:120-126, :145-175), so no allowed
+    name can reach another flag (-timeout= is not -timeout_exitcode=).
+  - Bare tokens and `--` after `--` are refused (:205; tests A6, A15), so no libFuzzer input path can be slipped in.
+- (4) Regressions against rev 2:
+  - None in the checks. The allow-list, the target, corpus and prefix checks are unchanged. The trees now run from $S
+    with the build's configs.
+  - The plant test is the same logic: the refusal now counts only if fuzz/Cargo.toml is among the differing files
+    (:120-122), and all listed files are checked before (:113) and after (:127). Its traps are unchanged.
+  - Two new behaviours count as regressions: R3-1 and R3-2 below.
+- R3-1 (Medium; functional, not a security hole): env -i also strips NPT_BITE. U5-Q6 term 2 says "The runner sets it,
+  or clears it, explicitly for every run" (advisor-u5-brief.md:192-196; u5-brief.md:192-195; fuzz/Cargo.toml:38-41).
+  - Effect: a bite run through the guard runs the bites build with no bite chosen. It fails visibly: the -34 run "must
+    end with panics at least 1". It is still a wasted run, and the guard cannot express the brief's "sets it".
+  - Fix: a guard option such as `--bite <id>`, allowed only with `run --features bites` and checked against the bite-id
+    form, added as `NPT_BITE=<id>` to the env -i list for the fuzz call only and printed in the GUARD PASSED line. An
+    NPT_BITE in the runner's environment without bites is refused.
+  - Builds and non-bite runs do not need it (clearing NPT_BITE is right for them), so it blocks the first bite run, not
+    first use.
+- R3-2 (Low; availability, fails closed): the strict parser (:76-85) refuses DEP-HOLD's own `deleted  <path>` form
+  (main .claude/CHECKPOINTS.md:64-66) and any listed path outside spikes/netcode-proof/ (test B11). A later release
+  file holding either would stop every cargo-fuzz call.
+  - Fix: accept `deleted  spikes/netcode-proof/<path>` (and require that file to be absent), and skip lines outside the
+    spike instead of refusing them. Skipping is safe, since the fuzz build reads nothing outside the spike.
+- R3-3 (Low; E5's remainder, carried): manifests in the fuzz graph that dependency-check.md does not list
+  (crates/client, crates/room, crates/link Cargo.toml, unchanged from main today) are still unchecked. A change that
+  needs no lock change passes `tree --locked`.
+  - Fix: every Cargo.toml and Cargo.lock under $S that the file does not list must equal HEAD's (tracked and unchanged).
+  - The workspace's own runner builds have the same exposure.
+- R3-4 (Low; resource nit): the numeric libFuzzer values accept 0 and 10 digits (:202-203).
+  - `-rss_limit_mb=0` and `-timeout=0` switch libFuzzer's memory and time guards off.
+  - Int flags wrap past 2^31, because MyStol's long is cast to int (FuzzerDriver.cpp:129-143, :160-165): for example,
+    -rss_limit_mb=4294967296 becomes 0.
+  - So a run can eat the shared machine's memory (N4).
+  - Fix (optional): 1 to 9 digits, and no 0 for rss_limit_mb or timeout; or leave it to the brief.
+- Carried, unchanged: the cargo-fuzz binary's sha256 is recorded on the card, not compared (E4's remainder, Low).
+  Symlinks under .gate/ (Low).
+- Verdict: READY FOR FIRST USE, for Block 3's builds and non-bite runs. GUARD-7 and E1-E5 are closed as asked, and no
+  security finding of Medium or higher is open. R3-1 (Medium, functional) must be fixed before the first bite run.
+  R3-2 to R3-4 are Low: fold them in with R3-1 or carry them as follow-ups. A changed guard needs a new sha256 on the
+  card and a diff-only re-read.
+
+DONE
