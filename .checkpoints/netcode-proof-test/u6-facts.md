@@ -37,15 +37,10 @@ crate's whole public surface §4.7 (:569-633). `crates/server/` and `crates/net/
   same size limits and panic-free parsing as network messages, what they cover: plan.md:1066-1077 (§10.2); E23
   plan.md:482. `ControlSocket` is the public item (plan.md:600). Room-wide controls `RoomControl` already in npt-proto
   (plan.md:594-595).
-- **systemd template units and capabilities** (`User=npt-room-NN` or DynamicUser, `NoNewPrivileges`,
-  `ProtectSystem=strict`, empty `CapabilityBoundingSet`, `MemoryMax`; supervisor unprivileged via `npt`'s sudo
-  wrappers; slot dirs 0700): plan.md:1078-1082; users plan.md:1137-1146; B12's interim ADR 0006:542.
-- **Per-session capability** (128 random bits per browser slot, minted through the socket, constant-time compare;
-  `SetProfile`/`BlockUdp` keyed on source address; `TriggerBurst` on the live session; parsing only on a joined
-  rostered session; pre-Join control closes the session; bites): plan.md:1083-1097.
-- **Roster and tokens** (128 bits, bound to room and slot, constant-time, expire at run end; version and content hash
-  checked; joins beyond N refused; bot token reusable, a Join on a live slot replaces it with `Kick(replaced)`; browser
-  token in URL fragment + resume secret; runner single-use token; strays counted, a run admitting one is INVALID):
+- **systemd template units and capabilities** (unit hardening, unprivileged supervisor via sudo wrappers, slot dirs
+  0700): plan.md:1078-1082; users plan.md:1137-1146; B12's interim ADR 0006:542.
+- **Per-session capability** (one per browser slot, minted through the socket; who may send which control):
+  plan.md:1083-1097. **Roster and tokens** (minting, binding, replacement, browser fragment, runner token, strays):
   plan.md:1100-1114 (§10.3).
 - **Interest under load:** E5 plan.md:464 (marks -8, -9, -10, -12); room-side code exists (section 2). The U6 row
   names it only (row:1).
@@ -360,7 +355,7 @@ B and before every run, network-facing advisories block (plan.md:643-649).
 15. C-U6-15: the room-tick bench is "measured on R2" (row:39), a VM run; are the cheap wins (code) inside U6 and the
     bench a pre-run step of R2's plan?
 16. The systemd unit and the `npt-ctl`/`npt-cert` wrappers: U6's row names them (row:1), U8 builds the run package
-    (plan.md:1255), and §4.1's ops/ lists cloud-init/, firewall/, runs/, operator/, checklists/ only (plan.md:399-403).
+    (plan.md:1255), and §4.1's ops/ lists cloud-init/, firewall/, runs/, operator/, checklists/ only (plan.md:408-411).
     Where do they live, and `User=npt-room-NN` or `DynamicUser` (plan.md:1078)?
 17. §8.5's WT dev certificate: made by "the room server or supervisor" (plan.md:992). Which?
 18. instant-acme: propose the 90-day fallback now (needs security-auditor's and the advisor's OK at U6,
@@ -369,6 +364,6 @@ B and before every run, network-facing advisories block (plan.md:643-649).
     -25's never-joining sessions get a DelayStream?
 20. Carry 60: weapon and health go in npt-log's `Header` (no such field today) or in params (row:9; u4s-carries.md:285-290)?
 21. C-U6-19's gate: U4g, U4h and U5 state "no throwing or rejoining hostile client" (u4g-brief.md:187,
-    u4h-brief.md:228, u5-brief.md:256-282 section); U4g2 has no brief yet. Does U4g2's brief need the same line?
+    u4h-brief.md:228, u5-brief.md:257-260); U4g2 has no brief yet. Does U4g2's brief need the same line?
 
 DONE
