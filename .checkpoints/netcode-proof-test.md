@@ -163,8 +163,8 @@
   size lines corrected (about 2,630-2,670). **The builder resumed ~22:30** for F-G and the early runs. **FP-2 only on his F-B-COUNT answer** (on (b) or (c), to
   the advisor first). Then R2-R5, round 2 (netcode, test, rust; xhigh; read only) on the fix pass's diff, then R6
   (check.mjs twice). The advisor's stop past 2,700 added at an FP end; his past 3,000. About four part-cleans (P27's
-  second form, no lane running). **msg-2026-11-21.md drafted** (F-B-COUNT, a stop; U4G-Q1, not a stop; three
-  choices): send it at the 23:05 UTC reminder (trig_01YRVLwWYgbgKS1DLsHeCcGx). **While his Advisor answers
+  second form, no lane running). **msg-2026-11-21.md SENT ~02:40 UTC 2026-11-21** (F-B-COUNT, a stop; U4G-Q1,
+  not a stop; choices 1-3 named; its 23:05 trigger fired during the cut). **While his Advisor answers
   (KEEP-PROGRESSING, about two days):** **U4h's brief rev 1 DONE ~21:59** (u4h-brief.md, 296 lines, read
   :192-297; notes u4h-brief-notes.md; saved 5e0f6d0): whole about 2,800-5,200 (about even to pass 6,000 at 1.5), a
   split U4h/U4h2 offered; U4H-Q1 to Q12 for the advisor; **U4H-SIZE and U4H-JUDGE (the judge gains four planned
@@ -182,9 +182,17 @@
   rev-2 check RUNNING from ~22:38** (sections 1-4, 6, 8 and 9; its "## Rev 2 check" block); U4g's build only after U4f2's merge
   (u4-build-plan.md:951-952, "never two at once"); U4G-Q2's text later, before -58's set. **Lesson:** never `cd` into an agent's
   worktree (the harness moved this session's main folder to it at 16:19; back at once); read it with Read/Grep.
-  Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bh8edyqwv from 21:10 UTC (to about 23:00). Main f5030a3.
+  Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bvyb8q0li from 02:38 UTC 11-21 (to about 04:28). Main f5030a3.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
+- **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in
+  its rev-2 check):** the notice, word for word (transcript line 64727, 22:39:36.282; the same text at 23:00:24,
+  23:05:59-23:06:01 as the day-message trigger tried, and 00:37:13-19 as the 00:34 check-in tried): "You've hit your
+  org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 2am (UTC)". Both agents'
+  tasks ended on it (rate_limit, HTTP 429). The saver ended on its own time at 23:00:23 (exit 0) after 6419c2b; the
+  23:05 day-message trigger and the 00:34 check-in waited unread. Resumed at 02:37:53 (the 02:35 check-in): `git
+  status` clean; the saver restarted (bvyb8q0li, 02:38); both agents resumed by SendMessage, the builder first checking
+  its worktree (no plant left, its last edit whole, the tree compiling); the day message sent about 02:40.
 - Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
   of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
   one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
