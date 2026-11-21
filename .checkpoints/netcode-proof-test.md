@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-20 16:2x UTC: U4f2's build at its end checks, resumed 16:20 after the floor stop and a
-  part-clean (Running work); next its end checks, hand-back, then the review round.
+- **Last update:** 2026-11-21 05:1x UTC: U4f2 waits on F-B-COUNT (his Advisor); U5's brief rev 1 drafted
+  (KEEP-PROGRESSING) and with the advisor for its check (Running work).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -170,10 +170,14 @@
   Edits; register entries 94-101 at u4s-carries.md:618-659). **U4H-Q4, U4H-SIZE and U4H-JUDGE** (final, section 8)
   go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop. **msg-2026-11-21.md
   SENT ~02:42 UTC** (F-B-COUNT, U4G-Q1, choices 1-3; held by the cut).
+- **U5's brief rev 1 DRAFTED (KEEP-PROGRESSING, 05:1x UTC; u5-brief.md, sources in u5-brief-notes.md): with the
+  advisor for its check** (general-purpose, opus, xhigh; advisor-u5-brief.md). U5 builds after U4's close. U5-Q1 to
+  Q7 are the advisor's; U5-SIZE is his (not a stop) in the first day's message after the check. S's letter for
+  SIZE-CHECK: U4b 701 lines (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
 - **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
-  16:19; back at once); read it with Read/Grep. **Check-in paused 03:12 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5: no agent
-  runs; re-enable it when the next agent starts); saver bvyb8q0li from 02:38 UTC (to about 04:28). Main f5030a3
-  (03:12 UTC).
+  16:19; back at once); read it with Read/Grep. **Check-in re-enabled ~05:1x UTC** for the U5 advisor
+  (trig_01EKqNqwZrQTVJ6caAyRrug5; paused 03:12-05:1x); saver bvyb8q0li ended 04:28:56 (nothing to save), a new one
+  from ~05:1x. Main f5030a3 (04:29 UTC).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in
