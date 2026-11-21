@@ -1,4 +1,4 @@
-# U5's brief, rev 2 (2026-11-21; rev 1 revised to the advisor's check, for its check of the changed parts)
+# U5's brief, rev 2.1 (2026-11-21; rev 2 with the advisor's rev-2 conditions met, advisor-u5-brief.md:395-424)
 **The unit:** plan.md §12.1's U5 row (:1252; size S): fuzzing (-34), the dependency and swap checks (-35), the audits
 (§4.8), with the counting allocator and the allocation half of catalogue item 3 (u4-build-plan.md:961-962), C-U5-1
 (plan.md:1252) and carry 48 (u4s-carries.md:762-764). It builds after U4's close (U4h's merge and sets, then U4's
@@ -22,6 +22,12 @@ units came to). The advisor ruled U5-Q1 to Q3 and Q5 to Q7 (section 8).
 - Lows -8 to -13: T2-L2 (Block 2) and S2's differential (Block 4) folded; every libFuzzer artifact class and the
   abort's place (Blocks 3 and 5); -35's tool details (Block 7); the bite's form and build rule (Block 6); deny.toml
   expected to need a change (Block 8); the judge set (section 3); engine-architect for A19 (section 7).
+
+**Rev 2 to rev 2.1** (the advisor's rev-2 check, APPROVE WITH CONDITIONS, 0 High, 3 Medium, 3 Low:
+advisor-u5-brief.md:324-430; met by the main session's Edits, no new check needed if met as written, :397): ADV-U5B-15,
+each target's `-max_len` (Block 5); -16 and -17, section 8's two texts as the advisor corrected them (:403-422); -18 to
+-20, the client targets' seeds and whole rule, each bar's reach test, Ping and Pong as `decode` calls, the decoder's own
+window on over-limit inputs (Blocks 3 to 5, section 3); the register lines before launch (section 9).
 
 ## 0. Where things are
 - **`<base>`:** the spike branch's head at launch, after U4's close, filled by the main session in U4f's fill form
@@ -137,8 +143,10 @@ units came to). The advisor ruled U5-Q1 to Q3 and Q5 to Q7 (section 8).
    Snapshot and FullState as Block 4; the other twelve targets 0. **Each target pins its message's type byte** (the
    harness writes the framing and the type byte, the fuzzer the rest), so it meets its own type's path only: with the
    byte free, a Join input would reach a 104 B note and a Ping 256 B or 832 B (u5-alloc-bounds.md:51-54, :121-136).
-   Ping and Pong run on both receivers' ways, the room's and the client's. The counting window holds the decode call
-   only: the harness's own copy of the input sits outside it. The over-limit decision, its message and the abort happen
+   Ping and Pong run on both receivers' ways, the room's and the client's, as two `decode` calls inside one target, one
+   run and one log per part, bar 0, never through the client's `input`, where a Ping is kept and a Pong feeds ClockSync
+   (u5-alloc-bounds.md:188-189; ADV-U5B-20). The counting window holds the decode call only: the harness's own copy of
+   the input sits outside it. The over-limit decision, its message and the abort happen
    in the harness after the decode returns, never inside `alloc`. The bars were measured at rustc 1.99.1 (std's sort
    scratch computed); the counted builds use the nightly, so Block 3 re-measures them there from the harness's own
    records, and a bar that differs comes to the advisor before the first counted run. A seed generator writes valid
@@ -150,23 +158,30 @@ units came to). The advisor ruled U5-Q1 to Q3 and Q5 to Q7 (section 8).
 4. **The three targets with state:** `Snapshot` and `FullState` through npt-client's receive path
    (`ClientEndpoint::input`, lib.rs:532-558, :783-831) from a fixed joined state: the stress scene's slot 0, its
    `JoinAccepted` and the room's `FullState` for it at the join tick (room.rs:1380-1398), built once at the harness's
-   start, the largest held state any proof run gives a client (u5-alloc-bounds.md:211-222). Per input, a clone of that
+   start at a tick where the scene's projectiles are live, the largest held state any proof run gives a client
+   (u5-alloc-bounds.md:211-222); its L_e (the entity records it holds) is printed in the header. Per input, a clone of that
    endpoint is made outside the counting window, then one `input` call inside it, so the group decode against baselines
    and the client's copies of its held world are fuzzed, not only the framing. **Their bars:** Snapshot through the
    client 304 x L_e bytes for a held frame of L_e >= 238 entity records (the first insert regrows a copied list to
    twice its length at 152 B a record), 155,952 at the stress scene's upper bound of 513 (lib.rs:135/:145); the harness
-   prints L_e and computes the bar by u5-alloc-bounds.md's Block 15 rule (:184-187); the decoder alone 53,248.
+   computes the bar from L_e by u5-alloc-bounds.md's whole Block 15 rule (:184-187: below 238 records the copy regrows
+   twice, so 304 x L_e holds only from 238 up); the decoder alone 53,248. Snapshot's seed corpus holds snapshots coded
+   against the fixed state's full-state tick at baseline ages 1 to 31 (lib.rs:1054-1066): random bytes rarely hit that
+   tick, and the copy-and-regrow path needs it (ADV-U5B-18).
    FullState through the client 2,213,272 (14,561 door records fit in 65,536 B; lib.rs:1125, its sort scratch at :1128
    the same size, computed); the decoder alone 1,703,936. After a decoder's refusal the client still allocates at most
-   256 B for its bookkeeping (lib.rs:806-829), so catalogue item 3's half is checked on the decoder, not on the whole
-   `input` call. DelayStream's scanner, client and server directions (bar 0: it never allocates), as a differential
+   256 B for its bookkeeping (lib.rs:806-829), so on every over-limit input the harness runs the decoder alone in its
+   own window (0 required: catalogue item 3's half) and judges the `input` call's window against the bar only for inputs
+   within the limit (ADV-U5B-20). DelayStream's scanner, client and server directions (bar 0: it never allocates), as a differential
    (S2, u3c-review-result.txt:396): on every input its head length equals tungstenite's (tungstenite is already in
    npt-net's tree).
 5. **The record and the runner:** an npt-lab subcommand writing one log per run through npt-log (process `fuzz`, as
    SERIES.md:160-163 names the writer): the header (suite `fuzz`, the message, the nightly's date and rustc commit, the
-   target binary's SHA-256, the seed, the sanitizer and the leak setting, the run count, the type's bar) and one
-   `fuzz_end` event with the four counts, `inputs_count` being libFuzzer's final executed-units figure.
-   ops/runs/c-u5-fuzz.mjs builds each target once, runs it with `-runs=10000000` and a recorded seed, reads libFuzzer's
+   target binary's SHA-256, the seed, the sanitizer and the leak setting, the run count, its `-max_len`, the type's bar)
+   and one `fuzz_end` event with the four counts, `inputs_count` being libFuzzer's final executed-units figure.
+   ops/runs/c-u5-fuzz.mjs builds each target once, runs it with `-runs=10000000`, a recorded seed and `-max_len` set to
+   its type's largest input plus 64 B (FullState 65,604: without it libFuzzer keeps inputs to about 4 KB or the largest
+   seed, so FullState's largest requests and its over-limit inputs would never be fed; ADV-U5B-15), reads libFuzzer's
    final stats, sorts every artifact by kind (a panic, the over-limit message, a timeout, an out-of-memory, a leak, a
    slow unit), counts the corpus and calls the writer. A run ended by anything but a panic or the over-limit abort is
    reported by name and comes to the advisor, never re-run into a pass. The three targets -34 does not judge write logs
@@ -225,6 +240,10 @@ units came to). The advisor ruled U5-Q1 to Q3 and Q5 to Q7 (section 8).
   catalogue item 3's half per type (a buffer one byte over the limit allocates nothing before its refusal); the
   scanner's differential on a planted head-length slip; the runner's artifact classes on canned output; the bite run
   FAILs.
+- **Each bar reached (ADV-U5B-19):** per type, a constructed largest input (8 commands; 431 removes; 14,561 doors; 16
+  peers; a 480 B note; the fixed state plus 238 door adds) whose largest request equals its bar under the window, run on
+  stable and again on the nightly (this is Block 3's re-measure). A figure that moves on the nightly under the same rule
+  is recorded and named in that day's message; a change to the rule is his.
 - **The judge set:** canned fuzz logs (README §1's header fields as the judge reads them) judged by npt-judge with
   marks.json's -34: PASS on clean logs, FAIL on a panic, FAIL on an over-limit count, the bite run shown. If the judge
   cannot read a fuzz log as written, that is a judge change and stops for him (section 5).
@@ -339,12 +358,15 @@ fails: an Input of 6 to 8 commands asks for 192 to 256 bytes against its 166-byt
 more changes asks for about 1,660 bytes against its 1,150. What the test is for is a decoder that believes a forged
 length and asks for far more memory than any real message could need.
 (a) Each type's bar is the most memory a message within its limit can make that code ask for at once, worked out from
-    the code and the test scene (the stress scene) and measured where it could be, written in the series file and
-    printed in every run: Input 256 bytes; SessionControl 480; RoomControl 272; Snapshot 155,952 (the client copies
-    the world it holds, so the scene sets this; the decoder alone 53,248); FullState 2,213,272 (one 65,536-byte full
-    state can carry 14,561 small records; the decoder alone 1,703,936); every other type 0. A message over its limit
-    must also be refused before any memory is asked for, which every decoder already does. No number chosen by us.
-(b) A fixed multiple of each limit (for example 64 times): simpler, but a new number.
+    the code and the test scene (the stress scene), measured where it could be and checked again on the compiler the
+    runs use, written in the series file and printed in every run: Input 256 bytes; SessionControl 480; RoomControl
+    272; Snapshot at most 155,952 (the client copies the world it holds, so the bar depends on how many records it
+    holds, at most 513 in the stress scene, and is worked out for each run; the decoder alone 53,248); FullState
+    2,213,272 (one 65,536-byte full state can carry 14,561 small records; the decoder alone 1,703,936); every other
+    type 0. A message over its limit must also be refused before any memory is asked for, which every decoder already
+    does. No number chosen by us.
+(b) One fixed multiple of every limit: simpler, but a new number, and it must be at least about 136 times, or a correct
+    client fails the Snapshot test (155,952 bytes against 1,150); that lets a FullState ask for up to about 9 MB.
 (c) Keep the words as they stand, and rebuild the decoded message types so that no single request passes the wire
     limit: a large change across the protocol, room and client code before the runs.
 No other pass mark, number or run changes. Only PM-0001-34's counted runs wait for this; the build does not.
@@ -363,7 +385,7 @@ small library that counts memory requests, the record writers for those runs, a 
 changes to the build checks, a few tests and three planted bugs.
 (a) Build U5 whole: its size line about 1,900 to 3,850, the build stopping past about 5,750 at a block end (your
     rule's "more than twice the plan", the plan taken as the middle, about 2,900). Units have grown about 1.35 times
-    their estimate (U4f2), about 5,200 at the top, so the stop is near but under that.
+    their estimate (U4f2): about 5,200 at the top of the range, under the stop.
 (b) Split it: U5 (the fuzzing, the memory counter, the tests and the audits: about 1,600 to 3,250; stop past about
     4,800), then U5b (the transport-swap checker and its two planted bugs: about 330 to 620; stop past about 950),
     built when unit U6 swaps the transport libraries.

@@ -331,5 +331,100 @@ DONE
 4. Spot-check the bounds' arithmetic against the code (Snapshot through the client 304 x L_e; FullState 14,561 doors).
 5. Section 8's two texts: accuracy and plain words.
 6. Verdict, findings ADV-U5B-15 on, conditions.
+STATUS: all blocks done (2026-11-21).
 
 ### Notes (as I go)
+- My list (:289-305) is met where rev 2's change list (u5-brief.md:12-24) says: U5-ALLOC his, Block 3's per-call figures,
+  the bars per type (Blocks 3-4, section 8); the shared target for every copy's call (sections 2 and 5, :209-215,
+  :268-270); Block 0 by path, the seeded fuzz lock, its check, both locks audited, the root lock offline, the second read
+  (:95-114, :190, :206); the strict swap count, its fixture and the U6 carry (:182-189, :231-233, :260-262); section 4's
+  line word for word (:240-248 = my :221-228); section 6 recomputed and section 8's texts; Lows -8 to -13 (Blocks 2, 4,
+  5, 6, 7, 8; section 3's judge set; section 7's engine-architect).
+- My rulings' terms are folded: Q1 (Block 5 :172-173; section 9 :383-384), Q2 (Block 7, section 2 :204-205, section 4
+  :260-262), Q3 (Block 1 :115-126), Q5 (Block 3 :148-149, section 2 :202-203, Block 6 :181), Q6 (Block 6 :177-180), Q7
+  (Blocks 0-1, section 5 :274-277). Section 8's cites into this file land on each ruling (:159-203).
+- Section 6's sums hold: 1,910-3,830 ("about 1,900 to 3,850"); middle 2,870, twice about 5,750; split 1,600-3,250
+  (middle 2,425, twice about 4,850; the brief rounds to 4,800) and 330-620 (middle 475, twice 950); 3,850 x 1.35 = 5,198.
+- The bounds hold where I read the code: Input reserves before any command (input.rs:208-212); the client's two baseline
+  clones (client/src/lib.rs:1065, :1074) and the insert into the copy (:135, :145); FullState's exact collect (:1125)
+  and sort (:1128). The bars rest on measured sizes (Command 32, EntityDelta 104, Held 152; u5-alloc-bounds.md:22-36)
+  and std's growth rule; the sort scratch is computed.
+- Snapshot's 304 x L_e holds only for L_e >= 238 (u5-alloc-bounds.md:184-187); below it the copy regrows twice (L_e 193:
+  193 -> 386 -> 772 slots, 117,344 B, not 304 x 193 = 58,672). Block 4 computes "by Block 15's rule", the whole rule:
+  right. 155,952 is the scene's upper bound (L_e 513), not one fixed bar; L_e at the join tick is a run's figure (:95).
+- libFuzzer's input length: with no `-max_len`, it takes max(4,096, the largest seed) (libFuzzer's kMinDefaultLen, from
+  my knowledge of its source, not read here); a stress-scene FullState seed is a few KB (the catalogue's estimate about
+  6.5 KB, docs/design/netcode-proof-messages.md:89). Rev 2 sets no `-max_len` (Block 5 :169).
+- Block 3's "the other twelve targets 0" counts the scanner with the eleven zero-bar message types: right.
+- The client's `input` keeps a Ping (pings.push, up to 336 B) and feeds a Pong to ClockSync (up to 5,040 B)
+  (u5-alloc-bounds.md:188-189): a Ping or Pong run through `input` would not have bar 0.
+- (b)'s "for example 64 times" in U5-ALLOC: 64 x 1,150 = 73,600 < 155,952, so a correct client fails Snapshot; the
+  smallest one multiple that passes every type is about 136 (155,952 / 1,150 = 135.6), which lets FullState reach about
+  8.9 MB (136 x 65,536).
+- U5-SIZE (a): "about 5,200 at the top, so the stop is near but under that" says the stop (5,750) is under 5,200: reversed.
+
+### Findings (rev 2)
+- **ADV-U5B-15 (Medium): FullState's inputs never reach its limit.** With no `-max_len`, libFuzzer keeps inputs to about
+  max(4,096 B, the largest seed); a stress-scene FullState seed is a few KB, so the FullState part never feeds the
+  65,540 B messages that make its largest requests (14,561 records: u5-alloc-bounds.md:193-200) nor the over-limit ones
+  past them, and its 10,000,000 inputs prove less than the bar claims. **Fix:** each target's `-max_len` set to its
+  type's largest input plus a margin past it (FullState about 65,540 + 64; the others likewise), recorded in the header;
+  ADV-U5B-19's test shows each bar reached.
+- **ADV-U5B-16 (Medium): two figures in U5-ALLOC's text.** (b)'s "for example 64 times" fails a correct client on
+  Snapshot (64 x 1,150 = 73,600 < 155,952); and Snapshot's 155,952 is the scene's upper bound, the run's bar being
+  worked out from the records the client holds (Block 4). **Fix:** the text below.
+- **ADV-U5B-17 (Medium): U5-SIZE's option (a) states the comparison backwards** ("the stop is near but under that"; the
+  growth's 5,200 is under the 5,750 stop). **Fix:** the text below.
+- **ADV-U5B-18 (Low): the client targets' seeds and held state.** A Snapshot meets the baseline copy and its regrowth only
+  at a baseline age of 1 to 31 against the fixed state's FullState tick (lib.rs:1054-1066); random bytes rarely hit
+  that 32-bit tick. **Fix:** the corpus for Snapshot through the client holds snapshots coded against that tick (ages 1
+  to 31); the fixed state is taken where the scene's projectiles are live, its L_e printed, and the bar computed by
+  Block 15's whole rule (below 238 records the copy regrows twice).
+- **ADV-U5B-19 (Low): no test shows each bar is reached.** **Fix:** section 3 gains, per type, a constructed largest
+  input (8 commands; 431 removes; 14,561 doors; 16 peers; a 480 B note; the fixed state plus 238 door adds) whose
+  largest request equals its bar under the window, run on stable and again on the nightly (Block 3's re-measure is this
+  test). A figure that moves on the nightly under the same rule is recorded and named in that day's message; a change
+  to the rule is his.
+- **ADV-U5B-20 (Low): Ping and Pong's two ways, and item 3 in the client targets, in one sentence each.** Both ways are
+  `decode` calls inside one target, one run and one log per part, bar 0 (not the client's `input`, where a Ping is kept
+  and a Pong feeds ClockSync); section 2's 14 and 17 runs stand. In the client targets the harness runs the decoder alone
+  in its own window on every over-limit input (0 required: catalogue item 3), and judges the `input` call's window
+  against the bar only for inputs within the limit (the client's 256 B of bookkeeping after a refusal is not "before its
+  refusal").
+
+### Verdict: APPROVE WITH CONDITIONS (2026-11-21)
+No Critical or High open; both rev-1 Highs are met (U5-ALLOC is his with the computed bars; every copy's cargo call in
+the shared target). The conditions are edits by the main session, none needing a new check by me if met as written:
+1. ADV-U5B-15: each target's `-max_len` (Block 5 and the header).
+2. ADV-U5B-16 and -17: section 8's two texts as below.
+3. ADV-U5B-18 to -20 in the same pass (Blocks 3-5, section 3).
+4. The register lines of section 9 before U5's launch.
+
+### The two texts for Mustafa, corrected (final once condition 2 is made; only the marked lines change)
+U5-ALLOC, option (a) and option (b) replaced; every other line of u5-brief.md:333-352 stays:
+```text
+(a) Each type's bar is the most memory a message within its limit can make that code ask for at once, worked out from
+    the code and the test scene (the stress scene), measured where it could be and checked again on the compiler the
+    runs use, written in the series file and printed in every run: Input 256 bytes; SessionControl 480; RoomControl
+    272; Snapshot at most 155,952 (the client copies the world it holds, so the bar depends on how many records it
+    holds, at most 513 in the stress scene, and is worked out for each run; the decoder alone 53,248); FullState
+    2,213,272 (one 65,536-byte full state can carry 14,561 small records; the decoder alone 1,703,936); every other
+    type 0. A message over its limit must also be refused before any memory is asked for, which every decoder already
+    does. No number chosen by us.
+(b) One fixed multiple of every limit: simpler, but a new number, and it must be at least about 136 times, or a correct
+    client fails the Snapshot test (155,952 bytes against 1,150); that lets a FullState ask for up to about 9 MB.
+```
+U5-SIZE, option (a)'s last sentence replaced; every other line of u5-brief.md:353-373 stays:
+```text
+(a) Build U5 whole: its size line about 1,900 to 3,850, the build stopping past about 5,750 at a block end (your
+    rule's "more than twice the plan", the plan taken as the middle, about 2,900). Units have grown about 1.35 times
+    their estimate (U4f2): about 5,200 at the top of the range, under the stop.
+```
+- Both are accurate against the code and u5-alloc-bounds.md once corrected, and in plain words. Both his; neither a
+  stop; the first day's message after these edits (with the U4H texts if that message has not gone).
+
+### What I did not check (rev 2)
+- Nothing run. The bars are the test-engineer's (sizes measured at 1.99.1, the sort scratch computed); I re-read the
+  sites, not every capacity chain. libFuzzer's default length rule is from memory. Sections 0, 1.1-1.3, 7 and 9 only
+  where they touch the items above.
+DONE (rev 2)

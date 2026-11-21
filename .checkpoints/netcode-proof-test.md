@@ -166,17 +166,18 @@
   Edits; register entries 94-101 at u4s-carries.md:618-659). **U4H-Q4, U4H-SIZE and U4H-JUDGE** (final, section 8)
   go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop. **msg-2026-11-21.md
   SENT ~02:42 UTC** (F-B-COUNT, U4G-Q1, choices 1-3; held by the cut).
-- **U5's brief (KEEP-PROGRESSING; U5 builds after U4's close):** rev 1 (2db0976) REVISE by the advisor ~05:05 UTC
-  (advisor-u5-brief.md, 322 lines: 2 High, 5 Medium, 7 Low; its list :289-305). **Rev 2 complete** (u5-brief.md, 385
-  lines, 2cfa592 at 05:23 UTC), with option (a)'s per-type bars from the test-engineer's read (u5-alloc-bounds.md, 254
-  lines, measured at rustc 1.99.1: Input 256, SessionControl 480, RoomControl 272, Snapshot 155,952 through the
-  client, FullState 2,213,272, the rest 0); **with the advisor for its rev-2 check now.** **U5-ALLOC and U5-SIZE are his**
-  (texts in section 8; neither a stop) for the first day's message after that check. S's letter: U4b 701 (411eeee),
-  U4f-F1 239 (u4f-f1-report.md:104).
+- **U5's brief rev 2.1 READY** (u5-brief.md; KEEP-PROGRESSING; U5 builds after U4's close): rev 1 (2db0976) REVISE
+  (advisor-u5-brief.md:1-322: 2 High, 5 Medium, 7 Low); rev 2 (2cfa592) with option (a)'s per-type bars from the
+  test-engineer's read (u5-alloc-bounds.md, 254 lines, measured at rustc 1.99.1: Input 256, SessionControl 480,
+  RoomControl 272, Snapshot at most 155,952 through the client, FullState 2,213,272, the rest 0); the advisor's rev-2
+  check APPROVE WITH CONDITIONS (:324-430: 3 Medium, 3 Low), all met by my Edits ~05:3x UTC (no new check needed).
+  **U5-ALLOC and U5-SIZE are his** (final texts, section 8; neither a stop): in the next day's message (2026-11-22's),
+  with the U4H texts if his U4G-Q1 answer has come. Register lines before U5's launch (section 9). S's letter: U4b 701
+  (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
 - **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
-  16:19; back at once); read it with Read/Grep. **Check-in re-enabled 04:46 UTC** for the U5 advisor
-  (trig_01EKqNqwZrQTVJ6caAyRrug5; paused 03:12-04:46; next 06:34); saver bvyb8q0li ended 04:28:56 (nothing to save);
-  saver bwv1nw5cg from 04:46 (to about 06:36). Main f5030a3 (04:29 UTC).
+  16:19; back at once); read it with Read/Grep. **Check-in paused again 05:29 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5: on
+  04:46-05:29 for the U5 agents, now none runs; re-enable it when the next agent starts); saver bwv1nw5cg from 04:46
+  (to about 06:36). Main f5030a3 (04:29 UTC).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in
