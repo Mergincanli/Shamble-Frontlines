@@ -119,3 +119,32 @@ U5's early builder, first stint: Block 0 only (u5-brief.md :101-120, narrowed by
   check.test.mjs +297 counted with Block 0's 43); new files: crates/alloc/Cargo.toml 26, src/lib.rs 144, tests/window.rs
   124, fuzz/Cargo.toml 189; fuzz/Cargo.lock 1,181 (apart). Added lines 1,177 (S line about 1,400). Next: snapshot
   1, then Block 2's sim test file written (its build waits for disk).
+- Snapshot 1 (16:1x UTC): `python3 -I worktree_patch.py <wt> wip/u5-early.patch u5-build`: base bd88fa7, 141,513 B, 12
+  files, notes copied; sha256 7d19c5e3c2fabef3345e10980ba574c7fba0daf5af7def14715fb8881b835706.
+- B2.1 written (16:12 UTC, not built then: F7): crates/sim/tests/allocations.rs, 2 tests (carry 48; T2-L2); rustfmt's
+  diff applied by Edit (b2-fmt.log), `cargo fmt --check -p npt-sim` exit 0 (b2-fmt-2.log).
+- Stopped 16:12-17:41 UTC (spend-limit cut). The main session meanwhile: P27 dev-profile clean of the shared target (cold
+  now), the nightly and cargo-fuzz 0.13.2 installed. Resume at 17:4x: df 9,359,749,120 B; the 8 manifests and locks equal
+  dependency-check.md; crates/sim/src unchanged from HEAD (history.rs f11e9b59…, replay.rs 802842b0…). No cargo-fuzz call
+  and no nightly in this stint.
+- B2.2 test build (17:51 UTC, df before 9,359,749,120 B): `cargo test --locked -p npt-sim --test allocations` exit 0, 2
+  of 2 (b2-sim-alloc-test.log); the #[global_allocator] compiles under the workspace's forbid (U5-Q3 term 5).
+- B2.3 plants (`-x -k`, each restored by Edit, sha256 checked; crates/sim/src equal to HEAD after, `git diff` empty):
+  P1 push grows its storage (history.rs:68 `= volumes.clone()`): a_push_into_a_full_hit_history_allocates_nothing FAILED
+  (24 requests, 53,760 B over 12 pushes) (b2-plant1-push.log); P2 reserve trusts the header (replay.rs:326
+  `with_capacity(h.ticks)`, the O4 form): a_short_recording_claiming_2_20_ticks_reserves_only_what_its_bytes_can_hold
+  FAILED (1 request, 109,051,904 B = 2^20 x 104) (b2-plant2-reserve.log); P3 room off by one (`min(room + 1)`): the same
+  test FAILED (104 B reserved where room is 0) (b2-plant3-room.log).
+- B2.4 end checks (`-x -k`, b2-end.log, df before 9,263,968,256 B, after 8,966,742,016 B): `cargo test -p npt-sim`
+  exit 0, 59 passed, 0 failed, 1 ignored; `--all-features` exit 0, 67 passed, 0 failed, 1 ignored (the 2 new tests in
+  both); clippy -p npt-sim -p npt-alloc --all-targets, plain and --all-features, -D warnings: exit 0; fmt --check of both:
+  exit 0. rustdoc with RUSTDOCFLAGS=-Dwarnings on npt-alloc, both builds: exit 0 (b2-doc.log; df after 8,966,418,432 B).
+  Workspace counts by delta (Block 2 adds only a new npt-sim test file, condition 7: its own crate's tests): 651 measured
+  and 748 bites (642 + 9, 739 + 9), not re-run workspace-wide.
+- F8: the fuzz crate's fmt and clippy (condition 8's early stop) cannot run yet: its 17 [[bin]] files are Block 3's, and
+  cargo refuses a manifest whose target files are missing. Named for Block 3's first `cargo check`.
+- Re-hash at 17:57 UTC: the 8 manifests and locks equal dependency-check.md. crates/sim/tests/allocations.rs
+  3bbc13c181d1e8ad4205ce28967f1da08700591eb26db13406bfcd4c270a48c4 (145 lines).
+- Block 2's sim half DONE (17:57 UTC). Added lines 1,322 (Block 1's 1,177 + 145; fuzz lock apart), under the S line
+  (about 1,400). Next: snapshot 2, then STOP before Block 3 (it waits for SEC-U5D-4's guard rev 4 and its plant test,
+  the main session's) and return.

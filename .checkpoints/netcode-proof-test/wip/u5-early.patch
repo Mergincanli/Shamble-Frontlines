@@ -1612,6 +1612,157 @@ index 0000000..49b3f3b
 +        "the worker's window holds its own request only"
 +    );
 +}
+diff --git a/spikes/netcode-proof/crates/sim/tests/allocations.rs b/spikes/netcode-proof/crates/sim/tests/allocations.rs
+new file mode 100644
+index 0000000..57587b5
+--- /dev/null
++++ b/spikes/netcode-proof/crates/sim/tests/allocations.rs
+@@ -0,0 +1,145 @@
++//! npt-sim's two allocation checks, counted by npt-alloc, this test binary's global allocator (U5 Block 2;
++//! u5-brief.md:133-135). Carry 48: a push into a full `HitHistory` allocates nothing (u4s-carries.md carry 48, the
++//! advisor's W1-U4D ruling; history.rs's push, seam.rs's hand-written `clone_from`). T2-L2: decoding a short recording
++//! whose header claims 2^20 ticks reserves at most room x `size_of::<TickInput>()`, room being the ticks its bytes can
++//! hold (u4d-round2-test.md:173-176; replay.rs:323-326). Each window holds the call under test only; what it is given
++//! is made before the window opens.
++
++use std::hint::black_box;
++
++use npt_alloc::{Counting, Counts, start, stop};
++use npt_sim::replay::Recording;
++use npt_sim::{HitHistory, HitVolumes, Scene, TickInput, VolumeBox};
++
++#[global_allocator]
++static ALLOC: Counting = Counting;
++
++/// One tick's volumes at their largest, every soldier and cover box a tick can hold, told apart by the tick.
++fn volumes(tick: u32) -> HitVolumes {
++    let one = VolumeBox {
++        center: [i32::try_from(tick).expect("a small tick"), 0, 0],
++        half: [30, 30, 90],
++        live: true,
++    };
++    HitVolumes {
++        tick,
++        soldiers: vec![one; HitVolumes::MAX_SOLDIERS],
++        cover: vec![one; HitVolumes::MAX_COVER],
++    }
++}
++
++#[test]
++fn a_push_into_a_full_hit_history_allocates_nothing() {
++    let mut ring = HitHistory::for_ms(200).expect("200 ms is a ring under 1 MB");
++    let capacity = ring.capacity();
++    let all: Vec<HitVolumes> = (0..capacity * 3).map(volumes).collect();
++    let boxes = size_of::<VolumeBox>() as u64;
++    // A push into a ring not yet full copies the tick: its two vectors (so the counter sees this binary's requests).
++    start();
++    ring.push(black_box(&all[0]));
++    let first = stop();
++    assert_eq!(
++        first,
++        Counts {
++            allocations: 2,
++            bytes: (HitVolumes::MAX_SOLDIERS + HitVolumes::MAX_COVER) as u64 * boxes,
++            largest: HitVolumes::MAX_COVER as u64 * boxes,
++        }
++    );
++    for v in &all[1..capacity as usize] {
++        ring.push(v);
++    }
++    assert_eq!(ring.len(), capacity, "the ring is full");
++    // Two laps into the full ring: each push copies into the evicted entry's storage.
++    start();
++    for v in &all[capacity as usize..] {
++        ring.push(black_box(v));
++    }
++    let seen = stop();
++    assert_eq!(
++        seen,
++        Counts::default(),
++        "a push into a full HitHistory allocates nothing"
++    );
++    let newest = capacity * 3 - 1;
++    let oldest = newest + 1 - capacity;
++    assert_eq!(
++        ring.get(newest),
++        Some(&all[newest as usize]),
++        "the newest tick is held whole"
++    );
++    assert_eq!(
++        ring.get(oldest),
++        Some(&all[oldest as usize]),
++        "the oldest the ring holds"
++    );
++    assert_eq!(
++        ring.get(oldest - 1),
++        None,
++        "a tick older than the ring is evicted"
++    );
++}
++
++/// The stress scene's recording of `ticks` empty ticks (12 bytes each), its header's tick count then set to `claim`
++/// (the header's eighth word, bytes 28..32: replay.rs's layout).
++fn claiming(ticks: u32, claim: u32) -> Vec<u8> {
++    let first_tick = 5;
++    let mut bytes = Recording {
++        scene: Scene::stress().id(),
++        seed: 9,
++        first_tick,
++        span_ms: 200,
++        generator: 0,
++        ticks: (0..ticks)
++            .map(|k| TickInput {
++                tick: first_tick + k,
++                ..TickInput::default()
++            })
++            .collect(),
++    }
++    .encode();
++    bytes[28..32].copy_from_slice(&claim.to_le_bytes());
++    bytes
++}
++
++#[test]
++fn a_short_recording_claiming_2_20_ticks_reserves_only_what_its_bytes_can_hold() {
++    let claim = 1 << 20;
++    let per_tick = size_of::<TickInput>() as u64;
++    // The 60-byte header alone holds no tick: nothing is reserved, and the decode is refused at the first tick.
++    let header = claiming(0, claim);
++    assert_eq!(header.len(), 60);
++    start();
++    let refused = Recording::decode(black_box(&header));
++    let seen = stop();
++    assert!(
++        refused.is_err(),
++        "a header claiming 2^20 ticks with none after it is refused"
++    );
++    assert_eq!(seen, Counts::default(), "room for no tick, so no reserve");
++    // Seven empty ticks: room for 7, so one reserve of 7 ticks, then a refusal at the 8th.
++    let short = claiming(7, claim);
++    let room = (short.len() as u64 - 60) / 12;
++    assert_eq!(room, 7);
++    start();
++    let refused = Recording::decode(black_box(&short));
++    let seen = stop();
++    assert!(
++        refused.is_err(),
++        "seven ticks where 2^20 are claimed are refused"
++    );
++    assert!(
++        seen.largest <= room * per_tick,
++        "the largest request {} B is past room x size_of::<TickInput>() = {} B",
++        seen.largest,
++        room * per_tick
++    );
++    assert_eq!(
++        seen,
++        Counts {
++            allocations: 1,
++            bytes: room * per_tick,
++            largest: room * per_tick,
++        }
++    );
++}
 diff --git a/spikes/netcode-proof/fuzz/Cargo.lock b/spikes/netcode-proof/fuzz/Cargo.lock
 new file mode 100644
 index 0000000..062df65
