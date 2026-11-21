@@ -183,6 +183,172 @@ index e88e3ea..4a93548 100644
      }
  }
  
+diff --git a/spikes/netcode-proof/crates/room/src/lib.rs b/spikes/netcode-proof/crates/room/src/lib.rs
+index 954d8d1..5c1bc29 100644
+--- a/spikes/netcode-proof/crates/room/src/lib.rs
++++ b/spikes/netcode-proof/crates/room/src/lib.rs
+@@ -34,9 +34,10 @@ pub use roster::Roster;
+ /// compares, -62's event routing, -22's event-queue cap, and catalogue item 5's class filter, whose id is outside the
+ /// `PM-<ADR>-<row>/<name>` form (U4E-Q13 (a): no mark judges it). npt-proto's ids reach the room's encoder through
+ /// `npt_proto::Quant::with_bite`, never spelled here. U4f adds -21's nine room-side checks (u4f-brief.md 2.11): kinds 1,
+-/// 2, 3, 4, 5, 6, 8 and 10 each removed, and kind 2 relaxed to "not older than".
++/// 2, 3, 4, 5, 6, 8 and 10 each removed, and kind 2 relaxed to "not older than". U4g adds -60's own-state section
++/// sent without a scripted change's values (U4G-Q5).
+ #[cfg(feature = "bites")]
+-pub const BITES: [&str; 16] = [
++pub const BITES: [&str; 17] = [
+     "PM-0001-18/no-fallback",
+     "PM-0001-58/lt-ack",
+     "PM-0001-58/lt-cmd-seq",
+@@ -53,4 +54,5 @@ pub const BITES: [&str; 16] = [
+     "PM-0001-21/no-ack-sent",
+     "PM-0001-21/no-catchup-cap",
+     "PM-0001-21/not-older-than",
++    "PM-0001-60/own-state-missing",
+ ];
+diff --git a/spikes/netcode-proof/crates/room/src/room.rs b/spikes/netcode-proof/crates/room/src/room.rs
+index 5ce5bac..5f2e5dd 100644
+--- a/spikes/netcode-proof/crates/room/src/room.rs
++++ b/spikes/netcode-proof/crates/room/src/room.rs
+@@ -53,6 +53,7 @@ enum RoomBite {
+     NoAckSent,
+     NoCatchupCap,
+     NotOlderThan,
++    OwnStateMissing,
+ }
+ 
+ #[cfg(feature = "bites")]
+@@ -75,11 +76,17 @@ impl RoomBite {
+             RoomBite::NoAckSent,
+             RoomBite::NoCatchupCap,
+             RoomBite::NotOlderThan,
++            RoomBite::OwnStateMissing,
+         ];
+         crate::BITES.iter().position(|b| *b == id).map(|i| all[i])
+     }
+ }
+ 
++/// The own-state record's move-speed and fire-interval fields (npt-sim seam.rs's `OWN_STATE` layout: velocity x, y
++/// and z, ammunition, fire timer, reload left, move speed, fire interval), in `AttributeChange`'s two kinds' order:
++/// what PM-0001-60/own-state-missing sends unchanged.
++const OWN_ATTRIBUTE_FIELDS: [usize; 2] = [6, 7];
++
+ /// Each client's running counts, for U4r's logs and the -21 and -22 counters U4f adds (U4E-Q7, U4E-Q11).
+ #[derive(Clone, Debug, Default, PartialEq, Eq)]
+ pub struct ClientCounters {
+@@ -119,6 +126,9 @@ pub struct ClientCounters {
+     pub cosmetic_sent: u64,
+     /// Cosmetic events the remainder had no room for (never resent).
+     pub cosmetic_skipped: u64,
++    /// Of the cosmetic events sent, those of this client's own shots (carry 79; SERIES.md's
++    /// `second.v.own_cosmetic_sent_count`): 0, but under PM-0001-62/server-echo.
++    pub own_cosmetic_sent: u64,
+     /// Overflow resyncs (carry 57); the tick of each is [`ClientSlot::overflow_resync`] on that tick.
+     pub overflow_resyncs: u64,
+     /// `Resync`s answered with a full state.
+@@ -492,6 +502,9 @@ pub struct Room<S: SimCore> {
+     scripted_spawns: Vec<Placement>,
+     scripted_teleports: Vec<Placement>,
+     scripted_attributes: Vec<AttributeChange>,
++    /// Per slot index, the move speed and fire interval its own-state record held before the last scripted change of
++    /// each (PM-0001-60/own-state-missing sends these while the change lasts; kept only under that bite).
++    pre_change: Vec<[Option<i32>; 2]>,
+     stamped: Vec<(u32, u32, SimEvent)>,
+     reports: InputReports,
+     index: Index,
+@@ -573,6 +586,7 @@ impl<S: SimCore> Room<S> {
+             scripted_spawns: Vec::new(),
+             scripted_teleports: Vec::new(),
+             scripted_attributes: Vec::new(),
++            pre_change: vec![[None; 2]; slots.max(1)],
+             stamped: Vec::new(),
+             reports: InputReports::default(),
+             index: Index::default(),
+@@ -1033,6 +1047,7 @@ impl<S: SimCore> Room<S> {
+         self.refusals.clear();
+         core::mem::swap(&mut self.incoming, &mut self.refusals);
+         self.fill_input(t);
++        self.hold_pre_change();
+         // Carry 26: the step's events are copied (stamped with the tick and their 32-bit numbers: carry 23) before
+         // anything else is read from the sim.
+         self.stamped.clear();
+@@ -1051,6 +1066,28 @@ impl<S: SimCore> Room<S> {
+         self.next_tick = t.wrapping_add(1);
+     }
+ 
++    /// PM-0001-60/own-state-missing (bites builds only; U4G-Q5): before the step applies this tick's scripted attribute
++    /// changes, each changed slot's value from its own-state record of the last tick, which the room then sends in
++    /// place of the changed one while the change lasts (until the next change of that attribute).
++    fn hold_pre_change(&mut self) {
++        if !self.bitten(RoomBite::OwnStateMissing) {
++            return;
++        }
++        let records = self.sim.entity_records();
++        for a in &self.input.attributes {
++            let k = match a.attribute {
++                npt_sim::Attribute::MoveSpeed => 0,
++                npt_sim::Attribute::FireInterval => 1,
++            };
++            if let (Some(i), Some(held)) = (
++                self.index.get((EntityKind::OwnState, u16::from(a.slot))),
++                self.pre_change.get_mut(usize::from(a.slot)),
++            ) {
++                held[k] = Some(records[i].grid[OWN_ATTRIBUTE_FIELDS[k]]);
++            }
++        }
++    }
++
+     /// The tick's `TickInput`: the script waiting for it, and per joined client the commands its option runs (option B:
+     /// the one stamped for the tick, or the last again; option A: every command accepted since the last tick, taken
+     /// in arrival order), each with its slot the session's and its Rewind when it holds or presses fire, then the
+@@ -1273,6 +1310,7 @@ impl<S: SimCore> Room<S> {
+     fn encode_all(&mut self, t: u32) {
+         let owner_to_all = self.bitten(RoomBite::OwnerToAll);
+         let no_fallback = self.bitten(RoomBite::NoFallback);
++        let own_state_missing = self.bitten(RoomBite::OwnStateMissing);
+         let records = self.sim.entity_records();
+         let slots = self.teams.len();
+         let full_ack = npt_sim::FULL_STATE_ACK_TICKS;
+@@ -1313,6 +1351,16 @@ impl<S: SimCore> Room<S> {
+                 push((EntityKind::Effect, i));
+             }
+             push((EntityKind::OwnState, owner));
++            // PM-0001-60/own-state-missing: the attribute fields as they were before each scripted change.
++            if own_state_missing && let Some(held) = self.pre_change.get(usize::from(owner)) {
++                for r in own.iter_mut().filter(|r| r.kind == EntityKind::OwnState) {
++                    for (field, v) in OWN_ATTRIBUTE_FIELDS.iter().zip(held) {
++                        if let Some(v) = v {
++                            r.grid[*field] = *v;
++                        }
++                    }
++                }
++            }
+             if let Some(forced) = c.full_state_due {
+                 full_state(c, t, forced, records, &own);
+                 continue;
+@@ -1589,6 +1637,10 @@ fn snapshot(
+                 p.groups[g].events.push((number as u16, 0, event));
+                 p.groups[g].numbers.push(number);
+                 c.counters.cosmetic_sent += 1;
++                // Carry 79: a shot of the client's own (sent only under PM-0001-62/server-echo).
++                if matches!(event, SimEvent::Shot { slot, .. } if slot == c.slot) {
++                    c.counters.own_cosmetic_sent += 1;
++                }
+             }
+             None => c.counters.cosmetic_skipped += 1,
+         }
+diff --git a/spikes/netcode-proof/crates/room/tests/bites.rs b/spikes/netcode-proof/crates/room/tests/bites.rs
+index ef751b6..23cb36b 100644
+--- a/spikes/netcode-proof/crates/room/tests/bites.rs
++++ b/spikes/netcode-proof/crates/room/tests/bites.rs
+@@ -26,6 +26,7 @@ fn the_rooms_bites_are_pinned_and_every_pm_id_is_marks_jsons() {
+             "PM-0001-21/no-ack-sent",
+             "PM-0001-21/no-catchup-cap",
+             "PM-0001-21/not-older-than",
++            "PM-0001-60/own-state-missing",
+         ]
+     );
+     let marks = include_str!("../../../marks/marks.json");
 diff --git a/spikes/netcode-proof/crates/sim/src/world.rs b/spikes/netcode-proof/crates/sim/src/world.rs
 index 1faee05..7f3fb5d 100644
 --- a/spikes/netcode-proof/crates/sim/src/world.rs
@@ -1353,6 +1519,241 @@ index 0000000..f22b68a
 +            let bitten = run(e, 40);
 +            assert!(bitten.iter().any(Applied::untraced), "{bitten:?}");
 +        }
++    }
++}
+diff --git a/spikes/netcode-proof/crates/room/tests/prediction.rs b/spikes/netcode-proof/crates/room/tests/prediction.rs
+new file mode 100644
+index 0000000..0914ced
+--- /dev/null
++++ b/spikes/netcode-proof/crates/room/tests/prediction.rs
+@@ -0,0 +1,229 @@
++//! U4g's room half (u4g-brief.md 1.3, block 3): carry 79's per-client count of the cosmetic events sent for the
++//! client's own shots, under PM-0001-62/server-echo's site, and PM-0001-60/own-state-missing's site (U4G-Q5). Each
++//! runs `Room<World>` through its own API with hand-made `Input`s, its datagrams decoded as a client would.
++
++use npt_proto::{EntityDelta, FullState, Input, Join, Limits, Message, Snapshot};
++use npt_room::Room;
++use npt_sim::{
++    Attribute, AttributeChange, Command, EntityKind, EntityRecord, Scene, SimCore, World,
++};
++
++fn token(slot: u8) -> [u8; 16] {
++    [slot.wrapping_add(1); 16]
++}
++
++fn join(slot: u8) -> Join {
++    Join {
++        token: token(slot),
++        bind: [slot ^ 0x3c; 16],
++        version: 1,
++        content_hash: [0; 32],
++    }
++}
++
++/// A room of `n` joined slots on `scene`, with the room bite `bite` (bites builds only; `None` clean).
++fn room(scene: &Scene, n: u8, bite: Option<&str>) -> Room<World> {
++    let world = World::new(scene, 1, 100);
++    let greybox = world.greybox().clone();
++    #[allow(unused_mut, reason = "a bites build plants the bite")]
++    let mut r = Room::new(
++        world,
++        scene,
++        &greybox,
++        (0..n).map(token).collect(),
++        usize::from(n),
++        30,
++    );
++    #[cfg(feature = "bites")]
++    if let Some(b) = bite {
++        r = r.with_bite(b).expect("a room bite");
++    }
++    #[cfg(not(feature = "bites"))]
++    assert!(bite.is_none(), "a bite needs a bites build");
++    for s in 0..n {
++        assert_eq!(r.join(&join(s)).map(|j| j.0), Ok(s));
++    }
++    r
++}
++
++/// What the last tick sent `slot`: its snapshot groups and its full state, each decoded on the channel its type's row
++/// of `Limits::TYPES` names (npt-room's tests name no npt-link type).
++fn sent(r: &mut Room<World>, slot: u8) -> (Vec<Snapshot>, Option<FullState>) {
++    let row = |name: &str| {
++        Limits::TYPES
++            .iter()
++            .find(|row| row.0 == name)
++            .expect("a type row")
++            .1
++    };
++    let decode = |name: &str, bytes: &[u8]| {
++        npt_proto::decode(npt_proto::Direction::RoomToClient, row(name), bytes).ok()
++    };
++    let snapshots = r
++        .take_datagrams(slot)
++        .iter()
++        .filter_map(|d| match decode("Snapshot", d) {
++            Some(Message::Snapshot(s)) => Some(s),
++            _ => None,
++        })
++        .collect();
++    let full = r
++        .take_control(slot)
++        .iter()
++        .find_map(|b| match decode("FullState", b) {
++            Some(Message::FullState(f)) => Some(f),
++            _ => None,
++        });
++    (snapshots, full)
++}
++
++/// Each joined slot's acknowledgement of what the last tick sent it, with a command stamped for the next tick that
++/// holds fire (none when `commands` is false), as one `Input`.
++fn answer(r: &mut Room<World>, n: u8, seq: u16, commands: bool) {
++    let t = r.last_tick();
++    for slot in 0..n {
++        let (snapshots, full) = sent(r, slot);
++        let mut groups = u8::from(full.is_some());
++        for s in &snapshots {
++            groups |= 1 << s.group;
++        }
++        let tick = t.wrapping_add(1);
++        let c = Command {
++            tick,
++            seq,
++            buttons: Command::FIRE,
++            aim: [0, 0, 140],
++            view_tick: t,
++            ..Command::default()
++        };
++        r.receive(
++            slot,
++            &Message::Input(Input {
++                ack_tick: t as u16,
++                ack_groups: groups,
++                commands: if commands { vec![c] } else { Vec::new() },
++            }),
++        );
++    }
++}
++
++/// Each client's (own cosmetic events sent, cosmetic events sent) after 60 ticks of SS's two clients firing.
++fn own_and_all(bite: Option<&str>) -> Vec<(u64, u64)> {
++    let mut r = room(&Scene::stress(), 2, bite);
++    r.tick();
++    for seq in 0..60u16 {
++        answer(&mut r, 2, seq, true);
++        r.tick();
++    }
++    (0..2)
++        .map(|s| {
++            let k = r.client(s).expect("joined").counters();
++            (k.own_cosmetic_sent, k.cosmetic_sent)
++        })
++        .collect()
++}
++
++/// Carry 79 (u4s-carries.md:596-600) at PM-0001-62/server-echo's site: on SS two clients fire and each sees the other;
++/// clean, the room sends each the other's cosmetic shots and none of its own (counted 0); under the bite it sends each
++/// its own too, and counts them per client.
++#[test]
++fn carry_79_the_room_counts_each_clients_own_cosmetic_events() {
++    let clean = own_and_all(None);
++    assert!(
++        clean.iter().all(|&(own, all)| own == 0 && all > 0),
++        "{clean:?}"
++    );
++    #[cfg(feature = "bites")]
++    {
++        let bitten = own_and_all(Some("PM-0001-62/server-echo"));
++        assert!(
++            bitten.iter().all(|&(own, all)| own > 0 && all > own),
++            "{bitten:?}"
++        );
++    }
++}
++
++/// The own-state record slot 0's view holds at each tick (its own-state delta read against the acknowledged full
++/// state, or that record unchanged), and the sim's own record, on the course: a move-speed change at the second tick
++/// and a fire-interval change at the sixth, by the room's script; the full state alone acknowledged.
++fn own_views(bite: Option<&str>) -> Vec<([i32; 2], [i32; 2])> {
++    let field = |r: &EntityRecord| [r.grid[6], r.grid[7]];
++    let mut r = room(&Scene::course(), 1, bite);
++    r.tick();
++    let (_, full) = sent(&mut r, 0);
++    let full = full.expect("the join's full state");
++    let base = *full
++        .own
++        .iter()
++        .find(|r| r.kind == EntityKind::OwnState)
++        .expect("its own-state record");
++    r.receive(
++        0,
++        &Message::Input(Input {
++            ack_tick: full.tick as u16,
++            ack_groups: 1,
++            commands: Vec::new(),
++        }),
++    );
++    let mut views = Vec::new();
++    for k in 0..20 {
++        let change = |attribute, value| AttributeChange {
++            slot: 0,
++            attribute,
++            value,
++        };
++        match k {
++            1 => r.script(&[], &[], &[change(Attribute::MoveSpeed, 700)]),
++            5 => r.script(&[], &[], &[change(Attribute::FireInterval, 130_000)]),
++            _ => {}
++        }
++        r.tick();
++        let (snapshots, _) = sent(&mut r, 0);
++        let mut held = base;
++        for d in snapshots.iter().flat_map(|s| s.own.iter()) {
++            if let EntityDelta::Update {
++                kind: EntityKind::OwnState,
++                ..
++            } = d
++            {
++                held = d
++                    .apply(Some(&base))
++                    .ok()
++                    .flatten()
++                    .expect("an update of the base");
++            } else if let EntityDelta::Add(a) = d
++                && a.kind == EntityKind::OwnState
++            {
++                held = *a;
++            }
++        }
++        let sim = *r
++            .sim()
++            .entity_records()
++            .iter()
++            .find(|r| r.kind == EntityKind::OwnState && r.index == 0)
++            .expect("the sim's own record");
++        views.push((field(&held), field(&sim)));
++    }
++    views
++}
++
++/// PM-0001-60/own-state-missing's site (U4G-Q5): clean, the own-state record slot 0 holds carries each scripted change
++/// from its tick on, as the sim holds it; under the bite it carries the pre-change values on every tick while the
++/// changes last (so a predicting client corrects at every snapshot: npt-client's test of that effect).
++#[test]
++fn pm_0001_60_own_state_missing_sends_the_pre_change_values_while_a_change_lasts() {
++    let clean = own_views(None);
++    assert_eq!(clean[0], ([600, 100_000], [600, 100_000]));
++    assert!(clean.iter().all(|(view, sim)| view == sim), "{clean:?}");
++    assert_eq!(clean[19].1, [700, 130_000], "both changes ran");
++    #[cfg(feature = "bites")]
++    {
++        let bitten = own_views(Some("PM-0001-60/own-state-missing"));
++        assert!(
++            bitten.iter().all(|(view, _)| *view == [600, 100_000]),
++            "{bitten:?}"
++        );
++        assert_eq!(bitten[19].1, [700, 130_000], "the sim changed");
 +    }
 +}
 diff --git a/spikes/netcode-proof/crates/sim/tests/predict.rs b/spikes/netcode-proof/crates/sim/tests/predict.rs
