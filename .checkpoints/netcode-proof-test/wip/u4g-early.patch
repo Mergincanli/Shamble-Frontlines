@@ -1,3 +1,21 @@
+diff --git a/spikes/netcode-proof/crates/client/src/lib.rs b/spikes/netcode-proof/crates/client/src/lib.rs
+index e88e3ea..8c1b750 100644
+--- a/spikes/netcode-proof/crates/client/src/lib.rs
++++ b/spikes/netcode-proof/crates/client/src/lib.rs
+@@ -21,8 +21,13 @@ use npt_sim::grid::{Config, Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW
+ use npt_sim::{Command, EntityKind, EntityRecord, SimEvent};
+ 
+ mod clock;
++mod predict;
+ 
+ pub use clock::{ClockSample, ClockSync};
++pub use predict::{
++    Applied, Correction, CorrectionKind, FADE_MS, FLAG_UM, HELD_MS, OwnChange, Predictor, SNAP_UM,
++    TRACE_UM,
++};
+ 
+ /// The bite ids this crate plants (bites builds only). u4-build-plan.md §4.14 plants each bite where its code lives:
+ /// PM-0001-17/client-rounding's site is the client's call into the wire grid, so its id lives here and not in npt-sim's
 diff --git a/spikes/netcode-proof/crates/sim/src/world.rs b/spikes/netcode-proof/crates/sim/src/world.rs
 index 1faee05..c45a926 100644
 --- a/spikes/netcode-proof/crates/sim/src/world.rs
@@ -609,6 +627,369 @@ index 0000000..331e5ee
 +    pub fn take_own_changes(&mut self) -> Vec<OwnChange> {
 +        core::mem::take(&mut self.closed)
 +    }
++}
+diff --git a/spikes/netcode-proof/crates/client/tests/predict.rs b/spikes/netcode-proof/crates/client/tests/predict.rs
+new file mode 100644
+index 0000000..fc10f3d
+--- /dev/null
++++ b/spikes/netcode-proof/crates/client/tests/predict.rs
+@@ -0,0 +1,357 @@
++//! U4g's tests of the `Predictor` (u4g-brief.md 1.3, block 2; section 3's rows for -41's trace, the fade, snap and
++//! clear, -42's and -55's flag, and -60): an authority `World` on the course stands in for the room (option B: at a
++//! late command's tick it runs the last command again), its records as a snapshot carries them, delivered `delay` ticks
++//! later; the predictor stamps each command `lead` ticks ahead. No endpoint and no wire.
++
++use std::collections::VecDeque;
++
++use npt_client::{Applied, CorrectionKind, Predictor, TRACE_UM};
++use npt_sim::{
++    Attribute, AttributeChange, Command, EntityKind, EntityRecord, HitHistory, Placement, Scene,
++    SimCore, TickInput, World,
++};
++
++/// The room's first tick.
++const FIRST: u32 = 100;
++
++/// A record as the wire carries it (npt-room's `wire`): no area, no values before the snap.
++fn wire(r: &EntityRecord) -> EntityRecord {
++    EntityRecord {
++        area: 0,
++        raw: [0; EntityRecord::FIELDS],
++        ..*r
++    }
++}
++
++/// The client's command number `k`: heading `k % 4` (so a command run again moves otherwise), aimed 10 m south of
++/// the map's centre, fire held when `fire`, a fire press every 7 commands.
++fn command(k: u32, fire: bool, presses: &mut [u8; 4]) -> Command {
++    const HEADINGS: [[i8; 2]; 4] = [[127, 0], [0, 127], [-127, 0], [0, -127]];
++    if k % 7 == 3 {
++        presses[Command::PRESS_FIRE] = presses[Command::PRESS_FIRE].wrapping_add(1);
++    }
++    Command {
++        buttons: if fire { Command::FIRE } else { 0 },
++        presses: *presses,
++        move_xy: HEADINGS[(k % 4) as usize],
++        aim: [0, -1_000, 140],
++        ..Command::default()
++    }
++}
++
++fn attribute(attribute: Attribute, value: u32) -> AttributeChange {
++    AttributeChange {
++        slot: 0,
++        attribute,
++        value,
++    }
++}
++
++/// One snapshot on its way: its tick, the client tick it arrives at, its header's two sequences, its records.
++struct Snap {
++    tick: u32,
++    at: u32,
++    last_run: Option<u32>,
++    newest: Option<u32>,
++    own: Vec<EntityRecord>,
++    entities: Vec<EntityRecord>,
++}
++
++/// The stand-in room and its client (the module text).
++struct Lab {
++    authority: World,
++    history: HitHistory,
++    client: Predictor,
++    lead: u32,
++    delay: u32,
++    fire: bool,
++    presses: [u8; 4],
++    made: Vec<Command>,
++    inbox: VecDeque<Snap>,
++    /// The command the room never gets before its tick (and the one after it arrives with it, at that tick).
++    late: Option<u32>,
++    ran: Option<(u32, Command)>,
++    /// The room's own changes by tick: attribute changes, and moves of the soldier by x cm (teleports).
++    changes: Vec<(u32, AttributeChange)>,
++    nudges: Vec<(u32, i32)>,
++    /// From this tick on, the own-state record's move speed sent as this value (PM-0001-60/own-state-missing's effect).
++    doctor: Option<(u32, i32)>,
++    /// From this tick on, both own records' generation sent one higher (a respawn, as the client meets it).
++    reborn: Option<u32>,
++    applied: Vec<Applied>,
++    /// The drawn correction's length, m, at each client tick after its snapshots.
++    offsets: Vec<f32>,
++}
++
++impl Lab {
++    fn new(lead: u32, delay: u32, prep: impl FnOnce(Predictor) -> Predictor) -> Lab {
++        let scene = Scene::course();
++        let mut client = prep(Predictor::new(&scene, 2, 30));
++        client.set_slot(0);
++        Lab {
++            authority: World::new(&scene, 1, FIRST),
++            history: HitHistory::for_ms(2_000).expect("2 s of ticks"),
++            client,
++            lead,
++            delay,
++            fire: false,
++            presses: [0; 4],
++            made: Vec::new(),
++            inbox: VecDeque::new(),
++            late: None,
++            ran: None,
++            changes: Vec::new(),
++            nudges: Vec::new(),
++            doctor: None,
++            reborn: None,
++            applied: Vec::new(),
++            offsets: Vec::new(),
++        }
++    }
++
++    /// The command stamped for tick `t`: the client stamps its command number `k` at its tick FIRST + k.
++    fn index_for(&self, t: u32) -> Option<u32> {
++        t.checked_sub(FIRST + self.lead)
++    }
++
++    fn soldier(&self) -> EntityRecord {
++        *self
++            .authority
++            .entity_records()
++            .iter()
++            .find(|r| r.kind == EntityKind::Soldier && r.index == 0)
++            .expect("slot 0's soldier")
++    }
++
++    fn run(&mut self, ticks: u32) {
++        for _ in 0..ticks {
++            let t = self.authority.next_tick();
++            // The client's tick t: the snapshots that arrived, then its command for t + lead, then the fade's tick.
++            while self.inbox.front().is_some_and(|s| s.at <= t) {
++                let s = self.inbox.pop_front().expect("a snapshot");
++                self.client.received(s.tick, s.newest, s.last_run);
++                if let Some(r) = s.last_run {
++                    self.client.snapshot(s.tick, r, &s.own, &s.entities);
++                }
++            }
++            self.applied.extend(self.client.take_applied());
++            let o = self.client.offset();
++            self.offsets.push((o[0] * o[0] + o[1] * o[1] + o[2] * o[2]).sqrt());
++            let k = self.made.len() as u32;
++            let c = command(k, self.fire, &mut self.presses);
++            self.client.command(k, t + self.lead, &c);
++            self.made.push(c);
++            self.client.advance();
++            // The room's tick t: its own changes, then the command stamped for t, or at a late one's tick the last run.
++            let mut input = TickInput {
++                tick: t,
++                ..TickInput::default()
++            };
++            input.attributes.extend(self.changes.iter().filter(|c| c.0 == t).map(|c| c.1));
++            for &(_, dx) in self.nudges.iter().filter(|n| n.0 == t) {
++                let g = self.soldier().grid;
++                input.teleports.push(Placement {
++                    slot: 0,
++                    position: [g[0] + dx, g[1], g[2]],
++                });
++            }
++            if let Some(k) = self.index_for(t) {
++                if Some(k) != self.late {
++                    self.ran = Some((k, self.made[k as usize]));
++                }
++                if let Some((_, c)) = self.ran {
++                    input.commands.push((Command { tick: t, ..c }, None));
++                }
++            }
++            self.authority.step(&input, &self.history);
++            self.history.push(self.authority.hit_volumes());
++            let records = self.authority.entity_records();
++            let mut own = [EntityKind::Soldier, EntityKind::OwnState].map(|kind| {
++                wire(records.iter().find(|r| r.kind == kind && r.index == 0).expect("slot 0's"))
++            });
++            if let Some((from, v)) = self.doctor
++                && t >= from
++            {
++                own[1].grid[6] = v;
++            }
++            if self.reborn.is_some_and(|from| t >= from) {
++                for r in &mut own {
++                    r.generation += 1;
++                }
++            }
++            let entities = records
++                .iter()
++                .filter(|r| r.index != 0 || !matches!(r.kind, EntityKind::Soldier | EntityKind::OwnState))
++                .map(wire)
++                .collect();
++            // The newest received: the command stamped for the next tick (it reached the room in time); a late one
++            // and the one after it arrive at its tick.
++            let next = self.index_for(t + 1);
++            let newest = match self.late {
++                Some(x) if next == Some(x) => x.checked_sub(1),
++                Some(x) if self.index_for(t) == Some(x) => Some(x + 1),
++                _ => next,
++            };
++            self.inbox.push_back(Snap {
++                tick: t,
++                at: t + self.delay,
++                last_run: self.ran.map(|r| r.0),
++                newest,
++                own: own.to_vec(),
++                entities,
++            });
++        }
++    }
++
++    /// The applied snapshot of `tick`.
++    fn at(&self, tick: u32) -> Applied {
++        *self
++            .applied
++            .iter()
++            .find(|a| a.tick == tick)
++            .unwrap_or_else(|| panic!("no snapshot of tick {tick} applied"))
++    }
++}
++
++/// The fade's ticks and the commands held follow the rate (carry 6's pattern: no constant derived from the tick rate
++/// outside npt-sim): 100 ms is 3 ticks at 30 Hz and 6 at 60 Hz, 2 s is 60 and 120.
++#[test]
++fn the_fade_and_the_history_follow_the_rate() {
++    let scene = Scene::course();
++    assert_eq!(Predictor::new(&scene, 1, 30).counts(), (3, 60));
++    assert_eq!(Predictor::new(&scene, 1, 60).counts(), (6, 120));
++}
++
++/// -41 at unit scale: every command in time, a lead of 3 and a delay of 2, fire held: every snapshot after the first
++/// is skipped bit for bit and none corrects; with the skip off (suite `cues`) every one replays its 4 newer commands and
++/// none corrects either, so the skip and the replay hold equal state (section 3's -41 row).
++#[test]
++fn p41_every_command_in_time_makes_no_correction_skipped_or_replayed() {
++    for always in [false, true] {
++        let mut lab = Lab::new(3, 2, |p| if always { p.with_replay_always() } else { p });
++        lab.fire = true;
++        lab.run(200);
++        let a = &lab.applied;
++        assert!(a.len() > 190, "{} applied", a.len());
++        assert!(a.iter().all(|x| x.correction.is_none()), "always {always}");
++        assert!(
++            a[1..].iter().all(|x| x.skipped != always && x.replayed == if always { 4 } else { 0 }),
++            "always {always}"
++        );
++    }
++}
++
++/// -41's trace: one command late at the room (its tick runs the last command again, then it is dropped): the snapshot
++/// of its tick and the next correct, each traced to it; none untraced; then the snapshots skip again.
++#[test]
++fn p41_a_late_command_makes_only_traced_corrections() {
++    let mut lab = Lab::new(3, 2, |p| p);
++    lab.late = Some(60);
++    lab.run(200);
++    let tick = FIRST + 3 + 60;
++    let c: Vec<(u32, _)> = lab
++        .applied
++        .iter()
++        .filter_map(|a| a.correction.map(|c| (a.tick, c)))
++        .collect();
++    assert_eq!(c.iter().map(|x| x.0).collect::<Vec<_>>(), [tick, tick + 1], "{c:?}");
++    assert!(
++        c.iter().all(|(_, c)| c.traced && c.kind == CorrectionKind::Fade && c.size_um > TRACE_UM),
++        "{c:?}"
++    );
++    assert_eq!(lab.applied.iter().filter(|a| a.corrected()).count(), 2);
++    assert_eq!(lab.applied.iter().filter(|a| a.untraced()).count(), 0);
++    assert!(lab.applied.iter().filter(|a| a.tick > tick + 1).all(|a| a.skipped));
++}
++
++/// -60 at unit scale (U4G-Q3, Q5): a move-speed change while the soldier walks, then a fire-interval change while it
++/// fires, each by the room alone with every command in time: one untraced correction each, at the first snapshot that
++/// carries it, none after; each closed change says so, with its blind time (the 4 commands replayed there). -41's count
++/// sees the move-speed one alone: the fire interval moves nothing (a correction of 0 µm).
++#[test]
++fn p60_each_own_change_makes_one_correction_at_its_first_snapshot() {
++    let mut lab = Lab::new(3, 2, |p| p);
++    lab.fire = true;
++    lab.changes = vec![
++        (150, attribute(Attribute::MoveSpeed, 700)),
++        (200, attribute(Attribute::FireInterval, 130_000)),
++    ];
++    lab.run(260);
++    lab.client.close();
++    let changes = lab.client.take_own_changes();
++    assert_eq!(changes.len(), 2, "{changes:?}");
++    let firsts: Vec<_> = changes.iter().map(|c| (c.attribute, c.from, c.to, c.tick)).collect();
++    assert_eq!(
++        firsts,
++        [
++            (Attribute::MoveSpeed, 600, 700, 150),
++            (Attribute::FireInterval, 100_000, 130_000, 200)
++        ]
++    );
++    for c in &changes {
++        assert_eq!((c.corrections, c.misplaced, c.later_over_1mm), (1, 0, 0), "{c:?}");
++        assert_eq!(c.blind_ns, 4 * 33_333_333, "{c:?}");
++    }
++    assert!(changes[0].first_size_um > TRACE_UM && changes[1].first_size_um == 0, "{changes:?}");
++    let untraced: Vec<u32> = lab
++        .applied
++        .iter()
++        .filter(|a| a.correction.is_some_and(|c| !c.traced))
++        .map(|a| a.tick)
++        .collect();
++    assert_eq!(untraced, [150, 200]);
++    assert_eq!(lab.applied.iter().filter(|a| a.untraced()).count(), 1);
++}
++
++/// PM-0001-60/own-state-missing's effect at the client (its site is npt-room's): a move-speed change whose snapshots
++/// keep the old value corrects at (nearly) every snapshot while the soldier walks, and opens no change.
++#[test]
++fn p60_an_own_state_section_without_the_change_corrects_every_snapshot() {
++    let mut lab = Lab::new(3, 2, |p| p);
++    lab.changes = vec![(150, attribute(Attribute::MoveSpeed, 700))];
++    lab.doctor = Some((150, 600));
++    lab.run(220);
++    let after: Vec<&Applied> = lab.applied.iter().filter(|a| a.tick >= 150).collect();
++    let corrected = after.iter().filter(|a| a.correction.is_some()).count();
++    assert!(corrected * 10 >= after.len() * 9, "{corrected} of {}", after.len());
++    lab.client.close();
++    assert!(lab.client.take_own_changes().is_empty());
++}
++
++/// The fade, the snap and the clear (ADR 0001 part 4; section 3's row), with -42's and -55's 5 cm flag: the room alone
++/// moves the soldier 30 cm (under 2 m: drawn whole at once, then over 100 ms, 3 ticks at 30 Hz, to 0) and 4 cm (above
++/// 1 mm, under the flag); then 30 cm and at the next tick 5 m (2 m or more: snapped, the running fade cleared); then 30
++/// cm and at the next tick a respawn as the client meets it (the generation one higher: cleared, counted apart).
++#[test]
++fn fade_snap_and_clear_and_the_5_cm_flag() {
++    let mut lab = Lab::new(3, 2, |p| p);
++    lab.nudges = vec![(140, 30), (170, 4), (199, 30), (200, 500), (229, 30)];
++    lab.reborn = Some(230);
++    lab.run(260);
++    let drawn = |t: u32| lab.offsets[(t - FIRST) as usize];
++    let near = |x: f32, want: f32| (x - want).abs() < 1e-4;
++    // 30 cm at tick 140, applied at the client's tick 142.
++    let c = lab.at(140).correction.expect("a correction at 140");
++    assert_eq!((c.size_um, c.kind, c.traced), (300_000, CorrectionKind::Fade, false));
++    assert!(lab.at(140).over_5cm() && lab.at(140).untraced());
++    let fade: Vec<f32> = (141..=146).map(drawn).collect();
++    assert!(
++        near(fade[0], 0.0) && near(fade[1], 0.3) && near(fade[2], 0.2) && near(fade[3], 0.1) && near(fade[4], 0.0),
++        "{fade:?}"
++    );
++    // 4 cm: above 1 mm, not above 5 cm.
++    let small = lab.at(170);
++    assert_eq!(small.correction.map(|c| c.size_um), Some(40_000));
++    assert!(small.corrected() && !small.over_5cm());
++    // 5 m while the 30 cm fade runs: snapped, cleared; counted apart from -41's untraced.
++    let snap = lab.at(200);
++    assert_eq!(snap.correction.map(|c| c.kind), Some(CorrectionKind::Snap));
++    assert!(!snap.untraced());
++    assert!(near(drawn(201), 0.3) && near(drawn(202), 0.0), "{} {}", drawn(201), drawn(202));
++    // The respawn while the next fade runs: cleared, counted apart.
++    let reborn = lab.at(230);
++    assert_eq!(reborn.correction.map(|c| c.kind), Some(CorrectionKind::Respawn));
++    assert!(!reborn.untraced());
++    assert!(near(drawn(231), 0.3) && near(drawn(232), 0.0), "{} {}", drawn(231), drawn(232));
++    assert!(lab.applied.iter().filter(|a| a.tick > 230).all(|a| a.skipped));
 +}
 diff --git a/spikes/netcode-proof/crates/sim/tests/predict.rs b/spikes/netcode-proof/crates/sim/tests/predict.rs
 new file mode 100644

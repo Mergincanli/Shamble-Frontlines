@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 07:32 UTC: U4f2 waits on F-B-COUNT (his Advisor); U4g's early builder: block 1 (sim) built
-  (+2/+5; NC-F1-4's plant fails by name), its block-end run going; -58's 3 counters moved to the re-base (cond. 3).
+- **Last update:** 2026-11-21 07:49 UTC: U4g's builder stopped on disk (3.79 GB; 3.8 GB a worktree path, not 0.5-1.5);
+  P27 dev part-clean 07:4x (5.4 GiB; free 9.37 GB); U4G-DISK (a), a clean between cycles: 2a's cycle resumed 07:49.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -64,9 +64,8 @@
   history.md:7255-7271 by record_u4f2_size.py): **U4f2's size line** (SIZE-CHECK): about 1,700 to 2,250 added lines (up
   to about 2,700 at 1.2), the four riders included; **the stop past 3,000 at a block end**. Brief u4f2-brief.md rev 1.2,
   filled at launch (`<base>` a289def, counts 642/739). **The build starts now.**
-- **Pointers:** the advisor's -20 ruling (ADV-U4F20-1 High: npt-sim's one-edge rule) and U4f-F1's build line at
-  history.md:7195-7206 (card_trim_1120d.py); -20 and -22's first set records and F1's plan line at :7209-7216 (1120e).
-  **-20's L1 now PASSES on F1's fix** (46ca143; its record at u4f-report.md item 5's end; u4f-f1-report.md).
+- **Pointers:** the -20 ruling (ADV-U4F20-1 High) and F1's build line: history.md:7195-7206; -20 and -22's first set
+  records and F1's plan line: :7209-7216. **-20's L1 now PASSES on F1's fix** (46ca143; u4f-report.md item 5's end).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-21 by the advisor's U4G-EARLY ruling (advisor-u4g-early.md:156-158; to name in the 2026-11-22 message by
@@ -175,9 +174,10 @@
   **U5-ALLOC and U5-SIZE are his** (final texts, section 8; neither a stop): in the next day's message (2026-11-22's),
   with the U4H texts if his U4G-Q1 answer has come. Register lines before U5's launch (section 9). S's letter: U4b 701
   (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
-- **U4G-EARLY APPROVED W/ CONDITIONS 1-10** (advisor-u4g-early.md): builder from 07:00 in .claude/worktrees/agent-abc25909b7dd4ad30
-  (ff to b25ee7d 07:03); fill u4g-brief.md §9 (`<base>` 8f9d97d, 1faf894's code, 642/739, 1,207 s). **Size line:**
-  prediction half ~2,100-3,700 (stop past 6,000); blocks 1-4 ~1,120-1,920 (past ~2,900: advisor). F-B-COUNT: stop it first.
+- **U4G-EARLY APPROVED W/ CONDITIONS 1-10** (advisor-u4g-early.md): builder in .claude/worktrees/agent-abc25909b7dd4ad30
+  (ff to b25ee7d; fill u4g-brief.md §9: `<base>` 8f9d97d, 642/739, 1,207 s). Block 1 done (644/744, 457 lines); 2a written
+  (776, uncompiled); snapshot wip/u4g-early.patch a842de67… (61,743 B); -58's 3 counters to the re-base. **Size line:**
+  prediction half ~2,100-3,700 (stop 6,000); blocks 1-4 ~1,120-1,920 (past ~2,900: advisor). F-B-COUNT: stop it, clean.
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch).
   **Check-in on again 06:43 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause it when no agent runs); saver bqiy6tzo9 from
