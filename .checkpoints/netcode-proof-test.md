@@ -54,12 +54,8 @@
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
 ## Now: U4f (clock and commands; u4-build-plan.md §5 :805-816; size M)
-- **Moved to history.md:7060-7088** (card_trim_1119i.py, 20:1x UTC): U4f's filled brief (u4f-brief.md, sha256
-  135325a0…, 2,040 lines, `<base>` 5b29296b), the advisor's build-1 ruling (advisor-u4f-build1.md), builder 3's stop
-  line and MAIN-61's done line (a6acc8a, pushed 631edf3, CI green; advisor-main-61-head.md).
-- **LEAD-BOUND (a), 400 ms frozen, and SIZE-U4F (a), U4f2 its own unit:** their answer lines word for word at
-  history.md:7492-7505 (card_trim_1121b.py, 05:1x UTC); his words at history.md:6791 on (LEAD-BOUND) and :6896-6903
-  (SIZE-U4F).
+- **Moved to history.md:7060-7088** (1119i): U4f's filled brief (u4f-brief.md 135325a0…), the build-1 ruling, MAIN-61.
+  **LEAD-BOUND (a), 400 ms frozen; SIZE-U4F (a), U4f2 its own unit:** history.md:7492-7505; his words :6791, :6896-6903.
 - **U4F2-SIZE ANSWERED: (a), build U4f2 whole** (Mustafa, 2026-11-20 14:10:29 UTC; word for word at
   history.md:7255-7271 by record_u4f2_size.py): **U4f2's size line** (SIZE-CHECK): about 1,700 to 2,250 added lines (up
   to about 2,700 at 1.2), the four riders included; **the stop past 3,000 at a block end**. Brief u4f2-brief.md rev 1.2,
@@ -68,6 +64,10 @@
   records and F1's plan line: :7209-7216. **-20's L1 now PASSES on F1's fix** (46ca143; u4f-report.md item 5's end).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
+- **2026-11-21 by the advisor's U6 brief check (advisor-u6-brief.md:176-232; register 112-119; to name in the message
+  that carries U6-SIZE, 2026-11-23):** U6-Q2 bots' glue, npt-load and E14's floods in U6d; Q4 the interest writers in
+  U6a; Q13 the swap form; Q15 the cheap wins' bench; Q16 ops/units/; Q17 the certificate in U6b; Q18 no 90-day fallback;
+  Q21 C-U6-19's line widened. Why: inside the plan, undoable, no pass mark, judge, marks.json or money; nothing on main.
 - **2026-11-21 by the advisor's SEC-U5D ruling (advisor-u5-early.md:267-356; to name in the 2026-11-22 message):**
   fuzz_target!'s two exports a recorded dependency-macro case beside the four unsafe exceptions, not a fifth (no
   `#[allow]` can exist under forbid), with check.mjs pins and plants; SEC-U5D-4's guard (u5-fuzz-guard.sh 2edc7b13…);
@@ -160,9 +160,9 @@
   2 (netcode, test, rust), R6, the merge, the r2 rows and -21's set; any U5 builder yields first (U5-EARLY cond. 6).
 - **U4h's brief rev 2.1 READY** (u4h-brief.md; rev-2 check's conditions met; register 94-101, u4s-carries.md:618-659).
   **U4H-Q4, U4H-SIZE, U4H-JUDGE** (section 8) are in the 2026-11-22 message's draft (msg-2026-11-22.md); none a stop.
-- **U6's brief rev 2 written 18:1x** (u6-brief.md; facts u6-facts.md; rev 1's check advisor-u6-brief.md: APPROVE WITH
-  CONDITIONS 1-9, ADV-U6B-1 High met by the recount: 11,200-12,450 in U6a-U6d + U6j; rulings filed as register 112-119);
-  its sections 1, 6, 8 to the advisor's short check (condition 9); U6-SIZE and U6-JUDGE his, a day's message after it.
+- **U6's brief rev 2.1 READY 18:2x** (u6-brief.md; facts u6-facts.md; advisor-u6-brief.md: rev 1 APPROVE WITH
+  CONDITIONS 1-9, ADV-U6B-1 High met by the recount, 11,200-12,450 in U6a-U6d + U6j; rev 2's short check APPROVE).
+  **U6-SIZE and U6-JUDGE** (its section 8, final) go in the 2026-11-23 day's message; neither is a stop.
 - **U5's brief rev 2.1** (u5-brief.md; rev-2 check advisor-u5-brief.md:324-430; option (a)'s bars, u5-alloc-bounds.md).
   **U5-ALLOC and U5-SIZE are his** (section 8), in the 2026-11-22 message's draft (msg-2026-11-22.md).
 - **U4G-EARLY's half DONE 09:2x** (advisor-u4g-early.md; worktree .claude/worktrees/agent-abc25909b7dd4ad30, kept):

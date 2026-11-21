@@ -317,3 +317,39 @@ size); my series grep matches each name's last segment as a string literal, so a
 as missing (I expect few); I read no reviewer seat's view and ran nothing (no build, by the rules of this check).
 
 DONE
+
+## Condition 9: the short check of rev 2's sections 1, 6 and 8 (2026-11-21)
+Read: u6-brief.md rev 2 (196 lines), whole, and its cites into this file (:27-33, :34-44, :64-71, :77-78, :81-86,
+:128-174, :226-232, :246-252: each points at the passage it names).
+
+- **Section 1, the sums: all hold.** U6a 750 + 250-450 + 800 + 600 + 150-200 = 2,550-2,800; U6b 750 + 350 + 400 + 700
+  + 400 + 150 + 300-500 + 100-150 = 3,150-3,400; U6c 400 + 350 + 400-800 + 350 + 700 + 300 + 250 = 2,750-3,150; U6d
+  750 + 150 + 650 + 250 + 600 + 200-400 + 150-300 = 2,750-3,100; whole 11,200-12,450; U6j 400 + 20 x 65-140 =
+  1,700-3,200. U6d no longer holds J1. Every piece is under about 3,500.
+- **Stops: all hold.** U6a keeps 6,000; U6b twice 3,275 = 6,550, capped at 6,000; U6c twice 2,950 = 5,900; U6d twice
+  2,925 = 5,850; U6j twice 2,450 = 4,900. At 1.5 times each top stays under its stop (U6a 4,200; U6b 5,100; U6c 4,725;
+  U6d 4,650; U6j 4,800 against 4,900, the closest), so section 6's sentence holds.
+- **Section 6: holds.** The basis named (judgements, not counts; the additions; the judge at U4h's per-figure cost), M
+  set before counting, about thirty follow-ups after rev 3.3 (b90fb7e), the growth line, "about halfway" (6,000 of a
+  middle of 11,825 is 51 %), U4g's and U4h's split form, the split his.
+- **Section 8: both texts hold.** U6-SIZE: whole "about 11,200 to 12,500" (12,450 rounded); (a)'s "about 24,000" is
+  twice 11,825 = 23,650, rounded to the thousand: acceptable; the four parts' figures match the table; process control
+  under U6c, the replay under U6d. U6-JUDGE: 1,700-3,200, stop about 4,900, (a)'s 400-800 a part (1,700-3,200 over
+  four), 12 marks under (c), and the last line now "after U6's last part", which matches section 2.
+- **Departure 1, -30's container runner in U6d: Ruled, accepted.** With it U6b would be 3,300-3,700, past the line I
+  set; the runner hosts clients on WtClient and WsClient, which is B1's kind of glue, and its crate (npt-lab) is
+  already U6d's. The cost is only timing: -30's container run moves from after U6b to after U6d and J1, still a
+  container run long before U8 (register 88 asks only that -30 stays NOT-RUN until U6). U6b's own loopback tests still
+  cover each transport. No register entry changes (my runner home was a note in item 1, not a ruling of item 3).
+- **Departure 2, npt-super in U6c: Ruled, accepted; the error was mine.** My piece sizes (:77-78) kept H3 in U6c, and my
+  text's "process control" under U6d contradicted them. H4 stays in U6c too (U6c is under 3,500, so the move I allowed
+  is not needed); the order still holds, since H2 in U6d sits behind H4's `npt-cert`.
+- **One Low, an optional Edit with no new check:** the U6-SIZE text gives only U6a's stop. As both precedents give each
+  part's stop (u4h-brief.md:343-345), add them after the estimates: U6b "(about 3,150 to 3,400; stop past 6,000)", U6c
+  "(about 2,750 to 3,150; stop past about 5,900)", U6d "(about 2,750 to 3,100; stop past about 5,850)".
+
+**Verdict on rev 2's sections 1, 6 and 8: APPROVE.** Conditions 1-9 are met for the parts I checked; both departures
+accepted; the Low above is optional. U6-SIZE and U6-JUDGE may go into a day's message as written (with or without that
+Edit). Leans unchanged: (b) and (b), both his, neither a stop.
+
+DONE

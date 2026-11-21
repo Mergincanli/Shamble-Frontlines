@@ -1,7 +1,8 @@
-# U6's brief, rev 2 (2026-11-21; WAIT-PLAN (a) part 2, history.md:7511-7516): U6's build plan and its split
-Rev 1 (164 lines) went to the advisor: APPROVE WITH CONDITIONS 1-9 (advisor-u6-brief.md, 319 lines; ADV-U6B-1 High:
-blocks missing). Rev 2 meets them; sections 1, 6 and 8 go back for its short check (condition 9) before U6-SIZE and
-U6-JUDGE reach him. The brief says what U6 builds, in which pieces, how each is tested and what is open; it points to
+# U6's brief, rev 2.1 (2026-11-21; WAIT-PLAN (a) part 2, history.md:7511-7516): U6's build plan and its split
+Rev 1 (164 lines) went to the advisor: APPROVE WITH CONDITIONS 1-9 (advisor-u6-brief.md; ADV-U6B-1 High: blocks
+missing). Rev 2 met them; the advisor's short check of its sections 1, 6 and 8 (condition 9): APPROVE, both departures
+accepted, one optional Low (a stop for each part in U6-SIZE's text) made here as rev 2.1, no new check needed. READY:
+U6-SIZE and U6-JUDGE go to him as written, in the 2026-11-23 day's message. The brief says what U6 builds, in which pieces, how each is tested and what is open; it points to
 plan.md:1253 (U6's row), u6-facts.md (369 lines, every fact cited) and advisor-u6-brief.md, and repeats none of them.
 Nothing here is built before U4 closes and U5 merges (the pieces share files with them: u6-facts.md:295-322).
 
@@ -144,11 +145,11 @@ through.
     U6a the room server's core: the tick loop, the session and join changes, the room's speed fixes and its
     measurements of who sees whom (about 2,550 to 2,800 lines; stop past 6,000);
     U6b the two transports on this machine's simulated network, and the server sending less when a link is congested
-    (about 3,150 to 3,400);
+    (about 3,150 to 3,400; stop past 6,000);
     U6c the control plane, the server's measurements and logs, its test controls and process control (about 2,750 to
-    3,150);
+    3,150; stop past about 5,900);
     U6d the timing probe, the page host and its certificates, the load generator, the hostile test clients and the
-    replay of recorded matches over both transports (about 2,750 to 3,100).
+    replay of recorded matches over both transports (about 2,750 to 3,100; stop past about 5,850).
 No pass mark, judge rule or marks.json text changes under either, and no run is dropped.
 The cheaper option is (b): three more reviews and merges, and no mid-build stop waiting on you. U6 starts only after
 U4 and U5 close, and its first part is built first either way, so nothing waits for this answer until that part is
