@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 07:01 UTC: U4f2 waits on F-B-COUNT (his Advisor); U5's brief rev 2.1 READY; U4G-EARLY
-  APPROVED WITH CONDITIONS 1-10: U4g's blocks 1-4 builder running from 07:00 (Running work).
+- **Last update:** 2026-11-21 07:32 UTC: U4f2 waits on F-B-COUNT (his Advisor); U4g's early builder: block 1 (sim) built
+  (+2/+5; NC-F1-4's plant fails by name), its block-end run going; -58's 3 counters moved to the re-base (cond. 3).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
