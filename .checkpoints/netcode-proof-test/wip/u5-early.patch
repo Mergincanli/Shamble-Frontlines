@@ -3145,3 +3145,351 @@ index 0000000..c96329c
 +overflow-checks = true
 +[profile.release.package.npt-proto]
 +overflow-checks = true
+diff --git a/spikes/netcode-proof/fuzz/fuzz_targets/input.rs b/spikes/netcode-proof/fuzz/fuzz_targets/input.rs
+new file mode 100644
+index 0000000..0d252fc
+--- /dev/null
++++ b/spikes/netcode-proof/fuzz/fuzz_targets/input.rs
+@@ -0,0 +1,7 @@
++//! PM-0001-34's Input part: the room's decode of a client's `Input` datagram, judged by npt_fuzz's shared check.
++#![no_main]
++
++use libfuzzer_sys::fuzz_target;
++
++// The two exports this macro expands, and why the crate's forbid does not see them: npt_fuzz's crate doc (SEC-U5D-1).
++fuzz_target!(|data: &[u8]| npt_fuzz::check("Input", data));
+diff --git a/spikes/netcode-proof/fuzz/src/lib.rs b/spikes/netcode-proof/fuzz/src/lib.rs
+new file mode 100644
+index 0000000..64aceb6
+--- /dev/null
++++ b/spikes/netcode-proof/fuzz/src/lib.rs
+@@ -0,0 +1,329 @@
++//! npt-fuzz: the shared check of PM-0001-34's fuzz targets (U5 Block 3; u5-brief.md §1.4 Block 3). Each target is one
++//! file under fuzz_targets/ that hands libFuzzer's bytes to [`check`] with its message type's name.
++//!
++//! **Per input:** the harness writes the channel's framing and the type's byte (each target pins its type, so it meets
++//! its own type's path only), then the fuzzer's bytes after them; that copy is made before npt-alloc's window opens. The
++//! window holds the decode call alone, once for each way the type's receivers decode it (Ping and Pong: the room's and
++//! the client's). After it closes, the harness judges what it saw ([`judge`]): an input over its type's limit must be
++//! refused with nothing allocated (catalogue §6 at U4 item 3's allocation half); an input within it must ask for no
++//! single request larger than its type's bar ([`Part::bar`]). A failure prints one `npt-fuzz: OVER:` line and aborts,
++//! so libFuzzer keeps the input as a crash; the decision is never taken inside the allocator. Each run prints a header
++//! line (its part, its limit, its bar and every type's bar) and a record line at each new largest request.
++//!
++//! **The bars** are option (a) of his open U5-ALLOC (u5-alloc-bounds.md:224-245, measured at rustc 1.99.1): the most a
++//! message within its limit can make the decoder ask for at once. His answer may change the bar, never the figures:
++//! every call's largest request and total are recorded whichever bar applies.
++//!
++//! **The exports libfuzzer-sys's macro writes into this crate** (the advisor's SEC-U5D-1 ruling): each target's one
++//! `fuzz_target!` call expands two `#[no_mangle] pub extern "C"` functions in the target's binary,
++//! `LLVMFuzzerInitialize` and `rust_fuzzer_test_input`, plus a safe function holding the closure, as the dependency
++//! read cleared libfuzzer-sys 0.4.13 (security-u5-deps.md:96-115). rustc does not lint another crate's macro, so this
++//! crate's forbid of unsafe_code does not see them; nothing else exported or unsafe is written here by hand. check.mjs's
++//! deps step holds that: one `fuzz_target!` per fuzz_targets/ file and no other libfuzzer_sys macro, no `no_mangle`,
++//! `export_name`, `link_section` or `extern` (fuzzProblems), and libfuzzer-sys at exactly 0.4.13 in fuzz/Cargo.lock
++//! (fuzzLockProblems).
++
++use std::sync::Once;
++use std::sync::atomic::{AtomicU64, Ordering};
++
++use npt_alloc::Counts;
++use npt_link::Channel;
++use npt_proto::{Direction, Limits, decode};
++
++/// Every target's allocator: npt-alloc's, so each decode call's window counts (U5-Q3 term 5: it compiles under this
++/// crate's forbid).
++#[global_allocator]
++static ALLOC: npt_alloc::Counting = npt_alloc::Counting;
++
++/// One fuzzed message type: its type byte (its row in [`Limits::TYPES`], from 1), the ways its receivers decode it, and
++/// its bar, the largest single request in bytes a message within its limit may make the decoder ask for.
++#[derive(Debug)]
++pub struct Part {
++    pub ty: u8,
++    pub ways: &'static [Direction],
++    pub bar: u64,
++}
++
++const ROOM: &[Direction] = &[Direction::ClientToRoom];
++const CLIENT: &[Direction] = &[Direction::RoomToClient];
++/// Ping and Pong: the room's way and the client's, two decode calls per input (ADV-U5B-20).
++const BOTH: &[Direction] = &[Direction::ClientToRoom, Direction::RoomToClient];
++
++/// One row of [`PARTS`].
++const fn row(ty: u8, ways: &'static [Direction], bar: u64) -> Part {
++    Part { ty, ways, bar }
++}
++
++/// The bars, one per type, option (a) of U5-ALLOC (u5-alloc-bounds.md:224-245; the site each comes from beside it).
++pub const PARTS: [Part; 15] = [
++    // Input: input.rs:212 reserves its count's commands, 8 x 32 B.
++    row(1, ROOM, 256),
++    // Snapshot, the decoder alone: its entities grow by push to 512 x 104 B (snapshot.rs:599-608); through the
++    // client its bar depends on the held state (Block 4).
++    row(2, CLIENT, 53_248),
++    // FullState, the decoder alone: 16,384 x 104 B (snapshot.rs:705-708); through the client 2,213,272 (Block 4).
++    row(3, CLIENT, 1_703_936),
++    row(4, ROOM, 0),
++    row(5, BOTH, 0),
++    row(6, BOTH, 0),
++    row(7, ROOM, 0),
++    row(8, CLIENT, 0),
++    row(9, CLIENT, 0),
++    row(10, ROOM, 0),
++    row(11, CLIENT, 0),
++    row(12, ROOM, 0),
++    row(13, CLIENT, 0),
++    // SessionControl: its note, up to 480 B (control.rs:285).
++    row(14, ROOM, 480),
++    row(15, CLIENT, 0),
++];
++
++impl Part {
++    /// Its type's name, as [`Limits::TYPES`] gives it.
++    pub fn name(&self) -> &'static str {
++        Limits::TYPES[usize::from(self.ty) - 1].0
++    }
++
++    /// The channel its type travels on.
++    pub fn channel(&self) -> Channel {
++        Limits::TYPES[usize::from(self.ty) - 1].1
++    }
++
++    /// The most bytes a receiver takes, framing included: the catalogue's limit, which counts a control message's 2 B
++    /// length and not a full state's 4 B length; `Snapshot`'s receive limit (msg.rs:244-263).
++    pub fn limit(&self) -> usize {
++        let limit = Limits::TYPES[usize::from(self.ty) - 1].3;
++        match (self.ty, self.channel()) {
++            (2, _) => Limits::SNAPSHOT_RECEIVE,
++            (_, Channel::FullState) => 4 + limit,
++            _ => limit,
++        }
++    }
++
++    /// The message the harness feeds: the channel's framing (a length that states the rest exactly), the type byte,
++    /// then `data`, into `out`.
++    pub fn framed(&self, data: &[u8], out: &mut Vec<u8>) {
++        out.clear();
++        match self.channel() {
++            Channel::Datagram => {}
++            Channel::Control => out.extend_from_slice(
++                &u16::try_from(data.len() + 1)
++                    .unwrap_or(u16::MAX)
++                    .to_le_bytes(),
++            ),
++            Channel::FullState => out.extend_from_slice(
++                &u32::try_from(data.len() + 1)
++                    .unwrap_or(u32::MAX)
++                    .to_le_bytes(),
++            ),
++        }
++        out.push(self.ty);
++        out.extend_from_slice(data);
++    }
++}
++
++/// The part of the type called `name`.
++///
++/// # Panics
++/// If no type has that name: a target's own mistake.
++pub fn part(name: &str) -> &'static Part {
++    PARTS
++        .iter()
++        .find(|p| p.name() == name)
++        .expect("a fuzzed type's name")
++}
++
++/// One decode call judged: `data` framed for `part` outside the window, then `decode` on it inside the window alone.
++/// `Ok` with what the window saw when it holds; `Err` with why not: an input over the limit that was accepted, or that
++/// asked for memory before its refusal, or an input within the limit that asked for more at once than the bar.
++///
++/// # Errors
++/// As above, one sentence.
++pub fn judge<T, E>(
++    part: &Part,
++    way: Direction,
++    data: &[u8],
++    decode: impl FnOnce(&[u8]) -> Result<T, E>,
++) -> Result<Counts, String> {
++    let mut bytes = Vec::with_capacity(data.len() + 5);
++    part.framed(data, &mut bytes);
++    let over = bytes.len() > part.limit();
++    npt_alloc::start();
++    let result = decode(&bytes);
++    let seen = npt_alloc::stop();
++    let refused = result.is_err();
++    drop(result);
++    let at = format!(
++        "{} ({way:?}), an input of {} B against its limit of {} B",
++        part.name(),
++        bytes.len(),
++        part.limit()
++    );
++    if over && !refused {
++        Err(format!("{at}: accepted"))
++    } else if over && seen.allocations > 0 {
++        Err(format!(
++            "{at}: {} request(s), {} B, before its refusal",
++            seen.allocations, seen.bytes
++        ))
++    } else if !over && seen.largest > part.bar {
++        Err(format!(
++            "{at}: one request of {} B, over its bar of {} B",
++            seen.largest, part.bar
++        ))
++    } else {
++        Ok(seen)
++    }
++}
++
++/// The largest request and the largest total any call of this run has made: the record lines print each new largest.
++static LARGEST: AtomicU64 = AtomicU64::new(0);
++static TOTAL: AtomicU64 = AtomicU64::new(0);
++static HEADER: Once = Once::new();
++
++/// One fuzz input for the type called `name`: each way its receivers decode it, through npt-proto's [`decode`], judged
++/// by [`judge`]; a failure prints its `npt-fuzz: OVER:` line and aborts, which libFuzzer keeps as a crash.
++pub fn check(name: &str, data: &[u8]) {
++    let part = part(name);
++    HEADER.call_once(|| {
++        let bars: Vec<String> = PARTS.iter().map(|p| format!("{} {}", p.name(), p.bar)).collect();
++        eprintln!(
++            "npt-fuzz header: part {}, type {}, ways {:?}, channel {:?}, limit {} B, bar {} B; bars (U5-ALLOC option (a), B): {}",
++            part.name(),
++            part.ty,
++            part.ways,
++            part.channel(),
++            part.limit(),
++            part.bar,
++            bars.join(", ")
++        );
++    });
++    for &way in part.ways {
++        match judge(part, way, data, |b| decode(way, part.channel(), b)) {
++            Ok(seen) => {
++                let total = TOTAL
++                    .fetch_max(seen.bytes, Ordering::Relaxed)
++                    .max(seen.bytes);
++                if seen.largest > LARGEST.fetch_max(seen.largest, Ordering::Relaxed) {
++                    eprintln!(
++                        "npt-fuzz record: {} ({way:?}): largest request {} B, its total {} B in {} request(s); the run's largest total {total} B (bar {} B)",
++                        part.name(),
++                        seen.largest,
++                        seen.bytes,
++                        seen.allocations,
++                        part.bar
++                    );
++                }
++            }
++            Err(why) => {
++                eprintln!("npt-fuzz: OVER: {why}");
++                std::process::abort();
++            }
++        }
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use std::hint::black_box;
++
++    use npt_proto::{Input, Message, encode};
++    use npt_sim::Command;
++
++    use super::*;
++
++    #[test]
++    fn every_part_is_its_rows_type_and_frames_its_limit() {
++        for (k, p) in PARTS.iter().enumerate() {
++            assert_eq!(usize::from(p.ty), k + 1, "{p:?}");
++            let mut out = Vec::new();
++            p.framed(&[7; 3], &mut out);
++            let frame = match p.channel() {
++                Channel::Datagram => 0,
++                Channel::Control => 2,
++                Channel::FullState => 4,
++            };
++            assert_eq!((out.len(), out[frame]), (frame + 4, p.ty), "{}", p.name());
++        }
++        let limits: Vec<(&str, usize)> = PARTS.iter().map(|p| (p.name(), p.limit())).collect();
++        assert_eq!(
++            &limits[..3],
++            &[("Input", 166), ("Snapshot", 1_150), ("FullState", 65_540)]
++        );
++        assert_eq!(part("SessionControl").limit(), 512);
++    }
++
++    /// A decoder planted to trust a length: it reserves 1 KiB for each unit of the type's first body byte.
++    fn trusting(b: &[u8]) -> Result<Vec<u8>, ()> {
++        Ok(Vec::with_capacity(usize::from(b[1]) * 1_024))
++    }
++
++    #[test]
++    fn a_planted_decoder_that_believes_a_length_is_over_its_bar() {
++        let input = part("Input");
++        let why = judge(input, Direction::ClientToRoom, &[200], trusting).unwrap_err();
++        assert_eq!(
++            why,
++            "Input (ClientToRoom), an input of 2 B against its limit of 166 B: one request of 204800 B, over its bar of 256 B"
++        );
++        assert_eq!(
++            judge(input, Direction::ClientToRoom, &[0], trusting),
++            Ok(Counts::default())
++        );
++    }
++
++    #[test]
++    fn an_input_over_its_limit_is_refused_with_nothing_asked_for() {
++        let input = part("Input");
++        let over = [0u8; Limits::INPUT];
++        let asks = |b: &[u8]| -> Result<(), ()> {
++            black_box(Vec::<u8>::with_capacity(b.len()));
++            Err(())
++        };
++        let why = judge(input, Direction::ClientToRoom, &over, asks).unwrap_err();
++        assert!(
++            why.ends_with(
++                "167 B against its limit of 166 B: 1 request(s), 167 B, before its refusal"
++            ),
++            "{why}"
++        );
++        let accepts = |_: &[u8]| -> Result<(), ()> { Ok(()) };
++        assert!(
++            judge(input, Direction::ClientToRoom, &over, accepts)
++                .unwrap_err()
++                .ends_with(": accepted")
++        );
++        // npt-proto's own decoder: refused before any request (msg.rs:403).
++        let real = judge(input, Direction::ClientToRoom, &over, |b| {
++            decode(Direction::ClientToRoom, Channel::Datagram, b)
++        });
++        assert_eq!(real, Ok(Counts::default()));
++    }
++
++    #[test]
++    fn inputs_largest_message_reaches_its_bar_and_no_further() {
++        let commands = (0..8u32)
++            .map(|k| Command {
++                tick: 100 - k,
++                seq: 50 - k as u16,
++                view_tick: 100 - k,
++                ..Command::default()
++            })
++            .collect();
++        let mut bytes = Vec::new();
++        let msg = Message::Input(Input {
++            ack_tick: 0,
++            ack_groups: 0,
++            commands,
++        });
++        encode(&msg, &mut bytes).expect("an Input of 8 commands encodes");
++        let seen = judge(part("Input"), Direction::ClientToRoom, &bytes[1..], |b| {
++            decode(Direction::ClientToRoom, Channel::Datagram, b)
++        });
++        assert_eq!(
++            seen.map(|c| c.largest),
++            Ok(256),
++            "8 commands of 32 B, reserved at once (input.rs:212)"
++        );
++    }
++}

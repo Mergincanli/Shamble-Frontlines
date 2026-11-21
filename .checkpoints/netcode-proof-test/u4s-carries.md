@@ -822,6 +822,68 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
      launch, advisor-u5-early.md condition 10):** "U6 makes the swap a change inside crates/net (npt-net's own
      selection), and a swap that needs a line outside it comes to the advisor before -35's run (to him if it changes
      what counts)."
+112. **U6-Q2, the advisor's ruling on U6's brief (advisor-u6-brief.md:179-183; filed 2026-11-21 with U6's brief rev 2,
+     its condition 8), word for word:**
+     **U6-Q2 (npt-bots' npt-net glue and npt-load): Ruled, U6d,** as leaned: u4-build-plan.md:966-967 gives them to U6
+     "with the clock bans' reviewed allows (§4.11)", and the allows come with them; after C-U6-18 (U6a's S3: one entry
+     point for a Behaviour's host order "before npt-bots and npt-load host Behaviours", row:43). E14's network floods
+     (plan.md:473; -25 at R4), which no unit row names, go with them in U6d (they are npt-bots clients on npt-net's
+     clients); its `ws://` and wrong-Origin pages go with U7's web harness. Each is counted in the recount.
+113. **U6-Q4, the advisor's ruling on U6's brief (advisor-u6-brief.md:184-191; filed 2026-11-21 with U6's brief rev 2,
+     its condition 8), word for word:**
+     **U6-Q4 (interest under load): Ruled differently from the lean.** "Nothing new beyond U6c's per-second counters"
+     does not hold: the series -8, -9, -10 and -12 read have no writers (Notes). Interest under load is: npt-server's
+     `tick.v.region_query_ns`, `tick.v.rank_pack_ns`, `tick.v.pair_test_per_pair_ns` and `event.reflood.time_ns`, timed
+     by PhaseTimers through a phase seam the room exposes without reading a clock (§4.4: npt-room counts ticks, no clock);
+     npt-room's `tick.s.nearest8_missing_count`, `tick.s.relevant_starved_count`, `tick.s.relevant_count`,
+     `tick.v.pair_count`, `tick.v.reflood` and `header.params.area_count`. Home: U6a beside PhaseTimers (S1), since it
+     opens room.rs anyway; the seam's form chosen in U6a's brief with the netcode seat; each writer tested on Loopback
+     with a fixed scene. -8, -9, -10 and -12 are judged at R2 (plan.md:724-725) on npt-room's interest code as it stands.
+114. **U6-Q13, the advisor's ruling on U6's brief (advisor-u6-brief.md:192-197; filed 2026-11-21 with U6's brief rev 2,
+     its condition 8), word for word:**
+     **U6-Q13 (-35's swap form): Ruled as leaned, with four terms.** (1) npt-net's own `default` feature names the one
+     WebTransport crate; no dependent sets `default-features = false` on npt-net or names a `wt-*` feature, held by a test
+     or check.mjs line; (2) with both features on (all-features builds and tests), the rule for which crate WtServer uses
+     is stated and tested; (3) U6b's end runs U5's tool uncounted on a scratch swap (never committed) and shows only
+     crates/net changes; (4) the one counted run follows U6d's merge, not U6b's (ADV-U6B-4). A swap that needs a line
+     outside crates/net comes to the advisor first (register 111), to him if it changes what counts.
+115. **U6-Q15, the advisor's ruling on U6's brief (advisor-u6-brief.md:198-202; filed 2026-11-21 with U6's brief rev 2,
+     its condition 8), word for word:**
+     **U6-Q15 (C-U6-15): Ruled as leaned, with one term.** The cheap wins are U6a's code, each with the rust-reviewer's
+     U4e bench (row:39's method) before and after in the container, reported and never judged; the judged measurement is
+     R2's pre-run step (U8). Term: over the bench's ticks the room's state hash is unchanged, and a win that changes the
+     encoded bytes (the relevant set's order among them) names every pinned file it moves (det-u4, the recordings) with
+     its reason, to the advisor before U6a merges.
+116. **U6-Q16, the advisor's ruling on U6's brief (advisor-u6-brief.md:203-207; filed 2026-11-21 with U6's brief rev 2,
+     its condition 8), word for word:**
+     **U6-Q16 (the unit file and wrappers): Ruled as leaned, with two terms.** ops/units/, and §4.1 gains that one line;
+     `User=npt-room-NN` (plan.md:1078 allows it or DynamicUser; fixed users match the slot directories' 0700 ownership,
+     :1081). Terms: the files either fit U8's 32 KiB cloud-init check or are installed from the clone (U8's choice,
+     stated in U8's brief); infra-engineer and security-auditor read them in the sub-unit's round (the sudo list against
+     GTFOBins) and again at stop B. If the recount needs it, H4 moves to U6d beside H2.
+117. **U6-Q17, the advisor's ruling on U6's brief (advisor-u6-brief.md:208-213; filed 2026-11-21 with U6's brief rev 2,
+     its condition 8), word for word:**
+     **U6-Q17 (the WebTransport dev certificate): Ruled, the room server makes it, with four terms.** (1) The key never
+     leaves the slot's 0700 directory; only the hash goes to a path npt-host's user can read; (2) PM-0006-26's next
+     certificate and its swap on a live endpoint (new handshakes on the new one, the 48 live sessions kept) are designed
+     with WtServer, so the certificate part of S8 moves to U6b with the binary's transport wiring, and U6a keeps the
+     binary's settings, lifecycle, panic catch and non-zero exit; (3) npt-host's `/npt/cert-hash.json` (plan.md:994-995)
+     is U6d's; (4) PM-0006-27's 15-day certificate is made the same way on a setting recorded in the header.
+118. **U6-Q18, the advisor's ruling on U6's brief (advisor-u6-brief.md:214-219; filed 2026-11-21 with U6's brief rev 2,
+     its condition 8), word for word:**
+     **U6-Q18 (instant-acme): Ruled, no 90-day fallback, with three terms.** The plan's default stands (`shortlived`,
+     failing closed: plan.md:966-968); if R1's staging read (plan.md:970-971) finds no `shortlived`, the fallback comes
+     back to security-auditor and the advisor then (C11, :969). Terms: the root store for hyper-rustls is chosen at U6d's
+     Block 0 by security-auditor's read; U6d confirms instant-acme 0.8.5's revocation call by name (plan.md:967); its
+     tests run against an in-process fake directory (no network to Let's Encrypt here), the first real order being R1's
+     staging dry run.
+119. **U6-Q21, the advisor's ruling on U6's brief (advisor-u6-brief.md:220-224; filed 2026-11-21 with U6's brief rev 2,
+     its condition 8), word for word:**
+     **U6-Q21 (C-U6-19's line): Ruled, widened.** Under U6-SIZE (b), C-U6-19 closes at U6a's merge, so its gate's "every
+     unit brief before U6's merge" (advisor-u4f-f1-r1.md:120-122) reads "before U6a's merge": U4g2's brief, U4h2's under
+     U4H-SIZE (b) (its thrower bots throw, so the line matters), the U4h judge change's under U4H-JUDGE (b), any change
+     F-B-COUNT (b) makes, and U6j's if it is briefed before U6a merges, each state in one line that its runs hold no
+     throwing or rejoining hostile client and no client restarted mid-run, or bring C-U6-19 first.
 
 ## For the advisor
 **NF-D4: drop `InputReports::non_finite` and reword D-4?**

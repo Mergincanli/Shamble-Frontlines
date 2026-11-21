@@ -151,3 +151,63 @@ U5's early builder, first stint: Block 0 only (u5-brief.md :101-120, narrowed by
 - Snapshot 2 (17:58 UTC): wip/u5-early.patch, base bd88fa7, 146,889 B, 13 files, notes copied; sha256
   303972b91a95ede8503cfcaf68736d996a7eba27ee82d2382241a873aa32ff12 (replaces snapshot 1's 7d19c5e3… at that path).
   df at the stop 8,966,193,152 B. STOPPED before Block 3.
+
+## Stint 3 (coordinator 18:0x UTC): Block 3 through guard rev 4; stop at the first block end past about 1,400
+- Guard u5-fuzz-guard.sh sha256 7413834d3a8d8d4e664631c1463cb66d5b85b0243876e082c7c90471e1d9edb4 (= rev 4) checked at
+  18:1x before the first call; header lines 1-50 read (allowed options, libFuzzer flags, corpus and artifact under
+  .gate/).
+- Plan: Block 3 split (it runs past about 400 lines): 3a = the shared core (fuzz/src/lib.rs: the part table with option
+  (a)'s bars, framing, judge, check, header and record lines, the S1 doc at the site), the Input target, the core's
+  unit tests (planted decoder, over-limit, Input's bar reached on stable), S1's first check, the fuzz crate's fmt and
+  clippy, Input's rate with and without ASan; 3b (the other 13 plain targets, RoomControl, the seed generator, proto's
+  per-type case) after his U5-SIZE answer. 3a's end passes 1,400: stop there and report.
+- B3a.1 written: fuzz/src/lib.rs, fuzz/fuzz_targets/input.rs (one comment line above its fuzz_target! call).
+- B3a.2 S1's first check (18:08 UTC, df before 8,963,325,952 B, after 8,748,490,752 B): `cargo check --locked
+  --manifest-path fuzz/Cargo.toml --lib --bin input` on stable 1.99.1, exit 0, no warning or error line (b3a-check.log);
+  libfuzzer-sys 0.4.13 compiled (its build script built libFuzzer's C++), arbitrary 1.5.0 checked, input.rs's
+  fuzz_target! expanded. The read's two reasoned points, recorded (S1): (1) the forbid stays silent: rustc 1.99.1 raised
+  no unsafe_code error on the expansion's two #[no_mangle] exports under fuzz/Cargo.toml's forbid; (2) edition 2024
+  accepts the bare #[no_mangle] from libfuzzer-sys's 2018-edition tokens: no "unsafe attribute used without unsafe"
+  error. No #[allow], no lowering.
+- B3a.3 fmt (rustfmt --check on the two files) and clippy (`--lib --tests --bin input -D warnings`): clippy exit 0;
+  rustfmt's diff applied by Edit (the part table rewritten as one-line `row(...)` calls through a const fn), then fmt
+  exit 0, clippy exit 0 (b3a-lint-2.log). Condition 8's fuzz-crate fmt and clippy: these two files; the other 16
+  [[bin]] files do not exist yet (F8), so `--all-targets` waits.
+- B3a.4 the core's unit tests on stable: `cargo test --locked --manifest-path fuzz/Cargo.toml --lib` 4 of 4 (planted
+  length-trusting decoder: "one request of 204800 B, over its bar of 256 B"; an over-limit input asking before its
+  refusal, and one accepted, both refused by name; npt-proto's own decoder on 167 B: 0 requests; Input's 8-command
+  message: largest 256 B, its bar exactly) (b3a-lint-2.log). df after 8,295,837,696 B.
+- B3a.5 check.test.mjs on the real fuzz files: 83 of 83 (b3a-selftest.log).
+- F9: the Write tool is held to this worktree, so the run's corpus and artifact folders are under the worktree's
+  .gate/u5/ (condition 7's place; the guard takes <worktree>/.gate/): corpus-input-asan/, corpus-input-none/ (one
+  seed file "0" each) and art-input/.
+- B3a.6 U5-Q5 term 1, Input's rate: two runs through the guard, `-x`, each `run -s <address|none> input <corpus> --
+  -artifact_prefix=<wt>/.gate/u5/art-input/ -max_total_time=60 -seed=1 -max_len=229 -print_final_stats=1` (229 =
+  Input's 166 B limit less the harness's type byte, plus 64 B: Block 5's rule); df before and after each.
+  - ASan (18:11-18:13 UTC, b3a-rate-asan.log; guard hash checked before; df before 8,295,731,200 B, after
+    7,810,056,192 B): GUARD PASSED (8 listed files match, 5 held manifests equal HEAD, NPT_BITE unset), release build
+    59.6 s + 11.1 s (every spike crate compiled from this worktree; the second step recompiled them after the runner's
+    touch); 3,598,973 inputs in 61 s, **58,999 exec/s**, 271 new units, peak RSS 495 MB, no crash; GUARD AFTER
+    unchanged, exit 0.
+  - None (18:14-18:16 UTC, b3a-rate-none.log; df before 7,810,056,192 B, after 7,540,957,184 B): GUARD PASSED, build
+    38.2 s + 7.6 s; 17,073,618 inputs in 61 s, **279,895 exec/s** (4.7 times ASan's), 337 new units, peak RSS 37 MB, no
+    crash; GUARD AFTER unchanged, exit 0.
+  - At 10,000,000 inputs: about 170 s with ASan, about 36 s without (Input; FullState through the client, the slowest,
+    is Block 4's, so U5-Q5's choice waits for that figure).
+  - The bar re-measured on the nightly (section 3): both runs' record lines reach "largest request 256 B" = Input's
+    option (a) bar, the same figure as stable 1.99.1's unit test. No over-bar and no over-limit line.
+- F10: cargo-fuzz 0.13.2 makes fuzz/artifacts/input/ (empty) before our later -artifact_prefix takes over; nothing was
+  written there (art-input/ holds only its README). Empty, untracked by git, not in the snapshot; left in place (a
+  delete is not mine). The guard's header could name it.
+- Re-hash at 18:17 UTC: the 8 manifests and locks equal dependency-check.md. fuzz/src/lib.rs
+  b1d18a2eb65b405ed8e4b76ced0f2c434e10d692130033708cbc2df531f342c9 (329 lines); fuzz/fuzz_targets/input.rs
+  a808e58134cb26f3ec98d315d9863143ca4e4c588ed250b32e30fc2a3fa517f4 (7).
+- Block 3a DONE (18:17 UTC). Added lines 1,658 (1,322 + 336; fuzz lock apart): past the S line (about 1,400), so the
+  build STOPS here (condition 2; coordinator's size rule). Left for Block 3b (after his U5-SIZE answer): the other 13
+  plain targets (Resync, Ping and Pong on both ways, Join, JoinAccepted, JoinRejected, ClientSettings, RoomEnded, Leave,
+  Kick, SessionControl, SessionStatus) and RoomControl's (its own decode and part), the seed generator, proto's
+  per-type case (one byte over each limit: nothing asked for; each bar reached), the fuzz crate's `--all-targets` fmt and
+  clippy.
+- Snapshot 3 (18:18 UTC): wip/u5-early.patch, base bd88fa7, 161,256 B, 15 files, notes copied; sha256
+  afd767ac2aa8f102473c320a9960a3ee363da9434b03b1960553b465ef870a19 (replaces snapshot 2's at that path). df at the stop
+  7,540,801,536 B. STOPPED at Block 3a's end (the S line).
