@@ -171,8 +171,9 @@
   go in the first day's message after his U4G-Q1 answer, 2026-11-22 at the earliest; none is a stop. **msg-2026-11-21.md
   SENT ~02:42 UTC** (F-B-COUNT, U4G-Q1, choices 1-3; held by the cut).
 - **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
-  16:19; back at once); read it with Read/Grep. Check-in on (trig_01EKqNqwZrQTVJ6caAyRrug5); saver bvyb8q0li from
-  02:38 UTC (to about 04:28). Main f5030a3.
+  16:19; back at once); read it with Read/Grep. **Check-in paused 03:12 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5: no agent
+  runs; re-enable it when the next agent starts); saver bvyb8q0li from 02:38 UTC (to about 04:28). Main f5030a3
+  (03:12 UTC).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in
