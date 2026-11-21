@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 06:5x UTC: U4f2 waits on F-B-COUNT (his Advisor); U5's brief rev 2.1 READY; U4G-EARLY
-  APPROVED WITH CONDITIONS 1-10, U4g's blocks 1-4 builder next (Running work).
+- **Last update:** 2026-11-21 07:01 UTC: U4f2 waits on F-B-COUNT (his Advisor); U5's brief rev 2.1 READY; U4G-EARLY
+  APPROVED WITH CONDITIONS 1-10: U4g's blocks 1-4 builder running from 07:00 (Running work).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -177,7 +177,7 @@
   (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
 - **U4G-EARLY APPROVED WITH CONDITIONS 1-10** (advisor-u4g-early.md, read whole): blocks 1-4 now; fill u4g-brief.md §9
   (`<base>` 8f9d97d, 1faf894's code, 642/739, 1,207 s). **Size line:** prediction half ~2,100-3,700 (stop past 6,000);
-  blocks 1-4 ~1,120-1,920 (past ~2,900: to the advisor). Builder: its start time here; yields at F-B-COUNT (cond. 5).
+  blocks 1-4 ~1,120-1,920 (past ~2,900: advisor). Builder 07:00 (agent-abc25909b7dd4ad30); at F-B-COUNT stop it first.
 - **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
   16:19; back at once); read it with Read/Grep. **Check-in on again 06:43 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause
   it when no agent runs); saver bqiy6tzo9 from 06:43 (to about 08:43); the 2026-11-22 message at 23:05 UTC
