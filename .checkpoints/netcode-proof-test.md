@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-21 04:4x UTC: U4f2 waits on F-B-COUNT (his Advisor); U5's brief rev 1 drafted
-  (KEEP-PROGRESSING) and with the advisor for its check (Running work).
+- **Last update:** 2026-11-21 06:4x UTC: U4f2 waits on F-B-COUNT (his Advisor); U5's brief rev 2.1 READY; U4G-EARLY
+  (U4g's blocks 1-4 now, beside U4f2's wait) with the advisor (Running work).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -174,10 +174,13 @@
   **U5-ALLOC and U5-SIZE are his** (final texts, section 8; neither a stop): in the next day's message (2026-11-22's),
   with the U4H texts if his U4G-Q1 answer has come. Register lines before U5's launch (section 9). S's letter: U4b 701
   (411eeee), U4f-F1 239 (u4f-f1-report.md:104).
+- **U4G-EARLY with the advisor** (asked 06:43 UTC; advisor-u4g-early.md): U4g's blocks 1-4 (sim, Predictor, room's
+  half, CueLog) now, in their own worktree from 762e001 (spike code = 1faf894's), lab/bots/ops shut until a re-base
+  after U4f2's merge and -21's set; my lean yes. msg-2026-11-21.md:28-30 said the opposite: a line on 2026-11-22.
 - **Lesson:** never `cd` into an agent's worktree (the harness moved this session's main folder to it on 2026-11-20 at
-  16:19; back at once); read it with Read/Grep. **Check-in paused again 05:29 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5: on
-  04:46-05:29 for the U5 agents, now none runs; re-enable it when the next agent starts); saver bwv1nw5cg from 04:46
-  (to about 06:36). Main f5030a3 (04:29 UTC).
+  16:19; back at once); read it with Read/Grep. **Check-in on again 06:43 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5; pause
+  it when no agent runs); saver bqiy6tzo9 from 06:43 (to about 08:43); the 2026-11-22 message at 23:05 UTC
+  (trig_017GgVrcAi86paTAgrupT4yf). Main f5030a3 (06:38 UTC).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-20 22:39:36 to 2026-11-21 02:37:53 UTC (a spend-limit cut: U4f2's builder in F-G, the U4h advisor in
