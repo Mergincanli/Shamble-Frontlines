@@ -1,0 +1,59 @@
+# C62H-BOUND: Mustafa's P0 re-judge (his words of 2026-11-15 20:50 Amsterdam: "after the build, judge the kept P0
+# set's logs again with the new judge and the new marks.json (a judge call, no new runs), and report its verdicts
+# beside the earlier ones. A changed judge must give the same answers on a set it was not changed for.")
+# The build brief c62h-bound-brief.md section 7; the advisor's head check of ddd38ba (H1).
+
+The kept P0 set: 93509dfd7fd1 (BRAWL-1's re-run P0 set, the one that counts), raw logs at
+.gate/netcode-proof-test/runs/u4r-P0-93509dfd7fd1/ (measured/ 1,547 MiB, bites/ 1,846 MiB). These are the kept set's
+two judge calls, measured/ then bites/, as that set was judged (U4r-F2's memory split), with no new runs.
+051995db9cea (U4r's P0) is still on disk; its re-judge would be one more judge call.
+
+Head: a87c7ec39b966f83cc927b627d8f0e83104ac572 (spike tree equal to ddd38bace3c63050d2087a1acf3a6e74c1d2ecb9, the
+pushed head the advisor checked); one main-run.sh call, log .gate/u4r/c62h-bound/p0-rejudge.log, 17:06:52-17:08:39 UTC,
+header diff and untracked e3b0c442..., free 6060 MiB. Its commands, in order (from spikes/netcode-proof):
+  df -B1 /home/user
+  cargo build --locked --release -p npt-judge
+  mkdir -p /home/user/Shamble-Frontlines/spikes/netcode-proof/results/c62h-bound/p0-rejudge-93509dfd7fd1/a87c7ec39b96
+  sha256sum /home/user/Shamble-Frontlines/.gate/shared-target/release/npt-judge marks/marks.json
+  python3 -I /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/peak.py /home/user/Shamble-Frontlines/.gate/shared-target/release/npt-judge --marks marks/marks.json --logs /home/user/Shamble-Frontlines/.gate/netcode-proof-test/runs/u4r-P0-93509dfd7fd1/measured --only PM-0001-2,PM-0001-17,PM-0001-57 --out /home/user/Shamble-Frontlines/spikes/netcode-proof/results/c62h-bound/p0-rejudge-93509dfd7fd1/a87c7ec39b96/verdict.json
+  python3 -I /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/peak.py /home/user/Shamble-Frontlines/.gate/shared-target/release/npt-judge --marks marks/marks.json --logs /home/user/Shamble-Frontlines/.gate/netcode-proof-test/runs/u4r-P0-93509dfd7fd1/bites --only PM-0001-2,PM-0001-17,PM-0001-57 --out /home/user/Shamble-Frontlines/spikes/netcode-proof/results/c62h-bound/p0-rejudge-93509dfd7fd1/a87c7ec39b96/verdict-bites.json
+  df -B1 /home/user
+Every command exit 0.
+
+The two sha256s:
+  npt-judge (the shared target's release build at this head): d8b8c91eccc2fdf9aeb3d2f29e77103635e6ca3161b2752e14a3bb1ed7073f6e
+  marks/marks.json (the built one, the built check's "after"): c1935a5b996fb0aaff82b0b3c1c604255e1534f6ca7e8d2e55a9f472cd3b22a9
+  (the earlier answers' judge was 65acacfe..., marks 9fb5be57...: 93509dfd7fd1/P0/runs.txt)
+
+The peaks (peak.py, the largest process's resident memory), against the 10,240 MiB call bound:
+  measured/: wall 48.2 s, 4014404 KiB = 3920.3 MiB (projected 3,921 MiB from 93509dfd7fd1's runs.txt)
+  bites/: wall 52.8 s, 4612672 KiB = 4504.6 MiB (projected 4,621 MiB)
+
+The comparison's self-test, run first (TE-CBB-1; .gate/u4r/c62h-bound/rejudge-compare-negative.log, whole):
+self-test on the earlier files (/home/user/Shamble-Frontlines/spikes/netcode-proof/results/u4r/93509dfd7fd1/P0; sha256 as the brief gives)
+case 1, the earlier answers with the two additions: SAME ANSWERS (0 differences); wanted SAME ANSWERS: as required
+case 2, one -17 L1 P0 check value changed: DIFFERENT; ['verdict.json[PM-0001-17].parts[L1 P0].runs[l1-p0-s1].checks[100 % of decoded snapshots rebuild the server\'s quantised state (0 mismatches; on L2 under the Arm rule)].value: new "1" | expected "0"']; wanted that one difference: as required
+case 3, the new bite entry twice: REFUSED (the new verdict.json: the new bite entry appears 2 times); wanted a refusal: as required
+case 4, verdict-bites.json without the new why line: DIFFERENT; ['verdict-bites.json[PM-0001-17].why: new ["L1 P0: 0 of 3 valid runs", "L1 P2: 0 of 3 valid runs", "L1 P3: 0 of 3 valid runs", "L1 B1: 0 of 3 valid runs", "L2 P0: 0 of 1 valid runs", "L2 P2: 0 of 1 valid runs", "L2 P3: 0 of 1 valid runs", "L2 B1: 0 of 1 valid runs", "every S30: 0 o | expected ["L1 P0: 0 of 3 valid runs", "L1 P2: 0 of 3 valid runs", "L1 P3: 0 of 3 valid runs", "L1 B1: 0 of 3 valid runs", "L2 P0: 0 of 1 valid runs", "L2 P2: 0 of 1 valid runs", "L2 P3: 0 of 1 valid runs", "L2 B1: 0 of 1 valid runs", "every S30: 0 o']; wanted that difference: as required
+SELF-TEST PASS: 4 of 4 cases as required
+
+The comparison (c62h_bound_rejudge_compare.py; .gate/u4r/c62h-bound/rejudge-compare.log, whole):
+new /home/user/Shamble-Frontlines/spikes/netcode-proof/results/c62h-bound/p0-rejudge-93509dfd7fd1/a87c7ec39b96/verdict.json: sha256 e5ed24e2469508506e0af4cdbc1bfba64a11648af40de7ab0a3daf7d804843f7; earlier /home/user/Shamble-Frontlines/spikes/netcode-proof/results/u4r/93509dfd7fd1/P0/verdict.json: sha256 e926b812cbe57d81e251bfb5c6685b889a4d2859e9cac25022f6788bf74af095
+new /home/user/Shamble-Frontlines/spikes/netcode-proof/results/c62h-bound/p0-rejudge-93509dfd7fd1/a87c7ec39b96/verdict-bites.json: sha256 13b6b107263cc83c1bb21732aacc40977850803fa1b149eb0c1a41abfc81c593; earlier /home/user/Shamble-Frontlines/spikes/netcode-proof/results/u4r/93509dfd7fd1/P0/verdict-bites.json: sha256 b472784f2c7208aeef38af373a8bc257bf0b3b88a18dc5dc376fb6533536942e
+verdict.json: each part and bite that holds a run, new beside earlier
+  PM-0001-2 SS runs: new PASS (l1-p0-s1 valid, l1-p0-s2 valid, l1-p0-s3 valid) | earlier PASS (l1-p0-s1 valid, l1-p0-s2 valid, l1-p0-s3 valid)
+  PM-0001-17 L1 P0: new PASS (l1-p0-s1 valid, l1-p0-s2 valid, l1-p0-s3 valid) | earlier PASS (l1-p0-s1 valid, l1-p0-s2 valid, l1-p0-s3 valid)
+  PM-0001-57 L1 P0: new PASS (l1-p0-s1 valid, l1-p0-s2 valid, l1-p0-s3 valid) | earlier PASS (l1-p0-s1 valid, l1-p0-s2 valid, l1-p0-s3 valid)
+verdict-bites.json: each part and bite that holds a run, new beside earlier
+  PM-0001-17/tick16: new shown (bite-tick16 valid) | earlier shown (bite-tick16 valid)
+  PM-0001-17/client-rounding: new shown (bite-client-rounding valid) | earlier shown (bite-client-rounding valid)
+  PM-0001-17/whole-as-lost: new shown (bite-whole-as-lost valid) | earlier shown (bite-whole-as-lost valid)
+  PM-0001-57/pos-4cm: new shown (bite-pos-4cm valid) | earlier shown (bite-pos-4cm valid)
+  PM-0001-57/yaw-12bit: new shown (bite-yaw-12bit valid) | earlier shown (bite-yaw-12bit valid)
+  PM-0001-57/pitch-8bit: new shown (bite-pitch-8bit valid) | earlier shown (bite-pitch-8bit valid)
+SAME ANSWERS
+
+Read: each new file equals the earlier one with exactly this lane's two additions, at their places and in their
+forms: -17's new bite entry {"id": "PM-0001-17/link-lost-overstated", "status": "not_run", "runs": []} right after
+whole-as-lost's, and one -17 why line "bite PM-0001-17/link-lost-overstated: no run yet" (after whole-as-lost's in
+verdict.json, last in -17's why list in verdict-bites.json). Every part and bite that holds a run reads as before.

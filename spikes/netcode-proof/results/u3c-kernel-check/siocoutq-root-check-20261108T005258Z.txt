@@ -1,0 +1,40 @@
+# siocoutq-root-check at 20261108T005258Z
+# kernel 6.18.44-fc-v310, CONFIG_HZ 250
+# sysctl tcp_congestion_control=bbr tcp_recovery=1 tcp_early_retrans=3 tcp_sack=1 tcp_frto=2 tcp_rto_min_us=200000 tcp_thin_linear_timeouts=0
+# spike commit 1a9fd73254d78fca2be2241e57a661b262aa03c4 (with uncommitted changes)
+INFO kernel=6.18.44-fc-v310 port=47613 client_port=37306 congestion=cubic congestion_set=ok srtt_us=Some(12) siocoutq=0 notsent=Some(0) rto_us=Some(204000) total_retrans=Some(0) snd_cwnd=Some(10) snd_mss=Some(32768) notsent_offset=144 rtt_offset=68
+RULE R0 pass
+READY
+# rule in: iptables -I INPUT 1 -i lo -p tcp --dport 47613 -j DROP
+# sent GO
+SAMPLE phase=write k=1 t_us=755 written=200 siocoutq=200 siocoutq_again=200 delivered=200 notsent=0 wqueue=200 unacked_pkts=1 in_flight=1 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=write k=2 t_us=5750 written=400 siocoutq=400 siocoutq_again=400 delivered=400 notsent=0 wqueue=400 unacked_pkts=2 in_flight=2 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=write k=3 t_us=10767 written=600 siocoutq=600 siocoutq_again=600 delivered=600 notsent=0 wqueue=600 unacked_pkts=3 in_flight=3 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=write k=4 t_us=15689 written=800 siocoutq=800 siocoutq_again=800 delivered=800 notsent=0 wqueue=800 unacked_pkts=4 in_flight=4 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=write k=5 t_us=20734 written=1000 siocoutq=1000 siocoutq_again=1000 delivered=1000 notsent=0 wqueue=1000 unacked_pkts=5 in_flight=5 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=write k=6 t_us=25704 written=1200 siocoutq=1200 siocoutq_again=1200 delivered=1200 notsent=0 wqueue=1200 unacked_pkts=6 in_flight=6 snd_cwnd=10 snd_mss=32768 total_retrans=1 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=write k=7 t_us=30696 written=1400 siocoutq=1400 siocoutq_again=1400 delivered=1400 notsent=0 wqueue=1400 unacked_pkts=7 in_flight=7 snd_cwnd=10 snd_mss=32768 total_retrans=1 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=write k=8 t_us=35685 written=1600 siocoutq=1600 siocoutq_again=1600 delivered=1600 notsent=0 wqueue=1600 unacked_pkts=8 in_flight=8 snd_cwnd=10 snd_mss=32768 total_retrans=1 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=write k=9 t_us=40681 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=9 in_flight=9 snd_cwnd=10 snd_mss=32768 total_retrans=1 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+INFO writes=9 (write 10 not made: 9 packets in flight + 1 for a loss probe >= snd_cwnd 10)
+SAMPLE phase=hold k=1 t_us=200594 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=9 in_flight=9 snd_cwnd=10 snd_mss=32768 total_retrans=1 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=hold k=2 t_us=300576 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=1 in_flight=1 snd_cwnd=1 snd_mss=32768 total_retrans=2 rto_us=408000 rtt_us=12 backoff=1 ca_state=4
+SAMPLE phase=hold k=3 t_us=400651 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=1 in_flight=1 snd_cwnd=1 snd_mss=32768 total_retrans=2 rto_us=408000 rtt_us=12 backoff=1 ca_state=4
+SAMPLE phase=hold k=4 t_us=500541 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=1 in_flight=1 snd_cwnd=1 snd_mss=32768 total_retrans=2 rto_us=408000 rtt_us=12 backoff=1 ca_state=4
+SAMPLE phase=hold k=5 t_us=600477 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=1 in_flight=1 snd_cwnd=1 snd_mss=32768 total_retrans=2 rto_us=408000 rtt_us=12 backoff=1 ca_state=4
+SAMPLE phase=hold k=6 t_us=700557 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=1 in_flight=1 snd_cwnd=1 snd_mss=32768 total_retrans=3 rto_us=816000 rtt_us=12 backoff=2 ca_state=4
+SAMPLE phase=hold k=7 t_us=800657 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=1 in_flight=1 snd_cwnd=1 snd_mss=32768 total_retrans=3 rto_us=816000 rtt_us=12 backoff=2 ca_state=4
+SAMPLE phase=hold k=8 t_us=900514 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=1 in_flight=1 snd_cwnd=1 snd_mss=32768 total_retrans=3 rto_us=816000 rtt_us=12 backoff=2 ca_state=4
+SAMPLE phase=hold k=9 t_us=1000591 written=1800 siocoutq=1800 siocoutq_again=1800 delivered=1800 notsent=0 wqueue=1800 unacked_pkts=1 in_flight=1 snd_cwnd=1 snd_mss=32768 total_retrans=3 rto_us=816000 rtt_us=12 backoff=2 ca_state=4
+HOLD-END
+# rule out: iptables -D INPUT -i lo -p tcp --dport 47613 -j DROP
+# sent RELEASED
+SAMPLE phase=release k=1 t_us=1454185 written=1800 siocoutq=0 siocoutq_again=0 delivered=1800 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=3 snd_mss=32768 total_retrans=4 rto_us=204000 rtt_us=136 backoff=0 ca_state=0
+RULE R1 pass
+RULE R2 pass
+RULE R3 pass
+RULE R4 pass
+INFO release_ms=435 r4_bound=Some(1.632s) rto_us_at_release=Some(816000) backoff_at_release=Some(2) last_write_us=40249 writes=9
+VERDICT PASS
+# iptables -S identical before and after (3 lines)
+# verdict PASS, exit 0; log: /home/user/Shamble-Frontlines/spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check-20261108T005258Z.txt

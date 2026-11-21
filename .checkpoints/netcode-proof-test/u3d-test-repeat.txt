@@ -1,0 +1,13 @@
+/dev/vda        252G   26G   14G  66% /
+debug binary /home/user/Shamble-Frontlines/.gate/shared-target/debug/deps/npt_net-088534cbcaf56b90 2026-11-09 03:13:44.989491381 +0000
+alone, 3 tests x 30 runs: 0 failed runs
+suite run 1: test result: ok. 160 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 24.78s
+suite run 2: test result: ok. 160 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 24.76s
+suite run 3: test result: ok. 160 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 24.83s
+suite run 4: test result: ok. 160 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 24.82s
+suite run 5: test result: ok. 160 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 24.76s
+suite run 6: test result: ok. 160 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 24.84s
+suite run 7: test result: ok. 160 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 24.77s
+suite run 8: test result: ok. 160 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 24.83s
+whole npt-net lib suite x 8: 0 failed runs
+exit 0

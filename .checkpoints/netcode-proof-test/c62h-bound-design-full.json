@@ -1,0 +1,197 @@
+{
+  "plain_words": "On the lossy test networks (P2, P3 and B1), every snapshot a test client files as \"lost\" now needs a reason. The reason has to come from a record the client does not write: either the server's own log says it sent that client nothing at that moment, or the simulated network's own log says it dropped at least one packet of that snapshot. Any other \"lost\" snapshot counts against the client, and the mark needs zero of them on every run. A second check runs the other way: a snapshot the network dropped a packet of can never be filed as received whole. That proves the network's record does not claim losses that never happened. \"It arrived too late\" is not on the list, because on the simulated network nothing can arrive that late (the slowest packet takes about a fifth of a second, and the client keeps about one second of snapshots). Two planted bugs prove the checks work: a client that files a received snapshot as lost fails the first check (48 of 48 clients), and a network record that invents a loss fails the second.",
+  "exact_texts": {
+    "marks_json": "PM-0001-17 in spikes/netcode-proof/marks/marks.json. The 'L1 P0 loses no group' check (marks.json:3972-3982) gets a comma after its closing brace, and these two checks follow it inside \"checks\":\n        {\n          \"name\": \"L1 P2, P3 and B1: every client-tick left incomplete is one the room sent that client nothing for, or one the link lost a snapshot datagram of (0 unexplained)\",\n          \"figure\": \"snap_lost_unexplained_count\",\n          \"op\": \"==\",\n          \"value\": 0,\n          \"parts\": [\n            \"L1 P2\",\n            \"L1 P3\",\n            \"L1 B1\"\n          ]\n        },\n        {\n          \"name\": \"L1 P2, P3 and B1: no client-tick filed whole is one the link lost a snapshot datagram of (0; the link's record is not overstated)\",\n          \"figure\": \"snap_whole_despite_link_loss_count\",\n          \"op\": \"==\",\n          \"value\": 0,\n          \"parts\": [\n            \"L1 P2\",\n            \"L1 P3\",\n            \"L1 B1\"\n          ]\n        }\nIn \"bites\", the whole-as-lost entry (marks.json:4009-4012) gets a comma after its closing brace, and this entry follows it:\n        {\n          \"id\": \"PM-0001-17/link-lost-overstated\",\n          \"what\": \"a lab record of the link's losses that counts a delivered snapshot datagram as lost: on each client, its first measured tick whose datagrams all arrived\"\n        }\nNothing else in marks.json changes: no other check, report, part, note or draft pin. PM-0001-17/whole-as-lost keeps its id and text, and gains a run on L1 P2 through the runner (see lane). About 26 lines added and 2 changed.",
+    "series_rows": "spikes/netcode-proof/marks/SERIES.md.\n(1) Header ':258 ## Figures (36): computations npt-judge carries in code' becomes '## Figures (38): computations npt-judge carries in code'. Two rows go in alphabetically, after `session_memory_growth_count` and before `sync_cost_ratio`:\n| `snap_lost_unexplained_count` | count | npt-judge | over the run's client logs (process `client`), measured tick records only: the (slot, tick) pairs with `tick.s.snap_incomplete` 1 whose room-log record at that tick gives that slot a non-null `hs.server_hash` (the room sent it a snapshot or a full state) and `tick.s.snap_link_lost_count` 0 (the link lost none of the snapshot datagrams the room sent it then). Explained, so not counted: `hs.server_hash` null (the room sent that client nothing: a full state not yet acknowledged, budget short, an encoder refusal, a kick) or `tick.s.snap_link_lost_count` 1 or more (npt-l1's fate log lost one by its loss draw or in a burst). Nothing else explains a tick filed lost: not a stale drop (L1 delivers every snapshot datagram well inside the 32-tick ring), not a full-state tick, not a tick whose datagrams all arrived. 0 incomplete is a real 0. Gaps: no room log gives `tick.s.snap_link_lost_count`, a room tick record without it, a list that does not hold the run's `clients` entries, an entry below 0, a `snap_incomplete` entry other than 0 or 1, a measured incomplete tick the room log has no record of. Inputs: `tick.s.snap_incomplete`, `hs.server_hash`, `tick.s.snap_link_lost_count` | PM-0001-17 '100 % of decoded snapshots': no decoded snapshot escapes the comparison by being filed lost (C62H-BOUND (a), 2026-11-15) | -17 |\n| `snap_whole_despite_link_loss_count` | count | npt-judge | over the run's client logs (process `client`), measured tick records only: the (slot, tick) pairs with a whole `hs.decoded_hash` (not null, not the sentinel 0) whose room-log record at that tick gives that slot `tick.s.snap_link_lost_count` 1 or more. No client can complete such a tick, so each one counted is a record that overstates the link's loss. A client hash at a tick the room log has no record of is not read here (`decoded_hash_mismatch_count` counts it). Gaps as `snap_lost_unexplained_count`'s. Inputs: `hs.decoded_hash`, `tick.s.snap_link_lost_count` | PM-0001-17, the link record's own check (C62H-BOUND (a), 2026-11-15) | -17 |\n(2) Header '## Series read only by figures (18)' becomes '(19)'. This row goes in after `tick.s.relevant_count`:\n| `tick.s.snap_link_lost_count` | count | npt-lab (from npt-l1's fate log; L1 only) | the room log, one per client slot on every room tick record (the run's `clients` entries, 0 included): of the snapshot datagrams (groups) the room sent that client at this tick, how many npt-l1's fate log records as lost by its loss draw or lost in a burst; read at the send, from the fate-log datagram entries that slot's send pushed, which must be exactly its groups (else the run fails) | snap_lost_unexplained_count, snap_whole_despite_link_loss_count |\n(3) The `tick.s.snap_incomplete` row (:320) gets a new last clause in its Meaning cell and a new Marks cell. The advisor's r2-run Low says '-17 reports it' is stale once -17 checks it:\n| `tick.s.snap_incomplete` | flag | npt-client (L1, through npt-lab's client log), npt-bots (L2) | one per client slot (the run's `clients` entries, each 0 or 1), at the tick it resolves: 1 when a group of that tick was lost and none refused, or the client dropped one as stale (README §1's `decoded_hash`), so the client logs no hash for it (§4.6), a tick none of whose groups arrived included (known from a later header's tick); with `hs.decoded_hash` it decides README §1's coverage rule (`decoded_hash_mismatch_count`); on L1 P2, P3 and B1 each 1 must be explained by the room's or the link's record (`snap_lost_unexplained_count`) | -17 (its L1 P0 check; snap_lost_unexplained_count), -58, -19 (the coverage rule) |",
+    "judge": "Two new figures in spikes/netcode-proof/crates/judge/src/figures.rs, each listed in FIGURES (:632-825) with unit \"C62H-BOUND\":\n- Figure { name: \"snap_lost_unexplained_count\", compute: Some(snap_lost_unexplained_count), unit: \"C62H-BOUND\", what: \"client-ticks filed lost that neither the room's record (no snapshot sent) nor the link's (a snapshot datagram lost) explains (-17)\" }\n- Figure { name: \"snap_whole_despite_link_loss_count\", compute: Some(snap_whole_despite_link_loss_count), unit: \"C62H-BOUND\", what: \"client-ticks filed whole at which the link's record lost a snapshot datagram: the record overstated (-17)\" }\nA shared room-side reader does three things. It takes `clients` from the room logs' headers (one value, else a gap, as `decoded` does at figures.rs:328-343). It takes `hs.server_hash` through slot_hashes (:236-279). It takes `tick.s.snap_link_lost_count` from every room tick record. That last read is a gap when no room log gives the series, when a room tick record lacks it, when a list does not hold `clients` entries, or when an entry is below 0.\nsnap_lost_unexplained_count reads the client logs (the `decoded_hash` writers: process client or bots, :224-233), measured tick records only. For each (slot, tick) with snap_incomplete 1 (an entry other than 0 or 1 is a gap; so is a tick with no room record), it counts the pair when that slot's server_hash there is non-null and its snap_link_lost_count there is 0. It returns the count, and never Empty.\nsnap_whole_despite_link_loss_count reads the same records. For each (slot, tick) with a non-null decoded_hash other than 0, it counts the pair when the room's record gives that slot snap_link_lost_count 1 or more. A tick with no room record is skipped.\nNo change to eval.rs, marks.rs or main.rs for C62H-BOUND: figure checks already take parts (marks.rs:543-551, :585-591), and a figure gap already makes a non-failing run INVALID (eval.rs:1215-1231).\nFixtures go in crates/judge/tests/engine.rs, beside hash_mark and hash_log (:1296-1335):\n- each explanation alone (a null server hash; a link loss of 1) reads 0;\n- an unexplained tick reads 1;\n- a warm-up tick is not counted;\n- a whole hash with a link loss reads 1 on the second figure;\n- the sentinel with a link loss reads 0;\n- gaps make the run INVALID: the series missing from every room log, a room tick without it, a wrong-length list, a negative entry, an incomplete measured tick with no room record;\n- a bite run whose figure fails reads shown.\nJDG-ONLY-1's fix (main.rs:94, eval.rs:958-962) is not part of this design. Its standing home is 'npt-judge's next change', so it rides here, counted apart, unless the advisor rules otherwise (C62HB-Q5).",
+    "lab_record": "The new record is tick.s.snap_link_lost_count, in npt-lab's room log (process room). It is written on every room tick record, beside hs.server_hash, with one entry per client slot (the run's clients entries, 0 included). Each value is the number of snapshot datagrams the room sent that client at that tick that npt-l1's fate log records as Lost (the loss draw) or Burst. It exists on L1 only.\nnpt-l1 (crates/l1/src/lib.rs) gets one read-only addition:\n  pub struct DatagramCounts { pub sent: u32, pub lost: u32, pub burst: u32 }\n  impl FateLog { pub fn server_datagrams_since(&self, from: usize) -> DatagramCounts }\nIt counts the Datagram entries sent server to client (Dir::Down) at fate-log index from on, by outcome. The canonical form and its hash (PM-0001-3's identity, l1 :341-398) do not change, and it takes no draw.\nWhen and where (crates/lab/src/scenario.rs, run, the per-slot loop at :967-1017), for each slot at each room tick:\n- Just before server.send(slot, ...) (:989): let from = net.with_fate_log(|l| l.len()).\n- After it: let c = net.with_fate_log(|l| l.server_datagrams_since(from)).\n- Check 1: c.sent must equal the number of groups take_datagrams gave when the slot has a session, and 0 when it has none.\n- Check 2: non-empty groups must have room.client(slot).server_hash() non-null.\n- If either check fails, the run returns Err. Its logs then end without footers, which the judge reads INVALID.\n- The slot's value is c.lost + c.burst.\nThe join is exact because Server::send (:557-584) sends only that slot's groups as datagrams. Pings and pongs come from the pump inside Server::io (pump.rs:387-404, :467). The events a send applies push only Ack and Stream entries (l1 :1419-1464, :1543-1584, :1624-1665).\nThe values go to Logs::room_tick (logs.rs:495) through one new parameter, link_lost: &[u32], which writes s[\"snap_link_lost_count\"] with n entries, padding with 0. The module texts (logs.rs:1-8, scenario.rs:1-27) name the record.\nMeasured totals go on npt-lab's summary line after 'decided lost at the stop N': '; measured snapshot datagrams S, lost by the link L (in bursts B)'. These totals are not read by the judge.\nThe plant runs in bites builds only. PM-0001-17/link-lost-overstated becomes LAB_BITES' third id (scenario.rs:204, :234-245). On each slot, it writes 1 at the first measured tick where c.sent >= 1 and c.lost + c.burst = 0.",
+    "readme": "spikes/netcode-proof/marks/README.md §1, in the `decoded_hash` paragraph. One sentence goes in after '...that tick is lost (`null`, `tick.s.snap_incomplete` 1), never the sentinel.' (README.md:66-67), and the following lines are reflowed to 120 columns:\nOn L1's P2, P3 and B1 a tick filed lost must have a reason in the room's or the link's record, never the client's own: the room sent that client nothing then (`hs.server_hash` `null`), or npt-l1 lost a snapshot datagram of it (`tick.s.snap_link_lost_count`, the room log); a stale drop is no reason there, since L1 delivers every snapshot datagram well inside the ring (PM-0001-17's `snap_lost_unexplained_count`; `snap_whole_despite_link_loss_count` checks the record the other way).\nREADME.md:6 holds: this contract change ships together with npt-judge and its fixtures."
+  },
+  "explanations": [
+    {
+      "id": "E1 ROOM-SENT-NOTHING",
+      "rule": "At that tick the room coded that client neither a snapshot nor a full state: its hs.server_hash for that slot is null (room.rs:204-208; reset each tick at :299-300, set only at :1128 for a full state and :1357 for a snapshot). This covers the full state not yet acknowledged (NC-L10; room.rs:1087-1089), whether after the join, after an overflow resync, or after a B1 burst's forced resync. It also covers budget short (:1173-1176, :1201-1204), an encoder refusal (:1119-1122, :1343-1346), and a kicked client (:1047-1049, :1057-1063).",
+      "source_of_truth": "The room's (server's) record: hs.server_hash in the room log (process room), written by npt-lab from ClientSlot::server_hash (logs.rs:534-564). npt-lab also asserts at each send that non-empty groups come with a non-null server hash."
+    },
+    {
+      "id": "E2 LINK-LOST",
+      "rule": "The room sent that client snapshot datagrams at that tick, and npt-l1's fate log records at least one of them as lost by the loss draw or lost in a burst (l1/src/lib.rs:1097-1100). In the room log this reads tick.s.snap_link_lost_count >= 1 for that slot at that tick. A datagram that arrived, however late or reordered, never explains. The list is closed: every other tick filed lost is unexplained, and the check is 0 unexplained. That includes a stale drop (on L1 no snapshot datagram can arrive after one 32 ticks newer: about 180 ms worst delay on P3 against the ring's 1.067 s, and nothing newer is sent while a full state is in flight), a full-state tick filed lost, a tick whose datagrams all arrived, and a tick decided lost by the lab's stop (never inside the measured window of a valid run: scenario.rs:1126-1137).",
+      "source_of_truth": "The link's record: npt-l1's fate-log entry of each snapshot datagram, which records the outcome decided at its send. npt-lab joins each entry to its (client, tick) at that send (the new record) and checks it one to one against the groups. The record is never taken from any client counter (stale, refused, duplicates)."
+    }
+  ],
+  "planned_size": {
+    "by_file": [
+      {
+        "file": "spikes/netcode-proof/crates/l1/src/lib.rs",
+        "lines": "+25 to +32",
+        "what": "DatagramCounts and FateLog::server_datagrams_since, with docs"
+      },
+      {
+        "file": "spikes/netcode-proof/crates/l1/src/tests.rs",
+        "lines": "+30 to +40",
+        "what": "one test: a forced datagram loss and a B1 burst are counted; Ack and Stream entries and client-to-server datagrams in the window are not"
+      },
+      {
+        "file": "spikes/netcode-proof/crates/lab/src/scenario.rs (code)",
+        "lines": "+55 to +75",
+        "what": "the per-slot read and its two run-failing checks; the per-slot list into room_tick; measured totals and the summary-line phrase; the Bites field, LAB_BITES to 3 ids and the link-lost-overstated plant; module text"
+      },
+      {
+        "file": "spikes/netcode-proof/crates/lab/src/scenario.rs (tests)",
+        "lines": "+90 to +130",
+        "what": "a short P2 run (16 clients, 6 s warm-up, 4 s measured): every room record carries 16 entries, the measured link-lost sum is above 0, and a test-side join gives 0 unexplained and 0 whole-despite-loss; whole-as-lost on it gives 16 unexplained; link-lost-overstated on it gives 16 whole-despite-loss"
+      },
+      {
+        "file": "spikes/netcode-proof/crates/lab/src/logs.rs",
+        "lines": "+10 to +15",
+        "what": "room_tick's link_lost parameter and the series; module text; the two existing test call sites"
+      },
+      {
+        "file": "spikes/netcode-proof/crates/judge/src/figures.rs",
+        "lines": "+85 to +110",
+        "what": "the room-side reader, the two figures, two FIGURES entries"
+      },
+      {
+        "file": "spikes/netcode-proof/crates/judge/tests/engine.rs",
+        "lines": "+110 to +150",
+        "what": "fixtures: each explanation, an unexplained tick, warm-up not counted, the converse, the sentinel, five gaps, a shown bite"
+      },
+      {
+        "file": "spikes/netcode-proof/marks/marks.json",
+        "lines": "+26, 2 changed",
+        "what": "two checks on PM-0001-17's L1 P2, P3 and B1 parts and one bite"
+      },
+      {
+        "file": "spikes/netcode-proof/marks/SERIES.md",
+        "lines": "+3 rows, 3 changed",
+        "what": "two figure rows, one figures-only series row, two header counts, the :320 row"
+      },
+      {
+        "file": "spikes/netcode-proof/marks/README.md",
+        "lines": "about 3",
+        "what": "one sentence in §1's decoded_hash paragraph, reflowed"
+      },
+      {
+        "file": "spikes/netcode-proof/ops/runs/c-u4r-runs.mjs",
+        "lines": "+8 to +15",
+        "what": "bitesOf: -17's whole-as-lost and link-lost-overstated also run on P2, and link-lost-overstated never on P0; the header comment's 'only P0'"
+      },
+      {
+        "file": "riding, counted apart (C62HB-Q5): crates/judge/src/main.rs, eval.rs, tests/cli.rs",
+        "lines": "+40 to +70",
+        "what": "JDG-ONLY-1's fix under its standing home 'npt-judge's next change'"
+      }
+    ],
+    "total": "About 520 changed lines for C62H-BOUND itself (range 440 to 600, SERIES.md included). With JDG-ONLY-1 riding, about 560 to 670. Under C62HB-Q2 (b) (lab flags, no judge change), about 390.",
+    "size_class": "S (small): one lab record, one npt-l1 read, two judge figures with fixtures, two checks and one bite, one runner line. No simulation, room, client or protocol code changes.",
+    "stop_line": "SIZE-CHECK: if numstat against the lane's base (SERIES.md included, JDG-ONLY-1 counted in if it rides) passes 1,050 changed lines (twice the plan, BRAWL-1's 'well past' precedent), the build stops. It goes to Mustafa in three lines: what grew, why, and the cheaper option."
+  },
+  "bites": [
+    {
+      "id": "PM-0001-17/whole-as-lost (existing id; new run on L1 P2)",
+      "plant": "Unchanged planted code in npt-lab's client writer (logs.rs:317-330, :362-366): each client's first tick decoded whole in the measured phase is filed as lost (null, snap_incomplete 1). New: one run in the judged P2 set (seed 1, 48 clients, 10 s + 600 s, header PM-0001-2 and PM-0001-17), beside its unchanged P0 run.",
+      "expected": "On P2: the run is valid (pre:PM-0001-2 passes, since the bite touches no room series). snap_lost_unexplained_count = 48 FAIL (needs == 0): the room sent each bitten tick and the link lost none of its datagrams. snap_whole_despite_link_loss_count = 0 and decoded_hash_mismatch_count = 0 both pass. Status shown. npt-lab's summary: fate log equal to l1-p2-s1's, measured incomplete s1's + 48 (17,308 if s1 reads 17,260 again). On P0, unchanged: 'L1 P0 loses no group' 48 FAIL. Today the P2 run would read Missed, which is the hole this lane closes."
+    },
+    {
+      "id": "PM-0001-17/link-lost-overstated (new)",
+      "plant": "npt-lab's record, bites builds only: on each slot, the first measured tick at which the room sent at least one snapshot datagram and the link lost none is written tick.s.snap_link_lost_count 1. One run in the judged P2 set (seed 1, 48 clients, full length). It never runs on P0, where no check reads the record and it would read Missed.",
+      "expected": "On P2: valid. snap_whole_despite_link_loss_count = 48 FAIL (each client hashed its overstated tick; sentinels are 0 on P2). snap_lost_unexplained_count = 0 and mismatches = 0 both pass. Status shown. A record that invents losses can never pass."
+    },
+    {
+      "id": "TEST understated record (no marks.json bite: every clean lossy run is the test)",
+      "plant": "A record that misses real losses: in the extreme, it writes 0 everywhere.",
+      "expected": "Each link-lost tick the client correctly files lost becomes unexplained. snap_lost_unexplained_count is about 17,000 per P2 run and about 43,000 per P3 run: FAIL, never a pass. The lab test's short P2 run also asserts that the measured link-lost sum is above 0, and that the test-side join of the real record gives 0 / 0."
+    },
+    {
+      "id": "TEST missing record (judge fixture)",
+      "plant": "A run whose room log has no tick.s.snap_link_lost_count (also: one room tick without it, a wrong-length list, a negative entry, an incomplete measured tick with no room record).",
+      "expected": "Both figures report a gap and the run reads INVALID (eval.rs:1215-1231), never PASS. Old P2 and P3 logs re-judged under the new marks.json read INVALID for -17's L1 P2 and P3 parts."
+    },
+    {
+      "id": "TEST record that cannot be joined (lab)",
+      "plant": "A send whose datagram fate entries differ from its groups, or groups at a tick with a null server hash.",
+      "expected": "The npt-lab run returns Err. Its logs end without footers, so the judge reads the run INVALID (README §4's complete rule). The record is never silently wrong."
+    },
+    {
+      "id": "TEST npt-l1 read",
+      "plant": "A unit test in l1/src/tests.rs: forced loss on one down datagram and a burst on another, with acks, stream pieces and an up datagram in the same window.",
+      "expected": "server_datagrams_since counts sent, lost and burst exactly for the down datagrams only. The fate log's canonical hash does not change."
+    }
+  ],
+  "judged_runs": {
+    "sets": "Two sets are re-run at the lane's commit with c-u4r-runs.mjs judged --profile P2, then --profile P3, one at a time, under the lane lock.\n- P2: seeds 1 to 3 measured, plus the bite runs PM-0001-17/whole-as-lost and PM-0001-17/link-lost-overstated at seed 1. All have 48 clients, SS, L1, 10 s warm-up, 600 s measured, tick_start 63,736. The set now has bites, so it is judged in two calls (measured/, then bites/: verdict.json and verdict-bites.json).\n- P3: seeds 1 to 3, no bites.\n- B1: nothing now. -17's L1 B1 part is INVALID by pre:PM-0001-2 until U4g's room fix, so U4g's judged B1 runs carry both checks.\n- P0: not re-run. No new check reads P0, and 93509dfd7fd1's verdicts stand.\nOld P2 and P3 logs cannot serve: they lack the series, which would be a gap.",
+    "time": "From BRAWL-1's set walls:\n- P2: 1,046.7 s (runs 332.9 / 345.9 / 330.5 s, plus builds and judge), plus two bite runs at about 336 s each, plus the bites judge call at about 15 s: about 1,735 s (29 min).\n- P3: about 1,020.5 s (17 min).\n- Total: about 2,755 s, about 46 min. The advisor's 35 min had no bite runs.",
+    "disk": "Runner projections (c-u4r-runs.mjs:152-153):\n- P2: 3 x 272.9 MB + 2 x 56 MB = 930.7 MB = 887.6 MiB, so its start check wants 4,983.6 MiB free.\n- P3: 3 x 183.3 MB = 549.9 MB = 524.4 MiB, so its start check wants 4,620.4 MiB.\nExpected on disk from BRAWL-1's actuals: P2 about 622 + 107 = 729 MiB, P3 about 291 MiB. Kept raw logs grow by about 1.0 GiB. The new series adds about 100 B per room tick (about 2 MB a run), inside the projections.\nJudge peaks by the six-point fit: P2 measured about 1.76 GiB, P2 bites about 0.55 GiB, P3 about 1.0 GiB, all under the 10 GiB line.\nIf free space is below the start checks (the card put the build phase near 4.2 GiB; N/u4r-disk-plan.md's floor is 4 GiB), KEPT-LOGS' pack under KL-YES runs first.",
+    "expect_lines": "P2 runs.txt:\n- the split line;\n- 'PM-0001-2 SS runs: PASS (l1-p2-s1 valid, l1-p2-s2 valid, l1-p2-s3 valid)';\n- 'PM-0001-17 L1 P2: PASS (l1-p2-s1 valid, l1-p2-s2 valid, l1-p2-s3 valid)', where verdict.json gives each run snap_lost_unexplained_count 0 pass, snap_whole_despite_link_loss_count 0 pass and decoded_hash_mismatch_count 0 pass;\n- 'PM-0001-57 L1 P2: PASS (...)';\n- from verdict-bites.json: 'PM-0001-17/whole-as-lost: shown (bite-whole-as-lost valid)' (unexplained 48 fail) and 'PM-0001-17/link-lost-overstated: shown (bite-link-lost-overstated valid)' (whole-despite-loss 48 fail).\n- npt-lab summary lines equal to results/u4r/fc411116c1f1/P2/runs.txt:24-26 in fate log (911d96e802b38294 / 6f4d3bf75a875a92 / 819c74ce1c037ef1), measured incomplete (17,260 / 17,089 / 17,532), stale 0, sentinels 0 and overflow resyncs 0. The new phrase shows about 2 % of measured snapshot datagrams lost by the link, bursts 0. The lane changes no simulated behaviour; if a merged change moved the digests, it is named before the runs count.\n- The bite runs' digests equal s1's; whole-as-lost's incomplete is s1's + 48.\nP3 runs.txt:\n- 'PM-0001-17 L1 P3: PASS (l1-p3-s1 valid, l1-p3-s2 valid, l1-p3-s3 valid)' with both figures 0 on each run.\n- Summaries equal to fd4612050cd6's: measured incomplete 43,295 / 43,210 / 43,454, overflow resyncs 27 / 0 / 1. s1's full-state gaps read as explained by a null server hash (E1), which tests condition 2 on a real run.\nIf either figure is above 0 on any clean run, the unit stops and tells Mustafa. The bar is never reworded to fit (his words, history.md:2143-2146)."
+  },
+  "conditions_met": [
+    {
+      "id": "ADV-C62H-2 (1): staleness from the link's record, never the client's counters",
+      "how": "No explanation reads a client counter (stale, refused or duplicates; client lib.rs:381-401). The closed list has no staleness reason at all, because the link's own model rules lateness out on L1. A snapshot datagram's delay is at most one_way + half_jitter (l1 :215-221, :790-814), and the reorder step adds at most one more delay (:1134-1146): about 180 ms worst case on P3. The client's ring holds 32 ticks, 1.067 s (sim ticks.rs:58-70). While a full state is unacknowledged the room sends that client nothing newer (room.rs:1087-1089). So a stale drop on L1 is always unexplained, which is stricter than the condition and closes the read's hiding place (c). If the advisor wants lateness as a reason (C62HB-Q1 (b)), it is computed from the fate log's arrival order, never from the client."
+    },
+    {
+      "id": "ADV-C62H-2 (2): ticks the room sent no snapshot for are not unexplained",
+      "how": "E1 reads the room's hs.server_hash null for that slot and tick (room.rs:204-208). That covers NC-L10's gap after a full state until it is acknowledged (room.rs:1087-1089), whether after the join, an overflow resync, or a B1 burst's forced resync. It also covers budget short, refusals and kicks. Ticks a B1 burst swallowed were sent and burst-lost, so E2 explains them. P3 s1's 27 overflow resyncs in the re-run set exercise this on a judged run."
+    },
+    {
+      "id": "ADV-C62H-2 (3): a new record of which client and tick each snapshot datagram carries; P2 and P3 re-run",
+      "how": "npt-lab joins each snapshot datagram's fate to its (client, tick) at the send. The fate-log datagram entries pushed during one Server::send(slot) are exactly that slot's groups for that tick (pings and pongs come only from the pump in Server::io; scenario.rs:458-545, :557-584; pump.rs:387-404, :467). This is checked one to one, and the run fails otherwise. The lab writes their link-loss count per slot per tick as tick.s.snap_link_lost_count in the room log, using a new read-only npt-l1 accessor, FateLog::server_datagrams_since. The fate log's tick-less form and its sha256 stay as they are. The judged P2 and P3 sets are re-run, since old logs lack the series and would read INVALID, never PASS. B1 comes with U4g's judged runs."
+    }
+  ],
+  "lane": {
+    "where": "C62H-BOUND gets its own small lane, as BRAWL-1 did. It sits on PR #40's branch (claude/netcode-proof-test-plan-hcky5g), built by the main session (or one isolated worktree, merged once).\n- It starts only after Mustafa's yes to this exact wording and planned size (history.md:2143-2146) and the advisor's and test-engineer's reads.\n- It goes before U4f's build. U4f's brief is tonight's night item, and U4f's lead and clock work will touch crates/lab/src/scenario.rs. Building first means U4f's client changes are built under the new checks.\n- It goes before U4g's judged B1 runs, which carry the checks.\n- Readers: test-engineer and netcode-architect (the advisor's list for this unit), plus rust-reviewer for the Rust. The marks.json and judge read gets its own report line under Mustafa's 13:35 rule.",
+    "files": "spikes/netcode-proof/crates/l1/src/lib.rs, crates/l1/src/tests.rs, crates/lab/src/scenario.rs, crates/lab/src/logs.rs, crates/judge/src/figures.rs, crates/judge/tests/engine.rs, marks/marks.json, marks/SERIES.md, marks/README.md, ops/runs/c-u4r-runs.mjs. JDG-ONLY-1's main.rs, eval.rs and tests/cli.rs ride only if C62HB-Q5 (a) holds. No change to npt-sim, npt-room, npt-client, npt-proto, npt-server or check.mjs.",
+    "order": "1. Mustafa's yes to the wording and size.\n2. Build in four commits: l1 + lab record; judge figures + fixtures; marks.json + SERIES.md + README.md; runner.\n3. check.mjs, the unit tests and the gate after each step.\n4. One review round.\n5. The P2 set, then the P3 set. KEPT-LOGS' pack runs first if free space is below the runner's start checks.\n6. The report. (c)'s P2 and P3 report lines give way to the checks' values only after both sets PASS. B1's (c) line stays until U4g's judged B1 runs.\n7. Then U4f's build, then U4g.\nTE-B1-R2-2's runner edit also touches c-u4r-runs.mjs: the two runner edits go one after the other, never at the same time.",
+    "u4f_interaction": "Carry 80 (u4s-carries.md:518-534) needs no change to this wording.\n- (b): a refused snapshot whose header tick reads far ahead moves the client's newest tick and files the whole span lost. On L1 those ticks were sent and delivered, so snap_lost_unexplained_count counts them. That is correct: it is the bug (b) fixes. No clean L1 run meets it (sentinels are 0 on every judged run), and the fix only removes lost filings.\n- (d): adds tests that pin today's two too-old cases (bad header gives the sentinel; stale files nothing) with no behaviour change. The bar already treats a stale drop on L1 as unexplained, consistent with (d).\n- (e): makes a full state for a tick already completed file the sentinel when the hashes differ, in an order the room never produces (snapshot or full state, never both). The second figure ignores the sentinel, and no tick becomes lost.\n- U4f's brief (night-2026-11-16.md lists C62H-BOUND as open where (b) and (d) touch lost filing) can record this as settled: any U4f run that carries -17's L1 P2 or P3 parts is judged under both checks."
+  },
+  "questions": [
+    {
+      "code": "C62HB-Q1",
+      "question": "Should 'delivered too late' stay off the list of explanations?",
+      "why": "Option (a) as put to Mustafa (advisor-c62h-review-full.md:79) named it. Leaving it out changes the list he was shown (it gets stricter), so the wording to him must say so.",
+      "options": "(a) Leave it out. On L1 nothing can arrive after a snapshot 32 ticks newer (about 180 ms worst delay against the ring's 1.067 s; nothing newer is sent while a full state is in flight), so a stale drop is always a client error. (b) Build it from the fate log's arrival order: npt-l1 exposes arrivals, and npt-lab keeps each snapshot datagram's arrival per (client, tick) until written. That is about +70 lines that can never fire on L1, so the code can only ever hide an error if it is built wrong.",
+      "recommendation": "(a). The wording to Mustafa says plainly that 'too late' was dropped and why, and that this makes the bar stricter."
+    },
+    {
+      "code": "C62HB-Q2",
+      "question": "Where should the comparison live: in the judge as two figures, or in the lab as two flag series?",
+      "why": "It sets the size, and it decides whether the program that writes the record is also the one that grades against it.",
+      "options": "(a) The judge: the lab writes only the facts (the room log's per-slot link-loss count), and two npt-judge figures compare them with the client's filing. Fixtures pin every case of the closed list, the same figures can serve L2 later, and this is how -17's coverage rule already works (figures.rs:316-536). About 520 lines, and JDG-ONLY-1 rides by its standing home. (b) The lab: npt-lab writes tick.s.snap_lost_unexplained and tick.s.snap_whole_despite_link_loss in the client log, and the checks are plain measured sums with no judge change. About 390 lines. The two bites still guard it (whole-as-lost would read Missed if the flag code were broken).",
+      "recommendation": "(a), with the exact texts given here."
+    },
+    {
+      "code": "C62HB-Q3",
+      "question": "Should the P2 bite runs be full length inside the judged P2 set, or short runs?",
+      "why": "Option (a)'s text said 'a short P2 run', but the runner only knows full-length bite runs.",
+      "options": "(a) Full length (10 s + 600 s) in the judged P2 set, as P0's bites run today: no runner length option, about +11 min and +107 MiB. (b) Short runs (for example 60 s measured): a new runner length option and its own projection, which saves about 10 minutes.",
+      "recommendation": "(a)."
+    },
+    {
+      "code": "C62HB-Q4",
+      "question": "Should -58's L1 wrap parts (P0 and P3) get the same two checks?",
+      "why": "The advisor's ADV-C62H-1 found them unbounded too, and the same figures would work there. But that is a new bar on another mark, so it would be Mustafa's decision.",
+      "options": "(a) Not in this lane: the report names them as still unbounded. (b) Offer Mustafa a follow-up decision after this lane's sets PASS, which would also need -58's L1 P3 wrap runs re-run.",
+      "recommendation": "(a) now, with (b) offered in the report."
+    },
+    {
+      "code": "C62HB-Q5",
+      "question": "Does JDG-ONLY-1's fix ride this lane, since this is npt-judge's next change?",
+      "why": "Its standing home is 'npt-judge's next change, before PR #40 is marked ready at the latest'. Riding adds about 40-70 lines and a rust-reviewer read of main.rs and eval.rs.",
+      "options": "(a) It rides, in its own commit with its own report line, its lines counted apart in the size. (b) The advisor moves its home to its own small change before PR #40 is ready, keeping this lane to C62H-BOUND alone.",
+      "recommendation": "(a), as already ruled, unless the advisor prefers the cleaner read of (b)."
+    }
+  ],
+  "risks": [
+    "A mechanism I missed could make a correct client file a tick lost with neither E1 nor E2. The re-run sets would then show unexplained ticks, and the unit stops and tells Mustafa (history.md:2145). My read of every filing path (client lib.rs:492-615, :717-839) found only those two for npt-client on L1, and stale and sentinels are 0 on every judged run.",
+    "The join assumes Server::send sends only snapshot groups as datagrams. A later change that sends pings or other datagrams there breaks the one-to-one check, and the run fails loudly rather than writing a wrong record.",
+    "Disk: the P2 and P3 sets need 4,983.6 MiB and 4,620.4 MiB free at their starts (the runner's own check). The card had the build phase near 4.2 GiB, so KEPT-LOGS' pack (KL-YES, its own kit PR to main first) may have to come before the runs, delaying them.",
+    "A double fault can still hide: a lab record bug placed exactly where a client bug is. The two-sided checks, the two bites and the clean runs' 17k to 43k real losses make this narrow, but it is not zero.",
+    "The checks read the measured window only. Ticks the lab's stop decides lost (24 to 33 per P2 run, all in the after phase) are never checked. On a valid measured run, no stop decision can fall in the measured window (scenario.rs:1126-1137).",
+    "The summary line gains a phrase. c-u4r-runs.mjs reads 'overflow resyncs N' from that line, and the phrase goes after 'decided lost at the stop', so the runner's flag read must be confirmed on a dry plan before the sets.",
+    "The P2 set changes shape: it now has bites, so two judge calls and the split line, where U4r's P2 had one call. Its runs.txt is not line-for-line comparable with fc411116c1f1's.",
+    "Still unbounded after this lane: -58's two wrap parts (C62HB-Q4), -17's L2 parts (R3), and -17's L1 B1 part until U4g makes it valid. B1's (c) report line stays until then.",
+    "The bites build must run seed 1 the same as the measured build for the 'equal fate log' and '+48' expected lines. P0's whole-as-lost run (0 + 48) supports this, but on P2 it is unproven until the set runs. If it differs, the reason comes to the advisor.",
+    "The new checks are a stricter reading of ADR 0001's -17 row (row sha256 3075f638..., unchanged). Mustafa's yes to the wording is the decision, and the readings PR still lists them."
+  ],
+  "fallback_b": "Not needed. Option (a) can be built cleanly. npt-l1 decides every snapshot datagram's fate, lost or not, at its send (l1/src/lib.rs:1097-1105), and npt-lab sends each slot's groups for one tick in one Server::send call, with nothing else sent as a datagram in that call. So the lab can join every fate to its (client, tick) exactly at that point, checked one to one, through a small read-only npt-l1 accessor and without keeping the fate log."
+}

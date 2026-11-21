@@ -1,0 +1,10 @@
+equal: .claude/CHECKPOINTS.md (a637c7a357e79614f896ddddf7488e08b5fc9180) 20502 bytes, 249 lines, sha256 320c7f2552c13b7827d55101e743b5ac3910eff14b2cb3a2bcf5f4e5db20abfa
+equal: .claude/scripts/kept-logs.mjs (a637c7a357e79614f896ddddf7488e08b5fc9180) 17705 bytes, 323 lines, sha256 c9109ab42a0c84c9ee3d3026e92bbde6818d82d512c3f6ff4730e79ffd0edcbb
+equal: .claude/scripts/kept-logs.test.mjs (a637c7a357e79614f896ddddf7488e08b5fc9180) 18180 bytes, 326 lines, sha256 20de2081b6b68d058e6ec0021ef594b0bd64b7779292d6131f69f3e98aae8526
+equal: docs/REPO_MAP.md (a637c7a357e79614f896ddddf7488e08b5fc9180) 18816 bytes, 148 lines, sha256 d26ef25202e247c7501459aea663b73befd274487a5dfb47891c78b706d22de8
+files the PR changes (git diff --name-status against main 4460ef5):
+  M	.claude/CHECKPOINTS.md
+  A	.claude/scripts/kept-logs.mjs
+  A	.claude/scripts/kept-logs.test.mjs
+  M	docs/REPO_MAP.md
+compare: PASS

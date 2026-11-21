@@ -1,0 +1,22 @@
+   Compiling npt-link v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/wf_3ea724fc-a63-1/spikes/netcode-proof/crates/link)
+   Compiling npt-tcpinfo v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/wf_3ea724fc-a63-1/spikes/netcode-proof/crates/tcpinfo)
+   Compiling npt-l1 v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/wf_3ea724fc-a63-1/spikes/netcode-proof/crates/l1)
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/wf_3ea724fc-a63-1/spikes/netcode-proof/crates/net)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.82s
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+
+running 1 test
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.634 ms p99 1.177 ms max 1.885 ms
+dir 0: 299 segments, 4 stalls (99.9 % band 0-15), repairs rack 4 probe 0 timeout 0
+dir 1: receipt − (delivery + lateness): p50 0.040 ms p99 0.154 ms max 0.229 ms; the poll's own window: p50 0.092 ms p99 0.343 ms max 2.074 ms
+dir 1: 298 segments, 6 stalls (99.9 % band 0-15), repairs rack 6 probe 0 timeout 0
+lateness down (P2, 30 Hz, 10.0 s): n 301 p50 0.460 ms p99 0.887 ms p99.9 1.716 ms max 1.716 ms E 6.3 µs over 4  ** CONDITION 10's TRIGGER: bring to the advisor **
+lateness up (P2, 30 Hz, 10.0 s): n 301 p50 0.590 ms p99 2.063 ms p99.9 4.783 ms max 4.783 ms E 50.0 µs over 22  ** CONDITION 10's TRIGGER: bring to the advisor **
+test l2::delay::tests::loopback_tls_tungstenite_at_p2_30_hz_both_ways ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 147 filtered out; finished in 13.06s
+
+
+real	0m32.038s
+user	0m11.524s
+sys	0m2.093s

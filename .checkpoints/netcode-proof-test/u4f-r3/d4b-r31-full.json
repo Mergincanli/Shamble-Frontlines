@@ -1,0 +1,556 @@
+{
+ "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4f-r3/d4b/d4b-notes.md",
+ "script": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4f-r3/d4b/d4_model_b.py",
+ "choices": [
+  "C1 offset sign: h = host clock - server clock (the lab's offset_ns, scenario.rs:930, :1131); error = estimate - h, reported as abs.",
+  "C2 integer ns throughout, as the code: L1's uniform integer delay in [one_way - a, one_way + a] inclusive (l1/src/lib.rs:846), the client's floor step grid (client/src/lib.rs:485-488), the server's floor tick grid floor(k*1e9/30) (schedule.rs:125-134); one division at the end.",
+  "C3 per-sample own-ping estimate: NTP/Cristian midpoint est = (c_s + c_r)/2 - s_hat, so est - h = (d_down - d_up)/2 + (s_r - s_hat) [+ b/2 bitten]; RTT = c_r - c_s, hold 0 (pump.rs:460, the runner wakes at the arrival).",
+  "C4 half-tick bias: every tick-stamp estimator (mean, lowest-RTT, newest) uses the centred stamp (T_{k-1} + T_k)/2; the uncentred T_k is a printed sensitivity only (about -16.6 ms median, fails).",
+  "C5 a Ping arriving exactly at a tick instant is stamped that tick (RQ8: the I/O step before the tick at one instant, scenario.rs:6-11, :476); stamp = smallest k with T_k >= s_r. 0 of 60,000 samples hit it under (ii).",
+  "C6 exact sub-tick stamp (U4F-Q6 (b), addition): the server arrival floored to the us since the previous tick's due instant.",
+  "C7 phases: per connect phi uniform in [0, 33,333,333] ns, first ping at T_300 + phi, ping m at step 3m = exactly m*1e8 ns later, so under (ii) every ping meets the tick grid at exactly phi (no ns drift on the floor grid); (i) shifts the quantising grid per sample by a uniform u_m, everything else unchanged.",
+  "C8 room-ping schedule: one seeded start R0 uniform in [0, 250 ms) per connect, 8 pings exactly 250 ms apart (pump slip left out), the same under (i) and (ii); since 250 ms = 7.5 ticks their phase against the client grid alternates by half a tick. (e)'s rows are therefore identical under (i) and (ii).",
+  "C9 (e) combination left open by the brief, both reported as main rows: e/mean-of-8 (mean of the 8 per-ping estimates) and e/lowest-of-8 (the ping with the smallest arrival - sent_ns); one-way delay = half the lowest observed own-ping RTT (bitten under arrivals (2)).",
+  "C10 the bite: every arrival stamp (own Pongs and room pings) moved to the first client step at or after it (an arrival at a step instant is read by that step: poll_recv(now) includes now); bitten RTTs become exactly 3 ticks = 100,000,000 ns (3,000 of 3,000 connects); lowest-RTT ties broken by first minimum in send order (strict <).",
+  "C11 loss: P2's 2 % each way not in the main rows (D4 fixes 20 samples and 8 room pings); run as an addition (own sample kept at 0.98^2, room ping at 0.98). Not modelled: L1's 1 % reorder step (it only delays, never lowers a lowest-RTT pick), the ADR's drift/reset filter rules, the read-instant cut (all samples arrive before it), and any constant between room tick numbers and server ns (the model gives the client the exact tick-to-ns map).",
+  "C12 draws: one random.Random(seed) per seed 1, 2, 3; a fixed number of draws per connect in a fixed order, so every variant is paired on the same draws; h uniform in [0, 1,000 s) as the lab.",
+  "C13 the bite shows when clean p99 <= 5 ms and bitten p99 > 5 ms, judged pooled (3,000) and per seed (all three agree); p99 nearest-rank ceil(0.99 n) as the judge (judge/src/eval.rs:264-289).",
+  "C14 additions marked addition=true: mean and lowest-RTT with the exact stamp; the newest sample (own ping 19, always the last to arrive) with the tick stamp and with the exact stamp; 2 % loss rows (the exact-stamp ones in this schema; all loss rows are in the notes)."
+ ],
+ "rows": [
+  {
+   "estimator": "mean of samples (tick stamp, as built)",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    6.236,
+    6.293,
+    5.743
+   ],
+   "p99_ms_pooled": 6.134,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "mean of samples (tick stamp, as built)",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    14.067,
+    14.095,
+    14.572
+   ],
+   "p99_ms_pooled": 14.276,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "mean of samples (tick stamp, as built)",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    8.536,
+    9.017,
+    8.921
+   ],
+   "p99_ms_pooled": 8.831,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "mean of samples (tick stamp, as built)",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    17.757,
+    17.651,
+    18.034
+   ],
+   "p99_ms_pooled": 17.822,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "lowest-RTT sample (tick stamp, as built)",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    18.311,
+    18.316,
+    18.493
+   ],
+   "p99_ms_pooled": 18.391,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "lowest-RTT sample (tick stamp, as built)",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    23.948,
+    23.599,
+    24.167
+   ],
+   "p99_ms_pooled": 23.997,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "lowest-RTT sample (tick stamp, as built)",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    18.342,
+    17.859,
+    18.384
+   ],
+   "p99_ms_pooled": 18.281,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "lowest-RTT sample (tick stamp, as built)",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    23.778,
+    24.003,
+    23.689
+   ],
+   "p99_ms_pooled": 23.811,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "(e) room pings, mean of 8, less half the lowest own-ping RTT",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    12.634,
+    13.091,
+    12.491
+   ],
+   "p99_ms_pooled": 12.712,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "(e) room pings, mean of 8, less half the lowest own-ping RTT",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    25.424,
+    26.25,
+    25.165
+   ],
+   "p99_ms_pooled": 25.833,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "(e) room pings, mean of 8, less half the lowest own-ping RTT",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    12.634,
+    13.091,
+    12.491
+   ],
+   "p99_ms_pooled": 12.712,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "(e) room pings, mean of 8, less half the lowest own-ping RTT",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    25.424,
+    26.25,
+    25.165
+   ],
+   "p99_ms_pooled": 25.833,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "(e) room pings, lowest of 8, less half the lowest own-ping RTT",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    6.43,
+    6.203,
+    6.375
+   ],
+   "p99_ms_pooled": 6.424,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "(e) room pings, lowest of 8, less half the lowest own-ping RTT",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    15.817,
+    15.508,
+    15.971
+   ],
+   "p99_ms_pooled": 15.79,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "(e) room pings, lowest of 8, less half the lowest own-ping RTT",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    6.43,
+    6.203,
+    6.375
+   ],
+   "p99_ms_pooled": 6.424,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "(e) room pings, lowest of 8, less half the lowest own-ping RTT",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    15.817,
+    15.508,
+    15.971
+   ],
+   "p99_ms_pooled": 15.79,
+   "passes_5ms": false,
+   "addition": false
+  },
+  {
+   "estimator": "mean of samples (exact sub-tick stamp, U4F-Q6 (b))",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    2.208,
+    2.406,
+    2.402
+   ],
+   "p99_ms_pooled": 2.312,
+   "passes_5ms": true,
+   "addition": true
+  },
+  {
+   "estimator": "mean of samples (exact sub-tick stamp, U4F-Q6 (b))",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    12.115,
+    12.166,
+    12.298
+   ],
+   "p99_ms_pooled": 12.194,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "mean of samples (exact sub-tick stamp, U4F-Q6 (b))",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    2.208,
+    2.406,
+    2.402
+   ],
+   "p99_ms_pooled": 2.312,
+   "passes_5ms": true,
+   "addition": true
+  },
+  {
+   "estimator": "mean of samples (exact sub-tick stamp, U4F-Q6 (b))",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    12.115,
+    12.166,
+    12.298
+   ],
+   "p99_ms_pooled": 12.194,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "lowest-RTT sample (exact sub-tick stamp, U4F-Q6 (b))",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    4.74,
+    4.478,
+    4.553
+   ],
+   "p99_ms_pooled": 4.567,
+   "passes_5ms": true,
+   "addition": true
+  },
+  {
+   "estimator": "lowest-RTT sample (exact sub-tick stamp, U4F-Q6 (b))",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    9.932,
+    9.914,
+    9.918
+   ],
+   "p99_ms_pooled": 9.922,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "lowest-RTT sample (exact sub-tick stamp, U4F-Q6 (b))",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    4.74,
+    4.478,
+    4.554
+   ],
+   "p99_ms_pooled": 4.568,
+   "passes_5ms": true,
+   "addition": true
+  },
+  {
+   "estimator": "lowest-RTT sample (exact sub-tick stamp, U4F-Q6 (b))",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    9.932,
+    9.914,
+    9.917
+   ],
+   "p99_ms_pooled": 9.922,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "newest sample alone, PM-0001-47/newest-sample (tick stamp, as built)",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    21.831,
+    22.208,
+    22.36
+   ],
+   "p99_ms_pooled": 22.208,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "newest sample alone, PM-0001-47/newest-sample (tick stamp, as built)",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    34.103,
+    32.756,
+    33.055
+   ],
+   "p99_ms_pooled": 33.497,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "newest sample alone, PM-0001-47/newest-sample (tick stamp, as built)",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    21.461,
+    21.718,
+    21.725
+   ],
+   "p99_ms_pooled": 21.718,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "newest sample alone, PM-0001-47/newest-sample (tick stamp, as built)",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    33.996,
+    33.921,
+    32.852
+   ],
+   "p99_ms_pooled": 33.733,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "newest sample alone, PM-0001-47/newest-sample (exact sub-tick stamp)",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    8.974,
+    8.846,
+    9.1
+   ],
+   "p99_ms_pooled": 8.904,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "newest sample alone, PM-0001-47/newest-sample (exact sub-tick stamp)",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    23.854,
+    23.54,
+    23.924
+   ],
+   "p99_ms_pooled": 23.759,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "newest sample alone, PM-0001-47/newest-sample (exact sub-tick stamp)",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    8.974,
+    8.845,
+    9.1
+   ],
+   "p99_ms_pooled": 8.903,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "newest sample alone, PM-0001-47/newest-sample (exact sub-tick stamp)",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    23.855,
+    23.54,
+    23.924
+   ],
+   "p99_ms_pooled": 23.759,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "mean of samples (exact sub-tick stamp) + P2 2 % loss each way",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    2.299,
+    2.396,
+    2.409
+   ],
+   "p99_ms_pooled": 2.396,
+   "passes_5ms": true,
+   "addition": true
+  },
+  {
+   "estimator": "mean of samples (exact sub-tick stamp) + P2 2 % loss each way",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    12.294,
+    12.533,
+    12.343
+   ],
+   "p99_ms_pooled": 12.357,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "mean of samples (exact sub-tick stamp) + P2 2 % loss each way",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    2.299,
+    2.396,
+    2.409
+   ],
+   "p99_ms_pooled": 2.396,
+   "passes_5ms": true,
+   "addition": true
+  },
+  {
+   "estimator": "mean of samples (exact sub-tick stamp) + P2 2 % loss each way",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    12.294,
+    12.533,
+    12.343
+   ],
+   "p99_ms_pooled": 12.357,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "lowest-RTT sample (exact sub-tick stamp) + P2 2 % loss each way",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    4.74,
+    4.514,
+    4.871
+   ],
+   "p99_ms_pooled": 4.74,
+   "passes_5ms": true,
+   "addition": true
+  },
+  {
+   "estimator": "lowest-RTT sample (exact sub-tick stamp) + P2 2 % loss each way",
+   "phase_model": "(i) uniform per sample",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    9.913,
+    9.914,
+    9.918
+   ],
+   "p99_ms_pooled": 9.918,
+   "passes_5ms": false,
+   "addition": true
+  },
+  {
+   "estimator": "lowest-RTT sample (exact sub-tick stamp) + P2 2 % loss each way",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(1) as built",
+   "p99_ms_per_seed": [
+    4.74,
+    4.514,
+    4.872
+   ],
+   "p99_ms_pooled": 4.74,
+   "passes_5ms": true,
+   "addition": true
+  },
+  {
+   "estimator": "lowest-RTT sample (exact sub-tick stamp) + P2 2 % loss each way",
+   "phase_model": "(ii) one phase per connect",
+   "arrivals": "(2) bitten (tick-quantised)",
+   "p99_ms_per_seed": [
+    9.913,
+    9.914,
+    9.917
+   ],
+   "p99_ms_pooled": 9.917,
+   "passes_5ms": false,
+   "addition": true
+  }
+ ],
+ "bite_shows": [
+  "mean, tick stamp (as built), phase (i): NO, hidden because the clean run already fails (6.134 ms clean, 14.276 ms bitten)",
+  "mean, tick stamp (as built), phase (ii): NO, hidden because the clean run already fails (8.831 ms clean, 17.822 ms bitten)",
+  "lowest-RTT, tick stamp (as built), phase (i): NO, hidden because the clean run already fails (18.391 ms clean, 23.997 ms bitten)",
+  "lowest-RTT, tick stamp (as built), phase (ii): NO, hidden because the clean run already fails (18.281 ms clean, 23.811 ms bitten)",
+  "(e) mean of 8 room pings, phases (i) and (ii) (identical by construction): NO, hidden because the clean run already fails (12.712 ms clean with a +7.29 ms median bias, 25.833 ms bitten)",
+  "(e) lowest of 8 room pings, phases (i) and (ii): NO, hidden because the clean run already fails (6.424 ms clean, 15.790 ms bitten)",
+  "addition: mean, exact sub-tick stamp (U4F-Q6 (b)), phases (i) and (ii): YES, pooled and on every seed (2.312 ms clean, 12.194 ms bitten; with 2 % loss 2.396 and 12.357 ms)",
+  "addition: lowest-RTT, exact sub-tick stamp (U4F-Q6 (b)), phases (i) and (ii): YES, pooled and on every seed (4.567 or 4.568 ms clean, 9.922 ms bitten; with 2 % loss 4.740 and 9.918 ms). Every bitten RTT collapses to exactly 3 ticks, so the strict-< first-minimum pick takes the oldest sample with a true RTT of at most 100 ms. A filter that averages all the tied lowest samples was not modelled",
+  "addition: newest sample, tick stamp: NO, hidden because the clean run already fails (22.208 or 21.718 ms clean)",
+  "addition: newest sample, exact stamp: NO, hidden because the clean run already fails (8.904 ms clean, 23.759 ms bitten)",
+  "newest-sample bite (PM-0001-47/newest-sample): YES against both exact-stamp estimators (mean 2.312 and lowest-RTT 4.567 ms clean, against 8.904 ms for the newest sample alone). Hidden against every tick-stamp estimator, because those already fail clean"
+ ],
+ "summary": "I built the independent model B of brief row D4 and ran it once (/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4f-r3/d4b/d4_model_b.py; the full output and choices C1 to C14 are in d4b-notes.md beside it). I did not read the main session's d4/ folder. It uses D4's fixed parameters at P2 (each direction 50 ms + U[-10, 10] ms, in integer ns), 1,000 connects x seeds 1, 2, 3, 20 own pings and 8 room pings. p99 is nearest-rank, as the judge computes it.\n\n(1) As built (U4F-Q6 (a)), no estimator passes -47's 5 ms under either phase model. With the stamp centred on the tick (C4), the mean of samples gives 6.134 ms (i) and 8.831 ms (ii); the lowest-RTT sample gives 18.391 ms and 18.281 ms. NA-4 holds: phase-locking raises the mean's p99 from 6.1 to 8.8 ms (max 11.3 ms). Even uniform phases miss the bar, because 20 samples of a 33.3 ms quantisation leave about 2.3 ms of spread. If the stamp is not centred, every estimator also carries about a -16.6 ms bias.\n\n(2) Option (e) as worded fails. The mean of the 8 room pings gives 12.712 ms with a +7.29 ms median bias, because half the lowest of 20 RTTs (about 42.7 ms) sits below the 50 ms mean one-way delay. The lowest of the 8 gives 6.424 ms. Both are the same under (i) and (ii), by construction.\n\n(3) An exact sub-tick server stamp (U4F-Q6 (b), an addition) passes under both phase models. The mean gives 2.312 ms. The lowest-RTT sample gives 4.567 ms, a thin margin: seeds 4.740, 4.478 and 4.553 ms, and 4.871 ms on seed 3 with 2 % loss.\n\n(4) The tick-quantised bite shows only under the exact stamp: bitten, the mean reads 12.194 ms and the lowest-RTT sample 9.922 ms, pooled and on every seed. Under the as-built tick stamp, and for (e), it is hidden because the clean runs already fail. The newest-sample bite (8.904 ms with the exact stamp) shows against both exact-stamp estimators and is hidden against every tick-stamp one.\n\n(5) On TE-6's worry: the lowest-RTT bite still shows under the exact stamp, but only because every bitten RTT is exactly 3 ticks (3,000 of 3,000 connects) and ties go to the oldest sample. I did not model a filter that averages all the tied lowest samples; my estimate puts its bitten bias near +3.3 ms, so 5.3's short run is still needed.\n\n(6) 2 % loss changes no pass or fail result. Not modelled: L1's reorder step, the ADR's filter thresholds, and any constant between room tick numbers and server ns.\n\nFor U4F-Q6 this is data, not a ruling: of (a), (b) and (e), only (b) lets -47 pass at P2 with both bites showing, and among (b)'s estimators the mean has the margin."
+}

@@ -1,0 +1,371 @@
+diff --git a/spikes/netcode-proof/crates/room/src/room.rs b/spikes/netcode-proof/crates/room/src/room.rs
+index e38ebdd..5ce5bac 100644
+--- a/spikes/netcode-proof/crates/room/src/room.rs
++++ b/spikes/netcode-proof/crates/room/src/room.rs
+@@ -352,8 +352,9 @@ impl ClientSlot {
+ 
+     /// The last tick's press edges: (seen, lost, doubled), over the commands run (-20's and -58's
+     /// `tick.v.press_count`, `.press_lost_count`, `.press_doubled_count`). Seen: each button's counter advance over the
+-    /// last command run on this slot; lost: the edges beyond the one the sim takes from a changed counter (npt-sim
+-    /// world.rs: an edge is a counter that differs from the one it last claimed); doubled: an edge on option B's repeat.
++    /// last command run on this slot; lost: the advance less the edges npt-sim's one rule takes from it
++    /// ([`Command::edges_taken`]), counted here with that rule and not read from the sim, so 0 while the rule takes
++    /// every edge; doubled: an edge taken on option B's repeat.
+     pub fn presses(&self) -> (u32, u32, u32) {
+         (self.t.presses[0], self.t.presses[1], self.t.presses[2])
+     }
+@@ -1325,8 +1326,10 @@ impl<S: SimCore> Room<S> {
+ }
+ 
+ /// One command run for `c` this tick (option B's repeat when `repeated`): its press edges counted against the slot's
+-/// last run counters `presses` (seen, lost beyond the one edge the sim takes, doubled on a repeat), the fire-press
+-/// tracking, and its Rewind when it holds or presses fire.
++/// last run counters `presses` (seen: each counter's advance; lost: the advance less the edges npt-sim's one rule
++/// [`Command::edges_taken`] takes, counted here with that rule and not read from the sim, so 0 while the rule takes
++/// every edge; doubled: the edges taken on a repeat), the fire-press tracking, and its Rewind when it holds or presses
++/// fire.
+ fn run_one(
+     c: &mut ClientSlot,
+     cmd: Command,
+@@ -1336,12 +1339,13 @@ fn run_one(
+     cover: CoverVariant,
+ ) -> (Command, Option<Rewind>) {
+     for (k, &p) in cmd.presses.iter().enumerate() {
+-        let edges = u32::from(p.wrapping_sub(presses[k]));
++        let advance = u32::from(p.wrapping_sub(presses[k]));
++        let taken = u32::from(Command::edges_taken(presses[k], p));
+         if repeated {
+-            c.t.presses[2] += edges;
++            c.t.presses[2] += taken;
+         } else {
+-            c.t.presses[0] += edges;
+-            c.t.presses[1] += edges.saturating_sub(1);
++            c.t.presses[0] += advance;
++            c.t.presses[1] += advance.saturating_sub(taken);
+         }
+     }
+     if !repeated {
+diff --git a/spikes/netcode-proof/crates/room/tests/commands.rs b/spikes/netcode-proof/crates/room/tests/commands.rs
+index 04f7e71..e0919ad 100644
+--- a/spikes/netcode-proof/crates/room/tests/commands.rs
++++ b/spikes/netcode-proof/crates/room/tests/commands.rs
+@@ -609,6 +609,40 @@ fn f17_a_forged_press_stream_and_its_twin_give_equal_state_hashes_on_every_tick(
+     assert_eq!(forged_hashes, twin_hashes);
+ }
+ 
++/// U4f-F1's T1 (ADV-U4F20-1; ADR 0001:226, :234-237): under option B two commands that arrive late (their ticks run, B
++/// repeating the last) each carry a fire press, so the next on-time command's counter is 2 edges on from the last
++/// command run (kind 5 accepts it: it covers 3 ticks from the newest accepted). Its two edges are seen, none lost and
++/// none doubled, and the sim takes both: the first fires, the second (one shot per command) is refused as Cooldown
++/// with that command's sequence.
++#[test]
++fn t1_under_option_b_two_late_drops_then_a_command_two_edges_on_lose_no_press() {
++    let (mut r, j) = room(CmdTiming::B, 100);
++    send(&mut r, &[cmd(1, j + 1)]);
++    let mut ran = Vec::new();
++    for _ in 0..4 {
++        ran.extend(tick(&mut r));
++    }
++    assert_eq!(ran, [1, 1, 1], "j + 1 runs it, j + 2 and j + 3 repeat it");
++    let pressed = |seq: u16, fire: u8| {
++        let mut c = cmd(seq, j + u32::from(seq));
++        c.presses[Command::PRESS_FIRE] = fire;
++        c.aim = [400, 0, 100];
++        c
++    };
++    send(&mut r, &[pressed(2, 1), pressed(3, 2), pressed(4, 2)]);
++    assert_eq!(tick(&mut r), [4]);
++    assert_eq!(counters(&r).late, 2, "the commands for j + 2 and j + 3");
++    // The sim's side first (TE-F1-3): the room's count below uses the same rule, so only this shows the sim's take.
++    let second = npt_sim::Refusal {
++        slot: 0,
++        seq: 4,
++        kind: npt_sim::RefusalKind::Cooldown,
++    };
++    assert_eq!(r.reports().refusals, [second], "the second edge, refused");
++    let presses = r.client(0).map(|c| c.presses());
++    assert_eq!(presses, Some((2, 0, 0)), "seen, lost, doubled");
++}
++
+ /// f34 (NA-14; the advisor's A3): under option A a trace whose commands arrive bunched (two in one tick, none the next)
+ /// gives `cmd_on_time` 1 for every tick whose stamped command arrived before it ran; a stamped command that never
+ /// arrived, and one that arrived after its tick, give 0; under both options.
+diff --git a/spikes/netcode-proof/crates/sim/src/seam.rs b/spikes/netcode-proof/crates/sim/src/seam.rs
+index 80748ff..9300b70 100644
+--- a/spikes/netcode-proof/crates/sim/src/seam.rs
++++ b/spikes/netcode-proof/crates/sim/src/seam.rs
+@@ -69,6 +69,16 @@ impl Command {
+     /// The melee button's press counter: named for the catalogue's action starts (fire, reload, throw, melee); the
+     /// stand-in sim has no melee and reads no press from it.
+     pub const PRESS_MELEE: usize = 3;
++
++    /// The press edges the sim takes from one counter's advance, from `last` (the counter of the last command run for
++    /// the slot) to `now`, wrapping: every edge of it, since a command dropped (or late) passes its presses to the next
++    /// one's counter and a resent command can neither lose nor double a press (ADR 0001:226). `World` runs each edge
++    /// through its own check against the server's state (:234-237), and npt-room's press series counts with this one
++    /// rule (lost: the advance less these), so the room's count and the rule cannot drift; the room does not read the
++    /// sim's take, which T1 and T2 test. Integers only.
++    pub const fn edges_taken(last: u8, now: u8) -> u8 {
++        now.wrapping_sub(last)
++    }
+ }
+ 
+ /// R-10's two cover variants (OQ-0001-9; plan.md:1382): the state a lag-compensated shot sees cover items in.
+diff --git a/spikes/netcode-proof/crates/sim/src/world.rs b/spikes/netcode-proof/crates/sim/src/world.rs
+index 8302434..1faee05 100644
+--- a/spikes/netcode-proof/crates/sim/src/world.rs
++++ b/spikes/netcode-proof/crates/sim/src/world.rs
+@@ -28,14 +28,17 @@
+ //!   toward one: [`Rewind`]'s rule) is counted and the command then runs exactly as with `None`: one rule for both
+ //!   (carry 10).
+ //! - **Refused input leaves no trace in the state** (the advisor's condition 1): a fire press in the cooldown or with
+-//!   no ammunition, a reload press the weapon refuses, a throw into a full pool and a Rewind outside the ring are
+-//!   counted in [`InputReports`], each listed there as a [`crate::Refusal`] (slot, sequence, kind) for the tick, and
+-//!   change nothing hashed; a clamped aim point is reported there and the shot uses the clamped point. The world's one
+-//!   piece of per-slot input bookkeeping is the press counters of the last command it ran for that slot: a press edge
+-//!   is a counter that differs from them, and a refused press's edge is consumed there and changes nothing hashed. They
+-//!   stay outside the hash and the dump (a twin's counters differ by design) and are a function of the command stream
+-//!   alone. A refused press's twin is the same stream with that press removed: that button's counter one lower from
+-//!   the refused command on, every other field equal (the advisor's W1-U4D ruling).
++//!   no ammunition (or beyond its command's one shot), a reload press the weapon refuses, a throw into a full pool and
++//!   a Rewind outside the ring are counted in [`InputReports`], each listed there as a [`crate::Refusal`] (slot,
++//!   sequence, kind) for the tick, and change nothing hashed; a clamped aim point is reported there and the shot uses
++//!   the clamped point. The world's one piece of per-slot input bookkeeping is the press counters of the last command
++//!   it ran for that slot: a counter's advance over them is that many press edges ([`Command::edges_taken`]; ADR
++//!   0001:226, :234-237), each through its own check, so a press a dropped command carried is taken from the next
++//!   one's counter; a command fires at most one shot, so each further fire edge is refused. A refused press's edge is
++//!   consumed there and changes nothing hashed. They stay outside the hash and the dump (a twin's counters differ by
++//!   design) and are a function of the command stream alone. A refused press's twin is the same stream with that
++//!   press removed: that button's counter one lower from the refused command on, every other field equal (the
++//!   advisor's W1-U4D ruling).
+ //! - Integers come in widened before any arithmetic (`move_xy` to i32, `aim` to f64), so no recorded command trips an
+ //!   overflow check (carry 15); every float the state holds is finite, asserted each tick in debug builds (D-4).
+ //! - `HitVolumes::tick` is the world's own tick counter, never `TickInput::tick` (carry 15).
+@@ -1337,12 +1340,14 @@ impl World {
+         if slot >= self.soldiers.len() {
+             return false;
+         }
+-        // The press edges: a counter that changed is one press (the room allows one per button per tick); the counter
+-        // seen is the client's claim, kept outside the state.
+-        let mut edge = [false; 4];
+-        for (k, e) in edge.iter_mut().enumerate() {
+-            *e = c.presses[k] != self.claimed[slot][k];
++        // The press edges: every edge of each counter's advance over the one last claimed ([`Command::edges_taken`]),
++        // each through its own check below, reload's, then fire's, then throw's; a button's first edge runs the
++        // one-edge code (`edge`). The counter seen is the client's claim, kept outside the state.
++        let mut edges = [0u8; 4];
++        for (k, e) in edges.iter_mut().enumerate() {
++            *e = Command::edges_taken(self.claimed[slot][k], c.presses[k]);
+         }
++        let edge = edges.map(|n| n > 0);
+         self.claimed[slot] = c.presses;
+         let mut s = self.soldiers[slot];
+         if !s.alive || self.scene.is_plate(c.slot) {
+@@ -1416,7 +1421,9 @@ impl World {
+                 s.ammo = w.magazine;
+             }
+         }
+-        if edge[Command::PRESS_RELOAD] {
++        // Each reload edge against the state the edge before it left: the first may start a reload, which refuses the
++        // rest.
++        for _ in 0..edges[Command::PRESS_RELOAD] {
+             if s.reload_left > 0 || s.ammo >= w.magazine {
+                 if authority {
+                     self.reports.reload += 1;
+@@ -1477,12 +1484,28 @@ impl World {
+                 });
+             }
+         }
++        // A command fires at most one shot: each fire edge beyond the first is refused and counted, by the kind test
++        // above against the weapon the shot (or the first edge's refusal) left.
++        if authority {
++            for _ in 1..edges[Command::PRESS_FIRE] {
++                if s.ammo == 0 {
++                    self.reports.ammunition += 1;
++                    self.refuse(c, RefusalKind::Ammunition);
++                } else {
++                    self.reports.cooldown += 1;
++                    self.refuse(c, RefusalKind::Cooldown);
++                }
++            }
++        }
+         if s.reload_left > 0 {
+             s.flags |= FLAG_RELOADING;
+         }
+         self.soldiers[slot] = s;
+-        if edge[Command::PRESS_THROW] && authority {
+-            self.throw(c, origin, d);
++        // Each throw edge throws, or is refused when the pool is full.
++        if authority {
++            for _ in 0..edges[Command::PRESS_THROW] {
++                self.throw(c, origin, d);
++            }
+         }
+         fired
+     }
+diff --git a/spikes/netcode-proof/crates/sim/tests/seam.rs b/spikes/netcode-proof/crates/sim/tests/seam.rs
+index 08febdc..fc8f7ac 100644
+--- a/spikes/netcode-proof/crates/sim/tests/seam.rs
++++ b/spikes/netcode-proof/crates/sim/tests/seam.rs
+@@ -576,6 +576,22 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
+     assert_ne!(POSITION_XY, VELOCITY, "one range, two kinds");
+ }
+ 
++/// U4f-F1's FP-2 (RR-F1-2, TE-F1-2): the one press rule takes every edge of a counter's advance across the u8 wrap
++/// (ADR 0001:226; PM-0001-58's wrapping counters), none on an unchanged counter.
++#[test]
++fn f1_edges_taken_is_the_wrapping_advance() {
++    for (last, now, edges) in [
++        (255, 1, 2),
++        (254, 0, 2),
++        (1, 0, 255),
++        (0, 255, 255),
++        (7, 7, 0),
++        (0, 1, 1),
++    ] {
++        assert_eq!(Command::edges_taken(last, now), edges, "{last} to {now}");
++    }
++}
++
+ /// The share of position values from 0 to 20 m, in sixteenths of a centimetre, on which `a` and `b` differ.
+ #[cfg(feature = "bites")]
+ fn differing_share(a: impl Fn(f32) -> f32, b: impl Fn(f32) -> f32) -> f64 {
+diff --git a/spikes/netcode-proof/crates/sim/tests/world.rs b/spikes/netcode-proof/crates/sim/tests/world.rs
+index 4d8a0ce..41991b9 100644
+--- a/spikes/netcode-proof/crates/sim/tests/world.rs
++++ b/spikes/netcode-proof/crates/sim/tests/world.rs
+@@ -1806,6 +1806,134 @@ fn d10_a_rewind_outside_the_ring_leaves_no_trace() {
+     assert!(rt.refusals.is_empty());
+ }
+ 
++/// U4f-F1's T2 (ADV-U4F20-1; ADR 0001:226, :234-237), the d10 twin form: the forged stream is `press` with button
++/// `k`'s step `at` named twice, so its command there is 2 edges on; the twin names it once. `twins` asserts equal state
++/// hashes and event lists on every tick (the second edge is refused and leaves no trace). Returns both runs' reports
++/// and the forged run's shots.
++fn two_edges(
++    n: u32,
++    held: impl Fn(u32) -> u16 + Copy,
++    press: &[(usize, u32)],
++    (k, at): (usize, u32),
++) -> (InputReports, InputReports, Vec<usize>) {
++    let twin = course_stream(n, held, press);
++    let forged = course_stream(n, held, &[press, &[(k, at)][..]].concat());
++    let (rf, rt, _) = twins(&Scene::course(), &forged, &twin, |_, _| {});
++    (rf, rt, shots_of(&forged))
++}
++
++#[test]
++fn t2_a_two_fire_edges_with_fire_held_and_the_weapon_ready_fire_once() {
++    // Fire held from 10 (ready), the fire counter 2 edges on at 10: one shot, the second edge refused as Cooldown.
++    let held = |k: u32| if k >= 10 { Command::FIRE } else { 0 };
++    let (rf, rt, shots) = two_edges(40, held, &[(0, 10)], (0, 10));
++    assert_eq!(shots[..2], [10, 13]);
++    assert_eq!((rf.cooldown, rt.cooldown), (1, 0));
++    assert_eq!(rf.refusals, [refusal(10, RefusalKind::Cooldown)]);
++    assert!(rt.refusals.is_empty());
++}
++
++#[test]
++fn t2_b_two_fire_edges_with_the_weapon_ready_fire_once() {
++    let (rf, rt, shots) = two_edges(40, |_| 0, &[(0, 10), (0, 20)], (0, 10));
++    assert_eq!(shots, [10, 20]);
++    assert_eq!((rf.cooldown, rt.cooldown), (1, 0));
++    assert_eq!(rf.refusals, [refusal(10, RefusalKind::Cooldown)]);
++    assert!(rt.refusals.is_empty());
++}
++
++#[test]
++fn t2_c_two_fire_edges_in_the_cooldown_are_both_refused() {
++    let (rf, rt, shots) = two_edges(40, |_| 0, &[(0, 10), (0, 11), (0, 20)], (0, 11));
++    assert_eq!(shots, [10, 20]);
++    assert_eq!((rf.cooldown, rt.cooldown), (2, 1));
++    let cooldown = refusal(11, RefusalKind::Cooldown);
++    assert_eq!(rf.refusals, [cooldown, cooldown]);
++    assert_eq!(rt.refusals, [cooldown]);
++}
++
++#[test]
++fn t2_d_two_fire_edges_on_the_last_round_fire_it_and_refuse_as_ammunition() {
++    // Fire held from 0 to 84 spends 29 of the 30 rounds; 2 edges at 100 fire the last, then meet an empty magazine;
++    // the reload at 105 runs and the press at 170 fires in both.
++    let held = |k: u32| if k < 85 { Command::FIRE } else { 0 };
++    let (rf, rt, shots) = two_edges(200, held, &[(0, 100), (1, 105), (0, 170)], (0, 100));
++    assert_eq!((shots.len(), &shots[28..]), (31, &[84, 100, 170][..]));
++    assert_eq!((rf.ammunition, rt.ammunition), (1, 0));
++    assert_eq!(rf.refusals, [refusal(100, RefusalKind::Ammunition)]);
++    assert!(rt.refusals.is_empty());
++}
++
++#[test]
++fn t2_e_two_reload_edges_start_one_reload_and_refuse_the_second() {
++    // Fire held from 0 to 29 spends ten rounds; 2 reload edges at 50: one reload (to 110), the second refused; the
++    // press at 120 fires in both.
++    let held = |k: u32| if k < 30 { Command::FIRE } else { 0 };
++    let (rf, rt, shots) = two_edges(140, held, &[(1, 50), (0, 120)], (1, 50));
++    assert_eq!(shots.last(), Some(&120));
++    assert_eq!((rf.reload, rt.reload), (1, 0));
++    assert_eq!(rf.refusals, [refusal(50, RefusalKind::Reload)]);
++    assert!(rt.refusals.is_empty());
++}
++
++/// The dump word named exactly `name`, if the dump has one.
++fn word_if(d: &StateDump, name: &str) -> Option<u32> {
++    (0..d.words().len())
++        .find(|&i| d.field(i).as_deref() == Some(name))
++        .map(|i| d.words()[i])
++}
++
++/// The command sequences of `world`'s live projectiles, in pool order (the dump's `projectile[i].live` and `.seq`).
++fn live_seqs(world: &World) -> Vec<u32> {
++    let d = world.dump();
++    (0..)
++        .map_while(|i| word_if(&d, &format!("projectile[{i}].live")).map(|live| (i, live)))
++        .filter(|&(_, live)| live == 1)
++        .map(|(i, _)| word(&d, &format!("projectile[{i}].seq")))
++        .collect()
++}
++
++#[test]
++fn t2_f_each_throw_edge_throws_or_meets_a_full_pool() {
++    // What the lists below pin (TE-F1-6), read through the World (the scene's fields are the crate's own): the
++    // course's pool holds 16 (scene.rs:234), and a grenade's fuse (scene.rs:232) outlasts the stream's 20 ticks.
++    let mut world = World::new(&Scene::course(), 5, 0);
++    let d = world.dump();
++    let pool = (0..).take_while(|i| word_if(&d, &format!("projectile[{i}].live")).is_some());
++    assert_eq!(pool.count(), 16, "Scene::course()'s projectile_capacity");
++    let throw = course_stream(1, |_| 0, &[(2, 0)]);
++    room_tick(&mut world, &mut ring(), &throw[0]);
++    let fuse = word(&world.dump(), "projectile[0].fuse");
++    assert!(
++        fuse > 20,
++        "Scene::course()'s grenade fuse, {fuse} ticks, outlasts the stream's 20"
++    );
++    // Apart from the twin form (each edge is a grenade, by the rule): 2 throw edges at 10 into an empty pool of 16
++    // throw two of that command's sequence; after one throw at each of 0 to 14, 2 edges at 15 fill the last slot and
++    // the second is refused as PoolFull.
++    let fill: Vec<(usize, u32)> = (0..=15).map(|s| (2, s)).collect();
++    for (press, seqs, refused) in [
++        (vec![(2, 10), (2, 10)], vec![10, 10], vec![]),
++        (
++            [&fill[..], &[(2, 15)][..]].concat(),
++            (0..=15).collect(),
++            vec![refusal(15, RefusalKind::PoolFull)],
++        ),
++    ] {
++        let stream = course_stream(20, |_| 0, &press);
++        let mut world = World::new(&Scene::course(), 5, 0);
++        let mut history = ring();
++        let mut refusals = Vec::new();
++        for t in &stream {
++            room_tick(&mut world, &mut history, t);
++            refusals.extend_from_slice(&world.reports().refusals);
++        }
++        assert_eq!(live_seqs(&world), seqs, "{press:?}");
++        assert_eq!(refusals, refused, "{press:?}");
++        assert_eq!(world.reports().pool_full, refused.len() as u64);
++    }
++}
++
+ #[test]
+ fn carry7_tick_view_tick_and_view_fraction_never_reach_the_state() {
+     // Two streams that differ only in each command's tick, view_tick and view_fraction (equal Rewinds) step to equal

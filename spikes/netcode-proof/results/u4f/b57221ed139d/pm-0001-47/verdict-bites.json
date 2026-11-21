@@ -1,0 +1,70 @@
+[
+  {
+    "mark": "PM-0001-47",
+    "title": "The client's clock is right",
+    "verdict": "NOT-RUN",
+    "why": [
+      "L1 P2, 1,000 connects: 0 of 3 valid runs"
+    ],
+    "parts": [
+      {
+        "name": "L1 P2, 1,000 connects",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P2, 1,000 connects: 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-47/newest-sample",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-newest-sample",
+            "valid": true,
+            "checks": [
+              {
+                "name": "1,000 connects with random true offsets",
+                "outcome": "pass",
+                "value": "1000",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "offset error at most 5 ms after 2 s of samples (p99 of |estimate - true|)",
+                "outcome": "fail",
+                "value": "9246460",
+                "needs": "<= 5000000"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-47/tick-quantised",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-tick-quantised",
+            "valid": true,
+            "checks": [
+              {
+                "name": "1,000 connects with random true offsets",
+                "outcome": "pass",
+                "value": "1000",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "offset error at most 5 ms after 2 s of samples (p99 of |estimate - true|)",
+                "outcome": "fail",
+                "value": "11961647",
+                "needs": "<= 5000000"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

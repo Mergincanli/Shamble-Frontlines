@@ -1,0 +1,21 @@
+# cargo-deny for the netcode proof test (plan §4.8; security F15). Run at U5, at stop B and before every VM run:
+#   cargo deny --locked check advisories bans sources
+# An advisory on a network-facing crate (quinn, rustls, ring, h3, tungstenite, hyper, tokio) blocks the next run.
+
+[graph]
+all-features = true
+
+[advisories]
+# Every advisory is an error unless it is listed here with a reason and a date (none today).
+ignore = []
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+
+[sources]
+# crates.io only: no git dependencies, no other registries.
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

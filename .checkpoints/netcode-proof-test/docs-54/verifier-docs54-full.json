@@ -1,0 +1,151 @@
+{
+ "result": "PASS. His words are copied exactly. All eleven new entries in docs/DECISIONS.md carry, inside \"> \", exactly what he typed in this session's transcript. They match history.md at 110c303 too, apart from the one named difference (E6's trailing space at :2151). E10 is byte for byte the block in 4460ef5's message. All 11 quote hashes and the E3 hash match 9660197's table (E10's row matches only when hashed with its \"> \" marks, see VER-D54-1). Every other claim checked holds. The gate and repo-map-check pass. There are three Low notes and no blocker. One thing is not yet done: the C3 check with `git merge-tree` against PR #40's head. It is a step before ready, and I did not run it because it writes to git's object store.",
+ "claims": [
+  {
+   "claim": "C1/C2: each of the 11 new entries' text inside \"> \" equals his transcript message byte for byte (exact inverse: \">\" is a blank line, \"> X\" is X)",
+   "where": "worktree docs/DECISIONS.md:124-324; transcript lines 48998, 47621, 45793, 45719 (queued_command), 43019, 42437, 42064, 41516, 40306, 40222",
+   "found": "My own reader (verifier-d54-words.py) found 0 failures. E1, E2, E3, E4, the 18:42:53 go and E6 equal his whole message. E5, E7, E8 (two runs) and E9 are line-aligned runs of his message, in order. Each record is a user record or queued_command, origin human, not a side chain, and its stamp matches the header.",
+   "holds": "yes"
+  },
+  {
+   "claim": "The copies equal history.md at 110c303 except E6's trailing space",
+   "where": "history.md blob 39f8c7a5; lines 2091-2107, 2116, 2129, 2134-2139, 2151-2161, 2166-2170, 2180-2187, and the quoted text at :2190, :2200, :2205",
+   "found": "All equal. The only difference is :2151: the transcript has 'reset: ' and history.md has 'reset:'. The copy keeps the space, as named.",
+   "holds": "yes"
+  },
+  {
+   "claim": "The hashes match the table in 9660197's message",
+   "where": "git log -1 --format=%B 9660197",
+   "found": "All 11 quote hashes and the E3 hash (4e3d1565) match. E10's 72dff2f0 is the hash of the block with its \"> \" marks. Without the marks it hashes to 9af5da4c. The other rows hash the text without marks, and the table header does not say so (VER-D54-1).",
+   "holds": "yes"
+  },
+  {
+   "claim": "Only his typed text sits inside \"> \". The session's questions, the three night-shift lines and the 18:04:58 ask are in labelled fenced blocks outside the quotes",
+   "where": "DECISIONS.md, E1, E2, E3 and the 18:42:53 go",
+   "found": "8 fenced blocks, each found word for word in the assistant message its label cites (a5b19b89, dc526fb2, 345259cd, 85c33559, d95dd5a3). None of them is his text. Every line in the new entries is a header line, a quote, an italic line or a fenced block.",
+   "holds": "yes"
+  },
+  {
+   "claim": "E3's three lines equal origin/main .claude/NIGHT_SHIFT.md:45-47 (sha256 4e3d1565..., without the final newline)",
+   "where": "DECISIONS.md, E3's fenced block",
+   "found": "sha 4e3d15658c0afaf40d922cdce9559a8dc2d1079ea04a8fc96e327798b3639223. It also equals history.md:2194-2196 and the first fenced block of the 20:50:16 message.",
+   "holds": "yes"
+  },
+  {
+   "claim": "C6: each partial copy names its cut in place and in its header",
+   "where": "E5, E7, E8, E9 and E1's session text",
+   "found": "E5 (:2172-2175), E7 (:2141-2146), E8 (:2118-2127) and E9 (:2109, :2111) each have an italic line in place and name the cut in the header. In E1's session text, :2216 and :2224 are named in place, but the cuts at the start (:2208-2214 and :2220-2222) are named only in the header (VER-D54-2, Low; session text, not his words).",
+   "holds": "yes"
+  },
+  {
+   "claim": "No lane words of the netcode test on main except the names in cut lines and headers",
+   "where": "every added line under docs/",
+   "found": "PACK-READ, C62HB-Q4, C62H-* and 5e563b95 appear only in headers and cut lines. Not found: SIZE-U4R, SIZE-CHECK, COMPACT-WAIT, MAIN-52, the bot fix's words. 'C62H-BOUND's P2 and P3 runs' does appear inside E4, but that is his NS-STATUS text copied whole, as planned.",
+   "holds": "yes"
+  },
+  {
+   "claim": "C4: E10's quote block equals 4460ef5's \"> \" block byte for byte, and its header says it was copied from the commit message only and not checked against that session's chat record",
+   "where": "DECISIONS.md, E10",
+   "found": "The 11 lines equal the commit's one contiguous block. The header says so.",
+   "holds": "yes"
+  },
+  {
+   "claim": "C5: every message for main since 2026-11-14 09:02 UTC has its entry",
+   "where": "transcript sweep (verifier-d54-sweep.py)",
+   "found": "22 typed messages: 10 for main, all recorded; 2 lane; 10 operational. Nothing is missing.",
+   "holds": "yes"
+  },
+  {
+   "claim": "merged_at: #52 2026-11-14T09:06:30Z, #53 2026-11-15T19:49:22Z, #54 2026-11-17T07:03:03Z",
+   "where": "STATUS, ROADMAP, archive, E2 header",
+   "found": "The REST API gives exactly these values.",
+   "holds": "yes"
+  },
+  {
+   "claim": "The merge commits' parents",
+   "where": "E2, E5 and E10 headers; archive rows",
+   "found": "4460ef5 = 4d21c1a + bfd719b; 53272a1 = 4460ef5 + a637c7a; 82c605e = 53272a1 + 20f9d59 (the expected heads).",
+   "holds": "yes"
+  },
+  {
+   "claim": "CI green on 82c605e: gate run 44035715175, toolchain run 44035715349; CI green on main for #52 and #53",
+   "where": "STATUS :24-25; ROADMAP entries",
+   "found": "Both runs: push, main, success, head_sha 82c605e. 4460ef5: 43578963868 and 43578963884 success. 53272a1: 43754558567 and 43754558678 success.",
+   "holds": "yes"
+  },
+  {
+   "claim": "ROADMAP fold: :85-87 equal main's :217, :215, :213 with '- ' in front, and are gone from Recent work",
+   "where": "worktree docs/ROADMAP.md",
+   "found": "All three equal, and each main line appears only once in the file (in Build history). Recent work now has 12 entries. The move hashes 33531265, b8d41e6d and 9b9e5cad match the commit.",
+   "holds": "yes"
+  },
+  {
+   "claim": "The archive's follow-up lines equal #53's description lines 88-105 and #54's lines 23-27, with two spaces in front",
+   "where": "STATUS_ARCHIVE.md :878 and :902",
+   "found": "Exact match against the descriptions read by REST (no CRLF). Hashes 29cff002 and d24ba2a3 match the commit.",
+   "holds": "yes"
+  },
+  {
+   "claim": "STATUS at most 120 lines",
+   "where": "docs/STATUS.md",
+   "found": "120 lines. The #40 row at :28 is unchanged.",
+   "holds": "yes"
+  },
+  {
+   "claim": "REPO_MAP's new §11 clause",
+   "where": "REPO_MAP.md:80 against main's .claude/CHECKPOINTS.md:231-235",
+   "found": "§11 is 'Kept raw logs and the old build cache', and only kept-logs.mjs removes either. The clause is accurate. 'Last checked' is 2026-11-17 after repo-map-check passed.",
+   "holds": "yes"
+  },
+  {
+   "claim": "Every entry title that the two Queued pointers (and the archive) quote exists exactly",
+   "where": "DECISIONS.md :41-47 and :99-105; archive :873-876 and :896-899",
+   "found": "7 of 7 quoted titles equal the bold entry titles, after re-joining wrapped lines.",
+   "holds": "yes"
+  },
+  {
+   "claim": "C8: the pointers cite E7 for #53, E4 and E3 for #54, and E5 and E1 for the kit's next change; #54's Lows were deferred in writing by the session",
+   "where": "DECISIONS Queued; archive Follow-ups",
+   "found": "As required. Nothing claims DECISIONS.md is complete, but 'his words since #52' could be read that way (VER-D54-3, Low).",
+   "holds": "yes"
+  },
+  {
+   "claim": "Other STATUS/ROADMAP facts: 5f7f682 waits for his go; #54 merged after the PR Advisor's APPROVE of 20f9d59; #53's review verdicts; PR #55 is a draft labelled needs-mustafa",
+   "where": "STATUS :13-15 and :34-35; ROADMAP :127-140",
+   "found": "The sweet-mayer branch head is 5f7f682, 'stopped for his go'. The PR Advisor's APPROVE comment for 20f9d59 is from 06:54:20Z. #53's description shows APPROVE WITH FINDINGS from security-auditor and test-engineer and APPROVE WITH CONDITIONS from the advisor on a637c7a. #55 is a draft with needs-mustafa.",
+   "holds": "yes"
+  },
+  {
+   "claim": "The copy script refused a second run and the file stayed as written",
+   "where": "copy-table-second-run.txt; worktree DECISIONS.md",
+   "found": "The second run printed 'REFUSED: nothing written'. The 201-line block hashes to 6cc30396, the write run's new text. The 14 extra lines are the two Queued pointers, added by Edit. 36242ad does not touch DECISIONS.md.",
+   "holds": "yes"
+  }
+ ],
+ "sweep": "His typed messages since 2026-11-14 09:02 UTC: 244 user or queued records, of which 222 are system records (207 task-notifications, 12 /compact commands and their output, 3 interrupts) and 22 are typed by him.\n\nMain (10, all recorded):\n- 11-15 12:01:41 \"My words of 2026-11-15, 08:20...\" (KEPT-LOGS): E9\n- 11-15 12:34:01 \"...13:35...\" (the kit rule's lines go to his Advisor first): E8\n- 11-15 15:34:42 \"...16:35...\" (KL-YES): E7\n- 11-15 16:21:11 \"You have just been /compact-ed...\" (KL-CHANGE-YES): E6\n- 11-15 18:42:53 \"go\": the go entry for #53's kit-file copy\n- 11-15 19:46:36 \"...20:50...\" (KL-MERGE): E5\n- 11-16 20:48:10, queued, \"...21:50...\" (NS-STATUS): E4\n- 11-16 21:09:27 \"yes\" (NS-LINES): E3\n- 11-17 07:00:54 \"Merge #54\": E2\n- 11-17 10:43:48 \"I agree with all your recommendations, continue\" (RECS-1043): E1\n\nLane (2, staying with PR #40):\n- 11-14 11:07:23 \"You were just compacted... My words of 2026-11-14\" (SIZE-U4R, SIZE-CHECK, COMPACT-WAIT, MAIN-52)\n- 11-16 09:06:54 \"Netcode: what I confirmed in the repo\" (a paste)\n\nOperational (10): 11-14 15:31:34 (usage reset), 17:33:04 and 22:55:12 (resume card); 11-15 07:12:33 (usage), 15:32:51 (queued check-in), 16:13:55 (96% usage, save), 16:18:42 (99% usage, save), 17:11:35 (usage reset); 11-17 12:13:14 (queued usage reset), 12:58:14 (queued progress question).\n\nE10 (2026-11-14 09:02:29) is from the foundation chat's session, not this transcript.",
+ "findings": [
+  {
+   "id": "VER-D54-1",
+   "severity": "Low",
+   "what": "The hash table in 9660197 hashes E10 differently from every other row, without saying so. E10 is hashed with its \"> \" marks; all other rows hash the text without them. The table header only says \"each block's lines joined by newlines\".",
+   "evidence": "Hashed with the marks, 4460ef5's block gives 72dff2f06e794fd0..., the value in the table. Without the marks it gives 9af5da4c6ae237b41aec7fb658afb1951677124dda49d8e7b28999dd1ad0888d. The copy is exact either way.",
+   "fix": "In the PR description's hash table, say that E10 is hashed as quoted (with \"> \"), or add the unquoted hash 9af5da4c... beside it. No change to the docs is needed."
+  },
+  {
+   "id": "VER-D54-2",
+   "severity": "Low",
+   "what": "In E1's session-text copy (not his words), some cuts are named only in the header, not in place. Cuts :2216 and :2224 have italic lines in place. The cuts at the start of each block, history.md:2208-2214 (the \"Decisions needed\" line and PACK-READ) and :2220-2222 (the \"unchanged:\" line and PACK-READ's repeat), do not. The header names 2209-2214 and 2222; the lead lines 2208 and 2220 are named nowhere.",
+   "evidence": "DECISIONS.md, E1: the italic line before the first fenced block says only 'two lines of its Decisions-needed block'. There is no '[history.md:2209-2214 left out ...]' line.",
+   "fix": "Optional: add an italic line '_[history.md:2208-2214 left out: the block's lead line and PACK-READ, the netcode test's; they stay with PR #40]_' before the first fence, and a similar one for :2220-2222. Otherwise defer as a follow-up (a Low triggers no push on its own)."
+  },
+  {
+   "id": "VER-D54-3",
+   "severity": "Low",
+   "what": "C8 wording. 'his words since #52' (STATUS's #55 row, ROADMAP :227, the build commit's subject) is qualified by 'from the netcode test's transcript', but it can still be read as DECISIONS.md being complete since #52. The foundation chat's words after its #52 go are not recorded: 4460ef5 says 'The plan for step 2.3 starts on my next message', and that branch reached plan revision 2.4 by 12:31 UTC on 11-14.",
+   "evidence": "STATUS.md row #55: '(his words since #52 in `docs/DECISIONS.md` by script, from the netcode test's transcript, ...)'. ROADMAP.md:227 reads the same way.",
+   "fix": "Optional: write 'his words in the netcode test's chat since #52', or add 'the foundation chat's own words are that lane's to record'. Otherwise defer as a follow-up."
+  }
+ ],
+ "gate_last_line": "GATE PASS (5a smoke skipped: --no-smoke). repo-map-check: repo map OK: 122 entries cover 109 required paths. CI on head 36242ad: gate, smoke and toolchain success (push and pull request).",
+ "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/docs-54/verifier-docs54.md (my scripts: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/docs-54/verifier-d54-words.py and /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/docs-54/verifier-d54-sweep.py). Not verified: C3's `git merge-tree --write-tree` against PR #40's head (a step before ready; it writes objects, so I did not run it); E10 against the foundation chat's own record (this account cannot read it, as E10's header says); the university-account attribution, which rests on his words on main (DECISIONS.md:248, 'The netcode chat on my university account')."
+}

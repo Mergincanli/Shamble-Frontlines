@@ -1,0 +1,113 @@
+start socket_tests.rs sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == builder
+start socket.rs sha256 7ad7cb22e4316c9f98f4d3abedc36fcab8ddea312239dd5e0b95f2c0856e76f9 == builder
+start stats.rs sha256 27dfd3266a0647b28cd642a062ffa45c7caac8da31a55ec4e62f9983187e9e22 == builder
+       df /home/user: 14.2 GB free
+BITES T1a poller on a blocking-pool thread with a parked-thread waker: the_task_poller_takes_lateness_where_the_task_runs; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'inbound lateness': True
+       at crates/net/src/l2/socket_tests.rs:1054:5: inbound lateness 92716 ns: at least 50 ms (the worker was held ~90 ms past due), at most 99235 ns | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T1b poller under Handle::block_on on its own thread: the_task_poller_takes_lateness_where_the_task_runs; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'inbound lateness': True
+       at crates/net/src/l2/socket_tests.rs:1045:5: inbound lateness 204931 ns: at least 50 ms (the worker was held ~90 ms past due), at most 213673 ns | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T1x (extra) the blocker lets go at the drain instead of drain + 110 ms: the_task_poller_takes_lateness_where_the_task_runs; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'inbound lateness': True
+       at crates/net/src/l2/socket_tests.rs:1044:5: inbound lateness 174656 ns: at least 50 ms (the worker was held ~90 ms past due), at most 182579 ns | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.1 GB free
+BITES T2a L taken as out - t_in: the_fate_log_and_the_histogram_agree; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says "the fate log's E": True
+       at crates/net/src/l2/socket_tests.rs:1100:9: up: the fate log's E 24835574 ns against the histogram's 25584 ns | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T2b Lost counted in the E set (in_e_set): the_fate_log_and_the_histogram_agree; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'the E set': True
+       at crates/net/src/l2/socket_tests.rs:1084:9: assertion `left == right` failed: up: the E set is the histogram's samples | left: 2000 | right: 1978 | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+PASSED (informative) T2x (extra) drive's accounting wait removed (gap 5): the_fate_log_and_the_histogram_agree; ran 1; compiled; test result: ok. 1 passed; 0 failed; says '': -
+       at -: (no panic)
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T3a < for <=: the_verdict_line_is_per_direction_and_inclusive; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1111:5: assertion `left == right` failed | left: ["MISS", "MISS"] | right: ["PASS", "PASS"] | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T3b pooled mean: the_verdict_line_is_per_direction_and_inclusive; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1113:5: assertion `left == right` failed | left: ["PASS", "PASS"] | right: ["MISS", "PASS"] | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T4a floor rank (saturating_div): nearest_rank_and_loss_band_on_fixed_inputs; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1123:5: assertion `left == right` failed: not the 999th | left: 999 | right: 1000 | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T4b interpolated quantile (Hazen, q n - 0.5): nearest_rank_and_loss_band_on_fixed_inputs; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'the 35,640th': True
+       at crates/net/src/l2/socket_tests.rs:1131:5: assertion `left == right` failed: the 35,640th | left: 356405 | right: 356400 | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T4c band (0, n): nearest_rank_and_loss_band_on_fixed_inputs; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1135:5: assertion `left == right` failed | left: (0, 1000000) | right: (9505, 10495) | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T4d sd rounded up: nearest_rank_and_loss_band_on_fixed_inputs; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1135:5: assertion `left == right` failed | left: (9500, 10500) | right: (9505, 10495) | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T4e sd in f64 from the integer variance: nearest_rank_and_loss_band_on_fixed_inputs; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1134:5: assertion `left == right` failed | left: (9503, 10497) | right: (9505, 10495) | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T4f sd from f64 p (the plan's ±497 form): nearest_rank_and_loss_band_on_fixed_inputs; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1136:5: assertion `left == right` failed | left: (9503, 10497) | right: (9505, 10495) | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T5a L0 swapped: the_exact_excess_on_fixed_samples; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1147:5: assertion `left == right` failed | left: Forms { p50: 100000, at_p50: 10100, at_zero: 10000 } | right: Forms { p50: 100000, at_p50: 10000, at_zero: 10100 } | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T5b divided by the over count: the_exact_excess_on_fixed_samples; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1147:5: assertion `left == right` failed | left: Forms { p50: 100000, at_p50: 10000000, at_zero: 10100000 } | right: Forms { p50: 100000, at_p50: 10000, at_zero: 10100 } | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T5c L0 = the mean: the_exact_excess_on_fixed_samples; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1147:5: assertion `left == right` failed | left: Forms { p50: 110250, at_p50: 9989, at_zero: 10100 } | right: Forms { p50: 100000, at_p50: 10000, at_zero: 10100 } | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T5d allowance not subtracted above the threshold: the_exact_excess_on_fixed_samples; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1147:5: assertion `left == right` failed | left: Forms { p50: 100000, at_p50: 10250, at_zero: 10350 } | right: Forms { p50: 100000, at_p50: 10000, at_zero: 10100 } | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T6a delay = due - t_in: the_cross_check_reads_delay_plus_lateness; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1216:5: assertion `left == right` failed | left: Cross { n: 1000, count: 1010, lost: 10, p001: 20000000, p90: 28990000, p999: 29980000, mean: 24995000, pass: [false, true, true, true, true, true] } | right: Cross { n: 1000, count: 1010, lost: 10, p001: 20000000, p90: 28990000, p999: 30280000, mean: 24995600, pass: [false, true, true, true, true, false] } | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T6b Lost entries kept as delays (saturating, no panic): the_cross_check_reads_delay_plus_lateness; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1213:5: assertion `left == right` failed | left: Cross { n: 1010, count: 1010, lost: 10, p001: 0, p90: 28980000, p999: 30280000, mean: 24748118, pass: [false, true, true, false, true, false] } | right: Cross { n: 1000, count: 1010, lost: 10, p001: 20000000, p90: 28990000, p999: 30280000, mean: 24995600, pass: [false, true, true, true, true, false] } | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T6c count over Delivered: the_cross_check_reads_delay_plus_lateness; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1216:5: assertion `left == right` failed | left: Cross { n: 1000, count: 1000, lost: 10, p001: 20000000, p90: 28990000, p999: 30280000, mean: 24995600, pass: [false, true, true, true, true, false] } | right: Cross { n: 1000, count: 1010, lost: 10, p001: 20000000, p90: 28990000, p999: 30280000, mean: 24995600, pass: [false, true, true, true, true, false] } | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T6d band rule off by a term (p001 at d - 0.9a): the_cross_check_reads_delay_plus_lateness; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1172:5: assertion `left == right` failed | left: Bands { count_min: 1000000, loss_ppm: (9500, 10500), mean: (23750000, 26250000), p001: (20250000, 20750000), p90: (28750000, 29250000), p999: (29750000, 30250000) } | right: Bands { count_min: 1000000, loss_ppm: (9500, 10500), mean: (23750000, 26250000), p001: (19750000, 20250000), p90: (28750000, 29250000), p999: (29750000, 30250000) } | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T6e band rule off by a term (mean within 10 %): the_cross_check_reads_delay_plus_lateness; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1172:5: assertion `left == right` failed | left: Bands { count_min: 1000000, loss_ppm: (9500, 10500), mean: (22500000, 27500000), p001: (19750000, 20250000), p90: (28750000, 29250000), p999: (29750000, 30250000) } | right: Bands { count_min: 1000000, loss_ppm: (9500, 10500), mean: (23750000, 26250000), p001: (19750000, 20250000), p90: (28750000, 29250000), p999: (29750000, 30250000) } | stack backtrace:
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES T7a down's release stamp = its due: a_held_lock_makes_both_directions_late; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'down: due at': True
+       at crates/net/src/l2/socket_tests.rs:1296:13: down: due at 421170055 ns inside the held lock (420705102-470802446 ns), released only 0 ns late (under 251000 ns): the release stamp does not see the stall | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored: {'socket.rs': True}
+       df /home/user: 14.2 GB free
+BITES T7b up's release stamp = its due: a_held_lock_makes_both_directions_late; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'up: due at': True
+       at crates/net/src/l2/socket_tests.rs:1296:13: up: due at 421232151 ns inside the held lock (420765453-470882807 ns), released only 0 ns late (under 251000 ns): the release stamp does not see the stall | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored: {'socket.rs': True}
+       df /home/user: 14.2 GB free
+BITES T7c summarize skips the log buckets: a_held_lock_makes_both_directions_late; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'samples at least': True
+       at crates/net/src/l2/socket_tests.rs:1307:9: up: over 61, under the 146 samples at least 314504 ns late | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored: {'stats.rs': True}
+       df /home/user: 14.2 GB free
+BITES T7x (extra) the 'held' window without the lock: a_held_lock_makes_both_directions_late; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'the release stamp does not see the stall': True
+       at crates/net/src/l2/socket_tests.rs:1294:13: up: due at 421203753 ns inside the held lock (420702962-470779140 ns), released only 63180 ns late (under 311528 ns): the release stamp does not see the stall | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored: {'socket_tests.rs': True}
+summary: T1a BITES; T1b BITES; T1x BITES; T2a BITES; T2b BITES; T2x PASSED (informative); T3a BITES; T3b BITES; T4a BITES; T4b BITES; T4c BITES; T4d BITES; T4e BITES; T4f BITES; T5a BITES; T5b BITES; T5c BITES; T5d BITES; T6a BITES; T6b BITES; T6c BITES; T6d BITES; T6e BITES; T7a BITES; T7b BITES; T7c BITES; T7x BITES
+exit 0

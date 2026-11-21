@@ -1,0 +1,123 @@
+{
+  "status": "done",
+  "stop_reason": "",
+  "staged_files": [
+    "spikes/netcode-proof/crates/judge/src/figures.rs",
+    "spikes/netcode-proof/crates/judge/tests/engine.rs"
+  ],
+  "numstat_step": [
+    {
+      "file": "spikes/netcode-proof/crates/judge/src/figures.rs",
+      "added": 172,
+      "deleted": 0
+    },
+    {
+      "file": "spikes/netcode-proof/crates/judge/tests/engine.rs",
+      "added": 149,
+      "deleted": 1
+    }
+  ],
+  "size_step": 322,
+  "size_lane_total": 821,
+  "check_log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/step2-check-2.log",
+  "check_exit": 0,
+  "check_summary": "Runner: \"=== 11:40:16 UTC run: node check.mjs\" ... \"--- end 11:52:06 UTC, exit 0\". check.mjs: PASS fmt; PASS clippy (measured build and bites build both linted); PASS clippy-wasm32; PASS doc; PASS test 647.8 s \"measured build: 551 tests passed, 0 failed, 0 reported a skip; bites build: 631 tests passed, 0 failed, 0 reported a skip\"; PASS deps; PASS wasm; PASS refs; PASS marks (\"81 marks read and checked\"); PASS self (\"78 of 78 tests passed\"); PASS redact; \"check: all 11 steps pass\". `git diff --cached HEAD -- . | sha256sum` from spikes/netcode-proof = f88bf7d5... (equal to the header). An earlier full run (step2-check.log, before the lost-set change) also passed all 11 with 551/631 and is superseded.",
+  "diff_hash_line": "diff f88bf7d56b845c33dd4ea7e659150aeb267f86ca2c53148ed0c0bf8c3381f5ec; untracked e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "untracked_hash_line": "untracked e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "counts": {
+    "measured": 551,
+    "bites": 631
+  },
+  "new_tests_measured": [
+    "c62hb_each_explanation_alone_reads_0",
+    "c62hb_an_unexplained_tick_reads_1",
+    "c62hb_warmup_and_after_phase_ticks_are_not_read",
+    "c62hb_the_converse_and_the_sentinel",
+    "c62hb_eight_gaps_read_on_both_figures",
+    "c62hb_a_bite_with_an_unexplained_tick_is_shown"
+  ],
+  "new_tests_bites": [
+    "c62hb_each_explanation_alone_reads_0",
+    "c62hb_an_unexplained_tick_reads_1",
+    "c62hb_warmup_and_after_phase_ticks_are_not_read",
+    "c62hb_the_converse_and_the_sentinel",
+    "c62hb_eight_gaps_read_on_both_figures",
+    "c62hb_a_bite_with_an_unexplained_tick_is_shown"
+  ],
+  "plants": [
+    {
+      "id": "CB-P8",
+      "home": "c62hb_warmup_and_after_phase_ticks_are_not_read",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P8-2.log (first round plant-CB-P8.log)",
+      "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 48 filtered out - panicked at engine.rs:1624, left [\"Fail 1\", \"Fail 1\"] right [\"Pass 0\", \"Pass 0\"]: (A, B) = (1, 1)",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P9",
+      "home": "c62hb_eight_gaps_read_on_both_figures",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P9-2.log (first round plant-CB-P9.log)",
+      "result": "test result: FAILED. 0 passed; 1 failed - panicked at engine.rs:1677, case 'a room tick record without hs.server_hash': valid, A Pass 0, B Pass 0 where Gap is wanted",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P10",
+      "home": "c62hb_the_converse_and_the_sentinel",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P10-2.log (first round plant-CB-P10.log)",
+      "result": "test result: FAILED. 0 passed; 1 failed - panicked at engine.rs:1632 (the sentinel's assert), left [\"Pass 0\", \"Fail 1\"]: B 1",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P14",
+      "home": "c62hb_each_explanation_alone_reads_0",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P14-2.log (first round plant-CB-P14.log)",
+      "result": "test result: FAILED. 0 passed; 1 failed - panicked at engine.rs:1610, left [\"Fail 1\", \"Pass 0\"]: A 1",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P15",
+      "home": "c62hb_each_explanation_alone_reads_0",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P15-2.log (first round plant-CB-P15.log)",
+      "result": "test result: FAILED. 0 passed; 1 failed - panicked at engine.rs:1610, left [\"Fail 1\", \"Pass 0\"]: A 1",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P16",
+      "home": "c62hb_eight_gaps_read_on_both_figures",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P16-2.log (first round plant-CB-P16.log)",
+      "result": "test result: FAILED. 0 passed; 1 failed - panicked at engine.rs:1680 (phrase assert): 'no room log gives tick.s.snap_link_lost_count: run c1: tick 1: a room tick record without tick.s.snap_link_lost_count' (the first case's note lacks its phrase)",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P17",
+      "home": "c62hb_eight_gaps_read_on_both_figures",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P17-2.log (first round plant-CB-P17.log)",
+      "result": "test result: FAILED. 0 passed; 1 failed - panicked at engine.rs:1680 (phrase assert): 'a room tick record without tick.s.snap_link_lost_count: run c1: slot 1, tick 1: a measured incomplete tick the room log has no record of' (the second case's note lacks its phrase)",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P18",
+      "home": "c62hb_eight_gaps_read_on_both_figures",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P18-2.log (first round plant-CB-P18.log)",
+      "result": "test result: FAILED. 0 passed; 1 failed - panicked at engine.rs:1677, case 'a list that does not hold the run's clients entries' (one entry short): valid, Pass 0 / Pass 0 where Gap is wanted",
+      "sha_equal_after_restore": true
+    }
+  ],
+  "existing_judge_answers_moved": [],
+  "points_for_main_session": [
+    "After the first full check (step2-check.log, all 11 PASS) the review found that figures.rs kept the lost ticks in a Vec, so a (slot, tick) pair filed lost by two client logs would count twice; the frozen row counts pairs. It is now a BTreeSet (figures.rs:546, :622, :645; +2 lines). Not reachable on a valid L1 run (one client log). Every plant, both named-test runs and check.mjs were re-run on the final code (logs *-2.log, step2-check-2.log).",
+    "Reading of the gap order: slot_hashes' own refusals (server_hash, decoded_hash) and 'its room logs disagree on clients' (as decoded's) come before the frozen row's eight gaps (figures.rs:579-590). The eight are kept as each gap's first occurrence, and the one earliest in the row's order is returned (LINK_GAPS figures.rs:565-574; the walk :591-655). For the advisor to confirm.",
+    "Reading of 'an entry below 0': it is applied to tick.s.snap_link_lost_count entries only (figures.rs:613-616); a snap_incomplete entry below 0 reads as gap 7 ('other than 0 or 1'). Within gap 4 the lists are checked in the order hs.server_hash, hs.decoded_hash (each one length from slot_hashes), each room tick's link list, each measured client record's snap_incomplete list.",
+    "The gap notes use the brief's item 1 phrases without the frozen row's markdown backticks (figures.rs:565-574); the tests assert those phrases (engine.rs:1665-1674).",
+    "The two FIGURES `what` strings exceed 100 columns on one line (figures.rs:821, :827); rustfmt leaves them and check.mjs's fmt passes.",
+    "The test fixtures encode a null hash as -1 in BoundTick = (Phase, [[i64; 2]; 4]) (engine.rs:1567-1588). The bite test sets role, bite and the bites feature on the built headers (engine.rs:1688-1701). The eight-gap test's edits are `[fn(&mut [Log]); 8]` because clippy's type_complexity refused `[&dyn Fn(&mut [Log]); 8]` (engine.rs:1653).",
+    "For step 3 (B-2): the real marks.json does not yet name these figures, so no fixture answer moved in step 2 (engine 49 = 43 + 6, fixtures 19, all pass). This reader turns a measured client record without snap_incomplete into a gap, and a measured incomplete tick with no room record too, so B-2's fixture files should be checked against it before step 3 edits them.",
+    "Size: step 322 (plan 255-355); lane 821 of 1,050 (figures.rs 172, engine.rs 150, l1 lib.rs 33, l1 tests.rs 98, logs.rs 54, scenario.rs 311, SERIES.md 3).",
+    "Next for the main session: commit 2; `git diff HEAD^ HEAD -- . | sha256sum` from spikes/netcode-proof must equal f88bf7d56b845c33dd4ea7e659150aeb267f86ca2c53148ed0c0bf8c3381f5ec; the committed SIZE-CHECK must be 821. Notes and the State block: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-build.md under '## Launch 2 (step 2)'."
+  ],
+  "deviations": [
+    "The reader sits after decoded's helper `coverage` (figures.rs:538), not directly after `decoded`, so decoded and its helper stay together.",
+    "A 'room logs disagree on clients' gap (decoded's text) is returned before the frozen row's eight gaps; the brief asks for one clients value 'else a gap, as decoded at :328-343' but does not place it in the row's order.",
+    "engine.rs's import line gained RunOut, and a new `use npt_log::Phase::{After, Measured, Warmup};` line was added (engine.rs:4, :6); no assertion was touched.",
+    "Two full check.mjs runs and two plant rounds, because of the lost-set change after the first run; the last check.mjs run (step2-check-2.log) covers the staged bytes."
+  ]
+}

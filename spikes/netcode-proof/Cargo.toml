@@ -1,0 +1,120 @@
+# The netcode proof test (docs/SPIKE_PLAN.md item 1): a throwaway spike (SPIKE-SCOPE (a)). The plan is
+# .checkpoints/netcode-proof-test/plan.md while the change-set runs; its layout is plan §4.1, its dependency rules §4.2.
+# Every build and test runs with --locked; Cargo.lock is committed.
+[workspace]
+resolver = "3"
+members = [
+    "crates/link",
+    "crates/l1",
+    "crates/sim",
+    "crates/proto",
+    "crates/room",
+    "crates/server",
+    "crates/net",
+    "crates/client",
+    "crates/client-wasm",
+    "crates/bots",
+    "crates/super",
+    "crates/host",
+    "crates/log",
+    "crates/judge",
+    "crates/lab",
+    "crates/tcpinfo",
+    "crates/hash-wasm",
+]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99.1"
+publish = false
+
+[workspace.dependencies]
+# Internal crates.
+npt-link = { path = "crates/link" }
+npt-l1 = { path = "crates/l1" }
+npt-sim = { path = "crates/sim" }
+npt-proto = { path = "crates/proto" }
+npt-room = { path = "crates/room" }
+npt-server = { path = "crates/server" }
+npt-net = { path = "crates/net" }
+npt-client = { path = "crates/client" }
+npt-bots = { path = "crates/bots" }
+npt-log = { path = "crates/log" }
+npt-tcpinfo = { path = "crates/tcpinfo" }
+# External crates, exact versions (more join as the units need them, each reviewed: plan §4.8).
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+# U2: ChaCha8Rng for L1's fate draws (plan §4.5's pinned generator), and SHA-256 for the fate log and binary hashes.
+rand_chacha = { version = "=0.10.0", default-features = false }
+rand_core = { version = "=0.10.1", default-features = false }
+sha2 = "=0.11.1"
+# U4s: npt-sim's one source of transcendentals (plan §4.5: ADR 0004's float allow-list, "transcendentals through libm
+# only"), pure Rust; already in Cargo.lock through quinn-proto's fastbloom, so no new package. Default features kept
+# (`arch`: sqrtf by x86-64's `sqrtss` and sqrt by its `sqrtsd`, and fma and fmaf with run-time CPU dispatch, on x86-64;
+# nothing on wasm32 stable; all correctly rounded: libm 0.2.16's configure.rs:82-101, arch/x86.rs:13 and :26 and
+# arch/x86/fma.rs:9-27, the rust review), the set fastbloom already turns on in the server build, so npt-sim's libm
+# resolves one feature set on native and wasm32 (plan §4.5 "Features"; check.mjs's deps step compares the sets).
+libm = "=0.2.16"
+# U3: the transports and L2 (plan §4.1's npt-net; PM-0001-35's floors: quinn-proto >= 0.11.18, rustls >= 0.23.46,
+# ring >= 0.17.12, tokio >= 1.54.1; U0 resolved these versions).
+wtransport = "=0.7.2"
+web-transport-quinn = "=0.13.6"
+quinn = "=0.11.12"
+tokio = { version = "=1.54.1", features = ["rt-multi-thread", "net", "time", "sync", "io-util", "macros"] }
+tokio-tungstenite = "=0.30.0"
+# U3c: npt-tcpinfo's one dependency (R20 (a); already in Cargo.lock through tokio, mio and socket2).
+libc = "=0.2.191"
+# U3c: TLS for the WebSocket accept path, above which DelayStream sits (Mustafa's U3-Q4 (b) and U3-Q5: pinned in U3,
+# audited at U5). Default features off (no aws-lc-rs, no TLS 1.2, no logging); `ring` is the one provider npt-net always
+# has (quinn's default rustls-ring), chosen explicitly per config, never as a process default (M16; u3c-plan.md 1.1).
+tokio-rustls = { version = "=0.26.6", default-features = false, features = ["ring"] }
+# U3c, tests only (the advisor's ruling of 2026-11-08): tokio-tungstenite's Sink and Stream in npt-net's loopback tests,
+# so they run through the library's own adapter. Already in the lock through tokio-tungstenite (the same features it
+# asks for), so no new package; a dev-dependency, so nothing ships. U6's WsServer takes it as a normal dependency.
+futures-util = { version = "=0.3.34", default-features = false, features = ["sink", "std"] }
+
+[workspace.lints.rust]
+# forbid, the compiler backstop (u3c review C2R-1): in a crate that inherits these lints no #[allow] can relax it
+# (rustc refuses one, a macro-built one too, with E0453), so unsafe code there does not compile. Three crates are ADR
+# 0002:264-265's exceptions ("an exception needs a written invariant, a test and an #[allow] with its reason") and
+# carry their own [lints] tables instead, every other lint as here: npt-client-wasm allows unsafe_code for the whole
+# crate, for wasm-bindgen's generated code (U7); npt-tcpinfo denies it, and its two pub functions in src/linux.rs,
+# srtt_us and unacked_and_unsent (getsockopt SOL_SOCKET, then getsockopt TCP_INFO or ioctl SIOCOUTQ, on a TCP socket
+# only), each carry one #[allow(unsafe_code, reason = "...")] (U3c, R20 (a)); npt-hash-wasm denies it, and its seven
+# exports in src/lib.rs (begin, feed, step, hash_lo, hash_hi, dump_len and dump_word, integers only), each carry one
+# #[allow(unsafe_code, reason = "...")] for their #[unsafe(no_mangle)], its only unsafe (U4d2). check.mjs's deps step
+# checks that this line is forbid; that every other member inherits these lints and sets no unsafe_code (nor
+# unsafe-code); that the three exceptions' tables equal these key for key but for unsafe_code (allow, deny, deny), a
+# lint given in any form its reader does not read being refused (a lint's own [lints.<tool>.<lint>] table; a quoted,
+# dotted, hyphenated or uppercase name); that no manifest has a cargo-features or rustflags key; that, as its scan reads
+# the crates' files, no other crate relaxes the lint or has unsafe code, npt-tcpinfo relaxes it only by those two
+# allows and has unsafe code only inside them, and npt-hash-wasm relaxes it only by one allow on each listed export,
+# whose #[unsafe(no_mangle)] is its only unsafe, with u32 or i32 parameters and results; that no #[path] or include!
+# literal, manifest target path or symbolic link compiles a file outside its crate; and that the environment and
+# cargo configs it reads pass no lint-lowering rustflags and set no clippy or fmt alias, other rustc, workspace
+# wrapper, config include or test runner, and that the environment sets neither RUSTC_BOOTSTRAP nor cargo's channel
+# override (__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS). That scan guards against
+# an accidental relaxation; review is the wall against a deliberate one. What it does not check is listed above
+# DEPS_CHECKED in check.mjs (among them a cargo config's [env], a build script's output, a RUSTC_WRAPPER program and
+# which toolchain runs).
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+# The determinism and clock bans (plan §4.5) are configured per crate in clippy.toml; these make them errors.
+disallowed_types = "deny"
+disallowed_methods = "deny"
+iter_over_hash_type = "deny"
+
+# L1's tests draw hundreds of thousands of packets, so its generator runs optimised in test builds too (dev and test
+# profiles; the code under test keeps its own debug build and checks).
+[profile.dev.package.rand_chacha]
+opt-level = 3
+[profile.dev.package.ppv-lite86]
+opt-level = 3
+
+# overflow-checks stay on for the sim and the protocol in every profile (plan §4.5; ADR 0002 part 2).
+[profile.release.package.npt-sim]
+overflow-checks = true
+[profile.release.package.npt-proto]
+overflow-checks = true

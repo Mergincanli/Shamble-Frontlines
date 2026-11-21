@@ -1,0 +1,34 @@
+[package]
+name = "npt-hash-wasm"
+description = "A check-only cdylib over npt-sim's replayer with integer-only exports, which Node runs for the native-against-Wasm check"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+# Not `workspace = true`: the workspace forbids unsafe_code, which no #[allow] can relax (E0453), and edition 2024's
+# `#[unsafe(no_mangle)]` is unsafe code to that lint. So this crate has its own tables, as npt-tcpinfo has (the spike's
+# third unsafe exception, ADR 0002:264-265; the advisor's condition 7): [lints.rust] denies the lint, so each of the
+# seven exports in src/lib.rs can carry one #[allow(unsafe_code, reason = "...")], and nothing else in the crate relaxes
+# it. Every other lint is the workspace's, key for key. check.mjs's deps step checks the level, the tables against the
+# workspace's key for key (it refuses a lint given in any form its reader does not read: a lint's own
+# [lints.<tool>.<lint>] table, or a quoted, dotted, hyphenated or uppercase name), where the seven allows sit, and that
+# the exports take and give u32 or i32 only.
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+disallowed_types = "deny"
+disallowed_methods = "deny"
+iter_over_hash_type = "deny"
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+# The bites build (plan §4.7): npt-sim's planted defects, armed per instance through `begin` (u4-build-plan.md §5 U4d2).
+bites = ["npt-sim/bites"]
+
+[dependencies]
+# npt-sim only, and nothing depends on this crate (check.mjs's deps step); no dev dependency.
+npt-sim.workspace = true

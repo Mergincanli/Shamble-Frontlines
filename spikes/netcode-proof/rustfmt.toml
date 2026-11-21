@@ -1,0 +1,4 @@
+# The foundation's rustfmt options (ADR 0002 part 7): stable options only.
+edition = "2024"
+style_edition = "2024"
+newline_style = "Unix"

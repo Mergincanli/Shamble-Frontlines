@@ -1,0 +1,101 @@
+{
+  "status": "done",
+  "stop_reason": "",
+  "answers_before_edits": [
+    "Judge tests before any edit (.gate/u4r/c62h-bound/step3-judge-before.log, `cargo test --locked -p npt-judge` and `--all-features`, -x -k): exit 101 in both builds. lib 14, cli 2 and engine 49 passed. fixtures: 'test result: FAILED. 18 passed; 1 failed' in each build. The one failure is pm_0001_17_equal_hashes_pass_and_the_lost_group_is_not_compared at fixtures.rs:229 on `base`: INVALID where NOT-RUN is wanted, with 'a gap in the record: run p2-1: no room log gives tick.s.snap_link_lost_count' on both new checks (base's room log has no series). Cargo stopped after that target, so the doc-tests did not run before the edits (0 doc-tests after).",
+    "base (judge CLI, step3-readings-before.log, b2-before/base.json): L1 P2 INVALID, the run not valid; decoded check pass 0; both new checks Gap, 'run p2-1: no room log gives tick.s.snap_link_lost_count'. This matches brief 3.3.",
+    "lost-group (CLI on a scratch copy cmp-equal to base room + lost-group client): L1 P2 INVALID, both new checks Gap (gap 1). Its test did not reach this case (the loop panics at base). The brief's 'FAIL (slot 1's tick 2: A 1)' is lost-group's reading once base's room log carries the series. That was shown after the edits: lost-group's client on base's new room log reads FAIL, A 1.",
+    "hashed-and-incomplete (CLI on a scratch copy): L1 P2 INVALID, its coverage gap 'slot 1, tick 2: a client hash and tick.s.snap_incomplete 1 at once' plus gap 1 on both new checks. Its existing INVALID assertion still passed before the edits. 'FAIL (A 1)' is again its reading once the series is in base's room log.",
+    "none-compared (CLI on a scratch copy): L1 P2 FAIL, the run valid, the empty comparison ('no client logged a hash (0 compared)'), both new checks Gap (gap 1) listed beside. 'A 6' needs the series and was shown after the edits.",
+    "Every other judge test passed. A read-only scan of every -17 case (base files plus the case's own files) found no measured client record without snap_incomplete, no entry other than 0 or 1, and no incomplete tick without a room record. Launch 2's gap 6 and gap 8 therefore meet no fixture. With zero links, figure A is 0 on every case except hashed-and-incomplete (1), lost-group (1) and none-compared (6), and figure B is 0 everywhere."
+  ],
+  "answers_after_edits": [
+    "base: NOT-RUN, the L1 P2 run valid, 0 mismatches, 6 compared, 0 incomplete, figure A pass 0, figure B pass 0. Same as before this lane; its existing test passes (step3-readings-after.log, b2-after/base.json).",
+    "lost-group (its own folder, now holding both logs): NOT-RUN, the run valid, 0 mismatches, 5 compared, 1 incomplete, A 0 (the link lost a datagram of slot 1's tick 2: E2), B 0. Same as before this lane; its existing test passes.",
+    "hashed-and-incomplete: L1 P2 FAIL, the run valid, A fail 1, B pass 0. why holds '... (0 unexplained) = 1, needs == 0' and 'also a gap in the record: run p2-1: slot 1, tick 2: a client hash and tick.s.snap_incomplete 1 at once'. The run's gaps hold that coverage gap. The new test asserts all three.",
+    "none-compared: L1 P2 FAIL, the run valid, the empty comparison stands, A fail 6, B pass 0. Its existing test passes with no edit.",
+    "Judge tests after (step3-judge-after.log): `cargo fmt --all --check` exit 0; both builds exit 0; fixtures 'test result: ok. 20 passed; 0 failed' (19 plus the new test); lib 14, cli 2, engine 49, doc-tests 0."
+  ],
+  "other_answers_moved": [],
+  "staged_files": [
+    "spikes/netcode-proof/marks/marks.json",
+    "spikes/netcode-proof/marks/SERIES.md",
+    "spikes/netcode-proof/marks/README.md",
+    "spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl",
+    "spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/lost-group/p2-room.jsonl",
+    "spikes/netcode-proof/crates/judge/tests/fixtures.rs",
+    "spikes/netcode-proof/crates/judge/fixtures/README.md"
+  ],
+  "numstat_step": [
+    {
+      "file": "spikes/netcode-proof/crates/judge/fixtures/README.md",
+      "added": 3,
+      "deleted": 3
+    },
+    {
+      "file": "spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl",
+      "added": 3,
+      "deleted": 3
+    },
+    {
+      "file": "spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/lost-group/p2-room.jsonl",
+      "added": 7,
+      "deleted": 0
+    },
+    {
+      "file": "spikes/netcode-proof/crates/judge/tests/fixtures.rs",
+      "added": 16,
+      "deleted": 5
+    },
+    {
+      "file": "spikes/netcode-proof/marks/README.md",
+      "added": 16,
+      "deleted": 11
+    },
+    {
+      "file": "spikes/netcode-proof/marks/SERIES.md",
+      "added": 4,
+      "deleted": 2
+    },
+    {
+      "file": "spikes/netcode-proof/marks/marks.json",
+      "added": 26,
+      "deleted": 0
+    }
+  ],
+  "size_step": 99,
+  "size_lane_total": 920,
+  "check_log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/step3-check.log",
+  "check_exit": 0,
+  "check_summary": "check: all 11 steps pass. The steps, all PASS: fmt (no diff), clippy, clippy-wasm32, doc, test (700.6 s: 'measured build: 552 tests passed, 0 failed, 0 reported a skip; bites build: 632 tests passed, 0 failed, 0 reported a skip'), deps, wasm, refs (1291 tracked files), marks ('npt-judge: 81 marks read and checked'; rows in docs/adr/ unchanged), self (78 of 78), redact (297 items, 0 findings). The runner logged '=== 12:42:37 UTC exit 0: node check.mjs'. It ran once, on the staged bytes; nothing was edited after it.",
+  "diff_hash_line": "diff a1238e901f4a5885ed12391c3988b535171021a5e8d57aab295ce8191c0e215c",
+  "untracked_hash_line": "untracked e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "counts": {
+    "measured": 552,
+    "bites": 632
+  },
+  "new_tests_measured": [
+    "pm_0001_17_hashed_and_incomplete_fails_with_its_coverage_gap_beside (npt-judge tests/fixtures.rs; step3-judge-after.log:102, `cargo test --locked -p npt-judge`)"
+  ],
+  "new_tests_bites": [
+    "pm_0001_17_hashed_and_incomplete_fails_with_its_coverage_gap_beside (npt-judge tests/fixtures.rs; step3-judge-after.log:228, `cargo test --locked -p npt-judge --all-features`)"
+  ],
+  "marks_files_sha256": [
+    "c1935a5b996fb0aaff82b0b3c1c604255e1534f6ca7e8d2e55a9f472cd3b22a9  spikes/netcode-proof/marks/marks.json",
+    "6898e119109a794a7779ad0395301e48a461848b60cfdc16431ec64faad87460  spikes/netcode-proof/marks/SERIES.md",
+    "f3c3c804c4e4d078ca07461f956eb60bc96e74eb4ed507bf28f652383a5742fe  spikes/netcode-proof/marks/README.md"
+  ],
+  "points_for_main_session": [
+    "Next steps: commit 3 in the worktree with the message from brief section 1, then check that `git diff HEAD^ HEAD -- . | sha256sum` from spikes/netcode-proof equals a1238e901f4a5885ed12391c3988b535171021a5e8d57aab295ce8191c0e215c. The committed SIZE-CHECK should be 920 (step 99). Then run the built check again and start step 4's launch. Notes and the State block are in /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-build.md under '## Launch 3 (step 3)'.",
+    "The pre-edit readings in brief 3.3 (lost-group 'FAIL (A 1)', hashed-and-incomplete 'FAIL (A 1)', none-compared 'A 6') are what those cases read once base's room log carries the series. Before any edit, all three show gap 1 on both new checks: lost-group INVALID, hashed-and-incomplete INVALID (its test still passed), none-compared FAIL by the empty comparison. Only base's test failed. The FAIL readings were reproduced after the edits, including lost-group's client on base's new room log (FAIL, A 1), which is why lost-group needs its own room log. Evidence: step3-readings-before.log, step3-readings-after.log, and .gate/u4r/c62h-bound/b2-before/*.json and b2-after/*.json. The scratch inputs were written with Write and are cmp-equal to the fixtures.",
+    "fixtures.rs:390-391: the doc comment of pm_0001_17_every_server_hash_is_resolved_on_the_client_side now ends 'Each case is INVALID (both at once: the next test).' (+1 line), so it no longer claims to cover the hashed-and-incomplete case. No assertion of an existing test was edited; only the hashed-and-incomplete tuple left the list (-4).",
+    "fixtures.rs:425-437: the new test, pm_0001_17_hashed_and_incomplete_fails_with_its_coverage_gap_beside, asserts three things on hashed-and-incomplete: the L1 P2 part's verdict is FAIL; a part why line contains '(0 unexplained) = 1, needs == 0'; and `part_run(&v, \"L1 P2\").gaps` contains 'slot 1, tick 2: a client hash and tick.s.snap_incomplete 1 at once'.",
+    "fixtures/README.md:23 carries the brief's 'E2' with a plain gloss ('the link's explanation, E2'). The README does not otherwise define E1/E2; the review may want the code dropped.",
+    "For the review round's 13:35 read: hashed-and-incomplete's move from INVALID to FAIL (A 1) is the only changed fixture answer. base and lost-group read as before this lane, and none-compared stays FAIL (now with A 6).",
+    "check.mjs refs and redact counts each rose by 1 (1291 tracked files, 297 items) because of the new lost-group/p2-room.jsonl."
+  ],
+  "deviations": [
+    "fixtures.rs:390-391: a one-line wording change to the existing test's doc comment, beyond the brief's list. No assertion changed.",
+    "I judged each named case before and after the edits with the judge's own CLI (`cargo run -p npt-judge`, through the runner), on scratch copies under .gate/u4r/c62h-bound/b2-before/ and b2-after/ (outside the worktree). Without this, lost-group's reading was not visible from its test, which panics at base first. The extra runs changed no worktree file."
+  ]
+}

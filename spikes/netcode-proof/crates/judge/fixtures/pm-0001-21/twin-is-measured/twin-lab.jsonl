@@ -1,0 +1,13 @@
+{"k":"header","schema":1,"run":"forged-a-1-twin","set":"u4f-21","role":"measured","marks":["PM-0001-21"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P0","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"lab","slot":0,"date":"2026-11-10","params":{"suite":"forged","cmd_timing":"A"}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"lead-bound","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"newer-tick","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"seq-forward","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"move-length","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"press-edge","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"aim-bounds","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"cooldown","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"ack-sent","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"trailing","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"catchup-cap","sent_count":1000,"unrejected_count":0}}
+{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"channel","sent_count":1000,"unrejected_count":0}}
+{"k":"footer","records":12,"ended":"clean"}

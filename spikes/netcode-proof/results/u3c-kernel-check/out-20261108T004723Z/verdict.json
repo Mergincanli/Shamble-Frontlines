@@ -1,0 +1,65 @@
+{
+ "rtt_ns": 124667,
+ "kernel_runs": [
+  {
+   "run": "kernel-run1.json",
+   "standing": "judged",
+   "why": "60 judged episodes <= 61 retransmissions",
+   "episodes": 60,
+   "episodes_one_gap": 37,
+   "tcpi_total_retrans": 61,
+   "kernel_counters_growth": {
+    "RetransSegs": 61,
+    "TCPFastRetrans": 60,
+    "TCPLossProbes": 1,
+    "TCPTimeouts": 0,
+    "TCPLostRetransmit": 0
+   }
+  },
+  {
+   "run": "kernel-run2.json",
+   "standing": "judged",
+   "why": "54 judged episodes <= 56 retransmissions",
+   "episodes": 54,
+   "episodes_one_gap": 31,
+   "tcpi_total_retrans": 56,
+   "kernel_counters_growth": {
+    "RetransSegs": 56,
+    "TCPFastRetrans": 54,
+    "TCPLossProbes": 1,
+    "TCPTimeouts": 1,
+    "TCPLostRetransmit": 1
+   }
+  },
+  {
+   "run": "kernel-run3.json",
+   "standing": "judged",
+   "why": "58 judged episodes <= 61 retransmissions",
+   "episodes": 58,
+   "episodes_one_gap": 32,
+   "tcpi_total_retrans": 61,
+   "kernel_counters_growth": {
+    "RetransSegs": 61,
+    "TCPFastRetrans": 58,
+    "TCPLossProbes": 2,
+    "TCPTimeouts": 1,
+    "TCPLostRetransmit": 1
+   }
+  }
+ ],
+ "kernel_episodes": 172,
+ "model_episodes": 5918,
+ "problems": [],
+ "kernel_rack_p50_ns": 33343759,
+ "model_rack_p50_ns": 33457999,
+ "rack_pass": true,
+ "kernel_other": 6,
+ "model_other_share": 0.04156809733017911,
+ "band": [
+  1,
+  15
+ ],
+ "other_pass": true,
+ "verdict": "PASS",
+ "pass": true
+}

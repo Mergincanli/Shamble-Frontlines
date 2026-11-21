@@ -1,0 +1,118 @@
+[
+  {
+    "mark": "PM-0001-22",
+    "title": "A client that never acknowledges cannot grow the server",
+    "verdict": "NOT-RUN",
+    "why": [
+      "bite PM-0001-22/unbounded: no run yet"
+    ],
+    "parts": [
+      {
+        "name": "L1, one never-acker among 48",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-22-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "its event queue held at the cap: it reaches the cap and never passes it (headroom = cap - length)",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "the client resynced or dropped",
+                "outcome": "pass",
+                "value": "2",
+                "needs": ">= 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-22-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "its event queue held at the cap: it reaches the cap and never passes it (headroom = cap - length)",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "the client resynced or dropped",
+                "outcome": "pass",
+                "value": "2",
+                "needs": ">= 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-22-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "its event queue held at the cap: it reaches the cap and never passes it (headroom = cap - length)",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "the client resynced or dropped",
+                "outcome": "pass",
+                "value": "2",
+                "needs": ">= 1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-22/unbounded",
+        "status": "not_run",
+        "runs": []
+      }
+    ],
+    "report": [
+      {
+        "name": "dropped rather than resynced",
+        "part": "L1, one never-acker among 48",
+        "run": "l1-22-s1",
+        "value": "0.5"
+      },
+      {
+        "name": "dropped rather than resynced",
+        "part": "L1, one never-acker among 48",
+        "run": "l1-22-s2",
+        "value": "0.5"
+      },
+      {
+        "name": "dropped rather than resynced",
+        "part": "L1, one never-acker among 48",
+        "run": "l1-22-s3",
+        "value": "0.5"
+      },
+      {
+        "name": "resident memory max",
+        "part": "L1, one never-acker among 48",
+        "run": "l1-22-s1",
+        "value": "not available: run l1-22-s1: no values for second.v.rss_bytes"
+      },
+      {
+        "name": "resident memory max",
+        "part": "L1, one never-acker among 48",
+        "run": "l1-22-s2",
+        "value": "not available: run l1-22-s2: no values for second.v.rss_bytes"
+      },
+      {
+        "name": "resident memory max",
+        "part": "L1, one never-acker among 48",
+        "run": "l1-22-s3",
+        "value": "not available: run l1-22-s3: no values for second.v.rss_bytes"
+      }
+    ]
+  }
+]

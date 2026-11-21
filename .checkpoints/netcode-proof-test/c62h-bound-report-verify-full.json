@@ -1,0 +1,40 @@
+{
+  "verdict": "FAIL",
+  "checked": 340,
+  "wrong": [
+    {
+      "where": "Section 1, draft :46 (commit 2/4)",
+      "says": "b423a7d9231f68c87a1af9004dc1f2c218b43948 (11:54)",
+      "record_says": "Commit b423a7d has author date, committer date and branch reflog entry 2026-11-16 12:18:58 UTC. No earlier commit exists between 54046d4 (11:01:06) and it.",
+      "source": "git log -1 --format='%ad %cd' b423a7d; git reflog c62h-bound-build. The build notes c62h-bound-build.md:243 carry the same wrong 11:54."
+    },
+    {
+      "where": "Card line references, draft :238, :244, :438, :490, :495, :503, :505",
+      "says": "U3C-HELD-1 card :3746-3759; CHECK-NFF-1 :3760-3761; deferred Lows :3762-3765; 12:44-14:22 restart :3198-3203; 17:09-20:36 entry :3184-3197; slip 16 :3195-3197; slip 17 :3587-3588",
+      "record_says": "These match the card at 055d152 (21:59) only. They were already off when the draft was written (card at b3fb754/3b826b4, 4128 lines). In the card now (67de11e, 4129 lines): U3C-HELD-1 :3760-3773; CHECK-NFF-1 :3774-3775; deferred Lows :3776-3779; 12:44-14:22 :3212-3217; 17:09-20:36 :3198-3211; slip 16 :3209-3211; slip 17 :3601-3602. Only :55-56 still holds. Each entry's content does match the draft.",
+      "source": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test.md (working copy and git show 67de11e / 3b826b4 / 055d152)"
+    },
+    {
+      "where": "Draft :9 (key) against :3-4, :164, :499, :504, :522, :537",
+      "says": "'Times are UTC, 2026-11-16 unless named', but Mustafa's word times are given with no zone: 16:35 and 20:50 (2026-11-15), his/your 13:35 rule, his 21:50 words, his 22:09 words, 'at 22:09'",
+      "record_says": "These are Amsterdam times. In UTC they are 15:35, 19:50, 12:35, 20:50 and 21:09 (each history.md decision heading gives both). Read under the draft's own key, for example, 'his 21:50 words' would be 21:50 UTC, which is wrong.",
+      "source": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/history.md:2113, :2131, :2163, :2177, :2189"
+    },
+    {
+      "where": "Section 3, draft :111",
+      "says": "Each was one temporary Edit",
+      "record_says": "CB-P6 took two edits (a prev_link vector, and room_tick passed std::mem::replace(...)). The notes say 'Both edits restored'.",
+      "source": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-build.md:79-81"
+    },
+    {
+      "where": "Section 6, draft :206-209 (first counted call)",
+      "says": "check.mjs stopped at its test step ... Every other check.mjs step passed",
+      "record_says": "check.mjs did not stop at the test step. It ran its later steps (deps, wasm, refs, marks, self, redact, all PASS) and ended with 'check: 1 step(s) failed'. What stopped after check.mjs was the main-run.sh call, so det-u4, the release build and the hash never ran.",
+      "source": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/merge.log (the PASS lines after 'FAIL  test', then 'check: 1 step(s) failed', '--- end 16:16:23 UTC, exit 1')"
+    }
+  ],
+  "missing_items": [
+    "Advisor condition P6 is not carried. The draft mentions only 'P6's spike-tree check' in passing (section 5, :186). It does not say that the report's head gets the advisor's check, naming the full SHA, before the report goes to Mustafa. It also does not give the check `git diff --quiet ddd38ba HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'` or its result at that head (today it exits 0 at 67de11e)."
+  ],
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/verifier-c62h-bound-report.md"
+}

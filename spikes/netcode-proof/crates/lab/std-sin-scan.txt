@@ -1,0 +1,17 @@
+# PM-0004-21/std-sin's scan (u4-build-plan.md §5 U4d2; u4d2-brief.md 2.3 and 2.7; the advisor's U4D2-Q5 ruling, (a)):
+# the bitten World (f32::sin in place of libm::sinf in the vehicles' loops: sim/src/world.rs's sinf and
+# place_vehicles), armed at the first tick of each recording whose scene has vehicles (SS-s1 and ES-s2; TC-s3's scene
+# has none), its native leg against its Wasm leg, and the bitten World against the clean one on each target. A `catch`
+# line is <recording> <first tick the bitten native and Wasm legs differ> <the field there>. check.mjs's wasm step arms
+# std-sin at the first catch in the recordings manifest's order, on its recording, native leg 1 and Wasm leg 1, and
+# fails unless their first mismatch is that tick and field. The lines below the catches are the scan's record.
+catch SS-s1 2 vehicle[8].pos.y
+catch ES-s2 1000002 vehicle[8].pos.y
+scanned on: <base> bfda3cd2e4733efc3d3ec9f7c6c3c99bc6c2e8c4 with U4d2's code (uncommitted, in its worktree), for x86_64-unknown-linux-gnu and wasm32-unknown-unknown under Node v22.23.4
+rustc: rustc 1.99.1 (58cf8f9c3 2026-10-13)
+libc: ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39
+SS-s1, armed at tick 0: native against Wasm, 9000 ticks compared, 1375 mismatching, the first at tick 2; native bitten against native clean, 1375 mismatching, the first at tick 2; Wasm bitten against Wasm clean, 0 mismatching (wasm32's std sin is libm's here)
+SS-s1, armed at tick 2 with both dumps: the first mismatch at tick 2, field vehicle[8].pos.y (word 2148): c159186a native, c1591869 on wasm32 (one ulp)
+ES-s2, armed at tick 1000000: native against Wasm, 9000 ticks compared, 1326 mismatching, the first at tick 1000002; native bitten against native clean, 1326 mismatching, the first at tick 1000002; Wasm bitten against Wasm clean, 0 mismatching
+ES-s2, armed at tick 1000002 with both dumps: the first mismatch at tick 1000002, field vehicle[8].pos.y (word 996): c0099f7a native, c0099f79 on wasm32 (one ulp)
+commands: the bites builds (cargo build --locked --release -p npt-lab --features bites; the same --target wasm32-unknown-unknown -p npt-hash-wasm); per recording R from its first tick F: npt-lab hash --manifest crates/lab/recordings.json --dir <recordings> --out <dir> --only R --bite PM-0004-21/std-sin --arm F; node crates/hash-wasm/loader.mjs --wasm <the bites npt_hash_wasm.wasm> --rec R.rec --name R --first-tick F --bite 2 --arm F --out <dir>/wasm-1.lines; the same two with no bite (the clean World); npt-lab hash compare for each pair; then armed at the first differing tick T with --dump-at T on both legs and compared with both dumps (--ours-dump, --theirs-dump), which names the field (the runner's logs: .gate/u4d2/b8-scan1.log and b8-scan2.log)

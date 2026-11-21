@@ -1,0 +1,76 @@
+{
+  "verdict": "APPROVE WITH FINDINGS",
+  "summary": "I checked whether PR #53 (head a637c7a) is proven. It is: every claim the PR makes is backed by a test or a measurement I re-ran or re-read, and every finding is Low.\n\n**Test suite.** I re-ran it in the worktree on node v22.23.4 with GNU tar 1.35. Result: 10 tests, 9 pass, 0 fail, 1 skipped, and the skipped one is the dry run. Test 2 (GNU tar unpacks the archive) ran with no SKIP, and test 5 (the second walk) passed. To check for flakes I ran four copies of the suite at the same time: all four gave 9 pass and 1 skipped, and no scratch folders were left in /tmp.\n\n**Planted bugs.** All 14 copies (M1 to M14) differ from the head's script by exactly one replacement. I re-ran all 14, not just the four asked for. Each one fails exactly the tests recorded in kl-evidence/evidence-1.log lines 2-15, which are also the homes the advisor named in advisor-kl-change-full.md:94-101:\n- M4 fails test 4.\n- M12, M13 and M14 each fail test 5.\n\n**Mustafa's evidence items.** All hold:\n- **GNU tar test:** it ran and was not skipped (history.md:2139).\n- **Dry runs:** both real folders passed with no SKIP, and their fingerprints are equal before and after.\n- **Test 5:** its line is present in the PR.\n- **Ready report:** the PR body has the head, the files and the by-script comparison (history.md:2159).\n\nThe fingerprint plus test 10's per-file sha256 check (kept-logs.test.mjs:321) is a sound proof that the real folders were only read. The fingerprint alone is not: it covers only regular files' paths, sizes and times, not their contents.\n\n**What is still untested.** A few refusal and failure paths have no test, and nothing deletes data through them:\n- pack's routine refusal\n- the detached-HEAD refusal\n- the free-space refusal\n- the checks that run while the archive is written\n- parseList's two refusals\n- a symbolic link inside the build cache\n\nAll of these fail safe when I read the code, and several are backstopped by the read-back check. The kept-logs tests are also not run in CI, the same as the other kit tests. These are follow-ups, not blockers.",
+  "checks_run": [
+    "(cd .gate/kept-logs-wt && git log -1): head a637c7a357e79614f896ddddf7488e08b5fc9180; diff --stat 4460ef5 a637c7a: 4 files, +671",
+    "Read CHECKPOINTS.md section 11 (lines 231-249), kept-logs.mjs (323 lines), kept-logs.test.mjs (326 lines) in full",
+    "node --test --test-reporter=tap .claude/scripts/kept-logs.test.mjs (worktree, KEPT_LOGS_SCRIPT and KEPT_LOGS_DRY_RUN unset): tests 10, pass 9, fail 0, skipped 1 (test 10 dry run, SKIP); ok 2 GNU tar with no SKIP; ok 5; node v22.23.4, GNU tar 1.35",
+    "diff of each .gate/kept-logs-rule/M1..M14/kept-logs.mjs against the head's script: every copy differs by exactly one replacement (M12 removes the 3-line second-walk block; M2 and M10 insert one line)",
+    "Suite re-run with KEPT_LOGS_SCRIPT set to each of M1..M14: M1 t4; M2 t1,t2,t4,t5; M3 t6; M4 t4; M5 t7,t8; M6 t3; M7 t8; M8 t9; M9 t4; M10 t4,t5; M11 t8; M12 t5; M13 t5; M14 t5. Identical to kl-evidence/evidence-1.log:2-15 and to advisor-kl-change-full.md:94-101",
+    "Load check: 4 suite runs at the same time: all 9 pass / 1 skipped (5.9-6.0 s each); 0 kept-logs-test-* folders left in /tmp",
+    "Read kl-evidence/evidence-0.log, evidence-1.log, compare-head.log, dry-u4r-precheck-30-faf42aeb034c.tap, dry-u4r-P3-fd4612050cd6.tap; kl_evidence.py (fingerprint, dry, mutants, full)",
+    "Read history.md:2088-2111, 2131-2161 (his words) and advisor-kl-change-full.md (KLC-F1, KLC-F2, build_plan_changes 1-7)",
+    "Read the PR #53 body via gh api REST (read-only; GraphQL is refused here, and no MCP GitHub tool was loadable in this run): head a637c7a, draft true",
+    "Checked .github/workflows (gate.yml, toolchain.yml) and tools/gate.mjs for kit-test wiring: none runs a .test.mjs",
+    "Did NOT run kept-logs.mjs list/pack/cache against the repo or worktree; did NOT set KEPT_LOGS_DRY_RUN; no git checkout/switch/reset; notes only in .checkpoints/netcode-proof-test/kl-pr-test.md"
+  ],
+  "findings": [
+    {
+      "id": "KLT-1",
+      "severity": "Low",
+      "where": ".claude/scripts/kept-logs.mjs:88-89 and :98 (walk's name check and 'holds no files' on the second walk at :261); .claude/scripts/kept-logs.test.mjs:162-194 (test 5)",
+      "what": "KLC-F2 is confirmed: two of the second walk's three failure branches have no test. One is a bad name added late (for example `.hidden`, `a b.log`, or a path longer than 99 characters). The other is a folder emptied late. If someone later rewired :89 to call refuse directly, the script would exit 2 instead of the 1 that section 11 and his words ask for. No test would catch it, but the folder would still stay.",
+      "fix": "Follow-up, not owed now. Add a fourth case to test 5: packWith(`fs.writeFileSync(${JSON.stringify(`${RUNS}/${SET}/.late`)}, 'x')`), then assert exit 1 and /MISMATCH[\\s\\S]*plain name/. Also plant a bug that makes :89 call refuse, and confirm it fails only test 5."
+    },
+    {
+      "id": "KLT-2",
+      "severity": "Low",
+      "where": "kept-logs.mjs:62 via root(), as called from pack at :312; kept-logs.test.mjs:199-200",
+      "what": "The routine refusal is tested for list and cache, never for pack, the command that deletes. The refusal sits in root(), which all three commands share, so M3 still bites through list. But no test pins that pack goes through root(). If main() were refactored to call pack(process.cwd()), only reading the code would catch it.",
+      "fix": "Follow-up: add refused(run(repo, ['pack', SET, '--results', RES], 'night-shift'), /routine/) to test 6."
+    },
+    {
+      "id": "KLT-3",
+      "severity": "Low",
+      "where": "kept-logs.mjs:206 (detached HEAD), :230-232 (free space), :237 and :245 (file changed while being packed), :110 and :113 (parseList), :255 (entry count), :196, :273-277 (removal failed), :292-293 (worktree list failed)",
+      "what": "These refusal and failure paths have no test and no planted bug. I traced each by reading the code, and each fails safe. Reasons by path:\n- **:206:** a missing branch falls through to the ls-tree refusal.\n- **:230-232:** a full disk makes the write fail, so the script exits 1 and the folder stays.\n- **:237 and :245:** a short or long entry desyncs the archive, so the read-back throws Mismatch.\n- **:110 and :113:** a loose parse is still checked against the folder and the archive.\n\nSo no path deletes data. But for a script that deletes data, these are untested negative cases.",
+      "fix": "Follow-up: a planted bug and a test each for parseList :113 (a list committed with an edited header) and for the free-space refusal (fake statfs through the same child-only --import hook as test 5). The rest can stay as reading-verified."
+    },
+    {
+      "id": "KLT-4",
+      "severity": "Low",
+      "where": "kept-logs.mjs:283-286 and :303 (cache's newest() and rmSync); kept-logs.test.mjs:248-274",
+      "what": "The cache test plants only one regular file. No test puts a symbolic link inside .gate/u3c-review-target that points at data outside it, and then checks that the target survives `cache`. Node's fs.rmSync with recursive unlinks links without following them, so the script is right. The negative case is simply not pinned.",
+      "fix": "Follow-up: in test 8, add a link inside the cache to the `away` folder before age(). Then assert that `cache` exits 0 and that away/keep still exists."
+    },
+    {
+      "id": "KLT-5",
+      "severity": "Low",
+      "where": ".claude/scripts/kept-logs.test.mjs:229-232",
+      "what": "The pipe case in test 7 runs only when mkfifo succeeds. On a machine without mkfifo the case disappears and the test still reports ok, with no SKIP or diagnostic line, so a reader cannot tell. It ran here on Linux.",
+      "fix": "Follow-up: when mkfifo fails, emit t.diagnostic('mkfifo missing: pipe case not run'), or t.skip only that case."
+    },
+    {
+      "id": "KLT-6",
+      "severity": "Low",
+      "where": ".github/workflows/gate.yml (no kit-test step); kept-logs.test.mjs",
+      "what": "The kept-logs tests do not run in CI. Neither do the other kit tests, so this is consistent with today's practice. A later edit to kept-logs.mjs would be proven only by hand. That matters more here than for other kit scripts, because this one deletes data.",
+      "fix": "Follow-up for infra-engineer, as a separate tier-2 PR, not this one (his words: keep the edit small and in one place). Add a CI step that runs node --test on the .claude/scripts/*.test.mjs and .claude/hooks/*.test.mjs files."
+    },
+    {
+      "id": "KLT-7",
+      "severity": "Low",
+      "where": "kl_evidence.py:156-159 (fingerprint); the PR #53 body, Evidence (b): 'It shows the real folders were only read.'",
+      "what": "The fingerprint hashes find -type f output (path, size, mtime) and runs without pipefail. On its own it is not a content proof: it ignores non-regular entries and file modes. If find failed, it would hash empty input. The recorded values are not the empty-input hash, so the record holds. The proof that the folders were only read rests on the fingerprint together with test 10's per-file sha256 check against the list (kept-logs.test.mjs:321). The PR sentence credits the fingerprint alone.",
+      "fix": "Wording only. In the ready report, say the fingerprint (paths, sizes, times unchanged) together with test 10's per-file sha256 check shows the folders were only read. Optionally add set -o pipefail to fingerprint() for any re-run."
+    },
+    {
+      "id": "KLT-8",
+      "severity": "Low",
+      "where": "PR #53 body: the links to history.md, compare-head.log, full.tap, the dry-*.tap files, evidence-1.log, gate.log, gate-no-smoke.log and kept-logs-final-text.md",
+      "what": "Most of the evidence links wrap their URL in backticks and spaces, for example [history.md:2088-2111](`` https://... ``). In GitHub markdown that is not a valid link destination, so they show as literal text and cannot be clicked. The kl-change-v2.diff, kl_build.py and kl_evidence.py links are well formed.",
+      "fix": "When the ready report is written, use plain (https://...) link destinations."
+    }
+  ],
+  "answers": "**3(a): Test 5's child-only --import preload is sound.**\n\n- **No leak.** The hook file is written into the fixture's own temp folder (kept-logs.test.mjs:170-174), which t.after deletes. Only test 5's spawnSync puts it on the command line (:177). The parent test process never imports it. Every other test spawns through run() (:41-46), which passes no --import and leaves NODE_OPTIONS alone. The list step inside packWith also goes through run(), so it runs without the hook.\n- **Real pack path, no seam.** The script is byte-identical to the approved text (compare-head.log). The hook replaces fs.createReadStream and calls syncBuiltinESMExports. That updates the live named binding the script imports from node:fs (kept-logs.mjs:26), so the script itself has no test hook.\n- **The late action lands only at the intended point.** In the pack child, the only createReadStream call on a path ending in .tar.gz.part is kept-logs.mjs:252. That call comes after the archive is written (:234-249) and fsynced (:250-251, through openSync, which the hook does not touch). The pack pipeline also reads the set's files through createReadStream (:240), but those paths never end in .part, so they pass straight through.\n  - The late action runs as readBack opens the .part, before it reads a byte. The archive is already sealed, so the read-back still equals the list, and nothing between :252 and :261 looks at the folder. The first thing that can see the change is the second walk (:261).\n  - The assertions prove that origin. \"changed while it was packed\" is printed only at :262. \"late-link … is not a plain file\" can only come from walk: :237 names listed paths only, and the first walk would have refused with exit 2.\n- **It fails loudly.** If a future refactor stopped the hook from firing (for example readBack moving to fs/promises), pack would exit 0. The status-1 assertion would then fail, turning test 5 red, not quietly green.\n- **Not flaky.** It has no timers, sleeps or races: the action runs synchronously inside the call, and the child runs under spawnSync. Test 5 passed in my single run and in four suites run at the same time (5.9-6.0 s each). It also passed in 9 of the 14 planted-bug runs; the other 5 (M2, M10, M12, M13, M14) are the bugs it exists to catch. Its only outside dependencies are git and the temp folder. One small trade-off: it builds three fixtures in one test, so a fixture failure names test 5, not a case.\n\n**3(b): KLC-F2, the two untested branches of the second walk.**\n\nThe two branches are walk()'s name check (kept-logs.mjs:88-89: a path that is not a plain name, or longer than 99 characters with the set prefix) and the 'holds no files' check (:98), both when called from the second walk at :261. Only the not-a-plain-file branch (:94) is exercised there, by test 5's late link.\n\nNeither branch can hide a defect that deletes data:\n- **:98.** If it were removed, an emptied folder gives an empty list, and differs() (:102) still fails on the length, so the result is Mismatch and exit 1.\n- **:89 calling refuse instead of fail.** The script exits 2 before any removal, so the folder and the .part stay. Only the exit code and message differ from his \"exits 1, as for a mismatch\".\n- **:89 skipping bad names instead of failing.** That would be the dangerous one: a late `.hidden` file would not be counted, so the folder would go with an unarchived file. But walk is shared, and test 7 (:233-236) fails on that change through list.\n- **The callback itself.** The only thing that is specific to the second walk is its fail callback, and test 5 case b plus M13 pin that.\n\nSo no test is owed now; a follow-up is enough. It costs about two lines: a fourth case in test 5 with a late `.late` file, expecting exit 1 and a 'plain name' MISMATCH, plus a planted bug that makes :89 call refuse."
+}

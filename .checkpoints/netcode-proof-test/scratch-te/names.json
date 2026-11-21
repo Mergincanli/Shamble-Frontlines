@@ -1,0 +1,1666 @@
+{
+ "event.ack_starved.dropped": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-22"
+  ]
+ },
+ "event.affinity.alone": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-1"
+  ]
+ },
+ "event.affinity.sibling_free": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-1",
+   "PM-0006-11"
+  ]
+ },
+ "event.aim_encoded.size_bits": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-51"
+  ]
+ },
+ "event.attempt.ok": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-28",
+   "PM-0006-15",
+   "PM-0006-25",
+   "PM-0006-27"
+  ]
+ },
+ "event.bulk_transfer.size_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-38"
+  ]
+ },
+ "event.burst_heal.after_link_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-18"
+  ]
+ },
+ "event.canary_grep.address_matches_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-21"
+  ]
+ },
+ "event.canary_grep.canaries_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-21"
+  ]
+ },
+ "event.canary_grep.ip_pattern_matches_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-21"
+  ]
+ },
+ "event.canary_grep.lines_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-21"
+  ]
+ },
+ "event.canary_grep.secret_matches_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-21"
+  ]
+ },
+ "event.canary_grep.seed_matches_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-21"
+  ]
+ },
+ "event.canary_grep.token_matches_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-21"
+  ]
+ },
+ "event.capture.fragments_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-14"
+  ]
+ },
+ "event.cargo_tree.sim_transport_deps_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-35"
+  ]
+ },
+ "event.clamp_kind.counted_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-21"
+  ]
+ },
+ "event.clamp_kind.sent_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-21"
+  ]
+ },
+ "event.conn_panic.closed": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-26"
+  ]
+ },
+ "event.conn_panic.others_dropped_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-26"
+  ]
+ },
+ "event.conn_panic.overruns_next_min_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-26"
+  ]
+ },
+ "event.connect_clock.offset_err_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-47"
+  ]
+ },
+ "event.counter_wrap.tick_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-58"
+  ]
+ },
+ "event.cpu_read.changed": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-11"
+  ]
+ },
+ "event.delay_settle.after_change_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-46"
+  ]
+ },
+ "event.edge_cheat_shot.gain_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-50"
+  ]
+ },
+ "event.fallback.playing_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-29"
+  ]
+ },
+ "event.fast_clock.excess_cmds_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-21"
+  ]
+ },
+ "event.fast_clock.excess_move_um": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-21"
+  ]
+ },
+ "event.feature_detect.webgpu": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-32"
+  ]
+ },
+ "event.forged_kind.sent_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-21"
+  ]
+ },
+ "event.forged_kind.unrejected_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-21"
+  ]
+ },
+ "event.fuzz_end.corpus_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-34"
+  ]
+ },
+ "event.fuzz_end.inputs_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-34"
+  ]
+ },
+ "event.fuzz_end.over_limit_allocs_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-34"
+  ]
+ },
+ "event.fuzz_end.panics_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-34"
+  ]
+ },
+ "event.fw_probe.tcp_timed_out": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-15"
+  ]
+ },
+ "event.fw_probe.udp_no_reply": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-15"
+  ]
+ },
+ "event.hit_history.size_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-7"
+  ]
+ },
+ "event.input_latency.to_screen_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-43"
+  ]
+ },
+ "event.join.from_connect_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-19"
+  ]
+ },
+ "event.join.world_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-19"
+  ]
+ },
+ "event.lag_burst.held_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-21"
+  ]
+ },
+ "event.mds_read.size_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-14",
+   "PM-0001-36"
+  ]
+ },
+ "event.metric.present": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-16",
+   "PM-0006-22"
+  ]
+ },
+ "event.metric.stuck_triggered": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-22"
+  ]
+ },
+ "event.metrics_probe.answered": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-16"
+  ]
+ },
+ "event.no_join_close.age_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-25"
+  ]
+ },
+ "event.over_cap.refused": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-25"
+  ]
+ },
+ "event.over_cap_v6.refused": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-25"
+  ]
+ },
+ "event.own_change.blind_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-60"
+  ]
+ },
+ "event.own_change.corrections_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-60"
+  ]
+ },
+ "event.own_change.first_size_um": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-60"
+  ]
+ },
+ "event.own_change.later_over_1mm_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-60"
+  ]
+ },
+ "event.own_change.misplaced_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-60"
+  ]
+ },
+ "event.own_cue.plays_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-62"
+  ]
+ },
+ "event.ping.lost_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-12"
+  ]
+ },
+ "event.ping.max_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-12"
+  ]
+ },
+ "event.ping.mean_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-12"
+  ]
+ },
+ "event.pong_cheat_shot.gain_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-50"
+  ]
+ },
+ "event.record_item.has_value": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-56"
+  ]
+ },
+ "event.records_check.crash_report_kept": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-59"
+  ]
+ },
+ "event.records_check.error_log": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-59"
+  ]
+ },
+ "event.records_check.match_crashed": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-59"
+  ]
+ },
+ "event.reflood.encoded": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-9"
+  ]
+ },
+ "event.reflood.time_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-9"
+  ]
+ },
+ "event.refusal.http_403": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-25"
+  ]
+ },
+ "event.reload.ok": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-26"
+  ]
+ },
+ "event.remote_event.lead_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-61"
+  ]
+ },
+ "event.respawn.slide_frames_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-46"
+  ]
+ },
+ "event.room_exit.after_panic_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-59"
+  ]
+ },
+ "event.room_exit.nonzero": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-59"
+  ]
+ },
+ "event.room_start.spawn_to_open_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-16"
+  ]
+ },
+ "event.rotation.dropped_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-26"
+  ]
+ },
+ "event.rule_list.diff_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-15"
+  ]
+ },
+ "event.scrape.loop_counters_present": {
+  "kind": "series",
+  "marks": [
+   "PM-0004-67"
+  ]
+ },
+ "event.series_count.foreign_labels_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-24"
+  ]
+ },
+ "event.series_count.total_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-24"
+  ]
+ },
+ "event.shot.blend_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.buffer_wait_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.cheat": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.clipped": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-48",
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.delay_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.frame_wait_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.honest_rewind_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.over_cap": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.rewind_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.rtt_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "event.shot.view_time_replaced": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-48"
+  ]
+ },
+ "event.slow_loris_close.age_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-25"
+  ]
+ },
+ "event.soak_trigger.bad_token_refusals_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-22"
+  ]
+ },
+ "event.soak_trigger.rooms_killed_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-22"
+  ]
+ },
+ "event.stall_1s.dropped_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0004-67"
+  ]
+ },
+ "event.stall_200ms.recover_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0004-67"
+  ]
+ },
+ "event.stall_scrape.dropped_err_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-23"
+  ]
+ },
+ "event.stall_scrape.overrun_delta_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-23"
+  ]
+ },
+ "event.stall_scrape.overruns_before_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-23"
+  ]
+ },
+ "event.static_shot.err_ground_um": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-51"
+  ]
+ },
+ "event.static_shot.err_h2_5m_um": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-51"
+  ]
+ },
+ "event.static_shot.err_h4m_um": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-51"
+  ]
+ },
+ "event.swap_diff.files_outside_transport_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-35"
+  ]
+ },
+ "event.throttle_end.full_rate_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-23"
+  ]
+ },
+ "event.throw_kind.throws_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-54"
+  ]
+ },
+ "event.tick_panic.after_warmup_ticks_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-59"
+  ]
+ },
+ "event.worker.cross_origin_isolated": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-43",
+   "PM-0001-44"
+  ]
+ },
+ "event.wss_cert.accepted": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-15"
+  ]
+ },
+ "figure:alloc_twin_diff_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0006-20"
+  ]
+ },
+ "figure:bulk_control_p99_rise_ns": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-38"
+  ]
+ },
+ "figure:crash_close_max_ns": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-59"
+  ]
+ },
+ "figure:cross_arch_mismatch_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-17",
+   "PM-0001-19",
+   "PM-0001-48",
+   "PM-0001-54"
+  ]
+ },
+ "figure:decoded_hash_compared_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-17"
+  ]
+ },
+ "figure:decoded_hash_mismatch_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-17",
+   "PM-0001-58",
+   "PM-0001-19"
+  ]
+ },
+ "figure:down_client_mean_max_bits": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-12"
+  ]
+ },
+ "figure:down_mean_ipv6_bits": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-12"
+  ]
+ },
+ "figure:egress_interface_bytes": {
+  "kind": "figure",
+  "marks": [
+   "PM-0006-17"
+  ]
+ },
+ "figure:egress_metric_vs_interface_ratio": {
+  "kind": "figure",
+  "marks": [
+   "PM-0006-17"
+  ]
+ },
+ "figure:egress_vs_r2_ratio": {
+  "kind": "figure",
+  "marks": [
+   "PM-0006-17"
+  ]
+ },
+ "figure:everyone_in_view_min_share": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "figure:false_hit_share": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-48"
+  ]
+ },
+ "figure:fate_log_twin_equal": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "figure:input_latency_p50_rise_ns": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-43"
+  ]
+ },
+ "figure:input_latency_p99_rise_ns": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-43"
+  ]
+ },
+ "figure:kill_p99_ratio": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-27"
+  ]
+ },
+ "figure:logging_cost_ratio": {
+  "kind": "figure",
+  "marks": [
+   "PM-0006-19"
+  ]
+ },
+ "figure:machine_named": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-1",
+   "PM-0006-11"
+  ]
+ },
+ "figure:one_build_hash": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-32"
+  ]
+ },
+ "figure:one_shot_dropped_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-38"
+  ]
+ },
+ "figure:queue_growth_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-15"
+  ]
+ },
+ "figure:r2_down_formula_bits": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-12"
+  ]
+ },
+ "figure:r2_egress_formula_bytes": {
+  "kind": "figure",
+  "marks": [
+   "PM-0006-17"
+  ]
+ },
+ "figure:rooms_per_vm_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0006-14"
+  ]
+ },
+ "figure:rss_slope_bytes_per_10min": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-15"
+  ]
+ },
+ "figure:rtt_agreement_p99_ns": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-33"
+  ]
+ },
+ "figure:rule_cap_set_by_rule": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-49"
+  ]
+ },
+ "figure:session_memory_growth_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-24"
+  ]
+ },
+ "figure:sync_cost_ratio": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-10"
+  ]
+ },
+ "figure:sync_unit_cost": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-10"
+  ]
+ },
+ "figure:throw_desync_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-54"
+  ]
+ },
+ "figure:times_of_day_rule": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-27",
+   "PM-0006-13",
+   "PM-0006-14"
+  ]
+ },
+ "figure:twin_hash_mismatch_count": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-21",
+   "PM-0001-30"
+  ]
+ },
+ "figure:up_client_mean_max_bits": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-13"
+  ]
+ },
+ "figure:view_hit_registered_share": {
+  "kind": "figure",
+  "marks": [
+   "PM-0001-48",
+   "PM-0001-49"
+  ]
+ },
+ "header.params.aim_bits": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-51"
+  ]
+ },
+ "header.params.area_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-9"
+  ]
+ },
+ "header.params.base_rtt_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "header.params.bottleneck_queue_datagrams_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-24"
+  ]
+ },
+ "header.params.bottleneck_queue_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-24"
+  ]
+ },
+ "header.params.buffer_depth_ticks_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-30"
+  ]
+ },
+ "header.params.cert_validity_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-25",
+   "PM-0006-27"
+  ]
+ },
+ "header.params.history_ticks_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-7"
+  ]
+ },
+ "header.params.lg_ipv6": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-25"
+  ]
+ },
+ "header.params.quinn_proto_version": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-35"
+  ]
+ },
+ "header.params.reorder_permille": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3",
+   "PM-0001-58",
+   "PM-0001-20"
+  ]
+ },
+ "header.params.rewind_cap_ticks_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-48",
+   "PM-0001-49"
+  ]
+ },
+ "header.params.ring_version": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-35"
+  ]
+ },
+ "header.params.rustls_version": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-35"
+  ]
+ },
+ "header.params.scrape_interval_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-23"
+  ]
+ },
+ "header.params.throttle_queue_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-23"
+  ]
+ },
+ "header.params.throttle_queue_datagrams_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-23"
+  ]
+ },
+ "header.params.tick_start": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-17"
+  ]
+ },
+ "header.params.ticks_below_wrap": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-58"
+  ]
+ },
+ "header.params.tokio_version": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-35"
+  ]
+ },
+ "header.params.ws_bots_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-22"
+  ]
+ },
+ "header.params.wt_dangerous_config": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-35"
+  ]
+ },
+ "second.s.buffer_depth_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-20"
+  ]
+ },
+ "second.s.cmd_sent_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-13"
+  ]
+ },
+ "second.s.cmd_whole_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-13"
+  ]
+ },
+ "second.s.down_bits": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-12"
+  ]
+ },
+ "second.s.frame_correction_um": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-42"
+  ]
+ },
+ "second.s.frame_extrap_over_interval": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-45"
+  ]
+ },
+ "second.s.frame_extrapolated": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-45"
+  ]
+ },
+ "second.s.input_cmds_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-13"
+  ]
+ },
+ "second.s.input_datagram_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-13"
+  ]
+ },
+ "second.s.interp_delay_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-46"
+  ]
+ },
+ "second.s.probe_burst_down_lost": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "second.s.probe_burst_up_lost": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "second.s.probe_down_delay_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "second.s.probe_down_lost": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "second.s.probe_rtt_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "second.s.probe_up_delay_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "second.s.probe_up_lost": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "second.s.replay_forced_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-44"
+  ]
+ },
+ "second.s.replay_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-44"
+  ]
+ },
+ "second.s.send_call_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-11"
+  ]
+ },
+ "second.s.snap_age_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-24"
+  ]
+ },
+ "second.s.snap_corr_over_5cm": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-42",
+   "PM-0001-55"
+  ]
+ },
+ "second.s.snap_late_after_send": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-37"
+  ]
+ },
+ "second.s.snap_lost_or_late": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-37"
+  ]
+ },
+ "second.s.throttle_missing_snaps_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-23"
+  ]
+ },
+ "second.s.up_bits": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-13"
+  ]
+ },
+ "second.s.ws_extra_delay_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-31"
+  ]
+ },
+ "second.v.console_errors_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-32"
+  ]
+ },
+ "second.v.delay_step_abs_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-46"
+  ]
+ },
+ "second.v.disconnects_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-27"
+  ]
+ },
+ "second.v.early_feedback_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-52"
+  ]
+ },
+ "second.v.feedback_shown_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-52"
+  ]
+ },
+ "second.v.handshake_headroom_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-25"
+  ]
+ },
+ "second.v.inputs_received_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-11"
+  ]
+ },
+ "second.v.io_cpu_permille": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-11"
+  ]
+ },
+ "second.v.one_shots_sent_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-38"
+  ]
+ },
+ "second.v.own_cosmetic_sent_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-62"
+  ]
+ },
+ "second.v.page_errors_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-32"
+  ]
+ },
+ "second.v.person_rtt_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-3"
+  ]
+ },
+ "second.v.pong_cheat_gap_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-50"
+  ]
+ },
+ "second.v.portal_changes_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "second.v.proc_cpu_permille": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-27",
+   "PM-0006-13"
+  ]
+ },
+ "second.v.projectile_spawns_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "second.v.recv_over_max_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-14"
+  ]
+ },
+ "second.v.reliable_events_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "second.v.rewinds_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-7"
+  ]
+ },
+ "second.v.rss_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-15",
+   "PM-0001-22",
+   "PM-0001-25"
+  ]
+ },
+ "second.v.shots_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "second.v.snap_datagrams_sent_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-11"
+  ]
+ },
+ "second.v.stand_in_changes_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "second.v.stand_in_spawns_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "second.v.steal_permille": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-1",
+   "PM-0001-27",
+   "PM-0006-13"
+  ]
+ },
+ "second.v.ws_stall_permille": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-31"
+  ]
+ },
+ "second.v.ws_stalls_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-31"
+  ]
+ },
+ "tick.s.cmd_on_time": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-20"
+  ]
+ },
+ "tick.s.encode_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-6"
+  ]
+ },
+ "tick.s.input_missing": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-20"
+  ]
+ },
+ "tick.s.nearest8_missing_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-8"
+  ]
+ },
+ "tick.s.own_state_sent": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-23"
+  ]
+ },
+ "tick.s.pitch_err_microdeg": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-57"
+  ]
+ },
+ "tick.s.pos_err_um": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-57"
+  ]
+ },
+ "tick.s.relevant_starved_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-8"
+  ]
+ },
+ "tick.s.rewind_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-7"
+  ]
+ },
+ "tick.s.snap_datagram_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-12",
+   "PM-0001-14"
+  ]
+ },
+ "tick.s.snap_payload_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-6"
+  ]
+ },
+ "tick.s.snap_wire_bytes": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-8"
+  ]
+ },
+ "tick.s.yaw_err_microdeg": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-57"
+  ]
+ },
+ "tick.v.ack_starved_headroom_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-22"
+  ]
+ },
+ "tick.v.big_vehicles_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "tick.v.block_extrap_over_interval": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-45"
+  ]
+ },
+ "tick.v.block_extrapolated": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-45"
+  ]
+ },
+ "tick.v.cmd_doubled_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-58"
+  ]
+ },
+ "tick.v.cmd_lost_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-58"
+  ]
+ },
+ "tick.v.cmd_refused_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-58"
+  ]
+ },
+ "tick.v.corrections_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-41"
+  ]
+ },
+ "tick.v.datagram_too_large_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-14"
+  ]
+ },
+ "tick.v.dropped_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-4"
+  ]
+ },
+ "tick.v.effects_per_soldier_max_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "tick.v.lagcomp_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-5"
+  ]
+ },
+ "tick.v.lagswitch_cmds_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-21"
+  ]
+ },
+ "tick.v.lagswitch_excess_move_um": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-21"
+  ]
+ },
+ "tick.v.overrun": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-4"
+  ]
+ },
+ "tick.v.own_event_misplaced_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-61"
+  ]
+ },
+ "tick.v.padded_step_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-14"
+  ]
+ },
+ "tick.v.pair_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-9"
+  ]
+ },
+ "tick.v.pair_test_per_pair_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-9"
+  ]
+ },
+ "tick.v.press_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-20"
+  ]
+ },
+ "tick.v.press_doubled_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-58",
+   "PM-0001-20"
+  ]
+ },
+ "tick.v.press_lost_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-58",
+   "PM-0001-20"
+  ]
+ },
+ "tick.v.projectiles_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "tick.v.rank_pack_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-8"
+  ]
+ },
+ "tick.v.reflood": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-9"
+  ]
+ },
+ "tick.v.region_query_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-8"
+  ]
+ },
+ "tick.v.remote_event_misplaced_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-61"
+  ]
+ },
+ "tick.v.replay_depth_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-44"
+  ]
+ },
+ "tick.v.server_only_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-5"
+  ]
+ },
+ "tick.v.sim_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-4",
+   "PM-0001-5"
+  ]
+ },
+ "tick.v.smallest_team_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "tick.v.snapshot_clients_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "tick.v.soldiers_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "tick.v.start_jitter_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0004-67"
+  ]
+ },
+ "tick.v.tick_allocs_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0006-20"
+  ]
+ },
+ "tick.v.unsent_snaps_max_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-31"
+  ]
+ },
+ "tick.v.untraced_corrections_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-58",
+   "PM-0001-41"
+  ]
+ },
+ "tick.v.very_large_units_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-2"
+  ]
+ },
+ "tick.v.wake_ticks_count": {
+  "kind": "series",
+  "marks": [
+   "PM-0004-67"
+  ]
+ },
+ "tick.v.work_ns": {
+  "kind": "series",
+  "marks": [
+   "PM-0001-4",
+   "PM-0001-24",
+   "PM-0001-25",
+   "PM-0001-27",
+   "PM-0006-13",
+   "PM-0006-19"
+  ]
+ }
+}

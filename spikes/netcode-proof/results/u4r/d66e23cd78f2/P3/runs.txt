@@ -1,0 +1,26 @@
+# u4r-P3: -17's, -57's L1 P3 part(s), run in this container on 2026-11-16 (u4r-brief.md 7.1)
+commit d66e23cd78f2c75673224109228a5014a0d20a52, spikes/netcode-proof tree 14d78602cbe0647c55356c5eec15dd603c5f7fec
+target: the main folder's own cache (CARGO_TARGET_DIR unset: plan §7.1 item 6)
+npt-lab (measured build) sha256 98c3967e04e4260985d24173b1fb2126ea1444636f4725e12cf76333d90b5113
+npt-lab (bites build) sha256 fbef68e9cd6a01c9e7d833a1ec67230d76443680209b9059e7b2ab138da37500
+npt-judge sha256 d8b8c91eccc2fdf9aeb3d2f29e77103635e6ca3161b2752e14a3bb1ed7073f6e
+marks.json sha256 c1935a5b996fb0aaff82b0b3c1c604255e1534f6ca7e8d2e55a9f472cd3b22a9 (copied into the bin folder and checked there, then into the raw-log folder; the bite list and the judge read those copies)
+raw logs: .gate/netcode-proof-test/runs/u4r-P3-d66e23cd78f2/ (not committed: plan §7.2)
+projection: u4r-P3: the set's 3 runs' projected logs, before the builds: free 5306 MiB, projected 524 MiB, so 4782 MiB after it against the 4 GiB floor (4096 MiB): room
+projection: u4r-P3: the set's 3 runs' projected logs, after the builds: free 5300 MiB, projected 524 MiB, so 4775 MiB after it against the 4 GiB floor (4096 MiB): room
+projection: u4r-P3: the judge, from the plan's bytes before the builds: 524.4 MiB of logs, so a projected peak of 1530 MiB by 302.2 + 2.3403 x MiB (the six-point fit: advisor-u4r-sets-r2) against the 10240 MiB line: room
+start: uptime 2673 s, load average 0.21 0.70 0.87
+end: uptime 3702 s, load average 1.00 1.00 1.00
+judge, projected from its logs on disk: 297.0 MiB of logs, so a projected peak of 997 MiB by 302.2 + 2.3403 x MiB (the six-point fit: advisor-u4r-sets-r2) against the 10240 MiB line: room
+judge: PM-0001-2    NOT-RUN   ES runs: 0 of 3 valid runs
+PM-0001-17   NOT-RUN   L1 P0: 0 of 3 valid runs
+PM-0001-57   NOT-RUN   L1 P0: 0 of 3 valid runs
+judge, the set's parts and bites (verdict.json: each part and bite that holds a run of this call, as the file gives them):
+  PM-0001-2 SS runs: PASS (l1-p3-s1 valid, l1-p3-s2 valid, l1-p3-s3 valid)
+  PM-0001-17 L1 P3: PASS (l1-p3-s1 valid, l1-p3-s2 valid, l1-p3-s3 valid)
+  PM-0001-57 L1 P3: PASS (l1-p3-s1 valid, l1-p3-s2 valid, l1-p3-s3 valid)
+
+# one line per run (npt-lab's own summary line and its wall time; the judge reads the logs, never these lines)
+l1-p3-s1 SS P3 seed 1: 18334 ticks (34 after); lead 7; commands 700663 (steps without one 178860, duplicate stamps 0); late 1118; press refused 0; buffer full 0; rewinds refused 0; stale 0; overflow resyncs 27; heals 0; client hashes 835238 (sentinels 0); measured incomplete 43295; decided lost at the stop 87; measured snapshot datagrams 863772, lost by the link 43094 (in bursts 0); measured client-ticks filed lost: the room sent nothing 201, the link lost a datagram 43094, neither 0; shots per measured second 693; carry 49: measured client sets 864000, holding every very large unit 864000 (1.0000), projectiles per set 285.77; audit 2501236 owner, 3613975 spatial checked against the radius, 151257 spatial not checked, 0 breaches; fate log b99096c62a5c51dd; connect order digest e826cbd37d20d3ae; in a building: 0 slot-ticks (slots none) (wall 318.2 s) (overflow resyncs: to the advisor before it counts, carry 58)
+l1-p3-s2 SS P3 seed 2: 18335 ticks (35 after); lead 7; commands 724309 (steps without one 155292, duplicate stamps 0); late 1136; press refused 0; buffer full 0; rewinds refused 0; stale 0; overflow resyncs 0; heals 0; client hashes 835419 (sentinels 0); measured incomplete 43210; decided lost at the stop 62; measured snapshot datagrams 864000, lost by the link 43210 (in bursts 0); measured client-ticks filed lost: the room sent nothing 0, the link lost a datagram 43210, neither 0; shots per measured second 693; carry 49: measured client sets 864000, holding every very large unit 864000 (1.0000), projectiles per set 284.29; audit 2500951 owner, 3965365 spatial checked against the radius, 151733 spatial not checked, 0 breaches; fate log 7dbd92ec2098f6da; connect order digest e826cbd37d20d3ae; in a building: 0 slot-ticks (slots none) (wall 339.0 s)
+l1-p3-s3 SS P3 seed 3: 18334 ticks (34 after); lead 7; commands 715622 (steps without one 163892, duplicate stamps 0); late 1210; press refused 0; buffer full 0; rewinds refused 0; stale 0; overflow resyncs 1; heals 0; client hashes 835088 (sentinels 0); measured incomplete 43454; decided lost at the stop 59; measured snapshot datagrams 863994, lost by the link 43449 (in bursts 0); measured client-ticks filed lost: the room sent nothing 5, the link lost a datagram 43449, neither 0; shots per measured second 693; carry 49: measured client sets 864000, holding every very large unit 864000 (1.0000), projectiles per set 287.36; audit 2504247 owner, 4074240 spatial checked against the radius, 153767 spatial not checked, 0 breaches; fate log f167ce6f8dfc3c09; connect order digest e826cbd37d20d3ae; in a building: 0 slot-ticks (slots none) (wall 334.0 s) (overflow resyncs: to the advisor before it counts, carry 58)

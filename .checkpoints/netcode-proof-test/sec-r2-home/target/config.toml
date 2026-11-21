@@ -1,0 +1,4 @@
+# The security seat's round-2 probe (u4d2-r2-review-security.md): a CARGO_HOME config that sets build.target.
+# Read only by sec-r2-deps-home.mjs through check.mjs's cargoConfigFiles; no cargo process is given this folder.
+[build]
+target = "wasm32-unknown-unknown"

@@ -1,0 +1,20 @@
+uname_r 6.18.44-fc-v310
+config_hz 250
+tcp_recovery 1
+tcp_early_retrans 3
+tcp_sack 1
+tcp_frto 2
+tcp_rto_min_us 200000
+tcp_thin_linear_timeouts 0
+tcp_timestamps 1
+tcp_dsack 1
+tcp_congestion_control bbr
+tcp_available_congestion_control reno bbr cubic
+port 47999
+started_utc 2026-11-08T00:47:23Z
+loadavg_before_run1 0.00 0.32 0.71 1/116 2923
+loadavg_after_run1 0.04 0.24 0.64 1/119 3142
+loadavg_before_run2 0.04 0.24 0.64 1/119 3144
+loadavg_after_run2 0.01 0.17 0.57 1/117 3162
+loadavg_before_run3 0.01 0.17 0.57 1/117 3164
+loadavg_after_run3 0.00 0.11 0.51 1/112 3183

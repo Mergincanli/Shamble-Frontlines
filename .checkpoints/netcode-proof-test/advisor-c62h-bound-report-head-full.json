@@ -1,0 +1,129 @@
+{
+  "verdict": "APPROVE WITH CONDITIONS",
+  "head_sha": "3626a377f95c0a9dc0edb3bce49227f73caf733d",
+  "summary": "The C62H-BOUND report at 3626a377f95c0a9dc0edb3bce49227f73caf733d (u4r-report.md lines 1201-1764) carries every item of brief section 9, the carries in order items 4-9 and conditions P1-P7. Every figure I spot-checked matches its source: about 60 claims, read against runs.txt, verdict.json, verdict-bites.json, the logs under .gate/, the ruling JSONs, the card, history.md and git. The append is clean: the diff from a5baab8 is one hunk with no removed line, 777ee782 (1,199 lines) becomes c5dee3fa (1,764 lines), and lines 1201 to the end hash to e4af2d54, the draft's sha256. The (c) diff 7526ffe is exactly the ruling's three texts, each once as a whole line (:997, :1008, :990), and B1's lines are byte-equal. All six post-PASS edits are right. P6 exits 0. CI is green on a59e0ee, whose tree outside .checkpoints/ is identical to the head's. I have four Low findings and no push. The conditions cover only what the chat message to Mustafa must say. Item 12, sending the report, is the next step. I ran no gate: this head is checkpoint-only, and CI's gate and smoke jobs passed on the identical code tree. Later heads up to bf752f3 change only the card and my own notes.",
+  "order_items": [
+    {
+      "item": "4. Write the C62H-BOUND report (brief section 9), each item PASS or FAIL; say where it lives; the five-item Still unbounded list",
+      "met": true,
+      "evidence": "The section starts at u4r-report.md:1201 ('a section of u4r-report.md, as BRAWL-1's is'). Sections 1-10, 13 and 14 are marked PASS. Each brief section 9 item is present: commits and SHAs, SIZE-CHECK per step against about 650 (s1), check.mjs counts and new test names (s2), CB-P1 to CB-P18 (s3), the built check with its three after-hashes and the freeze, the three shown-to-fail runs (s4), the 13:35 read line and B-2's answers (s5), the merge log (s6), the head check (s7), the P0 re-judge (s8), the 8.4 lines and S/L/B E1/E2/N per run (s10), the (c) lines (s13), kept logs and sha256s (s14). Section 16 lists exactly the five items: -58 L1 P0 and P3 (C62HB-Q4 (b)), -17 L2, -17 L1 B1 until U4g, outside the measured window, double fault."
+    },
+    {
+      "item": "5. H3, H4, H6; 967 stated against both the plan and the brief's estimate, under 1,050",
+      "met": true,
+      "evidence": "H3 (s6): merge.log:51-52 (I read those lines: the test's name and 429 passed / 1 failed), c62h-bound-build.md:428-435 and the merge-stop ruling; merge-2 deleted test.log by design (check.mjs:2655-2657). H4 (s6): npt-lab reaches npt-net through npt-server and npt-bots, whose sources never name DelayStream or l2::delay; crates/net is byte-equal to LANE_BASE; no 'not at all' anywhere (grep). H6 (s1): my numstat 044fab1..561bf42 (results excluded) gives 14 files, +904 -63 = 967. The per-file figures equal section 1, and the running totals are 499 / 821 / 920 / 967. The section states 967 against the plan (top 755, over by 212), against the estimate (top 875, over by 92) and under 1,050 by 83, and names the main session's scripts as not lane code."
+    },
+    {
+      "item": "6. C1-C8, with U3C-HELD-1, CHECK-NFF-1, the set check's sha256 and its shown-to-fail runs, the pre-flight",
+      "met": true,
+      "evidence": "C1: both calls are named. merge.log FAILs on the named test. merge-2.log passes whole: :12 552/632, :19 all 11 steps, :30 det-u4 215.5 s (non-cargo 200.8 + 2.5 + 0.9 = 204.2), :54-55 the SS-P0-s4 pin, :57 real 1m55.935s; all checked by me. C2 not triggered. C3: U3C-HELD-1, Medium, at the latest U4f's merge, never a looser bound, with a planted bug (card :3760-3773 at 67de11e). C4: CHECK-NFF-1 Low (:3774-3775). C5: e9eb9b23... given in full, with set-check-dry, -dry-2 and -negative (12 PASS, 29 FAIL) and the self-test. C6 met. C7: S 5,760, L 111, B 0, E1 0, E2 111, N 0; A 0, B 0, mismatches 0; NOT-RUN 1 of 3; ADV-CBH-1 (Medium) and -2 fixed before the run. C8: the brief's sha256 at the head is 7936074c... (my sha256sum)."
+    },
+    {
+      "item": "7. The ten deferred Lows as STATUS follow-ups with id, file:line and taker; NA-CBB-2 done; TE-CBH-1 and -2 fixed",
+      "met": true,
+      "evidence": "Section 15. Every file:line equals its review JSON's 'where'. I read all three JSONs, whose sha256s match (3bf8888c / 5adfdf18 / 3f39ade6). TE-CBH-5 = NA-CBB-1 (both lines given), NA-CBB-3 is the one-line note, and NA-CBB-2 is done by the pre-flight. The taker is pooled ('the next npt-judge or npt-lab change, U4f, U4g or JDG-ONLY-1'): that is the merge-stop ruling's own wording and the card's :3776-3779, so it meets the order. TE-CBH-1 and -2 are recorded as fixed in the main session's script."
+    },
+    {
+      "item": "8. P0 re-judge beside the earlier verdicts, SAME ANSWERS, the kept set's two calls; B-2; B-3; deferred (ii); the marks.json and judge read line",
+      "met": true,
+      "evidence": "My sha256s: the re-judge's verdict.json is e5ed24e2 and verdict-bites.json 13b6b107. The earlier 93509dfd7fd1/P0 files are e926b812 and b472784f. cb37f56 holds the three files; the peaks (3,920.3 and 4,504.6 MiB) match rejudge.txt:29-30. B-2 (s5): hashed-and-incomplete goes INVALID to FAIL, A 1, gap kept; no other assertion moved. B-3 (s8, s14): 93509dfd7fd1 is the kept set, both P0 folders are on disk now, and 051995db9cea is named. (ii) is shown by the gaps fixture, not by old logs (s14). The read line (s5) carries the test-engineer, marks 9fb5be57 to c1935a5b, the lines read and the diff stat; history.md:2127 is the 13:35 rule."
+    },
+    {
+      "item": "9. This ruling: s1 and s3 count; E1 201 and 5; 228 = 201 + 27 and 6 = 5 + 1 (ADV-CBP3-2); P3's B by my read (ADV-CBP3-5); condition 2 on a real run; equal caches; no pack; the four sha256s",
+      "met": true,
+      "evidence": "Sections 10 and 11 carry all of it, without repeating 'recorded as incomplete' (grep). My read of runs.txt: s1 S 863,772, L 43,094, B 0, E1 201, E2 43,094, N 0; s3 S 863,994, L 43,449, B 0, E1 5. npt-judge d8b8c91e and npt-lab 98c3967e appear in both runs.txt files. The section corrects my 5,307 to 5,306, and it is right: pre-P3-c62h.log:2 reads 'free 5306 MiB', and df gives 5,563,871,232 B = 5,306.1 MiB. The sha256s (s14) match pre-P3-c62h.log:26-29."
+    },
+    {
+      "item": "10. Save and push the card and the report; CI green on the pushed head",
+      "met": true,
+      "evidence": "Pushed at 3626a37, marked [skip ci] by checkpoint.mjs under CHECKPOINTS.md §5. My CI ruling holds this met: git diff --quiet a59e0ee 3626a37 -- . ':(exclude).checkpoints' exits 0. My gh read on a59e0ee shows gate and toolchain success on push and pull_request (43961950359, 43961950485, 43961962912, 43961962919), with both gate runs' gate and smoke jobs success. No run exists on 3626a37."
+    },
+    {
+      "item": "11. The advisor checks that head, naming the full SHA, against this list and the (c) diff",
+      "met": true,
+      "evidence": "This check, on 3626a377f95c0a9dc0edb3bce49227f73caf733d. The (c) diff: my python read of the_c_lines finds each of the three texts as exactly one whole line (:997, :1008, :990) at both 7526ffe and the head. 7526ffe is +3 -2, taking 76680d3a to 777ee782. B1's :1035 and :1167 are byte-equal to the old :1034 and :1166. c62h_bound_c_lines.py checks every number against the files and exits 1 on any difference."
+    },
+    {
+      "item": "12. Send the report to Mustafa in chat, ending with Decisions needed (C62HB-Q4 (b)) and For Mustafa; only then may a P0 folder be packed, by 8.1's rules",
+      "met": false,
+      "evidence": "Not done yet: it is the next step, after this verdict. The section is ready. It ends with '### Decisions needed' (C62HB-Q4 (b): options, recommendation) and '### For Mustafa' (four items). Both P0 folders are still unpacked on disk. Conditions R1-R4 govern the send."
+    }
+  ],
+  "conditions_p1_p7": [
+    {
+      "condition": "P1. P2 and P3 count, with s1 and s3 counted under carry 58; the card, the notes and the report say so, citing the ruling",
+      "met": true,
+      "evidence": "Report section 11 ('P3 COUNTS AND P2 COUNTS', citing advisor-c62h-bound-p3-full.json, facf298e, 71 lines: my sha256sum and wc). The card :157 says the same, and so does c62h-bound-build.md:530-533."
+    },
+    {
+      "condition": "P2. The (c) replacement only as the_c_lines gives it, numbers checked first, the diff exactly two lines plus the note, B1's lines unchanged",
+      "met": true,
+      "evidence": "7526ffe: +3 -2 on u4r-report.md, each new line equal to the ruling's text (my python match), the note at :990. c62h_bound_c_lines.py extracts the texts from the JSON and checks A/B 0/0/0, the tallies, the resyncs, the verdict paths and the bites 48/48 before writing. B1's lines are unchanged. No other change to u4r-report.md between 7526ffe and a5baab8 (both 777ee782)."
+    },
+    {
+      "condition": "P3. The report carries every item of brief section 9 and the order_to_the_report carries, plus the carry-58 reading and the E1 tie",
+      "met": true,
+      "evidence": "Item by item in my notes, checks 7 and 7b: brief section 9 is complete, and H3, H4, H6, C1-C8, the Lows with file:line and taker, B-2, B-3, the P0 re-judge, the size against both ranges and ADV-CBP3-2/-5 are all in sections 1-16."
+    },
+    {
+      "condition": "P4. c62h-bound-build.md's section 8 gains P3's lines before the report is written",
+      "met": true,
+      "evidence": "c62h-bound-build.md:515-533 at the head hold P3's end (1,029.4 s, exit 0, 995.8 MiB), 8ca774a, set-check-P3 32/0, the flags and the ruling. They are already present at 9a0e687 (21:55:59 UTC), before the draft's first commit b3fb754 (22:11)."
+    },
+    {
+      "condition": "P5. Both P0 folders, the reference sets and the c-u2 folders stay unpacked until the report has reached Mustafa",
+      "met": true,
+      "evidence": "Present on disk now (ls): u4r-P0-93509dfd7fd1, u4r-P0-051995db9cea, u4r-P2-fc411116c1f1, u4r-P3-fd4612050cd6, c-u2-pm-0001-3-65869918809f and -81c6d01e371b. Only u4r-P2-ab10f058a828 was packed (kl-pack-p2.log: free 5,883 to 6,455 MiB). Report sections 11 and 14 name all of them. This must hold until the send (R4)."
+    },
+    {
+      "condition": "P6. The report's head gets my check naming the full SHA; nothing in spikes/netcode-proof outside results/ changes from ddd38ba",
+      "met": true,
+      "evidence": "git diff --quiet ddd38ba 3626a377f95c0a9dc0edb3bce49227f73caf733d -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results' exits 0 (I ran it), as the main session reported. The only changes under spikes/ since ddd38ba are 8 added results files. It also exits 0 at e2d06ec and at a5baab8."
+    },
+    {
+      "condition": "P7. Every other bar and stop in the brief unchanged (C8); carry 58's capacity side stays open",
+      "met": true,
+      "evidence": "The brief at the head is 7936074c... (my sha256sum), the hash the report gives. Section 11 keeps EVQ-LOAD, U4f's cap measurement and the per-burst high-water marks before -18's B1 runs (U4g) open. Section 12 reads the stop rules as condition 3 does."
+    }
+  ],
+  "findings": [
+    {
+      "id": "ADV-CBR-1",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/u4r-report.md:1735-1753 (Decisions needed, C62HB-Q4 (b))",
+      "what": "The entry offers 'the same two checks' for -58's two wrap parts, but leaves out that the two figures read only measured ticks (the frozen SERIES rows: 'measured tick records only'; CB-P8's test). -58 reads the whole run because its wraps fall in the first seconds (marks.json PM-0001-58 notes: 'The whole run is read (window: all): the wraps fall in the first seconds'). As written, then, the checks would not see the wrap ticks. A real bound needs wrap runs that put the wraps inside the measured window, or a whole-run reading of the figures, and the second changes what a figure computes, which needs his yes. Option (a) is therefore bigger than the entry says. Both options already go through his yes on the exact wording, so nothing wrong can be built.",
+      "fix": "No push. The chat's decision entry carries the one-line caveat given in to_mustafa. The card records it for U4g's brief carry."
+    },
+    {
+      "id": "ADV-CBR-2",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/u4r-report.md:1735 and :1744-1753",
+      "what": "The code 'C62HB-Q4 (b)' names the design's option (b) (offer him a follow-up). The entry's own options then reuse (a), (b) and (c) with new meanings, and the recommendation reads '(b), with U4g'. His answer is only unambiguous because For Mustafa item 1 asks for '(a), (b) or (c)'.",
+      "fix": "No push. In chat, name the code plainly ('C62HB-Q4, the -58 offer'), as in to_mustafa."
+    },
+    {
+      "id": "ADV-CBR-3",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/u4r-report.md:1727 (section 17)",
+      "what": "'CI on ddd38ba is the main session's relay; the advisor did not re-read it' is now out of date. I read it with gh: four runs, all success (43911726413, 43911714149, 43911727938, 43911713654).",
+      "fix": "No push. The chat may say the advisor has now read CI on ddd38ba and on a59e0ee."
+    },
+    {
+      "id": "ADV-CBR-4",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/u4r-report.md:1532-1533 (section 10, Disk)",
+      "what": "The line cites pre-P3-c62h.log for 5,306, but its 6,057 before P2 comes from the runner's own start line (P2-8ee453c22882.log:1). pre-P2-c62h.log's header reads 6,056 (df 6,351,163,392 B = 6,056.9 MiB). Both figures clear 5,500, so no outcome changes.",
+      "fix": "None needed; at most a STATUS-level note. It never triggers a push."
+    }
+  ],
+  "conditions": [
+    "R1. The chat message to Mustafa carries the C62HB-Q4 entry as to_mustafa gives it: the code named plainly (ADV-CBR-2) and the measured-window caveat (ADV-CBR-1). The card records the caveat as an item for U4g's brief carry. u4r-report.md is not edited for these.",
+    "R2. The chat names the checked head 3626a377f95c0a9dc0edb3bce49227f73caf733d. Before sending, the main session confirms that the head it sends from still has u4r-report.md at sha256 c5dee3fa561dddbea4235625a0115cd2e122636ea624b11d92aea2dcda08d498, and that the P6 command still exits 0 there. Today the later heads cd91771, 7cce5af and bf752f3 change only the card and my notes.",
+    "R3. Any change to u4r-report.md, or to spikes/netcode-proof outside results/, before the report reaches Mustafa comes back to me for a new head check.",
+    "R4. P5 holds until the report has reached him. After that, pack only by brief section 8.1's rules, never both P0 folders, fc411116c1f1, fd4612050cd6 or the c-u2 folders without his word."
+  ],
+  "ruling_on_ci": "Item 10 is met. The pushed head 3626a37 carries [skip ci] under CHECKPOINTS.md §5 ('A commit that pushes only checkpoint files carries [skip ci], decided by the script alone'), and every commit from a59e0ee to the head touches only .checkpoints/. I confirmed this with git diff --name-only and --raw: all regular files, no symlink or submodule. git diff --quiet a59e0ee 3626a37 -- . ':(exclude).checkpoints' exits 0, so the code CI checks is byte-identical. Neither workflow, nor tools/gate.mjs, nor tools/smoke.mjs reads .checkpoints/ (git grep). My own gh read on a59e0ee shows gate success on push (43961950359) and pull_request (43961962912), each with its gate and smoke jobs success, and toolchain success on push (43961950485) and pull_request (43961962919). 'CI green on the pushed head' is therefore read as green on a commit whose checked tree equals the head's, and that holds. Nothing more is needed now: an empty commit just to run CI would add a non-checkpoint commit and prove nothing new. CI must run on the real final head: the commit that deletes .checkpoints/ before PR #40 is marked ready runs CI with no [skip ci] (CHECKPOINTS.md §9), and that run, with gate and smoke green, is the bar for any merge.",
+  "ruling_on_c62hb_q4": "I confirm (b), with U4g, and add one reason. The report's reasons hold. The two figures and their shared reader exist. U4g already takes -58 and will likely change marks.json (advisor-c62h-review-full.md:90), so one wording yes and one reviewer's read under his 13:35 rule cover both -58 and -17's B1 part. No -58 wrap results are committed yet (git grep finds none). The added reason is the strongest one: the figures read only measured ticks, but -58's wraps fall in the first seconds of its runs, which is why -58 reads the whole run (marks.json PM-0001-58 notes). Copying the two checks onto -58's parts would miss the wrap ticks, the very place -58 exists to test. A real bound needs U4g's design of the wrap runs: either the wraps fall inside the measured window, or the figures gain a whole-run reading, which changes what a figure computes and comes to him as exact wording for a yes. That design work belongs where the wrap runs are designed, so a separate lane now (a) would do it twice or do it blind. Option (c) is acceptable but leaves a known hiding place open with no owner. Until U4g, the two parts stay on the Still unbounded list.",
+  "to_mustafa": "C62H-BOUND is finished and checked.\n\nThe lab now records which snapshot packets the simulated network lost. The judge has two new checks on PM-0001-17:\n- every tick a client files as lost must be explained: either the room sent nothing that tick, or the network lost a packet of it;\n- no tick may arrive whole while the network says it lost a packet of it.\n\nResults:\n- On all six clean ten-minute runs (P2 and P3, three seeds each), both checks read 0. The lab's own count of unexplained ticks agrees with the judge's every time.\n- Each planted bug reads exactly 48 on its own check, with every other check passing.\n- Your P0 re-judge gave the same answers as before.\n- Two P3 runs had overflow resyncs. Every \"room sent nothing\" tick in them was a full state waiting for its acknowledgement, so both runs count.\n- The two old (c) report lines are replaced by the bounded figures.\n- Size: 967 changed lines. That is above the plan (about 650) and the estimate (650-875), and under your 1,050 stop.\n- None of your stop rules was met.\n- The advisor checked the report at head 3626a377f95c0a9dc0edb3bce49227f73caf733d: approve, with conditions that only concern the wording of this message.\n\nStill unbounded: -58's two counter-wrap parts, -17 on the real network (L2), -17's B1 part until U4g, the minutes outside each run's measured window, and a double fault.\n\nDecisions needed:\n- C62HB-Q4 (the -58 offer): should PM-0001-58 (\"every counter survives its wrap\") get this lane's two checks on its two parts, L1 P0 and L1 P3?\n  - Why it matters: until they do, a client bug that files snapshots as lost around a counter wrap goes unseen there. It is the same hiding place this lane closed on -17.\n  - One thing to know: the two checks read only the measured ticks, but -58's wraps fall in the first seconds of its runs (that is why -58 reads the whole run). So simply copying the checks would miss the wraps. Either the wrap runs are set up so the wraps fall inside the measured window, or the checks gain a whole-run reading. The second changes what a check computes, so it would come to you as exact wording for a yes.\n  - Options:\n    - (a) Now, as a small lane of its own: wording and size to you first, then -58's wrap runs made with the new lab and judged.\n    - (b) With U4g, which already takes -58 and will likely change marks.json anyway: the same wording yes from you first.\n    - (c) Not now: they stay on the still-unbounded list.\n  - Recommendation: (b), with U4g. The checks and their reader already exist, and U4g designs -58's wrap runs anyway, so the window question gets settled once, with one wording yes and one reviewer's read.\n\nFor Mustafa:\n1. Answer C62HB-Q4: (a), (b) or (c).\n2. Optional: if you also want U4r's own P0 set (051995db9cea) re-judged with the new judge, say so (one judge call, no new runs). Both P0 folders stay unpacked until you have read this.\n3. Nothing to check in Brave: this is spike code on PR #40's test branch. Nothing a player sees, hears or feels changes, and nothing merges to main.\n4. Separately: PR #54 (the three NIGHT_SHIFT.md lines you said yes to at 22:09 Amsterdam) waits for your go. If you want it merged, say \"merge #54\" in the chat of the session that will merge it (its head is 20f9d59).",
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-c62h-bound-report.md"
+}

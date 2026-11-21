@@ -1,0 +1,18 @@
+[package]
+name = "npt-host"
+description = "The page host on TCP 31000 (allow-listed files only) and the ACME client for the wss certificate"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "npt-host"
+path = "src/main.rs"
+
+[dependencies]
+# None of the sim, room, proto or client crates (plan §4.2). instant-acme 0.8.5 joins at U6 (plan §8.4).
+npt-log.workspace = true

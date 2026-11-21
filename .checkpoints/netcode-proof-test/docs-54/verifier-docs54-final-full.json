@@ -1,0 +1,120 @@
+{
+ "result": "PASS. The fix pass aea6f5b left his words alone: the reader finds 11 entries and 0 failures, and every quote hash matches 9660197's table. No line inside \"> \" and no fenced session-text line changed. The three docs changes are what the commit message says, and they are true. The checkpoint is deleted and nothing is left under .checkpoints/. The ready report's factual claims hold, with three Low notes about wording in the PR description; none needs a push. The PR description changed while I was checking (14:01:52Z, the step times corrected), and I checked that latest version. CI on aea6f5b is now green: 6 of 6 runs passed.",
+ "claims": [
+  {
+   "claim": "(1) His words are unchanged byte for byte after the fix pass",
+   "where": "worktree docs/DECISIONS.md:124-327; verifier-d54-words.py",
+   "found": "204 new lines, 11 entries, FAILS: 0. The text after the new entries equals main's. All 11 quote hashes equal 9660197's table: E1 71fe0608, E2 b4254ed8, E3 8a798890, E4 00152e44, E5 3c545d29, GO53 4cd0e21a, E6 449f7779, E7 8b26c0a2, E8 fc9e51b3 and 481f9fb5, E9 af371685. E3's fence hashes to 4e3d1565, equal to NIGHT_SHIFT.md:45-47 on main. E10 equals 4460ef5's block.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(1) The fix pass touched no line inside \"> \" and no fenced line",
+   "where": "git diff -U0 36242ad aea6f5b -- docs/DECISIONS.md",
+   "found": "8 lines removed and 11 added. None starts with '>' and none is inside a ```text fence. The changes are the Queued pointer (4 lines), E1's header (4 lines) and two new italic cut lines placed before the fences.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(2) The Queued pointer now names option (b)'s condition",
+   "where": "DECISIONS.md Queued pointer, against E1's fence at DECISIONS.md:145",
+   "found": "The pointer reads 'his (b) for both, each added only with his yes to its exact text'. The question reads '(b) add them then, with your yes to the exact text.' The pointer is faithful to it. The condition is not repeated at STATUS.md:75, ROADMAP.md:134 or STATUS_ARCHIVE.md:899, but the commit message claims only the Queued pointer.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(2) E1's two new cut lines and the header's 'lead lines (:2208, :2221)'",
+   "where": "history.md at 110c303: lines 2208-2214 and 2220-2222",
+   "found": "Line 2208 is '**Decisions needed:**' and lines 2209-2214 are the PACK-READ block. Line 2220 is blank, 2221 is '**Decisions needed:** unchanged:' and 2222 is '- PACK-READ: I recommend (a).' Both cut lines and the header are exact. VER-D54-2 had said :2220 for the second lead line, which is a blank line; the fix uses the right number.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(2) The 'since #52' wording is fixed in STATUS and ROADMAP, and STATUS has at most 120 lines",
+   "where": "STATUS.md:31 (#55 row); ROADMAP.md Recent work, the #55 entry",
+   "found": "STATUS reads 'his words in the netcode test's chat since #52'. ROADMAP reads 'his words in that session since #52 ... (the foundation chat's own words are that lane's to record)'. STATUS.md has 120 lines.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(3) The checkpoint is deleted and nothing else under .checkpoints/ is on the branch",
+   "where": "git ls-tree -r HEAD .checkpoints; git show --stat aea6f5b",
+   "found": "0 files under .checkpoints/. aea6f5b deletes .checkpoints/docs-after-54.md (40 lines). Against origin/main the branch changes only the 5 docs files.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(4) Hash note: E10 quoted is 72dff2f0..., unquoted is 9af5da4c...",
+   "where": "PR #55 description, line 26; 4460ef5's message",
+   "found": "Recomputed from 4460ef5's 11-line block. With the \"> \" marks: 72dff2f06e794fd0a053ab5985c0d285154c1afe7b6a0f0745fc002ad8b1a757. Without them: 9af5da4c6ae237b41aec7fb658afb1951677124dda49d8e7b28999dd1ad0888d.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(4) The sweep table: 22 typed messages (10 main, 2 lane, 10 operational)",
+   "where": "PR description lines 31-39; my sweep re-run now (verifier-d54-sweep.py)",
+   "found": "22 typed messages, with the same stamps and classes as the table. He typed nothing new after 12:58:14.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(4) ADV-D54H-2: transcript records 50467, 51177 and 51130",
+   "where": "transcript .jsonl, lines 50467, 51177 and 51130",
+   "found": "50467 (12:41:52.681Z) is a thinking block: 'the next call that may need your approval creates a separate checkout and branch from main without switching the main folder'; the next line, 50468, runs git worktree add. 51177 (13:23:06.456Z) is a thinking block: 'next I'll push the branch for the first time, which may need your approval'; 51178 pushes. 51130 (13:21:15.341Z) is a thinking block: it says the gate will run with NODE_PATH pointing at the main folder's modules, but not that the call may ask; 51131 runs the gate. All three are thinking blocks, as the description says, not text blocks.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(4) C3: only docs/STATUS.md conflicts with PR #40; the resolution is on #40's card",
+   "where": "read-only legacy git merge-tree with base 82c605e, aea6f5b against #40's current head 5d4d73a; .checkpoints/netcode-proof-test.md:4008-4009",
+   "found": "There is one conflict, in docs/STATUS.md at the In flight rows (#40 and #52 on #40's side, #40 and #55 on this side). DECISIONS, REPO_MAP, ROADMAP and the archive merge cleanly. #40's head has moved since the advisor's check (6f8f514 then, 5d4d73a now), and the result is the same. The card holds the resolution, and its line 382 still lists the re-run before ready.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(4) The steps table's times against the commits and the transcript",
+   "where": "PR description, the folded checkpoint table; transcript tool calls; git log",
+   "found": "Each time matches a tool call: worktree 12:41:53; copy script 13:13:46; its second run 13:13:59; edits 13:14:37 to 13:20:35 (move script 13:15:45); gate 13:21:16; commit, push and PR 13:23:02 to 13:23:50; review workflow started 13:26:10; the review JSON files saved at 13:34. Commit times: 9660197 13:23:02, 36242ad 13:24:33, aea6f5b 13:58:29. The first version of the table had 'about 13:40' and '13:25-13:33'; the version current at 14:01:52 corrects both.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(4) CI is green on 9660197 and on 36242ad (six runs each), and 'CI pending' on aea6f5b",
+   "where": "REST commits/{sha}/check-runs",
+   "found": "9660197 and 36242ad: 6 of 6 success each. aea6f5b: 6 of 6 success (gate, smoke and toolchain, for push and for pull request), the last at 14:00:01Z. The 'For Mustafa' line still says CI is pending (VER-D54F-2).",
+   "holds": "partly"
+  },
+  {
+   "claim": "(4) ADV-D54H-1's reason: STATUS's line 'points to the archive and to \"Queued\", which carry the condition'",
+   "where": "STATUS.md:66 and :75; STATUS_ARCHIVE.md:899",
+   "found": "STATUS's Follow-ups header points to the archive. Archive line 899 says only 'his (b) for both, queued in docs/DECISIONS.md'. It points on to Queued and does not itself carry the condition (VER-D54F-1).",
+   "holds": "partly"
+  },
+  {
+   "claim": "(4) Other claims: the lockfiles are byte-equal; ADV-D54H-4's footer; the head is three commits on 82c605e",
+   "where": "cmp of the two lockfiles; transcript line 51188; git log origin/main..HEAD",
+   "found": "tools/package-lock.json and tools/package.json are equal in both folders. The PR-creation call sent the required footer, and the body ends with it now. The three commits are 9660197, 36242ad and aea6f5b, and the merge base is 82c605e.",
+   "holds": "yes"
+  },
+  {
+   "claim": "(5) The gate and repo-map-check in the worktree",
+   "where": "worktree at aea6f5b",
+   "found": "Gate checks 1-4 and 5b-5d PASS, symbols +0 -0, exit 0. repo-map-check OK, exit 0. The worktree was clean afterwards.",
+   "holds": "yes"
+  }
+ ],
+ "findings": [
+  {
+   "id": "VER-D54F-1",
+   "severity": "Low",
+   "what": "The ready report explains why STATUS's Follow-ups line keeps the short form for ADV-D54H-1 by saying it points to the archive and to \"Queued\", 'which carry the condition'. The archive does not carry the condition; it only points on to Queued.",
+   "evidence": "STATUS_ARCHIVE.md:899: 'him as NS-TRAILER and NS-FIRST, his (b) for both, queued in `docs/DECISIONS.md` for the kit's next change after the freeze'. Only the DECISIONS Queued pointer has 'each added only with his yes to its exact text'.",
+   "fix": "In the PR description, write 'it points through the archive to \"Queued\", which carries the condition'. This is a description change only, with no push. Or add the condition to the archive line in a later docs pass, as a follow-up."
+  },
+  {
+   "id": "VER-D54F-2",
+   "severity": "Low",
+   "what": "The 'For Mustafa' item says CI on aea6f5b is pending. It has finished green.",
+   "evidence": "REST check-runs for aea6f5b: gate, smoke and toolchain, push and pull request, 6 of 6 success; the last finished at 14:00:01Z. The PR body was last edited at 14:01:52Z and still says '(both pending)'.",
+   "fix": "When marking the PR ready, update the line to say CI is green on aea6f5b (6 of 6) and only the advisor's approval of that head is pending. No push needed."
+  },
+  {
+   "id": "VER-D54F-3",
+   "severity": "Low",
+   "what": "For ADV-D54H-2, the naming before git worktree add (50467) and before the first push (51177) is in thinking blocks, not in message text. His NS-STATUS rule says 'name it in your message'. The description says so honestly ('thinking-type records', 'partly holds'). Still, whether his chat shows thinking text was not established.",
+   "evidence": "Transcript lines 50467 and 51177: content type 'thinking', no text block before the tool_use at 50468 and 51178.",
+   "fix": "None needed for this head. If the description is touched again, add that thinking text may not show in his chat, so these do not count as naming in the message. In later change-sets, name the expected asks in text, as the description already promises."
+  }
+ ],
+ "gate_last_line": "GATE PASS (5a smoke skipped: --no-smoke) | repo-map-check: repo map OK: 122 entries cover 109 required paths",
+ "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/docs-54/verifier-docs54-final.md. Not verified: whether Mustafa's chat shows thinking-block text (VER-D54F-3); E10 against the foundation chat's own record (this account cannot read it). The C3 re-run 'just before ready' has not happened yet: my read-only merge-tree against #40's current head 5d4d73a gives the same result. To read the PR I used gh api (REST), because no GitHub MCP tool was available to me and GraphQL is blocked."
+}

@@ -1,0 +1,6 @@
+{"k":"header","schema":1,"run":"d48-k4","set":"r5-d1-n48","role":"measured","marks":["PM-0006-13","PM-0006-14"],"machine":{"role":"RS","name":"RS","plan":"CCX23","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fsn1","kernel":"fixture","address":"203.0.113.10","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L2","profile":"P2","seed":13,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":1,"date":"2026-11-21","params":{"density":"count","k":4,"padding_target_ns":8330000,"sim":"stress"}}
+{"k":"tick","t":1,"ph":"warmup","v":{"work_ns":9800000,"padded_step_ns":8100000}}
+{"k":"tick","t":2,"ph":"measured","v":{"work_ns":9200000,"padded_step_ns":8330000}}
+{"k":"tick","t":3,"ph":"measured","v":{"work_ns":9300000,"padded_step_ns":8331500}}
+{"k":"tick","t":4,"ph":"measured","v":{"work_ns":9400000,"padded_step_ns":8333333}}
+{"k":"footer","records":5,"ended":"clean"}
