@@ -159,7 +159,11 @@
 - **U8's brief rev 1 DRAFTED 14:3x** (u8-brief.md, 368 lines; notes infra-u8-brief.md): about 2,150 added, likely
   2,900-3,250 (off the lane, no date moves); R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 20 min; planned R2
   Sat 12 Dec, R3 Sun 13, R5 Mon 14, close Fri 18 (holds at middle sizes, about Mon 21 at the top); asks U6c a ~20-line
-  TCP-model test change (S14's burst half). **The advisor's check running** (advisor-u8-brief.md).
+  TCP-model test change (S14's burst half). **The advisor's check: APPROVE WITH CONDITIONS C1-C10, L1-L5** (one High,
+  ADV-U8-1, closed by C1 word for word; Mediums read in full); **rev 1.1 APPLIED** (section 0.1; 131 pasted lines
+  checked equal to the ruling). npm DEP-HOLD: lock made (webdriverio 10.2.0, --before 2026-11-15, 167 packages,
+  scripts only edge/geckodriver); held in .gate/u8-deps/ (package.json 8370495d…, lock a0efce8e…); npm said 4
+  moderate advisories (`npm audit` refused here) → security's read running (security-u8-deps.md). Then the builder.
 - **U6b's brief rev 1 DRAFTED 14:4x** (u6b-brief.md, 411 lines; notes netcode-u6b-brief.md): about 2,700 added, likely
   3,650-4,050 (re-plan 2,205); lane before R1 about 9,950-11,350 likely (R1's date at risk: the advisor rules); lever
   ~250 lines to U6e; Block 0 manifest changes (web-transport-quinn and rcgen on ring; aws-lc-rs likely leaves the lock)
