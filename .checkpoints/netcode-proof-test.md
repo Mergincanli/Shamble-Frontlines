@@ -75,10 +75,9 @@
   block's 2026-11-22 lines; sizes (U6a 5,460, U8 4,176; at 1.9-2.3 U6c 5,300-6,450, U7 4,200-5,050; stop past 6,000);
   R1 with about a day of slack and its triggers; F26 (mine, fixed); the cut 15:47-19:44; planned R2 Sat 12, R3 Sun 13,
   R5 Mon 14, close Fri 18 (firm with R1's run plan at Stop B); Decisions needed, For Mustafa.
-- **Next 3, as agents return:** security (F26 closed if CLEAR; U6c's binding check kept); the round (Mediums and up in
-  full; fixes by SendMessage to the U6a builder; M3-M9: part-clean, `git apply --check` and `git apply` in the main
-  folder, cmp-equal to the worktree, M5 check.mjs via main-run.sh in the background, gate --no-smoke, one commit, push,
-  CI); then U6b's Block 0 and builder, U8's fix pass, U7's Block 0a after its check.
+- **Next 3:** the round's fixes by SendMessage to the U6a builder; M3-M9 (part-clean, `git apply --check` and `git
+  apply` in the main folder, cmp-equal to the worktree, M5 check.mjs via main-run.sh in the background, gate
+  --no-smoke, one commit, push, CI); then U6b's Block 0 and builder, U8's fix pass, U7's Block 0a after its check.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-22, U6a's close (my lean):** the pre-round merge-worktree check folded into the merge's M5, since `<base>`
@@ -144,10 +143,10 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (2 of 3):** (1) security ab80f7d9c82f327b9 (security-auditor, xhigh, from 20:1x): (A) F26's fix
-  2a9498d -> security-f26.md; (B) U6c's Block 0, the ruling's section 4 items 1-8 -> security-u6c-deps.md; scratch
-  security-u6c/; resume from its files. (2) U6a's netcode seat a9a29bd03da0757ad: DONE 20:5x (u6a-review-netcode.md
-  ends DONE; F1, F3, F7, F9 fine; F4 no owner for S1's burn; O1 carry U6d; O2 carry U6b, U7). (3) U6a's test seat
+- **Agents running (1 of 3):** (1) security ab80f7d9c82f327b9: DONE 20:4x (security-f26.md, security-u6c-deps.md:
+  U6c's Block 0 CLEAR WITH CONDITIONS, 5 conditions, SEC-U6CD-1 to -4 Low, lock 235 -> 252 modelled). (2) U6a's
+  netcode seat a9a29bd03da0757ad: DONE 20:5x (u6a-review-netcode.md ends DONE; F1, F3, F7, F9 fine; F4 no owner for
+  S1's burn; O1 carry U6d; O2 carry U6b, U7). (3) U6a's test seat
   a4724cf284e77b73e (test-engineer, xhigh, from 20:3x) -> u6a-review-test.md (TR-U6A-n), scratch u6a-review-test/;
   scope section 3 items 1-9 of its brief (counts, plants, bites, timing, carries, header, -2 parity, SERIES rows, not
   verified); same runner; resume from its file.
@@ -170,11 +169,12 @@
   in compare.py), F20 (other R1 bites not placed). Not run on a VM. `node --test ops/` fails on Node 22.23: use
   `'ops/**/*.test.mjs'`.
 - **F26 (mine, from 2ad2829):** FIXED at 2a9498d (the ruling's section 6; tests 11/11; plant shown, restored 2609bc87;
-  scan 0 findings; CI green on 8412c6b); security's read running.
+  scan 0 findings; CI green on 8412c6b); security CLEAR WITH CONDITIONS (SEC-F26-1 Low: asserts and 2 plants in the
+  test file only, at U6a's merge or deferred by the advisor; -2 Low accepted).
 - **U6b** (rev 1.1; security-u6b-deps.md done, with conditions; SEC-U6BD-1's seven packages, 242 -> 235): Block 0 and
   the build after U6a merges; about 2,650, at 1.9-2.3 about 5,000-6,100, so its launch names its own last-built valve
   (advisor-u6c-brief.md section 3) and, by Q-U7-2's lean, the homes of the protocol constants and WebSocket tags.
-- **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); security's Block 0 read running; disk freed before launch;
+- **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 security-cleared (5 conditions); disk freed first;
   its launch gives U7's seven dist names; at its merge U8's side checked per interface (C9). **R1 Thu 3 Dec holds with
   about a day of slack** (section 3: U6a merged Mon 23-Tue 24, U6b Wed 25, U6c Sat 28, U7's Rust Sun 29, Stop B Tue 1);
   three lines to him if U6b is not merged by end Thu 26, U6c by end Sun 29, or a lane unit hits SIZE-CHECK.
