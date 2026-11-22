@@ -164,8 +164,10 @@
   Lows NC-R2-2's case, NC-R2-3, TE-R2-2, -3, -5: follow-ups. **R6 run A RUNNING from 00:4x** (mine: P27 931 MiB, free
   8,214,966,272 B; `u4f-run.sh -x <worktree> .gate/u4f/u4f2-r6a.log node check.mjs`, task b55pw1jqu); then P27, run B,
   the merge, gate, check.mjs, CI, the advisor's head check, c-u4f-r2.mjs whole, D2, -21's set (report: Block 4's table).
-- **Running:** the advisor a21a731e3efbb7dc4 on replan.md (out advisor-replan.md). After a cut, resume it by
-  SendMessage, reading its file first; a cut R6 run is re-run whole (P27 first).
+- **The re-plan SENT to him 00:5x UTC** (replan.md): the advisor's one review APPROVE WITH CONDITIONS
+  (advisor-replan.md: ADV-RP-1 High, the moved marks' hand-off; -2 to -9 Medium; -10 to -16 Low); P1-P6 pasted word
+  for word, Lows folded in: no re-check. His four: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0. After his yes: the
+  moved-mark paste block for his game chat (P6 item 2), then the units' briefs. A cut R6 run is re-run whole (P27 first).
 - **Moved or stopped by NPT-TRIM (what is built stays, for reference):** U4g's early half (blocks 1-4, 2,053 lines;
   snapshot wip/u4g-early.patch a78e2853…; worktree agent-abc25909b7dd4ad30 kept); U4g2's client half and U4h (briefs
   u4g-brief.md rev 2.1, u4h-brief.md rev 2.1 kept for the real game); U5 stopped after Block 3a (1,658 lines; snapshot
