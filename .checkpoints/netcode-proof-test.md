@@ -156,7 +156,7 @@
   1-8, **5,460 added** (likely was 3,150-3,800; stop past 6,000); check3 all 11 steps PASS (744/844, +35/+38; test
   866.8 s); plants P1-P11 each fail their named test, restored; 3 bites by name; 20 starts p50 634 ms, max 979 ms
   (debug, container, not judged). Final tree = wip/u6a-build.patch a9f8b6e0… (re-checked). Part-cleans 15:4x (9.0 GiB)
-  and 20:2x (8.6 GiB). **Round from 20:4x:** netcode seat running (u6a-review-netcode.md), test seat when a slot frees;
+  and 20:1x (8.6 GiB). **Round from 20:2x:** netcode seat running (u6a-review-netcode.md), test seat when a slot frees;
   F1, F3, F4, F7, F9, O1, O2 to it. Merge: M3-M9 as U4f's (the pre-round merge check folded into M5: since `<base>` only
   npm files and redact-check changed in spikes/, no Rust).
 - **U8** (brief u8-brief.md rev 1.1, 3d102be9…; notes infra-u8-brief.md; R1 3.55 h of 4 h billed, cap EUR 0.80, him
