@@ -49,7 +49,13 @@ Tools: `cargo install --locked --version 0.22.0 cargo-deny --target-dir .gate/to
   unmaintained / Date: 2026-10-01 / ID: RUSTSEC-2026-0441 / URL: https://rustsec.org/advisories/RUSTSEC-2026-0441 /
   Solution: No fixed upgrade is available!". Clean as security-u6a-deps.md section 6 defines it.
 
+## Step 5, the rerun after security's answer (security-u6a-deps.md section 7): PASS
+deny.toml gained `allow-wildcard-paths = true` after `wildcards = "deny"`, committed alone at 6aa78ff. The same
+`cargo deny ... --locked check advisories bans sources`: "advisories ok, bans ok, sources ok", exit 0, the same five
+duplicate warnings (getrandom, syn, synstructure, windows-link, windows-sys); no wildcard or other error.
+
 ## After
+90404ee6b66b3884129195ad1d6eaef8a97a023159d4ff2b8f888242d7369ae1  spikes/netcode-proof/deny.toml
 5ebfbedfdf3015e1928aa140bbda1585ad39012521c11ede62f40dfcbcd0d36a  spikes/netcode-proof/Cargo.toml
 c55bab3c93d86c0068f572d9b20d152fe0080a6f29f278617615db04836e6b4d  spikes/netcode-proof/Cargo.lock
 e694b595ef02d4e0f01e87df61ed083ba3ae254ab0b46687f6183a11df28a60d  spikes/netcode-proof/crates/server/Cargo.toml

@@ -160,9 +160,9 @@
   cargo-audit 0.23.0; no deny.toml change unless deny fails on RUSTSEC-2026-0441 alone (then its exact ignore line, own
   commit); audit clean = 0 vulnerabilities, the pin-utils warning copied. **Step 5 run** (evidence u6a-block0.md):
   audit clean; deny "advisories ok, bans FAILED, sources ok", bans only `error[wildcard]` on our own workspace path
-  deps (pre-existing) → back to security (14:3x; lean `allow-wildcard-paths = true`, publish = false). **Block 0 is
-  STASHED** (`git stash list`: "U6a Block 0 steps 1-5 done ..."): on security's line: pop, the deny.toml line (own
-  commit), deny again, dependency-check.md, commit, save (it pushes), `cargo fetch --locked`, the builder.
+  deps (pre-existing) → security's section 7: `allow-wildcard-paths = true` (own commit 6aa78ff). **Block 0 DONE:**
+  deny rerun "advisories ok, bans ok, sources ok"; dependency-check.md's U6a block (with deny.toml's hash); Block 0
+  committed at 3e80e05, pushed by this save. Next: `cargo fetch --locked` on the lane, `<base>` filled, the builder.
   **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
   @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
   to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding

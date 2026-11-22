@@ -177,3 +177,41 @@ EmbarkStudios/cargo-deny), both read 2026-11-22.
   yesterday except that it now covers this run too.
 
 DONE
+
+### 7. Step 5's results: cargo-deny bans FAILED on path wildcards (DONE)
+Reported by the coordinator: final lock sha256 c55bab3c93d86c0068f572d9b20d152fe0080a6f29f278617615db04836e6b4d,
+steps 1-4 passed; cargo-deny 0.22.0 "advisories ok, bans FAILED, sources ok", bans failing only on `error[wildcard]`
+for the workspace's own path crates (15 flagged); warnings only: multiple versions of getrandom, syn, synstructure,
+windows-link, windows-sys; pin-utils not reported (section 6's prediction held); cargo-audit 0.23.0: 0 vulnerabilities
+in 242 crates, 1,560 advisories, database fetched 2026-11-22 ~14:2x UTC, 1 allowed warning (RUSTSEC-2026-0441).
+I did not run these; I take the numbers as reported, and the main session's evidence carries the raw outputs.
+- Cause: the root `[workspace.dependencies]` gives `npt-x = { path = "crates/x" }` with no version
+  (Cargo.toml:41-51), which cargo-deny counts as a wildcard; deny.toml:15 `wildcards = "deny"`. This predates U6a, and
+  none of U6a's registry edges (tokio, sha2, serde, serde_json, all `=` pins) is flagged. This is the first recorded
+  cargo-deny run on this lock (the advisor's condition 1), so it surfaced now.
+- Source: cargo-deny's bans config page (embarkstudios.github.io/cargo-deny/checks/bans/cfg.html, read 2026-11-22):
+  with `allow-wildcard-paths`, "path or git dependencies in private crates will no longer emit a warning or error";
+  "path or git dev-dependencies in both public and private crates will no longer emit a warning or error"; "path or
+  git dependencies and build-dependencies in public crates will continue to produce warnings and errors". The page
+  does not define "private"; cargo-deny treats a crate as private when it cannot reach crates.io (publish = false or
+  private registries only). I did not read that in the source today, so medium-high confidence; the re-run is the proof.
+- Every member is private: the root has `publish = false` (Cargo.toml:30), and all 17 crates/*/Cargo.toml carry
+  `publish.workspace = true` (grep: none missing, each exactly once).
+- What the option does not open: registry dependencies with `*` stay denied (`wildcards = "deny"` is kept); git
+  dependencies, which it would also excuse in private crates, are still refused by [sources] (`unknown-git = "deny"`,
+  `allow-git = []`); every external crate stays an exact `=` pin in [workspace.dependencies]. It removes no check that
+  covers a registry crate. The other route (a `version = "0.0.0"` beside every path entry) changes the workspace
+  manifest's 11 entries for no security gain and is a DEP-HOLD save of its own; not preferred.
+- **Answer: the coordinator's lean, agreed.** One line added to deny.toml under [bans], directly after
+  `wildcards = "deny"` (deny.toml:15), in its own commit with no other change:
+  `allow-wildcard-paths = true`
+  Then re-run `cargo deny --locked check advisories bans sources`. Clean = "advisories ok, bans ok, sources ok", exit 0,
+  with the same five multiple-versions warnings (accepted: warn by config, and none is new with U6a: tokio, sha2,
+  serde and serde_json each have one version). A remaining wildcard error, any new error or a new warning comes back
+  to me. cargo-audit's result stands as clean (0 vulnerabilities; the one warning is the accepted RUSTSEC-2026-0441).
+- dependency-check.md for this save: the four manifest and lock hashes of section "Binding check" step 5, plus
+  deny.toml's new hash, naming security-r1-deps.md for (a) and this file for (b) and for deny.toml (sections 6-7).
+- A deny.toml change is not a Cargo.toml or Cargo.lock change, so DEP-HOLD does not strictly cover it; but the file is
+  the dependency policy, so it goes into dependency-check.md and the report like the manifests.
+
+DONE
