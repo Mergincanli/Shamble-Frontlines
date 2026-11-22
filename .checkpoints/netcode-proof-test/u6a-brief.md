@@ -90,9 +90,11 @@ Its conditions, word for word (security-u6a-deps.md:98-117), go into section 6's
 Its binding check for U6a's save: security-u6a-deps.md:119-137 (condition 1); Block 0 runs in the main session.
 
 ## 0. Where things are
-- **`<base>`:** the lane head the main session fills at launch, after Block 0 (U4f2 merged; U4's report in), with its
-  spikes/ tree, its check.mjs counts (U4f2's head: 709 measured and 806 bites, u4f2-report.md:136, plus FP-10's) and
-  this brief's sha256. Today (u6-facts.md §2, re-read at 69b518a): npt-server has `Decoder`, `Schedule`, `due_ticks`
+- **`<base>`** (filled at launch, 2026-11-22 14:2x UTC): **aa5c62b68aecfe2fabd94a74915eb58cf0598fb4**, the lane head
+  after Block 0's save (6aa78ff deny.toml, 3e80e05 the url bump and manifests; U4's report is papers only and follows
+  beside the build); spikes/netcode-proof tree b21c63c715f43aa0ff0585b80aa210a13fc81947; check.mjs counts 709
+  measured and 806 bites (b4e1f43's R6, u4f2-report.md; Block 0 adds no test); `cargo check --workspace
+  --all-targets --locked` there on the shared target: 0 warnings, 0 errors. This brief's sha256: in the launch prompt. Today (u6-facts.md §2, re-read at 69b518a): npt-server has `Decoder`, `Schedule`, `due_ticks`
   and a stub binary (server/src/main.rs:1-6), no tokio, no TickLoop; `Link` has no `Send` bound and both of its
   in-process backends are `Rc<RefCell<..>>` (link/src/lib.rs:133; l1/src/lib.rs:1747), so `Send` cannot sit on
   `Link` itself; npt-super is a stub; the room's relevant set is crate-private (room/src/room.rs:248); only npt-lab

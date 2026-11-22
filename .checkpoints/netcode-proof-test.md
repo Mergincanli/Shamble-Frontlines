@@ -147,22 +147,15 @@
 - **The re-plan APPROVED** (replan.md; the advisor's review advisor-replan.md; his answers history.md:7595-7607). Done
   today: the moved-mark block (moved-block.md: 29 moved marks and 12 kept marks' moving parts, bars by ADR row and
   marks.json c1935a5b…; build-plan lines read on main f5030a3) goes in today's message; PACK-P0 (b) below.
-- **U6a's brief rev 1 DRAFTED 13:4x** (u6a-brief.md, 279 lines; notes netcode-u6a-brief.md): about 2,350 added, likely
-  3,150-3,800 (the re-plan said 1,675 / 2,250-2,500: about 1,000 more likely lines on the lane before R1); Q1-Q7 with
-  leans; six places the re-plan contradicts itself. **The advisor's check: APPROVE WITH CONDITIONS 1-8** (no Critical
-  or High; Mediums F-A to F-D read in full; R1 Thu 3 Dec holds with no slack). **Security's Block 0 (b) read DONE**
-  (security-u6a-deps.md: SEC-U6AD-1 to -6, no new package; Mediums read in full). **Rev 1.1 APPLIED** (section 0.1:
-  both sets word for word; contradicting lines fixed in place). Security asked condition 1's (i) pin-utils and (ii)
-  cargo-deny/audit here (14:0x). **Block 0 in the main folder, UNCOMMITTED (DEP-HOLD):** steps 1-4 of
-  security-u6a-deps.md:119-133 PASS (before-hashes equal; lock diff (a) url 2.5.9 and form_urlencoded 1.2.3 with the
-  index checksums; diff (b) the 5 lines; 242 packages; banned crates 0; tokio's features equal npt-net's; npt-super
-  links no sim, room or proto). Security's answer (security-u6a-deps.md section 6): yes to cargo-deny 0.22.0 and
-  cargo-audit 0.23.0; no deny.toml change unless deny fails on RUSTSEC-2026-0441 alone (then its exact ignore line, own
-  commit); audit clean = 0 vulnerabilities, the pin-utils warning copied. **Step 5 run** (evidence u6a-block0.md):
-  audit clean; deny "advisories ok, bans FAILED, sources ok", bans only `error[wildcard]` on our own workspace path
-  deps (pre-existing) → security's section 7: `allow-wildcard-paths = true` (own commit 6aa78ff). **Block 0 DONE:**
-  deny rerun "advisories ok, bans ok, sources ok"; dependency-check.md's U6a block (with deny.toml's hash); Block 0
-  committed at 3e80e05, pushed by this save. Next: `cargo fetch --locked` on the lane, `<base>` filled, the builder.
+- **U6a** (brief u6a-brief.md rev 1.1, sha256 c109691a…: the advisor's APPROVE WITH CONDITIONS 1-8 and SEC-U6AD-1 to
+  -6 in its section 0.1; drafter's notes netcode-u6a-brief.md). **Size line:** about 2,345 added, likely 3,150-3,800,
+  the stop past 6,000; R1 Thu 3 Dec holds with no slack (lane before R1 about 9,250-10,600 likely lines in 8 days).
+  **Block 0 DONE** (evidence u6a-block0.md): url 2.5.9 and the five manifest lines (3e80e05), deny.toml's
+  allow-wildcard-paths (6aa78ff, security's section 7), deny "advisories ok, bans ok, sources ok", audit 0
+  vulnerabilities, dependency-check.md released, pushed (aa5c62b); `cargo fetch --locked`; `cargo check --workspace
+  --all-targets --locked` 0 warnings. `<base>` aa5c62b68aecfe2fabd94a74915eb58cf0598fb4 (709/806). Runner
+  u6a-run.sh (u4f-run.sh, names only: diff shows only names). **Builder launched 14:2x** (general-purpose, opus, xhigh,
+  worktree; notes u6a-build.md in its worktree). Started a day early on my lean: the plan said Mon 23.
   **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
   @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
   to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding
