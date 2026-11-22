@@ -12,6 +12,7 @@ ignore = []
 [bans]
 multiple-versions = "warn"
 wildcards = "deny"
+allow-wildcard-paths = true
 
 [sources]
 # crates.io only: no git dependencies, no other registries.
