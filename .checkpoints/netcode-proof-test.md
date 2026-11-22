@@ -147,6 +147,9 @@
 - **The re-plan APPROVED** (replan.md; the advisor's review advisor-replan.md; his answers history.md:7595-7607). Done
   today: the moved-mark block (moved-block.md: 29 moved marks and 12 kept marks' moving parts, bars by ADR row and
   marks.json c1935a5b…; build-plan lines read on main f5030a3) goes in today's message; PACK-P0 (b) below.
+- **Running since 13:22 UTC (replan-units.md:196, today's row):** netcode-architect drafts U6a's brief (u6a-brief.md;
+  notes netcode-u6a-brief.md), then my read and the advisor's one check; security-auditor's DEP-HOLD read of the R1
+  path's new dependencies (security-r1-deps.md, ends DONE). A cut: resume each from its notes file (SPEND-LIMIT (a)).
 - **PACK-P0 (b)** (each list committed with its ruling, then packed; free MiB before → after; files read back = listed):
   c-u2-pm-0001-3-81c6d01e371b 4,760 → 5,364 (39/39; 47e4ee1); c-u2-pm-0001-3-65869918809f 5,364 → 5,967 (39/39;
   1dc9751); u4r-P0-051995db9cea 5,967 → 8,497 (30/30; 3d2c752); u4r-P0-93509dfd7fd1 8,497 → 11,156 (30/30;
@@ -161,8 +164,8 @@
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch);
   no shell loop or redirect for scratch files (it asks, and an unanswered ask stood the session still 2 hours on
   2026-11-22): scratch by Write, one simple command per call (the 2026-11-16 rule).
-  **Check-in PAUSED since 08:40 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5: no agent or workflow runs; on again with the next
-  agent); saver bj5ft8umh ended 10:30 (time up). Main f5030a3 (fetched 2026-11-22 13:1x UTC: unchanged).
+  **Check-in ON again 13:22 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5, next 14:34; paused 08:40-13:22 while nothing ran);
+  saver bx1nm13tz from 13:23 (to about 15:13). Main f5030a3 (fetched 2026-11-22 13:1x UTC: unchanged).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-22 06:34:54 to 08:37:34 UTC** (a stall, then a container restart; nothing else ran: the set had ended at
