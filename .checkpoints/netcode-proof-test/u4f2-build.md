@@ -623,6 +623,11 @@
   (it never ran on the clamp pair at all, so neither the exemption nor the check reached it), its exemption kept only
   where `suite == "forged"` (`match (suite == "forged", s + 1)`): the clamp pair's every client now has every refusal
   counter checked at 0.
-- Step in progress: u4f2-fp10-tests.log (fmt check, f16 alone `-x -k`, clippy on npt-lab measured and bites), run in
-  the background; a restart reads that log first.
-- Resume here: read u4f2-fp10-tests.log; then the snapshot with its sha256, SIZE-CHECK, and the report.
+- **FP-10's checks** (u4f2-fp10-tests.log, `-x -k`, 00:13-00:15:46 UTC, tree diff 93fcd1f7…, free 7,835 MiB at its
+  start): `cargo fmt --check` exit 0; f16 alone (`f16_option_`): 24 PASS in 59.08 s, the clamp pair's clients now
+  checked with every refusal counter 0 (none nonzero); clippy `-p npt-lab --all-targets -D warnings` measured exit 0
+  and `--all-features` exit 0 (npt-lab is the only Rust crate FP-10 touched).
+- SIZE-CHECK after FP-10: +2,198 -194 tracked; forged.rs 476 (`wc -l`): about 2,674 added (+31), under the advisor's
+  2,800 and Mustafa's 3,000. Free 7,319,400,448 B.
+- Snapshot after FP-10: f7d79ebdf4a698c6de349bb2ab9f906e1e9e84231a446c0e9ffc65106f20a86f (196,009 B as printed).
+- Resume here: nothing left in FP-10; the main session runs R6 (check.mjs twice) with its cleans.
