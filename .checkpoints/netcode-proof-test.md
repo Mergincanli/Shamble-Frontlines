@@ -146,9 +146,8 @@
 ## Running work
 - **U4f2 CLOSED** (merged b4e1f43; -21's set PASS at L1; report u4f2-report.md; its lines: this card at 00520b5; U4f-F1,
   U4g's brief and U4f2's brief check: history.md:7273-7311; U4G-Q2 before -58's set only). U4's report folds them.
-- **The re-plan APPROVED** (replan.md; the advisor's review advisor-replan.md; his answers history.md:7595-7607). Done
-  today: the moved-mark block (moved-block.md: 29 moved marks and 12 kept marks' moving parts, bars by ADR row and
-  marks.json c1935a5b…; build-plan lines read on main f5030a3) goes in today's message; PACK-P0 (b) below.
+- **The re-plan APPROVED** (replan.md; advisor-replan.md; his answers history.md:7595-7607); the moved-mark block sent
+  (moved-block.md: 29 moved marks, 12 kept marks' moving parts; bars by ADR row and marks.json c1935a5b…).
 - **U6a** (brief u6a-brief.md rev 1.1, sha256 c109691a…: the advisor's APPROVE WITH CONDITIONS 1-8 and SEC-U6AD-1 to
   -6 in its section 0.1; drafter's notes netcode-u6a-brief.md). **Size line:** about 2,345 added, likely 3,150-3,800,
   the stop past 6,000; R1 Thu 3 Dec holds with no slack (lane before R1 about 9,250-10,600 likely lines in 8 days).
@@ -172,15 +171,15 @@
   taken (about 250 lines to U6e); about 2,650 added, likely 3,600-4,000; lane before R1 about 9,900-11,300 likely: R1
   Thu 3 Dec holds with no slack. **Security's Block 0 read DONE** (security-u6b-deps.md): all clear (with conditions);
   SEC-U6BD-1 corrects the lock diff to seven packages (242 → 235; recorded in the brief's 0.1); Block 0 after U6a merges.
+- **U6c's brief drafting since 15:1x** (netcode-architect: u6c-brief.md, notes netcode-u6c-brief.md). Day message
+  reminder at 23:05 UTC (trig_01967r39CKqT2qxdsbAS5sCP; the message saved as msg-2026-11-23.md first).
 - **Done today (details in commits and the files):** the R1 path's DEP-HOLD read (security-r1-deps.md: takers SEC-R1D-1
   U6a, -2/-3/-5/-6 U8 and R1, -4 U6c; @wdio/cli not cleared); PACK-P0 (b) five folders, free 4,760 → 13,229 MiB, each
   read back = listed (commits 47e4ee1, 1dc9751, 3d2c752, 4e7d9c2, 46915c1; archives .gate/netcode-proof-test/kept-logs/).
 - **Moved or stopped by NPT-TRIM (built work kept for reference):** wip/u4g-early.patch (a78e2853…) and wip/u5-early.patch
   (afd767ac…), their worktrees kept; u4g-brief.md and u4h-brief.md rev 2.1 for the real game (this card at 0177a17).
-- **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
-  main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch);
-  no shell loop or redirect for scratch files (it asks, and an unanswered ask stood the session still 2 hours on
-  2026-11-22): scratch by Write, one simple command per call (the 2026-11-16 rule).
+- **Lessons:** never `cd` into an agent's worktree; a worktree agent starts at main, so its first step is `git merge
+  --ff-only <lane commit>`; no shell loop or redirect for scratch files (an unanswered ask stalled 2 h on 2026-11-22).
   **Check-in ON again 13:22 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5, next 14:34; paused 08:40-13:22 while nothing ran);
   saver b9flvzubm from 15:13 (to about 17:03; bx1nm13tz ended on time). Main f5030a3 (fetched 13:1x UTC: unchanged).
 
