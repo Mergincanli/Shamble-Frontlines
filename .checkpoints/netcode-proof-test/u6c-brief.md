@@ -147,11 +147,11 @@ File and item names are leans; the builder may merge modules and reports the nam
     authorization's DNS-01 challenge; prints `_acme-challenge.<name>` and its `dns_value`; waits for one line `go` on
     stdin (read on a std thread under a byte bound; anything else is exit 2), inside one 30-minute deadline from the
     start that covers both phases. Phase 2: `set_ready`; `poll_ready` under a bounded `RetryPolicy` (Invalid or a
-    timeout is exit 4, never retried: plan.md:972-973); a fresh ECDSA P-256 key and its CSR by rcgen, then
+    timeout is exit 4, never retried: plan.md:972-974); a fresh ECDSA P-256 key and its CSR by rcgen, then
     `finalize_csr`; `poll_certificate`; the key (PKCS#8, mode 0640 set at creation) and the chain as the server sent
     it (mode 0644) written by `create_new` (an existing path is exit 2), each `write_all` then `sync_all`, in the
     formats WsServer's loader reads (section 0); the leaf's serial and DER SHA-256 printed for the ledger
-    (plan.md:976-981); `DONE`. Every ACME call under `tokio::time::timeout` (SEC-R1D-4; lean 60 s each).
+    (plan.md:977-982); `DONE`. Every ACME call under `tokio::time::timeout` (SEC-R1D-4; lean 60 s each).
   - **Not built:** revocation (cut: replan-units.md:32, :118-119), so U6-Q18's "confirms instant-acme 0.8.5's
     revocation call by name" lapses with it; the HTTP-01 responder and port window (cut).
 - **Choices by lean (no ask):** the probe's shared pieces in npt-net, its leg runner in npt-server (Q-U6C-1); P0 first
@@ -451,9 +451,9 @@ here stands as Stop B's read of "U6c's host" (u8-brief.md:466-469).
   beside Stop B's read, and his Stop B steps Tue 1. **R1 on Thursday 3 December holds with no slack at the middle of
   these numbers; at the top it slips a day,** and he gets three lines at once (U6a's condition 8).
 - **Levers** (Q-U6C-8): (1) P2 rides in MOVED's brief, before R1's report (R1's run does not read it; its report does,
-  as the burst knob's ruling reasoned: advisor-u8-brief.md:107), about 230-255 likely lines off the lane before R1;
-  (2) security's read of U6c's host in this round stands as Stop B's (replan-units.md:214-215), so Stop B's round reads
-  U8's package and wrappers only; (3) the split R1 (replan-units.md:215-216) is his.
+  as the burst knob's ruling reasoned: advisor-u8-brief.md:106-107), about 230-255 likely lines off the lane before
+  R1; (2) security's read of U6c's host in this round stands as Stop B's (replan-units.md:214-215), so Stop B's round
+  reads U8's package and wrappers only; (3) the split R1 (replan-units.md:215-216) is his.
 
 ## 9. Open questions (each with my lean; the advisor's check answers them)
 - **Q-U6C-1, the probe's home** (U6-Q12; §4.7 lists npt-lab's `probe` and no probe item in npt-server: plan.md:612,

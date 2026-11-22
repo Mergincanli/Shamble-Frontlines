@@ -41,4 +41,7 @@ notes file is rewritten whole with Write at each step.)
   each with its own cert (u6b-brief.md:212-214). Q-U6C-3.
 - Step 9 DONE: u6c-brief.md rev 1 written (sections 0-10; Q-U6C-1..8). Size about 2,800 (2,550-3,050), likely
   3,800-4,200; at least +47 measured and +47 bites; 17 plants; lane before R1 about 11,050-12,550 likely.
-- Step 10: quote check next (scratchpad script, read-only).
+- Step 10 DONE: 35 of 35 quotes are substrings of their sources and of the brief (whitespace-normalised; scratchpad
+  qcheck.py, read-only); three cites corrected in a whole rewrite (plan.md:972-974, :977-982;
+  advisor-u8-brief.md:106-107). Final: 505 lines, widest 120 chars, sha256 13b0fe58777585525188adbd9d61cde4bc3a1d70df2306ae78cc88c6ba26ed5b.
+- Hand-back DONE.
