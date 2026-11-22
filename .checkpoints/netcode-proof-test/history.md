@@ -7649,3 +7649,5 @@ The compact is done. Pick up exactly where you left off, rebuilding from the rep
 2. Check the live state against the card: git status and the branch against origin; the task list and pending notifications; every agent, workflow and shell the card lists as running. Resume anything that stopped as SPEND-LIMIT (a) says, checking first what the card says to check. Start nothing twice.
 3. Then tell me in at most 8 lines: where the test stands (units done with their verdicts, units moved or stopped), what's running, the step you're on and the next ones, and what waits on me. If the card, the repo and the summary disagree, or something is missing, say what and stop. Otherwise carry on without waiting for me.
 ```
+- About 20:5x UTC (it reached this chat mid-turn, with a tool result), word for word:
+  "We're at 96% usage, make sure to save your progress (but also for the agents)"

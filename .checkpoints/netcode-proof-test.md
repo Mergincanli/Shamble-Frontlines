@@ -65,12 +65,12 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-22 20:4x UTC, resumed after his /compact by his steps, history.md:7645-7651)
-- **My step:** waiting on three agents (Running work, 3 of 3); U6a's test seat started 20:3x (the card's "two slots
-  free" was wrong: one was free; named to him in the resume report).
-- **Next 1, when a slot frees:** the advisor's one check of U7's brief rev 1 (u7-brief.md, c9e1fb33…) as U6c's was
-  (general-purpose, opus, xhigh, main's advisor.md first; Q-U7-1 to -4, the contradictions in U7's line below, size,
-  R1's date) -> advisor-u7-brief.md.
+## Now (2026-11-22 20:5x UTC; his warning at 96% usage, history.md:7652-7653: all saved, agents told to save)
+- **My step:** waiting on two agents; the netcode seat DONE, REVISE: NR-U6A-1 High (npt-super's header: bite None,
+  tick_hz 0, scene "", so its run goes INVALID); -2, -3 Medium (Q-U6A-5's SMT-sibling refusal not built; a failed
+  /proc walk writes alone 1); 5 Lows (-4, -8 fix; -5, -6, -7 carries to U6d, U6e, U6b). Day message draft not begun.
+- **Next 1:** when the test seat returns, one fix message to the U6a builder (both seats' Mediums and up, -4, -8);
+  then U7's advisor check (u7-brief.md c9e1fb33…, as U6c's) in the free slot, after the usage reset.
 - **Next 2, 23:05 UTC:** the day message (trig_01967r39…), saved first as msg-2026-11-23.md, one screen: the Choices
   block's 2026-11-22 lines; sizes (U6a 5,460, U8 4,176; at 1.9-2.3 U6c 5,300-6,450, U7 4,200-5,050; stop past 6,000);
   R1 with about a day of slack and its triggers; F26 (mine, fixed); the cut 15:47-19:44; planned R2 Sat 12, R3 Sun 13,
@@ -144,10 +144,10 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (3 of 3):** (1) security ab80f7d9c82f327b9 (security-auditor, xhigh, from 20:1x): (A) F26's fix
+- **Agents running (2 of 3):** (1) security ab80f7d9c82f327b9 (security-auditor, xhigh, from 20:1x): (A) F26's fix
   2a9498d -> security-f26.md; (B) U6c's Block 0, the ruling's section 4 items 1-8 -> security-u6c-deps.md; scratch
-  security-u6c/; resume from its files. (2) U6a's netcode seat a9a29bd03da0757ad (netcode-architect, xhigh, from 20:1x)
-  -> u6a-review-netcode.md (NR-U6A-n); runs only via u6a-run.sh; resume from its file. (3) U6a's test seat
+  security-u6c/; resume from its files. (2) U6a's netcode seat a9a29bd03da0757ad: DONE 20:5x (u6a-review-netcode.md
+  ends DONE; F1, F3, F7, F9 fine; F4 no owner for S1's burn; O1 carry U6d; O2 carry U6b, U7). (3) U6a's test seat
   a4724cf284e77b73e (test-engineer, xhigh, from 20:3x) -> u6a-review-test.md (TR-U6A-n), scratch u6a-review-test/;
   scope section 3 items 1-9 of its brief (counts, plants, bites, timing, carries, header, -2 parity, SERIES rows, not
   verified); same runner; resume from its file.
