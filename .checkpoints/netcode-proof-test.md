@@ -150,8 +150,9 @@
 - **U6a's brief rev 1 DRAFTED 13:4x** (u6a-brief.md, 279 lines; notes netcode-u6a-brief.md): about 2,350 added, likely
   3,150-3,800 (the re-plan said 1,675 / 2,250-2,500: about 1,000 more likely lines on the lane before R1); Q1-Q7 with
   leans; six places the re-plan contradicts itself. **Running since 13:5x:** the advisor's one check
-  (advisor-u6a-brief.md) and security's read of Block 0 (b) (security-u6a-deps.md, ends DONE). A cut: resume each from
-  its file (SPEND-LIMIT (a)).
+  (advisor-u6a-brief.md). A cut: resume from its file (SPEND-LIMIT (a)). **Security's Block 0 (b) read DONE**
+  (security-u6a-deps.md): clear with conditions SEC-U6AD-1 to -6, no new package (Mediums -1, -3, -4 read in full:
+  build conditions, :99-112); binding check :119-137 at U6a's save; all go into the brief's rev 1.1.
   **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
   @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
   to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding
