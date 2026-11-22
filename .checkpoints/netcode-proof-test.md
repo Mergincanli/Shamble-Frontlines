@@ -165,7 +165,8 @@
   ADV-U8-1, closed by C1 word for word; Mediums read in full); **rev 1.1 APPLIED** (section 0.1; 131 pasted lines
   checked equal to the ruling). npm DEP-HOLD DONE: lock (webdriverio 10.2.0, --before 2026-11-15, 167 entries,
   scripts only edge/geckodriver) cleared by security-u8-deps.md (the 4 moderates = minimatch's one advisory chain,
-  accepted; conditions in u8-brief.md 0.1); committed 2ad2829 with dependency-check.md's U8 block. Next: the builder.
+  accepted; conditions in u8-brief.md 0.1); committed 2ad2829 with dependency-check.md's U8 block. **Builder launched
+  15:0x** (general-purpose, opus, xhigh, worktree; `<base>` d854ae1375ab…; brief sha256 3d102be9…; notes u8-build.md).
 - **U6b's brief rev 1.1** (u6b-brief.md; notes netcode-u6b-brief.md): the advisor's APPROVE WITH CONDITIONS 1-8 (no
   Critical or High; Mediums ADV-U6BB-1 to -4 read in full) applied in section 0.1 (66 lines checked equal); the lever
   taken (about 250 lines to U6e); about 2,650 added, likely 3,600-4,000; lane before R1 about 9,900-11,300 likely: R1
