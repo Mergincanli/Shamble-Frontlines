@@ -15,7 +15,7 @@ Branch claude/netcode-proof-test-plan-hcky5g. Started 2026-11-22. No Edit tool: 
 5. Return report.
 
 ## Progress
-- Block 1 (reads): history, replan, replan-units, plan.md parts DONE.
+- Block 1 (reads): history, replan, replan-units, plan.md parts, u4s-carries, u6c-brief DONE.
 
 ## Findings (one line each, as I go)
 - F1 NPT-TRIM item 3 (history.md:7572): "U7, cut to a plain browser client: ..." R1-DAY Thu 3 Dec (history.md:7604).
@@ -25,6 +25,23 @@ Branch claude/netcode-proof-test-plan-hcky5g. Started 2026-11-22. No Edit tool: 
   risks: Chromium install, Firefox hashes untested, C-U7-3 cap source.
 - F4 plan.md line drift: current plan.md has every cited line +1 vs replan-units (U7 row now :1255, not :1254; -36 row
   :740 not :739; R1 row :819 not :818; E7 web :495-504, net.ts :496-497, host.ts :498). Smoke check :1214-1223.
-  "JoinAccepted field (plan.md:1254)" in replan-units = the U7 row's C-U7-3 text, now :1255.
+  "JoinAccepted field (plan.md:1254)" in replan-units = the U7 row's C-U7-3 text, now :1255. u6c-brief.md:7 already
+  notes the same +1 drift for U6's row.
 - F5 plan.md:643-644: "TypeScript 6.0.x, Vite, WebdriverIO and three.js, each exact ... `npm ci --ignore-scripts`".
   U7 needs neither Vite nor three.js (security B7: vite not needed; three.js goes with render.ts).
+- F6 C-U7-1..4 are NOT in u4s-carries.md (no U7 section; grep "C-U7" 0 hits). Word-for-word home: plan.md:1255 (U7 row);
+  C-U7-3/-4 originals advisor-u4f-r1.md:146-154. u4s-carries.md:831 (entry 112, U6-Q2): "its `ws://` and wrong-Origin
+  pages go with U7's web harness" -> CUT by replan-units.md:19 (Origin checks to the baseline). Brief says so.
+- F7 u4s-carries.md:870-871 (U6-Q17 term 3): `/npt/cert-hash.json` "is U6d's"; u6c-brief.md:341 moves it to U6c Block 5.
+- F8 u6c-brief.md:126-131 Block 5: allow-list of U7's dist names (index at `/`, scripts, Worker, Wasm as
+  application/wasm), in memory at start, missing = exit 2; `/npt/cert-hash-NN.json` NN 00-31 + `/npt/cert-hash.json` as
+  room 00's (Q-U6C-3, lean (a), not ruled); CSP of plan.md:1123-1126 word for word on every answer; :177 U7 owns page,
+  Worker, dist, hash fetch; :472-473 "U7's brief takes the form, and its dist names become Block 5's compiled-in
+  allow-list". :501 main session tells U7's drafter Q-U6C-3's URL form.
+- F9 CSP plan.md:1123-1126: script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://rs.nt..:*
+  wss://rs.nt..:* (+rs-b); style-src 'self'; img-src 'self'; default-src 'none'. So U7: no inline script/style, Wasm
+  compile OK, module Worker from self OK, fetch of hash/wasm = connect-src 'self'. No robots.txt (cut, u6c :136).
+  Container test must serve under the same CSP (a test asserting the dist runs under that header) -- else a CSP break
+  shows first at R1. Lean: the container's test static server sends the same CSP with the loopback origin added.
+- F10 C-U6-19 gate line (u6c-brief.md:303-307, from u6a-brief condition 2 :30-34): U7's brief states one line; R1 each
+  browser leg joins its own slot once. U7 has no rejoin (Worker restart cut): line holds.
