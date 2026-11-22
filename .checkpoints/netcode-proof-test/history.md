@@ -7618,3 +7618,27 @@ My answers to the five decisions (22 November), written with my stand-in Advisor
 - **2026-11-21 20:20:20 to 23:08 UTC** (all three agents; the worker restarted twice): "You've hit your org's monthly
   spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:40pm (UTC)". Resumed 23:08 by
   SendMessage after the 23:05 trigger: no cargo running, tree clean (saver's last push 28e0ad2), builder's FP-2 whole.
+
+## Cut by the spend limit, moved from the card word for word (2026-11-22 20:2x UTC)
+- **2026-11-22 15:47:28 to about 19:44 UTC** (both builders and this session; the worker restarted 18:36:52 and
+  19:43:12): "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets
+  7:40pm (UTC)". Nothing lost: U6a's builder, just resumed, ran nothing (last runner log 15:40; its tree re-snapshotted
+  = a9f8b6e0…); U8's builder's one npm install had finished (node_modules 15:45:29-15:45:33); the saver ended on time;
+  the check-ins of 16:34 and 18:35 read at 19:43. Resumed about 19:44 by his message "I hit my usage limit while you
+  were working, but it has reset now. Please continue from where you left off.": both builders by SendMessage, saver.
+
+## Mustafa, 2026-11-22, in this chat (word for word)
+- 19:44:58 UTC (it reached this chat mid-turn, with a tool result; transcript line 74586), after the cut above:
+  "I hit my usage limit while you were working, but it has reset now. Please continue from where you left off."
+- 20:23:00 UTC (transcript line 75359, uuid 1c13c09b-6028-48ee-a09a-228ee47e2c90), before his /compact:
+```
+I'm about to run /compact on this chat. First make sure nothing that lives only in this conversation is lost. Do just this, then stop:
+1. Start no new agent, workflow or unit until after the compact. Running ones carry on: background agents and shells keep running through a compact.
+2. Bring the card up to date as your resume source (no new file; stay within 200 lines by dropping finished lines and pointing to the card commit that held them, as you already do):
+   - Running work: for every running agent, workflow and background shell, the ID you use to message, resume or stop it, plus its task, notes file and resume point.
+   - Your own step: what you're in the middle of right now, and the next three steps after it.
+   - Anything decided, found or promised in this conversation that isn't on the card or in a file yet: choices for the day's message, findings and their takers, anything you told an agent beyond its brief.
+3. Any words of mine that matter later and aren't in history.md yet go in word for word, as usual.
+4. Save with checkpoint.mjs and push. Check that the branch equals origin and git status is clean (or name what is held back, and why).
+5. Reply in one line: "Ready for /compact: card <sha>; running: <names>."
+```
