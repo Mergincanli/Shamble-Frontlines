@@ -176,7 +176,11 @@
   and M5's hash in the report). Point 6 (:79-98): D2, the 21 rows, then -21's set; about 7.50 GB free before its
   builds; to the advisor before the report: a left-out above 76 on a 600 s run, any other kind left out, any forged run
   unrejected above 0; the report's per-run table and its own-line items. **D2 01:3x: 8,595,312,640 B free** (after the
-  shared release clean, 382.6 MiB). **The 21 rows RUNNING next** (flock; c-u4f-r2.mjs --date 2026-11-22).
+  shared release clean, 382.6 MiB). **The 21 rows DONE 01:5x** (commit 92ed9a8; .gate/netcode-proof-test/
+  u4f-r2-92ed9a8f03e0/r2.txt; read by r2read.mjs, scratch): 20 read their expect (p14 = p1: fate log b717b5ab…, 900
+  ticks equal; p13 cmds max 7, p19 8; p2 reruns 0; kind 7 on p1, p7, p14, p17: 0 left out, 73 sent, 0 unrejected);
+  **p12 off its expect** ('0 presses lost' passes at 0 where the pre-F1 expect says it fails; the bite still fails its
+  99.9 % target at 0.894861): asked the advisor (ad46fe8f3f1b5f74c) before -21's set.
 - **The re-plan SENT to him 00:5x UTC** (replan.md): the advisor's one review APPROVE WITH CONDITIONS
   (advisor-replan.md: ADV-RP-1 High, the moved marks' hand-off; -2 to -9 Medium; -10 to -16 Low); P1-P6 pasted word
   for word, Lows folded in: no re-check. His four: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0. After his yes: the
