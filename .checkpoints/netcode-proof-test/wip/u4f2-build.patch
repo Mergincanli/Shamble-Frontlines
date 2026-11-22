@@ -1748,7 +1748,7 @@ index dcd2e4e..85e69ae 100644
  mod logs;
  mod machine;
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
-index 7f54e46..035e228 100644
+index 7f54e46..15e9cd0 100644
 --- a/spikes/netcode-proof/crates/lab/src/scenario.rs
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
 @@ -48,6 +48,7 @@ use npt_sim::replay::Recording;
@@ -2215,7 +2215,7 @@ index 7f54e46..035e228 100644
          let held: Vec<u64> = read(&dir, "lab")
              .events
              .iter()
-@@ -4080,10 +4270,424 @@ pub(crate) mod tests {
+@@ -4080,10 +4270,425 @@ pub(crate) mod tests {
          let cap = npt_room::InputBuffer::CMD_CATCHUP as i64;
          assert!(most("lagswitch_cmds_count").is_some_and(|m| (1..=cap).contains(&m)));
          assert!(most("lagswitch_excess_move_um").is_some_and(|m| m <= 0));
@@ -2447,6 +2447,34 @@ index 7f54e46..035e228 100644
 +                .count()
 +        };
 +        assert!(link(a) > 0 && link(a) == link(b), "the forger's link alike");
++        // FP-8 (TE-U4F2-12; 2.5): in the run every client's refusal counters are 0 but a forger's own kind's; in the
++        // clamp pair every client's (FP-10, TE-U4F2-R2-4: the exemption is the forged suite's alone).
++        let lab = &run.logs[2].events;
++        for e in lab.iter().filter(|e| e.ev == "client_counts") {
++            let s = num(e, "slot");
++            let own: &[&str] = match (suite == "forged", s + 1) {
++                (true, 1) => &["lead_refused_count"],
++                (true, 2) => &["not_newer_count"],
++                (true, 3) => &["seq_refused_count"],
++                (true, 4) => &["move_refused_count"],
++                (true, 5) => &["press_refused_count"],
++                (true, 6) => &["aim_refused_count"],
++                (true, 8) => &["ack_refused_count", "ack_refused_commands_count"],
++                (true, 9) => &["pump_trailing_bytes_count", "pump_unknown_field_count"],
++                (true, 10) => &["buffer_full_count"],
++                (true, 11) => &["pump_wrong_channel_count"],
++                _ => &[],
++            };
++            let traffic = ["events_queued_count", "commands_repeat_count"];
++            let names = ROOM_COUNTS.iter().map(|x| x.0);
++            let names = names.chain(PUMP_COUNTS.iter().map(|x| x.0));
++            let names = names.filter(|k| !own.contains(k) && !traffic.contains(k));
++            let nonzero: Vec<&str> = names.filter(|k| num(e, k) != 0).collect();
++            assert!(
++                nonzero.is_empty(),
++                "slot {s}, outside its kind: {nonzero:?}"
++            );
++        }
 +        if suite == "clamp" {
 +            let k = run.logs[2]
 +                .events
@@ -2465,33 +2493,6 @@ index 7f54e46..035e228 100644
 +                ];
 +                assert_eq!(k.map(|k| num(e, k)), [0; 3], "slot {}", num(e, "slot"));
 +            }
-+        }
-+        // FP-8 (TE-U4F2-12; 2.5): in the run every client's refusal counters are 0 but a forger's own kind's.
-+        let lab = &run.logs[2].events;
-+        for e in lab.iter().filter(|e| e.ev == "client_counts") {
-+            let s = num(e, "slot");
-+            let own: &[&str] = match s + 1 {
-+                1 => &["lead_refused_count"],
-+                2 => &["not_newer_count"],
-+                3 => &["seq_refused_count"],
-+                4 => &["move_refused_count"],
-+                5 => &["press_refused_count"],
-+                6 => &["aim_refused_count"],
-+                8 => &["ack_refused_count", "ack_refused_commands_count"],
-+                9 => &["pump_trailing_bytes_count", "pump_unknown_field_count"],
-+                10 => &["buffer_full_count"],
-+                11 => &["pump_wrong_channel_count"],
-+                _ => &[],
-+            };
-+            let traffic = ["events_queued_count", "commands_repeat_count"];
-+            let names = ROOM_COUNTS.iter().map(|x| x.0);
-+            let names = names.chain(PUMP_COUNTS.iter().map(|x| x.0));
-+            let names = names.filter(|k| !own.contains(k) && !traffic.contains(k));
-+            let nonzero: Vec<&str> = names.filter(|k| num(e, k) != 0).collect();
-+            assert!(
-+                nonzero.is_empty(),
-+                "slot {s}, outside its kind: {nonzero:?}"
-+            );
 +        }
 +        let f = run.logs[2]
 +            .events
@@ -2945,10 +2946,10 @@ index f5d101e..d8eee4a 100644
  
  | Name | Unit | Written by (crate) | Meaning | Figures |
 diff --git a/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs b/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs
-index 27b6ab2..2ca41e3 100644
+index 27b6ab2..f0de766 100644
 --- a/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs
 +++ b/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs
-@@ -20,9 +20,9 @@
+@@ -20,15 +20,18 @@
  //   (never overwritten): one folder per row, <key>-verdict.json beside it, the copies of marks.json and SERIES.md (their
  //   sha256s in r2.txt's head), r2.txt; spikes/netcode-proof re-checked before r2.txt is written.
  // - B6 holds 5.3's p5, p6, p10, p11, p12 and p21, B7 the clamp's p2, p8 and p15, B8 the lag switch's p4, p13, p18
@@ -2958,10 +2959,20 @@ index 27b6ab2..2ca41e3 100644
 +//   and p19 and the fast clock's p3, p9, p16 and p20; U4f2 adds the forged suite's p1, p7, p14 and p17.
 +// - -21's rows (p1-p4, p7-p9, p13-p20) read as -21's 5.3 record only from U4f2's merge commit or a later one (carry
 +//   86; C-U4F2-4); from an earlier commit they are an early read of the suites built then (advisor-u4f-stop.md:90-94).
++// - Each forged-suite row (p1, p7, p14, p17) also gets kind 7's line from its lab.jsonl (`kind7Line`: F-B-COUNT (a),
++//   "report the number left out beside the check on every run"; FP-10). `--kind7 <run folder>...` prints that line for
++//   each folder and runs nothing (a dry read).
  // - Its helpers are exported (c-u4f-runs.mjs reads them); main runs only when this file is the entry module.
  
  import { spawnSync } from "node:child_process";
-@@ -46,8 +46,11 @@ const M20 = "PM-0001-2,PM-0001-20";
+ import { createHash } from "node:crypto";
+ import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from "node:fs";
+-import { dirname, join, resolve } from "node:path";
++import { basename, dirname, join, resolve } from "node:path";
+ import { fileURLToPath } from "node:url";
+ import { builtArtifact, run } from "../../check.mjs";
+ import { roomFor, spikeChanged, spikeReading } from "./c-u4r-runs.mjs";
+@@ -46,8 +49,11 @@ const M20 = "PM-0001-2,PM-0001-20";
  const M21 = "PM-0001-2,PM-0001-21";
  /** -21's suites at P0 (U4F-Q11 (ii) (a)), the honest clients on the open-loop steady script under the controller. */
  const P21 = `${SHORT} --profile P0 --controller 1 --behaviour steady`;
@@ -2974,7 +2985,7 @@ index 27b6ab2..2ca41e3 100644
  /** The fast clock at P0, 70 s measured: one whole 60 s episode from the measured start and 10 s (5.3; 2.6's schedule). */
  const FAST = "--scene SS --seed 1 --warmup-s 10 --profile P0 --controller 1 --behaviour steady --suite fast-clock";
  const FAST_SAYS = "'fast clock: 10 runs of 60 s' fails by length (1 episode); the episode's excess, lead-bound and not-newer refusals reported (event.fast_clock)";
-@@ -55,13 +58,17 @@ const CLAMP_SAYS ="'clamp: 1,000 points beyond reach per weapon kind the sim has
+@@ -55,13 +61,17 @@ const CLAMP_SAYS ="'clamp: 1,000 points beyond reach per weapon kind the sim has
  
  /** 5.3's rows: `build` the npt-lab build (`lab` measured, `bites`), `args` the scenario's settings, `marks` its header's. */
  export const RUNS = [
@@ -2994,7 +3005,7 @@ index 27b6ab2..2ca41e3 100644
    { key: "p3", build: "lab", args: `${FAST} --measured-s 70 --cmd-timing A`, marks: M21, expect: `every PM-0001-2 check and the shot band pass; 'fast clock: at most the server's ticks plus the lead bound of commands' and 'fast clock: moves no further than the honest client plus that many ticks of movement' pass; ${FAST_SAYS}` },
    { key: "p9", build: "bites", args: `${FAST} --measured-s 70 --cmd-timing A --role bite --bite PM-0001-21/not-older-than`, marks: M21, expect: `'fast clock: at most the server's ticks plus the lead bound of commands' FAILS (excess above 0; it passes on p3), the movement check may fail too; ${FAST_SAYS}` },
    { key: "p16", build: "lab", args: `${FAST} --measured-s 70 --cmd-timing B`, marks: M21, expect: "as p3, under option B (U4F-Q11 (iv))" },
-@@ -70,9 +77,11 @@ export const RUNS = [
+@@ -70,9 +80,11 @@ export const RUNS = [
    { key: "p6", build: "lab", args: `${P20} --cmd-timing B`, marks: M20, expect: "as p5, under option B (TE-3)" },
    { key: "p10", build: "bites", args: `${CLOCK} --role bite --bite PM-0001-47/newest-sample`, marks: "PM-0001-47", expect: "'offset error at most 5 ms after 2 s of samples' FAILS; '1,000 connects' fails by length; it passes on p21" },
    { key: "p11", build: "bites", args: `${CLOCK} --role bite --bite PM-0001-47/tick-quantised`, marks: "PM-0001-47", expect: "as p10 (D4: about 11.9 ms against the mean's 2.35 ms)" },
@@ -3007,7 +3018,39 @@ index 27b6ab2..2ca41e3 100644
  
  export function sh(cmd, args, cwd = SPIKE, keepLead = false) {
    const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
-@@ -142,7 +151,7 @@ function main(argv) {
+@@ -82,6 +94,17 @@ export function sh(cmd, args, cwd = SPIKE, keepLead = false) {
+ 
+ export const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
+ 
++/** Kind 7's line for a forged-suite run (F-B-COUNT (a), Mustafa 2026-11-21: "report the number left out beside the
++ * check on every run"; FP-10, TE-U4F2-R2-1): its `forged_kind` record's left-out, sent and unrejected counts, read from
++ * the run's lab.jsonl; a twin has no such record and says so. */
++export function kind7Line(dir) {
++  const path = join(dir, "lab.jsonl");
++  const recs = existsSync(path) ? readFileSync(path, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
++  const f = recs.find((r) => r.k === "event" && r.ev === "forged_kind" && r.f?.kind === 7)?.f;
++  if (!f) return `${basename(dir)}: kind 7: no forged_kind record (a twin forges nothing; its twin check covers every press, the left-out ones included)`;
++  return `${basename(dir)}: kind 7 beside 'every forged command rejected and counted': dead_left_out_count ${f.dead_left_out_count}, sent_count ${f.sent_count}, unrejected_count ${f.unrejected_count}`;
++}
++
+ /** Stops unless free space minus `projected` bytes leaves the 4 GiB floor (section 4 rule 6). */
+ export function floor(what, projected = 0) {
+   const s = statfsSync(ROOT);
+@@ -123,8 +146,12 @@ export function committed() {
+ }
+ 
+ function main(argv) {
++  if (argv[0] === "--kind7" && argv.length > 1) {
++    for (const d of argv.slice(1)) console.log(kind7Line(d));
++    return;
++  }
+   const date = argv[0] === "--date" ? argv[1] : undefined;
+-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || argv.length !== 2) throw new Error("usage: c-u4f-r2.mjs --date YYYY-MM-DD");
++  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || argv.length !== 2) throw new Error("usage: c-u4f-r2.mjs --date YYYY-MM-DD | --kind7 <run folder>...");
+   const { commit, reading, start } = committed();
+   const out = join(GATE, `u4f-r2-${commit.slice(0, 12)}`);
+   if (existsSync(out)) throw new Error(`${out} exists: a run set is never overwritten`);
+@@ -142,7 +169,7 @@ function main(argv) {
    const [marks, series] = [copy("marks.json"), copy("SERIES.md")];
    const lines = [
      `# U4f's 5.3 pre-runs from commit ${commit}, spikes/netcode-proof tree ${start.tree}, on ${date}`,
@@ -3016,8 +3059,16 @@ index 27b6ab2..2ca41e3 100644
      `npt-lab sha256 ${sha256(exe.lab)}; npt-lab (bites) sha256 ${sha256(exe.bites)}; npt-judge sha256 ${sha256(judge)}`,
      `marks.json sha256 ${sha256(marks)}, SERIES.md sha256 ${sha256(series)} (the copies contract and the judge read)`,
      `projection: ${before}`,
+@@ -157,6 +184,7 @@ function main(argv) {
+       ...step(exe[r.build], ["scenario", "--run", `u4f-r2-${r.key}-1`, "--set", "u4f-r2", "--date", date, "--commit", commit, "--out", logs, ...r.args.split(" "), "--marks", r.marks]),
+       ...step(exe[r.build], ["contract", "--logs", logs, "--series", series]),
+       ...step(judge, ["--marks", marks, "--logs", logs, "--only", r.marks, "--out", join(out, `${r.key}-verdict.json`)]),
++      ...(r.args.includes("--suite forged") ? [kind7Line(logs)] : []),
+       "",
+     ];
+     console.log(said.join("\n"));
 diff --git a/spikes/netcode-proof/ops/runs/c-u4f-runs.mjs b/spikes/netcode-proof/ops/runs/c-u4f-runs.mjs
-index c4bdeff..53900a7 100644
+index c4bdeff..72648cb 100644
 --- a/spikes/netcode-proof/ops/runs/c-u4f-runs.mjs
 +++ b/spikes/netcode-proof/ops/runs/c-u4f-runs.mjs
 @@ -1,6 +1,6 @@
@@ -3056,7 +3107,7 @@ index c4bdeff..53900a7 100644
  // - ADV-CBH-2's hardenings: npt-lab (both builds) and npt-judge built in this call; marks.json's and npt-judge's sha256s
  //   read when the set starts and checked again before each judge call (a difference stops the set there); `--commit` the
  //   full HEAD, with `git diff --quiet <HEAD> HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'`
-@@ -32,7 +40,8 @@
+@@ -32,41 +40,73 @@
  //   call and the judge bounded at RUN_LIMIT_MS (a stopped call is a result, never retried); the judge's projected peak
  //   per call (judgeRoom) printed before the builds, the set stopping there over the 10 GiB line.
  // - The projection: BYTES_10MIN_OTHER (56 MB a 10-minute run: c-u4r-runs.mjs:149-154) scaled by the measured seconds,
@@ -3066,7 +3117,11 @@ index c4bdeff..53900a7 100644
  
  import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
  import { join, resolve } from "node:path";
-@@ -43,30 +52,61 @@ import { build, committed, floor, GATE, ROOT, sha256, SPIKE } from "./c-u4f-r2.m
+ import { fileURLToPath } from "node:url";
+ import { run } from "../../check.mjs";
+ import { BYTES_10MIN_OTHER, judgeRoom, logBytes, RUN_LIMIT_MS, setParts, spikeChanged } from "./c-u4r-runs.mjs";
+-import { build, committed, floor, GATE, ROOT, sha256, SPIKE } from "./c-u4f-r2.mjs";
++import { build, committed, floor, GATE, kind7Line, ROOT, sha256, SPIKE } from "./c-u4f-r2.mjs";
  
  const SEEDS = [1, 2, 3];
  /** The line above a set's two judge blocks (5.4: U4f's stop note). */
@@ -3118,14 +3173,14 @@ index c4bdeff..53900a7 100644
 +        const run = `l1-${key}${name ? `-${name}` : ""}${o ? `-${o.toLowerCase()}` : ""}-s${seed}`;
 +        const measuredS = part.measuredS ?? set.measuredS;
 +        const twin = part.twin ? `${run}-twin` : null;
-+        runs.push({ run, exe: "lab", seed, group: "measured", extra: [...part.args, ...opt(o), "--role", "measured", ...(twin ? ["--twin", twin] : [])], measuredS });
-+        if (twin) runs.push({ run: twin, exe: "lab", seed, group: "measured", extra: [...part.args, ...opt(o), "--role", "twin", "--twin", run, ...(name === "clamp" ? ["--twin-logs", `@${run}`] : [])], measuredS });
++        runs.push({ run, exe: "lab", seed, group: "measured", part: name, extra: [...part.args, ...opt(o), "--role", "measured", ...(twin ? ["--twin", twin] : [])], measuredS });
++        if (twin) runs.push({ run: twin, exe: "lab", seed, group: "measured", part: name, extra: [...part.args, ...opt(o), "--role", "twin", "--twin", run, ...(name === "clamp" ? ["--twin-logs", `@${run}`] : [])], measuredS });
 +      }
 +    }
 +  }
 +  for (const [id, o, s, name] of set.bites) {
 +    const part = parts[name ?? ""];
-+    runs.push({ run: `bite-${id.split("/")[1]}`, exe: "labBites", seed: 1, group: "bites", extra: [...part.args, ...opt(o), "--role", "bite", "--bite", id], measuredS: s ?? part.measuredS ?? set.measuredS });
++    runs.push({ run: `bite-${id.split("/")[1]}`, exe: "labBites", seed: 1, group: "bites", part: name ?? "", extra: [...part.args, ...opt(o), "--role", "bite", "--bite", id], measuredS: s ?? part.measuredS ?? set.measuredS });
 +  }
    return runs.map((r) => ({ ...r, bytes: bytes(r.measuredS) }));
  }
@@ -3137,7 +3192,7 @@ index c4bdeff..53900a7 100644
    if (process.env.CARGO_TARGET_DIR !== undefined) throw new Error("CARGO_TARGET_DIR is set: the judged sets build in the main folder's own cache (plan §7.1 item 6)");
    const set = SETS[key];
    const { commit, reading, start } = committed();
-@@ -94,7 +134,8 @@ function main(argv) {
+@@ -94,13 +134,20 @@ function main(argv) {
    const lines = [];
    for (const r of runs) {
      floor(r.run, r.bytes);
@@ -3147,12 +3202,33 @@ index c4bdeff..53900a7 100644
      const t0 = Date.now();
      const x = run(exe[r.exe], args, ROOT, process.env, RUN_LIMIT_MS);
      const secs = ((Date.now() - t0) / 1000).toFixed(1);
+     const said = x.timedOut ? `${r.run}: stopped at ${secs} s (a result, never retried)` : x.status === 0 ? `${x.stdout.trim()} (wall ${secs} s)` : `${r.run}: exit ${x.status} (wall ${secs} s): ${x.out.trim()}`;
+     console.log(said);
+     lines.push(said);
++    // F-B-COUNT (a): kind 7's left-out count beside the check, on every forged-part run (FP-10, TE-U4F2-R2-1).
++    if (r.part === "forged") {
++      const k7 = kind7Line(join(logs, r.group, r.run));
++      console.log(k7);
++      lines.push(k7);
++    }
+   }
+   const call = (label, dir, only, file) => {
+     const why = spikeChanged(start, reading());
+@@ -119,7 +166,7 @@ function main(argv) {
+   if (set.report) calls.push(call("5.2's load report (never counted)", join(logs, "measured"), set.report, "verdict-load.json"));
+   mkdirSync(results, { recursive: true });
+   for (const c of calls) if (c.ok) copyFileSync(c.out, join(results, c.file));
+-  const top = [`# u4f-${key}: PM-0001-${key}'s L1 set, run on ${date} (u4f-brief.md 5.1, 5.4)`, ...head, STOP_NOTE, ...calls.flatMap((c) => c.block), "", "# one line per run (npt-lab's summary line and its wall time)"];
++  const top = [`# u4f-${key}: PM-0001-${key}'s L1 set, run on ${date} (u4f-brief.md 5.1, 5.4)`, ...head, STOP_NOTE, ...calls.flatMap((c) => c.block), "", "# one line per run (npt-lab's summary line and its wall time), and on each forged-part run kind 7's line (F-B-COUNT (a): the number left out beside the check)"];
+   writeFileSync(join(results, "runs.txt"), `${[...top, ...lines].join("\n")}\n`);
+   if (calls.some((c) => !c.ok)) throw new Error("a judge call gave no verdict: runs.txt written (to the advisor)");
+   console.log(`written: ${join("spikes", "netcode-proof", "results", "u4f", short, `pm-0001-${key}`)}/`);
 diff --git a/spikes/netcode-proof/crates/lab/src/forged.rs b/spikes/netcode-proof/crates/lab/src/forged.rs
 new file mode 100644
-index 0000000..42162ac
+index 0000000..2401480
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/forged.rs
-@@ -0,0 +1,475 @@
+@@ -0,0 +1,476 @@
 +//! -21's attribution (u4f-brief.md 2.4 item 6; TE3-2, SA-4): each forger's items, in 2.4's unit, counted rejected only
 +//! by its kind's rule, against every tick's records and `TickInput` (`event.forged_kind`, one record per kind at the
 +//! run's end, SERIES.md:158-159):
@@ -3203,7 +3279,8 @@ index 0000000..42162ac
 +    left_out: BTreeSet<u16>,
 +}
 +
-+/// Kind 7's runs kept for the dead window: the item's command and the one before it are at most a tick apart.
++/// Kind 7's first runs kept for the dead window: the item's command is the next first run after the one before it
++/// (the forger's sequences run in order), so the ring needs only the latest few; a property of run order, not of time.
 +const RECENT_RUNS: usize = 4;
 +
 +/// Every forger's tally of one run.

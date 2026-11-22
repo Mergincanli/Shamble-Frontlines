@@ -587,4 +587,42 @@
   1's alone now that kind 7's dead items are left out.
 - End of part B: free 8,223,191,040 B; size +2,168 -190 tracked, forged.rs 475: about 2,643 added. No code changed
   after FP-2's snapshot (e33d14f0…). Round 2, R6 and the merge are the main session's next steps (not started).
-- Resume here: nothing left in part B; step 4 is the snapshot and the report.
+- Resume here: nothing left in part B; step 4 is the snapshot and the report. (Done: reported, snapshot e33d14f0….)
+
+### Part B2: FP-10 (round 2's fixes: netcode and test APPROVE WITH FINDINGS, no Critical or High)
+- Round 2 cleared the bots lib.rs departure by its call sites and the lag-switch proof: no re-run of R4 or R5's
+  non-forged lines; it goes into U4f2's report as a departure (the letter widened by one predicate, chosen before the
+  build so one plant fails both tests).
+- **TE-U4F2-R2-1 (Medium): DONE.** ops/runs/c-u4f-r2.mjs: exported `kind7Line(dir)` (kind 7's `forged_kind` record from
+  the run's lab.jsonl: "kind 7 beside 'every forged command rejected and counted': dead_left_out_count N, sent_count S,
+  unrejected_count U", or for a twin "no forged_kind record (a twin forges nothing; its twin check covers every press,
+  the left-out ones included)"); each forged-suite row (p1, p7, p14, p17) adds that line to r2.txt; a `--kind7 <run
+  folder>...` dry-read mode (runs nothing; the usage names it); the header says so. ops/runs/c-u4f-runs.mjs: each
+  planned run carries its part (`part`), and every forged-part run (the forged measured runs, their twins, the 11
+  forged bites) adds kind 7's line to runs.txt; runs.txt's head line names it. `node --check` on both: exit 0. The dry
+  read on R2's folder printed the four lines: forged A dead_left_out_count 18, sent_count 1505, unrejected_count 0;
+  A twin no forged_kind record; B 8, 1515, 0; B twin no forged_kind record.
+- **The 15 R5b forged runs' kind 7 figures** (read from their logs with the same `--kind7` mode; no run): p1, p7, p14,
+  p17 each dead_left_out_count 0, sent_count 73, unrejected_count 0; the 11 forged bites each dead_left_out_count 0,
+  sent_count 36, unrejected_count 0, but bite-no-cooldown unrejected_count 31 (its own kind, the bite reaching it).
+- **TE-U4F2-R2-6's record lines:** (1) the snapshot sizes worktree_patch.py prints read 12 B low against the file
+  (the reviewer's reading; the sha256s recorded are the file's own); (2) R2's PM-0001-2 reads NOT-RUN by design (2 of
+  its 3 seeds): the per-run band checks are the reading (685.77, 691.52 pass); (3) the option-B re-run proxy
+  (`input_missing`) covers the 18,000 measured ticks, not the warm-up's 300 (24 of kind 7's items are forged there);
+  (4) R3's 673 is the summary line's whole number (the judge's bites call states no shot value).
+- **Follow-ups, built nothing for them** (round 2's Lows): NC-U4F2-R2-2's test case (an item first run alive with a
+  record, re-run dead under B: still counted rejected, not left out; with its plant), NC-U4F2-R2-3 (kind 7 still takes
+  intervals whose fire item lands on a reload's last command, `every` dividing L - 1: 59 at 30 Hz; 7, 17, 119 at 60 Hz;
+  a false FAIL, never a pass; the judged 12 not reached), TE-U4F2-R2-2 (the lab's death wiring has no test in the
+  step), TE-U4F2-R2-3 (fp2's two negatives: a re-run while dead, another kind's dead forger), TE-U4F2-R2-5 (kind 7's
+  tightest accepted interval, rest + 1, has no World-level case). NC-U4F2-R2-1 is met by TE-U4F2-R2-1's fix.
+- **NC-U4F2-R2-2's comment: DONE.** forged.rs `RECENT_RUNS`: "the item's command is the next first run after the one
+  before it (the forger's sequences run in order), so the ring needs only the latest few; a property of run order, not
+  of time" (doc only).
+- **TE-U4F2-R2-4 (Low): DONE.** scenario.rs f16: the zero-counter check moved before the clamp suite's early return
+  (it never ran on the clamp pair at all, so neither the exemption nor the check reached it), its exemption kept only
+  where `suite == "forged"` (`match (suite == "forged", s + 1)`): the clamp pair's every client now has every refusal
+  counter checked at 0.
+- Step in progress: u4f2-fp10-tests.log (fmt check, f16 alone `-x -k`, clippy on npt-lab measured and bites), run in
+  the background; a restart reads that log first.
+- Resume here: read u4f2-fp10-tests.log; then the snapshot with its sha256, SIZE-CHECK, and the report.
