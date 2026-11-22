@@ -150,6 +150,10 @@
 - **Running since 13:22 UTC (replan-units.md:196, today's row):** netcode-architect drafts U6a's brief (u6a-brief.md;
   notes netcode-u6a-brief.md), then my read and the advisor's one check; security-auditor's DEP-HOLD read of the R1
   path's new dependencies (security-r1-deps.md, ends DONE). A cut: resume each from its notes file (SPEND-LIMIT (a)).
+  **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
+  @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
+  to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding
+  checks :249-257 before each dependency-check.md entry.
 - **PACK-P0 (b)** (each list committed with its ruling, then packed; free MiB before → after; files read back = listed):
   c-u2-pm-0001-3-81c6d01e371b 4,760 → 5,364 (39/39; 47e4ee1); c-u2-pm-0001-3-65869918809f 5,364 → 5,967 (39/39;
   1dc9751); u4r-P0-051995db9cea 5,967 → 8,497 (30/30; 3d2c752); u4r-P0-93509dfd7fd1 8,497 → 11,156 (30/30;

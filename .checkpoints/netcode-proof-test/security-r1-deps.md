@@ -126,7 +126,7 @@ advisories and source only. (No Edit tool in this agent: the notes are rewritten
 - OSV querybatch over the lane lock (225 registry packages): 2 hits. url 2.5.8 RUSTSEC-2026-0592 (published
   2026-11-20): `Url::origin()` recursion on nested `blob:` URLs, stack overflow aborts the process; fixed 2.5.9;
   affected functions url::Url::origin, url::quirks::origin. pin-utils 0.1.1 RUSTSEC-2026-0441 (unmaintained,
-  informational), reached only via loom 0.7.2 (cfg(loom) test tooling).
+  informational), reached only via loom 0.7.2 (cfg(loom) test tooling); already seen at U5 (security-u5-deps.md:241).
 - url users in the lock: web-transport-proto 0.6.4, web-transport-quinn 0.13.6, wtransport 0.7.2, wtransport-proto
   0.7.2 (network-facing). grep of their src and tungstenite/tokio-tungstenite: no `Url::origin()` call (wtransport's
   `origin()` returns the header string: endpoint.rs:690-691, session.rs:175). So not reachable today: Medium, because
@@ -138,6 +138,146 @@ advisories and source only. (No Edit tool in this agent: the notes are rewritten
   Hoverbear, seanmonstar, servo teams; checksum f00cd2407bb42c0e...; diff vs 2.5.8 read (crate_diff.py): origin.rs
   takes an inner URL's origin only for http/https/file (the fix), parser.rs percent-encode set reordering, no new
   dep. form_urlencoded 1.2.3 (checksum afa489199eaffb12..., 2026-11-20 Manishearth): one change, a panic on a too-long
-  start_position replaced by a clamp. OSV: none for url 2.5.9 or form_urlencoded 1.2.3. pin-utils: record it as an
-  accepted informational advisory in deny.toml with its reason (test-only via loom), or confirm cargo-deny's
-  unmaintained scope excludes it; not a runtime risk.
+  start_position replaced by a clamp. OSV: none for url 2.5.9 or form_urlencoded 1.2.3. pin-utils: as U5 handled it.
+
+### B5 the npm set DONE
+- Method: a read-only Node resolver (scratchpad scripts/npm_tree.mjs: npm's bundled semver, registry packuments
+  over HTTPS, deps + non-optional peers + optional deps for linux-x64 and win32-x64), then OSV querybatch (npm).
+  Approximate like the cargo one: the committed package-lock.json is the binding list.
+- typescript 6.0.3: latest 6.0.x (6.0.2, 6.0.3; latest overall is 7.0.2, the native Go port, not the plan's 6.0.x);
+  2026-04-16, publisher typescript-bot; 0 dependencies; no preinstall/install/postinstall; OSV none. 1 package.
+- vite 8.3.8 (2026-11-11, GitHub Actions with npm provenance): 19 packages over linux-x64 + win32-x64, incl. native
+  prebuilt binaries (@rolldown/binding-*-1.2.19, lightningcss-*-1.33.0; lightningcss published by devongovett without
+  provenance); no install scripts; OSV none. 8 of the 19 were published in the last 14 days (vite, rolldown and its
+  bindings 2026-11-11, postcss 8.5.33 2026-11-13, source-map-js 1.2.4 2026-11-19).
+  Not needed for what U7 now is (a counters page, a module Worker, wasm-bindgen output): `tsc` + wasm-bindgen's
+  `--target web` ES module serve as static files. Option, not a condition: drop Vite (19 packages and two native
+  toolchains less). If kept: `vite build` only, never `vite`/`vite preview` with `--host`.
+- @types/node 22.20.5 (latest 22.x, 2026-10-01) only if the TypeScript uses Node types (Node tests).
+- WebdriverIO: 10.2.0 (2026-11-06, provenance, maintainers christian-bromann, wdio-user, wswebcreation-nl).
+  * standalone `webdriverio@10.2.0`: 162 packages; OSV: minimatch 10.2.6 GHSA-g3hv-75wg-m249 (CVE-2026-118764,
+    globparts amplification DoS, CVSS 4.0 VA:L; fixed only in 11.0.1, no 10.x fix). Install scripts: edgedriver 8.0.0
+    and geckodriver 8.0.0 postinstall (driver download; `--ignore-scripts` skips them).
+  * the testrunner set (@wdio/cli, local-runner, mocha-framework, spec-reporter, webdriverio, all 10.2.0): 321
+    packages; adds tsx 4.23.15 -> esbuild 0.28.2 (postinstall `node install.js`, native @esbuild/* binaries), the
+    @inquirer/* family published 2026-11-22 (today), glob 13.0.7 GHSA-3g3m-2fjr-6pw4 (CVE-2026-118773, fixed 14.0.2)
+    beside minimatch.
+  * 9.33.1 standalone: 219 packages, OSV: extract-zip 2.0.1 GHSA-7pqw-9j4j-h8q3 (arbitrary file write via symlink
+    archive entries, CVSS 3.1 I:H/A:H, no fix: used for driver downloads), basic-ftp 5.3.1 x3, glob 10.5.0,
+    minimatch 9/10. So never the 9.x line.
+- WebdriverIO at run time (@wdio/utils 10.2.0 build/index.js, startWebDriver, read from the published tarball):
+  `WDIO_SKIP_DRIVER_SETUP` makes it connect to localhost:4321 instead; otherwise for Chrome it calls
+  setupPuppeteerBrowser (may download Chrome for Testing) and setupChromedriver (downloads chromedriver) unless
+  `wdio:chromedriverOptions.binary` / CHROMEDRIVER_PATH is set; Firefox: setupPuppeteerBrowser + geckodriver
+  (downloads unless `wdio:geckodriverOptions.binary`); Edge: edgedriver (downloads unless
+  `wdio:edgedriverOptions.binary`). Downloads are not pinned by hash in our config.
+  It also defaults chromedriver to `allowedOrigins ["*"]`, `allowedIps ["0.0.0.0"]` and msedgedriver to
+  `allowedIps ["0.0.0.0"]` (geckodriver gets allowHosts ["localhost"]). ChromeDriver's own guidance: "By default,
+  ChromeDriver only allows local connections", remote access via `--allowed-ips`, "Use firewall to prevent
+  unauthorized remote connection to ChromeDriver" (https://developer.chrome.com/docs/chromedriver/security-
+  considerations). Whether "0.0.0.0" admits every remote peer I did not verify in chromedriver's source (medium
+  confidence); a WebDriver session can start any binary as "the browser", so a reachable driver port on the laptop
+  is code execution as the laptop user.
+
+### B6 advisory sweep DONE
+- Rust, OSV per pinned version (2026-11-22): none affecting instant-acme 0.8.5 or the 16 crates under it, rcgen
+  0.14.10, futures-util 0.3.34, wasm-bindgen(-cli/-macro/-macro-support/-shared) 0.2.130, js-sys 0.3.107,
+  web-transport-quinn 0.13.6, tokio-tungstenite/tungstenite 0.30.0, rustls 0.23.46, ring 0.17.14, tokio 1.54.1,
+  tokio-rustls 0.26.6, quinn 0.11.12, quinn-proto 0.11.19, http 1.5.0, httparse 1.10.1, x509-parser 0.18.1, time
+  0.3.55, rustls-platform-verifier 0.7.1, rustls-native-certs 0.8.5. Whole lane lock: url 2.5.8 (F1), pin-utils
+  (informational, known).
+- npm, OSV per resolved version: typescript + vite: none; webdriverio 10.2.0: minimatch 10.2.6 (Low here: the
+  patterns are our own spec globs, no attacker input); testrunner adds glob 13.0.7 (Low, same reason).
+- Not checked: the RustSec repo directly (GitHub API 403 for this session; OSV mirrors it, GHSA aliases shown for h2,
+  url); `npm audit` itself (no install); chromedriver's handling of allowed-ips 0.0.0.0 in source.
+
+### B7 answer DONE
+Findings:
+- SEC-R1D-1 (Medium): url 2.5.8 in the lane lock (RUSTSEC-2026-0592, GHSA-hrj5-67jp-wqp9; Url::origin() stack
+  overflow on nested blob: URLs; fixed 2.5.9). Not reached by our crates today; blocks `cargo deny check advisories`
+  (deny.toml ignore = []) at stop B and before every run. Exploit sketch: a client sends a URL with ~10,000 `blob:`
+  prefixes; any server code that calls `Url::origin()` on it aborts the room process. Fix: U6's lock change runs
+  `cargo update -p url --precise 2.5.9` (brings form_urlencoded 1.2.3); no Origin check uses `Url::origin()` on
+  client input before that.
+- SEC-R1D-2 (Medium): WebdriverIO 10.2.0 widens chromedriver/msedgedriver allow-lists by default (allowedIps
+  ["0.0.0.0"], allowedOrigins ["*"], @wdio/utils build/index.js startWebDriver). Exploit sketch: a host on the
+  laptop's network reaches the driver's port and starts a session whose "browser" binary is any program. Fix: set
+  `wdio:chromedriverOptions` and `wdio:edgedriverOptions` explicitly with allowedIps ["127.0.0.1"] (chromedriver also
+  allowedOrigins to none), keep geckodriver's localhost default, and the laptop's firewall blocks inbound.
+- SEC-R1D-3 (Medium): WebdriverIO downloads browsers and drivers at run time, unpinned (@puppeteer/browsers 3.2.7,
+  edgedriver 8.0.0, geckodriver 8.0.0). Exploit sketch: a compromised CDN or package download replaces chromedriver
+  on the laptop. Fix: drivers installed by hand from the vendors with versions and SHA-256 recorded, given by
+  `wdio:*Options.binary`; browsers given by goog:chromeOptions.binary / ms:edgeOptions.binary /
+  moz:firefoxOptions.binary (the installed stable browsers), so nothing downloads; cacheDir under .gate/.
+- SEC-R1D-4 (Low): instant-acme's DefaultClient has no per-request timeout and collects bodies uncapped
+  (lib.rs:312-318). Fix: each ACME call under `tokio::time::timeout` inside the wrapper's 30-minute bound; the
+  directory URL a constant per staging|production (as npt-cert's no-free-argument plan).
+- SEC-R1D-5 (Low): minimatch 10.2.6 (GHSA-g3hv-75wg-m249) in webdriverio 10.2.0's tree, no 10.x fix; our own glob
+  patterns only. Fix: record as an accepted risk beside `npm audit`'s output, or an `overrides` to minimatch 11.0.9
+  if WebdriverIO's tests pass with it.
+- SEC-R1D-6 (Low): freshness. Many npm versions are days old (testrunner's @inquirer/* today; vite 11 days). Fix: make
+  each package-lock.json with `--before` 7 days back (security fixes excepted, named), so no version younger than 7
+  days enters the lock.
+
+Verdicts and pins:
+- futures-util =0.3.34 (U6, npt-net normal dep, workspace entry unchanged): CLEAR.
+- rcgen =0.14.10 direct (U6): CLEAR WITH CONDITIONS: default-features = false, features = ["ring"].
+- instant-acme =0.8.5 (U6, npt-host only): CLEAR WITH CONDITIONS: default-features = false, features = ["ring",
+  "hyper-rustls"]; never aws-lc-rs / fips; DefaultClient (https_only) with the platform verifier or with_roots, no
+  custom plain-HTTP client; SEC-R1D-4.
+- Its 16 transitive crates (U6): CLEAR at exactly hyper 1.12.0, hyper-util 0.1.21, hyper-rustls 0.27.10, h2 0.4.20,
+  http-body 1.1.0, http-body-util 0.1.5, httpdate 1.0.3, tokio-util 0.7.20, want 0.3.2, try-lock 0.2.5,
+  atomic-waker 1.1.2, fnv 1.0.7, tower-service 0.3.3, async-trait 0.1.92, pem 4.0.0, base64 0.23.1.
+- url 2.5.9 + form_urlencoded 1.2.3 (U6, F1 fix): CLEAR.
+- wasm-bindgen =0.2.130 (U7, npt-client-wasm only): CLEAR WITH CONDITIONS: default features (std) only, no
+  serde-serialize; no web-sys or wasm-bindgen-futures without another read; js-sys =0.3.107 allowed (locked).
+- wasm-bindgen-cli 0.2.130 (U7 here, U8 on RS): CLEAR WITH CONDITIONS: `cargo install wasm-bindgen-cli --version
+  0.2.130 --locked` with default features only (never openssl / native-tls / vendored-openssl), CARGO_TARGET_DIR
+  under .gate/, version equal to the lock's wasm-bindgen; only the `wasm-bindgen` binary is used (not
+  wasm-bindgen-test-runner, whose stack holds the unmaintained crates and url 2.5.8).
+- typescript 6.0.3 exact (U7): CLEAR. @types/node 22.20.5 exact if needed: CLEAR.
+- vite 8.3.8 exact (U7, if kept): CLEAR WITH CONDITIONS: `vite build` only, never the dev/preview server with
+  `--host`; recommendation: drop it.
+- webdriverio 10.2.0 exact, standalone (U8): CLEAR WITH CONDITIONS: SEC-R1D-2, -3, -5; specs as plain Node scripts
+  (no @wdio/cli testrunner). The testrunner set (321 packages, esbuild postinstall, packages published today) is
+  not cleared by this read: it needs its own read if U8 wants it. Never the 9.x line (extract-zip
+  GHSA-7pqw-9j4j-h8q3).
+- Every npm install: `npm ci --ignore-scripts`; web/.npmrc with `ignore-scripts=true`; package-lock.json committed,
+  every `resolved` on https://registry.npmjs.org/ with an sha512 `integrity`; `npm audit` output recorded (SEC-R1D-5
+  as the one accepted entry); SEC-R1D-6 when the lock is made.
+
+Binding check for each unit's save (the main session, before writing its dependency-check.md lines):
+- U6: the real `cargo update` lock diff adds exactly the 17 packages above (crates.io source; checksums equal the
+  index's, listed below), bumps url 2.5.8 -> 2.5.9 and form_urlencoded 1.2.2 -> 1.2.3, and changes no other package.
+  Anything else (a newer patch released meanwhile, an extra crate, aws-lc-*) returns here before the save.
+  Then `cargo deny check advisories bans sources` and `cargo audit` on that lock, with the database date.
+- U7: the lock gains no package from wasm-bindgen; web/package-lock.json holds typescript 6.0.3 (+ @types/node,
+  vite's 19 if kept) and nothing more.
+- U8: its package-lock.json's set equals webdriverio 10.2.0's tree as resolved that day; a package with an install
+  script beyond edgedriver and geckodriver, or any OSV hit beyond minimatch, returns here.
+- Index checksums (sha256): instant-acme 0.8.5 9f05ad37c421b962354c358d347d4a6130151df9407978372d3ad7f0c8f71a64;
+  hyper 1.12.0 2c3e324da4c95177d6291d4c8730197c0d1822f8a9766814a4a44fa5ab797c9c; hyper-util 0.1.21
+  ddc03d96684f9226b8a787cdb71488417b53ab5ea8fdb1dac946cb9431cc8bff; hyper-rustls 0.27.10
+  dfa8e654703247911e29c23fbeaa261834bd9bb74efba2f9acddc37bfb127f53; h2 0.4.20
+  7d29020232d6aa3fb1daca64c1127cf662cf97f254ae16c18c05b8ab635fc118; http-body 1.1.0
+  ca2a8f2913ee65f60facd6a5905613afaa448497a0230cc41ce022d93290bc2c; http-body-util 0.1.5
+  23169fe34a5fbcdd3f3862e78fb9b6fccd5f02a6dc6f732547005d45631ce71c; httpdate 1.0.3
+  df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9; tokio-util 0.7.20
+  e464cf451ba96ebfc6f9b6542f17ee8b8956e33f1e40d9690624e59d7a7f8a4b; want 0.3.2
+  ec4cdd0dd910afe868b7ef477227d8d538b46b3075031afee8a9f2acb0a2ed0b; try-lock 0.2.5
+  e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b; atomic-waker 1.1.2
+  1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0; fnv 1.0.7
+  3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1; tower-service 0.3.3
+  8df9b6e13f2d32c91b9bd719c00d1958837bc7dec474d94952798cc8e69eeec3; async-trait 0.1.92
+  82f6aeea286b8eb4dd3431a1be1b59d290ace00f5bfd8e2a159bc2a05e2c1667; pem 4.0.0
+  d354a98a3d1251555de99e8fdd8afda05573c31b82f59063a7b0a29b5527f120; base64 0.23.1
+  ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5; url 2.5.9
+  f00cd2407bb42c0ef17be88d4cf020f5cceffd121665bac9b8b9493a369b3b1a; form_urlencoded 1.2.3
+  afa489199eaffb1211795df1c6236ce1ad0d41a6fa45250add73e3b02420f06e; wasm-bindgen-cli 0.2.130 (tool)
+  c37f6904387d19a319525c74af274c73912f3871c35555aa49f3ea64ebb2fc7a.
+- dependency-check.md per unit, in U5's shape (header naming this answer and its conditions, then `sha256  path` for
+  every changed Cargo.toml / Cargo.lock / package.json / package-lock.json at the cleared content).
+- Blocks: nothing blocks a unit's start. U6's merge needs the url bump to pass its own deny check; U8's specs need
+  SEC-R1D-2 and -3 in the spec config before any run on the laptop.
+
+DONE
