@@ -156,7 +156,7 @@
   vulnerabilities, dependency-check.md released, pushed (aa5c62b); `cargo fetch --locked`; `cargo check --workspace
   --all-targets --locked` 0 warnings. `<base>` aa5c62b68aecfe2fabd94a74915eb58cf0598fb4 (709/806). Runner
   u6a-run.sh (u4f-run.sh, names only: diff shows only names). **Builder launched 14:2x** (general-purpose, opus, xhigh,
-  worktree; notes u6a-build.md in its worktree). Started a day early on my lean: the plan said Mon 23.
+  worktree .claude/worktrees/agent-a95ebf14368f277ff, notes u6a-build.md there). A day early on my lean (plan: Mon 23).
 - **U8's brief rev 1 DRAFTED 14:3x** (u8-brief.md, 368 lines; notes infra-u8-brief.md): about 2,150 added, likely
   2,900-3,250 (off the lane, no date moves); R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 20 min; planned R2
   Sat 12 Dec, R3 Sun 13, R5 Mon 14, close Fri 18 (holds at middle sizes, about Mon 21 at the top); asks U6c a ~20-line
