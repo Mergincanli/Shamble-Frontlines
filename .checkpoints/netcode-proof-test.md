@@ -168,8 +168,10 @@
   snapshot f7d79ebd… applied (spikes/ = a289def's outside results/); 14 files +2,674 -194, each byte-equal to the
   worktree's; gate --no-smoke PASS; committed before M5 ended (the hook; the files are R6's twice-checked tree).
   **CI green on b4e1f43** (gate 44969638312 and 44969642476, toolchain 44969638333 and 44969642481: push and PR).
-  **M5 check.mjs RUNNING** on b4e1f43's tree (main-run.sh, .gate/u4f2-merge/m5-check.log, task bpv9732vc). Then the
-  advisor's head check of b4e1f43, c-u4f-r2.mjs whole, D2, -21's set (report: Block 4's table).
+  **M5 PASS 01:22:52** (.gate/u4f2-merge/m5-check.log; diff 445b8f9d… = b4e1f43's spikes/): all 11 steps; test 1,070.2
+  s; 709/806; wasm 0 mismatching; marks 81; self 78/78; redact 10/10. P27 01:2x (5.4 GiB; free 8,210,309,120 B).
+  **The advisor's head check of b4e1f43 RUNNING** (ad46fe8f3f1b5f74c; out advisor-u4f2-head.md). Then c-u4f-r2.mjs
+  whole (21 rows), D2, -21's set (49 runs, two judge calls; report: Block 4's table).
 - **The re-plan SENT to him 00:5x UTC** (replan.md): the advisor's one review APPROVE WITH CONDITIONS
   (advisor-replan.md: ADV-RP-1 High, the moved marks' hand-off; -2 to -9 Medium; -10 to -16 Low); P1-P6 pasted word
   for word, Lows folded in: no re-check. His four: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0. After his yes: the
