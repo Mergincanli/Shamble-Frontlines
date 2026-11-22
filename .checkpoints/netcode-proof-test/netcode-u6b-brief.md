@@ -23,7 +23,7 @@ is rewritten whole with Write at each step.)
 - N3 cut from the uncut T1-T5 (replan-units.md:11-31): second crate's new code, C-U6-12, Origin checks, -25's
   DelayStream question (:26), per-session SetProfile/TriggerBurst/BlockUdp controls (:24-25), yet :59 keeps "SetProfile"
   and "B1 range check" in T5: read as the DelayStream method + WsServer per-peer hook and the range check before
-  add_burst, called later by U6e's ControlSocket (RoomControl has SetPeerProfile and PeerBurst ≤ 1,000 ms:
+  add_burst, called later by U6e's ControlSocket (RoomControl has SetPeerProfile and PeerBurst <= 1,000 ms:
   proto/src/control.rs:363-384).
 - N4 S8b (:59, 75) keeps the cert at start; live swap CUT (:31). U6-Q17 terms: (1) per-slot 0700 dirs cut (:28-30) ->
   lean key in memory only; (2) swap cut; (3) cert-hash.json is U6c's H1; (4) PM-0006-27 MOVED (replan-marks.md:98), so
@@ -56,4 +56,10 @@ is rewritten whole with Write at each step.)
   promote it for WtClient/WsClient.
 - N14 security-r1-deps.md:249-253 is written for "U6" whole (17 instant-acme packages = U6c's; url done in U6a):
   U6b's slice adds no package; its own content (wtq features, rcgen entry, features, aws-lc removal) needs a short read.
-- Step 6 DONE. Step 7 (brief) next.
+- Step 6 DONE.
+- Step 7 DONE: u6b-brief.md rev 1, 411 lines, widest 120 chars (python char count), sections at :12, :42, :146, :165,
+  :222, :294, :325, :352, :360, :375, :403; sha256 b147a696199b4c12... Every quote in section 4 checked as a substring of
+  its source (plan.md:1254 joined on <br>; advisor-u6a-brief.md; advisor-u6-brief.md; security-r1-deps.md): 28 of 28.
+  Size about 2,700 (2,500-2,900), likely 3,650-4,050, stop past 6,000; +46 measured, +48 bites; 15 plants; Q-U6B-1..6.
+  Cite fixes made in the rewrite: plan.md:516 (not :515), :603-606 and :607-608, u3c-plan.md:171-191.
+- Step 8: hand-back. DONE.

@@ -159,8 +159,11 @@
 - **U8's brief rev 1 DRAFTED 14:3x** (u8-brief.md, 368 lines; notes infra-u8-brief.md): about 2,150 added, likely
   2,900-3,250 (off the lane, no date moves); R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 20 min; planned R2
   Sat 12 Dec, R3 Sun 13, R5 Mon 14, close Fri 18 (holds at middle sizes, about Mon 21 at the top); asks U6c a ~20-line
-  TCP-model test change (S14's burst half). **The advisor's check running** (advisor-u8-brief.md). U6b's brief
-  drafting (netcode-architect: u6b-brief.md, notes netcode-u6b-brief.md).
+  TCP-model test change (S14's burst half). **The advisor's check running** (advisor-u8-brief.md).
+- **U6b's brief rev 1 DRAFTED 14:4x** (u6b-brief.md, 411 lines; notes netcode-u6b-brief.md): about 2,700 added, likely
+  3,650-4,050 (re-plan 2,205); lane before R1 about 9,950-11,350 likely (R1's date at risk: the advisor rules); lever
+  ~250 lines to U6e; Block 0 manifest changes (web-transport-quinn and rcgen on ring; aws-lc-rs likely leaves the lock)
+  need security's own short read (after a seat frees). **The advisor's check running** (advisor-u6b-brief.md).
   **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
   @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
   to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding
