@@ -14,7 +14,7 @@ Read only; no builds. Severity on CLAUDE.md's one scale.
 7. Order and R1's date.
 8. Verdict, findings ADV-RP-n, paste-ready replacement text.
 
-**Resume here:** blocks 0-7 written (6-7 at the end); next block 8 (verdict, findings, paste text).
+**Resume here:** all blocks 0-8 written; review complete.
 
 ## 1. NPT-TRIM's asks, each in its own terms
 | Ask (history.md) | Answered? | Where / gap |
