@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-22 13:2x UTC: his re-plan answers (12:54 UTC) recorded; PACK-P0 (b) DONE (13,229 MiB free);
-  the moved-mark block sent (moved-block.md). Next: U4's report.
+- **Last update:** 2026-11-22 19:5x UTC: resumed after the spend-limit cut of 15:47-19:44 (Cuts block); U6a's builder
+  on its end checks after a disk-floor stop and part-clean; U8's builder on Block 9; the advisor checking U6c's brief.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -134,7 +134,7 @@
   0 failed, 0 skipped; marks 81; self 78 of 78; deps 137 crate files; wasm 27000 ticks, 0 mismatching) but refs 1463
   tracked files and redact 307 items (the light run at d4654df; 0ad9661: 1382 and 306). spikes/ outside results/ is
   unchanged since 0ad9661.
-- Disk (2026-11-22 13:2x UTC, after PACK-P0 (b)): 13,229 MiB free (the floor 4,096); still unpacked (none covered by
+- Disk (2026-11-22 15:5x UTC, after U6a's part-clean): 11,334 MiB free (floor 4,096); still unpacked (none covered by
   his packing words): u4r-P3-d66e23cd78f2 298 MiB, u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741,
   u4r-P2-fc411116c1f1 623, u4f-20-350677f0aef2 434, u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366,
   u4f-47-b57221ed139d 51.
@@ -148,31 +148,35 @@
   U4g's brief and U4f2's brief check: history.md:7273-7311; U4G-Q2 before -58's set only). U4's report folds them.
 - **The re-plan APPROVED** (replan.md; advisor-replan.md; his answers history.md:7595-7607); the moved-mark block sent
   (moved-block.md: 29 moved marks, 12 kept marks' moving parts; bars by ADR row and marks.json c1935a5b…).
-- **U6a** (brief u6a-brief.md rev 1.1, sha256 c109691a…: the advisor's APPROVE WITH CONDITIONS 1-8 and SEC-U6AD-1 to
-  -6 in its section 0.1; drafter's notes netcode-u6a-brief.md). **Size line:** about 2,345 added, likely 3,150-3,800,
-  the stop past 6,000; R1 Thu 3 Dec holds with no slack (lane before R1 about 9,250-10,600 likely lines in 8 days).
-  **Block 0 DONE** (evidence u6a-block0.md): url 2.5.9 and the five manifest lines (3e80e05), deny.toml's
-  allow-wildcard-paths (6aa78ff, security's section 7), deny "advisories ok, bans ok, sources ok", audit 0
-  vulnerabilities, dependency-check.md released, pushed (aa5c62b); `cargo fetch --locked`; `cargo check --workspace
-  --all-targets --locked` 0 warnings. `<base>` aa5c62b68aecfe2fabd94a74915eb58cf0598fb4 (709/806). Runner
-  u6a-run.sh (u4f-run.sh, names only: diff shows only names). **Builder launched 14:2x** (general-purpose, opus, xhigh,
-  worktree .claude/worktrees/agent-a95ebf14368f277ff, notes u6a-build.md there). A day early on my lean (plan: Mon 23).
+- **U6a** (brief u6a-brief.md rev 1.1, sha256 c109691a…; conditions 1-8 and SEC-U6AD-1 to -6 in its 0.1). **Block 0
+  DONE** (u6a-block0.md; pushed aa5c62b: url 2.5.9, five manifest lines, deny.toml's allow-wildcard-paths; deny and
+  audit clean). `<base>` aa5c62b68aecfe2fabd94a74915eb58cf0598fb4 (709/806); runner u6a-run.sh. **Builder** (14:2x, a
+  day early; worktree .claude/worktrees/agent-a95ebf14368f277ff, notes u6a-build.md there, copy here): blocks 1-8
+  DONE, **5,460 added** (likely was 3,150-3,800; stop past 6,000); tests 744/844 (+35/+38); 3 bites and P7 shown;
+  check2 9 of 11 (doc and redact fixed, not re-run). 15:40 stop at the 4 GB floor: snapshot wip/u6a-build.patch
+  a9f8b6e0… (19 files; 1965437); part-clean `--profile dev` 9.0 GiB (3,581 -> 11,334 MiB); resumed 15:47, cut, again
+  19:4x: end checks running (check.mjs, plants P1-P6 and P8-P11, 20 starts). Its F1, F3, F4, F7, F9, O1, O2 go to
+  the round (netcode and test, xhigh); then brief section 10's close.
 - **U8's brief rev 1 DRAFTED 14:3x** (u8-brief.md, 368 lines; notes infra-u8-brief.md): about 2,150 added, likely
   2,900-3,250 (off the lane, no date moves); R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 20 min; planned R2
-  Sat 12 Dec, R3 Sun 13, R5 Mon 14, close Fri 18 (holds at middle sizes, about Mon 21 at the top); asks U6c a ~20-line
-  TCP-model test change (S14's burst half). **The advisor's check: APPROVE WITH CONDITIONS C1-C10, L1-L5** (one High,
-  ADV-U8-1, closed by C1 word for word; Mediums read in full); **rev 1.1 APPLIED** (section 0.1; 131 pasted lines
-  checked equal to the ruling). npm DEP-HOLD DONE: lock (webdriverio 10.2.0, --before 2026-11-15, 167 entries,
-  scripts only edge/geckodriver) cleared by security-u8-deps.md (the 4 moderates = minimatch's one advisory chain,
-  accepted; conditions in u8-brief.md 0.1); committed 2ad2829 with dependency-check.md's U8 block. **Builder launched
-  15:0x** (general-purpose, opus, xhigh, worktree; `<base>` d854ae1375ab…; brief sha256 3d102be9…; notes u8-build.md).
+  Sat 12 Dec, R3 Sun 13, R5 Mon 14, close Fri 18 (holds at middle sizes, about Mon 21 at the top). **The advisor's
+  check: APPROVE WITH CONDITIONS C1-C10, L1-L5** (one High, ADV-U8-1, closed by C1 word for word; Mediums read in
+  full); **rev 1.1 APPLIED** (section 0.1; 131 pasted lines checked equal to the ruling). npm DEP-HOLD DONE: lock
+  (webdriverio 10.2.0, --before 2026-11-15, 167 entries, scripts only edge/geckodriver) cleared by security-u8-deps.md
+  (the 4 moderates = minimatch's one advisory chain, accepted; conditions in u8-brief.md 0.1); committed 2ad2829 with
+  dependency-check.md's U8 block. **Builder launched 15:0x** (general-purpose, opus, xhigh, worktree; `<base>`
+  d854ae1375ab…; brief 3d102be9…; notes u8-build.md); its one npm install done 15:45; cut 15:47; resumed 19:4x.
 - **U6b's brief rev 1.1** (u6b-brief.md; notes netcode-u6b-brief.md): the advisor's APPROVE WITH CONDITIONS 1-8 (no
   Critical or High; Mediums ADV-U6BB-1 to -4 read in full) applied in section 0.1 (66 lines checked equal); the lever
   taken (about 250 lines to U6e); about 2,650 added, likely 3,600-4,000; lane before R1 about 9,900-11,300 likely: R1
   Thu 3 Dec holds with no slack. **Security's Block 0 read DONE** (security-u6b-deps.md): all clear (with conditions);
   SEC-U6BD-1 corrects the lock diff to seven packages (242 → 235; recorded in the brief's 0.1); Block 0 after U6a merges.
-- **U6c's brief drafting since 15:1x** (netcode-architect: u6c-brief.md, notes netcode-u6c-brief.md). Day message
-  reminder at 23:05 UTC (trig_01967r39CKqT2qxdsbAS5sCP; the message saved as msg-2026-11-23.md first).
+- **U6c's brief rev 1 DRAFTED** (u6c-brief.md, 505 lines, sha256 13b0fe58…; notes netcode-u6c-brief.md; 1965437):
+  about 2,800 added, likely 3,800-4,200 (re-plan 1,950); the lane before R1 about 11,050-12,550 likely (drafter;
+  before U6a's actual 5,460); Q-U6C-1 to -8; six contradictions (a)-(f), four touching U8's brief. **The advisor's
+  check RUNNING from 19:4x** (advisor-u6c-brief.md); then rev 1.1 and security's short read of Block 0 (instant-acme
+  =0.8.5 and four direct crates, rcgen's pem, bots, the root store). Day message reminder 23:05 UTC
+  (trig_01967r39CKqT2qxdsbAS5sCP; saved as msg-2026-11-23.md first).
 - **Done today (details in commits and the files):** the R1 path's DEP-HOLD read (security-r1-deps.md: takers SEC-R1D-1
   U6a, -2/-3/-5/-6 U8 and R1, -4 U6c; @wdio/cli not cleared); PACK-P0 (b) five folders, free 4,760 → 13,229 MiB, each
   read back = listed (commits 47e4ee1, 1dc9751, 3d2c752, 4e7d9c2, 46915c1; archives .gate/netcode-proof-test/kept-logs/).
@@ -181,19 +185,15 @@
 - **Lessons:** never `cd` into an agent's worktree; a worktree agent starts at main, so its first step is `git merge
   --ff-only <lane commit>`; no shell loop or redirect for scratch files (an unanswered ask stalled 2 h on 2026-11-22).
   **Check-in ON again 13:22 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5, next 14:34; paused 08:40-13:22 while nothing ran);
-  saver b9flvzubm from 15:13 (to about 17:03; bx1nm13tz ended on time). Main f5030a3 (fetched 13:1x UTC: unchanged).
+  saver bksz5vu7x from 19:46 (to about 21:36; b9flvzubm ended on time). Main f5030a3 (fetched 13:1x UTC: unchanged).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
-- **2026-11-22 06:34:54 to 08:37:34 UTC** (a stall, then a container restart; nothing else ran: the set had ended at
-  05:30, the saver at 06:27 on time): my call at 06:34:54 (a shell loop writing scratch files by redirect) waited on an
-  approval prompt; the container came back about 08:34:28 (uptime). The notices: "[Tool call not completed: an approval
-  request was still unanswered when the message that follows arrived and was closed, so the action awaiting approval
-  did not run. Nobody refused it, so this is not the user's decision; ask again if it is still needed.]" and, at
-  08:36:55, "This session's worker process was restarted. If your previous turn was already complete, take no action
-  and wait for the next event. Otherwise, continue from where you left off." My reply wrongly took the turn as complete
-  ("No response requested."); resumed 08:37:34 by the check-ins of 06:34 and 08:34 (both read then): the report work.
-- **2026-11-21 20:20:20 to 23:08 UTC** (all three agents; the worker restarted twice): "You've hit your org's monthly
-  spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:40pm (UTC)". Resumed 23:08 by
-  SendMessage after the 23:05 trigger: no cargo running, tree clean (saver's last push 28e0ad2), builder's FP-2 whole.
+- **2026-11-22 15:47:28 to about 19:44 UTC** (both builders and this session; the worker restarted 18:36:52 and
+  19:43:12): "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets
+  7:40pm (UTC)". Nothing lost: U6a's builder, just resumed, ran nothing (last runner log 15:40; its tree re-snapshotted
+  = a9f8b6e0…); U8's builder's one npm install had finished (node_modules 15:45:29-15:45:33); the saver ended on time;
+  the check-ins of 16:34 and 18:35 read at 19:43. Resumed about 19:44 by his message "I hit my usage limit while you
+  were working, but it has reset now. Please continue from where you left off.": both builders by SendMessage, saver.
 - Earlier cuts, word for word in history.md: until 2026-11-17 from :5791 on; 2026-11-18 :6921-6932; 2026-11-19
-  :7124-7146, :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559.
+  :7124-7146, :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559,
+  :7618-7620; 2026-11-22 :7610-7617.

@@ -7605,3 +7605,16 @@ My answers to the five decisions (22 November), written with my stand-in Advisor
 6. Dates: with R1's run plan, give me planned dates for R2, R3, R5 and the close. Aim: the close on or before Friday 18 December; if that can't hold, tell me why in three lines.
 7. Hand-off: put the moved-mark block for my game chat in your next message. It goes to my main Advisor on Tuesday, before change-set 3's four questions.
 ```
+
+## Cuts by the spend limit, moved from the card word for word (2026-11-22 19:5x UTC)
+- **2026-11-22 06:34:54 to 08:37:34 UTC** (a stall, then a container restart; nothing else ran: the set had ended at
+  05:30, the saver at 06:27 on time): my call at 06:34:54 (a shell loop writing scratch files by redirect) waited on an
+  approval prompt; the container came back about 08:34:28 (uptime). The notices: "[Tool call not completed: an approval
+  request was still unanswered when the message that follows arrived and was closed, so the action awaiting approval
+  did not run. Nobody refused it, so this is not the user's decision; ask again if it is still needed.]" and, at
+  08:36:55, "This session's worker process was restarted. If your previous turn was already complete, take no action
+  and wait for the next event. Otherwise, continue from where you left off." My reply wrongly took the turn as complete
+  ("No response requested."); resumed 08:37:34 by the check-ins of 06:34 and 08:34 (both read then): the report work.
+- **2026-11-21 20:20:20 to 23:08 UTC** (all three agents; the worker restarted twice): "You've hit your org's monthly
+  spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:40pm (UTC)". Resumed 23:08 by
+  SendMessage after the 23:05 trigger: no cargo running, tree clean (saver's last push 28e0ad2), builder's FP-2 whole.
