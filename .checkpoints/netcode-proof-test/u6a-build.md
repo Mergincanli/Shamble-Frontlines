@@ -151,6 +151,46 @@ End: check.mjs both builds, plants P1-P11, bites x3.
 - Clean sha256 after the two fixes (supersede the earlier ones for these files): tick_loop.rs
   e2908a65ee88a9d6bb35eb8ee6da508f9512d1219c9cf2346abb2e32a3f65c79, server main.rs
   9ac7d64962de10be8dff35a5cdc4c2b97ec5b218e1640d48ea416a385f151e34.
+- **RESUMED** (coordinator: part-clean of the dev profile done, 11,333 MiB free; snapshot wip/u6a-build.patch
+  a9f8b6e0…1d39, 19 files, 5,460 added). Re-read: df 12 G free; the five plant files' sha256 equal the clean values
+  (tick_loop.rs e2908a65…5c79, main.rs 9ac7d649…1e34, proc_read.rs c562e475…6ae9, bots 5202e036…9334, client
+  1613a3f0…1ec7). Order: (1) check.mjs (check3.log); (2) plants; (3) touch and rebuild; (4) 20 starts.
+- **(1) check3.log DONE: all 11 steps PASS** (exit 0, 19:46:33-20:07:31 UTC; free 11,331 MiB at start; runner diff
+  850abb56…63f9, untracked 3c0a31cb…87d6): fmt 4.6 s; clippy 45.4 s; clippy-wasm32 12.3 s; doc 19.3 s; test 866.8 s
+  (measured 744 = 709 + 35, bites 844 = 806 + 38, 0 failed, 0 skipped; 0.81 of base's 1,070.2 s); deps 4.6 s; wasm
+  66.0 s (27,000 ticks, 0 mismatching; hash-map caught); refs 0.5 s (1,713 files); marks 7.0 s (81); self 2.5 s (78
+  of 78); redact 0.9 s (347 items, 0 findings). Provenance: the two `--no-run` builds exit 0; every npt-* crate
+  "Compiling" twice from this worktree's path.
+- **(2) plants, results** (each one `-x -k` runner call; restore sha256 checked after each):
+  P1 plant-p1.log: FAILS `s1_the_bounded_channels_count_a_flood_and_never_block_the_tick` (counted 0, want 5,905);
+  restored tick_loop.rs e2908a65…5c79 (clean). P2 plant-p2.log: FAILS
+  `s1_take_controls_messages_go_out_on_the_stream_their_framing_names_at_any_length` (Control, want FullState);
+  restored e2908a65… P3 plant-p3.log: FAILS `s1_the_tick_thread_takes_each_sessions_decoder_rtt_before_every_tick`
+  (None, want Some(42 ms)); first restore Edit matched twice and changed nothing (hash 4ed1a060…, no runner call
+  between), second restored e2908a65… P4 plant-p4.log: FAILS
+  `s1_a_tick_thread_panic_sends_room_ended_crash_and_writes_the_crash_record_and_footer` (no RoomEnded within 3 s);
+  restored e2908a65… P5 plant-p5.log: FAILS `s1_a_stall_runs_at_most_the_catch_up_cap_and_counts_the_dropped_time`
+  (30 ticks in the wake, want 7); restored e2908a65… P6 plant-p6.log: FAILS
+  `s1_a_replaced_session_is_kicked_and_closed_before_anything_else_is_routed_and_a_left_one_is_closed` ("A's Leave
+  was not routed: slot 0 is B's"); restored e2908a65… P8 plant-p8.log: FAILS
+  `proc_read::tests::s4_alone_leaves_out_only_the_tick_thread_and_kernel_threads_bound_to_its_vcpu` ("alone");
+  restored proc_read.rs c562e475…6ae9 (clean). P9 plant-p9.log: FAILS
+  `proc_read::tests::s4_the_steal_reader_reads_the_tick_vcpus_line_only` (27, want 100); restored c562e475…
+  P10 plant-p10.log: FAILS `c_u6_18_host_step_runs_input_then_the_endpoints_step_then_outgoing` ((101, 1), want
+  (0, 0)); restored bots lib.rs 5202e036…9334 (clean). P11 plant-p11.log: FAILS
+  `tests::s4_the_header_names_the_machine_and_carries_the_scenes_weapon_and_health` ("no entry found for key");
+  restored main.rs 9ac7d649…1e34 (clean). All five planted files at their clean sha256 after P11 (client lib.rs
+  1613a3f0… from P7). (3) next: touch and rebuild.
+- **(3) DONE** rebuild.log (20:11:18-20:14:25 UTC): touch + `cargo test -p npt-server -p npt-bots -p npt-client`
+  both builds, exit 0 both, 42 test binaries ok, 0 FAILED; npt-server, npt-bots, npt-client "Compiling" twice from
+  this worktree. Its tree hashes equal check3's (runner diff 850abb56…63f9, untracked 3c0a31cb…87d6): the final tree
+  is the one check3 passed, so no further check.mjs run is needed. Free disk at its start: 4,388 MiB.
+- **(4) STOP at the disk floor:** starts.log (20:15:07 UTC): "STOP: under 4 GB free" (3,859 MiB), runner exit 3,
+  nothing ran. The 20-start reading is not taken. Two debug builds (measured and bites, check3 then the rebuild)
+  took the 11.3 G back down. To resume: part-clean, then the starts.log command again (it builds the measured
+  npt-server binary first, since the rebuild's last build left the bites build at shared-target/debug/npt-server).
+- Final tree: `git diff HEAD --shortstat` 10 files, +1,570 -27 (all under spikes/netcode-proof; runner diff hash
+  850abb56…63f9); 9 new files (runner untracked hash 3c0a31cb…87d6) + these notes; added 5,460 in all.
 - Plant plan (each: Edit in place, one `-x -k` runner call on the named test, Edit back, sha256 = clean):
   P1 tick_loop.rs `ToTick` on std `channel()`/`send` (unbounded) → s1_the_bounded_channels_count_a_flood...;
   P2 `reliable_channel` = lab's `stream_of` copy → s1_take_controls_messages_go_out_on_the_stream...;

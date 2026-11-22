@@ -151,14 +151,14 @@
 - **The re-plan APPROVED** (replan.md; advisor-replan.md; his answers history.md:7595-7607); the moved-mark block sent
   (moved-block.md: 29 moved marks, 12 kept marks' moving parts; bars by ADR row and marks.json c1935a5b…).
 - **U6a** (brief u6a-brief.md rev 1.1, sha256 c109691a…; conditions 1-8 and SEC-U6AD-1 to -6 in its 0.1). **Block 0
-  DONE** (u6a-block0.md; pushed aa5c62b: url 2.5.9, five manifest lines, deny.toml's allow-wildcard-paths; deny and
-  audit clean). `<base>` aa5c62b68aecfe2fabd94a74915eb58cf0598fb4 (709/806); runner u6a-run.sh. **Builder** (14:2x, a
-  day early; worktree .claude/worktrees/agent-a95ebf14368f277ff, notes u6a-build.md there, copy here): blocks 1-8
-  DONE, **5,460 added** (likely was 3,150-3,800; stop past 6,000); tests 744/844 (+35/+38); 3 bites and P7 shown;
-  check2 9 of 11 (doc and redact fixed, not re-run). 15:40 stop at the 4 GB floor: snapshot wip/u6a-build.patch
-  a9f8b6e0… (19 files; 1965437); part-clean `--profile dev` 9.0 GiB (3,581 -> 11,334 MiB); resumed 15:47, cut, again
-  19:4x: end checks running (check.mjs, plants P1-P6 and P8-P11, 20 starts). Its F1, F3, F4, F7, F9, O1, O2 go to
-  the round (netcode and test, xhigh); then brief section 10's close.
+  DONE** (u6a-block0.md; pushed aa5c62b). `<base>` aa5c62b68aecfe2fabd94a74915eb58cf0598fb4 (709/806); runner
+  u6a-run.sh. **BUILT** (worktree .claude/worktrees/agent-a95ebf14368f277ff, notes u6a-build.md, copy here): blocks
+  1-8, **5,460 added** (likely was 3,150-3,800; stop past 6,000); check3 all 11 steps PASS (744/844, +35/+38; test
+  866.8 s); plants P1-P11 each fail their named test, restored; 3 bites by name; 20 starts p50 634 ms, max 979 ms
+  (debug, container, not judged). Final tree = wip/u6a-build.patch a9f8b6e0… (re-checked). Part-cleans 15:4x (9.0 GiB)
+  and 20:2x (8.6 GiB). **Round from 20:4x:** netcode seat running (u6a-review-netcode.md), test seat when a slot frees;
+  F1, F3, F4, F7, F9, O1, O2 to it. Merge: M3-M9 as U4f's (the pre-round merge check folded into M5: since `<base>` only
+  npm files and redact-check changed in spikes/, no Rust).
 - **U8** (brief u8-brief.md rev 1.1, 3d102be9…; notes infra-u8-brief.md; R1 3.55 h of 4 h billed, cap EUR 0.80, him
   about 2 h 40 min; planned R2 Sat 12 Dec, R3 Sun 13, R5 Mon 14, close Fri 18, about Mon 21 at the top). **BUILT 19:5x**
   (worktree builder, `<base>` d854ae1; cut 15:47-19:4x): blocks 0-11, 38 new files, **4,176 added** (likely was
