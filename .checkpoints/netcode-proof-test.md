@@ -167,8 +167,9 @@
   01:00:55** (u4f2-r6b.log, same tree; test 1,112.7 s; 709/806). **U4f2 MERGED at b4e1f43** (pushed 01:0x UTC):
   snapshot f7d79ebd… applied (spikes/ = a289def's outside results/); 14 files +2,674 -194, each byte-equal to the
   worktree's; gate --no-smoke PASS; committed before M5 ended (the hook; the files are R6's twice-checked tree).
-  **M5 check.mjs RUNNING** on b4e1f43's tree (main-run.sh, .gate/u4f2-merge/m5-check.log, task bpv9732vc). Then CI,
-  the advisor's head check of b4e1f43, c-u4f-r2.mjs whole, D2, -21's set (report: Block 4's table).
+  **CI green on b4e1f43** (gate 44969638312 and 44969642476, toolchain 44969638333 and 44969642481: push and PR).
+  **M5 check.mjs RUNNING** on b4e1f43's tree (main-run.sh, .gate/u4f2-merge/m5-check.log, task bpv9732vc). Then the
+  advisor's head check of b4e1f43, c-u4f-r2.mjs whole, D2, -21's set (report: Block 4's table).
 - **The re-plan SENT to him 00:5x UTC** (replan.md): the advisor's one review APPROVE WITH CONDITIONS
   (advisor-replan.md: ADV-RP-1 High, the moved marks' hand-off; -2 to -9 Medium; -10 to -16 Low); P1-P6 pasted word
   for word, Lows folded in: no re-check. His four: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0. After his yes: the
