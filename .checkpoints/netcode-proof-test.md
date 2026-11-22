@@ -5,8 +5,8 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-22 13:xx UTC: his re-plan answers (12:54 UTC) recorded; PACK-P0 (b) packing (below); the
-  moved-mark block written (moved-block.md) for today's message.
+- **Last update:** 2026-11-22 13:2x UTC: his re-plan answers (12:54 UTC) recorded; PACK-P0 (b) DONE (13,229 MiB free);
+  the moved-mark block sent (moved-block.md). Next: U4's report.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -130,10 +130,10 @@
   0 failed, 0 skipped; marks 81; self 78 of 78; deps 137 crate files; wasm 27000 ticks, 0 mismatching) but refs 1463
   tracked files and redact 307 items (the light run at d4654df; 0ad9661: 1382 and 306). spikes/ outside results/ is
   unchanged since 0ad9661.
-- Disk (D2, 2026-11-18 11:35 UTC, after the pack and the part-cleans): 12,154 MiB free (the floor 4,096); still kept:
-  u4r-P3-d66e23cd78f2 298 MiB, u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741, u4r-P2-fc411116c1f1 623,
-  u4r-P0-051995db9cea 3,249, u4r-P0-93509dfd7fd1 3,393, the c-u2 folders 998 each; the main folder's target 776. U4f's
-  sets and pre-runs need about 3,727 MiB.
+- Disk (2026-11-22 13:2x UTC, after PACK-P0 (b)): 13,229 MiB free (the floor 4,096); still unpacked (none covered by
+  his packing words): u4r-P3-d66e23cd78f2 298 MiB, u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741,
+  u4r-P2-fc411116c1f1 623, u4f-20-350677f0aef2 434, u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366,
+  u4f-47-b57221ed139d 51.
 - The packs so far (history.md, the old card's Key numbers :6523-6554): u4r-precheck-30, u4r-P2-ab10f058a828,
   u4r-B1-64f3307d5c7f, u4r-P3-0f066338dd8d (2026-11-18: 375 MiB back); each gave back about 72-73 % of its folder.
 - Mustafa's count at 9024840 (2026-11-17 19:04 UTC, against main): 72,678 Rust lines, 7,688 TypeScript and JavaScript,
@@ -150,7 +150,7 @@
 - **PACK-P0 (b)** (each list committed with its ruling, then packed; free MiB before → after; files read back = listed):
   c-u2-pm-0001-3-81c6d01e371b 4,760 → 5,364 (39/39; 47e4ee1); c-u2-pm-0001-3-65869918809f 5,364 → 5,967 (39/39;
   1dc9751); u4r-P0-051995db9cea 5,967 → 8,497 (30/30; 3d2c752); u4r-P0-93509dfd7fd1 8,497 → 11,156 (30/30;
-  4e7d9c2); u4f-21-f591dcf71ca6 11,156 → (150 files; 46915c1) packing. Archives in .gate/netcode-proof-test/kept-logs/.
+  4e7d9c2); u4f-21-f591dcf71ca6 11,156 → 13,229 (150/150; 46915c1). DONE. Archives in .gate/netcode-proof-test/kept-logs/.
 - **Moved or stopped by NPT-TRIM (what is built stays, for reference):** U4g's early half (blocks 1-4, 2,053 lines;
   snapshot wip/u4g-early.patch a78e2853…; worktree agent-abc25909b7dd4ad30 kept); U4g2's client half and U4h (briefs
   u4g-brief.md rev 2.1, u4h-brief.md rev 2.1 kept for the real game); U5 stopped after Block 3a (1,658 lines; snapshot
