@@ -5,7 +5,7 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-22 20:3x UTC, before his /compact (his words history.md:7630-7644): this card is the resume
+- **Last update:** 2026-11-22 20:4x UTC, after his /compact (his words history.md:7630-7651): this card is the resume
   source; Now holds my step and the next three; Running work holds every running agent and shell with its ID.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
@@ -65,14 +65,12 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-22 20:3x UTC; his rule before /compact: start nothing new until after it, history.md:7630-7644)
-- **My step:** the compact's card refresh; then waiting on two agents (Running work). Two slots free after the compact.
-- **Next 1, after the compact, one per free slot:** (a) U6a's test seat: test-engineer, opus, xhigh; evidence as the
-  netcode seat's (patch a9f8b6e0…, the builder's worktree by absolute paths, .gate/u6a/check3.log, plant-p*.log,
-  rebuild.log, starts2.log, u6a-build.md's F-items; runs only via u6a-run.sh); scope u6a-brief.md section 3 (counts,
-  plants' named tests, bites, timing tests, condition 5, F4, not verified) -> u6a-review-test.md (TR-U6A-n), ends DONE.
-  (b) The advisor's one check of U7's brief rev 1 (u7-brief.md, c9e1fb33…) as U6c's was (general-purpose, opus, xhigh,
-  main's advisor.md first; Q-U7-1 to -4, the contradictions in U7's line below, size, R1's date) -> advisor-u7-brief.md.
+## Now (2026-11-22 20:4x UTC, resumed after his /compact by his steps, history.md:7645-7651)
+- **My step:** waiting on three agents (Running work, 3 of 3); U6a's test seat started 20:3x (the card's "two slots
+  free" was wrong: one was free; named to him in the resume report).
+- **Next 1, when a slot frees:** the advisor's one check of U7's brief rev 1 (u7-brief.md, c9e1fb33…) as U6c's was
+  (general-purpose, opus, xhigh, main's advisor.md first; Q-U7-1 to -4, the contradictions in U7's line below, size,
+  R1's date) -> advisor-u7-brief.md.
 - **Next 2, 23:05 UTC:** the day message (trig_01967r39…), saved first as msg-2026-11-23.md, one screen: the Choices
   block's 2026-11-22 lines; sizes (U6a 5,460, U8 4,176; at 1.9-2.3 U6c 5,300-6,450, U7 4,200-5,050; stop past 6,000);
   R1 with about a day of slack and its triggers; F26 (mine, fixed); the cut 15:47-19:44; planned R2 Sat 12, R3 Sun 13,
@@ -146,10 +144,13 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (2 of 3):** (1) security ab80f7d9c82f327b9 (security-auditor, xhigh, from 20:1x): (A) F26's fix
+- **Agents running (3 of 3):** (1) security ab80f7d9c82f327b9 (security-auditor, xhigh, from 20:1x): (A) F26's fix
   2a9498d -> security-f26.md; (B) U6c's Block 0, the ruling's section 4 items 1-8 -> security-u6c-deps.md; scratch
   security-u6c/; resume from its files. (2) U6a's netcode seat a9a29bd03da0757ad (netcode-architect, xhigh, from 20:1x)
-  -> u6a-review-netcode.md (NR-U6A-n); runs only via u6a-run.sh; resume from its file.
+  -> u6a-review-netcode.md (NR-U6A-n); runs only via u6a-run.sh; resume from its file. (3) U6a's test seat
+  a4724cf284e77b73e (test-engineer, xhigh, from 20:3x) -> u6a-review-test.md (TR-U6A-n), scratch u6a-review-test/;
+  scope section 3 items 1-9 of its brief (counts, plants, bites, timing, carries, header, -2 parity, SERIES rows, not
+  verified); same runner; resume from its file.
 - **Shell and triggers:** the saver bksz5vu7x (checkpoint.mjs watch, from 19:46 to about 21:36; TaskStop it, restart in
   the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly); day message trig_01967r39CKqT2qxdsbAS5sCP.
 - **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950 (told at 20:0x, beyond its brief: the ruling's

@@ -7642,3 +7642,10 @@ I'm about to run /compact on this chat. First make sure nothing that lives only 
 4. Save with checkpoint.mjs and push. Check that the branch equals origin and git status is clean (or name what is held back, and why).
 5. Reply in one line: "Ready for /compact: card <sha>; running: <names>."
 ```
+- 20:32:28 UTC (transcript line 75573, uuid 359f5c6b-e71f-472e-9972-ec5114585c92), after his /compact:
+```
+The compact is done. Pick up exactly where you left off, rebuilding from the repo rather than the summary.
+1. Re-read your card in full; the rules in force it names, word for word in history.md (NPT-TRIM at :7561-7593 changes plan rev 3.3 and TEST-FIRST where they differ; my re-plan answers at :7595-7607); my words after them; replan.md; and the newest day message. Read each unit's brief and notes when your next step needs them, not all up front.
+2. Check the live state against the card: git status and the branch against origin; the task list and pending notifications; every agent, workflow and shell the card lists as running. Resume anything that stopped as SPEND-LIMIT (a) says, checking first what the card says to check. Start nothing twice.
+3. Then tell me in at most 8 lines: where the test stands (units done with their verdicts, units moved or stopped), what's running, the step you're on and the next ones, and what waits on me. If the card, the repo and the summary disagree, or something is missing, say what and stop. Otherwise carry on without waiting for me.
+```
