@@ -72,13 +72,12 @@
   2,250 added lines (about 2,700 at 1.2), the stop past 3,000; brief u4f2-brief.md rev 1.2 (`<base>` a289def, 642/739).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
-- **2026-11-21:** U4f2's second round with the netcode and test seats only (NPT-TRIM's default; the rust seat of
-  advisor-u4f2-r1.md:313-316 dropped). To name in the 2026-11-22 message.
-- **Moot under NPT-TRIM** (their work moved or stopped; not named): the 2026-11-21 entries for the advisor's U6, U5 and
-  U4h brief checks, SEC-U5D, U5-EARLY and U4G-EARLY (their text: this card at 0f744ba, and each advisor file).
-- The choices of 2026-11-20 (U4f-F1's round; the advisor's U4g brief rulings; the advisor's U4f2 round-1 ruling),
-  named in msg-2026-11-21.md (choices 1-3): history.md:7412-7433 (card_trim_1120i.py).
-- The choices of 2026-11-19 named in msg-2026-11-20.md: history.md:7177-7193 (card_trim_1120c.py).
+- **2026-11-22, U6a's brief (the advisor's rulings, advisor-u6a-brief.md §1-2; to name in the next day's message):**
+  -16's start timer, -2's room-log series, C-U6-16 (c), C-U6-14's first clause and the 0600 token file built in U6a;
+  T6's loss and space to U6d; taskset pinning; no wire change for C-U7-3; no engine-architect seat; C-U6-19's gate now
+  "before U6d's merge" with R1's browser legs one slot each; SEC-R1D-1's url bump as U6a's lock change (my lean).
+- Earlier choices, each named in its day's message: 2026-11-21's (U4f2's round 2 with netcode and test only; the ones
+  NPT-TRIM made moot: this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
 
 ## Next steps (NPT-TRIM's order; the re-plan fixes the rest)
 1. U4f2: DONE (u4f2-report.md, with -21's set report; results at 33d246f); its follow-ups go to STATUS (item 4).
@@ -100,7 +99,8 @@
   :78-85); the items the old card lists (history.md:6458-6461: Q15 (a), WS-RECONNECT-BAR (b), the PM-0001-31 pointer);
   from U4f-F1's round (advisor-u4f-f1-r1.md:153-169): NC-F1-3 (part 5's per-command order, one shot per command,
   collapsed throws), SA-F1-3's v2 rule (every press action has server-side rate state, or takes at most one edge per
-  command), and C-U6-19's session-start sentence.
+  command), and C-U6-19's session-start sentence; ADR 0001:1588's reading "per-CPU kernel threads bound to the tick
+  vCPU do not count" (advisor-u6a-brief.md condition 4).
 - **Carried past U4 (the old card's Open findings, history.md:6430-6464):** the advisor's U2 carries C1-C5 and its
   Note; C-U7-1; the U1 carries (C4, C6, A3, the results ledger, Q13, Q23); C6 widened (U6, before R3); JITTER-ORDER
   (parked: to him before R3 only if C6 shows the model's reordering moves a WebTransport result).
@@ -149,10 +149,12 @@
   marks.json c1935a5b…; build-plan lines read on main f5030a3) goes in today's message; PACK-P0 (b) below.
 - **U6a's brief rev 1 DRAFTED 13:4x** (u6a-brief.md, 279 lines; notes netcode-u6a-brief.md): about 2,350 added, likely
   3,150-3,800 (the re-plan said 1,675 / 2,250-2,500: about 1,000 more likely lines on the lane before R1); Q1-Q7 with
-  leans; six places the re-plan contradicts itself. **Running since 13:5x:** the advisor's one check
-  (advisor-u6a-brief.md). A cut: resume from its file (SPEND-LIMIT (a)). **Security's Block 0 (b) read DONE**
-  (security-u6a-deps.md): clear with conditions SEC-U6AD-1 to -6, no new package (Mediums -1, -3, -4 read in full:
-  build conditions, :99-112); binding check :119-137 at U6a's save; all go into the brief's rev 1.1.
+  leans; six places the re-plan contradicts itself. **The advisor's check: APPROVE WITH CONDITIONS 1-8** (no Critical
+  or High; Mediums F-A to F-D read in full; R1 Thu 3 Dec holds with no slack). **Security's Block 0 (b) read DONE**
+  (security-u6a-deps.md: SEC-U6AD-1 to -6, no new package; Mediums read in full). **Rev 1.1 APPLIED** (section 0.1:
+  both sets word for word; contradicting lines fixed in place). Security asked condition 1's (i) pin-utils and (ii)
+  cargo-deny/audit here (14:0x). Next: Block 0 by me on the lane (url bump, manifests, offline refresh, binding check
+  security-u6a-deps.md:119-137, deny and audit, dependency-check.md, push, `cargo fetch --locked`), then the builder.
   **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
   @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
   to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding

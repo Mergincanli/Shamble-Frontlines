@@ -1,14 +1,93 @@
-# U6a's brief, rev 1 (2026-11-22): the server core
+# U6a's brief, rev 1.1 (2026-11-22): the server core (the advisor's APPROVE WITH CONDITIONS 1-8 and security's SEC-U6AD-1 to -6 applied: section 0.1)
 **The unit:** the first piece of U6 as Mustafa's NPT-TRIM cut it (history.md:7561-7593; his answers of 2026-11-22,
 history.md:7595-7607: RE-PLAN-OK yes, R1 on Thursday 3 December). Its row: replan-units.md:58 (S1, S8a, C-U6-17 and
--18, T6, S4: 1,675 estimated, 2,250-2,500 likely), first needed by R1 for -1, -2, -16 and PM-0006-11. Build: Mon 23 Nov
-on the one cargo lane; round, fixes and merge Tue 24 (replan-units.md §7). Short by TEST-FIRST: what is built, how it
+-18, T6, S4: 1,675 estimated, 2,250-2,500 likely), first needed by R1 for -1, -2, -16 and PM-0006-11. Build Mon 23-Tue 24; round, fixes and
+merge Wed 25 (condition 8), on the one cargo lane. Short by TEST-FIRST: what is built, how it
 is tested, what is open; it points to the rest. Reference, never retyped: u6-brief.md rev 2.1 (the uncut brief),
 u6-facts.md (file:line facts), advisor-u6-brief.md (its conditions), U6's row plan.md:1254 (it was :1253 when
 replan-units.md and u6-brief.md cited it), u4f-brief.md sections 1 and 4 (the start, stops and build rules), and
 security-r1-deps.md (the R1 path's dependency read, DONE: SEC-R1D-1 is U6a's, section 5).
 **One advisor check** (NPT-TRIM), no re-check unless it finds a Critical or High. Section 9's seven questions are the
 only asks; every other choice goes by its lean, one line each (sections 1 and 5).
+
+## 0.1 Rev 1.1: the conditions (read first; each replaces or adds to the section or block it names)
+**The advisor's check** (advisor-u6a-brief.md, 2026-11-22): APPROVE WITH CONDITIONS; no Critical or High, so no
+re-check. Section 9's questions and the six places are ruled there (its sections 1 and 2): Q1 (a) -16's start timer in
+U6a; Q2 (a) -2's series in U6a's room log; Q3 C-U6-16 (c) and C-U6-14's first clause in U6a; Q4 T6's `loss` and
+send-buffer space to U6d with rate adaptation, `Send` here; Q5 taskset with terms (fixed path, cleared environment,
+every pin read back); Q6 no wire change, nothing joins U6a; Q7 no engine-architect seat. Its conditions, word for word
+(advisor-u6a-brief.md:223-269):
+1. **Block 0 (ADV-U6A-1).** Section 5's binding check is security-u6a-deps.md:119-137 with security-r1-deps.md:249-253
+   for (a); SEC-U6AD-1 to -6 go into section 6's bans by number. Before the deny and audit run, the main session asks
+   security-auditor, in one line: (i) how pin-utils 0.1.1 RUSTSEC-2026-0441 (unmaintained, loom's cfg(loom) edge) is
+   handled, since deny.toml's `ignore = []` with `[graph] all-features = true` reports it (security-u5-deps.md:241-243)
+   (my lean: an ignore entry with its reason and date, as deny.toml:9 provides, as its own one-line deny.toml change
+   read by security-auditor); (ii) its yes to cargo-deny 0.22.0 and cargo-audit 0.23.0 here, cleared "for Block 8 only"
+   (dependency-check.md:9-10). "Clean" then means no advisory but the one it names; anything else cargo-deny reports
+   (its first recorded run on this lock) goes back to security-auditor before the save. After the save, `cargo fetch
+   --locked` on the lane so the offline builder finds the bumped sources; if `cargo update -p url --precise 2.5.9`
+   will not move form_urlencoded, `cargo update -p form_urlencoded --precise 1.2.3` first, and the diff check decides.
+2. **C-U6-19's gate (ADV-U6A-2).** Section 4's gate line reads: "Until U6d merges, U6a's, U6b's, U6c's, U7's and U8's
+   briefs and R1's run plan each state in one line that their tests or runs hold no throwing or rejoining hostile
+   client and no client restarted mid-run, or bring C-U6-19 first. In R1 each browser leg (each browser on each
+   transport, the QUIC-blocked fallback, -36's three) joins its own slot once, or the room restarts between legs; the
+   token file holds a slot for every leg. SA-F1-1 stays open until U6d merges."
+3. **OPEN and npt-super (ADV-U6A-3).** Block 3: "U6a's OPEN means the room built and TickLoop running; U6b's brief
+   moves it after both listeners accept and the WebTransport certificate is made, so spawn to Open covers a real start
+   (ADR 0001:484, :1604); U6a's container readings are a lower bound, never -16's evidence." Block 6 adds a hold form:
+   npt-super starts a run's room, times it to OPEN, writes the event, keeps the room until its own end (stdin held
+   open, closed at npt-super's end) and records its exit; `time-starts` is N of those with no hold; so U8's run plan
+   starts every room through npt-super (marks.json -16's notes: "every room start in every run").
+4. **`alone` (ADV-U6A-4).** Block 4 states: "A task counts against `alone` when its allowed list holds the tick vCPU,
+   except the tick thread and kernel threads bound to that vCPU only (PF_KTHREAD in /proc/<pid>/task/<tid>/stat's
+   flags, allowed list exactly the tick vCPU); an unbound kernel thread counts." Section 3's affinity fixtures add a
+   per-CPU kernel thread on the tick vCPU (excluded), an unbound one (counts) and a user thread (counts). Section 2
+   carries to U8's brief: R1's run prep moves every movable kernel thread and the unbound workqueue mask off the tick
+   vCPU besides the slices, and R1's bring-up reads `alone` once before the first measured run. The reading "per-CPU
+   kernel threads bound to the tick vCPU do not count" of ADR 0001:1588 joins the readings-PR list on the card.
+5. **Build traps and small fixes (ADV-U6A-5 to -10).** Section 6: PM-0006-11/no-smt-map planted in npt-server (npt-log
+   has no `bites` feature); C-U6-17's test on a test-local delaying `Link` over Loopback (server/tests/common/mod.rs:82's
+   pattern), not npt-l1; npt-super's fake child without a manifest change; no new dev-dependency. Section 3: the binary
+   test asserts OPEN within the 5 s real-clock cap and reports the time (no 2 s bar here). Block 2 builds the writer
+   thread with the loop's series; Block 5 adds -2's fields to its record. `StealReader` stays pub(crate); U6c's brief
+   makes it pub if its probe lands outside npt-server. `cpu_read.changed` compares with a settings field the run
+   script fills from the run's first start (empty at the first start: `changed` 0). C-U6-17: every existing npt-client,
+   npt-server and npt-lab test and every pinned hash or recording passes unchanged; a moved pin stops the build and
+   comes to the advisor. `host_step`'s module text names the order lab's L1 sets ran (scenario.rs:1640-1689), and the
+   netcode seat confirms they match.
+6. **U6b's carries (ADV-U6A-11).** Section 2 lists for U6b's brief: OPEN's move (condition 3); `Kick(replaced)`
+   reaching the old client before the close on both transports; its security seat reads U6a's token minting and file
+   with the `Join` path.
+7. **Cites (ADV-U6A-12).** u6-facts.md:182-186; u4f2-report.md:135; replan-units.md:21-23; the -16 bite's reading in
+   the report's readings line.
+8. **The day line and size (ADV-U6A-13).** Section 0: "Build Mon 23-Tue 24; round, fixes and merge Wed 25." Section 8
+   adds: "R1 on Thursday 3 December still holds on these numbers, with no slack: the lane before R1 is about
+   9,250-10,600 likely lines in 8 days; one lost day and it slips (three lines to him at once). Lever, if the build runs
+   long: the four per-second reads no R1 mark reads go to U6e's S5."
+
+**Security's read of Block 0 (b)** (security-u6a-deps.md, 2026-11-22, DONE): clear with conditions, no new package.
+Its conditions, word for word (security-u6a-deps.md:98-117), go into section 6's bans:
+"Conditions (each a finding at the build review if broken; severity is the one it would carry then):
+- SEC-U6AD-1 (Medium): exactly `tokio.workspace = true`, `sha2.workspace = true`, `serde.workspace = true`,
+  `serde_json.workspace = true` in crates/server/Cargo.toml [dependencies] and `sha2.workspace = true` in
+  crates/super/Cargo.toml [dependencies]; no `features`, `default-features`, `optional` or version key; the workspace
+  Cargo.toml unchanged. No tokio io-std, process, signal, fs, io-uring, parking_lot or taskdump: stdin by std on its
+  own thread, children by std::process.
+- SEC-U6AD-2 (Low): settings read through `File::take(CAP + 1)` (or equal), refused above CAP before parsing; the
+  settings types `#[serde(deny_unknown_fields)]` with no `flatten`, `untagged` or `serde_json::Value` field; every
+  number range-checked before it sizes anything (the client count before any token or slot vector).
+- SEC-U6AD-3 (Medium): token file by `OpenOptions::new().write(true).create_new(true).mode(0o600)` (std's
+  OpenOptionsExt, no new crate), never a chmod afterwards; an existing path is refused (exit 2); a short or failed
+  /dev/urandom read is an exit, never a fallback; no token in any log, stdout line, panic message or Debug output (the
+  settings and token types carry no Debug, as roster.rs's Entry); the run script reads it, nothing else.
+- SEC-U6AD-4 (Medium): U6a binds and listens on no socket; no serde_json parse of bytes from a link, session or
+  socket in npt-server or npt-super.
+- SEC-U6AD-5 (Low): SHA-256 of a binary by a loop of `Read::read` into a fixed buffer and `Digest::update`; no
+  digest-io or any other new crate; the whole file never read into memory.
+- SEC-U6AD-6 (Low): npt-super's `Command` takes the program path and arguments as separate values, no `sh -c`; the
+  child's stdout read with a byte bound per line (e.g. `take`); a child past the deadline killed and then waited for,
+  its exit recorded; the child's stderr not copied into npt-super's log unbounded."
+Its binding check for U6a's save: security-u6a-deps.md:119-137 (condition 1); Block 0 runs in the main session.
 
 ## 0. Where things are
 - **`<base>`:** the lane head the main session fills at launch, after Block 0 (U4f2 merged; U4's report in), with its
@@ -63,8 +142,8 @@ only asks; every other choice goes by its lean, one line each (sections 1 and 5)
   per second `second.v.steal_permille` (the tick vCPU's `/proc/stat` steal), `rss_bytes`, `proc_cpu_permille`,
   `io_cpu_permille` (the runtime threads' schedstat) and `second.s.out_queue_count`; events `affinity` (start, end:
   `alone` when no other thread of any process may run on the tick vCPU, per-CPU kernel threads excluded;
-  `sibling_free` from the SMT map) and `cpu_read.changed`. Pinning: Q-U6A-5. C-U6-4: the steal reader is pub
-  (`npt_server::StealReader`) so U6c's probe writes the series "as npt-server does"; the carry closes there. Bite
+  `sibling_free` from the SMT map) and `cpu_read.changed`. Pinning: Q-U6A-5. C-U6-4: `StealReader` stays pub(crate);
+  U6c's brief makes it pub if its probe lands outside npt-server (condition 5). Bite
   PM-0006-11/no-smt-map: the header written without `smt`.
 - **Block 5, the room log for -2** (crates/server, room; ~250; Q-U6A-2): a writer thread fed fixed-size per-tick
   records (marks/README.md §1: never on the tick thread) writes `tick.v` `soldiers_count`, `smallest_team_count`,
@@ -114,7 +193,8 @@ only asks; every other choice goes by its lean, one line each (sections 1 and 5)
   bound and dropped time, bounded channels under a flood, decoding off the tick thread, register 96's RTT hand-off,
   `channel_of` on a full state above 262,144 B, kicked/left/replaced closing, the panic path (`RoomEnded(crash)`,
   crash record, footer, non-zero end), PhaseTimers' five values exact, one real-clock smoke (2 clients, 2 s) (10);
-  settings accepted and refused, the token file (0600, N distinct, absent from every log), `OPEN` within 2 s and
+  settings accepted and refused, the token file (0600, N distinct, absent from every log), `OPEN` within the 5 s real-clock cap with
+  the time reported (no 2 s bar here: condition 5) and
   exit 0 from `CARGO_BIN_EXE_npt-server`, exit codes (5); the steal, RSS, schedstat and affinity parsers on fixed
   /proc texts, kernel threads excluded, `sibling_free` on fixed SMT maps, `cpu_read.changed`, the header's machine
   and carry 60's params equal to `Scene::weapon()` and `health()` (8); the room log's -2 series on a fixed SS scene
@@ -135,7 +215,8 @@ only asks; every other choice goes by its lean, one line each (sections 1 and 5)
   both builds; counts as deltas on `<base>`'s: before = `<base>`'s measured and bites; after = at least +33 and +36.
   The test step's time reported against `<base>`'s; past 1.5 times it stops (u4f-brief.md section 1 item 5, TE31-10).
 - **Block 0's evidence:** each lock diff as section 5 binds it; `cargo deny check advisories bans sources` and
-  `cargo audit` on the bumped lock, both clean, with the advisory database's date.
+  `cargo audit` on the bumped lock, clean as condition 1 defines it (no advisory but the one security-auditor names),
+  with the advisory database's date.
 - **Container readings, reported, never judged:** 20 starts' spawn to Open (p50, max), the smoke's ticks and
   overruns, the affinity events with the tick thread pinned (4 vCPUs here, taskset present).
 - **The report gives:** the counts and provenance lines; each plant's failing test and restore hash; each bite's
@@ -173,9 +254,13 @@ only asks; every other choice goes by its lean, one line each (sections 1 and 5)
   "TickLoop, when `Room::join` reports a replacement, sends the old connection `Kick(replaced)` and closes it before
   routing anything else, and closes a kicked or left session;".
 - **C-U6-19's gate line** (register 119, U6-Q21): the re-plan moves C-U6-19 to U6d (replan-units.md:48-50, :61), so
-  "before U6a's merge" now reads "before U6d's merge", and U6a's brief states it: **U6a's tests hold no throwing or
-  rejoining hostile client and no client restarted mid-run; the one replacement test checks routing only, no press
-  or shot count.** SA-F1-1 stays open until U6d merges.
+  "before U6a's merge" now reads "before U6d's merge" (condition 2): "Until U6d merges, U6a's, U6b's, U6c's, U7's and
+  U8's briefs and R1's run plan each state in one line that their tests or runs hold no throwing or rejoining hostile
+  client and no client restarted mid-run, or bring C-U6-19 first. In R1 each browser leg (each browser on each
+  transport, the QUIC-blocked fallback, -36's three) joins its own slot once, or the room restarts between legs; the
+  token file holds a slot for every leg. SA-F1-1 stays open until U6d merges." U6a's line: **U6a's tests hold no
+  throwing or rejoining hostile client and no client restarted mid-run; the one replacement test checks routing only,
+  no press or shot count.**
 - **advisor-u6-brief.md, on U6a's blocks:** condition 1 (the rows U6a writes, section 3); condition 5 as re-placed
   above; condition 6 and ADV-U6B-7 (Block 0: "a sub-unit that changes any manifest or lock starts with Block 0";
   "U6a (npt-server's runtime and its own manifest)"); condition 7 and ADV-U6B-8 (every reviewer at xhigh; the
