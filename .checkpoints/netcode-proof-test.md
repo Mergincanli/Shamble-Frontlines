@@ -154,10 +154,15 @@
   ties to an R4/R5 re-run); replan-marks.md (214 lines; 48 kept, 24 moved, 9 flagged; leans 52/29; key claim checked);
   replan-units.md (222 lines; U6 cut to 9,200-9,450 + U6j; web-transport-quinn; DNS-01 by hand; R1 Wed 2 Dec no slack).
   PR #41 (R-PR) is on main; Chromium is pre-installed (/opt/pw-browsers).
-- **Running from 23:3x UTC (after a cut, resume each by SendMessage, reading its file first):** U4f2's round 2,
-  netcode a3a7030073725c17c (u4f2-review-r2-netcode.md) and test a90c1c66d72ec03ae (u4f2-review-r2-test.md), on the
-  fix pass's diff `git diff 3441d47f… 7c362a63…` (round 1's e9a0ae3e vs the final e33d14f0, each on a289def), each
-  asked about the bots lib.rs departure; the advisor a21a731e3efbb7dc4 on replan.md (out advisor-replan.md).
+- **U4f2 round 2 DONE 00:2x UTC** (fix pass's diff `git diff 3441d47f… 7c362a63…`): netcode APPROVE WITH FINDINGS
+  (NC-U4F2-R2-1 to -3, Low; u4f2-review-r2-netcode.md), test APPROVE WITH FINDINGS (TE-U4F2-R2-1 Medium, -2 to -6 Low;
+  u4f2-review-r2-test.md). Both: no re-run for the bots lib.rs departure (call sites + lag proof); into U4f2's report.
+  **FP-10 RUNNING from 00:2x** (builder resumed): TE-R2-1's per-run left-out/sent/unrejected line in c-u4f-runs.mjs and
+  c-u4f-r2.mjs; TE-R2-4's f16 exemption; NC-R2-2's comment; record lines. Lows NC-R2-2's case, NC-R2-3, TE-R2-2, -3,
+  -5: follow-ups. Then (mine): P27, R6 run 1, P27, R6 run 2, the merge, gate, check.mjs, CI, the advisor's head check,
+  c-u4f-r2.mjs whole, D2, -21's set; its report prints Block 4's table (u4f2-review-r2-test.md:127-133).
+- **Running:** the advisor a21a731e3efbb7dc4 on replan.md (out advisor-replan.md); the builder aa62d31b6fa5b9807 on
+  FP-10 (Block 10's "Resume here:"). After a cut, resume each by SendMessage, reading its file first.
 - **Moved or stopped by NPT-TRIM (what is built stays, for reference):** U4g's early half (blocks 1-4, 2,053 lines;
   snapshot wip/u4g-early.patch a78e2853…; worktree agent-abc25909b7dd4ad30 kept); U4g2's client half and U4h (briefs
   u4g-brief.md rev 2.1, u4h-brief.md rev 2.1 kept for the real game); U5 stopped after Block 3a (1,658 lines; snapshot
