@@ -5,13 +5,17 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-22 08:4x UTC: -21's set DONE (01:48-05:30 UTC: all parts PASS, 13 bites shown, no stop
-  condition); U4f2's report being written; the re-plan with him (sent 00:5x); a stall and restart recorded below.
+- **Last update:** 2026-11-22 13:xx UTC: his re-plan answers (12:54 UTC) recorded; PACK-P0 (b) packing (below); the
+  moved-mark block written (moved-block.md) for today's message.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
 
 ## Rules in force (his words word for word in history.md: read them there, never retype them)
+- **RE-PLAN answers, 2026-11-22 12:54 UTC (history.md:7595-7607):** RE-PLAN-OK yes (replan.md is the plan); MARK-NOTES
+  yes as replan.md:106-111 words them (the MOVED unit writes them, with a reviewer's read); LAPTOP (b) (R8 once he names
+  ML); PACK-P0 (b); R1 Thursday 3 December; dates for R2, R3, R5 and the close come with R1's run plan (aim: the close
+  by Friday 18 December, else three lines); the moved-mark block in today's message (to his main Advisor Tuesday).
 - **NPT-TRIM, 2026-11-21 21:01 Amsterdam (history.md:7561-7593; it changes plan rev 3.3 and TEST-FIRST where they
   differ):** KEEP U4f2 (FP-2, its review, the merge, -21's set), then U4's close with only its wire and server rows;
   U6 cut to the kept runs' needs (firewall admits only our machines; name what is cut; one WebTransport crate unless the
@@ -41,9 +45,9 @@
 - **2026-11-15 13:35 (:2125, :2127):** a new bar, or a change to one, comes to him before it is built; every
   marks.json or judge change gets a reviewer's read before its unit closes, named in the report in its own line.
 - **KEPT-LOGS (2026-11-15 08:20; .claude/CHECKPOINTS.md §11) and PACK-READ (a) (2026-11-17 10:43, :2204-2227):** only a
-  closed set's folder, by brief 8.1's procedure (c62h-bound-brief.md:485-501), never during a build or a set; never the
-  P0 folders (93509dfd7fd1, 051995db9cea), fc411116c1f1, fd4612050cd6 or the c-u2 folders without his word;
-  u4r-P3-0f066338dd8d is the last folder his yes covers.
+  closed set's folder, by brief 8.1's procedure (c62h-bound-brief.md:485-501), never during a build or a set; his
+  PACK-P0 (b) (history.md:7603) covers both P0 folders, the two c-u2 folders and u4f-21-f591dcf71ca6; fc411116c1f1 and
+  fd4612050cd6 still need his word.
 - **2026-11-14 (:2048-2051, the reading :2067-2075):** SIZE-CHECK: an M unit's plan is about 3,000 added lines; past
   6,000 the build stops and he gets three lines (what grew, why, the cheaper option). MAIN-52 (:2084-2085). /compact:
   ask at 35-40 % after the card is refreshed, then carry on.
@@ -62,7 +66,7 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now: U4f2's report (-21's set done); the re-plan with him (U4f's earlier text here: this card at 3f16454)
+## Now: the re-plan approved (2026-11-22); next U4's report, then the U6a-U8 briefs (U4f's text: card at 3f16454)
 - U4f's pointers: its brief and build-1 ruling history.md:7060-7088; LEAD-BOUND (a) and SIZE-U4F (a) :7492-7505; the
   -20 ruling and records :7195-7216 (-20's L1 PASSES on F1's fix, 46ca143). U4F2-SIZE (a) :7255-7271: about 1,700 to
   2,250 added lines (about 2,700 at 1.2), the stop past 3,000; brief u4f2-brief.md rev 1.2 (`<base>` a289def, 642/739).
@@ -78,9 +82,12 @@
 
 ## Next steps (NPT-TRIM's order; the re-plan fixes the rest)
 1. U4f2: DONE (u4f2-report.md, with -21's set report; results at 33d246f); its follow-ups go to STATUS (item 4).
-2. The re-plan: sent to him 00:5x UTC (replan.md); awaited: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0, and R1's day.
-3. After his OK: U4's kept wire and server rows, then U4's report; U6 (cut), U7, U8 as the re-plan orders them; the
-   MOVED change (marks.json and the judge, with a reviewer's read); Stop B; R1, R2, R3, R5; Stop C.
+2. The re-plan: APPROVED 2026-11-22 (history.md:7595-7607); PACK-P0 (b) and the moved-mark block done the same day.
+3. U4's report (it folds U4r's, U4f's and U4f2's; U4's kept server rows are U4k, after R1); then replan.md's order
+   (:89-94): U6a, U6b, U6c, U7's Rust half on the lane, U8 and U7's TypeScript beside it, each brief with one advisor
+   check; Stop B about Tue 1 Dec (R1's run plan with planned dates for R2, R3, R5 and the close: his item 6); R1 Thu
+   3 Dec; then MOVED (marks.json and the judge, MARK-NOTES' text, a reviewer's read), R1's report, U4k, U6d, U6e,
+   U6j; R2, R3, R5; Stop C.
 4. PR #40's closing checklist: the old card's Next steps (history.md:6350-6371): squash merge with the four cites
    re-pointed, no .checkpoints/ in the final tree, no wip patches, PROMOTE's one-pager, the readings to confirm, U4j's
    open findings.
@@ -135,28 +142,15 @@
 ## Running work
 - **Moved to history.md:7273-7311** (card_trim_1120f.py): U4f-F1 CLOSED (:7274-7280); U4g's brief to rev 2.1 (:7281-7299;
   U4G-Q1 now answered (b); U4G-Q2 before -58's set only); U4f2's brief check (:7300-7311; rev 1.2 at launch).
-- **U4f2** (its record u4f2-build.md, Blocks 1-10 and Part B2; reviews u4f2-review-*.md; rulings advisor-u4f2-r1.md,
-  -parta.md, -head.md; F-B-COUNT (a) history.md:7544-7551): round 1 REQUEST CHANGES (FP-1 to FP-10, FP-2 on his (a));
-  round 2 netcode and test APPROVE WITH FINDINGS (TE-U4F2-R2-1 Medium fixed by FP-10); R6 A and B PASS (709/806; test
-  1,155.5 s, 1,112.7 s); MERGED at b4e1f43 (14 files +2,674 -194, byte-equal to R6's tree; committed 01:03:34 UTC
-  before M5 ended: acceptable, stated in the report); CI green (44969638312/-333, 44969642476/-481); M5 PASS 01:22:52
-  (diff 445b8f9d…); head check APPROVE WITH FINDINGS (ADV-U4F2H-1 to -3 Low; the bots lib.rs departure accepted,
-  nothing re-runs); D2 8,595,312,640 B free; the 21 rows (92ed9a8; .gate/netcode-proof-test/u4f-r2-92ed9a8f03e0/
-  r2.txt): 20 on expect (p14 = p1, 900 ticks; kind 7 on p1, p7, p14, p17: 0/73/0), p12 on the corrected text (-3).
-- **-21's set DONE 01:48-05:30 UTC** on f591dcf (spikes/ = b4e1f43's; free 8,204,316,672 B before, 4,997,857,280 B
-  after; log .gate/u4f2-sets/set21.out): 49 runs, all exit 0, 253-311 s each. Measured call: PM-0001-2's SS band PASS
-  on all 24 runs (shots 685.77-695.66) and all 8 of -21's parts PASS (forged, clamp, fast-clock, lag-switch; A and B;
-  seeds 1-3). Bites call: all 13 shown, each forged bite on its own kind only. Kind 7 left out 18, 17, 16 (A) and 8,
-  15, 12 (B), every other kind 0; unrejected 0 on every forged measured run; every forged run has its record: no stop
-  condition (point 6.5). Results spikes/netcode-proof/results/u4f/f591dcf71ca6/pm-0001-21/ (untracked: commit with the
-  report); logs .gate/netcode-proof-test/runs/u4f-21-f591dcf71ca6/ (3.0 GiB; packed only on his word); scratch reader
-  setread.mjs and setread.out in the scratchpad. **U4f2's report DONE** (u4f2-report.md; the results committed at
-  33d246f; C-U4F2-8's missed plan row written, plan.md:378-381; the 11:15 reminder deleted). Next: his answers to the
-  re-plan, then its order (U4's report folds U4f2's).
-- **The re-plan SENT to him 00:5x UTC** (replan.md): the advisor's one review APPROVE WITH CONDITIONS
-  (advisor-replan.md: ADV-RP-1 High, the moved marks' hand-off; -2 to -9 Medium; -10 to -16 Low); P1-P6 pasted word
-  for word, Lows folded in: no re-check. His four: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0. After his yes: the
-  moved-mark paste block for his game chat (P6 item 2), then the units' briefs. A cut R6 run is re-run whole (P27 first).
+- **U4f2 CLOSED** (merged b4e1f43; -21's set PASS at L1, 13 bites shown; report u4f2-report.md, results 33d246f; its
+  record, rulings and set lines: this card at 00520b5). U4's report folds it.
+- **The re-plan APPROVED** (replan.md; the advisor's review advisor-replan.md; his answers history.md:7595-7607). Done
+  today: the moved-mark block (moved-block.md: 29 moved marks and 11 kept marks' moving parts, bars by ADR row and
+  marks.json c1935a5b…; build-plan lines read on main f5030a3) goes in today's message; PACK-P0 (b) below.
+- **PACK-P0 (b)** (each list committed with its ruling, then packed; free MiB before → after; files read back = listed):
+  c-u2-pm-0001-3-81c6d01e371b 4,760 → 5,364 (39/39; 47e4ee1); c-u2-pm-0001-3-65869918809f 5,364 → 5,967 (39/39;
+  1dc9751); u4r-P0-051995db9cea 5,967 → 8,497 (30/30; 3d2c752); u4r-P0-93509dfd7fd1 8,497 → (30 files; 4e7d9c2);
+  u4f-21-f591dcf71ca6 next. Archives in .gate/netcode-proof-test/kept-logs/.
 - **Moved or stopped by NPT-TRIM (what is built stays, for reference):** U4g's early half (blocks 1-4, 2,053 lines;
   snapshot wip/u4g-early.patch a78e2853…; worktree agent-abc25909b7dd4ad30 kept); U4g2's client half and U4h (briefs
   u4g-brief.md rev 2.1, u4h-brief.md rev 2.1 kept for the real game); U5 stopped after Block 3a (1,658 lines; snapshot
@@ -167,8 +161,8 @@
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch);
   no shell loop or redirect for scratch files (it asks, and an unanswered ask stood the session still 2 hours on
   2026-11-22): scratch by Write, one simple command per call (the 2026-11-16 rule).
-  **Check-in PAUSED 08:40 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5: no agent or workflow runs; on again with the next agent);
-  saver bj5ft8umh from 08:40 (to about 10:30; btvxd9vpw ended 06:27, time up). Main f5030a3 (unchanged at 19:39, 11-21).
+  **Check-in PAUSED since 08:40 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5: no agent or workflow runs; on again with the next
+  agent); saver bj5ft8umh ended 10:30 (time up). Main f5030a3 (fetched 2026-11-22 13:1x UTC: unchanged).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-22 06:34:54 to 08:37:34 UTC** (a stall, then a container restart; nothing else ran: the set had ended at

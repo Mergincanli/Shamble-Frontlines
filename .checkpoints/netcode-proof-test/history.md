@@ -7591,3 +7591,17 @@ HOW YOU WORK FROM NOW ON (less paper, same quality):
 - Each unit's brief gets one advisor-agent check, with no re-check unless it finds a Critical or High. Choices inside a brief go by your lean, one line each in the day's message.
 - Papers are for resuming after a cut and for the reports. Stop writing papers whose only reader is other papers (card-trim scripts, copies of the transcript, restated rulings). The day's message stays one screen.
 ```
+
+## Decision: Mustafa, 2026-11-22 (it reached this chat at 12:54:49 UTC), in this chat: his answers to the re-plan (word for word)
+- **Mustafa, typed into this chat (transcript 2026-11-22T12:54:49.121Z, uuid 3919a8de-bbeb-4bea-879f-02279d7aea1c), verbatim** (the whole message, unchanged, in the fence below):
+
+```text
+My answers to the five decisions (22 November), written with my stand-in Advisor.
+1. RE-PLAN-OK: yes. All five readings of my words are right.
+2. MARK-NOTES: yes to both, worded exactly as in replan.md's MARK-NOTES (with -56's items 1, 2 and 4 narrowed there).
+3. LAPTOP: (b). R1 takes rough readings of those legs; R8 judges the seven marks once I name the laptop.
+4. PACK-P0: (b).
+5. R1-DAY: Thursday 3 December.
+6. Dates: with R1's run plan, give me planned dates for R2, R3, R5 and the close. Aim: the close on or before Friday 18 December; if that can't hold, tell me why in three lines.
+7. Hand-off: put the moved-mark block for my game chat in your next message. It goes to my main Advisor on Tuesday, before change-set 3's four questions.
+```
