@@ -1,0 +1,9 @@
+{
+  "name": "npt-browser",
+  "version": "0.0.0",
+  "private": true,
+  "description": "U8's browser scripts for the netcode proof test's runs (plain Node scripts on standalone WebdriverIO; security-r1-deps.md B5)",
+  "dependencies": {
+    "webdriverio": "10.2.0"
+  }
+}
