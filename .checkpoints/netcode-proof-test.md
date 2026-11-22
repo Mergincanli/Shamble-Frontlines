@@ -170,7 +170,8 @@
 - **U6b's brief rev 1.1** (u6b-brief.md; notes netcode-u6b-brief.md): the advisor's APPROVE WITH CONDITIONS 1-8 (no
   Critical or High; Mediums ADV-U6BB-1 to -4 read in full) applied in section 0.1 (66 lines checked equal); the lever
   taken (about 250 lines to U6e); about 2,650 added, likely 3,600-4,000; lane before R1 about 9,900-11,300 likely: R1
-  Thu 3 Dec holds with no slack. **Security's Block 0 read running** (security-u6b-deps.md; the advisor's section 4).
+  Thu 3 Dec holds with no slack. **Security's Block 0 read DONE** (security-u6b-deps.md): all clear (with conditions);
+  SEC-U6BD-1 corrects the lock diff to seven packages (242 → 235; recorded in the brief's 0.1); Block 0 after U6a merges.
 - **Done today (details in commits and the files):** the R1 path's DEP-HOLD read (security-r1-deps.md: takers SEC-R1D-1
   U6a, -2/-3/-5/-6 U8 and R1, -4 U6c; @wdio/cli not cleared); PACK-P0 (b) five folders, free 4,760 → 13,229 MiB, each
   read back = listed (commits 47e4ee1, 1dc9751, 3d2c752, 4e7d9c2, 46915c1; archives .gate/netcode-proof-test/kept-logs/).
@@ -181,7 +182,7 @@
   no shell loop or redirect for scratch files (it asks, and an unanswered ask stood the session still 2 hours on
   2026-11-22): scratch by Write, one simple command per call (the 2026-11-16 rule).
   **Check-in ON again 13:22 UTC** (trig_01EKqNqwZrQTVJ6caAyRrug5, next 14:34; paused 08:40-13:22 while nothing ran);
-  saver bx1nm13tz from 13:23 (to about 15:13). Main f5030a3 (fetched 2026-11-22 13:1x UTC: unchanged).
+  saver b9flvzubm from 15:13 (to about 17:03; bx1nm13tz ended on time). Main f5030a3 (fetched 13:1x UTC: unchanged).
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - **2026-11-22 06:34:54 to 08:37:34 UTC** (a stall, then a container restart; nothing else ran: the set had ended at

@@ -10,6 +10,16 @@ interfaces and the build rules), advisor-u6a-brief.md, security-r1-deps.md.
 only asks; every other choice goes by its lean, one line each (section 1).
 
 ## 0.1 Rev 1.1: the advisor's conditions (read first; each replaces or adds to the section it names)
+**Security's Block 0 read** (security-u6b-deps.md, 2026-11-22, DONE): all eight items of advisor-u6b-brief.md section 4
+cleared, most with conditions; ring across the TLS stack CLEAR, nothing weaker for our runs. **SEC-U6BD-1 (Medium)
+corrects condition 2's expected lock diff, as condition 2 sends it back:** seven packages leave (aws-lc-rs 1.19.0,
+aws-lc-sys 0.47.0, cmake 0.1.58, dunce 1.0.5, fs_extra 1.3.0, jobserver 0.1.35, pkg-config 0.3.34), 242 to 235
+entries; ` "aws-lc-rs",` leaves quinn-proto's, rustls's and rustls-webpki's arrays and ` "jobserver",` and ` "libc",`
+leave cc's (cc's `parallel` was asked for by aws-lc-sys alone); npt-server gains ` "rcgen",`; `git diff --numstat`
+`1	65`. Block 0's save follows security's own binding check, security-u6b-deps.md:269 onward (steps 0-7; step 0 stops
+if U6a's merge changed a manifest or the lock). SEC-U6BD-2 (Low): `bites` never in a measured run binary. SEC-U6BD-3
+(Low, note): ring has no X25519MLKEM768 hybrid; no effect on our runs; revisit for production.
+
 **The advisor's check** (advisor-u6b-brief.md, 2026-11-22): APPROVE WITH CONDITIONS; no Critical or High, so no
 re-check. Q-U6B-1 to -6 and the seven contradictions are ruled there (its sections 1-2): Q1 (a) `begin_tick`; Q2 (a)
 ring, no `install_default`; Q3 (a) aligned to U8 (C-U8-5); Q4 as leaned with terms; Q5 and Q6 the lever taken now (the
