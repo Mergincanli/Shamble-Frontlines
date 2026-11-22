@@ -163,9 +163,12 @@
   return (it never reached the clamp pair): 24 pass, 59.08 s; the comment; R5b's 15 figures and TE-R2-6 recorded.
   Lows NC-R2-2's case, NC-R2-3, TE-R2-2, -3, -5: follow-ups. **R6 run A PASS 00:39:32** (u4f2-r6a.log; tree diff
   93fcd1f7…, untracked 07a4f4f5…): all 11 steps; test 1,155.5 s (51.5 s under 1,207); measured 709, bites 806 (+7 each
-  on 702/799), 0 failed, 0 skipped; wasm 27,000 ticks, 0 mismatching; marks 81; self 78/78; redact 10/10. **Run B
-  RUNNING from 00:4x** (P27 5.4 GiB; free 8,217,870,336 B; u4f2-r6b.log); then the merge, gate, check.mjs, CI, the
-  advisor's head check, c-u4f-r2.mjs whole, D2, -21's set (report: Block 4's table).
+  on 702/799), 0 failed, 0 skipped; wasm 27,000 ticks, 0 mismatching; marks 81; self 78/78; redact 10/10. **Run B PASS
+  01:00:55** (u4f2-r6b.log, same tree; test 1,112.7 s; 709/806). **The merge, in progress (uncommitted):** snapshot
+  f7d79ebd… applied on 2b65f02's tree (spikes/ = a289def's outside results/); `git add -N` forged.rs; 14 files +2,674
+  -194, each byte-equal to the worktree's (the diff's hash 445b8f9d… differs from the patch only by file order); gate
+  --no-smoke PASS; P27 5.4 GiB; **M5 check.mjs RUNNING** (main-run.sh, .gate/u4f2-merge/m5-check.log). Then commit,
+  push, CI, the advisor's head check, c-u4f-r2.mjs whole, D2, -21's set (report: Block 4's table).
 - **The re-plan SENT to him 00:5x UTC** (replan.md): the advisor's one review APPROVE WITH CONDITIONS
   (advisor-replan.md: ADV-RP-1 High, the moved marks' hand-off; -2 to -9 Medium; -10 to -16 Low); P1-P6 pasted word
   for word, Lows folded in: no re-check. His four: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0. After his yes: the
