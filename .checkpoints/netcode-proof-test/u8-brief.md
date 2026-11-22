@@ -60,12 +60,12 @@ read 2026-11-22), so replan-units.md:222's open point closes.
     housekeeping CPU", read 2026-11-22), each refusal recorded with its thread name; reads all of it back and prints
     one record. IRQ affinity is read and recorded per vCPU (/proc/interrupts), never changed: no mark asks it and it
     would change what is measured.
-  - `npt-ctl rooms start NN` / `rooms tokens NN` (condition 3; Q-U8-1): starts `npt-super` (hold form, U6a's Block 6)
-    as `npt-room` in a transient scope in `npt-rooms.slice`, which keeps every CPU, by `systemd-run --scope` then
-    `setpriv` (drop to `npt-room`, no new privileges) then `taskset -c <housekeeping>` (so npt-super and its children
-    start off the tick vCPU and only the room's tick thread pins itself onto it: Q-U6A-5), on the fixed settings path
-    `/var/lib/npt/run/room-NN.json`, NN 00-31; stdin passes through, so the run script holds it open. `rooms tokens NN`
-    prints that room's 0600 token file (owned by `npt-room`) to the run script, never to a log.
+  - `npt-ctl rooms start NN` / `rooms tokens NN` (condition 3; Q-U8-1, Q-U8-7): starts `npt-super` (hold form, U6a's
+    Block 6) as `npt-room` in a transient scope in `npt-rooms.slice`, which keeps every CPU, by `systemd-run --scope`
+    then `setpriv` (drop to `npt-room`, no new privileges) then `taskset -c <housekeeping>` (so npt-super and its
+    children start off the tick vCPU and only the room's tick thread pins itself onto it: Q-U6A-5), on the fixed
+    settings path `/var/lib/npt/run/room-NN.json`, NN 00-31; stdin passes through, so the run script holds it open.
+    `rooms tokens NN` prints that room's 0600 token file (owned by `npt-room`) to the run script, never to a log.
   - `npt-ctl quic off|on` (Q-U8-3): nftables drops UDP 30001-30032 from every source but `metrics_src` (LG), as a set
     element with a 15-minute timeout, so it cannot stay on.
   - `npt-cert issue staging|production` (replan-units.md:107-118): opens npt-host's egress to the one ACME directory
@@ -137,6 +137,9 @@ read 2026-11-22), so replan-units.md:222's open point closes.
   its status text and its records.
 - R2's, R3's and R5's run plans and prompts (written off-lane Fri 4-Tue 8 Dec, one advisor check together, his OK by
   Thu 10: section 6.4); R5's idle-hours drop of the game ranges (plan.md:941) goes with R5's plan.
+- -36's loopback legs on the laptop before R1 (R-7, plan.md:740; replan-units.md:203): they need the server built on
+  native Windows, and under LAPTOP (b) they would be rough readings of an unnamed laptop; R8 judges -36. Lean: not run
+  before R1.
 - Cut by the re-plan (replan-units.md:163-165, :28-33): W-PR and its workflow, the Safari spec and runner token, R1's
   Safari 0.3 h, the netcode checklist (R7), R4's, R6's and R7's plans, the per-slot systemd units and room-unit
   wrappers, `npt-cert revoke`, per-session controls, the HTTP-01 responder and port window.
@@ -228,22 +231,23 @@ read 2026-11-22), so replan-units.md:222's open point closes.
 | Block | Hours | Marks or checks | He is |
 |---|---|---|---|
 | Bring-up (cloud-init, build, dist, user-data and HEAD checks, host keys, `npt-ctl peers`, `npt-ctl cpus`, `alone`) | 0.90 | condition 4, C-U8-1 | away |
-| Certificate: staging, then production (two TXT records) | 0.25 | -56's item 2 base | present |
+| Certificate: staging, then production (two TXT records) | 0.25 | the WebSocket leg's trusted name | present |
 | Headers | 0.15 | -1, -2, PM-0006-11 | away |
 | L2 probe with ImpairSocket's self-test (0 added hours) | 0.20 | -3, C-U8-2/-4/-6 | away |
 | Calibration | 0.10 | load spread | away |
 | Room starts | 0.10 | -16 | away |
 | DelayStream's loaded self-test (C-U8-3) | 0.15 | condition 10 | away |
 | S14 veth and netem check | 0.30 | TCP-FREEZE | away |
-| Four-browser smoke, both transports (15-slot room) | 0.25 | -14 (rough), PM-0006-25 | present |
-| QUIC-blocked fallback, four browsers | 0.25 | -29 | present |
+| Four-browser smoke, both transports | 0.25 | -14 (rough), -56's item 2 | present |
+| Dev certificate pinned by hash in every browser | 0.20 | PM-0006-25 (rough) | present |
+| QUIC-blocked fallback, four browsers | 0.25 | -29 (rough) | present |
 | Ping, laptop and PC | 0.10 | PM-0006-12 | present |
 | -36's home EU path, three browsers at once | 0.50 | -36 (rough) | present (laptop runs it) |
 | First bites | 0.10 | the R1 bites | away |
-| **Planned** | **3.45**, billed **4** per VM | | |
-Arithmetic: plan.md:819's 2.95 less Safari's 0.30 is 2.65; plus -29 0.25 and PM-0006-25 0.20 (replan-marks.md:115) is
-3.10; PM-0006-25's 0.20 rides in the smoke legs (every WebTransport leg pins the dev certificate by hash), so the table
-shows 3.10 − 0.20 + 0.15 + 0.30 = 3.35, plus 0.10 for the ping row kept separate = 3.45. Left to the 4-hour bill: 0.55 h.
+| **Planned** | **3.55**, billed **4** per VM | | |
+Arithmetic: plan.md:819's 2.95 less Safari's 0.30 is 2.65; plus -29's 0.25 and PM-0006-25's 0.20 (replan-marks.md:115;
+replan.md:31's "+0.45 h" at :98-99) is 3.10; plus the two self-tests R1's row left unsized (replan.md:31), DelayStream's
+0.15 and S14's 0.30, is **3.55**. Left inside the 4-hour bill: 0.45 h.
 
 ### 6.2 His steps, with times (Amsterdam; T0 = RS's creation, proposed 09:30)
 **Once, at Stop B (Tue 1 Dec, about 75 minutes, before any VM):** confirm two-factor login on Hetzner and Cloudflare;
@@ -253,16 +257,17 @@ objects `fw-rs` and `fw-lg` from `ops/firewall/` with the kept LG and RS address
 Chrome, Firefox and Node 22, let the laptop session download the three drivers (one prompt each), copy
 `settings.json` to `~/npt-operator/`, and watch the four-attempt guard check (plan.md:1271-1277); approve
 `settings.json` and `PROMPT-R1.md` explicitly; OK R1's plan, its cap and its delete-by time.
-**Thursday 3 December:**
+**Thursday 3 December** (blocks: bring-up 09:30-10:25, certificate 10:25-10:40, server blocks 10:40-11:40, browser
+blocks 11:40-13:00, bites 13:00-13:05, teardown by 13:30):
 | Time | His step | Minutes |
 |---|---|---|
 | 09:10 | In `fw-rs`, type his home IPv4 into the SSH rule and the two game-port rules (typed only there, never in a file); in `fw-lg`, into the ICMP rule | 5 |
 | 09:15 | Create LG (CAX21, `fsn1`, Ubuntu 24.04, operator key, `fw-lg`, label `role=lg`, `npt-lg`, Cloud config from the raw URL R1.md gives, naming commit X), then RS the same way (CCX23, `fw-rs`, `role=rs`, `npt-rs`) | 15 |
-| 09:30 | T0. Start the laptop session with `PROMPT-R1.md`; away | 2 |
-| about 10:25 | Certificate: add the staging TXT record the session shows (`_acme-challenge.rs.nt`, TTL 1 min), delete it when told; then the production one the same way | 10 |
-| 11:35-13:05 | Browser legs: Brave on the PC from the USB-stick links (WebTransport, WebSocket, the fallback), reading "· Playing" and the version; the laptop runs Chrome, Edge and Firefox; the ping on the PC; -36's 10 minutes | 90 |
-| 13:05-13:25 | Teardown: the session collects results; he deletes both VMs, first checking no kept Primary IP shows the bin icon | 15 |
-Present about 2 hours in all, in three sittings (09:10-09:32, about 10:25-10:35, 11:35-13:25).
+| 09:30 | T0. Start the laptop session with `PROMPT-R1.md`; then away | 2 |
+| about 10:25 | Certificate: add the staging TXT record the session shows (`_acme-challenge.rs.nt`, TTL 1 min), delete it when told; then the production one the same way (about 2 minutes each, plus the waits) | 15 |
+| 11:40-13:00 | Browser legs: Brave on the PC from the USB-stick links (WebTransport, WebSocket, the fallback), reading "· Playing" and the version; the laptop runs Chrome, Edge and Firefox; the ping on the PC; -36's 10 minutes | 80 |
+| 13:05-13:25 | Teardown: the session collects results; he deletes both VMs, first checking no kept Primary IP shows the bin icon | 20 |
+Present about 2 hours 20 minutes in all, in three sittings (09:10-09:32, about 10:25-10:40, 11:40-13:25).
 
 ### 6.3 Cap and delete-by
 - **Planned EUR 0.62:** 4 h × 0.1386 + 4 h × 0.0176 = 0.5544 + 0.0704 = 0.6248. **Cap EUR 0.80:** with one spare hour
@@ -286,10 +291,10 @@ replan-units.md:208-209). Days: 7,410 / 1,175 = 6.3; 9,265 / 1,175 = 7.9; 11,120
 **The calendar** (lane day 1 = Fri 4 Dec; R1's day goes to R1 and its results):
 | Date | Lane | Beside it | Him |
 |---|---|---|---|
-| Thu 3 Dec | R1 | | R1 (about 2 h) |
+| Thu 3 Dec | R1 | | R1 (about 2 h 20 min) |
 | Fri 4-Fri 11 | MOVED, then U4k, U6d, U6e, U6j (7.9 days at the middle: done Fri 11; Thu 10 at the low end, Sun 13 at the top) | R1's report after MOVED (Sat 5-Sun 6); R2's, R3's, R5's plans and prompts Fri 4-Tue 8, one advisor check | OK the three plans, caps and delete-by times (about Thu 10) |
-| **Sat 12 Dec** | | **R2** (11 h, unattended; cap EUR 1.90) | create VMs about 08:00, delete about 19:30 |
-| **Sun 13 Dec** | | **R3** (10 h; cap EUR 1.80) | the same |
+| **Sat 12 Dec** | | **R2** (11 h, unattended; cap EUR 1.90) | create VMs about 08:00, delete by about 19:00 |
+| **Sun 13 Dec** | | **R3** (10 h; cap EUR 1.80) | create about 08:00, delete by about 18:00 |
 | **Mon 14 Dec** | | **R5** (17 h; density starts 08:00, 14:00, 20:00; cap EUR 3.60) | create about 06:45, delete about 23:30 |
 | Tue 15 Dec | | R5 judged; the spare day for one INVALID run or one lost day | |
 | Wed 16-Fri 18 | | Stop C: verifier and reviewers on the final diff, fixes, report, ADR 0001's results, advisor | **the close: his go, Fri 18 Dec** |
@@ -342,7 +347,7 @@ VMs deleted).
   cannot read at each leg's edges while its socket is bound. **Lean: U6c's probe writes them in C-U6-7's leg-edge
   calls** (C-U8-6's own fallback, plan.md:1256), any new npt-log name to the advisor; U8 checks presence.
 - **Q-U8-6, S14's burst half and C-U8-5.** (i) `kernel_cross_check_model` has no burst knob (`bursts_ns: Vec::new()`,
-  crates/net/src/tcp_model/tests.rs:1408), so S14's 10 one-second bursts have no model side. **Lean: a test-only
+  crates/net/src/tcp_model/tests.rs:1407), so S14's 10 one-second bursts have no model side. **Lean: a test-only
   `NPT_KC_BURSTS` knob (about 20 Rust lines) rides in U6c on the lane;** else S14 compares the stalls only and its
   burst half reads NOT-RUN in R1's report. (ii) C-U8-5 asks this plan to state DelayStream's judged form against
   U3D-L0 (advisor-u3d.md:80-83). **Lean: condition 10's form unchanged, E[(L − L0 − 0.25 ms)+] < about 10 µs and p99

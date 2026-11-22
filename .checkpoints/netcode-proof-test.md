@@ -156,8 +156,11 @@
   --all-targets --locked` 0 warnings. `<base>` aa5c62b68aecfe2fabd94a74915eb58cf0598fb4 (709/806). Runner
   u6a-run.sh (u4f-run.sh, names only: diff shows only names). **Builder launched 14:2x** (general-purpose, opus, xhigh,
   worktree; notes u6a-build.md in its worktree). Started a day early on my lean: the plan said Mon 23.
-- **Drafting since 14:2x (3 agents with the builder):** U8's brief (infra-engineer: u8-brief.md, notes infra-u8-brief.md;
-  R1's run plan with his item 6's dates) and U6b's brief (netcode-architect: u6b-brief.md, notes netcode-u6b-brief.md).
+- **U8's brief rev 1 DRAFTED 14:3x** (u8-brief.md, 368 lines; notes infra-u8-brief.md): about 2,150 added, likely
+  2,900-3,250 (off the lane, no date moves); R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 20 min; planned R2
+  Sat 12 Dec, R3 Sun 13, R5 Mon 14, close Fri 18 (holds at middle sizes, about Mon 21 at the top); asks U6c a ~20-line
+  TCP-model test change (S14's burst half). **The advisor's check running** (advisor-u8-brief.md). U6b's brief
+  drafting (netcode-architect: u6b-brief.md, notes netcode-u6b-brief.md).
   **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
   @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
   to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding
