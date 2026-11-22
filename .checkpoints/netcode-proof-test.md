@@ -170,8 +170,13 @@
   **CI green on b4e1f43** (gate 44969638312 and 44969642476, toolchain 44969638333 and 44969642481: push and PR).
   **M5 PASS 01:22:52** (.gate/u4f2-merge/m5-check.log; diff 445b8f9d… = b4e1f43's spikes/): all 11 steps; test 1,070.2
   s; 709/806; wasm 0 mismatching; marks 81; self 78/78; redact 10/10. P27 01:2x (5.4 GiB; free 8,210,309,120 B).
-  **The advisor's head check of b4e1f43 RUNNING** (ad46fe8f3f1b5f74c; out advisor-u4f2-head.md). Then c-u4f-r2.mjs
-  whole (21 rows), D2, -21's set (49 runs, two judge calls; report: Block 4's table).
+  **The advisor's head check of b4e1f43: APPROVE WITH FINDINGS** (advisor-u4f2-head.md; ADV-U4F2H-1 Low: a stopped
+  forged run reads as a twin in kind7Line, a torn log line could crash a set: follow-up; -2 Low: d-1-never-ran wording
+  in -21's reading line); **the departure ACCEPTED, nothing re-runs**; the commit-before-M5 order acceptable (state it
+  and M5's hash in the report). Point 6 (:79-98): D2, the 21 rows, then -21's set; about 7.50 GB free before its
+  builds; to the advisor before the report: a left-out above 76 on a 600 s run, any other kind left out, any forged run
+  unrejected above 0; the report's per-run table and its own-line items. **D2 01:3x: 8,595,312,640 B free** (after the
+  shared release clean, 382.6 MiB). **The 21 rows RUNNING next** (flock; c-u4f-r2.mjs --date 2026-11-22).
 - **The re-plan SENT to him 00:5x UTC** (replan.md): the advisor's one review APPROVE WITH CONDITIONS
   (advisor-replan.md: ADV-RP-1 High, the moved marks' hand-off; -2 to -9 Medium; -10 to -16 Low); P1-P6 pasted word
   for word, Lows folded in: no re-check. His four: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0. After his yes: the
