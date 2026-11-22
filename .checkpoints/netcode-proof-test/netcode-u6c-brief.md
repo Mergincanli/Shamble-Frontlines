@@ -35,50 +35,50 @@ notes file is rewritten whole with Write at each step.)
   security's read; revocation call confirmed by name -- now moot: revoke CUT, replan-units.md:32; fake directory in
   tests); Q11/C-U6-6 (10,000 a direction else advisor before R1's run plan); Q12 (engine-architect if the probe lands in
   npt-server); conditions 1 (SERIES.md rows named), 6 (Block 0), 7 (xhigh). u6-brief.md:124 old U6d reviewers.
-- Step 3 DONE. N4 plan.md:1254 split on <br>: C-U6-1..8 at bullets 24-31 (scratch copy not written; quotes checked
-  against the line itself). C-U6-8's bullet ends with no period ("drops out").
-- Step 4 DONE. N5 u6a-brief.md: condition 5 (:52-53) "`StealReader` stays pub(crate); U6c's brief makes it pub if its
-  probe lands outside npt-server"; condition 3 (:37-40) npt-super hold form (stdin held open, U8 starts every room
-  through npt-super); :180-183 U6c's list and pins; :163-165 "U6c's npt-load hosts through it" (host_step); section 6
-  rules :294-317 incl. Write/Edit line :314-317; condition 2 gate line :30-34; U6e owns npt-super's density harness.
-- Step 5 DONE. N6 u6b-brief.md condition 4 (:60-66): hash file struct algorithm/value_hex/validity_ns, create_new 0644,
-  "U6c's host serves it verbatim with `Cache-Control: no-store` (plan.md:994-995), read per request or after each room
-  start, under a size cap"; Block 6 (:210-212) WS certificate = public chain and key files from U6c's `npt-cert`, read
-  under a size cap; U8 sets the key file's group (:241-242). WtClient/WsClient with pin (Block 1-3) are what npt-load
-  hosts. ConnCap N + 8 per process.
-- Step 6 (u8) read. N7 C10 (u8-brief.md:97-101): U6c takes Q-U8-4's interface, Q-U8-5's reads, the probe's ports and
-  npt-load's control interface for C4; not the knob. Q-U8-4 (:144-149): one process both phases, "go" on stdin, no
-  account key or order state on disk between phases, every authoritative server (cora, steven), one 30-min bound, dig
-  no caller argument. Q-U8-5 (:150-153). C4 (:65-71): npt-load-ctl starts, feeds and stops npt-load, copies token
-  files, runs C5's check; "Its verbs follow the npt-load interface U6c's brief names". Block 2 (:203-204): probe port
-  outside UDP 30001-30032 / TCP 31000-31032 must be named. Block 3 npt-cert (:227-232): runs U6c's issue mode as
-  `npt-host`, name `_acme-challenge.rs.nt.shamblefrontlines.com`, dig every 15 s <= 30 min, egress to the one ACME host.
-- N8 STALE in u8-brief.md rev 1.1 (superseded by 0.1 C10, which says to replace them): :521 "U6c's takes ... Q-U8-6
-  (i)'s knob", :383 "(Q-U8-6's knob, if taken, is U6c's)", :505-507 Q-U8-6 (i) lean "rides in U6c on the lane". Not a
-  real contradiction (0.1 wins by its own rule) but the advisor should know U6c takes no knob.
-- N9 u8-brief.md :249-250 `probe` block checks C-U8-2/-6 reads present; :392 R1's L2 probe 0.20 h "(0 added hours)";
-  :389 calibration 0.10 h "load spread"; C-U8-4 run conditions (rate, C-U8-6 no-drop) checked by probe block.
-- Step 7 DONE. N10 security-r1-deps.md: 17 new = instant-acme + 16 (:82-85, :228-230); instant-acme's `ring` feature
-  is non-weak and turns rcgen on WITH instant-acme's own `features = ["pem"]` (:70-72): after U6c's Block 0 rcgen
-  unifies to crypto+pem+ring workspace-wide, so U6b's Block 0 check item (3) "rcgen without ... `pem`" no longer holds
-  after U6c (expected, pem 4.0.0 + base64 0.23.1 are 2 of the 17). DefaultClient: https_only, platform verifier or
-  with_roots (:76-78); no request timeout, bodies uncapped (:77, SEC-R1D-4 :212-214); RetryPolicy 30 s default
-  (order.rs:581-586); NewOrder::profile types.rs:456-462; dns_value order.rs:555. Binding check :249-253 written for
-  "U6" whole (url bump done in U6a's Block 0): U6c's slice is the 17 packages only. webpki-roots absent; root store at
-  Block 0 by security's read (U6-Q18): lean platform verifier (rustls-native-certs already locked).
-- N11 hyper is client+http1+http2 only (:73-74): no `server` feature, so the page host must be written on
-  tokio-rustls + httparse (both locked) or turn hyper's `server` on (a feature change, its own read). Lean: small
-  GET-only HTTP/1.1 over tokio-rustls, httparse.
-- N12 multi-room hash path: U8 C3 (u8-brief.md:55-63) runs a room per mark and browser, each room makes its own dev
-  certificate (U6-Q17), so one `/npt/cert-hash.json` is ambiguous with >1 room: Q for the brief (per-slot path).
-- N13 plan.md:964-983 (§8.4): staging "R1 reads and records both directories' profile lists"; if staging lacks
-  shortlived the dry run uses staging's default, production still requires it; key 0640 readable by a group of the
-  room user(s) and npt-host; new ACME account per VM. Stale there (U8 notes): http-01, revoke, TCP 80.
-- N14 docs.rs instant-acme 0.8.5 (read 2026-11-22): `Account::builder()` (hyper-rustls), `builder_with_root(pem_path)`,
-  `builder_with_http(Box<dyn HttpClient>)`; `Account::profiles() -> impl Iterator<Item = ProfileMeta>`; `new_order(&NewOrder)`;
-  `Order::authorizations()`, `poll_ready(&RetryPolicy) -> OrderStatus`, `finalize()` ONLY under instant-acme feature
-  `rcgen` (features page: rcgen, ring, hyper-rustls, time, x509-parser, aws-lc-rs, fips, default), `finalize_csr(&[u8])`,
-  `poll_certificate(&RetryPolicy) -> String`; `ChallengeHandle::key_authorization()`, `set_ready()`; HttpClient::request(
-  Request<BodyWrapper<Bytes>>) -> Pin<Box<dyn Future<Output=Result<BytesResponse,Error>>+Send>>; BytesResponse pub
-  fields parts, body; From<Response<B>>. So: finalize_csr with an rcgen CSR (not relying on the `rcgen` feature's
-  cfg), and a fake HttpClient in tests (needs dev-deps http, bytes, http-body-util).
+- Step 3 DONE. N4 plan.md:1254 split on <br>: C-U6-1..8 at bullets 24-31. C-U6-8's bullet ends with no period.
+- Step 4 DONE. N5 u6a-brief.md: condition 5 (:52-53) StealReader pub(crate) unless the probe lands outside npt-server;
+  condition 3 (:37-40) hold form; :180-183 U6c's list and pins; :163-165 host_step; section 6 :294-317; gate :30-34.
+- Step 5 DONE. N6 u6b-brief.md condition 4 (:60-66) hash file; Block 6 (:210-212) WS cert files from npt-cert under a
+  size cap; U8 sets the key's group (:241-242). ConnCap N + 8.
+- Step 6 DONE. N7 C10 (u8-brief.md:97-101); Q-U8-4 (:144-149); Q-U8-5 (:150-153); C4 (:65-71); Block 2 (:203-204);
+  npt-cert (:227-232). N8 STALE u8-brief.md :521, :383, :505-507 (knob as U6c's) superseded by C10. N9 probe block
+  checks C-U8-2/-6 (:249-250); R1 probe 0.20 h, calibration 0.10 h (:389-394).
+- Step 7 DONE. N10 security-r1-deps.md: 17 new (:82-85, :228-230); instant-acme `ring` turns rcgen on with `pem`
+  (:70-72); DefaultClient (:76-78); SEC-R1D-4 (:212-214); binding check (:249-253) for "U6" whole. N11 hyper has no
+  `server` feature (:73-74): page host on tokio-rustls + httparse (locked 1.10.1). N12 one hash URL ambiguous with
+  several rooms (U8 C3). N13 plan.md:964-983 (staging profile lists recorded; key 0640 group of room user and npt-host).
+  N14 docs.rs instant-acme 0.8.5: builder()/builder_with_root/builder_with_http; Account::profiles(); new_order;
+  finalize() only under feature `rcgen`; finalize_csr(&[u8]); poll_ready/poll_certificate(&RetryPolicy);
+  ChallengeHandle key_authorization/set_ready; HttpClient::request; BytesResponse pub parts/body, From<Response<B>>.
+- Step 8 (code) DONE, at 7ae83dd. N15 SERIES.md:497-501 already fixes the probe's home: "npt-server's binary in a probe
+  mode (process `probe`), on a free slot port of RS with its own `ImpairSocket`"; RTT "the echo's release minus the
+  original send"; pacer "a dedicated thread with 1 ns slack, never tokio (M13)"; "LG's side, npt-bots (probe), sends
+  up, echoes, and writes no probe series". SERIES.md:111-117 the seven `second.s.probe_*` rows (L2 writer named).
+- N16 ADR 0001:1590 (-3's row): "10,000 packets per second per direction"; injected delay (profile RTT - base RTT)/2,
+  base = median of 10 s of pings at session start; L2Config.base_rtt_ns exists (config.rs:24-26).
+- N17 -3's bites are all npt-l1's (l1/src/lib.rs:780-782) plus not-net-of-base (MP's part, MOVED: replan-marks.md:20):
+  U6c builds no bite.
+- N18 The E machinery is test code today: start_poller socket_tests.rs:676-713, samples :735, nearest_rank :759,
+  excess :775, forms :793, agree :904, pre-touch :1384-1408 (test-only access to `fates`), fate_entries :992 (Fate and
+  FateLog::entries pub(crate)/cfg(test): stats.rs:426-505; canonical 56 B :446-466). The probe needs them shipped:
+  promote into an npt-net module; socket_tests then calls the shipped ones (T1/T2/T5 re-run by construction).
+- N19 Slack is set through /proc (thread.rs:1-60, pub(crate) own_tid/set_own_slack), no unsafe: pacer helper in npt-net.
+- N20 C-U6-8 sites: up lock :501 then clock :503; down stamp `sh.now_ns()` after try_send :724-726; T7's doc
+  socket_tests.rs:1263-1265; agree :904-910.
+- N21 npt-bots already depends on npt-net (bots/Cargo.toml); clippy.toml bans Instant/SystemTime and tokio::time::Instant
+  crate-wide ("U6's runtime half adds its reviewed allows (§4.11)"). npt-host: only npt-log, no clippy.toml.
+- N22 check.mjs deps step: npt-host must not reach sim/room/proto/client (check.mjs:101-103); no external allow-list for
+  host or bots, so instant-acme passes the deps step.
+- N23 deny.toml: multiple-versions = "warn" (base64 0.22/0.23 and pem 3/4 duplicates add warnings, not errors); the
+  lock's existing `"base64"` and `"pem"` references gain version suffixes when the second versions enter.
+- N24 SERIES.md:432-433 + README:269-276: npt-load writes `second.s.inputs_count` (one per client, slot order) and
+  `second.v.cpu_permille` (LG CPU, < 800: lg-80/V-S). plan.md:473 E13: 5-minute calibration under 80 % CPU every second,
+  inputs within 1 %.
+- N25 plan.md:1117-1135 §10.4: allow-list (index, scripts, Worker, Wasm, cert-hash.json, ssh-host-keys.txt, robots),
+  GET/HEAD, CSP text, nosniff, Referrer-Policy, no-store on the two files, application/wasm. Cut: limits, bite, /iso/,
+  robots, noindex.
+- N26 CONTRADICTION (U8/re-plan, touches U6c): plan.md:286-290 (§1.6) has the laptop fetch
+  `/npt/ssh-host-keys.txt` over the production certificate BEFORE the first SSH; under DNS-01 by hand the order is
+  started by the laptop session over SSH (replan-units.md:110-111; u8-brief.md:416-417 certificate after bring-up), so
+  the certificate cannot exist before the first SSH. u8-brief.md has no step for it.
+- N27 GAP (U8): no wrapper starts `npt-host serve` as `npt-host` (u8-brief.md Block 3 :205-240 lists none).
