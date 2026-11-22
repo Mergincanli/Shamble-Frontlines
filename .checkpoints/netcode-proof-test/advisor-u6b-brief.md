@@ -43,6 +43,12 @@ TEST-FIRST (history.md:2234-2282).
 - F4 (Medium): Q3 against U8's brief: U8 sizes the self-test "5 min measured after 1 min warm-up" (u8-brief.md:206)
   while the pool never resets (delay.rs:185-188), and C-U8-5's form may be L0 = 0 (u8-brief.md:352-355) while
   `Summary.excess` gives only the median form (stats.rs:58-59).
+- Mid-check (14:5x): the U8 check finished (advisor-u8-brief.md, APPROVE WITH CONDITIONS C1-C10) and U8's brief is
+  now rev 1.1 (517 lines). Its C-U8-5 ruling (advisor-u8-brief.md:87-96; u8-brief.md:148-157): judged per direction E
+  with L0 = 0 <= 10,000 ns and p99 of L <= 1 ms "over the self-test's measured window (5 min after 1 min warm-up...)",
+  the median form, p50, p99.9, max and steal reported beside it. Q3 below is aligned to it: U6b writes both forms and
+  builds the window's start mark, so no U8 change is needed. Q-U8-7 (advisor-u8-brief.md:97-98): U6b's security
+  seat reads the token file's reader `npt-ctl rooms tokens NN` (as `npt-room`) with the minting.
 - F5 (Low): the blocks sum to 2,850 (150 + 500 + 200 + 300 + 130 + 760 + 560 + 250), section 8's T-sums to 2,700.
 - F6 (Low): `ConnCap` crosses into npt-server (both binds take it) but is not in the new pub items (u6b-brief.md:141-144).
 - F7 (Low): Block 0's expected lock diff names the removed build crates loosely; by the lock they are exactly cmake,
@@ -81,22 +87,28 @@ history.md:2261)
   `builder_with_provider` as M7 and M16 have it; wt.rs's module text (:4-6) and wt_tests.rs:586-592 say ring; `<base>`'s
   check.mjs test step PASSES with the wt module's tests now in the measured build on ring (not only counted);
   security-auditor's short read (section 4) before the save.
-- **Q-U6B-3, the series R1's DelayStream self-test reads: Ruled (a), with four terms; it agrees with U8's brief once
-  U8's rev takes term (3) (F4).** Pooled L per direction in the split's existing process pool costs about 60 lines
-  and two histograms; the per-second merge across connections serves only R3's -31 and -18 rows and stays U6e's
-  (SERIES.md:589-591, :616). Terms: (1) L is recorded per release into one more `Pooled` per direction in `Pool`
-  (delay.rs:189-205), the same L the identity sums (woken: clock + hop + pass + reader; other: wait + pass + reader),
-  and the fixed heap it adds is in the header's split bytes; (2) `ws_split` writes per direction n, p50, p99, p99.9,
-  max and E in **both** forms with their over counts: L0 = 0 (E[(L − 0.25 ms)+]) and the median form (E[(L − p50 −
-  0.25 ms)+], `Summary.excess` today: stats.rs:58-59), by giving `summarize` its threshold as a parameter, tested
-  against a brute-force sum as stats.rs's own tests do; so whichever form the U8 check rules for C-U8-5
-  (u8-brief.md:352-355; advisor-u8-brief.md has no ruling yet) is read from the log with no code change, and if that
-  check rules a third form, the main session brings it to U6b before Block 5 closes; (3) the window is the room
-  process's whole life from its first wrap (RC-10: one measured run per process; no window mark is built), so U8's
-  rev 1.1 states the self-test's judged window as its room process's life, the warm-up inside it (stricter, never
-  more lenient), replacing "5 min measured after 1 min warm-up" (u8-brief.md:206), and names `event.ws_split`'s
-  pooled-L fields as the series it reads; (4) the per-second merge is U6e's (S9), named in U6e's brief before R3, and
-  nothing in R1 reads it.
+- **Q-U6B-3, the series R1's DelayStream self-test reads: Ruled (a), with four terms, aligned to the U8 check's C-U8-5
+  ruling** (advisor-u8-brief.md:87-96, applied in u8-brief.md rev 1.1 :148-157: E with L0 = 0 and p99 of L judged per
+  direction over "5 min after 1 min warm-up", the median form reported beside it). Pooled L per direction in the
+  split's existing process pool costs about 60 lines and two histograms; the window mark about 60 more; the
+  per-second merge across connections serves only R3's -31 and -18 rows and stays U6e's (SERIES.md:589-591, :616).
+  Terms: (1) L is recorded per release into one more `Pooled` per direction in `Pool` (delay.rs:189-205), the same L
+  the identity sums (woken: clock + hop + pass + reader; other: wait + pass + reader), and the fixed heap it adds is in
+  the header's split bytes; (2) `ws_split` writes per direction n, p50, p99, p99.9, max and E in **both** forms with
+  their over counts: L0 = 0 (E[(L − 0.25 ms)+], the judged form) and the median form (E[(L − p50 − 0.25 ms)+],
+  `Summary.excess` today: stats.rs:58-59), by giving `summarize` its threshold as a parameter, tested against a
+  brute-force sum as stats.rs's own tests do; (3) **the window:** the pool takes one mark at the measured window's
+  start, a copy of every pooled bucket's count and sum, the kinds and the violations, taken once on the I/O runtime
+  (never on the release path) at a settings time after OPEN (SEC-U6AD-2's range check; absent: no mark, the whole
+  life, as RC-10's "one measured run per server process"), and `ws_split` at the run's end writes the difference, so
+  the split's parts and pooled L share one window; each pooled maximum restarts at the mark (swapped to 0 there: a
+  maximum is no difference); the header records the mark's time and whether it was taken (RC-10's "stated in the run's
+  header"); a test shows samples before the mark excluded, the maximum the window's own and the identity exact across
+  it; a mark taken under traffic may hold one in-flight sample's sum without its count per bucket (Pooled's own note,
+  stats.rs:301-303), stated in the report; U8's R1.md sets that time from its own timeline (LG's 48 connections up,
+  then the 1 min warm-up) and names `event.ws_split`'s pooled-L fields as the series it reads (one line in U8's next
+  edit, no new check); (4) the per-second merge is U6e's (S9), named in U6e's brief before R3, and nothing in R1 reads
+  it.
 - **Q-U6B-4, the key and the hash file: Ruled as leaned, with terms.** The key in memory only meets U6-Q17 term (1)'s
   purpose (npt-host's user never reads the key) more strictly than the cut 0700 folder did. The format
   `{"algorithm":"sha-256","value_hex":"<64 lowercase hex digits>","validity_ns":<u64>}` stands, with no "next" field
@@ -151,17 +163,18 @@ None touches a pass mark or money. Only the size reaches a run day, through R1's
   per-peer profile hook, the B1 range check, `burst_return`'s four server fields (SERIES.md:326-329) and their test,
   plants P12 and P13: about 250 estimated, 340-375 likely. Why now: no R1 mark reads them (section 0's R1 list,
   u6b-brief.md:35-40); their caller is U6e's and would refit them (Q-U6B-5); and "only if the build runs long" fires
-  when half of them are built. With it U6b is about 2,600 (likely 3,510-3,900), the lane before R1 about 9,800-11,190,
-  about 1,165-1,330 a day: where my U6a ruling put R1. The cost: U6e grows by the same lines after R1, which takes
-  about a third of the one spare day (Tue 15) in U8's close calendar at the middle (u8-brief.md:286-306); U8's own
-  lever (R2 and R3 as soon as U6e merges) still keeps Friday 18 December at the top. R1 has him present and a planned
-  day; R2-R5 run unattended. Counts become at least +42 measured and +44 bites (Block 4's `burst_return` test and
-  Block 5's three hook tests leave), 13 plants plus P16 (Q-U6B-1 term 2).
-- **R1 on Thursday 3 December: it still holds, with no slack, with the lever taken now.** Without the lever it sits a
-  few per cent past that line; with it, at the line. One lost day (a spend-limit cut of most of a day, a second round
+  when half of them are built. With it, and with Q-U6B-3's window mark (about +60), U6b is about 2,650 (likely
+  3,600-4,000), the lane before R1 about 9,900-11,300, about 1,180-1,345 a day: within about 2 % of where my U6a ruling
+  put R1. The cost: U6e grows by the moved lines after R1, which takes about a third of the one spare day (Tue 15) in
+  U8's close calendar at the middle (u8-brief.md:435-455, rev 1.1); U8's own lever (R2 and R3 as soon as U6e merges)
+  still keeps Friday 18 December at the top. R1 has him present and a planned day; R2-R5 run unattended. Counts become
+  at least +45 measured and +47 bites (Block 4's `burst_return` test and Block 5's three hook tests leave; the Box
+  forward, the two E forms and the window mark join), 13 plants plus P16 (Q-U6B-1 term 2).
+- **R1 on Thursday 3 December: it still holds, with no slack, with the lever taken now.** Without the lever it sits
+  about 5 % past that line (about 1,215-1,390 a day); with it, at the line. One lost day (a spend-limit cut of most of a day, a second round
   on any lane unit, a Block 0 surprise) and it slips; then he gets three lines at once. Not a decision today: one line
   in the day's message. The three lines, ready if a day is lost:
-  1. What grew: the server pieces before R1 came to about 9,800-11,200 likely lines against the re-plan's 8,350-9,250
+  1. What grew: the server pieces before R1 came to about 9,900-11,300 likely lines against the re-plan's 8,350-9,250
      (U6a's room log, start timer, tokens and pinning; U6b's closing tasks, binary wiring and OPEN's move).
   2. Why: R1's marks need them and no piece held them; the build rate is about 1,175 lines a day merged.
   3. The cheaper option: split R1, its server blocks first and its browser blocks when U7 lands (one more bring-up,
@@ -219,17 +232,22 @@ if both fail does the build stop for a manifest change.
 - **ADV-U6BB-2, Medium (F2):** TickLoop's I/O send site joins U6b's lane. Q-U6B-1 term (3); condition 1.
 - **ADV-U6BB-3, Medium (F3):** WsClient's limits are the client's own: tungstenite's frame and message limits at least
   the largest room message plus its 1 B tag (a FullState of 65,536 + 5 B: catalogue :73-76), not the server's 513 B;
-  its write side keeps the catalogue's client limits. Block 6's join test catches it late; condition 3 fixes it now.
-- **ADV-U6BB-4, Medium (F4):** Q3's window and form against U8's brief. Q-U6B-3 terms (2) and (3); condition 2.
-- **ADV-U6BB-5, Low (F5):** one size figure (section 3); condition 4.
+  its write side keeps the catalogue's client limits. Block 6's join test catches it late; condition 7 fixes it now.
+- **ADV-U6BB-4, Medium (F4):** Q3's window and form against U8's brief: as drafted, the log would hold only the
+  whole-life pool in the median form while U8 rev 1.1 judges E with L0 = 0 over 5 min after a 1 min warm-up, so R1's
+  self-test could not be read as ruled. Q-U6B-3 terms (2) and (3); condition 3.
+- **ADV-U6BB-5, Low (F5):** one size figure (section 3); condition 5.
 - **ADV-U6BB-6, Low (F6):** `ConnCap` (or whatever form both binds share) among the new pub items, the netcode seat
-  reading it; condition 5.
-- **ADV-U6BB-7, Low (F7):** the lock diff's removed set named exactly (section 4 item 3); condition 4.
+  reading it; condition 8.
+- **ADV-U6BB-7, Low (F7):** the lock diff's removed set named exactly (section 4 item 3); condition 2.
 - **ADV-U6BB-8, Low (F8):** RC-12's order reads "the four parts reach R1.md before Stop B's read" (U8 builds beside
-  U6: replan-units.md:197-198; UP-STAMP item 3's purpose, advisor-u3c-plan.md:187-188); condition 5.
+  U6: replan-units.md:197-198; UP-STAMP item 3's purpose, advisor-u3c-plan.md:187-188); condition 8.
 - **ADV-U6BB-9, Low (F9):** the two 20-iteration kick tests fit the 5 s real-clock cap (run concurrently, or fewer
   iterations with the reason stated); SERIES.md:616's second clause (which names the plain path writes) goes to U6e's
-  brief with the per-second merge, U6b writing only `ws_wrapper` 0 and fix 1's inputs on that path; condition 5.
+  brief with the per-second merge, U6b writing only `ws_wrapper` 0 and fix 1's inputs on that path; condition 8.
+- **ADV-U6BB-10, Low:** the U8 check's Q-U8-7 ruling (advisor-u8-brief.md:97-98) gives U6b's security seat the token
+  file's reader, `npt-ctl rooms tokens NN` run as `npt-room`, beside U6a's minting; section 7 names it (read at U6b's
+  round if U8 has built it by then, else at Stop B's read). Condition 8.
 - **Right as written:** the blocks' order and the one cargo lane; the cap at the first QUIC packet and the TCP accept,
   before TLS, `Incoming::refuse()` and an immediate drop; the deadlines over QUIC, HTTP/3, TLS and the upgrade, from
   the accept stamp carried into `Decoder::new` (plan.md:516; pump.rs:13-14); arrival stamps at the reader task; the
@@ -239,3 +257,88 @@ if both fail does the build stop for a manifest change.
   22); one builder, the ff-only start, agents never commit, Write and Edit only; one round with netcode-architect,
   test-engineer and security-auditor at xhigh (security's seat by NPT-TRIM, history.md:7590, and replan.md:93); the
   SIZE-CHECK stop past 6,000.
+
+## Verdict: APPROVE WITH CONDITIONS
+No Critical or High, so no re-check (NPT-TRIM, history.md:7591). Q-U6B-1 to -6 and the seven contradictions are ruled
+above; none is his (each inside the plan, undoable, no pass mark, no money, nothing on main: TEST-FIRST rule 2). R1 on
+Thursday 3 December holds with no slack once the lever is taken. Rev 1.1 applies these by Edit before launch; the main
+session records the rulings under "Choices taken without him" and names them, one line each, in the day's message.
+
+Conditions (paste-ready, each an Edit in u6b-brief.md rev 1.1):
+1. **W18 (Q-U6B-1; ADV-U6BB-1, -2).** Section 1 adds to Block 4: "npt-link gains `fn begin_tick(&mut self, lens:
+   &[usize], now_ns: u64) -> SendResult`, provided, default `SendResult::Sent`, its doc text stating the caller's duty;
+   the blanket `impl<L: Link + ?Sized> Link for Box<L>` (link/src/lib.rs:97-119) forwards it. TickLoop's I/O side
+   calls it once per session per tick before that tick's datagram sends, with each datagram's length (with a per-tick
+   batch boundary if U6a's I/O side has none). WsLink answers every datagram of a refused tick BufferFull, counted in
+   `tick.v.ws_skipped_snaps_count`; a datagram send no current `begin_tick` announced, or one past its count, is
+   answered BufferFull and counted, never written ungated; control and FullState sends are not gated; WtLink, Loopback
+   and L1 keep the default." Section 3 adds a test calling it through `Box<dyn Link + Send>` that sees WsLink's
+   refusal, and plant P16 (the Box forward removed) failing it. Section 6's Files line reads "TickLoop's seam for the
+   accept stamp and its I/O send site for `begin_tick`", both named in the report. Section 9's Q-U6B-1 reads "Ruled
+   (a)".
+2. **The provider and Block 0 (Q-U6B-2; ADV-U6BB-7).** Section 5's expected lock diff reads: "removed: aws-lc-rs
+   1.19.0, aws-lc-sys 0.47.0, cmake, dunce, fs_extra, pkg-config; `"aws-lc-rs"` leaves quinn-proto's, rustls's and
+   rustls-webpki's dependency arrays; npt-server's array gains `"rcgen"`; nothing added; no version, checksum or source
+   line changed." Block 0 (d) adds: "no `CryptoProvider::install_default` anywhere; wt.rs's module text (:4-6) says
+   ring for both crates." The binding check's item (4) reads "check.mjs's test step PASSES at `<base>` with the wt
+   module's tests in the measured build on ring, its counts before and after Block 0 by name". Security-auditor's short
+   read covers advisor-u6b-brief.md section 4's eight items; its answer and dependency-check.md exist before the save.
+3. **The self-test's series (Q-U6B-3; ADV-U6BB-4).** Block 5's "At the run's end" bullet reads: "`ws_split` once
+   through a now-pub `split_rows`, with pooled L per direction: one more `Pooled` per direction in `Pool`, recording each
+   release's L (the sum the identity checks); per direction n, p50, p99, p99.9, max and E in both forms with their over
+   counts, L0 = 0 (E[(L − 0.25 ms)+], the form the U8 check judges: advisor-u8-brief.md:87-96) and the median form
+   (E[(L − p50 − 0.25 ms)+]), `summarize` taking its threshold as a parameter. The pool takes one mark at the measured
+   window's start, at a settings time after OPEN (range-checked; absent: no mark, the whole life): a copy of every
+   pooled bucket's count and sum, the kinds and the violations, taken once on the I/O runtime, never on the release
+   path; each pooled maximum restarts there; `ws_split` writes the difference, so the parts and pooled L share one
+   window; the header records the mark's time and whether it was taken. The per-second merge across connections is
+   U6e's (S9), before R3." Section 3 adds three tests (both E forms against a brute-force sum; samples before the mark
+   excluded, the window's own maximum, the identity exact across the mark) and the loopback example reports pooled L in
+   both forms. Section 10 adds: "U8's next edit: R1.md sets the mark's time from its timeline (LG's 48 connections up,
+   then the 1 min warm-up) and names `event.ws_split`'s pooled-L fields as the series the self-test reads." Section 9's
+   Q-U6B-3 reads "Ruled (a), aligned to C-U8-5".
+4. **The hash file (Q-U6B-4).** Block 6 adds: "the hash file is written by serde_json from a struct of exactly
+   `algorithm`, `value_hex` (64 lowercase hex digits) and `validity_ns`, no `next` field (PM-0006-26 moved), by
+   `create_new` with mode 0644 set at creation, one `write_all` then `sync_all`, after the certificate is made and
+   before OPEN; `validity_ns` equals `header.params.cert_validity_ns`; an existing path is refused (exit 2), so U8's
+   R1.md removes the previous room's file before any room restart. U6c's host serves it verbatim with `Cache-Control:
+   no-store` (plan.md:994-995), read per request or after each room start, under a size cap; U7's page turns
+   `value_hex` into `serverCertificateHashes`' bytes." Section 9's Q-U6B-4 reads "Ruled as leaned, with these terms".
+5. **The lever and the size (Q-U6B-5, -6; ADV-U6BB-5).** Move `DelayStream::set_profile`, `WsServer::set_peer_profile`,
+   `WsServer::peer_burst` (the B1 range check), `burst_return`'s four server fields and their tests and plants P12 and
+   P13 from Blocks 4 and 5 to section 2's U6e line, with SP-6, RC-2 and SERIES.md:326-329 named there by number
+   (U6e's brief carries them; they stay U6's). Section 8 reads: "About 2,650 (the blocks recounted, the lever out,
+   Q-U6B-3's window mark in), likely 3,600-4,000; the stop past 6,000. The lane before R1: about 9,900-11,300 likely
+   lines; R1 on Thursday 3 December holds with no slack; one lost day and it slips (three lines to him at once: the
+   advisor's text, advisor-u6b-brief.md section 3)." Counts: at least +45 measured and +47 bites; plants P1-P11, P14,
+   P15, P16. Section 9's Q-U6B-5 and -6 read "Ruled: moved to U6e; the lever taken now".
+6. **The validity dates (the build trap).** Block 6's certificate text reads: "`not_before` = `rcgen::date_time_ymd` of
+   today's civil date (00:00 UTC) from one reviewed `SystemTime::now` read in cert.rs (the one allow, its reason
+   calendar validity), by a days-to-civil routine tested on fixed dates (1970-01-01, 2000-02-29, 2026-11-22,
+   2100-03-01, a year end); `not_after` = `not_before + std::time::Duration::from_secs(13 × 86,400)`, or
+   `date_time_ymd` of the civil date 13 days on; a clock before 1970 or past 9999 is exit 2, never a panic;
+   `cert_validity_ns` = 13 × 86,400 × 10^9 from the same values, and the test reads the DER's validity back; the read
+   feeds no timing series. If neither form compiles without naming `time`, the build stops for a manifest change."
+7. **WsClient's limits (ADV-U6BB-3).** Block 3's WsClient text reads "tungstenite's client handshake with the
+   client's own limits: frame and message at least the largest room message plus its tag (a FullState of 65,536 + 5 B
+   plus 1 B: the catalogue :73-76), from one constant beside L2Config's, never the server's 513 B", with a test that
+   a FullState of the largest size reaches the WsClient.
+8. **Small fixes (ADV-U6BB-6, -8, -9, -10).** The new pub items add `ConnCap` (or the form both binds share), read by
+   the netcode seat. Section 3's container reading reads "before Stop B's read of R1's run plan (U8 builds beside U6:
+   replan-units.md:197-198)", and RC-12's order is met that way. The two 20-iteration kick tests fit the 5 s real-clock
+   cap (concurrent, or fewer iterations with the reason). Section 2's U6e line adds SERIES.md:616's second clause (what
+   the plain path writes) beside the per-second merge; U6b writes `ws_wrapper` 0 and fix 1's inputs on that path.
+   Section 7's security reads add the token file's reader, U8's `npt-ctl rooms tokens NN` run as `npt-room`
+   (advisor-u8-brief.md:97-98), at U6b's round if U8 has built it, else at Stop B's read. The report notes once that
+   replan-units.md:77-78's "as l2/wt.rs does" is wrong (wt.rs:176-179).
+
+## What I could not check
+- No build or run (a brief check): the size figures are judgements, checked for sums only; whether
+  `OffsetDateTime + std::time::Duration` compiles without a `use time` (the impl exists: time-0.3.55
+  offset_date_time.rs:1686; condition 6 covers both outcomes).
+- The lock diff is read from Cargo.lock's dependency edges, not from a resolver run; the real offline refresh decides
+  (condition 2: anything else back to security).
+- U6a's I/O side as built (its builder is running): whether it hands a session its tick's messages as one batch
+  (condition 1 covers both).
+
+DONE

@@ -72,6 +72,10 @@
   2,250 added lines (about 2,700 at 1.2), the stop past 3,000; brief u4f2-brief.md rev 1.2 (`<base>` a289def, 642/739).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
+- **2026-11-22, U8's and U6b's briefs (advisor-u8-brief.md §1-2, advisor-u6b-brief.md §1-2):** U8: npt-super started
+  by one root command in its own CPU slice (Stop B confirms six points), home address held by the Hetzner firewall
+  (proved at bring-up), DelayStream judged on E with L0 = 0 (C-U8-5), the TCP-model burst knob in MOVED's brief; U6b:
+  `begin_tick`, ring for TLS, the self-test window mark, the in-memory key, the lever to U6e taken now.
 - **2026-11-22, U6a's brief (the advisor's rulings, advisor-u6a-brief.md §1-2; to name in the next day's message):**
   -16's start timer, -2's room-log series, C-U6-16 (c), C-U6-14's first clause and the 0600 token file built in U6a;
   T6's loss and space to U6d; taskset pinning; no wire change for C-U7-3; no engine-architect seat; C-U6-19's gate now
@@ -140,10 +144,8 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **Moved to history.md:7273-7311** (card_trim_1120f.py): U4f-F1 CLOSED (:7274-7280); U4g's brief to rev 2.1 (:7281-7299;
-  U4G-Q1 now answered (b); U4G-Q2 before -58's set only); U4f2's brief check (:7300-7311; rev 1.2 at launch).
-- **U4f2 CLOSED** (merged b4e1f43; -21's set PASS at L1, 13 bites shown; report u4f2-report.md, results 33d246f; its
-  record, rulings and set lines: this card at 00520b5). U4's report folds it.
+- **U4f2 CLOSED** (merged b4e1f43; -21's set PASS at L1; report u4f2-report.md; its lines: this card at 00520b5; U4f-F1,
+  U4g's brief and U4f2's brief check: history.md:7273-7311; U4G-Q2 before -58's set only). U4's report folds them.
 - **The re-plan APPROVED** (replan.md; the advisor's review advisor-replan.md; his answers history.md:7595-7607). Done
   today: the moved-mark block (moved-block.md: 29 moved marks and 12 kept marks' moving parts, bars by ADR row and
   marks.json c1935a5b…; build-plan lines read on main f5030a3) goes in today's message; PACK-P0 (b) below.
@@ -161,27 +163,18 @@
   Sat 12 Dec, R3 Sun 13, R5 Mon 14, close Fri 18 (holds at middle sizes, about Mon 21 at the top); asks U6c a ~20-line
   TCP-model test change (S14's burst half). **The advisor's check: APPROVE WITH CONDITIONS C1-C10, L1-L5** (one High,
   ADV-U8-1, closed by C1 word for word; Mediums read in full); **rev 1.1 APPLIED** (section 0.1; 131 pasted lines
-  checked equal to the ruling). npm DEP-HOLD: lock made (webdriverio 10.2.0, --before 2026-11-15, 167 packages,
-  scripts only edge/geckodriver); held in .gate/u8-deps/ (package.json 8370495d…, lock a0efce8e…); npm said 4
-  moderate advisories (`npm audit` refused here) → security's read running (security-u8-deps.md). Then the builder.
-- **U6b's brief rev 1 DRAFTED 14:4x** (u6b-brief.md, 411 lines; notes netcode-u6b-brief.md): about 2,700 added, likely
-  3,650-4,050 (re-plan 2,205); lane before R1 about 9,950-11,350 likely (R1's date at risk: the advisor rules); lever
-  ~250 lines to U6e; Block 0 manifest changes (web-transport-quinn and rcgen on ring; aws-lc-rs likely leaves the lock)
-  need security's own short read (after a seat frees). **The advisor's check running** (advisor-u6b-brief.md).
-  **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
-  @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
-  to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding
-  checks :249-257 before each dependency-check.md entry.
-- **PACK-P0 (b)** (each list committed with its ruling, then packed; free MiB before → after; files read back = listed):
-  c-u2-pm-0001-3-81c6d01e371b 4,760 → 5,364 (39/39; 47e4ee1); c-u2-pm-0001-3-65869918809f 5,364 → 5,967 (39/39;
-  1dc9751); u4r-P0-051995db9cea 5,967 → 8,497 (30/30; 3d2c752); u4r-P0-93509dfd7fd1 8,497 → 11,156 (30/30;
-  4e7d9c2); u4f-21-f591dcf71ca6 11,156 → 13,229 (150/150; 46915c1). DONE. Archives in .gate/netcode-proof-test/kept-logs/.
-- **Moved or stopped by NPT-TRIM (what is built stays, for reference):** U4g's early half (blocks 1-4, 2,053 lines;
-  snapshot wip/u4g-early.patch a78e2853…; worktree agent-abc25909b7dd4ad30 kept); U4g2's client half and U4h (briefs
-  u4g-brief.md rev 2.1, u4h-brief.md rev 2.1 kept for the real game); U5 stopped after Block 3a (1,658 lines; snapshot
-  wip/u5-early.patch afd767ac…; worktree agent-a60a432d4564f4cc7 kept; u5-build.md; guard u5-fuzz-guard.sh rev 4;
-  nightly-2026-11-01 and cargo-fuzz 0.13.2 installed; its Input target ran about 3.5M inputs a minute with ASan, no
-  crash). U6's brief rev 2.1 (u6-brief.md, u6-facts.md, advisor-u6-brief.md) is the input the re-plan cuts.
+  checked equal to the ruling). npm DEP-HOLD DONE: lock (webdriverio 10.2.0, --before 2026-11-15, 167 entries,
+  scripts only edge/geckodriver) cleared by security-u8-deps.md (the 4 moderates = minimatch's one advisory chain,
+  accepted; conditions in u8-brief.md 0.1); committed 2ad2829 with dependency-check.md's U8 block. Next: the builder.
+- **U6b's brief rev 1.1** (u6b-brief.md; notes netcode-u6b-brief.md): the advisor's APPROVE WITH CONDITIONS 1-8 (no
+  Critical or High; Mediums ADV-U6BB-1 to -4 read in full) applied in section 0.1 (66 lines checked equal); the lever
+  taken (about 250 lines to U6e); about 2,650 added, likely 3,600-4,000; lane before R1 about 9,900-11,300 likely: R1
+  Thu 3 Dec holds with no slack. **Security's Block 0 read running** (security-u6b-deps.md; the advisor's section 4).
+- **Done today (details in commits and the files):** the R1 path's DEP-HOLD read (security-r1-deps.md: takers SEC-R1D-1
+  U6a, -2/-3/-5/-6 U8 and R1, -4 U6c; @wdio/cli not cleared); PACK-P0 (b) five folders, free 4,760 → 13,229 MiB, each
+  read back = listed (commits 47e4ee1, 1dc9751, 3d2c752, 4e7d9c2, 46915c1; archives .gate/netcode-proof-test/kept-logs/).
+- **Moved or stopped by NPT-TRIM (built work kept for reference):** wip/u4g-early.patch (a78e2853…) and wip/u5-early.patch
+  (afd767ac…), their worktrees kept; u4g-brief.md and u4h-brief.md rev 2.1 for the real game (this card at 0177a17).
 - **Lessons:** never `cd` into an agent's worktree (read it with Read/Grep); an `isolation: worktree` agent starts at
   main, so its first step is `git merge --ff-only <lane commit>` (u4f-brief.md:292-295; missing from U4g's launch);
   no shell loop or redirect for scratch files (it asks, and an unanswered ask stood the session still 2 hours on
@@ -201,11 +194,5 @@
 - **2026-11-21 20:20:20 to 23:08 UTC** (all three agents; the worker restarted twice): "You've hit your org's monthly
   spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:40pm (UTC)". Resumed 23:08 by
   SendMessage after the 23:05 trigger: no cargo running, tree clean (saver's last push 28e0ad2), builder's FP-2 whole.
-- Cuts until 2026-11-17: history.md from :5791 on (the old card's block, the latest first) and the 19:46 one; the two
-  of 2026-11-18 (builders 2 and 3) word for word at history.md:6921-6932 (card_trim_1119e.py); 2026-11-19's 16:00:10
-  one (builder 4) at history.md:7124-7146 (card_trim_1119k.py); the 20:53:34-22:40:41 one (the advisor's -20 ruling
-  and the session) and the 11-18/11-19 choices at :7148-7160 (1119l); the 23:18 restart at :7169-7175 (1120b); the
-  01:01 restart at :7248-7253 (1120e); 2026-11-20's idle usage cut (06:16-10:57:41) at :7312-7315 and its 04:22
-  container restart at :7316-7322 (1120f); its 18:12:22-21:09:44 spend-limit cut at :7435-7444 (1120j);
-  2026-11-20's 22:39:36-02:37:53 one at history.md:7535-7542 (1121d);
-  2026-11-21's 16:12:40-17:41:37 one at history.md:7553-7559 (1121e).
+- Earlier cuts, word for word in history.md: until 2026-11-17 from :5791 on; 2026-11-18 :6921-6932; 2026-11-19
+  :7124-7146, :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559.

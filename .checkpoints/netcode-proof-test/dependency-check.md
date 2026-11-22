@@ -30,3 +30,16 @@ c55bab3c93d86c0068f572d9b20d152fe0080a6f29f278617615db04836e6b4d  spikes/netcode
 e694b595ef02d4e0f01e87df61ed083ba3ae254ab0b46687f6183a11df28a60d  spikes/netcode-proof/crates/server/Cargo.toml
 8ba544d368e0e35c509868a233dc0201cf8d4e0c3a19fa217f101724a5759086  spikes/netcode-proof/crates/super/Cargo.toml
 90404ee6b66b3884129195ad1d6eaef8a97a023159d4ff2b8f888242d7369ae1  spikes/netcode-proof/deny.toml
+
+# DEP-HOLD release, U8's browser package (main's .claude/CHECKPOINTS.md §3; u8-brief.md rev 1.1 section 5)
+# security-auditor's answers, read in full (each ends DONE): .checkpoints/netcode-proof-test/security-r1-deps.md (B5;
+# webdriverio 10.2.0 standalone CLEAR WITH CONDITIONS, :241-247; binding check :256-257) and
+# .checkpoints/netcode-proof-test/security-u8-deps.md (cleared with conditions: the 167 entries match the registry,
+# all published before the 2026-11-15 cut-off; install scripts only edgedriver and geckodriver; npm's 4 moderates are
+# GHSA-g3hv-75wg-m249 on minimatch 10.2.6 and the three packages that pull it in, accepted (code never called);
+# conditions: the only install is `npm ci --ignore-scripts` with npm_config_ignore_scripts=true, no .npmrc, no npx,
+# npm exec or npm create, specs run as `node <script>.mjs`, a later audit on the laptop shows exactly those 4,
+# SEC-R1D-2 and -3 in the spec config before any laptop run, no @wdio/cli). Made by `env npm_config_ignore_scripts=true
+# npm install --package-lock-only --ignore-scripts --before=2026-11-15`. Written 2026-11-22 ~15:0x UTC.
+8370495dee2ed77e6a937c6f40c72a5485015428d57f90505f4e440504293c90  spikes/netcode-proof/ops/browser/package.json
+a0efce8e511a8865d50008172b3f88e9cc072efbe92a85a035340562b7c49524  spikes/netcode-proof/ops/browser/package-lock.json

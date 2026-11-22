@@ -23,6 +23,13 @@ smoke, not five (:819); no W-PR at Stop B (:1269-1270, :1280). R-PR (PR #41) mer
 read 2026-11-22), so replan-units.md:222's open point closes.
 
 ## 0.1 Rev 1.1: the advisor's conditions (read first; each replaces or adds to the section it names)
+**The npm lock is in place** (committed by the main session under DEP-HOLD: `ops/browser/package.json` 8370495d…,
+`package-lock.json` a0efce8e…; dependency-check.md's U8 block). Security's conditions (security-u8-deps.md, DONE): the
+only install is `npm ci --ignore-scripts` with `npm_config_ignore_scripts=true` (no `.npmrc`: C2); no `npx`, `npm
+exec` or `npm create` anywhere; specs run as `node <script>.mjs`; a later audit on the laptop shows exactly the 4
+moderates of minimatch 10.2.6's GHSA-g3hv-75wg-m249 chain, anything else back to security; SEC-R1D-2 and -3 in the
+spec config before any laptop run; no @wdio/cli. The package files change only through a new DEP-HOLD read.
+
 **The advisor's check** (advisor-u8-brief.md, 2026-11-22): APPROVE WITH CONDITIONS; one High (ADV-U8-1) closed by C1
 as written, so no re-check. Its conditions, word for word (advisor-u8-brief.md:172-248):
 

@@ -1,4 +1,4 @@
-# U6b's brief, rev 1 (2026-11-22): the transports (for the advisor's one check, NPT-TRIM)
+# U6b's brief, rev 1.1 (2026-11-22): the transports (the advisor's APPROVE WITH CONDITIONS 1-8 applied: section 0.1)
 **The unit:** the second piece of U6 as Mustafa's NPT-TRIM cut it (history.md:7561-7593; his answers of 2026-11-22,
 history.md:7595-7607: RE-PLAN-OK yes, R1 on Thursday 3 December). Its row: replan-units.md:59 (T1, T2, T3, T4, T5,
 S8b: 2,205 estimated, 2,950-3,300 likely), first needed by R1 for the smoke, -36 and DelayStream's self-test. Built on
@@ -8,6 +8,79 @@ u6-facts.md, advisor-u6-brief.md, U6's row plan.md:1254 (replan-units.md:3 cites
 interfaces and the build rules), advisor-u6a-brief.md, security-r1-deps.md.
 **One advisor check** (NPT-TRIM), no re-check unless it finds a Critical or High. Section 9's six questions are the
 only asks; every other choice goes by its lean, one line each (section 1).
+
+## 0.1 Rev 1.1: the advisor's conditions (read first; each replaces or adds to the section it names)
+**The advisor's check** (advisor-u6b-brief.md, 2026-11-22): APPROVE WITH CONDITIONS; no Critical or High, so no
+re-check. Q-U6B-1 to -6 and the seven contradictions are ruled there (its sections 1-2): Q1 (a) `begin_tick`; Q2 (a)
+ring, no `install_default`; Q3 (a) aligned to U8 (C-U8-5); Q4 as leaned with terms; Q5 and Q6 the lever taken now (the
+per-peer profile, the B1 range check and `burst_return`'s fields to U6e). R1 on Thursday 3 December holds with no
+slack once the lever is taken. Its conditions, word for word (advisor-u6b-brief.md:268-333):
+1. **W18 (Q-U6B-1; ADV-U6BB-1, -2).** Section 1 adds to Block 4: "npt-link gains `fn begin_tick(&mut self, lens:
+   &[usize], now_ns: u64) -> SendResult`, provided, default `SendResult::Sent`, its doc text stating the caller's duty;
+   the blanket `impl<L: Link + ?Sized> Link for Box<L>` (link/src/lib.rs:97-119) forwards it. TickLoop's I/O side
+   calls it once per session per tick before that tick's datagram sends, with each datagram's length (with a per-tick
+   batch boundary if U6a's I/O side has none). WsLink answers every datagram of a refused tick BufferFull, counted in
+   `tick.v.ws_skipped_snaps_count`; a datagram send no current `begin_tick` announced, or one past its count, is
+   answered BufferFull and counted, never written ungated; control and FullState sends are not gated; WtLink, Loopback
+   and L1 keep the default." Section 3 adds a test calling it through `Box<dyn Link + Send>` that sees WsLink's
+   refusal, and plant P16 (the Box forward removed) failing it. Section 6's Files line reads "TickLoop's seam for the
+   accept stamp and its I/O send site for `begin_tick`", both named in the report. Section 9's Q-U6B-1 reads "Ruled
+   (a)".
+2. **The provider and Block 0 (Q-U6B-2; ADV-U6BB-7).** Section 5's expected lock diff reads: "removed: aws-lc-rs
+   1.19.0, aws-lc-sys 0.47.0, cmake, dunce, fs_extra, pkg-config; `"aws-lc-rs"` leaves quinn-proto's, rustls's and
+   rustls-webpki's dependency arrays; npt-server's array gains `"rcgen"`; nothing added; no version, checksum or source
+   line changed." Block 0 (d) adds: "no `CryptoProvider::install_default` anywhere; wt.rs's module text (:4-6) says
+   ring for both crates." The binding check's item (4) reads "check.mjs's test step PASSES at `<base>` with the wt
+   module's tests in the measured build on ring, its counts before and after Block 0 by name". Security-auditor's short
+   read covers advisor-u6b-brief.md section 4's eight items; its answer and dependency-check.md exist before the save.
+3. **The self-test's series (Q-U6B-3; ADV-U6BB-4).** Block 5's "At the run's end" bullet reads: "`ws_split` once
+   through a now-pub `split_rows`, with pooled L per direction: one more `Pooled` per direction in `Pool`, recording each
+   release's L (the sum the identity checks); per direction n, p50, p99, p99.9, max and E in both forms with their over
+   counts, L0 = 0 (E[(L − 0.25 ms)+], the form the U8 check judges: advisor-u8-brief.md:87-96) and the median form
+   (E[(L − p50 − 0.25 ms)+]), `summarize` taking its threshold as a parameter. The pool takes one mark at the measured
+   window's start, at a settings time after OPEN (range-checked; absent: no mark, the whole life): a copy of every
+   pooled bucket's count and sum, the kinds and the violations, taken once on the I/O runtime, never on the release
+   path; each pooled maximum restarts there; `ws_split` writes the difference, so the parts and pooled L share one
+   window; the header records the mark's time and whether it was taken. The per-second merge across connections is
+   U6e's (S9), before R3." Section 3 adds three tests (both E forms against a brute-force sum; samples before the mark
+   excluded, the window's own maximum, the identity exact across the mark) and the loopback example reports pooled L in
+   both forms. Section 10 adds: "U8's next edit: R1.md sets the mark's time from its timeline (LG's 48 connections up,
+   then the 1 min warm-up) and names `event.ws_split`'s pooled-L fields as the series the self-test reads." Section 9's
+   Q-U6B-3 reads "Ruled (a), aligned to C-U8-5".
+4. **The hash file (Q-U6B-4).** Block 6 adds: "the hash file is written by serde_json from a struct of exactly
+   `algorithm`, `value_hex` (64 lowercase hex digits) and `validity_ns`, no `next` field (PM-0006-26 moved), by
+   `create_new` with mode 0644 set at creation, one `write_all` then `sync_all`, after the certificate is made and
+   before OPEN; `validity_ns` equals `header.params.cert_validity_ns`; an existing path is refused (exit 2), so U8's
+   R1.md removes the previous room's file before any room restart. U6c's host serves it verbatim with `Cache-Control:
+   no-store` (plan.md:994-995), read per request or after each room start, under a size cap; U7's page turns
+   `value_hex` into `serverCertificateHashes`' bytes." Section 9's Q-U6B-4 reads "Ruled as leaned, with these terms".
+5. **The lever and the size (Q-U6B-5, -6; ADV-U6BB-5).** Move `DelayStream::set_profile`, `WsServer::set_peer_profile`,
+   `WsServer::peer_burst` (the B1 range check), `burst_return`'s four server fields and their tests and plants P12 and
+   P13 from Blocks 4 and 5 to section 2's U6e line, with SP-6, RC-2 and SERIES.md:326-329 named there by number
+   (U6e's brief carries them; they stay U6's). Section 8 reads: "About 2,650 (the blocks recounted, the lever out,
+   Q-U6B-3's window mark in), likely 3,600-4,000; the stop past 6,000. The lane before R1: about 9,900-11,300 likely
+   lines; R1 on Thursday 3 December holds with no slack; one lost day and it slips (three lines to him at once: the
+   advisor's text, advisor-u6b-brief.md section 3)." Counts: at least +45 measured and +47 bites; plants P1-P11, P14,
+   P15, P16. Section 9's Q-U6B-5 and -6 read "Ruled: moved to U6e; the lever taken now".
+6. **The validity dates (the build trap).** Block 6's certificate text reads: "`not_before` = `rcgen::date_time_ymd` of
+   today's civil date (00:00 UTC) from one reviewed `SystemTime::now` read in cert.rs (the one allow, its reason
+   calendar validity), by a days-to-civil routine tested on fixed dates (1970-01-01, 2000-02-29, 2026-11-22,
+   2100-03-01, a year end); `not_after` = `not_before + std::time::Duration::from_secs(13 × 86,400)`, or
+   `date_time_ymd` of the civil date 13 days on; a clock before 1970 or past 9999 is exit 2, never a panic;
+   `cert_validity_ns` = 13 × 86,400 × 10^9 from the same values, and the test reads the DER's validity back; the read
+   feeds no timing series. If neither form compiles without naming `time`, the build stops for a manifest change."
+7. **WsClient's limits (ADV-U6BB-3).** Block 3's WsClient text reads "tungstenite's client handshake with the
+   client's own limits: frame and message at least the largest room message plus its tag (a FullState of 65,536 + 5 B
+   plus 1 B: the catalogue :73-76), from one constant beside L2Config's, never the server's 513 B", with a test that
+   a FullState of the largest size reaches the WsClient.
+8. **Small fixes (ADV-U6BB-6, -8, -9, -10).** The new pub items add `ConnCap` (or the form both binds share), read by
+   the netcode seat. Section 3's container reading reads "before Stop B's read of R1's run plan (U8 builds beside U6:
+   replan-units.md:197-198)", and RC-12's order is met that way. The two 20-iteration kick tests fit the 5 s real-clock
+   cap (concurrent, or fewer iterations with the reason). Section 2's U6e line adds SERIES.md:616's second clause (what
+   the plain path writes) beside the per-second merge; U6b writes `ws_wrapper` 0 and fix 1's inputs on that path.
+   Section 7's security reads add the token file's reader, U8's `npt-ctl rooms tokens NN` run as `npt-room`
+   (advisor-u8-brief.md:97-98), at U6b's round if U8 has built it, else at Stop B's read. The report notes once that
+   replan-units.md:77-78's "as l2/wt.rs does" is wrong (wt.rs:176-179).
 
 ## 0. Where things are
 - **`<base>`** (filled at launch): U6a's merged head plus Block 0's commits (section 5); its spikes/netcode-proof tree,
