@@ -61,13 +61,36 @@ W = /home/user/Shamble-Frontlines/.claude/worktrees/agent-a95ebf14368f277ff/spik
   clippy passed in check3; same reads as lab/src/machine.rs.
 - Link Loopback Arc<Mutex> (link/src/lib.rs): const asserts, poison taken as is, l1 untouched. Fine.
 - FINDING C (High): npt-super's log header cannot sit in the run whose room it starts. super/src/main.rs:181-188 writes
-  bite None, tick_hz 0, scene "" (features []). The judge groups logs by header.run and makes a run INVALID when its
-  logs disagree on set, role, bite, layer, profile, tick_hz, scene or date (judge/src/eval.rs:47-61, :542-547). The
-  hold form exists so "U8's run plan starts every room through npt-super" (condition 3; -16's notes "every room start
-  in every run"): in that run, room (30, "SS") vs super (0, "") -> every R1 run INVALID. In its own run id instead, the
-  -16 bite can never be judged: super's header names no bite (and a bite run with no bites-build log is INVALID,
-  eval.rs:560-564). The bite test hides it: binary.rs:215-221 builds its "npt-super form" log from the ROOM's header
-  (process changed only), so the double-load evidence does not hold for npt-super's real log. Fix (about 15 lines):
-  npt-super takes `--scene`, `--tick-hz` and an optional `--bite` and writes them into its header (log(), :161-193);
-  the bite test (or an npt-super test) asserts a super header from log() agrees with the room's on the judge's eight
-  fields; U8 carry: super's log takes the run id of the room it starts.
+  bite None, tick_hz 0, scene "" (features []); confirmed in the real reading .gate/u6a/starts-super.jsonl line 1
+  ("bite":null,"tick_hz":0,"scene":""). The judge groups logs by header.run and makes a run INVALID when its logs
+  disagree on set, role, bite, layer, profile, tick_hz, scene or date (judge/src/eval.rs:47-61, :542-547). The hold form
+  exists so "U8's run plan starts every room through npt-super" (condition 3; -16's notes "every room start in every
+  run"): in that run, room (30, "SS") vs super (0, "") -> the run INVALID. In its own run id instead, the -16 bite can
+  never be judged: super's header names no bite (and a bite run with no bites-build log is INVALID, eval.rs:560-564).
+  The bite test hides it: binary.rs:215-221 builds its "npt-super form" log from the ROOM's header (process changed
+  only), so the double-load evidence does not hold for npt-super's real log. Fix (about 15 lines): npt-super takes
+  `--scene`, `--tick-hz` and an optional `--bite` and writes them into its header (log(), :161-193); one npt-super test
+  asserts log()'s header carries them; the bite test builds its super log through the same fields; U8 carry: super's
+  log takes the run id of the room it starts.
+- C-U6-17 (client/src/lib.rs:653-668): goal capped at next_tick_at(now + min(samples.rtt)/2) + 7 beside max_lead; 7 =
+  REDUNDANCY_CAP 8 - 1 = CMD_CATCHUP - 1 (proto limits.rs:17, room input.rs:177). The carry's form. carry.rs: Delay link
+  over Loopback (not l1), option B (room default), 10 ms path, 3rd exchange 600 ms slow both ways, buffer_full 0;
+  P7b fails it on the up leg. Fine. (Note, not a finding: the target "never down" (:671) can sit above a cap that just
+  shrank, e.g. lo_rtt falls; outside the carry's test, in not-verified.)
+- C-U6-18: host_step (bots lib.rs:887-899) = step (endpoint.input(None, received) then the command) -> endpoint.step ->
+  outgoing -> reliable; lab scenario.rs:1640 input(None), :1681 behaviour.step(&[]), :1688 endpoint.step, :1689
+  outgoing, :1690 reliable. They match (condition 5 confirmed); a view host feeds the endpoint itself and passes &[].
+- -2 parity: snapshot_clients equals lab's rule (logs.rs:629-632); everyone_in_view reads the room's relevant set (the
+  mark's words, SERIES.md:273) where the lab read its mirrored frame (mirror.rs:324-346); the -2 test compares every
+  count but sets `everyone: 0` on both sides (tests.rs:1071-1078), so flag parity with the lab is not tested (not
+  verified; test seat's lane).
+- Candidate (Low, carry U6e): the -2 counting runs on the tick thread after timers.end (tick_loop.rs:559-560), so its
+  time is in no series (not work_ns, no phase); PM-0006-19's logging-cost ratio over work_ns cannot see it, and it runs
+  with no log too (log None). For U6e's logging-cost work.
+- Candidate (Low): a failed /proc/stat read or a total of 0 writes steal_permille 0 (tick_loop.rs:1019-1021), the best
+  value -1 can read, so a failed read passes; rss and CPU likewise 0. Fix: leave the key out on None after the first
+  second (a gap the judge sees).
+- Candidate (Low, carry U6b): TickLoop::stop and Drop call runtime.block_on / shutdown_timeout (tick_loop.rs:1418-1427):
+  called from inside an async context (U6b's listener runtime) they panic; and the runtime has no pub handle for U6b's
+  listeners. U6b's brief names where TickLoop lives and who stops it.
+- Evidence read: check3.log:331-342 all 11 PASS, test 866.8 s, 744/844, 0 failed, 0 skipped; starts2.log exit 0.
