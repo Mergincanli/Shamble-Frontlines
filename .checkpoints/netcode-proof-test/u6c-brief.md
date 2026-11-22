@@ -1,4 +1,4 @@
-# U6c's brief, rev 1 (2026-11-22): the probe, the load, the page host and the certificate
+# U6c's brief, rev 1.1 (2026-11-22): the probe, the load, the page host and the certificate (the advisor's APPROVE WITH CONDITIONS C1-C9 applied: section 0.1)
 **The unit:** the third piece of U6 as Mustafa's NPT-TRIM cut it (history.md:7561-7593; his answers of 2026-11-22,
 history.md:7595-7607: RE-PLAN-OK yes, R1 on Thursday 3 December). Its row: replan-units.md:60 (P1, P2, B1, H1, H2:
 1,950 estimated, 2,650-2,950 likely), first needed by R1 for the L2 probe, the load, the pages and the certificate.
@@ -10,6 +10,121 @@ retyped: u6-brief.md rev 2.1, u6-facts.md, advisor-u6-brief.md, U6's row plan.md
 **One advisor check** (NPT-TRIM), no re-check unless it finds a Critical or High. Section 9's eight questions are the
 only asks (Q-U6C-5 is the read of new npt-log names that Q-U8-5 sends to this check); every other choice goes by its
 lean, one line each (section 1).
+
+## 0.1 Rev 1.1: the conditions (read first; each replaces or adds to the section or block it names)
+The advisor's check: APPROVE WITH CONDITIONS C1-C9 (advisor-u6c-brief.md, 451 lines, read in full; one High,
+ADV-U6C-1, closed by C1 word for word; Mediums ADV-U6C-2 to -5 read against their sources). Its sections 3 (the
+questions, the size, R1's date), 4 (security's short read), 5 (U8's fix pass), 6 (F26) and 7 (the contradictions) are
+read there. The conditions, word for word:
+
+**C1 (ADV-U6C-1, High), sections 1 (Blocks 3-6), 2, 4 and 9.** "U8's build finished on 2026-11-22 (snapshot
+wip/u8-build.patch, sha256 e9fd605c…; its interfaces were proposals: u8-build.md:28-30, :57-62). U6c builds these
+forms, and U8's fix pass (advisor-u6c-brief.md section 5) changes U8's side to match:
+(a) The issue mode is `npt-host issue staging|production`, exactly two arguments, writing into the compiled-in
+directory `/var/lib/npt/tls` (the library function takes the directory, so tests pass a temporary one; the binary takes
+no path); the directory check stays (owned by the calling user, writable by no one else; U8 makes it 2750
+`npt-host:npt-room`). Its files are `staging.key.pem`, `staging.chain.pem`, `production.key.pem` and
+`production.chain.pem`; the chain is created only after the key's `sync_all` returns, so a watcher of the chain sees
+both whole. Stdout carries exactly these lines, in this order, one each: `PROFILE <name>` (the order's profile,
+`default` when the order names none), `TXT_NAME _acme-challenge.rs.nt.shamblefrontlines.com`, `TXT_VALUE <dns_value>`;
+then it reads `go`; then `SERIAL <lowercase hex>`, `SHA256 <64 lowercase hex digits of the leaf's DER>`, `DONE`.
+Nothing else goes to stdout; the directory's profile list goes to stderr as one line `PROFILES <name>,<name>…`
+(plan.md:971's record; U8's certificate block keeps stderr in its results).
+(b) The probe starts as every RS process does: npt-server's settings gain `mode` (`room` or `probe`; SEC-U6AD-2's
+rules), and npt-super's hold form starts `npt-server --settings <file>` through `npt-ctl rooms start NN` (U8 uses room
+02: the probe binds the settings' `wt_bind`, UDP 30003, which replaces this brief's lean of 30032). Probe mode adds
+`probe_peer_ipv4`, `probe_legs` (default all six), `probe_packets` (default 1,000,000) and `probe_warmup_s` (default
+10); it parses and range-checks the room fields the run's settings carry and uses none of them; it mints no token file,
+writes no hash file and binds no TCP port; it prints `OPEN` once P0's socket is bound, exits 0 after its last leg, and
+on stdin's close ends at once, non-zero, every finished leg's log kept. One log per leg, named from `log_path` with the
+leg before `.log` (`room-02.log` gives `room-02-P0.log` to `room-02-B1.log`).
+(c) LG's side is `npt-load <settings path>`, one argument, as U8's npt-load-ctl starts it; the settings' `mode` is
+`run`, `calibrate` or `probe`. The settings are U8's fields (`room`, `server`, `wt_port`, `ws_port`, `mode`,
+`transport`, `clients`, `duration_s`, `token_path`, `log_path`) plus the header's (`run`, `set`, `marks`, `date`,
+`commit`), `machine` (LG's role, name, plan, location and address), `behaviour` (from a fixed list), `seed` and
+`pin_hex` (64 lowercase hex digits: the leaf the clients pin); SEC-U6AD-2's rules; probe mode reads no token. npt-load
+ends at `duration_s` with `DONE` and exit 0. Its stdin is /dev/null under npt-load-ctl, so stdin's close is no end for
+npt-load: section 4's sentence "npt-load's `run` and `probe` end the same way, when stdin closes" is struck. TERM
+(npt-load-ctl's `stop`) ends it at once, with no `DONE`, recorded as stopped. `READY` and `DONE` go to stdout, which
+npt-load-ctl writes to the load's log file.
+(d) The probe's records keep Q-U6C-5's names (section 4); U8's proposed `leg_edge` fields `leg`, `edge`, `cpu_lines`
+and `udp_drops` break marks/README.md:41-43's naming rule and are not built. In each leg's log, `leg_edge` and
+`cpu_stat` are written at `ph` `warmup` (after the bind, before the warm-up) and at `ph` `after` (after the tail, the
+socket still bound).
+(e) The page host matches the request target's path (up to the first `?`) exactly and ignores any query string, which
+it never reads or logs (U8's page URL is `/?smoke=1&suite=…&room=NN…`: config.mjs `pageUrl`). It serves
+`/npt/cert-hash-NN.json` for NN 00-31 from the settings' path template (U8: `/var/lib/npt/hash/room-NN.json`) and no
+`/npt/cert-hash.json` (Q-U6C-3 as ruled); its TLS chain and key are `production.chain.pem` and `production.key.pem`.
+(f) The host's start (Q-U6C-7 as ruled): `npt-host serve <settings.json>` runs until it is stopped; U8's systemd path
+and service pair in rs.yaml starts it as `npt-host` once `/var/lib/npt/tls/production.chain.pem` exists, with no
+sudoers line.
+Section 3 adds a test for each of (a) (the exact stdout lines; a staging then a production order in one directory both
+succeed), (b) (probe-mode settings accepted and refused; the per-leg log names in the end-to-end test), (c) (each mode's
+settings accepted and refused; the end at `duration_s` with `DONE`) and (e) (`/?a=b` serves the index; `/x?a=b` is a
+404), and plants P20 (the query kept in the match: (e)'s test) and P21 (the profile list printed on stdout: (a)'s
+test)."
+
+**C2 (ADV-U6C-2, -8, Medium), Blocks 1 and 3, section 3.** "LG speaks first. `probe_peer` keeps one UDP socket for the
+whole probe (one flow through both Hetzner firewalls; `fw-lg` admits no inbound UDP from RS: u8-brief.md:200-201),
+sends from its start to its `duration_s` without a pause, and counts, never fails on, send and receive errors while
+RS's socket is between legs (ICMP unreachable, ECONNREFUSED). In every leg RS's down pacer starts only after the first
+datagram whose source IPv4 equals `probe_peer_ipv4` has reached that leg's socket; that address and port are then
+pinned by `set_peer` (socket.rs:244 takes a full address), and every other source is dropped and counted; a leg with
+no such datagram within its warm-up ends the run non-zero (P0's 30 s rule extends to every leg). Rebinding the slot's
+port for the next leg retries for at most 2 s, since ImpairSocket's Drop signals its threads without joining them
+(socket.rs:440-446). Section 3 adds a Block 3 test (no down datagram before the peer's first; another source dropped
+and counted; P1 binds the port P0 used) and plant P18 (the pacer started before the peer is known), which must fail
+it."
+
+**C3 (ADV-U6C-3, Medium), Block 1, C-U6-6's line in Block 3, section 3.** "The echo keeps L1's design
+(lab/src/probe.rs:7, :10-11): each up datagram carries the newest down datagram LG has received and not yet echoed,
+with its hold, or none; a down datagram is echoed at most once, so `probe_rtt_ns` has one sample per round trip
+(SERIES.md:115). Block 3's C-U6-6 line reads "each carrying the newest down datagram not yet echoed and its hold, or
+none". On RS a repeated echo index is counted and only its first sample kept. Section 3's `probe_peer` test adds an up
+datagram sent with no new down (it carries none), and plant P19 (LG echoes the newest down whether echoed or not) must
+fail it."
+
+**C4 (ADV-U6C-4, Medium), section 1's order, sections 8 and 9.** "Block 2 (P2, C-U6-8) moves after Block 6 and is
+built last, as the release valve. After Block 6 the builder writes its added lines in its notes; if they pass 5,400,
+Block 2 is not built and the main session pulls lever (1): P2 rides in MOVED's brief, before R1's report, named in that
+day's message. Past 6,000 SIZE-CHECK applies as written (history.md:2048-2051): the build stops and Mustafa gets three
+lines; no split or move is made to get under it. Section 8's size line reads: "About 2,800 estimated; at the 1.9-2.3
+times the last units grew (U8 4,176 against 2,150; U6a 5,460 against 2,345) about 5,300-6,450, against the 6,000
+stop; Block 2 is built last as the valve." Section 8's lane line reads: "R1 on Thursday 3 December holds with about
+one day of slack (advisor-u6c-brief.md section 3), on four assumptions: each lane unit closes in one round within about
+a day and a half of its Block 0; the disk is freed before each build to the 4 GiB floor plus about 4 GiB (U6a's end
+checks stopped on the floor: u6a-build.md:139-146); no SIZE-CHECK stop; no spend-limit cut longer than half a day.
+Three lines go to Mustafa the day U6b is not merged by the end of Thu 26, or U6c by the end of Sun 29, or a lane unit
+hits SIZE-CHECK." Lever (2) is taken now: security-auditor's read of the host and the issue mode in U6c's round stands
+as Stop B's read of "U6c's host" (u8-brief.md:466-469), so Stop B's round reads U8's package and wrappers, and may start
+once U8's fix pass is in. Q-U6C-8 reads "Ruled: (a), with Block 2 last as the valve and lever (2) taken now"."
+
+**C5 (ADV-U6C-6, Low), sections 1 and 5.** "Section 5's binding check item (3) reads "instant-acme with `ring`,
+`hyper-rustls` and `rcgen` (its `ring` feature names `rcgen/ring` without `?`: security-r1-deps.md:70-72), never
+`aws-lc-rs`, `fips`, `time` or `x509-parser`". Section 1's lean "(instant-acme's `finalize()` is behind its `rcgen`
+feature, which the cleared set need not turn on)" reads "(`finalize_csr`, so the key's creation, mode and write stay in
+our code and tests; `finalize()` is likely compiled in by instant-acme's `ring` feature and is never called)".
+security-auditor's short read covers the eight items of advisor-u6c-brief.md section 4 before Block 0 runs."
+
+**C6 (Q-U6C-1 to -8), section 9.** "Each question reads "Ruled", with the terms in advisor-u6c-brief.md section 3:
+Q-U6C-1 (a); Q-U6C-2 (a); Q-U6C-3 (a), per room only, no plain name; Q-U6C-4 (a), one 8 KiB buffer and 32 header
+slots per connection, a request that does not fit closed; Q-U6C-5 the names as listed, read by U8's probe block per
+C1 (d); Q-U6C-6 U8's form (the console fingerprint first, the HTTPS line as the cross-check); Q-U6C-7 U8's systemd
+path and service pair (C1 (f)); Q-U6C-8 per C4."
+
+**C7 (counts), section 3.** "With C1's four tests and C2's, at least +52 measured and +52 bites (Block 2's 0-3 on top,
+when built); plants P1-P21 with TE2-TE4 (P18 and P19 from C2 and C3, P20 and P21 from C1)."
+
+**C8 (ADV-U6C-7, Low), sections 1, 4 and 9.** "Block 2 rewords T7's doc block, socket_tests.rs:1263-1271 (its stamp
+claims at :1263-1265 and :1270-1271; the carry's :1263-1264 is word for word and stays). This brief's own cites read
+plan.md:995-996 (the hash file), :967-972 (staging's profile) and :971-972 (the profile list's record): plan.md gained a
+line at :379 on 2026-11-22 (4d71571). `/npt/ssh-host-keys.txt` is served with `Cache-Control: no-store` as the hash
+files are (plan.md:1128: "`no-store` on the two files")."
+
+**C9 (section 10).** "Before launch: F26's fix on the lane (advisor-u6c-brief.md section 6); U8's fix pass off the lane
+after this rev 1.1 and U6a's merge (section 5's message); U7's drafter takes C1 (e): the page fetches
+`/npt/cert-hash-<room>.json` with the `room` of its own query, and the host ignores queries. At U6c's merge the main
+session checks U8's side against U6c's merged code, one line per interface (u8-build.md:62)."
 
 ## 0. Where things are
 - **`<base>`** (filled at launch): U6b's merged head plus Block 0's commit (section 5); its spikes/netcode-proof tree,
