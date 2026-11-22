@@ -47,9 +47,10 @@ pub enum CmdTiming {
 }
 
 /// A forged-command kind the room refuses and counts (ADR 0001:231-239; u4f-brief.md 2.4's table). Kind 7 is the
-/// sim's (its `reports()`), kinds 9 and 11 the pump's.
+/// sim's (its `reports()`, the sim's own `Refusal` records), kinds 9 and 11 the pump's (C-U4F2-3: named apart from
+/// the sim's records).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Refusal {
+pub enum CommandRefusal {
     /// Kind 1: the tick too far ahead of the room's (the lead bound).
     LeadBound,
     /// Kind 2: the tick not strictly newer than the newest accepted (on a fresh slot: at or before the join's tick).
@@ -68,18 +69,18 @@ pub enum Refusal {
     Catchup,
 }
 
-impl Refusal {
+impl CommandRefusal {
     /// The kind's number in u4f-brief.md 2.4's table.
     pub fn kind(self) -> u8 {
         match self {
-            Refusal::LeadBound => 1,
-            Refusal::NotNewer => 2,
-            Refusal::SeqNotForward => 3,
-            Refusal::MoveLength => 4,
-            Refusal::PressEdge => 5,
-            Refusal::AimBounds => 6,
-            Refusal::AckNeverSent => 8,
-            Refusal::Catchup => 10,
+            CommandRefusal::LeadBound => 1,
+            CommandRefusal::NotNewer => 2,
+            CommandRefusal::SeqNotForward => 3,
+            CommandRefusal::MoveLength => 4,
+            CommandRefusal::PressEdge => 5,
+            CommandRefusal::AimBounds => 6,
+            CommandRefusal::AckNeverSent => 8,
+            CommandRefusal::Catchup => 10,
         }
     }
 }
@@ -155,7 +156,7 @@ pub(crate) enum Offered {
     /// would run at (U4F-Q18 (a)). Dropped, counted `late`, never forged.
     Late,
     /// Refused under a forged kind.
-    Refused(Refusal),
+    Refused(CommandRefusal),
 }
 
 /// What `take` ran for one tick (option B).
@@ -251,11 +252,11 @@ impl InputBuffer {
             } else if self.buffered.len() < BITE_HELD {
                 self.buffered.push((k.arrival, c));
             } else {
-                return Offered::Refused(Refusal::Catchup);
+                return Offered::Refused(CommandRefusal::Catchup);
             }
             return Offered::Accepted;
         }
-        Offered::Refused(Refusal::SeqNotForward)
+        Offered::Refused(CommandRefusal::SeqNotForward)
     }
 
     /// A new sequence's checks (kinds 1, 2, the rejoin overlap, 4, 5, 6, late or the past window, 10), then the buffer.
@@ -263,7 +264,7 @@ impl InputBuffer {
         let r = k.relax;
         // Kind 1: no more than the lead bound ahead of the tick the room runs next.
         if !r.no_lead_bound && dist(c.tick, k.next_tick) > i64::from(k.lead_bound) {
-            return Offered::Refused(Refusal::LeadBound);
+            return Offered::Refused(CommandRefusal::LeadBound);
         }
         // Kind 2: strictly newer than the newest accepted (run or buffered: NA-13), or on a fresh slot strictly after
         // the join's tick (the join anchor, SA3-1).
@@ -271,7 +272,7 @@ impl InputBuffer {
         let d = dist(c.tick, reference);
         let newer = if r.not_older_than { d >= 0 } else { d > 0 };
         if !r.no_newer_tick && !newer {
-            return Offered::Refused(Refusal::NotNewer);
+            return Offered::Refused(CommandRefusal::NotNewer);
         }
         // The rejoin overlap: a fresh session's command at or before the slot's kept stamp (U4F-Q18 (ii) (d)).
         if self.accepted.is_none() && self.kept_stamp.is_some_and(|s| dist(c.tick, s) <= 0) {
@@ -280,7 +281,7 @@ impl InputBuffer {
         // Kind 4: x² + y² ≤ 127², each part widened to i32 before it is squared (SA3-3).
         let (x, y) = (i32::from(c.move_xy[0]), i32::from(c.move_xy[1]));
         if !r.no_move_length && x * x + y * y > 127 * 127 {
-            return Offered::Refused(Refusal::MoveLength);
+            return Offered::Refused(CommandRefusal::MoveLength);
         }
         // Kind 5: at most one edge per button for each tick the command covers, counters never backwards.
         let mut press_wrapped = false;
@@ -293,7 +294,7 @@ impl InputBuffer {
                 if !r.no_press_edge
                     && (!w.after8(PRESS, a, b) || i64::from(b.wrapping_sub(a)) > covered)
                 {
-                    return Offered::Refused(Refusal::PressEdge);
+                    return Offered::Refused(CommandRefusal::PressEdge);
                 }
                 press_wrapped |= b < a;
             }
@@ -302,7 +303,7 @@ impl InputBuffer {
         let [x0, y0, x1, y1] = k.extent;
         let inside = (x0..=x1).contains(&c.aim[0]) && (y0..=y1).contains(&c.aim[1]);
         if !r.no_aim_bounds && !inside {
-            return Offered::Refused(Refusal::AimBounds);
+            return Offered::Refused(CommandRefusal::AimBounds);
         }
         // B's late rule; A's past window W (more than W ticks before the tick it would run at: U4F-Q18 (a)).
         let late = match self.timing {
@@ -321,7 +322,7 @@ impl InputBuffer {
             InputBuffer::CMD_CATCHUP
         };
         if self.buffered.len() >= cap {
-            return Offered::Refused(Refusal::Catchup);
+            return Offered::Refused(CommandRefusal::Catchup);
         }
         match self.timing {
             CmdTiming::B => {
@@ -443,7 +444,7 @@ mod tests {
         }
         assert_eq!(
             b.offer(cmd(99, 99, [0; 4]), w, &mut wraps, &k),
-            Offered::Refused(Refusal::Catchup)
+            Offered::Refused(CommandRefusal::Catchup)
         );
     }
 
@@ -482,7 +483,7 @@ mod tests {
         let w = Wrap::default();
         let k = at(CmdTiming::B, 10);
         let mut wraps = Vec::new();
-        let press = Offered::Refused(Refusal::PressEdge);
+        let press = Offered::Refused(CommandRefusal::PressEdge);
         assert_eq!(
             b.offer(cmd(1, 10, [0; 4]), w, &mut wraps, &k),
             Offered::Accepted
@@ -542,7 +543,7 @@ mod tests {
         let t = b.take(11);
         assert_eq!((t.command.map(|c| c.seq), t.late), (Some(2), 1));
         assert_eq!(b.buffer_depth_ticks(), 2);
-        let kind2 = Offered::Refused(Refusal::NotNewer);
+        let kind2 = Offered::Refused(CommandRefusal::NotNewer);
         assert_eq!(b.offer(cmd(4, 11, [0; 4]), w, &mut wraps, &k), kind2);
         assert_eq!(
             b.offer(cmd(5, 13, [0; 4]), w, &mut wraps, &k),

@@ -487,6 +487,53 @@ fn brawl1_own_soldier_compares_ticks_by_the_endpoint_s_wrap_rule() {
     );
 }
 
+/// The commands of a step's `Input`s, newest first.
+fn sent(out: &StepOut) -> Vec<Command> {
+    out.datagrams
+        .iter()
+        .filter_map(
+            |d| match decode(Direction::ClientToRoom, Channel::Datagram, d) {
+                Ok(Message::Input(i)) => Some(i.commands),
+                _ => None,
+            },
+        )
+        .flatten()
+        .collect()
+}
+
+/// C-U4F2-2 (EA-U4F-1's built-ahead `skip_command`, the twin's skip: U4F-Q13 (b)): before the join it does nothing;
+/// joined (a fixed lead of 2), it uses the next command's sequence index and stamp and sends nothing for them, so the
+/// next command takes the index after and the stamp the lead gives; an unacknowledged older copy leaves the `Input`s
+/// (the sequences stay consecutive), counted in `twin_left_out`; with no copy held a skip leaves out nothing.
+#[test]
+fn c_u4f2_2_skip_command_uses_the_index_and_stamp_and_sends_nothing() {
+    let mut e = endpoint().with_lead(2);
+    e.skip_command();
+    let mut e = joined(e, 10);
+    e.skip_command();
+    e.input(Some(Command::default()), &[], 0);
+    let first = sent(&e.step());
+    assert_eq!(
+        first.iter().map(|c| (c.seq, c.tick)).collect::<Vec<_>>(),
+        [(1, 12)],
+        "the pre-join skip did nothing; the joined skip used index 0"
+    );
+    assert_eq!(e.twin_left_out(), 0, "no copy held");
+    e.skip_command();
+    assert_eq!(
+        e.twin_left_out(),
+        1,
+        "the unacknowledged command 1 left out"
+    );
+    e.input(Some(Command::default()), &[], 0);
+    let next = sent(&e.step());
+    assert_eq!(
+        next.iter().map(|c| (c.seq, c.tick)).collect::<Vec<_>>(),
+        [(3, 12)],
+        "index 2 used and never sent; only command 3 rides"
+    );
+}
+
 /// npt-client's planted defects (bites builds only), each in wave 1's two parts: a bites-only twin asserting the clean
 /// test's check fails on the bitten endpoint.
 #[cfg(feature = "bites")]

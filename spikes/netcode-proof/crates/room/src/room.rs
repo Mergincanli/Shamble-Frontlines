@@ -18,7 +18,9 @@ use crate::encoder::{
     DATAGRAM_OVERHEAD, Encoder, Packer, Section, delta_bits, event_bits, group_bytes, view,
 };
 use crate::events::{EventQueue, Queued};
-use crate::input::{CMD_SEQ, Checks, CmdTiming, InputBuffer, Offered, PRESS, Refusal, Relax, dist};
+use crate::input::{
+    CMD_SEQ, Checks, CmdTiming, CommandRefusal, InputBuffer, Offered, PRESS, Relax, dist,
+};
 use crate::interest::{AreaFlood, InterestGrid, Priority};
 use crate::rewind::rewind_at;
 use crate::roster::Roster;
@@ -33,6 +35,18 @@ const CELL_CM: i32 = 1_600;
 const HISTORY_MS: u32 = 2_000;
 /// Refusal records held between two ticks, at most (a bound on memory; more are counted in `refusals_dropped`).
 const REFUSALS_HELD: usize = 4_096;
+
+/// One refused command, in npt-sim's `Refusal` form (C-U4F2-3; plan §4.2 :246-247): its slot, its sequence and the
+/// room's kind (kind 8: one per command of the refused datagram). The sim's own records stay the sim's.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RefusalRecord {
+    /// The slot whose command it was.
+    pub slot: u8,
+    /// That command's sequence number.
+    pub seq: u16,
+    /// What the room refused it for (its kind's number: [`CommandRefusal::kind`]).
+    pub kind: CommandRefusal,
+}
 
 /// The room's planted defects (bites builds only), chosen per instance by [`Room::with_bite`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -510,8 +524,8 @@ pub struct Room<S: SimCore> {
     run_presses: Vec<[u8; 4]>,
     /// The refusal records (slot, seq, kind) of the receives since the last tick began (`incoming`), and those of the
     /// receives before it (`refusals`, what [`Room::refusals`] gives).
-    incoming: Vec<(u8, u16, Refusal)>,
-    refusals: Vec<(u8, u16, Refusal)>,
+    incoming: Vec<RefusalRecord>,
+    refusals: Vec<RefusalRecord>,
     refusals_dropped: u64,
     /// Option A's arrival numbers (its run order before `canonical`), and the tick's scratch list.
     arrivals: u64,
@@ -630,7 +644,7 @@ impl<S: SimCore> Room<S> {
 
     /// The refusal records of the commands received before the last tick began, as (slot, seq, kind), one per refused
     /// command (kind 8: one per command of the refused datagram), in arrival order (plan §4.2 :246-247's form).
-    pub fn refusals(&self) -> &[(u8, u16, Refusal)] {
+    pub fn refusals(&self) -> &[RefusalRecord] {
         &self.refusals
     }
 
@@ -930,9 +944,9 @@ impl<S: SimCore> Room<S> {
         let no_ack_sent = self.bitten(RoomBite::NoAckSent);
         let records = &mut self.incoming;
         let dropped = &mut self.refusals_dropped;
-        let mut record = |seq: u16, kind: Refusal| {
+        let mut record = |seq: u16, kind: CommandRefusal| {
             if records.len() < REFUSALS_HELD {
-                records.push((slot, seq, kind));
+                records.push(RefusalRecord { slot, seq, kind });
             } else {
                 *dropped += 1;
             }
@@ -980,7 +994,7 @@ impl<S: SimCore> Room<S> {
                     c.counters.ack_refused += 1;
                     c.counters.ack_refused_commands += input.commands.len() as u64;
                     for cmd in input.commands.iter().rev() {
-                        record(cmd.seq, Refusal::AckNeverSent);
+                        record(cmd.seq, CommandRefusal::AckNeverSent);
                     }
                     return;
                 }
@@ -1006,14 +1020,14 @@ impl<S: SimCore> Room<S> {
                 Offered::Late => k.late += 1,
                 Offered::Refused(r) => {
                     match r {
-                        Refusal::LeadBound => k.lead_refused += 1,
-                        Refusal::NotNewer => k.not_newer += 1,
-                        Refusal::SeqNotForward => k.seq_refused += 1,
-                        Refusal::MoveLength => k.move_refused += 1,
-                        Refusal::PressEdge => k.press_refused += 1,
-                        Refusal::AimBounds => k.aim_refused += 1,
-                        Refusal::Catchup => k.buffer_full += 1,
-                        Refusal::AckNeverSent => k.ack_refused_commands += 1,
+                        CommandRefusal::LeadBound => k.lead_refused += 1,
+                        CommandRefusal::NotNewer => k.not_newer += 1,
+                        CommandRefusal::SeqNotForward => k.seq_refused += 1,
+                        CommandRefusal::MoveLength => k.move_refused += 1,
+                        CommandRefusal::PressEdge => k.press_refused += 1,
+                        CommandRefusal::AimBounds => k.aim_refused += 1,
+                        CommandRefusal::Catchup => k.buffer_full += 1,
+                        CommandRefusal::AckNeverSent => k.ack_refused_commands += 1,
                     }
                     record(cmd.seq, r);
                 }

@@ -23,10 +23,10 @@ mod roster;
 pub use ack::AckRing;
 pub use encoder::Encoder;
 pub use events::EventQueue;
-pub use input::{CmdTiming, InputBuffer, Refusal};
+pub use input::{CmdTiming, CommandRefusal, InputBuffer};
 pub use interest::{AreaFlood, InterestGrid, Priority};
 pub use rewind::rewind_at;
-pub use room::{ClientCounters, ClientSlot, Room};
+pub use room::{ClientCounters, ClientSlot, RefusalRecord, Room};
 pub use roster::Roster;
 
 /// The bite ids npt-room plants (bites builds only; U4E-Q3 (a): a bites-only list of the room's own ids), each chosen

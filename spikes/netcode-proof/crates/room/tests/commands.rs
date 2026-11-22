@@ -79,7 +79,10 @@ fn tick(room: &mut Room<World>) -> Vec<u16> {
 
 /// The refusal records of the receives before the last tick, as (seq, kind number).
 fn refused(room: &Room<World>) -> Vec<(u16, u8)> {
-    room.refusals().iter().map(|r| (r.1, r.2.kind())).collect()
+    room.refusals()
+        .iter()
+        .map(|r| (r.seq, r.kind.kind()))
+        .collect()
 }
 
 fn counters(room: &Room<World>) -> npt_room::ClientCounters {

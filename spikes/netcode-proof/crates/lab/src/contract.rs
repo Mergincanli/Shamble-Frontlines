@@ -11,7 +11,7 @@
 //!   each `in_roster` true (the `roster` rule); `tick.v.late_count` on every room tick record. `late-zero` applies to
 //!   PM-0001-30 alone, which judges no U4r run, so this asks it of every run (stronger than "where it applies").
 //! - **(e) the shot band** (§4.13 :446-447): the measured seconds' mean of the room's `second.v.shots_count`, SS within
-//!   [665, 735], ES within [68.4, 75.6].
+//!   [665, 735], ES within [68.4, 75.6]; on a 48-client run but the clock suite's (its clients never fire: C-U4F2-7).
 //! - **The class audit** (the advisor's U4r build ruling 3, point 6 (1)): the lab log's `class_audit` event, its
 //!   `breaches_count` printed on every run; a run with no such event, or with a count above 0, fails, unless the run's
 //!   bite (its header's) is npt-room's class-filter bite, r4's, which must breach (catalogue item 5: the one id of
@@ -223,14 +223,22 @@ pub(crate) fn check(logs: &[Log], series: &str) -> Outcome {
         _ => (6_650, 7_350),
     };
     let in_band = n > 0 && sum * 10 >= lo * n && sum * 10 <= hi * n;
-    // The band is the scene's 48 soldiers' (PM-0001-2's parts select 48 clients): a smaller test run is not held to it.
-    let applies = clients == FULL_CLIENTS;
+    // The band is the scene's 48 soldiers' (PM-0001-2's parts select 48 clients): a smaller test run is not held to it,
+    // nor the clock suite, whose clients never fire (C-U4F2-7, U4F2-Q3 (a): -47's part has no PM-0001-2 precondition).
+    let clock = room
+        .header
+        .params
+        .get("suite")
+        .and_then(serde_json::Value::as_str)
+        == Some("clock");
+    let applies = clients == FULL_CLIENTS && !clock;
     o.lines.push(format!(
         "(e) shots per measured second: mean {:.2} over {n} s, band [{}, {}]: {}",
         if n > 0 { sum as f64 / n as f64 } else { 0.0 },
         lo as f64 / 10.0,
         hi as f64 / 10.0,
         match (applies, in_band) {
+            (false, _) if clock => "not applied (suite clock: its clients never fire)".to_owned(),
             (false, _) =>
                 format!("not applied ({clients} clients; the band is for {FULL_CLIENTS})"),
             (true, true) => "in".to_owned(),
@@ -448,24 +456,150 @@ mod tests {
     const SERIES: &str = include_str!("../../../marks/SERIES.md");
 
     /// One short L1 P0 run's logs (SS, 48 clients so the shot band applies, 6 s of warm-up, 2 s measured, its header
-    /// listing -17), with its scratch guard, so a failing caller keeps them (advisor-u4r-r1, FP-6 item 6: T-5).
-    fn short_run() -> (Scratch, Vec<Log>) {
-        let dir = scratch("r2");
-        let s = settings(
-            &dir,
-            "--seed 2 --profile P0 --warmup-s 6 --measured-s 2 --after-max-s 10 --marks PM-0001-17",
+    /// listing -17), made once per test process and read by r2's and T-6's tests (line 6); a failing run keeps its
+    /// folder (advisor-u4r-r1, FP-6 item 6: T-5).
+    fn short_run() -> &'static [Log] {
+        static RUN: std::sync::OnceLock<Vec<Log>> = std::sync::OnceLock::new();
+        RUN.get_or_init(|| {
+            let dir: Scratch = scratch("r2");
+            let s = settings(
+                &dir,
+                "--seed 2 --profile P0 --warmup-s 6 --measured-s 2 --after-max-s 10 --marks PM-0001-17",
+            );
+            crate::scenario::run(&s).expect("the run");
+            read(&dir).expect("its logs")
+        })
+    }
+
+    /// The process `p`'s log among `logs`.
+    fn at(logs: &[Log], p: &str) -> usize {
+        logs.iter()
+            .position(|l| l.header.process == p)
+            .expect("its log")
+    }
+
+    /// C-U4F2-7 (U4F2-Q3 (a)): a 48-client clock-suite record whose clients never fire (every measured second's shots
+    /// 0) reads "not applied" for the band and fails nothing.
+    #[test]
+    fn c_u4f2_7_the_shot_band_is_not_applied_to_the_clock_suite() {
+        let mut d = short_run().to_vec();
+        let room = at(&d, "room");
+        d[room].header.params.insert("suite".into(), "clock".into());
+        for s in &mut d[room].seconds {
+            s.v.insert("shots_count".into(), 0);
+        }
+        let o = check(&d, SERIES);
+        assert_eq!(o.failures, Vec::<String>::new());
+        let band = o
+            .lines
+            .iter()
+            .find(|l| l.starts_with("(e)"))
+            .expect("its line");
+        assert!(
+            band.ends_with("not applied (suite clock: its clients never fire)"),
+            "{band}"
         );
-        crate::scenario::run(&s).expect("the run");
-        let logs = read(&dir).expect("its logs");
-        (dir, logs)
+    }
+
+    /// C-U4F2-7 (U4F2-Q3 (a), neg): a 48-client record of another suite with shots 0 still fails the band (e).
+    #[test]
+    fn c_u4f2_7_the_shot_band_still_fails_another_suite_with_no_shots() {
+        let mut d = short_run().to_vec();
+        let room = at(&d, "room");
+        assert_eq!(d[room].header.params.get("suite"), Some(&"brawl".into()));
+        for s in &mut d[room].seconds {
+            s.v.insert("shots_count".into(), 0);
+        }
+        let f = check(&d, SERIES).failures;
+        assert_eq!(
+            f,
+            ["(e) the shot band: the measured mean is outside it".to_owned()]
+        );
+    }
+
+    /// T-6 (advisor-u4r-r1-full.md:122; u4f-brief.md P34) (1): carry 60's header param gone from one log fails by name.
+    #[test]
+    fn t6_a_missing_carry_60_header_param_fails_by_name() {
+        let mut d = short_run().to_vec();
+        let room = at(&d, "room");
+        d[room].header.params.remove("weapon_reach_cm");
+        let f = check(&d, SERIES).failures;
+        let want = "carry 60: the room log's header has no params.weapon_reach_cm";
+        assert_eq!(f, [want.to_owned()]);
+    }
+
+    /// T-6 (2): the lab log's `class_audit` event gone fails by name.
+    #[test]
+    fn t6_a_missing_class_audit_event_fails_by_name() {
+        let mut d = short_run().to_vec();
+        let lab = at(&d, "lab");
+        d[lab].events.retain(|e| e.ev != "class_audit");
+        let f = check(&d, SERIES).failures;
+        assert_eq!(
+            f,
+            ["class audit: the lab log has no class_audit event".to_owned()]
+        );
+    }
+
+    /// T-6 (3): one slot's `admit` event doubled fails by name (the roster rule's one admit per client).
+    #[test]
+    fn t6_a_duplicate_admit_fails_by_name() {
+        let mut d = short_run().to_vec();
+        let room = at(&d, "room");
+        let e = d[room]
+            .events
+            .iter()
+            .find(|e| e.ev == "admit")
+            .cloned()
+            .expect("an admit");
+        let slot = field_u64(&e, "slot").expect("its slot");
+        d[room].events.push(e);
+        let f = check(&d, SERIES).failures;
+        assert_eq!(f, [format!("(c) slot {slot}: 2 admit events, not 1")]);
+    }
+
+    /// T-6 (4): a log npt-log's reader refuses is the contract's FAIL, exit 1, naming the file (never exit 3).
+    #[test]
+    fn t6_a_log_the_reader_refuses_is_exit_1() {
+        let dir = scratch("t6-refused");
+        std::fs::create_dir_all(&*dir).expect("the folder");
+        for p in ["room", "client", "lab"] {
+            std::fs::write(dir.join(format!("{p}.jsonl")), "not a log\n").expect("a file");
+        }
+        let d = dir.to_str().expect("a UTF-8 path");
+        let series = format!("{}/../../marks/SERIES.md", env!("CARGO_MANIFEST_DIR"));
+        let argv: Vec<String> = ["--logs", d, "--series", series.as_str()]
+            .map(str::to_owned)
+            .to_vec();
+        let (code, why) = main(&argv).expect_err("a refused log");
+        assert_eq!(code, 1, "{why}");
+        assert!(
+            why.contains("room.jsonl does not read back as a log"),
+            "{why}"
+        );
+    }
+
+    /// T-6 (5): a usage error is exit 2 (an option with no value, one given twice, an unknown one, one missing).
+    #[test]
+    fn t6_a_usage_error_is_exit_2() {
+        for argv in [
+            vec!["--logs"],
+            vec!["--logs", "a", "--logs", "b"],
+            vec!["--log", "a"],
+            vec!["--logs", "a"],
+        ] {
+            let argv: Vec<String> = argv.into_iter().map(str::to_owned).collect();
+            let (code, why) = main(&argv).expect_err("a usage error");
+            assert_eq!(code, 2, "{argv:?}: {why}");
+        }
     }
 
     /// r2's checker passes the clean run, and each of U4R-Q11's four doctored copies fails it by name, and so do two
     /// more: the shot band, and a mirror breach (the advisor's U4r build ruling 3, point 6 (1)).
     #[test]
     fn r2_the_checker_passes_a_clean_run_and_fails_each_doctored_copy_by_name() {
-        let (_guard, logs) = short_run();
-        let clean = check(&logs, SERIES);
+        let logs = short_run();
+        let clean = check(logs, SERIES);
         for l in &clean.lines {
             println!("r2 clean: {l}");
         }
@@ -475,7 +609,7 @@ mod tests {
             .position(|l| l.header.process == "room")
             .expect("a room log");
         // (1) one admit event gone.
-        let mut d = logs.clone();
+        let mut d = logs.to_vec();
         let i = d[room]
             .events
             .iter()
@@ -489,7 +623,7 @@ mod tests {
             "{f:?}"
         );
         // (2) one footer gone.
-        let mut d = logs.clone();
+        let mut d = logs.to_vec();
         d[1].footer = None;
         let f = check(&d, SERIES).failures;
         assert!(
@@ -507,13 +641,13 @@ mod tests {
             .filter(|l| !l.starts_with(row))
             .collect::<Vec<_>>()
             .join("\n");
-        let f = check(&logs, &without).failures;
+        let f = check(logs, &without).failures;
         assert_eq!(
             f,
             ["(b) tick.s.snap_incomplete has no SERIES.md row".to_owned()]
         );
         // (4) one late_count series gone (a room tick record without it).
-        let mut d = logs.clone();
+        let mut d = logs.to_vec();
         d[room].ticks[3].v.remove("late_count");
         let f = check(&d, SERIES).failures;
         assert!(
@@ -524,7 +658,7 @@ mod tests {
             "{f:?}"
         );
         // (5) beyond U4R-Q11's four: the shot band, with every measured second's shots halved.
-        let mut d = logs.clone();
+        let mut d = logs.to_vec();
         for s in d[room]
             .seconds
             .iter_mut()
@@ -544,7 +678,7 @@ mod tests {
             .iter()
             .position(|l| l.header.process == "lab")
             .expect("a lab log");
-        let mut d = logs.clone();
+        let mut d = logs.to_vec();
         let a = d[lab]
             .events
             .iter_mut()

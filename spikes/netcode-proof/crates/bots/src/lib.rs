@@ -142,19 +142,284 @@ pub struct Behaviour {
     fast: Option<Fast>,
     /// -21's forger (`forger`).
     forge: Option<Forge>,
+    /// Kind 7's rest for the scene's weapon at the build's rate ([`fire_rest_at`]).
+    fire_rest: Option<u64>,
+    /// The lane walk's way (west), the fast clock's and the lag switch's (FP-4).
+    lane_west: bool,
 }
 
-/// A forger's state (u4f-brief.md 2.4, 2.6): its kind, its interval, the bound (ticks), the new sequences seen as an
-/// `Input`'s newest, the forged count, the newest command seen (honest) and the forged sequences not yet taken.
+/// Kind 7's items, every one a press edge where the sim refuses it (SA-15, both kinds): item i (the i-th due
+/// command) is a reload item when i % [`RELOAD_ITEMS`] is 2 (an honest reload edge on the command before, with fire
+/// released there, starts a reload, which refuses the forged reload edge; on a soldier revived just before, the full
+/// magazine refuses both, and nothing fires to leave it short: FP-1), else a fire item: fire released for the rest
+/// ([`fire_rest_at`]) commands before it (so the weapon is ready), an honest fire press on the command before (it
+/// fires), and the forged press on the next, in the weapon's cooldown (its interval is at least two ticks). The
+/// interval is above the rest (F-G), so the forged command itself is no rest and holds fire: a soldier revived just
+/// before it fires by the held trigger, as the twin does. A count of items, no time.
+const RELOAD_ITEMS: u64 = 40;
+
+/// Kind 7's rest at `tick_hz` for a weapon of `interval_us` (FP-3; carry 39: the rate an argument, pinned at 30 and
+/// 60 Hz): the commands a fire item's weapon rests before its honest press, so a shot's cost (`interval_us` x
+/// `tick_hz` units, falling 10^6 a command: npt-sim world.rs:1415-1416) has run out, `ceil(cost / 10^6)`. `None`
+/// under two ticks (a cost below 2 x 10^6): the clock carries at most one tick's remainder, so the press one command
+/// after the honest shot could find the weapon ready. SS's 68,571 µs: 3 at 30 Hz, 5 at 60 Hz.
+pub const fn fire_rest_at(tick_hz: u32, interval_us: u32) -> Option<u64> {
+    let cost = interval_us as u64 * tick_hz as u64;
+    if cost >= 2_000_000 {
+        Some(cost.div_ceil(1_000_000))
+    } else {
+        None
+    }
+}
+
+/// Kind 7's dead window (FP-2; F-B-COUNT (a), Mustafa 2026-11-21: "Leave kind 7's presses out of that count when the
+/// server's own state shows its soldier dead as that command or the one before it ran"): whether an item is left out of
+/// -21's count, from its soldier's state before the command phase of the tick that ran its command d (`dead_at_d`) and
+/// of the tick that ran d - 1 (`dead_before`, `None` when d - 1 never ran: then d alone decides). npt-lab's attribution
+/// applies it; this crate's World test (T-K7) reads the same rule.
+pub const fn kind_7_left_out(dead_at_d: bool, dead_before: Option<bool>) -> bool {
+    dead_at_d || matches!(dead_before, Some(true))
+}
+
+/// Kind 10's hold, in steps without a command: the burst's 8 accepted commands less its own two steps, so the
+/// forger's lead is the same after an episode as before it (a count of steps, with no time in it).
+const HOLD_STEPS: u32 = npt_proto::Limits::REDUNDANCY_CAP as u32 - 2;
+
+/// A forger's state (u4f-brief.md 2.4, 2.6, 2.12): its kind, interval, the bound (ticks) and kind 7's rest; whether
+/// it is the twin (the same script with only the forged part made honest); kind 10's option (A: hold, then burst;
+/// B: burst, then hold); the forged count, the newest command seen (honest), the forged sequences and kind 3's
+/// forged copies not yet taken; whether this step's command is the forged one; the last `Input`'s acknowledgement;
+/// kind 10's episode step, held datagram, kept stamps and next stamp; the twin's skips owed; kind 11's message; the
+/// forged `Input`s that would not encode (0 expected).
 #[derive(Clone, Debug, Default)]
 struct Forge {
     kind: u8,
     every: u64,
     bound: u32,
-    seen: u64,
+    rest: u64,
+    twin: bool,
+    option_a: bool,
     sent: u64,
     last: Option<Command>,
     forged: Vec<u16>,
+    copies: Vec<Command>,
+    due: bool,
+    ack: (u16, u8),
+    episode: u32,
+    held: Vec<Vec<u8>>,
+    stamps: std::collections::VecDeque<(u16, u32)>,
+    next_stamp: Option<u32>,
+    skips: u32,
+    message: Option<Vec<u8>>,
+    unencodable: u64,
+    burst: u8,
+    resume: Option<u32>,
+}
+
+/// How kind 9 leaves an `Input` undecodable: a trailing byte, or a set pad bit (the newest command's last byte's top
+/// bit: its 180 bits end 4 bits into its 23rd byte, the header's 5 B before it: proto/src/input.rs:9-10).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Undecodable {
+    Trailing,
+    Pad,
+}
+
+/// The byte holding the newest command's pad bits in an `Input` datagram (5 B header, 23 B whole command).
+const PAD_BYTE: usize = 5 + 22;
+
+/// Kind 10's commands accepted in a burst (the per-tick cap and B's buffer: 8) and the burst's commands under each
+/// option (A 16, B 12: the buffer's 8 and 4 more inside the bound).
+const BURST_KEPT: u32 = npt_proto::Limits::REDUNDANCY_CAP as u32;
+
+impl Forge {
+    /// Kind 10's forged commands per episode (A 8, B 4), so an episode comes every `every` times that many commands.
+    fn burst_refused(&self) -> u32 {
+        if self.option_a {
+            BURST_KEPT
+        } else {
+            BURST_KEPT / 2
+        }
+    }
+
+    /// Each command of `i` (oldest first) takes its kept stamp, or, as a new sequence, the next one (contiguous from
+    /// the forger's first stamp, the endpoint's own); a view tick after the stamp is the stamp (the endpoint's rule).
+    /// Returns the new sequences.
+    fn restamp(&mut self, i: &mut npt_proto::Input) -> Vec<u16> {
+        let mut new = Vec::new();
+        for c in i.commands.iter_mut().rev() {
+            let kept = self.stamps.iter().find(|(s, _)| *s == c.seq).map(|x| x.1);
+            c.tick = kept.unwrap_or_else(|| {
+                let t = *self.next_stamp.get_or_insert(c.tick);
+                self.next_stamp = Some(t.wrapping_add(1));
+                self.stamps.push_back((c.seq, t));
+                if self.stamps.len() > STAMPS_KEPT {
+                    self.stamps.pop_front();
+                }
+                new.push(c.seq);
+                t
+            });
+            if later(c.view_tick, c.tick) != c.tick {
+                (c.view_tick, c.view_fraction) = (c.tick, 0);
+            }
+        }
+        new
+    }
+
+    /// Kind 11's message on the control stream: the forger's a `Ping` (a datagram type) framed for that stream, which
+    /// the pump refuses as the wrong channel; the twin's a `ClientSettings` repeating the current delay (0: no `Interp`
+    /// yet), which changes nothing (2.12).
+    fn message(&self, now_ns: u64) -> Option<Vec<u8>> {
+        use npt_proto::{ClientSettings, Message, Ping, encode};
+        let mut out = Vec::new();
+        if self.twin {
+            encode(
+                &Message::ClientSettings(ClientSettings { delay: 0 }),
+                &mut out,
+            )
+            .ok()?;
+            return Some(out);
+        }
+        let ping = Message::Ping(Ping {
+            id: self.sent as u8,
+            sent_ns: now_ns,
+        });
+        encode(&ping, &mut out).ok()?;
+        let mut framed = u16::try_from(out.len()).ok()?.to_le_bytes().to_vec();
+        framed.append(&mut out);
+        Some(framed)
+    }
+
+    /// One item forged: counted, and its sequence kept for the lab.
+    fn record(&mut self, seq: u16) {
+        self.sent += 1;
+        self.forged.push(seq);
+    }
+
+    /// The forged part of one `Input` whose newest command `c` is new and due, `prev` the command before it, `ack` the
+    /// previous `Input`'s acknowledgement (2.6's per-kind table; the twin's rows, 2.12). Returns kind 9's way.
+    fn forge_input(
+        &mut self,
+        i: &mut npt_proto::Input,
+        c: Command,
+        prev: Option<Command>,
+        newest: u32,
+        ack: (u16, u8),
+    ) -> Option<Undecodable> {
+        let (n, twin) = (self.sent + 1, self.twin);
+        match self.kind {
+            // The twin never forges these (FP-5): its refused commands are never made (`forge_step`'s skip).
+            1 | 2 | 4 | 5 | 6 if !twin => {
+                i.commands[0] = forged(self.kind, c, prev, newest, self.bound, n)?;
+                self.record(c.seq);
+            }
+            3 => {
+                let p = prev.filter(|p| p.seq == c.seq.wrapping_sub(1))?;
+                let mut copy = p;
+                if !twin {
+                    if n % 2 == 1 {
+                        copy.move_xy[0] = p.move_xy[0].wrapping_add(1);
+                    } else {
+                        copy.aim[0] = p.aim[0].saturating_add(100);
+                    }
+                    self.record(p.seq);
+                    self.copies.push(copy);
+                }
+                match i.commands.get_mut(1) {
+                    Some(x) => *x = copy,
+                    None => i.commands.push(copy),
+                }
+            }
+            8 | 9 if twin && (self.kind == 9 || i.ack_groups != 0) => {
+                i.commands.clear();
+                (i.ack_tick, i.ack_groups) = ack;
+            }
+            8 if i.ack_groups != 0 => {
+                i.ack_tick = i.ack_tick.wrapping_add(1_000);
+                self.record(c.seq);
+            }
+            9 => {
+                self.record(c.seq);
+                return Some(if n % 2 == 1 {
+                    Undecodable::Trailing
+                } else {
+                    Undecodable::Pad
+                });
+            }
+            7 | 11 if !twin => self.record(c.seq),
+            _ => {}
+        }
+        None
+    }
+
+    /// The forger's hook on what its endpoint sends at its step (2.6: the honest datagrams, decoded and re-encoded with
+    /// only the kind's change; kind 9's left undecodable on purpose; kind 10's restamped, its burst's first `Input`
+    /// held and sent ahead of the second's). An `Input` whose forged form would not encode goes honest, counted.
+    fn outgoing(&mut self, newest: u32, datagrams: &mut Vec<Vec<u8>>) {
+        use npt_proto::{Direction, Message, decode, encode};
+        let (due, burst) = (
+            core::mem::take(&mut self.due),
+            core::mem::take(&mut self.burst),
+        );
+        let input = |d: &Vec<u8>| {
+            matches!(
+                decode(Direction::ClientToRoom, Channel::Datagram, d),
+                Ok(Message::Input(_))
+            )
+        };
+        for d in datagrams.iter_mut() {
+            let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
+            else {
+                continue;
+            };
+            let honest = i.clone();
+            let ack = core::mem::replace(&mut self.ack, (i.ack_tick, i.ack_groups));
+            let fresh = i.commands.first().copied().filter(|c| {
+                self.last
+                    .is_none_or(|l| (c.seq.wrapping_sub(l.seq) as i16) > 0)
+            });
+            if self.kind == 10 {
+                let new = self.restamp(&mut i);
+                if burst == 1 {
+                    self.resume = self.next_stamp;
+                } else if burst == 2 {
+                    self.next_stamp = self.resume;
+                    let twin = self.twin;
+                    for s in new.into_iter().filter(|_| !twin) {
+                        self.record(s);
+                    }
+                }
+            }
+            let mut way = None;
+            if let Some(c) = fresh {
+                let prev = i.commands.get(1).copied().or(self.last);
+                self.last = Some(c);
+                if due {
+                    way = self.forge_input(&mut i, c, prev, newest, ack);
+                }
+            }
+            if i == honest && way.is_none() {
+                continue;
+            }
+            let mut out = Vec::new();
+            if encode(&Message::Input(i), &mut out).is_err() {
+                self.unencodable += 1;
+                continue;
+            }
+            match way {
+                Some(Undecodable::Trailing) => out.push(0),
+                Some(Undecodable::Pad) => out[PAD_BYTE] |= 0x80,
+                None => {}
+            }
+            *d = out;
+        }
+        if burst == 1 {
+            self.held.extend(datagrams.extract_if(.., |d| input(d)));
+        } else if burst == 2 {
+            let mut both = core::mem::take(&mut self.held);
+            both.append(datagrams);
+            *datagrams = both;
+        }
+    }
 }
 
 /// `c`, the newest command of a new sequence, forged in `kind` (2.6's per-kind table), the `n`-th (from 1), against
@@ -192,8 +457,7 @@ fn forged(
 }
 
 /// The fast clock's state: the lead bound in ticks, the commands stamped, the last stamp, each recent sequence's stamp
-/// (every copy keeps it, so no copy differs: kind 3), the copies left out of an `Input` that would not encode, and the
-/// lane's way (west).
+/// (every copy keeps it, so no copy differs: kind 3), and the copies left out of an `Input` that would not encode.
 #[derive(Clone, Debug, Default)]
 struct Fast {
     bound: u32,
@@ -201,7 +465,6 @@ struct Fast {
     last: Option<u32>,
     stamps: std::collections::VecDeque<(u16, u32)>,
     left_out: u64,
-    west: bool,
 }
 
 /// The later of two ticks, wrap-aware.
@@ -298,32 +561,95 @@ impl Behaviour {
             lag: None,
             fast: None,
             forge: None,
+            fire_rest: fire_rest_at(npt_sim::TICK_HZ, scene.weapon().interval_us),
+            lane_west: false,
         }
     }
 
-    /// -21's forger of `kind` (2.4's kinds 1, 2, 4, 5 and 6: the room's checks on a whole command; `None` for another
-    /// kind) under the lead bound `bound` (ticks): the same behaviour, with the newest command of every `every`-th new
-    /// sequence forged in its kind in the first `Input` that carries it (2.6: the endpoint keeps the honest command, so
-    /// every later copy is honest, a repeat of a refused sequence: 2.4 item 2). `None` for `every` below 2: kinds 2 and
-    /// 5 forge against the previous command, so it must have been accepted (SEC-U4F-1), which every interval of 2 or
-    /// more gives on a lossless profile (P0).
+    /// -21's forger of `kind` (2.4's 11 kinds; `None` for another) under the lead bound `bound` (ticks), on a
+    /// fixed-lead endpoint at one command a step (2.6's per-kind table): the same behaviour with one forged item per
+    /// `every` commands given, in 2.4's unit. Kinds 1, 2, 4, 5 and 6: the `every`-th command's newest copy forged in
+    /// the first `Input` that carries it (the endpoint keeps the honest command, so every later copy is a repeat of a
+    /// refused sequence: 2.4 item 2). Kind 3: that `Input` carries the previous command's copy with its move or aim
+    /// changed. Kind 7: the command itself carries a fire edge in the weapon's cooldown, or (every 40th item, the
+    /// crate's `RELOAD_ITEMS`) a reload edge inside a reload an honest edge started, where the sim refuses it. Kind 8:
+    /// that `Input`'s acknowledgement names a tick never sent; kind 9: it takes a trailing byte or a set pad bit (in
+    /// turn); kind 11: a `Ping` on the control stream beside it. Kind 10: an episode every `every` x 8 (A) or x 4 (B)
+    /// commands, 16 (A) or 12 (B) commands in two datagrams sent in one step, stamped on from its last accepted stamp +
+    /// 1, so all but the first 8 are refused by the catch-up cap (A) or the full buffer (B), 6 steps without a command
+    /// (the crate's `HOLD_STEPS`) before (A) or after (B) the burst keeping its lead. `None` for `every` below 2:
+    /// kinds 2 and 5 forge against the previous command, so it must have been accepted (SEC-U4F-1), which every
+    /// interval of 2 or more gives on a lossless profile (P0); for kind 7 when the scene's weapon has no rest at the
+    /// build's rate or `every` is not above it (`fire_rest_at`: SS's 3 at 30 Hz, so from 4; FP-3, F-G: the forged
+    /// command itself then holds fire, so a soldier revived just before it fires as the twin's held trigger does); and
+    /// for an `every` whose 8 times overflows (kind 10's episode: FP-8).
     pub fn forger(mut self, kind: u8, every: u64, bound: u32) -> Option<Behaviour> {
-        ([1, 2, 4, 5, 6].contains(&kind) && every >= 2).then_some(())?;
+        ((1..=11).contains(&kind) && every >= 2).then_some(())?;
+        every.checked_mul(u64::from(BURST_KEPT))?;
+        let rest = match self.fire_rest {
+            Some(r) if kind == 7 && every > r => r,
+            _ if kind == 7 => return None,
+            _ => 0,
+        };
         self.forge = Some(Forge {
             kind,
             every,
             bound,
+            rest,
             ..Forge::default()
         });
         Some(self)
     }
 
-    /// The sequences the forger forged since the last take (the lab's attribution: 2.4 item 6).
+    /// The forger's twin (2.12): the same script and the same commands given, with only the forged part made honest:
+    /// kinds 1, 2, 4, 5, 6 and 10's refused commands never made (their sequence index and stamp used by
+    /// `ClientEndpoint::skip_command`: kinds 1, 2, 4, 5 and 6's at the due step itself, in the command's place; kind
+    /// 10's burst's at the next step, once the acknowledgement emptied the endpoint's copies: FP-8, NC-U4F2-6); kind
+    /// 3's copy with its honest content; kind 7's command without the forged edge; kinds 8's and 9's `Input` the header
+    /// only, its acknowledgement the previous `Input`'s; kind 11's message a `ClientSettings` repeating the delay.
+    pub fn twin(mut self) -> Behaviour {
+        if let Some(f) = self.forge.as_mut() {
+            f.twin = true;
+        }
+        self
+    }
+
+    /// Kind 10's option A shape (hold, then burst; a burst of 16): the room's option, which the lab gives it.
+    pub fn catchup_under_a(mut self) -> Behaviour {
+        if let Some(f) = self.forge.as_mut() {
+            f.option_a = true;
+        }
+        self
+    }
+
+    /// The sequences the forger forged since the last take (the lab's attribution: 2.4 item 6): kind 3's the copy's,
+    /// kind 10's the refused burst's, every other kind's the forged command's (kinds 8, 9 and 11: its step's newest).
     pub fn take_forged(&mut self) -> Vec<u16> {
         self.forge
             .as_mut()
             .map(|f| core::mem::take(&mut f.forged))
             .unwrap_or_default()
+    }
+
+    /// Kind 3's forged copies since the last take, each as sent (the attribution's "no command with the forged copy's
+    /// content runs").
+    pub fn take_copies(&mut self) -> Vec<Command> {
+        self.forge
+            .as_mut()
+            .map(|f| core::mem::take(&mut f.copies))
+            .unwrap_or_default()
+    }
+
+    /// The forger's `Input`s whose forged form would not encode, sent honest instead (0 expected: TE3-4, SA3-2).
+    pub fn forge_unencodable(&self) -> u64 {
+        self.forge.as_ref().map_or(0, |f| f.unencodable)
+    }
+
+    /// Kind 11's hook on what the endpoint sends reliably at its step: the step's message onto the control stream.
+    pub fn reliable(&mut self, out: &mut Vec<(Channel, Vec<u8>)>) {
+        if let Some(m) = self.forge.as_mut().and_then(|f| f.message.take()) {
+            out.push((Channel::Control, m));
+        }
     }
 
     /// -21's 1.5x clock (u4f-brief.md 2.6; U4F-Q11 (iii) (c) and (v) (b) as F1 amends it): fire held at a seeded point,
@@ -344,11 +670,11 @@ impl Behaviour {
         self.fast.as_ref().map_or(0, |f| f.left_out)
     }
 
-    /// The fast clock's walk (U4F-Q11 (iii) (c)): by its decoded position, toward the lane's west end until inside the
-    /// lane's band, then along the lane at full length (20 cm a tick), turning at each end; no complete tick yet, or a
-    /// dead soldier, stands (the sim moves no dead soldier).
+    /// The lane walk (U4F-Q11 (iii) (c); the fast clock's, and since FP-4 the lag switch's): by its decoded position,
+    /// toward the lane's west end until inside the lane's band, then along the lane at full length (20 cm a tick),
+    /// turning at each end; no complete tick yet, or a dead soldier, stands (the sim moves no dead soldier).
     fn lane(&mut self, own: Option<([i32; 3], bool)>) -> [i8; 2] {
-        let (Some(([x, y, _], false)), Some(f)) = (own, self.fast.as_mut()) else {
+        let Some(([x, y, _], false)) = own else {
             return [0, 0];
         };
         let [x0, x1] = LANE_X_CM;
@@ -357,11 +683,18 @@ impl Behaviour {
             return toward_centre(x - x0, y - LANE_Y_CM);
         }
         if x >= x1 {
-            f.west = true;
+            self.lane_west = true;
         } else if x <= x0 {
-            f.west = false;
+            self.lane_west = false;
         }
-        if f.west { [-127, 0] } else { [127, 0] }
+        if self.lane_west { [-127, 0] } else { [127, 0] }
+    }
+
+    /// -21's lag-switch client's script (FP-4, NC-U4F2-3): fire held at a seeded point and the fast clock's lane walk
+    /// on the fixed-lead rule, so its movement can show a burst's commands run (the standing steady script moved
+    /// nothing); closed loop, as the suite has no twin. [`Behaviour::lag_switch`] goes on it.
+    pub fn lane_walk(scene: &Scene, slot: u8, seed: u64) -> Behaviour {
+        Behaviour::new(Kind::Lane, scene, slot, seed)
     }
 
     /// -21's lag switch (2.6; U4F-Q15 (c)): the same behaviour, its `Input` datagrams held `hold_ns` (200 ms in the
@@ -424,11 +757,14 @@ impl Behaviour {
                 l.bursts.push(now_ns.saturating_sub(at));
             }
         }
-        if !self.never_acks && self.points.is_empty() && self.fast.is_none() && self.forge.is_none()
-        {
+        let newest = self.last_newest.unwrap_or(0);
+        if let Some(f) = self.forge.as_mut() {
+            f.outgoing(newest, datagrams);
             return;
         }
-        let newest = self.last_newest.unwrap_or(0);
+        if !self.never_acks && self.points.is_empty() && self.fast.is_none() {
+            return;
+        }
         for d in datagrams.iter_mut() {
             if let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
             {
@@ -458,23 +794,6 @@ impl Behaviour {
                         if later(c.view_tick, c.tick) != c.tick {
                             (c.view_tick, c.view_fraction) = (c.tick, 0);
                         }
-                    }
-                }
-                // The forger: an `Input` whose newest command is a new sequence counts it; every `every`-th is forged.
-                if let Some(f) = self.forge.as_mut()
-                    && let Some(&c) = i.commands.first()
-                    && f.last
-                        .is_none_or(|l| (c.seq.wrapping_sub(l.seq) as i16) > 0)
-                {
-                    f.seen += 1;
-                    let prev = i.commands.get(1).copied().or(f.last);
-                    f.last = Some(c);
-                    if f.seen.is_multiple_of(f.every)
-                        && let Some(x) = forged(f.kind, c, prev, newest, f.bound, f.sent + 1)
-                    {
-                        i.commands[0] = x;
-                        f.sent += 1;
-                        f.forged.push(c.seq);
                     }
                 }
                 // Every rewritten `Input` encodes: an older copy a past-bound stamp leaves more than 255 ticks below
@@ -585,9 +904,131 @@ impl Behaviour {
             self.skipped += 1;
             return false;
         }
+        if self.forge.is_some() {
+            return self.forge_step(endpoint, newest, view, now_ns);
+        }
         let command = self.next_command(newest, view, endpoint.own_soldier());
         endpoint.input(Some(command), &[], now_ns);
         true
+    }
+
+    /// A forger's step once its newest tick moved ([`Behaviour::forger`], [`Behaviour::twin`]): the twin's skips owed
+    /// first, then this step's command, each forged part marked for [`Behaviour::outgoing`] (kind 7's edges put on
+    /// the command itself, kind 11's message for [`Behaviour::reliable`]). Returns whether a command was given.
+    fn forge_step(
+        &mut self,
+        e: &mut ClientEndpoint,
+        newest: u32,
+        view: &[(u8, [i32; 3])],
+        now_ns: u64,
+    ) -> bool {
+        let own = e.own_soldier();
+        let n = self.given + 1;
+        let Some(f) = self.forge.as_mut() else {
+            return false;
+        };
+        for _ in 0..core::mem::take(&mut f.skips) {
+            e.skip_command();
+        }
+        if f.kind == 10 {
+            return self.catchup_step(e, newest, view, own, now_ns);
+        }
+        let due = n.is_multiple_of(f.every);
+        // Kind 7 ([`RELOAD_ITEMS`]): the due command `d`'s item kind, by its index d / every (reload item i % 40 == 2:
+        // d is at least 4, so a shot has left the magazine short of full by its honest edge at d - 1, unless a revive
+        // filled it, and then the full magazine refuses both edges).
+        let (every, kind) = (f.every, f.kind);
+        let reload = |d: u64| (d / every) % RELOAD_ITEMS == 2;
+        let ahead = |k: u64| kind == 7 && (n + k).is_multiple_of(every);
+        // Fire released on the command before every item, and for the rest before a fire item (FP-1, FP-3).
+        let rest = (1..=f.rest).any(|k| ahead(k) && (k == 1 || !reload(n + k)));
+        if ahead(1) {
+            let b = if reload(n + 1) {
+                Command::PRESS_RELOAD
+            } else {
+                Command::PRESS_FIRE
+            };
+            self.presses[b] = self.presses[b].wrapping_add(1);
+        }
+        if kind == 7 && due && !f.twin {
+            let b = if reload(n) {
+                Command::PRESS_RELOAD
+            } else {
+                Command::PRESS_FIRE
+            };
+            self.presses[b] = self.presses[b].wrapping_add(1);
+        }
+        let skip = due && f.twin && [1, 2, 4, 5, 6].contains(&kind);
+        f.due = due && !(f.twin && kind == 7) && !skip;
+        if due && kind == 11 {
+            f.message = f.message(now_ns);
+        }
+        let mut command = self.next_command(newest, view, own);
+        if rest {
+            // Kind 7: before a fire item the weapon rests (fire released) so the honest press before the forged one
+            // fires; before a reload item nothing fires, so a magazine a revive filled stays full (FP-1).
+            command.buttons &= !Command::FIRE;
+        }
+        if skip {
+            // The twin of a room-whole kind: the refused command is never made (U4F-Q13 (b)).
+            e.skip_command();
+            return false;
+        }
+        e.input(Some(command), &[], now_ns);
+        true
+    }
+
+    /// Kind 10's step ([`Behaviour::forger`]): an episode once every `every` x its refused count commands (A: 8,
+    /// B: 4): under A, [`HOLD_STEPS`] steps with no command, then 8 commands (their `Input` held), then 8 more (both
+    /// `Input`s sent in this step); under B the 8, then 4 more, then the hold. The twin gives none of the burst's
+    /// refused commands (generated, never made: their indices skipped at its next step).
+    fn catchup_step(
+        &mut self,
+        e: &mut ClientEndpoint,
+        newest: u32,
+        view: &[(u8, [i32; 3])],
+        own: Option<([i32; 3], bool)>,
+        now_ns: u64,
+    ) -> bool {
+        let given = self.given;
+        let Some(f) = self.forge.as_mut() else {
+            return false;
+        };
+        let period = f.every * u64::from(f.burst_refused());
+        if f.episode == 0 && given > 0 && given.is_multiple_of(period) {
+            f.episode = 1;
+        }
+        let (first, second) = if f.option_a {
+            (HOLD_STEPS + 1, HOLD_STEPS + 2)
+        } else {
+            (1, 2)
+        };
+        let step = f.episode;
+        let give = match step {
+            0 => 1,
+            s if s == first => BURST_KEPT,
+            s if s == second => f.burst_refused(),
+            _ => 0,
+        };
+        if step > 0 {
+            f.episode = if step == HOLD_STEPS + 2 { 0 } else { step + 1 };
+            f.burst = if step == first {
+                1
+            } else {
+                2 * u8::from(step == second)
+            };
+        }
+        let unmade = step == second && f.twin;
+        if unmade {
+            f.skips = give;
+        }
+        for _ in 0..give {
+            let c = self.next_command(newest, view, own);
+            if !unmade {
+                e.input(Some(c), &[], now_ns);
+            }
+        }
+        give > 0 && !unmade
     }
 
     /// The decision function (crate-private; `step` calls it, and so do this crate's tests): the next command from
@@ -652,6 +1093,10 @@ impl Behaviour {
         let walk = match self.kind {
             Kind::Brawl => self.leash(own, walk),
             Kind::Lane => self.lane(own),
+            // C-U4F2-5 (U4F2-Q1 (c), (b) not shown): the steady script stands, its fire, aim and presses kept. Its
+            // circle walk entered buildings in the sim-only test at full length and at 1/32 of it (a walking soldier
+            // that meets a passing vehicle part is set at the part's face), while a still soldier never moves.
+            Kind::Steady => [0, 0],
             _ => walk,
         };
         Command {
@@ -1165,14 +1610,589 @@ mod tests {
     }
 
     /// SEC-U4F-1: each room-whole forger refuses an interval below 2 (kinds 2 and 5 forge against the previous command,
-    /// which must have been accepted) and takes 2.
+    /// which must have been accepted) and takes 2 (kind 7 its rest: the fp3 test).
     #[test]
     fn f15_a_forgers_interval_below_2_is_refused() {
         let scene = Scene::stress();
         let steady = || Behaviour::script(&scene, 0, 1, "steady").expect("a script");
-        for k in [1, 2, 4, 5, 6] {
+        for k in 1..=11 {
             assert!(steady().forger(k, 1, 12).is_none(), "{k}");
-            assert!(steady().forger(k, 2, 12).is_some(), "{k}");
+            assert!(k == 7 || steady().forger(k, 2, 12).is_some(), "{k}");
+            let over = steady().forger(k, u64::MAX / 8 + 1, 12);
+            assert!(over.is_none(), "{k}: x 8 overflows");
+        }
+        assert!(steady().forger(12, 2, 12).is_none(), "no kind 12");
+    }
+
+    /// FP-3 (NC-U4F2-2 = RR-U4F2-1, SA-U4F2-2): kind 7's rest from the weapon and the rate, SS's pinned at 30 and 60
+    /// Hz (3 and 5) and `None` under two ticks; kind 7's forger takes an interval only above its rest (F-G: 2 and 3
+    /// refused at 30 Hz, 4 taken), and refuses any interval on a weapon with none.
+    #[test]
+    fn fp3_kind_7s_rest_comes_from_the_weapon_and_the_rate() {
+        let scene = Scene::stress();
+        let ss = scene.weapon().interval_us;
+        assert_eq!([30, 60].map(|hz| fire_rest_at(hz, ss)), [Some(3), Some(5)]);
+        let two_ticks = [66_666, 66_667].map(|i| fire_rest_at(30, i));
+        assert_eq!(two_ticks, [None, Some(3)], "1,999,980 and 2,000,010 units");
+        let rest = fire_rest_at(npt_sim::TICK_HZ, ss).expect("SS's rest");
+        let steady = || Behaviour::script(&scene, 6, 1, "steady").expect("a script");
+        let taken = [rest - 1, rest, rest + 1].map(|e| steady().forger(7, e, 12).is_some());
+        assert_eq!(taken, [false, false, true], "2 and 3 refused at 30 Hz");
+        let mut none = steady();
+        none.fire_rest = None;
+        assert!(none.forger(7, 1_000, 12).is_none(), "no rest");
+    }
+
+    /// One side of f15's run for kinds 3, 7, 8, 9, 10 and 11: a forger or its twin, its endpoint, the newest
+    /// sequence it sent (the acknowledgement fed back) and, per step, its endpoint's datagrams before and after
+    /// `outgoing` and its reliable messages.
+    struct Side {
+        b: Behaviour,
+        e: ClientEndpoint,
+        sent: Option<u16>,
+        steps: Vec<[Vec<Vec<u8>>; 3]>,
+    }
+
+    /// The steady script on a fixed-lead endpoint, forging kind `kind` every 3rd command (kind 10 under option A when
+    /// `a`), and its twin, fed the same snapshot ticks for 300 steps, each acknowledging the newest command its side
+    /// sent (as at P0; for kind 3 every 5th acknowledges nothing, so some `Input`s carry the copy already).
+    fn sides(kind: u8, a: bool) -> [Side; 2] {
+        sides_at(kind, a, 3, 300)
+    }
+
+    /// [`sides`] at the interval `every` for `steps` steps.
+    fn sides_at(kind: u8, a: bool, every: u64, steps: u32) -> [Side; 2] {
+        use npt_proto::{JoinAccepted, Message, Snapshot, encode};
+        let bytes = |m: &Message| {
+            let mut o = Vec::new();
+            encode(m, &mut o).expect("encodes");
+            o
+        };
+        let scene = Scene::stress();
+        let mut sides = [false, true].map(|twin| {
+            let b = Behaviour::script(&scene, 0, 1, "steady")
+                .and_then(|b| b.forger(kind, every, 12))
+                .expect("a forger");
+            let b = if a { b.catchup_under_a() } else { b };
+            Side {
+                b: if twin { b.twin() } else { b },
+                e: ClientEndpoint::new(npt_proto::Join::default(), 30).with_lead(2),
+                sent: None,
+                steps: Vec::new(),
+            }
+        });
+        let ja = bytes(&Message::JoinAccepted(JoinAccepted {
+            tick: 100,
+            ..JoinAccepted::default()
+        }));
+        for k in 0..steps {
+            let now = u64::from(k) * 33_333_333;
+            for s in &mut sides {
+                let snap = Snapshot {
+                    tick: 101 + k,
+                    groups: 1,
+                    newest_received: s.sent.filter(|_| kind != 3 || k % 5 != 4),
+                    ..Snapshot::default()
+                };
+                let mut rx = vec![(Channel::Datagram, bytes(&Message::Snapshot(snap)), now)];
+                if k == 0 {
+                    rx.insert(0, (Channel::Control, ja.clone(), 0));
+                }
+                s.b.step(&mut s.e, &rx, now, &[]);
+                let out = s.e.step();
+                let mut sent = out.datagrams.clone();
+                s.b.outgoing(now, &mut sent);
+                let mut reliable = Vec::new();
+                s.b.reliable(&mut reliable);
+                for i in sent.iter().filter_map(|d| decoded(d).ok()) {
+                    s.sent = i.commands.first().map(|c| c.seq).or(s.sent);
+                }
+                let reliable = reliable.into_iter().map(|r| r.1).collect();
+                s.steps.push([out.datagrams, sent, reliable]);
+            }
+        }
+        for s in &sides {
+            assert_eq!(
+                (s.b.forge_unencodable(), s.e.unencodable_commands()),
+                (0, 0)
+            );
+            assert_eq!(s.e.twin_left_out(), 0, "the twin left out no command");
+        }
+        sides
+    }
+
+    /// One datagram as an `Input`.
+    fn decoded(d: &[u8]) -> Result<npt_proto::Input, npt_proto::DecodeError> {
+        use npt_proto::{Direction, Message, decode};
+        match decode(Direction::ClientToRoom, Channel::Datagram, d)? {
+            Message::Input(i) => Ok(i),
+            _ => Err(npt_proto::DecodeError::UnknownType),
+        }
+    }
+
+    /// The `Input`s of one step's datagrams.
+    fn inputs(ds: &[Vec<u8>]) -> Vec<npt_proto::Input> {
+        ds.iter().filter_map(|d| decoded(d).ok()).collect()
+    }
+
+    /// f15's case for kinds 3, 8, 9 and 11 (2.6's per-kind table; TE3-4, SA3-2): each forged `Input` differs from the
+    /// honest one in the kind's part alone (kind 3: the previous command's copy, its move or aim changed, in place or
+    /// added; kind 8: the acknowledgement's tick, never sent; kind 9: a trailing byte or a set pad bit in turn, so it
+    /// does not decode; kind 11: its datagrams unchanged, a `Ping` on the control stream refused as the wrong channel),
+    /// at least 30 forged in 300 steps, each sequence once, and the twin's datagram in its slot by 2.12's row (kind 3:
+    /// the copy honest; kinds 8 and 9: the header only, the previous `Input`'s acknowledgement; kind 11: a
+    /// `ClientSettings` repeating the delay).
+    fn f15_datagram(kind: u8) {
+        use npt_proto::{ClientSettings, DecodeError, Direction, Message, decode};
+        let [mut f, t] = sides(kind, false);
+        let (mut seen, mut ways, mut prev_ack) = (Vec::new(), [0u32; 2], (0u16, 0u8));
+        for (k, ([honest, forged, msg], [_, twin, tmsg])) in
+            f.steps.iter().zip(&t.steps).enumerate()
+        {
+            let (h, tw) = (inputs(honest), inputs(twin));
+            if kind == 11 {
+                assert_eq!(honest, forged, "{k}");
+                assert_eq!(msg.len(), tmsg.len(), "{k}: the twin's message in its slot");
+                for (m, tm) in msg.iter().zip(tmsg) {
+                    let ctl = |b: &[u8]| decode(Direction::ClientToRoom, Channel::Control, b);
+                    assert_eq!(ctl(m), Err(DecodeError::WrongChannel), "{k}");
+                    let ping = decode(Direction::ClientToRoom, Channel::Datagram, &m[2..]);
+                    assert!(matches!(ping, Ok(Message::Ping(_))), "{k}: {ping:?}");
+                    let want = Ok(Message::ClientSettings(ClientSettings { delay: 0 }));
+                    assert_eq!(ctl(tm), want, "{k}");
+                    seen.push(h[0].commands[0].seq);
+                }
+                continue;
+            }
+            for (j, (hd, fd)) in honest.iter().zip(forged).enumerate() {
+                let hi = decoded(hd).expect("the honest Input");
+                let ack = core::mem::replace(&mut prev_ack, (hi.ack_tick, hi.ack_groups));
+                if hd == fd {
+                    continue;
+                }
+                let c = hi.commands[0];
+                match kind {
+                    3 => {
+                        let fi = decoded(fd).expect("a forged copy encodes");
+                        assert_eq!(fi.commands[0], c, "{k}: the new command honest");
+                        let (x, y) = (fi.commands[1], tw[j].commands[1]);
+                        assert_eq!((x.seq, x.tick), (y.seq, y.tick), "{k}");
+                        assert_eq!(x.seq, c.seq.wrapping_sub(1), "{k}: the copy one below");
+                        let moved = [x.move_xy != y.move_xy, x.aim != y.aim];
+                        assert_eq!(moved.iter().filter(|m| **m).count(), 1, "{k}: {x:?} {y:?}");
+                        let (mut back, mut honest) = (x, y);
+                        (back.move_xy, back.aim, honest.move_xy, honest.aim) =
+                            ([0; 2], [0; 3], [0; 2], [0; 3]);
+                        assert_eq!(back, honest, "{k}: only its move or aim");
+                        assert_eq!(fi.commands[2..], hi.commands[2.min(hi.commands.len())..]);
+                        ways[usize::from(hi.commands.len() > 1)] += 1;
+                        seen.push(x.seq);
+                    }
+                    8 => {
+                        let fi = decoded(fd).expect("a forged ack encodes");
+                        assert_eq!(fi.ack_tick, hi.ack_tick.wrapping_add(1_000), "{k}");
+                        assert_eq!((fi.ack_groups, &fi.commands), (hi.ack_groups, &hi.commands));
+                        seen.push(c.seq);
+                    }
+                    _ => {
+                        let way = usize::from(decoded(fd) == Err(DecodeError::UnknownField));
+                        ways[way] += 1;
+                        if way == 0 {
+                            assert_eq!(
+                                (decoded(fd), &fd[..hd.len()]),
+                                (Err(DecodeError::TrailingBytes), &hd[..])
+                            );
+                            assert_eq!(fd.len(), hd.len() + 1, "{k}: one trailing byte");
+                        } else {
+                            let diff: Vec<u8> = hd.iter().zip(fd).map(|(a, b)| a ^ b).collect();
+                            let mut want = vec![0u8; hd.len()];
+                            want[PAD_BYTE] = 0x80;
+                            assert_eq!(diff, want, "{k}: the newest command's top pad bit");
+                        }
+                        assert!(ways[0].abs_diff(ways[1]) <= 1, "in turn");
+                        seen.push(c.seq);
+                    }
+                }
+                if kind != 3 {
+                    let ti = &tw[j];
+                    assert!(ti.commands.is_empty(), "{k}: the twin's header only");
+                    assert_eq!((ti.ack_tick, ti.ack_groups), ack, "{k}: the previous ack");
+                }
+            }
+        }
+        assert_eq!(
+            f.b.take_forged(),
+            seen,
+            "{kind}: each forged once, in order"
+        );
+        if kind == 3 {
+            assert_eq!(f.b.take_copies().len(), seen.len());
+            assert!(
+                ways[0] > 0 && ways[1] > 0,
+                "kind 3: added {} and in place {}",
+                ways[0],
+                ways[1]
+            );
+        }
+        assert!(seen.len() >= 30, "{kind}: {} forged", seen.len());
+    }
+
+    #[test]
+    fn f15_the_kind_3_forger_breaks_only_the_sequence_forward_rule() {
+        f15_datagram(3);
+    }
+
+    #[test]
+    fn f15_the_kind_8_forger_acknowledges_only_a_tick_never_sent() {
+        f15_datagram(8);
+    }
+
+    #[test]
+    fn f15_the_kind_9_forger_sends_trailing_bytes_and_a_set_pad_bit_in_turn() {
+        f15_datagram(9);
+    }
+
+    #[test]
+    fn f15_the_kind_11_forger_sends_a_known_type_on_the_wrong_channel() {
+        f15_datagram(11);
+    }
+
+    /// f15's kind-7 case (SA-15; 2.6's row: the endpoint stores the forged command), at the rest + 1 (F-G: 4 at 30 Hz):
+    /// its datagrams unchanged; each forged command carries one edge against the command before it (inside kind 5's
+    /// rule), on the item's button (reload every [`RELOAD_ITEMS`]-th item, at index 2, else fire), right after an
+    /// honest edge of the same button; a fire item's rest before it holds no fire (SS's: 3 at 30 Hz), nor a reload
+    /// item's one command before it (FP-1); the twin gives the same commands with only the forged edges taken off (its
+    /// counters one lower from each on: carry 46).
+    #[test]
+    fn f15_the_kind_7_forger_presses_where_the_sim_refuses() {
+        let rest = fire_rest_at(npt_sim::TICK_HZ, Scene::stress().weapon().interval_us);
+        let rest = rest.expect("SS's rest");
+        let [mut f, t] = sides_at(7, false, rest + 1, 300);
+        let forged = f.b.take_forged();
+        let (mut cmds, mut tcmds) = (Vec::new(), Vec::new());
+        for ([honest, sent, _], [_, tsent, _]) in f.steps.iter().zip(&t.steps) {
+            assert_eq!(honest, sent, "the datagrams unchanged");
+            let new = |ds: &[Vec<u8>], v: &mut Vec<Command>| {
+                for c in inputs(ds).iter().flat_map(|i| i.commands.iter().rev()) {
+                    if v.last().is_none_or(|l: &Command| c.seq > l.seq) {
+                        v.push(*c);
+                    }
+                }
+            };
+            new(sent, &mut cmds);
+            new(tsent, &mut tcmds);
+        }
+        assert_eq!(cmds.len(), tcmds.len(), "one command a step on both");
+        let (fire, reload) = (Command::PRESS_FIRE, Command::PRESS_RELOAD);
+        let (mut taken, mut items) = ([0u8; 2], 0u64);
+        let edges = |a: &Command, b: &Command| {
+            [fire, reload].map(|x| b.presses[x].wrapping_sub(a.presses[x]))
+        };
+        for (n, w) in cmds.windows(2).enumerate().map(|(i, w)| (i + 1, w)) {
+            let e = edges(&w[0], &w[1]);
+            assert!(e[0] + e[1] <= 1, "{n}: one edge at most");
+            if forged.contains(&w[1].seq) {
+                items += 1;
+                let b = usize::from(items % RELOAD_ITEMS == 2);
+                assert_eq!(e[b], 1, "{n}: item {items}'s button");
+                assert_eq!(
+                    edges(&cmds[n - 2], &w[0])[b],
+                    1,
+                    "{n}: an honest edge before"
+                );
+                let before = if b == 0 { rest as usize } else { 1 };
+                let rested = cmds[n.saturating_sub(before)..n]
+                    .iter()
+                    .all(|c| c.buttons & Command::FIRE == 0);
+                assert!(rested, "{n}: {before} rested before item {items}");
+                taken[b] += 1;
+            }
+            let mut twin = w[1];
+            twin.presses[fire] = twin.presses[fire].wrapping_sub(taken[0]);
+            twin.presses[reload] = twin.presses[reload].wrapping_sub(taken[1]);
+            assert_eq!(tcmds[n], twin, "{n}: the twin's command");
+        }
+        assert_eq!(items, forged.len() as u64);
+        assert!(taken[0] >= 30 && taken[1] >= 2, "{taken:?}");
+    }
+
+    /// T-K7 (FP-1; TE-U4F2-1's proof of NC-U4F2-1): a kind-7 forger and its twin at the judged interval
+    /// ([`sides_at`], every 12th command, 640 steps), each run in a World of SS, with the same killers and placements
+    /// in both (at an interval of 3, the rest, every command is a rest, so an item d holds no fire and, after a revive
+    /// at d, its forged edge fires a shot the twin's d does not). The forger's soldier (slot 6, the judged runs' kind-7
+    /// slot) is teleported to an open point (35 m out: past the fight vehicles' parts, inside the outer loops' and 13
+    /// m from the nearest building), the 47 others onto a ring 8 m round it, holding fire at its chest (radial rays,
+    /// 107 cm apart at the ring). Kill 1: the forger stands idle until it dies, then its script starts so that item 2's
+    /// command before (a reload item's d - 1) is the first it runs after the sim's own respawn (`ticks_for_ms(1_000)`
+    /// later, SS's respawn: npt-sim scene.rs:186); its earlier commands run dead. It runs alive past item 42 (a reload
+    /// item, alive); kill 2 teleports it back and kills it again, and a spawn the test picks revives it at a fire
+    /// item's d, at least 10 ticks after the death, so that item's d - 1 ran dead. Asserts: every item whose d - 1 and
+    /// d ran alive carries its own record (fire: Cooldown, reload: Reload) under its sequence; every tick's state hash
+    /// equal between the two Worlds; the set-up reached each case. FP-2: the items `kind_7_left_out` leaves out (d or
+    /// d - 1 run dead) are counted apart and printed, and every other item carries its record (unrejected 0). Its
+    /// plants: fire held on a reload item's d - 1 (the shape before FP-1); the window ignored (FP-2).
+    #[test]
+    fn t_k7_kind_7_items_next_to_a_death_and_a_revive_through_the_world() {
+        use npt_sim::RefusalKind;
+        const SLOT: u8 = 6;
+        const C: [i32; 3] = [3_000, -1_800, 0];
+        let [mut f, t] = sides_at(7, false, 12, 640);
+        let forged = f.b.take_forged();
+        let commands = |s: &Side| {
+            let mut v: Vec<Command> = Vec::new();
+            let all = s.steps.iter().flat_map(|x| inputs(&x[1]));
+            for c in all.flat_map(|i| i.commands.into_iter().rev()) {
+                if v.last().is_none_or(|l| c.seq > l.seq) {
+                    v.push(c);
+                }
+            }
+            v
+        };
+        let (fc, tc) = (commands(&f), commands(&t));
+        assert_eq!(fc.len(), tc.len(), "one command a step on both");
+        // Each item (from 1): its command's index, and whether it is a reload item.
+        let index: BTreeMap<u16, usize> = (0..).zip(&fc).map(|(j, c)| (c.seq, j)).collect();
+        let items: Vec<(usize, bool)> = (1..)
+            .zip(&forged)
+            .map(|(i, s)| (index[s], i % RELOAD_ITEMS == 2))
+            .collect();
+        assert!(items[1].1 && items[41].1 && !items[43].1);
+        let scene = Scene::stress().with_stand_ins(StandIns::OFF);
+        let mut worlds = [World::new(&scene, 1, FIRST), World::new(&scene, 1, FIRST)];
+        let history = HitHistory::for_ms(2_000).expect("a ring");
+        // A soldier killed at tick D runs its next commands dead and the one at D + this alive.
+        let respawn = ticks_for_ms(1_000) as usize;
+        assert!(respawn > items[1].0);
+        let others = f64::from(scene.slots() - 1);
+        let ring: Vec<Placement> = (0..scene.slots())
+            .filter(|s| *s != SLOT)
+            .enumerate()
+            .map(|(i, slot)| {
+                let a = core::f64::consts::TAU * i as f64 / others;
+                let at = |c: i32, v: f64| c + (800.0 * v).round() as i32;
+                Placement {
+                    slot,
+                    position: [at(C[0], a.cos()), at(C[1], a.sin()), 0],
+                }
+            })
+            .collect();
+        let here = Placement {
+            slot: SLOT,
+            position: C,
+        };
+        let kill_2 = items[43].0 + 1;
+        // The killers firing; the script's first tick; the spawn's tick; the last command run.
+        let (mut firing, mut start, mut spawn, mut last) = (true, None, None, None);
+        let (mut dead, mut kills, mut first_diff) = (false, Vec::new(), None);
+        let mut ran_dead: Vec<Option<bool>> = vec![None; fc.len()];
+        let mut records: BTreeMap<u16, Vec<RefusalKind>> = BTreeMap::new();
+        for k in 0..fc.len() + 400 {
+            let j = start.and_then(|s| k.checked_sub(s));
+            if j.is_some_and(|j| j >= fc.len() || last.is_some_and(|l| j > l)) {
+                break;
+            }
+            let tick = FIRST.wrapping_add(k as u32);
+            let mut input = TickInput {
+                tick,
+                ..TickInput::default()
+            };
+            if k == 0 {
+                input.teleports = ring.clone();
+            }
+            if k == 0 || j == Some(kill_2) {
+                input.teleports.push(here);
+                firing = true;
+            }
+            if spawn == Some(k) {
+                input.spawns.push(here);
+            }
+            if let Some(j) = j {
+                ran_dead[j] = Some(dead && spawn != Some(k));
+            }
+            let mut both = [Vec::new(), Vec::new()];
+            for slot in 0..scene.slots() {
+                for (out, side) in both.iter_mut().zip([&fc, &tc]) {
+                    if let Some(j) = j.filter(|_| slot == SLOT) {
+                        let mut c = side[j];
+                        (c.slot, c.tick) = (slot, tick);
+                        out.push((c, None));
+                    } else if firing && slot != SLOT {
+                        let c = Command {
+                            slot,
+                            tick,
+                            seq: k as u16,
+                            buttons: Command::FIRE,
+                            aim: [C[0], C[1], 140],
+                            view_tick: tick,
+                            ..Command::default()
+                        };
+                        out.push((c, None));
+                    }
+                }
+            }
+            for (w, commands) in worlds.iter_mut().zip(both) {
+                w.step(
+                    &TickInput {
+                        commands,
+                        ..input.clone()
+                    },
+                    &history,
+                );
+            }
+            let [w, tw] = &worlds;
+            if first_diff.is_none() && w.state_hash() != tw.state_hash() {
+                first_diff = Some(k);
+            }
+            for r in w.reports().refusals.iter().filter(|r| r.slot == SLOT) {
+                records.entry(r.seq).or_default().push(r.kind);
+            }
+            dead = soldiers(w).iter().any(|x| x.0 == SLOT && x.2);
+            if firing && dead {
+                firing = false;
+                kills.push(k);
+                match start {
+                    None => start = Some(k + respawn + 1 - items[1].0),
+                    Some(s) => {
+                        let (jd, _) = *items
+                            .iter()
+                            .find(|&&(jd, r)| !r && s + jd > k + 10)
+                            .expect("a fire item left");
+                        spawn = Some(s + jd);
+                        last = Some(jd + 10);
+                    }
+                }
+            }
+        }
+        assert_eq!(kills.len(), 2, "two kills: {kills:?}");
+        // The cases: both runs alive; d dead; a fire item's d - 1 dead and d alive; a reload item's d - 1 the first
+        // live command; a reload item with d - 2 to d alive.
+        let (mut cases, mut missing, mut left_out) = ([0u32; 5], Vec::new(), Vec::new());
+        for &(j, reload) in &items {
+            let Some(at_d) = ran_dead[j] else {
+                continue;
+            };
+            let before = ran_dead[j - 1];
+            let got = records.get(&fc[j].seq).cloned().unwrap_or_default();
+            let want = if reload {
+                RefusalKind::Reload
+            } else {
+                RefusalKind::Cooldown
+            };
+            // FP-2: the attribution's rule; every item outside the dead window must carry its record.
+            if !kind_7_left_out(at_d, before) {
+                cases[0] += 1;
+                if !got.contains(&want) {
+                    missing.push((j + 1, fc[j].seq, reload, got.clone()));
+                }
+                if reload {
+                    cases[3 + usize::from(ran_dead[j - 2] == Some(false))] += 1;
+                }
+            } else {
+                cases[if at_d { 1 } else { 2 }] += u32::from(at_d || !reload);
+                left_out.push((j + 1, fc[j].seq, reload, before, at_d, got));
+            }
+        }
+        println!(
+            "t-k7: kills at ticks {kills:?}, script from tick {start:?}, spawn at tick {spawn:?}; cases (alive, d \
+             dead, fire d - 1 dead, reload after a revive, reload alive) {cases:?}; dead_left_out {} (FP-2: n, seq, \
+             reload, d - 1 dead, d dead, records): {left_out:?}",
+            left_out.len()
+        );
+        assert_eq!(
+            (missing, first_diff),
+            (Vec::new(), None),
+            "kind-7 items outside the dead window (FP-2) without their record, so unrejected (n, seq, reload, \
+             records), and the first tick whose state hash differs between the forger's World and the twin's"
+        );
+        assert!(
+            cases[0] >= 40 && cases[1..].iter().all(|c| *c >= 1),
+            "the set-up reached every case: {cases:?}"
+        );
+    }
+
+    /// f15's kind-10 case under both options (2.6's row; SA3-8, SA31-4 (c)): each episode sends two `Input`s in one
+    /// step, the first 8 new commands, the second 8 more new (A) or the first's last 4 again and 4 new (B), stamped
+    /// one apart on from the forger's last accepted stamp, every view tick at most its own tick, each `Input` encoding;
+    /// the forged sequences are the second's new ones; [`HOLD_STEPS`] steps with no new command come before (A) or
+    /// after (B) the burst; the twin sends the first `Input` and then the same commands again (repeats only), and its
+    /// later commands keep the forger's sequences.
+    #[test]
+    fn f15_the_kind_10_forger_sends_more_commands_in_one_tick_than_the_cap() {
+        for a in [true, false] {
+            let [mut f, t] = sides(10, a);
+            let forged = f.b.take_forged();
+            let (mut bursts, mut quiet, mut want) = (0, 0u32, Vec::new());
+            let (mut quiet_runs, mut newest) = (Vec::new(), None::<u16>);
+            for ([_, sent, _], [_, tsent, _]) in f.steps.iter().zip(&t.steps) {
+                let (fi, ti) = (inputs(sent), inputs(tsent));
+                let s: Vec<&Command> = fi.iter().flat_map(|i| i.commands.iter()).collect();
+                assert!(s.iter().all(|c| later(c.view_tick, c.tick) == c.tick));
+                let top = s.iter().map(|c| c.seq).max();
+                if top.is_some_and(|x| newest.is_none_or(|n| x > n)) {
+                    quiet_runs.push(core::mem::take(&mut quiet));
+                    newest = top;
+                } else {
+                    quiet += 1;
+                }
+                if fi.len() < 2 {
+                    continue;
+                }
+                bursts += 1;
+                let (one, two) = (&fi[0].commands, &fi[1].commands);
+                assert_eq!(one.len(), 8, "a: {a}");
+                let new = if a { 8 } else { 4 };
+                assert_eq!(
+                    &two[two.len() - (8 - new)..],
+                    &one[..8 - new],
+                    "a: {a}: the repeats"
+                );
+                let all: Vec<&Command> = two[..new].iter().chain(one).collect();
+                for p in all.windows(2) {
+                    assert_eq!(
+                        (p[0].seq.wrapping_sub(1), p[0].tick - 1),
+                        (p[1].seq, p[1].tick)
+                    );
+                }
+                want.extend(two[..new].iter().rev().map(|c| c.seq));
+                assert_eq!(ti.len(), 2, "the twin's two in that step");
+                assert_eq!(&ti[0].commands, one, "the twin's first: the accepted ones");
+                assert_eq!(&ti[1].commands, one, "the twin's second: repeats only");
+            }
+            assert_eq!(forged, want, "a: {a}");
+            assert!(bursts >= 2, "a: {a}: {bursts}");
+            quiet_runs.push(quiet);
+            let held = quiet_runs.iter().filter(|q| **q >= HOLD_STEPS).count();
+            assert!(held >= bursts, "a: {a}: {quiet_runs:?}");
+            let seqs = |s: &Side| -> BTreeMap<u16, ()> {
+                let all = s.steps.iter().flat_map(|x| inputs(&x[1]));
+                all.flat_map(|i| i.commands).map(|c| (c.seq, ())).collect()
+            };
+            let mut kept = seqs(&f);
+            kept.retain(|s, _| !forged.contains(s));
+            assert_eq!(
+                kept,
+                seqs(&t),
+                "a: {a}: the twin sends the same sequences but the refused"
+            );
+        }
+    }
+
+    /// FP-5 (NC-U4F2-4, TE-U4F2-2): U4F-Q13 (b)'s twin of the room-whole kinds 1, 2, 4, 5 and 6 never makes a
+    /// refused command: it sends no forged sequence, and its commands are the forger's honest ones less the forged
+    /// (the kind-10 case's pattern), at least 30 forged in 300 steps.
+    #[test]
+    fn fp5_the_room_whole_kinds_twin_never_makes_the_refused_command() {
+        for kind in [1, 2, 4, 5, 6] {
+            let [mut f, t] = sides(kind, false);
+            let forged = f.b.take_forged();
+            let by_seq = |s: &Side, k: usize| -> BTreeMap<u16, Command> {
+                let all = s.steps.iter().flat_map(|x| inputs(&x[k]));
+                all.flat_map(|i| i.commands).map(|c| (c.seq, c)).collect()
+            };
+            let mut kept = by_seq(&f, 0);
+            kept.retain(|s, _| !forged.contains(s));
+            assert!(forged.len() >= 30, "{kind}: {} forged", forged.len());
+            assert_eq!(kept, by_seq(&t, 1), "{kind}: the twin's commands");
         }
     }
 
@@ -1196,6 +2216,12 @@ mod tests {
         /// ten burst starts, the first 30 s into the measured phase (after the 10 s warm-up) and then every 60 s (the
         /// run scripts' B1 settings).
         Bursts,
+        /// (iv), barred (C-U4F2-5, U4F2-Q1 point 3): option A at P1. Each slot gives one command per client step (a
+        /// seeded phase in the tick), stamped P1's lead ahead (npt-lab's `lead_for`: its 50 ms RTT and 10 ms jitter in
+        /// ticks, plus 1); each arrives P1's one-way 25 ms ± 5 ms (uniform, seeded per command: l1/src/lib.rs:182-184)
+        /// later and runs at the first tick at or after its arrival, so a slot runs two commands in one tick and none
+        /// in another (no re-run on an empty tick).
+        OptionA,
     }
 
     /// One run's record: soldier-ticks in a building and the first; the largest distance from the centre (its square in
@@ -1242,19 +2268,32 @@ mod tests {
             .collect()
     }
 
-    /// The sim-only test's one run (no network): npt-sim's World from the judged runs' first tick, SS's 48 brawlers
-    /// driven through the decision function for `ms` of ticks under `pattern`. The position fed in is the World's own
-    /// record, `DELAY` steps old, standing in for the decoded position (with no network they are equal: this tests
-    /// the steering, not the decoding). It records every Soldier record with `area != 0`, the largest distance from
-    /// the centre, and names a soldier whose position stays inside a 100 cm square for more than 300 commands given.
-    fn sim_run(seed: u64, ms: u32, pattern: Pattern) -> Record {
+    /// The sim-only test's one run (no network): npt-sim's World from the judged runs' first tick, SS's 48 soldiers
+    /// on `script` (BRAWL-1's brawl; C-U4F2-5's steady: U4F2-Q1 point 3, the script as its parameter) driven through
+    /// the decision function for `ms` of ticks under `pattern`. The position fed in is the World's own record, `DELAY`
+    /// steps old, standing in for the decoded position (with no network they are equal: this tests the steering, not
+    /// the decoding). It records every Soldier record with `area != 0`, the largest distance from the centre, and
+    /// names a soldier whose position stays inside a 100 cm square for more than 300 commands given.
+    fn sim_script(
+        seed: u64,
+        ms: u32,
+        pattern: Pattern,
+        script: fn(&Scene, u8, u64) -> Behaviour,
+    ) -> Record {
         let scene = Scene::stress().with_stand_ins(StandIns::OFF);
         let mut world = World::new(&scene, seed, FIRST);
         let history = HitHistory::for_ms(2_000).expect("a ring");
         let n = usize::from(scene.slots());
         let mut bots: Vec<Behaviour> = (0..scene.slots())
-            .map(|s| Behaviour::brawl(&scene, s, seed))
+            .map(|s| script(&scene, s, seed))
             .collect();
+        // The option-A pattern's client steps and arrivals (ns from the run's first tick), and each slot's pending
+        // commands with the tick index each runs at.
+        let period = 1_000_000_000 / u64::from(npt_sim::TICK_HZ);
+        let mut arrive = seed ^ 0x6172_7269_7665_0000;
+        let phases: Vec<u64> = (0..n).map(|_| below(next(&mut arrive), period)).collect();
+        let mut pending: Vec<VecDeque<(u64, Command)>> = vec![VecDeque::new(); n];
+        let lead = ticks_for_ms(50 + 10).max(1) + 1;
         let mut last: Vec<Option<Command>> = vec![None; n];
         let mut seq = vec![0u16; n];
         let mut rng = seed ^ 0x736b_6970_7300_0000;
@@ -1310,9 +2349,31 @@ mod tests {
             let burst = bursts.iter().any(|&(a, b)| (a..b).contains(&k));
             let mut commands = Vec::with_capacity(n);
             for s in 0..n {
+                if pattern == Pattern::OptionA {
+                    let own = fed
+                        .iter()
+                        .find(|x| usize::from(x.0) == s)
+                        .map(|x| (x.1, x.2));
+                    let mut c = bots[s].next_command(t.wrapping_sub(DELAY as u32), &view, own);
+                    (c.slot, c.tick, c.seq) = (s as u8, t.wrapping_add(lead), seq[s]);
+                    seq[s] = seq[s].wrapping_add(1);
+                    square[s].2 += 1;
+                    let at = u64::from(k) * period
+                        + phases[s]
+                        + 20_000_000
+                        + below(next(&mut arrive), 10_000_001);
+                    pending[s].push_back((at.div_ceil(period), c));
+                    let before = commands.len();
+                    while pending[s].front().is_some_and(|p| p.0 <= u64::from(k)) {
+                        let (_, c) = pending[s].pop_front().expect("a pending command");
+                        commands.push((c, None));
+                    }
+                    r.skipped += u64::from(commands.len() == before);
+                    continue;
+                }
                 let skip = last[s].is_some()
                     && match pattern {
-                        Pattern::EveryTick => false,
+                        Pattern::EveryTick | Pattern::OptionA => false,
                         Pattern::Bursts => burst,
                         Pattern::Skips => {
                             r.chances += 1;
@@ -1369,8 +2430,20 @@ mod tests {
     /// rate per 1000 are the skip pattern's alone (ADV-PT-L1); every pattern prints its skipped ticks and longest
     /// streak.
     fn printed(seed: u64, ms: u32, pattern: Pattern) -> Record {
-        let r = sim_run(seed, ms, pattern);
+        printed_script(seed, ms, pattern, Behaviour::brawl, "brawl1")
+    }
+
+    /// [`printed`] with every slot on `script`, its print named `name`.
+    fn printed_script(
+        seed: u64,
+        ms: u32,
+        pattern: Pattern,
+        script: fn(&Scene, u8, u64) -> Behaviour,
+        name: &str,
+    ) -> Record {
+        let r = sim_script(seed, ms, pattern, script);
         let skips = match pattern {
+            Pattern::OptionA => format!("{} slot-ticks ran no command", r.skipped),
             Pattern::EveryTick => format!("skipped {}", r.skipped),
             Pattern::Skips => format!(
                 "skipped {} of {} chances ({} per 1000)",
@@ -1381,7 +2454,7 @@ mod tests {
             Pattern::Bursts => format!("skipped {} in its bursts", r.skipped),
         };
         println!(
-            "brawl1 sim seed {seed} {pattern:?} ({} ticks): in a building {} soldier-ticks (first {:?}); largest \
+            "{name} sim seed {seed} {pattern:?} ({} ticks): in a building {} soldier-ticks (first {:?}); largest \
              distance from the centre {} cm (slot {}, tick {}, at {}, {}); {skips}, longest streak {}; dead {} \
              soldier-ticks; stuck (slot, tick, x, y): {:?}",
             ticks_for_ms(ms),
@@ -1409,6 +2482,46 @@ mod tests {
             assert_eq!(r.in_building, 0, "{pattern:?}: first {:?}", r.first_in);
             assert!(r.dead > 0, "the dead-bit tie is exercised");
         }
+    }
+
+    /// Every slot on the steady script (-21's honest clients and the forgers' base walk: U4F2-Q1 point 3).
+    fn steady(scene: &Scene, slot: u8, seed: u64) -> Behaviour {
+        Behaviour::script(scene, slot, seed, "steady").expect("a script")
+    }
+
+    /// C-U4F2-5's sim-only test, short copy (the debug test step's; U4F2-Q1 point 3): all 48 slots on the steady
+    /// script, seed 1, `ticks_for_ms(120_000)`, the barred patterns (every tick, the skips, option A at P1): no
+    /// Soldier record with `area != 0` on any tick.
+    #[test]
+    fn c_u4f2_5_sim_short_no_steady_soldier_enters_a_building() {
+        for pattern in [Pattern::EveryTick, Pattern::Skips, Pattern::OptionA] {
+            let r = printed_script(1, 120_000, pattern, steady, "c-u4f2-5");
+            assert_eq!(r.in_building, 0, "{pattern:?}: first {:?}", r.first_in);
+        }
+    }
+
+    /// C-U4F2-5's sim-only test, full (U4F2-Q1 point 3): seeds 1 to 3, a judged run's `ticks_for_ms(610_000)`, all 48
+    /// slots on the steady script; the barred patterns (every tick, the skips, option A at P1) put no Soldier record
+    /// in a building on any tick; B1's bursts are printed only. Its plant is today's walk (25d316e's `MOVES` circle),
+    /// which must read in a building above 0 in at least one pattern and seed.
+    #[test]
+    #[ignore = "the full 610 s run, 3 seeds x 4 patterns: run by name in release for the record (C-U4F2-5)"]
+    fn c_u4f2_5_sim_full_no_steady_soldier_enters_a_building_seeds_1_to_3() {
+        let mut barred = Vec::new();
+        for seed in 1..=3 {
+            for pattern in [
+                Pattern::EveryTick,
+                Pattern::Skips,
+                Pattern::OptionA,
+                Pattern::Bursts,
+            ] {
+                let r = printed_script(seed, 610_000, pattern, steady, "c-u4f2-5");
+                if pattern != Pattern::Bursts && r.in_building > 0 {
+                    barred.push((seed, pattern, r.in_building, r.first_in));
+                }
+            }
+        }
+        assert!(barred.is_empty(), "in a building: {barred:?}");
     }
 
     /// TE-B1-2's npt-sim half (BRAWL-1 round 1): a soldier teleported to building 0's centre (2,200, 0: npt-sim

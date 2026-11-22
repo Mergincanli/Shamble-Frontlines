@@ -20,15 +20,18 @@
 //   (never overwritten): one folder per row, <key>-verdict.json beside it, the copies of marks.json and SERIES.md (their
 //   sha256s in r2.txt's head), r2.txt; spikes/netcode-proof re-checked before r2.txt is written.
 // - B6 holds 5.3's p5, p6, p10, p11, p12 and p21, B7 the clamp's p2, p8 and p15, B8 the lag switch's p4, p13, p18
-//   and p19 and the fast clock's p3, p9, p16 and p20; the forged suite's rows (p1, p7, p14, p17) join with it.
-// - -21's rows (p2-p4, p8, p9, p13, p15, p16, p18-p20) from a commit before U4f2's merge are an early read of the built
-//   suites, not -21's 5.3 record (advisor-u4f-stop.md:90-94).
+//   and p19 and the fast clock's p3, p9, p16 and p20; U4f2 adds the forged suite's p1, p7, p14 and p17.
+// - -21's rows (p1-p4, p7-p9, p13-p20) read as -21's 5.3 record only from U4f2's merge commit or a later one (carry
+//   86; C-U4F2-4); from an earlier commit they are an early read of the suites built then (advisor-u4f-stop.md:90-94).
+// - Each forged-suite row (p1, p7, p14, p17) also gets kind 7's line from its lab.jsonl (`kind7Line`: F-B-COUNT (a),
+//   "report the number left out beside the check on every run"; FP-10). `--kind7 <run folder>...` prints that line for
+//   each folder and runs nothing (a dry read).
 // - Its helpers are exported (c-u4f-runs.mjs reads them); main runs only when this file is the entry module.
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { builtArtifact, run } from "../../check.mjs";
 import { roomFor, spikeChanged, spikeReading } from "./c-u4r-runs.mjs";
@@ -46,8 +49,11 @@ const M20 = "PM-0001-2,PM-0001-20";
 const M21 = "PM-0001-2,PM-0001-21";
 /** -21's suites at P0 (U4F-Q11 (ii) (a)), the honest clients on the open-loop steady script under the controller. */
 const P21 = `${SHORT} --profile P0 --controller 1 --behaviour steady`;
-/** The lag switch at P1, slot 0 holding its `Input`s 200 ms every 6 s (3 bursts in 20 s: 5.3). */
+/** The lag switch at P1, slot 0 holding its `Input`s 200 ms every 6 s (5 bursts in the run's 30 s: F5 (a)). */
 const LAG = `${SHORT} --profile P1 --controller 1 --behaviour steady --suite lag-switch`;
+/** The forged suite at P0: the 11 forgers (slots 0 to 10) at the judged interval, 37 honest on the steady script. */
+const FORGED = `${P21} --suite forged --forge-every 12`;
+const FORGED_SAYS = "'forged: 1,000 commands of every kind' fails by length (about 75 a kind in 30 s) and the twin check reads a Gap (no twin in 5.3); 'forged: every kind of part 5's set sent (11 kinds)' passes";
 /** The fast clock at P0, 70 s measured: one whole 60 s episode from the measured start and 10 s (5.3; 2.6's schedule). */
 const FAST = "--scene SS --seed 1 --warmup-s 10 --profile P0 --controller 1 --behaviour steady --suite fast-clock";
 const FAST_SAYS = "'fast clock: 10 runs of 60 s' fails by length (1 episode); the episode's excess, lead-bound and not-newer refusals reported (event.fast_clock)";
@@ -55,13 +61,17 @@ const CLAMP_SAYS ="'clamp: 1,000 points beyond reach per weapon kind the sim has
 
 /** 5.3's rows: `build` the npt-lab build (`lab` measured, `bites`), `args` the scenario's settings, `marks` its header's. */
 export const RUNS = [
+  { key: "p1", build: "lab", args: `${FORGED} --cmd-timing A`, marks: M21, expect: `every PM-0001-2 check and the shot band pass; 'forged: every forged command rejected and counted' passes (event.forged_kind, each kind's unrejected_count 0 and refusals_dropped_count 0); ${FORGED_SAYS}` },
+  { key: "p7", build: "bites", args: `${FORGED} --cmd-timing A --role bite --bite PM-0001-21/no-lead-bound`, marks: M21, expect: `'forged: every forged command rejected and counted' FAILS (kind 1's items run; it passes on p1); ${FORGED_SAYS}` },
+  { key: "p14", build: "lab", args: `${FORGED} --cmd-timing A`, marks: M21, expect: "p1 again at seed 1 (TE-24, D11): its lab log's fate_log sha256 and its room log's per-tick hashes equal p1's" },
+  { key: "p17", build: "lab", args: `${FORGED} --cmd-timing B`, marks: M21, expect: "as p1, under option B (U4F-Q11 (iv))" },
   { key: "p2", build: "lab", args: `${P21} --cmd-timing A --suite clamp`, marks: M21, expect: `every PM-0001-2 check and the shot band pass; 'clamp: never refused or counted' passes; the clamp reruns 0 (event.clamp_kind.rerun_reports_count; SA-10); ${CLAMP_SAYS}` },
   { key: "p8", build: "bites", args: `${P21} --cmd-timing A --suite clamp --role bite --bite PM-0001-21/refuse-not-clamp`, marks: M21, expect: `'clamp: never refused or counted' FAILS (it passes on p2); ${CLAMP_SAYS}` },
   { key: "p15", build: "lab", args: `${P21} --cmd-timing B --suite clamp`, marks: M21, expect: "as p2, under option B (U4F-Q11 (iv))" },
-  { key: "p4", build: "lab", args: `${LAG} --cmd-timing A`, marks: M21, expect: "every PM-0001-2 check and the shot band pass; 'lag switch: no tick moves further than the catch-up cap allows' passes; 'lag switch: 100 bursts' fails by length (3 bursts in 20 s)" },
+  { key: "p4", build: "lab", args: `${LAG} --cmd-timing A`, marks: M21, expect: "every PM-0001-2 check and the shot band pass; 'lag switch: no tick moves further than the catch-up cap allows' passes; 'lag switch: 100 bursts' fails by length (its window is the whole run: 5 bursts in 30 s, F5 (a))" },
   { key: "p13", build: "bites", args: `${LAG} --cmd-timing A --role bite --bite PM-0001-21/no-catchup-cap`, marks: M21, expect: "'lag switch: no tick moves further than the catch-up cap allows' still PASSES (TE-7: it cannot fail at 200 ms); tick.v.lagswitch_cmds_count's max reported (at most 7 expected: D13)" },
   { key: "p18", build: "lab", args: `${LAG} --cmd-timing B`, marks: M21, expect: "as p4, under option B (U4F-Q11 (iv))" },
-  { key: "p19", build: "lab", args: `${LAG} --cmd-timing A --lag-hold-ms 400`, marks: M21, expect: "unjudged (U4F-Q15 (c)): a 400 ms hold, about 12 commands; reported: the commands dropped late by W (about 3 or 4), the input_limited datagrams (about 4), kind-10 refusals 0, tick.v.lagswitch_cmds_count's max at most 8" },
+  { key: "p19", build: "lab", args: `${LAG} --cmd-timing A --lag-hold-ms 400`, marks: M21, expect: "unjudged (U4F-Q15 (c); C-U4F2-6): a 400 ms hold, reported with no fixed counts: the commands W drops late (late_count), the bucket's limited datagrams (pump_input_limited_count), the per-tick cap's kind-10 refusals under option A (buffer_full_count on slot 0) and tick.v.lagswitch_cmds_count's max (at most 8)" },
   { key: "p3", build: "lab", args: `${FAST} --measured-s 70 --cmd-timing A`, marks: M21, expect: `every PM-0001-2 check and the shot band pass; 'fast clock: at most the server's ticks plus the lead bound of commands' and 'fast clock: moves no further than the honest client plus that many ticks of movement' pass; ${FAST_SAYS}` },
   { key: "p9", build: "bites", args: `${FAST} --measured-s 70 --cmd-timing A --role bite --bite PM-0001-21/not-older-than`, marks: M21, expect: `'fast clock: at most the server's ticks plus the lead bound of commands' FAILS (excess above 0; it passes on p3), the movement check may fail too; ${FAST_SAYS}` },
   { key: "p16", build: "lab", args: `${FAST} --measured-s 70 --cmd-timing B`, marks: M21, expect: "as p3, under option B (U4F-Q11 (iv))" },
@@ -70,9 +80,11 @@ export const RUNS = [
   { key: "p6", build: "lab", args: `${P20} --cmd-timing B`, marks: M20, expect: "as p5, under option B (TE-3)" },
   { key: "p10", build: "bites", args: `${CLOCK} --role bite --bite PM-0001-47/newest-sample`, marks: "PM-0001-47", expect: "'offset error at most 5 ms after 2 s of samples' FAILS; '1,000 connects' fails by length; it passes on p21" },
   { key: "p11", build: "bites", args: `${CLOCK} --role bite --bite PM-0001-47/tick-quantised`, marks: "PM-0001-47", expect: "as p10 (D4: about 11.9 ms against the mean's 2.35 ms)" },
-  { key: "p12", build: "bites", args: `${P20} --cmd-timing B --role bite --bite PM-0001-20/redundancy-1`, marks: M20, expect: "'at least 99.9 % of commands reach the server before their tick runs' FAILS (about 95 %), every PM-0001-2 check passing; it passes on p6" },
+  { key: "p12", build: "bites", args: `${P20} --cmd-timing B --role bite --bite PM-0001-20/redundancy-1`, marks: M20, expect: "'at least 99.9 % of commands reach the server before their tick runs' FAILS (89.5 % on U4f's early read: F5 (b)), and '0 presses lost' fails too, reached by the bite (F5 (c)), every PM-0001-2 check passing; it passes on p6" },
   { key: "p21", build: "lab", args: CLOCK, marks: "PM-0001-47", expect: "the p99 check passes (p10's and p11's clean partner); '1,000 connects' fails by length" },
 ];
+// FP-8 (TE-U4F2-10): every -21 row also expects its summary's "in a building: 0" (u4f2-brief.md:110).
+for (const r of RUNS) if (r.marks === M21) r.expect += "; the summary's 'in a building: 0 slot-ticks'";
 
 export function sh(cmd, args, cwd = SPIKE, keepLead = false) {
   const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
@@ -81,6 +93,17 @@ export function sh(cmd, args, cwd = SPIKE, keepLead = false) {
 }
 
 export const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
+
+/** Kind 7's line for a forged-suite run (F-B-COUNT (a), Mustafa 2026-11-21: "report the number left out beside the
+ * check on every run"; FP-10, TE-U4F2-R2-1): its `forged_kind` record's left-out, sent and unrejected counts, read from
+ * the run's lab.jsonl; a twin has no such record and says so. */
+export function kind7Line(dir) {
+  const path = join(dir, "lab.jsonl");
+  const recs = existsSync(path) ? readFileSync(path, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
+  const f = recs.find((r) => r.k === "event" && r.ev === "forged_kind" && r.f?.kind === 7)?.f;
+  if (!f) return `${basename(dir)}: kind 7: no forged_kind record (a twin forges nothing; its twin check covers every press, the left-out ones included)`;
+  return `${basename(dir)}: kind 7 beside 'every forged command rejected and counted': dead_left_out_count ${f.dead_left_out_count}, sent_count ${f.sent_count}, unrejected_count ${f.unrejected_count}`;
+}
 
 /** Stops unless free space minus `projected` bytes leaves the 4 GiB floor (section 4 rule 6). */
 export function floor(what, projected = 0) {
@@ -123,8 +146,12 @@ export function committed() {
 }
 
 function main(argv) {
+  if (argv[0] === "--kind7" && argv.length > 1) {
+    for (const d of argv.slice(1)) console.log(kind7Line(d));
+    return;
+  }
   const date = argv[0] === "--date" ? argv[1] : undefined;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || argv.length !== 2) throw new Error("usage: c-u4f-r2.mjs --date YYYY-MM-DD");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || argv.length !== 2) throw new Error("usage: c-u4f-r2.mjs --date YYYY-MM-DD | --kind7 <run folder>...");
   const { commit, reading, start } = committed();
   const out = join(GATE, `u4f-r2-${commit.slice(0, 12)}`);
   if (existsSync(out)) throw new Error(`${out} exists: a run set is never overwritten`);
@@ -142,7 +169,7 @@ function main(argv) {
   const [marks, series] = [copy("marks.json"), copy("SERIES.md")];
   const lines = [
     `# U4f's 5.3 pre-runs from commit ${commit}, spikes/netcode-proof tree ${start.tree}, on ${date}`,
-    "-21's rows (p2-p4, p8, p9, p13, p15, p16, p18-p20) from a commit before U4f2's merge are an early read of the built suites, not -21's 5.3 record (advisor-u4f-stop.md:90-94)",
+    "-21's rows (p1-p4, p7-p9, p13-p20) are -21's 5.3 record only from U4f2's merge commit or a later one (carry 86; C-U4F2-4); from an earlier commit, an early read of the suites built then (advisor-u4f-stop.md:90-94)",
     `npt-lab sha256 ${sha256(exe.lab)}; npt-lab (bites) sha256 ${sha256(exe.bites)}; npt-judge sha256 ${sha256(judge)}`,
     `marks.json sha256 ${sha256(marks)}, SERIES.md sha256 ${sha256(series)} (the copies contract and the judge read)`,
     `projection: ${before}`,
@@ -157,6 +184,7 @@ function main(argv) {
       ...step(exe[r.build], ["scenario", "--run", `u4f-r2-${r.key}-1`, "--set", "u4f-r2", "--date", date, "--commit", commit, "--out", logs, ...r.args.split(" "), "--marks", r.marks]),
       ...step(exe[r.build], ["contract", "--logs", logs, "--series", series]),
       ...step(judge, ["--marks", marks, "--logs", logs, "--only", r.marks, "--out", join(out, `${r.key}-verdict.json`)]),
+      ...(r.args.includes("--suite forged") ? [kind7Line(logs)] : []),
       "",
     ];
     console.log(said.join("\n"));

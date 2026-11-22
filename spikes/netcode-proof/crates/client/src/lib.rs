@@ -357,8 +357,9 @@ impl ClientEndpoint {
     /// keeps every honest command inside option B's buffer of 8 only while the up delay is at least about 2 ticks
     /// whenever the cap binds: L1's bounded jitter always gives it, other links are C-U6-17's (NC-U4F-3); the lab
     /// passes 9 under both options: f6). Its stamps are contiguous: a step's commands due are every stamp from the last
-    /// one + 1 up to its target, at most 2 a step ([`Self::commands_due`]). A goal more than the redundancy cap past the target (a clock reset or a host stall) moves the target at once,
-    /// the stamps between skipped and counted ([`Self::stamps_skipped`]).
+    /// one + 1 up to its target, at most 2 a step ([`Self::commands_due`]). A goal more than the redundancy cap past
+    /// the target (a clock reset or a host stall) moves the target at once, the stamps between skipped and counted
+    /// ([`Self::stamps_skipped`]).
     pub fn with_clock(mut self, max_lead: u32) -> ClientEndpoint {
         self.controller = Some(max_lead.max(1));
         self
@@ -614,9 +615,9 @@ impl ClientEndpoint {
     /// one; the target follows the goal, never down (the lead falls only by holding) and at most 2 up a step (the lead
     /// moves at most 1 a step), but a goal more than the redundancy cap past it (a clock reset or a host stall) moves it
     /// at once; the commands due are every stamp from the last + 1 to the target, at most 2. A target more than the
-    /// redundancy cap past the last stamp leaves the stamps between unused, counted. No
-    /// command is due before a snapshot, a clock estimate and a target above the join's tick; the first stamp is the
-    /// target itself, never counted up from 0 or from the join.
+    /// redundancy cap past the last stamp leaves the stamps between unused, counted. No command is due before a
+    /// snapshot, a clock estimate and a target above the join's tick; the first stamp is the target itself, never
+    /// counted up from 0 or from the join.
     fn plan(&mut self, now_ns: u64) {
         self.planned = true;
         self.due = 0;

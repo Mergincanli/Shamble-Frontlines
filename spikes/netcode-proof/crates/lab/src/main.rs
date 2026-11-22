@@ -14,6 +14,7 @@
 //! SHA-256 of v1's tag and the log's datagram entries, the hash U2's v1 logs had.
 
 mod contract;
+mod forged;
 mod hash;
 mod logs;
 mod machine;
