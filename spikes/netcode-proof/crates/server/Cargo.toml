@@ -28,6 +28,10 @@ npt-room.workspace = true
 npt-sim.workspace = true
 npt-net.workspace = true
 npt-log.workspace = true
+tokio.workspace = true
+sha2.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 
 [dev-dependencies]
 # U4e's Loopback tests run the library against the real client endpoint in npt-server's own tests, never in crates/lab
