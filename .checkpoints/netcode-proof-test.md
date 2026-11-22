@@ -153,8 +153,11 @@
   or High; Mediums F-A to F-D read in full; R1 Thu 3 Dec holds with no slack). **Security's Block 0 (b) read DONE**
   (security-u6a-deps.md: SEC-U6AD-1 to -6, no new package; Mediums read in full). **Rev 1.1 APPLIED** (section 0.1:
   both sets word for word; contradicting lines fixed in place). Security asked condition 1's (i) pin-utils and (ii)
-  cargo-deny/audit here (14:0x). Next: Block 0 by me on the lane (url bump, manifests, offline refresh, binding check
-  security-u6a-deps.md:119-137, deny and audit, dependency-check.md, push, `cargo fetch --locked`), then the builder.
+  cargo-deny/audit here (14:0x). **Block 0 in the main folder, UNCOMMITTED (DEP-HOLD):** steps 1-4 of
+  security-u6a-deps.md:119-133 PASS (before-hashes equal; lock diff (a) url 2.5.9 and form_urlencoded 1.2.3 with the
+  index checksums; diff (b) the 5 lines; 242 packages; banned crates 0; tokio's features equal npt-net's; npt-super
+  links no sim, room or proto). Step 5 (deny, audit) waits on security's (ii); then dependency-check.md, the save,
+  `cargo fetch --locked`, the builder. A cut: `git diff` shows Block 0; redo nothing, resume at step 5.
   **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
   @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
   to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding
