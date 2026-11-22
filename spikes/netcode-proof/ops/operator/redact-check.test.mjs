@@ -49,6 +49,17 @@ test("other addresses fail, in every form", () => {
   assert.deepEqual(kinds(`bare ${["ab", "cd"].join("::")} here`), ["IPv6 address"], "a valid IPv6 literal");
 });
 
+test("an npm tarball path on the registry is no host name (F26), and nothing else is excused", () => {
+  const file = `crc-32-${[1, 2, 2].join(".")}.tgz`; // read as host labels, four of them make no allowed address
+  assert.deepEqual(kinds(`"resolved": "https://registry.npmjs.org/crc-32/-/${file}",`), [], "a package lock's line");
+  assert.deepEqual(kinds(`"resolved": "https://registry.npmjs.org/@sc/crc-32/-/${file}",`), [], "a scoped package");
+  assert.deepEqual(kinds(`https://example.org/crc-32/-/${file}`), ["address in a host name"], "another host's path");
+  assert.deepEqual(kinds(`https://registry.npmjs.org/x/-/x-${pub4}.tgz`), ["IPv4 address"], "a dotted address in it");
+  const host = `ip-${pub4.replaceAll(".", "-")}.registry.npmjs.org`;
+  const both = ["address in a host name", "address in a host name"];
+  assert.deepEqual(kinds(`https://${host}/x/-/x-${file}`), both, "an address-shaped host, and its path keeps the reading");
+});
+
 test("versions, dates, times and Rust paths are not addresses", () => {
   // Two hex words joined by a double colon form a valid IPv6 literal and are flagged by design (the test above);
   // Rust paths are followed by a name, so they pass.

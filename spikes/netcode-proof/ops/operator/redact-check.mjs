@@ -134,6 +134,14 @@ const DOTTED = /(?<![0-9A-Za-z_.])(?:\d{1,3}\.){3}\d{1,3}(?![0-9A-Za-z_]|\.\d)/g
 const V6_CANDIDATE = /(?<![A-Za-z0-9_.:])[0-9A-Fa-f]*:[0-9A-Fa-f:.]*[0-9A-Fa-f:](?:%[0-9A-Za-z]+)?(?![A-Za-z0-9_:])/g;
 const HOSTNAME = /(?<![A-Za-z0-9_.-])(?:[A-Za-z0-9-]+\.)+[A-Za-z][A-Za-z0-9-]*(?![A-Za-z0-9_-])/g;
 const URL_DECIMAL = /(?<=:\/\/(?:[^/@\s]*@)?)\d{8,10}(?=[/:?#\s]|$)/g;
+// npm's tarball URLs on its own registry (a package lock's `resolved`), host exactly registry.npmjs.org and path
+// `/<name>/-/<file>.tgz` or `/@<scope>/<name>/-/<file>.tgz`: a file name there (a dashed name, then a dotted version)
+// is no host name, so the host-name reading skips a match lying wholly inside that path (F26: advisor-u6c-brief.md
+// section 6; its first case was the crc-32 package's tarball in ops/browser/package-lock.json).
+// Only that reading: the dotted, IPv6, mapped, URL-decimal, token and canary rules still scan the path, and any other
+// host's path, or a host under the registry's name, keeps the host-name reading.
+const NPM_TARBALL =
+  /https:\/\/registry\.npmjs\.org\/(?:@[A-Za-z0-9._~-]+\/)?[A-Za-z0-9._~-]+\/-\/[A-Za-z0-9._~+-]+\.tgz(?![A-Za-z0-9._~+\/-])/g;
 
 function quadsIn(labels) {
   // Every run of four numeric labels, as [forward, reversed]: rDNS names reverse the address.
@@ -226,7 +234,11 @@ export function scanText(text, opts = {}) {
       add(m.index, "IPv6 address", m[0]);
     }
   }
+  // The path of each npm tarball URL (NPM_TARBALL): from the slash after the host to the URL's end.
+  const tarballPaths = [...text.matchAll(NPM_TARBALL)].map((m) => [m.index + m[0].indexOf("/", 8), m.index + m[0].length]);
   for (const m of text.matchAll(HOSTNAME)) {
+    const end = m.index + m[0].length;
+    if (tarballPaths.some(([from, to]) => from <= m.index && end <= to)) continue;
     // A name embedding one of this run's VMs in either order is that VM's own name (rDNS reverses the address).
     // Otherwise both readings must be allowed: accepting either would let a real address through whenever its
     // reverse falls in an allowed range.
