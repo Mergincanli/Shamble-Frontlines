@@ -5,7 +5,7 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-22 20:1x UTC: after the cut of 15:47-19:44 (Cuts block): U8 BUILT (snapshot, waits for Stop
+- **Last update:** 2026-11-22 19:5x UTC: after the cut of 15:47-19:44 (Cuts block): U8 BUILT (snapshot, waits for Stop
   B); F26 found (redact red on the branch); U6a's builder on its end checks; the advisor on U6c; U7's brief drafting.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
@@ -160,14 +160,14 @@
 - **U8** (brief u8-brief.md rev 1.1, 3d102be9…: the advisor's C1-C10 and L1-L5 in its 0.1; notes infra-u8-brief.md;
   R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 40 min; planned R2 Sat 12 Dec, R3 Sun 13, R5 Mon 14, close Fri
   18, about Mon 21 at the top). npm lock (webdriverio 10.2.0) cleared by security-u8-deps.md, committed 2ad2829. **BUILT
-  20:0x** (worktree builder, `<base>` d854ae1; cut 15:47-19:4x): blocks 0-11, 38 new files, **4,176 added** (likely was
+  19:5x** (worktree builder, `<base>` d854ae1; cut 15:47-19:4x): blocks 0-11, 38 new files, **4,176 added** (likely was
   2,900-3,250); tests 66 + 214 pass, 7 plants shown; snapshot wip/u8-build.patch e9fd605c…, notes u8-build.md copied.
   Waits for Stop B's round (its one round). F22 (nothing starts U6c's page host) and F12 (first SSH before the
   certificate) sent to the advisor's U6c check; F25 (WebdriverIO overrides Edge's `allowedIps`, so lib.mjs starts
   msedgedriver itself) for security at Stop B.
 - **F26 (mine, from 2ad2829's npm lock):** check.mjs's redact step fails on the branch head: package-lock.json:606
   (crc-32's tarball name read as an address in a host name; nothing leaked; CI runs no check.mjs). It blocks U6a's merge
-  check; the fix's form is with the advisor (sent into the U6c check 20:0x); I build it as its own commit.
+  check; the fix's form is with the advisor (sent into the U6c check 19:5x); I build it as its own commit.
 - **U6b's brief rev 1.1** (u6b-brief.md; notes netcode-u6b-brief.md): the advisor's APPROVE WITH CONDITIONS 1-8 in its
   0.1 (66 lines checked equal); the lever taken (about 250 lines to U6e); about 2,650 added, likely 3,600-4,000.
   **Security's Block 0 read DONE** (security-u6b-deps.md, with conditions; SEC-U6BD-1: the lock diff is seven packages,
@@ -175,8 +175,8 @@
 - **U6c's brief rev 1 DRAFTED** (u6c-brief.md, 505 lines, 13b0fe58…; notes netcode-u6c-brief.md): about 2,800 added,
   likely 3,800-4,200 (re-plan 1,950); lane before R1 about 11,050-12,550 likely (before U6a's actual 5,460); Q-U6C-1 to
   -8; contradictions (a)-(f). **The advisor's check RUNNING from 19:4x** (advisor-u6c-brief.md; U8's F12, F22 and F26
-  added 20:0x); then rev 1.1 and security's short read of Block 0. Day message 23:05 UTC (trig_01967r39CKqT2qxdsbAS5sCP).
-- **U7's brief drafting from 20:1x** (netcode-architect: u7-brief.md, notes netcode-u7-brief.md; U8's F2/F15 interfaces
+  added 19:5x); then rev 1.1 and security's short read of Block 0. Day message 23:05 UTC (trig_01967r39CKqT2qxdsbAS5sCP).
+- **U7's brief drafting from 19:5x** (netcode-architect: u7-brief.md, notes netcode-u7-brief.md; U8's F2/F15 interfaces
   to meet; npm only typescript 6.0.3, no vite; wasm-bindgen 0.2.130), then its one advisor check.
 - **Done today:** the R1 path's DEP-HOLD read (security-r1-deps.md; @wdio/cli not cleared); PACK-P0 (b) five folders
   (4,760 → 13,229 MiB; commits 47e4ee1 to 46915c1; archives .gate/netcode-proof-test/kept-logs/).
