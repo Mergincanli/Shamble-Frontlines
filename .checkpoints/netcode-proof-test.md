@@ -183,8 +183,10 @@
   99.9 % target at 0.894861): **the advisor's ruling: -21's set may start** (advisor-u4f2-head.md, end block;
   ADV-U4F2H-3 Low: p12's expect to read "'0 presses lost' passes by design after U4f-F1", with ADV-U4F2H-1's fix in
   the next run-script commit or a follow-up; the -20 record cites no run-scale proof from it). Free 8,204,316,672 B
-  (main cache 363 MiB holds 92ed9a8's release builds). **-21's set RUNNING from 01:5x**, detached (setsid nohup; no
-  resume: a set folder is never overwritten; about 9 h): log .gate/u4f2-sets/set21.out; check by `pgrep -f c-u4f-runs`.
+  (main cache 363 MiB holds 92ed9a8's release builds). **-21's set RUNNING from 01:48 UTC** on f591dcf (spikes/ =
+  b4e1f43's), detached (setsid nohup, pids 28691/28692; builds Fresh; no resume: a set folder is never overwritten;
+  about 9 h, so about 11:00): log .gate/u4f2-sets/set21.out; check by `pgrep -f c-u4f-runs`; a reminder at 11:15 UTC
+  to read it and write the set report (send_later). If a restart kills it: re-run whole under a new --date.
 - **The re-plan SENT to him 00:5x UTC** (replan.md): the advisor's one review APPROVE WITH CONDITIONS
   (advisor-replan.md: ADV-RP-1 High, the moved marks' hand-off; -2 to -9 Medium; -10 to -16 Low); P1-P6 pasted word
   for word, Lows folded in: no re-check. His four: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0. After his yes: the
