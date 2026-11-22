@@ -77,7 +77,7 @@
 - The choices of 2026-11-19 named in msg-2026-11-20.md: history.md:7177-7193 (card_trim_1120c.py).
 
 ## Next steps (NPT-TRIM's order; the re-plan fixes the rest)
-1. U4f2: its report with -21's set report (all else done), committed with the set's results; one short message.
+1. U4f2: DONE (u4f2-report.md, with -21's set report; results at 33d246f); its follow-ups go to STATUS (item 4).
 2. The re-plan: sent to him 00:5x UTC (replan.md); awaited: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0, and R1's day.
 3. After his OK: U4's kept wire and server rows, then U4's report; U6 (cut), U7, U8 as the re-plan orders them; the
    MOVED change (marks.json and the judge, with a reviewer's read); Stop B; R1, R2, R3, R5; Stop C.
@@ -98,7 +98,8 @@
   Note; C-U7-1; the U1 carries (C4, C6, A3, the results ledger, Q13, Q23); C6 widened (U6, before R3); JITTER-ORDER
   (parked: to him before R3 only if C6 shows the model's reordering moves a WebTransport result).
 - **For PR #40's ready head** (the advisor's MAIN-60 head check): CI's green is 631edf3's (MAIN-61); the head marked ready needs
-  its own run. STATUS.md's #40 row still reads "main 53272a1 merged in": PR #40's closing docs pass (ADV-M60-7).
+  its own run. STATUS.md's #40 row still reads "main 53272a1 merged in": PR #40's closing docs pass (ADV-M60-7), which also takes
+  U4f2's follow-ups by id (u4f2-report.md, "Follow-ups").
 
 ## After the close (TEST-FIRST rule 1's list: found on the way, outside the plan)
 - ADV-U4F20-2 (Medium, his: a marks.json change): PM-0001-20's "measured reorder share" report row
@@ -149,9 +150,9 @@
   15, 12 (B), every other kind 0; unrejected 0 on every forged measured run; every forged run has its record: no stop
   condition (point 6.5). Results spikes/netcode-proof/results/u4f/f591dcf71ca6/pm-0001-21/ (untracked: commit with the
   report); logs .gate/netcode-proof-test/runs/u4f-21-f591dcf71ca6/ (3.0 GiB; packed only on his word); scratch reader
-  setread.mjs and setread.out in the scratchpad. **Next:** u4f2-report.md (the per-run table, point 6's own lines,
-  FP-9's record lines, the carries by number, the counts), commit it with the results, tell him; then delete the 11:15
-  reminder (trig_01XpjUjgiffPwDZtxsKqs5tD).
+  setread.mjs and setread.out in the scratchpad. **U4f2's report DONE** (u4f2-report.md; the results committed at
+  33d246f; C-U4F2-8's missed plan row written, plan.md:378-381; the 11:15 reminder deleted). Next: his answers to the
+  re-plan, then its order (U4's report folds U4f2's).
 - **The re-plan SENT to him 00:5x UTC** (replan.md): the advisor's one review APPROVE WITH CONDITIONS
   (advisor-replan.md: ADV-RP-1 High, the moved marks' hand-off; -2 to -9 Medium; -10 to -16 Low); P1-P6 pasted word
   for word, Lows folded in: no re-check. His four: RE-PLAN-OK, MARK-NOTES, LAPTOP, PACK-P0. After his yes: the
