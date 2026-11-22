@@ -147,9 +147,11 @@
 - **The re-plan APPROVED** (replan.md; the advisor's review advisor-replan.md; his answers history.md:7595-7607). Done
   today: the moved-mark block (moved-block.md: 29 moved marks and 12 kept marks' moving parts, bars by ADR row and
   marks.json c1935a5b…; build-plan lines read on main f5030a3) goes in today's message; PACK-P0 (b) below.
-- **Running since 13:22 UTC (replan-units.md:196, today's row):** netcode-architect drafts U6a's brief (u6a-brief.md;
-  notes netcode-u6a-brief.md), then my read and the advisor's one check; security-auditor's DEP-HOLD read of the R1
-  path's new dependencies (security-r1-deps.md, ends DONE). A cut: resume each from its notes file (SPEND-LIMIT (a)).
+- **U6a's brief rev 1 DRAFTED 13:4x** (u6a-brief.md, 279 lines; notes netcode-u6a-brief.md): about 2,350 added, likely
+  3,150-3,800 (the re-plan said 1,675 / 2,250-2,500: about 1,000 more likely lines on the lane before R1); Q1-Q7 with
+  leans; six places the re-plan contradicts itself. **Running since 13:5x:** the advisor's one check
+  (advisor-u6a-brief.md) and security's read of Block 0 (b) (security-u6a-deps.md, ends DONE). A cut: resume each from
+  its file (SPEND-LIMIT (a)).
   **The DEP-HOLD read DONE 13:3x** (Mediums read in full, :125-141, :196-211): all clear or clear with conditions but
   @wdio/cli (not cleared; U8 uses standalone webdriverio 10.2.0). Takers: SEC-R1D-1 url 2.5.9 → U6a's lock change (sent
   to the drafter); -2, -3, -5, -6 → U8's brief and R1's run plan; -4 → U6c; vite dropped (U7's lean); per-unit binding
