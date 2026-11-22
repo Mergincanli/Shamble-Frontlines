@@ -72,7 +72,7 @@ KEPT IN THE PROOF TEST, WITH PARTS THAT MOVE (only the named parts move):
   browser: their Safari parts: Safari later.
 - PM-0001-31 The fallback's stalls stay short: part "ML Chrome over WebSocket at P2" goes to Slice 3 with the human run.
 - PM-0001-36 Datagram size is measured per browser: the Safari parts: Safari later.
-- PM-0001-56 The proof test's records are complete, Mustafa's MARK-NOTES (22 November), word for word: "-56's record
+- PM-0001-56 The proof test's records are complete: the MARK-NOTES text Mustafa approved on 22 November: "-56's record
   counts 4 items, not 10: items 5-10 move with their marks; item 1 keeps only the carried crate's results on -11 and
   -28 (the other crate, -25, -35 and the pick move to Slice 3); item 2 keeps each browser's draft and its fallback
   (with RE-PLAN-OK (1)), Safari later; item 4 keeps NewReno against Cubic, while the browsers' rates at P2 to P4 move

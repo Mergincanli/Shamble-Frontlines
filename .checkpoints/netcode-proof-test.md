@@ -145,12 +145,12 @@
 - **U4f2 CLOSED** (merged b4e1f43; -21's set PASS at L1, 13 bites shown; report u4f2-report.md, results 33d246f; its
   record, rulings and set lines: this card at 00520b5). U4's report folds it.
 - **The re-plan APPROVED** (replan.md; the advisor's review advisor-replan.md; his answers history.md:7595-7607). Done
-  today: the moved-mark block (moved-block.md: 29 moved marks and 11 kept marks' moving parts, bars by ADR row and
+  today: the moved-mark block (moved-block.md: 29 moved marks and 12 kept marks' moving parts, bars by ADR row and
   marks.json c1935a5b…; build-plan lines read on main f5030a3) goes in today's message; PACK-P0 (b) below.
 - **PACK-P0 (b)** (each list committed with its ruling, then packed; free MiB before → after; files read back = listed):
   c-u2-pm-0001-3-81c6d01e371b 4,760 → 5,364 (39/39; 47e4ee1); c-u2-pm-0001-3-65869918809f 5,364 → 5,967 (39/39;
-  1dc9751); u4r-P0-051995db9cea 5,967 → 8,497 (30/30; 3d2c752); u4r-P0-93509dfd7fd1 8,497 → (30 files; 4e7d9c2);
-  u4f-21-f591dcf71ca6 next. Archives in .gate/netcode-proof-test/kept-logs/.
+  1dc9751); u4r-P0-051995db9cea 5,967 → 8,497 (30/30; 3d2c752); u4r-P0-93509dfd7fd1 8,497 → 11,156 (30/30;
+  4e7d9c2); u4f-21-f591dcf71ca6 11,156 → (150 files; 46915c1) packing. Archives in .gate/netcode-proof-test/kept-logs/.
 - **Moved or stopped by NPT-TRIM (what is built stays, for reference):** U4g's early half (blocks 1-4, 2,053 lines;
   snapshot wip/u4g-early.patch a78e2853…; worktree agent-abc25909b7dd4ad30 kept); U4g2's client half and U4h (briefs
   u4g-brief.md rev 2.1, u4h-brief.md rev 2.1 kept for the real game); U5 stopped after Block 3a (1,658 lines; snapshot
