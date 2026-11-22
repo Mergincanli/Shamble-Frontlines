@@ -98,3 +98,20 @@ still owed.
    readings PR's list); the departure with this ruling; the commit-before-M5 order; the follow-ups by id.
 
 **Decisions needed:** none. **For Mustafa:** nothing.
+
+## Ruling on the 21 rows (c-u4f-r2.mjs on 92ed9a8, r2.txt): -21's set MAY START; p12's expect is a follow-up
+- Checked: `git diff --stat b4e1f43 92ed9a8 -- spikes/netcode-proof` is empty (point 6.1 holds). p12-verdict.json:109-137:
+  "99.9 % reach" fails at 0.894861 and "missing inputs" fails at 0.105139, so the bite reaches its own target. "0
+  presses lost" passes at 0, "0 presses doubled" passes at 0, presses 14,398. The other 20 rows I take from the
+  coordinator's reading (not re-read by me).
+- p12 is -20's row, not -21's, and nothing in -21's set reads it. "0 presses lost" passing is by design since U4f-F1
+  (1faf894, 2026-11-20): the room counts presses with the rule the sim runs, as advisor-u4f-f1-r1.md:65-73 bound it.
+  So the expect is wrong, not the run. The stale text was F5 (c) (advisor-u4f-r2.md:201, written before F1), carried
+  into p12's row by U4f2's merge after F1 had landed. Neither round 2 nor this head check caught it.
+- **ADV-U4F2H-3 (Low):** c-u4f-r2.mjs p12's `expect` reads "'0 presses lost' fails too". Fix: "'0 presses lost' passes
+  by design after U4f-F1 (advisor-u4f-f1-r1.md:65-73)". It touches no code a run executes, and nothing re-runs. It
+  rides the next commit to the run scripts (with ADV-U4F2H-1's fix) or becomes a follow-up by id. U4f2's report shows
+  p12 as read against the corrected text.
+- Record lines: the -20 record must not cite this PASS as run-scale evidence of the sim's take (NC-F1-1's "High then").
+  Presses 14,398 against 14,400 scripted is window-edge variation, not loss: p5 reads 14,402 and p6 14,400.
+- -21's set starts after point 6.2's disk check, as point 6 says. Nothing else holds it.
