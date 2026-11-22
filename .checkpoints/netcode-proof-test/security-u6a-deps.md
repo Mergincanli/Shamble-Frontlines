@@ -137,3 +137,43 @@ crates/server/Cargo.toml 4a9d75c1...a136, crates/super/Cargo.toml 2f0c76bd...6b6
 Anything outside 1-4 (another package, a feature change, the workspace Cargo.toml touched) comes back to me first.
 
 DONE
+
+### 6. The coordinator's two questions (advisor-u6a-brief.md:223-232, condition 1) (DONE)
+Read: deny.toml (whole); Cargo.lock's kio, loom, pin-utils and web-transport-quinn entries; kio 0.6.4's and loom
+0.7.2's manifests in the local registry cache; security-u5-deps.md:236-262; OSV's RUSTSEC-2026-0441 record; cargo-deny's
+advisories config page (embarkstudios.github.io/cargo-deny/checks/advisories/cfg.html) and CHANGELOG.md (github.com/
+EmbarkStudios/cargo-deny), both read 2026-11-22.
+- The path, confirmed in the lock: web-transport-quinn 0.13.6 (npt-net, optional, feature `wt-wtq`) -> kio 0.6.4 ->
+  `[target."cfg(loom)".dependencies.loom]` 0.7.2 with features ["futures"] (kio's Cargo.toml:88-90) -> loom's
+  `futures = ["pin-utils"]` (loom's Cargo.toml:45-47, :79) -> pin-utils 0.1.1. No build passes `--cfg loom`, so it is
+  in the lock but compiled into nothing. RUSTSEC-2026-0441 (OSV: published 2026-10-01, "`pin-utils` is unmaintained",
+  every version affected, no fix): informational, not a vulnerability.
+- Source facts for (i): cargo-deny's CHANGELOG, 0.22.0: "changing `advisories.unmaintained` to default to `workspace`
+  scope instead of `all`"; the config page: under `workspace` (the default), "Unmaintained advisories will only fail if
+  they apply to a crate which is a direct dependency". deny.toml sets no `unmaintained` key, and pin-utils is a
+  dependency of loom, not of a workspace crate. So with cargo-deny 0.22.0 this advisory should not fail the run.
+  security-u5-deps.md:241-243's "will report it" predates reading 0.22.0's default. An ignore for an advisory the run
+  never meets may itself print a warning (`advisory-not-detected`, CHANGELOG 0.19.0's `unused-ignored-advisory`).
+  Confidence: medium-high (documentation and changelog read; not run).
+- **(i) Answer: no deny.toml change up front.** Run with deny.toml as it is. "Clean" for cargo-deny: exit 0, and any
+  line naming RUSTSEC-2026-0441 is a note or warning only. **Fallback, cleared here:** only if cargo-deny 0.22.0 fails
+  on RUSTSEC-2026-0441 and on nothing else, change deny.toml line 10 from `ignore = []` to exactly:
+  `ignore = [{ id = "RUSTSEC-2026-0441", reason = "2026-11-22: pin-utils 0.1.1 unmaintained, no fix; only via kio 0.6.4's cfg(loom) edge to loom 0.7.2 (web-transport-quinn 0.13.6), compiled in no build; security-u6a-deps.md section 6" }]`
+  and line 9's "(none today)" to "(one today)", as its own commit with no other change, then run again. No `expiry`
+  key (0.21.0 added it; not needed, and I did not check how the table parses it); no `unmaintained` key (setting
+  `none` or `transitive` would hide more than this one advisory). Anything else cargo-deny reports goes back to me
+  before the save, per the advisor's condition 1.
+- "Clean" for cargo-audit 0.23.0: exit 0 and "0 vulnerabilities". cargo-audit reads no deny.toml, and it lists
+  unmaintained crates as warnings without failing unless run with `--deny warnings` (do not pass it), so one warning
+  naming RUSTSEC-2026-0441 is expected and acceptable. Copy its whole warning list into the evidence: cargo-deny's
+  `workspace` default now hides transitive unmaintained crates, so cargo-audit's list is where they show (accepted
+  for this spike: unmaintained is not a vulnerability; any `unsound` or vulnerability entry comes back to me).
+- **(ii) Answer: yes**, cargo-deny 0.22.0 and cargo-audit 0.23.0 for U6a's Block 0, on dependency-check.md:9-10's
+  terms: `cargo install --locked --version 0.22.0 cargo-deny`, then (after it finishes) `cargo install --locked
+  --version 0.23.0 cargo-audit`, one at a time; build folders under .gate/ (CARGO_TARGET_DIR there); the advisory
+  database in its default home location, never inside the repository or a worktree. SEC-U5D-5 (Low, the tools' own
+  locks carry advisories, security-u5-deps.md:249-262) stays accepted on the same grounds: local developer tools on our
+  own inputs, never shipped. cargo-deny's own lock had 0 matches there; nothing has changed in that answer since
+  yesterday except that it now covers this run too.
+
+DONE
