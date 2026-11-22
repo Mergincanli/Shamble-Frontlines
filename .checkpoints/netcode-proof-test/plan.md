@@ -376,7 +376,8 @@ spikes/netcode-proof/
   crates/sim/       npt-sim: the stand-in sim behind the seam (§4.6); no I/O, clock, transport or bot logic
   crates/proto/     npt-proto: messages, controls, quantisation, delta codec, limits
   crates/room/      npt-room: the room library: slots and roster, command checks, input buffer (both OQ-0001-6
-                    options), interest, hit history and rewind, per-client encoding, event queue; tick-counted
+                    options; the one in force read by `Room::cmd_timing()`, which npt-lab writes into each run's
+                    header: C-U4F2-8), interest, hit history and rewind, per-client encoding, event queue; tick-counted
                     timers only; no I/O, async runtime or clock; builds for wasm32 and native
   crates/server/    npt-server: a library plus a thin binary (npt-lab imports the library): the S17 loop, the
                     tick thread, the I/O runtime (where every inbound message is decoded), the wall-time limits,
