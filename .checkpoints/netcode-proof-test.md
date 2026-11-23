@@ -67,18 +67,17 @@
 ## Now (2026-11-23 21:1x UTC; U6a MERGED 824d8e7; U7's T-half DONE 8ab088e8…, u7-t-build.md; before: card at 09958e5)
 - **U8:** pass 3 DONE ~17:29 (snapshot 0e7fbab2…, 6,111 of his 6,200 stop: items 1-8, every Low in, none carried; node
   tests 100/0, wrappers 315/0, redact 0 findings; package files unchanged; no plant left; item 1's judge run 17:08 at
-  627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round RUNNING** (his words: the three Highs' fixes
-  only): netcode a120f51df9a8f6986 on NC-R2-1 (u8-r3-netcode.md), security af8c5f0fbec829595 on SEC-R2-1 = INF-R2-1
-  and SEC-R2-2 (u8-r3-security.md); old tree .gate/u8-r3-old (pass 2's bca52b2c from 6759c83, hash checked).
+  627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round DONE 21:2x** (his words: the three Highs'
+  fixes only; old tree .gate/u8-r3-old, pass 2's bca52b2c): NC-R2-1 CLOSED (u8-r3-netcode.md), SEC-R2-1 = INF-R2-1 and
+  SEC-R2-2 CLOSED (u8-r3-security.md); one Low, NC-R3-1 (r1.sh:438-452, save_log unguarded under set -e), a follow-up.
 - **U6b: BUILT ~17:27** (snapshot 49f4488f…, 29 files, 5,498 added of the 6,000 stop; the brief's likely 3,650-4,050):
   check5.log 11/11 (measured 799 = +45, bites 898 = +48; test step 891.5 s, 0.93x base); 14 plants fail by name; the
-  valve built; no manifest change. **Its round RUNNING:** netcode a0a57a3948202de40 (u6b-review-netcode.md; its prompt
-  holds the inputs, rules and F-items); security and test next, each at xhigh, as slots free (3 agents at most).
-- **Next 1, U8's last round back:** read both in full; a Critical or High open stops U8 for him, the rest go to
-  follow-ups. Then the advisor a3de649cd25e474df reads U8's pushed head; U8 merges after U6c (about Sat 28), M3-M9.
-- **Next 2, U6b:** security (security-auditor) and test (test-engineer) seats, xhigh, with the netcode seat's inputs and
-  rules: security per u6b-brief.md section 7 and condition 8 (U8's npt-ctl from wip/u8-build.patch 0e7fbab2…); test:
-  the plants, the bite, the counts (section 3's count line against check5.log). Then the fix pass by U6b's builder
+  valve built; no manifest change. **Its round RUNNING** (all three seats, xhigh): netcode a0a57a3948202de40, security
+  aedb799ad9648b0e1, test a88f25b3d3f66d972 (u6b-review-*.md; their prompts hold the inputs, rules and F-items).
+- **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
+  a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
+- **Next 2, U6b:** read the three seats in full (every Medium or higher); the fix list (my lean, the advisor if a ruled
+  condition moves, F-PING among them). Then the fix pass by U6b's builder
   a2661dc320c9e6d00 (resumed) with the container readings; merge M3-M9 (main-run.sh), CI; U6b's report.
 - **Next 3:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md:
   the Choices of 2026-11-23 below, his SIZE-STOP (a), the three cuts, SEC-F26-1 done, U6b's and U8's state. U4's report
@@ -149,11 +148,12 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (3 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - U8's last round: netcode a120f51df9a8f6986 (u8-r3-netcode.md), security af8c5f0fbec829595 (u8-r3-security.md).
-  - U6b's netcode seat a0a57a3948202de40 (netcode-architect, xhigh; u6b-review-netcode.md; read only).
+  - U6b's seats: netcode a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972 (u6b-review-*.md; xhigh;
+    read only).
   - The saver b8o9wv6ox (checkpoint.mjs watch from 21:13 to about 23:03; when it ends, restart it: run_in_background,
     timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
-- **Finished, resumable by SendMessage:** U6b's builder a2661dc320c9e6d00 (worktree agent-a2661dc320c9e6d00, notes
+- **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
+  af8c5f0fbec829595; U6b's builder a2661dc320c9e6d00 (worktree agent-a2661dc320c9e6d00, notes
   u6b-build.md; for the fix pass; u6b-run.sh exports CARGO_INCREMENTAL=0; on the 4 GB floor it stops, never cleans);
   U8's builder ac59cce3e5d002441 (worktree agent-ac59cce3e5d002441, notes u8-build.md "## Pass 3"); Stop B's infra seat
   a0615e1ead860724b; the advisor a3de649cd25e474df (U8's rulings; U8's pushed head); the docs agent a6eb7acdf1c3ff885;
