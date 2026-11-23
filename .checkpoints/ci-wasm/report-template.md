@@ -254,11 +254,14 @@ The rule-sentence table is above: +97, -0, no rule of main's changed or removed.
 
 ## Follow-ups (for STATUS)
 TE-COUNT (the gate v2 fails a run with a skipped or missing test) · TE-TYPE-PLANTS (a planted type error in a Worker
-file and a page file) · TE-TSC-LINES (each type check prints its own result line; CI text, his yes) · TE-104 ·
+file and a page file) · TE-TSC-LINES (each type check prints its own result line; CI text, his yes) · TE-104 (a plant that reaches the
+hidden-tab bound at `skeleton.spec.ts:104`) ·
 TE-MONO (`performance.now()` at `skeleton.spec.ts:92` and `:98`) · F-CHANNEL (the refusal pattern also to refuse
 `__CARGO_*`, `CARGO_UNSTABLE_*` and every `RUSTC_*` name: local builds only, CI's cut drops such names; with
 change-set 3's build work) · TE-WATCH (on an image or Chrome change read the
-byte windows and the default backend first) · TE-CPU · TE-HIDDEN-FRAMES · IMAGE-CHROME · CUT-PATH · TOKEN-WORDS ·
+byte windows and the default backend first) · TE-CPU (the job prints `nproc` and the CPU model; CI text, his yes) ·
+TE-HIDDEN-FRAMES (the hidden-tab waits need the page to keep drawing while faked hidden, `packages/client/src/app/boot.ts:73-76`) ·
+IMAGE-CHROME · CUT-PATH · TOKEN-WORDS ·
 REQUIRED-CHECK, CANCEL-ON-MAIN, CI-CUT, NODE-26 (known) · RR-F5, SA-TREE and the `__pycache__/` line (change-set 3)
 · Firefox in CI with the CI pull request after 3a (his FIREFOX-TESTS (b)) · the line for CLAUDE.md on the third
 account (ACCT-3, his) · GH-TOOLS for the next pull requests · the saver and a worktree's local branch name.
@@ -278,6 +281,10 @@ chat tells him first, and he compacts.
   new chat); (c) a small kit pull request that lets a day session write pull requests through `gh api` with the
   guard's merge check moved to it (risk tier 2, Opus 5.5 work by his words of 2026-11-12). Recommendation: (a) for
   3a, and (c) planned with the gate step, where the guard changes anyway.
+- **KIT-QUOTE: do your words of 2026-11-13 on kit, gate and CI edits stay quoted in `docs/STATUS.md`?** Why: to keep
+  STATUS within its 120 lines, docs-keeper moved the bullet that quoted them into the archive (byte for byte, by
+  script) and left a pointer; they stand whole in `docs/DECISIONS.md`. Options: (a) as now, a pointer in STATUS; (b)
+  the quote back in STATUS and another block out. Recommendation: (a).
 
 ## For Mustafa
 {{FOR_MUSTAFA}}

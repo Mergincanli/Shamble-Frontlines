@@ -26,5 +26,13 @@ quotes='\n'.join(out)
 T=T.replace('{{WORKFLOW_DIFF}}',diff).replace('{{RULE_TABLE}}',table).replace('{{CLEAN_RUN_QUOTES}}',quotes)
 for k,v in fill.items(): T=T.replace('{{'+k+'}}',v)
 left=re.findall(r'\{\{[A-Z0-9_]+\}\}',T)
+import textwrap
+out2=[]; fence=False
+for l in T.split('\n'):
+    if l.startswith('```'): fence=not fence
+    if fence or l.startswith('|') or len(l)<=120: out2.append(l); continue
+    lead=re.match(r'\s*',l).group(0); m=re.match(r'\s*(- |\d+\. )',l)
+    out2.extend(textwrap.wrap(l,width=118,subsequent_indent=lead+(' '*len(m.group(1)) if m else ''),break_long_words=False,break_on_hyphens=False))
+T='\n'.join(out2)
 open('docs/reports/2026-11-19-ci-wasm.md','w',encoding='utf-8').write(T)
 print('written; lines',T.count('\n'),'| placeholders left:',left)
