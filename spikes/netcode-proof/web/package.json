@@ -1,0 +1,8 @@
+{
+  "name": "npt-web",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}
