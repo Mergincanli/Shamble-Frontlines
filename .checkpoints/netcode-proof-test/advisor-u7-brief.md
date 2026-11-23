@@ -16,3 +16,12 @@ Drafter: netcode-architect (notes netcode-u7-brief.md). Main's advisor.md read (
 6. Write verdict, paste-ready conditions, answers.
 
 ## Notes (one line per finding, as I go)
+- N1 Rules read word for word: NPT-TRIM history.md:7561-7593 (item 3 :7572; review seats :7590: "security only for
+  code that faces the internet in a run"; one advisor check :7591); answers :7595-7607 (R1-DAY :7604, dates :7605);
+  TEST-FIRST :2234-2282 (rule 2 :2261-2262). Card read (Rules, Now, Running work, U7 line :167-176).
+- N2 O2 (u6a-review-netcode.md:155-158; u6a-fix-pass.md:79): "one home both the binary and the clients or page reach,
+  the `mode_hash` too, with a test that they are equal". Code: `Join` carries version + content_hash only
+  (proto/src/msg.rs:74-83), checked by the server's pump (server/src/pump.rs:484-497); `mode_hash` is JoinAccepted's
+  (msg.rs:104), set [0;32] by U6a's binary (wip/u6a-build.patch:992), read by no client (grep: no hit in crates/client).
+  Q-U7-2's lean names version and content hash only: it must take mode_hash and the equality test too. Medium (a carry
+  met short; caught here, so no wire risk).
