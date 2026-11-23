@@ -127,6 +127,151 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-23, 20:47:59 UTC: PLANT-WRITE (a), yes to the two planted lines in GitHub's check; and his
+  yes in advance to their take-back, only if the planted run fails the expected way** (the builder chat he calls Builder
+  V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 8fe87b69-7b75-4459-bdd0-82430dc07783, whole; extracted by script from the chat's
+  transcript). The expected way, in his words: "at the step "GitHub's own check of the archive", with gh's own line that
+  the file is not part of the release, and nothing after it runs"; and the other case: "If the run fails any other way,
+  stop and bring me the lines before any write, as the stop rule says." His point 3: "My mode rule of 17:15:07 UTC holds
+  for both writes, read on this message." What it answers, in the chat's words (not his): the chat's ask PLANT-WRITE of
+  20:17:08 UTC: may the chat write the two planted lines into `.github/workflows/toolchain.yml`; the text is
+  `ci-plant-p-gh.diff` (sha256 e4f21ab359bc9fd911c663a4fcbc892133195fefe44e88ad7ec51b50e3d0b1ac, sent to him as a file
+  with its two added lines shown); the file after the write has sha256
+  84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8; the run must fail at the step "GitHub's own check of
+  the archive" with gh's own line that the file is not part of the release, nothing after it may run, and a permission
+  line or "no attestations found" instead is a stop; the ask said the take-back would come as its own ask (his point 2
+  answers that in advance); options (a) yes, (b) no, skip this plant; recommended (a). The record on this message reads
+  `default` (the session record at 20:47 UTC and the mode on the message); his point 3 has the mode read on this message
+  for both writes. Records, not his words: the mode on this message read `default`; the planted file was written at
+  20:48:40 UTC (sha256 84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8, commit 47d7024); both of its
+  runs failed at that step with gh's line "attestation for 0.2.130 does not contain subject
+  sha256:27c24e42e238fa86ca5feb42b3eeb1a4535040ed5dd0eb183da810f85cff6e10" and the three later steps were skipped; the
+  take-back was written at 21:01:33 UTC (sha256 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811, commit
+  ce5a7e7). Copied by script (1006 bytes, sha256 3cbb66ac1702ff7d51e6ae4f22c9502dc2897b8b9d19726b4defe578625d975c):
+> My answer of 23 November, written with my main Advisor. This chat is in Accept edits as I send this.
+>
+> 1. PLANT-WRITE: (a), yes. Write the two planted lines from ci-plant-p-gh.diff (sha256 e4f21ab359bc9fd911c663a4fcbc892133195fefe44e88ad7ec51b50e3d0b1ac). After the write the file's sha256 must be 84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8; show it to me.
+>
+> 2. The take-back, in advance: yes. Its exact text is the removal of those same two lines. If the planted run fails the expected way (at the step "GitHub's own check of the archive", with gh's own line that the file is not part of the release, and nothing after it runs), take the two lines back without a second ask. The file must then read 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811 again; show me that checksum and the runs. If the run fails any other way, stop and bring me the lines before any write, as the stop rule says.
+>
+> 3. My mode rule of 17:15:07 UTC holds for both writes, read on this message.
+- **Taken by Mustafa, 2026-11-23, 19:58:23 UTC: FIX-WRITE (a), yes to the corrected CI text (`ci-edit-2.diff`, against
+  the file at cb476b1), to the stop rule's new wording, and to the two new checksums for the planted lines and their
+  take-back; his mode rule of 17:15:07 UTC holds for this write** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message e06bc496-dee4-49fe-8321-68a323d5e5f4, whole; extracted by script from the chat's
+  transcript). The text puts the tool into a folder the job makes fresh as root directly under `/` (the place his
+  Advisor's input of 18:40:57 UTC named, the entry below, weighed and taken by infra-engineer) and has the check judge
+  the program and every folder above it up to `/`. What it answers, in the chat's words (not his): the chat's ask
+  FIX-WRITE of 19:49:01 UTC: may the chat write the corrected `.github/workflows/toolchain.yml`; the text is
+  `ci-edit-2.diff`, a diff against the file at cb476b1 (10 lines added, 6 removed, sha256
+  b4081e48b4c07e790fa489d31de940e0f95c162ae476b0f98b0160b7358203ec, sent to him as a file with its changed lines shown);
+  the file after the write has sha256 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811, with the two
+  planted lines 84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8, and after their take-back
+  56d37fc6...9811 again; the ask said this is a fourth CI write his point 7 did not count, that the two values replace
+  point 7's 12b90249... and its second d1dbcb53..., that his mode rule of 17:15:07 UTC is applied to this write too, and
+  it showed the stop rule's changed part (the plan's revision 4: the step's environment line, four exact install lines,
+  and a new stop if the folder exists already or could not be made); options (a) yes as shown, (b) yes with changes he
+  names, (c) no; recommended (a). The record on this message reads `default` (the session record at 19:58 UTC and the
+  mode on the message). Records, not his words: the mode on this message read `default`; the file was written at
+  20:00:41 UTC (sha256 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811, commit 2a654f3), and its first
+  runs were clean under the stop rule. Copied by script (884 bytes, sha256
+  36c48e6273a7d8a268f818095b19671dc902040d5eca86466cdbcb95a233479c):
+> My answer of 23 November, written with my main Advisor. This chat is in Accept edits as I send this.
+>
+> 1. FIX-WRITE: (a), yes. Write .github/workflows/toolchain.yml from ci-edit-2.diff (sha256 b4081e48b4c07e790fa489d31de940e0f95c162ae476b0f98b0160b7358203ec). After the write the file's sha256 must be 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811; show it to me. My Advisor rebuilt it from the file at cb476b1 and got that checksum, and 84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8 with the planted lines.
+>
+> 2. Yes to the new stop-rule wording as you put it, and to the two new checksums for the planted lines and their take-back. My mode rule of 17:15:07 UTC holds for this write.
+>
+> 3. My Advisor set #64's title and text from pr-64-title.txt and pr-64-body.md. The platform put the Claude Code footer line in its own form; the rest is your text.
+- **Taken by Mustafa, 2026-11-23, 18:40:57 UTC: OPT-PATH (a): the tool moves to a place where every parent folder is
+  root-owned and closed to others, and the check is widened to every parent up to `/`, not weakened; the corrected text
+  is prepared in one short pass and its exact text comes to him before anything is written; NOTES-PUSH (a)** (the
+  builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds
+  his claude.ai project "Shamble Frontlines ALT"; his message ee900136-bb16-4ee5-a6d4-8a7eccef346c, whole; extracted by
+  script from the chat's transcript). In his words: "The check is not weakened." The place directly under `/` is his
+  Advisor's input, "to weigh, not an order". The pass: "infra-engineer proposes, security-auditor reads the changed
+  lines, your advisor agent rules. A second round only for a Critical or High." And: "Nothing under .github/ is written
+  before my yes on that text. The stop rule holds for the next run too." His point 5 holds two sentences on the guard's
+  prompt for the copy, one that he saw and allowed it and one that he saw none; it stands as he sent it, and he asks
+  what the transcript shows. What it answers, in the chat's words (not his): the chat's stop message of 17:28:43 UTC:
+  both first toolchain runs on cb476b1 refused at the new install step, because /opt on GitHub's runner is writable by
+  anyone ("mode 777, owner root:root, 4096 bytes, /opt"). Its two questions. OPT-PATH: how the tool gets installed where
+  the runner's user cannot tamper with it: (a) move the tool to a place where every parent folder is root-owned and
+  closed to others and widen the check to every parent, worked out by infra-engineer and security-auditor, reviewed by
+  the advisor agent, then the text to him; (b) keep /opt and have the job close /opt itself before the install; (c) drop
+  the /opt part of the check (not recommended); recommended (a). NOTES-PUSH: may the card's record of the stop be pushed
+  now, notes only: (a) yes; (b) hold it until the corrected text is approved; recommended (a). His point 5 asks about
+  the guard's prompt for the copy, which the chat had reported as not known; its two sentences both stand in his message
+  as sent. Records, not his words: the transcript shows the guard's hook asked at 17:23:24 UTC and a one-time allow
+  given in the app answered it at 17:23:43 UTC, which the chat told him in its next message; the mode on this message
+  read `default`. Copied by script (1324 bytes, sha256
+  fc438e2e06e8443c3a4f431b3b3989f2c0d3016c79a614d88fe58383f19d4a84):
+> My answers of 23 November, written with my main Advisor.
+>
+> 1. OPT-PATH: (a). Move the tool to a place where every parent folder is root-owned and closed to others, and widen the check to every parent up to /. The check is not weakened. One input from my Advisor for infra-engineer and security-auditor to weigh, not an order: a fresh folder that the job itself creates as root directly under /, so nothing depends on how the runner image sets up /opt or /usr/local; the log prints mode and owner of every parent.
+>
+> 2. How: one short pass. infra-engineer proposes, security-auditor reads the changed lines, your advisor agent rules. A second round only for a Critical or High. Then bring me the exact text as a diff against the file at cb476b1, with the new checksums of the file and of the planted file. Nothing under .github/ is written before my yes on that text. The stop rule holds for the next run too.
+>
+> 3. NOTES-PUSH: (a). Push the card's record of this stop now.
+>
+> 4. With that push, put pr-body.md and the title in the notes folder, so my Advisor can read them and set them on #64. I converted #64 to a draft.
+>
+> 5. The guard's prompt for the copy onto toolchain.yml: I saw it and allowed it. / I saw no prompt. Tell me in one line what your transcript shows for that call: did the guard's hook ask, and what answered it.
+- **Taken by Mustafa, 2026-11-23, 17:22:42 UTC: his yes to CI-WRITE-1 again, sent with the mode switched; he has opened
+  the pull request** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the
+  account that also holds his claude.ai project "Shamble Frontlines ALT"; his message
+  99a5bc79-9b73-4f2a-ba5f-4e1c78eb6fb2, whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): the chat's message of 17:16:32 UTC after his answers of 17:15:07 UTC: the CI file was not
+  written, because the record on that message read `auto`; he was asked to pick Accept edits in the mode dropdown and to
+  send a new typed message, on which the mode is read, and to open the draft pull request and tell its number.
+  CI-WRITE-1 itself (the chat's ask of 17:04:48 UTC): may the chat write `.github/workflows/toolchain.yml` with the text
+  of `ci-edit.diff` (sha256 240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673), after which the file has
+  sha256 d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c. The record on this message reads `default`
+  (the session record at 17:22 and 17:23 UTC and the mode on the message): by his point 3 of 17:15:07 UTC the chat
+  writes and names the value in the report. Records, not his words: the mode on this message read `default`, which his
+  rule of 17:15:07 UTC (the entry below) covers; the file was written at 17:23:43 UTC (sha256
+  d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c, commit cb476b1); the pull request is #64, opened at
+  17:21:24 UTC and made a draft by him later that day. Copied by script (75 bytes, sha256
+  87080abd96f9ebdb655da27084391b2e9bf03663baf720659812e0d9d6ecd058):
+> "CI-WRITE-1: yes, mode switched"
+>
+> I have also opened the draft pull request
+- **Taken by Mustafa, 2026-11-23, 17:15:07 UTC: CI-WRITE-1 (a), yes to the first CI write; his rule for how the chat's
+  mode is read before a CI write; GH-TOOLS (a) for this pull request: he opens the draft, presses Ready and presses
+  Merge on GitHub himself, by steps that stand in for the "expected head" part of his point 9** (the builder chat he
+  calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai
+  project "Shamble Frontlines ALT"; his message 4c139df2-6889-4a70-bc2d-461bfdc159cc, whole; extracted by script from
+  the chat's transcript). The mode rule, in his words: "Write if the record on this message reads acceptEdits. If it
+  reads default: my screen shows Accept edits, and on 2026-11-12 the record gave that same mode as "default" (the
+  archive's MANUAL-MODE), so write as well and name the value in the report. Any other value: do not write, and tell me
+  the value. The same reading holds for writes 2 and 3." The merge steps, in his words: "your advisor agent approves the
+  full SHA, gate, smoke and toolchain are green on it, you push nothing after that approval, you give me the full SHA
+  when you ask for my go, and I type my go in this chat before I press Merge. My main Advisor checks from the repo that
+  the pull request's head is that SHA." His point 1 leaves the pull request's number open, as he sent it: "The draft
+  pull request is open: #__." What it answers, in the chat's words (not his): the chat's two questions in its message of
+  17:04 UTC. CI-WRITE-1: may the chat write `.github/workflows/toolchain.yml` with the text of `ci-edit.diff` (128
+  lines, 93 added, none removed, sha256 240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673, sent to him as
+  a file; the file his CI-TEXT (a) answered), after which the file has sha256
+  d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c: (a) yes, (b) yes with changes he names, (c) no;
+  recommended (a). GH-TOOLS: how the pull request is opened, marked ready and merged, since this chat cannot write to
+  GitHub: (a) he does the three steps on GitHub himself, the merge after the advisor agent's approval of the full SHA,
+  his go typed in the chat and the chat's read of the checks on that SHA; (b) he gives the account a GitHub connector;
+  (c) another guarded chat with the GitHub tools does them on his go there; recommended (a) for the draft, and for the
+  merge (b) if he can, else (a). His point 3 answers the chat's note that the record may call the app's Accept edits
+  "default". Records, not his words: the mode on this message read `auto` (the session record and the message), so by
+  his own rule nothing was written on it; no pull request from the branch was on GitHub at 17:15 UTC. Copied by script
+  (1385 bytes, sha256 6f4508c2297871b3802efe2fe6d7a181633b702a66d07d41808a64cfe4f332ce):
+> My answers of 23 November, written with my main Advisor. I switched this chat to Accept edits before I sent this.
+>
+> 1. The draft pull request is open: #__.
+>
+> 2. CI-WRITE-1: (a), yes. Write .github/workflows/toolchain.yml from ci-edit.diff (sha256 240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673). After the write the file's sha256 must be d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c; show it to me. My Advisor rebuilt the file from main's copy with this diff and got that same checksum.
+>
+> 3. The mode. Write if the record on this message reads acceptEdits. If it reads default: my screen shows Accept edits, and on 2026-11-12 the record gave that same mode as "default" (the archive's MANUAL-MODE), so write as well and name the value in the report. Any other value: do not write, and tell me the value. The same reading holds for writes 2 and 3.
+>
+> 4. GH-TOOLS: (a) for this pull request. I open the draft, press Ready and press Merge on GitHub myself. For the merge: your advisor agent approves the full SHA, gate, smoke and toolchain are green on it, you push nothing after that approval, you give me the full SHA when you ask for my go, and I type my go in this chat before I press Merge. My main Advisor checks from the repo that the pull request's head is that SHA. For this pull request that stands in for the "expected head" part of my point 9.
 - **Taken by Mustafa, 2026-11-23, 16:30:46 UTC: Builder V3, a new Claude Code chat on Fable 5.2, takes over the CI-WASM
   pull request; CI-MODEL (a): for that chat's CI edits of the CI-WASM pull request, each asked of him with its exact
   text, he sets his words of 2026-11-12 on CI work aside** (the builder chat he calls Builder V3,
