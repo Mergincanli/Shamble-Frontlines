@@ -83,6 +83,8 @@
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
 - **07:1x, Stop B's round started** (U8's one round, lever (2), advisor-u6c-brief.md:195-197; on snapshot 60205020 in
   the fix-pass worktree): security and netcode seats (xhigh), files u8-stopb-security.md, u8-stopb-netcode.md.
+- **07:1x, SEC-F26-1 DONE at 07d5d31** (test only, 4 asserts in rct's F26 test; plants A, B fail by name on a scratch
+  copy, restored, rc 2609bc87 unchanged; redact PASS 11/11, 351 items, 0 findings; gate PASS); CI to run.
 - **Next 3:** Stop B's infra seat (u8-stopb-infra.md, INF-SB-n; its items: F13, the path unit's restart, F14, F27, F11,
   ADV-U8-11, -14, C4, C6, C7, cost and outages) when a slot frees; then one ruling and U8's fix pass; U4's report; T5 (i).
 
@@ -110,7 +112,7 @@
 
 ## Open findings (inside the plan; each with its taker)
 - **U6a's carries:** u6a-fix-pass.md's last section (NR-U6A-5 U6d, -6 U6e, -7 U6b; O1 U6d; O2 U6b and U7; F4 U6e; F1
-  open; NR-U6A-1's U8 carry). **SEC-F26-1** (Low, mine): asserts and 2 plants in redact-check.test.mjs before #40 ready.
+  open; NR-U6A-1's U8 carry). **SEC-F26-1** DONE at 07d5d31 (Now).
 - **U4f's brief, its 9.2:** taken by U4f: RR-CB-2, TE-B1-R2-1 with RR2-B1-1, RR-B1-7 (1); left with their takers:
   C62H-BOUND's judge Lows (JDG-ONLY-1), TE-CBH-5 = NA-CBB-1 (c-u4r-runs.mjs's next change), U3C-HELD-1's eight
   (npt-net's next change: u3c-held-1/build.md:116-122), CHECK-NFF-1 (check.mjs's next owner), ADV-CBR-1 (U4g).
@@ -169,8 +171,7 @@
   reading list is in its prompt; for the ruling also F9, F12, F17, F20. Not run on a VM. `node --test ops/` fails on
   Node 22.23: use `'ops/**/*.test.mjs'`.
 - **F26 (mine, from 2ad2829):** FIXED at 2a9498d (the ruling's section 6; tests 11/11; plant shown, restored 2609bc87;
-  scan 0 findings; CI green on 8412c6b); security CLEAR WITH CONDITIONS (SEC-F26-1 Low: asserts and 2 plants in the
-  test file only, at U6a's merge or deferred by the advisor; -2 Low accepted).
+  scan 0 findings; CI green on 8412c6b); security CLEAR WITH CONDITIONS (SEC-F26-1 DONE at 07d5d31; -2 accepted).
 - **U6b** (rev 1.1; security-u6b-deps.md, with conditions; Block 0 DONE ae4f57e): building (Now); C2's homes from
   advisor-u7-brief.md (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in npt-proto; the WebSocket tags in npt-link).
 - **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 security-cleared (5 conditions); disk freed first;
