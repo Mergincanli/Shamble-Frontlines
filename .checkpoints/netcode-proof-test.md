@@ -65,7 +65,6 @@
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
 ## Now (2026-11-23 16:2x UTC; U6a MERGED at 824d8e7; U7's T-half DONE, 8ab088e8…, 2,482 added, u7-t-build.md)
-- **07:0x, U6b's Block 0 DONE at ae4f57e** (u6b-block0.md steps 0-7 PASS; 754/850): pushed 21765e3, CI no failure.
 - **07:0x, U6b's builder launched** (`<base>` 21765e3, 754/850; u6b-run.sh; items 1-6 with F28; the valve at 5,400).
 - **Next 1:** U6b's return: snapshot, its one round (netcode, test, security: transports face the internet), fixes, merge.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
@@ -73,19 +72,20 @@
 - **Cuts 07:53-11:14 and 12:28-16:22 UTC** (history.md:7675-7701): all resumed; part-cleans 7.5 and 10.4 GiB; CARGO_INCREMENTAL=0.
 - **11:4x, the advisor's Stop B ruling** (advisor-u8-stopb.md daf55033…): items 1-20; S14 10-min; item 8: u8-sec-sb-3-docs.md.
 - **16:3x, U8's fix pass 2 DONE** (95/0, 315/0; P10-P19; snapshot bca52b2c…, 5,876 added); old tree .gate/u8-r2-old.
-- **16:4x, round 2 netcode: REVISE** (u8-r2-netcode.md): NC-SB-1..4 closed; new NC-R2-1 High (LG TERMed, its cut log
-  saved as .jsonl: the reader refuses a half line or an empty log), -2, -3 Medium, 3 Low.
-- **16:4x, round 2 security: REVISE** (u8-r2-security.md): SEC-SB-1, Mediums closed; new SEC-R2-1 High (/etc/issue.d
-  absent on 24.04, checked here), -2 High (sudo -l wraps at 80 in a file), -3 Medium (`git -C` denied), 1 Low; fail safe.
-- **16:4x, round 2 infra: REVISE** (u8-r2-infra.md): INF-SB-1 and its Mediums closed; R1's day fits (3.55 h span);
-  new INF-R2-1 High = SEC-R2-1; 5 Low. Round 2 complete; its Highs and Mediums sent to the advisor 16:5x (advisor-u8-r2.md).
-- **Next 3:** the advisor's round-2 ruling; pass 3 by U8's builder; the last round on the Highs alone; U4's report; T5 (i).
+- **16:4x, round 2 DONE, all three REVISE** (u8-r2-*.md): every round-1 High and Medium closed; R1's day fits; new Highs
+  NC-R2-1 (LG's cut log), SEC-R2-1 = INF-R2-1 (/etc/issue.d absent, checked here), SEC-R2-2 (sudo -l wraps); 3 Medium, 9 Low.
+- **16:5x, the advisor's round-2 ruling: REVISE** (advisor-u8-r2.md d107cbe3…; section 3 read in full): pass 3 items 1-8
+  (the three Highs first); size 85-125, U8 at ~5,960-6,000 (SIZE-STOP live, lean go on); last round netcode (NC-R2-1) and
+  security (SEC-R2-1, -2) on pass 3's lines alone; item 1's judge run over the fixture tree is mine. Pass 3 started 16:5x.
+- **Next 3:** pass 3's return, then my npt-judge run and the last round; U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
   TR-U6A-5 to U6d; F4's S1 burn to U6e (the netcode seat's suggestion); FP-6: no rule changed on a difference.
 - **2026-11-23, U6a's round 2 (my lean):** its one Medium (a flake the fix pass opened) fixed now as FP-13 with no third
   round (NPT-TRIM: a third only for a Critical or High); its Lows to carries and the merge report.
+- **2026-11-23, the round-2 ruling (advisor-u8-r2.md, each his to reverse):** under alone 0 only headers, ds-selftest and
+  the bites skip; a cut log is kept as its whole-line prefix (the judge unchanged, its run INVALID); PowerShell's narrower deny.
 - **2026-11-23, the runner (my lean):** u6b-run.sh exports CARGO_INCREMENTAL=0 (the incremental cache was 4.3 GB of
   10.4 GB, which put end checks under the 4 GB floor); it only caches, so no result moves, only rebuild speed.
 - **2026-11-23, Stop B's ruling (advisor-u8-stopb.md:318-324, each his to reverse):** R1's headers run stays a measured
@@ -152,9 +152,9 @@
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
   .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
-  at its snapshot; resume after its last block marked done); the advisor a3de649cd25e474df on round 2 (16:5x,
-  advisor-u8-r2.md). Done: round 2's seats, netcode a120f51df9a8f6986, security af8c5f0fbec829595, infra
-  a0615e1ead860724b (u8-r2-*.md); U8's fix-pass builder ac59cce3e5d002441 (pass 3 by SendMessage); the docs agent a6eb7acdf1c3ff885
+  at its snapshot; resume after its last block marked done); U8's builder ac59cce3e5d002441 on pass 3 (16:5x, its
+  worktree's u8-build.md "## Pass 3"). Done: the advisor a3de649cd25e474df (advisor-u8-r2.md); round 2's seats, netcode
+  a120f51df9a8f6986, security af8c5f0fbec829595, infra a0615e1ead860724b (u8-r2-*.md); the docs agent a6eb7acdf1c3ff885
   (u8-sec-sb-3-docs.md); the advisor's Stop B ruling a3de649cd25e474df; Stop B's seats, netcode a120f51df9a8f6986, security
   af8c5f0fbec829595, infra a0615e1ead860724b (u8-stopb-*.md; round-2 reads by SendMessage); U7's T-builder
   a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
