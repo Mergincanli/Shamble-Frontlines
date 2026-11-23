@@ -20,7 +20,7 @@
   and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: #64**
   (he opened it at 17:21:24 UTC; a draft since his answer of 18:40:57 UTC; its title and
   text for his Advisor to set: `ci-wasm/pr-64-title.txt`, `ci-wasm/pr-64-body.md`); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 20:08 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 20:16 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -297,11 +297,24 @@ no failed, flaky or retry line; no error line. Recorded, not judged: the Wasm is
 RR-F5). The logs: `.gate/ci-wasm/logs/push-137974047720.log` (sha256 8dac0d2d...7a90), `pr-137974099620.log`
 (0965bb1c...47e2).
 
-**Next:** P-BROWSER (one render count 3 to 4 in `packages/e2e/tests/skeleton/render-counts.json`, pushed, its run
-read, taken back in the next commit; covered by his CI-TEXT (a); he is told); then the ask PLANT-WRITE (P-GH's two
-lines; expected 84b6b3fd...1ff8) and stop; after its run the ask PLANT-BACK (expected 56d37fc6...9811). Then reviews
-on the final diff, the verifier, the advisor agent, docs-keeper, DECISIONS (his messages since 17:15:07 UTC), the
-report.
+**P-BROWSER, done (covered by his CI-TEXT (a); told to him):** the plant 45a6f0e ("drawCalls" 3 to 4 in
+`packages/e2e/tests/skeleton/render-counts.json`), pushed 20:06 UTC. Both toolchain runs failed only at the step
+"Build and test with the network cut off", at the browser tests (push 45255955923, job 137977706424; pull request
+45255972032, job 137977761665): tests 8 and 9 ("the first page on the default backend", "the first page on the forced
+WebGL 2 fallback") with "Error: expect(received).toEqual(expected)", '-   "drawCalls": 4,' / '+   "drawCalls": 3,'; "2
+failed", "10 passed (1.1m)"; no retry line; the install lines, the cut, "Tests 7 passed" and Chrome's version before
+it as in the clean run. So the runner's default backend is the WebGL 2 fallback. The take-back d6e4fb6 (the count is 3
+again; outside `.checkpoints/` the tree equals 2a654f3's): all four runs success (toolchain push 45257140900, job
+137981826960; pull request 45257156268, job 137981878828; gate and smoke 45257140991, 45257156063), both toolchain
+logs 17 of 17 by `stop-rule-check.py`.
+
+**Next:** the ask PLANT-WRITE (P-GH's two lines, `ci-wasm/ci-plant-p-gh.diff`, sha256 e4f21ab3...b1ac; the file after
+it 84b6b3fd...1ff8; numstat 2 0) and stop for his typed yes; its run must fail at the step "GitHub's own check of the
+archive" with gh's own line that the file is not part of the release (not a permission line, not "no attestations
+found"), nothing after it runs; then the ask PLANT-BACK (after it 56d37fc6...9811; numstat 0 2) and a clean run. Then
+reviews on the final diff (security-auditor, infra-engineer, test-engineer), the tier-2 evidence, the verifier, the
+advisor agent, docs-keeper, DECISIONS (his messages since 17:15:07 UTC), the report, the checkpoint folded and
+deleted, then he presses Ready.
 
 _Step 10, kept for the record (its list of the writes still to make stands):_
 **Step 10 (2026-11-23): the corrected install place: the pass is done, its exact text is with him (ask FIX-WRITE);
