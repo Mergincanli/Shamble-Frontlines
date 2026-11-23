@@ -47,7 +47,27 @@ array lines as modelled.
   impair_tests.rs:465, socket.rs:27, :251-252, there since U3b), per-socket impairment settings, not rustls's process
   default. Recorded as the pattern's false hit, not a finding.
 
-## Step 5 (running): `cargo check --workspace --all-targets --locked` then `node check.mjs`
-Through main-run.sh after a part-clean (6.2 GiB; free 5,052 MiB before), log .gate/u6b-block0/step5-check.log. The
-counts before Block 0 are U6a's M5 (measured 750, bites 850, 0 failed: .gate/u6a-merge/m5-check.log), on this tree less
-Block 0.
+## Step 5, `cargo check --workspace --all-targets --locked` then `node check.mjs`: PASS
+Through main-run.sh after a part-clean (6.2 GiB; free 5,052 MiB before), log .gate/u6b-block0/step5-check.log
+(06:40:10-06:59:27 UTC). `cargo check`: exit 0, no warning. check.mjs: every step PASS but fmt, which asked for one hunk
+in wt_tests.rs (the `groups` closure on one line); applied by Edit, then `check.mjs --only fmt` PASS. The counts against
+U6a's M5 on this tree less Block 0 (.gate/u6a-merge/m5-check.log: measured 750, bites 850): measured 754, bites 850, 0
+failed, 0 skipped; test step 954.8 s. The four that join the measured build, by name (`cargo test --locked -p npt-net
+-- --list`, .gate/u6b-block0/step5-wt-list.log): l2::wt::tests::the_server_configs_turn_migration_off_and_keep_datagrams_on,
+l2::wt::tests::the_test_certificate_is_well_formed, l2::wt::tests::wtq_route::web_transport_quinn_counts_a_failed_handshake,
+l2::wt::tests::wtq_route::web_transport_quinn_serves_a_session_over_impair_socket_at_p2 (npt-net's new default turns the
+wt module on in the measured build; the bites build had them already).
+
+## Step 6, cargo-deny and cargo-audit: PASS
+- `cargo deny --manifest-path spikes/netcode-proof/Cargo.toml --locked check advisories bans sources`: "advisories ok,
+  bans ok, sources ok", with the same five duplicate warnings as U6a's Block 0 (getrandom, syn, synstructure,
+  windows-link, windows-sys); its database folder updated 2026-11-23 07:00:31 UTC.
+- `cargo audit --file spikes/netcode-proof/Cargo.lock`: database fetched from https://github.com/RustSec/advisory-db.git
+  (FETCH_HEAD 2026-11-23 07:00:33 UTC), 1,561 advisories, 235 crate dependencies scanned, 0 vulnerabilities, "1 allowed
+  warning found": pin-utils 0.1.1, unmaintained, RUSTSEC-2026-0441 (2026-10-01; no fixed upgrade), as U6a's Block 0.
+
+## Step 7, after (dependency-check.md's U6b section; then one commit and the save)
+7d0f39f2483644b6253b9a71cb2594d58acb491cf7046abeb2f76faffc8e241f  spikes/netcode-proof/Cargo.toml
+210bf2df2d968dc457a76a0c75f20f7dd06fd2a0f9c33ef05e5c7c2a3b2ca219  spikes/netcode-proof/Cargo.lock
+6d6ede543c1799abfc66b7299a2482a61653ca4766f5d8f494f9b3b9c5da3ea5  spikes/netcode-proof/crates/net/Cargo.toml
+3caf76bcc256af569d37910f2eb97cebf4eb9868b03827427acc443b7701403c  spikes/netcode-proof/crates/server/Cargo.toml

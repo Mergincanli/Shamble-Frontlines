@@ -70,12 +70,12 @@
   u6a-fix-pass.md; this card at 3d7b952 holds the round's lines). U7's T-half DONE (T1-T4: 56 Node tests, 10 plants,
   2,482 added; snapshot wip/u7-t-build.patch 8ab088e8…; notes u7-t-build.md: F1-F3 for the R-half, the host facts for
   U6c's C8). U8's fix pass started 03:58, cut at 03:59 with no item done, resumed 06:37.
-- **My step, U6b's Block 0** (u6b-block0.md): steps 0-4 PASS (lock `1 65`, 235 packages, sha256 210bf2df… = security's
-  model; the feature tree as modelled; the grep's only hits are ImpairSocket::set_default); part-clean (6.2 GiB); step 5
-  running (shell bmrtxibx1: `cargo check --workspace --all-targets --locked`, then check.mjs; .gate/u6b-block0/step5-check.log).
-- **Next 1:** step 5's result (the wt tests joining the measured build, by name); step 6, cargo deny and cargo audit with
-  the database dates; step 7, dependency-check.md's U6b section (four hashes), one commit (three manifests, the lock,
-  wt.rs, wt_tests.rs, ws_config.rs), the save; then `<base>`, the counts, u6b-run.sh, the size line, U6b's builder.
+- **07:0x, U6b's Block 0 DONE at ae4f57e** (u6b-block0.md, steps 0-7 PASS): lock `1 65`, 235 packages, sha256 =
+  security's model; ring only, no aws-lc-rs; cargo check no warning; check.mjs all 11 PASS (fmt after one hunk),
+  measured 754 (+ the four wt tests, by name), bites 850; cargo-deny ok; cargo-audit 0 vulnerabilities (databases
+  07:00 UTC); dependency-check.md's U6b section; the save pushes it (DEP-HOLD released).
+- **Next 1:** U6b's launch: `<base>` = that push's head, its counts 754/850, the runner copy u6b-run.sh (u6a-run.sh's
+  shape), the size line; U6b's builder (its launch adds the U6b line's items and names its last-built valve).
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
 - **Next 3:** U8's fix pass's return (a new snapshot); T5 (i) the day U6b merges; U4's report when a slot is free.
 

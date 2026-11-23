@@ -65,3 +65,16 @@ a0efce8e511a8865d50008172b3f88e9cc072efbe92a85a035340562b7c49524  spikes/netcode
 # spikes/netcode-proof/web/package.json" only (node_modules ignored).
 8c3b69497de87ad1c3e2fb528914b06700902f59414108ec2732dafc8da76bc0  spikes/netcode-proof/web/package.json
 86cdb96a21f50b95a295c8cea8db08ae355d6259160aa822991cc76e9eeaf3fb  spikes/netcode-proof/web/package-lock.json
+
+# DEP-HOLD release, U6b's Block 0 (main's .claude/CHECKPOINTS.md §3; u6b-brief.md rev 1.1 section 5)
+# security-auditor's answer, read in full (ends DONE): .checkpoints/netcode-proof-test/security-u6b-deps.md (items 1-8
+# CLEAR WITH CONDITIONS; SEC-U6BD-1: seven packages go, not six; binding check :269-307). Written 2026-11-23 ~07:0x UTC
+# by the main session after steps 0-6 passed (evidence u6b-block0.md): the lock diff `1 65`, 235 packages, sha256 equal
+# to security's model; the feature tree as modelled (ring only, no aws-lc-rs); `cargo check` no warning; check.mjs all 11
+# steps PASS (fmt after rustfmt's one hunk), measured 754 (750 + the four wt tests by name), bites 850; cargo-deny
+# "advisories ok, bans ok, sources ok" (the same five duplicate warnings); cargo-audit 0 vulnerabilities, one allowed
+# warning RUSTSEC-2026-0441; both databases fetched 2026-11-23 07:00 UTC.
+7d0f39f2483644b6253b9a71cb2594d58acb491cf7046abeb2f76faffc8e241f  spikes/netcode-proof/Cargo.toml
+210bf2df2d968dc457a76a0c75f20f7dd06fd2a0f9c33ef05e5c7c2a3b2ca219  spikes/netcode-proof/Cargo.lock
+6d6ede543c1799abfc66b7299a2482a61653ca4766f5d8f494f9b3b9c5da3ea5  spikes/netcode-proof/crates/net/Cargo.toml
+3caf76bcc256af569d37910f2eb97cebf4eb9868b03827427acc443b7701403c  spikes/netcode-proof/crates/server/Cargo.toml
