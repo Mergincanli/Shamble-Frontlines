@@ -17,9 +17,9 @@
   **Branch on GitHub: `claude/loving-hopper-6p0mg2`** (stands in for `cs/ci-wasm`), started from the thread's head
   21b6ea0. **Worktree: `.gate/ci-wasm-wt`, local branch `cs/ci-wasm`**: the main folder holds the `claude/` name at
   main and is never switched, so every push names its target (`git push origin cs/ci-wasm:claude/loving-hopper-6p0mg2`),
-  and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: not
-  opened yet** (this chat has no GitHub write tool: see "Open findings", GH-TOOLS); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 17:30 UTC (from the clock).
+  and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: #64** (he opened it at 17:21:24 UTC; a draft since his answer of 18:40:57 UTC; its title and
+  text for his Advisor to set: `ci-wasm/pr-64-title.txt`, `ci-wasm/pr-64-body.md`); #63 and #62 stay open.
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 18:46 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -258,6 +258,27 @@
    the guard keeps `gh api` read-only: GH-TOOLS.
 
 ## Current step
+**Step 10 (2026-11-23, from 18:41 UTC): the corrected install place, one short pass, then its exact text to him.** His
+answers of 18:40:57 UTC (`ci-wasm/mustafa-2026-11-23T184057-opt-path.md`, by script): **OPT-PATH (a)** (the tool where
+every parent folder is root-owned and closed to others; the check widened to every parent up to `/`; "The check is not
+weakened."; his Advisor's input to weigh, not an order: a fresh folder the job itself creates as root directly under
+`/`, the log printing mode and owner of every parent); **how:** infra-engineer proposes, security-auditor reads the
+changed lines, the advisor agent rules, a second round only for a Critical or High; then the exact text to him **as a
+diff against the file at cb476b1, with the new checksums of the file and of the planted file; nothing under `.github/`
+is written before his yes on that text; the stop rule holds for the next run too**; **NOTES-PUSH (a)**; the pull
+request's title and text into the notes folder (done). He converted #64 to a draft.
+
+**The guard's prompt for the copy (his point 5):** the transcript shows the guard's hook asked (PreToolUse,
+17:23:24.718 UTC: "kit and gate files ask first in a day session: .github/workflows/toolchain.yml (cp)") and the
+call's result carries the answer "accept", source `user_temporary`, scope `once`, at 17:23:43.732 UTC: a one-time
+allow given in the app, 19 seconds later.
+
+**The pass (agents on Opus 5.5, effort max; one at a time):** infra-engineer -> `ci-wasm/infra-engineer-opt-path.md`
+and the proposed file in `.gate/ci-wasm/proposed-2/`; security-auditor -> `ci-wasm/security-auditor-opt-path.md`; the
+advisor agent -> `ci-wasm/advisor-opt-path.md`. Then: `ci-edit-2.diff` (against cb476b1's file), the new file's
+sha256, the planted file's sha256, to him; stop.
+
+_Step 9, kept for the record:_
 **Step 9 (2026-11-23): CI write 1 is made and pushed; its first runner runs are read under the stop rule.** His yes
 again at 17:22:42 UTC (`ci-wasm/mustafa-2026-11-23T172242-ci-write-1-again.md`), typed, with the mode on it `default`
 (the session record at 17:22 and 17:23 UTC and the `permissionMode` on the message; mode sequence 677, it was 11): by
@@ -290,8 +311,7 @@ wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz is present in release 0.2.
 program's own sha256 line, the fetch, the cut, both builds, the tests, Chrome. The two logs: `.gate/ci-wasm/logs/`
 (untracked; sha256 210350fd...5f78 push, fda98715...d15f pull request).
 
-**Now: stopped, told to him, before any fix, push or re-run** (the card's save of this stop is a local commit until he
-has been told). Nothing is fixed, P-GH and P-BROWSER wait. Put to him (OPT-PATH): (a) a corrected text prepared with
+**Stopped and told to him at 17:28:43 UTC, before any fix, push or re-run** (the card's save of this stop stayed a local commit until his NOTES-PUSH (a)). Nothing is fixed, P-GH and P-BROWSER wait. Put to him (OPT-PATH): (a) a corrected text prepared with
 infra-engineer and security-auditor (the tool installed where every parent folder is root-owned and closed to others,
 the check widened to every parent), the advisor agent on it, then its exact text to him as a new CI ask; (b) the job
 closes `/opt` itself before the install; (c) the `/opt` part of the check dropped (not recommended: it is the swap the
