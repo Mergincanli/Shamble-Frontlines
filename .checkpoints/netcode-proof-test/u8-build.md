@@ -279,3 +279,170 @@ Done:
   against R1.md's 0.20 h waits for U6c's reading. Not verified here (no systemd in this container): whether the path
   unit starts the service again after the host exits while the chain still exists; if it does, `Restart=no` is
   bounded only by systemd's trigger limit (for infra-engineer at Stop B).
+
+## Fix pass 2 (Stop B, 2026-11-23)
+Ruling advisor-u8-stopb.md sha256 daf55033…9192 checked; the worktree equals wip/u8-build.patch 60205020…d662
+(`git apply -R --check` clean, 42 files); `git status`: nothing half done. Start: 4,957 added lines.
+Plan, section 7's order: 1 .jsonl names + collect per block (NC-SB-1, ADV-SB-1) · 2 own certificate off the browser
+rooms (INF-SB-1, NC-SB-11) · 3 durations + READY guard (NC-SB-2, Q1) · 4 per-leg run/header/footer (NC-SB-3) · 5 S14
+600 s + 34 bursts (NC-SB-4) · 6 drivers loopback (SEC-SB-1, -4) · 7 cloud-init (SEC-SB-2, -6, -10, INF-SB-2, -8, F12)
+· 8 operator (SEC-SB-3 setting from the main session's record, -7, -11) · 9 dist compare (SEC-SB-5) · 10 alone after
+down, TIMING-INVALID (NC-SB-8) · 11 traps, refusals, -aN (NC-SB-10, INF-SB-12) · 12 LG npt-log verb (NC-SB-7) · 13 rate,
+slack, policy (NC-SB-9) · 14 S14 noise guard, summary (NC-SB-12) · 15 marks (NC-SB-5, -6) · 16 R1.md/PROMPT lines · 17
+unit limits and sandbox subset (INF-SB-6, SEC-SB-9) · 18 PID 1 read (INF-SB-9) · 19 exact sudo list (SEC-SB-8) · 20
+NC-SB-13..-17. One line per item as done, with the running total.
+Done:
+- 2.1 DONE (NC-SB-1, ADV-SB-1): every npt-log `*.jsonl` (r1.sh room_settings' log, keep, room_up, alone read, probe
+  wait, starts glob, probe_presence's `room-02-<leg>.jsonl`, load_settings' `load-NN.jsonl`; npt-lib.sh
+  npt_super_args' pattern; lib.mjs save; R1.md §5 and the interface list); collect: the whole tree first, on a read
+  error each block folder apart and split.txt names the file; tar paths from $R. Test 7 +2 ("2.1 NC-SB-1" reads the
+  judge's rule from crates/judge/src/lib.rs; "2.1 ADV-SB-1" with an npt-judge stand-in and one cut log). Plant P10:
+  `.log` back in room_settings -> "2.1 NC-SB-1" FAILS; restored, r1.sh ab3c2da9… equal. Total 5,029.
+- 2.2 DONE (INF-SB-1, NC-SB-11): room_settings names the production pair for browser rooms only; every other kind
+  writes `ws_cert_chain`/`ws_cert_key` null (the room's own certificate; U6b's field form checked at its merge);
+  load_settings pins the room's hash file unless ws to a room naming the production chain; R1.md §3's outage line.
+  Test 7 +1 ("2.2 INF-SB-1"); item 5's case and test 3's check moved to the new rule. Plant P11: the production pair
+  on `alone` -> "2.2" FAILS; restored, r1.sh 3127607b… equal. Total 5,053.
+- 2.3 DONE (NC-SB-2, Q1): room_settings' duration_ms per kind (headers and calibrate 300,000, ds 420,000, else 0);
+  new lg_block (LG = room + 30 s; READY by OPEN + warm-up − 10 s from the settings' warmup_ticks, else `lg stop`,
+  room_down, INVALID-ready.txt; then npt-super's room_exit, LG's end, room_down) used by headers, calibrate, ds;
+  `setting` helper; load_ready on a clock deadline (NC-SB-14 done here); R1.md §5 LG-rooms bullet (Q1 named). Test 7
+  +1 ("2.3": all three kinds, READY and no READY, with stubs and a call trace); item 8's duration assert updated.
+  Plant P12: `duration_ms 0` back -> "2.3" FAILS; restored, r1.sh 99f24d76… equal. Total 5,108.
+- 2.4 DONE (NC-SB-3): probe_presence takes the settings' run and reads each leg's header (run `<run>-<leg>`, profile
+  the leg, process probe, layer L2) and footer, else INVALID; the probe block passes `$(setting 02 run)`; R1.md's
+  interface line. Test 7's fixtures: the settings run on P0, P3 sharing P2's run, a missing footer on P4, a wrong
+  profile on B1 (each INVALID), six good legs present. Plant P13: the run check removed -> the fixture test FAILS
+  (P0 present); restored, r1.sh 11c764a7… equal. Total 5,133.
+- 2.5 DONE (NC-SB-4, section 4): probe.py STEADY_S 600, 34 bursts every 10 s from 600 s, TOTAL_S 950 (28,500
+  messages); compare.py STEADY_END_NS 599 s, the same 34, MESSAGES 950 s, the sample in its header; npt-s14's header;
+  R1.md §1 S14 0.80 h with its last 0.50 h beside the browser legs (rows 4.05, span 3.55), §2 timeline (chain 10:39-
+  11:21, S14 11:21-12:09, browsers 11:39-12:57) and the 11:39 step, §5 S14 bullet (n and ranks, the overlap's
+  guards); PROMPT-R1.md §4-5; r1.sh stamps in browsers/browsers-down, s14 keeps them, one chain at a time (bites
+  refused while server runs). s14 test: N 28,500, 102/136 recoveries, env 28500; +1 "2.5 NC-SB-4" (one schedule,
+  >= 1,000 episodes, >= 101 recoveries): 9 pass. Test 5 recomputes hours (sum − overlap) and the timeline: 8 pass.
+  Test 3 +2 (chain refusal, stamps): 301 ok. Plant P14: STEADY_S 60 -> s14 test FAILS (2 tests); restored,
+  probe.py 469da684… equal. Total 5,189.
+- 2.6 DONE (SEC-SB-1, SEC-SB-4, section 5): config.mjs header reworded; capabilities name the browser binary only
+  (no wdio:*driverOptions); driverArgs (chrome/edge `--port` only; firefox `--host=127.0.0.1 --port --websocket-
+  port=0`); remoteOptions name 127.0.0.1:<port> path "/"; lib.mjs session starts every driver from its recorded path
+  after verifyDriver and connects remote() to it. rules.md, PROMPT-R1.md §1.5 and R1.md Stop B step 5: C8's inbound
+  allow-rule read, the Cancel/stop line, the Stop B dry start with Get-NetTCPConnection (recorded on his laptop: not
+  run here). Test 4's SEC-R1D-2 test replaced by "SEC-SB-1, SEC-SB-4" (argv, remote options) and SEC-R1D-3 adjusted:
+  9 pass; operator test's C8 rule strings: 8 pass. Plants P15 gecko `--host` dropped and P16 `--allowed-ips` back on
+  chromedriver: each FAILS test 4; restored, config.mjs bdce7f7c… equal. Total 5,191.
+- 2.7 DONE (SEC-SB-2, -6, -10, INF-SB-2's bounds, INF-SB-8, F12's term): rs.yaml `runuser -u npt -- install -d -m 0700
+  /home/npt/.ssh`; binaries read as npt-build (`take`: runuser cat to a root tmp, then install) and the dist tar read
+  as npt-build, RS and LG; RS nft output: `meta skuid 2001 ip daddr 127.0.0.53 drop`, `meta skuid 2001 th dport 53
+  drop` before the loopback accept; every curl `--max-time 900 --retry 2`, every git fetch `-c http.lowSpeedLimit=1000
+  -c http.lowSpeedTime=60` (RS and LG); RS `command -v dig tcpdump` after the upgrades; firstboot's first step (RS and
+  LG) writes `ssh-keygen -l -E sha256` of each host key to /etc/issue.d/50-npt-hostkeys.issue and runs `agetty
+  --reload` (the means chosen: issue.d, shown above the console's login prompt and kept across screen clears);
+  PROMPT-R1.md §2 step 2 names it and the 15-minute rule. Test 1 +2 ("2.7 …" per role; nft -c covers the new rules):
+  22 pass; rs.yaml 12,315 B, lg.yaml 7,644 B. Plant P17: rs.yaml's old `install -d -o npt …/home/npt/.ssh` -> "rs: 2.7"
+  FAILS; restored, rs.yaml 9449d10d… equal. Not verified: Hetzner's console showing /etc/issue.d (no VM). Total 5,231.
+- 2.8 DONE (SEC-SB-3 per the main session's docs record u8-sec-sb-3-docs.md, SEC-SB-7, SEC-SB-11): settings.json
+  `permissions.blockReadsOutsideWorkingDirectories: true`; denies `Read(~/.ssh/**)`, `Read(//**/.ssh/**)`, 14
+  PowerShell read forms (Get-Content, gc, cat, type, Select-String, Format-Hex, Copy-Item x npt_operator, .ssh), and
+  per shell the `refs/heads/` lane and cs/* forms, `--no-verify` (two), `git -c *`, setting core.hooksPath (four
+  forms; `git config --get core.hooksPath` stays readable for start check 7). pre-push reads git's ref lines first
+  and refuses any remote ref but refs/heads/claude/npt-results, then pipes them to redact-check (`set -euf`).
+  rules.md: the setting and its version, the read-only set, the documented gaps, the passphrase-in-ssh-agent wall,
+  the hook's ref rule. PROMPT-R1.md: token link files named (:7) and deleted at §6.3; start checks 7 (hooksPath) and
+  8 (`claude --version` >= 2.1.257). R1.md Stop B step 6: the version read and the passphrase. Operator test +1
+  ("2.8 …") and the hook test refuses four other refs: 9 pass. Plants P18 the setting removed -> "2.8" FAILS; P19
+  the hook's ref check removed -> the hook test FAILS (lane ref pushed); restored, settings.json f403db83…,
+  pre-push c38d9564… equal. Total 5,319.
+- 2.9 DONE (SEC-SB-5): new ops/runs/r1-dist.sha256 (comment only until Stop B's fill); r1.sh EXPECTED_DIST,
+  dist_check (python: names every file whose hash differs, is missing or extra; an empty list differs; writes
+  dist.txt and DIST-DIFFERS; never stops bring-up), bringup calls it before `done`; host_active refuses without
+  dist.txt or with DIST-DIFFERS unless DIST-ACCEPTED; new `dist-accept` block (his word, refused on an empty list);
+  R1.md §8, PROMPT-R1.md §2 step 10. Test 7 +1 ("2.9": equal served, a differing hash refused and named, his word
+  serves, a missing file refused, the committed unfilled list refused; the chain names no DIST); test 5 +1: 9 pass.
+  No plant named by the ruling for this item. Total 5,405 (43 files).
+- 2.10 DONE (NC-SB-8): r1.sh alone_min (the least `alone` over the affinity events) read after room_down 00, from
+  the closed log; chain_run skips each TIMING_BLOCKS block under TIMING-INVALID (NOT-RUN.txt "not run: alone 0 (C1)"
+  with alone-tasks.txt beside it, chain marker stopped), calibrate and s14 still run; collect's judge.txt opens with
+  the C1 line (C1.txt). Test 7 +1 ("2.10": the min of two events, read after down, both chains with a block stub:
+  only calibrate and s14 ran, five NOT-RUN folders, the C1 line first); the npt-judge stand-in shared. Total 5,454.
+- 2.11 DONE (NC-SB-10, INF-SB-12): r1.sh block_start (dispatch, for bringup and the seven chain blocks): refuses a
+  block the chain marked done unless its folder holds INVALID*; counts attempts (`attempts` file) and sets ATT=-aN
+  from the second, which room_settings, room_up, keep, lg_block's and the probe's super-log waits, the alone read and
+  probe_presence carry into run ids and log names; `trap down_all EXIT` (every room the block opened brought down).
+  busy: a live room holder (not for s14) or another running chain refuses the block, recorded in its stopped marker;
+  chain_run writes `<chain>.ended` from an EXIT trap (expanded at set time: a test caught the unbound local);
+  deadline_ok: 20-minute margin, LG blocks also against LG's delete-by (new `lg-boot <epoch>` block from PROMPT-R1.md
+  §2 step 9; unrecorded: RS's boot − 15 min); the probe writes INVALID-presence.txt on an INVALID leg. Test 7 +1
+  ("2.11": the trap brings room 01 down on exit 3; -a2 in run id and log; attempts file; done refused, INVALID
+  allowed; busy on a live holder, not for s14, on another chain): 12 pass; test 3 301 ok. Total 5,545.
+- 2.12 DONE (NC-SB-7): npt-load-ctl's one new fixed verb `npt-log NN` (head -c 256 MiB of logs/load-NN.jsonl;
+  npt_load_parse takes it); `start` removes the last load-NN.jsonl first (a re-run's fresh log; RS kept the last);
+  r1.sh's headers, probe, calibrate, ds blocks keep `lg "npt-log NN"` as load-NN$ATT.jsonl; load_settings passes role,
+  layer, profile, scene and tick_hz from the room's settings. Test 3 +7 (accepts `npt-log 05`; refuses 5 forms; the
+  fixed path): 308 ok; plant P7 re-run: 2 FAIL as before, restored, npt-load-ctl 1ad94210… equal. Test 7 +1 ("2.12":
+  eleven header fields equal the room's for all four LG kinds; each block keeps LG's npt-log; the re-run line): 13
+  pass. Total 5,577.
+- 2.13 DONE (NC-SB-9): probe_presence reads each leg's `l2_summary` window counts (probe_up/down_window_count over
+  probe_window_ns: 10,000 a second within 1 %, else INVALID; unread, INVALID) and P1's `l2_timer_slack_ns` and
+  `l2_sched_policy` at both edges (ImpairSocket's names, socket.rs:319, :362; U6c's merge confirms); R1.md's
+  interface line (also NC-SB-16's probe_packets line). Fixtures: P2 2 % off, P0 no window counts, P1 slack missing
+  at warmup and policy missing at after (each INVALID), P4 0.9 % off and P3 exact present: 13 pass. Total 5,608.
+- 2.14 DONE (NC-SB-12): probe.py's client reads total_retrans at the steady window's end (599 s, before sending the
+  first message after it) into `tcp_info_client.total_retrans_steady`; compare.py's noise guard compares the steady
+  episodes with it (unread: INVALID), its header and VOID/INVALID follow-up text (the re-run rule; a MISS never
+  re-run). r1.sh: s14_run (one npt-s14 run, then `compare.py summary` on RS into summary.txt); s14: a VOID or INVALID
+  run writes INVALID-s14.txt and runs once more into rerun/ only if now + S14_S (2,880 s) + 300 s <= RS boot +
+  BITES_AT_S (12,420 s), else rerun-R2.txt. s14 test +1 ("2.14": 6 episodes > 3 steady retransmissions VOID though
+  total_retrans 50; unread INVALID; r1.sh's grep matches the real summary): 10 pass. Test 7 +1 ("2.14": time left re-
+  runs once, too late writes the R2 note, judged never): 14 pass. Total 5,681.
+- 2.15 DONE (NC-SB-5, -6): room_settings: probe PM-0001-3 only; PM-0001-16 on alone, start, headers, calibrate, ds and
+  browser rooms (bites keep their own mark); R1.md §1's rows (probe "-3; conditions C-U8-2, C-U8-4, C-U8-6"; -16 on
+  bring-up, headers, calibration, DelayStream) and §4's line on the browser rooms. Test 7 +1 ("2.15"): 15 pass; test 5
+  9 pass. Total 5,698.
+- 2.16 DONE (INF-SB-2's rule and provider list, INF-SB-3, -4, -5, -7, -10, -11, -13, F9, F20, NC-SB-18, SEC-SB-8's LG
+  checks): R1.md §1 the slack per VM (RS 5 min at worst, LG about 10); §2 Stop B step 2 C7's text with six Primary
+  IPv4s, step 3 the fsn1 stock check before FIXED-IP (nbg1 fallback; r1.sh's new LOCATION fill, used by room_settings
+  and load_settings) and "exactly the list's /32s", the 09:10 source counts read aloud; §3 the 20-minute deadline
+  line, the bring-up rule (six providers, bounded fetches, delete by 10:15, one same-day retry by 10:45, cap EUR 0.78,
+  no console fingerprint = teardown) and the three more cases; §5 F9's line; §6 INF-SB-13's sentence; §8 F20's
+  bites with their judges. PROMPT-R1.md: §2 step 3 the 10:15 rule, step 4 LG's id/sudo/steps checks, §3 the ledger
+  wait at most 10 minutes, §4 the collect once the server chain ends. Test 5 +1 ("2.16": slack from the timeline, 1 +
+  5 = 2 + 4 Primary IPv4s, 10:15, 0.78, the six providers, the counts): 10 pass. Total 5,742.
+- 2.17 DONE (INF-SB-6, SEC-SB-9's subset): npt-host.service [Unit] StartLimitIntervalSec=300, StartLimitBurst=3,
+  [Service] ProtectHome, PrivateTmp, CapabilityBoundingSet= (empty), RestrictNamespaces, LockPersonality,
+  SystemCallArchitectures=native (NoNewPrivileges kept); its header states the restart rule and what waits for U6c's
+  merge (ProtectSystem=strict, PrivateDevices, MemoryDenyWriteExecute, SystemCallFilter, RestrictAddressFamilies:
+  SEC-SB-9's open part, named in the report); host_active refuses a failed npt-host.path. Test 1's unit assert
+  extended: 22 pass; test 7's 2.9 case: a failed path unit refuses: 15 pass. Total 5,768.
+- 2.18 DONE (INF-SB-9): npt-ctl cpus tries set-property on init.scope (taken or refused, recorded), then reads PID 1's
+  Cpus_allowed_list and, while npt_pid1_needs_move (new in npt-lib.sh: the list holds the tick vCPU or does not read)
+  says so, runs the taskset fallback too, recording the list before and after. Test 3 +7 (0-3 with tick 3 moved,
+  0-2 not, four unreadable lists moved, the order in cpus()): 315 ok. Total 5,791.
+- 2.19 DONE (SEC-SB-8's RS half): r1.sh sudo_exact (python: `sudo -n -l`'s command lines, merged lines split, against
+  sudoers.d/npt's nine `npt ALL=(root) NOPASSWD:` lines; prints each extra or missing line, exit 1) replaces bring-
+  up's full-rule grep and stops bring-up on any difference. Test 7 +1 ("2.19": the nine pass; one line beyond, one
+  missing, an (ALL : ALL) ALL line stop; one merged line reads alike): 16 pass. Not verified: sudo 1.9.15's exact
+  `-l` layout on the VM (read from its known form). Total 5,837.
+- Resumed after the 12:28-16:22 UTC cut: git status shows only U8's files and these notes; no plant left (grep of
+  every plant line: 0); settings.json f403db83, pre-push c38d9564, config.mjs bdce7f7c, rs.yaml 9449d10d,
+  npt-load-ctl 1ad94210 equal their post-restore hashes; item 19 was done before the cut, item 20's edits were made
+  and their tests passed, not yet logged.
+- 2.20 DONE (NC-SB-13, -14, -15, -16, -17): room_up, after room_start, waits 1 s and dies when room_exit follows (a
+  deadline kill or an early exit; live once F28's flush is in, U6b's merge); NC-SB-14 done in 2.3 (load_ready's clock
+  deadline); room_settings trims first_cpu_model at both ends; NC-SB-16's interface line done in 2.13 (R1.md); probe.py
+  netem() returns each link's call times (data direction first) and bursts records `actual` (the data direction's
+  window, which compare.py's validity rule reads) and `actual_reverse`, the tc call times per link; compare.py's
+  header names it; no early-start compensation (dropped by the ruling). Test 7 +1 ("2.20": open, a start followed by
+  room_exit dies, the trimmed model): 17 pass; s14 test +1 ("2.20 NC-SB-17"): 11 pass. Total 5,876.
+- END of fix pass 2: `node --test 'ops/**/*.test.mjs'` 95 pass, 0 fail (75 before; test 4's script check run with
+  ops/browser/node_modules linked from U8's build worktree, link removed after); `bash ops/tests/wrappers.test.sh` 315
+  ok, 0 failed (299 before); `check.mjs --only redact` PASS, 394 items, 0 findings; package.json 8370495d…,
+  package-lock.json a0efce8e… unchanged (DEP-HOLD); rs.yaml 12,315 B, lg.yaml 7,644 B. Plants P10-P19 each failed
+  its test and was restored with its sha256 checked; P7 re-run. 43 new files, 5,876 lines (4,957 + 919): SIZE-CHECK
+  not reached. No commit, no cargo, no npm install.
+- Open: F28 (npt-super's flush, U6b's merge) gates room_up's live reads, NC-SB-13's check and the probe's exit wait;
+  at U6b's merge: the own-certificate field form (null pair), the WebSocket pin's hash file, U6b's settings names; at
+  U6c's merge: host.json's names, the probe's leg header form, the rate/slack/policy names, probe_packets, npt-load's
+  header and footer, behaviour `brawl`, the chain's write-then-rename, SEC-SB-9's rest; Stop B on his laptop: the
+  drivers' listen read, `claude --version`, the passphrase, the fsn1 stock read; not verified here: Hetzner's console
+  showing /etc/issue.d, sudo -l's layout on the VM, systemd and nft on a VM.

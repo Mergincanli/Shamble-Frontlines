@@ -66,21 +66,21 @@
 
 ## Now (2026-11-23 16:2x UTC; U6a MERGED at 824d8e7; U7's T-half DONE, 8ab088e8…, 2,482 added, u7-t-build.md)
 - **07:0x, U6b's Block 0 DONE at ae4f57e** (u6b-block0.md steps 0-7 PASS; 754/850): pushed 21765e3, CI no failure.
-- **07:0x:** U8's fix pass DONE (wip/u8-build.patch 60205020…, 4,957 added, 42 files, base 096808b); F28 to U6b (item 5).
-- **07:0x, U6b's builder launched** (`<base>` 21765e3, 754/850; u6b-run.sh, logs .gate/u6b/; stop past 6,000) with items
-  1-6: C2's homes, C13, NR-U6A-7, NR2-U6A-2, F28, the valve (reader stamp and BudgetX2 last; past 5,400 they wait for U6e).
+- **07:0x, U6b's builder launched** (`<base>` 21765e3, 754/850; u6b-run.sh; items 1-6 with F28; the valve at 5,400).
 - **Next 1:** U6b's return: snapshot, its one round (netcode, test, security: transports face the internet), fixes, merge.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
 - **07:1x, SEC-F26-1 DONE at 07d5d31** (4 asserts; plants A, B fail by name; rc 2609bc87 unchanged; CI no failure).
 - **07:1x-11:2x, Stop B's round DONE (lever (2), on 60205020): all three REVISE** (u8-stopb-netcode.md 4 High, -security.md
   1, -infra.md 1; 16 Medium, 21 Low; Highs and Mediums read in full; NC-SB-1, -2 checked in code). U6b: F-PING, F-MARK-HDR.
 - **Cut 07:53-11:14 UTC** (history.md:7675-7687): U6b's builder and the infra seat; part-clean 7.5 GiB; both resumed.
-- **11:4x, the advisor's Stop B ruling: REVISE** (advisor-u8-stopb.md daf55033…, sections 3-7 and For Mustafa read in
-  full): section 7's items 1-20, all now; S14 the 10-minute window (no money moves); size 5,800-6,200 (SIZE-STOP live,
-  lean go on); round 2 the same three seats on the diff. U8's fix pass 2 from 11:4x; item 8's record u8-sec-sb-3-docs.md.
+- **11:4x, the advisor's Stop B ruling: REVISE** (advisor-u8-stopb.md daf55033…, read in full but sections 1-2): items
+  1-20, all now; S14's 10-minute window; round 2 the same three seats on the diff; item 8's record u8-sec-sb-3-docs.md.
 - **Cut 12:28-16:22 UTC** (history.md:7689-7701): U6b's builder (Block 6's last test) and U8's fix pass 2 (item 19)
   stopped; free 1,621 MiB; 16:2x part-clean 10.4 GiB (free 10,776), u6b-run.sh CARGO_INCREMENTAL=0, saver b67t3qh7l, both resumed.
-- **Next 3:** U8's fix pass 2; then its snapshot and round 2; U4's report; T5 (i).
+- **16:3x, U8's fix pass 2 DONE** (items 1-20; Node 95/0, wrappers 315/0, redact 0 of 394; plants P10-P19 fail by name,
+  restored; snapshot wip/u8-build.patch bca52b2c…, 5,876 added, 43 files, base 096808b; under 6,000). Old tree for the
+  interdiff: .gate/u8-r2-old (60205020 applied); 26 files changed + r1-dist.sha256. Builder's open: F28 (U6b), its values.
+- **Next 3:** round 2 (netcode, security, then infra; advisor-u8-stopb.md:294-305) on the interdiff; U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
