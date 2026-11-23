@@ -1,9 +1,19 @@
 # The takeover of the CI-WASM pull request by a project thread: an addendum to the plan (revision 3)
 
 _Written by the project thread "Build the game from change-set 3" (session_01WLuqnwQ8c8JuNgfBX7Wixg), 2026-11-23,
-14:41 UTC (from the clock), for the advisor agent's read before the CI write. It changes no step, no line of the CI
-text and no evidence of `plan.md` (revision 3, approved: `advisor-plan.md`, "APPROVE holds for sha256 240c7db7...").
-It says who carries the plan out now, and what that changes._
+14:40 UTC (its first commit, fcf6def, is stamped 14:40:57 UTC), for the advisor agent's read before the CI write.
+It changes no step, no line of the CI text and no evidence of `plan.md` (revision 3, approved: `advisor-plan.md`,
+"APPROVE holds for sha256 240c7db7..."). It says who carries the plan out now, and what that changes._
+
+_**Overtaken in part on 2026-11-23, 14:54:47 UTC** (his tap on the card WRITE-WHERE: "In a new Claude Code chat";
+`mustafa-2026-11-23T145447-write-where.md`). The thread makes no CI write. Section 3, items 4 and 5, and question 2
+of section 5 no longer apply to this pull request: a new Claude Code chat takes it over, where the guard loads and
+his WRITE-MODE words apply as written. Section 3, item 4's sentence that the thread "goes on unless he says
+otherwise" rested on the thread's answer of 14:33:55 UTC, which was incomplete (a normal Claude Code chat also loads
+the guard); the thread corrected it at 14:51:31 UTC and asked him again. Sections 2 and 4 stand. What the chat that
+takes over needs is in the resume card's section "Handover"; the advisor agent's read of this addendum and of the
+thread's records is `advisor-takeover.md`. The text below is left as it was written (but for the time in the
+line above, which first read "14:41 UTC")._
 
 ## 1. Why
 - The first builder chat (lane 1; he calls it Builder V1; session_019YNMUV9LFhASseJ9EP12kL, branch

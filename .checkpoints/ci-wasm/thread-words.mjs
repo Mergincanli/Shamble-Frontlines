@@ -137,6 +137,10 @@ const FROM = "Copied by script from the session's transcript (session_01WLuqnwQ8
   note('thread-2026-11-23T145131-correction.md', "The thread's correction of 2026-11-23, 14:51:31 UTC to its answer of 14:33:55 UTC (not his words)", `${FROM}: the text of the thread's post_message call toolu_01XjPKKsssZnEvHM9J6zFg9o, stamped ${c.at}`, c.input.text);
   const d = call('toolu_018t2TERYYtwV727oqCuN3LG', 'mcp__hearthbot__request_decision');
   note('thread-2026-11-23T145133-card-write-where.md', "The thread's decision card of 2026-11-23, 14:51:33 UTC: WRITE-WHERE (not his words)", `${FROM}: the question, options and reason of the thread's request_decision call toolu_018t2TERYYtwV727oqCuN3LG, stamped ${d.at}, each field whole, laid out one per line`, card(d));
+  const m = his('2026-11-23T14:54:47Z');
+  note('mustafa-2026-11-23T145447-write-where.md', 'Mustafa, 2026-11-23, 14:54:47 UTC: his tap on the card WRITE-WHERE', `${FROM}: the message the platform wrote for his tap, sent 2026-11-23T14:54:47Z, whole`, m.text);
+  const a = call('toolu_01J1wM7tj7RLQsh7h6PGnfvW', 'mcp__hearthbot__post_message');
+  note('thread-2026-11-23T145639-new-chat.md', "The thread's message of 2026-11-23, 14:56:39 UTC, after his tap on WRITE-WHERE (not his words)", `${FROM}: the text of the thread's post_message call toolu_01J1wM7tj7RLQsh7h6PGnfvW, stamped ${a.at}`, a.input.text);
 }
 
 let ok = true;

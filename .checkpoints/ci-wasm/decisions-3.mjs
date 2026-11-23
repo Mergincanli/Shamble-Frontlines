@@ -22,6 +22,8 @@ const THREAD =
   'the project thread "Build the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines ALT" on his second personal account';
 // The commit that holds the thread's saved messages and both plans, for when the notes are deleted.
 const NOTES_AT = 'fcf6def';
+// The commit that holds the thread's later texts (its correction, the card WRITE-WHERE, his tap on it).
+const NOTES_AT_2 = 'PENDING';
 const TAP =
   "a tap on the thread's decision card: the line below is the message the platform wrote for his tap, in the card's wording, not text he typed; extracted by script from the session's transcript";
 const sha = (s) => createHash('sha256').update(s).digest('hex');
@@ -62,6 +64,16 @@ const fence = (label, n) =>
 
 // Newest first. `file` undefined: a pointer, with no words of his quoted under it.
 const ENTRIES = [
+  {
+    key: '2026-11-23, 14:54:47 UTC: WRITE-WHERE',
+    file: 'mustafa-2026-11-23T145447-write-where.md',
+    after: [
+      { file: 'thread-2026-11-23T145131-correction.md', label: 'its message of 14:51:31 UTC, which corrects its answer of 14:33:55 UTC, holds the CI write and announces the card' },
+      { file: 'thread-2026-11-23T145133-card-write-where.md', label: 'the decision card he answered, posted at 14:51:33 UTC' },
+    ],
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 14:54:47 UTC: WRITE-WHERE, the CI file is written in a new Claude Code chat, not in the project thread** (${THREAD}; ${TAP}). It replaces his yes of 14:32:43 UTC (WRITE-THREAD, the entry below). He gave that yes together with a question, and the thread's answer to the question was incomplete: it told him that a normal Claude Code chat adds only the Accept edits switch, where such a chat also loads the repository's guard, which asks him before each kit or CI write, keeps agents away from those files and refuses a force push; none of that loads in a project thread. The thread corrected itself at 14:51:31 UTC, held the CI write and asked him again, recommending the thread; he chose the new chat. Both texts are shown under his tap as the thread's text, not his words. No CI write was made from the thread: \`.github/\` on its branch equals main's. What his tap decides is where the CI file is written. What it does not say: which model that chat runs on. His typed words of 14:32:43 UTC speak of "a new Claude Code chat running on Fable 5.2 creating those CI files"; his words of 2026-11-12, "The guard, the gate and CI work stays with Opus 5.5.", were set aside on 2026-11-17 only for the gate and CI edits the first builder chat asks of him (GATE-FOLLOW). So the model of that chat and its leave to make these CI edits are his to say in that chat, in the block he pastes there. His WRITE-MODE words apply in that chat as written. The thread's reply to his tap is in the notes (\`.checkpoints/ci-wasm/thread-2026-11-23T145639-new-chat.md\`, readable at ${NOTES_AT_2} once the notes are deleted). ${by(m)}`,
+  },
   {
     key: '2026-11-23, 14:32:43 UTC: WRITE-THREAD',
     file: 'mustafa-2026-11-23T143243-write-thread.md',
