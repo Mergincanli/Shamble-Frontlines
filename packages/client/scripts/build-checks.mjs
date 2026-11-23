@@ -169,8 +169,8 @@ export function checkOutDir(outDir, defaultDir) {
  * config files outside the repository (the quality gate's flag check).
  */
 export const CARGO_OVERRIDES = new RegExp(
-  "^(?!CARGO_(BUILD_)?TARGET_DIR$)(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC|RUSTC_(WORKSPACE_)?WRAPPER|RUSTUP_TOOLCHAIN|" +
-    "CARGO_(BUILD|PROFILE|TARGET)_.*|WASM_BINDGEN_.*|RUST_LOG)$",
+  "^(?!CARGO_(BUILD_)?TARGET_DIR$)(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC|RUSTC_(WORKSPACE_)?WRAPPER|RUSTC_BOOTSTRAP|" +
+    "RUSTUP_TOOLCHAIN|CARGO_INCREMENTAL|CARGO_(BUILD|PROFILE|RESOLVER|TARGET)_.*|WASM_BINDGEN_.*|RUST_LOG)$",
 );
 
 /** The names in `env` that the Wasm build refuses, in the environment's order. Only names are read, never a value. */
