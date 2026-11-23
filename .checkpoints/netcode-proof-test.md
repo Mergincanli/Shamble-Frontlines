@@ -70,6 +70,10 @@
   749/849 = 709+40/806+43; 5,843 added, measured on the new snapshot wip/u6a-build.patch 022ddb84…, 157 under the stop;
   the A legs of carry.rs never bite without the cap: round 2's). Part-clean 3: 8.7 GiB, free 11,253 MiB. U7's Block 0a
   DONE at bc87d2d (pushed 07fd08a). Round 2 and U7's T-builder running (Running work).
+- **03:3x, round 2's netcode seat:** APPROVE WITH FINDINGS (u6a-r2-netcode.md): NR-U6A-1 to -4 closed; 4 Lows: NR2-U6A-1
+  U8's carry adds "the same eight header values from one source, bite runs included"; -2 to U6b (exited I/O tids left out
+  of sibling_free); -3 the no-jiffy stderr wording and a rare steal flake in the pinned test; -4 the report names
+  `TickLoop::io_on_a_tick_sibling`. Waiting on the test seat.
 - **Earlier:** U6a's round 1 DONE: both seats REVISE on one shared High
   (NR-U6A-1 = TR-U6A-1: npt-super's header lacks the run's bite, tick_hz and scene, so its run goes INVALID); Mediums
   NR-U6A-2, -3, TR-U6A-2, -3, -4; Lows NR-U6A-4 to -8, TR-U6A-5 to -12. The fix list: u6a-fix-pass.md (FP-1 to FP-12,
