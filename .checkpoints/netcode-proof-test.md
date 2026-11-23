@@ -81,7 +81,7 @@
   a2661dc320c9e6d00 (resumed) with the container readings; merge M3-M9 (main-run.sh), CI; U6b's report.
 - **Next 3:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md:
   the Choices of 2026-11-23 below, his SIZE-STOP (a), the three cuts, SEC-F26-1 done, U6b's and U8's state. U4's report
-  (task 75) in the gaps; T5 (i) the day U6b merges.
+  DONE (u4-report.md), named in it; T5 (i) the day U6b merges.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6b's container readings (my lean):** built in its fix pass, before the merge (rev 1.1 condition 8:
@@ -109,7 +109,7 @@
   2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
 
 ## Next steps (NPT-TRIM's order; the re-plan fixes the rest; U4f2 and the re-plan DONE: this card at 1b26e8c)
-1. U4's report (it folds U4r's, U4f's and U4f2's; U4's kept server rows are U4k, after R1).
+1. U4's report DONE 2026-11-23 (u4-report.md: U4 closed); its kept server rows are U4k, after R1 (replan-marks.md:135-158).
 2. replan.md's order (:89-94): U6a, U6b, U6c, U7's Rust half on the lane, U8 and U7's TypeScript beside it, each brief
    with one advisor check; Stop B about Tue 1 Dec (R1's run plan with the planned dates: his item 6); R1 Thu 3 Dec; then
    MOVED (marks.json and the judge, MARK-NOTES' text, a reviewer's read), R1's report, U4k, U6d, U6e, U6j; R2, R3, R5.
