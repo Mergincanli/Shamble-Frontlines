@@ -127,6 +127,151 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-23, 14:32:43 UTC: WRITE-THREAD, his yes to the CI file being written from the project
+  thread, which has no Accept edits mode; and his question why a new Claude Code chat does not write the CI files
+  instead** (the project thread "Build the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai
+  project "Shamble Frontlines ALT" on his second personal account; his message
+  cmsg_019xis1ZabqTLNQbEMzA6WbhUZGHHmFH2k2HzELe9gE4ZM, typed in the app, whole; extracted by script from the session's
+  transcript). It answers the thread's decision card of 14:29:18 UTC, shown under it as the thread's text, not his
+  words; his first line is that card's question. His WRITE-MODE words of 2026-11-18 (the entry of 2026-11-18, 20:20:09
+  UTC, below: "From now on you read the chat's mode right before each kit write and stop unless it is Accept edits.")
+  are not reworded and stand for every chat that has the mode: the thread's session record read "auto" at 14:28 UTC, a
+  project thread has no switch for its mode, and no repository hook loads in one, so the thread stopped and asked him.
+  In place of the mode read: his yes on the exact text, and the file's sha256 compared with its scratch copy after each
+  CI write. His yes covers the three CI writes of the CI-WASM pull request (the file; the two planted lines; their
+  take-back) and no other kit, gate or CI edit. The thread answered his question at 14:33:55 UTC (it is a Claude Code
+  session on the model his words name for a builder chat, with the repository and the plans loaded; a separate chat can
+  take its branch over whenever he prefers) and goes on with the write unless he says otherwise; its answer is in the
+  notes (`.checkpoints/ci-wasm/thread-2026-11-23T143355-why-here.md`, readable at fcf6def once the notes are deleted).
+  Copied by script (197 bytes, sha256 e5a9738db3d8c855846dfaa7e781f0fa3680af75506dc5c54d2cd4be17daaba1):
+> Allow the CI file write in this thread, which has no Accept edits mode?
+> Yes, but why don't we make a new Claude Code chat running on Fable 5.2 creating those CI files?
+> Instead trying to do it here?
+- _The thread's text, not his words: the decision card he answered, posted at 14:29:18 UTC (copied by script, 563 bytes,
+  sha256 45e6eff1c27a5c0a0a92e682948113b18c2f24ebc24f8e644c80eece3998efe6):_
+```text
+Question: Allow the CI file write in this thread, which has no Accept edits mode?
+Option 1 (recommended): Yes, write it here. Your yes on the exact attached text is the gate. After writing I compare the file's checksum with the approved one and show you.
+Option 2: No, wait for Builder V1. The CI file waits until Builder V1 is back tomorrow after 20:00, and change-set 3 cannot start today.
+Why recommended: Your rule of 18 Nov (WRITE-MODE) says a builder stops unless its chat is in Accept edits. This thread has no such switch, so only your word lets me go on.
+```
+- **Taken by Mustafa, 2026-11-23, 14:32:42 UTC: LONG-RUNS, the long runs of his project's threads (a full test suite, a
+  long build) go on GitHub, from a branch the thread pushes, and are read from its checks** (the project thread "Build
+  the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines ALT" on
+  his second personal account; a tap on the thread's decision card: the line below is the message the platform wrote for
+  his tap, in the card's wording, not text he typed; extracted by script from the session's transcript). The card is
+  shown under it as the thread's text, not his words. It changes none of the evidence the change-set protocol asks for:
+  the short runs (a test file by its path, the legacy gate, one build, a rehearsal) still run in the thread's container.
+  Copied by script (112 bytes, sha256 3638a3897c6a5575fbced5d636156a3a862fc3a4ceae20cceb7b18e9a2b55a76):
+> Chose "On GitHub, from a branch I push" on the decision card asking "Where should long runs in this project go?"
+- _The thread's text, not his words: the decision card he answered, posted at 14:30:25 UTC (copied by script, 457 bytes,
+  sha256 49565db01b16e116b24d85df1672302f3a31ca0089198f71674019ad6f9983dc):_
+```text
+Question: Where should long runs in this project go?
+Option 1 (recommended): On GitHub, from a branch I push. Runs in the checks you already use, and results stay with the branch. May count toward your GitHub usage.
+Option 2: In the cloud now. Starts right away, with nothing to set up.
+Option 3: In the cloud tonight. Starts this evening and is usually done by morning.
+Why recommended: Runs in the checks you already use, and results stay with the branch.
+```
+- **Taken by Mustafa, 2026-11-23, 14:31:06 UTC: ANSWERS-7, his yes to the seven recommended answers. For the CI-WASM
+  pull request: CHROME-SOURCE (a), the Google Chrome in GitHub's runner image; CI-TEXT (a), yes to the CI text and what
+  goes with it; FIREFOX-TESTS (c), a small pull request of its own right after it. For change-set 3's plan: RNG-SOURCE
+  (c), our own ChaCha8, checked against the published test vectors; SIZE-3 (b), two change-sets, 3a then 3b; PRESS-PACE
+  (a), a second tap inside one tick is applied one tick later; DEPART-3 (a), he accepts the list** (the project thread
+  "Build the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines
+  ALT" on his second personal account; a tap on the thread's decision card: the line below is the message the platform
+  wrote for his tap, in the card's wording, not text he typed; extracted by script from the session's transcript). What
+  his tap answers is shown under it as the thread's text, not his words: the part of the thread's message of 14:28:25
+  UTC that states the seven answers back in plain words, and the card. The file attached to that message is the CI text,
+  byte for byte `.checkpoints/ci-wasm/ci-edit.diff` (128 lines, 93 added, none removed, sha256
+  240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673). Each question in full, with every option and the
+  recommended one, stands in the CI plan's section 16 and in change-set 3's plan (draft 3), section 12
+  (`.checkpoints/ci-wasm/plan.md` and `.checkpoints/ci-wasm/cs3-plan.md`, readable at fcf6def once the notes are
+  deleted): so the first builder chat put them to him on 2026-11-19 (at about 20:03 and 21:07 UTC, by its card), so two
+  threads of his project laid them out for him on 2026-11-23 (their messages of 13:39:57 and 14:11:11 UTC, in plain
+  words, with the options), and he pasted the first builder chat's own summary of them into this thread himself (the
+  entry of 14:25:03 UTC below: lines 5 to 90 of his message). The recommended answers hold more than the thread's
+  message spells out. CI-TEXT (a) is one yes for five things: `ci-edit.diff`; `ci-plant-p-gh.diff` (the two planted
+  lines, sha256 e4f21ab359bc9fd911c663a4fcbc892133195fefe44e88ad7ec51b50e3d0b1ac), written in one commit and taken out
+  in the next; the second planted change, one committed render count changed from 3 to 4 and taken back; the stop rule
+  of the CI plan's section 9; and the tool's second route, the runner's curl line with the limits of the route he
+  approved. SIZE-3 (b) carries his yes in advance to the two ladders of change-set 3's plan (its sections 4 and 5: a
+  part moves whole with its tests to a named place, no test is dropped, he is told when a part moves). DEPART-3 (a) is
+  the list of that plan's section 12, question 4. The advisor agent's rulings that went to him with the questions, each
+  his to overrule, stand, since he has named no objection: PERM-ATT (a), PLANTS both, PYCACHE-NOW (b), WASM-TEST-ROUTE
+  (a), CI-LOOP (a) for E1 only. Copied by script (121 bytes, sha256
+  9472cfb522d3a4f66263131baaad4edf8b79cb9266cc92f8caba0c547897e882):
+> Chose "Yes to all seven" on the decision card asking "Confirm the seven recommended answers so building can start today?"
+- _The thread's text, not his words: its message of 14:28:25 UTC from its third paragraph to its end, which states the
+  seven answers back to him (the two paragraphs before it are about the thread itself and about his question on the
+  chats' names; the whole message is in the notes); the CI text was attached to the message as a file (copied by script,
+  1092 bytes, sha256 6ecd830391f4880ef1e22d30802dc9e9a1858fbc3cb2adc01e2b4ca1cedd580c):_
+```text
+**The seven answers I will work from**, exactly the recommended ones you were shown:
+
+1. CHROME-SOURCE (which Chrome the GitHub robot tests in): the one already on GitHub's machine.
+2. CI-TEXT (your yes on the robot's new instructions): yes to the 93 lines, attached here word for word, plus the two deliberate fake faults that prove the alarms ring, and the stop rule.
+3. FIREFOX-TESTS (when the robot also tests Firefox): its own small pull request, right after this one.
+4. RNG-SOURCE (who makes the game's dice): our own, about 150 lines, checked against the public answer sheet.
+5. SIZE-3 (one delivery or two): two, 3a then 3b.
+6. PRESS-PACE (a double tap faster than the game counts): the second tap lands 33 ms later, nothing is lost.
+7. DEPART-3 (small deviations from your design drafts): accept all.
+
+Until your yes I write no CI file and record nothing as your words. Meanwhile I set up my branch and tools, so building starts the moment you answer.
+
+**Decisions needed:** one, on the card below (ANSWERS-7: your yes to the seven answers above).
+
+**For Mustafa:**
+1. Tap the card.
+```
+- _The thread's text, not his words: the decision card he answered, posted at 14:28:27 UTC (copied by script, 584 bytes,
+  sha256 fd41b0ed519f34234cf199298f02b04d2c5960ed596581dd45b68e07d2812e8c):_
+```text
+Question: Confirm the seven recommended answers so building can start today?
+Option 1 (recommended): Yes to all seven. I record your answers, write the CI file exactly as attached, and start building change-set 3a after it.
+Option 2: Yes, but I change some. You tell me which answers to change, and I wait for your message before writing anything.
+Option 3: Not yet. Nothing is written. I only keep my branch and tools ready until you say more.
+Why recommended: The review agents checked all seven. None changes how the game plays, and together they keep outside code out of the game.
+```
+- **Taken by Mustafa, 2026-11-23, 14:25:03 UTC: he would rather go on today, and wants a new builder chat, on the model
+  his words name, to continue building the game** (his message cmsg_019xis1ZabqTLNQbEMzA6WbhR97Lu4zJ8QjD4X3hYFruVA,
+  typed in the main chat of his claude.ai project "Shamble Frontlines ALT" on his second personal account; his project
+  made the thread "Build the game from change-set 3" from it, session_01WLuqnwQ8c8JuNgfBX7Wixg; extracted by script from
+  that session's transcript). Of its 211 lines, 201 are the last texts of three other chats, pasted by him: they are
+  left out and named in the lines in square brackets, and his own lines are whole (the whole message: 16731 bytes,
+  sha256 93c7645aebfee23df6658110d7cfe3fdd4d0e8f8db6be4d6ca2216f773848f93). The chat he calls Builder V1 is the first
+  builder chat, lane 1 of this repository's records (session_019YNMUV9LFhASseJ9EP12kL, branch
+  `claude/wonderful-hamilton-jdmlnf`), paused by his words of 2026-11-19, 21:44:09 UTC (the entry below); its account is
+  out of usage until the evening of 2026-11-24 (his message of 14:10:08 UTC in his project's main chat, read there, not
+  copied here). On his words the thread takes lane 1's work forward on a branch of its own,
+  `claude/project-thread-qx9woh`, started from that chat's last commit d064e17b84b73c8040ffe66db7105a517cde9215, and
+  never pushes to that chat's branch (LANE-RULES: "a lane never pushes to another lane's branch"). The first line of his
+  message quotes a paste block another thread of his project had written for the first builder chat; his question under
+  it was answered in the thread's message of 14:28:25 UTC
+  (`.checkpoints/ci-wasm/thread-2026-11-23T142825-seven-answers.md`, readable at fcf6def once the notes are deleted): by
+  "Lane 1" the paste block means the chat he calls Builder V1. Copied by script (1092 bytes, sha256
+  21d6a078b6b4be071278ecb1bf495d4495e1d2cebdcca0f220505e501aa0f751):
+> "this message by script into the notes and record it in docs/DECISIONS.md the usual way."
+> Usually Claude does all of this for me, with Lane 1 who do you refer too?
+> I have Netcode chat (enterprise account)
+> Builder V1 (Fable 5.2) - its last text before the usage cut was this:
+- _[left out, lines 5 to 90: the last text of the chat he calls Builder V1, pasted by him]_
+> Then there is Builder V2 (Opus) - That lets me do all the hideous manual tasks that needs to be done:
+> Its last text before usage cut was this:
+- _[left out, lines 93 to 121: the last text of the chat he calls Builder V2, pasted by him]_
+> There also is a 'Block 2.3' claude code chat, which I don't really know what it was working on, but its last text:
+- _[left out, lines 123 to 209: the last text of the chat he calls 'Block 2.3', pasted by him; equal to Builder V1's]_
+> All 3 of those given chats are Claude Code chats, so stick to their names when giving me instructions.
+> I would rather start today with the progression either way and would like to create a Fable 5.2 based Claude Code chat that will continue work on building the game
+- **Taken by Mustafa, 2026-11-19, 21:44:09 UTC: the pause: the first builder chat finishes what is in hand and starts
+  nothing until he says so** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; extracted by
+  script from the session's transcript, message 314f33b2-7c58-441f-8099-0b96cf4cd024, whole). When it came, the CI-WASM
+  pull request (#62) was a draft with no CI file written, and its three questions and change-set 3's four were with him;
+  the chat finished what was in hand and stopped (its last commit: d064e17). He has not told that chat to continue; on
+  2026-11-23 a thread of his project took the work forward (the entries above). Copied by script (111 bytes, sha256
+  75450ddf0fa40b2fd7cef3c762a2106f8b498581fdc8c55f3f4834886b55581e):
+> Finish the current tasks that you're working on and then pause.
+> I will let you know when you can continue again
 - **Taken by Mustafa, 2026-11-19, 16:08:04 UTC: two notes for the work after #61: the docs pass that records the merge
   of #61 stays with the CI-WASM pull request, whose report keeps the workflow text apart from the docs; and for
   change-set 3's browser check the README asks him to keep the browser's window in front and uncovered during the first
