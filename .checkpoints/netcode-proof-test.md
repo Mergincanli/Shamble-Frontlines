@@ -157,7 +157,7 @@
   - U6b's builder a2661dc320c9e6d00 on the fix pass (notes u6b-build.md "## Fix pass"; worktree agent-a2661dc320c9e6d00;
     after a cut: from its notes). Done, resumable: the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats
     netcode a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
-  - The saver b8o9wv6ox (checkpoint.mjs watch from 21:13 to about 23:03; when it ends, restart it: run_in_background,
+  - The saver b80065fbo (checkpoint.mjs watch from 23:03 to about 00:53; when it ends, restart it: run_in_background,
     timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
 - **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
   af8c5f0fbec829595 (u6b-run.sh exports CARGO_INCREMENTAL=0; a builder on the 4 GB floor stops, never cleans);
