@@ -162,6 +162,8 @@ const FROM = "Copied by script from the session's transcript (session_01WLuqnwQ8
   note('thread-2026-11-23T151058-build-seat-noted.md', "The thread's message of 2026-11-23, 15:10:58 UTC, after his tap on BUILD-SEAT (not his words)", `${FROM}: the text of the thread's post_message call toolu_015q8WpBCg8SfkVuooUs9HtB, stamped ${r.at}`, r.input.text);
   const a = his('2026-11-23T15:11:01Z');
   note('mustafa-2026-11-23T151101-acct-3.md', 'Mustafa, 2026-11-23, 15:11:01 UTC: his tap on the card ACCT-3', `${FROM}: the message the platform wrote for his tap, sent 2026-11-23T15:11:01Z, whole`, a.text);
+  const z = call('toolu_01YaB4RwyHkB3vmBudmbymui', 'mcp__hearthbot__post_message');
+  note('thread-2026-11-23T151314-both-saved.md', "The thread's message of 2026-11-23, 15:13:14 UTC, after his tap on ACCT-3: its last on the handover (not his words)", `${FROM}: the text of the thread's post_message call toolu_01YaB4RwyHkB3vmBudmbymui, stamped ${z.at}`, z.input.text);
 }
 
 let ok = true;
