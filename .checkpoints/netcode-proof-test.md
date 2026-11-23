@@ -76,8 +76,9 @@
 - **16:5x, the advisor's round-2 ruling** (advisor-u8-r2.md d107cbe3…): pass 3 items 1-8; last round netcode + security.
 - **17:0x, U8 STOPPED ON HIM (SIZE-STOP):** pass 3 item 1 (NC-R2-1) done, then the 6,000 stop at 6,001 (snapshot
   wip/u8-build.patch 66e2c199…; test 7 20/20, all 98 + 315 pass, plant shown); items 2-8 wait for his answer (lean (a)
-  go on). My npt-judge run over .claude/worktrees/agent-ac59cce3e5d002441/.gate/u8-p3-judge-tree: bne3yykfi (main-run.sh).
-- **Next 3:** his SIZE-STOP answer, then items 2-8 and the last round; the judge run's result; U4's report; T5 (i).
+  go on). My npt-judge run (item 1's proof, 17:08, main-run.sh at 627401d, .gate/u8-p3/): exit 0, the whole tree read;
+  run s30-2 INVALID, "complete: the bots log on LG1 has no footer (cut short)", as the ruling expects.
+- **Next 3:** his SIZE-STOP answer, then items 2-8 and the last round; U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
@@ -152,7 +153,7 @@
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
   .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
-  at its snapshot; resume after its last block marked done); the judge run bne3yykfi. Waiting on him: U8's builder
+  at its snapshot; resume after its last block marked done). Waiting on him: U8's builder
   ac59cce3e5d002441 (pass 3 at item 2; SendMessage on his answer). Done: the advisor a3de649cd25e474df; round 2's seats, netcode
   a120f51df9a8f6986, security af8c5f0fbec829595, infra a0615e1ead860724b (u8-r2-*.md); the docs agent a6eb7acdf1c3ff885
   (u8-sec-sb-3-docs.md); the advisor's Stop B ruling a3de649cd25e474df; Stop B's seats, netcode a120f51df9a8f6986, security
