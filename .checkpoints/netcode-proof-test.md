@@ -74,7 +74,9 @@
   check5.log 11/11 (measured 799 = +45, bites 898 = +48; test step 891.5 s, 0.93x base); 14 plants fail by name; the
   valve built; no manifest change. **Its round:** netcode DONE 21:3x, APPROVE WITH FINDINGS (u6b-review-netcode.md: 0
   High; Medium NR-U6B-1 ws_summary lost at a room's end, -2 the gate's 30 Hz literal; 12 Low; F-PING: keep the built
-  rule with NR-U6B-3, the advisor to word condition 1 anew); security aedb799ad9648b0e1, test a88f25b3d3f66d972 running.
+  rule with NR-U6B-3, the advisor to word condition 1 anew); security DONE 21:4x, REVISE (u6b-review-security.md: 0
+  High; Medium SEC-U6B-1 the closing task unbounded, a slot held for ever; -2 quinn's default stream limits, about
+  250 MB a connection; 3 Low, -3 to the security baseline); test a88f25b3d3f66d972 running.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
 - **Next 2, U6b:** read the three seats in full (every Medium or higher); the fix list (my lean, the advisor if a ruled
@@ -149,8 +151,8 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (3 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - U6b's seats: security aedb799ad9648b0e1, test a88f25b3d3f66d972 (u6b-review-*.md; xhigh; read only); netcode
-    a0a57a3948202de40 DONE (resumable).
+  - U6b's test seat a88f25b3d3f66d972 (u6b-review-test.md; xhigh; read only); netcode a0a57a3948202de40 and security
+    aedb799ad9648b0e1 DONE (resumable).
   - The saver b8o9wv6ox (checkpoint.mjs watch from 21:13 to about 23:03; when it ends, restart it: run_in_background,
     timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
 - **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
