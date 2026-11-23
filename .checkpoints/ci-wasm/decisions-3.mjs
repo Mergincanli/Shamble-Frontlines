@@ -56,12 +56,47 @@ function saved(file) {
   return { words, bytes: Buffer.byteLength(words), sha256: sha(words) };
 }
 const by = (m) => `Copied by script (${m.bytes} bytes, sha256 ${m.sha256}):`;
+// Since 2026-11-23, 16:30 UTC the chat he calls Builder V3 holds the pull request: his messages there are saved by
+// chat-words.mjs. A quote of his inside a lead is checked against his saved words, so it cannot drift from them.
+const V3 =
+  'the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble Frontlines ALT"';
+// The commit that holds Builder V3's saved messages, for when the notes are deleted.
+const V3_NOTES_AT = '08053c7';
+const BLOCK = saved('mustafa-2026-11-23T163046-builder-v3.md');
+const BLOCK_AS_WRITTEN = readFileSync(NOTES + 'handover-block.txt', 'utf8').replace(/\n$/, '');
+const said = (m, s) => {
+  if (!m.words.includes(s)) throw new Error(`not in his saved words: ${s}`);
+  return `"${s}"`;
+};
 // The thread's own text under his words: a label line, then the text whole in a fenced block.
 const fence = (label, n) =>
   `${wrap(`- _The thread's text, not his words: ${label} (copied by script, ${n.bytes} bytes, sha256 ${n.sha256}):_`)}\n\`\`\`text\n${n.words}\n\`\`\`\n`;
 
 // Newest first. `file` undefined: a pointer, with no words of his quoted under it.
 const ENTRIES = [
+  {
+    key: '2026-11-23, 16:30:46 UTC: Builder V3',
+    file: 'mustafa-2026-11-23T163046-builder-v3.md',
+    after: [
+      { file: 'thread-2026-11-23T150951-handover-decisions.md', label: 'the "Decisions needed" of its message of 15:09:51 UTC, the message that carried the block for him to paste (the whole message is in the notes)' },
+    ],
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 16:30:46 UTC: Builder V3, a new Claude Code chat on Fable 5.2, takes over the CI-WASM pull request; CI-MODEL (a): for that chat's CI edits of this pull request he sets his words of 2026-11-12 on CI work aside** (${V3}; his message 67cc6bba-62e1-48f2-bb37-8d7ae79afa81, whole; extracted by script from the chat's transcript). Points 1 to 10 are the block the project thread wrote for him to paste (\`.checkpoints/ci-wasm/handover-block.txt\`, saved and pushed at c405ccb before the thread posted it; his message starts with it byte for byte); pasted into the chat, it is his word. Points 11 and 12 he added himself. What it answers is shown under it as the thread's text, not his words. The thread's question CI-MODEL is answered by his point 6: ${said(m, 'For this chat\'s CI edits of the CI-WASM pull request, each asked of me with its exact text, I set my words of 2026-11-12 ("The guard, the gate and CI work stays with Opus 5.5.") aside, as GATE-FOLLOW did for Builder V1.')} His point 11 gives his taps BUILD-SEAT and ACCT-3 (the two entries below) in his own words. At 16:33:16 UTC he also sent the block as a file, the same bytes (\`.checkpoints/ci-wasm/mustafa-2026-11-23T163316-attached-block.md\`, readable at ${V3_NOTES_AT} once the notes are deleted). ${by(m)}`,
+  },
+  {
+    key: '2026-11-23, 15:11:01 UTC: ACCT-3',
+    file: 'mustafa-2026-11-23T151101-acct-3.md',
+    after: [{ file: 'thread-2026-11-23T150956-card-acct-3.md', label: 'the decision card he answered, posted at 15:09:56 UTC' }],
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 15:11:01 UTC: ACCT-3, the account his claude.ai project "Shamble Frontlines ALT" runs on counts like his other two** (${THREAD}; ${TAP}). The card is shown under it as the thread's text, not his words. In his block of 16:30:46 UTC (the entry above, point 11) he puts it as ${said(BLOCK, 'ACCT-3 (the account this chat runs on counts like my other two)')}. No line of CLAUDE.md is written from this tap: by the card's first option the account's roles and the exact line for CLAUDE.md come to him for a yes first. The entries of 2026-11-23 below call it "an account beside the two that CLAUDE.md's ACCOUNTS names"; they stay as written. ${by(m)}`,
+  },
+  {
+    key: '2026-11-23, 15:10:32 UTC: BUILD-SEAT',
+    file: 'mustafa-2026-11-23T151032-build-seat.md',
+    after: [{ file: 'thread-2026-11-23T150954-card-build-seat.md', label: 'the decision card he answered, posted at 15:09:54 UTC' }],
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 15:10:32 UTC: BUILD-SEAT, the new Claude Code chat builds change-set 3 after the CI pull request is merged** (${THREAD}; ${TAP}). The card is shown under it as the thread's text, not his words. In his block of 16:30:46 UTC (the entry above) he puts it as ${said(BLOCK, 'BUILD-SEAT (once the CI pull request is merged, you build change-set 3, starting when I say so in this chat)')}, and its point 9 says ${said(BLOCK, 'Do not start change-set 3.')} ${by(m)}`,
+  },
   {
     key: '2026-11-23, 14:54:47 UTC: WRITE-WHERE',
     file: 'mustafa-2026-11-23T145447-write-where.md',
@@ -169,6 +204,7 @@ const ok = {
     POINTER,
   ].every((s) => s.split('\n').every((l) => l.length <= 120)),
   'no carriage return': !t.includes('\r'),
+  'his block of 16:30:46 UTC starts with handover-block.txt, byte for byte': BLOCK.words.startsWith(BLOCK_AS_WRITTEN),
 };
 for (const b of blocks) {
   ok[`the lead holds its key: ${b.key.slice(0, 60)}`] = b.lead.replace(/\n {2}/g, ' ').includes(b.key);
