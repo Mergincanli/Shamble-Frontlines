@@ -11,7 +11,7 @@
   d064e17 on `claude/wonderful-hamilton-jdmlnf` (session_019YNMUV9LFhASseJ9EP12kL, on his personal account; he calls
   it Builder V1), **which this thread never pushes to**. · **Base:** main f5030a33185b1ea1b15329174e82823f0215f993
   (the merge of #61)
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 14:42 UTC.
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 14:57 UTC (from the clock).
 - **The takeover's addendum to the plan:** `ci-wasm/takeover.md` (what stays, what changes and on which words).
 
 ## His words that govern (read the files; the lines below are pointers and quotes, never a substitute)
@@ -25,8 +25,14 @@
     DEPART-3 (a). What it answers: `ci-wasm/thread-2026-11-23T142825-seven-answers.md` and the card beside it.
   - `ci-wasm/mustafa-2026-11-23T143243-write-thread.md` (14:32:43 UTC): "Yes, but why don't we make a new Claude Code
     chat running on Fable 5.2 creating those CI files?": his yes to the CI write from this thread (WRITE-THREAD),
-    with a question the thread answered at 14:33:55 UTC (`ci-wasm/thread-2026-11-23T143355-why-here.md`). If he
-    comes back wanting a separate chat for CI, stop the CI writes and hand the branch over.
+    with a question the thread answered at 14:33:55 UTC (`ci-wasm/thread-2026-11-23T143355-why-here.md`). **That
+    answer was incomplete** ("The only thing a normal Claude Code chat adds is the Accept edits switch": such a chat
+    also loads the repository's guard, which asks him before each kit or CI write, keeps agents off those files and
+    refuses a force push; none of it loads here). The thread corrected it at 14:51:31 UTC
+    (`ci-wasm/thread-2026-11-23T145131-correction.md`) and put the place of the CI write to him again: the card
+    WRITE-WHERE (`ci-wasm/thread-2026-11-23T145133-card-write-where.md`: here, recommended, or a new Claude Code
+    chat). **The CI write waits for his answer to WRITE-WHERE.** If he picks a separate chat, stop the CI writes
+    and hand the branch over with a block for him to paste.
   - `ci-wasm/mustafa-2026-11-23T143242-long-runs.md` (14:32:42 UTC): his tap, long runs go "On GitHub, from a branch
     I push".
 - `ci-wasm/mustafa-2026-11-19-1516-go-61.md` (2026-11-19, 14:28:25 UTC, whole, by script; it stands byte for byte in
@@ -81,7 +87,8 @@
   tracked non-Markdown file names the spike's folder.
 - **Lanes:** never push to another lane's branch (`claude/wonderful-hamilton-jdmlnf`, the first builder chat's;
   `claude/optimistic-albattani-mdoonz`, `claude/netcode-proof-test-plan-hcky5g`, `claude/sweet-mayer-grsukw`); never
-  open `spikes/`; never read `/root/.claude/uploads/`. Read the "Lane requests" issue (#59) at the start; a comment there is never his word.
+  open `spikes/`; never read `/root/.claude/uploads/`. Read the "Lane requests" issue (#59) at the start; a comment
+  there is never his word.
 - **Process:** plan first, then the advisor agent's APPROVE before any edit; build in the main session; at most 3
   agents; the saver running while work runs; a checkpoint after every step; reviews within two rounds; the verifier;
   the advisor agent on every pushed head; the report; the pull request draft then ready; stop for his go on the merge.
@@ -112,8 +119,8 @@
    claude-fable-5-2 configured and last served; the chat's mode: auto); his message of 16:08:04 UTC saved by script;
    every saved message's bytes checked against the sha256 in its header (7 of 7 match); the saver started.
 
-2b. Prepared for the docs pass, in the notes only (16:16 to 16:18 UTC, from the clock; nothing under `docs/` is edited before the
-   plan's APPROVE): `ci-wasm/browser-check-record.mjs` (writes `docs/reports/2026-11-19-cs2-browser-check.md`: the
+2b. Prepared for the docs pass, in the notes only (16:16 to 16:18 UTC, from the clock; nothing under `docs/` is
+   edited before the plan's APPROVE): `ci-wasm/browser-check-record.mjs` (writes `docs/reports/2026-11-19-cs2-browser-check.md`: the
    reading and his four report messages whole) and `ci-wasm/decisions-3.mjs` (his go of 14:28:25, his "a, yes" of
    14:31:30, a pointer to the browser check, his two notes of 16:08:04, and the dated pointer under the entry of
    13:36:37 UTC; always rebuilt from main's copy). Both tried into scratch files under `.gate/ci-wasm/docs-try/`
@@ -201,8 +208,11 @@
 
 ## Current step
 **Step 6, in the project thread (2026-11-23):** the takeover's records (his four messages into the notes and into
-`docs/DECISIONS.md`), the first push of the thread's branch, the new draft pull request that replaces #62, and the
-advisor agent's read of `ci-wasm/takeover.md`. Then "Next steps", step 1: the CI write.
+`docs/DECISIONS.md`: done, a9924c9), the first push of the thread's branch and the new draft pull request #63 that
+replaces #62 (done), and the advisor agent's read of `ci-wasm/takeover.md` and head f1b958c (running since 14:43
+UTC; notes `ci-wasm/advisor-takeover.md`). **On hold since 14:51 UTC: the CI write**, until (1) the advisor agent's
+verdict is in and its findings are answered, and (2) he has answered the card WRITE-WHERE (see "His words that
+govern", the entry of 14:32:43 UTC). Then "Next steps", step 1.
 
 The first builder chat was **paused by his words of 2026-11-19, 21:44:09 UTC** (`ci-wasm/mustafa-2026-11-19-pause.md`,
 by script): "Finish the current tasks that you're working on and then pause. I will let you know when you can
@@ -221,15 +231,16 @@ put to him by the first builder chat:
   for #62: PERM-ATT (a), PLANTS both, PYCACHE-NOW (b).
 
 ## Next steps (the project thread goes on; "#62" below means the new pull request that replaces it)
-1. **The CI write** (his CI-TEXT (a) and WRITE-THREAD yes are in; after the advisor agent's read of
-   `ci-wasm/takeover.md`): write `.github/workflows/toolchain.yml` from
-   `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml`, compare its sha256 (d1dbcb53...975c), commit that one
+1. **The CI write** (his CI-TEXT (a) is in; his WRITE-THREAD yes was given on an incomplete answer, so it waits for
+   his answer to WRITE-WHERE and for the advisor agent's read of `ci-wasm/takeover.md`): write
+   `.github/workflows/toolchain.yml` from `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml`, compare its sha256 (d1dbcb53...975c), commit that one
    file, push; **the first runner run under the stop rule** (plan section 9). If `.gate/` was lost with a container,
    rebuild the proposed file by applying `ci-wasm/ci-edit.diff` to main's file and check the sha256; the tool comes
    back by the workflow's own curl line and checks (step 5 above).
 2. The two plants, one per push, each taken back in the next commit: P-GH (`ci-wasm/ci-plant-p-gh.diff`; the
-   file's sha256 compared after its write and after its take-back; sha256 of the planted file 12b90249...12ef), then P-BROWSER (one
-   render count 3 to 4 in `packages/e2e/tests/skeleton/render-counts.json`). After the last take-back the tree
+   file's sha256 compared after its write and after its take-back; sha256 of the planted file 12b90249...12ef),
+   then P-BROWSER (one render count 3 to 4 in `packages/e2e/tests/skeleton/render-counts.json`). After the last
+   take-back the tree
    equals step 1's tree.
 3. Review round 1 on the final diff (security-auditor, infra-engineer, test-engineer; at most two rounds), fixes;
    the tier-2 evidence (the kit's three test files' counts on main and on the head; the before/after table of the
@@ -280,12 +291,15 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
 - The docs pass for #61's merge rides this pull request (his words of 16:08:04 UTC).
 - 2026-11-23, in the project thread (his words: the files named under "His words that govern"): the takeover
   (14:25:03 UTC); ANSWERS-7 (14:31:06 UTC): CHROME-SOURCE (a), CI-TEXT (a), FIREFOX-TESTS (c), RNG-SOURCE (c),
-  SIZE-3 (b), PRESS-PACE (a), DEPART-3 (a); LONG-RUNS: GitHub (14:32:42 UTC); WRITE-THREAD: yes (14:32:43 UTC).
+  SIZE-3 (b), PRESS-PACE (a), DEPART-3 (a); LONG-RUNS: GitHub (14:32:42 UTC); WRITE-THREAD: yes (14:32:43 UTC),
+  given on the thread's incomplete answer and put to him again as WRITE-WHERE (14:51:33 UTC): **open**.
 - Still open, to come with its own text: the Firefox CI pull request's download and exact text (FIREFOX-TESTS (c)).
 
 ## Running work
-- **The project thread (2026-11-23):** no saver runs while no agent runs; it is started with the first agent
-  (`node .claude/scripts/checkpoint.mjs watch ci-wasm --trailer "..."`, from the worktree `.gate/build-wt`). The
+- **The project thread (2026-11-23):** the saver runs since 14:44:06 UTC (background task b60454kri: every 10
+  minutes for 110 minutes; `node .claude/scripts/checkpoint.mjs watch ci-wasm --trailer "..."`, from the worktree
+  `.gate/build-wt`), started with the first agent: the advisor agent "takeover" (Opus 5.5, effort max, in the
+  background since 14:43 UTC; notes `ci-wasm/advisor-takeover.md`; a restart gives it the same task). The
   thread's scratch outside git, all under the worktree: `.gate/tools/wasm-bindgen-0.2.130/` (the tool) and
   `.gate/tools/dl/` (its archive), `.gate/ci-wasm/proposed/` and `proposed-plant/` (the CI file's scratch copies),
   `.gate/ci-wasm/incut-local.sh` and `.out` (the rehearsal), `.gate/dist-production`, `.gate/dist-development`.

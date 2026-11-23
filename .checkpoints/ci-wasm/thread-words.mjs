@@ -125,6 +125,19 @@ const FROM = "Copied by script from the session's transcript (session_01WLuqnwQ8
   const a = call('toolu_01QxMBMpnjWYiRtCRG8FEpcN', 'mcp__hearthbot__post_message');
   note('thread-2026-11-23T143355-why-here.md', "The thread's answer of 2026-11-23, 14:33:55 UTC to his question (not his words)", `${FROM}: the text of the thread's post_message call toolu_01QxMBMpnjWYiRtCRG8FEpcN, stamped ${a.at}`, a.input.text);
 }
+// 6. The thread's short message after his tap on ANSWERS-7 (it says the CI file still waits for the second card).
+{
+  const c = call('toolu_016fiAnrb4RD3t5tTKLMZx1s', 'mcp__hearthbot__post_message');
+  note('thread-2026-11-23T143117-got-your-yes.md', "The thread's message of 2026-11-23, 14:31:17 UTC, after his tap on ANSWERS-7 (not his words)", `${FROM}: the text of the thread's post_message call toolu_016fiAnrb4RD3t5tTKLMZx1s, stamped ${c.at}`, c.input.text);
+}
+// 7. The thread's correction of its 14:33:55 answer (what a normal Claude Code chat adds: the guard too, not only the
+// mode switch), and the card that puts the place of the CI write to him again: WRITE-WHERE.
+{
+  const c = call('toolu_01XjPKKsssZnEvHM9J6zFg9o', 'mcp__hearthbot__post_message');
+  note('thread-2026-11-23T145131-correction.md', "The thread's correction of 2026-11-23, 14:51:31 UTC to its answer of 14:33:55 UTC (not his words)", `${FROM}: the text of the thread's post_message call toolu_01XjPKKsssZnEvHM9J6zFg9o, stamped ${c.at}`, c.input.text);
+  const d = call('toolu_018t2TERYYtwV727oqCuN3LG', 'mcp__hearthbot__request_decision');
+  note('thread-2026-11-23T145133-card-write-where.md', "The thread's decision card of 2026-11-23, 14:51:33 UTC: WRITE-WHERE (not his words)", `${FROM}: the question, options and reason of the thread's request_decision call toolu_018t2TERYYtwV727oqCuN3LG, stamped ${d.at}, each field whole, laid out one per line`, card(d));
+}
 
 let ok = true;
 for (const n of out) {
