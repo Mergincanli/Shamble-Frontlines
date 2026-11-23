@@ -65,7 +65,7 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-23 02:5x UTC; the cut of 20:42-02:36 UTC: history.md:7655-7663)
+## Now (2026-11-23 02:47 UTC; the cut of 20:42-02:36 UTC: history.md:7655-7663)
 - **My step:** waiting on two agents (Running work). U6a's round 1 DONE: both seats REVISE on one shared High
   (NR-U6A-1 = TR-U6A-1: npt-super's header lacks the run's bite, tick_hz and scene, so its run goes INVALID); Mediums
   NR-U6A-2, -3, TR-U6A-2, -3, -4; Lows NR-U6A-4 to -8, TR-U6A-5 to -12. The fix list: u6a-fix-pass.md (FP-1 to FP-12,
@@ -134,9 +134,9 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (2 of 3):** (1) U6a's builder a95ebf14368f277ff, resumed 02:5x for the fix pass (u6a-fix-pass.md;
+- **Agents running (2 of 3):** (1) U6a's builder a95ebf14368f277ff, resumed 02:4x for the fix pass (u6a-fix-pass.md;
   its notes u6a-build.md in its worktree, one FP-n line per item; resume after its last FP-n line). (2) U7's advisor
-  check a1caa8c461475ac54 (general-purpose, xhigh, from 02:5x) -> advisor-u7-brief.md; resume from its file.
+  check a1caa8c461475ac54 (general-purpose, xhigh, from 02:4x) -> advisor-u7-brief.md; resume from its file.
 - **Finished, for round 2 by SendMessage:** U6a's netcode seat a9a29bd03da0757ad (u6a-review-netcode.md, DONE 20:38;
   F1, F3, F7, F9 fine) and test seat a4724cf284e77b73e (u6a-review-test.md, DONE 02:4x). Security ab80f7d9c82f327b9
   DONE 20:40 (security-f26.md; security-u6c-deps.md: U6c's Block 0 CLEAR WITH CONDITIONS, 5 conditions, Lows only).
