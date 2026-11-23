@@ -7720,3 +7720,17 @@ B. I'm about to run /compact on this chat. First make sure nothing that lives on
 ```
 - A was sent to U8's builder ac59cce3e5d002441 at 17:1x UTC, his words quoted (pass 3 items 2-7, then the Lows; stop 6,200;
   past it the unbuilt Lows to "Carried (past 6,200)" in its notes, end checks, return).
+
+## Cut by the spend limit (2026-11-23 about 17:33 to 21:12 UTC)
+- **The notice** (U8's last-round seats a120f51df9a8f6986 and af8c5f0fbec829595 and U6b's netcode seat
+  a0a57a3948202de40; all three tasks ended at about 17:33:01 UTC, HTTP 429): "You've hit your org's monthly spend limit
+  · ask your admin for a higher limit · your 5-hour limit resets 9:10pm (UTC)".
+- **What it stopped:** the three seats minutes after their start (U8's two had written only their plan lines in
+  u8-r3-netcode.md and u8-r3-security.md; U6b's netcode seat had checked its four input hashes, no file yet), and this
+  session's turn just after the card's edits (saved by the saver's 17:37:51 autosave e91085b, with both snapshots).
+  Both builders had returned before it (U6b's about 17:27, U8's about 17:29). No cargo was running. The saver ran to its
+  end at 18:17:38. The worker restarted several times; the check-ins of 18:34 and 20:34 reached this chat at 21:12 UTC.
+- **His message**, about 21:12 UTC (queued; it reached this chat mid-turn), word for word:
+  "I hit my usage limit while you were working, but it has reset now. Please continue from where you left off."
+- **Resumed 21:1x UTC:** no cargo running; git status clean (HEAD e91085b = origin); the saver restarted (b8o9wv6ox);
+  the three seats by SendMessage, each from its file.

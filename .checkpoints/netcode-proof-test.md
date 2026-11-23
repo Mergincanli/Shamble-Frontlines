@@ -5,7 +5,7 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-23 18:0x UTC, after his /compact: both builders back; U8's last round and U6b's round running.
+- **Last update:** 2026-11-23 21:1x UTC, after the 17:33-21:12 cut: both builders back; the three seats resumed.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -64,13 +64,13 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-23 18:0x UTC; U6a MERGED 824d8e7; U7's T-half DONE 8ab088e8…, u7-t-build.md; before: card at 09958e5)
-- **U8:** pass 3 DONE ~17:5x (snapshot 0e7fbab2…, 6,111 of his 6,200 stop: items 1-8, every Low in, none carried; node
+## Now (2026-11-23 21:1x UTC; U6a MERGED 824d8e7; U7's T-half DONE 8ab088e8…, u7-t-build.md; before: card at 09958e5)
+- **U8:** pass 3 DONE ~17:29 (snapshot 0e7fbab2…, 6,111 of his 6,200 stop: items 1-8, every Low in, none carried; node
   tests 100/0, wrappers 315/0, redact 0 findings; package files unchanged; no plant left; item 1's judge run 17:08 at
   627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round RUNNING** (his words: the three Highs' fixes
   only): netcode a120f51df9a8f6986 on NC-R2-1 (u8-r3-netcode.md), security af8c5f0fbec829595 on SEC-R2-1 = INF-R2-1
   and SEC-R2-2 (u8-r3-security.md); old tree .gate/u8-r3-old (pass 2's bca52b2c from 6759c83, hash checked).
-- **U6b: BUILT ~17:3x** (snapshot 49f4488f…, 29 files, 5,498 added of the 6,000 stop; the brief's likely 3,650-4,050):
+- **U6b: BUILT ~17:27** (snapshot 49f4488f…, 29 files, 5,498 added of the 6,000 stop; the brief's likely 3,650-4,050):
   check5.log 11/11 (measured 799 = +45, bites 898 = +48; test step 891.5 s, 0.93x base); 14 plants fail by name; the
   valve built; no manifest change. **Its round RUNNING:** netcode a0a57a3948202de40 (u6b-review-netcode.md; its prompt
   holds the inputs, rules and F-items); security and test next, each at xhigh, as slots free (3 agents at most).
@@ -151,7 +151,7 @@
 - **Running (3 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
   - U8's last round: netcode a120f51df9a8f6986 (u8-r3-netcode.md), security af8c5f0fbec829595 (u8-r3-security.md).
   - U6b's netcode seat a0a57a3948202de40 (netcode-architect, xhigh; u6b-review-netcode.md; read only).
-  - The saver b67t3qh7l (checkpoint.mjs watch from 16:2x to about 18:2x; when it ends, restart it: run_in_background,
+  - The saver b8o9wv6ox (checkpoint.mjs watch from 21:13 to about 23:03; when it ends, restart it: run_in_background,
     timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
 - **Finished, resumable by SendMessage:** U6b's builder a2661dc320c9e6d00 (worktree agent-a2661dc320c9e6d00, notes
   u6b-build.md; for the fix pass; u6b-run.sh exports CARGO_INCREMENTAL=0; on the 4 GB floor it stops, never cleans);
@@ -194,4 +194,5 @@
 - All word for word in history.md: until 2026-11-17 from :5791 on; 2026-11-18 :6921-6932; 2026-11-19 :7124-7146,
   :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559, :7618-7620;
   2026-11-22 :7610-7617, :7623-7628 (15:47:28 to about 19:44 UTC); 2026-11-22/23 :7655-7663 (about 20:42 to 02:36 UTC);
-  2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC), :7675-7687 (about 07:53 to 11:14 UTC), :7689-7701 (about 12:28 to 16:22 UTC).
+  2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC), :7675-7687 (about 07:53 to 11:14 UTC), :7689-7701 (about 12:28 to 16:22 UTC),
+  :7724-7736 (about 17:33 to 21:12 UTC).
