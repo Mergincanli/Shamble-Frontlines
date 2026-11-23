@@ -22,8 +22,10 @@ to him as a question again: the advisor agent withdrew its ruling, because the a
 
 _Revision 4, 2026-11-23, 19:30 UTC (from the clock), by Builder V3's chat: the first runs of the text (cb476b1) stopped
 under the stop rule, because `/opt` on GitHub's runner is writable by anyone ("mode 777, owner root:root, 4096 bytes,
-/opt"); his OPT-PATH (a) of 18:40:57 UTC moves the tool to a folder the job makes fresh as root directly under `/` and
-widens the check to every parent up to `/`. The corrected text: `ci-edit-2.diff` (a diff against the file at cb476b1;
+/opt"); his OPT-PATH (a) of 18:40:57 UTC asks for a place where every parent folder is root-owned and closed to others, with
+the check widened to every parent up to `/`. The place proposed, a folder the job makes fresh as root directly under
+`/`, is his Advisor's input (his words: "to weigh, not an order"), weighed and taken by infra-engineer; it is his
+decision only with his yes on the text. The corrected text: `ci-edit-2.diff` (a diff against the file at cb476b1;
 infra-engineer's proposal, `infra-engineer-opt-path.md`, with security-auditor's one-token hardening F-COUNT,
 `security-auditor-opt-path.md`). The words of sections 5 and 9 that named `/opt` follow it (security-auditor's F-STOP:
 the install path, the step's description, the stop rule's lines, and one more stop). Everything else stands as
@@ -100,7 +102,8 @@ All are lane 1's (Part 15: `packages/e2e/tests/skeleton/` is lane 1's folder; la
 - **What it does, in order:**
   1. The job gets seven values (`WB_*`): the tool's version, the archive's name, size and sha256, the program's size
      and sha256, all his of 2026-11-18, and the install path `/wasm-bindgen-0.2.130/wasm-bindgen` (a folder the job makes fresh as root directly under
-     `/`: Mustafa's OPT-PATH (a) of 2026-11-23).
+     `/`: proposed under Mustafa's OPT-PATH (a) of 2026-11-23, from his Advisor's input "to weigh, not an order"; his
+     with his yes on the text).
   2. Step "the archive": each value must stand as an exact line in `packages/client/scripts/wasm-bindgen-tool.mjs`
      (read as text, never imported: no repository code runs with the network); then the download (https only, at
      most two redirects, at most 12,000,000 bytes), its size, then its sha256, before any tar call.
@@ -240,22 +243,22 @@ The netcode proof test's rules: no new manifest or config file; no root `.cargo/
   `.claude/hooks/settings.test.mjs`, `.claude/scripts/checkpoint.test.mjs`) pass with the same counts on main and
   on the head; the before/after table of the workflow's rule sentences (section 7, item 5); security-auditor's
   review with each finding addressed or deferred in writing.
-- **The stop rule for the new lines** (as #60's: none has run on a runner). It holds on **every** run of the new
-  lines until the report is in, not only the first. The main session stops and tells him, with the log's lines and
-  before any fix, push or re-run, if: a new step or line fails; or the log lacks a final address on GitHub's
-  release-asset host, the archive's "size: 11860397" and ": OK", a gh of 2.93.0 or later and its success line naming
-  release 0.2.130, the seven members, the step's environment line "WB_TOOL: /wasm-bindgen-0.2.130/wasm-bindgen", then these four
-  lines in this order with nothing between them: "mode 555, owner root:root, 8170784 bytes,
-  /wasm-bindgen-0.2.130/wasm-bindgen", "mode 755, owner root:root, 4096 bytes, /wasm-bindgen-0.2.130", a line for
-  `/` with "mode 755, owner root:root" (its byte count printed, not judged), and
-  "/wasm-bindgen-0.2.130/wasm-bindgen: OK"; "the
-  network is cut", the two size tables, "Tests 7 passed", Chrome's version line, "Running 12 tests using 1 worker"
-  and "12 passed"; or a browser test fails once (nothing is re-run into green); or the job takes more than 10 of
-  its 15 minutes; or the install step says its folder "exists already or could not be made" (nothing is tried
-  before his answer: no `-p`, no other name, no removal); or a planted run fails anywhere but at its own step, or without its expected line (P-GH: gh's
-  line that the file is not a subject of the release's statement, not a permission line and not "no attestations
-  found"; P-BROWSER: the test's own difference of 4 against 3, with no retry line). Not a stop, only recorded: the
-  Wasm's bytes differing from here (expected: RR-F5); which backend the runner's Chrome starts.
+- **The stop rule for the new lines** (as #60's: none has run on a runner). It holds on **every** run of the new lines
+  until the report is in, not only the first. The main session stops and tells him, with the log's lines and before
+  any fix, push or re-run, if: a new step or line fails; or the log lacks a final address on GitHub's release-asset
+  host, the archive's "size: 11860397" and ": OK", a gh of 2.93.0 or later and its success line naming release
+  0.2.130, the seven members, the step's environment line "WB_TOOL: /wasm-bindgen-0.2.130/wasm-bindgen", then these
+  four lines in this order with nothing between them: "mode 555, owner root:root, 8170784 bytes,
+  /wasm-bindgen-0.2.130/wasm-bindgen", "mode 755, owner root:root, 4096 bytes, /wasm-bindgen-0.2.130", a line for `/`
+  with "mode 755, owner root:root" (its byte count printed, not judged), and "/wasm-bindgen-0.2.130/wasm-bindgen: OK";
+  or the log lacks "the network is cut", the two size tables, "Tests 7 passed", Chrome's version line, "Running 12
+  tests using 1 worker" and "12 passed"; or a browser test fails once (nothing is re-run into green); or the job takes
+  more than 10 of its 15 minutes; or the install step says its folder "exists already or could not be made" (nothing
+  is tried before his answer: no `-p`, no other name, no removal); or a planted run fails anywhere but at its own
+  step, or without its expected line (P-GH: gh's line that the file is not a subject of the release's statement, not a
+  permission line and not "no attestations found"; P-BROWSER: the test's own difference of 4 against 3, with no retry
+  line). Not a stop, only recorded: the Wasm's bytes differing from here (expected: RR-F5); which backend the runner's
+  Chrome starts.
 - **Planted changes** (PLANTS): P-GH, GitHub's check is given a file that is not the release's asset (two lines of
   CI text before the real check, so his yes covers them and their removal): the step must fail with gh's own line
   and nothing after it runs. It answers PERM-ATT only if that line is gh's "does not contain subject" line: a "no

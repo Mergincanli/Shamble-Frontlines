@@ -17,9 +17,10 @@
   **Branch on GitHub: `claude/loving-hopper-6p0mg2`** (stands in for `cs/ci-wasm`), started from the thread's head
   21b6ea0. **Worktree: `.gate/ci-wasm-wt`, local branch `cs/ci-wasm`**: the main folder holds the `claude/` name at
   main and is never switched, so every push names its target (`git push origin cs/ci-wasm:claude/loving-hopper-6p0mg2`),
-  and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: #64** (he opened it at 17:21:24 UTC; a draft since his answer of 18:40:57 UTC; its title and
+  and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: #64**
+  (he opened it at 17:21:24 UTC; a draft since his answer of 18:40:57 UTC; its title and
   text for his Advisor to set: `ci-wasm/pr-64-title.txt`, `ci-wasm/pr-64-body.md`); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 18:46 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 19:48 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -36,6 +37,20 @@
   are not copied into files). His taps **BUILD-SEAT** (15:10:32 UTC: this chat builds change-set 3 after the merge,
   starting when he says so here) and **ACCT-3** (15:11:01 UTC: this chat's account counts like his other two) are in
   DECISIONS too; `ci-wasm/handover-after.md` has the thread's note on both.
+- **2026-11-23, 17:15:07, 17:22:42 and 18:40:57 UTC, in Builder V3's chat** (by `ci-wasm/chat-words.mjs`, each with
+  the ask it answers; **not yet in `docs/DECISIONS.md`: they go in with the docs pass, before the pull request is
+  marked ready**, with the advisor agent's bar for their leads in `ci-wasm/advisor-opt-path.md`, ruling F).
+  `ci-wasm/mustafa-2026-11-23T171507-ci-write-1.md`: CI-WRITE-1 (a); **his rule for the mode** (his point 3; he gave
+  it for writes 1, 2 and 3): write if the record on his reply reads `acceptEdits`; if it reads `default`, write as
+  well and name the value in the report; any other value: no write, and he is told the value; GH-TOOLS (a): he opens
+  the draft, presses Ready and presses Merge himself, and his merge steps stand in for the "expected head" part of his
+  point 9 (the advisor agent approves the full SHA; gate, smoke and toolchain green on it; nothing pushed after that
+  approval; the chat gives him the full SHA when it asks for his go; he types his go here before he presses Merge; his
+  main Advisor checks the head). `ci-wasm/mustafa-2026-11-23T172242-ci-write-1-again.md`: his yes again, sent with the
+  mode switched. `ci-wasm/mustafa-2026-11-23T184057-opt-path.md`: OPT-PATH (a) ("The check is not weakened."; the
+  place directly under `/` is his Advisor's input, "to weigh, not an order"); one short pass; the corrected text to
+  him as a diff against the file at cb476b1 with the new checksums of the file and of the planted file; nothing under
+  `.github/` before his yes on that text; the stop rule holds for the next run too; NOTES-PUSH (a).
 - **2026-11-23, in the project thread** (copied by `ci-wasm/thread-words.mjs` from the thread's transcript; a tap on
   a decision card is recorded as a tap, in the card's wording):
   - `ci-wasm/mustafa-2026-11-23T142503-builder-chat.md` (14:25:03 UTC): "I would rather start today with the
@@ -258,25 +273,52 @@
    the guard keeps `gh api` read-only: GH-TOOLS.
 
 ## Current step
-**Step 10 (2026-11-23, from 18:41 UTC): the corrected install place, one short pass, then its exact text to him.** His
-answers of 18:40:57 UTC (`ci-wasm/mustafa-2026-11-23T184057-opt-path.md`, by script): **OPT-PATH (a)** (the tool where
-every parent folder is root-owned and closed to others; the check widened to every parent up to `/`; "The check is not
-weakened."; his Advisor's input to weigh, not an order: a fresh folder the job itself creates as root directly under
-`/`, the log printing mode and owner of every parent); **how:** infra-engineer proposes, security-auditor reads the
-changed lines, the advisor agent rules, a second round only for a Critical or High; then the exact text to him **as a
-diff against the file at cb476b1, with the new checksums of the file and of the planted file; nothing under `.github/`
-is written before his yes on that text; the stop rule holds for the next run too**; **NOTES-PUSH (a)**; the pull
-request's title and text into the notes folder (done). He converted #64 to a draft.
+**Step 10 (2026-11-23): the corrected install place: the pass is done, its exact text is with him (ask FIX-WRITE);
+nothing under `.github/` is written since cb476b1.** The pass, one agent at a time (Opus 5.5, effort max):
+infra-engineer 18:43 to 19:06 UTC (`ci-wasm/infra-engineer-opt-path.md`: a folder the job makes fresh as root directly
+under `/`, his Advisor's input weighed and taken; the check walks the program and every folder above it up to `/`; 50
+local tries pass); security-auditor 19:06 to 19:29 UTC (`ci-wasm/security-auditor-opt-path.md`: accept; two Lows, both
+taken: F-COUNT, one token on the counting line; F-STOP, the plan's words); the advisor agent 19:31 to 19:46 UTC
+(`ci-wasm/advisor-opt-path.md`, reviewed head e195bc8: **APPROVE the corrected text to go to him as it is**, no
+Critical or High, no second round; its record conditions M1 and G1 to G3 are made here and in the plan's revision 4).
+
+**The corrected text and its numbers:** `ci-wasm/ci-edit-2.diff`, a `diff -u` of cb476b1's file against the proposed
+file: 39 lines, 10 added, 6 removed, sha256 b4081e48b4c07e790fa489d31de940e0f95c162ae476b0f98b0160b7358203ec. The file
+after the write: 197 lines, sha256 **56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811**. With
+`ci-plant-p-gh.diff` (unchanged, e4f21ab3...b1ac) applied: sha256
+**84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8**; the plant taken back: 56d37fc6...9811 again. The
+file at cb476b1: d1dbcb53...975c. **Rebuild (the scratch copies under `.gate/` die with the container):** `git show
+cb476b1:.github/workflows/toolchain.yml` into a scratch file, `patch -F0` with `ci-edit-2.diff`, check the sha256; for
+the plant `patch -F0` with `ci-plant-p-gh.diff` on that.
+
+**The writes still to make, each with its own ask right before it, his typed yes, and the mode read on that reply by
+his rule of 17:15:07 UTC (`acceptEdits` or `default`: write, and name `default` in the report; anything else, or a
+reply sent while the chat works: no write, tell him the value):**
+- **FIX-WRITE** (asked 2026-11-23 in the chat's message after the advisor agent's verdict): the corrected text; after
+  it 56d37fc6...9811; numstat against cb476b1 10 6. A fourth CI write his point 7 did not count; his yes to it also
+  fixes the new values for the plant and its take-back, which replace point 7's 12b90249... and its second
+  d1dbcb53..., and applies his mode rule to this write.
+- Then **the first clean run under the stop rule as revision 4 of the plan words it** (`ci-wasm/plan.md`, section 9;
+  shown to him with the ask): the four install lines for `/wasm-bindgen-0.2.130`, the step's environment line, and a
+  new stop if the folder "exists already or could not be made". Only a runner shows: the mode and owner of its `/`,
+  whether the name is free, `sudo mkdir` and `chown` under `/`, everything after the install (the fetch, the cut, both
+  builds, the tests, Chrome). Each a stop, never a fix.
+- **PLANT-WRITE** (P-GH's two lines; after it 84b6b3fd...1ff8; numstat 2 0), its run must fail at gh's check with gh's
+  own line; then **PLANT-BACK** (after it 56d37fc6...9811; numstat 0 2). Then P-BROWSER (one render count 3 to 4 and
+  back; not a CI file; covered by his CI-TEXT (a), he is told when it is pushed).
+- **How a write is made:** rebuild in `.gate/ci-wasm/`, check the sha256, `cp` onto `.github/workflows/toolchain.yml`
+  with literal paths in the same command line (the guard asks him: on write 1 its ask was answered by a one-time allow
+  in the app); then the target's sha256, numstat, mode 100644, `git add` of that one path, `git diff --cached
+  --name-only`; the commit carries no skip marker; **the push stands alone on its command line** (`git push origin
+  cs/ci-wasm:claude/loving-hopper-6p0mg2`); show him the sha256. No push while a run on the head is going (the
+  workflow cancels a run in progress on a new push).
+- His yeses by `chat-words.mjs`, each with its ask. The draft #64 exists; its title and text wait for his Advisor
+  (`ci-wasm/pr-64-title.txt`, `ci-wasm/pr-64-body.md`).
 
 **The guard's prompt for the copy (his point 5):** the transcript shows the guard's hook asked (PreToolUse,
 17:23:24.718 UTC: "kit and gate files ask first in a day session: .github/workflows/toolchain.yml (cp)") and the
 call's result carries the answer "accept", source `user_temporary`, scope `once`, at 17:23:43.732 UTC: a one-time
 allow given in the app, 19 seconds later.
-
-**The pass (agents on Opus 5.5, effort max; one at a time):** infra-engineer -> `ci-wasm/infra-engineer-opt-path.md`
-and the proposed file in `.gate/ci-wasm/proposed-2/`; security-auditor -> `ci-wasm/security-auditor-opt-path.md`; the
-advisor agent -> `ci-wasm/advisor-opt-path.md`. Then: `ci-edit-2.diff` (against cb476b1's file), the new file's
-sha256, the planted file's sha256, to him; stop.
 
 _Step 9, kept for the record:_
 **Step 9 (2026-11-23): CI write 1 is made and pushed; its first runner runs are read under the stop rule.** His yes
@@ -311,7 +353,9 @@ wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz is present in release 0.2.
 program's own sha256 line, the fetch, the cut, both builds, the tests, Chrome. The two logs: `.gate/ci-wasm/logs/`
 (untracked; sha256 210350fd...5f78 push, fda98715...d15f pull request).
 
-**Stopped and told to him at 17:28:43 UTC, before any fix, push or re-run** (the card's save of this stop stayed a local commit until his NOTES-PUSH (a)). Nothing is fixed, P-GH and P-BROWSER wait. Put to him (OPT-PATH): (a) a corrected text prepared with
+**Stopped and told to him at 17:28:43 UTC, before any fix, push or re-run** (the card's save of this stop stayed a
+local commit until his NOTES-PUSH (a)). Nothing is fixed, P-GH and P-BROWSER wait. Put to him (OPT-PATH): (a) a
+corrected text prepared with
 infra-engineer and security-auditor (the tool installed where every parent folder is root-owned and closed to others,
 the check widened to every parent), the advisor agent on it, then its exact text to him as a new CI ask; (b) the job
 closes `/opt` itself before the install; (c) the `/opt` part of the check dropped (not recommended: it is the swap the
@@ -339,24 +383,8 @@ UTC (the newest is #63); his point 1 left the number open ("#__"). Checks on dba
 mode switched, and for the draft. His message of 17:15:07 UTC goes into `docs/DECISIONS.md` with the next docs write
 (`decisions-3.mjs`).
 
-**How each of the three CI writes goes (the advisor agent's rulings; his points 6 and 7; his point 3 of 17:15:07 UTC on `default`):**
-- **One ask per write, right before it:** the exact text and the sha256 the file will have, then stop. Write 1: the
-  whole `ci-edit.diff` (the file his CI-TEXT (a) answered; after it d1dbcb53...975c). Write 2: P-GH's two lines with
-  their place (12b90249...12ef). Write 3: their take-back (d1dbcb53...975c). A guard prompt is not his yes.
-- **The mode is read on his reply to that stop:** the session record (`get_session`) and the `permissionMode` on his
-  typed message in the transcript. Write only on the exact value `acceptEdits`. A reply sent while the chat was
-  working (queued) carries no mode: no write. Any other value: no write, and he is told the value; `default` after he
-  says he switched is put to him, not decided (the archive's MANUAL-MODE: on 2026-11-12 the record called his Accept
-  edits "default").
-- **The write:** rebuild the file in `.gate/ci-wasm/proposed/` with `patch` from main's file and the diff, check its
-  sha256, then `cp` it onto `.github/workflows/toolchain.yml` with literal paths in the same command line (the guard
-  asks him). After it: the target's sha256, `git diff --numstat` (93 0, then 2 0, then 0 2), mode 100644, `git add` of
-  that one path, `git diff --cached --name-only` showing only it. The CI commit's message carries no skip marker. Push
-  `cs/ci-wasm:claude/loving-hopper-6p0mg2`. Show him the sha256.
-- **His yes** is copied by `chat-words.mjs` with the ask it answers. Then the first runner run under the plan's stop
-  rule (job logs are readable here: `gh api repos/Mergincanli/Shamble-Frontlines/actions/jobs/<id>/logs`).
-- **The draft pull request** should exist before write 1 and must exist before the verifier and the advisor agent's
-  review of the final head (both runs green on it): GH-TOOLS.
+_(How the CI writes go: "Current step", on top; the first version of this block, with `acceptEdits` only, is in the
+card at 8dfa2f2.)_
 
 The project thread's part ended with its handover (step 7 of its own count: his messages of 2026-11-23 in the notes
 and in `docs/DECISIONS.md`, the draft pull request #63, the rehearsal of step 5, the advisor agent's read of its
@@ -403,6 +431,9 @@ differ, his block wins and you tell him.
 7. Then "Next steps", 1 to 4. **Change-set 3 (step 5) is not started by you unless he says so in your chat.**
 
 ## Next steps (for the chat that takes over; "#62" below means the pull request that replaces #62 and #63)
+_2026-11-23, 19:48 UTC: step 1 is done (cb476b1) and stopped at its first runs. The order now is in "Current step":
+FIX-WRITE, a clean run, PLANT-WRITE and PLANT-BACK, P-BROWSER; then steps 3 to 6 below. "After the last take-back the
+tree equals step 1's tree" now reads: equals the corrected write's tree._
 1. **The CI write** (his CI-TEXT (a) is in; your chat in Accept edits, read right before the write): write
    `.github/workflows/toolchain.yml` from `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml`, compare its
    sha256 (d1dbcb53...975c), commit that one file, push; **the first runner run under the stop rule** (plan
@@ -434,7 +465,9 @@ differ, his block wins and you tell him.
 - **Answered (the handover's three questions):** CI-MODEL (a), by point 6 of the block he pasted; BUILD-SEAT
   (Builder V3, on his word in its chat after the merge); ACCT-3 (counts the same; the line for CLAUDE.md and the
   account's roles are still his to give, with the exact text to him first, and not part of this pull request).
-- **GH-TOOLS (open with him, 2026-11-23):** Builder V3's chat cannot write to GitHub. `gh pr create` answered "HTTP
+- **GH-TOOLS (answered: (a), his words of 17:15:07 UTC; he opened #64 at 17:21:24 UTC and made it a draft; Ready
+  and Merge are his clicks, by his merge steps, "His words that govern"). As it was put:** Builder V3's chat cannot
+  write to GitHub. `gh pr create` answered "HTTP
   403: GitHub GraphQL is not available from Claude Code sessions" (between 16:37 and 16:41 UTC); the REST route is `gh
   api` with fields, which `.claude/settings.json` denies and the guard refuses for every session ("gh api is read-only
   here; GitHub writes go through the GitHub MCP tools", `routine-guard.mjs:1384`); the session has no `mcp__github__*`
@@ -468,6 +501,11 @@ differ, his block wins and you tell him.
 about 150 s while the simulation ran and no pause was recorded; the pause on a tab switch works in Brave).
 
 ## Key numbers
+- **2026-11-23, Builder V3:** CI write 1: commit cb476b141212c018e188061d65ab6e6b203c2c47, the file d1dbcb53...975c;
+  its runs: push 45227423151 (job 137877549845), pull request 45227437170 (job 137877597017), both refused at the
+  install check (`/opt` mode 777); gate and smoke green (45227423066, 45227437167). The corrected text:
+  `ci-edit-2.diff` b4081e48...03ec; the file 56d37fc6...9811; with the plant 84b6b3fd...1ff8. Pull request #64
+  (draft). The plan is at revision 4.
 - main: f5030a3. Change-set 2: 4,477 added lines of code (stop line 4,700).
 - His machine, from his reports: Brave 1.100.58 (Chromium 158) and Firefox 160 on Windows, 2560x1440, NVIDIA GeForce
   GTX 980, about 180 frames a second drawn in both browsers; WebGPU starts in both; errors 0 in all eight reports.
@@ -494,8 +532,10 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
 - Still open, to come with its own text: the Firefox CI pull request's download and exact text (FIREFOX-TESTS (c)).
 
 ## Running work
-- **Builder V3 (2026-11-23), 17:03 UTC: nothing runs.** The advisor agent "v3-takeover" (Opus 5.5, effort max, started
-  16:42 UTC) is done; its notes end with DONE. **No saver in this chat, a departure from `.claude/CHECKPOINTS.md`
+- **Builder V3 (2026-11-23), 19:48 UTC: nothing runs.** Agents of this chat, all Opus 5.5 at effort max, one at a
+  time, each done with notes ending in DONE: the advisor agent "v3-takeover" (16:42 to 17:02 UTC), infra-engineer
+  (18:43 to 19:06), security-auditor (19:06 to 19:29), the advisor agent on the corrected text (19:31 to 19:46). **No
+  saver in this chat, a departure from `.claude/CHECKPOINTS.md`
   section 5 to name in the report** (SAVER under "Open findings"): the card and notes are committed by path and pushed
   by hand after every step, before and after every agent run and at least every 30 minutes, with the saver's checks
   kept by hand (notes only, a look for secrets, no manifest or lockfile in a pushed range, no code through the notes
