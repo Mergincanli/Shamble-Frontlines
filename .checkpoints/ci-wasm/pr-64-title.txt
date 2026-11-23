@@ -1,0 +1,1 @@
+CI-WASM: CI builds the WebAssembly and runs the tests that need it; the docs pass for #61's merge (replaces #63 and #62)
