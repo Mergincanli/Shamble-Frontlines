@@ -20,7 +20,7 @@
   and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: #64**
   (he opened it at 17:21:24 UTC; a draft since his answer of 18:40:57 UTC; its title and
   text for his Advisor to set: `ci-wasm/pr-64-title.txt`, `ci-wasm/pr-64-body.md`); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 19:48 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 20:08 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -273,6 +273,37 @@
    the guard keeps `gh api` read-only: GH-TOOLS.
 
 ## Current step
+**Step 11 (2026-11-23): the corrected text is written and its first runs are clean under the stop rule; next the
+plants.** His yes to FIX-WRITE at 19:58:23 UTC (`ci-wasm/mustafa-2026-11-23T195823-fix-write.md`: (a); yes to the stop
+rule's new wording and to the two new checksums; his mode rule holds for this write), typed, the record on it
+`default` (session record 19:58 UTC, mode sequence 1659). The file rebuilt from cb476b1's file with `ci-edit-2.diff`
+(sha256 OK), copied onto `.github/workflows/toolchain.yml` at 20:00:41 UTC (the guard asked at 19:58:54; a one-time
+allow in the app answered at 20:00:41): **sha256 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811**,
+numstat 10 6, mode 100644, `diff -u` against cb476b1's file equal to `ci-edit-2.diff` byte for byte. Commit
+**2a654f37e9ca185e9f1828ec1c761f84e83d2578** (that one file), pushed 20:01 UTC; shown to him.
+
+**Its runs, all success:** push: toolchain 45254907594 (job 137974047720, 20:01:04 to 20:03:34 UTC, image ubuntu-24.04
+20261116.133.1), gate and smoke 45254907791; pull request: toolchain 45254923879 (job 137974099620, 20:01:09 to
+20:03:32 UTC, same image), gate and smoke 45254923656. **Both toolchain logs checked by script against every line of
+the stop rule (`.gate/ci-wasm/stop-rule-check.py`, 17 of 17 yes in each):** the final address on the release-asset
+host; "size: 11860397"; the archive ": OK"; gh 2.104.0; "✓ Verification succeeded! ... is present in release 0.2.130";
+the seven members; the environment line with the new WB_TOOL; the four install lines in order ("mode 555, owner
+root:root, 8170784 bytes, /wasm-bindgen-0.2.130/wasm-bindgen"; "mode 755, owner root:root, 4096 bytes,
+/wasm-bindgen-0.2.130"; "mode 755, owner root:root, 4096 bytes, /"; "/wasm-bindgen-0.2.130/wasm-bindgen: OK"); "the
+network is cut: no TCP connection to 48.200.82.112:443 (curl exit 7)" as uid=1001(runner) gid=65534(nogroup); four
+size tables; "Tests 7 passed"; "Google Chrome 157.0.8103.78"; "Running 12 tests using 1 worker"; "12 passed (1.1m)";
+no failed, flaky or retry line; no error line. Recorded, not judged: the Wasm is 28991 bytes with sha256
+22dad2ebf4be21ce0f123753bb77cfa25ca06886eddace43651601831ee8018b on both runners (28,987 bytes in the containers:
+RR-F5). The logs: `.gate/ci-wasm/logs/push-137974047720.log` (sha256 8dac0d2d...7a90), `pr-137974099620.log`
+(0965bb1c...47e2).
+
+**Next:** P-BROWSER (one render count 3 to 4 in `packages/e2e/tests/skeleton/render-counts.json`, pushed, its run
+read, taken back in the next commit; covered by his CI-TEXT (a); he is told); then the ask PLANT-WRITE (P-GH's two
+lines; expected 84b6b3fd...1ff8) and stop; after its run the ask PLANT-BACK (expected 56d37fc6...9811). Then reviews
+on the final diff, the verifier, the advisor agent, docs-keeper, DECISIONS (his messages since 17:15:07 UTC), the
+report.
+
+_Step 10, kept for the record (its list of the writes still to make stands):_
 **Step 10 (2026-11-23): the corrected install place: the pass is done, its exact text is with him (ask FIX-WRITE);
 nothing under `.github/` is written since cb476b1.** The pass, one agent at a time (Opus 5.5, effort max):
 infra-engineer 18:43 to 19:06 UTC (`ci-wasm/infra-engineer-opt-path.md`: a folder the job makes fresh as root directly
