@@ -78,3 +78,47 @@ Mustafa's words: `.checkpoints/ci-wasm/mustafa-2026-11-23T184057-opt-path.md` (O
   after the step (orig 122-193 = new 126-197) same sha256 c8c92219... The YAML's run text from its line 11 = the new
   lines dedented, byte for byte (`.gate/ci-wasm/opt-path/new-lines-as-parsed.sh`, sha256 bead1cd5...11fc, 11 lines);
   `bash -n` parses the whole run text. The try below runs that parsed file, not a retyped copy.
+- B5 the try (2026-11-23, as root, no network): `.gate/ci-wasm/opt-path/try.sh` runs the YAML's own parsed lines
+  (new-lines-as-parsed.sh, sha256 checked first) on scratch folders under `.gate/ci-wasm/opt-path/work/`, the
+  stand-in program a copy of /usr/bin/echo (35208 bytes; its own size and sha256 as WB_PROGRAM_*), each case once
+  under `bash -e` and once under `bash --noprofile --norc -eo pipefail`. Result: 50 PASS, 0 FAIL
+  (`.gate/ci-wasm/opt-path/try-output.txt`). Clean run: exit 0, stat prints 14 lines from the program up to the real
+  `/` of this container (all 755 root:root here; program 555), then ": OK"; umask 0000/0002/0077: folder 755, program
+  555. Refused with the step's own message, both shells: a parent 777; a parent 775; a parent owned by uid 1001;
+  the folder existing (a folder, a link to a folder, a dangling link: mkdir's EEXIST, our "exists already" line); a
+  parent that is a link; the program replaced by a link ("is not a plain file", and the judge alone too); the
+  folder swapped for a link after the install; the program or the folder missing (the judge alone, no stat before
+  it); WB_TOOL relative (refused before any mkdir: nothing made in the working folder); the fresh folder at 777 /
+  775 / owned by 1001 after the install; the program owned by 1001 or mode 757 (new: today's text did not judge
+  the program); wrong bytes (the unchanged size line still runs after the new ones). Contrast: today's judge
+  (cb476b1:118-119) alone with the folder missing exits 0, so the count-based judge closes a real gap.
+  Static check: others (the cut's uid in group nogroup) have r+x on the program and x on all 13 folders above it.
+- B6 the cut's user (2026-11-23): the first request (unshare --net + setpriv in one command) was refused by the
+  permission system; not retried, no other tool tried instead. A separate request for setpriv alone was allowed:
+  `setpriv --reuid=1001 --regid=nogroup --clear-groups --no-new-privs` (the cut's flags, without the namespace) on
+  C1's installed stand-in: it ran (exit 0); `id` = uid=1001 gid=65534(nogroup) groups=65534(nogroup); NoNewPrivs: 1;
+  sha256sum and Node's lstat + read (as build-checks.mjs:60-61 does) give plain file, 35208 bytes, 5c63567e...6bf7 (=
+  /usr/bin/echo). In the same state, renaming the folder, removing or writing the program, planting a file in the
+  folder, and chmod of the folder all fail (Permission denied / Operation not permitted); program and folder
+  unchanged after. Untried: the network namespace itself (unshare, refused here as in the earlier try, notes
+  infra-engineer-ci-plan.md:619). No folder was made outside the worktree.
+- B7 for the stop rule (plan.md:232-243 asks for "the lines for the program's folder and for `/opt` with owner
+  root:root, and the program's ': OK'"). On a clean run the new step prints, after tar's seven member lines, exactly
+  these four lines (each behind GitHub's timestamp), with nothing between them:
+    mode 555, owner root:root, 8170784 bytes, /wasm-bindgen-0.2.130/wasm-bindgen
+    mode 755, owner root:root, 4096 bytes, /wasm-bindgen-0.2.130
+    mode 755, owner root:root, 4096 bytes, /
+    /wasm-bindgen-0.2.130/wasm-bindgen: OK
+  The first two are set by the step itself (install -m 0555, mkdir -m 0755: 4096 bytes as the /opt folder printed
+  in both runs, same ext4 root filesystem, configure-environment.sh:81-83). Unknown until a runner prints it: line 3
+  (the mode, owner and size of the runner's `/`; expected 755 root:root 4096; the step judges only owner root and no
+  group/other write, so 555 or 711 would also pass and would just be printed); that the name /wasm-bindgen-0.2.130
+  is free on the image (else mkdir refuses: a stop); that `sudo -n mkdir` and `chown` under `/` behave as
+  `sudo -n install -D` did; the size and sha256 lines with the real program on a runner (both runs refused before
+  them; they ran here earlier with the real program, infra-engineer-ci-plan.md:553-554); and the real cut with the
+  new path (unshare is refused in this container).
+- Hand-back written 2026-11-23. Files: `.gate/ci-wasm/proposed-2/toolchain.yml` (41b51a5e...3db),
+  `.checkpoints/ci-wasm/ci-edit-2.diff` (75fc6332...2d04), planted 17e8354c...6e6e; scratch in
+  `.gate/ci-wasm/opt-path/` (try.sh 2f6b4f11...b229, try-output.txt c0d6e6c4...9ae1). Nothing outside the worktree was
+  made or changed; nothing under .github/ was written.
+DONE
