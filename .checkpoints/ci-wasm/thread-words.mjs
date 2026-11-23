@@ -142,6 +142,18 @@ const FROM = "Copied by script from the session's transcript (session_01WLuqnwQ8
   const a = call('toolu_01J1wM7tj7RLQsh7h6PGnfvW', 'mcp__hearthbot__post_message');
   note('thread-2026-11-23T145639-new-chat.md', "The thread's message of 2026-11-23, 14:56:39 UTC, after his tap on WRITE-WHERE (not his words)", `${FROM}: the text of the thread's post_message call toolu_01J1wM7tj7RLQsh7h6PGnfvW, stamped ${a.at}`, a.input.text);
 }
+// 8. The handover: the thread's message with the block for him to paste into the new Claude Code chat, and its two
+// cards (BUILD-SEAT, ACCT-3). The block inside the message must equal handover-block.txt, saved before the message.
+{
+  const c = call('toolu_01DnP7mtqK6QbonVaPGDEVGN', 'mcp__hearthbot__post_message');
+  const parts = c.input.text.split('```\n');
+  if (parts.length !== 3 || parts[1] !== readFileSync(NOTES + 'handover-block.txt', 'utf8')) throw new Error('the block in the message differs from handover-block.txt');
+  note('thread-2026-11-23T150951-handover.md', "The thread's message of 2026-11-23, 15:09:51 UTC: the handover, with the block for him to paste into the new Claude Code chat (not his words until he pastes the block there)", `${FROM}: the text of the thread's post_message call toolu_01DnP7mtqK6QbonVaPGDEVGN, stamped ${c.at}; the block between its two fence lines equals handover-block.txt byte for byte`, c.input.text);
+  const d = call('toolu_01TqVRR5AGJTkj158U1ugpAq', 'mcp__hearthbot__request_decision');
+  note('thread-2026-11-23T150954-card-build-seat.md', "The thread's decision card of 2026-11-23, 15:09:54 UTC: BUILD-SEAT (not his words)", `${FROM}: the question, options and reason of the thread's request_decision call toolu_01TqVRR5AGJTkj158U1ugpAq, stamped ${d.at}, each field whole, laid out one per line`, card(d));
+  const e = call('toolu_01Fb9XQyj49TyLjqhsqENji9', 'mcp__hearthbot__request_decision');
+  note('thread-2026-11-23T150956-card-acct-3.md', "The thread's decision card of 2026-11-23, 15:09:56 UTC: ACCT-3 (not his words)", `${FROM}: the question, options and reason of the thread's request_decision call toolu_01Fb9XQyj49TyLjqhsqENji9, stamped ${e.at}, each field whole, laid out one per line`, card(e));
+}
 
 let ok = true;
 for (const n of out) {
