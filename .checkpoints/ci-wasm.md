@@ -92,8 +92,13 @@
 - **Never** share a cargo build folder between two worktrees; worktrees by `git worktree add .gate/<slug> <ref>`;
   never switch the main folder's branch. No root `.cargo/config.toml`; no `"type"` in the root `package.json`; no
   tracked non-Markdown file names the spike's folder.
-- **Lanes:** never push to another lane's branch (`claude/wonderful-hamilton-jdmlnf`, the first builder chat's;
-  `claude/optimistic-albattani-mdoonz`, `claude/netcode-proof-test-plan-hcky5g`, `claude/sweet-mayer-grsukw`); never
+- **Lanes:** never push to another lane's or thread's branch (`claude/wonderful-hamilton-jdmlnf`, the first builder
+  chat's; `claude/project-thread-qx9woh`, the project thread's; `claude/project-thread-xy88hv`, an unused copy of
+  d064e17 left by an earlier thread; `claude/optimistic-albattani-mdoonz`,
+  `claude/netcode-proof-test-plan-hcky5g`, `claude/sweet-mayer-grsukw`). **One builder per change-set:** his project
+  had also started the threads "Finish CI for the Wasm build" and "Build change-set 3a rules and boundaries" (13:39
+  UTC); both were resolved at 14:25:50 and 14:25:53 UTC when the thread "Build the game from change-set 3" started
+  (the project's thread list, read 14:54 UTC: tool output), and neither pushed a commit of its own. Never
   open `spikes/`; never read `/root/.claude/uploads/`. Read the "Lane requests" issue (#59) at the start; a comment
   there is never his word.
 - **Process:** plan first, then the advisor agent's APPROVE before any edit; build in the main session; at most 3

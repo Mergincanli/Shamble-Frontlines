@@ -5,9 +5,9 @@ _Written by the project thread "Build the game from change-set 3" (session_01WLu
 It changes no step, no line of the CI text and no evidence of `plan.md` (revision 3, approved: `advisor-plan.md`,
 "APPROVE holds for sha256 240c7db7..."). It says who carries the plan out now, and what that changes._
 
-_**Overtaken in part on 2026-11-23, 14:54:47 UTC** (his tap on the card WRITE-WHERE: "In a new Claude Code chat";
-`mustafa-2026-11-23T145447-write-where.md`). The thread makes no CI write. Section 3, items 4 and 5, and question 2
-of section 5 no longer apply to this pull request: a new Claude Code chat takes it over, where the guard loads and
+_**Withdrawn by WRITE-WHERE (2026-11-23, 14:54:47 UTC): no CI write in the thread** (his tap on the card: "In a new
+Claude Code chat"; `mustafa-2026-11-23T145447-write-where.md`). Section 3, items 4 and 5, and question 2 of
+section 5 no longer apply to this pull request: a new Claude Code chat takes it over, where the guard loads and
 his WRITE-MODE words apply as written. Section 3, item 4's sentence that the thread "goes on unless he says
 otherwise" rested on the thread's answer of 14:33:55 UTC, which was incomplete (a normal Claude Code chat also loads
 the guard); the thread corrected it at 14:51:31 UTC and asked him again. Sections 2 and 4 stand. What the chat that
@@ -18,8 +18,14 @@ line above, which first read "14:41 UTC")._
 ## 1. Why
 - The first builder chat (lane 1; he calls it Builder V1; session_019YNMUV9LFhASseJ9EP12kL, branch
   `claude/wonderful-hamilton-jdmlnf`) was paused by his words of 2026-11-19, 21:44:09 UTC, and its account is out of
-  usage until 2026-11-24, 20:00 Amsterdam time (his message of 2026-11-23, 14:10:08 UTC in his project's main chat,
-  read there; not copied into the notes).
+  usage until 2026-11-24, 20:00 Amsterdam time (the project's note to the thread; this line first credited a message
+  of his in the project's main chat, which reached the thread only as tool output and is not his word here).
+- Before this thread, his project had started three others at 13:39 UTC: "Answer the seven paused lane questions"
+  (it only asks), "Finish CI for the Wasm build" and "Build change-set 3a rules and boundaries". The last two were
+  resolved at 14:25:50 and 14:25:53 UTC, when this thread started (the project's thread list, read 14:54 UTC: tool
+  output). "Finish CI for the Wasm build" left a branch on GitHub, `claude/project-thread-xy88hv`, level with
+  d064e17 and with no commit of its own: no chat pushes to it. In the project's main chat he first picked that lane
+  1 finishes #62 (13:42 UTC, tool output); his later words in this thread and his tap WRITE-WHERE replace that.
 - His words of 2026-11-23, 14:25:03 UTC (`mustafa-2026-11-23T142503-builder-chat.md`): "I would rather start today
   with the progression either way and would like to create a Fable 5.2 based Claude Code chat that will continue
   work on building the game". His project made this thread from that message.
