@@ -446,3 +446,39 @@ Done:
   header and footer, behaviour `brawl`, the chain's write-then-rename, SEC-SB-9's rest; Stop B on his laptop: the
   drivers' listen read, `claude --version`, the passphrase, the fsn1 stock read; not verified here: Hetzner's console
   showing /etc/issue.d, sudo -l's layout on the VM, systemd and nft on a VM.
+
+## Pass 3 (round 2, 2026-11-23)
+Plan: advisor-u8-r2.md (sha256 d107cbe3…a784) section 3's items 1-8 in order, each with its proof and plant, on the
+pass-2 tree (wip/u8-build.patch bca52b2c…6eb7; git status: only U8's files and these notes, nothing half done). Start:
+43 files, 5,876 lines. SIZE-CHECK: past 6,000, stop at the end of that item and report.
+- 3.1 DONE (NC-R2-1): r1.sh save_log (python: a whole log, or one cut at a line end, copied as it is; one cut inside a
+  line: its leading whole lines that each parse as one JSON object kept as <name>, the whole file as <name>.raw; empty
+  or no header line: <name>.empty; each such named in <dir>/cut.txt; a missing file skipped); keep saves the room,
+  super and leg logs through it; lg_keep (LG's stdout copy, then `lg "npt-log NN"` into $RUN/load-NN.fetch, save_log,
+  fetch removed) is the one LG fetch, in headers, probe, calibrate and ds; the probe block: exit, room_down, stat-after,
+  `load_wait 02 120` (LG's own end; `lg stop` only as load_wait's abort), lg_keep. Comments: the probe's wait, the
+  deadline's "17 at its bounds", collect's read. R1.md section 8 one line on save_log; the probe hours line 0.23 h with
+  LG's 60 s tail. Test 7: test 4's probe asserts (then LG's end; no `lg "stop`), 2.12's (lg_keep in the four blocks,
+  one LG fetch), JUDGE_STUB now models read_log (a line not one JSON record or an empty log fails the read; no footer
+  reads), 2.1 ADV-SB-1's cut fixture cut inside a line; +3 cases on judge/fixtures/pm-0001-4/base's logs: save_log's six
+  forms; the probe block's trace (load_wait 02 120 after lg start, before the fetch, no lg stop; load-02.jsonl the 3
+  whole lines, .raw the cut copy, cut.txt names it); a results tree with s30-2-lg.jsonl cut inside its footer line and
+  an empty load-07.jsonl reads whole under the stand-in, while the copy as fetched fails it at line 4. 20 pass. Plant
+  (probe's fetch back to `lg "npt-log 02" > "$d/load-02$ATT.jsonl"`): 3 FAIL (test 4, 2.12, and 3.1's trace: the cut
+  copy saved whole as .jsonl), restored by Edit, r1.sh ed12ebf6… equal to its pre-plant hash. Total 6,001 (+125: r1.sh
+  +41, R1.md +3, test 7 +81).
+- Fixture tree for the main session's npt-judge run (made by test 7's own case, NPT_R1_TREE set, no new code):
+  /home/user/Shamble-Frontlines/.claude/worktrees/agent-ac59cce3e5d002441/.gate/u8-p3-judge-tree (gitignored). It is
+  judge/fixtures/pm-0001-4/base's eight logs through save_log, s30-2-lg.jsonl cut 20 bytes before its end (inside the
+  footer): s30/s30-2-lg.jsonl its 3 whole lines (no footer), s30-2-lg.jsonl.raw the cut copy, load-07.jsonl.empty,
+  cut.txt naming both. Want: `npt-judge --marks spikes/netcode-proof/marks/marks.json --logs <tree> --out <file>` exits
+  0, and run s30-2 reads INVALID by "complete: the bots log on LG1 has no footer (cut short)". Rebuild into a new
+  folder: `NPT_R1_TREE=<new folder> node --test --test-name-pattern='results tree' ops/tests/r1sh.test.mjs`.
+- SIZE-CHECK STOP: 6,001 added lines after item 1 (past 6,000 by 1); stopped at the end of item 1 as the brief says.
+  Items 2-8 not started; item 3's container record (sudo into a regular file under .gate/ against the pipe form) not
+  made. End checks on this state: `node --test 'ops/**/*.test.mjs'` 98 pass, 0 fail (test 4's script check with
+  ops/browser/node_modules linked from U8's build worktree, link removed after); `bash ops/tests/wrappers.test.sh` 315
+  ok, 0 failed; `check.mjs --only redact` PASS, 394 items, 0 findings; package.json 8370495d…, package-lock.json
+  a0efce8e… unchanged (DEP-HOLD); no plant left. No commit, no cargo, no npm install.
+- Open: SIZE-STOP for Mustafa (go on with items 2-8, or stop U8 here; the advisor leans go on); items 2-8 as ruled;
+  the main session's npt-judge run over the tree above; F28 and the other merge-time checks as in pass 2's Open line.
