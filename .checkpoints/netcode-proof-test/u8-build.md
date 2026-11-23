@@ -482,3 +482,76 @@ pass-2 tree (wip/u8-build.patch bca52b2c…6eb7; git status: only U8's files and
   a0efce8e… unchanged (DEP-HOLD); no plant left. No commit, no cargo, no npm install.
 - Open: SIZE-STOP for Mustafa (go on with items 2-8, or stop U8 here; the advisor leans go on); items 2-8 as ruled;
   the main session's npt-judge run over the tree above; F28 and the other merge-time checks as in pass 2's Open line.
+- Resumed on his answer (a), go on: items 2-7, then the Lows; the new stop 6,200 (a Low that would pass it is carried,
+  never a stop). git status: only U8's files and these notes.
+- 3.2 DONE (SEC-R2-1 = INF-R2-1): rs.yaml and lg.yaml: `install -d -o root -g root -m 0755 /etc/issue.d` as the
+  fingerprint step's first command. Test 1's 2.7 case asserts it comes before the write in both: 22 pass. Plant (the
+  line dropped from both): rs and lg 2.7 FAIL, restored by Edit, rs.yaml 829db42e…, lg.yaml aea270cf… equal their
+  pre-plant hashes. Total 6,005.
+- 3.3 DONE (SEC-R2-2): bringup writes `sudo -n -l | cat > "$d/sudo-l.txt"` (a pipe; pipefail keeps sudo's failure).
+  Container record (sudo 1.9.15p5, as root, no terminal): through the pipe (`sudo -n -l | cat`) the Defaults line is
+  one 126-character line `    env_reset, mail_badpass, secure_path=…/snap/bin, use_pty`; into a regular file
+  (`sudo -n -l > .gate/u8-p3-sudo-l-file.txt`, the one redirect, as :92-93 asks for the measurement) it is three
+  lines, `    env_reset, mail_badpass,` / `    secure_path=…/snap/bin,` / `    use_pty` (wrapped at 80, continuation
+  indent 4 for Defaults; lbuf indent 8 for privileges). Test 7's 2.19 case: an lbuf.c model of the wrap, checked
+  against that file's three lines; sudoers.d/npt's nine lines wrapped at 80 give 11 (peers and rooms split) and stop
+  sudo_exact; the pipe form asserted in bringup: 20 pass. Plant (the plain redirect back): 2.19 FAIL, restored by
+  Edit, r1.sh d2f4146d… equal to its pre-plant hash. Total 6,031.
+- 3.4 DONE (NC-R2-2): lg_block on a missed READY: room_down first, then `lg stop` (its INVALID text and comment say
+  so); load_ready polls while the time left is above 0, each poll `LG_BOUND=$left lg …`, and lg runs ssh under
+  `timeout "$LG_BOUND"` when it is set (never `timeout 0`, which GNU timeout reads as no bound). Test 7's 2.3 case: the
+  no-READY rows read room_down then lg stop; a clocked load_ready (deadline 1003, clock 1000…) polls with bounds 3, 2,
+  1 and fails, and returns 0 on READY; lg with ssh and timeout stubbed: unbounded, then `timeout 4 ssh`: 20 pass.
+  Plants (the ruling names none; made for the record): the old order, 2.3 FAIL; the unbounded poll, 2.3 FAIL (bounds
+  "none"); restored by Edit, r1.sh da628b36… equal to its pre-plant hash. Total 6,044.
+- 3.5 DONE (NC-R2-3): room_settings' calibrate has no duration (held); lg_block gives a held room's LG CALIBRATE_S
+  (300, a new constant) and, with no room_exit wait, `load_wait NN 360` (LG's run plus 60), then room_down; measured
+  rooms as before. R1.md's LG-loaded rooms line says calibration is held, LG 300 s, then the room down. Test 7: the 2.3
+  calibrate row (duration 0, LG 300 s, `load_wait 03 360` then room_down), item 8's durations (headers and ds only):
+  20 pass; test 5: 10 pass. Plant (the ruling names none; for the record: calibrate's dur=300000 back): item 8 and 2.3
+  FAIL, restored by Edit, r1.sh a790c522… equal to its pre-plant hash. Total 6,055.
+- 3.6 DONE (SEC-R2-3): settings.json's PowerShell `git -c *` becomes `PowerShell(git -c *hookspath*)` and
+  `PowerShell(git * -c *hookspath*)`; Bash keeps `git -c *`. R1.md Stop B step 6: start check 4 run once in each shell,
+  each `git -C` prompting, not denied; rules.md's deny line says the PowerShell form. Operator test: 2.8's deny list
+  (Bash `git -c *`, the two PowerShell forms, no PowerShell `git -c *`); new 3.6: every `git …` command in
+  PROMPT-R1.md, and §6.2's push in PowerShell form, matched against every deny (a `*` as any text; PowerShell's rules
+  case-insensitively, Bash's not): none denied; `git -c core.hooksPath=x push` and `git -C . -c CORE.HOOKSPATH=x push`
+  still denied in PowerShell: 10 pass. Plant (the old PowerShell `git -c *` back): 2.8 and 3.6 FAIL (3.6 on
+  `git -C <run> rev-parse HEAD`), restored by Edit, settings.json 9aa8101e… equal to its pre-plant hash. Total 6,080.
+- 3.7 DONE (NC-R2-5): TIMING_BLOCKS "headers ds-selftest bites" (its comment cites section 2); chain_run's comment;
+  probe and starts no longer call timing_invalid (they run and are judged under alone 0). R1.md condition 4 and
+  PROMPT-R1.md §2 step 10 say "not run (C1)" for headers, DelayStream's self-test and the bites, the probe,
+  calibrate, starts and s14 still run (R1.md: ds-selftest may join at U6b's merge). Test 7's 2.10 C1 fixture: the
+  chains run probe, calibrate, starts, s14; NOT-RUN with the task list for exactly headers, ds-selftest, bites; no
+  record for probe or starts: 20 pass. Plant (the ruling names none; for the record: the old five-block list): 2.10
+  FAIL, restored by Edit, r1.sh a5ddeaec… equal to its pre-plant hash. Total 6,085.
+- 3.8 DONE (the Lows, all built, none carried):
+  - NC-R2-6: lg_keep writes `load-NN$ATT.log`; LGK (dir, NN) is set after LG's start in lg_block and the probe and
+    cleared by lg_keep; down_all (every block's EXIT trap) stops LG and runs lg_keep when LGK is set. Test 7 +1
+    ("3.8": a second attempt dying after LG's start: `lg stop 03`, `lg log 03`, `lg npt-log 03` on exit, kept as
+    load-03-a2.jsonl and load-03-a2.log): 21 pass. Plant (for the record: `$ATT` dropped from the .log): 3.8 FAIL,
+    restored, r1.sh bb2c4210… equal. Total 6,104.
+  - SEC-R2-4: R1.md Stop B step 5 names the read (`Start-Process <driver path> -ArgumentList <config.mjs
+    driverArgs(browser, 9515)> -PassThru`, `Get-NetTCPConnection -State Listen -OwningProcess <its Id>`, loopback only,
+    `Stop-Process -Id <its Id>`) and repeats it for a driver start check 6 replaces; rules.md the same; PROMPT-R1.md
+    start check 6 repeats it. Total 6,108.
+  - INF-R2-2: PROMPT-R1.md §4 "starts no block within 20 minutes of RS's delete-by (an LG block, LG's)"; R1.md's
+    probe hours line "inside RS's 5 minutes at worst (section 1's slack)". Total 6,109.
+  - INF-R2-3: npt-host.service's header "a fourth start". INF-R2-4: the three curl lines add `--speed-limit 1000
+    --speed-time 60`; test 1's 2.7 asserts them on every curl line: 22 pass; plant (lg.yaml's dropped): lg 2.7 FAIL,
+    restored, lg.yaml b58a8e04… equal. Total 6,109.
+  - INF-R2-5's line: PROMPT-R1.md §2 step 2, Enter on the console redraws the lines (the package move dropped, as
+    ruled). INF-R2-6: §2 step 9 names `ssh -F <ssh> npt-lg grep btime /proc/stat`; r1.sh's lg-boot comment follows.
+    Operator test 10 pass, test 5 10 pass. Total 6,111.
+- Carried (past 6,200): none; every Low is built.
+- END of pass 3: `node --test 'ops/**/*.test.mjs'` 100 pass, 0 fail (98 after item 1; +3.6, +3.8; test 4's script
+  check with ops/browser/node_modules linked from U8's build worktree, link removed after); `bash
+  ops/tests/wrappers.test.sh` 315 ok, 0 failed; `check.mjs --only redact` PASS, 394 items, 0 findings; package.json
+  8370495d…, package-lock.json a0efce8e… unchanged (DEP-HOLD); every plant restored by Edit with its sha256 checked;
+  final r1.sh 5262c8ee…, settings.json 9aa8101e…, rs.yaml 857c866c… (12,489 B), lg.yaml b58a8e04… (7,783 B). 43 files,
+  6,111 lines (+235 in pass 3: item 1 +125, items 2-7 +84, the Lows +26). The fixture tree above is unchanged
+  (save_log untouched since). No commit, no cargo, no npm install.
+- Open: the main session's npt-judge run over .gate/u8-p3-judge-tree; the last round (netcode-architect on NC-R2-1,
+  security-auditor on SEC-R2-1 and SEC-R2-2); NC-R2-4 at U6c's merge (probe_presence reads U6c's named records);
+  ds-selftest's place in the C1 run list at U6b's merge; sudo's list over ssh on RS not run (the container's sudo,
+  root, read here); F28 and the merge-time checks as in pass 2's Open line.

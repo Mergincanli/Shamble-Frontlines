@@ -5,7 +5,7 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-23 17:2x UTC, before his /compact (his words to history.md:7722): the resume source.
+- **Last update:** 2026-11-23 18:0x UTC, after his /compact: both builders back; U8's last round and U6b's round running.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -64,29 +64,29 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-23 17:2x UTC, before his /compact; U6a MERGED 824d8e7; U7's T-half DONE 8ab088e8…, u7-t-build.md)
-- **Today on U8:** Stop B round 1 (u8-stopb-*.md: 6 High) -> its ruling (advisor-u8-stopb.md daf55033…) -> pass 2
-  (bca52b2c…, 5,876) -> round 2 (u8-r2-*.md: round-1 Highs closed, 3 new) -> its ruling (advisor-u8-r2.md d107cbe3…)
-  -> pass 3 item 1 (66e2c199…, 6,001; my npt-judge run 17:08 at 627401d, .gate/u8-p3/: exit 0, run s30-2 INVALID
-  "complete: the bots log on LG1 has no footer (cut short)", as ruled) -> SIZE-STOP -> his (a) (history.md:7703-7722).
-- **My step:** waiting on the two builders (Running work); no new agent or unit until after his compact (his B.1). His A
-  went to U8's builder at 17:1x, quoted: pass 3 items 2-7, then the Lows; stop 6,200; past it the unbuilt Lows carried.
-- **Next 1, when U8's builder returns:** (a) snapshot: `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py
-  /home/user/Shamble-Frontlines/.claude/worktrees/agent-ac59cce3e5d002441 .checkpoints/netcode-proof-test/wip/u8-build.patch
-  u8-build`, its sha256, `grep -c '^+'` less 43; carried Lows to Open findings; (b) the last round's old tree (pass 2's
-  bca52b2c, in git at 6759c83): `git show 6759c83:.checkpoints/netcode-proof-test/wip/u8-build.patch | git apply
-  --directory=.gate/u8-r3-old`; (c) the last round by SendMessage, on pass 3's lines only (advisor-u8-r2.md:126-139):
-  netcode a120f51df9a8f6986 on NC-R2-1 (with my judge result), security af8c5f0fbec829595 on SEC-R2-1 = INF-R2-1 and
-  SEC-R2-2; files u8-r3-netcode.md, u8-r3-security.md; a Critical or High open after it stops U8 for him. Then the
-  advisor a3de649cd25e474df reads the pushed head; U8 merges after U6c (about Sat 28), M3-M9 as U4f's.
-- **Next 2, when U6b's builder returns:** snapshot (worktree agent-a2661dc320c9e6d00 -> wip/u6b-build.patch, prefix
-  u6b-build), the size line, its one round (netcode, test, security at xhigh, with F-PING (condition 1), F-MARK-HDR,
-  F-NEG, F-POOL-BYTES, F-WT-UNSENT, F-JOIN-ONCE from its notes), fixes, merge M3-M9 (main-run.sh), CI.
+## Now (2026-11-23 18:0x UTC; U6a MERGED 824d8e7; U7's T-half DONE 8ab088e8…, u7-t-build.md; before: card at 09958e5)
+- **U8:** pass 3 DONE ~17:5x (snapshot 0e7fbab2…, 6,111 of his 6,200 stop: items 1-8, every Low in, none carried; node
+  tests 100/0, wrappers 315/0, redact 0 findings; package files unchanged; no plant left; item 1's judge run 17:08 at
+  627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round RUNNING** (his words: the three Highs' fixes
+  only): netcode a120f51df9a8f6986 on NC-R2-1 (u8-r3-netcode.md), security af8c5f0fbec829595 on SEC-R2-1 = INF-R2-1
+  and SEC-R2-2 (u8-r3-security.md); old tree .gate/u8-r3-old (pass 2's bca52b2c from 6759c83, hash checked).
+- **U6b: BUILT ~17:3x** (snapshot 49f4488f…, 29 files, 5,498 added of the 6,000 stop; the brief's likely 3,650-4,050):
+  check5.log 11/11 (measured 799 = +45, bites 898 = +48; test step 891.5 s, 0.93x base); 14 plants fail by name; the
+  valve built; no manifest change. **Its round RUNNING:** netcode a0a57a3948202de40 (u6b-review-netcode.md; its prompt
+  holds the inputs, rules and F-items); security and test next, each at xhigh, as slots free (3 agents at most).
+- **Next 1, U8's last round back:** read both in full; a Critical or High open stops U8 for him, the rest go to
+  follow-ups. Then the advisor a3de649cd25e474df reads U8's pushed head; U8 merges after U6c (about Sat 28), M3-M9.
+- **Next 2, U6b:** security (security-auditor) and test (test-engineer) seats, xhigh, with the netcode seat's inputs and
+  rules: security per u6b-brief.md section 7 and condition 8 (U8's npt-ctl from wip/u8-build.patch 0e7fbab2…); test:
+  the plants, the bite, the counts (section 3's count line against check5.log). Then the fix pass by U6b's builder
+  a2661dc320c9e6d00 (resumed) with the container readings; merge M3-M9 (main-run.sh), CI; U6b's report.
 - **Next 3:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md:
-  the Choices of 2026-11-23 below, his SIZE-STOP (a), the three cuts, SEC-F26-1 done, U6b's and U8's state. Then U4's
-  report; T5 (i) the day U6b merges.
+  the Choices of 2026-11-23 below, his SIZE-STOP (a), the three cuts, SEC-F26-1 done, U6b's and U8's state. U4's report
+  (task 75) in the gaps; T5 (i) the day U6b merges.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
+- **2026-11-23, U6b's container readings (my lean):** built in its fix pass, before the merge (rev 1.1 condition 8:
+  before Stop B's read of R1's run plan); the round reads the code without them; U6b's report gives them.
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
   TR-U6A-5 to U6d; F4's S1 burn to U6e (the netcode seat's suggestion); FP-6: no rule changed on a difference.
 - **2026-11-23, U6a's round 2 (my lean):** its one Medium (a flake the fix pass opened) fixed now as FP-13 with no third
@@ -141,38 +141,35 @@
   counter, SA-16's variant); the kit's paper costs named to him on 2026-11-17. Nothing added since.
 
 ## Key numbers (U4f's `<base>` counts, the earlier packs and his 2026-11-17 count: this card at 1b26e8c)
-- Disk (2026-11-23 17:0x UTC): 6,950 MiB free with U6b's cold build running (floor 4,096; the dev profile reached 10.4 GB,
-  4.3 of it incremental; today's part-cleans 6.2, 8.7, 1.0, 7.5, 10.4 GiB); still unpacked
+- Disk (2026-11-23 17:2x UTC): 6,855 MiB free, no build running (floor 4,096; the dev profile reached 10.4 GB, 4.3 of
+  it incremental; today's part-cleans 6.2, 8.7, 1.0, 7.5, 10.4 GiB); still unpacked
   (none covered by his packing words): u4r-P3-d66e23cd78f2 298 MiB, u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741,
   u4r-P2-fc411116c1f1 623, u4f-20-350677f0aef2 434, u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366,
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (2 agents, 1 shell; message or resume each by SendMessage to its ID):**
-  - U6b's builder a2661dc320c9e6d00 (general-purpose, xhigh; worktree .claude/worktrees/agent-a2661dc320c9e6d00 from
-    21765e3, 754/850; u6b-brief.md rev 1.1 + launch items 1-6; runner u6b-run.sh, logs .gate/u6b/): notes in its worktree's
-    .checkpoints/netcode-proof-test/u6b-build.md (Blocks 1-6, F28 built; resume at Block 6's L2Config::named test, then the
-    end checks x2, plants, size line, the valve at 5,400). Told beyond its brief: u6b-run.sh exports CARGO_INCREMENTAL=0;
-    on the 4 GB floor it stops and reports, never cleans (the main session part-cleans, no lane running).
-  - U8's builder ac59cce3e5d002441 (worktree .claude/worktrees/agent-ac59cce3e5d002441 at 096808b + U8's files): pass 3
-    items 2-7, then the Lows (advisor-u8-r2.md section 3); stop 6,200 (his A); notes in its worktree's u8-build.md
-    "## Pass 3" (copied over by the snapshot); item 8's setting record u8-sec-sb-3-docs.md. On return: Now, Next 1.
+- **Running (3 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
+  - U8's last round: netcode a120f51df9a8f6986 (u8-r3-netcode.md), security af8c5f0fbec829595 (u8-r3-security.md).
+  - U6b's netcode seat a0a57a3948202de40 (netcode-architect, xhigh; u6b-review-netcode.md; read only).
   - The saver b67t3qh7l (checkpoint.mjs watch from 16:2x to about 18:2x; when it ends, restart it: run_in_background,
     timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
-- **Finished, resumable by SendMessage:** Stop B's seats, netcode a120f51df9a8f6986 and security af8c5f0fbec829595 (the
-  last round), infra a0615e1ead860724b; the advisor a3de649cd25e474df (U8's rulings; U8's pushed head); the docs agent
-  a6eb7acdf1c3ff885; U8's first builder abf71d95fc07b3522 (its worktree has ops/browser/node_modules for test 4); U7's
-  T-builder a9873cdba07a3219e (T5); U7's drafter a159f25bffe1d4950; the U6c advisor a662f1797b78cae95. Older: card at e67ef59.
+- **Finished, resumable by SendMessage:** U6b's builder a2661dc320c9e6d00 (worktree agent-a2661dc320c9e6d00, notes
+  u6b-build.md; for the fix pass; u6b-run.sh exports CARGO_INCREMENTAL=0; on the 4 GB floor it stops, never cleans);
+  U8's builder ac59cce3e5d002441 (worktree agent-ac59cce3e5d002441, notes u8-build.md "## Pass 3"); Stop B's infra seat
+  a0615e1ead860724b; the advisor a3de649cd25e474df (U8's rulings; U8's pushed head); the docs agent a6eb7acdf1c3ff885;
+  U8's first builder abf71d95fc07b3522 (its worktree has ops/browser/node_modules for test 4); U7's T-builder
+  a9873cdba07a3219e (T5); U7's drafter a159f25bffe1d4950; the U6c advisor a662f1797b78cae95. Older: card at e67ef59.
 - **U6a MERGED at 824d8e7 (2026-11-23 03:56):** u6a-report.md (build, M5, carries by number); the carries' takers in
   u6a-fix-pass.md's last section; its build lines on this card at 21765e3. Merge M3-M9 as U4f's (history.md:7022-7028).
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): its record in Now. Open at its
-  merge: F28 (U6b's flush), U6b's null certificate pair, U6c's names (advisor-u8-stopb.md:208-220, and NC-R2-4 in U6c's
-  message), Stop B's laptop reads (driver listen, passphrase, fsn1 stock, Claude Code >= 2.1.257). Interdiff old trees:
-  .gate/u8-r2-old (60205020). Not run on a VM. `node --test ops/` fails on Node 22.23: use `'ops/**/*.test.mjs'`.
+  merge: F28 (U6b's flush), U6b's null certificate pair, ds-selftest's place in C1's run list (U6b's merge), U6c's names
+  (advisor-u8-stopb.md:208-220, and NC-R2-4 in U6c's message), Stop B's laptop reads (driver listen, passphrase, fsn1
+  stock, Claude Code >= 2.1.257), `sudo -l` over ssh on RS (only the container's read). Old trees .gate/u8-r2-old
+  (60205020), .gate/u8-r3-old (bca52b2c). Not run on a VM. `node --test ops/` fails on Node 22.23: use `'ops/**/*.test.mjs'`.
 - **F26 (mine, from 2ad2829):** FIXED at 2a9498d (the ruling's section 6; tests 11/11; plant shown, restored 2609bc87;
   scan 0 findings; CI green on 8412c6b); security CLEAR WITH CONDITIONS (SEC-F26-1 DONE at 07d5d31; -2 accepted).
-- **U6b** (rev 1.1; security-u6b-deps.md, with conditions; Block 0 DONE ae4f57e): building (Now); C2's homes from
-  advisor-u7-brief.md (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in npt-proto; the WebSocket tags in npt-link).
+- **U6b** (rev 1.1; security-u6b-deps.md, with conditions; Block 0 DONE ae4f57e): built, its round running (Now); C2's
+  homes built as advisor-u7-brief.md has them (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in npt-proto; ws tags in npt-link).
 - **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 security-cleared (5 conditions); disk freed first;
   its launch gives U7's seven dist names and carries advisor-u8-stopb.md:208-220's six lines, NC-R2-4's record names
   (advisor-u8-r2.md) and U6b's F-JOIN-ONCE (its glue steps a client only once its link is Open); at its merge U8's

@@ -656,10 +656,10 @@ index 0000000..ef651a3
 +   under its cap, steps = each run's cost beside its cap, as he read them.
 diff --git a/spikes/netcode-proof/ops/cloud-init/lg.yaml b/spikes/netcode-proof/ops/cloud-init/lg.yaml
 new file mode 100644
-index 0000000..4033b88
+index 0000000..a311ffc
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/cloud-init/lg.yaml
-@@ -0,0 +1,164 @@
+@@ -0,0 +1,165 @@
 +#cloud-config
 +# LG's cloud-init for the netcode proof test (u8-brief.md rev 1.1, section 1 Block 1; plan.md §10.5). No secret, no
 +# address of the day; under 32 KiB. /etc/npt/commit names the run's code commit Y (the commit pair, choice 2).
@@ -751,6 +751,7 @@ index 0000000..4033b88
 +      step() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >> "$B/steps.log"; }
 +      trap 'step "FAILED at line $LINENO"; touch "$B/build.failed"' ERR
 +      step "host-key fingerprints to the console before any fetch (F12's term): /etc/issue.d, then agetty --reload"
++      install -d -o root -g root -m 0755 /etc/issue.d   # Ubuntu 24.04 ships no /etc/issue.d (SEC-R2-1)
 +      { echo "npt LG host keys (SHA256):"; for k in /etc/ssh/ssh_host_*_key.pub; do ssh-keygen -l -E sha256 -f "$k"; done; } \
 +        > /etc/issue.d/50-npt-hostkeys.issue
 +      agetty --reload || step "agetty --reload failed (recorded); the keys show at the console's next prompt"
@@ -794,7 +795,7 @@ index 0000000..4033b88
 +      runuser -u npt-build -- env -i HOME="$NB" PATH=/usr/bin:/bin COMMIT="$COMMIT" REPO="$REPO" \
 +        bash -euo pipefail -s <<'BUILD' >> "$B/build.log" 2>&1
 +      cd "$HOME"
-+      curl --proto '=https' --tlsv1.2 -fsSL --max-time 900 --retry 2 -o rustup-init \
++      curl --proto '=https' --tlsv1.2 -fsSL --max-time 900 --retry 2 --speed-limit 1000 --speed-time 60 -o rustup-init \
 +        https://static.rust-lang.org/rustup/archive/1.29.3/aarch64-unknown-linux-gnu/rustup-init
 +      echo "9f608c142e0e38a78957d0661ba1dfaf0b6fb37184cfaa4b9a0aa57af6184282  rustup-init" | sha256sum -c -
 +      chmod 0755 rustup-init
@@ -826,10 +827,10 @@ index 0000000..4033b88
 +  - [/usr/local/sbin/npt-firstboot]
 diff --git a/spikes/netcode-proof/ops/cloud-init/rs.yaml b/spikes/netcode-proof/ops/cloud-init/rs.yaml
 new file mode 100644
-index 0000000..ddb3523
+index 0000000..60f1ada
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/cloud-init/rs.yaml
-@@ -0,0 +1,237 @@
+@@ -0,0 +1,238 @@
 +#cloud-config
 +# RS's cloud-init for the netcode proof test (u8-brief.md rev 1.1, section 1 Block 1; plan.md §10.5 as NPT-TRIM trims
 +# it). It holds no secret and no address of the day (plan.md:1179); it stays under 32 KiB (ops/tests/cloudinit.test.mjs).
@@ -946,6 +947,7 @@ index 0000000..ddb3523
 +      step() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >> "$B/steps.log"; }
 +      trap 'step "FAILED at line $LINENO"; touch "$B/build.failed"' ERR
 +      step "host-key fingerprints to the console before any fetch (F12's term): /etc/issue.d, then agetty --reload"
++      install -d -o root -g root -m 0755 /etc/issue.d   # Ubuntu 24.04 ships no /etc/issue.d (SEC-R2-1)
 +      { echo "npt RS host keys (SHA256):"; for k in /etc/ssh/ssh_host_*_key.pub; do ssh-keygen -l -E sha256 -f "$k"; done; } \
 +        > /etc/issue.d/50-npt-hostkeys.issue
 +      agetty --reload || step "agetty --reload failed (recorded); the keys show at the console's next prompt"
@@ -1006,12 +1008,12 @@ index 0000000..ddb3523
 +      runuser -u npt-build -- env -i HOME="$NB" PATH=/usr/bin:/bin COMMIT="$COMMIT" REPO="$REPO" \
 +        bash -euo pipefail -s <<'BUILD' >> "$B/build.log" 2>&1
 +      cd "$HOME"
-+      curl --proto '=https' --tlsv1.2 -fsSL --max-time 900 --retry 2 -o rustup-init \
++      curl --proto '=https' --tlsv1.2 -fsSL --max-time 900 --retry 2 --speed-limit 1000 --speed-time 60 -o rustup-init \
 +        https://static.rust-lang.org/rustup/archive/1.29.3/x86_64-unknown-linux-gnu/rustup-init
 +      echo "b1c8cb14e30889e7e2999e6b69e62d9e9b9ffc0f4df8180564d306d9680e6c55  rustup-init" | sha256sum -c -
 +      chmod 0755 rustup-init
 +      ./rustup-init -y -q --no-modify-path --profile minimal --default-toolchain none
-+      curl --proto '=https' --tlsv1.2 -fsSL --max-time 900 --retry 2 -o node.tar.xz \
++      curl --proto '=https' --tlsv1.2 -fsSL --max-time 900 --retry 2 --speed-limit 1000 --speed-time 60 -o node.tar.xz \
 +        https://nodejs.org/dist/v22.23.4/node-v22.23.4-linux-x64.tar.xz
 +      echo "1805bcd35e6815559bd2eb97db438d3fdb0eb3a5e6a977b7c1badca76337e9ce  node.tar.xz" | sha256sum -c -
 +      mkdir -p node && tar -xJf node.tar.xz -C node --strip-components=1
@@ -1102,10 +1104,10 @@ index 0000000..b043286
 +in          tcp      22           <HOME_IPV4>/32
 diff --git a/spikes/netcode-proof/ops/operator/PROMPT-R1.md b/spikes/netcode-proof/ops/operator/PROMPT-R1.md
 new file mode 100644
-index 0000000..ced1e8f
+index 0000000..d2708d0
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/operator/PROMPT-R1.md
-@@ -0,0 +1,122 @@
+@@ -0,0 +1,126 @@
 +# PROMPT-R1: the laptop session's prompt for R1 (Thursday 3 December)
 +
 +You drive R1 of the netcode proof test from Mustafa's laptop. Keep `ops/operator/rules.md` and run R1's plan
@@ -1136,7 +1138,8 @@ index 0000000..ced1e8f
 +   else stop and ask him before any driver starts. During the run, Cancel any Windows Firewall dialog: one appearing
 +   is a stop (every driver binds loopback only, so none should appear: SEC-SB-1).
 +6. Each browser's major version against its driver's (`config.mjs` names the paths); a mismatch re-downloads that
-+   driver from its vendor (prompted; URL, version and SHA-256 recorded).
++   driver from its vendor (prompted; URL, version and SHA-256 recorded), then repeats Stop B's listen read on it
++   (R1.md section 2 step 5: `Start-Process`, `Get-NetTCPConnection`, loopback only, else stop; `Stop-Process`).
 +7. The pre-push hook is in the clone and its redact-check copy's SHA-256 equals Stop B's record;
 +   `git config --get core.hooksPath` prints nothing (SEC-SB-7).
 +8. `claude --version` is v2.1.257 or later (`blockReadsOutsideWorkingDirectories`: SEC-SB-3), else stop.
@@ -1149,8 +1152,9 @@ index 0000000..ced1e8f
 +2. **RS's host key (§1.6's console route):** `ssh-keyscan -t ed25519 <RS address>`, then its fingerprint
 +   (`ssh-keygen -lf`) printed in groups of 4; he compares it with RS's console in Hetzner: firstboot's first step
 +   writes the SHA-256 fingerprints above the console's login prompt (/etc/issue.d) before any fetch, and cloud-init's
-+   own copy follows at its end. If none shows 15 minutes after a VM's creation, no SSH is made and R1.md section 3's
-+   teardown rule applies (never trust on first use). On a
++   own copy follows at its end; if later output has scrolled them away, he presses Enter on the console to redraw the
++   lines (INF-R2-5). If none shows 15 minutes after a VM's creation, no SSH is made and R1.md section 3's teardown
++   rule applies (never trust on first use). On a
 +   match, write the line under the alias `npt-rs` into the per-run `known_hosts`; on a mismatch, stop. (The published
 +   line is cross-checked after the production certificate, section 3.)
 +3. **Build done:** `ssh -F <ssh> npt-rs cat /var/lib/npt/bringup/steps.log`; it ends `build done` (RS's), else wait
@@ -1174,10 +1178,12 @@ index 0000000..ced1e8f
 +   ruleset: compare both with rs.yaml.
 +9. **The delete-bys (L1):** `ssh -F <ssh> npt-rs uptime -s` and the same on `npt-lg`; tell him each VM's delete-by
 +   (its creation plus 4 hours) and warn 30 minutes before each. Then `ssh -F <ssh> npt-rs r1.sh lg-boot <LG's boot
-+   in epoch seconds>`, so the chain starts no LG block within 20 minutes of LG's delete-by (INF-SB-12).
++   in epoch seconds>`, the number `ssh -F <ssh> npt-lg grep btime /proc/stat` prints (INF-R2-6), so the chain starts
++   no LG block within 20 minutes of LG's delete-by (INF-SB-12).
 +10. **`ssh -F <ssh> npt-rs r1.sh bringup`:** C-U8-1's facts, C5's firewall proof, `npt-ctl cpus 3`, `alone`. A C5
 +    reply stops the run before any room opens and comes to him. If `alone` reads 0, R1 goes on with the certificate,
-+    the browser legs and the ping; the timing blocks are recorded INVALID and come to the advisor. If it prints
++    the browser legs and the ping; headers, ds-selftest and the bites are not run (C1) and come to the advisor; the
++    probe, calibrate, starts and s14 still run. If it prints
 +    `dist: DIFFERS`, show him `bringup/DIST-DIFFERS`'s file names: no page is served until he types his word for
 +    them that day; then, and only then, `ssh -F <ssh> npt-rs r1.sh dist-accept` (SEC-SB-5).
 +
@@ -1198,7 +1204,7 @@ index 0000000..ced1e8f
 +
 +## 4. The server chain (about 10:39; then he leaves)
 +`ssh -F <ssh> npt-rs r1.sh chain server` (one prompt). It runs headers, probe, calibrate, starts, ds-selftest and s14
-+on RS, detached, and stops itself 10 minutes before RS's delete-by. Run nothing while he is away. When he is back,
++on RS, detached, and starts no block within 20 minutes of RS's delete-by (an LG block, LG's). Run nothing while he is away. When he is back,
 +`ssh -F <ssh> npt-rs r1.sh chain-status`. S14 runs about 48 minutes and is still running at about 11:39: that is
 +planned (R1.md section 5's overlap). As soon as chain-status reads the server chain ended, `ssh -F <ssh> npt-rs r1.sh
 +collect` once, so the day's results do not live only on RS until the last collect (NC-SB-18).
@@ -1274,10 +1280,10 @@ index 0000000..9f7ea55
 +fi
 diff --git a/spikes/netcode-proof/ops/operator/rules.md b/spikes/netcode-proof/ops/operator/rules.md
 new file mode 100644
-index 0000000..7d1e2ff
+index 0000000..18cdbad
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/operator/rules.md
-@@ -0,0 +1,83 @@
+@@ -0,0 +1,85 @@
 +# Operator rules: the laptop session for the netcode proof test's runs
 +
 +The rules a Claude Code session on Mustafa's laptop keeps while it drives R1 (plan.md §12.3 as NPT-TRIM trims it;
@@ -1301,7 +1307,8 @@ index 0000000..7d1e2ff
 +- An `ask` on every `git push` (Bash and PowerShell forms): it beats main's `git push origin claude/*` allow, so every
 +  push prompts, the results push included.
 +- Denies, in Bash and PowerShell forms: pushes to the change-set branch, `cs/*` and main (their `refs/heads/` forms
-+  too), `--no-verify`, `git -c` and setting `core.hooksPath` (SEC-SB-7); `gh`; WebFetch and WebSearch; `node .gate/*`
++  too), `--no-verify`, `git -c` (in PowerShell, whose rules match case-insensitively, only a `-c` naming hooksPath, so
++  `git -C <run>` prompts: SEC-R2-3) and setting `core.hooksPath` (SEC-SB-7); `gh`; WebFetch and WebSearch; `node .gate/*`
 +  (main allows scripts under `.gate/`); `Read(~/.ssh/**)` and `Read(//**/.ssh/**)` (`~` on native Windows is not
 +  documented); and, because PowerShell's coverage by the setting below is not documented, each PowerShell read form
 +  naming `npt_operator` or `.ssh` (Get-Content and its aliases gc, cat and type; Select-String; Format-Hex; Copy-Item).
@@ -1343,9 +1350,10 @@ index 0000000..7d1e2ff
 +  each; URL, version, SHA-256 recorded) and named by path in `config.mjs`, as are the installed browsers: nothing
 +  downloads at run time (SEC-R1D-3). `lib.mjs` starts every driver itself, bound to loopback: chromedriver and
 +  msedgedriver with `--port` only (no `--allowed-ips`, which would bind every interface), geckodriver with
-+  `--host=127.0.0.1` (SEC-SB-1, SEC-SB-4). At Stop B one dry start of each driver is read back with
-+  `Get-NetTCPConnection -State Listen -OwningProcess <pid>` (read only, one prompt each): loopback only, else stop. At
-+  R1's start each browser's major version is compared with its driver's; a mismatch re-downloads that driver (prompted).
++  `--host=127.0.0.1` (SEC-SB-1, SEC-SB-4). At Stop B one dry start of each driver (`Start-Process <driver>
++  -ArgumentList <driverArgs> -PassThru`) is read back with `Get-NetTCPConnection -State Listen -OwningProcess <pid>`
++  (read only, one prompt each): loopback only, else stop; then `Stop-Process`. At R1's start each browser's major
++  version is compared with its driver's; a mismatch re-downloads that driver (prompted) and repeats that read (SEC-R2-4).
 +- The laptop's firewall is read, never changed, at Stop B and at each start (C8): inbound connections must be blocked
 +  on the active network profile, and no enabled inbound allow rule may name a driver path or node.exe
 +  (`Get-NetFirewallRule -Direction Inbound -Enabled True -Action Allow | Get-NetFirewallApplicationFilter`), else it
@@ -1363,10 +1371,10 @@ index 0000000..7d1e2ff
 +  key is removed from the Hetzner project.
 diff --git a/spikes/netcode-proof/ops/operator/settings.json b/spikes/netcode-proof/ops/operator/settings.json
 new file mode 100644
-index 0000000..174b077
+index 0000000..f3020f3
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/operator/settings.json
-@@ -0,0 +1,102 @@
+@@ -0,0 +1,103 @@
 +{
 +  "$schema": "https://json.schemastore.org/claude-code-settings.json",
 +  "permissions": {
@@ -1421,7 +1429,8 @@ index 0000000..174b077
 +      "PowerShell(git push *:refs/heads/cs/*)",
 +      "PowerShell(git push --no-verify*)",
 +      "PowerShell(git push * --no-verify*)",
-+      "PowerShell(git -c *)",
++      "PowerShell(git -c *hookspath*)",
++      "PowerShell(git * -c *hookspath*)",
 +      "PowerShell(git config core.hooksPath *)",
 +      "PowerShell(git config --global core.hooksPath *)",
 +      "PowerShell(git config --local core.hooksPath *)",
@@ -1471,10 +1480,10 @@ index 0000000..174b077
 +}
 diff --git a/spikes/netcode-proof/ops/runs/R1.md b/spikes/netcode-proof/ops/runs/R1.md
 new file mode 100644
-index 0000000..3499398
+index 0000000..05ce483
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/R1.md
-@@ -0,0 +1,327 @@
+@@ -0,0 +1,335 @@
 +# R1's run plan: Thursday 3 December 2026
 +
 +The first VM day of the netcode proof test (u8-brief.md rev 1.1 section 6, with the advisor's C1, C3, C6, C7, C8 and
@@ -1552,12 +1561,16 @@ index 0000000..3499398
 +5. The laptop session reads, and does not change, the laptop's firewall: inbound connections must be blocked on the
 +   active network profile, and no enabled inbound allow rule may name a driver path or node.exe, else it comes to him
 +   before any driver starts (C8). It repeats this at R1's start. Then one dry start of each driver as `lib.mjs` starts
-+   it (loopback-bound: SEC-SB-1, SEC-SB-4), read back with `Get-NetTCPConnection -State Listen -OwningProcess <pid>`
-+   (read only, one prompt each): loopback only, else stop; the reading is recorded. Any Windows Firewall dialog is
-+   answered Cancel, and one appearing is a stop.
++   it (loopback-bound: SEC-SB-1, SEC-SB-4), `Start-Process <driver path> -ArgumentList <config.mjs driverArgs(browser,
++   9515)> -PassThru`, read back with `Get-NetTCPConnection -State Listen -OwningProcess <its Id>` (read only, one prompt
++   each): loopback only, else stop; then `Stop-Process -Id <its Id>`; the reading is recorded, and repeated for any
++   driver start check 6 replaces on R1's day (SEC-R2-4). Any Windows Firewall dialog is answered Cancel, and one
++   appearing is a stop.
 +6. Copy `ops/operator/settings.json` to `~/npt-operator/` and `ops/operator/pre-push` into the clone's hooks; watch
 +   the four-attempt guard check (plan.md:1271-1277); the tree hash of main's `CLAUDE.md` and `.claude/` is recorded.
 +   `claude --version` is read: v2.1.257 or later (the settings' `blockReadsOutsideWorkingDirectories`), else stop.
++   Start check 4 is run once in each shell, Bash and PowerShell: each `git -C` command must prompt, not be denied
++   (PowerShell's rules match case-insensitively, so its `git -c` deny names the hooksPath key: SEC-R2-3).
 +   The operator key gets a passphrase and is held in Windows' ssh-agent for the run (SEC-SB-3).
 +7. Approve `settings.json` and `PROMPT-R1.md` explicitly; OK this plan, its cap and its delete-by times.
 +8. The main session, before his OK: fills Y and X, the expected dist SHA-256s (section 8) and re-reads hetzner.com's
@@ -1668,10 +1681,11 @@ index 0000000..3499398
 +  kernel's, with the netem numbers, and I decide." **The burst half** reads judged in R1's report once MOVED's rider
 +  is in; if MOVED drops the rider, R1's report says the burst half is NOT-RUN and why, and it comes to the advisor
 +  before -18's WebSocket part counts.
-+- **The LG-loaded rooms (NC-SB-2; Q1).** Each ends at its own `duration_ms` while LG still runs (headers and
-+  calibration 300 s with LG 330 s; DelayStream's self-test 420 s with LG 450 s), so no measured tick follows the load;
-+  the block waits for npt-super's `room_exit`, then LG's end. LG must print READY by OPEN + 50 s, 10 s before the 60 s
-+  warm-up ends (`warmup_ticks` 1,800), else LG stops and the room comes down before its first measured tick: its
++- **The LG-loaded rooms (NC-SB-2; Q1).** Each measured room ends at its own `duration_ms` while LG still runs (headers
++  300 s with LG 330 s; DelayStream's self-test 420 s with LG 450 s), so no measured tick follows the load; the block
++  waits for npt-super's `room_exit`, then LG's end. Calibration carries no mark and its summary reads LG's whole run,
++  so its room is held: LG runs 300 s, then the room comes down (NC-R2-3). LG must print READY by OPEN + 50 s, 10 s
++  before the 60 s warm-up ends (`warmup_ticks` 1,800), else the room comes down before its first measured tick: its
 +  series are empty, a gap, so the run reads INVALID, never FAIL. R1's headers run stays a measured -2 run
 +  (advisor-u8-stopb.md section 3): a FAIL left after both guards is kept for the whole test.
 +- **DelayStream's loaded self-test (condition 10; Q-U8-6 (ii) as ruled).** 48 LG connections over WebSocket at P2
@@ -1700,8 +1714,10 @@ index 0000000..3499398
 +  **C-U8-3:** sized at 0.15 h above. **C-U8-5:** the judged form above.
 +- **Condition 4:** `npt-ctl cpus 3` moves the slices, every movable kernel thread and the unbound workqueue mask off
 +  the tick vCPU 3; bring-up reads `alone` once in a pinned room. If it reads 0, bring-up records every task it lists
-+  and R1 goes on with the certificate, the browser legs and the ping; the timing blocks (headers, probe, starts,
-+  DelayStream's self-test, bites) are recorded INVALID with that list and come to the advisor (C1).
++  and R1 goes on with the certificate, the browser legs and the ping; the blocks whose judged work runs on the tick
++  vCPU (headers, DelayStream's self-test, bites) are not run (C1), recorded with that list for the advisor; the probe,
++  calibration, starts and S14 still run (NC-R2-5). DelayStream's self-test may join the run list at U6b's merge, if
++  its pump runs on the io threads.
 +- **Condition 3:** every room in every block starts through `npt-ctl rooms start` (`npt-super start`, its hold form),
 +  so -16's event is written at every start. npt-super's flags come from the room's own settings file (npt-lib.sh
 +  `npt_super_args`), so its log carries the room's run and the same set, role, layer, profile, date, scene, tick_hz
@@ -1764,8 +1780,9 @@ index 0000000..3499398
 +  files come to him and the advisor; the server chain still runs. The browser legs then run only on his typed word
 +  that day, recorded by `r1.sh dist-accept` (never for an empty list).
 +- **The probe block's hours, re-checked:** its 0.20 h (720 s) against r1.sh's 732 s planned, LG's 60 s tail (the
-+  block waits for LG's end: NC-R2-1) and about 30 s of start and stop is about 0.23 h, inside the 0.45 h left; re-checked against U6c's container reading of one leg at U6c's
-+  merge (no reading exists yet), and the row and the timeline change then if the reading moves it.
++  block waits for LG's end: NC-R2-1) and about 30 s of start and stop is about 0.23 h, 2 minutes over its row and
++  inside RS's 5 minutes at worst (section 1's slack: INF-R2-2); re-checked against U6c's container reading of one leg
++  at U6c's merge (no reading exists yet), and the row and the timeline change then if the reading moves it.
 +- **Interfaces to align with the merged code** (each in one home): the room settings' U6b and U6c field names (`r1.sh`
 +  room_settings, `deny_unknown_fields`; U6a's are its merged struct's, ops/tests/r1sh.test.mjs reads them); the page
 +  host's settings (`ops/systemd/host.json`: U6c); npt-super's `room_start` and `room_exit` events, read live by
@@ -1814,10 +1831,10 @@ index 0000000..667487a
 +# and `r1.sh host` and every `browsers` call refuse.
 diff --git a/spikes/netcode-proof/ops/runs/r1.sh b/spikes/netcode-proof/ops/runs/r1.sh
 new file mode 100644
-index 0000000..bb5b07f
+index 0000000..5b1f933
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/r1.sh
-@@ -0,0 +1,861 @@
+@@ -0,0 +1,876 @@
 +#!/bin/bash
 +# r1.sh <block> [<argument>]: RS's run script for R1 (u8-brief.md rev 1.1 section 1 Block 5; C1, C3, C5; conditions
 +# 3 and 4; Q-U8-5). It runs as npt on RS from the root-owned clone, one fixed block per call:
@@ -1854,7 +1871,8 @@ index 0000000..bb5b07f
 +readonly TICK=3 TICK_HZ=30 LOCATION=fsn1 # LOCATION: a Stop B fill, fsn1 or nbg1 (INF-SB-3)
 +readonly SERVER_CHAIN="headers probe calibrate starts ds-selftest s14"
 +readonly BITES_CHAIN="bites"
-+readonly TIMING_BLOCKS="headers probe starts ds-selftest bites"
++# The blocks C1 skips under alone 0: those whose judged work runs on the tick vCPU (NC-R2-5, advisor-u8-r2.md section 2).
++readonly TIMING_BLOCKS="headers ds-selftest bites"
 +# The probe (U6c's probe mode in room 02, UDP 30003: advisor-u6c-brief.md C1 (b)): six legs, each its warm-up, its
 +# window (1,000,000 a direction at 10,000 a second: 100 s), and about 12 s of tail and set-up (the profile's longest
 +# one-way delay plus 1 s, then the next leg's bind): 6 x 122 = 732 s planned. LG sends for that plus 60 s; the block
@@ -1863,6 +1881,8 @@ index 0000000..bb5b07f
 +readonly PROBE_TOTAL_S=$((6 * (PROBE_WARMUP_S + PROBE_PACKETS / PROBE_RATE + PROBE_LEG_EXTRA_S)))
 +# S14's three 950 s runs with set-up (R1.md section 1's 0.80 h), and the bites' start after RS's boot (12:57 - 09:30).
 +readonly S14_S=2880 BITES_AT_S=12420
++# Calibrate's LG run; its room is held and outlives it (NC-R2-3).
++readonly CALIBRATE_S=300
 +die() { printf 'r1.sh: %s\n' "$*" >&2; exit 2; }
 +[ "$(id -un)" = npt ] || die "run as npt"
 +. /usr/local/lib/npt/npt-lib.sh
@@ -1884,8 +1904,9 @@ index 0000000..bb5b07f
 +  npt_valid_ipv4 "$a" || die "no LG address: run npt-ctl peers first"
 +  printf '%s\n' "$a"
 +}
++# lg <verb>: one npt-load-ctl call on LG; LG_BOUND=<s> bounds the whole call (load_ready's polls: NC-R2-2).
 +lg() {
-+  ssh -i "$HOME/.ssh/npt_lg" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes \
++  ${LG_BOUND:+timeout "$LG_BOUND"} ssh -i "$HOME/.ssh/npt_lg" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes \
 +    -o ConnectTimeout=10 "npt-load@$(lg_ip)" "$1"
 +}
 +deadline_ok() {
@@ -1905,9 +1926,13 @@ index 0000000..bb5b07f
 +# file (ADR 0001:1582: a failing run is never re-run). Every attempt is kept and judged.
 +OPENED=()
 +ATT=''
++LGK=()
 +down_all() {
 +  local n
 +  for n in "${OPENED[@]}"; do room_down "$n" || true; done
++  # NC-R2-6: a block that died after LG's start keeps LG's copies (LGK: its dir and NN) before a re-run's start
++  # deletes LG's npt-log; LG is stopped first, its abort path.
++  [ "${#LGK[@]}" = 0 ] || { lg "stop ${LGK[1]}" || true; lg_keep "${LGK[@]}"; }
 +}
 +block_start() {
 +  local b=$1 n=1
@@ -2047,7 +2072,7 @@ index 0000000..bb5b07f
 +    start) set=starts marks=PM-0001-16 ;;
 +    headers) set=headers clients=48 warmup=1800 dur=300000 marks=PM-0001-1,PM-0001-2,PM-0006-11,PM-0001-16 ;;
 +    probe) set=probe mode=probe profile=P1 marks=PM-0001-3 ;;
-+    calibrate) set=calibrate clients=48 warmup=1800 dur=300000 marks=PM-0001-16 ;;
++    calibrate) set=calibrate clients=48 warmup=1800 marks=PM-0001-16 ;; # held: it outlives LG (NC-R2-3)
 +    ds) set=ds-selftest clients=48 warmup=1800 dur=420000 transport=ws profile=P2 mark=120 marks=PM-0001-16 ;;
 +    browser:*)
 +      # Only a browser room presents the production chain (INF-SB-1, NC-SB-11); every other kind serves the room's own
@@ -2163,11 +2188,12 @@ index 0000000..bb5b07f
 +}
 +load_up() { sudo -n /usr/local/sbin/npt-ctl rooms tokens "$1" | lg "token $1" && load_settings "$@" | lg "settings $1" && lg "start $1"; }
 +# load_ready NN <deadline, epoch s>: npt-load prints READY once its clients are up (C1 (c)); waits for it in LG's
-+# load log until the clock passes the deadline (a deadline, not a count of tries: NC-SB-14).
++# load log until the clock passes the deadline (a deadline, not a count of tries: NC-SB-14), each poll bounded by the
++# time left, so none runs past it (NC-R2-2).
 +load_ready() {
-+  local got
-+  while (($(date +%s) <= $2)); do
-+    got=$(lg "log $1" || true)
++  local got left
++  while left=$(($2 - $(date +%s))); ((left > 0)); do
++    got=$(LG_BOUND=$left lg "log $1" || true)
 +    grep -qx READY <<< "$got" && return 0
 +    sleep 1
 +  done
@@ -2177,27 +2203,31 @@ index 0000000..bb5b07f
 +setting() { python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))[sys.argv[2]])' "$RUN/room-$1.json" "$2"; }
 +# lg_block <dir> NN <kind> <mode> <transport>: an LG-loaded room (NC-SB-2, Q1). The room ends at its own duration_ms
 +# while LG still runs (LG's duration is the room's plus 30 s), so no measured tick follows the load; the block waits
-+# for npt-super's room_exit, then LG's end. READY must come 10 s before the room's warm-up ends, else LG stops and the
-+# room comes down before its first measured tick: its series are empty, a gap, so the run reads INVALID, never FAIL.
++# for npt-super's room_exit, then LG's end. READY must come 10 s before the room's warm-up ends, else the room comes
++# down first, before its first measured tick, then LG stops: its series are empty, a gap, so the run reads INVALID,
++# never FAIL. A held room (duration_ms 0: calibrate, no mark, its summary over LG's whole run: NC-R2-3) outlives its LG
++# instead: LG runs CALIBRATE_S, then the room comes down.
 +lg_block() {
-+  local d=$1 nn=$2 mode=$4 tr=$5 ms warm t0 i
++  local d=$1 nn=$2 mode=$4 tr=$5 ms warm t0 i lgs
 +  room_settings "$nn" "$3"
 +  ms=$(setting "$nn" duration_ms)
 +  warm=$(($(setting "$nn" warmup_ticks) / TICK_HZ))
++  lgs=$((ms ? ms / 1000 + 30 : CALIBRATE_S))
 +  room_up "$nn"
 +  t0=$(date +%s)
-+  load_up "$nn" "$mode" "$tr" 48 $((ms / 1000 + 30))
++  load_up "$nn" "$mode" "$tr" 48 "$lgs"
++  LGK=("$d" "$nn")
 +  if ! load_ready "$nn" $((t0 + warm - 10)); then
-+    printf 'INVALID: LG printed no READY %s s before the warm-up ended; LG stopped and the room down before its first measured tick (Q1)\n' 10 | tee "$d/INVALID-ready.txt"
-+    lg "stop $nn" || true
++    printf 'INVALID: LG printed no READY %s s before the warm-up ended; the room down before its first measured tick, then LG stopped (Q1)\n' 10 | tee "$d/INVALID-ready.txt"
 +    room_down "$nn" || true
++    lg "stop $nn" || true
 +    return 0
 +  fi
-+  for i in $(seq 1 $((ms / 1000 + 60))); do
++  for i in $(seq 1 $((ms ? ms / 1000 + 60 : 0))); do
 +    [ -z "$(logq "$ROOMS/super-$nn$ATT.jsonl" room_exit nonzero)" ] || break
 +    sleep 1
 +  done
-+  load_wait "$nn" 90
++  load_wait "$nn" $((ms ? 90 : lgs + 60))
 +  room_down "$nn" || true
 +}
 +load_wait() {
@@ -2251,7 +2281,8 @@ index 0000000..bb5b07f
 +# lg_keep <dir> NN: LG's stdout copy, and its npt-log through save_log (a stopped or unreachable LG gives a cut or
 +# empty copy: NC-R2-1).
 +lg_keep() {
-+  lg "log $2" > "$1/load-$2.log" || true
++  LGK=()
++  lg "log $2" > "$1/load-$2$ATT.log" || true
 +  lg "npt-log $2" > "$RUN/load-$2.fetch" || true
 +  save_log "$RUN/load-$2.fetch" "$1" "load-$2$ATT.jsonl"
 +  rm -f "$RUN/load-$2.fetch"
@@ -2285,7 +2316,9 @@ index 0000000..bb5b07f
 +  cat "$d/facts.txt"
 +  # The login: npt in its own group only; sudo lists the wrappers only (cloud-init's default-user merge, F13).
 +  [ "$(id -nG)" = npt ] || die "npt is in groups beyond its own: $(id -nG)"
-+  sudo -n -l > "$d/sudo-l.txt"
++  # Through a pipe: sudo wraps its list at 80 columns unless stdout is a FIFO (display.c), and a regular file is not
++  # (SEC-R2-2); pipefail keeps sudo's own failure.
++  sudo -n -l | cat > "$d/sudo-l.txt"
 +  sudo_exact "$d/sudo-l.txt" "$SPIKE/ops/sbin/sudoers.d/npt" > "$d/sudo-exact.txt" \
 +    || die "npt's sudo list is not exactly sudoers.d/npt's command lines (SEC-SB-8): see sudo-exact.txt"
 +  # C5: both Hetzner firewalls in force, before any room opens. Prints no address outside the VM list.
@@ -2371,7 +2404,6 @@ index 0000000..bb5b07f
 +probe() {
 +  local d i ended=''
 +  d=$(out probe)
-+  timing_invalid "$d"
 +  stat_cpu "$d/stat-before.txt"
 +  room_settings 02 probe
 +  room_up 02
@@ -2379,6 +2411,7 @@ index 0000000..bb5b07f
 +  printf '' | lg "token 02"
 +  load_settings 02 probe wt 1 $((PROBE_TOTAL_S + 60)) | lg "settings 02"
 +  lg "start 02"
++  LGK=("$d" 02)
 +  # The probe's own exit (npt-super's room_exit event) ends the probe; then LG's own end, 60 s on, with its footer
 +  # (NC-R2-1): `lg stop` is load_wait's abort path only.
 +  for i in $(seq 1 $((PROBE_TOTAL_S + 120))); do
@@ -2469,7 +2502,6 @@ index 0000000..bb5b07f
 +starts() {
 +  local d i sfx
 +  d=$(out starts)
-+  timing_invalid "$d"
 +  for i in $(seq -w 1 20); do
 +    sfx="-s$i"
 +    room_settings 04 start "$sfx"
@@ -2607,7 +2639,7 @@ index 0000000..bb5b07f
 +      continue
 +    fi
 +    # NC-SB-8: under C1's alone 0 no timing block runs, so no log is made that could FAIL a mark C1 rules invalid;
-+    # calibrate and s14 still run.
++    # probe (housekeeping vCPUs), calibrate, starts (-16 against 2 s) and s14 still run (NC-R2-5).
 +    if [ -f "$R/bringup/TIMING-INVALID" ] && npt_valid_word "$b" $TIMING_BLOCKS; then
 +      mkdir -p "$R/$b"
 +      cp -p "$R/bringup/alone-tasks.txt" "$R/$b/" 2> /dev/null || true
@@ -2640,7 +2672,7 @@ index 0000000..bb5b07f
 +  bites) bites ;;
 +  host) host_active; printf 'npt-host active: fetch /npt/ssh-host-keys.txt over HTTPS now (PROMPT-R1.md section 3)\n' ;;
 +  lg-boot)
-+    # LG's creation for its delete-by (INF-SB-12): the epoch seconds of LG's `uptime -s`, read in PROMPT-R1.md 2.9.
++    # LG's creation for its delete-by (INF-SB-12): LG's boot in epoch seconds (its `grep btime /proc/stat`: PROMPT-R1.md 2.9).
 +    [ "$#" -eq 2 ] && [[ $2 =~ ^[0-9]{10}$ ]] && (($(date +%s) - $2 < 21600)) || die "lg-boot <LG's boot, epoch s, within 6 h>"
 +    printf '%s\n' "$2" > "$R/bringup/lg-boot.txt"
 +    ;;
@@ -4097,7 +4129,7 @@ index 0000000..a805543
 +WantedBy=multi-user.target
 diff --git a/spikes/netcode-proof/ops/systemd/npt-host.service b/spikes/netcode-proof/ops/systemd/npt-host.service
 new file mode 100644
-index 0000000..bf3690b
+index 0000000..af18fd3
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/systemd/npt-host.service
 @@ -0,0 +1,26 @@
@@ -4105,7 +4137,7 @@ index 0000000..bf3690b
 +# npt-host user on TCP 31000 with /etc/npt/host.json. Started only by npt-host.path (no [Install] section); runs until
 +# stopped. rs.yaml installs this file root-owned, 0644, from the root-owned clone.
 +# The restart rule (INF-SB-6, systemd.path(5)): when the host ends, the path unit checks the chain again and starts it
-+# at once, so `Restart=no` does not hold it; the start limit does: a third start inside 300 s fails this unit and the
++# at once, so `Restart=no` does not hold it; the start limit does: a fourth start inside 300 s fails this unit and the
 +# path unit for good, and `r1.sh host` then refuses. The sandbox (SEC-SB-9's part a read-only server cannot trip; the
 +# rest, ProtectSystem=strict, PrivateDevices, MemoryDenyWriteExecute, SystemCallFilter and RestrictAddressFamilies,
 +# comes from the host's needs at U6c's merge).
@@ -4362,10 +4394,10 @@ index 0000000..230ece6
 +});
 diff --git a/spikes/netcode-proof/ops/tests/cloudinit.test.mjs b/spikes/netcode-proof/ops/tests/cloudinit.test.mjs
 new file mode 100644
-index 0000000..5fd179d
+index 0000000..9da7c6f
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/cloudinit.test.mjs
-@@ -0,0 +1,249 @@
+@@ -0,0 +1,251 @@
 +// Test 1 (u8-brief.md rev 1.1 section 3): the two cloud-init files.
 +import assert from "node:assert/strict";
 +import { execFileSync } from "node:child_process";
@@ -4520,7 +4552,7 @@ index 0000000..5fd179d
 +        assert.match(l, /runuser -u (npt|npt-build) -- /, `root touches a home path as itself (SEC-SB-2, -6): ${l.trim()}`);
 +      }
 +    }
-+    for (const l of fb.split("\n").filter((x) => /\bcurl\b/.test(x))) assert.match(l, /--max-time \d+/, `INF-SB-2: ${l.trim()}`);
++    for (const l of fb.split("\n").filter((x) => /\bcurl\b/.test(x))) assert.match(l, /--max-time \d+ .*--speed-limit \d+ --speed-time \d+/, `INF-SB-2, INF-R2-4: ${l.trim()}`);
 +    for (const l of fb.split("\n").filter((x) => /\bgit\b.* fetch /.test(x))) {
 +      assert.match(l, /-c http\.lowSpeedLimit=\d+ -c http\.lowSpeedTime=\d+/, `INF-SB-2: ${l.trim()}`);
 +    }
@@ -4528,6 +4560,8 @@ index 0000000..5fd179d
 +    const fetches = [/\n\s*git\b[^\n]* fetch /, /\n\s*curl --/, /\n\s*unattended-upgrade /].map((r) => fb.search(r)).filter((i) => i >= 0);
 +    assert.ok(fp > 0 && fetches.every((i) => fp < i), "F12: the console fingerprint step comes before any fetch");
 +    assert.match(fb, /> \/etc\/issue\.d\/50-npt-hostkeys\.issue\n\s*agetty --reload/);
++    const dir = fb.indexOf("\ninstall -d -o root -g root -m 0755 /etc/issue.d ");
++    assert.ok(dir > 0 && dir < fb.indexOf("> /etc/issue.d/"), "SEC-R2-1: the folder is made before the write (24.04 has none)");
 +    if (role === "rs") {
 +      assert.ok(fb.indexOf("command -v dig tcpdump") > 0 && fb.indexOf("command -v dig tcpdump") < fb.indexOf("root-owned clone"), "INF-SB-8");
 +      const nft = heredoc(cfg.bootcmd.join("\n"), "NFT");
@@ -4744,10 +4778,10 @@ index 0000000..a0915a9
 +}
 diff --git a/spikes/netcode-proof/ops/tests/operator.test.mjs b/spikes/netcode-proof/ops/tests/operator.test.mjs
 new file mode 100644
-index 0000000..e6cad19
+index 0000000..4a8ef4c
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/operator.test.mjs
-@@ -0,0 +1,167 @@
+@@ -0,0 +1,188 @@
 +// The operator files (u8-brief.md rev 1.1 Blocks 7 and 8; plan.md:1308-1345; C1, C8, L2): the settings' rule forms,
 +// the prompt's required steps, and the pre-push hook run against a throwaway repository.
 +import assert from "node:assert/strict";
@@ -4793,16 +4827,37 @@ index 0000000..e6cad19
 +  }
 +  for (const tool of ["Bash", "PowerShell"]) {
 +    for (const want of [`git push *:refs/heads/${BRANCH}*`, "git push *:refs/heads/cs/*", "git push --no-verify*",
-+      "git push * --no-verify*", "git -c *", "git config core.hooksPath *"]) {
++      "git push * --no-verify*", "git config core.hooksPath *"]) {
 +      assert.ok(deny.includes(`${tool}(${want})`), `${tool}(${want})`);
 +    }
 +  }
++  // SEC-R2-3: Bash keeps `git -c *`; PowerShell's case-insensitive rules name the hooksPath key, in both positions.
++  for (const want of ["Bash(git -c *)", "PowerShell(git -c *hookspath*)", "PowerShell(git * -c *hookspath*)"]) assert.ok(deny.includes(want), want);
++  assert.ok(!deny.includes("PowerShell(git -c *)"), "it would deny `git -C <run> …`");
 +  for (const want of ["claude --version", "v2.1.257", "git config --get core.hooksPath", ".gate\\npt-run-links\\"]) {
 +    assert.ok(prompt.includes(want), want);
 +  }
 +  for (const want of ["`permissions.blockReadsOutsideWorkingDirectories: true`", "a search that names no\n  file, a script that opens files itself, and no sandbox on native Windows",
 +    "the operator key's passphrase, with the key held in\n  Windows' ssh-agent from Stop B", "`refs/heads/claude/npt-results`"]) {
 +    assert.ok(rules.includes(want), want);
++  }
++});
++
++test("3.6 SEC-R2-3: no deny matches the prompt's own git commands (PowerShell's rules case-insensitively)", () => {
++  // A rule's `*` matches any text; PowerShell's matching is case-insensitive (code.claude.com/docs/en/permissions).
++  const hits = (rule, cmd) => {
++    const [, tool, pat] = rule.match(/^(Bash|PowerShell)\((.*)\)$/) ?? [];
++    const re = new RegExp(`^${pat?.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replaceAll("*", ".*")}$`, tool === "PowerShell" ? "i" : "");
++    return tool !== undefined && re.test(cmd);
++  };
++  const cmds = [...prompt.matchAll(/`(git [^`]+)`/g)].map((m) => m[1]);
++  assert.ok(cmds.filter((c) => c.startsWith("git -C ")).length >= 2, "start check 4's two `git -C` reads");
++  // §6.2's results push in its PowerShell form (an ask, never a deny), and the hooksPath forms the denies must still stop.
++  for (const cmd of [...cmds, String.raw`git -C .gate\npt-results push origin claude/npt-results`]) {
++    assert.deepEqual(deny.filter((r) => hits(r, cmd)), [], cmd);
++  }
++  for (const cmd of ["git -c core.hooksPath=x push", "git -C . -c CORE.HOOKSPATH=x push"]) {
++    assert.ok(deny.some((r) => r.startsWith("PowerShell") && hits(r, cmd)), `PowerShell still denies ${cmd}`);
 +  }
 +});
 +
@@ -5128,10 +5183,10 @@ index 0000000..c10c13b
 +});
 diff --git a/spikes/netcode-proof/ops/tests/r1sh.test.mjs b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
 new file mode 100644
-index 0000000..29f5f6e
+index 0000000..877326a
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
-@@ -0,0 +1,654 @@
+@@ -0,0 +1,709 @@
 +// Test 7 (U8's fix pass, advisor-u6c-brief.md section 5 items 4, 5, 8 and 10): r1.sh's settings writers and the
 +// probe's presence check, run in bash on their real text (each function cut from r1.sh, beside stubs for the VM's
 +// reads), with fixture logs. Writes only under a temporary folder, and under NPT_R1_TREE when the caller sets it (3.1's
@@ -5174,10 +5229,10 @@ index 0000000..29f5f6e
 +  const prelude = [
 +    "set -euo pipefail",
 +    `. "${LIB}"`,
-+    consts("TICK", "PROBE_LEGS", "PROBE_TOTAL_S"),
++    consts("TICK", "PROBE_LEGS", "PROBE_TOTAL_S", "CALIBRATE_S"),
 +    `STATE="${dir}/state" B="${dir}/bringup" RUN="${dir}/run" R="${dir}/results" HASH="${dir}/hash"`,
 +    "ROOMS=/var/lib/npt/rooms BIN=/opt/npt/bin ATT=''",
-+    "OPENED=()",
++    "OPENED=() LGK=()",
 +    'die() { printf "die: %s\\n" "$*" >&2; exit 2; }',
 +    `rs_ip() { printf '%s\\n' ${ADDR.rs}; }`,
 +    `lg_ip() { printf '%s\\n' ${ADDR.lg}; }`,
@@ -5316,7 +5371,7 @@ index 0000000..29f5f6e
 +  // npt-load ends at duration_s: stdin stays /dev/null under npt-load-ctl; READY gates the DelayStream self-test's mark.
 +  assert.match(text("sbin/npt-load-ctl"), /\n {4}setsid "\$BIN" "\$BASE\/run\/load-\$NN\.json" < \/dev\/null > /);
 +  assert.match(fn("ds_selftest"), /\n  lg_block "\$d" 05 ds run ws\n/);
-+  assert.match(fn("load_ready"), /got=\$\(lg "log \$1" \|\| true\)\n {4}grep -qx READY <<< "\$got" && return 0/);
++  assert.match(fn("load_ready"), /got=\$\(LG_BOUND=\$left lg "log \$1" \|\| true\)\n {4}grep -qx READY <<< "\$got" && return 0/);
 +  assert.doesNotMatch(R1, /load_up \d\d bots /, "no `bots` mode left");
 +});
 +
@@ -5349,8 +5404,8 @@ index 0000000..29f5f6e
 +      assert.ok(["room", "probe"].includes(s.mode), "C1 (b): room or probe");
 +      assert.equal(s.tick_vcpu === null, s.io_vcpus.length === 0, "tick_vcpu and io_vcpus: both or neither");
 +      assert.ok(!s.io_vcpus.includes(s.tick_vcpu) && s.io_threads >= 1 && s.io_threads <= 64);
-+      const ms = { headers: 300000, calibrate: 300000, ds: 420000 }[k[1]] ?? 0;
-+      assert.ok(s.clients >= 1 && s.clients <= 48 && s.duration_ms === ms, "LG rooms end at their duration; the rest held");
++      const ms = { headers: 300000, ds: 420000 }[k[1]] ?? 0;
++      assert.ok(s.clients >= 1 && s.clients <= 48 && s.duration_ms === ms, "measured LG rooms end at their duration; the rest held");
 +      assert.equal(s.log, `/var/lib/npt/rooms/room-${k[0]}${k[2] ?? ""}.jsonl`);
 +      assert.ok(Array.isArray(s.marks) && s.marks.every((m) => /^PM-\d{4}-\d{1,3}$/.test(m)));
 +      assert.equal(s.run, `R1-${s.set.slice(3)}-${k[0]}${k[2] ?? ""}`, "each start its own run");
@@ -5464,7 +5519,13 @@ index 0000000..29f5f6e
 +        const s = JSON.parse(readFileSync(join(dir, "run", `room-${nn}.json`), "utf8"));
 +        const calls = readFileSync(trace, "utf8").trim().split("\n");
 +        const lgS = Number(calls.find((c) => c.startsWith("load_up")).split(" ").at(-1));
-+        assert.ok(s.duration_ms > 0 && s.duration_ms / 1000 + 30 <= lgS, `${kind}: the room ends at least 30 s before LG`);
++        if (kind === "calibrate") {
++          // NC-R2-3: no mark, its summary over LG's whole run: the room has no duration and outlives LG's 300 s.
++          assert.ok(s.duration_ms === 0 && lgS === 300, "calibrate: a held room, LG 300 s");
++          if (ready === 0) assert.equal(calls.at(-2), "load_wait 03 360", "calibrate: LG's whole run awaited, then the room down");
++        } else {
++          assert.ok(s.duration_ms > 0 && s.duration_ms / 1000 + 30 <= lgS, `${kind}: the room ends at least 30 s before LG`);
++        }
 +        const by = Number(calls.find((c) => c.startsWith("load_ready")).split(" ").at(-1));
 +        const warm = s.warmup_ticks / s.tick_hz;
 +        assert.ok(warm === 60 && by <= warm - 10 && by >= warm - 12, `${kind}: READY due 10 s before the warm-up's end (${by} s)`);
@@ -5473,11 +5534,21 @@ index 0000000..29f5f6e
 +          assert.deepEqual(calls.slice(-2).map((c) => c.split(" ")[0]), ["load_wait", "room_down"], `${kind}: LG's end, then down`);
 +          assert.ok(!invalid);
 +        } else {
-+          assert.deepEqual(calls.slice(-2), [`lg stop ${nn}`, `room_down ${nn}`], `${kind}: no READY: LG stopped, room down`);
++          assert.deepEqual(calls.slice(-2), [`room_down ${nn}`, `lg stop ${nn}`], `${kind}: no READY: room down, then LG (NC-R2-2)`);
 +          assert.ok(invalid && !calls.some((c) => c.startsWith("load_wait")), `${kind}: before any measured tick`);
 +        }
 +      }
 +    }
++    // NC-R2-2: each READY poll is bounded by the time left (a clock read per poll: 1000, 1001, …; deadline 1003).
++    const polls = join(dir, "polls");
++    const clock = `date() { local n; n=$(cat ${dir}/clock 2> /dev/null || echo 0); echo $((n + 1)) > ${dir}/clock; echo $((1000 + n)); }
++sleep() { :; }; lg() { echo "\${LG_BOUND:-none} $1" >> ${polls}; [ "$READY" = 0 ] || echo READY; }`;
++    assert.throws(() => r1bash(dir, ["load_ready"], `${clock}\nREADY=0 load_ready 03 1003`));
++    assert.deepEqual(readFileSync(polls, "utf8").trim().split("\n"), ["3 log 03", "2 log 03", "1 log 03"], "the bound shrinks");
++    rmSync(join(dir, "clock"));
++    assert.equal(r1bash(dir, ["load_ready"], `${clock}\nREADY=1 load_ready 03 1003 && echo up`).trim(), "up");
++    const lgCalls = r1bash(dir, ["lg"], 'timeout() { echo "timeout $1 $2"; }; ssh() { echo ssh; }; lg "log 03"; LG_BOUND=4 lg "log 03"');
++    assert.deepEqual(lgCalls.trim().split("\n"), ["ssh", "timeout 4 ssh"], "unbounded, or timeout over the whole ssh call");
 +  });
 +});
 +
@@ -5548,9 +5619,12 @@ index 0000000..29f5f6e
 +    writeFileSync(join(dir, "block"), `echo "$1" >> "${dir}/ran"\n`);
 +    const pre = `${consts("SERVER_CHAIN", "BITES_CHAIN", "TIMING_BLOCKS")}\nSELF="${dir}/block"\ndeadline_ok() { true; }\nstamp() { echo T; }`;
 +    r1bash(dir, ["busy", "chain_run"], `${pre}\nchain_run server\nchain_run bites`);
-+    assert.deepEqual(readFileSync(join(dir, "ran"), "utf8").trim().split("\n"), ["calibrate", "s14"], "calibrate and s14 still run");
++    // NC-R2-5: the skip is exactly the blocks whose judged work runs on the tick vCPU.
++    assert.deepEqual(readFileSync(join(dir, "ran"), "utf8").trim().split("\n"), ["probe", "calibrate", "starts", "s14"], "the rest run");
 +    assert.equal(readFileSync(join(dir, "results", "chain", "bites.ended"), "utf8"), "chain bites ended T\n", "the end on exit");
-+    for (const t of ["headers", "probe", "starts", "ds-selftest", "bites"]) {
++    assert.ok(!["probe", "starts"].some((t) => existsSync(join(dir, "results", t))), "no NOT-RUN record for a block that ran");
++    assert.ok(!["probe", "starts"].some((b) => fn(b).includes("timing_invalid")), "and no INVALID-alone record either");
++    for (const t of ["headers", "ds-selftest", "bites"]) {
 +      assert.match(readFileSync(join(dir, "results", t, "NOT-RUN.txt"), "utf8"), /^not run: alone 0 \(C1\)/, t);
 +      assert.ok(readdirSync(join(dir, "results", t)).includes("alone-tasks.txt"), `${t}: the task list beside it`);
 +      assert.match(readFileSync(join(dir, "results", "chain", `${t}.stopped`), "utf8"), /not run: alone 0/);
@@ -5675,7 +5749,31 @@ index 0000000..29f5f6e
 +    assert.equal(list(nine.slice(1)).ok, false, "one missing");
 +    assert.match(list([...nine.slice(0, 8), "    (ALL : ALL) ALL"]).out, /extra: \(ALL : ALL\) ALL/);
 +    assert.equal(list([`    (root) NOPASSWD: ${nine.map((l) => l.split("NOPASSWD: ")[1]).join(", ")}`]).ok, true, "one merged line read alike");
++    // SEC-R2-2: the list as sudo 1.9.15p5 writes it to a regular file, lbuf.c's wrap at 80 columns (the break at the
++    // last space that fits, continuations indented 8 and given 72): the peers and rooms lines split, so it must stop.
++    const wrap = (line, cols = 80, indent = 8) => {
++      const out = [];
++      for (let cp = 0, have = cols; ; have = cols - indent) {
++        let need = line.length - cp;
++        let ep = -1;
++        if (need > have) {
++          ep = line.lastIndexOf(" ", cp + have - 1);
++          if (ep < cp) ep = line.indexOf(" ", cp + have);
++          if (ep >= 0) need = ep - cp;
++        }
++        out.push(`${cp ? " ".repeat(indent) : ""}${line.slice(cp, cp + need)}`);
++        if (ep < 0) return out;
++        for (cp = ep; line[cp] === " "; cp++);
++      }
++    };
++    // The model against this container's sudo 1.9.15p5 (u8-build.md 3.3): its Defaults line (indent 4), into a file.
++    const sp = String.raw`secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin,`;
++    assert.deepEqual(wrap(`    env_reset, mail_badpass, ${sp} use_pty`, 80, 4), ["    env_reset, mail_badpass,", `    ${sp}`, "    use_pty"]);
++    const wrapped = nine.flatMap((l) => wrap(l));
++    assert.equal(wrapped.length, 11, "two of the nine are over 80 columns: peers and rooms");
++    assert.equal(list(wrapped).ok, false, "a wrapped list stops bring-up");
 +  });
++  assert.match(fn("bringup"), /\n {2}sudo -n -l \| cat > "\$d\/sudo-l\.txt"\n/, "SEC-R2-2: the list through a pipe, never wrapped");
 +  assert.match(fn("bringup"), /sudo_exact "\$d\/sudo-l\.txt" "\$SPIKE\/ops\/sbin\/sudoers\.d\/npt" > "\$d\/sudo-exact\.txt" \\\n {4}\|\| die/);
 +});
 +
@@ -5784,6 +5882,18 @@ index 0000000..29f5f6e
 +    assert.notEqual(JSON.parse(kept.at(-1)).k, "footer", "run s30-2's LG log has no footer: INVALID by the complete rule");
 +    writeFileSync(join(bad, "s30-2-lg.jsonl"), LG2.slice(0, -20));
 +    assert.throws(() => judge(bad), (e) => /s30-2-lg\.jsonl: line 4: not one JSON record/.test(e.stdout), "the copy as fetched fails");
++  });
++});
++
++test("3.8 NC-R2-6: LG's stdout copy carries -aN; a block that dies after LG's start stops LG and keeps its copies", () => {
++  withTemp((dir) => {
++    const trace = join(dir, "trace");
++    const stub = `stamp() { echo T; }\nroom_down() { :; }\nlg() { echo "lg $1" >> ${trace}; [ "$1" != "npt-log 03" ] || head -n 3 "${join(FIX4, "s30-1-lg.jsonl")}"; }`;
++    const run = `block_start calibrate\nblock_start calibrate\nLGK=("$R/calibrate" 03)\ndie "a block dies"`;
++    assert.throws(() => r1bash(dir, ["block_start", "down_all", "save_log", "lg_keep"], `${stub}\n${run}`), /a block dies/);
++    assert.deepEqual(readFileSync(trace, "utf8").trim().split("\n"), ["lg stop 03", "lg log 03", "lg npt-log 03"], "on exit");
++    const kept = readdirSync(join(dir, "results", "calibrate")).filter((f) => f.startsWith("load-")).sort();
++    assert.deepEqual(kept, ["load-03-a2.jsonl", "load-03-a2.log"], "the second attempt's names: no copy overwritten");
 +  });
 +});
 diff --git a/spikes/netcode-proof/ops/tests/redact.test.mjs b/spikes/netcode-proof/ops/tests/redact.test.mjs
