@@ -19,7 +19,7 @@
   main and is never switched, so every push names its target (`git push origin cs/ci-wasm:claude/loving-hopper-6p0mg2`),
   and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: not
   opened yet** (this chat has no GitHub write tool: see "Open findings", GH-TOOLS); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 17:03 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 17:17 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -265,7 +265,21 @@ write's exact text is in this chat; no Critical, no High; its APPROVE of plan re
 wording fixes D1 to D3 are made in `docs/DECISIONS.md` by script. **No CI file is written yet: `.github/` equals
 main's.**
 
-**How each of the three CI writes goes (the advisor agent's rulings; his points 6 and 7):**
+**17:15:07 UTC: his answers** (`ci-wasm/mustafa-2026-11-23T171507-ci-write-1.md`, by script, with the chat's ask of
+17:04:48 UTC): **CI-WRITE-1 (a), yes**; his point 3, the mode for all three writes: write on `acceptEdits`, write on
+`default` too and name the value in the report, any other value: no write and he is told the value; **GH-TOOLS (a)**
+for this pull request (he opens the draft, presses Ready and Merge himself; for the merge: the advisor agent approves
+the full SHA, gate, smoke and toolchain green on it, nothing pushed after that approval, the chat gives him the full
+SHA when it asks for his go, he types his go here before he presses Merge, his main Advisor checks the head: that
+stands in for the "expected head" part of his point 9). **Not written: the record on that message read `auto`** (the
+session record at 17:15 UTC, mode sequence 11 as at 16:30, and the `permissionMode` on his message in the transcript),
+although he wrote that he had switched to Accept edits. **No pull request from the branch was on GitHub** at 17:15:33
+UTC (the newest is #63); his point 1 left the number open ("#__"). Checks on dba8219, push: gate and smoke success
+(run 45223537817), toolchain success (run 45223537844). Told to him; waiting for a new typed message of his with the
+mode switched, and for the draft. His message of 17:15:07 UTC goes into `docs/DECISIONS.md` with the next docs write
+(`decisions-3.mjs`).
+
+**How each of the three CI writes goes (the advisor agent's rulings; his points 6 and 7; his point 3 of 17:15:07 UTC on `default`):**
 - **One ask per write, right before it:** the exact text and the sha256 the file will have, then stop. Write 1: the
   whole `ci-edit.diff` (the file his CI-TEXT (a) answered; after it d1dbcb53...975c). Write 2: P-GH's two lines with
   their place (12b90249...12ef). Write 3: their take-back (d1dbcb53...975c). A guard prompt is not his yes.
