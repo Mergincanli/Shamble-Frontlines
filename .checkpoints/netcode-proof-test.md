@@ -77,16 +77,16 @@
   NR2-U6A-2, F28, and the valve (Block 5's reader stamp and BudgetX2 last; past 5,400 they wait for U6e if R1 reads neither).
 - **Next 1:** U6b's return: snapshot, its one round (netcode, test, security: transports face the internet), fixes, merge.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
-- **07:1x, Stop B's round started** (U8's one round, lever (2), advisor-u6c-brief.md:195-197; on snapshot 60205020 in
-  the fix-pass worktree): security and netcode seats (xhigh), files u8-stopb-security.md, u8-stopb-netcode.md.
+- **07:1x, Stop B's round started** (U8's one round, lever (2), advisor-u6c-brief.md:195-197) on snapshot 60205020.
 - **07:1x, SEC-F26-1 DONE at 07d5d31** (test only, 4 asserts in rct's F26 test; plants A, B fail by name on a scratch
   copy, restored, rc 2609bc87 unchanged; redact PASS 11/11, 351 items, 0 findings; gate PASS); CI no failure, 07:17.
-- **07:3x, Stop B's netcode seat DONE: REVISE** (u8-stopb-netcode.md, read in full): 4 High (NC-SB-1 the judge reads
-  only *.jsonl, R1's logs are *.log: checked, judge/src/lib.rs:18-33 vs r1.sh:160; -2 the LG rooms' measured window
-  outlives the load, duration_ms 0: checked; -3 the probe's six legs share one run id; -4 S14's kernel sample too small
-  for a p99), 8 Medium, 7 Low; Q1 (is R1's headers run a measured -2 run), Q2 (F9's window), Q3 (S14's power: maybe
-  his). The infra seat started 07:3x in its slot, with two hours questions (NC-SB-2's +30 s blocks, NC-SB-4's 10x S14).
-- **Next 3:** the security and infra seats' returns; then one ruling (all findings, F9, F12, F17, F20, Q1-Q3) and U8's
+- **07:3x, Stop B netcode: REVISE** (u8-stopb-netcode.md, read in full): 4 High (NC-SB-1 judge reads *.jsonl, R1 logs
+  *.log; -2 duration_ms 0, measured window outlives LG: both checked in code; -3 probe legs share a run id; -4 S14 sample
+  too small for p99), 8 Medium, 7 Low; Q1-Q3 (Q3 maybe his). Infra seat started 07:3x, with NC-SB-2's and -4's hours.
+- **07:4x, Stop B security: REVISE** (u8-stopb-security.md; High, Mediums read in full): 1 High (SEC-SB-1 geckodriver on
+  0.0.0.0, no peer check), 4 Medium (-2 root install through a symlink; -3 operator key read unprompted; -4 drivers on
+  all interfaces; -5 no dist hash compare), 6 Low. U6b's notes: F-PING (condition 1) and F-MARK-HDR for its round.
+- **Next 3:** the infra seat's return; then one ruling (all findings, F9, F12, F17, F20, Q1-Q3) and U8's
   fix pass; with Highs open, round 2 on what changed (NPT-TRIM); U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
@@ -155,9 +155,9 @@
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
   .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
-  at its snapshot; resume after its last block marked done); Stop B's security seat af8c5f0fbec829595 (07:1x) and
-  infra seat a0615e1ead860724b (07:3x), each rewriting its file whole per part (resume from its file). Done: Stop B's
-  netcode seat a120f51df9a8f6986 (u8-stopb-netcode.md; its round-2 read by SendMessage); U8's fix-pass
+  at its snapshot; resume after its last block marked done); Stop B's infra seat a0615e1ead860724b (07:3x), rewriting
+  its file whole per part (resume from its file). Done: Stop B's netcode seat a120f51df9a8f6986 and security seat
+  af8c5f0fbec829595 (u8-stopb-netcode.md, -security.md; round-2 reads by SendMessage); U8's fix-pass
   builder ac59cce3e5d002441 (Stop B's fixes by SendMessage); U7's T-builder a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
   seats a9a29bd03da0757ad, a4724cf284e77b73e; security's U7 read aca2c13cc291261c6 (security-u7-deps.md: CLEAR WITH
   CONDITIONS, Lows); U7's advisor check a1caa8c461475ac54; security ab80f7d9c82f327b9 (security-f26.md, -u6c-deps.md).
