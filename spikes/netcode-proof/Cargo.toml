@@ -59,7 +59,9 @@ libm = "=0.2.16"
 # U3: the transports and L2 (plan §4.1's npt-net; PM-0001-35's floors: quinn-proto >= 0.11.18, rustls >= 0.23.46,
 # ring >= 0.17.12, tokio >= 1.54.1; U0 resolved these versions).
 wtransport = "=0.7.2"
-web-transport-quinn = "=0.13.6"
+# U6b's Block 0: its default (aws-lc-rs) off here, since a member's `default-features = false` is honoured only when the
+# workspace entry sets it; npt-net turns on `ring` (security-u6b-deps.md section 2).
+web-transport-quinn = { version = "=0.13.6", default-features = false }
 quinn = "=0.11.12"
 tokio = { version = "=1.54.1", features = ["rt-multi-thread", "net", "time", "sync", "io-util", "macros"] }
 tokio-tungstenite = "=0.30.0"
@@ -73,6 +75,10 @@ tokio-rustls = { version = "=0.26.6", default-features = false, features = ["rin
 # so they run through the library's own adapter. Already in the lock through tokio-tungstenite (the same features it
 # asks for), so no new package; a dev-dependency, so nothing ships. U6's WsServer takes it as a normal dependency.
 futures-util = { version = "=0.3.34", default-features = false, features = ["sink", "std"] }
+# U6b: the room's WebTransport certificate, made at start (u6b-brief.md section 5 (a); security-u6b-deps.md section 2).
+# Default features off (no aws_lc_rs, fips, pem or x509-parser); `ring`, the provider npt-net already has. No package
+# added: rcgen 0.14.10 and what it needs are in the lock through wtransport's self-signed feature.
+rcgen = { version = "=0.14.10", default-features = false, features = ["ring"] }
 
 [workspace.lints.rust]
 # forbid, the compiler backstop (u3c review C2R-1): in a crate that inherits these lints no #[allow] can relax it

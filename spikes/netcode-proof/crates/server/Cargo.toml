@@ -19,7 +19,7 @@ path = "src/main.rs"
 [features]
 # The planted defects (plan §4.7, E19), bites builds only, with those of the crates it calls (PM-0004-67's three in
 # `due_ticks`, U4b: u4-build-plan.md §5).
-bites = ["npt-sim/bites", "npt-proto/bites", "npt-room/bites"]
+bites = ["npt-sim/bites", "npt-proto/bites", "npt-room/bites", "npt-net/bites"]
 
 [dependencies]
 npt-link.workspace = true
@@ -32,6 +32,7 @@ tokio.workspace = true
 sha2.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+rcgen.workspace = true
 
 [dev-dependencies]
 # U4e's Loopback tests run the library against the real client endpoint in npt-server's own tests, never in crates/lab

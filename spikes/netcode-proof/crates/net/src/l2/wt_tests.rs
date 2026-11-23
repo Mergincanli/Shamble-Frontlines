@@ -585,11 +585,23 @@ fn the_test_certificate_is_well_formed() {
     assert!(tls_config(thin, vec![cert], key).is_err());
     #[cfg(feature = "wt-wtq")]
     {
-        let p = rustls::crypto::aws_lc_rs::default_provider();
+        // web-transport-quinn's provider is ring, named directly (U6b's Block 0 turned its aws-lc-rs default off):
+        // a provider() that moved to another crate's default fails here.
+        let groups = |p: &CryptoProvider| p.kx_groups.iter().map(|g| g.name()).collect::<Vec<_>>();
+        let suites = |p: &CryptoProvider| {
+            p.cipher_suites
+                .iter()
+                .map(|s| s.suite())
+                .collect::<Vec<_>>()
+        };
+        let ring = rustls::crypto::ring::default_provider();
+        let p = wtq_server::provider();
+        assert_eq!(groups(&p), groups(&ring));
+        assert_eq!(suites(&p), suites(&ring));
         let (cert, key) = self_signed(&p);
         assert!(
             tls_config(p, vec![cert], key).is_ok(),
-            "aws-lc-rs takes it too"
+            "web-transport-quinn's ring takes it too"
         );
     }
 }

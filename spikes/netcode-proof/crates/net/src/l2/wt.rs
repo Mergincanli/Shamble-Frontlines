@@ -1,9 +1,10 @@
 //! Each WebTransport crate's server on our own quinn endpoint over ImpairSocket (R5-TEST-OQ2: yes for both crates;
 //! the advisor's M7, M8, M9). Used by the loopback tests here and by WtServer at U6.
 //!
-//! - **TLS (M7):** each feature builds its own rustls server configuration with `builder_with_provider` and its own
-//!   crate's provider (wtransport: ring, its default; web-transport-quinn: aws-lc-rs, its default), never the process
-//!   default, so an `--all-features` build has no dual-provider panic; TLS 1.3 only; ALPN `h3` set explicitly
+//! - **TLS (M7):** each feature builds its own rustls server configuration with `builder_with_provider` and the
+//!   ring provider (wtransport's default; web-transport-quinn's `ring` feature since U6b's Block 0 turned its default,
+//!   aws-lc-rs, off), never the process default, so an `--all-features` build has no dual-provider panic; TLS 1.3
+//!   only; ALPN `h3` set explicitly
 //!   (wtransport's `with_custom_tls*` sets none); TLS13_AES_128_GCM_SHA256 checked present (quinn's QUIC initial
 //!   suite, which wtransport's `build()` expects). The wt-wtq path never touches wtransport.
 //! - **Transport:** quinn's defaults, as each crate's own builder has them, datagrams enabled (wtransport panics on
@@ -174,9 +175,9 @@ pub(crate) mod wtq_server {
     use super::*;
     use tokio::sync::mpsc;
 
-    /// The crate's own provider: aws-lc-rs (its default feature).
+    /// The provider: ring, named explicitly (U6b's Block 0 turned the crate's default, aws-lc-rs, off).
     pub(crate) fn provider() -> rustls::crypto::CryptoProvider {
-        rustls::crypto::aws_lc_rs::default_provider()
+        rustls::crypto::ring::default_provider()
     }
 
     /// The endpoint and server configurations, built directly (as the crate's own builder does), with our TLS (M7),

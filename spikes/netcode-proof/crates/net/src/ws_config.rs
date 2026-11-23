@@ -1,7 +1,7 @@
 //! The WebSocket server's configurations (u3c-plan.md 1.1 and 1.2; C6, C7):
 //! - **TLS** (M16; Mustafa's U3-Q5: tokio-rustls pinned in U3, audited at U5, plan §4.8): tokio-rustls 0.26.6 over the
 //!   pinned rustls 0.23.46, the ring provider chosen explicitly for this configuration with `builder_with_provider`
-//!   (never a process default, so it lives beside wt-wtq's aws-lc-rs and wtransport's ring in one process: M7), TLS 1.3
+//!   (never a process default: M7; since U6b's Block 0, ring is the one provider in the process, wt-wtq's too), TLS 1.3
 //!   only, ALPN `http/1.1`. Ring because it is the one provider npt-net always has (quinn's default rustls-ring).
 //!   DelayStream sits above the stream it makes, tokio-tungstenite above DelayStream (U3-Q4 (b)).
 //! - **tungstenite** (the catalogue, docs/design/netcode-proof-messages.md:61-78): one source for the size limits,

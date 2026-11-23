@@ -13,6 +13,10 @@ workspace = true
 # One WebTransport crate per feature, swappable behind npt-link (PM-0001-35), pinned in the workspace.
 wt-wtransport = ["dep:wtransport"]
 wt-wtq = ["dep:web-transport-quinn"]
+# U6b: the runs carry one WebTransport crate, web-transport-quinn (the re-plan), so it is the default; `bites` marks the
+# planted defects (plan §4.7), on only in bites builds.
+default = ["wt-wtq"]
+bites = []
 
 [dependencies]
 npt-link.workspace = true
@@ -32,8 +36,6 @@ tokio-rustls.workspace = true
 # wtransport's `quinn` feature (no new dependency, so Cargo.lock is unchanged) opens
 # IncomingSessionFuture::with_quic_incoming: the session accepted from our own quinn endpoint over ImpairSocket (M8).
 wtransport = { workspace = true, optional = true, features = ["quinn"] }
-web-transport-quinn = { workspace = true, optional = true }
-
-[dev-dependencies]
-# The loopback tests drive tokio-tungstenite's own Sink and Stream (the advisor's ruling of 2026-11-08).
+web-transport-quinn = { workspace = true, optional = true, features = ["ring"] }
+# tokio-tungstenite's own Sink and Stream: the loopback tests' since 2026-11-08, U6's WsServer's from U6b on.
 futures-util.workspace = true
