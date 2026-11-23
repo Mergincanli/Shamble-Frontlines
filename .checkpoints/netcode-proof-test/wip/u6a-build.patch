@@ -506,10 +506,10 @@ index eef3695..2ac932a 100644
  pub use schedule::{Dropped, Due, LoopCounters, Schedule, due_ticks};
 +pub use tick_loop::{LoopSettings, TickLoop};
 diff --git a/spikes/netcode-proof/crates/server/src/main.rs b/spikes/netcode-proof/crates/server/src/main.rs
-index a4d10bb..5900fd7 100644
+index a4d10bb..9159fad 100644
 --- a/spikes/netcode-proof/crates/server/src/main.rs
 +++ b/spikes/netcode-proof/crates/server/src/main.rs
-@@ -1,6 +1,744 @@
+@@ -1,6 +1,808 @@
 -//! npt-server's thin binary: starts one room process (built in unit U6).
 +//! npt-server's binary: the room process (u6a-brief.md Block 3, S8a; plan E2; U6-Q17 term (2): the binary's settings,
 +//! lifecycle, panic catch and non-zero exit are U6a's, the WebTransport certificate U6b's).
@@ -524,8 +524,9 @@ index a4d10bb..5900fd7 100644
 +//! 4. the end: the settings' duration, or stdin closing (no tokio `signal` feature: SEC-U6AD-1), or the tick thread
 +//!    ending after a panic.
 +//!
-+//! Exit 0 after a clean end, 2 for bad settings (or a token or log file that already exists), 3 after a crash, 1 for
-+//! any other failure. U6a binds and listens on no socket (SEC-U6AD-4): U6b's transports join here.
++//! Exit 0 after a clean end, 2 for bad settings (or a token or log file that already exists, or an I/O vCPU on an SMT
++//! sibling of the tick vCPU on this machine's map: Q-U6A-5, refused before step 1), 3 after a crash, 1 for any other
++//! failure. U6a binds and listens on no socket (SEC-U6AD-4): U6b's transports join here.
  
 -fn main() {
 -    eprintln!("npt-server: not built yet (unit U6)");
@@ -941,8 +942,24 @@ index a4d10bb..5900fd7 100644
 +    run(checked)
 +}
 +
++/// Q-U6A-5 (NR-U6A-2): the refusal's line when the settings pin and an I/O vCPU is an SMT sibling of the tick vCPU on
++/// `smt` (this machine's map); none otherwise.
++fn sibling_refusal(s: &Settings, smt: &[Vec<u32>]) -> Option<String> {
++    let t = s.tick_vcpu?;
++    TickLoop::io_on_a_tick_sibling(smt, t, &s.io_vcpus).then(|| {
++        format!(
++            "io_vcpus {:?} hold an SMT sibling of tick_vcpu {t} on this machine",
++            s.io_vcpus
++        )
++    })
++}
++
 +/// The start, the run and the end (the module text, steps 1 to 4).
 +fn run(c: Checked) -> ExitCode {
++    let machine = local_machine(&c.settings);
++    if let Some(why) = sibling_refusal(&c.settings, &machine.smt) {
++        return fail(EXIT_SETTINGS, &why);
++    }
 +    let n = c.settings.clients as usize;
 +    let tokens = match mint(n) {
 +        Ok(t) => t,
@@ -960,7 +977,6 @@ index a4d10bb..5900fd7 100644
 +        Ok(s) => s,
 +        Err(e) => return fail(EXIT_FAILED, &format!("the binary's SHA-256: {e}")),
 +    };
-+    let machine = local_machine(&c.settings);
 +    let smt = machine.smt.clone();
 +    let header = header(&c, sha, machine);
 +    let file = match OpenOptions::new()
@@ -1006,10 +1022,10 @@ index a4d10bb..5900fd7 100644
 +    tl.event(cpu_read(&s.first_cpu_model, &cpu));
 +    println!("OPEN");
 +    if io::stdout().flush().is_err() {
-+        return finish(tl, EXIT_FAILED);
++        return finish(tl);
 +    }
 +    wait(&tl, s.duration_ms);
-+    finish(tl, EXIT_FAILED)
++    finish(tl)
 +}
 +
 +/// Waits for the end: the duration (when set), stdin closing, or the tick thread ending.
@@ -1043,12 +1059,23 @@ index a4d10bb..5900fd7 100644
 +    }
 +}
 +
-+/// Stops the loop and maps how it ended to the exit code (`failed` for a log that could not be finished).
-+fn finish(tl: TickLoop, failed: u8) -> ExitCode {
-+    match tl.stop() {
-+        Ok(Ended::Clean) => ExitCode::SUCCESS,
-+        Ok(_) => fail(EXIT_CRASH, "the room crashed (a panic on the tick thread)"),
-+        Err(e) => fail(failed, &format!("the log: {e}")),
++/// How the loop ended, as the exit code (the module text): 0 after a clean end, 3 after a crash, 1 for a log that
++/// could not be finished (TR-U6A-6).
++fn exit_code(ended: &io::Result<Ended>) -> u8 {
++    match ended {
++        Ok(Ended::Clean) => 0,
++        Ok(_) => EXIT_CRASH,
++        Err(_) => EXIT_FAILED,
++    }
++}
++
++/// Stops the loop and exits with [`exit_code`], one stderr line for a non-zero one.
++fn finish(tl: TickLoop) -> ExitCode {
++    let ended = tl.stop();
++    match (exit_code(&ended), ended) {
++        (0, _) => ExitCode::SUCCESS,
++        (code, Err(e)) => fail(code, &format!("the log: {e}")),
++        (code, Ok(_)) => fail(code, "the room crashed (a panic on the tick thread)"),
 +    }
 +}
 +
@@ -1202,6 +1229,14 @@ index a4d10bb..5900fd7 100644
 +        std::fs::remove_file(&path).expect("removed");
 +    }
 +
++    /// TR-U6A-6: the binary's exit by how the loop ended (the module text): clean 0, a crash 3, a log not finished 1.
++    #[test]
++    fn s8a_the_exit_code_is_0_clean_3_after_a_crash_and_1_for_a_log_not_finished() {
++        assert_eq!(exit_code(&Ok(Ended::Clean)), 0);
++        assert_eq!(exit_code(&Ok(Ended::Crash)), 3);
++        assert_eq!(exit_code(&Err(io::Error::other("the log"))), 1);
++    }
++
 +    #[test]
 +    fn s4_cpu_read_changed_is_1_only_when_the_model_differs_from_the_first_starts() {
 +        let changed = |first: &str, now: &str| cpu_read(first, now).f["changed"].clone();
@@ -1253,16 +1288,45 @@ index a4d10bb..5900fd7 100644
 +            assert_eq!(p["weapon_spread_urad"], w.spread_urad);
 +            assert_eq!(p["soldier_health_count"], c.scene.health());
 +            assert_eq!(p["stand_ins"], serde_json::json!([]));
++            // F4: no CPU stand-in burns at U6a (TR-U6A-8).
++            assert_eq!(p["stand_in_burn_ns"], 0);
++            assert_eq!(p["stand_in_top_up_ns"], 0);
 +            assert_eq!(p["cmd_timing"], "A");
 +            Writer::new(Vec::new(), &h).expect("npt-log takes the header");
 +        }
 +    }
++
++    /// Q-U6A-5 (NR-U6A-2), on a fixed 2-thread map: an I/O vCPU on the tick vCPU's SMT sibling is refused (exit 2's
++    /// line, `run` returning before the tokens); I/O vCPUs on other cores, or no pinning, are not.
++    #[test]
++    fn s4_an_io_vcpu_on_the_tick_vcpus_smt_sibling_is_refused() {
++        let smt = [vec![0, 4], vec![1, 5], vec![2, 6], vec![3, 7]];
++        let pinned = |io: serde_json::Value| {
++            parse_settings(&settings(|v| {
++                v["tick_vcpu"] = 3.into();
++                v["io_vcpus"] = io;
++            }))
++            .expect("taken")
++            .settings
++        };
++        let why = sibling_refusal(&pinned(serde_json::json!([1, 7])), &smt);
++        assert!(
++            why.is_some_and(|w| w.contains("SMT sibling of tick_vcpu 3")),
++            "7 is 3's sibling"
++        );
++        assert_eq!(
++            sibling_refusal(&pinned(serde_json::json!([1, 2])), &smt),
++            None
++        );
++        let unpinned = parse_settings(&settings(|_| {})).expect("taken").settings;
++        assert_eq!(sibling_refusal(&unpinned, &smt), None);
++    }
  }
 diff --git a/spikes/netcode-proof/crates/super/src/main.rs b/spikes/netcode-proof/crates/super/src/main.rs
-index 1e3456c..9dea260 100644
+index 1e3456c..025f6ed 100644
 --- a/spikes/netcode-proof/crates/super/src/main.rs
 +++ b/spikes/netcode-proof/crates/super/src/main.rs
-@@ -1,8 +1,531 @@
+@@ -1,8 +1,612 @@
  //! npt-super: the supervisor stand-in (plan E2, E16; §10.2): unprivileged, it starts, stops and kills room processes
  //! through systemd template units by npt's fixed sudo wrappers, times each start to Open, and logs every exit.
 -//! Built in unit U6.
@@ -1280,7 +1344,8 @@ index 1e3456c..9dea260 100644
 +//! its `spawn_to_open_ns`. The room's command takes its path and arguments as separate values, no shell (SEC-U6AD-6);
 +//! its stdout is read a bounded line at a time; its stderr goes to npt-super's stderr, never into the log. npt-super
 +//! reaches no sim, room or proto code (check.mjs's deps step); its log is npt-log's, process `super`, with this
-+//! machine from `Machine::read_local`.
++//! machine from `Machine::read_local`, and its header carries the run's `--scene`, `--tick-hz` and `--bite` as the
++//! room's does, so the judge reads both logs as one run (eval.rs's same-run check; NR-U6A-1).
  
 -fn main() {
 -    eprintln!("npt-super: not built yet (unit U6)");
@@ -1303,7 +1368,8 @@ index 1e3456c..9dea260 100644
 +const VALUE_MAX: usize = 4_096;
 +const COUNT_MAX: u32 = 1_000;
 +
-+/// What the flags say (the module text); every flag is required but `--deadline-ms`, `--count` and `--marks`.
++/// What the flags say (the module text); every flag is required but `--deadline-ms`, `--count`, `--marks` and
++/// `--bite`.
 +struct Flags {
 +    room: PathBuf,
 +    settings: String,
@@ -1312,6 +1378,9 @@ index 1e3456c..9dea260 100644
 +    deadline: Duration,
 +    header: [String; 12],
 +    marks: Vec<String>,
++    bite: Option<String>,
++    scene: String,
++    tick_hz: u32,
 +}
 +
 +/// The header flags, in [`Flags::header`]'s order.
@@ -1338,6 +1407,7 @@ index 1e3456c..9dea260 100644
 +    let mut deadline = DEADLINE_MS;
 +    let mut header: [Option<String>; 12] = Default::default();
 +    let mut marks = Vec::new();
++    let (mut bite, mut scene, mut tick_hz) = (None, None, None);
 +    let mut it = args.iter();
 +    while let Some(flag) = it.next() {
 +        let value = it.next().ok_or_else(|| format!("{flag} has no value"))?;
@@ -1357,6 +1427,17 @@ index 1e3456c..9dea260 100644
 +                    .map_err(|_| format!("--deadline-ms {value:?}"))?
 +            }
 +            "--marks" => marks = value.split(',').map(str::to_owned).collect(),
++            "--bite" => bite = Some(value.clone()),
++            "--scene" => scene = Some(value.clone()),
++            "--tick-hz" => {
++                tick_hz = Some(
++                    value
++                        .parse::<u32>()
++                        .ok()
++                        .filter(|hz| (1..=1_000).contains(hz))
++                        .ok_or_else(|| format!("--tick-hz {value:?} (1 to 1,000)"))?,
++                )
++            }
 +            f => {
 +                let i = HEADER_FLAGS
 +                    .iter()
@@ -1384,6 +1465,9 @@ index 1e3456c..9dea260 100644
 +        deadline: Duration::from_millis(deadline),
 +        header: header.try_into().map_err(|_| "the header flags")?,
 +        marks,
++        bite,
++        scene: scene.ok_or("--scene is missing")?,
++        tick_hz: tick_hz.ok_or("--tick-hz is missing")?,
 +    })
 +}
 +
@@ -1447,14 +1531,14 @@ index 1e3456c..9dea260 100644
 +            }
 +            .to_owned(),
 +        },
-+        bite: None,
++        // The run's bite, rate and scene, as the room's header has them (NR-U6A-1); npt-super itself runs no ticks.
++        bite: f.bite.clone(),
 +        layer: h[5].clone(),
 +        profile: h[6].clone(),
 +        seed: 0,
-+        // The supervisor runs no ticks.
-+        tick_hz: 0,
++        tick_hz: f.tick_hz,
 +        clients: 0,
-+        scene: String::new(),
++        scene: f.scene.clone(),
 +        process: "super".to_owned(),
 +        slot: 0,
 +        date: h[3].clone(),
@@ -1653,6 +1737,15 @@ index 1e3456c..9dea260 100644
 +        dir
 +    }
 +
++    /// One fake-room test at a time (TR-U6A-4 (c)), held across `fake()` and the room's spawns: a script written while
++    /// another test forks can be held open for writing by that child, and its exec then fails ("Text file busy").
++    static FAKE: std::sync::Mutex<()> = std::sync::Mutex::new(());
++
++    fn one_fake() -> std::sync::MutexGuard<'static, ()> {
++        FAKE.lock()
++            .unwrap_or_else(std::sync::PoisonError::into_inner)
++    }
++
 +    /// A fake room in `dir`: an executable script with `body` (it ignores its arguments; no shell runs it from npt-super,
 +    /// which execs the file by its path).
 +    fn fake(dir: &Path, body: &str) -> PathBuf {
@@ -1663,7 +1756,7 @@ index 1e3456c..9dea260 100644
 +        path
 +    }
 +
-+    fn flags(dir: &Path, room: PathBuf, count: u32, deadline_ms: u64) -> Flags {
++    fn flags(dir: &Path, room: PathBuf, count: u32, deadline_ms: u64, extra: &[&str]) -> Flags {
 +        let mut args: Vec<String> = [
 +            "--room",
 +            room.to_str().expect("utf-8"),
@@ -1677,8 +1770,13 @@ index 1e3456c..9dea260 100644
 +            &deadline_ms.to_string(),
 +            "--marks",
 +            "PM-0001-16",
++            "--scene",
++            "SS",
++            "--tick-hz",
++            "30",
 +        ]
 +        .iter()
++        .chain(extra)
 +        .map(|s| (*s).to_owned())
 +        .collect();
 +        for (i, f) in HEADER_FLAGS.iter().enumerate() {
@@ -1717,17 +1815,19 @@ index 1e3456c..9dea260 100644
 +    /// keeps the room until its own end comes, then records the exit.
 +    #[test]
 +    fn h_time_starts_and_the_hold_form_time_a_fake_room_to_open_and_record_its_exit() {
++        let _one = one_fake();
 +        let dir = folder("fake");
 +        let room = fake(&dir, "sleep 0.2\necho OPEN\ncat > /dev/null");
-+        let f = flags(&dir, room.clone(), 2, 5_000);
++        let f = flags(&dir, room.clone(), 2, 5_000, &[]);
 +        let mut w = log(&f).expect("the log");
 +        time_starts(&f, &mut w).expect("two starts");
 +        let (tx, rx) = channel();
++        // Taken before the ender starts (TR-U6A-4 (d)), so the hold is timed from no later than the ender's clock.
++        let held = Instant::now();
 +        let ender = std::thread::spawn(move || {
 +            std::thread::sleep(Duration::from_millis(300));
 +            let _ = tx.send(());
 +        });
-+        let held = Instant::now();
 +        hold(&f, &mut w, &rx).expect("the held start");
 +        let held = held.elapsed();
 +        ender.join().expect("the ender");
@@ -1764,9 +1864,10 @@ index 1e3456c..9dea260 100644
 +    /// Open, and its exit recorded as non-zero.
 +    #[test]
 +    fn h_a_silent_room_is_killed_at_the_deadline_with_its_elapsed_time_written() {
++        let _one = one_fake();
 +        let dir = folder("silent");
 +        let room = fake(&dir, "exec sleep 30");
-+        let f = flags(&dir, room, 1, 500);
++        let f = flags(&dir, room, 1, 500, &[]);
 +        let mut w = log(&f).expect("the log");
 +        let t0 = Instant::now();
 +        time_starts(&f, &mut w).expect("one start");
@@ -1785,6 +1886,45 @@ index 1e3456c..9dea260 100644
 +        std::fs::remove_dir_all(&dir).expect("removed");
 +    }
 +
++    /// The header carries the run's bite, scene and tick rate (`--bite` here; `--scene SS --tick-hz 30` from
++    /// `flags`), so npt-super's log sits in its run beside the room's (NR-U6A-1); against a fake room that opens after
++    /// 2.1 s (the double-load bite's delay), this log's own `spawn_to_open_ns` fails PM-0001-16's check "every start,
++    /// process spawn to Open, under 2 s" (max < 2,000,000,000) by name.
++    #[test]
++    fn h_the_log_header_carries_the_runs_bite_scene_and_tick_rate() {
++        let _one = one_fake();
++        let dir = folder("header");
++        let room = fake(&dir, "sleep 2.1\necho OPEN\ncat > /dev/null");
++        let f = flags(&dir, room, 1, 5_000, &["--bite", "PM-0001-16/double-load"]);
++        let mut w = log(&f).expect("the log");
++        time_starts(&f, &mut w).expect("one start");
++        w.finish(Ended::Clean).expect("the footer");
++        let text = std::fs::read_to_string(dir.join("super.jsonl")).expect("the log");
++        let h = npt_log::read_log(text.as_bytes())
++            .expect("reads back")
++            .header;
++        assert_eq!(
++            (h.bite.as_deref(), h.scene.as_str(), h.tick_hz),
++            (Some("PM-0001-16/double-load"), "SS", 30)
++        );
++        let (ev, _) = events(&dir);
++        let max = ev
++            .iter()
++            .filter(|(n, _)| n == "room_start")
++            .map(|(_, x)| *x)
++            .max();
++        println!(
++            "npt-super's header: {:?}, {}, {} Hz; max spawn to OPEN {max:?} ns",
++            h.bite, h.scene, h.tick_hz
++        );
++        let max = max.expect("one start");
++        assert!(
++            max >= 2_000_000_000,
++            "PM-0001-16's check 'every start, process spawn to Open, under 2 s' fails on npt-super's log: max {max} ns"
++        );
++        std::fs::remove_dir_all(&dir).expect("removed");
++    }
++
 +    #[test]
 +    fn h_the_flags_are_refused_unknown_missing_or_out_of_range() {
 +        assert!(parse(&["--nope".to_owned(), "x".to_owned()]).is_err());
@@ -1796,17 +1936,22 @@ index 1e3456c..9dea260 100644
 +            parse(&["--room".to_owned(), "r".to_owned()]).is_err(),
 +            "the rest missing"
 +        );
++        assert!(
++            parse(&["--tick-hz".to_owned(), "0".to_owned()])
++                .is_err_and(|e| e.contains("1 to 1,000")),
++            "a rate out of range"
++        );
 +    }
  }
 diff --git a/spikes/netcode-proof/crates/bots/tests/host_step.rs b/spikes/netcode-proof/crates/bots/tests/host_step.rs
 new file mode 100644
-index 0000000..1f28e4b
+index 0000000..bb58c62
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/bots/tests/host_step.rs
-@@ -0,0 +1,114 @@
+@@ -0,0 +1,137 @@
 +//! C-U6-18's test (EA-U4F-9; u6a-brief.md Block 8): `Behaviour::host_step` runs input, the endpoint's step and
 +//! outgoing in that order. The never-acker's hook rewrites the `Input` the step made, so its acknowledgement is gone;
-+//! an honest behaviour's step sends its acknowledgement as made.
++//! an honest behaviour's step sends its acknowledgement as made; a kind-11 forger's reliable hook adds its message.
 +
 +use npt_bots::Behaviour;
 +use npt_client::ClientEndpoint;
@@ -1917,6 +2062,29 @@ index 0000000..1f28e4b
 +            );
 +        }
 +    }
++    // The reliable hook acts after the endpoint's step too (TR-U6A-10): a kind-11 forger's second command brings its
++    // `Ping` framed for the control stream, which host_step puts last on the step's reliable messages.
++    let mut b = Behaviour::brawl(&scene, 0, 7)
++        .forger(11, 2, 12)
++        .expect("a kind-11 forger");
++    let mut e = ClientEndpoint::new(Join::default(), npt_sim::TICK_HZ).with_lead(1);
++    let (given, _) = b.host_step(&mut e, &joined, 0, &[]);
++    assert!(given, "the first command");
++    let (given, out) = b.host_step(&mut e, &snap, 33, &[]);
++    assert!(given, "the second command: the forged one");
++    let (channel, framed) = out.reliable.last().expect("a reliable message");
++    assert_eq!(*channel, Channel::Control);
++    assert!(
++        matches!(
++            decode(
++                Direction::ClientToRoom,
++                Channel::Datagram,
++                framed.get(2..).unwrap_or_default()
++            ),
++            Ok(Message::Ping(_))
++        ),
++        "the forged Ping, framed for the control stream, in out.reliable"
++    );
 +}
 diff --git a/spikes/netcode-proof/crates/proto/tests/channel.rs b/spikes/netcode-proof/crates/proto/tests/channel.rs
 new file mode 100644
@@ -2152,10 +2320,10 @@ index 0000000..42b3172
 +}
 diff --git a/spikes/netcode-proof/crates/server/src/proc_read.rs b/spikes/netcode-proof/crates/server/src/proc_read.rs
 new file mode 100644
-index 0000000..6e591b0
+index 0000000..171f7bb
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/src/proc_read.rs
-@@ -0,0 +1,383 @@
+@@ -0,0 +1,448 @@
 +//! The room's /proc and /sys reads (u6a-brief.md Block 4, S4; plan E18: "steal and affinity reads", per-thread CPU and
 +//! RSS each second): pure parsers over the files' texts, which the tests feed fixed texts, and the few reads and the
 +//! pinning that use them. Linux only: on another system every read is empty and every value absent.
@@ -2319,6 +2487,37 @@ index 0000000..6e591b0
 +        .all(|a| !a.iter().any(|c| siblings.contains(c)))
 +}
 +
++/// `event.affinity.alone` from one /proc walk (NR-U6A-3: a partial read is never the best value): the reason when the
++/// walk lacks the tick thread or tid 1 or reached [`TASKS_MAX`], else whether [`not_alone`] is empty.
++pub(crate) fn alone(tasks: &[Task], tick_tid: u32, vcpu: u32) -> Result<bool, &'static str> {
++    if tasks.len() >= TASKS_MAX
++        || ![tick_tid, 1]
++            .iter()
++            .all(|t| tasks.iter().any(|x| x.tid == *t))
++    {
++        return Err("the /proc walk lacks the tick thread or tid 1, or reached its cap");
++    }
++    Ok(not_alone(tasks, tick_tid, vcpu).is_empty())
++}
++
++/// `event.affinity.sibling_free` from its reads (NR-U6A-3): the reason when the SMT map is empty or an I/O thread's
++/// allowed list was not read (`None`), else [`sibling_free`].
++pub(crate) fn sibling_free_read(
++    smt: &[Vec<u32>],
++    vcpu: u32,
++    io: &[Option<Vec<u32>>],
++) -> Result<bool, &'static str> {
++    if smt.is_empty() {
++        return Err("no SMT map");
++    }
++    let io: Vec<Vec<u32>> = io
++        .iter()
++        .cloned()
++        .collect::<Option<_>>()
++        .ok_or("an I/O thread's allowed list was not read")?;
++    Ok(sibling_free(smt, vcpu, &io))
++}
++
 +/// Every task of every process under `proc` (`/proc`), at most [`TASKS_MAX`]; a task that ends mid-read is left out.
 +pub(crate) fn tasks(proc: &str) -> Vec<Task> {
 +    let mut out = Vec::new();
@@ -2412,26 +2611,29 @@ index 0000000..6e591b0
 +    }
 +}
 +
-+/// This process's CPU time so far (every thread's `schedstat`), and the part of it the threads `tids` ran, ns.
-+pub(crate) fn cpu_ns(tids: &[u32]) -> (u64, u64) {
-+    let (mut all, mut some) = (0u64, 0u64);
-+    let Ok(dir) = std::fs::read_dir("/proc/self/task") else {
-+        return (0, 0);
-+    };
++/// This process's CPU time so far (every thread's `schedstat`), and the part of it the threads `tids` ran, ns; `None`
++/// when /proc/self/task or no thread's `schedstat` could be read (NR-U6A-4: never a 0 for a failed read).
++pub(crate) fn cpu_ns(tids: &[u32]) -> Option<(u64, u64)> {
++    let (mut all, mut some, mut read) = (0u64, 0u64, false);
++    let dir = std::fs::read_dir("/proc/self/task").ok()?;
 +    for t in dir.flatten() {
 +        let Some(tid) = t.file_name().to_str().and_then(|x| x.parse::<u32>().ok()) else {
 +            continue;
 +        };
-+        let ns = std::fs::read_to_string(format!("/proc/self/task/{tid}/schedstat"))
++        // A thread that ended mid-read is left out.
++        let Some(ns) = std::fs::read_to_string(format!("/proc/self/task/{tid}/schedstat"))
 +            .ok()
 +            .and_then(|s| schedstat_ns(&s))
-+            .unwrap_or(0);
++        else {
++            continue;
++        };
++        read = true;
 +        all = all.saturating_add(ns);
 +        if tids.contains(&tid) {
 +            some = some.saturating_add(ns);
 +        }
 +    }
-+    (all, some)
++    read.then_some((all, some))
 +}
 +
 +#[cfg(test)]
@@ -2538,13 +2740,44 @@ index 0000000..6e591b0
 +            "1 on a 1-thread core"
 +        );
 +    }
++
++    /// NR-U6A-3, TR-U6A-9: a failed or partial read is never the best value. `alone` needs a walk holding the tick
++    /// thread and tid 1; `sibling_free` needs the SMT map and every I/O thread's allowed list.
++    #[test]
++    fn s4_a_partial_walk_or_a_failed_read_is_never_alone_or_sibling_free() {
++        let (init, tick, off) = (
++            task(1, false, "0-2"),
++            task(10, false, "3"),
++            task(31, false, "0-2"),
++        );
++        assert_eq!(
++            alone(&[init.clone(), tick.clone(), off.clone()], 10, 3),
++            Ok(true)
++        );
++        assert!(alone(&[], 10, 3).is_err(), "an empty walk");
++        assert!(alone(&[tick, off], 10, 3).is_err(), "a walk without tid 1");
++        assert!(
++            alone(&[init], 10, 3).is_err(),
++            "a walk without the tick thread"
++        );
++        let smt = vec![vec![0, 4], vec![1, 5], vec![2, 6], vec![3, 7]];
++        assert_eq!(sibling_free_read(&smt, 3, &[Some(vec![0, 1])]), Ok(true));
++        assert!(
++            sibling_free_read(&[], 3, &[Some(vec![0, 1])]).is_err(),
++            "an empty SMT map"
++        );
++        assert!(
++            sibling_free_read(&smt, 3, &[Some(vec![0, 1]), None]).is_err(),
++            "an I/O thread's list not read"
++        );
++    }
 +}
 diff --git a/spikes/netcode-proof/crates/server/src/tick_loop.rs b/spikes/netcode-proof/crates/server/src/tick_loop.rs
 new file mode 100644
-index 0000000..7938d8d
+index 0000000..599232b
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/src/tick_loop.rs
-@@ -0,0 +1,1447 @@
+@@ -0,0 +1,1511 @@
 +//! [`TickLoop`] (plan.md:601's list; plan E2, §4.4 and §4.6; u6a-brief.md Block 2): the room process's loop.
 +//!
 +//! - **The tick thread** (`npt-tick`) alone owns the `Room` and runs [`due_ticks`] on the monotonic clock (`clock.rs`'s
@@ -3206,10 +3439,13 @@ index 0000000..7938d8d
 +                        .position(|s| s.slot == Some(slot) && s.id != id)
 +                {
 +                    let mut kick = Vec::new();
-+                    if npt_proto::encode(&Message::Kick(Kick::Replaced), &mut kick).is_ok() {
-+                        self.sessions[old]
++                    if npt_proto::encode(&Message::Kick(Kick::Replaced), &mut kick).is_ok()
++                        && !self.sessions[old]
 +                            .out
-+                            .offer(Outbound::Reliable(Channel::Control, kick));
++                            .offer(Outbound::Reliable(Channel::Control, kick))
++                    {
++                        // Counted (NR-U6A-8); the old session is closed below either way.
++                        self.shared.out_full.fetch_add(1, Ordering::Relaxed);
 +                    }
 +                    self.close(old);
 +                }
@@ -3295,10 +3531,13 @@ index 0000000..7938d8d
 +        )
 +        .is_ok();
 +        while !self.sessions.is_empty() {
-+            if encoded {
-+                self.sessions[0]
++            if encoded
++                && !self.sessions[0]
 +                    .out
-+                    .offer(Outbound::Reliable(Channel::Control, bytes.clone()));
++                    .offer(Outbound::Reliable(Channel::Control, bytes.clone()))
++            {
++                // Counted (NR-U6A-8); the session is closed either way.
++                self.shared.out_full.fetch_add(1, Ordering::Relaxed);
 +            }
 +            self.close(0);
 +        }
@@ -3486,6 +3725,8 @@ index 0000000..7938d8d
 +/// The writer thread's per-second reads (Block 4; SERIES.md): the tick vCPU's steal (`second.v.steal_permille`, when
 +/// the run pins), the process's resident memory and CPU (`rss_bytes`, `proc_cpu_permille`), the I/O runtime's CPU
 +/// (`io_cpu_permille`) and each slot's session queue (`second.s.out_queue_count`). Read here, never on the tick thread.
++/// A read that fails leaves its key out of that record, with one stderr line at its first failure (NR-U6A-4: the
++/// judge sees a gap, never a best value).
 +pub(crate) struct Seconds {
 +    clients: usize,
 +    steal: Option<crate::proc_read::StealReader>,
@@ -3494,11 +3735,25 @@ index 0000000..7938d8d
 +    /// times (the process's, the I/O runtime's) read then.
 +    sec: Option<(u64, Phase)>,
 +    at_ns: u64,
-+    cpu: (u64, u64),
++    cpu: Option<(u64, u64)>,
 +    last_ns: u64,
 +    out_queue: [u16; LOGGED_SLOTS],
 +    /// PM-0001-2's per-second counts gathered so far this second.
 +    sums: [u64; 6],
++    /// The reads ([`SECOND_READS`]: steal, RSS, CPU times) that have failed at least once.
++    failed: [bool; 3],
++}
++
++/// The per-second reads that can fail, for their stderr lines.
++const SECOND_READS: [&str; 3] = [
++    "steal_permille",
++    "rss_bytes",
++    "proc_cpu_permille and io_cpu_permille",
++];
++
++/// `/proc`'s text at `path`, empty when it cannot be read (each parser then finds nothing: a failed read).
++fn proc_text(path: &str) -> String {
++    std::fs::read_to_string(path).unwrap_or_default()
 +}
 +
 +impl Seconds {
@@ -3509,10 +3764,11 @@ index 0000000..7938d8d
 +            shared,
 +            sec: None,
 +            at_ns: 0,
-+            cpu: (0, 0),
++            cpu: None,
 +            last_ns: 0,
 +            out_queue: [0; LOGGED_SLOTS],
 +            sums: [0; 6],
++            failed: [false; 3],
 +        }
 +    }
 +
@@ -3524,18 +3780,58 @@ index 0000000..7938d8d
 +            .clone()
 +    }
 +
-+    /// Reads the CPU times and the steal now: the next second's baseline.
-+    fn baseline(&mut self) -> Option<u32> {
++    /// Reads the CPU times now and the steal from `stat` (`/proc/stat`'s text): the next second's baseline.
++    fn baseline(&mut self, stat: &str) -> Option<u32> {
 +        self.cpu = crate::proc_read::cpu_ns(&self.io_tids());
-+        let stat = std::fs::read_to_string("/proc/stat").unwrap_or_default();
-+        self.steal.as_mut().and_then(|s| s.read(&stat))
++        self.steal.as_mut().and_then(|s| s.read(stat))
++    }
++
++    /// Puts each read into `v`, or leaves its keys out when it failed (`None`), with one stderr line at that read's
++    /// first failure (the struct's text). `steal` counts only when the run pins; `cpu` is the second's (process, I/O
++    /// runtime) CPU time, ns, over `wall_ns`.
++    fn values(
++        &mut self,
++        v: &mut std::collections::BTreeMap<String, i64>,
++        steal: Option<u32>,
++        rss: Option<u64>,
++        cpu: Option<(u64, u64)>,
++        wall_ns: u64,
++    ) {
++        let share = |ns| int(crate::proc_read::permille(ns, wall_ns));
++        let reads = [
++            (
++                self.steal.is_some(),
++                steal.map(|s| vec![("steal_permille", i64::from(s))]),
++            ),
++            (true, rss.map(|r| vec![("rss_bytes", int(r))])),
++            (
++                true,
++                cpu.map(|(p, io)| {
++                    vec![
++                        ("proc_cpu_permille", share(p)),
++                        ("io_cpu_permille", share(io)),
++                    ]
++                }),
++            ),
++        ];
++        for (i, (asked, read)) in reads.into_iter().enumerate() {
++            match read {
++                _ if !asked => {}
++                Some(kv) => v.extend(kv.into_iter().map(|(k, x)| (k.to_owned(), x))),
++                None if !core::mem::replace(&mut self.failed[i], true) => eprintln!(
++                    "npt-server: the per-second read of {} failed; its key is left out of each record it fails in",
++                    SECOND_READS[i]
++                ),
++                None => {}
++            }
++        }
 +    }
 +
 +    fn tick(&mut self, w: &mut Writer<Box<dyn Write + Send>>, r: &TickRow) -> io::Result<()> {
 +        let sec = r.start_ns / 1_000_000_000;
 +        match self.sec {
 +            None => {
-+                self.baseline();
++                self.baseline(&proc_text("/proc/stat"));
 +                self.at_ns = r.start_ns;
 +            }
 +            Some((s, _)) if sec > s => {
@@ -3560,25 +3856,13 @@ index 0000000..7938d8d
 +        };
 +        let wall = now_ns.saturating_sub(self.at_ns);
 +        let before = self.cpu;
-+        let steal = self.baseline();
++        let steal = self.baseline(&proc_text("/proc/stat"));
++        let rss = crate::proc_read::rss_bytes(&proc_text("/proc/self/status"));
++        let cpu = before
++            .zip(self.cpu)
++            .map(|(b, a)| (a.0.saturating_sub(b.0), a.1.saturating_sub(b.1)));
 +        let mut rec = npt_log::SecondRecord::new(sec, ph);
-+        let v = &mut rec.v;
-+        if self.steal.is_some() {
-+            v.insert("steal_permille".into(), steal.map_or(0, i64::from));
-+        }
-+        let status = std::fs::read_to_string("/proc/self/status").unwrap_or_default();
-+        let rss = crate::proc_read::rss_bytes(&status).unwrap_or(0);
-+        v.insert("rss_bytes".into(), int(rss));
-+        let proc_ns = self.cpu.0.saturating_sub(before.0);
-+        let io_ns = self.cpu.1.saturating_sub(before.1);
-+        v.insert(
-+            "proc_cpu_permille".into(),
-+            int(crate::proc_read::permille(proc_ns, wall)),
-+        );
-+        v.insert(
-+            "io_cpu_permille".into(),
-+            int(crate::proc_read::permille(io_ns, wall)),
-+        );
++        self.values(&mut rec.v, steal, rss, cpu, wall);
 +        rec.s.insert(
 +            "out_queue_count".into(),
 +            self.out_queue[..self.clients]
@@ -3817,21 +4101,28 @@ index 0000000..7938d8d
 +
 +    /// `event.affinity` (README §1; -1, PM-0006-11) when the run pins: `alone` (no other task may run on the tick
 +    /// vCPU, the module text of proc_read.rs) and `sibling_free` (no I/O runtime thread may run on its SMT sibling),
-+    /// read now; `when` is `start` or `end`.
++    /// read now; `when` is `start` or `end`. A value whose read failed or was partial is 0, with one stderr line
++    /// (NR-U6A-3).
 +    pub(crate) fn affinity(&self, when: &str) -> Option<EventRecord> {
 +        let vcpu = self.tick_vcpu?;
 +        let tick = self.shared.tick_tid.load(Ordering::Acquire);
 +        let tasks = crate::proc_read::tasks("/proc");
-+        let alone = crate::proc_read::not_alone(&tasks, tick, vcpu).is_empty();
-+        let io: Vec<Vec<u32>> = self
++        let alone = crate::proc_read::alone(&tasks, tick, vcpu);
++        let io: Vec<Option<Vec<u32>>> = self
 +            .shared
 +            .io_tids
 +            .lock()
 +            .unwrap_or_else(PoisonError::into_inner)
 +            .iter()
-+            .filter_map(|&t| crate::proc_read::allowed(t))
++            .map(|&t| crate::proc_read::allowed(t))
 +            .collect();
-+        let free = crate::proc_read::sibling_free(&self.smt, vcpu, &io);
++        let free = crate::proc_read::sibling_free_read(&self.smt, vcpu, &io);
++        let [alone, free] = [("alone", alone), ("sibling_free", free)].map(|(k, r)| {
++            r.unwrap_or_else(|why| {
++                eprintln!("npt-server: affinity at {when}: {k} written as 0: {why}");
++                false
++            })
++        });
 +        let ph = if when == "start" {
 +            Phase::Warmup
 +        } else {
@@ -3931,6 +4222,12 @@ index 0000000..7938d8d
 +        clock::resolution_ns(1_000)
 +    }
 +
++    /// Q-U6A-5's refusal (the binary's exit 2, before anything starts): whether one of `io_vcpus` is an SMT sibling of
++    /// `tick_vcpu` on the map `smt` (the header's sibling lists), by `event.affinity.sibling_free`'s own rule.
++    pub fn io_on_a_tick_sibling(smt: &[Vec<u32>], tick_vcpu: u32, io_vcpus: &[u32]) -> bool {
++        !crate::proc_read::sibling_free(smt, tick_vcpu, &[io_vcpus.to_vec()])
++    }
++
 +    /// Ends the loop: `RoomEnded` to every session (the crash reason after a tick-thread panic), their last messages
 +    /// sent, the log's footer written. [`Ended::Clean`], or [`Ended::Crash`] after a panic on the tick thread.
 +    ///
@@ -3994,10 +4291,10 @@ index 0000000..7938d8d
 +mod tests;
 diff --git a/spikes/netcode-proof/crates/server/src/tick_loop/tests.rs b/spikes/netcode-proof/crates/server/src/tick_loop/tests.rs
 new file mode 100644
-index 0000000..963b7b0
+index 0000000..04585a5
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/src/tick_loop/tests.rs
-@@ -0,0 +1,1264 @@
+@@ -0,0 +1,1330 @@
 +//! S1's tests (u6a-brief.md section 3): the tick thread's core on an injected clock (no threads: `Core::wake` and
 +//! `SessionIo::poll` driven in turn, each Loopback end's times the test's), and the threaded loop on the real clock
 +//! (each at most 5 s, no timing bar: the container's numbers are printed, never judged). U6a's tests hold no throwing
@@ -4811,7 +5108,12 @@ index 0000000..963b7b0
 +            "I/O thread {t} inherited the I/O vCPUs"
 +        );
 +    }
-+    std::thread::sleep(Duration::from_millis(2_300));
++    // On the loop's own progress (TR-U6A-4 (b)): until it has run 40 ticks (past a second's edge), at most 4 s.
++    let start = clock::now_ns();
++    while tl.ticks() < 40 && clock::now_ns() - start < 4_000 * MS {
++        std::thread::sleep(Duration::from_millis(5));
++    }
++    assert!(tl.ticks() >= 40, "40 ticks within 4 s");
 +    assert_eq!(tl.stop().expect("the log ends"), Ended::Clean);
 +    let text = sink
 +        .0
@@ -4857,6 +5159,37 @@ index 0000000..963b7b0
 +            .iter()
 +            .map(|r| (r.sec, r.v.clone()))
 +            .collect::<Vec<_>>()
++    );
++}
++
++/// NR-U6A-4 (TR-U6A-9's steal part): a per-second read that fails leaves its key out of the record (a gap, never a
++/// best value) and sets its failed flag (its one stderr line); a good read puts its keys in.
++#[test]
++fn s4_a_failed_per_second_read_leaves_its_key_out() {
++    let mut s = Seconds::new(1, Some(3), Arc::new(Shared::default()));
++    s.baseline("cpu3 100 0 10 1000 0 0 0 0 0 0\n");
++    for bad in ["", "cpu0 100 0 10 1900 0 0 0 100 0 0\n"] {
++        let steal = s.baseline(bad);
++        let mut v = BTreeMap::new();
++        s.values(&mut v, steal, None, Some((5, 1)), 10);
++        assert!(
++            !v.contains_key("steal_permille") && !v.contains_key("rss_bytes"),
++            "{bad:?}: {v:?}"
++        );
++        assert_eq!((v["proc_cpu_permille"], v["io_cpu_permille"]), (500, 100));
++        assert_eq!(s.failed, [true, true, false], "{bad:?}");
++    }
++    let steal = s.baseline("cpu3 100 0 10 1900 0 0 0 100 0 0\n");
++    let mut v = BTreeMap::new();
++    s.values(&mut v, steal, Some(4_096), None, 10);
++    assert_eq!(
++        (v["steal_permille"], v["rss_bytes"]),
++        (100, 4_096),
++        "100 of 1,000 ticks"
++    );
++    assert!(
++        !v.contains_key("proc_cpu_permille") && s.failed[2],
++        "the CPU times not read"
 +    );
 +}
 +
@@ -4994,6 +5327,25 @@ index 0000000..963b7b0
 +        .filter_map(|s| room.client(s))
 +        .filter(|c| !c.kicked() && c.counters().snapshots > 0)
 +        .count() as u32;
++    // The lab's rule (npt-lab mirror.rs:324-346, TR-U6A-2): every other soldier, and ES's vehicles, in the client's
++    // set; the room's `ClientSlot::relevant` stands for the client's frame here. No own-soldier condition.
++    let with_vehicles = scene.name() == "ES";
++    let mut everyone = 0u64;
++    for s in (0..scene.slots()).filter(|&s| usize::from(s) < LOGGED_SLOTS) {
++        let Some(c) = room.client(s).filter(|c| !c.kicked()) else {
++            continue;
++        };
++        let seen = |k: K, skip: Option<u16>| {
++            records
++                .iter()
++                .enumerate()
++                .filter(|(_, r)| r.kind == k && Some(r.index) != skip)
++                .all(|(i, _)| c.relevant().contains(&i))
++        };
++        if seen(K::Soldier, Some(u16::from(s))) && (!with_vehicles || seen(K::Vehicle, None)) {
++            everyone |= 1 << s;
++        }
++    }
 +    SceneRow {
 +        soldiers: count(K::Soldier),
 +        smallest_team: teams.values().copied().min().unwrap_or(0),
@@ -5003,7 +5355,7 @@ index 0000000..963b7b0
 +        projectiles: count(K::Projectile),
 +        effects_max: effects.values().copied().max().unwrap_or(0),
 +        per_second: [shots, reliable, portal, spawns, changes, stand_spawns],
-+        everyone: 0,
++        everyone,
 +    }
 +}
 +
@@ -5058,31 +5410,31 @@ index 0000000..963b7b0
 +}
 +
 +/// Q-U6A-2 (a): the room log's PM-0001-2 counts on a fixed SS run (two clients firing by the synthetic recording) are,
-+/// tick by tick, the sim's own: the records counted again by maps, and the shots, hits and kills from the sim's dump.
++/// tick by tick, the sim's own: the records counted again by maps, the shots, hits and kills from the sim's dump, and
++/// `everyone_in_view` by the lab's rule (TR-U6A-2): the whole row compared.
 +#[test]
 +fn s5_the_room_logs_minus_2_counts_equal_the_sims_own_tick_by_tick() {
 +    let mut b = bench(Scene::stress(), 2);
 +    let mut mirror = Mirror::default();
 +    let mut totals = [0u32; 6];
++    let mut seen = 0;
 +    drive(&mut b, 90, |b| {
 +        let rows = b.ticks();
 +        let row = rows.last().expect("a tick ran");
 +        let want = counted(&b.core.room, &mut mirror);
-+        assert_eq!(
-+            SceneRow {
-+                everyone: 0,
-+                ..row.scene
-+            },
-+            want,
-+            "tick {}",
-+            row.t
-+        );
++        assert_eq!(row.scene, want, "tick {}", row.t);
++        seen += u32::from(want.everyone != 0);
 +        for (t, x) in totals.iter_mut().zip(row.scene.per_second) {
 +            *t += x;
 +        }
 +    });
 +    println!(
-+        "-2 over 90 ticks: shots, reliable, portal changes, spawns, stand-in changes, stand-in spawns {totals:?}"
++        "-2 over 90 ticks: shots, reliable, portal changes, spawns, stand-in changes, stand-in spawns {totals:?}; \
++         ticks with an everyone_in_view bit {seen}"
++    );
++    assert!(
++        seen > 0,
++        "a client saw everyone, so the flag was compared set"
 +    );
 +    assert!(
 +        totals[0] > 0,
@@ -5137,17 +5489,22 @@ index 0000000..963b7b0
 +/// row beyond the queue's room is counted as dropped.
 +#[test]
 +fn s5_the_tick_never_waits_on_a_stuck_writer() {
-+    let mut b = bench(Scene::course(), 1);
 +    let extra = 40;
-+    for k in 0..(ROWS_CAP as u64 + extra) {
-+        b.wake(due(k));
-+    }
-+    assert_eq!(b.core.run, ROWS_CAP as u64 + extra, "every due tick ran");
-+    assert_eq!(
-+        b.shared.rows_dropped.load(Ordering::Relaxed),
-+        extra,
-+        "the rows beyond the queue's room"
-+    );
++    // The wakes on their own thread, awaited at most 5 s (TR-U6A-7): a row offer that waited fails here, never hangs.
++    let (tx, rx) = std::sync::mpsc::channel();
++    let wakes = std::thread::spawn(move || {
++        let mut b = bench(Scene::course(), 1);
++        for k in 0..(ROWS_CAP as u64 + extra) {
++            b.wake(due(k));
++        }
++        let _ = tx.send((b.core.run, b.shared.rows_dropped.load(Ordering::Relaxed)));
++    });
++    let (run, dropped) = rx
++        .recv_timeout(Duration::from_secs(5))
++        .expect("the wakes ended within 5 s");
++    wakes.join().expect("the wakes' thread");
++    assert_eq!(run, ROWS_CAP as u64 + extra, "every due tick ran");
++    assert_eq!(dropped, extra, "the rows beyond the queue's room");
 +}
 +
 +/// SERIES.md's rule (the advisor's C2): every counter on every record, 0 included: each tick record carries the loop's
@@ -5162,11 +5519,17 @@ index 0000000..963b7b0
 +    let (server, mut link) = Loopback::pair(1_200);
 +    assert!(tl.connect(Box::new(server), RttSource::Link));
 +    let mut e = ClientEndpoint::new(join(0), npt_sim::TICK_HZ);
++    // On the loop's own progress (TR-U6A-4 (a)): until it has run 40 ticks (1.3 s of its clock, so past a second's
++    // edge) and the client has a snapshot, at most 4 s.
 +    let start = clock::now_ns();
-+    while clock::now_ns() - start < 1_300 * MS {
++    while (tl.ticks() < 40 || e.newest_tick().is_none()) && clock::now_ns() - start < 4_000 * MS {
 +        step_client(&mut e, &mut link, clock::now_ns());
 +        std::thread::sleep(Duration::from_millis(5));
 +    }
++    assert!(
++        tl.ticks() >= 40 && e.newest_tick().is_some(),
++        "40 ticks and a snapshot within 4 s"
++    );
 +    assert_eq!(tl.stop().expect("the log ends"), Ended::Clean);
 +    let text = sink
 +        .0
@@ -5264,10 +5627,10 @@ index 0000000..963b7b0
 +}
 diff --git a/spikes/netcode-proof/crates/server/tests/binary.rs b/spikes/netcode-proof/crates/server/tests/binary.rs
 new file mode 100644
-index 0000000..2a20f6e
+index 0000000..a63c7be
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/tests/binary.rs
-@@ -0,0 +1,255 @@
+@@ -0,0 +1,259 @@
 +//! npt-server's binary from `CARGO_BIN_EXE_npt-server` (u6a-brief.md Block 3, section 3): the start to `OPEN` within the
 +//! 5 s real-clock cap (the time printed: a container reading, no 2 s bar here), exit 0 when stdin closes, no token in
 +//! the log, stdout or stderr, and the exit codes; in bites builds the two process-level bites, each failing its mark's
@@ -5331,9 +5694,25 @@ index 0000000..2a20f6e
 +    let t0 = std::time::Instant::now();
 +    let mut child = spawn(settings);
 +    let mut out = BufReader::new(child.stdout.take().expect("piped"));
-+    let mut first = String::new();
-+    out.read_line(&mut first).expect("stdout reads");
-+    let open_ns = u64::try_from(t0.elapsed().as_nanos()).unwrap_or(u64::MAX);
++    // The first line on its own thread, awaited at most 5 s (TR-U6A-7): a room that never opens is killed and the test
++    // fails at the cap, never hangs.
++    let (tx, rx) = std::sync::mpsc::channel();
++    let reader = std::thread::spawn(move || {
++        let mut first = String::new();
++        let read = out.read_line(&mut first);
++        let open_ns = u64::try_from(t0.elapsed().as_nanos()).unwrap_or(u64::MAX);
++        let _ = tx.send((read.map(|_| first), open_ns));
++        out
++    });
++    let (first, open_ns) = match rx.recv_timeout(Duration::from_secs(5)) {
++        Ok((first, open_ns)) => (first.expect("stdout reads"), open_ns),
++        Err(e) => {
++            let _ = child.kill();
++            let _ = child.wait();
++            panic!("no first line within the 5 s cap ({e:?}): the room was killed");
++        }
++    };
++    let mut out = reader.join().expect("the reader");
 +    std::thread::sleep(Duration::from_millis(300));
 +    drop(child.stdin.take());
 +    let status = child.wait().expect("the binary ends");
@@ -5468,11 +5847,11 @@ index 0000000..2a20f6e
 +#[cfg(feature = "bites")]
 +mod bites {
 +    use super::*;
-+    use npt_log::{EventRecord, Phase, Writer};
 +
-+    /// PM-0001-16/double-load: the bitten start reads its settings twice more, each behind 1 s, so spawn to Open
-+    /// passes 2 s; the start's `event.room_start.spawn_to_open_ns`, in a log of npt-super's form, fails -16's check
-+    /// "every start, process spawn to Open, under 2 s" (max < 2,000,000,000).
++    /// PM-0001-16/double-load: the bitten start reads its settings twice more, each behind 1 s, so its OPEN comes
++    /// 2 s or more after the spawn, and its header names the bite in a bites build. -16's check on npt-super's own log
++    /// (process `super`, the run's bite in its header) is npt-super's test
++    /// `h_the_log_header_carries_the_runs_bite_scene_and_tick_rate` (TR-U6A-1).
 +    #[test]
 +    fn pm_0001_16_double_load_fails_every_start_under_2_s() {
 +        let dir = folder("double-load");
@@ -5482,25 +5861,13 @@ index 0000000..2a20f6e
 +        ));
 +        assert_eq!(first, "OPEN\n", "stderr: {err}");
 +        assert_eq!(code, Some(0));
-+        let mut h = log_of(&dir).0.header;
++        let h = log_of(&dir).0.header;
 +        assert_eq!(h.bite.as_deref(), Some("PM-0001-16/double-load"));
-+        h.process = "super".to_owned();
-+        let mut w = Writer::new(Vec::new(), &h).expect("header");
-+        w.event(&EventRecord::new("room_start", Phase::Measured).with("spawn_to_open_ns", open_ns))
-+            .expect("event");
-+        let text = w.finish(Ended::Clean).expect("footer");
-+        let log = read_log(text.as_slice()).expect("reads back");
-+        let max = log
-+            .events
-+            .iter()
-+            .filter(|e| e.ev == "room_start")
-+            .filter_map(|e| e.f["spawn_to_open_ns"].as_u64())
-+            .max()
-+            .expect("one start");
-+        println!("double-load: spawn to OPEN {:.1} ms", max as f64 / 1e6);
++        assert_eq!(h.build.features, ["bites"]);
++        println!("double-load: spawn to OPEN {:.1} ms", open_ns as f64 / 1e6);
 +        assert!(
-+            max >= 2_000_000_000,
-+            "PM-0001-16's check 'every start, process spawn to Open, under 2 s' fails: max {max} ns"
++            open_ns >= 2_000_000_000,
++            "the bitten start opens 2 s or more after its spawn: {open_ns} ns"
 +        );
 +        std::fs::remove_dir_all(&dir).expect("removed");
 +    }
@@ -5525,10 +5892,10 @@ index 0000000..2a20f6e
 +}
 diff --git a/spikes/netcode-proof/crates/server/tests/carry.rs b/spikes/netcode-proof/crates/server/tests/carry.rs
 new file mode 100644
-index 0000000..a120e71
+index 0000000..92c12b8
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/tests/carry.rs
-@@ -0,0 +1,213 @@
+@@ -0,0 +1,229 @@
 +//! C-U6-17's test (plan.md:1254; u6a-brief.md Block 7 and condition 5): "one 600 ms pong and a 10 ms path, under
 +//! option B's buffer of 8, with no kind-10 refusal on the honest client". The honest client is a real endpoint under
 +//! U4f's controller (max lead 9, the lab's), against a room and its decoder on an injected clock, over a test-local
@@ -5538,14 +5905,15 @@ index 0000000..a120e71
 +//! `Ping` late). Both lift the client's upper one-way estimate past the controller's cap of 9; the slow way down also
 +//! lifts its clock offset by about 15 ms (300 ms in the mean of about 20 samples), which by itself pulls its stamps
 +//! back about half a tick on this path, so only the slow way up shows what the cap prevents (U6a's notes, P7: without
-+//! the cap the slow way down still passes).
++//! the cap the slow way down still passes). Both ways run under option A as well, each option set on the room
++//! (TR-U6A-3).
 +
 +use std::collections::VecDeque;
 +
 +use npt_client::ClientEndpoint;
 +use npt_link::{Channel, Link, LinkState, Loopback, Recv, SendResult};
 +use npt_proto::{Direction, Join, Message, Quant, channel_of, decode};
-+use npt_room::Room;
++use npt_room::{CmdTiming, Room};
 +use npt_server::{Decoder, RttSource};
 +use npt_sim::replay::Recording;
 +use npt_sim::{Scene, World};
@@ -5624,9 +5992,9 @@ index 0000000..a120e71
 +    }
 +}
 +
-+/// One run of 5 s: the 3rd exchange's `Pong` 600 ms late (`up` false) or its `Ping` (`up` true). Returns the commands
-+/// given and run, the kind-10 refusals, the largest lead and the slow messages' type count seen.
-+fn run(up: bool) -> (usize, u64, u64, i64, usize) {
++/// One run of 5 s under `timing`: the 3rd exchange's `Pong` 600 ms late (`up` false) or its `Ping` (`up` true).
++/// Returns the commands given and run, the kind-10 refusals, the largest lead and the slow messages' type count seen.
++fn run(timing: CmdTiming, up: bool) -> (usize, u64, u64, i64, usize) {
 +    let scene = Scene::course();
 +    let first = 1_000;
 +    let world = World::new(&scene, 5, first);
@@ -5638,9 +6006,10 @@ index 0000000..a120e71
 +        version: VERSION,
 +        content_hash: CONTENT,
 +    };
-+    // Option B, the room's default.
++    // Option A or B, set explicitly (TR-U6A-3).
 +    let mut room = Room::new(world, &scene, &greybox, vec![token], 1, npt_sim::TICK_HZ)
-+        .with_hashes(CONTENT, [0; 32]);
++        .with_hashes(CONTENT, [0; 32])
++        .with_cmd_timing(timing);
 +    let (s, c) = Loopback::pair(1_200);
 +    // A 10 ms path: 5 ms each way; the 3rd exchange 600 ms slow, down or up.
 +    let (down, rise) = if up { (None, Some(3)) } else { (Some(3), None) };
@@ -5724,21 +6093,35 @@ index 0000000..a120e71
 +    )
 +}
 +
++/// Both legs under option B (C-U6-17's words) and option A (TR-U6A-3: C-U6-16 (b) keeps A selectable); every leg runs
++/// before the first assert, so a failure names each leg's refusals.
 +#[test]
 +fn c_u6_17_one_600_ms_pong_on_a_10_ms_path_brings_no_kind_10_refusal_under_option_b() {
-+    for up in [false, true] {
-+        let (given, ran, refused, lead, seen) = run(up);
-+        let leg = if up {
-+            "its ping slow (up)"
-+        } else {
-+            "the pong slow (down)"
-+        };
++    let legs: Vec<_> = [CmdTiming::A, CmdTiming::B]
++        .into_iter()
++        .flat_map(|t| [(t, false), (t, true)])
++        .map(|(timing, up)| {
++            let way = if up {
++                "its ping slow (up)"
++            } else {
++                "the pong slow (down)"
++            };
++            (format!("{timing:?}, {way}"), run(timing, up))
++        })
++        .collect();
++    for (leg, (given, ran, refused, lead, seen)) in &legs {
 +        println!(
 +            "C-U6-17, {leg}: {given} commands given, {ran} run, {refused} refused as kind 10, largest lead {lead}, \
 +             {seen} of the slow message's type seen"
 +        );
-+        assert!(seen > 3, "{leg}: the slow one came and went");
-+        assert!(ran > 60, "{leg}: the honest client played");
-+        assert_eq!(refused, 0, "{leg}: no kind-10 refusal on the honest client");
++    }
++    let refusals: Vec<(&str, u64)> = legs.iter().map(|(l, r)| (l.as_str(), r.2)).collect();
++    for (leg, (_, ran, refused, _, seen)) in &legs {
++        assert!(*seen > 3, "{leg}: the slow one came and went");
++        assert!(*ran > 60, "{leg}: the honest client played");
++        assert_eq!(
++            *refused, 0,
++            "{leg}: no kind-10 refusal on the honest client (each leg's refusals: {refusals:?})"
++        );
 +    }
 +}
