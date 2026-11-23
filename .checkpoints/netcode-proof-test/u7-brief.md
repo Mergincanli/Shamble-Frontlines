@@ -1,4 +1,4 @@
-# U7's brief, rev 1 (2026-11-22): a plain browser client
+# U7's brief, rev 1.1 (2026-11-23): a plain browser client (the advisor's C1-C14 bind: section 0.1)
 **The unit:** U7 as Mustafa's NPT-TRIM keeps it (history.md:7561-7593), item 3 word for word: "U7, cut to a plain
 browser client: it connects over WebTransport and WebSocket, sends presses, receives snapshots and shows its counters.
 No sim in Wasm, no prediction, no drawing, no hash check: the real game runs the sim as Wasm since change-set 2 and
@@ -12,6 +12,14 @@ u6a-, u6b- and u6c-brief.md (interfaces and build rules), advisor-u6c-brief.md (
 wip/u8-build.patch with u8-build.md F2, F14, F15 (its proposed page interfaces), security-r1-deps.md B4, B5, B7.
 **One advisor check** (NPT-TRIM), no re-check unless it finds a Critical or High. Section 9's four questions are the
 only asks; every other choice goes by its lean, one line each.
+
+## 0.1 Rev 1.1: the advisor's conditions (read first)
+The advisor's one check: APPROVE WITH CONDITIONS, advisor-u7-brief.md (352 lines, sha256
+65e109aa7732307310bbdee71053d72a96613ac65e3cc277581b4a6506044df3): 0 Critical, 0 High, 6 Medium, 4 Low. Its conditions
+C1-C14 (advisor-u7-brief.md:110-247) apply word for word, each replacing or adding to the sections it names; they are
+not retyped here (NPT-TRIM: no restated rulings). Its section 3 answers Q-U7-1 to -4, section 5 is U8's fix-pass item
+9, and section 6 holds R1's date (about a day of slack, on six assumptions; the trigger: not merged by the end of
+Monday 30). Where this brief and a condition differ, the condition rules.
 
 ## 0. Where things are
 - **Two halves, two bases.** The TypeScript half (T-blocks) builds off the cargo lane once this brief passes, on

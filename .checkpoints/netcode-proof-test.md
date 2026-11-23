@@ -75,12 +75,17 @@
   --check` and `git apply` in the main folder, cmp-equal to the worktree, M5 check.mjs via main-run.sh in the
   background, gate --no-smoke, one commit, push, CI.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
-- **Next 3:** U6b's Block 0 and builder (its launch adds NR-U6A-7 and O2), U8's fix pass (adds NR-U6A-1's U8 carry),
-  U7's Block 0a after its check.
+- **Next 3:** when security answers on U7's Block 0: the T-builder (worktree; Block 0a, then the T-half; off the lane;
+  dependency-check.md lines before any save of web/'s npm files); after U6a's merge: U6b's Block 0 and builder (its
+  launch adds the U6b line's items), U8's fix pass (the U8 line's items).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
   TR-U6A-5 to U6d; F4's S1 burn to U6e (the netcode seat's suggestion); FP-6: no rule changed on a difference.
+- **2026-11-23, U7's brief (advisor-u7-brief.md):** Q-U7-1 (a), U8's save() writes the header now; Q-U7-2 the three
+  constants in npt-proto and the tags in npt-link, by U6b; Q-U7-3 one constant (9) bound at compile time; Q-U7-4
+  wt-attempts with a bounded hash=wrong control; the valve at 3,800; no security seat in U7's round. Mine: rev 1.1
+  binds C1-C14 by line range and hash instead of pasting them (NPT-TRIM: no restated rulings).
 - Each named in its day's message: 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at 9341c90 holds them);
   2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
 
@@ -135,8 +140,9 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Agents running (2 of 3):** (1) U6a's builder a95ebf14368f277ff, resumed 02:4x for the fix pass (u6a-fix-pass.md;
-  its notes u6a-build.md in its worktree, one FP-n line per item; resume after its last FP-n line). (2) U7's advisor
-  check a1caa8c461475ac54 (general-purpose, xhigh, from 02:4x) -> advisor-u7-brief.md; resume from its file.
+  its notes u6a-build.md in its worktree, one FP-n line per item; resume after its last FP-n line). (2) Security's U7
+  Block 0 read aca2c13cc291261c6 (security-auditor, xhigh, from 03:0x; C10's items 1-10, the npm-audit substitute)
+  -> security-u7-deps.md; resume from its file. U7's advisor check a1caa8c461475ac54 DONE 03:0x.
 - **Finished, for round 2 by SendMessage:** U6a's netcode seat a9a29bd03da0757ad (u6a-review-netcode.md, DONE 20:38;
   F1, F3, F7, F9 fine) and test seat a4724cf284e77b73e (u6a-review-test.md, DONE 02:4x). Security ab80f7d9c82f327b9
   DONE 20:40 (security-f26.md; security-u6c-deps.md: U6c's Block 0 CLEAR WITH CONDITIONS, 5 conditions, Lows only).
@@ -152,7 +158,8 @@
   Merge M3-M9 as U4f's (history.md:7022-7028), the pre-round merge check folded into M5 (Choices).
 - **U8** BUILT (blocks 0-11, 38 new files, 4,176 added; tests 66 + 214, 7 plants; wip/u8-build.patch e9fd605c…; notes
   u8-build.md, F1-F27; R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 40 min). Fix pass after U6a's merge (the
-  ruling's section 5 word for word; item 6 takes redact-check's 2609bc87…; Q-U7-1 if ruled), then Stop B's round, which
+  ruling's section 5 word for word; item 6 takes redact-check's 2609bc87…; item 9 from advisor-u7-brief.md section 5;
+  NR-U6A-1's carry, u6a-fix-pass.md), then Stop B's round, which
   reads sbin/, sudoers.d/, cloud-init, firewall lists, operator files and hook, config.mjs, lib.mjs with F25 (WebdriverIO
   sets Edge's `allowedIps` to any; lib.mjs starts msedgedriver itself), F13, F16, F22; its netcode seat R1.md §4-5, s14/,
   r1.sh's probe_presence, `alone`, C5; for the advisor F9, F17 (C12 (f) has no tolerance; S14's window and burst fixed
@@ -163,21 +170,19 @@
   test file only, at U6a's merge or deferred by the advisor; -2 Low accepted).
 - **U6b** (rev 1.1; security-u6b-deps.md done, with conditions; SEC-U6BD-1's seven packages, 242 -> 235): Block 0 and
   the build after U6a merges; about 2,650, at 1.9-2.3 about 5,000-6,100, so its launch names its own last-built valve
-  (advisor-u6c-brief.md section 3) and, by Q-U7-2's lean, the homes of the protocol constants and WebSocket tags.
+  (advisor-u6c-brief.md section 3), C2's homes from advisor-u7-brief.md (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in
+  npt-proto; the WebSocket tags in npt-link; the catalogue line), C13's draft line (-56 item 2), and NR-U6A-7.
 - **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 security-cleared (5 conditions); disk freed first;
   its launch gives U7's seven dist names; at its merge U8's side checked per interface (C9). **R1 Thu 3 Dec holds with
   about a day of slack** (section 3: U6a merged Mon 23-Tue 24, U6b Wed 25, U6c Sat 28, U7's Rust Sun 29, Stop B Tue 1);
   three lines to him if U6b is not merged by end Thu 26, U6c by end Sun 29, or a lane unit hits SIZE-CHECK.
-- **U7's brief rev 1 DRAFTED** (u7-brief.md, 358 lines, c9e1fb33…; notes netcode-u7-brief.md; 29 quotes checked):
-  about 2,200 (Rust 660 on the lane, TS/JS 1,550 off; 4,200-5,050 at 1.9-2.3); Block 0a npm now (typescript 6.0.3 only,
-  `--before` 7 days, `--ignore-scripts`, no .npmrc), 0b the hour U6c merges (`wasm-bindgen = "=0.2.130"`, no new
-  package; the CLI under .gate/); security reads the npm files, lines, lock diff, CLI, .npmrc substitute, deny, audit.
-  Its sections 9-10: Q-U7-1 to -4 and R1's terms (merged by end Mon 30, else three lines that day). Contradictions, only
-  in its hand-back, for the advisor: -28 dropped by replan-units.md:138, kept by replan.md:63-64, replan-marks.md:48
-  (Q-U7-4); security-r1-deps.md:245's web/.npmrc vs C2 (C2 rules); C-U7-1 to -4 live at plan.md:1255, not
-  u4s-carries.md; U8's cert14d.mjs and R1.md name /npt/cert-hash.json (U8 fix item 3); U8's `save()` writes no npt-log
-  header (Q-U7-1); no library holds the content hash or WebSocket tags (Q-U7-2); -56 item 2's negotiated draft has no
-  writer in any brief; replan-units.md's plan.md cites past :379 one low; U8's cites are patch lines.
+- **U7** (brief rev 1.1, 2026-11-23: the advisor APPROVE WITH CONDITIONS, advisor-u7-brief.md 65e109aa…, C1-C14 at
+  :110-247 bind by pointer, 6 Medium, 4 Low; notes netcode-u7-brief.md): about 2,200 (Rust 660 on the lane, TS/JS 1,550
+  off) plus C2-C9's 150-250; valve C11 (page bites and `wt-attempts` wait for R8 if the T-half passes 3,800). Order:
+  security's one short read for 0a and 0b (C10, running) -> Block 0a and the T-builder at once (off the lane, before
+  U6b's round) -> 0b's binding check the hour U6c merges -> the R-half Sun 29 -> one round (netcode, test; no security:
+  C12) -> merged by end Mon 30, else three lines that day. R1 holds with about a day of slack on six assumptions
+  (its section 6). Its section 4 routes the contradictions; nothing else edited.
 - **Tools:** snapshot `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree> <out.patch> <prefix>`;
   part-clean (no lane running) `env CARGO_NET_OFFLINE=true flock -x <M>/.gate/shared-target/.lane.lock cargo clean
   --manifest-path <M>/spikes/netcode-proof/Cargo.toml --target-dir <M>/.gate/shared-target --profile dev`, then `test`
