@@ -231,3 +231,29 @@ install, one more name in the cut's environment) are each inside the text he sai
   For this PR's own docs pass (docs-keeper), not follow-ups: TWO-PLAYWRIGHTS' clause "no real browser has run inside
   the cut's privilege drop" is now false (Chrome 157.0.8103.78 ran 12 tests there, six clean runs); WASM-ARTIFACT:
   CI now builds the release Wasm through build.mjs (the cut's own wasm32 line stays dev-profile).
+- Source S3 (read 2026-11-23, github.com/actions/runner-images/blob/main/images/ubuntu/templates/build.ubuntu-24_04.pkr.hcl,
+  through the fetch model; main branch, not the image's tag; data only): provisioner order lists install-google-chrome.sh
+  (34th), install-nodejs.sh (44th), install-rust.sh (51st), Install-Toolset.ps1 (64th), then configure-system.sh (73rd).
+  With configure-system.sh:12-15 `chmod -R 777 /opt` (my opt-path S1, tag ubuntu24/20261116.376), /opt/google/chrome and
+  the Node toolcache are opened to all after their install. Sure: medium-high (main's template; modes of those files
+  were never printed by a run).
+- Correction to follow-up 3 (CUT-PATH): severity Low, not Medium. Inside the job a hostile dependency in the cut can
+  already fake the verdict by other means (edit the specs, the built page, rustc under ~/.rustup, owned by the
+  runner's uid); PATH shadowing adds no reach beyond the job (the cache is none; the post-step reach is CI-CUT part 2).
+  What it changes: the root-owned tool's guarantee is narrow (its own file), and the report should not read wider.
+- B7 done. VERDICT: APPROVE (the diff needs no change). Findings, ranked:
+  F1 Medium: `.gate/ci-wasm/stop-rule-check.py:25` (Tests 7 passed is also the types package's line) and no check of
+     the 10-minute stop; fix before the final head's runs are read (replacement text = the tested lines in
+     `.gate/ci-wasm/infra-review-1/stop-rule-check-proposed.py`). Evidence of the six runs holds (read directly).
+  F2 Low: record drift: plan.md:87, :157 say `timeout: 60_000`, the code is `90_000` (playwright.config.ts:26, commit
+     3cddb55); report.ts (+9, drawn()) is missing from plan.md:80-91 and :301-308 -> the report's file list says so.
+  F3 Low: toolchain.yml:91 "The only step with the token" and plan.md:110 "the only step that holds the job's token":
+     checkout and setup-node get it as their default input (push log :38, :161) -> "the only run step"; the comment at
+     the next CI edit (TOKEN-WORDS), the report now.
+  F4 Low: the card's "(28,987 bytes in the containers: RR-F5)" (ci-wasm.md:296-297) reads as shown; the report says
+     "consistent with RR-F5, not shown" with the numbers.
+  Not verified: a same-path Wasm build (no registry, node_modules or target here); the runner's modes of PATH folders
+  and of /opt/google/chrome (never printed); Chromium's line on the 157 branch (read on main); run attempts (API not
+  queried); GitHub's own job times for the two take-back-browser runs (log stamps used); the PR's current head has no
+  run (faae0b8 is [skip ci]); the docs.
+DONE

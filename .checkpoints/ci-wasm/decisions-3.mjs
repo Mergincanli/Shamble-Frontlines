@@ -85,6 +85,12 @@ const V3_MSG = (id) => `${V3}; his message ${id}, whole; extracted by script fro
 // Newest first. `file` undefined: a pointer, with no words of his quoted under it.
 const ENTRIES = [
   {
+    key: '2026-11-23, 21:24:59 UTC: FIREFOX-TESTS (b)',
+    file: 'mustafa-2026-11-23T212459-after-64.md',
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 21:24:59 UTC: FIREFOX-TESTS (b) in place of (c): Firefox in CI joins the small CI pull request after change-set 3a, and no Firefox pull request comes between #64 and 3a; change-set 3a starts when #64 is merged, on this word, with no second ask; three items for change-set 3 come from his Advisor before 3b's build starts** (${V3}; his message 219448d3-8dec-4c23-bf93-d3e88bb6110c, sent while the chat was working, whole; extracted by script from the chat's transcript). It replaces his answer FIREFOX-TESTS (c) in ANSWERS-7 (the entry of 14:31:06 UTC below, which stays as written). In his words: ${said(m, 'Until then my own browser check covers Firefox, as at change-set 2.')} On the start of 3a: ${said(m, 'You need not ask me again to start. If your context is above 40 % at that point, tell me first and I compact the chat.')} On the three items: ${said(m, 'They do not touch 3a.')} ${ASKED('mustafa-2026-11-23T212459-after-64.md')} ${by(m)}`,
+  },
+  {
     key: '2026-11-23, 20:47:59 UTC: PLANT-WRITE (a)',
     file: 'mustafa-2026-11-23T204759-plant-write.md',
     lead: (m) =>
