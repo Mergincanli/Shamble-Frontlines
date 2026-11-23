@@ -84,35 +84,13 @@
 - **Next 2, U6b's fix pass back:** snapshot (wip/u6b-build.patch), the size line (past 6,000: three lines to him); the
   advisor's check of the fix diff (A3: advisor-u6b-r1.md:149-156, xhigh); merge M3-M9 (main-run.sh), CI; U6b's report
   (carries by number: advisor-u6b-r1.md:182-187 and u6b-fix-pass.md section 3; SEC-U6B-3 on PR #40's closing list).
-- **Next 3:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md:
-  the Choices of 2026-11-23 below, his SIZE-STOP (a), the three cuts, SEC-F26-1 done, U6b's and U8's state. U4's report
-  DONE (u4-report.md), named in it; T5 (i) the day U6b merges.
+- **Next 3:** the 2026-11-24 day message SENT 23:0x UTC (msg-2026-11-24.md: choices 1-7, /compact asked); the next at
+  2026-11-24 23:05 UTC (trig_016pV7v16ktVwMuzygofJhjJ, msg-2026-11-25.md). T5 (i) the day U6b merges.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
-- **2026-11-23, U6b's round (advisor-u6b-r1.md, each his to reverse):** R-PING (condition 1's letter replaced: outside a
-  tick, a datagram of at most 32 B goes out under fix 1's first two conditions, counted); A1 (the R3 bite ws-budget-x2 to
-  U6e, T-1 its condition); A2 (the 48-connection reading at U6c's close, reversing my earlier lean); A3 (no round 2).
-- **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
-  TR-U6A-5 to U6d; F4's S1 burn to U6e (the netcode seat's suggestion); FP-6: no rule changed on a difference.
-- **2026-11-23, U6a's round 2 (my lean):** its one Medium (a flake the fix pass opened) fixed now as FP-13 with no third
-  round (NPT-TRIM: a third only for a Critical or High); its Lows to carries and the merge report.
-- **2026-11-23, the round-2 ruling (advisor-u8-r2.md, each his to reverse):** under alone 0 only headers, ds-selftest and
-  the bites skip; a cut log is kept as its whole-line prefix (the judge unchanged, its run INVALID); PowerShell's narrower deny.
-- **2026-11-23, the runner (my lean):** u6b-run.sh exports CARGO_INCREMENTAL=0 (the incremental cache was 4.3 GB of
-  10.4 GB, which put end checks under the 4 GB floor); it only caches, so no result moves, only rebuild speed.
-- **2026-11-23, Stop B's ruling (advisor-u8-stopb.md:318-324, each his to reverse):** R1's headers run stays a measured
-  -2 run; S14's 10-minute window beside the browser legs; Stop B grows ~15 min; a differing dist holds the browser legs
-  for his word; part of SEC-SB-9 open until U6c's merge.
-- **2026-11-23, U6b's Block 0 (u6b-block0.md step 4):** the `set_default` grep's hits are npt-net's own impairment API, a
-  false hit, not a finding.
-- **2026-11-23, U6b's launch (my lean):** F28 (npt-super's per-event flush, U8's find) built by U6b, its round reading it;
-  U6b's valve: Block 5's reader stamp and BudgetX2 built last, past 5,400 they wait for U6e if R1 reads neither.
-- **2026-11-23, U7's brief (advisor-u7-brief.md):** Q-U7-1 (a), U8's save() writes the header now; Q-U7-2 the three
-  constants in npt-proto and the tags in npt-link, by U6b; Q-U7-3 one constant (9) bound at compile time; Q-U7-4
-  wt-attempts with a bounded hash=wrong control; the valve at 3,800; no security seat in U7's round. Mine: rev 1.1
-  binds C1-C14 by line range and hash instead of pasting them (NPT-TRIM: no restated rulings).
-- Each named in its day's message: 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at 9341c90 holds them);
-  2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
+- None since the 2026-11-24 message. Each named in its day's message: 2026-11-23's in msg-2026-11-24.md items 1-7
+  (this card at 2a7a5b8 holds them with their sources); 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at
+  9341c90); 2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
 
 ## Next steps (NPT-TRIM's order; the re-plan fixes the rest; U4f2 and the re-plan DONE: this card at 1b26e8c)
 1. U4's report DONE 2026-11-23 (u4-report.md: U4 closed); its kept server rows are U4k, after R1 (replan-marks.md:135-158).
@@ -158,7 +136,7 @@
     after a cut: from its notes). Done, resumable: the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats
     netcode a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
   - The saver b80065fbo (checkpoint.mjs watch from 23:03 to about 00:53; when it ends, restart it: run_in_background,
-    timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
+    timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
 - **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
   af8c5f0fbec829595 (u6b-run.sh exports CARGO_INCREMENTAL=0; a builder on the 4 GB floor stops, never cleans);
   U8's builder ac59cce3e5d002441 (worktree agent-ac59cce3e5d002441, notes u8-build.md "## Pass 3"); Stop B's infra seat
