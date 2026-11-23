@@ -20,7 +20,7 @@
   and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: #64**
   (he opened it at 17:21:24 UTC; a draft since his answer of 18:40:57 UTC; its title and
   text for his Advisor to set: `ci-wasm/pr-64-title.txt`, `ci-wasm/pr-64-body.md`); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 20:16 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 21:05 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -273,8 +273,8 @@
    the guard keeps `gh api` read-only: GH-TOOLS.
 
 ## Current step
-**Step 11 (2026-11-23): the corrected text is written and its first runs are clean under the stop rule; next the
-plants.** His yes to FIX-WRITE at 19:58:23 UTC (`ci-wasm/mustafa-2026-11-23T195823-fix-write.md`: (a); yes to the stop
+**Step 12 (2026-11-23): every CI write is made, both plants are run and taken back, the head is green; next the
+reviews.** Step 11, the corrected text written and its first runs clean under the stop rule: His yes to FIX-WRITE at 19:58:23 UTC (`ci-wasm/mustafa-2026-11-23T195823-fix-write.md`: (a); yes to the stop
 rule's new wording and to the two new checksums; his mode rule holds for this write), typed, the record on it
 `default` (session record 19:58 UTC, mode sequence 1659). The file rebuilt from cb476b1's file with `ci-edit-2.diff`
 (sha256 OK), copied onto `.github/workflows/toolchain.yml` at 20:00:41 UTC (the guard asked at 19:58:54; a one-time
@@ -308,13 +308,30 @@ again; outside `.checkpoints/` the tree equals 2a654f3's): all four runs success
 137981826960; pull request 45257156268, job 137981878828; gate and smoke 45257140991, 45257156063), both toolchain
 logs 17 of 17 by `stop-rule-check.py`.
 
-**Next:** the ask PLANT-WRITE (P-GH's two lines, `ci-wasm/ci-plant-p-gh.diff`, sha256 e4f21ab3...b1ac; the file after
-it 84b6b3fd...1ff8; numstat 2 0) and stop for his typed yes; its run must fail at the step "GitHub's own check of the
-archive" with gh's own line that the file is not part of the release (not a permission line, not "no attestations
-found"), nothing after it runs; then the ask PLANT-BACK (after it 56d37fc6...9811; numstat 0 2) and a clean run. Then
-reviews on the final diff (security-auditor, infra-engineer, test-engineer), the tier-2 evidence, the verifier, the
-advisor agent, docs-keeper, DECISIONS (his messages since 17:15:07 UTC), the report, the checkpoint folded and
-deleted, then he presses Ready.
+**P-GH, done.** His yes at 20:47:59 UTC (`ci-wasm/mustafa-2026-11-23T204759-plant-write.md`: PLANT-WRITE (a); **his
+yes to the take-back in advance**, if the planted run fails the expected way, else stop and bring him the lines before
+any write; his mode rule read on that message for both writes: the record `default`, session record 20:47 UTC). **The
+plant:** copied at 20:48:40 UTC, the file **84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8**,
+numstat 2 0, commit 47d7024c1dcc84db26dec73f7eab1d1af66385f0. Both toolchain runs failed only at the step "GitHub's
+own check of the archive (gh release verify-asset)" (push 45263235401, job 138003254035; pull request 45263244392, job
+138003287607), after "gh version 2.104.0", with gh's own line "attestation for 0.2.130 does not contain subject
+sha256:27c24e42e238fa86ca5feb42b3eeb1a4535040ed5dd0eb183da810f85cff6e10" (the planted file's sha256, computed here)
+and "##[error]Process completed with exit code 1."; the three steps after it were skipped; no permission line, no "no
+attestations found". So the check is live and the token's `contents: read` is enough (PERM-ATT (a) holds). **The
+take-back:** copied at 21:01:33 UTC, the file **56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811**
+again, numstat 0 2, commit ce5a7e78a7048f966460fdd346adf19250e009a3; outside `.checkpoints/` the tree equals
+2a654f3's. Its runs, all success: toolchain push 45265419122 (job 138010909634, 21:01:49 to 21:04:08 UTC), pull
+request 45265431448 (job 138010956116, 21:01:55 to 21:04:20 UTC), gate and smoke 45265419073 and 45265431460; both
+toolchain logs 17 of 17 by `stop-rule-check.py`. Shown to him. (The session's worker process was restarted once while
+the planted runs were being read, between 20:55 and 21:01 UTC; nothing was lost.)
+
+**Next (no CI write is left):** review round 1 on the final diff against main (security-auditor, infra-engineer,
+test-engineer; at most two rounds), fixes; the tier-2 evidence (the kit's three test files' counts on main and on the
+head; the before/after table of the workflow's rule sentences); the verifier; the advisor agent on the head;
+`docs/DECISIONS.md` by `decisions-3.mjs` (his messages of 17:15:07, 17:22:42, 18:40:57, 19:58:23 and 20:47:59 UTC,
+with the advisor agent's bar for their leads); docs-keeper (STATUS, ROADMAP, the map, the archive); the report
+`docs/reports/2026-11-19-ci-wasm.md`; the checkpoint folded and deleted; then he presses Ready, and the merge by his
+steps (GH-TOOLS (a)).
 
 _Step 10, kept for the record (its list of the writes still to make stands):_
 **Step 10 (2026-11-23): the corrected install place: the pass is done, its exact text is with him (ask FIX-WRITE);
