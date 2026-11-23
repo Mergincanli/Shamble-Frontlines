@@ -72,8 +72,48 @@ const said = (m, s) => {
 const fence = (label, n) =>
   `${wrap(`- _The thread's text, not his words: ${label} (copied by script, ${n.bytes} bytes, sha256 ${n.sha256}):_`)}\n\`\`\`text\n${n.words}\n\`\`\`\n`;
 
+// What a message of his in Builder V3's chat answers: the chat's own text, kept in the saved note's header by
+// chat-words.mjs. It is shown in the lead as the chat's words, never as his.
+const asked = (file) => {
+  const note = readFileSync(NOTES + file, 'utf8');
+  const m = note.slice(0, note.indexOf('\n---\n')).match(/What it answers: ([\s\S]*)_\s*$/);
+  if (!m) throw new Error(`${file}: no "What it answers" in its header`);
+  return m[1].trim();
+};
+const ASKED = (file) => `What it answers, in the chat's words (not his): ${asked(file)}`;
+const V3_MSG = (id) => `${V3}; his message ${id}, whole; extracted by script from the chat's transcript`;
 // Newest first. `file` undefined: a pointer, with no words of his quoted under it.
 const ENTRIES = [
+  {
+    key: '2026-11-23, 20:47:59 UTC: PLANT-WRITE (a)',
+    file: 'mustafa-2026-11-23T204759-plant-write.md',
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 20:47:59 UTC: PLANT-WRITE (a), yes to the two planted lines in GitHub's check; and his yes in advance to their take-back, only if the planted run fails the expected way** (${V3_MSG('8fe87b69-7b75-4459-bdd0-82430dc07783')}). The expected way, in his words: ${said(m, 'at the step "GitHub\'s own check of the archive", with gh\'s own line that the file is not part of the release, and nothing after it runs')}; and the other case: ${said(m, 'If the run fails any other way, stop and bring me the lines before any write, as the stop rule says.')} His point 3: ${said(m, 'My mode rule of 17:15:07 UTC holds for both writes, read on this message.')} ${ASKED('mustafa-2026-11-23T204759-plant-write.md')} Records, not his words: the mode on this message read \`default\`; the planted file was written at 20:48:40 UTC (sha256 84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8, commit 47d7024); both of its runs failed at that step with gh's line "attestation for 0.2.130 does not contain subject sha256:27c24e42e238fa86ca5feb42b3eeb1a4535040ed5dd0eb183da810f85cff6e10" and the three later steps were skipped; the take-back was written at 21:01:33 UTC (sha256 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811, commit ce5a7e7). ${by(m)}`,
+  },
+  {
+    key: '2026-11-23, 19:58:23 UTC: FIX-WRITE (a)',
+    file: 'mustafa-2026-11-23T195823-fix-write.md',
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 19:58:23 UTC: FIX-WRITE (a), yes to the corrected CI text (\`ci-edit-2.diff\`, against the file at cb476b1), to the stop rule's new wording, and to the two new checksums for the planted lines and their take-back; his mode rule of 17:15:07 UTC holds for this write** (${V3_MSG('e06bc496-dee4-49fe-8321-68a323d5e5f4')}). The text puts the tool into a folder the job makes fresh as root directly under \`/\` (the place his Advisor's input of 18:40:57 UTC named, the entry below, weighed and taken by infra-engineer) and has the check judge the program and every folder above it up to \`/\`. ${ASKED('mustafa-2026-11-23T195823-fix-write.md')} Records, not his words: the mode on this message read \`default\`; the file was written at 20:00:41 UTC (sha256 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811, commit 2a654f3), and its first runs were clean under the stop rule. ${by(m)}`,
+  },
+  {
+    key: '2026-11-23, 18:40:57 UTC: OPT-PATH (a)',
+    file: 'mustafa-2026-11-23T184057-opt-path.md',
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 18:40:57 UTC: OPT-PATH (a): the tool moves to a place where every parent folder is root-owned and closed to others, and the check is widened to every parent up to \`/\`, not weakened; the corrected text is prepared in one short pass and its exact text comes to him before anything is written; NOTES-PUSH (a)** (${V3_MSG('ee900136-bb16-4ee5-a6d4-8a7eccef346c')}). In his words: ${said(m, 'The check is not weakened.')} The place directly under \`/\` is his Advisor's input, ${said(m, 'to weigh, not an order')}. The pass: ${said(m, 'infra-engineer proposes, security-auditor reads the changed lines, your advisor agent rules. A second round only for a Critical or High.')} And: ${said(m, 'Nothing under .github/ is written before my yes on that text. The stop rule holds for the next run too.')} His point 5 holds two sentences on the guard's prompt for the copy, one that he saw and allowed it and one that he saw none; it stands as he sent it, and he asks what the transcript shows. ${ASKED('mustafa-2026-11-23T184057-opt-path.md')} Records, not his words: the transcript shows the guard's hook asked at 17:23:24 UTC and a one-time allow given in the app answered it at 17:23:43 UTC, which the chat told him in its next message; the mode on this message read \`default\`. ${by(m)}`,
+  },
+  {
+    key: '2026-11-23, 17:22:42 UTC: his yes to CI-WRITE-1 again',
+    file: 'mustafa-2026-11-23T172242-ci-write-1-again.md',
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 17:22:42 UTC: his yes to CI-WRITE-1 again, sent with the mode switched; he has opened the pull request** (${V3_MSG('99a5bc79-9b73-4f2a-ba5f-4e1c78eb6fb2')}). ${ASKED('mustafa-2026-11-23T172242-ci-write-1-again.md')} Records, not his words: the mode on this message read \`default\`, which his rule of 17:15:07 UTC (the entry below) covers; the file was written at 17:23:43 UTC (sha256 d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c, commit cb476b1); the pull request is #64, opened at 17:21:24 UTC and made a draft by him later that day. ${by(m)}`,
+  },
+  {
+    key: '2026-11-23, 17:15:07 UTC: CI-WRITE-1 (a)',
+    file: 'mustafa-2026-11-23T171507-ci-write-1.md',
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 17:15:07 UTC: CI-WRITE-1 (a), yes to the first CI write; his rule for how the chat's mode is read before a CI write; GH-TOOLS (a) for this pull request: he opens the draft, presses Ready and presses Merge on GitHub himself, by steps that stand in for the "expected head" part of his point 9** (${V3_MSG('4c139df2-6889-4a70-bc2d-461bfdc159cc')}). The mode rule, in his words: ${said(m, 'Write if the record on this message reads acceptEdits. If it reads default: my screen shows Accept edits, and on 2026-11-12 the record gave that same mode as "default" (the archive\'s MANUAL-MODE), so write as well and name the value in the report. Any other value: do not write, and tell me the value. The same reading holds for writes 2 and 3.')} The merge steps, in his words: ${said(m, 'your advisor agent approves the full SHA, gate, smoke and toolchain are green on it, you push nothing after that approval, you give me the full SHA when you ask for my go, and I type my go in this chat before I press Merge. My main Advisor checks from the repo that the pull request\'s head is that SHA.')} His point 1 leaves the pull request's number open, as he sent it: ${said(m, 'The draft pull request is open: #__.')} ${ASKED('mustafa-2026-11-23T171507-ci-write-1.md')} Records, not his words: the mode on this message read \`auto\` (the session record and the message), so by his own rule nothing was written on it; no pull request from the branch was on GitHub at 17:15 UTC. ${by(m)}`,
+  },
   {
     key: '2026-11-23, 16:30:46 UTC: Builder V3',
     file: 'mustafa-2026-11-23T163046-builder-v3.md',
