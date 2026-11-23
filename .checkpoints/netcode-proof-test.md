@@ -48,7 +48,7 @@
   fd4612050cd6 still need his word.
 - **2026-11-14 (:2048-2051, the reading :2067-2075):** SIZE-CHECK: an M unit's plan is about 3,000 added lines; past
   6,000 the build stops and he gets three lines (what grew, why, the cheaper option). MAIN-52 (:2084-2085). /compact:
-  ask at 35-40 % after the card is refreshed, then carry on.
+  ask at 35-40 % after the card is refreshed. U8's own stop is 6,200; past it unbuilt Lows are carried (:7703-7722).
 - **2026-11-13 CHECK-IN, 2026-11-12 SPEND-LIMIT (a), 2026-11-11 USAGE-SAVINGS (a), 2026-11-10 and 2026-11-09:** as the
   old card's Rules in force gives them (:6216-6316): a 2-hour check-in while agents run; restore and resume after each
   cut, each cut's notice and times recorded; read every Medium or higher and all that touches the judge, the marks or a
@@ -136,57 +136,47 @@
   PR #40's closing docs pass (ADV-M60-7), which also takes U4f2's follow-ups by id (u4f2-report.md, "Follow-ups").
 
 ## After the close (TEST-FIRST rule 1's list: found on the way, outside the plan)
-- ADV-U4F20-2 (Medium, his: a marks.json change): PM-0001-20's "measured reorder share" report row
-  (marks.json:4786-4790) and -58's (:4263-4267) read `header.params.reorder_permille`, which L1 scenario runs never write
-  (the share is the lab's `reorder` event since D3-1); reports state the event's figures by hand until he rules.
-  Beside it (NC-F1-1; advisor-u4f-f1-r1.md:220-221, his): a judged "presses seen equal the scripted count" check for -20
-  and -58, since "0 presses lost" holds by design after U4f-F1.
-- U5-Q1 term 3 (his, a marks.json item; advisor-u5-brief.md:163-165): -34's notes name "plan §4.7's npt-proto
-  messages", which include SessionStatus, while its parts do not.
-- His ADR-text item (the advisor's SEC-U5D-1 ruling, advisor-u5-early.md:312-314): ADR 0002:269's three-part form does
-  not cover the exports a dependency's macro expands.
-- NS-TRAILER and NS-FIRST: the night-shift lines' attribution option and status refresh, for the kit's next change
-  after the freeze (his RECS-1043 (b), history.md:2217).
-- For STATUS (the advisor's U4f L3): the hold-time cap's -21 counter (U4F-Q14 (b): a follow-up for the first unit that
-  runs ws sessions) and SA-16's variant (a client that acknowledges only forced full states cycles resyncs and is never
-  kicked: U6's limits).
-- The kit's paper costs I named to him on 2026-11-17 (my message after the card cut): for a decision after the close.
+- Whole and word for word on this card at e67ef59 ("After the close"): ADV-U4F20-2 with NC-F1-1 (his, marks.json); U5-Q1
+  term 3 (his); the ADR 0002:269 macro-export item (his); NS-TRAILER, NS-FIRST; the STATUS items (the -21 hold-time
+  counter, SA-16's variant); the kit's paper costs named to him on 2026-11-17. Nothing added since.
 
 ## Key numbers (U4f's `<base>` counts, the earlier packs and his 2026-11-17 count: this card at 1b26e8c)
-- Disk (2026-11-23 03:2x UTC, after part-clean 3): 11,253 MiB free (floor 4,096); still unpacked
+- Disk (2026-11-23 17:0x UTC): 6,950 MiB free with U6b's cold build running (floor 4,096; the dev profile reached 10.4 GB,
+  4.3 of it incremental; today's part-cleans 6.2, 8.7, 1.0, 7.5, 10.4 GiB); still unpacked
   (none covered by his packing words): u4r-P3-d66e23cd78f2 298 MiB, u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741,
   u4r-P2-fc411116c1f1 623, u4f-20-350677f0aef2 434, u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366,
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
-  .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
-  at its snapshot; resume after its last block marked done). Waiting on him: U8's builder
-  ac59cce3e5d002441 (pass 3 at item 2; SendMessage on his answer). Done: the advisor a3de649cd25e474df; round 2's seats, netcode
-  a120f51df9a8f6986, security af8c5f0fbec829595, infra a0615e1ead860724b (u8-r2-*.md); the docs agent a6eb7acdf1c3ff885
-  (u8-sec-sb-3-docs.md); the advisor's Stop B ruling a3de649cd25e474df; Stop B's seats, netcode a120f51df9a8f6986, security
-  af8c5f0fbec829595, infra a0615e1ead860724b (u8-stopb-*.md; round-2 reads by SendMessage); U7's T-builder
-  a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
-  seats a9a29bd03da0757ad, a4724cf284e77b73e; security's U7 read aca2c13cc291261c6 (security-u7-deps.md: CLEAR WITH
-  CONDITIONS, Lows); U7's advisor check a1caa8c461475ac54; security ab80f7d9c82f327b9 (security-f26.md, -u6c-deps.md).
-- **Shells and triggers:** the saver b67t3qh7l (checkpoint.mjs watch, from 16:2x
-  to about 18:2x; TaskStop it, restart in the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-  (2-hourly); day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
-- **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950; U8 builder abf71d95fc07b3522 (its worktree kept:
-  ops/browser/node_modules for test 4); the U6c advisor a662f1797b78cae95.
+- **Running (2 agents, 1 shell; message or resume each by SendMessage to its ID):**
+  - U6b's builder a2661dc320c9e6d00 (general-purpose, xhigh; worktree .claude/worktrees/agent-a2661dc320c9e6d00 from
+    21765e3, 754/850; u6b-brief.md rev 1.1 + launch items 1-6; runner u6b-run.sh, logs .gate/u6b/): notes in its worktree's
+    .checkpoints/netcode-proof-test/u6b-build.md (Blocks 1-6, F28 built; resume at Block 6's L2Config::named test, then the
+    end checks x2, plants, size line, the valve at 5,400). Told beyond its brief: u6b-run.sh exports CARGO_INCREMENTAL=0;
+    on the 4 GB floor it stops and reports, never cleans (the main session part-cleans, no lane running).
+  - U8's builder ac59cce3e5d002441 (worktree .claude/worktrees/agent-ac59cce3e5d002441 at 096808b + U8's files): pass 3
+    items 2-7, then the Lows (advisor-u8-r2.md section 3); stop 6,200 (his A); notes in its worktree's u8-build.md
+    "## Pass 3" (copied over by the snapshot); item 8's setting record u8-sec-sb-3-docs.md. On return: Now, Next 1.
+  - The saver b67t3qh7l (checkpoint.mjs watch from 16:2x to about 18:2x; when it ends, restart it: run_in_background,
+    timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
+- **Finished, resumable by SendMessage:** Stop B's seats, netcode a120f51df9a8f6986 and security af8c5f0fbec829595 (the
+  last round), infra a0615e1ead860724b; the advisor a3de649cd25e474df (U8's rulings; U8's pushed head); the docs agent
+  a6eb7acdf1c3ff885; U8's first builder abf71d95fc07b3522 (its worktree has ops/browser/node_modules for test 4); U7's
+  T-builder a9873cdba07a3219e (T5); U7's drafter a159f25bffe1d4950; the U6c advisor a662f1797b78cae95. Older: card at e67ef59.
 - **U6a MERGED at 824d8e7 (2026-11-23 03:56):** u6a-report.md (build, M5, carries by number); the carries' takers in
   u6a-fix-pass.md's last section; its build lines on this card at 21765e3. Merge M3-M9 as U4f's (history.md:7022-7028).
-- **U8** BUILT and fix pass DONE (4,957 added, 42 files; wip/u8-build.patch 60205020…; notes u8-build.md, F1-F28 and
-  "## Fix pass"; R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 40 min). Stop B's round (Now): each seat's
-  reading list is in its prompt; for the ruling also F9, F12, F17, F20. Not run on a VM. `node --test ops/` fails on
-  Node 22.23: use `'ops/**/*.test.mjs'`.
+- **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): its record in Now. Open at its
+  merge: F28 (U6b's flush), U6b's null certificate pair, U6c's names (advisor-u8-stopb.md:208-220, and NC-R2-4 in U6c's
+  message), Stop B's laptop reads (driver listen, passphrase, fsn1 stock, Claude Code >= 2.1.257). Interdiff old trees:
+  .gate/u8-r2-old (60205020). Not run on a VM. `node --test ops/` fails on Node 22.23: use `'ops/**/*.test.mjs'`.
 - **F26 (mine, from 2ad2829):** FIXED at 2a9498d (the ruling's section 6; tests 11/11; plant shown, restored 2609bc87;
   scan 0 findings; CI green on 8412c6b); security CLEAR WITH CONDITIONS (SEC-F26-1 DONE at 07d5d31; -2 accepted).
 - **U6b** (rev 1.1; security-u6b-deps.md, with conditions; Block 0 DONE ae4f57e): building (Now); C2's homes from
   advisor-u7-brief.md (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in npt-proto; the WebSocket tags in npt-link).
 - **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 security-cleared (5 conditions); disk freed first;
-  its launch gives U7's seven dist names and carries advisor-u8-stopb.md:208-220's six lines; at its merge U8's side
-  checked per interface (C9). **R1 Thu 3 Dec holds with
+  its launch gives U7's seven dist names and carries advisor-u8-stopb.md:208-220's six lines, NC-R2-4's record names
+  (advisor-u8-r2.md) and U6b's F-JOIN-ONCE (its glue steps a client only once its link is Open); at its merge U8's
+  side checked per interface (C9). **R1 Thu 3 Dec holds with
   about a day of slack** (section 3: U6a merged Mon 23-Tue 24, U6b Wed 25, U6c Sat 28, U7's Rust Sun 29, Stop B Tue 1);
   three lines to him if U6b is not merged by end Thu 26, U6c by end Sun 29, or a lane unit hits SIZE-CHECK.
 - **U7** (brief rev 1.1, 2026-11-23: the advisor APPROVE WITH CONDITIONS, advisor-u7-brief.md 65e109aa…, C1-C14 at
@@ -195,7 +185,8 @@
   security's read (security-u7-deps.md, CLEAR WITH CONDITIONS) -> Block 0a DONE bc87d2d -> T-half DONE (T1-T4, 8ab088e8…,
   2,482 added) -> 0b's binding check the hour U6c merges -> the R-half Sun 29 -> one round (netcode, test; no security:
   C12) -> merged by end Mon 30, else three lines that day. R1 holds with about a day of slack on six assumptions
-  (its section 6). Its section 4 routes the contradictions; nothing else edited.
+  (its section 6). Before Stop B's fill I build U7's dist twice, two clone paths and CARGO_HOMEs (SEC-SB-5's term,
+  advisor-u8-stopb.md:197-199): equal lists become ops/runs/r1-dist.sha256's fill; a difference goes to the advisor.
 - **Tools:** snapshot `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree> <out.patch> <prefix>`;
   part-clean (no lane running) `env CARGO_NET_OFFLINE=true flock -x <M>/.gate/shared-target/.lane.lock cargo clean
   --manifest-path <M>/spikes/netcode-proof/Cargo.toml --target-dir <M>/.gate/shared-target --profile dev`, then `test`
