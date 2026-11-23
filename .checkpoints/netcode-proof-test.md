@@ -72,16 +72,17 @@
   SEC-R2-2 CLOSED (u8-r3-security.md); one Low, NC-R3-1 (r1.sh:438-452, save_log unguarded under set -e), a follow-up.
 - **U6b: BUILT ~17:27** (snapshot 49f4488f…, 29 files, 5,498 added of the 6,000 stop; the brief's likely 3,650-4,050):
   check5.log 11/11 (measured 799 = +45, bites 898 = +48; test step 891.5 s, 0.93x base); 14 plants fail by name; the
-  valve built; no manifest change. **Its round:** netcode DONE 21:3x, APPROVE WITH FINDINGS (u6b-review-netcode.md: 0
-  High; Medium NR-U6B-1 ws_summary lost at a room's end, -2 the gate's 30 Hz literal; 12 Low; F-PING: keep the built
-  rule with NR-U6B-3, the advisor to word condition 1 anew); security DONE 21:4x, REVISE (u6b-review-security.md: 0
-  High; Medium SEC-U6B-1 the closing task unbounded, a slot held for ever; -2 quinn's default stream limits, about
-  250 MB a connection; 3 Low, -3 to the security baseline); test a88f25b3d3f66d972 running.
+  valve built; no manifest change. **Its round DONE 21:3x** (u6b-review-*.md): netcode APPROVE WITH FINDINGS (2 Medium,
+  12 Low; F-PING: keep the built rule with NR-U6B-3); security REVISE (Medium SEC-U6B-1 the closing task unbounded,
+  -2 quinn's default stream limits; 3 Low); test REVISE (High T-1: the R3 bite ws-budget-x2 never armed through an
+  accepted link; 8 Medium T-2 to T-9; 12 Low). **The fix list** u6b-fix-pass.md (my leans: the valve's bite to U6e with
+  T-1 as its condition, else about 6,000; the 48-connection reading at U6c's close); **the advisor's ruling RUNNING**
+  aaeb16476830d05d1 (-> advisor-u6b-r1.md: R-PING condition 1's sentence, A1 T-1, A2 the reading, A3 a second round).
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6b:** read the three seats in full (every Medium or higher); the fix list (my lean, the advisor if a ruled
-  condition moves, F-PING among them). Then the fix pass by U6b's builder
-  a2661dc320c9e6d00 (resumed) with the container readings; merge M3-M9 (main-run.sh), CI; U6b's report.
+- **Next 2, U6b:** on the ruling, the fix pass by U6b's builder a2661dc320c9e6d00 (resumed) with the ruling's block
+  (the fixes, the 20-starts reading, end checks x2, the size line); snapshot; a second round only if A3 says; merge
+  M3-M9 (main-run.sh), CI; U6b's report; the brief's rev 1.2 for R-PING.
 - **Next 3:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md:
   the Choices of 2026-11-23 below, his SIZE-STOP (a), the three cuts, SEC-F26-1 done, U6b's and U8's state. U4's report
   DONE (u4-report.md), named in it; T5 (i) the day U6b merges.
@@ -151,8 +152,8 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (3 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - U6b's test seat a88f25b3d3f66d972 (u6b-review-test.md; xhigh; read only); netcode a0a57a3948202de40 and security
-    aedb799ad9648b0e1 DONE (resumable).
+  - The advisor on U6b's fix list aaeb16476830d05d1 (advisor-u6b-r1.md; xhigh); U6b's seats DONE (resumable): netcode
+    a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
   - The saver b8o9wv6ox (checkpoint.mjs watch from 21:13 to about 23:03; when it ends, restart it: run_in_background,
     timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
 - **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
