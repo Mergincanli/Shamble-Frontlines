@@ -20,7 +20,7 @@
   and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: #64**
   (he opened it at 17:21:24 UTC; a draft since his answer of 18:40:57 UTC; its title and
   text for his Advisor to set: `ci-wasm/pr-64-title.txt`, `ci-wasm/pr-64-body.md`); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 21:05 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 21:52 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -273,6 +273,35 @@
    the guard keeps `gh api` read-only: GH-TOOLS.
 
 ## Current step
+**Step 13 (2026-11-23, 21:52 UTC): review round 1 is done and fixed; round 2 and the verifier run; the report is
+drafted.** Round 1 on the final diff (notes `ci-wasm/*-review-1.md`): infra-engineer APPROVE; test-engineer proven
+with follow-ups; security-auditor one Medium in the code (F-LOCKPATH). No Critical or High. **The fix pass:** 280f31c
+(the refusal pattern also refuses `CARGO_RESOLVER_*`, `CARGO_INCREMENTAL`, `RUSTC_BOOTSTRAP`; one test line;
+security-auditor's text); the stop-rule script tightened (`ci-wasm/stop-rule-check.py`, infra-engineer's version: the
+boundary block's own "Tests  7 passed (7)" and the job's time; 18 of 18 on all eight clean jobs); **a third plant,
+P-BOUNDARY** (8d2ce32: `packages/sim-worker/boundary/sim-wasm.test.mjs:31` expects 31; both toolchain runs failed in
+the boundary block, push 45270802317 job 138029769180, pull request 45270822315 job 138029828871: "AssertionError:
+expected 30 to be 31", "Tests  1 failed | 6 passed (7)", nothing after it; taken back 6d0b5b1). **The code head
+6d0b5b12945f3ca6b66bdb23036b6c7f90fc9299:** gate and smoke success (push 45272654640, pull request 45272669452),
+toolchain success (push 45272654783 job 138036214520, pull request 45272669543 job 138036262546), both logs 18 of 18.
+
+**His words of 21:24:59 UTC** (`ci-wasm/mustafa-2026-11-23T212459-after-64.md`, sent while the chat worked; in
+`docs/DECISIONS.md` since 1d8b61b): FIREFOX-TESTS (b) in place of (c): Firefox in CI joins the CI pull request after
+3a, none between #64 and 3a; **change-set 3a starts when #64 is merged, with no second ask; if the context is above 40
+% then, tell him first and he compacts** (it read 53 % at 20:47 UTC); three items for 3b come from his Advisor before
+3b's build. `docs/DECISIONS.md` also holds his five messages from 17:15:07 to 20:47:59 UTC since e98b927.
+
+**Running since 21:44 UTC (Opus 5.5, effort max):** security-auditor round 2 (`ci-wasm/security-auditor-review-2.md`),
+test-engineer round 2 (`ci-wasm/test-engineer-review-2.md`), the verifier (`ci-wasm/verifier.md`, ten claims).
+**Then:** fill the report (`ci-wasm/report-template.md` with `ci-wasm/report-build.py`, which inserts the workflow
+diff, infra-engineer's rule table and the first clean run's log lines, and `ci-wasm/report-fill.json` for the
+verdicts; it writes `docs/reports/2026-11-19-ci-wasm.md`); docs-keeper (STATUS within 120 lines, ROADMAP, the map, the
+archive: plan section 7 item 4, with the reviewers' follow-ups and FIREFOX-TESTS (b)); the advisor agent on the final
+head; the checkpoint deleted in the last commit (no skip marker on it); checks green on that head; then his go with
+the full SHA (his steps of GH-TOOLS (a)). The logs under `.gate/ci-wasm/logs/` are untracked: fetch them again by job
+id if the container is new.
+
+_Step 12, kept for the record:_
 **Step 12 (2026-11-23): every CI write is made, both plants are run and taken back, the head is green; next the
 reviews.** Step 11, the corrected text written and its first runs clean under the stop rule: His yes to FIX-WRITE at 19:58:23 UTC (`ci-wasm/mustafa-2026-11-23T195823-fix-write.md`: (a); yes to the stop
 rule's new wording and to the two new checksums; his mode rule holds for this write), typed, the record on it
