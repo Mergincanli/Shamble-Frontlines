@@ -128,18 +128,20 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 
 ## Decisions, newest first
 - **Taken by Mustafa, 2026-11-23, 16:30:46 UTC: Builder V3, a new Claude Code chat on Fable 5.2, takes over the CI-WASM
-  pull request; CI-MODEL (a): for that chat's CI edits of this pull request he sets his words of 2026-11-12 on CI work
-  aside** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account
-  that also holds his claude.ai project "Shamble Frontlines ALT"; his message 67cc6bba-62e1-48f2-bb37-8d7ae79afa81,
-  whole; extracted by script from the chat's transcript). Points 1 to 10 are the block the project thread wrote for him
-  to paste (`.checkpoints/ci-wasm/handover-block.txt`, saved and pushed at c405ccb before the thread posted it; his
-  message starts with it byte for byte); pasted into the chat, it is his word. Points 11 and 12 he added himself. What
-  it answers is shown under it as the thread's text, not his words. The thread's question CI-MODEL is answered by his
-  point 6: "For this chat's CI edits of the CI-WASM pull request, each asked of me with its exact text, I set my words
-  of 2026-11-12 ("The guard, the gate and CI work stays with Opus 5.5.") aside, as GATE-FOLLOW did for Builder V1." His
+  pull request; CI-MODEL (a): for that chat's CI edits of the CI-WASM pull request, each asked of him with its exact
+  text, he sets his words of 2026-11-12 on CI work aside** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 67cc6bba-62e1-48f2-bb37-8d7ae79afa81, whole; extracted by script from the chat's
+  transcript). Points 1 to 10 are the block the project thread wrote for him to paste
+  (`.checkpoints/ci-wasm/handover-block.txt`, saved and pushed at c405ccb before the thread posted it; his message
+  starts with it byte for byte); pasted into the chat, it is his word. Points 11 and 12 he added himself. What it
+  answers is shown under it as the thread's text, not his words. The thread's question CI-MODEL is answered by his point
+  6: "For this chat's CI edits of the CI-WASM pull request, each asked of me with its exact text, I set my words of
+  2026-11-12 ("The guard, the gate and CI work stays with Opus 5.5.") aside, as GATE-FOLLOW did for Builder V1." His
   point 11 gives his taps BUILD-SEAT and ACCT-3 (the two entries below) in his own words. At 16:33:16 UTC he also sent
-  the block as a file, the same bytes (`.checkpoints/ci-wasm/mustafa-2026-11-23T163316-attached-block.md`, readable at
-  08053c7 once the notes are deleted). Copied by script (4353 bytes, sha256
+  points 1 to 10 as a file, with the same sha256 as `handover-block.txt` (compared by sha256; the file was not opened);
+  that message is in the notes (`.checkpoints/ci-wasm/mustafa-2026-11-23T163316-attached-block.md`, readable at 08053c7
+  once the notes are deleted). Copied by script (4353 bytes, sha256
   6b1c9ac868965f4bed74db85b83e1bc9177bb2cace5ee3f31dd1eab9e8e3d38a):
 > My words of 2026-11-23 for a new Claude Code chat: you take over the CI-WASM pull request.
 >
@@ -196,14 +198,14 @@ Option 2: No, builders only on the two. Open the new chat on your university or 
 Why recommended: Your repo's rules name two accounts, the university one and your personal one. You already work from this third one, so the records should say what it may do.
 ```
 - **Taken by Mustafa, 2026-11-23, 15:10:32 UTC: BUILD-SEAT, the new Claude Code chat builds change-set 3 after the CI
-  pull request is merged** (the project thread "Build the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in
-  his claude.ai project "Shamble Frontlines ALT", on an account beside the two that CLAUDE.md's ACCOUNTS names (the
-  project's description calls it his second personal account); a tap on the thread's decision card: the line below is
-  the message the platform wrote for his tap, in the card's wording, not text he typed; extracted by script from the
-  session's transcript). The card is shown under it as the thread's text, not his words. In his block of 16:30:46 UTC
-  (the entry above) he puts it as "BUILD-SEAT (once the CI pull request is merged, you build change-set 3, starting when
-  I say so in this chat)", and its point 9 says "Do not start change-set 3." Copied by script (134 bytes, sha256
-  324be6b2ad1230c0d74a268e248c7213e2d220a6b5dd79298117abc85699d2cc):
+  pull request is merged, when he tells it to go on** (the project thread "Build the game from change-set 3",
+  session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines ALT", on an account beside the two that
+  CLAUDE.md's ACCOUNTS names (the project's description calls it his second personal account); a tap on the thread's
+  decision card: the line below is the message the platform wrote for his tap, in the card's wording, not text he typed;
+  extracted by script from the session's transcript). The card is shown under it as the thread's text, not his words. In
+  his block of 16:30:46 UTC (the entry above) he puts it as "BUILD-SEAT (once the CI pull request is merged, you build
+  change-set 3, starting when I say so in this chat)", and its point 9 says "Do not start change-set 3." Copied by
+  script (134 bytes, sha256 324be6b2ad1230c0d74a268e248c7213e2d220a6b5dd79298117abc85699d2cc):
 > Chose "The new Claude Code chat" on the decision card asking "Pick which chat builds change-set 3 after the CI pull request is merged"
 - _The thread's text, not his words: the decision card he answered, posted at 15:09:54 UTC (copied by script, 756 bytes,
   sha256 c393bf2139831a42d59bf0d40a22aa69d5d9121c60ac765c5e91575f47ef1ce4):_
