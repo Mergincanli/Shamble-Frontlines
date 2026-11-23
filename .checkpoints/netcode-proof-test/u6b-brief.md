@@ -1,4 +1,4 @@
-# U6b's brief, rev 1.1 (2026-11-22): the transports (the advisor's APPROVE WITH CONDITIONS 1-8 applied: section 0.1)
+# U6b's brief, rev 1.2 (2026-11-23): the transports (rev 1.1's conditions 1-8: section 0.1; rev 1.2's rulings: 0.0)
 **The unit:** the second piece of U6 as Mustafa's NPT-TRIM cut it (history.md:7561-7593; his answers of 2026-11-22,
 history.md:7595-7607: RE-PLAN-OK yes, R1 on Thursday 3 December). Its row: replan-units.md:59 (T1, T2, T3, T4, T5,
 S8b: 2,205 estimated, 2,950-3,300 likely), first needed by R1 for the smoke, -36 and DelayStream's self-test. Built on
@@ -8,6 +8,19 @@ u6-facts.md, advisor-u6-brief.md, U6's row plan.md:1254 (replan-units.md:3 cites
 interfaces and the build rules), advisor-u6a-brief.md, security-r1-deps.md.
 **One advisor check** (NPT-TRIM), no re-check unless it finds a Critical or High. Section 9's six questions are the
 only asks; every other choice goes by its lean, one line each (section 1).
+
+## 0.0 Rev 1.2 (2026-11-23, after U6b's one round; read before 0.1)
+The advisor's ruling advisor-u6b-r1.md (sha256 dc6973dacdac32cefd559c7a25cd6979c52a22d361a9452aa418a0a7e77135f5) binds by
+line range, word for word (NPT-TRIM: no restated rulings), over any text below it contradicts:
+- R-PING, :65-81: condition 1's quoted sentence on a datagram outside an announced tick is replaced, and section 3 gains
+  its tests and plant P17;
+- A1, :100-118: the bite PM-0001-18/ws-budget-x2 is U6e's, with T-1 as U6e's condition; this changes section 0's bite
+  line, Block 5's bites bullet, section 3's Bites paragraph, condition 5's counts (at least +45 measured and +45 bites)
+  and section 2's U6e line;
+- A2, :136-143: section 3's container readings are the 20 starts in the fix pass; the 48-connection reading and the
+  memory bound are read at U6c's close;
+- A3, :145-156: no second round; the advisor checks the fix diff.
+The fix pass's own order and stop: advisor-u6b-r1.md section 4.
 
 ## 0.1 Rev 1.1: the advisor's conditions (read first; each replaces or adds to the section it names)
 **Security's Block 0 read** (security-u6b-deps.md, 2026-11-22, DONE): all eight items of advisor-u6b-brief.md section 4
