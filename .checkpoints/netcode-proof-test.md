@@ -69,17 +69,17 @@
 - **07:0x, U6b's builder launched** (`<base>` 21765e3, 754/850; u6b-run.sh; items 1-6 with F28; the valve at 5,400).
 - **Next 1:** U6b's return: snapshot, its one round (netcode, test, security: transports face the internet), fixes, merge.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
-- **07:1x-11:2x, Stop B's round DONE (lever (2), on 60205020): all three REVISE** (u8-stopb-netcode.md 4 High, -security.md
-  1, -infra.md 1; 16 Medium, 21 Low; Highs and Mediums read in full; NC-SB-1, -2 checked in code). U6b: F-PING, F-MARK-HDR.
+- **07:1x-11:2x, Stop B's round 1: all three REVISE** (u8-stopb-*.md: 6 High, 16 Medium, 21 Low). U6b: F-PING, F-MARK-HDR.
 - **Cuts 07:53-11:14 and 12:28-16:22 UTC** (history.md:7675-7701): all resumed; part-cleans 7.5 and 10.4 GiB; CARGO_INCREMENTAL=0.
-- **11:4x, the advisor's Stop B ruling: REVISE** (advisor-u8-stopb.md daf55033…, read in full but sections 1-2): items
-  1-20, all now; S14's 10-minute window; round 2 the same three seats on the diff; item 8's record u8-sec-sb-3-docs.md.
-- **16:3x, U8's fix pass 2 DONE** (items 1-20; Node 95/0, wrappers 315/0, redact 0; plants P10-P19 shown; snapshot
-  bca52b2c…, 5,876 added, 43 files; under 6,000). Interdiff's old tree .gate/u8-r2-old; 26 files + r1-dist.sha256.
+- **11:4x, the advisor's Stop B ruling** (advisor-u8-stopb.md daf55033…): items 1-20; S14 10-min; item 8: u8-sec-sb-3-docs.md.
+- **16:3x, U8's fix pass 2 DONE** (95/0, 315/0; P10-P19; snapshot bca52b2c…, 5,876 added); old tree .gate/u8-r2-old.
 - **16:4x, round 2 netcode: REVISE** (u8-r2-netcode.md): NC-SB-1..4 all closed; new NC-R2-1 High (the probe block TERMs
   LG and saves its cut log as .jsonl: the reader refuses a half line or an empty log, so collect and the fallback fail),
   -2, -3 Medium, 3 Low. Infra's round 2 started 16:4x. Open Highs after round 2 go to the advisor (:304-305).
-- **Next 3:** round 2's security and infra returns; then the advisor on the open Highs; U4's report; T5 (i).
+- **16:5x, round 2 security: REVISE** (u8-r2-security.md): SEC-SB-1 and all round-1 Mediums closed; new SEC-R2-1 High
+  (/etc/issue.d absent on 24.04: firstboot dies; checked here, no package owns it), -2 High (sudo -l wraps at 80 into a
+  file: bring-up stops), -3 Medium (PowerShell deny case-insensitive blocks `git -C`), 1 Low. Both Highs fail safe.
+- **Next 3:** round 2's infra return; then the advisor on the open Highs and Mediums; U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
@@ -152,9 +152,9 @@
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
   .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
-  at its snapshot; resume after its last block marked done); round 2 on U8: the security seat af8c5f0fbec829595
-  (16:3x, u8-r2-security.md) and the infra seat a0615e1ead860724b (16:4x, u8-r2-infra.md). Done: the netcode seat's
-  round 2 a120f51df9a8f6986 (u8-r2-netcode.md); U8's fix-pass builder ac59cce3e5d002441; the docs agent a6eb7acdf1c3ff885
+  at its snapshot; resume after its last block marked done); round 2 on U8: the infra seat a0615e1ead860724b (16:4x,
+  u8-r2-infra.md). Done: round 2's netcode a120f51df9a8f6986 and security af8c5f0fbec829595 (u8-r2-netcode.md,
+  u8-r2-security.md); U8's fix-pass builder ac59cce3e5d002441; the docs agent a6eb7acdf1c3ff885
   (u8-sec-sb-3-docs.md); the advisor's Stop B ruling a3de649cd25e474df; Stop B's seats, netcode a120f51df9a8f6986, security
   af8c5f0fbec829595, infra a0615e1ead860724b (u8-stopb-*.md; round-2 reads by SendMessage); U7's T-builder
   a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's

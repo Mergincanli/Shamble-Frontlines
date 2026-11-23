@@ -78,9 +78,9 @@ Low 1. Under section 7's budget the two Highs go to the advisor, for one more ro
   - Every driver is started by lib.mjs from its recorded path, after its SHA-256 check (lib.mjs:83-90). driverArgs
     gives chrome and edge `--port=<p>` only, and firefox `--host=127.0.0.1 --port=<p> --websocket-port=0`
     (config.mjs:215-220).
-  - remote() names 127.0.0.1:<p> path "/" (config.mjs:222-226). WebdriverIO's `definesRemoteDriver` therefore starts no
+  - remote() names 127.0.0.1:<p> path "/" (config.mjs:223-226). WebdriverIO's `definesRemoteDriver` therefore starts no
     driver (@wdio/utils 10.2.0 build/index.js:766-770, read in round 1), and the capabilities carry no `wdio:*` option
-    (config.mjs:199-213).
+    (config.mjs:200-213).
   - Without `--allowed-ips` chromedriver binds loopback and refuses non-localhost Origin and Host (http_server.cc, read
     in round 1). geckodriver binds its `--host`, with Host allowed by default (geckodriver Flags docs).
   - Test 4 holds the argv and remote-options asserts (browser.test.mjs:18-35), and plants P15 and P16 fail it
@@ -109,7 +109,7 @@ Low 1. Under section 7's budget the two Highs go to the advisor, for one more ro
   - host_active (:119-127) refuses `host` (:780) and every `browsers` call (:690) when dist.txt is missing, or when
     DIST-DIFFERS exists without DIST-ACCEPTED. The server chain does not depend on it.
   - The `dist-accept` block (:786-792) refuses when there is no difference and refuses an empty list (:789). It prints
-    the differing names, then writes the stamp. PROMPT-R1.md:73-75 runs it only after his typed word. That is enough to
+    the differing names, then writes the stamp. PROMPT-R1.md:72-74 runs it only after his typed word. That is enough to
     record his word: DIST-DIFFERS sits beside the stamp, and the dist cannot change within one VM's life
     (/var/lib/npt/dist is root-owned).
   - Note, no finding: npt-host still serves the dist once the production chain exists. The gate stops his browsers
@@ -126,7 +126,7 @@ Low 1. Under section 7's budget the two Highs go to the advisor, for one more ro
   - The `--no-verify`, `refs/heads/` and hooksPath-setting denies are in both shells (settings.json:28-36, :51-59).
     Start check 7 reads `git config --get core.hooksPath`, which no deny matches (PROMPT-R1.md:32-33).
   - One side effect is SEC-R2-3.
-- **SEC-SB-8 (Low): the LG half is CLOSED; the RS half is not working as built.** PROMPT-R1.md:51-54 runs `id -nG`, the
+- **SEC-SB-8 (Low): the LG half is CLOSED; the RS half is not working as built.** PROMPT-R1.md:52-54 runs `id -nG`, the
   exact three-line `sudo -n -l` and steps.log `build done` on LG. The RS half is right in intent but false-stops on the
   VM (SEC-R2-2).
 - **SEC-SB-9 (Low): PART CLOSED.** ProtectHome, PrivateTmp, an empty CapabilityBoundingSet, RestrictNamespaces,
