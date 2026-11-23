@@ -7734,3 +7734,10 @@ B. I'm about to run /compact on this chat. First make sure nothing that lives on
   "I hit my usage limit while you were working, but it has reset now. Please continue from where you left off."
 - **Resumed 21:1x UTC:** no cargo running; git status clean (HEAD e91085b = origin); the saver restarted (b8o9wv6ox);
   the three seats by SendMessage, each from its file.
+
+## Mustafa, 2026-11-23 about 23:17 UTC, in this chat (word for word)
+- After the 2026-11-24 day message (sent 23:0x UTC):
+  "96% usage, make sure to save your progress (but also for the agents)"
+- Done at once: U6b's in-progress fix pass snapshotted as wip/u6b-fix.patch (its builder mid-way through its counted
+  check.mjs run; wip/u6b-build.patch stays the round's 49f4488f for U6e and the advisor's check); the builder told to
+  keep its notes current; the card and this file saved and pushed.
