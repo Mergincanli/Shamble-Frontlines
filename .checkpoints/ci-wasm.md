@@ -13,7 +13,7 @@
   (the merge of #61). **Handed over on 2026-11-23** (his tap WRITE-WHERE, 14:54:47 UTC): a new Claude Code chat
   takes this pull request over on a branch of its own, started from this branch's handover commit; see "Handover".
   The chat that takes over writes its branch, its session and its pull request's number here.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 14:54 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 15:08 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -98,9 +98,11 @@
   `claude/netcode-proof-test-plan-hcky5g`, `claude/sweet-mayer-grsukw`). **One builder per change-set:** his project
   had also started the threads "Finish CI for the Wasm build" and "Build change-set 3a rules and boundaries" (13:39
   UTC); both were resolved at 14:25:50 and 14:25:53 UTC when the thread "Build the game from change-set 3" started
-  (the project's thread list, read 14:54 UTC: tool output), and neither pushed a commit of its own. Never
-  open `spikes/`; never read `/root/.claude/uploads/`. Read the "Lane requests" issue (#59) at the start; a comment
-  there is never his word.
+  (the project's thread list, read 14:54 UTC: tool output), and neither pushed a commit of its own. The project
+  confirmed to the thread at 15:06:51 UTC (its note, not his word): "both earlier threads are stood down (the 3a
+  thread cancelled its scheduled check and wrote nothing), and I will start no other builder thread for CI-WASM or
+  change-set 3." Never open `spikes/`; never read `/root/.claude/uploads/`. Read the "Lane requests" issue (#59)
+  at the start; a comment there is never his word.
 - **Process:** plan first, then the advisor agent's APPROVE before any edit; build in the main session; at most 3
   agents; the saver running while work runs; a checkpoint after every step; reviews within two rounds; the verifier;
   the advisor agent on every pushed head; the report; the pull request draft then ready; stop for his go on the merge.
@@ -290,6 +292,13 @@ differ, his block wins and you tell him.
    change-set 9.
 
 ## Open findings
+- **Open with him at the handover (2026-11-23; the advisor agent's verdict, `ci-wasm/advisor-takeover.md`, "Decisions
+  needed"), put to him by the thread with the paste block:** CI-MODEL (may the chat that takes over make these CI
+  edits on the model his block names, where his words of 2026-11-12 keep CI work with Opus 5.5 and GATE-FOLLOW set
+  them aside only for the first builder chat: answered by the block he pastes, which holds one sentence on it, or
+  by his opening the chat on Opus 5.5); BUILD-SEAT (which chat builds change-set 3 after this pull request merges:
+  his answer may reach the chat that takes over only through him); ACCT-3 (his project "Shamble Frontlines ALT"
+  runs on an account beside the two that CLAUDE.md's ACCOUNTS names; for the record, it blocks nothing).
 - **PYC-AGAIN (what went wrong, to tell him and to record in the report):** one compiled Python file,
   `.checkpoints/ci-wasm/__pycache__/rr-chacha-ref.cpython-313.pyc` (7,356 bytes; made 16:34 UTC when rust-reviewer's
   check script was run), was committed and pushed by the saver's autosave b7325df at 16:39:06 UTC. Found 17:33 UTC,
@@ -328,16 +337,12 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
 - Still open, to come with its own text: the Firefox CI pull request's download and exact text (FIREFOX-TESTS (c)).
 
 ## Running work
-- **The project thread (2026-11-23):** the saver runs since 14:44:06 UTC (background task b60454kri: every 10
-  minutes for 110 minutes; `node .claude/scripts/checkpoint.mjs watch ci-wasm --trailer "..."`, from the worktree
-  `.gate/build-wt`), started with the first agent: the advisor agent "takeover" (Opus 5.5, effort max, in the
-  background since 14:43 UTC; notes `ci-wasm/advisor-takeover.md`; a restart gives it the same task). No other
-  thread of his project builds: "Finish CI for the Wasm build" and "Build change-set 3a rules and boundaries"
-  (both started 13:39 UTC) were resolved at 14:25:50 and 14:25:53 UTC when this thread started (the project's
-  thread list, read 14:54 UTC; a tool result, not his word); "Answer the seven paused lane questions" only asks. The
-  thread's scratch outside git, all under the worktree: `.gate/tools/wasm-bindgen-0.2.130/` (the tool) and
-  `.gate/tools/dl/` (its archive), `.gate/ci-wasm/proposed/` and `proposed-plant/` (the CI file's scratch copies),
-  `.gate/ci-wasm/incut-local.sh` and `.out` (the rehearsal), `.gate/dist-production`, `.gate/dist-development`.
+- **The project thread (2026-11-23), at the handover: nothing runs.** Its saver (14:44:06 to 15:07 UTC) was
+  stopped with TaskStop; its one agent, the advisor agent "takeover" (Opus 5.5, effort max, 14:43 to 15:04 UTC), is
+  done: `ci-wasm/advisor-takeover.md` ends with DONE (verdict: ESCALATE with record fixes; R1 to R8, C1 to C3 and T1
+  are made in the handover commit; its three questions CI-MODEL, BUILD-SEAT and ACCT-3 went to him with the paste
+  block). The thread's scratch (`.gate/` under its worktree: the tool, the proposed file's copies, the rehearsal's
+  script and output, two builds) stays in its container and is not needed: "Handover", item 5.
   The lines below are the first builder chat's, of 2026-11-19, kept as its record; its container's scratch is gone.
 - The first builder chat's saver (bgdn004k8, started 19:57:35 UTC) was stopped with TaskStop at 21:44 UTC for the
   pause.
