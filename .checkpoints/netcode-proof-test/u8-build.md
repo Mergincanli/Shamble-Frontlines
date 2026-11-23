@@ -166,3 +166,116 @@ Files only under spikes/netcode-proof/ops/ as the brief names them. No commit, n
   version, help, spawnOpts), WebdriverIO's documented form; cacheDir is set on remote()'s options, not the driver's.
 - F23 The operator allows are fixed strings: a trailing wildcard on a curl allow would admit `-T <file> <other host>`
   (an upload anywhere). plan.md:1320's "allows the HTTPS calls" is met by the exact ledger and DoH reads.
+
+## Fix pass (2026-11-23)
+Builder: own worktree .claude/worktrees/agent-ac59cce3e5d002441, fast-forwarded (`git merge --ff-only 096808b`) from
+f5030a3 to the lane head 096808b (U6a 824d8e7, F26 2a9498d inside); patch sha256 e9fd605c…5534 checked; `git apply
+--check` clean, applied. No cargo, no npm, no commit. These notes live in the worktree's copy of this file (the tool
+refuses the shared checkout's path from an isolated agent); the main session copies them over.
+Message: advisor-u6c-brief.md §5 items 1-8, advisor-u7-brief.md §5 item 9, the main session's item 10.
+Plan (in order; one line each below as done): 1 npt-host path+service+host.json in rs.yaml, r1.sh is-active checks,
+tests 1 and 3 · 2 TLS names production.*/staging.* · 3 hash URL /npt/cert-hash-NN.json, plan.md:995-996 superseded ·
+4 probe settings, empty token, LG duration, wait on npt-super's log, probe_presence per-leg + fixture test · 5
+load_settings fields, end at duration_s, READY wait · 6 test 6 no finding, hook EXPECTED from F26 · 7 report names
+u8-brief.md:383, :505-507, :521 superseded · 8 npt-super start flags, room_settings fields only · 9 save() header and
+footer, pure builder in config.mjs + test + plant · 10 npt-super run fields equal the room's settings + test.
+Resumed 06:37 UTC after a spend-limit cut at 03:59: no source edit had been made (git status: patch only); item 1
+redone whole.
+Done:
+- Item 1 DONE: new ops/systemd/npt-host.path (PathExists production.chain.pem; WantedBy multi-user), npt-host.service
+  (User/Group npt-host, NoNewPrivileges, ExecStart serve /etc/npt/host.json, Restart=no, no [Install]), host.json
+  (bind 0.0.0.0:31000, cert_chain/cert_key production.*, dist, hash_template room-NN, host_keys; field names U8's
+  until U6c merges); rs.yaml:218-222 installs them root 0644 from the clone, daemon-reload, `enable --now
+  npt-host.path`; r1.sh:70 host_active (`systemctl is-active npt-host`), :418 browsers() first line, :477 new `host`
+  block; PROMPT-R1.md §3 step 4 runs `r1.sh host` first. Tests: test 1 +1 ("rs: npt-host.path and npt-host.service
+  …", 20 pass); test 3 +5 (no sudoers line names npt-host or systemctl, both files; host_active; browsers first;
+  host block first: 219 ok). rs.yaml still < 32 KiB (test 1).
+- Item 2 DONE: r1.sh:130 room settings name production.chain.pem / production.key.pem; npt-cert:6-14 header names the
+  four files and the stderr `PROFILES …` line (passed through: the coproc redirects no stderr); r1.sh:273 cert_wait
+  keeps all but the TXT step. Test 3 +7 (four names in the header; the call line unchanged with no stderr redirect;
+  the cert block keeps stderr; production pair, no shared name): 226 ok.
+- Item 3 DONE: R1.md:134-136 `/npt/cert-hash-NN.json` (NN from the page's `room` query; per room only, Q-U6C-3);
+  R1.md:250-251 plan.md:995-996 joins the superseded list after :287; cert14d.mjs:3-5 comment. Test 5 +1 (the per-room
+  URL in R1.md and cert14d.mjs, :995-996 beside :287, no ops file but the tests names the plain URL): 8 pass.
+- Item 4 DONE: r1.sh:34-40 PROBE_* (6 x (10 + 100 + 12) = 732 s planned; the advisor's "about 690" did not add up with
+  its own 10 s set-up, so the sum is written out); :119 probe settings (probe_peer_ipv4 = LG, probe_legs six,
+  probe_packets 1,000,000, probe_warmup_s 10); :307-332 the block: `printf '' | lg "token 02"`, LG 792 s, waits for
+  npt-super's room_exit up to 852 s, then `lg "stop 02"` (abort path), keep copies the six (:190-194);
+  :334-371 probe_presence reads room-02-<leg>.log for leg_edge/cpu_stat at warmup and after (Q-U6C-5 names), P1
+  drops equal. R1.md §5 C-U8-2 bullet and §8 (hours re-check: 0.20 h vs about 0.21 h, pending U6c's reading; no
+  reading exists yet). New test 7 ops/tests/r1sh.test.mjs: 2 pass (settings and block; fixture logs present / missing
+  edge / P1 drop / row not found / string count / missing log).
+- F28 STOP-ITEM for the main session (found at item 4, not fixed: Rust, not U8's lane): npt-super's log is a
+  BufWriter (super/src/main.rs:214-218) and npt-log's Writer flushes only in finish (log/src/lib.rs:586-608), so
+  `room_start` and `room_exit` reach disk only when npt-super ends. r1.sh's room_up (waits 15 s for room_start in
+  super-NN.log, U8's design) would die at every start on RS, and item 4's wait for room_exit never sees it before the
+  stdin close. Needs npt-super to flush after each event (a Writer flush, or the log unbuffered: two events a start).
+- Item 5 DONE: r1.sh:177-208 load_settings (python3 -I, JSON): U8's ten fields plus run, set, marks, date, commit,
+  seed from the room's own settings file (one source), machine LG/LG1/CAX21/fsn1/LG's IPv4, behaviour `brawl`, pin_hex
+  (wt: the room's hash file's value_hex; ws: production.txt's "Ledger: … sha256 <hex>."; probe: 64 zeros, no hash
+  file); refuses a mode outside run|calibrate|probe or a missing pin. :210-218 load_ready (READY in `lg "log NN"`);
+  :444-446 ds-selftest waits 60 s for READY, else INVALID-ready.txt. Modes `bots` -> `run` (:335, :442: C1 (c)).
+  :29 HASH. npt-load-ctl:13-19 header (C1 (c): one argument, READY/DONE, stdin /dev/null; stop = abort); start line
+  unchanged. Test 7 +1 (19 fields in order; run fields equal the room's; pins on wt/ws/probe; ws refused without the
+  production line; `bots` refused; the /dev/null start line; READY before load_wait): 3 pass.
+- Item 6 DONE: ops/tests/redact.test.mjs rewritten: no finding over the spike folder (KNOWN_AT_BASE gone), and the
+  summary line reads 0 findings; ops/operator/pre-push:11 EXPECTED=2609bc87…519d31 (redact-check.mjs at F26's 2a9498d:
+  blob 4dcc849d equal to the worktree's); operator.test.mjs:93-101 pins that literal beside the file's hash. Test 6:
+  1 pass; operator test: 8 pass (were 6 of 8: tests 50-51 red on the old EXPECTED).
+- Item 7 DONE (no edit, report line): u8-brief.md:383's parenthesis ("Q-U8-6's knob, if taken, is U6c's"), :505-507
+  (Q-U8-6 (i)'s lean: the `NPT_KC_BURSTS` knob riding in U6c) and :521 (section 10's "U6c's takes … Q-U8-6 (i)'s
+  knob") are superseded by C10 in section 0.1 (u8-brief.md:97-101: the knob rides in MOVED's brief; U6c takes Q-U8-4's
+  interface, Q-U8-5's reads, the probe's ports and npt-load's control interface, "not the knob"). U8 built no Rust.
+- Item 8 DONE: r1.sh:109-175 room_settings rewritten through json_obj (:111-119, python json.dumps): only U6a's merged
+  Settings fields (crates/server/src/main.rs:62-103: log, token_file, machine_* flat, marks, tick_hz, io_threads,
+  duration_ms 0, warmup_ticks, first_cpu_model; `bite` only in bite rooms) + U6b's (wt_bind, ws_bind, transport,
+  ws_cert_chain/key, hash_path, ws_split_mark_s) + U6c's (mode room|probe; probe's four). The `super` object, log_path,
+  token_path and the `calibrate` room mode are gone; role measured|bite (was "RS", the machine role); each start its
+  own run R1-<set>-NN<sfx>, set R1-<set>; io_vcpus an int array. U8's values for required fields it never set (to
+  Stop B's netcode seat): io_threads = housekeeping vCPUs, warmup_ticks 1,800 where LG joins (headers, calibrate, ds)
+  else 0, first_cpu_model from bring-up's facts (empty at the first start); marks per R1.md's table rows (alone,
+  calibrate, ds, browsers: none). npt-lib.sh:182-229 NPT_SUPER_FIELDS, NPT_SETTINGS_PY, npt_super_args (17 values,
+  each by an anchored pattern; bites build for a bite; super log = room log with super-); npt-ctl:148-162 reads the
+  settings as npt-room (setpriv python3 -I) and execs `npt-super start "${NPT_SUPER_ARGS[@]}"`. Headers of r1.sh,
+  npt-ctl; R1.md condition 3 and §8's interface list. Tests: test 3 +73 (the scope line, the read, npt_super_args
+  accepts/bites/marks, 65 field refusals, another room's log, a missing value, a bad NN): 299 ok; test 7 +1 (fields
+  against U6a's struct read from main.rs, U6b/U6c names, bite only in bite rooms, every flag one npt-super parses and
+  every required one emitted): 4 pass.
+- Item 9 DONE: config.mjs:72-80 PAGE gains clockResNs/dropped; :82-171 LOG_SCHEMA 1, SUITE_MARKS (R1.md's rows;
+  wt-attempts -28 per advisor-u7 C4), ROOM_SCENE SS, RUN_PATH eu-path, codeCommit (Y from rs.yaml's /etc/npt/commit,
+  zeros refused), logDate, osMachine (Node's os; plan "", threads_per_core 0, smt [] as os gives none), legHeader
+  (pure: Header's 18 fields, Machine's 13, Build's 4; run R1-<suite>-<browser>-<transport>-aNN, set R1-<suite>; role
+  measured | control (wt-attempts + hash=wrong) | bite; params suite, browser, path, transport, room, attempt,
+  version, records_dropped_count, crate on wt-attempts only), legLog (header, page lines unchanged, footer 1 + lines,
+  clean|stopped). lib.mjs:108-118 openAndWait's timed_out; :120-128 read() returns nptClockResNs and nptDropped;
+  :129-145 runInfo (Y, date, the Wasm's SHA-256 fetched once per commit, kept under .gate/); :160-181 save(run, leg,
+  state, summary) and saveSummary (whole-suite summaries write no log). smoke/cert14d/fallback/mds36 call them.
+  Test 4 +1 ("item 9: …": field sets read from crates/log/src/lib.rs, SCHEMA from lib.rs, footer count, lines
+  unchanged, no token/URL/address, control/bite roles, os gaps, codeCommit, read/save wiring): 9 pass with
+  webdriverio resolvable (test 7 needs ops/browser/node_modules: absent in a fresh worktree, linked from U8's build
+  worktree for the run, link removed after). PLANT P8: the footer's count without the header (`records:
+  lines.length`) -> the item 9 test FAILS "the records before it, the header included" (3 vs 4); restored, config.mjs
+  sha256 4cf9b0af…c893 equal before and after.
+- Item 10 DONE (built with item 8; its test now): one source, the room's settings file: npt-ctl reads it as npt-room
+  (NPT_SETTINGS_PY) and npt_super_args turns run, set, role, layer, profile, date, scene, tick_hz, bite (and commit,
+  machine_*, marks, the super log) into npt-super's flags; `--scene`, `--tick-hz` always, `--bite` only for a bite
+  room (bites build); npt-super ends by its stdin closing (room_down kills the holder only). Test 7 +1 ("item 10: …":
+  for all eight kinds of room, bite included, npt-ctl's own read + npt_super_args on room_settings' file give flags
+  deepEqual to the settings' values; room_down's one kill is the holder's; no pkill/killall/systemctl stop): 5 pass.
+  PLANT P9: `--bite` dropped from npt_super_args -> "item 10" FAILS on the bite room ("--bite" missing); restored,
+  npt-lib.sh sha256 4ea06906…5a48 equal before and after.
+- END of the fix pass: `node --test 'ops/**/*.test.mjs'` 75 pass, 0 fail (66 before: +1 test 1, +1 test 5, +5 test 7
+  new, +1 test 4; tests 6 and the operator test's two now green), with ops/browser/node_modules linked from U8's build
+  worktree for test 4's script check (a fresh worktree has none; without it that one test fails as at the start),
+  link removed after; `bash ops/tests/wrappers.test.sh` 299 ok, 0 failed (214 before); `check.mjs --only redact` PASS,
+  393 items, 0 findings. Plants P8 (item 9) and P9 (item 10), each failing its test by name, restored, sha256 equal.
+  package.json 8370495d…, package-lock.json a0efce8e… unchanged (DEP-HOLD). rs.yaml 11,375 bytes (< 32,768). No
+  tracked spike file changed; no commit. Size: 42 new files under ops/, 4,957 lines (U8 4,176 + 781 net from this
+  pass); SIZE-CHECK (6,000) not reached.
+- Open for the main session: F28 (npt-super's log buffered: room_up and the probe's exit wait cannot read it live,
+  STOP-ITEM before R1); U6b's and U6c's room-settings names, host.json's names and npt-load's `behaviour` value are
+  U8's until those units merge (one home each); U8's values for U6a's fields it never set (io_threads,
+  warmup_ticks 1,800, first_cpu_model) and the room marks per block go to Stop B's netcode seat; the probe's 732 s
+  against R1.md's 0.20 h waits for U6c's reading. Not verified here (no systemd in this container): whether the path
+  unit starts the service again after the host exits while the chain still exists; if it does, `Restart=no` is
+  bounded only by systemd's trigger limit (for infra-engineer at Stop B).

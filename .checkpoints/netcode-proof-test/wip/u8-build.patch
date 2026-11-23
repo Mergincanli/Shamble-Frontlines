@@ -1,16 +1,19 @@
 diff --git a/spikes/netcode-proof/ops/browser/cert14d.mjs b/spikes/netcode-proof/ops/browser/cert14d.mjs
 new file mode 100644
-index 0000000..5ab7bfa
+index 0000000..e9e48cf
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/browser/cert14d.mjs
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,46 @@
 +// cert14d.mjs <chrome|edge|firefox|brave>: PM-0006-25's suite `cert-14d` as rough readings (C3; u8-brief.md rev 1.1
 +// Block 9). Room `cert-<browser>` must be up (`r1.sh browsers cert-<browser>`). Each attempt joins its own slot in a
-+// fresh session, closed before the next: the page fetches /npt/cert-hash.json and opens WebTransport with
-+// `serverCertificateHashes`, then writes one `event.attempt.ok` (1 when the session is ready and its echo worked).
++// fresh session, closed before the next: the page fetches /npt/cert-hash-NN.json (NN from its `room` query) and
++// opens WebTransport with `serverCertificateHashes`, then writes one `event.attempt.ok` (1 when the session is ready
++// and its echo worked).
 +// 20 attempts on each laptop browser; Brave's one attempt is a link for the USB stick.
 +import { ALL_BROWSERS, ATTEMPTS, ROOMS, pageUrl } from "./config.mjs";
-+import { ROUGH, braveLinks, close, events, machine, openAndWait, roomTokens, save, session } from "./lib.mjs";
++import {
++  ROUGH, braveLinks, close, events, machine, openAndWait, roomTokens, runInfo, save, saveSummary, session,
++} from "./lib.mjs";
 +
 +const browser = process.argv[2];
 +if (!ALL_BROWSERS.includes(browser) || process.argv.length !== 3) {
@@ -28,6 +31,7 @@ index 0000000..5ab7bfa
 +}
 +
 +const m = machine();
++const run = await runInfo();
 +const attempts = [];
 +for (let k = 0; k < ATTEMPTS.laptop; k++) {
 +  const s = await session(m, browser);
@@ -36,21 +40,22 @@ index 0000000..5ab7bfa
 +    const ev = events(st.records, "attempt");
 +    const ok = ev.length === 1 && ev[0].ok === 1;
 +    attempts.push({ attempt: k, slot: k, ok, events: ev.length, elapsed_ms: st.elapsed_ms });
-+    save(`cert-14d-a${String(k).padStart(2, "0")}`, browser, st.records, attempts.at(-1));
++    const leg = { suite: "cert-14d", browser, transport: "wt", nn: ROOMS[room].nn, attempt: k, slot: k };
++    save(run, leg, st, attempts.at(-1));
 +  } finally {
 +    await close(s);
 +  }
 +}
 +const okCount = attempts.filter((a) => a.ok).length;
-+save("cert-14d", browser, [], { browser, attempts: attempts.length, ok: okCount });
++saveSummary("cert-14d", browser, { browser, attempts: attempts.length, ok: okCount });
 +console.log(`${browser} cert-14d: ${okCount} of ${attempts.length} attempts connected with the pinned hash (${ROUGH})`);
 +process.exit(okCount === attempts.length ? 0 : 1);
 diff --git a/spikes/netcode-proof/ops/browser/config.mjs b/spikes/netcode-proof/ops/browser/config.mjs
 new file mode 100644
-index 0000000..9732198
+index 0000000..86f6e55
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/browser/config.mjs
-@@ -0,0 +1,143 @@
+@@ -0,0 +1,234 @@
 +// config.mjs: the one home for the browser scripts' URL contract with U7's page, the slot table and every WebDriver
 +// capability (u8-brief.md rev 1.1 Block 9; SEC-R1D-2, SEC-R1D-3; C3). Pure: it imports no WebDriver code, so the
 +// container test (ops/tests/browser.test.mjs) reads it directly.
@@ -121,15 +126,106 @@ index 0000000..9732198
 +  const q = new URLSearchParams({ smoke: "1", suite, room: nn, transport, attempt: String(attempt) });
 +  return `${PAGE_ORIGIN}/?${q}#t=${token}`;
 +}
-+// What the scripts read from the page (U7's): the status line and the version, by textContent, and the records as
-+// npt-log JSON lines held in page memory.
++// What the scripts read from the page (U7's): the status line and the version, by textContent, the records as
++// npt-log JSON lines held in page memory, the Worker clock's step and the records dropped past the page's cap.
 +export const PAGE = {
 +  status: "#status",
 +  version: "#version",
 +  playing: (transport) => `${TRANSPORTS[transport]} · Playing`,
 +  records: "nptRecords",
++  clockResNs: "nptClockResNs",
++  dropped: "nptDropped",
 +  playingWithinMs: 3000,
 +};
++
++// ---- the browser logs' header and footer (Q-U7-1 ruled (a): advisor-u7-brief.md section 5, U8's fix pass item 9) ----
++// save() writes each leg's .npt.log as one npt-log log that crates/log's read_log accepts (crates/log/src/lib.rs:641):
++// line 1 the header, exactly Header's fields (:136-169, deny_unknown_fields, with Machine's 13 and Build's 4); then the
++// page's lines unchanged; then the footer, its count the records before it, the header included.
++export const LOG_SCHEMA = 1;
++// Each suite's marks, from R1.md's block table (wt-attempts: -28's, C4 of advisor-u7-brief.md; R1 runs none).
++export const SUITE_MARKS = {
++  smoke: ["PM-0001-14", "PM-0001-56"],
++  "cert-14d": ["PM-0006-25"],
++  fallback: ["PM-0001-29"],
++  mds: ["PM-0001-36"],
++  "wt-attempts": ["PM-0001-28"],
++};
++export const ROOM_SCENE = "SS"; // the browser rooms' scene (r1.sh room_settings)
++export const RUN_PATH = "eu-path"; // the path every R1 browser leg takes
++
++/** The run's code commit Y, as rs.yaml's /etc/npt/commit names it (filled at Stop B; zeros refused). */
++export function codeCommit(rsYaml) {
++  const m = rsYaml.match(/- path: \/etc\/npt\/commit\n(?: {4}.*\n)*? {6}([0-9a-f]{40})\n/);
++  if (!m || /^0+$/.test(m[1])) throw new Error("rs.yaml's /etc/npt/commit is not filled (Stop B fills Y)");
++  return m[1];
++}
++
++/** The run's date in the header's form (YYYY-MM-DD, UTC). */
++export function logDate(d) {
++  return d.toISOString().slice(0, 10);
++}
++
++/** This laptop's machine fields from Node's `os` where it gives them; else empty, 0 or [] (never invented). */
++export function osMachine(os) {
++  const cpus = os.cpus();
++  return {
++    plan: "",
++    arch: os.arch(),
++    cpu: cpus[0]?.model ?? "",
++    vcpus: typeof os.availableParallelism === "function" ? os.availableParallelism() : cpus.length,
++    mem_mb: Math.floor(os.totalmem() / 1048576),
++    kernel: os.release(),
++    threads_per_core: 0,
++    smt: [],
++  };
++}
++
++const count = (v) => (Number.isSafeInteger(v) && v >= 0 ? v : null);
++
++/**
++ * One leg's npt-log header (pure). `run`: { run, date, commit, wasm_sha256 }; `leg`: { suite, browser, transport, nn,
++ * attempt, slot, bite?, hash?, crate? }; `page`: what read() returned; `machine`: osMachine(os).
++ */
++export function legHeader(run, leg, page, machine) {
++  if (!(leg.suite in SUITE_MARKS)) throw new Error(`no marks for suite ${leg.suite}`);
++  const control = leg.suite === "wt-attempts" && leg.hash === "wrong";
++  const params = {
++    suite: leg.suite, browser: leg.browser, path: RUN_PATH, transport: leg.transport, room: leg.nn,
++    attempt: leg.attempt, version: page.version ?? "", records_dropped_count: count(page.nptDropped),
++  };
++  if (leg.suite === "wt-attempts") params.crate = leg.crate ?? "";
++  return {
++    schema: LOG_SCHEMA,
++    run: `${run.run}-${leg.suite}-${leg.browser}-${leg.transport}-a${String(leg.attempt).padStart(2, "0")}`,
++    set: `${run.run}-${leg.suite}`,
++    role: leg.bite ? "bite" : control ? "control" : "measured",
++    marks: SUITE_MARKS[leg.suite],
++    machine: {
++      role: "ML", name: "ML*", plan: machine.plan, arch: machine.arch, cpu: machine.cpu, vcpus: machine.vcpus,
++      mem_mb: machine.mem_mb, location: "home", kernel: machine.kernel, address: "",
++      threads_per_core: machine.threads_per_core, smt: machine.smt, clock_res_ns: count(page.nptClockResNs) ?? 0,
++    },
++    build: { commit: run.commit, binary_sha256: run.wasm_sha256, features: leg.bite ? ["bites"] : [], profile: "release" },
++    bite: leg.bite ?? null,
++    layer: "real",
++    profile: "real-path",
++    seed: 0,
++    tick_hz: 30,
++    clients: 1,
++    scene: ROOM_SCENE,
++    process: "browser",
++    slot: leg.slot,
++    date: run.date,
++    params,
++  };
++}
++
++/** The leg's .npt.log text: the header, the page's lines unchanged, the footer (`stopped` on the time limit). */
++export function legLog(header, lines, stopped) {
++  const footer = { k: "footer", records: 1 + lines.length, ended: stopped ? "stopped" : "clean" };
++  return [JSON.stringify({ k: "header", ...header }), ...lines, JSON.stringify(footer)].map((l) => `${l}\n`).join("");
++}
 +export const MDS_MINUTES = 10;
 +export const MDS_MIN_READS = 61;
 +
@@ -196,10 +292,10 @@ index 0000000..9732198
 +}
 diff --git a/spikes/netcode-proof/ops/browser/fallback.mjs b/spikes/netcode-proof/ops/browser/fallback.mjs
 new file mode 100644
-index 0000000..58b8f73
+index 0000000..e0cc780
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/browser/fallback.mjs
-@@ -0,0 +1,53 @@
+@@ -0,0 +1,57 @@
 +// fallback.mjs <chrome|edge|firefox|brave>: -29's QUIC-blocked fallback as rough readings (C3; Q-U8-3; u8-brief.md
 +// rev 1.1 Block 9). Room `fallback-<browser>` must be up. It re-arms `npt-ctl quic off` for this browser (15 minutes at
 +// most), then runs each attempt in its own slot and a fresh session, closed before the next; the page tries
@@ -207,7 +303,9 @@ index 0000000..58b8f73
 +// reaches WebTransport while the block is meant on makes this browser's leg INVALID, never a pass. At its end it turns
 +// the block off (`quic on`). Brave: it arms the block and writes the link; mds36.mjs turns the block off first.
 +import { ALL_BROWSERS, ATTEMPTS, PAGE, ROOMS, pageUrl } from "./config.mjs";
-+import { ROUGH, braveLinks, close, events, machine, openAndWait, quic, roomTokens, save, session } from "./lib.mjs";
++import {
++  ROUGH, braveLinks, close, events, machine, openAndWait, quic, roomTokens, runInfo, save, saveSummary, session,
++} from "./lib.mjs";
 +
 +const browser = process.argv[2];
 +if (!ALL_BROWSERS.includes(browser) || process.argv.length !== 3) {
@@ -227,6 +325,7 @@ index 0000000..58b8f73
 +}
 +
 +const m = machine();
++const run = await runInfo();
 +const attempts = [];
 +try {
 +  for (let k = 0; k < ATTEMPTS.laptop; k++) {
@@ -237,7 +336,8 @@ index 0000000..58b8f73
 +      const reachedWt = st.status.includes(PAGE.playing("wt"));
 +      attempts.push({ attempt: k, slot: k, reached_webtransport: reachedWt, events: ev.length,
 +        playing_ns: ev.length === 1 ? ev[0].playing_ns : null, elapsed_ms: st.elapsed_ms });
-+      save(`fallback-a${String(k).padStart(2, "0")}`, browser, st.records, attempts.at(-1));
++      const leg = { suite: "fallback", browser, transport: "wt", nn: ROOMS[room].nn, attempt: k, slot: k };
++      save(run, leg, st, attempts.at(-1));
 +    } finally {
 +      await close(s);
 +    }
@@ -248,29 +348,34 @@ index 0000000..58b8f73
 +const invalid = attempts.some((a) => a.reached_webtransport);
 +const played = attempts.filter((a) => a.events === 1).length;
 +const max = Math.max(...attempts.map((a) => a.playing_ns ?? Infinity));
-+save("fallback", browser, [], { browser, attempts: attempts.length, played, max_playing_ns: max, invalid });
++saveSummary("fallback", browser, { browser, attempts: attempts.length, played, max_playing_ns: max, invalid });
 +console.log(invalid
 +  ? `${browser} fallback: INVALID: an attempt reached WebTransport while QUIC was meant blocked`
 +  : `${browser} fallback: ${played} of ${attempts.length} attempts playing over WebSocket; max ${max} ns (${ROUGH})`);
 +process.exit(!invalid && played === attempts.length ? 0 : 1);
 diff --git a/spikes/netcode-proof/ops/browser/lib.mjs b/spikes/netcode-proof/ops/browser/lib.mjs
 new file mode 100644
-index 0000000..0f3b1b3
+index 0000000..40dfe92
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/browser/lib.mjs
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,188 @@
 +// lib.mjs: the browser scripts' shared code (u8-brief.md rev 1.1 Block 9). Standalone WebdriverIO `remote()`, never
 +// the @wdio/cli testrunner (security-r1-deps.md:241-244). Tokens and page URLs are never printed: a message names the
 +// room and the slot only. Every write goes under .gate/.
 +import { execFileSync, spawn } from "node:child_process";
-+import { mkdirSync, openSync, writeFileSync } from "node:fs";
++import { createHash } from "node:crypto";
++import { existsSync, mkdirSync, openSync, readFileSync, writeFileSync } from "node:fs";
 +import { createServer, connect } from "node:net";
-+import { join } from "node:path";
++import os from "node:os";
++import { dirname, join } from "node:path";
++import { fileURLToPath } from "node:url";
 +import { remote } from "webdriverio";
 +import {
-+  CACHE, LINKS, LOGS, MACHINE_FILE, PAGE, R1SH, RECORDS, ROOMS, SSH, edgeDriverArgs, loadMachine, remoteOptions,
-+  verifyDriver,
++  CACHE, LINKS, LOGS, MACHINE_FILE, PAGE, PAGE_ORIGIN, R1SH, RECORDS, ROOMS, SSH, codeCommit, edgeDriverArgs, legHeader,
++  legLog, loadMachine, logDate, osMachine, remoteOptions, verifyDriver,
 +} from "./config.mjs";
++
++const HERE = dirname(fileURLToPath(import.meta.url));
 +
 +export const ROUGH = "rough, not judged; R8 judges the seven marks (-1, -14, -28, -29, -36, PM-0006-16, PM-0006-25) once he names the laptop";
 +
@@ -358,7 +463,7 @@ index 0000000..0f3b1b3
 +  }
 +}
 +
-+/** Opens a page and waits until `done(state)` holds, polling the status, version and records. */
++/** Opens a page and waits until `done(state)` holds, polling the status, version and records; `timed_out` when not. */
 +export async function openAndWait(s, url, done, ms) {
 +  const t0 = Date.now();
 +  await s.b.url(url);
@@ -366,18 +471,37 @@ index 0000000..0f3b1b3
 +  for (;;) {
 +    state = await read(s);
 +    state.elapsed_ms = Date.now() - t0;
-+    if (done(state) || state.elapsed_ms > ms) return state;
++    state.timed_out = !done(state);
++    if (!state.timed_out || state.elapsed_ms > ms) return state;
 +    await new Promise((r) => setTimeout(r, 200));
 +  }
 +}
 +
-+/** The page's status line, version and npt-log records (U7's page; config.mjs's PAGE). */
++/** The page's status line, version, npt-log records, clock step and dropped count (U7's page; config.mjs's PAGE). */
 +export async function read(s) {
 +  return s.b.execute((p) => {
 +    const text = (sel) => (document.querySelector(sel) || {}).textContent || "";
 +    const recs = Array.isArray(window[p.records]) ? window[p.records].slice() : [];
-+    return { status: text(p.status), version: text(p.version), records: recs };
-+  }, { status: PAGE.status, version: PAGE.version, records: PAGE.records });
++    return { status: text(p.status), version: text(p.version), records: recs,
++      nptClockResNs: window[p.clockResNs] ?? null, nptDropped: window[p.dropped] ?? null };
++  }, { status: PAGE.status, version: PAGE.version, records: PAGE.records, clockResNs: PAGE.clockResNs, dropped: PAGE.dropped });
++}
++
++/**
++ * The run's header values, once per run: Y from rs.yaml's commit line, today's date, and the SHA-256 of the page host's
++ * `/npt_client_wasm_bg.wasm`, fetched once per commit (normal TLS verification) and kept under .gate/.
++ */
++export async function runInfo() {
++  const commit = codeCommit(readFileSync(join(HERE, "..", "cloud-init", "rs.yaml"), "utf8"));
++  const kept = join(RECORDS, `wasm-${commit}.sha256`);
++  let sha = existsSync(kept) ? readFileSync(kept, "utf8").trim() : "";
++  if (!/^[0-9a-f]{64}$/.test(sha)) {
++    const res = await fetch(`${PAGE_ORIGIN}/npt_client_wasm_bg.wasm`);
++    if (!res.ok) throw new Error(`the page host answered ${res.status} for the Wasm`);
++    sha = createHash("sha256").update(Buffer.from(await res.arrayBuffer())).digest("hex");
++    writeFileSync(kept, `${sha}\n`);
++  }
++  return { run: "R1", date: logDate(new Date()), commit, wasm_sha256: sha };
 +}
 +
 +/** The records' events of one name (npt-log: {"k":"event","ev":<name>,"f":{...}}). */
@@ -394,13 +518,27 @@ index 0000000..0f3b1b3
 +  return out;
 +}
 +
-+/** Writes a leg's records as npt-log lines and its summary under .gate/, each file named by suite, browser and time. */
-+export function save(suite, browser, records, summary) {
-+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-+  const base = join(RECORDS, `${suite}-${browser}-${stamp}`);
-+  writeFileSync(`${base}.npt.log`, records.map((l) => `${l}\n`).join(""));
++/**
++ * Writes a leg's .npt.log (config.mjs's legHeader and legLog: the header, the page's lines unchanged, the footer,
++ * `stopped` when the leg ended on its time limit) and its summary under .gate/, named by suite, browser and time.
++ */
++export function save(run, leg, state, summary) {
++  const base = join(RECORDS, `${leg.suite}-${leg.browser}-${leg.transport}-a${leg.attempt}-${stampNow()}`);
++  const header = legHeader(run, leg, state, osMachine(os));
++  writeFileSync(`${base}.npt.log`, legLog(header, state.records, state.timed_out === true));
 +  writeFileSync(`${base}.summary.json`, `${JSON.stringify({ ...summary, label: ROUGH }, null, 1)}\n`);
 +  return base;
++}
++
++/** A browser's whole-suite summary under .gate/ (no log: it is no leg). */
++export function saveSummary(suite, browser, summary) {
++  const base = join(RECORDS, `${suite}-${browser}-${stampNow()}`);
++  writeFileSync(`${base}.summary.json`, `${JSON.stringify({ ...summary, label: ROUGH }, null, 1)}\n`);
++  return base;
++}
++
++function stampNow() {
++  return new Date().toISOString().replace(/[:.]/g, "-");
 +}
 +
 +/** Brave runs on his PC: its links go to a text file for the USB stick (plan.md:1111-1112), deleted after the run. */
@@ -411,16 +549,16 @@ index 0000000..0f3b1b3
 +}
 diff --git a/spikes/netcode-proof/ops/browser/mds36.mjs b/spikes/netcode-proof/ops/browser/mds36.mjs
 new file mode 100644
-index 0000000..d45dff3
+index 0000000..ed3b0f9
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/browser/mds36.mjs
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,39 @@
 +// mds36.mjs: -36's home EU path as rough readings (u8-brief.md rev 1.1 Block 9; plan.md:739, :818): Chrome, Edge and
 +// Firefox at once, each in its own slot of room `mds` (NN 19, `r1.sh browsers mds`), 10 minutes; the page reads
 +// maxDatagramSize at start and every 10 s and writes one `event.mds_read.size_bytes` per read; at least 61 reads each.
 +// It turns the QUIC block off first (the fallback legs ran before it). Records go under .gate/ as npt-log lines.
 +import { MDS_MINUTES, MDS_MIN_READS, MDS_SLOTS, ROOMS, pageUrl } from "./config.mjs";
-+import { ROUGH, close, events, machine, openAndWait, quic, read, roomTokens, save, session } from "./lib.mjs";
++import { ROUGH, close, events, machine, openAndWait, quic, read, roomTokens, runInfo, save, session } from "./lib.mjs";
 +
 +if (process.argv.length !== 2) {
 +  console.error("usage: node mds36.mjs");
@@ -429,6 +567,7 @@ index 0000000..d45dff3
 +console.log(quic("on"));
 +const tokens = roomTokens("mds");
 +const m = machine();
++const run = await runInfo();
 +const sessions = [];
 +try {
 +  for (const [slot, browser] of MDS_SLOTS.entries()) {
@@ -444,7 +583,8 @@ index 0000000..d45dff3
 +    const reads = events(st.records, "mds_read").map((f) => f.size_bytes);
 +    const enough = reads.length >= MDS_MIN_READS;
 +    all &&= enough;
-+    save("mds", s.browser, st.records, { browser: s.browser, slot, path: "eu-path", reads: reads.length,
++    const leg = { suite: "mds", browser: s.browser, transport: "wt", nn: ROOMS.mds.nn, attempt: 0, slot };
++    save(run, leg, st, { browser: s.browser, slot, path: "eu-path", reads: reads.length,
 +      min_bytes: Math.min(...reads), max_bytes: Math.max(...reads), at_least_61: enough });
 +    console.log(`${s.browser}: ${reads.length} maxDatagramSize reads, min ${Math.min(...reads)} B (${ROUGH})`);
 +  }
@@ -454,16 +594,16 @@ index 0000000..d45dff3
 +}
 diff --git a/spikes/netcode-proof/ops/browser/smoke.mjs b/spikes/netcode-proof/ops/browser/smoke.mjs
 new file mode 100644
-index 0000000..44c128b
+index 0000000..d018e3c
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/browser/smoke.mjs
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,41 @@
 +// smoke.mjs <chrome|edge|firefox|brave>: R1's four-browser smoke, each browser on each transport, one slot each
 +// (u8-brief.md rev 1.1 Block 9; plan.md:1214-1220; -14 rough, -56's item 2). Room `smoke` (NN 10) must be up
 +// (`r1.sh browsers smoke`). Brave runs on his PC: `brave` writes its two links for the USB stick. Run from this folder:
 +// `node smoke.mjs chrome` (never `node .gate/...`).
 +import { ALL_BROWSERS, PAGE, ROOMS, SMOKE_SLOTS, TRANSPORTS, pageUrl } from "./config.mjs";
-+import { ROUGH, braveLinks, close, machine, openAndWait, roomTokens, save, session } from "./lib.mjs";
++import { ROUGH, braveLinks, close, machine, openAndWait, roomTokens, runInfo, save, session } from "./lib.mjs";
 +
 +const browser = process.argv[2];
 +if (!ALL_BROWSERS.includes(browser) || process.argv.length !== 3) {
@@ -482,6 +622,7 @@ index 0000000..44c128b
 +}
 +
 +const m = machine();
++const run = await runInfo();
 +const results = [];
 +for (const t of Object.keys(TRANSPORTS)) {
 +  const s = await session(m, browser);
@@ -491,7 +632,7 @@ index 0000000..44c128b
 +    const ok = st.status.includes(want);
 +    results.push({ transport: t, slot: slot(t), playing: ok, within_3s: ok && st.elapsed_ms <= PAGE.playingWithinMs,
 +      elapsed_ms: st.elapsed_ms, status: st.status.slice(0, 80), version: st.version.slice(0, 80) });
-+    save(`smoke-${t}`, browser, st.records, results.at(-1));
++    save(run, { suite: "smoke", browser, transport: t, nn: ROOMS.smoke.nn, attempt: 0, slot: slot(t) }, st, results.at(-1));
 +    console.log(`${browser} ${TRANSPORTS[t]}: ${ok ? "Playing" : "NOT playing"} after ${st.elapsed_ms} ms (slot ${slot(t)}; ${ROUGH})`);
 +  } finally {
 +    await close(s);
@@ -693,10 +834,10 @@ index 0000000..dcaa681
 +  - [/usr/local/sbin/npt-firstboot]
 diff --git a/spikes/netcode-proof/ops/cloud-init/rs.yaml b/spikes/netcode-proof/ops/cloud-init/rs.yaml
 new file mode 100644
-index 0000000..cdc4a21
+index 0000000..2dfad5c
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/cloud-init/rs.yaml
-@@ -0,0 +1,222 @@
+@@ -0,0 +1,228 @@
 +#cloud-config
 +# RS's cloud-init for the netcode proof test (u8-brief.md rev 1.1, section 1 Block 1; plan.md §10.5 as NPT-TRIM trims
 +# it). It holds no secret and no address of the day (plan.md:1179); it stays under 32 KiB (ops/tests/cloudinit.test.mjs).
@@ -914,6 +1055,12 @@ index 0000000..cdc4a21
 +        > /var/lib/npt/dist/ssh-host-keys.txt
 +      chmod 0444 /var/lib/npt/dist/ssh-host-keys.txt
 +
++      step "the page host's start (Q-U6C-7): npt-host.path starts npt-host.service once the production chain exists"
++      install -o root -g root -m 0644 "$O/systemd/host.json" /etc/npt/host.json
++      install -o root -g root -m 0644 "$O/systemd/npt-host.path" "$O/systemd/npt-host.service" /etc/systemd/system/
++      systemctl daemon-reload
++      systemctl enable --now npt-host.path
++
 +      git -C /opt/npt/clone rev-parse HEAD > "$B/head.txt"
 +      step "build done"
 +      touch "$B/build.done"
@@ -954,10 +1101,10 @@ index 0000000..b043286
 +in          tcp      22           <HOME_IPV4>/32
 diff --git a/spikes/netcode-proof/ops/operator/PROMPT-R1.md b/spikes/netcode-proof/ops/operator/PROMPT-R1.md
 new file mode 100644
-index 0000000..80ae20c
+index 0000000..585e4ae
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/operator/PROMPT-R1.md
-@@ -0,0 +1,102 @@
+@@ -0,0 +1,104 @@
 +# PROMPT-R1: the laptop session's prompt for R1 (Thursday 3 December)
 +
 +You drive R1 of the netcode proof test from Mustafa's laptop. Keep `ops/operator/rules.md` and run R1's plan
@@ -1028,8 +1175,10 @@ index 0000000..80ae20c
 +   its absence with the allowed DNS-over-HTTPS TXT read (no answer holding the value).
 +3. The same for production (`cert-production`, `cert-production-wait`): it must have the `shortlived` profile. Add its
 +   serial and hash to the ledger file. A failed order stops the run and comes to him.
-+4. Once the page host serves on TCP 31000, fetch `https://rs.nt.shamblefrontlines.com:31000/npt/ssh-host-keys.txt`
-+   with normal TLS verification and compare its line with the per-run `known_hosts` entry; a mismatch stops the run.
++4. `ssh -F <ssh> npt-rs r1.sh host`: it checks `systemctl is-active npt-host` (started by rs.yaml's npt-host.path once
++   the production chain exists) and stops if it is not active. Then fetch
++   `https://rs.nt.shamblefrontlines.com:31000/npt/ssh-host-keys.txt` with normal TLS verification and compare its line
++   with the per-run `known_hosts` entry; a mismatch stops the run.
 +
 +## 4. The server chain (about 10:39; then he leaves)
 +`ssh -F <ssh> npt-rs r1.sh chain server` (one prompt). It runs headers, probe, calibrate, starts, ds-selftest and s14
@@ -1062,7 +1211,7 @@ index 0000000..80ae20c
 +4. A three-line summary for him: what ran, what was INVALID or stopped, what goes to the advisor.
 diff --git a/spikes/netcode-proof/ops/operator/pre-push b/spikes/netcode-proof/ops/operator/pre-push
 new file mode 100644
-index 0000000..bfb3177
+index 0000000..f0c1190
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/operator/pre-push
 @@ -0,0 +1,29 @@
@@ -1076,7 +1225,7 @@ index 0000000..bfb3177
 +set -eu
 +COPY="$HOME/npt-operator/redact-check.mjs"
 +VMS="$HOME/npt-operator/vms.txt"
-+EXPECTED=941c692514b7d9a7c65f55f0a2c2d890745b59c10b6b1ecc24beff531c578af2
++EXPECTED=2609bc87c9248558f8334731a07b0ce82479ced427f18d70af1ee7e130519d31
 +
 +if [ ! -f "$COPY" ]; then
 +  echo "pre-push: no fixed redact-check copy at $COPY: push refused" >&2
@@ -1247,10 +1396,10 @@ index 0000000..4dde7fb
 +}
 diff --git a/spikes/netcode-proof/ops/runs/R1.md b/spikes/netcode-proof/ops/runs/R1.md
 new file mode 100644
-index 0000000..3b630cf
+index 0000000..301a6b3
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/R1.md
-@@ -0,0 +1,249 @@
+@@ -0,0 +1,262 @@
 +# R1's run plan: Thursday 3 December 2026
 +
 +The first VM day of the netcode proof test (u8-brief.md rev 1.1 section 6, with the advisor's C1, C3, C6, C7, C8 and
@@ -1384,8 +1533,9 @@ index 0000000..3b630cf
 +| mds | 19 | 3 | -36: Chrome, Edge and Firefox at once, 10 minutes |
 +| **Browser slots** | | **133** | |
 +
-+- **cert-14d:** each attempt fetches `/npt/cert-hash.json` and opens WebTransport with `serverCertificateHashes`; one
-+  `event.attempt.ok` per attempt (1 when the session is ready and its echo worked).
++- **cert-14d:** each attempt fetches `/npt/cert-hash-NN.json` (the page derives NN from its `room` query; the host
++  serves one file per room, NN 00-31, and no plain name: Q-U6C-3) and opens WebTransport with
++  `serverCertificateHashes`; one `event.attempt.ok` per attempt (1 when the session is ready and its echo worked).
 +- **Fallback:** before each browser's attempts the script re-arms `npt-ctl quic off` (15 minutes at most); each attempt
 +  writes one `event.fallback.playing_ns`; an attempt that reaches WebTransport while the block is meant on makes that
 +  browser's leg INVALID, never a pass (C3; Q-U8-3).
@@ -1423,16 +1573,22 @@ index 0000000..3b630cf
 +  U3-Q9's facts present); U3D-MISS's sampling case as the row gives it; a miss goes to the advisor before any L2 mark
 +  counts.
 +- **C-U8-1:** `r1.sh bringup` reads the kernel, CONFIG_HZ, the cpuidle driver, the clocksource and THP before any
-+  timing judgement. **C-U8-2, -4, -6 (Q-U8-5):** the per-leg reads sit in the probe's own leg-edge calls (U6c);
-+  `r1.sh probe` checks every leg has them at both edges, the socket row found at both, and no drop on the P1 socket
-+  between them; a missing read makes that leg INVALID, and a P1 drop goes to the advisor before any L2 mark counts.
++  timing judgement. **C-U8-2, -4, -6 (Q-U8-5):** the per-leg reads sit in the probe's own leg-edge calls (U6c), one
++  log per leg (`room-02-P0.log` to `room-02-B1.log`); `r1.sh probe` checks in each `leg_edge` at `ph` warmup and after
++  with `udp_row_found` 1 and `udp_drops_count` at both (equal at both on P1), and `cpu_stat` at both with
++  `cpu_user_count` (Q-U6C-5's names); a missing read makes that leg INVALID, and a P1 drop goes to the advisor before
++  any L2 mark counts. The probe mints no token: LG's probe mode gets an empty token file. Planned 6 × (10 s warm-up +
++  100 s window + about 12 s tail and set-up) = 732 s; LG sends for 792 s; the block waits for the probe's own exit in
++  npt-super's log, at most 852 s, then stops LG.
 +  **C-U8-3:** sized at 0.15 h above. **C-U8-5:** the judged form above.
 +- **Condition 4:** `npt-ctl cpus 3` moves the slices, every movable kernel thread and the unbound workqueue mask off
 +  the tick vCPU 3; bring-up reads `alone` once in a pinned room. If it reads 0, bring-up records every task it lists
 +  and R1 goes on with the certificate, the browser legs and the ping; the timing blocks (headers, probe, starts,
 +  DelayStream's self-test, bites) are recorded INVALID with that list and come to the advisor (C1).
-+- **Condition 3:** every room in every block starts through `npt-ctl rooms start` (npt-super's hold form), so -16's
-+  event is written at every start.
++- **Condition 3:** every room in every block starts through `npt-ctl rooms start` (`npt-super start`, its hold form),
++  so -16's event is written at every start. npt-super's flags come from the room's own settings file (npt-lib.sh
++  `npt_super_args`), so its log carries the room's run and the same set, role, layer, profile, date, scene, tick_hz
++  and bite; each start is its own run (`R1-<block>-NN<suffix>`); npt-super ends by its stdin closing, never a kill.
 +- **C5:** before any room opens, a TCP connect from LG to RS's port 22 must time out and RS's ICMP echo to LG must get
 +  no answer; either reply stops the run and comes to him.
 +
@@ -1483,11 +1639,16 @@ index 0000000..3b630cf
 +  (this session's build of U7's dist at Y, one `sha256  path` line per file, below); the kept addresses typed only in
 +  the Hetzner console.
 +- **Expected dist SHA-256s:** filled at Stop B.
-+- **Interfaces to align with the merged code** (each in one home): the room settings' field names (`r1.sh`
-+  room_settings: U6a's and U6b's structs, `deny_unknown_fields`); npt-super's `hold` verb and its `room_start` event;
-+  the token file's format (U6a); npt-load's settings and command line (`r1.sh` load_settings, `npt-load-ctl`: U6c);
-+  the issue mode's lines (`npt-cert`: U6c); the probe's `leg_edge` records (`r1.sh` probe_presence: U6c, its npt-log
-+  names to the advisor); U7's dist build (`rs.yaml`) and the page's URL contract and records (`ops/browser/config.mjs`).
++- **The probe block's hours, re-checked:** its 0.20 h (720 s) against r1.sh's 732 s planned plus about 30 s of start
++  and stop is about 0.21 h, inside the 0.45 h left; re-checked against U6c's container reading of one leg at U6c's
++  merge (no reading exists yet), and the row and the timeline change then if the reading moves it.
++- **Interfaces to align with the merged code** (each in one home): the room settings' U6b and U6c field names (`r1.sh`
++  room_settings, `deny_unknown_fields`; U6a's are its merged struct's, ops/tests/r1sh.test.mjs reads them); the page
++  host's settings (`ops/systemd/host.json`: U6c); npt-super's `room_start` and `room_exit` events, read live by
++  room_up and the probe block, which U6a's merged npt-super writes to disk only at its end (U8's F28, to the main
++  session); the token file's format (U6a); npt-load's settings and command line (`r1.sh` load_settings, `npt-load-ctl`: U6c);
++  the issue mode's lines (`npt-cert`: U6c); the probe's `leg_edge` and `cpu_stat` records (`r1.sh` probe_presence:
++  U6c, Q-U6C-5's names); U7's dist build (`rs.yaml`) and the page's URL contract and records (`ops/browser/config.mjs`).
 +- **The R1 bites:** U6a's three room bites (PM-0001-1/shared-vcpu, PM-0006-11/no-smt-map, PM-0001-16/double-load)
 +  from npt-server's bites build. The other R1 marks' bites (-2 fire-stops, -3's five, -14 unsplit-group, -36
 +  read-once, -52 predicted-damage) are not placed here: to the advisor if one must run in R1.
@@ -1499,19 +1660,21 @@ index 0000000..3b630cf
 +  :940 and :969 (revocation); :1110 (`replaceState`); :1140-1141 (`revoke` and the room-unit controls on the sudo
 +  list); :1144 (one user per slot); :1269-1270 and :1280 (W-PR); :287 (RS's host key over the certificate before the
 +  first SSH: under DNS-01 by hand the first SSH comes first, so the console fingerprint serves it and the published
-+  line is checked after the production certificate).
++  line is checked after the production certificate); :995-996 (one hash file for every room: the host serves
++  `/npt/cert-hash-NN.json` per room only, Q-U6C-3).
 diff --git a/spikes/netcode-proof/ops/runs/r1.sh b/spikes/netcode-proof/ops/runs/r1.sh
 new file mode 100644
-index 0000000..f2c2a36
+index 0000000..59f30c4
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/r1.sh
-@@ -0,0 +1,490 @@
+@@ -0,0 +1,598 @@
 +#!/bin/bash
 +# r1.sh <block> [<argument>]: RS's run script for R1 (u8-brief.md rev 1.1 section 1 Block 5; C1, C3, C5; conditions
 +# 3 and 4; Q-U8-5). It runs as npt on RS from the root-owned clone, one fixed block per call:
 +#   bash /opt/npt/clone/spikes/netcode-proof/ops/runs/r1.sh <block>
 +# Every result goes under /var/lib/npt/results/r1/<block>/. Every room starts through `sudo npt-ctl rooms start NN`
-+# (npt-super's hold form, condition 3), its stdin held by a holder process this script owns and closed to end it.
++# (`npt-super start`, its hold form, condition 3), its stdin held by a holder process this script owns and closed to
++# end it: npt-super ends by its stdin closing, never by a kill (a log with no footer makes the run INVALID).
 +# C1: Manual mode prompts every laptop command and no ssh allow exists, so while Mustafa is away the laptop runs
 +# nothing: `chain server` starts the server blocks on RS detached from the SSH session (they survive the disconnect,
 +# hold each room's stdin, write a done or stopped marker per block); `chain-status` reads them when he is back.
@@ -1521,24 +1684,31 @@ index 0000000..f2c2a36
 +#   cert-staging|cert-production            starts the order and prints the TXT step (him present)
 +#   cert-staging-wait|cert-production-wait  waits for the order's end and records the ledger line
 +#   headers probe calibrate starts ds-selftest s14 bites   the server blocks (normally through a chain)
++#   host                     the HTTPS host-key cross-check's RS half: stops unless npt-host is active (Q-U6C-7)
 +#   browsers <room> | browsers-down <room>  a browser leg's room up or down (rooms: R1.md's slot table)
 +#   tokens NN                a room's token file to stdout (the laptop's browser scripts; never a log)
 +#   collect                  npt-judge's summaries and the raw tarball
 +#   chain server|bites | chain-status
-+# Interfaces still to align at Stop B against the merged code (each in one home here): the room settings' field names
-+# (room_settings: U6a's and U6b's structs), npt-load's settings (load_settings: U6c), the probe's leg-edge records
-+# (probe_presence: U6c, Q-U8-5), npt-super's `hold` verb and its log's `room_start` event.
++# Interfaces still to align against the merged code (each in one home here): U6b's and U6c's room settings fields
++# (room_settings; U6a's are its merged struct's), npt-load's settings (load_settings: U6c's C1 (c)) and the probe's
++# records (probe_presence: Q-U6C-5's names). npt-super's flags are U6a's merged `start` (npt-lib.sh npt_super_args).
 +set -euo pipefail
 +umask 022
 +export PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C
 +readonly SELF=/opt/npt/clone/spikes/netcode-proof/ops/runs/r1.sh
 +readonly SPIKE=/opt/npt/clone/spikes/netcode-proof
-+readonly R=/var/lib/npt/results/r1 RUN=/var/lib/npt/run ROOMS=/var/lib/npt/rooms BIN=/opt/npt/bin
++readonly R=/var/lib/npt/results/r1 RUN=/var/lib/npt/run ROOMS=/var/lib/npt/rooms BIN=/opt/npt/bin HASH=/var/lib/npt/hash
 +readonly B=/var/lib/npt/bringup STATE=/var/lib/npt/state
-+readonly TICK=3
++readonly TICK=3 TICK_HZ=30
 +readonly SERVER_CHAIN="headers probe calibrate starts ds-selftest s14"
 +readonly BITES_CHAIN="bites"
 +readonly TIMING_BLOCKS="headers probe starts ds-selftest bites"
++# The probe (U6c's probe mode in room 02, UDP 30003: advisor-u6c-brief.md C1 (b)): six legs, each its warm-up, its
++# window (1,000,000 a direction at 10,000 a second: 100 s), and about 12 s of tail and set-up (the profile's longest
++# one-way delay plus 1 s, then the next leg's bind): 6 x 122 = 732 s planned. LG sends for that plus 60 s; the block
++# waits for the probe's own exit, in npt-super's log, up to that plus 120 s.
++readonly PROBE_LEGS="P0 P1 P2 P3 P4 B1" PROBE_PACKETS=1000000 PROBE_WARMUP_S=10 PROBE_RATE=10000 PROBE_LEG_EXTRA_S=12
++readonly PROBE_TOTAL_S=$((6 * (PROBE_WARMUP_S + PROBE_PACKETS / PROBE_RATE + PROBE_LEG_EXTRA_S)))
 +die() { printf 'r1.sh: %s\n' "$*" >&2; exit 2; }
 +[ "$(id -un)" = npt ] || die "run as npt"
 +. /usr/local/lib/npt/npt-lib.sh
@@ -1572,6 +1742,13 @@ index 0000000..f2c2a36
 +  now=$(date +%s)
 +  ((now < boot + 4 * 3600 - 600))
 +}
++# The page host (rs.yaml's npt-host.path and npt-host.service, Q-U6C-7): no browser leg and no HTTPS host-key
++# cross-check runs unless systemd reads npt-host as active.
++host_active() {
++  local st
++  st=$(systemctl is-active npt-host || true)
++  [ "$st" = active ] || die "npt-host is not active ($st): no browser leg and no host-key cross-check; this comes to Mustafa"
++}
 +timing_invalid() {
 +  local d=$1
 +  if [ -f "$R/bringup/TIMING-INVALID" ]; then
@@ -1599,39 +1776,70 @@ index 0000000..f2c2a36
 +}
 +
 +# ---- room settings and rooms (the one home for the settings' field names) -----------------------------------------
++# json_obj s:<key>=<text> | l:<key>=<a,b,…> | j:<key>=<JSON> …: one JSON object in argument order (texts escaped by
++# json.dumps; an `l` value is a comma list of texts, empty for []).
++json_obj() {
++  python3 -I -c 'import json, sys
++o = {}
++for a in sys.argv[1:]:
++    k, v = a[2:].split("=", 1)
++    o[k] = v if a[0] == "s" else [x for x in v.split(",") if x] if a[0] == "l" else json.loads(v)
++print(json.dumps(o))' "$@"
++}
++
 +# room_settings NN <kind> [<log suffix>]: writes /var/lib/npt/run/room-NN.json (npt writes, npt-room reads through
-+# its group). Kinds: alone, headers, probe, calibrate, start, ds, browser:<slots>, bite:<id>.
++# its group) with only the fields the settings types accept (each refuses unknown fields: SEC-U6AD-2): U6a's merged
++# struct (crates/server/src/main.rs:62-103; `bite` only in a bites build, so only in a bite room), U6b's (the binds,
++# `transport`, the WebSocket pair, `hash_path`, `ws_split_mark_s`) and U6c's (`mode`; the probe's four: C1 (b)), the
++# last two checked at their merges. Each start is its own run, R1-<set>-NN<suffix> (the judge groups logs by run:
++# eval.rs:37-75). npt-ctl builds npt-super's flags from this same file (npt-lib.sh npt_super_args), so npt-super's log
++# and the room's carry one run and the same set, role, layer, profile, date, scene, tick_hz and bite (item 10).
++# U8's values for U6a's required fields it had not set: io_threads one per housekeeping vCPU; warmup_ticks 1,800
++# (60 s at 30 Hz) where LG's clients join, else 0; first_cpu_model bring-up's read, empty at the first start.
++# Kinds: alone, headers, probe, calibrate, start, ds, browser:<slots>, bite:<id>.
 +room_settings() {
 +  local nn=$1 kind=$2 sfx=${3:-} scene=SS clients=1 tick=$TICK layer=L2 profile=P0 transport=both mode=room
-+  local bin=$BIN/npt-server bite=null mark=null hk io
++  local set role=measured marks='' bite='' mark=null warmup=0 cpu='' hk io='' addr commit day s f args
 +  case $kind in
-+    alone | start) ;;
-+    headers) clients=48 ;;
-+    probe) mode=probe profile=P1 ;;
-+    calibrate) clients=48 mode=calibrate ;;
-+    ds) clients=48 transport=ws profile=P2 mark=120 ;;
-+    browser:*) clients=${kind#browser:} tick=null ;;
-+    bite:*) bite="\"${kind#bite:}\"" bin=$BIN/npt-server-bites ;;
++    alone) set=bringup ;;
++    start) set=starts marks=PM-0001-16 ;;
++    headers) set=headers clients=48 warmup=1800 marks=PM-0001-1,PM-0001-2,PM-0006-11 ;;
++    probe) set=probe mode=probe profile=P1 marks=PM-0001-3,PM-0001-4,PM-0001-6 ;;
++    calibrate) set=calibrate clients=48 warmup=1800 ;;
++    ds) set=ds-selftest clients=48 warmup=1800 transport=ws profile=P2 mark=120 ;;
++    browser:*) set=browsers clients=${kind#browser:} tick=null ;;
++    bite:*)
++      set=bites role=bite bite=${kind#bite:}
++      marks=${bite%%/*}
++      ;;
 +    *) die "unknown room kind" ;;
 +  esac
 +  [[ $clients =~ ^[0-9]{1,2}$ ]] || die "bad client count"
 +  hk=$(sed -n 's/^housekeeping=//p' "$STATE/cpus" 2> /dev/null)
 +  npt_cpulist_valid "$hk" || die "run npt-ctl cpus first"
-+  io="\"$hk\""
-+  [ "$tick" = null ] && io=null
-+  local s=$((10#$nn)) f="$RUN/room-$nn.json"
++  [ "$tick" = null ] || io=$(npt_cpulist_expand "$hk")
++  [ "$kind" = alone ] || cpu=$(sed -n 's/^model //p' "$R/bringup/facts.txt" 2> /dev/null | head -n 1 || true)
++  addr=$(rs_ip)
++  commit=$(tr -d '\n' < "$B/head.txt")
++  day=$(date -u +%Y-%m-%d)
++  s=$((10#$nn)) f="$RUN/room-$nn.json"
++  args=(s:run="R1-$set-$nn$sfx" s:set="R1-$set" s:role="$role" l:marks="$marks" s:date="$day" s:commit="$commit"
++    s:layer="$layer" s:profile="$profile" j:seed=1 s:scene="$scene" j:clients="$clients" s:cmd_timing=B
++    j:tick_hz="$TICK_HZ" s:machine_role=RS s:machine_name=RS s:machine_plan=CCX23 s:machine_location=fsn1
++    s:machine_address="$addr" j:tick_vcpu="$tick" j:io_vcpus="[${io// /,}]" j:io_threads="$(npt_cpulist_count "$hk")"
++    s:log="$ROOMS/room-$nn$sfx.log" s:token_file="$ROOMS/room-$nn.tok" j:duration_ms=0 j:warmup_ticks="$warmup"
++    s:first_cpu_model="$cpu" s:mode="$mode" s:transport="$transport" s:wt_bind="0.0.0.0:$((30001 + s))"
++    s:ws_bind="0.0.0.0:$((31001 + s))"
++    s:ws_cert_chain=/var/lib/npt/tls/production.chain.pem s:ws_cert_key=/var/lib/npt/tls/production.key.pem
++    s:hash_path="$HASH/room-$nn.json" j:ws_split_mark_s="$mark")
++  [ -z "$bite" ] || args+=(s:bite="$bite")
++  if [ "$mode" = probe ]; then
++    # U6c's probe mode (C1 (b)): LG's IPv4 is the one peer; the six legs, 1,000,000 a direction, 10 s warm-up.
++    args+=(s:probe_peer_ipv4="$(lg_ip)" l:probe_legs="${PROBE_LEGS// /,}" j:probe_packets="$PROBE_PACKETS"
++      j:probe_warmup_s="$PROBE_WARMUP_S")
++  fi
 +  rm -f "$f"
-+  cat > "$f" << JSON
-+{"run": "R1", "set": "$kind", "role": "RS", "date": "$(date -u +%Y-%m-%d)", "commit": "$(cat "$B/head.txt")",
-+ "layer": "$layer", "profile": "$profile", "seed": 1, "scene": "$scene", "clients": $clients, "cmd_timing": "B",
-+ "mode": "$mode", "machine": {"role": "RS", "name": "RS", "plan": "CCX23", "location": "fsn1", "address": "$(rs_ip)"},
-+ "tick_vcpu": $tick, "io_vcpus": $io, "transport": "$transport",
-+ "wt_bind": "0.0.0.0:$((30001 + s))", "ws_bind": "0.0.0.0:$((31001 + s))",
-+ "ws_cert_chain": "/var/lib/npt/tls/chain.pem", "ws_cert_key": "/var/lib/npt/tls/key.pem",
-+ "log_path": "$ROOMS/room-$nn$sfx.log", "token_path": "$ROOMS/room-$nn.tok", "hash_path": "/var/lib/npt/hash/room-$nn.json",
-+ "ws_split_mark_s": $mark, "bite": $bite,
-+ "super": {"log_path": "$ROOMS/super-$nn$sfx.log", "room_binary": "$bin", "open_deadline_s": 10}}
-+JSON
++  json_obj "${args[@]}" > "$f"
 +  chmod 0640 "$f"
 +}
 +
@@ -1664,19 +1872,59 @@ index 0000000..f2c2a36
 +  [ -z "$pid" ] || [ ! -d "/proc/$pid" ]
 +}
 +
-+# load_settings NN <mode> <transport> <clients> <duration s>: npt-load's settings (U6c's names; the one home).
++# load_settings NN <mode> <transport> <clients> <duration s>: npt-load's settings (U6c's C1 (c); the one home). Modes
++# run, calibrate and probe. The run's fields (run, set, marks, date, commit, seed) come from the room's own settings
++# file, one source. pin_hex is the leaf the clients pin: on wt the room's hash file's value_hex; on ws the production
++# order's SHA256 (every room's WebSocket presents the production chain, item 2); the probe pins nothing (it writes no
++# hash file: C1 (b)), so its pin_hex is 64 zeros. npt-load ends at duration_s with DONE (its stdin is /dev/null under
++# npt-load-ctl); `lg "stop NN"` stays the abort path.
 +load_settings() {
-+  local s=$((10#$1))
-+  printf '{"room": "%s", "server": "%s", "wt_port": %s, "ws_port": %s, "mode": "%s", "transport": "%s", "clients": %s, "duration_s": %s, "token_path": "/var/lib/npt-load/tokens/room-%s.tok", "log_path": "/var/lib/npt-load/logs/load-%s.npt.log"}\n' \
-+    "$1" "$(rs_ip)" $((30001 + s)) $((31001 + s)) "$2" "$3" "$4" "$5" "$1" "$1"
++  python3 -I - "$1" "$2" "$3" "$4" "$5" "$(rs_ip)" "$(lg_ip)" "$RUN/room-$1.json" "$HASH/room-$1.json" "$R/cert/production.txt" << 'PY'
++import json, re, sys
++nn, mode, transport, clients, duration, rs, lg, room, hashf, cert = sys.argv[1:11]
++r = json.load(open(room, encoding="utf-8"))
++try:
++    if mode == "probe":
++        pin = "0" * 64
++    elif transport == "wt":
++        pin = json.load(open(hashf, encoding="utf-8"))["value_hex"]
++    else:
++        pin = re.search(r"Ledger: serial [0-9a-f]+, sha256 ([0-9a-f]{64})\.", open(cert, encoding="utf-8").read())[1]
++except (OSError, ValueError, KeyError, TypeError):
++    pin = ""
++if mode not in ("run", "calibrate", "probe") or not re.fullmatch(r"[0-9a-f]{64}", str(pin)):
++    sys.exit(f"r1.sh: no load settings for room {nn}: mode {mode}, or no pin on {transport}")
++s = int(nn, 10)
++print(json.dumps({"room": nn, "server": rs, "wt_port": 30001 + s, "ws_port": 31001 + s, "mode": mode,
++    "transport": transport, "clients": int(clients), "duration_s": int(duration),
++    "token_path": f"/var/lib/npt-load/tokens/room-{nn}.tok", "log_path": f"/var/lib/npt-load/logs/load-{nn}.npt.log",
++    "run": r["run"], "set": r["set"], "marks": r["marks"], "date": r["date"], "commit": r["commit"],
++    "machine": {"role": "LG", "name": "LG1", "plan": "CAX21", "location": "fsn1", "address": lg},
++    "behaviour": "brawl", "seed": r["seed"], "pin_hex": pin}))
++PY
 +}
 +load_up() { sudo -n /usr/local/sbin/npt-ctl rooms tokens "$1" | lg "token $1" && load_settings "$@" | lg "settings $1" && lg "start $1"; }
++# load_ready NN <s>: npt-load prints READY once its clients are up (C1 (c)); waits for it in LG's load log.
++load_ready() {
++  local i got
++  for i in $(seq 1 "$2"); do
++    got=$(lg "log $1" || true)
++    grep -qx READY <<< "$got" && return 0
++    sleep 1
++  done
++  return 1
++}
 +load_wait() {
 +  local i
 +  for i in $(seq 1 "$2"); do lg "status $1" | grep -q stopped && return 0; sleep 1; done
 +  lg "stop $1" || true
 +}
-+keep() { local d=$1 nn=$2 sfx=${3:-}; cp -p "$ROOMS/room-$nn$sfx.log" "$ROOMS/super-$nn$sfx.log" "$d/" 2> /dev/null || true; }
++# keep <dir> NN [<log suffix> [<leg>...]]: the room's and npt-super's logs, and each named leg's log (the probe's six).
++keep() {
++  local d=$1 nn=$2 sfx=${3:-} leg
++  cp -p "$ROOMS/room-$nn$sfx.log" "$ROOMS/super-$nn$sfx.log" "$d/" 2> /dev/null || true
++  for leg in "${@:4}"; do cp -p "$ROOMS/room-$nn$sfx-$leg.log" "$d/" 2> /dev/null || true; done
++}
 +
 +# ---- the blocks ----------------------------------------------------------------------------------------------
 +bringup() {
@@ -1770,6 +2018,7 @@ index 0000000..f2c2a36
 +  d=$(out cert)
 +  pid=$(tr -dc '0-9' < "$RUN/cert-$p.pid")
 +  for i in $(seq 1 1860); do [ -d "/proc/$pid" ] || break; sleep 1; done
++  # Everything but the TXT step is kept, the issue mode's stderr `PROFILES …` line among it (plan.md:971-972).
 +  grep -v '^Add in Cloudflare' "$RUN/cert-$p.live" | tee "$d/$p.txt"
 +  rm -f "$RUN/cert-$p.live" "$RUN/cert-$p.pid"
 +  grep -q 'Ledger: serial' "$d/$p.txt" || die "the $p order failed: the run stops and this comes to Mustafa"
@@ -1781,7 +2030,7 @@ index 0000000..f2c2a36
 +  timing_invalid "$d"
 +  room_settings 01 headers
 +  room_up 01
-+  load_up 01 bots wt 48 300
++  load_up 01 run wt 48 300
 +  load_wait 01 330
 +  room_down 01 || true
 +  lg "log 01" > "$d/load-01.log" || true
@@ -1789,52 +2038,67 @@ index 0000000..f2c2a36
 +}
 +
 +probe() {
-+  local d
++  local d i ended=''
 +  d=$(out probe)
 +  timing_invalid "$d"
 +  stat_cpu "$d/stat-before.txt"
 +  room_settings 02 probe
 +  room_up 02
-+  load_up 02 probe wt 1 660
-+  load_wait 02 700
++  # The probe mints no token (C1 (b)): LG's probe mode gets an empty token file, never `rooms tokens 02`.
++  printf '' | lg "token 02"
++  load_settings 02 probe wt 1 $((PROBE_TOTAL_S + 60)) | lg "settings 02"
++  lg "start 02"
++  # The probe's own exit (npt-super's room_exit event), not LG's end, ends the block.
++  for i in $(seq 1 $((PROBE_TOTAL_S + 120))); do
++    ended=$(logq "$ROOMS/super-02.log" room_exit nonzero | head -n 1)
++    [ -n "$ended" ] && break
++    sleep 1
++  done
++  [ -n "$ended" ] || ended="not seen within $((PROBE_TOTAL_S + 120)) s"
++  printf 'probe exit: nonzero %s\n' "$ended" | tee "$d/exit.txt"
++  lg "stop 02" || true
 +  room_down 02 || true
 +  stat_cpu "$d/stat-after.txt"
 +  lg "log 02" > "$d/load-02.log" || true
-+  keep "$d" 02
-+  probe_presence "$ROOMS/room-02.log" | tee "$d/presence.txt"
++  keep "$d" 02 '' $PROBE_LEGS
++  probe_presence "$ROOMS" 02 | tee "$d/presence.txt"
 +}
 +
-+# Q-U8-5 and C-U8-2, -4, -6: the probe's own leg-edge records (U6c adds them to C-U6-7's leg-edge calls) must be
-+# present for every leg at both edges, the socket's drops row found at both, and no drop on the P1 socket between
-+# them; a missing read makes that leg INVALID, never "unreadable counts as present". Proposed record (U6c's brief
-+# names it, its npt-log names go to the advisor): event `leg_edge` with f.leg (0 P0, 1 P1, 2 P2, 3 P3, 4 P4, 5 B1),
-+# f.edge (0 start, 1 end), f.cpu_lines (the count of ^cpu lines read), f.udp_drops (the socket row's drops).
++# Q-U8-5 and C-U8-2, -4, -6 with Q-U6C-5's names (C1 (d)): each of the six per-leg logs room-02-<leg>.log must hold
++# `leg_edge` at `ph` warmup and after, with `udp_row_found` 1 and `udp_drops_count` at both (equal at both on P1), and
++# `cpu_stat` at both with `cpu_user_count`. A missing read makes that leg INVALID, never "unreadable counts as present";
++# a P1 drop goes to the advisor before any L2 mark counts. probe_presence <rooms dir> NN.
 +probe_presence() {
-+  python3 -I - "$1" << 'PY'
-+import json, sys
-+legs = ["P0", "P1", "P2", "P3", "P4", "B1"]
-+seen = {}
-+try:
-+    for line in open(sys.argv[1], encoding="utf-8"):
-+        try:
-+            r = json.loads(line)
-+        except ValueError:
-+            continue
-+        if r.get("k") == "event" and r.get("ev") == "leg_edge":
-+            f = r.get("f", {})
-+            seen[(f.get("leg"), f.get("edge"))] = f
-+except OSError:
-+    pass
-+for i, name in enumerate(legs):
-+    a, b = seen.get((i, 0)), seen.get((i, 1))
-+    if not a or not b:
-+        print(f"{name}: INVALID: a leg-edge read is missing (start {'present' if a else 'missing'}, end {'present' if b else 'missing'})")
-+    elif not a.get("cpu_lines") or not b.get("cpu_lines") or "udp_drops" not in a or "udp_drops" not in b:
-+        print(f"{name}: INVALID: a /proc/stat or socket-row read is missing at an edge")
-+    elif name == "P1" and b["udp_drops"] != a["udp_drops"]:
-+        print(f"P1: INVALID: {b['udp_drops'] - a['udp_drops']} drops on the probe's P1 socket between its reads (C-U8-6): to the advisor before any L2 mark counts")
++  python3 -I - "$1" "$2" << 'PY'
++import json, os, sys
++rooms, nn = sys.argv[1:3]
++for leg in ["P0", "P1", "P2", "P3", "P4", "B1"]:
++    seen = {"leg_edge": {}, "cpu_stat": {}}
++    try:
++        for line in open(os.path.join(rooms, f"room-{nn}-{leg}.log"), encoding="utf-8"):
++            try:
++                r = json.loads(line)
++            except ValueError:
++                continue
++            if isinstance(r, dict) and r.get("k") == "event" and r.get("ev") in seen and isinstance(r.get("f"), dict):
++                seen[r["ev"]].setdefault(r.get("ph"), r["f"])
++    except OSError:
++        print(f"{leg}: INVALID: its log room-{nn}-{leg}.log is missing or unreadable")
++        continue
++    count = lambda f, k: f.get(k) if type(f.get(k)) is int else None
++    edge, cpu = seen["leg_edge"], seen["cpu_stat"]
++    gone = [f"{ev} at {ph}" for ev in seen for ph in ("warmup", "after") if ph not in seen[ev]]
++    if gone:
++        print(f"{leg}: INVALID: missing {', '.join(gone)}")
++    elif any(edge[ph].get("udp_row_found") != 1 or count(edge[ph], "udp_drops_count") is None for ph in edge):
++        print(f"{leg}: INVALID: the socket's /proc/net/udp row was not read at both edges")
++    elif any(count(cpu[ph], "cpu_user_count") is None for ph in cpu):
++        print(f"{leg}: INVALID: /proc/stat was not read at both edges")
++    elif leg == "P1" and edge["after"]["udp_drops_count"] != edge["warmup"]["udp_drops_count"]:
++        d = edge["after"]["udp_drops_count"] - edge["warmup"]["udp_drops_count"]
++        print(f"P1: INVALID: {d} drops on the probe's P1 socket between its reads (C-U8-6): to the advisor before any L2 mark counts")
 +    else:
-+        print(f"{name}: present at both edges")
++        print(f"{leg}: present at both edges")
 +PY
 +}
 +
@@ -1873,7 +2137,11 @@ index 0000000..f2c2a36
 +  room_up 05
 +  # LG's 48 WebSocket connections at P2 join within 60 s; the 1 min warm-up follows; the pool's mark is at OPEN +
 +  # 120 s (settings `ws_split_mark_s`); the measured window is the 5 minutes after it (C-U8-3).
-+  load_up 05 bots ws 48 420
++  load_up 05 run ws 48 420
++  # The pool's mark needs LG's 48 clients up first (u6b-brief.md condition 3): READY within 60 s, else INVALID.
++  if ! load_ready 05 60; then
++    printf 'INVALID: LG printed no READY within 60 s, so its 48 connections were not up 60 s before the mark\n' | tee "$d/INVALID-ready.txt"
++  fi
 +  load_wait 05 450
 +  room_down 05 || true
 +  stat_cpu "$d/stat-after.txt"
@@ -1915,6 +2183,7 @@ index 0000000..f2c2a36
 +readonly BROWSER_ROOMS="smoke cert-chrome cert-edge cert-firefox cert-brave fallback-chrome fallback-edge fallback-firefox fallback-brave mds"
 +browsers() {
 +  local nn slots
++  host_active
 +  npt_valid_word "$1" $BROWSER_ROOMS || die "unknown browser room (R1.md's slot table)"
 +  read -r nn slots < <(browser_room "$1")
 +  room_settings "$nn" "browser:$slots"
@@ -1973,6 +2242,7 @@ index 0000000..f2c2a36
 +  ds-selftest) ds_selftest ;;
 +  s14) s14 ;;
 +  bites) bites ;;
++  host) host_active; printf 'npt-host active: fetch /npt/ssh-host-keys.txt over HTTPS now (PROMPT-R1.md section 3)\n' ;;
 +  browsers) [ "$#" -eq 2 ] || die "browsers <room>"; browsers "$2" ;;
 +  browsers-down) [ "$#" -eq 2 ] || die "browsers-down <room>"; browsers_down "$2" ;;
 +  tokens) [ "$#" -eq 2 ] && npt_valid_nn "$2" || die "tokens NN"; exec sudo -n /usr/local/sbin/npt-ctl rooms tokens "$2" ;;
@@ -2519,20 +2789,24 @@ index 0000000..7c0b785
 +esac
 diff --git a/spikes/netcode-proof/ops/sbin/npt-cert b/spikes/netcode-proof/ops/sbin/npt-cert
 new file mode 100644
-index 0000000..bc40b0b
+index 0000000..54cea0a
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/sbin/npt-cert
-@@ -0,0 +1,117 @@
+@@ -0,0 +1,121 @@
 +#!/bin/bash -p
 +# npt-cert issue staging|production: the WebSocket leg's browser-trusted certificate by DNS-01 by hand
 +# (u8-brief.md rev 1.1 section 1 Block 3; replan-units.md:107-118; Q-U8-4 as ruled). Root-owned, 0755.
 +# 1. Opens npt-host's egress to the one ACME directory host (its addresses resolved here, each element timing out
 +#    after 35 minutes); DNS goes over loopback to the local resolver, which nftables admits.
 +# 2. Runs U6c's issue mode as npt-host, ONE process across both phases (no ACME key or order state on disk between
-+#    them). Its interface (U6c's brief takes it): stdout `PROFILE <name>`, `TXT_NAME <name>`, `TXT_VALUE <value>`;
-+#    then it reads `go` on stdin; then `SERIAL <hex>`, `SHA256 <hex>`, `DONE`. It writes the key (0640, group
-+#    npt-room through the setgid directory) and the chain under /var/lib/npt/tls, and requires `shortlived` in
-+#    production (fails closed); this wrapper checks the PROFILE line too.
++#    them). Its interface (U6c's brief, C1 (a)): stdout `PROFILE <name>`, `TXT_NAME <name>`, `TXT_VALUE <value>`;
++#    then it reads `go` on stdin; then `SERIAL <hex>`, `SHA256 <hex>`, `DONE`. The directory's profile list goes to
++#    stderr as one line `PROFILES <name>,<name>…`, which this wrapper passes through, so the cert block's results keep
++#    it. It writes four files under /var/lib/npt/tls, the key (0640, group npt-room through the setgid directory) and
++#    then the chain: staging.key.pem and staging.chain.pem, or production.key.pem and production.chain.pem (one name
++#    for both orders would make the production order exit 2 on the existing path). Every room's WebSocket names the
++#    production pair; npt-host.path starts the page host once production.chain.pem exists. The issue mode requires
++#    `shortlived` in production (fails closed); this wrapper checks the PROFILE line too.
 +# 3. Polls EVERY authoritative server of the zone (npt-ns.txt in the root-owned clone) with `dig +norecurse` every
 +#    15 s and sends `go` only when all show the value (Let's Encrypt validates from several perspectives). One
 +#    30-minute bound covers both phases; no retry loop: a failed order stops the run and comes back to Mustafa.
@@ -2642,17 +2916,18 @@ index 0000000..bc40b0b
 +printf 'Delete the TXT record now; the session confirms its absence over DNS-over-HTTPS.\n'
 diff --git a/spikes/netcode-proof/ops/sbin/npt-ctl b/spikes/netcode-proof/ops/sbin/npt-ctl
 new file mode 100644
-index 0000000..6bc183d
+index 0000000..46a37da
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/sbin/npt-ctl
-@@ -0,0 +1,196 @@
+@@ -0,0 +1,203 @@
 +#!/bin/bash -p
 +# npt-ctl: the run's root controls (u8-brief.md rev 1.1 section 1 Block 3; C1, C4; Q-U8-1, -3, -7; L4).
 +# Installed root-owned, 0755, at /usr/local/sbin/npt-ctl; `npt` reaches it only through sudoers.d/npt (RS) or npt-lg
 +# (LG), each argument matched there by an anchored pattern and validated again here by npt-lib.sh.
 +#   RS:  npt-ctl peers <LG IPv4> [<more LG IPv4s>]   metrics_src, PermitOpen <LG>:22, sshd -t, reload; VM addresses only
 +#        npt-ctl cpus <tick vCPU>                     condition 4's housekeeping set (slices, workqueue mask, kthreads)
-+#        npt-ctl rooms start NN                       npt-super's hold form as npt-room in npt-rooms.slice (stdin held)
++#        npt-ctl rooms start NN                       `npt-super start` (its hold form) as npt-room in npt-rooms.slice,
++#                                                     its flags from the room's settings (stdin held)
 +#        npt-ctl rooms tokens NN                      that room's token file, read as npt-room, to stdout only
 +#        npt-ctl quic off|on                          UDP 30001-30032 dropped from all but metrics_src, 15 min at most
 +#   LG:  npt-ctl loadkey <RS IPv4>                    RS's .pub (one line on stdin) for npt-load, forced command (C4)
@@ -2792,15 +3067,21 @@ index 0000000..6bc183d
 +      # Q-U8-7 with Q-U8-1 term 4: read as npt-room, so a link the room plants reaches nothing npt-room cannot read.
 +      exec "${SETPRIV_ROOM[@]}" /usr/bin/head -c 1048576 -- "/var/lib/npt/rooms/room-$nn.tok" ;;
 +    start)
-+      local hk
++      local hk vals=()
 +      hk=$(housekeeping_record)
 +      [ -f "/var/lib/npt/run/room-$nn.json" ] || die "no settings at /var/lib/npt/run/room-$nn.json"
++      # npt-super's flags from the room's own settings, read as npt-room and checked field by field (npt-lib.sh).
++      mapfile -t vals < <("${SETPRIV_ROOM[@]}" /usr/bin/python3 -I -c "$NPT_SETTINGS_PY" \
++        "/var/lib/npt/run/room-$nn.json" "$NPT_SUPER_FIELDS")
++      npt_super_args "$nn" "${vals[@]}" || die "the room's settings do not give npt-super's flags"
 +      # A restart frees the room's token and hash paths as npt-room (U6a and U6b refuse an existing path).
 +      "${SETPRIV_ROOM[@]}" /usr/bin/rm -f -- "/var/lib/npt/rooms/room-$nn.tok" "/var/lib/npt/hash/room-$nn.json"
-+      # Condition 3 and Q-U8-1: npt-super's hold form as npt-room in npt-rooms.slice (every CPU), started off the
-+      # tick vCPU by taskset so only the room's tick thread pins itself onto it (Q-U6A-5); stdin passes through.
++      # Condition 3 and Q-U8-1: npt-super's hold form (`start`, U6a's merged code) as npt-room in npt-rooms.slice
++      # (every CPU), started off the tick vCPU by taskset so only the room's tick thread pins itself onto it
++      # (Q-U6A-5); stdin passes through, and its close is npt-super's end (never a kill: a log with no footer
++      # makes the run INVALID).
 +      exec systemd-run --quiet --scope --collect --slice=npt-rooms.slice --unit="npt-room-$nn-$$" \
-+        "${SETPRIV_ROOM[@]}" /usr/bin/taskset -c "$hk" /opt/npt/bin/npt-super hold "/var/lib/npt/run/room-$nn.json" ;;
++        "${SETPRIV_ROOM[@]}" /usr/bin/taskset -c "$hk" /opt/npt/bin/npt-super start "${NPT_SUPER_ARGS[@]}" ;;
 +  esac
 +}
 +
@@ -2844,10 +3125,10 @@ index 0000000..6bc183d
 +esac
 diff --git a/spikes/netcode-proof/ops/sbin/npt-lib.sh b/spikes/netcode-proof/ops/sbin/npt-lib.sh
 new file mode 100644
-index 0000000..f26aae0
+index 0000000..2847a29
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/sbin/npt-lib.sh
-@@ -0,0 +1,191 @@
+@@ -0,0 +1,233 @@
 +# npt-lib.sh: validators and pure computations for U8's wrappers (u8-brief.md rev 1.1 section 1 Block 3).
 +# No side effects: sourcing defines constants and functions only, reads no file and runs no command, so the container
 +# tests (ops/tests/wrappers.test.sh) source it as the wrappers do. Installed root-owned, 0644, at
@@ -3030,6 +3311,48 @@ index 0000000..f26aae0
 +  [ "$#" -eq 1 ] && [[ $1 =~ ^[0-9a-f]{2,128}$ ]]
 +}
 +
++# npt-super's `start` flags from one room's settings (fix pass items 8 and 10; U6a's merged npt-super,
++# crates/super/src/main.rs:54-139). `npt-ctl rooms start` reads the settings file as npt-room with NPT_SETTINGS_PY,
++# which prints one value per line in NPT_SUPER_FIELDS' order (marks joined by commas, a null bite empty), and passes
++# them here: each is checked against an anchored pattern, so npt-super's log takes the room's run and the same eight
++# header values (set, role, layer, profile, date, scene, tick_hz, bite) from that one file; the judge makes a run
++# INVALID when its logs differ on any of them (NR-U6A-1). Sets NPT_SUPER_ARGS; the room binary is the bites build only
++# for a bite, and npt-super's log is the room log's name with `super-` for `room-`.
++readonly NPT_SUPER_FIELDS='run set role date commit layer profile scene tick_hz machine_role machine_name machine_plan machine_location machine_address marks bite log'
++readonly NPT_SETTINGS_PY='import json, sys
++raw = open(sys.argv[1], "rb").read(65537)
++s = json.loads(raw) if len(raw) <= 65536 else sys.exit(2)
++out = []
++for k in sys.argv[2].split():
++    v = s.get(k)
++    if k == "marks" and isinstance(v, list) and all(isinstance(m, str) for m in v):
++        v = ",".join(v)
++    elif k == "bite" and v is None:
++        v = ""
++    if isinstance(v, bool) or not isinstance(v, (str, int)) or "\n" in str(v) or "\r" in str(v):
++        sys.exit(2)
++    out.append(str(v))
++sys.stdout.write("".join(x + "\n" for x in out))'
++npt_super_args() {
++  NPT_SUPER_ARGS=()
++  [ "$#" -eq 18 ] && npt_valid_nn "$1" || return 1
++  local nn=$1 id='^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$' w='^[A-Za-z0-9-]{1,16}$' mark='PM-[0-9]{4}-[0-9]{1,3}'
++  [[ $2 =~ $id && $3 =~ $id && $4 =~ ^[a-z][a-z-]{0,31}$ && $5 =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || return 1
++  [[ $6 =~ ^[0-9a-f]{40}$ && $7 =~ ^(L1|L2|real)$ && $8 =~ ^(P[0-4]|B1|real-path)$ && $9 =~ ^(SS|ES|CO|TC)$ ]] || return 1
++  [[ ${10} =~ ^[1-9][0-9]{0,2}$ && ${11} =~ ^[A-Z]{1,8}$ && ${12} =~ $w && ${13} =~ $w && ${14} =~ ^[a-z0-9-]{1,16}$ ]] || return 1
++  [ -z "${15}" ] || npt_valid_ipv4 "${15}" || return 1
++  [[ ${16} =~ ^($mark(,$mark){0,15})?$ && ${17} =~ ^($mark/[a-z0-9-]{1,32})?$ ]] || return 1
++  [[ ${18} =~ ^/var/lib/npt/rooms/room-$nn(-[a-z0-9-]{1,32})?\.log$ ]] || return 1
++  local bin=/opt/npt/bin/npt-server
++  [ -z "${17}" ] || bin=/opt/npt/bin/npt-server-bites
++  NPT_SUPER_ARGS=(--room "$bin" --settings "/var/lib/npt/run/room-$nn.json" --log "${18/\/room-//super-}"
++    --run "$2" --set "$3" --role "$4" --date "$5" --commit "$6" --layer "$7" --profile "$8" --scene "$9"
++    --tick-hz "${10}" --machine-role "${11}" --machine-name "${12}" --machine-plan "${13}"
++    --machine-location "${14}" --machine-address "${15}")
++  [ -z "${16}" ] || NPT_SUPER_ARGS+=(--marks "${16}")
++  [ -z "${17}" ] || NPT_SUPER_ARGS+=(--bite "${17}")
++}
++
 +# The metrics_src element command for validated LG addresses (npt-ctl peers).
 +npt_metrics_rule() {
 +  [ "$#" -ge 1 ] && [ "$#" -le 4 ] || return 1
@@ -3041,10 +3364,10 @@ index 0000000..f26aae0
 +}
 diff --git a/spikes/netcode-proof/ops/sbin/npt-load-ctl b/spikes/netcode-proof/ops/sbin/npt-load-ctl
 new file mode 100644
-index 0000000..36e7c17
+index 0000000..fcb8d07
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/sbin/npt-load-ctl
-@@ -0,0 +1,84 @@
+@@ -0,0 +1,86 @@
 +#!/bin/bash -p
 +# npt-load-ctl: LG's forced command for npt-load (C4; plan.md:1157-1162). Installed root-owned, 0755, at
 +# /usr/local/bin/npt-load-ctl; it runs as npt-load (never root), named by `command=` in the root-owned
@@ -3055,11 +3378,13 @@ index 0000000..36e7c17
 +#   token NN      stdin (at most 64 KiB) -> tokens/room-NN.tok (0600)
 +#   settings NN   stdin (at most 64 KiB) -> run/load-NN.json (0600)
 +#   start NN      /opt/npt/bin/npt-load run/load-NN.json, detached; log logs/load-NN.log
-+#   stop NN       TERM, then KILL after 10 s; prints the exit
++#   stop NN       TERM, then KILL after 10 s; prints the exit (the abort path: recorded as stopped, no DONE)
 +#   status NN     running or stopped
 +#   log NN        the load's log (at most 256 MiB) to stdout
 +#   fwcheck       C5's LG half: a TCP connect to RS's port 22 must time out (only fw-rs can drop it)
-+# The verbs and npt-load's command line follow the interface U6c's brief names; these are U8's proposal until then.
++# npt-load's command line is U6c's (advisor-u6c-brief.md C1 (c)): `npt-load <settings path>`, one argument. It prints
++# READY once its clients are up and ends at the settings' duration_s with DONE and exit 0; its stdin is /dev/null
++# here, so stdin's close is no end for it.
 +if [ "${NPT_ENV_CLEARED:-}" != 1 ]; then
 +  exec /usr/bin/env -i NPT_ENV_CLEARED=1 PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C \
 +    SSH_ORIGINAL_COMMAND="${SSH_ORIGINAL_COMMAND:-}" SSH_CONNECTION="${SSH_CONNECTION:-}" \
@@ -3282,12 +3607,63 @@ index 0000000..0d3ad25
 +npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-ctl ^loadkey (25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])([.](25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}$
 +npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-userdata ""
 +npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-userdata ^head$
+diff --git a/spikes/netcode-proof/ops/systemd/host.json b/spikes/netcode-proof/ops/systemd/host.json
+new file mode 100644
+index 0000000..f175e34
+--- /dev/null
++++ b/spikes/netcode-proof/ops/systemd/host.json
+@@ -0,0 +1,8 @@
++{
++  "bind": "0.0.0.0:31000",
++  "cert_chain": "/var/lib/npt/tls/production.chain.pem",
++  "cert_key": "/var/lib/npt/tls/production.key.pem",
++  "dist": "/var/lib/npt/dist",
++  "hash_template": "/var/lib/npt/hash/room-NN.json",
++  "host_keys": "/var/lib/npt/dist/ssh-host-keys.txt"
++}
+diff --git a/spikes/netcode-proof/ops/systemd/npt-host.path b/spikes/netcode-proof/ops/systemd/npt-host.path
+new file mode 100644
+index 0000000..a805543
+--- /dev/null
++++ b/spikes/netcode-proof/ops/systemd/npt-host.path
+@@ -0,0 +1,12 @@
++# npt-host.path on RS (Q-U6C-7 as ruled, U8's F22; advisor-u6c-brief.md C1 (f)): starts npt-host.service once the
++# production order's chain exists. The issue mode writes that chain last, after the key's sync_all (C1 (a)), so the
++# host starts with both files whole. Staging writes staging.* beside it and starts nothing. rs.yaml installs this file
++# root-owned, 0644, from the root-owned clone; no sudoers line names npt-host or systemctl.
++[Unit]
++Description=npt page host: start once the production chain exists
++
++[Path]
++PathExists=/var/lib/npt/tls/production.chain.pem
++
++[Install]
++WantedBy=multi-user.target
+diff --git a/spikes/netcode-proof/ops/systemd/npt-host.service b/spikes/netcode-proof/ops/systemd/npt-host.service
+new file mode 100644
+index 0000000..4f888db
+--- /dev/null
++++ b/spikes/netcode-proof/ops/systemd/npt-host.service
+@@ -0,0 +1,13 @@
++# npt-host.service on RS (Q-U6C-7 as ruled; advisor-u6c-brief.md C1 (f)): U6c's page host, `npt-host serve`, as the
++# npt-host user on TCP 31000 with /etc/npt/host.json. Started only by npt-host.path (no [Install] section); runs until
++# stopped. rs.yaml installs this file root-owned, 0644, from the root-owned clone.
++[Unit]
++Description=npt page host (npt-host serve) on TCP 31000
++
++[Service]
++Type=simple
++User=npt-host
++Group=npt-host
++NoNewPrivileges=yes
++ExecStart=/opt/npt/bin/npt-host serve /etc/npt/host.json
++Restart=no
 diff --git a/spikes/netcode-proof/ops/tests/browser.test.mjs b/spikes/netcode-proof/ops/tests/browser.test.mjs
 new file mode 100644
-index 0000000..7548ddf
+index 0000000..f7305f4
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/browser.test.mjs
-@@ -0,0 +1,164 @@
+@@ -0,0 +1,227 @@
 +// Test 4 (u8-brief.md rev 1.1 section 3; C2, C3; SEC-R1D-2, -3, -6): the browser package's config, lock and scripts.
 +import assert from "node:assert/strict";
 +import { createHash } from "node:crypto";
@@ -3442,6 +3818,69 @@ index 0000000..7548ddf
 +  assert.equal(r.status, 2);
 +});
 +
++// Item 9 (Q-U7-1 ruled (a)): save()'s header and footer, built by config.mjs's pure legHeader and legLog.
++const LOG_RS = readFileSync(join(SPIKE, "crates", "log", "src", "lib.rs"), "utf8");
++const rustFields = (name) => [...LOG_RS.match(new RegExp(`\\npub struct ${name} \\{\\n([\\s\\S]*?)\\n\\}`))[1]
++  .matchAll(/^ {4}pub ([a-z_0-9]+):/gm)].map((x) => x[1]).sort();
++const PAGE_LINES = [
++  '{"k":"event","ev":"mds_read","ph":"measured","ns":1200,"f":{"size_bytes":1232}}',
++  '{"k":"second","sec":0,"ph":"measured","v":{"frames_count":60}}',
++  '{"k":"event","ev":"mds_read","ph":"measured","ns":10000001200,"f":{"size_bytes":1232}}',
++];
++const RUN = { run: "R1", date: config.logDate(new Date(Date.UTC(2026, 11, 3, 11, 40))), commit: "1".repeat(40), wasm_sha256: "e".repeat(64) };
++const PAGE_STATE = { version: "npt-proof 0.1.0", nptClockResNs: 100000, nptDropped: 0, records: PAGE_LINES, timed_out: false };
++const FAKE_OS = { cpus: () => [{ model: "Test CPU" }], arch: () => "x64", availableParallelism: () => 8, totalmem: () => 16 * 1073741824, release: () => "10.0.26100" };
++const LEG = { suite: "mds", browser: "chrome", transport: "wt", nn: "19", attempt: 0, slot: 0 };
++
++test("item 9: a leg's .npt.log is one npt-log log: Header's fields exactly, the page's lines unchanged, the footer's count", () => {
++  assert.equal(config.LOG_SCHEMA, Number(LOG_RS.match(/^pub const SCHEMA: u32 = (\d+);$/m)[1]), "npt-log's SCHEMA");
++  const machine = config.osMachine(FAKE_OS);
++  const h = config.legHeader(RUN, LEG, PAGE_STATE, machine);
++  assert.deepEqual(Object.keys(h).sort(), rustFields("Header"));
++  assert.deepEqual(Object.keys(h.machine).sort(), rustFields("Machine"));
++  assert.deepEqual(Object.keys(h.build).sort(), rustFields("Build"));
++  assert.deepEqual(
++    [h.schema, h.run, h.set, h.role, h.marks, h.bite, h.layer, h.profile, h.seed, h.tick_hz, h.clients, h.scene, h.process, h.slot, h.date],
++    [1, "R1-mds-chrome-wt-a00", "R1-mds", "measured", ["PM-0001-36"], null, "real", "real-path", 0, 30, 1, "SS", "browser", 0, "2026-12-03"],
++  );
++  assert.deepEqual(h.machine, { role: "ML", name: "ML*", plan: "", arch: "x64", cpu: "Test CPU", vcpus: 8, mem_mb: 16384,
++    location: "home", kernel: "10.0.26100", address: "", threads_per_core: 0, smt: [], clock_res_ns: 100000 });
++  assert.deepEqual(h.build, { commit: RUN.commit, binary_sha256: RUN.wasm_sha256, features: [], profile: "release" });
++  assert.deepEqual(h.params, { suite: "mds", browser: "chrome", path: "eu-path", transport: "wt", room: "19", attempt: 0,
++    version: "npt-proof 0.1.0", records_dropped_count: 0 });
++  const log = config.legLog(h, PAGE_LINES, false);
++  const lines = log.split("\n");
++  assert.equal(lines.pop(), "", "every line ends in a newline");
++  assert.deepEqual(JSON.parse(lines[0]), { k: "header", ...h });
++  assert.deepEqual(lines.slice(1, -1), PAGE_LINES, "every page line unchanged");
++  const footer = JSON.parse(lines.at(-1));
++  assert.deepEqual(footer, { k: "footer", records: lines.length - 1, ended: "clean" }, "the records before it, the header included");
++  assert.equal(JSON.parse(config.legLog(h, PAGE_LINES, true).trim().split("\n").at(-1)).ended, "stopped", "the time limit");
++  assert.doesNotMatch(log, /nptj_|#t=|https?:\/\/|\b(?:\d{1,3}\.){3}\d{1,3}\b/, "no token, URL or address in the file");
++  // The roles: control on a wt-attempts leg with hash=wrong (with its crate), bite on a bites-dist leg.
++  const c = config.legHeader(RUN, { ...LEG, suite: "wt-attempts", hash: "wrong", crate: "wtransport" }, PAGE_STATE, machine);
++  assert.deepEqual([c.role, c.marks, c.params.crate], ["control", ["PM-0001-28"], "wtransport"]);
++  const b = config.legHeader(RUN, { ...LEG, suite: "smoke", bite: "PM-0001-14/unsplit-group" }, PAGE_STATE, machine);
++  assert.deepEqual([b.role, b.bite, b.build.features, "crate" in b.params], ["bite", "PM-0001-14/unsplit-group", ["bites"], false]);
++  assert.throws(() => config.legHeader(RUN, { ...LEG, suite: "other" }, PAGE_STATE, machine), /no marks/);
++  // What Node's os does not give stays empty, 0 or []; a value the page does not give is never invented.
++  const bare = config.osMachine({ ...FAKE_OS, availableParallelism: undefined, cpus: () => [] });
++  assert.deepEqual([bare.cpu, bare.vcpus, bare.plan, bare.threads_per_core, bare.smt], ["", 0, "", 0, []]);
++  const none = config.legHeader(RUN, LEG, { version: "v" }, machine);
++  assert.deepEqual([none.machine.clock_res_ns, none.params.records_dropped_count], [0, null]);
++  // Y from rs.yaml's commit line, filled at Stop B; the zeros refused.
++  const rs = text("cloud-init/rs.yaml");
++  assert.throws(() => config.codeCommit(rs), /not filled/);
++  assert.equal(config.codeCommit(rs.replace(/ {6}0{40}\n/, `      ${"ab".repeat(20)}\n`)), "ab".repeat(20));
++  // read() returns the clock step and the dropped count; save() writes legLog with the time limit's end.
++  assert.equal(config.PAGE.clockResNs, "nptClockResNs");
++  assert.equal(config.PAGE.dropped, "nptDropped");
++  const lib = text("browser/lib.mjs");
++  assert.match(lib, /nptClockResNs: window\[p\.clockResNs\] \?\? null, nptDropped: window\[p\.dropped\] \?\? null/);
++  assert.match(lib, /writeFileSync\(`\$\{base\}\.npt\.log`, legLog\(header, state\.records, state\.timed_out === true\)\)/);
++  for (const s of ["cert14d.mjs", "fallback.mjs"]) assert.doesNotMatch(text(`browser/${s}`), /save\("/, `${s}: a summary is no leg log`);
++});
++
 +test("C3: fallback re-arms the block per browser and marks a WebTransport arrival INVALID; cert-14d writes attempt.ok", () => {
 +  const f = text("browser/fallback.mjs");
 +  assert.match(f, /console\.log\(quic\("off"\)\);/);
@@ -3454,10 +3893,10 @@ index 0000000..7548ddf
 +});
 diff --git a/spikes/netcode-proof/ops/tests/cloudinit.test.mjs b/spikes/netcode-proof/ops/tests/cloudinit.test.mjs
 new file mode 100644
-index 0000000..548ae40
+index 0000000..b345d34
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/cloudinit.test.mjs
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,213 @@
 +// Test 1 (u8-brief.md rev 1.1 section 3): the two cloud-init files.
 +import assert from "node:assert/strict";
 +import { execFileSync } from "node:child_process";
@@ -3610,6 +4049,67 @@ index 0000000..548ae40
 +    assert.match(body, new RegExp(`visudo -c -q -f "\\$O/sbin/${s}"\\n\\s*install -m 0440 "\\$O/sbin/${s}" /etc/sudoers\\.d/npt`));
 +  });
 +}
++
++/** A systemd unit file as { section: { key: value } } (comments and blank lines skipped; a repeated key fails). */
++function unit(rel) {
++  const out = {};
++  let sec = null;
++  for (const raw of text(rel).split("\n")) {
++    const l = raw.trim();
++    if (!l || l.startsWith("#")) continue;
++    const s = l.match(/^\[([A-Za-z]+)\]$/);
++    if (s) {
++      sec = out[s[1]] = {};
++      continue;
++    }
++    const [k, ...v] = l.split("=");
++    assert.ok(sec && !(k in sec), `${rel}: ${l}`);
++    sec[k] = v.join("=");
++  }
++  return out;
++}
++
++test("rs: npt-host.path and npt-host.service as Q-U6C-7 rules them, and /etc/npt/host.json (fix pass item 1)", () => {
++  const path = unit("systemd/npt-host.path");
++  assert.deepEqual(Object.keys(path).sort(), ["Install", "Path", "Unit"]);
++  assert.deepEqual(path.Path, { PathExists: "/var/lib/npt/tls/production.chain.pem" });
++  assert.deepEqual(path.Install, { WantedBy: "multi-user.target" });
++  const svc = unit("systemd/npt-host.service");
++  assert.deepEqual(Object.keys(svc).sort(), ["Service", "Unit"], "no [Install]: only the path unit starts it");
++  assert.deepEqual(svc.Service, {
++    Type: "simple",
++    User: "npt-host",
++    Group: "npt-host",
++    NoNewPrivileges: "yes",
++    ExecStart: "/opt/npt/bin/npt-host serve /etc/npt/host.json",
++    Restart: "no",
++  });
++  assert.deepEqual(JSON.parse(text("systemd/host.json")), {
++    bind: "0.0.0.0:31000",
++    cert_chain: "/var/lib/npt/tls/production.chain.pem",
++    cert_key: "/var/lib/npt/tls/production.key.pem",
++    dist: "/var/lib/npt/dist",
++    hash_template: "/var/lib/npt/hash/room-NN.json",
++    host_keys: "/var/lib/npt/dist/ssh-host-keys.txt",
++  });
++  // Installed by root, 0644, from the root-owned clone, after the binaries and the host-key file, then enabled.
++  const rs = text(FILES.rs);
++  const lines = [
++    'install -o root -g root -m 0644 "$O/systemd/host.json" /etc/npt/host.json',
++    'install -o root -g root -m 0644 "$O/systemd/npt-host.path" "$O/systemd/npt-host.service" /etc/systemd/system/',
++    "systemctl daemon-reload",
++    "systemctl enable --now npt-host.path",
++  ];
++  let at = rs.indexOf("> /var/lib/npt/dist/ssh-host-keys.txt");
++  assert.ok(at > rs.indexOf('install -m 0755 "$T/$b" "/opt/npt/bin/$b"'), "the host-key file after the binaries");
++  for (const l of lines) {
++    const i = rs.indexOf(`\n      ${l}\n`);
++    assert.ok(i > at, `rs.yaml: ${l} (in order, after the binaries and the host-key file)`);
++    at = i;
++  }
++  assert.ok(at < rs.indexOf('touch "$B/build.done"'));
++  assert.doesNotMatch(rs, /npt-host\.service\b[^\n]*(enable|start)|systemctl (start|restart) npt-host/, "only the path unit starts the host");
++});
 diff --git a/spikes/netcode-proof/ops/tests/firewall.test.mjs b/spikes/netcode-proof/ops/tests/firewall.test.mjs
 new file mode 100644
 index 0000000..ca84da8
@@ -3739,10 +4239,10 @@ index 0000000..a0915a9
 +}
 diff --git a/spikes/netcode-proof/ops/tests/operator.test.mjs b/spikes/netcode-proof/ops/tests/operator.test.mjs
 new file mode 100644
-index 0000000..9cd7a9c
+index 0000000..6b3fcb4
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/operator.test.mjs
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,135 @@
 +// The operator files (u8-brief.md rev 1.1 Blocks 7 and 8; plan.md:1308-1345; C1, C8, L2): the settings' rule forms,
 +// the prompt's required steps, and the pre-push hook run against a throwaway repository.
 +import assert from "node:assert/strict";
@@ -3835,9 +4335,14 @@ index 0000000..9cd7a9c
 +  }
 +});
 +
-+test("pre-push: sh -n, and its expected hash is redact-check.mjs's", () => {
++// redact-check.mjs's SHA-256 at F26's commit (2a9498d, the fix of npm tarball paths); a later change to the scanner
++// fails here until the hook and this line take its new hash (fix pass item 6).
++const REDACT_SHA256_F26 = "2609bc87c9248558f8334731a07b0ce82479ced427f18d70af1ee7e130519d31";
++
++test("pre-push: sh -n, and its expected hash is redact-check.mjs's, F26's", () => {
 +  execFileSync("sh", ["-n", join(OPS, "operator", "pre-push")]);
 +  const sha = createHash("sha256").update(readFileSync(join(OPS, "operator", "redact-check.mjs"))).digest("hex");
++  assert.equal(sha, REDACT_SHA256_F26, "redact-check.mjs is F26's");
 +  assert.match(text("operator/pre-push"), new RegExp(`^EXPECTED=${sha}$`, "m"));
 +});
 +
@@ -3875,15 +4380,17 @@ index 0000000..9cd7a9c
 +});
 diff --git a/spikes/netcode-proof/ops/tests/r1plan.test.mjs b/spikes/netcode-proof/ops/tests/r1plan.test.mjs
 new file mode 100644
-index 0000000..1e03057
+index 0000000..b07059c
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/r1plan.test.mjs
-@@ -0,0 +1,155 @@
+@@ -0,0 +1,170 @@
 +// Test 5 (u8-brief.md rev 1.1 section 3; C1, C3, C6): R1.md's arithmetic, recomputed from its own tables and the
 +// lines and rate it cites; and no block marked away needs a laptop-session command.
 +import assert from "node:assert/strict";
++import { readFileSync, readdirSync, statSync } from "node:fs";
++import { join } from "node:path";
 +import { test } from "node:test";
-+import { text } from "./helpers.mjs";
++import { OPS, text } from "./helpers.mjs";
 +
 +const plan = text("runs/R1.md");
 +const r1 = text("runs/r1.sh");
@@ -4002,6 +4509,19 @@ index 0000000..1e03057
 +  assert.match(plan, /\*\*R1's line:\*\* R1's runs hold no throwing or rejoining hostile client and no client restarted mid-run/);
 +});
 +
++test("the hash URL is per room, `/npt/cert-hash-NN.json`, and plan.md:995-996 is superseded beside :287 (fix pass item 3)", () => {
++  assert.match(plan, /each attempt fetches `\/npt\/cert-hash-NN\.json` \(the page derives NN from its `room` query/);
++  assert.match(text("browser/cert14d.mjs"), /the page fetches \/npt\/cert-hash-NN\.json \(NN from its `room` query\)/);
++  assert.match(plan, /:287 \(RS's host key[^]*?\); :995-996 \(one hash file for every room/);
++  const plain = ["/npt/cert-hash", ".json"].join("");
++  const walk = (dir) => readdirSync(dir).flatMap((n) => {
++    const p = join(dir, n);
++    if (n === "node_modules" || p === join(OPS, "tests")) return [];
++    return statSync(p).isDirectory() ? walk(p) : [p];
++  });
++  for (const f of walk(OPS)) assert.ok(!readFileSync(f, "utf8").includes(plain), `${f} names the plain hash URL`);
++});
++
 +test("the dates recomputed from the cited lines and the rate (C6)", () => {
 +  const est = (lo, hi) => [lo * 1.35, hi * 1.5];
 +  const units = { MOVED: est(360, 720), U4k: [800, 1900], U6d: [2450, 2700], U6e: [2150, 2750], U6j: est(1650, 3050) };
@@ -4034,26 +4554,264 @@ index 0000000..1e03057
 +  assert.equal(round2(1.9 + 1.8 + 3.6), 7.3);
 +  assert.match(plan, /planned EUR 6\.62 \(1\.72 \+ 1\.56 \+ 3\.34\), caps EUR 7\.30 \(1\.90 \+ 1\.80 \+ 3\.60\)/);
 +});
+diff --git a/spikes/netcode-proof/ops/tests/r1sh.test.mjs b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
+new file mode 100644
+index 0000000..2af2d02
+--- /dev/null
++++ b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
+@@ -0,0 +1,236 @@
++// Test 7 (U8's fix pass, advisor-u6c-brief.md section 5 items 4, 5, 8 and 10): r1.sh's settings writers and the
++// probe's presence check, run in bash on their real text (each function cut from r1.sh, beside stubs for the VM's
++// reads), with fixture logs. Writes only under a temporary folder.
++import assert from "node:assert/strict";
++import { execFileSync } from "node:child_process";
++import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
++import { join } from "node:path";
++import { test } from "node:test";
++import { OPS, text, withTemp } from "./helpers.mjs";
++
++const R1 = text("runs/r1.sh");
++const LIB = join(OPS, "sbin", "npt-lib.sh");
++
++/** One function of r1.sh, from `name() {` to its closing `}` at the line's start. */
++export function fn(name, body = R1) {
++  const m = body.match(new RegExp(`^${name}\\(\\) \\{\\n[\\s\\S]*?\\n\\}\\n`, "m"));
++  assert.ok(m, `r1.sh has ${name}()`);
++  return m[0];
++}
++/** r1.sh's `readonly` lines naming any of `names`. */
++function consts(...names) {
++  return R1.split("\n").filter((l) => l.startsWith("readonly ") && names.some((n) => l.includes(`${n}=`))).join("\n");
++}
++
++const ADDR = { rs: "192.0.2.10", lg: "198.51.100.20" };
++const COMMIT = "0123456789abcdef0123456789abcdef01234567";
++
++/** The VM's folders and root-owned records under `dir` (the housekeeping set, LG's address, the commit). */
++function prep(dir) {
++  for (const d of ["state", "bringup", "run", "results/cert", "hash"]) mkdirSync(join(dir, d), { recursive: true });
++  writeFileSync(join(dir, "state", "cpus"), "tick=3\nhousekeeping=0-2\n");
++  writeFileSync(join(dir, "state", "peers"), `lg=${ADDR.lg}\n`);
++  writeFileSync(join(dir, "bringup", "head.txt"), `${COMMIT}\n`);
++}
++
++/** Runs `script` in bash after r1.sh's constants, npt-lib.sh, stubs and the named functions; `dir` holds state. */
++export function r1bash(dir, names, script) {
++  prep(dir);
++  const prelude = [
++    "set -euo pipefail",
++    `. "${LIB}"`,
++    consts("TICK", "PROBE_LEGS", "PROBE_TOTAL_S"),
++    `STATE="${dir}/state" B="${dir}/bringup" RUN="${dir}/run" R="${dir}/results" HASH="${dir}/hash"`,
++    "ROOMS=/var/lib/npt/rooms BIN=/opt/npt/bin",
++    'die() { printf "die: %s\\n" "$*" >&2; exit 2; }',
++    `rs_ip() { printf '%s\\n' ${ADDR.rs}; }`,
++    `lg_ip() { printf '%s\\n' ${ADDR.lg}; }`,
++    ...names.map((n) => fn(n)),
++  ].join("\n");
++  return execFileSync("bash", ["-c", `${prelude}\n${script}`], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
++}
++
++/** One npt-log event line. */
++const ev = (name, ph, f) => JSON.stringify({ k: "event", ev: name, ph, f });
++const LEGS = ["P0", "P1", "P2", "P3", "P4", "B1"];
++/** A leg's log with both edges (drops `a` then `b`), less any `[event, ph]` in `drop`. */
++function legLog(a = 7, b = 7, drop = []) {
++  const lines = [JSON.stringify({ k: "header" })];
++  for (const [ph, drops] of [["warmup", a], ["after", b]]) {
++    if (!drop.some(([e, p]) => e === "leg_edge" && p === ph)) {
++      lines.push(ev("leg_edge", ph, { udp_row_found: 1, udp_drops_count: drops, snmp_udp_in_datagrams_count: 5 }));
++    }
++    if (!drop.some(([e, p]) => e === "cpu_stat" && p === ph)) {
++      lines.push(ev("cpu_stat", ph, { cpu_user_count: 1000, cpu_system_count: 50, cpu3_user_count: 400 }));
++    }
++  }
++  return `${lines.join("\n")}\n`;
++}
++
++test("item 4: the probe's settings carry U6c's probe fields; the block stores an empty token and waits on the probe's exit", () => {
++  withTemp((dir) => {
++    r1bash(dir, ["json_obj", "room_settings"], "room_settings 02 probe");
++    const s = JSON.parse(readFileSync(join(dir, "run", "room-02.json"), "utf8"));
++    assert.equal(s.mode, "probe");
++    assert.equal(s.probe_peer_ipv4, ADDR.lg, "LG's IPv4");
++    assert.deepEqual(s.probe_legs, LEGS);
++    assert.equal(s.probe_packets, 1000000);
++    assert.equal(s.probe_warmup_s, 10);
++    const total = Number(r1bash(dir, [], 'printf "%s" "$PROBE_TOTAL_S"'));
++    assert.equal(total, 6 * (10 + 100 + 12), "six legs at warm-up + window + tail and set-up");
++  });
++  const p = fn("probe").split("\n").filter((l) => !/^\s*#/.test(l)).join("\n");
++  assert.match(p, /\n  printf '' \| lg "token 02"\n/, "an empty token for room 02");
++  assert.doesNotMatch(p, /rooms tokens|load_up/, "never the room's token file: the probe mints none");
++  assert.match(p, /load_settings 02 probe wt 1 \$\(\(PROBE_TOTAL_S \+ 60\)\) \| lg "settings 02"/, "LG: the total plus 60 s");
++  assert.match(p, /for i in \$\(seq 1 \$\(\(PROBE_TOTAL_S \+ 120\)\)\); do\n {4}ended=\$\(logq "\$ROOMS\/super-02\.log" room_exit nonzero/);
++  assert.doesNotMatch(p, /load_wait/, "the block waits for the probe's exit, not LG's");
++  assert.match(p, /keep "\$d" 02 '' \$PROBE_LEGS\n/, "keep copies the six per-leg logs");
++  assert.match(p, /probe_presence "\$ROOMS" 02 \| tee/);
++});
++
++test("item 4: probe_presence on fixture logs: present, a missing edge, a P1 drop, a missing log", () => {
++  withTemp((dir) => {
++    const rooms = join(dir, "rooms");
++    mkdirSync(rooms);
++    const write = (logs) => {
++      for (const leg of LEGS) writeFileSync(join(rooms, `room-02-${leg}.log`), logs[leg] ?? legLog());
++    };
++    const run = () => r1bash(dir, ["probe_presence"], `probe_presence "${rooms}" 02`).trim().split("\n");
++    write({});
++    assert.deepEqual(run(), LEGS.map((l) => `${l}: present at both edges`));
++    write({ P3: legLog(7, 7, [["cpu_stat", "after"]]), P0: legLog(7, 7, [["leg_edge", "warmup"]]) });
++    const missing = run();
++    assert.equal(missing[0], "P0: INVALID: missing leg_edge at warmup");
++    assert.equal(missing[3], "P3: INVALID: missing cpu_stat at after");
++    assert.equal(missing.filter((l) => l.endsWith("present at both edges")).length, 4);
++    write({ P1: legLog(7, 9), P2: legLog(7, 9) });
++    const drop = run();
++    assert.match(drop[1], /^P1: INVALID: 2 drops on the probe's P1 socket between its reads \(C-U8-6\)/);
++    assert.equal(drop[2], "P2: present at both edges", "a drop counts against P1 only");
++    write({ B1: legLog().replace('"udp_row_found":1', '"udp_row_found":0') });
++    assert.equal(run()[5], "B1: INVALID: the socket's /proc/net/udp row was not read at both edges");
++    write({ P4: legLog().replaceAll('"cpu_user_count":1000', '"cpu_user_count":"1000"') });
++    assert.equal(run()[4], "P4: INVALID: /proc/stat was not read at both edges");
++    write({});
++    rmSync(join(rooms, "room-02-P2.log"));
++    assert.equal(run()[2], "P2: INVALID: its log room-02-P2.log is missing or unreadable");
++  });
++});
++
++const LOAD_FIELDS = ["room", "server", "wt_port", "ws_port", "mode", "transport", "clients", "duration_s", "token_path",
++  "log_path", "run", "set", "marks", "date", "commit", "machine", "behaviour", "seed", "pin_hex"];
++
++test("item 5: npt-load's settings carry the run's fields from the room's settings, LG's machine and the pinned leaf", () => {
++  withTemp((dir) => {
++    const room = { run: "R1-headers-01", set: "R1-headers", marks: ["PM-0001-1", "PM-0001-2"], date: "2026-12-03", commit: COMMIT, seed: 1 };
++    const wtHash = "ab".repeat(32);
++    const wsHash = "cd".repeat(32);
++    prep(dir);
++    for (const nn of ["01", "02", "05"]) writeFileSync(join(dir, "run", `room-${nn}.json`), JSON.stringify({ ...room, run: `R1-x-${nn}` }));
++    writeFileSync(join(dir, "hash", "room-01.json"), JSON.stringify({ algorithm: "sha-256", value_hex: wtHash, validity_ns: 1 }));
++    const load = (args) => JSON.parse(r1bash(dir, ["load_settings"], `load_settings ${args}`));
++    const wt = load("01 run wt 48 300");
++    assert.deepEqual(Object.keys(wt), LOAD_FIELDS);
++    assert.deepEqual([wt.room, wt.server, wt.wt_port, wt.ws_port, wt.mode, wt.transport, wt.clients, wt.duration_s],
++      ["01", ADDR.rs, 30002, 31002, "run", "wt", 48, 300]);
++    assert.deepEqual([wt.run, wt.set, wt.marks, wt.date, wt.commit, wt.seed], ["R1-x-01", ...Object.values(room).slice(1)]);
++    assert.deepEqual(wt.machine, { role: "LG", name: "LG1", plan: "CAX21", location: "fsn1", address: ADDR.lg });
++    assert.equal(wt.behaviour, "brawl");
++    assert.equal(wt.pin_hex, wtHash, "wt: the room's hash file's value_hex");
++    assert.throws(() => load("05 run ws 48 420"), /no pin on ws/, "ws without the production order's line");
++    writeFileSync(join(dir, "results", "cert", "production.txt"),
++      `PROFILES classic,shortlived\nnpt-cert: issued (production, profile shortlived); egress closed. Ledger: serial 0a1b2c, sha256 ${wsHash}.\n`);
++    assert.equal(load("05 run ws 48 420").pin_hex, wsHash, "ws: the production order's SHA256 (the room's WebSocket chain)");
++    assert.equal(load("02 probe wt 1 792").pin_hex, "0".repeat(64), "the probe writes no hash file and pins nothing");
++    assert.throws(() => load("01 bots wt 48 300"), /no load settings/, "modes run, calibrate and probe only (C1 (c))");
++  });
++  // npt-load ends at duration_s: stdin stays /dev/null under npt-load-ctl; READY gates the DelayStream self-test's mark.
++  assert.match(text("sbin/npt-load-ctl"), /\n {4}setsid "\$BIN" "\$BASE\/run\/load-\$NN\.json" < \/dev\/null > /);
++  const ds = fn("ds_selftest");
++  assert.ok(ds.indexOf("load_up 05 run ws 48 420") < ds.indexOf("if ! load_ready 05 60; then"));
++  assert.ok(ds.indexOf("if ! load_ready 05 60; then") < ds.indexOf("load_wait 05 450"));
++  assert.match(fn("load_ready"), /got=\$\(lg "log \$1" \|\| true\)\n {4}grep -qx READY <<< "\$got" && return 0/);
++  assert.doesNotMatch(R1, /load_up \d\d bots /, "no `bots` mode left");
++});
++
++// Item 8: the settings types refuse unknown fields (SEC-U6AD-2). U6a's are its merged struct's (read here from the
++// source); U6b's and U6c's are the names their briefs and C1 (b) fix, checked again at their merges.
++const SERVER = readFileSync(join(OPS, "..", "crates", "server", "src", "main.rs"), "utf8");
++const U6A = [...SERVER.match(/\nstruct Settings \{\n([\s\S]*?)\n\}/)[1].matchAll(/^ {4}([a-z_0-9]+): /gm)].map((m) => m[1]);
++const U6B = ["wt_bind", "ws_bind", "transport", "ws_cert_chain", "ws_cert_key", "hash_path", "ws_split_mark_s"];
++const U6C = ["mode", "probe_peer_ipv4", "probe_legs", "probe_packets", "probe_warmup_s"];
++const KINDS = [["00", "alone"], ["01", "headers"], ["02", "probe"], ["03", "calibrate"], ["04", "start", "-s07"],
++  ["05", "ds"], ["10", "browser:8"], ["06", "bite:PM-0001-16/double-load", "-double-load"]];
++const settingsFor = (dir, [nn, kind, sfx = ""]) => {
++  r1bash(dir, ["json_obj", "room_settings"], `room_settings ${nn} '${kind}' '${sfx}'`);
++  return JSON.parse(readFileSync(join(dir, "run", `room-${nn}.json`), "utf8"));
++};
++
++test("item 8: room_settings writes only fields the settings types accept, every U6a field, `bite` only in a bite room", () => {
++  assert.equal(U6A.length, 27, "U6a's merged Settings: 26 fields and the bites build's `bite`");
++  withTemp((dir) => {
++    for (const k of KINDS) {
++      const s = settingsFor(dir, k);
++      const keys = Object.keys(s);
++      assert.deepEqual(keys.filter((x) => ![...U6A, ...U6B, ...U6C].includes(x)), [], `${k[1]}: no unknown field`);
++      assert.deepEqual(U6A.filter((x) => x !== "bite" && !keys.includes(x)), [], `${k[1]}: every U6a field`);
++      assert.equal("bite" in s, k[1].startsWith("bite:"), `${k[1]}: bite only in a bites build's room`);
++      assert.equal(keys.some((x) => x.startsWith("probe_")), k[1] === "probe", `${k[1]}: the probe's four in the probe only`);
++      assert.ok(!("super" in s) && !("log_path" in s) && !("token_path" in s), "npt-super's values ride on its flags");
++      assert.equal(s.tick_hz, 30);
++      assert.match(s.commit, /^[0-9a-f]{40}$/);
++      assert.ok(["room", "probe"].includes(s.mode), "C1 (b): room or probe");
++      assert.equal(s.tick_vcpu === null, s.io_vcpus.length === 0, "tick_vcpu and io_vcpus: both or neither");
++      assert.ok(!s.io_vcpus.includes(s.tick_vcpu) && s.io_threads >= 1 && s.io_threads <= 64);
++      assert.ok(s.clients >= 1 && s.clients <= 48 && s.duration_ms === 0, "held until stdin closes");
++      assert.equal(s.log, `/var/lib/npt/rooms/room-${k[0]}${k[2] ?? ""}.log`);
++      assert.ok(Array.isArray(s.marks) && s.marks.every((m) => /^PM-\d{4}-\d{1,3}$/.test(m)));
++      assert.equal(s.run, `R1-${s.set.slice(3)}-${k[0]}${k[2] ?? ""}`, "each start its own run");
++    }
++  });
++  // npt-ctl starts U6a's `npt-super start`: every flag it can pass is one npt-super parses.
++  const sup = readFileSync(join(OPS, "..", "crates", "super", "src", "main.rs"), "utf8");
++  const known = new Set([...sup.slice(sup.indexOf("const HEADER_FLAGS"), sup.indexOf("#[cfg(test)]")).matchAll(/"(--[a-z-]+)"/g)].map((m) => m[1]));
++  const lib = text("sbin/npt-lib.sh");
++  const emitted = [...fn("npt_super_args", lib).matchAll(/(--[a-z-]+) "/g)].map((m) => m[1]);
++  assert.deepEqual(emitted.filter((f) => !known.has(f)), [], "no flag npt-super refuses");
++  for (const f of ["--room", "--settings", "--log", "--scene", "--tick-hz", "--run", "--set", "--role", "--date", "--commit",
++    "--layer", "--profile", "--machine-role", "--machine-name", "--machine-plan", "--machine-location", "--machine-address"]) {
++    assert.ok(emitted.includes(f), `npt-super's required ${f}`);
++  }
++});
++
++test("item 10: npt-super's command line and the room's settings carry equal run fields, for every kind of room", () => {
++  withTemp((dir) => {
++    for (const k of KINDS) {
++      const s = settingsFor(dir, k);
++      // npt-ctl's own read (NPT_SETTINGS_PY, here without setpriv) and npt_super_args, on the file room_settings wrote.
++      const out = r1bash(dir, [], [
++        `mapfile -t vals < <(python3 -I -c "$NPT_SETTINGS_PY" "${dir}/run/room-${k[0]}.json" "$NPT_SUPER_FIELDS")`,
++        `npt_super_args ${k[0]} "\${vals[@]}"`,
++        'printf "%s\\n" "${NPT_SUPER_ARGS[@]}"',
++      ].join("\n"));
++      const argv = out.split("\n").slice(0, -1);
++      const flag = {};
++      for (let i = 0; i < argv.length; i += 2) flag[argv[i]] = argv[i + 1];
++      const want = {
++        "--run": s.run, "--set": s.set, "--role": s.role, "--layer": s.layer, "--profile": s.profile, "--date": s.date,
++        "--scene": s.scene, "--tick-hz": String(s.tick_hz), "--commit": s.commit, "--machine-role": s.machine_role,
++        "--machine-name": s.machine_name, "--machine-plan": s.machine_plan, "--machine-location": s.machine_location,
++        "--machine-address": s.machine_address, "--settings": `/var/lib/npt/run/room-${k[0]}.json`,
++        "--log": s.log.replace("/room-", "/super-"),
++        "--room": s.bite ? "/opt/npt/bin/npt-server-bites" : "/opt/npt/bin/npt-server",
++      };
++      if (s.marks.length) want["--marks"] = s.marks.join(",");
++      if (s.bite) want["--bite"] = s.bite;
++      assert.deepEqual(flag, want, `${k[1]}: one source for the run and the eight header values`);
++    }
++  });
++  // npt-super ends by its stdin closing (the holder's end), never by a kill: a log with no footer makes the run INVALID.
++  const down = fn("room_down");
++  assert.deepEqual(down.match(/\bkill\b[^\n]*/g), ['kill "$holder" 2> /dev/null || true'], "room_down kills the stdin holder only");
++  const code = R1.split("\n").filter((l) => !/^\s*#/.test(l)).join("\n");
++  assert.equal(code.match(/\bkill\b/g).length, 1, "no other kill in r1.sh");
++  assert.doesNotMatch(code, /pkill|killall|systemctl (stop|kill)/);
++});
 diff --git a/spikes/netcode-proof/ops/tests/redact.test.mjs b/spikes/netcode-proof/ops/tests/redact.test.mjs
 new file mode 100644
-index 0000000..f38d128
+index 0000000..848bd72
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/redact.test.mjs
-@@ -0,0 +1,25 @@
-+// Test 6 (u8-brief.md rev 1.1 section 3): redact-check over the whole spike folder, as check.mjs's `redact` step scans
-+// it (node_modules, target and .gate skipped by redact-check itself), so no U8 file carries an address, a token or a
-+// key. Plant P4 (a real-looking address in R1.md) fails here.
-+// KNOWN_AT_BASE: one finding already present at `<base>` (d854ae1) in the DEP-HOLD lock, which U8 may not change and
-+// whose cause is redact-check's host-name rule reading crc-32's tarball name (version 1, 2, 2) as an embedded address. It
-+// is named exactly (file, line, kind) and goes to the main session; any other finding fails this test.
+@@ -0,0 +1,21 @@
++// Test 6 (u8-brief.md rev 1.1 section 3; advisor-u6c-brief.md section 5 item 6): redact-check over the whole spike
++// folder, as check.mjs's `redact` step scans it (node_modules, target and .gate skipped by redact-check itself), so no
++// file carries an address, a token or a key. Plant P4 (a real-looking address in R1.md) fails here. Since F26's fix
++// (2a9498d: an npm tarball path on registry.npmjs.org is no host name) the scan has no finding at all.
 +import assert from "node:assert/strict";
 +import { test } from "node:test";
 +import { main } from "../operator/redact-check.mjs";
 +import { SPIKE } from "./helpers.mjs";
 +
-+const KNOWN_AT_BASE = ["ops/browser/package-lock.json:606:56: address in a host name: crc…(16 chars)"];
-+
-+test("redact-check finds nothing in spikes/netcode-proof beyond the one finding known at <base>", () => {
++test("redact-check finds nothing in spikes/netcode-proof", () => {
 +  const lines = [];
 +  const cwd = process.cwd();
 +  process.chdir(SPIKE);
@@ -4062,8 +4820,8 @@ index 0000000..f38d128
 +  } finally {
 +    process.chdir(cwd);
 +  }
-+  const findings = lines.filter((l) => !l.startsWith("redact-check:"));
-+  assert.deepEqual(findings.filter((l) => !KNOWN_AT_BASE.includes(l)), []);
++  assert.deepEqual(lines.filter((l) => !l.startsWith("redact-check:")), []);
++  assert.ok(lines.some((l) => /^redact-check: \d+ item\(s\) checked, 0 finding\(s\)/.test(l)), lines.join("\n"));
 +});
 diff --git a/spikes/netcode-proof/ops/tests/s14.test.mjs b/spikes/netcode-proof/ops/tests/s14.test.mjs
 new file mode 100644
@@ -4225,10 +4983,10 @@ index 0000000..b291db8
 +});
 diff --git a/spikes/netcode-proof/ops/tests/wrappers.test.sh b/spikes/netcode-proof/ops/tests/wrappers.test.sh
 new file mode 100644
-index 0000000..ada5254
+index 0000000..b802101
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/wrappers.test.sh
-@@ -0,0 +1,173 @@
+@@ -0,0 +1,220 @@
 +#!/bin/bash
 +# Test 3 (u8-brief.md rev 1.1 section 3): the root wrappers, npt-load-ctl, npt-lib.sh and the sudoers files.
 +# Run: bash spikes/netcode-proof/ops/tests/wrappers.test.sh   (no root needed for the checks; visudo -c reads only)
@@ -4237,6 +4995,7 @@ index 0000000..ada5254
 +HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 +SBIN=$(cd "$HERE/../sbin" && pwd)
 +CI=$(cd "$HERE/../cloud-init" && pwd)
++RUNS_DIR=$(cd "$HERE/../runs" && pwd)
 +. "$SBIN/npt-lib.sh"
 +
 +pass=0 fails=0
@@ -4342,8 +5101,34 @@ index 0000000..ada5254
 +check "a room-chosen thread name is cleaned" test "$(npt_comm_clean $'a b;\e[31m$(id)')" = 'a?b???31m??id?'
 +
 +# ---- Q-U8-1 term 2: no caller text reaches systemd-run, setpriv or taskset --------------------------------------
-+check "rooms start: the scope's command line is fixed" grep -qF \
-+  '"${SETPRIV_ROOM[@]}" /usr/bin/taskset -c "$hk" /opt/npt/bin/npt-super hold "/var/lib/npt/run/room-$nn.json" ;;' "$SBIN/npt-ctl"
++check "rooms start: the scope's command line is fixed (npt-super start, U6a's merged form)" grep -qF \
++  '"${SETPRIV_ROOM[@]}" /usr/bin/taskset -c "$hk" /opt/npt/bin/npt-super start "${NPT_SUPER_ARGS[@]}" ;;' "$SBIN/npt-ctl"
++check "rooms start: the settings read as npt-room, the flags from npt_super_args only" bash -c '
++  f=$1; grep -qF "mapfile -t vals < <(\"\${SETPRIV_ROOM[@]}\" /usr/bin/python3 -I -c \"\$NPT_SETTINGS_PY\" \\" "$f" &&
++  grep -qF "npt_super_args \"\$nn\" \"\${vals[@]}\" || die" "$f" && ! grep -q "npt-super hold" "$f"' _ "$SBIN/npt-ctl"
++# npt_super_args (items 8 and 10): one good settings line set, then each field broken in turn.
++SUP=(R1-headers-01 R1-headers measured 2026-12-03 "$(printf '0%.0s' $(seq 1 40))" L2 P0 SS 30 RS RS CCX23 fsn1
++  192.0.2.10 PM-0001-1,PM-0001-2 '' /var/lib/npt/rooms/room-01.log)
++check "npt_super_args takes a room's values" npt_super_args 01 "${SUP[@]}"
++check "npt_super_args: the measured binary, the settings, npt-super's log beside the room's" test \
++  "${NPT_SUPER_ARGS[*]:0:6}" = "--room /opt/npt/bin/npt-server --settings /var/lib/npt/run/room-01.json --log /var/lib/npt/rooms/super-01.log"
++check "npt_super_args: --marks given, no --bite for a measured room" bash -c '[[ "$1" == *" --marks PM-0001-1,PM-0001-2" && "$1" != *--bite* ]]' _ "${NPT_SUPER_ARGS[*]}"
++B=("${SUP[@]}"); B[15]=PM-0001-16/double-load; B[16]=/var/lib/npt/rooms/room-06-double-load.log
++check "npt_super_args: a bite starts the bites build with --bite" bash -c '. "$1"; npt_super_args 06 "${@:2}" &&
++  [[ ${NPT_SUPER_ARGS[1]} == /opt/npt/bin/npt-server-bites && "${NPT_SUPER_ARGS[*]}" == *" --bite PM-0001-16/double-load" ]]' _ "$SBIN/npt-lib.sh" "${B[@]}"
++for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16; do
++  for v in '' 'a b' $'x\ny' '$(id)'; do
++    B=("${SUP[@]}"); B[i]=$v
++    [ "$i" = 13 ] && [ -z "$v" ] && continue   # an empty address is the header's own form off the VMs
++    [ "$i" = 14 ] && [ -z "$v" ] && continue   # no marks: no --marks flag
++    [ "$i" = 15 ] && [ -z "$v" ] && continue   # no bite: a measured room
++    refuse "npt_super_args refuses field $i as '${v//$'\n'/\\n}'" npt_super_args 01 "${B[@]}"
++  done
++done
++B=("${SUP[@]}"); B[16]=/var/lib/npt/rooms/room-02.log
++refuse "npt_super_args refuses another room's log" npt_super_args 01 "${B[@]}"
++refuse "npt_super_args refuses a missing value" npt_super_args 01 "${SUP[@]:0:16}"
++refuse "npt_super_args refuses a bad NN" npt_super_args 1 "${SUP[@]}"
 +check "rooms tokens: read as npt-room, fixed path" grep -qF \
 +  'exec "${SETPRIV_ROOM[@]}" /usr/bin/head -c 1048576 -- "/var/lib/npt/rooms/room-$nn.tok" ;;' "$SBIN/npt-ctl"
 +check "setpriv drops to npt-room, clears groups and capability sets, no_new_privs" grep -qF \
@@ -4355,6 +5140,18 @@ index 0000000..ada5254
 +  grep -q "npt_valid_nn \"\$2\" || die" "$f"' _ "$SBIN/npt-ctl"
 +check "npt-cert: dig takes names from the root-owned clone only" grep -qF \
 +  'dig +norecurse +short +time=5 +tries=1 TXT "$NPT_CHALLENGE_NAME" "@$n"' "$SBIN/npt-cert"
++# ---- fix pass item 2: the TLS names; the issue mode's call and its stderr PROFILES line kept ------------------------
++for n in staging.key.pem staging.chain.pem production.key.pem production.chain.pem; do
++  check "npt-cert's header names /var/lib/npt/tls's $n" bash -c 'grep "^#" "$1" | grep -qF "$2"' _ "$SBIN/npt-cert" "$n"
++done
++check "npt-cert: the issue mode's call stays, its stderr not redirected (PROFILES reaches the results)" grep -qx \
++  '    --inh-caps=-all --ambient-caps=-all --reset-env /opt/npt/bin/npt-host issue "$PROFILE"' "$SBIN/npt-cert"
++check "r1.sh: the cert block keeps stderr and drops only the TXT step" bash -c '
++  grep -qF "npt-cert issue \"\$p\" < /dev/null > \"\$RUN/cert-\$p.live\" 2>&1 &" "$1" &&
++  grep -qF "grep -v '"'"'^Add in Cloudflare'"'"' \"\$RUN/cert-\$p.live\" | tee \"\$d/\$p.txt\"" "$1"' _ "$RUNS_DIR/r1.sh"
++check "r1.sh: every room's WebSocket names the production pair, never one shared name" bash -c '
++  grep -qF "s:ws_cert_chain=/var/lib/npt/tls/production.chain.pem s:ws_cert_key=/var/lib/npt/tls/production.key.pem" "$1" &&
++  ! grep -Eq "tls/(chain|key)\.pem" "$1"' _ "$RUNS_DIR/r1.sh"
 +check "npt-capture: tcpdump's line is fixed" grep -qF \
 +  'setsid /usr/bin/tcpdump -i "$IFACE" -n -s 96 -c 2000000 -U -Z tcpdump -w "$OUT" "$FILTER" < /dev/null > "$LOG" 2>&1 &' "$SBIN/npt-capture"
 +
@@ -4374,6 +5171,8 @@ index 0000000..ada5254
 +  check "sudoers.d/$s: never systemd-run, setpriv, taskset, nft, tcpdump, dig or a shell" bash -c \
 +    '! grep -E "^npt " "$1" | grep -Eq "systemd-run|setpriv|taskset|/nft|tcpdump|/dig|/bash|/sh( |$)|/dash|/zsh|ALL$|\*"' _ "$f"
 +  check "sudoers.d/$s: npt only, as root only" bash -c '! grep -E "^[^#D]" "$1" | grep -Ev "^npt ALL=\(root\) NOPASSWD: "' _ "$f"
++  check "sudoers.d/$s: no line names npt-host or systemctl (Q-U6C-7: the path unit starts the host)" bash -c \
++    '! grep -v "^#" "$1" | grep -Eq "npt-host|systemctl"' _ "$f"
 +done
 +
 +# ---- globbing is off in every wrapper (set -f): a glob is expanded only into an array inside a set +f window --------
@@ -4391,6 +5190,12 @@ index 0000000..ada5254
 +check "r1.sh: npt-super is never started directly" bash -c '! grep -v "^ *#" "$1" | grep -Eq "(^|[ /])npt-super( |$)"' _ "$RUNS/r1.sh"
 +check "r1.sh: the server chain is C1's list" grep -qx 'readonly SERVER_CHAIN="headers probe calibrate starts ds-selftest s14"' "$RUNS/r1.sh"
 +check "r1.sh: no npx, npm exec or npm create" bash -c '! grep -Eq "\bnpx\b|npm (exec|create)" "$1"' _ "$RUNS/r1.sh"
++check "r1.sh: host_active reads systemctl is-active npt-host and dies unless active" bash -c '
++  b=$(sed -n "/^host_active() {/,/^}/p" "$1"); grep -qF "st=\$(systemctl is-active npt-host || true)" <<< "$b" &&
++  grep -qF "[ \"\$st\" = active ] || die" <<< "$b"' _ "$RUNS/r1.sh"
++check "r1.sh: the browser block checks npt-host first" bash -c '
++  [ "$(sed -n "/^browsers() {/,/^}/p" "$1" | sed -n 3p)" = "  host_active" ]' _ "$RUNS/r1.sh"
++check "r1.sh: the host-key cross-check block checks npt-host first" grep -qE '^  host\) host_active; ' "$RUNS/r1.sh"
 +check "r1.sh: C5 stops before any room when LG reaches RS or answers it" bash -c '
 +  f=$1; a=$(grep -n "lg fwcheck" "$f" | head -1 | cut -d: -f1); b=$(grep -n "room_up 00" "$f" | head -1 | cut -d: -f1)
 +  [ -n "$a" ] && [ -n "$b" ] && [ "$a" -lt "$b" ] && grep -q " 0 received" "$f"' _ "$RUNS/r1.sh"

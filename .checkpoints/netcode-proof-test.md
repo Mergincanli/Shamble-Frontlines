@@ -5,7 +5,7 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-23 02:4x UTC, after the cut of 20:42-02:36 (his words history.md:7630-7653): the resume
+- **Last update:** 2026-11-23 07:0x UTC, after the cut of 03:59-06:36 (his words history.md:7630-7673): the resume
   source; Now holds my step and the next three; Running work holds every running agent and shell with its ID.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
@@ -74,16 +74,25 @@
   security's model; ring only, no aws-lc-rs; cargo check no warning; check.mjs all 11 PASS (fmt after one hunk),
   measured 754 (+ the four wt tests, by name), bites 850; cargo-deny ok; cargo-audit 0 vulnerabilities (databases
   07:00 UTC); dependency-check.md's U6b section; the save pushes it (DEP-HOLD released).
-- **Next 1:** U6b's launch: `<base>` = that push's head, its counts 754/850, the runner copy u6b-run.sh (u6a-run.sh's
-  shape), the size line; U6b's builder (its launch adds the U6b line's items and names its last-built valve).
+- **07:0x:** U8's fix pass DONE (items 1-10; Node 75/0, wrappers 299/0; plants P8, P9; redact PASS; snapshot
+  wip/u8-build.patch 60205020…, 4,957 added, 42 files, base 096808b; notes u8-build.md "## Fix pass"). Its F28 (npt-super's
+  log reaches disk only at its end: every RS room start would time out) went to U6b as item 5. For Stop B's netcode seat:
+  the values U8 chose for U6a's required fields (io_threads, warmup_ticks 1,800, first_cpu_model) and the marks per room.
+- **07:0x, U6b's builder launched** (`<base>` 21765e3, counts 754/850; runner u6b-run.sh, logs .gate/u6b/; size about
+  2,650, likely 5,000-6,100 at this week's growth, stop past 6,000) with items 1-6: C2's homes, C13's draft, NR-U6A-7,
+  NR2-U6A-2, F28, and the valve (Block 5's reader stamp and BudgetX2 last; past 5,400 they wait for U6e if R1 reads neither).
+- **Next 1:** U6b's return: snapshot, its one round (netcode, test, security: transports face the internet), fixes, merge.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
-- **Next 3:** U8's fix pass's return (a new snapshot); T5 (i) the day U6b merges; U4's report when a slot is free.
+- **Next 3:** Stop B's round, U8's one round (security, infra, netcode at xhigh: u8-brief.md section 7 and C9), may start
+  now its fix pass is in (lever (2), advisor-u6c-brief.md:195-197), in the slots U6b's round leaves; U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
   TR-U6A-5 to U6d; F4's S1 burn to U6e (the netcode seat's suggestion); FP-6: no rule changed on a difference.
 - **2026-11-23, U6a's round 2 (my lean):** its one Medium (a flake the fix pass opened) fixed now as FP-13 with no third
   round (NPT-TRIM: a third only for a Critical or High); its Lows to carries and the merge report.
+- **2026-11-23, U6b's launch (my lean):** F28 (npt-super's per-event flush, U8's find) built by U6b, its round reading it;
+  U6b's valve: Block 5's reader stamp and BudgetX2 built last, past 5,400 they wait for U6e if R1 reads neither.
 - **2026-11-23, U7's brief (advisor-u7-brief.md):** Q-U7-1 (a), U8's save() writes the header now; Q-U7-2 the three
   constants in npt-proto and the tags in npt-link, by U6b; Q-U7-3 one constant (9) bound at compile time; Q-U7-4
   wt-attempts with a bounded hash=wrong control; the valve at 3,800; no security seat in U7's round. Mine: rev 1.1
@@ -141,27 +150,22 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (1 of 3) from 06:37:** U8's fix-pass builder ac59cce3e5d002441 (general-purpose, xhigh, its own
-  worktree .claude/worktrees/agent-<ID>; items 1-10 of advisor-u6c-brief.md section 5 + advisor-u7-brief.md section 5 +
-  U6a's carry; its notes in its worktree's u8-build.md, "## Fix pass", copied over at its snapshot; resume after its
-  last done item). Done: U7's T-builder a9873cdba07a3219e (resumed for T5); U6a's builder a95ebf14368f277ff; round 2's
+- **Agents running (1 of 3) from 07:0x:** U6b's builder a2661dc320c9e6d00 (general-purpose, xhigh, its own worktree
+  .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
+  at its snapshot; resume after its last block marked done). Done: U8's fix-pass builder ac59cce3e5d002441 (Stop B's
+  fixes, if any, by SendMessage); U7's T-builder a9873cdba07a3219e (resumed for T5); U6a's builder a95ebf14368f277ff; round 2's
   seats a9a29bd03da0757ad, a4724cf284e77b73e; security's U7 read aca2c13cc291261c6 (security-u7-deps.md: CLEAR WITH
   CONDITIONS, Lows); U7's advisor check a1caa8c461475ac54; security ab80f7d9c82f327b9 (security-f26.md, -u6c-deps.md).
-- **Shells and triggers:** step 5's run bmrtxibx1 (main-run.sh); the saver bzvne7p20 (checkpoint.mjs watch, from 06:37
+- **Shells and triggers:** the saver bzvne7p20 (checkpoint.mjs watch, from 06:37
   to about 08:27; TaskStop it, restart in the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5
   (2-hourly); day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
 - **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950 (told at 20:0x, beyond its brief: the ruling's
   C9, Q-U6C-3, C1 (e), section 5 items 3 and 5, C1 (c)); U8 builder abf71d95fc07b3522 (worktree
   .claude/worktrees/agent-<ID>, kept for its fix pass, as U6a's builder's is); the U6c advisor a662f1797b78cae95.
-- **U6a MERGED at 824d8e7 (2026-11-23 03:56; u6a-report.md; carries in u6a-fix-pass.md's last section).** Before: (brief rev 1.1, c109691a…; `<base>` aa5c62b, 709/806; runner u6a-run.sh): BUILT, 5,460 added (stop past
-  6,000); check3 all 11 PASS (744/844, +35/+38; test 866.8 s); plants P1-P11 each fail their named test, restored; 3
-  bites by name; 20 starts p50 634 ms, max 979 ms (debug, container, not judged); final tree = wip/u6a-build.patch
-  a9f8b6e0… (checked twice); notes u6a-build.md (copy here). The builder's F1, F3, F4, F7, F9, O1, O2 go to the round.
-  Merge M3-M9 as U4f's (history.md:7022-7028), the pre-round merge check folded into M5 (Choices).
-- **U8** BUILT (blocks 0-11, 38 new files, 4,176 added; tests 66 + 214, 7 plants; wip/u8-build.patch e9fd605c…; notes
-  u8-build.md, F1-F27; R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 40 min). Fix pass after U6a's merge (the
-  ruling's section 5 word for word; item 6 takes redact-check's 2609bc87…; item 9 from advisor-u7-brief.md section 5;
-  NR-U6A-1's carry, u6a-fix-pass.md), then Stop B's round, which
+- **U6a MERGED at 824d8e7 (2026-11-23 03:56):** u6a-report.md (build, M5, carries by number); the carries' takers in
+  u6a-fix-pass.md's last section; its build lines on this card at 21765e3. Merge M3-M9 as U4f's (history.md:7022-7028).
+- **U8** BUILT and fix pass DONE (4,957 added, 42 files; wip/u8-build.patch 60205020…; notes u8-build.md, F1-F28 and
+  "## Fix pass"; R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 40 min). Stop B's round (Now, Next 3)
   reads sbin/, sudoers.d/, cloud-init, firewall lists, operator files and hook, config.mjs, lib.mjs with F25 (WebdriverIO
   sets Edge's `allowedIps` to any; lib.mjs starts msedgedriver itself), F13, F16, F22; its netcode seat R1.md §4-5, s14/,
   r1.sh's probe_presence, `alone`, C5; for the advisor F9, F17 (C12 (f) has no tolerance; S14's window and burst fixed
@@ -170,10 +174,8 @@
 - **F26 (mine, from 2ad2829):** FIXED at 2a9498d (the ruling's section 6; tests 11/11; plant shown, restored 2609bc87;
   scan 0 findings; CI green on 8412c6b); security CLEAR WITH CONDITIONS (SEC-F26-1 Low: asserts and 2 plants in the
   test file only, at U6a's merge or deferred by the advisor; -2 Low accepted).
-- **U6b** (rev 1.1; security-u6b-deps.md done, with conditions; SEC-U6BD-1's seven packages, 242 -> 235): Block 0 and
-  the build after U6a merges; about 2,650, at 1.9-2.3 about 5,000-6,100, so its launch names its own last-built valve
-  (advisor-u6c-brief.md section 3), C2's homes from advisor-u7-brief.md (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in
-  npt-proto; the WebSocket tags in npt-link; the catalogue line), C13's draft line (-56 item 2), and NR-U6A-7.
+- **U6b** (rev 1.1; security-u6b-deps.md, with conditions; Block 0 DONE ae4f57e): building (Now); C2's homes from
+  advisor-u7-brief.md (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in npt-proto; the WebSocket tags in npt-link).
 - **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 security-cleared (5 conditions); disk freed first;
   its launch gives U7's seven dist names; at its merge U8's side checked per interface (C9). **R1 Thu 3 Dec holds with
   about a day of slack** (section 3: U6a merged Mon 23-Tue 24, U6b Wed 25, U6c Sat 28, U7's Rust Sun 29, Stop B Tue 1);
