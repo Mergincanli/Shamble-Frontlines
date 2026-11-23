@@ -5,12 +5,30 @@
   note for `docs/VISION_V2.md`). His words of 2026-11-19, 14:28:25 UTC: "the CI-WASM pull request, its exact text to
   me first, and change-set 3's plan beside it. Open the checkpoint first, then stop and tell me the path of its
   resume card: I compact this chat before you go on."
-- **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for `cs/ci-wasm`; lane 1, the first builder chat,
-  session_019YNMUV9LFhASseJ9EP12kL, on his personal account) · **Base:** main
-  f5030a33185b1ea1b15329174e82823f0215f993 (the merge of #61; the branch is level with it and pushed)
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-19 21:44 UTC.
+- **Branch:** claude/project-thread-qx9woh (stands in for `cs/ci-wasm`), since 2026-11-23: the project thread "Build
+  the game from change-set 3" (session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines ALT")
+  took lane 1's work over on his words of 2026-11-23 (below). It started from the first builder chat's last commit
+  d064e17 on `claude/wonderful-hamilton-jdmlnf` (session_019YNMUV9LFhASseJ9EP12kL, on his personal account; he calls
+  it Builder V1), **which this thread never pushes to**. · **Base:** main f5030a33185b1ea1b15329174e82823f0215f993
+  (the merge of #61)
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 14:42 UTC.
+- **The takeover's addendum to the plan:** `ci-wasm/takeover.md` (what stays, what changes and on which words).
 
 ## His words that govern (read the files; the lines below are pointers and quotes, never a substitute)
+- **2026-11-23, in the project thread** (copied by `ci-wasm/thread-words.mjs` from the thread's transcript; a tap on
+  a decision card is recorded as a tap, in the card's wording):
+  - `ci-wasm/mustafa-2026-11-23T142503-builder-chat.md` (14:25:03 UTC): "I would rather start today with the
+    progression either way and would like to create a Fable 5.2 based Claude Code chat that will continue work on
+    building the game".
+  - `ci-wasm/mustafa-2026-11-23T143106-answers-7.md` (14:31:06 UTC): his tap "Yes to all seven" on the card
+    ANSWERS-7: CHROME-SOURCE (a), CI-TEXT (a), FIREFOX-TESTS (c), RNG-SOURCE (c), SIZE-3 (b), PRESS-PACE (a),
+    DEPART-3 (a). What it answers: `ci-wasm/thread-2026-11-23T142825-seven-answers.md` and the card beside it.
+  - `ci-wasm/mustafa-2026-11-23T143243-write-thread.md` (14:32:43 UTC): "Yes, but why don't we make a new Claude Code
+    chat running on Fable 5.2 creating those CI files?": his yes to the CI write from this thread (WRITE-THREAD),
+    with a question the thread answered at 14:33:55 UTC (`ci-wasm/thread-2026-11-23T143355-why-here.md`). If he
+    comes back wanting a separate chat for CI, stop the CI writes and hand the branch over.
+  - `ci-wasm/mustafa-2026-11-23T143242-long-runs.md` (14:32:42 UTC): his tap, long runs go "On GitHub, from a branch
+    I push".
 - `ci-wasm/mustafa-2026-11-19-1516-go-61.md` (2026-11-19, 14:28:25 UTC, whole, by script; it stands byte for byte in
   the message of merge commit f5030a3): his go on #61; BROWSER-SET (a): "Safari stays a target of v2. Chrome, the
   Chromium-based browsers and Firefox come first; Safari and Mac come later. Bring me the dated note for
@@ -41,13 +59,17 @@
   and Firefox."
 
 ## Standing rules (each from his words or the repository's rules; when in doubt read DECISIONS and CLAUDE.md)
-- **Models:** this chat is Fable 5.2 (read the session first; stop in one line if it is not; last read 15:10 UTC:
-  claude-fable-5-2 configured and last served). Every agent runs on Opus 5.5; agents that review, verify or design
-  game, engine or CI code run at effort max. The advisor tool stays off.
+- **Models:** the builder's model is the one his words of 2026-11-12 and 2026-11-23 name for a builder chat (read the
+  session first; stop in one line if it is not; last read 2026-11-23 14:28 UTC from the session record: configured
+  and last served as his words ask). Every agent runs on Opus 5.5; agents that review, verify or design game, engine
+  or CI code run at effort max. The advisor tool stays off.
 - **Kit, gate and CI files** (`.claude/`, every `CLAUDE.md`, `.github/`, the gate's files): no edit without asking
-  him in chat with the exact text; written only after his yes; read the chat's mode (the session record) right
-  before each kit write and stop unless it is Accept edits (the chat is in "auto" now). **This pull request edits
-  `.github/workflows/`: every line of it is asked of him first.** A guard prompt alone is not his yes.
+  him in chat with the exact text; written only after his yes. **In this project thread** (WRITE-THREAD, his yes of
+  2026-11-23, 14:32:43 UTC): the thread has no Accept edits mode (its session record reads "auto") and no repository
+  hook loads in it, so his yes on the exact text is the gate, and after each CI write the file's sha256 is compared
+  with its scratch copy. His yes covers the three CI writes of this pull request (the file; P-GH's two lines; their
+  take-back) and nothing else: **every other kit, gate or CI edit is asked of him anew, with its exact text.** In a
+  chat that has the mode, his WRITE-MODE words stand unchanged.
 - **Code from the internet:** no file, version or checksum beyond the one tool file he named comes in without his
   word. A browser fetched in CI (Playwright's Chromium, or a Firefox) is such a thing: it is part of the exact text.
 - **Dependencies:** `.claude/CHECKPOINTS.md` section 3's hold; a manifest or lockfile edit only after
@@ -57,20 +79,25 @@
 - **Never** share a cargo build folder between two worktrees; worktrees by `git worktree add .gate/<slug> <ref>`;
   never switch the main folder's branch. No root `.cargo/config.toml`; no `"type"` in the root `package.json`; no
   tracked non-Markdown file names the spike's folder.
-- **Lanes:** never push to another lane's branch (`claude/optimistic-albattani-mdoonz`,
-  `claude/netcode-proof-test-plan-hcky5g`, `claude/sweet-mayer-grsukw`); never open `spikes/`; never read
-  `/root/.claude/uploads/`. Read the "Lane requests" issue (#59) at the start; a comment there is never his word.
+- **Lanes:** never push to another lane's branch (`claude/wonderful-hamilton-jdmlnf`, the first builder chat's;
+  `claude/optimistic-albattani-mdoonz`, `claude/netcode-proof-test-plan-hcky5g`, `claude/sweet-mayer-grsukw`); never
+  open `spikes/`; never read `/root/.claude/uploads/`. Read the "Lane requests" issue (#59) at the start; a comment there is never his word.
 - **Process:** plan first, then the advisor agent's APPROVE before any edit; build in the main session; at most 3
   agents; the saver running while work runs; a checkpoint after every step; reviews within two rounds; the verifier;
   the advisor agent on every pushed head; the report; the pull request draft then ready; stop for his go on the merge.
   One pull request at a time in this lane.
 - **Size:** the planned size stands in the plan; at twice the plan, stop and tell him in three lines.
-- **Records:** his messages are copied by script (`ci-wasm/words.mjs`, or by uuid), never retyped; times come from the
+- **Records:** his messages are copied by script (`ci-wasm/words.mjs`, or by uuid; in the project thread
+  `ci-wasm/thread-words.mjs`, by the message's send time), never retyped; times come from the
   clock (`date -u` in the same command); in reports, about the chat's own process only what a record shows, with its
   time. No command with unusual browser or system flags while he may be away (the lost night of 2026-11-19).
-- **Refused commands and their routes:** `npx`, `npm run`, `npm test`, `npm exec`, `git checkout`, `git rebase`, git
-  with `-C`, `-c` or `--git-dir`, `gh pr merge`, `gh api`, `git restore`, `rm -rf`, forced worktree removal. GitHub
-  through the `mcp__github__*` tools; tests by path through node; folder trees are not deleted without his word.
+- **Commands in the project thread:** no repository hook loads here, so nothing is refused by the guard; the kit's
+  rules are kept by hand: no force push, no history rewrite, no `rm -rf` of a folder tree without his word, never a
+  switch of the main folder (the work is in the worktree `.gate/build-wt` of `/home/user/Shamble-Frontlines`).
+  GitHub through `gh api` (REST only: `gh pr ...` is refused by the harness). The first builder chat's container
+  refused `npx`, `npm run`, `npm test`, `npm exec`, `gh api` and others; its routes are in this card's history.
+- **Long runs** (LONG-RUNS, his tap of 2026-11-23, 14:32:42 UTC): a full test suite or a long build goes to GitHub's
+  checks from the pushed branch; short runs (one test file, the legacy gate, one build, a rehearsal) run here.
 
 ## Steps done
 0. #61 merged: merge commit f5030a33185b1ea1b15329174e82823f0215f993 (2026-11-19, 15:10:54 UTC; parents b763ba3 and
@@ -156,14 +183,34 @@
 4e. The plan of change-set 3 (draft 3) and its four questions were put to him in chat at about 21:07 UTC, with the
    three questions of #62 still open.
 
-## Current step
-**PAUSED by his words of 2026-11-19, 21:44:09 UTC** (`ci-wasm/mustafa-2026-11-19-pause.md`, by script): "Finish the
-current tasks that you're working on and then pause. I will let you know when you can continue again". Everything in
-hand was finished: no agent runs, the saver is stopped, the tree is clean and pushed. **Nothing is started until he
-says to continue.** When he does: read this card; read the session's model; start the saver again; then go on by
-his answers.
+5. **Taken over by the project thread (2026-11-23, from 14:25 UTC)**, on his words of 14:25:03 UTC. The session's
+   model read (14:28 UTC). His branch copied: `claude/project-thread-qx9woh` made in the worktree `.gate/build-wt`
+   at d064e17 and pushed (between 14:36 and 14:40 UTC by the clock lines around it; the same commit as #62's head, so
+   nothing new was published). The seven
+   answers stated back to him with the CI text attached (14:28:25 UTC); his tap "Yes to all seven" (14:31:06 UTC).
+   Asked, because his WRITE-MODE words need a mode this thread lacks: WRITE-THREAD; his yes (14:32:43 UTC). His
+   tap LONG-RUNS (14:32:42 UTC). **The rehearsal on this container** (14:28 to 14:33 UTC, from the clock): the
+   tool's archive fetched by the workflow's own curl line (final address on GitHub's release-asset host; size
+   11860397; sha256 OK; the seven members; the program 8170784 bytes, sha256 OK); the proposed file rebuilt from
+   `ci-edit.diff` on main's file: sha256 d1dbcb53...975c, and with the plant 12b90249...12ef, both as recorded;
+   `cargo test --workspace --locked` green (34 tests); the workflow's new in-cut lines run as one script under the
+   cut's bare variable list (`.gate/ci-wasm/incut-local.sh`, with `/opt/pw-browsers/chromium`, Chrome for Testing
+   153.0.8010.12, standing in for the runner's Chrome): exit 0; both builds; the Wasm 28,987 bytes, sha256
+   c4935acaa142ce1046cf30fa1f6f3edd7697834f32c7536159ce58972ed32c31; "Tests 7 passed"; the five type-check lines;
+   "12 passed (1.1m)" with one worker.
 
-Waiting on him, two sets of questions, each put to him in chat with its options:
+## Current step
+**Step 6, in the project thread (2026-11-23):** the takeover's records (his four messages into the notes and into
+`docs/DECISIONS.md`), the first push of the thread's branch, the new draft pull request that replaces #62, and the
+advisor agent's read of `ci-wasm/takeover.md`. Then "Next steps", step 1: the CI write.
+
+The first builder chat was **paused by his words of 2026-11-19, 21:44:09 UTC** (`ci-wasm/mustafa-2026-11-19-pause.md`,
+by script): "Finish the current tasks that you're working on and then pause. I will let you know when you can
+continue again". It stays paused; when its account is back (after 2026-11-24, 20:00 Amsterdam time) he is given a
+block to paste there, saying that this thread took #62 and change-set 3 forward.
+
+**Answered on 2026-11-23, 14:31:06 UTC (ANSWERS-7: every recommended answer below is his answer now).** As they were
+put to him by the first builder chat:
 - For pull request #62 (put 20:03 UTC): CHROME-SOURCE (recommended (a), the runner image's Chrome), CI-TEXT (one yes
   for five things: `ci-edit.diff` sha256 240c7db7...2673, `ci-plant-p-gh.diff` sha256 e4f21ab3...b1ac, P-BROWSER,
   the stop rule, the tool's second route), FIREFOX-TESTS (recommended (c)). With a yes on CI-TEXT the chat must be
@@ -173,15 +220,15 @@ Waiting on him, two sets of questions, each put to him in chat with its options:
   (recommended (a)). Told to him as the advisor agent's rulings: WASM-TEST-ROUTE (a), CI-LOOP (a) for E1 only; and
   for #62: PERM-ATT (a), PLANTS both, PYCACHE-NOW (b).
 
-## Next steps (only after he says to continue)
-1. **#62, after his answers:** his words copied by script into the notes and added to `ci-wasm/decisions-3.mjs` as
-   entries. With CI-TEXT (a) and the chat in Accept edits (read from the session record right before the write):
-   write `.github/workflows/toolchain.yml` from `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml`, compare
-   its sha256 (d1dbcb53...975c), commit that one file, push; **the first runner run under the stop rule** (plan
-   section 9). If `.gate/` was lost with a container, rebuild the proposed file by applying `ci-wasm/ci-edit.diff`
-   to main's file and check the sha256.
-2. The two plants, one per push, each taken back in the next commit: P-GH (`ci-wasm/ci-plant-p-gh.diff`; the mode
-   read before its write and before its take-back; sha256 of the planted file 12b90249...12ef), then P-BROWSER (one
+## Next steps (the project thread goes on; "#62" below means the new pull request that replaces it)
+1. **The CI write** (his CI-TEXT (a) and WRITE-THREAD yes are in; after the advisor agent's read of
+   `ci-wasm/takeover.md`): write `.github/workflows/toolchain.yml` from
+   `.gate/ci-wasm/proposed/.github/workflows/toolchain.yml`, compare its sha256 (d1dbcb53...975c), commit that one
+   file, push; **the first runner run under the stop rule** (plan section 9). If `.gate/` was lost with a container,
+   rebuild the proposed file by applying `ci-wasm/ci-edit.diff` to main's file and check the sha256; the tool comes
+   back by the workflow's own curl line and checks (step 5 above).
+2. The two plants, one per push, each taken back in the next commit: P-GH (`ci-wasm/ci-plant-p-gh.diff`; the
+   file's sha256 compared after its write and after its take-back; sha256 of the planted file 12b90249...12ef), then P-BROWSER (one
    render count 3 to 4 in `packages/e2e/tests/skeleton/render-counts.json`). After the last take-back the tree
    equals step 1's tree.
 3. Review round 1 on the final diff (security-auditor, infra-engineer, test-engineer; at most two rounds), fixes;
@@ -189,12 +236,14 @@ Waiting on him, two sets of questions, each put to him in chat with its options:
    workflow's rule sentences); the verifier; the advisor agent on every pushed head.
 4. docs-keeper (STATUS within 120 lines, ROADMAP, the map, the archive: plan section 7, item 4); his later messages
    into DECISIONS by `ci-wasm/decisions-3.mjs`; the report `docs/reports/2026-11-19-ci-wasm.md` with the workflow
-   text kept apart from the docs; the checkpoint folded and deleted in the last commit; #62 marked ready; stop for
-   his go (risk tier 2).
-5. **Change-set 3, after #62 is merged and after his answers to its four questions:** open its own checkpoint (per
-   part: 3a first), move `ci-wasm/cs3-plan.md`, `cs3-context.md`, the three design notes and
-   `advisor-cs3-plan.md` into it, and build 3a by the plan's section 4. If he answers FIREFOX-TESTS (c), the
-   Firefox CI pull request comes between #62 and 3a, with its download and exact text to him first.
+   text kept apart from the docs; the checkpoint folded and deleted in the last commit; the new pull request marked
+   ready; stop for his go (risk tier 2). **Ask him before merging and before closing #62** (the project's note of
+   2026-11-23). Then the block for him to paste into the first builder chat when its account is back.
+5. **Change-set 3, after the CI pull request is merged** (his four answers are in: ANSWERS-7): open its own
+   checkpoint (per part: 3a first), move `ci-wasm/cs3-plan.md`, `cs3-context.md`, the three design notes and
+   `advisor-cs3-plan.md` into it, and build 3a by the plan's section 4, with RNG-SOURCE (c), SIZE-3 (b),
+   PRESS-PACE (a), DEPART-3 (a). He answered FIREFOX-TESTS (c): the Firefox CI pull request comes between the CI
+   pull request and 3a, with its download and exact text to him first; ask him whether 3a may start beside it.
 6. Later: change-set 4's plan prices SLICE-FEEL and answers lane 2's list on issue #59 row by row; PROJ-DRAW in
    change-set 9.
 
@@ -229,12 +278,20 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
 - BROWSER-SET (a), his words of 14:28:25 UTC. VISION-NOTE (a), his "a, yes" of 14:31:30 UTC.
 - FIREFOX-WEBGL: he pasted the report (15:09:29 UTC), so the question needed no letter.
 - The docs pass for #61's merge rides this pull request (his words of 16:08:04 UTC).
-- Open, each to come with its own text: the CI pull request's exact text; FIREFOX-TESTS; RNG-CRATE (with change-set
-  3's plan).
+- 2026-11-23, in the project thread (his words: the files named under "His words that govern"): the takeover
+  (14:25:03 UTC); ANSWERS-7 (14:31:06 UTC): CHROME-SOURCE (a), CI-TEXT (a), FIREFOX-TESTS (c), RNG-SOURCE (c),
+  SIZE-3 (b), PRESS-PACE (a), DEPART-3 (a); LONG-RUNS: GitHub (14:32:42 UTC); WRITE-THREAD: yes (14:32:43 UTC).
+- Still open, to come with its own text: the Firefox CI pull request's download and exact text (FIREFOX-TESTS (c)).
 
 ## Running work
-- **Nothing runs.** The saver (bgdn004k8, started 19:57:35 UTC) was stopped with TaskStop at 21:44 UTC for the
-  pause; start it again when work goes on (`node .claude/scripts/checkpoint.mjs watch ci-wasm --trailer "..."`).
+- **The project thread (2026-11-23):** no saver runs while no agent runs; it is started with the first agent
+  (`node .claude/scripts/checkpoint.mjs watch ci-wasm --trailer "..."`, from the worktree `.gate/build-wt`). The
+  thread's scratch outside git, all under the worktree: `.gate/tools/wasm-bindgen-0.2.130/` (the tool) and
+  `.gate/tools/dl/` (its archive), `.gate/ci-wasm/proposed/` and `proposed-plant/` (the CI file's scratch copies),
+  `.gate/ci-wasm/incut-local.sh` and `.out` (the rehearsal), `.gate/dist-production`, `.gate/dist-development`.
+  The lines below are the first builder chat's, of 2026-11-19, kept as its record; its container's scratch is gone.
+- The first builder chat's saver (bgdn004k8, started 19:57:35 UTC) was stopped with TaskStop at 21:44 UTC for the
+  pause.
 - The planted defects, subset: done (20:00:29 to 20:08:18 UTC): ten of ten caught on the edited specs, each at the
   line that names it (1, 2, 7, 7b, 8, 8b, 11, 14, 14b, 15), and the control on the clean tree passes; output
   `ci-wasm/plants-subset-output.txt`, script `ci-wasm/plants-subset.py`. Its worktree `.gate/ci-wasm-plants` was
