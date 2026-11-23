@@ -11,6 +11,9 @@
 //! and the never-acker U4f's. The brawl's walk is on a leash (BRAWL-1): past 14 m from the cluster centre, by its own
 //! soldier's position as the endpoint decoded it (`ClientEndpoint::own_soldier`), it steers back toward the centre.
 //!
+//! **The host order is a contract** (C-U6-18): a host drives a behaviour through [`Behaviour::host_step`] alone:
+//! input, the endpoint's step, outgoing, in that order (its text gives each part).
+//!
 //! **When a command is given** (u4r-brief.md 2.2; carry 74 as U4R-Q14 (b1) amended it): at most one per client step,
 //! and none until the endpoint holds a snapshot (before it the stamp would be tick 0), nor at a step whose newest
 //! snapshot tick did not move since the last command (a second command would be stamped for the tick the first holds,
@@ -871,6 +874,28 @@ impl Behaviour {
     /// The steps since the endpoint's first snapshot at which no command was given (its newest tick had not moved).
     pub fn skipped(&self) -> u64 {
         self.skipped
+    }
+
+    /// **The host order, as the contract** (C-U6-18; EA-U4F-9): one host step at `now_ns` on the host's clock, the one
+    /// entry point a host drives a behaviour through, in this order: input ([`Behaviour::step`]: `received` to the
+    /// endpoint, then the command if one is due), the endpoint's step, outgoing ([`Behaviour::outgoing`] on its
+    /// datagrams, then [`Behaviour::reliable`] on its stream messages, the cheats' hooks on what the step made). A
+    /// host that computes a view feeds the endpoint itself and passes `&[]` (as for `step`). npt-lab's L1 sets ran in
+    /// this order (lab/src/scenario.rs:1640-1690: `input(None, received)`, `step` with nothing received, the
+    /// endpoint's `step`, `outgoing`, `reliable`) and keep their own calls this unit; npt-bots' and npt-load's network
+    /// hosts drive it (U6c). Returns whether a command was given, and what the endpoint sends.
+    pub fn host_step(
+        &mut self,
+        endpoint: &mut ClientEndpoint,
+        received: &[(Channel, Vec<u8>, u64)],
+        now_ns: u64,
+        view: &[(u8, [i32; 3])],
+    ) -> (bool, npt_client::StepOut) {
+        let given = self.step(endpoint, received, now_ns, view);
+        let mut out = endpoint.step();
+        self.outgoing(now_ns, &mut out.datagrams);
+        self.reliable(&mut out.reliable);
+        (given, out)
     }
 
     /// One client step at `now_ns` on the host's clock (u4r-brief.md 2.2; the module text): `received` goes to the

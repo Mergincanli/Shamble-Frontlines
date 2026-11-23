@@ -16,7 +16,10 @@ Brief u6a-brief.md rev 1.1 (c109691a…; the advisor's conditions 1-8 and SEC-U6
 ## Evidence
 - **Counts:** the builder's check4 on the fix-pass tree, all 11 steps PASS: measured 749 (+40), bites 849 (+43),
   against section 3's bars of +33 and +36; the test step 793.8 s (0.74 of base). FP-13 added one measured test.
-  **M5 in the main folder:** [filled after the run].
+  **M5 in the main folder** (wip/u6a-build.patch 33c9b5dd… applied, 19 of 19 files byte-equal to the builder's tree;
+  main-run.sh, .gate/u6a-merge/m5-check.log, 03:39:38-03:55:44 UTC): all 11 steps PASS; measured 750 passed (709 +41),
+  bites 850 (806 +44), 0 failed, 0 skipped; test step 854.9 s; self 78 of 78; redact 351 items, 0 findings. The gate
+  (`node tools/gate.mjs --no-smoke`): PASS.
 - **Plants** (each failed its named test for its planted reason, restored to its clean sha256): P1-P11 and P7b on the
   build; after the fix pass P7/P7b (the cap removed: fails the carry test's B leg with 6 refusals), P8, P9 (also FP-4's
   and FP-13's tests), and the new P12 (npt-super's header ignoring its flags), P13 (the SMT-sibling refusal removed),

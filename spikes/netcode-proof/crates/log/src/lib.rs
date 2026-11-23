@@ -41,6 +41,85 @@ pub struct Machine {
     pub clock_res_ns: u64,
 }
 
+impl Machine {
+    /// This machine as a header's `machine` (U6a: the /proc and /sys reads npt-lab's machine.rs makes; npt-lab keeps its
+    /// own copy): the CPU model (`/proc/cpuinfo`'s first `model name`), the vCPUs this process may run on
+    /// (`available_parallelism`), the memory (`/proc/meminfo`'s `MemTotal`), the kernel (`/proc/sys/kernel/osrelease`),
+    /// the SMT sibling lists (each CPU's `topology/thread_siblings_list`, each list once) and the threads per core (the
+    /// longest list). The caller gives what the machine cannot say: its role, name, plan, location and day address, and
+    /// the clock's resolution (npt-log reads no clock). A value the machine does not offer stays empty or 0, and the
+    /// judge's `machine_named` figure names what is missing.
+    pub fn read_local(
+        role: &str,
+        name: &str,
+        plan: &str,
+        location: &str,
+        address: &str,
+        clock_res_ns: u64,
+    ) -> Machine {
+        let read = |path: &str| std::fs::read_to_string(path).unwrap_or_default();
+        let cpu = read("/proc/cpuinfo")
+            .lines()
+            .find_map(|l| l.strip_prefix("model name").and_then(|r| r.split_once(':')))
+            .map(|(_, v)| v.trim().to_owned())
+            .unwrap_or_default();
+        let mem_kb = read("/proc/meminfo")
+            .lines()
+            .find_map(|l| l.strip_prefix("MemTotal:"))
+            .and_then(|v| v.trim().trim_end_matches("kB").trim().parse::<u64>().ok())
+            .unwrap_or(0);
+        let vcpus =
+            std::thread::available_parallelism().map_or(0, |n| u32::try_from(n.get()).unwrap_or(0));
+        let online = cpu_list(&read("/sys/devices/system/cpu/online"));
+        let mut smt: Vec<Vec<u32>> = Vec::new();
+        for c in online {
+            let siblings = cpu_list(&read(&format!(
+                "/sys/devices/system/cpu/cpu{c}/topology/thread_siblings_list"
+            )));
+            if !siblings.is_empty() && !smt.contains(&siblings) {
+                smt.push(siblings);
+            }
+        }
+        let threads_per_core = smt
+            .iter()
+            .map(|s| u32::try_from(s.len()).unwrap_or(0))
+            .max()
+            .unwrap_or(0);
+        Machine {
+            role: role.to_owned(),
+            name: name.to_owned(),
+            plan: plan.to_owned(),
+            arch: std::env::consts::ARCH.to_owned(),
+            cpu,
+            vcpus,
+            mem_mb: mem_kb / 1024,
+            location: location.to_owned(),
+            kernel: read("/proc/sys/kernel/osrelease").trim().to_owned(),
+            address: address.to_owned(),
+            threads_per_core,
+            smt,
+            clock_res_ns,
+        }
+    }
+}
+
+/// A Linux CPU list (`0-3,8`) as its CPUs ([0, 1, 2, 3, 8]); a part that does not parse is left out, and a range
+/// holds at most 4,096 CPUs.
+fn cpu_list(text: &str) -> Vec<u32> {
+    let mut out = Vec::new();
+    for part in text.trim().split(',').filter(|p| !p.is_empty()) {
+        match part.split_once('-') {
+            Some((a, b)) => {
+                if let (Ok(a), Ok(b)) = (a.parse::<u32>(), b.parse::<u32>()) {
+                    out.extend((a..=b).take(4_096));
+                }
+            }
+            None => out.extend(part.parse::<u32>().ok()),
+        }
+    }
+    out
+}
+
 /// The build that wrote the log (plan §4.7: each run's header records the bite, the features and the binary's hash).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -726,6 +805,38 @@ mod tests {
             .with("note", "two\nlines");
         w.event(&e).expect("event");
         w.finish(Ended::Clean).expect("footer")
+    }
+
+    /// U6a's `Machine::read_local`: the caller's role, name, plan, location, address and clock resolution as given, and
+    /// this machine's reads filled (on Linux: a CPU model, vCPUs, memory, the kernel, an SMT map of filled lists, and
+    /// threads per core its longest list).
+    #[test]
+    fn read_local_names_this_machine_with_the_callers_fields() {
+        let m = Machine::read_local("RS", "RS", "ccx23", "fsn1", "192.0.2.1", 7);
+        assert_eq!(
+            (
+                m.role.as_str(),
+                m.name.as_str(),
+                m.plan.as_str(),
+                m.location.as_str(),
+                m.address.as_str(),
+                m.clock_res_ns
+            ),
+            ("RS", "RS", "ccx23", "fsn1", "192.0.2.1", 7)
+        );
+        assert_eq!(m.arch, std::env::consts::ARCH);
+        if cfg!(target_os = "linux") {
+            assert!(!m.cpu.is_empty() && !m.kernel.is_empty(), "{m:?}");
+            assert!(m.vcpus > 0 && m.mem_mb > 0, "{m:?}");
+            assert!(
+                !m.smt.is_empty() && m.smt.iter().all(|l| !l.is_empty()),
+                "{m:?}"
+            );
+            let longest = m.smt.iter().map(Vec::len).max().unwrap_or(0);
+            assert_eq!(m.threads_per_core as usize, longest);
+        }
+        assert_eq!(cpu_list("0-3,8\n"), [0, 1, 2, 3, 8]);
+        assert_eq!(cpu_list("x,5"), [5]);
     }
 
     #[test]

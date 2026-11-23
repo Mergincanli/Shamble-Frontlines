@@ -10,11 +10,15 @@
 //! Dropping a link closes it: the other end's [`Link::state`] becomes [`LinkState::Closed`]. A send on a closed link is
 //! dropped and reports [`SendResult::Sent`], as a datagram to a vanished peer would be; `state` is how a caller learns
 //! that the session is gone.
+//!
+//! **`Send`** (T6, U6a): `Link` itself has no `Send` bound, because npt-l1's links share one simulator in one thread
+//! (`Rc<RefCell<..>>`) and stay there. A link that may move to another thread is a `Box<dyn Link + Send>`: npt-server's
+//! I/O runtime holds its sessions' links that way. [`Loopback`] is `Send` (its two ends share one `Arc<Mutex<..>>`), so
+//! a test can run the room's end on the runtime and the client's end on the test's thread.
 
-use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::net::SocketAddr;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 /// A session's channels (ADR 0001:425-427).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -127,32 +131,38 @@ struct Pipe {
 }
 
 /// One end of an in-memory pair: no delay, no loss, one order for all channels. Each message reaches the other end
-/// stamped with its send time and can be polled once the caller's clock has reached that time. Both ends live in one
-/// thread.
+/// stamped with its send time and can be polled once the caller's clock has reached that time. The ends are `Send`:
+/// each may live on its own thread, each call taking the pair's one lock for its own length only.
 pub struct Loopback {
-    pipe: Rc<RefCell<Pipe>>,
+    pipe: Arc<Mutex<Pipe>>,
     side: usize,
 }
 
 impl Loopback {
     /// Two connected ends; datagrams above `max_datagram_size` bytes are refused as `TooLarge`.
     pub fn pair(max_datagram_size: usize) -> (Loopback, Loopback) {
-        let pipe = Rc::new(RefCell::new(Pipe {
+        let pipe = Arc::new(Mutex::new(Pipe {
             waiting: [VecDeque::new(), VecDeque::new()],
             open: [true, true],
             max_datagram_size,
         }));
         (
             Loopback {
-                pipe: Rc::clone(&pipe),
+                pipe: Arc::clone(&pipe),
                 side: 0,
             },
             Loopback { pipe, side: 1 },
         )
     }
 
+    /// The pair's shared state. No call panics while it holds the lock, so a poisoned lock (a panic on another
+    /// thread between two calls) still holds a whole `Pipe`, which is taken as it is.
+    fn lock(&self) -> MutexGuard<'_, Pipe> {
+        self.pipe.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+
     fn send(&mut self, channel: Channel, bytes: &[u8], now_ns: u64) -> SendResult {
-        let mut pipe = self.pipe.borrow_mut();
+        let mut pipe = self.lock();
         let other = 1 - self.side;
         if pipe.open[other] {
             pipe.waiting[other].push_back(Recv {
@@ -167,7 +177,7 @@ impl Loopback {
 
 impl Link for Loopback {
     fn send_unreliable(&mut self, bytes: &[u8], now_ns: u64) -> SendResult {
-        if bytes.len() > self.pipe.borrow().max_datagram_size {
+        if bytes.len() > self.lock().max_datagram_size {
             return SendResult::TooLarge;
         }
         self.send(Channel::Datagram, bytes, now_ns)
@@ -182,7 +192,7 @@ impl Link for Loopback {
     }
 
     fn poll_recv(&mut self, now_ns: u64) -> Option<Recv> {
-        let mut pipe = self.pipe.borrow_mut();
+        let mut pipe = self.lock();
         let queue = &mut pipe.waiting[self.side];
         if queue.front().is_some_and(|r| r.arrival_ns <= now_ns) {
             queue.pop_front()
@@ -192,7 +202,7 @@ impl Link for Loopback {
     }
 
     fn state(&self) -> LinkState {
-        let pipe = self.pipe.borrow();
+        let pipe = self.lock();
         if pipe.open[0] && pipe.open[1] {
             LinkState::Open
         } else {
@@ -205,7 +215,7 @@ impl Link for Loopback {
     }
 
     fn max_datagram_size(&self) -> usize {
-        self.pipe.borrow().max_datagram_size
+        self.lock().max_datagram_size
     }
 
     fn unsent_unreliable(&self) -> usize {
@@ -215,11 +225,19 @@ impl Link for Loopback {
 
 impl Drop for Loopback {
     fn drop(&mut self) {
-        let mut pipe = self.pipe.borrow_mut();
-        pipe.open[self.side] = false;
-        pipe.waiting[self.side].clear();
+        let side = self.side;
+        let mut pipe = self.lock();
+        pipe.open[side] = false;
+        pipe.waiting[side].clear();
     }
 }
+
+/// T6's compile-time asserts: a Loopback end and a boxed `Send` link may move to another thread.
+const _: () = {
+    const fn is_send<T: Send + ?Sized>() {}
+    is_send::<Loopback>();
+    is_send::<Box<dyn Link + Send>>();
+};
 
 #[cfg(test)]
 mod tests {
@@ -290,7 +308,7 @@ mod tests {
         assert_eq!(a.state(), LinkState::Closed);
         assert_eq!(a.send_unreliable(b"late", 0), SendResult::Sent);
         assert_eq!(
-            a.pipe.borrow().waiting[1].len(),
+            a.lock().waiting[1].len(),
             0,
             "no queue grows for a dropped end"
         );
@@ -323,5 +341,77 @@ mod tests {
         assert_eq!(send_one(&mut a), SendResult::Sent);
         assert_eq!(b.poll_recv(7).map(|r| r.arrival_ns), Some(7));
         assert_eq!(b.state(), LinkState::Open);
+    }
+
+    /// T6: a boxed `Send` link moves to another thread, which answers every message on the other end's channel and
+    /// time; both ends keep one order, and dropping the moved end closes the pair for the end left behind.
+    #[test]
+    fn t6_a_loopback_end_runs_on_another_thread() {
+        let (a, mut b) = Loopback::pair(1200);
+        let a: Box<dyn Link + Send> = Box::new(a);
+        let echo = std::thread::spawn(move || {
+            let mut a = a;
+            let mut seen = Vec::new();
+            while seen.len() < 3 {
+                if let Some(r) = a.poll_recv(u64::MAX) {
+                    let reply = [r.bytes.as_slice(), b"!"].concat();
+                    let sent = match r.channel {
+                        Channel::Datagram => a.send_unreliable(&reply, r.arrival_ns + 1),
+                        ch => a.send_reliable(ch, &reply, r.arrival_ns + 1),
+                    };
+                    assert_eq!(sent, SendResult::Sent);
+                    seen.push(r.channel);
+                } else {
+                    std::thread::yield_now();
+                }
+            }
+            seen
+        });
+        b.send_unreliable(b"d", 10);
+        b.send_reliable(Channel::Control, b"c", 20);
+        b.send_reliable(Channel::FullState, b"f", 30);
+        let seen = echo.join().expect("the echo thread");
+        assert_eq!(
+            seen,
+            [Channel::Datagram, Channel::Control, Channel::FullState]
+        );
+        let back: Vec<(Channel, Vec<u8>, u64)> = drain(&mut b, 31)
+            .into_iter()
+            .map(|r| (r.channel, r.bytes, r.arrival_ns))
+            .collect();
+        assert_eq!(
+            back,
+            vec![
+                (Channel::Datagram, b"d!".to_vec(), 11),
+                (Channel::Control, b"c!".to_vec(), 21),
+                (Channel::FullState, b"f!".to_vec(), 31),
+            ]
+        );
+        assert_eq!(
+            b.state(),
+            LinkState::Closed,
+            "the moved end was dropped with its thread"
+        );
+    }
+
+    /// T6's `Send` asserts as a test: a Loopback end, a boxed `Send` link and a generic `Send` function all take a
+    /// Loopback; the const block above the tests holds the same at compile time.
+    #[test]
+    fn t6_a_loopback_end_and_a_boxed_send_link_are_send() {
+        fn takes_send<T: Send>(t: T) -> T {
+            t
+        }
+        let (a, b) = Loopback::pair(64);
+        let mut a = takes_send(a);
+        let mut b: Box<dyn Link + Send> = takes_send(Box::new(b));
+        assert_eq!(a.send_unreliable(b"s", 1), SendResult::Sent);
+        assert_eq!(b.poll_recv(1).map(|r| r.bytes), Some(b"s".to_vec()));
+        let moved = std::thread::spawn(move || b.state()).join().expect("moved");
+        assert_eq!(moved, LinkState::Open);
+        assert_eq!(
+            a.state(),
+            LinkState::Closed,
+            "the other end ended with its thread"
+        );
     }
 }

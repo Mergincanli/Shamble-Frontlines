@@ -304,6 +304,30 @@ pub fn decode(way: Direction, channel: Channel, bytes: &[u8]) -> Result<Message,
     Quant::default().decode(way, channel, bytes)
 }
 
+/// The stream a framed reliable message travels on, read from its own framing (C-U6-16 (c); U6a): `Some(Control)` when
+/// its 2 B length counts every byte after it and the type byte just after that length names a control-stream type,
+/// `Some(FullState)` the same for the 4 B length and a full-state type, `None` for anything else (a datagram has no
+/// length, so it is never one). The length is read first: the two prefixes differ by 2 B, so no message satisfies
+/// both, and a full state of any size is never read as a control message. npt-lab's test-only `stream_of` reads the
+/// type byte at offset 2 alone, which a full state's length reaches at 262,144 B (SEC-U4E-R2-4, A-R2-1).
+pub fn channel_of(bytes: &[u8]) -> Option<Channel> {
+    [Channel::Control, Channel::FullState]
+        .into_iter()
+        .find(|&channel| {
+            let frame = framing(channel);
+            let length = match bytes.get(..frame) {
+                Some(&[a, b]) => usize::from(u16::from_le_bytes([a, b])),
+                Some(&[a, b, c, d]) => u32::from_le_bytes([a, b, c, d]) as usize,
+                _ => return false,
+            };
+            length == bytes.len() - frame
+                && bytes.get(frame).is_some_and(|&t| {
+                    let t = usize::from(t);
+                    (1..=Limits::TYPES.len()).contains(&t) && row(t).1 == channel
+                })
+        })
+}
+
 impl Quant {
     /// [`encode`] with this `Quant`'s choices (its packing, and in a bites build its planted defect).
     ///

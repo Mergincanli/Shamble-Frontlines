@@ -357,6 +357,14 @@ impl ClientSlot {
         self.kicked
     }
 
+    /// The set the room encodes for this client at the last tick (catalogue §3's spatial rows: soldiers, hulls and
+    /// trajectories within the radius whose area connects to the client's, each hull's parts, the doors and the wall
+    /// it sees), as indices into the sim's `entity_records()` after that tick, in record-key order; empty for a kicked
+    /// client or one with no soldier. PM-0001-2's `tick.s.everyone_in_view` reads it (U6a's room log).
+    pub fn relevant(&self) -> &[usize] {
+        &self.relevant
+    }
+
     /// The last tick's `tick.s.cmd_on_time` (and `tick.s.input_missing`, its complement), by stamp (NA-14; the
     /// advisor's A3): `None` until the client's first accepted stamp is at or before the tick, then whether a command
     /// stamped for that tick had arrived before it ran (a command lost in every copy, or late, gives `false`).

@@ -36,7 +36,7 @@ pub use input::Input;
 pub use limits::Limits;
 pub use msg::{
     ClientSettings, Direction, EndReason, Join, JoinAccepted, JoinRejected, Kick, Leave, Message,
-    Ping, Pong, Resync, RoomEnded, decode, encode,
+    Ping, Pong, Resync, RoomEnded, channel_of, decode, encode,
 };
 #[cfg(feature = "bites")]
 pub use quant::BITES;

@@ -650,6 +650,22 @@ impl ClientEndpoint {
         } else {
             arrive
         };
+        // C-U6-17 (NC-U4F-3), beside `max_lead`: the stamp at most the earliest arrival's next tick + 7
+        // (`next_tick_at(now + lo_rtt / 2) + 7`, lo_rtt the lowest round trip the clock keeps), so on any link, under
+        // both options, an honest command fits option B's buffer of 8 (npt-room's `CMD_CATCHUP`, the redundancy cap:
+        // 7 = 8 - 1) however far one slow pong lifts the upper estimate.
+        let earliest = self
+            .clock
+            .samples()
+            .iter()
+            .map(|s| s.rtt_ns)
+            .min()
+            .and_then(|lo| self.clock.next_tick_at(now_ns.saturating_add(lo / 2)))
+            .map(|t| t.wrapping_add(Limits::REDUNDANCY_CAP as u32 - 1));
+        let goal = match earliest {
+            Some(e) if dist(goal, e) > 0 => e,
+            _ => goal,
+        };
         let target = match self.target {
             None => goal,
             Some(t) if dist(goal, t) < 0 => t,

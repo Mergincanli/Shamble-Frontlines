@@ -5,13 +5,21 @@
 //! the panic catch. npt-lab imports this library so L1 runs the real server code on simulated time. Built in U4 and U6.
 //!
 //! Built so far: the loop policy (U4b): [`Schedule`] and [`due_ticks`], tested on a fake clock with PM-0004-67's three
-//! bites; and the I/O step (U4e): [`Decoder::pump`] with its [`ConnLimits`] and [`Counters`]. Each item has one path,
-//! at the crate root (W1-PUB's nit: the modules are private).
+//! bites; the I/O step (U4e): [`Decoder::pump`] with its [`ConnLimits`] and [`Counters`]; and U6a's room process core:
+//! [`TickLoop`] (the tick thread, the I/O runtime, bounded channels, the panic catch) with its [`LoopSettings`], and
+//! [`PhaseTimers`]. The monotonic clock has one reader, crate-private (`clock.rs`). Each item has one path, at the
+//! crate root (W1-PUB's nit: the modules are private).
 
+mod clock;
+mod phase;
+mod proc_read;
 mod pump;
 mod schedule;
+mod tick_loop;
 
+pub use phase::PhaseTimers;
 pub use pump::{ConnLimits, Counters, Decoder, RttSource};
 #[cfg(feature = "bites")]
 pub use schedule::BITES;
 pub use schedule::{Dropped, Due, LoopCounters, Schedule, due_ticks};
+pub use tick_loop::{LoopSettings, TickLoop};
