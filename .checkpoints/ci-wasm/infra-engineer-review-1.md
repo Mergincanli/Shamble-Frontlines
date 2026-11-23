@@ -72,3 +72,162 @@ Scratch: `.gate/ci-wasm/infra-review-1/`. I review; I fix nothing. Memory: none 
   target to build one (checked: /root/.cargo has bin/ and env only), and the job prints only the sha256 and the
   registry-path grep (no second Wasm, no other path). The PR run builds the merge commit f97ff78 and gives the same
   Wasm bytes (Rust unchanged by the merge).
+- (B3 wording fix: regions were us-west-2 four times and us-east-1 twice.)
+- B4 done (stop-rule-check.py against plan.md:246-261, point for point). Ran it on the six clean logs: ALL (17/17)
+  each. Fair on: final address host; "size: 11860397"; the archive ": OK"; gh >= 2.93.0 (first version line); gh's
+  success line naming 0.2.130; seven members (the tar -tvzf listing, exactly 7); WB_TOOL env line (any step's env
+  block: WB_TOOL is job-level, so equivalent); the four install lines adjacent with `/`'s byte count not judged;
+  "exists already" outside the cyan script echo (ESC bytes are in the logs: 115 cyan prefixes in the push log, so
+  the exclusion works); "the network is cut"; Chrome's line; "Running 12 tests using 1 worker"; "12 passed"; no
+  failed/flaky/retry; no ##[error]. GAPS (each shown on a mutant copy of the push log in
+  `.gate/ci-wasm/infra-review-1/`): (G1) 'Tests 7 passed' (:25) is a search over the whole log, and packages/types'
+  unit tests print "Tests  7 passed (7)" too (push log :816, inside the cut via `npm test --workspaces`) besides the
+  boundary tests (:880): mutant-a (boundary "5 passed | 2 skipped (7)") still reads ALL. (G2) the rule's "the job
+  takes more than 10 of its 15 minutes" is not checked at all: mutant-b (last line +10 min, 746 s) reads ALL. Minor:
+  "the two size tables" is ">= 2 of the 4 tables"; the "then" order (members, env line, then the four lines) is not
+  checked; plants (rule point 6) are read by hand (card :300-326), not by the script. The proposed copy
+  `stop-rule-check-proposed.py` (G1: the boundary block between its echo and "== the type checks"; G2: first to
+  last timestamp <= 600 s) reads ALL on the six clean logs (19/19; 135-146 s) and NOT ALL on both mutants. The
+  evidence of the six runs holds (boundary line read directly at :877-880 in each; times 134.8-145.8 s).
+- Source S2 (read 2026-11-23, github.blog/changelog/2026-09-10-control-github-actions-cache-access-with-cache-mode,
+  through the fetch model; data only): values read, write, write-only, none; "`none` prevents all cache access";
+  workflow or job level, "Job-level settings override workflow-level settings"; "The selected mode is enforced by
+  the cache service and carries through reusable workflows". So the job's `cache-mode: none` (toolchain.yml:37) also
+  stops setup-node's automatic package cache (echoed `package-manager-cache: true` at push log :162; off today anyway:
+  the root package.json has no packageManager field). Sure: high (GitHub's own post; the post does not name setup-node).
+- B5 done: THE TABLE below (built from a script listing of every comment, step name and echo/exit line of main's
+  file 8b581adf...e016 and the final file 56d37fc6...9811; `git diff --numstat`: 97 added, 0 removed; every rule
+  line of main's stands byte for byte in the final file; no rule sentence is changed, so none is looser).
+
+### THE TABLE (for the report, section "The workflow text"; pasteable)
+Main's `.github/workflows/toolchain.yml` (sha256 8b581adf...e016, 100 lines) against the final file (sha256
+56d37fc6...9811, 197 lines). A rule sentence: a comment, step name, or echo/exit line that says what is required or
+refused. "Unchanged" means byte for byte (only its line number moved). Nothing of main's is removed or reworded.
+
+| # | Final line | Rule sentence (its words) | Main's line | Status | Stricter or looser |
+|---|---|---|---|---|---|
+| 1 | 1-3 | "the pinned Rust toolchain from rust-toolchain.toml, then the Rust and npm workspaces' builds and tests with the network cut off. One job, `toolchain`; the gate and smoke jobs stay in gate.yml." | 1-3 | unchanged | same |
+| 2 | 4-6 | "The cut: the last step runs in its own network namespace (sudo unshare --net), with loopback up, back as the runner's user with no docker group and no_new_privs; a TCP probe to an address resolved before the cut must connect outside and fail inside (only curl exit 7 or 28 counts as cut)." | 4-6 | unchanged | same |
+| 3 | 7-10 | "CI-WASM: before the cut, the wasm-bindgen tool's archive is fetched and checked against Mustafa's values and by GitHub's own check of the release; its one program is installed root-owned. Inside the cut the page is built with it; then the boundary tests, the type checks of the Worker, the page and the browser specs, and the browser tests run (in the runner image's Google Chrome: nothing is downloaded for them)." | none | new | stricter (adds checks; the one new download is his TOOL-SOURCE file, by CI-TEXT (a)) |
+| 4 | 25 | "Only the explicit install below brings a toolchain: rustup turned automatic install back on by default in 1.28.1." | 21 | unchanged | same |
+| 5 | 36 | "No cache in this job, restored or saved: code planted for a later step cannot reach another run through it." | 32 | unchanged | same |
+| 6 | 39-41 | "The one wasm-bindgen tool the build may run: Mustafa's values of 2026-11-18 (TOOL-SOURCE (a)); any other file, version or checksum comes back to him. The first tool step compares them line for line with packages/client/scripts/wasm-bindgen-tool.mjs, the copy build.mjs checks the program against before each run." | none | new | stricter |
+| 7 | 42 | "WB_TOOL and each folder above it are root-owned and closed to others, so no process inside the cut can swap it." | none | new | stricter |
+| 8 | 59 | step "Install the pinned Rust toolchain from rust-toolchain.toml (before any cargo call)" | 43 | unchanged | same |
+| 9 | 65 | "rust-toolchain.toml: no single exact x.y.z channel" (exit 1) | 49 | unchanged | same |
+| 10 | 66 | "RUSTUP_TOOLCHAIN is set: it would beat rust-toolchain.toml" (exit 1) | 50 | unchanged | same |
+| 11 | 68 | "the active toolchain does not come from rust-toolchain.toml" (exit 1) | 52 | unchanged | same |
+| 12 | 70 | "rustc equals the pin $pin" / "rustc is not the pin $pin" (exit 1) | 54 | unchanged | same |
+| 13 | 73 | "wasm-bindgen-tool.mjs is read as text, never imported: no code of the repository runs with the network." | none | new | stricter |
+| 14 | 74 | step "The wasm-bindgen tool's archive (https only, then its size and sha256, before any tar call)" | none | new | stricter |
+| 15 | 81 | "packages/client/scripts/wasm-bindgen-tool.mjs lacks this line of the workflow: $line" (exit 1) | none | new | stricter |
+| 16 | 88 | "the archive is $bytes bytes, not $WB_ARCHIVE_BYTES" (exit 1); then `sha256sum -c` (:89, no words of its own) | none | new | stricter |
+| 17 | 91-92 | "Before the tool's first run (Mustafa's CI-WASM (a)). The only step with the token; gh 2.93.0 keeps it off the TUF mirrors (CVE-2026-48501)." | none | new | stricter (see finding F4 on "the only step") |
+| 18 | 93 | step "GitHub's own check of the archive (gh release verify-asset)" | none | new | stricter |
+| 19 | 99 | "gh printed no version of the form x.y.z: $gh_version" (exit 1) | none | new | stricter |
+| 20 | 100 | "gh is older than 2.93.0" (exit 1) | none | new | stricter |
+| 21 | 103 | step "The tool's one program (the member list, then only wasm-bindgen taken out, installed root-owned, checked)" | none | new | stricter |
+| 22 | 109 | "the archive's member list is not the expected one" (exit 1) | none | new | stricter |
+| 23 | 111 | "a member is not a plain file or folder, has a name with a space, or is above 64 MiB" (exit 1) | none | new | stricter |
+| 24 | 114 | "more than the one program came out" (exit 1) | none | new | stricter |
+| 25 | 115 | "WB_TOOL is not an absolute path: $WB_TOOL" (exit 1) | none | new | stricter |
+| 26 | 117 | "${WB_TOOL%/*} exists already or could not be made: the tool needs a fresh folder made here as root" (exit 1) | none | new | stricter |
+| 27 | 119 | "$WB_TOOL is not a plain file" (exit 1) | none | new | stricter |
+| 28 | 123 | "$WB_TOOL or a folder above it is missing or a link, is not owned by root, or others than root may write in it" (exit 1) | none | new | stricter |
+| 29 | 124 | "the program is not $WB_PROGRAM_BYTES bytes" (exit 1); then `sha256sum -c` (:125) | none | new | stricter |
+| 30 | 127 | step "Fetch every dependency (the last step with the network)" | 57 | unchanged | same (still true: the three new network steps come before it) |
+| 31 | 132 | step "Build and test with the network cut off" | 62 | unchanged | same |
+| 32 | 136 | "control failed: github.com has no IPv4 address before the cut" (exit 1) | 66 | unchanged | same |
+| 33 | 138 | "control failed: no connection before the cut, so the probe below would prove nothing" (exit 1) | 68 | unchanged | same |
+| 34 | 148 | "getent: no answer (printed, not judged)" | 77 | unchanged | same |
+| 35 | 151-153 | "the network is still reachable inside the cut" (exit 1); "the network is cut: no TCP connection to $PROBE_IP:443 (curl exit $rc)"; "probe inconclusive: curl exit $rc" (exit 1) | 80-82 | unchanged | same |
+| 36 | 158 | "writing the generated types again changed:" (exit 1) | 87 | unchanged | same |
+| 37 | 167-168 | `[ -n "$shipped" ]`, `[ -n "$tests" ]` (exit on an empty list; no words) | 96-97 | unchanged | same |
+| 38 | 171 | "== the page as players get it, then the development page the browser tests need" (both builds; build.mjs's own refusals apply) | none | new | stricter |
+| 39 | 174, 176 | "== the Wasm built here, and the builder paths it carries (RR-F5: printed, not judged)"; "no registry path in the Wasm" | none | new | neither: printed, not judged (by design) |
+| 40 | 177 | "== the boundary tests, on the built Wasm" | none | new | stricter |
+| 41 | 179 | "== the type checks: the shipped files of the Worker and the page with the lib check, then with their tests; then the browser specs" | none | new | stricter |
+| 42 | 186 | "a file list is empty" (exit 1) | none | new | stricter |
+| 43 | 192 | "== the browser tests, one at a time, never retried, stopped by Playwright after 5 minutes (so before the job)" | none | new | stricter |
+
+Rule-bearing settings (no sentence of their own):
+| Setting | Main | Final | Status |
+|---|---|---|---|
+| `on: push`, `pull_request` | :9-11 | :13-15 | unchanged |
+| `permissions: contents: read` (log: "Contents: read, Metadata: read") | :13-14 | :17-18 | unchanged |
+| `concurrency` group `toolchain-${{ github.workflow }}-${{ github.ref }}`, `cancel-in-progress: true` | :16-18 | :20-22 | unchanged |
+| `RUSTUP_AUTO_INSTALL: "0"`; `defaults.run.shell: bash`; `runs-on: ubuntu-24.04` | :20-30 | :24-34 | unchanged |
+| `timeout-minutes: 15` | :31 | :35 | unchanged (the job now takes 2.2-2.4 min of it) |
+| `cache-mode: none` | :33 | :37 | unchanged |
+| actions by full SHA (checkout v7.0.1, setup-node v7.0.0); `persist-credentials: false`; no new `uses:` | :35-41 | :51-57 | unchanged |
+| job `env:` WB_* (seven values, his of 2026-11-18, and WB_TOOL) | none | :38-49 | new |
+| `GH_TOKEN: ${{ github.token }}` on one run step | none | :94-95 | new exposure, by his CI-WASM (a): "It runs GitHub's own check on the tool's file before the tool's first run there" |
+| `sudo -n` for mkdir, chown, install before the cut | none (sudo only for unshare, :70) | :116-118 | new, root-owned install by plan s5 item 4 (his CI-TEXT (a), FIX-WRITE (a)) |
+| the cut's `env -i` list | :72-74 | :142-145 | one name more: `SHAMBLE_WASM_BINDGEN="$WB_TOOL"` (plan s5 item 6; build.mjs refuses a relative path) |
+| Playwright flags `--workers=1 --retries=0 --reporter=list --global-timeout=300000` | none | :195-196 | new |
+No looser rule: nothing needs new words of his. The three new exposures (the token in one run step, sudo for the
+install, one more name in the cut's environment) are each inside the text he said yes to (CI-TEXT (a) on
+240c7db7...2673, FIX-WRITE (a) on b4081e48...03ec).
+- B2 done (the workflow file whole, final 56d37fc6...9811 against main 8b581adf...e016; +97 -0; gate.yml unchanged).
+  Shell: every step runs `/usr/bin/bash --noprofile --norc -e -o pipefail {0}` (push log :181, :238, :258, :299, :420);
+  the new lines fail closed under it: curl|sed and tar|sort/awk pipelines carry curl's/tar's failure (pipefail);
+  `gh --version | awk` reads to EOF (no SIGPIPE); the judge's `$(find ...|wc -l)` lowers the count on a missing path
+  (no reliance on -e inside a substitution); the inner script has no apostrophe and parses as one argument. awk's
+  juxtaposed rules (:110) are accepted by mawk 1.3.4 (tried here) and ran on the image. Triggers unchanged (push of
+  any branch or tag, pull_request default types). Concurrency unchanged: push runs group on refs/heads/<branch>, PR
+  runs on refs/pull/64/merge, so the two never cancel each other; a new push cancels both in-progress runs of the
+  previous head; a [skip ci] head creates no run and cancels nothing. Plants: their runs were not cancelled (each
+  ends in its own step's "##[error]Process completed with exit code 1.", the take-back pushed after). Merge: the
+  final head must not be a [skip ci] commit (CHECKPOINTS.md:214 already says so: the last commit runs CI); after the
+  merge main's push run is cancelled by a second merge within about 2.5 min now (CANCEL-ON-MAIN, known). Limit:
+  2.2-2.4 min of 15; Playwright's own 5 min bound ends first on a browser hang; other hangs end at 15 min.
+  cache-mode none: enforced by the cache service (S2); setup-node's `package-manager-cache: true` default (log :162)
+  stays off (no packageManager field) and would be refused anyway. Image drift: Chrome path hardcoded twice
+  (:193-194), version moved .50 -> .78 within 5 days (image 20261111.370.1 -> 20261116.133.1), V8-sensitive bounds
+  (per block 487-523 against 610); gh floor passes newer versions, refuses an unreadable one (fail closed); Node 22
+  from the toolcache until it leaves the image (NODE-26: EOL 2027-04-30); `/` 755 root:root and passwordless sudo
+  documented (S3.9 of my ci-plan notes); a new redirect hop beyond 2 fails curl visibly. Cost: 0 per run (public
+  repository, standard runner: "free and unlimited on public repositories", read 2026-11-19; the runs report
+  hardwareConcurrency 4, the public runner's size); about 4.7 runner-minutes per push (two events). Provider down:
+  GitHub releases, GitHub's attestation API, crates.io, npm or rustup's host fail their own step before the cut,
+  visibly; Google is not contacted. Exposes: public logs only (signed query cut by sed); Chrome runs with
+  Playwright's --no-sandbox on our own page on 127.0.0.1 inside the cut. Rollback: revert; nothing outside the
+  repository exists (no cache, artifact, secret or setting). Wording: :91 "The only step with the token" is not so
+  in the letter: checkout and setup-node get the job token as their default `token` input (push log :38 "token: ***",
+  :161 "token: ***"); it is the only run step with it (finding F3). PATH inside the cut is the runner's
+  (`env -i PATH="$PATH"`, :142), whose first folders are writable by the cut's own uid on this image (S1-S3 of my
+  opt-path notes): a build script can shadow node, npx, git or sha256sum for every later line; the root-owned tool
+  closes only its own file (follow-up CUT-PATH).
+- Plant logs re-read for B4 point 6: plant-browser x2 end at the cut step with the toEqual difference
+  ('-   "drawCalls": 4,' / '+   "drawCalls": 3,' twice), "2 failed", no retry line, then "##[error]Process completed
+  with exit code 1." (:972-976, :984-988); plant-gh x2 end at "Run gh --version" with gh's "attestation for 0.2.130
+  does not contain subject sha256:27c24e42...6e10" and exit 1 (:274-275, :286-287), no later step group. None was
+  cancelled. Known codes found in STATUS/archive: REQUIRED-CHECK, CANCEL-ON-MAIN (my IE-5), NODE-26, TWO-PLAYWRIGHTS,
+  WASM-ARTIFACT, CI-CUT part 2 (STATUS.md:22, :95; STATUS_ARCHIVE.md:703-768, :939-944, :974-976).
+- B6 done (follow-ups for STATUS, one line each, with why not here):
+  1. REQUIRED-CHECK (known, for 2.3): `toolchain` now holds the build players get and the 12 browser tests, still not
+     a required check, so each merge reads it by hand. Not here: branch protection is a repository setting (his), and
+     plan s15 leaves out a required-check change.
+  2. IMAGE-CHROME (new): the tests run the image's Chrome, which moved 157.0.8103.50 -> .78 in five days (images
+     20261111.370.1 -> 20261116.133.1); 158 is Playwright 1.65.0's own; 159 may outrun it; V8 moves the allocation
+     windows (per block 487-523 on runners against the 610 ceiling). Watch the printed line; a red is a Playwright
+     bump (a dependency, its security answer) or CHROME-SOURCE (c). Not here: his CHROME-SOURCE (a) accepted it.
+  3. CUT-PATH (new, with CI-CUT part 2; security, Medium, pre-existing class): inside the cut PATH is the runner's
+     (toolchain.yml:142), and on this image its early folders (setup-node's bin in /opt/hostedtoolcache, ~/.cargo/bin,
+     ~/.local/bin, /usr/local/bin: `chmod -R 777 /opt` and `/usr/local/bin` by the image's scripts) and /opt/google/
+     chrome are writable by the cut's own uid, so a build script can shadow node, npx, git, sha256sum or Chrome for
+     every later line; the root-owned tool closes only its own file. Not here: the fix (root-owned copies of node and
+     cargo like the tool, a PATH of root-owned folders only, and no JavaScript action with a post step) is new CI
+     text for the gate v2, beside CI-CUT part 2; first a run that prints `stat` of each PATH folder and of Chrome.
+  4. FIREFOX-TESTS (c) (his answer): its own pull request next: Playwright's patched Firefox 159.0 (about 187 MB, no
+     published checksum), 11 of the 12 tests; its download and exact text come to him first. Not here: his (c).
+  5. CANCEL-ON-MAIN (known, for 2.3): weightier now that the job takes 2.2-2.4 min: two merges inside that window
+     leave the first without a toolchain result on main. Not here: 2.3 owns the concurrency rule.
+  6. RR-F5 (known, change-set 3 with rust-reviewer): after the remap CI can judge the Wasm's sha256 against a
+     container build of one commit; until then 28991 against 28987 bytes fits the path but is not shown to be only it.
+  7. TOKEN-WORDS (new, Low): toolchain.yml:91 "The only step with the token" -> "The only run step with the token" at
+     the next CI edit. Not here: CI text needs his yes, and a Low triggers no push.
+  8. NODE-26 (known): this job's `node-version: 22` moves with it (Node 22's end of life 2027-04-30).
+  For this PR's own docs pass (docs-keeper), not follow-ups: TWO-PLAYWRIGHTS' clause "no real browser has run inside
+  the cut's privilege drop" is now false (Chrome 157.0.8103.78 ran 12 tests there, six clean runs); WASM-ARTIFACT:
+  CI now builds the release Wasm through build.mjs (the cut's own wasm32 line stays dev-profile).
