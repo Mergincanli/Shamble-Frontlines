@@ -80,7 +80,8 @@
   (advisor-u6b-r1.md dc6973da…; brief rev 1.2 binds it by line range): R-PING, A1 (a), A2 at U6c's close, A3 no second
   round. **The fix pass DONE 23:2x** (wip/u6b-fix.patch e29c003c…, 5,952 of 6,000; check.mjs x2 11/11, counted
   fx-check2.log: 807 = +53, 904 = +54, test 0.89x; 20 plants fail by name; 20 release starts p50 19.46 ms, max 25.17
-  ms; NR-U6B-5, T-12, T-17 carried; F-TICK-ROUND, div_ceil, for the advisor). **Next: the advisor's fix-diff check.**
+  ms; NR-U6B-5, T-12, T-17 carried; F-TICK-ROUND, div_ceil, for the advisor). **The advisor's fix-diff check RUNNING**
+  (a108f5cdf9270999e -> advisor-u6b-fix.md); then merge M3-M9 (main-run.sh), CI, U6b's report.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
 - **Next 2, U6b's fix pass back:** snapshot (wip/u6b-build.patch), the size line (past 6,000: three lines to him); the
@@ -134,7 +135,8 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (3 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - None right now (U6b's fix pass DONE). Done, resumable: U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix
+  - The advisor's U6b fix-diff check a108f5cdf9270999e (advisor-u6b-fix.md, saved per item; after a cut: from its file).
+    Done, resumable: U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix
     pass", worktree agent-a2661dc320c9e6d00), the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats
     netcode a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
   - The saver b80065fbo (checkpoint.mjs watch from 23:03 to about 00:53; when it ends, restart it: run_in_background,
