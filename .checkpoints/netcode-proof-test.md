@@ -75,8 +75,7 @@
 - **Cut 07:53-11:14 UTC** (history.md:7675-7687): U6b's builder and the infra seat; part-clean 7.5 GiB; both resumed.
 - **11:4x, the advisor's Stop B ruling: REVISE** (advisor-u8-stopb.md daf55033…, read in full but sections 1-2): items
   1-20, all now; S14's 10-minute window; round 2 the same three seats on the diff; item 8's record u8-sec-sb-3-docs.md.
-- **Cut 12:28-16:22 UTC** (history.md:7689-7701): U6b's builder (Block 6's last test) and U8's fix pass 2 (item 19)
-  stopped; free 1,621 MiB; 16:2x part-clean 10.4 GiB (free 10,776), u6b-run.sh CARGO_INCREMENTAL=0, saver b67t3qh7l, both resumed.
+- **Cut 12:28-16:22 UTC** (history.md:7689-7701): both builders; part-clean 10.4 GiB; CARGO_INCREMENTAL=0; both resumed.
 - **16:3x, U8's fix pass 2 DONE** (items 1-20; Node 95/0, wrappers 315/0, redact 0 of 394; plants P10-P19 fail by name,
   restored; snapshot wip/u8-build.patch bca52b2c…, 5,876 added, 43 files, base 096808b; under 6,000). Old tree for the
   interdiff: .gate/u8-r2-old (60205020 applied); 26 files changed + r1-dist.sha256. Builder's open: F28 (U6b), its values.
@@ -153,8 +152,9 @@
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
   .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
-  at its snapshot; resume after its last block marked done); U8's fix-pass builder ac59cce3e5d002441 (pass 2 from
-  11:4x, its worktree's u8-build.md "## Fix pass 2"). Done: the docs agent a6eb7acdf1c3ff885
+  at its snapshot; resume after its last block marked done); round 2 on U8 from 16:3x: the netcode seat
+  a120f51df9a8f6986 (u8-r2-netcode.md) and the security seat af8c5f0fbec829595 (u8-r2-security.md); the infra seat
+  a0615e1ead860724b next, by SendMessage. Done: U8's fix-pass builder ac59cce3e5d002441; the docs agent a6eb7acdf1c3ff885
   (u8-sec-sb-3-docs.md); the advisor's Stop B ruling a3de649cd25e474df; Stop B's seats, netcode a120f51df9a8f6986, security
   af8c5f0fbec829595, infra a0615e1ead860724b (u8-stopb-*.md; round-2 reads by SendMessage); U7's T-builder
   a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
