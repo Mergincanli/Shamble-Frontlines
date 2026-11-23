@@ -4,6 +4,10 @@
 # The cut: the last step runs in its own network namespace (sudo unshare --net), with loopback up, back as the runner's
 # user with no docker group and no_new_privs; a TCP probe to an address resolved before the cut must connect outside
 # and fail inside (only curl exit 7 or 28 counts as cut).
+# CI-WASM: before the cut, the wasm-bindgen tool's archive is fetched and checked against Mustafa's values and by
+# GitHub's own check of the release; its one program is installed root-owned. Inside the cut the page is built with
+# it; then the boundary tests, the type checks of the Worker, the page and the browser specs, and the browser tests
+# run (in the runner image's Google Chrome: nothing is downloaded for them).
 name: toolchain
 
 on:
@@ -31,6 +35,18 @@ jobs:
     timeout-minutes: 15
     # No cache in this job, restored or saved: code planted for a later step cannot reach another run through it.
     cache-mode: none
+    env:
+      # The one wasm-bindgen tool the build may run: Mustafa's values of 2026-11-18 (TOOL-SOURCE (a)); any other file,
+      # version or checksum comes back to him. The first tool step compares them line for line with
+      # packages/client/scripts/wasm-bindgen-tool.mjs, the copy build.mjs checks the program against before each run.
+      # WB_TOOL is root-owned, so no process inside the cut can swap it.
+      WB_VERSION: "0.2.130"
+      WB_NAME: wasm-bindgen-0.2.130-x86_64-unknown-linux-musl
+      WB_ARCHIVE_BYTES: "11860397"
+      WB_ARCHIVE_SHA256: 9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f
+      WB_PROGRAM_BYTES: "8170784"
+      WB_PROGRAM_SHA256: ca4df773020dae87d92b9eadb2b85412bea7a9cf6318ab9999dd119fd9f46931
+      WB_TOOL: /opt/wasm-bindgen-0.2.130/wasm-bindgen
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -54,6 +70,56 @@ jobs:
           case "$v" in "rustc $pin "*) echo "rustc equals the pin $pin" ;; *) echo "rustc is not the pin $pin"; exit 1 ;; esac
           cargo --version; node --version; npm --version
 
+      # wasm-bindgen-tool.mjs is read as text, never imported: no code of the repository runs with the network.
+      - name: The wasm-bindgen tool's archive (https only, then its size and sha256, before any tar call)
+        run: |
+          url="https://github.com/wasm-bindgen/wasm-bindgen/releases/download/$WB_VERSION/$WB_NAME.tar.gz"
+          for line in "  version: \"$WB_VERSION\"," "    url: \"$url\"," "    bytes: $WB_ARCHIVE_BYTES," \
+              "    sha256: \"$WB_ARCHIVE_SHA256\"," "    member: \"$WB_NAME/wasm-bindgen\"," \
+              "    bytes: $WB_PROGRAM_BYTES," "    sha256: \"$WB_PROGRAM_SHA256\","; do
+            grep -qxF -- "$line" packages/client/scripts/wasm-bindgen-tool.mjs \
+              || { echo "packages/client/scripts/wasm-bindgen-tool.mjs lacks this line of the workflow: $line"; exit 1; }
+          done
+          mkdir "$RUNNER_TEMP/wasm-bindgen"
+          curl --fail -L --max-redirs 2 --proto '=https' --proto-redir '=https' --max-filesize 12000000 -sS \
+            -o "$RUNNER_TEMP/wasm-bindgen/$WB_NAME.tar.gz" -w 'final address: %{url_effective}\n' "$url" \
+            | sed 's/?.*$/?(query left out)/'
+          bytes=$(stat -c %s "$RUNNER_TEMP/wasm-bindgen/$WB_NAME.tar.gz"); echo "size: $bytes"
+          [ "$bytes" = "$WB_ARCHIVE_BYTES" ] || { echo "the archive is $bytes bytes, not $WB_ARCHIVE_BYTES"; exit 1; }
+          printf '%s  %s\n' "$WB_ARCHIVE_SHA256" "$RUNNER_TEMP/wasm-bindgen/$WB_NAME.tar.gz" | sha256sum -c -
+
+      # Before the tool's first run (Mustafa's CI-WASM (a)). The only step with the token; gh 2.93.0 keeps it off the
+      # TUF mirrors (CVE-2026-48501).
+      - name: GitHub's own check of the archive (gh release verify-asset)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh --version
+          gh_version=$(gh --version | awk 'NR == 1 { print $3 }')
+          case "$gh_version" in "" | *[!0-9.]*) echo "gh printed no version of the form x.y.z: $gh_version"; exit 1 ;; esac
+          printf '%s\n' 2.93.0 "$gh_version" | sort -V -C || { echo "gh is older than 2.93.0"; exit 1; }
+          gh release verify-asset "$WB_VERSION" "$RUNNER_TEMP/wasm-bindgen/$WB_NAME.tar.gz" --repo wasm-bindgen/wasm-bindgen
+
+      - name: The tool's one program (the member list, then only wasm-bindgen taken out, installed root-owned, checked)
+        run: |
+          dl="$RUNNER_TEMP/wasm-bindgen"; archive="$dl/$WB_NAME.tar.gz"
+          tar -tzf "$archive" | LC_ALL=C sort > "$dl/members.txt"
+          printf '%s\n' "" LICENSE-APACHE LICENSE-MIT README.md wasm-bindgen wasm-bindgen-test-runner wasm2es6js \
+            | sed "s|^|$WB_NAME/|" | LC_ALL=C sort > "$dl/expected.txt"
+          diff "$dl/expected.txt" "$dl/members.txt" || { echo "the archive's member list is not the expected one"; exit 1; }
+          tar -tvzf "$archive" | awk '{ print } substr($1, 1, 1) !~ /^[-d]$/ || NF != 6 || $3 > 67108864 { bad = 1 } END { exit bad }' \
+            || { echo "a member is not a plain file or folder, has a name with a space, or is above 64 MiB"; exit 1; }
+          mkdir "$dl/x"
+          tar -xzf "$archive" -C "$dl/x" --no-same-owner --no-same-permissions --strip-components=1 "$WB_NAME/wasm-bindgen"
+          [ "$(ls -A "$dl/x")" = wasm-bindgen ] || { echo "more than the one program came out"; exit 1; }
+          sudo -n install -D -o root -g root -m 0555 "$dl/x/wasm-bindgen" "$WB_TOOL"
+          [ -f "$WB_TOOL" ] && [ ! -L "$WB_TOOL" ] || { echo "$WB_TOOL is not a plain file"; exit 1; }
+          stat -c 'mode %a, owner %U:%G, %s bytes, %n' "$WB_TOOL" "${WB_TOOL%/*}" /opt
+          [ -z "$(find "${WB_TOOL%/*}" /opt -maxdepth 0 \( ! -user root -o -perm /022 \))" ] \
+            || { echo "${WB_TOOL%/*} or /opt is not owned by root, or others than root may write in it"; exit 1; }
+          [ "$(stat -c %s "$WB_TOOL")" = "$WB_PROGRAM_BYTES" ] || { echo "the program is not $WB_PROGRAM_BYTES bytes"; exit 1; }
+          printf '%s  %s\n' "$WB_PROGRAM_SHA256" "$WB_TOOL" | sha256sum -c -
+
       - name: Fetch every dependency (the last step with the network)
         run: |
           cargo fetch --locked
@@ -72,6 +138,7 @@ jobs:
             env -i HOME="$HOME" PATH="$PATH" USER="$USER" CI=true LANG=C.UTF-8 PROBE_IP="$probe_ip" \
               CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}" RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}" \
               RUSTUP_AUTO_INSTALL=0 npm_config_update_notifier=false \
+              SHAMBLE_WASM_BINDGEN="$WB_TOOL" \
             bash --norc --noprofile -euo pipefail -c '
               id; ip -o link; rustc --version
               getent hosts github.com || echo "getent: no answer (printed, not judged)"
@@ -97,4 +164,30 @@ jobs:
               [ -n "$tests" ]
               npx --no -- tsc --ignoreConfig $strict $shipped
               npx --no -- tsc --ignoreConfig $strict --skipLibCheck $shipped $tests
+              echo "== the page as players get it, then the development page the browser tests need"
+              node packages/client/scripts/build.mjs --production --out-dir "$PWD/.gate/dist-production"
+              node packages/client/scripts/build.mjs --out-dir "$PWD/.gate/dist-development"
+              echo "== the Wasm built here, and the builder paths it carries (RR-F5: printed, not judged)"
+              sha256sum packages/sim-worker/pkg/sim_wasm_bg.wasm
+              grep -ao "/[A-Za-z0-9._/+-]*/\.cargo/registry/src/[A-Za-z0-9._/+-]*\.rs" packages/sim-worker/pkg/sim_wasm_bg.wasm || echo "no registry path in the Wasm"
+              echo "== the boundary tests, on the built Wasm"
+              npx --no -- vitest run --root packages/sim-worker --dir packages/sim-worker/boundary
+              echo "== the type checks: the shipped files of the Worker and the page with the lib check, then with their tests; then the browser specs"
+              common="${strict% --lib es2023}"
+              worker=$(find packages/sim-worker/src -name "*.ts" ! -name "*.test.ts" | LC_ALL=C sort)
+              worker_tests=$(find packages/sim-worker/src -name "*.test.ts" | LC_ALL=C sort)
+              page=$(find packages/client/src -name "*.ts" ! -name "*.test.ts" | LC_ALL=C sort)
+              page_tests=$(find packages/client/src -name "*.test.ts" | LC_ALL=C sort)
+              specs=$(find packages/e2e/tests -name "*.ts" | LC_ALL=C sort)
+              for list in "$worker" "$worker_tests" "$page" "$page_tests" "$specs"; do [ -n "$list" ] || { echo "a file list is empty"; exit 1; }; done
+              npx --no -- tsc --ignoreConfig $common --lib es2023,webworker,esnext.disposable $worker packages/sim-worker/pkg/sim_wasm.d.ts
+              npx --no -- tsc --ignoreConfig $common --lib es2023,webworker,esnext.disposable --skipLibCheck $worker $worker_tests packages/sim-worker/pkg/sim_wasm.d.ts
+              npx --no -- tsc --ignoreConfig $common --lib es2023,dom,dom.iterable,esnext.disposable --types vite/client $page
+              npx --no -- tsc --ignoreConfig $common --lib es2023,dom,dom.iterable,esnext.disposable --types vite/client --skipLibCheck $page $page_tests
+              npx --no -- tsc --ignoreConfig $common --lib es2023,dom,dom.iterable --skipLibCheck packages/e2e/node-names.d.ts packages/e2e/playwright.config.ts $specs
+              echo "== the browser tests, one at a time, never retried, stopped by Playwright after 5 minutes (so before the job)"
+              /opt/google/chrome/chrome --version
+              SHAMBLE_DIST="$PWD/.gate/dist-development" SHAMBLE_CHROMIUM=/opt/google/chrome/chrome \
+                npx --no -- playwright test -c packages/e2e/playwright.config.ts --project=chromium --workers=1 --retries=0 \
+                  --reporter=list --global-timeout=300000
             '
