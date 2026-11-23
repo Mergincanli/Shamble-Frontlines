@@ -7661,3 +7661,13 @@ The compact is done. Pick up exactly where you left off, rebuilding from the rep
   23:05 day-message reminder reached this chat together at 02:35:55 UTC.
 - **Resumed 02:36-02:38 UTC:** the test seat by SendMessage (from its STOPPED AT block); the saver restarted
   (bbz6p4y44); the day message sent late.
+
+## Cut by the spend limit (2026-11-23 about 03:59 to 06:36 UTC)
+- **The notice** (U8's fix-pass builder ac59cce3e5d002441; its task ended at about 03:59:11 UTC, HTTP 429): "You've
+  hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 6:10am (UTC)".
+- **What it stopped:** the U8 fix pass (its plan written, no item done); this session mid-way through U6b's Block 0
+  (the three manifest edits made, uncommitted; the provider lines, the lock refresh and the binding check not yet).
+  U7's T-builder had finished T1-T4 just before. The saver ran to its end at 04:28:12. CI on 824d8e7 completed with
+  no failure (04:00:38). The check-ins of 04:34 and 06:34 reached this chat at 06:36:12 UTC.
+- **Resumed 06:3x UTC:** the U8 builder by SendMessage (item 1 redone whole); the saver restarted; Block 0 continued
+  from its provider lines.

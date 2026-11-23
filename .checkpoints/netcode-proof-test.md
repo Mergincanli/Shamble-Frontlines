@@ -65,24 +65,19 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-23 03:36 UTC; the cut of 20:42-02:36 UTC: history.md:7655-7663)
-- **03:29:** U6a's fix pass DONE (FP-1 to FP-12; plants P7/P7b, P8, P9, P12-P14 fail and restored; check4 all 11 PASS,
-  749/849 = 709+40/806+43; 5,843 added, measured on the new snapshot wip/u6a-build.patch 022ddb84…, 157 under the stop;
-  the A legs of carry.rs never bite without the cap: round 2's). Part-clean 3: 8.7 GiB, free 11,253 MiB. U7's Block 0a
-  DONE at bc87d2d (pushed 07fd08a). Round 2 and U7's T-builder running (Running work).
-- **03:3x, round 2 DONE:** netcode APPROVE WITH FINDINGS (u6a-r2-netcode.md: the High and Mediums closed, 4 Lows);
-  test APPROVE WITH FINDINGS (u6a-r2-test.md: TR-U6A-1 closed by P12; TR2-U6A-1 Medium, a flake FP-4 opened: the
-  no-time steal read; 4 Lows). FP-13 (that Medium, with NR2-U6A-3) sent to the builder; the Lows' takers are in
-  u6a-fix-pass.md's last section. No third round (no Critical or High: NPT-TRIM).
-- **Earlier:** round 1 (both REVISE on one High; findings and fix list: u6a-fix-pass.md; this card at 187f0b3).
-- **03:56, U6a MERGED at 824d8e7** (pushed; CI on that head pending): FP-13 DONE; snapshot 33c9b5dd… (5,875 added, 19
-  files), 19 of 19 byte-equal; M5 (.gate/u6a-merge/m5-check.log) all 11 PASS, measured 750, bites 850, 0 failed, test
-  854.9 s; gate --no-smoke PASS; the wip patch removed; u6a-report.md.
-- **Next 1:** U6b's Block 0 on the lane (u6b-brief.md section 5 (a)-(d); security-u6b-deps.md's binding check steps 0-7,
-  evidence u6b-block0.md; dependency-check.md; the save); then `<base>`, the counts, u6b-run.sh, the size line, and
-  U6b's builder (its launch adds the U6b line's items). Beside it, off the lane: U8's fix pass now (the U8 line's items).
+## Now (2026-11-23 06:4x UTC; the cut of 03:59-06:36 UTC: history.md:7665-7673)
+- **Done since 03:56:** U6a MERGED at 824d8e7 (CI completed, no failure, 04:00:38; u6a-report.md; its round and carries:
+  u6a-fix-pass.md; this card at 3d7b952 holds the round's lines). U7's T-half DONE (T1-T4: 56 Node tests, 10 plants,
+  2,482 added; snapshot wip/u7-t-build.patch 8ab088e8…; notes u7-t-build.md: F1-F3 for the R-half, the host facts for
+  U6c's C8). U8's fix pass started 03:58, cut at 03:59 with no item done, resumed 06:37.
+- **My step, U6b's Block 0** (u6b-block0.md): steps 0-4 PASS (lock `1 65`, 235 packages, sha256 210bf2df… = security's
+  model; the feature tree as modelled; the grep's only hits are ImpairSocket::set_default); part-clean (6.2 GiB); step 5
+  running (shell bmrtxibx1: `cargo check --workspace --all-targets --locked`, then check.mjs; .gate/u6b-block0/step5-check.log).
+- **Next 1:** step 5's result (the wt tests joining the measured build, by name); step 6, cargo deny and cargo audit with
+  the database dates; step 7, dependency-check.md's U6b section (four hashes), one commit (three manifests, the lock,
+  wt.rs, wt_tests.rs, ws_config.rs), the save; then `<base>`, the counts, u6b-run.sh, the size line, U6b's builder.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
-- **Next 3:** the T-builder's return (T1-T4), its T5 (i) the day U6b merges; U4's report when a slot is free.
+- **Next 3:** U8's fix pass's return (a new snapshot); T5 (i) the day U6b merges; U4's report when a slot is free.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
@@ -146,15 +141,15 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (2 of 3) from 03:3x:** U6a's builder a95ebf14368f277ff on FP-13 (u6a-fix-pass.md; its notes
-  u6a-build.md in its worktree; resume after its last FP line); U7's T-builder a9873cdba07a3219e (general-purpose,
-  xhigh, its own worktree .claude/worktrees/agent-<ID>; T1-T4, then stops for T5) -> u7-t-build.md; resume from its
-  notes. Done: round 2's seats a9a29bd03da0757ad and a4724cf284e77b73e; security's U7 read aca2c13cc291261c6
-  (security-u7-deps.md: 0a and 0b CLEAR WITH CONDITIONS, SEC-U7D-1 to -3 Low, N-U7D-1); U7's advisor check
-  a1caa8c461475ac54. Security ab80f7d9c82f327b9
-  DONE 20:40 (security-f26.md; security-u6c-deps.md: U6c's Block 0 CLEAR WITH CONDITIONS, 5 conditions, Lows only).
-- **Shell and triggers:** the saver bbz6p4y44 (checkpoint.mjs watch, from 02:38 to about 04:28; TaskStop it, restart in
-  the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly); day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
+- **Agents running (1 of 3) from 06:37:** U8's fix-pass builder ac59cce3e5d002441 (general-purpose, xhigh, its own
+  worktree .claude/worktrees/agent-<ID>; items 1-10 of advisor-u6c-brief.md section 5 + advisor-u7-brief.md section 5 +
+  U6a's carry; its notes in its worktree's u8-build.md, "## Fix pass", copied over at its snapshot; resume after its
+  last done item). Done: U7's T-builder a9873cdba07a3219e (resumed for T5); U6a's builder a95ebf14368f277ff; round 2's
+  seats a9a29bd03da0757ad, a4724cf284e77b73e; security's U7 read aca2c13cc291261c6 (security-u7-deps.md: CLEAR WITH
+  CONDITIONS, Lows); U7's advisor check a1caa8c461475ac54; security ab80f7d9c82f327b9 (security-f26.md, -u6c-deps.md).
+- **Shells and triggers:** step 5's run bmrtxibx1 (main-run.sh); the saver bzvne7p20 (checkpoint.mjs watch, from 06:37
+  to about 08:27; TaskStop it, restart in the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5
+  (2-hourly); day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
 - **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950 (told at 20:0x, beyond its brief: the ruling's
   C9, Q-U6C-3, C1 (e), section 5 items 3 and 5, C1 (c)); U8 builder abf71d95fc07b3522 (worktree
   .claude/worktrees/agent-<ID>, kept for its fix pass, as U6a's builder's is); the U6c advisor a662f1797b78cae95.
@@ -186,8 +181,8 @@
 - **U7** (brief rev 1.1, 2026-11-23: the advisor APPROVE WITH CONDITIONS, advisor-u7-brief.md 65e109aa…, C1-C14 at
   :110-247 bind by pointer, 6 Medium, 4 Low; notes netcode-u7-brief.md): about 2,200 (Rust 660 on the lane, TS/JS 1,550
   off) plus C2-C9's 150-250; valve C11 (page bites and `wt-attempts` wait for R8 if the T-half passes 3,800). Order:
-  security's one short read for 0a and 0b (C10, running) -> Block 0a and the T-builder at once (off the lane, before
-  U6b's round) -> 0b's binding check the hour U6c merges -> the R-half Sun 29 -> one round (netcode, test; no security:
+  security's read (security-u7-deps.md, CLEAR WITH CONDITIONS) -> Block 0a DONE bc87d2d -> T-half DONE (T1-T4, 8ab088e8…,
+  2,482 added) -> 0b's binding check the hour U6c merges -> the R-half Sun 29 -> one round (netcode, test; no security:
   C12) -> merged by end Mon 30, else three lines that day. R1 holds with about a day of slack on six assumptions
   (its section 6). Its section 4 routes the contradictions; nothing else edited.
 - **Tools:** snapshot `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree> <out.patch> <prefix>`;
@@ -199,4 +194,5 @@
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - All word for word in history.md: until 2026-11-17 from :5791 on; 2026-11-18 :6921-6932; 2026-11-19 :7124-7146,
   :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559, :7618-7620;
-  2026-11-22 :7610-7617, :7623-7628 (15:47:28 to about 19:44 UTC); 2026-11-22/23 :7655-7663 (about 20:42 to 02:36 UTC).
+  2026-11-22 :7610-7617, :7623-7628 (15:47:28 to about 19:44 UTC); 2026-11-22/23 :7655-7663 (about 20:42 to 02:36 UTC);
+  2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC).
