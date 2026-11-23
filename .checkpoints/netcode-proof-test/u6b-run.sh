@@ -4,7 +4,9 @@
 # run, a check.mjs run, a `--list` or clippy confirmation, each bite run and each scratch switch or plant; otherwise
 # shared), waits until no other cargo or rustc runs, checks 4 GB free, touches every file under the copy's crates/
 # first and every 2 s while the commands run (the loop starts and stops here), and runs each command from the copy's
-# spikes/netcode-proof with CARGO_TARGET_DIR on the shared target and CARGO_NET_OFFLINE=true. Everything goes to the
+# spikes/netcode-proof with CARGO_TARGET_DIR on the shared target, CARGO_NET_OFFLINE=true and CARGO_INCREMENTAL=0
+# (2026-11-23: the incremental cache was 4.3 GB of the shared target's 10.4 GB, which put the second end check under
+# the 4 GB floor; incremental builds only cache, so no result changes, only rebuild speed). Everything goes to the
 # log file, which must be under /home/user/Shamble-Frontlines/.gate/u6b/; each command's exit code and, at the end, the
 # provenance lines (Compiling/Checking/Documenting npt-*) are appended. The sequence stops at the first command that
 # fails, and the script exits with that command's code; with `-k` (given after `-x` when both are) every command runs
@@ -19,6 +21,7 @@ T=$M/.gate/shared-target
 LOCK=$T/.lane.lock
 export CARGO_TARGET_DIR=$T
 export CARGO_NET_OFFLINE=true
+export CARGO_INCREMENTAL=0
 mode=-s
 if [ "${1:-}" = "-x" ]; then
   mode=-x
@@ -62,7 +65,7 @@ done
 avail=$(df -B1 --output=avail /home/user | tail -1 | tr -dc 0-9)
 {
   echo "lock $LOCK held ($mode) at $(date -u +%T) UTC; idle after ${i} s"
-  echo "pwd $(pwd); free $((avail/1048576)) MiB; HEAD $(git rev-parse --short HEAD); CARGO_TARGET_DIR $CARGO_TARGET_DIR"
+  echo "pwd $(pwd); free $((avail/1048576)) MiB; HEAD $(git rev-parse --short HEAD); CARGO_TARGET_DIR $CARGO_TARGET_DIR; CARGO_INCREMENTAL $CARGO_INCREMENTAL"
   echo "diff $(git diff HEAD -- . | sha256sum | cut -d' ' -f1); untracked $(git ls-files -z --others --exclude-standard -- . | xargs -0 -r sha256sum | sha256sum | cut -d' ' -f1)"
 } > "$log"
 if [ "$avail" -lt $((4*1024*1024*1024)) ]; then

@@ -7685,3 +7685,17 @@ The compact is done. Pick up exactly where you left off, rebuilding from the rep
   "I hit my usage limit while you were working, but it has reset now. Please continue from where you left off."
 - **Resumed 11:1x UTC:** no cargo left running; part-clean of the shared target's dev profile (7.5 GiB; guards ok;
   free 3,742 to 10,849 MiB); the saver restarted (brue1bd68); U6b's builder and the infra seat by SendMessage.
+
+## Cut by the spend limit (2026-11-23 about 12:28 to 16:22 UTC)
+- **The notice** (U6b's builder a2661dc320c9e6d00 and U8's fix-pass builder ac59cce3e5d002441; both tasks ended at
+  about 12:28:49 UTC, HTTP 429): "You've hit your org's monthly spend limit · ask your admin for a higher limit · your
+  5-hour limit resets 4:10pm (UTC)".
+- **What it stopped:** U6b's builder at Block 6's last test (its last words "Now add the extra measured test
+  (L2Config::named) in config.rs."); U8's fix pass 2 at item 19 (its last words "Now the item 19 test in test 7.").
+  The saver ran to its end. The worker restarted several times; the check-ins of 12:34 and 14:34 reached this chat at
+  16:22 UTC.
+- **His message**, 16:22:39 UTC (transcript line 78965, queued; it reached this chat mid-turn), word for word:
+  "I hit my usage limit while you were working, but it has reset now. Please continue from where you left off."
+- **Resumed 16:2x UTC:** no cargo left running; free 1,621 MiB (the shared target 10.4 GB, 4.3 GB of it the
+  incremental cache), part-clean 10.4 GiB (guards ok; free 10,776 MiB); u6b-run.sh now exports CARGO_INCREMENTAL=0
+  (my lean, a choice inside the plan); the saver restarted (b67t3qh7l); both builders by SendMessage.
