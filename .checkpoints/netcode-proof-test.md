@@ -75,7 +75,7 @@
   no-time steal read; 4 Lows). FP-13 (that Medium, with NR2-U6A-3) sent to the builder; the Lows' takers are in
   u6a-fix-pass.md's last section. No third round (no Critical or High: NPT-TRIM).
 - **Earlier:** round 1 (both REVISE on one High; findings and fix list: u6a-fix-pass.md; this card at 187f0b3).
-- **03:58, U6a MERGED at 824d8e7** (pushed; CI on that head pending): FP-13 DONE; snapshot 33c9b5dd… (5,875 added, 19
+- **03:56, U6a MERGED at 824d8e7** (pushed; CI on that head pending): FP-13 DONE; snapshot 33c9b5dd… (5,875 added, 19
   files), 19 of 19 byte-equal; M5 (.gate/u6a-merge/m5-check.log) all 11 PASS, measured 750, bites 850, 0 failed, test
   854.9 s; gate --no-smoke PASS; the wip patch removed; u6a-report.md.
 - **Next 1:** U6b's Block 0 on the lane (u6b-brief.md section 5 (a)-(d); security-u6b-deps.md's binding check steps 0-7,
@@ -158,7 +158,7 @@
 - **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950 (told at 20:0x, beyond its brief: the ruling's
   C9, Q-U6C-3, C1 (e), section 5 items 3 and 5, C1 (c)); U8 builder abf71d95fc07b3522 (worktree
   .claude/worktrees/agent-<ID>, kept for its fix pass, as U6a's builder's is); the U6c advisor a662f1797b78cae95.
-- **U6a MERGED at 824d8e7 (2026-11-23 03:58; u6a-report.md; carries in u6a-fix-pass.md's last section).** Before: (brief rev 1.1, c109691a…; `<base>` aa5c62b, 709/806; runner u6a-run.sh): BUILT, 5,460 added (stop past
+- **U6a MERGED at 824d8e7 (2026-11-23 03:56; u6a-report.md; carries in u6a-fix-pass.md's last section).** Before: (brief rev 1.1, c109691a…; `<base>` aa5c62b, 709/806; runner u6a-run.sh): BUILT, 5,460 added (stop past
   6,000); check3 all 11 PASS (744/844, +35/+38; test 866.8 s); plants P1-P11 each fail their named test, restored; 3
   bites by name; 20 starts p50 634 ms, max 979 ms (debug, container, not judged); final tree = wip/u6a-build.patch
   a9f8b6e0… (checked twice); notes u6a-build.md (copy here). The builder's F1, F3, F4, F7, F9, O1, O2 go to the round.
