@@ -39,3 +39,81 @@ Scratch: `.gate/ci-wasm/verifier/` (under the worktree). Main-folder never switc
   and cmp-equal; the two lines printf planted.tar.gz + verify-asset on it); ce5a7e7 only, 0/2, 56d37fc6.
   `git rev-list --full-history origin/main..HEAD -- .github` = 4, no merges in range; `.claude`, `tools`, CLAUDE.md
   (the only one) equal main's; gate.yml blob 1f3f0509 unchanged.
+- 21:58Z C3 PASS (for the 8 files from this chat; the 7 thread files: not verifiable here). Own script
+  `verifier/words-compare.mjs` (by uuid, body after "\n---\n" minus the final "\n"): 8 of 8 byte-equal with the
+  transcript entry, header bytes and sha256 equal: 163046 typed auto 4353; 163316 queued 120; 171507 typed **auto**
+  1385; 172242 typed **default** 75; 184057 typed default 1324; 195823 typed **default** 884; 204759 typed **default**
+  1006; 212459 queued 744. Queue-operation entries: every human enqueue is one of these 8 (no other message of his).
+  The 7 thread files (142503..151101): self-consistent with their own headers, last changed at cc78f39 (15:12Z, before
+  this chat). Writes, from the transcript's own tool calls (`verifier/github-writes.mjs`; all 64 calls naming .github
+  read: only 4 cp's write there; no Write/Edit targets .github): cp at 17:23:24.626 (result 17:23:43.732) after yes
+  17:22:42.519; 19:58:54.759 (20:00:41.601) after 19:58:23.131; 20:48:26.695 (20:48:40.739) after 20:47:59.800;
+  21:01:13.963 (21:01:33.525) take-back, his yes in advance 20:47:59. Commits: cb476b1 17:24:14, 2a654f3 20:00:55,
+  47d7024 20:48:50, ce5a7e7 21:01:41: each after its yes; nothing written at 17:15:07 (auto). Guard: each cp got a
+  PreToolUse "ask" and the result's permissionDecision {accept, user_temporary, once} (write 1 at 17:23:43.732Z: the
+  card is right; the main session's 21:49:27 one-off script printed 18:41:12 config/cliArg for write 1, a false match
+  on its own 18:41:12 search command: Low, not in the report template line 77). `decisions-3.mjs --check`: every line
+  yes, exit 0; DECISIONS sha256 b9190191...b857 and `git status` unchanged.
+- 22:00Z C4 (script part). 36 runs on the branch, all attempt 1 (no re-run); failures only cb476b1 (stop), 45a6f0e,
+  47d7024, 8d2ce32 (plants). Job ids -> commits by the API: 2a654f3 137974047720/137974099620, d6e4fb6
+  137981826960/137981878828, ce5a7e7 138010909634/138010956116, head 138036214520/138036262546. My own re-fetch of 14
+  logs == the pre-fetched copies byte for byte. `python3 -B -I .gate/ci-wasm/stop-rule-check.py` on the 8 clean logs:
+  ALL, 18 of 18 yes each; jobs 146/138/138/135/138/142/147/135 s; gh 2.104.0; Chrome 157.0.8103.78; size tables 4;
+  install lines exact; Wasm 28991 bytes sha256 22dad2eb...018b on all 8.
+- 22:04Z C4 PASS. Read by hand against plan s9's sentence: head push 138036214520 and 2a654f3 push 137974047720
+  (same line numbers in both): 249 final address release-assets.githubusercontent.com; 250 "size: 11860397"; 251
+  archive ": OK"; 270 gh 2.104.0; 276 success line naming release 0.2.130; 310-316 seven members (folder + 6);
+  308 install step env "WB_TOOL: /wasm-bindgen-0.2.130/wasm-bindgen"; 317-320 the four install lines in order, nothing
+  between ("/" = "mode 755, owner root:root, 4096 bytes, /"); 437/442 uid=1001(runner), "the network is cut: no TCP
+  connection to 140.82.114.3:443 (curl exit 7)" (2a654f3: 48.200.82.112); 4 size tables 835-862; 880 "Tests 7 passed
+  (7)" between the boundary echo 873 and the type-check echo 884; 884->885 nothing printed, and the cut runs
+  `bash -euo pipefail`, so the five tsc lines exited 0; 887 "Google Chrome 157.0.8103.78"; 889 "Running 12 tests using
+  1 worker"; 12 ticks; 915 "12 passed (1.1m)"; 0 failed/flaky/retry/x-mark/##[error] lines; 147 s and 146 s; image
+  ubuntu-24.04 20261116.133.1; token "Contents: read, Metadata: read". Recorded only: backend "WebGL 2 fallback"
+  (SwiftShader) on the default run; Wasm 28991 bytes 22dad2eb...018b.
+  GitHub's check, whole (head push log lines 270-276; `gh --version` then `gh release verify-asset`):
+    gh version 2.104.0 (2026-11-12)
+    https://github.com/cli/cli/releases/tag/v2.104.0
+    Calculated digest for wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz: sha256:9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f
+    Resolved tag 0.2.130 to sha1:c93b8ae848d4d9e6beaeaf9516e18a7cadd818a2
+    Loaded attestation from GitHub API
+    (empty line)
+    ✓ Verification succeeded! wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz is present in release 0.2.130
+- 22:08Z C5 PASS. cb476b1 push job 137877549845 (image 20261116.376.1, lines 313-317) and pull request job
+  137877597017 (20261116.133.1, lines 325-329), both in step "The tool's one program": "mode 555 ... /opt/wasm-
+  bindgen-0.2.130/wasm-bindgen", "mode 755 ... /opt/wasm-bindgen-0.2.130", "mode 777, owner root:root, 4096 bytes,
+  /opt", "/opt/wasm-bindgen-0.2.130 or /opt is not owned by root, or others than root may write in it",
+  "##[error]Process completed with exit code 1."; jobs done 17:25:24Z / 17:25:33Z. Pushes: local reflog of
+  origin/claude/loving-hopper-6p0mg2 and GitHub's activity API agree: 17:24:58 8dfa2f2->cb476b1, next 18:42:48
+  cb476b1->d4b7e3b (after 18:40:57.810); 5a0a852 (17:25:32) and 7a46f88 (17:28:29) went up only then. All 22 pushes
+  plain "push" (no force_push), by Mergincanli; no push while a run of the previous head was going (no run cancelled).
+- 22:08Z NOTE (moved head): during this check the main session committed 1564cd0 (21:52:09, notes only, [skip ci])
+  in this worktree and pushed it (21:52:13): PR #64's head is now 1564cd0, with 0 workflow runs; outside
+  `.checkpoints/` it equals 6d0b5b1. Checks from here use the explicit sha 6d0b5b1, not HEAD.
+- 22:14Z C6 PASS. P-BROWSER 45a6f0e (render-counts.json "WebGL 2 fallback" drawCalls 3->4, one line) -> d6e4fb6 (blob
+  011b4ae back; tree outside .checkpoints = 2a654f3's): jobs 137977706424 / 137977761665 fail only at step 10 (API),
+  after install lines, the cut, "Tests 7 passed (7)" (boundary) and Chrome; tests 8 and 9 x, "Error:
+  expect(received).toEqual(expected)", '-   "drawCalls": 4,' / '+   "drawCalls": 3,', "2 failed", "10 passed
+  (1.1m)"; 0 retry lines. P-GH 47d7024 -> ce5a7e7 (blob b5bb7cb back): jobs 138003254035 / 138003287607: step 7
+  "GitHub's own check of the archive (gh release verify-asset)" failure, steps 8, 9, 10 skipped (API); between "gh
+  version 2.104.0" and "##[error]" only "attestation for 0.2.130 does not contain subject sha256:27c24e42...6e10";
+  `printf 'not an asset of the release\n' | sha256sum` = 27c24e42e238...6e10 (computed here). P-BOUNDARY 8d2ce32
+  (sim-wasm.test.mjs:31 toBe(30)->31) -> 6d0b5b1 (blob ded0fb2c back, = 2a654f3's): jobs 138029769180 / 138029828871
+  fail only at step 10: "AssertionError: expected 30 to be 31", "Tests  1 failed | 6 passed (7)", then ##[error] and
+  nothing from the script after it. Origin: test-engineer review 1 (Medium, B9); the report draft names it as beyond
+  the plan. Trees: `git diff --stat 280f31c 6d0b5b1 -- . ':(exclude).checkpoints' ':(exclude)docs'` empty; vs 2a654f3
+  only build-checks.mjs (4 +-) and build-checks.test.mjs (+1), diff sha256 7a851fac... = 280f31c's own diff.
+- 22:20Z C7 PASS. `git worktree add --detach .gate/verifier-main origin/main` (f5030a3; left in place). `node --test`
+  per file, TMPDIR = the session scratchpad for both trees (tests write only in mkdtemp folders): main
+  routine-guard 1107/1107 pass, settings 127/127, checkpoint 33/33, fail 0; head (worktree at 1564cd0, `.claude/`
+  == 6d0b5b1's) 1107/1107, 127/127, 33/33, fail 0; 0 "not ok" lines in all six outputs (verifier/kit-*.txt).
+- 22:20Z C8 PASS. 280f31c: pattern + RUSTC_BOOTSTRAP, CARGO_INCREMENTAL, RESOLVER in the CARGO_(...)_.* family; the
+  test's refused list + the 3 names. Harness `verifier/build-checks-harness.mjs` on a byte copy of 6d0b5b1's module
+  (624d2f12...9062) and workflow (56d37fc6): 31 of 31 ok: the 3 refused alone and together; CARGO_TARGET_DIR,
+  CARGO_BUILD_TARGET_DIR pass; the 11 names of the cut's env -i list read from workflow lines 142-145 (HOME PATH USER
+  CI LANG PROBE_IP CARGO_HOME RUSTUP_HOME RUSTUP_AUTO_INSTALL npm_config_update_notifier SHAMBLE_WASM_BINDGEN) pass;
+  every probe refused by the old pattern still refused; new refusals among probes only CARGO_RESOLVER_*; lookalikes
+  (XCARGO_INCREMENTAL, CARGO_INCREMENTALX, RUSTC_BOOTSTRAPX, CARGO_RESOLVER, ...) pass. Runner: head push job
+  138036214520 checked out 6d0b5b1 (git log -1), pr job d667882 = merge of 6d0b5b1 into f5030a3; "✓
+  scripts/build-checks.test.mjs (18 tests) 36ms", "Tests  49 passed (49)". (18 and 49 equal 2a654f3's counts: the fix
+  extends one test's list, it adds no test.)
