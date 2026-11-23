@@ -59,6 +59,14 @@ SERIES.md or a manifest; if a fix seems to need one, stop that item and say so.
 - **FP-12 (TR-U6A-10 Low):** host_step's test (crates/bots/tests/host_step.rs:85-113) gains a leg with the forge
   behaviour, asserting `out.reliable` holds the forged message.
 
+- **FP-13 (round 2, 2026-11-23: TR2-U6A-1 Medium, with NR2-U6A-3; u6a-r2-test.md, u6a-r2-netcode.md):** FP-4 made a
+  steal read with no time elapsed (no jiffy between two /proc/stat reads) count as a failed read: its key is left out
+  with a false "failed" stderr line (tick_loop.rs:1037-1046), and the pinned test (tick_loop/tests.rs:843-851) wants
+  steal_permille on every second record, so a writer lag of about 300 ms can fail it. Tell "no time" apart from a
+  failed read (no stderr line for it), exempt the final partial second in the pinned test, and add one unit test for
+  the no-time case (two equal /proc/stat texts: no key, no failure flag). About 10-20 lines; no other change. After it:
+  rustfmt's diff by Edit; clippy and the touched tests through the runner (`--locked`); P9 once more on the final tree.
+
 ## Plants (scratch edits, one `-x -k` runner call each, restored and sha256-checked, on the final tree)
 - Re-run on the final tree: P7 and P7b (TR-U6A-11; carry.rs changes in FP-7), P8 (FP-3 touches affinity), P9 (FP-4
   touches the steal path). Each fails its named test as before.
@@ -80,3 +88,10 @@ version, content hash and `mode_hash` in one home with a test) to U6b and U7; F4
 the first run that times the tick under S1); F1's room half of register 96 stays open; TR-U6A-12 and section 3's
 not-verified gaps go into the merge report; NR-U6A-1's U8 carry (npt-super's log takes the room's run id; npt-super
 ends by its stdin closing, never by a kill) to U8's fix pass.
+Round 2's Lows: NR2-U6A-1 to U8's fix pass (npt-super's log takes the room's run id and the same eight header values,
+set, role, layer, profile, date, scene, tick_hz and bite, from one source, bite runs included; npt-super now needs
+`--scene` and `--tick-hz`); NR2-U6A-2 to U6b (exited I/O tids left out of sibling_free); to the merge report:
+NR2-U6A-4 (the new pub `TickLoop::io_on_a_tick_sibling`), TR2-U6A-2 (C-U6-17's A half holds by option A's own rule;
+its legs are a non-regression run), the fix-pass plants ran without `--locked`, the recorded 20-start command lacks
+the new flags, FP-2's and FP-3's paths in the binary and in affinity() are reached by no test, and the double-load
+bite shares the 5 s cap with its own 2 s of sleeps.

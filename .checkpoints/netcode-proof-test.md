@@ -70,16 +70,15 @@
   749/849 = 709+40/806+43; 5,843 added, measured on the new snapshot wip/u6a-build.patch 022ddb84…, 157 under the stop;
   the A legs of carry.rs never bite without the cap: round 2's). Part-clean 3: 8.7 GiB, free 11,253 MiB. U7's Block 0a
   DONE at bc87d2d (pushed 07fd08a). Round 2 and U7's T-builder running (Running work).
-- **03:3x, round 2's netcode seat:** APPROVE WITH FINDINGS (u6a-r2-netcode.md): NR-U6A-1 to -4 closed; 4 Lows: NR2-U6A-1
-  U8's carry adds "the same eight header values from one source, bite runs included"; -2 to U6b (exited I/O tids left out
-  of sibling_free); -3 the no-jiffy stderr wording and a rare steal flake in the pinned test; -4 the report names
-  `TickLoop::io_on_a_tick_sibling`. Waiting on the test seat.
+- **03:3x, round 2 DONE:** netcode APPROVE WITH FINDINGS (u6a-r2-netcode.md: the High and Mediums closed, 4 Lows);
+  test APPROVE WITH FINDINGS (u6a-r2-test.md: TR-U6A-1 closed by P12; TR2-U6A-1 Medium, a flake FP-4 opened: the
+  no-time steal read; 4 Lows). FP-13 (that Medium, with NR2-U6A-3) sent to the builder; the Lows' takers are in
+  u6a-fix-pass.md's last section. No third round (no Critical or High: NPT-TRIM).
 - **Earlier:** U6a's round 1 DONE: both seats REVISE on one shared High
   (NR-U6A-1 = TR-U6A-1: npt-super's header lacks the run's bite, tick_hz and scene, so its run goes INVALID); Mediums
   NR-U6A-2, -3, TR-U6A-2, -3, -4; Lows NR-U6A-4 to -8, TR-U6A-5 to -12. The fix list: u6a-fix-pass.md (FP-1 to FP-12,
   plants P7, P7b, P8, P9 again and new P12-P14, check4; its last section names every carry's taker).
-- **Next 1:** when round 2 returns: any fixes by the U6a builder (SendMessage; SIZE-CHECK: 157 lines left), a new
-  snapshot, then M3-M9: part-clean if the disk needs it, `git apply --check` and `git apply` in the main folder,
+- **Next 1:** when FP-13 returns (SIZE-CHECK: 157 lines left before it): a new snapshot, then M3-M9: part-clean if the disk needs it, `git apply --check` and `git apply` in the main folder,
   cmp-equal to the worktree, M5 check.mjs via main-run.sh in the background, gate --no-smoke, one commit, push, CI.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
 - **Next 3:** after U6a's merge: U6b's Block 0 and builder (its launch adds the U6b line's items), U8's fix pass (the
@@ -88,6 +87,8 @@
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
   TR-U6A-5 to U6d; F4's S1 burn to U6e (the netcode seat's suggestion); FP-6: no rule changed on a difference.
+- **2026-11-23, U6a's round 2 (my lean):** its one Medium (a flake the fix pass opened) fixed now as FP-13 with no third
+  round (NPT-TRIM: a third only for a Critical or High); its Lows to carries and the merge report.
 - **2026-11-23, U7's brief (advisor-u7-brief.md):** Q-U7-1 (a), U8's save() writes the header now; Q-U7-2 the three
   constants in npt-proto and the tags in npt-link, by U6b; Q-U7-3 one constant (9) bound at compile time; Q-U7-4
   wt-attempts with a bounded hash=wrong control; the valve at 3,800; no security seat in U7's round. Mine: rev 1.1
@@ -145,12 +146,12 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (3 of 3) from 03:2x:** U6a's round 2, the netcode seat a9a29bd03da0757ad -> u6a-r2-netcode.md
-  and the test seat a4724cf284e77b73e -> u6a-r2-test.md (each resumed by SendMessage; resume from its file); U7's
-  T-builder a9873cdba07a3219e (general-purpose, xhigh, its own worktree .claude/worktrees/agent-<ID>; T1-T4, then stops
-  for T5) -> u7-t-build.md; resume from its notes. Done: U6a's builder a95ebf14368f277ff (fix pass; kept for round 2's
-  fixes); security's U7 read aca2c13cc291261c6 (security-u7-deps.md: 0a and 0b CLEAR WITH CONDITIONS, SEC-U7D-1 to -3
-  Low, N-U7D-1); U7's advisor check a1caa8c461475ac54. Security ab80f7d9c82f327b9
+- **Agents running (2 of 3) from 03:3x:** U6a's builder a95ebf14368f277ff on FP-13 (u6a-fix-pass.md; its notes
+  u6a-build.md in its worktree; resume after its last FP line); U7's T-builder a9873cdba07a3219e (general-purpose,
+  xhigh, its own worktree .claude/worktrees/agent-<ID>; T1-T4, then stops for T5) -> u7-t-build.md; resume from its
+  notes. Done: round 2's seats a9a29bd03da0757ad and a4724cf284e77b73e; security's U7 read aca2c13cc291261c6
+  (security-u7-deps.md: 0a and 0b CLEAR WITH CONDITIONS, SEC-U7D-1 to -3 Low, N-U7D-1); U7's advisor check
+  a1caa8c461475ac54. Security ab80f7d9c82f327b9
   DONE 20:40 (security-f26.md; security-u6c-deps.md: U6c's Block 0 CLEAR WITH CONDITIONS, 5 conditions, Lows only).
 - **Shell and triggers:** the saver bbz6p4y44 (checkpoint.mjs watch, from 02:38 to about 04:28; TaskStop it, restart in
   the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly); day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
