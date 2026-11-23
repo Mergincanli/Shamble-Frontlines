@@ -305,3 +305,35 @@ Start: `git merge --ff-only 21765e3` in the worktree; `git rev-parse HEAD` = 217
   u6b_each_record_reaches_the_file_while_npt_super_runs FAILED super/src/main.rs:624; restored d6293d37 ok.
 - All 20 plants (P1-P11, P14, P14b, P15, P15b, P16-P20) fail their named tests on this tree; every plant file back at
   its hash, and `git diff HEAD -- .` = 219ee92e...0fef, fx-check1's (23:0x UTC). Next: check.mjs run 2 (counted).
+- check.mjs run 2 (counted) started 23:02 UTC: .gate/u6b/fx-check2.log (-x, both --no-run builds first). Item 8's
+  scratch files are written: .checkpoints/netcode-proof-test/u6b-starts/settings.json (P2, 48 clients, both transports,
+  relative log/token/hash paths) and starts.sh (20 starts, each in a fresh folder; spawn-to-OPEN by date +%s%N; exit).
+- COUNTED check.mjs run 2 (fx-check2.log, 23:02-23:18 UTC, -x; free 6,672 MiB; diff 219ee92e...0fef = run 1's and
+  the plants' tree): all 11 steps PASS (fmt, clippy, clippy-wasm32, doc, test 848.5 s, deps, wasm, refs, marks 81,
+  self 78/78, redact 11/11, 0 findings). Counts: measured 807 (+53 on <base>'s 754; +8 on the snapshot's 799), bites
+  904 (+54 on 850; +6 on 898). Test step 848.5 s against 954.8 s (0.89x).
+- Item 8, the release build (fx-release.log, 23:19 UTC, -x, `cargo build --locked --release -p npt-server`, default
+  features, no bites; 20.0 s; diff 219ee92e = the counted run's): shared-target/release/npt-server, 7,936,032 B.
+  Next: the starts (fx-starts.log).
+- Item 8, the 20 starts (fx-starts.log, 23:19:48-23:19:50 UTC, through the runner -x; its diff 219ee92e...0fef = the
+  counted check's; free 6,661 MiB): release npt-server sha256 f78dd20a...150a (default features, no bites); machine 4
+  vCPUs, Intel Xeon @ 2.30GHz (the container); settings u6b-starts/settings.json sha256 693818d8...964a (P2, 48
+  clients, transport both on 127.0.0.1:0, the dev certificate made at each start); each start in its own new folder
+  under the scratchpad's u6b-starts-run/start-<n> (fresh tokens, room.jsonl, hash.json); command per start
+  `(cd <folder> && npt-server --settings <settings.json>)`, stdin closed after OPEN. spawn_to_open_ns (the script's
+  date +%s%N around spawn and the OPEN line), starts 1-20: 17,780,412; 18,415,830; 17,643,650; 19,392,905; 18,177,288;
+  21,126,391; 25,165,111; 24,223,004; 19,702,001; 22,725,815; 23,060,573; 21,927,238; 18,594,728; 18,281,177;
+  18,731,760; 18,627,981; 19,605,697; 19,455,076; 20,756,055; 20,106,935. Every first line OPEN, every exit 0; no
+  failure. p50 19.46 ms (the 10th of 20 sorted), max 25.17 ms. These replace U6a's lower bound: both listeners and
+  the certificate are in the start now. Reported, never judged (a container; RS is R1's).
+- FIX PASS DONE (23:2x UTC): items 0-8 as above; final SIZE 5,952 added, 267 removed, 28 files (snapshot 5,498/254/29:
+  ws_gate.rs back to <base>). Out of lane: nothing (proto's +9 is the build's added item 1, untouched here; no
+  Cargo.toml/lock, marks.json, judge, room, client, bots change). The plants' blobs (git hash-object -w) are loose
+  objects only: no index, ref or commit change. Nothing committed.
+- Item 8's own wording: npt-super time-starts not used (its {n} replaces the settings path only, so every start would
+  share one token, log and hash path; create_new refuses the second); the script measures on its own clock instead.
+- Next (after fx-check2.log ends and its lines are written here): the release build through the runner,
+  `u6b-run.sh -x <wt> .gate/u6b/fx-release.log cargo build --locked --release -p npt-server`; then the starts through
+  the runner, `u6b-run.sh -x <wt> .gate/u6b/fx-starts.log bash <notes>/u6b-starts/starts.sh
+  /home/user/Shamble-Frontlines/.gate/shared-target/release/npt-server <notes>/u6b-starts/settings.json
+  <scratchpad>/u6b-starts-run`; its diff line must equal fx-check2's.
