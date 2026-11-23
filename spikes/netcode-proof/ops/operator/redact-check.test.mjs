@@ -58,6 +58,15 @@ test("an npm tarball path on the registry is no host name (F26), and nothing els
   const host = `ip-${pub4.replaceAll(".", "-")}.registry.npmjs.org`;
   const both = ["address in a host name", "address in a host name"];
   assert.deepEqual(kinds(`https://${host}/x/-/x-${file}`), both, "an address-shaped host, and its path keeps the reading");
+  // The path form and the end bound (SEC-F26-1): a URL without `/-/` or `.tgz` is no tarball path, and a host name
+  // after the tarball URL, on its line or the next, keeps its reading.
+  const one = ["address in a host name"];
+  assert.deepEqual(kinds(`https://registry.npmjs.org/crc-32/${file}`), one, "no /-/ in the path");
+  assert.deepEqual(kinds(`https://registry.npmjs.org/crc-32/-/${file.replace(/tgz$/, "tar")}`), one, "no .tgz");
+  const lock = `"resolved": "https://registry.npmjs.org/crc-32/-/${file}",`;
+  const after = `then ip-${pub4.replaceAll(".", "-")}.example`;
+  assert.deepEqual(kinds(`${lock} ${after}`), one, "a host name after the URL, on its line");
+  assert.deepEqual(kinds(`${lock}\n${after}`), one, "a host name after the URL, on the next line");
 });
 
 test("versions, dates, times and Rust paths are not addresses", () => {
