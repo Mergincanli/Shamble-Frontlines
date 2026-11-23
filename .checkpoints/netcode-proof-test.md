@@ -65,15 +65,13 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-23 06:4x UTC; the cut of 03:59-06:36 UTC: history.md:7665-7673)
-- **Done since 03:56:** U6a MERGED at 824d8e7 (CI completed, no failure, 04:00:38; u6a-report.md; its round and carries:
-  u6a-fix-pass.md; this card at 3d7b952 holds the round's lines). U7's T-half DONE (T1-T4: 56 Node tests, 10 plants,
-  2,482 added; snapshot wip/u7-t-build.patch 8ab088e8…; notes u7-t-build.md: F1-F3 for the R-half, the host facts for
-  U6c's C8). U8's fix pass started 03:58, cut at 03:59 with no item done, resumed 06:37.
+## Now (2026-11-23 07:1x UTC; the cut of 03:59-06:36 UTC: history.md:7665-7673)
+- **Done since 03:56:** U6a MERGED at 824d8e7 (u6a-report.md; round: u6a-fix-pass.md). U7's T-half DONE (8ab088e8…,
+  2,482 added; u7-t-build.md: F1-F3 for the R-half, the host facts for U6c's C8). U8's fix pass resumed 06:37.
 - **07:0x, U6b's Block 0 DONE at ae4f57e** (u6b-block0.md, steps 0-7 PASS): lock `1 65`, 235 packages, sha256 =
   security's model; ring only, no aws-lc-rs; cargo check no warning; check.mjs all 11 PASS (fmt after one hunk),
   measured 754 (+ the four wt tests, by name), bites 850; cargo-deny ok; cargo-audit 0 vulnerabilities (databases
-  07:00 UTC); dependency-check.md's U6b section; the save pushes it (DEP-HOLD released).
+  07:00 UTC); dependency-check.md's U6b section; pushed at 21765e3 (DEP-HOLD released): CI completed, no failure, 07:06.
 - **07:0x:** U8's fix pass DONE (items 1-10; Node 75/0, wrappers 299/0; plants P8, P9; redact PASS; snapshot
   wip/u8-build.patch 60205020…, 4,957 added, 42 files, base 096808b; notes u8-build.md "## Fix pass"). Its F28 (npt-super's
   log reaches disk only at its end: every RS room start would time out) went to U6b as item 5. For Stop B's netcode seat:
@@ -83,8 +81,10 @@
   NR2-U6A-2, F28, and the valve (Block 5's reader stamp and BudgetX2 last; past 5,400 they wait for U6e if R1 reads neither).
 - **Next 1:** U6b's return: snapshot, its one round (netcode, test, security: transports face the internet), fixes, merge.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
-- **Next 3:** Stop B's round, U8's one round (security, infra, netcode at xhigh: u8-brief.md section 7 and C9), may start
-  now its fix pass is in (lever (2), advisor-u6c-brief.md:195-197), in the slots U6b's round leaves; U4's report; T5 (i).
+- **07:1x, Stop B's round started** (U8's one round, lever (2), advisor-u6c-brief.md:195-197; on snapshot 60205020 in
+  the fix-pass worktree): security and netcode seats (xhigh), files u8-stopb-security.md, u8-stopb-netcode.md.
+- **Next 3:** Stop B's infra seat (u8-stopb-infra.md, INF-SB-n; its items: F13, the path unit's restart, F14, F27, F11,
+  ADV-U8-11, -14, C4, C6, C7, cost and outages) when a slot frees; then one ruling and U8's fix pass; U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
@@ -150,27 +150,24 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (1 of 3) from 07:0x:** U6b's builder a2661dc320c9e6d00 (general-purpose, xhigh, its own worktree
+- **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
   .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
-  at its snapshot; resume after its last block marked done). Done: U8's fix-pass builder ac59cce3e5d002441 (Stop B's
-  fixes, if any, by SendMessage); U7's T-builder a9873cdba07a3219e (resumed for T5); U6a's builder a95ebf14368f277ff; round 2's
+  at its snapshot; resume after its last block marked done); from 07:1x Stop B's security seat af8c5f0fbec829595 and
+  netcode seat a120f51df9a8f6986 (each rewrites its file whole per part; resume from its file). Done: U8's fix-pass
+  builder ac59cce3e5d002441 (Stop B's fixes by SendMessage); U7's T-builder a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
   seats a9a29bd03da0757ad, a4724cf284e77b73e; security's U7 read aca2c13cc291261c6 (security-u7-deps.md: CLEAR WITH
   CONDITIONS, Lows); U7's advisor check a1caa8c461475ac54; security ab80f7d9c82f327b9 (security-f26.md, -u6c-deps.md).
 - **Shells and triggers:** the saver bzvne7p20 (checkpoint.mjs watch, from 06:37
   to about 08:27; TaskStop it, restart in the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5
   (2-hourly); day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
-- **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950 (told at 20:0x, beyond its brief: the ruling's
-  C9, Q-U6C-3, C1 (e), section 5 items 3 and 5, C1 (c)); U8 builder abf71d95fc07b3522 (worktree
-  .claude/worktrees/agent-<ID>, kept for its fix pass, as U6a's builder's is); the U6c advisor a662f1797b78cae95.
+- **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950; U8 builder abf71d95fc07b3522 (its worktree kept:
+  ops/browser/node_modules for test 4); the U6c advisor a662f1797b78cae95.
 - **U6a MERGED at 824d8e7 (2026-11-23 03:56):** u6a-report.md (build, M5, carries by number); the carries' takers in
   u6a-fix-pass.md's last section; its build lines on this card at 21765e3. Merge M3-M9 as U4f's (history.md:7022-7028).
 - **U8** BUILT and fix pass DONE (4,957 added, 42 files; wip/u8-build.patch 60205020…; notes u8-build.md, F1-F28 and
-  "## Fix pass"; R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 40 min). Stop B's round (Now, Next 3)
-  reads sbin/, sudoers.d/, cloud-init, firewall lists, operator files and hook, config.mjs, lib.mjs with F25 (WebdriverIO
-  sets Edge's `allowedIps` to any; lib.mjs starts msedgedriver itself), F13, F16, F22; its netcode seat R1.md §4-5, s14/,
-  r1.sh's probe_presence, `alone`, C5; for the advisor F9, F17 (C12 (f) has no tolerance; S14's window and burst fixed
-  in compare.py), F20 (other R1 bites not placed). Not run on a VM. `node --test ops/` fails on Node 22.23: use
-  `'ops/**/*.test.mjs'`.
+  "## Fix pass"; R1 3.55 h of 4 h billed, cap EUR 0.80, him about 2 h 40 min). Stop B's round (Now): each seat's
+  reading list is in its prompt; for the ruling also F9, F12, F17, F20. Not run on a VM. `node --test ops/` fails on
+  Node 22.23: use `'ops/**/*.test.mjs'`.
 - **F26 (mine, from 2ad2829):** FIXED at 2a9498d (the ruling's section 6; tests 11/11; plant shown, restored 2609bc87;
   scan 0 findings; CI green on 8412c6b); security CLEAR WITH CONDITIONS (SEC-F26-1 Low: asserts and 2 plants in the
   test file only, at U6a's merge or deferred by the advisor; -2 Low accepted).
