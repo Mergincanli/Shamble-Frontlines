@@ -65,19 +65,22 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-23 02:4x UTC, resumed after the cut of 20:42-02:36 UTC, history.md:7655-7663)
-- **My step:** the day message sent late (msg-2026-11-23.md); waiting on the test seat (resumed 02:38). The netcode
-  seat DONE, REVISE: NR-U6A-1 High (npt-super's header: bite None, tick_hz 0, scene "", so its run goes INVALID); -2,
-  -3 Medium (Q-U6A-5's SMT-sibling refusal not built; a failed /proc walk writes alone 1); 5 Lows (-4, -8 fix; -5,
-  -6, -7 carries to U6d, U6e, U6b). The test seat so far (its notes): TR-U6A-1 High = NR-U6A-1; -2, -3 Medium.
-- **Next 1:** when the test seat returns, one fix message to the U6a builder (both seats' Mediums and up, -4, -8, the
-  test seat's Lows by its table); U7's advisor check (u7-brief.md c9e1fb33…, as U6c's) at the next wake.
+## Now (2026-11-23 02:5x UTC; the cut of 20:42-02:36 UTC: history.md:7655-7663)
+- **My step:** waiting on two agents (Running work). U6a's round 1 DONE: both seats REVISE on one shared High
+  (NR-U6A-1 = TR-U6A-1: npt-super's header lacks the run's bite, tick_hz and scene, so its run goes INVALID); Mediums
+  NR-U6A-2, -3, TR-U6A-2, -3, -4; Lows NR-U6A-4 to -8, TR-U6A-5 to -12. The fix list: u6a-fix-pass.md (FP-1 to FP-12,
+  plants P7, P7b, P8, P9 again and new P12-P14, check4; its last section names every carry's taker).
+- **Next 1:** when the builder returns: snapshot (worktree_patch.py -> wip/u6a-build.patch), round 2 on what changed
+  (the netcode and test seats by SendMessage; FP-6's rule if a tick differed), then M3-M9: part-clean, `git apply
+  --check` and `git apply` in the main folder, cmp-equal to the worktree, M5 check.mjs via main-run.sh in the
+  background, gate --no-smoke, one commit, push, CI.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
-- **Next 3:** the round's fixes by SendMessage to the U6a builder; M3-M9 (part-clean, `git apply --check` and `git
-  apply` in the main folder, cmp-equal to the worktree, M5 check.mjs via main-run.sh in the background, gate
-  --no-smoke, one commit, push, CI); then U6b's Block 0 and builder, U8's fix pass, U7's Block 0a after its check.
+- **Next 3:** U6b's Block 0 and builder (its launch adds NR-U6A-7 and O2), U8's fix pass (adds NR-U6A-1's U8 carry),
+  U7's Block 0a after its check.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
+- **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
+  TR-U6A-5 to U6d; F4's S1 burn to U6e (the netcode seat's suggestion); FP-6: no rule changed on a difference.
 - Each named in its day's message: 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at 9341c90 holds them);
   2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
 
@@ -90,6 +93,8 @@
    the final tree, no wip patches, PROMOTE's one-pager, the readings to confirm, U4j's open findings.
 
 ## Open findings (inside the plan; each with its taker)
+- **U6a's carries:** u6a-fix-pass.md's last section (NR-U6A-5 U6d, -6 U6e, -7 U6b; O1 U6d; O2 U6b and U7; F4 U6e; F1
+  open; NR-U6A-1's U8 carry). **SEC-F26-1** (Low, mine): asserts and 2 plants in redact-check.test.mjs before #40 ready.
 - **U4f's brief, its 9.2:** taken by U4f: RR-CB-2, TE-B1-R2-1 with RR2-B1-1, RR-B1-7 (1); left with their takers:
   C62H-BOUND's judge Lows (JDG-ONLY-1), TE-CBH-5 = NA-CBB-1 (c-u4r-runs.mjs's next change), U3C-HELD-1's eight
   (npt-net's next change: u3c-held-1/build.md:116-122), CHECK-NFF-1 (check.mjs's next owner), ADV-CBR-1 (U4g).
@@ -129,18 +134,17 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (1 of 3):** (1) security ab80f7d9c82f327b9: DONE 20:40 (security-f26.md, security-u6c-deps.md:
-  U6c's Block 0 CLEAR WITH CONDITIONS, 5 conditions, SEC-U6CD-1 to -4 Low, lock 235 -> 252 modelled). (2) U6a's
-  netcode seat a9a29bd03da0757ad: DONE 20:38 (u6a-review-netcode.md ends DONE; F1, F3, F7, F9 fine; F4 no owner for
-  S1's burn; O1 carry U6d; O2 carry U6b, U7). (3) U6a's test seat
-  a4724cf284e77b73e (test-engineer, xhigh, from 20:3x; cut 20:42, resumed 02:38) -> u6a-review-test.md (TR-U6A-n);
-  scope section 3 items 1-9 (counts, plants, bites, timing, carries, header, -2 parity, SERIES rows, not verified);
-  scratch u6a-review-test/; same runner; resume from its file's STOPPED AT block.
+- **Agents running (2 of 3):** (1) U6a's builder a95ebf14368f277ff, resumed 02:5x for the fix pass (u6a-fix-pass.md;
+  its notes u6a-build.md in its worktree, one FP-n line per item; resume after its last FP-n line). (2) U7's advisor
+  check a1caa8c461475ac54 (general-purpose, xhigh, from 02:5x) -> advisor-u7-brief.md; resume from its file.
+- **Finished, for round 2 by SendMessage:** U6a's netcode seat a9a29bd03da0757ad (u6a-review-netcode.md, DONE 20:38;
+  F1, F3, F7, F9 fine) and test seat a4724cf284e77b73e (u6a-review-test.md, DONE 02:4x). Security ab80f7d9c82f327b9
+  DONE 20:40 (security-f26.md; security-u6c-deps.md: U6c's Block 0 CLEAR WITH CONDITIONS, 5 conditions, Lows only).
 - **Shell and triggers:** the saver bbz6p4y44 (checkpoint.mjs watch, from 02:38 to about 04:28; TaskStop it, restart in
   the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly); day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
 - **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950 (told at 20:0x, beyond its brief: the ruling's
-  C9, Q-U6C-3, C1 (e), section 5 items 3 and 5, C1 (c)); U6a builder a95ebf14368f277ff and U8 builder abf71d95fc07b3522
-  (worktrees .claude/worktrees/agent-<ID>, kept for the fixes and the fix pass); the U6c advisor a662f1797b78cae95.
+  C9, Q-U6C-3, C1 (e), section 5 items 3 and 5, C1 (c)); U8 builder abf71d95fc07b3522 (worktree
+  .claude/worktrees/agent-<ID>, kept for its fix pass, as U6a's builder's is); the U6c advisor a662f1797b78cae95.
 - **U6a** (brief rev 1.1, c109691a…; `<base>` aa5c62b, 709/806; runner u6a-run.sh): BUILT, 5,460 added (stop past
   6,000); check3 all 11 PASS (744/844, +35/+38; test 866.8 s); plants P1-P11 each fail their named test, restored; 3
   bites by name; 20 starts p50 634 ms, max 979 ms (debug, container, not judged); final tree = wip/u6a-build.patch
