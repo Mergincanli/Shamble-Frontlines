@@ -56,6 +56,22 @@ No manifest, lockfile or dependency changes. `gate.yml`, `tools/`, `.claude/` an
 **Size:** outside the docs 191 added lines (planned about 155, stop line 310): the workflow 97, the build checks and
 their test 38, the config and the specs 39, the declaration file 16, `.gitignore` 1.
 
+**The steps, with their commits** (the checkpoint folded in; the notes themselves stay in the branch's history):
+| Step | Commits |
+|---|---|
+| The code, no CI file (first builder chat, 2026-11-19) | 3cddb55 |
+| The docs pass for #61's merge (first builder chat) | c934fc0 |
+| His words in the project thread, the handover | a9924c9, 0eb0cb6 (DECISIONS); the handover commit 2441b3e; the thread's head 21b6ea0 |
+| Builder V3's takeover: his block, ACCT-3, BUILD-SEAT | 8e7f503, aa1168d (DECISIONS) |
+| CI write 1; its runs stopped | cb476b1 |
+| The corrected CI text; clean runs | 2a654f3 |
+| P-BROWSER and its take-back | 45a6f0e, d6e4fb6 |
+| P-GH and its take-back | 47d7024, ce5a7e7 |
+| His five messages from 17:15:07 to 20:47:59 UTC | e98b927 (DECISIONS) |
+| Review round 1's fix; his words of 21:24:59 UTC | 280f31c; 1d8b61b (DECISIONS) |
+| P-BOUNDARY and its take-back (the code head) | 8d2ce32, 6d0b5b1 |
+| docs-keeper's pass, this report, the checkpoint deleted | the last three commits of the branch |
+
 ## The workflow text (kept apart from the docs, as his words of 2026-11-19, 16:08:04 UTC ask)
 **The texts he said yes to, and what was written:**
 | Write | His yes | The text | Commit | The file after it (sha256) |
@@ -136,8 +152,11 @@ After the last take-back, outside `.checkpoints/` and `docs/`, the tree equals t
 What the plants do not show: that the other ten browser tests bite on a runner; anything about WebGPU; that gh's
 signature check itself would refuse (gh compares the file with the release's list first).
 
-**Tests.** The client's unit tests run inside the cut: "scripts/build-checks.test.mjs (18 tests)", "Tests  49 passed
-(49)". test-engineer replayed the refusal test against 14 broken copies of the pattern: 14 caught. The specs'
+**Tests.** The client's unit tests run inside the cut ("scripts/build-checks.test.mjs (18 tests)", "Tests  49 passed
+(49)"). The counts did not change with the fix 280f31c, which adds three names to an existing test: that test passed
+on the runner in the four runs whose checkouts include 280f31c (8d2ce32, 6d0b5b1 and their merges), and
+test-engineer's replay shows it fails when any of the three names is removed, and on all 14 older broken copies of
+the pattern. The specs'
 type-check line caught seven of seven planted type errors in the final specs, in the container only and with
 near-matching versions (TypeScript 6.0.2, Playwright 1.63.0 types). In the first builder chat's container
 (2026-11-19): the browser tests passed three times with one worker, and the build exits 1 with `RUSTFLAGS` set.
@@ -183,6 +202,11 @@ The rule-sentence table is above: +97, -0, no rule of main's changed or removed.
   yes of 19:58:23 UTC set the new ones.
 - **A third plant** (P-BOUNDARY) beyond the plan's two: this chat's call on test-engineer's finding, a test file,
   no CI text.
+- **Built differently from the plan by the first builder chat (commit 3cddb55), found by the reviewers and the
+  verifier:** `drawn(page, frames)` in `packages/e2e/tests/skeleton/report.ts` (+9 lines; the plan's file table and
+  its section 6 do not name it; the hidden-tab test's four-frame waits use it), and the chromium project's
+  `timeout: 90_000` where the plan says `60_000` (60 s would tie with `report.ts`'s own 60 s wait). Both are for the
+  advisor agent to accept on the final head.
 - **This chat cannot write to GitHub** (GH-TOOLS): cloud chats have no GitHub tool now, the platform refuses
   `gh pr create`, and the guard keeps `gh api` read-only. He opened #64 himself (17:21:24 UTC; made a draft by
   him before his message of 18:40:57 UTC; title and text set by his Advisor from the notes) and presses Ready and Merge himself, by the steps of
@@ -209,7 +233,8 @@ The rule-sentence table is above: +97, -0, no rule of main's changed or removed.
   timed mark on a named machine, how the tool's program was built.
 - CI does not pin the test counts, and `toolchain` is not a required check: a red `toolchain` does not block a merge
   by itself; it is read by hand before every merge.
-- Never shown failing: a planted type error in the Worker's or the page's files; the build's refusal of a cargo
+- Never shown failing: a planted type error in the Worker's or the page's files (a failing type check would stop
+  the job by the path P-BOUNDARY showed; what is unshown is the type checker catching such an error on a runner); the build's refusal of a cargo
   setting on a runner (the cut's `env -i` drops such names); the hidden-tab bound at `skeleton.spec.ts:104` being hit
   (it holds by arithmetic; the plant that would reach it is caught two lines earlier).
 - Inside the cut a hostile dependency can still fake every result (accepted in #60); the cut's PATH starts with
@@ -230,7 +255,9 @@ The rule-sentence table is above: +97, -0, no rule of main's changed or removed.
 ## Follow-ups (for STATUS)
 TE-COUNT (the gate v2 fails a run with a skipped or missing test) · TE-TYPE-PLANTS (a planted type error in a Worker
 file and a page file) · TE-TSC-LINES (each type check prints its own result line; CI text, his yes) · TE-104 ·
-TE-MONO (`performance.now()` at `skeleton.spec.ts:92` and `:98`) · TE-WATCH (on an image or Chrome change read the
+TE-MONO (`performance.now()` at `skeleton.spec.ts:92` and `:98`) · F-CHANNEL (the refusal pattern also to refuse
+`__CARGO_*`, `CARGO_UNSTABLE_*` and every `RUSTC_*` name: local builds only, CI's cut drops such names; with
+change-set 3's build work) · TE-WATCH (on an image or Chrome change read the
 byte windows and the default backend first) · TE-CPU · TE-HIDDEN-FRAMES · IMAGE-CHROME · CUT-PATH · TOKEN-WORDS ·
 REQUIRED-CHECK, CANCEL-ON-MAIN, CI-CUT, NODE-26 (known) · RR-F5, SA-TREE and the `__pycache__/` line (change-set 3)
 · Firefox in CI with the CI pull request after 3a (his FIREFOX-TESTS (b)) · the line for CLAUDE.md on the third
@@ -238,7 +265,10 @@ account (ACCT-3, his) · GH-TOOLS for the next pull requests · the saver and a 
 
 ## Proposed next step
 Change-set 3a, "Rules and boundaries", by this chat, from the approved plan (`cs3-plan.md`, draft 3, with his
-ANSWERS-7). His words of 21:24:59 UTC: it starts when #64 is merged, with no second ask; above 40 % of context the
+ANSWERS-7). The plan, its context and the three design notes leave the tree with this pull request's checkpoint; they
+stand unchanged in the branch's history at 6d0b5b1 (`.checkpoints/ci-wasm/cs3-plan.md`, `cs3-context.md`,
+`engine-architect-cs3.md`, `netcode-architect-cs3.md`, `rust-reviewer-cs3-rng.md`, `advisor-cs3-plan.md`), from where
+3a's checkpoint takes them. His words of 21:24:59 UTC: it starts when #64 is merged, with no second ask; above 40 % of context the
 chat tells him first, and he compacts.
 
 ## Decisions needed
