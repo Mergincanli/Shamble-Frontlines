@@ -68,32 +68,30 @@
 ## Now (2026-11-23 11:1x UTC; U6a MERGED at 824d8e7; U7's T-half DONE, 8ab088e8…, 2,482 added, u7-t-build.md)
 - **07:0x, U6b's Block 0 DONE at ae4f57e** (u6b-block0.md, steps 0-7 PASS; measured 754, bites 850; ring only;
   dependency-check.md's U6b section): pushed at 21765e3 (DEP-HOLD released), CI completed, no failure, 07:06.
-- **07:0x:** U8's fix pass DONE (items 1-10; snapshot wip/u8-build.patch 60205020…, 4,957 added, 42 files, base
-  096808b; u8-build.md "## Fix pass"); its F28 (npt-super's log buffered: room starts time out) went to U6b as item 5.
+- **07:0x:** U8's fix pass DONE (wip/u8-build.patch 60205020…, 4,957 added, 42 files, base 096808b); F28 to U6b (item 5).
 - **07:0x, U6b's builder launched** (`<base>` 21765e3, 754/850; u6b-run.sh, logs .gate/u6b/; stop past 6,000) with items
   1-6: C2's homes, C13, NR-U6A-7, NR2-U6A-2, F28, the valve (reader stamp and BudgetX2 last; past 5,400 they wait for U6e).
 - **Next 1:** U6b's return: snapshot, its one round (netcode, test, security: transports face the internet), fixes, merge.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
-- **07:1x, Stop B's round started** (U8's one round, lever (2), advisor-u6c-brief.md:195-197) on snapshot 60205020.
-- **07:1x, SEC-F26-1 DONE at 07d5d31** (test only, 4 asserts in rct's F26 test; plants A, B fail by name on a scratch
-  copy, restored, rc 2609bc87 unchanged; redact PASS 11/11, 351 items, 0 findings; gate PASS); CI no failure, 07:17.
-- **07:3x, Stop B netcode: REVISE** (read in full): 4 High (NC-SB-1 judge reads *.jsonl, R1's logs *.log; -2 duration_ms 0:
-  both checked in code; -3 probe legs share a run id; -4 S14 sample too small), 8 Medium, 7 Low; Q1-Q3 (Q3 maybe his).
-- **07:4x, Stop B security: REVISE**: 1 High (SEC-SB-1 geckodriver on 0.0.0.0), 4 Medium (-2 root install via a symlink;
-  -3 key read unprompted; -4 drivers on all interfaces; -5 no dist hash check), 6 Low. U6b's F-PING, F-MARK-HDR: its round.
+- **07:1x, SEC-F26-1 DONE at 07d5d31** (4 asserts; plants A, B fail by name; rc 2609bc87 unchanged; CI no failure).
+- **07:1x-11:2x, Stop B's round DONE (lever (2), on 60205020): all three REVISE** (u8-stopb-netcode.md 4 High, -security.md
+  1, -infra.md 1; 16 Medium, 21 Low; Highs and Mediums read in full; NC-SB-1, -2 checked in code). U6b: F-PING, F-MARK-HDR.
 - **Cut 07:53-11:14 UTC** (history.md:7675-7687): U6b's builder (after Block 6, F28) and the infra seat stopped; 11:1x
   part-clean 7.5 GiB (free 10,849 MiB), saver brue1bd68, both resumed by SendMessage.
-- **11:2x, Stop B infra: REVISE** (u8-stopb-infra.md; High, Mediums read in full): 1 High (INF-SB-1 bring-up's room
-  names a chain not yet issued, shared fix with NC-SB-11), 4 Medium (-2 no bounded bring-up exit; -3 fsn1 stock unchecked;
-  -4 firewall sources not stated as /32 only; -5 C7 counts 2 Primary IPs, R5 needs 6), 8 Low; S14 10-min window EUR 0.78.
-- **Next 3:** the advisor's ruling on the whole round (advisor-u8-stopb.md; my lean for S14: the 10-minute window inside
-  the cap); then U8's fix pass; round 2 on what changed for the Highs (NPT-TRIM); U4's report; T5 (i).
+- **11:4x, the advisor's Stop B ruling: REVISE** (advisor-u8-stopb.md daf55033…, sections 3-7 and For Mustafa read in
+  full): section 7's items 1-20, all now; S14 the 10-minute window (no money moves); size 5,800-6,200 (SIZE-STOP live,
+  lean go on); round 2 the same three seats on the diff. U8's fix pass 2 started 11:4x; a docs agent reads item 8's setting.
+- **Next 3:** U8's fix pass 2 (item 8's setting record sent to it when the docs agent returns); then its snapshot and
+  round 2; U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
   TR-U6A-5 to U6d; F4's S1 burn to U6e (the netcode seat's suggestion); FP-6: no rule changed on a difference.
 - **2026-11-23, U6a's round 2 (my lean):** its one Medium (a flake the fix pass opened) fixed now as FP-13 with no third
   round (NPT-TRIM: a third only for a Critical or High); its Lows to carries and the merge report.
+- **2026-11-23, Stop B's ruling (advisor-u8-stopb.md:318-324, each his to reverse):** R1's headers run stays a measured
+  -2 run; S14's 10-minute window beside the browser legs; Stop B grows ~15 min; a differing dist holds the browser legs
+  for his word; part of SEC-SB-9 open until U6c's merge.
 - **2026-11-23, U6b's launch (my lean):** F28 (npt-super's per-event flush, U8's find) built by U6b, its round reading it;
   U6b's valve: Block 5's reader stamp and BudgetX2 built last, past 5,400 they wait for U6e if R1 reads neither.
 - **2026-11-23, U7's brief (advisor-u7-brief.md):** Q-U7-1 (a), U8's save() writes the header now; Q-U7-2 the three
@@ -155,10 +153,11 @@
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
   .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
-  at its snapshot; resume after its last block marked done); the advisor's Stop B ruling a3de649cd25e474df (11:2x,
-  advisor-u8-stopb.md, rewritten whole per part). Done: Stop B's seats, netcode a120f51df9a8f6986, security
-  af8c5f0fbec829595, infra a0615e1ead860724b (u8-stopb-*.md; round-2 reads by SendMessage); U8's fix-pass
-  builder ac59cce3e5d002441 (Stop B's fixes by SendMessage); U7's T-builder a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
+  at its snapshot; resume after its last block marked done); U8's fix-pass builder ac59cce3e5d002441 (pass 2 from
+  11:4x, its worktree's u8-build.md "## Fix pass 2"); the Claude Code docs agent a6eb7acdf1c3ff885 (item 8's setting).
+  Done: the advisor's Stop B ruling a3de649cd25e474df; Stop B's seats, netcode a120f51df9a8f6986, security
+  af8c5f0fbec829595, infra a0615e1ead860724b (u8-stopb-*.md; round-2 reads by SendMessage); U7's T-builder
+  a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
   seats a9a29bd03da0757ad, a4724cf284e77b73e; security's U7 read aca2c13cc291261c6 (security-u7-deps.md: CLEAR WITH
   CONDITIONS, Lows); U7's advisor check a1caa8c461475ac54; security ab80f7d9c82f327b9 (security-f26.md, -u6c-deps.md).
 - **Shells and triggers:** the saver brue1bd68 (checkpoint.mjs watch, from 11:1x
@@ -177,7 +176,8 @@
 - **U6b** (rev 1.1; security-u6b-deps.md, with conditions; Block 0 DONE ae4f57e): building (Now); C2's homes from
   advisor-u7-brief.md (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in npt-proto; the WebSocket tags in npt-link).
 - **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 security-cleared (5 conditions); disk freed first;
-  its launch gives U7's seven dist names; at its merge U8's side checked per interface (C9). **R1 Thu 3 Dec holds with
+  its launch gives U7's seven dist names and carries advisor-u8-stopb.md:208-220's six lines; at its merge U8's side
+  checked per interface (C9). **R1 Thu 3 Dec holds with
   about a day of slack** (section 3: U6a merged Mon 23-Tue 24, U6b Wed 25, U6c Sat 28, U7's Rust Sun 29, Stop B Tue 1);
   three lines to him if U6b is not merged by end Thu 26, U6c by end Sun 29, or a lane unit hits SIZE-CHECK.
 - **U7** (brief rev 1.1, 2026-11-23: the advisor APPROVE WITH CONDITIONS, advisor-u7-brief.md 65e109aa…, C1-C14 at
