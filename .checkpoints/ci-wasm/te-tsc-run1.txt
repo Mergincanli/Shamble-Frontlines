@@ -1,6 +1,0 @@
-te-tsc-run1 (test-engineer, block 4; the full output was 78 KB, cut to this summary 2026-11-19):
-tsc 6.0.3 --ignoreConfig + toolchain.yml's strict flags as they are (--lib es2023), on packages/e2e/playwright.config.ts
-and the 7 .ts files of packages/e2e/tests: 569 errors. In our files: DOM names missing (window, document, WebAssembly,
-Event, crossOriginIsolated, console, URL, import.meta.url) and Node names missing (process, node:fs, node:path,
-node:url). The rest inside node_modules (vite's and playwright-core's .d.ts: Buffer, node: modules, Request,
-Response, WebSocket, Console). Wall 2.6 s.
