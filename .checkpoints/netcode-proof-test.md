@@ -84,7 +84,7 @@
 - **07:1x, Stop B's round started** (U8's one round, lever (2), advisor-u6c-brief.md:195-197; on snapshot 60205020 in
   the fix-pass worktree): security and netcode seats (xhigh), files u8-stopb-security.md, u8-stopb-netcode.md.
 - **07:1x, SEC-F26-1 DONE at 07d5d31** (test only, 4 asserts in rct's F26 test; plants A, B fail by name on a scratch
-  copy, restored, rc 2609bc87 unchanged; redact PASS 11/11, 351 items, 0 findings; gate PASS); CI to run.
+  copy, restored, rc 2609bc87 unchanged; redact PASS 11/11, 351 items, 0 findings; gate PASS); CI no failure, 07:17.
 - **Next 3:** Stop B's infra seat (u8-stopb-infra.md, INF-SB-n; its items: F13, the path unit's restart, F14, F27, F11,
   ADV-U8-11, -14, C4, C6, C7, cost and outages) when a slot frees; then one ruling and U8's fix pass; U4's report; T5 (i).
 
