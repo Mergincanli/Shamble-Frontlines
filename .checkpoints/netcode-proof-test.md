@@ -77,17 +77,17 @@
 - **07:1x, Stop B's round started** (U8's one round, lever (2), advisor-u6c-brief.md:195-197) on snapshot 60205020.
 - **07:1x, SEC-F26-1 DONE at 07d5d31** (test only, 4 asserts in rct's F26 test; plants A, B fail by name on a scratch
   copy, restored, rc 2609bc87 unchanged; redact PASS 11/11, 351 items, 0 findings; gate PASS); CI no failure, 07:17.
-- **07:3x, Stop B netcode: REVISE** (u8-stopb-netcode.md, read in full): 4 High (NC-SB-1 judge reads *.jsonl, R1 logs
-  *.log; -2 duration_ms 0, measured window outlives LG: both checked in code; -3 probe legs share a run id; -4 S14 sample
-  too small for p99), 8 Medium, 7 Low; Q1-Q3 (Q3 maybe his). Infra seat started 07:3x, with NC-SB-2's and -4's hours.
-- **07:4x, Stop B security: REVISE** (u8-stopb-security.md; High, Mediums read in full): 1 High (SEC-SB-1 geckodriver on
-  0.0.0.0, no peer check), 4 Medium (-2 root install through a symlink; -3 operator key read unprompted; -4 drivers on
-  all interfaces; -5 no dist hash compare), 6 Low. U6b's notes: F-PING (condition 1) and F-MARK-HDR for its round.
-- **Cut 07:53-11:14 UTC** (history.md:7675-7687): U6b's builder (after Block 6 and F28; its runner stopped on the 4 GB
-  floor at 07:49) and the infra seat (plan line only) stopped; at 11:1x part-clean 7.5 GiB (free 10,849 MiB), saver
-  brue1bd68, both resumed by SendMessage.
-- **Next 3:** the infra seat's return; then one ruling (all findings, F9, F12, F17, F20, Q1-Q3) and U8's
-  fix pass; with Highs open, round 2 on what changed (NPT-TRIM); U4's report; T5 (i).
+- **07:3x, Stop B netcode: REVISE** (read in full): 4 High (NC-SB-1 judge reads *.jsonl, R1's logs *.log; -2 duration_ms 0:
+  both checked in code; -3 probe legs share a run id; -4 S14 sample too small), 8 Medium, 7 Low; Q1-Q3 (Q3 maybe his).
+- **07:4x, Stop B security: REVISE**: 1 High (SEC-SB-1 geckodriver on 0.0.0.0), 4 Medium (-2 root install via a symlink;
+  -3 key read unprompted; -4 drivers on all interfaces; -5 no dist hash check), 6 Low. U6b's F-PING, F-MARK-HDR: its round.
+- **Cut 07:53-11:14 UTC** (history.md:7675-7687): U6b's builder (after Block 6, F28) and the infra seat stopped; 11:1x
+  part-clean 7.5 GiB (free 10,849 MiB), saver brue1bd68, both resumed by SendMessage.
+- **11:2x, Stop B infra: REVISE** (u8-stopb-infra.md; High, Mediums read in full): 1 High (INF-SB-1 bring-up's room
+  names a chain not yet issued, shared fix with NC-SB-11), 4 Medium (-2 no bounded bring-up exit; -3 fsn1 stock unchecked;
+  -4 firewall sources not stated as /32 only; -5 C7 counts 2 Primary IPs, R5 needs 6), 8 Low; S14 10-min window EUR 0.78.
+- **Next 3:** the advisor's ruling on the whole round (advisor-u8-stopb.md; my lean for S14: the 10-minute window inside
+  the cap); then U8's fix pass; round 2 on what changed for the Highs (NPT-TRIM); U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
@@ -155,9 +155,9 @@
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
   .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
-  at its snapshot; resume after its last block marked done); Stop B's infra seat a0615e1ead860724b (07:3x), rewriting
-  its file whole per part (resume from its file). Done: Stop B's netcode seat a120f51df9a8f6986 and security seat
-  af8c5f0fbec829595 (u8-stopb-netcode.md, -security.md; round-2 reads by SendMessage); U8's fix-pass
+  at its snapshot; resume after its last block marked done); the advisor's Stop B ruling a3de649cd25e474df (11:2x,
+  advisor-u8-stopb.md, rewritten whole per part). Done: Stop B's seats, netcode a120f51df9a8f6986, security
+  af8c5f0fbec829595, infra a0615e1ead860724b (u8-stopb-*.md; round-2 reads by SendMessage); U8's fix-pass
   builder ac59cce3e5d002441 (Stop B's fixes by SendMessage); U7's T-builder a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
   seats a9a29bd03da0757ad, a4724cf284e77b73e; security's U7 read aca2c13cc291261c6 (security-u7-deps.md: CLEAR WITH
   CONDITIONS, Lows); U7's advisor check a1caa8c461475ac54; security ab80f7d9c82f327b9 (security-f26.md, -u6c-deps.md).
