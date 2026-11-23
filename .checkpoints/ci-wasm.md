@@ -19,7 +19,7 @@
   main and is never switched, so every push names its target (`git push origin cs/ci-wasm:claude/loving-hopper-6p0mg2`),
   and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: not
   opened yet** (this chat has no GitHub write tool: see "Open findings", GH-TOOLS); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 16:41 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 17:03 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -245,23 +245,44 @@
    "12 passed (1.1m)" with one worker.
 
 6. **Taken over by Builder V3 (2026-11-23, from 16:30 UTC).** The session record, read 16:30 UTC: model
-   claude-fable-5-2 (configured and in the session's context; no "last served" field yet), **mode auto**. Checked
-   before any write: the thread's head 21b6ea0 contains 2441b3e; after it only notes under `.checkpoints/ci-wasm/`
-   (ten new files and the copy script's extension, his point 11); `.github/`, `.claude/`, `CLAUDE.md` and `tools/`
-   equal main's; his paste starts with `handover-block.txt` byte for byte and his attachment (16:33:16 UTC) has the
-   same sha256; `docs/DECISIONS.md` holds every entry his point 5 names; the proposed file rebuilt from `ci-edit.diff`
-   on main's file: sha256 d1dbcb53...975c, with the plant 12b90249...12ef. The first answer went to him between 16:33
-   and 16:37 UTC (the clock lines around it). Then: the worktree (16:36:52 UTC); his two messages by script (08053c7);
-   three entries in `docs/DECISIONS.md` by `decisions-3.mjs`, every check "yes" (8e7f503, 26bf677); the first push to
+   claude-fable-5-2 (configured; served too: the record's "last served" field, read 17:01 UTC, and 119 of 119
+   assistant entries of the transcript by the advisor agent's count), **mode auto**. Checked before any write: the
+   thread's head 21b6ea0 contains 2441b3e; after it only notes under `.checkpoints/ci-wasm/` (ten new files and the
+   copy script's extension, his point 11); `.github/`, `.claude/`, `CLAUDE.md` and `tools/` equal main's; his paste
+   starts with `handover-block.txt` byte for byte and his attachment (16:33:16 UTC) has the same sha256;
+   `docs/DECISIONS.md` holds every entry his point 5 names; the proposed file rebuilt from `ci-edit.diff` on main's
+   file: sha256 d1dbcb53...975c, with the plant 12b90249...12ef. The first answer went to him between 16:33 and 16:37
+   UTC (the clock lines around it). Then: the worktree (16:36:52 UTC); his two messages by script (08053c7); three
+   entries in `docs/DECISIONS.md` by `decisions-3.mjs`, every check "yes" (8e7f503, 26bf677); the first push to
    `claude/loving-hopper-6p0mg2` (26bf677). `gh pr create` was refused by the platform (no GraphQL in cloud chats) and
    the guard keeps `gh api` read-only: GH-TOOLS.
 
 ## Current step
-**Step 8 (2026-11-23): Builder V3, before the first CI write.** Done: step 6. Waiting: the advisor agent's takeover
-read (`ci-wasm/advisor-v3-takeover.md`); the draft pull request (GH-TOOLS: he opens it, or says another way); **the
-chat's mode: it is auto, and the CI write needs Accept edits** (his switch; read again right before each of the
-three writes); the exact text shown to him in this chat once more before the write (his point 6: "each asked of me
-with its exact text"). **No CI file is written yet: `.github/` equals main's.**
+**Step 8 (2026-11-23): Builder V3, the first CI write is put to him.** The advisor agent's takeover read is in
+(`ci-wasm/advisor-v3-takeover.md`; its notes ended with DONE by 17:01:21 UTC; reviewed head c37fc11): **APPROVE for
+the first CI write**, once the record shows `acceptEdits` on his reply to that write's stop and his yes on that
+write's exact text is in this chat; no Critical, no High; its APPROVE of plan revision 3 holds for this chat. Its
+wording fixes D1 to D3 are made in `docs/DECISIONS.md` by script. **No CI file is written yet: `.github/` equals
+main's.**
+
+**How each of the three CI writes goes (the advisor agent's rulings; his points 6 and 7):**
+- **One ask per write, right before it:** the exact text and the sha256 the file will have, then stop. Write 1: the
+  whole `ci-edit.diff` (the file his CI-TEXT (a) answered; after it d1dbcb53...975c). Write 2: P-GH's two lines with
+  their place (12b90249...12ef). Write 3: their take-back (d1dbcb53...975c). A guard prompt is not his yes.
+- **The mode is read on his reply to that stop:** the session record (`get_session`) and the `permissionMode` on his
+  typed message in the transcript. Write only on the exact value `acceptEdits`. A reply sent while the chat was
+  working (queued) carries no mode: no write. Any other value: no write, and he is told the value; `default` after he
+  says he switched is put to him, not decided (the archive's MANUAL-MODE: on 2026-11-12 the record called his Accept
+  edits "default").
+- **The write:** rebuild the file in `.gate/ci-wasm/proposed/` with `patch` from main's file and the diff, check its
+  sha256, then `cp` it onto `.github/workflows/toolchain.yml` with literal paths in the same command line (the guard
+  asks him). After it: the target's sha256, `git diff --numstat` (93 0, then 2 0, then 0 2), mode 100644, `git add` of
+  that one path, `git diff --cached --name-only` showing only it. The CI commit's message carries no skip marker. Push
+  `cs/ci-wasm:claude/loving-hopper-6p0mg2`. Show him the sha256.
+- **His yes** is copied by `chat-words.mjs` with the ask it answers. Then the first runner run under the plan's stop
+  rule (job logs are readable here: `gh api repos/Mergincanli/Shamble-Frontlines/actions/jobs/<id>/logs`).
+- **The draft pull request** should exist before write 1 and must exist before the verifier and the advisor agent's
+  review of the final head (both runs green on it): GH-TOOLS.
 
 The project thread's part ended with its handover (step 7 of its own count: his messages of 2026-11-23 in the notes
 and in `docs/DECISIONS.md`, the draft pull request #63, the rehearsal of step 5, the advisor agent's read of its
@@ -345,9 +366,15 @@ differ, his block wins and you tell him.
   here; GitHub writes go through the GitHub MCP tools", `routine-guard.mjs:1384`); the session has no `mcp__github__*`
   tool and his account lists no GitHub connector. So the draft pull request, "ready for review", comments and the
   merge (the guard's merge check hangs on `mcp__github__merge_pull_request`) cannot be done from this chat as the kit
-  stands. Put to him: he opens the draft himself from the prepared title and text (`.gate/ci-wasm/pr-body.md` in the
-  worktree, untracked), and the ready and merge clicks are decided before they are due.
-- **SAVER (told to him, 2026-11-23):** the saver script pushes to the local branch's own name, and this worktree's
+  stands. Put to him with the first CI ask (the chat's message after the advisor agent's verdict), with the advisor
+  agent's options: (a) he does the three steps on GitHub himself (the draft from the prepared title and text,
+  `.gate/ci-wasm/pr-body.md` in the worktree, untracked; Ready; the merge after the advisor agent's APPROVE of the
+  full SHA, his go typed here and the chat's read of the checks on that SHA: a click passes no expected head, which
+  sets that part of his point 9 aside); (b) he gives this chat's account a GitHub write tool (a connector; may need a
+  new chat); (c) another guarded chat with the tools does them on his go there. Recommended: (a) for the draft now;
+  for the merge (b) if he can, else (a). Due before "ready"; it does not block the first CI write.
+- **SAVER (told to him, 2026-11-23; the advisor agent's ruling G4: hand saves are acceptable, and he is not asked to
+  switch the main folder):** the saver script pushes to the local branch's own name, and this worktree's
   local name differs from the branch on GitHub, so `checkpoint.mjs save` and `watch` are not used here; the card
   and notes are committed by path and pushed by hand after every step. The other way (one allowed command in the
   main folder, `git switch -c <new> origin/main`, frees the name) is his to say: his block says "Do not switch your
@@ -393,8 +420,12 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
 - Still open, to come with its own text: the Firefox CI pull request's download and exact text (FIREFOX-TESTS (c)).
 
 ## Running work
-- **Builder V3 (2026-11-23):** no saver. The advisor agent "v3-takeover" (Opus 5.5, effort max) is started right
-  after this save; its notes: `ci-wasm/advisor-v3-takeover.md`.
+- **Builder V3 (2026-11-23), 17:03 UTC: nothing runs.** The advisor agent "v3-takeover" (Opus 5.5, effort max, started
+  16:42 UTC) is done; its notes end with DONE. **No saver in this chat, a departure from `.claude/CHECKPOINTS.md`
+  section 5 to name in the report** (SAVER under "Open findings"): the card and notes are committed by path and pushed
+  by hand after every step, before and after every agent run and at least every 30 minutes, with the saver's checks
+  kept by hand (notes only, a look for secrets, no manifest or lockfile in a pushed range, no code through the notes
+  route).
 - **The project thread (2026-11-23), at the handover: nothing runs.** Its saver (14:44:06 to 15:07 UTC) was
   stopped with TaskStop; its one agent, the advisor agent "takeover" (Opus 5.5, effort max, 14:43 to 15:04 UTC), is
   done: `ci-wasm/advisor-takeover.md` ends with DONE (verdict: ESCALATE with record fixes; R1 to R8, C1 to C3 and T1
