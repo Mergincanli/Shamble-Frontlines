@@ -28,7 +28,7 @@ const tickOf = (buffer) => new DataView(buffer).getUint32(0, true);
 
 test("a block written by Rust passes the page's layout check, from tick 0 on", () => {
   const sim = new Sim(SEED, 0, 0, 0);
-  expect(tick_hz()).toBe(30);
+  expect(tick_hz()).toBe(31);
   // The host's cap is a quarter of a second of the simulation's own tick rate (ADR 0004 part 5).
   expect(Math.floor(0.25 * tick_hz())).toBe(MAX_TICKS_PER_WAKE);
   expect(sim.block_len()).toBe(8);
