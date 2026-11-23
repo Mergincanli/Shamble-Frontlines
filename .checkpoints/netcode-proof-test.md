@@ -66,17 +66,20 @@
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
 ## Now (2026-11-23 02:47 UTC; the cut of 20:42-02:36 UTC: history.md:7655-7663)
-- **My step:** waiting on two agents (Running work). U6a's round 1 DONE: both seats REVISE on one shared High
+- **03:3x:** U6a's fix pass DONE (FP-1 to FP-12; plants P7/P7b, P8, P9, P12-P14 fail and restored; check4 all 11 PASS,
+  749/849 = 709+40/806+43; about 5,843 added, estimated, not measured; the A legs of carry.rs never bite without the
+  cap: for round 2; disk 3,791 MiB after check4, part-clean before any lane run). U7's Block 0a DONE at bc87d2d.
+- **Earlier:** U6a's round 1 DONE: both seats REVISE on one shared High
   (NR-U6A-1 = TR-U6A-1: npt-super's header lacks the run's bite, tick_hz and scene, so its run goes INVALID); Mediums
   NR-U6A-2, -3, TR-U6A-2, -3, -4; Lows NR-U6A-4 to -8, TR-U6A-5 to -12. The fix list: u6a-fix-pass.md (FP-1 to FP-12,
   plants P7, P7b, P8, P9 again and new P12-P14, check4; its last section names every carry's taker).
-- **Next 1:** when the builder returns: snapshot (worktree_patch.py -> wip/u6a-build.patch), round 2 on what changed
+- **Next 1:** snapshot (worktree_patch.py -> wip/u6a-build.patch, its added lines measured), part-clean, round 2 on what changed
   (the netcode and test seats by SendMessage; FP-6's rule if a tick differed), then M3-M9: part-clean, `git apply
   --check` and `git apply` in the main folder, cmp-equal to the worktree, M5 check.mjs via main-run.sh in the
   background, gate --no-smoke, one commit, push, CI.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
-- **Next 3:** when security answers on U7's Block 0: the T-builder (worktree; Block 0a, then the T-half; off the lane;
-  dependency-check.md lines before any save of web/'s npm files); after U6a's merge: U6b's Block 0 and builder (its
+- **Next 3:** the T-builder now (worktree from bc87d2d or later; the T-half off the lane; security-u7-deps.md's
+  conditions, N-U7D-1: no web/dist where check.mjs runs); after U6a's merge: U6b's Block 0 and builder (its
   launch adds the U6b line's items), U8's fix pass (the U8 line's items).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
@@ -139,10 +142,9 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (2 of 3):** (1) U6a's builder a95ebf14368f277ff, resumed 02:4x for the fix pass (u6a-fix-pass.md;
-  its notes u6a-build.md in its worktree, one FP-n line per item; resume after its last FP-n line). (2) Security's U7
-  Block 0 read aca2c13cc291261c6 (security-auditor, xhigh, from 03:0x; C10's items 1-10, the npm-audit substitute)
-  -> security-u7-deps.md; resume from its file. U7's advisor check a1caa8c461475ac54 DONE 03:0x.
+- **Agents running (0 of 3) at 03:3x:** U6a's builder a95ebf14368f277ff DONE its fix pass (its notes u6a-build.md in
+  its worktree; logs .gate/u6a/fp*.log, check4.log); security's U7 read aca2c13cc291261c6 DONE (security-u7-deps.md:
+  0a and 0b CLEAR WITH CONDITIONS, SEC-U7D-1 to -3 Low, N-U7D-1); U7's advisor check a1caa8c461475ac54 DONE.
 - **Finished, for round 2 by SendMessage:** U6a's netcode seat a9a29bd03da0757ad (u6a-review-netcode.md, DONE 20:38;
   F1, F3, F7, F9 fine) and test seat a4724cf284e77b73e (u6a-review-test.md, DONE 02:4x). Security ab80f7d9c82f327b9
   DONE 20:40 (security-f26.md; security-u6c-deps.md: U6c's Block 0 CLEAR WITH CONDITIONS, 5 conditions, Lows only).

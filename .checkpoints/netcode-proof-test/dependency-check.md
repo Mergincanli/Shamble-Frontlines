@@ -43,3 +43,25 @@ e694b595ef02d4e0f01e87df61ed083ba3ae254ab0b46687f6183a11df28a60d  spikes/netcode
 # npm install --package-lock-only --ignore-scripts --before=2026-11-15`. Written 2026-11-22 ~15:0x UTC.
 8370495dee2ed77e6a937c6f40c72a5485015428d57f90505f4e440504293c90  spikes/netcode-proof/ops/browser/package.json
 a0efce8e511a8865d50008172b3f88e9cc072efbe92a85a035340562b7c49524  spikes/netcode-proof/ops/browser/package-lock.json
+
+# DEP-HOLD release, U7's Block 0a (web/'s npm files) (main's .claude/CHECKPOINTS.md §3; advisor-u7-brief.md C10)
+# security-auditor's answer, read in full (ends DONE): .checkpoints/netcode-proof-test/security-u7-deps.md
+# (sha256 3de813ec01f72f8ea6e4ca89adff950d538f6f41bbcd05d7caec75964a39c29c; Block 0a CLEAR WITH CONDITIONS).
+# Written 2026-11-23 ~03:3x UTC by the main session. The conditions: item (3)'s commands with `--no-audit --no-fund`;
+# item (4)'s substitute (U8's C2: no .npmrc under spikes/, ignore-scripts on every npm command; no
+# npm-shrinkwrap.json); item (5)'s OSV in place of npm audit; any difference goes back to security.
+# Records: node v22.23.4; npm 10.9.9; `npm config get registry ignore-scripts omit before --prefix <web>`:
+# registry=https://registry.npmjs.org/, ignore-scripts=false (set per command), omit= (no dev), before=null.
+# Made by `npm_config_ignore_scripts=true npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+# --before=2026-11-16 --prefix /home/user/Shamble-Frontlines/spikes/netcode-proof/web` ("up to date in 1s").
+# web-lock-check.mjs (sha256 99bbae398d5de67ef15e8cf259aab40f523a6b06c67ee07592b6639d99786d21): 13 PASS, last line
+# "/home/user/Shamble-Frontlines/spikes/netcode-proof/web: all PASS".
+# OSV at 2026-11-23T03:26:50Z, request {"package":{"ecosystem":"npm","name":"typescript"},"version":"6.0.3"} to
+# https://api.osv.dev/v1/query, answer {}. npm audit not run (permission refused); OSV, GHSA-backed, substitutes
+# (security-u7-deps.md item (5)); tarball read by security: no install script, no dependency, integrity re-derived.
+# `npm_config_ignore_scripts=true npm ci --ignore-scripts --no-audit --no-fund --prefix <web>`: "added 1 package in
+# 486ms"; typescript installed 6.0.3; check.mjs --only redact: "PASS redact 11 of 11 tests passed; redact-check: 342
+# item(s) checked, 0 finding(s)"; git status: "?? spikes/netcode-proof/web/package-lock.json" and "??
+# spikes/netcode-proof/web/package.json" only (node_modules ignored).
+8c3b69497de87ad1c3e2fb528914b06700902f59414108ec2732dafc8da76bc0  spikes/netcode-proof/web/package.json
+86cdb96a21f50b95a295c8cea8db08ae355d6259160aa822991cc76e9eeaf3fb  spikes/netcode-proof/web/package-lock.json
