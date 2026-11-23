@@ -80,9 +80,9 @@
   part-clean 7.5 GiB (free 10,849 MiB), saver brue1bd68, both resumed by SendMessage.
 - **11:4x, the advisor's Stop B ruling: REVISE** (advisor-u8-stopb.md daf55033…, sections 3-7 and For Mustafa read in
   full): section 7's items 1-20, all now; S14 the 10-minute window (no money moves); size 5,800-6,200 (SIZE-STOP live,
-  lean go on); round 2 the same three seats on the diff. U8's fix pass 2 started 11:4x; a docs agent reads item 8's setting.
-- **Next 3:** U8's fix pass 2 (item 8's setting record sent to it when the docs agent returns); then its snapshot and
-  round 2; U4's report; T5 (i).
+  lean go on); round 2 the same three seats on the diff. U8's fix pass 2 started 11:4x; item 8's docs record
+  u8-sec-sb-3-docs.md (the setting exists, v2.1.257+; PowerShell undocumented, so fallback denies) sent to it 11:5x.
+- **Next 3:** U8's fix pass 2; then its snapshot and round 2; U4's report; T5 (i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - **2026-11-23, U6a's fix list (u6a-fix-pass.md, my lean):** every Medium and up fixed now, with six Lows; O1 and
@@ -154,8 +154,8 @@
 - **Agents running (3 of 3):** U6b's builder a2661dc320c9e6d00 from 07:0x (general-purpose, xhigh, its own worktree
   .claude/worktrees/agent-<ID>; its notes in that worktree's .checkpoints/netcode-proof-test/u6b-build.md, copied over
   at its snapshot; resume after its last block marked done); U8's fix-pass builder ac59cce3e5d002441 (pass 2 from
-  11:4x, its worktree's u8-build.md "## Fix pass 2"); the Claude Code docs agent a6eb7acdf1c3ff885 (item 8's setting).
-  Done: the advisor's Stop B ruling a3de649cd25e474df; Stop B's seats, netcode a120f51df9a8f6986, security
+  11:4x, its worktree's u8-build.md "## Fix pass 2"). Done: the docs agent a6eb7acdf1c3ff885
+  (u8-sec-sb-3-docs.md); the advisor's Stop B ruling a3de649cd25e474df; Stop B's seats, netcode a120f51df9a8f6986, security
   af8c5f0fbec829595, infra a0615e1ead860724b (u8-stopb-*.md; round-2 reads by SendMessage); U7's T-builder
   a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
   seats a9a29bd03da0757ad, a4724cf284e77b73e; security's U7 read aca2c13cc291261c6 (security-u7-deps.md: CLEAR WITH
