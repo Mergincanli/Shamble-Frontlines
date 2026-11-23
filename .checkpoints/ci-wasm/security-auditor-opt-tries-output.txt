@@ -1,0 +1,318 @@
+== the replacement judge (cut-printf.sh) differs from the cut only here:
+   8c8
+   < [ "$(find "$@" -maxdepth 0 \( -type f -o -type d \) -user root ! -perm /022 | wc -l)" -eq "$#" ] \
+   ---
+   > [ "$(find "$@" -maxdepth 0 \( -type f -o -type d \) -user root ! -perm /022 -printf '.\n' | wc -l)" -eq "$#" ] \
+== the walk alone, on the WB_TOOL value of the file and on odd values (bash -e; 2 s limit)
+-- the file's value
+    [/wasm-bindgen-0.2.130/wasm-bindgen]
+    [/wasm-bindgen-0.2.130]
+    [/]
+    3 entries
+    exit 0
+-- a double slash at the start
+    [//wasm-bindgen-0.2.130/wasm-bindgen]
+    [//wasm-bindgen-0.2.130]
+    [/]
+    [/]
+    4 entries
+    exit 0
+-- a double slash inside
+    [/a//b/wasm-bindgen]
+    [/a//b]
+    [/a/]
+    [/a]
+    [/]
+    5 entries
+    exit 0
+-- a .. inside
+    [/opt/../wasm-bindgen-0.2.130/wasm-bindgen]
+    [/opt/../wasm-bindgen-0.2.130]
+    [/opt/..]
+    [/opt]
+    [/]
+    5 entries
+    exit 0
+-- a trailing slash
+    [/wasm-bindgen-0.2.130/wasm-bindgen/]
+    [/wasm-bindgen-0.2.130/wasm-bindgen]
+    [/wasm-bindgen-0.2.130]
+    [/]
+    4 entries
+    exit 0
+-- a space
+    [/wasm bindgen/wasm-bindgen]
+    [/wasm bindgen]
+    [/]
+    3 entries
+    exit 0
+-- a newline in the folder's name
+    [/wasm
+bindgen/wasm-bindgen]
+    [/wasm
+bindgen]
+    [/]
+    3 entries
+    exit 0
+-- the root alone
+    [/]
+    [/]
+    2 entries
+    exit 0
+-- a program directly under /
+    [/wasm-bindgen]
+    [/]
+    2 entries
+    exit 0
+-- relative: without the case line the walk never ends
+
+    exit 124
+-- mkdir of the empty folder name that "${WB_TOOL%/*}" gives for /x or /: refused, nothing made
+    mkdir: cannot create directory '': No such file or directory
+== shell e
+PASS B1 control: clean run                                              e   exit 0 (want 0)
+      | W/b1-clean-e/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B2 a double slash inside WB_TOOL (root/ and root both judged)      e   exit 0 (want 0)
+      | mode 555, owner root:root, 35208 bytes, W/b2-dslash-e/root//wasm-bindgen-0.2.130/wasm-bindgen
+      | mode 755, owner root:root, 4096 bytes, W/b2-dslash-e/root//wasm-bindgen-0.2.130
+      | mode 755, owner root:root, 4096 bytes, W/b2-dslash-e/root/
+      | mode 755, owner root:root, 4096 bytes, W/b2-dslash-e/root
+      | mode 755, owner root:root, 4096 bytes, W/b2-dslash-e
+      | mode 755, owner root:root, 4096 bytes, W
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines
+      | mode 755, owner root:root, 4096 bytes, /home/user
+      | mode 755, owner root:root, 4096 bytes, /home
+      | mode 755, owner root:root, 4096 bytes, /
+      | W/b2-dslash-e/root//wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B3 a .. inside WB_TOOL, no link                                    e   exit 0 (want 0)
+      | W/b3-dotdot-e/side/../root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B4 a link, then .. (the link is judged as its own prefix)          e   exit 1 (want 1)
+      | W/b4-link-dotdot-e/lnk/../root/wasm-bindgen-0.2.130/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B5 a trailing slash                                                e   exit 1 (want 1)
+      | W/b5-trailing-e/root/wasm-bindgen-0.2.130/ is not a plain file
+PASS B6 a space in a folder name                                        e   exit 0 (want 0)
+      | W/b6-space-e/ro ot/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B7 newline in the program's name + a parent at 775: judge fooled   e   exit 1 (want 1)
+      | mode 555, owner root:root, 35208 bytes, W/b7-nl-prog-e/root/wasm-bindgen-0.2.130/wasm
+      | bindgen
+      | mode 755, owner root:root, 4096 bytes, W/b7-nl-prog-e/root/wasm-bindgen-0.2.130
+      | mode 775, owner root:root, 4096 bytes, W/b7-nl-prog-e/root
+      | mode 755, owner root:root, 4096 bytes, W/b7-nl-prog-e
+      | mode 755, owner root:root, 4096 bytes, W
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines
+      | mode 755, owner root:root, 4096 bytes, /home/user
+      | mode 755, owner root:root, 4096 bytes, /home
+      | mode 755, owner root:root, 4096 bytes, /
+      | sha256sum: W/b7-nl-prog-e/root/wasm-bindgen-0.2.130/wasm: No such file or directory
+      | W/b7-nl-prog-e/root/wasm-bindgen-0.2.130/wasm: FAILED open or read
+      | sha256sum: WARNING: 1 line is improperly formatted
+      | sha256sum: WARNING: 1 listed file could not be read
+PASS B7p the same, judge with -printf (replacement): refused there      e   exit 1 (want 1)
+      | bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B7b newline in the folder's name, all good: count too high         e   exit 1 (want 1)
+      | bindgen/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B7c the same with -printf: judge passes, sha256 line refuses       e   exit 1 (want 1)
+      | sha256sum: WARNING: 1 listed file could not be read
+PASS B7d control: clean run with the -printf judge                      e   exit 0 (want 0)
+      | W/b7d-clean-printf-e/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B8 a fifo where the program should be, the judge alone             e   exit 1 (want 1)
+      | W/b8-fifo-e/root/wasm-bindgen-0.2.130/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B9 a setgid parent of group 1001 (chown takes the group back)      e   exit 0 (want 0)
+      | mode 555, owner root:root, 35208 bytes, W/b9-setgid-e/root/wasm-bindgen-0.2.130/wasm-bindgen
+      | mode 2755, owner root:root, 4096 bytes, W/b9-setgid-e/root/wasm-bindgen-0.2.130
+      | mode 2755, owner root:UNKNOWN, 4096 bytes, W/b9-setgid-e/root
+      | mode 755, owner root:root, 4096 bytes, W/b9-setgid-e
+      | mode 755, owner root:root, 4096 bytes, W
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines
+      | mode 755, owner root:root, 4096 bytes, /home/user
+      | mode 755, owner root:root, 4096 bytes, /home
+      | mode 755, owner root:root, 4096 bytes, /
+      | W/b9-setgid-e/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B10 a sticky parent 1755                                           e   exit 0 (want 0)
+      | W/b10-sticky-e/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B10b a sticky parent 1777 (like /tmp)                              e   exit 1 (want 1)
+      | W/b10b-sticky-e/root/wasm-bindgen-0.2.130/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B11 the program setuid 4555: no write route, passes, stat shows it e   exit 0 (want 0)
+      | mode 4555, owner root:root, 35208 bytes, W/b11-setuid-e/root/wasm-bindgen-0.2.130/wasm-bindgen
+      | mode 755, owner root:root, 4096 bytes, W/b11-setuid-e/root/wasm-bindgen-0.2.130
+      | mode 755, owner root:root, 4096 bytes, W/b11-setuid-e/root
+      | mode 755, owner root:root, 4096 bytes, W/b11-setuid-e
+      | mode 755, owner root:root, 4096 bytes, W
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines
+      | mode 755, owner root:root, 4096 bytes, /home/user
+      | mode 755, owner root:root, 4096 bytes, /home
+      | mode 755, owner root:root, 4096 bytes, /
+      | W/b11-setuid-e/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B12 sudo refuses chown                                             e   exit 1 (want 1)
+      | W/b12-chown-e/root/wasm-bindgen-0.2.130 exists already or could not be made: the tool needs a fresh folder made here as root
+      | the program was not installed
+PASS B13 sudo refuses mkdir                                             e   exit 1 (want 1)
+      | W/b13-mkdir-e/root/wasm-bindgen-0.2.130 exists already or could not be made: the tool needs a fresh folder made here as root
+      | no folder was made
+      | default ACL set on /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b14-default-acl-e/root: u::rwx,u:1001:rwx,g::r-x,m::rwx,o::r-x; mode now 755
+PASS B14 a default ACL giving uid 1001 rwx on the parent                e   exit 0 (want 0)
+      | W/b14-default-acl-e/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+      | access ACL of /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b14-default-acl-e/root/wasm-bindgen-0.2.130: user::rwx user:1001:rwx group::r-x mask::r-x other::r-x; mode 755
+      | access ACL of /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b14-default-acl-e/root/wasm-bindgen-0.2.130/wasm-bindgen: none (No data available)
+      | access ACL set on /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b15-access-acl-e/root: u::rwx,u:1001:rwx,g::r-x,m::rwx,o::r-x; mode now 775
+PASS B15 an access ACL giving uid 1001 write on the parent              e   exit 1 (want 1)
+      | W/b15-access-acl-e/root/wasm-bindgen-0.2.130/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+      | access ACL set on /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b15b-masked-acl-e/root: u::rwx,u:1001:rwx,g::r-x,m::r-x,o::r-x; mode now 755
+PASS B15b the same entry, mask r-x (no write in effect)                 e   exit 0 (want 0)
+      | W/b15b-masked-acl-e/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+== shell pf
+PASS B1 control: clean run                                              pf  exit 0 (want 0)
+      | W/b1-clean-pf/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B2 a double slash inside WB_TOOL (root/ and root both judged)      pf  exit 0 (want 0)
+      | mode 555, owner root:root, 35208 bytes, W/b2-dslash-pf/root//wasm-bindgen-0.2.130/wasm-bindgen
+      | mode 755, owner root:root, 4096 bytes, W/b2-dslash-pf/root//wasm-bindgen-0.2.130
+      | mode 755, owner root:root, 4096 bytes, W/b2-dslash-pf/root/
+      | mode 755, owner root:root, 4096 bytes, W/b2-dslash-pf/root
+      | mode 755, owner root:root, 4096 bytes, W/b2-dslash-pf
+      | mode 755, owner root:root, 4096 bytes, W
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines
+      | mode 755, owner root:root, 4096 bytes, /home/user
+      | mode 755, owner root:root, 4096 bytes, /home
+      | mode 755, owner root:root, 4096 bytes, /
+      | W/b2-dslash-pf/root//wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B3 a .. inside WB_TOOL, no link                                    pf  exit 0 (want 0)
+      | W/b3-dotdot-pf/side/../root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B4 a link, then .. (the link is judged as its own prefix)          pf  exit 1 (want 1)
+      | W/b4-link-dotdot-pf/lnk/../root/wasm-bindgen-0.2.130/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B5 a trailing slash                                                pf  exit 1 (want 1)
+      | W/b5-trailing-pf/root/wasm-bindgen-0.2.130/ is not a plain file
+PASS B6 a space in a folder name                                        pf  exit 0 (want 0)
+      | W/b6-space-pf/ro ot/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B7 newline in the program's name + a parent at 775: judge fooled   pf  exit 1 (want 1)
+      | mode 555, owner root:root, 35208 bytes, W/b7-nl-prog-pf/root/wasm-bindgen-0.2.130/wasm
+      | bindgen
+      | mode 755, owner root:root, 4096 bytes, W/b7-nl-prog-pf/root/wasm-bindgen-0.2.130
+      | mode 775, owner root:root, 4096 bytes, W/b7-nl-prog-pf/root
+      | mode 755, owner root:root, 4096 bytes, W/b7-nl-prog-pf
+      | mode 755, owner root:root, 4096 bytes, W
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines
+      | mode 755, owner root:root, 4096 bytes, /home/user
+      | mode 755, owner root:root, 4096 bytes, /home
+      | mode 755, owner root:root, 4096 bytes, /
+      | sha256sum: W/b7-nl-prog-pf/root/wasm-bindgen-0.2.130/wasm: No such file or directory
+      | W/b7-nl-prog-pf/root/wasm-bindgen-0.2.130/wasm: FAILED open or read
+      | sha256sum: WARNING: 1 line is improperly formatted
+      | sha256sum: WARNING: 1 listed file could not be read
+PASS B7p the same, judge with -printf (replacement): refused there      pf  exit 1 (want 1)
+      | bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B7b newline in the folder's name, all good: count too high         pf  exit 1 (want 1)
+      | bindgen/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B7c the same with -printf: judge passes, sha256 line refuses       pf  exit 1 (want 1)
+      | sha256sum: WARNING: 1 listed file could not be read
+PASS B7d control: clean run with the -printf judge                      pf  exit 0 (want 0)
+      | W/b7d-clean-printf-pf/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B8 a fifo where the program should be, the judge alone             pf  exit 1 (want 1)
+      | W/b8-fifo-pf/root/wasm-bindgen-0.2.130/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B9 a setgid parent of group 1001 (chown takes the group back)      pf  exit 0 (want 0)
+      | mode 555, owner root:root, 35208 bytes, W/b9-setgid-pf/root/wasm-bindgen-0.2.130/wasm-bindgen
+      | mode 2755, owner root:root, 4096 bytes, W/b9-setgid-pf/root/wasm-bindgen-0.2.130
+      | mode 2755, owner root:UNKNOWN, 4096 bytes, W/b9-setgid-pf/root
+      | mode 755, owner root:root, 4096 bytes, W/b9-setgid-pf
+      | mode 755, owner root:root, 4096 bytes, W
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines
+      | mode 755, owner root:root, 4096 bytes, /home/user
+      | mode 755, owner root:root, 4096 bytes, /home
+      | mode 755, owner root:root, 4096 bytes, /
+      | W/b9-setgid-pf/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B10 a sticky parent 1755                                           pf  exit 0 (want 0)
+      | W/b10-sticky-pf/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B10b a sticky parent 1777 (like /tmp)                              pf  exit 1 (want 1)
+      | W/b10b-sticky-pf/root/wasm-bindgen-0.2.130/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+PASS B11 the program setuid 4555: no write route, passes, stat shows it pf  exit 0 (want 0)
+      | mode 4555, owner root:root, 35208 bytes, W/b11-setuid-pf/root/wasm-bindgen-0.2.130/wasm-bindgen
+      | mode 755, owner root:root, 4096 bytes, W/b11-setuid-pf/root/wasm-bindgen-0.2.130
+      | mode 755, owner root:root, 4096 bytes, W/b11-setuid-pf/root
+      | mode 755, owner root:root, 4096 bytes, W/b11-setuid-pf
+      | mode 755, owner root:root, 4096 bytes, W
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate/ci-wasm-wt
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines/.gate
+      | mode 755, owner root:root, 4096 bytes, /home/user/Shamble-Frontlines
+      | mode 755, owner root:root, 4096 bytes, /home/user
+      | mode 755, owner root:root, 4096 bytes, /home
+      | mode 755, owner root:root, 4096 bytes, /
+      | W/b11-setuid-pf/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+PASS B12 sudo refuses chown                                             pf  exit 1 (want 1)
+      | W/b12-chown-pf/root/wasm-bindgen-0.2.130 exists already or could not be made: the tool needs a fresh folder made here as root
+      | the program was not installed
+PASS B13 sudo refuses mkdir                                             pf  exit 1 (want 1)
+      | W/b13-mkdir-pf/root/wasm-bindgen-0.2.130 exists already or could not be made: the tool needs a fresh folder made here as root
+      | no folder was made
+      | default ACL set on /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b14-default-acl-pf/root: u::rwx,u:1001:rwx,g::r-x,m::rwx,o::r-x; mode now 755
+PASS B14 a default ACL giving uid 1001 rwx on the parent                pf  exit 0 (want 0)
+      | W/b14-default-acl-pf/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+      | access ACL of /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b14-default-acl-pf/root/wasm-bindgen-0.2.130: user::rwx user:1001:rwx group::r-x mask::r-x other::r-x; mode 755
+      | access ACL of /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b14-default-acl-pf/root/wasm-bindgen-0.2.130/wasm-bindgen: none (No data available)
+      | access ACL set on /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b15-access-acl-pf/root: u::rwx,u:1001:rwx,g::r-x,m::rwx,o::r-x; mode now 775
+PASS B15 an access ACL giving uid 1001 write on the parent              pf  exit 1 (want 1)
+      | W/b15-access-acl-pf/root/wasm-bindgen-0.2.130/wasm-bindgen or a folder above it is missing or a link, is not owned by root, or others than root may write in it
+      | access ACL set on /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/ci-wasm/sa-opt-path/work/b15b-masked-acl-pf/root: u::rwx,u:1001:rwx,g::r-x,m::r-x,o::r-x; mode now 755
+PASS B15b the same entry, mask r-x (no write in effect)                 pf  exit 0 (want 0)
+      | W/b15b-masked-acl-pf/root/wasm-bindgen-0.2.130/wasm-bindgen: OK
+== one entry at a time: today's judge (cb476b1:118, nothing printed = accept) against the new one (count = 1)
+  d755           mode 755   today accept new accept
+  d775           mode 775   today refuse new refuse
+  d777           mode 777   today refuse new refuse
+  d757           mode 757   today refuse new refuse
+  d1777          mode 1777  today refuse new refuse
+  d1755          mode 1755  today accept new accept
+  d2755          mode 2755  today accept new accept
+  d755-u1001     mode 755   today refuse new refuse
+  d755-g1001     mode 755   today accept new accept
+  d775-g1001     mode 775   today refuse new refuse
+  f555           mode 555   today accept new accept
+  f4555          mode 4555  today accept new accept
+  f575           mode 575   today refuse new refuse
+  f555-u1001     mode 555   today refuse new refuse
+  link-to-d755   mode 777   today refuse new refuse
+  link-to-f555   mode 777   today refuse new refuse
+  fifo644        mode 644   today accept new refuse
+  acl-w          mode 775   today refuse new refuse
+  acl-masked     mode 755   today accept new accept
+  missing        mode -     today accept new refuse
+  entries the new judge accepts and today's refuses: 0
+== find's own exit status inside the judge (pipefail on)
+  2 entries, one missing: count 1, find's status 1 (not seen by the [ ]): refused
+== 42 PASS, 0 FAIL

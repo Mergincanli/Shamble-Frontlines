@@ -32,7 +32,7 @@
 -            || { echo "${WB_TOOL%/*} or /opt is not owned by root, or others than root may write in it"; exit 1; }
 +          set -- "$WB_TOOL"; p="$WB_TOOL"; until [ -z "$p" ]; do p="${p%/*}"; set -- "$@" "${p:-/}"; done
 +          stat -c 'mode %a, owner %U:%G, %s bytes, %n' "$@"
-+          [ "$(find "$@" -maxdepth 0 \( -type f -o -type d \) -user root ! -perm /022 | wc -l)" -eq "$#" ] \
++          [ "$(find "$@" -maxdepth 0 \( -type f -o -type d \) -user root ! -perm /022 -printf '.\n' | wc -l)" -eq "$#" ] \
 +            || { echo "$WB_TOOL or a folder above it is missing or a link, is not owned by root, or others than root may write in it"; exit 1; }
            [ "$(stat -c %s "$WB_TOOL")" = "$WB_PROGRAM_BYTES" ] || { echo "the program is not $WB_PROGRAM_BYTES bytes"; exit 1; }
            printf '%s  %s\n' "$WB_PROGRAM_SHA256" "$WB_TOOL" | sha256sum -c -
