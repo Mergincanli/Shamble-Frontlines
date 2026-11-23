@@ -2320,10 +2320,10 @@ index 0000000..42b3172
 +}
 diff --git a/spikes/netcode-proof/crates/server/src/proc_read.rs b/spikes/netcode-proof/crates/server/src/proc_read.rs
 new file mode 100644
-index 0000000..171f7bb
+index 0000000..19d78a9
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/src/proc_read.rs
-@@ -0,0 +1,448 @@
+@@ -0,0 +1,454 @@
 +//! The room's /proc and /sys reads (u6a-brief.md Block 4, S4; plan E18: "steal and affinity reads", per-thread CPU and
 +//! RSS each second): pure parsers over the files' texts, which the tests feed fixed texts, and the few reads and the
 +//! pinning that use them. Linux only: on another system every read is empty and every value absent.
@@ -2389,6 +2389,12 @@ index 0000000..171f7bb
 +            .map(|x| x.parse().ok())
 +            .collect::<Option<_>>()?;
 +        (v.len() == 8).then(|| (v[7], v.iter().sum()))
++    }
++
++    /// Whether `stat` holds the vCPU's line: a read of such a text that gives no share (the first, or no time since the
++    /// last) did not fail (FP-13).
++    pub(crate) fn has_line(&self, stat: &str) -> bool {
++        self.ticks(stat).is_some()
 +    }
 +
 +    /// The steal share since the last read, permille: `None` at the first read, for a text without the vCPU's line,
@@ -2774,10 +2780,10 @@ index 0000000..171f7bb
 +}
 diff --git a/spikes/netcode-proof/crates/server/src/tick_loop.rs b/spikes/netcode-proof/crates/server/src/tick_loop.rs
 new file mode 100644
-index 0000000..599232b
+index 0000000..3449928
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/src/tick_loop.rs
-@@ -0,0 +1,1511 @@
+@@ -0,0 +1,1519 @@
 +//! [`TickLoop`] (plan.md:601's list; plan E2, §4.4 and §4.6; u6a-brief.md Block 2): the room process's loop.
 +//!
 +//! - **The tick thread** (`npt-tick`) alone owns the `Room` and runs [`due_ticks`] on the monotonic clock (`clock.rs`'s
@@ -3780,19 +3786,24 @@ index 0000000..599232b
 +            .clone()
 +    }
 +
-+    /// Reads the CPU times now and the steal from `stat` (`/proc/stat`'s text): the next second's baseline.
-+    fn baseline(&mut self, stat: &str) -> Option<u32> {
++    /// Reads the CPU times now and the steal from `stat` (`/proc/stat`'s text): the next second's baseline. The steal
++    /// is `Err` for a failed read (no line for the tick vCPU), `Ok(None)` for no share without a failure (unpinned, the
++    /// first read, or no time since the last: FP-13).
++    fn baseline(&mut self, stat: &str) -> Result<Option<u32>, ()> {
 +        self.cpu = crate::proc_read::cpu_ns(&self.io_tids());
-+        self.steal.as_mut().and_then(|s| s.read(stat))
++        match self.steal.as_mut() {
++            Some(s) if !s.has_line(stat) => Err(()),
++            s => Ok(s.and_then(|s| s.read(stat))),
++        }
 +    }
 +
-+    /// Puts each read into `v`, or leaves its keys out when it failed (`None`), with one stderr line at that read's
-+    /// first failure (the struct's text). `steal` counts only when the run pins; `cpu` is the second's (process, I/O
-+    /// runtime) CPU time, ns, over `wall_ns`.
++    /// Puts each read into `v`, or leaves its keys out when it failed (`None`, `Err`), with one stderr line at that
++    /// read's first failure (the struct's text). `steal` counts only when the run pins, and `Ok(None)` (no time) leaves
++    /// its key out with no line and no flag; `cpu` is the second's (process, I/O runtime) CPU time, ns, over `wall_ns`.
 +    fn values(
 +        &mut self,
 +        v: &mut std::collections::BTreeMap<String, i64>,
-+        steal: Option<u32>,
++        steal: Result<Option<u32>, ()>,
 +        rss: Option<u64>,
 +        cpu: Option<(u64, u64)>,
 +        wall_ns: u64,
@@ -3800,8 +3811,11 @@ index 0000000..599232b
 +        let share = |ns| int(crate::proc_read::permille(ns, wall_ns));
 +        let reads = [
 +            (
-+                self.steal.is_some(),
-+                steal.map(|s| vec![("steal_permille", i64::from(s))]),
++                self.steal.is_some() && steal != Ok(None),
++                steal
++                    .ok()
++                    .flatten()
++                    .map(|s| vec![("steal_permille", i64::from(s))]),
 +            ),
 +            (true, rss.map(|r| vec![("rss_bytes", int(r))])),
 +            (
@@ -3831,7 +3845,7 @@ index 0000000..599232b
 +        let sec = r.start_ns / 1_000_000_000;
 +        match self.sec {
 +            None => {
-+                self.baseline(&proc_text("/proc/stat"));
++                let _ = self.baseline(&proc_text("/proc/stat"));
 +                self.at_ns = r.start_ns;
 +            }
 +            Some((s, _)) if sec > s => {
@@ -4291,10 +4305,10 @@ index 0000000..599232b
 +mod tests;
 diff --git a/spikes/netcode-proof/crates/server/src/tick_loop/tests.rs b/spikes/netcode-proof/crates/server/src/tick_loop/tests.rs
 new file mode 100644
-index 0000000..04585a5
+index 0000000..6b264b7
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/src/tick_loop/tests.rs
-@@ -0,0 +1,1330 @@
+@@ -0,0 +1,1348 @@
 +//! S1's tests (u6a-brief.md section 3): the tick thread's core on an injected clock (no threads: `Core::wake` and
 +//! `SessionIo::poll` driven in turn, each Loopback end's times the test's), and the threaded loop on the real clock
 +//! (each at most 5 s, no timing bar: the container's numbers are printed, never judged). U6a's tests hold no throwing
@@ -5137,14 +5151,18 @@ index 0000000..04585a5
 +        "{} second records",
 +        log.seconds.len()
 +    );
-+    for r in &log.seconds {
++    // The last record is the close's partial second: its steal read may come within one jiffy of the one before (no
++    // time passed: no share, its key left out; FP-13), so only its other keys are required.
++    let last = log.seconds.len() - 1;
++    for (i, r) in log.seconds.iter().enumerate() {
 +        for k in [
 +            "steal_permille",
 +            "rss_bytes",
 +            "proc_cpu_permille",
 +            "io_cpu_permille",
 +        ] {
-+            assert!(r.v.contains_key(k), "second {}: {k}", r.sec);
++            let exempt = i == last && k == "steal_permille";
++            assert!(exempt || r.v.contains_key(k), "second {}: {k}", r.sec);
 +        }
 +        assert!(r.v["rss_bytes"] > 0);
 +        assert_eq!(r.s["out_queue_count"].len(), 2, "one per slot");
@@ -5167,7 +5185,7 @@ index 0000000..04585a5
 +#[test]
 +fn s4_a_failed_per_second_read_leaves_its_key_out() {
 +    let mut s = Seconds::new(1, Some(3), Arc::new(Shared::default()));
-+    s.baseline("cpu3 100 0 10 1000 0 0 0 0 0 0\n");
++    assert_eq!(s.baseline("cpu3 100 0 10 1000 0 0 0 0 0 0\n"), Ok(None));
 +    for bad in ["", "cpu0 100 0 10 1900 0 0 0 100 0 0\n"] {
 +        let steal = s.baseline(bad);
 +        let mut v = BTreeMap::new();
@@ -5191,6 +5209,20 @@ index 0000000..04585a5
 +        !v.contains_key("proc_cpu_permille") && s.failed[2],
 +        "the CPU times not read"
 +    );
++}
++
++/// FP-13 (TR2-U6A-1, NR2-U6A-3): a steal read with no time since the last (two equal /proc/stat texts) has no share:
++/// its key is left out, with no failure flag (so no stderr line).
++#[test]
++fn s4_a_steal_read_with_no_time_passed_leaves_its_key_out_with_no_failure() {
++    let mut s = Seconds::new(1, Some(3), Arc::new(Shared::default()));
++    let stat = "cpu3 100 0 10 1000 0 0 0 0 0 0\n";
++    assert_eq!(s.baseline(stat), Ok(None), "the baseline");
++    let steal = s.baseline(stat);
++    let mut v = BTreeMap::new();
++    s.values(&mut v, steal, Some(4_096), Some((5, 1)), 10);
++    assert!(!v.contains_key("steal_permille"), "{v:?}");
++    assert_eq!(s.failed, [false; 3], "no read failed");
 +}
 +
 +/// The shared-vcpu bite (bites builds only).

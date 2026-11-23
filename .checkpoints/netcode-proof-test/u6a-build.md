@@ -344,3 +344,19 @@ End: check.mjs both builds, plants P1-P11, bites x3.
   (03:04, after FP-12) plus the 13 fmt hunks' net lines (fp-fmt.log: host_step +4, proc_read +17, tests.rs +13,
   tick_loop.rs +5, main.rs +9, carry.rs +4, super +10 = +62; the two clippy fixes change no line count) = **5,843**
   added in all (existing +1,715, new 4,128); under 6,000. A measured count needs one runner call after a part-clean.
+- **FP-13 DONE** (round 2: TR2-U6A-1, NR2-U6A-3). Start fp13-start.log (03:36 UTC, free 11,210 MiB): diff
+  0fc8865b…b60d, untracked 421bff63…92d7 (= check4's tree). Change: proc_read.rs:70 `StealReader::has_line`;
+  tick_loop.rs:1006 `baseline()` returns `Result<Option<u32>, ()>` (Err only for a text without the tick vCPU's line;
+  Ok(None) for no share: unpinned, first read, or no time); `values()` (:1028) asks for steal only when not Ok(None),
+  so no time leaves the key out with no flag and no stderr line; tick() :1062 `let _ =`. Pinned test (tests.rs:843-854)
+  exempts the last record's (the close's partial second) steal only. New test
+  `tick_loop::tests::s4_a_steal_read_with_no_time_passed_leaves_its_key_out_with_no_failure` (:906: two equal texts,
+  no key, flags [false; 3]); FP-4's test now asserts its baseline read is Ok(None). fp13-1.log: fmt 1 hunk (applied by
+  Edit), clippy -p npt-server --all-targets --locked both builds 0, the 8 named tests ok (pinned included).
+  fp13-2.log: fmt check 0, clippy both builds 0; clean sha256 proc_read.rs 0d0e3eda…d387, tick_loop.rs fea75451…d88a,
+  tests.rs 8069aa1d…17f7. P9 (fp13-plant-p9.log, -x -k, exit 101): `"cpu"` line → FAILS
+  `proc_read::tests::s4_the_steal_reader_reads_the_tick_vcpus_line_only` (Some(27) vs Some(100)),
+  `s4_a_failed_per_second_read_leaves_its_key_out` (:877 Err(()) vs Ok(None)) and the new test (:909); restored,
+  0d0e3eda…d387 (fp13-end.log). Final tree: diff 0fc8865b…b60d, untracked d01ae55c…669b. Size measured
+  (fp13-end.log): existing +1,715, new 4,160 = **5,875** added in all (FP-13 +32; confirms the derived 5,843 before
+  it). Full check.mjs not rerun after FP-13 (not asked).

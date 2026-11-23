@@ -75,9 +75,13 @@
   no-time steal read; 4 Lows). FP-13 (that Medium, with NR2-U6A-3) sent to the builder; the Lows' takers are in
   u6a-fix-pass.md's last section. No third round (no Critical or High: NPT-TRIM).
 - **Earlier:** round 1 (both REVISE on one High; findings and fix list: u6a-fix-pass.md; this card at 187f0b3).
-- **Next 1:** when FP-13 returns (SIZE-CHECK: 157 lines left before it): a new snapshot, then M3-M9: part-clean if the
-  disk needs it, `git apply --check` and `git apply` in the main folder, cmp-equal to the worktree, M5 check.mjs via
-  main-run.sh in the background, gate --no-smoke, one commit, push, CI.
+- **03:4x, U6a's merge:** FP-13 DONE (32 lines; P9 fails, restored). Final snapshot wip/u6a-build.patch 33c9b5dd…
+  (5,875 added, 27 removed, 19 files). Part-clean (1.0 GiB); M3 `git apply --check` and M4 `git apply` in the main folder
+  (uncommitted), 19 of 19 byte-equal to the worktree; **M5 running** (shell bce3443pv: main-run.sh `node check.mjs`,
+  log .gate/u6a-merge/m5-check.log). u6a-report.md written, M5's counts to fill.
+- **Next 1:** M5's result (a failing step stops: the tree stays uncommitted, nothing pushed); M7 gate --no-smoke; M8 one
+  commit: the 19 files, `git rm` of wip/u6a-build.patch, u6a-report.md with M5's line; M9 a plain push (no manifest in
+  it), CI on that head, then the saver and the card.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
 - **Next 3:** after U6a's merge: U6b's Block 0 and builder (its launch adds the U6b line's items), U8's fix pass (the
   U8 line's items); the T-builder's T5 (i) the day U6b merges.
