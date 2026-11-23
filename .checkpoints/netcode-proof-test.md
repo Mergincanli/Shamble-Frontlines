@@ -5,7 +5,7 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-23 07:0x UTC, after the cut of 03:59-06:36 (his words history.md:7630-7673): the resume
+- **Last update:** 2026-11-23 11:1x UTC, after the cut of 07:53-11:14 (his words history.md:7630-7687): the resume
   source; Now holds my step and the next three; Running work holds every running agent and shell with its ID.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
@@ -65,16 +65,13 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-23 07:1x UTC; the cut of 03:59-06:36 UTC: history.md:7665-7673)
-- **Done since 03:56:** U6a MERGED at 824d8e7 (u6a-report.md; round: u6a-fix-pass.md). U7's T-half DONE (8ab088e8…,
-  2,482 added; u7-t-build.md: F1-F3 for the R-half, the host facts for U6c's C8). U8's fix pass resumed 06:37.
+## Now (2026-11-23 11:1x UTC; U6a MERGED at 824d8e7; U7's T-half DONE, 8ab088e8…, 2,482 added, u7-t-build.md)
 - **07:0x, U6b's Block 0 DONE at ae4f57e** (u6b-block0.md, steps 0-7 PASS; measured 754, bites 850; ring only;
   dependency-check.md's U6b section): pushed at 21765e3 (DEP-HOLD released), CI completed, no failure, 07:06.
 - **07:0x:** U8's fix pass DONE (items 1-10; snapshot wip/u8-build.patch 60205020…, 4,957 added, 42 files, base
   096808b; u8-build.md "## Fix pass"); its F28 (npt-super's log buffered: room starts time out) went to U6b as item 5.
-- **07:0x, U6b's builder launched** (`<base>` 21765e3, counts 754/850; runner u6b-run.sh, logs .gate/u6b/; size about
-  2,650, likely 5,000-6,100 at this week's growth, stop past 6,000) with items 1-6: C2's homes, C13's draft, NR-U6A-7,
-  NR2-U6A-2, F28, and the valve (Block 5's reader stamp and BudgetX2 last; past 5,400 they wait for U6e if R1 reads neither).
+- **07:0x, U6b's builder launched** (`<base>` 21765e3, 754/850; u6b-run.sh, logs .gate/u6b/; stop past 6,000) with items
+  1-6: C2's homes, C13, NR-U6A-7, NR2-U6A-2, F28, the valve (reader stamp and BudgetX2 last; past 5,400 they wait for U6e).
 - **Next 1:** U6b's return: snapshot, its one round (netcode, test, security: transports face the internet), fixes, merge.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
 - **07:1x, Stop B's round started** (U8's one round, lever (2), advisor-u6c-brief.md:195-197) on snapshot 60205020.
@@ -86,6 +83,9 @@
 - **07:4x, Stop B security: REVISE** (u8-stopb-security.md; High, Mediums read in full): 1 High (SEC-SB-1 geckodriver on
   0.0.0.0, no peer check), 4 Medium (-2 root install through a symlink; -3 operator key read unprompted; -4 drivers on
   all interfaces; -5 no dist hash compare), 6 Low. U6b's notes: F-PING (condition 1) and F-MARK-HDR for its round.
+- **Cut 07:53-11:14 UTC** (history.md:7675-7687): U6b's builder (after Block 6 and F28; its runner stopped on the 4 GB
+  floor at 07:49) and the infra seat (plan line only) stopped; at 11:1x part-clean 7.5 GiB (free 10,849 MiB), saver
+  brue1bd68, both resumed by SendMessage.
 - **Next 3:** the infra seat's return; then one ruling (all findings, F9, F12, F17, F20, Q1-Q3) and U8's
   fix pass; with Highs open, round 2 on what changed (NPT-TRIM); U4's report; T5 (i).
 
@@ -161,8 +161,8 @@
   builder ac59cce3e5d002441 (Stop B's fixes by SendMessage); U7's T-builder a9873cdba07a3219e (for T5); U6a's builder a95ebf14368f277ff; round 2's
   seats a9a29bd03da0757ad, a4724cf284e77b73e; security's U7 read aca2c13cc291261c6 (security-u7-deps.md: CLEAR WITH
   CONDITIONS, Lows); U7's advisor check a1caa8c461475ac54; security ab80f7d9c82f327b9 (security-f26.md, -u6c-deps.md).
-- **Shells and triggers:** the saver bzvne7p20 (checkpoint.mjs watch, from 06:37
-  to about 08:27; TaskStop it, restart in the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5
+- **Shells and triggers:** the saver brue1bd68 (checkpoint.mjs watch, from 11:1x
+  to about 13:1x; TaskStop it, restart in the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5
   (2-hourly); day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
 - **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950; U8 builder abf71d95fc07b3522 (its worktree kept:
   ops/browser/node_modules for test 4); the U6c advisor a662f1797b78cae95.
@@ -197,4 +197,4 @@
 - All word for word in history.md: until 2026-11-17 from :5791 on; 2026-11-18 :6921-6932; 2026-11-19 :7124-7146,
   :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559, :7618-7620;
   2026-11-22 :7610-7617, :7623-7628 (15:47:28 to about 19:44 UTC); 2026-11-22/23 :7655-7663 (about 20:42 to 02:36 UTC);
-  2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC).
+  2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC), :7675-7687 (about 07:53 to 11:14 UTC).

@@ -7671,3 +7671,17 @@ The compact is done. Pick up exactly where you left off, rebuilding from the rep
   no failure (04:00:38). The check-ins of 04:34 and 06:34 reached this chat at 06:36:12 UTC.
 - **Resumed 06:3x UTC:** the U8 builder by SendMessage (item 1 redone whole); the saver restarted; Block 0 continued
   from its provider lines.
+
+## Cut by the spend limit (2026-11-23 about 07:53 to 11:14 UTC)
+- **The notice** (Stop B's infra seat a0615e1ead860724b and U6b's builder a2661dc320c9e6d00; both tasks ended at
+  about 07:53:55 UTC, HTTP 429): "You've hit your org's monthly spend limit · ask your admin for a higher limit · your
+  5-hour limit resets 11:10am (UTC)".
+- **What it stopped:** U6b's builder after Block 6 and F28 were built (its runner had already stopped at 07:49 on the
+  4 GB floor, 3,741 MiB free; its last words "Now the WsServer arming."); Stop B's infra seat with only its plan line
+  written (07:36). The netcode and security seats had finished before (07:3x, 07:4x). This session's turn had ended at
+  07:43. The saver ran to its end. The worker restarted several times; the check-ins of 08:34 and 10:34 reached this
+  chat at 11:14 UTC.
+- **His message**, 11:14:03 UTC (transcript line 78498, queued; it reached this chat mid-turn), word for word:
+  "I hit my usage limit while you were working, but it has reset now. Please continue from where you left off."
+- **Resumed 11:1x UTC:** no cargo left running; part-clean of the shared target's dev profile (7.5 GiB; guards ok;
+  free 3,742 to 10,849 MiB); the saver restarted (brue1bd68); U6b's builder and the infra seat by SendMessage.
