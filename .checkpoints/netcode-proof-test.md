@@ -65,7 +65,7 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-23 03:29 UTC; the cut of 20:42-02:36 UTC: history.md:7655-7663)
+## Now (2026-11-23 03:36 UTC; the cut of 20:42-02:36 UTC: history.md:7655-7663)
 - **03:29:** U6a's fix pass DONE (FP-1 to FP-12; plants P7/P7b, P8, P9, P12-P14 fail and restored; check4 all 11 PASS,
   749/849 = 709+40/806+43; 5,843 added, measured on the new snapshot wip/u6a-build.patch 022ddb84…, 157 under the stop;
   the A legs of carry.rs never bite without the cap: round 2's). Part-clean 3: 8.7 GiB, free 11,253 MiB. U7's Block 0a
@@ -74,12 +74,10 @@
   test APPROVE WITH FINDINGS (u6a-r2-test.md: TR-U6A-1 closed by P12; TR2-U6A-1 Medium, a flake FP-4 opened: the
   no-time steal read; 4 Lows). FP-13 (that Medium, with NR2-U6A-3) sent to the builder; the Lows' takers are in
   u6a-fix-pass.md's last section. No third round (no Critical or High: NPT-TRIM).
-- **Earlier:** U6a's round 1 DONE: both seats REVISE on one shared High
-  (NR-U6A-1 = TR-U6A-1: npt-super's header lacks the run's bite, tick_hz and scene, so its run goes INVALID); Mediums
-  NR-U6A-2, -3, TR-U6A-2, -3, -4; Lows NR-U6A-4 to -8, TR-U6A-5 to -12. The fix list: u6a-fix-pass.md (FP-1 to FP-12,
-  plants P7, P7b, P8, P9 again and new P12-P14, check4; its last section names every carry's taker).
-- **Next 1:** when FP-13 returns (SIZE-CHECK: 157 lines left before it): a new snapshot, then M3-M9: part-clean if the disk needs it, `git apply --check` and `git apply` in the main folder,
-  cmp-equal to the worktree, M5 check.mjs via main-run.sh in the background, gate --no-smoke, one commit, push, CI.
+- **Earlier:** round 1 (both REVISE on one High; findings and fix list: u6a-fix-pass.md; this card at 187f0b3).
+- **Next 1:** when FP-13 returns (SIZE-CHECK: 157 lines left before it): a new snapshot, then M3-M9: part-clean if the
+  disk needs it, `git apply --check` and `git apply` in the main folder, cmp-equal to the worktree, M5 check.mjs via
+  main-run.sh in the background, gate --no-smoke, one commit, push, CI.
 - **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
 - **Next 3:** after U6a's merge: U6b's Block 0 and builder (its launch adds the U6b line's items), U8's fix pass (the
   U8 line's items); the T-builder's T5 (i) the day U6b merges.
