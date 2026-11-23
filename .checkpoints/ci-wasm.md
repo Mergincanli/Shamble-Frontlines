@@ -19,7 +19,7 @@
   main and is never switched, so every push names its target (`git push origin cs/ci-wasm:claude/loving-hopper-6p0mg2`),
   and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: not
   opened yet** (this chat has no GitHub write tool: see "Open findings", GH-TOOLS); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 17:26 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 17:30 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -271,8 +271,31 @@ rule (`git push *+*` matched the `+` of a chained `date` command): a push stands
 request #64** (his, opened 17:21:24 UTC; head = the branch): **not a draft, default title, no text yet**: told to him.
 Runs on cb476b1, push: gate and smoke 45227423066, toolchain 45227423151.
 
-**Next:** read toolchain's log line by line against the stop rule (plan section 9) for the push run and the
-pull-request run; then ask 2 (P-GH's two lines, expected sha256 12b90249...12ef), stop.
+**THE STOP RULE FIRED (17:25 UTC): both `toolchain` runs on cb476b1 failed at the new step "The tool's one program",
+at its last check.** Push: run 45227423151, job 137877549845 (image ubuntu-24.04 20261116.376.1). Pull request: run
+45227437170, job 137877597017 (image ubuntu-24.04 20261116.133.1). The same lines in both: "mode 555, owner root:root,
+8170784 bytes, /opt/wasm-bindgen-0.2.130/wasm-bindgen"; "mode 755, owner root:root, 4096 bytes,
+/opt/wasm-bindgen-0.2.130"; **"mode 777, owner root:root, 4096 bytes, /opt"**; "/opt/wasm-bindgen-0.2.130 or /opt is
+not owned by root, or others than root may write in it"; exit 1. On GitHub's runner anyone may write in `/opt`, so the
+check security-auditor added (F-OPT) refused, as it must: it failed closed (the advisor agent's Re-read had named
+`/opt`'s mode on the runner as the open unknown). gate and smoke: success on both events (runs 45227423066,
+45227437167).
+
+**Read before the failure, both jobs, as the stop rule lists them:** the final address on
+`release-assets.githubusercontent.com`; "size: 11860397"; the archive ": OK"; "gh version 2.104.0 (2026-11-12)";
+GitHub's check: "Calculated digest ... sha256:9687f3bb...227f", "Resolved tag 0.2.130 to
+sha1:c93b8ae848d4d9e6beaeaf9516e18a7cadd818a2", "Loaded attestation from GitHub API", "✓ Verification succeeded!
+wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz is present in release 0.2.130" with the job's token at
+"Contents: read, Metadata: read" (PERM-ATT (a) holds); the seven members; the program installed. **Not reached:** the
+program's own sha256 line, the fetch, the cut, both builds, the tests, Chrome. The two logs: `.gate/ci-wasm/logs/`
+(untracked; sha256 210350fd...5f78 push, fda98715...d15f pull request).
+
+**Now: stopped, told to him, before any fix, push or re-run** (the card's save of this stop is a local commit until he
+has been told). Nothing is fixed, P-GH and P-BROWSER wait. Put to him (OPT-PATH): (a) a corrected text prepared with
+infra-engineer and security-auditor (the tool installed where every parent folder is root-owned and closed to others,
+the check widened to every parent), the advisor agent on it, then its exact text to him as a new CI ask; (b) the job
+closes `/opt` itself before the install; (c) the `/opt` part of the check dropped (not recommended: it is the swap the
+check exists for). Recommended (a). Also told: #64 is not a draft and has the default title.
 
 _Before it, kept for the record:_
 **Step 8 (2026-11-23): Builder V3, the first CI write is put to him.** The advisor agent's takeover read is in
