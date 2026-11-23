@@ -12,13 +12,30 @@
   it Builder V1), **which this thread never pushes to**. · **Base:** main f5030a33185b1ea1b15329174e82823f0215f993
   (the merge of #61). **Handed over on 2026-11-23** (his tap WRITE-WHERE, 14:54:47 UTC): a new Claude Code chat
   takes this pull request over on a branch of its own, started from this branch's handover commit; see "Handover".
-  The chat that takes over writes its branch, its session and its pull request's number here.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 15:08 UTC (from the clock).
+- **Since 2026-11-23, 16:30 UTC: Builder V3 holds this pull request** (session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude
+  Code chat under the repository's guard; his block of 16:30:46 UTC, `ci-wasm/mustafa-2026-11-23T163046-builder-v3.md`).
+  **Branch on GitHub: `claude/loving-hopper-6p0mg2`** (stands in for `cs/ci-wasm`), started from the thread's head
+  21b6ea0. **Worktree: `.gate/ci-wasm-wt`, local branch `cs/ci-wasm`**: the main folder holds the `claude/` name at
+  main and is never switched, so every push names its target (`git push origin cs/ci-wasm:claude/loving-hopper-6p0mg2`),
+  and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: not
+  opened yet** (this chat has no GitHub write tool: see "Open findings", GH-TOOLS); #63 and #62 stay open.
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 16:41 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
 
 ## His words that govern (read the files; the lines below are pointers and quotes, never a substitute)
+- **2026-11-23, 16:30:46 UTC, in Builder V3's chat: his block** (`ci-wasm/mustafa-2026-11-23T163046-builder-v3.md`,
+  by `ci-wasm/chat-words.mjs`; in `docs/DECISIONS.md` since 8e7f503). Twelve points; read them there. The ones that
+  steer every step: 6 (CI-MODEL (a): this chat's CI edits of this pull request, each asked of him with its exact
+  text); 7 (three CI writes; before each the mode is read, stop unless Accept edits; after each the sha256 is
+  compared and shown to him); 8 (the advisor agent's takeover read before the first CI write, then the plan as
+  written); 9 (never push to another lane's or thread's branch; ask before #62 or #63 is closed; merge only on his go
+  here, for the approved head, with its full SHA; change-set 3 is not started); 12 (less paper: notes are for
+  resuming and for the report; his words by script, each with the question it answers; the chat's own other messages
+  are not copied into files). His taps **BUILD-SEAT** (15:10:32 UTC: this chat builds change-set 3 after the merge,
+  starting when he says so here) and **ACCT-3** (15:11:01 UTC: this chat's account counts like his other two) are in
+  DECISIONS too; `ci-wasm/handover-after.md` has the thread's note on both.
 - **2026-11-23, in the project thread** (copied by `ci-wasm/thread-words.mjs` from the thread's transcript; a tap on
   a decision card is recorded as a tap, in the card's wording):
   - `ci-wasm/mustafa-2026-11-23T142503-builder-chat.md` (14:25:03 UTC): "I would rather start today with the
@@ -108,8 +125,10 @@
   the advisor agent on every pushed head; the report; the pull request draft then ready; stop for his go on the merge.
   One pull request at a time in this lane.
 - **Size:** the planned size stands in the plan; at twice the plan, stop and tell him in three lines.
-- **Records:** his messages are copied by script (`ci-wasm/words.mjs`, or by uuid; in the project thread
-  `ci-wasm/thread-words.mjs`, by the message's send time), never retyped; times come from the
+- **Records:** his messages are copied by script (in Builder V3's chat `ci-wasm/chat-words.mjs`, each with the
+  question it answers; the first builder chat used `ci-wasm/words.mjs`, the project thread
+  `ci-wasm/thread-words.mjs`), never retyped; the chat's own other messages are not copied into files (his point
+  12); times come from the
   clock (`date -u` in the same command); in reports, about the chat's own process only what a record shows, with its
   time. No command with unusual browser or system flags while he may be away (the lost night of 2026-11-19).
 - **Refused commands and their routes, in a Claude Code chat under the guard** (the first builder chat's list of
@@ -117,6 +136,10 @@
   `--git-dir`, `gh pr merge`, `gh api`, `git restore`, `rm -rf`, forced worktree removal. GitHub through the
   `mcp__github__*` tools; tests by path through node; folder trees are not deleted without his word. (In the
   project thread no repository hook loaded and GitHub went through `gh api`; it kept these rules by hand.)
+  **Builder V3's chat has no `mcp__github__*` tools** (the platform gives cloud chats `gh` now): reading GitHub
+  works (`gh api repos/Mergincanli/Shamble-Frontlines/...`, GET only); every write (open, edit, mark ready, merge,
+  comment) is closed on purpose (the platform refuses `gh pr`, the guard and the settings keep `gh api` read-only)
+  and is not worked around: GH-TOOLS under "Open findings".
 - **Long runs** (LONG-RUNS, his tap of 2026-11-23, 14:32:42 UTC): a full test suite or a long build goes to GitHub's
   checks from the pushed branch; short runs (one test file, the legacy gate, one build, a rehearsal) run here.
 
@@ -221,11 +244,28 @@
    c4935acaa142ce1046cf30fa1f6f3edd7697834f32c7536159ce58972ed32c31; "Tests 7 passed"; the five type-check lines;
    "12 passed (1.1m)" with one worker.
 
+6. **Taken over by Builder V3 (2026-11-23, from 16:30 UTC).** The session record, read 16:30 UTC: model
+   claude-fable-5-2 (configured and in the session's context; no "last served" field yet), **mode auto**. Checked
+   before any write: the thread's head 21b6ea0 contains 2441b3e; after it only notes under `.checkpoints/ci-wasm/`
+   (ten new files and the copy script's extension, his point 11); `.github/`, `.claude/`, `CLAUDE.md` and `tools/`
+   equal main's; his paste starts with `handover-block.txt` byte for byte and his attachment (16:33:16 UTC) has the
+   same sha256; `docs/DECISIONS.md` holds every entry his point 5 names; the proposed file rebuilt from `ci-edit.diff`
+   on main's file: sha256 d1dbcb53...975c, with the plant 12b90249...12ef. The first answer went to him between 16:33
+   and 16:37 UTC (the clock lines around it). Then: the worktree (16:36:52 UTC); his two messages by script (08053c7);
+   three entries in `docs/DECISIONS.md` by `decisions-3.mjs`, every check "yes" (8e7f503, 26bf677); the first push to
+   `claude/loving-hopper-6p0mg2` (26bf677). `gh pr create` was refused by the platform (no GraphQL in cloud chats) and
+   the guard keeps `gh api` read-only: GH-TOOLS.
+
 ## Current step
-**Step 7 (2026-11-23): the handover of this pull request to a new Claude Code chat.** The project thread's part is
-done with the handover commit: his messages of 2026-11-23 in the notes and in `docs/DECISIONS.md`, the draft pull
-request #63, the rehearsal (step 5), the advisor agent's read of the thread's records. **No CI file is written yet:
-`.github/` equals main's.** The chat that takes over goes on from "Handover", then "Next steps".
+**Step 8 (2026-11-23): Builder V3, before the first CI write.** Done: step 6. Waiting: the advisor agent's takeover
+read (`ci-wasm/advisor-v3-takeover.md`); the draft pull request (GH-TOOLS: he opens it, or says another way); **the
+chat's mode: it is auto, and the CI write needs Accept edits** (his switch; read again right before each of the
+three writes); the exact text shown to him in this chat once more before the write (his point 6: "each asked of me
+with its exact text"). **No CI file is written yet: `.github/` equals main's.**
+
+The project thread's part ended with its handover (step 7 of its own count: his messages of 2026-11-23 in the notes
+and in `docs/DECISIONS.md`, the draft pull request #63, the rehearsal of step 5, the advisor agent's read of its
+records).
 
 The first builder chat was **paused by his words of 2026-11-19, 21:44:09 UTC** (`ci-wasm/mustafa-2026-11-19-pause.md`,
 by script): "Finish the current tasks that you're working on and then pause. I will let you know when you can
@@ -244,6 +284,9 @@ put to him by the first builder chat:
   for #62: PERM-ATT (a), PLANTS both, PYCACHE-NOW (b).
 
 ## Handover (2026-11-23): for the chat that takes this pull request over
+_Done by Builder V3 on 2026-11-23 (step 6 above), except the pull request of item 4 (GH-TOOLS). The scratch copy
+of item 5 is rebuilt at write time with `patch` from main's file and `ci-edit.diff` (tried between 16:32 and 16:37
+UTC: both sha256 as recorded)._
 This section is the thread's note, not his word. His word is the block he pastes into your chat; where the two
 differ, his block wins and you tell him.
 1. **Start:** `git fetch origin claude/project-thread-qx9woh`; the handover commit is the one his block names. Make
@@ -282,8 +325,9 @@ differ, his block wins and you tell him.
    ready; stop for his go (risk tier 2). **Ask him before merging and before closing #62 or #63.** Then the block
    for him to paste into the first builder chat when its account is back (after 2026-11-24, 20:00 Amsterdam time):
    #62 was taken forward in the new pull request, and that chat does not continue it.
-5. **Change-set 3, after the CI pull request is merged, by the chat he names for it** (open on 2026-11-23: he has
-   not said which chat builds it; his four answers on its plan are in, ANSWERS-7): open its own
+5. **Change-set 3, after the CI pull request is merged, built by Builder V3, starting when he says so in its chat**
+   (BUILD-SEAT, his tap of 15:10:32 UTC, and points 9 and 11 of his block; his four answers on its plan are in,
+   ANSWERS-7): open its own
    checkpoint (per part: 3a first), move `ci-wasm/cs3-plan.md`, `cs3-context.md`, the three design notes and
    `advisor-cs3-plan.md` into it, and build 3a by the plan's section 4, with RNG-SOURCE (c), SIZE-3 (b),
    PRESS-PACE (a), DEPART-3 (a). He answered FIREFOX-TESTS (c): the Firefox CI pull request comes between the CI
@@ -292,13 +336,25 @@ differ, his block wins and you tell him.
    change-set 9.
 
 ## Open findings
-- **Open with him at the handover (2026-11-23; the advisor agent's verdict, `ci-wasm/advisor-takeover.md`, "Decisions
-  needed"), put to him by the thread with the paste block:** CI-MODEL (may the chat that takes over make these CI
-  edits on the model his block names, where his words of 2026-11-12 keep CI work with Opus 5.5 and GATE-FOLLOW set
-  them aside only for the first builder chat: answered by the block he pastes, which holds one sentence on it, or
-  by his opening the chat on Opus 5.5); BUILD-SEAT (which chat builds change-set 3 after this pull request merges:
-  his answer may reach the chat that takes over only through him); ACCT-3 (his project "Shamble Frontlines ALT"
-  runs on an account beside the two that CLAUDE.md's ACCOUNTS names; for the record, it blocks nothing).
+- **Answered (the handover's three questions):** CI-MODEL (a), by point 6 of the block he pasted; BUILD-SEAT
+  (Builder V3, on his word in its chat after the merge); ACCT-3 (counts the same; the line for CLAUDE.md and the
+  account's roles are still his to give, with the exact text to him first, and not part of this pull request).
+- **GH-TOOLS (open with him, 2026-11-23):** Builder V3's chat cannot write to GitHub. `gh pr create` answered "HTTP
+  403: GitHub GraphQL is not available from Claude Code sessions" (between 16:37 and 16:41 UTC); the REST route is `gh
+  api` with fields, which `.claude/settings.json` denies and the guard refuses for every session ("gh api is read-only
+  here; GitHub writes go through the GitHub MCP tools", `routine-guard.mjs:1384`); the session has no `mcp__github__*`
+  tool and his account lists no GitHub connector. So the draft pull request, "ready for review", comments and the
+  merge (the guard's merge check hangs on `mcp__github__merge_pull_request`) cannot be done from this chat as the kit
+  stands. Put to him: he opens the draft himself from the prepared title and text (`.gate/ci-wasm/pr-body.md` in the
+  worktree, untracked), and the ready and merge clicks are decided before they are due.
+- **SAVER (told to him, 2026-11-23):** the saver script pushes to the local branch's own name, and this worktree's
+  local name differs from the branch on GitHub, so `checkpoint.mjs save` and `watch` are not used here; the card
+  and notes are committed by path and pushed by hand after every step. The other way (one allowed command in the
+  main folder, `git switch -c <new> origin/main`, frees the name) is his to say: his block says "Do not switch your
+  main folder."
+- **UPLOADS (for the record):** the card's rule "never read `/root/.claude/uploads/`" has no source in
+  `docs/DECISIONS.md`, `CLAUDE.md` or `.claude/`; his attachment of 16:33:16 UTC lies there and was compared by
+  sha256 only.
 - **PYC-AGAIN (what went wrong, to tell him and to record in the report):** one compiled Python file,
   `.checkpoints/ci-wasm/__pycache__/rr-chacha-ref.cpython-313.pyc` (7,356 bytes; made 16:34 UTC when rust-reviewer's
   check script was run), was committed and pushed by the saver's autosave b7325df at 16:39:06 UTC. Found 17:33 UTC,
@@ -337,6 +393,8 @@ about 150 s while the simulation ran and no pause was recorded; the pause on a t
 - Still open, to come with its own text: the Firefox CI pull request's download and exact text (FIREFOX-TESTS (c)).
 
 ## Running work
+- **Builder V3 (2026-11-23):** no saver. The advisor agent "v3-takeover" (Opus 5.5, effort max) is started right
+  after this save; its notes: `ci-wasm/advisor-v3-takeover.md`.
 - **The project thread (2026-11-23), at the handover: nothing runs.** Its saver (14:44:06 to 15:07 UTC) was
   stopped with TaskStop; its one agent, the advisor agent "takeover" (Opus 5.5, effort max, 14:43 to 15:04 UTC), is
   done: `ci-wasm/advisor-takeover.md` ends with DONE (verdict: ESCALATE with record fixes; R1 to R8, C1 to C3 and T1
