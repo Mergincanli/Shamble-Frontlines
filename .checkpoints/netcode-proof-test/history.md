@@ -7699,3 +7699,24 @@ The compact is done. Pick up exactly where you left off, rebuilding from the rep
 - **Resumed 16:2x UTC:** no cargo left running; free 1,621 MiB (the shared target 10.4 GB, 4.3 GB of it the
   incremental cache), part-clean 10.4 GiB (guards ok; free 10,776 MiB); u6b-run.sh now exports CARGO_INCREMENTAL=0
   (my lean, a choice inside the plan); the saver restarted (b67t3qh7l); both builders by SendMessage.
+
+## Decision: Mustafa, 2026-11-23 17:15:17 UTC (SIZE-STOP (a) for U8; the pre-compact steps)
+Transcript line 79675, uuid e720cc6b-a9c5-4ab6-851d-e28b61d4a365; it answers SIZE-STOP (U8 stopped at 6,001 added lines
+after pass 3's item 1). Word for word:
+```
+Two things, written with my Advisor.
+
+A. SIZE-STOP: (a), go on. Finish pass 3: items 2 to 7 first (the two Highs, then the Mediums), then the Lows. The new stop for U8 is 6,200 added lines. If U8 would pass it, the Lows not built yet go to the carry list and the last round starts; do not stop on me again for that. The last round stays as ruled: netcode and security, on the three Highs' fixes only. Send this to U8's builder now.
+
+B. I'm about to run /compact on this chat. First make sure nothing that lives only in this conversation is lost. Do just this, then stop:
+1. Start no new agent, workflow or unit until after the compact, apart from A. Running ones carry on: background agents and shells keep running through a compact.
+2. Bring the card up to date as your resume source (no new file; stay within 200 lines, as you already do):
+   - Running work: for every running agent, workflow and background shell, the ID you use to message, resume or stop it, plus its task, notes file and resume point. For U8's builder: what you do when it returns.
+   - Your own step: what you're in the middle of right now, and the next three steps after it.
+   - Anything decided, found or promised in this conversation that isn't on the card or in a file yet: choices for the day's message, findings and their takers, anything you told an agent beyond its brief.
+3. Any words of mine that matter later and aren't in history.md yet go in word for word, as usual. That includes this message.
+4. Save with checkpoint.mjs and push. Check that the branch equals origin and git status is clean (or name what is held back, and why).
+5. Reply in one line: "Ready for /compact: card <sha>; running: <names>."
+```
+- A was sent to U8's builder ac59cce3e5d002441 at 17:1x UTC, his words quoted (pass 3 items 2-7, then the Lows; stop 6,200;
+  past it the unbuilt Lows to "Carried (past 6,200)" in its notes, end checks, return).
