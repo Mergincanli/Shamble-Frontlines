@@ -5,7 +5,7 @@
   **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
   conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
   before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-22 20:4x UTC, after his /compact (his words history.md:7630-7651): this card is the resume
+- **Last update:** 2026-11-23 02:4x UTC, after the cut of 20:42-02:36 (his words history.md:7630-7653): the resume
   source; Now holds my step and the next three; Running work holds every running agent and shell with its ID.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
@@ -65,35 +65,21 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-22 20:5x UTC; his warning at 96% usage, history.md:7652-7653: all saved, agents told to save)
-- **My step:** waiting on two agents; the netcode seat DONE, REVISE: NR-U6A-1 High (npt-super's header: bite None,
-  tick_hz 0, scene "", so its run goes INVALID); -2, -3 Medium (Q-U6A-5's SMT-sibling refusal not built; a failed
-  /proc walk writes alone 1); 5 Lows (-4, -8 fix; -5, -6, -7 carries to U6d, U6e, U6b). Day message draft not begun.
-- **Next 1:** when the test seat returns, one fix message to the U6a builder (both seats' Mediums and up, -4, -8);
-  then U7's advisor check (u7-brief.md c9e1fb33…, as U6c's) in the free slot, after the usage reset.
-- **Next 2, 23:05 UTC:** the day message (trig_01967r39…), saved first as msg-2026-11-23.md, one screen: the Choices
-  block's 2026-11-22 lines; sizes (U6a 5,460, U8 4,176; at 1.9-2.3 U6c 5,300-6,450, U7 4,200-5,050; stop past 6,000);
-  R1 with about a day of slack and its triggers; F26 (mine, fixed); the cut 15:47-19:44; planned R2 Sat 12, R3 Sun 13,
-  R5 Mon 14, close Fri 18 (firm with R1's run plan at Stop B); Decisions needed, For Mustafa.
+## Now (2026-11-23 02:4x UTC, resumed after the cut of 20:42-02:36 UTC, history.md:7655-7663)
+- **My step:** the day message sent late (msg-2026-11-23.md); waiting on the test seat (resumed 02:38). The netcode
+  seat DONE, REVISE: NR-U6A-1 High (npt-super's header: bite None, tick_hz 0, scene "", so its run goes INVALID); -2,
+  -3 Medium (Q-U6A-5's SMT-sibling refusal not built; a failed /proc walk writes alone 1); 5 Lows (-4, -8 fix; -5,
+  -6, -7 carries to U6d, U6e, U6b). The test seat so far (its notes): TR-U6A-1 High = NR-U6A-1; -2, -3 Medium.
+- **Next 1:** when the test seat returns, one fix message to the U6a builder (both seats' Mediums and up, -4, -8, the
+  test seat's Lows by its table); U7's advisor check (u7-brief.md c9e1fb33…, as U6c's) at the next wake.
+- **Next 2:** the 2026-11-24 day message at 23:05 UTC (trig_01Wz38rMh8AJJNNQ6k3BhZFs), saved first as msg-2026-11-24.md.
 - **Next 3:** the round's fixes by SendMessage to the U6a builder; M3-M9 (part-clean, `git apply --check` and `git
   apply` in the main folder, cmp-equal to the worktree, M5 check.mjs via main-run.sh in the background, gate
   --no-smoke, one commit, push, CI); then U6b's Block 0 and builder, U8's fix pass, U7's Block 0a after its check.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
-- **2026-11-22, U6a's close (my lean):** the pre-round merge-worktree check folded into the merge's M5, since `<base>`
-  only the npm files and redact-check changed in spikes/ (no Rust); U7's brief drafted before its replan slot (U8 done).
-- **2026-11-22, U6c's brief and F26 (advisor-u6c-brief.md §1-6):** lever (2) taken (U6c's security read stands as Stop
-  B's read of its host); Block 2 last as the valve; Q-U6C-1 to -8 as ruled; F26's fix form, as my own commit.
-- **2026-11-22, U8's and U6b's briefs (advisor-u8-brief.md §1-2, advisor-u6b-brief.md §1-2):** U8: npt-super started
-  by one root command in its own CPU slice (Stop B confirms six points), home address held by the Hetzner firewall
-  (proved at bring-up), DelayStream judged on E with L0 = 0 (C-U8-5), the TCP-model burst knob in MOVED's brief; U6b:
-  `begin_tick`, ring for TLS, the self-test window mark, the in-memory key, the lever to U6e taken now.
-- **2026-11-22, U6a's brief (the advisor's rulings, advisor-u6a-brief.md §1-2; to name in the next day's message):**
-  -16's start timer, -2's room-log series, C-U6-16 (c), C-U6-14's first clause and the 0600 token file built in U6a;
-  T6's loss and space to U6d; taskset pinning; no wire change for C-U7-3; no engine-architect seat; C-U6-19's gate now
-  "before U6d's merge" with R1's browser legs one slot each; SEC-R1D-1's url bump as U6a's lock change (my lean).
-- Earlier choices, each named in its day's message: 2026-11-21's (U4f2's round 2 with netcode and test only; the ones
-  NPT-TRIM made moot: this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
+- Each named in its day's message: 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at 9341c90 holds them);
+  2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
 
 ## Next steps (NPT-TRIM's order; the re-plan fixes the rest; U4f2 and the re-plan DONE: this card at 1b26e8c)
 1. U4's report (it folds U4r's, U4f's and U4f2's; U4's kept server rows are U4k, after R1).
@@ -143,15 +129,15 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Agents running (1 of 3):** (1) security ab80f7d9c82f327b9: DONE 20:4x (security-f26.md, security-u6c-deps.md:
+- **Agents running (1 of 3):** (1) security ab80f7d9c82f327b9: DONE 20:40 (security-f26.md, security-u6c-deps.md:
   U6c's Block 0 CLEAR WITH CONDITIONS, 5 conditions, SEC-U6CD-1 to -4 Low, lock 235 -> 252 modelled). (2) U6a's
-  netcode seat a9a29bd03da0757ad: DONE 20:5x (u6a-review-netcode.md ends DONE; F1, F3, F7, F9 fine; F4 no owner for
+  netcode seat a9a29bd03da0757ad: DONE 20:38 (u6a-review-netcode.md ends DONE; F1, F3, F7, F9 fine; F4 no owner for
   S1's burn; O1 carry U6d; O2 carry U6b, U7). (3) U6a's test seat
-  a4724cf284e77b73e (test-engineer, xhigh, from 20:3x) -> u6a-review-test.md (TR-U6A-n), scratch u6a-review-test/;
-  scope section 3 items 1-9 of its brief (counts, plants, bites, timing, carries, header, -2 parity, SERIES rows, not
-  verified); same runner; resume from its file.
-- **Shell and triggers:** the saver bksz5vu7x (checkpoint.mjs watch, from 19:46 to about 21:36; TaskStop it, restart in
-  the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly); day message trig_01967r39CKqT2qxdsbAS5sCP.
+  a4724cf284e77b73e (test-engineer, xhigh, from 20:3x; cut 20:42, resumed 02:38) -> u6a-review-test.md (TR-U6A-n);
+  scope section 3 items 1-9 (counts, plants, bites, timing, carries, header, -2 parity, SERIES rows, not verified);
+  scratch u6a-review-test/; same runner; resume from its file's STOPPED AT block.
+- **Shell and triggers:** the saver bbz6p4y44 (checkpoint.mjs watch, from 02:38 to about 04:28; TaskStop it, restart in
+  the background, timeout 7200000); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly); day message trig_01Wz38rMh8AJJNNQ6k3BhZFs.
 - **Finished, resumable by SendMessage:** U7's drafter a159f25bffe1d4950 (told at 20:0x, beyond its brief: the ruling's
   C9, Q-U6C-3, C1 (e), section 5 items 3 and 5, C1 (c)); U6a builder a95ebf14368f277ff and U8 builder abf71d95fc07b3522
   (worktrees .claude/worktrees/agent-<ID>, kept for the fixes and the fix pass); the U6c advisor a662f1797b78cae95.
@@ -197,4 +183,4 @@
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - All word for word in history.md: until 2026-11-17 from :5791 on; 2026-11-18 :6921-6932; 2026-11-19 :7124-7146,
   :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559, :7618-7620;
-  2026-11-22 :7610-7617 and :7623-7628 (15:47:28 to about 19:44 UTC, the monthly spend limit; nothing lost).
+  2026-11-22 :7610-7617, :7623-7628 (15:47:28 to about 19:44 UTC); 2026-11-22/23 :7655-7663 (about 20:42 to 02:36 UTC).

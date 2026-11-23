@@ -7649,5 +7649,15 @@ The compact is done. Pick up exactly where you left off, rebuilding from the rep
 2. Check the live state against the card: git status and the branch against origin; the task list and pending notifications; every agent, workflow and shell the card lists as running. Resume anything that stopped as SPEND-LIMIT (a) says, checking first what the card says to check. Start nothing twice.
 3. Then tell me in at most 8 lines: where the test stands (units done with their verdicts, units moved or stopped), what's running, the step you're on and the next ones, and what waits on me. If the card, the repo and the summary disagree, or something is missing, say what and stop. Otherwise carry on without waiting for me.
 ```
-- About 20:5x UTC (it reached this chat mid-turn, with a tool result), word for word:
+- 20:37:59 UTC (transcript line 75797, queued; it reached this chat mid-turn), word for word:
   "We're at 96% usage, make sure to save your progress (but also for the agents)"
+
+## Cut by the spend limit (2026-11-22 about 20:42 UTC to 2026-11-23 02:36 UTC)
+- **The notice** (U6a's test seat a4724cf284e77b73e; its task ended at about 20:42:17 UTC, HTTP 429): "You've hit your
+  org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 12:40am (UTC)".
+- **What it stopped:** only the test seat (read only; no cargo left running; its notes saved with a STOPPED AT block).
+  The netcode seat and security had finished at about 20:38-20:40; this session's turn had ended at 20:41; the saver
+  ran to its end at 21:35:49. The worker restarted several times; the check-ins of 22:34, 00:34 and 02:34 and the
+  23:05 day-message reminder reached this chat together at 02:35:55 UTC.
+- **Resumed 02:36-02:38 UTC:** the test seat by SendMessage (from its STOPPED AT block); the saver restarted
+  (bbz6p4y44); the day message sent late.
