@@ -127,6 +127,28 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-23, 21:24:59 UTC: FIREFOX-TESTS (b) in place of (c): Firefox in CI joins the small CI pull
+  request after change-set 3a, and no Firefox pull request comes between #64 and 3a; change-set 3a starts when #64 is
+  merged, on this word, with no second ask; three items for change-set 3 come from his Advisor before 3b's build
+  starts** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account
+  that also holds his claude.ai project "Shamble Frontlines ALT"; his message 219448d3-8dec-4c23-bf93-d3e88bb6110c, sent
+  while the chat was working, whole; extracted by script from the chat's transcript). It replaces his answer
+  FIREFOX-TESTS (c) in ANSWERS-7 (the entry of 14:31:06 UTC below, which stays as written). In his words: "Until then my
+  own browser check covers Firefox, as at change-set 2." On the start of 3a: "You need not ask me again to start. If
+  your context is above 40 % at that point, tell me first and I compact the chat." On the three items: "They do not
+  touch 3a." What it answers, in the chat's words (not his): nothing the chat asked. It changes his answer FIREFOX-TESTS
+  (c) of ANSWERS-7 (2026-11-23, 14:31:06 UTC: a small pull request of its own right after the CI pull request) to (b),
+  in his words here; it gives the start word that BUILD-SEAT (15:10:32 UTC) and points 9 and 11 of his block of 16:30:46
+  UTC left with him (change-set 3a starts when #64 is merged, with no second ask; above 40 % of context the chat tells
+  him first); and it announces three items for change-set 3b from his Advisor. Copied by script (744 bytes, sha256
+  3328818de5c15eae845914b86f5cbf20490be2cb048d3e92d101100aa5704109):
+> My words of 23 November on what comes after #64, written with my main Advisor.
+>
+> 1. FIREFOX-TESTS: I change my answer from (c) to (b). Firefox in CI joins the small CI pull request after 3a (E1's). No Firefox pull request comes between #64 and 3a. Until then my own browser check covers Firefox, as at change-set 2.
+>
+> 2. Change-set 3a starts when #64 is merged, on this word (BUILD-SEAT): open its checkpoint from the approved plan (cs3-plan.md, draft 3, with my ANSWERS-7) and build. You need not ask me again to start. If your context is above 40 % at that point, tell me first and I compact the chat.
+>
+> 3. Before 3b's build starts, my Advisor sends you three items that moved from the netcode proof test into change-set 3. They do not touch 3a.
 - **Taken by Mustafa, 2026-11-23, 20:47:59 UTC: PLANT-WRITE (a), yes to the two planted lines in GitHub's check; and his
   yes in advance to their take-back, only if the planted run fails the expected way** (the builder chat he calls Builder
   V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
