@@ -96,6 +96,11 @@ const FROM = "Copied by script from the session's transcript (session_01WLuqnwQ8
 {
   const c = call('toolu_0131ioSAEjCfPXbqMgajDDTX', 'mcp__hearthbot__post_message');
   note('thread-2026-11-23T142825-seven-answers.md', "The thread's message of 2026-11-23, 14:28:25 UTC: the seven answers stated back to him (not his words)", `${FROM}: the text of the thread's post_message call ${'toolu_0131ioSAEjCfPXbqMgajDDTX'}, stamped ${c.at}`, c.input.text);
+  // The part his tap answers: from the paragraph that lists the seven answers to the end. The two paragraphs before
+  // it are about the thread itself and about his question on the chats' names.
+  const start = '**The seven answers I will work from**';
+  if (c.input.text.split(start).length !== 2) throw new Error('the paragraph of the seven answers must stand once');
+  note('thread-2026-11-23T142825-seven-answers-part.md', "The thread's message of 2026-11-23, 14:28:25 UTC, from its third paragraph to its end: the seven answers stated back to him (not his words)", `${FROM}: the text of the thread's post_message call toolu_0131ioSAEjCfPXbqMgajDDTX, stamped ${c.at}, from the paragraph that lists the seven answers to the end; the whole message is thread-2026-11-23T142825-seven-answers.md`, start + c.input.text.split(start)[1]);
   const d = call('toolu_015HWn2nBDfXux9zUHAr6HrM', 'mcp__hearthbot__request_decision');
   note('thread-2026-11-23T142827-card-answers-7.md', "The thread's decision card of 2026-11-23, 14:28:27 UTC: ANSWERS-7 (not his words)", `${FROM}: the question, options and reason of the thread's request_decision call toolu_015HWn2nBDfXux9zUHAr6HrM, stamped ${d.at}, each field whole, laid out one per line`, card(d));
 }

@@ -1,6 +1,8 @@
 // The docs pass of the CI-WASM pull request: writes Mustafa's chat messages since his go on #61 into docs/DECISIONS.md,
 // newest first, and one dated pointer under the entry of 2026-11-19, 13:36:37 UTC. His words are never retyped: they
 // come from the files saved by script from the session's transcript (words.mjs), each with its byte count and sha256.
+// Since 2026-11-23 the project thread that took the pull request over adds its entries on top: his messages there are
+// saved by thread-words.mjs; the thread's own message and cards are shown under his words as the thread's text.
 // The file is always rebuilt from BEFORE (main's copy), so a second run writes the same bytes. From the repository root:
 //   node .checkpoints/ci-wasm/decisions-3.mjs [--check] [--out <file>]
 import { execFileSync } from 'node:child_process';
@@ -16,9 +18,18 @@ const NOTES = '.checkpoints/ci-wasm/';
 const BEFORE = 'f5030a33185b1ea1b15329174e82823f0215f993';
 const SESSION = 'the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account';
 const RECORD = 'docs/reports/2026-11-19-cs2-browser-check.md';
+const THREAD =
+  'the project thread "Build the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines ALT" on his second personal account';
+// The commit that holds the thread's saved messages and both plans, for when the notes are deleted.
+const NOTES_AT = 'fcf6def';
+const TAP =
+  "a tap on the thread's decision card: the line below is the message the platform wrote for his tap, in the card's wording, not text he typed; extracted by script from the session's transcript";
 const sha = (s) => createHash('sha256').update(s).digest('hex');
-const quote = (s) => s.split('\n').map((l) => (l === '' ? '>' : `> ${l}`)).join('\n');
-const unquote = (s) => s.split('\n').map((l) => (l === '>' ? '' : l.replace(/^> /, ''))).join('\n');
+// A line that stands for text left out of his message (thread-words.mjs) is shown as a pointer, outside the quote.
+const LEFT_OUT = /^\[left out, lines \d+ to \d+: .*\]$/;
+const quote = (s) => s.split('\n').map((l) => (LEFT_OUT.test(l) ? `- _${l}_` : l === '' ? '>' : `> ${l}`)).join('\n');
+const unquote = (s) =>
+  s.split('\n').map((l) => (l === '>' ? '' : /^- _\[left out, lines .*\]_$/.test(l) ? l.slice(3, -1) : l.replace(/^> /, ''))).join('\n');
 const wrap = (text, rest = '  ') => {
   const out = [];
   let line = '';
@@ -45,9 +56,48 @@ function saved(file) {
   return { words, bytes: Buffer.byteLength(words), sha256: sha(words) };
 }
 const by = (m) => `Copied by script (${m.bytes} bytes, sha256 ${m.sha256}):`;
+// The thread's own text under his words: a label line, then the text whole in a fenced block.
+const fence = (label, n) =>
+  `${wrap(`- _The thread's text, not his words: ${label} (copied by script, ${n.bytes} bytes, sha256 ${n.sha256}):_`)}\n\`\`\`text\n${n.words}\n\`\`\`\n`;
 
 // Newest first. `file` undefined: a pointer, with no words of his quoted under it.
 const ENTRIES = [
+  {
+    key: '2026-11-23, 14:32:43 UTC: WRITE-THREAD',
+    file: 'mustafa-2026-11-23T143243-write-thread.md',
+    after: [{ file: 'thread-2026-11-23T142918-card-write-thread.md', label: 'the decision card he answered, posted at 14:29:18 UTC' }],
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 14:32:43 UTC: WRITE-THREAD, his yes to the CI file being written from the project thread, which has no Accept edits mode; and his question why a new Claude Code chat does not write the CI files instead** (${THREAD}; his message cmsg_019xis1ZabqTLNQbEMzA6WbhUZGHHmFH2k2HzELe9gE4ZM, typed in the app, whole; extracted by script from the session's transcript). It answers the thread's decision card of 14:29:18 UTC, shown under it as the thread's text, not his words; his first line is that card's question. His WRITE-MODE words of 2026-11-18 (the entry of 2026-11-18, 20:20:09 UTC, below: "From now on you read the chat's mode right before each kit write and stop unless it is Accept edits.") are not reworded and stand for every chat that has the mode: the thread's session record read "auto" at 14:28 UTC, a project thread has no switch for its mode, and no repository hook loads in one, so the thread stopped and asked him. In place of the mode read: his yes on the exact text, and the file's sha256 compared with its scratch copy after each CI write. His yes covers the three CI writes of the CI-WASM pull request (the file; the two planted lines; their take-back) and no other kit, gate or CI edit. The thread answered his question at 14:33:55 UTC (it is a Claude Code session on the model his words name for a builder chat, with the repository and the plans loaded; a separate chat can take its branch over whenever he prefers) and goes on with the write unless he says otherwise; its answer is in the notes (\`.checkpoints/ci-wasm/thread-2026-11-23T143355-why-here.md\`, readable at ${NOTES_AT} once the notes are deleted). ${by(m)}`,
+  },
+  {
+    key: '2026-11-23, 14:32:42 UTC: LONG-RUNS',
+    file: 'mustafa-2026-11-23T143242-long-runs.md',
+    after: [{ file: 'thread-2026-11-23T143025-card-long-runs.md', label: 'the decision card he answered, posted at 14:30:25 UTC' }],
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 14:32:42 UTC: LONG-RUNS, the long runs of his project's threads (a full test suite, a long build) go on GitHub, from a branch the thread pushes, and are read from its checks** (${THREAD}; ${TAP}). The card is shown under it as the thread's text, not his words. It changes none of the evidence the change-set protocol asks for: the short runs (a test file by its path, the legacy gate, one build, a rehearsal) still run in the thread's container. ${by(m)}`,
+  },
+  {
+    key: '2026-11-23, 14:31:06 UTC: ANSWERS-7',
+    file: 'mustafa-2026-11-23T143106-answers-7.md',
+    after: [
+      { file: 'thread-2026-11-23T142825-seven-answers-part.md', label: 'its message of 14:28:25 UTC from its third paragraph to its end, which states the seven answers back to him (the two paragraphs before it are about the thread itself and about his question on the chats\' names; the whole message is in the notes); the CI text was attached to the message as a file' },
+      { file: 'thread-2026-11-23T142827-card-answers-7.md', label: 'the decision card he answered, posted at 14:28:27 UTC' },
+    ],
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 14:31:06 UTC: ANSWERS-7, his yes to the seven recommended answers. For the CI-WASM pull request: CHROME-SOURCE (a), the Google Chrome in GitHub's runner image; CI-TEXT (a), yes to the CI text and what goes with it; FIREFOX-TESTS (c), a small pull request of its own right after it. For change-set 3's plan: RNG-SOURCE (c), our own ChaCha8, checked against the published test vectors; SIZE-3 (b), two change-sets, 3a then 3b; PRESS-PACE (a), a second tap inside one tick is applied one tick later; DEPART-3 (a), he accepts the list** (${THREAD}; ${TAP}). What his tap answers is shown under it as the thread's text, not his words: the part of the thread's message of 14:28:25 UTC that states the seven answers back in plain words, and the card. The file attached to that message is the CI text, byte for byte \`.checkpoints/ci-wasm/ci-edit.diff\` (128 lines, 93 added, none removed, sha256 240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673). Each question in full, with every option and the recommended one, stands in the CI plan's section 16 and in change-set 3's plan (draft 3), section 12 (\`.checkpoints/ci-wasm/plan.md\` and \`.checkpoints/ci-wasm/cs3-plan.md\`, readable at ${NOTES_AT} once the notes are deleted): so the first builder chat put them to him on 2026-11-19 (at about 20:03 and 21:07 UTC, by its card), so two threads of his project laid them out for him on 2026-11-23 (their messages of 13:39:57 and 14:11:11 UTC, in plain words, with the options), and he pasted the first builder chat's own summary of them into this thread himself (the entry of 14:25:03 UTC below: lines 5 to 90 of his message). The recommended answers hold more than the thread's message spells out. CI-TEXT (a) is one yes for five things: \`ci-edit.diff\`; \`ci-plant-p-gh.diff\` (the two planted lines, sha256 e4f21ab359bc9fd911c663a4fcbc892133195fefe44e88ad7ec51b50e3d0b1ac), written in one commit and taken out in the next; the second planted change, one committed render count changed from 3 to 4 and taken back; the stop rule of the CI plan's section 9; and the tool's second route, the runner's curl line with the limits of the route he approved. SIZE-3 (b) carries his yes in advance to the two ladders of change-set 3's plan (its sections 4 and 5: a part moves whole with its tests to a named place, no test is dropped, he is told when a part moves). DEPART-3 (a) is the list of that plan's section 12, question 4. The advisor agent's rulings that went to him with the questions, each his to overrule, stand, since he has named no objection: PERM-ATT (a), PLANTS both, PYCACHE-NOW (b), WASM-TEST-ROUTE (a), CI-LOOP (a) for E1 only. ${by(m)}`,
+  },
+  {
+    key: '2026-11-23, 14:25:03 UTC: he would rather go on today',
+    file: 'mustafa-2026-11-23T142503-builder-chat.md',
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-23, 14:25:03 UTC: he would rather go on today, and wants a new builder chat, on the model his words name, to continue building the game** (his message cmsg_019xis1ZabqTLNQbEMzA6WbhR97Lu4zJ8QjD4X3hYFruVA, typed in the main chat of his claude.ai project "Shamble Frontlines ALT" on his second personal account; his project made the thread "Build the game from change-set 3" from it, session_01WLuqnwQ8c8JuNgfBX7Wixg; extracted by script from that session's transcript). Of its 211 lines, 201 are the last texts of three other chats, pasted by him: they are left out and named in the lines in square brackets, and his own lines are whole (the whole message: 16731 bytes, sha256 93c7645aebfee23df6658110d7cfe3fdd4d0e8f8db6be4d6ca2216f773848f93). The chat he calls Builder V1 is the first builder chat, lane 1 of this repository's records (session_019YNMUV9LFhASseJ9EP12kL, branch \`claude/wonderful-hamilton-jdmlnf\`), paused by his words of 2026-11-19, 21:44:09 UTC (the entry below); its account is out of usage until the evening of 2026-11-24 (his message of 14:10:08 UTC in his project's main chat, read there, not copied here). On his words the thread takes lane 1's work forward on a branch of its own, \`claude/project-thread-qx9woh\`, started from that chat's last commit d064e17b84b73c8040ffe66db7105a517cde9215, and never pushes to that chat's branch (LANE-RULES: "a lane never pushes to another lane's branch"). The first line of his message quotes a paste block another thread of his project had written for the first builder chat; his question under it was answered in the thread's message of 14:28:25 UTC (\`.checkpoints/ci-wasm/thread-2026-11-23T142825-seven-answers.md\`, readable at ${NOTES_AT} once the notes are deleted): by "Lane 1" the paste block means the chat he calls Builder V1. ${by(m)}`,
+  },
+  {
+    key: '2026-11-19, 21:44:09 UTC: the pause',
+    file: 'mustafa-2026-11-19-pause.md',
+    lead: (m) =>
+      `- **Taken by Mustafa, 2026-11-19, 21:44:09 UTC: the pause: the first builder chat finishes what is in hand and starts nothing until he says so** (${SESSION}; extracted by script from the session's transcript, message 314f33b2-7c58-441f-8099-0b96cf4cd024, whole). When it came, the CI-WASM pull request (#62) was a draft with no CI file written, and its three questions and change-set 3's four were with him; the chat finished what was in hand and stopped (its last commit: d064e17). He has not told that chat to continue; on 2026-11-23 a thread of his project took the work forward (the entries above). ${by(m)}`,
+  },
   {
     key: '2026-11-19, 16:08:04 UTC: two notes for the work after #61',
     file: 'mustafa-2026-11-19-1638-two-notes.md',
@@ -83,7 +133,11 @@ const POINTER =
 const blocks = ENTRIES.map((e) => {
   const m = e.file === undefined ? undefined : saved(e.file);
   const lead = wrap(e.lead(m));
-  return { ...e, m, lead, block: m === undefined ? `${lead}\n` : `${lead}\n${quote(m.words)}\n` };
+  const after = (e.after ?? []).map((a) => {
+    const n = saved(a.file);
+    return { ...a, n, text: fence(a.label, n) };
+  });
+  return { ...e, m, lead, after, block: (m === undefined ? `${lead}\n` : `${lead}\n${quote(m.words)}\n`) + after.map((a) => a.text).join('') };
 });
 const TOP = '## Decisions, newest first\n';
 const before = execFileSync('git', ['show', `${BEFORE}:${DEC}`], { maxBuffer: 1 << 26 }).toString('utf8');
@@ -98,7 +152,12 @@ const ok = {
   [`with the new blocks and the pointer taken out, every byte equals the file at ${BEFORE.slice(0, 7)}`]:
     blocks.reduce((s, b) => s.replace(b.block, ''), t).replace(POINTER, '') === before,
   'the newest entry stands at the top of the list': t.includes(TOP + blocks[0].lead),
-  'no new line over 120 characters outside his quoted words': [...blocks.map((b) => b.lead), POINTER].every((s) => s.split('\n').every((l) => l.length <= 120)),
+  'no new line over 120 characters outside his quoted words and the thread\'s quoted text': [
+    ...blocks.map((b) => b.lead),
+    ...blocks.flatMap((b) => b.after.map((a) => a.text.split('\n```text\n')[0])),
+    ...blocks.flatMap((b) => (b.m === undefined ? [] : b.m.words.split('\n').filter((l) => LEFT_OUT.test(l)).map((l) => `- _${l}_`))),
+    POINTER,
+  ].every((s) => s.split('\n').every((l) => l.length <= 120)),
   'no carriage return': !t.includes('\r'),
 };
 for (const b of blocks) {
@@ -107,6 +166,11 @@ for (const b of blocks) {
   const i = t.indexOf(b.lead);
   ok[`${b.file}: in DECISIONS, unquoted, equal to the saved words (${b.m.bytes} bytes, sha256 ${b.m.sha256.slice(0, 12)})`] =
     i >= 0 && unquote(t.slice(i + b.lead.length + 1, i + b.lead.length + 1 + quote(b.m.words).length)) === b.m.words;
+  for (const a of b.after) {
+    const j = t.indexOf(a.text);
+    ok[`${a.file}: under that entry as the thread's text, equal to the saved text (${a.n.bytes} bytes, sha256 ${a.n.sha256.slice(0, 12)})`] =
+      j > i && t.slice(j, j + a.text.length).split('\n```text\n')[1] === `${a.n.words}\n\`\`\`\n`;
+  }
 }
 for (const [k, v] of Object.entries(ok)) console.log(`${v ? 'yes' : 'NO '}  ${k}`);
 process.exit(Object.values(ok).every(Boolean) ? 0 : 1);
