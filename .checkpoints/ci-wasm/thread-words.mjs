@@ -154,6 +154,15 @@ const FROM = "Copied by script from the session's transcript (session_01WLuqnwQ8
   const e = call('toolu_01Fb9XQyj49TyLjqhsqENji9', 'mcp__hearthbot__request_decision');
   note('thread-2026-11-23T150956-card-acct-3.md', "The thread's decision card of 2026-11-23, 15:09:56 UTC: ACCT-3 (not his words)", `${FROM}: the question, options and reason of the thread's request_decision call toolu_01Fb9XQyj49TyLjqhsqENji9, stamped ${e.at}, each field whole, laid out one per line`, card(e));
 }
+// 9. His taps on those two cards, and the thread's reply to the first.
+{
+  const b = his('2026-11-23T15:10:32Z');
+  note('mustafa-2026-11-23T151032-build-seat.md', 'Mustafa, 2026-11-23, 15:10:32 UTC: his tap on the card BUILD-SEAT', `${FROM}: the message the platform wrote for his tap, sent 2026-11-23T15:10:32Z, whole`, b.text);
+  const r = call('toolu_015q8WpBCg8SfkVuooUs9HtB', 'mcp__hearthbot__post_message');
+  note('thread-2026-11-23T151058-build-seat-noted.md', "The thread's message of 2026-11-23, 15:10:58 UTC, after his tap on BUILD-SEAT (not his words)", `${FROM}: the text of the thread's post_message call toolu_015q8WpBCg8SfkVuooUs9HtB, stamped ${r.at}`, r.input.text);
+  const a = his('2026-11-23T15:11:01Z');
+  note('mustafa-2026-11-23T151101-acct-3.md', 'Mustafa, 2026-11-23, 15:11:01 UTC: his tap on the card ACCT-3', `${FROM}: the message the platform wrote for his tap, sent 2026-11-23T15:11:01Z, whole`, a.text);
+}
 
 let ok = true;
 for (const n of out) {
