@@ -19,7 +19,7 @@
   main and is never switched, so every push names its target (`git push origin cs/ci-wasm:claude/loving-hopper-6p0mg2`),
   and the saver script is not used (it pushes to the local name): saves are by hand, by path. **Pull request: not
   opened yet** (this chat has no GitHub write tool: see "Open findings", GH-TOOLS); #63 and #62 stay open.
-- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 17:17 UTC (from the clock).
+- **Opened:** 2026-11-19 15:13 UTC (from the clock). **Last update:** 2026-11-23 17:26 UTC (from the clock).
 - **The thread's addendum to the plan:** `ci-wasm/takeover.md` (2026-11-23; what stays and what changed while the
   thread held the work; its parts on a CI write from the thread are overtaken by WRITE-WHERE) and the advisor
   agent's read of it, `ci-wasm/advisor-takeover.md`.
@@ -258,6 +258,23 @@
    the guard keeps `gh api` read-only: GH-TOOLS.
 
 ## Current step
+**Step 9 (2026-11-23): CI write 1 is made and pushed; its first runner runs are read under the stop rule.** His yes
+again at 17:22:42 UTC (`ci-wasm/mustafa-2026-11-23T172242-ci-write-1-again.md`), typed, with the mode on it `default`
+(the session record at 17:22 and 17:23 UTC and the `permissionMode` on the message; mode sequence 677, it was 11): by
+his point 3 of 17:15:07 UTC the chat writes on `default` and names the value in the report. The file rebuilt in
+`.gate/ci-wasm/proposed/toolchain.yml` (sha256 OK), copied onto `.github/workflows/toolchain.yml` at 17:23:43 UTC by
+the clock line after it: **sha256 d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c**, numstat 93 0,
+mode 100644, `diff -u` of main's file against it equal to `ci-edit.diff`'s body byte for byte. Commit
+**cb476b141212c018e188061d65ab6e6b203c2c47** (that one file), pushed 17:24 to 17:25 UTC; shown to him. Not known:
+whether the guard's prompt for the copy reached him (the command ran). A first push command was refused by a settings
+rule (`git push *+*` matched the `+` of a chained `date` command): a push stands alone on its command line. **Pull
+request #64** (his, opened 17:21:24 UTC; head = the branch): **not a draft, default title, no text yet**: told to him.
+Runs on cb476b1, push: gate and smoke 45227423066, toolchain 45227423151.
+
+**Next:** read toolchain's log line by line against the stop rule (plan section 9) for the push run and the
+pull-request run; then ask 2 (P-GH's two lines, expected sha256 12b90249...12ef), stop.
+
+_Before it, kept for the record:_
 **Step 8 (2026-11-23): Builder V3, the first CI write is put to him.** The advisor agent's takeover read is in
 (`ci-wasm/advisor-v3-takeover.md`; its notes ended with DONE by 17:01:21 UTC; reviewed head c37fc11): **APPROVE for
 the first CI write**, once the record shows `acceptEdits` on his reply to that write's stop and his yes on that
