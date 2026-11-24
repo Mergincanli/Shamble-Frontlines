@@ -3271,3 +3271,196 @@ fn moved_outranks_reported_and_stand_in() {
         "the kept part is still reported"
     );
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// Part b (U6j): the figures of the network runs, on made-up logs. Most of their input series have no writer yet.
+
+/// A mark like PM-0006-20: the tick thread's allocation count with logging on equals its logging-off twin's.
+fn alloc_mark() -> Value {
+    json!({
+        "id": "PM-0006-20", "title": "logging allocates nothing", "verdict": "pass",
+        "draft": {"file": "docs/adr/0006-infrastructure-operations.md", "row_sha256": "0".repeat(64)},
+        "parts": [{"name": "logging on", "select": {"params.suite": "logging-alloc"}, "min": 1}],
+        "checks": [{"name": "allocs equal", "figure": "alloc_twin_diff_count", "op": "==", "value": 0}],
+        "bites": [{"id": "PM-0006-20/planted-format", "what": "a format! on the tick thread"}]
+    })
+}
+
+/// One room log of an allocation run: its role, the twin it names, whether it runs the planted-format bite, and its
+/// ticks in order, each with its phase and its allocation count (`None`: the record has no count).
+fn alloc_run(
+    id: &'static str,
+    role: &'static str,
+    twin: Option<&'static str>,
+    bite: bool,
+    ticks: &[(Phase, Option<i64>)],
+) -> Log {
+    let mut s = LogSpec::room(id, "set-alloc", "PM-0006-20");
+    s.role = role;
+    s.bite = bite.then_some("PM-0006-20/planted-format");
+    s.params.push(("suite", json!("logging-alloc")));
+    s.params.extend(twin.map(|t| ("twin", json!(t))));
+    s.ticks = ticks
+        .iter()
+        .map(|(ph, n)| {
+            (
+                *ph,
+                n.map(|n| ("tick_allocs_count", n)).into_iter().collect(),
+            )
+        })
+        .collect();
+    s.build()
+}
+
+/// Measured ticks 1, 2, … with these allocation counts.
+fn measured(counts: &[i64]) -> Vec<(Phase, Option<i64>)> {
+    counts.iter().map(|n| (Measured, Some(*n))).collect()
+}
+
+#[test]
+fn alloc_twin_diff_count_compares_the_two_runs_tick_by_tick() {
+    let on =
+        |counts: &[i64]| alloc_run("on-1", "measured", Some("off-1"), false, &measured(counts));
+    let off = |role: &'static str, counts: &[i64]| {
+        alloc_run("off-1", role, None, false, &measured(counts))
+    };
+    // The bite's own pair is in every case: its count differs from its logging-off twin's on every tick (shown).
+    let bite = alloc_run(
+        "bite-1",
+        "bite",
+        Some("bite-off"),
+        true,
+        &measured(&[4, 4, 4]),
+    );
+    let bite_off = alloc_run("bite-off", "logging-off", None, true, &measured(&[3, 3, 3]));
+    let judged = |on_log: Log, off_log: Option<Log>| {
+        let mut logs = vec![on_log, bite.clone(), bite_off.clone()];
+        logs.extend(off_log);
+        judge(&marks_file(&[alloc_mark()]), &logs).remove(0)
+    };
+    // Pass: equal at every measured tick.
+    let v = judged(on(&[3, 3, 3]), Some(off("logging-off", &[3, 3, 3])));
+    assert_eq!(v.verdict, VerdictKind::Pass, "{:?}", v.why);
+    assert_eq!(
+        v.bites[0].status,
+        BiteStatus::Shown,
+        "{:?}",
+        v.bites[0].runs
+    );
+    // Fail: one tick differs; a tick that only one of the two runs has counts too.
+    let fail = ["logging on: run on-1: allocs equal = 1, needs == 0"];
+    let v = judged(on(&[3, 4, 3]), Some(off("logging-off", &[3, 3, 3])));
+    assert_eq!(
+        (v.verdict, v.why.as_slice()),
+        (VerdictKind::Fail, &fail.map(String::from)[..])
+    );
+    let v = judged(on(&[3, 3, 3]), Some(off("logging-off", &[3, 3])));
+    assert_eq!(
+        (v.verdict, v.why.as_slice()),
+        (VerdictKind::Fail, &fail.map(String::from)[..])
+    );
+    // Not run yet: the twin is not in the set.
+    let v = judged(on(&[3, 3, 3]), None);
+    assert_eq!(v.verdict, VerdictKind::NotRun, "{:?}", v.why);
+    assert!(
+        says(&v.why, "its twin off-1 is not in set set-alloc yet"),
+        "{:?}",
+        v.why
+    );
+    // Gaps: a twin of another role; a measured tick record without the count.
+    let v = judged(on(&[3, 3, 3]), Some(off("twin", &[3, 3, 3])));
+    assert_eq!(v.verdict, VerdictKind::Invalid, "{:?}", v.why);
+    assert!(
+        says(&v.why, "off-1 has role twin, not logging-off"),
+        "{:?}",
+        v.why
+    );
+    let holed = [(Measured, Some(3)), (Measured, None)];
+    let v = judged(
+        alloc_run("on-1", "measured", Some("off-1"), false, &holed),
+        Some(off("logging-off", &[3, 3])),
+    );
+    assert_eq!(v.verdict, VerdictKind::Invalid, "{:?}", v.why);
+    assert!(
+        says(&v.why, "measured tick 2 has no tick.v.tick_allocs_count"),
+        "{:?}",
+        v.why
+    );
+    // An empty comparison fails: neither run has a measured tick.
+    let warm = [(Warmup, Some(3))];
+    let v = judged(
+        alloc_run("on-1", "measured", Some("off-1"), false, &warm),
+        Some(alloc_run("off-1", "logging-off", None, false, &warm)),
+    );
+    assert_eq!(v.verdict, VerdictKind::Fail, "{:?}", v.why);
+    assert!(
+        says(&v.why, "have no measured tick; an empty comparison fails"),
+        "{:?}",
+        v.why
+    );
+}
+
+/// C-U6-10: the planted-format bite run's logging-off twin runs the same bite on the bites build. The build rule
+/// refuses a logging-off run that names a bite everywhere else; `twin_of` lets it through for a bite run alone.
+#[test]
+fn a_bite_runs_logging_off_twin_may_name_its_bite() {
+    let on = alloc_run(
+        "on-1",
+        "measured",
+        Some("off-1"),
+        false,
+        &measured(&[3, 3, 3]),
+    );
+    let off = alloc_run("off-1", "logging-off", None, false, &measured(&[3, 3, 3]));
+    let bite = alloc_run(
+        "bite-1",
+        "bite",
+        Some("bite-off"),
+        true,
+        &measured(&[4, 4, 4]),
+    );
+    let judged = |mark: Value, logs: Vec<Log>| judge(&marks_file(&[mark]), &logs).remove(0);
+    // The pair as it runs: the bite is shown.
+    let bite_off = alloc_run("bite-off", "logging-off", None, true, &measured(&[3, 3, 3]));
+    let v = judged(
+        alloc_mark(),
+        vec![on.clone(), off.clone(), bite.clone(), bite_off],
+    );
+    assert_eq!(
+        v.bites[0].status,
+        BiteStatus::Shown,
+        "{:?}",
+        v.bites[0].runs
+    );
+    // The same twin as a measured run: a measured run never names a bite, so the bite run's comparison has a gap.
+    let as_measured = alloc_run("bite-off", "measured", None, true, &measured(&[3, 3, 3]));
+    let v = judged(alloc_mark(), vec![on.clone(), off, bite, as_measured]);
+    assert_eq!(
+        v.bites[0].status,
+        BiteStatus::Invalid,
+        "{:?}",
+        v.bites[0].runs
+    );
+    let why = &v.bites[0].runs[0].invalid_why;
+    assert!(
+        says(
+            why,
+            "its twin bite-off is invalid: build: a measured run names the bite"
+        ),
+        "{why:?}"
+    );
+    // A measured run whose logging-off twin names a bite: refused as before.
+    let mut no_bites = alloc_mark();
+    no_bites["bites"] = json!([]);
+    let off_bitten = alloc_run("off-1", "logging-off", None, true, &measured(&[3, 3, 3]));
+    let v = judged(no_bites, vec![on, off_bitten]);
+    assert_eq!(v.verdict, VerdictKind::Invalid, "{:?}", v.why);
+    assert!(
+        says(
+            &v.why,
+            "its twin off-1 is invalid: build: a logging-off run names the bite"
+        ),
+        "{:?}",
+        v.why
+    );
+}
