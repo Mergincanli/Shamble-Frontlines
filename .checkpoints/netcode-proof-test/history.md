@@ -7751,3 +7751,20 @@ B. I'm about to run /compact on this chat. First make sure nothing that lives on
   stopped the saver b80065fbo. The check-ins of 00:34 and 02:34 reached this chat at 02:35 UTC.
 - **Resumed 02:3x UTC:** no cargo running; git status clean (HEAD = origin); the saver restarted (bg149e5i4); the
   advisor by SendMessage, from its plan.
+
+## Container restart (2026-11-24, between about 05:26 and 05:37 UTC; not a spend-limit cut)
+- **The notice** (in this chat, word for word, in the fence below):
+
+```text
+The container was restarted. The following background tasks were running and are now stopped:
+- Restart the background checkpoint saver (task b60xfhy35)
+- Run U6b's counted merge check again (C4) (task btp0vdr1c)
+Re-create them if still needed.
+```
+
+- **What it stopped:** U6b's M5 run 2 (main-run.sh from 05:24:31 UTC; fmt, clippy, clippy-wasm32 and doc had passed,
+  the test step had started; the partial log kept as .gate/u6b-merge/m5-check2-cut.log) and the saver b60xfhy35 (its
+  last save 7a060ba at 05:25:31).
+- **Resumed 05:37-05:38 UTC:** git as before (HEAD = origin; the 29 merge files uncommitted, all 29 equal to
+  .gate/u6b-merge/m6-files.txt by `sha256sum -c`); no cargo running; free 7,699 MiB (C4's floor 6,144); the saver
+  restarted (b5zvi56zl); M5 run 2 restarted from its start under the same log name (b5x83ixmp).

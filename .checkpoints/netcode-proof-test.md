@@ -92,7 +92,8 @@
   is now 2.10 GHz, was 2.30). **R1 DONE 05:23** (m6-probe3.log, sha2 opt-level 3 by --config: s8a 120 ms; bitten
   2,125-2,157 ms, own 125-157 ms; alone 2.50 s): **R2 taken**: Cargo.toml +3 after :120 (lock unchanged);
   **probe4 PASS 05:24** (m6-probe4.log: s8a 117-122 ms, bitten own 121-125 ms, alone 2.46 s); **M5 run 2 RUNNING**
-  (btp0vdr1c -> m5-check2.log); then C5 (m6-files.txt 29 files e46b0a73…; m6-cargo.diff 53682b3a…), M7-M9.
+  (restarted 05:38 after a container restart: b5x83ixmp -> m5-check2.log); then C5 (m6-files.txt 29 files e46b0a73…;
+  m6-cargo.diff 53682b3a…), M7-M9.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
 - **Next 2, U6b's merge** (advisor-u6b-m6.md C3-C7): the probe passes (all pass; untracked 4a61ef21; each start's own
@@ -147,13 +148,12 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (0 agents, 2 shells; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - M5 run 2, main-run.sh btp0vdr1c from 05:25 (.gate/u6b-merge/m5-check2.log). Done, resumable: the advisor's M6 rulings
-    a6e7ce46a28424b0b (advisor-u6b-m6.md DONE, both); its U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md DONE).
-    U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree
-    agent-a2661dc320c9e6d00), the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode
-    a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
-  - The saver b60xfhy35 (checkpoint.mjs watch from 04:27 to about 06:17; when it ends, restart it: run_in_background,
-    timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
+  - M5 run 2, main-run.sh b5x83ixmp from 05:38 (.gate/u6b-merge/m5-check2.log). Done, resumable: the advisor's M6
+    rulings a6e7ce46a28424b0b (advisor-u6b-m6.md DONE, both); its U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
+    DONE); U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree agent-a2661dc320c9e6d00), the
+    advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode a0a57a3948202de40, security aedb799ad9648b0e1,
+    test a88f25b3d3f66d972.
+  - The saver b5zvi56zl (05:37 to about 07:27; when it ends, restart it: run_in_background, timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
 - **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
   af8c5f0fbec829595 (u6b-run.sh exports CARGO_INCREMENTAL=0; a builder on the 4 GB floor stops, never cleans);
   U8's builder ac59cce3e5d002441 (worktree agent-ac59cce3e5d002441, notes u8-build.md "## Pass 3"); Stop B's infra seat
@@ -196,4 +196,5 @@
   :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559, :7618-7620;
   2026-11-22 :7610-7617, :7623-7628 (15:47:28 to about 19:44 UTC); 2026-11-22/23 :7655-7663 (about 20:42 to 02:36 UTC);
   2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC), :7675-7687 (about 07:53 to 11:14 UTC), :7689-7701 (about 12:28 to 16:22 UTC),
-  :7724-7736 (about 17:33 to 21:12 UTC); 2026-11-23/24 :7745-7753 (about 23:22 to 02:36 UTC).
+  :7724-7736 (about 17:33 to 21:12 UTC); 2026-11-23/24 :7745-7753 (about 23:22 to 02:36 UTC); 2026-11-24 :7755-7770
+  (a container restart, about 05:26 to 05:37 UTC: M5 run 2 and the saver re-run).
