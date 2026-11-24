@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-24 about 23:05 UTC, part b at 67892d39, the last checks running.
+- **Last update:** 2026-11-24 about 23:25 UTC, part b's final code head 72651a3c, the last checks running.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -63,21 +63,28 @@
    redact 11 of 11, 0 findings. GitHub on that SHA: the gate workflow's jobs gate and smoke success (run 45483689493),
    the toolchain workflow success (run 45483689440). Part a's commit id reported to Mustafa.
 
-## Part a, for whoever merges it (the netcode chat, on Mustafa's word only)
-- **The commit:** 0e0f654776fc0e10e153875d59b33869e6179a88 (commits after it on this branch touch only
-  `.checkpoints/netcode-judge*`). It changes only `spikes/netcode-proof/crates/judge/` and `spikes/netcode-proof/marks/`
-  (9 files); no manifest or lockfile; `marks/SERIES.md` untouched.
-- **To repeat the checks, from `spikes/netcode-proof/`:** `cargo test -p npt-judge --locked --no-fail-fast` (98 pass:
-  17 + 3 + 55 + 23); `cargo clippy -p npt-judge --all-targets --locked -- -D warnings`; `cargo fmt --check`;
+## Both parts, for whoever merges them (the netcode chat, in one merge, only on Mustafa's word, after his main Advisor checked the final commit)
+- **The commit:** 72651a3c6326546b423c4773ac5a92902a37b590 (commits after it on this branch touch only
+  `.checkpoints/netcode-judge*`). From the netcode head e2c0e896 it changes only `spikes/netcode-proof/crates/judge/`
+  and `spikes/netcode-proof/marks/` (24 files, 4,712 added, 208 deleted); no manifest or lockfile.
+- **To repeat the checks, from `spikes/netcode-proof/`:** `cargo test -p npt-judge --locked --no-fail-fast` (132 pass:
+  19 + 4 + 83 + 26); `cargo clippy -p npt-judge --all-targets --locked -- -D warnings`; `cargo fmt --check`;
   `cargo run -q --locked -p npt-judge -- --marks marks/marks.json --check-marks` (81 marks); from the repository's
   root `node spikes/netcode-proof/check.mjs` (11 of 11 steps).
-- **What changes for callers:** a new verdict word MOVED (a mark's and a part's), a bite status `moved`, and optional
-  `moved` fields in the `--out` JSON (`moved` on a verdict, a part and a bite; `moved_checks` on a verdict). Exit
-  codes and the `npt-judge: ` error lines are as before. The three `outside` marks read MOVED, not NOT-RUN.
-- **marks.json:** sha256 86705adc5f120747e97ecf5ef6eef7250983a838fe031772161215144edcfee4. An older judge refuses
+- **What changes for callers:** a new verdict word MOVED (a mark's and a part's), a bite status `moved`, optional
+  `moved` fields in the `--out` JSON; the three `outside` marks read MOVED. `--only` judges the named marks against
+  the whole marks file (JDG-ONLY-1 is fixed: the interim rule of naming PM-0001-2 beside a mark is no longer needed).
+  The summary line escapes control characters. Exit codes and the `npt-judge: ` error lines are as before.
+- **marks.json:** sha256 c3396db225b394695b6cf41460723e1d98b96f42e1d42d412976f4ca702f1b7a. An older judge refuses
   it (unknown field `moved`): judge and marks.json merge together. `marks/README.md` 2.6 is the contract.
-- **Before the merge:** the real-data line under "Open findings"; Mustafa's answer to OUTSIDE-NOTES (on his (a), one
-  more small commit lands here first).
+- **SERIES.md, for the merge with U6c's 51 rows:** 3 new rows (`event.admit` with `event.session_end`;
+  `event.room_end`'s slot), the heading "Series read only by figures (21)" (was 19), the 19 figures' rows and
+  `decoded_hash_mismatch_count`'s coverage clause reworded, `tick.s.relevant_count` and `event.iface.tx_bytes` changed.
+- **Mustafa's message of 2026-11-24** is saved word for word in `.checkpoints/netcode-judge/mustafa-2026-11-24.md`;
+  his decisions belong in `docs/DECISIONS.md` (outside this chat's fence: the merging chat or docs-keeper carries it).
+- **The burst setting (NPT_KC_BURSTS):** the netcode chat builds it after R1's run and before R1's report (his item 2).
+- **Before the merge:** the re-judge of the -47 set on real data (under "Open findings"); his answer to SYNC-ENTITIES
+  is needed before R2's -10 runs are judged, not for the merge.
 
 9. Part b's plan and its review · `plan-b.md` on `figures-b.md` (the spec sheet) · the advisor agent: APPROVE with 11
    conditions (plan-b.md section 5); part a's head stands; the board has the two questions for the netcode chat.
@@ -182,12 +189,17 @@
     setting (NPT_KC_BURSTS) after R1's run and before R1's report. His item 5: the netcode chat may take both parts
     in one merge, only on his word, after his main Advisor checked the final commit.
 
+26. The reviewers' re-check of the fix pass (on what changed only) · both APPROVE WITH FINDINGS, the High closed;
+    the rust-reviewer confirmed no other figure can overflow the same way; the test-engineer raised two Mediums.
+27. After the re-check · 72651a3c6326546b423c4773ac5a92902a37b590 (pushed) · both Mediums: the later-session hole
+    test (`c_u6_11_a_hole_inside_a_later_session_is_a_gap`), and by the advisor agent's ruling a `session_end` at or
+    after the room log's last tick record gives no tail (`c_u6_11_a_session_end_at_the_stop_gives_no_tail`; two
+    plants). 132 judge tests (19 + 4 + 83 + 26). From 0e0f6547: 3,393 added, 172 deleted (the stop is 4,900).
+
 ## Current step
-**Part b is at 67892d39, waiting on its last checks.** Running since about 23:00 UTC: the two reviewers' re-check of
-the High's fix (on what changed only; they append to their notes) and `check.mjs` whole on 67892d39 (output in the
-session's scratch folder). Then: GitHub's gate and toolchain on the head, the advisor agent's read of the head (the
-fix pass and the small commit), then part b's commit id, the commands and the report to Mustafa. Open with him:
-MAIN-MODEL, and the new SYNC-ENTITIES.
+**Part b's final code head is 72651a3c.** Running since about 23:20 UTC: `check.mjs` whole on it (output in the
+session's scratch folder) and the advisor agent's read of the head. Then GitHub's gate and toolchain on that SHA,
+and part b's commit id, commands and report to Mustafa. Open with him: MAIN-MODEL, SYNC-ENTITIES.
 **For the report (collected while building):**
 - Condition 4, readings still open (built on the written reading): -12 and -13 "per client" = the largest client
   mean; -15's slope method and "flat" rule; -24's halves; -27's "within 5 %" = not worse by more than 5 %;
@@ -205,6 +217,9 @@ MAIN-MODEL, and the new SYNC-ENTITIES.
   `session_end` in the room's log; the two `iface` records carry `ns`; `relevant_count`'s meaning; the kill at the
   end of the measured window.
 - One review round as he asked, plus a re-check of the one High's fix by the two reviewers (both had said REVISE).
+- Two edges of the tail rule left open (the advisor: for U6d's writer brief and the readings change before R5): a
+  writer that ends sessions one tick before the room's last tick record; the tail has no length limit (a principled
+  fix: `session_end` carries a reason, and only a scripted leave gets the tail).
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
