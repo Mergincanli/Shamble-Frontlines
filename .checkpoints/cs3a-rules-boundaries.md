@@ -362,13 +362,51 @@
    rule tests passed in both profiles), and the native float test passed there (so that runner had FMA, or its
    software path is exact: not told apart by the log).
 
+12. **Round 2's fix pass: a1b2e802, then 8619d539** (8619d53968e997846fc1a9174051862030a41a94), pushed 16:13 and
+   16:18 UTC. Round 2 (five reviewers on 79666ad9): security-auditor REVISE with 1 High; rust-reviewer REVISE with
+   1 new Medium; test-engineer APPROVE with 1 new Medium; engine-architect REVISE only for that High; perf-auditor
+   OK.
+   - **The High (the dev server reached the test-only module through npm's link):** the module is now built into
+     `.gate/rules-module/{release,dev}` at the repository's root, outside every package (`build.mjs` `rulesDir`;
+     engine-architect: the right fix, the boundary then holds by where the module sits). The dev server's list
+     holds `node_modules/three` instead of `node_modules`. The isolation spec asserts: the players' Wasm 200 with
+     type `application/wasm`; 403 for the module's two files at their real place; 403 for the Worker's package
+     through npm's link (two files); no WebAssembly from the module's old place. The `.gitignore` line for the old
+     folder stays (a stale copy lies in this worktree; deleting it was refused here, and nothing reaches it).
+   - **The scan:** a range's `..` is one token, so `self.0.sin()` and `m.0.mul_add(..)` are seen again (my
+     regression in step 11's range fix: rust-reviewer's N1); `arch` counts as a path step or a `use` entry however
+     it is brought in, and names holding `_relaxed_` (test-engineer's Medium); `#[cfg_attr(.., path = "..")]`;
+     the escape does not cover a `const fn`. 43 planted breaches and 12 controls inside it.
+   - Small: `registryRemapFlag(cargoHome, homeDir, base)` resolves a relative home against the folder cargo runs
+     in and refuses a control character in the path; comments say what a cargo config file can still set; the
+     WebAssembly float test's title and doc name the pinned cases; the FMA line allows for FMA4; `panic.rs`'s doc
+     on `start`; the feature compare's doc names its clash with ADR 0002 part 5's planned dev-only feature.
+   - **CI was red on a1b2e802** (run 45434633338, job 138588985695, 16:13:42 to 16:16:23 UTC): 12 of 14 browser
+     tests passed; the two dev-server cases failed at the one assertion I had added last, "not 200" for the
+     module's old place. On a clean machine no stale copy lies there, and Vite's dev server answers 200 with the
+     page itself for a file that is not there; here the stale copy made it 403, so the local run could not show
+     it (measured after: `.gate/cs3a/devserver-probe.mjs`). Not re-run. **Fixed forward in 8619d539:** the
+     assertion asks that what comes back is no WebAssembly, and the players' control asks for the file's type too.
+   **Checked** (`.gate/cs3a/fix2.log`, 16:09 to 16:11 UTC, the tree of a1b2e802): the same counts as step 11; the
+   players' Wasm unchanged (31,718 bytes, sha256 383f5303...3963). **Planted: 96 plants, 96 caught in one run**
+   (`.gate/cs3a/plants-fix2.log`, 16:11 to 16:13 UTC; the two dev-server plants again on 8619d539's tree at 16:18
+   UTC). **Size: 3,557 added lines** (1.71 times the plan; 543 of room to the stop line 4,100); by package: devtools
+   946, sim 936, client 904, sim-worker 489, sim-wasm 165, e2e 115, root 2; 8619d539 adds 4 more (3,561; 539 of room).
+   **CI on 8619d539, read line by line:** gate success (run 45435601291); toolchain success (run 45435601223, job
+   138592422504, 16:18:37 to 16:21:42 UTC; image version 20261116.133.1, Chrome 157.0.8103.78;
+   `.gate/cs3a/ci-8619d539-toolchain.log`): cargo debug 15, 3, 2, 2, 1, 15, 5, 1, 9, twice; release 2, 15, 5, 1;
+   client 70, e2e's node project 1, net 1, sim-worker 42, types 7; boundary 2 files and 17 tests; "Running 14
+   tests", "14 passed (1.1m)"; nothing skipped or ignored; the players' Wasm sha256 383f5303...3963; "no registry
+   path in the Wasm".
+
 ## Current step
-**The reviews, round 2, on the fix pass 79666ad9** (only what changed since 5c92311): rust-reviewer, test-engineer
-and security-auditor run (started between 15:27 and 15:29 UTC; notes `<name>-review2.md`); engine-architect and
-perf-auditor follow when places are free. Then, only if round 2 asks for it, one small fix pass (a third round only
-for an open Critical or High; size: 604 lines of room to the stop line). Then the verifier until PASS; the advisor
-agent on the pushed head; docs-keeper; DECISIONS by script; the report; the zip and its README; the pull request's
-title and text. His answer to MUL-ADD is (a) (15:58:25 UTC): what was built stays.
+**Round 3, security-auditor only, on the dev-server fix** (the one High that was open after round 2; started after 16:13
+UTC on a1b2e802, told after 16:18 UTC that the head to judge is 8619d539; notes `security-auditor-review3.md`). Then
+the verifier until PASS; the advisor agent on the pushed head; docs-keeper; DECISIONS by script (`decisions-4.mjs`,
+six of his messages); the report; the zip and its README; the pull request's title and text in this folder, then
+tell him (his main Advisor opens the draft). **A High still open after round 3 stops the change-set for him.**
+His answer to MUL-ADD is (a) (15:58:25 UTC): what was built stays. Plain words with him: no tag or code without
+its explanation in the same sentence.
 (Card written 15:31 UTC.)
 
 ## Next steps (after the compact)
@@ -396,6 +434,20 @@ title and text. His answer to MUL-ADD is (a) (15:58:25 UTC): what was built stay
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **State at 8619d539 (16:22 UTC): round 2's High, both Mediums and the cheap Lows are taken (step 12); round 3
+  (security-auditor) reads the High's fix.** Left as follow-ups for STATUS: CI runs neither generator's `--check`
+  (with E1's CI pull request); `from_f64` has no exact tie and no case between the largest f32 and the overflow
+  point (test-engineer and rust-reviewer); the feature closure matches packages by name, not name and version
+  (engine-architect's NEW-A; fails closed); the scan refuses part 7's own helpers when imported by name or called
+  on our own ordered newtypes (engine-architect's NEW-B: with the helpers' change-set or the quality gate step);
+  the clash between the feature compare and ADR 0002 part 5's planned dev-only feature (NEW-C: for the step that
+  first nests generated types); hashed maps not named after std's; a passing native float test does not show in
+  the log which path `mul_add` took (cargo hides a passing test's line).
+- **Round 2, engine-architect (on 79666ad9; `engine-architect-review2.md`): REVISE only for security-auditor's
+  High; its own: 0 Critical, 0 High, 0 Medium, 3 Low** (NEW-A, NEW-B, NEW-C above). Its round-1 findings are
+  fixed or deferred as agreed. `cfg!(target_arch)` in the tools crate's check is the right place (it only chooses
+  which expected values are compared; nothing per-target is in `sim` or `sim-wasm`). On the dev server: (B), the
+  module outside every package, and (A) as well.
 - **Round 2, perf-auditor (on 79666ad9; `perf-auditor-review2.md`; read 16:05 UTC): OK, no finding in its field.**
   Both its Lows are fixed: the block check allocates 280.0 bytes per block again in its harness (296.0 before the
   fix, main's 280.0), 0 once optimised; the comment is true. No regression per block, per frame or per wake; the
@@ -570,7 +622,7 @@ title and text. His answer to MUL-ADD is (a) (15:58:25 UTC): what was built stay
 
 ## Key numbers
 - main 1ec6f6c; #64's final head 8aadfb0, its code head 6d0b5b1, its notes' last commit 5911b56.
-- 3a: about 2,050 (2,080) lines planned, stop line 4,100; **3,496 after the fix pass** (604 of room); about 281 KB
+- 3a: about 2,050 (2,080) lines planned, stop line 4,100; **3,561 at 8619d539** (539 of room); about 281 KB
   of committed data (the vectors). The players' Wasm at 79666ad9: 31,718 bytes, sha256 383f5303...3963 (here and on
   the runner).
 - CI today: one `toolchain` job, about 2 to 2.5 minutes; the Wasm on the runners 28,991 bytes, sha256
@@ -589,6 +641,7 @@ title and text. His answer to MUL-ADD is (a) (15:58:25 UTC): what was built stay
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
+- **Round 2 has ended; round 3 is security-auditor alone (above).** What follows describes round 2:
 - **Reviewers in the background** (round 2, on 79666ad9, only what changed since 5c92311): rust-reviewer
   (`rust-reviewer-review2.md`; with the advisor agent's question whether another allowed operation picks its
   native path by processor), test-engineer (`test-engineer-review2.md`; with its question on the hard-case classes
