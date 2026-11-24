@@ -34,7 +34,7 @@ departures that change no reading. Three decisions of his follow; this pull requ
 | A closed pull request's build is gone in 24 hours (PM-0006-6) | "24 h after each test pull request closes, none of its URLs ... answers HTTP 200 with that build's marker"; run "with the access policy off" (:1374) | Met with a departure: at 24.1 to 24.4 hours every link of the four closed cases gone, the open control and the bite still serving, no wall; the hourly probes fell short (3 scheduled runs in the 24 slots; by-hand probes stood in) |
 | Do uploads count against the 500 builds a month (PM-0006-7) | "reported, no pass number: the project's monthly build count before and after 10 direct uploads ... passes when both are recorded" (:1375) | **Open:** no count is shown on any page read, before or after; Cloudflare's docs do not say |
 | The wall covers the previews and not production (PM-0006-8) | "on every preview URL of at least 2 open branches ... and on PM-0006-6's leftover URLs, a cookie-less client gets no build"; "on the production URL ... it gets the build"; "the mark reads the 1-hour sweep" (:1376) | Met, on a reading of "open": at 1 hour or more no build from any link of six Pages branches (one with an open pull request, five without) or of the leftover links; production's own address served; with the wall off, every build served |
-| His verdict in Brave (PM-0006-9) | "every step of the hosting checklist below \"achieved\", 0 \"not yet\"" (:1377) | **Open:** steps 1 to 3 and 5 to 8 "achieved" in his words; step 4 (the build count) has no verdict |
+| His verdict in Brave (PM-0006-9) | "every step of the hosting checklist below "achieved", 0 "not yet"" (:1377) | **Open:** steps 1 to 3 and 5 to 8 "achieved" in his words; step 4 (the build count) has no verdict |
 | GitHub shows the preview link on the pull request (PM-0006-10) | "recorded: yes or no, with a screenshot of the page" (:1378) | Met: yes, logged out (this chat's picture) and logged in (his words) |
 | A pull request cannot reach the token or production (PM-0006-32) | "2 of 2: ... gets no secret until the `preview` environment's required reviewer approves it ...; a job in a pull request that names the `production` environment is refused" (:1379) | Met: both cases, the control and the bite; reported: a production deploy with the preview token is not refused; recorded: the merge ref is judged and refused, and his revocation is proven by the refused upload |
 
@@ -141,6 +141,17 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
   copies and their sha256, each placed by its time between the decisions around it; 252 lines added, no other line
   changed (RECORD-FILES). Commit 7c803a6.
 - DOCSKEEPERLINE
+
+## Lane 2's first list of needs (issue #59), folded from its own checkpoint
+- His lane-2 words of 2026-11-18 (in DECISIONS) asked for lane 2's needs from the simulation's per-tick block before
+  change-set 4's plan is reviewed. One agent (engine-architect) read the sources, one advisor-tool consultation checked
+  the list, and one comment went on the "Lane requests" issue, naming lane 2:
+  https://github.com/Mergincanli/Shamble-Frontlines/issues/59#issuecomment-6994614989 (2026-11-18, 23:24:14 UTC): 16
+  fields (one of them conditional), 6 events, 5 wishes and 10 gaps or questions, each with its source.
+- His answers since, in DECISIONS: PROJ-DRAW (a) and AIM-STATE (a) (2026-11-19, 00:01:25 UTC), and his words of
+  2026-11-19, 12:00 (aiming down sights and the sprint-to-fire delay are game rules of Slice 1; the wishes W1 and W4 are
+  needs now; the comment stays as it is). Change-set 10's plan starts from AIM-STATE's rule for the poses.
+- That checkpoint (`.checkpoints/lane2-needs.md` with its notes) is readable at CARDSHA.
 
 ## Decisions and deviations
 - **Machines** (his MACHINES (a)): GitHub's hosted runners stood in for the minimum laptop and the Mac; each run names
