@@ -1,7 +1,7 @@
 import { BlockPool } from "./block-pool.ts";
 import { isPageToWorker, type WorkerStats, type WorkerToPage } from "./messages.ts";
 import { Pacer } from "./pacing.ts";
-import { readPanicMessage } from "./panic-message.ts";
+import { trapMessage } from "./panic-message.ts";
 import { copyBlock, type LinearMemory } from "./read-block.ts";
 import { Ring } from "./stats.ts";
 
@@ -137,9 +137,7 @@ export class SimHost {
     } catch (error) {
       this.#failed = true;
       this.#clearTimer();
-      const panic = readPanicMessage(this.#env.memory, this.#env.panicBuffer);
-      const thrown = error instanceof Error ? error.message : String(error);
-      this.#env.post({ type: "error", message: panic === "" ? thrown : `the simulation stopped: ${panic}` }, []);
+      this.#env.post({ type: "error", message: trapMessage(this.#env.memory, this.#env.panicBuffer, error) }, []);
       return undefined;
     }
   }

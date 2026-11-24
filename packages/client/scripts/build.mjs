@@ -53,10 +53,13 @@ const targetDir = path.join(root, "target");
 const wasmFile = path.join(targetDir, "wasm32-unknown-unknown/release/sim_wasm.wasm");
 const wasmTarget = "wasm32-unknown-unknown";
 /**
- * Given to every cargo build of a Wasm, on its command line: panic locations inside registry crates name one fixed
- * place, not this machine's cargo folder, so one commit gives the same Wasm bytes wherever it is built (RR-F5).
+ * The environment of every cargo call this script makes. Its one addition: the compiler flags, which are the path
+ * remap and nothing else (panic locations inside registry crates name one fixed place, not this machine's cargo
+ * folder, so one commit gives the same Wasm bytes wherever it is built: RR-F5). Given this way, cargo takes its
+ * flags from here alone: a flag in a cargo config file outside the repository does not reach the compiler. The
+ * same name coming from outside is refused before any cargo call (refuseSettings).
  */
-const remapConfig = `target.${wasmTarget}.rustflags=${JSON.stringify([registryRemapFlag(process.env["CARGO_HOME"] ?? path.join(os.homedir(), ".cargo"))])}`;
+const cargoEnv = () => ({ ...process.env, CARGO_ENCODED_RUSTFLAGS: registryRemapFlag(process.env["CARGO_HOME"], os.homedir()) });
 /** The test-only module: its bindings' folder, and a target folder that is never the players' Wasm's. */
 const rulesDir = path.join(root, "packages/sim-worker/pkg-rules");
 const rulesTargetDir = path.join(root, ".gate/target-rules");
@@ -82,10 +85,11 @@ function refuseSettings() {
  * the simulation's features differently from another build that runs it.
  */
 function checkCrates() {
-  const tree = (...args) => execFileSync("cargo", ["tree", "--locked", ...args], { cwd: root, encoding: "utf8" });
+  const tree = (...args) => execFileSync("cargo", ["tree", "--locked", ...args], { cwd: root, encoding: "utf8", env: cargoEnv() });
   const unchecked = missingOverflowOverrides(
     tree("-p", "sim-wasm", "--target", wasmTarget, "-e", "normal,no-proc-macro", "--prefix", "none"),
     readFileSync(path.join(root, "Cargo.toml"), "utf8"),
+    root,
   );
   if (unchecked.length > 0) {
     throw new Error(
@@ -93,11 +97,12 @@ function checkCrates() {
         "Give each its [profile.release.package.<name>] block with overflow-checks = true in the root Cargo.toml",
     );
   }
-  const features = (...args) => simFeatureList(tree(...args, "-e", "features,normal,no-proc-macro", "--prefix", "depth", "--no-dedupe"));
+  const features = (edges, ...args) => tree(...args, "-e", `features,${edges},no-proc-macro`, "--prefix", "depth", "--no-dedupe");
   const differences = simFeatureDifferences({
-    "the players' Wasm": features("-p", "sim-wasm", "--target", wasmTarget),
-    "the test-only module": features("-p", "devtools", "--target", wasmTarget),
-    "the native tests": features("--workspace"),
+    "the players' Wasm": simFeatureList(features("normal", "-p", "sim-wasm", "--target", wasmTarget)),
+    "the test-only module": simFeatureList(features("normal", "-p", "devtools", "--target", wasmTarget)),
+    // As `cargo test --workspace` builds it: dev-dependencies' features count, the simulation's own test helpers do not.
+    "the native tests": simFeatureList(features("normal,dev", "--workspace"), features("normal", "--workspace")),
   });
   if (differences.length > 0) throw new Error(differences.join("\n"));
 }
@@ -112,8 +117,8 @@ export function buildRulesModule() {
     refuseSettings();
     execFileSync(
       "cargo",
-      ["build", "--locked", ...flags, "--target", wasmTarget, "-p", "devtools", "--lib", "--target-dir", rulesTargetDir, "--config", remapConfig],
-      { cwd: root, stdio: "inherit" },
+      ["build", "--locked", ...flags, "--target", wasmTarget, "-p", "devtools", "--lib", "--target-dir", rulesTargetDir],
+      { cwd: root, stdio: "inherit", env: cargoEnv() },
     );
     const outDir = path.join(rulesDir, profile);
     rmSync(outDir, { recursive: true, force: true });
@@ -136,8 +141,8 @@ export function buildWasm() {
   checkCrates();
   execFileSync(
     "cargo",
-    ["build", "--locked", "--release", "--target", wasmTarget, "-p", "sim-wasm", "--target-dir", targetDir, "--config", remapConfig],
-    { cwd: root, stdio: "inherit" },
+    ["build", "--locked", "--release", "--target", wasmTarget, "-p", "sim-wasm", "--target-dir", targetDir],
+    { cwd: root, stdio: "inherit", env: cargoEnv() },
   );
   mkdirSync(pkgDir, { recursive: true });
   // Checked again: the cargo build above ran build scripts as this same user.

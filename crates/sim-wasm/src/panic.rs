@@ -1,12 +1,17 @@
 //! The panic hook that keeps a trap's message (ADR 0004 part 20's check; ADR 0002 part 5). A panic in the Wasm ends
-//! in a trap, and the host then sees only "unreachable executed". This hook writes the panic's own text, its place
-//! and its message, into one fixed buffer first; the host reads the buffer after the trap, through a fresh view of
-//! the memory and with no further call into the Wasm (`panic_buffer` is asked once, when the Worker starts).
+//! in a trap, and the host then sees only the engine's own words for it ("unreachable"). This hook writes the
+//! panic's own text, its place and its message, into one fixed buffer first; the host reads the buffer after the
+//! trap, through a fresh view of the memory and with no further call into the Wasm (`panic_buffer` is asked once,
+//! when the Worker starts).
 //!
 //! The buffer describes itself, so the host copies no size from here: bytes 0 to 3 hold the text's length (a `u32`,
 //! little-endian; 0 while nothing has panicked), bytes 4 to 7 how many bytes of text fit, and the text follows as
-//! UTF-8, cut at a character's end when it is too long. Writing it allocates nothing: a panic may be a failed
-//! allocation. Each byte is an atomic, so there is no `unsafe` here and no lock that a trap could leave taken.
+//! UTF-8, cut at a character's end when it is too long. The hook's own write allocates nothing, and each byte is an
+//! atomic, so there is no `unsafe` here and no lock that a trap could leave taken.
+//!
+//! What it does not show: a stop for want of memory. The standard library does not run a panic hook for a failed
+//! allocation (it prints and aborts), so the buffer stays empty and the host falls back to the trap's own text.
+//! And a panic inside the hook itself aborts without running it again: the length then stays 0 as well.
 
 use core::fmt::{self, Write};
 use core::sync::atomic::{AtomicU8, Ordering};
@@ -28,7 +33,7 @@ struct Text<'a> {
 
 impl Write for Text<'_> {
     fn write_str(&mut self, text: &str) -> fmt::Result {
-        let room = self.buffer.len() - HEADER_BYTES - self.length;
+        let room = self.buffer.len().saturating_sub(HEADER_BYTES + self.length);
         let mut take = if self.full { 0 } else { room.min(text.len()) };
         while !text.is_char_boundary(take) {
             take -= 1;
@@ -65,9 +70,9 @@ fn record(buffer: &[AtomicU8], text: fmt::Arguments<'_>) {
     store_word(&buffer[..4], writer.length);
 }
 
-/// Installs the hook. The glue calls this when the module is instantiated, before any other export can run; the
-/// host never calls it.
-#[wasm_bindgen(start)]
+/// Installs the hook. The glue runs this when the module is instantiated, before any other export can run. It is
+/// no export of the glue (`private`): the host cannot call it, and has no reason to.
+#[wasm_bindgen(start, private)]
 pub fn start() {
     store_word(&BUFFER[4..HEADER_BYTES], BUFFER_BYTES - HEADER_BYTES);
     std::panic::set_hook(Box::new(|info| record(&BUFFER, format_args!("{info}"))));

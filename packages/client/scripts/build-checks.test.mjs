@@ -295,10 +295,12 @@ test("the Wasm build refuses cargo's and the tool's settings from the environmen
   const env = Object.fromEntries([...allowed, ...refused].map((name) => [name, "x"]));
   expect(refusedBuildSettings(env)).toEqual(refused);
   expect(refusedBuildSettings({})).toEqual([]);
+  // Windows takes a variable's name without regard to case, so the names are compared in upper case.
+  expect(refusedBuildSettings({ rustflags: "x", Rustc_Bootstrap: "1", cargo_target_dir: "x", path: "x" })).toEqual(["rustflags", "Rustc_Bootstrap"]);
 });
 
 
-describe("every third-party crate in the players' Wasm has its overflow override", () => {
+describe("every crate in the players' Wasm that is not ours has its overflow override", () => {
   // What `cargo tree -e normal,no-proc-macro --prefix none -p sim-wasm` prints today, for the Wasm target.
   const TREE = `sim-wasm v0.0.0 (/repo/crates/sim-wasm)
 client-endpoint v0.0.0 (/repo/crates/client-endpoint)
@@ -312,66 +314,125 @@ cfg-if v1.0.5 (*)
   const manifest = readFileSync(new URL("../../../Cargo.toml", import.meta.url), "utf8");
 
   test("today's tree against the root Cargo.toml as it stands: nothing is missing", () => {
-    expect(runtimeCrates(TREE)).toEqual(["cfg-if", "unicode-ident", "wasm-bindgen", "wasm-bindgen-shared"]);
+    expect(runtimeCrates(TREE, "/repo")).toEqual(["cfg-if", "unicode-ident", "wasm-bindgen", "wasm-bindgen-shared"]);
+    expect(runtimeCrates(TREE.replaceAll("/repo/", "C:\\repo\\"), "C:\\repo\\")).toEqual(["cfg-if", "unicode-ident", "wasm-bindgen", "wasm-bindgen-shared"]);
     expect(overriddenCrates(manifest)).toEqual(["cfg-if", "thiserror", "ts-rs", "unicode-ident", "wasm-bindgen", "wasm-bindgen-shared"]);
-    expect(missingOverflowOverrides(TREE, manifest)).toEqual([]);
+    expect(missingOverflowOverrides(TREE, manifest, "/repo")).toEqual([]);
   });
 
   test("a crate that joins the tree, an override that is removed or turned off: each is named", () => {
-    expect(missingOverflowOverrides(`${TREE}rand_chacha v0.10.0\nppv-lite86 v0.2.21\n`, manifest)).toEqual(["ppv-lite86", "rand_chacha"]);
+    expect(missingOverflowOverrides(`${TREE}rand_chacha v0.10.0\nppv-lite86 v0.2.21\n`, manifest, "/repo")).toEqual(["ppv-lite86", "rand_chacha"]);
     const block = "[profile.release.package.cfg-if]\noverflow-checks = true\n";
     expect(manifest).toContain(block);
-    expect(missingOverflowOverrides(TREE, manifest.replace(block, ""))).toEqual(["cfg-if"]);
-    expect(missingOverflowOverrides(TREE, manifest.replace(block, "[profile.release.package.cfg-if]\noverflow-checks = false\n"))).toEqual(["cfg-if"]);
+    expect(missingOverflowOverrides(TREE, manifest.replace(block, ""), "/repo")).toEqual(["cfg-if"]);
+    expect(missingOverflowOverrides(TREE, manifest.replace(block, "[profile.release.package.cfg-if]\noverflow-checks = false\n"), "/repo")).toEqual(["cfg-if"]);
     // The setting for every crate that is not named does not count as a name, and a commented line is no setting.
     expect(overriddenCrates('[profile.release.package."*"]\noverflow-checks = true\n')).toEqual([]);
     expect(overriddenCrates("[profile.release.package.a]\n# overflow-checks = true\n[profile.release.package.b]\noverflow-checks = true # on\n")).toEqual(["b"]);
     expect(overriddenCrates('[profile.dev.package.a]\noverflow-checks = true\n[profile.release.package."quoted-name"]\noverflow-checks = true\n')).toEqual(["quoted-name"]);
   });
 
-  test("a line the check cannot place stops it: the list must be exact", () => {
-    expect(() => runtimeCrates(`${TREE}wasm-bindgen-macro v0.2.130 (proc-macro)\n`)).toThrow("cannot place");
-    expect(() => runtimeCrates(`${TREE}error: something else\n`)).toThrow("cannot place");
-    expect(runtimeCrates("")).toEqual([]);
+  test("only a folder under the repository's crates/ is ours: a crate from git, another registry or a folder elsewhere needs its override", () => {
+    const foreign = [
+      "from-git v0.1.0 (https://github.com/example/from-git?rev=abc#abc12345)",
+      "from-registry v0.1.0 (registry `mirror`)",
+      "from-outside v0.1.0 (/home/someone/elsewhere/from-outside)",
+      "from-vendor v0.1.0 (/repo/vendor/from-vendor)",
+      "lookalike v0.1.0 (/repository/crates/lookalike)",
+    ];
+    expect(missingOverflowOverrides(`${TREE}${foreign.join("\n")}\n`, manifest, "/repo")).toEqual(["from-git", "from-outside", "from-registry", "from-vendor", "lookalike"]);
+  });
+
+  test("a line the check cannot place, or a tree that is not the players' Wasm's, stops it: the list must be exact", () => {
+    expect(() => runtimeCrates(`${TREE}wasm-bindgen-macro v0.2.130 (proc-macro)\n`, "/repo")).toThrow("cannot place");
+    expect(() => runtimeCrates(`${TREE}error: something else\n`, "/repo")).toThrow("cannot place");
+    expect(() => runtimeCrates("", "/repo")).toThrow("did not start at sim-wasm");
+    expect(() => runtimeCrates("devtools v0.0.0 (/repo/crates/devtools)\nwasm-bindgen v0.2.130\n", "/repo")).toThrow("did not start at sim-wasm");
   });
 });
 
 describe("one feature set builds the simulation in every build that runs it", () => {
-  // `cargo tree -e features,normal,no-proc-macro --prefix depth --no-dedupe`, as it would read once `sim` has a
-  // dependency (today it has none, and every list is the simulation's own default feature alone).
-  const players = `0sim-wasm v0.0.0 (/repo/crates/sim-wasm)
+  // cargo's own output (`cargo tree -e features,<edges>,no-proc-macro --prefix depth --no-dedupe`, cargo 1.99.1) for a
+  // small workspace made for this test: `sim` depends on `dep`; `players` depends on `sim`; `server` depends on `sim`
+  // and turns on `dep`'s feature "fast"; `tools` depends on `sim` and turns the same feature on as a dev-dependency.
+  const PLAYERS = `0players v0.0.0 (/repo/crates/players)
 1sim feature "default"
 2sim v0.0.0 (/repo/crates/sim)
-3libm feature "default"
-4libm v0.2.16
-1wasm-bindgen feature "default"
-2wasm-bindgen v0.2.130
+3dep feature "default"
+4dep v0.0.0 (/repo/crates/dep)
 `;
-  const server = players.replace("0sim-wasm v0.0.0 (/repo/crates/sim-wasm)", "0server v0.0.0 (/repo/crates/server)").replace(/1wasm-bindgen[^]*$/, '1tokio feature "rt"\n2tokio v1.50.0\n');
+  // PM-0004-74's own named failure: cargo prints the extra feature under the server, not under the simulation.
+  const SERVER = `0server v0.0.0 (/repo/crates/server)
+1dep feature "default"
+2dep v0.0.0 (/repo/crates/dep)
+1dep feature "fast"
+2dep v0.0.0 (/repo/crates/dep)
+1sim feature "default"
+2sim v0.0.0 (/repo/crates/sim)
+3dep feature "default"
+4dep v0.0.0 (/repo/crates/dep)
+`;
+  // `-p tools` on normal edges, and the same with dev edges, as the tests are built.
+  const TOOLS = `0tools v0.0.0 (/repo/crates/tools)
+1sim feature "default" (command-line)
+2sim v0.0.0 (/repo/crates/sim)
+3dep feature "default" (command-line)
+4dep v0.0.0 (/repo/crates/dep)
+`;
+  const TOOLS_DEV = `${TOOLS}1dep feature "default" (command-line)
+2dep v0.0.0 (/repo/crates/dep)
+1dep feature "fast"
+2dep v0.0.0 (/repo/crates/dep)
+`;
+  const plain = ['dep feature "default"', "dep v0.0.0", 'sim feature "default"'];
 
-  test("the list is the simulation's own features and everything under it, wherever it sits in the tree", () => {
-    expect(simFeatureList(players)).toEqual(['libm feature "default"', "libm v0.2.16", 'sim feature "default"']);
-    expect(simFeatureList('0sim v0.0.0 (/repo/crates/sim)\n0devtools v0.0.0 (/repo/crates/devtools)\n1sim feature "default" (command-line)\n')).toEqual(['sim feature "default"']);
+  test("the list is every feature of the simulation and of what it depends on, wherever cargo prints it", () => {
+    expect(simFeatureList(PLAYERS)).toEqual(plain);
+    expect(simFeatureList(SERVER)).toEqual(['dep feature "default"', 'dep feature "fast"', "dep v0.0.0", 'sim feature "default"']);
+    // A root package's lines carry "(command-line)": the same list all the same.
+    expect(simFeatureList(TOOLS)).toEqual(plain);
+    // Several roots in one tree (a whole workspace), with blank lines between them.
+    expect(simFeatureList(`0dep v0.0.0 (/repo/crates/dep)\n\n${PLAYERS}\n0sim v0.0.0 (/repo/crates/sim)\n1dep feature "default" (command-line)\n2dep v0.0.0 (/repo/crates/dep)\n`)).toEqual(plain);
+    // Today's real case: the simulation depends on nothing.
+    expect(simFeatureList('0sim-wasm v0.0.0 (/repo/crates/sim-wasm)\n1sim feature "default"\n2sim v0.0.0 (/repo/crates/sim)\n1wasm-bindgen feature "default"\n2wasm-bindgen v0.2.130\n')).toEqual(['sim feature "default"']);
     expect(() => simFeatureList("0protocol v0.0.0 (/repo/crates/protocol)\n")).toThrow("no sim crate");
   });
 
-  test("equal lists pass, also when the builds differ outside the simulation", () => {
-    expect(simFeatureDifferences({ "the players' Wasm": simFeatureList(players), "the server": simFeatureList(server) })).toEqual([]);
-  });
-
-  test("a feature one build adds to a dependency of the simulation is found and named", () => {
-    const planted = server.replace('3libm feature "default"\n', '3libm feature "default"\n3libm feature "unstable-float"\n4libm v0.2.16\n');
-    const found = simFeatureDifferences({ "the players' Wasm": simFeatureList(players), "the server": simFeatureList(planted), "the tools": simFeatureList(players) });
+  test("a feature another package turns on for a dependency of the simulation is found and named", () => {
+    const found = simFeatureDifferences({ "the players' Wasm": simFeatureList(PLAYERS), "the server": simFeatureList(SERVER), "the tools": simFeatureList(TOOLS) });
     expect(found).toHaveLength(1);
     expect(found[0]).toContain("differ between the players' Wasm and the server");
-    expect(found[0]).toContain('libm feature \\"unstable-float\\"');
-    // A feature of the simulation itself that one build turns on is a difference too.
-    const own = server.replace('1sim feature "default"\n', '1sim feature "default"\n1sim feature "fast-math"\n2sim v0.0.0 (/repo/crates/sim)\n');
-    expect(simFeatureDifferences({ a: simFeatureList(players), b: simFeatureList(own) })).toHaveLength(1);
+    expect(found[0]).toContain('dep feature \\"fast\\"');
+  });
+
+  test("a feature only a dev-dependency turns on is found in the list the tests are built with", () => {
+    // On normal edges the tools' tree is the players' list; with dev edges it is not.
+    expect(simFeatureDifferences({ a: simFeatureList(PLAYERS), b: simFeatureList(TOOLS) })).toEqual([]);
+    const tests = simFeatureList(TOOLS_DEV, TOOLS);
+    expect(tests).toEqual(['dep feature "default"', 'dep feature "fast"', "dep v0.0.0", 'sim feature "default"']);
+    expect(simFeatureDifferences({ "the players' Wasm": simFeatureList(PLAYERS), "the native tests": tests })).toHaveLength(1);
+    // The simulation's own dev-dependency is not one of its dependencies: with the closure from normal edges it stays out.
+    const simDev = `0sim v0.0.0 (/repo/crates/sim)\n1dep feature "default" (command-line)\n2dep v0.0.0 (/repo/crates/dep)\n1testkit feature "default"\n2testkit v0.0.0 (/repo/crates/testkit)\n`;
+    const simNormal = '0sim v0.0.0 (/repo/crates/sim)\n1dep feature "default" (command-line)\n2dep v0.0.0 (/repo/crates/dep)\n';
+    expect(simFeatureList(simDev, simNormal)).toEqual(["dep feature \"default\"", "dep v0.0.0"]);
+    expect(simFeatureList(simDev)).toContain("testkit v0.0.0");
+  });
+
+  test("builds that differ outside the simulation, or in a feature of the simulation itself", () => {
+    // The control: a feature on a crate the simulation does not depend on changes nothing.
+    const other = `${PLAYERS}1wasm-bindgen feature "std"\n2wasm-bindgen v0.2.130\n`;
+    expect(simFeatureDifferences({ a: simFeatureList(PLAYERS), b: simFeatureList(other) })).toEqual([]);
+    const own = `${PLAYERS}1sim feature "fast-math"\n2sim v0.0.0 (/repo/crates/sim)\n`;
+    expect(simFeatureDifferences({ a: simFeatureList(PLAYERS), b: simFeatureList(own) })).toHaveLength(1);
   });
 });
 
 test("the path remap names the registry folder under cargo's home, whatever that home is", () => {
-  expect(registryRemapFlag("/root/.cargo")).toBe("--remap-path-prefix=/root/.cargo/registry/src=/cargo/registry/src");
-  expect(registryRemapFlag("/home/runner/.cargo/")).toBe("--remap-path-prefix=/home/runner/.cargo/registry/src=/cargo/registry/src");
+  expect(registryRemapFlag("/root/.cargo", "/root")).toBe("--remap-path-prefix=/root/.cargo/registry/src=/cargo/registry/src");
+  expect(registryRemapFlag("/home/runner/.cargo/", "/home/runner")).toBe("--remap-path-prefix=/home/runner/.cargo/registry/src=/cargo/registry/src");
+  // No CARGO_HOME, or an empty one (cargo reads it as unset): .cargo under the home folder.
+  expect(registryRemapFlag(undefined, "/home/someone")).toBe("--remap-path-prefix=/home/someone/.cargo/registry/src=/cargo/registry/src");
+  expect(registryRemapFlag("", "/home/someone")).toBe("--remap-path-prefix=/home/someone/.cargo/registry/src=/cargo/registry/src");
+  // A relative one is made absolute: the compiler matches whole paths.
+  expect(registryRemapFlag("cargo-home", "/home/someone")).toBe(`--remap-path-prefix=${process.cwd().replaceAll("\\", "/")}/cargo-home/registry/src=/cargo/registry/src`);
 });

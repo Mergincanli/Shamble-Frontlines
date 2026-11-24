@@ -54,7 +54,7 @@ function setUp(options: { transfer?: boolean; blockBytes?: number; copyMs?: numb
   const panicked = (text: string): void => {
     const encoded = new TextEncoder().encode(text);
     new DataView(bytes).setUint32(512, encoded.length, true);
-    new DataView(bytes).setUint32(516, 1016 - 512, true);
+    new DataView(bytes).setUint32(516, 1016, true);
     new Uint8Array(bytes).set(encoded, 520);
   };
   const env: HostEnv = {

@@ -16,9 +16,11 @@ pub const WORDS: usize = 10_000;
 /// The last section: this many words of stream 1 from block 2^32 - 3, across the carry of the block counter's low
 /// word into its high word.
 pub const CARRY_WORDS: usize = 96;
+/// The first word of that section: block 2^32 - 3's first.
 pub const CARRY_START: u64 = ((1 << 32) - 3) * 16;
 /// Where a stream is restored in mid-run, and for how many words it must then go on as the file does.
 pub const RESTORE_AT: usize = 1_001;
+/// The words a restored stream is followed for.
 pub const RESTORE_WORDS: usize = 1_000;
 /// The file's length: four bytes a word.
 pub const FILE_BYTES: usize = 4 * (STREAMS.len() * WORDS + CARRY_WORDS);

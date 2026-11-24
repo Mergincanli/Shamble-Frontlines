@@ -1,40 +1,58 @@
-# f32-inputs.bin: 120000 bytes, sha256 85629398853ef3f2a3836932abceab0dc5be3c95fc0ad3c1915a65da1d88ae6b
+# f32-inputs.bin: 120576 bytes, sha256 f45993948702180c4cf1bb5e1f6d6ec714359e9f8e8e9ce197107c28afa63396
 # operation, bytes of one result, FNV-1a 64 of all results in order (made by make_f32_vectors.py)
-add 4 e514e7144a13947f
-sub 4 23f60c4c18b2db83
-mul 4 5f3751cdca1bbf4d
-div 4 54494ab679bab227
-neg 4 4402bc8b5c2c556d
-lt 1 33fe819d11a02d72
-le 1 11007d07a3f6fea6
-gt 1 8cf0c048fccfe7fa
-ge 1 fcb28188db411a4e
-eq 1 f2d68bd46869a995
-ne 1 4fee6f2a4520339d
-total_cmp 1 98deccc2b21b3ebb
-sqrt 4 bffc5c3f13d1284b
-sqrt_abs 4 f66e71bbf5386388
-floor 4 e38ad0c5deab1e89
-ceil 4 3296c893c8f3cba6
-round 4 89db5fdbadf488d4
-trunc 4 b1619f754b454e95
-fract 4 f6bc91d175998152
-mul_add 4 02e113815c9d1a2a
-abs 4 bae1c9420623a6ed
-copysign 4 ab8db503e07930ed
-to_i8 1 4a5e823eb1f06a50
-to_u8 1 b52493c36e5f2c5e
-to_i16 2 84aba268d719f2a1
-to_u16 2 043f33d0b6898d8e
-to_i32 4 deeaad678845757c
-to_u32 4 b9fca2a0e39aa675
-to_i64 8 550671d63093f208
-to_u64 8 5e89dbd8d93d6253
-from_i32 4 b9af361825ffe812
-from_u32 4 d8906664522dfb7f
-from_i64 4 a9d19035b9a6c207
-from_u64 4 9bb1ee6b34540a6c
-to_f64 8 4f778d7c9d77b424
-from_f64 4 5f3751cdca1bbf4d
-is_finite 1 986b57b4073b5019
-is_nan 1 534ec48b08db642d
+add 4 6afa0f8a11cb5c5f
+sub 4 e17a2deee63a9d53
+mul 4 02d2235e6231600d
+div 4 8540b9059b54c2df
+neg 4 d5c6f0b21c8d0b45
+lt 1 4f26b8b36e38e0ee
+le 1 7dd132ff62a8f922
+gt 1 1520572395cf4096
+ge 1 fc2a412d938991ea
+eq 1 e16d2f08f8d9b155
+ne 1 b103cd0e4430618d
+total_cmp 1 4d4eefd65ad08ddb
+sqrt 4 f6afc09d1c2d46eb
+sqrt_abs 4 f3f33c78a63a1068
+floor 4 75790f8d401ad7d9
+ceil 4 71a53aa1d47a6956
+round 4 d091004e6b156c24
+trunc 4 1ab6fe8ab7c94725
+fract 4 abd9da743837cbba
+mul_add 4 49a2000d59f6b50a
+abs 4 cfe691d89ce242c5
+copysign 4 ddb05294b455ccc5
+to_i8 1 b7b7a5fab255f16c
+to_u8 1 f9375ce05520f3fa
+to_i16 2 6a14e9a3dc5b1d19
+to_u16 2 4cf15bf8555b1186
+to_i32 4 64f5df380e69896c
+to_u32 4 afa84604e4208565
+to_i64 8 75d434539b11afe8
+to_u64 8 b20ec0bc39839433
+from_i32 4 f4bded67826c0ff2
+from_u32 4 c289a827dfca95e3
+from_i64 4 5ed2214ea7d81dc7
+from_u64 4 3a24ea4a492d5c7c
+to_f64 8 b69347ea81c65424
+from_f64 4 802d12fa47f31563
+is_finite 1 a0cdbe7456defb09
+is_nan 1 6fba38828b369ded
+# MUL-ADD, a known defect of the toolchain: where mul_add in WebAssembly is not the exact result.
+# pin, operation, case, a, b, c, the exact result, the result measured in WebAssembly
+pin mul_add 10024 01000001 32fffffe 007fffff 007fffff 00800000
+pin mul_add 10025 81000001 32fffffe 007fffff 007fffff 007ffffe
+pin mul_add 10026 81000001 32fffffe 807fffff 807fffff 80800000
+pin mul_add 10027 01000001 32fffffe 807fffff 807fffff 807ffffe
+pin mul_add 10028 01000001 32fffffe 00400001 00400001 00400002
+pin mul_add 10029 81000001 32fffffe 00400001 00400001 00400000
+pin mul_add 10030 81000001 32fffffe 80400001 80400001 80400002
+pin mul_add 10031 01000001 32fffffe 80400001 80400001 80400000
+pin mul_add 10032 01000001 32fffffe 00012345 00012345 00012346
+pin mul_add 10033 81000001 32fffffe 00012345 00012345 00012344
+pin mul_add 10034 81000001 32fffffe 80012345 80012345 80012346
+pin mul_add 10035 01000001 32fffffe 80012345 80012345 80012344
+pin mul_add 10036 01000001 32fffffe 00000041 00000041 00000042
+pin mul_add 10037 81000001 32fffffe 00000041 00000041 00000040
+pin mul_add 10038 81000001 32fffffe 80000041 80000041 80000042
+pin mul_add 10039 01000001 32fffffe 80000041 80000041 80000040

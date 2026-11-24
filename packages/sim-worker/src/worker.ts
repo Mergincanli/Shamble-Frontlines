@@ -4,7 +4,7 @@
 import init, { panic_buffer, Sim, tick_hz } from "../pkg/sim_wasm.js";
 import { SimHost } from "./host.ts";
 import { isPageToWorker, MODE_LOCAL, type WorkerToPage } from "./messages.ts";
-import { readPanicMessage } from "./panic-message.ts";
+import { trapMessage } from "./panic-message.ts";
 import type { LinearMemory } from "./read-block.ts";
 
 let host: SimHost | undefined;
@@ -54,9 +54,9 @@ addEventListener("message", (event: MessageEvent<unknown>) => {
   } else if (data.type === "start" && !starting) {
     starting = true;
     start(data.padBytes).catch((error: unknown) => {
-      const panic = loaded === undefined ? "" : readPanicMessage(loaded.memory, loaded.panicBuffer);
-      const thrown = error instanceof Error ? error.message : String(error);
-      tell({ type: "error", message: panic === "" ? thrown : `the simulation stopped: ${panic}` });
+      // Before the Wasm is loaded there is no buffer to read: an empty memory reads as no text.
+      const { memory, panicBuffer } = loaded ?? { memory: { buffer: new ArrayBuffer(0) }, panicBuffer: 0 };
+      tell({ type: "error", message: trapMessage(memory, panicBuffer, error) });
     });
   } else if (data.type === "visibility") {
     // The tab may be hidden while the Wasm loads: the match then starts paused.

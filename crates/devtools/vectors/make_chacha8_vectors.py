@@ -5,8 +5,8 @@ A second implementation of ChaCha with 8 rounds, written from Bernstein's descri
 code it checks (crates/sim/src/rng.rs). Before it writes anything it must reproduce the eight published test vectors
 that the Rust file's tests hold (TC1 to TC8 of draft-strombergson-chacha-test-vectors-01, 8 rounds, 256-bit key).
 
-  python3 -B crates/devtools/vectors/make_chacha8_vectors.py           writes the two files
-  python3 -B crates/devtools/vectors/make_chacha8_vectors.py --check   compares them byte for byte, writes nothing
+  python3 -I -B crates/devtools/vectors/make_chacha8_vectors.py           writes the two files
+  python3 -I -B crates/devtools/vectors/make_chacha8_vectors.py --check   compares them byte for byte, writes nothing
 
 Python's standard library only. The layout below is also what crates/devtools/src/rules/stream.rs expects.
 """

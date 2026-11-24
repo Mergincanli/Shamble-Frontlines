@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { readPanicMessage } from "./panic-message.ts";
+import { PANIC_TEXT_ROOM, readPanicMessage, trapMessage } from "./panic-message.ts";
 
 /** A memory with a panic buffer at `ptr`: the length word, the room word, then the text's bytes. */
 function memoryWith(ptr: number, text: Uint8Array, options: { length?: number; room?: number; bytes?: number } = {}) {
@@ -36,4 +36,29 @@ test("a buffer that makes no sense reads as no text and throws nothing", () => {
   }
   // A text cut inside a character is still read, with the mark for what is missing.
   expect(readPanicMessage(memoryWith(64, utf8("né").slice(0, 2)), 64)).toBe("n\ufffd");
+});
+
+test("a header whose room is not the hook's is not read at all", () => {
+  // A damaged header could otherwise make the page decode whatever lies behind the buffer.
+  expect(PANIC_TEXT_ROOM).toBe(1016);
+  const text = utf8("panicked");
+  for (const room of [0, 8, 1015, 1017, 4000, 0xffff_ffff]) {
+    expect(readPanicMessage(memoryWith(64, text, { room }), 64), String(room)).toBe("");
+  }
+  expect(readPanicMessage(memoryWith(64, text, { length: 4000, room: 4000 }), 64)).toBe("");
+  expect(readPanicMessage(memoryWith(64, text, { room: 1016 }), 64)).toBe("panicked");
+});
+
+test("the Worker's sentence after a throw: the panic's own text, or else what was thrown", () => {
+  const panicked = memoryWith(64, utf8("panicked at crates/sim/src/world.rs:43:14:\nthe tick counter is at u32::MAX and cannot advance"));
+  expect(trapMessage(panicked, 64, new Error("unreachable executed"))).toBe(
+    "the simulation stopped: panicked at crates/sim/src/world.rs:43:14:\nthe tick counter is at u32::MAX and cannot advance",
+  );
+  // No panic was recorded (a trap without one, a stop for want of memory, an error that is not the Wasm's).
+  const quiet = { buffer: new ArrayBuffer(4096) };
+  expect(trapMessage(quiet, 64, new Error("unreachable executed"))).toBe("unreachable executed");
+  expect(trapMessage(quiet, 64, "a thrown text")).toBe("a thrown text");
+  expect(trapMessage({ buffer: new ArrayBuffer(0) }, 0, new RangeError("the block is 8 bytes and the buffer for it is 16"))).toBe(
+    "the block is 8 bytes and the buffer for it is 16",
+  );
 });

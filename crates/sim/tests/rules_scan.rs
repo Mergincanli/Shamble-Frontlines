@@ -3,10 +3,16 @@
 //! `docs/reports/2026-11-17-build-plan-slice-1.md`, "The sim's rules, until the lints exist"): it checks exactly
 //! part 7's allow-list, it runs in the plain `cargo test`, and it is interim until those lints merge.
 //!
-//! It reads `crates/sim/src` as text and fails on: a float method outside part 7's list, a std hash map or hash set
-//! without part 9's escape, and a clock. A scan of text sees no types, so a banned name counts wherever it is called
-//! as a method (`.min(`) or through `f32::` or `f64::`; integer code writes the path form on its own type
-//! (`u32::min(a, b)`, `Ord::min(a, b)`), which the scan lets through. Not caught, as part 7 says: the float `%`.
+//! It reads `crates/sim/src` as text and fails on: a float method outside part 7's list, a hash map or hash set
+//! without part 9's escape, a clock, per-target code (`target_feature`, `core::arch`: PM-0004-23 names relaxed SIMD),
+//! and source brought in from outside `src/` (`#[path]`, `include!`), which it would not read.
+//!
+//! A scan of text sees no types. So a banned name counts wherever it is called as a method (`.min(`) and after any
+//! path (`f32::min`, `Self::min`, a type alias, a generic, `<f32 as T>::min`), unless that path is an integer type
+//! or one of `Ord`, `PartialOrd`, `Iterator` and `cmp`: integer code writes the path form on its own type
+//! (`u32::min(a, b)`, `Ord::min(a, b)`), and the simulation's own helpers are called by their bare names or take
+//! other names. Not caught: a macro that is handed a method's name and builds the call itself, and, as part 7
+//! says, the float `%`.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -18,6 +24,16 @@ const ALLOWED: [&str; 14] = [
     "total_cmp", "sqrt", "floor", "ceil", "round", "trunc", "fract", "mul_add", "abs", "copysign", "is_finite", "is_nan",
     "to_bits", "from_bits",
 ];
+
+/// On part 7's list and refused here all the same, until Mustafa answers MUL-ADD. `mul_add` is not the same on
+/// every target on the pinned toolchain: exact natively on a processor with FMA, and not in WebAssembly, where the
+/// toolchain's software `fmaf` misses results below the smallest normal `f32` (the `pin` lines of
+/// `crates/devtools/vectors/f32-expected.txt` hold the measured cases). Part 7's list above stays word for word;
+/// his answer takes this one line out or keeps it.
+const HELD: [(&str, &str); 1] = [(
+    "mul_add",
+    "MUL-ADD: its bits differ between the native build and WebAssembly on the pinned toolchain",
+)];
 
 /// Every inherent method of `f32` and of `f64` in std 1.99.1 (the two pages hold the same 79 names): read from
 /// doc.rust-lang.org/1.99.1/std/primitive.f32.html and primitive.f64.html on 2026-11-24. Banned is what is here
@@ -34,16 +50,24 @@ const STD: [&str; 79] = [
     "to_degrees", "to_int_unchecked", "to_le_bytes", "to_ne_bytes", "to_radians", "total_cmp", "trunc",
 ];
 
-/// Part 9's ban: std's hashed collections and what builds them. Their iteration order is not the same on every run.
+/// Part 9's ban: hashed collections and what builds them (their iteration order is not the same on every run). A
+/// name that holds `HashMap` or `HashSet` counts too: the hashed maps of other crates are named after std's.
 #[rustfmt::skip]
 const HASHED: [&str; 6] = ["HashMap", "HashSet", "hash_map", "hash_set", "RandomState", "DefaultHasher"];
+
+/// The paths before a banned name that are not a float's: the integers, and what orders things.
+#[rustfmt::skip]
+const NOT_FLOATS: [&str; 16] = [
+    "u8", "u16", "u32", "u64", "u128", "usize", "i8", "i16", "i32", "i64", "i128", "isize", "Ord", "PartialOrd", "Iterator", "cmp",
+];
 
 /// Part 4: the tick is the simulation's only clock.
 const CLOCKS: [&str; 3] = ["Instant", "SystemTime", "UNIX_EPOCH"];
 
-/// The words an item starts with: part 9's escape counts on an item, not on a field or a statement.
+/// The words an item that names a type or a value starts with: part 9's escape counts on such an item, not on a
+/// field or a statement, and not on a whole `fn`, `impl`, `mod` or `trait` with everything in it.
 #[rustfmt::skip]
-const ITEMS: [&str; 10] = ["type", "struct", "enum", "static", "const", "fn", "use", "impl", "mod", "trait"];
+const ITEMS: [&str; 6] = ["type", "struct", "enum", "static", "const", "use"];
 
 /// Part 9's escape as the scan reads it, token by token; `"…"` is a string that is not empty: the written reason.
 #[rustfmt::skip]
@@ -75,7 +99,12 @@ fn tokens(source: &str) -> Vec<Token> {
         loop {
             match at_or(at) {
                 '\0' => return (at, at > start),
-                '\\' if !raw => at += 1,
+                '\\' if !raw => {
+                    at += 1;
+                    if at_or(at) == '\n' {
+                        *line += 1;
+                    }
+                }
                 '"' if (1..=hashes).all(|k| at_or(at + k) == '#') => {
                     return (at + 1 + hashes, at > start);
                 }
@@ -223,26 +252,30 @@ fn breaches(file: &str, source: &str) -> Vec<String> {
     let mut found = Vec::new();
     for (i, token) in t.iter().enumerate() {
         let name = token.text.as_str();
-        let (before, before_2, before_3) = (
+        let (before, before_2, next) = (
             text(i.checked_sub(1)),
             text(i.checked_sub(2)),
-            text(i.checked_sub(3)),
+            text(Some(i + 1)),
         );
-        let on_float = before == "::"
-            && (matches!(before_2, "f32" | "f64")
-                || (before_2 == ">" && matches!(before_3, "f32" | "f64")));
-        if STD.contains(&name)
-            && !ALLOWED.contains(&name)
-            && ((before == "." && text(Some(i + 1)) == "(") || on_float)
-        {
+        // A method call (not the end of a range, `0..min(a, b)`), or any path that is not an integer's.
+        let called = before == "." && before_2 != "." && next == "(";
+        let on_a_path = before == "::" && !NOT_FLOATS.contains(&before_2);
+        let float_call = STD.contains(&name) && (called || on_a_path);
+        if let Some((_, why)) = HELD.iter().find(|(held, _)| float_call && *held == name) {
+            found.push(format!(
+                "{file}:{}: `{name}` is on ADR 0004 part 7's list and held back all the same ({why}); write `a * b + c`",
+                token.line
+            ));
+        } else if float_call && !ALLOWED.contains(&name) {
             found.push(format!(
                 "{file}:{}: `{name}` is a float method outside ADR 0004 part 7's list (on an integer, write the path form on its own type, as in `u32::{name}(..)`)",
                 token.line
             ));
         }
-        if HASHED.contains(&name) && !covered[i] {
+        let hashed = HASHED.contains(&name) || name.contains("HashMap") || name.contains("HashSet");
+        if hashed && !covered[i] {
             found.push(format!(
-                "{file}:{}: `{name}`: no std hash map or hash set in the simulation (ADR 0004 part 9); a `BTreeMap` or an index-ordered `Vec` instead, or the escape with its reason on the item",
+                "{file}:{}: `{name}`: no hash map or hash set in the simulation (ADR 0004 part 9); a `BTreeMap` or an index-ordered `Vec` instead, or the escape with its reason on the type's own item",
                 token.line
             ));
         }
@@ -251,6 +284,22 @@ fn breaches(file: &str, source: &str) -> Vec<String> {
         {
             found.push(format!(
                 "{file}:{}: `{name}`: the tick is the simulation's only clock (ADR 0004 part 4)",
+                token.line
+            ));
+        }
+        if name == "target_feature"
+            || (name == "arch" && before == "::" && matches!(before_2, "std" | "core"))
+        {
+            found.push(format!(
+                "{file}:{}: `{name}`: no per-target code in the simulation, SIMD least of all (ADR 0004 part 7: one result on every target)",
+                token.line
+            ));
+        }
+        if (name == "path" && before == "[" && before_2 == "#")
+            || (name == "include" && next == "!")
+        {
+            found.push(format!(
+                "{file}:{}: `{name}`: the simulation's source lies under `src/`, where this scan reads it; a file brought in from elsewhere would not be read",
                 token.line
             ));
         }
@@ -322,41 +371,68 @@ fn the_lists_are_the_draft_s() {
     assert_eq!(algebraic.count(), 5);
 }
 
+#[test]
+fn what_is_held_back_is_one_name_of_the_draft_s_list() {
+    assert!(
+        HELD.iter()
+            .all(|(name, why)| ALLOWED.contains(name) && why.starts_with("MUL-ADD"))
+    );
+    assert_eq!(HELD.map(|(name, _)| name), ["mul_add"]);
+}
+
 /// Each planted breach, with the name its one finding must hold.
 #[rustfmt::skip]
-const BITES: [(&str, &str); 22] = [
+const BITES: [(&str, &str); 35] = [
     ("fn f(x: f32) -> f32 { x.sin() }", "`sin`"),
     ("fn f(deg: f32) -> f32 { deg.to_radians() }", "`to_radians`"),
     ("fn f(a: f32, b: f32) -> f32 { a.min(b) }", "`min`"),
     ("fn f(x: f32) -> f32 { f32::powi(x, 2) }", "`powi`"),
     ("fn f(x: f64) -> f64 { <f64>::hypot(x, x) }", "`hypot`"),
     ("fn f(v: &[f32]) -> Vec<f32> { v.iter().copied().map(f32::cbrt).collect() }", "`cbrt`"),
+    // Held back (MUL-ADD), as a method and by its path.
+    ("fn f(x: f32, y: f32, z: f32) -> f32 { x.mul_add(y, z) }", "`mul_add` is on ADR 0004 part 7's list and held back"),
+    ("fn f(a: f32, b: f32, c: f32) -> f32 { f32::mul_add(a, b, c) }", "`mul_add` is on ADR 0004 part 7's list and held back"),
+    // A float under another name: an alias, `Self`, a generic, a trait path.
+    ("type Real = f32; fn f(x: Real) -> Real { Real::sin(x) }", "`sin`"),
+    ("impl Trig for f32 { fn g(self) -> f32 { Self::tan(self) } }", "`tan`"),
+    ("fn f<F: Float>(x: F) -> F { F::cbrt(x) }", "`cbrt`"),
+    ("fn f(x: f32) -> f32 { <f32 as Float>::powi(x, 2) }", "`powi`"),
     ("fn f(x: f32) -> f32 { x\n    .algebraic_add(1.0) }", "2: `algebraic_add`"),
     ("fn f(x: f32) -> [u8; 4] { x.to_le_bytes() }", "`to_le_bytes`"),
     ("struct S { seen: std::collections::HashMap<u32, u32> }", "`HashMap`"),
     ("use std::collections::hash_map::Entry;", "`hash_map`"),
     ("fn f() { let _ = std::hash::RandomState::new(); }", "`RandomState`"),
+    ("struct S { seen: rustc_hash::FxHashMap<u32, u32> }", "`FxHashMap`"),
     ("fn f() { let _ = Instant::now(); }", "`Instant`"),
     ("fn f(t: SystemTime) {}", "`SystemTime`"),
     ("use std::time::Duration;", "`time`"),
     ("fn f(d: core::time::Duration) {}", "`time`"),
+    // Per-target code, and source from outside `src/`.
+    ("#[target_feature(enable = \"relaxed-simd\")] fn f() {}", "`target_feature`"),
+    ("use core::arch::wasm32::f32x4_relaxed_madd;", "`arch`"),
+    ("#[path = \"../../elsewhere.rs\"] mod elsewhere;", "`path`"),
+    ("include!(\"generated.rs\");", "`include`"),
     // The escape: not on a field, not without a written reason, and no further than its own item.
     ("struct S { #[allow(clippy::disallowed_types, reason = \"lookup only\")] seen: HashSet<u32> }", "`HashSet`"),
     ("#[allow(clippy::disallowed_types, reason = \"\")] type Seen = HashSet<u32>;", "`HashSet`"),
     ("#[allow(clippy::disallowed_types)] type Seen = HashSet<u32>;", "`HashSet`"),
     ("#[allow(clippy::disallowed_types, reason = \"lookup only\")] type A = BTreeSet<u32>;\ntype B = HashSet<u32>;", "2: `HashSet`"),
+    ("#[allow(clippy::disallowed_types, reason = \"lookup only\")] fn f() { let _ = HashSet::<u32>::new(); }", "`HashSet`"),
     // The scan comes back out of a literal, a lifetime and a comment: what follows them is still read.
     ("fn f() -> (char, char, u8) { ('\"', '\\'', b'\"') } fn g(x: f32) -> f32 { x.cos() }", "`cos`"),
     ("fn f<'a>(x: &'a f32) -> &'static str { r#\"a \"quote\" \"# } fn g(x: f32) -> f32 { x.tan() }", "`tan`"),
     ("/* a /* nested */ comment */ fn g(x: f32) -> f32 { x.exp() } // x.ln()", "`exp`"),
+    ("fn f() -> &'static str { \"a line break \\\n inside a text\" }\nfn g(x: f32) -> f32 { x.ln() }", "3: `ln`"),
 ];
 
 /// What must pass: the allowed methods, the path forms on integers, the escape on an item, and names in prose.
 #[rustfmt::skip]
-const CONTROLS: [&str; 8] = [
-    "fn f(x: f32) -> f32 { x.abs().fract().sqrt().mul_add(2.0, 1.5e3).copysign(-1.0).total_cmp(&x) as i32 as f32 }",
+const CONTROLS: [&str; 10] = [
+    "fn f(x: f32) -> f32 { (x.abs().fract().sqrt() * 2.0 + 1.5e3).copysign(-1.0).total_cmp(&x) as i32 as f32 }",
     "fn f(a: u32, b: u32) -> u32 { core::cmp::min(a, b) + u32::max(a, b) + Ord::clamp(a, 0, 9) + min(a, b) }",
     "fn f(tick: u32) -> [u8; 4] { u32::to_le_bytes(tick) }",
+    "fn f(a: u32, b: u32) -> u32 { (0..min(a, b)).sum::<u32>() + Iterator::max([a, b].into_iter()).unwrap_or(0) }",
+    "fn f(include: u32, path: u32, arch: u32) -> u32 { include + path + arch }",
     "#[allow(clippy::disallowed_types, reason = \"lookup only, outside the serialized state\")]\npub(crate) struct Lookup { by_name: std::collections::HashMap<u32, [u8; 4]> }",
     "#[allow(clippy::disallowed_types, reason = \"lookup only\")] use std::collections::{HashMap, HashSet};",
     "// a HashMap, x.sin() and Instant::now()\n/* std::time /* x.cos() */ x.tan() */ fn f() {}",

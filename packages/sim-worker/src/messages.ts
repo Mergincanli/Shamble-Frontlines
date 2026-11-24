@@ -82,8 +82,9 @@ const STATS_FIELDS: { readonly [Name in keyof WorkerStats]: WorkerStats[Name] ex
   crossOriginIsolated: "boolean",
 };
 /**
- * The same list as pairs, made once: the check runs on the page for every report and allocates nothing. Marked as
- * free of side effects, so the Worker's chunk, which never runs this check, does not carry the list.
+ * The same list as pairs, made once, so the check that runs on the page for every report (four times a second, in
+ * development builds) builds no list of its own; reading a report's fractional numbers still costs a few bytes
+ * each. Marked as free of side effects, so the Worker's chunk, which never runs this check, does not carry it.
  */
 const STATS_KINDS: readonly (readonly [string, string])[] = /* @__PURE__ */ Object.entries(STATS_FIELDS);
 
@@ -139,7 +140,8 @@ export function isWorkerToPage(value: unknown): value is WorkerToPage {
     case "ready":
       return isCount(value["blockBytes"]) && isCount(value["tickHz"]);
     case "block":
-      return value["buffer"] instanceof ArrayBuffer && typeof value["doneAt"] === "number" && Number.isFinite(value["doneAt"]);
+      // One read of the time: `isFinite` refuses everything that is not a number, without converting it.
+      return value["buffer"] instanceof ArrayBuffer && Number.isFinite(value["doneAt"]);
     case "error":
       return typeof value["message"] === "string";
     case "report":

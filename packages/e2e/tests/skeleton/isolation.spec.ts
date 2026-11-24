@@ -39,6 +39,14 @@ for (const kind of ["dev server", "preview server"] as const) {
         expect(data.header.crossOriginIsolated).toBe(flag);
         expect(data.worker?.crossOriginIsolated).toBe(flag);
         expect(data.errors).toBe(0);
+        if (kind === "dev server") {
+          // The dev server reads files outside the page's folder by their full path. It hands out the players' Wasm,
+          // which the Worker loads, and refuses the test-only module that the build puts beside it.
+          const file = (folder: string, name: string): string => `${address ?? ""}@fs${path.join(client, "../sim-worker", folder, name)}`;
+          expect((await page.request.get(file("pkg", "sim_wasm_bg.wasm"))).status()).toBe(200);
+          expect((await page.request.get(file("pkg-rules/release", "devtools_bg.wasm"))).status()).toBe(403);
+          expect((await page.request.get(file("pkg-rules/dev", "devtools.js"))).status()).toBe(403);
+        }
       } finally {
         await server?.close();
         restore("SHAMBLE_ISOLATION", before[0]);

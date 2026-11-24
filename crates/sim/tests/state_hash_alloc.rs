@@ -23,7 +23,7 @@ thread_local! {
 
 fn count() {
     // A thread that is ending may no longer have the counter; such a call is not this test's.
-    let _ = TAKEN.try_with(|taken| taken.set(taken.get() + 1));
+    let _ = TAKEN.try_with(|taken| taken.set(taken.get().wrapping_add(1)));
 }
 
 fn taken() -> u64 {

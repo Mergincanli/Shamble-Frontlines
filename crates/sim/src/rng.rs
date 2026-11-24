@@ -1,4 +1,4 @@
-//! The generator of the simulation's random streams: ChaCha with 8 rounds (ADR 0004 part 8). It is our own code and
+//! The generator of the simulation's random streams: `ChaCha` with 8 rounds (ADR 0004 part 8). It is our own code and
 //! no library's (Mustafa's RNG-SOURCE (c), 2026-11-23: "our own ChaCha8, checked against the published test
 //! vectors"), so the server and every browser run these same lines: plain 32-bit adds, xors and rotations, with no
 //! processor-specific path that could make them disagree. The tests below hold the published vectors.
@@ -14,6 +14,9 @@ const CONSTANTS: [u32; 4] = [0x6170_7865, 0x3320_646e, 0x7962_2d32, 0x6b20_6574]
 
 /// Words per block.
 const BLOCK_WORDS: u64 = 16;
+
+// The key is eight words: a seed of another length would be cut short without a word (`new` pairs them up).
+const _: () = assert!(SEED_BYTES == 32);
 
 /// One random stream of a match: the match seed as the key, a stream id, and a position. There is no `Debug`: the
 /// seed is never printed or logged (ADR 0004 part 8).
@@ -83,6 +86,9 @@ impl ChaCha8 {
     }
 
     /// The next 64 bits: two words in the order they are drawn, the first one low.
+    ///
+    /// # Panics
+    /// As [`Self::next_u32`], at the stream's last word.
     pub fn next_u64(&mut self) -> u64 {
         let low = u64::from(self.next_u32());
         low | (u64::from(self.next_u32()) << 32)
@@ -122,7 +128,7 @@ impl ChaCha8 {
     }
 }
 
-/// ChaCha's quarter round on four words of the block. The additions wrap on purpose: they are sums modulo 2^32.
+/// `ChaCha`'s quarter round on four words of the block. The additions wrap on purpose: they are sums modulo 2^32.
 fn quarter_round(x: &mut [u32; 16], a: usize, b: usize, c: usize, d: usize) {
     x[a] = x[a].wrapping_add(x[b]);
     x[d] = (x[d] ^ x[a]).rotate_left(16);
@@ -141,7 +147,9 @@ mod tests {
     /// The published test vectors for 8 rounds and a 256-bit key, TC1 to TC8 of the Internet-Draft
     /// "draft-strombergson-chacha-test-vectors-01" (J. Strombergson, December 2013;
     /// www.ietf.org/archive/id/draft-strombergson-chacha-test-vectors-01.txt): the key, the IV, and the first two
-    /// keystream blocks. Copied from the draft's text by a script, never typed.
+    /// keystream blocks. Copied from the draft's text by a script, never typed. The text they were copied from, as
+    /// fetched on 2026-11-24: 76,754 bytes, sha256
+    /// e0a49fddc11091989b018b0d4c7ffb73c44f849255659b938b464c65d1ab4d55.
     #[rustfmt::skip]
     const PUBLISHED: [(&str, &str, &str); 8] = [
         // TC1
@@ -263,6 +271,16 @@ mod tests {
             assert_eq!(pairs.next_u64(), low | (high << 32));
         }
         assert_eq!(pairs.position(), 40);
+        // From an odd word, so that a pair lies across a block's end (words 15 and 16), and from a block's last word.
+        for start in [1, 15, 31] {
+            pairs.set_position(start);
+            words.set_position(start);
+            for _ in 0..12 {
+                let (low, high) = (u64::from(words.next_u32()), u64::from(words.next_u32()));
+                assert_eq!(pairs.next_u64(), low | (high << 32), "from word {start}");
+            }
+            assert_eq!(pairs.position(), start + 24);
+        }
     }
 
     #[test]

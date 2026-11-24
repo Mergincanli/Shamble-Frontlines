@@ -7,10 +7,11 @@
 import { readFileSync } from "node:fs";
 import { checkLayoutHash, LAYOUT_HASH } from "@shamble/types";
 import { beforeAll, expect, test } from "vitest";
+import * as glue from "../pkg/sim_wasm.js";
 import { initSync, panic_buffer, Sim, tick_hz } from "../pkg/sim_wasm.js";
 import { SimHost } from "../src/host.ts";
 import { MAX_TICKS_PER_WAKE } from "../src/pacing.ts";
-import { readPanicMessage } from "../src/panic-message.ts";
+import { PANIC_TEXT_ROOM, readPanicMessage } from "../src/panic-message.ts";
 import { copyBlock } from "../src/read-block.ts";
 
 const SEED = new Uint8Array(32).fill(7);
@@ -91,7 +92,15 @@ test("the panic hook's buffer stands from the module's start: no text, and its r
   // The room is written by the module's start function, which the glue runs as it instantiates the module: so
   // the hook is installed before any other export can run. (A trap's text itself: rules.test.mjs.)
   expect(header.getUint32(4, true)).toBe(1016);
+  // The one number the Worker's reader holds a copy of.
+  expect(PANIC_TEXT_ROOM).toBe(1016);
   expect(readPanicMessage(wasm.memory, ptr)).toBe("");
+});
+
+test("the glue exports what the Worker calls and nothing more", () => {
+  // The two ways to load the module, the one type, and two calls asked once. The start function that installs the
+  // panic hook is not among them: the glue runs it itself.
+  expect(Object.keys(glue).sort()).toEqual(["Sim", "default", "initSync", "panic_buffer", "tick_hz"]);
 });
 
 test("in the glue, each per-tick call reaches exactly one export", () => {

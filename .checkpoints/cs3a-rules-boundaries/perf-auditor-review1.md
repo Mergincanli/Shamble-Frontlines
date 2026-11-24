@@ -77,3 +77,44 @@ Scratch and builds: .gate/perf-auditor-cs3a/ only.
   first line is 0.25 s on the runner (node + tool check + --version + the 4 cargo tree), twice a job. Browser tests
   12 -> 14: 64.7 / 62.3 s -> 69.0 / 59.4 s (Playwright's own lines; runner noise +-5 s). Net: about +14..16 s a job
   (+11 %), inside the runner's +-15 s spread between jobs; the job stays under 3 minutes.
+- (6) here, 1 run each for clean (load ~0.1), 3 for warm: players' Wasm clean main 6.90 s, head 7.31 s (one run each:
+  within noise). Test-only module, own target folder (.gate/perf-auditor-cs3a/target-rules-mine; its outputs are
+  byte for byte the builder's pkg-rules, sha256 8e7fbcab.../45543baa...): release clean 7.41 s, dev clean 7.82 s; warm
+  0.050..0.066 s each; wasm-bindgen 0.019 s (release module) and 0.067 s (dev module, 255,317 B); the tool's sha256
+  check 12 ms each (8.2 MB). checkCrates' four cargo tree calls (tree-time.mjs, exact arguments + --offline): median
+  323 ms (290..377, 7 rounds), ~80 ms a call, once per build.mjs run. So a development build gains ~15.2 s clean and
+  ~0.5 s warm; a --production build only the 0.32 s of checkCrates. New tests on the runner: the two rules specs 0.60 +
+  0.34 s, boundary/rules.test.mjs 0.22 s. Not a finding (no time limit binds; browser tests 1.0 min of 5).
+- (2, cont.) Same harness with every message made by V8's own structured clone (as the browser's deserialiser makes
+  them; --clone), interval 1, 2 runs each, deterministic: window main 280.0, head 305.8 (+25.8), head-fix 289.8 (+9.8).
+  The +9.8 is isWorkerStats: 80 B per report (5 fractional fields read through megamorphic keyed loads, each boxed:
+  5 x 16), 30 reports in the window. Steady state (optimised, heap delta, 2 runs): main 328.22, head 338.25, head-fix
+  338.25 B per block incl. 2 frames + 1/8 report: the doneAt reads cost 0 once optimised, the report check keeps
+  80 B a report in every tier = 320 B/s at 4 reports/s, development builds only (requestReport is behind the readout).
+  So the runner's +19.3 +- 6.2 B/block is 16 (doneAt) + ~10 (reports) within noise.
+  FINDING L-2 (Low): messages.ts:85-88 doc says the report check "allocates nothing"; it allocates ~80 B per report
+  (boxed doubles). Fix: say so in the comment (dev builds only, ~320 B/s); no code change needed. Ride the fix pass.
+- (4, cont.) My clean head build + the checked wasm-bindgen gives sha256 e138cae8...2bc5 (= the builder's and CI's).
+  The tool's own flags on that build: --remove-name-section 23,808 / 10,874 / 9,283 (raw / gzip -9 / Brotli 11:
+  -25.1 % / -14.1 % / -14.0 %); with --remove-producers-section too 23,682 / 10,780 / 9,161. Head without names is
+  below main with names (28,987). Costs: Wasm frames lose their names in stack traces and in browser profiles (a v2
+  method); a split between the development and the production Wasm would meet wasmProblems' byte-for-byte rule.
+  Cheap cuts inside the hook itself (write_char 229, the closure's duplicated shim 121, panic_const_sub_overflow 16
+  from the unchecked-looking subtraction, rust-reviewer's L3 saturating_sub) are each < 1 % of the file: not worth a
+  change now. Names on/off belongs in "the table of build options" (PM-0002-29's rows) with the Advisor's first limit.
+- (7) Bundles on the runner (#64's main run vs 5c92311): page JS 822,196 -> 823,255 raw (+1,059; gzip +320, Brotli
+  +278); Worker chunk 8,226 -> 8,833 (+607; gzip +201); STATS_FIELDS stays out of the Worker chunk (the pure mark works:
+  found only in the page chunk). The Wasm's existing functions keep their exact sizes (wasm-sections: no "~" line):
+  the tick's code is untouched; the hook runs once at instantiation. Nothing else per tick or per frame in the diff.
+- (1, cont.) The page's own readout in the browser tests (headless Chromium, 2 s skeleton runs, clock step 0.1 ms):
+  copyP50 0 / copyP99 0.1 ms at main and at every 3a head; latenessP50 0.63..0.87 ms (main) vs 0.67..0.87 (3a),
+  latenessP99 2.4..5.9 vs 2.8..6.6: the same spread; this clock cannot see nanoseconds, so it agrees with the harness.
+
+## Verdict
+VERDICT: OK (no regression on a per-tick or per-frame path; fps() ~15x cheaper; Wasm +2,818 B raw / +841 B Brotli
+with no pass number to meet). 0 Critical, 0 High, 0 Medium, 2 Low (L-1 doneAt read twice: +16 B/block while
+unoptimised; L-2 the report check's "allocates nothing" doc: 80 B a report, dev only), both for this change-set's fix
+pass (one line of code, one line of doc); follow-ups: names on/off in "the table of build options"; ChaCha8's block
+copy with PM-0004-27 in change-set 8; the rules module's 14..16 s of CI with E1. Not measured: Brave/real GPU, Firefox,
+WebKit; the allocation spec itself on a fixed head (port 4173 busy); Chrome's V8 (Node 22's V8 12.4 stood in); the
+Worker's real postMessage cost; a trap's path timing (once per match).

@@ -27,11 +27,12 @@ export default defineConfig({
   // A module Worker (Vite's default would be a classic script).
   worker: { format: "es" },
   // Both servers answer on this computer only, never on the network (the dependency answer's condition), and the
-  // dev server serves only the folders the page loads from, not the whole repository.
+  // dev server serves only the folders the page loads from, not the whole repository: of the Worker's package its
+  // sources and the players' Wasm, so never the test-only module that is built beside them (pkg-rules).
   server: {
     host: "127.0.0.1",
     headers: isolation,
-    fs: { allow: [folder("."), folder("../sim-worker"), folder("../types"), folder("../../node_modules")] },
+    fs: { allow: [folder("."), folder("../sim-worker/src"), folder("../sim-worker/pkg"), folder("../types"), folder("../../node_modules")] },
   },
   preview: { host: "127.0.0.1", headers: isolation },
 });
