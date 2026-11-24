@@ -959,13 +959,14 @@ fn room_log<'r>(run: &'r Run<'_>) -> Result<&'r Log, Lack> {
     }
 }
 
-/// A name only one process writes (`kind`: `second.v`, `second.s`, `tick.v` or `tick.s`): in a log of another
-/// process it is a gap, as for the `hs` names (the advisor's FX-5 (a)).
+/// A name only one process writes (`kind`: `second.v`, `second.s`, `tick.v`, `tick.s`, or `event` for an event's
+/// name): in a log of another process it is a gap, as for the `hs` names (the advisor's FX-5 (a)).
 fn only_from(run: &Run<'_>, process: &str, kind: &str, name: &str) -> Result<(), Lack> {
     let has = |l: &Log| match kind {
         "second.v" => l.seconds.iter().any(|s| s.v.contains_key(name)),
         "second.s" => l.seconds.iter().any(|s| s.s.contains_key(name)),
         "tick.v" => l.ticks.iter().any(|t| t.v.contains_key(name)),
+        "event" => l.events.iter().any(|e| e.ev == name),
         _ => l.ticks.iter().any(|t| t.s.contains_key(name)),
     };
     let other = run
@@ -1295,6 +1296,180 @@ fn sync_cost_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
     Ok(worst.unwrap_or(own))
 }
 
+/// A run's own counts for R2's worked bandwidth formula (docs/research/r2-netcode.md, E3: lines 1742-1766), all
+/// from the room log's measured records, as the netcode-architect ruled their meaning (R2-INPUTS, 2026-11-24).
+struct R2Counts {
+    /// The header's `tick_hz`: the snapshot rate.
+    hz: i128,
+    clients: i128,
+    /// E: the mean `tick.s.relevant_count` entry (the other soldiers and the big-vehicle hulls in a client's set).
+    entities: Ratio,
+    /// V: the mean `tick.v.big_vehicles_count`.
+    vehicles: Ratio,
+    /// S, R, J: the mean `second.v` `shots_count`, `reliable_events_count`, `projectile_spawns_count`.
+    per_second: [Ratio; 3],
+}
+
+impl R2Counts {
+    /// Gaps: no room log or more than one, a name in another process's log, a measured tick or second without one
+    /// of its series, a `relevant_count` list that does not hold the run's `clients` entries, no measured tick or
+    /// second, a run of 0 clients.
+    fn of(run: &Run<'_>) -> Result<R2Counts, Lack> {
+        let (relevant, big) = ("relevant_count", "big_vehicles_count");
+        only_from(run, "room", "tick.s", relevant)?;
+        only_from(run, "room", "tick.v", big)?;
+        let room = room_log(run)?;
+        let clients = i128::from(room.header.clients);
+        let gap = |why: String| Err(Lack::Gap(format!("run {}: {why}", run.id)));
+        let (mut entities, mut vehicles, mut ticks) = (0_i128, 0_i128, 0_i128);
+        for t in room.ticks.iter().filter(|t| t.ph == Phase::Measured) {
+            let (Some(list), Some(v)) = (t.s.get(relevant), t.v.get(big)) else {
+                return gap(format!(
+                    "measured tick {} of the room log lacks tick.s.{relevant} or tick.v.{big}",
+                    t.t
+                ));
+            };
+            if list.len() as i128 != clients {
+                return gap(format!(
+                    "tick {}'s tick.s.{relevant} holds {} entries, not the run's {clients} clients",
+                    t.t,
+                    list.len()
+                ));
+            }
+            entities += list.iter().map(|e| i128::from(*e)).sum::<i128>();
+            vehicles += i128::from(*v);
+            ticks += 1;
+        }
+        if ticks == 0 || clients == 0 {
+            return gap(format!(
+                "no measured tick in the room log, or 0 clients (tick.s.{relevant})"
+            ));
+        }
+        let mean = |name: &str| -> Result<Ratio, Lack> {
+            let values = room_seconds(run, "second.v", name, |s| s.v.get(name).copied())?;
+            let sum = values.values().map(|v| i128::from(*v)).sum::<i128>();
+            Ok(Ratio::new(sum, values.len() as i128))
+        };
+        Ok(R2Counts {
+            hz: i128::from(room.header.tick_hz),
+            clients,
+            entities: Ratio::new(entities, ticks * clients),
+            vehicles: Ratio::new(vehicles, ticks),
+            per_second: [
+                mean("shots_count")?,
+                mean("reliable_events_count")?,
+                mean("projectile_spawns_count")?,
+            ],
+        })
+    }
+
+    /// Bits per second to one client: 8 x (hz x (90 + 7.5 x (E - V) + 9.4 x V) + 4 S + 24 R + 11 J) bytes, which is
+    /// 4/5 x hz x (900 + 75 E + 19 V) + 32 S + 192 R + 88 J. Per snapshot 90 B fixed (57 transport, 8 header, 16
+    /// own state, 7 structures, 2 economy), 7.5 B per other soldier, 9.4 B per vehicle; 4 B per shot, 8 B x 3 sends
+    /// per reliable event, 11 B per projectile spawn.
+    fn bits(&self) -> Ratio {
+        let [shots, reliable, spawns] = self.per_second;
+        let snapshot =
+            Ratio::int(900) + Ratio::int(75) * self.entities + Ratio::int(19) * self.vehicles;
+        Ratio::new(4 * self.hz, 5) * snapshot
+            + Ratio::int(32) * shots
+            + Ratio::int(192) * reliable
+            + Ratio::int(88) * spawns
+    }
+
+    /// The arithmetic, for the reports that show it.
+    fn text(&self) -> String {
+        let [shots, reliable, spawns] = self.per_second;
+        format!(
+            "4/5 x {} Hz x (900 + 75 x {} + 19 x {}) + 32 x {shots} + 192 x {reliable} + 88 x {spawns}",
+            self.hz, self.entities, self.vehicles
+        )
+    }
+}
+
+/// PM-0006-17: R2's formula for a room-hour, in bytes: the bits per second per client x clients x 3,600 / 8.
+fn r2_egress_formula_bytes(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let counts = R2Counts::of(i.run)?;
+    Ok(counts.bits() * Ratio::int(counts.clients * 450))
+}
+
+/// Its arithmetic, with the time between the interface counter's two reads (the formula takes 3,600 s as written).
+fn r2_egress_detail(i: &Inputs<'_, '_>) -> Option<String> {
+    let counts = R2Counts::of(i.run).ok()?;
+    let reads = room_log(i.run)
+        .ok()?
+        .events
+        .iter()
+        .filter(|e| e.ev == "iface");
+    let span = match reads.map(|e| e.ns).collect::<Vec<_>>()[..] {
+        [Some(start), Some(end)] if end >= start => {
+            format!(
+                "{} s apart",
+                Ratio::new(i128::from(end - start), 1_000_000_000)
+            )
+        }
+        _ => "not timed (no ns on both)".to_owned(),
+    };
+    Some(format!(
+        "({}) x {} clients x 3,600 s / 8; the interface counter's two reads are {span}",
+        counts.text(),
+        counts.clients
+    ))
+}
+
+/// A counter the room logs twice, at the start and at the end of its window (`event.<ev>.<field>`, in record
+/// order): how far it moved. Gaps: the event in another process's log, no room log or more than one, not exactly
+/// two such events, a field that is not a whole number, a counter that fell.
+fn counter_growth(run: &Run<'_>, ev: &str, field: &str) -> Result<i128, Lack> {
+    only_from(run, "room", "event", ev)?;
+    let events = room_log(run)?.events.iter().filter(|e| e.ev == ev);
+    let reads: Vec<Option<i64>> = events
+        .map(|e| e.f.get(field).and_then(Value::as_i64))
+        .collect();
+    let why = match reads[..] {
+        [Some(start), Some(end)] if end >= start => return Ok(i128::from(end) - i128::from(start)),
+        [Some(start), Some(end)] => {
+            format!("event.{ev}.{field} fell from {start} to {end} between its two reads")
+        }
+        [_, _] => format!("an event.{ev} record has no whole-number {field}"),
+        _ => format!(
+            "{} event.{ev} records in the room log, not the two reads (start and end)",
+            reads.len()
+        ),
+    };
+    Err(Lack::Gap(format!("run {}: {why}", run.id)))
+}
+
+/// PM-0006-17: the bytes RS's interface sent between its counter's two reads. A counter that did not move is a gap.
+fn egress_interface_bytes(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    match counter_growth(i.run, "iface", "tx_bytes")? {
+        0 => Err(Lack::Gap(format!(
+            "run {}: event.iface.tx_bytes did not move between its two reads",
+            i.run.id
+        ))),
+        bytes => Ok(Ratio::int(bytes)),
+    }
+}
+
+/// PM-0006-17: the room's own bytes-sent metric over the same two moments, against the interface's bytes.
+fn egress_metric_vs_interface_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let interface = egress_interface_bytes(i)?;
+    let metric = counter_growth(i.run, "room_metric", "sent_bytes")?;
+    Ok(Ratio::new(metric, interface.num()))
+}
+
+/// PM-0006-17: the interface's bytes against R2's formula at the run's own counts.
+fn egress_vs_r2_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let formula = r2_egress_formula_bytes(i)?;
+    match formula.num() {
+        0 => Err(Lack::Gap(format!(
+            "run {}: R2's formula gives 0 bytes at the run's counts",
+            i.run.id
+        ))),
+        num => Ok(egress_interface_bytes(i)? * Ratio::new(formula.den(), num)),
+    }
+}
+
 /// A figure's computation over its [`Inputs`].
 pub type Compute = fn(&Inputs<'_, '_>) -> Result<Ratio, Lack>;
 
@@ -1441,11 +1616,13 @@ pub const FIGURES: &[Figure] = &[
         down_mean_ipv6_bits,
         "the downstream mean with IPv6's 20 B more per datagram (-12)",
     ),
-    planned(
-        "r2_down_formula_bits",
-        "U6",
-        "R2's downstream formula at the run's own counts (-12)",
-    ),
+    Figure {
+        name: "r2_down_formula_bits",
+        compute: Some(|i| Ok(R2Counts::of(i.run)?.bits())),
+        unit: "U6j",
+        what: "R2's downstream formula at the run's own counts (-12)",
+        detail: Some(|i| R2Counts::of(i.run).ok().map(|c| c.text())),
+    },
     built(
         "up_client_mean_max_bits",
         |i| slot_mean_max(i.run, "up_bits"),
@@ -1491,24 +1668,26 @@ pub const FIGURES: &[Figure] = &[
         "U6",
         "each client's RoomEnded or close after the tick panic, the slowest (-59)",
     ),
-    planned(
+    built(
         "egress_interface_bytes",
-        "U6",
+        egress_interface_bytes,
         "interface bytes sent in the room-hour (PM-0006-17)",
     ),
-    planned(
+    built(
         "egress_metric_vs_interface_ratio",
-        "U6",
+        egress_metric_vs_interface_ratio,
         "the room's bytes-sent metric against the interface counter (PM-0006-17)",
     ),
-    planned(
-        "r2_egress_formula_bytes",
-        "U6",
-        "R2's egress formula at the run's counts (PM-0006-17)",
-    ),
-    planned(
+    Figure {
+        name: "r2_egress_formula_bytes",
+        compute: Some(r2_egress_formula_bytes),
+        unit: "U6j",
+        what: "R2's egress formula at the run's counts (PM-0006-17)",
+        detail: Some(r2_egress_detail),
+    },
+    built(
         "egress_vs_r2_ratio",
-        "U6",
+        egress_vs_r2_ratio,
         "interface bytes against R2's formula (PM-0006-17)",
     ),
     planned(

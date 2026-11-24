@@ -4149,3 +4149,219 @@ fn u6j_the_sync_unit_costs_gaps_and_its_large_sums() {
     let (line, note) = sync_out(&logs);
     assert!(line.starts_with("Pass 0.5"), "{line} {note}");
 }
+
+/// Run f1's room log for R2's formula, 48 clients at 30 Hz: two measured ticks with `relevant` entities in every
+/// client's set and `vehicles` big vehicles; 25 measured seconds with `shots` and `reliable` each and `spawns` in
+/// all; the interface counter (`iface`) and the room's metric read twice, an hour apart.
+fn egress_run(counts: [i64; 5], iface: [i64; 2], metric: [i64; 2]) -> Vec<Log> {
+    let [relevant, vehicles, shots, reliable, spawns] = counts;
+    let mut s = LogSpec::room("f1", "set-f", M).ticks("big_vehicles_count", &[vehicles; 2]);
+    let second = |k: i64| {
+        let spawned = spawns / 25 + if k == 24 { spawns % 25 } else { 0 };
+        let v = vec![
+            ("shots_count", shots),
+            ("reliable_events_count", reliable),
+            ("projectile_spawns_count", spawned),
+        ];
+        (Measured, v, vec![])
+    };
+    s.seconds = (0..25).map(second).collect();
+    let read = |ev: &str, field: &str, value: i64, ns: u64| {
+        let mut e = EventRecord::new(ev, Measured).with(field, value);
+        e.ns = Some(ns);
+        e
+    };
+    let hour = 3_600_000_000_000;
+    s.events = vec![
+        read("iface", "tx_bytes", iface[0], 5),
+        read("room_metric", "sent_bytes", metric[0], 5),
+        read("iface", "tx_bytes", iface[1], 5 + hour),
+        read("room_metric", "sent_bytes", metric[1], 5 + hour),
+    ];
+    let mut log = s.build();
+    for t in &mut log.ticks {
+        t.s.insert("relevant_count".into(), vec![relevant; 48]);
+    }
+    vec![log]
+}
+
+/// R2's own counts (r2-netcode.md's worked estimate): 47 other soldiers and 15 vehicles in every set, 72 shots and
+/// 10 reliable events a second, 528 projectile spawns in 25 seconds.
+const R2_COUNTS: [i64; 5] = [62, 15, 72, 10, 528];
+const R2_BYTES: i64 = 3_156_247_296;
+
+#[test]
+fn u6j_r2s_formula_at_its_own_counts_and_the_egress_against_it() {
+    let golden = egress_run(R2_COUNTS, [1_000, 1_000 + R2_BYTES], [0, R2_BYTES]);
+    let check = |figure: &str, op: &str, value: Value, logs: &[Log]| {
+        figure_check(figure, op, value, logs).0
+    };
+    // 3653064/25 bits a second per client (R2 prints 146.1 kbps); x 48 clients x 3,600 s / 8: R2's 3.156 GB.
+    assert_eq!(
+        check("r2_down_formula_bits", "==", json!("146122.56"), &golden),
+        "Pass 146122.56"
+    );
+    assert_eq!(
+        check("r2_egress_formula_bytes", "==", json!(R2_BYTES), &golden),
+        "Pass 3156247296"
+    );
+    assert_eq!(
+        check("egress_interface_bytes", "==", json!(R2_BYTES), &golden),
+        "Pass 3156247296"
+    );
+    assert_eq!(
+        check("egress_vs_r2_ratio", "<=", json!("1.2"), &golden),
+        "Pass 1"
+    );
+    assert_eq!(
+        check(
+            "egress_metric_vs_interface_ratio",
+            ">=",
+            json!("0.95"),
+            &golden
+        ),
+        "Pass 1"
+    );
+    // Everything sent twice: 2.0.
+    let double = egress_run(R2_COUNTS, [1_000, 1_000 + 2 * R2_BYTES], [0, R2_BYTES]);
+    assert_eq!(
+        check("egress_vs_r2_ratio", "<=", json!("1.2"), &double),
+        "Fail 2"
+    );
+    assert_eq!(
+        check(
+            "egress_metric_vs_interface_ratio",
+            ">=",
+            json!("0.95"),
+            &double
+        ),
+        "Fail 0.5"
+    );
+    // The limits themselves pass. With no shots, events or spawns the formula gives 3,024,864,000 B.
+    let quiet =
+        |bytes: i64, metric: i64| egress_run([62, 15, 0, 0, 0], [7, 7 + bytes], [0, metric]);
+    let at =
+        |logs: &[Log], op: &str, limit: &str| check("egress_vs_r2_ratio", op, json!(limit), logs);
+    assert_eq!(at(&quiet(2_419_891_200, 0), ">=", "0.8"), "Pass 0.8");
+    assert_eq!(at(&quiet(2_419_891_199, 0), ">=", "0.8"), "Fail 0.8");
+    assert_eq!(at(&quiet(3_629_836_800, 0), "<=", "1.2"), "Pass 1.2");
+    assert_eq!(at(&quiet(3_629_836_801, 0), "<=", "1.2"), "Fail 1.2");
+    let metric = |logs: &[Log], op: &str, limit: &str| {
+        check("egress_metric_vs_interface_ratio", op, json!(limit), logs)
+    };
+    assert_eq!(
+        metric(&quiet(2_000_000, 2_100_000), "<=", "1.05"),
+        "Pass 1.05"
+    );
+    assert_eq!(
+        metric(&quiet(2_000_000, 2_100_002), "<=", "1.05"),
+        "Fail 1.050001"
+    );
+    assert_eq!(
+        metric(&quiet(2_000_000, 1_900_000), ">=", "0.95"),
+        "Pass 0.95"
+    );
+    // The reports show the arithmetic, and the egress one the time between the counter's two reads.
+    let mark = json!({
+        "id": M, "title": "egress", "draft": draft(), "verdict": "reported",
+        "parts": [{"name": "P", "select": {"layer": "L2"}, "min": 1}],
+        "report": [{"name": "bits", "figure": "r2_down_formula_bits"},
+                   {"name": "bytes", "figure": "r2_egress_formula_bytes"},
+                   {"name": "interface", "figure": "egress_interface_bytes"}]
+    });
+    let v = judge(&marks_file(&[mark]), &golden);
+    let sum = "4/5 x 30 Hz x (900 + 75 x 62 + 19 x 15) + 32 x 72 + 192 x 10 + 88 x 21.12";
+    assert_eq!(report(&v[0], "bits"), [format!("146122.56 ({sum})")]);
+    let bytes = format!(
+        "3156247296 (({sum}) x 48 clients x 3,600 s / 8; the interface counter's two reads are 3600 s apart)"
+    );
+    assert_eq!(report(&v[0], "bytes"), [bytes]);
+    assert_eq!(report(&v[0], "interface"), ["3156247296"]);
+}
+
+#[test]
+fn u6j_the_formulas_and_the_counters_gaps() {
+    let gap = |figure: &str, edit: &dyn Fn(&mut Log)| {
+        let mut logs = egress_run(R2_COUNTS, [1_000, 1_000 + R2_BYTES], [0, R2_BYTES]);
+        edit(&mut logs[0]);
+        let (line, note) = figure_check(figure, "<=", json!(1), &logs);
+        assert_eq!(line, "Gap -", "{figure}: {note}");
+        note
+    };
+    // The interface counter: read three times, read once, fallen, standing still, not a whole number.
+    let third = |l: &mut Log| l.events.push(l.events[0].clone());
+    let why = gap("egress_interface_bytes", &third);
+    assert_eq!(
+        why,
+        "run f1: 3 event.iface records in the room log, not the two reads (start and end)"
+    );
+    let why = gap("egress_vs_r2_ratio", &|l| drop(l.events.remove(2)));
+    assert_eq!(
+        why,
+        "run f1: 1 event.iface records in the room log, not the two reads (start and end)"
+    );
+    let fell = |l: &mut Log| l.events.swap(0, 2);
+    let why = gap("egress_vs_r2_ratio", &fell);
+    assert_eq!(
+        why,
+        "run f1: event.iface.tx_bytes fell from 3156248296 to 1000 between its two reads"
+    );
+    assert_eq!(gap("egress_metric_vs_interface_ratio", &fell), why);
+    let still = |l: &mut Log| drop(l.events[2].f.insert("tx_bytes".into(), json!(1_000)));
+    let why = gap("egress_interface_bytes", &still);
+    assert_eq!(
+        why,
+        "run f1: event.iface.tx_bytes did not move between its two reads"
+    );
+    let why = gap("egress_interface_bytes", &|l| {
+        drop(l.events[2].f.insert("tx_bytes".into(), json!("9")))
+    });
+    assert_eq!(
+        why,
+        "run f1: an event.iface record has no whole-number tx_bytes"
+    );
+    let why = gap("egress_metric_vs_interface_ratio", &|l| {
+        drop(l.events.remove(3))
+    });
+    assert_eq!(
+        why,
+        "run f1: 1 event.room_metric records in the room log, not the two reads (start and end)"
+    );
+    // The formula's inputs: a measured tick or second without one of them, a list of another length.
+    let why = gap("r2_down_formula_bits", &|l| {
+        assert!(l.ticks[1].v.remove("big_vehicles_count").is_some())
+    });
+    assert_eq!(
+        why,
+        "run f1: measured tick 2 of the room log lacks tick.s.relevant_count or tick.v.big_vehicles_count"
+    );
+    let why = gap("r2_egress_formula_bytes", &|l| {
+        assert!(l.seconds[3].v.remove("reliable_events_count").is_some())
+    });
+    assert_eq!(
+        why,
+        "run f1: measured second 3 of the room log has no second.v.reliable_events_count"
+    );
+    let why = gap("egress_vs_r2_ratio", &|l| {
+        drop(l.ticks[0].s.insert("relevant_count".into(), vec![62; 47]))
+    });
+    assert_eq!(
+        why,
+        "run f1: tick 1's tick.s.relevant_count holds 47 entries, not the run's 48 clients"
+    );
+    let why = gap("r2_down_formula_bits", &|l| {
+        l.ticks.iter_mut().for_each(|t| t.ph = Warmup)
+    });
+    assert_eq!(
+        why,
+        "run f1: no measured tick in the room log, or 0 clients (tick.s.relevant_count)"
+    );
+    // A counter read in another process's log is not the room's.
+    let mut logs = egress_run(R2_COUNTS, [1_000, 1_000 + R2_BYTES], [0, R2_BYTES]);
+    let mut bots = seconds_log("bots", "LG", vec![]);
+    bots.events = vec![logs[0].events[0].clone()];
+    logs.push(bots);
+    let (line, note) = figure_check("egress_interface_bytes", "<=", json!(1), &logs);
+    let why = "run f1: event.iface in the bots log on LG1: only process room writes it";
+    assert_eq!((line.as_str(), note.as_str()), ("Gap -", why));
+}
