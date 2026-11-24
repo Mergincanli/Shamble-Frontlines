@@ -915,6 +915,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      green on 78c2d9a; the PR-page picture carried as the merged reports carry pictures, or the departure stated; the
      hourly probe's exit after 2026-12-02 checked (if 3: his archive go, dated, in the closing message). What the delete
      takes (saved messages, plan.md, reviewer notes, token-test variants): cited by commit SHA or folded in.
+   - C2 done: his fourteen messages to this chat recorded in docs/DECISIONS.md by script (decisions/extract.py and
+     build.py in this folder): each quoted block byte for byte from the transcript (checked against the saved copies and
+     their sha256; the queued note of 2026-11-15 16:03:05 UTC from its saved copy, 914 bytes, sha256 7742caa2d586...),
+     each placed by its header's time between the decision headers around it (never between a decision and its
+     sub-entries), 252 lines added and no other line changed (the script asserts both); committed separately.
 
 ## Next steps
 1. The report (`/advisor-report`), folding both checkpoints (this one and `lane2-needs.md`), the results log and the
@@ -1470,6 +1475,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    the 2 December probe question.
 
 ## Running work
+- saver b4au202dl (`watch preview-hosting-check`), started 2026-11-24 about 22:54 UTC, before the verifier.
+- agent verifier (its file: model opus, effort high): the evidence against ADR 0006's own words, spot-checks against
+  the downloaded data, questions a-f (open branches without a pull request; "When a mark fails" and Risk 13; step 4's
+  verdict; the hourly series; Brave's version late; Safari) · launched 2026-11-24 about 22:55 UTC, background · notes
+  `verifier-evidence.md`.
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
   and on Zero Trust's first screen · launched 2026-11-19 about 14:15 UTC (after the save 4396e0a's edits) · DONE; its
   answers in step 26.
