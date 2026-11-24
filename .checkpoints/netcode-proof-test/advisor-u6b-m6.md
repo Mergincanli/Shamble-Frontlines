@@ -421,4 +421,46 @@ Findings this section: Critical 0, High 0, Medium 1 (F-M6-6, report text, fixed 
 (release untouched), money or stop moves; 5,969 of his 6,000. The day's message carries the lines of C7 and R2.
 **For Mustafa:** nothing.
 
+DONE (C5)
+
+## 7. H3: the head read of the pushed merge 8efb9b2 (2026-11-24)
+### What I checked myself (git, gh; read only)
+- **The commit:** 8efb9b2d971c3bb48ef41337249438c725f34708, parent 80a303245133… (`git log -1 --format=%H %P`).
+  Between 21765e3 and the parent, spikes/ and docs/ hold only 07d5d31's test file (`git diff --stat`). After it, only
+  .checkpoints/netcode-proof-test.md (d8b5ddc, ffd90cc: [skip ci] notes).
+- **Its change** (`git show --stat --format=`, `git diff --raw --no-renames` parent..8efb9b2): 30 entries = the 29 files
+  of m6-files.txt plus the deletion of wip/u6b-fix.patch; +5,969 -7,448. Every mode is 100644 (no link, no submodule).
+  Cargo.lock is not among them.
+- **Its blobs** (`git ls-tree -r 8efb9b2`): all 29 equal the approved ones. Cargo.toml 906d145 and binary.rs 1bbe8d8;
+  the 27 others are the patch's post-images (af39989 … 665ab3f, the same list as section 6). So the pushed head is the
+  head C5 approved.
+- **Kept and removed:** wip/u6b-build.patch is in the tree (for U6e), wip/u6b-fix.patch is gone. u6b-report.md is in
+  the tree (blob 2a99e5f): the saver had committed it before 8efb9b2, which is why it is not in the commit's own list.
+  No harm: the tree holds the fixed text.
+- **The report's fixes (H1),** read at 8efb9b2. The header names 4f07818f…, the second ruling and the C5 APPROVE.
+  TR2-U6A-4's section names the cause as measured (the 116 MB debug executable hashed by unoptimised sha2 on the slower
+  host; about 3.0 s to about 120 ms), "Fixed by C1's hunk … R2's sha2 line restored the start's margin", "to the merge
+  report (u6a-fix-pass.md:93-97)", and the rule as "a finding whose fix is code". F-M6-9 is carried to the next
+  Cargo.toml edit. F-M6-6, -7 and -8: closed.
+- **M7** (.gate/u6b-merge/m7-gate.log): checks 1-4 and 5b-5d PASS, symbols +0 -0, 5a skipped by --no-smoke. CI's
+  smoke covers 5a.
+- **CI** (`gh api …/commits/8efb9b2…/check-runs`): six check runs on 8efb9b2, all completed, all success: gate, smoke
+  (twice each: push and pull_request) and toolchain twice. `gh run view 45338377262`: event pull_request, headSha
+  8efb9b2…, jobs gate (06:09:45-06:10:04) and smoke (06:09:46-06:16:11, "Smoke (check 5a)" success).
+- **H4** (the card at HEAD): :74-83 record U6b merged at 8efb9b2, TR2-U6A-4 closed, the four CI runs, and "main-run.sh
+  sets no CARGO_INCREMENTAL: pass `env CARGO_INCREMENTAL=0`".
+
+### Verdict: APPROVE (the pushed head 8efb9b2d971c3bb48ef41337249438c725f34708)
+It is the head C5 approved, byte for byte, in its 29 files, and every check run on it is green. H1-H4 are met.
+Findings: none new (Critical 0, High 0, Medium 0, Low 0).
+
+### Left for U6b's close (none blocks it)
+1. The builder's worktree (.claude/worktrees/agent-a2661dc320c9e6d00) can go now (`.claude/CHECKPOINTS.md` §10). C1
+   copied its 20 plant diffs, and u6b-build.patch keeps the bite's hunks.
+2. The card cites this file at 4f07818f… (the C5 state). Its final hash (after this section) goes on the card. The
+   report needs no new commit: its cite names the state that approved the tree.
+3. The day's message carries C7's and R2's lines (NPT-TRIM).
+4. Next in the card's order: T5 (i), then U6c's launch. SEC-U6B-3 stays on PR #40's closing list (needs-mustafa there).
+**Decisions needed:** none. **For Mustafa:** nothing.
+
 DONE
