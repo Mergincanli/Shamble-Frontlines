@@ -71,35 +71,24 @@
   627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round DONE 21:2x** (his words: the three Highs'
   fixes only; old tree .gate/u8-r3-old, pass 2's bca52b2c): NC-R2-1 CLOSED (u8-r3-netcode.md), SEC-R2-1 = INF-R2-1 and
   SEC-R2-2 CLOSED (u8-r3-security.md); one Low, NC-R3-1 (r1.sh:438-452, save_log unguarded under set -e), a follow-up.
-- **U6b MERGED at 8efb9b2** (pushed 06:09 UTC; u6b-report.md holds the whole story; 29 files, 5,969 added of the
-  6,000 stop): built 5,498; round (netcode APPROVE WITH FINDINGS, security REVISE, test REVISE on High T-1); ruling
-  advisor-u6b-r1.md (R-PING, A1-A3); fix pass e29c003c (5,952); fix check advisor-u6b-fix.md APPROVE WITH CONDITIONS
-  C1-C2 (C1: the 20 plant diffs in .gate/u6b/). Merge: M5 run 1 FAIL (the double-load bite past its 5 s cap:
-  TR2-U6A-4, re-rated Medium, now CLOSED); disk part-clean 10.0 GiB; M6 rulings (advisor-u6b-m6.md 4f07818f…): the
-  cap in start() (binary.rs +14 -12) and sha2 at opt-level 3 in the dev profile (Cargo.toml +3; the debug start 3.0 s
-  -> 0.12 s; the host now 2.10 GHz, was 2.30); probe4 PASS; M5 run 2 PASS (m5-check2.log: 11/11, 807/904, 1,037.2 s);
-  C5 APPROVE of the changed head; M7 gate PASS (m7-gate.log); 29 blobs = .gate/u6b-merge/m6-files.txt. **CI GREEN on
-  8efb9b2** (gate 45338377262 + 45338369910, toolchain 45338377334 + 45338370007, all success); **H3 APPROVE of the
-  pushed head** (advisor-u6b-m6.md section 7, fe2e4c0d…): **U6b CLOSED 06:2x**. The builder's worktree stays (its
+- **U6b CLOSED 06:2x: MERGED at 8efb9b2** (u6b-report.md holds the whole story; 29 files, 5,969 added; M6 rulings
+  advisor-u6b-m6.md: the cap in start(), sha2 at opt-level 3 in the dev profile; M5 run 2 11/11, 807/904, 1,037.2 s;
+  M7 gate PASS; CI green on 8efb9b2; H3 APPROVE of the pushed head, fe2e4c0d…). The builder's worktree stays (its
   uncommitted copy of the tree; plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, T5 (i) RUNNING 06:2x:** U6b's merged release binary built (t5i-release.log, 25.6 s) and copied to
-  .gate/u7/npt-server (f78dd20a… = the fix pass's 20-start binary); U7's T-builder a9873cdba07a3219e resumed by
-  SendMessage (C9's slot rule; U8 re-read from u8-build.patch 0e7fbab2…; its logs in its worktree's .gate/u7/, I copy
-  them out). **U6c's Block 0 IN PROGRESS (UNCOMMITTED in the main folder; security-u6c-deps.md's binding check):** step
-  0 PASS (lock 210bf2df…, 235 packages, the three hashes); step 1 the manifest edits (+12 -2, +13, +6); step 2 the lock
-  refreshed with the network (main-run.sh, `env CARGO_NET_OFFLINE=false`: .gate/u6c-block0/step2-metadata.log) put
-  hyper 1.13.0 in; pinned back to the cleared 1.12.0 (step2b-pin.log); the lock now 3394b451… (model ea6efb00…), diff
-  229/6 (model 226/3): security-u6c-lock.md **CLEAR WITH CONDITIONS** (three Windows-only windows-sys lines moved by
-  the pin; SEC-U6CL-1, -2 Low); amended step 3 PASS; step 4 (step4-tree.log) PASS (its three unlisted feature lines,
-  hyper and hyper-util `default` and hyper-rustls `rustls-native-certs`, accepted in security's addendum, SEC-U6CL-3
-  Low); step 6 PASS (deny: advisories/bans/sources ok, the 7 duplicates; audit: 252 crates, 0 vulnerabilities,
-  RUSTSEC-2026-0441 allowed; DBs 06:33:09 and 06:33:11 UTC; deny 0.22.0, audit 0.23.0); **step 5 RUNNING**
-  (b5263aevb -> step5-check.log; cargo check exit 0, no warnings). Then step 7 (dependency-check.md; evidence
-  u6c-block0.md), commit, save. Before launch: u6c-run.sh made (names only); Q-U6C-3 to U7 and Q-U6C-5/6/7 to U8
-  already met (u7-brief.md:232-236, u8-build.md:177-218); launch message drafted (scratchpad u6c-launch-prompt.txt);
-  dev part-clean first if free < 8 GiB. Size: brief ~2,800, likely 3,800-4,200, stop past 6,000 (section 8).
+- **Next 2, U6c's build RUNNING from 06:56 UTC:** builder a3a3e3fdf559de095 (general-purpose, opus, xhigh, worktree,
+  background); its launch message u6c-launch-prompt.txt (added items 1-6: U7's dist names, advisor-u8-stopb.md:210-220's
+  six lines, NC-R2-4, F-JOIN-ONCE, A2's command, the 5,400 stop). `<base>` 8c81952 (U6b's merge 8efb9b2 + Block 0
+  3b75d00), 807/904, test step 1086.7 s; runner u6c-run.sh, logs .gate/u6c/; its notes in its worktree's u6c-build.md.
+  Its first build is cold (dev part-clean 06:55: 7.0 GiB; free 3,861 -> 10,666 MiB). On a cut: SendMessage it to read
+  its notes and go on.
+- **U6c's Block 0 DONE at 3b75d00 (pushed 8c81952, 06:53):** security-u6c-deps.md's binding check steps 0-7 PASS
+  (u6c-block0.md): the lock 3394b451… (229/6, 252 packages, hyper pinned back to 1.12.0; security-u6c-lock.md and its
+  addendum CLEAR WITH CONDITIONS, SEC-U6CL-1 to -3 Low); step 5 11/11, 807/904 (= U6b's merged head); deny ok, audit 0
+  vulnerabilities; dependency-check.md's U6c section released DEP-HOLD. Before launch: u6c-run.sh (names only);
+  Q-U6C-3 to U7 and Q-U6C-5/6/7 to U8 already met (u7-brief.md:232-236, u8-build.md:177-218). Size: brief ~2,800,
+  likely 3,800-4,200, stop past 6,000 (section 8).
 - **T5 (i) DONE 06:3x** (the T-builder's report; container readings, never judged): 4 loads, each on its own room, all
   exit 0 (WT ready 44 ms, wss open 25 ms, the hash control refused, the real page to its Wasm 404). Records copied to
   .gate/u7/t5i/; notes u7-t-build.md copied; T-half snapshot wip/u7-t-build-t5i.patch (23 files; +376 = 2,858). For
@@ -178,7 +167,7 @@
   scan 0 findings; CI green on 8412c6b); security CLEAR WITH CONDITIONS (SEC-F26-1 DONE at 07d5d31; -2 accepted).
 - **U6b** (rev 1.1; security-u6b-deps.md, with conditions; Block 0 DONE ae4f57e): built, its round running (Now); C2's
   homes built as advisor-u7-brief.md has them (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in npt-proto; ws tags in npt-link).
-- **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 security-cleared (5 conditions); disk freed first;
+- **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 DONE at 3b75d00; its builder launched 06:56 (Now, Next 2);
   its launch gives U7's seven dist names and carries advisor-u8-stopb.md:208-220's six lines, NC-R2-4's record names
   (advisor-u8-r2.md) and U6b's F-JOIN-ONCE (its glue steps a client only once its link is Open); at its merge U8's
   side checked per interface (C9). **R1 Thu 3 Dec holds with
