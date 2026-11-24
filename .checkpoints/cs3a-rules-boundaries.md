@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 13:24 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 13:44 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -205,35 +205,56 @@
    toolchain success (run 45386600112, job 138419013852; the log: `.gate/cs3a/ci-50656d6-toolchain.log`): cargo debug
    15, 1, 2, 1, 9, 4, 1, 6, twice; release protocol 2, sim 9, 4 and 1; the unit and browser counts as on a1c59e8.
 
+6. **Plan step 3 (the one batch of manifest changes): 0412814**, with its release record f5a9f67, pushed 13:36 UTC.
+   security-auditor's answer (Opus 5.5, effort max, 13:12 to 13:25 UTC; `security-auditor-deps.md`): "The dependency
+   change may be committed and built: yes with conditions"; neither condition changes one of the four files. Its
+   condition 1 is met and in `dependency-check.md`: the players' Wasm from the head's code plus only the four
+   files, in the clean worktree `.gate/cs3a-batch` with a clean target folder, is byte for byte the Wasm without
+   them (28,987 bytes, sha256 c4935aca...2c31); the four hashes unchanged after `npm ci --offline
+   --ignore-scripts` and after the build. **CI on f5a9f67:** gate success (run 45405162456), toolchain success (run
+   45405162281, job 138483741233; `.gate/cs3a/ci-f5a9f67-toolchain.log`): the counts as on step 2, and the Wasm's
+   sha256 on the runner still 22dad2eb...018b. **Its condition 2 binds step 7** (below). Its Low follow-up: the
+   root `Cargo.toml`'s comment "in sim-wasm only" (line 14), for the next manifest batch (3b's).
+7. **Plan steps 4 and 5 (our own ChaCha8 with its vectors; the float vectors): ec27f85**, one commit because the two
+   share `crates/devtools/src/rules.rs`. First real run after the hold: the 8 published vectors, the 160,384-byte
+   stream file and all 38 float operations passed at once, debug and release. `rng.rs` 299 lines;
+   `chacha8-words.bin` sha256 8531eb01...68f2 (its manifest beside it); `f32-inputs.bin` 120,000 bytes, sha256
+   85629398...ae6b (in `f32-expected.txt`'s first line); both generators regenerate their files byte for byte
+   (`--check`). **Planted: 15 of 15 caught** (8 in the generator: a rotation, the rounds, the stream id's high
+   half, the counter's carry, 64-bit draws, a stale block, the position; 7 in the float operations: `round`,
+   `mul_add` as two roundings, `total_cmp`, `fract`, a cast, `sqrt` one unit off, a NaN's own bits).
+8. **Plan step 6 (the panic hook and the Worker's guard): 0624557**, pushed 13:43 UTC with steps 4 and 5. The
+   players' Wasm with the hook: 31,809 bytes raw, 12,658 gzip, 10,805 Brotli here (28,987, 11,655, 9,955 without);
+   sha256 here 55ca031f...00b9. Checked on clean builds (`.gate/cs3a/step6.log`): cargo debug (client-endpoint 15,
+   devtools f32 2 and stream 2, protocol 2, room 1, sim 15, `rules_scan` 4, `state_hash_alloc` 1, sim-wasm 9) and
+   release (sim, protocol, devtools, sim-wasm); fmt; clippy clean; both pages; vitest types 7, sim-worker 40,
+   boundary 8, client 60, net 1; the five type checks; the browser tests 12 passed (53.2 s; allocation 52 and 537);
+   the gate PASS. **Planted: 9 of 9 caught** (one plant passed at first: the compiler had joined three constant
+   text pieces into one, so "nothing follows the cut" was not exercised; the test now uses pieces known only at
+   run time). **End to end, with a panic planted in the players' Wasm at tick 90 (restored, never committed;
+   `trap-on-page.mjs`, output `.gate/cs3a/trap-on-page.out`):** the page's notice reads "The match stopped: the
+   simulation stopped: panicked at crates/sim-wasm/src/lib.rs:140:9:" and on its next line "planted: tick 90 is one
+   too many"; errors 1; the readout's last error the same on one line; the newest block tick 89; no page error; the
+   Worker stopped.
+   **Size after step 6, counted as change-set 2 counted (fixtures and lockfiles not counted): 2,558 added lines
+   against about 1,730 planned for steps 1 to 6 (1.48 times).** Steps 7 and 8 are planned at about 355: at the same
+   ratio 3a ends near 3,100, under the stop line 4,100.
+   **Expected in CI on 0624557 (C3):** cargo debug as above, twice; the release line (sim, protocol only) sim 15, 4
+   and 1, protocol 2; `npm test --workspaces`: types 7, sim-worker 40, client 60, net 1, e2e's node project 1;
+   boundary 1 file, 8 tests; the browser tests "Running 12 tests", "12 passed"; 0 skipped, 0 ignored.
+
 ## Current step
-**Plan step 3, the one batch of manifest changes, in the hold since 13:12 UTC: written, not committed, nothing
-built with it.** Four files (their sha256: `cs3a-rules-boundaries/deps-sha256.txt`; the diffs:
-`deps-manifests.diff`, `deps-lockfiles.diff`): `crates/devtools/Cargo.toml` (a cdylib beside the rlib; `sim` and
-`sim-wasm` by path, `wasm-bindgen` from the workspace), `Cargo.lock` (devtools' three dependencies, by `cargo update
---workspace --offline`, "Locking 0 packages"), `packages/sim-worker/package.json` and `package-lock.json`
-(`@shamble/types` to devDependencies; the lockfile's two words by hand, to be checked with `npm ci --ignore-scripts`
-after the answer, C5). No outside package enters. No root `Cargo.toml` change: cargo's `trim-paths` is not stable in
-1.99.1 (tried in a scratch project), so RR-F5's fix in step 8 is a path remap on cargo's command line from
-`build.mjs`. **security-auditor (Opus 5.5, effort max) is answering on exactly that content** (started 13:12 UTC;
-its notes: `security-auditor-deps.md`). After its yes: `dependency-check.md` with the four hashes, `npm ci
---ignore-scripts`, the first build, then the commit by path.
-**Plan step 4 is written beside it and not built yet** (uncommitted): `crates/sim/src/rng.rs` (our own ChaCha8,
-280 lines with the 8 published vectors, copied by script from the draft fetched at 13:13 UTC, 76,754 bytes, sha256
-e0a49fdd...4d55; the notes' reference script matches 48 of the draft's 48 vectors);
-`crates/devtools/vectors/make_chacha8_vectors.py` (a second implementation; it reproduces the 8 published vectors
-from `rng.rs` before it writes), `chacha8-words.bin` (160,384 bytes, sha256 8531eb01...68f2) and
-`chacha8.manifest.txt`; `crates/devtools/src/rules.rs`, `rules/stream.rs` (the check, one function for native and
-Wasm) and `tests/stream_vectors.rs`. Left out on purpose: the stream's canonical state bytes (no stream is in the
-world's state before its first draw; it joins with that change-set).
-**Plan steps 5 and 6 are also written and not built** (uncommitted, as of 13:24 UTC): step 5,
-`crates/devtools/vectors/make_f32_vectors.py` (the exact reference: rational arithmetic rounded once; 38
-operations, 10,000 cases of three inputs, 62 edge values in every ordered pair, then seeded ones; its self-check on
-hand-known answers passes; 1.3 s), `f32-inputs.bin` (120,000 bytes), `f32-expected.txt` (one digest line per
-operation), `crates/devtools/src/rules/f32_ops.rs` and `tests/f32_vectors.rs`; step 6, `crates/sim-wasm/src/panic.rs`
-(the hook: a 1,024-byte buffer of atomics, no `unsafe`, no lock; length and room words, then the text),
-`packages/sim-worker/src/panic-message.ts` with its test, `host.ts` (one guard `#call` around every Wasm call after
-the start, the resume too; no closure per wake), `worker.ts`, `host.test.ts`, and the boundary test's read of the
-buffer's header. **None of it has been compiled or run: first thing after the security answer.**
+**Plan step 7** (the test-only WebAssembly module, built by the development build into its ignored folder; the
+vectors, the planted overflow in debug and release, the hook's text and the players' Wasm's import list, in Node
+and in Chromium), started 13:44 UTC. **It must hold security-auditor's condition 2:** the module is built in its
+own cargo call (`-p devtools --lib`) with its own `--target-dir`, never in the players' call or `target/`; it and
+its glue go only to an ignored folder outside `packages/client/`, `packages/sim-worker/pkg/` and every `dist*`
+folder; no page or Worker source imports it; only the spec's own routing serves it, never `serve.mjs`; and the
+build refuses an out folder that holds any .wasm but the one equal to `pkg/sim_wasm_bg.wasm`, shown failing on a
+planted copy. And the advisor agent's C1 (the spec uses only the Node names `node-names.d.ts` declares, or adds
+them), C3 (once, with the module's folder deleted: both rules tests fail, not skip) and C6 (the checks before
+each cargo and tool run; the `.gitignore` line in the same commit; `--production` never builds it; the boundary
+file's header says which mode builds it; slow boundary tests get their own time limit).
 
 ## Next steps (after the compact)
 1. Read CLAUDE.md, this card, the plan (`cs3-plan.md`: sections 0, 3, 4, 8, 9, 12 and 13), `cs3-context.md`, and
@@ -282,7 +303,7 @@ buffer's header. **None of it has been compiled or run: first thing after the se
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
-- security-auditor, in the background: the dependency answer (above). No saver.
+- Nothing runs in the background. No saver. A second worktree `.gate/cs3a-batch` (condition 1's builds) may stay.
 - In a folder outside the repository cargo is the default 1.97.0, not the pin: scratch projects use `cargo +1.99.1`.
 - How things are run here (the guard refuses `npx`, `npm run`, `npm test`): vitest by
   `node node_modules/vitest/vitest.mjs run --root packages/<name> [--dir ...]`; the browser tests by
