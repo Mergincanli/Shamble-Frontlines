@@ -37,15 +37,20 @@
    that do not stop the build: OUTSIDE-NOTES (the three outside marks' notes sentence) and BURST-RIDER (a test
    setting in crates/net that an earlier ruling put in MOVED's brief; outside this fence).
 
+4. Part a's build · b22c30cd7fa35e02d4bbcfb64f2db4c50cb0488f (pushed, no skip marker) · 9 files, 1,232 added and 36
+   deleted against e2c0e896 (the stop is 1,440); 98 judge tests pass (85 before; 3 changed, 13 new); fmt, clippy with
+   warnings as errors and check.mjs's nine quick steps pass; marks.json's sha256 is now 7f148c3e….
+
 ## Current step
-Part a's build, by plan-a.md with its section 6. It starts when the baseline run of check.mjs (below) has ended, so
-that run reads only the base's files. Order: marks.rs (the label and the load refusals), eval.rs (the MOVED rule),
-`node .checkpoints/netcode-judge/moved-table.mjs --write`, the tests, the two READMEs.
+Part a's one review round on b22c30cd: test-engineer and rust-reviewer, both at once, at xhigh; their notes in
+`.checkpoints/netcode-judge/test-engineer-a.md` and `rust-reviewer-a.md`.
 
 ## Next steps
-1. Build part a (above); `cargo test -p npt-judge --locked` after each file.
-2. The judge's lints and check.mjs whole on the build's head; the size count against 1,440.
-3. One review round (test-engineer, rust-reviewer), one fix pass, the final head's checks, the report with the commit id.
+1. One fix pass on the round's findings (a Low never triggers a push on its own); the size count again.
+2. On the final head: `cargo test -p npt-judge --locked`, clippy, fmt, then `node spikes/netcode-proof/check.mjs`
+   whole; GitHub's gate and toolchain results on that full SHA (pushed alone, no skip marker); the advisor's read.
+3. The report to Mustafa with the commit id (plan-a.md section 6, conditions 10 to 12, say what it must hold); the
+   board thread's ready line.
 
 ## Open findings
 - none yet
@@ -53,15 +58,27 @@ that run reads only the base's files. Order: marks.rs (the label and the load re
 ## Key numbers
 - The judge today: src 5,238 lines (eval.rs 1,784; marks.rs 1,263; figures.rs 1,020; practice.rs 797), tests 3,618,
   marks.json 12,630 lines, 81 marks (wc -l at e2c0e896).
+- The baseline, `node spikes/netcode-proof/check.mjs` on the base's files in this container (2026-11-24, 975 s): all
+  11 steps pass; test: measured build 807 passed, bites build 904 passed, 0 failed, 0 skipped; self 78 of 78; redact
+  11 of 11, 359 items, 0 findings; marks: 81 read, rows unchanged.
+- Part a's two planted defects, each run once and taken back (`cargo test -p npt-judge --locked --no-fail-fast`):
+  (A) a moved mark judged anyway fails `a_mark_moved_whole_is_never_judged`,
+  `moved_marks_and_parts_show_in_the_summary_and_the_json` and `the_real_marks_file_labels_what_the_trim_moved`;
+  (B) MOVED ranked above FAIL fails `a_moved_part_is_never_judged_and_the_kept_parts_still_decide`,
+  `a_moved_check_is_skipped_wherever_checks_are_chosen`, `a_moved_bite_is_never_evaluated`,
+  `a_bite_run_on_moved_parts_only_is_left_out`, `a_moved_bite_hides_no_kept_failure_or_invalid_run` and
+  `a_label_anywhere_on_a_passing_mark_never_reads_pass`.
+- Existing assertions changed by part a (old, new): cli.rs, the outside mark's line "PM-0001-39   NOT-RUN   outside
+  this change-set" is now "PM-0001-39   MOVED     outside this change-set"; engine.rs `person_and_outside_marks`, the
+  outside mark's verdict NOT-RUN is now MOVED; fixtures.rs, `pm_0006_14_counts_a_padded_session_and_waits_for_the_
+  other_n` (NOT-RUN, "N=36: 0 of 1 valid runs", "N=18: 0 of 1 valid runs") is now `pm_0006_14_counts_a_padded_
+  session_and_its_other_n_moved` (MOVED, both parts named with "slice 6, on the real sim", N=48's count reported).
 
 ## Decisions taken
 - His four answers of 2026-11-24 (checks in the container; 19 figures; the first push as the netcode head; the main
   folder parked) · Mustafa · in the chat.
 
 ## Running work
-- The baseline: `node spikes/netcode-proof/check.mjs` at the base's files, in the background since about 20:00 UTC
-  (its first four steps passed: fmt, clippy, clippy-wasm32, doc); its log is in the session's scratchpad, its result
-  goes under Key numbers.
-- Ready, not run on the file: `.checkpoints/netcode-judge/moved-table.mjs` (the labels as a table, with the advisor's
-  conditions 8 and 9 in; its dry run finds every name: 26 marks whole, 21 parts, 2 checks, 1 bite; marks.json's sha256
-  after would be 7f148c3e…).
+- The review round: test-engineer and rust-reviewer on b22c30cd, launched 2026-11-24 about 20:45 UTC (2 agents).
+- `.checkpoints/netcode-judge/moved-table.mjs` was run once with `--write` at the base's marks.json (it refuses any
+  other file): 26 marks whole, 21 parts, 2 checks, 1 bite, -56's kept check, -7's and -56's notes.
