@@ -95,8 +95,8 @@
   test 5 Medium, security 5 Low (= Stop B's host read). Ruling advisor-u6c-r1.md (ad72c0b8…): the fix pass, then round 2
   on the diff; the readings mine; NC-U6C-12 and SEC-U6C-5 into U8 (C9). Block 2, the stamp tests, held back (C4, lever (1)).
 - **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
-  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** the ruling's advisor runs (from 22:50; request
-  u6c-r2-ruling-request.txt 9a57324e…, = the scratchpad copy); MAIN-65 first (main-65-plan.md, its check from 22:56), then U6c's merge.
+  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** U6c's merge by advisor-u6c-r2.md after his NPT-EDGE-READ answer (H2
+  always, H1 on (a); H2 alone after end Fri 27, Amsterdam); M4b's head read in a reset's first 30 min; A2 logs kept (.gate/u6c/a2-logs/); MAIN-65's step 7 at 03:51 (trig_01Co9w6DYSoCbkQz5RWhK58i).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - For msg-2026-11-25.md (C7, R2): (1) U6b's merge fixed one test's cap: the double-load bite's start gets its own 2 s
@@ -154,7 +154,7 @@
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
     (next 20:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
-- **MAIN-65 steps 1-5 DONE 23:2x UTC; step 6 is the save that pushes them:** merge 39a0d04 (parents H0 473f5c1, main 28254a7); STATUS.md 120 lines, "1 1" against main; H0..HEAD 64 files +4677/-317 (63 without STATUS.md, +4644/-284); anchor 9475d37 exit 0 (index and HEAD); gate PASS (--no-smoke); repo map OK 186/110; checkpoint tests 33/33; light.log PASS (refs 1848 = 1825 + 23, marks 81, self 78/78, redact 11/11, 359 items, 0 findings); outputs .gate/main-65/ kept for step 7 (03:50 UTC). CI on the pushed head: next.
+- **MAIN-65 steps 1-6 DONE 23:28 UTC (step 7 at 03:51):** pushed at 82bd694 (82bd69428512e679b789797d674ef04bd4743715); CI on it green: gate 45509875991 and toolchain 45509875989 (push), gate 45509881420 and toolchain 45509881180 (pull request); merge 39a0d04 (parents H0 473f5c1, main 28254a7); STATUS.md 120 lines, "1 1" against main; H0..HEAD 64 files +4677/-317 (63 without STATUS.md, +4644/-284); anchor 9475d37 exit 0 (index and HEAD); gate PASS (--no-smoke); repo map OK 186/110; checkpoint tests 33/33; light.log PASS (refs 1848 = 1825 + 23, marks 81, self 78/78, redact 11/11, 359 items, 0 findings); outputs .gate/main-65/ kept for step 7.
 - **My step (18:3x):** round 2: netcode 3 Lows in the diff, 2 Mediums outside it before R1 (the start-edge drop read;
   LG's DONE with no READY, caught at U8's one load_up call :2218-2221); P1's +222 drops are in-window, a separate fact
   (U8's equal-on-P1 rule, :1708-1711); test 1 Medium (TE-U6C-R2-4), 7 Lows; security 2 Lows. Ruling 22:5x (19:5x: the snapshot applies on 4f9ca2b, 24 files; facts added to the request). The readings are DONE,
