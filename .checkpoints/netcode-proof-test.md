@@ -5,8 +5,8 @@
   **Base:** main 1ec6f6c merged in at 72b0dc3 (MAIN-64, 2026-11-24 13:0x UTC: #64, CI-WASM; one conflict,
   docs/STATUS.md: this branch's #40 row kept beside main's #64 and "#63, #62" rows); before it main f5030a3 at a6acc8a
   (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-24 16:2x UTC: the Fable advisor tool is on (his 16:14 words, history.md:7891-7900); its look-back
-  read taken (question (7), the hand-off pointers, two reading checks); round 2 at the 17:51 trigger.
+- **Last update:** 2026-11-24 17:5x UTC: U6c's round 2 running (three seats from 17:57, the saver restarted); the Fable
+  advisor tool on (his 16:14 words, history.md:7891-7900); the day message drafted, finished at 23:05.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -147,17 +147,17 @@
 - Disk (11-24 15:3x UTC): 10,504 MiB free (floor 4,096; a full check.mjs fills the dev profile to ~7.8 GB); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (no agent, no shell, 3 triggers):** the saver bghk215os ended at its window's end (about 14:58). Restart
-  it with round 2 at 17:51 (run_in_background, timeout 7200000); until then saves by hand.
-  - No agent running (LEAN-MODE item 3: new ones only in the 30 minutes after a reset; next reset 17:50 UTC).
+- **Running (3 agents from 17:57 UTC, the saver, 2 triggers):** U6c's round 2: netcode ac0f5d109f30fedce, test
+  aacd36781fdea65a0, security a307bdd231bf3e9b4 (xhigh; outputs u6c-r2-{netcode,test,security}.md); the saver b74ohsd5l.
+  - A stopped seat resumes by SendMessage from its notes file (my reading: a resume is not a new agent; tonight's message).
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-    (next 16:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
+    (next 20:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
 - **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
   check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
-- **My step (15:5x):** at the 17:51 trigger: get_session shows the reset; the diff's --stat and W's hash (0549389e…)
-  again; then U6c's round 2, three seats in one message at xhigh on `git diff aad2103 6c3ff00` (advisor-u6c-r1.md §4);
-  briefs in the scratchpad (u6c-r2-*.txt; if lost, redraft them). Restart the saver with it. The container readings are DONE,
+- **My step (17:5x):** U6c's round 2 RUNNING since 17:57 (launch checks passed: past the 17:50 reset, tree clean, the
+  diff 10 files +356/-94, W = 0549389e…; briefs in the scratchpad, u6c-r2-*.txt). On the three returns: Fable's read,
+  then the advisor agent's recorded round-2 ruling, then the merge M3-M9. The container readings are DONE,
   my own runs through u6c-run.sh, release builds (.gate/u6c/read-*.log):
   - DONE: the release build (read-build.log, exit 0). A2 over WebSocket (read-a2-ws.log, 14:08-14:09): 1 passed in
     70.8 s; npt-load READY then DONE, exit 0; the room exit 0; room memory peak 157,499,392 B; 5-31 inputs per client
