@@ -10,18 +10,26 @@ import { needsBuild, report, running } from "./report.ts";
 const client = fileURLToPath(new URL("../../../client", import.meta.url));
 const settings = { root: client, configFile: path.join(client, "vite.config.mjs"), logLevel: "silent" } as const;
 
+/** Puts a variable of the test process back as it was: a spec that runs later reads its own environment, not this one's. */
+function restore(name: string, value: string | undefined): void {
+  if (value === undefined) delete process.env[name];
+  else process.env[name] = value;
+}
+
 for (const kind of ["dev server", "preview server"] as const) {
   for (const flag of [true, false]) {
     test(`with the flag ${flag ? "on" : "off"} under Vite's ${kind}, crossOriginIsolated is ${flag} on the page and in the Worker`, async ({ page }) => {
       const dist = needsBuild();
+      const before = [process.env["SHAMBLE_ISOLATION"], process.env["VITE_SHAMBLE_DEVTOOLS"]] as const;
       // The config reads the flag when it is loaded; the development page is what has the report.
       process.env["SHAMBLE_ISOLATION"] = flag ? "1" : "0";
       process.env["VITE_SHAMBLE_DEVTOOLS"] = "1";
-      const server =
-        kind === "dev server"
-          ? await (await createServer(settings)).listen()
-          : await preview({ ...settings, build: { outDir: dist } });
+      let server: Awaited<ReturnType<typeof preview>> | Awaited<ReturnType<typeof createServer>> | undefined;
       try {
+        server =
+          kind === "dev server"
+            ? await (await createServer(settings)).listen()
+            : await preview({ ...settings, build: { outDir: dist } });
         const address = server.resolvedUrls?.local[0];
         expect(address).toContain("127.0.0.1");
         await page.goto(address ?? "");
@@ -32,7 +40,9 @@ for (const kind of ["dev server", "preview server"] as const) {
         expect(data.worker?.crossOriginIsolated).toBe(flag);
         expect(data.errors).toBe(0);
       } finally {
-        await server.close();
+        await server?.close();
+        restore("SHAMBLE_ISOLATION", before[0]);
+        restore("VITE_SHAMBLE_DEVTOOLS", before[1]);
       }
     });
   }

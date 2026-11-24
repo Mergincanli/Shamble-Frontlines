@@ -14,3 +14,4 @@ CLAUDE.local.md
 test-results/
 packages/sim-worker/pkg/
 packages/e2e/playwright-report/
+__pycache__/

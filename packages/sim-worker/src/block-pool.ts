@@ -29,11 +29,6 @@ export class BlockPool {
     return this.#refused;
   }
 
-  /** How many buffers lie ready. */
-  get free(): number {
-    return this.#free.length;
-  }
-
   /** A buffer of the block's size: a pooled one, or a new one when none is left. */
   take(): ArrayBuffer {
     const pooled = this.#free.pop();

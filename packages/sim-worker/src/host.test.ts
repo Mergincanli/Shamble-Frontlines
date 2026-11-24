@@ -5,10 +5,17 @@ import type { WorkerToPage } from "./messages.ts";
 const PERIOD = 1000 / 30;
 
 /** A stand-in for the Wasm: a "linear memory" whose block holds the tick, and the schedule `LocalSchedule` keeps. */
-function setUp(options: { transfer?: boolean; blockBytes?: number } = {}) {
+function setUp(options: { transfer?: boolean; blockBytes?: number; copyMs?: number } = {}) {
   const blockBytes = options.blockBytes ?? 8;
-  const memory = { buffer: new ArrayBuffer(1024) };
+  const bytes = new ArrayBuffer(1024);
   const clock = { now: 1000 };
+  // The host reads the memory's buffer when it copies the block: a test can let that copy take time on the clock.
+  const memory = {
+    get buffer(): ArrayBuffer {
+      clock.now += options.copyMs ?? 0;
+      return bytes;
+    },
+  };
   const calls = { input: 0, step: 0, rebase: 0, block_ptr: 0, block_len: 0 };
   let tick = 0;
   let anchor = 0;
@@ -26,7 +33,7 @@ function setUp(options: { transfer?: boolean; blockBytes?: number } = {}) {
       if (this.trapNext) throw new Error("unreachable executed");
       tick += 1;
       since += 1;
-      new DataView(memory.buffer).setUint32(64, tick, true);
+      new DataView(bytes).setUint32(64, tick, true);
       return anchor + (since + 1) * PERIOD;
     },
     rebase(nowMs) {
@@ -89,6 +96,16 @@ test("it says ready, then posts one transferred block per tick with two calls pe
   expect(host.stats()).toMatchObject({ ticks: 90, maxTicksInOneWake: 1, drops: 0, undetached: 0, blockBytes: 8 });
   // The time is on the clock the page shares: the first wake came 34 ms after the start (33.33 rounded up).
   expect(blocks()[0]?.doneAt).toBe(5_000_000 + 1000 + Math.ceil(PERIOD));
+});
+
+test("the hand-off's time is read when the step returned, before the copy", () => {
+  const { host, runTimer, blocks } = setUp({ copyMs: 3 });
+  host.start();
+  runTimer();
+  // The wake came 34 ms after the start; the copy then took 3 ms, and the block's time holds none of them
+  // (PM-0002-8's method starts the hand-off "when its step returns, before the copy").
+  expect(blocks()[0]?.doneAt).toBe(5_000_000 + 1000 + Math.ceil(PERIOD));
+  expect(host.stats().copyP50).toBe(3);
 });
 
 test("the newest input reaches the simulation, and returned buffers are used again", () => {

@@ -132,14 +132,38 @@ export function cspProblems(files) {
 const DEV_MARKERS = ["Copy report", "__shambleReport", "ticks while hidden", "first page: report"];
 
 /**
+ * The one chunk the build made from the Worker's own source module, by the name the build gave it. `chunks` is what
+ * the Worker's bundle holds (Rollup's output: `fileName`, `isEntry`, `facadeModuleId`); `workerSource` is the
+ * absolute path of the Worker's entry module. Throws unless exactly one entry chunk comes from that module: the
+ * check below must know the Worker's chunk from the build, never guess it from a file name.
+ * @param {{ fileName: string, isEntry?: boolean, facadeModuleId?: string | null }[]} chunks
+ */
+export function workerEntryChunk(chunks, workerSource) {
+  const source = workerSource.replaceAll("\\", "/");
+  const entries = chunks
+    .filter((chunk) => chunk.isEntry === true && (chunk.facadeModuleId ?? "").split("?", 1)[0].replaceAll("\\", "/") === source)
+    .map((chunk) => chunk.fileName);
+  if (entries.length !== 1) {
+    throw new Error(`the build made ${entries.length} entry chunks from the Worker's source (${workerSource}), not exactly one`);
+  }
+  return entries[0];
+}
+
+/**
  * Two rules of the built page, one line per breach. The Wasm's glue is in the Worker's chunk and in no other (the
  * page never touches the Wasm); and a production build holds none of the development-only code, while a
- * development build holds all of it (so the markers themselves are known to be right).
+ * development build holds all of it (so the markers themselves are known to be right). `workerEntry` is the
+ * Worker's chunk as `workerEntryChunk` named it: every other script is the page's, whatever its file is called.
  * @param {{ name: string, bytes: Uint8Array }[]} files
+ * @param {boolean} production
+ * @param {string} workerEntry
  */
-export function bundleProblems(files, production) {
+export function bundleProblems(files, production, workerEntry) {
   const scripts = files.filter(({ name }) => name.endsWith(".js")).map(({ name, bytes }) => ({ name, text: Buffer.from(bytes).toString("utf8") }));
-  const page = scripts.filter(({ name }) => !/(^|\/)worker-[^/]*\.js$/.test(name));
+  if (typeof workerEntry !== "string" || !scripts.some(({ name }) => name === workerEntry)) {
+    return [`the Worker's chunk (${String(workerEntry)}) is not among the built scripts: the glue check cannot tell the page's code from the Worker's`];
+  }
+  const page = scripts.filter(({ name }) => name !== workerEntry);
   const problems = [
     ...page.filter(({ text }) => /__wbindgen|__wbg_/.test(text)).map(({ name }) => `${name}: the Wasm's glue outside the Worker's chunk`),
     // The page never touches WebAssembly (PM-0002-2): its chunks do not even name it, wherever a call would sit.

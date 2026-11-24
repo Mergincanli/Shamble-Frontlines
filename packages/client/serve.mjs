@@ -125,6 +125,12 @@ async function handle(server, realRoot, request, response) {
     refuse(response, 421, `This server answers only at http://${own} . Open that address.`);
     return;
   }
+  // A browser asks for this by itself. The game has no icon yet: "no content" keeps a 404 out of its console.
+  if ((request.url ?? '').split(/[?#]/, 1)[0] === '/favicon.ico') {
+    response.writeHead(204, COMMON_HEADERS);
+    response.end();
+    return;
+  }
   const found = await fileFor(realRoot, request.url ?? '');
   if (found.status !== 200) {
     refuse(response, found.status, found.status === 400 ? 'That address is not valid.' : 'Not found.');

@@ -48,22 +48,22 @@ export async function boot(): Promise<void> {
 
   const worker = new SimWorker();
   const link = new WorkerLink(worker, () => performance.timeOrigin + performance.now());
-  // The first problem ends the match: it is counted once, the Worker is stopped (it would run on and fill memory
-  // with blocks nobody takes), and the page says why.
-  const stop = (problem: string): void => {
+  // The link decides that the match is over and stops the Worker (`WorkerLink.end`), whichever way the problem
+  // came; here the first problem is counted once and said on the page.
+  const stopped = (problem: string): void => {
     errors.note(problem);
-    worker.terminate();
     fail(`The match stopped: ${problem}`);
   };
   worker.addEventListener("message", (event: MessageEvent<unknown>) => {
     const problem = link.receive(event);
-    if (problem !== "") stop(problem);
+    if (problem !== "") stopped(problem);
   });
   worker.addEventListener("error", (event) => {
     // A script that does not load gives an event with no message. Cancelled, so the window does not count it again.
     event.preventDefault();
-    stop(event.message || "the Worker failed");
-  }, { once: true });
+    const problem = event.message || "the Worker failed";
+    if (link.end(problem)) stopped(problem);
+  });
   link.start(flags.padBytes);
 
   const frames = __SHAMBLE_DEVTOOLS__ ? new FrameTimes() : null;

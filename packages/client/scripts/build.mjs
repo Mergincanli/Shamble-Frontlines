@@ -29,12 +29,15 @@ import {
   refusedBuildSettings,
   sizeTable,
   tooLarge,
+  workerEntryChunk,
 } from "./build-checks.mjs";
 import { WASM_BINDGEN_TOOL } from "./wasm-bindgen-tool.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const clientDir = path.join(root, "packages/client");
 const pkgDir = path.join(root, "packages/sim-worker/pkg");
+/** The Worker's entry module: the chunk the build makes from it is the only one that may hold the Wasm's glue. */
+const workerSource = path.join(root, "packages/sim-worker/src/worker.ts");
 const targetDir = path.join(root, "target");
 const wasmFile = path.join(targetDir, "wasm32-unknown-unknown/release/sim_wasm.wasm");
 /** The tool's absolute path, after its file was compared with the recorded values. */
@@ -98,12 +101,26 @@ export async function buildPage({ production, outDir }) {
   process.env["VITE_SHAMBLE_COMMIT"] = commitName();
   if (production) delete process.env["VITE_SHAMBLE_DEVTOOLS"];
   else process.env["VITE_SHAMBLE_DEVTOOLS"] = "1";
+  // The Worker's bundle reports its own chunks: Vite builds it apart from the page's, with these plugins beside the
+  // settings of vite.config.mjs.
+  const workerChunks = [];
   await viteBuild({
     root: clientDir,
     configFile: path.join(clientDir, "vite.config.mjs"),
     logLevel: "warn",
     build: { outDir, emptyOutDir: true },
+    worker: {
+      plugins: () => [
+        {
+          name: "shamble-worker-chunks",
+          generateBundle(_options, bundle) {
+            for (const chunk of Object.values(bundle)) if (chunk.type === "chunk") workerChunks.push(chunk);
+          },
+        },
+      ],
+    },
   });
+  const workerEntry = workerEntryChunk(workerChunks, workerSource);
   // The zip's small server is a development tool: it is not part of a production build.
   if (!production) copyFileSync(path.join(clientDir, "serve.mjs"), path.join(outDir, "serve.mjs"));
   const files = filesOf(outDir)
@@ -113,7 +130,7 @@ export async function buildPage({ production, outDir }) {
   const problems = [
     ...tooLarge(rows).map((row) => `${row.name}: a served file reaches 25 MiB`),
     ...cspProblems(files),
-    ...bundleProblems(files, production),
+    ...bundleProblems(files, production, workerEntry),
   ];
   if (problems.length > 0) throw new Error(`the built page is refused:\n  ${problems.join("\n  ")}`);
   return rows;

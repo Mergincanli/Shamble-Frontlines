@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { formatReport, readoutLines, type ReportData } from "./report.ts";
+import { fixed, formatReport, readoutLines, type ReportData } from "./report.ts";
 
 const DATA: ReportData = {
   header: {
@@ -80,4 +80,26 @@ test("the report is plain text with one named value per line", () => {
     expect(lines, expected).toContain(expected);
   }
   expect(formatReport(DATA)).toContain("worker: (no report yet)");
+});
+
+test("a value that rounds to zero prints as zero, never with a minus sign", () => {
+  expect(fixed(-0.001, 2)).toBe("0.00");
+  expect(fixed(-0, 1)).toBe("0.0");
+  expect(fixed(-0.4, 0)).toBe("0");
+  expect(fixed(0.004, 2)).toBe("0.00");
+  // A value that does not round to zero keeps its sign.
+  expect(fixed(-0.005, 2)).toBe("-0.01");
+  expect(fixed(-12.345, 1)).toBe("-12.3");
+  expect(fixed(16.666, 2)).toBe("16.67");
+  // His Brave report of 2026-11-19 held "deliveryP50: -0.00 ms": the two sides' clocks, each rounded by the browser.
+  const lines = formatReport({
+    ...DATA,
+    deliveryP50: -0.0004,
+    frameP50: -0.004,
+    worker: { latenessP50: -0.0002 } as unknown as ReportData["worker"],
+  }).split("\n");
+  expect(lines).toContain("deliveryP50: 0.00 ms");
+  expect(lines).toContain("frameP50: 0.00 ms");
+  expect(lines).toContain("worker.latenessP50: 0.000");
+  expect(lines.join("\n")).not.toMatch(/-0\.0+( |$)/m);
 });
