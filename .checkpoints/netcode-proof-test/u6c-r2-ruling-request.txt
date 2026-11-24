@@ -1,0 +1,68 @@
+You are the project's advisor for U6c's round-2 ruling. First read your rules from main:
+`git show origin/main:.claude/agents/advisor.md` (run from /home/user/Shamble-Frontlines), and follow them. Read only,
+effort xhigh. Your one output file: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-u6c-r2.md.
+Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write.
+Write your plan first and a notes line after each item, so a usage cut loses nothing. Never `cd` into a worktree; no
+`git -C`; one simple command per Bash call; run no cargo, test or plant.
+
+What U6c is (plain words): the netcode proof test's piece that adds the server's probe mode on the real network, the
+load generator's probe peer and its 48-client test over WebSocket and WebTransport, and the small host that serves the
+certificate hash files. R1 is the first real run on rented servers, Thursday 3 December.
+
+Inputs (check each sha256 first; stop and say so if one differs), all in
+/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/:
+- Your round-1 ruling: advisor-u6c-r1.md (ad72c0b85198b9e4bb95752a0dfe82040aa2b973a42b0810efe7aa227faed179); its
+  section 4 already says: a Critical or High open after round 2 stops U6c for Mustafa; a Medium or Low becomes a
+  follow-up. Round 2 found no Critical and no High.
+- Round 2's reviews: u6c-r2-netcode.md (444b0f78e98644a25ae2dd49b933422433d896e426631c5c98e59b96a95acdf2),
+  u6c-r2-test.md (d06a8c4fbae30f2e07c28e615389468536cdf8b49ac7732a74809377aefb0811), u6c-r2-security.md
+  (7dfe60b677acdc02998f130cc0b6f009d82f842de345a5384d59baeebbd16f2c). Each verdict: APPROVE WITH FINDINGS.
+- The fix pass: u6c-build.md (a9d45dd440a6e5b46542ee54413214d95d42de21705f02b45f6a5bc0c7196f3d), "## Fix pass"
+  (lines 214-296); the snapshot wip/u6c-fix.patch (0549389e714392e99f7241821eca67e95c48e1d3d4b7c2fe37a8675e6045e254),
+  which the worktree /home/user/Shamble-Frontlines/.claude/worktrees/agent-a3a3e3fdf559de095 holds exactly.
+- U8's snapshot (the run package, not merged): wip/u8-build.patch, lines 1708-1711 (the probe's per-leg reads and the
+  "udp_drops_count equal at both on P1" rule) and 2189-2221 (load_up and load_ready; load_up has one call site, 2218,
+  followed by load_ready at 2220).
+- Checked by the main session at 19:5x UTC on 4f9ca2b (read only; later commits touch only .checkpoints/, and the
+  main session rechecks that at your launch): wip/u6c-fix.patch still hashes 0549389e… and `git apply --check` passes
+  for all 24 files, all under spikes/netcode-proof/; nothing there changed on the branch since U6c's base 8c81952
+  (MAIN-64's merge touched only .github/, .gitignore, docs/ and packages/). Disk: 10,491 MiB free; the shared target
+  holds no dev profile, so M5 builds cold. U6b's M6 rules for that case, to restate as conditions: CARGO_INCREMENTAL=0
+  for M5, shown in the log (advisor-u6b-m6.md:153-157; main-run.sh does not export it, so U6b's M5 ran
+  `env CARGO_INCREMENTAL=0 node check.mjs`: .gate/u6b-merge/m5-check2.log:7), and at least 8,192 MiB free before a
+  cold M5 (:158-165; 10,491 now). A full check.mjs can fill the dev profile to about 7.8 GB, so after M5 the free space
+  may sit under main-run.sh's 4 GB start floor: a re-run (M6) or the next counted run would need the approved dev
+  part-clean first.
+
+Rule only on these five items (every other Medium and Low is already a follow-up by your section 4; do not re-open):
+1. The netcode seat's two Mediums outside the diff, both "before R1", taker "U6c's merge" (u6c-r2-netcode.md, its
+   Mediums): (a) the start-edge drop read (server probe.rs:462, :465, :478) races a full, unread buffer, so a few
+   datagrams can be counted between the edges; (b) the load generator ends "clean", prints DONE with no READY and exits
+   0 when every client is done before READY (crates/bots/src/load.rs:675 with :705-707); U8's one load_up call goes
+   through load_ready, which makes the run INVALID without READY. For each: fixed before the merge (a small change whose
+   only review is your head read, since no round 3 is available), or carried to a named step before R1 (C9's U8 edits,
+   or another), or after R1?
+2. TE-U6C-R2-4 (the test seat's Medium, tests/load.rs:177-184): the four-client WebTransport test now counts the run's
+   last second, which starts after the room has closed, so it passes only while the load generator starts within a few
+   tenths of a second of the room. The merge's counted run and every later check run it. Fix before the merge (the seat's
+   one line), or carry?
+3. FP-3's wording: your round-1 ruling said the shipped-code P2 plant "must fail that assert"; the test seat says it
+   fails earlier, at the header check (crates/server/src/probe_tests.rs:358), so the new assert is never shown to bite.
+   Closed in substance, or the variant plant (the seat's one line and one runner call) before the merge?
+4. Slot 41: in the A2 WebTransport reading one client gave commands about 1.1 s after the room closed. The test seat
+   says look before R1 (R1 runs 48 WebTransport clients); the netcode seat says U6d and U6e, after R1.
+5. The in-window drops: P1's udp_drops_count rose 569 to 791 inside the measured window on this container (the netcode
+   seat: P0 +17 and P1 +222, matching each up window's extra length, about 16 and 214 intervals). This is a separate fact
+   from item 1 (a): re-reading at the window's start would not remove it. U8's rule "equal at both on P1" would then send
+   P1 to the advisor on such a day. What should U8 compare, and is a P1 drop on R1's machines an advisor question, an
+   INVALID leg, or a reported number? (The main session edits U8 at C9.)
+
+Also say: which tree merges (the fix-pass snapshot as it is, or with the changes you name); for each change you name
+before the merge, who makes it: the main session by hand in the main folder after M4's apply (M4's cmp check then
+covers the snapshot's files before the change, and the change is its own logged hunk), or U6c's builder resumed for
+new work (under lean mode item 3 that waits for the next reset's first 30 minutes, 03:50-04:20 UTC); the conditions
+for the merge's steps M3-M9 (as U4f's, history.md:7022-7028); and anything for Mustafa: say whether any answer
+(item 5's above all) changes a run condition, an INVALID rule or a bar, which by his 2026-11-15 rule (history.md
+:2125-2146) goes to him before it is built. He answers NPT-L2-ONEWAY and STAMP-HOME in tonight's message. End the file
+with DONE on its own line. Your final reply goes to the
+main session: the ruling per item in one line each, the merge's tree and conditions, and "For Mustafa". Plain words.

@@ -95,7 +95,7 @@
   on the diff; the readings mine; NC-U6C-12 and SEC-U6C-5 into U8 (C9). Block 2, the stamp tests, held back (C4, lever (1)).
 - **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
   2,858 added; T5i-1 to -3 for U7's round). **Next 3:** 22:52 reminder: a fresh advisor for round 2's ruling (five items;
-  scratchpad u6c-r2-ruling-request.txt), no merge before it; 23:05: the day message (its to-do block; Fable reads it first).
+  u6c-r2-ruling-request.txt here, = the scratchpad copy, afd4ab37…; Fable's 19:5x fixes in), no merge before it; 23:05: the message (its note).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - For msg-2026-11-25.md (C7, R2): (1) U6b's merge fixed one test's cap: the double-load bite's start gets its own 2 s
