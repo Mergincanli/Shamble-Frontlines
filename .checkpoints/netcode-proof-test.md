@@ -5,8 +5,8 @@
   **Base:** main 1ec6f6c merged in at 72b0dc3 (MAIN-64, 2026-11-24 13:0x UTC: #64, CI-WASM; one conflict,
   docs/STATUS.md: this branch's #40 row kept beside main's #64 and "#63, #62" rows); before it main f5030a3 at a6acc8a
   (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-24 15:2x UTC, after his /compact: the card matches the branch (ffcde1c, clean, equal to
-  origin); his 15:22 words (history.md:7881-7889) name the judge chat Netcode Builder 2; round 2 at the 17:51 trigger.
+- **Last update:** 2026-11-24 16:2x UTC: the Fable advisor tool is on (his 16:14 words, history.md:7891-7900); its look-back
+  read taken (question (7), the hand-off pointers, two reading checks); round 2 at the 17:51 trigger.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -21,6 +21,8 @@
   - The check-in every 4 hours; a cut gets one line in the day's message.
   - Notes: this card and the day's message (his words still word for word in history.md).
   - Stop B's message (B): U4k, U6d and U6e at about 3.3x, and options (a)-(c), each with my lean.
+- **FABLE, 2026-11-24 16:14 UTC (history.md:7891-7900):** the advisor tool (Fable 5.2) is on: use it before each step on
+  R1's path and before a step is called done; tell him what needs it. An extra: the recorded advisor rulings stay.
 - **RE-PLAN answers, 2026-11-22 12:54 UTC (history.md:7595-7607):** RE-PLAN-OK yes (replan.md is the plan); MARK-NOTES
   yes as replan.md:106-111 words them (the MOVED unit writes them, with a reviewer's read); LAPTOP (b) (R8 once he names
   ML); PACK-P0 (b); R1 Thursday 3 December; dates for R2, R3, R5 and the close come with R1's run plan (aim: the close
@@ -49,9 +51,8 @@
   main taken in when it changes code, CI or rules; every PR the plan names stops for his go (he asks his Advisor first).
 - **2026-11-16 21:50 (:2177-2187):** commands in the simple forms that need no approval, one per call; a call that will
   ask is named in the message before it is sent.
-- **2026-11-15 16:35 (:2131-2146):** C62H-KEEP (a); C62H-BOUND (a): its wording frozen, never reworded to fit a run.
-- **2026-11-15 13:35 (:2125, :2127):** a new bar, or a change to one, comes to him before it is built; every
-  marks.json or judge change gets a reviewer's read before its unit closes, named in the report in its own line.
+- **2026-11-15 (:2125-2146):** C62H-KEEP (a); C62H-BOUND (a), its wording frozen; a new or changed bar goes to him
+  before it is built; every marks.json or judge change gets a reviewer's read before its unit closes, in its own line.
 - **KEPT-LOGS (2026-11-15 08:20; .claude/CHECKPOINTS.md §11) and PACK-READ (a) (2026-11-17 10:43, :2204-2227):** only a
   closed set's folder, by brief 8.1's procedure (c62h-bound-brief.md:485-501), never during a build or a set; his
   PACK-P0 (b) (history.md:7603) covers both P0 folders, the two c-u2 folders and u4f-21-f591dcf71ca6; fc411116c1f1 and
@@ -80,10 +81,8 @@
   627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round DONE 21:2x** (his words: the three Highs'
   fixes only; old tree .gate/u8-r3-old, pass 2's bca52b2c): NC-R2-1 CLOSED (u8-r3-netcode.md), SEC-R2-1 = INF-R2-1 and
   SEC-R2-2 CLOSED (u8-r3-security.md); one Low, NC-R3-1 (r1.sh:438-452, save_log unguarded under set -e), a follow-up.
-- **U6b CLOSED 06:2x: MERGED at 8efb9b2** (u6b-report.md holds the whole story; 29 files, 5,969 added; M6 rulings
-  advisor-u6b-m6.md: the cap in start(), sha2 at opt-level 3 in the dev profile; M5 run 2 11/11, 807/904, 1,037.2 s;
-  M7 gate PASS; CI green on 8efb9b2; H3 APPROVE of the pushed head, fe2e4c0d…). The builder's worktree stays (its
-  uncommitted copy of the tree; plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
+- **U6b CLOSED 06:2x: MERGED at 8efb9b2** (u6b-report.md holds the whole story: 5,969 added; CI green; H3 APPROVE). Its
+  builder's worktree stays (plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
 - **U6c's fix pass DONE 13:50** (FP-1 to FP-6; 5,693 added; fix-check.log 11/11, 861/958 (+54/+54), 1,176.3 s; plants
@@ -95,19 +94,21 @@
   test 5 Medium, security 5 Low (= Stop B's host read). Ruling advisor-u6c-r1.md (ad72c0b8…): the fix pass, then round 2
   on the diff; the readings mine; NC-U6C-12 and SEC-U6C-5 into U8 (C9). Block 2, the stamp tests, held back (C4, lever (1)).
 - **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
-  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** the day message at 23:05 UTC (msg-2026-11-25.md).
+  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** the day message at 23:05 UTC (msg-2026-11-25.md), read by Fable
+  first: (7) as a question, hand-off pointers for Netcode Builder 2, and that a SendMessage resume is not "a new agent".
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - For msg-2026-11-25.md (C7, R2): (1) U6b's merge fixed one test's cap: the double-load bite's start gets its own 2 s
   on top of the 5 s (TR2-U6A-4); (2) sha2 runs optimised in debug builds, so the test build's start fits its 5 s;
   (3) U6c's builder names the command for U6b's 48-connection reading (A2) and I take it at U6c's close. Named, not
   mine (C4): U6c's build reached 5,426 added after Block 6 (past 5,400), so Block 2 (P2) was not built and lever (1) is
-  pulled: P2 rides in MOVED's brief, before R1's report. (4) Main 1ec6f6c taken in now, plan first (MAIN-64:
+  pulled: P2 was to ride in MOVED's brief (now question (7)). (4) Main 1ec6f6c taken in now, plan first (MAIN-64:
   advisor-main-64.md). (5) U6c's round-1 ruling (advisor-u6c-r1.md): one fix pass, a narrow round 2, the readings at
   U6c's close. **Decision:** NPT-L2-ONEWAY (its §5; lean (a); built by Netcode Builder 2). (6) Q-FP6-1 (b): the
-  failed-handshake count stays in the "no READY" line, its log half to U6e. (7) U6c's held-back stamp tests stay here
-  after R1. (8) Round 2's netcode seat may read the code behind the two readings' counts outside the diff; every
-  outside-the-diff line carries a severity, may be taken before R1, and a High there goes to the advisor.
+  failed-handshake count stays in the "no READY" line, its log half to U6e. (7) A question for him, not a choice: U6c's
+  held-back stamp tests (C-U6-8, ~170 lines in crates/net) built here after R1, before R1's report, their SERIES.md
+  reword after Netcode Builder 2's MOVED merge (my lean). (8) Round 2's netcode seat may read the code behind the two
+  readings' counts outside the diff; every outside-the-diff line carries a severity, may be taken before R1; a High goes to the advisor.
 - Earlier choices, each in its day's message: 11-23's (msg-2026-11-24.md items 1-7; card at 2a7a5b8), 11-22's
   (msg-2026-11-23.md items 1-5; card at 9341c90), 11-21's (card at 0f744ba), 11-20's history.md:7412-7433, 11-19's :7177-7193.
 
@@ -143,8 +144,7 @@
   counter, SA-16's variant); the kit's paper costs named to him on 2026-11-17. Nothing added since.
 
 ## Key numbers (U4f's `<base>` counts, the earlier packs and his 2026-11-17 count: this card at 1b26e8c)
-- Disk (2026-11-24 13:5x UTC): 10,568 MiB free after a part-clean of 8.3 GiB (floor 4,096; a full check.mjs fills the
-  dev profile to ~7.8 GB). The unpacked folders his packing words do not cover: this card at 74bf901.
+- Disk (11-24 15:3x UTC): 10,504 MiB free (floor 4,096; a full check.mjs fills the dev profile to ~7.8 GB); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (no agent, no shell, 3 triggers):** the saver bghk215os ended at its window's end (about 14:58). Restart

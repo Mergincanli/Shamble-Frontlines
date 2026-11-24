@@ -7887,3 +7887,14 @@ The compact is done. Read the resume card first and check it against the branch.
   that branch merges into this one only on his word (MOVED before R1's report, U6j before R2). "The 18:50 reset" is
   Amsterdam time (UTC+1): 17:50 UTC by the session's limit clock (resetsAt 1795542600), when U6c's round 2 may start.
   Transcript record f32f90d3-79b5-45bc-bc94-09c6bc2b7ca2, 15:22:04 UTC, 350 characters.
+
+## Mustafa, 2026-11-24 16:14 UTC, in this chat, after he turned on the Fable advisor tool (word for word)
+```text
+Yes, I wish I had enabled it much earlier, especially reading it how fast it has found two problems already.
+Make good use of it and if there are things that might need to be reviewed by the Fable advisor that I just have turned on for you, tell me, if not continue as you were
+```
+- **Read as** (the main session's reading, not his words): the advisor tool (Fable 5.2, turned on by his `/advisor
+  Fable` at about 15:4x UTC) is a standing extra check in this chat: before each substantive step on R1's path, before
+  a step is called done, and on today's choices made before it was on. CLAUDE.md's Models line keeps it an extra: the
+  recorded advisor-agent reviews stay required. What may need its review is told to him in plain words.
+  Transcript record 5a4f0c9f-4d09-40f1-a79e-2bad27f12f71, 16:14:02 UTC, 277 characters.
