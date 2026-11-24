@@ -144,7 +144,7 @@
   counter, SA-16's variant); the kit's paper costs named to him on 2026-11-17. Nothing added since.
 
 ## Key numbers (U4f's `<base>` counts, the earlier packs and his 2026-11-17 count: this card at 1b26e8c)
-- Disk (11-24 15:3x UTC): 10,504 MiB free (floor 4,096; a full check.mjs fills the dev profile to ~7.8 GB); unpacked: card at 74bf901.
+- Disk (11-24 19:5x UTC): 10,491 MiB free (floor 4,096); no dev profile: a cold M5 (≥ 8,192 first, advisor-u6b-m6.md:158-165: met; it may fill ~7.8 GB, so the dev part-clean before the next run); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (3 triggers, the ruling's trig_01C4uA49qe1c9RAnFZaLGa3T at 22:52; no agent; saver ended 19:47, hand saves):** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
@@ -157,7 +157,7 @@
   check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
 - **My step (18:3x):** round 2: netcode 3 Lows in the diff, 2 Mediums outside it before R1 (the start-edge drop read;
   LG's DONE with no READY, caught at U8's one load_up call :2218-2221); P1's +222 drops are in-window, a separate fact
-  (U8's equal-on-P1 rule, :1708-1711); test 1 Medium (TE-U6C-R2-4), 7 Lows; security 2 Lows. Ruling 22:5x. The readings are DONE,
+  (U8's equal-on-P1 rule, :1708-1711); test 1 Medium (TE-U6C-R2-4), 7 Lows; security 2 Lows. Ruling 22:5x (19:5x: the snapshot applies on 4f9ca2b, 24 files; facts added to the request). The readings are DONE,
   my own runs through u6c-run.sh, release builds (.gate/u6c/read-*.log):
   - DONE: the release build (read-build.log, exit 0). A2 over WebSocket (read-a2-ws.log, 14:08-14:09): 1 passed in
     70.8 s; npt-load READY then DONE, exit 0; the room exit 0; room memory peak 157,499,392 B; 5-31 inputs per client
