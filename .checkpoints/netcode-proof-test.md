@@ -103,13 +103,13 @@
   (3) U6c's builder names the command for U6b's 48-connection reading (A2) and I take it at U6c's close. Named, not
   mine (C4): U6c's build reached 5,426 added after Block 6 (past 5,400), so Block 2 (P2) was not built and lever (1) is
   pulled: P2 rides in MOVED's brief, before R1's report. (4) Main 1ec6f6c taken in now, plan first (MAIN-64:
-  advisor-main-64.md). (5) U6c's round-1 ruling (the advisor's, advisor-u6c-r1.md): one fix pass, a narrow round 2,
-  the container readings at U6c's close (the probe; A2 on both transports). **Decision:** NPT-L2-ONEWAY (its §5; lean (a);
-  its build now Netcode Builder 2's). (6) Q-FP6-1 (b): the load generator's failed-handshake count stays in its "no
-  READY" line; its log half goes to U6e. (7) U6c's held-back stamp tests stay on this lane after R1 (LEAN-MODE item 2).
-- Before those, none since the 2026-11-24 message. Each named in its day's message: 2026-11-23's in msg-2026-11-24.md items 1-7
-  (this card at 2a7a5b8 holds them with their sources); 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at
-  9341c90); 2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
+  advisor-main-64.md). (5) U6c's round-1 ruling (advisor-u6c-r1.md): one fix pass, a narrow round 2, the readings at
+  U6c's close. **Decision:** NPT-L2-ONEWAY (its §5; lean (a); built by Netcode Builder 2). (6) Q-FP6-1 (b): the
+  failed-handshake count stays in the "no READY" line, its log half to U6e. (7) U6c's held-back stamp tests stay here
+  after R1. (8) Round 2's netcode seat may read the code behind the two readings' counts outside the diff; every
+  outside-the-diff line carries a severity, may be taken before R1, and a High there goes to the advisor.
+- Earlier choices, each in its day's message: 11-23's (msg-2026-11-24.md items 1-7; card at 2a7a5b8), 11-22's
+  (msg-2026-11-23.md items 1-5; card at 9341c90), 11-21's (card at 0f744ba), 11-20's history.md:7412-7433, 11-19's :7177-7193.
 
 ## Next steps (NPT-TRIM's order; the re-plan fixes the rest; U4f2 and the re-plan DONE: this card at 1b26e8c)
 1. U4's report DONE 2026-11-23 (u4-report.md: U4 closed); its kept server rows are U4k, after R1 (replan-marks.md:135-158).
@@ -155,9 +155,9 @@
     (next 16:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
 - **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
   check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
-- **My step (15:4x):** waiting for the 17:51 trigger (trig_014DtEnzDqnWHT2N6MsvfyA1). Then U6c's round 2, one batch at
-  xhigh, three seats on `git diff aad2103 6c3ff00` (advisor-u6c-r1.md §4); their briefs are drafted in the scratchpad
-  (u6c-r2-common.txt plus one a seat; W re-checked: 0549389e…). Restart the saver with it. The container readings are DONE,
+- **My step (15:5x):** at the 17:51 trigger: get_session shows the reset; the diff's --stat and W's hash (0549389e…)
+  again; then U6c's round 2, three seats in one message at xhigh on `git diff aad2103 6c3ff00` (advisor-u6c-r1.md §4);
+  briefs in the scratchpad (u6c-r2-*.txt; if lost, redraft them). Restart the saver with it. The container readings are DONE,
   my own runs through u6c-run.sh, release builds (.gate/u6c/read-*.log):
   - DONE: the release build (read-build.log, exit 0). A2 over WebSocket (read-a2-ws.log, 14:08-14:09): 1 passed in
     70.8 s; npt-load READY then DONE, exit 0; the room exit 0; room memory peak 157,499,392 B; 5-31 inputs per client
