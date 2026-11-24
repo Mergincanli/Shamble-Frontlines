@@ -997,3 +997,6 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   your Cloudflare account, allowing secure integration with tools, scripts, and third-party services." / "Create a
   token". The delete time itself was not given: it lies after my step-10 message (after 22:05:54 UTC) and before
   22:14:34 UTC. Next: the `revoked` run (my start, his approval); it must fail at Cloudflare's sign-in.
+- **Step 11, `revoked` started** by the session (run_workflow, deploy.yml, ref main, set `revoked`): deploy run #19, id
+  45499119373, head 347d5e0, created 22:15:00 UTC; plan green (22:15:05-19), build "build (revoked, preview, revoked,
+  preview, 1)" green (22:15:26-38); the run "waiting" on `preview` at 22:15:44 UTC. His approval asked.
