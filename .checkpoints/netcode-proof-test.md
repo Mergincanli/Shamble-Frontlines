@@ -71,36 +71,20 @@
   627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round DONE 21:2x** (his words: the three Highs'
   fixes only; old tree .gate/u8-r3-old, pass 2's bca52b2c): NC-R2-1 CLOSED (u8-r3-netcode.md), SEC-R2-1 = INF-R2-1 and
   SEC-R2-2 CLOSED (u8-r3-security.md); one Low, NC-R3-1 (r1.sh:438-452, save_log unguarded under set -e), a follow-up.
-- **U6b: BUILT ~17:27** (snapshot 49f4488f…, 29 files, 5,498 added of the 6,000 stop; the brief's likely 3,650-4,050):
-  check5.log 11/11 (measured 799 = +45, bites 898 = +48; test step 891.5 s, 0.93x base); 14 plants fail by name; the
-  valve built; no manifest change. **Its round DONE 21:3x** (u6b-review-*.md): netcode APPROVE WITH FINDINGS (2 Medium,
-  12 Low; F-PING: keep the built rule with NR-U6B-3); security REVISE (Medium SEC-U6B-1 the closing task unbounded,
-  -2 quinn's default stream limits; 3 Low); test REVISE (High T-1: the R3 bite ws-budget-x2 never armed through an
-  accepted link; 8 Medium T-2 to T-9; 12 Low). Fix list u6b-fix-pass.md; **the advisor's ruling DONE 21:5x**
-  (advisor-u6b-r1.md dc6973da…; brief rev 1.2 binds it by line range): R-PING, A1 (a), A2 at U6c's close, A3 no second
-  round. **The fix pass DONE 23:2x** (wip/u6b-fix.patch e29c003c…, 5,952 of 6,000; check.mjs x2 11/11, counted
-  fx-check2.log: 807 = +53, 904 = +54, test 0.89x; 20 plants fail by name; 20 release starts p50 19.46 ms, max 25.17
-  ms; NR-U6B-5, T-12, T-17 carried; F-TICK-ROUND, div_ceil). **The advisor's check DONE 04:3x: APPROVE WITH CONDITIONS
-  C1-C2** (advisor-u6b-fix.md bf8da516…); C1 done (20 diffs in .gate/u6b/); M3/M4 done (28/28 byte-equal; applied,
-  UNCOMMITTED in the main folder). **M5 FAIL 04:55** (.gate/u6b-merge/m5-check.log; measured 807/0; bites: the
-  double-load bite's start past binary.rs:77's 5 s cap = TR2-U6A-4, a Low with no taker); disk 974 MiB after it, dev
-  part-clean 10.0 GiB (free 10,709). **M6 ruling DONE: APPROVE WITH CONDITIONS C1-C7** (advisor-u6b-m6.md f4100ef7…;
-  TR2-U6A-4 re-rated Medium). C1 done (binary.rs only, +14 -12; .gate/u6b-merge/m6-hunk.diff c6bfe8a9…, binary.rs.pre
-  6691abdf… = the builder's; m6-files.txt: 27 = the builder's). **C3's probe DONE 05:16, FAILED its 2,500 ms bar**
-  (m6-probe2.log: all tests pass; own work 2,908-3,050 ms, alone as slow; likely the 116 MB debug binary hashed with
-  unoptimized sha2, main.rs:368-370): stopped before M5. **Second ruling DONE** (advisor-u6b-m6.md section 5: the host
-  is now 2.10 GHz, was 2.30). **R1 DONE 05:23** (m6-probe3.log, sha2 opt-level 3 by --config: s8a 120 ms; bitten
-  2,125-2,157 ms, own 125-157 ms; alone 2.50 s): **R2 taken**: Cargo.toml +3 after :120 (lock unchanged);
-  **probe4 PASS 05:24** (m6-probe4.log: s8a 117-122 ms, bitten own 121-125 ms, alone 2.46 s); **M5 run 2 PASS 06:01**
-  (m5-check2.log b0487c3a…: 11/11, 807/904, 0 failed, test 1,037.2 s; after a container restart); **C5 APPROVE** of
-  the changed head (advisor-u6b-m6.md section 6, 4f07818f…; H1 report fixes done; F-M6-6..9); **M7 gate PASS**; M8-M9
-  now. TR2-U6A-4 CLOSES at U6b's commit. main-run.sh still sets no CARGO_INCREMENTAL: pass `env CARGO_INCREMENTAL=0`.
+- **U6b MERGED at 8efb9b2** (pushed 06:09 UTC; u6b-report.md holds the whole story; 29 files, 5,969 added of the
+  6,000 stop): built 5,498; round (netcode APPROVE WITH FINDINGS, security REVISE, test REVISE on High T-1); ruling
+  advisor-u6b-r1.md (R-PING, A1-A3); fix pass e29c003c (5,952); fix check advisor-u6b-fix.md APPROVE WITH CONDITIONS
+  C1-C2 (C1: the 20 plant diffs in .gate/u6b/). Merge: M5 run 1 FAIL (the double-load bite past its 5 s cap:
+  TR2-U6A-4, re-rated Medium, now CLOSED); disk part-clean 10.0 GiB; M6 rulings (advisor-u6b-m6.md 4f07818f…): the
+  cap in start() (binary.rs +14 -12) and sha2 at opt-level 3 in the dev profile (Cargo.toml +3; the debug start 3.0 s
+  -> 0.12 s; the host now 2.10 GHz, was 2.30); probe4 PASS; M5 run 2 PASS (m5-check2.log: 11/11, 807/904, 1,037.2 s);
+  C5 APPROVE of the changed head; M7 gate PASS (m7-gate.log); 29 blobs = .gate/u6b-merge/m6-files.txt. **CI running;
+  then H3** (the advisor's head read: SHA, the check, m7-gate.log, CI). main-run.sh sets no CARGO_INCREMENTAL: pass
+  `env CARGO_INCREMENTAL=0`.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6b's merge** (advisor-u6b-m6.md C3-C7): the probe passes (all pass; untracked 4a61ef21; each start's own
-  work <= 2,500 ms) else stop, log to the advisor; C4 M5 again (m5-check2.log, env CARGO_INCREMENTAL=0, loadavg before
-  and after, >= 6,144 MiB free); C5 the advisor's read (resume a6e7ce46a28424b0b; name the `let s` form); M7 the gate --no-smoke; M8 one commit (the 28 files, u6b-report.md, `git rm` wip/u6b-fix.patch; keep u6b-build.patch
-  for U6e); M9 push, CI, the card; then T5 (i), U6c's launch. SEC-U6B-3 is on PR #40's closing list (done 04:4x).
+- **Next 2, U6b's close:** CI green, then H3 (resume a6e7ce46a28424b0b); then T5 (i) (U7's T-builder with U6b's merged
+  release binary under .gate/u7/) and U6c's launch on the lane. SEC-U6B-3 is on PR #40's closing list (done 04:4x).
 - **Next 3:** the 2026-11-24 day message SENT 23:0x UTC (msg-2026-11-24.md: choices 1-7, /compact asked); the next at
   2026-11-24 23:05 UTC (trig_016pV7v16ktVwMuzygofJhjJ, msg-2026-11-25.md). T5 (i) the day U6b merges.
 
@@ -148,13 +132,13 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (1 agent, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - The advisor's C5 read a6e7ce46a28424b0b (appends to advisor-u6b-m6.md). Done, resumable: M5 run 2 (m5-check2.log,
-    PASS); the advisor's U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
+- **Running (0 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
+  - CI on 8efb9b2 (PR #40's check runs). Done, resumable: the advisor a6e7ce46a28424b0b (advisor-u6b-m6.md, C5 APPROVE;
+    H3 next); the advisor's U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
     DONE); U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree agent-a2661dc320c9e6d00), the
     advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode a0a57a3948202de40, security aedb799ad9648b0e1,
     test a88f25b3d3f66d972.
-  - The saver b5zvi56zl (05:37 to about 07:27; when it ends, restart it: run_in_background, timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
+  - The saver bopei7hrt (06:10 to about 08:00; when it ends, restart it: run_in_background, timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
 - **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
   af8c5f0fbec829595 (u6b-run.sh exports CARGO_INCREMENTAL=0; a builder on the 4 GB floor stops, never cleans);
   U8's builder ac59cce3e5d002441 (worktree agent-ac59cce3e5d002441, notes u8-build.md "## Pass 3"); Stop B's infra seat
