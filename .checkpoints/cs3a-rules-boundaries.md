@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 11:25 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 11:38 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -165,8 +165,31 @@
    doc.rust-lang.org/1.99.1/std/primitive.f32.html and .f64.html on 2026-11-24, 11:12 UTC (rustdoc "1.99.1
    (58cf8f9c3 2026-10-13)").
 
+4. **Plan step 1 (the follow-ups that need nothing new): a1c59e8**, pushed 11:38 UTC (26 files). What it holds: the
+   commit's message. Left for later steps, as planned: EA-F13 (4), `@shamble/types` to sim-worker's
+   devDependencies, with step 3's batch; EA-N3's Worker half (one guard around every Wasm call) with step 6; EA-F10's
+   bindings part and EA-F13's one-writer item are 3b's. **Checked here before the push:** `cargo test --workspace
+   --locked` (client-endpoint 15, devtools 1, protocol 2, room 1, sim 8 and its new `state_hash_alloc` 1, sim-wasm
+   6); sim also in release (8 and 1); `cargo fmt --check`, clippy with no warning; both builds (the Wasm still
+   28,987 bytes here; the Worker's chunk 8,259 bytes against 8,226); vitest: types 7, sim-worker src 35, boundary 7,
+   client 60, net 1; the five type checks of `toolchain.yml` (`cs3a-rules-boundaries/typecheck.sh`); the browser
+   tests 12 passed (52.7 s; allocation 54 bytes a frame and 516 a block, inside 25 to 170 and 430 to 610); the
+   legacy gate PASS, symbols +0 -0. **Planted defects: 25 of 25 caught, each at its own check**
+   (`cs3a-rules-boundaries/plants.py`; outputs in `.gate/cs3a/plant-*.out`; the tree's diff was the same before
+   and after): among them TE-NT5's (a Worker that runs on while hidden, with no fresh report: caught only by the new
+   line on the page's own tick), TE-104's (90 extra ticks on resume with no drop counted: caught at the bound that
+   had never been seen hit) and VF-L7's lookalike chunk. **Size so far, counted as change-set 2 counted: 826 added
+   lines against about 410 planned for this step** (tests are more than half; `state_hash_alloc.rs` alone 104).
+   The whole of 3a is planned at about 2,050 with the stop line at 4,100: if the later steps also ran at twice
+   their estimate, 3a would end at the stop line, so each later step is written as tight as its proof allows, the
+   running total is read after every step, and the ladder (plan section 4) is used before the line is reached.
+   **Expected in CI on a1c59e8** (toolchain; C3): cargo debug as above, twice; the release line sim 8 and 1,
+   protocol 2; `npm test --workspaces`: types 7, sim-worker 35, client 60, net 1, e2e's node project 1; boundary 1
+   file, 7 tests; the browser tests "Running 12 tests", "12 passed"; 0 skipped, 0 ignored.
+
 ## Current step
-**Step 1 of the plan's section 4** (the follow-ups that need nothing new), started 11:25 UTC.
+**Plan step 2** (the scan test `crates/sim/tests/rules_scan.rs` and PM-0002-53's native half), started 11:38 UTC.
+Read CI's run on a1c59e8 before the next code push.
 
 ## Next steps (after the compact)
 1. Read CLAUDE.md, this card, the plan (`cs3-plan.md`: sections 0, 3, 4, 8, 9, 12 and 13), `cs3-context.md`, and
