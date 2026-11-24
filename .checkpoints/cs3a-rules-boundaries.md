@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 13:44 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 13:56 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -243,18 +243,59 @@
    and 1, protocol 2; `npm test --workspaces`: types 7, sim-worker 40, client 60, net 1, e2e's node project 1;
    boundary 1 file, 8 tests; the browser tests "Running 12 tests", "12 passed"; 0 skipped, 0 ignored.
 
+   **CI on 0624557 (steps 4 to 6), read line by line:** gate success (run 45406415137), toolchain success (run
+   45406414987, job 138488241220): every count as expected; the Wasm with the hook on the runner 31,817 bytes,
+   sha256 534bb6bd...0ca6 (31,809 here: the builder's path, RR-F5).
+9. **Plan step 7 (the test-only WebAssembly module): df72a58**, pushed 13:50 UTC. `crates/devtools/src/wasm.rs`
+   (the two vector checks, the planted counter; `sim-wasm` linked whole, so the module carries the players' hook
+   and its start function: tried first by hand, it holds); `build.mjs` `buildRulesModule` (every build but
+   `--production`: release and dev profile, its own cargo call `-p devtools --lib` and target folder
+   `.gate/target-rules`, the settings refused and the tool checked before each run, into
+   `packages/sim-worker/pkg-rules/{release,dev}`, ignored in the same commit); `wasmProblems` (a built page with
+   any WebAssembly that is not byte for byte the players' own is refused); `boundary/rules.test.mjs` (Node) and
+   `e2e/tests/rules/wasm-rules.spec.ts` (Chromium, a made-up address the spec answers itself; only the Node names
+   `node-names.d.ts` declares: C1). In both profiles, Node and Chromium: the 38 float operations and the stream
+   file pass; the counter traps and the hook's text reads "panicked at crates/devtools/src/wasm.rs:34:5:" then
+   "attempt to add with overflow"; the players' Wasm imports three functions of its own glue and nothing else.
+   **security-auditor's condition 2: met** (its last clause shown on a planted copy: with the module's Wasm in
+   `packages/client/public/` the build stops with "extra_bg.wasm: a WebAssembly file that is not the players'
+   own"). **C3's once: shown** (with `pkg-rules` moved away the boundary file fails at its imports and both spec
+   tests fail; none skips; `.gate/cs3a/step7-missing-and-foreign.out`). **Planted: 6 of 6 caught** (with the
+   release profile's overflow checks off only the release module's test fails, 14 of 15 pass: PM-0002-53's four
+   builds each shown). **CI on df72a58, read line by line:** gate success (run 45407675059), toolchain success
+   (run 45407674933, job 138492663865, 13:50:54 to 13:53:47 UTC, with no CI edit): the development build made the
+   module inside the network cut; boundary 2 files and 15 tests; "Running 14 tests", "14 passed (1.2m)", the two
+   rules tests in the runner's Chrome in both profiles; client 61; the rest as before.
+10. **Plan step 8 (the build's two refusals, the path remap, F-CHANNEL): 5c92311**, pushed 13:56 UTC.
+   `build-checks.mjs`: `runtimeCrates`, `overriddenCrates`, `missingOverflowOverrides` (SA-TREE);
+   `simFeatureList`, `simFeatureDifferences` (PM-0004-74: the players' Wasm, the test-only module and the native
+   tests; today each list is `sim feature "default"` alone); `registryRemapFlag`; the refusal pattern widened by
+   every `RUSTC_` name, `__CARGO_` and `CARGO_UNSTABLE_` (F-CHANNEL; CI's cut names stay allowed). `build.mjs`:
+   `checkCrates()` before the players' cargo build; `--config target.wasm32-unknown-unknown.rustflags=[the
+   remap]` on both Wasm builds. The players' Wasm here is now 31,805 bytes, sha256 e138cae8...2bc5, and holds
+   `/cargo/registry/src/...` in place of `/root/.cargo/registry/src/...`; **the same sha256 is expected on the
+   runner: read it in CI on 5c92311** (its line "the builder paths it carries" should print "no registry path in
+   the Wasm"). **Planted: 6 of 6 caught**, two of them by the real build's refusal (an override removed from the
+   root manifest; a feature of `sim` turned on by the test-only module alone). Checked on clean builds
+   (`.gate/cs3a/step8.log`): cargo debug 9 result lines and release 7, all ok; fmt; clippy clean; both pages;
+   vitest types 7, sim-worker 40, boundary 16, client 68, net 1; the five type checks; the browser tests 14 passed
+   (52.7 s); the gate PASS.
+   **Size after step 8, counted as change-set 2 counted (fixtures and lockfiles not counted): 3,046 added lines
+   against about 2,080 planned (1.46 times); the stop line 4,100 is not reached.** By package: sim 809, client
+   786, devtools 752, sim-worker 437, sim-wasm 159, e2e 101, root 2; 1,428 of them in test files, and 346 in the
+   two reference scripts. **Planted defects so far: 66 planted, 66 caught** (`plants.py`, by step: 25, 5, 15, 9, 6 and 6;
+   beside them the 22 breaches planted inside `rules_scan.rs` itself), one test strengthened on the way.
+   **Expected in CI on 5c92311 (C3):** cargo debug client-endpoint 15, devtools f32 2 and stream 2, protocol 2,
+   room 1, sim 15, `rules_scan` 4, `state_hash_alloc` 1, sim-wasm 9, twice; the release line protocol 2, sim 15, 4
+   and 1; `npm test --workspaces`: types 7, sim-worker 40, client 68, net 1, e2e's node project 1; boundary 2
+   files, 16 tests; "Running 14 tests", "14 passed"; 0 skipped, 0 ignored; the Wasm's sha256 e138cae8...2bc5.
+
 ## Current step
-**Plan step 7** (the test-only WebAssembly module, built by the development build into its ignored folder; the
-vectors, the planted overflow in debug and release, the hook's text and the players' Wasm's import list, in Node
-and in Chromium), started 13:44 UTC. **It must hold security-auditor's condition 2:** the module is built in its
-own cargo call (`-p devtools --lib`) with its own `--target-dir`, never in the players' call or `target/`; it and
-its glue go only to an ignored folder outside `packages/client/`, `packages/sim-worker/pkg/` and every `dist*`
-folder; no page or Worker source imports it; only the spec's own routing serves it, never `serve.mjs`; and the
-build refuses an out folder that holds any .wasm but the one equal to `pkg/sim_wasm_bg.wasm`, shown failing on a
-planted copy. And the advisor agent's C1 (the spec uses only the Node names `node-names.d.ts` declares, or adds
-them), C3 (once, with the module's folder deleted: both rules tests fail, not skip) and C6 (the checks before
-each cargo and tool run; the `.gitignore` line in the same commit; `--production` never builds it; the boundary
-file's header says which mode builds it; slow boundary tests get their own time limit).
+**The reviews, round 1, on the code head 5c92311** (plan section 4: rust-reviewer, engine-architect, test-engineer;
+then security-auditor and perf-auditor; Opus 5.5, effort max; at most 3 at a time; each with its notes in this
+folder), started 13:56 UTC. Then one fix pass; round 2 on what changed; the verifier until PASS; the advisor agent
+on the pushed head; docs-keeper; DECISIONS by script; the report; the zip and its README; the pull request's title
+and text.
 
 ## Next steps (after the compact)
 1. Read CLAUDE.md, this card, the plan (`cs3-plan.md`: sections 0, 3, 4, 8, 9, 12 and 13), `cs3-context.md`, and
