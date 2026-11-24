@@ -149,8 +149,8 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (2 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - security-auditor a866e544173bb98fc on step 4's three lines (security-u6c-lock.md); step 5's main-run.sh b5263aevb.
-    Done, resumable: U7's T-builder a9873cdba07a3219e (T5 (i) DONE); the advisor a6e7ce46a28424b0b
+  - Step 5's main-run.sh b5263aevb. Done, resumable: security-auditor a866e544173bb98fc (security-u6c-lock.md DONE);
+    U7's T-builder a9873cdba07a3219e (T5 (i) DONE); the advisor a6e7ce46a28424b0b
     (advisor-u6b-m6.md DONE, fe2e4c0d…); the advisor's U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
     DONE); U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree agent-a2661dc320c9e6d00), the
     advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode a0a57a3948202de40, security aedb799ad9648b0e1,

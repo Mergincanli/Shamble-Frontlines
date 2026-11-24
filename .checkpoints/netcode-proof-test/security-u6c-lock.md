@@ -95,3 +95,34 @@ passing; security-u6c-deps.md Conditions 2-5 unchanged. Not verified: the exact 
 three edges (medium confidence), and steps 4-6's outputs (the main session runs them).
 
 DONE
+
+## Addendum (2026-11-24, after step 4): three feature lines outside my lists
+Input: .gate/u6c-block0/step4-tree.log :11-35 (06:30:49 UTC, `--locked --offline`, lock 3394b451...4873).
+Plan: read each crate's [features] table and its dependents' entries in REG; rule; amend step 4's lists; step 7.
+
+- (1) hyper `default`: REG hyper-1.12.0/Cargo.toml:76 `default = []`. Turned on because instant-acme 0.8.5's
+  `[dependencies.hyper]` (its Cargo.toml:136-143) has no `default-features = false` (hyper-rustls's has: :90-92).
+  An empty feature: enables no code and no dependency. Still no `server`. Acceptable.
+- (2) hyper-util `default`: REG hyper-util-0.1.21/Cargo.toml:81 `default = []`; same cause, instant-acme's
+  `[dependencies.hyper-util]` (:157-166) keeps defaults (hyper-rustls's turns them off: :94-100). Empty; no server,
+  server-auto, server-graceful, client-proxy or client-pool. Acceptable.
+- (3) hyper-rustls `rustls-native-certs`: REG hyper-rustls-0.27.10/Cargo.toml:75 `native-tokio =
+  ["rustls-native-certs"]`, and :110-112 an optional dependency of that name: cargo lists the implicit feature an
+  optional dependency makes. instant-acme asks `native-tokio` (:145-150), which I had listed; my list missed its
+  implied line (my error, not a change). Reach: no new package (rustls-native-certs 0.8.5 is locked and already
+  compiled on Linux under rustls-platform-verifier, which uses it for its roots: security-u6c-deps.md item 5). It
+  compiles hyper-rustls's `with_native_roots` builder; our route stays `Account::builder()` -> the platform verifier
+  (Condition 2), which reads the same native roots, so the trust store and SEC-U6CD-4's environment condition are
+  unchanged. Not `webpki-tokio` / webpki-roots (grep 0). Acceptable.
+- Ruling: all three acceptable as is; no remedy, nothing reruns because of them.
+- Step 4 amended lists: hyper client, default, http1, http2; hyper-util client, client-legacy, default, http1, http2,
+  tokio; hyper-rustls http1, http2, native-tokio, ring, rustls-native-certs, rustls-platform-verifier, tls12. The rest
+  of step 4 as written (and matched, per the main session).
+- Step 7: yes, dependency-check.md names them: the three amended lists as the recorded expectation, with this
+  addendum as the source, so the record matches step4-tree.log.
+- Finding SEC-U6CL-3 (Low, evidence note): my item 6 / step 4 lists omitted two empty `default` features and one
+  implied optional-dependency feature. Exploit sketch: none (no code or package added); only a binding check whose
+  lists do not hold. Evidence: the REG lines above. Fix: the amended lists.
+- Verdict unchanged: CLEAR WITH CONDITIONS (no Critical, High or Medium).
+
+DONE
