@@ -91,9 +91,9 @@
   unoptimized sha2, main.rs:368-370): stopped before M5. **Second ruling DONE** (advisor-u6b-m6.md section 5: the host
   is now 2.10 GHz, was 2.30). **R1 DONE 05:23** (m6-probe3.log, sha2 opt-level 3 by --config: s8a 120 ms; bitten
   2,125-2,157 ms, own 125-157 ms; alone 2.50 s): **R2 taken**: Cargo.toml +3 after :120 (lock unchanged);
-  **probe4 PASS 05:24** (m6-probe4.log: s8a 117-122 ms, bitten own 121-125 ms, alone 2.46 s); **M5 run 2 RUNNING**
-  (restarted 05:38 after a container restart: b5x83ixmp -> m5-check2.log); then C5 (m6-files.txt 29 files e46b0a73…;
-  m6-cargo.diff 53682b3a…), M7-M9.
+  **probe4 PASS 05:24** (m6-probe4.log: s8a 117-122 ms, bitten own 121-125 ms, alone 2.46 s); **M5 run 2 PASS 06:01**
+  (m5-check2.log b0487c3a…: 11/11, 807/904, 0 failed, test 1,037.2 s; after a container restart); **C5 RUNNING** (the
+  advisor a6e7ce46a28424b0b resumed; m6-files.txt 29 files e46b0a73…; report 97634049…); then M7-M9.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
 - **Next 2, U6b's merge** (advisor-u6b-m6.md C3-C7): the probe passes (all pass; untracked 4a61ef21; each start's own
@@ -147,9 +147,9 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (0 agents, 2 shells; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - M5 run 2, main-run.sh b5x83ixmp from 05:38 (.gate/u6b-merge/m5-check2.log). Done, resumable: the advisor's M6
-    rulings a6e7ce46a28424b0b (advisor-u6b-m6.md DONE, both); its U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
+- **Running (1 agent, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
+  - The advisor's C5 read a6e7ce46a28424b0b (appends to advisor-u6b-m6.md). Done, resumable: M5 run 2 (m5-check2.log,
+    PASS); the advisor's U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
     DONE); U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree agent-a2661dc320c9e6d00), the
     advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode a0a57a3948202de40, security aedb799ad9648b0e1,
     test a88f25b3d3f66d972.

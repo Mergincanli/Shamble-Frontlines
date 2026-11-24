@@ -54,7 +54,11 @@ f4100ef7…): **APPROVE WITH CONDITIONS C1-C7**, the cap fixed in binary.rs, the
   and the hash value unchanged, Cargo.lock unchanged. U6b's brief kept Cargo.toml out ("a further change stops the
   build", u6b-brief.md:433-435); the advisor lifted that for this one line only. **probe4** (m6-probe4.log, the edited
   tree, no `--config`): 3 parallel runs 5 of 5 each, the bite alone 1 of 1 in 2.46 s (under the brief's 5 s per
-  test); s8a 116.9-122.1 ms, the bitten start 2,120.8-2,125.3 ms. **Run 2** (m5-check2.log): PENDING.
+  test); s8a 116.9-122.1 ms, the bitten start 2,120.8-2,125.3 ms. **Run 2** (.gate/u6b-merge/m5-check2.log b0487c3a…,
+  05:38:21-06:01:53 UTC, CARGO_INCREMENTAL=0, the probed tree's hashes; a container restart had killed its first try at
+  the test step, m5-check2-cut.log): **all 11 steps PASS**; measured 807 passed, bites 904 passed, 0 failed, 0 skipped;
+  test step 1,037.2 s (1.09x base's 954.8 s); deps PASS with the sha2 line; marks 81, self 78 of 78, redact 11 of 11
+  (0 findings). Free 7,697 MiB before, 6,614 after.
 - **Plants** (each failed its named test for its planted reason and was restored; advisor-u6b-fix.md item (4) has the
   table): P1-P11, P14, P14b, P15, P15b, P16-P20, all 20 re-applied to the fixed tree. Logs .gate/u6b/fx-plant-<id>.log;
   the diff files beside them since 2026-11-24 04:3x UTC (C1), sha256:
