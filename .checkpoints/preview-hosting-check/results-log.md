@@ -970,3 +970,16 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - **Visit 2, step 8**: pull request #5 (the control, cs/pd-open) closed by the session (update_pull_request, about
   21:17:3x UTC); its cleanup run `close` #6, id 45489619919, created 21:17:40 UTC, "waiting" on `preview` at 21:17:42
   (so the reviewer is still on, as Day 2 expects). His approval asked, with the run's link.
+- **His answers** (his message after 21:18 UTC, his words): step 7's second half: "Opened in private window:
+  https://shamble-preview-check.pages.dev/" / "> opened without a login"; step 8 (after restarting Brave, the iso-off
+  link): "ioebed straight away" (the test page opened with no login page; his pasted page text: Build marker
+  2162db55d93f59cf2ed7e371a3915409f0b5a587, Build mode preview, crossOriginIsolated false and false, WebAssembly "ran (2 +
+  3 = 5)", the content file, Status done, the usual resources); **"Step 5 to 8 achieved"**; the cleanup run: "done, and
+  deployed and has gone green". So the hosting checklist's steps 5 to 8 are achieved in his words; step 8 records that
+  the login lasted across a Brave restart (how long a login lasts is recorded, not judged).
+- **(c)'s cleanup (step 8 of visit 2)**: run `close` #6, id 45489619919, job `cleanup` 138784117668, success: "Pull
+  request closed at 2026-11-24T21:17:35Z (merged: false); this job started at 2026-11-24T21:56:05Z." / "Uploads of
+  cs/pd-open found: 1" / "Delete 17d45ef9-1187-4897-9073-2b79a2ed8b64
+  (https://17d45ef9.shamble-preview-check.pages.dev): HTTP 200 {"success":true,"errors":[]}" / "This job ended at
+  2026-11-24T21:56:06Z." "Uploads found" equals the records (1 upload, 17d45ef9). His approval: the job started
+  21:56:04 UTC. The token worked at 21:56:06 UTC: the "alive" control for the revoke.
