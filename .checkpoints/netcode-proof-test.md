@@ -151,7 +151,8 @@
     worktree; notes u6c-build.md there ("Resume from" lines); end check .gate/u6c/fix-check.log; plants P2, P8, P18, P19, P22.
   - Done, resumable: the U6c advisor a662f1797b78cae95 (its ruling); the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-    (next 14:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
+    (next 14:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md); PR #40's CI
+    safety net trig_01Vdp2uNrAM4Q46vJHboJyFj (14:00: CI on 807e92a; if toolchain is green, step 7).
 - **My step: MAIN-64's step 7** (main-64-plan.md; advisor-main-64.md). **Steps 1-6 DONE** (history.md, "## MAIN-64"):
   merge 72b0dc3 (parents dd6a03b, 1ec6f6c), pushed with this card's save; gate PASS, repo map 173/110, checkpoint tests
   33/33, light run PASS (refs 1,814 = N0 + 3; the rest word for word the base's). Next: CI on the pushed head (gate,
