@@ -2,11 +2,11 @@
 - **Goal:** the netcode proof test (SPIKE_PLAN item 1) under its approved plan `.checkpoints/netcode-proof-test/plan.md`,
   rev 3.3 (the advisor and Mustafa, 2026-11-06; verdict advisor-verdict.md) · PR #40 (draft).
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`).
-  **Base:** main 1ec6f6c merged in at 72b0dc3 (MAIN-64, 2026-11-24 13:0x UTC: #64, CI-WASM; one conflict,
-  docs/STATUS.md: this branch's #40 row kept beside main's #64 and "#63, #62" rows); before it main f5030a3 at a6acc8a
-  (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-24 23:0x UTC: main moved to 28254a7 (#65); MAIN-65's plan check runs from 22:56, the round-2
-  ruling's advisor from 22:50; the saver ended 19:47 (hand saves); Fable on (history.md:7891-7900); msg sent 23:1x.
+  **Base:** main 28254a7 merged in at 39a0d04 (MAIN-65, 2026-11-24 23:2x UTC: #65, cs3a; one conflict,
+  docs/STATUS.md: this branch's #40 row kept beside main's 3a row); before it main 1ec6f6c at 72b0dc3 (MAIN-64, #64)
+  and main f5030a3 at a6acc8a (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
+- **Last update:** 2026-11-24 23:2x UTC: MAIN-65 merged at 39a0d04 and pushed by step 6's save; both advisors DONE (U6c's
+  ruling: H2 before M5, H1 on his NPT-EDGE-READ yes); saver ended 19:47 (hand saves); Fable on; msg sent 23:00.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -145,7 +145,7 @@
   counter, SA-16's variant); the kit's paper costs named to him on 2026-11-17. Nothing added since.
 
 ## Key numbers (U4f's `<base>` counts, the earlier packs and his 2026-11-17 count: this card at 1b26e8c)
-- Disk (11-24 19:5x UTC): 10,491 MiB free (floor 4,096); no dev profile: a cold M5 (≥ 8,192 first, advisor-u6b-m6.md:158-165: met; it may fill ~7.8 GB, so the dev part-clean before the next run); unpacked: card at 74bf901.
+- Disk (11-24 23:24 UTC, MAIN-65's light run): 10,290 MiB free (floor 4,096); no dev profile: a cold M5 (≥ 8,192 first, advisor-u6b-m6.md:158-165: met; it may fill ~7.8 GB, so the dev part-clean before the next run); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **No agent running. DONE 23:1x: the round-2 ruling a0031a451c8991809 (advisor-u6c-r2.md: APPROVE; H2 before M5; H1 only on his NPT-EDGE-READ yes; U6c merges after MAIN-65 and his answer, H2 alone after end Fri 27) and MAIN-65's check ad01820dd92758e65 (APPROVE WITH CONDITIONS M65-1 to -5); saver ended 19:47, hand saves:** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
@@ -154,7 +154,7 @@
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
     (next 20:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
-- **RESUME (MAIN-65):** MAIN-65 approved (advisor-main-65.md), running steps 1-7. If `git rev-parse -q --verify MERGE_HEAD` prints 28254a73ab226379373e380eeee64336e58ef916, the merge is in progress: no save, no `git merge --abort`, no reset. If `git diff --name-only --diff-filter=U` names docs/STATUS.md, resume at step 3; otherwise resume at step 3's checks before the commit (C2 (b)), then step 4. If HEAD^2 is 28254a7 and HEAD is not on the remote yet, resume at step 5. The ruling advisor's notes (advisor-u6c-r2.md), advisor-main-65.md and this card may show unstaged: leave them; step 6's card save takes them. Anything else: the advisor rules.
+- **MAIN-65 steps 1-5 DONE 23:2x UTC; step 6 is the save that pushes them:** merge 39a0d04 (parents H0 473f5c1, main 28254a7); STATUS.md 120 lines, "1 1" against main; H0..HEAD 64 files +4677/-317 (63 without STATUS.md, +4644/-284); anchor 9475d37 exit 0 (index and HEAD); gate PASS (--no-smoke); repo map OK 186/110; checkpoint tests 33/33; light.log PASS (refs 1848 = 1825 + 23, marks 81, self 78/78, redact 11/11, 359 items, 0 findings); outputs .gate/main-65/ kept for step 7 (03:50 UTC). CI on the pushed head: next.
 - **My step (18:3x):** round 2: netcode 3 Lows in the diff, 2 Mediums outside it before R1 (the start-edge drop read;
   LG's DONE with no READY, caught at U8's one load_up call :2218-2221); P1's +222 drops are in-window, a separate fact
   (U8's equal-on-P1 rule, :1708-1711); test 1 Medium (TE-U6C-R2-4), 7 Lows; security 2 Lows. Ruling 22:5x (19:5x: the snapshot applies on 4f9ca2b, 24 files; facts added to the request). The readings are DONE,
