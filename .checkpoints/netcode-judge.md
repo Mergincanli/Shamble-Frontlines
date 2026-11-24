@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-24, block 3 of part b complete (d98b0024).
+- **Last update:** 2026-11-24, block 5 of part b complete (8735bc5f).
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -130,13 +130,31 @@
     judge tests pass (17 + 4 + 58 + 25); fmt, clippy and check.mjs's seven quick steps pass. Part b so far 713 added,
     48 deleted (from 0e0f6547; the stop is 4,900).
 
+16. Part b, block 4 (C-U6-11) · d8d4ff338fd3a0121a5262a192a4ef747c2fb9de (pushed) · figures.rs: `session_ticks`,
+    `Session`, `sessions`, `coverage` per session (cut at the room log's `admit` records; a session before the slot's
+    last may leave a tail only up to its recorded `session_end`, read from the room's or the lab's log; a slot with no
+    admit keeps its single span; no measured room hash before a slot's first admit). Engine tests
+    `c_u6_11_coverage_runs_per_session_cut_at_the_admits` and
+    `c_u6_11_a_mid_run_join_and_the_slots_with_no_admit_record`; six plants, each failing one and taken back. Every
+    PM-0001-17 fixture reads as before. README section 1, SERIES.md's coverage clause and one new SERIES.md row
+    (`event.admit`, `event.session_end`; the "read only by figures" count is now 20). 1,021 added so far.
+    **For the report (a reading still open):** the slot's LAST session may leave no tail, even with a session_end
+    (the sheet's rule): a bot that leaves for good before the stop reads INVALID.
+
+17. Part b, block 5 · 8735bc5ff66cb517088e2a62c27add169373afd6 (pushed) · `down_client_mean_max_bits`,
+    `up_client_mean_max_bits` (`slot_mean_max`), `down_mean_ipv6_bits`, `bulk_control_p99_rise_ns`,
+    `one_shot_dropped_count`; helpers `room_log`, `only_from`, `room_seconds`, `room_lists`, `logs_of`,
+    `second_total`, and `built(..)` for the table. Four engine tests (`u6j_...`); eight plants, each failing one and
+    taken back. SERIES.md's four rows. 110 judge tests pass (17 + 4 + 64 + 25). 1,450 added, 105 deleted so far.
+
 ## Current step
-Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 4 (C-U6-11):** the
-coverage rule's spans per session, cut at the room log's `admit` events (figures-b.md B3; plan-b.md condition 5: a
-slot with no `admit` keeps today's single span; a run with no `session_end` keeps today's verdict). Every PM-0001-17
-fixture keeps its verdict. README section 1's warm-up sentence and SERIES.md's coverage clause are reworded. The two
-writer-side needs go on the board first (condition 8). Then blocks 5 to 9 as plan-b.md section 2 and the verdict's
-last paragraph order them; before block 8, one netcode-architect agent rules R2-INPUTS (condition 3).
+Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 6:**
+`rss_slope_bytes_per_10min`, `queue_growth_count`, `session_memory_growth_count` (figures-b.md A4, A5; windows by
+time). Then block 7 (`sync_unit_cost`, `sync_cost_ratio`), block 8 (the R2 formula and the egress figures; the
+netcode-architect agent's R2-INPUTS ruling is asked, its notes go to
+`.checkpoints/netcode-judge/netcode-architect-r2-inputs.md`), block 9 (`crash_close_max_ns`, `logging_cost_ratio`,
+the LoggingOff fix, the texts, `kill_p99_ratio` last). Planted defects run through a scratch script (one JSON list of
+[name, old, new] per block; each restores the file).
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
