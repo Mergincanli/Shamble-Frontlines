@@ -70,10 +70,13 @@ U6c's build (the probe, the load, the page host and the certificate; u6c-brief.m
 - F-TERM: npt-load has no signal handler (no tokio `signal` feature, no libc, unsafe forbidden), so TERM ends it by the
   default action with no footer; its log is written through a LineWriter, so it is cut at a line end (U8's helper keeps
   it as is, the judge reads it as cut short).
-- A2's command (this container, the runner, release): `cargo test --locked --release -p npt-bots --test load a2_ --
-  --ignored --nocapture --exact` after `cargo build --locked --release -p npt-server` (the test runs the npt-server
-  binary beside npt-load's): 48 WebSocket clients at P2, the split's mark 10 s after OPEN, NPT_A2_SECS (default 60);
-  prints the room's ws_split (pooled E both ways, ws_split_mark_room_ns: F-3), its max rss_bytes (the cap's memory at
+- A2's commands (this container, the runner, release; FP-5: each by its full name, the earlier `a2_ … --exact` form
+  selected no test), each after `cargo build --locked --release -p npt-server` (the test runs the npt-server binary
+  beside npt-load's):
+  `cargo test --locked --release -p npt-bots --test load a2_48_websocket_clients_at_p2_against_one_room -- --ignored --nocapture --exact`
+  `cargo test --locked --release -p npt-bots --test load a2_48_webtransport_clients_at_p2_against_one_room -- --ignored --nocapture --exact`
+  48 clients at P2 on the transport, the split's mark 10 s after OPEN, NPT_A2_SECS (default 60); prints the room's
+  ws_split (WebSocket only: pooled E both ways, ws_split_mark_room_ns: F-3), its max rss_bytes (the cap's memory at
   N = 48) and LG's inputs a client a second. Not run by me.
 - F-FMT-1: rustfmt's diff over Blocks 1 and 3 is +318/-57 (42 hunks, .gate/u6c/b3-fmt.log); applied by Edit at the end,
   counted in the size now.
@@ -207,3 +210,87 @@ U6c's build (the probe, the load, the page host and the certificate; u6c-brief.m
   Tracked diff hash 80fb60a7… as in end-check.log (no tracked file changed since); the untracked hash differs by
   issue_tests.rs's fix and these notes.
 - Size, final: 5,431 added, 199 removed (Block 6 now 792 with the fix).
+
+## Fix pass (advisor-u6c-r1.md, REVISE; FP-1 to FP-6 in order)
+- Start: ruling sha256 ad72c0b8…faed179 equal; snapshot wip/u6c-build.patch a4e63455…385d2f equal, and
+  `git apply -R --check` of it on this tree is clean (24 files, the same `git status`): the tree is the snapshot.
+- FP-1 DONE (.gate/u6c/fp1-test.log, 13:10 UTC: npt-net u6c_ 11 passed, npt-server u6c_ 6 passed). `leg_series(fates,
+  echoes, zero_ns, start_ns, packets, interval_ns, bursts)`: the peer found first (the first Delivered up fate whose
+  record is not OTHER), then per direction the candidates (t_in >= start, up the peer's) sorted by t_in (stable: ties in
+  log order), kept until `packets` lie outside the bursts plus every fate at the last kept t_in; the rows from the
+  start's second to the last record's; the main loop unchanged in log order over the kept fates (RTT join as before).
+  New summary fields `probe_up_window_ns`, `probe_down_window_ns` (last kept t_in − start + interval, 0 with none);
+  `probe_window_ns` (the nominal window, total × interval) now written by `run_leg`. `run_leg` passes `zero + warm`,
+  `s.packets`, `interval`; the Measured phase runs to the last record's second (else records past the nominal end would
+  sit in an After second, which the judge's measured window skips). SERIES.md: the section's text, `probe_window_ns`'s
+  and the window counts' meaning, one new row for the two spans. Test `u6c_fp1_each_direction_keeps_exactly_packets_
+  records_whatever_the_clocks` (N 120,000 so 5 ppm reaches 60 µs); the C-U6-5 and leg_series tests take the new call
+  (packets 1,002 and 4: the same fates kept); the e2e bound `>= s.packets`.
+- FP-2 built: `edge_events(_bound: &ImpairSocket, port, ph)`, both calls pass `&sock` (server probe.rs), the doc
+  says why; probe_tests.rs's doc no longer calls the e2e test "P8's test". P8c runs at the end.
+- FP-3 built: the e2e test asserts P1's `l2_down_delivered_count` <= its `probe_down_sent_count`. P2's shipped-code
+  plant runs at the end.
+- FP-4 built: (b) tests/load.rs `probe_peer_sent_count >= 5_000`; (c) the echo test reads until 9's echo or 1 s,
+  asserts [9] or [8, 9], then ten reads with no echo. P19 runs at the end.
+- FP-5 built: `a2_48_webtransport_clients_at_p2_against_one_room` beside the WebSocket one, both calling `a2(transport)`
+  (the room's `transport` and LG's from it; the split's mark kept, so WebTransport's run has no `ws_split`: printed
+  None); the doc and these notes give both commands by full name. Proof (.gate/u6c/fp5-list.log, 13:15 UTC): each
+  `--list` call prints "<name>: test" and "1 test, 0 benchmarks".
+- FP-2 to FP-5 run (.gate/u6c/fp2-5-test.log, 13:12-13:15 UTC): npt-net u6c_ 11 passed; `cargo test -p npt-server`
+  all binaries pass (lib 32, binary.rs 5 in 84 s, the rest); `cargo test -p npt-bots` lib 30 passed, tests/load.rs 3
+  passed and 2 ignored (the two A2s), 0 failed.
+- SIZE after FP-5 (13:16 UTC): 5,559 added (tracked +457, new files 5,102), +128 on 5,431; under 5,850.
+- FP-6 built (not yet run):
+  - SEC-U6C-1: serve.rs's accept error sleeps 100 ms (tokio's timer) before the next accept.
+  - SEC-U6C-3: serve.rs's NN takes `n.bytes().all(|b| b.is_ascii_digit())`; `/npt/cert-hash-+5.json` in the 404 list,
+    with a `room-+5.json` written first so the entry bites; load.rs's `room` check takes the same (load_tests.rs case
+    "room sign").
+  - SEC-U6C-4: `Intake::take` pins only when `ProbeDatagram::decode(b, None)` is Some; the e2e test's stranger now sends
+    probe datagrams, so P18 (the source check dropped) still has a stranger to pin.
+  - NC-U6C-3: `probe_down_unindexed_count` in `leg_series`' summary, its SERIES.md row.
+  - NC-U6C-5: the "no READY" line carries `handshake_failed_count=<n>` (HostState::failed()). NOT built: "in LG's
+    footer": npt-log's Footer holds only `records` and `ended` (log/src/lib.rs:344-348), so a count there is a schema
+    change; a question for the coordinator (Q-FP6-1 below).
+  - NC-U6C-6: `w.finish(Ended::Stopped)` before the probe peer's and a client's connect-error returns (load.rs).
+  - NC-U6C-8: SERIES.md rows for `probe_peer`'s six counts and `header.params.room`, `header.params.mode`; tests/load.rs'
+    probe test checks every `probe_peer` field and header param of LG's log against SERIES.md.
+  - F-NO-PEER: `u6c_a_leg_with_no_peer_ends_non_zero_and_writes_no_log` (server probe_tests.rs).
+  - F-NAMES: the steal check needs seconds; hosts_four checks every whole measured second (from the second one; the
+    WebSocket run's last, the close's part second, left out) and the last second's index (WT: duration − 1; WS: before
+    the duration).
+  - F-5S: `hosts_four("wt", 4)`. F-JOIN-4 and F-STALE-BIN: doc wording (hosts_four's doc and the accept assert; room()).
+- Q-FP6-1 (design, to the coordinator): NC-U6C-5's "in LG's footer". Options: (a) an event before every footer of
+  LG's log (a new name and SERIES.md row, e.g. `load_end` with `handshake_failed_count`); (b) the failing line only, as
+  built. Lean (a) if the count must reach the log; else (b) stands.
+- FP-6 run (.gate/u6c/fp6-test.log, 13:18-13:21 UTC): npt-net u6c_ 11 passed; npt-server lib 33 (+1, F-NO-PEER),
+  binary.rs 5, all others pass; npt-bots lib 30, tests/load.rs 3 passed (4.17 s) and 2 ignored; npt-host 23 + 1; 0
+  failed. rustfmt's diff (same log, 7 hunks) applied by Edit; .gate/u6c/fp6-fmt-clippy.log (13:22-13:23 UTC): `cargo
+  fmt --check` exit 0, `check.mjs --only clippy,doc` both PASS.
+- SIZE after FP-6 and rustfmt (13:24 UTC): 5,693 added (tracked +460, new files 5,233), +262 on 5,431 (FP-1 to FP-5
+  +128, FP-6 and rustfmt +134); under 5,850, so no rider carried.
+- PLANTS of the fix pass (pre-plant sha256: server probe.rs 2cf464a6…9f9c3, net probe.rs c3446e7c…12d45; each
+  restore checked equal, and both at the end, 13:27 UTC):
+  - P22 (FP-1; the clock span back: break at t_in >= start + packets × interval): FAILS
+    `u6c_fp1_each_direction_keeps_exactly_packets_records_whatever_the_clocks` (probe_tests.rs:331, (119,999, 119,999)
+    not (120,000, 120,000); plant-p22.log). Restored, equal.
+  - P19 (copy, not take): FAILS `u6c_probe_peer_echoes_the_newest_down_once_with_its_hold` on the new form (:506, "no
+    new down: no echo", Some(7); plant-p19b.log). Restored, equal.
+  - P8: P8 cannot fail a test (plant-p8.log: 1 passed); after FP-2 the compiler holds it (plant-p8c.log, E0382: "value
+    borrowed here after move", probe.rs:571). Restored, equal.
+  - P18 (the source check dropped; SEC-U6C-4's decode kept): FAILS `u6c_one_probe_on_loopback…` (:274 `ran.expect`,
+    "leg P0: no round trip in its window's first 10 s": the stranger's probe datagram pinned; plant-p18b.log).
+    Restored, equal.
+  - P2 in shipped code (one socket bound at the first leg, kept for every later leg in a static, `set_default` per leg,
+    in place of the per-leg bind): FAILS `u6c_one_probe_on_loopback…`, but at :358, `base_rtt_ns` 0 not 525,313 (the
+    kept socket's header is P0's), before FP-3's new assert is reached (plant-p2b.log). F-P2-HEADER: the e2e test
+    already caught a carried socket by its header; FP-3's assert is a second guard, which this plant did not reach.
+    Restored, equal. The test-body P2 (plant-p2.log) stands as the unit half.
+- FIX-PASS CHECK DONE (.gate/u6c/fix-check.log, 13:27:21-13:50:32 UTC, runner -x, free 7,735 MiB at start, 2.7 G
+  after, so the next runner call would stop at the floor): all 11 steps PASS: fmt, clippy 25.8 s, clippy-wasm32, doc
+  44.7 s, **test 1,176.3 s** (1.08 times base's 1,086.7 s; measured **861 = 807 + 54**, bites **958 = 904 + 54**: the
+  pass's +2 are FP-1's test and F-NO-PEER; the two A2s ignored), deps, wasm 125.3 s (27,000 ticks, 0 mismatching, both
+  bites caught), refs, marks (81), self (78/78), redact (371 items, 0 findings). Tree diff hash 0e3199ae…, untracked
+  22bda910… (the plants restored before it; hashes checked at 13:27).
+- Open after the pass: Q-FP6-1 (NC-U6C-5's footer half, above); F-P2-HEADER (P2 in shipped code fails at the header's
+  base check, not at FP-3's assert); the container readings (F-READINGS) are the main session's; the disk at 2.7 G.
+- Resume from: nothing left in the fix pass; the return.
