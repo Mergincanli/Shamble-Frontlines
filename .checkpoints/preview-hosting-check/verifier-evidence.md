@@ -237,4 +237,11 @@ by :1404: PM-0006-2 not met as written; PM-0006-9 and PM-0006-5 open; PM-0006-8 
 - Not verified: the "secret: present" log lines (logs not in .gate); his screenshots and words (transcribed by the
   session, images kept out); run metadata (schedule events, run lists, approval times) from the GitHub tool; sitting
   2's ten headers files and SIZES lines; whether he quit Brave before step 5.
+- PM-0006-5 re-judged (coordinator's new evidence, results-log :1034-1046): `grep -rh 'SIZES {'` in all 13 folders under
+  .gate/preview-hosting-check/sizes/ (sitting 2's ten, bite-production 44366750977, restore-production 44367096948,
+  revoked 45499119373): each line largest content.ef463692.bin 65536, limit 26214400, flagged [], count 9, from the
+  build job's log file. Tombstone logs 44370914405/44374107847: the printf text re-run here gives 96 bytes; "Uploaded 1
+  files" / "Uploaded 0 files (1 already uploaded)". Verdict now: met with a recorded departure (MACHINES (a): the size
+  script ran on GitHub's Linux runner, not ML). Note: the tombstones' size comes from the workflow's own text, not
+  from the size script (they are not builds); 96 bytes, far below the limit. F-5 closed.
 DONE
