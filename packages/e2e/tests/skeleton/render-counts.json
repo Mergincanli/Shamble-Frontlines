@@ -1,0 +1,5 @@
+{
+  "note": "The empty scene's render counts per backend (ADR 0003's committed baseline). A backend with null has no baseline yet: the container's Chromium has no WebGPU adapter, so its counts come from a Brave report.",
+  "WebGL 2 fallback": { "drawCalls": 3, "triangles": 3, "lines": 62, "geometries": 3, "textures": 3, "programs": 6 },
+  "WebGPU": null
+}

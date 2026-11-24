@@ -11,6 +11,9 @@ publish = false
 # Shared dependency versions, set once here; each enters with the first crate that needs it (ADR 0002 part 3).
 [workspace.dependencies]
 ts-rs = { version = "=12.0.1", default-features = false }
+# The bindings the Worker loads (ADR 0002 parts 2 and 5), in sim-wasm only. The command-line tool that writes the glue
+# must be exactly this version (PM-0002-18); each bump is its own change-set.
+wasm-bindgen = "=0.2.130"
 
 # Every crate opts in with `[lints] workspace = true` (ADR 0002 parts 4 and 7).
 [workspace.lints.rust]
@@ -28,3 +31,24 @@ overflow-checks = true
 
 [profile.release.package."*"]
 overflow-checks = false
+
+# Third-party crates compiled into our libraries and tests check overflow too, each by name (register row
+# OVERFLOW-ALL: "a named override for each such crate (it beats "*")"). Proc-macro crates and build scripts run on the
+# build machine only and stay at "*". A new third-party crate joins this list in the change that adds it.
+[profile.release.package.cfg-if]
+overflow-checks = true
+
+[profile.release.package.thiserror]
+overflow-checks = true
+
+[profile.release.package.ts-rs]
+overflow-checks = true
+
+[profile.release.package.unicode-ident]
+overflow-checks = true
+
+[profile.release.package.wasm-bindgen]
+overflow-checks = true
+
+[profile.release.package.wasm-bindgen-shared]
+overflow-checks = true

@@ -5,6 +5,7 @@ rebuild. Status tags as in LOOP_V2.md: `[DECIDED]` Mustafa decided it · `[DEFAU
 `[OPEN]` needs a decision · `[LATER]` not now.
 Updated on 2026-11-06 with Mustafa's words: his community-servers note of 2026-11-03 (§5) and his design walk of
 2026-11-04 (pillar 5, and the pointers in §5 and §7); on 2026-11-07, his private-match XP item of 2026-11-06 (§5).
+On 2026-11-19, his answer BROWSER-SET, as a dated note (§4).
 
 ## 1. North star
 **Matches that turn into stories players retell:** a last-second steal, a saved-up rush that flips the game, a combo
@@ -53,6 +54,9 @@ What players should say after a match, in Mustafa's words:
 
 ## 4. Platforms and performance
 - `[DECIDED]` Desktop browsers first: Chrome, Edge, Firefox and Safari. Mobile comes later but is not designed out.
+  - _Dated note, 2026-11-19 (Mustafa's answer BROWSER-SET (a), order only; his words in `docs/DECISIONS.md`, the
+    entry of 2026-11-19, 14:28:25 UTC): "Safari stays a target of v2. Chrome, the Chromium-based browsers and Firefox
+    come first; Safari and Mac come later." The line above stands as decided._
 - `[DECIDED]` **Minimum:** a laptop with integrated graphics runs the largest mode at 30+ fps on Low.
 - `[DECIDED]` **Recommended:** a mid-range graphics card runs it at 60 fps on High.
 - `[DEFAULT]` Matches feel fair up to about 100 ms of ping. Servers start in one EU region.
