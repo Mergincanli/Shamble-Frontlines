@@ -50,5 +50,14 @@ Edit only docs/ (not DECISIONS, adr/, research/, VISION/LOOP/LOOK/EDITOR_V2, the
 - Drift: START_HERE, MODULE_MAP, TECHNICAL, ART_DIRECTION, ANIMATION_PLAN hold no v2 claim (grep); nothing false.
   REPO_MAP :18 "devtools ... still an empty stub with one test" is false now.
 - cs2 report names 9a09c88 as the notes' last commit: #61's block pointer is fine.
+- DONE in STATUS_ARCHIVE (2026-11-24 ~16:50 UTC): :161 header corrected (F-MOVE); #64 merged row at the top of "In
+  flight" (with #63/#62 closed by GitHub, the STATUS-row and 40 % corrections, his go's accepted list summarized, not
+  copied); #61 block: RR-F5, SA-TREE, __pycache__ (CI group), EA-F8, EA-F10 (TS), EA-F13 (but one-writer), EA-N3,
+  EA-N6, VF-L7, VF-L4, TE-NT3-5, TE-L, SA-ENV, FAVICON, FPS-LINE, NEG-ZERO marked done in 3a + a dated group line;
+  #64 block: header (merged, 5911b56, corrected line), TE-104, TE-MONO, F-CHANNEL done; GH-TOOLS answered for 3a.
+- DONE in STATUS_ARCHIVE too: the "From change-set 3a" block (23 ids, each with its source; the table of build options
+  recorded inside 3A-NAME-SECTION: build plan :330, plan s8); Health rows (main 1ec6f6c; change-set 3a; #64 merged);
+  Open bugs and risks: change-set 3a's three risks. NOTE: the archive's "3a, ranked" is the LEGACY 3a (PR #15).
+- VF-L4, FPS-LINE, NEG-ZERO verified in code at 8619d539 (serve.test.mjs:73-78; frame-times mean; report.ts zero).
 - REPO_MAP: map check fails on a listed entry missing on disk; not in CI. Build outputs go in rows the checker does
   not take as entries (first cell not starting with a backtick), so a clean clone still passes.

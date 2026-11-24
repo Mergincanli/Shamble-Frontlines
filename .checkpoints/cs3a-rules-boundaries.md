@@ -500,7 +500,8 @@ its explanation in the same sentence.
     `::` wherever it stands, names holding `_relaxed_`, two more bites; `cfg!(target_arch)` branches stay out of
     scope, said in the doc. **Taken in the round-2 pass.**
   - Lows: the test title and `wasm.rs`'s doc still say "exact" for WebAssembly (taken); the FMA line is printed by
-    a passing test, which cargo hides (taken: a test named for the fact); CI runs neither generator's `--check`
+    a passing test, which cargo hides (left as a follow-up: a test that asserts the instruction would fail on a
+    processor with FMA4 only, where the result is exact; only the line's wording changed); CI runs neither generator's `--check`
     (a follow-up for E1's CI pull request: a CI file); `from_f64` has no exact tie and no case between the largest
     f32 and the overflow point (a STATUS follow-up); the fixture's comment says `-p tools` (taken).
   - Not verified by it: a processor without FMA; Firefox, WebKit, Safari; the toolchain's `fmaf` source; the
