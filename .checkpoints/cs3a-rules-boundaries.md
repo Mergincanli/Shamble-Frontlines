@@ -396,6 +396,12 @@ title and text. His answer to MUL-ADD is (a) (15:58:25 UTC): what was built stay
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **Round 2, perf-auditor (on 79666ad9; `perf-auditor-review2.md`; read 16:05 UTC): OK, no finding in its field.**
+  Both its Lows are fixed: the block check allocates 280.0 bytes per block again in its harness (296.0 before the
+  fix, main's 280.0), 0 once optimised; the comment is true. No regression per block, per frame or per wake; the
+  players' Wasm went from 31,805 to 31,718 bytes for the reasons it lists (a dropped panic function and its name).
+  One Low outside its field: `panic.rs`'s comment says the host cannot call `start`; the raw Wasm exports still
+  hold it (harmless: it installs the same hook again). **Wording taken in the round-2 pass.**
 - **Round 2, rust-reviewer (on 79666ad9; `rust-reviewer-review2.md`; read 16:00 UTC): REVISE, 0 Critical, 0 High, 1
   new Medium (made by the fix pass), 10 Low.** Its four round-1 Mediums are fixed, each checked by itself. It
   measured `mul_add` on 22,048 cases of its own: natively (FMA) all exact; in wasm32 every result below the smallest

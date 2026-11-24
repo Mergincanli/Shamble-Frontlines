@@ -57,3 +57,27 @@ wasm-sections.mjs) on a copy build; explain the -87. Worktree read-only; scratch
   19.4/19.4; under receive 181.9/180.1 -> 168.1/169.9 (-12.0 mean). isWorkerStats 7.4 B/block both (= 60 B a report,
   5 x 12: L-2's "a few bytes each" holds). Round 1's runner shift +19.3 B/block = 12 + 7.4 here: after the fix the
   expected spec reading is main + ~7.4 (~513); the one reading, 528, is ~1 SD over: noise.
+- 16:03 Worker per wake (round 1's host-bench-root.mjs, real SimHost + each head's own Wasm copied into r2-base/r2-fix
+  pkg): bytes (heap delta, 512 MB semi-space, 3 windows x 200k wakes, 3 processes each): 5c92311 421.56 x2 / 410.81
+  x1, 79666ad9 410.81 x2 / 421.56 x1 = round 1's two JIT modes, 0 B/wake from the fix pass. Time (5 reps x 300k, 3
+  processes): medians 197.4 / 187.5 / 169.1 vs 186.0 / 191.8 / 185.8 ns: no difference beyond +-15 ns process spread.
+  --trace-opt --trace-deopt over 300k wakes: the same 46 events each side, 0 deopts, 0 bailouts.
+- host.ts:137-141 catch -> trapMessage (panic-message.ts:30-34): runs once per match at most (#failed is set, every later
+  #call returns at its first line); try body unchanged. worker.ts:57-59 fallback object: only when start() fails, once.
+  Cold; allocation there (DataView, 2-item array, TextDecoder, the sentence) does not reach a tick or a frame.
+- rng.rs at 79666ad9 on the copy: `cargo test -p sim --lib rng` 6 of 6 pass (the published TC1..TC8 keystream among
+  them). Non-test code without comments, 5c92311 vs 79666ad9: the one const assert, nothing else.
+- L-2: messages.ts:84-88 now says the report check "builds no list of its own; reading a report's fractional numbers
+  still costs a few bytes each", "four times a second, in development builds". Checked: requestReport only behind
+  __SHAMBLE_DEVTOOLS__ (boot.ts:80, 115), READOUT_EVERY_MS 250 (boot.ts:18); 60 B a report in Chromium. FIXED.
+- Side note (not perf, Low at most, for rust-reviewer / engine-architect): panic.rs:73-74 "It is no export of the glue
+  (`private`): the host cannot call it". The glue's named export is gone, but the Wasm still exports `start` and the
+  glue's typings keep `readonly start: () => void` in InitOutput (pkg/sim_wasm.d.ts:70); init() returns those raw
+  exports (glue line 191, worker.ts:21). A call would only re-set the same hook. Wording, not a cost.
+
+## Verdict (round 2, code 79666ad9; branch head 94b7318f has no code change since)
+VERDICT: OK. 0 Critical, 0 High, 0 Medium, 0 Low in perf (+1 Low wording side note outside perf). L-1 FIXED (per block
+in the spec's window: Node 296.0 -> 280.0 = main, Chromium 153 isWorkerToPage 24.0 -> 12.0; 0 B steady both).
+L-2 FIXED (doc true: 60 B a report in Chromium, dev builds only). Wasm -87 B raw / -41 Brotli, explained section by
+section; Worker chunk +20 B raw once per load; per wake 0 B, same JIT events. Not measured: the spec on the runner more
+than once per head; Chrome 157 (153 here); Brave/real GPU; the real postMessage/MessageEvent; the trap path's time.
