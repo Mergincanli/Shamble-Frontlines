@@ -84,6 +84,20 @@ impl Ratio {
         Ok(Ratio::new(if neg { -num } else { num }, den))
     }
 
+    /// `self + o`, or `None` where the exact sum does not fit i128 (the `+` operator stops the judge there): for a
+    /// figure that adds fractions of unrelated denominators.
+    pub fn checked_add(self, o: Ratio) -> Option<Ratio> {
+        let left = self.num.checked_mul(o.den)?;
+        let num = left.checked_add(o.num.checked_mul(self.den)?)?;
+        Some(Ratio::new(num, self.den.checked_mul(o.den)?))
+    }
+
+    /// `self * o`, or `None` where the exact product does not fit i128.
+    pub fn checked_mul(self, o: Ratio) -> Option<Ratio> {
+        let num = self.num.checked_mul(o.num)?;
+        Some(Ratio::new(num, self.den.checked_mul(o.den)?))
+    }
+
     /// Divides by a positive integer.
     pub fn div_int(self, n: i128) -> Ratio {
         Ratio::new(self.num, checked(self.den.checked_mul(n)))
@@ -239,6 +253,17 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn the_checked_sum_and_product_say_when_they_do_not_fit() {
+        let (third, sixth) = (Ratio::new(1, 3), Ratio::new(1, 6));
+        assert_eq!(third.checked_add(sixth), Some(Ratio::new(1, 2)));
+        assert_eq!(third.checked_mul(sixth), Some(Ratio::new(1, 18)));
+        let big = Ratio::new(1, 10_i128.pow(20) + 1);
+        assert_eq!(big.checked_mul(big), None);
+        assert_eq!(big.checked_add(Ratio::new(1, 10_i128.pow(20) + 3)), None);
+        assert_eq!(Ratio::int(i128::MAX).checked_add(Ratio::int(1)), None);
     }
 
     #[test]

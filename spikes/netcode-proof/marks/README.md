@@ -80,12 +80,13 @@ header; tick, second and event records follow in time order. Every record has a 
     first snapshot resolved, in the warm-up, or it is a join (-19's; C-U6-11): the rule runs per session of a slot,
     from each `admit` record the room's log holds for it (field `slot`; the record's tick `t`, the room's tick at
     admission) to the slot's next. A session's first snapshot is resolved at or before the room's first measured hash
-    of it. A session that leaves before the slot's next `admit` may leave the room's last hashes unresolved, in
-    flight when it left, only up to its recorded `session_end` (field `slot`, tick `t`: the room's last tick of the
-    session; the lab's log on L1, the room's on L2), never past it and never without one. The slot's last session
-    leaves no such tail, a slot with no `admit` record is one session, and the room logs no measured hash for a slot
-    before its first `admit`. After the measured phase the clients keep logging until every measured tick is
-    resolved, and a tick still in flight at the stop is not written;
+    of it. A session that left (the slot's last one too: a client that leaves for good) may leave the room's last
+    hashes unresolved, in flight when it left, only up to its recorded `session_end` (field `slot`, tick `t`: the
+    room's last tick of the session; the first one recorded in the session; the lab's log on L1, the room's on L2),
+    never past it. With no `session_end` (still connected at the stop, or a silent stop) the session's span reaches
+    the room's last measured hash. A slot with no `admit` record is one session with no tail, and the room logs no
+    measured hash for a slot before its first `admit`. After the measured phase the clients keep logging until every
+    measured tick is resolved, and a tick still in flight at the stop is not written;
   - `replay_hash` (only in a `replay` log on x86_64, the x86-64 re-decode of an L2 client's logged bytes, R-8): the
     same as `decoded_hash`, decoded again natively, for the Arm rule.
 - **Events the judge reads for validity** (§4): `admit` (`session`, `in_roster`), `control` (`source`: `socket` or

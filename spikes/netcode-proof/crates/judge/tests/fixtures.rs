@@ -829,3 +829,16 @@ fn pm_0001_30_a_measured_twin_must_be_the_other_transport_and_name_the_run_back(
         );
     }
 }
+
+/// `sync_cost_ratio` finds -10's two reference parts by their names and takes each one's `min` runs (the
+/// test-engineer's L5): the real file keeps both, at 3 runs.
+#[test]
+fn pm_0001_10_keeps_the_two_reference_parts_its_figure_names() {
+    let marks = parse_marks(&marks_text()).expect("marks.json compiles");
+    let mark = marks.marks.iter().find(|m| m.id == "PM-0001-10");
+    let parts = &mark.expect("PM-0001-10 is in marks.json").parts;
+    for name in ["N=24", "N=36"] {
+        let kept = |p: &&npt_judge::marks::Part| p.name == name && p.moved.is_none() && p.min == 3;
+        assert!(parts.iter().any(|p| kept(&p)), "{name}");
+    }
+}

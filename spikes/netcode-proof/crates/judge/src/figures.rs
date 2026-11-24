@@ -213,8 +213,9 @@ fn state_hashes(run: &Run<'_>) -> Result<BTreeMap<u64, u64>, Lack> {
 
 /// PM-0001-21 and -30 ("identical server state hashes on every tick"): the tick numbers whose state hash (`h`) differs
 /// between the run and the run it names in `params.twin`, a tick hashed in one only counting; every phase. The twin
-/// (`twin_of`) has the same profile, seed and bite, and role `twin`, else a gap, as for `fate_log_twin_equal` (the
-/// advisor's FX-4; -30's form comes with U6). It fails, never passes, when neither run hashed a tick.
+/// (`twin_of`) has the same profile, seed and bite, and role `twin` (the advisor's FX-4), or it is -30's
+/// other-transport twin (`other_transport_twin`); any other twin is a gap. It fails, never passes, when neither
+/// run hashed a tick.
 fn twin_hash_mismatch_count(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack> {
     let own = state_hashes(run)?;
     let twin = twin_of(run, set, &["profile", "seed", "bite"])?;
@@ -574,39 +575,41 @@ fn session_ticks(run: &Run<'_>, ev: &str, writers: &[&str]) -> BTreeMap<usize, B
     out
 }
 
-/// One session of a slot under the coverage rule: its ticks `from..to` (from its `admit` to the slot's next; the last
-/// to the end), and the first and last tick in them the client side resolves. A slot with no `admit` record has one
-/// session over every tick, `cut` false: the rule as it was before C-U6-11.
+/// One session of a slot under the coverage rule: its ticks `from..=last` (from its `admit` to the tick before the
+/// slot's next; the last session to the end), and the first and last tick in them the client side resolves. A slot
+/// with no `admit` record has one session over every tick, `cut` false: the rule as it was before C-U6-11.
 struct Session {
     from: u64,
-    to: u64,
+    last: u64,
     span: Option<(u64, u64)>,
     cut: bool,
 }
 
 fn sessions(admits: Option<&BTreeSet<u64>>, resolved: Option<&BTreeSet<u64>>) -> Vec<Session> {
     let starts: Vec<u64> = admits.map_or_else(|| vec![0], |a| a.iter().copied().collect());
-    let ends = starts.iter().skip(1).copied().chain([u64::MAX]);
-    let session = |(from, to): (&u64, u64)| {
-        let mut ticks = resolved.into_iter().flat_map(|r| r.range(*from..to));
+    // The starts are distinct and rising, so each next one is above 0.
+    let lasts = starts.iter().skip(1).map(|next| next - 1).chain([u64::MAX]);
+    let session = |(from, last): (&u64, u64)| {
+        let mut ticks = resolved.into_iter().flat_map(|r| r.range(*from..=last));
         let first = ticks.next().copied();
         Session {
             from: *from,
-            to,
+            last,
             span: first.map(|f| (f, ticks.next_back().copied().unwrap_or(f))),
             cut: admits.is_some(),
         }
     };
-    starts.iter().zip(ends).map(session).collect()
+    starts.iter().zip(lasts).map(session).collect()
 }
 
 /// README §1's `null` rule on one run (the advisor's FX-10 (b) to (d); per session since C-U6-11): the first
 /// (slot, tick) the client side leaves unresolved, or resolves twice. `incomplete` holds the (slot, tick) pairs a
 /// client log marks `snap_incomplete` 1. A slot's sessions are cut at its `admit` records' ticks; in each, (c) every
 /// tick from its first resolved tick to its last at which the room logged the slot's hash is resolved, and (d) that
-/// span covers the room's measured hashes of the session. One tail is allowed: a session before the slot's last may
-/// leave the room's hashes after its last resolved tick unresolved (in flight when it left), up to its recorded
-/// `session_end` and never past it. A slot with `admit` records has no measured room hash before the first.
+/// span covers the room's measured hashes of the session. One tail is allowed: a session that left may leave the
+/// room's hashes after its last resolved tick unresolved (in flight when it left), up to its recorded `session_end`
+/// and never past it; with no `session_end` (a session still connected at the stop, or a silent one) the span
+/// reaches the room's last measured hash. A slot with `admit` records has no measured room hash before the first.
 fn coverage(
     run: &Run<'_>,
     server: &SlotHashes,
@@ -651,9 +654,11 @@ fn coverage(
     // (c): inside a session's span, every tick the room logged a hash for the slot is resolved.
     for (t, list) in server {
         for (slot, e) in list.iter().enumerate() {
-            let session = of
-                .get(&slot)
-                .and_then(|v| v.iter().find(|x| x.from <= *t && *t < x.to));
+            // A slot's sessions follow one another, so the last one that starts at or before the tick holds it.
+            let session = of.get(&slot).and_then(|v| {
+                let after = v.partition_point(|x| x.from <= *t);
+                after.checked_sub(1).map(|i| &v[i])
+            });
             let inside = session
                 .and_then(|x| x.span)
                 .is_some_and(|(a, b)| a <= *t && *t <= b);
@@ -684,8 +689,8 @@ fn coverage(
                 run.id, first.from
             ));
         }
-        for (i, x) in list.iter().enumerate() {
-            let mut of_session = ticks.range(x.from..x.to);
+        for x in list {
+            let mut of_session = ticks.range(x.from..=x.last);
             let Some(a) = of_session.next().copied() else {
                 continue;
             };
@@ -697,14 +702,15 @@ fn coverage(
                     who(x)
                 ));
             };
-            // The tail a session that left may leave: only before the slot's next admit, only up to its recorded end.
-            let last = i + 1 == list.len();
-            let end = ended.get(slot).and_then(|v| v.range(x.from..x.to).next());
-            let left = !last && end.is_some_and(|end| b <= *end);
+            // The tail a session that left may leave: only up to its recorded end. A slot with no admit record
+            // keeps the rule as it was: no tail.
+            let end = ended
+                .get(slot)
+                .and_then(|v| v.range(x.from..=x.last).next());
+            let left = x.cut && end.is_some_and(|end| b <= *end);
             if c > a || (e < b && !left) {
                 let tail = match end {
                     _ if !x.cut || e >= b => String::new(),
-                    _ if last => " (the slot's last session: no tail is allowed)".to_owned(),
                     None => " (no session_end records that it left)".to_owned(),
                     Some(end) => format!(" (its session_end is at tick {end})"),
                 };
@@ -967,7 +973,8 @@ fn only_from(run: &Run<'_>, process: &str, kind: &str, name: &str) -> Result<(),
         "second.s" => l.seconds.iter().any(|s| s.s.contains_key(name)),
         "tick.v" => l.ticks.iter().any(|t| t.v.contains_key(name)),
         "event" => l.events.iter().any(|e| e.ev == name),
-        _ => l.ticks.iter().any(|t| t.s.contains_key(name)),
+        "tick.s" => l.ticks.iter().any(|t| t.s.contains_key(name)),
+        other => unreachable!("only_from: no kind {other}"),
     };
     let other = run
         .logs
@@ -1137,6 +1144,7 @@ fn second_total(run: &Run<'_>, process: &str, name: &str) -> Result<i128, Lack> 
 
 /// PM-0001-38: the one-shot actions LG's clients sent minus those the room received, over the whole run.
 fn one_shot_dropped_count(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    room_log(i.run)?;
     let sent = second_total(i.run, "bots", "one_shots_sent_count")?;
     let received = second_total(i.run, "room", "one_shots_received_count")?;
     Ok(Ratio::int(sent - received))
@@ -1150,19 +1158,27 @@ fn rss_slope_bytes_per_10min(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
     let rss = room_seconds(i.run, "second.v", name, |s| s.v.get(name).copied())?;
     let first = rss.keys().next().copied().unwrap_or(0);
     // Seconds counted from the first one keep the sums small: 2 hours at 1 GB stays near 1e23, far inside i128.
-    let points = rss
-        .iter()
-        .map(|(sec, y)| (i128::from(sec - first), i128::from(*y)));
-    let (mut n, mut sx, mut sy, mut sxx, mut sxy) = (0, 0, 0, 0, 0);
-    for (x, y) in points {
-        (n, sx, sy, sxx, sxy) = (n + 1, sx + x, sy + y, sxx + x * x, sxy + x * y);
-    }
-    match n * sxx - sx * sx {
-        0 => Err(Lack::Gap(format!(
-            "run {}: one measured second of second.v.rss_bytes gives no slope",
-            i.run.id
-        ))),
-        den => Ok(Ratio::new(600 * (n * sxy - sx * sy), den)),
+    // Every step is checked all the same: a malformed log (a second numbered near the end of u64) gives a gap,
+    // never a wrapped slope.
+    let sums = || -> Option<(i128, i128)> {
+        let (mut n, mut sx, mut sy, mut sxx, mut sxy) = (0_i128, 0_i128, 0_i128, 0_i128, 0_i128);
+        for (sec, y) in &rss {
+            let (x, y) = (i128::from(sec - first), i128::from(*y));
+            n += 1;
+            sx = sx.checked_add(x)?;
+            sy = sy.checked_add(y)?;
+            sxx = sxx.checked_add(x.checked_mul(x)?)?;
+            sxy = sxy.checked_add(x.checked_mul(y)?)?;
+        }
+        let den = n.checked_mul(sxx)?.checked_sub(sx.checked_mul(sx)?)?;
+        let num = n.checked_mul(sxy)?.checked_sub(sx.checked_mul(sy)?)?;
+        Some((num.checked_mul(600)?, den))
+    };
+    let gap = |why: &str| Err(Lack::Gap(format!("run {}: {why}", i.run.id)));
+    match sums() {
+        None => gap("second.v.rss_bytes: its seconds or values are too large for an exact slope"),
+        Some((_, 0)) => gap("one measured second of second.v.rss_bytes gives no slope"),
+        Some((num, den)) => Ok(Ratio::new(num, den)),
     }
 }
 
@@ -1217,7 +1233,7 @@ fn session_memory_growth_count(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
     let need = "two halves need 2 measured seconds";
     growth_count(i.run, &series, need, |first, last| {
         let mid = first + (last - first) / 2;
-        (last > first).then_some((mid, mid + 1))
+        (last > first).then(|| (mid, mid + 1))
     })
 }
 
@@ -1263,7 +1279,8 @@ fn sync_unit(run: &Run<'_>) -> Result<Ratio, Lack> {
 
 /// PM-0001-10: this run's unit cost against the mean unit cost of the valid runs at N = 24 and, separately, at
 /// N = 36 (the mark's parts of those names); the larger of the two ratios. NOT-RUN while either part has fewer
-/// valid runs than its `min`; a gap if a reference's mean is 0.
+/// valid runs than its `min`. Gaps: a part with more valid runs than its `min` (the row's mean is over "the 3
+/// runs"), a reference mean of 0, an exact mean that does not fit i128.
 fn sync_cost_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
     let own = sync_unit(i.run)?;
     let mut worst: Option<Ratio> = None;
@@ -1279,18 +1296,31 @@ fn sync_cost_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
                 runs.len()
             )));
         }
-        let mut sum = Ratio::int(0);
-        for r in runs {
-            sum = sum + sync_unit(r)?;
-        }
-        if sum.num() == 0 {
-            return Err(Lack::Gap(format!(
-                "run {}: the mean unit cost of part {part} is 0",
-                i.run.id
+        let gap = |why: String| Lack::Gap(format!("run {}: part {part} {why}", i.run.id));
+        // The row's mean is over the part's `min` runs (-10's "the 3 runs"): of more, which ones would it take?
+        if runs.len() > min.max(1) {
+            return Err(gap(format!(
+                "has {} valid runs; the row's mean is over its {min}: judge a folder that holds one session's runs",
+                runs.len()
             )));
         }
-        // own / (sum / n): every product checked, and the two ratios compared exactly at any size.
-        let ratio = own * Ratio::new(sum.den(), sum.num()) * Ratio::int(runs.len() as i128);
+        // The exact mean of fractions of unrelated denominators grows with each run: where it does not fit, a
+        // gap, never a stop of the whole judge.
+        let wide = || {
+            gap("has unit costs whose exact mean does not fit the judge's arithmetic".to_owned())
+        };
+        let mut sum = Ratio::int(0);
+        for r in runs {
+            sum = sum.checked_add(sync_unit(r)?).ok_or_else(wide)?;
+        }
+        if sum.num() == 0 {
+            return Err(gap("has a mean unit cost of 0".to_owned()));
+        }
+        // own / (sum / n); the two ratios are compared exactly at any size (`Ratio`'s order).
+        let per_mean = Ratio::new(sum.den(), sum.num());
+        let ratio = own.checked_mul(per_mean);
+        let ratio = ratio.and_then(|r| r.checked_mul(Ratio::int(runs.len() as i128)));
+        let ratio = ratio.ok_or_else(wide)?;
         worst = Some(worst.map_or(ratio, |w| w.max(ratio)));
     }
     Ok(worst.unwrap_or(own))
@@ -1408,7 +1438,7 @@ fn r2_egress_detail(i: &Inputs<'_, '_>) -> Option<String> {
                 Ratio::new(i128::from(end - start), 1_000_000_000)
             )
         }
-        _ => "not timed (no ns on both)".to_owned(),
+        _ => "not timed (the room log has no two reads with an ns each, in order)".to_owned(),
     };
     Some(format!(
         "({}) x {} clients x 3,600 s / 8; the interface counter's two reads are {span}",
@@ -1515,12 +1545,15 @@ fn crash_close_max_ns(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
             return gap(format!("two event.room_end records for slot {slot}"));
         }
     }
-    let open: Vec<u64> = (0..clients).filter(|s| !closes.contains_key(s)).collect();
-    match (open.first(), closes.values().max()) {
+    // Every recorded slot is one of the run's, once: the slots left open are the rest.
+    let open = clients - closes.len() as u64;
+    match (
+        (0..clients).find(|s| !closes.contains_key(s)),
+        closes.values().max(),
+    ) {
         (Some(slot), _) => Err(Lack::Fail(format!(
-            "run {}: slot {slot} has no event.room_end: {} of {clients} clients left open after the tick panic",
-            run.id,
-            open.len()
+            "run {}: slot {slot} has no event.room_end: {open} of {clients} clients left open after the tick panic",
+            run.id
         ))),
         (None, Some(last)) => Ok(Ratio::int(i128::from(*last) - i128::from(panic))),
         (None, None) => gap("a run of 0 clients has no close to time".to_owned()),

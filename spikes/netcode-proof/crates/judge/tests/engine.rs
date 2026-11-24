@@ -1703,11 +1703,23 @@ fn c_u6_11_coverage_runs_per_session_cut_at_the_admits() {
         !valid && why.contains("measured ticks 1 to 6 (its session_end is at tick 5)"),
         "{why}"
     );
-    // The slot's last session keeps the whole rule: its end recorded or not, its span reaches the room's last hash.
-    let last = [("admit", 1, "room"), ("session_end", 6, "lab")];
-    let (valid, why) = covered(&session_run(&FIRST, &FIRST[..4], &last));
+    // The slot's last session may leave for good the same way: its end recorded at tick 6, ticks 5 and 6 in flight.
+    let gone = [("admit", 1, "room"), ("session_end", 6, "lab")];
+    assert_eq!(
+        covered(&session_run(&FIRST, &FIRST[..4], &gone)),
+        (true, String::new())
+    );
+    // Still connected at the stop (no session_end): its span reaches the room's last measured hash, or it is a gap.
+    let (valid, why) = covered(&session_run(&FIRST, &FIRST[..4], &[("admit", 1, "room")]));
     assert!(
-        !valid && why.contains("(the slot's last session: no tail is allowed)"),
+        !valid && why.contains("measured ticks 1 to 6 (no session_end records that it left)"),
+        "{why}"
+    );
+    // And never past its end: the room logged its hash at tick 6, after the end at tick 5.
+    let past = [("admit", 1, "room"), ("session_end", 5, "lab")];
+    let (valid, why) = covered(&session_run(&FIRST, &FIRST[..4], &past));
+    assert!(
+        !valid && why.contains("measured ticks 1 to 6 (its session_end is at tick 5)"),
         "{why}"
     );
     // A session the client never resolved a tick of.
@@ -1718,6 +1730,59 @@ fn c_u6_11_coverage_runs_per_session_cut_at_the_admits() {
                 "slot 0, its session admitted at tick 1: the room logged its hash at measured ticks 1 to 6, and \
                  no client log resolves any tick of it"
             ),
+        "{why}"
+    );
+}
+
+/// C-U6-11's edges (the test-engineer's review, M2): whose `session_end` counts, which one, and whose `admit`.
+#[test]
+fn c_u6_11_each_session_has_its_own_end_and_only_the_room_side_admits() {
+    // Three sessions (admitted at 1, 5 and 9). The first stops silently after tick 2; the second's end at tick 8
+    // is not the first's.
+    let every: Vec<u64> = (1..=12).collect();
+    let ends = [
+        ("admit", 1, "room"),
+        ("admit", 5, "room"),
+        ("session_end", 8, "room"),
+        ("admit", 9, "room"),
+    ];
+    let (valid, why) = covered(&session_run(&every, &[1, 2, 5, 6, 9, 10, 11, 12], &ends));
+    assert!(
+        !valid
+            && why.contains(
+                "its session admitted at tick 1: the client side resolves ticks 1 to 2 only"
+            )
+            && why.contains("(no session_end records that it left)"),
+        "{why}"
+    );
+    // Two ends recorded in one session: the first is its end, so the room's hash at tick 6 is past it.
+    let room = [&FIRST[..], &SECOND[..]].concat();
+    let client = [&FIRST[..4], &SECOND[..]].concat();
+    let two = [
+        ("admit", 1, "room"),
+        ("session_end", 5, "room"),
+        ("session_end", 6, "lab"),
+        ("admit", 9, "room"),
+    ];
+    let (valid, why) = covered(&session_run(&room, &client, &two));
+    assert!(
+        !valid && why.contains("(its session_end is at tick 5)"),
+        "{why}"
+    );
+    // An admit only a client-side log records cuts nothing: with it, ticks 5 and 6 would be an allowed tail.
+    let claimed = [
+        ("admit", 1, "room"),
+        ("session_end", 6, "lab"),
+        ("admit", 7, "client"),
+    ];
+    let (valid, why) = covered(&session_run(
+        &every,
+        &[1, 2, 3, 4, 7, 8, 9, 10, 11, 12],
+        &claimed,
+    ));
+    assert!(
+        !valid
+            && why.contains("slot 0, tick 5: the room logged a hash and no client log resolves it"),
         "{why}"
     );
 }
@@ -1766,6 +1831,14 @@ fn c_u6_11_a_mid_run_join_and_the_slots_with_no_admit_record() {
             && why.contains("slot 0, tick 5: the room logged a hash and no client log resolves it"),
         "{why}"
     );
+    // And a slot with no admit record gets no tail, whatever end is recorded: the rule as it was.
+    let (valid, why) = covered(&session_run(
+        &FIRST,
+        &FIRST[..4],
+        &[("session_end", 6, "lab")],
+    ));
+    let old = "run h1: slot 0: the client side resolves ticks 1 to 4 only, not the room's measured ticks 1 to 6";
+    assert!(!valid && why.ends_with(old), "{why}");
     // An admit record with no tick cuts nothing: the two sessions read as one, and the ticks in flight are a gap.
     let both = [
         ("admit", 1, "room"),
@@ -3844,6 +3917,16 @@ fn u6j_one_shots_sent_less_those_received_over_the_whole_run() {
     logs[0].seconds.clear();
     let gap = "run f1: no second record in its room log (second.v.one_shots_received_count)";
     assert_eq!(dropped(&logs), ("Gap -".to_owned(), gap.to_owned()));
+    // Two room logs in one run: which room's count?
+    let mut logs = run(6_000);
+    logs.push(logs[0].clone());
+    assert_eq!(
+        dropped(&logs),
+        (
+            "Gap -".to_owned(),
+            "run f1: more than one room log".to_owned()
+        )
+    );
     let mut logs = run(6_000);
     logs[0].seconds[0].v.insert(SENT.into(), 1);
     let gap =
@@ -3896,6 +3979,12 @@ fn u6j_the_resident_memory_slope_per_10_minutes() {
     assert_eq!(high(&rss_run(3, |sec| [0, 0, 3][sec as usize])), "Pass 900");
     // 2 hours at 1 GB, 1 byte more each second: exact, and no overflow.
     assert_eq!(high(&rss_run(7_200, |sec| 1_000_000_000 + sec)), "Pass 600");
+    // A malformed log (a second numbered at the end of u64) gives a gap, never a wrapped slope.
+    let mut far = rss_run(3, |_| 1);
+    far[0].seconds[2].sec = u64::MAX;
+    let (line, note) = figure_check("rss_slope_bytes_per_10min", "<=", json!(1_000_000), &far);
+    let wide = "run f1: second.v.rss_bytes: its seconds or values are too large for an exact slope";
+    assert_eq!((line.as_str(), note.as_str()), ("Gap -", wide));
     let one = figure_check(
         "rss_slope_bytes_per_10min",
         "<=",
@@ -4127,7 +4216,7 @@ fn u6j_the_sync_unit_costs_gaps_and_its_large_sums() {
     // A reference whose work is all 0 gives nothing to divide by.
     let why =
         gap(&|l| (1..4).for_each(|k| *l[k].ticks[0].v.get_mut("server_only_ns").expect("set") = 0));
-    assert_eq!(why, "run a48: the mean unit cost of part N=24 is 0");
+    assert_eq!(why, "run a48: part N=24 has a mean unit cost of 0");
     // A gap in a reference run's own record is this run's gap too.
     let why = gap(&|l| drop(l[5].ticks[0].s.remove("relevant_count")));
     assert_eq!(
@@ -4146,8 +4235,159 @@ fn u6j_the_sync_unit_costs_gaps_and_its_large_sums() {
     for (n, ids) in [24, 36].into_iter().zip(ids) {
         logs.extend((0..3).map(|k| sync_log(ids[k], n, refs[k].0, refs[k].1 + i64::from(n))));
     }
-    let (line, note) = sync_out(&logs);
-    assert!(line.starts_with("Pass 0.5"), "{line} {note}");
+    // 11,088.6 ns per entity against a mean of 22,177.4 at N=24 and at N=36.
+    assert_eq!(sync_out(&logs), ("Pass 0.500001".to_owned(), String::new()));
+}
+
+/// Run `id` of part N=24 with totals as large as a 10-minute run's (18,000 ticks x 24 clients x 38 entities).
+fn ten_minute_24(id: &'static str, k: usize) -> Log {
+    let totals = [
+        (197_999_999_977, 16_416_007),
+        (198_000_000_019, 16_416_011),
+        (197_999_999_993, 16_416_013),
+        (198_000_000_007, 16_416_029),
+        (198_000_000_043, 16_416_031),
+        (197_999_999_929, 16_416_037),
+    ];
+    sync_log(id, 24, totals[k].0, totals[k].1)
+}
+
+/// The rust-reviewer's and the test-engineer's High (H1): the exact mean of the reference runs' unit costs is over
+/// the part's `min` runs, as -10's row has it ("the 3 runs"); a fourth valid run is a gap that says so, and sums
+/// that would not fit the judge's arithmetic are a gap too, never a stop of the whole judge.
+#[test]
+fn u6j_the_sync_reference_is_the_parts_min_runs_and_never_stops_the_judge() {
+    let ids = ["a24", "b24", "c24", "d24", "e24", "f24"];
+    let with = |n24: usize, mark: &Value| {
+        let mut logs = vec![sync_log("a48", 48, 1_781_999_999_989, 160_704_011)];
+        logs.extend((0..n24).map(|k| ten_minute_24(ids[k], k)));
+        let n36 = [
+            (197_999_999_959, 32_400_011),
+            (198_000_000_031, 32_400_017),
+            (198_000_000_049, 32_400_023),
+        ];
+        logs.extend(
+            ["a36", "b36", "c36"]
+                .into_iter()
+                .zip(n36)
+                .map(|(id, (w, r))| sync_log(id, 36, w, r)),
+        );
+        let v = judge(&marks_file(std::slice::from_ref(mark)), &logs);
+        let c = &v[0].parts[0].runs[0].checks[0];
+        (
+            format!("{:?} {}", c.outcome, c.value.as_deref().unwrap_or("-")),
+            c.note.clone().unwrap_or_default(),
+        )
+    };
+    // Three 10-minute runs per part against a 30-minute N=48 run: exact, a value (11,088.6 ns per entity against
+    // a mean of 6,111.1 at N=36, the cheaper reference).
+    let value = ("Fail 1.814517".to_owned(), String::new());
+    assert_eq!(with(3, &sync_mark()), value);
+    // A fourth valid run of N=24 (a rerun in the same folder), and six (two sessions' runs).
+    let gap = |n: usize| {
+        let folder = "the row's mean is over its 3: judge a folder that holds one session's runs";
+        (
+            "Gap -".to_owned(),
+            format!("run a48: part N=24 has {n} valid runs; {folder}"),
+        )
+    };
+    assert_eq!(with(4, &sync_mark()), gap(4));
+    assert_eq!(with(6, &sync_mark()), gap(6));
+    // A mark that asks for four: the exact mean of four such unit costs does not fit, and the judge says so.
+    let mut four = sync_mark();
+    four["parts"][1]["min"] = json!(4);
+    let wide =
+        "run a48: part N=24 has unit costs whose exact mean does not fit the judge's arithmetic";
+    assert_eq!(with(4, &four), ("Gap -".to_owned(), wide.to_owned()));
+    // And for six: there the sum itself passes i128, before any ratio is formed.
+    four["parts"][1]["min"] = json!(6);
+    assert_eq!(with(6, &four), ("Gap -".to_owned(), wide.to_owned()));
+}
+
+/// The plan review's condition 2 (the test-engineer's M3): a part's valid runs, as the figures read them, hold
+/// their validity rules with nothing undecided and pass the part's setup checks; a moved part gives none.
+#[test]
+fn u6j_only_valid_runs_of_kept_parts_reach_the_figures() {
+    let out = |mark: &Value, logs: &[Log]| {
+        let v = judge(&marks_file(&[mark.clone(), unbuilt_mark()]), logs);
+        let c = &v[0].parts[0].runs[0].checks[0];
+        (
+            format!("{:?} {}", c.outcome, c.value.as_deref().unwrap_or("-")),
+            c.note.clone().unwrap_or_default(),
+        )
+    };
+    // A fourth N=24 run that fails the part's setup check is not one of its valid runs: the mean is over the three.
+    let mut mark = sync_mark();
+    mark["checks"].as_array_mut().expect("checks").push(json!({
+        "name": "setup: starts low", "series": "header.params.start_tick", "stat": "max", "op": "<=",
+        "value": 10, "setup": true, "parts": ["N=24"]}));
+    let mut logs = sync_runs(110, [100; 3], [105; 3]);
+    logs.push(sync_log("d24", 24, 90_000, 100));
+    for (k, log) in logs
+        .iter_mut()
+        .enumerate()
+        .filter(|(_, l)| l.header.clients == 24)
+    {
+        log.header
+            .params
+            .insert("start_tick".into(), json!(if k == 7 { 99 } else { 5 }));
+    }
+    assert_eq!(out(&mark, &logs), ("Pass 1.1".to_owned(), String::new()));
+    // N=36's runs wait on a precondition whose figure is not built: undecided, so none of them is in the mean yet.
+    let mut mark = sync_mark();
+    mark["parts"][2]["validity"] = json!(["pre:PM-0001-54"]);
+    let mut logs = sync_runs(110, [100; 3], [105; 3]);
+    for log in logs.iter_mut().filter(|l| l.header.clients == 36) {
+        log.header.marks.push("PM-0001-54".to_owned());
+    }
+    let wait = |part: &str, min: u32| {
+        let why = format!(
+            "run a48: part {part} has 0 of its {min} valid runs: its mean unit cost is not there yet"
+        );
+        ("Cannot -".to_owned(), why)
+    };
+    assert_eq!(out(&mark, &logs), wait("N=36", 3));
+    // A moved part's runs never reach a figure.
+    let mut mark = sync_mark();
+    mark["parts"][2]["moved"] = json!({"to": "Slice 6", "why": "a test", "by": "the test"});
+    assert_eq!(
+        out(&mark, &sync_runs(110, [100; 3], [105; 3])),
+        wait("N=36", 1)
+    );
+}
+
+/// A mark whose one check is a figure nobody has built: as a precondition it stays undecided.
+fn unbuilt_mark() -> Value {
+    json!({
+        "id": "PM-0001-54", "title": "not built", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "any", "select": {"layer": "L2"}, "min": 1}],
+        "checks": [{"name": "throws", "figure": "throw_desync_count", "op": "==", "value": 0}],
+        "bites": []
+    })
+}
+
+/// The test-engineer's M1: the unit cost is the work of every measured tick over the entities of every (tick,
+/// slot) entry, and R2's E the mean over every such entry.
+#[test]
+fn u6j_the_unit_cost_and_r2s_entities_read_every_tick_and_every_slot() {
+    // Tick 1: 3,000 ns, 1 entity per client (48); tick 2: 6,600 ns, 2 per client (96): 9,600 / 144.
+    let mut s =
+        LogSpec::room("a48", "set-s", "PM-0001-10").ticks("server_only_ns", &[3_000, 6_600]);
+    s.clients = 48;
+    let mut own = s.build();
+    for (t, per_client) in own.ticks.iter_mut().zip([1, 2]) {
+        t.s.insert("relevant_count".into(), vec![per_client; 48]);
+    }
+    let mut logs = sync_runs(110, [100; 3], [105; 3]);
+    logs[0] = own;
+    let v = judge(&marks_file(&[sync_mark()]), &logs);
+    assert_eq!(report(&v[0], "unit")[0], "66.666667", "{:?}", v[0].report);
+    // Slots alternating 63 and 61 entities on one tick, 62 each on the other: the mean entry is still 62.
+    let mut logs = egress_run(R2_COUNTS, [1_000, 1_000 + R2_BYTES], [0, R2_BYTES]);
+    let uneven: Vec<i64> = (0..48).map(|k| if k % 2 == 0 { 63 } else { 61 }).collect();
+    logs[0].ticks[0].s.insert("relevant_count".into(), uneven);
+    let (line, note) = figure_check("r2_down_formula_bits", "==", json!("146122.56"), &logs);
+    assert_eq!(line, "Pass 146122.56", "{note}");
 }
 
 /// Run f1's room log for R2's formula, 48 clients at 30 Hz: two measured ticks with `relevant` entities in every
@@ -4468,6 +4708,11 @@ fn u6j_every_client_is_closed_within_a_second_of_the_tick_panic() {
         "run f1: event.tick_panic in the bots log on LG1: only process room writes it"
     );
     assert_eq!(gap(&|l| drop(l.pop())), "run f1: no bots log");
+    let why = gap(&|l| {
+        l[0].header.clients = 0;
+        l[1].events.clear();
+    });
+    assert_eq!(why, "run f1: a run of 0 clients has no close to time");
 }
 
 /// A mark like PM-0006-19: three logging-on runs, the pooled ratio, its own validity rule and the busy-wait bite.
@@ -4570,6 +4815,65 @@ fn u6j_the_logging_cost_pools_the_on_runs_against_the_off_runs() {
     );
 }
 
+/// The test-engineer's M3 and L6: each set pools its own on runs; an on run with no measured work and off runs
+/// whose pooled p99 is 0 are gaps.
+#[test]
+fn u6j_the_logging_cost_pools_one_set_at_a_time() {
+    let judged = |logs: &[Log]| judge(&marks_file(&[logging_mark()]), logs).remove(0);
+    // A second set (set-m) whose on runs are twice as slow: neither set's pool holds the other's runs.
+    let mut logs = logging_runs([102, 101, 100]);
+    let other = [
+        ("m-on-1", "measured", 200),
+        ("m-on-2", "measured", 200),
+        ("m-on-3", "measured", 200),
+    ];
+    let off = [
+        ("m-off-1", "logging-off", 100),
+        ("m-off-2", "logging-off", 100),
+        ("m-off-3", "logging-off", 100),
+    ];
+    for (id, role, slowest) in other.into_iter().chain(off) {
+        let mut log = logging_run(id, role, &[90, slowest]);
+        log.header.set = "set-m".to_owned();
+        logs.push(log);
+    }
+    let v = judged(&logs);
+    for (run, line) in v.parts[0].runs.iter().zip(logging_checks(&v)) {
+        let want = if run.run.starts_with("m-") {
+            "Fail 2"
+        } else {
+            "Pass 1.02"
+        };
+        assert_eq!(line, want, "{}", run.run);
+    }
+    // Off runs that did no work at all: nothing to divide by.
+    let mut logs = logging_runs([102, 101, 100]);
+    for log in logs.iter_mut().filter(|l| l.header.role == "logging-off") {
+        log.ticks
+            .iter_mut()
+            .for_each(|t| *t.v.get_mut("work_ns").expect("set") = 0);
+    }
+    let v = judged(&logs);
+    let note = v.parts[0].runs[0].checks[0]
+        .note
+        .clone()
+        .unwrap_or_default();
+    assert_eq!(note, "run on-1: the logging-off runs' pooled p99 is 0");
+    assert_eq!(logging_checks(&v), ["Gap -"; 3]);
+    // An on run with no measured tick: a gap for every run of the pool (the mark has no validity rule here).
+    let mut mark = logging_mark();
+    mark["validity"] = json!([]);
+    let mut logs = logging_runs([102, 101, 100]);
+    logs[1].ticks.iter_mut().for_each(|t| t.ph = Warmup);
+    let v = judge(&marks_file(&[mark]), &logs).remove(0);
+    let note = v.parts[0].runs[0].checks[0]
+        .note
+        .clone()
+        .unwrap_or_default();
+    assert_eq!(note, "run on-2: no values for tick.v.work_ns");
+    assert_eq!(logging_checks(&v), ["Gap -"; 3]);
+}
+
 /// PM-0006-19's rule and its figure both refuse a logging-off run that breaks a rule every run holds (the plan
 /// review's condition 9: the rule skipped them before).
 #[test]
@@ -4597,10 +4901,8 @@ fn u6j_a_logging_off_run_holds_the_rules_every_run_holds() {
         .note
         .clone()
         .unwrap_or_default();
-    assert!(
-        note.starts_with("run on-1: logging-off run off-2 is invalid: complete: "),
-        "{note}"
-    );
+    let cut = "run on-1: logging-off run off-2 is invalid: complete: the room log on RS1 has no footer (cut short)";
+    assert_eq!(note, cut);
     assert_eq!(logging_checks(&v), ["Gap -"; 3]);
 }
 
@@ -4659,4 +4961,42 @@ fn u6j_a_surviving_rooms_p99_after_the_kill_against_before() {
     );
     let two = "run room-1: 2 runs of set set-k say params.killed true; one room is killed";
     assert_eq!(ratio(&[80, 105], 2), ("Gap -".to_owned(), two.to_owned()));
+}
+
+/// The gaps the review found untested (the test-engineer's L6): a measured p99 of 0 and a work series in another
+/// process's log for the kill ratio; a formula of 0 bytes for the egress ratio.
+#[test]
+fn u6j_the_kill_ratios_and_the_egress_ratios_last_gaps() {
+    let mark = |figure: &str| {
+        json!({
+            "id": M, "title": "gaps", "draft": draft(), "verdict": "pass",
+            "parts": [{"name": "P", "select": {"params.killed": false}, "min": 1}],
+            "checks": [{"name": "c", "figure": figure, "op": "<=", "value": 1}],
+            "bites": []
+        })
+    };
+    let note = |figure: &str, logs: &[Log]| {
+        let v = judge(&marks_file(&[mark(figure)]), logs).remove(0);
+        let c = &v.parts[0].runs[0].checks[0];
+        assert_eq!(format!("{:?}", c.outcome), "Gap", "{c:?}");
+        c.note.clone().unwrap_or_default()
+    };
+    let killed = kill_room("room-8", true, &[100], &[]);
+    let idle = vec![kill_room("room-1", false, &[0, 0], &[5]), killed.clone()];
+    assert_eq!(
+        note("kill_p99_ratio", &idle),
+        "run room-1: its measured p99 of tick.v.work_ns is 0"
+    );
+    let mut bots = kill_room("room-1", false, &[90, 100], &[105]);
+    bots.header.process = "bots".to_owned();
+    let why = "run room-1: tick.v.work_ns in the bots log on RS1: only process room writes it";
+    assert_eq!(note("kill_p99_ratio", &[bots, killed]), why);
+    // A room at 0 Hz that sent nothing countable: R2's formula gives 0 bytes, and the ratio has no bottom.
+    let mut logs = egress_run([62, 15, 0, 0, 0], [7, 9], [0, 1]);
+    logs[0].header.tick_hz = 0;
+    logs[0].header.params.insert("killed".into(), json!(false));
+    assert_eq!(
+        note("egress_vs_r2_ratio", &logs),
+        "run f1: R2's formula gives 0 bytes at the run's counts"
+    );
 }

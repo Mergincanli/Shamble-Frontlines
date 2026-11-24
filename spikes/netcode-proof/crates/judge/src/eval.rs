@@ -1764,9 +1764,9 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
     // A first pass, for the figures that read across parts or pool a part's runs: each kept part's valid runs,
     // those that hold their validity rules and its setup checks. Only for a mark that names a figure.
     let measures = mark.checks.iter().map(|c| &c.measure);
-    let mut reports = mark.report.iter().map(|r| &r.measure);
+    let reports = mark.report.iter().map(|r| &r.measure);
     let reads_figures = measures
-        .chain(&mut reports)
+        .chain(reports)
         .any(|m| matches!(m, Measure::Figure(_)));
     let mut valid = figures::Parts::new();
     for part in mark
