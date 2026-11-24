@@ -2,12 +2,12 @@
 - **Goal:** the judge piece of the netcode proof test (PR #40's work), taken off the netcode chat's hands by Mustafa's
   start block of 2026-11-24 in the Netcode Builder 2 chat. Two parts, in order: **part a, MOVED** (the judge and
   marks.json report a moved pass mark, or a moved part of one, as MOVED and never as PASS; its text is his MARK-NOTES
-  answer), then **part b, U6j** (the judge learns 19 figures and three waiting judge changes). Plan:
-  `.checkpoints/netcode-judge/plan-a.md` (not written yet).
+  answer), then **part b, U6j** (the judge learns 19 figures and three waiting judge changes). Plans:
+  `.checkpoints/netcode-judge/plan-a.md` and `plan-b.md`.
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-24 20:55 Amsterdam (19:55 UTC).
+- **Last update:** 2026-11-24, block 3 of part b complete (d98b0024).
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -117,55 +117,33 @@
     only when the run is role `bite` and the twin role `logging-off` (C-U6-10; eval.rs: `always_rules` =
     `every_run_rules(run, &["bite", "twin"])`); `alloc_counts` and `alloc_twin_diff_count` (room logs, measured
     ticks, gaps for no room log, a tick without the count, two logs at one tick; empty when neither run has a
-    measured tick), its table entry built (unit "U6j"). The 100 existing tests pass. **Its tests are not written
-    yet.**
+    measured tick), its table entry built (unit "U6j"). The 100 existing tests pass.
+
+15. Part b, block 3 complete · d98b00244fc3e268fa3f573418a2bb4fd62ad411 (pushed; before it bc1efd7c, the engine
+    tests) · engine.rs: `alloc_twin_diff_count_compares_the_two_runs_tick_by_tick` and
+    `a_bite_runs_logging_off_twin_may_name_its_bite`; fixtures.rs with the real marks.json and ten made-up logs under
+    `crates/judge/fixtures/pm-0001-30/` (written by `gen-30-fixtures.mjs`):
+    `pm_0001_30_each_run_is_compared_with_its_other_transport_twin` and
+    `pm_0001_30_a_measured_twin_must_be_the_other_transport_and_name_the_run_back`. Four plants, each failing its
+    test and taken back: one-sided ticks dropped; the logging-off exemption widened; the transport check off; the
+    name-back check off. SERIES.md's two rows, README section 4's build rule and the fixtures README say it. 104
+    judge tests pass (17 + 4 + 58 + 25); fmt, clippy and check.mjs's seven quick steps pass. Part b so far 713 added,
+    48 deleted (from 0e0f6547; the stop is 4,900).
 
 ## Current step
-Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 3's tests
-(figures-b.md B1, B2, A11 list them):**
-- engine.rs, `alloc_twin_diff_count` on a PM-0006-20-like mark (part select `params.suite` = `logging-alloc`, min
-  1, check `== 0`, a bite): pass (equal counts), fail (one tick differs), fail (a tick in one run only), NOT-RUN
-  (twin not in the set), INVALID (twin of role `twin`; a measured tick without the count), an empty comparison
-  (neither has a measured tick); C-U6-10: a bite run with its same-bite logging-off twin is shown, that twin with
-  role `measured` is a gap, a measured run whose logging-off twin names a bite is a gap. Plant: one-sided ticks
-  dropped.
-- C-U6-9 with the real marks.json: fixtures under `crates/judge/fixtures/pm-0001-30/` (the base gains the C part's
-  six measured room logs, 3 recordings x wt and ws, each naming its other-transport run in `params.twin`, 3 ticks
-  with `h`, `tick.v.late_count` 0; cases `twin-differs` FAIL, `same-transport` INVALID, `not-mutual` INVALID,
-  `twin-missing` NOT-RUN), tests in tests/fixtures.rs, the fixtures/README.md rows; PM-0001-21's `twin-is-measured`
-  stays INVALID (it passes today). Plants: the transport check removed; the mutual check removed.
-- SERIES.md's `twin_hash_mismatch_count` row names both forms; its `alloc_twin_diff_count` row and README section 4's
-  build rule say the bite pair's logging-off twin.
-Then commit, push, count, card. Before block 4: the two writer-side SERIES.md needs go on the board (condition 8;
-the question is already posted in part b's thread). Part b's board thread is open (state doing).
+Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 4 (C-U6-11):** the
+coverage rule's spans per session, cut at the room log's `admit` events (figures-b.md B3; plan-b.md condition 5: a
+slot with no `admit` keeps today's single span; a run with no `session_end` keeps today's verdict). Every PM-0001-17
+fixture keeps its verdict. README section 1's warm-up sentence and SERIES.md's coverage clause are reworded. The two
+writer-side needs go on the board first (condition 8). Then blocks 5 to 9 as plan-b.md section 2 and the verdict's
+last paragraph order them; before block 8, one netcode-architect agent rules R2-INPUTS (condition 3).
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
    one small commit, the checks again on the new head, the new commit id to him.
-2. Part b (U6j; the stop is 4,900 added lines). Read so far: u6-brief.md sections 1, 2, 3, 6, 7, 8; figures.rs whole;
-   SERIES.md's "Figures" table (:258-299) and "Series read only by figures" (:402-424); which marks name the
-   figures (jq over marks.json). Its pieces:
-   - **J0, found while reading, not in the hand-off's detail:** two standing items for "the judge's next change" that
-     part a did not do. (1) u4s-carries.md entry 64 (:455-480): six follow-ups (a) to (f) from the advisor's U4j
-     round-2 ruling, "before any other edit to crates/judge/src, and at the latest before U6 builds -19's figure",
-     each shown failing under its plant; (a) is Medium (the Arm test's role C and ML cases), (f) changes
-     `summary_line` (control characters escaped). (2) JDG-ONLY-1, Medium (history.md:4609-4614): `--only` narrows the
-     marks before a precondition is looked up (main.rs:94; eval.rs `Rule::Pre`), so a mark with `pre:PM-0001-2`
-     judged alone reads INVALID; home "npt-judge's next change, before PR #40 is marked ready at the latest". Both go
-     first in part b; the advisor rules whether part a's head stands as it is (my lean: yes).
-   - **J1, the three waiting judge changes** (plan.md:1254's row): C-U6-9, `twin_hash_mismatch_count` gains -30's
-     form (each other's measured runs differing in `params.transport`), with fixtures and SERIES.md's row naming both
-     forms; C-U6-10, PM-0006-20's logging-off twin against C4's role list and `twin_of`'s same-bite rule
-     (`alloc_twin_diff_count` settles it); C-U6-11, -19's join hash under the coverage rule: how a client admitted
-     mid-run starts its span (a marks/README.md rule), and whether ML's `browser` process joins the `decoded_hash`
-     writers (-19's ML part is moved now).
-   - **J2, 19 figures** (figures.rs's `planned(.., "U6", ..)` entries less `rtt_agreement_p99_ns`, which moved with
-     PM-0001-33): sync_unit_cost, sync_cost_ratio (-10); down_client_mean_max_bits, down_mean_ipv6_bits,
-     r2_down_formula_bits (-12); up_client_mean_max_bits (-13); rss_slope_bytes_per_10min, queue_growth_count (-15);
-     session_memory_growth_count (-24); kill_p99_ratio (-27); bulk_control_p99_rise_ns, one_shot_dropped_count (-38);
-     crash_close_max_ns (-59); egress_interface_bytes, egress_metric_vs_interface_ratio, r2_egress_formula_bytes,
-     egress_vs_r2_ratio (PM-0006-17); logging_cost_ratio (PM-0006-19); alloc_twin_diff_count (PM-0006-20).
-   Then `plan-b.md`, the advisor agent's review, the build in blocks (each compiling with its tests before the next).
+2. Part b's blocks 4 to 9 (plan-b.md section 2 and its 11 conditions; figures-b.md is the spec sheet), then one
+   review round (test-engineer and rust-reviewer, xhigh), one fix pass, the final head's checks, the advisor agent's
+   read, and part b's commit id with the report to Mustafa.
 
 ## Open findings
 - Left as follow-ups from part a's round (Low, no fix now): rust-reviewer's L4 (a kept bite whose only runs were left
@@ -205,17 +183,6 @@ the question is already posted in part b's thread). Part b's board thread is ope
   folder parked) · Mustafa · in the chat.
 
 ## Running work
-- Part b's spec sheet: DONE (`.checkpoints/netcode-judge/figures-b.md`, 358 lines, test-engineer, cited). Part b's
-  plan: `.checkpoints/netcode-judge/plan-b.md`, with the advisor agent for its plan review since 2026-11-24 about
-  21:22 UTC (six rulings asked; no part b edit before its APPROVE). On its return: its verdict and conditions into
-  plan-b.md's end, then block 1 (J0: entry 64's six items and JDG-ONLY-1). Two questions for the netcode chat are on
-  the board (the kill record's name and fields; `room_end`'s `slot` and the room log's `admit` and `session_end`).
-- The review round: test-engineer and rust-reviewer on b22c30cd, 2026-11-24 about 20:25 to 20:40 UTC: DONE.
-- The two defects that survived the test-engineer's planting are now caught, each run once and taken back: a moved
-  check kept on a bite run that matches no part fails `a_moved_check_is_skipped_wherever_checks_are_chosen`; a bite
-  run judged with its moved part's checks too fails `a_bite_run_on_moved_parts_only_is_left_out`.
-- The background saver (`checkpoint.mjs watch netcode-judge`, every 10 minutes for 110) since about 20:30 UTC, for
-  the reviewers' notes; it stops by 22:20 UTC and is checked at each card update.
-- GitHub on b22c30cd: the gate workflow green (run 45480243854); the toolchain workflow running (run 45480243852).
-- `.checkpoints/netcode-judge/moved-table.mjs` was run once with `--write` at the base's marks.json (it refuses any
-  other file): 26 marks whole, 21 parts, 2 checks, 1 bite, -56's kept check, -7's and -56's notes.
+- Nothing in the background but the saver (`checkpoint.mjs watch netcode-judge`), which stops by about 22:20 UTC.
+- Two questions for the netcode chat are on the board, unanswered so far (the kill record's name and fields;
+  `room_end`'s `slot` and the room log's `admit` and `session_end`).
