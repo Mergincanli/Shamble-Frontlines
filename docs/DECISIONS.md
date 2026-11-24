@@ -127,6 +127,520 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-23, 21:24:59 UTC: FIREFOX-TESTS (b) in place of (c): Firefox in CI joins the small CI pull
+  request after change-set 3a, and no Firefox pull request comes between #64 and 3a; change-set 3a starts when #64 is
+  merged, on this word, with no second ask; three items for change-set 3 come from his Advisor before 3b's build
+  starts** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account
+  that also holds his claude.ai project "Shamble Frontlines ALT"; his message 219448d3-8dec-4c23-bf93-d3e88bb6110c, sent
+  while the chat was working, whole; extracted by script from the chat's transcript). It replaces his answer
+  FIREFOX-TESTS (c) in ANSWERS-7 (the entry of 14:31:06 UTC below, which stays as written). In his words: "Until then my
+  own browser check covers Firefox, as at change-set 2." On the start of 3a: "You need not ask me again to start. If
+  your context is above 40 % at that point, tell me first and I compact the chat." On the three items: "They do not
+  touch 3a." What it answers, in the chat's words (not his): nothing the chat asked. It changes his answer FIREFOX-TESTS
+  (c) of ANSWERS-7 (2026-11-23, 14:31:06 UTC: a small pull request of its own right after the CI pull request) to (b),
+  in his words here; it gives the start word that BUILD-SEAT (15:10:32 UTC) and points 9 and 11 of his block of 16:30:46
+  UTC left with him (change-set 3a starts when #64 is merged, with no second ask; above 40 % of context the chat tells
+  him first); and it announces three items for change-set 3b from his Advisor. Copied by script (744 bytes, sha256
+  3328818de5c15eae845914b86f5cbf20490be2cb048d3e92d101100aa5704109):
+> My words of 23 November on what comes after #64, written with my main Advisor.
+>
+> 1. FIREFOX-TESTS: I change my answer from (c) to (b). Firefox in CI joins the small CI pull request after 3a (E1's). No Firefox pull request comes between #64 and 3a. Until then my own browser check covers Firefox, as at change-set 2.
+>
+> 2. Change-set 3a starts when #64 is merged, on this word (BUILD-SEAT): open its checkpoint from the approved plan (cs3-plan.md, draft 3, with my ANSWERS-7) and build. You need not ask me again to start. If your context is above 40 % at that point, tell me first and I compact the chat.
+>
+> 3. Before 3b's build starts, my Advisor sends you three items that moved from the netcode proof test into change-set 3. They do not touch 3a.
+- **Taken by Mustafa, 2026-11-23, 20:47:59 UTC: PLANT-WRITE (a), yes to the two planted lines in GitHub's check; and his
+  yes in advance to their take-back, only if the planted run fails the expected way** (the builder chat he calls Builder
+  V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 8fe87b69-7b75-4459-bdd0-82430dc07783, whole; extracted by script from the chat's
+  transcript). The expected way, in his words: "at the step "GitHub's own check of the archive", with gh's own line that
+  the file is not part of the release, and nothing after it runs"; and the other case: "If the run fails any other way,
+  stop and bring me the lines before any write, as the stop rule says." His point 3: "My mode rule of 17:15:07 UTC holds
+  for both writes, read on this message." What it answers, in the chat's words (not his): the chat's ask PLANT-WRITE of
+  20:17:08 UTC: may the chat write the two planted lines into `.github/workflows/toolchain.yml`; the text is
+  `ci-plant-p-gh.diff` (sha256 e4f21ab359bc9fd911c663a4fcbc892133195fefe44e88ad7ec51b50e3d0b1ac, sent to him as a file
+  with its two added lines shown); the file after the write has sha256
+  84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8; the run must fail at the step "GitHub's own check of
+  the archive" with gh's own line that the file is not part of the release, nothing after it may run, and a permission
+  line or "no attestations found" instead is a stop; the ask said the take-back would come as its own ask (his point 2
+  answers that in advance); options (a) yes, (b) no, skip this plant; recommended (a). The record on this message reads
+  `default` (the session record at 20:47 UTC and the mode on the message); his point 3 has the mode read on this message
+  for both writes. Records, not his words: the mode on this message read `default`; the planted file was written at
+  20:48:40 UTC (sha256 84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8, commit 47d7024); both of its
+  runs failed at that step with gh's line "attestation for 0.2.130 does not contain subject
+  sha256:27c24e42e238fa86ca5feb42b3eeb1a4535040ed5dd0eb183da810f85cff6e10" and the three later steps were skipped; the
+  take-back was written at 21:01:33 UTC (sha256 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811, commit
+  ce5a7e7). Copied by script (1006 bytes, sha256 3cbb66ac1702ff7d51e6ae4f22c9502dc2897b8b9d19726b4defe578625d975c):
+> My answer of 23 November, written with my main Advisor. This chat is in Accept edits as I send this.
+>
+> 1. PLANT-WRITE: (a), yes. Write the two planted lines from ci-plant-p-gh.diff (sha256 e4f21ab359bc9fd911c663a4fcbc892133195fefe44e88ad7ec51b50e3d0b1ac). After the write the file's sha256 must be 84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8; show it to me.
+>
+> 2. The take-back, in advance: yes. Its exact text is the removal of those same two lines. If the planted run fails the expected way (at the step "GitHub's own check of the archive", with gh's own line that the file is not part of the release, and nothing after it runs), take the two lines back without a second ask. The file must then read 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811 again; show me that checksum and the runs. If the run fails any other way, stop and bring me the lines before any write, as the stop rule says.
+>
+> 3. My mode rule of 17:15:07 UTC holds for both writes, read on this message.
+- **Taken by Mustafa, 2026-11-23, 19:58:23 UTC: FIX-WRITE (a), yes to the corrected CI text (`ci-edit-2.diff`, against
+  the file at cb476b1), to the stop rule's new wording, and to the two new checksums for the planted lines and their
+  take-back; his mode rule of 17:15:07 UTC holds for this write** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message e06bc496-dee4-49fe-8321-68a323d5e5f4, whole; extracted by script from the chat's
+  transcript). The text puts the tool into a folder the job makes fresh as root directly under `/` (the place his
+  Advisor's input of 18:40:57 UTC named, the entry below, weighed and taken by infra-engineer) and has the check judge
+  the program and every folder above it up to `/`. What it answers, in the chat's words (not his): the chat's ask
+  FIX-WRITE of 19:49:01 UTC: may the chat write the corrected `.github/workflows/toolchain.yml`; the text is
+  `ci-edit-2.diff`, a diff against the file at cb476b1 (10 lines added, 6 removed, sha256
+  b4081e48b4c07e790fa489d31de940e0f95c162ae476b0f98b0160b7358203ec, sent to him as a file with its changed lines shown);
+  the file after the write has sha256 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811, with the two
+  planted lines 84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8, and after their take-back
+  56d37fc6...9811 again; the ask said this is a fourth CI write his point 7 did not count, that the two values replace
+  point 7's 12b90249... and its second d1dbcb53..., that his mode rule of 17:15:07 UTC is applied to this write too, and
+  it showed the stop rule's changed part (the plan's revision 4: the step's environment line, four exact install lines,
+  and a new stop if the folder exists already or could not be made); options (a) yes as shown, (b) yes with changes he
+  names, (c) no; recommended (a). The record on this message reads `default` (the session record at 19:58 UTC and the
+  mode on the message). Records, not his words: the mode on this message read `default`; the file was written at
+  20:00:41 UTC (sha256 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811, commit 2a654f3), and its first
+  runs were clean under the stop rule. Copied by script (884 bytes, sha256
+  36c48e6273a7d8a268f818095b19671dc902040d5eca86466cdbcb95a233479c):
+> My answer of 23 November, written with my main Advisor. This chat is in Accept edits as I send this.
+>
+> 1. FIX-WRITE: (a), yes. Write .github/workflows/toolchain.yml from ci-edit-2.diff (sha256 b4081e48b4c07e790fa489d31de940e0f95c162ae476b0f98b0160b7358203ec). After the write the file's sha256 must be 56d37fc64ccfce2a21765613401a746633c6a9c661f3af52a9054bf650df9811; show it to me. My Advisor rebuilt it from the file at cb476b1 and got that checksum, and 84b6b3fd61dc1e798375374eef48f16ca3e9098887bd63cd944c4191bc631ff8 with the planted lines.
+>
+> 2. Yes to the new stop-rule wording as you put it, and to the two new checksums for the planted lines and their take-back. My mode rule of 17:15:07 UTC holds for this write.
+>
+> 3. My Advisor set #64's title and text from pr-64-title.txt and pr-64-body.md. The platform put the Claude Code footer line in its own form; the rest is your text.
+- **Taken by Mustafa, 2026-11-23, 18:40:57 UTC: OPT-PATH (a): the tool moves to a place where every parent folder is
+  root-owned and closed to others, and the check is widened to every parent up to `/`, not weakened; the corrected text
+  is prepared in one short pass and its exact text comes to him before anything is written; NOTES-PUSH (a)** (the
+  builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds
+  his claude.ai project "Shamble Frontlines ALT"; his message ee900136-bb16-4ee5-a6d4-8a7eccef346c, whole; extracted by
+  script from the chat's transcript). In his words: "The check is not weakened." The place directly under `/` is his
+  Advisor's input, "to weigh, not an order". The pass: "infra-engineer proposes, security-auditor reads the changed
+  lines, your advisor agent rules. A second round only for a Critical or High." And: "Nothing under .github/ is written
+  before my yes on that text. The stop rule holds for the next run too." His point 5 holds two sentences on the guard's
+  prompt for the copy, one that he saw and allowed it and one that he saw none; it stands as he sent it, and he asks
+  what the transcript shows. What it answers, in the chat's words (not his): the chat's stop message of 17:28:43 UTC:
+  both first toolchain runs on cb476b1 refused at the new install step, because /opt on GitHub's runner is writable by
+  anyone ("mode 777, owner root:root, 4096 bytes, /opt"). Its two questions. OPT-PATH: how the tool gets installed where
+  the runner's user cannot tamper with it: (a) move the tool to a place where every parent folder is root-owned and
+  closed to others and widen the check to every parent, worked out by infra-engineer and security-auditor, reviewed by
+  the advisor agent, then the text to him; (b) keep /opt and have the job close /opt itself before the install; (c) drop
+  the /opt part of the check (not recommended); recommended (a). NOTES-PUSH: may the card's record of the stop be pushed
+  now, notes only: (a) yes; (b) hold it until the corrected text is approved; recommended (a). His point 5 asks about
+  the guard's prompt for the copy, which the chat had reported as not known; its two sentences both stand in his message
+  as sent. Records, not his words: the transcript shows the guard's hook asked at 17:23:24 UTC and a one-time allow
+  given in the app answered it at 17:23:43 UTC, which the chat told him in its next message; the mode on this message
+  read `default`. Copied by script (1324 bytes, sha256
+  fc438e2e06e8443c3a4f431b3b3989f2c0d3016c79a614d88fe58383f19d4a84):
+> My answers of 23 November, written with my main Advisor.
+>
+> 1. OPT-PATH: (a). Move the tool to a place where every parent folder is root-owned and closed to others, and widen the check to every parent up to /. The check is not weakened. One input from my Advisor for infra-engineer and security-auditor to weigh, not an order: a fresh folder that the job itself creates as root directly under /, so nothing depends on how the runner image sets up /opt or /usr/local; the log prints mode and owner of every parent.
+>
+> 2. How: one short pass. infra-engineer proposes, security-auditor reads the changed lines, your advisor agent rules. A second round only for a Critical or High. Then bring me the exact text as a diff against the file at cb476b1, with the new checksums of the file and of the planted file. Nothing under .github/ is written before my yes on that text. The stop rule holds for the next run too.
+>
+> 3. NOTES-PUSH: (a). Push the card's record of this stop now.
+>
+> 4. With that push, put pr-body.md and the title in the notes folder, so my Advisor can read them and set them on #64. I converted #64 to a draft.
+>
+> 5. The guard's prompt for the copy onto toolchain.yml: I saw it and allowed it. / I saw no prompt. Tell me in one line what your transcript shows for that call: did the guard's hook ask, and what answered it.
+- **Taken by Mustafa, 2026-11-23, 17:22:42 UTC: his yes to CI-WRITE-1 again, sent with the mode switched; he has opened
+  the pull request** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the
+  account that also holds his claude.ai project "Shamble Frontlines ALT"; his message
+  99a5bc79-9b73-4f2a-ba5f-4e1c78eb6fb2, whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): the chat's message of 17:16:32 UTC after his answers of 17:15:07 UTC: the CI file was not
+  written, because the record on that message read `auto`; he was asked to pick Accept edits in the mode dropdown and to
+  send a new typed message, on which the mode is read, and to open the draft pull request and tell its number.
+  CI-WRITE-1 itself (the chat's ask of 17:04:48 UTC): may the chat write `.github/workflows/toolchain.yml` with the text
+  of `ci-edit.diff` (sha256 240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673), after which the file has
+  sha256 d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c. The record on this message reads `default`
+  (the session record at 17:22 and 17:23 UTC and the mode on the message): by his point 3 of 17:15:07 UTC the chat
+  writes and names the value in the report. Records, not his words: the mode on this message read `default`, which his
+  rule of 17:15:07 UTC (the entry below) covers; the file was written at 17:23:43 UTC (sha256
+  d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c, commit cb476b1); the pull request is #64, opened at
+  17:21:24 UTC and made a draft by him later that day. Copied by script (75 bytes, sha256
+  87080abd96f9ebdb655da27084391b2e9bf03663baf720659812e0d9d6ecd058):
+> "CI-WRITE-1: yes, mode switched"
+>
+> I have also opened the draft pull request
+- **Taken by Mustafa, 2026-11-23, 17:15:07 UTC: CI-WRITE-1 (a), yes to the first CI write; his rule for how the chat's
+  mode is read before a CI write; GH-TOOLS (a) for this pull request: he opens the draft, presses Ready and presses
+  Merge on GitHub himself, by steps that stand in for the "expected head" part of his point 9** (the builder chat he
+  calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai
+  project "Shamble Frontlines ALT"; his message 4c139df2-6889-4a70-bc2d-461bfdc159cc, whole; extracted by script from
+  the chat's transcript). The mode rule, in his words: "Write if the record on this message reads acceptEdits. If it
+  reads default: my screen shows Accept edits, and on 2026-11-12 the record gave that same mode as "default" (the
+  archive's MANUAL-MODE), so write as well and name the value in the report. Any other value: do not write, and tell me
+  the value. The same reading holds for writes 2 and 3." The merge steps, in his words: "your advisor agent approves the
+  full SHA, gate, smoke and toolchain are green on it, you push nothing after that approval, you give me the full SHA
+  when you ask for my go, and I type my go in this chat before I press Merge. My main Advisor checks from the repo that
+  the pull request's head is that SHA." His point 1 leaves the pull request's number open, as he sent it: "The draft
+  pull request is open: #__." What it answers, in the chat's words (not his): the chat's two questions in its message of
+  17:04 UTC. CI-WRITE-1: may the chat write `.github/workflows/toolchain.yml` with the text of `ci-edit.diff` (128
+  lines, 93 added, none removed, sha256 240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673, sent to him as
+  a file; the file his CI-TEXT (a) answered), after which the file has sha256
+  d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c: (a) yes, (b) yes with changes he names, (c) no;
+  recommended (a). GH-TOOLS: how the pull request is opened, marked ready and merged, since this chat cannot write to
+  GitHub: (a) he does the three steps on GitHub himself, the merge after the advisor agent's approval of the full SHA,
+  his go typed in the chat and the chat's read of the checks on that SHA; (b) he gives the account a GitHub connector;
+  (c) another guarded chat with the GitHub tools does them on his go there; recommended (a) for the draft, and for the
+  merge (b) if he can, else (a). His point 3 answers the chat's note that the record may call the app's Accept edits
+  "default". Records, not his words: the mode on this message read `auto` (the session record and the message), so by
+  his own rule nothing was written on it; no pull request from the branch was on GitHub at 17:15 UTC. Copied by script
+  (1385 bytes, sha256 6f4508c2297871b3802efe2fe6d7a181633b702a66d07d41808a64cfe4f332ce):
+> My answers of 23 November, written with my main Advisor. I switched this chat to Accept edits before I sent this.
+>
+> 1. The draft pull request is open: #__.
+>
+> 2. CI-WRITE-1: (a), yes. Write .github/workflows/toolchain.yml from ci-edit.diff (sha256 240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673). After the write the file's sha256 must be d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c; show it to me. My Advisor rebuilt the file from main's copy with this diff and got that same checksum.
+>
+> 3. The mode. Write if the record on this message reads acceptEdits. If it reads default: my screen shows Accept edits, and on 2026-11-12 the record gave that same mode as "default" (the archive's MANUAL-MODE), so write as well and name the value in the report. Any other value: do not write, and tell me the value. The same reading holds for writes 2 and 3.
+>
+> 4. GH-TOOLS: (a) for this pull request. I open the draft, press Ready and press Merge on GitHub myself. For the merge: your advisor agent approves the full SHA, gate, smoke and toolchain are green on it, you push nothing after that approval, you give me the full SHA when you ask for my go, and I type my go in this chat before I press Merge. My main Advisor checks from the repo that the pull request's head is that SHA. For this pull request that stands in for the "expected head" part of my point 9.
+- **Taken by Mustafa, 2026-11-23, 16:30:46 UTC: Builder V3, a new Claude Code chat on Fable 5.2, takes over the CI-WASM
+  pull request; CI-MODEL (a): for that chat's CI edits of the CI-WASM pull request, each asked of him with its exact
+  text, he sets his words of 2026-11-12 on CI work aside** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 67cc6bba-62e1-48f2-bb37-8d7ae79afa81, whole; extracted by script from the chat's
+  transcript). Points 1 to 10 are the block the project thread wrote for him to paste
+  (`.checkpoints/ci-wasm/handover-block.txt`, saved and pushed at c405ccb before the thread posted it; his message
+  starts with it byte for byte); pasted into the chat, it is his word. Points 11 and 12 he added himself. What it
+  answers is shown under it as the thread's text, not his words. The thread's question CI-MODEL is answered by his point
+  6: "For this chat's CI edits of the CI-WASM pull request, each asked of me with its exact text, I set my words of
+  2026-11-12 ("The guard, the gate and CI work stays with Opus 5.5.") aside, as GATE-FOLLOW did for Builder V1." His
+  point 11 gives his taps BUILD-SEAT and ACCT-3 (the two entries below) in his own words. At 16:33:16 UTC he also sent
+  points 1 to 10 as a file, with the same sha256 as `handover-block.txt` (compared by sha256; the file was not opened);
+  that message is in the notes (`.checkpoints/ci-wasm/mustafa-2026-11-23T163316-attached-block.md`, readable at 08053c7
+  once the notes are deleted). Copied by script (4353 bytes, sha256
+  6b1c9ac868965f4bed74db85b83e1bc9177bb2cace5ee3f31dd1eab9e8e3d38a):
+> My words of 2026-11-23 for a new Claude Code chat: you take over the CI-WASM pull request.
+>
+> 1. Who you are. You are a new Claude Code chat on Fable 5.2, on the account that also holds my claude.ai project "Shamble Frontlines ALT". I call you Builder V3. Read your session's model first. If it is not Fable 5.2, stop and tell me in one line.
+>
+> 2. What you take over. The CI-WASM pull request: CI builds the WebAssembly and runs the tests that need it. Builder V1 planned it (draft pull request #62, branch claude/wonderful-hamilton-jdmlnf). Builder V1 is paused by my words of 2026-11-19 and has not been told to continue. Today a thread of my project "Shamble Frontlines ALT", named "Build the game from change-set 3", took its records forward on the branch claude/project-thread-qx9woh (draft pull request #63). That thread has no guard and no Accept edits mode. On its card WRITE-WHERE I chose that the CI file is written in a new Claude Code chat. That chat is you.
+>
+> 3. Where you start. The head of origin/claude/project-thread-qx9woh. It must contain the commit 2441b3e0c40bba435b0dac21f8783ec3f29f88d2. What comes after that commit only adds notes under .checkpoints/ci-wasm/ (a copy of this block, the thread's last messages to me and my answers to them). If anything else differs, stop and tell me. Work on your own branch, in a worktree made from that head. Do not switch your main folder. Open a new draft pull request from your branch that replaces #63 and #62.
+>
+> 4. What you read first. CLAUDE.md. The resume card .checkpoints/ci-wasm.md, from its section "Handover". The plan .checkpoints/ci-wasm/plan.md (revision 3). The advisor agent's review of that plan, .checkpoints/ci-wasm/advisor-plan.md, with its "Re-read". The advisor agent's read of the thread's records, .checkpoints/ci-wasm/advisor-takeover.md.
+>
+> 5. My words that bind you are the entries in docs/DECISIONS.md at that head. I do not retype them here: ANSWERS-7, LONG-RUNS and WRITE-WHERE (2026-11-23); WRITE-MODE (the entry of 2026-11-18, 20:20:09 UTC); CI-WASM (a) and TOOL-SOURCE (the entry of 2026-11-18, 22:34:37 UTC); GATE-FOLLOW (the entry of 2026-11-17, 19:10:44 UTC).
+>
+> 6. The model for the CI edits. For this chat's CI edits of the CI-WASM pull request, each asked of me with its exact text, I set my words of 2026-11-12 ("The guard, the gate and CI work stays with Opus 5.5.") aside, as GATE-FOLLOW did for Builder V1.
+>
+> 7. The three CI writes: the file .github/workflows/toolchain.yml, then the two planted lines, then their take-back. Before each one, read your chat's mode and stop unless it is Accept edits. After each one, compare the file's sha256 with the expected one and show me: d1dbcb533460936e9f4f3ca2e97ed28c6d586638e52c00fa034e875f7a4e975c, then 12b9024966abc4907b27c8c2b4c6cdccfa56ceea3d27d94c060b9ab2ca1f12ef, then the first one again.
+>
+> 8. Before the first CI write, your advisor agent does the short takeover read that advisor-takeover.md asks for. Then the plan as written: the stop rule on every run of the new lines, the two planted faults, the reviews, the verifier, your advisor agent on every pushed head, the docs pass, the report.
+>
+> 9. Limits. Never push to the branch of another lane or thread: claude/wonderful-hamilton-jdmlnf, claude/project-thread-qx9woh, claude/project-thread-xy88hv and the card's list. Ask me before #62 or #63 is closed. A merge happens only on my go in your chat, for the head your advisor agent approved, with that full SHA as the expected head. Do not start change-set 3.
+>
+> 10. Your first answer, before you write anything: your model, your mode, your branch, and whether the head and the card match this block.
+>
+> 11. Added by me after the thread wrote this block. After 2441b3e the thread also extended its copy script, .checkpoints/ci-wasm/thread-words.mjs; that is expected, not a stop. Read .checkpoints/ci-wasm/handover-after.md right after the card. It holds my two answers after this block: BUILD-SEAT (once the CI pull request is merged, you build change-set 3, starting when I say so in this chat) and ACCT-3 (the account this chat runs on counts like my other two), and the three card lines to bring up to date.
+>
+> 12. Less paper, same quality. Notes are for resuming after a cut and for the report. My words still go in by script, each with the question it answers. Don't copy your own other messages into files.
+- _The thread's text, not his words: the "Decisions needed" of its message of 15:09:51 UTC, the message that carried the
+  block for him to paste (the whole message is in the notes) (copied by script, 630 bytes, sha256
+  ace588122aedec499b5c9010302552cdf8d05b92760caf814e7ead914764335b):_
+```text
+**Decisions needed:**
+- CI-MODEL: may the new chat write the CI file on Fable 5.2? It matters because your rule of 12 Nov keeps CI work with Opus 5.5, and on 17 Nov you set it aside only for Builder V1. (a) Yes: paste the block as it is, point 6 says so. (b) No: open the chat on Opus 5.5, delete point 6 and change the model in point 1. I recommend (a), because you named Fable 5.2 for this yourself today.
+- BUILD-SEAT: which chat builds change-set 3 once the CI pull request is merged. It is on the first card below.
+- ACCT-3: whether the account this project runs on counts like your other two. It is on the second card below.
+```
+- **Taken by Mustafa, 2026-11-23, 15:11:01 UTC: ACCT-3, the account his claude.ai project "Shamble Frontlines ALT" runs
+  on counts like his other two** (the project thread "Build the game from change-set 3",
+  session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines ALT", on an account beside the two that
+  CLAUDE.md's ACCOUNTS names (the project's description calls it his second personal account); a tap on the thread's
+  decision card: the line below is the message the platform wrote for his tap, in the card's wording, not text he typed;
+  extracted by script from the session's transcript). The card is shown under it as the thread's text, not his words. In
+  his block of 16:30:46 UTC (the entry above, point 11) he puts it as "ACCT-3 (the account this chat runs on counts like
+  my other two)". No line of CLAUDE.md is written from this tap: by the card's first option the account's roles and the
+  exact line for CLAUDE.md come to him for a yes first. The entries of 2026-11-23 below call it "an account beside the
+  two that CLAUDE.md's ACCOUNTS names"; they stay as written. Copied by script (137 bytes, sha256
+  8a7312e429154729b718cedc3bfc4da868d77b4c3f5e965fdf3fb79e6f573321):
+> Chose "Yes, it counts the same" on the decision card asking "Confirm whether the account this project runs on counts like your other two"
+- _The thread's text, not his words: the decision card he answered, posted at 15:09:56 UTC (copied by script, 646 bytes,
+  sha256 a6a7534971c27e50f50dbc42399816ee08f2260f20628eba916d8aaed450ef00):_
+```text
+Question: Confirm whether the account this project runs on counts like your other two
+Option 1 (recommended): Yes, it counts the same. Your words and chats on it count like on the other two. You name its roles later, and the exact line for CLAUDE.md comes to you for a yes before anything is written.
+Option 2: No, builders only on the two. Open the new chat on your university or first personal account and change point 1 of the block. This project keeps advising only.
+Why recommended: Your repo's rules name two accounts, the university one and your personal one. You already work from this third one, so the records should say what it may do.
+```
+- **Taken by Mustafa, 2026-11-23, 15:10:32 UTC: BUILD-SEAT, the new Claude Code chat builds change-set 3 after the CI
+  pull request is merged, when he tells it to go on** (the project thread "Build the game from change-set 3",
+  session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines ALT", on an account beside the two that
+  CLAUDE.md's ACCOUNTS names (the project's description calls it his second personal account); a tap on the thread's
+  decision card: the line below is the message the platform wrote for his tap, in the card's wording, not text he typed;
+  extracted by script from the session's transcript). The card is shown under it as the thread's text, not his words. In
+  his block of 16:30:46 UTC (the entry above) he puts it as "BUILD-SEAT (once the CI pull request is merged, you build
+  change-set 3, starting when I say so in this chat)", and its point 9 says "Do not start change-set 3." Copied by
+  script (134 bytes, sha256 324be6b2ad1230c0d74a268e248c7213e2d220a6b5dd79298117abc85699d2cc):
+> Chose "The new Claude Code chat" on the decision card asking "Pick which chat builds change-set 3 after the CI pull request is merged"
+- _The thread's text, not his words: the decision card he answered, posted at 15:09:54 UTC (copied by script, 756 bytes,
+  sha256 c393bf2139831a42d59bf0d40a22aa69d5d9121c60ac765c5e91575f47ef1ce4):_
+```text
+Question: Pick which chat builds change-set 3 after the CI pull request is merged
+Option 1 (recommended): The new Claude Code chat. One builder with the safety script, merging on your go there. When it asks what comes next after the merge, you tell it to go on. This thread stops building.
+Option 2: This project thread. I build 3a and 3b here without the safety script, game code only. Every CI or rules file and every merge still goes through a Claude Code chat.
+Option 3: Builder V1, when it is back. Change-set 3 waits until Builder V1 has usage again, after tomorrow 20:00, and you tell it to continue.
+Why recommended: One guarded builder is simplest, and it is what you asked for today: a Fable 5.2 Claude Code chat that continues building the game.
+```
+- **Taken by Mustafa, 2026-11-23, 14:54:47 UTC: WRITE-WHERE, the CI file is written in a new Claude Code chat, not in
+  the project thread** (the project thread "Build the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in his
+  claude.ai project "Shamble Frontlines ALT", on an account beside the two that CLAUDE.md's ACCOUNTS names (the
+  project's description calls it his second personal account); a tap on the thread's decision card: the line below is
+  the message the platform wrote for his tap, in the card's wording, not text he typed; extracted by script from the
+  session's transcript). It answers the thread's card of 14:51:33 UTC, which the thread posted after correcting its
+  answer of 14:33:55 UTC to his question of 14:32:43 UTC; the correction of 14:51:31 UTC and the card stand under his
+  tap as the thread's text, not his words. It replaces his answer WRITE-THREAD (the entry below). Nothing was written
+  under `.github/` in the thread. Copied by script (126 bytes, sha256
+  9b105ac059382c438fdf0114b1241ab907b690db656e624fa4f7851676857ae8):
+> Chose "In a new Claude Code chat" on the decision card asking "Write the CI file in this thread or in a new Claude Code chat?"
+- _The thread's text, not his words: its message of 14:51:31 UTC, which corrects its answer of 14:33:55 UTC, holds the
+  CI write and announces the card (copied by script, 1090 bytes, sha256
+  d13ca088e1a4887a2153d4a8f91b05bac64b6a07f244cc95398ab52fbd1df44b):_
+```text
+A correction to my answer on "why not a new Claude Code chat", before I write anything.
+
+I told you the only thing a normal Claude Code chat adds is the Accept edits switch. That was incomplete. A normal Claude Code chat on this repository also loads the repo's safety script (the guard). It asks you for a tap before every CI or rules file is written, keeps helper agents away from those files, and refuses force pushes. In this thread that script does not load, so I keep those rules by hand.
+
+What still protects the CI file here: your yes on the exact 93 lines, a checksum compare after each write, the advisor agent and the security review on the pull request, and your go before anything merges.
+
+The advisor agent caught this while checking the handover, and it is still reading. I have not written the CI file, and I will not until you answer the card below, because your earlier yes was given on my incomplete answer.
+
+**Decisions needed:** WRITE-WHERE, where the CI file gets written. The card below has the two options and my recommendation.
+
+**For Mustafa:**
+1. Answer the card.
+```
+- _The thread's text, not his words: the decision card he answered, posted at 14:51:33 UTC (copied by script, 700 bytes,
+  sha256 f001d4814b1763515b957b23c8109104feeb8d86714bf726b55a85ca37d12432):_
+```text
+Question: Write the CI file in this thread or in a new Claude Code chat?
+Option 1 (recommended): Here, in this thread. Starts today, all in one place. The safety script does not run here: your yes on the exact text and my checksum compare stand in for it. Reviews and your go before merge stay.
+Option 2: In a new Claude Code chat. By the book: the safety script asks you before each CI write. You open the chat and paste a block from me. It needs about 30 minutes to catch up and its own pull request replaces #63.
+Why recommended: The CI text is already approved by you, the advisor agent and the security review, and nothing merges without your go. Here saves about half an hour and a paste block.
+```
+- **Replaced by WRITE-WHERE (the entry above). Taken by Mustafa, 2026-11-23, 14:32:43 UTC: WRITE-THREAD, his answer to
+  the thread's card "Allow the CI file write in this thread, which has no Accept edits mode?": a yes, with his question
+  why "a new Claude Code chat running on Fable 5.2" does not create the CI files instead** (the project thread "Build
+  the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines ALT", on
+  an account beside the two that CLAUDE.md's ACCOUNTS names (the project's description calls it his second personal
+  account); his message cmsg_019xis1ZabqTLNQbEMzA6WbhUZGHHmFH2k2HzELe9gE4ZM, typed in the app, whole; extracted by
+  script from the session's transcript). His first line is the card's question; the card is shown under his words as the
+  thread's text, not his words. The thread's reply (14:33:55 UTC) said a normal Claude Code chat adds only the Accept
+  edits switch and left out the repository's guard; the thread corrected it at 14:51:31 UTC and asked again
+  (WRITE-WHERE). Nothing was written on this answer. His WRITE-MODE words (the entry of 2026-11-18, 20:20:09 UTC, below:
+  "From now on you read the chat's mode right before each kit write and stop unless it is Accept edits.") are unchanged.
+  The thread's reply of 14:33:55 UTC is in the notes (`.checkpoints/ci-wasm/thread-2026-11-23T143355-why-here.md`,
+  readable at fcf6def once the notes are deleted). Copied by script (197 bytes, sha256
+  e5a9738db3d8c855846dfaa7e781f0fa3680af75506dc5c54d2cd4be17daaba1):
+> Allow the CI file write in this thread, which has no Accept edits mode?
+> Yes, but why don't we make a new Claude Code chat running on Fable 5.2 creating those CI files?
+> Instead trying to do it here?
+- _The thread's text, not his words: the decision card he answered, posted at 14:29:18 UTC (copied by script, 563 bytes,
+  sha256 45e6eff1c27a5c0a0a92e682948113b18c2f24ebc24f8e644c80eece3998efe6):_
+```text
+Question: Allow the CI file write in this thread, which has no Accept edits mode?
+Option 1 (recommended): Yes, write it here. Your yes on the exact attached text is the gate. After writing I compare the file's checksum with the approved one and show you.
+Option 2: No, wait for Builder V1. The CI file waits until Builder V1 is back tomorrow after 20:00, and change-set 3 cannot start today.
+Why recommended: Your rule of 18 Nov (WRITE-MODE) says a builder stops unless its chat is in Accept edits. This thread has no such switch, so only your word lets me go on.
+```
+- **Taken by Mustafa, 2026-11-23, 14:32:42 UTC: LONG-RUNS, long runs in his project go on GitHub, from a branch that is
+  pushed** (the project thread "Build the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai
+  project "Shamble Frontlines ALT", on an account beside the two that CLAUDE.md's ACCOUNTS names (the project's
+  description calls it his second personal account); a tap on the thread's decision card: the line below is the message
+  the platform wrote for his tap, in the card's wording, not text he typed; extracted by script from the session's
+  transcript). The card is shown under it as the thread's text, not his words. The thread reads it as: a full test suite
+  or a long build is pushed and read from GitHub's checks on that branch; the short runs (a test file by its path, the
+  legacy gate, one build, a rehearsal) still run in the thread's container; and none of the evidence the change-set
+  protocol asks for changes. Copied by script (112 bytes, sha256
+  3638a3897c6a5575fbced5d636156a3a862fc3a4ceae20cceb7b18e9a2b55a76):
+> Chose "On GitHub, from a branch I push" on the decision card asking "Where should long runs in this project go?"
+- _The thread's text, not his words: the decision card he answered, posted at 14:30:25 UTC (copied by script, 457 bytes,
+  sha256 49565db01b16e116b24d85df1672302f3a31ca0089198f71674019ad6f9983dc):_
+```text
+Question: Where should long runs in this project go?
+Option 1 (recommended): On GitHub, from a branch I push. Runs in the checks you already use, and results stay with the branch. May count toward your GitHub usage.
+Option 2: In the cloud now. Starts right away, with nothing to set up.
+Option 3: In the cloud tonight. Starts this evening and is usually done by morning.
+Why recommended: Runs in the checks you already use, and results stay with the branch.
+```
+- **Taken by Mustafa, 2026-11-23, 14:31:06 UTC: ANSWERS-7, his yes to the seven recommended answers. For the CI-WASM
+  pull request: CHROME-SOURCE (a), the Google Chrome in GitHub's runner image; CI-TEXT (a), yes to the CI text and what
+  goes with it; FIREFOX-TESTS (c), a small pull request of its own right after it. For change-set 3's plan: RNG-SOURCE
+  (c), our own ChaCha8, checked against the published test vectors; SIZE-3 (b), two change-sets, 3a then 3b; PRESS-PACE
+  (a), a second tap inside one tick is applied one tick later; DEPART-3 (a), he accepts the list** (the project thread
+  "Build the game from change-set 3", session_01WLuqnwQ8c8JuNgfBX7Wixg, in his claude.ai project "Shamble Frontlines
+  ALT", on an account beside the two that CLAUDE.md's ACCOUNTS names (the project's description calls it his second
+  personal account); a tap on the thread's decision card: the line below is the message the platform wrote for his tap,
+  in the card's wording, not text he typed; extracted by script from the session's transcript). What his tap answers is
+  shown under it as the thread's text, not his words: the part of the thread's message of 14:28:25 UTC that states the
+  seven answers back in plain words, and the card. The file attached to that message is the CI text, byte for byte
+  `.checkpoints/ci-wasm/ci-edit.diff` (128 lines, 93 added, none removed, sha256
+  240c7db726dee600b54d10b0252b33e527482ecf88ba41af849660d55e8d2673). Each question in full, with every option and the
+  recommended one, stands in the CI plan's section 16 and in change-set 3's plan (draft 3), section 12
+  (`.checkpoints/ci-wasm/plan.md` and `.checkpoints/ci-wasm/cs3-plan.md`, readable at fcf6def once the notes are
+  deleted): so the first builder chat put them to him on 2026-11-19 (at about 20:03 and 21:07 UTC, by its card), so a
+  thread of his project, "Answer the seven paused lane questions", laid them out for him on 2026-11-23 (its messages of
+  13:39:57 and 14:11:11 UTC, in plain words, with the options; the thread read them as tool output), and he pasted the
+  first builder chat's own summary of them into this thread himself (the entry of 14:25:03 UTC below: lines 5 to 90 of
+  his message). The recommended answers hold more than the thread's message spells out. CI-TEXT (a) is one yes for five
+  things: `ci-edit.diff`; `ci-plant-p-gh.diff` (the two planted lines, sha256
+  e4f21ab359bc9fd911c663a4fcbc892133195fefe44e88ad7ec51b50e3d0b1ac), written in one commit and taken out in the next;
+  the second planted change, one committed render count changed from 3 to 4 and taken back; the stop rule of the CI
+  plan's section 9; and the tool's second route, the runner's curl line with the limits of the route he approved. His
+  yes to CI-TEXT came with his WRITE-MODE condition: the CI file is written only in a chat in Accept edits (WRITE-THREAD
+  and WRITE-WHERE, above). The card's "start building change-set 3a after it" changes no word of his: by CI-WASM (a)
+  change-set 3's build starts after the CI pull request is merged, and by FIREFOX-TESTS (c) the Firefox pull request
+  comes right after it. SIZE-3 (b) carries his yes in advance to the two ladders of change-set 3's plan (its sections 4
+  and 5: a part moves whole with its tests to a named place, no test is dropped, he is told when a part moves). DEPART-3
+  (a) is the list of that plan's section 12, question 4. The advisor agent's rulings that went to him with the
+  questions, each his to overrule, stand, since he has named no objection: PERM-ATT (a), PLANTS both, PYCACHE-NOW (b),
+  WASM-TEST-ROUTE (a), CI-LOOP (a) for E1 only. Copied by script (121 bytes, sha256
+  9472cfb522d3a4f66263131baaad4edf8b79cb9266cc92f8caba0c547897e882):
+> Chose "Yes to all seven" on the decision card asking "Confirm the seven recommended answers so building can start today?"
+- _The thread's text, not his words: its message of 14:28:25 UTC from its third paragraph to its end, which states the
+  seven answers back to him (the two paragraphs before it are about the thread itself and about his question on the
+  chats' names; the whole message is in the notes); the CI text was attached to the message as a file (copied by script,
+  1092 bytes, sha256 6ecd830391f4880ef1e22d30802dc9e9a1858fbc3cb2adc01e2b4ca1cedd580c):_
+```text
+**The seven answers I will work from**, exactly the recommended ones you were shown:
+
+1. CHROME-SOURCE (which Chrome the GitHub robot tests in): the one already on GitHub's machine.
+2. CI-TEXT (your yes on the robot's new instructions): yes to the 93 lines, attached here word for word, plus the two deliberate fake faults that prove the alarms ring, and the stop rule.
+3. FIREFOX-TESTS (when the robot also tests Firefox): its own small pull request, right after this one.
+4. RNG-SOURCE (who makes the game's dice): our own, about 150 lines, checked against the public answer sheet.
+5. SIZE-3 (one delivery or two): two, 3a then 3b.
+6. PRESS-PACE (a double tap faster than the game counts): the second tap lands 33 ms later, nothing is lost.
+7. DEPART-3 (small deviations from your design drafts): accept all.
+
+Until your yes I write no CI file and record nothing as your words. Meanwhile I set up my branch and tools, so building starts the moment you answer.
+
+**Decisions needed:** one, on the card below (ANSWERS-7: your yes to the seven answers above).
+
+**For Mustafa:**
+1. Tap the card.
+```
+- _The thread's text, not his words: the decision card he answered, posted at 14:28:27 UTC (copied by script, 584 bytes,
+  sha256 fd41b0ed519f34234cf199298f02b04d2c5960ed596581dd45b68e07d2812e8c):_
+```text
+Question: Confirm the seven recommended answers so building can start today?
+Option 1 (recommended): Yes to all seven. I record your answers, write the CI file exactly as attached, and start building change-set 3a after it.
+Option 2: Yes, but I change some. You tell me which answers to change, and I wait for your message before writing anything.
+Option 3: Not yet. Nothing is written. I only keep my branch and tools ready until you say more.
+Why recommended: The review agents checked all seven. None changes how the game plays, and together they keep outside code out of the game.
+```
+- **Taken by Mustafa, 2026-11-23, 14:25:03 UTC: he would rather start today, and would like a new Fable 5.2 based Claude
+  Code chat to continue building the game** (his message cmsg_019xis1ZabqTLNQbEMzA6WbhR97Lu4zJ8QjD4X3hYFruVA, typed in
+  the main chat of his claude.ai project "Shamble Frontlines ALT", on an account beside the two that CLAUDE.md's
+  ACCOUNTS names (the project's description calls it his second personal account); his project made the thread "Build
+  the game from change-set 3" from it, session_01WLuqnwQ8c8JuNgfBX7Wixg; extracted by script from that session's
+  transcript). Of its 211 lines, 201 are the last texts of three other chats, pasted by him: they are left out and named
+  in the lines in square brackets, and his own lines are whole (the whole message: 16731 bytes, sha256
+  93c7645aebfee23df6658110d7cfe3fdd4d0e8f8db6be4d6ca2216f773848f93). The chat he calls Builder V1 is the first builder
+  chat, lane 1 of this repository's records (session_019YNMUV9LFhASseJ9EP12kL, branch
+  `claude/wonderful-hamilton-jdmlnf`), paused by his words of 2026-11-19, 21:44:09 UTC (the entry below; the project's
+  note to the thread: that account is out of usage until 2026-11-24, 20:00 Amsterdam time). His project made this thread
+  from his message; the thread took lane 1's records forward on a branch of its own, `claude/project-thread-qx9woh`,
+  started from that chat's last commit d064e17b84b73c8040ffe66db7105a517cde9215, and never pushes to that chat's branch
+  (LANE-RULES: "a lane never pushes to another lane's branch"); the CI write went to a new Claude Code chat
+  (WRITE-WHERE, above). The first line of his message quotes a paste block another thread of his project had written for
+  the first builder chat; his question under it was answered in the thread's message of 14:28:25 UTC
+  (`.checkpoints/ci-wasm/thread-2026-11-23T142825-seven-answers.md`, readable at fcf6def once the notes are deleted): by
+  "Lane 1" the paste block means the chat he calls Builder V1. Copied by script (1092 bytes, sha256
+  21d6a078b6b4be071278ecb1bf495d4495e1d2cebdcca0f220505e501aa0f751):
+> "this message by script into the notes and record it in docs/DECISIONS.md the usual way."
+> Usually Claude does all of this for me, with Lane 1 who do you refer too?
+> I have Netcode chat (enterprise account)
+> Builder V1 (Fable 5.2) - its last text before the usage cut was this:
+- _[left out, lines 5 to 90: the last text of the chat he calls Builder V1, pasted by him]_
+> Then there is Builder V2 (Opus) - That lets me do all the hideous manual tasks that needs to be done:
+> Its last text before usage cut was this:
+- _[left out, lines 93 to 121: the last text of the chat he calls Builder V2, pasted by him]_
+> There also is a 'Block 2.3' claude code chat, which I don't really know what it was working on, but its last text:
+- _[left out, lines 123 to 209: the last text of the chat he calls 'Block 2.3', pasted by him; equal to Builder V1's]_
+> All 3 of those given chats are Claude Code chats, so stick to their names when giving me instructions.
+> I would rather start today with the progression either way and would like to create a Fable 5.2 based Claude Code chat that will continue work on building the game
+- **Taken by Mustafa, 2026-11-19, 21:44:09 UTC: the pause: the first builder chat finishes what is in hand and starts
+  nothing until he says so** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; extracted by
+  script from the session's transcript, message 314f33b2-7c58-441f-8099-0b96cf4cd024, whole). When it came, the CI-WASM
+  pull request (#62) was a draft with no CI file written, and its three questions and change-set 3's four were with him;
+  the chat finished what was in hand and stopped (its last commit: d064e17). He has not told that chat to continue; on
+  2026-11-23 a thread of his project took the records forward, and the CI-WASM pull request goes to a new Claude Code
+  chat (WRITE-WHERE; the entries above). Copied by script (111 bytes, sha256
+  75450ddf0fa40b2fd7cef3c762a2106f8b498581fdc8c55f3f4834886b55581e):
+> Finish the current tasks that you're working on and then pause.
+> I will let you know when you can continue again
+- **Taken by Mustafa, 2026-11-19, 16:08:04 UTC: two notes for the work after #61: the docs pass that records the merge
+  of #61 stays with the CI-WASM pull request, whose report keeps the workflow text apart from the docs; and for
+  change-set 3's browser check the README asks him to keep the browser's window in front and uncovered during the first
+  run and has one step with the window covered on purpose, so that BR-GAP is read and not guessed** (the build chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-19, 16:38 (Amsterdam
+  time)"; extracted by script from the session's transcript, message e02d3ad1-8f0c-4b6a-a30a-5b267f681630, whole: its
+  first paragraph is his instruction to the chat after a compaction). BR-GAP is the one unexplained reading of his
+  browser check: `docs/reports/2026-11-19-cs2-browser-check.md`. Copied by script (880 bytes, sha256
+  d468d8d3e21b852e841e7443f50d5719d1e76b9a7435eac681150c8d77332595):
+> You were just compacted to cut usage. Nothing is lost: pull request #61 is merged (main f5030a3) and its report is on main. Read the resume card .checkpoints/ci-wasm.md first and continue from its "Next steps". Do not redo finished work. Before the first agent starts, tell me in two lines that the card and its notes folder are complete and that the background saver runs.
+>
+> My words of 2026-11-19, 16:38 (Amsterdam time): two notes for the work ahead.
+> - The docs pass that records the merge of #61 stays with the CI pull request, as you put it. In its report keep the workflow text apart from the docs, so that it can be compared with the text I say yes to.
+> - For change-set 3's browser check: the README asks me to keep the browser's window in front and uncovered during the first run, and has one step with the window covered on purpose, so that BR-GAP is read and not guessed.
+- _A pointer, not a decision: **his browser check of the first page (#61), 2026-11-19, 14:46:25 to 15:09:29 UTC.** Four
+  chat messages (14:46:25, 14:54:19, 15:02:50 and 15:09:29 UTC) with eight "Copy report" texts, from his own browser
+  (Brave 1.100.58) and from Firefox 160 on his Windows computer, and one picture. His go below says: "My browser reports
+  are recorded with the next docs pass, not by a push to this head." They stand whole, copied by script, in
+  `docs/reports/2026-11-19-cs2-browser-check.md`, Appendix A, with the build chat's reading of them against the zip's
+  README. His first Brave report read "last pause: none yet" where the README expects a recorded pause; by his go's
+  condition ("If your reading of them shows a line that is not as your README expects, stop and tell me before you
+  merge.") the chat told him at 14:50:49 UTC (its message 7e4ded94-23e4-459c-ad2a-6d1fdcb3d7d8 in the session's
+  transcript), before any merge, and his re-check of 15:02:50 UTC showed the pause (45.0 s hidden, 0 ticks while
+  hidden)._
+- **Taken by Mustafa, 2026-11-19, 14:31:30 UTC: his answer to the question VISION-NOTE ((a): the dated note for
+  `docs/VISION_V2.md` is right as the chat wrote it)** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his
+  personal account; extracted by script from the session's transcript, message 94cf4e6c-e46b-48a4-b48e-3270856870be,
+  whole). The question, as the chat put it to him at 14:29:51 UTC under the note's exact text (the chat's message
+  699736ec-f365-4458-aceb-592bba842d59, copied by script): "VISION-NOTE: is the dated note's text right as written
+  above?", with the options "(a) Yes, as written." and "(b) Change it: tell me the wording." The text it showed is the
+  dated note now in `docs/VISION_V2.md` §4 and the sentence added to that file's "Updated on" lines, both written by
+  this docs pass from that message, byte for byte. His second sentence asks for the instructions again; the chat
+  answered with the browser check's steps at 14:31:56 UTC. Copied by script (103 bytes, sha256
+  8c15eeaeb638a66519884a9200d6c86e20270c82934f8e756bea29775659ec04):
+> a, yes
+>
+> also can you give me the instructions again of what needs to be done exactly? I'm not following
+- **Taken by Mustafa, 2026-11-19, 14:28:25 UTC: his go on the merge of pull request #61 (change-set 2, the first page)
+  into main by a merge commit at head 4cf30ce303b16e96b3ca5d5c0b20b928a4db6b86, what he accepts with that merge, his
+  answer BROWSER-SET ((a), order only: Safari stays a target of v2; Chrome, the Chromium-based browsers and Firefox come
+  first; Safari and Mac come later), and what comes after the merge (the CI-WASM pull request, its exact text to him
+  first, with change-set 3's plan beside it; with change-set 3, one line in `.gitignore` for `__pycache__/`)** (the
+  build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-19, 15:16
+  (Amsterdam time)"; extracted by script from the session's transcript, message 65801ff7-6e9d-4343-b384-16a67118bc87,
+  whole; the same bytes stand in the message of the merge commit f5030a3). When these words came, no browser report was
+  in the chat; the merge waited for his reports (the pointer above) and was made at 15:10:54 UTC, at that head, with
+  `gate`, `smoke` and `toolchain` green on it (read at 15:10 UTC). The dated note he asks for stands in
+  `docs/VISION_V2.md` §4 (his answer VISION-NOTE, the entry above). Copied by script (2104 bytes, sha256
+  67f98d3a76c8f5de73081f6cb4d089b5baa4244f4ed69eb043b1f5c7bc760f20):
+> My words of 2026-11-19, 15:16 (Amsterdam time): my go on the merge of pull request #61, and my answer to BROWSER-SET.
+>
+> My browser check is done: my reports from my own browser and from Firefox are in this chat. If your reading of them shows a line that is not as your README expects, stop and tell me before you merge.
+>
+> Merge pull request #61 (change-set 2, the first page: the simulation as WebAssembly in a Web Worker, an empty lit ground with a grid, the small server) into main by a merge commit, at head 4cf30ce303b16e96b3ca5d5c0b20b928a4db6b86. Put these words in the merge message.
+>
+> Before you merge:
+> - Read gate, smoke and toolchain on that head once more. All are green, or you stop and tell me.
+> - If the head is not 4cf30ce303b16e96b3ca5d5c0b20b928a4db6b86, stop. A later push needs the advisor agent's review and my go again. My browser reports are recorded with the next docs pass, not by a push to this head.
+>
+> What I accept with this merge:
+> - The things that went wrong, as the report writes them down, the lost night and the two compiled Python files in the branch's history among them.
+> - The size: 4,477 added lines against the stop line of 4,700.
+> - That CI does not build the WebAssembly or run the browser tests yet. Until the CI-WASM pull request is merged, those tests ran in your container only.
+> - The follow-ups below High, as the report lists them, and the advisor agent's wording points for the next docs pass.
+> - As before, the checkpoint commits enter main's history with this merge.
+>
+> BROWSER-SET: (a), order only. Safari stays a target of v2. Chrome, the Chromium-based browsers and Firefox come first; Safari and Mac come later. Bring me the dated note for docs/VISION_V2.md with its exact text.
+>
+> After the merge:
+> - As my answers of 2026-11-18 have it: the CI-WASM pull request, its exact text to me first, and change-set 3's plan beside it. Open the checkpoint first, then stop and tell me the path of its resume card: I compact this chat before you go on.
+> - With change-set 3, one line in .gitignore for __pycache__/, so that a save cannot pick up compiled Python files again.
 - **Taken by Mustafa, 2026-11-19, 13:36:37 UTC: his answer to SIZE-STOP-2 in his own words ((a): the stop line of
   change-set 2 moves to 4,700 added lines, and it is the last move of that line), the night lost to an approval prompt
   accepted as the report writes it down, and four things for the change-sets after this one: SLICE-FEEL (aiming down
@@ -166,6 +680,9 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. Lane 2's first list of needs stands on the "Lane requests" issue, #59 (the comment of 2026-11-18, 23:24:14 UTC). Answer it in change-set 4's plan, row by row, as it asks. With point 1, its wishes W1 (an aiming-down-sights flag) and W4 (how far the sprint-to-fire swing has got) are needs. A comment there is never my word.
 >
 > 4. My browser check of the first page: I open the zip in my own browser and once in Firefox. Put the Firefox steps in the zip's README and say what I paste back. The game has to work in Chrome, the Chromium-based browsers and Firefox. Safari and Mac come later.
+  _Dated pointer, 2026-11-19 (the docs pass after #61's merge; the advisor agent's wording point on head 4cf30ce): where
+  the header of this entry says the lost night is "accepted as the report writes it down", his words above are "is
+  accepted as you wrote it down, with your lesson."_
 - **Taken by Mustafa, 2026-11-19, 11:07:48 UTC: his answer to the question SIZE-STOP-2 of change-set 2 (the change-set
   stood at 4,430 added lines against the stop line of 4,400, with review round 2's fix pass of 41 lines prepared and not
   yet applied): (a), the stop line moves to 4,700 and the fix pass goes in** (the build chat,

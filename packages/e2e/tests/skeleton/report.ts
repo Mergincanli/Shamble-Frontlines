@@ -39,6 +39,15 @@ export async function running(page: Page, blocks = 90): Promise<void> {
   );
 }
 
+/**
+ * Waits until the page has drawn its frame number `frames`. The Worker's numbers reach the page from its frame loop
+ * (a request at most four times a second, the answer between two frames), so on a slow page a read right after a
+ * change can still be the old report.
+ */
+export async function drawn(page: Page, frames: number): Promise<void> {
+  await page.waitForFunction((wanted) => ((window as unknown as Hooked).__shambleReport?.().frames ?? 0) >= wanted, frames);
+}
+
 /** Every browser spec needs the built development page. */
 export function needsBuild(): string {
   const dist = process.env["SHAMBLE_DIST"];
