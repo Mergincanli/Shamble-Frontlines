@@ -65,7 +65,7 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-23 21:1x UTC; U6a MERGED 824d8e7; U7's T-half DONE 8ab088e8…, u7-t-build.md; before: card at 09958e5)
+## Now (2026-11-24 10:1x UTC; U6b MERGED 8efb9b2; U6c BUILT, its round running; before: card at e788f57)
 - **U8:** pass 3 DONE ~17:29 (snapshot 0e7fbab2…, 6,111 of his 6,200 stop: items 1-8, every Low in, none carried; node
   tests 100/0, wrappers 315/0, redact 0 findings; package files unchanged; no plant left; item 1's judge run 17:08 at
   627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round DONE 21:2x** (his words: the three Highs'
@@ -138,29 +138,29 @@
   counter, SA-16's variant); the kit's paper costs named to him on 2026-11-17. Nothing added since.
 
 ## Key numbers (U4f's `<base>` counts, the earlier packs and his 2026-11-17 count: this card at 1b26e8c)
-- Disk (2026-11-23 17:2x UTC): 6,855 MiB free, no build running (floor 4,096; the dev profile reached 10.4 GB, 4.3 of
-  it incremental; today's part-cleans 6.2, 8.7, 1.0, 7.5, 10.4 GiB); still unpacked
-  (none covered by his packing words): u4r-P3-d66e23cd78f2 298 MiB, u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741,
-  u4r-P2-fc411116c1f1 623, u4f-20-350677f0aef2 434, u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366,
-  u4f-47-b57221ed139d 51.
+- Disk (2026-11-24 10:1x UTC): 10,553 MiB free (floor 4,096; a full check.mjs fills the dev profile to ~7.8 GB;
+  today's part-cleans 7.0, 8.2, 7.2 GiB); unpacked (none covered by his packing words): u4r-P3-d66e23cd78f2 298 MiB,
+  u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741, u4r-P2-fc411116c1f1 623, u4f-20-350677f0aef2 434,
+  u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366, u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (2 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - Step 5's main-run.sh b5263aevb. Done, resumable: security-auditor a866e544173bb98fc (security-u6c-lock.md DONE);
-    U7's T-builder a9873cdba07a3219e (T5 (i) DONE); the advisor a6e7ce46a28424b0b
-    (advisor-u6b-m6.md DONE, fe2e4c0d…); the advisor's U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
-    DONE); U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree agent-a2661dc320c9e6d00), the
-    advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode a0a57a3948202de40, security aedb799ad9648b0e1,
-    test a88f25b3d3f66d972.
-  - The saver b1bd3pcdl (09:50 to about 11:50; when it ends, restart it: run_in_background, timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
-- **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
-  af8c5f0fbec829595 (u6b-run.sh exports CARGO_INCREMENTAL=0; a builder on the 4 GB floor stops, never cleans);
-  U8's builder ac59cce3e5d002441 (worktree agent-ac59cce3e5d002441, notes u8-build.md "## Pass 3"); Stop B's infra seat
-  a0615e1ead860724b; the advisor a3de649cd25e474df (U8's rulings; U8's pushed head); the docs agent a6eb7acdf1c3ff885;
-  U8's first builder abf71d95fc07b3522 (its worktree has ops/browser/node_modules for test 4); U7's T-builder
-  a9873cdba07a3219e (T5); U7's drafter a159f25bffe1d4950; the U6c advisor a662f1797b78cae95. Older: card at e67ef59.
-- **U6a MERGED at 824d8e7 (2026-11-23 03:56):** u6a-report.md (build, M5, carries by number); the carries' takers in
-  u6a-fix-pass.md's last section; its build lines on this card at 21765e3. Merge M3-M9 as U4f's (history.md:7022-7028).
+- **Running (3 agents, 1 shell, 2 triggers; resume each by SendMessage to its ID; after a cut, from its own file):**
+  - U6c's round (section 7, xhigh, read only, from ~10:10 UTC, snapshot a4e63455…, tree agent-a3a3e3fdf559de095):
+    netcode-architect aa64bb15ad4467641 -> u6c-review-netcode.md; test-engineer a3a1718b1419d246e -> u6c-review-test.md;
+    security-auditor a546a4604d30ee9d4 -> u6c-review-security.md. Resume point: each reads its file and goes on after
+    its last complete block (their launch messages say so); their runner logs .gate/u6c/rev-<seat>-<n>.log.
+  - The saver b1bd3pcdl (09:50 to about 11:50; when it ends, restart it: run_in_background, timeout 7200000). Triggers:
+    check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly, next ~10:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24
+    23:05 UTC, msg-2026-11-25.md).
+- **My step (his words, history.md "2026-11-24 about 10:14": no new agent until after his /compact):** waiting on U6c's
+  round. **Next three:** (1) read the three files; the advisor's one ruling on them (F-P8 and each Medium or higher in
+  its packet); (2) the fix pass by U6c's builder (SendMessage), its check, then merge M3-M9 as U4f's (history.md:7022-
+  7028; M5 check.mjs in the main folder after a part-clean; A2's 48-connection reading at the close; U8's side per
+  interface, C9); (3) U7's 0b check the hour U6c merges, U7's R-half (its T-builder) and U8's merge. Day message 23:05.
+- **Finished, resumable by SendMessage:** U6c's builder a3a3e3fdf559de095 (BUILT; notes u6c-build.md; takes the fix
+  pass); U7's T-builder a9873cdba07a3219e (T5 (i); takes the R-half); U8's builder ac59cce3e5d002441 (worktree
+  agent-ac59cce3e5d002441, notes u8-build.md "## Pass 3"); the advisor a3de649cd25e474df (U8's rulings; U8's pushed
+  head); the U6c advisor a662f1797b78cae95; U6b's builder a2661dc320c9e6d00 (worktree stays). Older: card at e67ef59.
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): its record in Now. Open at its
   merge: F28 (U6b's flush), U6b's null certificate pair, ds-selftest's place in C1's run list (U6b's merge), U6c's names
   (advisor-u8-stopb.md:208-220, and NC-R2-4 in U6c's message), Stop B's laptop reads (driver listen, passphrase, fsn1

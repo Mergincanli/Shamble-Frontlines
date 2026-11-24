@@ -7781,3 +7781,11 @@ Re-create them if still needed.
   running or failed, 07:01:01).
 - **Resumed 08:0x UTC:** no cargo or runner running; the saver restarted (bldcg3pna); the builder by SendMessage, from
   its notes and its plan.
+
+## Mustafa, 2026-11-24 about 10:14 UTC (in this chat, before his /compact; word for word)
+> I'm about to run /compact. Start no new agent until after it; running ones carry on. Check that the card lists every
+> running agent, shell and trigger with its ID, task and resume point, and your own step with the next three. Record
+> this message, save with checkpoint.mjs and push. Then reply in one line: "Ready for /compact: card <sha>; running:
+> <names>."
+- Done 10:1x: the card's "Running work" lists U6c's three seats, the saver and both triggers with ID, task and resume
+  point, and "My step" with the next three; no agent started after it.
