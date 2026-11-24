@@ -144,6 +144,17 @@ WITH NOTES; report `docs/reports/2026-11-11-foundation-2-1a.md`. Merged:
 PR #50, 76b4f7a, 2026-11-11 18:38 UTC, by merge commit, on Mustafa's go after the advisor's APPROVE of f6becf5; CI
 green on main (run 43079707687).
 
+**The foundation, 2.1b: the move [2026-11-11 to 11-12, MERGED]** — foundation-restructure, the second of step 2.1's two
+pull requests, after 2.1a (PR #50, merged as 76b4f7a on 2026-11-11, by merge commit, on Mustafa's go after the
+advisor's APPROVE of f6becf5). The five legacy files move into `legacy/` with `git mv`, bytes unchanged, in a commit of
+their own (c090843); the commands in text name the `legacy` folder (`tools/README.md` with the build-folder rule, the
+tool headers, `tools/village.py`, the root README: 1e6f84e); the four kit lines on his yes, KIT-2.1B (a) (CLAUDE.md
+:19, :43, :44 and `.claude/agents/verifier.md:28`: b6b3b81); the docs (his words of 2026-11-11 in `docs/DECISIONS.md`,
+his SCOPE (a) in ADR 0002 and the register, OQ-0002-2 answered in part, the maps, STATUS). Evidence E1-E6 and E8 PASS;
+CI's gate and smoke green on c090843, 1e6f84e and b6b3b81. Review round 1 and the verifier passed; the report:
+`docs/reports/2026-11-11-foundation-2-1b.md`. Merged: PR #51, 2aa5e9c, 2026-11-12 13:22 UTC, by merge commit, on
+Mustafa's go after the advisor's APPROVE of 5d50bf2; CI green on main (run 43226692719).
+
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
 
@@ -161,6 +172,10 @@ green on main (run 43079707687).
   2026-11-14 changes "wave 1 runs one heavy spike at a time" in the line above; they follow the build plan's order
   (`docs/reports/2026-11-17-build-plan-slice-1.md`). His go of 2026-11-17: "The 2.3 chat stays stopped for now: I pass
   it nothing until its plan has been checked." Both: `docs/DECISIONS.md`.
+- **Pointer, 2026-11-24 (change-set 3a's docs pass; not his words):** of the build plan, change-sets 0, 1 and 2 are
+  merged (PRs #56, #58, #61), CI builds the WebAssembly and runs the tests that need it (PR #64), and change-set 3a is
+  in flight; next, in change-set 3's approved plan's order, with Firefox joining by his FIREFOX-TESTS (b): the small CI
+  pull request, then 3b (`docs/STATUS.md`, "Next").
 - **Superseded by v2** (paused in issue #16; where things stand: `docs/STATUS.md` and `docs/V2_PHASE0_BRIEF.md`). **Queue (Advisor, 2026-10-15; updated 2026-10-16 after 3a):** greybox phase: three-teams (0. team-prep-fixes, merged → 3a three-teams-core, merged 2026-10-17 → **N1** (next; editor Play never rebuilds the nav grid; a one-line change-set) → **R19** (navBuild building-cell fix; right after N1, before 3b; Night queue item 2, NEEDS PLAN) → 3b three-teams-hud → 3c spawn-and-buy; editor v2 comes after the playable greybox loop, per the Advisor's queue) → **"ramps as slopes in SIM"** (its own change-set, before octopon-3-greybox; lets `_botFireWorld` go) → **NC-7 blast reach by line of sight** (to the target's nearest surface, ignoring the target's own box; before the octopon-3 playtests) → octopon-3-greybox → harvest-economy → bot-replan-storm → uplinks → win-and-scoring → scale test on the Octopon-3 greybox (N = 12, 24, 36, 48). Paused until the greybox loop is playable: tutorial-field-manual, ui-step-2, ui-step-3, build-spike, ADR run. house-textures-seeded: low priority, unslotted.
 - **From the 3a report** (approved unattended work is listed in the [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)): the `navBuild` building-cell fix with bot replanning (R19: 27.5 % of Cabana objective routes cross a roof bots can't climb) is now approved into the queue as item 2, NEEDS PLAN (Advisor 2026-10-17, R19-ORDER). Advisor LOS-SIZE: the bots' sight-check budget for 48 soldiers is sized in the 48-player performance change-set, with measured cost, together with the `updateSoldierAnim` split (CS11) and the soldier draw-call reduction (about 120 per on-screen soldier); that work is still proposed, not approved, and comes before `TUNE.teams.size` rises. Advisor K4-MEASURE: bot fairness between teams is judged by target searches per bot per second and the share of time with a target (`tools/perfbots.js` fairness), plus which team's bot fires first in mutual sightings (not in the tools yet; R19's plan adds it). After N1 and R19: 3b three-teams-hud, 3c spawn-and-buy, as planned.
 - **Core loop v2 (Oct 2026):** see LOOP_V2.md; greybox prototype first (§11).
@@ -180,14 +195,29 @@ green on main (run 43079707687).
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-23, PR #64, in flight]** — ci-wasm
+**Change-set 3a of the build plan, Rules and boundaries [2026-11-24, in flight]** — cs3a-rules-boundaries (the first
+half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the simulation's rules under
+tests. A scan of `crates/sim/src` refuses a float method outside ADR 0004 part 7's list, a hash map, a clock and
+per-target code; our own ChaCha8 (his RNG-SOURCE (c)) matches the 8 published vectors and a 160,384-byte stream file;
+38 float operations on 10,048 inputs are exact natively and in WebAssembly, but for 16 `mul_add` results below the
+smallest normal float in WebAssembly, pinned as a toolchain defect, with `mul_add` refused in `sim` (his MUL-ADD (a));
+the panic hook's text reaches the page; a test-only WebAssembly module, built outside every package; the build refuses
+a runtime crate without its overflow override and a feature set that differs between builds, and the runner's Wasm is
+the container's byte for byte. A player sees nothing new beyond two lines of the development readout. 3,561 added
+lines (stop line 4,100), 96 planted defects caught; CI green on the code head 8619d539; three review rounds, the third
+on one High, now closed; the verifier PASS; report `docs/reports/2026-11-24-cs3a-rules-boundaries.md`. Waits for the
+advisor agent on the head, his browser check and his go.
+
+**CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-24, MERGED]** — ci-wasm
 (risk tier 2; planned by the first builder chat, carried by a thread of his project, built by the chat he calls
 Builder V3): before the network cut the `toolchain` job fetches the wasm-bindgen tool's archive by his TOOL-SOURCE
 values, runs GitHub's own check on it and installs its one program root-owned; inside the cut it builds the page
 twice, then runs the boundary tests, five type checks and the 12 browser tests in the runner image's Chrome (CI does
 not pin the test counts). Two CI writes on his yes (the first stopped at its install check on `/opt`), three planted
 faults each red at its own step; with it his browser check of #61 and his words of 2026-11-19 and 2026-11-23. Two
-review rounds, no Critical or High; report `docs/reports/2026-11-19-ci-wasm.md`. Waits for his go; then change-set 3a.
+review rounds, no Critical or High; report `docs/reports/2026-11-19-ci-wasm.md`. Merged: PR #64, 1ec6f6c, 2026-11-24
+10:15:31 UTC, by merge commit, by his main Advisor on his tap after his go for head 8aadfb0; CI green on main (gate
+run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with it.
 
 **Change-set 2 of the build plan, First page [2026-11-18 to 11-19, MERGED]** — cs2-first-page (foundation
 step 2.5, first half), by lane 1: the Rust simulation (a tick counter and the match seed), built as WebAssembly with
@@ -292,14 +322,3 @@ crate on the advisor agent's ruling (RR-1, High; his go asked, then given with t
 the drafts' owners. The Fable advisor's whole read before ready changed no file. The verifier passed (bd44a68). Merged:
 PR #48, 4d21c1a, 2026-11-13 16:20 UTC, by merge commit, on Mustafa's go after the advisor agent's APPROVE of 9b20b67; CI
 green on main (gate run 43461710700, toolchain run 43461710673).
-
-**The foundation, 2.1b: the move [2026-11-11 to 11-12, MERGED]** — foundation-restructure, the second of step 2.1's two
-pull requests, after 2.1a (PR #50, merged as 76b4f7a on 2026-11-11, by merge commit, on Mustafa's go after the
-advisor's APPROVE of f6becf5). The five legacy files move into `legacy/` with `git mv`, bytes unchanged, in a commit of
-their own (c090843); the commands in text name the `legacy` folder (`tools/README.md` with the build-folder rule, the
-tool headers, `tools/village.py`, the root README: 1e6f84e); the four kit lines on his yes, KIT-2.1B (a) (CLAUDE.md
-:19, :43, :44 and `.claude/agents/verifier.md:28`: b6b3b81); the docs (his words of 2026-11-11 in `docs/DECISIONS.md`,
-his SCOPE (a) in ADR 0002 and the register, OQ-0002-2 answered in part, the maps, STATUS). Evidence E1-E6 and E8 PASS;
-CI's gate and smoke green on c090843, 1e6f84e and b6b3b81. Review round 1 and the verifier passed; the report:
-`docs/reports/2026-11-11-foundation-2-1b.md`. Merged: PR #51, 2aa5e9c, 2026-11-12 13:22 UTC, by merge commit, on
-Mustafa's go after the advisor's APPROVE of 5d50bf2; CI green on main (run 43226692719).

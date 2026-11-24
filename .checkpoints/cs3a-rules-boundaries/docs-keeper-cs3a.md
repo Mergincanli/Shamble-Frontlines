@@ -13,6 +13,11 @@ Edit only docs/ (not DECISIONS, adr/, research/, VISION/LOOP/LOOK/EDITOR_V2, the
 6. REPO_MAP: new paths + .gate/rules-module/ + packages/sim-worker/pkg/; run repo-map-check.
 7. Drift: MODULE_MAP, START_HERE, TECHNICAL only if false.
 
+## State: DONE (2026-11-24, ~17:10 UTC). Late additions: round 3 APPROVE and the verifier PASS became committed at
+1c668e95 during the pass, so STATUS's 3a row, the archive's 3a block header and ROADMAP state them; N3 folded into
+3A-CONFIG-FILE, the verifier's L2 into 3A-PLANTS, its TE-WATCH read into the Health row. Checks at the end: STATUS 120
+lines; repo-map-check OK (176/109); table cell counts right; DECISIONS untouched by me (still the main session's +132).
+
 ## Progress
 - (step 0) notes file written.
 - Read: card (all 670 lines), STATUS (120 lines, at the cap), DECISIONS diff (6 entries, 23:44:10 to 15:58:25; not touched).
@@ -58,6 +63,28 @@ Edit only docs/ (not DECISIONS, adr/, research/, VISION/LOOP/LOOK/EDITOR_V2, the
 - DONE in STATUS_ARCHIVE too: the "From change-set 3a" block (23 ids, each with its source; the table of build options
   recorded inside 3A-NAME-SECTION: build plan :330, plan s8); Health rows (main 1ec6f6c; change-set 3a; #64 merged);
   Open bugs and risks: change-set 3a's three risks. NOTE: the archive's "3a, ranked" is the LEGACY 3a (PR #15).
+- DONE STATUS (120 lines, final newline): header date; Last merged #64; main's CI on 1ec6f6c; In flight: #64 and
+  #63/#62 rows out, change-set 3a's row in (no verdict stated; round 3 and verifier "running"); Next 1 tightened, 2
+  rewritten (small CI PR, 3b, change-set 4 with 3A-FMA-CHECK explained); Waiting: 3a's check and go (GH-NEXT (a)),
+  ACCT-3 roles+line, 3A-RUST-REPORT, 3A-PART7-POINTER; Follow-ups: #61 and #64 lines pruned of closed ids, 3a line
+  added; risks: change-set 3a's. MOVED by script, byte for byte (diff vs 1ec6f6c STATUS :48-50 empty): the "Legacy,
+  frozen" waiting bullet to the archive's end of "Phase" (archive :169-171), a 1-line pointer left.
+- DONE ROADMAP: 3a entry (in flight) on top; #64 entry -> MERGED (1ec6f6c, his main Advisor's tap, CI runs); 2.1b
+  folded into Build history by script after 2.1a (diff vs 1ec6f6c ROADMAP :296-305 empty); 12 recent entries; a dated
+  pointer in "Next / open". The order 3a -> E1 (small CI PR, Firefox joins by FIREFOX-TESTS (b)) -> 3b -> 4 is the
+  approved plan's (cs3-plan s0 :23-28), not "his words": STATUS Next and the ROADMAP pointer say so. E1 = every
+  crate's release tests (plan s6) added to STATUS Next.
+- Archive header :5-7 updated for the 2026-11-24 move.
+- DONE REPO_MAP: rows for the 21 new paths (all named; checked by a loop over files-changed.txt), updated rows
+  (crates/, sim-wasm lib.rs, sim-worker src, boundary, vite.config, serve.mjs, build.mjs, build-checks.mjs (22/20
+  names, counted), e2e skeleton, .gitignore, app/), two "built, not in git" rows that the checker does not take as
+  entries (pkg/, .gate/rules-module/), the 3a report row; "Last checked" 2026-11-24. repo-map-check: OK, 176 entries
+  cover 109 required paths, exit 0.
+- DONE #64 report corrections, each with a dated italic line: F-SHOWN (byte-equal bullet: what was shown when, from
+  the transcript), F-EFFORT (:99: 11 of 12 at max, docs-keeper high), "Four Lows" (3 deferred + the timeout record),
+  the advisor's heads (3 reads, the ranges they covered, the verdict's record), the docs-pass paragraph's "byte for
+  byte" (Follow-ups and Routines blocks byte-equal: diffs checked; Phase block not), the plan pointer (5911b56).
+  Left (not in brief): report :35-38 "the mode read on that reply" vs the advisor's "acceptEdits" condition.
 - VF-L4, FPS-LINE, NEG-ZERO verified in code at 8619d539 (serve.test.mjs:73-78; frame-times mean; report.ts zero).
 - REPO_MAP: map check fails on a listed entry missing on disk; not in CI. Build outputs go in rows the checker does
   not take as entries (first cell not starting with a backtick), so a clean clone still passes.
