@@ -11,7 +11,7 @@ pub mod panic;
 
 use client_endpoint::block::BlockWriter;
 use client_endpoint::schedule::LocalSchedule;
-use sim::{SEED_BYTES, TICK_HZ, World};
+use sim::{MatchSetup, SEED_BYTES, TICK_HZ, World};
 use wasm_bindgen::prelude::*;
 
 /// Local play: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far.
@@ -80,7 +80,10 @@ impl Sim {
             return Err(CreateError::Mode(mode));
         }
         let mut writer = BlockWriter::new(pad_bytes).ok_or(CreateError::PadBytes(pad_bytes))?;
-        let world = World::new(seed);
+        let world = World::new(&MatchSetup {
+            seed,
+            start_tick: 0,
+        });
         writer.write_header(world.tick());
         Ok(Self {
             world,
@@ -136,7 +139,7 @@ impl Sim {
 
     /// Runs one tick, writes its block, and returns the time (the host's milliseconds) at which the next tick is due.
     pub fn step(&mut self) -> f64 {
-        self.world.authority_step();
+        self.world.authority_step(&[]);
         self.writer.write_header(self.world.tick());
         self.schedule.ticked();
         self.schedule.next_due_ms()

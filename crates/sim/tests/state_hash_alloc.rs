@@ -13,7 +13,7 @@ use std::alloc::{GlobalAlloc, Layout, System};
 use std::cell::Cell;
 use std::hint::black_box;
 
-use sim::{SEED_BYTES, World};
+use sim::{BUTTONS, MatchSetup, PlayerCommand, SEED_BYTES, World};
 
 thread_local! {
     /// Calls on this thread that took memory: `alloc`, `alloc_zeroed` and `realloc`. A constant start value, so the
@@ -64,7 +64,10 @@ static ALLOCATOR: Counting = Counting;
 
 #[test]
 fn the_state_hash_takes_memory_once_and_never_again() {
-    let mut world = World::new([7; SEED_BYTES]);
+    let mut world = World::new(&MatchSetup {
+        seed: [7; SEED_BYTES],
+        start_tick: 0,
+    });
     let mut scratch = Vec::new();
 
     // The control: the counter sees an allocation when there is one.
@@ -86,11 +89,15 @@ fn the_state_hash_takes_memory_once_and_never_again() {
         "the first call sizes the scratch buffer once"
     );
 
-    // Ten minutes of ticks at 30 a second, each stepped and hashed: not one more.
+    // Ten minutes of ticks at 30 a second, each stepped with a command and hashed twice: not one more.
     let before = taken();
     let mut last = first;
-    for _ in 0..18_000 {
-        world.authority_step();
+    for tick in 0..18_000_u16 {
+        world.authority_step(&[PlayerCommand {
+            buttons: tick,
+            presses: [tick.to_le_bytes()[0]; BUTTONS],
+        }]);
+        black_box(world.shared_hash(&mut scratch));
         last = black_box(world.state_hash(&mut scratch));
     }
     assert_eq!(taken() - before, 0, "a later call took memory");
