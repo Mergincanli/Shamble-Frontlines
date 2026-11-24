@@ -4562,7 +4562,7 @@
           "moved": {
             "to": "Slice 3, with the human run",
             "why": "its only run was a leg of the human run (R7), which left the proof test",
-            "by": "NPT-TRIM, 2026-11-21, as the advisor agent read its move of the human run (R7) on 2026-11-24; not a line of the re-plan's table"
+            "by": "Mustafa's decision of 2026-11-24 (his message to Netcode Builder 2 of that day, item 3: \"yes, they move with the human run to Slice 3\")"
           },
           "select": {
             "layer": "L2",
@@ -6751,7 +6751,7 @@
           "moved": {
             "to": "Slice 3, with the human run",
             "why": "its only run was a leg of the human run (R7), which left the proof test",
-            "by": "NPT-TRIM, 2026-11-21, as the advisor agent read its move of the human run (R7) on 2026-11-24; not a line of the re-plan's table"
+            "by": "Mustafa's decision of 2026-11-24 (his message to Netcode Builder 2 of that day, item 3: \"yes, they move with the human run to Slice 3\")"
           },
           "select": {
             "layer": "L2",
@@ -7796,7 +7796,7 @@
       "stand_in": false,
       "arm_rule": false,
       "readings": [],
-      "notes": "Not in this change-set: the 60 Hz run, in its own change-set, replaces npt-sim through the seam and changes no other crate (plan §4.6, §6.2). Always NOT-RUN here. The bites are kept as data for that change-set."
+      "notes": "Not in this change-set: the 60 Hz run, in its own change-set, replaces npt-sim through the seam and changes no other crate (plan §4.6, §6.2). Always MOVED here. The bites are kept as data for that change-set."
     },
     {
       "id": "PM-0001-40",
@@ -7815,7 +7815,7 @@
       "stand_in": false,
       "arm_rule": false,
       "readings": [],
-      "notes": "Not in this change-set: the 60 Hz run, in its own change-set, replaces npt-sim through the seam and changes no other crate (plan §4.6, §6.2). Always NOT-RUN here. The bites are kept as data for that change-set."
+      "notes": "Not in this change-set: the 60 Hz run, in its own change-set, replaces npt-sim through the seam and changes no other crate (plan §4.6, §6.2). Always MOVED here. The bites are kept as data for that change-set."
     },
     {
       "id": "PM-0001-63",
@@ -7843,7 +7843,7 @@
       "stand_in": false,
       "arm_rule": false,
       "readings": [],
-      "notes": "Not in this change-set: the 60 Hz run, in its own change-set, replaces npt-sim through the seam and changes no other crate (plan §4.6, §6.2). Always NOT-RUN here. The bites are kept as data for that change-set."
+      "notes": "Not in this change-set: the 60 Hz run, in its own change-set, replaces npt-sim through the seam and changes no other crate (plan §4.6, §6.2). Always MOVED here. The bites are kept as data for that change-set."
     },
     {
       "id": "PM-0001-41",

@@ -24,12 +24,19 @@ const SHOOT = "Slice 1 change-set 8 (Shoot)";
 const S3 = "Slice 3";
 const SAFARI = ["Safari later", "Safari left the proof test (BROWSER-SET (a))"];
 const HUMAN = ["Slice 3, with the human run", "the human run (R7) left the proof test"];
-// Three labels the re-plan's table does not name (the advisor agent's rulings of 2026-11-24 on part a: its plan
-// review's condition 8, and its ruling on the review round's M1 and M3): the rough-laptop twins of two parts that moved
-// with the human run, and the one bite that can only fail a moved part's checks. Their `by` says whose reading it is.
+// Mustafa's message of 2026-11-24 to this chat (saved word for word by save-message.mjs): its item 3 moves the two
+// rough-laptop parts with the human run, and its item 1 changes one sentence in the three outside marks' notes. Both
+// are read from the saved file, never retyped.
+const said = readFileSync(".checkpoints/netcode-judge/mustafa-2026-11-24.md", "utf8");
+const rough = said.match(/^3\. The rough-laptop parts of PM-0001-19 and PM-0001-31 \("ML\* Chrome \(rough, reported\)"\): (yes, they move with the human run to Slice 3)\. That is now my decision of today\./m);
+const outside = said.match(/^1\. OUTSIDE-NOTES: \(a\)\. In the notes of PM-0001-39, -40 and -63, "(Always NOT-RUN here\.)" becomes "(Always MOVED here\.)" Nothing else in those notes changes\.$/m);
+if (!rough || !outside) fail("mustafa-2026-11-24.md does not hold items 1 and 3 as this script reads them");
+const BY_MUSTAFA = `Mustafa's decision of 2026-11-24 (his message to Netcode Builder 2 of that day, item 3: "${rough[1]}")`;
+const HUMAN_ROUGH = [HUMAN[0], "its only run was a leg of the human run (R7), which left the proof test", BY_MUSTAFA];
+// One label the re-plan's table does not name (the advisor agent's ruling of 2026-11-24 on part a's review round, M1
+// and M3): the one bite that can only fail a moved part's checks. Its `by` says whose reading it is.
 const BY_READING =
   "NPT-TRIM, 2026-11-21, as the advisor agent read its move of the human run (R7) on 2026-11-24; not a line of the re-plan's table";
-const HUMAN_ROUGH = [HUMAN[0], "its only run was a leg of the human run (R7), which left the proof test", BY_READING];
 const MP_BITE = [HUMAN[0], "it fails only the checks of the part MP at P2, which rode the human run (R7)", BY_READING];
 const CRATE = ["Slice 3's WebTransport crate choice", "the proof test carries one crate, web-transport-quinn"];
 const R4 = "its run, R4, left the proof test";
@@ -188,8 +195,17 @@ const m7 = data.marks[mark("PM-0001-7")];
 if (m7.notes.split(OLD_7).length !== 2) fail("-7's notes do not hold the sentence MARK-NOTES replaces exactly once");
 m7.notes = m7.notes.replace(OLD_7, `${TAG}${NOTE_7}`);
 
+// The three marks that were outside this test from the start read MOVED: one sentence of their notes says so now
+// (Mustafa's item 1; nothing else in those notes changes).
+for (const id of ["PM-0001-39", "PM-0001-40", "PM-0001-63"]) {
+  const mk = data.marks[mark(id)];
+  if (mk.verdict !== "outside") fail(`${id} is not an outside mark`);
+  if (mk.notes.split(outside[1]).length !== 2) fail(`${id}'s notes do not hold "${outside[1]}" exactly once`);
+  mk.notes = mk.notes.replace(outside[1], outside[2]);
+}
+
 const out = `${JSON.stringify(data, null, 2)}\n`;
-console.log(`labels: ${counts.marks} marks whole, ${counts.parts} parts, ${counts.checks} checks, ${counts.bites} bites; -56's kept check added; -7's and -56's notes`);
+console.log(`labels: ${counts.marks} marks whole, ${counts.parts} parts, ${counts.checks} checks, ${counts.bites} bites; -56's kept check added; -7's and -56's notes; the three outside marks' notes`);
 console.log(`sha256 before ${BEFORE}`);
 console.log(`sha256 after  ${sha(out)}`);
 if (process.argv.includes("--write")) {
