@@ -40,3 +40,14 @@ Read only, effort xhigh. Brief: u6c-r2-ruling-request.txt (sha256 9a57324e… ch
   :283) needs a datagram the reader took in and the model released (P1: about 30 ms of one-way delay later), so a read
   after `started` (:487-494, at the leg's zero) comes after the reader has drained that backlog.
 - A2 logs still in /tmp (load.jsonl, room.jsonl; a `tokens` file beside them, 0600): item 4's look needs no run.
+- Item 4 look (read only, python -I reading /tmp/npt-u6c-load-7849-a2-wt/room.jsonl): `second.s.out_queue_count` (the
+  room's outbound queue per client, SERIES.md:416) is 1 for all 48 clients in every second 0-70, slot 41 included;
+  `wt_accept`: accepted 48, handshake_failed 0, deadline_closed 0, `datagrams_dropped_count` 225 ("client datagrams a
+  full session inbox dropped", SERIES.md:891; not split by client; no mark reads it). The room logs no per-client
+  inbound lateness, so the look cannot say whether slot 41's commands reached the room late while it ran.
+  (`stand_in_changes_count` is a game-entity count, SERIES.md:96: not used.)
+- Lead per item (before writing the ruling): 1(a) fix before the merge by a one-line move of the start-edge read to
+  the leg's zero (after the pin), main session by hand; 1(b) carry after R1 (U6e), U8's load_ready already makes it
+  INVALID; 2 fix before the merge (the seat's one token), main session; 3 closed in substance, no plant; 4 after R1
+  (U6d/U6e), the look made here; 5 C-U8-6 stands: INVALID, U8 restores the word at C9. Spike: own Cargo.lock and
+  rustfmt.toml (default width 100 for code).

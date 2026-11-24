@@ -55,3 +55,24 @@
 - refs: the plan's `git grep -I` prints nothing. check.mjs's referenceProblems (:1852-1867) also reads binaries
   (utf8, outside spikes/, docs/, .checkpoints/, *.md): `git grep -a -l "spikes/"` on main over that set prints only
   kept-logs.mjs and its test (the exception), the two new .bin vectors hold no such text. So refs passes.
+- Main's CI on 28254a7 (gh api): SIX check runs, all completed success. Main's push (head_branch main): gate run
+  45503161434 (gate job 138831416058, smoke 138831416551) and toolchain run 45503161333 (job 138831415745),
+  22:40:42-22:42:53 UTC, as the plan says. The other three: a push of the same commit to claude/loving-hopper-6p0mg2
+  (gate 45503920083, toolchain 45503920426, 22:45:42-22:48:27): not main's; a by-SHA read will see them.
+- PR #65: merged 22:40:39 UTC by the Mergincanli account (whose hand: not provable from GitHub), merge 28254a7, head
+  1624f08. PR #40: head 1fb3a1b (= local HEAD now; 1d36067 -> e8e276f -> 1fb3a1b are notes saves), draft, open,
+  mergeable false, "dirty", base 1ec6f6c. The 22:41 conflict event: not found in the timeline read (not material).
+- toolchain.yml (unchanged by main): `cargo test --workspace`, `npm test --workspaces`, the boundary dir, playwright
+  with the e2e config: 3a's new tests run with no workflow change, as the plan says.
+- Card: 200 lines now (M64-2's cap reached). Saver: none (pgrep exit 1); card :9 and :151 say it ended 19:47.
+- U6c's fix patch (wip/u6c-fix.patch): 24 files, all under spikes/netcode-proof/ (marks/SERIES.md among them). Main's
+  64 paths and U6c's are disjoint. U4f's merge form (history.md:7022-7028): M3/M4 apply, M5 counted run, M6, M7 gate,
+  M8 one commit (U4f's papers were drafted by an agent), M9 push, saver, CI, card.
+- Precedent: MAIN-61's step 7 ran 17:46-17:55, U4f's M3 at 18:27 (step 7 first, before LEAN-MODE). MAIN-61's own
+  risk line (C6, main-61-plan.md:122-123) gates further lane steps on CI of the pushed head, not on step 7.
+- Plan's merge-window line (:96-97): "a save only after step 4's commit" conflicts with main-61-plan.md:110-112 ("No
+  save runs from step 2 to the push"): checkpoint.mjs save pushes every local commit (:2-6), so a save after step 4
+  publishes the merge before step 5's gate and light run. Needs a condition.
+- Citations: MAIN-52 history.md:2055-2057; LEAN-MODE items 1 and 3 at :7862, :7864; advisor-main-64.md:15-48;
+  advisor-main-61.md:19-104; main-61-plan.md:106-114, :116-128; checkpoint.mjs:23-24: all as cited. Preview 81aa7f1e
+  and 5f57b5ae exist; 92fdf65..81aa7f1e without STATUS.md is the 63-file line.
