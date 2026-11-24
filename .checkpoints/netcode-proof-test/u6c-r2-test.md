@@ -18,3 +18,25 @@ W = /home/user/Shamble-Frontlines/.claude/worktrees/agent-a3a3e3fdf559de095/spik
 Run nothing unless a claim needs it (name each run here).
 
 ## 2. Notes (one line per finding)
+- Run r2-test-1 (.gate/u6c/r2-test-1.log, 18:01:32 UTC): runner, shared lock, command `true`, only to print W's
+  hashes: diff 0e3199ae…, untracked 22bda910…, equal to fix-check.log's (13:27), read-a2-ws/-wt (14:08, 14:10) and
+  read-probe (14:29). So fix-check's tree is W's at 18:01, the tree the 17:5x patch was made from. Counts tie.
+- FP-1 test read (net probe_tests.rs:288-357): up t_in strictly increasing (100 µs + i/2 ns), down strictly increasing
+  (last three +60 µs, no reorder); log order per direction = t_in order; no two fates share a t_in. It pins: exactly N
+  outside the burst a direction (:331), the burst's fates apart (:336), both spans (:341-348), first and last second
+  (:349-355), with and without the B1 burst. It does not pin: t_in order against log order, or the tie clause.
+- P22 (plant-p22.log): break at t_in >= start + packets × interval; fails :331 with (119,999, 119,999), exactly the
+  one record each arm (5 ppm up, late pacer down) puts past the clock span: the right reason. Untracked hash 79241c8a
+  (net probe.rs is a new file, so the plant shows there). OK.
+- TE-U6C-R2-1 (Low): t_in order and the tie clause unpinned. Live at R1: Delivered fates are logged at release
+  (impair.rs:685-696), drops at intake (impair.rs:576-579), so the log is not in t_in order; up t_in is one clock read
+  per receive batch (socket.rs:633-639), so ties are real. A plant dropping the sort (probe.rs:721) or the tie clause
+  (`last != Some(t)`, probe.rs:725) passes all three leg_series tests. No mark flips (each direction still keeps
+  >= packets), the E set shifts by a few boundary records. Fix: one case in FP-1's test with a Lost down fate logged
+  before an earlier Delivered one at the boundary, and two up fates sharing the last kept t_in; about 20 lines.
+- C-U6-5 test (packets 1,002) keeps the same 1,002 up fates as [10 s, 20 s) (1,000 + Oversize at 11 s + Lost at 12 s);
+  leg_series test (packets 4) keeps all 5 down (4 outside + 1 in burst) and the 4 peer ups, one second: the same fates.
+  Both pass at any packets >= their fate counts, so they pin "the same fates", not the cut (FP-1's test does). OK.
+- FP-2: `edge_events(_bound: &ImpairSocket, …)` (server probe.rs:179), calls :465 and :553 pass `&sock`; after
+  `drop(sock)` (:571) nothing at :572-657 reads the kernel (header, params, seconds, summary are values taken before).
+  plant-p8c.log: E0382 at :571 "value borrowed here after move". Notes line 278-279 word it as the ruling does. OK.
