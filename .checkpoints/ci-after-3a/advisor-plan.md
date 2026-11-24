@@ -38,3 +38,16 @@ Advisor file: main's `.claude/agents/advisor.md` (main 28254a73; identical in th
 ## Verdict
 REVISE. F1 leaves a rule of his loosened in the plan text, and F2-F4 change what ask 1 says, which is sent right after an APPROVE. Revision 2 gets a re-review limited to these changes (a plan review, not a round).
 Not verified by me: runner-image and PPA facts (web), run 45503161333's times, the `--list` output (denied here), the local trial logs in `.gate/trial/`.
+
+## Re-read of revision 2 (commit 7951759; only `git diff 6cc516d 7951759 -- .checkpoints/ci-after-3a/plan.md`)
+Checked myself: `.gate/pw-firefox-1572/` holds one file, `firefox-ubuntu-24.04.zip`, 118,965,377 bytes, mode 644, sha256 189ce3e09c61776010ab8a7cbffaa016b8b1914d3c9b50cb5ab6d0c5db4c368f (equal to the plan), gitignored (`.gitignore:2`), nothing unpacked beside it, no Firefox in `~/.cache/ms-playwright`. Not checked by me (web): the key fingerprint against Launchpad, the gpg result, the Packages.gz and .deb hashes, the runner-image install script's path.
+- R2-1 (was High): met. Every CI change, a typo fix included, goes to him with exact text and new sha256; final file's sha256 must equal the approved one.
+- R2-2: met. Tells him and goes on with (b) under the advance yes, re-checking size and sha256 before unpacking; (b) failing too stops with three lines.
+- R2-3: met. security-auditor and infra-engineer read the tried texts before ask 2; ask 2 lists their findings; final head: sha256 equality plus what changed.
+- R2-4: met, and better than asked: no apt, no root scripts (curl + `dpkg-deb -x`, 30 dependencies already present), 161.0 vs 160.0 stated, source line, full fingerprint, full checksums; "experimental" dropped.
+- R2-5: met (3A-RULES-STEP's CI half only; WebKit and Safari open; the `isolation.spec.ts` comment as a follow-up).
+- R2-6: met. R2-7: met (path `/usr/lib/firefox/firefox`, checked as a plain file in CI; the extra evidence lines).
+- New, Low: the keyserver key and `InRelease` fetch went beyond the letter of ruling 3 (which named only Playwright's zip). Same reason, it fits: verification data, nothing installed or run beyond gpg on a fresh scratch keyring. Accepted; ask 1 must say it was fetched before his yes, as section 9 already does.
+- New, Low: after ask 2, a change to `playwright.config.ts` also changes a text he approved as a set; treat it like a CI change (back to him with exact text) rather than writing it silently.
+
+Verdict: APPROVE revision 2 at 7951759. Conditions: the two Lows above; the item-3 ruling's conditions stand (delete the zip at once on his (a) without the fallback, on a no, or if he says the fetch counted as use). The next ask to him is ask 1; nothing is written to `.github/` or `packages/e2e/` before his yes to ask 2.
