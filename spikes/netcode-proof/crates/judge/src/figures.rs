@@ -1140,6 +1140,85 @@ fn one_shot_dropped_count(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
     Ok(Ratio::int(sent - received))
 }
 
+/// PM-0001-15: the least-squares slope of the room's resident memory over its measured seconds, in bytes per 10
+/// minutes (x is the record's `sec`, so a missing second moves nothing): 600 x (n Sxy - Sx Sy) / (n Sxx - Sx Sx),
+/// exact. Fewer than two measured seconds give no slope: a gap.
+fn rss_slope_bytes_per_10min(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let name = "rss_bytes";
+    let rss = room_seconds(i.run, "second.v", name, |s| s.v.get(name).copied())?;
+    let first = rss.keys().next().copied().unwrap_or(0);
+    // Seconds counted from the first one keep the sums small: 2 hours at 1 GB stays near 1e23, far inside i128.
+    let points = rss
+        .iter()
+        .map(|(sec, y)| (i128::from(sec - first), i128::from(*y)));
+    let (mut n, mut sx, mut sy, mut sxx, mut sxy) = (0, 0, 0, 0, 0);
+    for (x, y) in points {
+        (n, sx, sy, sxx, sxy) = (n + 1, sx + x, sy + y, sxx + x * x, sxy + x * y);
+    }
+    match n * sxx - sx * sx {
+        0 => Err(Lack::Gap(format!(
+            "run {}: one measured second of second.v.rss_bytes gives no slope",
+            i.run.id
+        ))),
+        den => Ok(Ratio::new(600 * (n * sxy - sx * sy), den)),
+    }
+}
+
+/// PM-0001-15's "flat" rule over the room's measured seconds: the count of (series, index) pairs whose largest
+/// value in the late window is above their largest in the early one. `windows` gives, from the first and last
+/// measured `sec`, the early window's last second and the late window's first (by time, so a missing second record
+/// moves no boundary), or `None` when the seconds are too few for two windows (`need`): a gap.
+fn growth_count(
+    run: &Run<'_>,
+    series: &[(&str, bool)],
+    need: &str,
+    windows: fn(u64, u64) -> Option<(u64, u64)>,
+) -> Result<Ratio, Lack> {
+    let mut grown = 0;
+    for (name, per_client) in series {
+        let lists = room_lists(run, name, *per_client)?;
+        let first = lists.keys().next().copied().unwrap_or(0);
+        let last = lists.keys().next_back().copied().unwrap_or(0);
+        let Some((early, late)) = windows(first, last) else {
+            return Err(Lack::Gap(format!(
+                "run {}: measured seconds {first} to {last} of second.s.{name}: {need}",
+                run.id
+            )));
+        };
+        let most =
+            |index: usize, from: u64, to: u64| lists.range(from..=to).map(|(_, l)| l[index]).max();
+        let width = lists.values().next().map_or(0, |l| l.len());
+        let grew = |index: &usize| most(*index, late, last) > most(*index, first, early);
+        grown += (0..width).filter(grew).count() as i128;
+    }
+    Ok(Ratio::int(grown))
+}
+
+/// PM-0001-15: the per-client queues (outbound, unacknowledged events) whose largest length in the last 10 measured
+/// minutes is above their largest in the first 10.
+fn queue_growth_count(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let queues = [("out_queue_count", true), ("event_queue_count", true)];
+    let need = "the first and the last 10 minutes need 1,200 measured seconds";
+    growth_count(i.run, &queues, need, |first, last| {
+        (last - first >= 1_199).then(|| (first + 599, last - 599))
+    })
+}
+
+/// PM-0001-24: the same rule on the two halves of the measured seconds (the middle second of an odd count is the
+/// first half's), over each session's buffered bytes and each client's two queues.
+fn session_memory_growth_count(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let series = [
+        ("session_buffered_bytes", false),
+        ("out_queue_count", true),
+        ("event_queue_count", true),
+    ];
+    let need = "two halves need 2 measured seconds";
+    growth_count(i.run, &series, need, |first, last| {
+        let mid = first + (last - first) / 2;
+        (last > first).then_some((mid, mid + 1))
+    })
+}
+
 /// A figure's computation over its [`Inputs`].
 pub type Compute = fn(&Inputs<'_, '_>) -> Result<Ratio, Lack>;
 
@@ -1296,19 +1375,19 @@ pub const FIGURES: &[Figure] = &[
         |i| slot_mean_max(i.run, "up_bits"),
         "the largest client mean of the upstream (-13)",
     ),
-    planned(
+    built(
         "rss_slope_bytes_per_10min",
-        "U6",
+        rss_slope_bytes_per_10min,
         "the least-squares slope of RSS over the measured seconds (-15)",
     ),
-    planned(
+    built(
         "queue_growth_count",
-        "U6",
+        queue_growth_count,
         "per-client queues whose last-10-minute max exceeds the first's (-15)",
     ),
-    planned(
+    built(
         "session_memory_growth_count",
-        "U6",
+        session_memory_growth_count,
         "the same rule on per-session memory, over halves (-24)",
     ),
     planned(

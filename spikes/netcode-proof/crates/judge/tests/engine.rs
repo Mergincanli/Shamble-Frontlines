@@ -3850,3 +3850,163 @@ fn u6j_one_shots_sent_less_those_received_over_the_whole_run() {
         "run f1: second.v.one_shots_sent_count in the room log on RS1: only process bots writes it";
     assert_eq!(dropped(&logs), ("Gap -".to_owned(), gap.to_owned()));
 }
+
+/// Run f1's room log with `rss(sec)` as `second.v.rss_bytes` on each of `n` measured seconds.
+fn rss_run(n: u64, rss: impl Fn(i64) -> i64) -> Vec<Log> {
+    let second = |sec| (Measured, vec![("rss_bytes", rss(sec))], vec![]);
+    vec![seconds_log(
+        "room",
+        "RS",
+        (0..n as i64).map(second).collect(),
+    )]
+}
+
+#[test]
+fn u6j_the_resident_memory_slope_per_10_minutes() {
+    let high =
+        |logs: &[Log]| figure_check("rss_slope_bytes_per_10min", "<=", json!(1_000_000), logs).0;
+    let low =
+        |logs: &[Log]| figure_check("rss_slope_bytes_per_10min", ">=", json!(-1_000_000), logs).0;
+    let flat = rss_run(20, |_| 50_000_000);
+    assert_eq!(
+        (high(&flat), low(&flat)),
+        ("Pass 0".to_owned(), "Pass 0".to_owned())
+    );
+    let rising = rss_run(20, |sec| 50_000_000 + 1_000 * sec);
+    assert_eq!(
+        (high(&rising), low(&rising)),
+        ("Pass 600000".to_owned(), "Pass 600000".to_owned())
+    );
+    let leak = rss_run(20, |sec| 50_000_000 + 2_000 * sec);
+    assert_eq!(
+        (high(&leak), low(&leak)),
+        ("Fail 1200000".to_owned(), "Pass 1200000".to_owned())
+    );
+    let falling = rss_run(20, |sec| 50_000_000 - 2_000 * sec);
+    assert_eq!(
+        (high(&falling), low(&falling)),
+        ("Pass -1200000".to_owned(), "Fail -1200000".to_owned())
+    );
+    // x is the record's second, not its place in the log: a missing second and a warm-up second move nothing.
+    let mut holed = rss_run(20, |sec| 50_000_000 + 1_000 * sec);
+    holed[0].seconds.remove(7);
+    holed[0].seconds[0].ph = Warmup;
+    assert_eq!(high(&holed), "Pass 600000");
+    // Not on a line: (0, 0), (1, 0), (2, 3) fit a slope of 3/2 bytes per second.
+    assert_eq!(high(&rss_run(3, |sec| [0, 0, 3][sec as usize])), "Pass 900");
+    // 2 hours at 1 GB, 1 byte more each second: exact, and no overflow.
+    assert_eq!(high(&rss_run(7_200, |sec| 1_000_000_000 + sec)), "Pass 600");
+    let one = figure_check(
+        "rss_slope_bytes_per_10min",
+        "<=",
+        json!(1_000_000),
+        &rss_run(1, |_| 1),
+    );
+    let gap = "run f1: one measured second of second.v.rss_bytes gives no slope";
+    assert_eq!(one, ("Gap -".to_owned(), gap.to_owned()));
+    let mut logs = rss_run(20, |_| 1);
+    logs[0].seconds[4].v.remove("rss_bytes");
+    assert_eq!(high(&logs), "Gap -");
+    let mut logs = rss_run(20, |_| 1);
+    logs[0].seconds[4].sec = 3;
+    let twice = figure_check("rss_slope_bytes_per_10min", "<=", json!(1_000_000), &logs);
+    assert_eq!(twice.1, "run f1: the room log has measured second 3 twice");
+}
+
+/// Run f1's room log: `n` measured seconds, each with slot 0's and slot 1's length of both per-client queues from
+/// `queue(sec)` (the same in both), and `buffered(sec)` as the 3 sessions' buffered bytes.
+fn queue_run(
+    n: i64,
+    queue: impl Fn(i64) -> [i64; 2],
+    buffered: impl Fn(i64) -> [i64; 3],
+) -> Vec<Log> {
+    let second = |sec| {
+        let queues = ["out_queue_count", "event_queue_count"].map(|k| (k, queue(sec).to_vec()));
+        let mut lists = queues.to_vec();
+        lists.push(("session_buffered_bytes", buffered(sec).to_vec()));
+        (Measured, vec![], lists)
+    };
+    vec![seconds_log("room", "RS", (0..n).map(second).collect())]
+}
+
+#[test]
+fn u6j_a_queue_that_grows_from_the_first_10_minutes_to_the_last() {
+    let grown = |logs: &[Log]| figure_check("queue_growth_count", "==", json!(0), logs);
+    // 1,300 measured seconds: the first 10 minutes are seconds 0 to 599, the last 700 to 1,299.
+    let flat = queue_run(1_300, |_| [5, 5], |_| [0; 3]);
+    assert_eq!(grown(&flat).0, "Pass 0");
+    // Slot 1's largest length is 5 in the first 10 minutes and 6 in the last: both of its queues count.
+    let run = queue_run(1_300, |sec| [5, 5 + i64::from(sec == 1_000)], |_| [0; 3]);
+    assert_eq!(grown(&run).0, "Fail 2");
+    let mut one = queue_run(1_300, |_| [5, 5], |_| [0; 3]);
+    one[0].seconds[699]
+        .s
+        .insert("event_queue_count".into(), vec![9, 5]);
+    one[0].seconds[700]
+        .s
+        .insert("out_queue_count".into(), vec![6, 5]);
+    assert_eq!(
+        grown(&one).0,
+        "Fail 1",
+        "second 699 is in neither window, second 700 in the last"
+    );
+    // A fall, and a peak between the two windows, are not growth.
+    let run = queue_run(
+        1_300,
+        |sec| [5 - i64::from(sec > 600), 5 + i64::from(sec == 650)],
+        |_| [0; 3],
+    );
+    assert_eq!(grown(&run).0, "Pass 0");
+    // The windows go by time: with second 100's record missing, second 600 is still outside the first 10 minutes,
+    // so slot 0's peak there and in the last 10 minutes is growth (the first 600 records would hold second 600).
+    let peaks = |sec| [5 + i64::from(sec == 600 || sec == 1_000), 5];
+    let mut holed = queue_run(1_300, peaks, |_| [0; 3]);
+    holed[0].seconds.remove(100);
+    assert_eq!(grown(&holed).0, "Fail 2");
+    let short = grown(&queue_run(1_199, |_| [5, 5], |_| [0; 3]));
+    let gap = "run f1: measured seconds 0 to 1198 of second.s.out_queue_count: the first and the last 10 minutes \
+               need 1,200 measured seconds";
+    assert_eq!(short, ("Gap -".to_owned(), gap.to_owned()));
+    assert_eq!(grown(&queue_run(1_200, |_| [5, 5], |_| [0; 3])).0, "Pass 0");
+    let mut logs = queue_run(1_300, |_| [5, 5], |_| [0; 3]);
+    logs[0].seconds[9].s.remove("event_queue_count");
+    let gap = "run f1: measured second 9 of the room log has no second.s.event_queue_count";
+    assert_eq!(grown(&logs), ("Gap -".to_owned(), gap.to_owned()));
+}
+
+#[test]
+fn u6j_session_memory_that_grows_from_the_first_half_to_the_second() {
+    let grown = |logs: &[Log]| figure_check("session_memory_growth_count", "==", json!(0), logs);
+    // 5 measured seconds: seconds 0 to 2 are the first half, 3 and 4 the second.
+    assert_eq!(
+        grown(&queue_run(5, |_| [1, 1], |_| [10, 10, 10])).0,
+        "Pass 0"
+    );
+    let run = queue_run(5, |_| [1, 1], |sec| [10 + i64::from(sec == 4), 10, 10]);
+    assert_eq!(grown(&run).0, "Fail 1");
+    // The middle second is the first half's: a peak there that the second half only equals is flat.
+    let run = queue_run(5, |_| [1, 1], |sec| [10 + i64::from(sec >= 2), 10, 10]);
+    assert_eq!(grown(&run).0, "Pass 0");
+    // A fall is not growth; a queue that grows counts beside the buffers.
+    let run = queue_run(
+        5,
+        |sec| [1, 1 + i64::from(sec == 3)],
+        |sec| [10 - i64::from(sec > 2), 10, 10],
+    );
+    assert_eq!(grown(&run).0, "Fail 2");
+    let mut logs = queue_run(5, |_| [1, 1], |_| [10, 10, 10]);
+    logs[0].seconds[1].s.remove("session_buffered_bytes");
+    let gap = "run f1: measured second 1 of the room log has no second.s.session_buffered_bytes";
+    assert_eq!(grown(&logs), ("Gap -".to_owned(), gap.to_owned()));
+    // The buffers are one per session, not one per client: their count only has to stay the same.
+    let mut logs = queue_run(5, |_| [1, 1], |_| [10, 10, 10]);
+    logs[0].seconds[3]
+        .s
+        .insert("session_buffered_bytes".into(), vec![10, 10]);
+    let gap = "run f1: measured second 3's second.s.session_buffered_bytes holds 2 entries, not 3, as its first \
+               measured second";
+    assert_eq!(grown(&logs), ("Gap -".to_owned(), gap.to_owned()));
+    let one = grown(&queue_run(1, |_| [1, 1], |_| [10, 10, 10]));
+    let gap = "run f1: measured seconds 0 to 0 of second.s.session_buffered_bytes: two halves need 2 measured seconds";
+    assert_eq!(one, ("Gap -".to_owned(), gap.to_owned()));
+}
