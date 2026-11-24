@@ -418,12 +418,30 @@
    server, Chromium): "errors: 0", "commit: c5f6a85a3", ticks at 30 a second; opened as a file it shows the one
    line that says to run `node serve.mjs`. **Not sent yet: it goes to him with the advisor agent's verdict.**
 
+14. **The advisor agent on c5f6a85a: REVISE, for wording only; corrected in 8d277cf2**, pushed 17:38 UTC. By its
+   own gate run, build (the same Wasm bytes), ChaCha8 and exact fractions the code is fit and proven; its nine
+   start conditions (C8 open until the final head) and its seven MUL-ADD conditions are met. **Its High (A): four
+   places put the register's wording in quotation marks as Mustafa's own** ("two change-sets, 3a then 3b"; "our own
+   ChaCha8, checked against the published test vectors": the report twice, `rng.rs`'s doc, `pr-body.md`); his
+   recorded choice was "Yes to all seven". Its Mediums: B the scan's comment still said "until Mustafa answers"; C
+   the open security follow-ups were not named as what his go accepts; E no docs-pass section in the report. Lows
+   F to J. All worked into 8d277cf2 (comments in two Rust files, the report, the archive, STATUS, `pr-body.md`);
+   every quotation of his 15:58:25 UTC message in the report checked by script against his saved message. The
+   players' Wasm unchanged (383f5303...3963). **CI on 8d277cf2, read line by line:** gate success (run
+   45450856180); toolchain success (run 45450856204, job 138647229600, 17:38:49 to 17:41:48 UTC;
+   `.gate/cs3a/ci-8d277cf2-toolchain.log`): the counts of step 12 again; "14 passed (1.2m)"; the Wasm's sha256
+   383f5303...3963; "no registry path in the Wasm". **The zip was sent to him** (built from c5f6a85a3; the game
+   files are the same; the advisor agent: "The zip may go to him now").
+
 ## Current step
-**The advisor agent on the pushed head c5f6a85a** (c5f6a85a3142d69e3e48f531d549ddd665a156ed; started after 17:06
-UTC; notes `advisor-head.md`). Then: its verdict into the report; the zip to him (built, below) with the README's
-seven steps; tell him the pull request's title and text are in this folder (`pr-title.txt`, `pr-body.md`; his main
-Advisor opens the draft). After his browser check: his reports into the docs, the checkpoint folded and deleted
-(the last commit, no skip marker), the advisor agent on that head, his go for its full SHA.
+**Waiting for three things** (17:42 UTC): the advisor agent's verdict on the corrected head 8d277cf2
+(8d277cf21cf54919c2ae54e5232d45e944e7b040; asked after 17:38 UTC, its notes `advisor-head.md`); the verifier's
+cover of that head (comments only since 8619d539; `verifier-final.md`); **Mustafa's browser check of the zip (sent
+to him after 17:38 UTC) and his main Advisor's draft pull request from `pr-title.txt` and `pr-body.md` here**
+(told to him with the zip). Then the LAST commit: the advisor agent's verdict on 8d277cf2 and his browser reports
+into the docs (his messages by `chat-words.mjs` and a DECISIONS entry by script), the report's notes pointer
+(the commit where the notes stay readable: this branch's last commit before the deletion), the checkpoint
+folded and deleted, no skip marker; CI; the verifier and the advisor agent on that head; his go for its full SHA.
 Plain words with him: no tag or code without its explanation in the same sentence.
 (Card written 15:31 UTC.)
 
