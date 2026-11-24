@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-24 (Day 2 resumed at his message of 19:07:46 UTC; step 26)
+- **Last update:** 2026-11-24 after 22:26 UTC (Day 2 done and step 26 closed after consultation 26; step 27 next)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -685,7 +685,6 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      read (attempt 1 "approved", attempt 2 no event, attempt 3 "rejected"); the environments' deployment history
      from the pull request pages; the revoke stays open for Day 2.
 
-## Current step
 26. Day 2 (plan Part 3 D), prepared next; nothing in Cloudflare changes before the 24-hour reading is recorded.
    - Rule for him (sent 2026-11-19 about 00:30 UTC): no access policy and no token delete until I write that the
      24-hour reading is recorded. Why: the wall reads as "gone" for the probe, so an early wall spoils (c) and (d), and
@@ -875,19 +874,42 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - **Visit 2 done** (results log): steps 5-8 "achieved" in his words (step 7's private half: no login; step 8: the
      page opened straight away after a restart); the control's cleanup approved and green (1 upload, 17d45ef9, HTTP 200,
      21:56:06 UTC: the token alive); the token tests' cleanups rejected (failure, nothing ran); the token deleted by him
-     (between 22:05:54 and 22:14:34 UTC; the list empty); `revoked` (deploy #19) approved and refused at Cloudflare's
+     (between 22:05:59 and 22:14:34 UTC; the list empty); `revoked` (deploy #19) approved and refused at Cloudflare's
      first call (10000, 9109), no record artifact: the token is dead. Runs tallied: 56, nothing off the list. Still
      open from him: the billing screenshot (consultation 24's row: no plan screen showed). Next: consultation 26
      (moment 5) before step 26 is saved as done; then the closing message; then the report, with main taken in first.
 
+   - Closed 2026-11-24 after consultation 26 (22:24:35 UTC): every Day 2 reading as expected (the 24-hour reading, the
+     wall at 10 minutes and 1 hour, steps 5-8 "achieved" in his words, the revoke proven by the refusal and the missing
+     record); runs tallied (56, nothing off the list); the records given their message ids and times; moved here intact
+     (diffed by script against the block it was in "Current step").
+
+## Current step
+27. The report and the closing docs pull request (plan Part 8, items 10 and 11), prepared next. In the test repository
+   nothing runs but the hourly probe; nothing changes in Cloudflare, the test repository or Zero Trust until my go
+   (no clicks for those sent tonight: the lesson of 2026-11-19).
+   - Waiting on him: the billing screenshot (Manage account → Billing): "Restrict previews" showed no plan screen, and a
+     Zero Trust organization now exists (team domain shamble-preview-check-pages.cloudflareaccess.com).
+   - Before the report: this repository's main (1ec6f6c, lane 1's #61 and #64) taken in; plan Risk 13 re-read (its last
+     sentence: the check's end and step 2.6 wait for the revised draft), likely a decision entry, with today's finding
+     that production's one-off links are behind the wall; his verdict on checklist step 4 (no count shown anywhere; no
+     "achieved"/"not yet" given), which the report asks.
+   - Before 2026-12-02 (the upload records' 14 days end): read whether the hourly probe then exits 3 on every fire
+     ("nothing to probe", so red mails); if so, his archive go or the workflow switched off comes first; anything the
+     report needs from the records pulled into the results log or .gate before then. The local evidence in
+     `.gate/preview-hosting-check/day1` and `day2` is present (listed 2026-11-24 after 22:26 UTC).
+
 ## Next steps
-1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
-   wall, Brave steps 5-8, the closes of (c) #5, #9 and #10 ((c)'s cleanup approved; the other two rejected), the
-   revoke and the `revoked` run, by 2026-11-25 (the token ends 2026-11-25T22:59:59Z).
-2. Then the report and the closing docs pull request (DECISIONS.md: his answers word for word, REVIEWER (b), the
-   browsers decision, PROJ-DRAW and AIM-STATE from lane2-needs.md, and his words of 2026-11-19 12:00 there, lane 2's
-   lines only under RECORD-FILES); the checkpoints of both tasks folded and deleted;
-   step 2.6's plan: the locked install, and previews without his click per preview, showing what keeps the token safe.
+1. The report (`/advisor-report`), folding both checkpoints (this one and `lane2-needs.md`), the results log and the
+   decisions; docs-keeper's pass (STATUS, ROADMAP, a dated pointer in SPIKE_PLAN entry 6); DECISIONS.md lines (his
+   answers word for word: REVIEWER (b), the browsers decision, TOKEN-SCOPE (a), PROJ-DRAW, AIM-STATE, his words of
+   2026-11-19 12:00; lane 2's lines only); the closing docs pull request marked ready only after both checkpoints are
+   deleted, stopping for his go. The billing screenshot by name before the report is final.
+2. His acts, each only after my go (none sent tonight): archive the test repository (TR-END (a)) once the evidence is
+   saved; after the report is merged, delete the test project and the Access application (Zero Trust, Access,
+   Applications).
+3. Then step 2.6's plan (unless Risk 13's decision holds it): the locked install, previews without his click per
+   preview, and what keeps the token safe then.
 
 ## For the report (the checkpoint is deleted at the end)
 - Step 2.6's plan: previews without his click per preview, showing what keeps the token safe then (his words of 2026-11-19, 00:59); he decides with that plan.
@@ -927,6 +949,18 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   preview rests on: with no reviewer a pull request's job gets the token; a `main`-only rule refuses it. The hourly
   schedule: seven silent slots (15:23-21:23 UTC), one fire 14 minutes late (22:37:26 for 22:23), none at 23:23 by
   00:23 UTC.
+
+- Day 2 (consultation 26), for the report's verdicts mark by mark (the check is not called "passed" as a whole): Risk 13
+  (PM-0006-2 "not met as written" on production's one-off link; for the draft's author); Safari dropped by his decision
+  (PM-0006-3 on Chrome, Edge, Firefox and Brave); the hourly series short (PM-0006-6's method: 3 scheduled runs in the 28
+  slots to the 24-hour mark, by-hand probes standing in; the mark itself read at 24.1-24.4 h); his Brave version reached
+  the header after the 24-hour reading (PM-0006-1, given 2026-11-19 21:02:51 UTC); checklist step 4 with readings ("no
+  count shown") but no verdict word from him (PM-0006-9 open on step 4 until he gives one). Also: his early press of
+  2026-11-19 (my list put runnable steps before him five hours early: for step 2.6's instructions, a step that must
+  wait comes only with the go); the setting renamed ("Preview access", "Restrict previews"; the row's "Cloudflare
+  Access" link opens the product page with "Try it for free"); the login screen an e-mail code (the setup page said the
+  Cloudflare account); a login lasting across a Brave restart; production's one-off links behind the wall (for
+  OQ-0006-4); the switch-on time known only as a window, so the sweeps' 10 minutes and 1 hour are lower bounds.
 
 ## Open findings
 - The advisor agent's F-A (2026-11-16): rewriting "Current step" at each update lost steps 11, 12, 14 and 16 from this
@@ -1011,9 +1045,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 ## Key numbers
 - Test repository Mergincanli/shamble-preview-check (public): `main` 347d5e044871... (merges of #4 756d33f and #8
   347d5e0 on 2162db5; workflows unchanged); branches `setup`, `check-token`, cs/pd-one, cs/pd-off, cs/pd-open,
-  cs/pdt-one, cs/b9-edit (7f3a684), cs/b9-prod (9965630); pull requests: #1, #4, #8 merged; #2, #3, #6, #7 closed
-  unmerged; #5 (c), #9 (cs/b9-edit), #10 (cs/b9-prod) open. Runs: 29 at 2026-11-19 00:23 UTC. `preview`: reviewer
-  Mergincanli on (since 00:13:42 UTC), self-review and bypass off; `production`: `main` only (since 00:21:51 UTC).
+  cs/pdt-one, cs/b9-edit (7f3a684), cs/b9-prod (9965630); pull requests: #1, #4, #8 merged; #2, #3, #5, #6, #7, #9,
+  #10 closed unmerged (#5 21:17:35Z, #9 21:57:22Z, #10 21:57:32Z on 2026-11-24); none open. Runs: 56 at 2026-11-24
+  22:23 UTC (probes #1-#27, deploys #1-#19, cleanups #1-#8, browsers #1, the token check). `preview`: reviewer
+  Mergincanli on (since 2026-11-19 00:13:42 UTC; a run waited on 2026-11-24), self-review and bypass off;
+  `production`: `main` only (since 2026-11-19 00:21:51 UTC).
+- Cloudflare (2026-11-24): the project's "Preview access" restricted by his "Restrict previews" (between 19:12:54 and
+  20:14:13 UTC): the Access application "shamble-preview-check - Cloudflare Pages", policy "Allow Members - Cloudflare
+  Pages" (Legacy, Allow); a Zero Trust organization, team domain shamble-preview-check-pages.cloudflareaccess.com;
+  the login screen asks for an e-mail and sends a code. The token deleted by him (between 22:05:59 and 22:14:34 UTC)
+  and proven dead at 22:22:23 UTC (deploy #19). This repository's main: 1ec6f6c (to be taken in).
 - Workflows at `main` (sha256 prefixes, re-hashed 2026-11-18): deploy.yml 29593af18d34, close.yml 3afdf389d636,
   probe.yml f24ad6e81daf, browsers.yml 6791076916ae; token-test variants (not placed) fd3dc4c6029b, 8b745631a278;
   check-token.yml 0ad66aa0f2b3 (on `check-token` only).
@@ -1388,6 +1429,17 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    margin before 23:59); three red GitHub mails certain, other mails "may"; rows for approvals possibly off, the token
    possibly dead (stop and consult), Brave possibly updated; short turns near the sweep marks; the unread scheduled
    probes and Day 1's evidence as non-blocking checks; the card's "Last update" line confirmed changed.
+
+26. 2026-11-24 22:24:35 UTC (called; answer 22:26:47 UTC; transcript times), moment 5 (before step 26 was saved as
+   done) · Q: may Day 2 close, and what goes to him tonight? · Changed: the readings and the revoke proof confirmed
+   (the refusal words, no record artifact, the same token alive 26 minutes earlier); my claim to him that steps 5-8
+   "complete the Brave checklist" corrected (step 4 has readings but no verdict word); his verdict lines, the "done"
+   and the close times given their message ids and times by script; step 26 moved intact, Next steps and Key numbers
+   rewritten, the billing screenshot carried by name; tonight's message says every Day 2 reading came out as expected
+   and the report gives the verdict mark by mark (four marks not a plain pass: Risk 13, Safari, the hourly series,
+   Brave's version late), one ask only (the billing screenshot), the acts he leaves alone until my go named with no
+   clicks, the 25 November deadline gone; not blocking: Risk 13 re-read before "then step 2.6", the records' end on
+   2 December and the probe's exit 3, the local evidence listed (present).
 
 ## Running work
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
