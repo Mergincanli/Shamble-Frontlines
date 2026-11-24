@@ -1604,6 +1604,184 @@ fn u4j_an_empty_comparison_fails_the_run_and_shows_no_bite() {
     assert_eq!(v[0].bites[0].status, BiteStatus::Shown);
 }
 
+/// C-U6-11's run h1 over measured ticks 1 to 12: slot 0's room hash at the ticks in `room` and its client hash at
+/// those in `client`; slot 1 has both at every tick and no session record (one span, as before). `events` are slot
+/// 0's room-side session records (name, tick, the process whose log carries it).
+fn session_run(room: &[u64], client: &[u64], events: &[(&str, u64, &'static str)]) -> Vec<Log> {
+    let lists = |own: &[u64]| -> Vec<Vec<Option<u64>>> {
+        let slot0 = |t: u64| own.contains(&t).then_some(100 + t);
+        (1..=12).map(|t| vec![slot0(t), Some(200 + t)]).collect()
+    };
+    let log = |process: &'static str, name: &str, own: &[u64]| {
+        let lists = lists(own);
+        let lists: Vec<&[Option<u64>]> = lists.iter().map(Vec::as_slice).collect();
+        let mut log = hash_log("h1", process, name, &lists, &|_| {});
+        let of_process = events.iter().filter(|e| e.2 == process).map(|(ev, t, _)| {
+            let mut e = EventRecord::new(ev, Measured).with("slot", 0);
+            if *ev == "admit" {
+                e = e.with("session", *t).with("in_roster", true);
+            }
+            e.t = Some(*t);
+            e
+        });
+        log.events = of_process.collect();
+        log
+    };
+    let mut lab = log("lab", "server_hash", &[]);
+    lab.ticks
+        .iter_mut()
+        .for_each(|t| drop(t.hs.remove("server_hash")));
+    vec![
+        log("room", "server_hash", room),
+        log("client", "decoded_hash", client),
+        lab,
+    ]
+}
+
+/// The L1 part's run of `session_run`'s logs under `hash_mark`: whether it counts, and its coverage gap.
+fn covered(logs: &[Log]) -> (bool, String) {
+    let o = &judge(&marks_file(&[hash_mark()]), logs)[0].parts[0].runs[0];
+    (o.valid, o.invalid_why.join("; "))
+}
+
+const FIRST: [u64; 6] = [1, 2, 3, 4, 5, 6];
+const SECOND: [u64; 4] = [9, 10, 11, 12];
+
+/// C-U6-11 (-19's joins): the coverage rule runs per session, cut at the room log's `admit` records. A session that
+/// left may leave the room's last hashes unresolved, up to its recorded `session_end` and never past it.
+#[test]
+fn c_u6_11_coverage_runs_per_session_cut_at_the_admits() {
+    let room = [&FIRST[..], &SECOND[..]].concat();
+    let client = [&FIRST[..4], &SECOND[..]].concat();
+    // Two sessions: the first leaves with ticks 5 and 6 in flight, its end recorded at tick 6; re-admitted at 9.
+    let left = [
+        ("admit", 1, "room"),
+        ("session_end", 6, "lab"),
+        ("admit", 9, "room"),
+    ];
+    assert_eq!(
+        covered(&session_run(&room, &client, &left)),
+        (true, String::new())
+    );
+    // The end recorded in the room's log (L2's home) counts the same.
+    let l2 = [
+        ("admit", 1, "room"),
+        ("session_end", 6, "room"),
+        ("admit", 9, "room"),
+    ];
+    assert!(covered(&session_run(&room, &client, &l2)).0);
+    // No session_end: a silent stop never passes.
+    let silent = [("admit", 1, "room"), ("admit", 9, "room")];
+    let (valid, why) = covered(&session_run(&room, &client, &silent));
+    assert!(!valid, "{why}");
+    assert!(
+        why.contains(
+            "run h1: slot 0, its session admitted at tick 1: the client side resolves ticks 1 to 4 only, not the \
+             room's measured ticks 1 to 6 (no session_end records that it left)"
+        ),
+        "{why}"
+    );
+    // An end only a client-side log records is not the room's word.
+    let claimed = [
+        ("admit", 1, "room"),
+        ("session_end", 6, "client"),
+        ("admit", 9, "room"),
+    ];
+    let (valid, why) = covered(&session_run(&room, &client, &claimed));
+    assert!(
+        !valid && why.contains("(no session_end records that it left)"),
+        "{why}"
+    );
+    // The room logged a hash after the recorded end.
+    let early = [
+        ("admit", 1, "room"),
+        ("session_end", 5, "lab"),
+        ("admit", 9, "room"),
+    ];
+    let (valid, why) = covered(&session_run(&room, &client, &early));
+    assert!(
+        !valid && why.contains("measured ticks 1 to 6 (its session_end is at tick 5)"),
+        "{why}"
+    );
+    // The slot's last session keeps the whole rule: its end recorded or not, its span reaches the room's last hash.
+    let last = [("admit", 1, "room"), ("session_end", 6, "lab")];
+    let (valid, why) = covered(&session_run(&FIRST, &FIRST[..4], &last));
+    assert!(
+        !valid && why.contains("(the slot's last session: no tail is allowed)"),
+        "{why}"
+    );
+    // A session the client never resolved a tick of.
+    let (valid, why) = covered(&session_run(&room, &SECOND, &left));
+    assert!(
+        !valid
+            && why.contains(
+                "slot 0, its session admitted at tick 1: the room logged its hash at measured ticks 1 to 6, and \
+                 no client log resolves any tick of it"
+            ),
+        "{why}"
+    );
+}
+
+/// C-U6-11's head and the two cases the advisor's plan review fixed (condition 5).
+#[test]
+fn c_u6_11_a_mid_run_join_and_the_slots_with_no_admit_record() {
+    let joined = [("admit", 5, "room")];
+    let from = |a: u64| (a..=12).collect::<Vec<u64>>();
+    // Admitted in the measured phase at tick 5, its first snapshot resolved at 5.
+    assert_eq!(
+        covered(&session_run(&from(5), &from(5), &joined)),
+        (true, String::new())
+    );
+    // Its first resolved tick is 7, after the room's first hash of the session.
+    let (valid, why) = covered(&session_run(&from(5), &from(7), &joined));
+    assert!(!valid, "{why}");
+    assert!(
+        why.contains(
+            "slot 0, its session admitted at tick 5: the client side resolves ticks 7 to 12 only, not the room's \
+             measured ticks 5 to 12"
+        ) && !why.contains("12 ("),
+        "{why}"
+    );
+    // A measured room hash before the slot's first admit belongs to no session.
+    let (valid, why) = covered(&session_run(&from(3), &from(5), &joined));
+    assert!(
+        !valid && why.contains("slot 0: the room logged its hash at measured tick 3, before the slot's first admit (tick 5)"),
+        "{why}"
+    );
+    // A slot with no admit record keeps its single span: a join nobody recorded still fails, in the words as before.
+    let (valid, why) = covered(&session_run(&from(5), &from(7), &[]));
+    assert!(
+        !valid
+            && why.contains(
+                "run h1: slot 0: the client side resolves ticks 7 to 12 only, not the room's measured ticks 5 to 12"
+            ),
+        "{why}"
+    );
+    // The same for a leave and a rejoin with no admit record, even with the end recorded.
+    let room = [&FIRST[..], &SECOND[..]].concat();
+    let client = [&FIRST[..4], &SECOND[..]].concat();
+    let (valid, why) = covered(&session_run(&room, &client, &[("session_end", 6, "lab")]));
+    assert!(
+        !valid
+            && why.contains("slot 0, tick 5: the room logged a hash and no client log resolves it"),
+        "{why}"
+    );
+    // An admit record with no tick cuts nothing: the two sessions read as one, and the ticks in flight are a gap.
+    let both = [
+        ("admit", 1, "room"),
+        ("session_end", 6, "lab"),
+        ("admit", 9, "room"),
+    ];
+    let mut logs = session_run(&room, &client, &both);
+    logs[0].events[1].t = None;
+    let (valid, why) = covered(&logs);
+    assert!(
+        !valid
+            && why.contains("slot 0, tick 5: the room logged a hash and no client log resolves it"),
+        "{why}"
+    );
+}
+
 // C62H-BOUND's two figures (SERIES.md's frozen rows): A, snap_lost_unexplained_count; B, the link record's converse.
 
 /// A -17 mark with the two C62H-BOUND checks (== 0) on one L1 part, and the whole-as-lost bite.

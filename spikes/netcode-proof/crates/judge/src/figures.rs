@@ -410,9 +410,9 @@ struct Decoded {
 /// client log's `tick.s.snap_incomplete` list), a `snap_incomplete` entry other than 0 or 1, two logs at one
 /// (slot, tick), or a server hash of 0 (the hash is never 0, so 0 is the client's sentinel alone). The coverage rule
 /// (README §1's `null` rule, the advisor's FX-10) is kept for after the count: a (slot, tick) is resolved by a client
-/// hash (compared) or by `snap_incomplete` 1 (lost, not compared), never both; per slot, every tick from its first
-/// resolved tick to its last at which the room logged that slot's hash is resolved, and that span covers the room's
-/// measured ticks for the slot. Ticks outside a slot's span are neither compared nor counted.
+/// hash (compared) or by `snap_incomplete` 1 (lost, not compared), never both; per session of a slot (`coverage`:
+/// cut at the room log's `admit` records), every tick from its first resolved tick to its last at which the room
+/// logged that slot's hash is resolved, and that span covers the room's measured hashes of the session.
 fn decoded(run: &Run<'_>) -> Result<Decoded, Lack> {
     let missing = |name: &str| {
         Lack::Gap(format!(
@@ -555,8 +555,56 @@ fn decoded(run: &Run<'_>) -> Result<Decoded, Lack> {
     Ok(d)
 }
 
-/// README §1's `null` rule on one run (the advisor's FX-10 (b) to (d)): the first (slot, tick) the client side leaves
-/// unresolved, or resolves twice. `incomplete` holds the (slot, tick) pairs a client log marks `snap_incomplete` 1.
+/// Per slot, the ticks of one room-side session event (C-U6-11): `admit` in the room's log, `session_end` in the
+/// room's log (L2) or the lab's (L1). A record without `slot` or `t` is not read, which only makes the coverage rule
+/// stricter (a slot with one session fewer, or an end not recorded); a client-side log's record never counts.
+fn session_ticks(run: &Run<'_>, ev: &str, writers: &[&str]) -> BTreeMap<usize, BTreeSet<u64>> {
+    let mut out: BTreeMap<usize, BTreeSet<u64>> = BTreeMap::new();
+    let logs = run.logs.iter();
+    let logs = logs.filter(|l| writers.contains(&l.header.process.as_str()));
+    for e in logs.flat_map(|l| &l.events).filter(|e| e.ev == ev) {
+        let slot = e.f.get("slot").and_then(Value::as_u64);
+        if let (Some(slot), Some(t)) = (slot, e.t) {
+            let slot = usize::try_from(slot).unwrap_or(usize::MAX);
+            out.entry(slot).or_default().insert(t);
+        }
+    }
+    out
+}
+
+/// One session of a slot under the coverage rule: its ticks `from..to` (from its `admit` to the slot's next; the last
+/// to the end), and the first and last tick in them the client side resolves. A slot with no `admit` record has one
+/// session over every tick, `cut` false: the rule as it was before C-U6-11.
+struct Session {
+    from: u64,
+    to: u64,
+    span: Option<(u64, u64)>,
+    cut: bool,
+}
+
+fn sessions(admits: Option<&BTreeSet<u64>>, resolved: Option<&BTreeSet<u64>>) -> Vec<Session> {
+    let starts: Vec<u64> = admits.map_or_else(|| vec![0], |a| a.iter().copied().collect());
+    let ends = starts.iter().skip(1).copied().chain([u64::MAX]);
+    let session = |(from, to): (&u64, u64)| {
+        let mut ticks = resolved.into_iter().flat_map(|r| r.range(*from..to));
+        let first = ticks.next().copied();
+        Session {
+            from: *from,
+            to,
+            span: first.map(|f| (f, ticks.next_back().copied().unwrap_or(f))),
+            cut: admits.is_some(),
+        }
+    };
+    starts.iter().zip(ends).map(session).collect()
+}
+
+/// README §1's `null` rule on one run (the advisor's FX-10 (b) to (d); per session since C-U6-11): the first
+/// (slot, tick) the client side leaves unresolved, or resolves twice. `incomplete` holds the (slot, tick) pairs a
+/// client log marks `snap_incomplete` 1. A slot's sessions are cut at its `admit` records' ticks; in each, (c) every
+/// tick from its first resolved tick to its last at which the room logged the slot's hash is resolved, and (d) that
+/// span covers the room's measured hashes of the session. One tail is allowed: a session before the slot's last may
+/// leave the room's hashes after its last resolved tick unresolved (in flight when it left), up to its recorded
+/// `session_end` and never past it. A slot with `admit` records has no measured room hash before the first.
 fn coverage(
     run: &Run<'_>,
     server: &SlotHashes,
@@ -580,14 +628,33 @@ fn coverage(
     for (slot, t) in incomplete {
         resolved.entry(*slot).or_default().insert(*t);
     }
-    let span = |slot: usize| {
-        let ticks = resolved.get(&slot)?;
-        Some((*ticks.first()?, *ticks.last()?))
-    };
-    // (c): inside a slot's span, every tick the room logged a hash for it is resolved.
+    let admits = session_ticks(run, "admit", &["room"]);
+    let ended = session_ticks(run, "session_end", &["room", "lab"]);
+    let mut measured: BTreeMap<usize, BTreeSet<u64>> = BTreeMap::new();
+    for log in run.logs.iter().filter(|l| l.header.process == "room") {
+        for t in log.ticks.iter().filter(|t| t.ph == Phase::Measured) {
+            let Some(list) = t.hashes("server_hash") else {
+                continue;
+            };
+            for (slot, _) in list.iter().enumerate().filter(|(_, e)| e.is_some()) {
+                measured.entry(slot).or_default().insert(t.t);
+            }
+        }
+    }
+    let slots: BTreeSet<usize> = resolved.keys().chain(measured.keys()).copied().collect();
+    let of: BTreeMap<usize, Vec<Session>> = slots
+        .iter()
+        .map(|s| (*s, sessions(admits.get(s), resolved.get(s))))
+        .collect();
+    // (c): inside a session's span, every tick the room logged a hash for the slot is resolved.
     for (t, list) in server {
         for (slot, e) in list.iter().enumerate() {
-            let inside = span(slot).is_some_and(|(a, b)| a <= *t && *t <= b);
+            let session = of
+                .get(&slot)
+                .and_then(|v| v.iter().find(|x| x.from <= *t && *t < x.to));
+            let inside = session
+                .and_then(|x| x.span)
+                .is_some_and(|(a, b)| a <= *t && *t <= b);
             let done = resolved.get(&slot).is_some_and(|r| r.contains(t));
             if e.is_some() && inside && !done {
                 return Some(format!(
@@ -597,39 +664,53 @@ fn coverage(
             }
         }
     }
-    // (d): every slot the room logged at a measured tick has a span covering the room's first and last measured hash.
-    let mut measured: BTreeMap<usize, (u64, u64)> = BTreeMap::new();
-    for log in run.logs.iter().filter(|l| l.header.process == "room") {
-        for t in log.ticks.iter().filter(|t| t.ph == Phase::Measured) {
-            let Some(list) = t.hashes("server_hash") else {
+    // (d): every session the room logged at a measured tick has a span covering its first and last measured hash.
+    for (slot, ticks) in &measured {
+        let list = of.get(slot).map_or(&[][..], Vec::as_slice);
+        let who = |x: &Session| match x.cut {
+            true => format!(
+                "run {}: slot {slot}, its session admitted at tick {}",
+                run.id, x.from
+            ),
+            false => format!("run {}: slot {slot}", run.id),
+        };
+        let early = list.first().filter(|x| x.cut).zip(ticks.first());
+        if let Some((first, t)) = early.filter(|(first, t)| **t < first.from) {
+            return Some(format!(
+                "run {}: slot {slot}: the room logged its hash at measured tick {t}, before the slot's first admit \
+                 (tick {})",
+                run.id, first.from
+            ));
+        }
+        for (i, x) in list.iter().enumerate() {
+            let mut of_session = ticks.range(x.from..x.to);
+            let Some(a) = of_session.next().copied() else {
                 continue;
             };
-            for (slot, e) in list.iter().enumerate() {
-                if e.is_some() {
-                    let r = measured.entry(slot).or_insert((t.t, t.t));
-                    r.0 = r.0.min(t.t);
-                    r.1 = r.1.max(t.t);
-                }
-            }
-        }
-    }
-    for (slot, (a, b)) in measured {
-        match span(slot) {
-            None => {
+            let b = of_session.next_back().copied().unwrap_or(a);
+            let Some((c, e)) = x.span else {
                 return Some(format!(
-                    "run {}: slot {slot}: the room logged its hash at measured ticks {a} to {b}, and no client log \
-                     resolves any tick of it",
-                    run.id
+                    "{}: the room logged its hash at measured ticks {a} to {b}, and no client log resolves any tick \
+                     of it",
+                    who(x)
+                ));
+            };
+            // The tail a session that left may leave: only before the slot's next admit, only up to its recorded end.
+            let last = i + 1 == list.len();
+            let end = ended.get(slot).and_then(|v| v.range(x.from..x.to).next());
+            let left = !last && end.is_some_and(|end| b <= *end);
+            if c > a || (e < b && !left) {
+                let tail = match end {
+                    _ if !x.cut || e >= b => String::new(),
+                    _ if last => " (the slot's last session: no tail is allowed)".to_owned(),
+                    None => " (no session_end records that it left)".to_owned(),
+                    Some(end) => format!(" (its session_end is at tick {end})"),
+                };
+                return Some(format!(
+                    "{}: the client side resolves ticks {c} to {e} only, not the room's measured ticks {a} to {b}{tail}",
+                    who(x)
                 ));
             }
-            Some((c, e)) if c > a || e < b => {
-                return Some(format!(
-                    "run {}: slot {slot}: the client side resolves ticks {c} to {e} only, not the room's measured \
-                     ticks {a} to {b}",
-                    run.id
-                ));
-            }
-            Some(_) => {}
         }
     }
     None
