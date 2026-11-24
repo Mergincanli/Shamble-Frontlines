@@ -109,7 +109,7 @@
   failed-handshake count stays in the "no READY" line, its log half to U6e. (7) A question for him, not a choice: U6c's
   held-back stamp tests (C-U6-8, ~170 lines in crates/net) built here after R1, before R1's report, their SERIES.md
   reword after Netcode Builder 2's MOVED merge (my lean). (8) Round 2's netcode seat may read the code behind the two
-  readings' counts outside the diff; every outside-the-diff line carries a severity, may be taken before R1; a High goes to the advisor.
+  readings' counts outside the diff; every outside-the-diff line carries a severity, may be taken before R1; a High goes to the advisor. (9) Main 28254a7 (#65) taken in now, plan first (MAIN-65), before U6c's merge.
 - Earlier choices, each in its day's message: 11-23's (msg-2026-11-24.md items 1-7; card at 2a7a5b8), 11-22's
   (msg-2026-11-23.md items 1-5; card at 9341c90), 11-21's (card at 0f744ba), 11-20's history.md:7412-7433, 11-19's :7177-7193.
 
@@ -148,7 +148,7 @@
 - Disk (11-24 19:5x UTC): 10,491 MiB free (floor 4,096); no dev profile: a cold M5 (≥ 8,192 first, advisor-u6b-m6.md:158-165: met; it may fill ~7.8 GB, so the dev part-clean before the next run); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (from 22:50: the round-2 ruling's advisor a0031a451c8991809, request 9a57324e…; MAIN-65's plan (main-65-plan.md) to its advisor next; saver ended 19:47, hand saves):** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
+- **Running (from 22:50: the round-2 ruling's advisor a0031a451c8991809, request 9a57324e…; from 22:56 MAIN-65's plan check ad01820dd92758e65 (main-65-plan.md fd6e8c4c…, out advisor-main-65.md); saver ended 19:47, hand saves):** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
   aacd36781fdea65a0, security a307bdd231bf3e9b4, each APPROVE WITH FINDINGS, no Critical or High (u6c-r2-*.md, each
   ending DONE). A stopped agent resumes by SendMessage from its notes.
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
