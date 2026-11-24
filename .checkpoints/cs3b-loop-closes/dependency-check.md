@@ -19,3 +19,7 @@
 - **Its Low L2, kept in sight:** `devtools`' three new edges and its comment serve the replay runner and the link
   simulator (the plan's steps 7 and 8). If the size ladder moves both out of 3b, that manifest is looked at again,
   and a change to it is a new batch under the hold.
+- **On GitHub, the batch alone (commit 1ee3e918, toolchain run 45512119140):** green, with main's counts. The
+  players' WebAssembly file there: 31,728 bytes, sha256 1b116e0fd17419a7ad8a788689531cee93c04c410e68174d266ea25b61127cf9:
+  10 bytes more than main's 31,718 (sha256 383f5303...3963), with two more of our own crates linked and no code
+  using them yet. What the 10 bytes are was not looked into.
