@@ -206,13 +206,14 @@ export function checkOutDir(outDir, defaultDir) {
 }
 
 /**
- * Variables through which cargo's or the tool's settings can be changed from outside with no diff in the repository.
- * Not refused: the two that name the build folder, which the build's `--target-dir` overrides. Not covered: cargo's
- * config files outside the repository (the quality gate's flag check).
+ * Variables through which cargo's or the tool's settings can be changed from outside with no diff in the repository:
+ * among them every `RUSTC_*`, and the names through which a stable cargo takes nightly-only features (`__CARGO_*`,
+ * `CARGO_UNSTABLE_*`). Not refused: the two that name the build folder, which the build's `--target-dir` overrides.
+ * Not covered: cargo's config files outside the repository (the quality gate's flag check).
  */
 export const CARGO_OVERRIDES = new RegExp(
-  "^(?!CARGO_(BUILD_)?TARGET_DIR$)(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC|RUSTC_(WORKSPACE_)?WRAPPER|RUSTC_BOOTSTRAP|" +
-    "RUSTUP_TOOLCHAIN|CARGO_INCREMENTAL|CARGO_(BUILD|PROFILE|RESOLVER|TARGET)_.*|WASM_BINDGEN_.*|RUST_LOG)$",
+  "^(?!CARGO_(BUILD_)?TARGET_DIR$)(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC(_.*)?|RUSTUP_TOOLCHAIN|CARGO_INCREMENTAL|" +
+    "__CARGO_.*|CARGO_(BUILD|PROFILE|RESOLVER|TARGET|UNSTABLE)_.*|WASM_BINDGEN_.*|RUST_LOG)$",
 );
 
 /** The names in `env` that the Wasm build refuses, in the environment's order. Only names are read, never a value. */
@@ -220,3 +221,78 @@ export function refusedBuildSettings(env) {
   return Object.keys(env).filter((name) => CARGO_OVERRIDES.test(name));
 }
 
+
+/**
+ * The third-party crates in `cargo tree`'s flat list (`-e normal,no-proc-macro --prefix none`): what is compiled for
+ * the target and linked into the Wasm. A workspace member shows its folder after its version and is left out
+ * (`[profile.release]` covers it). A line this cannot read, or a proc-macro, is a refusal: the list must be exact.
+ */
+export function runtimeCrates(treeText) {
+  const names = new Set();
+  for (const line of treeText.split("\n").filter((text) => text.trim() !== "")) {
+    const entry = /^([A-Za-z0-9_-]+) v[0-9][^ ]*( \(([^)]*)\))?( \(\*\))?$/.exec(line.trim());
+    if (entry === null || entry[3] === "proc-macro") throw new Error(`cargo tree printed a line the overflow check cannot place: ${line}`);
+    if (entry[3] === undefined) names.add(entry[1]);
+  }
+  return [...names].sort();
+}
+
+/** The crates the root `Cargo.toml` turns overflow checks on for by name: `[profile.release.package.<name>]`. */
+export function overriddenCrates(cargoToml) {
+  const names = [];
+  for (const block of cargoToml.split(/^(?=\[)/m)) {
+    const header = /^\[profile\.release\.package\.("?)([A-Za-z0-9_-]+)\1\]\s*$/m.exec(block.split("\n", 1)[0]);
+    if (header !== null && /^overflow-checks\s*=\s*true\s*(#.*)?$/m.test(block)) names.push(header[2]);
+  }
+  return names.sort();
+}
+
+/**
+ * The runtime crates of a build that would ship with overflow checks off: in the tree, and without a named override
+ * (ADR 0002 part 4: the workspace's `"*"` turns them off for every crate that is not named). Empty when all is well.
+ */
+export function missingOverflowOverrides(treeText, cargoToml) {
+  const overridden = new Set(overriddenCrates(cargoToml));
+  return runtimeCrates(treeText).filter((name) => !overridden.has(name));
+}
+
+/**
+ * What one build resolves for the simulation, from `cargo tree -e features,normal,no-proc-macro --prefix depth
+ * --no-dedupe`: the features of `sim` it turns on, and every dependency of `sim` with its features, sorted. ADR 0002
+ * part 4 wants this list identical in every build that runs the simulation (PM-0004-74), because cargo unifies
+ * features over everything one command builds. Throws when the tree holds no `sim` at all.
+ */
+export function simFeatureList(treeText) {
+  const lines = treeText.split("\n").map((line) => /^(\d+)(.*)$/.exec(line)).filter((line) => line !== null);
+  const found = new Set();
+  let under = -1;
+  let seen = false;
+  for (const [, depthText, text] of lines) {
+    const depth = Number(depthText);
+    if (under !== -1 && depth > under) found.add(text.replace(/ \(\/[^)]*\)$/, ""));
+    else under = -1;
+    if (/^sim v[0-9]/.test(text) && under === -1) [under, seen] = [depth, true];
+    if (/^sim feature "/.test(text)) found.add(text.replace(/ \(command-line\)$/, ""));
+  }
+  if (!seen) throw new Error("cargo tree printed no sim crate: the feature check has nothing to read");
+  return [...found].sort();
+}
+
+/**
+ * Where the simulation's feature lists differ between builds: one line per build that is not the first one's
+ * equal. `lists` maps a build's name to its `simFeatureList`.
+ */
+export function simFeatureDifferences(lists) {
+  const [[firstName, first], ...rest] = Object.entries(lists);
+  return rest
+    .filter(([, list]) => JSON.stringify(list) !== JSON.stringify(first))
+    .map(([name, list]) => `the simulation's features differ between ${firstName} and ${name}: ${JSON.stringify(first)} against ${JSON.stringify(list)}`);
+}
+
+/**
+ * The compiler flag that writes one fixed place instead of the builder's own cargo folder into panic locations of
+ * registry crates, so one commit gives the same Wasm bytes on every machine (RR-F5).
+ */
+export function registryRemapFlag(cargoHome) {
+  return `--remap-path-prefix=${cargoHome.replace(/[\\/]+$/, "")}/registry/src=/cargo/registry/src`;
+}

@@ -20,6 +20,7 @@
 
 import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as viteBuild } from "vite";
@@ -31,7 +32,11 @@ import {
   cspProblems,
   formatSizeTable,
   lockedWasmBindgenVersion,
+  missingOverflowOverrides,
   refusedBuildSettings,
+  registryRemapFlag,
+  simFeatureDifferences,
+  simFeatureList,
   sizeTable,
   tooLarge,
   wasmProblems,
@@ -46,6 +51,12 @@ const pkgDir = path.join(root, "packages/sim-worker/pkg");
 const workerSource = path.join(root, "packages/sim-worker/src/worker.ts");
 const targetDir = path.join(root, "target");
 const wasmFile = path.join(targetDir, "wasm32-unknown-unknown/release/sim_wasm.wasm");
+const wasmTarget = "wasm32-unknown-unknown";
+/**
+ * Given to every cargo build of a Wasm, on its command line: panic locations inside registry crates name one fixed
+ * place, not this machine's cargo folder, so one commit gives the same Wasm bytes wherever it is built (RR-F5).
+ */
+const remapConfig = `target.${wasmTarget}.rustflags=${JSON.stringify([registryRemapFlag(process.env["CARGO_HOME"] ?? path.join(os.homedir(), ".cargo"))])}`;
 /** The test-only module: its bindings' folder, and a target folder that is never the players' Wasm's. */
 const rulesDir = path.join(root, "packages/sim-worker/pkg-rules");
 const rulesTargetDir = path.join(root, ".gate/target-rules");
@@ -66,6 +77,32 @@ function refuseSettings() {
 }
 
 /**
+ * Two refusals read from cargo's own resolution, before anything is compiled (build-checks.mjs explains each): a
+ * third-party crate that would be linked into the players' Wasm with overflow checks off, and a build that resolves
+ * the simulation's features differently from another build that runs it.
+ */
+function checkCrates() {
+  const tree = (...args) => execFileSync("cargo", ["tree", "--locked", ...args], { cwd: root, encoding: "utf8" });
+  const unchecked = missingOverflowOverrides(
+    tree("-p", "sim-wasm", "--target", wasmTarget, "-e", "normal,no-proc-macro", "--prefix", "none"),
+    readFileSync(path.join(root, "Cargo.toml"), "utf8"),
+  );
+  if (unchecked.length > 0) {
+    throw new Error(
+      `the players' Wasm would hold these crates with overflow checks off: ${unchecked.join(", ")}. ` +
+        "Give each its [profile.release.package.<name>] block with overflow-checks = true in the root Cargo.toml",
+    );
+  }
+  const features = (...args) => simFeatureList(tree(...args, "-e", "features,normal,no-proc-macro", "--prefix", "depth", "--no-dedupe"));
+  const differences = simFeatureDifferences({
+    "the players' Wasm": features("-p", "sim-wasm", "--target", wasmTarget),
+    "the test-only module": features("-p", "devtools", "--target", wasmTarget),
+    "the native tests": features("--workspace"),
+  });
+  if (differences.length > 0) throw new Error(differences.join("\n"));
+}
+
+/**
  * Builds the test-only module in both profiles and writes each one's bindings into its own folder under
  * packages/sim-worker/pkg-rules/. The same refusals and the same checked tool as the players' Wasm; its own cargo
  * call and target folder, so nothing it compiles can stand where the players' Wasm is read from.
@@ -75,13 +112,13 @@ export function buildRulesModule() {
     refuseSettings();
     execFileSync(
       "cargo",
-      ["build", "--locked", ...flags, "--target", "wasm32-unknown-unknown", "-p", "devtools", "--lib", "--target-dir", rulesTargetDir],
+      ["build", "--locked", ...flags, "--target", wasmTarget, "-p", "devtools", "--lib", "--target-dir", rulesTargetDir, "--config", remapConfig],
       { cwd: root, stdio: "inherit" },
     );
     const outDir = path.join(rulesDir, profile);
     rmSync(outDir, { recursive: true, force: true });
     mkdirSync(outDir, { recursive: true });
-    const built = path.join(rulesTargetDir, "wasm32-unknown-unknown", folder, "devtools.wasm");
+    const built = path.join(rulesTargetDir, wasmTarget, folder, "devtools.wasm");
     execFileSync(checkedTool(), ["--target", "web", "--out-dir", outDir, built], { cwd: root, stdio: "inherit" });
   }
 }
@@ -96,9 +133,10 @@ export function buildWasm() {
   // The Wasm players get is built with no setting from the environment (the overflow checks, the optimisation level,
   // the target's features), and into this repository's own target folder, which is where it is read from below.
   refuseSettings();
+  checkCrates();
   execFileSync(
     "cargo",
-    ["build", "--locked", "--release", "--target", "wasm32-unknown-unknown", "-p", "sim-wasm", "--target-dir", targetDir],
+    ["build", "--locked", "--release", "--target", wasmTarget, "-p", "sim-wasm", "--target-dir", targetDir, "--config", remapConfig],
     { cwd: root, stdio: "inherit" },
   );
   mkdirSync(pkgDir, { recursive: true });

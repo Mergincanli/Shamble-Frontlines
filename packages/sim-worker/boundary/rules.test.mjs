@@ -4,6 +4,8 @@
 // production one makes in its release and its dev profile (`node packages/client/scripts/build.mjs --wasm-only`).
 // A missing module fails this file at its imports: these tests never skip.
 import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 import * as dev from "../pkg-rules/dev/devtools.js";
 import * as release from "../pkg-rules/release/devtools.js";
@@ -56,4 +58,15 @@ test("the Wasm players get imports nothing but its own glue: no clock, no random
   }
   // And the two modules are two files: the test-only one is not the players' under another name.
   expect(readFileSync(new URL("../pkg-rules/release/devtools_bg.wasm", import.meta.url)).equals(readFileSync(new URL("../pkg/sim_wasm_bg.wasm", import.meta.url)))).toBe(false);
+});
+
+test("no Wasm names the cargo folder of the machine that built it", () => {
+  // A panic's place inside a registry crate is a path. The build maps cargo's own folder to one fixed place, so
+  // one commit gives the same bytes on every machine (RR-F5); here: the fixed place is there, and this machine's is not.
+  const registry = path.join(process.env["CARGO_HOME"] ?? path.join(homedir(), ".cargo"), "registry");
+  for (const file of ["../pkg/sim_wasm_bg.wasm", "../pkg-rules/release/devtools_bg.wasm", "../pkg-rules/dev/devtools_bg.wasm"]) {
+    const text = readFileSync(new URL(file, import.meta.url)).toString("latin1");
+    expect(text.includes("/cargo/registry/src/"), file).toBe(true);
+    expect(text.includes(registry), file).toBe(false);
+  }
 });
