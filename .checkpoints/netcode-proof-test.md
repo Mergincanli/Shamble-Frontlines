@@ -82,13 +82,13 @@
   six lines, NC-R2-4, F-JOIN-ONCE, A2's command, the 5,400 stop). `<base>` 8c81952 (U6b's merge 8efb9b2 + Block 0
   3b75d00), 807/904, test step 1086.7 s; runner u6c-run.sh, logs .gate/u6c/; its notes in its worktree's u6c-build.md.
   Its first build is cold (dev part-clean 06:55: 7.0 GiB; free 3,861 -> 10,666 MiB). On a cut: SendMessage it to read
-  its notes and go on.
+  its notes and go on. **09:11:** Blocks 1, 3, 4, 5, 6 DONE (u6c-build.md "## Done"), rustfmt applied; 5,426 added
+  (C4: Block 2 not built, lever (1) pulled); its end check.mjs running from 09:07 (.gate/u6c/end-check.log), then plants.
 - **U6c's Block 0 DONE at 3b75d00 (pushed 8c81952, 06:53):** security-u6c-deps.md's binding check steps 0-7 PASS
   (u6c-block0.md): the lock 3394b451… (229/6, 252 packages, hyper pinned back to 1.12.0; security-u6c-lock.md and its
   addendum CLEAR WITH CONDITIONS, SEC-U6CL-1 to -3 Low); step 5 11/11, 807/904 (= U6b's merged head); deny ok, audit 0
   vulnerabilities; dependency-check.md's U6c section released DEP-HOLD. Before launch: u6c-run.sh (names only);
-  Q-U6C-3 to U7 and Q-U6C-5/6/7 to U8 already met (u7-brief.md:232-236, u8-build.md:177-218). Size: brief ~2,800,
-  likely 3,800-4,200, stop past 6,000 (section 8).
+  Q-U6C-3 to U7 and Q-U6C-5/6/7 to U8 already met (u7-brief.md:232-236, u8-build.md:177-218).
 - **T5 (i) DONE 06:3x** (the T-builder's report; container readings, never judged): 4 loads, each on its own room, all
   exit 0 (WT ready 44 ms, wss open 25 ms, the hash control refused, the real page to its Wasm 404). Records copied to
   .gate/u7/t5i/; notes u7-t-build.md copied; T-half snapshot wip/u7-t-build-t5i.patch (23 files; +376 = 2,858). For
@@ -99,8 +99,9 @@
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - For msg-2026-11-25.md (C7, R2): (1) U6b's merge fixed one test's cap: the double-load bite's start gets its own 2 s
   on top of the 5 s (TR2-U6A-4); (2) sha2 runs optimised in debug builds, so the test build's start fits its 5 s;
-  (3) U6c's builder names the command for U6b's 48-connection reading (A2) and I take it at U6c's close; (4) U6c's
-  builder stops and reports at 5,400 added lines (the levers stay mine; his stop stays 6,000).
+  (3) U6c's builder names the command for U6b's 48-connection reading (A2) and I take it at U6c's close. Named, not
+  mine (C4): U6c's build reached 5,426 added after Block 6 (past 5,400), so Block 2 (P2) was not built and lever (1) is
+  pulled: P2 rides in MOVED's brief, before R1's report.
 - Before those, none since the 2026-11-24 message. Each named in its day's message: 2026-11-23's in msg-2026-11-24.md items 1-7
   (this card at 2a7a5b8 holds them with their sources); 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at
   9341c90); 2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
