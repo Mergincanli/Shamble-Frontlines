@@ -14,6 +14,11 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
 | PM-0001-4 | `fail-with-gap` | run 2 is over 16.67 ms and also lacks its overrun counter: the failure stands, the gap listed beside it | FAIL |
 | PM-0001-30 | `base` | the validity bite: a replay with one command past its tick; its run comes out INVALID by `late-zero` alone | bite shown |
 | PM-0001-30 | `missed` | the same bite run with no late command counted: the validity check let it through | FAIL |
+| PM-0001-30 | `base` (the C part) | six measured room logs on the container, 3 recordings x `wt` and `ws`, each naming its other-transport run in `params.twin` (C-U6-9), equal state hashes, `late_count` 0; RS's six runs and the wallclock bite not run | the C part PASS; the mark NOT-RUN |
+| PM-0001-30 | `twin-differs` | recording 2's `ws` run has another hash at tick 2: both runs of the recording fail, each against the other | FAIL |
+| PM-0001-30 | `same-transport` | recording 3's two runs both say `wt` | INVALID (the C part) |
+| PM-0001-30 | `not-mutual` | recording 1's `ws` run names another run as its twin | INVALID (the C part) |
+| PM-0001-30 | `twin-missing` | recording 1's `ws` file holds another run, serving no mark: the `wt` run's twin is not in the set yet | NOT-RUN (the C part) |
 | PM-0006-14 | `base` | the N = 48 session: both bracket runs and one count run padded to 8.33 ms on every tick; its N = 36 and N = 18 parts are moved (`marks/README.md` §2.6), so the mark reads MOVED, with N = 48's count reported | MOVED |
 | PM-0006-14 | `short` | one measured tick of the count run padded to 8.329 ms, short of 8.33 ms | INVALID |
 | PM-0001-4 | `measured-bites-build` | C4: run 1's room log comes from a bites build, naming no bite | INVALID |

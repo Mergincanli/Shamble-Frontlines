@@ -282,7 +282,8 @@ figure compares with (a twin, a practice run):
 - **complete:** every log of the run ends with its `footer`, unless its header has `params.killed` true (a room the
   run kills on purpose, as PM-0001-27 does); a cut log makes the run INVALID;
 - **build** (C4: plan §4.7's "measured builds never contain them", checked by the judge, not by the run script alone):
-  a run that names a bite (header `bite`) must have role `bite` or `twin` (a bite run's twin runs the same bite) and
+  a run that names a bite (header `bite`) must have role `bite` or `twin` (a bite run's twin runs the same bite; a bite run's `logging-off` twin may name it
+  too, only as the run a twin figure compares that bite run with: PM-0006-20's planted-format bite) and
   at least one log whose `build.features` lists `bites`; in a run that names none (measured, a measured run's twin,
   clean, practice, …) no log may list `bites`. "At least one log": on L2 the bite lives in one binary (RS's room)
   while LG's bots may run the measured build. Either way round, the run is INVALID (a `bite` run naming no bite is

@@ -760,3 +760,72 @@ fn a_moved_bite_hides_no_kept_failure_or_invalid_run() {
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// PM-0001-30's twin form (C-U6-9): each measured run against its other-transport twin, on the real marks.json.
+
+const C_PART: &str = "C: loopback, 3 recordings x 2 transports";
+
+/// The container's six runs (3 recordings x wt and ws), each naming its other-transport run: equal hashes pass the
+/// C part. The mark still waits for RS's six runs and its wallclock bite.
+#[test]
+fn pm_0001_30_each_run_is_compared_with_its_other_transport_twin() {
+    let v = verdict("PM-0001-30", "base");
+    let part = part_of(&v, C_PART);
+    assert_eq!(part.verdict, VerdictKind::Pass, "{:?}", part.why);
+    assert_eq!(part.runs.len(), 6);
+    assert!(
+        part.runs
+            .iter()
+            .all(|r| r.valid && r.checks[0].value.as_deref() == Some("0"))
+    );
+    assert_eq!(v.verdict, VerdictKind::NotRun, "{:?}", v.why);
+    // One transport's tick 2 differs: both runs of that recording fail, each against the other.
+    let v = verdict("PM-0001-30", "twin-differs");
+    assert_eq!(v.verdict, VerdictKind::Fail, "{:?}", v.why);
+    let needs = "identical server state hashes on every tick (each run against its other-transport twin) = 1, needs == 0";
+    for run in ["c-rec2-ws", "c-rec2-wt"] {
+        assert!(
+            says(&v, &format!("{C_PART}: run {run}: {needs}")),
+            "{:?}",
+            v.why
+        );
+    }
+    // The twin is not in the set yet: NOT-RUN, never a guess.
+    let v = verdict("PM-0001-30", "twin-missing");
+    let part = part_of(&v, C_PART);
+    assert_eq!(part.verdict, VerdictKind::NotRun, "{:?}", part.why);
+    assert!(
+        part.why
+            .iter()
+            .any(|w| w.contains("its twin c-rec1-ws is not in set c-both yet")),
+        "{:?}",
+        part.why
+    );
+}
+
+/// What the other-transport form refuses: two measured runs on one transport, and a twin that does not name the run
+/// back. Each is a gap, so the run is INVALID (as PM-0001-21's measured twin still is: it carries no transport).
+#[test]
+fn pm_0001_30_a_measured_twin_must_be_the_other_transport_and_name_the_run_back() {
+    for (case, run, why) in [
+        (
+            "same-transport",
+            "c-rec3-wt",
+            "their params.transport are not wt and ws, one each",
+        ),
+        ("not-mutual", "c-rec1-wt", "it does not name this run back"),
+    ] {
+        let v = verdict("PM-0001-30", case);
+        let part = part_of(&v, C_PART);
+        assert_eq!(part.verdict, VerdictKind::Invalid, "{case}: {:?}", part.why);
+        let line = format!("run {run}: a gap in the record: run {run}: ");
+        assert!(
+            part.why.iter().any(|w| w.contains(&line)
+                && w.contains("has role measured, not twin, and")
+                && w.contains(why)),
+            "{case}: {:?}",
+            part.why
+        );
+    }
+}
