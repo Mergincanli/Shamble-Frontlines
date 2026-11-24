@@ -1,5 +1,12 @@
 # MAIN-65: take main 28254a7 into the netcode branch (plan, 2026-11-24 22:5x UTC)
 
+## As approved
+The advisor's check (advisor-main-65.md, ends DONE; 22:56-23:17 UTC): **APPROVE WITH CONDITIONS M65-1 to M65-5** on this
+plan's text fd6e8c4c…. Its own words (advisor-main-65.md:16-160: the conditions, the fallbacks of its section 3 and
+U6c's terms of its section 4) govern wherever this plan differs. In short: no save from step 2 until step 6's card save
+(M65-1); this take-in's numbers and the resume line (M65-2); the card at 200 lines or fewer (M65-3); risk tier 1, `wc -l`
+before the add, .gate/main-65/ kept until step 7 (M65-4); U6c's M3-M9 may start once step 6's CI is green (M65-5).
+
 ## Why
 MAIN-52, Mustafa's words (history.md:2055-2057; TEST-FIRST's "main taken in when it changes code, CI or rules"; LEAN-MODE
 item 1 names "main taken in" on R1's path): main moved from 1ec6f6c (MAIN-64's) to 28254a7, PR #65 (change-set 3a,
@@ -93,8 +100,8 @@ and numbers below differ.
   the apply on the new head. Nothing of U6c's is staged during MAIN-65. **Question for the checker:** may U6c's M3-M9
   run once step 6's CI is green, with step 7 reading MAIN-65's merge commit by its SHA at 03:50 (and U6c's head with
   it), or must U6c wait for step 7? The answer moves U6c's merge by about four hours.
-- No save inside the merge window (steps 2-4): an agent's notice or the Stop hook in that window gets a save only after
-  step 4's commit.
+- No save, commit or push by hand from step 2 until step 6's card save (M65-1): an agent's notice, a trigger or the
+  Stop hook in that window is read and gets no save until step 6.
 - The record, under "Choices taken without him": "main 28254a7 taken in now, plan first (MAIN-65)", named in tonight's
   message, msg-2026-11-25.md, as MAIN-64 was in it.
 
