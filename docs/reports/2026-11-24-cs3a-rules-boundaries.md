@@ -15,12 +15,16 @@ readout changed ("frames" is now a count over time; a value that rounds to zero 
 if the simulation ever stops with an error, its own text now reaches the page instead of "unreachable".
 
 ## Outcome
-DONE, waiting for his browser check and his go. Eight planned steps are built; three review rounds are closed; the
-code head is 8619d539 (8619d53968e997846fc1a9174051862030a41a94); CI's `gate` and `toolchain` jobs are green on it
-with every test count as written down before the push. One finding changed a rule: the fused multiply-add
+DONE, waiting for his go. Eight planned steps are built; three review rounds are closed; the verifier's PASS and
+the advisor agent's APPROVE cover the corrected head 8d277cf2; his browser check is in (errors 0 in Brave and in
+Firefox). The last commit that changed what runs is 8619d539 (8619d53968e997846fc1a9174051862030a41a94); 8d277cf2
+(8d277cf21cf54919c2ae54e5232d45e944e7b040) after it changed comments in two Rust files, and the commit that holds
+this last version of the report changes docs only and removes the notes folder. CI's `gate` and `toolchain` jobs
+were green on 8619d539, c5f6a85a and 8d277cf2 with every test count as written down before the push, and the
+game's WebAssembly file has the same bytes on all three. One finding changed a rule: the fused multiply-add
 (`mul_add`, the operation that computes a * b + c with one rounding) does not give the same bits natively and in
 WebAssembly on our pinned Rust toolchain. Mustafa decided on 2026-11-24, 15:58:25 UTC that it stays banned in the
-simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned (1.71 times); his stop line of
+simulation ("MUL-ADD: (a)"). Size: 3,562 added lines against about 2,080 planned (1.71 times); his stop line of
 4,100 was not reached, and nothing was cut.
 
 ## Plan and approval
@@ -162,24 +166,31 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
   3A-PLANTS); two exports were built under other names than the design notes planned (next section); the
   runner's image version changed between runs with no read of the allocation numbers recorded (its own read: 61
   bytes a frame and 529 a block, inside the test's windows).
-- **The advisor agent on c5f6a85a (the first head with this report): REVISE, for wording only.** By its own gate
-  run, its own build (the same WebAssembly bytes), its own ChaCha8 and exact fractions, "the code is fit and
-  proven"; its nine start conditions and its seven conditions on `mul_add` are met. Its High: four places put
+- **The advisor agent on c5f6a85a (the first head with this report): REVISE, for wording only.** By its own gate run,
+  its own build (the same WebAssembly bytes), its own ChaCha8 and exact fractions it found the code fit and proven;
+  its seven conditions on `mul_add` are met, and its nine start conditions too, but for the eighth, which closes only
+  with the last commit (no skip marker; the pull request's text final before the notes go). Its High: four places put
   the register's wording in quotation marks as Mustafa's own (this report twice, a comment in `rng.rs`, the pull
   request's text); his recorded choice was "Yes to all seven". Corrected in the commit after c5f6a85a, with its
-  Mediums (a comment in the scan that still said "until Mustafa answers"; the open security follow-ups named for
-  his go; the docs pass's section below) and Lows. Its verdict on the corrected head is added with the last
-  commit, before his go is asked.
+  Mediums (a comment in the scan that still said "until Mustafa answers"; the open security follow-ups named for his
+  go; the docs pass's section below) and Lows.
+- **The advisor agent on the corrected head 8d277cf2: APPROVE.** Every point of its read of c5f6a85a is closed; its
+  own build gave the same WebAssembly bytes again, and its own script found every quotation given as his in his
+  saved messages. It names 8d277cf2 the corrected head, not the merge head: his go is for the full SHA of the
+  commit that holds this last version of the report, after its read of that commit (docs only; the notes removed).
+- **The verifier on 8d277cf2: PASS.** The code change since 8619d539 is 15 comment lines in two Rust files; its own
+  run and CI agree; all 12 quotations given as his in this report stand word for word in his saved messages. Its
+  three wording points and the advisor agent's two are corrected in this last version.
 
 ## Decisions and deviations
 - **MUL-ADD (a)**, his (above). The scan therefore checks "part 7's list exactly, less `mul_add`", which the
   advisor agent ruled is within its build-plan condition as long as part 7's own list stays word for word.
 - **Departures from the drafts beyond the plan's accepted list, as pointers for their next revision, never as
-  rewording now:** the feature compare reads PM-0004-74 (the pass mark "one feature set in every build") as three
-  builds, with dev-dependency edges for the tests; ADR 0002 part 8 names `wasm-bindgen-test` for Rust tests in
-  WebAssembly, and 3a runs them through its own test-only module instead; PM-0004-27's "each stream" is read as
-  four edge stream ids (no stream exists yet); the feature compare would refuse the dev-only feature ADR 0002 part
-  5 plans, loudly, the day it arrives.
+  rewording now:** the feature compare reads PM-0004-74 (the pass mark "One feature set builds the sim on every
+  target") as three builds, with dev-dependency edges for the tests; ADR 0002 part 8 names `wasm-bindgen-test` for
+  Rust tests in WebAssembly, and 3a runs them through its own test-only module instead; PM-0004-27's "each stream" is
+  read as four edge stream ids (no stream exists yet); the feature compare would refuse the dev-only feature ADR 0002
+  part 5 plans, loudly, the day it arrives.
 - **Pass marks, scoped honestly:** PM-0004-22 (the float pass mark) is met in part: `sqrt` bit for bit and equal to
   a correctly rounded reference, natively, in Node and in Chromium; part 7's other operations too, not `mul_add`;
   not yet: its `libm` clause, the three min/max/clamp helpers, Firefox, WebKit, Safari, 20 runs on one commit.
@@ -191,8 +202,8 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
   the hook buffer's and the vector file's layout constants (`BUFFER_BYTES`, `HEADER_BYTES`, `CARRY_WORDS`,
   `FILE_BYTES`, `RESTORE_AT`, `STREAMS`), the row type `Op`, and `chacha8_vectors`.
 - **The scan is interim:** it stands in for the lints of the quality gate step (step 2.3) and goes when they merge.
-- **Size:** 1.71 times the plan. More than half of the added lines are tests (1,703), and 430 are the two reference
-  scripts; the fix passes added 515 lines, most of them tests and planted cases. Nothing moved down the ladder.
+- **Size:** 1.71 times the plan. More than half of the added lines are tests (1,704), and 430 are the two reference
+  scripts; the fix passes added 516 lines, most of them tests and planted cases. Nothing moved down the ladder.
 
 ## The docs pass (in this change-set)
 - **His words, by script** (`docs/DECISIONS.md`; each message whole, copied from the chat's transcript with its
@@ -206,12 +217,32 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
   editor can start against the offline core, but 3b stays first in line for the main builder."; "VFX repo stays
   separate for now; we merge later. Both sides should agree on one effect file format, so the merge is easy.").
 - **#64's merge** (main 1ec6f6c, 2026-11-24, 10:15:31 UTC; #63 and #62 closed): STATUS, the archive and ROADMAP.
-- **Five dated corrections to #64's report** (`docs/reports/2026-11-19-ci-wasm.md`), asked by the advisor agent's
-  read of #64's final head; no word of his changed.
+- **Five dated corrections and one dated addition** (the pointer to commit 5911b56) **to #64's report**
+  (`docs/reports/2026-11-19-ci-wasm.md`), asked by the advisor agent's read of #64's final head; no word of his
+  changed.
+- **His browser check of 3a** (next section): `docs/reports/2026-11-24-cs3a-browser-check.md`, his message whole
+  and by script, with a pointer in `docs/DECISIONS.md`.
+
+## His browser check (2026-11-24, 21:48:49 UTC; the zip built from c5f6a85a3)
+The record, with his message whole: `docs/reports/2026-11-24-cs3a-browser-check.md`. In short:
+- **Brave** (Shields up): two reports, WebGPU, errors 0, the commit c5f6a85a3. The "frames" line reads 180.0 a
+  second and the frames over the ticked time come to 180.0 and 180.1. With the window covered on purpose, in his
+  words, "it dropped to 179 fps briefly"; no gap opened between frames and ticks. After the tab switch: "ticks
+  while hidden: 0", no drop. The page opened as a file shows its one line that says to run `node serve.mjs`.
+- **Firefox:** WebGPU, errors 0; the "frames" line reads 178.4 a second against 179.9 over the ticked time (at
+  change-set 2's check it read 239.2 against 179.9: the line is fixed).
+- **One line is not what the zip's README said to expect:** "last pause" shows 16.5 s hidden, not about 60 s. The
+  report counts six pauses and holds only the last one's length; by the two reports' clock times the match stood
+  still for about 140 s between them, which fits a covered minute and a minute in another tab. So his Brave
+  reports a fully covered window as hidden too, and the match pauses for it. Nothing ran while hidden.
 - **STATUS, the archive, ROADMAP, the map:** 3a's line; 23 follow-ups by id (3A-…) with their text; the follow-ups
   of #61 and #64 that 3a closed, each with its evidence; every new path (the map check passes).
 
-## Steps and commits (the notes of each step: the checkpoint, readable at the commit the last commit names)
+## Steps and commits
+The notes of every step (the resume card, the reviewers', the verifier's and the advisor agent's notes, his saved
+messages, the planted-defect script, the pull request's title and text) stay readable at commit
+6491b839dc7243caa796be807b67c5ae5abb1990, the last one before this report's last version removed them
+(`git show 6491b839:.checkpoints/cs3a-rules-boundaries.md`).
 | What | Commit |
 |---|---|
 | Step 1, the follow-ups from change-set 2 | a1c59e8 |
@@ -224,11 +255,15 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
 | Round 1's fix pass | 79666ad9 |
 | Round 2's fix pass, and the corrected test after the red run | a1b2e802, 8619d539 |
 | The docs pass | c5f6a85a |
+| The advisor agent's wording corrections (comments in two Rust files, docs) | 8d277cf2 |
+| His browser check recorded, the checkpoint folded and removed (docs only) | the commit that holds this version |
 
 ## Not verified
 A processor without FMA (emulated only). Firefox, WebKit and Safari for the vectors (Firefox is his browser check's
 step 6 for the page; the vectors run in CI's Chrome only). The dev server and the builds on Windows. The toolchain's
-`fmaf` source was read by rust-reviewer, not by the builder. His own Brave and Firefox check is still to come.
+`fmaf` source was read by rust-reviewer, not by the builder. A single hidden stretch of a known length in his
+browser (a report holds only the last pause). CI on the commit that holds this version (a report cannot hold the
+result of its own commit): the chat reads it line by line before his go is asked.
 
 ## Risks
 1. A library that enters the simulation later may call the fused multiply-add itself; the scan sees only our code
@@ -259,12 +294,10 @@ after his Advisor's three items.
   it stands. Nothing is needed for 3a's merge.
 
 ## For Mustafa
-1. The browser check of 3a's zip (about 6 minutes; Brave first, then Firefox once), by the README inside it: run
-   `node serve.mjs`, open the address in Brave; keep the window in front for 2 minutes; cover it for 1 minute;
-   switch tabs for 1 minute; press "Copy report" and paste it, with whether Brave Shields was up and what a
-   double-click on `index.html` shows; then 2 minutes in Firefox and its report.
-2. Your go for the merge, for the full SHA the advisor agent approves, once your main Advisor has opened the draft
-   from `pr-title.txt` and `pr-body.md` in the notes folder. With that go you also accept that three small
+1. Done: the browser check (above).
+2. Your go for the merge, for the full SHA the advisor agent approves (the commit that holds this version), once
+   your main Advisor has opened the draft from `pr-title.txt` and `pr-body.md` (in the notes folder at commit
+   6491b839). With that go you also accept that three small
    security follow-ups stay open: the copy report's rows are not yet built from one fixed list (3A-STATS-ROWS); a
    cargo settings file outside the repository can still change a build profile, the linker, a compiler wrapper
    or where a crate's source comes from (3A-CONFIG-FILE, for the quality gate step); one comment in the root

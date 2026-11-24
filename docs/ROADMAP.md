@@ -203,10 +203,11 @@ per-target code; our own ChaCha8 (his RNG-SOURCE (c)) matches the 8 published ve
 smallest normal float in WebAssembly, pinned as a toolchain defect, with `mul_add` refused in `sim` (his MUL-ADD (a));
 the panic hook's text reaches the page; a test-only WebAssembly module, built outside every package; the build refuses
 a runtime crate without its overflow override and a feature set that differs between builds, and the runner's Wasm is
-the container's byte for byte. A player sees nothing new beyond two lines of the development readout. 3,561 added
-lines (stop line 4,100), 96 planted defects caught; CI green on the code head 8619d539; three review rounds, the third
-on one High, now closed; the verifier PASS; report `docs/reports/2026-11-24-cs3a-rules-boundaries.md`. Waits for the
-advisor agent on the head, his browser check and his go.
+the container's byte for byte. A player sees nothing new beyond two lines of the development readout. 3,562 added
+lines (stop line 4,100), 96 planted defects caught; CI green on 8619d539 and on the corrected head 8d277cf2; three
+review rounds, the third on one High, now closed; the verifier PASS and the advisor agent APPROVE on 8d277cf2; his
+browser check: errors 0 in Brave and Firefox (`docs/reports/2026-11-24-cs3a-browser-check.md`); report
+`docs/reports/2026-11-24-cs3a-rules-boundaries.md`. Waits for the advisor agent's read of the last commit and his go.
 
 **CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-24, MERGED]** — ci-wasm
 (risk tier 2; planned by the first builder chat, carried by a thread of his project, built by the chat he calls

@@ -129,6 +129,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/reports/2026-11-19-cs2-browser-check.md` | Mustafa's browser check of the first page (PR #61, in Brave and Firefox on his Windows computer): his four messages with eight "Copy report" texts, word for word, and their reading against the zip's README, with the observations (BR-GAP, FPS-LINE, NEG-ZERO, FF-WAKES, BR-LATE, ADAPTER, TQ-FF, NOT-SHOWN) (recorded by PR #64) |
 | `docs/reports/2026-11-19-ci-wasm.md` | The report of the CI-WASM pull request (PR #64): CI builds the WebAssembly and runs the boundary tests, the type checks and the browser tests inside the network cut; the workflow text he said yes to, kept apart from the docs, with every rule sentence before and after; the planted faults (its corrections after the merge: change-set 3a's docs pass, dated in the text) |
 | `docs/reports/2026-11-24-cs3a-rules-boundaries.md` | The report of change-set 3a of the build plan, Rules and boundaries: the scan of the simulation's rules, our own ChaCha8 and the float vectors natively and in WebAssembly, the fused multiply-add found inexact in WebAssembly and his MUL-ADD (a), the panic hook, the test-only module, the build's refusals |
+| `docs/reports/2026-11-24-cs3a-browser-check.md` | Mustafa's browser check of change-set 3a's zip (in Brave and Firefox on his Windows computer, 2026-11-24): his message with three "Copy report" texts, word for word, and its reading against the zip's README |
 
 ## .claude/
 | Path | What it is |

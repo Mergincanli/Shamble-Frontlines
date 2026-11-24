@@ -1,1 +1,0 @@
-cs3a: rules and boundaries (the simulation's rules under tests, our own ChaCha8, the float vectors, the panic hook's text on the page)

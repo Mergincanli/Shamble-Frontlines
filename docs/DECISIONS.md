@@ -127,6 +127,21 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- _A pointer, not a decision: **his browser check of change-set 3a's zip, 2026-11-24, 21:48:49 UTC.** One chat message
+  (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also
+  holds his claude.ai project "Shamble Frontlines ALT"; his message b5bb0503-5aef-45fc-b832-6bc2a147b40c; 4451 bytes of
+  text, sha256 393a9e4be27c2927a215344efe2aacc4a4a3a4a16953e054340e8db072c5ce99) with three "Copy report" texts, two
+  from his own browser (Brave) and one from Firefox on his Windows computer, and two pictures. It stands whole, copied
+  by script, in `docs/reports/2026-11-24-cs3a-browser-check.md`, Appendix A, with the build chat's reading of it against
+  the zip's README: errors 0 in all three reports; the match stands still while the page is hidden
+  ("lastPauseTicksWhileHidden: 0"); Brave Shields was up; the page opened as a file shows its one line of text. One line
+  is not what the README said to expect: the last pause reads 16.5 s, not about 60 s (six pauses in all; only the last
+  one's length is in a report). In his words on the covered window: "When I placed the thing explorer window in front of
+  it: it dropped to 179 fps briefly". What it answers, in the chat's words: the chat's request of 17:42:35 UTC: the
+  browser check of the zip by its README (Brave in front for 2 minutes, covered for 1 minute, another tab for 1 minute,
+  "Copy report", whether Brave Shields was up, what a double-click on index.html shows; then Firefox for 2 minutes and
+  its report). The message's two pictures are not in the repository (one shows a folder path of his computer); what they
+  show is written in the browser-check record_
 - **Taken by Mustafa, 2026-11-24, 15:58:25 UTC: MUL-ADD (a): the fused multiply-add stays banned in the simulation,
   which writes a * b + c; the check on the built file comes with the first outside crate; the stop line of 4,100 lines
   stays; four decisions of his of 24 November (no separate animation editor; Testlines and the level editor; 3b first in

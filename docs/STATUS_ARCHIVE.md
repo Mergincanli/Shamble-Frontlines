@@ -1346,7 +1346,8 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
   nothing above Low; report `docs/reports/2026-11-24-cs3a-rules-boundaries.md`. The reviewers' notes stay readable at
   f153ddf4 (`.checkpoints/cs3a-rules-boundaries/`: `<reviewer>-review1.md` and `-review2.md`, the advisor agent's
   `advisor-mul-add.md`), round 3's and the verifier's at 1c668e95 (`security-auditor-review3.md`,
-  `verifier-final.md`). The ids are this docs pass's; each item names its source):
+  `verifier-final.md`), and all of them in their last state at 6491b839, the last commit before the notes were
+  removed (with the advisor agent's `advisor-head.md` and his browser check's message). The ids are this docs pass's; each item names its source):
   - **His two, from his words of 2026-11-24, 15:58:25 UTC** (MUL-ADD (a), with his Advisor's two conditions "for the
     report and STATUS's follow-ups"; whole in `docs/DECISIONS.md`):
     - 3A-FMA-CHECK (change-set 4): "The check on the built file (no fused multiply-add inside the players'
