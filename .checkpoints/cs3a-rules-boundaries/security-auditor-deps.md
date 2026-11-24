@@ -48,3 +48,26 @@ git status: the four files plus .checkpoints/.../plants.py (a scratch file, not 
   true; a manifest, so it belongs in the next batch. The later cargo-deny wasm-bindgen rule must allow devtools too.
   devtools/Cargo.toml:9's "never part of what players get" is a promise step 7 must make true (condition 2).
   Not grown by this batch: no cargo-deny or cargo-audit set-up exists yet (no deny.toml; CI runs neither).
+- During the review (13:15-13:24 UTC) the session wrote steps 4-5 (crates/sim/src/lib.rs, rng.rs; devtools src, tests,
+  vectors) and made two checkpoint commits (54235a9e, a8afdc3a): .checkpoints only, no code, manifest or CI change
+  since 50656d6 (git diff --quiet). No other manifest, lockfile, build.rs, .cargo or .npmrc differs (checked twice).
+
+## Conditions
+1. Medium, none of the four files changes. Show (b) on the batch alone: build the player's Wasm from the head's code
+   plus only these four files (e.g. a clean worktree under .gate/ with the four copied in, hashes checked), with a
+   clean target folder, and compare pkg/sim_wasm_bg.wasm with c4935aca...c31, 28,987 bytes (if the folder differs
+   from the "before" build's, build "before" there too). This tree's steps 4-5 sim code is in sim-wasm's graph and may
+   change the Wasm. Re-hash the four files after `npm ci --offline --ignore-scripts` and after that build: unchanged.
+2. Medium, none of the four files changes; holds at step 7. The test module is built in its own cargo call
+   (`-p devtools --lib`) with its own --target-dir, never in the player's `-p sim-wasm` call or target/; it and its
+   glue go only to an ignored folder outside packages/client/, packages/sim-worker/pkg/ and every dist* folder,
+   imported by no page or Worker source, served only by the spec's own routing (never serve.mjs); and the build
+   refuses an out folder holding any .wasm but the one equal to pkg/sim_wasm_bg.wasm, shown failing on a planted copy.
+
+End hashes (13:24 UTC, sha256sum -c against deps-sha256.txt): all four OK, the same four values as at the start.
+
+## Answer
+The dependency change may be committed and built: yes with conditions (1 and 2 above; neither changes one of the four
+files). Follow-up, Low: root Cargo.toml:14's "in sim-wasm only" in the next manifest batch.
+Not verified: nothing built or run (no cargo tree/metadata: Cargo's cache tracker may write); Cargo's cdylib naming and
+npm's lock rules from memory, not read today; no advisory database consulted (none set up; no package changes).
