@@ -84,7 +84,8 @@ header; tick, second and event records follow in time order. Every record has a 
     hashes unresolved, in flight when it left, only up to its recorded `session_end` (field `slot`, tick `t`: the
     room's last tick of the session; the first one recorded in the session; the lab's log on L1, the room's on L2),
     never past it. With no `session_end` (still connected at the stop, or a silent stop) the session's span reaches
-    the room's last measured hash. A slot with no `admit` record is one session with no tail, and the room logs no
+    the room's last measured hash; so the writer records a `session_end` at the tick a session ends, and none for a
+    session still connected at the stop (one at the room log's last tick record or later gives no tail). A slot with no `admit` record is one session with no tail, and the room logs no
     measured hash for a slot before its first `admit`. After the measured phase the clients keep logging until every
     measured tick is resolved, and a tick still in flight at the stop is not written;
   - `replay_hash` (only in a `replay` log on x86_64, the x86-64 re-decode of an L2 client's logged bytes, R-8): the

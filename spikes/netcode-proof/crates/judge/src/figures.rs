@@ -608,8 +608,9 @@ fn sessions(admits: Option<&BTreeSet<u64>>, resolved: Option<&BTreeSet<u64>>) ->
 /// tick from its first resolved tick to its last at which the room logged the slot's hash is resolved, and (d) that
 /// span covers the room's measured hashes of the session. One tail is allowed: a session that left may leave the
 /// room's hashes after its last resolved tick unresolved (in flight when it left), up to its recorded `session_end`
-/// and never past it; with no `session_end` (a session still connected at the stop, or a silent one) the span
-/// reaches the room's last measured hash. A slot with `admit` records has no measured room hash before the first.
+/// and never past it; with no `session_end` (a session still connected at the stop, or a silent one), or with one
+/// at the room log's last tick record or later (the stop, not a leave), the span reaches the room's last measured
+/// hash. A slot with `admit` records has no measured room hash before the first.
 fn coverage(
     run: &Run<'_>,
     server: &SlotHashes,
@@ -635,6 +636,10 @@ fn coverage(
     }
     let admits = session_ticks(run, "admit", &["room"]);
     let ended = session_ticks(run, "session_end", &["room", "lab"]);
+    // The room's last tick record: a `session_end` there or later is the stop, not a leave.
+    let rooms = run.logs.iter().filter(|l| l.header.process == "room");
+    let stop = rooms.flat_map(|l| &l.ticks).map(|t| t.t).max();
+    let at_stop = |end: &u64| stop.is_none_or(|stop| *end >= stop);
     let mut measured: BTreeMap<usize, BTreeSet<u64>> = BTreeMap::new();
     for log in run.logs.iter().filter(|l| l.header.process == "room") {
         for t in log.ticks.iter().filter(|t| t.ph == Phase::Measured) {
@@ -702,16 +707,21 @@ fn coverage(
                     who(x)
                 ));
             };
-            // The tail a session that left may leave: only up to its recorded end. A slot with no admit record
-            // keeps the rule as it was: no tail.
+            // The tail a session that left may leave: only up to its recorded end, and only an end before the
+            // room's last tick record (a session still connected at the stop left nothing in flight: an end
+            // written there would give a client that went silent a tail it never had). A slot with no admit
+            // record keeps the rule as it was: no tail.
             let end = ended
                 .get(slot)
                 .and_then(|v| v.range(x.from..=x.last).next());
-            let left = x.cut && end.is_some_and(|end| b <= *end);
+            let left = x.cut && end.is_some_and(|end| b <= *end && !at_stop(end));
             if c > a || (e < b && !left) {
                 let tail = match end {
                     _ if !x.cut || e >= b => String::new(),
                     None => " (no session_end records that it left)".to_owned(),
+                    Some(end) if b <= *end => format!(
+                        " (its session_end at tick {end} is at the room's last tick or later: the stop, not a leave)"
+                    ),
                     Some(end) => format!(" (its session_end is at tick {end})"),
                 };
                 return Some(format!(

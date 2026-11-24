@@ -1787,6 +1787,54 @@ fn c_u6_11_each_session_has_its_own_end_and_only_the_room_side_admits() {
     );
 }
 
+/// The test-engineer's re-check: every room hash inside a LATER session's span is resolved too (the session that
+/// holds the tick is looked up, not the slot's first).
+#[test]
+fn c_u6_11_a_hole_inside_a_later_session_is_a_gap() {
+    let every: Vec<u64> = (1..=12).collect();
+    let rejoined = [
+        ("admit", 1, "room"),
+        ("session_end", 4, "room"),
+        ("admit", 5, "room"),
+    ];
+    // The second session resolves ticks 5 to 12 but for tick 8.
+    let (valid, why) = covered(&session_run(
+        &every,
+        &[1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12],
+        &rejoined,
+    ));
+    let hole = "run h1: slot 0, tick 8: the room logged a hash and no client log resolves it";
+    assert!(!valid && why.ends_with(hole), "{why}");
+    assert_eq!(
+        covered(&session_run(&every, &every, &rejoined)),
+        (true, String::new())
+    );
+}
+
+/// The advisor's guard on the last session's tail: a `session_end` at the room log's last tick record, or later,
+/// is the stop and no leave, so a client that went silent mid-run gets no tail from it.
+#[test]
+fn c_u6_11_a_session_end_at_the_stop_gives_no_tail() {
+    let every: Vec<u64> = (1..=12).collect();
+    let silent: Vec<u64> = (1..=10).collect();
+    // The room's last tick record is tick 12. An end one tick before it is a leave: ticks 11 was in flight.
+    let left = [("admit", 1, "room"), ("session_end", 11, "room")];
+    assert_eq!(
+        covered(&session_run(&every[..11], &silent, &left)),
+        (true, String::new())
+    );
+    for stop in [12, 13] {
+        let ended = [("admit", 1, "room"), ("session_end", stop, "room")];
+        let (valid, why) = covered(&session_run(&every, &silent, &ended));
+        let gap = format!(
+            "run h1: slot 0, its session admitted at tick 1: the client side resolves ticks 1 to 10 only, not the \
+             room's measured ticks 1 to 12 (its session_end at tick {stop} is at the room's last tick or later: the \
+             stop, not a leave)"
+        );
+        assert!(!valid && why.ends_with(&gap), "{why}");
+    }
+}
+
 /// C-U6-11's head and the two cases the advisor's plan review fixed (condition 5).
 #[test]
 fn c_u6_11_a_mid_run_join_and_the_slots_with_no_admit_record() {
