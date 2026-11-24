@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 14:21 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 14:30 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -329,6 +329,33 @@ and text.
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **Round 1, rust-reviewer (on 5c92311; `rust-reviewer-review1.md`): 0 Critical, 0 High, 4 Medium (fix now), 7
+  Low.** It reproduced the ChaCha8 file and the Wasm's sha256 e138cae8...2bc5 with its own tools, and read the
+  machine code: on x86-64 `floor`, `ceil`, `trunc`, `round` and `mul_add` are calls into the toolchain's own
+  compiler_builtins and `sqrt` is an instruction; on wasm32 `floor`, `ceil`, `trunc` and `sqrt` are instructions and
+  `round` and `mul_add` call compiler_builtins inside the module. For the fix pass:
+  - M1: `from_f64` tests nothing that `mul` does not (the compiler turns it into an f32 multiply; the two digests
+    are equal). Fix: `f(f64::from_bits(wide(a, b)) as f32)` and a reference that rounds that double once;
+    regenerate. Until then the count is 37 operations.
+  - M2: `panic.rs`'s doc gives a wrong reason ("a panic may be a failed allocation"): std formats a message with
+    run-time arguments into a new String before a custom hook runs, and an out-of-memory stop never reaches the
+    hook on stable (it prints and aborts). Fix the doc; the report says an out-of-memory stop shows no message.
+  - M3 (the same root as engine-architect's F1): the native tests' feature list is read without dev-dependency
+    edges. Fix: read `sim`'s own features for that list from a tree with `dev` edges (the subtree stays on normal
+    edges), with the reviewers' plant as a test; the doc says what is not modelled.
+  - M4: the scan's rules let real constructs through (16 probes): a type alias of `f32`, `Self::sin` in an impl for
+    `f32`, `<f32 as Trait>::powi`, a generic `F::sin`, a macro that takes the method's name, `#[path]` and
+    `include!`, and hash maps under other names (`FxHashMap`). Fix: a banned name after `::` counts unless the
+    segment before it is an integer type or `Ord`, `cmp` or `Iterator`; names that contain `HashMap` or `HashSet`;
+    flag `#[path` and `include!`; the macro gap written in the file's doc.
+  - Lows to ride the fix pass where cheap: L1 the remap through `CARGO_ENCODED_RUSTFLAGS` in the cargo child's
+    environment (it shuts config files' rustflags out; a config-file profile stays "not covered", said in the
+    note); L2 `runtimeCrates` counts a crate with a source outside the repository as third-party; L3
+    `saturating_sub` in the hook's writer; L6 the escape no longer covers a whole `fn`, `impl`, `mod` or `trait`,
+    `0..min(a, b)` is not a method call, line numbers after a backslash line break; L7 nits (a const assert on the
+    seed's length, `wrapping_add` in the test allocator, docs). Follow-ups: L3's name section (a quarter of the
+    players' Wasm: with "the table of build options"), L4 the generator copies its 64-byte block on every draw
+    (with PM-0004-27's cost, change-set 8), L5 the hook's test in its own test binary (3b, as engine-architect's F6).
 - **Round 1, engine-architect (on 5c92311; `engine-architect-review1.md`): 0 Critical, 0 High, 1 Medium, 5 Low; the
   five follow-ups EA-F8, -F10, -F13, -N3, -N6 closed as meant.** For the fix pass:
   - F1 (Medium, fix now): the feature compare's "native tests" list reads normal edges only, so a feature of `sim`
@@ -374,7 +401,7 @@ and text.
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
-- **Reviewers in the background** (round 1, on 5c92311; engine-architect ended, security-auditor started 14:21 UTC
+- **Reviewers in the background** (round 1, on 5c92311; engine-architect and rust-reviewer ended; perf-auditor started 14:30 UTC, notes `perf-auditor-review1.md`; security-auditor started 14:21 UTC
   with notes in `security-auditor-review1.md`; perf-auditor follows): rust-reviewer
   (`rust-reviewer-review1.md`), engine-architect (`engine-architect-review1.md`), test-engineer
   (`test-engineer-review1.md`); each works in its own `.gate/<name>-cs3a/` folder. security-auditor and
