@@ -63,9 +63,12 @@ Against security-u6c-deps.md:244-262, with the addendum's amended lists (securit
 - `--target all -d --depth 0`: base64, getrandom, pem, syn, synstructure, windows-link, windows-sys, the seven (:404-434).
 - `-i aws-lc-rs`: "did not match any packages", exit 101 (:435-437).
 
-## Step 5, `cargo check --workspace --all-targets --locked` then `node check.mjs`: RUNNING
-Through main-run.sh, log .gate/u6c-block0/step5-check.log (from 06:31:27 UTC; same HEAD and diff hash as step 4's
-run). `cargo check`: exit 0, no warning (06:31:45 UTC). check.mjs: fmt, clippy, clippy-wasm32, doc PASS so far.
+## Step 5, `cargo check --workspace --all-targets --locked` then `node check.mjs`: PASS
+Through main-run.sh, log .gate/u6c-block0/step5-check.log (06:31:27-06:52:17 UTC; same HEAD and diff hash as step 4's
+run). `cargo check`: exit 0, no warning. check.mjs: "all 11 steps pass" (fmt, clippy, clippy-wasm32, doc, test, deps,
+wasm, refs, marks, self, redact); measured 807, bites 904, 0 failed, 0 reported a skip, equal to U6b's merged head (its
+M5 run 2: 807/904), so Block 0 adds and drops no test; test step 1086.7 s; deps: npt-super and npt-host keep off the
+sim, room, proto and client crates.
 
 ## Step 6, cargo-deny and cargo-audit: PASS
 - `cargo deny --manifest-path spikes/netcode-proof/Cargo.toml --locked check advisories bans sources`

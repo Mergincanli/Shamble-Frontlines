@@ -78,3 +78,26 @@ a0efce8e511a8865d50008172b3f88e9cc072efbe92a85a035340562b7c49524  spikes/netcode
 210bf2df2d968dc457a76a0c75f20f7dd06fd2a0f9c33ef05e5c7c2a3b2ca219  spikes/netcode-proof/Cargo.lock
 6d6ede543c1799abfc66b7299a2482a61653ca4766f5d8f494f9b3b9c5da3ea5  spikes/netcode-proof/crates/net/Cargo.toml
 3caf76bcc256af569d37910f2eb97cebf4eb9868b03827427acc443b7701403c  spikes/netcode-proof/crates/server/Cargo.toml
+
+# DEP-HOLD release, U6c's Block 0 (main's .claude/CHECKPOINTS.md §3; u6c-brief.md rev 1.1 section 5)
+# security-auditor's answers, read in full (each ends DONE): .checkpoints/netcode-proof-test/security-u6c-deps.md
+# (items 1-8 CLEAR WITH CONDITIONS; SEC-U6CD-1 to -4 Low; binding check :222-270; Conditions :210-220: Block 0's
+# content exactly as item 1 plus SEC-U6CD-2's comment; the issue mode on `Account::builder()` (the platform verifier),
+# `builder_with_http` under #[cfg(test)] only, no install_default or set_default, SSL_CERT_FILE and SSL_CERT_DIR unset,
+# each ACME call under a timeout; TLS 1.3 only on every server and pinning client configuration; npt-load adds no tokio
+# feature and npt-server reaches npt-bots by the dev edge only; cargo-deny 0.22.0 and cargo-audit 0.23.0 with both
+# database dates) and .checkpoints/netcode-proof-test/security-u6c-lock.md (the lock refresh: CLEAR WITH CONDITIONS,
+# SEC-U6CL-1 to -3 Low; its addendum accepts step 4's three extra feature lines). Written 2026-11-24 ~06:5x UTC by the
+# main session after steps 0-6 passed (evidence u6c-block0.md). The refresh took hyper 1.13.0, pinned back by `cargo
+# update -p hyper --precise 1.12.0` (step2b-pin.log), which moved three Windows-only edges windows-sys 0.61.2 -> 0.52.0
+# (quinn-udp, rustls-platform-verifier, winapi-util). Step 3 as amended: `229 6`, 252 packages, the 17 new checksums as
+# cleared, sha256 equal to security's after-lock. Step 4's lists as amended: hyper client, default, http1, http2;
+# hyper-util client, client-legacy, default, http1, http2, tokio; hyper-rustls http1, http2, native-tokio, ring,
+# rustls-native-certs, rustls-platform-verifier, tls12. `cargo check` no warning; check.mjs all 11 steps PASS, measured
+# 807, bites 904 (equal to U6b's merged head); cargo-deny "advisories ok, bans ok, sources ok" (the seven duplicate
+# warnings); cargo-audit 252 crate dependencies, 0 vulnerabilities, one allowed warning RUSTSEC-2026-0441; databases
+# fetched 2026-11-24 06:33:09 and 06:33:11 UTC.
+7992c8e10da940a2f610be7223bcf0d6d3e4c2e31c7b78a61edbe2e88925ca03  spikes/netcode-proof/Cargo.toml
+3394b451b06492758621445c250f44e93572e0b33a0269e68b7c9021b0f54873  spikes/netcode-proof/Cargo.lock
+a06c090c7ee4b3b2f0fdf4ef9e319943957de549fb291da5aeefd6feb062748f  spikes/netcode-proof/crates/host/Cargo.toml
+3cf4b077b8c9f8a440c74759124720ba1f9a30bdda9370c90b7c6a0bad28f45f  spikes/netcode-proof/crates/bots/Cargo.toml
