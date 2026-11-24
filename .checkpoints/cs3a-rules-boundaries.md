@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 10:34 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 11:11 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -100,9 +100,23 @@
    `cs3-plan.md`, `cs3-context.md`, `engine-architect-cs3.md`, `netcode-architect-cs3.md`,
    `rust-reviewer-cs3-rng.md`, `advisor-cs3-plan.md`, `rr-chacha-ref.py`, `test-engineer-followups.md` (it holds
    SA-TREE's draft) and `chat-words.mjs` (pointed at this folder); his three messages since his go, by script.
+2. **Rebuilt after his /compact (2026-11-24, 11:04 to 11:11 UTC):** his message of 11:03 UTC (the compact is done;
+   rebuild from the repo; tell him in at most 6 lines; then "build change-set 3a by the plan without waiting for
+   me"; it goes into DECISIONS with the docs pass, by script). Read: CLAUDE.md, this card, the plan, his entries of
+   2026-11-23 in DECISIONS and the three messages here; card, repo and summary agree. The session record: model
+   `claude-fable-5-2` (last served the same), permission mode `auto`, context about 10 %. Issue #59: one comment
+   (lane 2, 2026-11-18, for change-set 4's plan), nothing for 3a. Set up in this container: `npm ci
+   --ignore-scripts` at the root and in `tools/`; the wasm-bindgen archive by the workflow's own curl line into
+   `.gate/wb-tool/` (11,860,397 bytes, sha256 9687f3bb...227f; the one program 8,170,784 bytes, sha256
+   ca4df773...6931: his TOOL-SOURCE values, both checked). **Baseline on 8a62e79 (code = main 1ec6f6c):** `cargo test
+   --workspace --locked` ok (client-endpoint 15, devtools 1, protocol 2, room 1, sim 9, sim-wasm 6); the development
+   build ok (Wasm 28,987 bytes here); vitest: types 7, sim-worker src 30, boundary 7, client 49, net 1; the browser
+   tests 12 passed (52.6 s, the container's Chromium); `node tools/gate.mjs --no-smoke`: GATE PASS, symbols +0 -0.
 
 ## Current step
-**Stopped for his /compact.** His words: "Build nothing before I have compacted this chat." Nothing of 3a is built.
+**The advisor agent's short read of the plan on main 1ec6f6c** (started 11:06 UTC; its notes:
+`cs3a-rules-boundaries/advisor-cs3a-start.md`; ten points, among them step 7's route on main's CI text, F-CHANNEL
+with step 8, the release evidence before E1). No source file is edited before its verdict. Then step 1.
 
 ## Next steps (after the compact)
 1. Read CLAUDE.md, this card, the plan (`cs3-plan.md`: sections 0, 3, 4, 8, 9, 12 and 13), `cs3-context.md`, and
@@ -151,4 +165,17 @@
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
-- Nothing runs. No saver. No agent.
+- The advisor agent (Opus 5.5, effort max), in the background: the short read above. No saver.
+- How things are run here (the guard refuses `npx`, `npm run`, `npm test`): vitest by
+  `node node_modules/vitest/vitest.mjs run --root packages/<name> [--dir ...]`; the browser tests by
+  `SHAMBLE_DIST="$PWD/.gate/dist-development" SHAMBLE_CHROMIUM=/opt/pw-browsers/chromium node
+  node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --workers=1
+  --retries=0 --reporter=list --global-timeout=300000 --trace off`; the build by
+  `SHAMBLE_WASM_BINDGEN="$PWD/.gate/wb-tool/x/wasm-bindgen" node packages/client/scripts/build.mjs --out-dir
+  "$PWD/.gate/dist-development"`; logs under `.gate/cs3a/`.
+- Where step 1's items are spelled out: the reviewers' notes of change-set 2 at commit e9f31f0
+  (`git show e9f31f0:.checkpoints/cs2-first-page/test-engineer-review1.md`, `-review2.md`,
+  `engine-architect-review1.md`, `-review2.md`): TE-L's four server branches (the leading slash, the lexical "..",
+  the empty path, not a file), the silent returns of the link cases, the unstubbed WebAssembly names, the
+  one-Worker assert, the scratch-buffer proxy; TE-NT3 (the error text's cleaning), TE-NT4 (the hand-off time read
+  before the copy), TE-NT5 (the hidden-tab equality also holds on stale reports).
