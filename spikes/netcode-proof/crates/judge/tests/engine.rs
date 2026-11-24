@@ -2510,9 +2510,22 @@ fn u4j_ws_far_better_past_the_cap_is_invalid() {
         set_field(&mut w, name, value);
     }
     w.record.push(("chance_ruling", json!("x")));
+    // Probe A: the record's line widens the band, so it is not the mark's line: the pin refuses it by its own reason.
     let (part, v) = ws_part(&w);
     assert_eq!(part.verdict, VerdictKind::Invalid, "{:?}", part.why);
-    assert!(says(&part.why, "ws-practice: "), "{:?}", part.why);
+    let pin = "its bound line is not PM-0001-18's ws_bound_line, byte for byte";
+    assert!(says(&part.why, pin), "{:?}", part.why);
+    assert_eq!(v.verdict, VerdictKind::Invalid, "{:?}", v.why);
+    // Probe A pinned (TE2-2): the record carries marks.json's own line, and FAR BETTER at s = 1.9 with a chance
+    // ruling is refused by the class rule, since 1.9 is not below the band.
+    set_field(&mut w, "bound", json!(WS_BOUND));
+    let (part, v) = ws_part(&w);
+    assert_eq!(part.verdict, VerdictKind::Invalid, "{:?}", part.why);
+    assert!(
+        says(&part.why, r#"is "FAR BETTER" at s = 1.9"#),
+        "{:?}",
+        part.why
+    );
     assert_eq!(v.verdict, VerdictKind::Invalid, "{:?}", v.why);
 }
 
