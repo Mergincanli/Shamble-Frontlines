@@ -76,7 +76,7 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-24 23:0x UTC; U6b MERGED 8efb9b2; U6c's ruling running; MAIN-65 planned, its check running; before: e788f57)
+## Now (2026-11-24 23:3x UTC; MAIN-65 pushed 82bd694, CI green, step 7 at 03:51; U6c ruled, its merge waits on NPT-EDGE-READ; before: e788f57)
 - **U8:** pass 3 DONE ~17:29 (snapshot 0e7fbab2…, 6,111 of his 6,200 stop: items 1-8, every Low in, none carried; node
   tests 100/0, wrappers 315/0, redact 0 findings; package files unchanged; no plant left; item 1's judge run 17:08 at
   627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round DONE 21:2x** (his words: the three Highs'
@@ -145,7 +145,7 @@
   counter, SA-16's variant); the kit's paper costs named to him on 2026-11-17. Nothing added since.
 
 ## Key numbers (U4f's `<base>` counts, the earlier packs and his 2026-11-17 count: this card at 1b26e8c)
-- Disk (11-24 23:24 UTC, MAIN-65's light run): 10,290 MiB free (floor 4,096); no dev profile: a cold M5 (≥ 8,192 first, advisor-u6b-m6.md:158-165: met; it may fill ~7.8 GB, so the dev part-clean before the next run); unpacked: card at 74bf901.
+- Disk (11-24 23:24 UTC, MAIN-65's light run): 10,290 MiB free (floor 4,096); debug only 212 MiB (the light runs' judge build): a near-cold M5 (≥ 8,192 first, advisor-u6b-m6.md:158-165: met; it may fill ~7.8 GB, so the dev part-clean before the next run); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **No agent running. DONE 23:1x: the round-2 ruling a0031a451c8991809 (advisor-u6c-r2.md: APPROVE; H2 before M5; H1 only on his NPT-EDGE-READ yes; U6c merges after MAIN-65 and his answer, H2 alone after end Fri 27) and MAIN-65's check ad01820dd92758e65 (APPROVE WITH CONDITIONS M65-1 to -5); saver ended 19:47, hand saves:** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
@@ -153,7 +153,7 @@
   ending DONE). A stopped agent resumes by SendMessage from its notes.
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-    (next 20:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
+    (next 00:34); step 7 trig_01Co9w6DYSoCbkQz5RWhK58i (03:51; main-65-step7-request.txt 849b4775…); day message trig_01XVEDQzVLaAwy4Fer6AERdS (11-25 23:05); U6c's H2-alone fallback trig_016oDPmJFc98ivTt3fLbjj9a (Fri 27 23:01 UTC).
 - **MAIN-65 steps 1-6 DONE 23:28 UTC (step 7 at 03:51):** pushed at 82bd694 (82bd69428512e679b789797d674ef04bd4743715); CI on it green: gate 45509875991 and toolchain 45509875989 (push), gate 45509881420 and toolchain 45509881180 (pull request); merge 39a0d04 (parents H0 473f5c1, main 28254a7); STATUS.md 120 lines, "1 1" against main; H0..HEAD 64 files +4677/-317 (63 without STATUS.md, +4644/-284); anchor 9475d37 exit 0 (index and HEAD); gate PASS (--no-smoke); repo map OK 186/110; checkpoint tests 33/33; light.log PASS (refs 1848 = 1825 + 23, marks 81, self 78/78, redact 11/11, 359 items, 0 findings); outputs .gate/main-65/ kept for step 7.
 - **My step (18:3x):** round 2: netcode 3 Lows in the diff, 2 Mediums outside it before R1 (the start-edge drop read;
   LG's DONE with no READY, caught at U8's one load_up call :2218-2221); P1's +222 drops are in-window, a separate fact
