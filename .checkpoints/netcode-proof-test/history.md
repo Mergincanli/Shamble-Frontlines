@@ -7848,5 +7848,8 @@ Re-create them if still needed.
 - **Step 5 (13:05):**
   - Gate PASS (--no-smoke), repo map 173/110, checkpoint tests 33/33 (.gate/main-64/step5-outputs.txt).
   - light.log PASS: HEAD 72b0dc3; refs 1,814 = N0 + 3; marks, self and redact equal to the base's word for word.
-- **Step 6:** pushed with the card save (no CI read before it: C4). Next: CI on the pushed head, then step 7, the
-  advisor's head check.
+- **Step 6:** pushed at 807e92a with the card save (no CI read before it: C4). CI on 807e92a: 6 of 6 green (gate
+  45400232353 and 45400238799, each with gate and smoke; toolchain 45400232653 and 45400238548). The saver restarted
+  (bghk215os).
+- **Step 7 DONE (13:2x):** the advisor's head check is APPROVE (advisor-main-64-head.md). No new finding.
+  Toolchain's summary lines equal main's run 45373056953. ADV-M60-7 and ADV-M54-8 are still open (Low).

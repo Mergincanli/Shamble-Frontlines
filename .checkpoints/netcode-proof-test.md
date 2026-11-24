@@ -151,14 +151,12 @@
     worktree; notes u6c-build.md there ("Resume from" lines); end check .gate/u6c/fix-check.log; plants P2, P8, P18, P19, P22.
   - Done, resumable: the U6c advisor a662f1797b78cae95 (its ruling); the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-    (next 14:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md). CI on 807e92a
-    all green (gate 45400232353/45400238799, toolchain 45400232653/45400238548); step 7 running from 13:13.
-- **My step: MAIN-64's step 7** (main-64-plan.md; advisor-main-64.md). **Steps 1-6 DONE** (history.md, "## MAIN-64"):
-  merge 72b0dc3 (parents dd6a03b, 1ec6f6c), pushed with this card's save; gate PASS, repo map 173/110, checkpoint tests
-  33/33, light run PASS (refs 1,814 = N0 + 3; the rest word for word the base's). Next: CI on the pushed head (gate,
-  smoke, toolchain), then the advisor's head check by SendMessage. **Next three:** (1) U6c's fix pass and its check,
-  then round 2 (three seats, the diff only); (2) the merge M3-M9 as U4f's (history.md:7022-7028; M5 after a part-clean;
-  the readings; C9's U8 edits); (3) U7's 0b check and R-half, U8's merge. Msg 23:05.
+    (next 14:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
+- **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
+  check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
+- **My step:** waiting on U6c's fix pass (its builder runs its end check). **Next three:** (1) the fix pass's report and
+  check, then round 2 (three seats, the diff only); (2) the merge M3-M9 as U4f's (history.md:7022-7028; M5 after a
+  part-clean; the readings; C9's U8 edits); (3) U7's 0b check and R-half, U8's merge. Msg 23:05.
 - **Finished, resumable by SendMessage:** U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder
   ac59cce3e5d002441 (notes u8-build.md "## Pass 3"); the advisor a3de649cd25e474df (U8's rulings). Older: card at e67ef59.
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): its record in Now. Open at its
