@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 11:36 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 13:16 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -187,9 +187,42 @@
    protocol 2; `npm test --workspaces`: types 7, sim-worker 35, client 60, net 1, e2e's node project 1; boundary 1
    file, 7 tests; the browser tests "Running 12 tests", "12 passed"; 0 skipped, 0 ignored.
 
+   **CI on a1c59e8, read line by line (the log: `.gate/cs3a/ci-a1c59e8-toolchain.log`):** gate success (run
+   45385683163), toolchain success (run 45385682879, job 138415844793, 11:36:13 to 11:38:31 UTC): every count as
+   expected, 0 skipped, 0 ignored; the Wasm's sha256 on the runner 22dad2eb...018b, as on main; Chrome
+   157.0.8103.78; allocation 43 bytes a frame and 539 a block.
+5. **Plan step 2 (the scan test and the planted counter): 50656d6**, pushed 11:43 UTC (3 files).
+   `crates/sim/tests/rules_scan.rs` (387 lines): std 1.99.1's 79 inherent float methods less ADR 0004 part 7's 14;
+   the hash-map ban with part 9's escape recognised on an item with a written reason only; the clock ban; 22
+   planted breaches in the file, each found once and by name, and 8 controls. It found one real case, the tick's
+   bytes in the method form (`tick.to_le_bytes()`), now `u32::to_le_bytes(*tick)`: **integer code in `sim` writes
+   the path form on its own type, because a scan of text sees no types** (so will the ChaCha8 code). PM-0002-53's
+   native half: the planted `u16` counter and its wrapping control, debug and release. Checked: `cargo test
+   --workspace --locked` (sim 9, `rules_scan` 4, `state_hash_alloc` 1); sim in release; fmt; clippy clean; the gate
+   PASS. **Planted on the crate itself: 5 of 5 caught** (a hash map, a float method, a clock, the method form
+   again, and the release profile's overflow checks turned off on cargo's command line). **Size so far: 1,228
+   added lines against about 710 planned for steps 1 and 2.** Not read yet: CI on 50656d6.
+
 ## Current step
-**Plan step 2** (the scan test `crates/sim/tests/rules_scan.rs` and PM-0002-53's native half), started 11:36 UTC.
-Read CI's run on a1c59e8 before the next code push.
+**Plan step 3, the one batch of manifest changes, in the hold since 13:12 UTC: written, not committed, nothing
+built with it.** Four files (their sha256: `cs3a-rules-boundaries/deps-sha256.txt`; the diffs:
+`deps-manifests.diff`, `deps-lockfiles.diff`): `crates/devtools/Cargo.toml` (a cdylib beside the rlib; `sim` and
+`sim-wasm` by path, `wasm-bindgen` from the workspace), `Cargo.lock` (devtools' three dependencies, by `cargo update
+--workspace --offline`, "Locking 0 packages"), `packages/sim-worker/package.json` and `package-lock.json`
+(`@shamble/types` to devDependencies; the lockfile's two words by hand, to be checked with `npm ci --ignore-scripts`
+after the answer, C5). No outside package enters. No root `Cargo.toml` change: cargo's `trim-paths` is not stable in
+1.99.1 (tried in a scratch project), so RR-F5's fix in step 8 is a path remap on cargo's command line from
+`build.mjs`. **security-auditor (Opus 5.5, effort max) is answering on exactly that content** (started 13:12 UTC;
+its notes: `security-auditor-deps.md`). After its yes: `dependency-check.md` with the four hashes, `npm ci
+--ignore-scripts`, the first build, then the commit by path.
+**Plan step 4 is written beside it and not built yet** (uncommitted): `crates/sim/src/rng.rs` (our own ChaCha8,
+280 lines with the 8 published vectors, copied by script from the draft fetched at 13:13 UTC, 76,754 bytes, sha256
+e0a49fdd...4d55; the notes' reference script matches 48 of the draft's 48 vectors);
+`crates/devtools/vectors/make_chacha8_vectors.py` (a second implementation; it reproduces the 8 published vectors
+from `rng.rs` before it writes), `chacha8-words.bin` (160,384 bytes, sha256 8531eb01...68f2) and
+`chacha8.manifest.txt`; `crates/devtools/src/rules.rs`, `rules/stream.rs` (the check, one function for native and
+Wasm) and `tests/stream_vectors.rs`. Left out on purpose: the stream's canonical state bytes (no stream is in the
+world's state before its first draw; it joins with that change-set).
 
 ## Next steps (after the compact)
 1. Read CLAUDE.md, this card, the plan (`cs3-plan.md`: sections 0, 3, 4, 8, 9, 12 and 13), `cs3-context.md`, and
@@ -238,7 +271,8 @@ Read CI's run on a1c59e8 before the next code push.
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
-- Nothing runs in the background. No saver.
+- security-auditor, in the background: the dependency answer (above). No saver.
+- In a folder outside the repository cargo is the default 1.97.0, not the pin: scratch projects use `cargo +1.99.1`.
 - How things are run here (the guard refuses `npx`, `npm run`, `npm test`): vitest by
   `node node_modules/vitest/vitest.mjs run --root packages/<name> [--dir ...]`; the browser tests by
   `SHAMBLE_DIST="$PWD/.gate/dist-development" SHAMBLE_CHROMIUM=/opt/pw-browsers/chromium node

@@ -1,0 +1,29 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 140d6be0..a7775847 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -21,6 +21,11 @@ version = "0.0.0"
+ [[package]]
+ name = "devtools"
+ version = "0.0.0"
++dependencies = [
++ "sim",
++ "sim-wasm",
++ "wasm-bindgen",
++]
+ 
+ [[package]]
+ name = "proc-macro2"
+diff --git a/package-lock.json b/package-lock.json
+index d7fd8246..d5b26207 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1256,7 +1256,7 @@
+       "name": "@shamble/sim-worker",
+       "version": "0.0.0",
+       "license": "UNLICENSED",
+-      "dependencies": {
++      "devDependencies": {
+         "@shamble/types": "0.0.0"
+       }
+     },

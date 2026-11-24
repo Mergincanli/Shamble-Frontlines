@@ -19,6 +19,7 @@ OUT = ROOT / ".gate/cs3a"
 VITEST = ["node", "node_modules/vitest/vitest.mjs", "run"]
 CLIENT = VITEST + ["--root", "packages/client"]
 WORKER = VITEST + ["--root", "packages/sim-worker", "--dir", "packages/sim-worker/src"]
+SCAN = ["cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan"]
 BUILD = ["node", "packages/client/scripts/build.mjs", "--out-dir", str(ROOT / ".gate/dist-plant")]
 E2E = ["node", "node_modules/@playwright/test/cli.js", "test", "-c", "packages/e2e/playwright.config.ts", "--project=chromium",
        "--workers=1", "--retries=0", "--reporter=list", "--global-timeout=300000", "--trace", "off"]
@@ -111,6 +112,22 @@ PLANTS = [
     ("alloc-every-call", "the state hash frees and takes its buffer on every call",
      [("crates/sim/src/world.rs", "        out.clear();\n        out.reserve(STATE_BYTES);", "        out.clear();\n        out.shrink_to_fit();\n        out.reserve(STATE_BYTES);")],
      [["cargo", "test", "-p", "sim", "--locked", "--test", "state_hash_alloc"]], r"a later call took memory"),
+    # --- step 2: the rule scan on the simulation crate itself, and the planted counter
+    ("scan-hash", "a std hash map enters the simulation crate",
+     [("crates/sim/src/world.rs", "use crate::state_hash::fnv1a_64;\n", "use crate::state_hash::fnv1a_64;\n#[allow(unused_imports)]\nuse std::collections::HashMap;\n")],
+     [SCAN], r"world\.rs:6: `HashMap`"),
+    ("scan-float", "a float method outside the list enters the simulation crate",
+     [("crates/sim/src/world.rs", "/// The length of a match seed in bytes.", "pub fn planted(x: f32) -> f32 {\n    x.sin()\n}\n\n/// The length of a match seed in bytes.")],
+     [SCAN], r"world\.rs:\d+: `sin`"),
+    ("scan-clock", "a clock enters the simulation crate",
+     [("crates/sim/src/world.rs", "/// The length of a match seed in bytes.", "pub fn planted() -> bool {\n    Instant::now().elapsed().is_zero()\n}\nuse std::time::Instant;\n\n/// The length of a match seed in bytes.")],
+     [SCAN], r"world\.rs:\d+: `Instant`"),
+    ("scan-method-form", "the tick's bytes are taken in the method form again",
+     [("crates/sim/src/world.rs", "u32::to_le_bytes(*tick)", "tick.to_le_bytes()")],
+     [SCAN], r"world\.rs:\d+: `to_le_bytes`"),
+    ("overflow-off", "the release profile's overflow checks are turned off (by a cargo setting on the command line; no file is edited)",
+     [], [["cargo", "test", "--release", "-p", "sim", "--locked", "--lib", "--config", "profile.release.overflow-checks=false"]],
+     r"overflow_checks_are_on - should panic \.\.\. FAILED"),
     # --- in the browser: a build of the planted tree, then one spec
     ("nt5-stale", "the Worker runs on while hidden and the page asks for no report while hidden",
      [("packages/sim-worker/src/host.ts", "        if (data.hidden) {\n          this.#pacer.pause();\n          this.#clearTimer();\n        } else if",
