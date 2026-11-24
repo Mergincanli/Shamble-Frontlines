@@ -297,12 +297,68 @@
    31,805 bytes with sha256 e138cae8b686fed4fe317602332fb65616fb7235194c9043ee49c4451ed72bc5, the very bytes of
    this container's build, and the job's line reads "no registry path in the Wasm".**
 
+11. **Round 1's fix pass: 79666ad9** (79666ad9c8ac3a8d756f874873c820b1c178bc35), pushed 15:27 UTC. One pass for the
+   five reviewers' findings (0 Critical, 2 High, 7 Medium, Lows where cheap):
+   - **`mul_add` (H1; the advisor agent's interim ruling in `advisor-mul-add.md`: (a) on seven conditions).** The
+     float vectors gain 48 constructed cases after the 10,000 (10,048; `f32-inputs.bin` 120,576 bytes, sha256
+     f4599394...3396; its first 120,000 bytes are the old file's). Each is asserted by the generator to be a true
+     double-rounding case, and it asserts that none of the 10,000 others is. **Measured at 15:14 UTC** (scratch probe
+     `.gate/cs3a/hard2/`, Rust 1.99.1): natively on this FMA processor all 48 are exact; in wasm32, release and dev
+     alike, the 32 with a normal result are exact and the 16 whose result lies below the smallest normal f32 give
+     the two-roundings value. Those 16 are `pin` lines in `f32-expected.txt` with their measured values. In
+     WebAssembly every case is still checked, the 16 at their measured value (any change fails by case: "MUL-ADD is
+     open again"); natively nothing is pinned and every case must be exact; the native test prints whether the
+     processor has FMA (`check_as`, and the test `a_pinned_case_that_no_longer_gives_its_measured_value_fails_by_name`).
+     The scan refuses `mul_add` in `sim` through its own one-name list `HELD`; part 7's `ALLOWED` (14) and its test
+     are untouched. std 1.99.1's page for `f32::mul_add` says "The result of this operation is guaranteed to be the
+     rounded infinite-precision result" (fetched 15:25 UTC, 346,838 bytes, sha256 039fc4ea...65e4): a toolchain
+     defect. **Not run anywhere: a processor without FMA.**
+   - `from_f64` rounds a real f64 (two inputs' bits side by side); its digest is no longer `mul`'s.
+   - The scan (rust-reviewer's M4 and L6, test-engineer's Medium): a banned name counts after any path that is not
+     an integer's or `Ord`, `PartialOrd`, `Iterator`, `cmp`; names holding `HashMap` or `HashSet`; `target_feature`
+     and `core::arch`; `#[path]` and `include!`; the escape only on `type, struct, enum, static, const, use`;
+     `0..min(` and a string's line break read right; the macro gap in its doc. 35 planted breaches, 10 controls.
+   - Build checks (H2, security-auditor's M1, rust-reviewer's M3, L1, L2): a member is a folder under `crates/`;
+     the feature list is every feature of `sim`'s dependency closure from the whole tree, with dev edges for the
+     tests' list; fixtures are real cargo output; the remap goes through `CARGO_ENCODED_RUSTFLAGS` in cargo's
+     child environment; refused names are compared in upper case; an empty `CARGO_HOME` counts as unset.
+   - The hook (rust-reviewer's M2, engine-architect's F2 and F3, security-auditor's L3): the doc says an
+     out-of-memory stop leaves no message; `#[wasm_bindgen(start, private)]` (the glue exports exactly `Sim`,
+     `default`, `initSync`, `panic_buffer`, `tick_hz`); `PANIC_TEXT_ROOM = 1016` and `trapMessage` in
+     `panic-message.ts`.
+   - security-auditor's L1 (its condition 2, clause (d)): the dev server reads only the Worker's `src` and `pkg`;
+     the isolation spec asserts 200 for the players' Wasm and 403 for the test-only module's two files.
+   - Small: the draft's sha256 beside the published vectors; `next_u64` across a block's end; a const assert on
+     the seed's length; perf-auditor's two Lows (`doneAt` read once; the comment).
+   **Checked** (`.gate/cs3a/fix1.log`, 15:23 to 15:24 UTC, before the commit, same tree): fmt, clippy clean; both
+   generators `--check`; cargo debug client-endpoint 15, devtools f32 3 and stream 2, protocol 2, room 1, sim 15,
+   `rules_scan` 5, `state_hash_alloc` 1, sim-wasm 9, twice; release (with devtools and sim-wasm) the same counts;
+   vitest client 70, net 1, sim-worker 42, types 7, boundary 17; the five type checks; the browser tests 14 passed
+   (52.5 s); the gate PASS. The players' Wasm: 31,718 bytes, sha256 383f5303...3963.
+   **Planted: 90 plants, 90 caught** (`plants.py`; the full run `.gate/cs3a/plants-fix1.log`, 15:22 to 15:26 UTC:
+   89 caught, and `features-blind` failed three tests but not the one its line named, a test this pass renamed;
+   re-aimed and caught at 15:26 UTC). 24 of the 90 are new in this pass, 4 were re-aimed at moved code.
+   **Size: 3,496 added lines** (fixtures and lockfiles not counted) against about 2,080 planned (1.68 times); the
+   stop line 4,100 is not reached (604 lines of room). By package: devtools 946, sim 903, client 884, sim-worker
+   488, sim-wasm 164, e2e 109, root 2; 1,656 in test files, 430 in the two reference scripts.
+   **CI on 79666ad9, read line by line:** gate success (run 45425663173); toolchain success (run 45425663247, job
+   138556835447, 15:27:12 to 15:29:44 UTC; image ubuntu-24.04 20261116.376.1, Chrome 157.0.8103.78;
+   `.gate/cs3a/ci-79666ad9-toolchain.log`): every count as expected (cargo debug 15, 3, 2, 2, 1, 15, 5, 1, 9,
+   twice; release 2, 15, 5, 1; client 70, e2e's node project 1, net 1, sim-worker 42, types 7; boundary 2 files
+   and 17 tests; "Running 14 tests", "14 passed (1.1m)"; nothing skipped or ignored). The players' Wasm on the
+   runner: 31,718 bytes, sha256 383f53039ca93651f3d1655deb956040f688b45b0a9d347199c6f08f9f833963, this
+   container's bytes again; "no registry path in the Wasm". The pinned cases hold in the runner's Chrome too (the
+   rule tests passed in both profiles), and the native float test passed there (so that runner had FMA, or its
+   software path is exact: not told apart by the log).
+
 ## Current step
-**The reviews, round 1, on the code head 5c92311** (plan section 4: rust-reviewer, engine-architect, test-engineer;
-then security-auditor and perf-auditor; Opus 5.5, effort max; at most 3 at a time; each with its notes in this
-folder), started 13:56 UTC. Then one fix pass; round 2 on what changed; the verifier until PASS; the advisor agent
-on the pushed head; docs-keeper; DECISIONS by script; the report; the zip and its README; the pull request's title
-and text.
+**The reviews, round 2, on the fix pass 79666ad9** (only what changed since 5c92311): rust-reviewer, test-engineer
+and security-auditor run (started between 15:27 and 15:29 UTC; notes `<name>-review2.md`); engine-architect and
+perf-auditor follow when places are free. Then, only if round 2 asks for it, one small fix pass (a third round only
+for an open Critical or High; size: 604 lines of room to the stop line). Then the verifier until PASS; the advisor
+agent on the pushed head; docs-keeper; DECISIONS by script; the report; the zip and its README; the pull request's
+title and text. **3a merges only after his own answer to MUL-ADD** (the advisor agent's ruling, below).
+(Card written 15:31 UTC.)
 
 ## Next steps (after the compact)
 1. Read CLAUDE.md, this card, the plan (`cs3-plan.md`: sections 0, 3, 4, 8, 9, 12 and 13), `cs3-context.md`, and
@@ -329,6 +385,19 @@ and text.
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **State after the fix pass 79666ad9: every round-1 finding marked "fix now" below is taken; round 2 confirms.**
+  perf-auditor's round 1 (`perf-auditor-review1.md`): OK, 0 Critical, 0 High, 0 Medium, 2 Low,
+  both taken (`doneAt` read once; the comment that said the report check allocates nothing).
+- **MUL-ADD, for Mustafa (open until he answers):** does `mul_add` stay refused in the simulation? Options: (a)
+  keep the ban, the simulation writes `a * b + c`, and part 7 loses the name by a dated pointer; (b) our own exact
+  fused multiply-add, the same code everywhere, written only when a formula needs it; (c) allow it, require FMA on
+  servers and accept that browsers differ (an exception to part 7's identity target and to PM-0004-19).
+  Recommended: (a), free today (nothing uses it). The limit: the scan sees our code, not a library's.
+- **Follow-ups this pass leaves** (for STATUS with the docs pass): step 2.3's lint carries his MUL-ADD answer; when
+  an outside crate enters `sim`, a check that the players' Wasm holds no `fmaf`; the stricter lint's leftovers in
+  `rules_scan.rs` and `rng.rs` (a long function, similar names; his quoted words keep their spelling); no plant
+  for the six newly stubbed WebAssembly names or the Worker's start path; `module-no-hook` and `tel-not-a-file`
+  are caught at their named test for a neighbouring reason; a config-file profile is outside the build's refusals.
 - **Round 1, test-engineer (on 5c92311; `test-engineer-review1.md`, its scripts in `.gate/test-engineer-cs3a/`): 0
   Critical, 2 High, 1 Medium, 10 Low.** It re-ran 21 of the 66 plants (21 caught), checked the float digests with
   a third implementation (C) and the stream file with its own ChaCha, and found TE-L, TE-NT3 to -NT5, TE-MONO and
@@ -336,13 +405,15 @@ and text.
   - **H1 (High): `mul_add` gives different bits natively and in WebAssembly, and the 10,000 cases cannot see it.**
     For (0x01000001, 0x32FFFFFE, 0x007FFFFF) the exact fused result is 0x007FFFFF; native here (an FMA CPU)
     gives it; the test-only Wasm, release and dev, gives 0x00800000, the two-roundings value. **Reproduced by the
-    builder at 14:53 UTC** (`.gate/cs3a/hard/`: a scratch native probe and the module under Node). The toolchain's
+    builder at 14:52 UTC** (the files' times) (`.gate/cs3a/hard/`: a scratch native probe and the module under Node). The toolchain's
     software `fmaf` is not the exact one; a server CPU without FMA probably gives the Wasm's value (not tested).
     ADR 0004 part 7 allows "explicit `mul_add`, which std specifies exactly": its premise does not hold on the
     pinned toolchain. Nothing in `sim` calls `mul_add`. Its fix: the constructed cases join the inputs and stay;
-    never drop the case to get green; the rule is the advisor's or his. **The advisor agent is ruling on MUL-ADD
-    (started 14:53 UTC; `advisor-mul-add.md`): (a) an interim ban in the scan, the cases kept, the difference
-    pinned by a test, and the question to him with the report; (b) keep part 7 as written; (c) stop and ask first.**
+    never drop the case to get green; the rule is the advisor's or his. **The advisor agent ruled (a) on seven
+    conditions (`advisor-mul-add.md`, written 15:07 UTC): the interim ban is built (step 11); the rule stays
+    Mustafa's; 3a merges only after his own answer to MUL-ADD; an answer that changes 3a's code is a new head.
+    Asked in the chat with the update after the fix pass, and again in the report. Round 2 confirms conditions 1
+    to 4; F-MULADD then counts as fixed and MUL-ADD is a decision, not an open High.**
   - **H2 (High): the feature compare misses PM-0004-74's own named failure.** cargo prints a feature that another
     package turns on for a dependency it shares with `sim` under that other package, not under `sim`; the unit
     test's planted fixture puts it where cargo never prints it; normal edges hide dev-dependency features;
@@ -429,7 +500,9 @@ and text.
 
 ## Key numbers
 - main 1ec6f6c; #64's final head 8aadfb0, its code head 6d0b5b1, its notes' last commit 5911b56.
-- 3a: about 2,050 lines, stop line 4,100; about 280 KB of committed data (the vectors).
+- 3a: about 2,050 (2,080) lines planned, stop line 4,100; **3,496 after the fix pass** (604 of room); about 281 KB
+  of committed data (the vectors). The players' Wasm at 79666ad9: 31,718 bytes, sha256 383f5303...3963 (here and on
+  the runner).
 - CI today: one `toolchain` job, about 2 to 2.5 minutes; the Wasm on the runners 28,991 bytes, sha256
   22dad2ebf4be21ce0f123753bb77cfa25ca06886eddace43651601831ee8018b.
 - This container (it can be replaced at any time): cargo 1.99.1, Node v22.23.5; no `node_modules` installed and no
@@ -437,17 +510,20 @@ and text.
   `.gate/ci-wasm/` in the worktree (the logs, the notes' copy, `advisor-final.md`): not needed to resume.
 
 ## Decisions taken
+- 2026-11-24: MUL-ADD's interim, by the advisor agent: (a), the ban and the pins, on seven conditions; the rule
+  itself is his (asked in the chat; the merge waits for his answer).
 - 2026-11-24: his main Advisor marked #64 ready and merged it on his tap (the merge commit's message).
 - 2026-11-23, 23:44:10 UTC: GH-NEXT (a) with his change; CLOSE-OLD (a); the order after the merge.
 - KIT-QUOTE: the advisor agent ruled (a) (his words of 2026-11-13 stay in the archive and DECISIONS, with a pointer
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
-- **Reviewers in the background** (round 1, on 5c92311; engine-architect, rust-reviewer, test-engineer and security-auditor ended; perf-auditor still reads; the advisor agent rules on MUL-ADD; perf-auditor started 14:30 UTC, notes `perf-auditor-review1.md`; security-auditor started 14:21 UTC
-  with notes in `security-auditor-review1.md`; perf-auditor follows): rust-reviewer
-  (`rust-reviewer-review1.md`), engine-architect (`engine-architect-review1.md`), test-engineer
-  (`test-engineer-review1.md`); each works in its own `.gate/<name>-cs3a/` folder. security-auditor and
-  perf-auditor follow when a place is free. No source file is edited while a round is being read. No saver.
+- **Reviewers in the background** (round 2, on 79666ad9, only what changed since 5c92311): rust-reviewer
+  (`rust-reviewer-review2.md`; with the advisor agent's question whether another allowed operation picks its
+  native path by processor), test-engineer (`test-engineer-review2.md`; with its question on the hard-case classes
+  for `floor`, `ceil`, `trunc`, `round`), security-auditor (`security-auditor-review2.md`; condition 2's clause
+  (d)). engine-architect and perf-auditor follow. Each works on copies under `.gate/<name>-cs3a/`; the shared
+  tree is read-only for them, builds included. No source file is edited while a round is being read. No saver.
 - Prepared for the docs pass and the check, not yet run on the tree: `decisions-4.mjs` (his five messages of
   2026-11-23, 23:44:10 UTC to 2026-11-24, 11:03:53 UTC into DECISIONS, on top of main's copy; preview in
   `.gate/cs3a/DECISIONS.preview.md`), the two newly saved messages (`mustafa-2026-11-24T105043-compact-command.md`,
