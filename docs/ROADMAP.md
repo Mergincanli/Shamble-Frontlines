@@ -155,6 +155,23 @@ CI's gate and smoke green on c090843, 1e6f84e and b6b3b81. Review round 1 and th
 `docs/reports/2026-11-11-foundation-2-1b.md`. Merged: PR #51, 2aa5e9c, 2026-11-12 13:22 UTC, by merge commit, on
 Mustafa's go after the advisor's APPROVE of 5d50bf2; CI green on main (run 43226692719).
 
+**The foundation, 2.2: the toolchain [2026-11-10 to 11-13, MERGED]** — foundation-toolchain, ADR 0002's
+migration plan step 2.2 (Mustafa's decision of 2026-11-10: the second account plans and builds steps 2.1 and 2.2 now).
+The pins: Rust 1.99.1 (`rust-toolchain.toml`); a virtual Cargo workspace and its lock with six empty crates in `crates/`
+(unsafe code denied, overflow checks in every profile for every workspace crate); npm workspaces with exact versions and
+one lock, five empty packages in `packages/` (TypeScript 6.0.3, Vitest 5.1.0, @playwright/test 1.65.0, Node 22). The CI
+job `toolchain` (`.github/workflows/toolchain.yml`; `gate.yml` unchanged) installs the pinned toolchain, checks rustc
+against the pin, then builds and tests with the network cut off (a TCP probe must fail inside); it is green on the
+build's heads, and eight planted failures each went red at the expected step and were reverted. On his yes: the four kit
+lines (the hard constraints bind `legacy/` only; his 2026-11-10 decision is the exception in the three lines that forbid
+v2 code) and the CI job's release-test line; main merged in (c901187); the overflow tests expect their panic's message.
+Review round 1 (five reviewers, 17 findings, each checked by a skeptic): the overflow setting widened to every workspace
+crate on the advisor agent's ruling (RR-1, High; his go asked, then given with the merge, OVERFLOW-ALL). Review round 2
+(four reviewers, nothing Critical or High): on the advisor agent's ruling D1-R2, `"*"` kept and the panic side handed to
+the drafts' owners. The Fable advisor's whole read before ready changed no file. The verifier passed (bd44a68). Merged:
+PR #48, 4d21c1a, 2026-11-13 16:20 UTC, by merge commit, on Mustafa's go after the advisor agent's APPROVE of 9b20b67; CI
+green on main (gate run 43461710700, toolchain run 43461710673).
+
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
 
@@ -194,6 +211,18 @@ Mustafa's go after the advisor's APPROVE of 5d50bf2; CI green on main (run 43226
 
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
+
+**The preview hosting check, ADR 0006's spike 1 [2026-11-15 to 11-24, in flight]** — preview-hosting-check
+(SPIKE_PLAN entry 6), by lane 2, run by the chat he calls Builder V2 in his throwaway test repository
+Mergincanli/shamble-preview-check on a test Cloudflare Pages project: 56 runs over the rehearsal and two days of
+sittings. A closed pull request's links were gone within 24 hours, through the cleanup job (without it the host kept
+them); the login wall covered every preview link and left production's own address open; a pull request reached no
+token without his approval and no production; the deleted token was refused. Not passed by the draft's rule:
+production's one-off links carry the host's `X-Robots-Tag: noindex` (the header mark, back to the draft), and the
+build count (no count shown anywhere) and his verdict on checklist step 4 are open; five marks met with departures
+that change no reading. Two review rounds on the build, the verifier PASS WITH NOTES on the evidence; report
+`docs/reports/2026-11-24-preview-hosting-check.md`. Waits for his three decisions (ONE-OFF-HEADER, STEP4-COUNT,
+DEPARTURES), the advisor agent's review of its head and his go.
 
 **Change-set 3a of the build plan, Rules and boundaries [2026-11-24, in flight]** — cs3a-rules-boundaries (the first
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the simulation's rules under
@@ -306,20 +335,3 @@ Mustafa's words of 2026-11-13 (docs only, no kit, gate or CI file): his go for #
 CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge and on his go for it, and two pointing
 clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
 `docs/reports/2026-11-13-foundation-2-3-docs.md`. Step 2.3's plan followed on its branch and waits for his go.
-
-**The foundation, 2.2: the toolchain [2026-11-10 to 11-13, MERGED]** — foundation-toolchain, ADR 0002's
-migration plan step 2.2 (Mustafa's decision of 2026-11-10: the second account plans and builds steps 2.1 and 2.2 now).
-The pins: Rust 1.99.1 (`rust-toolchain.toml`); a virtual Cargo workspace and its lock with six empty crates in `crates/`
-(unsafe code denied, overflow checks in every profile for every workspace crate); npm workspaces with exact versions and
-one lock, five empty packages in `packages/` (TypeScript 6.0.3, Vitest 5.1.0, @playwright/test 1.65.0, Node 22). The CI
-job `toolchain` (`.github/workflows/toolchain.yml`; `gate.yml` unchanged) installs the pinned toolchain, checks rustc
-against the pin, then builds and tests with the network cut off (a TCP probe must fail inside); it is green on the
-build's heads, and eight planted failures each went red at the expected step and were reverted. On his yes: the four kit
-lines (the hard constraints bind `legacy/` only; his 2026-11-10 decision is the exception in the three lines that forbid
-v2 code) and the CI job's release-test line; main merged in (c901187); the overflow tests expect their panic's message.
-Review round 1 (five reviewers, 17 findings, each checked by a skeptic): the overflow setting widened to every workspace
-crate on the advisor agent's ruling (RR-1, High; his go asked, then given with the merge, OVERFLOW-ALL). Review round 2
-(four reviewers, nothing Critical or High): on the advisor agent's ruling D1-R2, `"*"` kept and the panic side handed to
-the drafts' owners. The Fable advisor's whole read before ready changed no file. The verifier passed (bd44a68). Merged:
-PR #48, 4d21c1a, 2026-11-13 16:20 UTC, by merge commit, on Mustafa's go after the advisor agent's APPROVE of 9b20b67; CI
-green on main (gate run 43461710700, toolchain run 43461710673).

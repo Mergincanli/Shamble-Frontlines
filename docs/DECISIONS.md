@@ -127,6 +127,26 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-24, 23:16:11 UTC: lane 2 builds the game now, beside lane 1 (Builder V3, on his third
+  account: change-set 3a merged as #65, 3b next; lane 1's CI edits now go to a separate chat, CI Builder); lane 2 reads
+  Part 15 and STATUS again and answers in at most 12 lines what step 2.6 still needs and when his first link comes,
+  which of its units can start now, and what of change-set 6 and M it could build before change-set 5 without lane 1's
+  folders (his decision; nothing of it built before his yes); read and answer only; one pull request at a time per lane,
+  every file one owner, the kit frozen** (the builder chat he calls Builder V2, lane 2 of the build,
+  session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For Builder V2 (lane 2),
+  from me, written with my main Advisor (25 November)"; a message queued while the chat worked, entry
+  0c2a5b97-5c59-4e91-87ec-b3e315f2eee9; whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): nothing the chat asked. Its line "The Cloudflare sitting is still to come, later today" came
+  after Day 2 had run (2026-11-24, from about 20:14 UTC); the chat said so and answered in its chat, changing no file
+  for it. Copied by script (1359 bytes, sha256 332b0f9e4f1ae97018fcb31c560bbf8566de41e35c6b21755dcf00c16cf2e17f):
+> For Builder V2 (lane 2), from me, written with my main Advisor (25 November). The Cloudflare sitting is still to come, later today. This block does not replace it.
+>
+> 1. I want lane 2 building the game now, beside lane 1. Lane 1 is Builder V3 on my third account: change-set 3a is merged as #65 (main 28254a73), 3b is next. Lane 1's CI edits now go to a separate chat, CI Builder.
+> 2. Read Part 15 again (docs/reports/2026-11-17-build-plan-slice-1-part-15.md) and docs/STATUS.md on main. Then tell me in at most 12 lines:
+>    a. what step 2.6 (the preview links) still needs once the sitting is done, and when I get the first link;
+>    b. which of your units can start now under Part 15 as it stands (the carry of my look decisions, the comparisons that stay);
+>    c. what of change-set 6 (Look) and M (the first model) you could build before change-set 5 is merged without touching lane 1's folders, for example the look on a test page of its own or the model checks as a tool, what that needs from lane 1, and what it would change in Part 15. That part is my decision. Build nothing of it before my yes.
+> 3. Read and answer only. Change no file and push nothing for this. Nothing else changes: one pull request at a time per lane, every file has one owner, the kit stays frozen. Use plain words with me: no tag or code without its explanation in the same sentence.
 - _A pointer, not a decision: **his browser check of change-set 3a's zip, 2026-11-24, 21:48:49 UTC.** One chat message
   (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also
   holds his claude.ai project "Shamble Frontlines ALT"; his message b5bb0503-5aef-45fc-b832-6bc2a147b40c; 4451 bytes of
