@@ -86,4 +86,17 @@ No Critical or High.
 - I did not read the netcode seat's brief beyond its notes file, or what it reads from the main folder.
 - CI on the pushed head: that is step 7.
 
+## Step-1 ruling (10:4x UTC)
+None of (a)-(c) is needed: the push did land. `git ls-remote origin refs/heads/claude/netcode-proof-test-plan-hcky5g`
+prints d7d8a34f707234304d8c7e812f74e513e4bad9c4, which is HEAD. Only the local tracking ref is stale (373a2d8): the
+kill came after the push and before git moved the ref, as at MAIN-61 (ADV-M61H-2). d7d8a34 is the "(terminated)"
+autosave and touches .checkpoints/ only (the card, the plan, this file); its message ends with both trailers.
+- Go on with H0 = d7d8a34. C4's `git fetch origin`, run in its own call, moves the tracking ref. Then "HEAD = the
+  remote branch" holds. The card names the proof used: ls-remote, or the fetch, plus pgrep exit 1. C5 (b)'s second
+  form holds.
+- No push by hand, and no second save. The one foreground save already ran ("nothing to save", checkpoint.mjs:196),
+  so C5 (c) is spent.
+- Only if the fetch shows the remote is not d7d8a34: stop before step 2, and I rule again. (a) would then be the lean.
+- Moot (origin had d7d8a34): the coordinator's 10:40 UTC fetch confirmed it. MAIN-64 is paused before step 2.
+
 DONE

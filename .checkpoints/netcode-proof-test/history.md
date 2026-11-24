@@ -7789,3 +7789,13 @@ Re-create them if still needed.
 > <names>."
 - Done 10:1x: the card's "Running work" lists U6c's three seats, the saver and both triggers with ID, task and resume
   point, and "My step" with the next three; no agent started after it.
+
+## Mustafa, 2026-11-24 about 10:40 UTC (in this chat, during MAIN-64's step 1; word for word)
+> 98% usage, save progress (also for the agents)
+- Done 10:41-10:4x:
+  - MAIN-64 paused at step 1, before the merge. There is no MERGE_HEAD, and HEAD = origin = d7d8a34, the saver's
+    "(terminated)" autosave, whose push had landed (advisor-main-64.md, "## Step-1 ruling"). After the cut, step 1
+    starts again from its first line (C3 (b)).
+  - The U6c advisor a662f1797b78cae95 was told to write each finished block of advisor-u6c-r1.md at once, with a
+    "Resume from" line. MAIN-64's advisor is done; step 7 waits for the push.
+  - The saver restarted (b7jvh8w3n). The card and this file saved and pushed.
