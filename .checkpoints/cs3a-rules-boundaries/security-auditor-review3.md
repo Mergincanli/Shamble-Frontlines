@@ -70,3 +70,60 @@ relative CARGO_HOME note). Shared worktree read-only; builds, servers, plants on
   package.json + link players wasm 403; stale pkg-rules wasm 403 (no content-type header: the 403 page sets none);
   a missing file 200 text/html (SPA fallback). WARMED server, all 88 routes + 9 invokes again: leaks 0, the same
   answers as fresh (200s only controls, ?worker stubs, SPA fallback).
+- 16:28 Spec at 8619d539 read (isolation.spec.ts:47-58): players = [200, application/wasm] (a fallback 200 cannot
+  pass); the four 403s unchanged (files that exist after a non-production build, so a missing one fails loudly as a
+  200); the old place: content-type must not hold "wasm" (403 sets no type; missing = 200 text/html). Sound. The
+  last check bites only where a stale copy exists, which is the only place the old folder exists at all.
+- 16:29 CI (gh run list, branch claude/loving-hopper-6p0mg2): 8619d539 gate success, toolchain success; a1b2e802
+  toolchain FAILURE (gate success). Builder log .gate/cs3a/ci-8619d539-toolchain.log:1048-1051 both dev-server
+  isolation cases pass, 14 passed; ci-a1b2e802 log:1080 failed at isolation.spec.ts:54 (the old not-200 line).
+- 16:29 Plants (plants.py:320-325): devserver-open swaps the sim-worker/src+pkg entries for folder("../..") ->
+  caught at the .gate/rules-module 403 line; devserver-link widens three back to node_modules -> caught at the link
+  package.json 403 line (.gate/cs3a/plants-fix2.log:87-88, "96 of 96 caught" 16:13). Both catching lines are
+  unchanged at 8619d539.
+- 16:30 N1 FIXED (r3/remap-n1.mjs, importing the head build-checks.mjs read-only): all 33 control characters
+  (U+0000-U+001F, U+007F) refused in CARGO_HOME, in the home folder and in the base: 0 let through; every accepted
+  value stays ONE argument after a split at U+001F. build-checks.test.mjs: 29 passed (shared tree, vitest 5.1.0).
+- 16:30 Relative-home note FIXED: path.resolve(base, ...) with base = root (build.mjs:66), and every cargo call runs
+  in root (build.mjs:95, :128, :152). Residual, not security: a relative CARGO_HOME with ".." is normalized by node
+  but (I believe) joined un-normalized by cargo; the remap would then miss and rules.test.mjs:68-72 fails (fails
+  closed). Not probed.
+- 16:30 N2 FIXED as asked: build.mjs:58-64 and build-checks.mjs:213-216 now say only rustflags are shut out and name
+  linker, compiler wrapper, [env], profile as still open.
+- 16:31 Trust widening, none found: vite.config.mjs narrower; build.mjs writes .gate/rules-module (rmSync of the
+  profile folder, then wasm-bindgen; never read back by the build); page and Worker code unchanged (panic.rs,
+  wasm.rs, f32_vectors.rs: comments and a message; rules_scan.rs: a stricter test scan). serve.mjs unchanged and
+  confines by lexical + realpath checks (serve.mjs:84, :88-94). Routine guard: node runs only tracked scripts equal
+  to main (routine-guard.mjs:988-1012), and a .gate/ entry script is refused (:1001); the PR Advisor runs nothing and
+  the night shift could write the old folder as well, so the new place gives no routine new reach.
+- 16:32 Head now 1218b4ff (checkpoint commits only; `git diff 8619d539 HEAD -- . ':!.checkpoints'` empty). Boundary
+  tests in the shared tree (vitest 5.1.0, root packages/sim-worker, boundary/): 2 files, 17 passed, loading the
+  module from .gate/rules-module (built 16:18).
+- 16:33 Supplement (r3/devserver-extra.mjs, fresh server each): round 2's remaining spellings on the stale copy and
+  the link (/@fs//, //, sim%2Dworker, ?worker_file, ?raw??, ?import&raw??, node_modules//, %40shamble) and encoded
+  names (%2egate, %2Egate ?raw, devtools%5fbg, rules%2Dmodule, three/%2e%2e ?url, three/build/../../.. ?import):
+  17 more, leaks 0 (403, or the page for %40 which decodeURI keeps encoded).
+  TOTAL: 99 HTTP spellings on fresh servers, 88 on a warmed one, 31 in order on one server, 9 WebSocket invokes x 2:
+  no answer held the test-only bytes or glue text. => THE HIGH IS CLOSED; condition 2 clause (d) MET for the dev server.
+- 16:34 NEW Low N3 (wording of the accepted risk, no new reach): build.mjs:60-63 and build-checks.mjs:212-216 list
+  what a cargo config file outside the repository can still set (linker, compiler wrapper, [env], profile) and name
+  the gate flag check; the list omits source replacement ([source.crates-io] replace-with = a directory source:
+  swaps a crate's code with no diff; the Cargo book, source-replacement page: the directory checksum file "is not a
+  security mechanism and does not protect against malicious changes") and build.rustc ("Sets the executable to use
+  for rustc", config page). Neither is a flag, so the flag check does not see them. Fix: name both, or "among
+  others". STATUS follow-up; no push on its own. Sources read today: doc.rust-lang.org/cargo/reference/
+  source-replacement.html (replacement set in .cargo/config.toml; "core assumption ... source code is exactly the
+  same"; checksum file not a security mechanism) and .../config.html (build.rustc; [source] keys, env not supported;
+  [patch] in config files, config patch wins over Cargo.toml; config files read from cwd and every parent, then
+  $CARGO_HOME/config.toml). Confidence: high on the docs; not probed with cargo.
+
+## Verdict (round 3, judged head 8619d539; code equal at 1218b4ff)
+APPROVE from security. Open: 0 Critical, 0 High, 0 Medium, 1 new Low (N3, wording, follow-up); L-STATS stays the
+STATUS follow-up it was.
+- The High (dev server served the test-only module through npm's link): CLOSED. Clause (d) of condition 2: MET for
+  Vite's dev server (and still for serve.mjs, the preview server, the spec's routing).
+- N1 fixed (33 control characters x 3 places refused; 29 unit tests pass); relative-home note fixed (base = root =
+  cargo's cwd); N2 fixed as asked.
+- Nothing in the diff widens what the build, the page or the Worker trusts.
+- Not verified: Windows/macOS (junctions, case-insensitive paths; read only); the e2e suite and plants.py not run by
+  me (CI green on 8619d539 by gh; builder log 96/96); cargo not run (".." in a relative CARGO_HOME, N3 by docs only).

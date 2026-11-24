@@ -434,6 +434,19 @@ its explanation in the same sentence.
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **Round 3, security-auditor (judged 8619d539; `security-auditor-review3.md`; read 16:37 UTC): APPROVE. The High is
+  closed; its condition 2, clause (d), is met for Vite's dev server.** 99 request spellings on fresh dev servers, 88
+  on a warmed one, 31 in sequence, each answer's body read: none held the test-only module. N1, N2 and the
+  relative-home note fixed. New Low N3 (wording; a STATUS follow-up with 3A-CONFIG-FILE): the comments that list
+  what a cargo config file can still set leave out source replacement and `build.rustc`. Not verified by it:
+  Windows and macOS; the e2e suite and the plants (read from CI and the builder's log).
+- **No Critical, High or Medium is open.** The verifier (started 16:23 UTC, `verifier-final.md`) and docs-keeper
+  (`docs-keeper-cs3a.md`) run. Prepared: `docs/DECISIONS.md` by script (six entries), the report's draft
+  (`docs/reports/2026-11-24-cs3a-rules-boundaries.md`), `pr-title.txt` and `pr-body.md` here, C2's release run
+  (`.gate/cs3a/c2-8619d539.log`, 16:26 UTC). Left: the verifier's verdict into the report; docs commit and push;
+  CI; the advisor agent on that head; the development build at that head, the zip (`make-zip.py`) and its send;
+  tell him the title and text are here; after his browser check: his reports into the docs, the checkpoint folded
+  and deleted, the advisor agent on the final head, his go.
 - **State at 8619d539 (16:22 UTC): round 2's High, both Mediums and the cheap Lows are taken (step 12); round 3
   (security-auditor) reads the High's fix.** Left as follow-ups for STATUS: CI runs neither generator's `--check`
   (with E1's CI pull request); `from_f64` has no exact tie and no case between the largest f32 and the overflow
