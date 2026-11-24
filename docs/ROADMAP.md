@@ -221,8 +221,8 @@ token without his approval and no production; the deleted token was refused. Not
 production's one-off links carry the host's `X-Robots-Tag: noindex` (the header mark, back to the draft), and the
 build count (no count shown anywhere) and his verdict on checklist step 4 are open; five marks met with departures
 that change no reading. Two review rounds on the build, the verifier PASS WITH NOTES on the evidence; report
-`docs/reports/2026-11-24-preview-hosting-check.md`. Waits for his four decisions (ONE-OFF-HEADER, STEP4-COUNT,
-DEPARTURES, HISTORY-ID), the advisor agent's review of its head and his go.
+`docs/reports/2026-11-24-preview-hosting-check.md`. His answers of 2026-11-25 are in DECISIONS (DEPARTURES
+item 5 and HISTORY-ID still his); waits for the advisor agent's review of its final head and his go.
 
 **Change-set 3a of the build plan, Rules and boundaries [2026-11-24, in flight]** — cs3a-rules-boundaries (the first
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the simulation's rules under

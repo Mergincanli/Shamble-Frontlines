@@ -127,6 +127,47 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-24, 23:53:15 UTC: his answers to three decisions of the preview hosting check's report:
+  ONE-OFF-HEADER (a) with two additions (the revised row gives its reason and weighs Workers static assets in a short
+  paragraph; step 2.6's plan starts after #66 and its first edit waits for his go on the revised row; the revision is a
+  small pull request of its own after #66), STEP4-COUNT (b) (the draft says plainly that the question is not answered;
+  until a count is shown, step 2.6 works as if uploads count: only a pull request's newest push is deployed, and its
+  deploys are counted per month) and DEPARTURES (a) for the four departures he names (Safari stays written as not
+  checked, never as passed); for #66: this message recorded by script, the status row's two stale words corrected, one
+  review of the final head by the advisor agent, then ready and the head's full commit id to him, his main Advisor
+  checks that head, no merge before his go for it; EARLY-LOOK (a) as a plan first and under his conditions, which
+  changes his LANE-SPLIT answer of 2026-11-17 and his words of 2026-11-18 for the look test page and the model-check
+  tool only; lane 2's order; he switches off the test repository's hourly checker himself before 2 December** (the
+  builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his
+  personal account; his label: "For Builder V2 (lane 2), from me, written with my main Advisor (25 November, 00:55
+  Amsterdam)"; message 487190e2-1c25-4cf0-b91b-76aa5c220de6, whole; extracted by script from the chat's transcript).
+  What it answers, in the chat's words (not his): ONE-OFF-HEADER, STEP4-COUNT and DEPARTURES as the report first put
+  them (three decisions, four departures), and the chat's question (c) of 2026-11-25 on building the look test page and
+  the model-check tool before change-set 5. Records, not his words: at bff6ca1 the report had added a fifth departure
+  (the pictures stay out of the repository) and a fourth decision, HISTORY-ID (how #66 is merged); his message names
+  four departures and three decisions, so those two stay his. Copied by script (3334 bytes, sha256
+  7573f9eb9587cced4e6172911f0f023a73cef00f891c0af5af892756a45ceb9a):
+> For Builder V2 (lane 2), from me, written with my main Advisor (25 November, 00:55 Amsterdam).
+>
+> 1. My three decisions on the preview hosting check.
+> - ONE-OFF-HEADER (the header mark that is not met): (a), with two additions. The revision of the draft's row gives its reason in the row and weighs the other Cloudflare product (Workers static assets) in a short paragraph, as the draft's own rule for a failed header mark asks. Step 2.6's plan starts after pull request #66, and its first edit waits for my go on the revised row. The revision is one small pull request of its own, after #66.
+> - STEP4-COUNT (checklist step 4 and the build count): (b). The draft says plainly that the question is not answered. Until someone shows a count, step 2.6 works as if uploads count: only the newest push of a pull request is deployed, and it counts its deploys per month.
+> - DEPARTURES (the four recorded departures): (a), all four stand as recorded. Safari stays written as not checked, never as passed.
+>
+> 2. Pull request #66. Record this message by script as usual. In the same push, correct two stale words in the status board's row for this check: "PR to open" is now #66, and the count of my messages is one short. Then your advisor agent reviews the final head, once. When it approves, mark #66 ready and give me the head's full commit id. My main Advisor checks that head before I give my go. Do not merge before my go for that exact head.
+>
+> 3. EARLY-LOOK (may lane 2 build the look test page and the model-check tool before change-set 5 is merged): (a), yes, as a plan first. This changes my LANE-SPLIT answer of 17 November and my words of 18 November ("You write no game code here before change-set 5 is merged") for these two parts only, under these conditions:
+> - One plan for both parts, written after step 2.6's plan. Your advisor agent reviews it, and engine-architect reads the folder split and how the code moves at the hand-over. The plan says what changes in Part 15. It comes back to me, and nothing is built before my go on it.
+> - The model-check tool comes first. Say in the plan whether it can read a model file without a new library. If it needs one, that waits for lane 1, like the page.
+> - The look test page starts only after the carry of my look decisions is merged, and after lane 1 has added the second page to the build setup. Builder V3 makes that small pull request after change-set 3b is merged, never in the middle of it. You write the exact request on issue #59; I pass it to Builder V3.
+> - The page reads the interface file between the tracks and draws through its shape, so that the hand-over is a move of files. You edit no file of lane 1.
+> - No pass mark of change-set 6 or of M is called passed on the test page. My look in Brave comes before its merge.
+>
+> 4. Your order: #66, the draft's small revision, step 2.6's plan, the carry when my block with the picture file comes, then the plan of item 3. One pull request at a time per lane, every file has one owner, the kit stays frozen. The CI edit that hands the tested build to the preview job is the CI Builder chat's: write the exact request for it in step 2.6's plan.
+>
+> 5. I switch off the test repository's hourly checker myself before 2 December.
+>
+> Answer in at most 8 lines. Use plain words with me: no tag or code without its explanation in the same sentence.
 - **Taken by Mustafa, 2026-11-24, 23:16:11 UTC: in his words, "I want lane 2 building the game now, beside lane 1" (lane
   1 is Builder V3, on his third account: change-set 3a merged as #65, 3b next; lane 1's CI edits now go to a separate
   chat, CI Builder); lane 2 reads Part 15 and STATUS again and answers in at most 12 lines what step 2.6 still needs and

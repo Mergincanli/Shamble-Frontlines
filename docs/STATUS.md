@@ -23,7 +23,7 @@ _Last updated: 2026-11-24 (change-set 3a's docs pass, after #64's merge; main 1e
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
 | none yet | change-set 3a, "Rules and boundaries" (the first half of change-set 3, his SIZE-3 (b)), by the chat he calls Builder V3: the simulation's rules under tests (the scan of `sim`, our own ChaCha8 against the published vectors, the float vectors natively and in WebAssembly, `mul_add` refused and pinned by his MUL-ADD (a)), the panic hook's text on the page, the build's refusals; report `docs/reports/2026-11-24-cs3a-rules-boundaries.md` | `claude/loving-hopper-6p0mg2` (stands in for `cs/3a-rules-boundaries`) | risk tier 1; no pull request yet (his GH-NEXT (a): the chat puts its title and text in its notes folder, his main Advisor opens the draft, he presses Ready and Merge); built in 8 steps; the last commit that changed what runs is 8619d539, the corrected head 8d277cf2 (comments, docs), CI green on both; two review rounds by five reviewers, then a third by security-auditor on one fix (APPROVE: the High closed); the verifier PASS and the advisor agent APPROVE on 8d277cf2; his browser check of 2026-11-24, 21:48:49 UTC: errors 0 in Brave and in Firefox (`docs/reports/2026-11-24-cs3a-browser-check.md`: the Shields setting and the page opened as a file are shown; no gap with the window covered); the notes: commit 6491b839 | the advisor agent's read of the last commit; his go for its full SHA |
-| #66 | the preview hosting check (ADR 0006's spike 1, SPIKE_PLAN entry 6), by lane 2 (the chat he calls Builder V2), run in his test repository Mergincanli/shamble-preview-check; report `docs/reports/2026-11-24-preview-hosting-check.md`: the runs are done; by the draft's rule not passed yet (the header mark not met as written; the build-count mark and his verdict on checklist step 4 open) | `claude/optimistic-albattani-mdoonz` (stands in for `cs/preview-hosting-check`) | draft; risk tier 1 (the report and his fourteen messages in `docs/DECISIONS.md`); main 28254a7 merged in | his three decisions (ONE-OFF-HEADER, STEP4-COUNT, DEPARTURES); the advisor agent's review of its head; his go |
+| #66 | the preview hosting check (ADR 0006's spike 1, SPIKE_PLAN entry 6), by lane 2 (the chat he calls Builder V2), run in his test repository Mergincanli/shamble-preview-check; report `docs/reports/2026-11-24-preview-hosting-check.md`: the runs are done; by the draft's rule not passed yet (the header mark not met as written; the build-count mark and his verdict on checklist step 4 open) | `claude/optimistic-albattani-mdoonz` (stands in for `cs/preview-hosting-check`) | draft; risk tier 1 (the report and his sixteen messages in `docs/DECISIONS.md`); main 28254a7 merged in | his answers of 2026-11-25 recorded; still his: DEPARTURES item 5 and HISTORY-ID; the advisor agent's review of the final head; his go for that head |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
@@ -35,21 +35,20 @@ _Last updated: 2026-11-24 (change-set 3a's docs pass, after #64's merge; main 1e
    Advisor's three items first; "3b stays first in line for the main builder"); then change-set 4, the first outside
    crate in `sim` (the collision library), whose plan names the check that the players' WebAssembly holds no fused
    multiply-add (3A-FMA-CHECK). The first builder chat stays paused; then lane 2's work; Slice 3 waits for #40.
-3. Lane 2 (Builder V2): after his four decisions on the preview hosting check, step 2.6's plan (the preview links),
-   unless his ONE-OFF-HEADER answer makes it wait for ADR 0006's revision. His question of 2026-11-25, what of
-   change-set 6 (Look) and M (the first model) lane 2 could build before change-set 5: answered read-only in the
-   chat, awaiting his yes; nothing built.
+3. Lane 2 (Builder V2), in his order of 2026-11-25: #66; ADR 0006's small revision of the header row (its own pull
+   request); step 2.6's plan (its first edit after his go on the revised row); the carry of his look decisions when his
+   block comes; then one plan for the look test page and the model-check tool (his EARLY-LOOK (a)); nothing built
+   before his go on that plan.
 
 ## Waiting on Mustafa
 - Change-set 3a: his go for the head the advisor agent approves (his browser check is in; GH-NEXT (a): his main
   Advisor opens the draft from the chat's notes at 6491b839, he presses Ready and Merge). His to give: the roles and CLAUDE.md
   line of ACCT-3 (his third account, which counts like the other two); his go before anything goes to the Rust project
   (3A-RUST-REPORT); part 7's pointer sentence at ADR 0004's next revision, shown to him first (3A-PART7-POINTER).
-- Lane 2's preview hosting check (its report's "Decisions needed"): ONE-OFF-HEADER (the header mark is not met: how
-  the draft's header row is revised, and whether step 2.6 waits for it), STEP4-COUNT (checklist step 4 and the build
-  count: no page shows a count), DEPARTURES (may five recorded departures stand), HISTORY-ID (a normal or a squash merge); his go on the pull request. Before
-  2 December: switch off the test repository's hourly checker. After the merge: archive the test repository, delete
-  the test project and its Access application.
+- Lane 2's preview hosting check (#66): his answers of 2026-11-25 are in DECISIONS; still his: DEPARTURES item 5 (the
+  pictures stay out of the repository) and HISTORY-ID (a normal or a squash merge); his go for the final head after
+  his main Advisor checks it. He switches off the test repository's hourly checker himself before 2 December. After the
+  merge: archive the test repository, delete the test project and its Access application.
 - From Part 15 (its "Lane requests" issue: #59): give lane 2 Part 15 and ask for its needs from the block; tell lane 2
   which chat on his PC makes the model files; the VFX chat's exports; pass the VFX findings on.
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's

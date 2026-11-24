@@ -28,7 +28,7 @@ departures that change no reading. Four decisions of his follow; this pull reque
 |---|---|---|
 | The setup is written down first (PM-0006-1) | "recorded: ... each browser's and WebdriverIO's versions"; "checked again before PM-0006-6's 24 h reading" (:1369) | Met with departures: GitHub's machines stand in for the laptop and the Mac (his MACHINES (a)); his Brave version reached the record about 2 hours after the 24-hour reading |
 | The headers as built, on both kinds of link (PM-0006-2) | "100 % of responses carry their expected set: ... previews `X-Robots-Tag: noindex`, production none" (:1370) | **Not met as written:** production's one-off links (0354374e and de1c3e5e) carry the "keep out of search engines" header on all 7 paths, added by the host; every other header as expected, and both planted mistakes were caught |
-| Isolation follows the flag in every browser (PM-0006-3) | "3 of 3 loads per browser and deployment", in Chrome, Edge, Firefox, Safari and Brave (:1371) | Met with a departure: Safari not run (his words: "focus on brave, chrome, firefox and maybe edge (most used browsers)"); Chrome, Edge and Firefox 3 of 3 on all five links, the planted mistake caught; Brave 1 load per link, each as expected |
+| Isolation follows the flag in every browser (PM-0006-3) | "3 of 3 loads per browser and deployment", in Chrome, Edge, Firefox, Safari and Brave (:1371) | Met for Chrome, Edge, Firefox and Brave, with a departure: Safari not checked, so never passed (his words: "focus on brave, chrome, firefox and maybe edge (most used browsers)"); Chrome, Edge and Firefox 3 of 3 on all five links, the planted mistake caught; Brave 1 load per link, each as expected |
 | The content file is cached for good (PM-0006-4) | "immutable"; on a second visit "it transfers 0 bytes", "3 repeats" (:1372) | Met with a departure (a GitHub machine for the laptop): 0 bytes in 3 of 3; the planted `no-cache` caught |
 | Every file fits the host (PM-0006-5) | "the largest file in each deployed build under 25 MiB ... on every deployment of the check" (:1373) | Met with a departure (the same): every build's size line read, the largest file 65,536 bytes; the planted 26 MiB file flagged and refused by the upload tool |
 | A closed pull request's build is gone in 24 hours (PM-0006-6) | "24 h after each test pull request closes, none of its URLs ... answers HTTP 200 with that build's marker"; run "with the access policy off" (:1374) | Met with a departure: at 24.1 to 24.4 hours every link of the four closed cases gone, the open control and the bite still serving, no wall; the hourly probes fell short (3 scheduled runs in the 24 slots; by-hand probes stood in) |
@@ -142,7 +142,8 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
   changed (RECORD-FILES). Commit 7c803a6.
 - His message of 2026-11-25 (Amsterdam; 2026-11-24, 23:16:11 UTC; lane 2 building beside lane 1; his question on
   change-set 6 and M before change-set 5) added
-  the same way (20 lines), so that it outlives the checkpoint.
+  the same way (20 lines), so that it outlives the checkpoint; and his message of 2026-11-25, 00:55 Amsterdam (his answers
+  to three of the decisions below, and EARLY-LOOK (a)), added the same way at the top (41 lines).
 - docs-keeper's pass (its notes, readable at d28b8f1d4040, list every line): `docs/STATUS.md`, lane 2's lines (this pull
   request in "In flight"; step 2.6's plan and his question of 2026-11-25 in "Next"; his decisions, the probe's
   switch-off and the clean-up after the merge in "Waiting on Mustafa"; nine follow-ups named PHC-; two open risks,
@@ -258,13 +259,20 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
   scripts; none carries into step 2.6 unless its plan picks it up.
 
 ## Proposed next step
-His four decisions below. Then, unless he decides that step 2.6 waits for the draft's revision: step 2.6's plan (the
-previews without his click and what keeps the token safe then, the locked install), brought to him for his go; the
-revision of ADR 0006's header row is infra-engineer's work by the draft's route, after his word. The test repository's
-probe is switched off before 2 December, and the repository archived and the test project deleted after this report is
-merged (his TR-END (a)).
+His order (2026-11-25, 00:55 Amsterdam): this pull request; then the draft's small revision of the header row
+(infra-engineer, by the draft's route: its reason in the row and a short paragraph weighing Workers static assets), as a
+pull request of its own; step 2.6's plan, whose first edit waits for his go on the revised row and which writes the exact
+request for the CI Builder chat's edit that hands the tested build to the preview job; the carry of his look decisions
+when his block with the picture file comes; then one plan for the look test page and the model-check tool (his
+EARLY-LOOK (a), under his conditions). He switches off the test repository's hourly checker himself before 2 December;
+the repository is archived and the test project deleted after this report is merged (his TR-END (a)).
 
 ## Decisions needed
+His answers (2026-11-25, 00:55 Amsterdam, recorded in `docs/DECISIONS.md`): ONE-OFF-HEADER (a), with his two additions;
+STEP4-COUNT (b); DEPARTURES (a) for the four departures he named, Safari written as not checked, never as passed. Still
+his: DEPARTURES item (5) and HISTORY-ID, added after his message was written. The entries stand below as they were put
+to him.
+
 1. **ONE-OFF-HEADER: what happens to the header mark that is not met.**
    - What: Cloudflare adds the "keep out of search engines" header (`X-Robots-Tag: noindex`) to every one-off address
      of the project, production's uploads included; production's own address stays clean. The draft's header mark
@@ -313,12 +321,13 @@ merged (his TR-END (a)).
      name the last four.
 
 ## For Mustafa
-1. The four decisions above, one line each (for example "ONE-OFF-HEADER (a), STEP4-COUNT (b), DEPARTURES (a),
-   HISTORY-ID (a)").
-2. Before 2 December: switch off the test repository's hourly checker, so it cannot mail failures once its records
-   expire. Go: any time now (no reading needs it any more). Clicks (GitHub's docs): Mergincanli/shamble-preview-check →
-   Actions → in the left list, "probe" → the "..." menu at the top right → Disable workflow.
-3. Your go on this pull request, once the advisor agent has reviewed its head (it is a draft until then).
+1. DEPARTURES item (5) (the pictures stay out of the repository) and HISTORY-ID (a normal or a squash merge), one line
+   each.
+2. Before 2 December you switch off the test repository's hourly checker yourself (your words of 2026-11-25). The
+   clicks (GitHub's docs): Mergincanli/shamble-preview-check → Actions → in the left list, "probe" → the "..." menu at the
+   top right → Disable workflow.
+3. Your go on this pull request for its final head, after the advisor agent has reviewed it and your main Advisor has
+   checked it.
 4. After it is merged, on my go: archive the test repository (Settings, General, "Archive this repository"), then delete
    the test project in Cloudflare and its Access application (Zero Trust, Access, Applications).
 
