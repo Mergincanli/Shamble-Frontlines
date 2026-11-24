@@ -27,11 +27,12 @@ const ALLOWED: [&str; 14] = [
     "to_bits", "from_bits",
 ];
 
-/// On part 7's list and refused here all the same, until Mustafa answers MUL-ADD. `mul_add` is not the same on
-/// every target on the pinned toolchain: exact natively on a processor with FMA, and not in WebAssembly, where the
+/// On part 7's list and refused here all the same: Mustafa's answer MUL-ADD (a) of 2026-11-24, 15:58:25 UTC, "The
+/// fused multiply-add stays banned in the simulation; it writes a * b + c." `mul_add` is not the same on every
+/// target on the pinned toolchain: exact natively on a processor with FMA, and not in WebAssembly, where the
 /// toolchain's software `fmaf` misses results below the smallest normal `f32` (the `pin` lines of
-/// `crates/devtools/vectors/f32-expected.txt` hold the measured cases). Part 7's list above stays word for word;
-/// his answer takes this one line out or keeps it.
+/// `crates/devtools/vectors/f32-expected.txt` hold the measured cases). Part 7's list above stays word for word: the
+/// draft gets a dated pointer at its next revision, not a changed list here.
 const HELD: [(&str, &str); 1] = [(
     "mul_add",
     "MUL-ADD: its bits differ between the native build and WebAssembly on the pinned toolchain",

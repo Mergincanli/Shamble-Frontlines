@@ -1417,9 +1417,10 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     `build-checks.mjs` say so (rust-reviewer's round 1, L1; security-auditor's round 2, N2). Those comments still
     leave out two more such settings, source replacement (`[source]`, a crate's code swapped with no diff) and
     `build.rustc` (security-auditor's round 3, N3: name both, or say "among others").
-  - 3A-PEDANTIC (the quality gate step): seven warnings of clippy's stricter `pedantic` group left in
-    `crates/sim/src/rng.rs` and `crates/sim/tests/rules_scan.rs` (among them a long function and similar names; one
-    stays because it lies inside his quoted words) (engine-architect's round 1, F4: nine; its round 2: seven).
+  - 3A-PEDANTIC (the quality gate step): six warnings of clippy's stricter `pedantic` group left in
+    `crates/sim/src/rng.rs` and `crates/sim/tests/rules_scan.rs` (among them a long function and similar names)
+    (engine-architect's round 1, F4: nine; its round 2: seven; the seventh stood inside words that were wrongly in
+    quotation marks as his and went with that correction, the advisor agent's read of c5f6a85a).
   - 3A-FMA-LOG (when: not named): the native float test prints whether the processor has FMA from inside a passing
     test, which cargo hides, so no log shows that line; only the pass itself shows that the exact path ran
     (test-engineer's round 2, L-FMA-LINE; its fix: `--show-output` where the test runs, or the line said to show on a
@@ -1431,7 +1432,8 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
   - 3A-OTHER-BROWSERS (with Firefox in CI, then later): the vectors ran in Node and Chromium only, not in Firefox,
     WebKit or Safari (test-engineer's round 2, "Not verified").
   - 3A-MANIFEST-COMMENT (the next manifest batch, 3b's): the root `Cargo.toml`'s comment "in sim-wasm only" (line 14)
-    is no longer true (security-auditor's answer on the dependency batch, `security-auditor-deps.md`).
+    is no longer true; and "The later cargo-deny wasm-bindgen rule must allow devtools too" (security-auditor's
+    answer on the dependency batch, `security-auditor-deps.md`).
   - 3A-DEPARTURES (the drafts' next revision, as dated pointers, never as rewording now): readings that go beyond the
     list his DEPART-3 (a) accepted (change-set 3's plan, section 12, question 4), so not covered by it: PM-0004-74 ("One
     feature set builds the sim on every target", `docs/adr/0004-simulation-core.md:1184`) read as three builds, the

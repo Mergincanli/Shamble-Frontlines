@@ -101,7 +101,7 @@ _Last updated: 2026-11-24 (change-set 3a's docs pass, after #64's merge; main 1e
   PROJ-DRAW, FIREFOX); his check's readings (BR-GAP, not explained; BR-LATE, NOT-SHOWN, FF-WAKES, ADAPTER, TQ-FF).
 - **From CI-WASM (#64)** (the archive's block for #64): TE-COUNT, TE-TYPE-PLANTS, TE-TSC-LINES, TE-WATCH, TE-CPU,
   TE-HIDDEN-FRAMES, IMAGE-CHROME, CUT-PATH, TOKEN-WORDS, GH-TOOLS after 3a, SAVER, MANUAL-MODE's record value.
-- **From change-set 3a** (the archive's block): 3A-FMA-CHECK (his, change-set 4), 3A-RUST-REPORT (his),
+- **From change-set 3a** (the archive's block): 3A-FMA-CHECK (his: first outside crate), 3A-RUST-REPORT (his),
   3A-PART7-POINTER; for the small CI pull request 3A-GEN-CHECK, 3A-RULES-STEP; for 3b 3A-FROM-F64, 3A-HOOK-TEST,
   3A-MANIFEST-COMMENT; for the gate step 3A-LINT-MULADD, 3A-SCAN-NAMES, 3A-CONFIG-FILE, 3A-PEDANTIC; later
   3A-FEATURE-VERSION, 3A-SCAN-HELPERS, 3A-PART5-CLASH, 3A-NAME-SECTION, 3A-RNG-COPY, 3A-STATS-ROWS, 3A-PLANTS,

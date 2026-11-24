@@ -1,7 +1,8 @@
 # Advisor report: cs3a-rules-boundaries (2026-11-24, branch `claude/loving-hopper-6p0mg2` standing in for `cs/3a-rules-boundaries`, base main 1ec6f6c)
 
-Change-set 3a, "Rules and boundaries": the first half of change-set 3 (Mustafa's answer SIZE-3 (b), 2026-11-23: "two
-change-sets, 3a then 3b"). Built by the builder chat he calls Builder V3 (session_01WLuqnvpAh9XTitx8ehKJcQ) on his
+Change-set 3a, "Rules and boundaries": the first half of change-set 3 (the answer SIZE-3 (b), two change-sets, 3a
+then 3b, one of the seven recommended answers Mustafa confirmed on 2026-11-23 by choosing "Yes to all seven").
+Built by the builder chat he calls Builder V3 (session_01WLuqnvpAh9XTitx8ehKJcQ) on his
 words of 2026-11-24, 11:03:53 UTC: "build change-set 3a by the plan without waiting for me". Risk tier 1 (game code,
 tests, build scripts) plus `docs/DECISIONS.md`, a decision doc: it merges only on his go, after his browser check.
 No pull request exists yet: by his words of 2026-11-23, 23:44:10 UTC the chat puts the title and text in its notes
@@ -24,10 +25,12 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
 
 ## Plan and approval
 - **The plan:** `cs3-plan.md`, draft 3, section 4 (written by the first builder chat, 2026-11-19; the advisor agent
-  read draft 1: REVISE with twelve conditions; draft 2: APPROVE with conditions, worked into draft 3). His answers of
-  2026-11-23 (in `docs/DECISIONS.md`): RNG-SOURCE (c), "our own ChaCha8, checked against the published test
-  vectors"; SIZE-3 (b), with his yes in advance to the cut ladder; PRESS-PACE (a), which is 3b's; DEPART-3 (a), he
-  accepts the plan's list of small departures from the drafts.
+  read draft 1: REVISE with twelve conditions; draft 2: APPROVE with conditions, worked into draft 3). On 2026-11-23
+  he chose "Yes to all seven" on the card that confirmed the recommended answers (`docs/DECISIONS.md`; the
+  answers' wording there is the register's, not his): RNG-SOURCE (c), our own ChaCha8 checked against the
+  published test vectors; SIZE-3 (b), two change-sets, with his yes in advance to the cut ladder; PRESS-PACE (a),
+  a second tap inside one tick is applied one tick later (it concerns 3b); DEPART-3 (a), he accepts the plan's
+  list of small departures from the drafts.
 - **The eight steps:** (1) follow-ups from change-set 2 that need nothing new; (2) a scan of the simulation's source
   for forbidden float methods, hash maps and clocks, and a planted counter overflow; (3) one batch of manifest
   changes; (4) our own ChaCha8 random generator; (5) float test vectors against an exact reference; (6) a panic
@@ -49,7 +52,9 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
   or built: "The dependency change may be committed and built: yes with conditions". No outside package entered.
   The players' WebAssembly built with only those four files changed was byte for byte the one without them.
 
-## What changed (56 files, 21 new; no file under `.github/`, `.claude/`, `docs/adr/`, `docs/research/`, no gate file)
+## What changed
+56 files of code and tests, 21 of them new; 63 with the docs pass. No file under `.github/`, `.claude/`,
+`docs/adr/` or `docs/research/`, and no gate file.
 - **`crates/sim`:** `src/rng.rs` (new: `ChaCha8`, our own generator: `new`, `next_u32`, `next_u64`, `position`,
   `set_position`, `stream`; the eight published vectors inside its tests); `tests/rules_scan.rs` (new: the scan);
   `tests/state_hash_alloc.rs` (new: the state hash allocates nothing after its first call, counted by an
@@ -81,7 +86,8 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
   browser package's Node project 1; the boundary tests on the built WebAssembly: 2 files, 17 tests; "Running 14
   tests", "14 passed"; nothing skipped or ignored. The baseline on main was 12 browser tests and 7 boundary tests.
 - **The same WebAssembly everywhere:** the players' file is 31,718 bytes with sha256 383f5303...3963 in this
-  container and on GitHub's runner (it was 28,987 bytes before the hook), and holds no builder path.
+  container and on GitHub's runner, and holds no builder path (before the hook: 28,987 bytes here, 28,991 on the
+  runner, whose file then still held its own cargo path).
 - **One red run, not re-run:** on a1b2e802 the `toolchain` job failed at one assertion I had added last ("not 200"
   for the test-only module's old folder). On a clean machine no stale copy lies there, and Vite's dev server
   answers 200 with the page itself for a file that is not there; here a stale copy made it 403, so the local run
@@ -98,9 +104,10 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
   arithmetic and rounded once. Natively every result is exact, in debug and release. In WebAssembly (Node, the
   container's Chromium 153, the runner's Chrome 157; release and dev profiles) every result is exact except
   `mul_add` on 16 inputs (next section).
-- **The error text end to end:** with a panic planted in the players' WebAssembly at tick 90 (never committed), the
-  page read "The match stopped: the simulation stopped: panicked at crates/sim-wasm/src/lib.rs:140:9:" and
-  "planted: tick 90 is one too many"; the Worker stopped and was not called again.
+- **The error text end to end:** with a panic planted in the players' WebAssembly at tick 90 (on step 6's tree,
+  the code of 0624557; never committed), the page read "The match stopped: the simulation stopped: panicked at
+  crates/sim-wasm/src/lib.rs:140:9:" and "planted: tick 90 is one too many"; the Worker stopped and was not called
+  again. The advisor agent repeated it with a panic of its own on the final code: its text reached the page.
 - **Cost** (perf-auditor, measured): no regression per block, per frame or per Worker wake; the page's check of a
   block allocates 280.0 bytes per block in its harness, as on main, and nothing once optimised.
 
@@ -155,8 +162,14 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
   3A-PLANTS); two exports were built under other names than the design notes planned (next section); the
   runner's image version changed between runs with no read of the allocation numbers recorded (its own read: 61
   bytes a frame and 529 a block, inside the test's windows).
-- **The advisor agent:** its interim ruling on `mul_add` is above. It reviews the pushed head that holds this
-  report; its verdict is added here with the next commit, before his go is asked.
+- **The advisor agent on c5f6a85a (the first head with this report): REVISE, for wording only.** By its own gate
+  run, its own build (the same WebAssembly bytes), its own ChaCha8 and exact fractions, "the code is fit and
+  proven"; its nine start conditions and its seven conditions on `mul_add` are met. Its High: four places put
+  the register's wording in quotation marks as Mustafa's own (this report twice, a comment in `rng.rs`, the pull
+  request's text); his recorded choice was "Yes to all seven". Corrected in the commit after c5f6a85a, with its
+  Mediums (a comment in the scan that still said "until Mustafa answers"; the open security follow-ups named for
+  his go; the docs pass's section below) and Lows. Its verdict on the corrected head is added with the last
+  commit, before his go is asked.
 
 ## Decisions and deviations
 - **MUL-ADD (a)**, his (above). The scan therefore checks "part 7's list exactly, less `mul_add`", which the
@@ -181,6 +194,37 @@ simulation ("MUL-ADD: (a)"). Size: 3,561 added lines against about 2,080 planned
 - **Size:** 1.71 times the plan. More than half of the added lines are tests (1,703), and 430 are the two reference
   scripts; the fix passes added 515 lines, most of them tests and planted cases. Nothing moved down the ladder.
 
+## The docs pass (in this change-set)
+- **His words, by script** (`docs/DECISIONS.md`; each message whole, copied from the chat's transcript with its
+  byte count and sha256 and the question it answers): 2026-11-23, 23:44:10 UTC (his go for #64; how later pull
+  requests are opened); 23:51:57 UTC (a short message the chat could not read either way and asked about);
+  2026-11-24, 10:16:15 UTC (#64 merged by his main Advisor on his tap); 10:50:43 UTC (his compact of the chat);
+  11:03:53 UTC ("build change-set 3a by the plan without waiting for me"); 15:58:25 UTC (MUL-ADD (a), his Advisor's
+  two conditions, the stop line, plain words with him, and his four decisions of 24 November, which "change
+  nothing in 3a": "No separate animation editor. Rigging and animation happen in Blender, with the Blender MCP.";
+  "Testlines stays for feel and metrics. The real level editor goes in the main game (Editor V2)."; "The level
+  editor can start against the offline core, but 3b stays first in line for the main builder."; "VFX repo stays
+  separate for now; we merge later. Both sides should agree on one effect file format, so the merge is easy.").
+- **#64's merge** (main 1ec6f6c, 2026-11-24, 10:15:31 UTC; #63 and #62 closed): STATUS, the archive and ROADMAP.
+- **Five dated corrections to #64's report** (`docs/reports/2026-11-19-ci-wasm.md`), asked by the advisor agent's
+  read of #64's final head; no word of his changed.
+- **STATUS, the archive, ROADMAP, the map:** 3a's line; 23 follow-ups by id (3A-…) with their text; the follow-ups
+  of #61 and #64 that 3a closed, each with its evidence; every new path (the map check passes).
+
+## Steps and commits (the notes of each step: the checkpoint, readable at the commit the last commit names)
+| What | Commit |
+|---|---|
+| Step 1, the follow-ups from change-set 2 | a1c59e8 |
+| Step 2, the scan and the planted counter | 50656d6 |
+| Step 3, the manifests (with its release record) | 0412814, f5a9f67 |
+| Steps 4 and 5, our own ChaCha8 and the float vectors | ec27f85 |
+| Step 6, the panic hook and the Worker's guard | 0624557 |
+| Step 7, the test-only WebAssembly module | df72a58 |
+| Step 8, the build's refusals and the path remap | 5c92311 |
+| Round 1's fix pass | 79666ad9 |
+| Round 2's fix pass, and the corrected test after the red run | a1b2e802, 8619d539 |
+| The docs pass | c5f6a85a |
+
 ## Not verified
 A processor without FMA (emulated only). Firefox, WebKit and Safari for the vectors (Firefox is his browser check's
 step 6 for the page; the vectors run in CI's Chrome only). The dev server and the builds on Windows. The toolchain's
@@ -188,7 +232,8 @@ step 6 for the page; the vectors run in CI's Chrome only). The dev server and th
 
 ## Risks
 1. A library that enters the simulation later may call the fused multiply-add itself; the scan sees only our code
-   (follow-up 3A-FMA-CHECK, bound to change-set 4 by his Advisor's condition).
+   (follow-up 3A-FMA-CHECK: by his Advisor's condition it is built in the change-set that brings the first outside
+   crate into the simulation, which is planned as change-set 4).
 2. The scan reads text, not types: it fails closed on some valid code (our own ordered types' `max`) and misses a
    macro that builds a call. It is interim until the lints.
 3. CI does not yet check that the vector files match their generators (a CI edit; with the small CI pull request).
@@ -218,5 +263,10 @@ after his Advisor's three items.
    `node serve.mjs`, open the address in Brave; keep the window in front for 2 minutes; cover it for 1 minute;
    switch tabs for 1 minute; press "Copy report" and paste it, with whether Brave Shields was up and what a
    double-click on `index.html` shows; then 2 minutes in Firefox and its report.
-2. Your go for the merge, for the full SHA the advisor agent approved, once your main Advisor has opened the draft
-   from `pr-title.txt` and `pr-body.md` in the notes folder.
+2. Your go for the merge, for the full SHA the advisor agent approves, once your main Advisor has opened the draft
+   from `pr-title.txt` and `pr-body.md` in the notes folder. With that go you also accept that three small
+   security follow-ups stay open: the copy report's rows are not yet built from one fixed list (3A-STATS-ROWS); a
+   cargo settings file outside the repository can still change a build profile, the linker, a compiler wrapper
+   or where a crate's source comes from (3A-CONFIG-FILE, for the quality gate step); one comment in the root
+   manifest is out of date, and a later licence-and-advisory check must allow the tools crate to use
+   wasm-bindgen too (3A-MANIFEST-COMMENT, for 3b's manifest batch).

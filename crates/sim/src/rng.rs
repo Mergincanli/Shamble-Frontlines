@@ -1,7 +1,7 @@
 //! The generator of the simulation's random streams: `ChaCha` with 8 rounds (ADR 0004 part 8). It is our own code and
-//! no library's (Mustafa's RNG-SOURCE (c), 2026-11-23: "our own ChaCha8, checked against the published test
-//! vectors"), so the server and every browser run these same lines: plain 32-bit adds, xors and rotations, with no
-//! processor-specific path that could make them disagree. The tests below hold the published vectors.
+//! no library's (the answer RNG-SOURCE (c), which Mustafa confirmed on 2026-11-23: our own `ChaCha8`, checked against
+//! the published test vectors), so the server and every browser run these same lines: plain 32-bit adds, xors and
+//! rotations, with no processor-specific path that could make them disagree. The tests below hold those vectors.
 //!
 //! The layout is Bernstein's: sixteen 32-bit words, four constants, the 256-bit key, a 64-bit block counter, then
 //! the 64-bit stream id. One key gives 2^64 streams that never overlap; the simulation gives each purpose its own.
