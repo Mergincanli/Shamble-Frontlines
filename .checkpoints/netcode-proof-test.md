@@ -144,17 +144,20 @@
   u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366, u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (1 agent, 1 shell, 2 triggers; resume by SendMessage to its ID; after a cut, from its own file):**
-  - The U6c advisor a662f1797b78cae95 (resumed 10:4x, read only, no cargo): round 1's one ruling -> advisor-u6c-r1.md
-    (told 10:41 to write each block at once, with a "Resume from" line). Seats DONE, resumable: netcode aa64bb15ad4467641
-    (REVISE: NC-U6C-1 High), test a3a1718b1419d246e, security a546a4604d30ee9d4. MAIN-64's advisor a74a6501af7e576c7: step 7.
-  - The saver b7jvh8w3n (10:41 to about 12:41; restart when it ends: run_in_background, timeout 7200000). Triggers:
-    check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (next 12:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC,
-    msg-2026-11-25.md).
-- **My step: MAIN-64** (main-64-plan.md; main 1ec6f6c, PR #64; advisor-main-64.md: APPROVE WITH CONDITIONS, then its
-  step-1 ruling). **Paused at step 1, before the merge,** on his "98% usage" (history.md, 10:40 UTC): no MERGE_HEAD,
-  HEAD = origin = d7d8a34, the saver restarted. After the cut: step 1 again from its first line (C3 (b)): C5 (a)'s
-  resume line by Edit in M64-1's words, TaskStop, the proof, at most one save, H0, fetch and CI, pre-checks, base run.
+- **Running (1 agent, 2 triggers; the saver off for MAIN-64; resume by SendMessage to its ID; after a cut, from its file):**
+  - The U6c advisor a662f1797b78cae95 (read only, no cargo; cut 10:42, resumed 12:55 from its file's block 3): round 1's
+    one ruling -> advisor-u6c-r1.md. Seats DONE, resumable: netcode aa64bb15ad4467641 (REVISE: NC-U6C-1 High), test
+    a3a1718b1419d246e, security a546a4604d30ee9d4. MAIN-64's advisor a74a6501af7e576c7: step 7.
+  - The saver b7jvh8w3n ended 12:31 (time is up); off from MAIN-64's step 1 to step 6 (then restart: run_in_background,
+    timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (next 14:34; until the push the card by Edit
+    only); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
+- **My step: MAIN-64** (main-64-plan.md; main 1ec6f6c, PR #64; advisor-main-64.md with its step-1 ruling). MAIN-64
+  approved (advisor-main-64.md), running steps 1-7. If `git rev-parse -q --verify MERGE_HEAD` prints
+  1ec6f6c3852d2922989f299bfc053c403d0e52d3, the merge is in progress: no save, no `git merge --abort`, no reset. If
+  `git diff --name-only --diff-filter=U` names docs/STATUS.md, resume at step 3; otherwise resume at step 3's checks
+  before the commit (C2 (b)), then step 4. If HEAD^2 is 1ec6f6c3852d2922989f299bfc053c403d0e52d3 and HEAD is not on the
+  remote yet, resume at step 5. The netcode seat's notes and this card may show unstaged: leave them; step 6's card save
+  takes them. Anything else: the advisor rules.
   **Next three:** (1) the U6c ruling, then the fix pass (U6c's builder) and its check; (2) the merge M3-M9 as U4f's
   (history.md:7022-7028; M5 after a part-clean; A2's reading; C9); (3) U7's 0b check and R-half, U8's merge. Msg 23:05.
 - **Finished, resumable by SendMessage:** U6c's builder a3a3e3fdf559de095 (BUILT; notes u6c-build.md; takes the fix
@@ -165,10 +168,6 @@
   (advisor-u8-stopb.md:208-220, and NC-R2-4 in U6c's message), Stop B's laptop reads (driver listen, passphrase, fsn1
   stock, Claude Code >= 2.1.257), `sudo -l` over ssh on RS (only the container's read). Old trees .gate/u8-r2-old
   (60205020), .gate/u8-r3-old (bca52b2c). Not run on a VM. `node --test ops/` fails on Node 22.23: use `'ops/**/*.test.mjs'`.
-- **F26 (mine, from 2ad2829):** FIXED at 2a9498d (the ruling's section 6; tests 11/11; plant shown, restored 2609bc87;
-  scan 0 findings; CI green on 8412c6b); security CLEAR WITH CONDITIONS (SEC-F26-1 DONE at 07d5d31; -2 accepted).
-- **U6b** (rev 1.1; security-u6b-deps.md, with conditions; Block 0 DONE ae4f57e): built, its round running (Now); C2's
-  homes built as advisor-u7-brief.md has them (PROTOCOL_VERSION, CONTENT_HASH, MODE_HASH in npt-proto; ws tags in npt-link).
 - **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 DONE at 3b75d00; its builder launched 06:56 (Now, Next 2);
   its launch gives U7's seven dist names and carries advisor-u8-stopb.md:208-220's six lines, NC-R2-4's record names
   (advisor-u8-r2.md) and U6b's F-JOIN-ONCE (its glue steps a client only once its link is Open); at its merge U8's
@@ -196,4 +195,5 @@
   2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC), :7675-7687 (about 07:53 to 11:14 UTC), :7689-7701 (about 12:28 to 16:22 UTC),
   :7724-7736 (about 17:33 to 21:12 UTC); 2026-11-23/24 :7745-7753 (about 23:22 to 02:36 UTC); 2026-11-24 :7755-7770
   (a container restart, about 05:26 to 05:37 UTC: M5 run 2 and the saver re-run), :7772-7783 (about 06:55 to 07:59
-  UTC: U6c's builder, cut while reading, and this chat; the builder resumed by SendMessage 08:0x).
+  UTC: U6c's builder, cut while reading, and this chat; the builder resumed by SendMessage 08:0x), :7803-7819 (about
+  10:42 to 12:54 UTC: the U6c advisor, its notes saved, and this chat; resumed 12:55 on his words).

@@ -7799,3 +7799,21 @@ Re-create them if still needed.
   - The U6c advisor a662f1797b78cae95 was told to write each finished block of advisor-u6c-r1.md at once, with a
     "Resume from" line. MAIN-64's advisor is done; step 7 waits for the push.
   - The saver restarted (b7jvh8w3n). The card and this file saved and pushed.
+
+## Cut by the spend limit (2026-11-24 about 10:42 to 12:54 UTC)
+- **The notice** (the U6c advisor a662f1797b78cae95, its task ended at about 10:42 UTC, HTTP 429; then this chat at
+  10:42:54, 12:31:32 and three times at 12:34:56-57 UTC, the same words, found by cut_notice_find.py): "You've hit your
+  org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 12:50pm (UTC)".
+- **What it stopped:**
+  - The U6c advisor's ruling. Its plan and working notes were saved at 10:42, with "Resume from: block 3", after the
+    10:41 "save now" message.
+  - This chat, after the 10:42:21 save (25052e6). MAIN-64 stays paused at step 1 before the merge (no MERGE_HEAD).
+  - The saver b7jvh8w3n was not cut. It ran to its window's end ("watch stopped: time is up", 12:31:29, nothing to
+    save).
+  - The 12:34 check-in reached this chat at 12:54:28, with "This session's worker process was restarted".
+- **Resumed 12:55 UTC**, on his words (in this chat, word for word): "I hit my usage limit while you were working, but
+  it has reset now. Please continue from where you left off."
+  - State checked: git clean, HEAD = origin 25052e6; no saver, cargo or rustc running.
+  - The U6c advisor resumed by SendMessage, from its file.
+  - MAIN-64's step 1 started again from its first line (C3 (b)). The saver ended before it, so its completion notice
+    and an empty `pgrep` are the proof (M64-3), with no TaskStop.
