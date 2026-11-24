@@ -2883,6 +2883,39 @@ fn u4j_ws_a_bite_run_takes_its_counted_runs_practice_run() {
     let bite = ws_bite(&v);
     assert_eq!(bite.status, BiteStatus::Shown, "{:?}", bite.runs);
     assert_eq!(check_c(&bite.runs[0]), check_c(&part.runs[0]));
+    // (5) Two measured runs of one build with different practice runs in force (TE2-3): the second started after a
+    // second practice run of the build, which holds a second ruling. The bite cannot tell whose numbers hold.
+    let ruling = json!("advisor-r3.md:40: the cause found and fixed");
+    let mut split = logs.clone();
+    split.extend(another_practice(
+        &logs,
+        "ws-practice-2",
+        "2026-11-20T23:00:00Z",
+        &[("second_ruling", ruling)],
+    ));
+    let mut second: Vec<Log> = logs
+        .iter()
+        .filter(|l| l.header.run == "ws-1")
+        .cloned()
+        .collect();
+    edit_run(&mut second, "ws-1", &|l| {
+        l.header.run = "ws-2".to_owned();
+        if let Some(started) = l.header.params.get_mut("started_utc") {
+            *started = json!("2026-11-20T23:30:00Z");
+        }
+    });
+    split.extend(second);
+    let (_, v) = ws_judge(&split);
+    let bite = ws_bite(&v);
+    assert_eq!(bite.status, BiteStatus::Invalid, "{:?}", bite.runs);
+    assert!(
+        says(
+            &bite.runs[0].invalid_why,
+            "have practice runs ws-practice and ws-practice-2 in force"
+        ),
+        "{:?}",
+        bite.runs[0].invalid_why
+    );
 }
 
 // ---------------------------------------------------------------------------------------------------------------
