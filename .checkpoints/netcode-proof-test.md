@@ -5,8 +5,8 @@
   **Base:** main 1ec6f6c merged in at 72b0dc3 (MAIN-64, 2026-11-24 13:0x UTC: #64, CI-WASM; one conflict,
   docs/STATUS.md: this branch's #40 row kept beside main's #64 and "#63, #62" rows); before it main f5030a3 at a6acc8a
   (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-24 10:3x UTC, after his /compact (history.md:7785-7791) and his resume words: U6c's round 2
-  of 3 back; MAIN-64 planned (main-64-plan.md), its advisor check running; live state checked against this card.
+- **Last update:** 2026-11-24 15:0x UTC, before his /compact: MAIN-64 DONE; U6c's fix pass and all its container
+  readings DONE; LEAN-MODE in force; nothing running until the 17:51 trigger (U6c's round 2).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -155,10 +155,10 @@
     (next 14:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
 - **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
   check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
-- **My step (14:1x):** the container readings, my own runs through u6c-run.sh on the builder's tree, release builds:
-  - A2 on both transports, by the full test names (u6c-build.md "Fix pass");
-  - then the probe with the shipped binaries (P0 and P1, 1,000,000 packets, 127.0.0.1, UDP 30003), as advisor-u6c-r1.md
-    lines 73-81 say. Logs go to .gate/u6c/read-*.log.
+- **My step (15:0x):** waiting for the 17:51 trigger (trig_014DtEnzDqnWHT2N6MsvfyA1). Then U6c's round 2 in one batch at
+  xhigh: three seats on the interdiff `git diff aad2103 6c3ff00` (advisor-u6c-r1.md §4), told about F-P2-HEADER,
+  WebTransport's 0-input second and P1's 484 refused sends. Restart the saver with it. The container readings are DONE,
+  my own runs through u6c-run.sh, release builds (.gate/u6c/read-*.log):
   - DONE: the release build (read-build.log, exit 0). A2 over WebSocket (read-a2-ws.log, 14:08-14:09): 1 passed in
     70.8 s; npt-load READY then DONE, exit 0; the room exit 0; room memory peak 157,499,392 B; 5-31 inputs per client
     per second; split violations 0; pooled p99 about 1.8 ms. A2 over WebTransport (read-a2-wt.log, to 14:12): 1 passed
