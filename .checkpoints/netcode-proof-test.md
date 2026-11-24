@@ -5,8 +5,8 @@
   **Base:** main 1ec6f6c merged in at 72b0dc3 (MAIN-64, 2026-11-24 13:0x UTC: #64, CI-WASM; one conflict,
   docs/STATUS.md: this branch's #40 row kept beside main's #64 and "#63, #62" rows); before it main f5030a3 at a6acc8a
   (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-24 15:0x UTC, before his /compact: MAIN-64 DONE; U6c's fix pass and all its container
-  readings DONE; LEAN-MODE in force; nothing running until the 17:51 trigger (U6c's round 2).
+- **Last update:** 2026-11-24 15:2x UTC, after his /compact: the card matches the branch (ffcde1c, clean, equal to
+  origin); his 15:22 words (history.md:7881-7889) name the judge chat Netcode Builder 2; round 2 at the 17:51 trigger.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -15,8 +15,8 @@
 - **LEAN-MODE, 2026-11-24 about 14:0x UTC (history.md:7857-7880), until R1; plain words, every code explained in its
   sentence:**
   - Only R1's path: U6c's fixes and merge, U7's Rust half, U8's merge, main taken in, Stop B.
-  - The judge leaves this lane: MOVED and U6j go to his "Judge builder" chat, on its own branch. No edits to
-    crates/judge/ or marks/, except my own SERIES.md rows. Its branch merges on his word.
+  - The judge leaves this lane: MOVED and U6j go to his Netcode Builder 2 chat (his name for it, 15:22), on its own
+    branch. No edits to crates/judge/ or marks/, except my own SERIES.md rows. Its branch merges on his word.
   - New agents only in the first 30 minutes after a usage reset.
   - The check-in every 4 hours; a cut gets one line in the day's message.
   - Notes: this card and the day's message (his words still word for word in history.md).
@@ -105,7 +105,7 @@
   pulled: P2 rides in MOVED's brief, before R1's report. (4) Main 1ec6f6c taken in now, plan first (MAIN-64:
   advisor-main-64.md). (5) U6c's round-1 ruling (the advisor's, advisor-u6c-r1.md): one fix pass, a narrow round 2,
   the container readings at U6c's close (the probe; A2 on both transports). **Decision:** NPT-L2-ONEWAY (its §5; lean (a);
-  its build now the Judge builder's). (6) Q-FP6-1 (b): the load generator's failed-handshake count stays in its "no
+  its build now Netcode Builder 2's). (6) Q-FP6-1 (b): the load generator's failed-handshake count stays in its "no
   READY" line; its log half goes to U6e. (7) U6c's held-back stamp tests stay on this lane after R1 (LEAN-MODE item 2).
 - Before those, none since the 2026-11-24 message. Each named in its day's message: 2026-11-23's in msg-2026-11-24.md items 1-7
   (this card at 2a7a5b8 holds them with their sources); 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at
@@ -152,10 +152,10 @@
   - No agent running (LEAN-MODE item 3: new ones only in the 30 minutes after a reset; next reset 17:50 UTC).
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-    (next 14:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
+    (next 16:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
 - **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
   check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
-- **My step (15:0x):** waiting for the 17:51 trigger (trig_014DtEnzDqnWHT2N6MsvfyA1). Then U6c's round 2 in one batch at
+- **My step (15:2x):** waiting for the 17:51 trigger (trig_014DtEnzDqnWHT2N6MsvfyA1). Then U6c's round 2 in one batch at
   xhigh: three seats on the interdiff `git diff aad2103 6c3ff00` (advisor-u6c-r1.md §4), told about F-P2-HEADER,
   WebTransport's 0-input second and P1's 484 refused sends. Restart the saver with it. The container readings are DONE,
   my own runs through u6c-run.sh, release builds (.gate/u6c/read-*.log):

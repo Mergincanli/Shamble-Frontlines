@@ -7877,3 +7877,13 @@ Reply now in at most 5 lines: what in part A you cannot do, and why. Then carry 
   nothing else. Item 2 moves NPT-L2-ONEWAY's build (the judge's one-way comparison on the real network) to the Judge
   builder. U6c's held-back stamp tests (C-U6-8 with TE2-TE4) stay on this lane after R1, unless he says otherwise. The
   check-in trigger is changed to every 4 hours, with its stored prompt to match.
+
+## Mustafa, 2026-11-24 15:22 UTC, in this chat after his /compact: the new chat's name (word for word)
+```text
+The compact is done. Read the resume card first and check it against the branch. Do not redo finished work. Lean mode (my block of 24 November, in history.md) stays on. The new chat on my first personal account is named Netcode Builder 2, not Judge builder. Reply in at most 4 lines: where you stand and what starts at the 18:50 reset. Then carry on.
+```
+- **Read as** (the main session's reading, not his words): the new chat that LEAN-MODE item 2 (history.md:7863) calls
+  "Judge builder" is named Netcode Builder 2. Its work does not change: it builds MOVED and U6j on its own branch, and
+  that branch merges into this one only on his word (MOVED before R1's report, U6j before R2). "The 18:50 reset" is
+  Amsterdam time (UTC+1): 17:50 UTC by the session's limit clock (resetsAt 1795542600), when U6c's round 2 may start.
+  Transcript record f32f90d3-79b5-45bc-bc94-09c6bc2b7ca2, 15:22:04 UTC, 350 characters.
