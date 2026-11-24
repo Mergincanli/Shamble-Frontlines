@@ -79,17 +79,20 @@
   cap in start() (binary.rs +14 -12) and sha2 at opt-level 3 in the dev profile (Cargo.toml +3; the debug start 3.0 s
   -> 0.12 s; the host now 2.10 GHz, was 2.30); probe4 PASS; M5 run 2 PASS (m5-check2.log: 11/11, 807/904, 1,037.2 s);
   C5 APPROVE of the changed head; M7 gate PASS (m7-gate.log); 29 blobs = .gate/u6b-merge/m6-files.txt. **CI GREEN on
-  8efb9b2** (gate 45338377262 + 45338369910, toolchain 45338377334 + 45338370007, all success); **H3 RUNNING** (the
-  advisor's head read). main-run.sh sets no CARGO_INCREMENTAL: pass `env CARGO_INCREMENTAL=0`.
+  8efb9b2** (gate 45338377262 + 45338369910, toolchain 45338377334 + 45338370007, all success); **H3 APPROVE of the
+  pushed head** (advisor-u6b-m6.md section 7, fe2e4c0d…): **U6b CLOSED 06:2x**. The builder's worktree stays (its
+  uncommitted copy of the tree; plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6b's close:** CI green, then H3 (resume a6e7ce46a28424b0b); then T5 (i) (U7's T-builder with U6b's merged
-  release binary under .gate/u7/) and U6c's launch on the lane. SEC-U6B-3 is on PR #40's closing list (done 04:4x).
+- **Next 2, T5 (i):** U6b's merged release binary built in the main folder (main-run.sh, .gate/u7/t5i-release.log) and
+  copied to .gate/u7/npt-server; then U7's T-builder a9873cdba07a3219e by SendMessage; then U6c's launch on the lane.
 - **Next 3:** the 2026-11-24 day message SENT 23:0x UTC (msg-2026-11-24.md: choices 1-7, /compact asked); the next at
   2026-11-24 23:05 UTC (trig_016pV7v16ktVwMuzygofJhjJ, msg-2026-11-25.md). T5 (i) the day U6b merges.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
-- None since the 2026-11-24 message. Each named in its day's message: 2026-11-23's in msg-2026-11-24.md items 1-7
+- For msg-2026-11-25.md (C7, R2): (1) U6b's merge fixed one test's cap: the double-load bite's start gets its own 2 s
+  on top of the 5 s (TR2-U6A-4); (2) sha2 runs optimised in debug builds, so the test build's start fits its 5 s.
+- Before those, none since the 2026-11-24 message. Each named in its day's message: 2026-11-23's in msg-2026-11-24.md items 1-7
   (this card at 2a7a5b8 holds them with their sources); 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at
   9341c90); 2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
 
