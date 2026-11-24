@@ -12,12 +12,10 @@
 //! - **Accept loop (M8):** we drive `quinn::Endpoint::accept` ourselves and call each crate's per-connection accept,
 //!   so every failed handshake is counted by its reason (web-transport-quinn's own `Server` drops them silently; E6
 //!   counts them). Sessions come out of a bounded channel.
-//! - **Carried to U6, before WtServer reuses this file:** the accept loops start one task per `Incoming` with no cap
-//!   on concurrent handshakes once QUIC is up, and no deadline on the HTTP/3 stage (wtransport awaits SETTINGS and
-//!   CONNECT, endpoint.rs:621-634; quinn's 30 s idle timeout is defeated by a client's keep-alives); quinn bounds only
-//!   the `Incoming` queue (max_incoming). Both must be bounded there (.claude/rules/netcode.md: nothing unbounded keyed
-//!   by client data), and a task blocked on `tx.send` when the channel is full needs the same deadline. Fine for the
-//!   loopback tests here.
+//! - **The accept loops here are the loopback tests'** (one task per `Incoming`, no cap, no HTTP/3 deadline). U6b's
+//!   WtServer (crate::wt_server) closes that carry: it reuses `endpoint` and `wtq_server::config_with`, takes a permit
+//!   of the connection cap per `Incoming`, and runs the whole handshake and the hand-off under one deadline from the
+//!   first packet.
 
 use super::MIGRATION;
 use super::socket::ImpairSocket;
@@ -186,6 +184,15 @@ pub(crate) mod wtq_server {
         chain: Vec<CertificateDer<'static>>,
         key: PrivateKeyDer<'static>,
     ) -> io::Result<(quinn::EndpointConfig, quinn::ServerConfig)> {
+        config_with(chain, key, quinn::TransportConfig::default())
+    }
+
+    /// `config` with `transport` (U6b's WtServer: its congestion controller from the run's `cc`, E6).
+    pub(crate) fn config_with(
+        chain: Vec<CertificateDer<'static>>,
+        key: PrivateKeyDer<'static>,
+        transport: quinn::TransportConfig,
+    ) -> io::Result<(quinn::EndpointConfig, quinn::ServerConfig)> {
         let tls = tls_config(provider(), chain, key)?;
         debug_assert_eq!(
             tls.alpn_protocols,
@@ -194,7 +201,7 @@ pub(crate) mod wtq_server {
         let crypto =
             quinn::crypto::rustls::QuicServerConfig::try_from(tls).map_err(io::Error::other)?;
         let mut sc = quinn::ServerConfig::with_crypto(Arc::new(crypto));
-        sc.transport_config(Arc::new(quinn::TransportConfig::default()));
+        sc.transport_config(Arc::new(transport));
         sc.migration(MIGRATION);
         Ok((quinn::EndpointConfig::default(), sc))
     }

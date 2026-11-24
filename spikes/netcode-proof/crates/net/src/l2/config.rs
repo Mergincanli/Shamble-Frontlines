@@ -81,6 +81,9 @@ impl L2Config {
     pub const DEFAULT_MAX_DATAGRAM_BYTES: usize = 1_472;
     /// The catalogue's WebSocket frame and message limit (513 B). pub(crate): the fields are the public surface (C5).
     pub(crate) const WS_MAX_MESSAGE_BYTES: usize = 513;
+    /// The native WebSocket client's own frame and message limit (u6b-brief.md condition 7): the largest room message
+    /// plus its tag, a FullState of 65,536 + 5 B plus 1 B (catalogue :73-76), never the server's 513 B.
+    pub(crate) const WS_CLIENT_MAX_MESSAGE_BYTES: usize = 65_536 + 5 + 1;
     /// The WebSocket upgrade request's cap on DelayStream's path (8,192 B).
     pub(crate) const WS_MAX_REQUEST_BYTES: usize = 8_192;
 
@@ -110,6 +113,16 @@ impl L2Config {
             ws_max_message_bytes: Self::WS_MAX_MESSAGE_BYTES,
             ws_max_request_bytes: Self::WS_MAX_REQUEST_BYTES,
         }
+    }
+
+    /// The run's settings for the profile named `profile` (U6b: npt-server's settings name it): `P0` is the
+    /// pass-through (M12; R20: the WebSocket path then goes plain), any other of npt-l1's profiles impaired with this
+    /// crate's defaults; `None` for a name npt-l1 has not.
+    pub fn named(seed: u64, profile: &str) -> Option<L2Config> {
+        if profile == "P0" {
+            return Some(L2Config::clean(seed));
+        }
+        Profile::by_name(profile).map(|p| L2Config::new(seed, p))
     }
 
     /// The pass-through (M12): P0 with every impairment off, on the same path.
@@ -159,4 +172,27 @@ pub(crate) fn queue_ns(queue_bytes: u64, bits_per_s: u64) -> u64 {
         return u64::MAX;
     }
     (u128::from(queue_bytes) * 8 * 1_000_000_000 / u128::from(bits_per_s)) as u64
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// U6b: the room's settings name a profile; P0 is the pass-through (so the WebSocket path goes plain, R20), every
+    /// other of npt-l1's profiles is impaired with this crate's defaults, and an unknown name is none.
+    #[test]
+    fn u6b_a_named_profile_is_the_pass_through_at_p0_and_impaired_otherwise() {
+        let p0 = L2Config::named(3, "P0").expect("P0");
+        assert_eq!(p0, L2Config::clean(3));
+        assert!(p0.pass_through);
+        for name in ["P1", "P2", "P3", "P4"] {
+            let c = L2Config::named(5, name).expect(name);
+            assert!(
+                !c.pass_through && c.profile.name == name && c.seed == 5,
+                "{name}"
+            );
+            assert_eq!(c, L2Config::new(5, Profile::by_name(name).expect(name)));
+        }
+        assert_eq!(L2Config::named(5, "P9"), None);
+    }
 }

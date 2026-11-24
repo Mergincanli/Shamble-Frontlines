@@ -23,6 +23,20 @@ mod ws_config;
 mod l2;
 pub use l2::{DelayStream, ImpairSocket, L2Config};
 
+// U6b: the transports (u6b-brief.md Blocks 1-4): the connection cap, the certificate pin, what both servers share, and
+// the servers and clients themselves (plan §4.7's WtServer, WtClient, WsServer, WsClient).
+mod cap;
+mod pin;
+mod session;
+pub use cap::ConnCap;
+pub use session::{Accepted, Listen};
+#[cfg(feature = "wt-wtq")]
+mod wt_server;
+#[cfg(feature = "wt-wtq")]
+pub use wt_server::{WtClient, WtServer};
+mod ws_server;
+pub use ws_server::{WsClient, WsServer};
+
 // The plain WebSocket path's kernel readings for fix 1's gate, through npt-tcpinfo (U3c 1.8); WsServer calls them at U6.
 #[cfg_attr(not(test), allow(dead_code))]
 mod tcp_kernel;

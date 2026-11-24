@@ -252,6 +252,100 @@ pub(crate) const SPLIT_VIOLATIONS: [&str; 2] = [
 /// The `ws_split` event's rows per direction: 2 class counts, 6 statistics per part, the kinds and the violations.
 pub(crate) const SPLIT_ROWS: usize = 2 * (2 + PARTS * 6 + KINDS + 1);
 
+/// `[direction]`: the pooled lateness L over the split's window (u6b-brief.md condition 3): n, p50, p99, p99.9, max,
+/// E[(L − p50 − 0.25 ms)+] with its over count, E[(L − 0.25 ms)+] (L0 = 0) with its over count.
+pub(crate) const POOLED: [[&str; 9]; 2] = [
+    [
+        "ws_late_down_pooled_count",
+        "ws_late_down_pooled_p50_ns",
+        "ws_late_down_pooled_p99_ns",
+        "ws_late_down_pooled_p999_ns",
+        "ws_late_down_pooled_max_ns",
+        "ws_late_down_pooled_excess_ns",
+        "ws_late_down_pooled_over_count",
+        "ws_late_down_pooled_zero_excess_ns",
+        "ws_late_down_pooled_zero_over_count",
+    ],
+    [
+        "ws_late_up_pooled_count",
+        "ws_late_up_pooled_p50_ns",
+        "ws_late_up_pooled_p99_ns",
+        "ws_late_up_pooled_p999_ns",
+        "ws_late_up_pooled_max_ns",
+        "ws_late_up_pooled_excess_ns",
+        "ws_late_up_pooled_over_count",
+        "ws_late_up_pooled_zero_excess_ns",
+        "ws_late_up_pooled_zero_over_count",
+    ],
+];
+/// The pooled rows of both directions.
+pub(crate) const POOLED_ROWS: usize = 2 * 9;
+/// The window's mark: 1 when taken, and its stamp on DelayStream's clock (0 when none).
+pub(crate) const MARK_SET: &str = "ws_split_mark_set";
+pub(crate) const MARK_NS: &str = "ws_split_mark_ns";
+
+/// Up only, the reader stamp's parts (RC-12; delay.rs's `PASS`, `READER`, `OTHER_PASS`, `OTHER_READER`): each part's
+/// p50, p99, p99.9, max, E[(x − x0 − 0.25 ms)+] and over count, as the split's other parts.
+pub(crate) const READER: [[&str; 6]; 4] = [
+    [
+        "ws_late_up_pass_p50_ns",
+        "ws_late_up_pass_p99_ns",
+        "ws_late_up_pass_p999_ns",
+        "ws_late_up_pass_max_ns",
+        "ws_late_up_pass_excess_ns",
+        "ws_late_up_pass_over_count",
+    ],
+    [
+        "ws_late_up_reader_p50_ns",
+        "ws_late_up_reader_p99_ns",
+        "ws_late_up_reader_p999_ns",
+        "ws_late_up_reader_max_ns",
+        "ws_late_up_reader_excess_ns",
+        "ws_late_up_reader_over_count",
+    ],
+    [
+        "ws_late_up_other_pass_p50_ns",
+        "ws_late_up_other_pass_p99_ns",
+        "ws_late_up_other_pass_p999_ns",
+        "ws_late_up_other_pass_max_ns",
+        "ws_late_up_other_pass_excess_ns",
+        "ws_late_up_other_pass_over_count",
+    ],
+    [
+        "ws_late_up_other_reader_p50_ns",
+        "ws_late_up_other_reader_p99_ns",
+        "ws_late_up_other_reader_p999_ns",
+        "ws_late_up_other_reader_max_ns",
+        "ws_late_up_other_reader_excess_ns",
+        "ws_late_up_other_reader_over_count",
+    ],
+];
+/// The releases with a reader part, woken then other, and the early class's (the reader returned before any R).
+pub(crate) const READER_COUNT: [&str; 2] =
+    ["ws_late_up_woken_read_count", "ws_late_up_other_read_count"];
+pub(crate) const EARLY: &str = "ws_late_up_early_count";
+
+/// The reader stamp's rows: the two counts, each part's six statistics, the early class's count.
+pub(crate) fn reader_rows(parts: [Summary; 4], early: u64, out: &mut Vec<(&'static str, u64)>) {
+    out.push((READER_COUNT[0], parts[0].n));
+    out.push((READER_COUNT[1], parts[2].n));
+    for (p, s) in parts.iter().enumerate() {
+        let vals = [s.p50, s.p99, s.p999, s.max, s.excess, s.over];
+        out.extend(READER[p].iter().copied().zip(vals));
+    }
+    out.push((EARLY, early));
+}
+
+/// The pooled lateness's rows (`POOLED`'s order): per direction its median form, then its L0 = 0 form's E and over.
+pub(crate) fn pooled_rows(late: [(Summary, Summary); 2], out: &mut Vec<(&'static str, u64)>) {
+    for (d, (m, z)) in late.iter().enumerate() {
+        let vals = [
+            m.n, m.p50, m.p99, m.p999, m.max, m.excess, m.over, z.excess, z.over,
+        ];
+        out.extend(POOLED[d].iter().copied().zip(vals));
+    }
+}
+
 /// The connection's own counts: closes by the scanner's reason (ws_frame::Reason's order), then the rest.
 pub(crate) const CLOSE: [&str; REASONS] = [
     "ws_close_request_count",
@@ -401,11 +495,20 @@ mod tests {
         out.iter().map(|x| x.0).collect()
     }
 
+    fn all_pooled() -> Vec<&'static str> {
+        let mut out = Vec::new();
+        pooled_rows([(Summary::default(), Summary::default()); 2], &mut out);
+        reader_rows([Summary::default(); 4], 0, &mut out);
+        out.extend([(MARK_SET, 0), (MARK_NS, 0)]);
+        out.iter().map(|x| x.0).collect()
+    }
+
     /// README §1's naming rule, and one name per quantity across every row DelayStream writes.
     #[test]
     fn every_name_follows_the_rule_once() {
         let mut names = all_v();
         names.extend(all_split());
+        names.extend(all_pooled());
         names.extend([CONNS_BEFORE, ACCEPTED, WRITTEN[0], WRITTEN[1]]);
         let flags = [
             "ws_wrapper",
@@ -459,8 +562,8 @@ mod tests {
                 "no SERIES.md row for event.ws_summary.{n}"
             );
         }
-        // The split is the run's, pooled, never a per-second or per-connection row.
-        for n in all_split() {
+        // The split is the run's, pooled, never a per-second or per-connection row; so is the pooled lateness (U6b).
+        for n in all_split().into_iter().chain(all_pooled()) {
             assert!(
                 series.contains(&format!("| `event.ws_split.{n}` |")),
                 "no SERIES.md row for event.ws_split.{n}"

@@ -245,11 +245,30 @@ pub(crate) fn thread_tid() -> Option<u32> {
 
 /// The allowed CPUs of this process's thread `tid`, read back from /proc.
 pub(crate) fn allowed(tid: u32) -> Option<Vec<u32>> {
-    let status = std::fs::read_to_string(format!("/proc/self/task/{tid}/status")).ok()?;
+    allowed_in("/proc/self/task", tid)
+}
+
+/// The allowed CPUs of thread `tid` under `task_dir` (`/proc/self/task`).
+fn allowed_in(task_dir: &str, tid: u32) -> Option<Vec<u32>> {
+    let status = std::fs::read_to_string(format!("{task_dir}/{tid}/status")).ok()?;
     status
         .lines()
         .find_map(|l| l.strip_prefix("Cpus_allowed_list:"))
         .map(cpu_list)
+}
+
+/// The I/O runtime's threads' allowed lists for `event.affinity.sibling_free` (NR2-U6A-2): a thread no longer under
+/// `task_dir` (`/proc/self/task`) has exited (a blocking-pool thread after its idle time, U6b's transports' too), so
+/// it is left out; a live one whose list cannot be read is `None`, a failed read.
+pub(crate) fn io_allowed(task_dir: &str, tids: &[u32]) -> Vec<Option<Vec<u32>>> {
+    let live = |t: u32| std::path::Path::new(&format!("{task_dir}/{t}")).exists();
+    tids.iter()
+        .filter_map(|&t| match allowed_in(task_dir, t) {
+            Some(list) => Some(Some(list)),
+            None if !live(t) => None,
+            None => Some(None),
+        })
+        .collect()
 }
 
 /// Pins this process's thread `tid` to `cpus` by taskset (the module text), then reads the pin back.
@@ -450,5 +469,34 @@ mod tests {
             sibling_free_read(&smt, 3, &[Some(vec![0, 1]), None]).is_err(),
             "an I/O thread's list not read"
         );
+    }
+
+    /// NR2-U6A-2: an I/O thread that has exited is left out of `sibling_free`'s read (no failed read, so no 0 for it);
+    /// a live one is read; a live tid under a folder that cannot be read stays a failed read.
+    #[test]
+    fn u6b_an_exited_io_thread_is_left_out_of_the_sibling_read() {
+        let dead = std::thread::spawn(|| thread_tid().expect("its tid"))
+            .join()
+            .expect("the thread");
+        // `join` returns at the kernel's clear of the thread's tid futex, a little before its /proc entry goes
+        // (check run 2 read it there once): wait for the entry to go, at most 5,000 waits of 1 ms (no clock read).
+        let entry = format!("/proc/self/task/{dead}");
+        let mut waits = 0;
+        while std::path::Path::new(&entry).exists() {
+            waits += 1;
+            assert!(waits <= 5_000, "{entry} still there");
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
+        let me = thread_tid().expect("this thread's tid");
+        let got = io_allowed("/proc/self/task", &[dead, me]);
+        assert_eq!(got.len(), 1, "the exited thread is left out: {got:?}");
+        assert!(got[0].as_ref().is_some_and(|l| !l.is_empty()));
+        let smt = vec![vec![0, 4], vec![1, 5]];
+        assert!(sibling_free_read(&smt, 0, &got).is_ok(), "no failed read");
+        let unreadable = std::env::temp_dir().join(format!("npt-u6b-task-{}", std::process::id()));
+        std::fs::create_dir_all(unreadable.join(me.to_string())).expect("a folder");
+        let dir = unreadable.to_str().expect("utf-8");
+        assert_eq!(io_allowed(dir, &[me]), vec![None], "live but unread");
+        std::fs::remove_dir_all(&unreadable).expect("removed");
     }
 }

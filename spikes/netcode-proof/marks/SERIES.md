@@ -824,6 +824,88 @@ and which of these names it can write from TCP_INFO and SIOCOUTQ.
 | `header.params.ws_handshake` | string | npt-net (DelayStream) | that the TCP and TLS handshakes run undelayed below the wrapper and the model starts without an RTT sample (RTO 1 s and fix 1's 100 ms srtt until the first data acknowledgement, where Linux has the handshake's sample; NC-U3c-11) |
 | `header.params.ws_clock_timer_slack_error` | string | npt-net (DelayStream) | the slack write's error, present only when it failed |
 
+## The transports (U6b): new rows only, no mark reads them yet
+
+npt-server writes these from npt-net's WtServer and WsServer (u6b-brief.md Blocks 1-6). The `ws_split` event's pooled
+lateness is the series R1's DelayStream self-test reads (u6b-brief.md condition 3; C-U8-5): L itself, pooled over every
+connection in the process like the split's parts, over the split's window (from its mark, else the process's life).
+
+| Name | Unit | Written by (crate) | Meaning |
+|---|---|---|---|
+| `event.ws_split.ws_late_down_pooled_count` | count | npt-net (DelayStream; npt-server writes it) | server to client: release-lateness samples over the split's window, pooled over every connection |
+| `event.ws_split.ws_late_down_pooled_p50_ns` | ns | npt-net (DelayStream; npt-server writes it) | server to client: the pooled lateness L's median over the window |
+| `event.ws_split.ws_late_down_pooled_p99_ns` | ns | npt-net (DelayStream; npt-server writes it) | server to client: its 99th percentile |
+| `event.ws_split.ws_late_down_pooled_p999_ns` | ns | npt-net (DelayStream; npt-server writes it) | server to client: its 99.9th percentile |
+| `event.ws_split.ws_late_down_pooled_max_ns` | ns | npt-net (DelayStream; npt-server writes it) | server to client: its maximum over the window (restarted at the mark) |
+| `event.ws_split.ws_late_down_pooled_excess_ns` | ns | npt-net (DelayStream; npt-server writes it) | server to client: E[(L − L0 − 0.25 ms)+] over the window, L0 its median (U3-Q1's statistic) |
+| `event.ws_split.ws_late_down_pooled_over_count` | count | npt-net (DelayStream; npt-server writes it) | server to client: samples with L − L0 above 0.25 ms, L0 its median |
+| `event.ws_split.ws_late_down_pooled_zero_excess_ns` | ns | npt-net (DelayStream; npt-server writes it) | server to client: E[(L − 0.25 ms)+] over the window (L0 = 0: the form R1's self-test judges, advisor-u8-brief.md:87-96) |
+| `event.ws_split.ws_late_down_pooled_zero_over_count` | count | npt-net (DelayStream; npt-server writes it) | server to client: samples with L above 0.25 ms |
+| `event.ws_split.ws_late_up_pooled_count` | count | npt-net (DelayStream; npt-server writes it) | client to server: release-lateness samples over the split's window, pooled over every connection |
+| `event.ws_split.ws_late_up_pooled_p50_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server: the pooled lateness L's median over the window |
+| `event.ws_split.ws_late_up_pooled_p99_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server: its 99th percentile |
+| `event.ws_split.ws_late_up_pooled_p999_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server: its 99.9th percentile |
+| `event.ws_split.ws_late_up_pooled_max_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server: its maximum over the window (restarted at the mark) |
+| `event.ws_split.ws_late_up_pooled_excess_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server: E[(L − L0 − 0.25 ms)+] over the window, L0 its median |
+| `event.ws_split.ws_late_up_pooled_over_count` | count | npt-net (DelayStream; npt-server writes it) | client to server: samples with L − L0 above 0.25 ms, L0 its median |
+| `event.ws_split.ws_late_up_pooled_zero_excess_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server: E[(L − 0.25 ms)+] over the window (L0 = 0) |
+| `event.ws_split.ws_late_up_pooled_zero_over_count` | count | npt-net (DelayStream; npt-server writes it) | client to server: samples with L above 0.25 ms |
+| `event.ws_split.ws_late_up_woken_read_count` | count | npt-net (DelayStream; npt-server writes it) | client to server, the reader stamp R (RC-12: the pump's stamp at its pass's closing wake, which wakes the reader): woken-class releases with a reader part over the window; their clock + hop + pass + reader parts sum to L exactly |
+| `event.ws_split.ws_late_up_other_read_count` | count | npt-net (DelayStream; npt-server writes it) | client to server: other-class releases with a reader part; their wait + pass + reader parts sum to L exactly |
+| `event.ws_split.ws_late_up_early_count` | count | npt-net (DelayStream; npt-server writes it) | client to server: releases whose reader returned before any R (an application step released them, or the reader took them during the pump's pass): their own class, no reader part |
+| `event.ws_split.ws_late_up_pass_p50_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's pass part, R − P: from the pass's opening stamp to its closing wake: its median (x0 over the window) |
+| `event.ws_split.ws_late_up_pass_p99_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's pass part, R − P: its 99th percentile |
+| `event.ws_split.ws_late_up_pass_p999_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's pass part, R − P: its 99.9th percentile |
+| `event.ws_split.ws_late_up_pass_max_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's pass part, R − P: its maximum |
+| `event.ws_split.ws_late_up_pass_excess_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's pass part, R − P: E[(x − x0 − 0.25 ms)+] over the window, x0 its median |
+| `event.ws_split.ws_late_up_pass_over_count` | count | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's pass part, R − P: samples with x − x0 above 0.25 ms |
+| `event.ws_split.ws_late_up_reader_p50_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's reader part, (3) − R: from the closing wake to the poll_read that hands the record's last byte to tungstenite (the reader task's wake and turn): its median (x0 over the window) |
+| `event.ws_split.ws_late_up_reader_p99_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's reader part, (3) − R: its 99th percentile |
+| `event.ws_split.ws_late_up_reader_p999_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's reader part, (3) − R: its 99.9th percentile |
+| `event.ws_split.ws_late_up_reader_max_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's reader part, (3) − R: its maximum |
+| `event.ws_split.ws_late_up_reader_excess_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's reader part, (3) − R: E[(x − x0 − 0.25 ms)+] over the window, x0 its median |
+| `event.ws_split.ws_late_up_reader_over_count` | count | npt-net (DelayStream; npt-server writes it) | client to server, the woken class's reader part, (3) − R: samples with x − x0 above 0.25 ms |
+| `event.ws_split.ws_late_up_other_pass_p50_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's pass part, R − T: from the releasing step to the closing wake: its median (x0 over the window) |
+| `event.ws_split.ws_late_up_other_pass_p99_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's pass part, R − T: its 99th percentile |
+| `event.ws_split.ws_late_up_other_pass_p999_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's pass part, R − T: its 99.9th percentile |
+| `event.ws_split.ws_late_up_other_pass_max_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's pass part, R − T: its maximum |
+| `event.ws_split.ws_late_up_other_pass_excess_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's pass part, R − T: E[(x − x0 − 0.25 ms)+] over the window, x0 its median |
+| `event.ws_split.ws_late_up_other_pass_over_count` | count | npt-net (DelayStream; npt-server writes it) | client to server, the other class's pass part, R − T: samples with x − x0 above 0.25 ms |
+| `event.ws_split.ws_late_up_other_reader_p50_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's reader part, (3) − R: its median (x0 over the window) |
+| `event.ws_split.ws_late_up_other_reader_p99_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's reader part, (3) − R: its 99th percentile |
+| `event.ws_split.ws_late_up_other_reader_p999_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's reader part, (3) − R: its 99.9th percentile |
+| `event.ws_split.ws_late_up_other_reader_max_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's reader part, (3) − R: its maximum |
+| `event.ws_split.ws_late_up_other_reader_excess_ns` | ns | npt-net (DelayStream; npt-server writes it) | client to server, the other class's reader part, (3) − R: E[(x − x0 − 0.25 ms)+] over the window, x0 its median |
+| `event.ws_split.ws_late_up_other_reader_over_count` | count | npt-net (DelayStream; npt-server writes it) | client to server, the other class's reader part, (3) − R: samples with x − x0 above 0.25 ms |
+| `event.ws_split.ws_split_mark_set` | flag | npt-net (DelayStream; npt-server writes it) | 1 when the window's mark was taken (the settings' `ws_split_mark_s` after OPEN, on the I/O runtime); 0: the window is the process's life |
+| `event.ws_split.ws_split_mark_ns` | ns | npt-net (DelayStream; npt-server writes it) | the mark's stamp on DelayStream's clock (0 when none) |
+| `event.ws_split.ws_split_mark_room_ns` | ns | npt-server | the same mark on the room's clock (the tick rows' clock; NR-U6B-6), read just before it was taken (0 when none) |
+| `event.open.wt_serving_ns` | ns | npt-server | the room clock when the WebTransport listener's accept loop started (T-7: at most `open_ns`) |
+| `event.open.ws_serving_ns` | ns | npt-server | the room clock when the WebSocket listener's accept loop started (T-7: at most `open_ns`) |
+| `event.open.open_ns` | ns | npt-server | the room clock just before the `OPEN` line on stdout |
+| `event.wt_accept.accepted_count` | count | npt-server (npt-net's WtServer) | WebTransport sessions handed to the room over the run |
+| `event.wt_accept.handshake_failed_count` | count | npt-server (npt-net's WtServer) | handshakes failed before the deadline: QUIC, HTTP/3 or the answer, one count |
+| `event.wt_accept.cap_refused_count` | count | npt-server (npt-net's WtServer) | first packets refused with no permit of the connection cap (N + 8) free |
+| `event.wt_accept.deadline_closed_count` | count | npt-server (npt-net's WtServer) | connections closed at the 2 s deadline from their first packet before a session reached the room |
+| `event.wt_accept.malformed_closed_count` | count | npt-server (npt-net's WtServer) | sessions closed as malformed by the framing (a control length above 512 B) |
+| `event.wt_accept.datagrams_dropped_count` | count | npt-server (npt-net's WtServer) | client datagrams a full session inbox dropped |
+| `event.wt_accept.close_failed_count` | count | npt-server (npt-net's WtServer) | closes that failed while the peer had not closed (0 on WebTransport: its close never reports) |
+| `event.ws_accept.accepted_count` | count | npt-server (npt-net's WsServer) | WebSocket sessions handed to the room over the run |
+| `event.ws_accept.handshake_failed_count` | count | npt-server (npt-net's WsServer) | handshakes failed before the deadline: TLS or the upgrade, one count |
+| `event.ws_accept.cap_refused_count` | count | npt-server (npt-net's WsServer) | TCP connections dropped at accept with no permit of the connection cap free |
+| `event.ws_accept.deadline_closed_count` | count | npt-server (npt-net's WsServer) | connections closed at the 2 s deadline from their TCP accept before a session reached the room |
+| `event.ws_accept.malformed_closed_count` | count | npt-server (npt-net's WsServer) | sessions closed as malformed (an unknown channel tag, a text message) |
+| `event.ws_accept.datagrams_dropped_count` | count | npt-server (npt-net's WsServer) | client datagrams a full session inbox dropped |
+| `event.ws_accept.close_failed_count` | count | npt-server (npt-net's WsServer) | closes (Close frame, shutdown) that failed while the peer had not closed (C1c: after the peer's close, a normal end) |
+| `event.ws_accept.summaries_dropped_count` | count | npt-server (npt-net's WsServer) | connections' `ws_summary` events not kept (1,024 waiting already) |
+| `event.ws_accept.outside_tick_sent_count` | count | npt-server (npt-net's WsServer) | datagrams written outside an announced tick (the room's Pings and Pongs, R-PING): at most 32 B, nothing owed below the link's own queue, room in the socket |
+| `event.ws_accept.outside_tick_refused_count` | count | npt-server (npt-net's WsServer) | datagrams outside an announced tick answered `BufferFull`: above 32 B, or bytes owed below the link's own queue, or no room in the socket |
+| `header.params.transport` | string | npt-server | what the run's clients use: `wt`, `ws` or `both` (both listeners always bind) |
+| `header.params.wt_crate` | string | npt-server | the WebTransport crate and its version (replan-units.md:84: every header names the crate) |
+| `header.params.conn_cap_count` | count | npt-server | the connection cap: the settings' clients + 8 permits, shared by both listeners (F7) |
+| `header.params.ws_split_pool_rule` | string | npt-server | the split's pool rule: one measured run per server process, the pool never reset (RC-10) |
+| `header.params.ws_split_mark_after_open_ns` | ns | npt-server | the split's window mark's time after OPEN as the settings give it; absent: no mark |
+
 ## Open naming questions
 
 - Q3: no length or angle unit (`_um`, `_microdeg` proposed).

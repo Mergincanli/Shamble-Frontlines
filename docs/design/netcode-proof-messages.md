@@ -70,8 +70,9 @@
   would be above 512 B (the largest client message, `SessionControl`), and again, after the type, if it would be above
   that type's limit.
 - **Full-state stream:** a 4 B length, then one `FullState`.
-- **WebSocket:** one connection carries all three channels, so each binary message starts with a 1 B channel tag,
-  followed by the same bytes as above. The server's WebSocket frame and message limits are 513 B (`SessionControl`'s
+- **WebSocket:** one connection carries all three channels, so each binary message starts with a 1 B channel tag
+  (0 `datagram`, 1 `control stream`, 2 `full-state stream`: npt-link's `Channel::ws_tag`; any other tag closes the
+  session as malformed), followed by the same bytes as above. The server's WebSocket frame and message limits are 513 B (`SessionControl`'s
   512 B plus the tag: ADR 0001:452-453 asks for explicit limits). Its write buffer must hold the largest room message,
   a `FullState` of 65,536 + 5 B, so proposed 128 KB; plan E15's delaying wrapper still returns Pending above 64 KB.
 - **Over a limit or malformed:** a datagram is dropped and counted; a stream message closes the session (with

@@ -416,8 +416,8 @@ fn quantiles(v: &mut [u64]) -> String {
 
 pub(crate) type TlsServer = tokio_rustls::server::TlsStream<tokio::net::TcpStream>;
 pub(crate) type TlsClient = tokio_rustls::client::TlsStream<tokio::net::TcpStream>;
-type ServerWs = WebSocketStream<DelayStream<TlsServer>>;
-type ClientWs = WebSocketStream<TlsClient>;
+pub(crate) type ServerWs = WebSocketStream<DelayStream<TlsServer>>;
+pub(crate) type ClientWs = WebSocketStream<TlsClient>;
 
 /// A message's receipt: the stamps on DelayStream's clock at the start and at the end of the poll that yielded it.
 #[derive(Debug, Clone, Copy)]
@@ -2679,6 +2679,9 @@ async fn its_rows_use_the_named_series() {
     // The split's rows are the run's (the `ws_split` event), not a connection's.
     let mut split = Vec::new();
     names::split_rows([Split::default(); 2], &mut split);
+    names::pooled_rows([(Summary::default(), Summary::default()); 2], &mut split);
+    names::reader_rows([Summary::default(); 4], 0, &mut split);
+    split.extend([(names::MARK_SET, 0), (names::MARK_NS, 0)]);
     assert_eq!(names_of(&DelayStream::split_rows()), names_of(&split));
     assert_eq!(value(&summary, names::CONNS_BEFORE), 7);
     assert_eq!(value(&summary, names::ACCEPTED), 42);
@@ -3089,6 +3092,100 @@ async fn the_lateness_split_sums_to_the_total_per_release_and_its_bites_break_it
     }
     let after = pool().read();
     pool_grew(&before, &after, &all).unwrap_or_else(|e| panic!("the pool: {e}"));
+}
+
+/// The up releases' reader split (RC-12) checked on a connection's log: each stamped R is the first of the pump's
+/// closing stamps at or after its release (T-5), P (or T) <= R <= (3), and its parts sum to L (woken: clock + hop +
+/// pass + reader; other: wait + pass + reader). Returns (woken with R, other with R, early: no R).
+pub(crate) fn reader_split(s: &Snapshot) -> Result<[u64; 3], String> {
+    let mut n = [0u64; 3];
+    for l in s.logs.splits.iter().filter(|l| l.dir == UP) {
+        let Some(r) = l.reader else {
+            n[2] += 1;
+            continue;
+        };
+        // T-5: R is the first closing wake at or after its release (the identity alone is only a range check for R).
+        let wakes = &s.logs.reader_wakes;
+        let first = wakes.get(wakes.partition_point(|&w| w < l.step));
+        if first != Some(&r) {
+            return Err(format!(
+                "R {r} is not the first closing wake after {}",
+                l.step
+            ));
+        }
+        if !(l.step <= r && r <= l.at) {
+            return Err(format!("R {r} outside {}..{}", l.step, l.at));
+        }
+        let hop = if l.woke.is_some() { l.parts[1] } else { 0 };
+        if l.parts[0] + hop + (r - l.step) + (l.at - r) != l.total {
+            return Err(format!(
+                "the reader split's parts sum otherwise than {}",
+                l.total
+            ));
+        }
+        n[usize::from(l.woke.is_none())] += 1;
+    }
+    Ok(n)
+}
+
+/// RC-12 (the advisor's UP-STAMP ruling): on a short real loopback session (`split_session`, 60 ticks), every up record a
+/// pump step released carries R from a pass's closing wake, between its release and its hand-over, and its four parts
+/// (woken: clock, hop, pass, reader) or three (other: wait, pass, reader) sum to its L exactly; a release with no R is
+/// the early class; none is a violation. The misattribution bite (R stamped at the release, as b5c9009's did) fails the
+/// check.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn u6b_the_reader_stamp_splits_up_work_at_the_closing_wake_and_its_bite_breaks_it() {
+    let (good, bitten) = tokio::join!(
+        split_session(SplitBite::Off, 60),
+        split_session(SplitBite::ReaderAtRelease, 60)
+    );
+    let n = reader_split(&good).unwrap_or_else(|e| panic!("the reader split: {e}"));
+    println!(
+        "reader split: woken with R {}, other with R {}, early {}",
+        n[0], n[1], n[2]
+    );
+    assert!(n[0] > 0, "woken up releases with a reader part");
+    assert_eq!(good.split_violations[UP], 0);
+    let e = reader_split(&bitten).expect_err("R at the release is no closing wake");
+    println!("the reader bite caught: {e}");
+}
+
+/// T-6 (condition 3's "the identity exact across the mark"; NR-U6B-12): on a local Pool (not the process's), up
+/// releases before and after one mark (7 woken and 3 other at 10x, then 4 and 2): each window's n is the window's own
+/// in the parts, pooled L, the reader's parts and the kinds, L's n is the two classes' together, and each class's parts'
+/// maxima sum to L's (1 + 2 + 3 µs = 6 µs woken, 4 + 5 µs = 9 µs other: each release's parts sum to its L). With no
+/// release during the mark it is exact; under traffic one in flight can land on either side of each histogram's copy.
+#[test]
+fn u6b_a_marked_pool_counts_one_window_for_the_parts_and_pooled_l() {
+    let p = Pool::new();
+    let release = |k: u64, woken: bool| {
+        let us = |v: u64| v * k * 1_000;
+        if woken {
+            p.parts[UP][CLOCK].record(us(1));
+            p.parts[UP][HOP].record(us(2));
+            p.parts[UP][WORK].record(us(3));
+            p.reader[PASS].record(us(1));
+            p.reader[READER].record(us(2));
+            p.late[UP].record(us(6));
+        } else {
+            p.parts[UP][WAIT].record(us(4));
+            p.parts[UP][OTHER_WORK].record(us(5));
+            p.kinds[UP][MID].fetch_add(1, Ordering::Relaxed);
+            p.late[UP].record(us(9));
+        }
+    };
+    (0..10).for_each(|i| release(10, i < 7));
+    assert!(p.mark(5) && !p.mark(6), "one mark");
+    (0..6).for_each(|i| release(1, i < 4));
+    let (s, l, (r, _)) = (p.read()[UP], p.read_late()[UP], p.read_reader());
+    let (n, max) = (|x: Summary| x.n, |x: Summary| x.max);
+    assert_eq!([CLOCK, HOP, WORK].map(|i| n(s.parts[i])), [4; 3]);
+    assert_eq!([WAIT, OTHER_WORK].map(|i| n(s.parts[i])), [2; 2]);
+    assert_eq!((n(r[PASS]), n(r[READER]), s.kinds[MID]), (4, 4, 2));
+    assert_eq!((n(l.0), n(l.1)), (6, 6), "L: both classes, both E forms");
+    let woken: u64 = [CLOCK, HOP, WORK].map(|i| max(s.parts[i])).iter().sum();
+    let other = max(s.parts[WAIT]) + max(s.parts[OTHER_WORK]);
+    assert_eq!((woken, other, max(l.0)), (6_000, 9_000, 9_000));
 }
 
 /// Condition 10's evidence run (the main session's, quiet, nothing else alongside): the same run with at least 10,000

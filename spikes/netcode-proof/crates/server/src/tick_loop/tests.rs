@@ -1198,6 +1198,7 @@ fn s5_everyone_in_view_is_1_then_0_with_one_soldier_moved_past_the_radius() {
             everyone: 0b01,
             ..SceneRow::default()
         },
+        ws_skipped: 0,
     };
     assert_eq!(
         tick_record(&row, 3).s["everyone_in_view"],
@@ -1345,4 +1346,308 @@ fn s1_smoke_two_clients_for_two_seconds_on_the_real_clock() {
             "client {i} decoded the room's state"
         );
     }
+}
+
+/// A Loopback end that gates whole ticks as WsLink does (U6b's test stand-in): it records each `begin_tick`'s lengths,
+/// refuses a tick while `refuse` is set (each of its datagrams then `BufferFull`), and records any datagram sent outside
+/// an announced tick.
+struct Gated {
+    inner: Loopback,
+    refuse: Arc<AtomicBool>,
+    announced: usize,
+    allowed: bool,
+    ticks: Arc<Mutex<Vec<Vec<usize>>>>,
+    outside: Arc<Mutex<Vec<Vec<u8>>>>,
+}
+
+impl Link for Gated {
+    fn begin_tick(&mut self, lens: &[usize], _now_ns: u64) -> SendResult {
+        self.ticks
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .push(lens.to_vec());
+        self.announced = lens.len();
+        self.allowed = !self.refuse.load(Ordering::Relaxed);
+        if self.allowed {
+            SendResult::Sent
+        } else {
+            SendResult::BufferFull
+        }
+    }
+    fn send_unreliable(&mut self, bytes: &[u8], now_ns: u64) -> SendResult {
+        if self.announced == 0 {
+            self.outside
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner)
+                .push(bytes.to_vec());
+            return self.inner.send_unreliable(bytes, now_ns);
+        }
+        self.announced -= 1;
+        if self.allowed {
+            self.inner.send_unreliable(bytes, now_ns)
+        } else {
+            SendResult::BufferFull
+        }
+    }
+    fn send_reliable(&mut self, channel: Channel, bytes: &[u8], now_ns: u64) -> SendResult {
+        self.inner.send_reliable(channel, bytes, now_ns)
+    }
+    fn poll_recv(&mut self, now_ns: u64) -> Option<Recv> {
+        self.inner.poll_recv(now_ns)
+    }
+    fn state(&self) -> LinkState {
+        self.inner.state()
+    }
+    fn rtt_ns(&self) -> Option<u64> {
+        self.inner.rtt_ns()
+    }
+    fn max_datagram_size(&self) -> usize {
+        self.inner.max_datagram_size()
+    }
+    fn unsent_unreliable(&self) -> usize {
+        0
+    }
+}
+
+/// W18 (condition 1): the I/O side announces each tick's datagrams once, whole, before sending them (every snapshot
+/// datagram the client gets was announced; only the decoder's own pings and pongs go outside a tick), and a tick the
+/// link refuses is counted in the next tick row's `ws_skipped_snaps_count`, one per refused tick.
+#[test]
+fn u6b_each_tick_is_announced_whole_and_a_refused_one_is_counted() {
+    let mut b = bench(Scene::stress(), 2);
+    let (server, mut link) = Loopback::pair(1_200);
+    let refuse = Arc::new(AtomicBool::new(false));
+    let ticks = Arc::new(Mutex::new(Vec::new()));
+    let outside = Arc::new(Mutex::new(Vec::new()));
+    let gated = Gated {
+        inner: server,
+        refuse: Arc::clone(&refuse),
+        announced: 0,
+        allowed: true,
+        ticks: Arc::clone(&ticks),
+        outside: Arc::clone(&outside),
+    };
+    let mut io = b.session(0, Box::new(gated), 0);
+    let mut e = ClientEndpoint::new(join(0), npt_sim::TICK_HZ);
+    let mut datagrams = 0usize;
+    let mut skipped_rows = 0i64;
+    let mut refused = 0usize;
+    for k in 0..40u64 {
+        refuse.store((20..30).contains(&k), Ordering::Relaxed);
+        let now = due(k);
+        let mut got = Vec::new();
+        while let Some(r) = link.poll_recv(now + 3) {
+            datagrams += usize::from(r.channel == Channel::Datagram);
+            got.push((r.channel, r.bytes, r.arrival_ns));
+        }
+        e.input(None, &got, now);
+        let out = e.step();
+        for d in &out.datagrams {
+            link.send_unreliable(d, now);
+        }
+        for (ch, bytes) in &out.reliable {
+            link.send_reliable(*ch, bytes, now);
+        }
+        let before = ticks.lock().unwrap_or_else(PoisonError::into_inner).len();
+        assert!(io.poll(now + 1));
+        b.wake(now + 2);
+        assert!(io.poll(now + 3));
+        let after = ticks.lock().unwrap_or_else(PoisonError::into_inner).len();
+        if refuse.load(Ordering::Relaxed) {
+            refused += after - before;
+        }
+        skipped_rows += b
+            .ticks()
+            .iter()
+            .map(|r| tick_record(r, 2).v["ws_skipped_snaps_count"])
+            .sum::<i64>();
+    }
+    let ticks = ticks.lock().unwrap_or_else(PoisonError::into_inner).clone();
+    let outside = outside
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner)
+        .clone();
+    let announced: usize = ticks.iter().map(Vec::len).sum();
+    println!(
+        "{} ticks announced ({announced} datagrams), {} outside a tick, {datagrams} datagrams received, \
+         {skipped_rows} skipped in the rows",
+        ticks.len(),
+        outside.len()
+    );
+    assert!(ticks.len() > 20, "snapshots flowed: {}", ticks.len());
+    assert!(
+        ticks.iter().all(|t| !t.is_empty()),
+        "no empty tick announced"
+    );
+    for d in &outside {
+        let m = decode(Direction::RoomToClient, Channel::Datagram, d).expect("decodes");
+        assert!(
+            matches!(m, Message::Ping(_) | Message::Pong(_)),
+            "only the decoder's pings and pongs go outside a tick: {}",
+            m.name()
+        );
+    }
+    assert!(refused >= 5, "ticks refused: {refused}");
+    assert_eq!(
+        skipped_rows, refused as i64,
+        "one per refused tick, in the rows"
+    );
+}
+
+/// Block 6 (C-U6-17's form on L2): two npt-client endpoints, one over WtClient and one over WsClient, against
+/// WtServer and WsServer at P2 (ImpairSocket and DelayStream), the room's core driven on the real clock: both join with
+/// their tokens and get snapshots, and the room refuses none of their commands as kind 10. U6b's tests hold no throwing
+/// or rejoining hostile client and no client restarted mid-run.
+#[test]
+fn u6b_clients_over_both_transports_join_at_p2_with_no_kind_10_refusal() {
+    use npt_net::{ConnCap, L2Config, Listen, WsClient, WsServer, WtClient, WtServer};
+    use sha2::Digest as _;
+    let rt = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(2)
+        .enable_all()
+        .build()
+        .expect("a runtime");
+    let _g = rt.enter();
+    let key = rcgen::KeyPair::generate().expect("a key");
+    let cert = rcgen::CertificateParams::new(vec!["localhost".to_owned()])
+        .expect("params")
+        .self_signed(&key)
+        .expect("a certificate");
+    let (der, pkcs8) = (cert.der().to_vec(), key.serialize_der());
+    let hash: [u8; 32] = sha2::Sha256::digest(&der).into();
+    let cap = ConnCap::new(2);
+    let listen = || Listen {
+        addr: std::net::SocketAddr::from(([127, 0, 0, 1], 0)),
+        clock: clock::now_ns,
+        deadline_ns: 2_000 * MS,
+        cap: Arc::clone(&cap),
+        tick_ns: 1_000_000_000u64.div_ceil(u64::from(npt_sim::TICK_HZ)),
+        outside_max: npt_proto::Limits::PING.max(npt_proto::Limits::PONG),
+    };
+    let l2 = L2Config::named(11, "P2").expect("P2");
+    let chain = [der];
+    let wt = WtServer::bind(listen(), &l2, &chain, &pkcs8, "cubic").expect("bound");
+    let ws = WsServer::bind(listen(), &l2, &chain, &pkcs8).expect("bound");
+    wt.start().expect("started");
+    ws.start().expect("started");
+    let wt_link = WtClient::connect(wt.local_addr().expect("its address"), hash, clock::now_ns);
+    let ws_link = WsClient::connect(ws.local_addr(), "localhost", hash, clock::now_ns);
+    let mut clients: Vec<(Box<dyn Link>, ClientEndpoint)> = vec![
+        (
+            Box::new(wt_link.expect("a client")),
+            ClientEndpoint::new(join(0), npt_sim::TICK_HZ),
+        ),
+        (
+            Box::new(ws_link.expect("a client")),
+            ClientEndpoint::new(join(1), npt_sim::TICK_HZ),
+        ),
+    ];
+    // T-8: a handshake dropped at its deadline never hangs the step: each accept is bounded.
+    let (a_wt, a_ws) = rt.block_on(async {
+        let within = Duration::from_secs(5);
+        (
+            tokio::time::timeout(within, wt.accept()).await,
+            tokio::time::timeout(within, ws.accept()).await,
+        )
+    });
+    let a_wt = a_wt.expect("in time").expect("a WebTransport session");
+    let a_ws = a_ws.expect("in time").expect("a WebSocket session");
+    // An endpoint's first step sends its Join once: each client steps only once its link is open (a Connecting link
+    // answers BufferFull), as U6c's glue must.
+    let t0 = clock::now_ns();
+    while clients.iter().any(|c| c.0.state() != LinkState::Open)
+        && clock::now_ns() - t0 < 5_000 * MS
+    {
+        for c in &mut clients {
+            c.0.poll_recv(clock::now_ns());
+        }
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    let open = clients.iter().map(|c| c.0.state()).collect::<Vec<_>>();
+    assert_eq!(open, [LinkState::Open; 2], "both clients open");
+    let mut b = bench(Scene::stress(), 2);
+    let mut ios = [
+        b.session_with(0, a_wt.link, a_wt.accept_ns, RttSource::Link, OUTBOUND_CAP),
+        b.session_with(1, a_ws.link, a_ws.accept_ns, RttSource::Pings, OUTBOUND_CAP),
+    ];
+    let origin = clock::now_ns();
+    let mut next = 0;
+    while clock::now_ns() - origin < 3_500 * MS {
+        let now = clock::now_ns();
+        for (link, e) in &mut clients {
+            let mut got = Vec::new();
+            while let Some(r) = link.poll_recv(now) {
+                got.push((r.channel, r.bytes, r.arrival_ns));
+            }
+            e.input(None, &got, now);
+            let out = e.step();
+            for d in &out.datagrams {
+                link.send_unreliable(d, now);
+            }
+            for (ch, bytes) in &out.reliable {
+                link.send_reliable(*ch, bytes, now);
+            }
+        }
+        for io in &mut ios {
+            assert!(io.poll(clock::now_ns()), "the session stays");
+        }
+        let t = clock::now_ns() - origin;
+        if t >= next {
+            next = b.core.wake(t, &mut || clock::now_ns() - origin);
+        }
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    for (i, (_, e)) in clients.iter().enumerate() {
+        let k = b
+            .core
+            .room
+            .client(i as u8)
+            .expect("joined")
+            .counters()
+            .clone();
+        println!(
+            "client {i}: slot {:?}, newest tick {:?}, {} snapshots, {} commands refused as kind 10",
+            e.slot(),
+            e.newest_tick(),
+            k.snapshots,
+            k.buffer_full
+        );
+        assert_eq!(e.slot(), Some(i as u8), "client {i} joined");
+        assert!(
+            e.newest_tick().is_some() && k.snapshots > 0,
+            "client {i} gets snapshots"
+        );
+        assert_eq!(k.buffer_full, 0, "client {i}: no kind-10 refusal");
+    }
+}
+
+/// NR-U6A-7 and Block 1's stamp: a session handed over by a `Connector` carries its accept stamp into the decoder, so
+/// the Join deadline runs from it: accepted 2.5 s before now, it is closed before any Join; accepted now, it stays
+/// open. `stop` runs on this plain thread.
+#[test]
+fn u6b_a_connector_carries_the_accept_stamp_to_the_join_deadline() {
+    let tl = TickLoop::start(settings(Scene::course(), 2)).expect("starts");
+    let wait = (2_600 * MS).saturating_sub(TickLoop::now_ns());
+    std::thread::sleep(Duration::from_nanos(wait));
+    let c = tl.connector();
+    let (late, late_client) = Loopback::pair(1_200);
+    let (fresh, fresh_client) = Loopback::pair(1_200);
+    let now = TickLoop::now_ns();
+    assert!(c.connect(Box::new(late), RttSource::Link, now - 2_500 * MS));
+    assert!(c.connect(Box::new(fresh), RttSource::Link, now));
+    let t0 = clock::now_ns();
+    while late_client.state() != LinkState::Closed && clock::now_ns() - t0 < 2_000 * MS {
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    assert_eq!(
+        late_client.state(),
+        LinkState::Closed,
+        "past its deadline: closed"
+    );
+    assert_eq!(fresh_client.state(), LinkState::Open, "within it: open");
+    assert_eq!(tl.stop().expect("the log ends"), Ended::Clean);
+    assert!(
+        !c.connect(Box::new(Loopback::pair(8).0), RttSource::Link, 0),
+        "after stop: nothing"
+    );
 }

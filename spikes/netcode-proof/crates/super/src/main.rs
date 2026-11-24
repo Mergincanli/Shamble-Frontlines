@@ -178,7 +178,7 @@ fn binary_sha256() -> io::Result<String> {
 }
 
 /// npt-super's log (made new): process `super`, this machine, this build.
-fn log(f: &Flags) -> io::Result<Writer<io::BufWriter<File>>> {
+fn log(f: &Flags) -> io::Result<Writer<io::LineWriter<File>>> {
     let h = &f.header;
     let header = Header {
         schema: npt_log::SCHEMA,
@@ -215,7 +215,9 @@ fn log(f: &Flags) -> io::Result<Writer<io::BufWriter<File>>> {
         .write(true)
         .create_new(true)
         .open(&f.log)?;
-    Writer::new(io::BufWriter::new(file), &header)
+    // F28 (U8's fix pass): line-flushed, so each record reaches the file as it is written (npt-log's Writer ends each
+    // record with its newline): r1.sh reads `room_start` and `room_exit` while npt-super still runs.
+    Writer::new(io::LineWriter::new(file), &header)
 }
 
 /// One room started: its process, and the time from spawn to its `OPEN` line (or to the deadline).
@@ -298,19 +300,19 @@ fn end(mut s: Started, deadline: Duration) -> bool {
     }
 }
 
-fn started(w: &mut Writer<io::BufWriter<File>>, s: &Started) -> io::Result<()> {
+fn started(w: &mut Writer<io::LineWriter<File>>, s: &Started) -> io::Result<()> {
     w.event(
         &EventRecord::new("room_start", Phase::Measured)
             .with("spawn_to_open_ns", s.spawn_to_open_ns),
     )
 }
 
-fn exited(w: &mut Writer<io::BufWriter<File>>, nonzero: bool) -> io::Result<()> {
+fn exited(w: &mut Writer<io::LineWriter<File>>, nonzero: bool) -> io::Result<()> {
     w.event(&EventRecord::new("room_exit", Phase::Measured).with("nonzero", i64::from(nonzero)))
 }
 
 /// `time-starts`: N starts one at a time, each closed once open (the module text).
-fn time_starts(f: &Flags, w: &mut Writer<io::BufWriter<File>>) -> io::Result<()> {
+fn time_starts(f: &Flags, w: &mut Writer<io::LineWriter<File>>) -> io::Result<()> {
     for n in 1..=f.count {
         let settings = f.settings.replace("{n}", &n.to_string());
         let s = start(&f.room, &settings, f.deadline)?;
@@ -322,7 +324,7 @@ fn time_starts(f: &Flags, w: &mut Writer<io::BufWriter<File>>) -> io::Result<()>
 }
 
 /// `start`, the hold form: one start, held until `stop` says npt-super's end came (or the room ends first).
-fn hold(f: &Flags, w: &mut Writer<io::BufWriter<File>>, stop: &Receiver<()>) -> io::Result<()> {
+fn hold(f: &Flags, w: &mut Writer<io::LineWriter<File>>, stop: &Receiver<()>) -> io::Result<()> {
     let settings = f.settings.replace("{n}", "1");
     let mut s = start(&f.room, &settings, f.deadline)?;
     started(w, &s)?;
@@ -589,6 +591,45 @@ mod tests {
             max >= 2_000_000_000,
             "PM-0001-16's check 'every start, process spawn to Open, under 2 s' fails on npt-super's log: max {max} ns"
         );
+        std::fs::remove_dir_all(&dir).expect("removed");
+    }
+
+    /// F28: npt-super's log reaches its file record by record: while the hold form still holds its room (npt-super
+    /// running), `room_start` is read back from the file with no footer yet; `room_exit` follows once the room ends.
+    #[test]
+    fn u6b_each_record_reaches_the_file_while_npt_super_runs() {
+        let _one = one_fake();
+        let dir = folder("flush");
+        let room = fake(&dir, "echo OPEN\ncat > /dev/null");
+        let f = flags(&dir, room, 1, 5_000, &[]);
+        let (tx, rx) = channel();
+        let held = std::thread::spawn(move || {
+            let mut w = log(&f).expect("the log");
+            hold(&f, &mut w, &rx).expect("the held start");
+            w
+        });
+        let read = || {
+            let text = std::fs::read_to_string(dir.join("super.jsonl")).unwrap_or_default();
+            npt_log::read_log(text.as_bytes()).ok()
+        };
+        let t0 = Instant::now();
+        let mut live = None;
+        while t0.elapsed() < Duration::from_secs(5) {
+            if let Some(l) = read().filter(|l| !l.events.is_empty()) {
+                live = Some(l);
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        let live = live.expect("room_start on disk while npt-super runs");
+        assert_eq!(live.events[0].ev, "room_start");
+        assert!(live.footer.is_none(), "npt-super has not ended");
+        tx.send(()).expect("the end");
+        let w = held.join().expect("the holder");
+        let after = read().expect("reads");
+        assert_eq!(after.events.len(), 2, "room_exit on disk before the footer");
+        assert!(after.footer.is_none());
+        w.finish(Ended::Clean).expect("the footer");
         std::fs::remove_dir_all(&dir).expect("removed");
     }
 

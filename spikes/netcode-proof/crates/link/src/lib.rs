@@ -31,6 +31,28 @@ pub enum Channel {
     FullState,
 }
 
+impl Channel {
+    /// The channel's 1 B tag before each binary message on the WebSocket fallback (catalogue :73-76): `Datagram` 0,
+    /// `Control` 1, `FullState` 2. One home for the server, the native clients and U7's page (advisor-u7-brief.md C2).
+    pub fn ws_tag(self) -> u8 {
+        match self {
+            Channel::Datagram => 0,
+            Channel::Control => 1,
+            Channel::FullState => 2,
+        }
+    }
+
+    /// The channel a WebSocket message's tag names; `None` for any other tag (the session closes as malformed).
+    pub fn from_ws_tag(tag: u8) -> Option<Channel> {
+        match tag {
+            0 => Some(Channel::Datagram),
+            1 => Some(Channel::Control),
+            2 => Some(Channel::FullState),
+            _ => None,
+        }
+    }
+}
+
 /// What one send did. The caller counts each result: rate adaptation reads them, and so do PM-0001-14's and -24's
 /// counters.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -89,6 +111,23 @@ pub trait Link {
 
     /// Datagrams handed to the backend and not yet on the wire.
     fn unsent_unreliable(&self) -> usize;
+
+    /// The start of one tick's datagrams (W18; u6b-brief.md Q-U6B-1 (a)): `lens` holds each datagram's length, in the
+    /// order they follow through [`Link::send_unreliable`].
+    ///
+    /// **The caller's duty:** call it once per tick, before that tick's datagram sends, and then send exactly those
+    /// datagrams, in that order, with no other datagram between them (an empty `lens` announces nothing). A backend
+    /// that gates a tick's whole snapshot (the WebSocket fallback's fix 1) answers `BufferFull` for a tick it skips,
+    /// and then answers each of that tick's datagrams `BufferFull` too; every other backend keeps this default, `Sent`,
+    /// and changes nothing. Reliable sends are never gated by it.
+    ///
+    /// **Outside a tick** (none announced, or past its count: the room's own Pings and Pongs, R-PING), that backend
+    /// never holds a datagram to the snapshot budget and never writes one ungated: only one at most the largest Ping or
+    /// Pong, with nothing owed below its own send queue and room in the socket; else `BufferFull`, both counted.
+    fn begin_tick(&mut self, lens: &[usize], now_ns: u64) -> SendResult {
+        let _ = (lens, now_ns);
+        SendResult::Sent
+    }
 }
 
 /// The server side of a transport: yields each new session with its peer's address, which the per-address limits key
@@ -119,6 +158,9 @@ impl<L: Link + ?Sized> Link for Box<L> {
     }
     fn unsent_unreliable(&self) -> usize {
         (**self).unsent_unreliable()
+    }
+    fn begin_tick(&mut self, lens: &[usize], now_ns: u64) -> SendResult {
+        (**self).begin_tick(lens, now_ns)
     }
 }
 
@@ -392,6 +434,32 @@ mod tests {
             LinkState::Closed,
             "the moved end was dropped with its thread"
         );
+    }
+
+    /// Added item 1 (advisor-u7-brief.md C2): each channel's WebSocket tag reads back as that channel, the three tags
+    /// are 0, 1 and 2 (the catalogue's line), and every other tag names none.
+    #[test]
+    fn u6b_ws_tags_round_trip_and_an_unknown_tag_names_no_channel() {
+        let all = [Channel::Datagram, Channel::Control, Channel::FullState];
+        assert_eq!(all.map(Channel::ws_tag), [0, 1, 2]);
+        for c in all {
+            assert_eq!(Channel::from_ws_tag(c.ws_tag()), Some(c));
+        }
+        for tag in 3..=u8::MAX {
+            assert_eq!(Channel::from_ws_tag(tag), None, "tag {tag}");
+        }
+    }
+
+    /// W18's default: a backend that does not gate (Loopback here) answers `begin_tick` `Sent` and sends the tick's
+    /// datagrams as before, boxed or not.
+    #[test]
+    fn u6b_begin_tick_defaults_to_sent_and_changes_nothing() {
+        let (a, mut b) = Loopback::pair(64);
+        let mut a: Box<dyn Link + Send> = Box::new(a);
+        assert_eq!(a.begin_tick(&[2, 3], 5), SendResult::Sent);
+        assert_eq!(a.send_unreliable(b"d1", 5), SendResult::Sent);
+        assert_eq!(a.send_unreliable(b"d22", 5), SendResult::Sent);
+        assert_eq!(drain(&mut b, 5).len(), 2);
     }
 
     /// T6's `Send` asserts as a test: a Loopback end, a boxed `Send` link and a generic `Send` function all take a

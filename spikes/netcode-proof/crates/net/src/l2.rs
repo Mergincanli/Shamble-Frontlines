@@ -15,7 +15,8 @@
 //! - `tls_test` (tests only): the test certificate and the pinning client both TLS paths' loopback tests use.
 
 mod config;
-mod delay;
+// pub(crate) for U6b's WsLink tests (its loopback pair) and the reading handle; its public items stay plan §4.7's.
+pub(crate) mod delay;
 mod delay_clock;
 mod delay_names;
 mod impair;
@@ -27,7 +28,7 @@ mod thread;
 #[cfg(test)]
 pub(crate) mod tls_test;
 mod ws_frame;
-// WtServer joins at U6; until then only the loopback tests use these.
+// WtServer (crate::wt_server, U6b) uses `endpoint` and `wtq_server`; the accept loops are the loopback tests'.
 #[cfg(any(feature = "wt-wtransport", feature = "wt-wtq"))]
 #[cfg_attr(not(test), allow(dead_code))]
 pub(crate) mod wt;

@@ -96,19 +96,28 @@ impl Lateness {
     }
 
     pub(crate) fn summary(&self) -> Summary {
-        summarize(self.n, self.max, || self.buckets())
+        summarize(self.n, self.max, || self.buckets(), Base::Median)
     }
+}
+
+/// Where E's threshold sits (u6b-brief.md condition 3): `Median`, c = p50 + 0.25 ms (U3-Q1's statistic, L0 the
+/// window's median); `Zero`, c = 0.25 ms (L0 = 0, the form R1's DelayStream self-test judges: advisor-u8-brief.md:87-96).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Base {
+    Median,
+    Zero,
 }
 
 /// A window's summary from its sample count, its maximum and its non-empty buckets in ascending order (`buckets`
 /// gives a fresh pass on each call): the nearest-rank quantiles, each the mean of its bucket's samples (exact within
-/// 1 µs below 8.192 ms), and E[(L − c)+] with c = p50 + 0.25 ms, with the count above c (the threshold's own bucket
-/// taken at its samples' mean). One routine for every window, so a window kept as a difference (`Running`) and a
-/// whole histogram give the same answer for the same samples.
+/// 1 µs below 8.192 ms), and E[(L − c)+] with c = L0 + 0.25 ms (L0 by `base`: the p50, or 0), with the count above c
+/// (the threshold's own bucket taken at its samples' mean). One routine for every window, so a window kept as a
+/// difference (`Running`) and a whole histogram give the same answer for the same samples.
 fn summarize<I: Iterator<Item = (usize, u64, u64)>>(
     n: u64,
     max: u64,
     buckets: impl Fn() -> I,
+    base: Base,
 ) -> Summary {
     if n == 0 {
         return Summary::default();
@@ -127,7 +136,10 @@ fn summarize<I: Iterator<Item = (usize, u64, u64)>>(
         max
     };
     let p50 = quantile(1, 2);
-    let c = p50 + ALLOWANCE_NS;
+    let c = match base {
+        Base::Median => p50,
+        Base::Zero => 0,
+    } + ALLOWANCE_NS;
     let first = bucket_of(c);
     let (mut total, mut over) = (0u128, 0u64);
     for (b, k, s) in buckets() {
@@ -253,16 +265,24 @@ impl Running {
             (k > 0).then(|| (b, k, all.sum[b].saturating_sub(s)))
         };
         match (&self.dense, self.dense_on) {
-            (Some(d), true) => summarize(self.win_n, self.win_max, || {
-                (0..BUCKETS).filter_map(move |b| diff(b, d.count[b], d.sum[b]))
-            }),
+            (Some(d), true) => summarize(
+                self.win_n,
+                self.win_max,
+                || (0..BUCKETS).filter_map(move |b| diff(b, d.count[b], d.sum[b])),
+                Base::Median,
+            ),
             _ => {
                 let sparse = &self.sparse;
-                summarize(self.win_n, self.win_max, || {
-                    sparse
-                        .iter()
-                        .filter_map(move |&(b, c, s)| diff(usize::from(b), c, s))
-                })
+                summarize(
+                    self.win_n,
+                    self.win_max,
+                    || {
+                        sparse
+                            .iter()
+                            .filter_map(move |&(b, c, s)| diff(usize::from(b), c, s))
+                    },
+                    Base::Median,
+                )
             }
         }
     }
@@ -305,7 +325,13 @@ pub(crate) struct Pooled {
     count: Box<[AtomicU64]>,
     sum: Box<[AtomicU64]>,
     max: AtomicU64,
+    /// The window's mark (u6b-brief.md condition 3): every bucket's (count, sum) when it was taken; the summary is the
+    /// difference from it. Taken once, by the reader's side, never on the release path.
+    mark: std::sync::Mutex<Mark>,
 }
+
+/// A pooled histogram's mark: every bucket's (count, sum), once taken.
+type Mark = Option<Box<[(u64, u64)]>>;
 
 impl Pooled {
     pub(crate) fn new() -> Pooled {
@@ -314,7 +340,41 @@ impl Pooled {
             count: zeros(),
             sum: zeros(),
             max: AtomicU64::new(0),
+            mark: std::sync::Mutex::new(None),
         }
+    }
+
+    /// Marks the window's start: a copy of every bucket's count and sum (allocated here, off the release path), and
+    /// the maximum restarts, so the summary is the window's own from now on.
+    pub(crate) fn mark(&self) {
+        let m: Box<[(u64, u64)]> = (0..BUCKETS)
+            .map(|b| (self.count[b].load(Relaxed), self.sum[b].load(Relaxed)))
+            .collect();
+        *self
+            .mark
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(m);
+        self.max.store(0, Relaxed);
+    }
+
+    /// The summary over the window (since the mark, or every sample when none was taken), E by `base`.
+    pub(crate) fn summary_at(&self, base: Base) -> Summary {
+        let mark = self
+            .mark
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let mut l = Lateness::new();
+        for b in 0..BUCKETS {
+            let (k0, s0) = mark.as_ref().map_or((0, 0), |m| m[b]);
+            let k = self.count[b].load(Relaxed).saturating_sub(k0);
+            if k > 0 {
+                l.count[b] = k;
+                l.sum[b] = self.sum[b].load(Relaxed).saturating_sub(s0);
+                l.n += k;
+            }
+        }
+        l.max = self.max.load(Relaxed);
+        summarize(l.n, l.max, || l.buckets(), base)
     }
 
     /// One sample: three relaxed atomic updates (a bucket's sum wraps only past 584 years of lateness in it).
@@ -325,19 +385,9 @@ impl Pooled {
         self.max.fetch_max(ns, Relaxed);
     }
 
-    /// The summary over every sample so far (`Lateness::summary` of a copy).
+    /// The summary over the window so far (`Lateness::summary` of a copy, U3-Q1's E).
     pub(crate) fn summary(&self) -> Summary {
-        let mut l = Lateness::new();
-        for b in 0..BUCKETS {
-            let k = self.count[b].load(Relaxed);
-            if k > 0 {
-                l.count[b] = k;
-                l.sum[b] = self.sum[b].load(Relaxed);
-                l.n += k;
-            }
-        }
-        l.max = self.max.load(Relaxed);
-        l.summary()
+        self.summary_at(Base::Median)
     }
 
     /// The heap one holds: its buckets' counts and sums (135,040 B).
@@ -720,6 +770,64 @@ mod tests {
         assert!(
             FateLog::new(0).push(f),
             "capacity 0: no log, nothing counted as full"
+        );
+    }
+
+    /// Condition 3: both E forms against a brute-force sum over the same samples, on whole-µs samples (one per linear
+    /// bucket, so a bucket's mean is the sample): E[(L − 0.25 ms)+] (L0 = 0) and E[(L − p50 − 0.25 ms)+], each with its
+    /// over count.
+    #[test]
+    fn u6b_both_e_forms_match_a_brute_force_sum() {
+        let samples: Vec<u64> = (0..2_000u64).map(|i| (i * 7_919 % 1_999) * 1_000).collect();
+        let p = Pooled::new();
+        for &s in &samples {
+            p.record(s);
+        }
+        let mut sorted = samples.clone();
+        sorted.sort_unstable();
+        let p50 = sorted[sorted.len().div_ceil(2) - 1];
+        let brute = |c: u64| {
+            let over: Vec<u64> = samples.iter().filter(|&&s| s > c).map(|&s| s - c).collect();
+            (
+                over.iter().sum::<u64>() / samples.len() as u64,
+                over.len() as u64,
+            )
+        };
+        let zero = p.summary_at(Base::Zero);
+        let median = p.summary_at(Base::Median);
+        assert_eq!(median.p50, p50);
+        assert_eq!((zero.excess, zero.over), brute(ALLOWANCE_NS), "L0 = 0");
+        assert_eq!(
+            (median.excess, median.over),
+            brute(p50 + ALLOWANCE_NS),
+            "L0 = p50"
+        );
+        assert!(zero.excess > median.excess);
+    }
+
+    /// Condition 3: the window's mark: samples recorded before it are left out, the window's own maximum is its own
+    /// (a larger earlier sample does not carry over), and the window's sums are exact (its parts' sum equals the
+    /// difference of the whole's).
+    #[test]
+    fn u6b_the_mark_leaves_earlier_samples_out_and_restarts_the_maximum() {
+        let p = Pooled::new();
+        for s in [9_000_000u64, 5_000, 7_000] {
+            p.record(s);
+        }
+        p.mark();
+        for s in [1_000u64, 2_000, 3_000] {
+            p.record(s);
+        }
+        let w = p.summary_at(Base::Zero);
+        assert_eq!((w.n, w.max, w.p50), (3, 3_000, 2_000));
+        let mut fresh = Lateness::new();
+        for s in [1_000u64, 2_000, 3_000] {
+            fresh.record(s);
+        }
+        assert_eq!(
+            p.summary(),
+            fresh.summary(),
+            "the window equals a fresh histogram of its own samples"
         );
     }
 }

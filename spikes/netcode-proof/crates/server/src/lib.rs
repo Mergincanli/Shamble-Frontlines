@@ -22,4 +22,4 @@ pub use pump::{ConnLimits, Counters, Decoder, RttSource};
 #[cfg(feature = "bites")]
 pub use schedule::BITES;
 pub use schedule::{Dropped, Due, LoopCounters, Schedule, due_ticks};
-pub use tick_loop::{LoopSettings, TickLoop};
+pub use tick_loop::{Connector, LoopSettings, TickLoop};

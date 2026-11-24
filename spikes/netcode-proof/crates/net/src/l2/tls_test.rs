@@ -7,16 +7,10 @@
 //! still checks the handshake's signature. rustls is the one pinned 0.23.46, reached through tokio-rustls (quinn's
 //! re-export is the same crate).
 
-use std::sync::Arc;
 use tokio_rustls::rustls;
-use tokio_rustls::rustls::client::danger::{
-    HandshakeSignatureValid, ServerCertVerified, ServerCertVerifier,
-};
+use tokio_rustls::rustls::SignatureScheme;
 use tokio_rustls::rustls::crypto::CryptoProvider;
-use tokio_rustls::rustls::pki_types::{
-    CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer, ServerName, UnixTime,
-};
-use tokio_rustls::rustls::{DigitallySignedStruct, SignatureScheme};
+use tokio_rustls::rustls::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 
 /// A DER element: tag, definite length, content.
 fn der(tag: u8, content: &[u8]) -> Vec<u8> {
@@ -87,72 +81,11 @@ pub(crate) fn self_signed(
     (CertificateDer::from(cert), key)
 }
 
-/// Accepts exactly one certificate and checks the handshake's signature with the provider's algorithms.
-#[derive(Debug)]
-struct Pinned {
-    cert: CertificateDer<'static>,
-    provider: Arc<CryptoProvider>,
-}
-
-impl ServerCertVerifier for Pinned {
-    fn verify_server_cert(
-        &self,
-        end_entity: &CertificateDer<'_>,
-        _intermediates: &[CertificateDer<'_>],
-        _server_name: &ServerName<'_>,
-        _ocsp: &[u8],
-        _now: UnixTime,
-    ) -> Result<ServerCertVerified, rustls::Error> {
-        if end_entity.as_ref() == self.cert.as_ref() {
-            Ok(ServerCertVerified::assertion())
-        } else {
-            Err(rustls::Error::General("not the pinned certificate".into()))
-        }
-    }
-
-    fn verify_tls12_signature(
-        &self,
-        _message: &[u8],
-        _cert: &CertificateDer<'_>,
-        _dss: &DigitallySignedStruct,
-    ) -> Result<HandshakeSignatureValid, rustls::Error> {
-        Err(rustls::Error::General("TLS 1.2 is not offered".into()))
-    }
-
-    fn verify_tls13_signature(
-        &self,
-        message: &[u8],
-        cert: &CertificateDer<'_>,
-        dss: &DigitallySignedStruct,
-    ) -> Result<HandshakeSignatureValid, rustls::Error> {
-        rustls::crypto::verify_tls13_signature(
-            message,
-            cert,
-            dss,
-            &self.provider.signature_verification_algorithms,
-        )
-    }
-
-    fn supported_verify_schemes(&self) -> Vec<SignatureScheme> {
-        self.provider
-            .signature_verification_algorithms
-            .supported_schemes()
-    }
-}
-
-/// The client's TLS: TLS 1.3, ALPN `alpn`, the server's certificate pinned.
+/// The client's TLS: TLS 1.3, ALPN `alpn`, the server's certificate pinned (the shipped pin since U6b: its SHA-256).
 pub(crate) fn client_tls(
     provider: CryptoProvider,
     cert: CertificateDer<'static>,
     alpn: &[u8],
 ) -> rustls::ClientConfig {
-    let provider = Arc::new(provider);
-    let mut tls = rustls::ClientConfig::builder_with_provider(Arc::clone(&provider))
-        .with_protocol_versions(&[&rustls::version::TLS13])
-        .expect("TLS 1.3")
-        .dangerous()
-        .with_custom_certificate_verifier(Arc::new(Pinned { cert, provider }))
-        .with_no_client_auth();
-    tls.alpn_protocols = vec![alpn.to_vec()];
-    tls
+    crate::pin::client_config(provider, crate::pin::sha256(cert.as_ref()), alpn).expect("TLS 1.3")
 }

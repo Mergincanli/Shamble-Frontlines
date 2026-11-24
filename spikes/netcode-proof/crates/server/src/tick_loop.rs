@@ -33,7 +33,7 @@ use std::sync::{Arc, Mutex, PoisonError};
 use std::thread::JoinHandle;
 use std::time::Duration;
 
-use npt_link::{Channel, Link, LinkState};
+use npt_link::{Channel, Link, LinkState, SendResult};
 use npt_log::{Ended, EventRecord, Phase, TickRecord, Writer};
 use npt_proto::{EndReason, JoinRejected, Kick, Message, Quant, RoomEnded};
 use npt_room::{CmdTiming, Room};
@@ -321,7 +321,9 @@ enum Inbound {
 
 /// What the tick thread queues for one session.
 enum Outbound {
-    Datagram(Vec<u8>),
+    /// One of a tick's datagrams, `true` on its tick's last (U6b, W18: the I/O side's per-tick batch boundary; a
+    /// tick's datagrams are queued all or none).
+    Datagram(Vec<u8>, bool),
     Reliable(Channel, Vec<u8>),
     /// The room accepted the session's `Join`: datagrams are taken from now on.
     Accept,
@@ -372,6 +374,9 @@ pub(crate) struct Shared {
     pub(crate) sessions_dropped: AtomicU64,
     /// Tick rows a full writer queue dropped.
     pub(crate) rows_dropped: AtomicU64,
+    /// Ticks whose snapshot the WebSocket send budget skipped since the last tick row, all sessions (U6b; the next
+    /// row's `tick.v.ws_skipped_snaps_count`: the I/O side sends a tick's datagrams after that tick's row is made).
+    pub(crate) ws_skipped: AtomicU64,
     /// Ticks run.
     pub(crate) ticks: AtomicU64,
     /// The tick thread's id (0 until it starts).
@@ -398,6 +403,8 @@ pub(crate) struct TickRow {
     pub(crate) out_queue: [u16; LOGGED_SLOTS],
     /// The tick's PM-0001-2 counts.
     pub(crate) scene: SceneRow,
+    /// Snapshots the WebSocket send budget skipped since the last row, all sessions (U6b).
+    pub(crate) ws_skipped: u32,
 }
 
 /// What the writer thread is given.
@@ -565,6 +572,8 @@ impl Core {
             start_ns: timers.start_ns(),
             out_queue,
             scene,
+            ws_skipped: u32::try_from(self.shared.ws_skipped.swap(0, Ordering::Relaxed))
+                .unwrap_or(u32::MAX),
         };
         self.offer_row(Row::Tick(row));
         self.run += 1;
@@ -705,9 +714,18 @@ impl Core {
                 i += 1;
                 continue;
             };
-            for d in self.room.take_datagrams(slot) {
-                if !self.sessions[i].out.offer(Outbound::Datagram(d)) {
-                    self.shared.out_full.fetch_add(1, Ordering::Relaxed);
+            // The tick's datagrams all or none (U6b, W18): the queue's room for every one of them is reserved first, so
+            // the I/O side never sees part of a tick; a queue without room drops them all, each counted.
+            let datagrams = self.room.take_datagrams(slot);
+            let n = datagrams.len();
+            match self.sessions[i].out.0.try_reserve_many(n) {
+                Ok(permits) => {
+                    for (k, (permit, d)) in permits.zip(datagrams).enumerate() {
+                        permit.send(Outbound::Datagram(d, k + 1 == n));
+                    }
+                }
+                Err(_) => {
+                    self.shared.out_full.fetch_add(n as u64, Ordering::Relaxed);
                 }
             }
             let mut lost = false;
@@ -793,6 +811,9 @@ struct SessionIo {
     reported: Option<u32>,
     unreported: u32,
     msgs: Vec<(Message, u64)>,
+    /// The tick's datagrams so far (until its last arrives) and their lengths for `begin_tick`; both reused.
+    batch: Vec<Vec<u8>>,
+    lens: Vec<usize>,
 }
 
 impl SessionIo {
@@ -841,7 +862,24 @@ impl SessionIo {
             reported: None,
             unreported: 0,
             msgs: Vec::new(),
+            batch: Vec::new(),
+            lens: Vec::new(),
         })
+    }
+
+    /// One tick's datagrams, whole (W18; u6b-brief.md condition 1): `Link::begin_tick` once with each one's length, then
+    /// each sent in order; a tick the link refuses (the WebSocket fallback's fix 1 skipping it) is counted in
+    /// `tick.v.ws_skipped_snaps_count`, and the link answers each of its datagrams `BufferFull`. This is the session's
+    /// I/O task on the I/O runtime, so the gate's per-tick reads (and their syscalls) run here, never on the tick thread.
+    fn send_tick(&mut self, now_ns: u64) {
+        self.lens.clear();
+        self.lens.extend(self.batch.iter().map(Vec::len));
+        if self.link.begin_tick(&self.lens, now_ns) == SendResult::BufferFull {
+            self.shared.ws_skipped.fetch_add(1, Ordering::Relaxed);
+        }
+        for b in self.batch.drain(..) {
+            self.link.send_unreliable(&b, now_ns);
+        }
     }
 
     /// One poll at `now_ns`: what the tick thread queued goes out, then the pump, then the report once a tick.
@@ -851,8 +889,11 @@ impl SessionIo {
         while let Ok(o) = self.from_tick.try_recv() {
             // Rate adaptation reads each send's result (U6d); U6a sends and goes on.
             match o {
-                Outbound::Datagram(b) => {
-                    self.link.send_unreliable(&b, now_ns);
+                Outbound::Datagram(b, last) => {
+                    self.batch.push(b);
+                    if last {
+                        self.send_tick(now_ns);
+                    }
                 }
                 Outbound::Reliable(channel, b) => {
                     self.link.send_reliable(channel, &b, now_ns);
@@ -916,8 +957,8 @@ async fn run_session(mut io: SessionIo) {
 }
 
 /// The writer thread: one record per row, in order, with a second record each time the ticks' start enters a new
-/// second of the loop's clock (and one for the last second at the end); the footer from the last row (`stopped` if the
-/// rows ended without one).
+/// second of the loop's clock (and one for the last second at the end); the footer from the tick thread's last row
+/// (`stopped` if the rows ended without one), written once every sender is gone.
 fn write_rows(
     mut w: Writer<Box<dyn Write + Send>>,
     rows: Receiver<Row>,
@@ -931,10 +972,9 @@ fn write_rows(
                 w.tick(&tick_record(&r, seconds.clients))?;
             }
             Row::Event(e) => w.event(&e)?,
-            Row::End(e) => {
-                ended = e;
-                break;
-            }
+            // The verdict; the loop's own last events may follow it (`TickLoop::stop_with`, NR-U6B-1): the rows end
+            // when both senders are gone (the tick thread's at its end, the loop's at its shutdown).
+            Row::End(e) => ended = e,
         }
     }
     seconds.close(&mut w)?;
@@ -1124,6 +1164,7 @@ pub(crate) fn tick_record(r: &TickRow, clients: usize) -> TickRecord {
     v.insert("dropped_ns".into(), int(r.timers.dropped_ns()));
     v.insert("overrun".into(), i64::from(r.timers.overrun()));
     v.insert("wake_ticks_count".into(), i64::from(r.timers.wake_ticks()));
+    v.insert("ws_skipped_snaps_count".into(), i64::from(r.ws_skipped));
     let s = &r.scene;
     for (name, x) in [
         ("soldiers_count", s.soldiers),
@@ -1183,19 +1224,70 @@ fn tick_thread(mut core: Core, stop: Arc<AtomicBool>) -> Ended {
     }
 }
 
+/// What hands a new session to the I/O runtime: shared by [`TickLoop`] and every [`Connector`].
+struct Connect {
+    handle: tokio::runtime::Handle,
+    tasks: Mutex<Vec<tokio::task::JoinHandle<()>>>,
+    stop: Arc<AtomicBool>,
+    to_tick: ToTick,
+    shared: Arc<Shared>,
+    next_session: AtomicU32,
+    join: (u16, [u8; 32]),
+}
+
+impl Connect {
+    fn connect(&self, link: Box<dyn Link + Send>, rtt: RttSource, accept_ns: u64) -> bool {
+        let mut tasks = self.tasks.lock().unwrap_or_else(PoisonError::into_inner);
+        tasks.retain(|t| !t.is_finished());
+        if tasks.len() >= SESSIONS_MAX || self.stop.load(Ordering::Acquire) {
+            return false;
+        }
+        let id = self.next_session.fetch_add(1, Ordering::Relaxed);
+        let Some(io) = SessionIo::open(
+            &self.to_tick,
+            &self.shared,
+            id,
+            link,
+            rtt,
+            self.join,
+            accept_ns,
+            OUTBOUND_CAP,
+        ) else {
+            return false;
+        };
+        tasks.push(self.handle.spawn(run_session(io)));
+        true
+    }
+}
+
+/// A handle that gives the loop new sessions from any thread or task (U6b; NR-U6A-7): the transports' accept tasks
+/// hold one, on the loop's own I/O runtime ([`TickLoop::io_handle`]). Each session carries its accept stamp (the first
+/// QUIC packet or the TCP accept, on the room's clock) into `Decoder::new`, so the Join deadline runs from it (plan.md
+/// :516). After [`TickLoop::stop`] it takes nothing.
+#[derive(Clone)]
+pub struct Connector(Arc<Connect>);
+
+impl Connector {
+    /// Hands `link` to the I/O runtime, accepted at `accept_ns` (the room's clock), its RTT from `rtt`. False when the
+    /// loop holds 256 sessions (`SESSIONS_MAX`), has stopped, or its queue is full.
+    pub fn connect(&self, link: Box<dyn Link + Send>, rtt: RttSource, accept_ns: u64) -> bool {
+        self.0.connect(link, rtt, accept_ns)
+    }
+}
+
 /// The room process's loop (the module text): started by [`TickLoop::start`], given sessions by
-/// [`TickLoop::connect`], ended by [`TickLoop::stop`].
+/// [`TickLoop::connect`] or a [`Connector`], ended by [`TickLoop::stop`].
+///
+/// **Where it lives (NR-U6A-7):** the binary's main thread owns it; the transports' listeners and their sessions run
+/// on its I/O runtime ([`TickLoop::io_handle`]), so they share its threads, their pins and their CPU reads. `stop` (and
+/// a drop) blocks on that runtime, so it is called on a plain thread, never inside an async context.
 pub struct TickLoop {
     tick: Option<JoinHandle<Ended>>,
     writer: Option<JoinHandle<io::Result<()>>>,
     runtime: Option<tokio::runtime::Runtime>,
-    tasks: Mutex<Vec<tokio::task::JoinHandle<()>>>,
-    stop: Arc<AtomicBool>,
-    to_tick: ToTick,
+    connect: Arc<Connect>,
     events: Option<SyncSender<Row>>,
     shared: Arc<Shared>,
-    next_session: AtomicU32,
-    join: (u16, [u8; 32]),
     tick_vcpu: Option<u32>,
     smt: Vec<Vec<u32>>,
     io_threads: usize,
@@ -1234,7 +1326,8 @@ impl TickLoop {
         let runtime = tokio::runtime::Builder::new_multi_thread()
             .worker_threads(settings.io_threads.max(1))
             .thread_name("npt-io")
-            .enable_time()
+            // I/O too (U6b, NR-U6A-7): the transports' listeners and sessions run on this runtime.
+            .enable_all()
             .on_thread_start(move || {
                 let mut t = tids.io_tids.lock().unwrap_or_else(PoisonError::into_inner);
                 if let Some(tid) = crate::proc_read::thread_tid()
@@ -1297,7 +1390,7 @@ impl TickLoop {
         crate::proc_read::pin(tid, &[vcpu])?;
         #[cfg(feature = "bites")]
         if self.bite.as_deref() == Some(SHARED_VCPU_BITE) {
-            let stop = Arc::clone(&self.stop);
+            let stop = Arc::clone(&self.connect.stop);
             let shared = Arc::clone(&self.shared);
             let h = std::thread::Builder::new()
                 .name("npt-bite".into())
@@ -1336,14 +1429,14 @@ impl TickLoop {
         let tick = self.shared.tick_tid.load(Ordering::Acquire);
         let tasks = crate::proc_read::tasks("/proc");
         let alone = crate::proc_read::alone(&tasks, tick, vcpu);
-        let io: Vec<Option<Vec<u32>>> = self
+        let tids = self
             .shared
             .io_tids
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
-            .iter()
-            .map(|&t| crate::proc_read::allowed(t))
-            .collect();
+            .clone();
+        // NR2-U6A-2: an exited I/O thread is left out, never a failed read.
+        let io = crate::proc_read::io_allowed("/proc/self/task", &tids);
         let free = crate::proc_read::sibling_free_read(&self.smt, vcpu, &io);
         let [alone, free] = [("alone", alone), ("sibling_free", free)].map(|(k, r)| {
             r.unwrap_or_else(|why| {
@@ -1378,17 +1471,22 @@ impl TickLoop {
         let tick = std::thread::Builder::new()
             .name(TICK_THREAD.into())
             .spawn(move || tick_thread(core, flag))?;
+        let connect = Arc::new(Connect {
+            handle: runtime.handle().clone(),
+            tasks: Mutex::new(Vec::new()),
+            stop,
+            to_tick,
+            shared: Arc::clone(&shared),
+            next_session: AtomicU32::new(0),
+            join: (settings.version, settings.content_hash),
+        });
         Ok(TickLoop {
             tick: Some(tick),
             writer,
             runtime: Some(runtime),
-            tasks: Mutex::new(Vec::new()),
-            stop,
-            to_tick,
+            connect,
             events,
             shared,
-            next_session: AtomicU32::new(0),
-            join: (settings.version, settings.content_hash),
             tick_vcpu: settings.tick_vcpu,
             smt: settings.smt,
             io_threads: settings.io_threads.max(1),
@@ -1399,32 +1497,41 @@ impl TickLoop {
         })
     }
 
-    /// Hands a new session's link to the I/O runtime, its RTT from `rtt` (the session's kind). False when the loop
-    /// holds 256 sessions (`SESSIONS_MAX`), has stopped, or its queue is full.
+    /// Hands a new session's link to the I/O runtime, its RTT from `rtt` (the session's kind), accepted now. False when
+    /// the loop holds 256 sessions (`SESSIONS_MAX`), has stopped, or its queue is full.
     pub fn connect(&self, link: Box<dyn Link + Send>, rtt: RttSource) -> bool {
-        let Some(runtime) = &self.runtime else {
-            return false;
-        };
-        let mut tasks = self.tasks.lock().unwrap_or_else(PoisonError::into_inner);
-        tasks.retain(|t| !t.is_finished());
-        if tasks.len() >= SESSIONS_MAX || self.stop.load(Ordering::Acquire) {
-            return false;
+        self.connect.connect(link, rtt, clock::now_ns())
+    }
+
+    /// A [`Connector`] for the transports' accept tasks (each session with its own accept stamp).
+    pub fn connector(&self) -> Connector {
+        Connector(Arc::clone(&self.connect))
+    }
+
+    /// The I/O runtime's handle (NR-U6A-7): the transports' listeners spawn on it, so their tasks run on the I/O
+    /// threads (pinned with them, counted in `io_cpu_permille`).
+    pub fn io_handle(&self) -> tokio::runtime::Handle {
+        self.connect.handle.clone()
+    }
+
+    /// The room's clock now (`clock.rs`'s one item, ns): the transports' stamps are taken on it (`fn() -> u64`).
+    pub fn now_ns() -> u64 {
+        clock::now_ns()
+    }
+
+    /// Pins the calling thread to `io_vcpus` (Q-U6A-5 (a)'s first step, which [`TickLoop::start`] repeats): a thread it
+    /// starts afterwards (the transports' L2 threads, bound before the room's log is made) inherits the I/O vCPUs.
+    /// Nothing when `io_vcpus` is empty.
+    ///
+    /// # Errors
+    /// This thread's id is not in /proc, or the pin failed or read back otherwise.
+    pub fn pin_to_io(io_vcpus: &[u32]) -> io::Result<()> {
+        if io_vcpus.is_empty() {
+            return Ok(());
         }
-        let id = self.next_session.fetch_add(1, Ordering::Relaxed);
-        let Some(io) = SessionIo::open(
-            &self.to_tick,
-            &self.shared,
-            id,
-            link,
-            rtt,
-            self.join,
-            clock::now_ns(),
-            OUTBOUND_CAP,
-        ) else {
-            return false;
-        };
-        tasks.push(runtime.spawn(run_session(io)));
-        true
+        let me = crate::proc_read::thread_tid()
+            .ok_or_else(|| io::Error::other("this thread's id is not in /proc"))?;
+        crate::proc_read::pin(me, io_vcpus)
     }
 
     /// Writes `event` to the room's log, through the writer thread; false with no log or a full queue.
@@ -1462,16 +1569,26 @@ impl TickLoop {
     /// # Errors
     /// The log could not be written.
     pub fn stop(mut self) -> io::Result<Ended> {
-        self.shutdown()
+        self.shutdown(|_| {})
     }
 
-    fn shutdown(&mut self) -> io::Result<Ended> {
+    /// [`TickLoop::stop`] with `at_end` run once the sessions have ended (stop set, the tick thread joined, the session
+    /// tasks awaited within FLUSH) and before the I/O runtime's shutdown and the log's end (NR-U6B-1): the transports'
+    /// closings, which run on that runtime, can still end, and `at_end`'s events still reach the log.
+    ///
+    /// # Errors
+    /// The log could not be written.
+    pub fn stop_with(mut self, at_end: impl FnOnce(&TickLoop)) -> io::Result<Ended> {
+        self.shutdown(at_end)
+    }
+
+    fn shutdown(&mut self, at_end: impl FnOnce(&TickLoop)) -> io::Result<Ended> {
         if self.tick.as_ref().is_some_and(|h| !h.is_finished())
             && let Some(e) = self.affinity("end")
         {
             self.event(e);
         }
-        self.stop.store(true, Ordering::Release);
+        self.connect.stop.store(true, Ordering::Release);
         #[cfg(feature = "bites")]
         if let Some(h) = self
             .bite_thread
@@ -1485,9 +1602,15 @@ impl TickLoop {
             Some(h) => h.join().unwrap_or(Ended::Crash),
             None => Ended::Stopped,
         };
-        let tasks =
-            core::mem::take(&mut *self.tasks.lock().unwrap_or_else(PoisonError::into_inner));
-        if let Some(runtime) = self.runtime.take() {
+        let tasks = core::mem::take(
+            &mut *self
+                .connect
+                .tasks
+                .lock()
+                .unwrap_or_else(PoisonError::into_inner),
+        );
+        let runtime = self.runtime.take();
+        if let Some(runtime) = &runtime {
             runtime.block_on(async {
                 let all = async {
                     for t in tasks {
@@ -1496,6 +1619,9 @@ impl TickLoop {
                 };
                 let _ = tokio::time::timeout(FLUSH, all).await;
             });
+        }
+        at_end(self);
+        if let Some(runtime) = runtime {
             runtime.shutdown_timeout(FLUSH);
         }
         self.events = None;
@@ -1510,7 +1636,7 @@ impl TickLoop {
 impl Drop for TickLoop {
     fn drop(&mut self) {
         if self.tick.is_some() {
-            let _ = self.shutdown();
+            let _ = self.shutdown(|_| {});
         }
     }
 }

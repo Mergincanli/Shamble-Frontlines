@@ -43,3 +43,12 @@ pub use quant::BITES;
 pub use quant::Quant;
 pub use snapshot::{Class, EntityDelta, FullState, Snapshot};
 pub use wrap::Wrap;
+
+/// The protocol version every `Join` must carry (plan §10.3). One home for the room, U6b's clients and U7's page
+/// (advisor-u7-brief.md C2): the value U6a's binary held, unchanged.
+pub const PROTOCOL_VERSION: u16 = 1;
+/// The content hash every `Join` must carry and every `JoinAccepted` names (no plan line names the content's files yet:
+/// U6a's report, open items); U6a's binary's value, unchanged.
+pub const CONTENT_HASH: [u8; 32] = *b"npt-server room content hash v1 ";
+/// The mode hash every `JoinAccepted` names (one mode at the spike: all zero); U6a's binary's value, unchanged.
+pub const MODE_HASH: [u8; 32] = [0; 32];

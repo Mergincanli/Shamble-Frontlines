@@ -85,11 +85,18 @@
 //! 2026-11-08): one `stats::Pooled` per part per direction shared by every connection in the process, with the total's
 //! statistics, updated by relaxed atomics (no lock, no allocation on the release path) and read once over the run
 //! (`DelayStream::split_rows`, the `ws_split` event); the connection keeps only its total.
+//!
+//! **The reader stamp (U6b; the advisor's UP-STAMP ruling, RC-12).** Up, the pump stamps R at its pass's closing wake
+//! (the `wake_all` that wakes the reader) on every record a pump step released and the reader has not yet read; at the
+//! hand-over (3) the work part splits into pass = R − P (the other class: R − T) and reader = (3) − R, each pooled, and
+//! the four (three) parts' identity is checked with the rest. A record an application step released, or one the reader
+//! took during the pump's pass, has no R: its own counted class (early), with no reader part. The split's window, the
+//! pooled lateness L per direction and its mark (u6b-brief.md condition 3) cover these parts too.
 
 use super::config::{L2Config, one_way_ns};
 use super::delay_clock::{self, Clock};
 use super::delay_names::{self as names, KINDS, PARTS, Split};
-use super::stats::{Pooled, Running, Summary};
+use super::stats::{Base, Pooled, Running, Summary};
 use super::thread;
 use super::ws_frame::{Boundary, MAX_HEADER, REASONS, Reason, Scanner};
 use crate::tcp_model::{MAX_BURSTS, MODEL, NOT_MODELLED, TcpConfig, TcpModel};
@@ -174,7 +181,19 @@ struct Freed {
     step: u64,
     woke: Option<u64>,
     kind: usize,
+    /// Up only, the reader stamp R (the advisor's UP-STAMP ruling, RC-12): the pump's stamp at its pass's closing
+    /// `wake_all`, which wakes the reader, for a record a pump step released and the reader had not yet read.
+    reader: Option<u64>,
 }
+
+/// The reader stamp's parts, up only (RC-12), in `delay_names::READER`'s order: the woken class's pass (R − P) and
+/// reader ((3) − R), the other class's pass (R − T) and reader ((3) − R).
+const PASS: usize = 0;
+const READER: usize = 1;
+const OTHER_PASS: usize = 2;
+const OTHER_READER: usize = 3;
+/// Its parts.
+const READER_PARTS: usize = 4;
 
 /// The per-release split over the run (the advisor's ruling (b) on its memory, 2026-11-08): per direction one
 /// `stats::Pooled` per part, the other class's releases by kind, and the releases whose parts did not sum to their total
@@ -190,33 +209,130 @@ struct Pool {
     parts: [[Pooled; PARTS]; 2],
     kinds: [[AtomicU64; KINDS]; 2],
     violations: [AtomicU64; 2],
+    /// The lateness L itself, pooled per direction (u6b-brief.md condition 3: the series R1's self-test reads).
+    late: [Pooled; 2],
+    /// The window's mark (condition 3): its stamp on DelayStream's clock plus 1 (0: none taken), and the kinds' and
+    /// violations' counts then.
+    mark_at: AtomicU64,
+    mark_kinds: [[AtomicU64; KINDS]; 2],
+    mark_violations: [AtomicU64; 2],
+    /// Up only, the reader stamp's parts (RC-12: `PASS`, `READER`, `OTHER_PASS`, `OTHER_READER`), and the releases whose
+    /// reader returned before any R (the early class, no reader part), with its count at the mark.
+    reader: [Pooled; READER_PARTS],
+    early: AtomicU64,
+    mark_early: AtomicU64,
 }
 
 static POOL: OnceLock<Pool> = OnceLock::new();
 
 /// The process's split (created at its first call: `build`, before any connection releases a record).
 fn pool() -> &'static Pool {
-    POOL.get_or_init(|| Pool {
-        parts: std::array::from_fn(|_| std::array::from_fn(|_| Pooled::new())),
-        kinds: Default::default(),
-        violations: Default::default(),
-    })
+    POOL.get_or_init(Pool::new)
 }
 
 impl Pool {
-    /// The split over the run so far, per direction.
+    fn new() -> Pool {
+        Pool {
+            parts: std::array::from_fn(|_| std::array::from_fn(|_| Pooled::new())),
+            kinds: Default::default(),
+            violations: Default::default(),
+            late: std::array::from_fn(|_| Pooled::new()),
+            mark_at: AtomicU64::new(0),
+            mark_kinds: Default::default(),
+            mark_violations: Default::default(),
+            reader: std::array::from_fn(|_| Pooled::new()),
+            early: AtomicU64::new(0),
+            mark_early: AtomicU64::new(0),
+        }
+    }
+
+    /// The split over the window so far (since the mark, else the process's life), per direction.
     fn read(&self) -> [Split; 2] {
+        let since = |now: &AtomicU64, mark: &AtomicU64| {
+            now.load(Relaxed).saturating_sub(mark.load(Relaxed))
+        };
         std::array::from_fn(|d| Split {
             parts: std::array::from_fn(|p| self.parts[d][p].summary()),
-            kinds: std::array::from_fn(|k| self.kinds[d][k].load(Relaxed)),
-            violations: self.violations[d].load(Relaxed),
+            kinds: std::array::from_fn(|k| since(&self.kinds[d][k], &self.mark_kinds[d][k])),
+            violations: since(&self.violations[d], &self.mark_violations[d]),
         })
+    }
+
+    /// The pooled lateness over the same window, per direction: (E with L0 = its median, E with L0 = 0).
+    fn read_late(&self) -> [(Summary, Summary); 2] {
+        std::array::from_fn(|d| {
+            (
+                self.late[d].summary_at(Base::Median),
+                self.late[d].summary_at(Base::Zero),
+            )
+        })
+    }
+
+    /// The reader stamp's parts over the same window (up), and the early class's count.
+    fn read_reader(&self) -> ([Summary; READER_PARTS], u64) {
+        let early = self
+            .early
+            .load(Relaxed)
+            .saturating_sub(self.mark_early.load(Relaxed));
+        (std::array::from_fn(|p| self.reader[p].summary()), early)
+    }
+
+    /// Takes the window's mark at `at` (DelayStream's clock), once.
+    fn mark(&self, at: u64) -> bool {
+        if self
+            .mark_at
+            .compare_exchange(0, at.saturating_add(1), Relaxed, Relaxed)
+            .is_err()
+        {
+            return false;
+        }
+        self.mark_early.store(self.early.load(Relaxed), Relaxed);
+        for p in &self.reader {
+            p.mark();
+        }
+        for d in 0..2 {
+            for k in 0..KINDS {
+                self.mark_kinds[d][k].store(self.kinds[d][k].load(Relaxed), Relaxed);
+            }
+            self.mark_violations[d].store(self.violations[d].load(Relaxed), Relaxed);
+            for p in &self.parts[d] {
+                p.mark();
+            }
+            self.late[d].mark();
+        }
+        true
     }
 
     /// The heap it holds, once per process: ten histograms of 135,040 B (`ws_split_fixed_bytes`).
     fn heap_bytes() -> u64 {
         2 * PARTS as u64 * Pooled::heap_bytes()
     }
+}
+
+/// The header's strings from the release clock's `info`: the model's name and what it leaves out, the clock's
+/// scheduling policy (read now), the index rule, the record boundaries, the handshake's note, and the slack write's
+/// error only when it failed.
+fn header_texts_of(info: &delay_clock::Info) -> Vec<(&'static str, String)> {
+    let sched = match info.tid.and_then(thread::sched) {
+        Some((policy, prio)) => format!("{} {prio}", thread::policy_name(policy)),
+        None => "unknown".to_owned(),
+    };
+    let mut v: Vec<(&'static str, String)> = names::HEADER_TEXTS
+        .iter()
+        .copied()
+        .zip([
+            MODEL.to_owned(),
+            NOT_MODELLED.to_owned(),
+            sched,
+            CONN_INDEX_RULE.to_owned(),
+            RECORDS.to_owned(),
+            HANDSHAKE.to_owned(),
+        ])
+        .collect();
+    if let Some(e) = &info.slack.write_error {
+        v.push((names::HEADER_TEXTS[6], e.clone()));
+    }
+    v
 }
 
 /// The split's bites (M2's pattern): the identity test turns one on and the identity must fail.
@@ -229,6 +345,9 @@ pub(crate) enum SplitBite {
     DropHop,
     /// A part misattributed: the woken class's work measured from the clock's wake (1) instead of the pass's start (2).
     WorkFromWake,
+    /// The reader stamp misattributed (RC-12's bite, as b5c9009 did): R taken at the release (the step's stamp), not at
+    /// the pass's closing wake.
+    ReaderAtRelease,
 }
 
 #[cfg(test)]
@@ -237,7 +356,7 @@ impl SplitBite {
     fn apply(self, mut parts: [u64; 3], at: u64, woke: Option<u64>) -> [u64; 3] {
         if let Some(w) = woke {
             match self {
-                SplitBite::Off => {}
+                SplitBite::Off | SplitBite::ReaderAtRelease => {}
                 SplitBite::DropHop => parts[HOP] = 0,
                 SplitBite::WorkFromWake => parts[WORK] = at.saturating_sub(w),
             }
@@ -259,6 +378,8 @@ pub(crate) struct SplitLog {
     pub(crate) kind: usize,
     pub(crate) total: u64,
     pub(crate) parts: [u64; 3],
+    /// Up: the reader stamp R recorded (None: the early class).
+    pub(crate) reader: Option<u64>,
 }
 
 /// The per-return record (C8): at each burst's end, as the model passes it.
@@ -345,6 +466,8 @@ pub(crate) struct Logs {
     pub(crate) handed_up: Vec<(u64, u64)>,
     /// Every release's split as recorded, both ways, in the order recorded.
     pub(crate) splits: Vec<SplitLog>,
+    /// Each reader stamp R the pump's closing block took (RC-12), in order.
+    pub(crate) reader_wakes: Vec<u64>,
 }
 
 /// One atomic reading of a connection for the tests (W2): every field taken under one lock, after one step to now.
@@ -583,6 +706,7 @@ impl Conn {
         #[cfg(test)]
         let parts = self.split_bite.apply(parts, at, f.woke);
         let pool = pool();
+        pool.late[dir].record(total);
         let p = &pool.parts[dir];
         if f.woke.is_some() {
             p[CLOCK].record(parts[0]);
@@ -593,7 +717,33 @@ impl Conn {
             p[OTHER_WORK].record(parts[1]);
             pool.kinds[dir][f.kind].fetch_add(1, Relaxed);
         }
-        if parts[0].saturating_add(parts[1]).saturating_add(parts[2]) != total {
+        let mut ok = parts[0].saturating_add(parts[1]).saturating_add(parts[2]) == total;
+        // RC-12, up: the work part splits at the reader stamp R into pass (R − P, or R − T in the other class) and
+        // reader ((3) − R), with the identity checked on the four (or three) parts; with no R the reader returned
+        // before any pump's closing wake: the early class, no reader part.
+        if dir == UP {
+            match f.reader {
+                Some(r) => {
+                    let (pass, reader) = (r.saturating_sub(f.step), at.saturating_sub(r));
+                    let (pi, ri) = if f.woke.is_some() {
+                        (PASS, READER)
+                    } else {
+                        (OTHER_PASS, OTHER_READER)
+                    };
+                    pool.reader[pi].record(pass);
+                    pool.reader[ri].record(reader);
+                    ok &= parts[0].saturating_add(pass).saturating_add(reader)
+                        + if f.woke.is_some() { parts[1] } else { 0 }
+                        == total
+                        && f.step <= r
+                        && r <= at;
+                }
+                None => {
+                    pool.early.fetch_add(1, Relaxed);
+                }
+            }
+        }
+        if !ok {
             pool.violations[dir].fetch_add(1, Relaxed);
             #[cfg(test)]
             {
@@ -610,8 +760,34 @@ impl Conn {
             kind: f.kind,
             total,
             parts,
+            reader: f.reader,
         });
         total
+    }
+
+    /// The reader stamp R (RC-12) at the pump's closing block, `r` on DelayStream's clock: every up record a pump step
+    /// released (an opening or a mid step) and the reader has not yet read takes R once; a record an application step
+    /// released never does (its reader returns at once: the early class).
+    fn stamp_reader(&mut self, r: u64) {
+        #[cfg(test)]
+        let bite = self.split_bite == SplitBite::ReaderAtRelease;
+        let mut stamped = false;
+        for rec in self.recs[UP].iter_mut().take(self.released[UP]) {
+            if rec.freed.reader.is_none() && rec.freed.kind != APP {
+                #[cfg(test)]
+                if bite {
+                    rec.freed.reader = Some(rec.freed.step);
+                    continue;
+                }
+                rec.freed.reader = Some(r);
+                stamped = true;
+            }
+        }
+        #[cfg(test)]
+        if stamped {
+            self.logs.reader_wakes.push(r);
+        }
+        let _ = stamped;
     }
 
     /// One record of `len` plaintext bytes into the model at `t` from `dir`'s end. The caller checked the room, so the
@@ -669,27 +845,17 @@ impl Conn {
     /// open per-return times.
     fn harvest(&mut self, t: u64, step: u64, by: By) -> [bool; 2] {
         let m = self.origin.saturating_add(t);
-        let freed = match by {
-            By::Open(Some((due, woke))) if due <= m && m <= woke => Freed {
-                step,
-                woke: Some(woke),
-                kind: OPEN,
-            },
-            By::Open(_) => Freed {
-                step,
-                woke: None,
-                kind: OPEN,
-            },
-            By::Mid => Freed {
-                step,
-                woke: None,
-                kind: MID,
-            },
-            By::App => Freed {
-                step,
-                woke: None,
-                kind: APP,
-            },
+        let (woke, kind) = match by {
+            By::Open(Some((due, woke))) if due <= m && m <= woke => (Some(woke), OPEN),
+            By::Open(_) => (None, OPEN),
+            By::Mid => (None, MID),
+            By::App => (None, APP),
+        };
+        let freed = Freed {
+            step,
+            woke,
+            kind,
+            reader: None,
         };
         let mut new = [false; 2];
         let mut message = [false; 2];
@@ -933,6 +1099,8 @@ impl Shared {
 /// it. See the module documentation.
 pub struct DelayStream<S> {
     sh: Arc<Shared>,
+    /// False for a [`DelayStream::handle`]: its drop ends nothing.
+    owner: bool,
     _s: PhantomData<fn(S) -> S>,
 }
 
@@ -1096,10 +1264,24 @@ where
         Ok((
             DelayStream {
                 sh,
+                owner: true,
                 _s: PhantomData,
             },
             pump,
         ))
+    }
+}
+
+impl<S> DelayStream<S> {
+    /// A reading handle on the same connection (U6b's WsLink: fix 1's inputs once per tick, the per-return records and
+    /// the connection's summary while tokio-tungstenite owns the stream). Its drop ends nothing; it reads, it never
+    /// reads or writes the stream.
+    pub(crate) fn handle(&self) -> DelayStream<()> {
+        DelayStream {
+            sh: Arc::clone(&self.sh),
+            owner: false,
+            _s: PhantomData,
+        }
     }
 }
 
@@ -1113,13 +1295,87 @@ impl DelayStream<()> {
 
     /// The per-release split over the run so far, pooled over every connection in the process (the `ws_split` event's
     /// fields, `event.ws_split.<name>`; SERIES.md): per direction the class counts, each part's statistics, the other
-    /// class's releases by kind and the releases whose parts did not sum to their total. Read it once the traffic has
-    /// ended. U6 carry: npt-server's writer writes it at the run's end, through a public reading then.
-    #[cfg_attr(not(test), allow(dead_code))]
-    pub(crate) fn split_rows() -> Vec<(&'static str, u64)> {
-        let mut out = Vec::with_capacity(names::SPLIT_ROWS);
-        names::split_rows(pool().read(), &mut out);
+    /// class's releases by kind and the releases whose parts did not sum to their total, then the pooled lateness L
+    /// itself (u6b-brief.md condition 3: n, p50, p99, p99.9, max, and E with its over count in both forms, L0 = 0 and
+    /// L0 = the window's median), then the window's mark. Over the window from [`DelayStream::mark_split`] when it was
+    /// called, else the process's whole life. Read it once the traffic has ended: npt-server's writer writes it once at
+    /// the run's end.
+    pub fn split_rows() -> Vec<(&'static str, u64)> {
+        let mut out = Vec::with_capacity(names::SPLIT_ROWS + names::POOLED_ROWS + 29);
+        let p = pool();
+        names::split_rows(p.read(), &mut out);
+        names::pooled_rows(p.read_late(), &mut out);
+        let (reader, early) = p.read_reader();
+        names::reader_rows(reader, early, &mut out);
+        let mark = p.mark_at.load(Relaxed);
+        out.push((names::MARK_SET, u64::from(mark != 0)));
+        out.push((names::MARK_NS, mark.saturating_sub(1)));
         out
+    }
+
+    /// The split's window mark (condition 3): from now on `split_rows` reads the difference from this instant, for the
+    /// parts, the pooled lateness, the kinds and the violations alike, and each pooled maximum restarts here. A copy of
+    /// every pooled bucket's count and sum, taken once by the caller (npt-server's I/O runtime, at its settings' time
+    /// after OPEN), never on the release path. A second call is refused (false).
+    pub fn mark_split() -> bool {
+        pool().mark(DelayStream::now_ns())
+    }
+
+    /// The header's numbers (`header.params.<name>`) from the run's one `&L2Config`, read once at start-up before any
+    /// connection (F6's "once at start-up"; it blocks on the release clock's slack reading, at most 1 s): those of
+    /// [`DelayStream::header_numbers`] without a connection, the wrapper on; only `ws_wrapper` 0 for a pass-through
+    /// `cfg` (R20: the plain path has no DelayStream).
+    pub fn header_numbers_from(cfg: &L2Config) -> Vec<(&'static str, u64)> {
+        if cfg.pass_through {
+            return vec![(names::HEADER_NUMBERS[0], 0)];
+        }
+        let model = TcpModel::new(&cfg.profile, cfg.seed, 0).with_one_way_ns(one_way_ns(cfg));
+        let clock = delay_clock::clock();
+        if let Ok(key) = clock.start(cfg.timer_slack_ns) {
+            clock.release(key);
+        }
+        let slack_now = clock.slack_now();
+        let info = clock.info();
+        let tcp = TcpConfig::default();
+        let max_frame = cfg.ws_max_message_bytes + MAX_HEADER;
+        let fixed = 2 * Running::new().heap_bytes()
+            + (cfg.ws_max_request_bytes.max(max_frame) + RECORD_MAX + max_frame) as u64;
+        let vals = [
+            1,
+            model.one_way_ns(),
+            model.half_jitter_ns(),
+            tcp.write_budget,
+            model.mss(),
+            tcp.rto_min_us * 1_000,
+            u64::from(tcp.thin_linear_timeouts),
+            u64::from(tcp.timestamps),
+            tcp.syn_rto_us * 1_000,
+            u64::from(tcp.syn_linear_timeouts),
+            slack_now.unwrap_or(u64::MAX),
+            info.slack.read_ns.unwrap_or(u64::MAX),
+            u64::from(info.slack.write_error.is_none()),
+            cfg.ws_max_message_bytes as u64,
+            cfg.ws_max_request_bytes as u64,
+            RECORD_MAX as u64,
+            OVERHEAD,
+            max_frame as u64 + OVERHEAD,
+            SHUTDOWN_WAIT_NS,
+            MAX_BURSTS as u64,
+            MAX_RETURNS as u64,
+            fixed,
+            Pool::heap_bytes(),
+        ];
+        names::HEADER_NUMBERS.iter().copied().zip(vals).collect()
+    }
+
+    /// The header's strings from the release clock as it stands (`header_texts` without a connection); none for a
+    /// pass-through `cfg`.
+    pub fn header_texts_from(cfg: &L2Config) -> Vec<(&'static str, String)> {
+        if cfg.pass_through {
+            return Vec::new();
+        }
+        let info = delay_clock::clock().info();
+        header_texts_of(&info)
     }
 }
 
@@ -1394,27 +1650,7 @@ impl<S> DelayStream<S> {
     /// The header's strings: the model's name and version, what it leaves out (S11), the release clock's scheduling
     /// policy (read now), the connection index rule, the record boundaries' approximation and the handshake's note.
     pub fn header_texts(&self) -> Vec<(&'static str, String)> {
-        let info = self.sh.clock.info();
-        let sched = match info.tid.and_then(thread::sched) {
-            Some((policy, prio)) => format!("{} {prio}", thread::policy_name(policy)),
-            None => "unknown".to_owned(),
-        };
-        let mut v: Vec<(&'static str, String)> = names::HEADER_TEXTS
-            .iter()
-            .copied()
-            .zip([
-                MODEL.to_owned(),
-                NOT_MODELLED.to_owned(),
-                sched,
-                CONN_INDEX_RULE.to_owned(),
-                RECORDS.to_owned(),
-                HANDSHAKE.to_owned(),
-            ])
-            .collect();
-        if let Some(e) = info.slack.write_error {
-            v.push((names::HEADER_TEXTS[6], e));
-        }
-        v
+        header_texts_of(&self.sh.clock.info())
     }
 
     /// The per-second window since the last call (`second.v.<name>`), which it closes: per direction the model's
@@ -1486,8 +1722,12 @@ impl<S> DelayStream<S> {
 }
 
 impl<S> Drop for DelayStream<S> {
-    /// Ends the pump (it drops S on its next poll) and removes the connection's clock entry at once.
+    /// Ends the pump (it drops S on its next poll) and removes the connection's clock entry at once; a handle's drop
+    /// does nothing.
     fn drop(&mut self) {
+        if !self.owner {
+            return;
+        }
         let w = {
             let mut c = self.sh.lock();
             c.dropped = true;
@@ -1902,6 +2142,10 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
             c.held_now();
             c.reschedule(sh.clock, sh.key);
             let again = c.released[DOWN] > 0 && !s_owes_write;
+            // RC-12: the reader stamp R, at the closing wake that wakes the reader (UP-STAMP).
+            if wake_reader {
+                c.stamp_reader(sh.clock.now_ns());
+            }
             (c.wakers(wake_reader, wake_writer), again)
         };
         wake_all(w);
