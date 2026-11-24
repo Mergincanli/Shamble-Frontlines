@@ -45,13 +45,17 @@ for (const kind of ["dev server", "preview server"] as const) {
           // And it refuses the Worker's package reached through npm's link in node_modules: that link would open
           // the package's whole folder, whatever is built into it.
           const at = (file: string): string => `${address ?? ""}@fs${path.join(client, "../..", file)}`;
-          expect((await page.request.get(at("packages/sim-worker/pkg/sim_wasm_bg.wasm"))).status()).toBe(200);
+          // (For a file that is not there this server answers 200 with the page itself, so the file's type is asked too.)
+          const players = await page.request.get(at("packages/sim-worker/pkg/sim_wasm_bg.wasm"));
+          expect([players.status(), players.headers()["content-type"]]).toEqual([200, "application/wasm"]);
           expect((await page.request.get(at(".gate/rules-module/release/devtools_bg.wasm"))).status()).toBe(403);
           expect((await page.request.get(at(".gate/rules-module/dev/devtools.js"))).status()).toBe(403);
           expect((await page.request.get(at("node_modules/@shamble/sim-worker/package.json"))).status()).toBe(403);
           expect((await page.request.get(at("node_modules/@shamble/sim-worker/pkg/sim_wasm_bg.wasm"))).status()).toBe(403);
-          // Where earlier builds put the module: a copy may still lie there on a developer's machine. Not handed out.
-          expect((await page.request.get(at("packages/sim-worker/pkg-rules/release/devtools_bg.wasm"))).status()).not.toBe(200);
+          // Where earlier builds put the module: a copy may still lie there on a developer's machine. With or without
+          // one, what comes back is no WebAssembly: a refusal, or the page itself for a file that is not there.
+          const old = await page.request.get(at("packages/sim-worker/pkg-rules/release/devtools_bg.wasm"));
+          expect(old.headers()["content-type"] ?? "").not.toContain("wasm");
         }
       } finally {
         await server?.close();
