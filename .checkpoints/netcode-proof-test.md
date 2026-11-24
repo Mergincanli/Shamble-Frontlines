@@ -80,13 +80,13 @@
   (advisor-u6b-r1.md dc6973da…; brief rev 1.2 binds it by line range): R-PING, A1 (a), A2 at U6c's close, A3 no second
   round. **The fix pass DONE 23:2x** (wip/u6b-fix.patch e29c003c…, 5,952 of 6,000; check.mjs x2 11/11, counted
   fx-check2.log: 807 = +53, 904 = +54, test 0.89x; 20 plants fail by name; 20 release starts p50 19.46 ms, max 25.17
-  ms; NR-U6B-5, T-12, T-17 carried; F-TICK-ROUND, div_ceil, for the advisor). **The advisor's fix-diff check RUNNING**
-  (a108f5cdf9270999e -> advisor-u6b-fix.md); then merge M3-M9 (main-run.sh), CI, U6b's report.
+  ms; NR-U6B-5, T-12, T-17 carried; F-TICK-ROUND, div_ceil). **The advisor's check DONE 04:3x: APPROVE WITH CONDITIONS
+  C1-C2** (advisor-u6b-fix.md bf8da516…); C1 done (20 diffs in .gate/u6b/); M3/M4 done (28/28 byte-equal); M5 RUNNING.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6b's fix pass back:** snapshot (wip/u6b-build.patch), the size line (past 6,000: three lines to him); the
-  advisor's check of the fix diff (A3: advisor-u6b-r1.md:149-156, xhigh); merge M3-M9 (main-run.sh), CI; U6b's report
-  (carries by number: advisor-u6b-r1.md:182-187 and u6b-fix-pass.md section 3; SEC-U6B-3 on PR #40's closing list).
+- **Next 2, U6b's merge:** M5 (.gate/u6b-merge/m5-check.log, main-run.sh b2hoobkx9); M6 a failing test stops, to the
+  advisor; M7 the gate --no-smoke; M8 one commit (the 28 files, u6b-report.md drafted, `git rm` wip/u6b-fix.patch; keep
+  u6b-build.patch for U6e); M9 push, CI, the card; SEC-U6B-3 onto PR #40's closing list; then T5 (i), U6c's launch.
 - **Next 3:** the 2026-11-24 day message SENT 23:0x UTC (msg-2026-11-24.md: choices 1-7, /compact asked); the next at
   2026-11-24 23:05 UTC (trig_016pV7v16ktVwMuzygofJhjJ, msg-2026-11-25.md). T5 (i) the day U6b merges.
 
@@ -134,10 +134,10 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (3 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - The advisor's U6b fix-diff check a108f5cdf9270999e (advisor-u6b-fix.md, saved per item; cut 23:22, resumed 02:3x).
-    On a prompt 02:43-04:27 (a cd into T): stopped, resumed 04:3x read-only from item (4); re-snapshot = e29c003c.
-    Done, resumable: U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree
+- **Running (0 agents, 2 shells; message or resume each by SendMessage to its ID; after a cut, from its file):**
+  - U6b's M5, main-run.sh b2hoobkx9 from 04:34 (.gate/u6b-merge/m5-check.log; an 18 min run). Done, resumable: the
+    advisor's U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md DONE; a prompt 02:43-04:27, stopped, resumed 04:3x).
+    U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree
     agent-a2661dc320c9e6d00), the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode
     a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
   - The saver b60xfhy35 (checkpoint.mjs watch from 04:27 to about 06:17; when it ends, restart it: run_in_background,
