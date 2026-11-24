@@ -57,16 +57,37 @@
    things before the commit id goes to Mustafa: check.mjs whole passes on this head, and the report names the main
    session's model (it is Fable 5.2, by his start block; CLAUDE.md's Models line says Opus 5.5: his to settle).
 
+8. The final head's checks · 0e0f654776fc0e10e153875d59b33869e6179a88 · `node spikes/netcode-proof/check.mjs` whole
+   in this container (2026-11-24, ended 20:56 UTC): all 11 steps pass; test: measured build 820 passed, bites build 917
+   passed, 0 failed, 0 skipped (the base: 807 and 904; +13 each); marks: 81 read, rows unchanged; self 78 of 78;
+   redact 11 of 11, 0 findings. GitHub on that SHA: the gate workflow's jobs gate and smoke success (run 45483689493),
+   the toolchain workflow success (run 45483689440). Part a's commit id reported to Mustafa.
+
+## Part a, for whoever merges it (the netcode chat, on Mustafa's word only)
+- **The commit:** 0e0f654776fc0e10e153875d59b33869e6179a88 (commits after it on this branch touch only
+  `.checkpoints/netcode-judge*`). It changes only `spikes/netcode-proof/crates/judge/` and `spikes/netcode-proof/marks/`
+  (9 files); no manifest or lockfile; `marks/SERIES.md` untouched.
+- **To repeat the checks, from `spikes/netcode-proof/`:** `cargo test -p npt-judge --locked --no-fail-fast` (98 pass:
+  17 + 3 + 55 + 23); `cargo clippy -p npt-judge --all-targets --locked -- -D warnings`; `cargo fmt --check`;
+  `cargo run -q --locked -p npt-judge -- --marks marks/marks.json --check-marks` (81 marks); from the repository's
+  root `node spikes/netcode-proof/check.mjs` (11 of 11 steps).
+- **What changes for callers:** a new verdict word MOVED (a mark's and a part's), a bite status `moved`, and optional
+  `moved` fields in the `--out` JSON (`moved` on a verdict, a part and a bite; `moved_checks` on a verdict). Exit
+  codes and the `npt-judge: ` error lines are as before. The three `outside` marks read MOVED, not NOT-RUN.
+- **marks.json:** sha256 86705adc5f120747e97ecf5ef6eef7250983a838fe031772161215144edcfee4. An older judge refuses
+  it (unknown field `moved`): judge and marks.json merge together. `marks/README.md` 2.6 is the contract.
+- **Before the merge:** the real-data line under "Open findings"; Mustafa's answer to OUTSIDE-NOTES (on his (a), one
+  more small commit lands here first).
+
 ## Current step
-On the final head 0e0f6547: `node spikes/netcode-proof/check.mjs` whole (background since 20:44 UTC, about 17
-minutes). Then the report.
+Part a is reported. Waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL. Part b starts with its own plan.
 
 ## Next steps
-1. If all three hold: the report to Mustafa with the commit id (plan-a.md section 6, conditions 10 to 12, say what it
-   must hold) and the board thread's ready line. If check.mjs fails: fix, push, run it again.
-2. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
+1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
    one small commit, the checks again on the new head, the new commit id to him.
-3. Part b (U6j, 19 figures and three waiting judge changes): its own plan, the advisor's review, then the build.
+2. Part b (U6j, 19 figures and three waiting judge changes; the stop is 4,900 added lines): read u6-brief.md section 8
+   and replan-units.md:40, :63, :175 on the netcode branch's notes, SERIES.md's formulas and figures.rs; its own
+   plan (`plan-b.md`), the advisor agent's review, then the build in blocks.
 
 ## Open findings
 - Left as follow-ups from part a's round (Low, no fix now): rust-reviewer's L4 (a kept bite whose only runs were left
