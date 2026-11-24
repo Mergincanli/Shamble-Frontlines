@@ -108,3 +108,18 @@ fn probe_pb9_each_set_pools_its_own_on_runs() {
         assert_eq!(line, want, "{run}: {lines:?}");
     }
 }
+
+/// H1: four valid 10-minute N=24 runs (18,000 ticks x 24 x 38 entities, no common factor): panics today at
+/// ratio.rs:27 ("a fraction overflowed i128"); after the fix, the chosen outcome (a gap naming the count, or a value).
+#[test]
+fn probe_sync_four_valid_ten_minute_references() {
+    let mut logs = vec![sync_log("a48", 48, 1_781_999_999_989, 160_704_011)];
+    let n24 = [(197_999_999_977, 16_416_007), (198_000_000_019, 16_416_011), (197_999_999_993, 16_416_013), (198_000_000_007, 16_416_029)];
+    let n36 = [(197_999_999_959, 32_400_011), (198_000_000_031, 32_400_017), (198_000_000_049, 32_400_023)];
+    let ids24 = ["a24", "b24", "c24", "d24"];
+    let ids36 = ["a36", "b36", "c36"];
+    logs.extend((0..4).map(|k| sync_log(ids24[k], 24, n24[k].0, n24[k].1)));
+    logs.extend((0..3).map(|k| sync_log(ids36[k], 36, n36[k].0, n36[k].1)));
+    let (line, note) = sync_out(&logs);
+    assert!(line.starts_with("Pass") || line.starts_with("Fail") || line.starts_with("Gap"), "{line} {note}");
+}
