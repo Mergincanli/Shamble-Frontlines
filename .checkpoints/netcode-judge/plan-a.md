@@ -105,3 +105,33 @@ Base: e2c0e896 (the netcode branch's head, this branch's first push). Paths belo
    separate verifier agent (his block names one round of two reviewers; test-engineer runs the tests itself); the
    advisor reads the final head; the gate is GitHub's gate check on each push.
 5. **The real-data line** (section 3, last bullet): skipped here, handed to the netcode chat. Lean: accept.
+
+## 6. The advisor agent's verdict (2026-11-24, about 20:10 UTC, on head 41a8938): APPROVE with 12 conditions
+The conditions, each binding on the build (my wording, shortened; the plan above is read with them):
+1. The loader also refuses: `moved` on a part of a `person` mark (the person path never reads parts, so it could read
+   PASS); `moved` on a `ws_bound` check; a `pre:<mark>` rule naming a mark with any moved part or check, or moved whole.
+2. No rule skips a precondition mark's moved checks or parts: condition 1's refusal replaces section 2's "a
+   precondition's checks" site and test 6.
+3. A bite run whose matched parts are all moved is left out of that bite's runs; a bite run matching no part keeps
+   today's rule (the mark-wide checks). One test for each.
+4. Test 3 has one test per place checks are chosen (plain, pooled, setup, bite runs); a kept bite whose run fails only
+   a moved check reads missed (FAIL), not shown.
+5. Test 8 also runs on committed FAIL and INVALID fixtures with `moved` on each bite in turn: the verdict is unchanged.
+6. A kept mark reading MOVED names each moved part, check and bite with its `to` in its first `why` line; cli.rs
+   tests the summary line and the `--out` JSON for a mark moved whole and a kept mark with a moved part.
+7. The three `outside` marks read MOVED; their notes stay as they are until Mustafa answers (OUTSIDE-NOTES).
+8. -19's and -31's "ML* Chrome (rough, reported)" parts are moved with their "ML Chrome" parts' `to`, their `why`
+   saying their only run was a leg of the human run (R7); the report names them as the one move the table does not
+   name, the advisor's reading of NPT-TRIM's move of R7, not a decision of Mustafa's.
+9. -56's moved 10-item check points, in its `to`, to the MARK-NOTES sentence in its notes (no paraphrase).
+10. The report and the hand-off say part a does not carry the NPT_KC_BURSTS test rider (crates/net, outside the
+    fence; an earlier ruling put it in "MOVED's brief": advisor-u8-brief.md:106-113). BURST-RIDER goes to Mustafa.
+11. The commit id given to Mustafa is a build commit pushed without "[skip ci]"; the report gives GitHub's gate (gate
+    and smoke jobs) and toolchain conclusions on that full SHA, read from the check runs.
+12. The report lists every changed existing assertion (old and new), marks.json's changes by count (26 marks, 21
+    parts, 2 checks, 1 bite, -56's added check, two notes), its sha256 before and after, and section 4's commands with
+    their output; fixtures/README.md's closing paragraph is fixed. Also: `to`, `why` and `by` non-blank after trimming.
+The five rulings: (1) the rough twins move (condition 8); (2) `outside` maps to MOVED, the notes sentence is
+Mustafa's (build with the notes untouched); (3) -56 as leaned; (4) no separate verifier agent for this unit, no local
+`tools/gate.mjs` run (GitHub's gate job is the gate), the advisor reads the final head, the kit's verifier runs at PR
+#40's close; (5) the real-data re-judge is handed to the netcode chat with its command, said as not verified here.

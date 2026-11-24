@@ -22,6 +22,8 @@ const SHOOT = "Slice 1 change-set 8 (Shoot)";
 const S3 = "Slice 3";
 const SAFARI = ["Safari later", "Safari left the proof test (BROWSER-SET (a))"];
 const HUMAN = ["Slice 3, with the human run", "the human run (R7) left the proof test"];
+// The rough-laptop twin of a part that moved with the human run (the advisor's reading of NPT-TRIM's move of R7).
+const HUMAN_ROUGH = [HUMAN[0], "its only run was a leg of the human run (R7), which left the proof test"];
 const CRATE = ["Slice 3's WebTransport crate choice", "the proof test carries one crate, web-transport-quinn"];
 const R4 = "its run, R4, left the proof test";
 const U4G = "client prediction left the proof test (U4g)";
@@ -63,7 +65,7 @@ const PARTS = {
   "PM-0001-1": { RD: ["when RD is named, with PM-0001-43's RD part", "the desktop's legs rode the human run (R7)"], MAC: SAFARI },
   "PM-0001-3": { "MP at P2": HUMAN },
   "PM-0001-14": { "MAC Safari": SAFARI },
-  "PM-0001-19": { "ML Chrome": HUMAN },
+  "PM-0001-19": { "ML Chrome": HUMAN, "ML* Chrome (rough, reported)": HUMAN_ROUGH },
   "PM-0001-28": {
     "wtransport: ML chrome": CRATE,
     "wtransport: ML edge": CRATE,
@@ -74,7 +76,7 @@ const PARTS = {
     "web-transport-quinn: MAC safari": SAFARI,
   },
   "PM-0001-29": { "MAC-b safari": SAFARI },
-  "PM-0001-31": { "ML Chrome over WebSocket at P2": HUMAN },
+  "PM-0001-31": { "ML Chrome over WebSocket at P2": HUMAN, "ML* Chrome (rough, reported)": HUMAN_ROUGH },
   "PM-0001-36": { "MAC-b safari loopback": SAFARI, "MAC-b safari eu-path": SAFARI },
   "PM-0006-14": {
     "N=36": ["slice 6, on the real sim", "the N = 36 and N = 18 searches (R6) left the proof test"],
@@ -93,8 +95,8 @@ const PIECES = {
   "PM-0001-56": {
     checks: {
       "every listed item read once and written (10 items)": [
-        "with their marks: items 5 to 10, and item 1's other crate and pick (Slice 3)",
-        "MARK-NOTES: the record counts 4 items here",
+        "with the items' own marks, as the MARK-NOTES sentence in this mark's notes says item by item",
+        "MARK-NOTES: the record counts 4 items here, not 10",
       ],
     },
     bites: {},

@@ -33,12 +33,18 @@
 2. The reading and part a's plan · `.checkpoints/netcode-judge/plan-a.md` · baseline: the judge's 85 tests pass at
    the base (`cargo test -p npt-judge --locked`, 14 + 2 + 49 + 20).
 
+3. The advisor agent's plan review · APPROVE with 12 conditions (plan-a.md, section 6) · two questions for Mustafa
+   that do not stop the build: OUTSIDE-NOTES (the three outside marks' notes sentence) and BURST-RIDER (a test
+   setting in crates/net that an earlier ruling put in MOVED's brief; outside this fence).
+
 ## Current step
-Part a: the advisor agent reviews plan-a.md (its five questions in section 5). No judge or marks edit before APPROVE.
+Part a's build, by plan-a.md with its section 6. It starts when the baseline run of check.mjs (below) has ended, so
+that run reads only the base's files. Order: marks.rs (the label and the load refusals), eval.rs (the MOVED rule),
+`node .checkpoints/netcode-judge/moved-table.mjs --write`, the tests, the two READMEs.
 
 ## Next steps
-1. The advisor's verdict into plan-a.md's end (verdict and conditions, short); fix the plan if REVISE.
-2. Build part a in this worktree; the judge's tests, lints and check.mjs; the size count against 1,440.
+1. Build part a (above); `cargo test -p npt-judge --locked` after each file.
+2. The judge's lints and check.mjs whole on the build's head; the size count against 1,440.
 3. One review round (test-engineer, rust-reviewer), one fix pass, the final head's checks, the report with the commit id.
 
 ## Open findings
@@ -53,7 +59,9 @@ Part a: the advisor agent reviews plan-a.md (its five questions in section 5). N
   folder parked) · Mustafa · in the chat.
 
 ## Running work
-- The advisor agent on plan-a.md (launched 2026-11-24 19:53 UTC, xhigh; its verdict comes back to the session).
-- Ready, not run on the file: `.checkpoints/netcode-judge/moved-table.mjs` (the labels as a table; its dry run finds
-  every name: 26 marks whole, 19 parts, 2 checks, 1 bite; marks.json's sha256 after would be 152578df…; the table
-  changes if the advisor rules on plan-a.md's questions 1 to 3).
+- The baseline: `node spikes/netcode-proof/check.mjs` at the base's files, in the background since about 20:00 UTC
+  (its first four steps passed: fmt, clippy, clippy-wasm32, doc); its log is in the session's scratchpad, its result
+  goes under Key numbers.
+- Ready, not run on the file: `.checkpoints/netcode-judge/moved-table.mjs` (the labels as a table, with the advisor's
+  conditions 8 and 9 in; its dry run finds every name: 26 marks whole, 21 parts, 2 checks, 1 bite; marks.json's sha256
+  after would be 7f148c3e…).
