@@ -1490,6 +1490,41 @@ fn u4j_the_arm_rule_counts_an_aarch64_mismatch_only_when_the_x86_64_re_decode_mi
     let lg = hash_log("h1", "bots", "decoded_hash", &wrong, arm);
     let (k, why) = verdict_of(&[hash_mark()], &[arm_room, lg, replay(&SERVER)]);
     assert_eq!(k, VerdictKind::Fail, "{why:?}");
+    // The rule's key is LG (TE2-1): an aarch64 `client` log on role C or ML, the room on x86_64 and the re-decode
+    // agreeing with the server, is a mismatch that counts (1), and nothing is reported as aarch64 only.
+    for role in ["C", "ML"] {
+        let room = hash_log("h1", "room", "server_hash", &SERVER, no);
+        let client = hash_log("h1", "client", "decoded_hash", &wrong, &|s| {
+            s.arch = "aarch64";
+            s.machine_role = role;
+        });
+        let v = judge(
+            &marks_file(&[hash_mark()]),
+            &[room, client, replay(&SERVER)],
+        );
+        let part = &v[0].parts[0];
+        assert_eq!(part.verdict, VerdictKind::Fail, "{role}: {:?}", part.why);
+        assert!(says(&part.why, "= 1, needs"), "{role}: {:?}", part.why);
+        assert_eq!(report(&v[0], "aarch64 only"), ["0"], "{role}");
+    }
+}
+
+/// A reason carries log text (run ids, a person's name). `summary_line` escapes every control character, so the line
+/// stays one line and no forged verdict line starts on stdout (SEC-R2-N2). The reason is set here by hand: npt-log's
+/// writer refuses a control character in a run id, and the judge does not rest on that.
+#[test]
+fn the_summary_line_escapes_control_characters() {
+    let mut v = judge(
+        &marks_file(&[tick_mark(M, json!({"bites": []}))]),
+        &three_runs(M, [90, 101, 100]),
+    );
+    assert_eq!(v[0].verdict, VerdictKind::Fail);
+    v[0].why[0] = "S30: run run-2\nPM-0001-9    PASS\ttick p99 = 101\u{1b}[2K".to_owned();
+    let line = npt_judge::summary_line(&v[0]);
+    assert_eq!(
+        line,
+        "PM-0001-4    FAIL      S30: run run-2\\nPM-0001-9    PASS\\ttick p99 = 101\\u{1b}[2K"
+    );
 }
 
 #[test]

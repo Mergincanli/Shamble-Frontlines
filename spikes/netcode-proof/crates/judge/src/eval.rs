@@ -1818,7 +1818,7 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
         }
     }
     if mark.arm_rule && kind == VerdictKind::Fail {
-        why.push("the Arm rule (ADR 0001): an aarch64-only mismatch is a cross-architecture finding; this judge applies it to the decoded hashes (decoded_hash_mismatch_count, against the x86-64 re-decode), and the shot view test's and throw landing's kinds with their figures (U4h)".to_owned());
+        why.push("the Arm rule (ADR 0001): an LG aarch64 mismatch (the room on x86_64) whose x86-64 re-decode agrees is a cross-architecture finding; this judge applies it to the decoded hashes (decoded_hash_mismatch_count, against the x86-64 re-decode), and the shot view test's and throw landing's kinds with their figures (U4h)".to_owned());
     }
     v.report = report_values(mark, &v.parts, &members, all);
     v.verdict = kind;

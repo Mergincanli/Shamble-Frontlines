@@ -45,8 +45,18 @@ pub fn read_logs(dir: &Path) -> Result<Vec<npt_log::Log>, String> {
     Ok(logs)
 }
 
-/// One line per verdict: the mark, the verdict, and its first reason.
+/// One line per verdict: the mark, the verdict, and its first reason. Every control character is escaped, so no text
+/// from a log (a run id in a reason) starts a line of its own on stdout.
 pub fn summary_line(v: &Verdict) -> String {
     let first = v.why.first().map(String::as_str).unwrap_or("");
-    format!("{:<12} {:<9} {first}", v.mark, v.verdict.to_string())
+    let line = format!("{:<12} {:<9} {first}", v.mark, v.verdict.to_string());
+    let mut out = String::with_capacity(line.len());
+    for c in line.chars() {
+        if c.is_control() {
+            out.extend(c.escape_default());
+        } else {
+            out.push(c);
+        }
+    }
+    out
 }
