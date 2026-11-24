@@ -70,3 +70,107 @@ the tree's file now (`git hash-object`: session.rs bfe90ca, ws_server.rs 137feec
   (main.rs:843-844). WsLink pushes its summary before its permit drops, also when the bound cut it
   (ws_server.rs:855-865), so "every permit back" implies every summary pushed. Binary test (tests/binary.rs:317-321,
   :370-375): the WsClient stays connected through stdin's close; one `ws_summary`, before `ws_split`.
+- **NR-U6B-2: MET** (F-TICK-ROUND: section 3). Seat's fix (u6b-review-netcode.md:162): "`Listen` (or `WsServer::bind`)
+  takes `tick_ns`; npt-server passes `1_000_000_000 / u64::from(npt_sim::TICK_HZ)`; every `TickWriter::new` takes it;
+  `TICK_NS` stays in tests only; one test ... gives N = 10 at srtt 100 ms." Tree: the form is `Listen` (named, my
+  ruling's item 5: one form for both caller values), `GateCfg::of(&Listen)` (ws_server.rs:84-98, :462), the gate's
+  `TickWriter::new(c.tick_ns)` (:575); `TICK_NS` is `#[cfg(test)]` (:68-70); npt-server passes `GATE_TICK_NS` =
+  `1e9.div_ceil(TICK_HZ)` with its reason (server/src/main.rs:148-150, :561); ws_gate.rs equals `<base>` (no diff), so
+  `snapshot_budget(srtt, tick_ns)` is unchanged (ws_gate.rs:25-31). Test b4_the_gate_counts_n_in_the_callers_tick_60_hz_
+  gives_10_at_100_ms (ws_server_tests.rs:710-729): N = 10 at 60 Hz through `GateCfg::of(&Listen)`, 6 at the tests' 30 Hz.
+- **T-2: MET, both halves** (my ruling's carry of the WT half to U6e is not needed: no QUIC-stage hook). Seat's fix
+  (u6b-review-test.md:127): "raw TCP, wait for the permit, set 700, finish TLS and the upgrade and assert 500; the same
+  on WebTransport between the first packet and the answer." WS: ws_server_tests.rs:215-241 exactly that. WT:
+  b2_the_accept_stamp_is_the_first_packets_never_the_answers (wt_server_tests.rs:333-377): the clock moves 500 → 700
+  after QUIC's handshake and before HTTP/3's SETTINGS, CONNECT and the answer; the session carries 500.
+- **T-3: MET.** Fix (:128): "Wait (bounded) on an arrivals count". Tree: the clock counts its own reads (load, then
+  count, SeqCst: ws_server_tests.rs:197-208); the test waits (5 s bound) for the reader's two reads, then moves the
+  clock to 9,000 (:242-256). No sleep left in the test. (An unrelated clock read would make it fail, never pass falsely.)
+- **T-4: MET as worded; its time alone not measured.** Fix (:129): "Bursts at 0.5 s and 2.5 s (or one burst), or state
+  the exception". Tree: bursts at 0.5 s and 2.5 s (ws_server_tests.rs:824-827; the bite's (c) test left with A1). The
+  ws_server module's wall time fell from 6.53 s (fx4-test3.log:36, before T-4) to 5.20-5.21 s (fx5-test.log,
+  fx6-test3.log:79), with 22-23 tests in parallel: the test is at most about 5.2 s under that load; alone, by the old
+  6.54 s less 2 s, about 4.5 s. Not shown under 5 s alone: Low F-2.
+- **T-5: MET (the code half).** Fix (:130): "Say so in the report and in R1.md's reading (the identity is a range check
+  for R); in the loopback self-test assert each R is the first closing wake after its release." Tree: `reader_split`
+  checks R = the first closing wake at or after the release (`partition_point` on `reader_wakes`,
+  l2/delay_tests.rs:3097-3127), used by the reader-stamp test (:3142) and the b5 loopback self-test
+  (ws_server_tests.rs:934). Report half: U6b's report; R1.md half: U8's next edit (my ruling's section 3 item 9).
+- **T-6: MET** (also NR-U6B-12). Fix (:131): "A test on a local `Pool` (not the static): samples, mark, samples; assert
+  each window's n and that the parts sum to L; state the in-flight skew bound in the report." Tree: `Pool::new()`
+  (l2/delay.rs:229-234); u6b_a_marked_pool_counts_one_window_for_the_parts_and_pooled_l (l2/delay_tests.rs:3151-3190):
+  10 releases at 10x, one mark (a second refused), 6 at 1x; each window's n in the parts, the reader parts, the kinds
+  and pooled L asserted; the window's own maxima (6,000 and 9,000 µs-ns, not the 10x ones) with each class's parts'
+  maxima summing to L's. The sum appears as the maxima of identical releases, not as a sum field; with n asserted it
+  fixes the sums. The skew bound is stated in the test's doc (:3155-3157): report text.
+- **T-7: MET.** Fix (:132): "Log each listener's serving stamp and OPEN's on one clock and assert serving <= OPEN;
+  re-plant P14 between Net::bind and serve." Tree: `Net::serve` returns both stamps on the room clock after each
+  `start()` (server/src/main.rs:617-622); OPEN's stamp just before its line, event `open` with three rows
+  (:782-791; SERIES.md:883-885); the binary test asserts both <= `open_ns` (tests/binary.rs:366-368); P14b
+  (plant-p14b.diff: OPEN and its stamp moved before `serve`) fails it at binary.rs:368 (item 4).
+- **T-8: MET.** Fix (:133): "`tokio::time::timeout(5 s, ...)` on each accept with an expect; assert both links Open
+  after the wait." Tree: tick_loop/tests.rs:1545-1567: both accepts under 5 s timeouts with expects; both client
+  links asserted Open after a 5 s bounded wait.
+- **T-9: MET.** Fix (:134): "Send FULL_STATE_MAX bytes and assert them received". Tree: ws_server_tests.rs:503-523
+  sends 65,541 B exactly and asserts 65,541 received, malformed 0 (the optional one-more case not built).
+- **The Lows built (my ruling's item 7 order; the scope line, item (6)):**
+  - NR-U6B-6: MET. The mark task reads `TickLoop::now_ns()` just before `mark_split()` and stores it only when the
+    mark is taken (server/src/main.rs:635-643); `ws_split` carries `ws_split_mark_room_ns` (:666-670; SERIES.md:882).
+    Tested at 0 only (binary.rs:376-379; a mark needs more than 1 s of run): the non-zero case is read at A2's U6c
+    reading, which sets the mark (carry C-6).
+  - SEC-U6B-4 (= T-15): MET, in a stronger form than the seat's unit call. pin.rs's
+    u6b_the_pin_refuses_the_pinned_certificate_signed_with_another_key: a full TLS 1.3 handshake against a server
+    presenting the pinned certificate, taken with its own key, refused with another key; P19 (plant-p19.diff: the
+    signature check returns `assertion()`) fails it at pin.rs:141.
+  - SEC-U6B-5: MET. The OPEN test lists the run folder and hash/ after the run, scans each file for PKCS#8's P-256
+    start (the scan proved on a fresh rcgen key), and asserts exactly hash/room.json, room.jsonl, settings.json,
+    tokens (tests/binary.rs:322-345); P15 and P15b fail it at :342. (It lists files, not new subfolders: no finding,
+    the room makes none.)
+  - NR-U6B-4: MET. `begin_tick(&[])` returns `Sent` with no tick (ws_server.rs:665-668); `send_unreliable` decrements
+    `announced` before the `TooLarge` return (:685-698); the trait doc says "an empty `lens` announces nothing"
+    (link/src/lib.rs, `begin_tick`'s doc); test b4_an_empty_tick_is_none_and_a_too_large_datagram_takes_its_slot
+    (ws_server_tests.rs:696-708).
+  - Not built (the scope line): NR-U6B-5, T-12, T-17: carried by number (item 8).
+- **Lane:** the diff touches no Cargo.toml or Cargo.lock, marks.json, R1.md, check.mjs, room, client or bots file;
+  ws_gate.rs is back to `<base>`; SERIES.md has 82 added lines and none removed; proto's +9 is the round's added item
+  1, unchanged in the fix pass (notes :330-331).
+**Item (1): MET.**
+
+### (2) R-PING as rev 1.2 words it (advisor-u6b-r1.md:65-81; u6b-brief.md:12-25 binds it by line range): MET
+- "never held to the snapshot budget": the outside path never calls the writer's `on_tick` (ws_server.rs:699-713).
+- "WsLink writes it only when its length is at most the largest Ping or Pong ... passed in by npt-server beside the
+  gate's tick period, as npt-net names no npt-proto item": `bytes.len() <= outside_max` (:703-704), `outside_max` a
+  `Listen` field beside `tick_ns` (GateCfg, :84-98), npt-server passes `Limits::PING.max(Limits::PONG)` = 32 B
+  (server/src/main.rs:561-562; proto/src/limits.rs:32-33); npt-net's manifest is unchanged (no npt-proto dependency).
+- "fix 1's first two conditions hold (nothing owed below WsLink's own send queue, which is bounded and left out of
+  this check only, and room in the socket for its model bytes)": `inputs(false)` leaves `queued` out of owed, a tick's
+  `inputs(true)` keeps it (:610-645); the check is `owed == 0 && free >= model_bytes(len)` (:704-706).
+- "otherwise it is answered BufferFull": :710-712. "None announced, or past its count": `outside` is true exactly when
+  `announced == 0` (:685-695).
+- "the sent and the refused are counted in `event.ws_accept` (two new SERIES.md rows)": `Counts::outside` on the
+  server's shared counts (the gate holds the server's `Arc<Counts>`, :584), rows `outside_tick_sent_count` and
+  `outside_tick_refused_count` in `Counts::rows` for WebSocket only (session.rs:182-196), which `WsServer::event_rows`
+  writes (ws_server.rs:385-392); SERIES.md:901-902. The round's cfg(test)-only counts (NR-U6B-3 (a)) are now logged.
+- "the trait's doc states the rule and the caller's duty (one call per tick before its datagrams, then exactly those
+  datagrams, in order, with no other datagram between them)": link/src/lib.rs, `begin_tick`'s doc, both paragraphs
+  ("The caller's duty", "Outside a tick").
+- Tests (rev 1.2's section 3 line): b4_outside_a_tick_only_a_ping_or_pong_with_nothing_owed_below_the_queue_is_sent
+  (ws_server_tests.rs:669-694, current_thread so the writer task cannot drain): 33 B refused, 32 B sent, a 10 B Ping
+  after an allowed tick's batch (still in the link's queue, asserted) sent; both counts (2 sent, 1 refused) read from
+  `Counts::rows`, the function `ws_accept` writes. The round's outside test now uses 32 B (:657-666). P17
+  (plant-p17.diff: the bound made always true) fails the new test at ws_server_tests.rs:678 (item 4).
+- The proof that TickLoop announces every snapshot stays u6b_each_tick_is_announced_whole_and_a_refused_one_is_counted
+  (as my ruling says; it passes in both counted runs).
+
+### (3) A1's removal complete (item 0's grep): MET
+- My grep of T (2026-11-24): `ws-budget`, `ws_budget`, `WS_BUDGET_BITE`, `pm_0001_18_*` in crates/net and
+  crates/server: no hit but U5's PM-0001-18 tests and docs (tcp_model/fixes.rs, server/tests/gap.rs: `<base>`'s).
+  `with_bite` on WsServer: none; the hits left are TickWriter's (`#[cfg(test)]`, ws_gate.rs:98-99) and its test
+  callers, and npt-server's own Schedule, Decoder and loopback bites. `BudgetX2`: ws_gate.rs:63-66 (enum under
+  `#[cfg(test)]`), :107-108 (under `#[cfg(test)]`), ws_gate_tests.rs:40, :225, l2/delay_tests.rs:3457 (test files;
+  delay_tests.rs's one use is `<base>`'s too). No "bite" left in ws_server.rs.
+- ws_gate.rs and ws_gate_tests.rs: `git diff HEAD` empty (= `<base>`). npt-net lib.rs: only the re-export
+  `WS_BUDGET_BITE` left against the round (the per-file comparison of the two snapshots). main.rs: the bite list is
+  `<base>`'s three (server/src/main.rs:264-266), no WS_BUDGET_BITE, no arming.
+- The size fell 5,498 → 5,398 (notes :204), inside my ruling's "about 90-100". The snapshot 49f4488f keeps the hunks
+  for U6e (wip/u6b-build.patch, sha256 checked).
