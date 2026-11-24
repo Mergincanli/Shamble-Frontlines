@@ -84,8 +84,10 @@
   uncommitted copy of the tree; plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, T5 (i):** U6b's merged release binary built in the main folder (main-run.sh, .gate/u7/t5i-release.log) and
-  copied to .gate/u7/npt-server; then U7's T-builder a9873cdba07a3219e by SendMessage; then U6c's launch on the lane.
+- **Next 2, T5 (i) RUNNING 06:2x:** U6b's merged release binary built (t5i-release.log, 25.6 s) and copied to
+  .gate/u7/npt-server (f78dd20a… = the fix pass's 20-start binary); U7's T-builder a9873cdba07a3219e resumed by
+  SendMessage (C9's slot rule; U8 re-read from u8-build.patch 0e7fbab2…; its logs in its worktree's .gate/u7/, I copy
+  them out). Then U6c's launch on the lane (u6c-brief.md section 10's before-launch list; chat ~75 % at 06:22).
 - **Next 3:** the 2026-11-24 day message SENT 23:0x UTC (msg-2026-11-24.md: choices 1-7, /compact asked); the next at
   2026-11-24 23:05 UTC (trig_016pV7v16ktVwMuzygofJhjJ, msg-2026-11-25.md). T5 (i) the day U6b merges.
 
@@ -136,8 +138,8 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (1 agent, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - The advisor's H3 head read a6e7ce46a28424b0b (appends to advisor-u6b-m6.md). Done, resumable: the advisor's U6b fix
-    check a108f5cdf9270999e (advisor-u6b-fix.md
+  - U7's T-builder a9873cdba07a3219e on T5 (i) (notes u7-t-build.md). Done, resumable: the advisor a6e7ce46a28424b0b
+    (advisor-u6b-m6.md DONE, fe2e4c0d…); the advisor's U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
     DONE); U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree agent-a2661dc320c9e6d00), the
     advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode a0a57a3948202de40, security aedb799ad9648b0e1,
     test a88f25b3d3f66d972.
