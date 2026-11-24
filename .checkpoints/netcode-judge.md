@@ -53,4 +53,7 @@ Part a: the advisor agent reviews plan-a.md (its five questions in section 5). N
   folder parked) · Mustafa · in the chat.
 
 ## Running work
-- none
+- The advisor agent on plan-a.md (launched 2026-11-24 19:53 UTC, xhigh; its verdict comes back to the session).
+- Ready, not run on the file: `.checkpoints/netcode-judge/moved-table.mjs` (the labels as a table; its dry run finds
+  every name: 26 marks whole, 19 parts, 2 checks, 1 bite; marks.json's sha256 after would be 152578df…; the table
+  changes if the advisor rules on plan-a.md's questions 1 to 3).
