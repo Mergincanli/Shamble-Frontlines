@@ -859,6 +859,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      given: the sweeps count from 20:14:13 UTC (trig_012uYr31Q5puh8mgoMhPHnUR 20:25 UTC; trig_01PgaNh9YUgYbGi8tzK2My4X
      21:15 UTC, the one that counts), so visit 2 starts after 21:15 UTC (22:15 Amsterdam) or tomorrow by 21:00
      Amsterdam. Next: his step 2 (Brave, normal window), one step at a time.
+   - **Brave steps done** (his message 20:18:53 UTC, all at once; results log): step 5 login then the page; the private
+     window showed the login page ("Send login code", an e-mail code); step 6 no second login (iso-on true/true); step 7
+     production no login in the normal window; Brave 1.100.58 unchanged; Windows 11 25H2 (Build 26200.9974). Open: step
+     7's private half (production in a private window) and step 8's result (the login after a restart), with his
+     verdict words; then the billing screenshot during the wait. The 10-minute sweep fires at 20:25 UTC.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the

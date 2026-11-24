@@ -907,3 +907,34 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   and a production upload's one-off link is behind the wall too (recorded; the mark judges production's own address
   only). Sweeps scheduled: trig_012uYr31Q5puh8mgoMhPHnUR at 20:25 UTC (at least 10 minutes) and
   trig_01PgaNh9YUgYbGi8tzK2My4X at 21:15 UTC (at least 1 hour, the reading that counts).
+- **The hosting checklist, steps 5 to 8, with the wall on (Brave, his PC)**: his message of 2026-11-24 20:18:53 UTC
+  (065b61dd-5ad4-4ad0-a82c-ebf9a2f3c948), five screenshots (the images stay out of the repository), his words:
+  "ttps://iso-off.shamble-preview-check.pages.dev/ led to a login page, I logged in with my credentials and led to this
+  page" / "Other screenshot shows the private page (ctrl shift N), also asking to log in" / "reloaded the
+  https://iso-on.shamble-preview-check.pages.dev/ on the normal window and didn't ask me to relog, and shower the
+  preview hosting check page" / "https://shamble-preview-check.pages.dev/ showed no login (4th screenshot)" /
+  "https://iso-off.shamble-preview-check.pages.dev/ quit brave and started it again, used the first link".
+  - Screenshot 1 (normal window, iso-off.shamble-preview-check.pages.dev, after his login): Build marker
+    2162db55d93f59cf2ed7e371a3915409f0b5a587, Build mode preview, crossOriginIsolated (page) false, (worker) false,
+    WebAssembly "ran (2 + 3 = 5)", Content file "content.ef463692.bin (65536 bytes)", Status done; the usual resources.
+  - Screenshot 2 (private window): tab "Sign in · Cloudflare Access", address
+    shamble-preview-check-pages.cloudflareaccess.com/cdn-cgi/access/login/iso-off.shamble-preview-check.pages.dev?kid=...
+    ; page "Cloudflare Access" / "shamble-preview-check - Cloudflare Access" / "Log in to shamble-preview-check -
+    Cloudflare Pages" / "Email" (box "example@email.com") / button "Send login code". So the login method shown is a code
+    sent by e-mail (the setup page of 2026-10-12 said new organizations sign in with the Cloudflare account; recorded,
+    not judged).
+  - Screenshot 3 (normal window, iso-on.shamble-preview-check.pages.dev): the same marker, Build mode
+    preview-isolated, crossOriginIsolated (page) true, (worker) true, "ran (2 + 3 = 5)", the same content file, done.
+    Isolation still holds behind the wall.
+  - Screenshot 4 (normal window, shamble-preview-check.pages.dev): the same marker, Build mode production, false and
+    false, "ran (2 + 3 = 5)", done; no login (his words).
+  - Screenshot 5 (brave://version): "Brave: 1.100.58 Chromium: 158.0.8127.42 (Official Build) (64-bit)" (unchanged
+    since 2026-11-19); "OS: Windows 11 Version 25H2 (Build 26200.9974)"; JavaScript V8 15.8.62.31. (His profile path,
+    which holds his Windows user name, is not copied here.)
+  - Read against the checklist (ADR 0006 :1450-1457): step 5 (a Cloudflare login page; after one login the test page
+    loads): as expected; the extra private-window open of iso-off: a login page, as expected (the stop rule not hit);
+    step 6 (another branch, no second login): as expected; step 7: production with no login in the same session, as
+    expected; **its second half (production again in a private window) not reported**; **step 8's result (does the
+    login page come back after a restart) not stated**. Both asked of him; his verdict words ("achieved" or "not yet")
+    asked with them.
+- PM-0006-1, the machines: his PC runs Windows 11 Version 25H2 (Build 26200.9974) (brave://version, 2026-11-24).
