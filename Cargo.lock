@@ -21,6 +21,11 @@ version = "0.0.0"
 [[package]]
 name = "devtools"
 version = "0.0.0"
+dependencies = [
+ "sim",
+ "sim-wasm",
+ "wasm-bindgen",
+]
 
 [[package]]
 name = "proc-macro2"
