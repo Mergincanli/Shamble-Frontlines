@@ -179,3 +179,78 @@ stopped before it ran (it asked for a permission); item (4) uses the logs and di
   `<base>`'s three (server/src/main.rs:264-266), no WS_BUDGET_BITE, no arming.
 - The size fell 5,498 → 5,398 (notes :204), inside my ruling's "about 90-100". The snapshot 49f4488f keeps the hunks
   for U6e (wip/u6b-build.patch, sha256 checked).
+
+### (4) Every plant's log and diff file, the old ones re-run on the fixed tree: MET
+Read with Grep over .gate/u6b/fx-plant-*.log (20 logs) and Read of the worktree's .gate/u6b/plant-*.diff (20 files).
+Every log: the lane lock held (-x), HEAD 21765e3, untracked = the empty set's hash, one filtered test run ("0 passed;
+1 failed"), exit 101; its diff hash differs from the clean 219ee92e…0fef and from the 19 others (20 distinct). Every
+diff file names its plant and file, and its "before" blob is the tree's file now (provenance above), so every old
+plant was re-applied to the fixed tree.
+
+| Plant | Diff file's edit | Named test, failure (log line) |
+|---|---|---|
+| P1 | ws_server.rs, Writer::run forgets the permit | b1_one_cap_of_n_plus_8_across_both_transports, ws_server_tests.rs:166 (p1.log:19) |
+| P2 | WsLink::poll_recv stamps at the poll | b1_arrival_stamps_are_taken_at_arrival_never_at_poll, :263 (p2.log:19) |
+| P3 | wt_server.rs, the deadline over QUIC only | b2_the_deadline_covers_http3_..., wt_server_tests.rs:271 (p3.log:19) |
+| P4 | the WebSocket deadline 10 s later | b3_the_deadline_covers_tls_and_the_upgrade, ws_server_tests.rs:299 (p4.log:19) |
+| P5 | no closing sequence (immediate close) | b2_a_kick_queued_before_the_drop_is_read_before_the_close, wt_server_tests.rs:330 (p5.log:19) |
+| P6 | the Close before the queued messages | b3_a_kick_queued_before_the_drop_..., ws_server_tests.rs:465 (p6.log:19) |
+| P7 | tungstenite's limit from the 513 B constant | b3_one_source_for_tungstenite_and_delaystream_limits, :277 (p7.log:19) |
+| P8 | the gate's inputs read per datagram | b4_the_inputs_are_read_once_per_tick, :626 (p8.log:19) |
+| P9 | each datagram gated alone | b4_a_tick_is_written_all_or_none, :647 (p9.log:19) |
+| P10 | owed without rustls's unsent bytes | b4_owed_counts_rustls_unsent_bytes, :1010 (p10.log:20) |
+| P11 | a close error counted whatever the peer did | b4_a_close_error_after_the_peers_close_is_a_normal_end, :547 (p11.log:31) |
+| P14 | OPEN before Net::bind | u6b_open_..., tests/binary.rs:235 (p14.log:25) |
+| P14b | OPEN and its stamp between Net::bind and serve (T-7) | u6b_open_..., binary.rs:368, serving <= open_ns (p14b.log:25) |
+| P15 | a stand-in file beside the hash file | u6b_open_..., binary.rs:342, the file list (p15.log:25) |
+| P15b | the same beside the log (SEC-U6B-5) | u6b_open_..., binary.rs:342 (p15b.log:25) |
+| P16 | link/lib.rs, the Box forward of begin_tick removed | b4_begin_tick_through_a_boxed_link_sees_the_gates_refusal, ws_server_tests.rs:738 (p16.log:19) |
+| P17 | R-PING's size bound made always true | b4_outside_a_tick_only_a_ping_or_pong_..., :678, the 33 B one Sent (p17.log:19) |
+| P18 | session.rs, `bounded` without its bound | b2_a_peer_that_grants_no_credit_..., wt_server_tests.rs:418, no permit in 4 s (p18.log:20) |
+| P19 | pin.rs, the signature check returns `assertion()` | u6b_the_pin_refuses_the_pinned_certificate_signed_with_another_key, pin.rs:141 (p19.log:19) |
+| P20 | super/main.rs, LineWriter back to BufWriter (6 sites) | u6b_each_record_reaches_the_file_while_npt_super_runs, super/src/main.rs:624 (p20.log:17) |
+
+- The restores: the last plant ran at 23:01:44 (p20.log:47); the counted check.mjs run 2 started 23:02 with the clean
+  tree's diff 219ee92e (item 5), and the tree's blobs are the diff files' "before" blobs now.
+- My ruling's new plants are all there: P14b, P15b, P17, P18, P19, P20 (T-19's F28 plant). T-10 is met in substance
+  (each plant's edit recorded), but the diff files sit in the worktree's gitignored .gate/u6b/ (F-DIFF-HOME), not
+  beside their logs in the main .gate/u6b/: removing the worktree removes them (condition C1).
+- Not checked by me: that each log's diff hash is the clean diff with that file's planted blob (it needs an alternate
+  git index; the call asked for a permission and was not run). The tie rests on each failure matching its diff's edit.
+  If wanted: the main session computes it for one plant before the worktree goes (not a condition).
+
+### (5) check.mjs twice, with its counts: MET
+| | fx-check1.log | fx-check2.log (counted) |
+|---|---|---|
+| Window, lock | 22:29:55-22:47:37 UTC, -x (:1, :159) | 23:02:25-23:18:58 UTC, -x (:1, :159) |
+| Tree | diff 219ee92e…0fef, untracked empty, HEAD 21765e3, free 6,698 MiB (:2-3) | the same diff, free 6,672 MiB (:2-3) |
+| Both `--no-run` builds | exit 0 (:74, :145) | exit 0 (:74, :145) |
+| 11 steps | all PASS, "check: all 11 steps pass" (:147-158) | all PASS (:147-158) |
+| test | 863.0 s; measured 807, bites 904, 0 failed, 0 skips (:151) | 848.5 s; 807 and 904 (:151) |
+| marks / self / redact | 81 marks; 78/78; 11/11, 0 findings (:155-157) | the same (:155-157) |
+
+- Against `<base>` (754, 850): +53 measured, +54 bites. Against the snapshot 49f4488f (799, 898): +8 and +6.
+- Condition 5 as rev 1.2 binds it (advisor-u6b-r1.md:106-107: "at least +45 measured and +45 bites ..., plus each
+  test the fix pass adds, by name"): the fix pass adds 8 tests, all in both builds, so at least 807 and 903: met
+  (807, 904). The arithmetic holds: 799 + 8 = 807; 898 - 2 (the pm_0001_18_* tests, bites only) + 8 = 904. The 8, by
+  name (notes :275-280), each found in T: b2_a_peer_that_grants_no_credit_gets_its_permit_back_within_the_bound,
+  b2_the_servers_quic_config_bounds_its_streams_and_windows, b2_the_accept_stamp_is_the_first_packets_never_the_answers
+  (wt_server_tests.rs), b4_outside_a_tick_only_a_ping_or_pong_with_nothing_owed_below_the_queue_is_sent,
+  b4_the_gate_counts_n_in_the_callers_tick_60_hz_gives_10_at_100_ms, b4_an_empty_tick_is_none_and_a_too_large_datagram_
+  takes_its_slot (ws_server_tests.rs), u6b_a_marked_pool_counts_one_window_for_the_parts_and_pooled_l
+  (l2/delay_tests.rs), u6b_the_pin_refuses_the_pinned_certificate_signed_with_another_key (pin.rs).
+- The test step against 954.8 s: 0.90x and 0.89x (the stop is 1.5x). The counted run's tree is the snapshot's
+  spikes/ part (219ee92e = `git diff HEAD -- .` in T, provenance) with every plant restored (item 4).
+
+### (6) The size line: MET
+- Final: 28 files, +5,952 -267 (`git diff HEAD --shortstat` at T's root, HEAD = 21765e3; the snapshot's own line).
+  Against the round's 5,498 (29 files, -254): +454 net; ws_gate.rs left the diff (back to `<base>`).
+- The running line (notes :204-271): item 0 → 5,398 (-100); 1 → 5,476; 2 → 5,522; 3 → 5,569; 4 → 5,686; 5 → 5,874
+  (my ruling's "about 5,850-5,900" after the Mediums and R-PING); then the Lows: NR-U6B-6 → 5,883, SEC-U6B-4 → 5,926,
+  SEC-U6B-5 → 5,933, NR-U6B-4 → 5,952.
+- The scope line (my ruling's item 7: "a Low starts only if the running total plus its estimate stays at or under
+  5,950 ... a scope line, not a stop"), read at each start: SEC-U6B-4 5,883 + 25 = 5,908; SEC-U6B-5 5,926 + 20 =
+  5,946; NR-U6B-4 5,933 + 15 = 5,948: each allowed to start; NR-U6B-4 took 19, ending 2 past the line, which the line
+  allows (it governs a start). NR-U6B-5 at 5,952 + 8 was not started, nor T-12 or T-17: carried by number. The order is
+  my ruling's.
+- Mustafa's SIZE-CHECK stop (past 6,000) was not reached: 48 under it. No "STOP" line in the notes, none needed.
