@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-24 about 23:25 UTC, part b's final code head 72651a3c, the last checks running.
+- **Last update:** 2026-11-24 about 23:35 UTC, both parts done at 72651a3c and reported.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -195,10 +195,19 @@
     after the room log's last tick record gives no tail (`c_u6_11_a_session_end_at_the_stop_gives_no_tail`; two
     plants). 132 judge tests (19 + 4 + 83 + 26). From 0e0f6547: 3,393 added, 172 deleted (the stop is 4,900).
 
+28. The final head's checks · 72651a3c6326546b423c4773ac5a92902a37b590 · the advisor agent: APPROVE for this head
+    (2026-11-24 about 23:20 UTC; all 11 conditions and its later rulings held; the fence held; the small commit
+    67892d39 as Mustafa asked). `node spikes/netcode-proof/check.mjs` whole in this container (ended about 23:30
+    UTC): all 11 steps pass; test: measured build 854 passed, bites build 951 passed, 0 failed, 0 skipped (part a's
+    head: 820 and 917; +34 each); marks: 81 read, rows unchanged; self 78 of 78; redact 11 of 11, 0 findings. The
+    judge's own commands on the same tree: 132 tests (19 + 4 + 83 + 26), clippy and fmt exit 0, --check-marks 81.
+    GitHub on that SHA: the gate workflow (jobs gate and smoke) success, run 45508565066; the toolchain workflow
+    success, run 45508565097. Part b's commit id reported to Mustafa.
+
 ## Current step
-**Part b's final code head is 72651a3c.** The advisor agent read it: APPROVE for 72651a3c, holding only if `check.mjs` whole passes on it (running since
-about 23:16 UTC; output in the session's scratch folder). Then GitHub's gate and toolchain on that SHA, and part
-b's commit id, commands and report to Mustafa. Open with him: MAIN-MODEL, SYNC-ENTITIES.
+**Both parts are done and reported: the commit is 72651a3c6326546b423c4773ac5a92902a37b590.** Waiting on Mustafa:
+his word for the merge (the netcode chat merges, after his main Advisor's check), SYNC-ENTITIES and MAIN-MODEL.
+Nothing is running but the background saver.
 **For the report (collected while building):**
 - Condition 4, readings still open (built on the written reading): -12 and -13 "per client" = the largest client
   mean; -15's slope method and "flat" rule; -24's halves; -27's "within 5 %" = not worse by more than 5 %;
@@ -221,10 +230,10 @@ b's commit id, commands and report to Mustafa. Open with him: MAIN-MODEL, SYNC-E
   fix: `session_end` carries a reason, and only a scripted leave gets the tail).
 
 ## Next steps
-1. `check.mjs` whole on 72651a3c must pass (the advisor agent's APPROVE of that head, 2026-11-24 about 23:20 UTC,
-   holds only then); GitHub's gate and toolchain on that SHA; then the commit id, the commands and the report to
-   Mustafa. The netcode chat merges both parts in one merge, only on his word, after his main Advisor's check.
-2. Not started, only on his word: the one-way delay comparison on a real network (NPT-L2-ONEWAY).
+1. Only on Mustafa's word: an answer to SYNC-ENTITIES may change `tick.s.relevant_count`'s row or add a count (a
+   small change-set of its own); MAIN-MODEL; the one-way delay comparison on a real network (NPT-L2-ONEWAY), not
+   started.
+2. The netcode chat merges this branch into its own (both parts in one merge), on his word.
 
 ## Open findings
 - Follow-ups, Low, none needed before the merge (the advisor agent's read): part a's rust-reviewer L4 and L6 and
@@ -253,4 +262,4 @@ b's commit id, commands and report to Mustafa. Open with him: MAIN-MODEL, SYNC-E
   advisor agent; both parts in one merge on his word after his main Advisor's check).
 
 ## Running work
-- `check.mjs` whole on 72651a3c, since about 23:16 UTC; the background saver (`checkpoint.mjs watch`).
+- Nothing but the background saver (`checkpoint.mjs watch`).
