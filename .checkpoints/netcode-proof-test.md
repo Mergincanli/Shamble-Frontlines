@@ -84,11 +84,14 @@
   C1-C2** (advisor-u6b-fix.md bf8da516…); C1 done (20 diffs in .gate/u6b/); M3/M4 done (28/28 byte-equal; applied,
   UNCOMMITTED in the main folder). **M5 FAIL 04:55** (.gate/u6b-merge/m5-check.log; measured 807/0; bites: the
   double-load bite's start past binary.rs:77's 5 s cap = TR2-U6A-4, a Low with no taker); disk 974 MiB after it, dev
-  part-clean 10.0 GiB (free 10,709); **M6: the advisor's ruling RUNNING** (a6e7ce46a28424b0b -> advisor-u6b-m6.md).
+  part-clean 10.0 GiB (free 10,709). **M6 ruling DONE: APPROVE WITH CONDITIONS C1-C7** (advisor-u6b-m6.md f4100ef7…;
+  TR2-U6A-4 re-rated Medium). C1 done (binary.rs only, +14 -12; .gate/u6b-merge/m6-hunk.diff c6bfe8a9…, binary.rs.pre
+  6691abdf… = the builder's; m6-files.txt: 27 = the builder's); **C3's probe RUNNING** (bweqnkejv -> m6-probe2.log).
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6b's merge:** the advisor's M6 ruling, then its terms (the cap fix, the probe, M5 again with the disk rule);
-  M7 the gate --no-smoke; M8 one commit (the 28 files, u6b-report.md, `git rm` wip/u6b-fix.patch; keep u6b-build.patch
+- **Next 2, U6b's merge** (advisor-u6b-m6.md C3-C7): the probe passes (all pass; untracked 4a61ef21; each start's own
+  work <= 2,500 ms) else stop, log to the advisor; C4 M5 again (m5-check2.log, env CARGO_INCREMENTAL=0, loadavg before
+  and after, >= 6,144 MiB free); C5 the advisor's read (resume a6e7ce46a28424b0b; name the `let s` form); M7 the gate --no-smoke; M8 one commit (the 28 files, u6b-report.md, `git rm` wip/u6b-fix.patch; keep u6b-build.patch
   for U6e); M9 push, CI, the card; then T5 (i), U6c's launch. SEC-U6B-3 is on PR #40's closing list (done 04:4x).
 - **Next 3:** the 2026-11-24 day message SENT 23:0x UTC (msg-2026-11-24.md: choices 1-7, /compact asked); the next at
   2026-11-24 23:05 UTC (trig_016pV7v16ktVwMuzygofJhjJ, msg-2026-11-25.md). T5 (i) the day U6b merges.
@@ -137,9 +140,9 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (1 agent, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - The advisor's M6 ruling a6e7ce46a28424b0b (advisor-u6b-m6.md, saved per item). Done, resumable: the advisor's U6b
-    fix check a108f5cdf9270999e (advisor-u6b-fix.md DONE; a prompt 02:43-04:27, stopped, resumed 04:3x).
+- **Running (0 agents, 2 shells; message or resume each by SendMessage to its ID; after a cut, from its file):**
+  - C3's probe, main-run.sh bweqnkejv from 05:14:43 (.gate/u6b-merge/m6-probe2.log; free 10,705; diff 907ffd42…). Done, resumable: the advisor's M6
+    ruling a6e7ce46a28424b0b (advisor-u6b-m6.md DONE); its U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md DONE).
     U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree
     agent-a2661dc320c9e6d00), the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode
     a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
