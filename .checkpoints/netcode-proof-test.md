@@ -145,8 +145,8 @@
   u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366, u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (1 agent, 2 triggers; the saver restarts after this push; resume by SendMessage to its ID, after a cut from
-  its file):**
+- **Running (1 agent, 1 shell, 2 triggers; resume by SendMessage to its ID, after a cut from its file):** the saver
+  bghk215os (13:08 to about 15:00; restart when it ends: run_in_background, timeout 7200000). MAIN-64 pushed at 807e92a.
   - U6c's builder a3a3e3fdf559de095: the fix pass FP-1 to FP-6 by advisor-u6c-r1.md (ad72c0b8…), from 13:0x in its
     worktree; notes u6c-build.md there ("Resume from" lines); end check .gate/u6c/fix-check.log; plants P2, P8, P18, P19, P22.
   - Done, resumable: the U6c advisor a662f1797b78cae95 (its ruling); the seats aa64bb15ad4467641, a3a1718b1419d246e,
