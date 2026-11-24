@@ -51,9 +51,15 @@
    c1935a5b996fb0aaff82b0b3c1c604255e1534f6ca7e8d2e55a9f472cd3b22a9); labels: 26 marks whole, 21 parts, 2 checks, 2
    bites; the test-engineer's own diff script on base and head: "rest equal after strip and undo: true".
 
+7. The advisor agent's read of the final head · APPROVE for 0e0f654776fc0e10e153875d59b33869e6179a88 (2026-11-24,
+   about 20:47 UTC) · all 12 conditions and both fix-pass rulings hold; it checked the fence, the judge's tests in its
+   own build, marks.json by its own script, and GitHub's gate, smoke and toolchain (all success on 0e0f6547). Two
+   things before the commit id goes to Mustafa: check.mjs whole passes on this head, and the report names the main
+   session's model (it is Fable 5.2, by his start block; CLAUDE.md's Models line says Opus 5.5: his to settle).
+
 ## Current step
-On the final head 0e0f6547: `node spikes/netcode-proof/check.mjs` whole (background, about 17 minutes); GitHub's gate
-and toolchain results on that SHA; the advisor agent's read of the head.
+On the final head 0e0f6547: `node spikes/netcode-proof/check.mjs` whole (background since 20:44 UTC, about 17
+minutes). Then the report.
 
 ## Next steps
 1. If all three hold: the report to Mustafa with the commit id (plan-a.md section 6, conditions 10 to 12, say what it
