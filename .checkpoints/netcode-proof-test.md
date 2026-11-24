@@ -147,17 +147,17 @@
 - Disk (11-24 15:3x UTC): 10,504 MiB free (floor 4,096; a full check.mjs fills the dev profile to ~7.8 GB); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (2 agents from 17:57 UTC, the saver, 2 triggers):** U6c's round 2: netcode ac0f5d109f30fedce, test
-  aacd36781fdea65a0 (xhigh; a stopped seat resumes by SendMessage from its notes); the saver b74ohsd5l. Security
-  a307bdd231bf3e9b4 DONE 18:15: APPROVE WITH FINDINGS, 2 Lows (SEC-U6C-R2-1 the spoofed pin, after R1; -2 old pin wording).
+- **Running (the saver b74ohsd5l, 2 triggers; no agent):** U6c's round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
+  aacd36781fdea65a0, security a307bdd231bf3e9b4, each APPROVE WITH FINDINGS, no Critical or High (u6c-r2-*.md, each
+  ending DONE). A stopped agent resumes by SendMessage from its notes.
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
     (next 20:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
 - **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
   check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
-- **My step (17:5x):** U6c's round 2 RUNNING since 17:57 (launch checks passed: past the 17:50 reset, tree clean, the
-  diff 10 files +356/-94, W = 0549389e…; briefs in the scratchpad, u6c-r2-*.txt). On the three returns: Fable's read,
-  then the advisor agent's recorded round-2 ruling, then the merge M3-M9. The container readings are DONE,
+- **My step (18:2x):** round 2: netcode 3 Lows in the diff and 2 Mediums outside it, before R1 (the start-edge drop read
+  vs U8's equal-on-P1 rule, u8-build.patch:1708-1711; LG's DONE with no READY, caught by U8's READY gate :2190-2221);
+  test 1 Medium (TE-U6C-R2-4, the last second) and 7 Lows; security 2 Lows. Next: Fable, the ruling. The readings are DONE,
   my own runs through u6c-run.sh, release builds (.gate/u6c/read-*.log):
   - DONE: the release build (read-build.log, exit 0). A2 over WebSocket (read-a2-ws.log, 14:08-14:09): 1 passed in
     70.8 s; npt-load READY then DONE, exit 0; the room exit 0; room memory peak 157,499,392 B; 5-31 inputs per client
@@ -165,7 +165,7 @@
     in 100.1 s; READY, DONE, exit 0; room peak 125,689,856 B; **0**-31 inputs per client per second (for round 2's netcode seat).
   - The probe reading DONE (read-probe.log; probe_reading.py holds the server's stdin; .gate/u6c/read-probe/): P0 and P1
     each 1,000,000 records a direction (FP-1); legs about 112 s (B1 ~113 s by arithmetic; P2-P4 and B1 unmeasured: round
-    2's question 3); P1 lost ~1.1 %; 484 peer datagrams refused for the leg (probe.rs:286-295); drain 82/77 ms; peer errors ≈ its 76 s after the legs.
+    2's question 3); P1 lost ~1.0 % a way (the seat's count); 484 peer datagrams refused for the leg (probe.rs:286-295); drain 82/77 ms; peer errors ≈ its 76 s after the legs.
   **Next three:** (1) round 2 at 17:51; (2) the merge M3-M9 as U4f's (history.md:7022-7028), with C9's U8 edits;
   (3) U7's 0b check and R-half (its builder starts in a reset's first 30 minutes), then U8's merge. Msg 23:05.
 - **Finished, resumable by SendMessage:** U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder

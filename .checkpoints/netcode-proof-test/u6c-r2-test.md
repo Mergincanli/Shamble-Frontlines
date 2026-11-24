@@ -79,12 +79,13 @@ Run nothing unless a claim needs it; name each run.
 - F-NAMES, steal (server probe_tests.rs:314-321): `!log.seconds.is_empty() &&` closes the vacuous `all`. Closed.
 - F-NAMES, last second's index (tests/load.rs:185-193): WT `load_s − 1`; WS `k + 1 < 30`. Closed.
 - TE-U6C-R2-4 (Medium): hosts_four's WebTransport case now needs inputs from every client in its last second, which
-  lies after the room's close. The room ends 3,000 ms after OPEN (tests/load.rs:139; server main.rs:918-961); LG
-  starts after OPEN (load.rs:508) and runs to 4 s (tests/load.rs:234), so second 3 begins at OPEN + 3 s + LG's start
-  lag. A client gives commands only up to MAX_LEAD 9 ticks (0.3 s, load.rs:45, :601) past the last tick it heard; A2's
-  own log shows the cut (47 of 48 at 0 one second after the room's close). So `whole.iter().all(|v| v[i] > 0)`
-  (tests/load.rs:177-184) passes only while LG starts within about 0.3 s (plus P2's 50 ms one way) of OPEN, and a
-  change to MAX_LEAD breaks it for an unrelated reason. Introduced by F-NAMES on the WT arm (plus F-5S's 4 s).
+  lies after the room's close. The room ends 3,000 ms after OPEN in 50 ms steps (tests/load.rs:139; server
+  main.rs:918-961); LG starts after OPEN (load.rs:508) and runs to 4 s (tests/load.rs:234), so second 3 begins at
+  OPEN + 3 s + LG's start lag. A client gives commands only up to MAX_LEAD 9 ticks (0.3 s, load.rs:45, :601) past the
+  last tick it heard; A2's own log shows the cut (47 of 48 at 0 one second after the room's close; most clients'
+  commands ran about 0.2 s past it). So `whole.iter().all(|v| v[i] > 0)` (tests/load.rs:177-184) passes only while LG
+  starts within a few tenths of a second of OPEN (estimate: about 0.2 to 0.35 s), and a change to MAX_LEAD breaks it
+  for an unrelated reason. Introduced by F-NAMES on the WT arm (with F-5S's 4 s run).
 - TE-U6C-R2-5 (Low): the WebSocket arm's slice (tests/load.rs:177) needs 3 measured seconds; the room's 3 s gives LG
   seconds 0, 1 and a part second 2, so READY must come inside LG's first second (phase set per record at its write,
   load.rs:679-683). The guard at :171 still asks for 2. The budget for spawn plus four joins went from about 2 s to
@@ -105,7 +106,7 @@ APPROVE WITH FINDINGS (one Medium, seven Low; no Critical or High; each becomes 
 ## 4. Findings
 | Id | Severity | Where (W) | What goes wrong | Smallest fix | Test or plant that shows it |
 |---|---|---|---|---|---|
-| TE-U6C-R2-4 | Medium | crates/bots/tests/load.rs:177-184 (with :139, :234; bots load.rs:45, :508) | WT arm: second 3 starts after the room's close (OPEN + 3 s); inputs there come only from the 9-tick lead (0.3 s). If LG starts more than about 0.3 s after OPEN (a loaded gate), or MAX_LEAD drops, "client i gave commands every whole measured second" fails with a last entry of zeros: a flake that blames the clients | Drop the last measured second for both transports: `&measured[1..measured.len() - 1]` (keep the last-second index asserts at :185-193); for WT that leaves seconds 1 and 2, both with the room alive | Test-body plant: sleep 500 ms before spawning npt-load in hosts_four (WT): today's form fails at :180, the fixed form passes |
+| TE-U6C-R2-4 | Medium | crates/bots/tests/load.rs:177-184 (with :139, :234; bots load.rs:45, :508) | WT arm: second 3 starts after the room's close (OPEN + 3 s); inputs there come only from the clients' lead past the last tick heard (MAX_LEAD 9 ticks; A2 shows about 0.2 s). If LG starts more than a few tenths of a second after OPEN (a loaded gate), or MAX_LEAD drops, "client i gave commands every whole measured second" fails with a last entry of zeros: a flake that blames the clients | Drop the last measured second for both transports: `&measured[1..measured.len() - 1]` (keep the last-second index asserts at :185-193); for WT that leaves seconds 1 and 2, both with the room alive | Test-body plant: sleep 500 ms before spawning npt-load in hosts_four (WT): today's form fails at :180, the fixed form passes |
 | TE-U6C-R2-5 | Low | crates/bots/tests/load.rs:171, :177 (room 3,000 ms at :139) | WS arm: `whole` is empty unless READY lands in LG's first second, while :171 still accepts 2 measured seconds; a READY after 1 s fails with "2 measured seconds" | Give the WS room 4,000 to 5,000 ms (WS ends at the close, so +1 to 2 s), or assert `measured.len() >= 3` for WS with that reason | A test-body delay of 1.2 s before the spawn (WS): fails today; passes with the longer room |
 | TE-U6C-R2-1 | Low | crates/net/src/l2/probe.rs:721, :725; test probe_tests.rs:288-357 | The t_in sort and the tie clause are pinned by no test (log order = t_in order, no shared t_in). Dropping either passes; at R1 the log is release-ordered (impair.rs:685-696) and up t_in is per receive batch (socket.rs:633-639), so a few boundary records would shift (no mark flips) | One more case in FP-1's test: a Lost down fate logged before an earlier-t_in Delivered one at the boundary, and two up fates sharing the last kept t_in; assert the kept sets | Plants: sort removed; `last[d] != Some(t)` removed: each must fail the new case |
 | TE-U6C-R2-2 | Low | crates/server/src/probe_tests.rs:367-375 | FP-3's assert is not shown to bite: plant P2b fails at :358 (header) first. The ruling's "it must fail that assert" is not met; F-P2's defect is caught (by :358) | Run variant P2c: P2b plus one line writing `base` into P1's header `base_rtt_ns` (after server probe.rs:578); restore and hash-check; else the report says the assert is unshown | P2c must fail at :372 ("P1 delivered X down, sent Y", X about twice Y) |
@@ -143,8 +144,8 @@ APPROVE WITH FINDINGS (one Medium, seven Low; no Critical or High; each becomes 
 
 ## 7. What I did not check
 - I ran no test and no plant; one runner call (`true`) only printed W's hashes. Every plant result is the builder's log.
-- TE-U6C-R2-4's margin (about 0.3 s plus P2's one-way delay) is reasoned from MAX_LEAD, the room's end and A2's log;
-  no log here holds LG's start lag against the room's OPEN (their clocks are separate), so it is an estimate.
+- TE-U6C-R2-4's margin is reasoned from MAX_LEAD, the room's end and A2's per-second log; no log here holds LG's start
+  lag against the room's OPEN (their clocks are separate), so "a few tenths of a second" is an estimate.
 - SEC-U6C-3's 404 entry and "room sign" bite by reading only (no plant was asked for or run).
 - I did not read serve.rs's accept sleep (SEC-U6C-1), NC-U6C-3, NC-U6C-5, NC-U6C-6 or FP-1's logic beyond what the tests
   touch: the netcode and security seats'. I did not read U8's snapshot or marks.json.
