@@ -140,7 +140,18 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
   19:07:46 UTC), each whole, copied by script from the chat's transcript and checked byte for byte against the saved
   copies and their sha256, each placed by its time between the decisions around it; 252 lines added, no other line
   changed (RECORD-FILES). Commit 7c803a6.
-- DOCSKEEPERLINE
+- His message of 2026-11-25 (lane 2 building beside lane 1; his question on change-set 6 and M before change-set 5) added
+  the same way (20 lines), so that it outlives the checkpoint.
+- docs-keeper's pass (its notes, readable at CARDSHA, list every line): `docs/STATUS.md`, lane 2's lines (this pull
+  request in "In flight"; step 2.6's plan and his question of 2026-11-25 in "Next"; his three decisions, the probe's
+  switch-off and the clean-up after the merge in "Waiting on Mustafa"; nine follow-ups named PHC-; two open risks,
+  PHC-HEADER and PHC-PROBE-MAIL) and their texts in `docs/STATUS_ARCHIVE.md`. To keep STATUS within its 120 lines, the
+  follow-up bullets of the merged #49, #50, #51 and #48 (STATUS lines 78-93 at 28254a7) moved by script, byte for byte,
+  to the archive's new "Moved from STATUS (2026-11-24)" (his OLD-LINES); this chat checked all 16 lines verbatim.
+  `docs/ROADMAP.md`: one entry, and the oldest entry (foundation 2.2, 17 lines) moved by script, byte for byte, to "Build
+  history" (OLD-LINES; checked verbatim). `docs/REPO_MAP.md`: the report's row (the map check: "repo map OK: 178 entries
+  cover 109 required paths"). `docs/SPIKE_PLAN.md`, entry 6: a dated pointer to this report. Lane 1's lines that #65's
+  merge made stale (3a's row and bullets) are left for lane 1 (RECORD-FILES). No ADR changes.
 
 ## Lane 2's first list of needs (issue #59), folded from its own checkpoint
 - His lane-2 words of 2026-11-18 (in DECISIONS) asked for lane 2's needs from the simulation's per-tick block before
