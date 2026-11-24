@@ -146,7 +146,7 @@
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (2 agents, 1 shell, 2 triggers; resume each by SendMessage to its ID; after a cut, from its own file):**
   - U6c's netcode seat aa64bb15ad4467641 (section 7, xhigh, read only, snapshot a4e63455…, tree
-    agent-a3a3e3fdf559de095) -> u6c-review-netcode.md: resumed, it reads its file and goes on after its last complete
+    agent-a3a3e3fdf559de095) -> u6c-review-netcode.md; to resume, it reads its file and goes on after its last complete
     block; runner logs .gate/u6c/rev-netcode-<n>.log. Test and security DONE (Next 2; resumable: a3a1718b1419d246e,
     a546a4604d30ee9d4). MAIN-64's advisor a74a6501af7e576c7 (from 10:30, high) -> advisor-main-64.md.
   - The saver b1bd3pcdl (09:50 to about 11:50; when it ends, restart it: run_in_background, timeout 7200000). Triggers:
