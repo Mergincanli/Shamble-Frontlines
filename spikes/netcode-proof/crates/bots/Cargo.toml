@@ -24,3 +24,9 @@ npt-proto.workspace = true
 npt-client.workspace = true
 npt-net.workspace = true
 npt-log.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+npt-server.workspace = true

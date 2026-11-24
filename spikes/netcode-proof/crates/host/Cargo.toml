@@ -16,3 +16,16 @@ path = "src/main.rs"
 [dependencies]
 # None of the sim, room, proto or client crates (plan §4.2). instant-acme 0.8.5 joins at U6 (plan §8.4).
 npt-log.workspace = true
+instant-acme.workspace = true
+rcgen = { workspace = true, features = ["pem"] }
+tokio.workspace = true
+tokio-rustls.workspace = true
+httparse.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+
+[dev-dependencies]
+http.workspace = true
+bytes.workspace = true
+http-body-util.workspace = true
