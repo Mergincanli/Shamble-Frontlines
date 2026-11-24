@@ -872,6 +872,13 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      the same 43 rows as at 10 minutes, nothing unexpected; only probes between the control and it. Next: visit 2, one
      step at a time: I close pull request 5 first and send its cleanup run's link. Still open from him: step 7's private
      half, step 8's result, his verdict words, the billing screenshot.
+   - **Visit 2 done** (results log): steps 5-8 "achieved" in his words (step 7's private half: no login; step 8: the
+     page opened straight away after a restart); the control's cleanup approved and green (1 upload, 17d45ef9, HTTP 200,
+     21:56:06 UTC: the token alive); the token tests' cleanups rejected (failure, nothing ran); the token deleted by him
+     (between 22:05:54 and 22:14:34 UTC; the list empty); `revoked` (deploy #19) approved and refused at Cloudflare's
+     first call (10000, 9109), no record artifact: the token is dead. Runs tallied: 56, nothing off the list. Still
+     open from him: the billing screenshot (consultation 24's row: no plan screen showed). Next: consultation 26
+     (moment 5) before step 26 is saved as done; then the closing message; then the report, with main taken in first.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the

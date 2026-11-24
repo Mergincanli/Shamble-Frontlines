@@ -1000,3 +1000,30 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - **Step 11, `revoked` started** by the session (run_workflow, deploy.yml, ref main, set `revoked`): deploy run #19, id
   45499119373, head 347d5e0, created 22:15:00 UTC; plan green (22:15:05-19), build "build (revoked, preview, revoked,
   preview, 1)" green (22:15:26-38); the run "waiting" on `preview` at 22:15:44 UTC. His approval asked.
+- **Step 11, the proof that the token is dead (PM-0006-32's revocation)**: his message "done" with a screenshot of the
+  run page (deploy #19: Status "Failure", "Deployment protection rules": "Mergincanli approved 1 minute ago",
+  "preview"; Annotations "2 errors and 1 warning": deploy "Process completed with exit code 1.", verify "Process
+  completed with exit code 3.", the warning "No files were found with the provided path: records/. No artifacts will
+  be uploaded."; Artifacts: headers-45499119373, 311 Bytes). Read with the GitHub MCP tool: deploy run #19, id
+  45499119373, conclusion "failure"; job "deploy (revoked, preview, revoked, preview, 1)" (138817751333) started
+  22:22:00 UTC after his approval; the download, the server-code check and Wrangler's install green; "Upload to
+  Cloudflare Pages" failed 22:22:21-23 UTC, word for word: "⛅️ wrangler 4.156.0" / "✘ [ERROR] A request to the
+  Cloudflare API (/accounts/***/pages/projects/shamble-preview-check) failed." / "Authentication error [code: 10000]" /
+  "📎 It looks like you are authenticating Wrangler via a custom API token set in an environment variable." / "Please
+  ensure it has the correct permissions for this operation." / "Getting User settings..." / "✘ [ERROR] A request to the
+  Cloudflare API (/accounts) failed." / "Invalid access token [code: 9109]" / "##[error]Process completed with exit code
+  1."; then the records upload: "##[warning]No files were found with the provided path: records/. No artifacts will be
+  uploaded."; verify (138821514796) exit 3 (no records). The run's artifacts: headers-45499119373 (311 bytes) and
+  site-revoked (the build) only: **no deployment-record artifact**, so no upload was made. No account name or ID
+  printed (the path masked as ***; the user lookup failed with 9109).
+- **The revocation read:** the token worked at 21:56:06 UTC (the control's cleanup deleted 17d45ef9 with HTTP 200); he
+  deleted it between 22:05:54 and 22:14:34 UTC (the empty "Account API tokens" list); at 22:22:21-23 UTC Cloudflare
+  refused it at its first call (10000, then 9109), the same refusal as the rehearsal's attempt 1 with an unknown token,
+  and nothing was uploaded. The run's red colour is not the proof; the refusal words and the missing record are.
+  PM-0006-32's last clause ("Your revocation of the token at the end is recorded"): recorded.
+- **Day 2's runs against its list** (56 runs in the repository at 22:23 UTC; today's 7 after the 50 counted at 19:08
+  UTC, which included the control #25): probes #25 (control), #26 (10 minutes), #27 (1 hour); `close` #6 (the control,
+  approved, success), #7 and #8 (the token tests, rejected, failure); deploy #19 (`revoked`, approved, failure as
+  required). Nothing off the list; no scheduled probe ran during the sitting. His clicks on GitHub today: 2 approvals,
+  2 rejections; in Cloudflare: "Restrict previews" and the token's delete. Red mails expected: three (the two
+  rejections and `revoked`).
