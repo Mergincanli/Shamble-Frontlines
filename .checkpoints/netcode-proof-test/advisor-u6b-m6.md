@@ -337,4 +337,88 @@ DONE (first ruling)
 - **Findings added:** F-M6-5 (Medium, only under R3; closed by R2). Item 1's "slower run" corrected (above).
 **Decisions needed:** none. **For Mustafa:** nothing.
 
+DONE (second ruling)
+
+## 6. C5: the changed head (2026-11-24, after R2, probe4 and M5 run 2)
+### What I checked myself (read only; no cargo)
+- **Hashes** (`sha256sum`): m6-hunk.diff c6bfe8a9…7324, m6-cargo.diff 53682b3a…4469, m6-files.txt e46b0a73…d70d,
+  m6-probe2/3/4.log 366b5de9…, 011ddbad…, ed276746…, m5-check2.log b0487c3a…, m5-check2-cut.log 36e3b0c7…,
+  binary.rs.pre 6691abdf…, u6b-report.md 97634049…: each as sent. wip/u6b-fix.patch is e29c003c…ac64af1c.
+- **The tree now:** `git status` lists exactly 29 paths (21 modified with Cargo.toml, 8 untracked), Cargo.lock not
+  among them; `git diff --stat HEAD` on Cargo.toml and Cargo.lock: Cargo.toml +3 only. `sha256sum --quiet -c
+  m6-files.txt`: all 29 OK. My `git hash-object` of the 27 other files equals each post-image blob in the patch's index
+  lines (docs af39989 … SERIES.md 665ab3f, all 27). binary.rs.pre's blob c11b3a2 is the patch's binary.rs post-image
+  (patch :6738-6739); `git diff --no-index --stat` pre→now: +14 -12, = m6-hunk.diff (blob c11b3a2..1bbe8d8). Committed
+  spikes/ and docs/ since 21765e3: only 07d5d31's test file; the rest of the log is checkpoint commits.
+- **The hunk (m6-hunk.diff), against item 2's list:** OPEN_CAP (5 s) with its doc after spawn(); start() takes
+  `cap: Duration`, its comment says `cap`, `recv_timeout(cap)`, the panic names `{cap:?}`; s8a and pm_0006_11 pass
+  OPEN_CAP; the double-load test passes `OPEN_CAP + Duration::from_secs(2)` with the comment naming main.rs:505-506
+  (checked: the sleeps' loop is there). No assert, settings value or u6b_open line moved; the optional doc phrases were
+  not used. **The form choice:** the local `let s = settings(...)` in the two bite tests, inside item 2(c)'s caller
+  lines; the settings' content is byte-identical and the path lives a few lines longer, which changes nothing. I accept
+  it: it keeps C1's 15-line limit (14 added), where rustfmt's form of the inline call would have made 19.
+- **Cargo.toml (m6-cargo.diff):** after :120 only, a comment, `[profile.dev.package.sha2]`, `opt-level = 3`, as R2
+  says. check.mjs's deps step passed with it (m5-check2.log:13: "no profile" there means the env and config files,
+  check.mjs:1443-1446; the manifest is the sanctioned place).
+- **probe3 (R1):** on probe2's tree (diff 907ffd42…), `--config profile.dev.package.sha2.opt-level=3`: s8a 120.1,
+  120.5, 120.1 ms; bitten 2,125.0, 2,126.7, 2,127.5, alone 2,157.0 ms (:25-102): every own-work value at most 157 ms.
+  R2's condition (at most 2,500 ms) met: R2 rightly taken.
+- **probe4:** diff 9e555e41…, untracked 4a61ef21…; fmt PASS; 3 × 5 passed, alone 1 passed in 2.46 s; s8a 119.3,
+  122.1, 116.9 ms; bitten 2,120.8, 2,122.8, 2,121.8, 2,125.3 ms (:26-105). Only npt-* recompiled (:10-19: the runner's
+  toucher), not sha2: the manifest line gives the same artifacts as probe3's `--config`. Bar met with about 20x room.
+  The bite's own assert (`open_ns >= 2 s`) rests on the two sleeps, so it cannot flake low.
+- **M5 run 2 (m5-check2.log):** 05:38:21-06:01:53 UTC, `env CARGO_INCREMENTAL=0 node check.mjs` (:7), loadavg before
+  and after (:5, :22); header diff 9e555e41… and untracked 4a61ef21… = probe4's (:3); free 7,697 MiB (≥ 6,144: C4
+  met); 11 of 11 PASS (:8-19); measured 807, bites 904, 0 failed, 0 skips (:12); test 1,037.2 s = 1.09x of 954.8 s
+  (under 1.5x); deps, wasm, refs (1,791 tracked: the new notes files), marks 81, self 78/78, redact 11/11 (0 findings).
+  The cut first try (m5-check2-cut.log) ended in its test step with no result (four steps PASS, :8-11): a run killed
+  by the container restart, not a failed run re-run to green.
+- **Host:** /proc/cpuinfo still reads "Xeon Processor @ 2.10GHz" after the restart.
+
+### The report (u6b-report.md 97634049…), its changed lines
+- Size (:23-26): 5,952 + 14 + 3 = 5,969 added, 267 + 12 = 279 removed, 29 files; the 12 removed lines are base lines
+  (base binary.rs :60, :64-65, :74, :79, :128, :225-228, :247-248: checked against `git show 21765e3:…`). Under his
+  6,000 stop. Holds.
+- "M5 in the main folder" (:39-61): run 1, the fix, probe2, the host change, the cause, the second ruling, R1, R2 with
+  the lift, probe4, run 2: each number matches its log. Holds.
+- Carries (:150, :157): F-M6-3 to U6e; TR2-U6A-4 in "Closed in U6b". Holds. "Not verified" (:159-168): honest.
+- **F-M6-6 (Medium): the closing record names the wrong cause.** :103-104: "U6b's start (the dev certificate, both
+  listeners) used up the margin". The A/B says otherwise: with sha2 alone optimised, the whole start fell from about
+  3.0 s to about 120 ms (probe2 against probe3/probe4), so the certificate and listeners cost at most about 120 ms. The
+  margin went to hashing the 116 MB debug executable, which U6b's new dependencies grew, with unoptimised sha2, on the
+  slower host. The report's own evidence (:48-50) says that, so the section contradicts it. (My first ruling's item 1
+  leaned the same way; section 5 corrected it.) Fix: that clause, plus "the start's margin restored by R2's sha2 line"
+  beside "Fixed by C1's hunk".
+- **F-M6-7 (Low):** the header (:6-7) cites advisor-u6b-m6.md as f4100ef7…. The file was 2aeaea13… before this section
+  and changes with it. The header also names only the first ruling. Fix: the file's final hash, and the second ruling
+  and this APPROVE named.
+- **F-M6-8 (Low):** :102 puts U6a's fix pass "under 'Not verified'": the fix pass sent it "to the merge report"
+  (u6a-fix-pass.md:96-97), and the report put it under Not verified (u6a-report.md:66). :105 narrows F-M6-2's rule to "a
+  Low". My words: a finding whose fix is code closes only by that code or by a carry by id with a taker, never by a "Not
+  verified" line.
+- **F-M6-9 (Low, no action):** Cargo.toml's comment says "test builds only"; the dev profile covers every debug build,
+  as :115-116 says. Left as is: an edit would move the tree off M5 run 2's evidence for a wording nit.
+- **F-M6-4's residual (Low):** main-run.sh itself still sets no CARGO_INCREMENTAL (the runs passed `env` per command).
+  A card line for the next main-folder counted run.
+F-M6-6 to -8 are in the report, a .checkpoints/ file outside the 29: they touch no evidence and no tree hash.
+
+### Verdict: APPROVE (the changed head), with conditions
+**The head approved:** the U6b commit whose spikes/ and docs/ change against its parent is exactly the 29 files of
+m6-files.txt (e46b0a73…): 27 = wip/u6b-fix.patch's (e29c003c…) post-images; binary.rs = blob 1bbe8d8 (c11b3a2 +
+m6-hunk.diff c6bfe8a9…); Cargo.toml = HEAD's + m6-cargo.diff (53682b3a…, blob 906d145); Cargo.lock unchanged; nothing
+else in spikes/ or docs/.
+1. **H1:** before M8, the report's fixes F-M6-6, -7 and -8 (its lines only; the header gets this file's hash as it
+   stands after this section).
+2. **H2:** M7 (`node tools/gate.mjs --no-smoke`, PASS), then M8 as planned (the 29 files, u6b-report.md, `git rm`
+   wip/u6b-fix.patch, wip/u6b-build.patch kept). Before M9, check the commit's 29 blobs against m6-files.txt, and that
+   `git show --stat --format=` lists nothing in spikes/ or docs/ beyond them.
+3. **H3:** after M9, my head read: the pushed SHA, that check's output, the gate log, CI's check-run conclusions on the
+   SHA, and the report's changed lines (F-M6-6 to -8). It is the review of every pushed head, not a round.
+4. **H4:** the card closes TR2-U6A-4 at the U6b commit, and names F-M6-4's residual (main-run.sh) for the next
+   main-folder counted run.
+Findings this section: Critical 0, High 0, Medium 1 (F-M6-6, report text, fixed by H1), Low 4.
+**Decisions needed:** none. A test-harness edit and a dev-profile line: no mark, judge rule, marks.json text, run value
+(release untouched), money or stop moves; 5,969 of his 6,000. The day's message carries the lines of C7 and R2.
+**For Mustafa:** nothing.
+
 DONE

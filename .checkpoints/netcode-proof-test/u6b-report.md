@@ -3,8 +3,9 @@ Brief u6b-brief.md rev 1.2 (7bc69f1a…; section 0.0 binds the advisor's ruling 
 range). Base 21765e3 (U6a's merge 824d8e7 plus Block 0; measured 754, bites 850). One round (NPT-TRIM): netcode,
 security and test seats; the ruling (R-PING, A1-A3); the fix pass (u6b-fix-pass.md 031742e4…; notes u6b-build.md
 74e0d697…); the advisor's check of the fix diff in place of a second round (A3): **APPROVE WITH CONDITIONS C1-C2**
-(advisor-u6b-fix.md bf8da516…). At the merge, M5 failed on one test's cap; the advisor's M6 ruling (advisor-u6b-m6.md
-f4100ef7…): **APPROVE WITH CONDITIONS C1-C7**, the cap fixed in binary.rs, the probe, M5 again.
+(advisor-u6b-fix.md bf8da516…). At the merge, M5 failed on one test's cap; the advisor's M6 rulings (advisor-u6b-m6.md
+4f07818f…): the first **APPROVE WITH CONDITIONS C1-C7** (the cap fixed in binary.rs, the probe, M5 again); the second
+(section 5) measure first, then R2's sha2 line; section 6, **APPROVE of the changed head** with H1-H4.
 
 ## What was built, and its size
 - **WebTransport:** WtServer, WtLink, WtClient over l2/wt.rs's endpoint, with the server's own QUIC limits (4
@@ -99,10 +100,12 @@ f4100ef7…): **APPROVE WITH CONDITIONS C1-C7**, the cap fixed in binary.rs, the
 ## TR2-U6A-4, closed here
 - **Its history:** raised Low in U6a's round 2 (u6a-r2-test.md:112: "The double-load bite's start shares the 5 s
   first-line cap although 2 s of it are the bite's own sleeps (2,660 ms here); a loaded runner can push it past 5 s and
-  fail a correct bite"); named in U6a's fix pass (u6a-fix-pass.md:96-97) and U6a's report (u6a-report.md:66) only under
-  "Not verified", with no taker. U6b's start (the dev certificate, both listeners) used up the margin, and it fired in
-  M5's run 1 on a correct tree. **Re-rated Medium** by the advisor (F-M6-1). Fixed by C1's hunk, above.
-- **F-M6-2's rule:** a Low whose fix is code is carried with a taker, never closed by a "Not verified" line.
+  fail a correct bite"); U6a's fix pass sent it "to the merge report" (u6a-fix-pass.md:93-97), and U6a's report put
+  it under "Not verified" (u6a-report.md:66) with no id and no taker. The margin went to the start hashing its own
+  116 MB debug executable with unoptimised sha2 on the slower host (optimising sha2 alone took the start from about
+  3.0 s to about 120 ms), and it fired in M5's run 1 on a correct tree. **Re-rated Medium** by the advisor (F-M6-1).
+  Fixed by C1's hunk, above; R2's sha2 line restored the start's margin.
+- **F-M6-2's rule:** a finding whose fix is code is carried with a taker, never closed by a "Not verified" line.
 
 ## The round
 - Netcode APPROVE WITH FINDINGS (Mediums NR-U6B-1, -2; twelve Lows). Security REVISE (Mediums SEC-U6B-1, -2; no
@@ -149,6 +152,7 @@ ws_split_mark_after_open_ns). Notes the rows need (report text):
 |---|---|
 | U6e | PM-0001-18/ws-budget-x2 (wip/u6b-build.patch 49f4488f's hunks) with T-1 as its condition, word for word; SP-4 and SEC-U6BD-2; N4 (the binary's arming in no test); T-4's bite half; T-11; T-14; T-16 (from U6d); T-18; T-21; NR-U6B-5 (not built: the scope line); T-12 (not built); F-1 (the WebSocket half of the closing bound untested); F-2 (T-4's test timed alone); F-M6-3 (u6b_open reads its first line with no cap, binary.rs's u6b_open test: a room that never opens hangs the test step; its handshakes' margin against the room's 2 s deadline unmeasured) |
 | U6d | NR-U6B-11, NR-U6B-13, NR-U6B-14 |
+| The next edit of spikes/netcode-proof/Cargo.toml | F-M6-9 (Low: the sha2 line's comment says "test builds only"; the dev profile covers every debug build; left as is so the tree stays M5 run 2's) |
 | U6c's close (A2) | the 48-connection DelayStream self-test reading and the cap's memory bound at N = 48 (NR-U6B-5's recount of the pool's heap in it); F-3 (the room-clock mark read non-zero) |
 | U7 | SEC-U6B-2's unidirectional stream count (6), confirmed in its headless Chromium run |
 | U7's or U8's record step | NR-U6B-10 (F-NEG: a presence-only draft count, or -56 item 2 by number) |
