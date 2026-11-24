@@ -33,6 +33,11 @@ Inputs (check each sha256 first; stop and say so if one differs), all in
   cold M5 (:158-165; 10,491 now). A full check.mjs can fill the dev profile to about 7.8 GB, so after M5 the free space
   may sit under main-run.sh's 4 GB start floor: a re-run (M6) or the next counted run would need the approved dev
   part-clean first.
+- New at 22:4x UTC: main moved to 28254a7 (PR #65, change-set 3a: code in crates/sim, crates/devtools,
+  crates/sim-wasm and packages/, with Cargo.lock and package-lock.json; no spikes/ path, no .claude/, .github/ or
+  tools/ file). GitHub reports PR #40 un-mergeable again (one conflict, docs/STATUS.md), so no CI runs on PR #40 until
+  main is in. MAIN-65 takes it in first, plan first with its own advisor check, as MAIN-64 did; U6c's M3 then re-runs
+  `git apply --check` on the post-MAIN-65 head. Say if your conditions change because of that order.
 
 Rule only on these five items (every other Medium and Low is already a follow-up by your section 4; do not re-open):
 1. The netcode seat's two Mediums outside the diff, both "before R1", taker "U6c's merge" (u6c-r2-netcode.md, its
