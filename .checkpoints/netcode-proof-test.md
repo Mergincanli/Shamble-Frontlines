@@ -92,8 +92,9 @@
   is now 2.10 GHz, was 2.30). **R1 DONE 05:23** (m6-probe3.log, sha2 opt-level 3 by --config: s8a 120 ms; bitten
   2,125-2,157 ms, own 125-157 ms; alone 2.50 s): **R2 taken**: Cargo.toml +3 after :120 (lock unchanged);
   **probe4 PASS 05:24** (m6-probe4.log: s8a 117-122 ms, bitten own 121-125 ms, alone 2.46 s); **M5 run 2 PASS 06:01**
-  (m5-check2.log b0487c3a…: 11/11, 807/904, 0 failed, test 1,037.2 s; after a container restart); **C5 RUNNING** (the
-  advisor a6e7ce46a28424b0b resumed; m6-files.txt 29 files e46b0a73…; report 97634049…); then M7-M9.
+  (m5-check2.log b0487c3a…: 11/11, 807/904, 0 failed, test 1,037.2 s; after a container restart); **C5 APPROVE** of
+  the changed head (advisor-u6b-m6.md section 6, 4f07818f…; H1 report fixes done; F-M6-6..9); **M7 gate PASS**; M8-M9
+  now. TR2-U6A-4 CLOSES at U6b's commit. main-run.sh still sets no CARGO_INCREMENTAL: pass `env CARGO_INCREMENTAL=0`.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
 - **Next 2, U6b's merge** (advisor-u6b-m6.md C3-C7): the probe passes (all pass; untracked 4a61ef21; each start's own
