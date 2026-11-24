@@ -52,7 +52,9 @@ impl World {
         let Self { tick, seed } = self;
         out.clear();
         out.reserve(STATE_BYTES);
-        out.extend_from_slice(&tick.to_le_bytes());
+        // The path form on the integer's own type: the rule scan (tests/rules_scan.rs) reads text and cannot tell
+        // `.to_le_bytes()` on a tick from the same call on a float, which part 7 does not allow.
+        out.extend_from_slice(&u32::to_le_bytes(*tick));
         out.extend_from_slice(seed);
     }
 
