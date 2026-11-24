@@ -101,15 +101,28 @@
     the Arm test. 100 judge tests pass, fmt and clippy clean; part b so far 145 added, 10 deleted (from 0e0f6547; the
     stop is 4,900).
 
+13. Part b, block 2 (the plumbing) · 24c3ba21fb060da40695b4e44e1711f297b546d2 (pushed) · as plan-b.md's "Block 2's
+    design": `figures::Inputs { run, set, parts }`, `Parts`, `Lack::Fail` and `Missing::Fail`, `Figure.detail` with
+    `figures::detail`, `Ctx.parts`, the first pass in `judge_mark` (only for a mark that names a figure; a run is
+    valid when its validity holds with nothing undecided and its part's setup checks pass), `fail_lines`' reason
+    line, the report's detail text. No test file changed: all 100 judge tests pass as before; fmt and clippy clean.
+    Part b so far 287 added, 34 deleted (from 0e0f6547; the stop is 4,900). Still owed by later blocks: the exact-line
+    test for `Lack::Fail` (condition 10, with `crash_close_max_ns`), the detail text's test (with the R2 formula),
+    `Inputs.parts`' tests (with `sync_cost_ratio` and `logging_cost_ratio`).
+
 ## Current step
-Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 2 (the plumbing;
-plan-b.md section 2 item 2, conditions 2 and 10; figures-b.md 0.1):** in figures.rs `Compute` takes
-`&Inputs { run, set, parts }` (`parts`: each kept part's valid runs, from a first pass in `judge_mark` before any
-check; never a moved part's), the 8 built figures moved to it unchanged; `Lack::Fail(why)` (a failure with no number,
-whose reason `fail_lines` prints, with a test of the exact line); a detail text beside a reported value. All 100
-tests keep their results before any figure is added. Then block 3 (C-U6-9, C-U6-10, `alloc_twin_diff_count`), and
-before block 4 the two writer-side SERIES.md needs go on the board (condition 8). Part b's board thread is open
-(state doing).
+Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 3 (figures-b.md
+B1, B2, A11; about 413 lines):** C-U6-9, `twin_hash_mismatch_count` accepts -30's form (both runs role `measured`,
+each naming the other in `params.twin`, `params.transport` present in both, each `wt` or `ws`, different; any other
+measured twin stays a gap, so PM-0001-21's `twin-is-measured` fixture stays INVALID), with fixtures under
+`crates/judge/fixtures/pm-0001-30/` (base gains the C part's six measured room logs; cases `twin-differs`,
+`same-transport`, `not-mutual`, `twin-missing`) and SERIES.md's twin row naming both forms; C-U6-10, `twin_of`
+accepts a role-`bite` run's logging-off twin of the same bite (the one pair C4's role list refuses), nothing else
+loosened; `alloc_twin_diff_count` (measured tick numbers whose `tick.v.tick_allocs_count` differs between the run
+and its `params.twin` of role `logging-off`; a tick in one only counts; pass, fail, gap, waiting, empty tests; the
+table entry takes `|i| alloc_twin_diff_count(i.run, i.set)` with `detail: None`). Then commit, push, count, card.
+Before block 4: the two writer-side SERIES.md needs go on the board (condition 8; the question is already posted
+in part b's thread). Part b's board thread is open (state doing).
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
