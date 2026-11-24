@@ -77,13 +77,13 @@
   uncommitted copy of the tree; plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6c's build RUNNING:** builder a3a3e3fdf559de095 (general-purpose, opus, xhigh, worktree, background;
-  launched ~06:55, cut 06:55-07:59, resumed 08:0x); launch message u6c-launch-prompt.txt (added items 1-6); `<base>`
-  8c81952, 807/904, test 1086.7 s; runner u6c-run.sh, logs .gate/u6c/; notes in its worktree's u6c-build.md. Blocks
-  1, 3-6 DONE, rustfmt applied, 5,428 added (C4: Block 2 not built, lever (1) pulled). End check: 10 PASS, redact FAIL
-  (F-REDACT, issue_tests.rs:266's PEM header string; fixed, not re-run); test 859/956 (+52/+52, C7 met), 1,171.9 s
-  (1.08x); then STOPPED at the disk floor (2.8 GB free; debug 7.8 GB). Snapshot wip/u6c-build.patch (24 files, 241,666
-  B; notes copied); part-clean 8.2 GiB (10,560 MiB); resumed 09:4x: F-REDACT's re-run, plants P1-P21, check.mjs.
+- **Next 2, U6c BUILT 10:07, its round RUNNING from 10:2x:** builder a3a3e3fdf559de095 (worktree, base 8c81952;
+  launch message u6c-launch-prompt.txt; cut 06:55-07:59 and a disk-floor stop, both resumed). Blocks 1, 3-6; Block 2
+  not built (C4: lever (1)); F-REDACT fixed and PASS; plants 20 of 21 fail, **F-P8: P8 does not** (ImpairSocket's Drop
+  joins no thread, socket.rs:440-446); end-check2.log 11/11, 859/956 (+52/+52), 1,116.8 s (1.03x of 1,086.7); 5,431
+  added, 199 removed. Snapshot wip/u6c-build.patch a4e63455… (24 files; notes u6c-build.md 426b31da…). Part-cleans
+  09:3x and 10:1x (free 10,553 MiB). Round (section 7, xhigh): netcode aa64bb15ad4467641, test a3a1718b1419d246e,
+  security a546a4604d30ee9d4 (= Stop B's host read) -> u6c-review-{netcode,test,security}.md.
 - **U6c's Block 0 DONE at 3b75d00 (pushed 8c81952, 06:53):** security-u6c-deps.md's binding check steps 0-7 PASS
   (u6c-block0.md): the lock 3394b451… (229/6, 252 packages, hyper pinned back to 1.12.0; security-u6c-lock.md and its
   addendum CLEAR WITH CONDITIONS, SEC-U6CL-1 to -3 Low); step 5 11/11, 807/904 (= U6b's merged head); deny ok, audit 0
