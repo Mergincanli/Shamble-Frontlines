@@ -87,7 +87,11 @@
 - **Next 2, T5 (i) RUNNING 06:2x:** U6b's merged release binary built (t5i-release.log, 25.6 s) and copied to
   .gate/u7/npt-server (f78dd20a… = the fix pass's 20-start binary); U7's T-builder a9873cdba07a3219e resumed by
   SendMessage (C9's slot rule; U8 re-read from u8-build.patch 0e7fbab2…; its logs in its worktree's .gate/u7/, I copy
-  them out). Then U6c's launch on the lane (u6c-brief.md section 10's before-launch list; chat ~75 % at 06:22).
+  them out). **U6c's Block 0 IN PROGRESS (UNCOMMITTED in the main folder; security-u6c-deps.md's binding check):** step
+  0 PASS (lock 210bf2df…, 235 packages, the three hashes); step 1 the manifest edits (+12 -2, +13, +6); step 2 the lock
+  refreshed with the network (main-run.sh, `env CARGO_NET_OFFLINE=false`: .gate/u6c-block0/step2-metadata.log) put
+  hyper 1.13.0 in; pinned back to the cleared 1.12.0 (step2b-pin.log); the lock now 3394b451… (model ea6efb00…), diff
+  229/6 (model 226/3): **to security-auditor (condition 1)**, lock.diff efb07c46…. Steps 3-5 and the save wait.
 - **Next 3:** the 2026-11-24 day message SENT 23:0x UTC (msg-2026-11-24.md: choices 1-7, /compact asked); the next at
   2026-11-24 23:05 UTC (trig_016pV7v16ktVwMuzygofJhjJ, msg-2026-11-25.md). T5 (i) the day U6b merges.
 
