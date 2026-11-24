@@ -102,25 +102,21 @@ STATUS: COMPLETE (reviewed head a3476e6c; HEAD dc589f62 adds checkpoint files on
 appended); plants: te-plant-b.mjs; scratch copy .gate/te-plant-b (reset to the worktree's src, probes appended).
 
 ## Re-check of 7c3855c7 (head 67892d39: marks.json's 5 lines and notes only; not a new full round)
-- Ran myself: cargo test -p npt-judge --locked --no-fail-fast: 19 + 0 + 4 + 81 + 26 = 130 pass; --check-marks: 81
-  marks, exit 0. Scratch copy refreshed to the head; te-plant-b2.mjs / te-plant-b2-run.sh; results plant-results-2.txt.
+- Ran: cargo test 19 + 0 + 4 + 81 + 26 = 130 pass; --check-marks 81, exit 0. Plants: te-plant-b2.mjs on the copy.
 1. CLOSED: H1 (exactly `min` runs, else a gap; checked add/mul: an overflow is a gap: with(3) a value, 4/6 runs the
    count gap, min 4/6 the "does not fit" gap; my plant r6, the min gap off, fails it), M1 (pb4, pb6 fail
    u6j_the_unit_cost_and_r2s_entities...), M2 (pb3, r3 = pb1 fail c_u6_11_each_session_has_its_own_end...), M3 (pb9
    fails ..._pools_one_set_at_a_time; pb17, pb18, pb19 fail u6j_only_valid_runs_of_kept_parts...). L5, L6 tests seen.
-2. Last-session rule: proven both sides. Pass: `gone` (end 6, ticks 5-6 in flight) valid. Guards: no end -> "(no
-   session_end records that it left)"; past the end -> "(its session_end is at tick 5)"; no admit -> old words.
-   Plants r1 (no-admit tail), r2 (past-end allowed), r5 (session's last = next admit) each fail a c_u6_11 test.
-   README section 1 and the SERIES clause say what figures.rs:703-710 does (first end in the session, no admit: no tail).
-3. Still passing with logic broken: r4, the (c) lookup returning the slot's FIRST session (figures.rs:657-661,
-   new partition_point code), passes all 130: no test has a hole inside a later session's span. Code right: my
-   probe probe_r4_a_hole_inside_a_later_session (te-probe-b.rs) passes on the head and fails under r4. (Medium; the
-   same hole was in round 1's suite: I missed it then.)
-- New Medium (text, writer-side): the last session now takes a tail up to any session_end in it, so an L2 writer
-  that records session_end for every session at the stop would let a client that silently stopped mid-run pass
-  coverage (end >= the room's last hash). L1 is safe today (live sessions get client_counts at the stop, lab
-  scenario.rs:1818, f23 at :4414). Fix: SERIES.md:418 says "a session still connected at the stop gets no
-  session_end"; test-side, a judge guard (an end at the room's final tick gives no tail) if wanted.
-- Expectations changed, both fine: the large-sums assert strengthened to the exact value; the mean-0 gap reworded.
-VERDICT on 67892d39: APPROVE WITH FINDINGS (two Mediums: probe_r4 as a test; the writer sentence. Follow-ups
-under the budget, or one small push if another reason pushes anyway).
+2. Last-session rule: proven both sides. Pass: `gone` (end 6, ticks 5-6 in flight) valid. Guards: no end gives "(no
+   session_end records that it left)"; past the end "(its session_end is at tick 5)"; no admit the old words.
+   Plants r1 (no-admit tail), r2 (past-end allowed), r5 (session last = next admit) each fail a c_u6_11 test. README
+   section 1 and the SERIES clause say what figures.rs:703-710 does (first end in the session; no admit: no tail).
+3. Still passing with logic broken: r4, the (c) lookup returning the slot's FIRST session (figures.rs:657-661, new
+   partition_point code), passes all 130: no test has a hole inside a later session's span. Code right: my probe
+   probe_r4_a_hole_inside_a_later_session (te-probe-b.rs) passes on the head, fails under r4 (Medium; in round 1's
+   suite too: I missed it). Changed expectations: large-sums now exact (stronger), mean-0 gap reworded: fine.
+- New Medium (writer text): any session_end now gives the last session a tail, so an L2 writer that records one for
+  every session at the stop lets a client that went silent mid-run pass (end at or past the room's last hash). L1 is
+  safe (stop writes client_counts, lab scenario.rs:1818; f23 :4414). Fix: SERIES.md:418 "a session still connected
+  at the stop gets no session_end"; or a judge guard (an end at the room's final tick gives no tail).
+VERDICT on 67892d39: APPROVE WITH FINDINGS (two Mediums: probe_r4 as a test; the writer sentence: follow-ups).
