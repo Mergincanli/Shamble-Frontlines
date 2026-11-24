@@ -1027,3 +1027,6 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   required). Nothing off the list; no scheduled probe ran during the sitting. His clicks on GitHub today: 2 approvals,
   2 rejections; in Cloudflare: "Restrict previews" and the token's delete. Red mails expected: three (the two
   rejections and `revoked`).
+- **Billing, after the wall** (his message of 2026-11-24 22:47:31 UTC, f0185b17-b019-44b2-b25e-493c285d4b18), his words:
+  "I just checked the cloudflare's billing page, and nothing paid was added when the wall went on". His word, not a
+  screenshot: no paid plan or charge came with "Restrict previews" and the Zero Trust organization it made.

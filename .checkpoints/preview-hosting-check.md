@@ -888,8 +888,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 27. The report and the closing docs pull request (plan Part 8, items 10 and 11), prepared next. In the test repository
    nothing runs but the hourly probe; nothing changes in Cloudflare, the test repository or Zero Trust until my go
    (no clicks for those sent tonight: the lesson of 2026-11-19).
-   - Waiting on him: the billing screenshot (Manage account → Billing): "Restrict previews" showed no plan screen, and a
-     Zero Trust organization now exists (team domain shamble-preview-check-pages.cloudflareaccess.com).
+   - Billing: answered in his words (2026-11-24 22:47:31 UTC, f0185b17-...): "I just checked the cloudflare's billing
+     page, and nothing paid was added when the wall went on" (a word, not a screenshot; results log). Nothing is
+     waiting on him now.
    - Before the report: this repository's main (1ec6f6c, lane 1's #61 and #64) taken in; plan Risk 13 re-read (its last
      sentence: the check's end and step 2.6 wait for the revised draft), likely a decision entry, with today's finding
      that production's one-off links are behind the wall; his verdict on checklist step 4 (no count shown anywhere; no
@@ -904,7 +905,7 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    decisions; docs-keeper's pass (STATUS, ROADMAP, a dated pointer in SPIKE_PLAN entry 6); DECISIONS.md lines (his
    answers word for word: REVIEWER (b), the browsers decision, TOKEN-SCOPE (a), PROJ-DRAW, AIM-STATE, his words of
    2026-11-19 12:00; lane 2's lines only); the closing docs pull request marked ready only after both checkpoints are
-   deleted, stopping for his go. The billing screenshot by name before the report is final.
+   deleted, stopping for his go. (The billing question: answered by his word, 2026-11-24 22:47:31 UTC.)
 2. His acts, each only after my go (none sent tonight): archive the test repository (TR-END (a)) once the evidence is
    saved; after the report is merged, delete the test project and the Access application (Zero Trust, Access,
    Applications).
