@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-24 about 22:35 UTC, part b built (a3476e6c), review round running.
+- **Last update:** 2026-11-24 about 23:30 UTC, part b at 67892d39, the last checks running.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -161,29 +161,50 @@
     built.** 122 judge tests pass (18 + 4 + 75 + 25); fmt, clippy and check.mjs's seven quick steps pass. From
     0e0f6547: 2,915 added, 166 deleted, 22 files, only `crates/judge/` and `marks/` (marks.json untouched).
 
+22. Part b's one review round on a3476e6c · both REVISE on one High (`rust-reviewer-b.md`, `test-engineer-b.md`):
+    `sync_cost_ratio` stopped the whole judge with an i128 overflow at four or more valid reference runs.
+    test-engineer: 4 Medium (M1 to M3 unpinned logic, with probes; M4 a ruling), 9 Low; rust-reviewer: 11 Low.
+    `check.mjs` whole on a3476e6c: 11 of 11 (844 and 941 tests).
+23. The advisor agent's rulings for the fix pass (2026-11-24): the High by option (A): the mean stays over the part's
+    `min` runs, more is a gap, an overflow is a gap, never a stop; C-U6-11's last session MAY leave a tail up to its
+    recorded `session_end`; the bottom of -10's unit cost is Mustafa's named decision SYNC-ENTITIES (the architect's
+    meaning stands meanwhile).
+24. The fix pass · 7c3855c755076de3728bf522abad7fa2eedd77f8 (pushed) · the High, the Mediums' tests (all ten of the
+    test-engineer's surviving plants now fail a test), the Lows taken (see the commit message). 130 judge tests
+    (19 + 4 + 81 + 26). From 0e0f6547: 3,329 added, 167 deleted. Not taken, follow-ups (Low): rust-reviewer's L7
+    (a `Lack::Fail` reads "= ?" in the precondition and setup lines: not reachable today), L9 (visibility), L6's
+    enum and `only_from`'s scan cost; test-engineer's L9 (wording of condition 5's bracket).
+25. Mustafa's message of 2026-11-24 (saved word for word by script: `mustafa-2026-11-24.md`, `save-message.mjs`) ·
+    67892d3966905ec3d6c38a64de92b18e93d43d8a (pushed) · his item 1 (the three outside marks' notes say "Always
+    MOVED here.") and item 3 (the two rough-laptop parts move by his decision; their `by` names his message) by
+    `moved-table.mjs`: five lines of marks.json, sha256 now
+    c3396db225b394695b6cf41460723e1d98b96f42e1d42d412976f4ca702f1b7a. His item 2: the netcode chat builds the burst
+    setting (NPT_KC_BURSTS) after R1's run and before R1's report. His item 5: the netcode chat may take both parts
+    in one merge, only on his word, after his main Advisor checked the final commit.
+
 ## Current step
-Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b is built at a3476e6c.**
-Running since about 22:32 UTC: the one review round (test-engineer and rust-reviewer, notes
-`test-engineer-b.md` and `rust-reviewer-b.md`) and `node spikes/netcode-proof/check.mjs` whole on a3476e6c (output in
-the session's scratch folder). Then: one fix pass; the final head's checks (judge tests, clippy, fmt, check.mjs
-whole, GitHub's gate and toolchain on that SHA); the advisor agent's read of the head; part b's commit id and report
-to Mustafa.
-**For the advisor's read and the report (collected while building):**
+**Part b is at 67892d39, waiting on its last checks.** Running since about 23:25 UTC: the two reviewers' re-check of
+the High's fix (on what changed only; they append to their notes) and `check.mjs` whole on 67892d39 (output in the
+session's scratch folder). Then: GitHub's gate and toolchain on the head, the advisor agent's read of the head (the
+fix pass and the small commit), then part b's commit id, the commands and the report to Mustafa. Open with him:
+MAIN-MODEL, and the new SYNC-ENTITIES.
+**For the report (collected while building):**
 - Condition 4, readings still open (built on the written reading): -12 and -13 "per client" = the largest client
   mean; -15's slope method and "flat" rule; -24's halves; -27's "within 5 %" = not worse by more than 5 %;
-  PM-0006-19's pooled comparison.
+  PM-0006-19's pooled comparison; -10's mean of the 3 runs and what its "relevant entities" count (SYNC-ENTITIES;
+  the test-engineer's numbers: 1.25 against 0.80).
 - Condition 7: C4-KILL (the killed-room record check) is not built: the netcode chat named no kill record. Today any
   log that says `killed` is exempt from `complete`. Home: before R5's -27 and PM-0006-22 runs. README section 4 says so.
-- Condition 9: the Rule::LoggingOff fix is outside the U6j list.
-- Condition 11: no writer logs 16 of the input series; every figure is proven on made-up logs only.
+- Condition 9: the Rule::LoggingOff fix is outside the U6j list. Also outside it: `Ratio`'s exact order at any size.
+- Condition 11: no writer logs 16 of the input series; every figure is proven on made-up logs only. The netcode chat
+  says (board) its later units write `admit`, `session_end` and `room_end` on L2 per SERIES.md's rows, after R1.
 - The ordering miss of part a (condition 1): entry 64 and JDG-ONLY-1 landed first in part b, not before part a.
-- My own readings: C-U6-11's last session leaves no tail (a bot that leaves for good before the stop reads INVALID);
-  `logging_cost_ratio` takes exactly 3 logging-off runs; every room-reading figure needs exactly one room log.
-- The netcode-architect's Medium: fixing `relevant_count`'s meaning (other soldiers + vehicle hulls) also fixes the
-  bottom of -10's unit cost; the advisor confirms or sends back.
+- My own readings: `logging_cost_ratio` takes exactly 3 logging-off runs; a figure that reads the room needs one
+  room log; -10's reference parts are found by their names `N=24` and `N=36`.
 - Writer-side needs now in SERIES.md (posted on the board): `room_end` carries `slot`; on L2 `admit` and
   `session_end` in the room's log; the two `iface` records carry `ns`; `relevant_count`'s meaning; the kill at the
   end of the measured window.
+- One review round as he asked, plus a re-check of the one High's fix by the two reviewers (both had said REVISE).
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
