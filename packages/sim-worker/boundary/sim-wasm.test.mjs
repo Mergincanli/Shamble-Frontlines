@@ -5,9 +5,10 @@
 import { readFileSync } from "node:fs";
 import { checkLayoutHash, LAYOUT_HASH } from "@shamble/types";
 import { beforeAll, expect, test } from "vitest";
-import { initSync, Sim, tick_hz } from "../pkg/sim_wasm.js";
+import { initSync, panic_buffer, Sim, tick_hz } from "../pkg/sim_wasm.js";
 import { SimHost } from "../src/host.ts";
 import { MAX_TICKS_PER_WAKE } from "../src/pacing.ts";
+import { readPanicMessage } from "../src/panic-message.ts";
 import { copyBlock } from "../src/read-block.ts";
 
 const SEED = new Uint8Array(32).fill(7);
@@ -81,6 +82,16 @@ test("a bad seed, mode or padding is refused with a plain reason", () => {
   expect(() => new Sim(SEED, 0, 0xffff_ffff, 0)).toThrow("above the writer's cap");
 });
 
+test("the panic hook's buffer stands from the module's start: no text, and its room said", () => {
+  const ptr = panic_buffer();
+  const header = new DataView(wasm.memory.buffer, ptr, 8);
+  expect(header.getUint32(0, true)).toBe(0);
+  // The room is written by the module's start function, which the glue runs as it instantiates the module: so
+  // the hook is installed before any other export can run. (A trap's text itself: rules.test.mjs.)
+  expect(header.getUint32(4, true)).toBe(1016);
+  expect(readPanicMessage(wasm.memory, ptr)).toBe("");
+});
+
 test("in the glue, each per-tick call reaches exactly one export", () => {
   const glue = readFileSync(new URL("../pkg/sim_wasm.js", import.meta.url), "utf8");
   for (const [method, exported] of [["input(sequence)", "sim_input"], ["step()", "sim_step"]]) {
@@ -110,6 +121,7 @@ test("the host on the real Wasm: two calls per tick, one transferred block per t
     counted,
     {
       memory: wasm.memory,
+      panicBuffer: panic_buffer(),
       now: () => clock.now,
       timeOrigin: 0,
       post: (message, transfer) => posts.push(structuredClone(message, { transfer })),

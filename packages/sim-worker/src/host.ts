@@ -1,6 +1,7 @@
 import { BlockPool } from "./block-pool.ts";
 import { isPageToWorker, type WorkerStats, type WorkerToPage } from "./messages.ts";
 import { Pacer } from "./pacing.ts";
+import { readPanicMessage } from "./panic-message.ts";
 import { copyBlock, type LinearMemory } from "./read-block.ts";
 import { Ring } from "./stats.ts";
 
@@ -16,6 +17,8 @@ export interface HostSim {
 /** Everything the host needs from the Worker around it, passed in so that a test can stand in for each part. */
 export interface HostEnv {
   readonly memory: LinearMemory;
+  /** Where the Wasm's panic hook keeps a trap's message (`panic_buffer()`, asked once at the start). */
+  readonly panicBuffer: number;
   /** The Worker's clock, `performance.now()`. */
   now(): number;
   /** `performance.timeOrigin`: with `now()` it gives the clock the page shares. */
@@ -93,8 +96,7 @@ export class SimHost {
         if (data.hidden) {
           this.#pacer.pause();
           this.#clearTimer();
-        } else if (this.#pacer.paused) {
-          this.#pacer.resume();
+        } else if (this.#pacer.paused && this.#call(this.#resume) !== undefined) {
           this.#wake();
         }
         return;
@@ -122,21 +124,36 @@ export class SimHost {
     };
   }
 
+  /**
+   * The one way into the Wasm after the start: every call the host makes goes through here. A throw is a trap in
+   * the Wasm, or a block that does not fit: the match cannot go on. The page is told why, once, with the panic's
+   * own text when the hook kept one; the timer is cleared, and no call into the Wasm is made again (a trapped
+   * instance may hold half-written state). Returns what `run` returned, or `undefined` when the match is over.
+   */
+  #call<T>(run: () => T): T | undefined {
+    if (this.#failed) return undefined;
+    try {
+      return run();
+    } catch (error) {
+      this.#failed = true;
+      this.#clearTimer();
+      const panic = readPanicMessage(this.#env.memory, this.#env.panicBuffer);
+      const thrown = error instanceof Error ? error.message : String(error);
+      this.#env.post({ type: "error", message: panic === "" ? thrown : `the simulation stopped: ${panic}` }, []);
+      return undefined;
+    }
+  }
+
+  // The two calls that reach the Wasm, made once: a wake allocates no function of its own.
+  readonly #runTicks = (): number | null => this.#pacer.wake(this.#afterTick);
+  readonly #resume = (): number => this.#pacer.resume();
+
   readonly #wake = (): void => {
     this.#timer = undefined;
-    if (this.#failed) return;
-    let sleep: number | null;
-    try {
-      sleep = this.#pacer.wake(this.#afterTick);
-    } catch (error) {
-      // A trap in the Wasm, or a block that does not fit: the match cannot go on, and the page is told why.
-      this.#failed = true;
-      this.#env.post({ type: "error", message: error instanceof Error ? error.message : String(error) }, []);
-      return;
-    }
+    const sleep = this.#call(this.#runTicks);
     // A whole number of milliseconds, rounded up: a timer cuts a fraction off, fires before the tick is due, and
     // the short second sleep that follows is stretched to about 4 ms by the browser, so the tick starts late.
-    if (sleep !== null) this.#timer = this.#env.setTimer(this.#wake, Math.ceil(sleep));
+    if (sleep !== undefined && sleep !== null) this.#timer = this.#env.setTimer(this.#wake, Math.ceil(sleep));
   };
 
   readonly #afterTick = (): void => {

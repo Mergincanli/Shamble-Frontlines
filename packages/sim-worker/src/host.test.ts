@@ -21,8 +21,9 @@ function setUp(options: { transfer?: boolean; blockBytes?: number; copyMs?: numb
   let anchor = 0;
   let since = 0;
   let newest = -1;
-  const sim: HostSim & { trapNext: boolean; newest(): number } = {
+  const sim: HostSim & { trapNext: boolean; trapRebase: boolean; newest(): number } = {
     trapNext: false,
+    trapRebase: false,
     newest: () => newest,
     input(sequence) {
       calls.input += 1;
@@ -38,6 +39,7 @@ function setUp(options: { transfer?: boolean; blockBytes?: number; copyMs?: numb
     },
     rebase(nowMs) {
       calls.rebase += 1;
+      if (this.trapRebase) throw new Error("unreachable executed");
       anchor = nowMs;
       since = 0;
       return nowMs + PERIOD;
@@ -48,8 +50,16 @@ function setUp(options: { transfer?: boolean; blockBytes?: number; copyMs?: numb
   const posts: WorkerToPage[] = [];
   let timer: { run: () => void; at: number } | undefined;
   const delays: number[] = [];
+  /** What the Wasm's panic hook would have written before a trap: the text into the buffer at 512. */
+  const panicked = (text: string): void => {
+    const encoded = new TextEncoder().encode(text);
+    new DataView(bytes).setUint32(512, encoded.length, true);
+    new DataView(bytes).setUint32(516, 1016 - 512, true);
+    new Uint8Array(bytes).set(encoded, 520);
+  };
   const env: HostEnv = {
     memory,
+    panicBuffer: 512,
     now: () => clock.now,
     timeOrigin: 5_000_000,
     post(message, transfer) {
@@ -78,7 +88,7 @@ function setUp(options: { transfer?: boolean; blockBytes?: number; copyMs?: numb
   };
   const blocks = () => posts.flatMap((post) => (post.type === "block" ? [post] : []));
   const tickOf = (buffer: ArrayBuffer) => new DataView(buffer).getUint32(0, true);
-  return { host, sim, calls, posts, clock, delays, runTimer, blocks, tickOf, hasTimer: () => timer !== undefined };
+  return { host, sim, calls, posts, clock, delays, runTimer, blocks, tickOf, panicked, hasTimer: () => timer !== undefined };
 }
 
 test("it says ready, then posts one transferred block per tick with two calls per tick", () => {
@@ -164,5 +174,43 @@ test("a trap stops the match and tells the page once", () => {
   runTimer();
   expect(posts.at(-1)).toEqual({ type: "error", message: "unreachable executed" });
   expect(hasTimer()).toBe(false);
+  expect(posts.filter((post) => post.type === "error")).toHaveLength(1);
+});
+
+test("a trap's own message reaches the page, and the Wasm is never called again", () => {
+  const { host, sim, calls, posts, runTimer, hasTimer, panicked } = setUp();
+  host.start();
+  runTimer();
+  sim.trapNext = true;
+  panicked("panicked at crates/sim/src/world.rs:43:14:\nthe tick counter is at u32::MAX and cannot advance");
+  runTimer();
+  expect(posts.at(-1)).toEqual({
+    type: "error",
+    message: "the simulation stopped: panicked at crates/sim/src/world.rs:43:14:\nthe tick counter is at u32::MAX and cannot advance",
+  });
+  // Whatever the page still sends, a trapped instance gets no call: not a tick, not a resume.
+  const after = { ...calls };
+  sim.trapNext = false;
+  host.onMessage({ type: "input", sequence: 5, returned: [] });
+  host.onMessage({ type: "visibility", hidden: true });
+  host.onMessage({ type: "visibility", hidden: false });
+  expect(runTimer()).toBe(false);
+  expect(hasTimer()).toBe(false);
+  expect(calls).toEqual(after);
+  expect(posts.filter((post) => post.type === "error")).toHaveLength(1);
+});
+
+test("a trap on the resume after a hidden tab is caught as one in a tick is", () => {
+  const { host, sim, posts, runTimer, hasTimer, panicked } = setUp();
+  host.start();
+  runTimer();
+  host.onMessage({ type: "visibility", hidden: true });
+  sim.trapRebase = true;
+  panicked("panicked at crates/client-endpoint/src/schedule.rs:1:1:\nplanted");
+  // Nothing is thrown out of the message handler, where the Worker would only see an error event with no text.
+  expect(() => host.onMessage({ type: "visibility", hidden: false })).not.toThrow();
+  expect(posts.at(-1)).toEqual({ type: "error", message: "the simulation stopped: panicked at crates/client-endpoint/src/schedule.rs:1:1:\nplanted" });
+  expect(hasTimer()).toBe(false);
+  expect(runTimer()).toBe(false);
   expect(posts.filter((post) => post.type === "error")).toHaveLength(1);
 });
