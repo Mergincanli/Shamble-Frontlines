@@ -7,6 +7,8 @@
 //! The checks live in plain Rust (`Sim::create`), tested natively; the bindings below are a thin wrapper, because
 //! the glue's own types only work inside Wasm.
 
+pub mod panic;
+
 use client_endpoint::block::BlockWriter;
 use client_endpoint::schedule::LocalSchedule;
 use sim::{SEED_BYTES, TICK_HZ, World};

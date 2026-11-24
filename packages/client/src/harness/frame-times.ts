@@ -21,10 +21,14 @@ export class FrameTimes {
     this.#last = null;
   }
 
-  /** Frames per second over the frames kept; 0 before the second frame. */
+  /**
+   * Frames per second as a count over time: the frames kept, divided by the time they took (a pause is left out by
+   * `skip`). Not the usual gap turned upside down: a run whose frames come in short and long gaps would then read
+   * as fast as its short ones. 0 before the second frame.
+   */
   fps(): number {
-    const median = this.#deltas.percentile(50);
-    return median > 0 ? 1000 / median : 0;
+    const mean = this.#deltas.mean();
+    return mean > 0 ? 1000 / mean : 0;
   }
 
   /** The frame time at a percentile, in milliseconds. */

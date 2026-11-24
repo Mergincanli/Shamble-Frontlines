@@ -37,7 +37,7 @@ test("a ring keeps the newest samples and forgets the oldest", () => {
   expect(ring.percentile(1)).toBe(0);
 });
 
-test("reading a ring does not disturb it, and clear empties it", () => {
+test("reading a ring does not disturb it", () => {
   const ring = new Ring(3);
   for (const value of [3, 1, 2]) ring.push(value);
   expect(ring.percentile(99)).toBe(3);
@@ -46,9 +46,23 @@ test("reading a ring does not disturb it, and clear empties it", () => {
   // The oldest sample was 3, not the smallest: sorting for a reading must not reorder what is held.
   expect(ring.percentile(1)).toBe(1);
   expect(ring.max()).toBe(10);
-  ring.clear();
-  expect(ring.count).toBe(0);
-  expect(ring.max()).toBeNaN();
+});
+
+test("the mean is over the samples held, and only those", () => {
+  const ring = new Ring(4);
+  expect(ring.mean()).toBeNaN();
+  ring.push(10);
+  expect(ring.mean()).toBe(10);
+  for (const value of [20, 30]) ring.push(value);
+  expect(ring.mean()).toBe(20);
+  // Two more: the 10 is pushed out, and the mean is of 20, 30, 40 and 50.
+  for (const value of [40, 50]) ring.push(value);
+  expect(ring.mean()).toBe(35);
+  // A median hides what a mean shows: one long sample among short ones.
+  const frames = new Ring(4);
+  for (const value of [4, 4, 4, 20]) frames.push(value);
+  expect(frames.percentile(50)).toBe(4);
+  expect(frames.mean()).toBe(8);
 });
 
 test("a ring refuses a capacity that is not a whole number above 0", () => {

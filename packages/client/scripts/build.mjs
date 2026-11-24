@@ -8,13 +8,21 @@
 // the page is the development flavour: it has the readout and the copy report, and the zip's small server is
 // copied beside it. Every command runs as a list of arguments, never through a shell.
 //
+// Every build but a --production one also makes the test-only WebAssembly module (crates/devtools, in its release
+// and its dev profile) into .gate/rules-module/ at the repository's root, where the rule tests load it
+// (boundary/rules.test.mjs, the e2e rules spec). That folder lies outside every package: no folder a server reads
+// holds it, and no link in node_modules leads to it. It is built in a cargo call and a target folder of its own,
+// nothing of the page or the Worker imports it, and a built page that held it would be refused (build-checks.mjs,
+// wasmProblems).
+//
 // The wasm-bindgen tool is a ready-built program from the internet. Before it is run at all, `--version` included,
 // its file must be the one wasm-bindgen-tool.mjs records (a plain file of that size and sha256), and its version
 // must equal the wasm-bindgen library in Cargo.lock (PM-0002-18). The path that was checked is the path that is
 // run: the tool is never looked up by name.
 
 import { execFileSync } from "node:child_process";
-import { copyFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as viteBuild } from "vite";
@@ -26,17 +34,42 @@ import {
   cspProblems,
   formatSizeTable,
   lockedWasmBindgenVersion,
+  missingOverflowOverrides,
   refusedBuildSettings,
+  registryRemapFlag,
+  simFeatureDifferences,
+  simFeatureList,
   sizeTable,
   tooLarge,
+  wasmProblems,
+  workerEntryChunk,
 } from "./build-checks.mjs";
 import { WASM_BINDGEN_TOOL } from "./wasm-bindgen-tool.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const clientDir = path.join(root, "packages/client");
 const pkgDir = path.join(root, "packages/sim-worker/pkg");
+/** The Worker's entry module: the chunk the build makes from it is the only one that may hold the Wasm's glue. */
+const workerSource = path.join(root, "packages/sim-worker/src/worker.ts");
 const targetDir = path.join(root, "target");
 const wasmFile = path.join(targetDir, "wasm32-unknown-unknown/release/sim_wasm.wasm");
+const wasmTarget = "wasm32-unknown-unknown";
+/**
+ * The environment of every cargo call this script makes. Its one addition: the compiler flags, which are the path
+ * remap and nothing else (panic locations inside registry crates name one fixed place, not this machine's cargo
+ * folder, so one commit gives the same Wasm bytes wherever it is built: RR-F5). Given this way, cargo takes its
+ * compiler flags from here alone: `rustflags` in a cargo config file outside the repository do not reach the
+ * compiler. What such a file can still set is not shut out here: a linker, a compiler wrapper, an `[env]` table,
+ * a profile (the quality gate's flag check). The same name coming from outside is refused before any cargo call
+ * (refuseSettings).
+ */
+const cargoEnv = () => ({ ...process.env, CARGO_ENCODED_RUSTFLAGS: registryRemapFlag(process.env["CARGO_HOME"], os.homedir(), root) });
+/**
+ * The test-only module: its bindings' folder, outside every package (so outside what a server reads and what
+ * node_modules links to), and a target folder that is never the players' Wasm's.
+ */
+const rulesDir = path.join(root, ".gate/rules-module");
+const rulesTargetDir = path.join(root, ".gate/target-rules");
 /** The tool's absolute path, after its file was compared with the recorded values. */
 function checkedTool() {
   const tool = process.env["SHAMBLE_WASM_BINDGEN"];
@@ -45,6 +78,61 @@ function checkedTool() {
   }
   checkCliFile(tool, WASM_BINDGEN_TOOL.program.sha256, WASM_BINDGEN_TOOL.program.bytes);
   return tool;
+}
+
+/** Stops the build when the environment holds a setting of cargo's or the tool's (build-checks.mjs names them). */
+function refuseSettings() {
+  const overrides = refusedBuildSettings(process.env);
+  if (overrides.length > 0) throw new Error(`build settings from the environment are refused: unset ${overrides.join(", ")}`);
+}
+
+/**
+ * Two refusals read from cargo's own resolution, before anything is compiled (build-checks.mjs explains each): a
+ * third-party crate that would be linked into the players' Wasm with overflow checks off, and a build that resolves
+ * the simulation's features differently from another build that runs it.
+ */
+function checkCrates() {
+  const tree = (...args) => execFileSync("cargo", ["tree", "--locked", ...args], { cwd: root, encoding: "utf8", env: cargoEnv() });
+  const unchecked = missingOverflowOverrides(
+    tree("-p", "sim-wasm", "--target", wasmTarget, "-e", "normal,no-proc-macro", "--prefix", "none"),
+    readFileSync(path.join(root, "Cargo.toml"), "utf8"),
+    root,
+  );
+  if (unchecked.length > 0) {
+    throw new Error(
+      `the players' Wasm would hold these crates with overflow checks off: ${unchecked.join(", ")}. ` +
+        "Give each its [profile.release.package.<name>] block with overflow-checks = true in the root Cargo.toml",
+    );
+  }
+  const features = (edges, ...args) => tree(...args, "-e", `features,${edges},no-proc-macro`, "--prefix", "depth", "--no-dedupe");
+  const differences = simFeatureDifferences({
+    "the players' Wasm": simFeatureList(features("normal", "-p", "sim-wasm", "--target", wasmTarget)),
+    "the test-only module": simFeatureList(features("normal", "-p", "devtools", "--target", wasmTarget)),
+    // As `cargo test --workspace` builds it: dev-dependencies' features count, the simulation's own test helpers do not.
+    "the native tests": simFeatureList(features("normal,dev", "--workspace"), features("normal", "--workspace")),
+  });
+  if (differences.length > 0) throw new Error(differences.join("\n"));
+}
+
+/**
+ * Builds the test-only module in both profiles and writes each one's bindings into its own folder under
+ * .gate/rules-module/. The same refusals and the same checked tool as the players' Wasm; its own cargo
+ * call and target folder, so nothing it compiles can stand where the players' Wasm is read from.
+ */
+export function buildRulesModule() {
+  for (const [profile, flags, folder] of [["release", ["--release"], "release"], ["dev", [], "debug"]]) {
+    refuseSettings();
+    execFileSync(
+      "cargo",
+      ["build", "--locked", ...flags, "--target", wasmTarget, "-p", "devtools", "--lib", "--target-dir", rulesTargetDir],
+      { cwd: root, stdio: "inherit", env: cargoEnv() },
+    );
+    const outDir = path.join(rulesDir, profile);
+    rmSync(outDir, { recursive: true, force: true });
+    mkdirSync(outDir, { recursive: true });
+    const built = path.join(rulesTargetDir, wasmTarget, folder, "devtools.wasm");
+    execFileSync(checkedTool(), ["--target", "web", "--out-dir", outDir, built], { cwd: root, stdio: "inherit" });
+  }
 }
 
 /** Builds the Wasm and writes its bindings. Returns the size table of what the Worker loads. */
@@ -56,12 +144,12 @@ export function buildWasm() {
   checkCli(execFileSync(checkedTool(), ["--version"], { encoding: "utf8" }), locked);
   // The Wasm players get is built with no setting from the environment (the overflow checks, the optimisation level,
   // the target's features), and into this repository's own target folder, which is where it is read from below.
-  const overrides = refusedBuildSettings(process.env);
-  if (overrides.length > 0) throw new Error(`build settings from the environment are refused: unset ${overrides.join(", ")}`);
+  refuseSettings();
+  checkCrates();
   execFileSync(
     "cargo",
-    ["build", "--locked", "--release", "--target", "wasm32-unknown-unknown", "-p", "sim-wasm", "--target-dir", targetDir],
-    { cwd: root, stdio: "inherit" },
+    ["build", "--locked", "--release", "--target", wasmTarget, "-p", "sim-wasm", "--target-dir", targetDir],
+    { cwd: root, stdio: "inherit", env: cargoEnv() },
   );
   mkdirSync(pkgDir, { recursive: true });
   // Checked again: the cargo build above ran build scripts as this same user.
@@ -98,12 +186,26 @@ export async function buildPage({ production, outDir }) {
   process.env["VITE_SHAMBLE_COMMIT"] = commitName();
   if (production) delete process.env["VITE_SHAMBLE_DEVTOOLS"];
   else process.env["VITE_SHAMBLE_DEVTOOLS"] = "1";
+  // The Worker's bundle reports its own chunks: Vite builds it apart from the page's, with these plugins beside the
+  // settings of vite.config.mjs.
+  const workerChunks = [];
   await viteBuild({
     root: clientDir,
     configFile: path.join(clientDir, "vite.config.mjs"),
     logLevel: "warn",
     build: { outDir, emptyOutDir: true },
+    worker: {
+      plugins: () => [
+        {
+          name: "shamble-worker-chunks",
+          generateBundle(_options, bundle) {
+            for (const chunk of Object.values(bundle)) if (chunk.type === "chunk") workerChunks.push(chunk);
+          },
+        },
+      ],
+    },
   });
+  const workerEntry = workerEntryChunk(workerChunks, workerSource);
   // The zip's small server is a development tool: it is not part of a production build.
   if (!production) copyFileSync(path.join(clientDir, "serve.mjs"), path.join(outDir, "serve.mjs"));
   const files = filesOf(outDir)
@@ -113,7 +215,8 @@ export async function buildPage({ production, outDir }) {
   const problems = [
     ...tooLarge(rows).map((row) => `${row.name}: a served file reaches 25 MiB`),
     ...cspProblems(files),
-    ...bundleProblems(files, production),
+    ...bundleProblems(files, production, workerEntry),
+    ...wasmProblems(files, readFileSync(path.join(pkgDir, "sim_wasm_bg.wasm"))),
   ];
   if (problems.length > 0) throw new Error(`the built page is refused:\n  ${problems.join("\n  ")}`);
   return rows;
@@ -127,8 +230,12 @@ async function main() {
   if (unknown.length > 0 || (at !== -1 && args[at + 1] === undefined)) throw new Error(`unknown or unfinished option: ${args.join(" ")}`);
   checkOutDir(outDir, path.join(clientDir, "dist"));
   console.log(formatSizeTable(buildWasm()));
-  if (args.includes("--wasm-only")) return;
   const production = args.includes("--production");
+  if (!production) {
+    buildRulesModule();
+    console.log(`\nthe test-only module (never shipped) in ${path.relative(root, rulesDir)}: release and dev`);
+  }
+  if (args.includes("--wasm-only")) return;
   console.log(`\n${production ? "production" : "development"} page in ${path.relative(root, outDir)}:`);
   console.log(formatSizeTable(await buildPage({ production, outDir })));
 }

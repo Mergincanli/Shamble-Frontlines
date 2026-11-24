@@ -11,7 +11,7 @@ export function percentile(sorted: ArrayLike<number>, p: number): number {
 
 /**
  * The newest `capacity` samples of one measurement. Both buffers are allocated once, so `push` allocates nothing;
- * the readings (`percentile`, `max`) are for the readout and the report, a few times a second at most.
+ * the readings (`percentile`, `mean`, `max`) are for the readout and the report, a few times a second at most.
  */
 export class Ring {
   readonly #values: Float64Array;
@@ -47,6 +47,13 @@ export class Ring {
     return percentile(held, p);
   }
 
+  /** The mean of the samples held; `NaN` when there are none. */
+  mean(): number {
+    let sum = 0;
+    for (let i = 0; i < this.#count; i += 1) sum += this.#values[i] ?? Number.NaN;
+    return this.#count === 0 ? Number.NaN : sum / this.#count;
+  }
+
   /** The largest sample held; `NaN` when there are none. */
   max(): number {
     let max = Number.NaN;
@@ -55,11 +62,5 @@ export class Ring {
       if (!(value <= max)) max = value;
     }
     return max;
-  }
-
-  /** Forgets every sample. */
-  clear(): void {
-    this.#next = 0;
-    this.#count = 0;
   }
 }

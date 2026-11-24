@@ -58,6 +58,36 @@ export interface WorkerStats {
   readonly crossOriginIsolated: boolean;
 }
 
+/**
+ * Every field of `WorkerStats` with its kind: a field that joins the interface does not compile until it is named
+ * here, so the check below cannot fall behind it.
+ */
+const STATS_FIELDS: { readonly [Name in keyof WorkerStats]: WorkerStats[Name] extends boolean ? "boolean" : "number" } = {
+  ticks: "number",
+  wakes: "number",
+  maxTicksInOneWake: "number",
+  drops: "number",
+  droppedMs: "number",
+  pauses: "number",
+  latenessP50: "number",
+  latenessP99: "number",
+  latenessMax: "number",
+  copyP50: "number",
+  copyP99: "number",
+  blockBytes: "number",
+  poolMisses: "number",
+  poolRefused: "number",
+  undetached: "number",
+  hardwareConcurrency: "number",
+  crossOriginIsolated: "boolean",
+};
+/**
+ * The same list as pairs, made once, so the check that runs on the page for every report (four times a second, in
+ * development builds) builds no list of its own; reading a report's fractional numbers still costs a few bytes
+ * each. Marked as free of side effects, so the Worker's chunk, which never runs this check, does not carry it.
+ */
+const STATS_KINDS: readonly (readonly [string, string])[] = /* @__PURE__ */ Object.entries(STATS_FIELDS);
+
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -85,6 +115,37 @@ export function isPageToWorker(value: unknown): value is PageToWorker {
       return typeof value["hidden"] === "boolean";
     case "report-request":
       return true;
+    default:
+      return false;
+  }
+}
+
+/** Whether a value is the Worker's statistics: every field there, each of its kind. A reading may be `NaN`. */
+export function isWorkerStats(value: unknown): value is WorkerStats {
+  if (!isObject(value)) return false;
+  for (let i = 0; i < STATS_KINDS.length; i += 1) {
+    const field = STATS_KINDS[i];
+    if (field === undefined || typeof value[field[0]] !== field[1]) return false;
+  }
+  return true;
+}
+
+/**
+ * Whether a message the page received is one the Worker may send. Anything else ends the match on the page: the
+ * two sides are then from different builds, or the Worker's script is not ours.
+ */
+export function isWorkerToPage(value: unknown): value is WorkerToPage {
+  if (!isObject(value)) return false;
+  switch (value["type"]) {
+    case "ready":
+      return isCount(value["blockBytes"]) && isCount(value["tickHz"]);
+    case "block":
+      // One read of the time: `isFinite` refuses everything that is not a number, without converting it.
+      return value["buffer"] instanceof ArrayBuffer && Number.isFinite(value["doneAt"]);
+    case "error":
+      return typeof value["message"] === "string";
+    case "report":
+      return isWorkerStats(value["stats"]);
     default:
       return false;
   }

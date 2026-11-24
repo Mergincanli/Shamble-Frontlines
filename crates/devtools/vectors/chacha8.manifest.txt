@@ -1,0 +1,9 @@
+chacha8-words.bin: ChaCha with 8 rounds, 32-bit words in drawing order, each little-endian
+made by make_chacha8_vectors.py after it reproduced the 8 published vectors in crates/sim/src/rng.rs
+key c46ec1b18ce8a878725a37e780dfb7351f68ed2e194c79fbc6aebee1a667975d
+bytes 160384  sha256 8531eb019ebc35b27c8963876e69bdd538c519d983f193ccefe4b64c960968f2
+at byte 0: stream 0, words 0 to 9999 (10000)  sha256 b738d86c58c3c75915f89d37221ceceff36c0efee490587b4880597f9ff69362
+at byte 40000: stream 1, words 0 to 9999 (10000)  sha256 cda5165164ee446bf41cd97e7fd45f30392a2f211ec682f1d9d8435e91e5d329
+at byte 80000: stream 4294967296, words 0 to 9999 (10000)  sha256 0e41a652f0a2221865d6d144094c2ad834d3440c0327b5b7d661cc71c395331d
+at byte 120000: stream 18446744073709551615, words 0 to 9999 (10000)  sha256 2f20a169c0c63c129b15ea1431d156dd4b79be86a5b1d68f2701d00698de1234
+at byte 160000: stream 1, words 68719476688 to 68719476783 (96)  sha256 d74ea33e34faaceb9a6c301d24d8d65bb9f1f9b1b3152e150485e5a02c57d164
