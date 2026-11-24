@@ -123,3 +123,13 @@ fn probe_sync_four_valid_ten_minute_references() {
     let (line, note) = sync_out(&logs);
     assert!(line.starts_with("Pass") || line.starts_with("Fail") || line.starts_with("Gap"), "{line} {note}");
 }
+
+/// R4 (re-check): an unresolved room hash in the middle of a LATER session's span is a gap ((c) per session).
+#[test]
+fn probe_r4_a_hole_inside_a_later_session() {
+    let room: Vec<u64> = (1..=12).collect();
+    let client = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12];
+    let ev = [("admit", 1, "room"), ("session_end", 4, "room"), ("admit", 5, "room")];
+    let (valid, why) = covered(&session_run(&room, &client, &ev));
+    assert!(!valid && why.contains("slot 0, tick 8: the room logged a hash and no client log resolves it"), "{why}");
+}
