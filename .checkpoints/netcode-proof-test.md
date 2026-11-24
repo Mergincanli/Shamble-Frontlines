@@ -94,8 +94,8 @@
   test 5 Medium, security 5 Low (= Stop B's host read). Ruling advisor-u6c-r1.md (ad72c0b8…): the fix pass, then round 2
   on the diff; the readings mine; NC-U6C-12 and SEC-U6C-5 into U8 (C9). Block 2, the stamp tests, held back (C4, lever (1)).
 - **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
-  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** the day message at 23:05 UTC (msg-2026-11-25.md), read by Fable
-  first: (7) as a question, hand-off pointers for Netcode Builder 2, and that a SendMessage resume is not "a new agent".
+  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** 22:52 reminder: a fresh advisor for round 2's ruling (five items;
+  scratchpad u6c-r2-ruling-request.txt), no merge before it; 23:05: the day message (its to-do block; Fable reads it first).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - For msg-2026-11-25.md (C7, R2): (1) U6b's merge fixed one test's cap: the double-load bite's start gets its own 2 s
@@ -147,7 +147,7 @@
 - Disk (11-24 15:3x UTC): 10,504 MiB free (floor 4,096; a full check.mjs fills the dev profile to ~7.8 GB); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (the saver b74ohsd5l, 2 triggers; no agent):** U6c's round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
+- **Running (the saver b74ohsd5l; 3 triggers, the ruling's trig_01C4uA49qe1c9RAnFZaLGa3T at 22:52; no agent):** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
   aacd36781fdea65a0, security a307bdd231bf3e9b4, each APPROVE WITH FINDINGS, no Critical or High (u6c-r2-*.md, each
   ending DONE). A stopped agent resumes by SendMessage from its notes.
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
