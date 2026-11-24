@@ -983,3 +983,7 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   (https://17d45ef9.shamble-preview-check.pages.dev): HTTP 200 {"success":true,"errors":[]}" / "This job ended at
   2026-11-24T21:56:06Z." "Uploads found" equals the records (1 upload, 17d45ef9). His approval: the job started
   21:56:04 UTC. The token worked at 21:56:06 UTC: the "alive" control for the revoke.
+- **Visit 2, step 9**: pull requests #9 (cs/b9-edit) and #10 (cs/b9-prod) closed by the session (update_pull_request,
+  21:57 UTC); their cleanup runs: `close` #7, id 45496209201 (cs/b9-edit), created 21:57:24, "waiting"; `close` #8, id
+  45496236161 (cs/b9-prod), created 21:57:35, "waiting". His rejections asked (neither branch has an upload: the token
+  tests uploaded nothing).
