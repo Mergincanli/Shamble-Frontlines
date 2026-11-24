@@ -842,6 +842,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      possible; it must finish before the token ends (2026-11-25 23:59 Amsterdam), with margin, since (c)'s cleanup
      needs the token and the revoke proof must not be confused with the token's own end. Next: consultation 25, then
      the timing, the one-screen list and step 1 only.
+   - Rows added by consultation 25 (before step 1): the approval setting was last seen five days ago, so if pull request
+     5's cleanup runs without waiting → recorded, told to him, the sitting goes on; that cleanup failing at Cloudflare's
+     sign-in (the token already dead) → stop and consult (the revoke proof would have no "alive" control); his Brave
+     version asked again with his Brave results (it may have updated). Visit 2 tomorrow: start by 21:00 Amsterdam at the
+     latest (a clear margin before 23:59). During the sitting: keep turns short near the 10-minute and 1-hour marks, or
+     time each sweep from its own probed_at; consult only on a row that is not the expected one, and before step 26 is
+     saved as done. Not blocking: the 15 scheduled probe results unread; Day 1's downloaded evidence in .gate checked
+     before the report (the upload records expire 2026-12-02).
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
@@ -1341,6 +1349,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    on without waiting; on that message an outside look and both sweeps scheduled with send_later (the first at once if
    his report is late, its real offset recorded); the wall and Brave offered tonight (about 20 minutes), D tonight or
    any evening up to the 25th; plain words, one line of why, the numbered list as "For Mustafa".
+
+25. 2026-11-24 19:10:53 UTC (called; answer 19:12:02 UTC; transcript times), moment 1 (Day 2 resumed after five days,
+   before the sitting) · Q: are the fresh readings enough, and how does the list go to him? · Changed: the readings
+   confirmed as the right ones; the token-delete clicks given in the one-screen list after all (he asked for every
+   click), with the gate inside that step's sentence (only after I write that pull request 5's cleanup has finished);
+   plain words only (no bare case letters, numbers or workflow names); his item 3 first (visit 1 about 20 minutes now;
+   visit 2 about 15 minutes, at the earliest an hour after the wall, tonight or tomorrow with a latest start leaving a
+   margin before 23:59); three red GitHub mails certain, other mails "may"; rows for approvals possibly off, the token
+   possibly dead (stop and consult), Brave possibly updated; short turns near the sweep marks; the unread scheduled
+   probes and Day 1's evidence as non-blocking checks; the card's "Last update" line confirmed changed.
 
 ## Running work
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
