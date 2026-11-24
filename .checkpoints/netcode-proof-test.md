@@ -153,14 +153,14 @@
     check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly, next ~10:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24
     23:05 UTC, msg-2026-11-25.md).
 - **My step (his words, history.md "2026-11-24 about 10:14": no new agent until after his /compact):** waiting on U6c's
-  round. **Next three:** (1) read the three files; the advisor's one ruling on them (F-P8 and each Medium or higher in
-  its packet); (2) the fix pass by U6c's builder (SendMessage), its check, then merge M3-M9 as U4f's (history.md:7022-
-  7028; M5 check.mjs in the main folder after a part-clean; A2's 48-connection reading at the close; U8's side per
-  interface, C9); (3) U7's 0b check the hour U6c merges, U7's R-half (its T-builder) and U8's merge. Day message 23:05.
+  round. **First after his /compact:** PR #40 conflicts with main 1ec6f6c (PR #64; only docs/STATUS.md, the rest
+  auto-merge): take main in as at MAIN-53 (merge_main_53.py's rule), gate, push (no CI on #40 until then). **Next
+  three:** (1) the three files read; the advisor's one ruling (F-P8, each Medium+); (2) the fix pass (U6c's builder),
+  its check, merge M3-M9 as U4f's (history.md:7022-7028; M5 after a part-clean; A2's reading; U8's side per interface,
+  C9); (3) U7's 0b check the hour U6c merges, U7's R-half (its T-builder), U8's merge. Day message 23:05.
 - **Finished, resumable by SendMessage:** U6c's builder a3a3e3fdf559de095 (BUILT; notes u6c-build.md; takes the fix
-  pass); U7's T-builder a9873cdba07a3219e (T5 (i); takes the R-half); U8's builder ac59cce3e5d002441 (worktree
-  agent-ac59cce3e5d002441, notes u8-build.md "## Pass 3"); the advisor a3de649cd25e474df (U8's rulings; U8's pushed
-  head); the U6c advisor a662f1797b78cae95; U6b's builder a2661dc320c9e6d00 (worktree stays). Older: card at e67ef59.
+  pass); U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder ac59cce3e5d002441 (notes u8-build.md "## Pass
+  3"); the advisor a3de649cd25e474df (U8's rulings); the U6c advisor a662f1797b78cae95. Older: card at e67ef59.
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): its record in Now. Open at its
   merge: F28 (U6b's flush), U6b's null certificate pair, ds-selftest's place in C1's run list (U6b's merge), U6c's names
   (advisor-u8-stopb.md:208-220, and NC-R2-4 in U6c's message), Stop B's laptop reads (driver listen, passphrase, fsn1
