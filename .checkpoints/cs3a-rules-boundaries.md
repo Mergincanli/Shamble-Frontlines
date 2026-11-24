@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 14:30 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 14:53 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -329,6 +329,48 @@ and text.
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **Round 1, test-engineer (on 5c92311; `test-engineer-review1.md`, its scripts in `.gate/test-engineer-cs3a/`): 0
+  Critical, 2 High, 1 Medium, 10 Low.** It re-ran 21 of the 66 plants (21 caught), checked the float digests with
+  a third implementation (C) and the stream file with its own ChaCha, and found TE-L, TE-NT3 to -NT5, TE-MONO and
+  TE-104 closed as meant; PM-0002-53 four of four; no new speed-dependent verdict.
+  - **H1 (High): `mul_add` gives different bits natively and in WebAssembly, and the 10,000 cases cannot see it.**
+    For (0x01000001, 0x32FFFFFE, 0x007FFFFF) the exact fused result is 0x007FFFFF; native here (an FMA CPU)
+    gives it; the test-only Wasm, release and dev, gives 0x00800000, the two-roundings value. **Reproduced by the
+    builder at 14:53 UTC** (`.gate/cs3a/hard/`: a scratch native probe and the module under Node). The toolchain's
+    software `fmaf` is not the exact one; a server CPU without FMA probably gives the Wasm's value (not tested).
+    ADR 0004 part 7 allows "explicit `mul_add`, which std specifies exactly": its premise does not hold on the
+    pinned toolchain. Nothing in `sim` calls `mul_add`. Its fix: the constructed cases join the inputs and stay;
+    never drop the case to get green; the rule is the advisor's or his. **The advisor agent is ruling on MUL-ADD
+    (started 14:53 UTC; `advisor-mul-add.md`): (a) an interim ban in the scan, the cases kept, the difference
+    pinned by a test, and the question to him with the report; (b) keep part 7 as written; (c) stop and ask first.**
+  - **H2 (High): the feature compare misses PM-0004-74's own named failure.** cargo prints a feature that another
+    package turns on for a dependency it shares with `sim` under that other package, not under `sim`; the unit
+    test's planted fixture puts it where cargo never prints it; normal edges hide dev-dependency features;
+    "(command-line)" is stripped on one kind of line only. Fix: per build, every feature line of every package in
+    `sim`'s dependency closure, from the whole tree; dev edges for the tests' list; real cargo output as fixtures.
+    (engine-architect's F1 and rust-reviewer's M3 are the same check.)
+  - M (Medium): the scan lets relaxed SIMD through (`#[target_feature]`, `core::arch`): ban both in `sim`, with two
+    planted cases (PM-0004-23 names the relaxed-simd feature).
+  - Lows: (a) `from_f64` = rust-reviewer's M1; (b) the vectors are f32 only: the script's first line claims too
+    much; (c) PM-0002-53's counter is devtools' function in Wasm (accepted by DEPART-3 (a); say so); (d) record
+    the draft's sha256 e0a49fdd...4d55 (76,754 bytes) beside the published vectors; (e) `next_u64` from an odd
+    position across a block's end has no test; (f) two plants are caught at their named test but for another
+    reason (`tel-not-a-file` by a broken connection, `module-no-hook` by a missing function); (g) no plant for
+    the six new WebAssembly stub names or the Worker's start path; (h) = rust-reviewer's M4; (i) = the hook's
+    test in its own binary (3b); (j) `step8.log` was a run on df72a58 plus the working tree: the final evidence
+    run is made on the final head, with C2's versions and refused names.
+  - Card sentences it does not carry: step 10's "PM-0004-74" (H2); step 7's "all 38 float operations passed"
+    (true, but not bit for bit for `mul_add`: H1); "each at its own check" (f).
+- **Round 1, security-auditor (on 5c92311; `security-auditor-review1.md`): 0 Critical, 0 High, 1 Medium, 6 Low. Its
+  condition 2: clauses (a), (b), (c), (e) met; (d) not met for Vite's dev server.**
+  - M1 (Medium, fix now; = rust-reviewer's L2): `runtimeCrates` takes any crate with a source in brackets for a
+    workspace member; count a member only when the bracket is a folder under the repository's `crates/`; refuse a
+    tree without its `sim-wasm` line; plants for both.
+  - L1 (fix now: clause (d)): `vite.config.mjs` lets the dev server read the whole `../sim-worker` folder, so the
+    dev server the isolation spec starts answers for `pkg-rules/`; allow only `../sim-worker/src` and `/pkg`.
+  - L2: an empty or relative `CARGO_HOME` makes the remap do nothing (resolve it; empty counts as unset). L3: the
+    panic reader refuses any room but 1,016. L5: the generators' run lines say `python3 -I -B`. L6: the refusal
+    pattern compares names in upper case (Windows). Follow-up: L4 (the copy report's rows from the known list).
 - **Round 1, rust-reviewer (on 5c92311; `rust-reviewer-review1.md`): 0 Critical, 0 High, 4 Medium (fix now), 7
   Low.** It reproduced the ChaCha8 file and the Wasm's sha256 e138cae8...2bc5 with its own tools, and read the
   machine code: on x86-64 `floor`, `ceil`, `trunc`, `round` and `mul_add` are calls into the toolchain's own
@@ -401,7 +443,7 @@ and text.
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
-- **Reviewers in the background** (round 1, on 5c92311; engine-architect and rust-reviewer ended; perf-auditor started 14:30 UTC, notes `perf-auditor-review1.md`; security-auditor started 14:21 UTC
+- **Reviewers in the background** (round 1, on 5c92311; engine-architect, rust-reviewer, test-engineer and security-auditor ended; perf-auditor still reads; the advisor agent rules on MUL-ADD; perf-auditor started 14:30 UTC, notes `perf-auditor-review1.md`; security-auditor started 14:21 UTC
   with notes in `security-auditor-review1.md`; perf-auditor follows): rust-reviewer
   (`rust-reviewer-review1.md`), engine-architect (`engine-architect-review1.md`), test-engineer
   (`test-engineer-review1.md`); each works in its own `.gate/<name>-cs3a/` folder. security-auditor and
