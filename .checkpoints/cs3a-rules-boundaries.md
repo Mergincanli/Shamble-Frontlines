@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 14:01 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 14:21 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -329,6 +329,29 @@ and text.
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **Round 1, engine-architect (on 5c92311; `engine-architect-review1.md`): 0 Critical, 0 High, 1 Medium, 5 Low; the
+  five follow-ups EA-F8, -F10, -F13, -N3, -N6 closed as meant.** For the fix pass:
+  - F1 (Medium, fix now): the feature compare's "native tests" list reads normal edges only, so a feature of `sim`
+    turned on through a dev-dependency passes though `cargo test --workspace` builds it (measured in its scratch).
+    Fix: the check's doc and the report say it compares normal edges only (dev-dependency features and CI's release
+    line are not modelled), and the doc names ADR 0002 part 3, not part 4; the exact check goes with the quality
+    gate step's G5 (a STATUS follow-up, with its plant).
+  - F2 (Low): `#[wasm_bindgen(start)] pub fn start()` also puts a callable `start()` into the players' glue;
+    `#[wasm_bindgen(start, private)]` removes it and the start still runs; plus one boundary assertion that the
+    glue exports exactly `default`, `initSync`, `Sim`, `panic_buffer`, `tick_hz`. Take it in the fix pass.
+  - F3 (Low): the trap's sentence is built in `host.ts` and in `worker.ts`: one function beside
+    `readPanicMessage`. Take it in the fix pass.
+  - F4 (Low): nine `clippy::pedantic` warnings in `rng.rs` and `rules_scan.rs` (the later lint of ADR 0002 part 7):
+    doc backticks now where cheap, the rest a follow-up for the quality gate step.
+  - F5 (Low, forward): `devtools` is both the native tools crate and the wasm32 module of every development build;
+    its first native-only dependency must be target-gated: a STATUS follow-up, and a separate rules build step
+    when CI's lines are next edited (E1).
+  - F6 (Low, forward): the hook's test installs a process-wide hook inside sim-wasm's shared unit-test binary;
+    move it to its own test binary in 3b.
+  - Departures it names beyond the plan's section 12 list, for the docs pass (pointers, not rewording): PM-0004-74
+    read as three builds over normal edges; ADR 0002 part 8's row "Rust in Wasm: wasm-bindgen-test" (line 494);
+    PM-0004-27's "each stream" read as four edge stream ids; ADR 0002 part 5 (lines 353 to 357) plans a feature
+    turned on only by dev-dependencies, which PM-0004-74's control would count.
 - None on main. The follow-ups of #64 and #61: `docs/STATUS.md`, "Follow-ups", and the archive's two blocks.
 - WORK-FOLDER (not asked yet): hand saves hold as long as the worktree's local name differs from the branch on
   GitHub; if they get heavy, ask him whether 3a may be built in the main folder, where the saver script works.
@@ -351,7 +374,8 @@ and text.
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
-- **Three reviewers in the background since 13:58 UTC** (round 1, on 5c92311): rust-reviewer
+- **Reviewers in the background** (round 1, on 5c92311; engine-architect ended, security-auditor started 14:21 UTC
+  with notes in `security-auditor-review1.md`; perf-auditor follows): rust-reviewer
   (`rust-reviewer-review1.md`), engine-architect (`engine-architect-review1.md`), test-engineer
   (`test-engineer-review1.md`); each works in its own `.gate/<name>-cs3a/` folder. security-auditor and
   perf-auditor follow when a place is free. No source file is edited while a round is being read. No saver.
