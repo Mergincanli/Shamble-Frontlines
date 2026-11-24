@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-24 about 23:10 UTC, part b built (a3476e6c), review round running.
+- **Last update:** 2026-11-24 about 22:35 UTC, part b built (a3476e6c), review round running.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -163,7 +163,7 @@
 
 ## Current step
 Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b is built at a3476e6c.**
-Running since about 23:05 UTC: the one review round (test-engineer and rust-reviewer, notes
+Running since about 22:32 UTC: the one review round (test-engineer and rust-reviewer, notes
 `test-engineer-b.md` and `rust-reviewer-b.md`) and `node spikes/netcode-proof/check.mjs` whole on a3476e6c (output in
 the session's scratch folder). Then: one fix pass; the final head's checks (judge tests, clippy, fmt, check.mjs
 whole, GitHub's gate and toolchain on that SHA); the advisor agent's read of the head; part b's commit id and report
