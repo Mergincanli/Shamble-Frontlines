@@ -1479,6 +1479,22 @@ fn u4j_the_arm_rule_counts_an_aarch64_mismatch_only_when_the_x86_64_re_decode_mi
         "{:?}",
         v[0].parts[0].why
     );
+    // A coverage gap beside a waiting Arm mismatch (TE2-4): slot 0's tick 2 is left unresolved while slot 1's LG
+    // mismatch waits for its re-decode. The gap decides: INVALID, never NOT-RUN.
+    let holed: [&[Option<u64>]; 3] = [
+        &[Some(11), Some(21)],
+        &[None, Some(99)],
+        &[Some(13), Some(23)],
+    ];
+    let lg = hash_log("h1", "bots", "decoded_hash", &holed, arm);
+    let v = judge(&marks_file(&[hash_mark()]), &[room.clone(), lg]);
+    let part = &v[0].parts[0];
+    assert_eq!(part.verdict, VerdictKind::Invalid, "{:?}", part.why);
+    assert!(
+        says(&part.why, "no client log resolves it"),
+        "{:?}",
+        part.why
+    );
     // On x86-64 a mismatch counts as it stands, with or without a replay.
     let x86 = hash_log("h1", "client", "decoded_hash", &wrong, no);
     let (k, _) = verdict_of(&[hash_mark()], &[room, x86, replay(&SERVER)]);
