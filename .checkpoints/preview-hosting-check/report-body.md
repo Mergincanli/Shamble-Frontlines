@@ -16,11 +16,13 @@ of 2026-11-14 (PREVIEW-START: "it starts now, on the infra draft as proposed") a
 `docs/DECISIONS.md`.
 
 ## Outcome
-DONE as a check, waiting for his go on this pull request and for two decisions of his. Every reading of Day 2 came out
-as expected: 24 hours after the closes every closed test's links were gone (and still were six days later), the login
-wall stopped a stranger on every preview link while production stayed open, and the deleted token was refused at
-Cloudflare's sign-in with nothing uploaded. The check is not reported as "passed" as a whole: the verdicts below are
-mark by mark, and four marks are not a plain pass.
+The runs are finished and every reading of the last day came out as expected: 24 hours after the closes every closed
+test's links were gone (and still were six days later), the login wall stopped a stranger on every preview link while
+production stayed open, and the deleted token was refused at Cloudflare's sign-in with nothing uploaded. But **the
+check has not passed by the draft's own rule** ("A spike passes when every mark that applies passes", ADR 0006 :1404):
+the header mark is not met as written (production's one-off links carry the "keep out of search engines" header), and
+two marks are open (the build count, and his verdict on checklist step 4, which depends on it). Five marks are met with
+departures that change no reading. Three decisions of his follow; this pull request waits for them and for his go.
 
 VERDICTTABLE
 
@@ -120,8 +122,22 @@ EVIDENCE
 - **The token**: Cloudflare Pages Read and Edit (his TOKEN-SCOPE (a): Read stays; "Edit alone" was never measured); its
   window fixed to 7 days by him (TOKEN-WINDOW); the Cloudflare account renamed so a failed upload cannot print his
   e-mail address (his yes of 2026-11-17).
-- **The hourly series** (PM-0006-6's method): GitHub's hourly schedule fired 3 times in the 28 slots up to the 24-hour
-  mark; by-hand probes stood in at 4 more points; the 24-hour reading itself was taken by hand, as planned.
+- **The hourly series** (PM-0006-6's method): GitHub's hourly schedule fired 3 times in the 24 slots from the closes to
+  the 24-hour mark; by-hand probes stood in at 4 more points; the 24-hour reading itself was taken by hand, as planned
+  (plan Risk 4).
+- **The token tests claim only the extra bite of ADR 0002's PM-0002-66** (the `production` rule removed, the job printed
+  "present"), never that mark as a whole.
+- **Pictures stay out of the repository**: the pull-request page's picture (PM-0006-10), the logged-out run pages and his
+  screenshots are under `.gate/` (gitignored) or in the chat; the results log transcribes what each shows. The plan
+  listed the PR-page picture among the closing files: a departure, made because the other chats' records keep
+  pictures out of the repository too.
+- **The wall's "at least 2 open branches"**: six Pages branches were walled on every link, one with an open pull
+  request (cs/pd-open) and five made by the by-hand runs with no pull request (iso-off, iso-on, uploads, bite-coep,
+  bite-nocache). The draft does not define "open"; its reason for two ("with one, a wall set on that branch alone would
+  pass too", ADR 0006 :1360) fits counting all six.
+- **His Brave version** reached the setup record on 2026-11-19, 21:02:51 UTC, about 2 hours after the 24-hour reading
+  (the record was to be checked again before it); his Brave steps 1-3 of 2026-11-18 ran on a version no one recorded
+  then. Decided by no one: one of the departures put to him.
 - **The wall's switch-on time** is known only as a window (19:12:54 to 20:14:13 UTC on 2026-11-24), so "10 minutes" and
   "1 hour" are lower bounds. The setting is now "Preview access" with the button "Restrict previews"; the row's
   "Cloudflare Access" link opens Cloudflare's product page with "Try it for free", which he pressed on 2026-11-19 before
@@ -143,8 +159,11 @@ EVIDENCE
   access-policy step at 14:09 UTC (nothing switched on). Since then a step that must wait goes only with the go.
 - 2026-11-24: in the closing message I first wrote that his steps 5 to 8 "complete the Brave checklist"; step 4 still
   has no verdict word (corrected in the same evening's message).
-- The advisor tool was consulted 27 times, each before the step it bore on was saved as done (Appendix C, with times).
-- Refused by the guard: one `git -C` (2026-11-15, 15:54:02 UTC; the route: run git from inside the folder).
+- The advisor tool was consulted 28 times (Appendix C, with times); apart from the slip of 2026-11-15 above, each before
+  the step it bore on was saved as done.
+- Refused by the guard: a `git -C` of this chat (2026-11-15, 15:54:02 UTC; the route: run git from inside the folder);
+  and, while the advisor agent wrote its notes, a relative path and then a variable target (its route: a literal
+  absolute path).
 
 ## Not verified, not covered
 - What the draft itself leaves out (ADR 0006): the weekly sweep and the 7-day artifact rule (step 2.6's jobs), the
