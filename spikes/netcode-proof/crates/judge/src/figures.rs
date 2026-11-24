@@ -17,6 +17,20 @@ pub enum Lack {
     Waiting(String),
     /// A comparison that compared nothing: its check fails, never passes, and shows no bite (README §2.3).
     Empty(String),
+    /// The figure fails with no number to show (a client that never got its close): its check fails as a value over
+    /// its limit does, and its reason is printed in the value's place.
+    Fail(String),
+}
+
+/// A mark's kept parts by name, each with its valid runs: those that held their validity rules and setup checks.
+pub type Parts<'r, 'a> = BTreeMap<String, Vec<&'r Run<'a>>>;
+
+/// What a figure reads: the run under judgement, every run of its set, and the valid runs of the mark's kept parts
+/// (for a figure that compares across parts or pools a part's runs; empty where the caller has no mark's parts).
+pub struct Inputs<'r, 'a> {
+    pub run: &'r Run<'a>,
+    pub set: &'r [&'r Run<'a>],
+    pub parts: &'r Parts<'r, 'a>,
 }
 
 /// PM-0001-2: the least share, over client slots, of measured ticks on which that slot's snapshot held every other
@@ -764,8 +778,11 @@ fn machine_named(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, Lack> {
     Ok(Ratio::int(i128::from(named)))
 }
 
-/// A figure's computation: the run under judgement and every run of its set.
-pub type Compute = fn(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack>;
+/// A figure's computation over its [`Inputs`].
+pub type Compute = fn(&Inputs<'_, '_>) -> Result<Ratio, Lack>;
+
+/// The arithmetic behind a figure's value, for a report that must show it; `None` when its inputs are missing.
+pub type Detail = fn(&Inputs<'_, '_>) -> Option<String>;
 
 /// One listed figure.
 pub struct Figure {
@@ -776,6 +793,8 @@ pub struct Figure {
     pub unit: &'static str,
     /// What it computes, in plain words.
     pub what: &'static str,
+    /// The arithmetic printed beside its reported value, for the figures whose row asks for it.
+    pub detail: Option<Detail>,
 }
 
 const fn planned(name: &'static str, unit: &'static str, what: &'static str) -> Figure {
@@ -784,6 +803,7 @@ const fn planned(name: &'static str, unit: &'static str, what: &'static str) -> 
         compute: None,
         unit,
         what,
+        detail: None,
     }
 }
 
@@ -792,49 +812,57 @@ const fn planned(name: &'static str, unit: &'static str, what: &'static str) -> 
 pub const FIGURES: &[Figure] = &[
     Figure {
         name: "fate_log_twin_equal",
-        compute: Some(fate_log_twin_equal),
+        compute: Some(|i| fate_log_twin_equal(i.run, i.set)),
+        detail: None,
         unit: "U2",
         what: "the same seed gives the same packet-fate log (PM-0001-3)",
     },
     Figure {
         name: "everyone_in_view_min_share",
-        compute: Some(everyone_in_view_min_share),
+        compute: Some(|i| everyone_in_view_min_share(i.run, i.set)),
+        detail: None,
         unit: "U1",
         what: "the least share of a slot's snapshots with all 47 others in its set (-2)",
     },
     Figure {
         name: "decoded_hash_mismatch_count",
-        compute: Some(decoded_hash_mismatch_count),
+        compute: Some(|i| decoded_hash_mismatch_count(i.run, i.set)),
+        detail: None,
         unit: "U4j",
         what: "decoded snapshots whose hash differs from the server's (-17, -19, -58)",
     },
     Figure {
         name: "decoded_hash_compared_count",
-        compute: Some(decoded_hash_compared_count),
+        compute: Some(|i| decoded_hash_compared_count(i.run, i.set)),
+        detail: None,
         unit: "U4j",
         what: "the (client, tick) pairs compared (-17)",
     },
     Figure {
         name: "snap_lost_unexplained_count",
-        compute: Some(snap_lost_unexplained_count),
+        compute: Some(|i| snap_lost_unexplained_count(i.run, i.set)),
+        detail: None,
         unit: "C62H-BOUND",
         what: "client-ticks filed lost that neither the room's record (no snapshot sent) nor the link's (a snapshot datagram lost) explains (-17)",
     },
     Figure {
         name: "snap_whole_despite_link_loss_count",
-        compute: Some(snap_whole_despite_link_loss_count),
+        compute: Some(|i| snap_whole_despite_link_loss_count(i.run, i.set)),
+        detail: None,
         unit: "C62H-BOUND",
         what: "client-ticks filed whole at which the link's record lost a snapshot datagram: the record overstated (-17)",
     },
     Figure {
         name: "twin_hash_mismatch_count",
-        compute: Some(twin_hash_mismatch_count),
+        compute: Some(|i| twin_hash_mismatch_count(i.run, i.set)),
+        detail: None,
         unit: "U4j",
         what: "ticks whose hash differs from the twin run's (-21, -30)",
     },
     Figure {
         name: "cross_arch_mismatch_count",
-        compute: Some(cross_arch_mismatch_count),
+        compute: Some(|i| cross_arch_mismatch_count(i.run, i.set)),
+        detail: None,
         unit: "U4j",
         what: "aarch64 hash mismatches the x86-64 re-decode does not reproduce (the Arm rule; the hash kind)",
     },
@@ -860,7 +888,8 @@ pub const FIGURES: &[Figure] = &[
     ),
     Figure {
         name: "machine_named",
-        compute: Some(machine_named),
+        compute: Some(|i| machine_named(i.run, i.set)),
+        detail: None,
         unit: "U4j",
         what: "every header names its machine in full (-1, PM-0006-11)",
     },
@@ -1000,15 +1029,22 @@ pub fn known(name: &str) -> bool {
     FIGURES.iter().any(|f| f.name == name)
 }
 
+/// The arithmetic behind a figure's value, where its row asks for it shown and its inputs are there.
+pub(crate) fn detail(name: &str, inputs: &Inputs<'_, '_>) -> Option<String> {
+    let figure = FIGURES.iter().find(|f| f.name == name)?;
+    figure.detail.and_then(|d| d(inputs))
+}
+
 /// Computes a figure: a gap if its inputs are missing, not-built if its code is not there yet.
-pub(crate) fn compute(name: &str, run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Missing> {
+pub(crate) fn compute(name: &str, inputs: &Inputs<'_, '_>) -> Result<Ratio, Missing> {
     match FIGURES.iter().find(|f| f.name == name) {
         Some(Figure {
             compute: Some(f), ..
-        }) => f(run, set).map_err(|lack| match lack {
+        }) => f(inputs).map_err(|lack| match lack {
             Lack::Gap(why) => Missing::Gap(why),
             Lack::Waiting(why) => Missing::NotBuilt(why),
             Lack::Empty(why) => Missing::Empty(why),
+            Lack::Fail(why) => Missing::Fail(why),
         }),
         Some(Figure { unit, .. }) => Err(Missing::NotBuilt(format!(
             "figure {name} is not built yet ({unit})"
