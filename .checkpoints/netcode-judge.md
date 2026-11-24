@@ -110,19 +110,34 @@
     test for `Lack::Fail` (condition 10, with `crash_close_max_ns`), the detail text's test (with the R2 formula),
     `Inputs.parts`' tests (with `sync_cost_ratio` and `logging_cost_ratio`).
 
+14. Part b, block 3's code · e01e681560cbcd30d6ee93c5267eddb9969bf494 (pushed) · in figures.rs:
+    `other_transport_twin` (C-U6-9: called by `twin_hash_mismatch_count` when the twin is not role `twin`; both
+    measured, the twin's `params.twin` names the run back, `params.transport` wt and ws one each, else a gap whose
+    text keeps "has role …, not twin"); `twin_of` passes `every_run_rules(twin, roles)` with `logging-off` added
+    only when the run is role `bite` and the twin role `logging-off` (C-U6-10; eval.rs: `always_rules` =
+    `every_run_rules(run, &["bite", "twin"])`); `alloc_counts` and `alloc_twin_diff_count` (room logs, measured
+    ticks, gaps for no room log, a tick without the count, two logs at one tick; empty when neither run has a
+    measured tick), its table entry built (unit "U6j"). The 100 existing tests pass. **Its tests are not written
+    yet.**
+
 ## Current step
-Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 3 (figures-b.md
-B1, B2, A11; about 413 lines):** C-U6-9, `twin_hash_mismatch_count` accepts -30's form (both runs role `measured`,
-each naming the other in `params.twin`, `params.transport` present in both, each `wt` or `ws`, different; any other
-measured twin stays a gap, so PM-0001-21's `twin-is-measured` fixture stays INVALID), with fixtures under
-`crates/judge/fixtures/pm-0001-30/` (base gains the C part's six measured room logs; cases `twin-differs`,
-`same-transport`, `not-mutual`, `twin-missing`) and SERIES.md's twin row naming both forms; C-U6-10, `twin_of`
-accepts a role-`bite` run's logging-off twin of the same bite (the one pair C4's role list refuses), nothing else
-loosened; `alloc_twin_diff_count` (measured tick numbers whose `tick.v.tick_allocs_count` differs between the run
-and its `params.twin` of role `logging-off`; a tick in one only counts; pass, fail, gap, waiting, empty tests; the
-table entry takes `|i| alloc_twin_diff_count(i.run, i.set)` with `detail: None`). Then commit, push, count, card.
-Before block 4: the two writer-side SERIES.md needs go on the board (condition 8; the question is already posted
-in part b's thread). Part b's board thread is open (state doing).
+Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 3's tests
+(figures-b.md B1, B2, A11 list them):**
+- engine.rs, `alloc_twin_diff_count` on a PM-0006-20-like mark (part select `params.suite` = `logging-alloc`, min
+  1, check `== 0`, a bite): pass (equal counts), fail (one tick differs), fail (a tick in one run only), NOT-RUN
+  (twin not in the set), INVALID (twin of role `twin`; a measured tick without the count), an empty comparison
+  (neither has a measured tick); C-U6-10: a bite run with its same-bite logging-off twin is shown, that twin with
+  role `measured` is a gap, a measured run whose logging-off twin names a bite is a gap. Plant: one-sided ticks
+  dropped.
+- C-U6-9 with the real marks.json: fixtures under `crates/judge/fixtures/pm-0001-30/` (the base gains the C part's
+  six measured room logs, 3 recordings x wt and ws, each naming its other-transport run in `params.twin`, 3 ticks
+  with `h`, `tick.v.late_count` 0; cases `twin-differs` FAIL, `same-transport` INVALID, `not-mutual` INVALID,
+  `twin-missing` NOT-RUN), tests in tests/fixtures.rs, the fixtures/README.md rows; PM-0001-21's `twin-is-measured`
+  stays INVALID (it passes today). Plants: the transport check removed; the mutual check removed.
+- SERIES.md's `twin_hash_mismatch_count` row names both forms; its `alloc_twin_diff_count` row and README section 4's
+  build rule say the bite pair's logging-off twin.
+Then commit, push, count, card. Before block 4: the two writer-side SERIES.md needs go on the board (condition 8;
+the question is already posted in part b's thread). Part b's board thread is open (state doing).
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
