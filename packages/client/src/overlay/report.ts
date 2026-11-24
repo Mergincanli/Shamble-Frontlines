@@ -1,5 +1,4 @@
 import type { WorkerStats } from "@shamble/sim-worker";
-import type { PauseRecord } from "../app/worker-link.ts";
 import type { RunHeader } from "../harness/run-header.ts";
 import type { PictureInfo, RenderCounters } from "../picture.ts";
 
@@ -26,11 +25,21 @@ export interface ReportData {
   readonly errors: number;
   readonly lastError: string;
   readonly pauses: number;
-  readonly lastPause: PauseRecord | null;
+  /** The last pause while the tab was hidden, as the report shows it (the shape is stated here: nothing of the app shell is imported). */
+  readonly lastPause: { readonly hiddenMs: number; readonly ticksWhileHidden: number } | null;
   readonly worker: WorkerStats | null;
 }
 
-const ms = (value: number): string => (Number.isFinite(value) ? `${value.toFixed(2)} ms` : "no reading yet");
+/**
+ * A number with a fixed count of decimals. A value that rounds to zero prints as zero, never as "-0.00": two clocks
+ * that the browser rounds can put a difference a hair under 0.
+ */
+export function fixed(value: number, digits: number): string {
+  const text = value.toFixed(digits);
+  return Number(text) === 0 ? text.replace("-", "") : text;
+}
+
+const ms = (value: number): string => (Number.isFinite(value) ? `${fixed(value, 2)} ms` : "no reading yet");
 
 /** Why this backend runs: a fallback that was asked for reads differently from one the browser fell back to. */
 function backendLine(data: ReportData): string {
@@ -51,11 +60,11 @@ export function readoutLines(data: ReportData): string[] {
   return [
     backendLine(data),
     `ticks: ${data.tick} at ${data.tickHz} a second · blocks: ${data.blocks} of ${data.blockBytes} bytes`,
-    `frames: ${data.fps.toFixed(1)} a second · frame time ${ms(data.frameP50)} (p99 ${ms(data.frameP99)})`,
+    `frames: ${fixed(data.fps, 1)} a second · frame time ${ms(data.frameP50)} (p99 ${ms(data.frameP99)})`,
     `errors: ${data.errors}${data.lastError === "" ? "" : ` (last: ${data.lastError})`}`,
     pause === null
       ? "last pause: none yet"
-      : `last pause: ${(pause.hiddenMs / 1000).toFixed(1)} s hidden · ticks while hidden: ${pause.ticksWhileHidden} (a match that ran on: about ${Math.round((pause.hiddenMs / 1000) * data.tickHz)})`,
+      : `last pause: ${fixed(pause.hiddenMs / 1000, 1)} s hidden · ticks while hidden: ${pause.ticksWhileHidden} (a match that ran on: about ${Math.round((pause.hiddenMs / 1000) * data.tickHz)})`,
     `isolation: ${data.header.crossOriginIsolated ? "yes" : "no"} · commit: ${data.header.commit}`,
   ];
 }
@@ -82,7 +91,7 @@ export function formatReport(data: ReportData): string {
     ["blockBytes", data.blockBytes],
     ["inputPosts", data.posts],
     ["frames", data.frames],
-    ["fps", data.fps.toFixed(2)],
+    ["fps", fixed(data.fps, 2)],
     ["frameP50", ms(data.frameP50)],
     ["frameP99", ms(data.frameP99)],
     ["deliveryP50", ms(data.deliveryP50)],
@@ -90,13 +99,13 @@ export function formatReport(data: ReportData): string {
     ["errors", data.errors],
     ["lastError", data.lastError === "" ? "(none)" : data.lastError],
     ["pauses", data.pauses],
-    ["lastPauseHiddenMs", data.lastPause === null ? "(none)" : data.lastPause.hiddenMs.toFixed(0)],
+    ["lastPauseHiddenMs", data.lastPause === null ? "(none)" : fixed(data.lastPause.hiddenMs, 0)],
     ["lastPauseTicksWhileHidden", data.lastPause === null ? "(none)" : data.lastPause.ticksWhileHidden],
     ...(data.worker === null
       ? [["worker", "(no report yet)"] as [string, string]]
       : Object.entries(data.worker).map(([name, value]): [string, string | number | boolean] => [
           `worker.${name}`,
-          typeof value === "number" && !Number.isInteger(value) ? value.toFixed(3) : value,
+          typeof value === "number" && !Number.isInteger(value) ? fixed(value, 3) : value,
         ])),
   ];
   return ["Shamble Frontlines, first page: report", ...readoutLines(data), "", ...rows.map(([name, value]) => `${name}: ${value}`)].join("\n");

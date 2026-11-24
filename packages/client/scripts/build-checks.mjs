@@ -3,6 +3,7 @@
 
 import { createHash } from "node:crypto";
 import { lstatSync, readFileSync } from "node:fs";
+import path from "node:path";
 import { brotliCompressSync, constants, gzipSync } from "node:zlib";
 
 /** No served file may reach 25 MiB (PM-0002-29's gated clause; a static host's per-file limit). */
@@ -132,14 +133,38 @@ export function cspProblems(files) {
 const DEV_MARKERS = ["Copy report", "__shambleReport", "ticks while hidden", "first page: report"];
 
 /**
+ * The one chunk the build made from the Worker's own source module, by the name the build gave it. `chunks` is what
+ * the Worker's bundle holds (Rollup's output: `fileName`, `isEntry`, `facadeModuleId`); `workerSource` is the
+ * absolute path of the Worker's entry module. Throws unless exactly one entry chunk comes from that module: the
+ * check below must know the Worker's chunk from the build, never guess it from a file name.
+ * @param {{ fileName: string, isEntry?: boolean, facadeModuleId?: string | null }[]} chunks
+ */
+export function workerEntryChunk(chunks, workerSource) {
+  const source = workerSource.replaceAll("\\", "/");
+  const entries = chunks
+    .filter((chunk) => chunk.isEntry === true && (chunk.facadeModuleId ?? "").split("?", 1)[0].replaceAll("\\", "/") === source)
+    .map((chunk) => chunk.fileName);
+  if (entries.length !== 1) {
+    throw new Error(`the build made ${entries.length} entry chunks from the Worker's source (${workerSource}), not exactly one`);
+  }
+  return entries[0];
+}
+
+/**
  * Two rules of the built page, one line per breach. The Wasm's glue is in the Worker's chunk and in no other (the
  * page never touches the Wasm); and a production build holds none of the development-only code, while a
- * development build holds all of it (so the markers themselves are known to be right).
+ * development build holds all of it (so the markers themselves are known to be right). `workerEntry` is the
+ * Worker's chunk as `workerEntryChunk` named it: every other script is the page's, whatever its file is called.
  * @param {{ name: string, bytes: Uint8Array }[]} files
+ * @param {boolean} production
+ * @param {string} workerEntry
  */
-export function bundleProblems(files, production) {
+export function bundleProblems(files, production, workerEntry) {
   const scripts = files.filter(({ name }) => name.endsWith(".js")).map(({ name, bytes }) => ({ name, text: Buffer.from(bytes).toString("utf8") }));
-  const page = scripts.filter(({ name }) => !/(^|\/)worker-[^/]*\.js$/.test(name));
+  if (typeof workerEntry !== "string" || !scripts.some(({ name }) => name === workerEntry)) {
+    return [`the Worker's chunk (${String(workerEntry)}) is not among the built scripts: the glue check cannot tell the page's code from the Worker's`];
+  }
+  const page = scripts.filter(({ name }) => name !== workerEntry);
   const problems = [
     ...page.filter(({ text }) => /__wbindgen|__wbg_/.test(text)).map(({ name }) => `${name}: the Wasm's glue outside the Worker's chunk`),
     // The page never touches WebAssembly (PM-0002-2): its chunks do not even name it, wherever a call would sit.
@@ -154,6 +179,24 @@ export function bundleProblems(files, production) {
 }
 
 /**
+ * The only WebAssembly a built page may hold is the players' own. One line for every file among `files` that is a
+ * WebAssembly module (by its name's ending or by its first four bytes) and is not byte for byte `playersWasm`, the
+ * file the Worker's bindings were just written for; and one line when there is none at all. The test-only module
+ * is built beside the players' Wasm: this keeps it, and anything else, out of what a server hands out.
+ * @param {{ name: string, bytes: Uint8Array }[]} files
+ * @param {Uint8Array} playersWasm
+ */
+export function wasmProblems(files, playersWasm) {
+  const magic = Buffer.from([0x00, 0x61, 0x73, 0x6d]);
+  const modules = files.filter(({ name, bytes }) => name.endsWith(".wasm") || Buffer.from(bytes.subarray(0, 4)).equals(magic));
+  const others = modules.filter(({ bytes }) => !Buffer.from(bytes).equals(Buffer.from(playersWasm)));
+  return [
+    ...others.map(({ name }) => `${name}: a WebAssembly file that is not the players' own`),
+    ...(modules.length === others.length ? ["no file is the players' WebAssembly: the Worker would have nothing to load"] : []),
+  ];
+}
+
+/**
  * Refuses an output folder the build must not empty. Vite clears the folder it builds into, so the folder is either
  * the page's own `dist` or one whose name starts with `dist-`: a mistyped `--out-dir` cannot wipe sources or notes.
  */
@@ -164,17 +207,126 @@ export function checkOutDir(outDir, defaultDir) {
 }
 
 /**
- * Variables through which cargo's or the tool's settings can be changed from outside with no diff in the repository.
- * Not refused: the two that name the build folder, which the build's `--target-dir` overrides. Not covered: cargo's
- * config files outside the repository (the quality gate's flag check).
+ * Variables through which cargo's or the tool's settings can be changed from outside with no diff in the repository:
+ * among them every `RUSTC_*`, and the names through which a stable cargo takes nightly-only features (`__CARGO_*`,
+ * `CARGO_UNSTABLE_*`). Not refused: the two that name the build folder, which the build's `--target-dir` overrides.
+ * Not covered: cargo's config files outside the repository, through which a profile setting (overflow checks among
+ * them), a linker, a compiler wrapper or an `[env]` table can still be set with no diff here (the quality gate's
+ * flag check); only their `rustflags` are shut out, by the build itself, which gives cargo its own (build.mjs,
+ * `cargoEnv`).
  */
 export const CARGO_OVERRIDES = new RegExp(
-  "^(?!CARGO_(BUILD_)?TARGET_DIR$)(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC|RUSTC_(WORKSPACE_)?WRAPPER|RUSTC_BOOTSTRAP|" +
-    "RUSTUP_TOOLCHAIN|CARGO_INCREMENTAL|CARGO_(BUILD|PROFILE|RESOLVER|TARGET)_.*|WASM_BINDGEN_.*|RUST_LOG)$",
+  "^(?!CARGO_(BUILD_)?TARGET_DIR$)(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC(_.*)?|RUSTUP_TOOLCHAIN|CARGO_INCREMENTAL|" +
+    "__CARGO_.*|CARGO_(BUILD|PROFILE|RESOLVER|TARGET|UNSTABLE)_.*|WASM_BINDGEN_.*|RUST_LOG)$",
 );
 
-/** The names in `env` that the Wasm build refuses, in the environment's order. Only names are read, never a value. */
+/**
+ * The names in `env` that the Wasm build refuses, in the environment's order. Only names are read, never a value;
+ * they are compared in upper case, because Windows takes a variable's name without regard to case.
+ */
 export function refusedBuildSettings(env) {
-  return Object.keys(env).filter((name) => CARGO_OVERRIDES.test(name));
+  return Object.keys(env).filter((name) => CARGO_OVERRIDES.test(name.toUpperCase()));
 }
 
+
+/**
+ * The crates in `cargo tree`'s flat list (`-e normal,no-proc-macro --prefix none`) that are not ours: what is
+ * compiled for the target and linked into the Wasm beside the workspace's own crates. Ours is a crate whose source
+ * is a folder under `<root>/crates/` (`[profile.release]` covers it); a crate from the registry, from git, from
+ * another registry or from a folder elsewhere all count, whatever cargo prints after its version. A line this
+ * cannot read, a proc-macro, or a tree that does not start at `rootCrate` is a refusal: the list must be exact.
+ */
+export function runtimeCrates(treeText, root, rootCrate = "sim-wasm") {
+  const ours = `${root.replaceAll("\\", "/").replace(/\/+$/, "")}/crates/`;
+  const names = new Set();
+  const lines = treeText.split("\n").filter((text) => text.trim() !== "");
+  if (!(lines[0] ?? "").startsWith(`${rootCrate} v`)) throw new Error(`cargo tree did not start at ${rootCrate}: the overflow check has nothing to read`);
+  for (const line of lines) {
+    const entry = /^([A-Za-z0-9_-]+) v[0-9][^ ]*( \(([^)]*)\))?( \(\*\))?$/.exec(line.trim());
+    if (entry === null || entry[3] === "proc-macro") throw new Error(`cargo tree printed a line the overflow check cannot place: ${line}`);
+    if (!(entry[3] ?? "").replaceAll("\\", "/").startsWith(ours)) names.add(entry[1]);
+  }
+  return [...names].sort();
+}
+
+/** The crates the root `Cargo.toml` turns overflow checks on for by name: `[profile.release.package.<name>]`. */
+export function overriddenCrates(cargoToml) {
+  const names = [];
+  for (const block of cargoToml.split(/^(?=\[)/m)) {
+    const header = /^\[profile\.release\.package\.("?)([A-Za-z0-9_-]+)\1\]\s*$/m.exec(block.split("\n", 1)[0]);
+    if (header !== null && /^overflow-checks\s*=\s*true\s*(#.*)?$/m.test(block)) names.push(header[2]);
+  }
+  return names.sort();
+}
+
+/**
+ * The runtime crates of a build that would ship with overflow checks off: in the tree, and without a named override
+ * (ADR 0002 part 4: the workspace's `"*"` turns them off for every crate that is not named). Empty when all is well.
+ */
+export function missingOverflowOverrides(treeText, cargoToml, root) {
+  const overridden = new Set(overriddenCrates(cargoToml));
+  return runtimeCrates(treeText, root).filter((name) => !overridden.has(name));
+}
+
+/**
+ * What one build resolves for the simulation, from `cargo tree -e features,normal,no-proc-macro --prefix depth
+ * --no-dedupe`: every feature of `sim` and of every package `sim` depends on, with those packages' versions,
+ * sorted. Cargo prints a feature where it is asked for: a server that turns a feature on for a dependency it shares
+ * with `sim` shows it under the server, so the whole tree is read, not `sim`'s branch alone. ADR 0002 part 3 wants
+ * this list identical in every build that runs the simulation (PM-0004-74), because cargo unifies features over
+ * everything one command builds.
+ *
+ * `closureTree` says which packages are `sim`'s (the tree on normal edges); `treeText` may be the same build's tree
+ * with `dev` edges too, as the tests are built: a feature a dev-dependency turns on is then seen, and `sim`'s own
+ * dev-dependencies do not count as its dependencies. Not modelled: a build made with other `--features` flags or a
+ * narrower `-p` list than the one the tree was asked for (CI's release test line is one). Throws without a `sim`.
+ *
+ * A known clash, kept loud: ADR 0002 part 5 plans a feature that only dev-dependencies turn on (the generated
+ * types). The day it reaches `sim` or one of its dependencies this compare refuses it and every build stops; the
+ * step that first nests generated types decides which of the two gives way.
+ */
+export function simFeatureList(treeText, closureTree = treeText) {
+  const parse = (text) => text.split("\n").map((line) => /^(\d+)(.*?)( \(command-line\))?$/.exec(line)).filter((line) => line !== null);
+  const nameOf = (text) => /^([A-Za-z0-9_-]+) (v[0-9]|feature ")/.exec(text)?.[1];
+  const closure = new Set(["sim"]);
+  let seen = false;
+  let under = -1;
+  for (const [, depthText, text] of parse(closureTree)) {
+    const depth = Number(depthText);
+    if (under !== -1 && depth > under) closure.add(nameOf(text));
+    else under = /^sim v[0-9]/.test(text) ? depth : -1;
+    seen ||= under !== -1;
+  }
+  if (!seen) throw new Error("cargo tree printed no sim crate: the feature check has nothing to read");
+  const found = new Set();
+  for (const [, , text] of parse(treeText)) {
+    const name = nameOf(text);
+    if (closure.has(name) && (text.includes(' feature "') || name !== "sim")) found.add(text.replace(/ \([^)]*\)$/, ""));
+  }
+  return [...found].sort();
+}
+
+/**
+ * Where the simulation's feature lists differ between builds: one line per build that is not the first one's
+ * equal. `lists` maps a build's name to its `simFeatureList`.
+ */
+export function simFeatureDifferences(lists) {
+  const [[firstName, first], ...rest] = Object.entries(lists);
+  return rest
+    .filter(([, list]) => JSON.stringify(list) !== JSON.stringify(first))
+    .map(([name, list]) => `the simulation's features differ between ${firstName} and ${name}: ${JSON.stringify(first)} against ${JSON.stringify(list)}`);
+}
+
+/**
+ * The compiler flag that writes one fixed place instead of the builder's own cargo folder into panic locations of
+ * registry crates, so one commit gives the same Wasm bytes on every machine (RR-F5). `cargoHome` is `CARGO_HOME`,
+ * or nothing: cargo reads an empty value as unset, and then its home is `.cargo` under the user's home folder; a
+ * relative value is resolved against `base`, the folder cargo is run in, because the compiler matches the flag
+ * against absolute paths. A path with a control character in it is refused: the flags travel in one variable that
+ * is split at such a character, so the rest of the path would arrive as a flag of its own.
+ */
+export function registryRemapFlag(cargoHome, homeDir, base) {
+  const home = path.resolve(base, cargoHome === undefined || cargoHome === "" ? path.join(homeDir, ".cargo") : cargoHome);
+  if (/[\u0000-\u001f\u007f]/.test(home)) throw new Error("cargo's home folder has a control character in its path: the build cannot name it in a compiler flag");
+  return `--remap-path-prefix=${home.replaceAll("\\", "/").replace(/\/+$/, "")}/registry/src=/cargo/registry/src`;
+}

@@ -12,7 +12,7 @@
   "scripts": {
     "test": "vitest run --dir src"
   },
-  "dependencies": {
+  "devDependencies": {
     "@shamble/types": "0.0.0"
   }
 }

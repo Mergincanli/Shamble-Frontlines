@@ -4,7 +4,7 @@ here, beside the short `docs/STATUS.md` and his decisions in `docs/DECISIONS.md`
 script, by line ranges, from `docs/STATUS.md` at main 2d22b69 (`git show 2d22b69:docs/STATUS.md`; the script, its line
 ranges and its checks: `docs/reports/2026-11-10-status-diet.md`), except what docs-keeper has added since: merged PRs'
 rows in "In flight", new items in the two live sections (below), and blocks moved later from STATUS by script, each
-under a dated header that says so (at the end of "Phase" and of "Routines", 2026-11-23). Each section keeps the old section's name, so a
+under a dated header that says so (at the end of "Phase", 2026-11-23 and 2026-11-24, and of "Routines", 2026-11-23). Each section keeps the old section's name, so a
 citation such as "STATUS, Routines" finds its text here; line numbers in older citations read at 2d22b69, and words such
 as "below" and "above" read in STATUS's old order. The text is the record as it stood then; the current state is in
 `docs/STATUS.md`._
@@ -159,16 +159,22 @@ _From STATUS's "Follow-ups", moved here on 2026-11-23 by docs-keeper's script, b
 - **Binding this chat:** `.claude/CHECKPOINTS.md` §3's hold; the advisor agent's ruling of #58: manifest and lockfile
   edits stay uncommitted and unbuilt, other code is committed by path only, until security-auditor answers.
 
-_From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper's script, byte for byte (the CI-WASM docs pass, PR #64, to keep STATUS within 120 lines; still current: STATUS points here, and his words of 2026-11-13 stand whole in `docs/DECISIONS.md`):_
+_From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper (the CI-WASM docs pass, PR #64, to keep STATUS within 120 lines; still current: STATUS points here, and his words of 2026-11-13 stand whole in `docs/DECISIONS.md`). His quoted words below are STATUS's byte for byte; the bullet's first two lines are not: at f5030a3 (`docs/STATUS.md:14-16`) they read "KIT-FREEZE-2, what he meant by it (FREEZE-FDN) and his exceptions (two more since, for #53 and #54):" and were re-wrapped here. Corrected 2026-11-24 (change-set 3a's docs pass, from the advisor agent's read of #64's final head): this header said the whole block was moved by script, byte for byte [verified 2026-11-24: `diff` of f5030a3's STATUS lines 14-19 against these lines]._
 - **The kit:** KIT-FREEZE-2, FREEZE-FDN and his exceptions (two more since, for #53 and #54): `docs/DECISIONS.md`,
   "Queued"; his two additions of 2026-11-11 for the foundation chat: `docs/DECISIONS.md`. His words of 2026-11-13 for step 2.3:
   "The kit's freeze (KIT-FREEZE-2) ends with this step. That makes no edit unasked: every edit to a kit, gate or CI file
   is asked of me in chat with its exact text and written only after my yes, with the chat in Accept edits. A guard
   prompt alone is not my yes. No such edit happens in the docs pass or while planning."
 
+_From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's script, byte for byte (change-set 3a's docs pass, to keep STATUS within 120 lines; still current: STATUS points here; the archive's "In flight" and "Phase" it names are this file's sections of those names):_
+- Legacy, frozen (the archive's "In flight" and "Phase"): his Windows run ("Check a new machine", `tools/README.md`);
+  the UI theme step 1 Brave check (DEV-panel FPS); `/permissions` locally (kit-v1-1); the editor inventory marks
+  (docs-editor-v2); re-saving each old map once (map-dedupe-on-load). Routines: delete the old "Night shift" (below).
+
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
+| **the CI-WASM pull request** (ci-wasm; planned by the first builder chat, built by the builder chat he calls Builder V3; it replaces #63, the project thread's records, and #62, the first builder chat's plan and first code; risk tier 2): before the network cut CI's `toolchain` job fetches the wasm-bindgen tool's archive by his TOOL-SOURCE values, runs GitHub's own check on it (`gh release verify-asset`) and installs its one program root-owned; inside the cut it builds the page twice (production, development), then runs the boundary tests, five type checks and the 12 browser tests in the runner image's Google Chrome (CI pins no test count: TE-COUNT); `.github/workflows/toolchain.yml` +97 −0 in two writes on his yes (cb476b1; the correction 2a654f3, after the first text stopped at its install check), three planted faults each red at its own step and taken back; the build's refusal of cargo settings from the environment moved into `build-checks.mjs` with a test; `dist-*/` in `.gitignore`; `packages/e2e/node-names.d.ts`; his words of 2026-11-19 and 2026-11-23 in `docs/DECISIONS.md` by script; his browser check of #61 (`docs/reports/2026-11-19-cs2-browser-check.md`); VISION_V2's dated note (his VISION-NOTE (a)); report `docs/reports/2026-11-19-ci-wasm.md`. Follow-ups (their text: the archive's "Follow-ups", "From the CI-WASM pull request (PR #64)") | merged: PR #64 (`claude/loving-hopper-6p0mg2` (stands in for `cs/ci-wasm`), Builder V3), 1ec6f6c, 2026-11-24 10:15:31 UTC (`merged_at`; the merge commit is dated 10:15:30), by merge commit (parents f5030a3 and 8aadfb0), by his main Advisor on his tap of 10:14:23 UTC in that thread, with the expected head 8aadfb09640c9d37a3e6ad8be078165f5074f399 (the merge commit's message; his words of 10:16:15 UTC, `docs/DECISIONS.md`), after his go MERGE-64 (a) for that head (2026-11-23, 23:44:10 UTC); `gate`, `smoke` and `toolchain` green on the head for the push and the pull request (the merge commit's message); CI green on main (gate with smoke, run 45373057216; toolchain, run 45373056953; push, on 1ec6f6c); #63 and #62 closed by GitHub itself as merged at 10:15:33 UTC, through 1ec6f6c, since their heads (21b6ea0, d064e17) are in #64's history: his CLOSE-OLD (a) had them closed once #64 was merged, and the merge did it [verified 2026-11-24, GitHub's REST API (`merged` true, the close event naming 1ec6f6c) and `git merge-base --is-ancestor`] | done: opened by him 2026-11-23 17:21:24 UTC (the report); two review rounds (infra-engineer, test-engineer and security-auditor; then test-engineer and security-auditor on what changed): no Critical or High; the verifier's PASS WITH NOTES on the code head 6d0b5b1 (the report, "Reviews"); the advisor agent's APPROVE of the final head 8aadfb0, given in the chat (recorded in `docs/DECISIONS.md`, 2026-11-23, 23:44:10 UTC, and in the merge commit's message). His go answered the chat's ask of 23:17:21 UTC, whose list of what his go accepts named the open Low F-CHANNEL, TE-TYPE-PLANTS, the two things built differently from the plan, `toolchain` still not a required check, the compiled Python file in the branch's history, and four inaccuracies in the report and this archive left for the next docs pass (corrected by change-set 3a's docs pass, 2026-11-24, with the Lows of the same read; the source: change-set 3a's card at f153ddf4, "Next steps" item 5). The notes of #64 stay readable at 5911b56 (`.checkpoints/ci-wasm/`). _Corrected 2026-11-24 (change-set 3a's docs pass): STATUS's row for #64 at 8aadfb0 said "the verifier's and the advisor agent's verdicts on the final head: the report"; the verifier's verdict is on the code head 6d0b5b1, and the advisor agent's on the final head came in the chat. STATUS's "Next" line left out his condition "If your context is above 40 % at that point, tell me first and I compact the chat." (2026-11-23, 21:24:59 UTC); by his order of 23:44:10 UTC the chat was compacted before 3a's build (his /compact, 2026-11-24, 10:50:43 UTC)._ | none |
 | **change-set 2 of the build plan, "First page"** (cs2-first-page; foundation step 2.5, first half), by lane 1: the Rust simulation (a tick counter and the match seed; no random-number library yet, his RNG-CRATE (c)), built as WebAssembly with wasm-bindgen `=0.2.130`, runs in one module Web Worker at 30 ticks a second and hands the page one block per tick (so far its header: the tick and the layout's hash); the page, which makes no Wasm call, draws an empty lit ground with a 1 m grid on three.js 0.187.0's WebGPU renderer (WebGL 2 as the fallback), names its backend and has a development readout with "Copy report"; `packages/client/serve.mjs` serves a built page to this computer only, under a strict content security policy; `packages/client/scripts/build.mjs` builds the Wasm and the page and checks the tool's file (size and sha256) before every run; browser tests in `packages/e2e` (CI does not run them yet: his CI-WASM (a)); his six messages of 2026-11-18 and 2026-11-19 in `docs/DECISIONS.md` by script; report `docs/reports/2026-11-19-cs2-first-page.md` (the size: there). Follow-ups (their text: the archive's "Follow-ups", "From change-set 2, the first page (PR #61)"): for the CI pull request TE-NT6, RR-N4, RR-F5, E2E-TYPES, SA-TREE, SA-DIST; for change-set 3 NA-N1 to NA-N7, EA-F8, EA-F9, EA-F10, EA-F13, EA-N3, EA-N5, EA-N6, GE-N1, GE-N4, GE-N5, GE-N6, TE-NT3, TE-NT4, TE-NT5, TE-NT7, PA-N2, PA-L2, TE-L, SA-ENV, FAVICON; for change-sets 5 and 6 GE-F7, PA-L4; for the quality gate step SA-F6 (the npm scope `@shamble`), SA-SWAP, TE-NT2; for the drafts' next revision EA-F6, EA-F12 | merged: PR #61 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs2-first-page`), lane 1's first builder chat), f5030a3, 2026-11-19 15:10:54 UTC (the merge commit's date; `merged_at` 15:10:55), by merge commit (parents b763ba3 and 4cf30ce), on his go of 14:28:25 UTC for head 4cf30ce303b16e96b3ca5d5c0b20b928a4db6b86, his words in the merge commit's message (`docs/DECISIONS.md`, 2026-11-19, 14:28:25 UTC), made after his browser check's last report (15:09:29 UTC; the record: `docs/reports/2026-11-19-cs2-browser-check.md`); `gate`, `smoke` and `toolchain` green on the head (read at 15:10 UTC); CI green on main (gate with smoke, id 44551896122; toolchain, id 44551894194; push, on f5030a3) [verified 2026-11-23, GitHub's REST API] | done: opened as a draft 2026-11-19 11:01:27 UTC; the eight build steps in (3833e3e, 784ae3e, 4c32a06, a7f785a, a68e3da, cc9fc71 (the dependency step, pushed through the hold), 6e76f30, 015a212, de63a30, c4a12eb, 74a0c24), then the fix passes 29378dd and d257bb6; round 2's fix pass: the report; two review rounds (seven reviewers, then six on what the fixes changed): no Critical, no High open; the verifier's verdict: the report; the advisor agent's: the pull request's description. **Not verified anywhere yet:** WebGPU itself (this container has no WebGPU adapter: every run here was on the WebGL 2 fallback with software rendering, in Chromium), Brave, Firefox, Safari, a real GPU (then his browser check, in Brave 1.100.58 and Firefox 160 on his Windows computer: errors 0 in all eight reports, WebGPU started in both, the forced WebGL 2 fallback and the hidden-tab pause worked in both; one reading not explained, BR-GAP: the record above and this archive's "Follow-ups", the block for #61). With the merge he accepted, in his words: "The things that went wrong, as the report writes them down", the size, "That CI does not build the WebAssembly or run the browser tests yet", the follow-ups below High and the checkpoint commits in main's history (`docs/DECISIONS.md`, 2026-11-19, 14:28:25 UTC); its merge recorded by #64 | none |
 | **the kit hold and two CI edits** (kit-hold-ci), by lane 1, on his words of 2026-11-18, 15:38:13 UTC ("One small pull request with the kit hold and the two CI edits, nothing else in it."): the checkpoint script holds a push that changes a manifest or a lockfile until its security check is recorded (`.claude/scripts/checkpoint.mjs`, six new tests, one rule line in `.claude/CHECKPOINTS.md` §3; his answer DEP-HOLD (a), written on his yes to its exact text: KIT-TEXT, yes with one change, then KIT-FIX, the fix of a hole in the changed lines); the `toolchain` job runs with no cache (his CI-CUT (a), part 1), writes the generated types again and compares them, and type-checks `packages/types` with strict flags (his CI-TYPES (a)); his three messages of the day in `docs/DECISIONS.md` by script; 293 added lines, accepted by his word of 18:01:08 UTC; report `docs/reports/2026-11-18-kit-hold-ci.md`. Meanwhile, in his words: "No new library of change-set 2 is committed before that pull request is merged." Open after it, as follow-ups (below, "Follow-ups", "From the kit hold and two CI edits (PR #60)"), each below High and so a follow-up by his word of 18:01:08: security-auditor's two Mediums, F1 (in two corners the hold checks another path than the one it pushes: a root folder whose name begins with a blank character, or is not valid UTF-8) and F3 (no rule makes the review of a pull request read the hold's record; until a kit change, change-set 2's report quotes each record and the security answer it names), and its three Lows; test-engineer's three Mediums (behaviours no test pins: main's side of the "equal to main" comparison read at the exact path, a `deleted  <path>` line leaving an existing file held, `origin/main` over a local `main`) and seven Lows; infra-engineer's six Lows (two for his list for the quality gate v2's plan, four on the report's wording) | merged: PR #60 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/kit-hold-ci`), lane 1's first builder chat), b763ba3, 2026-11-18 20:30:46 UTC (the merge commit's date; `merged_at` 20:30:47), by merge commit (parents 9b4b518 and e5ca735), on his go of 20:20:09 UTC for head e5ca7358d5a3f8cc68ee07cd59d7bbf2c45e253d, his words in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC), after the advisor agent's APPROVE of that head (in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 900 with smoke, id 44391809186; toolchain run 198, id 44391809357; push, on b763ba3) | done: the four files written on his yes at 17:15 UTC, two of them again at 18:01 UTC (commits 8bf4bee and 94c197f, pushed 17:18:16 UTC; 4877599, pushed 18:03:10 UTC); the new CI lines on real runs from 17:18 to 17:23 UTC ("Cache mode: none" in the job's log; the compare step failing on a planted change, then passing on the clean tree); one review round, its notes committed at 18:08:01 (infra-engineer), 18:31:54 (security-auditor) and 18:40:04 UTC (test-engineer): nothing Critical or High; the verifier's verdict: the report; the advisor agent's: the pull request's description; with the merge he accepted the four things that went wrong as the report writes them down, the five Medium findings as follow-ups ("They are fixed with the kit changes of the quality gate step. Until then every ready report of a pull request that changes a manifest or a lockfile quotes each release record and the security answer it names."), the two wording slips left in the report, the size (293 added lines against the stop line of 300) and the checkpoint commits in main's history; his answers WRITE-MODE (a) and REC-OLD (a), with one limit; its merge recorded by #61 | none |
 | **change-set 1 of the build plan, Types** (foundation step 2.4), by lane 1: the first eight message types in `crates/protocol` (plain types, no codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript generated into `packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's layout-hash check; his go on #57 and his answer OLD-LINES (who may fold old lines in the shared record files) in `docs/DECISIONS.md` by script; report `docs/reports/2026-11-18-cs1-types.md`; its follow-ups, open after it (CI-CUT; the security check's L1, L2 and L4; the lines for change-sets 2, 3 and 4, the 2.3 chat and the drafts' next revision; round 2's Lows): below, "Follow-ups", "From change-set 1, Types (PR #58)" | merged: PR #58 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs1-types`), the build chat on his personal account), 9b4b518, 2026-11-18 15:39:28 UTC (the merge commit's date; `merged_at` 15:39:29), by merge commit, on his go of 15:38:13 UTC for head 1bfe462e339511cfae6b30a1015330d9ff2e718c, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 15:38:13 UTC), after the advisor agent's APPROVE of that head (in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 884 with smoke, id 44338178450; toolchain run 182, id 44338178455; push, on 9b4b518) | done: two review rounds and the verifier's PASS (15:03 UTC); with the merge he accepted the two misses as written (CI built the nine new packages before their security check, Medium, "written down, not waived"; one evidence record did not hold, and the runs were redone), the size as counted (940 hand-written lines against 600 planned, under his stop line of 1,200), round 2's Lows as follow-ups, what was not verified and the checkpoint commits in main's history; his five answers: DEP-HOLD (a) and CI-TYPES (a), and CI-CUT (a) part 1 (the kit hold and the two CI edits: PR #60), LANE-ISSUE (a) (the "Lane requests" issue: #59, opened 15:41:35 UTC) and WATCH-58 (b) (not watched); its merge recorded by #60 | none |
@@ -1116,22 +1122,36 @@ _From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper's script, byte f
       `packages/client/scripts/build.mjs` has no test of its own.
     - RR-F5 (**its fix moved to change-set 3**, with rust-reviewer; in #64 CI prints the Wasm's sha256 and the builder
       paths it carries, "printed, not judged": 28,991 bytes on every runner build, 28,987 in the containers,
-      consistent with this finding and not shown to be only it): the Wasm carries the builder's registry path (a panic
+      consistent with this finding and not shown to be only it; **done in change-set 3a**, 2026-11-24: 5c92311 remaps
+      cargo's registry path on both Wasm builds, through `CARGO_ENCODED_RUSTFLAGS` since 79666ad9; on 5c92311,
+      79666ad9 and 8619d539 the runner's Wasm is the container's byte for byte and CI prints "no registry path in the
+      Wasm"; rust-reviewer reproduced 5c92311's sha256 in another target folder, its round 1): the Wasm carries the builder's registry path (a panic
       location inside wasm-bindgen), so one commit gives other Wasm bytes and sizes on another machine (also for
       change-set 3's size table).
     - E2E-TYPES (**done in #64**: CI type-checks the specs and `playwright.config.ts`, with
       `packages/e2e/node-names.d.ts` for the four Node names they use; seven of seven planted type errors caught, in a
       container with near-matching versions): the browser specs in `packages/e2e/tests/` are run by Playwright but
       type-checked by no tool.
-    - SA-TREE (**moved to change-set 3**, as #64's plan said): the list of third-party crates with an overflow override
+    - SA-TREE (**moved to change-set 3**, as #64's plan said; **done in change-set 3a**, 2026-11-24: 5c92311, the
+      build's refusal `missingOverflowOverrides` before the players' cargo build (a planted removal of an override
+      from the root manifest stopped the real build); the
+      security-auditor's Medium on it (any crate with a source in brackets counted as ours) fixed in 79666ad9 and
+      confirmed fixed in its round 2): the list of third-party crates with an overflow override
       (root `Cargo.toml`) is checked by hand (`cargo tree`); a test would stop a new runtime crate from shipping
       without its override.
     - SA-DIST (**done in #64**: `.gitignore` has `dist-*/`): `.gitignore` covers `dist/` but not the `dist-<something>`
       folders `build.mjs --out-dir` accepts.
     - _Moved to change-set 3 as well, by his words of 2026-11-19, 14:28:25 UTC ("With change-set 3, one line in
       .gitignore for __pycache__/, so that a save cannot pick up compiled Python files again."): that `.gitignore` line
-      (not in #64's `.gitignore` [verified 2026-11-23])._
+      (not in #64's `.gitignore` [verified 2026-11-23]). **Done in change-set 3a**, 2026-11-24: a1c59e8
+      (`.gitignore:18` at 8619d539 [verified 2026-11-24])._
   - **For change-set 3, "The loop closes":**
+    _Dated line, 2026-11-24 (change-set 3a's docs pass): his SIZE-3 (b) split change-set 3 into 3a, "Rules and
+    boundaries", and 3b, "The loop closes"; change-set 3's plan (draft 3, section 8) placed each item below. Those done
+    in 3a are marked with their commit and the reviewer that found them closed (the round-1 notes, readable at
+    f153ddf4: `.checkpoints/cs3a-rules-boundaries/test-engineer-review1.md`, `engine-architect-review1.md`,
+    `security-auditor-review1.md`); NA-N1, -N2, -N4 to -N7, EA-F9, EA-F10's bindings part, EA-F13's one-writer item,
+    TE-NT7 and PA-N2 stay for 3b, NA-N3 for change-set 4, EA-N5, GE-N1, GE-N4 to -N6 and PA-L2 for change-set 5._
     - NA-N1 to NA-N7 (netcode-architect, all Low): the step gets the host's time; the pause on a hidden tab comes from
       the mode once online play lands, and held buttons are cleared on hide; who picks the blend fraction between two
       blocks (one sentence in `picture.ts` now, a field at change-set 4; events read from every block); the seed as an
@@ -1139,36 +1159,54 @@ _From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper's script, byte f
       protocol's command sequence (name it the post number); a start tick in the authority's match setup; the Pacer
       throws on a due time that is not finite. Its answers for that plan: `checked_sub` or wrap-aware compares on
       decoded ticks, never a plain minus.
-    - EA-F8: the Worker-to-page messages are parsed by hand (an `isWorkerToPage` beside `isPageToWorker`).
+    - EA-F8 (**done in change-set 3a**, a1c59e8: `isWorkerToPage`, the link switches on the checked type;
+      engine-architect's round 1: closed): the Worker-to-page messages are parsed by hand (an `isWorkerToPage` beside
+      `isPageToWorker`).
     - EA-F9: the endpoint's state lives in `sim-wasm`; it belongs in `client-endpoint` from change-set 3.
-    - EA-F10: `newest_input`, which only tests call, ships in the player's Wasm (drop it when the input reaches a
-      command), and test-only members ship in the TypeScript (`Ring.clear`, `BlockPool.free`, the `percentile`
-      re-export).
-    - EA-F13: nits on ownership and small couplings.
-    - EA-N3: "the match is over" has two owners, and the Worker's error event does not tell the link.
+    - EA-F10 (**its TypeScript part done in change-set 3a**, a1c59e8, engine-architect's round 1: closed; the
+      bindings part, `newest_input`, stays for 3b): `newest_input`, which only tests call, ships in the player's Wasm
+      (drop it when the input reaches a command), and test-only members ship in the TypeScript (`Ring.clear`,
+      `BlockPool.free`, the `percentile` re-export).
+    - EA-F13 (**done in change-set 3a but for its one-writer item**, the anchor, which stays for 3b: the link's state
+      read through getters and the report's own pause shape in a1c59e8, `@shamble/types` among the Worker package's
+      dev-dependencies in 0412814; engine-architect's round 1: closed as planned): nits on ownership and small
+      couplings.
+    - EA-N3 (**done in change-set 3a**: the page's half in a1c59e8, `WorkerLink.end` the one owner; the Worker's half
+      in 0624557, one guard around every WebAssembly call; engine-architect's round 1: closed): "the match is over"
+      has two owners, and the Worker's error event does not tell the link.
     - EA-N5: why a fallback runs is worked out in the app shell, not reported by the picture (engine-architect: or when
       `render/` changes hands, change-set 5).
-    - EA-N6: the build's glue check finds the Worker's chunk by a name prefix.
-    - VF-L7 (the verifier's re-check): the same name prefix lets a lazily loaded page module named `worker-...` go
-      unscanned by the build's WebAssembly check (its second plant passed both builds): scan every script but the
-      Worker's entry chunk, named by the build itself. With EA-N6.
+    - EA-N6 (**done in change-set 3a**, a1c59e8: the Worker's chunk named by its source module, through a plugin of
+      the Worker's bundle; engine-architect's round 1: closed): the build's glue check finds the Worker's chunk by a
+      name prefix.
+    - VF-L7 (the verifier's re-check; **done in change-set 3a with EA-N6**, a1c59e8: every other script is the
+      page's whatever its name, with a lookalike plant; engine-architect's round 1: closed): the same name prefix lets
+      a lazily loaded page module named `worker-...` go unscanned by the build's WebAssembly check (its second plant
+      passed both builds): scan every script but the Worker's entry chunk, named by the build itself. With EA-N6.
     - VF-L4, VF-L5 (the verifier): the policy header is asserted on the 200 answer only; the build's refusal of
       environment settings has no test (with RR-N4). _VF-L5 is done in #64, with RR-N4 (above); VF-L4 stays here._
+      _VF-L4 is **done in change-set 3a**, a1c59e8: the four headers are asserted on every answer, refusals too
+      (`packages/client/serve.test.mjs:73-78` at 8619d539 [verified 2026-11-24]; no reviewer names it)._
     - GE-N1: the lost-device and lost-context route has no test.
     - GE-N4: each renderer error prints twice, with three's doubled prefix.
     - GE-N5: after a lost device the page says nothing outside the development readout (with ADR 0003's loss
       handling).
     - GE-N6: "because WebGPU did not start" cannot say why (no adapter, or the device request failed).
-    - TE-NT3, TE-NT4, TE-NT5, TE-NT7: no test for the cleaning of the error text, or for the hand-off time read before
-      the copy; one equality in the browser test also holds on stale reports; the listener's own body is outside the
-      allocation sums.
+    - TE-NT3, TE-NT4, TE-NT5, TE-NT7 (**TE-NT3 to TE-NT5 done in change-set 3a**, a1c59e8, each with a plant that
+      test-engineer re-ran in its round 1: proven; TE-NT7 stays for 3b): no test for the cleaning of the error text, or
+      for the hand-off time read before the copy; one equality in the browser test also holds on stale reports; the
+      listener's own body is outside the allocation sums.
     - PA-N2: on a fast machine the per-frame allocation window can fall partly before the browser optimises the code.
     - PA-L2: the pool's size assumes one tick per frame and one per wake (a pool of 9 once blocks grow).
-    - TE-L: four branches of the small server without a test case of their own; `skipIf` for the link cases; more
-      `WebAssembly` names in the test stand-ins; one Worker only; the scratch-buffer test.
-    - SA-ENV: the isolation spec sets two variables in the test process and never restores them (no later spec reads
-      them today).
-    - FAVICON: the browser's own request for `/favicon.ico` gets a 404.
+    - TE-L (**done in change-set 3a**, a1c59e8; test-engineer's round 1: proven, its plants re-run; left: no plant
+      for the six newly stubbed `WebAssembly` names, follow-up 3A-PLANTS): four branches of the small server without a
+      test case of their own; `skipIf` for the link cases; more `WebAssembly` names in the test stand-ins; one Worker
+      only; the scratch-buffer test.
+    - SA-ENV (**done in change-set 3a**, a1c59e8: the spec restores both; test-engineer's round 1: no test can see the
+      restore): the isolation spec sets two variables in the test process and never restores them (no later spec
+      reads them today).
+    - FAVICON (**done in change-set 3a**, a1c59e8: `/favicon.ico` gets "no content", 204, with the common headers;
+      security-auditor's round 1 read it: not a finding): the browser's own request for `/favicon.ico` gets a 404.
   - **For change-sets 5 and 6 (the picture and the look):** GE-F7, the memory cost of multisampling (an estimate of
     about 125 MB at 1920x1080; three's memory count leaves the samples out); PA-L4, the readout's frame time is the
     interval between animation frames, not the frame callback's own work time (both change-set 6).
@@ -1217,10 +1255,13 @@ _From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper's script, byte f
       UTC, `docs/DECISIONS.md`): Brave's first run drew 46,382 frames while it ticked for 410 s (113 a second, where
       every other Brave run averages 180), so for about 150 s the page drew nothing while the simulation ran on, and no
       pause was recorded. The window may have been covered or the screen off; the pause on a tab switch works in Brave.
-    - FPS-LINE: the readout's "frames a second" comes from the usual gap between two frames; in Firefox it said 239.2
-      where the run's average was 179.9. The line should be a count over time (no change-set named).
-    - NEG-ZERO: "deliveryP50: -0.00 ms" (Brave, `?pad=65536`): the page's and the Worker's clocks, each rounded by the
-      browser, can give a difference just under 0.
+    - FPS-LINE (**done in change-set 3a**, a1c59e8: frames a second is the frames kept over the time they took,
+      `packages/client/src/harness/frame-times.ts` at 8619d539 [verified 2026-11-24]; his Firefox step of 3a's browser
+      check reads it): the readout's "frames a second" comes from the usual gap between two frames; in Firefox it said
+      239.2 where the run's average was 179.9. The line should be a count over time (no change-set named).
+    - NEG-ZERO (**done in change-set 3a**, a1c59e8: a value that rounds to zero prints without its minus sign,
+      `packages/client/src/overlay/report.ts` at 8619d539 [verified 2026-11-24]): "deliveryP50: -0.00 ms" (Brave,
+      `?pad=65536`): the page's and the Worker's clocks, each rounded by the browser, can give a difference just under 0.
     - FF-WAKES: in Firefox 4 % to 10 % of the Worker's wakes come before a tick is due (6982 wakes for 6717 ticks; 1126
       for 1018), with no dropped tick and lateness p99 4.667 ms; a reading for the pacing marks in change-set 3.
     - BR-LATE: Brave's first run has lateness p99 13.2 ms and max 15.833 ms, its other runs p99 4.0 to 6.3 ms; it reads
@@ -1230,11 +1271,15 @@ _From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper's script, byte f
       reports 6 logical processors where Firefox reports 24.
     - TQ-FF: no timestamp query on Firefox's WebGL 2 (yes on Brave's WebGL 2 and on WebGPU in both).
     - NOT-SHOWN: a single hidden stretch of 6 minutes; Brave's double-click on `index.html`; his Shields setting.
-- **From the CI-WASM pull request (PR #64)** (in flight, waiting for his go; risk tier 2; two review rounds,
+- **From the CI-WASM pull request (PR #64)** (merged as 1ec6f6c on 2026-11-24, by his main Advisor on his tap, after
+  his go MERGE-64 (a) of 2026-11-23, 23:44:10 UTC, `docs/DECISIONS.md`; risk tier 2; two review rounds,
   infra-engineer, test-engineer and security-auditor, then test-engineer and security-auditor on what changed: no
   Critical or High; the items are the report's "Follow-ups", `docs/reports/2026-11-19-ci-wasm.md`, with each owner
   and time as the report and the reviewers' notes give them; "not named" where they give none. The reviewers' notes
-  stay readable at the checkpoint commit that report names. The ids are the report's):
+  stay readable at the checkpoint commit 5911b56 (`.checkpoints/ci-wasm/`). The ids are the report's. _Corrected
+  2026-11-24 (change-set 3a's docs pass): this header said "in flight, waiting for his go", and that the notes stay
+  readable "at the checkpoint commit that report names"; the report names none, and 5911b56 is the notes' last
+  commit (the advisor agent's read of #64's final head) [verified 2026-11-24: `git ls-tree 5911b56` holds the notes]._):
   - TE-COUNT (test-engineer; the gate v2, step 2.3): CI pins no test count (a skipped or removed test keeps it green,
     only zero tests turns it red); the gate v2 fails a run with a skipped or missing test. Today each clean run printed
     "Running 12 tests using 1 worker", "12 passed" and the boundary block's "Tests  7 passed (7)".
@@ -1242,10 +1287,13 @@ _From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper's script, byte f
     been shown failing CI's type checks (the specs' check caught seven of seven, in a container only).
   - TE-TSC-LINES (test-engineer; the next CI edit, its exact text asked of him): each type check prints its own result
     line (today `tsc` prints nothing on success, and a pass is read from the next echo under `bash -e`).
-  - TE-104 (test-engineer; with the next change to that spec): the hidden-tab bound at
+  - TE-104 (test-engineer; with the next change to that spec; **done in change-set 3a**, a1c59e8, with TE-NT5's
+    change: a plant of 90 extra ticks on resume with no drop counted is caught at that bound; test-engineer re-ran it
+    in its round 1: proven): the hidden-tab bound at
     `packages/e2e/tests/skeleton/skeleton.spec.ts:104` has never been seen hit (it holds by arithmetic; the plant that
     would reach it is caught two lines earlier): a plant that runs extra ticks on resume without counting drops.
-  - TE-MONO (test-engineer; with the next change to that spec): `performance.now()` in place of `Date.now()` at `skeleton.spec.ts:92` and
+  - TE-MONO (test-engineer; with the next change to that spec; **done in change-set 3a**, a1c59e8, a monotonic clock
+    in the hidden-tab test; test-engineer's round 1: proven): `performance.now()` in place of `Date.now()` at `skeleton.spec.ts:92` and
     `:98`.
   - TE-WATCH (every session that reads a red `toolchain`; on every runner-image or Chrome change): read the allocation
     test's byte windows and the default backend first.
@@ -1264,13 +1312,19 @@ _From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper's script, byte f
   - TOKEN-WORDS (security-auditor and infra-engineer, Low; the next CI edit, his yes): the comment "The only step with
     the token" (`.github/workflows/toolchain.yml:91`) is true of run steps; checkout and setup-node, both pinned by
     SHA, receive the job's token as their default input, as on main ("the only run step with the token").
-  - F-CHANNEL (security-auditor, Low; with change-set 3's build work): the refusal pattern in
+  - F-CHANNEL (security-auditor, Low; with change-set 3's build work; named in the list of what his go for #64
+    accepts; **done in change-set 3a**, 5c92311: `CARGO_OVERRIDES` refuses every `RUSTC_` name, `__CARGO_` and
+    `CARGO_UNSTABLE_`, CI's cut names still allowed, and names compared in upper case since 79666ad9;
+    security-auditor's round 1 found them "refused as meant"): the refusal pattern in
     `packages/client/scripts/build-checks.mjs` also refuses `__CARGO_*`, `CARGO_UNSTABLE_*` and `RUSTC_*`: with
     `__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS` and `CARGO_UNSTABLE_*`, stable cargo takes nightly-only features
     from the environment; local builds only (CI's cut starts from `env -i`).
   - GH-TOOLS for later pull requests (his; open as GH-NEXT, the report's "Decisions needed"): his GH-TOOLS (a) of
     2026-11-23, 17:15:07 UTC was "for this pull request"; Builder V3 cannot write to GitHub (no GitHub tool, the
-    platform refuses `gh pr create`, the guard keeps `gh api` read-only).
+    platform refuses `gh pr create`, the guard keeps `gh api` read-only). _Answered for change-set 3a by his GH-NEXT
+    (a) with one change (2026-11-23, 23:44:10 UTC, `docs/DECISIONS.md`): the chat puts each pull request's title and
+    text in its notes folder, his main Advisor opens the draft and sets them, he presses Ready and Merge; his (c), a
+    kit change, "is planned with the gate step, not now". After 3a: open._
   - SAVER (the kit; when: not named, a kit change that asks him): the checkpoint saver pushes to the local branch's
     name, and Builder V3's worktree branch is named `cs/ci-wasm` (the main folder holds the `claude/` name and is never
     switched), so no saver ran in that chat: card and notes were committed by path and pushed by hand after every
@@ -1282,10 +1336,116 @@ _From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper's script, byte f
   - Firefox in CI (the chat he calls Builder V3; the small CI pull request after change-set 3a, his FIREFOX-TESTS (b),
     2026-11-23, 21:24:59 UTC).
   - The line for CLAUDE.md on the third account (ACCT-3; his to give).
-  - RR-F5's fix, SA-TREE and the `__pycache__/` line: change-set 3 (the block for #61 above).
+  - RR-F5's fix, SA-TREE and the `__pycache__/` line: change-set 3 (the block for #61 above). _All three **done in
+    change-set 3a** (marked there, 2026-11-24)._
   - Known ones it touches: REQUIRED-CHECK, CANCEL-ON-MAIN, TWO-PLAYWRIGHTS and WASM-ARTIFACT (a dated line under each,
     in "From foundation 2.2" above); CI-CUT and NODE-26 (#64 changes nothing they say: checkout's post step still
     runs after the cut, and the job still names `node-version: 22`).
+- **From change-set 3a, "Rules and boundaries"** (in flight, no pull request yet; branch `claude/loving-hopper-6p0mg2`
+  standing in for `cs/3a-rules-boundaries`, code head 8619d539; risk tier 1; two review rounds, five reviewers
+  (rust-reviewer, engine-architect, test-engineer, security-auditor, perf-auditor) on 5c92311 and again on what changed
+  at 79666ad9, then security-auditor alone on one fix (APPROVE, the High closed); the verifier PASS on 8619d539,
+  nothing above Low; report `docs/reports/2026-11-24-cs3a-rules-boundaries.md`. The reviewers' notes stay readable at
+  f153ddf4 (`.checkpoints/cs3a-rules-boundaries/`: `<reviewer>-review1.md` and `-review2.md`, the advisor agent's
+  `advisor-mul-add.md`), round 3's and the verifier's at 1c668e95 (`security-auditor-review3.md`,
+  `verifier-final.md`), and all of them in their last state at 6491b839, the last commit before the notes were
+  removed (with the advisor agent's `advisor-head.md` and his browser check's message). The ids are this docs pass's; each item names its source):
+  - **His two, from his words of 2026-11-24, 15:58:25 UTC** (MUL-ADD (a), with his Advisor's two conditions "for the
+    report and STATUS's follow-ups"; whole in `docs/DECISIONS.md`):
+    - 3A-FMA-CHECK (change-set 4): "The check on the built file (no fused multiply-add inside the players'
+      WebAssembly) is built in the same change-set that brings the first outside crate into the simulation (the
+      collision library, planned for change-set 4), not later. That change-set's plan names it." Until then only our
+      own code is held to the ban: the scan of `crates/sim/src` refuses `mul_add` (its one-name list `HELD` in
+      `crates/sim/tests/rules_scan.rs`); an outside crate's code is not scanned, and in WebAssembly such a call would
+      run the toolchain's software `fmaf`.
+    - 3A-RUST-REPORT (when: not named): reporting the defect to the Rust project. In WebAssembly `f32::mul_add` gives
+      the value of two roundings wherever the result lies below the smallest normal `f32` (the builder's measurement on
+      the 48 constructed cases; rust-reviewer's on 22,048 of its own: the whole class of such results, not 16 points),
+      where std 1.99.1's page says "The result of this operation is guaranteed to be the rounded infinite-precision
+      result" (the builder's read of 2026-11-24, 15:25 UTC: change-set 3a's card at f153ddf4, step 11). His words:
+      "Nothing is posted anywhere without my go."
+  - 3A-PART7-POINTER (the drafts' next revision; the same message): ADR 0004 part 7 names "explicit `mul_add`, which
+    std specifies exactly" (`docs/adr/0004-simulation-core.md:263-264`); it gets a dated pointer for his MUL-ADD (a) at
+    its next revision, "with its exact sentence shown to me first". No word of ADR 0004 changes in 3a.
+  - 3A-LINT-MULADD (the quality gate step, 2.3): the step's lints carry his MUL-ADD (a), so that `mul_add` cannot come
+    back silently when they replace the interim scan: part 7's list still names it, and only the scan's `HELD` refuses
+    it meanwhile (the card at f153ddf4, "Follow-ups this pass leaves").
+  - 3A-GEN-CHECK (the small CI pull request; a CI file: his yes on its exact text): CI runs neither vector generator's
+    `--check` (`crates/devtools/vectors/make_f32_vectors.py`, `make_chacha8_vectors.py`); a `pin` line added by hand
+    would let WebAssembly accept a new wrong value while the native test ignores pins, and only review and a local
+    `--check` would see it (test-engineer's round 2, L-CHECK-CI).
+  - 3A-RULES-STEP (the small CI pull request; and `devtools`' first native-only dependency): `devtools` is both the
+    native tools crate and the test-only WebAssembly module every development build makes, so its first native-only
+    dependency must be target-gated, or the development build and CI break; and the test-only module gets a build step
+    of its own in CI (engine-architect's round 1, F5).
+  - 3A-FROM-F64 (3b): the cast from `f64` to `f32` is now tested on real `f64` values, but no input is an exact tie
+    and none lies between the largest `f32` and the overflow point (test-engineer's round 2, its Low a; rust-reviewer's
+    round 2).
+  - 3A-HOOK-TEST (3b): the panic hook's test installs a process-wide hook inside `sim-wasm`'s shared unit-test binary,
+    where a later panicking test would race it; it moves to a test binary of its own (engine-architect's round 1, F6;
+    rust-reviewer's round 1, L5).
+  - 3A-FEATURE-VERSION (when `sim` first gets a dependency): the feature compare matches packages by name, not by name
+    and version, so another version of a crate `sim` uses, with its features, counts as `sim`'s wherever it sits in
+    the tree; the builds then differ and every build stops: it fails closed (engine-architect's round 2, NEW-A,
+    measured on a scratch workspace).
+  - 3A-SCAN-HELPERS (with the change-set that adds part 7's three helpers, or the quality gate step): the scan
+    refuses those helpers when imported by name or called by a module path, and `max` or `min` on our own ordered
+    types (`Tick::max`; only `Ord::max` passes): false refusals, so it fails closed (engine-architect's round 2,
+    NEW-B).
+  - 3A-PART5-CLASH (the step that first nests generated types): the feature compare would refuse the feature ADR 0002
+    part 5 plans for nested generated types, one that only dev-dependency entries turn on
+    (`docs/adr/0002-code-structure-build-toolchain.md:353-357`); that step decides (engine-architect's round 2,
+    NEW-C).
+  - 3A-SCAN-NAMES (the quality gate step's type lint): hashed maps not named after std's pass the scan (`DashMap`,
+    hashbrown's `HashTable`); the scan's doc says so, and the type lint is the real net (rust-reviewer's round 2,
+    N4).
+  - 3A-NAME-SECTION (with the table of build options: the build plan's change-set 3 card names it,
+    `docs/reports/2026-11-17-build-plan-slice-1.md:330`, and defines it nowhere; change-set 3's plan, section 8, made
+    it a follow-up of its own): a quarter of the players' Wasm is its name section (7,997 of 31,805 bytes at 5c92311)
+    (rust-reviewer's round 1, L3).
+  - 3A-RNG-COPY (with PM-0004-27's cost, change-set 8): the generator copies its cached 64-byte block to the stack on
+    every draw (`next_u32` in `crates/sim/src/rng.rs`) (rust-reviewer's round 1, L4).
+  - 3A-STATS-ROWS (when: not named): the Worker's statistics check lets extra keys through and the copy report copies
+    every key, so a Worker of another build could add uncleaned lines to the report; the report's rows should come
+    from the known list (security-auditor's round 1, L-STATS; narrower than main's check, which took any object).
+  - 3A-PLANTS (when: not named): no planted defect for the six newly stubbed `WebAssembly` names (`Table`, `Global`,
+    `Tag`, `Exception`, `Suspending`, `promising`) or for the Worker's start path; two plants (`module-no-hook`,
+    `tel-not-a-file`) are caught at their named test, but for a neighbouring reason (test-engineer's round 1, R20 and
+    R26); and the planted-defect script leaves one plant's build on disk for the next (`room-drift` meets
+    `hook-start-exported`'s build and gets one extra failure; its own test still fails for its own reason) (the
+    verifier's L2). With TE-NT2, the planted set's place in the gate v2.
+  - 3A-CONFIG-FILE (the quality gate's flag check): a cargo config file outside the repository can still set a
+    profile, a linker, a compiler wrapper or an `[env]` table; the build shuts out only its `rustflags`, by giving the
+    remap through `CARGO_ENCODED_RUSTFLAGS` in cargo's environment, and the comments in `build.mjs` and
+    `build-checks.mjs` say so (rust-reviewer's round 1, L1; security-auditor's round 2, N2). Those comments still
+    leave out two more such settings, source replacement (`[source]`, a crate's code swapped with no diff) and
+    `build.rustc` (security-auditor's round 3, N3: name both, or say "among others").
+  - 3A-PEDANTIC (the quality gate step): six warnings of clippy's stricter `pedantic` group left in
+    `crates/sim/src/rng.rs` and `crates/sim/tests/rules_scan.rs` (among them a long function and similar names)
+    (engine-architect's round 1, F4: nine; its round 2: seven; the seventh stood inside words that were wrongly in
+    quotation marks as his and went with that correction, the advisor agent's read of c5f6a85a).
+  - 3A-FMA-LOG (when: not named): the native float test prints whether the processor has FMA from inside a passing
+    test, which cargo hides, so no log shows that line; only the pass itself shows that the exact path ran
+    (test-engineer's round 2, L-FMA-LINE; its fix: `--show-output` where the test runs, or the line said to show on a
+    failure only).
+  - 3A-NO-FMA (when: not named): on a processor without the fused multiply-add instruction (and without AMD's FMA4)
+    the native `fmaf` takes the same software path as WebAssembly, and the three native float tests then fail; shown
+    by emulation only (rust-reviewer's round 2: run under a debugger with the processor's FMA flags cleared), never on
+    such a processor.
+  - 3A-OTHER-BROWSERS (with Firefox in CI, then later): the vectors ran in Node and Chromium only, not in Firefox,
+    WebKit or Safari (test-engineer's round 2, "Not verified").
+  - 3A-MANIFEST-COMMENT (the next manifest batch, 3b's): the root `Cargo.toml`'s comment "in sim-wasm only" (line 14)
+    is no longer true; and "The later cargo-deny wasm-bindgen rule must allow devtools too" (security-auditor's
+    answer on the dependency batch, `security-auditor-deps.md`).
+  - 3A-DEPARTURES (the drafts' next revision, as dated pointers, never as rewording now): readings that go beyond the
+    list his DEPART-3 (a) accepted (change-set 3's plan, section 12, question 4), so not covered by it: PM-0004-74 ("One
+    feature set builds the sim on every target", `docs/adr/0004-simulation-core.md:1184`) read as three builds, the
+    players' Wasm, the test-only module and the native tests, with dev-dependency edges for the tests; ADR 0002 part
+    8's row "Rust in Wasm | wasm-bindgen-test in Node" (`docs/adr/0002-code-structure-build-toolchain.md:494`), met
+    through our own test-only module instead; PM-0004-27's "each stream" read as four edge stream ids (no stream exists
+    yet); ADR 0002 part 5's planned dev-only feature (3A-PART5-CLASH) (engine-architect's round 1, its departures line,
+    and NEW-C). Inside DEPART-3 (a), said here so it is not lost: PM-0002-53's counter in WebAssembly is the tools
+    crate's own function (test-engineer's round 1, its Low (c): "accepted by DEPART-3 (a); say so").
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -1601,6 +1761,16 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   3. The inventory's line numbers hold after phase 1's move: `git mv` kept the bytes and the line numbers (foundation
      2.1b, PR #51: five pure renames, the blobs equal at 76b4f7a and at the move commit c090843), so its citations hold
      with the prefix `legacy/` (`shamble-game.js:N` is `legacy/shamble-game.js:N`) [verified 2026-11-11].
+- **Change-set 3a of the v2 build plan, "Rules and boundaries"** (in flight, 2026-11-24; not the legacy 3a below; the
+  evidence: its reviewers' notes at f153ddf4 and its report `docs/reports/2026-11-24-cs3a-rules-boundaries.md`):
+  1. MUL-ADD: on the pinned toolchain `f32::mul_add` gives other bits in WebAssembly than natively wherever the result
+     lies below the smallest normal `f32`. By his MUL-ADD (a) (2026-11-24, 15:58:25 UTC) it stays banned in the
+     simulation, and its 16 WebAssembly values are pinned in the float vectors as a known defect. A call from an
+     outside crate is not caught until 3A-FMA-CHECK (change-set 4), and a native server without FMA would give the
+     WebAssembly values (3A-NO-FMA).
+  2. The scan of `crates/sim/src` reads text, not types: it refuses some valid code (3A-SCAN-HELPERS) and misses a
+     macro that builds a call itself (its doc says so); it is interim until the quality gate step's lints.
+  3. CI does not check that the vector files match their generators (3A-GEN-CHECK, a CI edit).
 - **3a, ranked (all from the change-set's evidence; not re-measured by docs-keeper):**
   1. Cabana: buildings are not NAV cells, so 27.5 % of objective routes and 25 % of siege legs cross a building roof bots can't climb (`tools/reach.js`; R19: the `navBuild` building-cell fix with bot replanning; queued as Night queue item 2, NEEDS PLAN, right after N1 and before 3b)
   2. Allocation grows with team fights (garbage-included inspector profile, MB per game second inside update(), seeded): default Cabana natural match head 4.6-4.8 vs main 2.4-3.1 (head's ally and Soviet bots fight, main's bots don't), Cabana ring combat head 1.72-2.09 vs main 1.94-1.98; DM_Tri 12 soldiers 2.9-3.0 and 48 soldiers 7.2-8.2 after the review fixes (main Cabana at 48: 6.2-6.3). Driver: `updateSoldierAnim` hit/death states (the CS11 anim split); `syncSimWorld` runs twice per step since K4 (0.39-0.43 after the house-array fix, was 0.56-0.65; main 0.16 for its one call)
@@ -1648,8 +1818,10 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
 | Editor rebuild (Cabana): full-map draw calls boot / 1 / 2 rebuilds | base 1992 / 2406 / 3502 · head 1992 / 1992 / 1992; heap after GC boot / 10 rebuilds: base 42.9 / 119.5 MB · head 42.7 / 44.5 MB | 2026-10-14 | preview.js harness + perf-auditor |
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
-| CI on main, latest (the rows below are older) | `gate` with `smoke` (run 934, id 44551896122) and `toolchain` (run 232, id 44551894194) success on f5030a3, PR #61's merge commit (push) | 2026-11-19 | GitHub Actions runs (REST API, read 2026-11-23) |
-| CI-WASM (PR #64, in flight): the `toolchain` job on a runner | 135 to 147 s per clean job (eight jobs on four heads, push and pull request); the Wasm 28,991 bytes, sha256 22dad2eb...018b, on every runner build (28,987 bytes in the containers: RR-F5, not judged); 12 browser tests in Google Chrome 157.0.8103.78 in about 1.1 min; boundary tests 7, the client's unit tests 49; the allocation test 65 to 76 frames (floor: more than 20) | 2026-11-23 | docs/reports/2026-11-19-ci-wasm.md |
+| CI on main, latest (the rows below are older) | `gate` with `smoke` (run id 45373057216) and `toolchain` (run id 45373056953) success on 1ec6f6c, PR #64's merge commit (push) | 2026-11-24 | GitHub Actions check runs (REST API, read 2026-11-24) |
+| Change-set 3a (in flight): the `toolchain` job on a runner, and the players' Wasm | 138 s (a1c59e8) to 185 s (8619d539) per job, from the job's start and end, on the six heads whose times the card records; the players' Wasm with the panic hook 31,718 bytes, sha256 383f5303...3963, the same bytes on the runner and in the container since the remap (RR-F5; 28,991 on the runners before 3a); 14 browser tests in Google Chrome 157.0.8103.78 in about 1.1 min; boundary tests 2 files, 17 tests; the client's unit tests 70; the allocation test 61 bytes a frame and 529 a block (75 frames) on 8619d539, whose runner image moved to 20261116.133.1 (20261116.376.1 before): the verifier's TE-WATCH read found the allocation inside its windows (25 to 170, 430 to 610) and the default backend unchanged (the WebGL 2 fallback); one red, on a1b2e802 (an assertion of the builder's, fixed forward, not re-run) | 2026-11-24 | change-set 3a's card at f153ddf4 (steps 4 to 12); the job log of 8619d539 (job 138592422504) |
+| CI on main (older) | `gate` with `smoke` (run 934, id 44551896122) and `toolchain` (run 232, id 44551894194) success on f5030a3, PR #61's merge commit (push) | 2026-11-19 | GitHub Actions runs (REST API, read 2026-11-23) |
+| CI-WASM (PR #64, merged 2026-11-24 as 1ec6f6c): the `toolchain` job on a runner | 135 to 147 s per clean job (eight jobs on four heads, push and pull request); the Wasm 28,991 bytes, sha256 22dad2eb...018b, on every runner build (28,987 bytes in the containers: RR-F5, not judged); 12 browser tests in Google Chrome 157.0.8103.78 in about 1.1 min; boundary tests 7, the client's unit tests 49; the allocation test 65 to 76 frames (floor: more than 20) | 2026-11-23 | docs/reports/2026-11-19-ci-wasm.md |
 | CI on main (older) | `gate` with `smoke` (run 900, id 44391809186) and `toolchain` (run 198, id 44391809357) success on b763ba3, PR #60's merge commit (push) | 2026-11-18 | GitHub Actions runs (API) |
 | CI on main | `gate` and `smoke` success on 44446a5 (PR #44's merge commit) after one re-run: run 42673290304's first attempt lost its `gate` job on GitHub's side (only `smoke` ran, green); attempt 2 green, 06:37 UTC | 2026-11-10 | GitHub Actions runs (API) |
 | Gate (official battery, older) | 0 flagged, 44 editor refs all guarded | 2026-10-10 | battery.js |

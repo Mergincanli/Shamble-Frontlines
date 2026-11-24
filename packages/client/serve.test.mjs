@@ -2,12 +2,19 @@
 // Node's http client, not fetch: fetch tidies ".." out of an address before it is sent, and these tests must send it.
 
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { realpath } from 'node:fs/promises';
 import { request } from 'node:http';
 import { connect } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { addressFor, CONTENT_SECURITY_POLICY, createServer, DEFAULT_PORT, HOST, listen } from './serve.mjs';
+
+// The server's question to the file system is watched, never changed: two refusals must come before it is asked.
+vi.mock('node:fs/promises', async (importOriginal) => {
+  const real = await importOriginal();
+  return { ...real, realpath: vi.fn(real.realpath) };
+});
 
 const SECRET = 'outside the served folder';
 let base;
@@ -28,6 +35,7 @@ beforeAll(async () => {
   writeFileSync(path.join(root, 'notes.md'), 'a type that is not in the table\n');
   writeFileSync(path.join(root, 'serve.mjs'), '// the server never serves its own source\n');
   writeFileSync(path.join(root, 'big.js'), Buffer.alloc(8 * 1024 * 1024, '/'));
+  mkdirSync(path.join(root, 'folder.js'));
   writeFileSync(path.join(base, 'outside.js'), SECRET);
   try {
     symlinkSync(path.join(base, 'outside.js'), path.join(root, 'leak.js'));
@@ -62,16 +70,32 @@ function send({ method = 'GET', path: requestPath = '/', host = addressFor(port)
   });
 }
 
+/** The four headers every answer carries, a refusal too: a Worker takes its policy from its own script's response. */
+function expectFixedHeaders(answer, what) {
+  expect(answer.headers['x-content-type-options'], what).toBe('nosniff');
+  expect(answer.headers['cache-control'], what).toBe('no-store');
+  expect(answer.headers['cross-origin-resource-policy'], what).toBe('same-origin');
+  expect(answer.headers['content-security-policy'], what).toBe(CONTENT_SECURITY_POLICY);
+}
+
+/** One request written by hand on a plain connection: what Node's http client would never send. */
+function sendRaw(text) {
+  return new Promise((resolve, reject) => {
+    const socket = connect(port, HOST, () => socket.write(text));
+    const chunks = [];
+    socket.on('data', (chunk) => chunks.push(chunk));
+    socket.on('end', () => resolve(Buffer.concat(chunks).toString()));
+    socket.on('error', reject);
+  });
+}
+
 describe('what it serves', () => {
   test('the page at the folder itself, with the fixed headers', async () => {
     const answer = await send({ path: '/' });
     expect(answer.status).toBe(200);
     expect(answer.body.toString()).toBe('<!doctype html><title>root</title>');
     expect(answer.headers['content-type']).toBe('text/html; charset=utf-8');
-    expect(answer.headers['x-content-type-options']).toBe('nosniff');
-    expect(answer.headers['cache-control']).toBe('no-store');
-    expect(answer.headers['cross-origin-resource-policy']).toBe('same-origin');
-    expect(answer.headers['content-security-policy']).toBe(CONTENT_SECURITY_POLICY);
+    expectFixedHeaders(answer, '/');
     expect(CONTENT_SECURITY_POLICY).toContain("default-src 'none'");
     expect(CONTENT_SECURITY_POLICY).not.toMatch(/'unsafe-inline'|'unsafe-eval'|blob:|data:/);
     expect(answer.headers['content-length']).toBe(String(answer.body.length));
@@ -89,7 +113,7 @@ describe('what it serves', () => {
       const answer = await send({ path: requestPath });
       expect(answer.status, requestPath).toBe(200);
       expect(answer.headers['content-type'], requestPath).toBe(type);
-      expect(answer.headers['x-content-type-options'], requestPath).toBe('nosniff');
+      expectFixedHeaders(answer, requestPath);
     }
     expect((await send({ path: '/sub/' })).body.toString()).toContain('<title>sub</title>');
     expect((await send({ path: '/sim.wasm' })).body).toEqual(Buffer.from([0, 0x61, 0x73, 0x6d, 1, 0, 0, 0]));
@@ -108,6 +132,19 @@ describe('what it serves', () => {
     expect(answer.headers['content-length']).toBe(String('export const a = 1;\n'.length));
     expect(answer.body.length).toBe(0);
   });
+
+  test("the browser's own request for an icon gets \"no content\", not an error", async () => {
+    for (const requestPath of ['/favicon.ico', '/favicon.ico?v=2']) {
+      for (const method of ['GET', 'HEAD']) {
+        const answer = await send({ method, path: requestPath });
+        expect(answer.status, `${method} ${requestPath}`).toBe(204);
+        expect(answer.body.length, `${method} ${requestPath}`).toBe(0);
+        expectFixedHeaders(answer, `${method} ${requestPath}`);
+      }
+    }
+    // Only that one address: an icon elsewhere is a file type the table does not have.
+    expect((await send({ path: '/sub/favicon.ico' })).status).toBe(404);
+  });
 });
 
 describe('what it refuses', () => {
@@ -116,6 +153,7 @@ describe('what it refuses', () => {
       const answer = await send({ method, path: '/' });
       expect(answer.status, method).toBe(405);
       expect(answer.headers.allow, method).toBe('GET, HEAD');
+      expectFixedHeaders(answer, method);
     }
   });
 
@@ -138,25 +176,60 @@ describe('what it refuses', () => {
       const answer = await send({ path: attempt });
       expect([400, 404], attempt).toContain(answer.status);
       expect(answer.body.toString(), attempt).not.toContain(SECRET);
-      expect(answer.headers['x-content-type-options'], attempt).toBe('nosniff');
+      expectFixedHeaders(answer, attempt);
     }
   });
 
-  test('a link inside the folder that leads outside it', async () => {
-    if (!linkMade) return;
+  test('a path that leaves the folder, or names the folder itself, before the file system is asked', async () => {
+    // Each of these is also refused later, by the check of the real path: these two checks keep the server from
+    // asking the file system about a place outside its folder at all.
+    for (const requestPath of ['/../outside.js', '/sub/../../outside.js', '/../missing.js', '/.', '/sub/..']) {
+      vi.mocked(realpath).mockClear();
+      const answer = await send({ path: requestPath });
+      expect(answer.status, requestPath).toBe(404);
+      expect(realpath, requestPath).not.toHaveBeenCalled();
+    }
+    // The control: for a path inside the folder the file system is asked, once.
+    vi.mocked(realpath).mockClear();
+    expect((await send({ path: '/app.js' })).status).toBe(200);
+    expect(realpath).toHaveBeenCalledTimes(1);
+  });
+
+  test('an address that does not start with a slash', async () => {
+    // "*" is the one such address Node's own parser lets through (the form of an OPTIONS request).
+    const answer = await sendRaw(`GET * HTTP/1.1\r\nHost: ${addressFor(port)}\r\nConnection: close\r\n\r\n`);
+    expect(answer.split('\r\n', 1)[0]).toContain(' 400 ');
+    expect(answer).toContain('That address is not valid.');
+    expect(answer.toLowerCase()).toContain(`content-security-policy: ${CONTENT_SECURITY_POLICY}`.toLowerCase());
+  });
+
+  test('a folder whose name has a served ending', async () => {
+    // Only the check that the real path is a plain file refuses it: its name passes the table of types.
+    for (const requestPath of ['/folder.js', '/folder.js?x=1']) {
+      const answer = await send({ path: requestPath });
+      expect(answer.status, requestPath).toBe(404);
+      expectFixedHeaders(answer, requestPath);
+    }
+  });
+
+  test('a link inside the folder that leads outside it', async ({ skip }) => {
+    skip(!linkMade, 'this system does not let this user make links');
     const answer = await send({ path: '/leak.js' });
     expect(answer.status).toBe(404);
     expect(answer.body.toString()).not.toContain(SECRET);
+    expectFixedHeaders(answer, '/leak.js');
   });
 
   test('a file type that is not in the table, its own source among them', async () => {
     for (const requestPath of ['/notes.md', '/serve.mjs']) {
-      expect((await send({ path: requestPath })).status, requestPath).toBe(404);
+      const answer = await send({ path: requestPath });
+      expect(answer.status, requestPath).toBe(404);
+      expectFixedHeaders(answer, requestPath);
     }
   });
 
-  test('a link with a served ending to a file of another type', async () => {
-    if (!linkMade) return;
+  test('a link with a served ending to a file of another type', async ({ skip }) => {
+    skip(!linkMade, 'this system does not let this user make links');
     const answer = await send({ path: '/alias.js' });
     expect(answer.status).toBe(404);
     expect(answer.body.toString()).not.toContain('never serves its own source');
@@ -187,7 +260,9 @@ describe('what it refuses', () => {
 
   test('an address that cannot be decoded, or holds a zero byte, a backslash or a colon', async () => {
     for (const requestPath of ['/%E0%A4%A', '/%', '/a%00.js', '/app.js%00', '/a%5Cb.js', '/c%3A/app.js', '/app.js::$DATA']) {
-      expect((await send({ path: requestPath })).status, requestPath).toBe(400);
+      const answer = await send({ path: requestPath });
+      expect(answer.status, requestPath).toBe(400);
+      expectFixedHeaders(answer, requestPath);
     }
   });
 
@@ -197,19 +272,14 @@ describe('what it refuses', () => {
       expect(answer.status, host).toBe(421);
       expect(answer.body.toString(), host).toContain(`http://${addressFor(port)}`);
       expect(answer.body.toString(), host).not.toContain('<title>');
+      expectFixedHeaders(answer, host);
     }
     expect((await send({ path: '/', host: addressFor(port) })).status).toBe(200);
   });
 
   test('a request that names no host at all', async () => {
     // Written by hand on a plain connection: Node's http client always adds a Host header.
-    const answer = await new Promise((resolve, reject) => {
-      const socket = connect(port, HOST, () => socket.write('GET / HTTP/1.0\r\n\r\n'));
-      const chunks = [];
-      socket.on('data', (chunk) => chunks.push(chunk));
-      socket.on('end', () => resolve(Buffer.concat(chunks).toString()));
-      socket.on('error', reject);
-    });
+    const answer = await sendRaw('GET / HTTP/1.0\r\n\r\n');
     expect(answer.split('\r\n', 1)[0]).toContain(' 421 ');
     expect(answer).not.toContain('<title>');
   });

@@ -127,6 +127,153 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- _A pointer, not a decision: **his browser check of change-set 3a's zip, 2026-11-24, 21:48:49 UTC.** One chat message
+  (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also
+  holds his claude.ai project "Shamble Frontlines ALT"; his message b5bb0503-5aef-45fc-b832-6bc2a147b40c; 4451 bytes of
+  text, sha256 393a9e4be27c2927a215344efe2aacc4a4a3a4a16953e054340e8db072c5ce99) with three "Copy report" texts, two
+  from his own browser (Brave) and one from Firefox on his Windows computer, and two pictures. It stands whole, copied
+  by script, in `docs/reports/2026-11-24-cs3a-browser-check.md`, Appendix A, with the build chat's reading of it against
+  the zip's README: errors 0 in all three reports; the match stands still while the page is hidden
+  ("lastPauseTicksWhileHidden: 0"); Brave Shields was up; the page opened as a file shows its one line of text. One line
+  is not what the README said to expect: the last pause reads 16.5 s, not about 60 s (six pauses in all; only the last
+  one's length is in a report). In his words on the covered window: "When I placed the thing explorer window in front of
+  it: it dropped to 179 fps briefly". What it answers, in the chat's words: the chat's request of 17:42:35 UTC: the
+  browser check of the zip by its README (Brave in front for 2 minutes, covered for 1 minute, another tab for 1 minute,
+  "Copy report", whether Brave Shields was up, what a double-click on index.html shows; then Firefox for 2 minutes and
+  its report). The message's two pictures are not in the repository (one shows a folder path of his computer); what they
+  show is written in the browser-check record_
+- **Taken by Mustafa, 2026-11-24, 15:58:25 UTC: MUL-ADD (a): the fused multiply-add stays banned in the simulation,
+  which writes a * b + c; the check on the built file comes with the first outside crate; the stop line of 4,100 lines
+  stays; four decisions of his of 24 November (no separate animation editor; Testlines and the level editor; 3b first in
+  line; the VFX repository stays separate for now); plain words with him from now on** (the builder chat he calls
+  Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project
+  "Shamble Frontlines ALT"; his message ae21a771-6b61-41e8-8a91-81d47c5f0946, whole; extracted by script from the chat's
+  transcript). His answer: "MUL-ADD: (a). The fused multiply-add stays banned in the simulation; it writes a * b + c."
+  What stays: "What 3a built for it stays as it is (the one-name ban, the 48 hard cases, exact natively, the 16
+  WebAssembly values pinned as a known toolchain defect)." On the draft: "No word of ADR 0004 changes in 3a; part 7 gets
+  its dated pointer at its next revision, with its exact sentence shown to me first." His Advisor's two conditions, for
+  the report and STATUS's follow-ups: "The check on the built file (no fused multiply-add inside the players'
+  WebAssembly) is built in the same change-set that brings the first outside crate into the simulation (the collision
+  library, planned for change-set 4), not later. That change-set's plan names it."; and reporting the defect to the Rust
+  project is a follow-up: "Nothing is posted anywhere without my go." The size: "The stop line of 4,100 lines stays. If
+  round 2's fixes would pass it, cut by the plan's ladder and tell me in three lines." His four decisions of 24
+  November, of which he says "They change nothing in 3a": "No separate animation editor. Rigging and animation happen in
+  Blender, with the Blender MCP."; "Testlines stays for feel and metrics. The real level editor goes in the main game
+  (Editor V2)."; "The level editor can start against the offline core, but 3b stays first in line for the main
+  builder."; "VFX repo stays separate for now; we merge later. Both sides should agree on one effect file format, so the
+  merge is easy." On how the chat writes to him: "From now on use plain words with me: no tag or code without its
+  explanation in the same sentence." On the pull request: "When the pull request's title and text are in your notes
+  folder, tell me, and my main Advisor opens the draft." What it answers, in the chat's words (not his): the chat's
+  question MUL-ADD of 15:32:07 UTC (repeated at 15:51:16 and 15:55:06 UTC): does the fused multiply-add (`mul_add`) stay
+  banned in the simulation, with the options (a) keep the ban, (b) our own exact version when a formula needs it, (c)
+  allow it and require the instruction on servers; the chat recommended (a). Points 2 to 5 answer nothing the chat asked
+  Records, not his words: the question followed the advisor agent's interim ruling of the same day (the ban and the
+  pinned values built meanwhile, the rule left to him); at his answer they stood in commit
+  79666ad9c8ac3a8d756f874873c820b1c178bc35, and nothing in ADR 0004 or the research was changed; his four decisions
+  touch no file of change-set 3a. Copied by script (1894 bytes, sha256
+  78e74b7a9614ca8e186f68a7c94b4d9cf4d81c85c4ec880f68bddf7fbb94e528):
+> For Builder V3, from me, written with my main Advisor (24 November). From now on use plain words with me: no tag or code without its explanation in the same sentence.
+>
+> 1. MUL-ADD: (a). The fused multiply-add stays banned in the simulation; it writes a * b + c. What 3a built for it stays as it is (the one-name ban, the 48 hard cases, exact natively, the 16 WebAssembly values pinned as a known toolchain defect). No word of ADR 0004 changes in 3a; part 7 gets its dated pointer at its next revision, with its exact sentence shown to me first.
+> 2. Two conditions from my Advisor, both for the report and STATUS's follow-ups:
+>    - The check on the built file (no fused multiply-add inside the players' WebAssembly) is built in the same change-set that brings the first outside crate into the simulation (the collision library, planned for change-set 4), not later. That change-set's plan names it.
+>    - "Report the defect to the Rust project" is a follow-up. Nothing is posted anywhere without my go.
+> 3. The stop line of 4,100 lines stays. If round 2's fixes would pass it, cut by the plan's ladder and tell me in three lines.
+> 4. Also record, by script with 3a's docs pass, these four decisions of mine of 24 November. They change nothing in 3a:
+>    - "No separate animation editor. Rigging and animation happen in Blender, with the Blender MCP."
+>    - "Testlines stays for feel and metrics. The real level editor goes in the main game (Editor V2)."
+>    - "The level editor can start against the offline core, but 3b stays first in line for the main builder."
+>    - "VFX repo stays separate for now; we merge later. Both sides should agree on one effect file format, so the merge is easy."
+> 5. Carry on: round 2, the verifier, the advisor agent on the head, the docs, the report and my zip. When the pull request's title and text are in your notes folder, tell me, and my main Advisor opens the draft.
+- **Taken by Mustafa, 2026-11-24, 11:03:53 UTC: the chat is compacted: rebuild from the repository, then build
+  change-set 3a by the plan with no further word from him** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 733cfd16-899a-462e-8789-64be8b09cd1f, whole; extracted by script from the chat's
+  transcript). His steps for the rebuild: "Read CLAUDE.md, change-set 3a's resume card, the plan it names (cs3-plan.md,
+  draft 3) and my words of 23 and 24 November in docs/DECISIONS.md and in the notes." and "Check git status and your
+  branch against origin and main. Read your session's model and mode." His stop: "If the card, the repo and the summary
+  disagree, or something is missing, say what and stop." His word to build: "Otherwise build change-set 3a by the plan
+  without waiting for me." What it answers, in the chat's words (not his): nothing the chat asked: it follows his
+  /compact of this chat (10:50:43 UTC), which the chat had announced as ready at 10:34:42 UTC ("Ready for /compact: card
+  .checkpoints/cs3a-rules-boundaries.md at 8a62e79..."). It gives three steps for the rebuild and the word to build:
+  "Otherwise build change-set 3a by the plan without waiting for me." Records, not his words: the chat answered in six
+  lines (model `claude-fable-5-2`, permission mode `auto` on the session record, context about 10 %; card, repository
+  and summary agreed) and built change-set 3a; nothing in 3a is a kit, gate or CI write. Copied by script (557 bytes,
+  sha256 de32419d2d0b31477224bbcb7a5d2d3338d83f34b526076217c192a9216d6f17):
+> The compact is done. Rebuild from the repo rather than the summary.
+> 1. Read CLAUDE.md, change-set 3a's resume card, the plan it names (cs3-plan.md, draft 3) and my words of 23 and 24 November in docs/DECISIONS.md and in the notes.
+> 2. Check git status and your branch against origin and main. Read your session's model and mode.
+> 3. Tell me in at most 6 lines where you stand and what you build first. If the card, the repo and the summary disagree, or something is missing, say what and stop. Otherwise build change-set 3a by the plan without waiting for me.
+- **Taken by Mustafa, 2026-11-24, 10:50:43 UTC: his /compact of the builder chat, with what its summary must keep** (the
+  builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds
+  his claude.ai project "Shamble Frontlines ALT"; his message 0b0b5dc3-7df2-45df-9c69-4ac83d009c71, whole; extracted by
+  script from the chat's transcript). What the summary must keep, in his words: "change-set 3a's resume card (its path
+  and commit) is the resume source"; "my words of 23 and 24 November in docs/DECISIONS.md and in the notes bind you
+  (ANSWERS-7, BUILD-SEAT, FIREFOX-TESTS (b), GH-TOOLS and GH-NEXT, the mode rule of 17:15:07 UTC, LONG-RUNS)"; "your
+  branch is claude/loving-hopper-6p0mg2 and this chat cannot write to GitHub". What it answers, in the chat's words (not
+  his): the chat's line of 10:34:42 UTC ("Ready for /compact: card .checkpoints/cs3a-rules-boundaries.md at
+  8a62e79..."), which his words of 2026-11-23, 23:44:10 UTC had asked for. The platform stores a typed command inside
+  its own tags; his words are the text between the command-args tags. Records, not his words: the resume card was
+  `.checkpoints/cs3a-rules-boundaries.md` at 8a62e7904c2f2f664c8cd2f22277297625197b92. Copied by script (613 bytes,
+  sha256 8b844c806bd78942e321f9531223bda87482d12937954eef1f675cda629514f8):
+> <command-name>/compact</command-name>
+>             <command-message>compact</command-message>
+>             <command-args>Keep what the resume needs: change-set 3a's resume card (its path and commit) is the resume source; my words of 23 and 24 November in docs/DECISIONS.md and in the notes bind you (ANSWERS-7, BUILD-SEAT, FIREFOX-TESTS (b), GH-TOOLS and GH-NEXT, the mode rule of 17:15:07 UTC, LONG-RUNS); your branch is claude/loving-hopper-6p0mg2 and this chat cannot write to GitHub; the next three steps. Drop file contents, tool output, CI logs and review texts that are already saved in files.</command-args>
+- **Taken by Mustafa, 2026-11-24, 10:16:15 UTC: #64 is merged, by his main Advisor on his tap, with the expected head
+  8aadfb0; the chat carries on with point 4 of his block of 23:44:10 UTC** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message a930a57f-7351-47d2-9a4c-f3f06f1a5ec8, whole; extracted by script from the chat's
+  transcript). In his words: "I did not press the buttons myself: on my tap in my main Advisor's thread, the Advisor
+  marked it ready and merged it with the expected head 8aadfb09640c9d37a3e6ad8be078165f5074f399." And: "The merge
+  commit's message records the tap." What it answers, in the chat's words (not his): the chat's question READY-WHO of
+  23:57 UTC (2026-11-23): who marks #64 ready, since GitHub showed it as a draft with no ready event since 17:48 UTC:
+  (a) he presses Ready for review and Merge; (b) the chat tries the ready command once and he presses Merge; recommended
+  (a). He answers with what happened instead: his main Advisor marked it ready and merged it on his tap. Records, not
+  his words: main is 1ec6f6c3852d2922989f299bfc053c403d0e52d3 (2026-11-24, 10:15:31 UTC; its parents f5030a3 and
+  8aadfb0); gate, smoke and toolchain were green on it (read 10:17 UTC); #63 and #62 are closed. Copied by script (445
+  bytes, sha256 5da62e38d8e43d5477210d0c48157249489686eb19dacdee5da6689921737043):
+> #64 is merged: main is 1ec6f6c3852d2922989f299bfc053c403d0e52d3 (2026-11-24, 10:15:31 UTC). I did not press the buttons myself: on my tap in my main Advisor's thread, the Advisor marked it ready and merged it with the expected head 8aadfb09640c9d37a3e6ad8be078165f5074f399. The merge commit's message records the tap. Carry on with point 4 of my last block: main's checks, the fast-forward, change-set 3a's checkpoint, then "Ready for /compact".
+- **Taken by Mustafa, 2026-11-23, 23:51:57 UTC: his short message while #64 still showed as a draft** (the builder chat
+  he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai
+  project "Shamble Frontlines ALT"; his message d884b0ed-cef8-4aba-a3cf-76cb6f6a9fde, whole; extracted by script from
+  the chat's transcript). The chat could not tell whether it reported what he had done or asked the chat to do it, did
+  neither (it cannot write to GitHub), and asked; his message of 2026-11-24, 10:16:15 UTC (the entry above) says what
+  happened. What it answers, in the chat's words (not his): the chat's message of 23:46 UTC: main had not moved and
+  GitHub showed #64 as open, not merged and still a draft; he was asked to press Ready for review again and then Merge,
+  and to tell the chat when it was merged. The chat could not tell whether this message reported what he had done or
+  asked the chat to do it, did neither, and asked (READY-WHO); his next message (2026-11-24) answers it. Records, not
+  his words: nothing was written or pushed on this message. Copied by script (27 bytes, sha256
+  e0ff6c899de3126bf9ed233755eee3a100db11ce83815bafa4f980016543fcae):
+> Ready for review then merge
+- **Taken by Mustafa, 2026-11-23, 23:44:10 UTC: MERGE-64 (a), his go for #64 at 8aadfb0; GH-NEXT (a) with one change,
+  for change-set 3a: the chat writes each pull request's title and text into the notes, his main Advisor opens the draft
+  and sets them, he presses Ready and Merge; CLOSE-OLD (a); the order of work after the merge** (the builder chat he
+  calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai
+  project "Shamble Frontlines ALT"; his message 6322ff66-b54e-4ddb-aa5c-2ffab3d2a1da, whole; extracted by script from
+  the chat's transcript). His go: "MERGE-64: (a), go for 8aadfb09640c9d37a3e6ad8be078165f5074f399." On later pull
+  requests: "GH-NEXT: (a) for change-set 3a, with one change: you put each pull request's title and text in the notes
+  folder, my main Advisor opens the draft and sets them, and I press Ready and Merge. (c) is planned with the gate step,
+  not now." On the old drafts: "CLOSE-OLD: (a). #63 and #62 are closed once #64 is merged; my Advisor or I do that." His
+  point 4 ends: "Build nothing before I have compacted this chat." What it answers, in the chat's words (not his): the
+  chat's ask for his go of 23:17 UTC: MERGE-64 (his go to merge 8aadfb09640c9d37a3e6ad8be078165f5074f399, the head the
+  advisor agent approved, with gate, smoke and toolchain green on it: (a) go, (b) hold); GH-NEXT (how pull requests are
+  opened, marked ready and merged for change-set 3a and after, since this chat cannot write to GitHub: (a) as now, he
+  presses the buttons; (b) a GitHub connector on this account; (c) a small kit pull request that lets a day session
+  write pull requests through gh api; recommended (a) for 3a and (c) planned with the gate step); CLOSE-OLD (may #63 and
+  #62 be closed once #64 is merged: (a) yes, (b) keep them open; recommended (a)). His point 4 gives the order of work
+  after the merge, which the chat had not asked. Records, not his words: the advisor agent had approved
+  8aadfb09640c9d37a3e6ad8be078165f5074f399 with gate, smoke and toolchain green on it; the merge followed on 2026-11-24
+  (the entry of 10:16:15 UTC above). Copied by script (1043 bytes, sha256
+  96f3292caae3fe525984ae9c228508bc1e18de08b8503c04f8060aae9e5040a4):
+> My answers of 24 November, written with my main Advisor, who checked #64's head from the repo.
+>
+> 1. MERGE-64: (a), go for 8aadfb09640c9d37a3e6ad8be078165f5074f399. I pressed Ready, and I press Merge (a merge commit) right after sending this. Fetch main after two minutes; if it has not moved, wait for my word.
+>
+> 2. GH-NEXT: (a) for change-set 3a, with one change: you put each pull request's title and text in the notes folder, my main Advisor opens the draft and sets them, and I press Ready and Merge. (c) is planned with the gate step, not now.
+>
+> 3. CLOSE-OLD: (a). #63 and #62 are closed once #64 is merged; my Advisor or I do that.
+>
+> 4. After the merge, in this order: read gate, smoke and toolchain on main's new head and tell me; take main's new head into your branch by fast-forward; open change-set 3a's checkpoint with its resume card and the plan files restored from the notes' last commit (5911b56); push it; then stop and reply in one line: "Ready for /compact: card <path> at <sha>." Build nothing before I have compacted this chat.
 - **Taken by Mustafa, 2026-11-23, 21:24:59 UTC: FIREFOX-TESTS (b) in place of (c): Firefox in CI joins the small CI pull
   request after change-set 3a, and no Firefox pull request comes between #64 and 3a; change-set 3a starts when #64 is
   merged, on this word, with no second ask; three items for change-set 3 come from his Advisor before 3b's build

@@ -19,7 +19,9 @@ async function open(page: Page, query: string): Promise<string[]> {
     const count = window as unknown as { __wasmCalls: number };
     count.__wasmCalls = 0;
     const wasm = WebAssembly as unknown as Record<string, unknown>;
-    for (const name of ["instantiate", "instantiateStreaming", "compile", "compileStreaming", "validate", "Module", "Instance", "Memory"]) {
+    // Every function and constructor the name holds: the first five run code or check it, the rest make its parts.
+    const names = ["instantiate", "instantiateStreaming", "compile", "compileStreaming", "validate", "Module", "Instance", "Memory"];
+    for (const name of [...names, "Table", "Global", "Tag", "Exception", "Suspending", "promising"]) {
       wasm[name] = function () {
         count.__wasmCalls += 1;
         throw new Error(`the page used WebAssembly.${name}`);
@@ -61,6 +63,8 @@ for (const [name, query] of [["the default backend", ""], ["the forced WebGL 2 f
     expect(later.errors).toBe(0);
     // The page made no call into WebAssembly and no instantiation (PM-0002-2).
     expect(await page.evaluate(() => (window as unknown as { __wasmCalls: number }).__wasmCalls)).toBe(0);
+    // And the Wasm runs in one Worker: no second one was started beside it.
+    expect(page.workers()).toHaveLength(1);
     // Nothing was asked of any address but the small server's.
     expect(outside).toEqual([]);
     // The empty scene's render counts are the committed ones for this backend.
@@ -83,19 +87,26 @@ test("a hidden tab pauses the match, and it resumes where it stopped", async ({ 
   // answer on a page too slow to do that within the second.
   await page.waitForTimeout(1000);
   await drawn(page, atHide.frames + 4);
-  const hidden = (await report(page)).worker?.ticks ?? -1;
+  const atRead = await report(page);
+  const hidden = atRead.worker?.ticks ?? -1;
   await page.waitForTimeout(2000);
   const stillHidden = await report(page);
-  console.log(`a hidden tab: ${hidden} ticks at the read after hiding, ${stillHidden.worker?.ticks} two seconds later`);
+  console.log(
+    `a hidden tab: ${hidden} ticks at the read after hiding, ${stillHidden.worker?.ticks} two seconds later; ` +
+      `the newest block's tick ${atRead.tick}, then ${stillHidden.tick}`,
+  );
   // Not one tick in two seconds; a match that ran on would have made 60.
   expect(stillHidden.worker?.ticks).toBe(hidden);
-  const shown = Date.now();
+  // The Worker's count reaches the page in a report, and two reads of one old report are equal too. The newest
+  // block's tick is the page's own: a match that ran on would have moved it, whatever the reports did.
+  expect(stillHidden.tick).toBe(atRead.tick);
+  const shown = performance.now();
   await setHidden(false);
   await page.waitForTimeout(1500);
   await drawn(page, stillHidden.frames + 4);
   const after = await report(page);
   // A tick never runs before it is due, so the time since showing bounds the ticks: 30 a second, and two for the ends.
-  const most = Math.floor((30 * (Date.now() - shown)) / 1000) + 2;
+  const most = Math.floor((30 * (performance.now() - shown)) / 1000) + 2;
   console.log(`a hidden tab: ${(after.worker?.ticks ?? 0) - hidden} ticks since showing (at most ${most}), pauses ${after.worker?.pauses}, drops ${after.worker?.drops}`);
   // It goes on from where it stopped: one pause, nothing dropped, and no more ticks than the time since.
   expect(after.worker?.pauses).toBe(1);

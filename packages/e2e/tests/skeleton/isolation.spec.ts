@@ -10,18 +10,26 @@ import { needsBuild, report, running } from "./report.ts";
 const client = fileURLToPath(new URL("../../../client", import.meta.url));
 const settings = { root: client, configFile: path.join(client, "vite.config.mjs"), logLevel: "silent" } as const;
 
+/** Puts a variable of the test process back as it was: a spec that runs later reads its own environment, not this one's. */
+function restore(name: string, value: string | undefined): void {
+  if (value === undefined) delete process.env[name];
+  else process.env[name] = value;
+}
+
 for (const kind of ["dev server", "preview server"] as const) {
   for (const flag of [true, false]) {
     test(`with the flag ${flag ? "on" : "off"} under Vite's ${kind}, crossOriginIsolated is ${flag} on the page and in the Worker`, async ({ page }) => {
       const dist = needsBuild();
+      const before = [process.env["SHAMBLE_ISOLATION"], process.env["VITE_SHAMBLE_DEVTOOLS"]] as const;
       // The config reads the flag when it is loaded; the development page is what has the report.
       process.env["SHAMBLE_ISOLATION"] = flag ? "1" : "0";
       process.env["VITE_SHAMBLE_DEVTOOLS"] = "1";
-      const server =
-        kind === "dev server"
-          ? await (await createServer(settings)).listen()
-          : await preview({ ...settings, build: { outDir: dist } });
+      let server: Awaited<ReturnType<typeof preview>> | Awaited<ReturnType<typeof createServer>> | undefined;
       try {
+        server =
+          kind === "dev server"
+            ? await (await createServer(settings)).listen()
+            : await preview({ ...settings, build: { outDir: dist } });
         const address = server.resolvedUrls?.local[0];
         expect(address).toContain("127.0.0.1");
         await page.goto(address ?? "");
@@ -31,8 +39,28 @@ for (const kind of ["dev server", "preview server"] as const) {
         expect(data.header.crossOriginIsolated).toBe(flag);
         expect(data.worker?.crossOriginIsolated).toBe(flag);
         expect(data.errors).toBe(0);
+        if (kind === "dev server") {
+          // The dev server reads files outside the page's folder by their full path. It hands out the players' Wasm,
+          // which the Worker loads. It refuses the test-only module where the build puts it, outside every package.
+          // And it refuses the Worker's package reached through npm's link in node_modules: that link would open
+          // the package's whole folder, whatever is built into it.
+          const at = (file: string): string => `${address ?? ""}@fs${path.join(client, "../..", file)}`;
+          // (For a file that is not there this server answers 200 with the page itself, so the file's type is asked too.)
+          const players = await page.request.get(at("packages/sim-worker/pkg/sim_wasm_bg.wasm"));
+          expect([players.status(), players.headers()["content-type"]]).toEqual([200, "application/wasm"]);
+          expect((await page.request.get(at(".gate/rules-module/release/devtools_bg.wasm"))).status()).toBe(403);
+          expect((await page.request.get(at(".gate/rules-module/dev/devtools.js"))).status()).toBe(403);
+          expect((await page.request.get(at("node_modules/@shamble/sim-worker/package.json"))).status()).toBe(403);
+          expect((await page.request.get(at("node_modules/@shamble/sim-worker/pkg/sim_wasm_bg.wasm"))).status()).toBe(403);
+          // Where earlier builds put the module: a copy may still lie there on a developer's machine. With or without
+          // one, what comes back is no WebAssembly: a refusal, or the page itself for a file that is not there.
+          const old = await page.request.get(at("packages/sim-worker/pkg-rules/release/devtools_bg.wasm"));
+          expect(old.headers()["content-type"] ?? "").not.toContain("wasm");
+        }
       } finally {
-        await server.close();
+        await server?.close();
+        restore("SHAMBLE_ISOLATION", before[0]);
+        restore("VITE_SHAMBLE_DEVTOOLS", before[1]);
       }
     });
   }
