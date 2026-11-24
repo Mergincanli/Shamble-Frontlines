@@ -42,3 +42,18 @@ wasm-sections.mjs) on a copy build; explain the -87. Worktree read-only; scratch
   panic.rs's "the host cannot call it" is true of the glue's named exports only (harmless if called: re-sets the hook).
 - rng.rs: not in the players' Wasm at all (no chacha/ChaCha/next_u32/rng name in either name section). Diff: a const
   assert (compile time, no code), docs, one test. No draw path changed.
+- Runner (toolchain job logs, 1 job each: 45408571090 = 5c92311, 45425663247 = 79666ad9): Wasm 31,718 / 12,642 /
+  10,755 + sha 383f5303 = mine. Production page JS 823,255 -> 823,228 (-27; gzip -5, Brotli -164); Worker chunk
+  8,833 -> 8,853 (+20; gzip 3,446 -> 3,477, Brotli 3,118 -> 3,149: trapMessage, the room check, worker.ts's empty
+  fallback memory; once per page load, 0.2 %). Development page JS 826,237 -> 826,210. Not a finding.
+- allocation.spec on the runner: 525 (5c92311) -> 528 (79666ad9) B per block, 1 reading each (the gate workflow does
+  not run it). Sampling interval 64 gives ~+-13 B a run (round 1: SD 10.2 / 13.6): one reading cannot see a -16 (or,
+  in Chrome, likely -12) shift. Inconclusive by design, not a contradiction.
+- 16:02 L-1 in Chromium's own V8 (browser-link-bench.mjs + browser-link-page.js: the same feed and window as
+  link-bench, the repo's .ts type-stripped by a local server on a free port, messages by structuredClone; CDP sampling,
+  interval 1, collected objects counted = the spec's method; headless Chromium 153.0.8010.12 from /opt/pw-browsers,
+  not the runner's 157; 2 runs each, alternating): isWorkerToPage's own bytes 24.0 -> 12.0 per block (2 runs each,
+  exact: 2 -> 1 boxed doubles, 12 B each with pointer compression; Node's are 16 B); with callees 32.1/31.4 ->
+  19.4/19.4; under receive 181.9/180.1 -> 168.1/169.9 (-12.0 mean). isWorkerStats 7.4 B/block both (= 60 B a report,
+  5 x 12: L-2's "a few bytes each" holds). Round 1's runner shift +19.3 B/block = 12 + 7.4 here: after the fix the
+  expected spec reading is main + ~7.4 (~513); the one reading, 528, is ~1 SD over: noise.
