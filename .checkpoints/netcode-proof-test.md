@@ -147,9 +147,9 @@
 - Disk (11-24 15:3x UTC): 10,504 MiB free (floor 4,096; a full check.mjs fills the dev profile to ~7.8 GB); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (3 agents from 17:57 UTC, the saver, 2 triggers):** U6c's round 2: netcode ac0f5d109f30fedce, test
-  aacd36781fdea65a0, security a307bdd231bf3e9b4 (xhigh; outputs u6c-r2-{netcode,test,security}.md); the saver b74ohsd5l.
-  - A stopped seat resumes by SendMessage from its notes file (my reading: a resume is not a new agent; tonight's message).
+- **Running (2 agents from 17:57 UTC, the saver, 2 triggers):** U6c's round 2: netcode ac0f5d109f30fedce, test
+  aacd36781fdea65a0 (xhigh; a stopped seat resumes by SendMessage from its notes); the saver b74ohsd5l. Security
+  a307bdd231bf3e9b4 DONE 18:15: APPROVE WITH FINDINGS, 2 Lows (SEC-U6C-R2-1 the spoofed pin, after R1; -2 old pin wording).
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
     (next 20:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
