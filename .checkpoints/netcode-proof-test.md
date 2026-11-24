@@ -12,6 +12,15 @@
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
 
 ## Rules in force (his words word for word in history.md: read them there, never retype them)
+- **LEAN-MODE, 2026-11-24 about 14:0x UTC (history.md:7857-7880), until R1; plain words, every code explained in its
+  sentence:**
+  - Only R1's path: U6c's fixes and merge, U7's Rust half, U8's merge, main taken in, Stop B.
+  - The judge leaves this lane: MOVED and U6j go to his "Judge builder" chat, on its own branch. No edits to
+    crates/judge/ or marks/, except my own SERIES.md rows. Its branch merges on his word.
+  - New agents only in the first 30 minutes after a usage reset.
+  - The check-in every 4 hours; a cut gets one line in the day's message.
+  - Notes: this card and the day's message (his words still word for word in history.md).
+  - Stop B's message (B): U4k, U6d and U6e at about 3.3x, and options (a)-(c), each with my lean.
 - **RE-PLAN answers, 2026-11-22 12:54 UTC (history.md:7595-7607):** RE-PLAN-OK yes (replan.md is the plan); MARK-NOTES
   yes as replan.md:106-111 words them (the MOVED unit writes them, with a reviewer's read); LAPTOP (b) (R8 once he names
   ML); PACK-P0 (b); R1 Thursday 3 December; dates for R2, R3, R5 and the close come with R1's run plan (aim: the close
@@ -77,7 +86,11 @@
   uncommitted copy of the tree; plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6c: round 1 DONE, its fix pass RUNNING from 13:0x:** builder a3a3e3fdf559de095 (worktree, base 8c81952;
+- **U6c's fix pass DONE 13:50** (FP-1 to FP-6; 5,693 added; fix-check.log 11/11, 861/958 (+54/+54), 1,176.3 s; plants
+  P22, P19, P18 and P2 fail, P8 held by the compiler; snapshot wip/u6c-fix.patch 0549389e…, 24 files; notes u6c-build.md
+  a9d45dd4…; the interdiff `git diff aad2103 6c3ff00`, 10 files, +356/-94). Round 2 waits for the 17:50 reset (LEAN-MODE
+  item 3): trigger trig_014DtEnzDqnWHT2N6MsvfyA1 at 17:51. F-P2-HEADER goes to its test seat.
+- **Next 2, U6c (round 1 below):** builder a3a3e3fdf559de095 (worktree, base 8c81952;
   launch message u6c-launch-prompt.txt; cut 06:55-07:59 and a disk-floor stop, both resumed). Blocks 1, 3-6; Block 2
   not built (C4: lever (1)); F-REDACT fixed and PASS; plants 20 of 21 fail, **F-P8: P8 does not** (ImpairSocket's Drop
   joins no thread, socket.rs:440-446); end-check2.log 11/11, 859/956 (+52/+52), 1,116.8 s (1.03x of 1,086.7); 5,431
@@ -86,14 +99,8 @@
   test APPROVE WITH FINDINGS (5 Medium: F-A2-EXACT, F-READINGS, F-P8, F-TIMING, F-P2; 10 Low); netcode REVISE.
   **Ruling** (advisor-u6c-r1.md ad72c0b8…): REVISE: fix pass FP-1 to FP-6 (about +200, to ~5,630; riders stop past
   5,850), then round 2 on the diff (three seats); F-READINGS mine at U6c's close; NC-U6C-12 and SEC-U6C-5 into U8 (C9).
-- **U6c's Block 0 DONE at 3b75d00 (pushed 8c81952):** security-u6c-deps.md's binding check steps 0-7 PASS (u6c-block0.md;
-  the lock 3394b451…); dependency-check.md's U6c section released DEP-HOLD.
-- **T5 (i) DONE 06:3x** (the T-builder's report; container readings, never judged): 4 loads, each on its own room, all
-  exit 0 (WT ready 44 ms, wss open 25 ms, the hash control refused, the real page to its Wasm 404). Records copied to
-  .gate/u7/t5i/; notes u7-t-build.md copied; T-half snapshot wip/u7-t-build-t5i.patch (23 files; +376 = 2,858). For
-  the advisor at U7's round: T5i-1 (ws counted 1 accepted + 1 failed for one page), T5i-2, T5i-3.
-- **Next 3:** the 2026-11-24 day message SENT 23:0x UTC (msg-2026-11-24.md: choices 1-7, /compact asked); the next at
-  2026-11-24 23:05 UTC (trig_016pV7v16ktVwMuzygofJhjJ, msg-2026-11-25.md). T5 (i) the day U6b merges.
+- **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
+  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** the day message at 23:05 UTC (msg-2026-11-25.md).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - For msg-2026-11-25.md (C7, R2): (1) U6b's merge fixed one test's cap: the double-load bite's start gets its own 2 s
@@ -102,7 +109,9 @@
   mine (C4): U6c's build reached 5,426 added after Block 6 (past 5,400), so Block 2 (P2) was not built and lever (1) is
   pulled: P2 rides in MOVED's brief, before R1's report. (4) Main 1ec6f6c taken in now, plan first (MAIN-64:
   advisor-main-64.md). (5) U6c's round-1 ruling (the advisor's, advisor-u6c-r1.md): one fix pass, a narrow round 2,
-  the container readings at U6c's close (the probe; A2 on both transports). **Decision:** NPT-L2-ONEWAY (its §5; lean (a)).
+  the container readings at U6c's close (the probe; A2 on both transports). **Decision:** NPT-L2-ONEWAY (its §5; lean (a);
+  its build now the Judge builder's). (6) Q-FP6-1 (b): the load generator's failed-handshake count stays in its "no
+  READY" line; its log half goes to U6e. (7) U6c's held-back stamp tests stay on this lane after R1 (LEAN-MODE item 2).
 - Before those, none since the 2026-11-24 message. Each named in its day's message: 2026-11-23's in msg-2026-11-24.md items 1-7
   (this card at 2a7a5b8 holds them with their sources); 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at
   9341c90); 2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
@@ -139,24 +148,25 @@
   counter, SA-16's variant); the kit's paper costs named to him on 2026-11-17. Nothing added since.
 
 ## Key numbers (U4f's `<base>` counts, the earlier packs and his 2026-11-17 count: this card at 1b26e8c)
-- Disk (2026-11-24 10:1x UTC): 10,553 MiB free (floor 4,096; a full check.mjs fills the dev profile to ~7.8 GB;
-  today's part-cleans 7.0, 8.2, 7.2 GiB); unpacked (none covered by his packing words): u4r-P3-d66e23cd78f2 298 MiB,
-  u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741, u4r-P2-fc411116c1f1 623, u4f-20-350677f0aef2 434,
-  u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366, u4f-47-b57221ed139d 51.
+- Disk (2026-11-24 13:5x UTC): 10,568 MiB free after a part-clean of 8.3 GiB (floor 4,096; a full check.mjs fills the
+  dev profile to ~7.8 GB). The unpacked folders his packing words do not cover: this card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (1 agent, 1 shell, 2 triggers; resume by SendMessage to its ID, after a cut from its file):** the saver
   bghk215os (13:08 to about 15:00; restart when it ends: run_in_background, timeout 7200000). MAIN-64 pushed at 807e92a.
-  - U6c's builder a3a3e3fdf559de095: the fix pass FP-1 to FP-6 by advisor-u6c-r1.md (ad72c0b8…), from 13:0x in its
-    worktree; notes u6c-build.md there ("Resume from" lines); end check .gate/u6c/fix-check.log; plants P2, P8, P18, P19, P22.
-  - Done, resumable: the U6c advisor a662f1797b78cae95 (its ruling); the seats aa64bb15ad4467641, a3a1718b1419d246e,
+  - No agent running (LEAN-MODE item 3: new ones only in the 30 minutes after a reset; next reset 17:50 UTC).
+  - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
     (next 14:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
 - **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
   check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
-- **My step:** waiting on U6c's fix pass (its builder runs its end check). **Next three:** (1) the fix pass's report and
-  check, then round 2 (three seats, the diff only); (2) the merge M3-M9 as U4f's (history.md:7022-7028; M5 after a
-  part-clean; the readings; C9's U8 edits); (3) U7's 0b check and R-half, U8's merge. Msg 23:05.
+- **My step (14:1x):** the container readings, my own runs through u6c-run.sh on the builder's tree, release builds:
+  - A2 on both transports, by the full test names (u6c-build.md "Fix pass");
+  - then the probe with the shipped binaries (P0 and P1, 1,000,000 packets, 127.0.0.1, UDP 30003), as advisor-u6c-r1.md
+    lines 73-81 say. Logs go to .gate/u6c/read-*.log.
+  - Disk is 10,568 MiB after the 13:5x part-clean.
+  **Next three:** (1) round 2 at 17:51; (2) the merge M3-M9 as U4f's (history.md:7022-7028), with C9's U8 edits;
+  (3) U7's 0b check and R-half (its builder starts in a reset's first 30 minutes), then U8's merge. Msg 23:05.
 - **Finished, resumable by SendMessage:** U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder
   ac59cce3e5d002441 (notes u8-build.md "## Pass 3"); the advisor a3de649cd25e474df (U8's rulings). Older: card at e67ef59.
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): its record in Now. Open at its
@@ -184,12 +194,6 @@
   the lock, CACHEDIR.TAG and no debug, df; redact `node spikes/netcode-proof/ops/operator/redact-check.mjs <spike>`; his
   words via msgcheck.mjs. A worktree agent first runs `git merge --ff-only`; never `cd` into it; no shell loops. Main f5030a3.
 
-## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
-- All word for word in history.md: until 2026-11-17 from :5791 on; 2026-11-18 :6921-6932; 2026-11-19 :7124-7146,
-  :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559, :7618-7620;
-  2026-11-22 :7610-7617, :7623-7628 (15:47:28 to about 19:44 UTC); 2026-11-22/23 :7655-7663 (about 20:42 to 02:36 UTC);
-  2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC), :7675-7687 (about 07:53 to 11:14 UTC), :7689-7701 (about 12:28 to 16:22 UTC),
-  :7724-7736 (about 17:33 to 21:12 UTC); 2026-11-23/24 :7745-7753 (about 23:22 to 02:36 UTC); 2026-11-24 :7755-7770
-  (a container restart, about 05:26 to 05:37 UTC: M5 run 2 and the saver re-run), :7772-7783 (about 06:55 to 07:59
-  UTC: U6c's builder, cut while reading, and this chat; the builder resumed by SendMessage 08:0x), :7803-7819 (about
-  10:42 to 12:54 UTC: the U6c advisor, its notes saved, and this chat; resumed 12:55 on his words).
+## Cuts (LEAN-MODE item 4: one line each in the day's message: from, to, what it stopped)
+- For msg-2026-11-25.md: 06:55-07:59 UTC (U6c's builder and this chat); 10:42-12:54 UTC (the U6c advisor and this
+  chat). Older cuts, word for word: history.md from :5791 to :7819 (indexed on this card at 74bf901).

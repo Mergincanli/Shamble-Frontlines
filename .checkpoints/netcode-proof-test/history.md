@@ -7853,3 +7853,27 @@ Re-create them if still needed.
   (bghk215os).
 - **Step 7 DONE (13:2x):** the advisor's head check is APPROVE (advisor-main-64-head.md). No new finding.
   Toolchain's summary lines equal main's run 45373056953. ADV-M60-7 and ADV-M54-8 are still open (Low).
+
+## Decision: Mustafa, 2026-11-24 about 14:0x UTC, in this chat: LEAN-MODE (word for word)
+```text
+For the netcode chat, from me, written with my main Advisor (24 November). Use plain words with me: no tag or code without its explanation in the same sentence.
+
+A. Lean mode, from now until R1. It changes how you work, not a pass mark, a judge rule, marks.json or a run.
+1. Only R1's path: U6c's fixes and merge, U7's Rust half, U8's merge, main taken in, Stop B. Start nothing else.
+2. The judge leaves your lane. MOVED and U6j are built by a new chat on my first personal account ("Judge builder"), on its own branch, from tonight. You do not build them. Until its branch is merged you do not edit crates/judge/ or marks/, except rows in marks/SERIES.md that your own pieces add. You merge its branch into yours on my word: MOVED before R1's report, U6j before R2.
+3. Start a new agent only in the first 30 minutes after a usage reset, so a cut does not stop it half way.
+4. The check-in comes every 4 hours, not every 2. A cut gets one line in the day's message (from, to, what it stopped): no word-for-word notice and no transcript search. This changes my CHECK-IN and SPEND-LIMIT (a) words.
+5. Notes: the card and the day's message. No packets and no copies of rulings.
+
+B. In your Stop B message (R1's run plan, about 1 December), one screen:
+1. Each piece still on your lane (U4k, U6d, U6e) with its estimate and its likely size at the growth the last four showed (about 3.3 times by my Advisor's count), and whether R2, R3, R5 and the close of 18 December hold.
+2. What each of these would save in lines and days. I have decided none of them: (a) R5 moves to Slice 6 with its marks, reported as MOVED and never as PASS; (b) one reviewer per piece, and security only on parts that face the internet during a run; (c) a stop line per piece at twice its re-plan estimate, in place of 6,000 lines.
+3. Your own lean on each, one line.
+
+Reply now in at most 5 lines: what in part A you cannot do, and why. Then carry on with R1's path.
+```
+- **Read as** (the main session's reading, not his words): item 3 holds U6c's round 2 (three new reviewers) to the
+  next usage reset, 17:50 UTC by the session's limit clock. Item 5 leaves his own words here, word for word, and
+  nothing else. Item 2 moves NPT-L2-ONEWAY's build (the judge's one-way comparison on the real network) to the Judge
+  builder. U6c's held-back stamp tests (C-U6-8 with TE2-TE4) stay on this lane after R1, unless he says otherwise. The
+  check-in trigger is changed to every 4 hours, with its stored prompt to match.
