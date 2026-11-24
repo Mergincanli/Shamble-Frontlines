@@ -3,3 +3,4 @@
 //! module. Nothing here is part of what players get.
 
 pub mod rules;
+pub mod wasm;

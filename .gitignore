@@ -13,5 +13,6 @@ CLAUDE.local.md
 /target/
 test-results/
 packages/sim-worker/pkg/
+packages/sim-worker/pkg-rules/
 packages/e2e/playwright-report/
 __pycache__/

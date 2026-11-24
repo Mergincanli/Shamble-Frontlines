@@ -15,6 +15,7 @@ import {
   refusedBuildSettings,
   sizeTable,
   tooLarge,
+  wasmProblems,
   workerEntryChunk,
 } from "./build-checks.mjs";
 
@@ -239,6 +240,32 @@ test("the Worker's chunk is the one entry chunk the build made from the Worker's
   expect(() => workerEntryChunk([{ ...entry, facadeModuleId: null }], source)).toThrow("made 0 entry chunks");
   expect(() => workerEntryChunk([{ ...entry, facadeModuleId: "/repo/packages/client/src/app/worker-link.ts" }], source)).toThrow("made 0 entry chunks");
   expect(() => workerEntryChunk([entry, { ...entry, fileName: "assets/worker-def.js" }], source)).toThrow("made 2 entry chunks");
+});
+
+test("a built page holds the players' WebAssembly and no other", () => {
+  const players = Buffer.from([0x00, 0x61, 0x73, 0x6d, 1, 0, 0, 0, 7]);
+  const other = Buffer.from([0x00, 0x61, 0x73, 0x6d, 1, 0, 0, 0, 8]);
+  const page = [{ name: "index.html", bytes: Buffer.from("<!doctype html>") }, { name: "assets/index-abc.js", bytes: Buffer.from("boot()") }];
+  const own = { name: "assets/sim_wasm_bg-abc.wasm", bytes: players };
+  expect(wasmProblems([...page, own], players)).toEqual([]);
+  // A second copy of the players' own file is the same file; a Uint8Array is compared as a Buffer is.
+  expect(wasmProblems([...page, own, { name: "assets/copy.wasm", bytes: new Uint8Array(players) }], new Uint8Array(players))).toEqual([]);
+  // The test-only module beside it, whatever it is called: by its name's ending, or by its first bytes alone.
+  expect(wasmProblems([...page, own, { name: "assets/devtools_bg.wasm", bytes: other }], players)).toEqual([
+    "assets/devtools_bg.wasm: a WebAssembly file that is not the players' own",
+  ]);
+  expect(wasmProblems([...page, own, { name: "assets/data.bin", bytes: other }], players)).toEqual([
+    "assets/data.bin: a WebAssembly file that is not the players' own",
+  ]);
+  expect(wasmProblems([...page, own, { name: "empty.wasm", bytes: Buffer.alloc(0) }], players)).toEqual([
+    "empty.wasm: a WebAssembly file that is not the players' own",
+  ]);
+  // Another file in the players' place, and no WebAssembly at all, are both refused.
+  expect(wasmProblems([...page, { ...own, bytes: other }], players)).toEqual([
+    "assets/sim_wasm_bg-abc.wasm: a WebAssembly file that is not the players' own",
+    "no file is the players' WebAssembly: the Worker would have nothing to load",
+  ]);
+  expect(wasmProblems(page, players)).toEqual(["no file is the players' WebAssembly: the Worker would have nothing to load"]);
 });
 
 test("the Wasm build refuses cargo's and the tool's settings from the environment, and lets the build folder and CI's names through", () => {

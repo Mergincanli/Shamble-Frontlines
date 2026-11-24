@@ -8,13 +8,18 @@
 // the page is the development flavour: it has the readout and the copy report, and the zip's small server is
 // copied beside it. Every command runs as a list of arguments, never through a shell.
 //
+// Every build but a --production one also makes the test-only WebAssembly module (crates/devtools, in its release
+// and its dev profile) into packages/sim-worker/pkg-rules/, where the rule tests load it (boundary/rules.test.mjs,
+// the e2e rules spec). It is built in a cargo call and a target folder of its own, nothing of the page or the
+// Worker imports it, and a built page that held it would be refused (build-checks.mjs, wasmProblems).
+//
 // The wasm-bindgen tool is a ready-built program from the internet. Before it is run at all, `--version` included,
 // its file must be the one wasm-bindgen-tool.mjs records (a plain file of that size and sha256), and its version
 // must equal the wasm-bindgen library in Cargo.lock (PM-0002-18). The path that was checked is the path that is
 // run: the tool is never looked up by name.
 
 import { execFileSync } from "node:child_process";
-import { copyFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as viteBuild } from "vite";
@@ -29,6 +34,7 @@ import {
   refusedBuildSettings,
   sizeTable,
   tooLarge,
+  wasmProblems,
   workerEntryChunk,
 } from "./build-checks.mjs";
 import { WASM_BINDGEN_TOOL } from "./wasm-bindgen-tool.mjs";
@@ -40,6 +46,9 @@ const pkgDir = path.join(root, "packages/sim-worker/pkg");
 const workerSource = path.join(root, "packages/sim-worker/src/worker.ts");
 const targetDir = path.join(root, "target");
 const wasmFile = path.join(targetDir, "wasm32-unknown-unknown/release/sim_wasm.wasm");
+/** The test-only module: its bindings' folder, and a target folder that is never the players' Wasm's. */
+const rulesDir = path.join(root, "packages/sim-worker/pkg-rules");
+const rulesTargetDir = path.join(root, ".gate/target-rules");
 /** The tool's absolute path, after its file was compared with the recorded values. */
 function checkedTool() {
   const tool = process.env["SHAMBLE_WASM_BINDGEN"];
@@ -48,6 +57,33 @@ function checkedTool() {
   }
   checkCliFile(tool, WASM_BINDGEN_TOOL.program.sha256, WASM_BINDGEN_TOOL.program.bytes);
   return tool;
+}
+
+/** Stops the build when the environment holds a setting of cargo's or the tool's (build-checks.mjs names them). */
+function refuseSettings() {
+  const overrides = refusedBuildSettings(process.env);
+  if (overrides.length > 0) throw new Error(`build settings from the environment are refused: unset ${overrides.join(", ")}`);
+}
+
+/**
+ * Builds the test-only module in both profiles and writes each one's bindings into its own folder under
+ * packages/sim-worker/pkg-rules/. The same refusals and the same checked tool as the players' Wasm; its own cargo
+ * call and target folder, so nothing it compiles can stand where the players' Wasm is read from.
+ */
+export function buildRulesModule() {
+  for (const [profile, flags, folder] of [["release", ["--release"], "release"], ["dev", [], "debug"]]) {
+    refuseSettings();
+    execFileSync(
+      "cargo",
+      ["build", "--locked", ...flags, "--target", "wasm32-unknown-unknown", "-p", "devtools", "--lib", "--target-dir", rulesTargetDir],
+      { cwd: root, stdio: "inherit" },
+    );
+    const outDir = path.join(rulesDir, profile);
+    rmSync(outDir, { recursive: true, force: true });
+    mkdirSync(outDir, { recursive: true });
+    const built = path.join(rulesTargetDir, "wasm32-unknown-unknown", folder, "devtools.wasm");
+    execFileSync(checkedTool(), ["--target", "web", "--out-dir", outDir, built], { cwd: root, stdio: "inherit" });
+  }
 }
 
 /** Builds the Wasm and writes its bindings. Returns the size table of what the Worker loads. */
@@ -59,8 +95,7 @@ export function buildWasm() {
   checkCli(execFileSync(checkedTool(), ["--version"], { encoding: "utf8" }), locked);
   // The Wasm players get is built with no setting from the environment (the overflow checks, the optimisation level,
   // the target's features), and into this repository's own target folder, which is where it is read from below.
-  const overrides = refusedBuildSettings(process.env);
-  if (overrides.length > 0) throw new Error(`build settings from the environment are refused: unset ${overrides.join(", ")}`);
+  refuseSettings();
   execFileSync(
     "cargo",
     ["build", "--locked", "--release", "--target", "wasm32-unknown-unknown", "-p", "sim-wasm", "--target-dir", targetDir],
@@ -131,6 +166,7 @@ export async function buildPage({ production, outDir }) {
     ...tooLarge(rows).map((row) => `${row.name}: a served file reaches 25 MiB`),
     ...cspProblems(files),
     ...bundleProblems(files, production, workerEntry),
+    ...wasmProblems(files, readFileSync(path.join(pkgDir, "sim_wasm_bg.wasm"))),
   ];
   if (problems.length > 0) throw new Error(`the built page is refused:\n  ${problems.join("\n  ")}`);
   return rows;
@@ -144,8 +180,12 @@ async function main() {
   if (unknown.length > 0 || (at !== -1 && args[at + 1] === undefined)) throw new Error(`unknown or unfinished option: ${args.join(" ")}`);
   checkOutDir(outDir, path.join(clientDir, "dist"));
   console.log(formatSizeTable(buildWasm()));
-  if (args.includes("--wasm-only")) return;
   const production = args.includes("--production");
+  if (!production) {
+    buildRulesModule();
+    console.log(`\nthe test-only module (never shipped) in ${path.relative(root, rulesDir)}: release and dev`);
+  }
+  if (args.includes("--wasm-only")) return;
   console.log(`\n${production ? "production" : "development"} page in ${path.relative(root, outDir)}:`);
   console.log(formatSizeTable(await buildPage({ production, outDir })));
 }

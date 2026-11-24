@@ -178,6 +178,24 @@ export function bundleProblems(files, production, workerEntry) {
 }
 
 /**
+ * The only WebAssembly a built page may hold is the players' own. One line for every file among `files` that is a
+ * WebAssembly module (by its name's ending or by its first four bytes) and is not byte for byte `playersWasm`, the
+ * file the Worker's bindings were just written for; and one line when there is none at all. The test-only module
+ * is built beside the players' Wasm: this keeps it, and anything else, out of what a server hands out.
+ * @param {{ name: string, bytes: Uint8Array }[]} files
+ * @param {Uint8Array} playersWasm
+ */
+export function wasmProblems(files, playersWasm) {
+  const magic = Buffer.from([0x00, 0x61, 0x73, 0x6d]);
+  const modules = files.filter(({ name, bytes }) => name.endsWith(".wasm") || Buffer.from(bytes.subarray(0, 4)).equals(magic));
+  const others = modules.filter(({ bytes }) => !Buffer.from(bytes).equals(Buffer.from(playersWasm)));
+  return [
+    ...others.map(({ name }) => `${name}: a WebAssembly file that is not the players' own`),
+    ...(modules.length === others.length ? ["no file is the players' WebAssembly: the Worker would have nothing to load"] : []),
+  ];
+}
+
+/**
  * Refuses an output folder the build must not empty. Vite clears the folder it builds into, so the folder is either
  * the page's own `dist` or one whose name starts with `dist-`: a mistyped `--out-dir` cannot wipe sources or notes.
  */

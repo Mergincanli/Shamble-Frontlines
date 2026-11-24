@@ -1,7 +1,9 @@
 // The boundary tests: the built Wasm and its glue, loaded in Node (ADR 0002 part 8). They need the build
-// (`node packages/client/scripts/build.mjs --wasm-only`), so the package's `test` script, which CI runs, leaves this
-// folder out. Plain JavaScript on purpose: they read the Wasm with Node's own module, and Node's types are not a
-// dependency, so a TypeScript file here would never be type-checked.
+// (`node packages/client/scripts/build.mjs --wasm-only`, which makes the players' Wasm and, for rules.test.mjs
+// beside this file, the test-only module; a `--production` build makes the players' Wasm alone), so the package's
+// `test` script leaves this folder out and CI runs it after its builds. Plain JavaScript on purpose: they read the
+// Wasm with Node's own module, and Node's types are not a dependency, so a TypeScript file here would never be
+// type-checked.
 import { readFileSync } from "node:fs";
 import { checkLayoutHash, LAYOUT_HASH } from "@shamble/types";
 import { beforeAll, expect, test } from "vitest";
