@@ -2,7 +2,7 @@
 //! slopes, arithmetic against a formula). Every name `marks.json` uses must be listed here; one that is listed but
 //! not built yet says which unit builds it, and its check comes out NOT-RUN rather than guessed.
 
-use crate::eval::{Missing, Run, every_run_rules, stat_of};
+use crate::eval::{Missing, Run, always_rules, every_run_rules, measured_work, stat_of};
 use crate::marks::Stat;
 use crate::ratio::Ratio;
 use npt_log::{Log, Phase, SecondRecord};
@@ -1470,6 +1470,138 @@ fn egress_vs_r2_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
     }
 }
 
+/// PM-0001-59: how long after the room's tick panic (`event.tick_panic.server_ns`, the room log) the slowest client
+/// had its RoomEnded or its close (`event.room_end.server_est_ns`, field `slot`, LG's bots logs: on its estimate of
+/// the server's clock), over every client of the run. A client with no `room_end` was left open: the figure fails
+/// with no number. Gaps: either event in another process's log, no room or bots log, not exactly one panic with a
+/// whole-number time, a `room_end` without its slot or time, one for a slot the run does not have, two for one slot.
+fn crash_close_max_ns(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let run = i.run;
+    only_from(run, "room", "event", "tick_panic")?;
+    only_from(run, "bots", "event", "room_end")?;
+    let room = room_log(run)?;
+    let gap = |why: String| Err(Lack::Gap(format!("run {}: {why}", run.id)));
+    let panics = room.events.iter().filter(|e| e.ev == "tick_panic");
+    let panics: Vec<Option<i64>> = panics
+        .map(|e| e.f.get("server_ns").and_then(Value::as_i64))
+        .collect();
+    let [Some(panic)] = panics[..] else {
+        return gap(format!(
+            "{} event.tick_panic records in the room log, not one with a whole-number server_ns",
+            panics.len()
+        ));
+    };
+    let clients = u64::from(room.header.clients);
+    let mut closes: BTreeMap<u64, i64> = BTreeMap::new();
+    let logs = logs_of(run, "bots")?;
+    for e in logs
+        .iter()
+        .flat_map(|l| &l.events)
+        .filter(|e| e.ev == "room_end")
+    {
+        let slot = e.f.get("slot").and_then(Value::as_u64);
+        let at = e.f.get("server_est_ns").and_then(Value::as_i64);
+        let (Some(slot), Some(at)) = (slot, at) else {
+            return gap(
+                "an event.room_end record has no slot or no whole-number server_est_ns".to_owned(),
+            );
+        };
+        if slot >= clients {
+            return gap(format!(
+                "an event.room_end record names slot {slot}; the run has {clients} clients"
+            ));
+        }
+        if closes.insert(slot, at).is_some() {
+            return gap(format!("two event.room_end records for slot {slot}"));
+        }
+    }
+    let open: Vec<u64> = (0..clients).filter(|s| !closes.contains_key(s)).collect();
+    match (open.first(), closes.values().max()) {
+        (Some(slot), _) => Err(Lack::Fail(format!(
+            "run {}: slot {slot} has no event.room_end: {} of {clients} clients left open after the tick panic",
+            run.id,
+            open.len()
+        ))),
+        (None, Some(last)) => Ok(Ratio::int(i128::from(*last) - i128::from(panic))),
+        (None, None) => gap("a run of 0 clients has no close to time".to_owned()),
+    }
+}
+
+/// PM-0006-19's row pools "the 3 'on' runs" against "the 3 'off' runs".
+const LOGGING_OFF_RUNS: usize = 3;
+
+/// PM-0006-19: the p99 of the tick's work pooled over the logging-on runs, against the same pooled over the set's
+/// logging-off runs (the measured ticks' `tick.v.work_ns`, nearest rank). The on runs are the valid runs, in this
+/// run's set, of the part this run is in, so each of them reads the same value; a run in no part (a bite run) is
+/// pooled alone. NOT-RUN while the part's `min` on runs or the 3 off runs are not all there. Gaps: more than 3 off
+/// runs, an off run that breaks a rule every run holds, a run with no measured `work_ns`, a pooled off p99 of 0.
+fn logging_cost_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let run = i.run;
+    let here = |r: &Run<'_>| r.set == run.set;
+    let mut parts = i.parts.values();
+    let part = parts.find(|(_, runs)| runs.iter().any(|r| here(r) && r.id == run.id));
+    let on: Vec<&Run<'_>> = match part {
+        None => vec![run],
+        Some((min, runs)) => {
+            let on: Vec<&Run<'_>> = runs.iter().copied().filter(|r| here(r)).collect();
+            if on.len() < *min {
+                return Err(Lack::Waiting(format!(
+                    "run {}: {} of the {min} valid logging-on runs its part needs are in set {}",
+                    run.id,
+                    on.len(),
+                    run.set
+                )));
+            }
+            on
+        }
+    };
+    let off: Vec<&Run<'_>> = i
+        .set
+        .iter()
+        .copied()
+        .filter(|r| r.role == "logging-off")
+        .collect();
+    if off.len() < LOGGING_OFF_RUNS {
+        return Err(Lack::Waiting(format!(
+            "run {}: {} of the {LOGGING_OFF_RUNS} logging-off runs are in set {}",
+            run.id,
+            off.len(),
+            run.set
+        )));
+    }
+    let gap = |why: String| Err(Lack::Gap(format!("run {}: {why}", run.id)));
+    if off.len() > LOGGING_OFF_RUNS {
+        return gap(format!(
+            "{} logging-off runs in set {}, not {LOGGING_OFF_RUNS}",
+            off.len(),
+            run.set
+        ));
+    }
+    if let Some((r, why)) = off
+        .iter()
+        .map(|r| (r, always_rules(r)))
+        .find(|(_, why)| !why.is_empty())
+    {
+        return gap(format!(
+            "logging-off run {} is invalid: {}",
+            r.id,
+            why.join("; ")
+        ));
+    }
+    let pooled_p99 = |runs: &[&Run<'_>]| -> Result<Ratio, Lack> {
+        let mut pooled = Vec::new();
+        for r in runs {
+            pooled.extend(measured_work(r).map_err(Lack::Gap)?);
+        }
+        Ok(stat_of(&Stat::Pct(Ratio::new(99, 100)), None, &pooled))
+    };
+    let (on, off) = (pooled_p99(&on)?, pooled_p99(&off)?);
+    match off.num() {
+        0 => gap("the logging-off runs' pooled p99 is 0".to_owned()),
+        _ => Ok(on * Ratio::new(off.den(), off.num())),
+    }
+}
+
 /// A figure's computation over its [`Inputs`].
 pub type Compute = fn(&Inputs<'_, '_>) -> Result<Ratio, Lack>;
 
@@ -1663,9 +1795,9 @@ pub const FIGURES: &[Figure] = &[
         one_shot_dropped_count,
         "one-shot actions sent minus received (-38)",
     ),
-    planned(
+    built(
         "crash_close_max_ns",
-        "U6",
+        crash_close_max_ns,
         "each client's RoomEnded or close after the tick panic, the slowest (-59)",
     ),
     built(
@@ -1690,9 +1822,9 @@ pub const FIGURES: &[Figure] = &[
         egress_vs_r2_ratio,
         "interface bytes against R2's formula (PM-0006-17)",
     ),
-    planned(
+    built(
         "logging_cost_ratio",
-        "U6",
+        logging_cost_ratio,
         "the pooled p99 with logging on against off (PM-0006-19)",
     ),
     Figure {

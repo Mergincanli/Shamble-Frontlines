@@ -263,6 +263,12 @@ fn collect_some(
     }
 }
 
+/// A run's `tick.v.work_ns` over its measured ticks (PM-0006-19's rule and figure pool them): a gap if it has none.
+pub(crate) fn measured_work(run: &Run<'_>) -> Result<Vec<i64>, String> {
+    let work = Source::TickV("work_ns".to_owned());
+    collect_some(run, &work, Window::Measured, &BTreeMap::new())
+}
+
 /// The 1-based nearest rank of quantile `q` among `n` values: ⌈q × n⌉ (plan §6.1).
 pub fn nearest_rank(n: usize, q: Ratio) -> usize {
     let n = n as i128;
@@ -949,12 +955,17 @@ fn rule(
             let mut pooled = Vec::new();
             let mut each = Vec::new();
             for r in &off {
-                match collect_some(
-                    r,
-                    &Source::TickV("work_ns".to_owned()),
-                    Window::Measured,
-                    &BTreeMap::new(),
-                ) {
+                // An "off" run holds the rules every run holds, as any run another is compared with.
+                let broken = always_rules(r);
+                if !broken.is_empty() {
+                    why.push(format!(
+                        "PM-0006-19: logging-off run {} is invalid: {}",
+                        r.id,
+                        broken.join("; ")
+                    ));
+                    return;
+                }
+                match measured_work(r) {
                     Ok(v) => {
                         each.push((r.id, stat_of(&p99, None, &v)));
                         pooled.extend(v);

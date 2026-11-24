@@ -4365,3 +4365,241 @@ fn u6j_the_formulas_and_the_counters_gaps() {
     let why = "run f1: event.iface in the bots log on LG1: only process room writes it";
     assert_eq!((line.as_str(), note.as_str()), ("Gap -", why));
 }
+
+/// Run f1 with 3 clients: the room's tick panic at 1,000 ns on its clock, and LG's bots log with each listed
+/// (slot, server-clock estimate) as a `room_end`.
+fn crash_run(closes: &[(u64, i64)]) -> Vec<Log> {
+    let mut room = seconds_log("room", "RS", vec![]);
+    room.header.clients = 3;
+    room.events = vec![EventRecord::new("tick_panic", After).with("server_ns", 1_000)];
+    let mut bots = seconds_log("bots", "LG", vec![]);
+    bots.header.clients = 3;
+    let close = |(slot, at): &(u64, i64)| {
+        EventRecord::new("room_end", After)
+            .with("slot", *slot)
+            .with("server_est_ns", *at)
+    };
+    bots.events = closes.iter().map(close).collect();
+    vec![room, bots]
+}
+
+#[test]
+fn u6j_every_client_is_closed_within_a_second_of_the_tick_panic() {
+    let second = 1_000_000_000;
+    let closed = |logs: &[Log]| figure_check("crash_close_max_ns", "<=", json!(second), logs);
+    // The slowest of the three decides; a close the client's clock puts before the panic counts as it is.
+    assert_eq!(
+        closed(&crash_run(&[(0, 900), (1, 1_000 + second), (2, 5_000)])).0,
+        "Pass 1000000000"
+    );
+    assert_eq!(
+        closed(&crash_run(&[(0, 900), (1, 1_001 + second), (2, 5_000)])).0,
+        "Fail 1000000001"
+    );
+    assert_eq!(
+        closed(&crash_run(&[(0, 900), (1, 400), (2, 100)])).0,
+        "Pass -100"
+    );
+    // A client with no room_end was left open: the check fails with no number, and the reason is the line.
+    let open = crash_run(&[(0, 900), (2, 5_000)]);
+    let why = "run f1: slot 1 has no event.room_end: 1 of 3 clients left open after the tick panic";
+    assert_eq!(closed(&open), ("Fail -".to_owned(), why.to_owned()));
+    let mark = json!({
+        "id": M, "title": "crash", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "P", "select": {"layer": "L2"}, "min": 1}],
+        "checks": [{"name": "closed", "figure": "crash_close_max_ns", "op": "<=", "value": second}],
+        "bites": []
+    });
+    let (kind, lines) = verdict_of(&[mark], &open);
+    assert_eq!(kind, VerdictKind::Fail);
+    assert_eq!(
+        lines,
+        [format!("P: run f1: closed: {why} (needs <= 1000000000)")]
+    );
+    // Gaps: two panics, a panic with no time, a room_end twice for a slot, for a slot the run lacks, with no slot,
+    // with no time; either event in another process's log; no bots log.
+    let full = || crash_run(&[(0, 900), (1, 950), (2, 5_000)]);
+    // Copies event `from.1` of log `from.0` to the end of log `to`.
+    let copy = |l: &mut Vec<Log>, from: (usize, usize), to: usize| {
+        let event = l[from.0].events[from.1].clone();
+        l[to].events.push(event);
+    };
+    let gap = |edit: &dyn Fn(&mut Vec<Log>)| {
+        let mut logs = full();
+        edit(&mut logs);
+        let (line, note) = closed(&logs);
+        assert_eq!(line, "Gap -", "{note}");
+        note
+    };
+    let why = gap(&|l| copy(l, (0, 0), 0));
+    assert_eq!(
+        why,
+        "run f1: 2 event.tick_panic records in the room log, not one with a whole-number server_ns"
+    );
+    let why = gap(&|l| drop(l[0].events[0].f.remove("server_ns")));
+    assert_eq!(
+        why,
+        "run f1: 1 event.tick_panic records in the room log, not one with a whole-number server_ns"
+    );
+    let why = gap(&|l| copy(l, (1, 2), 1));
+    assert_eq!(why, "run f1: two event.room_end records for slot 2");
+    let why = gap(&|l| drop(l[1].events[2].f.insert("slot".into(), json!(3))));
+    assert_eq!(
+        why,
+        "run f1: an event.room_end record names slot 3; the run has 3 clients"
+    );
+    let why = gap(&|l| drop(l[1].events[1].f.remove("slot")));
+    assert_eq!(
+        why,
+        "run f1: an event.room_end record has no slot or no whole-number server_est_ns"
+    );
+    assert_eq!(
+        gap(&|l| drop(l[1].events[1].f.remove("server_est_ns"))),
+        why
+    );
+    let why = gap(&|l| copy(l, (1, 0), 0));
+    assert_eq!(
+        why,
+        "run f1: event.room_end in the room log on RS1: only process bots writes it"
+    );
+    let why = gap(&|l| copy(l, (0, 0), 1));
+    assert_eq!(
+        why,
+        "run f1: event.tick_panic in the bots log on LG1: only process room writes it"
+    );
+    assert_eq!(gap(&|l| drop(l.pop())), "run f1: no bots log");
+}
+
+/// A mark like PM-0006-19: three logging-on runs, the pooled ratio, its own validity rule and the busy-wait bite.
+fn logging_mark() -> Value {
+    json!({
+        "id": "PM-0006-19", "title": "logging cost", "verdict": "pass",
+        "draft": {"file": "docs/adr/0006-infrastructure-operations.md", "row_sha256": "0".repeat(64)},
+        "parts": [{"name": "on", "select": {"params.suite": "logging-cost"}, "min": 3}],
+        "validity": ["PM-0006-19"],
+        "checks": [{"name": "cost", "figure": "logging_cost_ratio", "op": "<=", "value": "1.02"}],
+        "bites": [{"id": "PM-0006-19/busy-50us", "what": "a 50 us busy-wait in the log call"}]
+    })
+}
+
+/// One run of that mark in set-l: role `measured` (logging on), `logging-off`, or `bite` (the busy-wait bite).
+fn logging_run(id: &'static str, role: &'static str, work: &[i64]) -> Log {
+    let mut s = LogSpec::room(id, "set-l", "PM-0006-19").ticks("work_ns", work);
+    s.role = role;
+    s.params.push(("suite", json!("logging-cost")));
+    s.bite = (role == "bite").then_some("PM-0006-19/busy-50us");
+    s.build()
+}
+
+/// Three on runs with the given slowest ticks, three off runs at 100 ns, and the bite run at 150 ns.
+fn logging_runs(on: [i64; 3]) -> Vec<Log> {
+    let ids = [["on-1", "on-2", "on-3"], ["off-1", "off-2", "off-3"]];
+    let mut logs: Vec<Log> = (0..3)
+        .map(|k| logging_run(ids[0][k], "measured", &[90, on[k]]))
+        .collect();
+    logs.extend(ids[1].map(|id| logging_run(id, "logging-off", &[100, 100])));
+    logs.push(logging_run("busy", "bite", &[150, 150]));
+    logs
+}
+
+/// The on runs' check under `logging_mark`, each as "Outcome value".
+fn logging_checks(v: &npt_judge::Verdict) -> Vec<String> {
+    let line = |c: &npt_judge::eval::CheckOut| {
+        format!("{:?} {}", c.outcome, c.value.as_deref().unwrap_or("-"))
+    };
+    v.parts[0]
+        .runs
+        .iter()
+        .map(|r| r.checks.first().map_or("none".to_owned(), line))
+        .collect()
+}
+
+#[test]
+fn u6j_the_logging_cost_pools_the_on_runs_against_the_off_runs() {
+    let judged = |logs: &[Log]| judge(&marks_file(&[logging_mark()]), logs).remove(0);
+    // Pooled p99 102 against 100: every on run reads the same 1.02. The bite run alone is 1.5: shown.
+    let v = judged(&logging_runs([102, 101, 100]));
+    assert_eq!(v.verdict, VerdictKind::Pass, "{:?}", v.why);
+    assert_eq!(logging_checks(&v), ["Pass 1.02"; 3]);
+    assert_eq!(v.bites[0].status, BiteStatus::Shown, "{:?}", v.bites[0]);
+    // One slow run: the mean of the three runs' own p99s is 102, the pooled p99 is 106, and all three fail.
+    let v = judged(&logging_runs([100, 100, 106]));
+    assert_eq!(v.verdict, VerdictKind::Fail, "{:?}", v.why);
+    assert_eq!(logging_checks(&v), ["Fail 1.06"; 3]);
+    assert_eq!(
+        logging_checks(&judged(&logging_runs([103, 100, 100]))),
+        ["Fail 1.03"; 3]
+    );
+    // Two off runs: not all there yet. Four: which three?
+    let mut logs = logging_runs([102, 101, 100]);
+    logs.remove(5);
+    let v = judged(&logs);
+    assert_eq!(v.verdict, VerdictKind::NotRun, "{:?}", v.why);
+    assert!(
+        says(
+            &v.why,
+            "run on-1: 2 of the 3 logging-off runs are in set set-l"
+        ),
+        "{:?}",
+        v.why
+    );
+    let mut logs = logging_runs([102, 101, 100]);
+    logs.push(logging_run("off-4", "logging-off", &[100, 100]));
+    let v = judged(&logs);
+    assert_eq!(v.verdict, VerdictKind::Invalid, "{:?}", v.why);
+    assert!(
+        says(&v.why, "run on-1: 4 logging-off runs in set set-l, not 3"),
+        "{:?}",
+        v.why
+    );
+    // Two valid on runs (the third's log is cut): the part's three are not all there, and nothing fails early.
+    let mut logs = logging_runs([100, 100, 106]);
+    let mut cut = LogSpec::room("on-3", "set-l", "PM-0006-19").ticks("work_ns", &[90, 106]);
+    cut.params.push(("suite", json!("logging-cost")));
+    cut.footer = false;
+    logs[2] = cut.build();
+    let v = judged(&logs);
+    assert_eq!(logging_checks(&v)[..2], ["Cannot -"; 2], "{:?}", v.why);
+    let note = v.parts[0].runs[0].checks[0]
+        .note
+        .clone()
+        .unwrap_or_default();
+    assert_eq!(
+        note,
+        "run on-1: 2 of the 3 valid logging-on runs its part needs are in set set-l"
+    );
+}
+
+/// PM-0006-19's rule and its figure both refuse a logging-off run that breaks a rule every run holds (the plan
+/// review's condition 9: the rule skipped them before).
+#[test]
+fn u6j_a_logging_off_run_holds_the_rules_every_run_holds() {
+    let mut logs = logging_runs([102, 101, 100]);
+    let mut cut = LogSpec::room("off-2", "set-l", "PM-0006-19").ticks("work_ns", &[100, 100]);
+    (cut.role, cut.footer) = ("logging-off", false);
+    logs[4] = cut.build();
+    let v = judge(&marks_file(&[logging_mark()]), &logs).remove(0);
+    assert_eq!(v.verdict, VerdictKind::Invalid, "{:?}", v.why);
+    let rule = "PM-0006-19: logging-off run off-2 is invalid: complete: ";
+    assert!(
+        v.parts[0]
+            .runs
+            .iter()
+            .all(|r| !r.valid && says(&r.invalid_why, rule)),
+        "{:?}",
+        v.parts[0].runs
+    );
+    // The figure alone (no validity rule on the mark) says the same, as a gap.
+    let mut mark = logging_mark();
+    mark["validity"] = json!([]);
+    let v = judge(&marks_file(&[mark]), &logs).remove(0);
+    let note = v.parts[0].runs[0].checks[0]
+        .note
+        .clone()
+        .unwrap_or_default();
+    assert!(
+        note.starts_with("run on-1: logging-off run off-2 is invalid: complete: "),
+        "{note}"
+    );
+    assert_eq!(logging_checks(&v), ["Gap -"; 3]);
+}
