@@ -71,6 +71,16 @@
   and duplication, which the proof test's simulator lacks). Those line numbers were checked there on main f5030a3:
   read them again on today's main.
 
+- **2026-11-24, 23:24:50 UTC** (`cs3b-loop-closes/mustafa-2026-11-24T232450-after-the-compact.md`, by script:
+  1,043 bytes, sha256 4da9ba90...6f73; he dates it 25 November; into DECISIONS with 3b's docs pass): the compact is
+  done; rebuild from the repository; **the build plan's third sentence (its risk 8): (a)**, "Change it with the
+  other two in 3b's docs pass, and show me all three old and new sentences in your report."; at most 6 lines on
+  where things stand and what is built first; "If the card, the repo and the summary disagree, or something is
+  missing, say what and stop. Otherwise build change-set 3b by the plan under your advisor agent's eight
+  conditions, without waiting for me."; past 4,900 lines "tell me in three lines before a part moves"; "Time the
+  browser tests before the first push, as you said."; "A short block for the agent board may follow from me.
+  Install nothing for it on your own."
+
 ## Standing rules (from his words and the repository's rules; when in doubt read DECISIONS and CLAUDE.md)
 - **Process:** the plan is approved (the advisor agent, 2026-11-19: `cs3b-loop-closes/advisor-cs3-plan.md`). Build
   in the main session; at most 3 agents at a time, each with its notes in this folder, none commits, the shared
@@ -205,11 +215,14 @@
    the netcode branch it read only the lines he named.
 
 ## Current step
-**Waiting for his compact of this chat** (23:12 UTC): the advisor agent's read is in (step 2), the message of at
-most 6 lines is sent with it. Nothing of 3b is built yet. After the compact: "Next steps" 1.
+**Building 3b: the manifest batch first** (C5). Rebuilt after his compact (2026-11-24, 23:25 UTC, from the clock):
+the card, the repository and the summary agree (HEAD = origin's branch = 8e3c0a75 before this save; main 28254a73
+with gate, smoke and toolchain success; the tree clean; the lane-requests issue #59 has nothing newer than
+2026-11-18; the session record: model `claude-fable-5-2` configured and last served, mode `auto`, context 106,693
+of 1,000,000 tokens, about 11 %). His answer on the third sentence is (a). Nothing of 3b is built yet.
 
 ## Next steps
-1. After his compact (if he does it): read CLAUDE.md, this card, the plan's sections 0, 3, 5, 8, 9, 12 and 13, his
+1. (Reading done after his compact; the build order stands:) read CLAUDE.md, this card, the plan's sections 0, 3, 5, 8, 9, 12 and 13, his
    two messages of 22:44:50 and 22:59:49 UTC, `advisor-cs3b-start.md`; read the session's model and mode; tell him
    where things stand; then build 3b by the plan's section 5 under C1 to C8, in this order: (i) the manifest batch
    under the dependency hold (C5); (ii) the plan's steps 1 to 6, with the decoder test at its row's count (C1,
