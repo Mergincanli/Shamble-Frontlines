@@ -1489,6 +1489,19 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    privacy sweep, the checks on 78c2d9a, the advisor agent's file, the picture's route; his message's two decisions and
    the 2 December probe question.
 
+28. 2026-11-24 23:10:54 UTC (called; answer 23:12:51 UTC; transcript times), moment 4 (the verifier's verdict changes
+   the report's outcome; how to word the verdicts and the decisions) · Q: what goes into the verdict table and the
+   decisions? · Changed: the draft's own words read by this session for the table; the file-size mark judged by the
+   verifier from the new size lines (met with a recorded departure), not by this chat; two DECISIONS headers that stated
+   the chat's reading as his decision rewritten by script; step 4 and the build count as one entry (no count source
+   exists; open, or back to the draft with the header mark); the production one-off link's header back to the draft
+   (no ADR edit in this pull request; docs-keeper told); whether step 2.6 waits put to him with both texts (the plan's
+   Risk 13 sentence and his later order), recommended, not decided; one entry for the recorded departures (Brave late,
+   the hourly series in 24 slots, 1 pull-request branch plus 5 without, Safari in his words); plain words; the outcome
+   not "DONE"; the consultations line made true; both guard refusals; only the extra bite of ADR 0002's mark claimed;
+   the picture departure; the probe switch-off as a dated go before 2 December; who opens the pull request checked; the
+   gate run after npm ci; the assembler re-run after this record.
+
 ## Running work
 - saver b4au202dl (`watch preview-hosting-check`), started 2026-11-24 about 22:54 UTC, before the verifier.
 - agent verifier (its file: model opus, effort high): the evidence against ADR 0006's own words, spot-checks against
@@ -1512,7 +1525,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 - agent web-fetch (model opus, effort high): Cloudflare's docs on whether direct uploads count against the Free plan's
   500 builds a month, and where a count shows (PM-0006-7) · launched about 23:09 UTC, background. DONE: not found
   (results log, "After the verifier"). PM-0006-5's gap closed from the run logs: every build's size line read (results
-  log): the largest file 65,536 bytes, flagged none, the tombstone 96 bytes.
+  log): the largest file 65,536 bytes, flagged none, the tombstone 96 bytes. The verifier, sent the new lines (SendMessage, its
+  second hand-back after 23:13 UTC): **PM-0006-5 met with a recorded departure** (MACHINES (a)); it grepped all 13
+  folders itself; the spike still has not passed (-2 not met; -7 and -9 open).
+- Consultation 28's fixes: two of lane 2's DECISIONS headers rewritten by `decisions/fix_headers.py` (browsers: his words
+  quoted, "Safari leaves the check" moved to the chat's reading with his BROWSER-SET of 2026-11-19 keeping Safari a
+  target of v2; reviewer: "it stays on for Day 2" moved to the chat's plan), his quoted lines unchanged (asserted),
+  commit 07121e7. The draft's own words read by this session (ADR 0006 :1356-1362, :1370-1378, :1404-1418) for the
+  table. Who opens the pull request: his GH-TOOLS (a) and GH-NEXT (a) ("my main Advisor opens the draft") were given to
+  Builder V3 for #64 and change-set 3a; his go of 2026-11-15 covers this chat opening "at the end, the report's pull
+  request, which stops for my go": this chat opens it as a draft and tells him so.
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
   and on Zero Trust's first screen · launched 2026-11-19 about 14:15 UTC (after the save 4396e0a's edits) · DONE; its
   answers in step 26.
