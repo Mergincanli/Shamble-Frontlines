@@ -30,12 +30,14 @@
 ## Steps done
 1. The worktree and the first push · e2c0e896 (the netcode head, unchanged) · done.
 
+2. The reading and part a's plan · `.checkpoints/netcode-judge/plan-a.md` · baseline: the judge's 85 tests pass at
+   the base (`cargo test -p npt-judge --locked`, 14 + 2 + 49 + 20).
+
 ## Current step
-Part a: reading the judge (`crates/judge/src/marks.rs`, `eval.rs`, `main.rs`, the tests) and the re-plan's mark table
-(replan-marks.md:7-99, its MOVED section :193-214, moved-block.md), then the plan.
+Part a: the advisor agent reviews plan-a.md (its five questions in section 5). No judge or marks edit before APPROVE.
 
 ## Next steps
-1. Write `.checkpoints/netcode-judge/plan-a.md`; the advisor agent's review of it.
+1. The advisor's verdict into plan-a.md's end (verdict and conditions, short); fix the plan if REVISE.
 2. Build part a in this worktree; the judge's tests, lints and check.mjs; the size count against 1,440.
 3. One review round (test-engineer, rust-reviewer), one fix pass, the final head's checks, the report with the commit id.
 
