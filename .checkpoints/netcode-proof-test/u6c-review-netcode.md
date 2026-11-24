@@ -60,11 +60,12 @@ has no Edit tool, so this file is rewritten whole with Write at each save. One r
 - N7 LOW (NC-U6C-6): NC-SB-2's "footer on every end": two exits after the header is written return with no footer: a
   client's connect error (load.rs:588-591) and probe_peer's bind error (load.rs:560-562).
 - N8 LOW (NC-U6C-7): pub with no consumer outside its crate: npt-net `samples`, `Samples`, `forms`, `Forms`, `excess`,
-  `nearest_rank` (net l2.rs export; used only inside npt-net and socket_tests); npt-server `leg_log` (server lib.rs
-  export; used only in probe_tests); npt-bots `now_ns`, `Hosted`, `HostState` (bots lib.rs:36-37; the bin uses only
-  `LoadSettings` and `run_load`). §4.7 keeps the rest of npt-net pub(crate) (plan.md:610-613). The brief listed most
-  of them, so this is a narrowing for the next change, not a defect. Beyond the brief's list, each with a consumer:
-  `send_down`, `Pacer` (its return), `Polled`, `ProbePeer`, `LegSeries`, `L2Config::b1`, `PROBE_LEGS`, `PEER_WAIT_NS`.
+  `nearest_rank` (net lib.rs:26-29, l2.rs:41-44; used only inside npt-net and socket_tests); npt-server `leg_log`
+  (server lib.rs:23; used only in probe_tests); npt-bots `now_ns`, `Hosted`, `HostState` (bots lib.rs:37; the bin uses
+  only `LoadSettings` and `run_load`). §4.7 keeps the rest of npt-net pub(crate) (plan.md §4.7, its npt-net entry).
+  The brief listed most of them, so this is a narrowing for the next change, not a defect. Beyond the brief's list,
+  each with a consumer: `send_down`, `Pacer` (its return), `Polled`, `ProbePeer`, `LegSeries`, `L2Config::b1`,
+  `PROBE_LEGS`, `PEER_WAIT_NS`.
 - N9 LOW (NC-U6C-8): new npt-log names with no SERIES.md row: LG's `probe_peer` event fields `probe_peer_sent_count`,
   `_send_err_count`, `_received_count`, `_recv_err_count`, `_refused_count`, `_echoed_count` (net probe.rs:577-584,
   load.rs:606-612) and LG's header params `room` and `mode` (load.rs:441-448). The section's text names the event
@@ -72,8 +73,8 @@ has no Edit tool, so this file is rewritten whole with Write at each save. One r
   probe_tests.rs:272-282). 27 name rows plus the header line.
 - N10 LOW (NC-U6C-9): LG's phase is Measured from READY (load.rs:665-669), so the first measured second holds only part
   of the last-joined client's second, and on the room's close the last record is a part second too (load.rs:661,
-  :689-692); V-S sums measured seconds × tick_hz within 1 % (eval.rs:744-777), so up to about 60 inputs a client go
-  missing: a fail for any V-S run under about 200 s. Not R1 (V-S is R2's and R3's: marks.json validity lists).
+  :689-692); V-S sums measured seconds × tick_hz within 1 % (judge eval.rs:744-777), so up to about 60 inputs a
+  client go missing: a fail for any V-S run under about 200 s. Not R1 (V-S is R2's and R3's: marks.json validity).
 - N11 LOW (NC-U6C-10): the glue passes no view (load.rs:159-161), so the brawl aims at its blind point
   (bots/src/lib.rs:1152-1166) on every network run; U8 hosts `brawl` everywhere (u8-build.patch:2186). The lab's L1
   hosts give it a view from a mirror (lab/src/scenario.rs:1672-1681). Harmless for R1's marks; R2's stress load and
@@ -83,7 +84,7 @@ has no Edit tool, so this file is rewritten whole with Write at each save. One r
   the plant cannot fail any test (plant-p8.log). `edge_events` taking `&ImpairSocket` (unused but borrowed) would make
   a read after `drop(sock)` fail to compile: a bite by type, no new pub item.
 - N13 LOW (NC-U6C-12), the merge's alignment line (C9, NC-R2-4): U8's probe_presence looks for P1's slack and policy
-  in the `leg_edge` events at both edges (u8-build.patch:2447, :2477-2478), while U6c writes them in the P1 header:
+  in the `leg_edge` events at both edges (u8-build.patch:2446, :2484-2485), while U6c writes them in the P1 header:
   `l2_timer_slack_ns` and `l2_sched_policy` (the end edge's header read) and `probe_start_timer_slack_ns` and
   `probe_start_sched_policy` (10 ms before the window: server probe.rs:509-517, :582-586). As built, every P1 would
   read INVALID; U8's reader must move to those four header names at U6c's merge. U6c's placement is plan.md:1256's
@@ -111,18 +112,18 @@ changed (the open High allows a second round under NPT-TRIM), would make this AP
 ## 4. Findings
 | Id | Severity | Finding | File:line under W | Smallest fix |
 |---|---|---|---|---|
-| NC-U6C-1 | High | Each direction's measured records are the fates whose t_in lies in a span of RS's clock, so the count is `packets` plus or minus the edge jitter and LG's clock-rate error; PM-0001-3's ten `>= 1000000` counts (up most of all, and B1's outside-burst counts) fail at random at R1; the e2e test accepts 1,800-2,100 for 2,000 | crates/server/src/probe.rs:447-450, :557-563; crates/net/src/l2/probe.rs:684-763 (:692, :733); crates/server/src/probe_tests.rs:313-319 | Define each direction's records by count, as L1 does: from the first fate at or after the window's start, in flow-index order, until `packets` fates lie outside the bursts (down: datagram index from warm / interval; up: the peer's flow), the tail already covers the extra sends; `probe_window_ns` per direction the span those records cover, for C-U8-4's rate. Cheaper alternative: a 10 ms margin on the window (100 datagrams: about 100 ppm of drift). Test: fixed fates with up spaced 100 µs × (1 + 5 × 10⁻⁶) and a late pacer at the end edge give at least `packets` a direction outside the burst; plant: the clock span back, which must fail it; the e2e bound becomes `>= packets` |
+| NC-U6C-1 | High | Each direction's measured records are the fates whose t_in lies in a span of RS's clock, so the count is `packets` plus or minus the edge jitter and LG's clock-rate error; PM-0001-3's ten `>= 1000000` counts (up most of all, and B1's outside-burst counts) fail at random at R1; the e2e test accepts 1,800-2,100 for 2,000 | crates/server/src/probe.rs:447-450, :557-563; crates/net/src/l2/probe.rs:684-763 (:692, :733); crates/server/src/probe_tests.rs:313-319 | Define each direction's records by count, as L1 does: from the first fate at or after the window's start, in flow-index order, until `packets` fates lie outside the bursts (down: datagram index from warm / interval; up: the peer's flow); the tail already covers the extra sends; `probe_window_ns` per direction the span those records cover, for C-U8-4's rate. Cheaper alternative: a 10 ms margin on the window (100 datagrams: about 100 ppm of drift). Test: fixed fates with up spaced 100 µs × (1 + 5 × 10⁻⁶) and a late pacer at the end edge give at least `packets` a direction outside the burst; plant: the clock span back, which must fail it; the e2e bound becomes `>= packets` |
 | NC-U6C-2 | Medium | A2's command selects no test (`--exact` with the filter `a2_`): "0 tests, 0 benchmarks" (rev-netcode-1.log) | crates/bots/tests/load.rs:288 (and u6c-build.md:73-77) | Drop `--exact` (no other test name starts `a2_`) or give the full name `a2_48_websocket_clients_at_p2_against_one_room`; fix the doc line and the notes' command |
-| NC-U6C-4 | Medium (outside the diff) | L2's one-way delays are injected + L with the injected one-way net of base/2, against bounds of ± 5 % of the half jitter: P1's p001 and p999 low ends fail once P0's base passes about 0.5 ms | crates/net/src/l2/config.rs:24-25; marks.json PM-0001-3 checks | To the advisor before R1's run plan (a reading of the bound or of the one-way's form on L2); not U6c's |
-| NC-U6C-3 | Low | The down join takes the flow index as the datagram's index; QueueDrop and PoolDrop take none, so after one host drop every later RTT is joined to the wrong datagram, uncounted (latent at R1's profiles) | crates/net/src/l2/probe.rs:704-712; impair.rs:489-512 | Count down fates with no index in the summary (`probe_down_unindexed_count`), or map datagram i to the i-th down fate in t_in order |
-| NC-U6C-5 | Low | F-JOIN-ONCE (2): failed handshakes counted in memory only; R1 sees "no READY", not how many | crates/bots/src/load.rs:142-148, :658-659 | One count in LG's footer-time event or the failing line (`handshake_failed_count`) |
+| NC-U6C-4 | Medium (outside the diff) | L2's one-way delays are injected + L with the injected one-way net of base/2, against bounds of ± 5 % of the half jitter: P1's p001 and p999 low ends fail once P0's base passes about 0.5 ms | crates/net/src/l2/config.rs:24-25; marks/marks.json PM-0001-3 checks | To the advisor before R1's run plan (a reading of the bound or of the one-way's form on L2); not U6c's |
+| NC-U6C-3 | Low | The down join takes the flow index as the datagram's index; QueueDrop and PoolDrop take none, so after one host drop every later RTT is joined to the wrong datagram, uncounted (latent at R1's profiles) | crates/net/src/l2/probe.rs:704-712; crates/net/src/l2/impair.rs:489-512 | Count down fates with no index in the summary (`probe_down_unindexed_count`), or map datagram i to the i-th down fate in t_in order |
+| NC-U6C-5 | Low | F-JOIN-ONCE (2): failed handshakes counted in memory only; R1 sees "no READY", not how many | crates/bots/src/load.rs:142-148, :658-659 | One count in LG's log or the failing line (`handshake_failed_count`) |
 | NC-U6C-6 | Low | Two exits after the header is written leave no footer (a client's connect error, probe_peer's bind error), against NC-SB-2's "every end" | crates/bots/src/load.rs:560-562, :588-591 | `w.finish(Ended::Stopped)` before those returns |
-| NC-U6C-7 | Low | Pub items with no outside consumer: npt-net's six E helpers, npt-server `leg_log`, npt-bots `now_ns`, `Hosted`, `HostState` (§4.7's narrow surface) | crates/net/src/l2.rs (export), crates/server/src/lib.rs (export), crates/bots/src/lib.rs:36-37 | pub(crate) at the next change of each crate, or named in the report with the brief's reason |
+| NC-U6C-7 | Low | Pub items with no outside consumer: npt-net's six E helpers, npt-server `leg_log`, npt-bots `now_ns`, `Hosted`, `HostState` (§4.7's narrow surface) | crates/net/src/lib.rs:26-29; crates/server/src/lib.rs:23; crates/bots/src/lib.rs:37 | pub(crate) at the next change of each crate, or named in the report with the brief's reason |
 | NC-U6C-8 | Low | No SERIES.md rows for LG's six `probe_peer_*_count` fields and its params `room` and `mode` | crates/net/src/l2/probe.rs:577-584; crates/bots/src/load.rs:441-448, :606-612; marks/SERIES.md (new section) | Three rows in the new section |
 | NC-U6C-9 | Low | LG's Measured phase starts mid-second at READY and may end on a part second; V-S loses up to about 60 inputs a client, a fail under about 200 s (R2, R3) | crates/bots/src/load.rs:661-692 | Measured from the first whole second after READY; a part last second written `after` |
-| NC-U6C-10 | Low | The glue gives the brawl no view, so every network brawler aims blind | crates/bots/src/load.rs:159-161; bots/src/lib.rs:1152-1166 | Decide at R2's run plan or U6e (the view from the endpoint's own decoded state); nothing for R1 |
+| NC-U6C-10 | Low | The glue gives the brawl no view, so every network brawler aims blind | crates/bots/src/load.rs:159-161; crates/bots/src/lib.rs:1152-1166 | Decide at R2's run plan or U6e (the view from the endpoint's own decoded state); nothing for R1 |
 | NC-U6C-11 | Low | P8 cannot bite: the end-edge read's place before the drop is by order only | crates/server/src/probe.rs:176, :549, :564 | `edge_events(&sock, port, ph)` borrowing the socket, so a read after the drop does not compile |
-| NC-U6C-12 | Low | U8's probe_presence reads P1's slack and policy from `leg_edge`; U6c writes them as four header params | crates/server/src/probe.rs:509-517, :582-586; u8-build.patch:2447, :2477-2478 | At the merge (C9, NC-R2-4): probe_presence reads header `l2_timer_slack_ns`, `l2_sched_policy`, `probe_start_timer_slack_ns`, `probe_start_sched_policy` |
+| NC-U6C-12 | Low | U8's probe_presence reads P1's slack and policy from `leg_edge`; U6c writes them as four header params | crates/server/src/probe.rs:509-517, :582-586; wip/u8-build.patch:2446, :2484-2485 | At the merge (C9, NC-R2-4): probe_presence reads header `l2_timer_slack_ns`, `l2_sched_policy`, `probe_start_timer_slack_ns`, `probe_start_sched_policy` |
 
 Counts: Critical 0, High 1, Medium 2 (one outside the diff), Low 10.
 
@@ -155,7 +156,7 @@ tests/load.rs:145-149, :197-210), its count unrecorded (NC-U6C-5); (5) A2's comm
   the right end. R1 loses nothing; no fix.
 - **F-WT-CLOSE: right in effect, its cause likely but unproven.** WtServer's Drop closes the endpoint with no
   `wait_idle` (wt_server.rs:205-215) before the process exits; RoomEnded most likely reaches the client (the control
-  stream is finished and its acknowledgement awaited, wt_server.rs:538-545) and the endpoint records it
+  stream is finished and its acknowledgement awaited, wt_server.rs:538-546) and the endpoint records it
   (client/src/lib.rs:412-418, pub(crate)), but the glue cannot read it, so a WT client keeps stepping for up to 30 s
   (b4-test2.log: wt 30.16 s against ws 3.31 s, from the test's earlier form). R1 loses nothing (LG ends at its
   duration; the probe block waits for the room's own exit), but LG's WT log gains up to 30 s of Measured seconds after
@@ -167,9 +168,9 @@ tests/load.rs:145-149, :197-210), its count unrecorded (NC-U6C-5); (5) A2's comm
   client fails (no counter in any log: U6e's metrics). The brief's "no kind-10 refusal" line (section 3, Block 4)
   stays unproven, since LG counts commands given, not taken: U6c's report should name it open, for U6d/U6e's refusal
   counts.
-- **F-LG-SHA: right.** The judge's build set (practice.rs:303-308) takes LG's "" in every run alike, so no verdict
-  moves; R1 loses LG's binary identity in its own log, which U8's shell record gives. A hashing crate in npt-bots waits
-  for a manifest change (DEP-HOLD); nothing now.
+- **F-LG-SHA: right.** The judge's build set (judge practice.rs:303-308) takes LG's "" in every run alike, so no
+  verdict moves; R1 loses LG's binary identity in its own log, which U8's shell record gives. A hashing crate in
+  npt-bots waits for a manifest change (DEP-HOLD); nothing now.
 - **F-TERM: right, one correction.** No handler can be built (no tokio `signal` feature, no libc, unsafe forbidden).
   LineWriter writes through at newlines, but a record longer than its 1 KiB buffer (the header) reaches the file in
   parts, so a TERM can cut inside a line; U8's helper keeps the lines up to the last whole one (NC-R2-1), so nothing is
