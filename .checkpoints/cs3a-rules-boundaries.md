@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 11:38 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 11:36 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -165,7 +165,7 @@
    doc.rust-lang.org/1.99.1/std/primitive.f32.html and .f64.html on 2026-11-24, 11:12 UTC (rustdoc "1.99.1
    (58cf8f9c3 2026-10-13)").
 
-4. **Plan step 1 (the follow-ups that need nothing new): a1c59e8**, pushed 11:38 UTC (26 files). What it holds: the
+4. **Plan step 1 (the follow-ups that need nothing new): a1c59e8**, pushed 11:36 UTC (26 files). What it holds: the
    commit's message. Left for later steps, as planned: EA-F13 (4), `@shamble/types` to sim-worker's
    devDependencies, with step 3's batch; EA-N3's Worker half (one guard around every Wasm call) with step 6; EA-F10's
    bindings part and EA-F13's one-writer item are 3b's. **Checked here before the push:** `cargo test --workspace
@@ -188,7 +188,7 @@
    file, 7 tests; the browser tests "Running 12 tests", "12 passed"; 0 skipped, 0 ignored.
 
 ## Current step
-**Plan step 2** (the scan test `crates/sim/tests/rules_scan.rs` and PM-0002-53's native half), started 11:38 UTC.
+**Plan step 2** (the scan test `crates/sim/tests/rules_scan.rs` and PM-0002-53's native half), started 11:36 UTC.
 Read CI's run on a1c59e8 before the next code push.
 
 ## Next steps (after the compact)
