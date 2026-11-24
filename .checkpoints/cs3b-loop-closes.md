@@ -136,22 +136,91 @@
    `advisor-cs3-plan.md`, `test-engineer-followups.md`, `typecheck.sh`, `plants.py`, `make-zip.py`,
    `decisions-4.mjs`, and `chat-words.mjs` (pointed at this folder). His message of 22:44:50 UTC saved by script.
 
+2. **The advisor agent's read of his three items against the plan on main 28254a73: APPROVE, build 3b by the plan
+   (draft 3, section 5) under eight conditions; nothing needs his decision; compact first** (2026-11-24, read
+   23:12 UTC; Opus 5.5, effort max; its notes `cs3b-loop-closes/advisor-cs3b-start.md`). It checked both of his
+   messages against the transcript byte for byte. What it found, by his items:
+   - **(a) The decoder test.** The plan has 100,000 random plus 100,000 mutated inputs per decoder (plan lines 166
+     to 167; `netcode-architect-cs3.md` T9, lines 380 to 389). The row (ADR 0001 line 1626) asks for 10 million
+     per message type. 3b gives decoders to five types: Join, JoinAccepted, JoinRejected, Input, Snapshot (the
+     recording file is not a message type). Its estimate: about +120 lines; 10 million of each kind for 5 types is
+     100 million decodes, about 20 to 60 s in release and minutes per debug run. **No CI file is needed:** CI's
+     release line already runs `-p protocol` (`toolchain.yml` line 159) and release keeps overflow checks, so the
+     full count runs there and the debug runs keep the plan's count. The counting allocator: build on
+     `crates/sim/tests/state_hash_alloc.rs` (it counts calls; sizes must be added). Seeds: a test-only SplitMix64
+     or xorshift64*, never `sim`'s ChaCha8 or a match seed (`protocol` does not depend on `sim`).
+   - **(b) Command timing.** The build plan (`docs/reports/2026-11-17-build-plan-slice-1.md`, unchanged since
+     f5030a3) says it in three places: lines 389 to 391 ("…because the netcode proof test still chooses between
+     them (Part 6) and the slice's mark runs under each."); Part 6's row at line 909, under "What the proof test
+     may change" (lines 904 and 907); and risk 8, lines 1257 to 1258 ("…the largest is how commands are timed.").
+     His go names two places: **the third is asked of him** (the message of 23:12 UTC). The new sentences it
+     accepts: line 390 "…because Slice 3 chooses between them, no longer the netcode proof test (Mustafa,
+     2026-11-24), and the slice's mark runs under each"; the row of line 909 moves under line 919's "Not the proof
+     test's, kept open the same way:", reading "Slice 3 picks it, no longer the proof test; change-set 7 still
+     builds both ways behind one command scheduler in `room`"; risk 8 ends "how commands are timed is no longer
+     among them: Slice 3 picks it". Nothing in 3b depends on the pick (one slot, lockstep loopback).
+   - **(c) The link simulator** is step 8, the last (about 595 lines). The ladder from 4,900 lines: its rate limit
+     and duplication first (about 90 lines, exactly what the proof test's simulator lacks), then the whole
+     simulator (about 600), then the first recording (about 300), each to a change-set 3c.
+   - **No longer true in the plan (corrected here, not in the approved plan):** the CI pull request placed before
+     3b and written by this chat (plan lines 40 to 45, 190 to 198, 211 to 213; "#62" there is #64, merged; the
+     small CI pull request is now an Opus 5.5 chat's, beside 3b); the old decoder count; section 5 has no
+     manifest-batch step though 3b adds path dependencies; 3A-HOOK-TEST and 3A-FROM-F64 are code, not docs.
+     The swappable-transport mark (PM-0001-35, ADR 0001 line 1627) is Slice 3's whole: nothing of it touches 3b's
+     transport interface or loopback, and the report must not count it as started.
+   - **Size:** about +150 lines, so about 3,950 planned; the stop line stays 7,600 and the ladder's trigger 4,900.
+     Steps 1 to 6 come to about 3,080 planned lines; at change-set 2's ratio (1.54) or 3a's (1.71) that is 4,740
+     to 5,270 before steps 7 and 8, so the ladder will likely move the link simulator and the recording to 3c.
+   - **CI's limits and today's times (its read of main's run 45503161333):** the job 2 min 07 s of 15 minutes; the
+     browser tests "14 passed (54.8s)" of 5 minutes.
+   **Its conditions:**
+   - **C1 (High):** item (a) exactly as the row. For each of the 5 types one release run of 10 million random plus
+     10 million mutated seeded inputs (if that proves too slow: 10 million in all with the split named, and back
+     to it). The run shows 0 panics, 0 allocations above the codec's caps, and the planted index found, with its
+     input number. A control (the counter sees an allocation of known size) and one planted over-allocation, both
+     caught in debug too (release may optimise an unused allocation away). The report says the mark has started,
+     never that it passed; the recording keeps the plan's count, outside the mark.
+   - **C2 (Medium):** the test in its own integration-test binary in `protocol`; the full count only when debug
+     assertions are off; the time measured here and the expected counts written down before the push.
+   - **C3 (Medium):** the three old/new pairs in the report, his words quoted only as they stand; ADR 0001 lines
+     252, 1156 and 1699 to 1700 untouched (a follow-up for a dated pointer); the comment at `messages.rs` lines 5
+     to 6 updated for command timing only; the report says 3b's queue picks neither way.
+   - **C4 (Medium):** before steps 7 and 8, project the final size (lines so far plus the step's plan times the
+     ratio so far). Past 4,900 the parts not yet built move in the ladder's order until the projection is under
+     4,900. He is told first, and about the simulator before anyone builds it (his item (c)).
+   - **C5 (Medium):** first one manifest batch with every new path dependency plus 3A-MANIFEST-COMMENT, answered
+     by security-auditor before any commit or build. Then 3A-HOOK-TEST in step 4, before sim-wasm's first test
+     that panics; 3A-FROM-F64 as its own step: new rows after the existing 10,048 so the 16 pinned rows keep their
+     places, `--check`, the new sha256s recorded, the verifier regenerates the files.
+   - **C6 (Medium):** on a clean copy, with the new specs, time the browser run and the whole job before the first
+     evidence push. If the browser run would pass about 4 minutes, three lines to him first. A spec over 90 s sets
+     its own limit. The 10-minute run stays outside `packages/e2e/tests/`.
+   - **C7 (Low):** the release runs of room, client-endpoint, sim-wasm and devtools are local until the CI pull
+     request lands; the recording's "three processes" means CI's two debug runs plus the local release run;
+     whichever of 3b and the CI pull request merges second takes the other in and is checked again; the
+     development build is run after steps 7 and 8.
+   - **C8 (Low):** both of his messages into DECISIONS by script; his decisions of 21 and 22 November as a pointer
+     to e8e276f0, not copied as his words on main.
+   Not verified by it: it built and ran nothing (line counts, run times and the debug slowdown are estimates); on
+   the netcode branch it read only the lines he named.
+
 ## Current step
-**The advisor agent reads his three items against the plan on main 28254a73** (notes
-`cs3b-loop-closes/advisor-cs3b-start.md`). Then the message to him in at most 6 lines: what changes in size,
-whether anything in the plan no longer holds, whether this chat should be compacted (the chat's answer: yes, the
-context stands at about 70 %, and his words of 2026-11-23 ask to be told above 40 %).
+**Waiting for his compact of this chat** (23:12 UTC): the advisor agent's read is in (step 2), the message of at
+most 6 lines is sent with it. Nothing of 3b is built yet. After the compact: "Next steps" 1.
 
 ## Next steps
 1. After his compact (if he does it): read CLAUDE.md, this card, the plan's sections 0, 3, 5, 8, 9, 12 and 13, his
-   message of 22:44:50 UTC, `advisor-cs3b-start.md`; read the session's model and mode; tell him where things
-   stand; then build 3b by the plan's section 5 with the advisor agent's conditions.
+   two messages of 22:44:50 and 22:59:49 UTC, `advisor-cs3b-start.md`; read the session's model and mode; tell him
+   where things stand; then build 3b by the plan's section 5 under C1 to C8, in this order: (i) the manifest batch
+   under the dependency hold (C5); (ii) the plan's steps 1 to 6, with the decoder test at its row's count (C1,
+   C2), 3A-HOOK-TEST in step 4 and 3A-FROM-F64 as a step of its own (C5); (iii) the size projection before steps
+   7 and 8 (C4), telling him first if a part moves; (iv) steps 7 and 8 as far as the ladder leaves them.
 2. Owed with 3b's docs pass: his message of 22:44:50 UTC into DECISIONS by script; #65's merge in STATUS, the
    archive and ROADMAP; the stale "no pull request yet" sentences of 3a's report, STATUS and the archive (the
    advisor agent's Low on 1624f084); the build plan's two places on command timing (his item (b)), with the old
-   and the new sentences in the report; 3a's follow-ups placed at 3b: 3A-FROM-F64 (the cast from f64: an exact
-   tie and a case near the overflow point among the inputs), 3A-HOOK-TEST (the panic hook's test in its own test
-   binary), 3A-MANIFEST-COMMENT (the root manifest's comment, with 3b's manifest batch).
+   and the new sentences in the report (three pairs if he says yes to the third, C3); his two messages of
+   2026-11-24 by script and a pointer to his decisions of 21 and 22 November at e8e276f0 (C8). (3a's follow-ups
+   3A-FROM-F64, 3A-HOOK-TEST and 3A-MANIFEST-COMMENT are build steps, C5, not docs.)
 3. Not this chat's: the small CI pull request (an Opus 5.5 chat: Firefox in CI, every crate's release tests, the
    two generators' checks, a build step of its own for the test-only module).
 
