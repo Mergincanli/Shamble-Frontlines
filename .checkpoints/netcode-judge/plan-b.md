@@ -47,6 +47,27 @@ of the sheet.
   `Lack::Fail`, the report's detail text, `summary_line`'s escape (lib.rs); main.rs: `--only` through `judge_only`.
 - **Not touched:** marks.json; every other crate; check.mjs; ops/; manifests and lockfiles.
 
+### Block 2's design, fixed before its build (so a cut resumes on the same lines)
+- **figures.rs:** `pub struct Inputs<'r, 'a> { run: &'r Run<'a>, set: &'r [&'r Run<'a>], parts: &'r Parts<'r, 'a> }`
+  with `type Parts = BTreeMap<String, Vec<&Run>>` (part name to its valid runs); `Compute = fn(&Inputs) ->
+  Result<Ratio, Lack>`. The 8 built functions keep their `(run, set)` signatures; the table calls them through
+  non-capturing closures (`Some(|i| fate_log_twin_equal(i.run, i.set))`). `Lack::Fail(String)` maps to a new
+  `Missing::Fail`. `Figure` gains `detail: Option<fn(&Inputs) -> Option<String>>` (`None` on the 8 and on `planned`);
+  `compute(name, &Inputs)`.
+- **eval.rs:** `Ctx` gains `parts: &Parts` and derives `Clone, Copy`; `judge_only` builds it with an empty map;
+  `judge_mark` makes a first pass over the kept parts (members by `part_select`; valid = `validity(..)` holds and
+  every setup check of the part passes, both evaluated with empty parts), then judges with `Ctx { parts: &valid,
+  ..*ctx }`. `measure` takes the parts (a figure gets `Inputs`; `reference` passes none); `Rule::Pre` evaluates the
+  precondition's checks with empty parts (they are another mark's). `eval_check`: `Missing::Fail(why)` gives
+  `Outcome::Fail` with no value and the reason as its note; `fail_lines` prints such a line as
+  `"{part}: run {id}: {check}: {reason} (needs {needs})"` in place of `= ?, needs`. `report_values`: a figure with a
+  `detail` prints `"<value> (<detail>)"`.
+- **Tests (engine.rs):** a test-only figure is not possible (the table is const), so block 2 is proven by all 100
+  tests passing unchanged; `Lack::Fail`'s line and the detail text get their tests with their first users
+  (`crash_close_max_ns` in block 9, the R2 formula in block 8), and `Inputs.parts` with `sync_cost_ratio` (block 7)
+  and `logging_cost_ratio` (block 9). To honour condition 10 early, block 3's `alloc_twin_diff_count` does not need
+  it, so the exact-line test lands with block 9 at the latest; if block 9 is cut, `Lack::Fail` goes with it.
+
 ## 3. Tests and evidence
 - **Every computation: pass, fail and gap cases on made-up logs** (his rule), as the sheet lists per figure, plus the
   waiting case where a figure compares with a run not in the set yet, and an empty comparison where one exists. One
