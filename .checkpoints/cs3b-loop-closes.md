@@ -56,9 +56,20 @@
   22:34:37 UTC (TOOL-SOURCE: every other file, version or checksum comes back to him); 2026-11-14 (the size rule:
   at twice the plan, stop and tell him in three lines); 2026-11-12 ("The guard, the gate and CI work stays with
   Opus 5.5.": it stands, point 2 above).
-- **His decisions of 21 and 22 November that his message names** (the netcode test's marks that moved to the real
-  game) are not in `docs/DECISIONS.md` on main 28254a73 (no entry of those two days): the three items bind as his
-  message of 22:44:50 UTC words them.
+- **2026-11-24, 22:59:49 UTC** (`cs3b-loop-closes/mustafa-2026-11-24T225949-where-the-decisions-are.md`, by script;
+  into DECISIONS with 3b's docs pass): his decisions of 21 and 22 November are recorded on the netcode test's
+  branch `claude/netcode-proof-test-plan-hcky5g`, not on main: `.checkpoints/netcode-proof-test/history.md`, lines
+  7561 to 7607 (NPT-TRIM of 21 November; his answers to the re-plan of 22 November), and
+  `.checkpoints/netcode-proof-test/moved-block.md`, the part "FOR CHANGE-SET 3 ITSELF". "Read them with git show,
+  read only. That is not the spikes/ folder. My message with the three items is my word either way." **Read at
+  23:00 UTC at that branch's head e8e276f0bf8b201f6a4db3b59315ac6de4c84a04 (fetched by name; nothing is ever pushed
+  there):** NPT-TRIM moves the proof test's marks -34 and -35 "to the real protocol and its dependency checks",
+  "nothing dropped or loosened"; the moved-marks part for change-set 3 has the same three items as his message of
+  22:44:50 UTC and names the build plan's lines: change-set 7 builds both ways of command timing (lines 389 to
+  391; line 390 still says the proof test chooses), the build plan's line for that open question (line 909) and
+  its Part 6 change on his go; change-set 3's own link simulator (lines 321 to 323; line 322 lists a rate limit
+  and duplication, which the proof test's simulator lacks). Those line numbers were checked there on main f5030a3:
+  read them again on today's main.
 
 ## Standing rules (from his words and the repository's rules; when in doubt read DECISIONS and CLAUDE.md)
 - **Process:** the plan is approved (the advisor agent, 2026-11-19: `cs3b-loop-closes/advisor-cs3-plan.md`). Build
