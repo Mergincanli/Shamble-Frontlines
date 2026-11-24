@@ -850,6 +850,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      time each sweep from its own probed_at; consult only on a row that is not the expected one, and before step 26 is
      saved as done. Not blocking: the 15 scheduled probe results unread; Day 1's downloaded evidence in .gate checked
      before the report (the upload records expire 2026-12-02).
+   - The one-screen list sent (about 19:13 UTC). **Step 1 done**: his message 20:14:13 UTC: "Restrict previews" pressed,
+     the row now reads "Preview deployments are restricted by a Cloudflare Access policy" with "Manage"; he opened
+     Manage (the Access application "shamble-preview-check - Cloudflare Pages", policy "Allow Members - Cloudflare
+     Pages", Legacy, Allow). No plan or payment screen mentioned, so a billing screenshot is asked during the wait
+     (consultation 24's row). Outside look 20:15:15 UTC: every preview link 302 to
+     shamble-preview-check-pages.cloudflareaccess.com, production's own address 200 (results log). Switch-on time not
+     given: the sweeps count from 20:14:13 UTC (trig_012uYr31Q5puh8mgoMhPHnUR 20:25 UTC; trig_01PgaNh9YUgYbGi8tzK2My4X
+     21:15 UTC, the one that counts), so visit 2 starts after 21:15 UTC (22:15 Amsterdam) or tomorrow by 21:00
+     Amsterdam. Next: his step 2 (Brave, normal window), one step at a time.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the

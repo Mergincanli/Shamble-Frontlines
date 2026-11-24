@@ -885,3 +885,25 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   serves; (d) 2 serves (144.61); the by-hand previews 19 serves; production 4 serves; the rehearsal 2 gone (148.21).
   Unexpected 0, no reading 0. So after six days nothing came back and nothing the check needs went away.
 - get_session (about 19:10 UTC): 394,099 of 1,000,000 tokens; the seven-day limit "allowed" (reset; next 2026-12-01).
+- **The wall switched on (his step 1)**: his message of 2026-11-24 20:14:13 UTC (f39e46f9-f1ea-4ea2-9267-d9f6bb287aa4),
+  his words: "Done, the button turned into a 'manage' button" / "When pressing on it the following page shows (see
+  screenshot), I have censored the policy ID incase its something sensitive". The switch-on time itself was not given:
+  it lies after my list (sent about 19:13 UTC) and before 20:14:13 UTC; the sweeps count from 20:14:13 UTC, so each is
+  at least its stated time after the switch-on. No Zero Trust set-up, plan or payment screen is mentioned.
+  - Screenshot 1, transcribed: "Preview access": "Preview deployments are restricted by a Cloudflare Access policy." /
+    "Visitors must sign in and match the policy before viewing previews." / "This protects preview deployment URLs
+    only. Production pages.dev and custom domains are managed separately in Zero Trust.", button "Manage".
+  - Screenshot 2, transcribed (the address holds his account ID and the application's ID; not copied here): Zero
+    Trust, Access controls, Applications, "shamble-preview-check - Cloudflare Pages", "Application details";
+    Destinations, "Public hostnames": Subdomain (optional) [a field that appears to hold a wildcard], Domain
+    "shamble-preview-check.pages.dev", Path empty; "Allow access through browser-based RDP, SSH, or VNC sessions" Off;
+    "Access policies": "Allow Members - Cloudflare Pages" (marked "Legacy"), Action "Allow", Rules 1, Policy ID
+    (blacked out by him); "Policy tester"; "Authentication" (Identity, MFA). Left menu: "Zero Trust" with Overview,
+    Insights & Logs, Team & Resources, Access controls (Overview, Applications, Policies).
+- **Outside look right after** (this container, curl with the probe's User-Agent, no cookies, 20:15:15 UTC): iso-off,
+  (c) cs-pd-open, (d) cs-pd-off, the one-off 6e61a4c4 (iso-off) and production's one-off 0354374e: each HTTP 302 to
+  https://shamble-preview-check-pages.cloudflareaccess.com/... (path not copied); production's own address
+  https://shamble-preview-check.pages.dev/ 200. So the wall is on for previews, production's own address stays open,
+  and a production upload's one-off link is behind the wall too (recorded; the mark judges production's own address
+  only). Sweeps scheduled: trig_012uYr31Q5puh8mgoMhPHnUR at 20:25 UTC (at least 10 minutes) and
+  trig_01PgaNh9YUgYbGi8tzK2My4X at 21:15 UTC (at least 1 hour, the reading that counts).
