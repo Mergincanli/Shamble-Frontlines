@@ -78,9 +78,9 @@
   TR2-U6A-4, re-rated Medium, now CLOSED); disk part-clean 10.0 GiB; M6 rulings (advisor-u6b-m6.md 4f07818f…): the
   cap in start() (binary.rs +14 -12) and sha2 at opt-level 3 in the dev profile (Cargo.toml +3; the debug start 3.0 s
   -> 0.12 s; the host now 2.10 GHz, was 2.30); probe4 PASS; M5 run 2 PASS (m5-check2.log: 11/11, 807/904, 1,037.2 s);
-  C5 APPROVE of the changed head; M7 gate PASS (m7-gate.log); 29 blobs = .gate/u6b-merge/m6-files.txt. **CI running;
-  then H3** (the advisor's head read: SHA, the check, m7-gate.log, CI). main-run.sh sets no CARGO_INCREMENTAL: pass
-  `env CARGO_INCREMENTAL=0`.
+  C5 APPROVE of the changed head; M7 gate PASS (m7-gate.log); 29 blobs = .gate/u6b-merge/m6-files.txt. **CI GREEN on
+  8efb9b2** (gate 45338377262 + 45338369910, toolchain 45338377334 + 45338370007, all success); **H3 RUNNING** (the
+  advisor's head read). main-run.sh sets no CARGO_INCREMENTAL: pass `env CARGO_INCREMENTAL=0`.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
 - **Next 2, U6b's close:** CI green, then H3 (resume a6e7ce46a28424b0b); then T5 (i) (U7's T-builder with U6b's merged
@@ -132,9 +132,9 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (0 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - CI on 8efb9b2 (PR #40's check runs). Done, resumable: the advisor a6e7ce46a28424b0b (advisor-u6b-m6.md, C5 APPROVE;
-    H3 next); the advisor's U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
+- **Running (1 agent, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
+  - The advisor's H3 head read a6e7ce46a28424b0b (appends to advisor-u6b-m6.md). Done, resumable: the advisor's U6b fix
+    check a108f5cdf9270999e (advisor-u6b-fix.md
     DONE); U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree agent-a2661dc320c9e6d00), the
     advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode a0a57a3948202de40, security aedb799ad9648b0e1,
     test a88f25b3d3f66d972.
