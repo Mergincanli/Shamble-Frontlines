@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-24, block 5 of part b complete (8735bc5f).
+- **Last update:** 2026-11-24 about 23:10 UTC, part b built (a3476e6c), review round running.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -147,14 +147,43 @@
     `second_total`, and `built(..)` for the table. Four engine tests (`u6j_...`); eight plants, each failing one and
     taken back. SERIES.md's four rows. 110 judge tests pass (17 + 4 + 64 + 25). 1,450 added, 105 deleted so far.
 
+18. Part b, block 6 · 46581724e8cf60eadad58a2a5b4f8079f1025976 · `rss_slope_bytes_per_10min`, `growth_count`
+    (`queue_growth_count`, `session_memory_growth_count`; windows by time); 3 tests, 8 plants.
+19. Part b, block 7 · 3c42524f85aca1ea672975b2a1a87f5ff34cd633 · `sync_unit`, `sync_cost_ratio`; `Parts` now maps a
+    part to (its min, its valid runs); **found:** comparing two such ratios overflowed i128, so `Ratio`'s `Ord` falls
+    back to `cmp_wide` (Euclid's steps), with its own test; 2 tests, 7 plants.
+20. Part b, block 8 · a6d640646bc4e0b525f55a69143f85774ccb2aab · `R2Counts` (the formula as the netcode-architect
+    ruled its inputs: `netcode-architect-r2-inputs.md`; the soldier term is on E - V, golden E is 62), the two formula
+    figures with their detail text, `counter_growth`, the three egress figures; 2 tests, 8 plants.
+21. Part b, block 9 · 9380e202948ab4317d91c953340736fa1a264480 (`crash_close_max_ns` with the exact failure line,
+    `logging_cost_ratio`, the Rule::LoggingOff fix; 3 tests, 8 plants) and
+    a3476e6c87701b00f70e811f9e7d3549649d382b (`kill_p99_ratio` last, the texts; 1 test, 4 plants). **All 19 figures
+    built.** 122 judge tests pass (18 + 4 + 75 + 25); fmt, clippy and check.mjs's seven quick steps pass. From
+    0e0f6547: 2,915 added, 166 deleted, 22 files, only `crates/judge/` and `marks/` (marks.json untouched).
+
 ## Current step
-Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 6:**
-`rss_slope_bytes_per_10min`, `queue_growth_count`, `session_memory_growth_count` (figures-b.md A4, A5; windows by
-time). Then block 7 (`sync_unit_cost`, `sync_cost_ratio`), block 8 (the R2 formula and the egress figures; the
-netcode-architect agent's R2-INPUTS ruling is asked, its notes go to
-`.checkpoints/netcode-judge/netcode-architect-r2-inputs.md`), block 9 (`crash_close_max_ns`, `logging_cost_ratio`,
-the LoggingOff fix, the texts, `kill_p99_ratio` last). Planted defects run through a scratch script (one JSON list of
-[name, old, new] per block; each restores the file).
+Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b is built at a3476e6c.**
+Running since about 23:05 UTC: the one review round (test-engineer and rust-reviewer, notes
+`test-engineer-b.md` and `rust-reviewer-b.md`) and `node spikes/netcode-proof/check.mjs` whole on a3476e6c (output in
+the session's scratch folder). Then: one fix pass; the final head's checks (judge tests, clippy, fmt, check.mjs
+whole, GitHub's gate and toolchain on that SHA); the advisor agent's read of the head; part b's commit id and report
+to Mustafa.
+**For the advisor's read and the report (collected while building):**
+- Condition 4, readings still open (built on the written reading): -12 and -13 "per client" = the largest client
+  mean; -15's slope method and "flat" rule; -24's halves; -27's "within 5 %" = not worse by more than 5 %;
+  PM-0006-19's pooled comparison.
+- Condition 7: C4-KILL (the killed-room record check) is not built: the netcode chat named no kill record. Today any
+  log that says `killed` is exempt from `complete`. Home: before R5's -27 and PM-0006-22 runs. README section 4 says so.
+- Condition 9: the Rule::LoggingOff fix is outside the U6j list.
+- Condition 11: no writer logs 16 of the input series; every figure is proven on made-up logs only.
+- The ordering miss of part a (condition 1): entry 64 and JDG-ONLY-1 landed first in part b, not before part a.
+- My own readings: C-U6-11's last session leaves no tail (a bot that leaves for good before the stop reads INVALID);
+  `logging_cost_ratio` takes exactly 3 logging-off runs; every room-reading figure needs exactly one room log.
+- The netcode-architect's Medium: fixing `relevant_count`'s meaning (other soldiers + vehicle hulls) also fixes the
+  bottom of -10's unit cost; the advisor confirms or sends back.
+- Writer-side needs now in SERIES.md (posted on the board): `room_end` carries `slot`; on L2 `admit` and
+  `session_end` in the room's log; the two `iface` records carry `ns`; `relevant_count`'s meaning; the kill at the
+  end of the measured window.
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
