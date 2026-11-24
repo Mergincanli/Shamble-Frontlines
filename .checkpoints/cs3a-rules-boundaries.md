@@ -470,6 +470,19 @@ Plain words with him: no tag or code without its explanation in the same sentenc
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **The advisor agent on 8d277cf2 (`advisor-head.md`, "Review 2"; read 17:45 UTC): APPROVE
+  8d277cf21cf54919c2ae54e5232d45e944e7b040.** Every letter A to J of its read of c5f6a85a is closed (its own
+  build: the same Wasm bytes; its own script: every quotation given as his stands in his saved messages; CI green
+  on the first attempt). **It is the corrected head, not the merge head: his go waits for the last commit's full
+  SHA and its read of that.** Two Lows for the last commit: the report says its nine start conditions "are met",
+  but C8 closes only with the last commit; "five dated corrections" to #64's report are five corrections plus one
+  dated addition (the 5911b56 pointer). **The last commit must hold:** its verdict on 8d277cf2; his browser
+  reports, whole and by script; the commit where the notes stay readable, named in the steps table's heading; the
+  checkpoint folded in and `.checkpoints/` deleted (`git ls-tree -r --name-only HEAD -- .checkpoints` prints
+  nothing); no skip marker; no code, manifest or lockfile change (the Wasm stays 383f5303...3963, so his check
+  still covers it; a fault he finds is a new head and a new read); `pr-title.txt` and `pr-body.md` exactly as they
+  are now (they are read from the last commit that still has them). Then gate, smoke and toolchain green on it
+  and its read. The zip built from c5f6a85a3 covers this head.
 - **Round 3, security-auditor (judged 8619d539; `security-auditor-review3.md`; read 16:37 UTC): APPROVE. The High is
   closed; its condition 2, clause (d), is met for Vite's dev server.** 99 request spellings on fresh dev servers, 88
   on a warmed one, 31 in sequence, each answer's body read: none held the test-only module. N1, N2 and the
