@@ -18,7 +18,8 @@ and numbers below differ.
 - Main's CI on 28254a7 (push): gate run 45503161434 and toolchain run 45503161333, both completed with success
   (22:40:42-22:42:53 UTC).
 - `git diff --name-status 1ec6f6c origin/main`: 64 paths, +4,677 / -317: 23 added, 41 modified, none deleted or
-  renamed. The tracked-file count is 1,822 now (`git ls-files | wc -l`), so 1,845 = N0 + 23 after the merge.
+  renamed. N0 is the tracked-file count step 1's base light run reads (1,822 at 40a3481; this plan's own commit and
+  step 1's save add notes files before it), and refs are N0 + 23 after the merge.
 - Kit and CI: main changes no `.claude/`, CLAUDE.md, AGENTS.md, `.github/` or `tools/` file. This branch changes none of
   them: the guard's full pathspec (main-61-plan.md:37-40) prints nothing. So a plain `git merge origin/main` in its own
   call passes the guard. Main's checkpoint tests stay 33.
@@ -63,8 +64,12 @@ and numbers below differ.
    Then the marker grep and `git add docs/STATUS.md`. Then `wc -l docs/STATUS.md`: exactly 120, and STATUS.md differs
    from main's in the #40 row alone.
 4. As written, with H0 and 28254a7 as the two parents (git's own message, no attribution lines; the card save carries
-   them: ADV-M60H-5). C2 (b): `git diff --stat H0 HEAD` is "64 files changed, 4677 insertions(+), 317 deletions(-)",
-   equal to `git diff --stat 1ec6f6c origin/main`.
+   them: ADV-M60H-5). C2 (b), observed at 22:5x on a merge preview of 92fdf65 (tree 81aa7f1e…): without
+   docs/STATUS.md, `git diff --shortstat HEAD 81aa7f1e -- . ':(exclude)docs/STATUS.md'` and the same over
+   `1ec6f6c origin/main` both give "63 files changed, 4644 insertions(+), 284 deletions(-)". Step 4 checks that line
+   again over H0 and the merge commit, and reads docs/STATUS.md's own line as is (main's is +33/-33, so the whole stat is
+   expected at 64 files, +4,677/-317); if STATUS.md's line differs, step 3's content check (main's file but the #40
+   row) governs.
 5. a-c as written. Repo map: "repo map OK", with its two numbers recorded. d's bar as written: every count equals the
    base run's word for word, except HEAD, and refs at N0 + 23. Outputs go under .gate/main-65/.
 6. As written:
@@ -85,9 +90,13 @@ and numbers below differ.
   REPO_MAP.md and STATUS_ARCHIVE.md. A red there is main's or the runner's, and the advisor rules before any further
   step.
 - Order with U6c: MAIN-65 merges first (CI needs a mergeable PR); U6c's merge then follows its ruling, its M3 re-checking
-  the apply on the new head. Nothing of U6c's is staged during MAIN-65.
-- The record, under "Choices taken without him": "main 28254a7 taken in now, plan first (MAIN-65)", named in the next
-  day's message, as MAIN-64 was.
+  the apply on the new head. Nothing of U6c's is staged during MAIN-65. **Question for the checker:** may U6c's M3-M9
+  run once step 6's CI is green, with step 7 reading MAIN-65's merge commit by its SHA at 03:50 (and U6c's head with
+  it), or must U6c wait for step 7? The answer moves U6c's merge by about four hours.
+- No save inside the merge window (steps 2-4): an agent's notice or the Stop hook in that window gets a save only after
+  step 4's commit.
+- The record, under "Choices taken without him": "main 28254a7 taken in now, plan first (MAIN-65)", named in tonight's
+  message, msg-2026-11-25.md, as MAIN-64 was in it.
 
 ## Change type, tier, size
 - A merge of main: main's reviewed and merged text (64 files, +4,677 / -317; #65 had two review rounds by five
