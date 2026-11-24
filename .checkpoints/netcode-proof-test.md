@@ -5,8 +5,8 @@
   **Base:** main 1ec6f6c merged in at 72b0dc3 (MAIN-64, 2026-11-24 13:0x UTC: #64, CI-WASM; one conflict,
   docs/STATUS.md: this branch's #40 row kept beside main's #64 and "#63, #62" rows); before it main f5030a3 at a6acc8a
   (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-24 17:5x UTC: U6c's round 2 running (three seats from 17:57, the saver restarted); the Fable
-  advisor tool on (his 16:14 words, history.md:7891-7900); the day message drafted, finished at 23:05.
+- **Last update:** 2026-11-24 19:5x UTC: U6c's round 2 DONE 18:22 (no Critical or High); its ruling's fresh advisor at
+  22:52; the saver ended 19:47 (hand saves); the Fable advisor tool on (history.md:7891-7900); the day message at 23:05.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -75,7 +75,7 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-24 10:3x UTC; U6b MERGED 8efb9b2; U6c BUILT, its round running; MAIN-64 planned; before: e788f57)
+## Now (2026-11-24 19:5x UTC; U6b MERGED 8efb9b2; U6c's round 2 DONE, its ruling at 22:52; MAIN-64 DONE; before: e788f57)
 - **U8:** pass 3 DONE ~17:29 (snapshot 0e7fbab2…, 6,111 of his 6,200 stop: items 1-8, every Low in, none carried; node
   tests 100/0, wrappers 315/0, redact 0 findings; package files unchanged; no plant left; item 1's judge run 17:08 at
   627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round DONE 21:2x** (his words: the three Highs'
@@ -87,8 +87,8 @@
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
 - **U6c's fix pass DONE 13:50** (FP-1 to FP-6; 5,693 added; fix-check.log 11/11, 861/958 (+54/+54), 1,176.3 s; plants
   P22, P19, P18 and P2 fail, P8 held by the compiler; snapshot wip/u6c-fix.patch 0549389e…, 24 files; notes u6c-build.md
-  a9d45dd4…; the interdiff `git diff aad2103 6c3ff00`, 10 files, +356/-94). Round 2 waits for the 17:50 reset (LEAN-MODE
-  item 3): trigger trig_014DtEnzDqnWHT2N6MsvfyA1 at 17:51. F-P2-HEADER goes to its test seat.
+  a9d45dd4…; the interdiff `git diff aad2103 6c3ff00`, 10 files, +356/-94). Round 2 ran 17:57-18:22 (Running work);
+  F-P2-HEADER went to its test seat (FP-3's wording is the ruling's item 3).
 - **Next 2, U6c's round 1** (builder a3a3e3fdf559de095, base 8c81952): built 10:07 (5,431 added; 11/11, 859/956; round-1
   snapshot wip/u6c-build.patch a4e63455…). Reviews u6c-review-{netcode,test,security}.md: netcode REVISE (NC-U6C-1 High),
   test 5 Medium, security 5 Low (= Stop B's host read). Ruling advisor-u6c-r1.md (ad72c0b8…): the fix pass, then round 2
@@ -166,8 +166,8 @@
   - The probe reading DONE (read-probe.log; probe_reading.py holds the server's stdin; .gate/u6c/read-probe/): P0 and P1
     each 1,000,000 records a direction (FP-1); legs about 112 s (B1 ~113 s by arithmetic; P2-P4 and B1 unmeasured: round
     2's question 3); P1 lost ~1.0 % a way (the seat's count); 484 peer datagrams refused for the leg (probe.rs:286-295); drain 82/77 ms; peer errors ≈ its 76 s after the legs.
-  **Next three:** (1) round 2 at 17:51; (2) the merge M3-M9 as U4f's (history.md:7022-7028), with C9's U8 edits;
-  (3) U7's 0b check and R-half (its builder starts in a reset's first 30 minutes), then U8's merge. Msg 23:05.
+  **Next three:** (1) the ruling at 22:52 (Fable reads the request first); (2) the merge M3-M9 as U4f's (history.md:7022-7028)
+  and the ruling, with C9's U8 edits; (3) U7's 0b check and R-half (a reset's first 30 minutes), then U8's merge. Msg 23:05.
 - **Finished, resumable by SendMessage:** U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder
   ac59cce3e5d002441 (notes u8-build.md "## Pass 3"); the advisor a3de649cd25e474df (U8's rulings). Older: card at e67ef59.
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): its record in Now. Open at its
