@@ -27,3 +27,16 @@ Read only, effort xhigh. Brief: u6c-r2-ruling-request.txt (sha256 9a57324e… ch
   load_ready, lg_block, load_wait), :3860-3873 (npt-load-ctl). Every LG run with clients goes through lg_block, whose
   load_ready (:2193-2201) waits for READY in LG's stdout until t0 + warm - 10 and otherwise writes INVALID-ready.txt and
   brings the room down (:2220-2224). Nothing in U8 reads LG's exit code or DONE as a pass.
+- C-U8-6's source: the advisor's U3D-RCVBUF ruling (advisor-u3d.md:251-277; plan.md:1256): a drop on P1's socket
+  between the two reads makes ImpairSocket's self-test INVALID, cause named, to the advisor before any L2 mark counts,
+  never re-run away (a drop = a reader stall of tens of ms, which t_in stamped at drain cannot show). U8's :1709-1711
+  says only "goes to the advisor": weaker words than the rule.
+- Mustafa's 2026-11-15 words (history.md:2125): "A new bar, or a change to one, comes to me under Decisions needed; it
+  is not built on the ruling alone." U4f's merge steps M3-M9: history.md:7022-7028.
+- 1(a) mechanism, checked in the code (net socket.rs): the kernel reader is its own thread from bind (:214-216,
+  :586-646) and takes the shared lock per batch (:634); the pre-touch holds that lock (:434-436). So the buffer fills
+  during the pre-touch (the start values 679 and 569), and the start read (:465) races the reader's catch-up after the
+  pre-touch, not the poller's start (the seat's mechanism slightly off; its conclusion stands). The pin (Intake::take
+  :283) needs a datagram the reader took in and the model released (P1: about 30 ms of one-way delay later), so a read
+  after `started` (:487-494, at the leg's zero) comes after the reader has drained that backlog.
+- A2 logs still in /tmp (load.jsonl, room.jsonl; a `tokens` file beside them, 0600): item 4's look needs no run.

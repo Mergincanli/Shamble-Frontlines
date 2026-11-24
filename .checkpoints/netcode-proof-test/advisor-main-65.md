@@ -47,3 +47,11 @@
   the pattern); no duplicates. Required: main's new files at mapped depths are two docs/reports/ files only, and
   nothing outside .checkpoints/ changed on the branch since 72b0dc3 (110 there) -> 110. Expected "repo map OK: 186
   entries cover 110 required paths".
+- DEP-HOLD: Cargo.lock, package-lock.json, crates/devtools/Cargo.toml, packages/sim-worker/package.json, Cargo.toml,
+  package.json: `git diff --stat origin/main 9475d37` empty. checkpoint.mjs:23-24 says it as cited; the code
+  (:115-141) diffs against the remote branch and frees a file whose blob equals refs/remotes/origin/main's. Not held,
+  as long as origin/main is still 28254a7 locally at the save.
+- Marks: main changes nothing under docs/adr/, spikes/, docs/design/, .checkpoints/.
+- refs: the plan's `git grep -I` prints nothing. check.mjs's referenceProblems (:1852-1867) also reads binaries
+  (utf8, outside spikes/, docs/, .checkpoints/, *.md): `git grep -a -l "spikes/"` on main over that set prints only
+  kept-logs.mjs and its test (the exception), the two new .bin vectors hold no such text. So refs passes.
