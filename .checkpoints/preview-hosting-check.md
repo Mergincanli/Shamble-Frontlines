@@ -1510,7 +1510,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   "secret: present" lines, his screenshots and words, run metadata, sitting 2's headers files. The gate did not run (no
   tools/ dependencies installed).
 - agent web-fetch (model opus, effort high): Cloudflare's docs on whether direct uploads count against the Free plan's
-  500 builds a month, and where a count shows (PM-0006-7) · launched about 23:09 UTC, background.
+  500 builds a month, and where a count shows (PM-0006-7) · launched about 23:09 UTC, background. DONE: not found
+  (results log, "After the verifier"). PM-0006-5's gap closed from the run logs: every build's size line read (results
+  log): the largest file 65,536 bytes, flagged none, the tombstone 96 bytes.
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
   and on Zero Trust's first screen · launched 2026-11-19 about 14:15 UTC (after the save 4396e0a's edits) · DONE; its
   answers in step 26.

@@ -1030,3 +1030,28 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - **Billing, after the wall** (his message of 2026-11-24 22:47:31 UTC, f0185b17-b019-44b2-b25e-493c285d4b18), his words:
   "I just checked the cloudflare's billing page, and nothing paid was added when the wall went on". His word, not a
   screenshot: no paid plan or charge came with "Restrict previews" and the Zero Trust organization it made.
+
+### After the verifier (2026-11-24, before the report)
+- **PM-0006-5's coverage gap closed from the run logs** (the verifier: no size line was recorded for sitting 2's ten
+  builds, bite-production, restore-production, the two tombstones and `revoked`; check-sizes.mjs never fails on a
+  flagged file, so a green build proves nothing). Each run's whole log downloaded (GitHub MCP tool, the logs' zip, files
+  written 23:09:10-23:09:52 UTC) to `.gate/preview-hosting-check/sizes/<run id>/` and read with grep. Every build's line, word for
+  word: "SIZES {"largest":{"path":"content.ef463692.bin","size":65536},"limit":26214400,"flagged":[],"count":9}" in
+  deploy runs #7 44370016948, #8 44370024556, #9 44370034770, #10 44370043893, #11 44370054922, #12 44370062021, #13
+  44370443574, #14 44370444666, #15 44370706631, #16 44370744826 (sitting 2's ten builds), #5 44366750977
+  (bite-production), #6 44367096948 (restore-production) and #19 45499119373 (`revoked`). With round-a's, uploads' and
+  bites' lines already recorded, every build of the check has its size line: the largest file 65,536 bytes, flagged
+  none, except the planted 26 MiB file of `bite-oversize` (flagged and refused by Wrangler). The two tombstones (cleanup
+  runs #3 44370914405 and #5 44374107847) upload one file each, `index.html`, written by close.yml's printf (its text at
+  347d5e0: 96 bytes, counted with wc -c; "✨ Success! Uploaded 1 files" and "Uploaded 0 files (1 already uploaded)").
+- **PM-0006-7, the question behind it** (a web-fetch agent, model opus, effort high, after 23:09 UTC): Cloudflare's
+  docs do not say whether direct uploads count against the Free plan's 500 builds a month ("Each time you push new code
+  to your Git repository, Pages will build and deploy your site."; the limits table "Builds per month | 500 | 5,000 |
+  20,000"; limits page, dateModified 2026-11-19), and no page says where the dashboard shows a count. So the question
+  stays unanswered by the dashboard and by the docs.
+- **Corrections from the verifier** (for the report; the lines above stand as written at their dates): ADR 0006's line
+  numbers in this log are three lines low since main's 3747bb3 ("When a mark fails" is now :1404-1418, the checklist's
+  steps 1-3 :1447-1450 and steps 5-8 :1453-1460); from the closes to the 24-hour mark there were 24 schedule slots, not
+  28 (3 scheduled runs in them); "the wall on the stable links of 6 open branches" counts 1 branch with an open pull
+  request (cs/pd-open) and 5 Pages branches with none (iso-off, iso-on, uploads, bite-coep, bite-nocache); his Brave
+  checks were 1 load per link (all as expected), not 3.
