@@ -65,7 +65,7 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-24 10:1x UTC; U6b MERGED 8efb9b2; U6c BUILT, its round running; before: card at e788f57)
+## Now (2026-11-24 10:3x UTC; U6b MERGED 8efb9b2; U6c BUILT, its round running; MAIN-64 planned; before: e788f57)
 - **U8:** pass 3 DONE ~17:29 (snapshot 0e7fbab2…, 6,111 of his 6,200 stop: items 1-8, every Low in, none carried; node
   tests 100/0, wrappers 315/0, redact 0 findings; package files unchanged; no plant left; item 1's judge run 17:08 at
   627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round DONE 21:2x** (his words: the three Highs'
@@ -81,9 +81,9 @@
   launch message u6c-launch-prompt.txt; cut 06:55-07:59 and a disk-floor stop, both resumed). Blocks 1, 3-6; Block 2
   not built (C4: lever (1)); F-REDACT fixed and PASS; plants 20 of 21 fail, **F-P8: P8 does not** (ImpairSocket's Drop
   joins no thread, socket.rs:440-446); end-check2.log 11/11, 859/956 (+52/+52), 1,116.8 s (1.03x of 1,086.7); 5,431
-  added, 199 removed. Snapshot wip/u6c-build.patch a4e63455… (24 files; notes u6c-build.md 426b31da…). Part-cleans
-  09:3x and 10:1x (free 10,553 MiB). Round (section 7, xhigh): netcode aa64bb15ad4467641, test a3a1718b1419d246e,
-  security a546a4604d30ee9d4 (= Stop B's host read) -> u6c-review-{netcode,test,security}.md.
+  added, 199 removed. Snapshot wip/u6c-build.patch a4e63455… (24 files; notes u6c-build.md 426b31da…). Round (xhigh)
+  -> u6c-review-{netcode,test,security}.md: security APPROVE WITH FINDINGS (5 Low, SEC-U6C-1..5; = Stop B's host read);
+  test APPROVE WITH FINDINGS (5 Medium: F-A2-EXACT, F-READINGS, F-P8, F-TIMING, F-P2; 10 Low); netcode running.
 - **U6c's Block 0 DONE at 3b75d00 (pushed 8c81952, 06:53):** security-u6c-deps.md's binding check steps 0-7 PASS
   (u6c-block0.md): the lock 3394b451… (229/6, 252 packages, hyper pinned back to 1.12.0; security-u6c-lock.md and its
   addendum CLEAR WITH CONDITIONS, SEC-U6CL-1 to -3 Low); step 5 11/11, 807/904 (= U6b's merged head); deny ok, audit 0
@@ -144,20 +144,20 @@
   u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366, u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (3 agents, 1 shell, 2 triggers; resume each by SendMessage to its ID; after a cut, from its own file):**
-  - U6c's round (section 7, xhigh, read only, from ~10:10 UTC, snapshot a4e63455…, tree agent-a3a3e3fdf559de095):
-    netcode-architect aa64bb15ad4467641 -> u6c-review-netcode.md; test-engineer a3a1718b1419d246e -> u6c-review-test.md;
-    security-auditor a546a4604d30ee9d4 -> u6c-review-security.md. Resume point: each reads its file and goes on after
-    its last complete block (their launch messages say so); their runner logs .gate/u6c/rev-<seat>-<n>.log.
+- **Running (2 agents, 1 shell, 2 triggers; resume each by SendMessage to its ID; after a cut, from its own file):**
+  - U6c's netcode seat aa64bb15ad4467641 (section 7, xhigh, read only, snapshot a4e63455…, tree
+    agent-a3a3e3fdf559de095) -> u6c-review-netcode.md: resumed, it reads its file and goes on after its last complete
+    block; runner logs .gate/u6c/rev-netcode-<n>.log. Test and security DONE (Next 2; resumable: a3a1718b1419d246e,
+    a546a4604d30ee9d4). MAIN-64's advisor a74a6501af7e576c7 (from 10:30, high) -> advisor-main-64.md.
   - The saver b1bd3pcdl (09:50 to about 11:50; when it ends, restart it: run_in_background, timeout 7200000). Triggers:
     check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly, next ~10:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24
     23:05 UTC, msg-2026-11-25.md).
-- **My step (his words, history.md "2026-11-24 about 10:14": no new agent until after his /compact):** waiting on U6c's
-  round. **First after his /compact:** PR #40 conflicts with main 1ec6f6c (PR #64; only docs/STATUS.md, the rest
-  auto-merge): take main in as at MAIN-53 (merge_main_53.py's rule), gate, push (no CI on #40 until then). **Next
-  three:** (1) the three files read; the advisor's one ruling (F-P8, each Medium+); (2) the fix pass (U6c's builder),
-  its check, merge M3-M9 as U4f's (history.md:7022-7028; M5 after a part-clean; A2's reading; U8's side per interface,
-  C9); (3) U7's 0b check the hour U6c merges, U7's R-half (its T-builder), U8's merge. Day message 23:05.
+- **My step (after his /compact, 10:2x):** MAIN-64, main 1ec6f6c into PR #40 (PR #64; only docs/STATUS.md conflicts):
+  plan main-64-plan.md (ed31452e…, saved 2f6001f) in MAIN-61's form, its advisor check running; then its steps 1-7
+  (the saver stopped at step 1; no save from the merge to the push). **Next three:** (1) the three files read; the
+  advisor's one ruling (F-P8, each Medium+); (2) the fix pass (U6c's builder), its check, merge M3-M9 as U4f's
+  (history.md:7022-7028; M5 after a part-clean; A2's reading; U8's side per interface, C9); (3) U7's 0b check the hour
+  U6c merges, U7's R-half (its T-builder), U8's merge. Day message 23:05.
 - **Finished, resumable by SendMessage:** U6c's builder a3a3e3fdf559de095 (BUILT; notes u6c-build.md; takes the fix
   pass); U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder ac59cce3e5d002441 (notes u8-build.md "## Pass
   3"); the advisor a3de649cd25e474df (U8's rulings); the U6c advisor a662f1797b78cae95. Older: card at e67ef59.
