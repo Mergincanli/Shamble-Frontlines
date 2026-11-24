@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 13:56 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 14:01 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -290,6 +290,13 @@
    and 1; `npm test --workspaces`: types 7, sim-worker 40, client 68, net 1, e2e's node project 1; boundary 2
    files, 16 tests; "Running 14 tests", "14 passed"; 0 skipped, 0 ignored; the Wasm's sha256 e138cae8...2bc5.
 
+   **CI on 5c92311 (step 8), read line by line:** gate success (run 45408570716), toolchain success (run
+   45408571090, job 138495835913, 13:56:06 to 13:58:29 UTC; image ubuntu-24.04 20261116.376.1, Chrome
+   157.0.8103.78; `.gate/cs3a/ci-5c92311-toolchain.log`): every count as expected (client 68, boundary 2 files and
+   16 tests, "14 passed (59.8s)", allocation 50 and 525). **RR-F5 is shown: the players' Wasm on the runner is
+   31,805 bytes with sha256 e138cae8b686fed4fe317602332fb65616fb7235194c9043ee49c4451ed72bc5, the very bytes of
+   this container's build, and the job's line reads "no registry path in the Wasm".**
+
 ## Current step
 **The reviews, round 1, on the code head 5c92311** (plan section 4: rust-reviewer, engine-architect, test-engineer;
 then security-auditor and perf-auditor; Opus 5.5, effort max; at most 3 at a time; each with its notes in this
@@ -344,7 +351,16 @@ and text.
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
-- Nothing runs in the background. No saver. A second worktree `.gate/cs3a-batch` (condition 1's builds) may stay.
+- **Three reviewers in the background since 13:58 UTC** (round 1, on 5c92311): rust-reviewer
+  (`rust-reviewer-review1.md`), engine-architect (`engine-architect-review1.md`), test-engineer
+  (`test-engineer-review1.md`); each works in its own `.gate/<name>-cs3a/` folder. security-auditor and
+  perf-auditor follow when a place is free. No source file is edited while a round is being read. No saver.
+- Prepared for the docs pass and the check, not yet run on the tree: `decisions-4.mjs` (his five messages of
+  2026-11-23, 23:44:10 UTC to 2026-11-24, 11:03:53 UTC into DECISIONS, on top of main's copy; preview in
+  `.gate/cs3a/DECISIONS.preview.md`), the two newly saved messages (`mustafa-2026-11-24T105043-compact-command.md`,
+  `mustafa-2026-11-24T110353-compact-done.md`), and `make-zip.py` (the zip `shamble-v2-03a-rules-boundaries` with
+  the README's seven steps; run it on the final head's development build).
+- A second worktree `.gate/cs3a-batch` (condition 1's builds) may stay.
 - In a folder outside the repository cargo is the default 1.97.0, not the pin: scratch projects use `cargo +1.99.1`.
 - How things are run here (the guard refuses `npx`, `npm run`, `npm test`): vitest by
   `node node_modules/vitest/vitest.mjs run --root packages/<name> [--dir ...]`; the browser tests by
