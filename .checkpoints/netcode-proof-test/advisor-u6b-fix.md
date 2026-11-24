@@ -254,3 +254,104 @@ plant was re-applied to the fixed tree.
   allows (it governs a start). NR-U6B-5 at 5,952 + 8 was not started, nor T-12 or T-17: carried by number. The order is
   my ruling's.
 - Mustafa's SIZE-CHECK stop (past 6,000) was not reached: 48 under it. No "STOP" line in the notes, none needed.
+
+### (7) The 20 starts' record: MET
+Against u6b-review-test.md section 5's provenance and starts bullets, as my ruling's A2 and item 8 keep them:
+- **Same tree as the counted run:** fx-release.log:3 and fx-starts.log:3 both show diff 219ee92e…0fef, untracked
+  empty, HEAD 21765e3, = fx-check2.log:3; no cargo or rustc ran beside either (fx-release.log:26, fx-starts.log:33).
+- **The build:** `cargo build --locked --release -p npt-server` (fx-release.log:4-15, 20.0 s, exit 0): release, default
+  features, no `bites`. The binary's sha256 f78dd20a…150a (fx-starts.log:5).
+- **The machine, disk, time, settings:** 4 vCPUs, Intel Xeon @ 2.30GHz (:6); free 6,662 MiB, 2026-11-23T23:19:48Z (:8);
+  settings sha256 693818d8…964a (:7): P2, 48 clients, `transport` both, both listeners on 127.0.0.1:0, no PEM files
+  (the dev certificate made at each start), log, token file and hash path relative (u6b-starts/settings.json:1-11).
+- **Fresh paths per start:** starts.sh makes a new folder per start and runs the room in it (u6b-starts/starts.sh:19-23),
+  so each start has its own token file, log and hash file (`create_new` would refuse a used one, exit 2). npt-super's
+  time-starts was not used for that reason (notes :333-334); the script measures on its own clock (`date +%s%N` before
+  the spawn and after the OPEN line: :22-27).
+- **Each start:** its command line, first line `OPEN`, spawn_to_open_ns and exit 0 (:9-28). **20 of 20, 0 failed;
+  p50 19,455,076 ns (the 10th of 20 sorted: I re-sorted the 20 and agree), max 25,165,111 ns** (:29). U6a's lower
+  bound is replaced (both listeners and the certificate are now in the start): the notes say so (:327-328), the report
+  must too. "Reported, never judged".
+- The test seat's "a WebSocket and a WebTransport client opened at once after OPEN" is answered by T-7's check
+  (my ruling's item 8), which the binary test now makes (item (1), T-7).
+
+### (8) The carries by number: MET, with three takers named here
+Every finding of the round is fixed in T, ruled away (T-1 by A1) or carried by number in u6b-fix-pass.md section 3 as
+my ruling's section 3 item 9 amends it. The builder's three unbuilt Lows (notes :270-271) had no taker in either text;
+I name them (section 6): NR-U6B-5 to U6e (the header row) with its recount in A2's U6c reading, T-12 to U6e, T-17 to
+U8's next edit. My own Lows below (F-1 to F-3) are carried there too. The full list, by number with takers, is
+section 6.
+
+## 3. F-TICK-ROUND: confirmed; my ruling's line is corrected
+- The formula is unchanged from `<base>`: N = ceil(3 x srtt / (2 x tick_ns)) + 1, at least 3 (ws_gate.rs:25-31).
+- At 60 Hz and srtt 100 ms: truncated, tick_ns = 16,666,666, 2 x tick = 33,333,332, 300,000,000 / 33,333,332 =
+  9.0000003, ceil 10, **N = 11**; rounded up, 16,666,667, 2 x tick = 33,333,334, ratio 8.9999998, ceil 9, **N = 10**.
+  The exact period (16,666,666.67 ns) gives exactly 9, so N = 10: the netcode seat's intended value (its fix text pairs
+  "16,666,666" with "N = 10", which its own formula does not give). At 30 Hz both give 6 (truncated 33,333,333:
+  4.50000005, ceil 5; rounded up 33,333,334: 4.4999999, ceil 5).
+- Which errs where: a truncated period overstates the ratio, so N is one too high exactly at srtt values where the
+  exact ratio is a whole number (100 ms at 60 Hz is one); a rounded-up period understates it, so N is one too low only
+  for srtt within about 2 ns above such a boundary (m x 11,111,111.11 ns to m x 11,111,111.33 ns at 60 Hz), never at a
+  whole microsecond near N = 10 (TCP_INFO's srtt is in microseconds). Rounding up is the closer one, and the safe side
+  (a smaller N holds fewer bytes in flight).
+- **Ruling:** `GATE_TICK_NS = 1_000_000_000u64.div_ceil(TICK_HZ)` with its reason (server/src/main.rs:148-150) stands;
+  my ruling's builder message (advisor-u6b-r1.md:230, item 4: "1_000_000_000 / u64::from(npt_sim::TICK_HZ)") is
+  corrected to it. U6b's report names the correction in one line. No mark, judge rule or run value moves (the runs are
+  30 Hz, where both agree).
+
+## 4. Findings (CLAUDE.md's scale)
+Critical 0, High 0, Medium 0. Every Medium of the round is fixed to its seat's words; R-PING and A1 are as ruled.
+- **F-1 (Low): the WebSocket half of SEC-U6B-1's bound has no test of its own.** WsLink's drain, Close and shutdown
+  run under `bounded` (ws_server.rs:833-866), but the only test of the bound is WebTransport's
+  (wt_server_tests.rs:380-420), and P18 removes the bound inside the shared helper (session.rs:115-126): a WsLink that
+  stopped calling `bounded` would pass every test. Fix: a WebSocket peer that stops reading with messages queued, its
+  permit back within the bound after the drop; a plant at WsLink's call site. Taker: U6e (the next unit in
+  ws_server_tests.rs).
+- **F-2 (Low): T-4's test is not timed alone.** The bursts moved as worded (ws_server_tests.rs:824-827); the module's
+  wall time fell from 6.53 s to 5.20-5.21 s with 22-23 tests in parallel (fx4-test3.log:36; fx6-test3.log:79), so the
+  test is at most about 5.2 s under load, about 4.5 s alone by arithmetic, near the 5 s cap. Taker: U6e's report gives
+  its time alone (the next run of this file).
+- **F-3 (Low): NR-U6B-6's row is tested at 0 only** (binary.rs:376-379). The non-zero path (the mark taken, the room
+  clock read just before it) is first read in A2's U6c reading, which sets the mark: that record shows
+  `ws_split_mark_room_ns` non-zero and at least `open_ns` plus the mark's seconds. Taker: U6c's close (A2).
+- **F-4 (Low, evidence): the 20 plant diffs live in the worktree's gitignored .gate/u6b/** (F-DIFF-HOME), not beside
+  their logs: the worktree's removal deletes them, and T-10's fix ("beside its log") is then lost. Condition C1.
+- Note (no finding): my ruling's tick-period line was wrong by one rounding (section 3); the builder flagged it.
+- Not checked by me: each plant log's diff hash against its diff file (item 4); a session task that outlived FLUSH
+  would keep its link until the runtime's shutdown and lose its `ws_summary` (read only: the session poll is 1 ms and
+  non-blocking, so I see no path to it); quinn's Debug text as the stable form the SEC-U6B-2 test reads; any test run
+  (none needed by a claim I could not settle from the logs; none run, as asked).
+
+## 5. Verdict: APPROVE WITH CONDITIONS (merge on M3-M9)
+For the head whose spikes/ and docs/ diff against 21765e3 equals wip/u6b-fix.patch (e29c003c…ac64af1c). No second
+round: no Critical or High (A3's rule), so no seat reads anything again.
+- **C1:** before the builder's worktree is removed, the main session copies the 20 `plant-<id>.diff` files from
+  .claude/worktrees/agent-a2661dc320c9e6d00/.gate/u6b/ into the main .gate/u6b/ beside their fx-plant logs, and U6b's
+  report lists each with its sha256.
+- **C2:** U6b's report carries section 6 by number with its takers, the F-TICK-ROUND correction (one line), the 20
+  starts' p50 19.46 ms and max 25.17 ms as replacing U6a's lower bound, and A1's line word for word ("closed for U6b by
+  removing its subject, not by a fix: U6b's merged tree claims no ws-budget-x2 behaviour"; T-1 stays High as U6e's
+  condition).
+The gate, smoke and every other M-step stand as the plan sets them; this check replaces none of them.
+
+## 6. Carries for U6b's report (by number, with takers)
+| Taker | Items |
+|---|---|
+| **U6e** | The bite PM-0001-18/ws-budget-x2 (snapshot 49f4488f's hunks, advisor-u6b-r1.md:108-118) with **T-1 as its condition, word for word**, SP-4 and SEC-U6BD-2 by number, the test seat's N4 (the binary's arming in no test) and T-4's bite half (the bite's (c) test inside 5 s); T-11 (the WT kick test's setup concurrent); T-14 (a deadline inside QUIC's handshake); T-16 (C1c on DelayStream; moved from U6d); T-18 (the early class asserted); T-21 (port 0); NR-U6B-5 (the pool's added heap in a header row, from `Pooled::heap_bytes()`; not built: the scope line); T-12 (the bite path pushes `r`; not built); F-1; F-2 |
+| **U6d** | NR-U6B-11 (the unit of `unsent_unreliable`), NR-U6B-13 (sessions the loop refuses counted), NR-U6B-14 (the plain path's drift) |
+| **U6c's close (A2)** | The 48-connection DelayStream self-test reading and the cap's memory bound at N = 48, by A2's terms (with NR-U6B-5's recount of the pool's heap in the bound); F-3 (the room-clock mark read non-zero) |
+| **U7** | SEC-U6B-2's unidirectional stream count (6) confirmed in its headless Chromium run |
+| **U7's or U8's record step** | NR-U6B-10 (F-NEG: a presence-only draft count, or -56 item 2 by number) |
+| **U8's next edit (R1.md and the unit)** | NR-U6B-6's room-clock mark read by the INVALID rule; NR-U6B-9's reader rows named beside pooled L; T-5's note (the identity is a range check for R); T-17 (the hash file's 0644 depends on the umask: UMask=0022 named in the room's unit; not built: the scope line) |
+| **The security baseline, and PR #40's closing list** | SEC-U6B-3 (Retry before the permit): a security finding left open (advisor.md step 4), named in PR #40's list (needs-mustafa already) |
+| **U6b's report text only** | NR-U6B-7 (the skipped row's one-row shift); NR-U6B-8 (the new pub items with reasons, the fix pass's included: `TickLoop::stop_with`, `Listen::tick_ns` and `outside_max`; the bite's two gone); NR-U6B-9 (the reader stamp is R1's); T-20 (the named-vs-extra count split: the fix pass's 8 tests named); T-5's report half; T-6's in-flight skew statement; TickLoop's stop step in U6b's lane (my ruling's item 10); F-TICK-ROUND (section 3) |
+| **Closed in this fix pass (for the report's table)** | SEC-U6B-1, -2, -4, -5; NR-U6B-1, -2, -3 (R-PING), -4, -6 (the row), -12 (by T-6); T-2 (both halves), T-3 to T-9, T-10 (with C1), T-13 (by SEC-U6B-1's test), T-15 (= SEC-U6B-4), T-19 (P20); T-1 closed for U6b by A1 (its subject removed), open as U6e's condition |
+
+## 7. What goes to Mustafa
+**Decisions needed:** none. F-TICK-ROUND is a technical correction inside the plan (no mark, judge rule, marks.json
+text, run value, money or stop of his changes); the main session names it in the day's message, one line, as a choice
+taken without him (NPT-TRIM). The scope line held (5,952, his stop of 6,000 not reached), so his three lines are not
+triggered.
+**For Mustafa:** nothing.
+
+DONE
