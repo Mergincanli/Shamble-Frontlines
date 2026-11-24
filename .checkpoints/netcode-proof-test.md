@@ -77,8 +77,8 @@
   uncommitted copy of the tree; plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6c's build RUNNING from 06:56 UTC:** builder a3a3e3fdf559de095 (general-purpose, opus, xhigh, worktree,
-  background); its launch message u6c-launch-prompt.txt (added items 1-6: U7's dist names, advisor-u8-stopb.md:210-220's
+- **Next 2, U6c's build RUNNING (launched about 06:55; cut by the spend limit 06:55-07:59, no edit lost; resumed by
+  SendMessage 08:0x):** builder a3a3e3fdf559de095 (general-purpose, opus, xhigh, worktree, background); its launch message u6c-launch-prompt.txt (added items 1-6: U7's dist names, advisor-u8-stopb.md:210-220's
   six lines, NC-R2-4, F-JOIN-ONCE, A2's command, the 5,400 stop). `<base>` 8c81952 (U6b's merge 8efb9b2 + Block 0
   3b75d00), 807/904, test step 1086.7 s; runner u6c-run.sh, logs .gate/u6c/; its notes in its worktree's u6c-build.md.
   Its first build is cold (dev part-clean 06:55: 7.0 GiB; free 3,861 -> 10,666 MiB). On a cut: SendMessage it to read
@@ -151,7 +151,7 @@
     DONE); U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree agent-a2661dc320c9e6d00), the
     advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode a0a57a3948202de40, security aedb799ad9648b0e1,
     test a88f25b3d3f66d972.
-  - The saver bopei7hrt (06:10 to about 08:00; when it ends, restart it: run_in_background, timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
+  - The saver bldcg3pna (08:00 to about 10:00; when it ends, restart it: run_in_background, timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
 - **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
   af8c5f0fbec829595 (u6b-run.sh exports CARGO_INCREMENTAL=0; a builder on the 4 GB floor stops, never cleans);
   U8's builder ac59cce3e5d002441 (worktree agent-ac59cce3e5d002441, notes u8-build.md "## Pass 3"); Stop B's infra seat
@@ -195,4 +195,5 @@
   2026-11-22 :7610-7617, :7623-7628 (15:47:28 to about 19:44 UTC); 2026-11-22/23 :7655-7663 (about 20:42 to 02:36 UTC);
   2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC), :7675-7687 (about 07:53 to 11:14 UTC), :7689-7701 (about 12:28 to 16:22 UTC),
   :7724-7736 (about 17:33 to 21:12 UTC); 2026-11-23/24 :7745-7753 (about 23:22 to 02:36 UTC); 2026-11-24 :7755-7770
-  (a container restart, about 05:26 to 05:37 UTC: M5 run 2 and the saver re-run).
+  (a container restart, about 05:26 to 05:37 UTC: M5 run 2 and the saver re-run), :7772-7783 (about 06:55 to 07:59
+  UTC: U6c's builder, cut while reading, and this chat; the builder resumed by SendMessage 08:0x).

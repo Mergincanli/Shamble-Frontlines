@@ -7768,3 +7768,16 @@ Re-create them if still needed.
 - **Resumed 05:37-05:38 UTC:** git as before (HEAD = origin; the 29 merge files uncommitted, all 29 equal to
   .gate/u6b-merge/m6-files.txt by `sha256sum -c`); no cargo running; free 7,699 MiB (C4's floor 6,144); the saver
   restarted (b5zvi56zl); M5 run 2 restarted from its start under the same log name (b5x83ixmp).
+
+## Cut by the spend limit (2026-11-24 about 06:55 to 07:59 UTC)
+- **The notice** (U6c's builder a3a3e3fdf559de095, its task ended at about 06:55:27 UTC, HTTP 429; then this chat at
+  06:56:56 and 07:01:02 UTC, the same words): "You've hit your org's monthly spend limit · ask your admin for a higher
+  limit · your 5-hour limit resets 7:10am (UTC)".
+- **What it stopped:** U6c's builder, launched about 06:55 and cut while still reading (its last line: "Now the test
+  code that gets promoted: the poller, samples and E forms, pre-touch, and T1/T2/T5/T7."): its worktree on 8c81952, no
+  edit (worktree_patch.py: patch 0 B, 0 files), its notes u6c-build.md holding its plan only (copied to the main
+  folder). This chat, after the card edit of 06:56:56 (choices (3) and (4)). The saver bopei7hrt ran on to its 2 h end
+  (07:59:46). Every notification queued meanwhile reached this chat at 07:59:46-08:00:16 (CI on 8c81952: no suite
+  running or failed, 07:01:01).
+- **Resumed 08:0x UTC:** no cargo or runner running; the saver restarted (bldcg3pna); the builder by SendMessage, from
+  its notes and its plan.
