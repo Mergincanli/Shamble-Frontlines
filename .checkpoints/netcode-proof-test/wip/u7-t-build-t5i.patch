@@ -1,0 +1,2996 @@
+diff --git a/spikes/netcode-proof/web/bites/hooks.js b/spikes/netcode-proof/web/bites/hooks.js
+new file mode 100644
+index 0000000..aed22d7
+--- /dev/null
++++ b/spikes/netcode-proof/web/bites/hooks.js
+@@ -0,0 +1,10 @@
++// hooks.js of the bites dist only (u7-brief.md rev 1.1 Block T4; C13): `node build.mjs --bites` copies this file over
++// tsc's measured hooks.js into <checkout>/.gate/netcode-proof-test/dist-bites/, never under web/. The page imports it;
++// it arms at most one bite, named by the link's `bite` query (marks.json's ids, :6541 and :7493), and the page refuses
++// a `bite` it does not list. With no bite it gives the measured timings.
++export const BITE_IDS = Object.freeze(["PM-0001-36/read-once", "PM-0001-29/no-wt-timeout"]);
++const bite = new URLSearchParams(globalThis.location?.search ?? "").get("bite");
++/** PM-0001-29/no-wt-timeout: no WebTransport timeout, so the attempt hangs (no fallback). */
++export const WT_TIMEOUT_MS = bite === "PM-0001-29/no-wt-timeout" ? null : 1_500;
++/** PM-0001-36/read-once: maxDatagramSize read once, at session ready only. */
++export const MDS_READ_PERIOD_MS = bite === "PM-0001-36/read-once" ? null : 10_000;
+diff --git a/spikes/netcode-proof/web/build.mjs b/spikes/netcode-proof/web/build.mjs
+new file mode 100644
+index 0000000..91e469c
+--- /dev/null
++++ b/spikes/netcode-proof/web/build.mjs
+@@ -0,0 +1,162 @@
++#!/usr/bin/env node
++// build.mjs: U7's web build (u7-brief.md rev 1.1 Block T1; u8-build.md F14). RS runs it in web/ as
++// `npm_config_ignore_scripts=true CARGO_NET_OFFLINE=true node build.mjs` after `npm ci --ignore-scripts`.
++//   1. `wasm-bindgen --version` must print 0.2.130, else exit 2 (the binary: NPT_WASM_BINDGEN, else PATH's);
++//   2. `cargo build --locked --offline --release --target wasm32-unknown-unknown -p npt-client-wasm` in its own target
++//      folder under .gate/, with CARGO_HOME, the workspace and that target remapped, so RS and here make the same bytes;
++//   3. `wasm-bindgen --target web --no-typescript` (no wasm-opt); the Wasm is scanned for absolute home paths;
++//   4. `tsc -p .` into .gate/;
++//   5. exactly seven files into a fresh dist folder, each SHA-256 printed.
++// Options: `--bites` writes the bites dist (web/bites/hooks.js in place of hooks.js) to
++// <checkout>/.gate/netcode-proof-test/dist-bites/ (C13); `--out <dir>` writes the measured dist under that .gate/
++// folder instead of web/dist/ (a dist under web/ fails check.mjs's redact step: N-U7D-1). No shell, no npx.
++import { createHash } from "node:crypto";
++import { execFileSync } from "node:child_process";
++import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
++import { homedir } from "node:os";
++import { dirname, join, relative, resolve, sep } from "node:path";
++import { fileURLToPath, pathToFileURL } from "node:url";
++
++export const WEB = dirname(fileURLToPath(import.meta.url));
++export const SPIKE = resolve(WEB, "..");
++export const ROOT = resolve(WEB, "..", "..", "..");
++export const GATE = join(ROOT, ".gate", "netcode-proof-test");
++export const WASM_BINDGEN_VERSION = "0.2.130";
++/** The dist names U6c's page host compiles in (u6c-brief.md:241-246), in this order. */
++export const DIST_NAMES = Object.freeze([
++  "index.html",
++  "main.js",
++  "worker.js",
++  "lib.js",
++  "hooks.js",
++  "npt_client_wasm.js",
++  "npt_client_wasm_bg.wasm",
++]);
++const FROM_TSC = ["main.js", "worker.js", "lib.js", "hooks.js"];
++const FROM_BINDGEN = ["npt_client_wasm.js", "npt_client_wasm_bg.wasm"];
++
++/** `--bites` and `--out <dir>`; anything else is a usage error. */
++export function parseArgs(argv) {
++  const a = { bites: false, out: null };
++  for (let i = 0; i < argv.length; i++) {
++    if (argv[i] === "--bites") a.bites = true;
++    else if (argv[i] === "--out" && i + 1 < argv.length) a.out = argv[++i];
++    else throw new Error(`unknown argument ${JSON.stringify(argv[i])}`);
++  }
++  if (a.bites && a.out) throw new Error("--bites writes to its own folder; --out is for the measured dist");
++  return a;
++}
++
++function inside(dir, parent) {
++  const r = relative(parent, dir);
++  return r !== "" && !r.startsWith("..") && !r.startsWith(sep) && resolve(parent, r) === dir;
++}
++
++/** The dist folder: web/dist (measured), .gate/netcode-proof-test/dist-bites (bites), or `--out` under that .gate/. */
++export function outDirFor({ bites = false, out = null } = {}) {
++  if (bites) return join(GATE, "dist-bites");
++  if (out === null) return join(WEB, "dist");
++  const d = resolve(out);
++  if (!inside(d, GATE)) throw new Error("--out must name a folder under .gate/netcode-proof-test/");
++  return d;
++}
++
++/** True when `wasm-bindgen --version` printed exactly the pinned version. */
++export function wasmBindgenOk(text) {
++  return String(text).trim() === `wasm-bindgen ${WASM_BINDGEN_VERSION}`;
++}
++
++/** CARGO_ENCODED_RUSTFLAGS: CARGO_HOME, the workspace and the Wasm's target folder mapped to fixed names. */
++export function encodedRustFlags(cargoHome, spike, target) {
++  return [
++    `--remap-path-prefix=${cargoHome}=/cargo-home`,
++    `--remap-path-prefix=${spike}=/npt`,
++    `--remap-path-prefix=${target}=/npt-target`,
++  ].join("\x1f");
++}
++
++/** The absolute home-like paths `bytes` holds: the generic home roots and each named folder. */
++export function homePaths(bytes, folders = []) {
++  const text = Buffer.from(bytes).toString("latin1");
++  const needles = ["/home/", "/root/", "/Users/", "C:\\Users\\", ...folders.filter((f) => f && f.length > 1)];
++  return needles.filter((n) => text.includes(n));
++}
++
++function sha256(file) {
++  return createHash("sha256").update(readFileSync(file)).digest("hex");
++}
++
++/**
++ * Copies the seven files into a fresh `out` (removed first; only web/dist or a folder under .gate/netcode-proof-test/)
++ * and returns each name with its SHA-256. `jsDir` holds tsc's four files, `bindgenDir` wasm-bindgen's two; `hooks`
++ * replaces tsc's hooks.js when given.
++ */
++export function assemble({ out, index, jsDir, bindgenDir, hooks = null }) {
++  const d = resolve(out);
++  if (d !== join(WEB, "dist") && !inside(d, GATE)) throw new Error("a dist goes to web/dist or under .gate/ only");
++  const from = new Map([["index.html", index]]);
++  for (const n of FROM_TSC) from.set(n, join(jsDir, n));
++  for (const n of FROM_BINDGEN) from.set(n, join(bindgenDir, n));
++  if (hooks !== null) from.set("hooks.js", hooks);
++  for (const [n, f] of from) if (!existsSync(f)) throw new Error(`missing ${n}`);
++  rmSync(d, { recursive: true, force: true });
++  mkdirSync(d, { recursive: true });
++  const sums = [];
++  for (const n of DIST_NAMES) {
++    copyFileSync(from.get(n), join(d, n));
++    sums.push({ name: n, sha256: sha256(join(d, n)) });
++  }
++  const got = readdirSync(d).sort();
++  if (got.join("\n") !== [...DIST_NAMES].sort().join("\n")) throw new Error("the dist is not the seven names");
++  return sums;
++}
++
++function run(cmd, args, env = process.env, cwd = SPIKE) {
++  return execFileSync(cmd, args, { cwd, env, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] });
++}
++
++function main() {
++  let args;
++  try {
++    args = parseArgs(process.argv.slice(2));
++  } catch (e) {
++    console.error(`build.mjs: ${e.message}; usage: node build.mjs [--bites | --out <dir under .gate/netcode-proof-test>]`);
++    process.exit(2);
++  }
++  const out = outDirFor(args);
++  const bindgen = process.env.NPT_WASM_BINDGEN || "wasm-bindgen";
++  let version = "";
++  try {
++    version = run(bindgen, ["--version"]);
++  } catch {
++    version = "";
++  }
++  if (!wasmBindgenOk(version)) {
++    console.error(`build.mjs: wasm-bindgen ${WASM_BINDGEN_VERSION} is required (read: ${version.trim().slice(0, 60) || "none"})`);
++    process.exit(2);
++  }
++  const target = join(GATE, "wasm-target");
++  const work = join(GATE, args.bites ? "web-build-bites" : "web-build");
++  const cargoHome = resolve(process.env.CARGO_HOME || join(homedir(), ".cargo"));
++  const env = { ...process.env, CARGO_NET_OFFLINE: "true", CARGO_ENCODED_RUSTFLAGS: encodedRustFlags(cargoHome, SPIKE, target) };
++  delete env.RUSTFLAGS;
++  run("cargo", ["build", "--locked", "--offline", "--release", "--target", "wasm32-unknown-unknown", "-p", "npt-client-wasm",
++    "--target-dir", target], env);
++  rmSync(work, { recursive: true, force: true });
++  const bindgenDir = join(work, "bindgen");
++  const jsDir = join(work, "js");
++  run(bindgen, ["--target", "web", "--no-typescript", "--out-dir", bindgenDir,
++    join(target, "wasm32-unknown-unknown", "release", "npt_client_wasm.wasm")]);
++  const found = homePaths(readFileSync(join(bindgenDir, "npt_client_wasm_bg.wasm")), [cargoHome, SPIKE, ROOT, homedir()]);
++  if (found.length > 0) {
++    console.error(`build.mjs: the Wasm holds ${found.length} absolute home path(s); the remap missed one`);
++    process.exit(1);
++  }
++  run(process.execPath, [join(WEB, "node_modules", "typescript", "bin", "tsc"), "-p", WEB, "--outDir", jsDir], process.env, WEB);
++  const sums = assemble({ out, index: join(WEB, "index.html"), jsDir, bindgenDir,
++    hooks: args.bites ? join(WEB, "bites", "hooks.js") : null });
++  console.log(`build.mjs: ${args.bites ? "bites" : "measured"} dist, ${sums.length} files`);
++  for (const s of sums) console.log(`${s.sha256}  ${s.name}`);
++}
++
++if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) main();
+diff --git a/spikes/netcode-proof/web/e2e/contact.html b/spikes/netcode-proof/web/e2e/contact.html
+new file mode 100644
+index 0000000..a748ab3
+--- /dev/null
++++ b/spikes/netcode-proof/web/e2e/contact.html
+@@ -0,0 +1,12 @@
++<!doctype html>
++<html lang="en">
++<head>
++<meta charset="utf-8">
++<title>npt early contact</title>
++<script type="module" src="contact.js"></script>
++</head>
++<body>
++<p id="status">Starting</p>
++<pre id="out"></pre>
++</body>
++</html>
+diff --git a/spikes/netcode-proof/web/e2e/contact.js b/spikes/netcode-proof/web/e2e/contact.js
+new file mode 100644
+index 0000000..4678a95
+--- /dev/null
++++ b/spikes/netcode-proof/web/e2e/contact.js
+@@ -0,0 +1,103 @@
++// contact.js: T5 (i)'s early-contact page (u7-brief.md rev 1.1:129-132), before the Wasm client exists. It uses the
++// page's own lib.js and hooks.js (the hash file, the chooser, the room's ports) to open one session and record what
++// happened, then waits for the room to close it (its 2 s Join deadline: no Join is ever sent), at most 10 s.
++// `?mode=wt&room=NN`: WebTransport with the room's hash, then its control stream. `?mode=ws&room=NN`: wss straight.
++// `?mode=wt-wrong&room=NN`: WebTransport with each hash byte XOR 0xff (a control: it must fail; no fallback).
++// The result goes to window.contact (and #out) for the driver; it holds no token, URL or bind value.
++import { WT_TIMEOUT_MS } from "./hooks.js";
++import { connect } from "./lib.js";
++
++const t0 = performance.now();
++const ms = () => Math.round(performance.now() - t0);
++const q = new URLSearchParams(location.search);
++const mode = q.get("mode");
++const room = q.get("room") ?? "";
++const out = { mode, room, steps: [], statuses: [], violations: [] };
++const step = (what, extra = {}) => out.steps.push({ what, ms: ms(), ...extra });
++const sleep = (t) => new Promise((ok) => setTimeout(() => ok("timeout"), t));
++document.addEventListener("securitypolicyviolation", (e) => {
++  out.violations.push({ directive: e.effectiveDirective, blocked: String(e.blockedURI).slice(0, 60) });
++});
++
++function done() {
++  out.endMs = ms();
++  document.getElementById("status").textContent = "Done";
++  document.getElementById("out").textContent = JSON.stringify(out, null, 1);
++  window.contact = out;
++  window.contactDone = true;
++}
++
++async function wtSession(wt) {
++  step("webtransport ready", { maxDatagramSize: wt.datagrams.maxDatagramSize });
++  try {
++    const bidi = await wt.createBidirectionalStream();
++    step("control stream open");
++    const w = bidi.writable.getWriter();
++    try {
++      await w.write(new Uint8Array(0));
++      step("empty write accepted");
++    } catch (e) {
++      step("empty write refused", { error: e?.name ?? "error" });
++    }
++  } catch (e) {
++    step("control stream refused", { error: e?.name ?? "error" });
++  }
++  const end = await Promise.race([
++    wt.closed.then((v) => ({ how: "closed", closeCode: v?.closeCode ?? null, reason: String(v?.reason ?? "").slice(0, 80) }),
++      (e) => ({ how: "closed with an error", error: e?.name ?? "error", source: e?.source ?? null })),
++    sleep(10000),
++  ]);
++  if (end === "timeout") {
++    wt.close();
++    step("closed by the page at 10 s");
++  } else {
++    step("webtransport session ended", end);
++  }
++}
++
++async function wsSession(ws) {
++  step("websocket open", { protocol: ws.protocol, extensions: ws.extensions });
++  const end = await Promise.race([
++    new Promise((ok) => {
++      ws.onclose = (e) => ok({ how: "closed", code: e.code, wasClean: e.wasClean, reason: String(e.reason).slice(0, 80) });
++      ws.onerror = () => step("websocket error event");
++    }),
++    sleep(10000),
++  ]);
++  if (end === "timeout") {
++    ws.close();
++    step("closed by the page at 10 s");
++  } else {
++    step("websocket ended", end);
++  }
++}
++
++if (!["wt", "ws", "wt-wrong"].includes(mode) || !/^(0[0-9]|[12][0-9]|3[01])$/.test(room)) {
++  step("a bad contact link");
++  done();
++} else {
++  const link = {
++    suite: mode === "wt-wrong" ? "wt-attempts" : "smoke", room, transport: mode === "ws" ? "ws" : "wt", attempt: 0,
++    token: "", wrongHash: mode === "wt-wrong", bite: null,
++  };
++  step("connect starts");
++  const chosen = await connect({
++    link,
++    host: location.hostname,
++    timeoutMs: WT_TIMEOUT_MS,
++    fetchText: async (path) => {
++      const r = await fetch(path, { cache: "no-store", credentials: "omit", redirect: "error" });
++      if (!r.ok) throw new Error("not found");
++      return r.text();
++    },
++    webTransport: (url, options) => new WebTransport(url, options),
++    webSocket: (url) => new WebSocket(url),
++    setTimer: (fn, t) => setTimeout(fn, t),
++    clearTimer: (id) => clearTimeout(id),
++    onStatus: (s) => out.statuses.push({ text: s, ms: ms() }),
++  });
++  step(`chosen: ${chosen.kind}`, chosen.kind === "failed" ? { why: chosen.why } : chosen.kind === "ws" ? { fellBack: chosen.fellBack } : {});
++  if (chosen.kind === "wt") await wtSession(chosen.wt);
++  else if (chosen.kind === "ws") await wsSession(chosen.ws);
++  done();
++}
+diff --git a/spikes/netcode-proof/web/e2e/serve.mjs b/spikes/netcode-proof/web/e2e/serve.mjs
+new file mode 100644
+index 0000000..774e628
+--- /dev/null
++++ b/spikes/netcode-proof/web/e2e/serve.mjs
+@@ -0,0 +1,54 @@
++// serve.mjs: T5's page server on http://127.0.0.1 (a secure context; u7-brief.md rev 1.1 section 3's browser line;
++// advisor-u6c-brief.md C1 (e)). It matches the request target's path, up to the first `?`, exactly against a fixed
++// table and never reads or keeps the query; it serves each room's hash file `/npt/cert-hash-NN.json` from the file the
++// caller names for that room; every answer carries plan.md:1123-1126's CSP word for word with https://127.0.0.1:* and
++// wss://127.0.0.1:* added to connect-src, `nosniff` and `no-referrer`; GET and HEAD only.
++import { existsSync, readFileSync } from "node:fs";
++import { createServer } from "node:http";
++import { extname } from "node:path";
++
++export const CSP = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' "
++  + "https://rs.nt.shamblefrontlines.com:* wss://rs.nt.shamblefrontlines.com:* https://rs-b.nt.shamblefrontlines.com:* "
++  + "wss://rs-b.nt.shamblefrontlines.com:* https://127.0.0.1:* wss://127.0.0.1:*; style-src 'self'; img-src 'self'; "
++  + "base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
++const TYPES = {
++  ".html": "text/html; charset=utf-8",
++  ".js": "text/javascript; charset=utf-8",
++  ".wasm": "application/wasm",
++  ".json": "application/json",
++};
++const HASH_PATH = /^\/npt\/cert-hash-(0[0-9]|[12][0-9]|3[01])\.json$/;
++
++/**
++ * `files`: request path to a file on disk; `hash(nn)`: that room's hash file on disk, or null. Resolves to
++ * { port, served, close }, `served` listing [path, status] per answer (paths only).
++ */
++export function serve({ files, hash }) {
++  const served = [];
++  const server = createServer((req, res) => {
++    const path = (req.url ?? "").split("?")[0];
++    const head = { "Content-Security-Policy": CSP, "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer" };
++    const answer = (status, extra = {}, body = undefined) => {
++      served.push([path, status]);
++      res.writeHead(status, { ...head, ...extra }).end(body);
++    };
++    if (req.method !== "GET" && req.method !== "HEAD") return answer(405);
++    const room = HASH_PATH.exec(path);
++    const file = room ? hash(room[1]) : Object.hasOwn(files, path) ? files[path] : null;
++    if (file === null || !existsSync(file)) return answer(404);
++    const type = TYPES[extname(file)] ?? "application/octet-stream";
++    const body = readFileSync(file);
++    return answer(200, { "Content-Type": type, "Cache-Control": "no-store" }, req.method === "HEAD" ? undefined : body);
++  });
++  return new Promise((ok, fail) => {
++    server.once("error", fail);
++    server.listen(0, "127.0.0.1", () => ok({
++      port: server.address().port,
++      served,
++      close: () => new Promise((done) => {
++        server.closeAllConnections();
++        server.close(done);
++      }),
++    }));
++  });
++}
+diff --git a/spikes/netcode-proof/web/e2e/t5i.mjs b/spikes/netcode-proof/web/e2e/t5i.mjs
+new file mode 100644
+index 0000000..ba1b0d2
+--- /dev/null
++++ b/spikes/netcode-proof/web/e2e/t5i.mjs
+@@ -0,0 +1,207 @@
++#!/usr/bin/env node
++// t5i.mjs: Block T5 (i), early contact (u7-brief.md rev 1.1:129-132; advisor-u7-brief.md C9), with U6b's merged
++// release binary and no cargo, before the Wasm client exists. Each load gets its own fresh room start in its own folder
++// (its own settings, token file, log and hash file; C9: no load sends a Join, so no slot is ever joined):
++//   A-wt          the contact page: the hash file, lib.js's connect() over WebTransport, the control stream;
++//   B-ws          the contact page: wss straight, the room's own certificate admitted by this context's
++//                 ignoreHTTPSErrors only (never a flag on the laptop: plan.md:1222-1223);
++//   C-wt-wrong    the contact page with each hash byte XOR 0xff: a control, which must fail (no fallback);
++//   D-real-page   index.html with main.js, the module Worker, lib.js and hooks.js, on a link with a synthetic token:
++//                 the Worker connects over WebTransport, then ends "the client did not load" (no Wasm yet).
++// The room's 2 s Join deadline closes each session. Container readings, recorded and never judged.
++// Use: node t5i.mjs --server <npt-server> --server-sha256 <64 hex> --chromium <chrome> --playwright <index.mjs>
++//      [--room NN] [--commit <40 hex>]
++// Writes <checkout>/.gate/u7/t5i/<UTC stamp>/<load>/ (settings.json, room.jsonl, room.stdout.txt, room.stderr.txt,
++// hash.json, contact.json; the token file is deleted once its room has exited) and summary.json. Prints no token.
++import { spawn } from "node:child_process";
++import { createHash } from "node:crypto";
++import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
++import { basename, dirname, join, resolve } from "node:path";
++import { fileURLToPath, pathToFileURL } from "node:url";
++import { serve } from "./serve.mjs";
++
++const HERE = dirname(fileURLToPath(import.meta.url));
++const WEB = resolve(HERE, "..");
++const ROOT = resolve(WEB, "..", "..", "..");
++const OUT = resolve(process.env.NPT_WEB_OUT || join(ROOT, ".gate", "netcode-proof-test", "web-check"));
++const sleep = (ms) => new Promise((ok) => setTimeout(() => ok(null), ms));
++const sha256 = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");
++
++function parseArgs(argv) {
++  const a = { room: "27", commit: "8efb9b2d971c3bb48ef41337249438c725f34708" };
++  for (let i = 0; i < argv.length; i += 2) {
++    const k = argv[i]?.replace(/^--/, "");
++    if (!["server", "server-sha256", "chromium", "playwright", "room", "commit"].includes(k) || argv[i + 1] === undefined) {
++      throw new Error(`unknown or empty argument ${argv[i]}`);
++    }
++    a[k] = argv[i + 1];
++  }
++  for (const k of ["server", "server-sha256", "chromium", "playwright"]) if (!a[k]) throw new Error(`--${k} is needed`);
++  if (!/^(0[0-9]|[12][0-9]|3[01])$/.test(a.room) || !/^[0-9a-f]{40}$/.test(a.commit)) throw new Error("bad --room or --commit");
++  return a;
++}
++
++function settings(dir, nn, transport, commit) {
++  return {
++    run: `T5i-${basename(dir)}`, set: "T5i", role: "contact", marks: [], date: new Date().toISOString().slice(0, 10),
++    commit, layer: "L2", profile: "P0", seed: 7, scene: "SS", clients: 1, cmd_timing: "B", tick_hz: 30,
++    machine_role: "C", machine_name: "C", machine_plan: "container", machine_location: "here", machine_address: "",
++    tick_vcpu: null, io_vcpus: [], io_threads: 2, log: join(dir, "room.jsonl"), token_file: join(dir, "tokens"),
++    duration_ms: 0, warmup_ticks: 0, first_cpu_model: "", transport,
++    wt_bind: `127.0.0.1:${30001 + Number(nn)}`, ws_bind: `127.0.0.1:${31001 + Number(nn)}`,
++    ws_cert_chain: "", ws_cert_key: "", hash_path: join(dir, "hash.json"), ws_split_mark_s: null,
++  };
++}
++
++/** Starts the room from its settings; `open` resolves true at its OPEN line, false at an exit or 15 s. */
++function startRoom(server, dir, s) {
++  const file = join(dir, "settings.json");
++  writeFileSync(file, `${JSON.stringify(s, null, 1)}\n`);
++  const child = spawn(server, ["--settings", file], { stdio: ["pipe", "pipe", "pipe"] });
++  const out = [];
++  const err = [];
++  child.stderr.on("data", (d) => err.push(d));
++  const exited = new Promise((ok) => child.on("exit", (code, signal) => ok({ code, signal })));
++  const open = new Promise((ok) => {
++    child.stdout.on("data", (d) => {
++      out.push(d);
++      if (Buffer.concat(out).toString().includes("OPEN")) ok(true);
++    });
++    exited.then(() => ok(false));
++    setTimeout(() => ok(false), 15000);
++  });
++  return { child, out, err, exited, open };
++}
++
++/** Ends the room by closing its stdin (main.rs:799-829), at most 20 s, then a kill; keeps its output; drops the tokens. */
++async function stopRoom(room, dir) {
++  room.child.stdin.end();
++  let exit = await Promise.race([room.exited, sleep(20000)]);
++  const killed = exit === null;
++  if (killed) {
++    room.child.kill("SIGKILL");
++    exit = await room.exited;
++  }
++  writeFileSync(join(dir, "room.stdout.txt"), Buffer.concat(room.out));
++  writeFileSync(join(dir, "room.stderr.txt"), Buffer.concat(room.err));
++  rmSync(join(dir, "tokens"), { force: true });
++  return { ...exit, killed };
++}
++
++/** The room log's events (they hold no token: SEC-U6AD-3), its record count, its footer. */
++function roomLog(file) {
++  if (!existsSync(file)) return { present: false };
++  const recs = readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
++  return {
++    present: true,
++    records: recs.length,
++    header_transport: recs[0]?.params?.transport ?? null,
++    events: recs.filter((r) => r.k === "event").map((r) => ({ ev: r.ev, ph: r.ph, f: r.f ?? {} })),
++    footer: recs.find((r) => r.k === "footer") ?? null,
++  };
++}
++
++const LOADS = [
++  { name: "A-wt", transport: "wt", path: "/contact.html", query: "mode=wt", ignoreHTTPSErrors: false },
++  { name: "B-ws", transport: "ws", path: "/contact.html", query: "mode=ws", ignoreHTTPSErrors: true },
++  { name: "C-wt-wrong", transport: "wt", path: "/contact.html", query: "mode=wt-wrong", ignoreHTTPSErrors: false },
++  { name: "D-real-page", transport: "wt", path: "/", query: "smoke=1&suite=smoke&room=NN&transport=wt&attempt=0", ignoreHTTPSErrors: false },
++];
++
++async function runLoad(load, a, browser, site, base, current) {
++  const dir = join(base, load.name);
++  mkdirSync(dir, { recursive: true });
++  current.hash = join(dir, "hash.json");
++  const room = startRoom(a.server, dir, settings(dir, a.room, load.transport, a.commit));
++  const opened = await room.open;
++  const query = load.path === "/" ? load.query.replace("NN", a.room) : `${load.query}&room=${a.room}`;
++  const result = { load: load.name, page: `${load.path}?${query}`, ignoreHTTPSErrors: load.ignoreHTTPSErrors, room_open: opened };
++  if (opened) {
++    const ctx = await browser.newContext({ ignoreHTTPSErrors: load.ignoreHTTPSErrors });
++    const page = await ctx.newPage();
++    const consoleLines = [];
++    page.on("console", (m) => consoleLines.push({ type: m.type(), text: m.text().slice(0, 200) }));
++    page.on("pageerror", (e) => consoleLines.push({ type: "pageerror", text: String(e.message).slice(0, 200) }));
++    const servedBefore = site.served.length;
++    const t0 = Date.now();
++    const fragment = load.path === "/" ? `#t=${["nptj", "_", "T5iContactNoJoinSynth", "A"].join("")}` : "";
++    await page.goto(`http://127.0.0.1:${site.port}${load.path}?${query}${fragment}`);
++    try {
++      if (load.path === "/") {
++        await page.waitForFunction(() => (document.querySelector("#status")?.textContent ?? "").startsWith("Ended"), null, { timeout: 20000 });
++        result.page_state = await page.evaluate(() => ({
++          status: document.querySelector("#status")?.textContent ?? "",
++          version: document.querySelector("#version")?.textContent ?? "",
++          records: Array.isArray(window.nptRecords) ? window.nptRecords.slice() : null,
++          nptClockResNs: window.nptClockResNs ?? null,
++          nptDropped: window.nptDropped ?? null,
++        }));
++      } else {
++        await page.waitForFunction(() => window.contactDone === true, null, { timeout: 20000 });
++        result.contact = await page.evaluate(() => window.contact);
++      }
++    } catch (e) {
++      result.wait_error = String(e.message).split("\n")[0].slice(0, 160);
++    }
++    result.page_ms = Date.now() - t0;
++    await sleep(300);
++    result.console = consoleLines;
++    result.served = site.served.slice(servedBefore);
++    await ctx.close();
++  }
++  result.room_exit = await stopRoom(room, dir);
++  result.room_log = roomLog(join(dir, "room.jsonl"));
++  result.hash_file = existsSync(current.hash) ? sha256(current.hash) : null;
++  writeFileSync(join(dir, "contact.json"), `${JSON.stringify(result, null, 1)}\n`);
++  return result;
++}
++
++async function main() {
++  const a = parseArgs(process.argv.slice(2));
++  const serverSha = sha256(a.server);
++  if (serverSha !== a["server-sha256"]) throw new Error("the npt-server binary's SHA-256 is not the one named");
++  for (const n of ["lib.js", "hooks.js", "main.js", "worker.js"]) if (!existsSync(join(OUT, n))) throw new Error(`no ${n}: run tsc first`);
++  const { chromium } = await import(pathToFileURL(a.playwright).href);
++  const pwVersion = JSON.parse(readFileSync(join(dirname(a.playwright), "package.json"), "utf8")).version;
++  const base = join(ROOT, ".gate", "u7", "t5i", new Date().toISOString().replace(/[:.]/g, "-"));
++  mkdirSync(base, { recursive: true });
++  const current = { hash: null };
++  const site = await serve({
++    files: {
++      "/": join(WEB, "index.html"), "/main.js": join(OUT, "main.js"), "/worker.js": join(OUT, "worker.js"),
++      "/lib.js": join(OUT, "lib.js"), "/hooks.js": join(OUT, "hooks.js"),
++      "/contact.html": join(HERE, "contact.html"), "/contact.js": join(HERE, "contact.js"),
++    },
++    hash: (nn) => (nn === a.room ? current.hash : null),
++  });
++  const browser = await chromium.launch({ executablePath: a.chromium, headless: true });
++  const summary = {
++    when: new Date().toISOString(), commit: a.commit, server: { path: a.server, sha256: serverSha },
++    browser: { path: a.chromium, version: browser.version(), headless: true }, playwright_core: pwVersion,
++    command: ["node", "web/e2e/t5i.mjs", ...process.argv.slice(2)].join(" "), room: a.room,
++    ports: { wt_udp: 30001 + Number(a.room), ws_tcp: 31001 + Number(a.room) }, page_server: "http://127.0.0.1 (port chosen at start)",
++    loads: [],
++  };
++  try {
++    for (const load of LOADS) {
++      const r = await runLoad(load, a, browser, site, base, current);
++      const steps = r.contact?.steps?.map((s) => `${s.what}@${s.ms}`) ?? [];
++      summary.loads.push({ load: r.load, room_open: r.room_open, room_exit: r.room_exit, steps,
++        status: r.page_state?.status ?? null, records: r.page_state?.records ?? null, wait_error: r.wait_error ?? null,
++        violations: r.contact?.violations ?? null });
++      console.log(`${r.load}: room ${r.room_open ? "open" : "NOT open"}, exit ${r.room_exit.code}; ${steps.join(", ") || r.page_state?.status || r.wait_error}`);
++    }
++  } finally {
++    await browser.close();
++    await site.close();
++  }
++  summary.files = readdirSync(base, { recursive: true }).sort().map((f) => join(base, f))
++    .filter((f) => statSync(f).isFile()).map((f) => ({ file: f.slice(ROOT.length + 1), sha256: sha256(f) }));
++  writeFileSync(join(base, "summary.json"), `${JSON.stringify(summary, null, 1)}\n`);
++  console.log(`t5i: ${summary.loads.length} loads; records under ${base.slice(ROOT.length + 1)}`);
++}
++
++main().catch((e) => {
++  console.error(`t5i: ${e.message}`);
++  process.exit(1);
++});
+diff --git a/spikes/netcode-proof/web/index.html b/spikes/netcode-proof/web/index.html
+new file mode 100644
+index 0000000..b3bf9df
+--- /dev/null
++++ b/spikes/netcode-proof/web/index.html
+@@ -0,0 +1,16 @@
++<!doctype html>
++<html lang="en">
++<head>
++<meta charset="utf-8">
++<meta name="viewport" content="width=device-width, initial-scale=1">
++<meta name="referrer" content="no-referrer">
++<title>npt browser client</title>
++<script type="module" src="main.js"></script>
++</head>
++<body>
++<h1>Netcode proof test: browser client</h1>
++<p id="status">Starting</p>
++<p id="version"></p>
++<table id="counters"><tbody></tbody></table>
++</body>
++</html>
+diff --git a/spikes/netcode-proof/web/src/hooks.ts b/spikes/netcode-proof/web/src/hooks.ts
+new file mode 100644
+index 0000000..8f1333d
+--- /dev/null
++++ b/spikes/netcode-proof/web/src/hooks.ts
+@@ -0,0 +1,7 @@
++// hooks.ts: the measured build's two timings (u7-brief.md rev 1.1 Block T4). The bites dist swaps this file for
++// web/bites/hooks.js, which arms one page bite from the link's `bite` query; this one holds no bite.
++
++/** WebTransport's wait before the page falls back to WebSocket (plan.md:496-497). */
++export const WT_TIMEOUT_MS: number | null = 1_500;
++/** The period of `maxDatagramSize` reads after the one at session ready (plan.md:497). */
++export const MDS_READ_PERIOD_MS: number | null = 10_000;
+diff --git a/spikes/netcode-proof/web/src/lib.ts b/spikes/netcode-proof/web/src/lib.ts
+new file mode 100644
+index 0000000..0f4c66f
+--- /dev/null
++++ b/spikes/netcode-proof/web/src/lib.ts
+@@ -0,0 +1,523 @@
++// lib.ts: the page's logic, pure and Node-testable (u7-brief.md rev 1.1 Block T2 with the advisor's C1, C4, C5, C9):
++// the link, the hash file, the stream framing, the WebSocket tag, the Wasm boundary's packing, the bounded inbox, the
++// npt-log records and the transport chooser. It touches no global: the Worker and the page pass what it needs.
++// Never put the token, a URL or the bind value into a status, a record or a console line.
++
++export type Suite = "smoke" | "cert-14d" | "fallback" | "mds" | "wt-attempts";
++export type Transport = "wt" | "ws";
++export const SUITES: readonly Suite[] = ["smoke", "cert-14d", "fallback", "mds", "wt-attempts"];
++export const TRANSPORT_NAME: Readonly<Record<Transport, string>> = { wt: "WebTransport", ws: "WebSocket" };
++
++/** The status line's texts, byte for byte (U8's PAGE.playing reads "<name> · Playing", U+00B7). */
++export const STATUS = {
++  starting: "Starting",
++  connecting: (t: Transport): string => `${TRANSPORT_NAME[t]} · Connecting`,
++  joined: (t: Transport): string => `${TRANSPORT_NAME[t]} · Joined`,
++  playing: (t: Transport): string => `${TRANSPORT_NAME[t]} · Playing`,
++  ended: (why: string): string => `Ended: ${why}`,
++  badLink: (why: string): string => `Bad link: ${why}`,
++};
++
++// ---- The numbers (catalogue docs/design/netcode-proof-messages.md; plan.md:909-910; C5) --------------------------
++
++/** WebTransport's UDP port is this plus the room's NN; WebSocket's TCP port the next. */
++export const WT_PORT_BASE = 30001;
++export const WS_PORT_BASE = 31001;
++export const HASH_BYTES = 32;
++export const HASH_FILE_MAX = 1024;
++const HEX_DIGITS_PER_BYTE = 2;
++const HEX_RADIX = 16;
++const ALL_BITS = 0xff;
++/** Inbox record head: channel u8, arrival ns u64, length u32. Outbox record head: channel u8, length u32. */
++const INBOX_HEAD = 13;
++const INBOX_NS_AT = 1;
++const INBOX_LEN_AT = 9;
++const OUTBOX_HEAD = 5;
++const OUTBOX_LEN_AT = 1;
++const LIMITS_COUNT = 6;
++const TAG_VALUES = 256;
++/** A control message is at least its 2 B length and 1 B type; a full state its 4 B length and 1 B type. */
++const CONTROL_HEAD = 2;
++const FULL_STATE_HEAD = 4;
++const MIN_TYPE = 1;
++export const NS_PER_MS = 1e6;
++export const NS_PER_S = 1e9;
++const CLOCK_READS = 1000;
++export const INBOX_MAX = 512;
++export const RECORDS_MAX = 4096;
++export const ATTEMPT_DEADLINE_MS = 10_000;
++
++// ---- The link (U8's URL contract, wip/u8-build.patch:115-123; C4) ------------------------------------------------
++
++export interface Link {
++  readonly suite: Suite;
++  /** NN, two digits, 00-31. */
++  readonly room: string;
++  readonly transport: Transport;
++  readonly attempt: number;
++  readonly token: string;
++  /** C4's control: the room's 32 bytes each XOR 0xff (suite `wt-attempts` only). */
++  readonly wrongHash: boolean;
++  /** The armed page bite (the bites dist only), else null. */
++  readonly bite: string | null;
++}
++export type Parsed<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly why: string };
++
++/* eslint-disable ts-patterns/require-regex-example -- each has its examples above; no outside link in client code */
++// U6a's slot token: "nptj_" then 22 base64url characters. Matches "nptj_" + 22 "A"; rejects "nptj_AAA".
++const TOKEN_FORM = /^nptj_[A-Za-z0-9_-]{22}$/;
++// A query value: 1-40 of letters, digits, "/", "_", "-". Matches "cert-14d"; rejects "a%20b" and "".
++const VALUE_FORM = /^[A-Za-z0-9/_-]{1,40}$/;
++// A room: two digits 00-31. Matches "07" and "31"; rejects "7", "32" and "007".
++const ROOM_FORM = /^(0[0-9]|[12][0-9]|3[01])$/;
++// An attempt: 0-99 without a leading zero. Matches "0" and "19"; rejects "01" and "100".
++const ATTEMPT_FORM = /^(0|[1-9][0-9]?)$/;
++// The hash: 64 lowercase hex digits. Matches "00ff" repeated 16 times; rejects any upper-case "A" or 63 digits.
++const HEX64_FORM = /^[0-9a-f]{64}$/;
++// A GREASE brand such as "Not)A;Brand" or "Not_A Brand". Matches "Not/A)Brand"; rejects "Chromium".
++const GREASE_BRAND = /not.?a.?brand/i;
++/* eslint-enable ts-patterns/require-regex-example */
++
++/** Suites that try WebTransport only and never fall back (cert-14d's attempt rules: C4). */
++export const NO_FALLBACK: readonly Suite[] = ["cert-14d", "wt-attempts"];
++/** Suites whose measurement needs WebTransport first. */
++const WT_ONLY: readonly Suite[] = ["cert-14d", "wt-attempts", "fallback", "mds"];
++const HASH_PREFIX = "#t=";
++
++function pair(part: string): readonly [string, string] {
++  const eq = part.indexOf("=");
++  return eq < 0 ? [part, ""] : [part.slice(0, eq), part.slice(eq + 1)];
++}
++
++/**
++ * `?smoke=1&suite=<s>&room=<NN>&transport=<wt|ws>&attempt=<k>[&hash=wrong][&bite=<id>]` with `#t=<token>`. No other
++ * key, no repeated key, no percent-encoding. `bite` is accepted only when `biteIds` (the bites dist's) names it.
++ * A refusal's reason never holds the token or the link.
++ */
++export function parseLink(search: string, hash: string, biteIds: readonly string[] = []): Parsed<Link> {
++  const bad = (why: string): Parsed<Link> => ({ ok: false, why });
++  if (!search.startsWith("?")) return bad("no query");
++  const keys = ["smoke", "suite", "room", "transport", "attempt", "hash", ...(biteIds.length > 0 ? ["bite"] : [])];
++  const pairs = search.slice(1).split("&").map(pair);
++  if (pairs.some(([k]) => !keys.includes(k))) return bad("an unknown query key");
++  if (new Set(pairs.map(([k]) => k)).size !== pairs.length) return bad("a query key twice");
++  const malformed = pairs.find(([, v]) => !VALUE_FORM.test(v));
++  if (malformed !== undefined) return bad(`a malformed ${malformed[0]}`);
++  const q = new Map(pairs);
++  if (q.get("smoke") !== "1") return bad("smoke is not 1");
++  const suite = SUITES.find((s) => s === q.get("suite"));
++  if (suite === undefined) return bad("an unknown suite");
++  const room = q.get("room") ?? "";
++  if (!ROOM_FORM.test(room)) return bad("the room is not 00-31");
++  const t = q.get("transport");
++  if (t !== "wt" && t !== "ws") return bad("the transport is not wt or ws");
++  if (t === "ws" && WT_ONLY.includes(suite)) return bad(`suite ${suite} runs on wt only`);
++  const a = q.get("attempt") ?? "";
++  if (!ATTEMPT_FORM.test(a)) return bad("the attempt is not 0-99");
++  const h = q.get("hash");
++  if (h !== undefined && (h !== "wrong" || suite !== "wt-attempts")) return bad("hash=wrong goes with suite wt-attempts only");
++  const bite = q.get("bite") ?? null;
++  if (bite !== null && !biteIds.includes(bite)) return bad("an unknown bite");
++  if (!hash.startsWith(HASH_PREFIX)) return bad("no #t= fragment");
++  const token = hash.slice(HASH_PREFIX.length);
++  if (!TOKEN_FORM.test(token)) return bad("the token is malformed");
++  return { ok: true, value: { suite, room, transport: t, attempt: Number(a), token, wrongHash: h === "wrong", bite } };
++}
++
++// ---- The hash file (u6b-brief.md condition 4; advisor-u6c-brief.md C1 (e), C9) ---------------------------------
++
++export const hashPath = (room: string): string => `/npt/cert-hash-${room}.json`;
++
++/** `{"algorithm":"sha-256","value_hex":<64 lowercase hex>,"validity_ns":<integer>}` exactly, as its 32 bytes. */
++export function parseHashFile(text: string): Parsed<Uint8Array> {
++  const bad = (why: string): Parsed<Uint8Array> => ({ ok: false, why: `the hash file ${why}` });
++  if (text.length > HASH_FILE_MAX) return bad("is over 1 KiB");
++  let o: unknown;
++  try {
++    o = JSON.parse(text);
++  } catch {
++    return bad("is not JSON");
++  }
++  if (typeof o !== "object" || o === null || Array.isArray(o)) return bad("is not an object");
++  const rec = o as Record<string, unknown>;
++  if (Object.keys(rec).sort().join(",") !== "algorithm,validity_ns,value_hex") return bad("has other keys");
++  if (rec.algorithm !== "sha-256") return bad("is not sha-256");
++  const hex = rec.value_hex;
++  if (typeof hex !== "string" || !HEX64_FORM.test(hex)) return bad("value is not 64 lowercase hex digits");
++  if (!Number.isSafeInteger(rec.validity_ns) || (rec.validity_ns as number) < 0) return bad("validity is not an integer");
++  const at = (i: number): string => hex.slice(HEX_DIGITS_PER_BYTE * i, HEX_DIGITS_PER_BYTE * (i + 1));
++  return { ok: true, value: Uint8Array.from({ length: HASH_BYTES }, (_, i) => parseInt(at(i), HEX_RADIX)) };
++}
++
++/** C4's `hash=wrong`: each byte XOR 0xff, so the pin can never match. */
++export function wrongHash(bytes: Uint8Array): Uint8Array {
++  return bytes.map((b) => b ^ ALL_BITS);
++}
++
++// ---- Addresses ----------------------------------------------------------------------------------------------------
++
++export const wtUrl = (host: string, room: string): string => `https://${host}:${WT_PORT_BASE + Number(room)}/npt`;
++export const wsUrl = (host: string, room: string): string => `wss://${host}:${WS_PORT_BASE + Number(room)}/`;
++
++// ---- The Wasm boundary (C5: every integer little-endian) ---------------------------------------------------------
++
++// eslint-disable-next-line ts-patterns/no-magic-numbers -- C5's channel numbers, named by this table
++export const CH = { datagram: 0, control: 1, fullState: 2 } as const;
++export type Channel = 0 | 1 | 2;
++
++export interface Limits {
++  /** The largest control message with its 2 B length. */
++  readonly control: number;
++  /** The largest full state with its 4 B length. */
++  readonly fullState: number;
++  readonly datagram: number;
++  /** The WebSocket tag of each channel, by channel number. */
++  readonly tags: readonly [number, number, number];
++}
++
++/** `limits()` in C5's order: control, full state, datagram, then the three WebSocket tags. */
++export function readLimits(v: ArrayLike<number>): Parsed<Limits> {
++  const n = Array.from(v);
++  const [control = 0, fullState = 0, datagram = 0, td = -1, tc = -1, tf = -1] = n;
++  const tags: [number, number, number] = [td, tc, tf];
++  const okTags = tags.every((t) => Number.isInteger(t) && t >= 0 && t < TAG_VALUES) && new Set(tags).size === tags.length;
++  const okCaps = control >= CONTROL_HEAD + MIN_TYPE && fullState >= FULL_STATE_HEAD + MIN_TYPE && datagram >= MIN_TYPE;
++  if (n.length !== LIMITS_COUNT || !okCaps || !okTags) return { ok: false, why: "the client's limits are malformed" };
++  return { ok: true, value: { control, fullState, datagram, tags } };
++}
++
++export interface InboxRecord {
++  readonly channel: Channel;
++  readonly arrivalNs: bigint;
++  readonly bytes: Uint8Array;
++}
++export interface OutRecord {
++  readonly channel: 0 | 1;
++  readonly bytes: Uint8Array;
++}
++
++/** The inbox: channel u8, arrival ns u64, length u32, bytes, per record. */
++export function packInbox(recs: readonly InboxRecord[]): Uint8Array {
++  const out = new Uint8Array(recs.reduce((n, r) => n + INBOX_HEAD + r.bytes.length, 0));
++  const v = new DataView(out.buffer);
++  recs.reduce((o, r) => {
++    v.setUint8(o, r.channel);
++    v.setBigUint64(o + INBOX_NS_AT, r.arrivalNs, true);
++    v.setUint32(o + INBOX_LEN_AT, r.bytes.length, true);
++    out.set(r.bytes, o + INBOX_HEAD);
++    return o + INBOX_HEAD + r.bytes.length;
++  }, 0);
++  return out;
++}
++
++/** The outbox: channel u8 (0 or 1), length u32, bytes, per record. A malformed outbox throws (a core fault). */
++export function unpackOutbox(b: Uint8Array): OutRecord[] {
++  const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
++  const out: OutRecord[] = [];
++  let o = 0;
++  // eslint-disable-next-line ts-patterns/no-loop-statements -- a walk over byte offsets, bounded by the buffer
++  while (o < b.length) {
++    if (o + OUTBOX_HEAD > b.length) throw new Error("the outbox ends inside a record header");
++    const ch = v.getUint8(o);
++    const len = v.getUint32(o + OUTBOX_LEN_AT, true);
++    if (ch !== CH.datagram && ch !== CH.control) throw new Error("the outbox names an unknown channel");
++    if (o + OUTBOX_HEAD + len > b.length) throw new Error("the outbox ends inside a record");
++    out.push({ channel: ch, bytes: b.subarray(o + OUTBOX_HEAD, o + OUTBOX_HEAD + len) });
++    o += OUTBOX_HEAD + len;
++  }
++  return out;
++}
++
++/** Received messages waiting for the next wake: at most `cap`, more dropped and counted. */
++export class InboxQueue {
++  private q: InboxRecord[] = [];
++  dropped = 0;
++  constructor(readonly cap: number = INBOX_MAX) {}
++  push(r: InboxRecord): boolean {
++    if (this.q.length >= this.cap) {
++      this.dropped++;
++      return false;
++    }
++    this.q.push(r);
++    return true;
++  }
++  drain(): InboxRecord[] {
++    const q = this.q;
++    this.q = [];
++    return q;
++  }
++  get length(): number {
++    return this.q.length;
++  }
++}
++
++// ---- Stream framing (catalogue docs/design/netcode-proof-messages.md:68-76) ------------------------------------
++
++export class FrameError extends Error {}
++
++/**
++ * Reassembles length-prefixed messages (a `head`-byte little-endian length of what follows) across any chunk split.
++ * Each message, its length included, is at most `cap` bytes; a longer one throws FrameError (the session closes).
++ */
++export class StreamFramer {
++  private readonly buf: Uint8Array;
++  private have = 0;
++  private total = 0;
++  constructor(private readonly head: typeof CONTROL_HEAD | typeof FULL_STATE_HEAD, private readonly cap: number) {
++    this.buf = new Uint8Array(cap);
++  }
++  push(chunk: Uint8Array): Uint8Array[] {
++    const out: Uint8Array[] = [];
++    let i = 0;
++    // eslint-disable-next-line ts-patterns/no-loop-statements -- a walk over byte offsets, bounded by the chunk
++    while (i < chunk.length) {
++      const need = (this.total === 0 ? this.head : this.total) - this.have;
++      const n = Math.min(need, chunk.length - i);
++      this.buf.set(chunk.subarray(i, i + n), this.have);
++      this.have += n;
++      i += n;
++      if (this.total === 0 && this.have === this.head) {
++        const v = new DataView(this.buf.buffer, 0, this.head);
++        const len = this.head === CONTROL_HEAD ? v.getUint16(0, true) : v.getUint32(0, true);
++        if (this.head + len > this.cap) throw new FrameError(`a stream message over its ${this.cap} B cap`);
++        this.total = this.head + len;
++      }
++      if (this.total !== 0 && this.have === this.total) {
++        out.push(this.buf.slice(0, this.total));
++        this.have = 0;
++        this.total = 0;
++      }
++    }
++    return out;
++  }
++  /** True while a message is cut short (the stream must not end here). */
++  get partial(): boolean {
++    return this.have > 0;
++  }
++}
++export const controlFramer = (lim: Limits): StreamFramer => new StreamFramer(CONTROL_HEAD, lim.control);
++export const fullStateFramer = (lim: Limits): StreamFramer => new StreamFramer(FULL_STATE_HEAD, lim.fullState);
++
++/** A WebSocket message: the channel's 1 B tag, then the channel's bytes. */
++export function wsWrap(tag: number, bytes: Uint8Array): Uint8Array {
++  const out = new Uint8Array(bytes.length + 1);
++  out[0] = tag;
++  out.set(bytes, 1);
++  return out;
++}
++
++export type Unwrapped =
++  | { readonly ok: true; readonly channel: Channel; readonly bytes: Uint8Array }
++  | { readonly ok: false; readonly close: boolean; readonly why: string };
++
++/** Strips the tag by `limits`' table and applies the channel's cap: a datagram over it is dropped, a stream closes. */
++export function wsUnwrap(data: Uint8Array, lim: Limits): Unwrapped {
++  const channel = lim.tags.indexOf(data[0] ?? -1);
++  if (data.length === 0 || channel < 0) return { ok: false, close: true, why: "an unknown WebSocket tag" };
++  const bytes = data.subarray(1);
++  const caps = [lim.datagram, lim.control, lim.fullState];
++  if (bytes.length > (caps[channel] ?? 0)) return { ok: false, close: channel !== CH.datagram, why: "a message over its cap" };
++  return { ok: true, channel: channel as Channel, bytes };
++}
++
++// ---- Records (npt-log's `event` and `second` forms: crates/log/src/lib.rs:195-233; C1) ---------------------------
++
++export function eventLine(ev: string, ns: number, f: Readonly<Record<string, number>>): string {
++  return JSON.stringify({ k: "event", ev, ph: "measured", ns: Math.max(0, Math.round(ns)), f });
++}
++export function secondLine(sec: number, v: Readonly<Record<string, number>>): string {
++  return JSON.stringify({ k: "second", sec, ph: "measured", v });
++}
++
++/**
++ * The suites' records, from times in ns since the Worker's start: `attempt.ok` once, `fallback.playing_ns` once
++ * (from the connect sequence's start), `mds_read.size_bytes` per read, and per second `recv_over_max_count`.
++ */
++export class Recorder {
++  private attemptDone = false;
++  private fallbackDone = false;
++  private overMax = 0;
++  private lastSec = -1;
++  constructor(private readonly emit: (line: string) => void, private readonly connectStartNs: number) {}
++  attempt(ns: number, ok: 0 | 1): void {
++    if (this.attemptDone) return;
++    this.attemptDone = true;
++    this.emit(eventLine("attempt", ns, { ok }));
++  }
++  get attemptWritten(): boolean {
++    return this.attemptDone;
++  }
++  fallback(ns: number): void {
++    if (this.fallbackDone) return;
++    this.fallbackDone = true;
++    this.emit(eventLine("fallback", ns, { playing_ns: Math.round(ns - this.connectStartNs) }));
++  }
++  mdsRead(ns: number, size: number): void {
++    this.emit(eventLine("mds_read", ns, { size_bytes: size }));
++  }
++  datagram(size: number, maxDatagramSize: number): void {
++    if (size > maxDatagramSize) this.overMax++;
++  }
++  /** Called each second: one record for the second just completed, with the datagrams counted since the last. */
++  second(ns: number): void {
++    const sec = Math.floor(ns / NS_PER_S) - 1;
++    if (sec < 0 || sec <= this.lastSec) return;
++    this.emit(secondLine(sec, { recv_over_max_count: this.overMax }));
++    this.overMax = 0;
++    this.lastSec = sec;
++  }
++}
++
++/** The Worker clock's step (C1): the smallest non-zero difference over `reads` consecutive reads, integer ns. */
++export function clockResNs(now: () => number, reads = CLOCK_READS): number {
++  const t = Array.from({ length: reads }, () => now());
++  const best = t.reduce((m, x, i) => (i > 0 && x > (t[i - 1] ?? x) ? Math.min(m, x - (t[i - 1] ?? x)) : m), Infinity);
++  return best === Infinity ? 0 : Math.max(1, Math.round(best * NS_PER_MS));
++}
++
++/** The counters the page reads by name (C5: names, never positions): Playing is joined plus the own soldier. */
++export const NEEDED_COUNTERS = ["joined", "clock_samples", "own_soldier"] as const;
++export type Needed = Record<(typeof NEEDED_COUNTERS)[number], number>;
++export function counterIndex(names: readonly string[]): Parsed<Needed> {
++  const missing = NEEDED_COUNTERS.find((n) => !names.includes(n));
++  if (missing !== undefined) return { ok: false, why: `the client has no counter ${missing}` };
++  const [joined, clock_samples, own_soldier] = NEEDED_COUNTERS.map((n) => names.indexOf(n));
++  return { ok: true, value: { joined: joined ?? 0, clock_samples: clock_samples ?? 0, own_soldier: own_soldier ?? 0 } };
++}
++
++/** The browser's brand versions, else its user-agent string (no GREASE brand). */
++export function versionText(nav: { userAgent?: string; userAgentData?: { brands?: { brand: string; version: string }[] } }): string {
++  const brands = (nav.userAgentData?.brands ?? []).filter((b) => !GREASE_BRAND.test(b.brand));
++  return brands.length > 0 ? brands.map((b) => `${b.brand} ${b.version}`).join("; ") : (nav.userAgent ?? "");
++}
++
++// ---- The transport chooser (plan.md:496-497; C9) ----------------------------------------------------------------
++
++export interface Bidi {
++  readonly readable: ReadableStream<Uint8Array>;
++  readonly writable: WritableStream<Uint8Array>;
++}
++export interface WtLike {
++  readonly ready: Promise<unknown>;
++  readonly closed: Promise<unknown>;
++  close(): void;
++  readonly datagrams: {
++    readonly readable: ReadableStream<Uint8Array>;
++    readonly writable: WritableStream<Uint8Array>;
++    readonly maxDatagramSize: number;
++  };
++  createBidirectionalStream(): Promise<Bidi>;
++  readonly incomingUnidirectionalStreams: ReadableStream<ReadableStream<Uint8Array>>;
++}
++export interface WsLike {
++  binaryType: string;
++  readonly bufferedAmount: number;
++  onopen: ((e: unknown) => void) | null;
++  onclose: ((e: unknown) => void) | null;
++  onerror: ((e: unknown) => void) | null;
++  onmessage: ((e: { data: unknown }) => void) | null;
++  send(data: Uint8Array): void;
++  close(): void;
++}
++export interface WtOptions {
++  readonly allowPooling: false;
++  readonly requireUnreliable: true;
++  readonly serverCertificateHashes: { algorithm: "sha-256"; value: Uint8Array }[];
++}
++export interface ConnectDeps {
++  readonly link: Link;
++  /** The page's own `location.hostname`. */
++  readonly host: string;
++  /** WebTransport's wait before the fallback; null waits for ever (a bite). */
++  readonly timeoutMs: number | null;
++  fetchText(path: string): Promise<string>;
++  webTransport(url: string, options: WtOptions): WtLike;
++  webSocket(url: string): WsLike;
++  setTimer(fn: () => void, ms: number): unknown;
++  clearTimer(id: unknown): void;
++  onStatus(text: string): void;
++}
++export type Chosen =
++  | { readonly kind: "wt"; readonly wt: WtLike }
++  | { readonly kind: "ws"; readonly ws: WsLike; readonly fellBack: boolean }
++  | { readonly kind: "failed"; readonly why: string };
++
++/** True when `p` resolves, false when it rejects; never throws. */
++export async function settles(p: Promise<unknown>): Promise<boolean> {
++  try {
++    await p;
++    return true;
++  } catch {
++    return false;
++  }
++}
++
++function shut(wt: WtLike): void {
++  try {
++    wt.close();
++  } catch {
++    // already closed
++  }
++}
++
++/**
++ * `ws`: WebSocket at once. `wt`: the room's hash file first (anything wrong stops here, before any connect), then
++ * WebTransport; on failure WebSocket at once, on silence WebSocket after `timeoutMs`. Suites in NO_FALLBACK never fall
++ * back and arm no timer. An abandoned WebTransport is closed, and closed again if it turns ready later (C9): the
++ * caller sends its `Join` on the one transport this returns.
++ */
++export async function connect(d: ConnectDeps): Promise<Chosen> {
++  const { link } = d;
++  if (link.transport === "ws") return openWs(d, false);
++  let text: string;
++  try {
++    text = await d.fetchText(hashPath(link.room));
++  } catch {
++    return { kind: "failed", why: "the hash file could not be fetched" };
++  }
++  const h = parseHashFile(text);
++  if (!h.ok) return { kind: "failed", why: h.why };
++  const value = link.wrongHash ? wrongHash(h.value) : h.value;
++  const noFallback = NO_FALLBACK.includes(link.suite);
++  d.onStatus(STATUS.connecting("wt"));
++  let wt: WtLike;
++  try {
++    wt = d.webTransport(wtUrl(d.host, link.room), {
++      allowPooling: false,
++      requireUnreliable: true,
++      serverCertificateHashes: [{ algorithm: "sha-256", value }],
++    });
++  } catch {
++    return noFallback ? { kind: "failed", why: "WebTransport did not start" } : openWs(d, true);
++  }
++  void settles(wt.closed);
++  const ready = settles(wt.ready);
++  let timer: unknown = null;
++  const silence = new Promise<"timeout">((done) => {
++    if (!noFallback && d.timeoutMs !== null) timer = d.setTimer(() => done("timeout"), d.timeoutMs);
++  });
++  const outcome = await Promise.race([ready, silence]);
++  if (timer !== null) d.clearTimer(timer);
++  if (outcome === true) return { kind: "wt", wt };
++  shut(wt);
++  void (async (): Promise<void> => {
++    if (await ready) shut(wt);
++  })();
++  if (noFallback) return { kind: "failed", why: "the WebTransport session did not open" };
++  return openWs(d, true);
++}
++
++function openWs(d: ConnectDeps, fellBack: boolean): Promise<Chosen> {
++  d.onStatus(STATUS.connecting("ws"));
++  let ws: WsLike;
++  try {
++    ws = d.webSocket(wsUrl(d.host, d.link.room));
++  } catch {
++    return Promise.resolve({ kind: "failed", why: "the WebSocket did not start" });
++  }
++  ws.binaryType = "arraybuffer";
++  return new Promise((done) => {
++    ws.onopen = (): void => done({ kind: "ws", ws, fellBack });
++    ws.onerror = ws.onclose = (): void => done({ kind: "failed", why: "the WebSocket did not open" });
++  });
++}
+diff --git a/spikes/netcode-proof/web/src/main.ts b/spikes/netcode-proof/web/src/main.ts
+new file mode 100644
+index 0000000..5acb34e
+--- /dev/null
++++ b/spikes/netcode-proof/web/src/main.ts
+@@ -0,0 +1,72 @@
++// main.ts: the page (u7-brief.md rev 1.1 Block T3; C1). It reads its link, starts the module Worker, posts the link's
++// fields, and draws the status, #version and a counters table, all by textContent. For U8's save() it keeps
++// window.nptRecords (at most 4,096 npt-log lines), window.nptDropped and window.nptClockResNs, read-only.
++// A malformed link starts nothing and says why, never echoing the token.
++import * as hooks from "./hooks.js";
++import { RECORDS_MAX, STATUS, parseLink, versionText, type Link } from "./lib.js";
++import type { StartMsg, ToPage } from "./worker.js";
++
++/** The bites dist's hooks.js lists the bite ids its `bite` query may arm; the measured one lists none. */
++export const BITE_IDS: readonly string[] = (hooks as unknown as { BITE_IDS?: readonly string[] }).BITE_IDS ?? [];
++const COUNTERS_MS = 1000;
++
++/** What the Worker tells the page, kept for the draw and for U8's reads. */
++export class PageState {
++  readonly records: string[] = [];
++  dropped = 0;
++  clockResNs = 0;
++  status: string = STATUS.starting;
++  counters: readonly (readonly [string, number])[] = [];
++  apply(m: ToPage): void {
++    if (m.kind === "status") this.status = m.text;
++    else if (m.kind === "clock") this.clockResNs = m.resNs;
++    else if (m.kind === "counters") this.counters = m.names.map((n, i) => [n, m.values[i] ?? 0] as const);
++    else m.lines.forEach((l) => (this.records.length < RECORDS_MAX ? this.records.push(l) : this.dropped++));
++  }
++}
++
++export function startMessage(link: Link, host: string): StartMsg {
++  return { kind: "start", link, host, wtTimeoutMs: hooks.WT_TIMEOUT_MS, mdsPeriodMs: hooks.MDS_READ_PERIOD_MS };
++}
++
++function setText(id: string, text: string): void {
++  const e = document.getElementById(id);
++  if (e !== null) e.textContent = text;
++}
++
++function drawCounters(rows: PageState["counters"]): void {
++  const body = document.querySelector("#counters tbody");
++  if (body === null) return;
++  body.replaceChildren(...rows.map(([name, value]) => {
++    const tr = document.createElement("tr");
++    const th = document.createElement("th");
++    const td = document.createElement("td");
++    th.textContent = name;
++    td.textContent = String(value);
++    tr.append(th, td);
++    return tr;
++  }));
++}
++
++if (typeof document !== "undefined" && typeof Worker !== "undefined") {
++  const state = new PageState();
++  const expose = (name: string, get: () => unknown): void => void Object.defineProperty(window, name, { get, enumerable: true });
++  expose("nptRecords", () => state.records);
++  expose("nptDropped", () => state.dropped);
++  expose("nptClockResNs", () => state.clockResNs);
++  setText("version", versionText(navigator as unknown as Parameters<typeof versionText>[0]));
++  const link = parseLink(location.search, location.hash, BITE_IDS);
++  if (link.ok) {
++    const w = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
++    w.onmessage = (e: MessageEvent<ToPage>): void => {
++      state.apply(e.data);
++      setText("status", state.status);
++    };
++    w.onerror = (): void => setText("status", STATUS.ended("the Worker failed"));
++    setText("status", STATUS.starting);
++    w.postMessage(startMessage(link.value, location.hostname));
++    setInterval(() => drawCounters(state.counters), COUNTERS_MS);
++  } else {
++    setText("status", STATUS.badLink(link.why));
++  }
++}
+diff --git a/spikes/netcode-proof/web/src/worker.ts b/spikes/netcode-proof/web/src/worker.ts
+new file mode 100644
+index 0000000..30ecccf
+--- /dev/null
++++ b/spikes/netcode-proof/web/src/worker.ts
+@@ -0,0 +1,397 @@
++// worker.ts: the module Worker (u7-brief.md rev 1.1 Block T3; C-U7-3; C1, C5, C9). It loads the Wasm client, makes a
++// 16 B bind, connects (lib.ts's chooser), stamps every received message with performance.now() in its own read,
++// queues it (at most 512) and hands the queue to the client at the next wake, set from next_due_ns; after each wake's
++// sends it stamps the send time the next step gets. A trap ends the session ("Ended"): no restart, no rejoin.
++// The token reaches the Wasm only; the bind never leaves this Worker; neither is posted, logged or recorded.
++import {
++  ATTEMPT_DEADLINE_MS, CH, NS_PER_MS, Recorder, STATUS, clockResNs, connect, controlFramer, counterIndex,
++  fullStateFramer, packInbox, readLimits, settles, unpackOutbox, wsUnwrap, wsWrap,
++  InboxQueue, type Channel, type Limits, type Link, type Needed, type OutRecord, type StreamFramer, type Transport,
++  type WsLike, type WtLike, type WtOptions,
++} from "./lib.js";
++
++export interface CoreClient {
++  step(nowNs: bigint, prevSendNs: bigint, inbox: Uint8Array): Uint8Array;
++  next_due_ns(): bigint;
++  counters(): Uint32Array;
++}
++/** wasm-bindgen's `--target web` module of npt-client-wasm (C5's boundary). */
++export interface CoreModule {
++  default(): Promise<unknown>;
++  Client: new (token: string, bind: Uint8Array) => CoreClient;
++  counter_names(): string[];
++  limits(): Uint32Array;
++}
++export interface StartMsg {
++  readonly kind: "start";
++  readonly link: Link;
++  readonly host: string;
++  readonly wtTimeoutMs: number | null;
++  readonly mdsPeriodMs: number | null;
++}
++export type ToPage =
++  | { readonly kind: "status"; readonly text: string }
++  | { readonly kind: "records"; readonly lines: readonly string[] }
++  | { readonly kind: "counters"; readonly names: readonly string[]; readonly values: readonly number[] }
++  | { readonly kind: "clock"; readonly resNs: number };
++export interface EngineDeps {
++  now(): number;
++  setTimer(fn: () => void, ms: number): unknown;
++  clearTimer(id: unknown): void;
++  fetchText(path: string): Promise<string>;
++  webTransport(url: string, options: WtOptions): WtLike;
++  webSocket(url: string): WsLike;
++  randomBytes(n: number): Uint8Array;
++  loadCore(): Promise<CoreModule>;
++  post(msg: ToPage): void;
++}
++
++const BIND_BYTES = 16;
++const SECOND_MS = 1000;
++const WAKE_MAX_MS = 1000;
++/** Writes in flight per writer, full-state streams open at once, and WebSocket bytes buffered: every queue bounded. */
++const PENDING_MAX = 64;
++const UNI_MAX = 4;
++const WS_BUFFER_MAX = 1_048_576;
++/** `prev_send_ns` at the first step, before anything was sent. */
++const NO_SEND_NS = 0n;
++
++/** Reads `r` chunk by chunk, each read starting the next (no loop, no promise chain); `onDone` once at the end. */
++function pump<T>(r: ReadableStreamDefaultReader<T>, onChunk: (v: T) => boolean, onDone: (error: boolean) => void): void {
++  void (async (): Promise<void> => {
++    let res: ReadableStreamReadResult<T>;
++    try {
++      res = await r.read();
++    } catch {
++      onDone(true);
++      return;
++    }
++    if (res.done) onDone(false);
++    else if (onChunk(res.value)) pump(r, onChunk, onDone);
++  })();
++}
++
++/** The page's own counters, beside the client's. */
++const PAGE_COUNTERS = ["inbox_dropped", "datagram_over_cap", "datagram_send_dropped", "send_failed", "uni_refused"] as const;
++
++export class Engine {
++  private readonly startMs: number;
++  private ended = false;
++  private playing = false;
++  private shownJoined = false;
++  private fellBack = false;
++  private transport: Transport = "wt";
++  private rec: Recorder | null = null;
++  private client: CoreClient | null = null;
++  private lim: Limits | null = null;
++  private idx: Needed | null = null;
++  private names: readonly string[] = [];
++  private wt: WtLike | null = null;
++  private ws: WsLike | null = null;
++  private dgWriter: WritableStreamDefaultWriter<Uint8Array> | null = null;
++  private ctlWriter: WritableStreamDefaultWriter<Uint8Array> | null = null;
++  private readonly pending = { dg: 0, ctl: 0 };
++  private openUnis = 0;
++  private prevSendNs = NO_SEND_NS;
++  private readonly inbox = new InboxQueue();
++  private readonly pc: Record<(typeof PAGE_COUNTERS)[number], number> = {
++    inbox_dropped: 0, datagram_over_cap: 0, datagram_send_dropped: 0, send_failed: 0, uni_refused: 0,
++  };
++  private readonly timers: Record<"wake" | "second" | "mds" | "deadline", unknown> = {
++    wake: null, second: null, mds: null, deadline: null,
++  };
++
++  constructor(private readonly d: EngineDeps) {
++    this.startMs = d.now();
++    d.post({ kind: "clock", resNs: clockResNs(d.now) });
++  }
++
++  /** Nanoseconds since this Worker started: the records' clock (C1). */
++  private ns(): number {
++    return (this.d.now() - this.startMs) * NS_PER_MS;
++  }
++  /** The client's clock: performance.now() as integer ns. */
++  private stamp(): bigint {
++    return BigInt(Math.round(this.d.now() * NS_PER_MS));
++  }
++  private status(text: string): void {
++    this.d.post({ kind: "status", text });
++  }
++  private arm(name: keyof Engine["timers"], fn: () => void, ms: number): void {
++    this.timers[name] = this.d.setTimer(() => {
++      this.timers[name] = null;
++      if (!this.ended) fn();
++    }, ms);
++  }
++
++  async start(m: StartMsg): Promise<void> {
++    const core = (async (): Promise<CoreModule | null> => {
++      try {
++        const mod = await this.d.loadCore();
++        await mod.default();
++        return mod;
++      } catch {
++        return null;
++      }
++    })();
++    const rec = new Recorder((line) => this.d.post({ kind: "records", lines: [line] }), this.ns());
++    this.rec = rec;
++    this.arm("deadline", () => rec.attempt(this.ns(), 0), ATTEMPT_DEADLINE_MS);
++    this.arm("second", this.everySecond, SECOND_MS);
++    const chosen = await connect({
++      link: m.link, host: m.host, timeoutMs: m.wtTimeoutMs, fetchText: this.d.fetchText, webTransport: this.d.webTransport,
++      webSocket: this.d.webSocket, setTimer: this.d.setTimer, clearTimer: this.d.clearTimer, onStatus: (s) => this.status(s),
++    });
++    if (chosen.kind === "failed") return this.end(chosen.why);
++    if (chosen.kind === "wt") this.watchWt(chosen.wt);
++    else this.watchWs(chosen.ws, chosen.fellBack);
++    const mod = await core;
++    if (this.ended) return undefined;
++    if (mod === null) return this.end("the client did not load");
++    const lim = readLimits(mod.limits());
++    const names = mod.counter_names();
++    const idx = counterIndex(names);
++    if (!lim.ok) return this.end(lim.why);
++    if (!idx.ok) return this.end(idx.why);
++    [this.lim, this.idx, this.names] = [lim.value, idx.value, names];
++    try {
++      this.client = new mod.Client(m.link.token, this.d.randomBytes(BIND_BYTES));
++    } catch {
++      return this.end("the client refused the link");
++    }
++    if (this.wt !== null) await this.setupWt(this.wt, lim.value, m.mdsPeriodMs);
++    else this.setupWs(lim.value);
++    if (!this.ended) this.wake();
++    return undefined;
++  }
++
++  /** The chosen transport's end is watched at once, before the client has loaded. */
++  private watchWt(wt: WtLike): void {
++    this.wt = wt;
++    void (async (): Promise<void> => {
++      await settles(wt.closed);
++      this.end("the WebTransport session closed");
++    })();
++  }
++  private watchWs(ws: WsLike, fellBack: boolean): void {
++    [this.ws, this.transport, this.fellBack] = [ws, "ws", fellBack];
++    this.ws.onclose = this.ws.onerror = (): void => this.end("the WebSocket closed");
++  }
++
++  private async setupWt(wt: WtLike, lim: Limits, mdsPeriodMs: number | null): Promise<void> {
++    const dg = wt.datagrams as WtLike["datagrams"] & { createWritable?: () => WritableStream<Uint8Array> };
++    this.dgWriter = (typeof dg.createWritable === "function" ? dg.createWritable() : dg.writable).getWriter();
++    try {
++      const bidi = await wt.createBidirectionalStream();
++      this.ctlWriter = bidi.writable.getWriter();
++      this.readStream(bidi.readable, controlFramer(lim), CH.control, () => this.end("the control stream ended"));
++    } catch {
++      return this.end("the control stream did not open");
++    }
++    pump(wt.datagrams.readable.getReader(), (v) => this.onDatagram(v, wt, lim), () => undefined);
++    pump(wt.incomingUnidirectionalStreams.getReader(), (s) => this.onUni(s, lim), () => undefined);
++    const read = (): void => {
++      this.rec?.mdsRead(this.ns(), wt.datagrams.maxDatagramSize);
++      if (mdsPeriodMs !== null) this.arm("mds", read, mdsPeriodMs);
++    };
++    read();
++    return undefined;
++  }
++
++  private onDatagram(v: Uint8Array, wt: WtLike, lim: Limits): boolean {
++    const at = this.stamp();
++    if (this.ended) return false;
++    this.rec?.datagram(v.byteLength, wt.datagrams.maxDatagramSize);
++    if (v.byteLength > lim.datagram) this.pc.datagram_over_cap++;
++    else if (!this.inbox.push({ channel: CH.datagram, arrivalNs: at, bytes: v })) this.pc.inbox_dropped++;
++    return true;
++  }
++
++  private onUni(s: ReadableStream<Uint8Array>, lim: Limits): boolean {
++    if (this.ended) return false;
++    if (this.openUnis >= UNI_MAX) {
++      this.pc.uni_refused++;
++      void settles(s.cancel());
++      return true;
++    }
++    this.openUnis++;
++    this.readStream(s, fullStateFramer(lim), CH.fullState, () => this.openUnis--);
++    return true;
++  }
++
++  /** One stream's messages, reassembled and capped; a message over its cap or cut short ends the session. */
++  private readStream(s: ReadableStream<Uint8Array>, framer: StreamFramer, channel: Channel, onEnd: () => void): void {
++    pump(s.getReader(), (v) => {
++      const at = this.stamp();
++      if (this.ended) return false;
++      let frames: Uint8Array[];
++      try {
++        frames = framer.push(v);
++      } catch {
++        this.end("a stream message over its cap");
++        return false;
++      }
++      frames.forEach((bytes) => {
++        if (!this.inbox.push({ channel, arrivalNs: at, bytes })) this.pc.inbox_dropped++;
++      });
++      return true;
++    }, (error) => {
++      if (framer.partial || error) this.end("a stream ended inside a message");
++      else onEnd();
++    });
++  }
++
++  private setupWs(lim: Limits): void {
++    const ws = this.ws;
++    if (ws === null) return;
++    ws.onmessage = (e): void => {
++      const at = this.stamp();
++      if (this.ended) return;
++      if (!(e.data instanceof ArrayBuffer)) return this.end("a WebSocket message that is not binary");
++      const u = wsUnwrap(new Uint8Array(e.data), lim);
++      if (!u.ok && u.close) return this.end(u.why);
++      if (!u.ok) this.pc.datagram_over_cap++;
++      else if (!this.inbox.push({ channel: u.channel, arrivalNs: at, bytes: u.bytes })) this.pc.inbox_dropped++;
++      return undefined;
++    };
++  }
++
++  private send(r: OutRecord): void {
++    if (this.ws !== null && this.lim !== null) {
++      if (this.ws.bufferedAmount <= WS_BUFFER_MAX) this.ws.send(wsWrap(this.lim.tags[r.channel], r.bytes));
++      else if (r.channel === CH.datagram) this.pc.datagram_send_dropped++;
++      else this.end("the WebSocket's send buffer is full");
++      return;
++    }
++    const isDg = r.channel === CH.datagram;
++    const w = isDg ? this.dgWriter : this.ctlWriter;
++    const key = isDg ? "dg" : "ctl";
++    if (w === null) return;
++    if (this.pending[key] >= PENDING_MAX) {
++      if (isDg) this.pc.datagram_send_dropped++;
++      else this.end("the control stream is stuck");
++      return;
++    }
++    this.pending[key]++;
++    void (async (): Promise<void> => {
++      if (!(await settles(w.write(r.bytes)))) this.pc.send_failed++;
++      this.pending[key]--;
++    })();
++  }
++
++  /** One wake: the queue to the client, its outbox sent, the send time stamped (C-U7-3), the next wake set. */
++  private readonly wake = (): void => {
++    const client = this.client;
++    if (this.ended || client === null) return;
++    let out: OutRecord[];
++    let dueNs: bigint;
++    try {
++      out = unpackOutbox(client.step(this.stamp(), this.prevSendNs, packInbox(this.inbox.drain())));
++      out.forEach((r) => this.send(r));
++      this.prevSendNs = this.stamp();
++      this.observe(client.counters());
++      dueNs = client.next_due_ns();
++    } catch {
++      return this.end("the client trapped");
++    }
++    const ms = Number(dueNs - this.stamp()) / NS_PER_MS;
++    if (!this.ended) this.arm("wake", this.wake, Math.min(WAKE_MAX_MS, Math.max(0, ms)));
++    return undefined;
++  };
++
++  private observe(c: Uint32Array): void {
++    const idx = this.idx;
++    if (idx === null) return;
++    const [joined, samples, own] = [c[idx.joined] ?? 0, c[idx.clock_samples] ?? 0, c[idx.own_soldier] ?? 0];
++    const ns = this.ns();
++    if (joined > 0 && samples > 0) this.rec?.attempt(ns, 1);
++    if (this.playing || joined === 0) return;
++    if (own > 0) {
++      this.playing = true;
++      this.status(STATUS.playing(this.transport));
++      if (this.fellBack) this.rec?.fallback(ns);
++    } else if (!this.shownJoined) {
++      this.shownJoined = true;
++      this.status(STATUS.joined(this.transport));
++    }
++  }
++
++  private postCounters(): void {
++    const core = this.client === null ? [] : Array.from(this.client.counters());
++    this.d.post({
++      kind: "counters",
++      names: [...this.names, ...PAGE_COUNTERS.map((n) => `page_${n}`)],
++      values: [...core, ...PAGE_COUNTERS.map((n) => (n === "inbox_dropped" ? this.inbox.dropped : this.pc[n]))],
++    });
++  }
++
++  private readonly everySecond = (): void => {
++    if (this.wt !== null && this.client !== null) this.rec?.second(this.ns());
++    this.postCounters();
++    this.arm("second", this.everySecond, SECOND_MS);
++  };
++
++  /** Ends the session once: timers cleared, `attempt.ok` 0 if not yet written, the transport closed. No restart. */
++  private end(why: string): void {
++    if (this.ended) return;
++    this.ended = true;
++    Object.values(this.timers).forEach((t) => (t === null ? undefined : this.d.clearTimer(t)));
++    this.rec?.attempt(this.ns(), 0);
++    this.status(STATUS.ended(why));
++    try {
++      this.postCounters();
++    } catch {
++      // a trapped client may not answer
++    }
++    try {
++      this.wt?.close();
++      this.ws?.close();
++    } catch {
++      // already closed
++    }
++  }
++}
++
++/** The start message's shape, checked (it comes from the page, which parsed the link). */
++export function readStart(x: unknown): StartMsg | null {
++  const m = x as Partial<StartMsg> | null;
++  const ms = (v: unknown): boolean => v === null || (typeof v === "number" && v > 0);
++  const ok = m !== null && typeof m === "object" && m.kind === "start" && typeof m.host === "string"
++    && typeof m.link === "object" && m.link !== null && typeof m.link.token === "string"
++    && ms(m.wtTimeoutMs) && ms(m.mdsPeriodMs);
++  return ok ? (m as StartMsg) : null;
++}
++
++/** wasm-bindgen's glue, beside this file in the dist (a string, so tsc does not resolve it). */
++const CORE_URL: string = "./npt_client_wasm.js";
++
++interface WorkerScope {
++  postMessage(m: unknown): void;
++  onmessage: ((e: MessageEvent) => void) | null;
++}
++
++if ("WorkerGlobalScope" in globalThis) {
++  const scope = globalThis as unknown as WorkerScope;
++  const engine = new Engine({
++    now: () => performance.now(),
++    setTimer: (fn, ms) => setTimeout(fn, ms),
++    clearTimer: (id) => clearTimeout(id as ReturnType<typeof setTimeout>),
++    fetchText: async (path) => {
++      const r = await fetch(path, { cache: "no-store", credentials: "omit", redirect: "error" });
++      if (!r.ok) throw new Error("not found");
++      return r.text();
++    },
++    webTransport: (url, options) => new WebTransport(url, options as WebTransportOptions) as unknown as WtLike,
++    webSocket: (url) => new WebSocket(url) as unknown as WsLike,
++    randomBytes: (n) => crypto.getRandomValues(new Uint8Array(n)),
++    loadCore: async () => (await import(CORE_URL)) as CoreModule,
++    post: (msg) => scope.postMessage(msg),
++  });
++  let started = false;
++  scope.onmessage = (e): void => {
++    const m = readStart(e.data);
++    if (started || m === null) return;
++    started = true;
++    void engine.start(m);
++  };
++}
+diff --git a/spikes/netcode-proof/web/test/boundary.test.mjs b/spikes/netcode-proof/web/test/boundary.test.mjs
+new file mode 100644
+index 0000000..01b2589
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/boundary.test.mjs
+@@ -0,0 +1,53 @@
++// boundary.test.mjs: C5's golden file against the page's packing (lib.js) and the fake core's own (fake-core.mjs).
++// R3's Rust test reads the same file with include_str! against the real packing.
++import assert from "node:assert/strict";
++import { readFileSync } from "node:fs";
++import { join } from "node:path";
++import { test } from "node:test";
++import { fakePackOutbox, fakeUnpackInbox } from "./fake-core.mjs";
++import { WEB, load } from "./helpers.mjs";
++
++const L = await load("lib.js");
++const G = JSON.parse(readFileSync(join(WEB, "test", "fixtures", "boundary.json"), "utf8"));
++const hex = (b) => Buffer.from(b).toString("hex");
++const bytes = (h) => Uint8Array.from(Buffer.from(h, "hex"));
++const inbox = G.inbox.records.map((r) => ({ channel: r.channel, arrivalNs: BigInt(r.arrival_ns), bytes: bytes(r.bytes_hex) }));
++const outbox = G.outbox.records.map((r) => ({ channel: r.channel, bytes: bytes(r.bytes_hex) }));
++
++test("the golden file: one inbox record per channel, an arrival above 2^32, two outbox records", () => {
++  assert.deepEqual(G.inbox.records.map((r) => r.channel), [0, 1, 2]);
++  assert.ok(inbox.some((r) => r.arrivalNs > 0xffffffffn));
++  assert.deepEqual(G.outbox.records.map((r) => r.channel), [0, 1]);
++});
++
++test("the page packs the golden inbox and reads the golden outbox", () => {
++  assert.equal(hex(L.packInbox(inbox)), G.inbox.hex);
++  assert.deepEqual(L.unpackOutbox(bytes(G.outbox.hex)).map((r) => ({ channel: r.channel, bytes_hex: hex(r.bytes) })),
++    G.outbox.records);
++  assert.equal(L.packInbox([]).length, 0);
++  assert.deepEqual(L.unpackOutbox(new Uint8Array(0)), []);
++});
++
++test("the fake core reads the golden inbox and packs the golden outbox", () => {
++  const u = fakeUnpackInbox(bytes(G.inbox.hex));
++  assert.equal(u.refused, 0);
++  assert.deepEqual(u.records.map((r) => ({ channel: r.channel, arrival_ns: String(r.arrivalNs), bytes_hex: hex(r.bytes) })),
++    G.inbox.records);
++  assert.equal(hex(fakePackOutbox(outbox)), G.outbox.hex);
++});
++
++test("a malformed outbox is a core fault: cut header, cut body, unknown channel", () => {
++  const o = bytes(G.outbox.hex);
++  assert.throws(() => L.unpackOutbox(o.subarray(0, 3)), /record header/);
++  assert.throws(() => L.unpackOutbox(o.subarray(0, o.length - 1)), /inside a record/);
++  const bad = Uint8Array.from(o);
++  bad[0] = 2;
++  assert.throws(() => L.unpackOutbox(bad), /unknown channel/);
++});
++
++test("the fake core refuses a truncated inbox record and the rest after it", () => {
++  const b = bytes(G.inbox.hex);
++  const u = fakeUnpackInbox(b.subarray(0, b.length - 1));
++  assert.equal(u.refused, 1);
++  assert.equal(u.records.length, 2);
++});
+diff --git a/spikes/netcode-proof/web/test/build.test.mjs b/spikes/netcode-proof/web/test/build.test.mjs
+new file mode 100644
+index 0000000..4715221
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/build.test.mjs
+@@ -0,0 +1,125 @@
++// build.test.mjs: Block T1 (u7-brief.md rev 1.1): index.html under the CSP, build.mjs's dist and its checks, web/'s
++// npm rule (advisor-u8-brief.md C2 as security-u7-deps.md item (4) applies it).
++import assert from "node:assert/strict";
++import { createHash } from "node:crypto";
++import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
++import { join } from "node:path";
++import { test } from "node:test";
++import {
++  DIST_NAMES, GATE as BUILD_GATE, WEB as BUILD_WEB, assemble, encodedRustFlags, homePaths, outDirFor, parseArgs,
++  wasmBindgenOk,
++} from "../build.mjs";
++import { GATE, WEB, scratch } from "./helpers.mjs";
++
++const html = readFileSync(join(WEB, "index.html"), "utf8");
++
++test("index.html: no inline script, no inline style, the three elements the scripts read", () => {
++  const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
++  assert.equal(scripts.length, 1);
++  assert.match(scripts[0][1], /\btype="module"/);
++  assert.match(scripts[0][1], /\bsrc="main\.js"/);
++  assert.equal(scripts[0][2].trim(), "");
++  assert.doesNotMatch(html, /<style\b/i);
++  assert.doesNotMatch(html, /\sstyle\s*=/i);
++  assert.doesNotMatch(html, /\son[a-z]+\s*=/i);
++  assert.doesNotMatch(html, /javascript:/i);
++  for (const id of ["status", "version", "counters"]) assert.match(html, new RegExp(`id="${id}"`));
++});
++
++test("the dist is the seven names U6c's host takes", () => {
++  assert.deepEqual([...DIST_NAMES], [
++    "index.html", "main.js", "worker.js", "lib.js", "hooks.js", "npt_client_wasm.js", "npt_client_wasm_bg.wasm",
++  ]);
++});
++
++function fakeInputs(dir) {
++  const js = join(dir, "js");
++  const bg = join(dir, "bindgen");
++  mkdirSync(js);
++  mkdirSync(bg);
++  for (const n of ["main.js", "worker.js", "lib.js", "hooks.js"]) writeFileSync(join(js, n), `// ${n}\n`);
++  writeFileSync(join(bg, "npt_client_wasm.js"), "// glue\n");
++  writeFileSync(join(bg, "npt_client_wasm_bg.wasm"), Buffer.from([0, 0x61, 0x73, 0x6d, 1, 0, 0, 0]));
++  writeFileSync(join(js, "extra.js"), "// never copied\n");
++  return { jsDir: js, bindgenDir: bg };
++}
++
++test("assemble: a fresh folder with exactly the seven files, each SHA-256 right", () => {
++  const dir = scratch("assemble");
++  const inputs = fakeInputs(dir);
++  const out = join(dir, "dist");
++  mkdirSync(out);
++  writeFileSync(join(out, "stale.txt"), "old\n");
++  const sums = assemble({ out, index: join(WEB, "index.html"), ...inputs });
++  assert.deepEqual(readdirSync(out).sort(), [...DIST_NAMES].sort());
++  assert.deepEqual(sums.map((s) => s.name), [...DIST_NAMES]);
++  for (const s of sums) {
++    assert.equal(s.sha256, createHash("sha256").update(readFileSync(join(out, s.name))).digest("hex"));
++  }
++});
++
++test("assemble: a hooks file replaces tsc's; a missing input or a folder outside .gate/ is refused", () => {
++  const dir = scratch("assemble-hooks");
++  const inputs = fakeInputs(dir);
++  const hooks = join(dir, "other-hooks.js");
++  writeFileSync(hooks, "// other\n");
++  const out = join(dir, "dist");
++  assemble({ out, index: join(WEB, "index.html"), ...inputs, hooks });
++  assert.equal(readFileSync(join(out, "hooks.js"), "utf8"), "// other\n");
++  assert.throws(() => assemble({ out, index: join(dir, "absent.html"), ...inputs }), /missing index\.html/);
++  assert.throws(() => assemble({ out: join(WEB, "test"), index: join(WEB, "index.html"), ...inputs }), /web\/dist or under \.gate/);
++});
++
++test("outDirFor: web/dist, the bites folder under .gate/ (C13), --out only under .gate/netcode-proof-test/", () => {
++  assert.equal(BUILD_WEB, WEB);
++  assert.equal(BUILD_GATE, GATE);
++  assert.equal(outDirFor({}), join(WEB, "dist"));
++  assert.equal(outDirFor({ bites: true }), join(GATE, "dist-bites"));
++  assert.equal(outDirFor({ out: join(GATE, "t5", "dist") }), join(GATE, "t5", "dist"));
++  assert.throws(() => outDirFor({ out: join(WEB, "dist2") }), /under \.gate/);
++  assert.throws(() => outDirFor({ out: GATE }), /under \.gate/);
++  assert.throws(() => outDirFor({ out: join(GATE, "..", "x") }), /under \.gate/);
++  assert.deepEqual(parseArgs([]), { bites: false, out: null });
++  assert.deepEqual(parseArgs(["--bites"]), { bites: true, out: null });
++  assert.throws(() => parseArgs(["--bites", "--out", "x"]), /own folder/);
++  assert.throws(() => parseArgs(["--fast"]), /unknown argument/);
++});
++
++test("wasm-bindgen: exactly 0.2.130 passes", () => {
++  assert.equal(wasmBindgenOk("wasm-bindgen 0.2.130\n"), true);
++  assert.equal(wasmBindgenOk("wasm-bindgen 0.2.129"), false);
++  assert.equal(wasmBindgenOk("wasm-bindgen 0.2.1300"), false);
++  assert.equal(wasmBindgenOk(""), false);
++});
++
++test("the remap flags name CARGO_HOME, the workspace and the target, one per field", () => {
++  const f = encodedRustFlags("/h/.cargo", "/w/spike", "/w/.gate/t").split("\x1f");
++  assert.deepEqual(f, [
++    "--remap-path-prefix=/h/.cargo=/cargo-home",
++    "--remap-path-prefix=/w/spike=/npt",
++    "--remap-path-prefix=/w/.gate/t=/npt-target",
++  ]);
++});
++
++test("the Wasm scan finds absolute home paths and passes remapped ones", () => {
++  const bad = Buffer.from("\0\0panicked at /home/someone/.cargo/registry/src/x/lib.rs\0", "latin1");
++  assert.deepEqual(homePaths(bad), ["/home/"]);
++  assert.deepEqual(homePaths(Buffer.from("C:\\Users\\me\\x.rs")), ["C:\\Users\\"]);
++  assert.deepEqual(homePaths(Buffer.from("/opt/w/spike/crates/a.rs"), ["/opt/w/spike"]), ["/opt/w/spike"]);
++  assert.deepEqual(homePaths(Buffer.from("\0/cargo-home/registry/src/x.rs /npt/crates/client/src/lib.rs\0")), []);
++});
++
++test("web/ holds no .npmrc and no npm-shrinkwrap.json (C2; security-u7-deps.md item (4))", () => {
++  const found = [];
++  const walk = (d) => {
++    for (const n of readdirSync(d)) {
++      if (n === "node_modules") continue;
++      const p = join(d, n);
++      if (n === ".npmrc" || n === "npm-shrinkwrap.json") found.push(p);
++      if (statSync(p).isDirectory()) walk(p);
++    }
++  };
++  walk(WEB);
++  assert.deepEqual(found, []);
++  assert.equal(existsSync(join(WEB, "dist")), false, "a web/dist folder fails check.mjs's redact step (N-U7D-1)");
++});
+diff --git a/spikes/netcode-proof/web/test/connect.test.mjs b/spikes/netcode-proof/web/test/connect.test.mjs
+new file mode 100644
+index 0000000..9b14240
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/connect.test.mjs
+@@ -0,0 +1,152 @@
++// connect.test.mjs: the transport chooser (u7-brief.md rev 1.1 section 3; C4, C9) over a fake clock and fake
++// transports: wt ready, wt failing, wt silent, ws, the no-fallback suites, the hash file first, the late-ready attempt.
++import assert from "node:assert/strict";
++import { test } from "node:test";
++import { FakeClock, FakeWs, FakeWt, HASH_BYTES, connectDeps, flush } from "./fakes.mjs";
++import { load, token } from "./helpers.mjs";
++
++const L = await load("lib.js");
++const link = (o = {}) => ({ suite: "smoke", room: "10", transport: "wt", attempt: 0, token: token(), wrongHash: false, bite: null, ...o });
++
++/** Starts connect() and resolves `out.v` once it settles. */
++function start(d) {
++  const out = { v: undefined };
++  L.connect(d).then((v) => (out.v = v));
++  return out;
++}
++
++test("wt ready: WebTransport, with the pinned hash, no pooling, unreliable required, the room's port", async () => {
++  const c = new FakeClock();
++  const d = connectDeps(link(), c);
++  const r = start(d);
++  await flush();
++  assert.deepEqual(d.fetched, ["/npt/cert-hash-10.json"]);
++  assert.equal(FakeWt.made.length, 1);
++  const wt = FakeWt.made[0];
++  assert.equal(wt.url, "https://127.0.0.1:30011/npt");
++  assert.equal(wt.options.allowPooling, false);
++  assert.equal(wt.options.requireUnreliable, true);
++  assert.equal(wt.options.serverCertificateHashes.length, 1);
++  assert.equal(wt.options.serverCertificateHashes[0].algorithm, "sha-256");
++  assert.deepEqual([...wt.options.serverCertificateHashes[0].value], [...HASH_BYTES]);
++  await c.advance(200);
++  wt.open();
++  await flush();
++  assert.equal(r.v.kind, "wt");
++  assert.equal(r.v.wt, wt);
++  assert.equal(c.timers.size, 0, "the 1.5 s timer is cleared");
++  await c.advance(5000);
++  assert.equal(FakeWs.made.length, 0);
++  assert.equal(wt.closeCalls, 0);
++});
++
++test("wt failing: WebSocket at once, not after 1.5 s", async () => {
++  const c = new FakeClock();
++  const d = connectDeps(link(), c);
++  const r = start(d);
++  await c.advance(100);
++  FakeWt.made[0].fail();
++  await flush();
++  assert.equal(FakeWs.made.length, 1);
++  assert.equal(FakeWs.made[0].url, "wss://127.0.0.1:31011/");
++  assert.equal(FakeWs.made[0].binaryType, "arraybuffer");
++  FakeWs.made[0].open();
++  await flush();
++  assert.equal(r.v.kind, "ws");
++  assert.equal(r.v.fellBack, true);
++  assert.equal(c.t, 100);
++});
++
++test("wt silent: WebSocket at 1.5 s, not before (P9)", async () => {
++  const c = new FakeClock();
++  const d = connectDeps(link(), c);
++  const r = start(d);
++  await c.advance(1499);
++  assert.equal(FakeWs.made.length, 0);
++  await c.advance(1);
++  assert.equal(FakeWs.made.length, 1);
++  assert.equal(FakeWt.made[0].closeCalls, 1, "the silent attempt is closed");
++  FakeWs.made[0].open();
++  await flush();
++  assert.equal(r.v.kind, "ws");
++  assert.deepEqual(d.statuses, ["WebTransport · Connecting", "WebSocket · Connecting"]);
++});
++
++test("C9: a WebTransport ready at 1.6 s, after the fallback began, is closed again and never used", async () => {
++  const c = new FakeClock();
++  const d = connectDeps(link(), c);
++  const r = start(d);
++  await c.advance(1600);
++  const wt = FakeWt.made[0];
++  wt.open();
++  await flush();
++  assert.equal(wt.closeCalls, 2);
++  assert.equal(wt.bidis.length, 0, "no control stream, so no Join, on the abandoned session");
++  FakeWs.made[0].open();
++  await flush();
++  assert.equal(r.v.kind, "ws");
++});
++
++test("ws: never WebTransport, no hash file", async () => {
++  const c = new FakeClock();
++  const d = connectDeps(link({ transport: "ws" }), c);
++  const r = start(d);
++  await flush();
++  FakeWs.made[0].open();
++  await flush();
++  assert.equal(r.v.kind, "ws");
++  assert.equal(r.v.fellBack, false);
++  assert.equal(FakeWt.made.length, 0);
++  assert.deepEqual(d.fetched, []);
++});
++
++test("cert-14d and wt-attempts: no fallback and no timer; a failed session fails at once (P13)", async () => {
++  for (const suite of ["cert-14d", "wt-attempts"]) {
++    const c = new FakeClock();
++    const d = connectDeps(link({ suite }), c);
++    const r = start(d);
++    await c.advance(5000);
++    assert.equal(r.v, undefined, `${suite}: still waiting at 5 s`);
++    assert.equal(FakeWs.made.length, 0);
++    FakeWt.made[0].fail();
++    await flush();
++    assert.deepEqual(r.v, { kind: "failed", why: "the WebTransport session did not open" });
++    await c.advance(5000);
++    assert.equal(FakeWs.made.length, 0, `${suite}: never WebSocket`);
++  }
++});
++
++test("hash=wrong pins each byte XOR 0xff (C4)", async () => {
++  const c = new FakeClock();
++  const d = connectDeps(link({ suite: "wt-attempts", wrongHash: true }), c);
++  start(d);
++  await flush();
++  assert.deepEqual([...FakeWt.made[0].options.serverCertificateHashes[0].value], [...HASH_BYTES].map((b) => b ^ 0xff));
++});
++
++test("the hash file comes first: a fetch failure or a bad file connects nothing", async () => {
++  for (const o of [{ fetchFails: true }, { hashText: "{}" }]) {
++    const c = new FakeClock();
++    const d = connectDeps(link(), c, o);
++    const r = start(d);
++    await c.advance(3000);
++    assert.equal(r.v.kind, "failed");
++    assert.equal(FakeWt.made.length + FakeWs.made.length, 0);
++  }
++});
++
++test("a WebSocket that never opens fails; no timeout (null) waits on WebTransport for ever", async () => {
++  const c = new FakeClock();
++  const d = connectDeps(link({ transport: "ws" }), c);
++  const r = start(d);
++  await flush();
++  FakeWs.made[0].fail();
++  await flush();
++  assert.deepEqual(r.v, { kind: "failed", why: "the WebSocket did not open" });
++  const c2 = new FakeClock();
++  const d2 = connectDeps(link(), c2, { timeoutMs: null });
++  const r2 = start(d2);
++  await c2.advance(30000);
++  assert.equal(r2.v, undefined);
++  assert.equal(FakeWs.made.length, 0);
++});
+diff --git a/spikes/netcode-proof/web/test/dist.test.mjs b/spikes/netcode-proof/web/test/dist.test.mjs
+new file mode 100644
+index 0000000..09f39a3
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/dist.test.mjs
+@@ -0,0 +1,108 @@
++// dist.test.mjs: Block T4 (u7-brief.md rev 1.1 sections 1 and 3; C11, C13): the measured dist from tsc's output holds
++// no bite id and no innerHTML (P14, P15); its hooks.js holds only the two timings; the bites dist arms each bite by
++// its query, and each armed bite does what marks.json says (read once; no WebTransport timeout).
++import assert from "node:assert/strict";
++import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
++import { join } from "node:path";
++import { test } from "node:test";
++import { pathToFileURL } from "node:url";
++import { DIST_NAMES, assemble } from "../build.mjs";
++import { makeCore } from "./fake-core.mjs";
++import { FakeClock, FakeWs, FakeWt, connectDeps } from "./fakes.mjs";
++import { OUT, WEB, load, scratch, token } from "./helpers.mjs";
++
++const L = await load("lib.js");
++const W = await load("worker.js");
++const OURS = ["index.html", "main.js", "worker.js", "lib.js", "hooks.js"];
++
++/** A dist from tsc's output and stand-ins for wasm-bindgen's two files (the real ones come with R3). */
++function dist(tag, hooks = null) {
++  const dir = scratch(tag);
++  const bindgenDir = join(dir, "bindgen");
++  mkdirSync(bindgenDir);
++  writeFileSync(join(bindgenDir, "npt_client_wasm.js"), "export default async function init() {}\n");
++  writeFileSync(join(bindgenDir, "npt_client_wasm_bg.wasm"), Buffer.from([0, 0x61, 0x73, 0x6d, 1, 0, 0, 0]));
++  const out = join(dir, "dist");
++  assemble({ out, index: join(WEB, "index.html"), jsDir: OUT, bindgenDir, hooks });
++  return out;
++}
++
++test("the measured dist: the seven names, no bite id, no innerHTML, no eval or Function, no Date.now (P14, P15)", () => {
++  const out = dist("measured");
++  assert.deepEqual(readdirSync(out).sort(), [...DIST_NAMES].sort());
++  for (const n of DIST_NAMES) {
++    const text = readFileSync(join(out, n), "latin1");
++    assert.equal(text.includes("PM-0001-"), false, `${n} holds a bite id`);
++    assert.equal(text.includes("innerHTML"), false, `${n} uses innerHTML`);
++  }
++  for (const n of OURS) {
++    const text = readFileSync(join(out, n), "utf8");
++    assert.doesNotMatch(text, /\beval\s*\(|\bnew Function\b|\bFunction\s*\(|Date\.now|outerHTML|insertAdjacentHTML|document\.write/, n);
++  }
++});
++
++test("the measured hooks.js holds only the 1,500 ms timeout and the 10,000 ms read period", async () => {
++  const h = await load("hooks.js");
++  assert.deepEqual(Object.keys(h).sort(), ["MDS_READ_PERIOD_MS", "WT_TIMEOUT_MS"]);
++  assert.equal(h.WT_TIMEOUT_MS, 1500);
++  assert.equal(h.MDS_READ_PERIOD_MS, 10000);
++});
++
++let n = 0;
++/** The bites dist's hooks.js, evaluated afresh under a page whose query is `search`. */
++async function bitesHooks(out, search) {
++  globalThis.location = { search };
++  try {
++    return await import(`${pathToFileURL(join(out, "hooks.js")).href}?case=${++n}`);
++  } finally {
++    delete globalThis.location;
++  }
++}
++
++test("the bites dist (C13): its hooks.js arms each bite by the link's query, and the page takes only its ids", async () => {
++  const out = dist("bites", join(WEB, "bites", "hooks.js"));
++  assert.deepEqual(readdirSync(out).sort(), [...DIST_NAMES].sort());
++  const link = "?smoke=1&suite=mds&room=19&transport=wt&attempt=0";
++  const none = await bitesHooks(out, link);
++  const once = await bitesHooks(out, `${link}&bite=PM-0001-36/read-once`);
++  const hang = await bitesHooks(out, `${link}&bite=PM-0001-29/no-wt-timeout`);
++  assert.deepEqual([none.WT_TIMEOUT_MS, none.MDS_READ_PERIOD_MS], [1500, 10000]);
++  assert.deepEqual([once.WT_TIMEOUT_MS, once.MDS_READ_PERIOD_MS], [1500, null]);
++  assert.deepEqual([hang.WT_TIMEOUT_MS, hang.MDS_READ_PERIOD_MS], [null, 10000]);
++  const ids = once.BITE_IDS;
++  const frag = `#t=${token()}`;
++  assert.equal(L.parseLink(`${link}&bite=PM-0001-36/read-once`, frag, ids).value.bite, "PM-0001-36/read-once");
++  assert.equal(L.parseLink(`${link}&bite=PM-0001-36/read-once`, frag).ok, false, "the measured page refuses a bite");
++  assert.equal(L.parseLink(`${link}&bite=PM-0001-99/other`, frag, ids).ok, false);
++});
++
++function engine(link, hooks) {
++  const c = new FakeClock();
++  const cd = connectDeps(link, c);
++  const posts = [];
++  const e = new W.Engine({
++    now: c.now, setTimer: c.setTimer, clearTimer: c.clearTimer, fetchText: cd.fetchText, webTransport: cd.webTransport,
++    webSocket: cd.webSocket, randomBytes: (k) => new Uint8Array(k), loadCore: async () => makeCore(), post: (m) => posts.push(m),
++  });
++  void e.start({ kind: "start", link, host: "127.0.0.1", wtTimeoutMs: hooks.WT_TIMEOUT_MS, mdsPeriodMs: hooks.MDS_READ_PERIOD_MS });
++  const events = (ev) => posts.filter((p) => p.kind === "records").flatMap((p) => p.lines).map((l) => JSON.parse(l))
++    .filter((x) => x.ev === ev);
++  return { c, events };
++}
++
++test("the bites armed: read-once gives 1 read in 12 s; no-wt-timeout gives no fallback event in 10 s", async () => {
++  const out = dist("bites-run", join(WEB, "bites", "hooks.js"));
++  const base = { room: "19", transport: "wt", attempt: 0, token: token(), wrongHash: false };
++  const once = engine({ ...base, suite: "mds", bite: "PM-0001-36/read-once" },
++    await bitesHooks(out, "?bite=PM-0001-36/read-once"));
++  await once.c.advance(100);
++  FakeWt.made[0].open();
++  await once.c.advance(12000);
++  assert.equal(once.events("mds_read").length, 1);
++  const hang = engine({ ...base, suite: "fallback", bite: "PM-0001-29/no-wt-timeout" },
++    await bitesHooks(out, "?bite=PM-0001-29/no-wt-timeout"));
++  await hang.c.advance(10000);
++  assert.equal(FakeWs.made.length, 0);
++  assert.equal(hang.events("fallback").length, 0);
++  assert.deepEqual(hang.events("attempt").map((x) => x.f.ok), [0], "the hung attempt reads 0 at its deadline");
++});
+diff --git a/spikes/netcode-proof/web/test/fake-core.mjs b/spikes/netcode-proof/web/test/fake-core.mjs
+new file mode 100644
+index 0000000..5d0b47b
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/fake-core.mjs
+@@ -0,0 +1,105 @@
++// fake-core.mjs: a stand-in for wasm-bindgen's npt_client_wasm.js with the Wasm class's shape (C5's boundary): a
++// default `init`, `new Client(token, bind)`, `step(now_ns: bigint, prev_send_ns: bigint, inbox: Uint8Array)` returning
++// the outbox, `next_due_ns(): bigint`, `counters(): Uint32Array`, and free `counter_names()` and `limits()`. Its
++// packing is written here from C5's text, apart from lib.ts's, so the golden file checks both.
++// Script: the first step sends the Join on Control; each due step sends an Input datagram, every 5th a Ping. A control
++// message of type 8 (JoinAccepted) sets `joined`, a datagram of type 6 (Pong) counts a clock sample, a full state
++// after the join sets `own_soldier`.
++export const TYPE = { input: 1, snapshot: 2, fullState: 3, ping: 5, pong: 6, join: 7, joinAccepted: 8 };
++export const TICK_NS = 33_333_333n;
++/** Steps a call at most (the real core's `npt_sim::LOOP_CATCHUP`). */
++export const CATCHUP = 7;
++export const NAMES = ["joined", "clock_samples", "own_soldier", "steps", "inbox_records", "inbox_refused"];
++
++/** C5's inbox, read with Buffer: records, or the rest refused at the first malformed one. */
++export function fakeUnpackInbox(bytes, caps = [1150, 256, 65541]) {
++  const b = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
++  const out = [];
++  let o = 0;
++  let refused = 0;
++  while (o < b.length && out.length < 512) {
++    if (o + 13 > b.length) {
++      refused++;
++      break;
++    }
++    const channel = b.readUInt8(o);
++    const arrivalNs = b.readBigUInt64LE(o + 1);
++    const len = b.readUInt32LE(o + 9);
++    if (channel > 2 || len > caps[channel] || o + 13 + len > b.length) {
++      refused++;
++      break;
++    }
++    out.push({ channel, arrivalNs, bytes: Uint8Array.from(b.subarray(o + 13, o + 13 + len)) });
++    o += 13 + len;
++  }
++  return { records: out, refused };
++}
++
++/** C5's outbox, written with Buffer. */
++export function fakePackOutbox(records) {
++  return new Uint8Array(Buffer.concat(records.flatMap((r) => {
++    const h = Buffer.alloc(5);
++    h.writeUInt8(r.channel, 0);
++    h.writeUInt32LE(r.bytes.length, 1);
++    return [h, Buffer.from(r.bytes)];
++  })));
++}
++
++/** A core module; `opts.limits` replaces the six numbers, `opts.names` the counter names, `opts.trapAt` traps there. */
++export function makeCore(opts = {}) {
++  const log = { inits: 0, clients: [], steps: [] };
++  const limits = opts.limits ?? [256, 65541, 1150, 0, 1, 2];
++  class Client {
++    constructor(token, bind) {
++      if (typeof token !== "string" || !/^nptj_[A-Za-z0-9_-]{22}$/.test(token)) throw new Error("bad token");
++      if (!(bind instanceof Uint8Array) || bind.length !== 16) throw new Error("bad bind");
++      log.clients.push({ token, bind: Uint8Array.from(bind) });
++      this.c = { joined: 0, clock_samples: 0, own_soldier: 0, steps: 0, inbox_records: 0, inbox_refused: 0 };
++      this.due = 0n;
++      this.sentJoin = false;
++    }
++    step(nowNs, prevSendNs, inbox) {
++      if (typeof nowNs !== "bigint" || typeof prevSendNs !== "bigint" || !(inbox instanceof Uint8Array)) {
++        throw new TypeError("step(bigint, bigint, Uint8Array)");
++      }
++      const { records, refused } = fakeUnpackInbox(inbox, [limits[2], limits[0], limits[1]]);
++      log.steps.push({ nowNs, prevSendNs, records });
++      this.c.inbox_records += records.length;
++      this.c.inbox_refused += refused;
++      for (const r of records) {
++        if (r.channel === 1 && r.bytes[2] === TYPE.joinAccepted) this.c.joined = 1;
++        if (r.channel === 0 && r.bytes[0] === TYPE.pong && this.c.joined) this.c.clock_samples++;
++        if (r.channel === 2 && this.c.joined) this.c.own_soldier = 1;
++      }
++      const out = [];
++      if (!this.sentJoin) {
++        this.sentJoin = true;
++        out.push({ channel: 1, bytes: [3, 0, TYPE.join, 0xa1, 0xa2] });
++      }
++      if (opts.trapAt !== undefined && this.c.steps >= opts.trapAt) throw new WebAssembly.RuntimeError("unreachable");
++      for (let k = 0; k < CATCHUP && this.due <= nowNs; k++) {
++        this.c.steps++;
++        out.push({ channel: 0, bytes: [TYPE.input, this.c.steps & 0xff] });
++        if (this.c.steps % 5 === 0) out.push({ channel: 0, bytes: [TYPE.ping, this.c.steps & 0xff] });
++        this.due = (this.due === 0n ? nowNs : this.due) + TICK_NS;
++      }
++      return fakePackOutbox(out);
++    }
++    next_due_ns() {
++      return this.due;
++    }
++    counters() {
++      return Uint32Array.from(NAMES.map((n) => this.c[n]));
++    }
++    free() {}
++  }
++  return {
++    log,
++    default: async () => {
++      log.inits++;
++    },
++    Client,
++    counter_names: () => (opts.names ?? NAMES).slice(),
++    limits: () => Uint32Array.from(limits),
++  };
++}
+diff --git a/spikes/netcode-proof/web/test/fakes.mjs b/spikes/netcode-proof/web/test/fakes.mjs
+new file mode 100644
+index 0000000..b2a96b5
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/fakes.mjs
+@@ -0,0 +1,157 @@
++// fakes.mjs: a fake clock with timers, a fake WebTransport and WebSocket (Node's own web streams), for the chooser and
++// the Worker's tests. Each fake records what the page did to it; nothing touches a network.
++
++/** Lets every pending promise callback run. */
++export async function flush(rounds = 4) {
++  for (let i = 0; i < rounds; i++) await new Promise((r) => setImmediate(r));
++}
++
++/** Time in ms from 0; timers fire only inside `advance`, in time order, with promises flushed after each. */
++export class FakeClock {
++  t = 0;
++  seq = 0;
++  timers = new Map();
++  now = () => this.t;
++  setTimer = (fn, ms) => {
++    const id = ++this.seq;
++    this.timers.set(id, { at: this.t + Math.max(0, ms), fn });
++    return id;
++  };
++  clearTimer = (id) => {
++    this.timers.delete(id);
++  };
++  async advance(ms) {
++    const end = this.t + ms;
++    await flush();
++    for (;;) {
++      const next = [...this.timers.entries()].filter(([, x]) => x.at <= end).sort((a, b) => a[1].at - b[1].at || a[0] - b[0])[0];
++      if (!next) break;
++      this.timers.delete(next[0]);
++      this.t = next[1].at;
++      next[1].fn();
++      await flush();
++    }
++    this.t = end;
++    await flush();
++  }
++}
++
++function deferred() {
++  let resolve;
++  let reject;
++  const promise = new Promise((a, b) => {
++    resolve = a;
++    reject = b;
++  });
++  return { promise, resolve, reject };
++}
++
++/** A readable stream whose chunks the test pushes, and a writable one that keeps what the page wrote. */
++function pipePair() {
++  let ctl;
++  const readable = new ReadableStream({ start: (c) => (ctl = c) });
++  const written = [];
++  const writable = new WritableStream({ write: (chunk) => void written.push(Uint8Array.from(chunk)) });
++  return { readable, writable, written, push: (b) => ctl.enqueue(Uint8Array.from(b)), end: () => ctl.close() };
++}
++
++export class FakeWt {
++  static made = [];
++  constructor(url, options) {
++    this.url = url;
++    this.options = options;
++    this.closeCalls = 0;
++    this.bidis = [];
++    this._ready = deferred();
++    this._closed = deferred();
++    this.ready = this._ready.promise;
++    this.closed = this._closed.promise;
++    this.ready.catch(() => {});
++    this.dg = pipePair();
++    this.datagrams = { readable: this.dg.readable, writable: this.dg.writable, maxDatagramSize: 1024 };
++    let uctl;
++    this.incomingUnidirectionalStreams = new ReadableStream({ start: (c) => (uctl = c) });
++    this.pushUni = (chunks) => {
++      let sc;
++      const s = new ReadableStream({ start: (c) => (sc = c) });
++      uctl.enqueue(s);
++      for (const ch of chunks) sc.enqueue(Uint8Array.from(ch));
++      return { end: () => sc.close(), push: (b) => sc.enqueue(Uint8Array.from(b)) };
++    };
++    FakeWt.made.push(this);
++  }
++  open() {
++    this._ready.resolve();
++  }
++  fail() {
++    this._ready.reject(new Error("refused"));
++    this._closed.reject(new Error("refused"));
++  }
++  close() {
++    this.closeCalls++;
++    this._closed.resolve();
++  }
++  async createBidirectionalStream() {
++    const p = pipePair();
++    this.bidis.push(p);
++    return p;
++  }
++}
++
++export class FakeWs {
++  static made = [];
++  constructor(url) {
++    this.url = url;
++    this.binaryType = "blob";
++    this.bufferedAmount = 0;
++    this.sent = [];
++    this.closeCalls = 0;
++    this.onopen = this.onclose = this.onerror = this.onmessage = null;
++    FakeWs.made.push(this);
++  }
++  open() {
++    this.onopen?.({});
++  }
++  fail() {
++    this.onerror?.({});
++    this.onclose?.({});
++  }
++  message(bytes) {
++    this.onmessage?.({ data: Uint8Array.from(bytes).buffer });
++  }
++  send(d) {
++    this.sent.push(Uint8Array.from(d));
++  }
++  close() {
++    this.closeCalls++;
++  }
++}
++
++/** The hash file U6b's room writes, for a 32-byte value that is no palindrome (bytes 0x00..0x1f). */
++export const HASH_BYTES = Uint8Array.from({ length: 32 }, (_, i) => i);
++export const hashFile = (hex = Buffer.from(HASH_BYTES).toString("hex")) =>
++  JSON.stringify({ algorithm: "sha-256", value_hex: hex, validity_ns: 13 * 86400 * 1e9 });
++
++/** ConnectDeps over the fakes; `fetched` lists every path asked for. */
++export function connectDeps(link, clock, { timeoutMs = 1500, hashText = hashFile(), fetchFails = false } = {}) {
++  FakeWt.made = [];
++  FakeWs.made = [];
++  const d = {
++    link,
++    host: "127.0.0.1",
++    timeoutMs,
++    fetched: [],
++    statuses: [],
++    fetchText: async (path) => {
++      d.fetched.push(path);
++      if (fetchFails) throw new Error("404");
++      return hashText;
++    },
++    webTransport: (url, options) => new FakeWt(url, options),
++    webSocket: (url) => new FakeWs(url),
++    setTimer: clock.setTimer,
++    clearTimer: clock.clearTimer,
++    onStatus: (s) => d.statuses.push(s),
++  };
++  return d;
++}
+diff --git a/spikes/netcode-proof/web/test/fixtures/boundary.json b/spikes/netcode-proof/web/test/fixtures/boundary.json
+new file mode 100644
+index 0000000..ffd9595
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/fixtures/boundary.json
+@@ -0,0 +1,18 @@
++{
++  "about": "The Wasm boundary's golden vectors (advisor-u7-brief.md C5): every integer little-endian. Inbox record: channel u8 (0 Datagram, 1 Control, 2 FullState), arrival ns u64, length u32, bytes. Outbox record: channel u8 (0 or 1), length u32, bytes. Read by web/test/boundary.test.mjs (the page's packing and the fake core's) and by R3's Rust test (include_str!). arrival_ns is a decimal string: u64 does not fit JSON's safe integers.",
++  "inbox": {
++    "hex": "0001000000010000000400000002aabbcc01cb04fb711f01000005000000030008010202efcdab8967452301060000000200000003ff",
++    "records": [
++      { "channel": 0, "arrival_ns": "4294967297", "bytes_hex": "02aabbcc" },
++      { "channel": 1, "arrival_ns": "1234567890123", "bytes_hex": "0300080102" },
++      { "channel": 2, "arrival_ns": "81985529216486895", "bytes_hex": "0200000003ff" }
++    ]
++  },
++  "outbox": {
++    "hex": "0005000000010506070801070000000500070a0b0c0d",
++    "records": [
++      { "channel": 0, "bytes_hex": "0105060708" },
++      { "channel": 1, "bytes_hex": "0500070a0b0c0d" }
++    ]
++  }
++}
+diff --git a/spikes/netcode-proof/web/test/helpers.mjs b/spikes/netcode-proof/web/test/helpers.mjs
+new file mode 100644
+index 0000000..6266b2d
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/helpers.mjs
+@@ -0,0 +1,51 @@
++// helpers.mjs: shared test code. The tests run over tsc's output (C7): NPT_WEB_OUT names that folder, else
++// <checkout>/.gate/netcode-proof-test/web-check (tsconfig.json's outDir). Nothing here writes under web/.
++import assert from "node:assert/strict";
++import { existsSync, mkdirSync, mkdtempSync } from "node:fs";
++import { dirname, join, resolve } from "node:path";
++import { fileURLToPath, pathToFileURL } from "node:url";
++
++export const WEB = resolve(dirname(fileURLToPath(import.meta.url)), "..");
++export const ROOT = resolve(WEB, "..", "..", "..");
++export const GATE = join(ROOT, ".gate", "netcode-proof-test");
++export const OUT = resolve(process.env.NPT_WEB_OUT || join(GATE, "web-check"));
++
++/** One of tsc's emitted modules; a missing one fails the test (never a skip). */
++export async function load(name) {
++  const f = join(OUT, name);
++  if (!existsSync(f)) throw new Error(`no ${name} in tsc's output folder: run tsc -p web first`);
++  return import(pathToFileURL(f).href);
++}
++
++/** A fresh scratch folder under .gate/netcode-proof-test/web-test/. */
++export function scratch(tag) {
++  const base = join(GATE, "web-test");
++  mkdirSync(base, { recursive: true });
++  return mkdtempSync(join(base, `${tag}-`));
++}
++
++/** Each line is npt-log's `event` or `second` form exactly (crates/log/src/lib.rs:195-233; C1), with no token or URL. */
++export function checkLine(line, tok) {
++  const r = JSON.parse(line);
++  const name = /^[a-z][a-z0-9_]*$/;
++  if (r.k === "event") {
++    assert.deepEqual(Object.keys(r), ["k", "ev", "ph", "ns", "f"]);
++    assert.match(r.ev, name);
++    assert.ok(Number.isSafeInteger(r.ns) && r.ns >= 0);
++    for (const [k, v] of Object.entries(r.f)) assert.ok(name.test(k) && Number.isSafeInteger(v), k);
++  } else {
++    assert.equal(r.k, "second");
++    assert.deepEqual(Object.keys(r), ["k", "sec", "ph", "v"]);
++    assert.ok(Number.isSafeInteger(r.sec) && r.sec >= 0);
++    for (const [k, v] of Object.entries(r.v)) assert.ok(name.test(k) && Number.isSafeInteger(v), k);
++  }
++  assert.equal(r.ph, "measured");
++  assert.equal(line.includes(tok.slice(5, 15)), false);
++  assert.equal(line.includes("nptj_"), false);
++  assert.equal(/https?:|wss?:/.test(line), false);
++}
++
++/** A slot token in U6a's form (`nptj_` + 22 base64url), built at run time so no token literal sits in the tree. */
++export function token(seed = "Ab3") {
++  return ["nptj", "_", seed.repeat(8).slice(0, 21), "A"].join("");
++}
+diff --git a/spikes/netcode-proof/web/test/lib.test.mjs b/spikes/netcode-proof/web/test/lib.test.mjs
+new file mode 100644
+index 0000000..04bcf47
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/lib.test.mjs
+@@ -0,0 +1,229 @@
++// lib.test.mjs: Block T2's pure logic (u7-brief.md rev 1.1 section 3 with C1, C4, C5): the link, the hash file, the
++// framing, the WebSocket tag, the limits, the inbox queue, the records, the status texts.
++import assert from "node:assert/strict";
++import { test } from "node:test";
++import { HASH_BYTES, hashFile } from "./fakes.mjs";
++import { checkLine, load, token } from "./helpers.mjs";
++
++const L = await load("lib.js");
++const TOKEN = token();
++const q = (o) => `?${Object.entries(o).map(([k, v]) => `${k}=${v}`).join("&")}`;
++const base = { smoke: "1", suite: "smoke", room: "10", transport: "wt", attempt: "0" };
++
++test("the link: U8's form parses, each field read", () => {
++  const p = L.parseLink(q(base), `#t=${TOKEN}`);
++  assert.equal(p.ok, true);
++  assert.deepEqual(p.value, { suite: "smoke", room: "10", transport: "wt", attempt: 0, token: TOKEN, wrongHash: false, bite: null });
++  for (const [suite, transport] of [["smoke", "ws"], ["cert-14d", "wt"], ["fallback", "wt"], ["mds", "wt"], ["wt-attempts", "wt"]]) {
++    assert.equal(L.parseLink(q({ ...base, suite, transport, room: "00", attempt: "19" }), `#t=${TOKEN}`).ok, true, suite);
++  }
++  assert.equal(L.parseLink(q({ ...base, room: "31", attempt: "99" }), `#t=${TOKEN}`).value.room, "31");
++});
++
++test("the link: each bad field starts nothing, and no reason or status holds the token (P16)", () => {
++  const bad = [
++    [q({ ...base, smoke: "0" }), `#t=${TOKEN}`],
++    [q({ ...base, suite: "load" }), `#t=${TOKEN}`],
++    [q({ ...base, room: "32" }), `#t=${TOKEN}`],
++    [q({ ...base, room: "7" }), `#t=${TOKEN}`],
++    [q({ ...base, room: "007" }), `#t=${TOKEN}`],
++    [q({ ...base, transport: "h3" }), `#t=${TOKEN}`],
++    [q({ ...base, suite: "cert-14d", transport: "ws" }), `#t=${TOKEN}`],
++    [q({ ...base, attempt: "01" }), `#t=${TOKEN}`],
++    [q({ ...base, attempt: "100" }), `#t=${TOKEN}`],
++    [q({ ...base, extra: "1" }), `#t=${TOKEN}`],
++    [`${q(base)}&room=11`, `#t=${TOKEN}`],
++    [q({ ...base, suite: "cert%2D14d" }), `#t=${TOKEN}`],
++    [q(Object.fromEntries(Object.entries(base).filter(([k]) => k !== "attempt"))), `#t=${TOKEN}`],
++    ["", `#t=${TOKEN}`],
++    [q(base), ""],
++    [q(base), `#x=${TOKEN}`],
++    [q(base), `#t=${TOKEN.slice(5)}`],
++    [q(base), `#t=${TOKEN.slice(0, -1)}`],
++    [q(base), `#t=${TOKEN}A`],
++    [q(base), `#t=${TOKEN.slice(0, -1)}!`],
++    [q(base), `#t=${TOKEN}&t=${TOKEN}`],
++    [q({ ...base, bite: "x" }), `#t=${TOKEN}`],
++  ];
++  for (const [search, hash] of bad) {
++    const p = L.parseLink(search, hash);
++    assert.equal(p.ok, false, `${search} ${hash.length}`);
++    const status = L.STATUS.badLink(p.why);
++    for (const s of [p.why, status]) {
++      assert.equal(s.includes(TOKEN.slice(5, 15)), false);
++      assert.equal(s.includes("nptj_"), false);
++      assert.equal(s.includes("?smoke"), false);
++    }
++  }
++});
++
++test("the link: hash=wrong only with wt-attempts (C4, P19); bite only when the dist names it", () => {
++  const w = L.parseLink(q({ ...base, suite: "wt-attempts", hash: "wrong" }), `#t=${TOKEN}`);
++  assert.equal(w.ok, true);
++  assert.equal(w.value.wrongHash, true);
++  for (const suite of ["cert-14d", "smoke", "fallback", "mds"]) {
++    assert.equal(L.parseLink(q({ ...base, suite, hash: "wrong" }), `#t=${TOKEN}`).ok, false, suite);
++  }
++  assert.equal(L.parseLink(q({ ...base, suite: "wt-attempts", hash: "right" }), `#t=${TOKEN}`).ok, false);
++  const ids = ["one/id", "two/id"];
++  assert.equal(L.parseLink(q({ ...base, bite: "one/id" }), `#t=${TOKEN}`).ok, false);
++  assert.equal(L.parseLink(q({ ...base, bite: "one/id" }), `#t=${TOKEN}`, ids).value.bite, "one/id");
++  assert.equal(L.parseLink(q({ ...base, bite: "three/id" }), `#t=${TOKEN}`, ids).ok, false);
++});
++
++test("the hash file: U6b's form gives its 32 bytes in order (P8); anything else is refused", () => {
++  const good = L.parseHashFile(hashFile());
++  assert.equal(good.ok, true);
++  assert.deepEqual([...good.value], [...HASH_BYTES]);
++  const hex = Buffer.from(HASH_BYTES).toString("hex");
++  const bad = [
++    JSON.stringify({ algorithm: "sha-384", value_hex: hex, validity_ns: 1 }),
++    JSON.stringify({ algorithm: "sha-256", value_hex: hex.toUpperCase(), validity_ns: 1 }),
++    JSON.stringify({ algorithm: "sha-256", value_hex: hex.slice(2), validity_ns: 1 }),
++    JSON.stringify({ algorithm: "sha-256", value_hex: `${hex}00`, validity_ns: 1 }),
++    JSON.stringify({ algorithm: "sha-256", value_hex: hex }),
++    JSON.stringify({ algorithm: "sha-256", value_hex: hex, validity_ns: -1 }),
++    JSON.stringify({ algorithm: "sha-256", value_hex: hex, validity_ns: 1, next: hex }),
++    JSON.stringify([hex]),
++    "not json",
++    hashFile().padEnd(1025, " "),
++  ];
++  for (const t of bad) assert.equal(L.parseHashFile(t).ok, false, t.slice(0, 40));
++  assert.deepEqual([...L.wrongHash(HASH_BYTES)], [...HASH_BYTES].map((b) => b ^ 0xff));
++  assert.equal(L.hashPath("07"), "/npt/cert-hash-07.json");
++});
++
++test("the addresses: the page's own host, UDP 30001 + NN and TCP 31001 + NN", () => {
++  assert.equal(L.wtUrl("rs.example", "05"), "https://rs.example:30006/npt");
++  assert.equal(L.wsUrl("rs.example", "31"), "wss://rs.example:31032/");
++});
++
++const LIM = { control: 256, fullState: 65541, datagram: 1150, tags: [7, 8, 9] };
++const control = (body) => Uint8Array.from([body.length & 0xff, body.length >> 8, ...body]);
++const full = (body) => {
++  const h = Buffer.alloc(4);
++  h.writeUInt32LE(body.length);
++  return Uint8Array.from([...h, ...body]);
++};
++
++function splits(framer, bytes, cut) {
++  return [...framer.push(bytes.subarray(0, cut)), ...framer.push(bytes.subarray(cut))];
++}
++
++test("framing: a control, a full state and a two-message chunk, split at every byte offset (P10)", () => {
++  const c = control([8, 1, 2, 3, 4, 5, 6, 7]);
++  const f = full(Array.from({ length: 300 }, (_, i) => i & 0xff));
++  const two = Uint8Array.from([...control([8, 9]), ...control([11, 12, 13])]);
++  for (let cut = 0; cut <= c.length; cut++) assert.deepEqual(splits(L.controlFramer(LIM), c, cut), [c], `control ${cut}`);
++  for (let cut = 0; cut <= f.length; cut++) assert.deepEqual(splits(L.fullStateFramer(LIM), f, cut), [f], `full ${cut}`);
++  for (let cut = 0; cut <= two.length; cut++) {
++    assert.deepEqual(splits(L.controlFramer(LIM), two, cut), [two.subarray(0, 4), two.subarray(4)], `two ${cut}`);
++  }
++  const fr = L.controlFramer(LIM);
++  const parts = [...c].flatMap((b) => fr.push(Uint8Array.of(b)));
++  assert.deepEqual(parts, [c]);
++  assert.equal(fr.partial, false);
++  fr.push(c.subarray(0, 3));
++  assert.equal(fr.partial, true);
++});
++
++test("framing: a message over its cap closes, counting its length bytes (P11)", () => {
++  const atC = control(Array(254).fill(1));
++  assert.equal(L.controlFramer(LIM).push(atC).length, 1);
++  assert.throws(() => L.controlFramer(LIM).push(control(Array(255).fill(1))), L.FrameError);
++  const head = (n) => {
++    const h = Buffer.alloc(4);
++    h.writeUInt32LE(n);
++    return Uint8Array.from(h);
++  };
++  assert.deepEqual(L.fullStateFramer(LIM).push(head(65537)), []);
++  assert.throws(() => L.fullStateFramer(LIM).push(head(65538)), L.FrameError);
++  const atF = full(Array(65537).fill(2));
++  assert.equal(atF.length, 65541);
++  assert.deepEqual(L.fullStateFramer(LIM).push(atF), [atF]);
++});
++
++test("the WebSocket tag both ways, from the limits' table; unknown tags and over-cap messages", () => {
++  const body = Uint8Array.of(8, 1, 2);
++  for (const ch of [0, 1, 2]) {
++    const w = L.wsWrap(LIM.tags[ch], body);
++    assert.deepEqual([...w], [LIM.tags[ch], 8, 1, 2]);
++    const u = L.wsUnwrap(w, LIM);
++    assert.equal(u.ok, true);
++    assert.equal(u.channel, ch);
++    assert.deepEqual([...u.bytes], [...body]);
++  }
++  assert.deepEqual(L.wsUnwrap(Uint8Array.of(0, 1), LIM), { ok: false, close: true, why: "an unknown WebSocket tag" });
++  assert.equal(L.wsUnwrap(new Uint8Array(0), LIM).close, true);
++  assert.equal(L.wsUnwrap(L.wsWrap(7, new Uint8Array(1150)), LIM).ok, true);
++  assert.deepEqual(L.wsUnwrap(L.wsWrap(7, new Uint8Array(1151)), LIM), { ok: false, close: false, why: "a message over its cap" });
++  assert.equal(L.wsUnwrap(L.wsWrap(8, new Uint8Array(257)), LIM).close, true);
++  assert.equal(L.wsUnwrap(L.wsWrap(9, new Uint8Array(65542)), LIM).close, true);
++});
++
++test("the limits: six numbers in C5's order; anything else is refused", () => {
++  assert.deepEqual(L.readLimits([256, 65541, 1150, 7, 8, 9]), { ok: true, value: LIM });
++  for (const v of [[256, 65541, 1150, 7, 8], [256, 65541, 1150, 7, 8, 9, 10], [256, 65541, 1150, 7, 7, 9],
++    [256, 65541, 1150, 7, 8, 256], [2, 65541, 1150, 7, 8, 9], [256, 4, 1150, 7, 8, 9], [256, 65541, 0, 7, 8, 9]]) {
++    assert.equal(L.readLimits(v).ok, false, v.join(","));
++  }
++});
++
++test("the inbox queue holds at most 512, counting the rest", () => {
++  const qq = new L.InboxQueue();
++  for (let i = 0; i < 520; i++) qq.push({ channel: 0, arrivalNs: BigInt(i), bytes: Uint8Array.of(i & 0xff) });
++  assert.equal(qq.length, 512);
++  assert.equal(qq.dropped, 8);
++  assert.equal(qq.drain().length, 512);
++  assert.equal(qq.length, 0);
++});
++
++test("the records: attempt once, fallback once from the connect start, mds reads, one second record a second", () => {
++  const lines = [];
++  const r = new L.Recorder((l) => lines.push(l), 2e8);
++  r.attempt(1.5e9, 1);
++  r.attempt(1.6e9, 0);
++  r.fallback(2.9e9);
++  r.fallback(3e9);
++  r.mdsRead(3.1e9, 1024);
++  r.datagram(1100, 1024);
++  r.datagram(1000, 1024);
++  r.datagram(1200, 1024);
++  r.second(1.2e9);
++  r.second(1.9e9);
++  r.datagram(1300, 1024);
++  r.second(3.05e9);
++  assert.deepEqual(lines, [
++    '{"k":"event","ev":"attempt","ph":"measured","ns":1500000000,"f":{"ok":1}}',
++    '{"k":"event","ev":"fallback","ph":"measured","ns":2900000000,"f":{"playing_ns":2700000000}}',
++    '{"k":"event","ev":"mds_read","ph":"measured","ns":3100000000,"f":{"size_bytes":1024}}',
++    '{"k":"second","sec":0,"ph":"measured","v":{"recv_over_max_count":2}}',
++    '{"k":"second","sec":2,"ph":"measured","v":{"recv_over_max_count":1}}',
++  ]);
++  assert.equal(r.attemptWritten, true);
++  for (const l of lines) checkLine(l, TOKEN);
++});
++
++test("the status texts, byte for byte (U+00B7 as U8's PAGE reads it)", () => {
++  assert.equal(Buffer.from(L.STATUS.playing("wt")).toString("hex"), Buffer.from("WebTransport · Playing").toString("hex"));
++  assert.equal(L.STATUS.playing("wt"), "WebTransport · Playing");
++  assert.equal(L.STATUS.playing("ws"), "WebSocket · Playing");
++  assert.equal(L.STATUS.connecting("wt"), "WebTransport · Connecting");
++  assert.equal(L.STATUS.joined("ws"), "WebSocket · Joined");
++  assert.equal(L.STATUS.ended("x"), "Ended: x");
++  assert.equal(L.STATUS.badLink("x"), "Bad link: x");
++  assert.equal(L.STATUS.starting, "Starting");
++});
++
++test("the clock step, the counters by name, the version text", () => {
++  const seq = [0, 0, 0, 0.1, 0.1, 0.3, 0.3, 0.35];
++  let i = 0;
++  assert.equal(L.clockResNs(() => seq[Math.min(i++, seq.length - 1)], seq.length), 50000);
++  assert.equal(L.clockResNs(() => 5, 10), 0);
++  assert.deepEqual(L.counterIndex(["x", "own_soldier", "joined", "clock_samples"]),
++    { ok: true, value: { joined: 2, clock_samples: 3, own_soldier: 1 } });
++  assert.equal(L.counterIndex(["joined", "clock_samples"]).ok, false);
++  assert.equal(L.versionText({ userAgent: "UA", userAgentData: { brands: [{ brand: "Not)A;Brand", version: "8" },
++    { brand: "Chromium", version: "143" }] } }), "Chromium 143");
++  assert.equal(L.versionText({ userAgent: "Mozilla/5.0 UA" }), "Mozilla/5.0 UA");
++});
+diff --git a/spikes/netcode-proof/web/test/page.test.mjs b/spikes/netcode-proof/web/test/page.test.mjs
+new file mode 100644
+index 0000000..a6b35a5
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/page.test.mjs
+@@ -0,0 +1,36 @@
++// page.test.mjs: Block T3's page state (C1): the record cap and its drop count, the clock step, the counters, the
++// start message with the measured hooks' timings.
++import assert from "node:assert/strict";
++import { test } from "node:test";
++import { load, token } from "./helpers.mjs";
++
++const M = await load("main.js");
++const L = await load("lib.js");
++
++test("the page keeps at most 4,096 records and counts the rest", () => {
++  const s = new M.PageState();
++  s.apply({ kind: "records", lines: Array.from({ length: 4000 }, (_, i) => `a${i}`) });
++  s.apply({ kind: "records", lines: Array.from({ length: 100 }, (_, i) => `b${i}`) });
++  assert.equal(s.records.length, L.RECORDS_MAX);
++  assert.equal(s.records.length, 4096);
++  assert.equal(s.dropped, 4);
++  assert.equal(s.records.at(-1), "b95");
++});
++
++test("status, clock step and counters from the Worker", () => {
++  const s = new M.PageState();
++  assert.equal(s.status, "Starting");
++  s.apply({ kind: "status", text: "WebSocket · Playing" });
++  s.apply({ kind: "clock", resNs: 100000 });
++  s.apply({ kind: "counters", names: ["joined", "steps"], values: [1, 42] });
++  assert.equal(s.status, "WebSocket · Playing");
++  assert.equal(s.clockResNs, 100000);
++  assert.deepEqual(s.counters, [["joined", 1], ["steps", 42]]);
++});
++
++test("the start message carries the link and the measured hooks' timings; the measured dist arms no bite", () => {
++  const link = { suite: "smoke", room: "10", transport: "wt", attempt: 0, token: token(), wrongHash: false, bite: null };
++  assert.deepEqual(M.startMessage(link, "127.0.0.1"),
++    { kind: "start", link, host: "127.0.0.1", wtTimeoutMs: 1500, mdsPeriodMs: 10000 });
++  assert.deepEqual(M.BITE_IDS, []);
++});
+diff --git a/spikes/netcode-proof/web/test/worker.test.mjs b/spikes/netcode-proof/web/test/worker.test.mjs
+new file mode 100644
+index 0000000..79e8f80
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/worker.test.mjs
+@@ -0,0 +1,238 @@
++// worker.test.mjs: Block T3's Worker engine over a fake clock, fake transports and the fake core (u7-brief.md rev 1.1
++// sections 1 and 3; C-U7-3; C1, C9): the join on one transport, Playing, the records, stamping, the bounded queue, the
++// timer from next_due_ns, the trap, the caps.
++import assert from "node:assert/strict";
++import { test } from "node:test";
++import { TICK_NS, TYPE, makeCore } from "./fake-core.mjs";
++import { FakeClock, FakeWs, FakeWt, connectDeps, flush } from "./fakes.mjs";
++import { checkLine, load, token } from "./helpers.mjs";
++
++const W = await load("worker.js");
++const TOKEN = token();
++const link = (o = {}) => ({ suite: "smoke", room: "10", transport: "wt", attempt: 0, token: TOKEN, wrongHash: false, bite: null, ...o });
++const JOIN_ACCEPTED = [1, 0, TYPE.joinAccepted];
++const PONG = [TYPE.pong, 1];
++const FULL_STATE = [1, 0, 0, 0, TYPE.fullState];
++
++function rig(o = {}) {
++  const c = new FakeClock();
++  const core = o.core ?? makeCore(o.coreOpts);
++  const cd = connectDeps(link(o.link), c, { timeoutMs: o.timeoutMs === undefined ? 1500 : o.timeoutMs });
++  const posts = [];
++  const e = new W.Engine({
++    now: c.now, setTimer: c.setTimer, clearTimer: c.clearTimer, fetchText: cd.fetchText, webTransport: cd.webTransport,
++    webSocket: cd.webSocket, randomBytes: (n) => new Uint8Array(n).fill(7),
++    loadCore: () => (o.coreDelayMs ? new Promise((ok) => c.setTimer(() => ok(core), o.coreDelayMs)) : Promise.resolve(core)),
++    post: (m) => posts.push(m),
++  });
++  const r = {
++    c, core, posts,
++    start: () => e.start({ kind: "start", link: link(o.link), host: "127.0.0.1", wtTimeoutMs: o.timeoutMs === undefined ? 1500 : o.timeoutMs,
++      mdsPeriodMs: o.mdsPeriodMs === undefined ? 10000 : o.mdsPeriodMs }),
++    lines: () => posts.filter((p) => p.kind === "records").flatMap((p) => p.lines),
++    events: (ev) => r.lines().map((l) => JSON.parse(l)).filter((x) => x.k === "event" && x.ev === ev),
++    statuses: () => posts.filter((p) => p.kind === "status").map((p) => p.text),
++    counters: () => posts.filter((p) => p.kind === "counters").at(-1),
++  };
++  return r;
++}
++
++/** Starts a smoke session over WebTransport, opened at 100 ms; returns the rig and the fake session. */
++async function wtSession(o = {}) {
++  const r = rig(o);
++  void r.start();
++  await r.c.advance(100);
++  const wt = FakeWt.made[0];
++  wt.open();
++  await r.c.advance(0);
++  return { r, wt };
++}
++
++test("WebTransport: the Join on the control stream, datagrams on the writer, then Playing and attempt.ok 1", async () => {
++  const { r, wt } = await wtSession();
++  assert.equal(r.core.log.clients.length, 1);
++  assert.equal(r.core.log.clients[0].token, TOKEN);
++  assert.equal(r.core.log.clients[0].bind.length, 16);
++  assert.equal(wt.bidis.length, 1);
++  assert.deepEqual([...wt.bidis[0].written[0]], [3, 0, TYPE.join, 0xa1, 0xa2]);
++  assert.ok(wt.dg.written.length >= 1);
++  assert.deepEqual(r.statuses(), ["WebTransport · Connecting"]);
++  wt.bidis[0].push(JOIN_ACCEPTED);
++  wt.dg.push(PONG);
++  wt.pushUni([FULL_STATE]).end();
++  await r.c.advance(40);
++  assert.equal(r.statuses().at(-1), "WebTransport · Playing");
++  assert.deepEqual(r.events("attempt").map((x) => x.f), [{ ok: 1 }]);
++  assert.equal(r.events("fallback").length, 0);
++  assert.equal(FakeWs.made.length, 0);
++  for (const l of r.lines()) checkLine(l, TOKEN);
++  assert.equal(JSON.stringify(r.posts).includes(TOKEN.slice(5)), false, "no post holds the token");
++});
++
++test("stamps: each message at its own read, in ns; prev_send_ns 0 first, then the last wake's send time (C-U7-3)", async () => {
++  const { r, wt } = await wtSession();
++  await r.c.advance(5);
++  const at = r.c.t;
++  wt.dg.push(PONG);
++  wt.bidis[0].push(JOIN_ACCEPTED);
++  await r.c.advance(50);
++  const steps = r.core.log.steps;
++  assert.equal(steps[0].prevSendNs, 0n);
++  const seen = steps.flatMap((s) => s.records);
++  assert.deepEqual(seen.map((x) => x.arrivalNs), [BigInt(at * 1e6), BigInt(at * 1e6)]);
++  assert.deepEqual(seen.map((x) => x.channel), [0, 1]);
++  for (let i = 1; i < steps.length; i++) assert.equal(steps[i].prevSendNs, steps[i - 1].nowNs, `step ${i}`);
++});
++
++test("the timer follows next_due_ns: about 30 wakes a second", async () => {
++  const { r } = await wtSession();
++  const before = r.core.log.steps.length;
++  await r.c.advance(1000);
++  const n = r.core.log.steps.length - before;
++  assert.ok(n >= 29 && n <= 31, `${n} wakes`);
++  assert.equal(TICK_NS, 33_333_333n);
++});
++
++test("the inbox holds at most 512 between wakes; the rest is counted on the page", async () => {
++  const { r, wt } = await wtSession();
++  await r.c.advance(5);
++  for (let i = 0; i < 600; i++) wt.dg.push([TYPE.snapshot, i & 0xff]);
++  await r.c.advance(30);
++  assert.equal(Math.max(...r.core.log.steps.map((s) => s.records.length)), 512);
++  await r.c.advance(1000);
++  const k = r.counters();
++  assert.equal(k.values[k.names.indexOf("page_inbox_dropped")], 88);
++  assert.ok(k.names.includes("joined") && k.names.includes("steps"));
++});
++
++test("mds_read at session ready and every 10 s (P12); a second record each second with recv_over_max_count", async () => {
++  const { r, wt } = await wtSession();
++  wt.datagrams.maxDatagramSize = 1000;
++  wt.dg.push(new Array(1100).fill(2));
++  wt.dg.push(new Array(1200).fill(2));
++  wt.dg.push(new Array(1151).fill(2));
++  await r.c.advance(21000);
++  const reads = r.events("mds_read");
++  assert.equal(reads.length, 3);
++  assert.deepEqual(reads.map((x) => x.f.size_bytes), [1024, 1000, 1000]);
++  assert.deepEqual(reads.map((x) => Math.round(x.ns / 1e8)), [1, 101, 201]);
++  const secs = r.lines().map((l) => JSON.parse(l)).filter((x) => x.k === "second");
++  assert.ok(secs.length >= 19);
++  assert.deepEqual(secs.map((x) => x.sec), secs.map((_, i) => i));
++  assert.equal(secs[0].v.recv_over_max_count, 3);
++  assert.equal(secs.slice(1).every((x) => x.v.recv_over_max_count === 0), true);
++  const k = r.counters();
++  assert.equal(k.values[k.names.indexOf("page_datagram_over_cap")], 2, "1,200 B and 1,151 B are over the 1,150 B cap");
++  for (const l of r.lines()) checkLine(l, TOKEN);
++});
++
++test("fallback: WebSocket at 1.5 s with the tags from limits(); Join on it only (C9); fallback.playing_ns once", async () => {
++  const r = rig({ coreOpts: { limits: [256, 65541, 1150, 7, 8, 9] } });
++  void r.start();
++  await r.c.advance(1500);
++  const ws = FakeWs.made[0];
++  await r.c.advance(100);
++  ws.open();
++  await r.c.advance(0);
++  assert.deepEqual([...ws.sent[0]], [8, 3, 0, TYPE.join, 0xa1, 0xa2]);
++  assert.ok(ws.sent.slice(1).every((m) => m[0] === 7), "datagrams behind tag 7");
++  FakeWt.made[0].open();
++  await r.c.advance(100);
++  assert.equal(FakeWt.made[0].bidis.length, 0, "no control stream, so no Join, on the late WebTransport");
++  assert.equal(FakeWt.made[0].closeCalls, 2);
++  ws.message([8, ...JOIN_ACCEPTED]);
++  ws.message([7, ...PONG]);
++  ws.message([9, ...FULL_STATE]);
++  await r.c.advance(40);
++  assert.equal(r.statuses().at(-1), "WebSocket · Playing");
++  const fb = r.events("fallback");
++  assert.equal(fb.length, 1);
++  assert.ok(fb[0].f.playing_ns >= 1.5e9 && fb[0].f.playing_ns <= 3e9, String(fb[0].f.playing_ns));
++  assert.equal(fb[0].f.playing_ns, fb[0].ns);
++  assert.deepEqual(r.events("attempt").map((x) => x.f), [{ ok: 1 }]);
++  assert.equal(r.events("mds_read").length, 0, "no maxDatagramSize over WebSocket");
++});
++
++test("cert-14d: a failed session writes attempt.ok 0 at once and never falls back (P13)", async () => {
++  const r = rig({ link: { suite: "cert-14d" } });
++  void r.start();
++  await r.c.advance(300);
++  FakeWt.made[0].fail();
++  await r.c.advance(0);
++  assert.deepEqual(r.events("attempt").map((x) => [x.f.ok, x.ns]), [[0, 3e8]]);
++  assert.equal(r.statuses().at(-1), "Ended: the WebTransport session did not open");
++  await r.c.advance(15000);
++  assert.equal(FakeWs.made.length, 0);
++  assert.equal(r.events("attempt").length, 1);
++});
++
++test("the attempt deadline: no JoinAccepted in 10 s writes attempt.ok 0, once", async () => {
++  const { r } = await wtSession();
++  await r.c.advance(9800);
++  assert.equal(r.events("attempt").length, 0);
++  await r.c.advance(200);
++  assert.deepEqual(r.events("attempt").map((x) => [x.f.ok, x.ns]), [[0, 1e10]]);
++  await r.c.advance(5000);
++  assert.equal(r.events("attempt").length, 1);
++});
++
++test("a trap ends the session (Ended), no restart, no new client", async () => {
++  const { r, wt } = await wtSession({ coreOpts: { trapAt: 3 } });
++  await r.c.advance(500);
++  assert.equal(r.statuses().at(-1), "Ended: the client trapped");
++  assert.equal(r.core.log.clients.length, 1);
++  const n = r.core.log.steps.length;
++  await r.c.advance(2000);
++  assert.equal(r.core.log.steps.length, n);
++  assert.ok(wt.closeCalls >= 1);
++  assert.deepEqual(r.events("attempt").map((x) => x.f.ok), [0]);
++});
++
++test("caps: a control message over 256 B ends the session; a full-state stream cut short ends it", async () => {
++  const a = await wtSession();
++  a.wt.bidis[0].push([255, 0, TYPE.joinAccepted]);
++  await a.r.c.advance(40);
++  assert.equal(a.r.statuses().at(-1), "Ended: a stream message over its cap");
++  const b = await wtSession();
++  b.wt.pushUni([[5, 0, 0, 0, 3]]).end();
++  await b.r.c.advance(40);
++  assert.equal(b.r.statuses().at(-1), "Ended: a stream ended inside a message");
++});
++
++test("a client without the needed counters, or with malformed limits, starts nothing", async () => {
++  const a = rig({ coreOpts: { names: ["joined", "steps"] } });
++  void a.start();
++  await a.c.advance(100);
++  FakeWt.made[0].open();
++  await a.c.advance(0);
++  assert.equal(a.statuses().at(-1), "Ended: the client has no counter clock_samples");
++  assert.equal(a.core.log.clients.length, 0);
++  const b = rig({ transport: "ws", coreOpts: { limits: [256, 65541, 1150, 1, 1, 2] }, link: { transport: "ws" } });
++  void b.start();
++  await b.c.advance(0);
++  FakeWs.made[0].open();
++  await b.c.advance(0);
++  assert.equal(b.statuses().at(-1), "Ended: the client's limits are malformed");
++});
++
++test("a WebSocket that closes while the client still loads ends the session; no client is made", async () => {
++  const r = rig({ link: { transport: "ws" }, coreDelayMs: 50 });
++  void r.start();
++  await r.c.advance(0);
++  FakeWs.made[0].open();
++  await r.c.advance(10);
++  FakeWs.made[0].fail();
++  await r.c.advance(100);
++  assert.equal(r.statuses().at(-1), "Ended: the WebSocket closed");
++  assert.equal(r.core.log.clients.length, 0);
++  assert.deepEqual(r.events("attempt").map((x) => x.f.ok), [0]);
++});
++
++test("the start message is checked; the clock step is posted first", () => {
++  assert.equal(W.readStart({ kind: "start", host: "h", link: { token: TOKEN }, wtTimeoutMs: 1500, mdsPeriodMs: null }) !== null, true);
++  assert.equal(W.readStart({ kind: "start", host: "h", link: { token: TOKEN }, wtTimeoutMs: 0, mdsPeriodMs: 1 }), null);
++  assert.equal(W.readStart({ kind: "go" }), null);
++  assert.equal(W.readStart(null), null);
++  const r = rig();
++  assert.deepEqual(r.posts[0], { kind: "clock", resNs: 0 });
++});
+diff --git a/spikes/netcode-proof/web/tsconfig.json b/spikes/netcode-proof/web/tsconfig.json
+new file mode 100644
+index 0000000..3fa9c9d
+--- /dev/null
++++ b/spikes/netcode-proof/web/tsconfig.json
+@@ -0,0 +1,23 @@
++{
++  "compilerOptions": {
++    "target": "ES2022",
++    "module": "ES2022",
++    "moduleResolution": "bundler",
++    "lib": ["ES2022", "DOM"],
++    "types": [],
++    "strict": true,
++    "noUncheckedIndexedAccess": true,
++    "noImplicitReturns": true,
++    "noImplicitOverride": true,
++    "noFallthroughCasesInSwitch": true,
++    "noUnusedLocals": true,
++    "noUnusedParameters": true,
++    "useUnknownInCatchVariables": true,
++    "rootDir": "src",
++    "outDir": "../../../.gate/netcode-proof-test/web-check",
++    "newLine": "lf",
++    "sourceMap": false,
++    "declaration": false
++  },
++  "include": ["src/*.ts"]
++}

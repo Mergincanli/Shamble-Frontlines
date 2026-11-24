@@ -91,7 +91,14 @@
   0 PASS (lock 210bf2df…, 235 packages, the three hashes); step 1 the manifest edits (+12 -2, +13, +6); step 2 the lock
   refreshed with the network (main-run.sh, `env CARGO_NET_OFFLINE=false`: .gate/u6c-block0/step2-metadata.log) put
   hyper 1.13.0 in; pinned back to the cleared 1.12.0 (step2b-pin.log); the lock now 3394b451… (model ea6efb00…), diff
-  229/6 (model 226/3): **to security-auditor (condition 1)**, lock.diff efb07c46…. Steps 3-5 and the save wait.
+  229/6 (model 226/3): security-u6c-lock.md **CLEAR WITH CONDITIONS** (three Windows-only windows-sys lines moved by
+  the pin; SEC-U6CL-1, -2 Low); amended step 3 PASS; step 4 (step4-tree.log) PASS but three unlisted feature lines
+  (hyper and hyper-util `default`, hyper-rustls `rustls-native-certs`): to security (a866e544173bb98fc resumed); **step
+  5 RUNNING** (b5263aevb -> step5-check.log). Then step 6 (deny, audit, DB dates), step 7 (dependency-check.md), save.
+- **T5 (i) DONE 06:3x** (the T-builder's report; container readings, never judged): 4 loads, each on its own room, all
+  exit 0 (WT ready 44 ms, wss open 25 ms, the hash control refused, the real page to its Wasm 404). Records copied to
+  .gate/u7/t5i/; notes u7-t-build.md copied; T-half snapshot wip/u7-t-build-t5i.patch (23 files; +376 = 2,858). For
+  the advisor at U7's round: T5i-1 (ws counted 1 accepted + 1 failed for one page), T5i-2, T5i-3.
 - **Next 3:** the 2026-11-24 day message SENT 23:0x UTC (msg-2026-11-24.md: choices 1-7, /compact asked); the next at
   2026-11-24 23:05 UTC (trig_016pV7v16ktVwMuzygofJhjJ, msg-2026-11-25.md). T5 (i) the day U6b merges.
 
@@ -142,8 +149,8 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (2 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - U7's T-builder a9873cdba07a3219e on T5 (i) (notes u7-t-build.md); security-auditor a866e544173bb98fc on U6c's Block 0
-    lock (security-u6c-lock.md). Done, resumable: the advisor a6e7ce46a28424b0b
+  - security-auditor a866e544173bb98fc on step 4's three lines (security-u6c-lock.md); step 5's main-run.sh b5263aevb.
+    Done, resumable: U7's T-builder a9873cdba07a3219e (T5 (i) DONE); the advisor a6e7ce46a28424b0b
     (advisor-u6b-m6.md DONE, fe2e4c0d…); the advisor's U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md
     DONE); U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree agent-a2661dc320c9e6d00), the
     advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode a0a57a3948202de40, security aedb799ad9648b0e1,
