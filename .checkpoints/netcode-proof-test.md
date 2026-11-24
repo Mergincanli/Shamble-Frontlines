@@ -165,7 +165,7 @@
     in 100.1 s; READY, DONE, exit 0; room peak 125,689,856 B; **0**-31 inputs per client per second (for round 2's netcode seat).
   - The probe reading DONE (read-probe.log; probe_reading.py holds the server's stdin; .gate/u6c/read-probe/): P0 and P1
     each 1,000,000 records a direction (FP-1); legs about 112 s (B1 ~113 s by arithmetic; P2-P4 and B1 unmeasured: round
-    2's question 3); P1 lost ~1.1 %, 484 refused sends; drain 82/77 ms; the peer's 751,417 errors ≈ its 76 s after the legs.
+    2's question 3); P1 lost ~1.1 %; 484 peer datagrams refused for the leg (probe.rs:286-295); drain 82/77 ms; peer errors ≈ its 76 s after the legs.
   **Next three:** (1) round 2 at 17:51; (2) the merge M3-M9 as U4f's (history.md:7022-7028), with C9's U8 edits;
   (3) U7's 0b check and R-half (its builder starts in a reset's first 30 minutes), then U8's merge. Msg 23:05.
 - **Finished, resumable by SendMessage:** U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder
