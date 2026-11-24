@@ -987,3 +987,6 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   21:57 UTC); their cleanup runs: `close` #7, id 45496209201 (cs/b9-edit), created 21:57:24, "waiting"; `close` #8, id
   45496236161 (cs/b9-prod), created 21:57:35, "waiting". His rejections asked (neither branch has an upload: the token
   tests uploaded nothing).
+- **Step 9 done**: his words "I have rejected both"; `close` #7 (45496209201, cs/b9-edit) completed "failure" (updated
+  22:05:09 UTC) and `close` #8 (45496236161, cs/b9-prod) completed "failure" (22:05:20 UTC): rejected, so nothing ran.
+  Next: step 10, his delete of the token (the control's cleanup, which needed it, ended 21:56:06 UTC).
