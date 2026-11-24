@@ -106,3 +106,80 @@ Started 2026-11-24. Branch claude/optimistic-albattani-mdoonz. Edits nothing but
   just after 24 hours; every gap is recorded"), part of the plan Mustafa approved (his go 2026-11-15). Verdict: met
   with a recorded departure in method (the hourly series), route foreseen by plan Risk 4 in the plan he approved; not
   a separate decision of his on this shortfall.
+- Extra checks (advisor consultation): probes 2-7 (day1/probe-2..4, day2/probe5..7) each 43 rows, unexpected 0, (c) 2
+  serves and (d) 2 serves at every one, closed cases gone at every one: "(c) serves at every probe" holds (probes 2-9,
+  25). Close logs (day1/closes/{a,ap,b,bp}/0_cleanup.txt) "Uploads found" 1/2/3/4 and Delete/Kept ids equal probe8's
+  deployment_ids per branch: "every deployment it ever had" is covered.
+- Commit times (git log on results-log.md): header f37cb7a 2026-11-17T20:38:22Z, before round-a (2026-11-18 16:26:57);
+  re-check 87547f6 2026-11-19T13:44:30Z (found Brave missing), before the 24 h reading (18:56); Brave line 3172188
+  2026-11-19T21:05:14Z, about 2 h after the 24 h reading.
+- "Open branch" (question a): ADR has no definition (GLOSSARY "The access wall" :618-630 none; OQ-0006-4 :876-887
+  none). But ADR :1360 gives the count's reason: "PM-0006-8's at least 2 open branches (with one, a wall set on that
+  branch alone would pass too)". That reason is about distinct preview branches, not pull requests, so the five
+  Pages-only branches serve it. probe.mjs:102 builds in the looser reading (pr==null counts as open).
+- PM-0006-32 pictures day1/sitting3/run17-a1.png ("Mergincanli approved", preview, Success), -a2.png (no Deployment
+  protection rules section, Success), -a3.png ("Mergincanli rejected", preview, Failure, annotation "The deployment was
+  rejected or didn't satisfy other protection rules."): match log :725-729. The "secret: present" lines live only in
+  run logs not in .gate: not verified from data (session's reading).
+- Stale ADR line numbers (Low): ADR 0006 changed at 3747bb3 (2026-11-17T20:59Z), after the plan; lines moved by +3.
+  Log cites :1401 (now :1404), :1409-1414 (now :1411-1418), :1444-1447 (steps 1-3 now :1447-1450), :1450-1457 (steps
+  5-8 now :1453-1460); plan :101 ":1436-1457", :121 ":1401", ":1409-1414", :385 ":1444-1447", :1302 ":1401-1415".
+- PM-0006-6 denominator (Low): log says 3 scheduled runs "in the 28 slots from 2026-11-18 15:23 to 2026-11-19 18:23"
+  (:837-838); 4 of those slots (15:23-18:23) fall before the first close (18:32:51). From the close to 24 h after
+  (19:23 11-18 .. 18:23 11-19): 24 slots, the same 3 runs. State both.
+- Gate: `node tools/gate.mjs --no-smoke` stops at "Cannot find module 'acorn'" (tools/ deps not installed); not
+  installed by me (writes outside .gate/). The change-set's diff is checkpoint/notes files only (no legacy code).
+
+## Per-mark verdicts (ADR 0006 words at the cited line)
+- PM-0006-1 (:1369): met with recorded departures: machines -> GitHub runner images, browser versions per row at run
+  time (MACHINES (a), Mustafa 2026-11-15). Timing clause for one line not met as written: the Brave version was not in
+  the header before the first run nor at the re-check before the 24 h reading; filled 2026-11-19 21:02:51 UTC (log
+  :840-860), after the reading. No one decided that gap. Day 1's Brave steps ran on a version recorded only a day
+  later (unchanged by 2026-11-24, :931).
+- PM-0006-2 (:1370): NOT MET AS WRITTEN. "previews `X-Robots-Tag: noindex`, production none" on "both URL forms":
+  production's one-off links 0354374e and de1c3e5e carry noindex on all 7 paths (round-a, restore-production).
+  Everything else met; both bites caught; R5-PREV-OQ6 answered (X-Check-Rule version-host on branch links).
+- PM-0006-3 (:1371): met on Chrome, Edge, Firefox (3 of 3, 45 rows; MACHINES). Safari: not run, by Mustafa's decision
+  (2026-11-18 18:21:30 UTC); the ADR row still names it. Brave: 1 load per deployment at steps 1-3 (not "3 loads per
+  browser and deployment"); all readings as expected; gap not decided by anyone (F-3b). Bite seen as worker refused,
+  not "false" (F-3a).
+- PM-0006-4 (:1372): met with recorded departure (MACHINES): immutable header; transferSize 0 x3 fresh profiles; bite
+  300 x3 plus the header half.
+- PM-0006-5 (:1373): open: met for round-a, uploads, bites (bite flagged 27262976 and refused by Wrangler); SIZES not
+  recorded for sitting 2's ten builds, bite-production, restore-production, two tombstones, revoked (F-5).
+- PM-0006-6 (:1374): met with a recorded departure in method (F-6).
+- PM-0006-7 (:1375): reported mark; record complete in its letter ("no count shown" before and after on the three
+  pages; ten uploads listed); its question (do direct uploads count) unanswered: goes to the draft's author.
+- PM-0006-8 (:1376): met on the ADR's stated reason (:1360), conditional on "open branch" = a live preview branch
+  (1 with an open PR + 5 Pages-only); if "open" needs a PR, 1 < 2, not met as written. Times are lower bounds.
+- PM-0006-9 (:1377): open: steps 1-3 "achieved" (2026-11-18 17:21:40), steps 5-8 "achieved" (2026-11-24 21:56:20);
+  step 4 has no "achieved", no "not yet", no two numbers. 7 of 8.
+- PM-0006-10 (:1378): met (yes; logged out pr3.json/png; logged in his screenshot of #8).
+- PM-0006-32 (:1379): met: 2 of 2, control, bite, plan's extra PM-0002-66 bite; reported: preview token not refused
+  for production (round-a 0354374e); merge ref recorded; revocation recorded (deleted 22:05:59-22:14:34 2026-11-24;
+  revoked run 10000/9109, no record). Small departure: "the environment's deployment history" read from PR page
+  timelines (repository deployments page 404 logged out).
+
+## Answers a-f
+- a: ADR silent on "open"; its reason (:1360) favours distinct preview branches; verdict depends on the reading; state
+  1 PR branch + 5 Pages-only (not git branches in TR); log's flat "6 open branches" overstates.
+- b: :1404 "A spike passes when every mark that applies passes"; :1411-1416 "A failed mark goes back to the draft:
+  infra-engineer revises the decision part the row names by the draft's own Rollback and "Revisit when" routes (a header
+  or PREV-DELETE fail on Pages: Workers static assets weighed again; ...), and the revised part returns to the advisor
+  for review and to Mustafa and the Advisor with the measured numbers"; :1416-1417 "A mark's number changes only in the
+  draft, with its reason, never inside a spike". The paragraph does not name step 2.6. The wait comes from plan 1.1
+  (:121) and Risk 13 (:1358-1361) "the check's end and step 2.6 wait for the revised draft", ADR 0002 :1507 "After ADR
+  0006's preview hosting check", DECISIONS :1449 "a draft is accepted only when its marks are met" / "Step 2.6, the
+  previews, follows the preview hosting check as planned". Not mine to decide.
+- c: "Step 4: no verdict from him (neither "achieved" nor "not yet" nor the two numbers the step asks for; his three
+  screenshots show no count)"; PM-0006-9 open at 7 of 8; never "achieved".
+- d: met with a recorded departure in method; route = plan Risk 4 in the plan he approved; not a decision of his on
+  this shortfall.
+- e: "re-checked before the 24 h reading (2026-11-19 13:41-13:43 UTC); the re-check found the Brave version missing;
+  it was recorded at 21:02:51 UTC, about 2 h after the reading": the timing clause not met for that line.
+- f: quote his words; "Safari leaves the check" is the session's reading; ADR row unchanged (:1416-1417 only the draft
+  changes a mark); PM-0006-3 met on Chrome, Edge, Firefox; Safari not run by his decision; the draft's author told.
+
+## My verdict on the evidence: PASS WITH NOTES (the evidence holds against the data). The spike itself has NOT passed
+by :1404: PM-0006-2 not met as written; PM-0006-9 and PM-0006-5 open; PM-0006-8 needs a ruling on "open".
+DONE

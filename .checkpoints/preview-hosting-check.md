@@ -920,6 +920,12 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      their sha256; the queued note of 2026-11-15 16:03:05 UTC from its saved copy, 914 bytes, sha256 7742caa2d586...),
      each placed by its header's time between the decision headers around it (never between a decision and its
      sub-entries), 252 lines added and no other line changed (the script asserts both); committed separately.
+   - C3 under way: the report's body by hand in `report-body.md` (placeholders for the verifier's verdicts, the evidence,
+     the decisions and the links); `decisions/assemble.py` builds `docs/reports/2026-11-24-preview-hosting-check.md` from
+     it with three appendices by script (A the results log, headings demoted, the account ID's first and last four
+     characters replaced by a marker in 5 places; B the workflow texts as run from the test repository's commits, each
+     with its sha256; C the consultations). A web-fetch agent (model opus, effort high) reads GitHub's docs on archived
+     repositories' scheduled runs and failure mails (the probe exits 3 once the upload records expire on 2026-12-02).
 
 ## Next steps
 1. The report (`/advisor-report`), folding both checkpoints (this one and `lane2-needs.md`), the results log and the
