@@ -52,3 +52,6 @@ Seat: day-session advisor (subagent). Main = 1ec6f6c3. Code head = 8619d539. Rea
 - LOW H: report :29 "PRESS-PACE (a), which is 3b's": a code with no explanation (his plain-words rule of 15:58:25). LOW I: report :101-103 end-to-end panic text names no head (the builder's run was 13:41 UTC on step 6's tree; mine on the final code holds).
 - Budget: 3 rounds, the third security-auditor alone on one open High (allowed); nothing at Medium or above open from any reviewer or the verifier; 23 follow-ups (STATUS:104-108 = archive :1342-1443), each from a named reviewer Low; only F dropped a sentence.
 - VERDICT (17:42 UTC): REVISE for c5f6a85a3142d69e3e48f531d549ddd665a156ed: one High (A, mine, wording of his words), Mediums B, C, E, Lows F-J; all fixable in the commit that comes anyway; the code players run is fit: the zip may go to him now. My head review is not a round: A does not reopen the budget and needs no decision from him.
+
+## Review 2: pushed head 8d277cf21cf54919c2ae54e5232d45e944e7b040 (what changed since c5f6a85a)
+Plan: R1 diff c5f6a85a..8d277cf2 (8 files; notes, pr-body, rng.rs, rules_scan.rs, STATUS, archive, report); R2 letters A-J one by one; R3 code diff comments only (my copy: Wasm sha256, sim tests, scan, clippy pedantic count); R4 every quote of his in the changed lines vs his saved words; R5 CI on 8d277cf2 (wait, never re-run); R6 verdict.
