@@ -82,12 +82,20 @@
 9. Part b's plan and its review · `plan-b.md` on `figures-b.md` (the spec sheet) · the advisor agent: APPROVE with 11
    conditions (plan-b.md section 5); part a's head stands; the board has the two questions for the netcode chat.
 
+10. Part b, block 1's first half: JDG-ONLY-1 · ab1074e367ae6928c1774bceb3c9285732dfa45a (pushed) · `judge_only`
+    judges the named marks against the whole file; main.rs no longer narrows it; the cli test
+    `only_keeps_a_marks_precondition_in_reach` (real marks.json, PM-0001-4's base fixture) fails with the old
+    narrowing planted back and passes restored; 99 judge tests pass; part b so far 32 added lines (from 0e0f6547).
+
 ## Current step
-Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 1 (J0):**
+Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 1's second half:**
 u4s-carries.md entry 64 (a) to (f), each test shown failing under its plant and passing restored (figures-b.md C1
-gives each item's test, wording and plant), then JDG-ONLY-1 (figures-b.md C2: `judge_only`, main.rs drops its
-`retain`, a cli test on the real marks.json with `fixtures/pm-0001-4/base --only PM-0001-4`). Then commit, push, the
-size count from 0e0f6547, and block 2. Part b's board thread is open (state doing).
+gives each item's test, wording, line numbers and plant): (a) the Arm test's role C and ML cases, and the
+fixtures/README.md row's wording; (b) the far-better test's exact reason and the pinned probe; (c) the bite-run
+practice test's case (5); (d) a coverage gap and a waiting Arm mismatch in one run reads INVALID; (e) two wordings
+(eval.rs's Arm note, practice.rs's module doc); (f) `summary_line` escapes control characters, with its test. Then
+commit, push, the size count from 0e0f6547, the card, and block 2 (the plumbing: `Inputs`, `Lack::Fail`, the detail
+text; plan-b.md section 2 and its condition 2). Part b's board thread is open (state doing).
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
