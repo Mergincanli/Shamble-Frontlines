@@ -20,9 +20,10 @@ f4100ef7…): **APPROVE WITH CONDITIONS C1-C7**, the cap fixed in binary.rs, the
   event's serving stamps.
 - **The binary:** settings, the dev certificate and its hash file, OPEN after both listeners serve, every closing ended
   before the log ends (`TickLoop::stop_with`); F28 (npt-super's log line-flushed).
-- **Size: 5,952 added, 267 removed, 28 files** (wip/u6b-fix.patch e29c003c…ac64af1c, base 21765e3). The build came in
-  at 5,498; A1's removal took 100; the fix pass added 554 (the Mediums and R-PING to 5,874, four Lows to 5,952). Each
-  Low started inside the 5,950 scope line; his 6,000 stop was not reached.
+- **Size: 5,952 added, 267 removed, 28 files** in the fix pass's snapshot (wip/u6b-fix.patch e29c003c…ac64af1c, base
+  21765e3); the merge adds M6's 14 + 3 lines (binary.rs's cap, Cargo.toml's sha2 line): **5,969 added, 279 removed, 29
+  files** as merged. The build came in at 5,498; A1's removal took 100; the fix pass added 554 (the Mediums and R-PING
+  to 5,874, four Lows to 5,952). Each Low started inside the 5,950 scope line; his 6,000 stop was not reached.
 - **Block 0** (before the build): the lock diff `1 65` (235 packages; ring only, no aws-lc-rs); cargo-deny "advisories
   ok, bans ok, sources ok" (five duplicate warnings); cargo-audit 0 vulnerabilities, one allowed warning
   RUSTSEC-2026-0441; both databases fetched 2026-11-23 07:00 UTC (dependency-check.md's U6b section; u6b-block0.md). The
@@ -41,8 +42,19 @@ f4100ef7…): **APPROVE WITH CONDITIONS C1-C7**, the cap fixed in binary.rs, the
   line within the 5 s cap (Timeout): the room was killed" (binary.rs:82). Every other step passed. The cause (the M6
   ruling): TR2-U6A-4, below, not U6b's code. **The fix** (C1, the main session, binary.rs only, +14 -12;
   .gate/u6b-merge/m6-hunk.diff c6bfe8a9…): `OPEN_CAP` (5 s) for every start's own work, `start()` takes its cap, the
-  bitten start gets `OPEN_CAP` plus the bite's own 2 s; no assert changed. **The probe** (C3, m6-probe2.log): PENDING.
-  **Run 2** (m5-check2.log): PENDING.
+  bitten start gets `OPEN_CAP` plus the bite's own 2 s; no assert changed. **The probe** (C3, m6-probe2.log,
+  CARGO_INCREMENTAL=0): every test passed, but the start's own work was 2,908-3,050 ms (s8a 2,957.8, 3,018.9, 2,984.0
+  ms; the bitten start 4,908-5,050 ms less its 2 s), alone as slow as in parallel, over the advisor's 2,500 ms bar (half
+  the 5 s cap). The host had changed: "Xeon @ 2.10GHz" now against fx-starts.log's "@ 2.30GHz" (when, not shown). The
+  cause: the start hashes its own executable (main.rs:368-370), 116,112,832 B in a debug build, with sha2 unoptimised
+  (the dev profile optimised only rand_chacha and ppv-lite86). **The second ruling** (advisor-u6b-m6.md section 5):
+  measure first. **R1** (m6-probe3.log, sha2 at opt-level 3 by `--config` only): s8a 120.1-120.5 ms, the bitten start
+  2,125-2,157 ms (own work 125-157 ms). **R2 taken:** spikes/netcode-proof/Cargo.toml +3 lines after :120 (a comment,
+  `[profile.dev.package.sha2]`, `opt-level = 3`; .gate/u6b-merge/m6-cargo.diff 53682b3a…), test builds only, release
+  and the hash value unchanged, Cargo.lock unchanged. U6b's brief kept Cargo.toml out ("a further change stops the
+  build", u6b-brief.md:433-435); the advisor lifted that for this one line only. **probe4** (m6-probe4.log, the edited
+  tree, no `--config`): 3 parallel runs 5 of 5 each, the bite alone 1 of 1 in 2.46 s (under the brief's 5 s per
+  test); s8a 116.9-122.1 ms, the bitten start 2,120.8-2,125.3 ms. **Run 2** (m5-check2.log): PENDING.
 - **Plants** (each failed its named test for its planted reason and was restored; advisor-u6b-fix.md item (4) has the
   table): P1-P11, P14, P14b, P15, P15b, P16-P20, all 20 re-applied to the fixed tree. Logs .gate/u6b/fx-plant-<id>.log;
   the diff files beside them since 2026-11-24 04:3x UTC (C1), sha256:
@@ -147,5 +159,6 @@ each plant log's diff hash against its diff file (the advisor's check needed an 
 stopped at a permission prompt and not run: each failure matches its diff's edit instead); the WebSocket half of the
 closing bound (F-1); T-4's test alone (F-2); the mark row only at 0 (F-3); quinn's Debug text as a stable form for
 SEC-U6B-2's test; the mark's cost on an I/O worker (arithmetic only); the 20 starts are one container's, never judged;
-what slowed M5's run 1 (its test step 1,013.6 s against the builder's 848.5 s; incremental builds were on in that run,
-F-M6-4, off since: C2), and the bitten start's own time in that run.
+what slowed M5's run 1 beyond the host change (its test step 1,013.6 s against the builder's 848.5 s; incremental builds
+were on in that run, F-M6-4, off since: C2), and the bitten start's own time in that run; the hash's share of the
+start was shown by the A/B (about 2.9 s of 3.0 s), not timed inside the binary.
