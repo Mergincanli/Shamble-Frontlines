@@ -11,3 +11,4 @@
   Playwright's Firefox 159.0 build 1572: 118,965,377 bytes. Runner image Firefox 160.0 (PPA now 161.0).
 - Open: his FIREFOX-SOURCE; the advisor agent's ruling on fetching only to hash; the Chromium baseline run he declined
   at the prompt (2026-11-24, before the plan review): run it only after the plan is approved, if he allows it.
+- The board add-on is active.
