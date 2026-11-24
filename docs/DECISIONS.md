@@ -1003,24 +1003,25 @@ Why recommended: The review agents checked all seven. None changes how the game 
 > After the merge:
 > - Open change-set 2's checkpoint (the first page, foundation step 2.5), with the plan draft carried over from the notes at commit f167f061a9b0b694836c272e397c90c815d7829f. Then stop and tell me the path of its resume card: I compact this chat before you go on.
 > - Then change-set 2: its plan, its review, the build and its pull request, then stop for my go.
-- **Taken by Mustafa, 2026-11-18, 18:21:30 UTC: the browsers for the preview hosting check: Brave, Chrome, Firefox and
-  maybe Edge, so Safari leaves the check; sitting 2 starts now** (the builder chat he calls Builder V2, lane 2 of the
-  build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his message as typed; message
-  aff8acbf-a617-472c-a56a-b58822623ae1, whole; extracted by script from the chat's transcript). What it answers, in the
-  chat's words (not his): it followed the chat's report that the Safari row read 1 load of 15 (a script fault); the row
-  PM-0006-3 is then read on Chrome, Edge and Firefox by script and in Brave by him. Copied by script (150 bytes, sha256
-  6e83c36e1862bb86a19eaecb4c3e8453aca429ec34e663a9ddd492f0b168f948):
+- **Taken by Mustafa, 2026-11-18, 18:21:30 UTC: the browsers for the preview hosting check: in his words, "focus on
+  brave, chrome, firefox and maybe edge (most used browsers)"; sitting 2 starts now** (the builder chat he calls Builder
+  V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his message as
+  typed; message aff8acbf-a617-472c-a56a-b58822623ae1, whole; extracted by script from the chat's transcript). What it
+  answers, in the chat's words (not his): it followed the chat's report that the Safari row read 1 load of 15 (a script
+  fault). The chat's reading of it, not his words: Safari leaves this check, so the row PM-0006-3 is read on Chrome,
+  Edge and Firefox by script and in Brave by him; his BROWSER-SET of 2026-11-19 (above) keeps Safari a target of v2.
+  Copied by script (150 bytes, sha256 6e83c36e1862bb86a19eaecb4c3e8453aca429ec34e663a9ddd492f0b168f948):
 > why do you keep talking about safar, focus on brave, chrome, firefox and maybe edge (most used browsers)
 >
 > Also you can start sitting 2 now if possible
-- **Taken by Mustafa, 2026-11-18, 18:04:10 UTC: REVIEWER (b): for the rest of the preview hosting check he unticks
-  "Required reviewers" on the test repository's preview environment, except for sitting 3, before which he ticks it
-  again; it stays on for Day 2** (the builder chat he calls Builder V2, lane 2 of the build,
-  session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his message as typed; message
-  cd546f27-bed3-4291-97d0-174478c77df5, whole; extracted by script from the chat's transcript). What it answers, in the
-  chat's words (not his): REVIEWER-NOW, after his question of 17:50:30 UTC "Why do I have to approve these things, can't
-  we just automate it?"; option (b): "You untick "Required reviewers" on preview for everything but sitting 3". Copied
-  by script (56 bytes, sha256 67f69e0f575819b2b66cfd9a7434f385eb8ba7a8eed7f8cc809e1ec4c4af9de4):
+- **Taken by Mustafa, 2026-11-18, 18:04:10 UTC: REVIEWER (b): "Required reviewers" on the test repository's preview
+  environment is unticked for the rest of the preview hosting check except sitting 3, as option (b) reads** (the builder
+  chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal
+  account; his message as typed; message cd546f27-bed3-4291-97d0-174478c77df5, whole; extracted by script from the
+  chat's transcript). What it answers, in the chat's words (not his): REVIEWER-NOW, after his question of 17:50:30 UTC
+  "Why do I have to approve these things, can't we just automate it?"; option (b): "You untick "Required reviewers" on
+  preview for everything but sitting 3". The chat's plan, not his words: ticked again before sitting 3 and kept on for
+  Day 2. Copied by script (56 bytes, sha256 67f69e0f575819b2b66cfd9a7434f385eb8ba7a8eed7f8cc809e1ec4c4af9de4):
 > B, give me the links for the untick "required reviewers"
 - **Taken by Mustafa, 2026-11-18, 18:01:08 UTC: his answers to three questions of the build chat, and the size accepted:
   KIT-FIX (may a fix to the checkpoint script's hold, in the lines changed after his first answer, be written with the
