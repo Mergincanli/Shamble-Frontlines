@@ -191,7 +191,7 @@
    45385683163), toolchain success (run 45385682879, job 138415844793, 11:36:13 to 11:38:31 UTC): every count as
    expected, 0 skipped, 0 ignored; the Wasm's sha256 on the runner 22dad2eb...018b, as on main; Chrome
    157.0.8103.78; allocation 43 bytes a frame and 539 a block.
-5. **Plan step 2 (the scan test and the planted counter): 50656d6**, pushed 11:43 UTC (3 files).
+5. **Plan step 2 (the scan test and the planted counter): 50656d6**, pushed 11:42 UTC (3 files).
    `crates/sim/tests/rules_scan.rs` (387 lines): std 1.99.1's 79 inherent float methods less ADR 0004 part 7's 14;
    the hash-map ban with part 9's escape recognised on an item with a written reason only; the clock ban; 22
    planted breaches in the file, each found once and by name, and 8 controls. It found one real case, the tick's
@@ -201,7 +201,9 @@
    --workspace --locked` (sim 9, `rules_scan` 4, `state_hash_alloc` 1); sim in release; fmt; clippy clean; the gate
    PASS. **Planted on the crate itself: 5 of 5 caught** (a hash map, a float method, a clock, the method form
    again, and the release profile's overflow checks turned off on cargo's command line). **Size so far: 1,228
-   added lines against about 710 planned for steps 1 and 2.** Not read yet: CI on 50656d6.
+   added lines against about 710 planned for steps 1 and 2.** **CI on 50656d6:** gate success (run 45386600136),
+   toolchain success (run 45386600112, job 138419013852; the log: `.gate/cs3a/ci-50656d6-toolchain.log`): cargo debug
+   15, 1, 2, 1, 9, 4, 1, 6, twice; release protocol 2, sim 9, 4 and 1; the unit and browser counts as on a1c59e8.
 
 ## Current step
 **Plan step 3, the one batch of manifest changes, in the hold since 13:12 UTC: written, not committed, nothing
