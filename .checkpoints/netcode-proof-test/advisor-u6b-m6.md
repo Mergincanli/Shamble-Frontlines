@@ -252,4 +252,89 @@ Critical 0, High 0.
 or stop of his changes; U6b stays under his 6,000 stop; the 5,950 scope line does not govern it (item 7).
 **For Mustafa:** nothing.
 
+DONE (first ruling)
+
+## 5. Second ruling (2026-11-24, after C3's probe missed its 2,500 ms bar)
+### Plan
+1. Read m6-probe2.log myself; check the coordinator's facts (binary sizes, Cargo.toml:115-120, main.rs:368-370).
+2. What the probe changes in my item 1 and item 3.
+3. The options (a)-(d): lane, rules check.mjs keeps on profiles, evidence.
+4. The ruling, conditions, Mustafa, DONE.
+
+### (1) The probe, read (m6-probe2.log, 05:14:43-05:16:01 UTC)
+- Header: free 10,705 MiB; HEAD 8418275; diff 907ffd42… (binary.rs edited); untracked 4a61ef21… (:1-3). loadavg
+  0.00 0.07 0.54 before, 2.38 after (:5, :263). fmt PASS (:7-8). Every cargo line has `env CARGO_INCREMENTAL=0` (:9):
+  C2 met.
+- Three parallel runs, 5 passed 0 failed each (:186, :212, :238); the bite alone 1 passed, finished in 5.26 s (:259).
+- s8a: 2,957.8; 3,018.9; 2,984.0 ms (:179, :206, :232). Bitten: 5,049.7; 4,932.8; 4,908.1 ms, alone 4,918.4 ms (:182,
+  :208, :234, :256). The start's own work: 2,908-3,050 ms, the same alone and in parallel, and the same in the measured
+  and the bitten start. I agree with the coordinator: it is the debug start's own cost, not contention.
+- Facts checked: debug npt-server 116,112,832 B, release 7,936,032 B (`ls -l` of both); `binary_sha256` hashes
+  `current_exe()` with sha2 in 64 KiB reads (main.rs:368-379, called at :727); the dev profile optimises only rand_chacha
+  and ppv-lite86 (Cargo.toml:115-120), so sha2 v0.11.1 (probe2:159) runs at opt-level 0. This CPU reports sha_ni on all
+  4 vCPUs (/proc/cpuinfo), so sha2 likely takes its SHA-NI path, unoptimised: how much of the 3 s the hash is stays
+  unknown. Not measured here or by the coordinator.
+- **New fact: the host changed.** /proc/cpuinfo now reads "Intel(R) Xeon(R) Processor @ 2.10GHz"; fx-starts.log (23:19
+  on 2026-11-23, the builder's counted-run window) read "@ 2.30GHz". When it changed is not shown (the 23:22-02:36 cut is
+  a likely moment, not proven).
+
+### (2) What this corrects in my first ruling
+- **Item 1:** "in a slower run" is withdrawn. On this host the bitten start opens at 4,908-5,050 ms on a quiet machine
+  (loadavg 0.00): the old 5 s cap sat on the edge (one of four probe starts over it), so M5 needed no extra load. The
+  builder's passing runs were on the 2.30 GHz host. The cause stands (TR2-U6A-4's margin; U6b's heavier debug start),
+  and so does the Medium. The hunk works: 4 of 4 bitten starts under its 7 s, with 2 s to spare.
+- **Item 3:** the fallback I named (the file's spawning tests in turn) is withdrawn: the alone run equals the parallel
+  ones. My 2,500 ms bar stays the measure of the headroom the 5 s cap should have (2x). Probe2 shows 1.6x.
+
+### (3) The options
+- **(a) `[profile.dev.package.sha2] opt-level = 3`.** It follows the manifest's own precedent (Cargo.toml:115-116:
+  third-party code optimised in test builds; "the code under test keeps its own debug build and checks"). Release is
+  untouched, so no run value moves (R1 runs release), and the digest is the same at any opt-level. It adds no
+  dependency, feature, version, source or lock line. check.mjs refuses a profile set outside the manifests (env
+  CARGO_PROFILE_*, a config file's profile: check.mjs:1443-1446), so the manifest is the sanctioned place. Lane: U6b's
+  brief keeps every Cargo.toml out, and "a further change stops the build" and is reported (u6b-brief.md:433-435). This
+  is that report, and the ruling is mine: a dev-profile line for one third-party crate is not Block 0's subject
+  (dependencies). But it is worth a manifest line only if it actually moves the start.
+- **(b) Keep the 5 s cap with the 3.0 s reading.** Honest, but 1.6x headroom on a host that has already changed once:
+  the next counted run (U6c's, U6e's, U8's merges each run this file twice) can fail s8a or the bite with no defect,
+  and a failing counted run stops for a ruling, as here. Acceptable only if (a) does not help.
+- **(c) Measure first, without new code or a file change:** cargo's `--config` sets the same profile line for one
+  run: `--config profile.dev.package.sha2.opt-level=3` (a cargo flag, not a config file or an env variable; check.mjs
+  does not run then). It measures (a)'s effect directly, which is the remedy's value, not only the hash's share.
+  Tracing the hash with strace would give the share, but it needs a standalone start with its own settings and stdin,
+  for an answer (c) does not need.
+- **(d) Others, rejected:** skipping the hash in debug builds (the tests would no longer run the product's start);
+  ring's SHA-256 in main.rs (product code and maybe a direct dependency, for the same effect as (a)); raising the
+  measured 5 s cap (a brief term: u6a-brief.md:51, :198).
+
+### (4) Ruling: (c), then (a) if it meets the bar, else (b); inside U6b's merge
+1. **R1, the measurement (no file change):** one main-run.sh invocation, log .gate/u6b-merge/m6-probe3.log, on probe2's
+   tree (the same diff and untracked hashes), at least 8,192 MiB free at its start (else the dev part-clean first):
+   loadavg :: `env CARGO_INCREMENTAL=0 cargo test --locked --workspace --all-features --config
+   profile.dev.package.sha2.opt-level=3 --test binary -- --nocapture` three times :: the same with `--exact
+   bites::pm_0001_16_double_load_fails_every_start_under_2_s` :: loadavg.
+2. **R2, if every s8a start and every bitten start less 2,000 ms in probe3 is at most 2,500 ms, (a) goes in:**
+   spikes/netcode-proof/Cargo.toml, after :120 only: a comment line (the room's start hashes its own debug executable,
+   116 MB; test builds only, release unchanged) and `[profile.dev.package.sha2]` / `opt-level = 3`. Nothing else in any
+   manifest; Cargo.lock unchanged (`git diff --quiet` on it). Then probe4: probe2's exact form on the edited tree (log
+   m6-probe4.log, no --config), with my bar kept (at most 2,500 ms each); then M5 (C4 as ruled; check.mjs's deps step
+   must PASS with the line). U6b's commit then holds 29 files.
+3. **R3, if probe3 misses the bar, (b):** no manifest edit. My bar is replaced by the stated reading: the start's own
+   work 2,908-3,050 ms against the 5 s cap (1.6x headroom on this host), recorded in the report. M5 runs on probe2's
+   tree with no further probe. A new Medium, F-M6-5 (the debug start is about 4x U6a's 634-790 ms and holds 3.0 s of
+   the 5 s cap), is carried by id to U6e (it edits binary.rs): find the start's cost by part, cut it or state the
+   headroom.
+4. **C5 extends:** under R2, m6-files.txt covers 29 files and Cargo.toml's diff is exactly R2's lines; the rest of C5 is
+   unchanged. Under R3, C5 as ruled. Size: at most 3 more added lines, under his 6,000 stop.
+5. **C6 adds:** probe2's numbers, the host change, probe3's result and the branch taken; under R2, the manifest line
+   with its reason and this ruling's lift of u6b-brief.md:433 for that line only; the bite alone's 5.26 s against the
+   brief's "real-clock tests at most 5 s each" (a Low for U6e with that number unless probe4 brings it under 5 s).
+6. **Stops:** any failing test, or a probe4 value above 2,500 ms after (a): stop and send me the log.
+- **No review seat:** no dependency moves. The evidence is the lock's empty diff plus check.mjs's deps step. No plant:
+  the A/B is the evidence.
+- **Mustafa:** nothing. No mark, judge rule, marks.json text, run value (release untouched), money or stop. Under R2,
+  one more line in the day's message (NPT-TRIM): sha2 optimised in test builds, so the debug start fits its 5 s.
+- **Findings added:** F-M6-5 (Medium, only under R3; closed by R2). Item 1's "slower run" corrected (above).
+**Decisions needed:** none. **For Mustafa:** nothing.
+
 DONE

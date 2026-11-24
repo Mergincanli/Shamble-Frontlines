@@ -88,7 +88,9 @@
   TR2-U6A-4 re-rated Medium). C1 done (binary.rs only, +14 -12; .gate/u6b-merge/m6-hunk.diff c6bfe8a9…, binary.rs.pre
   6691abdf… = the builder's; m6-files.txt: 27 = the builder's). **C3's probe DONE 05:16, FAILED its 2,500 ms bar**
   (m6-probe2.log: all tests pass; own work 2,908-3,050 ms, alone as slow; likely the 116 MB debug binary hashed with
-  unoptimized sha2, main.rs:368-370): stopped before M5; **the advisor's new ruling RUNNING** (a6e7ce46a28424b0b resumed).
+  unoptimized sha2, main.rs:368-370): stopped before M5. **Second ruling DONE** (advisor-u6b-m6.md section 5: the host
+  is now 2.10 GHz, was 2.30): **R1 RUNNING** (bzb4zdq1j -> m6-probe3.log, sha2 opt-level 3 by --config only); then R2
+  (all <= 2,500 ms: Cargo.toml after :120, 3 lines; probe4; M5; 29 files) or R3 (no edit; M5 on probe2's tree; F-M6-5).
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
 - **Next 2, U6b's merge** (advisor-u6b-m6.md C3-C7): the probe passes (all pass; untracked 4a61ef21; each start's own
@@ -142,9 +144,9 @@
   u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (1 agent, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - The advisor's second M6 ruling a6e7ce46a28424b0b (appends to advisor-u6b-m6.md). Done, resumable: the advisor's U6b
-    fix check a108f5cdf9270999e (advisor-u6b-fix.md DONE). C3's probe ended (m6-probe2.log, exit 0, bar failed).
+- **Running (0 agents, 2 shells; message or resume each by SendMessage to its ID; after a cut, from its file):**
+  - R1's probe, main-run.sh bzb4zdq1j (.gate/u6b-merge/m6-probe3.log). Done, resumable: the advisor's M6 rulings
+    a6e7ce46a28424b0b (advisor-u6b-m6.md DONE, both); its U6b fix check a108f5cdf9270999e (advisor-u6b-fix.md DONE).
     U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree
     agent-a2661dc320c9e6d00), the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode
     a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
