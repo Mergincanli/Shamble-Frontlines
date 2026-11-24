@@ -926,6 +926,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      characters replaced by a marker in 5 places; B the workflow texts as run from the test repository's commits, each
      with its sha256; C the consultations). A web-fetch agent (model opus, effort high) reads GitHub's docs on archived
      repositories' scheduled runs and failure mails (the probe exits 3 once the upload records expire on 2026-12-02).
+   - Its answers (hand-back after 23:05 UTC): whether archiving stops scheduled workflows: NOT FOUND (the archiving page
+     lists what becomes read-only and names no Actions; "In a public repository, scheduled workflows are automatically
+     disabled when no repository activity has occurred in 60 days."); "Notifications for scheduled workflows are sent to
+     the user who initially created the workflow" (or who last changed its cron, or re-enabled it), by e-mail only if
+     he has e-mail notifications for Actions on; disabling one workflow: "Under your repository name, click Actions." /
+     "In the left sidebar, click the workflow you want to disable." / the kebab, "Disable workflow". So the sure step
+     before 2026-12-02 is switching the probe workflow off (his click, on my go), then archiving after the merge.
+   - The assembled report stays in the notes folder (`report-assembled.md`) until it is final (the Stop hook flagged the
+     untracked draft in docs/reports; removed there, `assemble.py --final` writes it at the end).
 
 ## Next steps
 1. The report (`/advisor-report`), folding both checkpoints (this one and `lane2-needs.md`), the results log and the

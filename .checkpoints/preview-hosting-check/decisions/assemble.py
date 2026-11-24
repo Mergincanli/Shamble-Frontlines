@@ -42,6 +42,9 @@ appC = ("_Copied by script from the checkpoint's section \"Advisor tool consulta
 out = body.replace('APPENDIXA\n', appA).replace('APPENDIXB\n', appB).replace('APPENDIXC\n', appC)
 left = [k for k in ['APPENDIXA', 'APPENDIXB', 'APPENDIXC'] if k in out]
 assert not left, left
-open('docs/reports/2026-11-24-preview-hosting-check.md', 'w', encoding='utf-8').write(out)
+# Until the report is final it stays in the notes folder (the saver keeps it); --final writes it into docs/reports/.
+dest = 'docs/reports/2026-11-24-preview-hosting-check.md' if '--final' in sys.argv else N + 'report-assembled.md'
+open(dest, 'w', encoding='utf-8').write(out)
+print('to', dest)
 holes = re.findall(r'\b[A-Z0-9]{6,}\b', out)
 print('written;', out.count('\n'), 'lines; placeholders still open:', sorted(set(h for h in holes if h in {'PRNUMBER','VERDICTTABLE','EVIDENCE','CARDSHA','VERIFIERLINE','DOCSKEEPERLINE','RISK13ROUTE','PROBEAFTER','STEPNEXT','DECISIONSNEEDED','FORMUSTAFA','RISK13ROUTE'})))
