@@ -55,6 +55,16 @@ const said = (m, s) => {
 // repository's records show, marked as not his words.
 const ENTRIES = [
   {
+    when: '2026-11-24, 15:58:25 UTC',
+    file: 'mustafa-2026-11-24T155825-mul-add-a.md',
+    title:
+      'MUL-ADD (a): the fused multiply-add stays banned in the simulation, which writes a * b + c; the check on the built file comes with the first outside crate; the stop line of 4,100 lines stays; four decisions of his of 24 November (no separate animation editor; Testlines and the level editor; 3b first in line; the VFX repository stays separate for now); plain words with him from now on',
+    lead: (m) =>
+      `His answer: ${said(m, 'MUL-ADD: (a). The fused multiply-add stays banned in the simulation; it writes a * b + c.')} What stays: ${said(m, 'What 3a built for it stays as it is (the one-name ban, the 48 hard cases, exact natively, the 16 WebAssembly values pinned as a known toolchain defect).')} On the draft: ${said(m, 'No word of ADR 0004 changes in 3a; part 7 gets its dated pointer at its next revision, with its exact sentence shown to me first.')} His Advisor's two conditions, for the report and STATUS's follow-ups: ${said(m, 'The check on the built file (no fused multiply-add inside the players\' WebAssembly) is built in the same change-set that brings the first outside crate into the simulation (the collision library, planned for change-set 4), not later. That change-set\'s plan names it.')}; and reporting the defect to the Rust project is a follow-up: ${said(m, 'Nothing is posted anywhere without my go.')} The size: ${said(m, 'The stop line of 4,100 lines stays. If round 2\'s fixes would pass it, cut by the plan\'s ladder and tell me in three lines.')} His four decisions of 24 November, of which he says ${said(m, 'They change nothing in 3a')}: ${said(m, 'No separate animation editor. Rigging and animation happen in Blender, with the Blender MCP.')}; ${said(m, 'Testlines stays for feel and metrics. The real level editor goes in the main game (Editor V2).')}; ${said(m, 'The level editor can start against the offline core, but 3b stays first in line for the main builder.')}; ${said(m, 'VFX repo stays separate for now; we merge later. Both sides should agree on one effect file format, so the merge is easy.')} On how the chat writes to him: ${said(m, 'From now on use plain words with me: no tag or code without its explanation in the same sentence.')} On the pull request: ${said(m, 'When the pull request\'s title and text are in your notes folder, tell me, and my main Advisor opens the draft.')}`,
+    records:
+      'the question followed the advisor agent\'s interim ruling of the same day (the ban and the pinned values built meanwhile, the rule left to him); at his answer they stood in commit 79666ad9c8ac3a8d756f874873c820b1c178bc35, and nothing in ADR 0004 or the research was changed; his four decisions touch no file of change-set 3a',
+  },
+  {
     when: '2026-11-24, 11:03:53 UTC',
     file: 'mustafa-2026-11-24T110353-compact-done.md',
     title: 'the chat is compacted: rebuild from the repository, then build change-set 3a by the plan with no further word from him',

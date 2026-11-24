@@ -18,6 +18,17 @@
 - **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 14:53 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
+- **2026-11-24, 15:58:25 UTC** (`mustafa-2026-11-24T155825-mul-add-a.md`; in `decisions-4.mjs`): **MUL-ADD (a)**: the
+  fused multiply-add stays banned in the simulation and what 3a built for it stays as it is; no word of ADR 0004
+  changes in 3a (part 7's dated pointer comes at its next revision, its exact sentence shown to him first). For the
+  report and STATUS's follow-ups: the check on the built file comes in the change-set that brings the first outside
+  crate into the simulation (the collision library, change-set 4), and that plan names it; reporting the defect to
+  the Rust project is a follow-up, nothing is posted anywhere without his go. The stop line of 4,100 stays: if round
+  2's fixes would pass it, cut by the plan's ladder and tell him in three lines. Four decisions of his to record by
+  script with the docs pass (the animation editor, Testlines and the level editor, 3b first in line, the VFX
+  repository). **"From now on use plain words with me: no tag or code without its explanation in the same
+  sentence."** When the pull request's title and text are in the notes folder, tell him; his main Advisor opens
+  the draft.
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
   joins the small CI pull request after 3a, none between #64 and 3a; 3a starts when #64 is merged, no second ask;
   above 40 % of context the chat tells him first; three items for 3b come from his Advisor before 3b's build and
@@ -357,7 +368,7 @@ and security-auditor run (started between 15:27 and 15:29 UTC; notes `<name>-rev
 perf-auditor follow when places are free. Then, only if round 2 asks for it, one small fix pass (a third round only
 for an open Critical or High; size: 604 lines of room to the stop line). Then the verifier until PASS; the advisor
 agent on the pushed head; docs-keeper; DECISIONS by script; the report; the zip and its README; the pull request's
-title and text. **3a merges only after his own answer to MUL-ADD** (the advisor agent's ruling, below).
+title and text. His answer to MUL-ADD is (a) (15:58:25 UTC): what was built stays.
 (Card written 15:31 UTC.)
 
 ## Next steps (after the compact)
@@ -385,6 +396,28 @@ title and text. **3a merges only after his own answer to MUL-ADD** (the advisor 
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **Round 2, rust-reviewer (on 79666ad9; `rust-reviewer-review2.md`; read 16:00 UTC): REVISE, 0 Critical, 0 High, 1
+  new Medium (made by the fix pass), 10 Low.** Its four round-1 Mediums are fixed, each checked by itself. It
+  measured `mul_add` on 22,048 cases of its own: natively (FMA) all exact; in wasm32 every result below the smallest
+  normal f32 is the two-roundings value and every normal one is exact; the committed file differs at exactly cases
+  10024 to 10039, each at its pinned value: **the defect is the whole class of such results, not 16 points**. The
+  pin mechanism is sound.
+  - Its answers to the advisor agent's question: (a) no other allowed operation picks its native path by
+    processor (it read the toolchain's whole x86-64 compiler_builtins: only `fma` and `fmaf` do; ARM64 not
+    checked); (b) without FMA (and without AMD's FMA4) the native `fmaf` takes the same software path as wasm32:
+    run under a debugger with the FMA flags cleared it was bit for bit wasm32's on all 22,048 cases, and the
+    repository's three native float tests then fail, 3 of 3 (never on a real such processor).
+  - **Medium N1, `rules_scan.rs`: the range fix made tuple-field calls invisible.** The lexer drops numbers, so
+    `self.0.sin()` reads as two dots and `before_2 != "."` lets it through; `m.0.mul_add(..)` too. Fix: lex `..`
+    as one token where the dots stand side by side, drop the `before_2` test, bites for both. **Taken in the
+    round-2 pass; it says no third round is needed for it.**
+  - Lows: the scan misses `#[cfg_attr(x, path = "..")]` (taken) and hashed maps not named after std's (`DashMap`,
+    hashbrown's `HashTable`: the comment is corrected; the type lint of step 2.3 is the real net); `const` in the
+    escape's item words covers a `const fn` body (taken if cheap); the FMA line says "NO FMA" on a processor with
+    FMA4 only, where the path is exact (wording taken); a relative `CARGO_HOME` against the root (taken); the
+    feature closure matches by crate name (fails closed; left); `from_f64` has no exact tie (a STATUS follow-up,
+    as test-engineer's); the generator's block copy and the hook's test binary stay follow-ups. For the report:
+    without FMA the three native float tests fail, not "may fail".
 - **Round 2, test-engineer (on 79666ad9; `test-engineer-review2.md`; read 15:52 UTC): APPROVE, 0 Critical, 0 High
   (both round-1 Highs fixed), 1 new Medium, 4 new Low, 1 nit.** It confirmed the advisor agent's conditions 1 to 4
   for MUL-ADD by its own runs (a C check with glibc's `fmaf`: 48 of 48 constructed cases are true double-rounding
@@ -418,11 +451,12 @@ title and text. **3a merges only after his own answer to MUL-ADD** (the advisor 
 - **State after the fix pass 79666ad9: every round-1 finding marked "fix now" below is taken; round 2 confirms.**
   perf-auditor's round 1 (`perf-auditor-review1.md`): OK, 0 Critical, 0 High, 0 Medium, 2 Low,
   both taken (`doneAt` read once; the comment that said the report check allocates nothing).
-- **MUL-ADD, for Mustafa (open until he answers):** does `mul_add` stay refused in the simulation? Options: (a)
-  keep the ban, the simulation writes `a * b + c`, and part 7 loses the name by a dated pointer; (b) our own exact
-  fused multiply-add, the same code everywhere, written only when a formula needs it; (c) allow it, require FMA on
-  servers and accept that browsers differ (an exception to part 7's identity target and to PM-0004-19).
-  Recommended: (a), free today (nothing uses it). The limit: the scan sees our code, not a library's.
+- **MUL-ADD is decided: (a), his words of 15:58:25 UTC.** The ban, the 48 cases and the 16 pinned values stay as
+  built. Two follow-ups for the report and STATUS (his Advisor's conditions): the check that the players'
+  WebAssembly holds no fused multiply-add is built in the change-set that brings the first outside crate into the
+  simulation (planned: change-set 4, the collision library), named in that plan; reporting the defect to the Rust
+  project, never posted without his go. Part 7's dated pointer: at the draft's next revision, the sentence shown to
+  him first.
 - **Follow-ups this pass leaves** (for STATUS with the docs pass): step 2.3's lint carries his MUL-ADD answer; when
   an outside crate enters `sim`, a check that the players' Wasm holds no `fmaf`; the stricter lint's leftovers in
   `rules_scan.rs` and `rng.rs` (a long function, similar names; his quoted words keep their spelling); no plant
@@ -540,6 +574,7 @@ title and text. **3a merges only after his own answer to MUL-ADD** (the advisor 
   `.gate/ci-wasm/` in the worktree (the logs, the notes' copy, `advisor-final.md`): not needed to resume.
 
 ## Decisions taken
+- 2026-11-24, 15:58:25 UTC: MUL-ADD (a), his; the stop line stays; plain words with him (above).
 - 2026-11-24: MUL-ADD's interim, by the advisor agent: (a), the ban and the pins, on seven conditions; the rule
   itself is his (asked in the chat; the merge waits for his answer).
 - 2026-11-24: his main Advisor marked #64 ready and merged it on his tap (the merge commit's message).
