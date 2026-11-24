@@ -2,7 +2,7 @@
 //! slopes, arithmetic against a formula). Every name `marks.json` uses must be listed here; one that is listed but
 //! not built yet says which unit builds it, and its check comes out NOT-RUN rather than guessed.
 
-use crate::eval::{Missing, Run, always_rules};
+use crate::eval::{Missing, Run, every_run_rules};
 use crate::ratio::Ratio;
 use npt_log::Phase;
 use serde_json::Value;
@@ -133,7 +133,14 @@ fn twin_of<'r, 'a>(
             run.id, run.set
         )));
     };
-    let broken = always_rules(twin);
+    // A bite run's logging-off twin runs the same bite on the same bites build (PM-0006-20's planted-format bite):
+    // the one pair the build rule's role list refuses and a twin comparison needs. Every other rule holds for it.
+    let roles: &[&str] = if run.role == "bite" && twin.role == "logging-off" {
+        &["bite", "twin", "logging-off"]
+    } else {
+        &["bite", "twin"]
+    };
+    let broken = every_run_rules(twin, roles);
     if !broken.is_empty() {
         return Err(Lack::Gap(format!(
             "run {}: its twin {name} is invalid: {}",
@@ -210,16 +217,95 @@ fn twin_hash_mismatch_count(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, La
     let own = state_hashes(run)?;
     let twin = twin_of(run, set, &["profile", "seed", "bite"])?;
     if twin.role != "twin" {
-        return Err(Lack::Gap(format!(
-            "run {}: {} has role {}, not twin",
-            run.id, twin.id, twin.role
-        )));
+        other_transport_twin(run, twin)?;
     }
     let other = state_hashes(twin)?;
     let ticks: BTreeSet<u64> = own.keys().chain(other.keys()).copied().collect();
     if ticks.is_empty() {
         return Err(Lack::Empty(format!(
             "run {} and its twin {} hashed no tick",
+            run.id, twin.id
+        )));
+    }
+    let differ = ticks.iter().filter(|t| own.get(t) != other.get(t)).count();
+    Ok(Ratio::int(differ as i128))
+}
+
+/// PM-0001-30's twin form (C-U6-9), for a twin that is not role `twin`: the run and its twin are both measured runs,
+/// each names the other in `params.twin`, and their `params.transport` are `wt` and `ws`, one each. Any other twin
+/// that is not role `twin` is a gap (PM-0001-21's runs carry no transport, so its twins must be role `twin`).
+fn other_transport_twin(run: &Run<'_>, twin: &Run<'_>) -> Result<(), Lack> {
+    let gap = |why: &str| {
+        Err(Lack::Gap(format!(
+            "run {}: {} has role {}, not twin, and {why}",
+            run.id, twin.id, twin.role
+        )))
+    };
+    if run.role != "measured" || twin.role != "measured" {
+        return gap("the two are not both measured runs");
+    }
+    if run_param(twin, "twin")?.and_then(Value::as_str) != Some(run.id) {
+        return gap("it does not name this run back");
+    }
+    let transport = |r| Ok(run_param(r, "transport")?.and_then(Value::as_str));
+    match (transport(run)?, transport(twin)?) {
+        (Some("wt"), Some("ws")) | (Some("ws"), Some("wt")) => Ok(()),
+        _ => gap("their params.transport are not wt and ws, one each"),
+    }
+}
+
+/// A run's `tick.v.tick_allocs_count` per measured tick number, from its room logs (the tick thread is the room's):
+/// a gap with no room log, a measured tick record without the count (counters are on every record), or two logs
+/// giving one tick a count.
+fn alloc_counts(run: &Run<'_>) -> Result<BTreeMap<u64, i64>, Lack> {
+    let gap = |why: String| Err(Lack::Gap(format!("run {}: {why}", run.id)));
+    let rooms: Vec<_> = run
+        .logs
+        .iter()
+        .filter(|l| l.header.process == "room")
+        .collect();
+    if rooms.is_empty() {
+        return gap("no room log (tick.v.tick_allocs_count's writer)".to_owned());
+    }
+    let mut out = BTreeMap::new();
+    for t in rooms.iter().flat_map(|l| &l.ticks) {
+        if t.ph != Phase::Measured {
+            continue;
+        }
+        let Some(n) = t.v.get("tick_allocs_count") else {
+            return gap(format!(
+                "measured tick {} has no tick.v.tick_allocs_count",
+                t.t
+            ));
+        };
+        if out.insert(t.t, *n).is_some() {
+            return gap(format!(
+                "two room logs give tick {} an allocation count",
+                t.t
+            ));
+        }
+    }
+    Ok(out)
+}
+
+/// PM-0006-20 ("on every tick after the warm-up ... equals the count with logging off", "compared tick by tick"): the
+/// measured tick numbers whose `tick.v.tick_allocs_count` differs between the run and the run it names in
+/// `params.twin`, a tick counted in one only counting. The twin (`twin_of`) has role `logging-off` and the same
+/// profile, seed and bite, else a gap; a twin not in the set yet is NOT-RUN. It fails, never passes, when neither
+/// run has a measured tick.
+fn alloc_twin_diff_count(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack> {
+    let twin = twin_of(run, set, &["profile", "seed", "bite"])?;
+    if twin.role != "logging-off" {
+        return Err(Lack::Gap(format!(
+            "run {}: {} has role {}, not logging-off",
+            run.id, twin.id, twin.role
+        )));
+    }
+    let (own, other) = (alloc_counts(run)?, alloc_counts(twin)?);
+    let ticks: BTreeSet<u64> = own.keys().chain(other.keys()).copied().collect();
+    if ticks.is_empty() {
+        return Err(Lack::Empty(format!(
+            "run {} and its twin {} have no measured tick",
             run.id, twin.id
         )));
     }
@@ -988,11 +1074,13 @@ pub const FIGURES: &[Figure] = &[
         "U6",
         "the pooled p99 with logging on against off (PM-0006-19)",
     ),
-    planned(
-        "alloc_twin_diff_count",
-        "U6",
-        "ticks whose allocation count differs from the logging-off twin's (PM-0006-20)",
-    ),
+    Figure {
+        name: "alloc_twin_diff_count",
+        compute: Some(|i| alloc_twin_diff_count(i.run, i.set)),
+        unit: "U6j",
+        what: "ticks whose allocation count differs from the logging-off twin's (PM-0006-20)",
+        detail: None,
+    },
     planned(
         "one_build_hash",
         "U7",

@@ -551,6 +551,12 @@ fn field_bool(f: &BTreeMap<String, Value>, name: &str) -> Option<bool> {
 /// The rules that hold for every run: consistent headers, complete logs, the roster, capabilities, and the build
 /// (the advisor's C4): a measured build never names a bite, and a bite never runs without the bites build.
 pub(crate) fn always_rules(run: &Run<'_>) -> Vec<String> {
+    every_run_rules(run, &["bite", "twin"])
+}
+
+/// [`always_rules`] with the roles that may name a bite given. Only `figures::twin_of` passes another list: a bite
+/// run's logging-off twin runs the same bite on the same build (PM-0006-20's planted-format bite).
+pub(crate) fn every_run_rules(run: &Run<'_>, may_name_a_bite: &[&str]) -> Vec<String> {
     let mut why = Vec::new();
     if !run.inconsistent.is_empty() {
         why.push(format!(
@@ -564,7 +570,7 @@ pub(crate) fn always_rules(run: &Run<'_>) -> Vec<String> {
         .any(|l| l.header.build.features.iter().any(|f| f == "bites"));
     match run.bite {
         Some(id) => {
-            if run.role != "bite" && run.role != "twin" {
+            if !may_name_a_bite.contains(&run.role) {
                 why.push(format!(
                     "build: a {} run names the bite {id}; only a bite run or a bite run's twin may",
                     run.role
