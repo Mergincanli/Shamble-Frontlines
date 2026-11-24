@@ -90,15 +90,10 @@
   P22, P19, P18 and P2 fail, P8 held by the compiler; snapshot wip/u6c-fix.patch 0549389e…, 24 files; notes u6c-build.md
   a9d45dd4…; the interdiff `git diff aad2103 6c3ff00`, 10 files, +356/-94). Round 2 waits for the 17:50 reset (LEAN-MODE
   item 3): trigger trig_014DtEnzDqnWHT2N6MsvfyA1 at 17:51. F-P2-HEADER goes to its test seat.
-- **Next 2, U6c (round 1 below):** builder a3a3e3fdf559de095 (worktree, base 8c81952;
-  launch message u6c-launch-prompt.txt; cut 06:55-07:59 and a disk-floor stop, both resumed). Blocks 1, 3-6; Block 2
-  not built (C4: lever (1)); F-REDACT fixed and PASS; plants 20 of 21 fail, **F-P8: P8 does not** (ImpairSocket's Drop
-  joins no thread, socket.rs:440-446); end-check2.log 11/11, 859/956 (+52/+52), 1,116.8 s (1.03x of 1,086.7); 5,431
-  added, 199 removed. Snapshot wip/u6c-build.patch a4e63455… (24 files; notes u6c-build.md 426b31da…). Round (xhigh)
-  -> u6c-review-{netcode,test,security}.md: security APPROVE WITH FINDINGS (5 Low, SEC-U6C-1..5; = Stop B's host read);
-  test APPROVE WITH FINDINGS (5 Medium: F-A2-EXACT, F-READINGS, F-P8, F-TIMING, F-P2; 10 Low); netcode REVISE.
-  **Ruling** (advisor-u6c-r1.md ad72c0b8…): REVISE: fix pass FP-1 to FP-6 (about +200, to ~5,630; riders stop past
-  5,850), then round 2 on the diff (three seats); F-READINGS mine at U6c's close; NC-U6C-12 and SEC-U6C-5 into U8 (C9).
+- **Next 2, U6c's round 1** (builder a3a3e3fdf559de095, base 8c81952): built 10:07 (5,431 added; 11/11, 859/956; round-1
+  snapshot wip/u6c-build.patch a4e63455…). Reviews u6c-review-{netcode,test,security}.md: netcode REVISE (NC-U6C-1 High),
+  test 5 Medium, security 5 Low (= Stop B's host read). Ruling advisor-u6c-r1.md (ad72c0b8…): the fix pass, then round 2
+  on the diff; the readings mine; NC-U6C-12 and SEC-U6C-5 into U8 (C9). Block 2, the stamp tests, held back (C4, lever (1)).
 - **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
   2,858 added; T5i-1 to -3 for U7's round). **Next 3:** the day message at 23:05 UTC (msg-2026-11-25.md).
 
@@ -164,7 +159,13 @@
   - A2 on both transports, by the full test names (u6c-build.md "Fix pass");
   - then the probe with the shipped binaries (P0 and P1, 1,000,000 packets, 127.0.0.1, UDP 30003), as advisor-u6c-r1.md
     lines 73-81 say. Logs go to .gate/u6c/read-*.log.
-  - Disk is 10,568 MiB after the 13:5x part-clean.
+  - DONE: the release build (read-build.log, exit 0). A2 over WebSocket (read-a2-ws.log, 14:08-14:09): 1 passed in
+    70.8 s; npt-load READY then DONE, exit 0; the room exit 0; room memory peak 157,499,392 B; 5-31 inputs per client
+    per second; split violations 0; pooled p99 about 1.8 ms. A2 over WebTransport (read-a2-wt.log, to 14:12): 1 passed
+    in 100.1 s; READY, DONE, exit 0; room peak 125,689,856 B; **0**-31 inputs per client per second (for round 2's netcode seat).
+  - The probe reading: after his /compact. A launcher script in this folder that only starts the release npt-server
+    (its stdin held, as the probe mode needs) and then npt-load; both settings files written by Write (server probe
+    keys: mode, probe_peer_ipv4, probe_legs, probe_packets, probe_warmup_s, as in u8-build.patch:2111 and :5383).
   **Next three:** (1) round 2 at 17:51; (2) the merge M3-M9 as U4f's (history.md:7022-7028), with C9's U8 edits;
   (3) U7's 0b check and R-half (its builder starts in a reset's first 30 minutes), then U8's merge. Msg 23:05.
 - **Finished, resumable by SendMessage:** U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder
