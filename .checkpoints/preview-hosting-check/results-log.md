@@ -990,3 +990,10 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - **Step 9 done**: his words "I have rejected both"; `close` #7 (45496209201, cs/b9-edit) completed "failure" (updated
   22:05:09 UTC) and `close` #8 (45496236161, cs/b9-prod) completed "failure" (22:05:20 UTC): rejected, so nothing ran.
   Next: step 10, his delete of the token (the control's cleanup, which needed it, ended 21:56:06 UTC).
+- **Step 10, the token deleted (PM-0006-32's revocation)**: his message of 2026-11-24 22:14:34 UTC
+  (1bb52d80-37b6-4b51-8f78-52411327fda2), his words: "I have deleted the token". His screenshot, transcribed (the
+  address holds his account ID; not copied here): "Account API tokens" / "Manage account API tokens. User API tokens are
+  found in My Profile → API Tokens." / an empty list: "Create your first API token" / "API tokens authenticate access to
+  your Cloudflare account, allowing secure integration with tools, scripts, and third-party services." / "Create a
+  token". The delete time itself was not given: it lies after my step-10 message (after 22:05:54 UTC) and before
+  22:14:34 UTC. Next: the `revoked` run (my start, his approval); it must fail at Cloudflare's sign-in.
