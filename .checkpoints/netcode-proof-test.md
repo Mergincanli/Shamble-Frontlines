@@ -136,10 +136,11 @@
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (3 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
   - The advisor's U6b fix-diff check a108f5cdf9270999e (advisor-u6b-fix.md, saved per item; cut 23:22, resumed 02:3x).
-    Done, resumable: U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix
-    pass", worktree agent-a2661dc320c9e6d00), the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats
-    netcode a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
-  - The saver bg149e5i4 (checkpoint.mjs watch from 02:36 to about 04:26; when it ends, restart it: run_in_background,
+    On a prompt 02:43-04:27 (a cd into T): stopped, resumed 04:3x read-only from item (4); re-snapshot = e29c003c.
+    Done, resumable: U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix pass", worktree
+    agent-a2661dc320c9e6d00), the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats netcode
+    a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
+  - The saver b60xfhy35 (checkpoint.mjs watch from 04:27 to about 06:17; when it ends, restart it: run_in_background,
     timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
 - **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
   af8c5f0fbec829595 (u6b-run.sh exports CARGO_INCREMENTAL=0; a builder on the 4 GB floor stops, never cleans);

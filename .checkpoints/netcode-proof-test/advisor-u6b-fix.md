@@ -30,7 +30,12 @@ e29c003c…ac64af1c (checked); the round's wip/u6b-build.patch 49f4488f…0c14c 
 snapshot; `git diff HEAD -- .` in spikes/netcode-proof hashes 219ee92e…0fef = fx-check1/2's diff line; 28 files, +5,952
 -267 (`--shortstat`); the worktree's u6b-build.md = the main folder's (74e0d697…). Every plant diff's "before" blob is
 the tree's file now (`git hash-object`: session.rs bfe90ca, ws_server.rs 137feec, wt_server.rs c703b8b, pin.rs
-496663c, link/lib.rs ee3aee8, server/main.rs 5b9d026, super/main.rs 07886aa).
+496663c, link/lib.rs ee3aee8, server/main.rs 5b9d026, super/main.rs 07886aa). The main session's re-run of the
+snapshot script on the builder's worktree (2026-11-24 04:3x UTC, `python3 -I .checkpoints/netcode-proof-test/
+worktree_patch.py`: the tracked `git diff HEAD --binary` plus every untracked file, .checkpoints/ left out) hashes
+e29c003c…ac64af1c = wip/u6b-fix.patch, base 21765e3, 28 files: the snapshot is the whole tree, no untracked file
+outside it (the coordinator's message; not re-run by me). My alternate-index check of each plant's diff hash was
+stopped before it ran (it asked for a permission); item (4) uses the logs and diff files instead.
 
 ### (1) Each Medium's fix against its seat's words, and each Low built
 - **SEC-U6B-1: MET.** Seat's fix (u6b-review-security.md:66-69): "from the link's drop, run the drain and the close
