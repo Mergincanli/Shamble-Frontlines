@@ -1,3 +1,0 @@
-You were just compacted to cut usage. Nothing is lost. Continue the preview hosting check from your checkpoint: Day 2 (step 26), starting with the 24-hour probe. Read the resume card .checkpoints/preview-hosting-check.md first. Do not redo finished work.
-
-My words of 2026-11-19, 12:00 (Amsterdam time): one thing for lane 2, no work now. Aiming down sights and the sprint-to-fire delay are game rules of Slice 1 by my decision of 2026-11-19. Lane 1 prices and places them in change-set 4's plan. Your wishes W1 and W4 on issue #59 are needs now; leave your comment as it is, lane 1 has this from me. My answer AIM-STATE of 2026-11-19, 00:59 stands for the poses.
