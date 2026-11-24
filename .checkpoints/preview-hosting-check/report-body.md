@@ -1,6 +1,6 @@
 # Advisor report: the preview hosting check (2026-11-24, branch `claude/optimistic-albattani-mdoonz` standing in for `cs/preview-hosting-check`, base main 28254a7)
 
-Pull request: PRNUMBER. Risk tier 1: it adds this report and records Mustafa's words in `docs/DECISIONS.md`; it
+Pull request: #66 (https://github.com/Mergincanli/Shamble-Frontlines/pull/66). Risk tier 1: it adds this report and records Mustafa's words in `docs/DECISIONS.md`; it
 touches no secret, no CI file and no infrastructure. The check itself (risk tier 2: a deploy token, CI and hosting) ran
 in his separate test repository, Mergincanli/shamble-preview-check. Written by the builder chat Mustafa calls Builder
 V2 (lane 2 of the build; session_019YNMUSYpJGi1xxCjKgr4e5; main model Opus 5.5, its advisor tool answered by Fable 5.2,

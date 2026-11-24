@@ -1550,7 +1550,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 - The report placed: `docs/reports/2026-11-24-preview-hosting-check.md` (commit cf5a1bc; 2,386 lines; lane 2's needs list
   folded in as its own section). C4 launched: docs-keeper (its file's model and effort; background, after the saver
   b4au202dl was running) on STATUS, ROADMAP, REPO_MAP and SPIKE_PLAN entry 6, lane 2's lines only, no ADR edit, no
-  DECISIONS edit; notes `docs-keeper-pass.md`.
+  DECISIONS edit; notes `docs-keeper-pass.md`. DONE: STATUS, STATUS_ARCHIVE, ROADMAP, REPO_MAP, SPIKE_PLAN (lane 2's lines; the
+  follow-up bullets of the merged #49-#51 and #48 and ROADMAP's oldest entry moved by script, byte for byte: checked by
+  this chat, all verbatim); the map check OK; committed 1e4b53f with his message of 2026-11-25 added to DECISIONS by
+  script (`decisions/add_1125.py`, 20 lines at the top). The report's docs line: 0830d48.
+- **C5: the draft pull request #66** (https://github.com/Mergincanli/Shamble-Frontlines/pull/66), opened by this chat
+  (create_pull_request, draft) after 0a03e82 was pushed. The saver b4au202dl stopped by TaskStop before the fold. Next,
+  by hand: the report's two last links (the pull request; CARDSHA = the commit that saves this card, the last one with
+  the checkpoints), then the fold commit deleting `.checkpoints/preview-hosting-check*` and `.checkpoints/lane2-needs*`
+  (CHECKPOINTS.md section 9), pushed by hand; then the advisor agent's review of that head (its notes under `.gate/`,
+  since the checkpoint folder is gone), then ready and his go.
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
   and on Zero Trust's first screen · launched 2026-11-19 about 14:15 UTC (after the save 4396e0a's edits) · DONE; its
   answers in step 26.
