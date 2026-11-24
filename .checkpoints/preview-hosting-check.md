@@ -891,7 +891,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Billing: answered in his words (2026-11-24 22:47:31 UTC, f0185b17-...): "I just checked the cloudflare's billing
      page, and nothing paid was added when the wall went on" (a word, not a screenshot; results log). Nothing is
      waiting on him now.
-   - Before the report: this repository's main (1ec6f6c, lane 1's #61 and #64) taken in; plan Risk 13 re-read (its last
+   - Main taken in (his item 6): 28254a7 (the merge of #65) merged into this branch as 78c2d9a (plain merge; no file
+     changed on both sides since b763ba3e; 108 files from main, none in .claude/, CLAUDE.md or AGENTS.md).
+   - Before the report: plan Risk 13 re-read (its last
      sentence: the check's end and step 2.6 wait for the revised draft), likely a decision entry, with today's finding
      that production's one-off links are behind the wall; his verdict on checklist step 4 (no count shown anywhere; no
      "achieved"/"not yet" given), which the report asks.
