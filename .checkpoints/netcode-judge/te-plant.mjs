@@ -64,7 +64,7 @@ const PLANTS = {
                 why: vec![format!("{}: {}", part.name, m.line())],
                 runs: judged.runs,`,
   ],
-  // P9: the "every part moved" count also counts a mark with one part (off by one: refuse only when >1 part).
+  // P9: a moved ws_bound check is let through (the ws_bound refusal disabled).
   p9_moved_ws_bound_allowed: [
     "marks.rs",
     "        if ws_bound.is_some() {\n            return Err(",

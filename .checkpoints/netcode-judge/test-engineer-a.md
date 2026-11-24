@@ -45,3 +45,22 @@
   applies (all(setup) on empty -> Undecided -> NOT-RUN). Low.
 - Comment eval.rs:964 says every check of a precondition counts, yet `applies` (eval.rs:1177-1179) skips moved checks in
   the matched branch and not in the no-match branch (eval.rs:970-971): unreachable (loader refuses), Low.
+- Plants P11 (MOVED above kept-part NOT-RUN) and P12 (any_moved forgets bites) caught (see above). Scratch copy reset;
+  worktree spikes/ == b22c30cd; git status clean of source changes.
+- Cross-read rust-reviewer-a.md: agrees on inert checks, doc line marks.rs:99, expect-invalid latent gap; its L5
+  (tautological sum assert in a_label_anywhere…) confirmed by reading. It did not raise -3's bite or the P1 branch.
+
+## Final (complete; the hand-back text)
+VERDICT: APPROVE WITH FINDINGS. No Critical or High. Four Medium, seven Low. Details in the hand-back message.
+M1 marks.json:2350 PM-0001-3/not-net-of-base kept, belongs to moved "MP at P2" (u6c-brief.md:300) -> -3 NOT-RUN for ever.
+M2 eval.rs:1494 no test for a moved mark-wide check on a bite run matching no part (plant P1 survived; reach: -58).
+M3 marks.json -19/-31 "ML* Chrome (rough, reported)": by/why do not say it is the advisor's reading (cond. 8 honesty).
+M4 marks.json -56 moved check why "MARK-NOTES: the record counts 4 items here, not 10": paraphrase under his name.
+L1 mixed bite run (kept + moved part) untested (plant P2 survived).
+L2 outside mark with a moved bite: refusal untested (plant P5 survived).
+L3 check piece's `to` in the MOVED line not asserted (contains("check \"") only); JSON of moved_checks / bite moved untested.
+L4 README §5 "so its bite is missed" wrong when no kept non-setup check applies (Undecided -> NOT-RUN).
+L5 inert kept checks/reports naming only moved parts: unnamed, README silent.
+L6 doc/comment drift: marks.rs:99 "counted"; eval.rs:964 vs applies() in Pre's matched branch.
+L7 real-file test proves labels + "missing run never MOVED", not plan test 9's "kept mark with a moved piece cannot read
+   PASS" on real marks (structural guarantee only); tautological sum assert fixtures.rs (rust-reviewer L5).

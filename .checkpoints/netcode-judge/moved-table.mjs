@@ -2,11 +2,13 @@
 //   node .checkpoints/netcode-judge/moved-table.mjs [--write]      (from the repository root; without --write: a dry run)
 // The file is exactly JSON.stringify(x, null, 2) + "\n" (checked below), so nothing but the listed fields moves.
 // Sources: .checkpoints/netcode-proof-test/replan-marks.md:7-99 (the table) and moved-block.md (the destinations);
-// MARK-NOTES is read from replan.md:106-111 by line, never retyped. It refuses to run on any other marks.json.
+// MARK-NOTES is read from replan.md:106-111 by line, never retyped. It builds from the base commit's marks.json only.
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const FILE = "spikes/netcode-proof/marks/marks.json";
+const BASE = "e2c0e896dedd5c09c2536e2fbe9323353756fe99";
 const BEFORE = "c1935a5b996fb0aaff82b0b3c1c604255e1534f6ca7e8d2e55a9f472cd3b22a9";
 const BY = "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)";
 const sha = (t) => createHash("sha256").update(t, "utf8").digest("hex");
@@ -22,8 +24,13 @@ const SHOOT = "Slice 1 change-set 8 (Shoot)";
 const S3 = "Slice 3";
 const SAFARI = ["Safari later", "Safari left the proof test (BROWSER-SET (a))"];
 const HUMAN = ["Slice 3, with the human run", "the human run (R7) left the proof test"];
-// The rough-laptop twin of a part that moved with the human run (the advisor's reading of NPT-TRIM's move of R7).
-const HUMAN_ROUGH = [HUMAN[0], "its only run was a leg of the human run (R7), which left the proof test"];
+// Three labels the re-plan's table does not name (the advisor agent's rulings of 2026-11-24 on part a: its plan
+// review's condition 8, and its ruling on the review round's M1 and M3): the rough-laptop twins of two parts that moved
+// with the human run, and the one bite that can only fail a moved part's checks. Their `by` says whose reading it is.
+const BY_READING =
+  "NPT-TRIM, 2026-11-21, as the advisor agent read its move of the human run (R7) on 2026-11-24; not a line of the re-plan's table";
+const HUMAN_ROUGH = [HUMAN[0], "its only run was a leg of the human run (R7), which left the proof test", BY_READING];
+const MP_BITE = [HUMAN[0], "it fails only the checks of the part MP at P2, which rode the human run (R7)", BY_READING];
 const CRATE = ["Slice 3's WebTransport crate choice", "the proof test carries one crate, web-transport-quinn"];
 const R4 = "its run, R4, left the proof test";
 const U4G = "client prediction left the proof test (U4g)";
@@ -92,15 +99,7 @@ const PIECES = {
     checks: { "0 corrections larger than 1 mm not traced to a late or lost command (PM-0001-41's count)": WITH_41 },
     bites: { "PM-0001-58/lt-tick-offset": WITH_41 },
   },
-  "PM-0001-56": {
-    checks: {
-      "every listed item read once and written (10 items)": [
-        "with the items' own marks, as the MARK-NOTES sentence in this mark's notes says item by item",
-        "MARK-NOTES: the record counts 4 items here, not 10",
-      ],
-    },
-    bites: {},
-  },
+  "PM-0001-3": { checks: {}, bites: { "PM-0001-3/not-net-of-base": MP_BITE } },
 };
 
 // MARK-NOTES, word for word from the re-plan (lines 106-111), split at its "(1)" and "(2)".
@@ -110,15 +109,27 @@ const m = notes.match(/\(1\) -7: (.+?\.) \(2\) (-56's record .+?\.) Lean: yes to
 if (!m) fail("replan.md:106-111 is not the MARK-NOTES text this script reads");
 const [, NOTE_7, NOTE_56] = m;
 const TAG = "MARK-NOTES (Mustafa, 2026-11-22): ";
+// -56's 10-item check moves by MARK-NOTES (2): its `why` quotes that sentence's own first clause, never a paraphrase.
+PIECES["PM-0001-56"] = {
+  checks: {
+    "every listed item read once and written (10 items)": [
+      "with the items' own marks, as the MARK-NOTES sentence in this mark's notes says item by item",
+      `MARK-NOTES, in this mark's notes: "${NOTE_56.split(":")[0]}"`,
+    ],
+  },
+  bites: {},
+};
 const OLD_7 =
   "The history is sized for the largest cap the test uses (-48's test cap, fixed in U4 from L1's largest honest rewind at P3 and P4) plus the margin, as data, recorded; the rule cap can only shrink it, so -7 needs no re-run (plan §6.2).";
 
-const text = readFileSync(FILE, "utf8");
-if (sha(text) !== BEFORE) fail(`${FILE} is not the file this table was written for (sha256 ${sha(text)})`);
+// Always built from the base's file (the netcode branch's head this branch started from), so a re-run after a
+// change to the table gives the same bytes as a first run.
+const text = execFileSync("git", ["show", `${BASE}:${FILE}`], { encoding: "utf8", maxBuffer: 64 << 20 });
+if (sha(text) !== BEFORE) fail(`${BASE}:${FILE} is not the file this table was written for (sha256 ${sha(text)})`);
 const data = JSON.parse(text);
 if (`${JSON.stringify(data, null, 2)}\n` !== text) fail("marks.json is not JSON.stringify(x, null, 2): refusing to rewrite it");
 
-const moved = ([to, why]) => ({ to, why, by: BY });
+const moved = ([to, why, by = BY]) => ({ to, why, by });
 /** The object again with `moved` right after `after` (so the label sits beside the name it belongs to). */
 const withMoved = (obj, after, label) => {
   if ("moved" in obj) fail(`${obj.id ?? obj.name}: already moved`);

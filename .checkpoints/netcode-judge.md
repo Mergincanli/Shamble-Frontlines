@@ -41,19 +41,40 @@
    deleted against e2c0e896 (the stop is 1,440); 98 judge tests pass (85 before; 3 changed, 13 new); fmt, clippy with
    warnings as errors and check.mjs's nine quick steps pass; marks.json's sha256 is now 7f148c3e….
 
+5. Part a's one review round on b22c30cd · both APPROVE WITH FINDINGS, no Critical or High · test-engineer: 4 Medium,
+   7 Low (`test-engineer-a.md`); rust-reviewer: 7 Low (`rust-reviewer-a.md`). The advisor agent's ruling for the fix
+   pass: PM-0001-3's bite `not-net-of-base` is labelled moved with its part; it and the two rough twins carry a `by`
+   that says it is the advisor agent's reading, not a line of the re-plan's table.
+6. The fix pass · 0e0f654776fc0e10e153875d59b33869e6179a88 (pushed alone, no skip marker) · every Medium and the cheap
+   Lows taken; 1,321 added and 38 deleted against e2c0e896 (the stop is 1,440); 98 judge tests pass, fmt and clippy
+   clean; marks.json's sha256 is 86705adc5f120747e97ecf5ef6eef7250983a838fe031772161215144edcfee4 (before:
+   c1935a5b996fb0aaff82b0b3c1c604255e1534f6ca7e8d2e55a9f472cd3b22a9); labels: 26 marks whole, 21 parts, 2 checks, 2
+   bites; the test-engineer's own diff script on base and head: "rest equal after strip and undo: true".
+
 ## Current step
-Part a's one review round on b22c30cd: test-engineer and rust-reviewer, both at once, at xhigh; their notes in
-`.checkpoints/netcode-judge/test-engineer-a.md` and `rust-reviewer-a.md`.
+On the final head 0e0f6547: `node spikes/netcode-proof/check.mjs` whole (background, about 17 minutes); GitHub's gate
+and toolchain results on that SHA; the advisor agent's read of the head.
 
 ## Next steps
-1. One fix pass on the round's findings (a Low never triggers a push on its own); the size count again.
-2. On the final head: `cargo test -p npt-judge --locked`, clippy, fmt, then `node spikes/netcode-proof/check.mjs`
-   whole; GitHub's gate and toolchain results on that full SHA (pushed alone, no skip marker); the advisor's read.
-3. The report to Mustafa with the commit id (plan-a.md section 6, conditions 10 to 12, say what it must hold); the
-   board thread's ready line.
+1. If all three hold: the report to Mustafa with the commit id (plan-a.md section 6, conditions 10 to 12, say what it
+   must hold) and the board thread's ready line. If check.mjs fails: fix, push, run it again.
+2. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
+   one small commit, the checks again on the new head, the new commit id to him.
+3. Part b (U6j, 19 figures and three waiting judge changes): its own plan, the advisor's review, then the build.
 
 ## Open findings
-- none yet
+- Left as follow-ups from part a's round (Low, no fix now): rust-reviewer's L4 (a kept bite whose only runs were left
+  out reads "no run yet", though runs exist: it needs a field on `BiteOut`) and L6 (a kept mark reading MOVED lists
+  its moved parts' lines after the summary line, but not its moved checks' or bites': the summary line and the JSON
+  carry them); test-engineer's L7 (the 12 real kept marks with a moved piece are proven never-PASS by the rule's
+  order and the two-mark enumeration, not by passing logs for each of the 12: said so in the report).
+- Not verified here: the re-plan's real-data line (re-judging `results/u4f/b57221ed139d/pm-0001-47/`): the raw logs
+  are not in the repository. For the netcode chat before it merges part a, from `spikes/netcode-proof/`:
+  `cargo run -q --locked -p npt-judge -- --marks marks/marks.json --logs <the -47 set's logs> --only PM-0001-47`,
+  expected MOVED.
+- Not carried by part a: the NPT_KC_BURSTS test rider (crates/net/src/tcp_model/tests.rs, outside this fence; an
+  earlier ruling put it in "MOVED's brief": advisor-u8-brief.md:106-113). BURST-RIDER is with Mustafa.
+- With Mustafa: OUTSIDE-NOTES (the three outside marks' notes still end "Always NOT-RUN here." while they read MOVED).
 
 ## Key numbers
 - The judge today: src 5,238 lines (eval.rs 1,784; marks.rs 1,263; figures.rs 1,020; practice.rs 797), tests 3,618,
@@ -79,7 +100,10 @@ Part a's one review round on b22c30cd: test-engineer and rust-reviewer, both at 
   folder parked) · Mustafa · in the chat.
 
 ## Running work
-- The review round: test-engineer and rust-reviewer on b22c30cd, launched 2026-11-24 about 20:25 UTC (2 agents).
+- The review round: test-engineer and rust-reviewer on b22c30cd, 2026-11-24 about 20:25 to 20:40 UTC: DONE.
+- The two defects that survived the test-engineer's planting are now caught, each run once and taken back: a moved
+  check kept on a bite run that matches no part fails `a_moved_check_is_skipped_wherever_checks_are_chosen`; a bite
+  run judged with its moved part's checks too fails `a_bite_run_on_moved_parts_only_is_left_out`.
 - The background saver (`checkpoint.mjs watch netcode-judge`, every 10 minutes for 110) since about 20:30 UTC, for
   the reviewers' notes; it stops by 22:20 UTC and is checked at each card update.
 - GitHub on b22c30cd: the gate workflow green (run 45480243854); the toolchain workflow running (run 45480243852).
