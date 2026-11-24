@@ -2624,10 +2624,10 @@ index 0000000..9a3cf79
 +mod tests;
 diff --git a/spikes/netcode-proof/crates/host/src/issue_tests.rs b/spikes/netcode-proof/crates/host/src/issue_tests.rs
 new file mode 100644
-index 0000000..015783d
+index 0000000..beaa2ae
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/host/src/issue_tests.rs
-@@ -0,0 +1,430 @@
+@@ -0,0 +1,433 @@
 +//! Block 6's tests (u6c-brief.md section 3, C1 (a)): the issue mode against an in-process fake ACME directory, a test
 +//! `HttpClient` given to `Account::builder_with_http` (U6-Q18's term; no network), on short test bounds.
 +
@@ -2895,7 +2895,10 @@ index 0000000..015783d
 +        assert_eq!(err, "PROFILES classic,shortlived,tlsserver\n");
 +        let key = std::fs::read(dir.join(format!("{word}.key.pem"))).expect("the key");
 +        let parsed = PrivateKeyDer::from_pem_slice(&key);
-+        assert!(matches!(parsed, Ok(PrivateKeyDer::Pkcs8(_))), "a PKCS#8 key");
++        assert!(
++            matches!(parsed, Ok(PrivateKeyDer::Pkcs8(_))),
++            "a PKCS#8 key"
++        );
 +        assert_eq!(mode(&dir.join(format!("{word}.key.pem"))), 0o640);
 +        assert_eq!(mode(&dir.join(format!("{word}.chain.pem"))), 0o644);
 +        let chain =

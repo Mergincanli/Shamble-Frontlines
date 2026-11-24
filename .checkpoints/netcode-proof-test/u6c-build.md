@@ -158,3 +158,52 @@ U6c's build (the probe, the load, the page host and the certificate; u6c-brief.m
   - P19 probe_peer's `.take()` → a copy of the newest; `u6c_probe_peer_echoes_the_newest_down_once_with_its_hold`.
   - TE2-TE4: Block 2's, not built.
 - Size with the fix: 5,428 added (issue_tests.rs 430).
+- RESUMED 09:35 UTC (the coordinator: disk freed, 10,559 MiB free). F-REDACT DONE: redact-fix2.log: rustfmt wanted the
+  new assert split (applied by Edit); redact-fix3.log (09:36 UTC): `cargo fmt --check -p npt-host` exit 0; `cargo test
+  --locked -p npt-host` 23 + 1 passed, 0 failed (the six-lines test with the PKCS#8 parse among them); `check.mjs --only
+  redact` PASS, 371 items, 0 findings. Size now 5,431 (issue_tests.rs 433).
+- PLANTS (each one runner -x -k call, .gate/u6c/plant-pN.log; restore checked by sha256sum against the hashes above):
+  - P1 FAILS T1 `the_task_poller_takes_lateness_where_the_task_runs` (socket_tests.rs:917: lateness 220,047 ns, not
+    >= 50 ms); restored, probe.rs 00b3dca6… equal.
+  - P2 FAILS `u6c_two_legs_on_two_sockets_never_mix` (probe_tests.rs:150 "a new leg starts empty", 3 not 0);
+    restored, probe_tests.rs 03192a00… equal.
+  - P3 FAILS `u6c_the_pretouch_fills_and_empties…` (probe_tests.rs:171, 0 not 1,000); restored, socket.rs 0046eae2…
+    equal.
+  - P4 FAILS `u6c_c_u6_5_the_window_takes_exactly_its_fates_into_both_e_forms` (:210 n 1,001 not 1,000); P5 FAILS it
+    (:211 the judged form 10,000 not 10,100); P4's restore and P5's checked by one hash after both (P5 was planted
+    before P4's hash was taken; disjoint lines): probe.rs 00b3dca6… equal.
+  - P6 FAILS the same test (:210 n 1,001: the Oversize fate in E); restored, equal.
+  - P7 FAILS `u6c_leg_series_files_loss_delay_burst…` (:285 RTT 23 ms not 20 ms); restored, equal.
+  - **P8 does NOT fail** `u6c_one_probe_on_loopback…` (plant-p8.log: 1 passed, 4.46 s): read after `drop(sock)`, the
+    socket's /proc/net/udp row is still there, since ImpairSocket's Drop signals its threads without joining them
+    (socket.rs:440-446) and they keep the kernel socket a moment. F-P8: the test cannot tell a read before the drop from
+    one just after; a bite needs an observable the drop removes at once (a joined Drop is U6b's code). Restored, server
+    probe.rs 5a025434… equal. No retry, no test change.
+  - P9 FAILS `u6c_the_udp_row_is_found…` (probe_tests.rs:19, Some(0) not None); restored, equal.
+  - P10 FAILS `u6c_one_probe_on_loopback…` (:308 base_rtt_ns 0 not 206,575); restored, equal.
+  - P11 FAILS `u6c_inputs_count_lists…` (load_tests.rs:109, [30, 29, 31]); restored, load.rs b2aa97ae… equal.
+  - P12 FAILS `u6c_a_replaced_hash_file_is_served_anew` (serve_tests.rs:297, the old bytes); restored, serve.rs
+    a6f3e311… equal.
+  - P13 FAILS `u6c_the_hash_files_are_served_verbatim…` (:267, Cache-Control None); restored, equal.
+  - P14: the first plant (`.as_str()`) did not compile (plant-p14.log, E0658), so no test ran; corrected to
+    `path.starts_with(f.0)` and run once: FAILS `u6c_targets_outside_the_list_are_404` (:222, `/../Cargo.toml` 200
+    not 404; plant-p14b.log); restored, equal.
+  - P15 FAILS `u6c_the_production_order_asks_for_shortlived` (issue_tests.rs:295, Some(None)); restored, issue.rs
+    5cbcbebf… equal.
+  - P16 FAILS `u6c_an_invalid_order_exits_4…` (:330, refreshes 2 not 1); restored, equal.
+  - P17 FAILS `u6c_staging_then_production…` (:272, mode 0o644 not 0o640); restored, equal.
+  - P18 FAILS `u6c_one_probe_on_loopback…` (:226 `ran.expect`: "leg P0: no round trip in its window's first 10 s":
+    the stranger taken as the peer, the down pacer pointed at it); restored, equal.
+  - P19 FAILS `u6c_probe_peer_echoes_the_newest_down_once_with_its_hold` (:437 "no new down: no echo", Some(7));
+    restored, net probe.rs equal.
+  - P20 FAILS `u6c_a_query_is_ignored` (serve_tests.rs:237, 404 not 200); restored, equal.
+  - P21 FAILS `u6c_staging_then_production…` (issue_tests.rs:247, 7 lines on stdout); restored, equal.
+  - All seven planted files equal their pre-plant hashes after the last restore (one sha256sum at 09:46 UTC).
+  - In all: 20 of 21 plants fail their named test; P8 does not (F-P8). TE2-TE4 go with Block 2: not built.
+- FINAL END CHECK DONE (.gate/u6c/end-check2.log, 09:46:09-10:07:45 UTC, runner -x, free 9,234 MiB at start, 3.8 G
+  after): all 11 steps PASS: fmt 1.1 s, clippy 37.4 s, clippy-wasm32 7.5 s, doc 37.1 s, **test 1,116.8 s** (1.03 times
+  base's 1,086.7 s; measured **859 = 807 + 52**, bites **956 = 904 + 52**, 0 failed, 0 skipped), deps 2.6 s, wasm 82.6 s
+  (27,000 ticks, 0 mismatching, both bites caught), refs, marks (81), self (78/78), redact (371 items, 0 findings).
+  Tracked diff hash 80fb60a7… as in end-check.log (no tracked file changed since); the untracked hash differs by
+  issue_tests.rs's fix and these notes.
+- Size, final: 5,431 added, 199 removed (Block 6 now 792 with the fix).
