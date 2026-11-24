@@ -850,7 +850,7 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      time each sweep from its own probed_at; consult only on a row that is not the expected one, and before step 26 is
      saved as done. Not blocking: the 15 scheduled probe results unread; Day 1's downloaded evidence in .gate checked
      before the report (the upload records expire 2026-12-02).
-   - The one-screen list sent (about 19:13 UTC). **Step 1 done**: his message 20:14:13 UTC: "Restrict previews" pressed,
+   - The one-screen list sent 19:12:54 UTC (transcript time). **Step 1 done**: his message 20:14:13 UTC: "Restrict previews" pressed,
      the row now reads "Preview deployments are restricted by a Cloudflare Access policy" with "Manage"; he opened
      Manage (the Access application "shamble-preview-check - Cloudflare Pages", policy "Allow Members - Cloudflare
      Pages", Legacy, Allow). No plan or payment screen mentioned, so a billing screenshot is asked during the wait

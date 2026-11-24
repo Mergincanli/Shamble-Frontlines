@@ -888,7 +888,7 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - **The wall switched on (his step 1)**: his message of 2026-11-24 20:14:13 UTC (f39e46f9-f1ea-4ea2-9267-d9f6bb287aa4),
   his words: "Done, the button turned into a 'manage' button" / "When pressing on it the following page shows (see
   screenshot), I have censored the policy ID incase its something sensitive". The switch-on time itself was not given:
-  it lies after my list (sent about 19:13 UTC) and before 20:14:13 UTC; the sweeps count from 20:14:13 UTC, so each is
+  it lies after my list (sent 19:12:54 UTC by the transcript) and before 20:14:13 UTC; the sweeps count from 20:14:13 UTC, so each is
   at least its stated time after the switch-on. No Zero Trust set-up, plan or payment screen is mentioned.
   - Screenshot 1, transcribed: "Preview access": "Preview deployments are restricted by a Cloudflare Access policy." /
     "Visitors must sign in and match the policy before viewing previews." / "This protects preview deployment URLs
