@@ -47,6 +47,11 @@
         },
         {
           "name": "RD",
+          "moved": {
+            "to": "when RD is named, with PM-0001-43's RD part",
+            "why": "the desktop's legs rode the human run (R7)",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "machine.role": "RD"
           },
@@ -54,6 +59,11 @@
         },
         {
           "name": "MAC",
+          "moved": {
+            "to": "Safari later",
+            "why": "Safari left the proof test (BROWSER-SET (a))",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "machine.role": "MAC"
           },
@@ -739,6 +749,11 @@
         },
         {
           "name": "MP at P2",
+          "moved": {
+            "to": "Slice 3, with the human run",
+            "why": "the human run (R7) left the proof test",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "machine.role": "MP",
             "profile": "P2"
@@ -2736,7 +2751,7 @@
       "readings": [
         "R-20"
       ],
-      "notes": "PM-0001-4's runs at 700 shots/s (-2 checks the rate). The history is sized for the largest cap the test uses (-48's test cap, fixed in U4 from L1's largest honest rewind at P3 and P4) plus the margin, as data, recorded; the rule cap can only shrink it, so -7 needs no re-run (plan §6.2). 700 / 30 x 20 us = 0.47 ms per tick is a planning check. MB = 10^6 B."
+      "notes": "PM-0001-4's runs at 700 shots/s (-2 checks the rate). MARK-NOTES (Mustafa, 2026-11-22): R2 measures lag compensation's time and memory at the room's 2,000 ms history, which covers any cap the real game sets (-48's test cap, which -7 was sized from, moved). 700 / 30 x 20 us = 0.47 ms per tick is a planning check. MB = 10^6 B."
     },
     {
       "id": "PM-0001-8",
@@ -3528,6 +3543,11 @@
         },
         {
           "name": "MAC Safari",
+          "moved": {
+            "to": "Safari later",
+            "why": "Safari left the proof test (BROWSER-SET (a))",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "machine.role": "MAC",
             "params.browser": "safari"
@@ -4228,6 +4248,11 @@
         },
         {
           "name": "0 corrections larger than 1 mm not traced to a late or lost command (PM-0001-41's count)",
+          "moved": {
+            "to": "Slice 1 change-set 7 (Lag), with PM-0001-41",
+            "why": "it reads the client's prediction, which left the proof test",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "series": "tick.v.untraced_corrections_count",
           "stat": "sum",
           "window": "all",
@@ -4277,6 +4302,11 @@
         },
         {
           "id": "PM-0001-58/lt-tick-offset",
+          "moved": {
+            "to": "Slice 1 change-set 7 (Lag), with PM-0001-41",
+            "why": "it reads the client's prediction, which left the proof test",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "what": "the snapshot header's command acknowledgements (16-bit sequences) compared with a plain <"
         },
         {
@@ -4508,6 +4538,11 @@
         },
         {
           "name": "ML Chrome",
+          "moved": {
+            "to": "Slice 3, with the human run",
+            "why": "the human run (R7) left the proof test",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "layer": "L2",
             "profile": "P2",
@@ -4519,6 +4554,11 @@
         },
         {
           "name": "ML* Chrome (rough, reported)",
+          "moved": {
+            "to": "Slice 3, with the human run",
+            "why": "its only run was a leg of the human run (R7), which left the proof test",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "layer": "L2",
             "profile": "P2",
@@ -5437,6 +5477,11 @@
         "row_sha256": "8225dff9521e754646524883b5b967107529fe008d540424c567548de7dc6e85"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "the security baseline before the first online playtest",
+        "why": "its run, R4 (hostile input), left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R4",
         "ML*",
@@ -6206,6 +6251,11 @@
       "parts": [
         {
           "name": "wtransport: ML chrome",
+          "moved": {
+            "to": "Slice 3's WebTransport crate choice",
+            "why": "the proof test carries one crate, web-transport-quinn",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.suite": "wt-attempts",
             "params.crate": "wtransport",
@@ -6216,6 +6266,11 @@
         },
         {
           "name": "wtransport: ML edge",
+          "moved": {
+            "to": "Slice 3's WebTransport crate choice",
+            "why": "the proof test carries one crate, web-transport-quinn",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.suite": "wt-attempts",
             "params.crate": "wtransport",
@@ -6226,6 +6281,11 @@
         },
         {
           "name": "wtransport: ML firefox",
+          "moved": {
+            "to": "Slice 3's WebTransport crate choice",
+            "why": "the proof test carries one crate, web-transport-quinn",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.suite": "wt-attempts",
             "params.crate": "wtransport",
@@ -6236,6 +6296,11 @@
         },
         {
           "name": "wtransport: MAC safari",
+          "moved": {
+            "to": "Slice 3's WebTransport crate choice",
+            "why": "the proof test carries one crate, web-transport-quinn",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.suite": "wt-attempts",
             "params.crate": "wtransport",
@@ -6246,6 +6311,11 @@
         },
         {
           "name": "wtransport: control, wrong certificate hash",
+          "moved": {
+            "to": "Slice 3's WebTransport crate choice",
+            "why": "the proof test carries one crate, web-transport-quinn",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "role": "control",
             "params.suite": "wt-attempts",
@@ -6255,6 +6325,11 @@
         },
         {
           "name": "wtransport: ML* (rough, reported)",
+          "moved": {
+            "to": "Slice 3's WebTransport crate choice",
+            "why": "the proof test carries one crate, web-transport-quinn",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.suite": "wt-attempts",
             "params.crate": "wtransport",
@@ -6294,6 +6369,11 @@
         },
         {
           "name": "web-transport-quinn: MAC safari",
+          "moved": {
+            "to": "Safari later",
+            "why": "Safari left the proof test (BROWSER-SET (a))",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.suite": "wt-attempts",
             "params.crate": "web-transport-quinn",
@@ -6450,6 +6530,11 @@
         },
         {
           "name": "MAC-b safari",
+          "moved": {
+            "to": "Safari later",
+            "why": "Safari left the proof test (BROWSER-SET (a))",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.suite": "fallback",
             "machine.name": "MAC-b",
@@ -6642,6 +6727,11 @@
         },
         {
           "name": "ML Chrome over WebSocket at P2",
+          "moved": {
+            "to": "Slice 3, with the human run",
+            "why": "the human run (R7) left the proof test",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "layer": "L2",
             "profile": "P2",
@@ -6653,6 +6743,11 @@
         },
         {
           "name": "ML* Chrome (rough, reported)",
+          "moved": {
+            "to": "Slice 3, with the human run",
+            "why": "its only run was a leg of the human run (R7), which left the proof test",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "layer": "L2",
             "profile": "P2",
@@ -6738,6 +6833,11 @@
         "row_sha256": "f36dc5f658f5330806ba01528b59b23b9a8492709ed716e35179bb9dff2910c8"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 6 (Look) for both backends; the browsers online at Slice 3; Safari later",
+        "why": "it rode the human run (R7), which left the proof test; the proof test's browser client draws nothing",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R7",
         "ML*",
@@ -6972,6 +7072,11 @@
         "row_sha256": "a9c376c03ddbd846b90a2f8c12521ad000c66bb172274777c0c6215dc62bf858"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 3",
+        "why": "it needs WebTransport's rtt() in the real client; it rode the human run (R7), which left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R7",
         "ML*"
@@ -7059,6 +7164,11 @@
         "row_sha256": "e70cb5beda57565e31693908edd51b2df9399c0cdbc77d5a161d139b5f34a881"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "the real protocol: change-set 3's codec first, then each message type as it is added",
+        "why": "its unit (U5, the decoder fuzzing) stopped",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C"
       ],
@@ -7230,6 +7340,11 @@
         "row_sha256": "004bf1c1a3116d6c55b5bffd1bd8276afdd732bfd9281669c5b65ae3d967933e"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 3",
+        "why": "its swap needs the second transport; its unit (U5) stopped",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C"
       ],
@@ -7396,6 +7511,11 @@
         },
         {
           "name": "MAC-b safari loopback",
+          "moved": {
+            "to": "Safari later",
+            "why": "Safari left the proof test (BROWSER-SET (a))",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.suite": "mds",
             "machine.name": "MAC-b",
@@ -7406,6 +7526,11 @@
         },
         {
           "name": "MAC-b safari eu-path",
+          "moved": {
+            "to": "Safari later",
+            "why": "Safari left the proof test (BROWSER-SET (a))",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.suite": "mds",
             "machine.name": "MAC-b",
@@ -7723,6 +7848,11 @@
         "row_sha256": "4ae7542a1f18abfa9f8e970dfdf872e9a481fbde1fcbe405ac099ecd237b87fc"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 7 (Lag)",
+        "why": "client prediction left the proof test (U4g)",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R7",
@@ -7867,6 +7997,11 @@
         "row_sha256": "0e4a895458aa941cf1b7348563449ded6a967d9cbf0b46b47a2fa7541efb01e3"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 7 (Lag)",
+        "why": "client prediction left the proof test (U4g); 48 scripted clients there",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R7",
@@ -8075,6 +8210,11 @@
         "row_sha256": "9ac589c2acb04c147d62295420fdb100f4dd673d307e1f0d258db45612e3e71a"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 7 (Lag) for movement, change-set 8 (Shoot) for fire timing",
+        "why": "client prediction left the proof test (U4g)",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R7",
@@ -8202,6 +8342,11 @@
         "row_sha256": "377d2c4875b884c63c6dfda396f53c9b052c9f4d5751a3133d3cb02412b625ed"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 7 (Lag) for movement, change-set 8 (Shoot) for shots; its RD part when RD is named",
+        "why": "it rode the human run (R7), which left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R7",
         "ML*"
@@ -8331,6 +8476,11 @@
         "row_sha256": "8306e145ff1935cb0a89ed57ef04236e32935b421d50b5752fb466904531758f"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 7 (Lag)",
+        "why": "the replay's cost is the real client's; it rode the human run (R7), which left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R7",
         "ML*"
@@ -8602,6 +8752,11 @@
         "row_sha256": "676542b80ff45385188b261969dd1f539be2115cb6d7d17a845e1cd645f2c78f"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 7 (Lag)",
+        "why": "interpolation left the proof test (U4g2's client half)",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R7",
@@ -8802,6 +8957,11 @@
         "row_sha256": "d7a44d28197a6959850eab6d88d28ef156cf591d61e5b87903ca4670aebdd38b"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 7 (Lag) for the delay, change-set 8 (Shoot) for respawns",
+        "why": "it rode the human run (R7), which left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R7",
         "ML*"
@@ -8940,6 +9100,11 @@
         "row_sha256": "56d8e1c180718a9e1dbf9d0fd940e60435fcae85a511788cf93d8b2b42e68b7b"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 8 (Shoot)",
+        "why": "remote events left the proof test (U4g2's client half)",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R7",
@@ -9077,6 +9242,11 @@
         "row_sha256": "255f6ec3283e223bc920a69c347fb41facfc13cc870626fc477ad3385d0360c9"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 7 (Lag)",
+        "why": "the clock estimate is the real client's; its L1 pass here (a4cac39) stays as a record",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C"
       ],
@@ -9141,6 +9311,11 @@
         "row_sha256": "284dd110b6bb9fd3a3bfaf3a238512f465465ffd6a33d9f8ea8e3f946b9c041c"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 3",
+        "why": "lag compensation's judged rows left the proof test (U4h)",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R3"
@@ -9445,6 +9620,11 @@
         "row_sha256": "71ba84fa2af7a74aec1d7ac1954626d64b1c5716e02bcb69787e1feb247b5c47"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 3",
+        "why": "lag compensation's judged rows left the proof test (U4h)",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R3",
@@ -9990,6 +10170,11 @@
         "row_sha256": "e4e7dd2db811c3ced2420fc7ca830ab7532c4ef9833fc5daebf6925891478e05"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 3",
+        "why": "lag compensation's judged rows left the proof test (U4h)",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C"
       ],
@@ -10115,6 +10300,11 @@
         "row_sha256": "fc31574ddb964d86b408aa1d32fdabc1ada2b7aa6303a32872fda5c73a79f4dd"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 8 (Shoot) for hitscan; its lag-compensated parts at Slice 3",
+        "why": "lag compensation's judged rows left the proof test (U4h)",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R7",
@@ -10352,6 +10542,11 @@
         "row_sha256": "a74ca0a3b369c42b222f709f415ce99a068e0cf69ab3e4a62fef3bcf5dd620d9"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 8 (Shoot); the browsers at Slice 3",
+        "why": "it rode the human run (R7), which left the proof test; the proof test's browser client draws nothing",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R1",
         "R4",
@@ -10471,6 +10666,11 @@
         "row_sha256": "f3b48aeef7b6a42e88c521f91b08c7272bc91225e95aee0557bd18d0b9762ac4"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 8 (Shoot)",
+        "why": "client prediction left the proof test (U4g)",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R7",
@@ -10596,6 +10796,11 @@
         "row_sha256": "02843a31e884733e07cb4afd5d89417cb63c41771856301d51bbf307a53bd78c"
       },
       "verdict": "person",
+      "moved": {
+        "to": "Slice 3",
+        "why": "it is the human run (R7), which left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R7",
         "MP"
@@ -10630,6 +10835,11 @@
         "row_sha256": "f94f95a76362b60db79d5174be7306dfaba79ef78723821ba5068771c317dc77"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "Slice 1 change-set 9 (Throw)",
+        "why": "its unit (U4h2) left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C",
         "R3"
@@ -10698,6 +10908,11 @@
         "row_sha256": "9b334d1eaed6d805f064b7beb8621982253f53f73e35a8c541e887e951be1a4d"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "the first slice that adds vehicles",
+        "why": "its unit (U4g) left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "C"
       ],
@@ -10772,11 +10987,24 @@
       "checks": [
         {
           "name": "every listed item read once and written (10 items)",
+          "moved": {
+            "to": "with the items' own marks, as the MARK-NOTES sentence in this mark's notes says item by item",
+            "why": "MARK-NOTES: the record counts 4 items here, not 10",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "series": "event.record_item.has_value",
           "stat": "count",
           "window": "all",
           "op": ">=",
           "value": 10
+        },
+        {
+          "name": "every kept item read once and written (4 items)",
+          "series": "event.record_item.has_value",
+          "stat": "count",
+          "window": "all",
+          "op": ">=",
+          "value": 4
         },
         {
           "name": "every item has a number or a value",
@@ -10794,7 +11022,7 @@
       "readings": [
         "R-10"
       ],
-      "notes": "The record step reads each item once and writes one `record_item` event per item (`item` names it; `has_value` 1 when it has a number or value). The items: (1) both crates' results on PM-0001-11, -25, -28 and -35, and their pick with its reason (R2-TRN-OQ5); (2) each browser's negotiated draft and its behaviour with UDP blocked; (3) the real record sizes per entity kind and the command size; (4) NewReno against Cubic (-24) and each browser's received snapshot rate and age at P2 to P4; (5) the smoothness of a remote soldier sprinting straight and turning with linear interpolation (the standard deviation of its per-frame displacement as a share of the mean) beside Mustafa's step 5; (6) OQ-0001-6's two options, each with -42's correction share, -48's registration and -49's honest rewind at P2 to P4; (7) the absolute input-to-screen delay at P0 (-43); (8) the replay depth per profile (-44); (9) Brave's transport and version on MP; (10) R-10's cover item: both cover variants recorded on L1 (plan §6.2). Item (1) needs -11 and -25 run with both crates, which their own rows do not ask: the run plans must (question). No bite: the row names none."
+      "notes": "The record step reads each item once and writes one `record_item` event per item (`item` names it; `has_value` 1 when it has a number or value). The items: (1) both crates' results on PM-0001-11, -25, -28 and -35, and their pick with its reason (R2-TRN-OQ5); (2) each browser's negotiated draft and its behaviour with UDP blocked; (3) the real record sizes per entity kind and the command size; (4) NewReno against Cubic (-24) and each browser's received snapshot rate and age at P2 to P4; (5) the smoothness of a remote soldier sprinting straight and turning with linear interpolation (the standard deviation of its per-frame displacement as a share of the mean) beside Mustafa's step 5; (6) OQ-0001-6's two options, each with -42's correction share, -48's registration and -49's honest rewind at P2 to P4; (7) the absolute input-to-screen delay at P0 (-43); (8) the replay depth per profile (-44); (9) Brave's transport and version on MP; (10) R-10's cover item: both cover variants recorded on L1 (plan §6.2). Item (1) needs -11 and -25 run with both crates, which their own rows do not ask: the run plans must (question). No bite: the row names none. MARK-NOTES (Mustafa, 2026-11-22): -56's record counts 4 items, not 10: items 5-10 move with their marks; item 1 keeps only the carried crate's results on -11 and -28 (the other crate, -25, -35 and the pick move to Slice 3); item 2 keeps each browser's draft and its fallback (with RE-PLAN-OK (1)), Safari later; item 4 keeps NewReno against Cubic, while the browsers' rates at P2 to P4 move with the human run."
     },
     {
       "id": "PM-0004-67",
@@ -11271,6 +11499,11 @@
         },
         {
           "name": "N=36",
+          "moved": {
+            "to": "slice 6, on the real sim",
+            "why": "the N = 36 and N = 18 searches (R6) left the proof test",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.density": "count",
             "clients": 36
@@ -11279,6 +11512,11 @@
         },
         {
           "name": "N=18",
+          "moved": {
+            "to": "slice 6, on the real sim",
+            "why": "the N = 36 and N = 18 searches (R6) left the proof test",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "params.density": "count",
             "clients": 18
@@ -11326,6 +11564,11 @@
         "row_sha256": "3749e5e223e504e79b7b5422174ef177f6f3b21d58ebc39971c9c2b4db85fd09"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "the security baseline before the first online playtest",
+        "why": "its run, R4, left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R4",
         "ML*",
@@ -12275,6 +12518,11 @@
         },
         {
           "name": "MAC safari",
+          "moved": {
+            "to": "Safari later",
+            "why": "Safari left the proof test (BROWSER-SET (a))",
+            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+          },
           "select": {
             "machine.role": "MAC",
             "params.suite": "cert-14d",
@@ -12372,6 +12620,11 @@
         "row_sha256": "f9606553f83e9fa2c151e6b0db50d669122ae3b318957d76ce64eba2cdd28548"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "the security baseline before the first online playtest",
+        "why": "its run, R4, left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R4",
         "ML*",
@@ -12482,6 +12735,11 @@
         "row_sha256": "feb2960c18ef757c65791e77a313fcdeda3ae19817b8b150d84740a47f4171e1"
       },
       "verdict": "pass",
+      "moved": {
+        "to": "the security baseline before the first online playtest",
+        "why": "its run, R4, left the proof test",
+        "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+      },
       "where": [
         "R4",
         "ML*",

@@ -1,5 +1,5 @@
 //! npt-judge: one verdict per mark from the runs' results logs and `marks.json` (plan §6.1): PASS, FAIL, INVALID,
-//! STAND-IN, REPORTED or NOT-RUN, with nearest-rank percentiles and exact fractions. `marks/README.md` is the
+//! STAND-IN, REPORTED, NOT-RUN or MOVED, with nearest-rank percentiles and exact fractions. `marks/README.md` is the
 //! contract it follows. It depends only on npt-log and serde (plan §4.2), so its verdicts never share code with what
 //! they judge.
 

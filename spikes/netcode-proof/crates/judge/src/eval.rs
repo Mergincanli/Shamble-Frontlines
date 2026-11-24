@@ -3,8 +3,8 @@
 
 use crate::figures;
 use crate::marks::{
-    Against, BoundNumber, Combine, Cond, Kind, Mark, Marks, Measure, Part, Rule, Source, Stat,
-    Threshold, Window,
+    Against, BoundNumber, Combine, Cond, Kind, Mark, Marks, Measure, Moved, Part, Rule, Source,
+    Stat, Threshold, Window,
 };
 use crate::practice;
 use crate::ratio::Ratio;
@@ -961,6 +961,7 @@ fn rule(
                 why.push(format!("pre:{id}: not in marks.json"));
                 return;
             };
+            // The loader refuses a precondition with a moved part or check, so every part and check of it counts.
             let matched = matched_parts(pre, run);
             let checks: Vec<&crate::marks::Check> = pre
                 .checks
@@ -1064,6 +1065,9 @@ pub enum VerdictKind {
     Reported,
     #[serde(rename = "NOT-RUN")]
     NotRun,
+    /// The mark, or a part, check or bite of it, left this test (README §2.6): never PASS, REPORTED or STAND-IN.
+    #[serde(rename = "MOVED")]
+    Moved,
 }
 
 impl fmt::Display for VerdictKind {
@@ -1075,6 +1079,7 @@ impl fmt::Display for VerdictKind {
             VerdictKind::StandIn => "STAND-IN",
             VerdictKind::Reported => "REPORTED",
             VerdictKind::NotRun => "NOT-RUN",
+            VerdictKind::Moved => "MOVED",
         })
     }
 }
@@ -1103,6 +1108,9 @@ pub struct PartOut {
     pub runs: Vec<RunOut>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub pooled: Vec<CheckOut>,
+    /// Where the part went, when it left this test: its verdict is MOVED and it holds no runs.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moved: Option<Moved>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -1115,6 +1123,8 @@ pub enum BiteStatus {
     Invalid,
     NotRun,
     Undecided,
+    /// It left this test: never evaluated, run or not.
+    Moved,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -1122,6 +1132,16 @@ pub struct BiteOut {
     pub id: String,
     pub status: BiteStatus,
     pub runs: Vec<RunOut>,
+    /// Where the bite went, when it left this test.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moved: Option<Moved>,
+}
+
+/// A check that left this test, by name, with where it went.
+#[derive(Debug, Clone, Serialize)]
+pub struct MovedCheck {
+    pub name: String,
+    pub moved: Moved,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -1145,10 +1165,17 @@ pub struct Verdict {
     pub bites: Vec<BiteOut>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub report: Vec<ReportOut>,
+    /// Where the whole mark went, when it left this test.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moved: Option<Moved>,
+    /// The mark's checks that left this test: skipped wherever checks are chosen.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub moved_checks: Vec<MovedCheck>,
 }
 
+/// A check counts for a part when it is kept (not moved: README §2.6) and names that part, or names none.
 fn applies(check: &crate::marks::Check, part: &str) -> bool {
-    check.parts.is_empty() || check.parts.iter().any(|p| p == part)
+    check.moved.is_none() && (check.parts.is_empty() || check.parts.iter().any(|p| p == part))
 }
 
 fn part_select(part: &Part) -> BTreeMap<String, Value> {
@@ -1380,6 +1407,7 @@ fn eval_part(
         why,
         runs,
         pooled,
+        moved: None,
     }
 }
 
@@ -1390,23 +1418,35 @@ fn eval_bite(
     all: &[Run<'_>],
     ctx: &Ctx<'_>,
 ) -> BiteOut {
-    let bite_runs: Vec<&Run<'_>> = serving
+    // A bite run that matches only moved parts is not a run of this test (README §5): it is left out, so it can
+    // neither show the bite nor miss it. A run that matches no part at all stays, judged on the mark-wide checks.
+    let kept_parts = |run: &Run<'_>| {
+        let matched = matched_parts(mark, run);
+        let kept: Vec<&Part> = matched
+            .iter()
+            .copied()
+            .filter(|p| p.moved.is_none())
+            .collect();
+        (matched.is_empty() || !kept.is_empty()).then_some(kept)
+    };
+    let bite_runs: Vec<(&Run<'_>, Vec<&Part>)> = serving
         .iter()
         .copied()
         .filter(|r| r.role == "bite" && r.bite == Some(bite.id.as_str()))
+        .filter_map(|r| kept_parts(r).map(|kept| (r, kept)))
         .collect();
     if bite_runs.is_empty() {
         return BiteOut {
             id: bite.id.clone(),
             status: BiteStatus::NotRun,
             runs: vec![],
+            moved: None,
         };
     }
     let mut outs = Vec::new();
     let mut statuses = Vec::new();
-    for run in bite_runs {
-        // A bite run takes the validity of the parts it matches (the advisor's B7 ruling).
-        let matched = matched_parts(mark, run);
+    for (run, matched) in bite_runs {
+        // A bite run takes the validity of the kept parts it matches (the advisor's B7 ruling).
         let rules = rules_of(mark, &matched);
         if let Some(expected) = bite.rule.as_deref() {
             // An expect-invalid bite: shown only when its run is INVALID by that one rule and holds every other.
@@ -1451,7 +1491,7 @@ fn eval_bite(
         }
         let checks = mark.checks.iter().filter(|c| {
             if matched.is_empty() {
-                c.parts.is_empty()
+                c.moved.is_none() && c.parts.is_empty()
             } else {
                 matched.iter().any(|p| applies(c, &p.name))
             }
@@ -1498,6 +1538,7 @@ fn eval_bite(
         id: bite.id.clone(),
         status,
         runs: outs,
+        moved: None,
     }
 }
 
@@ -1621,9 +1662,33 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
         parts: vec![],
         bites: vec![],
         report: vec![],
+        moved: mark.moved.clone(),
+        moved_checks: mark
+            .checks
+            .iter()
+            .filter_map(|c| {
+                c.moved.clone().map(|moved| MovedCheck {
+                    name: c.name.clone(),
+                    moved,
+                })
+            })
+            .collect(),
     };
+    // A mark moved whole (README §2.6) is never judged, whatever its runs hold: a pass here would not be its pass.
+    if let Some(m) = &mark.moved {
+        v.verdict = VerdictKind::Moved;
+        v.why.push(format!(
+            "{}; {} run(s) here list it: counted, not judged",
+            m.line(),
+            serving.len()
+        ));
+        return v;
+    }
     match mark.kind {
         Kind::Outside => {
+            // Outside this test from the start: it left before any trim, so it reads MOVED like the marks that
+            // left later.
+            v.verdict = VerdictKind::Moved;
             v.why
                 .push(format!("outside this change-set: {}", mark.notes));
             return v;
@@ -1638,6 +1703,18 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
     }
     let mut members: BTreeMap<String, Vec<&Run<'_>>> = BTreeMap::new();
     for part in &mark.parts {
+        // A moved part is never judged: no run of it can pass, fail or hold the mark.
+        if let Some(m) = &part.moved {
+            v.parts.push(PartOut {
+                name: part.name.clone(),
+                verdict: VerdictKind::Moved,
+                why: vec![format!("{}: {}", part.name, m.line())],
+                runs: vec![],
+                pooled: vec![],
+                moved: Some(m.clone()),
+            });
+            continue;
+        }
         let s = part_select(part);
         let m: Vec<&Run<'_>> = serving
             .iter()
@@ -1650,11 +1727,21 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
     v.bites = mark
         .bites
         .iter()
-        .map(|b| eval_bite(mark, b, &serving, all, ctx))
+        .map(|b| match &b.moved {
+            Some(m) => BiteOut {
+                id: b.id.clone(),
+                status: BiteStatus::Moved,
+                runs: vec![],
+                moved: Some(m.clone()),
+            },
+            None => eval_bite(mark, b, &serving, all, ctx),
+        })
         .collect();
     let part_is = |k: VerdictKind| v.parts.iter().any(|p| p.verdict == k);
     let bite_is = |s: BiteStatus| v.bites.iter().any(|b| b.status == s);
     let mut why = Vec::new();
+    // The order (README §3): what the kept parts and bites show comes first, so a kept failure, invalid run or
+    // missing run is never hidden; then MOVED, so a mark with a moved piece never reads PASS, REPORTED or STAND-IN.
     let kind = if part_is(VerdictKind::Fail) || bite_is(BiteStatus::Missed) {
         VerdictKind::Fail
     } else if part_is(VerdictKind::Invalid) || bite_is(BiteStatus::Invalid) {
@@ -1664,6 +1751,28 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
         || bite_is(BiteStatus::Undecided)
     {
         VerdictKind::NotRun
+    } else if mark.any_moved() {
+        // One line naming each moved piece and where it went: the summary line prints the first reason.
+        let pieces: Vec<String> = v
+            .parts
+            .iter()
+            .filter_map(|p| Some(format!("part {:?} to {}", p.name, p.moved.as_ref()?.to)))
+            .chain(
+                v.moved_checks
+                    .iter()
+                    .map(|c| format!("check {:?} to {}", c.name, c.moved.to)),
+            )
+            .chain(
+                v.bites
+                    .iter()
+                    .filter_map(|b| Some(format!("bite {} to {}", b.id, b.moved.as_ref()?.to))),
+            )
+            .collect();
+        why.push(format!(
+            "the kept parts hold; moved, never judged here: {}",
+            pieces.join("; ")
+        ));
+        VerdictKind::Moved
     } else if mark.kind == Kind::Reported {
         VerdictKind::Reported
     } else {
@@ -1699,7 +1808,7 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
                 "bite {}: undecided (a check cannot be computed yet)",
                 b.id
             )),
-            BiteStatus::Shown => None,
+            BiteStatus::Shown | BiteStatus::Moved => None,
         };
         let wanted = match kind {
             VerdictKind::Fail => b.status == BiteStatus::Missed,

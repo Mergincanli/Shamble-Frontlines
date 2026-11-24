@@ -25,6 +25,9 @@ struct RawMark {
     title: String,
     draft: Draft,
     verdict: String,
+    /// The whole mark left this test (README §2.6).
+    #[serde(default)]
+    moved: Option<Moved>,
     #[serde(default, rename = "where")]
     where_: Vec<String>,
     #[serde(default)]
@@ -59,10 +62,43 @@ pub struct Draft {
     pub row_sha256: String,
 }
 
+/// A mark, part, check or bite that left this test for a later one (README §2.6). The judge reports it MOVED and
+/// never judges it; its bar stays in the file as data for the test that takes it.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, serde::Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Moved {
+    /// Where it is judged instead.
+    pub to: String,
+    /// Why it left this test.
+    pub why: String,
+    /// The decision that moved it.
+    pub by: String,
+}
+
+impl Moved {
+    /// Each of the three says something: a blank one is refused.
+    fn check(&self) -> Result<(), String> {
+        for (name, text) in [("to", &self.to), ("why", &self.why), ("by", &self.by)] {
+            if text.trim().is_empty() {
+                return Err(format!("moved needs a {name} that is not blank"));
+            }
+        }
+        Ok(())
+    }
+
+    /// One line for a verdict's reasons.
+    pub fn line(&self) -> String {
+        format!("moved to {}: {} ({})", self.to, self.why, self.by)
+    }
+}
+
 #[derive(Debug, Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct RawPart {
     name: String,
+    /// The part left this test (README §2.6): its runs are counted, never judged.
+    #[serde(default)]
+    moved: Option<Moved>,
     #[serde(default)]
     select: BTreeMap<String, Value>,
     min: u32,
@@ -90,6 +126,9 @@ struct RawAgainst {
 #[serde(deny_unknown_fields)]
 struct RawCheck {
     name: String,
+    /// The check left this test (README §2.6); never on a reported statistic.
+    #[serde(default)]
+    moved: Option<Moved>,
     #[serde(default)]
     series: Option<String>,
     #[serde(default)]
@@ -130,6 +169,9 @@ struct RawCheck {
 #[serde(deny_unknown_fields)]
 pub struct Bite {
     pub id: String,
+    /// The bite left this test (README §2.6): it is never evaluated, run or not.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub moved: Option<Moved>,
     pub what: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expect: Option<String>,
@@ -283,6 +325,8 @@ pub struct Check {
     pub setup: bool,
     /// The check holds a number of the WebSocket bound, which the judge applies times the practice run's factor.
     pub ws_bound: Option<BoundNumber>,
+    /// The check left this test: the judge skips it wherever checks are chosen.
+    pub moved: Option<Moved>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -303,6 +347,8 @@ pub struct Part {
     pub min: u32,
     /// Rules for this part's runs, beside the mark's.
     pub validity: Vec<Rule>,
+    /// The part left this test: it reads MOVED and its runs are never judged.
+    pub moved: Option<Moved>,
 }
 
 /// A validity rule a mark or a part may name (README §4); the four that hold for every run are not listed.
@@ -399,6 +445,18 @@ pub struct Mark {
     pub ws_bound_line: Option<String>,
     pub readings: Vec<String>,
     pub notes: String,
+    /// The whole mark left this test: it reads MOVED, whatever its runs hold.
+    pub moved: Option<Moved>,
+}
+
+impl Mark {
+    /// Any piece of the mark left this test: the mark itself, a part, a check or a bite.
+    pub fn any_moved(&self) -> bool {
+        self.moved.is_some()
+            || self.parts.iter().any(|p| p.moved.is_some())
+            || self.checks.iter().any(|c| c.moved.is_some())
+            || self.bites.iter().any(|b| b.moved.is_some())
+    }
 }
 
 /// Every mark of one `marks.json`.
@@ -637,6 +695,15 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
             Some(n)
         }
     };
+    if let Some(m) = &c.moved {
+        m.check()?;
+        // The bound's line is compared with every ws_bound check of its mark, so none of them can leave alone.
+        if ws_bound.is_some() {
+            return Err(
+                "a ws_bound check cannot be moved: the bound's line holds its number".to_owned(),
+            );
+        }
+    }
     Ok(Check {
         name: c.name.clone(),
         measure,
@@ -647,10 +714,14 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
         pooled: c.pooled,
         setup: c.setup,
         ws_bound,
+        moved: c.moved.clone(),
     })
 }
 
 fn compile_report(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Report, String> {
+    if c.moved.is_some() {
+        return Err("a reported statistic decides nothing, so it cannot be moved".to_owned());
+    }
     if c.setup || c.ws_bound.is_some() {
         return Err(
             "a reported statistic decides nothing, so it is no setup or ws_bound check".to_owned(),
@@ -736,11 +807,15 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
                 Err(e) => errors.push(format!("part {:?}: {e}", p.name)),
             }
         }
+        if let Some(Err(e)) = p.moved.as_ref().map(Moved::check) {
+            errors.push(format!("part {:?}: {e}", p.name));
+        }
         parts.push(Part {
             name: p.name.clone(),
             select: p.select.clone(),
             min: p.min,
             validity: part_rules,
+            moved: p.moved.clone(),
         });
     }
     let mut checks = Vec::new();
@@ -851,8 +926,37 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
     if m.stand_in && m.id != "PM-0001-4" {
         errors.push("only PM-0001-4 has a stand-in verdict (plan §6.1)".to_owned());
     }
+    // Moved (README §2.6): said once, at the widest level that left, and never where the judge would not read it.
+    if let Some(Err(e)) = m.moved.as_ref().map(Moved::check) {
+        errors.push(e);
+    }
+    let moved_parts = m.parts.iter().filter(|p| p.moved.is_some()).count();
+    let moved_piece = moved_parts > 0
+        || m.checks.iter().any(|c| c.moved.is_some())
+        || m.bites.iter().any(|b| b.moved.is_some());
+    if m.moved.is_some() && moved_piece {
+        errors.push(
+            "moved on the mark and on a part, check or bite of it: a mark moved whole says it once"
+                .to_owned(),
+        );
+    }
+    if kind == Kind::Outside && (m.moved.is_some() || moved_piece) {
+        errors.push("an outside mark reads MOVED by its kind: it takes no moved label".to_owned());
+    }
+    if kind == Kind::Person && moved_parts > 0 {
+        errors.push(
+            "a person's mark is judged whole, from its person record: move the mark, not a part"
+                .to_owned(),
+        );
+    }
+    if moved_parts > 0 && moved_parts == m.parts.len() {
+        errors.push("every part is moved: move the mark instead".to_owned());
+    }
     let mut bite_ids = BTreeSet::new();
     for b in &m.bites {
+        if let Some(Err(e)) = b.moved.as_ref().map(Moved::check) {
+            errors.push(format!("bite {:?}: {e}", b.id));
+        }
         if !bite_ids.insert(b.id.as_str()) || !b.id.starts_with(&format!("{}/", m.id)) {
             errors.push(format!(
                 "bite {:?} is twice, or does not start with \"{}/\"",
@@ -902,6 +1006,7 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
             ws_bound_line: m.ws_bound_line.clone(),
             readings: m.readings.clone(),
             notes: m.notes.clone(),
+            moved: m.moved.clone(),
         })
     } else {
         Err(errors)
@@ -950,6 +1055,18 @@ pub fn parse(text: &str) -> Result<Marks, Vec<String>> {
         {
             if let Rule::Pre(id) = r {
                 match marks.iter().find(|x| &x.id == id) {
+                    // A precondition is judged whole: with the mark, a part or a check of it moved, the runs that
+                    // rest on it would be valid on less than the mark asks.
+                    Some(pre)
+                        if pre.moved.is_some()
+                            || pre.parts.iter().any(|p| p.moved.is_some())
+                            || pre.checks.iter().any(|c| c.moved.is_some()) =>
+                    {
+                        errors.push(format!(
+                            "{}: precondition {id} is moved, or has a moved part or check; a precondition is judged whole",
+                            m.id
+                        ))
+                    }
                     Some(pre) if pre.kind == Kind::Pass && !has_pre(pre) => {}
                     Some(_) => errors.push(format!(
                         "{}: precondition {id} must be a pass mark with no precondition of its own",
@@ -1030,6 +1147,152 @@ mod tests {
         let errors = parse(&text).expect_err("must fail");
         assert_eq!(errors.len(), 7, "{errors:#?}");
         assert!(errors.iter().all(|e| e.starts_with("PM-0001-4: ")));
+    }
+
+    const MOVED: &str = r#""moved":{"to":"Slice 3","why":"the human run left","by":"NPT-TRIM"}"#;
+    const S30: &str = r#"{"name":"S30","select":{"layer":"L2"},"min":3}"#;
+    const RD: &str = r#"{"name":"RD","select":{"machine.role":"RD"},"min":1}"#;
+    const CHECK: &str = r#"{"name":"p99","series":"tick.v.w","stat":"p99","op":"<=","value":1}"#;
+    const MAX: &str = r#"{"name":"max","series":"tick.v.w","stat":"max","op":"<=","value":1}"#;
+    const BITE: &str = r#"{"id":"PM-0001-4/B-S","what":"a busy-wait"}"#;
+
+    /// A JSON object's text with `label` (a `"moved":{…}` member) put first.
+    fn with(label: &str, object: &str) -> String {
+        format!("{{{label},{}", &object[1..])
+    }
+
+    /// A pass mark: `head` (members ending in a comma, or nothing), then these parts, checks and bites.
+    fn pass(head: &str, parts: &[&str], checks: &[&str], bites: &[&str]) -> String {
+        let (parts, checks, bites) = (parts.join(","), checks.join(","), bites.join(","));
+        mark(&format!(
+            r#"{head}"verdict":"pass","parts":[{parts}],"checks":[{checks}],"bites":[{bites}]"#
+        ))
+    }
+
+    /// The label is read on a mark, a part, a check and a bite, and comes through to the compiled mark.
+    #[test]
+    fn a_moved_label_is_read_at_each_level() {
+        let head = format!("{MOVED},");
+        let whole = parse(&file(&pass(&head, &[S30], &[CHECK], &[]))).expect("compiles");
+        let label = whole.marks[0].moved.as_ref().expect("the mark's label");
+        assert_eq!(
+            label.line(),
+            "moved to Slice 3: the human run left (NPT-TRIM)"
+        );
+        let (rd, check, bite) = (with(MOVED, RD), with(MOVED, CHECK), with(MOVED, BITE));
+        let pieces =
+            parse(&file(&pass("", &[S30, &rd], &[&check, MAX], &[&bite]))).expect("compiles");
+        let m = &pieces.marks[0];
+        assert!(m.moved.is_none() && m.any_moved());
+        assert!(m.parts[0].moved.is_none() && m.parts[1].moved.is_some());
+        assert!(m.checks[0].moved.is_some() && m.checks[1].moved.is_none());
+        assert!(m.bites[0].moved.is_some());
+        let kept = parse(&file(&pass("", &[S30], &[CHECK], &[]))).expect("compiles");
+        assert!(!kept.marks[0].any_moved() && whole.marks[0].any_moved());
+    }
+
+    /// What the loader refuses about `moved` (README §2.6), each by its own message.
+    #[test]
+    fn moved_labels_are_refused_where_the_judge_would_not_read_them() {
+        let head = format!("{MOVED},");
+        let (rd, s30, check) = (with(MOVED, RD), with(MOVED, S30), with(MOVED, CHECK));
+        let whole = |head: &str| pass(head, &[S30], &[CHECK], &[]);
+        let no_by = MOVED.replace("NPT-TRIM", " ");
+        let report = with(MOVED, r#"{"name":"r","series":"tick.v.w","stat":"max"}"#);
+        let cases = [
+            (
+                whole(&head.replace("Slice 3", " ")),
+                "PM-0001-4: moved needs a to that is not blank",
+            ),
+            (
+                whole(&head.replace("the human run left", "")),
+                "moved needs a why that is not blank",
+            ),
+            (
+                whole(&head.replace(r#","by""#, r#","x":"","by""#)),
+                "unknown field `x`",
+            ),
+            (
+                whole(&head.replace(r#","by":"NPT-TRIM""#, "")),
+                "missing field `by`",
+            ),
+            (
+                mark(&format!(
+                    r#"{head}"verdict":"outside","notes":"the 60 Hz run""#
+                )),
+                "an outside mark reads MOVED by its kind",
+            ),
+            (
+                pass(&head, &[S30, &rd], &[CHECK], &[]),
+                "a mark moved whole says it once",
+            ),
+            (
+                pass("", &[&s30, &rd], &[CHECK], &[]),
+                "every part is moved: move the mark instead",
+            ),
+            (
+                mark(&format!(r#""verdict":"person","parts":[{S30},{rd}]"#)),
+                "a person's mark is judged whole",
+            ),
+            (
+                mark(&format!(
+                    r#""verdict":"reported","parts":[{S30}],"report":[{report}]"#
+                )),
+                "a reported statistic decides nothing, so it cannot be moved",
+            ),
+            (
+                pass(
+                    "",
+                    &[S30, &rd.replace("the human run left", " ")],
+                    &[CHECK],
+                    &[],
+                ),
+                "part \"RD\": moved needs a why that is not blank",
+            ),
+            (
+                pass("", &[S30], &[&check.replace("Slice 3", "")], &[]),
+                "check \"p99\": moved needs a to that is not blank",
+            ),
+            (
+                pass("", &[S30], &[CHECK], &[&with(&no_by, BITE)]),
+                "bite \"PM-0001-4/B-S\": moved needs a by that is not blank",
+            ),
+        ];
+        for (text, why) in cases {
+            let errors = parse(&file(&text)).expect_err(why);
+            assert!(errors.iter().any(|e| e.contains(why)), "{why}: {errors:?}");
+        }
+        // A moved check that holds the WebSocket bound: the bound's line would no longer agree with its checks.
+        let checks = format!("{},{Y},{Z}", with(MOVED, X));
+        let errors = parse(&ws_mark("ws-practice:1.10", Some(LINE), &checks)).expect_err("refused");
+        let why = "a ws_bound check cannot be moved";
+        assert!(errors.iter().any(|e| e.contains(why)), "{errors:?}");
+    }
+
+    /// A precondition is judged whole: a mark that names `pre:<mark>` is refused when that mark is moved, or has a
+    /// moved part or check; a moved bite of it changes none of its checks, so it is let through.
+    #[test]
+    fn a_precondition_with_a_moved_piece_is_refused() {
+        let user = pass(r#""validity":["pre:PM-0001-2"],"#, &[S30], &[CHECK], &[]);
+        let head = format!("{MOVED},");
+        let (rd, check) = (with(MOVED, RD), with(MOVED, CHECK));
+        let bite = with(MOVED, &BITE.replace("PM-0001-4", "PM-0001-2"));
+        let why = "precondition PM-0001-2 is moved, or has a moved part or check";
+        for (pre, refused) in [
+            (pass("", &[S30], &[CHECK], &[]), false),
+            (pass("", &[S30], &[CHECK], &[&bite]), false),
+            (pass(&head, &[S30], &[CHECK], &[]), true),
+            (pass("", &[S30, &rd], &[CHECK], &[]), true),
+            (pass("", &[S30], &[&check, MAX], &[]), true),
+        ] {
+            let pre = pre.replacen("PM-0001-4", "PM-0001-2", 1);
+            let got = parse(&file(&format!("{pre},{user}")));
+            let said = got
+                .as_ref()
+                .err()
+                .is_some_and(|errors| errors.iter().any(|e| e.contains(why)));
+            assert_eq!((got.is_err(), said), (refused, refused), "{pre}");
+        }
     }
 
     #[test]

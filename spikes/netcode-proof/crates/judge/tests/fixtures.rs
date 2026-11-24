@@ -2,6 +2,7 @@
 //! FAIL and INVALID, PM-0006-14's short padding among them. `fixtures/README.md` lists the cases.
 
 use npt_judge::eval::{BiteStatus, Verdict};
+use npt_judge::marks::{Kind, Mark};
 use npt_judge::{VerdictKind, judge, parse_marks, read_logs};
 use std::collections::BTreeMap;
 use std::path::PathBuf;
@@ -10,12 +11,19 @@ fn root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
 }
 
+fn marks_text() -> String {
+    std::fs::read_to_string(root().join("../../marks/marks.json")).expect("marks/marks.json")
+}
+
 /// Judges one case: the mark's base logs, with the case's files replacing those of the same name.
 fn verdict(mark: &str, case: &str) -> Verdict {
-    let text =
-        std::fs::read_to_string(root().join("../../marks/marks.json")).expect("marks/marks.json");
+    verdict_with(&marks_text(), mark, case).expect("marks.json compiles")
+}
+
+/// The same with this marks text (the real file, or the real file with a label added); the loader's refusal as `Err`.
+fn verdict_with(text: &str, mark: &str, case: &str) -> Result<Verdict, Vec<String>> {
     // The whole file: a mark's preconditions (pre:PM-0001-2) are other marks of it.
-    let marks = parse_marks(&text).expect("marks.json compiles");
+    let marks = parse_marks(text)?;
     let index = marks
         .marks
         .iter()
@@ -44,7 +52,7 @@ fn verdict(mark: &str, case: &str) -> Verdict {
                 .unwrap_or_else(|e| panic!("{}: {e}", path.display())),
         );
     }
-    judge(&marks, &logs).remove(index)
+    Ok(judge(&marks, &logs).remove(index))
 }
 
 fn says(v: &Verdict, text: &str) -> bool {
@@ -102,10 +110,12 @@ fn pm_0001_4_is_invalid_when_v_s_breaks() {
     );
 }
 
+/// PM-0006-14 after the trim: its N = 36 and N = 18 parts moved to slice 6, so the padded N = 48 session reads MOVED
+/// (never REPORTED, and no longer NOT-RUN waiting for the other two counts).
 #[test]
-fn pm_0006_14_counts_a_padded_session_and_waits_for_the_other_n() {
+fn pm_0006_14_counts_a_padded_session_and_its_other_n_moved() {
     let v = verdict("PM-0006-14", "base");
-    assert_eq!(v.verdict, VerdictKind::NotRun, "{:?}", v.why);
+    assert_eq!(v.verdict, VerdictKind::Moved, "{:?}", v.why);
     assert_eq!(v.parts[0].name, "N=48");
     assert_eq!(
         v.parts[0].verdict,
@@ -114,10 +124,21 @@ fn pm_0006_14_counts_a_padded_session_and_waits_for_the_other_n() {
         v.parts[0].why
     );
     assert!(
-        says(&v, "N=36: 0 of 1 valid runs") && says(&v, "N=18: 0 of 1 valid runs"),
+        says(
+            &v,
+            "moved, never judged here: part \"N=36\" to slice 6, on the real sim; part \"N=18\" to slice 6, on the real sim"
+        ),
         "{:?}",
         v.why
     );
+    assert!(
+        v.parts[1..]
+            .iter()
+            .all(|p| p.verdict == VerdictKind::Moved && p.runs.is_empty()),
+        "{:?}",
+        v.parts
+    );
+    assert!(!v.report.is_empty(), "the N = 48 count is still reported");
 }
 
 #[test]
@@ -597,5 +618,146 @@ fn the_fixtures_read_through_the_command_line_folder_reader_too() {
             logs.iter().all(|l| l.footer.is_some()),
             "every fixture log is complete"
         );
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// MOVED on the real marks.json (README §2.6; the trim of 2026-11-21 and its re-plan).
+
+/// What the trim moved, read from the real file, so a label lost or added by mistake fails here by name: the marks
+/// moved whole, the three outside from the start, and the kept marks with a moved part, check or bite.
+#[test]
+fn the_real_marks_file_labels_what_the_trim_moved() {
+    let marks = parse_marks(&marks_text()).expect("marks.json compiles");
+    // Ids in the file's order, without their "PM-000" start, joined by spaces.
+    let ids = |keep: &dyn Fn(&Mark) -> bool| -> String {
+        let kept = marks.marks.iter().filter(|m| keep(m));
+        let short: Vec<&str> = kept.map(|m| m.id.trim_start_matches("PM-000")).collect();
+        short.join(" ")
+    };
+    let whole = ids(&|m| m.moved.is_some());
+    let outside = ids(&|m| m.kind == Kind::Outside);
+    let in_part = ids(&|m| m.moved.is_none() && m.any_moved());
+    assert_eq!(
+        whole,
+        "1-25 1-32 1-33 1-34 1-35 1-41 1-42 1-60 1-43 1-44 1-45 1-46 1-61 1-47 1-48 1-49 1-50 1-51 1-52 \
+         1-62 1-53 1-54 1-55 6-15 6-26 6-27"
+    );
+    assert_eq!(outside, "1-39 1-40 1-63");
+    assert_eq!(
+        in_part,
+        "1-1 1-3 1-14 1-58 1-19 1-28 1-29 1-31 1-36 1-56 6-14 6-25"
+    );
+    let count = |of: &dyn Fn(&Mark) -> usize| marks.marks.iter().map(of).sum::<usize>();
+    let parts = count(&|m| m.parts.iter().filter(|p| p.moved.is_some()).count());
+    let checks = count(&|m| m.checks.iter().filter(|c| c.moved.is_some()).count());
+    let bites = count(&|m| m.bites.iter().filter(|b| b.moved.is_some()).count());
+    assert_eq!((parts, checks, bites), (21, 2, 1));
+    // With no log at all, the 29 read MOVED and every other mark NOT-RUN: a kept mark with a moved piece still waits
+    // for its kept parts, so MOVED never stands in for a run that is missing.
+    for v in judge(&marks, &[]) {
+        let id = v.mark.trim_start_matches("PM-000");
+        let left = whole.split(' ').chain(outside.split(' ')).any(|x| x == id);
+        let want = if left {
+            VerdictKind::Moved
+        } else {
+            VerdictKind::NotRun
+        };
+        assert_eq!(v.verdict, want, "{}: {:?}", v.mark, v.why);
+    }
+}
+
+fn label() -> serde_json::Value {
+    serde_json::json!({"to": "a later test", "why": "a test's label", "by": "tests/fixtures.rs"})
+}
+
+/// The real marks.json with one mark's entry edited.
+fn edited(mark: &str, edit: &dyn Fn(&mut serde_json::Value)) -> String {
+    let mut file: serde_json::Value = serde_json::from_str(&marks_text()).expect("marks.json");
+    let entry = file["marks"]
+        .as_array_mut()
+        .expect("marks")
+        .iter_mut()
+        .find(|m| m["id"] == mark)
+        .unwrap_or_else(|| panic!("{mark} is in marks.json"));
+    edit(entry);
+    file.to_string()
+}
+
+fn count_of(mark: &str, list: &str) -> usize {
+    let file: serde_json::Value = serde_json::from_str(&marks_text()).expect("marks.json");
+    let entry = file["marks"].as_array().expect("marks").iter();
+    entry
+        .filter(|m| m["id"] == mark)
+        .map(|m| m[list].as_array().map_or(0, Vec::len))
+        .sum()
+}
+
+/// The property (the re-plan's): a label added anywhere on a mark that passes today never reads PASS. On the two
+/// committed cases that read PASS with the real file, each position in turn: the mark, each part, each check, each
+/// bite. It reads MOVED; or FAIL where the labelled check was the one the mark's bite fails, so the kept bite now
+/// passes every kept check. A position the loader refuses (the mark's only part) is counted, never judged.
+#[test]
+fn a_label_anywhere_on_a_passing_mark_never_reads_pass() {
+    for (mark, case) in [("PM-0001-4", "base"), ("PM-0006-11", "base")] {
+        assert_eq!(verdict(mark, case).verdict, VerdictKind::Pass, "{mark}");
+        let mut positions: Vec<Option<(&str, usize)>> = vec![None];
+        for list in ["parts", "checks", "bites"] {
+            positions.extend((0..count_of(mark, list)).map(|i| Some((list, i))));
+        }
+        let (mut moved, mut missed, mut refused) = (0, 0, 0);
+        for at in &positions {
+            let text = edited(mark, &|m| match at {
+                None => m["moved"] = label(),
+                Some((list, i)) => m[*list][*i]["moved"] = label(),
+            });
+            match verdict_with(&text, mark, case) {
+                Ok(v) if v.verdict == VerdictKind::Moved => moved += 1,
+                Ok(v) => {
+                    let bite_missed = v.verdict == VerdictKind::Fail
+                        && v.why.iter().all(|w| w.contains("did not fail"))
+                        && matches!(at, Some(("checks", _)));
+                    assert!(bite_missed, "{mark} {at:?}: {} {:?}", v.verdict, v.why);
+                    missed += 1;
+                }
+                Err(errors) => {
+                    assert!(
+                        matches!(at, Some(("parts", _)))
+                            && errors.iter().any(|e| e.contains("every part is moved")),
+                        "{mark} {at:?}: {errors:?}"
+                    );
+                    refused += 1;
+                }
+            }
+        }
+        assert_eq!(moved + missed + refused, positions.len());
+        assert!(
+            moved >= 3 && missed == 1 && refused == 1,
+            "{mark}: {moved}, {missed}, {refused}"
+        );
+    }
+}
+
+/// The other half of the order: a kept FAIL or INVALID still shows. On committed cases that read FAIL or INVALID from
+/// a kept part, a label on each bite in turn leaves the verdict as it was.
+#[test]
+fn a_moved_bite_hides_no_kept_failure_or_invalid_run() {
+    for (mark, case, kind) in [
+        ("PM-0001-4", "fail", VerdictKind::Fail),
+        ("PM-0001-4", "fail-with-gap", VerdictKind::Fail),
+        ("PM-0001-4", "invalid", VerdictKind::Invalid),
+        ("PM-0001-4", "load-short", VerdictKind::Invalid),
+        ("PM-0006-11", "unnamed", VerdictKind::Fail),
+        ("PM-0001-17", "differ", VerdictKind::Fail),
+        ("PM-0001-17", "sparse", VerdictKind::Invalid),
+    ] {
+        assert_eq!(verdict(mark, case).verdict, kind, "{mark} {case}");
+        let bites = count_of(mark, "bites");
+        assert!(bites > 0, "{mark} has a bite to label");
+        for i in 0..bites {
+            let text = edited(mark, &|m| m["bites"][i]["moved"] = label());
+            let v = verdict_with(&text, mark, case).expect("a moved bite compiles");
+            assert_eq!(v.verdict, kind, "{mark} {case}, bite {i}: {:?}", v.why);
+        }
     }
 }

@@ -14,7 +14,7 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
 | PM-0001-4 | `fail-with-gap` | run 2 is over 16.67 ms and also lacks its overrun counter: the failure stands, the gap listed beside it | FAIL |
 | PM-0001-30 | `base` | the validity bite: a replay with one command past its tick; its run comes out INVALID by `late-zero` alone | bite shown |
 | PM-0001-30 | `missed` | the same bite run with no late command counted: the validity check let it through | FAIL |
-| PM-0006-14 | `base` | the N = 48 session: both bracket runs and one count run padded to 8.33 ms on every tick; N = 36 and 18 not run | NOT-RUN |
+| PM-0006-14 | `base` | the N = 48 session: both bracket runs and one count run padded to 8.33 ms on every tick; its N = 36 and N = 18 parts are moved (`marks/README.md` §2.6), so the mark reads MOVED, with N = 48's count reported | MOVED |
 | PM-0006-14 | `short` | one measured tick of the count run padded to 8.329 ms, short of 8.33 ms | INVALID |
 | PM-0001-4 | `measured-bites-build` | C4: run 1's room log comes from a bites build, naming no bite | INVALID |
 | PM-0001-4 | `measured-names-bite` | C4: run 2 is a measured run that names the B-S bite | INVALID |
@@ -56,6 +56,12 @@ are built in code and judged with the real `marks/marks.json` in `tests/engine.r
 `u4j_ws_one_practice_run_per_build_over_every_set`, `u4j_ws_a_bite_run_takes_its_counted_runs_practice_run`,
 `u4j_ws_the_record_carries_the_marks_bound_line`, `u4j_ws_the_tolerance_and_band_boundaries`).
 
-PM-0006-14 has no pass number, so it is never PASS or FAIL: with all three N run and padded right it is REPORTED
-(the engine tests cover that path); its fixture proves that short padding comes out INVALID (ADR 0006's PM-0006-14 row:
-"npt-judge's fixtures prove that short padding comes out INVALID").
+PM-0006-14 has no pass number, so it is never PASS or FAIL. With the real `marks/marks.json` its N = 36 and N = 18
+parts are moved, so its padded N = 48 session reads MOVED (the `base` case); REPORTED is covered by the engine tests,
+on made-up marks with no moved part. Its fixture proves that short padding comes out INVALID (ADR 0006's PM-0006-14
+row: "npt-judge's fixtures prove that short padding comes out INVALID").
+
+MOVED with the real `marks/marks.json` (`tests/fixtures.rs`): which marks, parts, checks and bites the file labels
+(`the_real_marks_file_labels_what_the_trim_moved`); a label added at every position of a passing case never reads PASS
+(`a_label_anywhere_on_a_passing_mark_never_reads_pass`, on PM-0001-4 `base` and PM-0006-11 `base`); and a label on a
+bite hides no kept FAIL or INVALID (`a_moved_bite_hides_no_kept_failure_or_invalid_run`).

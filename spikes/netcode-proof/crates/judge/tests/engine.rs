@@ -620,8 +620,9 @@ fn person_and_outside_marks() {
         verdict_of(&[person], &[checklist("maybe")]).0,
         VerdictKind::Invalid
     );
+    // Outside this test from the start: it left before any trim, and reads MOVED (README §2.6), never NOT-RUN.
     let (k, why) = verdict_of(&[outside], &[]);
-    assert_eq!(k, VerdictKind::NotRun);
+    assert_eq!(k, VerdictKind::Moved);
     assert!(why[0].starts_with("outside this change-set"));
 }
 
@@ -2818,4 +2819,314 @@ fn u4j_ws_a_bite_run_takes_its_counted_runs_practice_run() {
     let bite = ws_bite(&v);
     assert_eq!(bite.status, BiteStatus::Shown, "{:?}", bite.runs);
     assert_eq!(check_c(&bite.runs[0]), check_c(&part.runs[0]));
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// MOVED (README §2.6): a mark, part, check or bite that left this test is never judged and never reads PASS.
+
+fn moved() -> Value {
+    json!({"to": "Slice 3", "why": "the human run left", "by": "NPT-TRIM"})
+}
+
+/// The tick-budget mark with two parts: "S30" (profile P2, three runs) and "P3" (profile P3, one run), given here.
+fn two_parts(p3_extra: Value, extra: Value) -> Value {
+    let mut p3 = json!({"name": "P3", "select": {"profile": "P3"}, "min": 1});
+    if let (Some(p), Some(e)) = (p3.as_object_mut(), p3_extra.as_object()) {
+        p.extend(e.clone());
+    }
+    let mut m = tick_mark(
+        M,
+        json!({"bites": [], "parts": [{"name": "S30", "select": {"profile": "P2"}, "min": 3}, p3]}),
+    );
+    if let (Some(m), Some(e)) = (m.as_object_mut(), extra.as_object()) {
+        m.extend(e.clone());
+    }
+    m
+}
+
+/// One measured run at this profile with these work times; an empty list gives a run with no tick record (a gap).
+fn profile_run(id: &'static str, profile: &'static str, work: &[i64]) -> Log {
+    let mut s = LogSpec::room(id, "set-a", M).ticks("work_ns", work);
+    s.profile = profile;
+    s.build()
+}
+
+/// A bite run of the B-S bite at this profile.
+fn profile_bite(profile: &'static str, work: &[i64]) -> Log {
+    let mut s = LogSpec::room("bite-1", "set-a", M).ticks("work_ns", work);
+    s.role = "bite";
+    s.bite = Some("PM-0001-4/B-S");
+    s.profile = profile;
+    s.build()
+}
+
+#[test]
+fn a_mark_moved_whole_is_never_judged() {
+    let mark = tick_mark(M, json!({"moved": moved()}));
+    // Passing runs with a shown bite, failing runs, and no run at all: MOVED each time, with no part or bite judged.
+    let mut passing = three_runs(M, [90, 95, 100]);
+    passing.push(bite_run(M, "PM-0001-4/B-S", "set-a", &[10, 150]));
+    for (logs, listed) in [
+        (passing, 4),
+        (three_runs(M, [90, 101, 100]), 3),
+        (vec![], 0),
+    ] {
+        let v = judge(&marks_file(std::slice::from_ref(&mark)), &logs);
+        assert_eq!(v[0].verdict, VerdictKind::Moved, "{:?}", v[0].why);
+        assert_eq!(
+            v[0].why,
+            [format!(
+                "moved to Slice 3: the human run left (NPT-TRIM); {listed} run(s) here list it: counted, not judged"
+            )]
+        );
+        assert!(v[0].parts.is_empty() && v[0].bites.is_empty());
+        assert_eq!(v[0].moved.as_ref().map(|m| m.to.as_str()), Some("Slice 3"));
+    }
+    // The same mark kept: the failing runs fail it, so the label is what stops the judging.
+    let (k, _) = verdict_of(
+        &[tick_mark(M, json!({"bites": []}))],
+        &three_runs(M, [90, 101, 100]),
+    );
+    assert_eq!(k, VerdictKind::Fail);
+    // A person's mark moved whole: a recorded "fail" is not read.
+    let person = json!({"id": "PM-0001-53", "title": "looks correct", "draft": draft(), "verdict": "person",
+                        "moved": moved()});
+    let mut s = LogSpec::room("mp-1", "set-mp", "PM-0001-53");
+    s.events = vec![
+        EventRecord::new("person", Phase::Measured)
+            .with("who", "Mustafa")
+            .with("mark", "PM-0001-53")
+            .with("verdict", "fail"),
+    ];
+    assert_eq!(verdict_of(&[person], &[s.build()]).0, VerdictKind::Moved);
+}
+
+#[test]
+fn a_moved_part_is_never_judged_and_the_kept_parts_still_decide() {
+    let mark = two_parts(json!({"moved": moved()}), json!({}));
+    let s30 = |worst: [i64; 3]| -> Vec<Log> {
+        vec![
+            profile_run("run-1", "P2", &[10, 20, worst[0]]),
+            profile_run("run-2", "P2", &[10, 20, worst[1]]),
+            profile_run("run-3", "P2", &[10, 20, worst[2]]),
+        ]
+    };
+    // The kept part passes: MOVED, whatever the moved part's runs hold (none, a failure, a gap).
+    for p3 in [None, Some(vec![500]), Some(vec![])] {
+        let mut logs = s30([90, 95, 100]);
+        logs.extend(p3.map(|work| profile_run("p3-1", "P3", &work)));
+        let v = judge(&marks_file(std::slice::from_ref(&mark)), &logs);
+        assert_eq!(v[0].verdict, VerdictKind::Moved, "{:?}", v[0].why);
+        assert_eq!(
+            v[0].why[0],
+            "the kept parts hold; moved, never judged here: part \"P3\" to Slice 3"
+        );
+        assert_eq!(v[0].parts[0].verdict, VerdictKind::Pass);
+        let p3 = &v[0].parts[1];
+        assert_eq!(p3.verdict, VerdictKind::Moved);
+        assert!(p3.runs.is_empty(), "a moved part's runs are never judged");
+        assert_eq!(
+            p3.why,
+            ["P3: moved to Slice 3: the human run left (NPT-TRIM)"]
+        );
+    }
+    // The kept part fails, has a gap, or lacks a run: FAIL, INVALID and NOT-RUN still show.
+    let (k, why) = verdict_of(std::slice::from_ref(&mark), &s30([90, 101, 100]));
+    assert_eq!(k, VerdictKind::Fail);
+    assert_eq!(why, ["S30: run run-2: tick p99 = 101, needs <= 100"]);
+    let mut gap = s30([90, 95, 100]);
+    gap[1] = profile_run("run-2", "P2", &[]);
+    let (k, why) = verdict_of(std::slice::from_ref(&mark), &gap);
+    assert_eq!(k, VerdictKind::Invalid);
+    assert!(why[0].contains("run run-2: a gap in the record"), "{why:?}");
+    let two: Vec<Log> = s30([90, 95, 100]).into_iter().take(2).collect();
+    let (k, why) = verdict_of(std::slice::from_ref(&mark), &two);
+    assert_eq!(k, VerdictKind::NotRun);
+    assert_eq!(why, ["S30: 2 of 3 valid runs"]);
+    // The same mark with "P3" kept and unrun: NOT-RUN, so the label is what makes it MOVED.
+    let (k, why) = verdict_of(&[two_parts(json!({}), json!({}))], &s30([90, 95, 100]));
+    assert_eq!(k, VerdictKind::NotRun);
+    assert_eq!(why, ["P3: 0 of 1 valid runs"]);
+}
+
+/// A moved check is skipped in each place checks are chosen (a part's plain checks, its pooled checks, its setup
+/// checks, a bite run's checks): beside each, the same check kept, which decides the mark.
+#[test]
+fn a_moved_check_is_skipped_wherever_checks_are_chosen() {
+    let kept = json!({"name": "tick p99", "series": "tick.v.work_ns", "stat": "p99", "op": "<=", "value": 100});
+    let with = |check: Value, bites: Value| {
+        tick_mark(M, json!({"checks": [kept.clone(), check], "bites": bites}))
+    };
+    let label = |mut check: Value| {
+        check["moved"] = moved();
+        check
+    };
+    let runs = three_runs(M, [90, 95, 100]);
+    let cases = [
+        (
+            "a plain check that fails",
+            json!({"name": "max", "series": "tick.v.work_ns", "stat": "max", "op": "<=", "value": 50}),
+            VerdictKind::Fail,
+        ),
+        (
+            "a plain check with a gap",
+            json!({"name": "absent", "series": "tick.v.absent_ns", "stat": "max", "op": "<=", "value": 50}),
+            VerdictKind::Invalid,
+        ),
+        (
+            "a pooled check that fails",
+            json!({"name": "pooled max", "series": "tick.v.work_ns", "stat": "max", "op": "<=", "value": 50,
+                   "pooled": true}),
+            VerdictKind::Fail,
+        ),
+        (
+            "a setup check that fails",
+            json!({"name": "setup", "series": "tick.v.work_ns", "stat": "min", "op": ">=", "value": 1000,
+                   "setup": true}),
+            VerdictKind::Invalid,
+        ),
+    ];
+    for (what, check, kept_verdict) in cases {
+        let (k, why) = verdict_of(&[with(check.clone(), json!([]))], &runs);
+        assert_eq!(k, kept_verdict, "{what}, kept: {why:?}");
+        let v = judge(&marks_file(&[with(label(check), json!([]))]), &runs);
+        assert_eq!(
+            v[0].verdict,
+            VerdictKind::Moved,
+            "{what}, moved: {:?}",
+            v[0].why
+        );
+        assert!(v[0].why[0].contains("check \""), "{:?}", v[0].why);
+        assert_eq!(v[0].moved_checks.len(), 1);
+        let judged = v[0].parts[0]
+            .runs
+            .iter()
+            .flat_map(|r| &r.checks)
+            .chain(&v[0].parts[0].pooled);
+        assert!(
+            judged.clone().count() == 3 && judged.clone().all(|c| c.name == "tick p99"),
+            "{what}"
+        );
+    }
+    // A bite run: it passes the kept check and fails only the moved one, so it did not show the bite. Kept, the
+    // same check is what the bite fails.
+    let bites = json!([{"id": "PM-0001-4/B-S", "what": "a busy-wait"}]);
+    let max =
+        json!({"name": "max", "series": "tick.v.work_ns", "stat": "max", "op": "<=", "value": 50});
+    let mut logs = three_runs(M, [40, 45, 50]);
+    logs.push(bite_run(M, "PM-0001-4/B-S", "set-a", &[10, 60]));
+    let (k, why) = verdict_of(&[with(max.clone(), bites.clone())], &logs);
+    assert_eq!(k, VerdictKind::Pass, "{why:?}");
+    let (k, why) = verdict_of(&[with(label(max), bites)], &logs);
+    assert_eq!(k, VerdictKind::Fail);
+    assert_eq!(
+        why,
+        ["bite PM-0001-4/B-S did not fail: the check cannot be shown to work"]
+    );
+}
+
+#[test]
+fn a_moved_bite_is_never_evaluated() {
+    let mark = tick_mark(
+        M,
+        json!({"bites": [{"id": "PM-0001-4/B-S", "moved": moved(), "what": "a busy-wait"}]}),
+    );
+    // With no run of it (NOT-RUN if kept) and with a run that passes every check (FAIL if kept): MOVED.
+    let mut missed = three_runs(M, [90, 95, 100]);
+    missed.push(bite_run(M, "PM-0001-4/B-S", "set-a", &[10, 20]));
+    for logs in [three_runs(M, [90, 95, 100]), missed] {
+        let v = judge(&marks_file(std::slice::from_ref(&mark)), &logs);
+        assert_eq!(v[0].verdict, VerdictKind::Moved, "{:?}", v[0].why);
+        assert_eq!(
+            v[0].why,
+            ["the kept parts hold; moved, never judged here: bite PM-0001-4/B-S to Slice 3"]
+        );
+        assert_eq!(v[0].bites[0].status, BiteStatus::Moved);
+        assert!(v[0].bites[0].runs.is_empty());
+    }
+    // A kept failure still shows past a moved bite.
+    let (k, _) = verdict_of(&[mark], &three_runs(M, [90, 101, 100]));
+    assert_eq!(k, VerdictKind::Fail);
+}
+
+/// A bite run that matches only moved parts is left out (it is not a run of this test); one that matches no part
+/// keeps today's rule and is judged on the mark-wide checks.
+#[test]
+fn a_bite_run_on_moved_parts_only_is_left_out() {
+    let mark = two_parts(
+        json!({"moved": moved()}),
+        json!({"bites": [{"id": "PM-0001-4/B-S", "what": "a busy-wait"}]}),
+    );
+    let s30 = || {
+        vec![
+            profile_run("run-1", "P2", &[10, 20, 90]),
+            profile_run("run-2", "P2", &[10, 20, 95]),
+            profile_run("run-3", "P2", &[10, 20, 100]),
+        ]
+    };
+    let with_bite = |profile: &'static str, work: &[i64]| {
+        let mut logs = s30();
+        logs.push(profile_bite(profile, work));
+        judge(&marks_file(std::slice::from_ref(&mark)), &logs).remove(0)
+    };
+    // On the moved part only: whether it would have shown the bite (150) or missed it (20), it is no run of the bite.
+    for work in [[10, 150], [10, 20]] {
+        let v = with_bite("P3", &work);
+        assert_eq!(v.verdict, VerdictKind::NotRun, "{:?}", v.why);
+        assert_eq!(v.why, ["bite PM-0001-4/B-S: no run yet"]);
+        assert_eq!(v.bites[0].status, BiteStatus::NotRun);
+        assert!(v.bites[0].runs.is_empty());
+    }
+    // Matching no part (profile P4): judged on the mark-wide check, shown or missed as before.
+    let v = with_bite("P4", &[10, 150]);
+    assert_eq!(
+        v.bites[0].status,
+        BiteStatus::Shown,
+        "{:?}",
+        v.bites[0].runs
+    );
+    assert_eq!(v.verdict, VerdictKind::Moved, "{:?}", v.why);
+    let v = with_bite("P4", &[10, 20]);
+    assert_eq!(v.bites[0].status, BiteStatus::Missed);
+    assert_eq!(v.verdict, VerdictKind::Fail);
+    // On the kept part: judged with that part's rules, as before.
+    let v = with_bite("P2", &[10, 150]);
+    assert_eq!(
+        v.bites[0].status,
+        BiteStatus::Shown,
+        "{:?}",
+        v.bites[0].runs
+    );
+}
+
+/// MOVED comes before REPORTED and STAND-IN: neither a reported mark nor a stand-in pass hides a moved part.
+#[test]
+fn moved_outranks_reported_and_stand_in() {
+    let stand_in = |p3: Value| two_parts(p3, json!({"stand_in": true}));
+    let mut logs = vec![
+        profile_run("run-1", "P2", &[10, 20, 90]),
+        profile_run("run-2", "P2", &[10, 20, 95]),
+        profile_run("run-3", "P2", &[10, 20, 100]),
+        profile_run("p3-1", "P3", &[10]),
+    ];
+    let mut s = LogSpec::room("run-1", "set-a", M).ticks("work_ns", &[10]);
+    s.params = vec![("sim", json!("stand-in"))];
+    logs[0] = s.build();
+    assert_eq!(
+        verdict_of(&[stand_in(json!({}))], &logs).0,
+        VerdictKind::StandIn
+    );
+    assert_eq!(
+        verdict_of(&[stand_in(json!({"moved": moved()}))], &logs).0,
+        VerdictKind::Moved
+    );
+    let mut density = density_mark();
+    density["parts"] = json!([{"name": "N48", "select": {"clients": 48}, "min": 1},
+                              {"name": "N36", "moved": moved(), "select": {"clients": 36}, "min": 1}]);
+    let v = judge(&marks_file(&[density]), &[density_run(false)]);
+    assert_eq!(v[0].verdict, VerdictKind::Moved, "{:?}", v[0].why);
+    assert_eq!(
+        v[0].report[0].value, "8330004",
+        "the kept part is still reported"
+    );
 }
