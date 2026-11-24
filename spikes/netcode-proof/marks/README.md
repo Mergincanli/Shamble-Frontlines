@@ -206,8 +206,11 @@ from the part's valid runs, never judged (B10).
 - `params.cmd_timing` (`A` or `B`, OQ-0001-6's options) and `params.cc` (`newreno` or `cubic`): start-up settings from
   the room unit's configuration (L2) or the scenario (L1), never changed during a run (A2).
 - `params.killed`: only on a room killed on purpose (PM-0001-27's SIGKILL, PM-0006-22's soak kill), and the exemption
-  from `complete` holds only if npt-super's log records that kill of that slot (built at U6: C4). PM-0001-59's crashed
-  rooms need none: their catch writes the `crash` footer.
+  from `complete` holds only if npt-super's log records that kill of that slot (C4). That check is not built yet:
+  npt-super writes no kill record today, so the judge exempts every log that says `killed`; its home is before R5's
+  -27 and PM-0006-22 runs. PM-0001-27's figure needs the killed room's run in the set, and reads the survivors'
+  ticks of phase `after`: the run script kills the room at the end of the measured window, so `after` begins at the
+  kill. PM-0001-59's crashed rooms need none: their catch writes the `crash` footer.
 - `hs` in a tick record: built at U4j, §1 (B15).
 - `params.burst_spacing_ns` (B1 runs of PM-0001-18): the scheduled interval between burst starts, before each burst's
   random offset; the practice run and its counted run must share it. `params.config_hz` (L2): RS's kernel CONFIG_HZ,

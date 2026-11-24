@@ -1602,6 +1602,61 @@ fn logging_cost_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
     }
 }
 
+/// The p99 of `tick.v.work_ns` over the room log's ticks of one phase (nearest rank). Gaps: the name in another
+/// process's log, no room log or more than one, a tick of that phase without it, no tick of that phase.
+fn work_p99(run: &Run<'_>, phase: Phase, label: &str) -> Result<Ratio, Lack> {
+    only_from(run, "room", "tick.v", "work_ns")?;
+    let ticks = room_log(run)?.ticks.iter().filter(|t| t.ph == phase);
+    let values: Option<Vec<i64>> = ticks.map(|t| t.v.get("work_ns").copied()).collect();
+    match values {
+        Some(v) if !v.is_empty() => Ok(stat_of(&Stat::Pct(Ratio::new(99, 100)), None, &v)),
+        Some(_) => Err(Lack::Gap(format!(
+            "run {}: no {label} tick in the room log (tick.v.work_ns)",
+            run.id
+        ))),
+        None => Err(Lack::Gap(format!(
+            "run {}: a {label} tick of the room log has no tick.v.work_ns",
+            run.id
+        ))),
+    }
+}
+
+/// PM-0001-27: a surviving room's p99 after the kill of another room of its set, against its own p99 before it:
+/// its ticks of phase `after` (the run script kills the room at the end of the measured window, so `after` begins
+/// at the kill) against its measured ticks. The kill is known by the killed room's run in the set (`params.killed`
+/// true): NOT-RUN while it is not there, a gap if the set has more than one. A measured p99 of 0 is a gap.
+fn kill_p99_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let run = i.run;
+    let mut killed = 0;
+    for r in i.set {
+        killed += usize::from(run_param(r, "killed")? == Some(&Value::Bool(true)));
+    }
+    match killed {
+        1 => {}
+        0 => {
+            return Err(Lack::Waiting(format!(
+                "run {}: the killed room's run (params.killed true) is not in set {} yet",
+                run.id, run.set
+            )));
+        }
+        n => {
+            return Err(Lack::Gap(format!(
+                "run {}: {n} runs of set {} say params.killed true; one room is killed",
+                run.id, run.set
+            )));
+        }
+    }
+    let before = work_p99(run, Phase::Measured, "measured")?;
+    let after = work_p99(run, Phase::After, "after-phase")?;
+    match before.num() {
+        0 => Err(Lack::Gap(format!(
+            "run {}: its measured p99 of tick.v.work_ns is 0",
+            run.id
+        ))),
+        num => Ok(after * Ratio::new(before.den(), num)),
+    }
+}
+
 /// A figure's computation over its [`Inputs`].
 pub type Compute = fn(&Inputs<'_, '_>) -> Result<Ratio, Lack>;
 
@@ -1775,14 +1830,14 @@ pub const FIGURES: &[Figure] = &[
         session_memory_growth_count,
         "the same rule on per-session memory, over halves (-24)",
     ),
-    planned(
+    built(
         "kill_p99_ratio",
-        "U6",
+        kill_p99_ratio,
         "the other rooms' p99 after the SIGKILL against before (-27)",
     ),
     planned(
         "rtt_agreement_p99_ns",
-        "U6",
+        "Slice 3: it moved with PM-0001-33",
         "p99 of |app RTT - quinn's rtt()| per second (-33)",
     ),
     built(

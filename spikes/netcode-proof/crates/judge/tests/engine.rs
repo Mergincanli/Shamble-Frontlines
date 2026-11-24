@@ -4603,3 +4603,60 @@ fn u6j_a_logging_off_run_holds_the_rules_every_run_holds() {
     );
     assert_eq!(logging_checks(&v), ["Gap -"; 3]);
 }
+
+/// One room of an 8-room session (set set-k): its measured and after-phase ticks' work, and whether it was killed.
+fn kill_room(id: &'static str, killed: bool, measured: &[i64], after: &[i64]) -> Log {
+    let mut s = LogSpec::room(id, "set-k", M);
+    let ticks = |ph: Phase, v: &[i64]| {
+        v.iter()
+            .map(|w| (ph, vec![("work_ns", *w)]))
+            .collect::<Vec<_>>()
+    };
+    s.ticks = [ticks(Measured, measured), ticks(After, after)].concat();
+    s.params.push(("killed", json!(killed)));
+    s.build()
+}
+
+#[test]
+fn u6j_a_surviving_rooms_p99_after_the_kill_against_before() {
+    // The check on the survivor `room-1`; the killed room is the set's evidence of the kill.
+    let ratio = |after: &[i64], with_killed: usize| {
+        let mut logs = vec![kill_room("room-1", false, &[90, 100], after)];
+        logs.extend(
+            [
+                kill_room("room-8", true, &[100], &[]),
+                kill_room("room-7", true, &[100], &[]),
+            ]
+            .into_iter()
+            .take(with_killed),
+        );
+        let mark = json!({
+            "id": M, "title": "kill", "draft": draft(), "verdict": "pass",
+            "parts": [{"name": "survivors", "select": {"params.killed": false}, "min": 1}],
+            "checks": [{"name": "c", "figure": "kill_p99_ratio", "op": "<=", "value": "1.05"}],
+            "bites": []
+        });
+        let v = judge(&marks_file(&[mark]), &logs).remove(0);
+        let c = &v.parts[0].runs[0].checks[0];
+        (
+            format!("{:?} {}", c.outcome, c.value.as_deref().unwrap_or("-")),
+            c.note.clone().unwrap_or_default(),
+        )
+    };
+    assert_eq!(ratio(&[80, 105], 1).0, "Pass 1.05");
+    // The before is the measured ticks alone: 106 after against 100, not against the run's 106 overall.
+    assert_eq!(ratio(&[80, 106], 1).0, "Fail 1.06");
+    assert_eq!(ratio(&[80, 95], 1).0, "Pass 0.95");
+    let none = (
+        "Gap -".to_owned(),
+        "run room-1: no after-phase tick in the room log (tick.v.work_ns)".to_owned(),
+    );
+    assert_eq!(ratio(&[], 1), none);
+    let wait = "run room-1: the killed room's run (params.killed true) is not in set set-k yet";
+    assert_eq!(
+        ratio(&[80, 105], 0),
+        ("Cannot -".to_owned(), wait.to_owned())
+    );
+    let two = "run room-1: 2 runs of set set-k say params.killed true; one room is killed";
+    assert_eq!(ratio(&[80, 105], 2), ("Gap -".to_owned(), two.to_owned()));
+}

@@ -70,3 +70,9 @@ MOVED with the real `marks/marks.json` (`tests/fixtures.rs`): which marks, parts
 (`the_real_marks_file_labels_what_the_trim_moved`); a label added at every position of a passing case never reads PASS
 (`a_label_anywhere_on_a_passing_mark_never_reads_pass`, on PM-0001-4 `base` and PM-0006-11 `base`); and a label on a
 bite hides no kept FAIL or INVALID (`a_moved_bite_hides_no_kept_failure_or_invalid_run`).
+
+U6j's figures (the 19 built in part b: -10, -12, -13, -15, -24, -27, -38, -59, PM-0006-17, -19 and -20's) have no
+fixture folder: no writer logs their series yet, so each is proven on logs made up in code, in `tests/engine.rs`
+(`u6j_...`, `alloc_twin_diff_count_...`), with a pass, a fail and a gap case, and a waiting case where it compares
+with a run not in the set yet. -19's join rule (C-U6-11) is there too (`c_u6_11_...`); -30's other-transport twins
+have the fixtures above.
