@@ -155,9 +155,9 @@
     (next 20:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
 - **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
   check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
-- **My step (18:2x):** round 2: netcode 3 Lows in the diff and 2 Mediums outside it, before R1 (the start-edge drop read
-  vs U8's equal-on-P1 rule, u8-build.patch:1708-1711; LG's DONE with no READY, caught by U8's READY gate :2190-2221);
-  test 1 Medium (TE-U6C-R2-4, the last second) and 7 Lows; security 2 Lows. Next: Fable, the ruling. The readings are DONE,
+- **My step (18:3x):** round 2: netcode 3 Lows in the diff, 2 Mediums outside it before R1 (the start-edge drop read;
+  LG's DONE with no READY, caught at U8's one load_up call :2218-2221); P1's +222 drops are in-window, a separate fact
+  (U8's equal-on-P1 rule, :1708-1711); test 1 Medium (TE-U6C-R2-4), 7 Lows; security 2 Lows. Ruling 22:5x. The readings are DONE,
   my own runs through u6c-run.sh, release builds (.gate/u6c/read-*.log):
   - DONE: the release build (read-build.log, exit 0). A2 over WebSocket (read-a2-ws.log, 14:08-14:09): 1 passed in
     70.8 s; npt-load READY then DONE, exit 0; the room exit 0; room memory peak 157,499,392 B; 5-31 inputs per client
