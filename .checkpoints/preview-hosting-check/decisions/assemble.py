@@ -36,6 +36,7 @@ appB = ("_Copied by script from the test repository's commits (`git show <commit
 card = open('.checkpoints/preview-hosting-check.md', encoding='utf-8').read()
 i = card.index('## Advisor tool consultations'); j = card.index('\n## ', i + 5)
 cons = card[i:j].split('\n', 1)[1].strip('\n')
+cons = cons.replace('d17d\u2026d8e7', "[the account ID's first and last four characters]")
 appC = ("_Copied by script from the checkpoint's section \"Advisor tool consultations\" (his words of 2026-11-11: when, the "
         "question, what changed; each called before the step it bore on was saved as done, except the slip of 2026-11-15 "
         "told under \"The process\")._\n\n" + cons + '\n')

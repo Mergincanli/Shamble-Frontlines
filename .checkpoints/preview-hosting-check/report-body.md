@@ -42,7 +42,7 @@ By the draft's rule the spike has not passed: one mark is not met as written (th
 count, and his verdict on step 4, which asks for that count). The departures change no reading.
 
 ## How it ran
-- **The plan** (`.checkpoints/preview-hosting-check/plan.md`, revision 2 at 2a2f426; readable at CARDSHA after the
+- **The plan** (`.checkpoints/preview-hosting-check/plan.md`, revision 2 at 2a2f426; readable at d28b8f1d4040 after the
   notes leave the branch): the advisor agent's review of revision 1 was APPROVE with conditions (A1 to A13, all folded
   into revision 2). His answers to its seven decisions (each (a)), his go and his yes to Part 7's six workflow texts by
   their sha256: 2026-11-15, 18:42:30 UTC.
@@ -133,7 +133,7 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
   and words, sitting 2's header files. The gate did not run for it (the toolkit was not installed); this chat ran it
   afterwards: PASS, the smoke test skipped (the branch changes only docs and notes).
 - The review notes (`.checkpoints/preview-hosting-check/*-review*.md`, `advisor-*.md`, `security-auditor-diag.md`,
-  `verifier-evidence.md`) are readable at CARDSHA.
+  `verifier-evidence.md`) are readable at d28b8f1d4040.
 
 ## The docs pass
 - `docs/DECISIONS.md`: his fourteen messages to this chat, from the task (2026-11-15, 15:33:37 UTC) to Day 2 (2026-11-24,
@@ -142,7 +142,7 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
   changed (RECORD-FILES). Commit 7c803a6.
 - His message of 2026-11-25 (lane 2 building beside lane 1; his question on change-set 6 and M before change-set 5) added
   the same way (20 lines), so that it outlives the checkpoint.
-- docs-keeper's pass (its notes, readable at CARDSHA, list every line): `docs/STATUS.md`, lane 2's lines (this pull
+- docs-keeper's pass (its notes, readable at d28b8f1d4040, list every line): `docs/STATUS.md`, lane 2's lines (this pull
   request in "In flight"; step 2.6's plan and his question of 2026-11-25 in "Next"; his three decisions, the probe's
   switch-off and the clean-up after the merge in "Waiting on Mustafa"; nine follow-ups named PHC-; two open risks,
   PHC-HEADER and PHC-PROBE-MAIL) and their texts in `docs/STATUS_ARCHIVE.md`. To keep STATUS within its 120 lines, the
@@ -162,7 +162,7 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
 - His answers since, in DECISIONS: PROJ-DRAW (a) and AIM-STATE (a) (2026-11-19, 00:01:25 UTC), and his words of
   2026-11-19, 12:00 (aiming down sights and the sprint-to-fire delay are game rules of Slice 1; the wishes W1 and W4 are
   needs now; the comment stays as it is). Change-set 10's plan starts from AIM-STATE's rule for the poses.
-- That checkpoint (`.checkpoints/lane2-needs.md` with its notes) is readable at CARDSHA.
+- That checkpoint (`.checkpoints/lane2-needs.md` with its notes) is readable at d28b8f1d4040.
 
 ## Decisions and deviations
 - **Machines** (his MACHINES (a)): GitHub's hosted runners stood in for the minimum laptop and the Mac; each run names
