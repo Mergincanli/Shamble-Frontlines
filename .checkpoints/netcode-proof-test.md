@@ -147,7 +147,7 @@
 - Disk (11-24 15:3x UTC): 10,504 MiB free (floor 4,096; a full check.mjs fills the dev profile to ~7.8 GB); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (the saver b74ohsd5l; 3 triggers, the ruling's trig_01C4uA49qe1c9RAnFZaLGa3T at 22:52; no agent):** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
+- **Running (3 triggers, the ruling's trig_01C4uA49qe1c9RAnFZaLGa3T at 22:52; no agent; saver ended 19:47, hand saves):** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
   aacd36781fdea65a0, security a307bdd231bf3e9b4, each APPROVE WITH FINDINGS, no Critical or High (u6c-r2-*.md, each
   ending DONE). A stopped agent resumes by SendMessage from its notes.
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
