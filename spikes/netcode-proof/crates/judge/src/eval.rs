@@ -1828,10 +1828,17 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
 
 /// One verdict per mark, in `marks.json`'s order.
 pub fn judge(marks: &Marks, logs: &[Log]) -> Vec<Verdict> {
+    judge_only(marks, logs, &[])
+}
+
+/// The same for the marks `only` names (every mark when it names none). A precondition (`pre:<mark>`) is looked up
+/// in the whole file all the same, so a mark judged alone still finds the mark its runs must pass.
+pub fn judge_only(marks: &Marks, logs: &[Log], only: &[String]) -> Vec<Verdict> {
     let all = runs(logs);
     marks
         .marks
         .iter()
+        .filter(|m| only.is_empty() || only.contains(&m.id))
         .map(|m| {
             judge_mark(
                 m,

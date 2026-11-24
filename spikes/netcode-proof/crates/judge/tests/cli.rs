@@ -196,6 +196,27 @@ fn moved_marks_and_parts_show_in_the_summary_and_the_json() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
+/// `--only` on a mark with a precondition (JDG-ONLY-1): PM-0001-4's runs must pass PM-0001-2's checks, and the mark
+/// judged alone still finds PM-0001-2 in the file. The real marks.json on PM-0001-4's committed base case.
+#[test]
+fn only_keeps_a_marks_precondition_in_reach() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let marks = root.join("../../marks/marks.json");
+    let logs = root.join("fixtures/pm-0001-4/base");
+    let (code, stdout, stderr) = judge(&[
+        "--marks",
+        marks.to_str().unwrap(),
+        "--logs",
+        logs.to_str().unwrap(),
+        "--only",
+        "PM-0001-4",
+    ]);
+    assert_eq!(code, 0, "{stderr}");
+    let lines: Vec<&str> = stdout.lines().collect();
+    assert_eq!(lines.len(), 1, "{stdout}");
+    assert!(lines[0].starts_with("PM-0001-4    PASS"), "{stdout}");
+}
+
 #[test]
 fn malformed_inputs_exit_1_and_bad_usage_exits_2() {
     let dir = temp_dir("errors");

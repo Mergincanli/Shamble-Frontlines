@@ -9,7 +9,7 @@ pub mod marks;
 mod practice;
 pub mod ratio;
 
-pub use eval::{Verdict, VerdictKind, judge};
+pub use eval::{Verdict, VerdictKind, judge, judge_only};
 pub use marks::{Marks, parse as parse_marks};
 
 use std::io::BufReader;

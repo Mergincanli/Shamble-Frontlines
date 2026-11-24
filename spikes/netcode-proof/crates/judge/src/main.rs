@@ -64,7 +64,7 @@ fn main() -> ExitCode {
             return ExitCode::from(1);
         }
     };
-    let mut marks = match npt_judge::parse_marks(&text) {
+    let marks = match npt_judge::parse_marks(&text) {
         Ok(m) => m,
         Err(errors) => {
             for e in errors {
@@ -91,7 +91,6 @@ fn main() -> ExitCode {
             eprintln!("npt-judge: --only names marks not in marks.json: {unknown:?}");
             return ExitCode::from(2);
         }
-        marks.marks.retain(|m| args.only.contains(&m.id));
     }
     let Some(dir) = args.logs else {
         return ExitCode::from(2);
@@ -103,7 +102,8 @@ fn main() -> ExitCode {
             return ExitCode::from(1);
         }
     };
-    let verdicts = npt_judge::judge(&marks, &logs);
+    // The whole file goes in with the names: a mark judged alone still finds its precondition (README §4, `pre:`).
+    let verdicts = npt_judge::judge_only(&marks, &logs, &args.only);
     for v in &verdicts {
         println!("{}", npt_judge::summary_line(v));
     }
