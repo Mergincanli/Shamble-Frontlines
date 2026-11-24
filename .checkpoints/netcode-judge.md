@@ -87,15 +87,24 @@
     `only_keeps_a_marks_precondition_in_reach` (real marks.json, PM-0001-4's base fixture) fails with the old
     narrowing planted back and passes restored; 99 judge tests pass; part b so far 32 added lines (from 0e0f6547).
 
+11. Part b, block 1: entry 64 (a), (e), (f) · cb34ba5e8527579dfca3ed6879a2d7e317266538 (pushed) · (a) the Arm
+    test's role C and ML cases and the fixtures README row (planted: the LG key dropped in figures.rs, the Arm test
+    fails); (e) the two wordings; (f) `summary_line` escapes control characters, test
+    `the_summary_line_escapes_control_characters` (planted: the escape off, it fails; npt-log's writer refuses a
+    control character in a run id, so the test sets the reason by hand); 100 judge tests pass; part b so far 82 added.
+
 ## Current step
-Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 1's second half:**
-u4s-carries.md entry 64 (a) to (f), each test shown failing under its plant and passing restored (figures-b.md C1
-gives each item's test, wording, line numbers and plant): (a) the Arm test's role C and ML cases, and the
-fixtures/README.md row's wording; (b) the far-better test's exact reason and the pinned probe; (c) the bite-run
-practice test's case (5); (d) a coverage gap and a waiting Arm mismatch in one run reads INVALID; (e) two wordings
-(eval.rs's Arm note, practice.rs's module doc); (f) `summary_line` escapes control characters, with its test. Then
-commit, push, the size count from 0e0f6547, the card, and block 2 (the plumbing: `Inputs`, `Lack::Fail`, the detail
-text; plan-b.md section 2 and its condition 2). Part b's board thread is open (state doing).
+Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 1's rest:** entry
+64 (b), (c), (d) (figures-b.md C1 gives each item's test, line numbers and plant; u4s-carries.md:455-480 is the
+ruling's own wording): (b) `u4j_ws_far_better_past_the_cap_is_invalid` asserts the pin's own reason ("its bound line
+is not PM-0001-18's ws_bound_line, byte for byte") and gains the pinned probe (FAR BETTER at s = 1.9 with a chance
+ruling: INVALID by 'is "FAR BETTER" at s = 1.9'); plants: the pin removed, `s < bound.band_low` removed; (c)
+`u4j_ws_a_bite_run_takes_its_counted_runs_practice_run` gains case (5), two measured runs of one build with
+different practice runs in force: the bite INVALID ("have practice runs … in force"); plant: that refusal in `find`
+removed; (d) a coverage gap and an LG Arm mismatch waiting for its re-decode in one run: INVALID, never NOT-RUN;
+plant: the gap and waiting checks in `decoded_hash_mismatch_count` swapped. Then commit, push, the size count from
+0e0f6547, the card, and block 2 (the plumbing: `Inputs`, `Lack::Fail`, the detail text; plan-b.md section 2 and its
+conditions 2 and 10). Part b's board thread is open (state doing).
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
