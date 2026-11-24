@@ -9,9 +9,11 @@
 // copied beside it. Every command runs as a list of arguments, never through a shell.
 //
 // Every build but a --production one also makes the test-only WebAssembly module (crates/devtools, in its release
-// and its dev profile) into packages/sim-worker/pkg-rules/, where the rule tests load it (boundary/rules.test.mjs,
-// the e2e rules spec). It is built in a cargo call and a target folder of its own, nothing of the page or the
-// Worker imports it, and a built page that held it would be refused (build-checks.mjs, wasmProblems).
+// and its dev profile) into .gate/rules-module/ at the repository's root, where the rule tests load it
+// (boundary/rules.test.mjs, the e2e rules spec). That folder lies outside every package: no folder a server reads
+// holds it, and no link in node_modules leads to it. It is built in a cargo call and a target folder of its own,
+// nothing of the page or the Worker imports it, and a built page that held it would be refused (build-checks.mjs,
+// wasmProblems).
 //
 // The wasm-bindgen tool is a ready-built program from the internet. Before it is run at all, `--version` included,
 // its file must be the one wasm-bindgen-tool.mjs records (a plain file of that size and sha256), and its version
@@ -56,12 +58,17 @@ const wasmTarget = "wasm32-unknown-unknown";
  * The environment of every cargo call this script makes. Its one addition: the compiler flags, which are the path
  * remap and nothing else (panic locations inside registry crates name one fixed place, not this machine's cargo
  * folder, so one commit gives the same Wasm bytes wherever it is built: RR-F5). Given this way, cargo takes its
- * flags from here alone: a flag in a cargo config file outside the repository does not reach the compiler. The
- * same name coming from outside is refused before any cargo call (refuseSettings).
+ * compiler flags from here alone: `rustflags` in a cargo config file outside the repository do not reach the
+ * compiler. What such a file can still set is not shut out here: a linker, a compiler wrapper, an `[env]` table,
+ * a profile (the quality gate's flag check). The same name coming from outside is refused before any cargo call
+ * (refuseSettings).
  */
-const cargoEnv = () => ({ ...process.env, CARGO_ENCODED_RUSTFLAGS: registryRemapFlag(process.env["CARGO_HOME"], os.homedir()) });
-/** The test-only module: its bindings' folder, and a target folder that is never the players' Wasm's. */
-const rulesDir = path.join(root, "packages/sim-worker/pkg-rules");
+const cargoEnv = () => ({ ...process.env, CARGO_ENCODED_RUSTFLAGS: registryRemapFlag(process.env["CARGO_HOME"], os.homedir(), root) });
+/**
+ * The test-only module: its bindings' folder, outside every package (so outside what a server reads and what
+ * node_modules links to), and a target folder that is never the players' Wasm's.
+ */
+const rulesDir = path.join(root, ".gate/rules-module");
 const rulesTargetDir = path.join(root, ".gate/target-rules");
 /** The tool's absolute path, after its file was compared with the recorded values. */
 function checkedTool() {
@@ -109,7 +116,7 @@ function checkCrates() {
 
 /**
  * Builds the test-only module in both profiles and writes each one's bindings into its own folder under
- * packages/sim-worker/pkg-rules/. The same refusals and the same checked tool as the players' Wasm; its own cargo
+ * .gate/rules-module/. The same refusals and the same checked tool as the players' Wasm; its own cargo
  * call and target folder, so nothing it compiles can stand where the players' Wasm is read from.
  */
 export function buildRulesModule() {

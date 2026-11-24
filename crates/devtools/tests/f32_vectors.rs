@@ -8,7 +8,7 @@ use devtools::rules::f32_ops::{CASES, OPS, check, check_as};
 fn fma() -> &'static str {
     #[cfg(target_arch = "x86_64")]
     if !std::is_x86_feature_detected!("fma") {
-        return "this processor has NO FMA: `mul_add` takes the toolchain's software path, known not to be exact (MUL-ADD)";
+        return "this processor reports no FMA: unless it is an AMD one with FMA4, `mul_add` takes the toolchain's software path, which is not exact (MUL-ADD)";
     }
     #[cfg(target_arch = "x86_64")]
     return "this processor has FMA";

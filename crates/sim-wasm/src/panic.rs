@@ -71,7 +71,8 @@ fn record(buffer: &[AtomicU8], text: fmt::Arguments<'_>) {
 }
 
 /// Installs the hook. The glue runs this when the module is instantiated, before any other export can run. It is
-/// no export of the glue (`private`): the host cannot call it, and has no reason to.
+/// no export of the glue's own (`private`), and the host has no reason to call it; the Wasm's raw exports still
+/// hold it, and a call there would only install the same hook again.
 #[wasm_bindgen(start, private)]
 pub fn start() {
     store_word(&BUFFER[4..HEADER_BYTES], BUFFER_BYTES - HEADER_BYTES);

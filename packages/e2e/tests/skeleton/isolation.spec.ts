@@ -41,11 +41,17 @@ for (const kind of ["dev server", "preview server"] as const) {
         expect(data.errors).toBe(0);
         if (kind === "dev server") {
           // The dev server reads files outside the page's folder by their full path. It hands out the players' Wasm,
-          // which the Worker loads, and refuses the test-only module that the build puts beside it.
-          const file = (folder: string, name: string): string => `${address ?? ""}@fs${path.join(client, "../sim-worker", folder, name)}`;
-          expect((await page.request.get(file("pkg", "sim_wasm_bg.wasm"))).status()).toBe(200);
-          expect((await page.request.get(file("pkg-rules/release", "devtools_bg.wasm"))).status()).toBe(403);
-          expect((await page.request.get(file("pkg-rules/dev", "devtools.js"))).status()).toBe(403);
+          // which the Worker loads. It refuses the test-only module where the build puts it, outside every package.
+          // And it refuses the Worker's package reached through npm's link in node_modules: that link would open
+          // the package's whole folder, whatever is built into it.
+          const at = (file: string): string => `${address ?? ""}@fs${path.join(client, "../..", file)}`;
+          expect((await page.request.get(at("packages/sim-worker/pkg/sim_wasm_bg.wasm"))).status()).toBe(200);
+          expect((await page.request.get(at(".gate/rules-module/release/devtools_bg.wasm"))).status()).toBe(403);
+          expect((await page.request.get(at(".gate/rules-module/dev/devtools.js"))).status()).toBe(403);
+          expect((await page.request.get(at("node_modules/@shamble/sim-worker/package.json"))).status()).toBe(403);
+          expect((await page.request.get(at("node_modules/@shamble/sim-worker/pkg/sim_wasm_bg.wasm"))).status()).toBe(403);
+          // Where earlier builds put the module: a copy may still lie there on a developer's machine. Not handed out.
+          expect((await page.request.get(at("packages/sim-worker/pkg-rules/release/devtools_bg.wasm"))).status()).not.toBe(200);
         }
       } finally {
         await server?.close();

@@ -211,8 +211,9 @@ export function checkOutDir(outDir, defaultDir) {
  * among them every `RUSTC_*`, and the names through which a stable cargo takes nightly-only features (`__CARGO_*`,
  * `CARGO_UNSTABLE_*`). Not refused: the two that name the build folder, which the build's `--target-dir` overrides.
  * Not covered: cargo's config files outside the repository, through which a profile setting (overflow checks among
- * them) can still be changed with no diff here (the quality gate's flag check); their compiler flags are shut out
- * by the build itself, which gives cargo its own (build.mjs, `cargoEnv`).
+ * them), a linker, a compiler wrapper or an `[env]` table can still be set with no diff here (the quality gate's
+ * flag check); only their `rustflags` are shut out, by the build itself, which gives cargo its own (build.mjs,
+ * `cargoEnv`).
  */
 export const CARGO_OVERRIDES = new RegExp(
   "^(?!CARGO_(BUILD_)?TARGET_DIR$)(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|RUSTC(_.*)?|RUSTUP_TOOLCHAIN|CARGO_INCREMENTAL|" +
@@ -279,6 +280,10 @@ export function missingOverflowOverrides(treeText, cargoToml, root) {
  * with `dev` edges too, as the tests are built: a feature a dev-dependency turns on is then seen, and `sim`'s own
  * dev-dependencies do not count as its dependencies. Not modelled: a build made with other `--features` flags or a
  * narrower `-p` list than the one the tree was asked for (CI's release test line is one). Throws without a `sim`.
+ *
+ * A known clash, kept loud: ADR 0002 part 5 plans a feature that only dev-dependencies turn on (the generated
+ * types). The day it reaches `sim` or one of its dependencies this compare refuses it and every build stops; the
+ * step that first nests generated types decides which of the two gives way.
  */
 export function simFeatureList(treeText, closureTree = treeText) {
   const parse = (text) => text.split("\n").map((line) => /^(\d+)(.*?)( \(command-line\))?$/.exec(line)).filter((line) => line !== null);
@@ -316,9 +321,12 @@ export function simFeatureDifferences(lists) {
  * The compiler flag that writes one fixed place instead of the builder's own cargo folder into panic locations of
  * registry crates, so one commit gives the same Wasm bytes on every machine (RR-F5). `cargoHome` is `CARGO_HOME`,
  * or nothing: cargo reads an empty value as unset, and then its home is `.cargo` under the user's home folder; a
- * relative value is resolved, because the compiler matches the flag against absolute paths.
+ * relative value is resolved against `base`, the folder cargo is run in, because the compiler matches the flag
+ * against absolute paths. A path with a control character in it is refused: the flags travel in one variable that
+ * is split at such a character, so the rest of the path would arrive as a flag of its own.
  */
-export function registryRemapFlag(cargoHome, homeDir) {
-  const home = path.resolve(cargoHome === undefined || cargoHome === "" ? path.join(homeDir, ".cargo") : cargoHome);
+export function registryRemapFlag(cargoHome, homeDir, base) {
+  const home = path.resolve(base, cargoHome === undefined || cargoHome === "" ? path.join(homeDir, ".cargo") : cargoHome);
+  if (/[\u0000-\u001f\u007f]/.test(home)) throw new Error("cargo's home folder has a control character in its path: the build cannot name it in a compiler flag");
   return `--remap-path-prefix=${home.replaceAll("\\", "/").replace(/\/+$/, "")}/registry/src=/cargo/registry/src`;
 }

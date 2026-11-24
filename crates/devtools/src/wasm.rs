@@ -11,8 +11,8 @@ use sim_wasm as _;
 
 use crate::rules::{f32_ops, stream};
 
-/// The float vectors (PM-0004-22): an empty text when every operation gives the exact reference's results, or what
-/// differs.
+/// The float vectors (PM-0004-22): an empty text when every operation gives the exact reference's results and
+/// `mul_add`'s pinned cases their measured values (MUL-ADD), or what differs.
 #[wasm_bindgen]
 #[must_use]
 pub fn f32_vectors(inputs: &[u8], expected: &str) -> String {

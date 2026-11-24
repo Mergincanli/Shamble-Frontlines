@@ -27,7 +27,7 @@ for (const profile of ["release", "dev"] as const) {
       if (name === "") return route.fulfill({ contentType: "text/html", body: "<!doctype html><title>rules</title>" });
       if (name === "devtools.js" || name === "devtools_bg.wasm") {
         const contentType = name.endsWith(".js") ? "text/javascript" : "application/wasm";
-        return route.fulfill({ contentType, path: path.join(root, "packages/sim-worker/pkg-rules", profile, name) });
+        return route.fulfill({ contentType, path: path.join(root, ".gate/rules-module", profile, name) });
       }
       if (VECTORS.includes(name)) {
         return route.fulfill({ contentType: "application/octet-stream", path: path.join(root, "crates/devtools/vectors", name) });

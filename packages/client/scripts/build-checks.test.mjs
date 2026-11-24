@@ -372,7 +372,7 @@ describe("one feature set builds the simulation in every build that runs it", ()
 3dep feature "default"
 4dep v0.0.0 (/repo/crates/dep)
 `;
-  // `-p tools` on normal edges, and the same with dev edges, as the tests are built.
+  // `--workspace` on normal edges, and the same with dev edges, as the tests are built.
   const TOOLS = `0tools v0.0.0 (/repo/crates/tools)
 1sim feature "default" (command-line)
 2sim v0.0.0 (/repo/crates/sim)
@@ -428,11 +428,14 @@ describe("one feature set builds the simulation in every build that runs it", ()
 });
 
 test("the path remap names the registry folder under cargo's home, whatever that home is", () => {
-  expect(registryRemapFlag("/root/.cargo", "/root")).toBe("--remap-path-prefix=/root/.cargo/registry/src=/cargo/registry/src");
-  expect(registryRemapFlag("/home/runner/.cargo/", "/home/runner")).toBe("--remap-path-prefix=/home/runner/.cargo/registry/src=/cargo/registry/src");
+  expect(registryRemapFlag("/root/.cargo", "/root", "/repo")).toBe("--remap-path-prefix=/root/.cargo/registry/src=/cargo/registry/src");
+  expect(registryRemapFlag("/home/runner/.cargo/", "/home/runner", "/repo")).toBe("--remap-path-prefix=/home/runner/.cargo/registry/src=/cargo/registry/src");
   // No CARGO_HOME, or an empty one (cargo reads it as unset): .cargo under the home folder.
-  expect(registryRemapFlag(undefined, "/home/someone")).toBe("--remap-path-prefix=/home/someone/.cargo/registry/src=/cargo/registry/src");
-  expect(registryRemapFlag("", "/home/someone")).toBe("--remap-path-prefix=/home/someone/.cargo/registry/src=/cargo/registry/src");
-  // A relative one is made absolute: the compiler matches whole paths.
-  expect(registryRemapFlag("cargo-home", "/home/someone")).toBe(`--remap-path-prefix=${process.cwd().replaceAll("\\", "/")}/cargo-home/registry/src=/cargo/registry/src`);
+  expect(registryRemapFlag(undefined, "/home/someone", "/repo")).toBe("--remap-path-prefix=/home/someone/.cargo/registry/src=/cargo/registry/src");
+  expect(registryRemapFlag("", "/home/someone", "/repo")).toBe("--remap-path-prefix=/home/someone/.cargo/registry/src=/cargo/registry/src");
+  // A relative one is made absolute against the folder cargo runs in, as cargo does: the compiler matches whole paths.
+  expect(registryRemapFlag("cargo-home", "/home/someone", "/repo")).toBe("--remap-path-prefix=/repo/cargo-home/registry/src=/cargo/registry/src");
+  // The flags travel in one variable, split at a control character: a home with one in its path is refused.
+  expect(() => registryRemapFlag("/home/a\u001f--cfg\u001fevil/.cargo", "/home/a", "/repo")).toThrow("control character");
+  expect(() => registryRemapFlag(undefined, "/home/a\nb", "/repo")).toThrow("control character");
 });
