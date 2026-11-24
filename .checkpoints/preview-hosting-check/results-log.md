@@ -865,3 +865,23 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   (26.54); (b) 4 gone (26.24); (b') 5 gone (26.24); (c) 2 serves; (d) 2 serves (26.53); the by-hand previews 19
   serves; production 4 serves; the rehearsal 2 gone (30.13). Unexpected 0, no reading 0. The control holds if no
   deploy or cleanup run starts between it and his switch-on time (the run list is checked afterwards).
+
+### Day 2 resumed (2026-11-24)
+- **His message of 2026-11-24 19:07:46 UTC** (15af9685-0caf-45cf-a404-14f591e2e9af; byte for byte in
+  `mustafa-2026-11-24-day2.md`, 927 bytes, sha256 f340440ac215...): he is here for the Day 2 sitting now; the token ends
+  2026-11-25T22:59:59Z; read the card first; do the fresh readings my rules ask for before he changes anything in
+  Cloudflare; the sitting's length and whether its second visit can be tonight first; then the list in one screen, then
+  one step at a time; plain words.
+- **Fresh readings, 2026-11-24 19:08-19:10 UTC (transcript times):** this branch equals its remote (f34fc45); this
+  repository's `main` moved to 1ec6f6c (lane 1's #61 and #64 merged), to be taken in before the report's pull request.
+  The test repository: `main` 347d5e0 (workflows unchanged); the same nine branches; open pull requests #5 (c), #9
+  (cs/b9-edit), #10 (cs/b9-prod) only. Runs: 50 in all; since the control of 2026-11-19 (run 34 of them) only probe runs
+  #10 to #25: the schedule fired 15 times (#10 to #24, 2026-11-20 03:30 to 2026-11-24 12:41 UTC, all success) and my
+  #25. No deploy or cleanup run since the closes, so nothing changed the uploads.
+- **The control with the wall off, before his switch-on**: probe run #25, id 45467161902, by hand, `purpose: deletion`,
+  head 347d5e0, created 19:09:11 UTC; probe-results-45467161902 (artifact 14955801668, zip sha256 f2b1c7a3ac50...,
+  equal to its digest), probed_at 2026-11-24T19:09:30.966Z, `.gate/preview-hosting-check/day2/probe25-control/`: 43
+  rows, no `wall` row; (a) 2 gone (144.61 h); (a') 3 gone (144.61); (b) 4 gone (144.32); (b') 5 gone (144.31); (c) 2
+  serves; (d) 2 serves (144.61); the by-hand previews 19 serves; production 4 serves; the rehearsal 2 gone (148.21).
+  Unexpected 0, no reading 0. So after six days nothing came back and nothing the check needs went away.
+- get_session (about 19:10 UTC): 394,099 of 1,000,000 tokens; the seven-day limit "allowed" (reset; next 2026-12-01).

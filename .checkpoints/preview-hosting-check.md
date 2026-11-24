@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-19 14:44 Amsterdam (13:44 UTC, save 87547f6): resumed after his compaction; Day 2 prep (step 26)
+- **Last update:** 2026-11-24 (Day 2 resumed at his message of 19:07:46 UTC; step 26)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -831,6 +831,17 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      switch-on message: an outside look at once, both `wall` sweeps scheduled with send_later (10 min and 1 h after his
      time; if his report comes later than 10 minutes, the first sweep at once, its real offset recorded); afterwards
      the run list checked for any deploy or cleanup between the control and his switch-on.
+   - No answer from him on 2026-11-19 after the refreshed list (sent after f34fc45). **Resumed 2026-11-24**: his message of
+     19:07:46 UTC (byte for byte in `mustafa-2026-11-24-day2.md`, 927 bytes, sha256 f340440ac215...): he is here now;
+     the token ends 2026-11-25T22:59:59Z; fresh readings first; the sitting's length and whether visit 2 can be tonight;
+     the list in one screen, then one step at a time; plain words. Fresh readings (results log, "Day 2 resumed"): the
+     branch equals its remote; this repository's main moved to 1ec6f6c (taken in before the report's pull request); the
+     test repository unchanged but for 16 probe runs; control probe #25 (19:09:30 UTC): all 43 rows as expected, no
+     wall; get_session 394,099 tokens, the weekly limit "allowed". Timing: the wall and Brave about 20 minutes now;
+     visit 2 at least an hour after his switch-on time (the 1-hour sweep first), so tonight about 21:20 Amsterdam is
+     possible; it must finish before the token ends (2026-11-25 23:59 Amsterdam), with margin, since (c)'s cleanup
+     needs the token and the revoke proof must not be confused with the token's own end. Next: consultation 25, then
+     the timing, the one-screen list and step 1 only.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
