@@ -79,6 +79,9 @@ Part a's one review round on b22c30cd: test-engineer and rust-reviewer, both at 
   folder parked) · Mustafa · in the chat.
 
 ## Running work
-- The review round: test-engineer and rust-reviewer on b22c30cd, launched 2026-11-24 about 20:45 UTC (2 agents).
+- The review round: test-engineer and rust-reviewer on b22c30cd, launched 2026-11-24 about 20:25 UTC (2 agents).
+- The background saver (`checkpoint.mjs watch netcode-judge`, every 10 minutes for 110) since about 20:30 UTC, for
+  the reviewers' notes; it stops by 22:20 UTC and is checked at each card update.
+- GitHub on b22c30cd: the gate workflow green (run 45480243854); the toolchain workflow running (run 45480243852).
 - `.checkpoints/netcode-judge/moved-table.mjs` was run once with `--write` at the base's marks.json (it refuses any
   other file): 26 marks whole, 21 parts, 2 checks, 1 bite, -56's kept check, -7's and -56's notes.
