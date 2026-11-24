@@ -3,7 +3,7 @@
 //! folder again: `SHAMBLE_WRITE_TYPES=1 cargo test -p protocol`. Both folders are named here: no `#[ts(export)]`,
 //! no `TS_RS_EXPORT_DIR` and no build file decides where ts-rs writes.
 
-use crate::messages::{Input, Join, JoinAccepted, Snapshot};
+use crate::messages::{Input, Join, JoinAccepted, JoinRejected, Snapshot};
 use std::collections::BTreeMap;
 use std::fs;
 use std::io::ErrorKind;
@@ -110,9 +110,11 @@ fn generated_types_are_current() {
     let config = Config::new()
         .with_out_dir(&scratch)
         .with_import_extension(Some("ts"));
-    // Each call also writes the types its message holds: `Command`, `SnapshotAck`, `AimPoint`, `ViewTime`.
+    // Each call also writes the types its message holds: `RejectReason`, `Command`, `SnapshotAck`, `AimPoint`,
+    // `ViewTime`, `OwnState`.
     Join::export_all(&config).expect("ts-rs can write Join");
     JoinAccepted::export_all(&config).expect("ts-rs can write JoinAccepted");
+    JoinRejected::export_all(&config).expect("ts-rs can write JoinRejected");
     Input::export_all(&config).expect("ts-rs can write Input");
     Snapshot::export_all(&config).expect("ts-rs can write Snapshot");
     let generated = files_in(&scratch, "the scratch folder is this test's own");
