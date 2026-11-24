@@ -868,6 +868,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      preview row walled (42 rows, 302 to the Access login), production's own address 200, 6 open branches walled on their
      stable links, nothing unexpected (results log). Next: the 1-hour sweep at 21:15 UTC (the one that counts), then
      visit 2.
+   - **The 1-hour sweep: PM-0006-8 met** (probe #27, 45489339865, probed_at 21:16:27 UTC, 1 h 2 min after his message):
+     the same 43 rows as at 10 minutes, nothing unexpected; only probes between the control and it. Next: visit 2, one
+     step at a time: I close pull request 5 first and send its cleanup run's link. Still open from him: step 7's private
+     half, step 8's result, his verdict words, the billing screenshot.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the

@@ -950,3 +950,20 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   production's own address); unexpected 0, no reading 0. The wall on the stable links of open branches (the script's
   rule, counted from the rows): 6, bite-coep, bite-nocache, cs/pd-open, iso-off, iso-on, uploads (the mark needs 2).
   PREV-DELETE's leftovers ((d)'s two links) give no build.
+- **The wall sweep at 1 hour or more, the reading that counts (PM-0006-8)**: probe run #27, id 45489339865, started by
+  the session after the check-in trig_01PgaNh9YUgYbGi8tzK2My4X fired (21:15:28 UTC), `purpose: wall`, head 347d5e0,
+  created 21:16:02 UTC; probe-results-45489339865 (artifact 14966750236, zip sha256 a6e1c2c7d932..., equal to its
+  digest), probed_at 2026-11-24T21:16:27.123Z, 1 h 2 min 14 s after his message of 20:14:13 UTC (so at least that long
+  after the switch-on), `.gate/preview-hosting-check/day2/probe27-wall60/`. The same 43 rows as at 10 minutes: 42
+  answer 302 to shamble-preview-check-pages.cloudflareaccess.com; production's own address 200 "serves" (expected
+  "serves"); production's three one-off links walled (not judged); unexpected 0, no reading 0; the wall on the stable
+  links of 6 open branches (bite-coep, bite-nocache, cs/pd-open, iso-off, iso-on, uploads). Runs between the control
+  (#25, 19:09:30 UTC) and this sweep: only the probes #26 and #27 (52 runs in all): no deploy or cleanup in between.
+- **PM-0006-8 read:** "with the wall switched on, a stranger gets no build from any link of at least 2 open preview
+  branches, nor from PREV-DELETE's leftover links, while production still serves; read 10 minutes and 1 hour after you
+  switch it on (the 1-hour reading counts); control: the same sweep with the wall off shows the builds": met. At 1 hour
+  or more: no build from any link of 6 open preview branches (every one of their links walled) nor from the leftover
+  links of (d), production's own address serving; at 10 minutes or more: the same; the control (#25, 19:09:30 UTC, the same 43
+  links with the wall off, before the switch-on) showed every build serving. The
+  switch-on time is not recorded to the minute (between 19:12:54 and 20:14:13 UTC), so "10 minutes" and "1 hour" are
+  lower bounds; production's one-off links are behind the wall too (recorded for OQ-0006-4, not judged).
