@@ -16,13 +16,30 @@ of 2026-11-14 (PREVIEW-START: "it starts now, on the infra draft as proposed") a
 `docs/DECISIONS.md`.
 
 ## Outcome
-DONE as a check, waiting for his go on this pull request and for two decisions of his. Every reading of Day 2 came out
-as expected: 24 hours after the closes every closed test's links were gone (and still were six days later), the login
-wall stopped a stranger on every preview link while production stayed open, and the deleted token was refused at
-Cloudflare's sign-in with nothing uploaded. The check is not reported as "passed" as a whole: the verdicts below are
-mark by mark, and four marks are not a plain pass.
+The runs are finished and every reading of the last day came out as expected: 24 hours after the closes every closed
+test's links were gone (and still were six days later), the login wall stopped a stranger on every preview link while
+production stayed open, and the deleted token was refused at Cloudflare's sign-in with nothing uploaded. But **the
+check has not passed by the draft's own rule** ("A spike passes when every mark that applies passes", ADR 0006 :1404):
+the header mark is not met as written (production's one-off links carry the "keep out of search engines" header), and
+two marks are open (the build count, and his verdict on checklist step 4, which depends on it). Five marks are met with
+departures that change no reading. Three decisions of his follow; this pull request waits for them and for his go.
 
-VERDICTTABLE
+| What it checks (the mark) | The draft's own words, shortened (ADR 0006) | Verdict |
+|---|---|---|
+| The setup is written down first (PM-0006-1) | "recorded: ... each browser's and WebdriverIO's versions"; "checked again before PM-0006-6's 24 h reading" (:1369) | Met with departures: GitHub's machines stand in for the laptop and the Mac (his MACHINES (a)); his Brave version reached the record about 2 hours after the 24-hour reading |
+| The headers as built, on both kinds of link (PM-0006-2) | "100 % of responses carry their expected set: ... previews `X-Robots-Tag: noindex`, production none" (:1370) | **Not met as written:** production's one-off links (0354374e and de1c3e5e) carry the "keep out of search engines" header on all 7 paths, added by the host; every other header as expected, and both planted mistakes were caught |
+| Isolation follows the flag in every browser (PM-0006-3) | "3 of 3 loads per browser and deployment", in Chrome, Edge, Firefox, Safari and Brave (:1371) | Met with a departure: Safari not run (his words: "focus on brave, chrome, firefox and maybe edge (most used browsers)"); Chrome, Edge and Firefox 3 of 3 on all five links, the planted mistake caught; Brave 1 load per link, each as expected |
+| The content file is cached for good (PM-0006-4) | "immutable"; on a second visit "it transfers 0 bytes", "3 repeats" (:1372) | Met with a departure (a GitHub machine for the laptop): 0 bytes in 3 of 3; the planted `no-cache` caught |
+| Every file fits the host (PM-0006-5) | "the largest file in each deployed build under 25 MiB ... on every deployment of the check" (:1373) | Met with a departure (the same): every build's size line read, the largest file 65,536 bytes; the planted 26 MiB file flagged and refused by the upload tool |
+| A closed pull request's build is gone in 24 hours (PM-0006-6) | "24 h after each test pull request closes, none of its URLs ... answers HTTP 200 with that build's marker"; run "with the access policy off" (:1374) | Met with a departure: at 24.1 to 24.4 hours every link of the four closed cases gone, the open control and the bite still serving, no wall; the hourly probes fell short (3 scheduled runs in the 24 slots; by-hand probes stood in) |
+| Do uploads count against the 500 builds a month (PM-0006-7) | "reported, no pass number: the project's monthly build count before and after 10 direct uploads ... passes when both are recorded" (:1375) | **Open:** no count is shown on any page read, before or after; Cloudflare's docs do not say |
+| The wall covers the previews and not production (PM-0006-8) | "on every preview URL of at least 2 open branches ... and on PM-0006-6's leftover URLs, a cookie-less client gets no build"; "on the production URL ... it gets the build"; "the mark reads the 1-hour sweep" (:1376) | Met, on a reading of "open": at 1 hour or more no build from any link of six Pages branches (one with an open pull request, five without) or of the leftover links; production's own address served; with the wall off, every build served |
+| His verdict in Brave (PM-0006-9) | "every step of the hosting checklist below \"achieved\", 0 \"not yet\"" (:1377) | **Open:** steps 1 to 3 and 5 to 8 "achieved" in his words; step 4 (the build count) has no verdict |
+| GitHub shows the preview link on the pull request (PM-0006-10) | "recorded: yes or no, with a screenshot of the page" (:1378) | Met: yes, logged out (this chat's picture) and logged in (his words) |
+| A pull request cannot reach the token or production (PM-0006-32) | "2 of 2: ... gets no secret until the `preview` environment's required reviewer approves it ...; a job in a pull request that names the `production` environment is refused" (:1379) | Met: both cases, the control and the bite; reported: a production deploy with the preview token is not refused; recorded: the merge ref is judged and refused, and his revocation is proven by the refused upload |
+
+By the draft's rule the spike has not passed: one mark is not met as written (the headers) and two are open (the build
+count, and his verdict on step 4, which asks for that count). The departures change no reading.
 
 ## How it ran
 - **The plan** (`.checkpoints/preview-hosting-check/plan.md`, revision 2 at 2a2f426; readable at CARDSHA after the
@@ -53,7 +70,18 @@ VERDICTTABLE
   setting was his.
 
 ## Evidence, mark by mark
-EVIDENCE
+Every reading stands word for word in Appendix A, by sitting and in time order; the verifier spot-checked the key ones
+against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
+- The setup record: "Setup header (PM-0006-1)", "PM-0006-1: the header checked again before the 24-hour reading", "PM-0006-1, the header's Brave line".
+- The headers: round-a, `uploads`, `bites`, `bite-production`, `restore-production`, and "Sitting 1's readings in short" (24 preview readings on 15 links, production's own address twice).
+- Isolation and caching: `browsers` (51 Windows rows; Safari 1 reading of 15, then dropped).
+- File sizes: "After the verifier" (every build's size line).
+- Deletion: "Day 1, sitting 2", the probes after it, "The 24-hour reading" and "PM-0006-6 read".
+- The build count: "The build count, first reading" and "second reading".
+- The wall: "The control with the wall off", "The wall sweep at 10 minutes or more", "at 1 hour or more" and "PM-0006-8 read".
+- Brave: "The hosting checklist, steps 1 to 3" and "steps 5 to 8, with the wall on".
+- The pull-request page: "PM-0006-10" in sitting 2.
+- The token: "Day 1, sitting 3", "PM-0006-32 clause by clause", the revoke and "The revocation read".
 
 ## What the check answers, and what it gives the open questions
 - **PREV-DELETE (R5-PREV-OQ2, "Does a closed PR's preview really disappear on Cloudflare Pages?")**: yes, through the
@@ -97,7 +125,13 @@ EVIDENCE
 - **The token check**: security-auditor REVISE (an error path could print the account's name and ID), then APPROVE on
   sha256 0ad66aa0f2b3...; the advisor agent APPROVE with conditions (the outcome table read in order). His yes covered
   one run; its logs were deleted after reading, as he asked.
-- **The verifier on the evidence** (2026-11-24): VERIFIERLINE
+- **The verifier on the evidence** (2026-11-24): PASS WITH NOTES on the evidence: five spot-checks against the downloaded data (the 24-hour
+  reading, both wall sweeps, the control, the header summaries, the browser rows), all PASS; its verdicts per mark are
+  the table above. It first called the file-size mark open (no size line recorded for 13 builds); this chat then read
+  every build's size line from the run logs, and the verifier, given them, judged it met with a departure. Its
+  corrections are in Appendix A, "After the verifier". Not verified by it: the "secret: present" lines, his screenshots
+  and words, sitting 2's header files. The gate did not run for it (the toolkit was not installed); this chat ran it
+  afterwards: PASS, the smoke test skipped (the branch changes only docs and notes).
 - The review notes (`.checkpoints/preview-hosting-check/*-review*.md`, `advisor-*.md`, `security-auditor-diag.md`,
   `verifier-evidence.md`) are readable at CARDSHA.
 
@@ -120,8 +154,22 @@ EVIDENCE
 - **The token**: Cloudflare Pages Read and Edit (his TOKEN-SCOPE (a): Read stays; "Edit alone" was never measured); its
   window fixed to 7 days by him (TOKEN-WINDOW); the Cloudflare account renamed so a failed upload cannot print his
   e-mail address (his yes of 2026-11-17).
-- **The hourly series** (PM-0006-6's method): GitHub's hourly schedule fired 3 times in the 28 slots up to the 24-hour
-  mark; by-hand probes stood in at 4 more points; the 24-hour reading itself was taken by hand, as planned.
+- **The hourly series** (PM-0006-6's method): GitHub's hourly schedule fired 3 times in the 24 slots from the closes to
+  the 24-hour mark; by-hand probes stood in at 4 more points; the 24-hour reading itself was taken by hand, as planned
+  (plan Risk 4).
+- **The token tests claim only the extra bite of ADR 0002's PM-0002-66** (the `production` rule removed, the job printed
+  "present"), never that mark as a whole.
+- **Pictures stay out of the repository**: the pull-request page's picture (PM-0006-10), the logged-out run pages and his
+  screenshots are under `.gate/` (gitignored) or in the chat; the results log transcribes what each shows. The plan
+  listed the PR-page picture among the closing files: a departure, made because the other chats' records keep
+  pictures out of the repository too.
+- **The wall's "at least 2 open branches"**: six Pages branches were walled on every link, one with an open pull
+  request (cs/pd-open) and five made by the by-hand runs with no pull request (iso-off, iso-on, uploads, bite-coep,
+  bite-nocache). The draft does not define "open"; its reason for two ("with one, a wall set on that branch alone would
+  pass too", ADR 0006 :1360) fits counting all six.
+- **His Brave version** reached the setup record on 2026-11-19, 21:02:51 UTC, about 2 hours after the 24-hour reading
+  (the record was to be checked again before it); his Brave steps 1-3 of 2026-11-18 ran on a version no one recorded
+  then. Decided by no one: one of the departures put to him.
 - **The wall's switch-on time** is known only as a window (19:12:54 to 20:14:13 UTC on 2026-11-24), so "10 minutes" and
   "1 hour" are lower bounds. The setting is now "Preview access" with the button "Restrict previews"; the row's
   "Cloudflare Access" link opens Cloudflare's product page with "Try it for free", which he pressed on 2026-11-19 before
@@ -143,8 +191,11 @@ EVIDENCE
   access-policy step at 14:09 UTC (nothing switched on). Since then a step that must wait goes only with the go.
 - 2026-11-24: in the closing message I first wrote that his steps 5 to 8 "complete the Brave checklist"; step 4 still
   has no verdict word (corrected in the same evening's message).
-- The advisor tool was consulted 27 times, each before the step it bore on was saved as done (Appendix C, with times).
-- Refused by the guard: one `git -C` (2026-11-15, 15:54:02 UTC; the route: run git from inside the folder).
+- The advisor tool was consulted 28 times (Appendix C, with times); apart from the slip of 2026-11-15 above, each before
+  the step it bore on was saved as done.
+- Refused by the guard: a `git -C` of this chat (2026-11-15, 15:54:02 UTC; the route: run git from inside the folder);
+  and, while the advisor agent wrote its notes, a relative path and then a variable target (its route: a literal
+  absolute path).
 
 ## Not verified, not covered
 - What the draft itself leaves out (ADR 0006): the weekly sweep and the 7-day artifact rule (step 2.6's jobs), the
@@ -157,9 +208,19 @@ EVIDENCE
 
 ## Risks
 - **Risk 13 happened**: production's one-off link carries the "keep out of search engines" header, which the host adds
-  to every preview address. By ADR 0006's "When a mark fails", RISK13ROUTE.
+  to every preview address. By ADR 0006's "When a mark fails", "A failed mark goes back to the draft: infra-engineer revises the decision
+  part the row names by the draft's own Rollback and "Revisit when" routes (a header or PREV-DELETE fail on Pages:
+  Workers static assets weighed again ...), and the revised part returns to the advisor for review and to Mustafa and
+  the Advisor with the measured numbers" (ADR 0006 :1411-1416). Nothing in ADR 0006 changes in this pull request. That
+  paragraph does not name step 2.6; the plan he approved does ("the check's end and step 2.6 wait for the revised
+  draft", Risk 13), while his order of 2026-11-18 puts step 2.6's plan right after this report. Whether step 2.6 waits
+  is his decision (below)..
 - **The test repository's hourly probe after 2026-12-02**: the upload records it reads expire then (14 days).
-  PROBEAFTER
+  The upload records are kept 14 days; the last of them expires on
+  2026-12-02 (about 18:35 UTC). After that the probe finds nothing to probe and ends every run red (it exits 3 when it
+  has no rows), and GitHub mails the failure of a scheduled workflow to the person who made it: Mustafa's account.
+  GitHub's docs do not say whether archiving a repository stops its scheduled runs; switching the workflow off does. So
+  the probe is switched off before 2 December (For Mustafa).
 
 ## Follow-ups (for STATUS)
 - For step 2.6's plan: previews without his click per preview, and what keeps the token safe then (his words of
@@ -174,16 +235,57 @@ EVIDENCE
   scripts; none carries into step 2.6 unless its plan picks it up.
 
 ## Proposed next step
-STEPNEXT
+His three decisions below. Then, unless he decides that step 2.6 waits for the draft's revision: step 2.6's plan (the
+previews without his click and what keeps the token safe then, the locked install), brought to him for his go; the
+revision of ADR 0006's header row is infra-engineer's work by the draft's route, after his word. The test repository's
+probe is switched off before 2 December, and the repository archived and the test project deleted after this report is
+merged (his TR-END (a)).
 
 ## Decisions needed
-DECISIONSNEEDED
+1. **ONE-OFF-HEADER: what happens to the header mark that is not met.**
+   - What: Cloudflare adds the "keep out of search engines" header (`X-Robots-Tag: noindex`) to every one-off address
+     of the project, production's uploads included; production's own address stays clean. The draft's header mark
+     asks for "production none", so it is not met as written; by the draft's rule it goes back to the draft.
+   - Why it matters: the test cannot pass until the draft is revised, and the plan he approved says step 2.6 waits for
+     that revision.
+   - Options: (a) infra-engineer revises the draft's header row to judge production's own address only (a one-off
+     address works like a preview address, and the header there keeps old builds out of search engines), the revision
+     comes to him with these numbers, and step 2.6's plan starts meanwhile, as his order of 2026-11-18 has it; (b) the
+     same revision, and step 2.6 waits for it, as the plan's Risk 13 says; (c) the draft weighs Workers static assets
+     again (its own route for a header fail on Pages).
+   - My recommendation: (a). The finding changes nothing a player or a preview link meets, and step 2.6 does not use
+     production's one-off links.
+2. **STEP4-COUNT: checklist step 4 and the build-count question.**
+   - What: step 4 asks for Cloudflare's count of builds this month before and after 10 uploads, to learn whether
+     uploads count against the Free plan's 500 builds a month. No page he read shows a count, and Cloudflare's docs do
+     not say. So step 4 has no verdict and the build-count mark is open.
+   - Why it matters: both stand between the test and a pass; and if uploads count, step 2.6 must count its deploys.
+   - Options: (a) both stay open until a count source exists (a usage page, or Cloudflare's answer to a question);
+     (b) both go back to the draft with the header row: the question is re-stated as one the dashboard cannot answer,
+     and step 2.6 counts its own deploys and stays far below 500 a month whatever the answer; (c) he gives step 4 a
+     verdict now (only "not yet" would match what he saw: no count).
+   - My recommendation: (b).
+3. **DEPARTURES: may these recorded departures stand?** None of them changes a reading.
+   - (1) His Brave version reached the setup record about 2 hours after the 24-hour reading (it was to be checked
+     before). (2) GitHub's hourly checker ran 3 times in the 24 hours, so the deletion series has 7 readings, by-hand
+     checks standing in; the 24-hour reading itself was taken. (3) The wall's "at least 2 open branches" counted six
+     Pages branches, only one of them with an open pull request; the draft's reason for two fits all six. (4) Safari
+     was not run, by his words "focus on brave, chrome, firefox and maybe edge (most used browsers)".
+   - Options: (a) all four stand as recorded; (b) he names any that goes back to the draft (none can be re-run as it
+     was: the Brave version of 18 November was not recorded, and the hourly series would need a new 24-hour case).
+   - My recommendation: (a).
 
 ## For Mustafa
-FORMUSTAFA
+1. The three decisions above, one line each (for example "ONE-OFF-HEADER (a), STEP4-COUNT (b), DEPARTURES (a)").
+2. Before 2 December: switch off the test repository's hourly checker, so it cannot mail failures once its records
+   expire. Go: any time now (no reading needs it any more). Clicks (GitHub's docs): Mergincanli/shamble-preview-check →
+   Actions → in the left list, "probe" → the "..." menu at the top right → Disable workflow.
+3. Your go on this pull request, once the advisor agent has reviewed its head (it is a draft until then).
+4. After it is merged, on my go: archive the test repository (Settings, General, "Archive this repository"), then delete
+   the test project in Cloudflare and its Access application (Zero Trust, Access, Applications).
 
 ## Appendix A: the results log
-_Moved whole from `.checkpoints/preview-hosting-check/results-log.md` by script (101280 bytes before the move; its headings demoted two levels; 4 places where it gave the account ID's first and last four characters replaced by a marker). Every time is UTC unless marked; times about this chat's own process are transcript times._
+_Moved whole from `.checkpoints/preview-hosting-check/results-log.md` by script (103927 bytes before the move; its headings demoted two levels; 4 places where it gave the account ID's first and last four characters replaced by a marker). Every time is UTC unless marked; times about this chat's own process are transcript times._
 
 ### Results log: the preview hosting check (ADR 0006 spike 1, SPIKE_PLAN entry 6)
 Kept while the check runs (plan Part 2, "The results log"); folded into the report at the end. Every time is UTC
@@ -1218,6 +1320,31 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "I just checked the cloudflare's billing page, and nothing paid was added when the wall went on". His word, not a
   screenshot: no paid plan or charge came with "Restrict previews" and the Zero Trust organization it made.
 
+##### After the verifier (2026-11-24, before the report)
+- **PM-0006-5's coverage gap closed from the run logs** (the verifier: no size line was recorded for sitting 2's ten
+  builds, bite-production, restore-production, the two tombstones and `revoked`; check-sizes.mjs never fails on a
+  flagged file, so a green build proves nothing). Each run's whole log downloaded (GitHub MCP tool, the logs' zip, files
+  written 23:09:10-23:09:52 UTC) to `.gate/preview-hosting-check/sizes/<run id>/` and read with grep. Every build's line, word for
+  word: "SIZES {"largest":{"path":"content.ef463692.bin","size":65536},"limit":26214400,"flagged":[],"count":9}" in
+  deploy runs #7 44370016948, #8 44370024556, #9 44370034770, #10 44370043893, #11 44370054922, #12 44370062021, #13
+  44370443574, #14 44370444666, #15 44370706631, #16 44370744826 (sitting 2's ten builds), #5 44366750977
+  (bite-production), #6 44367096948 (restore-production) and #19 45499119373 (`revoked`). With round-a's, uploads' and
+  bites' lines already recorded, every build of the check has its size line: the largest file 65,536 bytes, flagged
+  none, except the planted 26 MiB file of `bite-oversize` (flagged and refused by Wrangler). The two tombstones (cleanup
+  runs #3 44370914405 and #5 44374107847) upload one file each, `index.html`, written by close.yml's printf (its text at
+  347d5e0: 96 bytes, counted with wc -c; "✨ Success! Uploaded 1 files" and "Uploaded 0 files (1 already uploaded)").
+- **PM-0006-7, the question behind it** (a web-fetch agent, model opus, effort high, after 23:09 UTC): Cloudflare's
+  docs do not say whether direct uploads count against the Free plan's 500 builds a month ("Each time you push new code
+  to your Git repository, Pages will build and deploy your site."; the limits table "Builds per month | 500 | 5,000 |
+  20,000"; limits page, dateModified 2026-11-19), and no page says where the dashboard shows a count. So the question
+  stays unanswered by the dashboard and by the docs.
+- **Corrections from the verifier** (for the report; the lines above stand as written at their dates): ADR 0006's line
+  numbers in this log are three lines low since main's 3747bb3 ("When a mark fails" is now :1404-1418, the checklist's
+  steps 1-3 :1447-1450 and steps 5-8 :1453-1460); from the closes to the 24-hour mark there were 24 schedule slots, not
+  28 (3 scheduled runs in them); "the wall on the stable links of 6 open branches" counts 1 branch with an open pull
+  request (cs/pd-open) and 5 Pages branches with none (iso-off, iso-on, uploads, bite-coep, bite-nocache); his Brave
+  checks were 1 load per link (all as expected), not 3.
+
 ## Appendix B: the workflow texts as run
 _Copied by script from the test repository's commits (`git show <commit>:<path>`). `main` 347d5e0 holds the four workflows that ran every run on `main` and every test pull request; the two token-test variants ran only on their own pull requests (#9, #10) in sitting 3; check-token.yml ran once (two attempts) on pull request #2._
 
@@ -2233,3 +2360,16 @@ _Copied by script from the checkpoint's section "Advisor tool consultations" (hi
    summaries; lane 1's merged report as the shape); what the delete takes cited or folded; the last commit by hand; the
    privacy sweep, the checks on 78c2d9a, the advisor agent's file, the picture's route; his message's two decisions and
    the 2 December probe question.
+
+28. 2026-11-24 23:10:54 UTC (called; answer 23:12:51 UTC; transcript times), moment 4 (the verifier's verdict changes
+   the report's outcome; how to word the verdicts and the decisions) · Q: what goes into the verdict table and the
+   decisions? · Changed: the draft's own words read by this session for the table; the file-size mark judged by the
+   verifier from the new size lines (met with a recorded departure), not by this chat; two DECISIONS headers that stated
+   the chat's reading as his decision rewritten by script; step 4 and the build count as one entry (no count source
+   exists; open, or back to the draft with the header mark); the production one-off link's header back to the draft
+   (no ADR edit in this pull request; docs-keeper told); whether step 2.6 waits put to him with both texts (the plan's
+   Risk 13 sentence and his later order), recommended, not decided; one entry for the recorded departures (Brave late,
+   the hourly series in 24 slots, 1 pull-request branch plus 5 without, Safari in his words); plain words; the outcome
+   not "DONE"; the consultations line made true; both guard refusals; only the extra bite of ADR 0002's mark claimed;
+   the picture departure; the probe switch-off as a dated go before 2 December; who opens the pull request checked; the
+   gate run after npm ci; the assembler re-run after this record.
