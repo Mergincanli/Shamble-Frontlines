@@ -1547,6 +1547,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   lines).
 - C3: the placeholders filled (`decisions/fill.py`); the assembled draft in `report-assembled.md` (2,375 lines; open:
   CARDSHA, DOCSKEEPERLINE, PRNUMBER).
+- The report placed: `docs/reports/2026-11-24-preview-hosting-check.md` (commit cf5a1bc; 2,386 lines; lane 2's needs list
+  folded in as its own section). C4 launched: docs-keeper (its file's model and effort; background, after the saver
+  b4au202dl was running) on STATUS, ROADMAP, REPO_MAP and SPIKE_PLAN entry 6, lane 2's lines only, no ADR edit, no
+  DECISIONS edit; notes `docs-keeper-pass.md`.
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
   and on Zero Trust's first screen · launched 2026-11-19 about 14:15 UTC (after the save 4396e0a's edits) · DONE; its
   answers in step 26.
