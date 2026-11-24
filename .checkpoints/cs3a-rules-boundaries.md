@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 11:11 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 11:25 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -113,10 +113,60 @@
    build ok (Wasm 28,987 bytes here); vitest: types 7, sim-worker src 30, boundary 7, client 49, net 1; the browser
    tests 12 passed (52.6 s, the container's Chromium); `node tools/gate.mjs --no-smoke`: GATE PASS, symbols +0 -0.
 
+3. **The advisor agent's short read of the plan on main 1ec6f6c: APPROVE (build), nine conditions (three Medium,
+   six Low), nothing for him to decide** (2026-11-24, 11:06 to 11:25 UTC; Opus 5.5, effort max; its notes:
+   `cs3a-rules-boundaries/advisor-cs3a-start.md`). FIREFOX-TESTS (b) changes nothing in section 4; step 7's route
+   holds on main's CI text with no CI edit; the release run of `devtools` and `sim-wasm` from this container is
+   acceptable evidence until E1; F-CHANNEL is inside the approved plan as a small part of step 8; no step touches a
+   protected file (`.gitignore` is none); risk tier 1, his go after his browser check; hand saves carry over;
+   nothing on main contradicts a step. **Its conditions, each with where it is met:**
+   - C1 (Medium, before the push that adds the rules spec): the spec uses only the Node names
+     `packages/e2e/node-names.d.ts` declares, or 3a adds the names there; the five type checks of
+     `toolchain.yml` lines 180 to 191 are run here first.
+   - C2 (Medium, by the report): `cargo test --release -p devtools -p sim-wasm --locked` here on the final code
+     head; record the SHA, cargo's and rustc's versions, the empty list of refused environment names (names only),
+     the counts per test binary; keep the log; the report says CI runs these in debug only until E1; again if
+     those crates change.
+   - C3 (Medium, before the first push whose runs are evidence): the expected counts in this card before each
+     such push (cargo per binary, the boundary files and tests, the browser tests, 0 skipped, 0 ignored); each
+     run's counts read line by line, a mismatch or a skip is a stop; a red is never re-run; a red the log pins on
+     3a's own change is fixed by a new push and named in the report; any other red goes to him with the lines
+     (TE-WATCH first); once, here, the test module's folder deleted: both rules tests fail, not skip.
+   - C4 (Low, **done here**): **F-CHANNEL joins step 8**: `CARGO_OVERRIDES` gains `__CARGO_.*`,
+     `CARGO_UNSTABLE_.*` and `RUSTC_.*`, one refused name per new family in the test; CI's cut names stay allowed
+     (no loose `RUST.*`: `RUSTUP_HOME` must pass); it moves with step 8 down the ladder; security-auditor reads it.
+   - C5 (Low, step 3): `package-lock.json`'s sim-worker entry changes in the same batch as EA-F13 (4)'s
+     `package.json` change, is shown to security-auditor, and is checked with `npm ci --ignore-scripts`.
+   - C6 (Low, step 7): the test module's cargo and tool runs behind `build.mjs`'s existing checks (`checkedTool`
+     before each tool run, `refusedBuildSettings` before each cargo call, `--target-dir`); its `.gitignore` line
+     in the same commit; `--production` never builds it; the boundary file's header says which mode builds it;
+     slow boundary tests get their own time limit in the file (vitest's default is 5 s).
+   - C7 (Low, **done here**): **the size is counted as change-set 2 counted it**: added lines in `crates/`,
+     `packages/`, `.gitignore` and the two root manifests by `git diff --numstat origin/main...HEAD`, the
+     lockfiles and the fixture files not counted, the fixtures named (`chacha8-words.bin`, `f32-inputs.bin`, their
+     manifests and `f32-expected.txt`). Planned about 2,050 (with F-CHANNEL, the Node names and TE-104/TE-MONO
+     about 2,080: inside the estimate, the plan's number stays); **the stop line stays 4,100**.
+   - C8 (Low, ongoing): a background agent's notes committed and pushed at least every 30 minutes while it runs;
+     the head given to him for his go carries no skip marker; the pull request's title and text are final before
+     the commit that deletes the checkpoint.
+   - C9 (Low, **done here**): the plan's out-of-date lines are corrected in this card, not in the approved plan:
+     where the plan says "#62" (its lines 39 to 42, 190, 191, 224) read #64, merged as main 1ec6f6c (E1's base
+     line is `toolchain.yml` line 159); where it says "the saver running" (line 75) read the hand saves of
+     "Saves" above.
+   Also from its read: TE-104 and TE-MONO ride only with a change to `skeleton.spec.ts` (TE-NT5 makes one; if the
+   ladder moves TE-NT5 they move with it); `wasm-bindgen-tool.mjs` is never edited in 3a (CI reads it line by line
+   as his TOOL-SOURCE values).
+   **Tried in scratch before the first edit (`.gate/cs3a/`, no source touched):** Vite 8.3.7 runs an inline
+   `worker.plugins` beside the config file's `worker` settings and its `generateBundle` sees one entry chunk whose
+   `facadeModuleId` is `packages/sim-worker/src/worker.ts` (EA-N6's route holds); Node's HTTP parser hands the
+   request target `*` to a server (the small server's leading-slash branch gets a case of its own) and refuses
+   `app.js` itself; vitest 5.1.0's test context has `skip(condition, note)`. The standard library's inherent
+   methods of `f32` and `f64` for the scan test: 79 names each, the same set, read from
+   doc.rust-lang.org/1.99.1/std/primitive.f32.html and .f64.html on 2026-11-24, 11:12 UTC (rustdoc "1.99.1
+   (58cf8f9c3 2026-10-13)").
+
 ## Current step
-**The advisor agent's short read of the plan on main 1ec6f6c** (started 11:06 UTC; its notes:
-`cs3a-rules-boundaries/advisor-cs3a-start.md`; ten points, among them step 7's route on main's CI text, F-CHANNEL
-with step 8, the release evidence before E1). No source file is edited before its verdict. Then step 1.
+**Step 1 of the plan's section 4** (the follow-ups that need nothing new), started 11:25 UTC.
 
 ## Next steps (after the compact)
 1. Read CLAUDE.md, this card, the plan (`cs3-plan.md`: sections 0, 3, 4, 8, 9, 12 and 13), `cs3-context.md`, and
@@ -165,7 +215,7 @@ with step 8, the release evidence before E1). No source file is edited before it
   in STATUS); told to him with #64's ask, no answer needed.
 
 ## Running work
-- The advisor agent (Opus 5.5, effort max), in the background: the short read above. No saver.
+- Nothing runs in the background. No saver.
 - How things are run here (the guard refuses `npx`, `npm run`, `npm test`): vitest by
   `node node_modules/vitest/vitest.mjs run --root packages/<name> [--dir ...]`; the browser tests by
   `SHAMBLE_DIST="$PWD/.gate/dist-development" SHAMBLE_CHROMIUM=/opt/pw-browsers/chromium node
