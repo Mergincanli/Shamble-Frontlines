@@ -58,3 +58,26 @@ Info: ratio.rs cmp_wide correct (see progress); no HashMap, no float decision, a
    turns another run's disagreeing params.killed into this run's gap (run_param `?`, figures.rs:1632): conservative.
 
 ## Verdict: REVISE (H1 only; the Lows are optional or follow-ups)
+
+## Re-check of 7c3855c7
+RAN on a19664c5 (no crate, Cargo.toml or Cargo.lock change after 7c3855c7): tests 19+0+4+81+26 = 130 passed; clippy -D warnings 0; fmt --check 0.
+1. H1 CLOSED. sync_cost_ratio now takes exactly max(min,1) runs (fewer: waiting; more: gap), sums with checked_add, multiplies with
+   checked_mul, overflow -> gap. Rest: `runs.len() as i128` lossless; sync_unit's ns/entities are i128 sums of i64 (overflow needs
+   ~1.8e19 values in memory); Ratio::new(sum.den, sum.num) guarded by num != 0; w.max -> Ord (fast path checked, else cmp_wide):
+   no panic, no wrap. Real sizes at min 3: 30-min N=48 against 30-min refs at 33 ms ticks and 62 entities stays <= ~9e36 (fits).
+   Info only: checked_add/checked_mul pass a num of exactly i128::MIN to Ratio::new, whose gcd `abs()` panics (needs negative ns
+   and power-of-two factors: unreachable in practice; `.filter(|n| *n != i128::MIN)` closes it). sync_unit's `ticks` is an
+   inferred i32 (2^31 tick records: unreachable).
+2. No other figure sums fractions over an open count. logging_cost_ratio and kill_p99_ratio: integer p99s (stat_of Pct is
+   Ratio::int), one product of two integers. slot_mean_max, down_mean_ipv6_bits: i128 integer sums, one Ratio::new. bulk_control,
+   one_shot, egress_interface/metric, crash_close, growth counts: integers. R2Counts: five fixed terms whose denominators divide
+   ticks x clients, ticks and the measured-second count: grows with run length (room-hour lcm <= ~1e14, num ~1e19), never with run
+   count; only absurd per-record values (entity totals ~1e27 with tick_hz ~4e9) could overflow, and then it panics loudly (Low,
+   malformed only). eval.rs's `against` mean (outside the diff) averages integer p99s of 2-3 runs.
+3. Nothing broken. Slope: all steps checked; den = n Sxx - Sx^2 >= 0, 0 only at n = 1; 600 x num never i128::MIN. sessions:
+   `next - 1` safe (starts distinct, rising); `from..=last` never inverted; the last session now includes u64::MAX; partition_point
+   correct (sessions contiguous from the first admit to u64::MAX); `left = x.cut && ..` keeps no-admit slots on the old rule
+   (tested) and gives the last session the ruled tail (tested both ways). crash_close: `clients - closes.len()` cannot underflow
+   (keys < clients, unique); `find` stops within closes.len()+1. only_from: all 13 call sites pass one of the five literal kinds;
+   `unreachable!` is a programmer-error path, lazy (fires only with a log of another process): the enum stays a follow-up.
+VERDICT on the head: APPROVE WITH FINDINGS (H1 closed; L6 enum, L7, L9 and the two Info notes are follow-ups, none needs a push).

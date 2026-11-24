@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-24 about 23:30 UTC, part b at 67892d39, the last checks running.
+- **Last update:** 2026-11-24 about 23:05 UTC, part b at 67892d39, the last checks running.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -183,7 +183,7 @@
     in one merge, only on his word, after his main Advisor checked the final commit.
 
 ## Current step
-**Part b is at 67892d39, waiting on its last checks.** Running since about 23:25 UTC: the two reviewers' re-check of
+**Part b is at 67892d39, waiting on its last checks.** Running since about 23:00 UTC: the two reviewers' re-check of
 the High's fix (on what changed only; they append to their notes) and `check.mjs` whole on 67892d39 (output in the
 session's scratch folder). Then: GitHub's gate and toolchain on the head, the advisor agent's read of the head (the
 fix pass and the small commit), then part b's commit id, the commands and the report to Mustafa. Open with him:
