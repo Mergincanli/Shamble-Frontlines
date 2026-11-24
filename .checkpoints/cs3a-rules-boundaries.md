@@ -470,6 +470,15 @@ Plain words with him: no tag or code without its explanation in the same sentenc
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **The verifier on 8d277cf2 (`verifier-final.md`; read 17:45 UTC): PASS, nothing above Low.** The code diff since
+  8619d539 is 15 whole-line comments in two Rust files; its own run and CI agree; the Wasm unchanged; all 12
+  quotations given as his in the report found word for word. **Three report Lows for the last commit:** "the code
+  head is 8619d539" and "Size: 3,561" predate 8d277cf2 (comments in two code files; the count is 3,562); "the code
+  is fit and proven" stands in quotation marks as the advisor agent's words, its notes say "the code players run
+  is fit"; PM-0004-74 is quoted as "one feature set in every build", the draft reads "One feature set builds the
+  sim on every target".
+- **Everything is in but his browser reports.** The last commit is prepared in the list above (the advisor
+  agent's) plus these three Lows and its own two.
 - **The advisor agent on 8d277cf2 (`advisor-head.md`, "Review 2"; read 17:45 UTC): APPROVE
   8d277cf21cf54919c2ae54e5232d45e944e7b040.** Every letter A to J of its read of c5f6a85a is closed (its own
   build: the same Wasm bytes; its own script: every quotation given as his stands in his saved messages; CI green
