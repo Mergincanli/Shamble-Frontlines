@@ -15,7 +15,7 @@
   `/home/user/Shamble-Frontlines` holds the local name `claude/loving-hopper-6p0mg2` at f5030a3 and is never
   switched (his block: "Do not switch your main folder."). **Base:** main
   1ec6f6c3852d2922989f299bfc053c403d0e52d3 (the merge of #64).
-- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 13:16 UTC (from the clock).
+- **Opened:** 2026-11-24 10:34 UTC (from the clock). **Last update:** 2026-11-24 13:24 UTC (from the clock).
 
 ## His words that govern (read them where they stand; these lines are pointers, never a substitute)
 - **In `docs/DECISIONS.md`, entries of 2026-11-23 (newest first):** 21:24:59 UTC (FIREFOX-TESTS (b): Firefox in CI
@@ -225,6 +225,15 @@ from `rng.rs` before it writes), `chacha8-words.bin` (160,384 bytes, sha256 8531
 `chacha8.manifest.txt`; `crates/devtools/src/rules.rs`, `rules/stream.rs` (the check, one function for native and
 Wasm) and `tests/stream_vectors.rs`. Left out on purpose: the stream's canonical state bytes (no stream is in the
 world's state before its first draw; it joins with that change-set).
+**Plan steps 5 and 6 are also written and not built** (uncommitted, as of 13:24 UTC): step 5,
+`crates/devtools/vectors/make_f32_vectors.py` (the exact reference: rational arithmetic rounded once; 38
+operations, 10,000 cases of three inputs, 62 edge values in every ordered pair, then seeded ones; its self-check on
+hand-known answers passes; 1.3 s), `f32-inputs.bin` (120,000 bytes), `f32-expected.txt` (one digest line per
+operation), `crates/devtools/src/rules/f32_ops.rs` and `tests/f32_vectors.rs`; step 6, `crates/sim-wasm/src/panic.rs`
+(the hook: a 1,024-byte buffer of atomics, no `unsafe`, no lock; length and room words, then the text),
+`packages/sim-worker/src/panic-message.ts` with its test, `host.ts` (one guard `#call` around every Wasm call after
+the start, the resume too; no closure per wake), `worker.ts`, `host.test.ts`, and the boundary test's read of the
+buffer's header. **None of it has been compiled or run: first thing after the security answer.**
 
 ## Next steps (after the compact)
 1. Read CLAUDE.md, this card, the plan (`cs3-plan.md`: sections 0, 3, 4, 8, 9, 12 and 13), `cs3-context.md`, and
