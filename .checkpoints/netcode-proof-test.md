@@ -83,7 +83,7 @@
   joins no thread, socket.rs:440-446); end-check2.log 11/11, 859/956 (+52/+52), 1,116.8 s (1.03x of 1,086.7); 5,431
   added, 199 removed. Snapshot wip/u6c-build.patch a4e63455… (24 files; notes u6c-build.md 426b31da…). Round (xhigh)
   -> u6c-review-{netcode,test,security}.md: security APPROVE WITH FINDINGS (5 Low, SEC-U6C-1..5; = Stop B's host read);
-  test APPROVE WITH FINDINGS (5 Medium: F-A2-EXACT, F-READINGS, F-P8, F-TIMING, F-P2; 10 Low); netcode running.
+  test APPROVE WITH FINDINGS (5 Medium: F-A2-EXACT, F-READINGS, F-P8, F-TIMING, F-P2; 10 Low); netcode REVISE.
 - **U6c's Block 0 DONE at 3b75d00 (pushed 8c81952, 06:53):** security-u6c-deps.md's binding check steps 0-7 PASS
   (u6c-block0.md): the lock 3394b451… (229/6, 252 packages, hyper pinned back to 1.12.0; security-u6c-lock.md and its
   addendum CLEAR WITH CONDITIONS, SEC-U6CL-1 to -3 Low); step 5 11/11, 807/904 (= U6b's merged head); deny ok, audit 0
@@ -144,20 +144,20 @@
   u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366, u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (2 agents, 1 shell, 2 triggers; resume each by SendMessage to its ID; after a cut, from its own file):**
-  - U6c's netcode seat aa64bb15ad4467641 (section 7, xhigh, read only, snapshot a4e63455…, tree
-    agent-a3a3e3fdf559de095) -> u6c-review-netcode.md; to resume, it reads its file and goes on after its last complete
-    block; runner logs .gate/u6c/rev-netcode-<n>.log. Test and security DONE (Next 2; resumable: a3a1718b1419d246e,
-    a546a4604d30ee9d4). MAIN-64's advisor a74a6501af7e576c7 (from 10:30, high) -> advisor-main-64.md.
-  - The saver b1bd3pcdl (09:50 to about 11:50; when it ends, restart it: run_in_background, timeout 7200000). Triggers:
-    check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly, next ~10:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24
-    23:05 UTC, msg-2026-11-25.md).
-- **My step (after his /compact, 10:2x):** MAIN-64, main 1ec6f6c into PR #40 (PR #64; only docs/STATUS.md conflicts):
-  plan main-64-plan.md (ed31452e…, saved 2f6001f) in MAIN-61's form, its advisor check running; then its steps 1-7
-  (the saver stopped at step 1; no save from the merge to the push). **Next three:** (1) the three files read; the
-  advisor's one ruling (F-P8, each Medium+); (2) the fix pass (U6c's builder), its check, merge M3-M9 as U4f's
-  (history.md:7022-7028; M5 after a part-clean; A2's reading; U8's side per interface, C9); (3) U7's 0b check the hour
-  U6c merges, U7's R-half (its T-builder), U8's merge. Day message 23:05.
+- **Running (1 agent, 2 triggers; the saver off for MAIN-64; resume by SendMessage to its ID, after a cut from its file):**
+  - The U6c advisor a662f1797b78cae95 (resumed 10:4x, read only, no cargo): round 1's one ruling -> advisor-u6c-r1.md.
+    Seats DONE, resumable: netcode aa64bb15ad4467641 (REVISE: NC-U6C-1 High), test a3a1718b1419d246e, security a546a4604d30ee9d4.
+  - The saver b1bd3pcdl: stopped at MAIN-64's step 1 (restart at step 6: run_in_background, timeout 7200000). Triggers:
+    check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (next 12:34; until the push the card by Edit only, no save); day message
+    trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md). MAIN-64's advisor a74a6501af7e576c7 takes step 7.
+- **My step: MAIN-64** (main-64-plan.md; main 1ec6f6c, PR #64). MAIN-64 approved (advisor-main-64.md), running steps 1-7.
+  If `git rev-parse -q --verify MERGE_HEAD` prints 1ec6f6c3852d2922989f299bfc053c403d0e52d3, the merge is in progress:
+  no save, no `git merge --abort`, no reset. If `git diff --name-only --diff-filter=U` names docs/STATUS.md, resume at
+  step 3; otherwise resume at step 3's checks before the commit (C2 (b)), then step 4. If HEAD^2 is
+  1ec6f6c3852d2922989f299bfc053c403d0e52d3 and HEAD is not on the remote yet, resume at step 5. The netcode seat's notes
+  and this card may show unstaged: leave them; step 6's card save takes them. Anything else: the advisor rules.
+  **Next three:** (1) the U6c ruling, then the fix pass (U6c's builder) and its check; (2) the merge M3-M9 as U4f's
+  (history.md:7022-7028; M5 after a part-clean; A2's reading; C9); (3) U7's 0b check and R-half, U8's merge. Msg 23:05.
 - **Finished, resumable by SendMessage:** U6c's builder a3a3e3fdf559de095 (BUILT; notes u6c-build.md; takes the fix
   pass); U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder ac59cce3e5d002441 (notes u8-build.md "## Pass
   3"); the advisor a3de649cd25e474df (U8's rulings); the U6c advisor a662f1797b78cae95. Older: card at e67ef59.

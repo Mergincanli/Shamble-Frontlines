@@ -1,5 +1,24 @@
 # MAIN-64: take main 1ec6f6c into the netcode branch (plan, 2026-11-24 10:3x UTC)
 
+## As approved
+The advisor's check (advisor-main-64.md, 89 lines, f7db0d84…, read in full; 10:3x-10:5x UTC): **APPROVE WITH
+CONDITIONS M64-1 to M64-4** on this plan's first text (ed31452e…, in 2f6001f). Applied word for word, they need no new
+review, and step 7 stays. Their own words (advisor-main-64.md:15-48) govern wherever this plan differs. In short:
+- M64-1, the numbers C1-C6 bind with:
+  - at 5d, every count equals the base run's word for word, except HEAD, and refs, which are N0 + 3;
+  - C1 (c) and C2 (b): 19 names, and "19 files changed, 2174 insertions(+), 99 deletions(-)";
+  - origin/main is 1ec6f6c3852d2922989f299bfc053c403d0e52d3, and main's CI is three check runs;
+  - the resume line's words;
+  - the block is lines :24-31: keep :25, :29 and :30, drop :26 and :28;
+  - the repo map line: "repo map OK: 173 entries cover 110 required paths".
+- M64-2: the card stays at 200 lines or fewer.
+- M64-3: the saver's window.
+- M64-4, the text:
+  - STATUS.md has exactly 120 lines;
+  - step 4 checks that STATUS.md differs from main in the #40 row alone;
+  - risk tier 1;
+  - step 7 compares toolchain's test, Test Files and Playwright lines with main's run 45373056953.
+
 ## Why
 MAIN-52, Mustafa's words (history.md:2055-2057; TEST-FIRST's "main taken in when it changes code, CI or rules"): main
 moved from f5030a3 (MAIN-61's) to 1ec6f6c, PR #64 (CI-WASM, merged 10:15 UTC). It changes CI
