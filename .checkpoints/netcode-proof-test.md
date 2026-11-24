@@ -98,7 +98,9 @@
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - For msg-2026-11-25.md (C7, R2): (1) U6b's merge fixed one test's cap: the double-load bite's start gets its own 2 s
-  on top of the 5 s (TR2-U6A-4); (2) sha2 runs optimised in debug builds, so the test build's start fits its 5 s.
+  on top of the 5 s (TR2-U6A-4); (2) sha2 runs optimised in debug builds, so the test build's start fits its 5 s;
+  (3) U6c's builder names the command for U6b's 48-connection reading (A2) and I take it at U6c's close; (4) U6c's
+  builder stops and reports at 5,400 added lines (the levers stay mine; his stop stays 6,000).
 - Before those, none since the 2026-11-24 message. Each named in its day's message: 2026-11-23's in msg-2026-11-24.md items 1-7
   (this card at 2a7a5b8 holds them with their sources); 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at
   9341c90); 2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
