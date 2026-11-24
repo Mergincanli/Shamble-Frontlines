@@ -155,9 +155,9 @@
     (next 16:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
 - **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
   check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
-- **My step (15:2x):** waiting for the 17:51 trigger (trig_014DtEnzDqnWHT2N6MsvfyA1). Then U6c's round 2 in one batch at
-  xhigh: three seats on the interdiff `git diff aad2103 6c3ff00` (advisor-u6c-r1.md §4), told about F-P2-HEADER,
-  WebTransport's 0-input second and P1's 484 refused sends. Restart the saver with it. The container readings are DONE,
+- **My step (15:4x):** waiting for the 17:51 trigger (trig_014DtEnzDqnWHT2N6MsvfyA1). Then U6c's round 2, one batch at
+  xhigh, three seats on `git diff aad2103 6c3ff00` (advisor-u6c-r1.md §4); their briefs are drafted in the scratchpad
+  (u6c-r2-common.txt plus one a seat; W re-checked: 0549389e…). Restart the saver with it. The container readings are DONE,
   my own runs through u6c-run.sh, release builds (.gate/u6c/read-*.log):
   - DONE: the release build (read-build.log, exit 0). A2 over WebSocket (read-a2-ws.log, 14:08-14:09): 1 passed in
     70.8 s; npt-load READY then DONE, exit 0; the room exit 0; room memory peak 157,499,392 B; 5-31 inputs per client
