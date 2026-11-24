@@ -12,6 +12,7 @@ import {
   formatSizeTable,
   lockedWasmBindgenVersion,
   MAX_SERVED_BYTES,
+  refusedBuildSettings,
   sizeTable,
   tooLarge,
 } from "./build-checks.mjs";
@@ -203,5 +204,25 @@ test("the glue stays in the Worker's chunk, and development code stays out of a 
   ]);
   expect(bundleProblems([worker, page, dev], true)).toHaveLength(4);
   expect(bundleProblems([worker, page], false)).toHaveLength(4);
+});
+
+test("the Wasm build refuses cargo's and the tool's settings from the environment, and lets the build folder and CI's names through", () => {
+  // One name per family of the pattern; the last two: a build-folder name with more after it is refused.
+  const refused = [
+    "RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "RUSTC", "RUSTC_WRAPPER", "RUSTC_WORKSPACE_WRAPPER", "RUSTUP_TOOLCHAIN",
+    "CARGO_BUILD_RUSTFLAGS", "CARGO_BUILD_TARGET", "CARGO_PROFILE_RELEASE_OVERFLOW_CHECKS", "CARGO_PROFILE_RELEASE_OPT_LEVEL",
+    "CARGO_RESOLVER_LOCKFILE_PATH", "CARGO_INCREMENTAL", "RUSTC_BOOTSTRAP",
+    "CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS", "WASM_BINDGEN_KEEP_DEBUG", "RUST_LOG", "CARGO_TARGET_DIR_X",
+    "CARGO_BUILD_TARGET_DIRX",
+  ];
+  // The two build-folder names (the build's --target-dir beats them), every name CI's network cut sets (toolchain.yml,
+  // its env -i list, with the tool's path), and two names that only contain a refused one.
+  const allowed = [
+    "CARGO_TARGET_DIR", "CARGO_BUILD_TARGET_DIR", "HOME", "PATH", "USER", "CI", "LANG", "PROBE_IP", "CARGO_HOME",
+    "RUSTUP_HOME", "RUSTUP_AUTO_INSTALL", "npm_config_update_notifier", "SHAMBLE_WASM_BINDGEN", "XRUSTFLAGS", "RUSTFLAGS_X",
+  ];
+  const env = Object.fromEntries([...allowed, ...refused].map((name) => [name, "x"]));
+  expect(refusedBuildSettings(env)).toEqual(refused);
+  expect(refusedBuildSettings({})).toEqual([]);
 });
 

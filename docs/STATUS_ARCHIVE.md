@@ -3,7 +3,8 @@ _What this holds: Mustafa's STATUS-DIET of 2026-11-10 puts "the rest (done chang
 here, beside the short `docs/STATUS.md` and his decisions in `docs/DECISIONS.md`. Everything below was moved here by a
 script, by line ranges, from `docs/STATUS.md` at main 2d22b69 (`git show 2d22b69:docs/STATUS.md`; the script, its line
 ranges and its checks: `docs/reports/2026-11-10-status-diet.md`), except what docs-keeper has added since: merged PRs'
-rows in "In flight" and new items in the two live sections (below). Each section keeps the old section's name, so a
+rows in "In flight", new items in the two live sections (below), and blocks moved later from STATUS by script, each
+under a dated header that says so (at the end of "Phase" and of "Routines", 2026-11-23). Each section keeps the old section's name, so a
 citation such as "STATUS, Routines" finds its text here; line numbers in older citations read at 2d22b69, and words such
 as "below" and "above" read in STATUS's old order. The text is the record as it stood then; the current state is in
 `docs/STATUS.md`._
@@ -154,9 +155,21 @@ is playable:** tutorial-field-manual, ui-step-2, ui-step-3, build-spike and the 
 stays low priority and unslotted (seeded house textures also make before/after renders exact). The old order (client
 visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_V2 §12.
 
+_From STATUS's "Follow-ups", moved here on 2026-11-23 by docs-keeper's script, byte for byte (the CI-WASM docs pass, PR #64): "this chat" is lane 1's first builder chat, paused since his words of 2026-11-19, 21:44:09 UTC (`docs/DECISIONS.md`); the hold itself stays in `.claude/CHECKPOINTS.md` §3 for every session._
+- **Binding this chat:** `.claude/CHECKPOINTS.md` §3's hold; the advisor agent's ruling of #58: manifest and lockfile
+  edits stay uncommitted and unbuilt, other code is committed by path only, until security-auditor answers.
+
+_From STATUS's "Phase", moved here on 2026-11-23 by docs-keeper's script, byte for byte (the CI-WASM docs pass, PR #64, to keep STATUS within 120 lines; still current: STATUS points here, and his words of 2026-11-13 stand whole in `docs/DECISIONS.md`):_
+- **The kit:** KIT-FREEZE-2, FREEZE-FDN and his exceptions (two more since, for #53 and #54): `docs/DECISIONS.md`,
+  "Queued"; his two additions of 2026-11-11 for the foundation chat: `docs/DECISIONS.md`. His words of 2026-11-13 for step 2.3:
+  "The kit's freeze (KIT-FREEZE-2) ends with this step. That makes no edit unasked: every edit to a kit, gate or CI file
+  is asked of me in chat with its exact text and written only after my yes, with the chat in Accept edits. A guard
+  prompt alone is not my yes. No such edit happens in the docs pass or while planning."
+
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
+| **change-set 2 of the build plan, "First page"** (cs2-first-page; foundation step 2.5, first half), by lane 1: the Rust simulation (a tick counter and the match seed; no random-number library yet, his RNG-CRATE (c)), built as WebAssembly with wasm-bindgen `=0.2.130`, runs in one module Web Worker at 30 ticks a second and hands the page one block per tick (so far its header: the tick and the layout's hash); the page, which makes no Wasm call, draws an empty lit ground with a 1 m grid on three.js 0.187.0's WebGPU renderer (WebGL 2 as the fallback), names its backend and has a development readout with "Copy report"; `packages/client/serve.mjs` serves a built page to this computer only, under a strict content security policy; `packages/client/scripts/build.mjs` builds the Wasm and the page and checks the tool's file (size and sha256) before every run; browser tests in `packages/e2e` (CI does not run them yet: his CI-WASM (a)); his six messages of 2026-11-18 and 2026-11-19 in `docs/DECISIONS.md` by script; report `docs/reports/2026-11-19-cs2-first-page.md` (the size: there). Follow-ups (their text: the archive's "Follow-ups", "From change-set 2, the first page (PR #61)"): for the CI pull request TE-NT6, RR-N4, RR-F5, E2E-TYPES, SA-TREE, SA-DIST; for change-set 3 NA-N1 to NA-N7, EA-F8, EA-F9, EA-F10, EA-F13, EA-N3, EA-N5, EA-N6, GE-N1, GE-N4, GE-N5, GE-N6, TE-NT3, TE-NT4, TE-NT5, TE-NT7, PA-N2, PA-L2, TE-L, SA-ENV, FAVICON; for change-sets 5 and 6 GE-F7, PA-L4; for the quality gate step SA-F6 (the npm scope `@shamble`), SA-SWAP, TE-NT2; for the drafts' next revision EA-F6, EA-F12 | merged: PR #61 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs2-first-page`), lane 1's first builder chat), f5030a3, 2026-11-19 15:10:54 UTC (the merge commit's date; `merged_at` 15:10:55), by merge commit (parents b763ba3 and 4cf30ce), on his go of 14:28:25 UTC for head 4cf30ce303b16e96b3ca5d5c0b20b928a4db6b86, his words in the merge commit's message (`docs/DECISIONS.md`, 2026-11-19, 14:28:25 UTC), made after his browser check's last report (15:09:29 UTC; the record: `docs/reports/2026-11-19-cs2-browser-check.md`); `gate`, `smoke` and `toolchain` green on the head (read at 15:10 UTC); CI green on main (gate with smoke, id 44551896122; toolchain, id 44551894194; push, on f5030a3) [verified 2026-11-23, GitHub's REST API] | done: opened as a draft 2026-11-19 11:01:27 UTC; the eight build steps in (3833e3e, 784ae3e, 4c32a06, a7f785a, a68e3da, cc9fc71 (the dependency step, pushed through the hold), 6e76f30, 015a212, de63a30, c4a12eb, 74a0c24), then the fix passes 29378dd and d257bb6; round 2's fix pass: the report; two review rounds (seven reviewers, then six on what the fixes changed): no Critical, no High open; the verifier's verdict: the report; the advisor agent's: the pull request's description. **Not verified anywhere yet:** WebGPU itself (this container has no WebGPU adapter: every run here was on the WebGL 2 fallback with software rendering, in Chromium), Brave, Firefox, Safari, a real GPU (then his browser check, in Brave 1.100.58 and Firefox 160 on his Windows computer: errors 0 in all eight reports, WebGPU started in both, the forced WebGL 2 fallback and the hidden-tab pause worked in both; one reading not explained, BR-GAP: the record above and this archive's "Follow-ups", the block for #61). With the merge he accepted, in his words: "The things that went wrong, as the report writes them down", the size, "That CI does not build the WebAssembly or run the browser tests yet", the follow-ups below High and the checkpoint commits in main's history (`docs/DECISIONS.md`, 2026-11-19, 14:28:25 UTC); its merge recorded by #64 | none |
 | **the kit hold and two CI edits** (kit-hold-ci), by lane 1, on his words of 2026-11-18, 15:38:13 UTC ("One small pull request with the kit hold and the two CI edits, nothing else in it."): the checkpoint script holds a push that changes a manifest or a lockfile until its security check is recorded (`.claude/scripts/checkpoint.mjs`, six new tests, one rule line in `.claude/CHECKPOINTS.md` §3; his answer DEP-HOLD (a), written on his yes to its exact text: KIT-TEXT, yes with one change, then KIT-FIX, the fix of a hole in the changed lines); the `toolchain` job runs with no cache (his CI-CUT (a), part 1), writes the generated types again and compares them, and type-checks `packages/types` with strict flags (his CI-TYPES (a)); his three messages of the day in `docs/DECISIONS.md` by script; 293 added lines, accepted by his word of 18:01:08 UTC; report `docs/reports/2026-11-18-kit-hold-ci.md`. Meanwhile, in his words: "No new library of change-set 2 is committed before that pull request is merged." Open after it, as follow-ups (below, "Follow-ups", "From the kit hold and two CI edits (PR #60)"), each below High and so a follow-up by his word of 18:01:08: security-auditor's two Mediums, F1 (in two corners the hold checks another path than the one it pushes: a root folder whose name begins with a blank character, or is not valid UTF-8) and F3 (no rule makes the review of a pull request read the hold's record; until a kit change, change-set 2's report quotes each record and the security answer it names), and its three Lows; test-engineer's three Mediums (behaviours no test pins: main's side of the "equal to main" comparison read at the exact path, a `deleted  <path>` line leaving an existing file held, `origin/main` over a local `main`) and seven Lows; infra-engineer's six Lows (two for his list for the quality gate v2's plan, four on the report's wording) | merged: PR #60 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/kit-hold-ci`), lane 1's first builder chat), b763ba3, 2026-11-18 20:30:46 UTC (the merge commit's date; `merged_at` 20:30:47), by merge commit (parents 9b4b518 and e5ca735), on his go of 20:20:09 UTC for head e5ca7358d5a3f8cc68ee07cd59d7bbf2c45e253d, his words in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC), after the advisor agent's APPROVE of that head (in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 900 with smoke, id 44391809186; toolchain run 198, id 44391809357; push, on b763ba3) | done: the four files written on his yes at 17:15 UTC, two of them again at 18:01 UTC (commits 8bf4bee and 94c197f, pushed 17:18:16 UTC; 4877599, pushed 18:03:10 UTC); the new CI lines on real runs from 17:18 to 17:23 UTC ("Cache mode: none" in the job's log; the compare step failing on a planted change, then passing on the clean tree); one review round, its notes committed at 18:08:01 (infra-engineer), 18:31:54 (security-auditor) and 18:40:04 UTC (test-engineer): nothing Critical or High; the verifier's verdict: the report; the advisor agent's: the pull request's description; with the merge he accepted the four things that went wrong as the report writes them down, the five Medium findings as follow-ups ("They are fixed with the kit changes of the quality gate step. Until then every ready report of a pull request that changes a manifest or a lockfile quotes each release record and the security answer it names."), the two wording slips left in the report, the size (293 added lines against the stop line of 300) and the checkpoint commits in main's history; his answers WRITE-MODE (a) and REC-OLD (a), with one limit; its merge recorded by #61 | none |
 | **change-set 1 of the build plan, Types** (foundation step 2.4), by lane 1: the first eight message types in `crates/protocol` (plain types, no codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript generated into `packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's layout-hash check; his go on #57 and his answer OLD-LINES (who may fold old lines in the shared record files) in `docs/DECISIONS.md` by script; report `docs/reports/2026-11-18-cs1-types.md`; its follow-ups, open after it (CI-CUT; the security check's L1, L2 and L4; the lines for change-sets 2, 3 and 4, the 2.3 chat and the drafts' next revision; round 2's Lows): below, "Follow-ups", "From change-set 1, Types (PR #58)" | merged: PR #58 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs1-types`), the build chat on his personal account), 9b4b518, 2026-11-18 15:39:28 UTC (the merge commit's date; `merged_at` 15:39:29), by merge commit, on his go of 15:38:13 UTC for head 1bfe462e339511cfae6b30a1015330d9ff2e718c, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 15:38:13 UTC), after the advisor agent's APPROVE of that head (in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 884 with smoke, id 44338178450; toolchain run 182, id 44338178455; push, on 9b4b518) | done: two review rounds and the verifier's PASS (15:03 UTC); with the merge he accepted the two misses as written (CI built the nine new packages before their security check, Medium, "written down, not waived"; one evidence record did not hold, and the runs were redone), the size as counted (940 hand-written lines against 600 planned, under his stop line of 1,200), round 2's Lows as follow-ups, what was not verified and the checkpoint commits in main's history; his five answers: DEP-HOLD (a) and CI-TYPES (a), and CI-CUT (a) part 1 (the kit hold and the two CI edits: PR #60), LANE-ISSUE (a) (the "Lane requests" issue: #59, opened 15:41:35 UTC) and WATCH-58 (b) (not watched); its merge recorded by #60 | none |
 | **Part 15 of the build plan, "The second lane", to main** with his six answers (all (a), with additions), a docs change of its own (his go for #56): his words of 2026-11-17, 22:10:34 and 22:59:16 UTC, in `docs/DECISIONS.md` by script; Part 15 as he read it, with his answers on top: `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules file's line on gun files (GUN-FILES, AX-R1); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. Then change-set 1, Types (foundation step 2.4), by lane 1; lane 2 (`claude/optimistic-albattani-mdoonz`) works by Part 15, each unit from the point its 15.2 names | merged: PR #57 (`claude/wonderful-hamilton-jdmlnf` (stands in for `cs/part-15-second-lane`), the build chat on his personal account), 22c6afa, 2026-11-18 11:09:31 UTC (the merge commit's date and `merged_at`), by merge commit, on his go of 11:08:25 UTC for head f26ac5b85396f4b280ba21e57f2a1ea177382d80, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-18, 11:08:25 UTC), after the advisor agent's APPROVE of that head (about 00:17 UTC, in the pull request's description); `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 866 with smoke, id 44292101495; toolchain run 165, id 44292101705; push, on 22c6afa) | done: report `docs/reports/2026-11-17-part-15-second-lane.md`; docs-keeper's pass, the verifier's PASS (seven Lows, fixed) and the advisor agent's APPROVE at 3e4fea1 (five Lows, fixed); with the merge he accepted his go on #56 as recorded, Part 15's text as he read it (where it differs from his answers, his answers hold), the size as counted (220 written lines against the stop line of 300, and 339 copied), the lines left as found because another lane wrote them, and the checkpoint commits in main's history, and he answered OLD-LINES, who may fold old lines in the shared record files (his go, above); the advisor agent's three Lows on the final head: two in STATUS, fixed by #58's docs pass, and a size recount, left to #58's report; its merge recorded by #58 | none |
@@ -601,6 +614,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     - **MANUAL-MODE**: CLAUDE.md's change-set protocol, step 3, says to make a `.claude/` edit "in Accept edits or
       Manual mode", but the cloud app offers Accept edits, Plan or Auto, with no Manual mode (the environment's
       documentation page on permissions, read 2026-11-12), and the session record called the mode he chose "default".
+      _Since (#64, 2026-11-23):_ the same again on his messages of 17:22:42, 19:58:23 and 20:47:59 UTC (the record
+      `default`, his screen Accept edits), which his mode rule of 17:15:07 UTC covers (`docs/DECISIONS.md`); the block
+      for #64 below.
     - **GIT-C**: `.claude/CHECKPOINTS.md` §10 (:221) tells a session to run `git -C <path> status --short --ignored`,
       which the guard refuses ("no option before the subcommand"); sessions `cd` into the folder instead. The 2.1b
       report lists the same refusal in its "Findings for 2.3" [verified 2026-11-12].
@@ -687,6 +703,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       then, each edit asked of him: today CLAUDE.md:119 and :130, `.claude/agents/advisor.md` :157, :163, :224, :273,
       :294 and :323, and the guard's merge check (`routine-guard.mjs:1486`) with its comments and tests [verified
       2026-11-13].
+      _Since (#64, 2026-11-23):_ `toolchain` now also holds the build players get, the boundary tests, the type checks
+      and the 12 browser tests, and it is still not a required check, so a red `toolchain` blocks no merge by itself and
+      is read by hand before every merge (infra-engineer, #64's review round 1; the report's Risks).
     - **SETUP-NODE-CACHE** (S4; reworded on D6, security-auditor's SA-3): setup-node v7.0.0 (pinned by SHA 8207627 in
       `toolchain.yml` and `gate.yml` [verified 2026-11-13]) turns automatic caching on when the root `package.json`
       names npm in its top-level `packageManager` field or in `devEngines.packageManager`. The root `package.json` has
@@ -716,8 +735,17 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     - **WASM-ARTIFACT**: `sim-wasm` is a plain library, so the wasm32 step compiles the crates but emits no `.wasm`
       file; its crate type and its `unsafe_code` exception come with the bindings; the wasm32 build is dev-profile only
       (it joins OVERFLOW-XCRATE-CI, whose counter test runs in wasm32 release).
+      _Since (#64, 2026-11-23):_ `sim-wasm` is a `cdylib` and an `rlib` since change-set 2 (#61;
+      `crates/sim-wasm/Cargo.toml:10`), and CI now builds the release Wasm through `packages/client/scripts/build.mjs`
+      (`cargo build --locked --release --target wasm32-unknown-unknown -p sim-wasm`), twice, inside the cut, and runs
+      the boundary tests on it; the cut's own wasm32 line of five crates stays dev-profile
+      (`.github/workflows/toolchain.yml:160`) [verified 2026-11-23]. No boundary test checks overflow on the Wasm, so OVERFLOW-XCRATE-CI's Wasm half is still open
+      [verified 2026-11-23: no overflow, panic or trap case in `packages/sim-worker/boundary/sim-wasm.test.mjs`].
     - **TWO-PLAYWRIGHTS**: two Playwright versions now live in the repository (the toolkit's 1.56.1, the root's
       1.65.0), so 2.3's browser cache needs a key per version; no real browser has run inside the cut's privilege drop.
+      _Since (#64, 2026-11-23):_ the last clause no longer holds: a real browser has run inside the cut, the runner
+      image's Google Chrome 157.0.8103.78, 12 tests, in eight clean jobs (four heads, push and pull request each); no
+      browser is downloaded for them, so the two versions still need a key each only once a browser cache comes.
     - **TOOLKIT-RESOLVES-UP**: with the root installed and `tools/` installed without its optional packages (the gate
       job's form), `require('playwright')` from `tools/smoke.mjs` loads the root's Playwright 1.65.0 instead of
       reporting the toolkit's 1.56.1 missing; CI's smoke job installs `tools/` in full and never installs the root, and a
@@ -775,6 +803,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       merges inside one run the middle one's run is cancelled; not tested); and planted failures wait for each run, a
       revert's included (four revert runs in this change-set were cancelled by the next plant, 2 to 4 s later). CI
       edits: each asks him.
+      _Since (#64, 2026-11-23):_ the `toolchain` job now takes about 2.2 to 2.5 minutes (135 to 147 s per clean job), so
+      two merges within that time leave the first without a `toolchain` result on main (infra-engineer,
+      #64's review round 1; the report's Risks). The concurrency rule itself is unchanged.
     - **LINT-TABLE-PEDANTIC** (D10, rust-reviewer's RR-2): ADR 0002 part 7 asks both that every crate opt into the
       workspace lint table (`[lints] workspace = true`, itself a gate check) and that pedantic be at warn on `sim`,
       `protocol` and `content` only (:433-436 [verified 2026-11-13]); Cargo cannot hold both: cargo 1.99.1 refuses a
@@ -1066,23 +1097,40 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     that the cache service refuses anything (and until part 2 the post steps of checkout and setup-node still run after
     the cut, with the network and the read-only token); the job-log endpoint is named as the source of the quoted log
     lines.
-- **From change-set 2, the first page (PR #61)** (in flight; two review rounds, seven reviewers on its first head and
+- **From change-set 2, the first page (PR #61)** (merged as f5030a3 on 2026-11-19 on his go of 14:28:25 UTC,
+  `docs/DECISIONS.md`, with which he accepted "The follow-ups below High, as the report lists them"; two review rounds, seven reviewers on its first head and
   six on what the fixes changed, each Opus 5.5 at effort max: no Critical, no High open; every finding below is Low;
   round 2's three Mediums and its fix pass: `docs/reports/2026-11-19-cs2-first-page.md`; the reviewers' notes stay
   readable at the checkpoint commit that report names. The ids are this docs pass's: a prefix for the reviewer (EA
   engine-architect, GE graphics-engineer, NA netcode-architect, PA perf-auditor, RR rust-reviewer, SA security-auditor,
   TE test-engineer) and the reviewer's own code where it has one; reviewers' codes overlap between them):
-  - **For the CI pull request (CI-WASM), right after the merge:**
-    - TE-NT6: the browser checks that depend on the machine's speed (the frame count in the allocation window, the
-      hidden-tab waits) are tuned on this container only.
-    - RR-N4: the pattern that refuses cargo's settings from the environment in `packages/client/scripts/build.mjs` has
-      no test of its own.
-    - RR-F5: the Wasm carries the builder's registry path (a panic location inside wasm-bindgen), so one commit gives
-      other Wasm bytes and sizes on another machine (also for change-set 3's size table).
-    - E2E-TYPES: the browser specs in `packages/e2e/tests/` are run by Playwright but type-checked by no tool.
-    - SA-TREE: the list of third-party crates with an overflow override (root `Cargo.toml`) is checked by hand
-      (`cargo tree`); a test would stop a new runtime crate from shipping without its override.
-    - SA-DIST: `.gitignore` covers `dist/` but not the `dist-<something>` folders `build.mjs --out-dir` accepts.
+  - **For the CI pull request (CI-WASM), right after the merge** (each item marked by the CI-WASM docs pass,
+    2026-11-23, PR #64; the evidence: `docs/reports/2026-11-19-ci-wasm.md`, "What changed" and "Evidence"):
+    - TE-NT6 (**done in #64**: five timing points of the browser specs made robust for a slower machine without
+      lowering a bound, and a readings line per test; test-engineer read six clean runner jobs: nothing thin, the
+      allocation test drew 65 to 76 frames against a floor of more than 20): the browser checks that depend on the
+      machine's speed (the frame count in the allocation window, the hidden-tab waits) are tuned on this container only.
+    - RR-N4 (**done in #64**, with VF-L5 below: the pattern moved into `packages/client/scripts/build-checks.mjs` as
+      `refusedBuildSettings`, with one test of 18 refused and 15 allowed names; test-engineer replayed it against 14
+      broken copies of the pattern: 14 caught): the pattern that refuses cargo's settings from the environment in
+      `packages/client/scripts/build.mjs` has no test of its own.
+    - RR-F5 (**its fix moved to change-set 3**, with rust-reviewer; in #64 CI prints the Wasm's sha256 and the builder
+      paths it carries, "printed, not judged": 28,991 bytes on every runner build, 28,987 in the containers,
+      consistent with this finding and not shown to be only it): the Wasm carries the builder's registry path (a panic
+      location inside wasm-bindgen), so one commit gives other Wasm bytes and sizes on another machine (also for
+      change-set 3's size table).
+    - E2E-TYPES (**done in #64**: CI type-checks the specs and `playwright.config.ts`, with
+      `packages/e2e/node-names.d.ts` for the four Node names they use; seven of seven planted type errors caught, in a
+      container with near-matching versions): the browser specs in `packages/e2e/tests/` are run by Playwright but
+      type-checked by no tool.
+    - SA-TREE (**moved to change-set 3**, as #64's plan said): the list of third-party crates with an overflow override
+      (root `Cargo.toml`) is checked by hand (`cargo tree`); a test would stop a new runtime crate from shipping
+      without its override.
+    - SA-DIST (**done in #64**: `.gitignore` has `dist-*/`): `.gitignore` covers `dist/` but not the `dist-<something>`
+      folders `build.mjs --out-dir` accepts.
+    - _Moved to change-set 3 as well, by his words of 2026-11-19, 14:28:25 UTC ("With change-set 3, one line in
+      .gitignore for __pycache__/, so that a save cannot pick up compiled Python files again."): that `.gitignore` line
+      (not in #64's `.gitignore` [verified 2026-11-23])._
   - **For change-set 3, "The loop closes":**
     - NA-N1 to NA-N7 (netcode-architect, all Low): the step gets the host's time; the pause on a hidden tab comes from
       the mode once online play lands, and held buttons are cleared on hide; who picks the blend fraction between two
@@ -1105,7 +1153,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       unscanned by the build's WebAssembly check (its second plant passed both builds): scan every script but the
       Worker's entry chunk, named by the build itself. With EA-N6.
     - VF-L4, VF-L5 (the verifier): the policy header is asserted on the 200 answer only; the build's refusal of
-      environment settings has no test (with RR-N4).
+      environment settings has no test (with RR-N4). _VF-L5 is done in #64, with RR-N4 (above); VF-L4 stays here._
     - GE-N1: the lost-device and lost-context route has no test.
     - GE-N4: each renderer error prints twice, with three's doubled prefix.
     - GE-N5: after a lost device the page says nothing outside the development readout (with ADR 0003's loss
@@ -1150,6 +1198,94 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       own profiler). A Firefox run needs a Firefox build from the internet: the question goes to him with the CI pull
       request's text. His check of #61 in Firefox is the page's first Firefox run; what it finds is a fix before the
       merge or a follow-up here.
+      _Dated pointer, 2026-11-23 (the CI-WASM docs pass, PR #64): what his Firefox check found (Firefox 160 on his
+      Windows computer, reports of 2026-11-19, 14:53:34 and 15:09:11 UTC, and a screenshot; the record:
+      `docs/reports/2026-11-19-cs2-browser-check.md`): errors 0 in both reports; three.js's WebGPU backend starts in his
+      Firefox (adapter "(not given)"); the forced WebGL 2 fallback runs (its name: "ANGLE (NVIDIA, NVIDIA GeForce GTX 980
+      Direct3D11 vs_5_0 ps_5_0), or similar"); the hidden-tab pause holds (0 ticks while hidden); the page opened as a
+      file keeps its own line of text. What it found beyond that is the group below (FPS-LINE, FF-WAKES, ADAPTER, TQ-FF;
+      none an error count above 0); #61 merged with no fix for Firefox. The question went to him as FIREFOX-TESTS: his
+      answer (c) of ANSWERS-7 (2026-11-23, 14:31:06 UTC) is now (b), by his words of 2026-11-23, 21:24:59 UTC: "Firefox
+      in CI joins the small CI pull request after 3a (E1's)." (`docs/DECISIONS.md`)._
+  - **From his browser check** (2026-11-19, 14:46:25 to 15:09:29 UTC: eight "Copy report" texts from Brave 1.100.58 and
+    Firefox 160 on his Windows computer; the record, with his four messages whole and the readings below:
+    `docs/reports/2026-11-19-cs2-browser-check.md`, "Observations for the follow-ups"; the ids are that record's; none
+    is an error count above 0):
+    - BR-GAP (**the one reading not explained**; to read again with change-set 3's browser check, whose README asks him
+      to keep the window in front and uncovered during the first run and has one step with it covered on purpose, by
+      his words of 2026-11-19, 16:08:04
+      UTC, `docs/DECISIONS.md`): Brave's first run drew 46,382 frames while it ticked for 410 s (113 a second, where
+      every other Brave run averages 180), so for about 150 s the page drew nothing while the simulation ran on, and no
+      pause was recorded. The window may have been covered or the screen off; the pause on a tab switch works in Brave.
+    - FPS-LINE: the readout's "frames a second" comes from the usual gap between two frames; in Firefox it said 239.2
+      where the run's average was 179.9. The line should be a count over time (no change-set named).
+    - NEG-ZERO: "deliveryP50: -0.00 ms" (Brave, `?pad=65536`): the page's and the Worker's clocks, each rounded by the
+      browser, can give a difference just under 0.
+    - FF-WAKES: in Firefox 4 % to 10 % of the Worker's wakes come before a tick is due (6982 wakes for 6717 ticks; 1126
+      for 1018), with no dropped tick and lateness p99 4.667 ms; a reading for the pacing marks in change-set 3.
+    - BR-LATE: Brave's first run has lateness p99 13.2 ms and max 15.833 ms, its other runs p99 4.0 to 6.3 ms; it reads
+      like the system's coarse timer (about 15.6 ms) while the window was not in front; with BR-GAP.
+    - ADAPTER: Brave names no adapter on WebGPU and "Brave" on WebGL; Firefox none on WebGPU and a rounded name on
+      WebGL. A report from Brave cannot say which GPU ran (his machine's, from Firefox: NVIDIA GeForce GTX 980); Brave
+      reports 6 logical processors where Firefox reports 24.
+    - TQ-FF: no timestamp query on Firefox's WebGL 2 (yes on Brave's WebGL 2 and on WebGPU in both).
+    - NOT-SHOWN: a single hidden stretch of 6 minutes; Brave's double-click on `index.html`; his Shields setting.
+- **From the CI-WASM pull request (PR #64)** (in flight, waiting for his go; risk tier 2; two review rounds,
+  infra-engineer, test-engineer and security-auditor, then test-engineer and security-auditor on what changed: no
+  Critical or High; the items are the report's "Follow-ups", `docs/reports/2026-11-19-ci-wasm.md`, with each owner
+  and time as the report and the reviewers' notes give them; "not named" where they give none. The reviewers' notes
+  stay readable at the checkpoint commit that report names. The ids are the report's):
+  - TE-COUNT (test-engineer; the gate v2, step 2.3): CI pins no test count (a skipped or removed test keeps it green,
+    only zero tests turns it red); the gate v2 fails a run with a skipped or missing test. Today each clean run printed
+    "Running 12 tests using 1 worker", "12 passed" and the boundary block's "Tests  7 passed (7)".
+  - TE-TYPE-PLANTS (test-engineer; when: not named): a planted type error in a Worker file and in a page file has never
+    been shown failing CI's type checks (the specs' check caught seven of seven, in a container only).
+  - TE-TSC-LINES (test-engineer; the next CI edit, its exact text asked of him): each type check prints its own result
+    line (today `tsc` prints nothing on success, and a pass is read from the next echo under `bash -e`).
+  - TE-104 (test-engineer; with the next change to that spec): the hidden-tab bound at
+    `packages/e2e/tests/skeleton/skeleton.spec.ts:104` has never been seen hit (it holds by arithmetic; the plant that
+    would reach it is caught two lines earlier): a plant that runs extra ticks on resume without counting drops.
+  - TE-MONO (test-engineer; with the next change to that spec): `performance.now()` in place of `Date.now()` at `skeleton.spec.ts:92` and
+    `:98`.
+  - TE-WATCH (every session that reads a red `toolchain`; on every runner-image or Chrome change): read the allocation
+    test's byte windows and the default backend first.
+  - TE-CPU (test-engineer; the next CI edit, its exact text asked of him): the job prints `nproc` and the CPU model
+    once, so a timing reading on a runner comes with its machine (no run prints them today).
+  - TE-HIDDEN-FRAMES (test-engineer; when the page's pause behaviour changes): the hidden-tab test's four-frame waits
+    need the page to keep drawing while it is faked hidden (`packages/client/src/app/boot.ts:73-76`); revisit them if that
+    changes.
+  - IMAGE-CHROME (infra-engineer; on a red): the browser tests run the image's Chrome, which moved 157.0.8103.50 to
+    157.0.8103.78 in five days; a later Chrome can outrun Playwright 1.65.0 or move the allocation test's byte
+    windows: read the printed line, and the fix is a Playwright update (a dependency, with its security answer) or
+    another browser source (his CHROME-SOURCE (a) accepts a moving browser). A red is read, not re-run into green.
+  - CUT-PATH (infra-engineer, Low after its own correction; with CI-CUT part 2, the gate v2): inside the cut PATH is
+    the runner's, whose first folders the cut's user can write on this image, so a build script can shadow node,
+    npx, git, sha256sum or Chrome for every later line; the root-owned tool protects its own file only.
+  - TOKEN-WORDS (security-auditor and infra-engineer, Low; the next CI edit, his yes): the comment "The only step with
+    the token" (`.github/workflows/toolchain.yml:91`) is true of run steps; checkout and setup-node, both pinned by
+    SHA, receive the job's token as their default input, as on main ("the only run step with the token").
+  - F-CHANNEL (security-auditor, Low; with change-set 3's build work): the refusal pattern in
+    `packages/client/scripts/build-checks.mjs` also refuses `__CARGO_*`, `CARGO_UNSTABLE_*` and `RUSTC_*`: with
+    `__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS` and `CARGO_UNSTABLE_*`, stable cargo takes nightly-only features
+    from the environment; local builds only (CI's cut starts from `env -i`).
+  - GH-TOOLS for later pull requests (his; open as GH-NEXT, the report's "Decisions needed"): his GH-TOOLS (a) of
+    2026-11-23, 17:15:07 UTC was "for this pull request"; Builder V3 cannot write to GitHub (no GitHub tool, the
+    platform refuses `gh pr create`, the guard keeps `gh api` read-only).
+  - SAVER (the kit; when: not named, a kit change that asks him): the checkpoint saver pushes to the local branch's
+    name, and Builder V3's worktree branch is named `cs/ci-wasm` (the main folder holds the `claude/` name and is never
+    switched), so no saver ran in that chat: card and notes were committed by path and pushed by hand after every
+    step (the advisor agent ruled it acceptable; a departure from `.claude/CHECKPOINTS.md` §5).
+  - MANUAL-MODE's record value (beside MANUAL-MODE, in "From foundation 2.2" above): on his messages of 2026-11-23,
+    17:22:42, 19:58:23 and 20:47:59 UTC the record read `default` while his screen showed Accept edits, as his rule of
+    17:15:07 UTC foresaw ("If it reads default: my screen shows Accept edits"); on 17:15:07 UTC it read `auto`, and
+    nothing was written on it.
+  - Firefox in CI (the chat he calls Builder V3; the small CI pull request after change-set 3a, his FIREFOX-TESTS (b),
+    2026-11-23, 21:24:59 UTC).
+  - The line for CLAUDE.md on the third account (ACCT-3; his to give).
+  - RR-F5's fix, SA-TREE and the `__pycache__/` line: change-set 3 (the block for #61 above).
+  - Known ones it touches: REQUIRED-CHECK, CANCEL-ON-MAIN, TWO-PLAYWRIGHTS and WASM-ARTIFACT (a dated line under each,
+    in "From foundation 2.2" above); CI-CUT and NODE-26 (#64 changes nothing they say: checkout's post step still
+    runs after the cut, and the job still names `node-version: 22`).
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -1267,6 +1403,14 @@ and the night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); nei
   commit and push uncommitted changes, untracked files that are not ignored, and unpushed or unsigned commits. B1's
   probe (`.checkpoints/part-b/probe.md`) set it off; the guard refused the push, and the hook asks only once per stop.
   B2 left no files and did not set it off.
+
+_From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byte for byte (the CI-WASM docs pass, PR #64): the two routines as read on 2026-11-10 at 20:10 UTC; the "next" runs they name have passed, and no read of the routines has been recorded since. STATUS keeps their state and schedules._
+- **Night shift** (trig_01QpV6y6UaG1Na2q3jumRDxh): enabled; `CRON_TZ=Europe/Amsterdam 10 0-6 * * *` (hourly, 00:10 to
+  06:10 Amsterdam), set 2026-11-10 18:00 UTC (daily at 06:00 from 2026-11-07 00:02 UTC until then); Opus 5.5; last run
+  2026-11-10 05:04 UTC, succeeded; next 2026-11-10 23:10 UTC.
+- **PR Advisor** (trig_01YPyWAsQmsaQoydhMGG3CkJ): enabled again 2026-11-10 16:07:30 UTC, after #46's merge (paused
+  2026-11-09 18:22 UTC by Mustafa); `CRON_TZ=Europe/Amsterdam 45 7,13,19 * * *`, a schedule only, never pull-request
+  events; Opus 5.5; runs 16:07 UTC (succeeded) and 18:46 UTC (failed: the usage limit); next 2026-11-11 06:45 UTC.
 
 ## Open bugs and risks
 - **netcode proof test** (in flight, PR #40; its plan ranks 15 risks, plan §13; here its numbers 1 to 4 and 11):
@@ -1503,8 +1647,10 @@ and the night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); nei
 | Seeded match pairs (240) | tree-face stall windows 1885 -> 0; mean stall 9.12% -> 8.50% | 2026-10-14 | scratch harness (report) |
 | Editor rebuild (Cabana): full-map draw calls boot / 1 / 2 rebuilds | base 1992 / 2406 / 3502 · head 1992 / 1992 / 1992; heap after GC boot / 10 rebuilds: base 42.9 / 119.5 MB · head 42.7 / 44.5 MB | 2026-10-14 | preview.js harness + perf-auditor |
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
-| v2, the first page (change-set 2, PR #61, in flight): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
-| CI on main, latest (the row below is older) | `gate` with `smoke` (run 900, id 44391809186) and `toolchain` (run 198, id 44391809357) success on b763ba3, PR #60's merge commit (push) | 2026-11-18 | GitHub Actions runs (API) |
+| v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
+| CI on main, latest (the rows below are older) | `gate` with `smoke` (run 934, id 44551896122) and `toolchain` (run 232, id 44551894194) success on f5030a3, PR #61's merge commit (push) | 2026-11-19 | GitHub Actions runs (REST API, read 2026-11-23) |
+| CI-WASM (PR #64, in flight): the `toolchain` job on a runner | 135 to 147 s per clean job (eight jobs on four heads, push and pull request); the Wasm 28,991 bytes, sha256 22dad2eb...018b, on every runner build (28,987 bytes in the containers: RR-F5, not judged); 12 browser tests in Google Chrome 157.0.8103.78 in about 1.1 min; boundary tests 7, the client's unit tests 49; the allocation test 65 to 76 frames (floor: more than 20) | 2026-11-23 | docs/reports/2026-11-19-ci-wasm.md |
+| CI on main (older) | `gate` with `smoke` (run 900, id 44391809186) and `toolchain` (run 198, id 44391809357) success on b763ba3, PR #60's merge commit (push) | 2026-11-18 | GitHub Actions runs (API) |
 | CI on main | `gate` and `smoke` success on 44446a5 (PR #44's merge commit) after one re-run: run 42673290304's first attempt lost its `gate` job on GitHub's side (only `smoke` ran, green); attempt 2 green, 06:37 UTC | 2026-11-10 | GitHub Actions runs (API) |
 | Gate (official battery, older) | 0 flagged, 44 editor refs all guarded | 2026-10-10 | battery.js |
 
