@@ -901,6 +901,20 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      ("nothing to probe", so red mails); if so, his archive go or the workflow switched off comes first; anything the
      report needs from the records pulled into the results log or .gate before then. The local evidence in
      `.gate/preview-hosting-check/day1` and `day2` is present (listed 2026-11-24 after 22:26 UTC).
+   - The closing units, in plan Part 8's order (consultation 27): C1 the saver, then the verifier on the evidence,
+     matching every mark against ADR 0006's own words (not the plan's plain-words table), whether "at least 2 open
+     preview branches" is met by branches without a pull request (5 of the 6 walled ones), ADR 0006's "When a mark
+     fails" before any not-met wording (it also settles whether step 2.6 waits on Risk 13), docs citations re-checked
+     after main's 108 files; C2 his words into DECISIONS.md by script from the saved message files; C3 the report, its
+     appendix the results log moved by script and diffed, the body written from the log's "in short" and "read" entries
+     (the log and the card not read whole), in the shape of lane 1's merged report (decisions script, workflow texts
+     kept apart, the fold commit); C4 docs-keeper, lane 2's own lines only; C5 the draft pull request, the advisor
+     agent's review of its head (its file on main unchanged since 2026-11-13, before this session), the fold and delete
+     of both checkpoints by a hand commit after the gate and the repo-map check, then ready. Before main: the appendix
+     swept for his account ID, e-mail, Windows user name and the policy, application and kid values; the branch's checks
+     green on 78c2d9a; the PR-page picture carried as the merged reports carry pictures, or the departure stated; the
+     hourly probe's exit after 2026-12-02 checked (if 3: his archive go, dated, in the closing message). What the delete
+     takes (saved messages, plan.md, reviewer notes, token-test variants): cited by commit SHA or folded in.
 
 ## Next steps
 1. The report (`/advisor-report`), folding both checkpoints (this one and `lane2-needs.md`), the results log and the
@@ -1443,6 +1457,17 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    Brave's version late), one ask only (the billing screenshot), the acts he leaves alone until my go named with no
    clicks, the 25 November deadline gone; not blocking: Risk 13 re-read before "then step 2.6", the records' end on
    2 December and the probe's exit 3, the local evidence listed (present).
+   2 December and the probe's exit 3, the local evidence listed (present).
+
+27. 2026-11-24 22:50:59 UTC (called; answer 22:53:09 UTC; transcript times), moment 1 (the closing change-set's
+   approach) · Q: start the report tonight, and in what order? · Changed: start now, each unit saved before the next,
+   no compaction stop; plan Part 8's order (the saver, the verifier on the evidence, his words by script, the report
+   with the log as its appendix, docs-keeper with lane 2's lines only, the draft pull request, the advisor agent's
+   review, the fold, ready); marks judged against ADR 0006's own words, the open-branches question and "When a mark
+   fails" first; citations re-checked after main's 108 files; low context (the log moved by script, the body from its
+   summaries; lane 1's merged report as the shape); what the delete takes cited or folded; the last commit by hand; the
+   privacy sweep, the checks on 78c2d9a, the advisor agent's file, the picture's route; his message's two decisions and
+   the 2 December probe question.
 
 ## Running work
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
