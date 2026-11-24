@@ -40,3 +40,33 @@ relative CARGO_HOME note). Shared worktree read-only; builds, servers, plants on
   "./worker" (package.json), so a bare /@id/@shamble/sim-worker/pkg-rules/... should not resolve: to probe.
 - 16:18 The stale copy in the shared tree: packages/sim-worker/pkg-rules/{release,dev} (15:26), release wasm sha256
   6f368718... = .gate/rules-module/release/devtools_bg.wasm (live target).
+- 16:21 Copy r3/copy (.gate/security-auditor-cs3a/r3/setup-copy.mjs): packages w/o node_modules (stale pkg-rules
+  inside), .gate/rules-module, three as a REAL copy (allow list is lexical), other root entries linked, @shamble/* as
+  npm links; sha256 of both wasm copies, vite.config.mjs and isolation.spec.ts equal to the shared tree (8619d539).
+- 16:23 FRESH dev server per route (r3/devserver-fresh.mjs + r3/routes.mjs; Vite 8.3.7, the page config, as the spec
+  starts it): 82 HTTP routes, LEAKS 0 (a leak = body holds the test-only bytes or a marker export name). Controls 200:
+  players wasm (application/wasm), three/package.json, types/package.json, /@id/@shamble/sim-worker/worker.
+  403: .gate/rules-module by /@fs/ with ?raw ?url ?import ?inline ?init ?raw?? ?import&raw?? ?inline&import
+  ?worker_file ?url&import ?.svg?.wasm?init ?vite-wasm-instance ?direct ?t= ?v= .d.ts, sec-fetch-dest script; .. and
+  %2e%2e/%2E%2E from pkg, three, client, types; /@fs//, //, /./. Stale copy: direct, every query, .. from pkg/src/
+  three/types/client, file/../..; THE LINK ROUTE node_modules/@shamble/sim-worker/pkg-rules/... (wasm, js, ?raw ?url
+  ?init ?import ?inline), via @shamble/client/.. and @shamble/types/.., from three/.. -> all 403. Link package.json,
+  link pkg/sim_wasm_bg.wasm, link src/worker.ts, link boundary test -> 403.
+  200 text/html (SPA fallback, the page): ..%2f, %252e, root-relative ../%2e%2e, absolute path w/o /@fs, /@id/<abs>,
+  /node_modules/... root-relative, .map, pkg%2f..%2f. 400: any # (rejectInvalidRequestMiddleware). 500: /@id/ bare
+  subpath (exports field refuses: error page quotes the path and a stack, no file text).
+  200 stub only: ?worker / ?sharedworker of devtools.js (G, stale, link): generated WorkerWrapper naming the path; its
+  Worker address (?worker_file) -> 403. No bytes.
+- 16:23 HMR WebSocket vite:invoke fetchModule (token from /@vite/client): "fetchModule is disabled in this
+  environment" for all 9 (control included): closed route.
+- 16:25 ORDER effect on ONE server (r3/order-probe.mjs): ?worker / ?sharedworker / /@id/ error first, then the direct
+  spellings of G, stale and link (?worker_file, plain, ?import, ?raw, wasm, ?url, ?init): all 403, leaks 0. Source:
+  safeModulePaths only grows from importAnalysis of a transformed (allowed) module and the html entry (node.js:26640,
+  :37038); no allowed file imports the module.
+- 16:27 COLD cache page run (r3/page-warm.mjs on r3/cold, a second fresh copy: no packages/client/node_modules/.vite at
+  start), real Chromium /opt/pw-browsers/chromium: page RUNS (31 blocks, worker 25 ticks, report errors 0); the one
+  console 404 is /favicon.ico (r3/page-404.mjs: request logger in front of the Vite stack; browser-internal, accept
+  image/*). Spec asserts through page.request: players 200 application/wasm; .gate/rules-module wasm + js 403; link
+  package.json + link players wasm 403; stale pkg-rules wasm 403 (no content-type header: the 403 page sets none);
+  a missing file 200 text/html (SPA fallback). WARMED server, all 88 routes + 9 invokes again: leaks 0, the same
+  answers as fresh (200s only controls, ?worker stubs, SPA fallback).
