@@ -8,3 +8,6 @@
 5. Plants (>= 6, my own) in a scratch copy under .gate/te-plant-b/, each run against the named test.
 6. Findings, verdict.
 ## Blocks done (one line each)
+- B1 commands at a3476e6c: cargo test -p npt-judge --locked --no-fail-fast: lib 18, main 0, cli 4, engine 75,
+  fixtures 25, doc 0 = 122 pass, 0 fail. clippy --all-targets -D warnings: exit 0. cargo fmt --check: exit 0.
+  --check-marks: "81 marks read and checked (drafts at 626df678...)", exit 0. marks.json: git diff --quiet = unchanged.
