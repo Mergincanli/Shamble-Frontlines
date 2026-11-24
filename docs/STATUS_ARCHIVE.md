@@ -1444,7 +1444,7 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     yet); ADR 0002 part 5's planned dev-only feature (3A-PART5-CLASH) (engine-architect's round 1, its departures line,
     and NEW-C). Inside DEPART-3 (a), said here so it is not lost: PM-0002-53's counter in WebAssembly is the tools
     crate's own function (test-engineer's round 1, its Low (c): "accepted by DEPART-3 (a); say so").
-- **From the preview hosting check** (lane 2, the chat he calls Builder V2; in flight, its pull request still to open;
+- **From the preview hosting check** (lane 2, the chat he calls Builder V2; in flight, its pull request #66;
   branch `claude/optimistic-albattani-mdoonz` standing in for `cs/preview-hosting-check`; risk tier 1; the items of its
   report's "Follow-ups (for STATUS)", `docs/reports/2026-11-24-preview-hosting-check.md`, their text kept; the ids are
   this docs pass's):

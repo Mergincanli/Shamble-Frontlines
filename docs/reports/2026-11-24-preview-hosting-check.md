@@ -22,7 +22,7 @@ production stayed open, and the deleted token was refused at Cloudflare's sign-i
 check has not passed by the draft's own rule** ("A spike passes when every mark that applies passes", ADR 0006 :1404):
 the header mark is not met as written (production's one-off links carry the "keep out of search engines" header), and
 two marks are open (the build count, and his verdict on checklist step 4, which depends on it). Five marks are met with
-departures that change no reading. Three decisions of his follow; this pull request waits for them and for his go.
+departures that change no reading. Four decisions of his follow; this pull request waits for them and for his go.
 
 | What it checks (the mark) | The draft's own words, shortened (ADR 0006) | Verdict |
 |---|---|---|
@@ -36,7 +36,7 @@ departures that change no reading. Three decisions of his follow; this pull requ
 | The wall covers the previews and not production (PM-0006-8) | "on every preview URL of at least 2 open branches ... and on PM-0006-6's leftover URLs, a cookie-less client gets no build"; "on the production URL ... it gets the build"; "the mark reads the 1-hour sweep" (:1376) | Met, on a reading of "open": at 1 hour or more no build from any link of six Pages branches (one with an open pull request, five without) or of the leftover links; production's own address served; with the wall off, every build served |
 | His verdict in Brave (PM-0006-9) | "every step of the hosting checklist below "achieved", 0 "not yet"" (:1377) | **Open:** steps 1 to 3 and 5 to 8 "achieved" in his words; step 4 (the build count) has no verdict |
 | GitHub shows the preview link on the pull request (PM-0006-10) | "recorded: yes or no, with a screenshot of the page" (:1378) | Met: yes, logged out (this chat's picture) and logged in (his words) |
-| A pull request cannot reach the token or production (PM-0006-32) | "2 of 2: ... gets no secret until the `preview` environment's required reviewer approves it ...; a job in a pull request that names the `production` environment is refused" (:1379) | Met: both cases, the control and the bite; reported: a production deploy with the preview token is not refused; recorded: the merge ref is judged and refused, and his revocation is proven by the refused upload |
+| A pull request cannot reach the token or production (PM-0006-32) | "2 of 2: ... gets no secret until the `preview` environment's required reviewer approves it ...; a job in a pull request that names the `production` environment is refused" (:1379) | Met: both cases, the control and the bite; reported: a production deploy with the preview token is not refused; recorded: the merge ref is judged and refused, and his revocation is proven by the refused upload; one departure: the environments' deployment history was read from the pull-request pages (the repository's deployments pages answer 404 when logged out) |
 
 By the draft's rule the spike has not passed: one mark is not met as written (the headers) and two are open (the build
 count, and his verdict on step 4, which asks for that count). The departures change no reading.
@@ -140,10 +140,11 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
   19:07:46 UTC), each whole, copied by script from the chat's transcript and checked byte for byte against the saved
   copies and their sha256, each placed by its time between the decisions around it; 252 lines added, no other line
   changed (RECORD-FILES). Commit 7c803a6.
-- His message of 2026-11-25 (lane 2 building beside lane 1; his question on change-set 6 and M before change-set 5) added
+- His message of 2026-11-25 (Amsterdam; 2026-11-24, 23:16:11 UTC; lane 2 building beside lane 1; his question on
+  change-set 6 and M before change-set 5) added
   the same way (20 lines), so that it outlives the checkpoint.
 - docs-keeper's pass (its notes, readable at d28b8f1d4040, list every line): `docs/STATUS.md`, lane 2's lines (this pull
-  request in "In flight"; step 2.6's plan and his question of 2026-11-25 in "Next"; his three decisions, the probe's
+  request in "In flight"; step 2.6's plan and his question of 2026-11-25 in "Next"; his decisions, the probe's
   switch-off and the clean-up after the merge in "Waiting on Mustafa"; nine follow-ups named PHC-; two open risks,
   PHC-HEADER and PHC-PROBE-MAIL) and their texts in `docs/STATUS_ARCHIVE.md`. To keep STATUS within its 120 lines, the
   follow-up bullets of the merged #49, #50, #51 and #48 (STATUS lines 78-93 at 28254a7) moved by script, byte for byte,
@@ -236,7 +237,7 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
   the Advisor with the measured numbers" (ADR 0006 :1411-1416). Nothing in ADR 0006 changes in this pull request. That
   paragraph does not name step 2.6; the plan he approved does ("the check's end and step 2.6 wait for the revised
   draft", Risk 13), while his order of 2026-11-18 puts step 2.6's plan right after this report. Whether step 2.6 waits
-  is his decision (below)..
+  is his decision (below).
 - **The test repository's hourly probe after 2026-12-02**: the upload records it reads expire then (14 days).
   The upload records are kept 14 days; the last of them expires on
   2026-12-02 (about 18:35 UTC). After that the probe finds nothing to probe and ends every run red (it exits 3 when it
@@ -257,7 +258,7 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
   scripts; none carries into step 2.6 unless its plan picks it up.
 
 ## Proposed next step
-His three decisions below. Then, unless he decides that step 2.6 waits for the draft's revision: step 2.6's plan (the
+His four decisions below. Then, unless he decides that step 2.6 waits for the draft's revision: step 2.6's plan (the
 previews without his click and what keeps the token safe then, the locked install), brought to him for his go; the
 revision of ADR 0006's header row is infra-engineer's work by the draft's route, after his word. The test repository's
 probe is switched off before 2 December, and the repository archived and the test project deleted after this report is
@@ -272,7 +273,8 @@ merged (his TR-END (a)).
      that revision.
    - Options: (a) infra-engineer revises the draft's header row to judge production's own address only (a one-off
      address works like a preview address, and the header there keeps old builds out of search engines), the revision
-     comes to him with these numbers, and step 2.6's plan starts meanwhile, as his order of 2026-11-18 has it; (b) the
+     comes to him with these numbers, and step 2.6's plan starts meanwhile, as his order of 2026-11-18 has it (this
+     skips the draft's own route for a header fail on Pages, weighing Workers static assets again: option (c)); (b) the
      same revision, and step 2.6 waits for it, as the plan's Risk 13 says; (c) the draft weighs Workers static assets
      again (its own route for a header fail on Pages).
    - My recommendation: (a). The finding changes nothing a player or a preview link meets, and step 2.6 does not use
@@ -292,13 +294,27 @@ merged (his TR-END (a)).
      before). (2) GitHub's hourly checker ran 3 times in the 24 hours, so the deletion series has 7 readings, by-hand
      checks standing in; the 24-hour reading itself was taken. (3) The wall's "at least 2 open branches" counted six
      Pages branches, only one of them with an open pull request; the draft's reason for two fits all six. (4) Safari
-     was not run, by his words "focus on brave, chrome, firefox and maybe edge (most used browsers)".
-   - Options: (a) all four stand as recorded; (b) he names any that goes back to the draft (none can be re-run as it
+     was not run, by his words "focus on brave, chrome, firefox and maybe edge (most used browsers)". (5) The pictures
+     stay out of the repository, the pull-request page's picture (PM-0006-10) among them, though the plan he approved
+     said the closing pull request would carry that one; the report transcribes what each picture shows.
+   - Options: (a) all five stand as recorded; (b) he names any that goes back to the draft (none can be re-run as it
      was: the Brave version of 18 November was not recorded, and the hourly series would need a new 24-hour case).
    - My recommendation: (a).
+4. **HISTORY-ID: how this pull request is merged, given what its branch's history holds.**
+   - What: the account ID's first and last four characters (not the ID, which is not a password either) sit in this
+     branch's older checkpoint commits, from de1a902 to 23418fd, and the report points to d28b8f1 for the deleted
+     checkpoint. A normal merge carries those commits into main's history; a squash merge gives main one commit
+     without them. Rewriting history to remove them is never allowed.
+   - Why it matters: the test's plan kept the account ID out of public logs; this is a fragment of it, in public
+     history.
+   - Options: (a) a normal merge: the history and the report's link to the checkpoint stay whole; (b) a squash merge:
+     main never holds the fragment, and the link to d28b8f1 works only while this branch exists.
+   - My recommendation: (a). Eight characters of an account ID open nothing, and his own words in DECISIONS already
+     name the last four.
 
 ## For Mustafa
-1. The three decisions above, one line each (for example "ONE-OFF-HEADER (a), STEP4-COUNT (b), DEPARTURES (a)").
+1. The four decisions above, one line each (for example "ONE-OFF-HEADER (a), STEP4-COUNT (b), DEPARTURES (a),
+   HISTORY-ID (a)").
 2. Before 2 December: switch off the test repository's hourly checker, so it cannot mail failures once its records
    expire. Go: any time now (no reading needs it any more). Clicks (GitHub's docs): Mergincanli/shamble-preview-check →
    Actions → in the left list, "probe" → the "..." menu at the top right → Disable workflow.

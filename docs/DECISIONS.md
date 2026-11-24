@@ -127,14 +127,14 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
-- **Taken by Mustafa, 2026-11-24, 23:16:11 UTC: lane 2 builds the game now, beside lane 1 (Builder V3, on his third
-  account: change-set 3a merged as #65, 3b next; lane 1's CI edits now go to a separate chat, CI Builder); lane 2 reads
-  Part 15 and STATUS again and answers in at most 12 lines what step 2.6 still needs and when his first link comes,
-  which of its units can start now, and what of change-set 6 and M it could build before change-set 5 without lane 1's
-  folders (his decision; nothing of it built before his yes); read and answer only; one pull request at a time per lane,
-  every file one owner, the kit frozen** (the builder chat he calls Builder V2, lane 2 of the build,
-  session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For Builder V2 (lane 2),
-  from me, written with my main Advisor (25 November)"; a message queued while the chat worked, entry
+- **Taken by Mustafa, 2026-11-24, 23:16:11 UTC: in his words, "I want lane 2 building the game now, beside lane 1" (lane
+  1 is Builder V3, on his third account: change-set 3a merged as #65, 3b next; lane 1's CI edits now go to a separate
+  chat, CI Builder); lane 2 reads Part 15 and STATUS again and answers in at most 12 lines what step 2.6 still needs and
+  when his first link comes, which of its units can start now, and what of change-set 6 and M it could build before
+  change-set 5 without lane 1's folders (his decision; nothing of it built before his yes); read and answer only; one
+  pull request at a time per lane, every file one owner, the kit frozen** (the builder chat he calls Builder V2, lane 2
+  of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For Builder V2
+  (lane 2), from me, written with my main Advisor (25 November)"; a message queued while the chat worked, entry
   0c2a5b97-5c59-4e91-87ec-b3e315f2eee9; whole; extracted by script from the chat's transcript). What it answers, in the
   chat's words (not his): nothing the chat asked. Its line "The Cloudflare sitting is still to come, later today" came
   after Day 2 had run (2026-11-24, from about 20:14 UTC); the chat said so and answered in its chat, changing no file
@@ -1605,7 +1605,7 @@ The kept-logs build is still waiting for you. Please switch the session to Accep
   advisor tool; the plan for the check, with the eight things it must give him** (the builder chat he calls Builder V2,
   lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "My
   words of 2026-11-14, for a fresh chat on my personal account: the second builder chat for the game"; written
-  2026-11-14, pasted 2026-11-15 (his note of 16:03:05 UTC below); message 7dceb92c-e718-42e9-bfe7-7cec24c10671, whole;
+  2026-11-14, pasted 2026-11-15 (his note of 16:03:05 UTC above); message 7dceb92c-e718-42e9-bfe7-7cec24c10671, whole;
   extracted by script from the chat's transcript). Records, not his words: the decision of 2026-11-14 on two builder
   chats that this message quotes is recorded by the first builder chat's change-set 0, as the message says. Copied by
   script (5830 bytes, sha256 e86c6b53e9f6769a47a7024a01a127042681fd6b0b101d98cb55ab53a86b4009):
