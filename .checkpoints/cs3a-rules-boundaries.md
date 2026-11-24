@@ -385,6 +385,20 @@ title and text. **3a merges only after his own answer to MUL-ADD** (the advisor 
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **Round 2, security-auditor (on 79666ad9; `security-auditor-review2.md`; read 15:51 UTC): REVISE, 0 Critical, 1
+  High, 0 Medium, 3 Low.** Round 1's M1, L2, L3, L5, L6 confirmed fixed.
+  - **High (L1 not fixed; "evidence that does not hold"): the dev server still reaches the test-only module.**
+    `vite.config.mjs` still allows `../../node_modules`, and npm's link `node_modules/@shamble/sim-worker ->
+    ../../packages/sim-worker` (seen here) puts `pkg-rules/` under it: its run gave 200 with the module's bytes
+    through the link, and 403 only for the direct spelling the spec tries. Condition 2's clause (d) stays not met
+    for the dev server. **The fix, once the round has ended: build the test-only module outside `packages/`
+    (under `.gate/`), narrow the list to `node_modules/three`, assert the real place and a link spelling in the
+    isolation spec, plants for both.** A third round on this fix is within the budget (an open High).
+  - New Lows, in the same pass: N1 a control character in cargo's home path splits `CARGO_ENCODED_RUSTFLAGS`
+    (refuse it in `registryRemapFlag`); N2 the comments that say a config-file flag "does not reach the compiler"
+    hold for rustflags only (name the linker, the compiler wrappers, profiles and `[env]` as outside); its note
+    that a relative `CARGO_HOME` is resolved against node's folder while cargo uses the root (resolve against the
+    root). L-STATS stays its STATUS follow-up.
 - **State after the fix pass 79666ad9: every round-1 finding marked "fix now" below is taken; round 2 confirms.**
   perf-auditor's round 1 (`perf-auditor-review1.md`): OK, 0 Critical, 0 High, 0 Medium, 2 Low,
   both taken (`doneAt` read once; the comment that said the report check allocates nothing).
