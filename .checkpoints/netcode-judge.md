@@ -85,9 +85,30 @@ Part a is reported. Waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL. 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
    one small commit, the checks again on the new head, the new commit id to him.
-2. Part b (U6j, 19 figures and three waiting judge changes; the stop is 4,900 added lines): read u6-brief.md section 8
-   and replan-units.md:40, :63, :175 on the netcode branch's notes, SERIES.md's formulas and figures.rs; its own
-   plan (`plan-b.md`), the advisor agent's review, then the build in blocks.
+2. Part b (U6j; the stop is 4,900 added lines). Read so far: u6-brief.md sections 1, 2, 3, 6, 7, 8; figures.rs whole;
+   SERIES.md's "Figures" table (:258-299) and "Series read only by figures" (:402-424); which marks name the
+   figures (jq over marks.json). Its pieces:
+   - **J0, found while reading, not in the hand-off's detail:** two standing items for "the judge's next change" that
+     part a did not do. (1) u4s-carries.md entry 64 (:455-480): six follow-ups (a) to (f) from the advisor's U4j
+     round-2 ruling, "before any other edit to crates/judge/src, and at the latest before U6 builds -19's figure",
+     each shown failing under its plant; (a) is Medium (the Arm test's role C and ML cases), (f) changes
+     `summary_line` (control characters escaped). (2) JDG-ONLY-1, Medium (history.md:4609-4614): `--only` narrows the
+     marks before a precondition is looked up (main.rs:94; eval.rs `Rule::Pre`), so a mark with `pre:PM-0001-2`
+     judged alone reads INVALID; home "npt-judge's next change, before PR #40 is marked ready at the latest". Both go
+     first in part b; the advisor rules whether part a's head stands as it is (my lean: yes).
+   - **J1, the three waiting judge changes** (plan.md:1254's row): C-U6-9, `twin_hash_mismatch_count` gains -30's
+     form (each other's measured runs differing in `params.transport`), with fixtures and SERIES.md's row naming both
+     forms; C-U6-10, PM-0006-20's logging-off twin against C4's role list and `twin_of`'s same-bite rule
+     (`alloc_twin_diff_count` settles it); C-U6-11, -19's join hash under the coverage rule: how a client admitted
+     mid-run starts its span (a marks/README.md rule), and whether ML's `browser` process joins the `decoded_hash`
+     writers (-19's ML part is moved now).
+   - **J2, 19 figures** (figures.rs's `planned(.., "U6", ..)` entries less `rtt_agreement_p99_ns`, which moved with
+     PM-0001-33): sync_unit_cost, sync_cost_ratio (-10); down_client_mean_max_bits, down_mean_ipv6_bits,
+     r2_down_formula_bits (-12); up_client_mean_max_bits (-13); rss_slope_bytes_per_10min, queue_growth_count (-15);
+     session_memory_growth_count (-24); kill_p99_ratio (-27); bulk_control_p99_rise_ns, one_shot_dropped_count (-38);
+     crash_close_max_ns (-59); egress_interface_bytes, egress_metric_vs_interface_ratio, r2_egress_formula_bytes,
+     egress_vs_r2_ratio (PM-0006-17); logging_cost_ratio (PM-0006-19); alloc_twin_diff_count (PM-0006-20).
+   Then `plan-b.md`, the advisor agent's review, the build in blocks (each compiling with its tests before the next).
 
 ## Open findings
 - Left as follow-ups from part a's round (Low, no fix now): rust-reviewer's L4 (a kept bite whose only runs were left
