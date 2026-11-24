@@ -3,7 +3,8 @@ Brief u6b-brief.md rev 1.2 (7bc69f1a…; section 0.0 binds the advisor's ruling 
 range). Base 21765e3 (U6a's merge 824d8e7 plus Block 0; measured 754, bites 850). One round (NPT-TRIM): netcode,
 security and test seats; the ruling (R-PING, A1-A3); the fix pass (u6b-fix-pass.md 031742e4…; notes u6b-build.md
 74e0d697…); the advisor's check of the fix diff in place of a second round (A3): **APPROVE WITH CONDITIONS C1-C2**
-(advisor-u6b-fix.md bf8da516…).
+(advisor-u6b-fix.md bf8da516…). At the merge, M5 failed on one test's cap; the advisor's M6 ruling (advisor-u6b-m6.md
+f4100ef7…): **APPROVE WITH CONDITIONS C1-C7**, the cap fixed in binary.rs, the probe, M5 again.
 
 ## What was built, and its size
 - **WebTransport:** WtServer, WtLink, WtClient over l2/wt.rs's endpoint, with the server's own QUIC limits (4
@@ -34,7 +35,14 @@ security and test seats; the ruling (R-PING, A1-A3); the fix pass (u6b-fix-pass.
   steps PASS: measured 807 (754 +53), bites 904 (850 +54), 0 failed, 0 skipped; test step 848.5 s (0.89 of base's
   954.8 s). Condition 5 (at least +45 and +45, plus each test the fix pass adds, by name; T-20): the fix pass adds 8
   tests, named in advisor-u6b-fix.md item (5); 807 = 799 + 8; 904 = 898 − 2 + 8 (the two pm_0001_18_* tests left with A1).
-  **M5 in the main folder:** PENDING.
+  **M5 in the main folder, run 1** (wip/u6b-fix.patch applied, 28 of 28 files byte-equal to the builder's tree;
+  .gate/u6b-merge/m5-check.log, 04:34:46-04:55:29 UTC): **FAIL** at the test step (1,013.6 s): the measured build 807
+  passed, 0 failed; the bites build stopped at `bites::pm_0001_16_double_load_fails_every_start_under_2_s`, "no first
+  line within the 5 s cap (Timeout): the room was killed" (binary.rs:82). Every other step passed. The cause (the M6
+  ruling): TR2-U6A-4, below, not U6b's code. **The fix** (C1, the main session, binary.rs only, +14 -12;
+  .gate/u6b-merge/m6-hunk.diff c6bfe8a9…): `OPEN_CAP` (5 s) for every start's own work, `start()` takes its cap, the
+  bitten start gets `OPEN_CAP` plus the bite's own 2 s; no assert changed. **The probe** (C3, m6-probe2.log): PENDING.
+  **Run 2** (m5-check2.log): PENDING.
 - **Plants** (each failed its named test for its planted reason and was restored; advisor-u6b-fix.md item (4) has the
   table): P1-P11, P14, P14b, P15, P15b, P16-P20, all 20 re-applied to the fixed tree. Logs .gate/u6b/fx-plant-<id>.log;
   the diff files beside them since 2026-11-24 04:3x UTC (C1), sha256:
@@ -71,6 +79,14 @@ security and test seats; the ruling (R-PING, A1-A3); the fix pass (u6b-fix-pass.
   25.17 ms**. These replace U6a's lower bound (p50 634 ms, max 979 ms, a debug build without the listeners or the
   certificate): both listeners and the certificate are now in the start. The 48-connection reading and the cap's
   memory bound at N = 48 moved to U6c's close (A2); the bound exists only as arithmetic (u6b-build.md:181-183).
+
+## TR2-U6A-4, closed here
+- **Its history:** raised Low in U6a's round 2 (u6a-r2-test.md:112: "The double-load bite's start shares the 5 s
+  first-line cap although 2 s of it are the bite's own sleeps (2,660 ms here); a loaded runner can push it past 5 s and
+  fail a correct bite"); named in U6a's fix pass (u6a-fix-pass.md:96-97) and U6a's report (u6a-report.md:66) only under
+  "Not verified", with no taker. U6b's start (the dev certificate, both listeners) used up the margin, and it fired in
+  M5's run 1 on a correct tree. **Re-rated Medium** by the advisor (F-M6-1). Fixed by C1's hunk, above.
+- **F-M6-2's rule:** a Low whose fix is code is carried with a taker, never closed by a "Not verified" line.
 
 ## The round
 - Netcode APPROVE WITH FINDINGS (Mediums NR-U6B-1, -2; twelve Lows). Security REVISE (Mediums SEC-U6B-1, -2; no
@@ -115,14 +131,14 @@ ws_split_mark_after_open_ns). Notes the rows need (report text):
 ## Carries, by number (advisor-u6b-fix.md section 6)
 | Taker | Items |
 |---|---|
-| U6e | PM-0001-18/ws-budget-x2 (wip/u6b-build.patch 49f4488f's hunks) with T-1 as its condition, word for word; SP-4 and SEC-U6BD-2; N4 (the binary's arming in no test); T-4's bite half; T-11; T-14; T-16 (from U6d); T-18; T-21; NR-U6B-5 (not built: the scope line); T-12 (not built); F-1 (the WebSocket half of the closing bound untested); F-2 (T-4's test timed alone) |
+| U6e | PM-0001-18/ws-budget-x2 (wip/u6b-build.patch 49f4488f's hunks) with T-1 as its condition, word for word; SP-4 and SEC-U6BD-2; N4 (the binary's arming in no test); T-4's bite half; T-11; T-14; T-16 (from U6d); T-18; T-21; NR-U6B-5 (not built: the scope line); T-12 (not built); F-1 (the WebSocket half of the closing bound untested); F-2 (T-4's test timed alone); F-M6-3 (u6b_open reads its first line with no cap, binary.rs's u6b_open test: a room that never opens hangs the test step; its handshakes' margin against the room's 2 s deadline unmeasured) |
 | U6d | NR-U6B-11, NR-U6B-13, NR-U6B-14 |
 | U6c's close (A2) | the 48-connection DelayStream self-test reading and the cap's memory bound at N = 48 (NR-U6B-5's recount of the pool's heap in it); F-3 (the room-clock mark read non-zero) |
 | U7 | SEC-U6B-2's unidirectional stream count (6), confirmed in its headless Chromium run |
 | U7's or U8's record step | NR-U6B-10 (F-NEG: a presence-only draft count, or -56 item 2 by number) |
 | U8's next edit (R1.md and the unit) | NR-U6B-6's room-clock mark read by the INVALID rule; NR-U6B-9's reader rows beside pooled L; T-5's note; T-17 (the hash file's 0644 and the umask: UMask=0022 in the room's unit; not built) |
 | The security baseline; PR #40's closing list | SEC-U6B-3 (Retry before the permit): a security finding left open (advisor.md step 4) |
-| Closed in U6b | SEC-U6B-1, -2, -4, -5; NR-U6B-1, -2, -3 (R-PING), -4, -6 (the row), -12 (by T-6); T-2 (both halves), T-3 to T-9, T-10 (with C1), T-13, T-15 (= SEC-U6B-4), T-19 (P20); T-1 closed for U6b by A1, open as U6e's condition |
+| Closed in U6b | TR2-U6A-4 (U6a's, Medium by F-M6-1: the bitten start's cap); SEC-U6B-1, -2, -4, -5; NR-U6B-1, -2, -3 (R-PING), -4, -6 (the row), -12 (by T-6); T-2 (both halves), T-3 to T-9, T-10 (with C1), T-13, T-15 (= SEC-U6B-4), T-19 (P20); T-1 closed for U6b by A1, open as U6e's condition |
 
 ## Not verified
 No RS, no load, no browser (U7's headless Chromium is the first contact; whether a browser's CONNECT names a draft-02
@@ -130,4 +146,6 @@ header is from web-transport-proto's comments only); the 48-connection reading a
 each plant log's diff hash against its diff file (the advisor's check needed an alternate git index; that call was
 stopped at a permission prompt and not run: each failure matches its diff's edit instead); the WebSocket half of the
 closing bound (F-1); T-4's test alone (F-2); the mark row only at 0 (F-3); quinn's Debug text as a stable form for
-SEC-U6B-2's test; the mark's cost on an I/O worker (arithmetic only); the 20 starts are one container's, never judged.
+SEC-U6B-2's test; the mark's cost on an I/O worker (arithmetic only); the 20 starts are one container's, never judged;
+what slowed M5's run 1 (its test step 1,013.6 s against the builder's 848.5 s; incremental builds were on in that run,
+F-M6-4, off since: C2), and the bitten start's own time in that run.
