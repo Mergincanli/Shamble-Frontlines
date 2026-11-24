@@ -938,3 +938,15 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
     login page come back after a restart) not stated**. Both asked of him; his verdict words ("achieved" or "not yet")
     asked with them.
 - PM-0006-1, the machines: his PC runs Windows 11 Version 25H2 (Build 26200.9974) (brave://version, 2026-11-24).
+- **The wall sweep at 10 minutes or more (PM-0006-8)**: probe run #26, id 45480782801, started by the session after
+  the check-in trig_012uYr31Q5puh8mgoMhPHnUR fired (20:25:51 UTC), `purpose: wall`, head 347d5e0, created 20:26:12
+  UTC; probe-results-45480782801 (artifact 14961513330, zip sha256 eb5cd9e2ad5e..., equal to its digest), probed_at
+  2026-11-24T20:26:39.259Z, 12 min 26 s after his message of 20:14:13 UTC (so at least that long after the switch-on),
+  `.gate/preview-hosting-check/day2/probe26-wall10/`. 43 rows: 42 answer HTTP 302 to
+  shamble-preview-check-pages.cloudflareaccess.com ("wall"); production's own address https://shamble-preview-check.pages.dev/
+  200 "serves" (expected "serves"). By case: (a) 2 wall; (a') 3 wall; (b) 4 wall; (b') 5 wall; (c) 2 wall; (d) 2 wall;
+  the by-hand previews 19 wall; the rehearsal 2 wall; production's three one-off links (0354374e, e9a37459, de1c3e5e)
+  wall (not judged: the mark names production's own address). Every judged row as expected ("no build" for all but
+  production's own address); unexpected 0, no reading 0. The wall on the stable links of open branches (the script's
+  rule, counted from the rows): 6, bite-coep, bite-nocache, cs/pd-open, iso-off, iso-on, uploads (the mark needs 2).
+  PREV-DELETE's leftovers ((d)'s two links) give no build.

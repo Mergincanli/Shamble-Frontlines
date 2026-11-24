@@ -864,6 +864,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      production no login in the normal window; Brave 1.100.58 unchanged; Windows 11 25H2 (Build 26200.9974). Open: step
      7's private half (production in a private window) and step 8's result (the login after a restart), with his
      verdict words; then the billing screenshot during the wait. The 10-minute sweep fires at 20:25 UTC.
+   - **The 10-minute sweep** (probe #26, 45480782801, probed_at 20:26:39 UTC, 12 min 26 s after his message): every
+     preview row walled (42 rows, 302 to the Access login), production's own address 200, 6 open branches walled on their
+     stable links, nothing unexpected (results log). Next: the 1-hour sweep at 21:15 UTC (the one that counts), then
+     visit 2.
 
 ## Next steps
 1. Day 2 (step 26): the 24-hour probe at 18:55 UTC (check-in), then Day 2's list (after a consultation), then the
