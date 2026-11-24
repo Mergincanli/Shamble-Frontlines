@@ -433,15 +433,26 @@
    383f5303...3963; "no registry path in the Wasm". **The zip was sent to him** (built from c5f6a85a3; the game
    files are the same; the advisor agent: "The zip may go to him now").
 
+15. **His browser check: 2026-11-24, 21:48:49 UTC** (`mustafa-2026-11-24T214849-browser-check.md`, by script: 4,451
+   bytes of text, sha256 393a9e4b...ce99; two pictures, not in the repository). The zip built from c5f6a85a3. Brave
+   (Chrome/158 in the report, Shields up): two reports, WebGPU, errors 0, "frames: 180.0 a second", frames over the
+   ticked time 180.0 and 180.1 a second; with the window covered "it dropped to 179 fps briefly" and no gap opened
+   (180.2 a second between the reports); "last pause: 16.5 s hidden · ticks while hidden: 0", pauses 6, drops 0: by
+   the reports' clock times the match stood still for about 140 s in all. **Not as the README words it: it said
+   about 60 s hidden; a report holds only the last pause.** The page opened as a file shows its one line. Firefox
+   160: WebGPU, errors 0, "frames: 178.4 a second" against 179.9 over the ticked time (239.2 against 179.9 at
+   change-set 2's check: the line is fixed). The advisor agent on 8d277cf2: APPROVE (17:44 UTC); the verifier's
+   cover of 8d277cf2: PASS (17:52 UTC). Size at 8d277cf2: 3,562 lines (538 of room).
+
 ## Current step
-**Waiting for three things** (17:42 UTC): the advisor agent's verdict on the corrected head 8d277cf2
-(8d277cf21cf54919c2ae54e5232d45e944e7b040; asked after 17:38 UTC, its notes `advisor-head.md`); the verifier's
-cover of that head (comments only since 8619d539; `verifier-final.md`); **Mustafa's browser check of the zip (sent
-to him after 17:38 UTC) and his main Advisor's draft pull request from `pr-title.txt` and `pr-body.md` here**
-(told to him with the zip). Then the LAST commit: the advisor agent's verdict on 8d277cf2 and his browser reports
-into the docs (his messages by `chat-words.mjs` and a DECISIONS entry by script), the report's notes pointer
-(the commit where the notes stay readable: this branch's last commit before the deletion), the checkpoint
-folded and deleted, no skip marker; CI; the verifier and the advisor agent on that head; his go for its full SHA.
+**The last commit** (21:51 UTC): his browser reports are in (step 15). The commit after this one holds: the
+browser-check record `docs/reports/2026-11-24-cs3a-browser-check.md` (by `browser-check-record.mjs`), the pointer
+in `docs/DECISIONS.md` (by `decisions-4.mjs`, seven entries), the report's last edits (the advisor agent's
+APPROVE of 8d277cf2; the verifier's cover; the five wording Lows; the steps table with this commit as the place
+where the notes stay readable), STATUS's line, and the deletion of this card and its folder. No skip marker. Then
+CI, the verifier's and the advisor agent's read of that head, and his go for its full SHA; he, or his main Advisor
+on his tap, presses Ready and Merge with that SHA as the expected head. **After that commit this card is gone:
+the report and STATUS are the resume source.**
 Plain words with him: no tag or code without its explanation in the same sentence.
 (Card written 15:31 UTC.)
 

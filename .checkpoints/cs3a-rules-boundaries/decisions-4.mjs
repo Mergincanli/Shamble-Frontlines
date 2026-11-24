@@ -55,6 +55,12 @@ const said = (m, s) => {
 // repository's records show, marked as not his words.
 const ENTRIES = [
   {
+    when: '2026-11-24, 21:48:49 UTC',
+    file: 'mustafa-2026-11-24T214849-browser-check.md',
+    pointer: (m) =>
+      `_A pointer, not a decision: **his browser check of change-set 3a's zip, 2026-11-24, 21:48:49 UTC.** One chat message (${V3}; his message ${m.id}; ${m.bytes} bytes of text, sha256 ${m.sha256}) with three "Copy report" texts, two from his own browser (Brave) and one from Firefox on his Windows computer, and two pictures. It stands whole, copied by script, in \`docs/reports/2026-11-24-cs3a-browser-check.md\`, Appendix A, with the build chat's reading of it against the zip's README: errors 0 in all three reports; the match stands still while the page is hidden (${said(m, 'lastPauseTicksWhileHidden: 0')}); Brave Shields was up; the page opened as a file shows its one line of text. One line is not what the README said to expect: the last pause reads 16.5 s, not about 60 s (six pauses in all; only the last one's length is in a report). In his words on the covered window: ${said(m, 'When I placed the thing explorer window in front of it: it dropped to 179 fps briefly')}. What it answers, in the chat's words: ${m.answers}_`,
+  },
+  {
     when: '2026-11-24, 15:58:25 UTC',
     file: 'mustafa-2026-11-24T155825-mul-add-a.md',
     title:
@@ -115,6 +121,7 @@ const MARK = '## Decisions, newest first\n';
 if (before.split(MARK).length !== 2) throw new Error('the heading "Decisions, newest first" must stand once');
 const blocks = ENTRIES.map((entry) => {
   const m = saved(entry.file);
+  if (entry.pointer) return `${wrap(`- ${entry.pointer(m)}`)}\n`;
   const header = `- **Taken by Mustafa, ${entry.when}: ${entry.title}** (${V3}; his message ${m.id}, whole; extracted by script from the chat's transcript). ${entry.lead(m)} What it answers, in the chat's words (not his): ${m.answers} Records, not his words: ${entry.records}. Copied by script (${m.bytes} bytes, sha256 ${m.sha256}):`;
   return `${wrap(header)}\n${quote(m.words)}\n`;
 });
