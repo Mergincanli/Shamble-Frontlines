@@ -3642,3 +3642,211 @@ fn a_bite_runs_logging_off_twin_may_name_its_bite() {
         v.why
     );
 }
+
+// U6j's figures (part b): each on made-up logs, with a pass, a fail and a gap case. No writer logs these series yet.
+
+/// Run f1 (L2) under a mark with one check of `figure` (`op` `value`): the check as "Outcome value" (`-`: no
+/// value), and its note.
+fn figure_check(figure: &str, op: &str, value: Value, logs: &[Log]) -> (String, String) {
+    let mark = json!({
+        "id": M, "title": "a figure", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "P", "select": {"layer": "L2"}, "min": 1}],
+        "checks": [{"name": "c", "figure": figure, "op": op, "value": value}],
+        "bites": []
+    });
+    let v = judge(&marks_file(&[mark]), logs);
+    let c = &v[0].parts[0].runs[0].checks[0];
+    let value = c.value.as_deref().unwrap_or("-");
+    (
+        format!("{:?} {value}", c.outcome),
+        c.note.clone().unwrap_or_default(),
+    )
+}
+
+/// One log of run f1 with 2 clients: `process` on machine role `machine`, its second records in order from 0.
+fn seconds_log(process: &'static str, machine: &'static str, seconds: Vec<SecondSpec>) -> Log {
+    let mut s = LogSpec::room("f1", "set-f", M);
+    (s.process, s.machine_role, s.clients, s.seconds) = (process, machine, 2, seconds);
+    s.build()
+}
+
+/// A second record of `phase` with list series only.
+fn lists(phase: Phase, lists: &[(&'static str, [i64; 2])]) -> SecondSpec {
+    let lists = lists.iter().map(|(k, v)| (*k, v.to_vec())).collect();
+    (phase, vec![], lists)
+}
+
+#[test]
+fn u6j_the_largest_client_mean_of_the_downstream_and_the_upstream() {
+    // Per measured second: slot 0, slot 1. A warm-up second is not read. The other direction differs on purpose.
+    let run = |name: &'static str, other: &'static str, slot1: [i64; 3]| {
+        let mut seconds = vec![lists(
+            Warmup,
+            &[(name, [900_000, 900_000]), (other, [1, 1])],
+        )];
+        seconds
+            .extend(slot1.map(|b| lists(Measured, &[(name, [159_999, b]), (other, [700_000, 1])])));
+        vec![seconds_log("room", "RS", seconds)]
+    };
+    let down = |logs: &[Log]| figure_check("down_client_mean_max_bits", "<=", json!(160_000), logs);
+    assert_eq!(
+        down(&run("down_bits", "up_bits", [160_000; 3])).0,
+        "Pass 160000"
+    );
+    // Slot 1's 480,003 bits over 3 s: 160,001, though the mean over both clients is 160,000.
+    assert_eq!(
+        down(&run("down_bits", "up_bits", [160_001; 3])).0,
+        "Fail 160001"
+    );
+    assert_eq!(
+        down(&run("down_bits", "up_bits", [160_000, 160_000, 160_001])).0,
+        "Fail 160000.333333"
+    );
+    let up = |logs: &[Log]| figure_check("up_client_mean_max_bits", "<=", json!(160_000), logs);
+    assert_eq!(
+        up(&run("up_bits", "down_bits", [160_001; 3])).0,
+        "Fail 160001"
+    );
+    assert_eq!(up(&run("up_bits", "down_bits", [1; 3])).0, "Pass 159999");
+    // Gaps: a measured second without the series; a list that does not hold the run's clients; the name in a log
+    // of another process; no room log; no measured second.
+    let mut gaps: Vec<(Vec<Log>, &str)> = vec![];
+    let mut logs = run("down_bits", "up_bits", [1; 3]);
+    logs[0].seconds[2].s.remove("down_bits");
+    gaps.push((
+        logs,
+        "run f1: measured second 2 of the room log has no second.s.down_bits",
+    ));
+    let mut logs = run("down_bits", "up_bits", [1; 3]);
+    logs[0].seconds[3]
+        .s
+        .insert("down_bits".into(), vec![1, 2, 3]);
+    gaps.push((
+        logs,
+        "run f1: measured second 3's second.s.down_bits holds 3 entries, not 2, the run's clients (the room log's header)",
+    ));
+    let mut logs = run("down_bits", "up_bits", [1; 3]);
+    logs.push(seconds_log(
+        "bots",
+        "LG",
+        vec![lists(Measured, &[("down_bits", [1, 1])])],
+    ));
+    gaps.push((
+        logs,
+        "run f1: second.s.down_bits in the bots log on LG1: only process room writes it",
+    ));
+    let bots = seconds_log("bots", "LG", vec![lists(Measured, &[("x_count", [1, 1])])]);
+    gaps.push((vec![bots], "run f1: no room log"));
+    let warm = seconds_log("room", "RS", vec![lists(Warmup, &[("down_bits", [1, 1])])]);
+    gaps.push((
+        vec![warm],
+        "run f1: no measured second in the room log (second.s.down_bits)",
+    ));
+    for (logs, why) in &gaps {
+        assert_eq!(down(logs), ("Gap -".to_owned(), (*why).to_owned()));
+    }
+}
+
+#[test]
+fn u6j_the_ipv6_downstream_mean_adds_160_bits_per_datagram() {
+    let second = |bits, datagrams| {
+        lists(
+            Measured,
+            &[("down_bits", bits), ("down_datagrams_count", datagrams)],
+        )
+    };
+    let ipv6 = |logs: &[Log]| figure_check("down_mean_ipv6_bits", "==", json!(1_320), logs);
+    // 3 seconds of 1,000 bits and 2 datagrams per client: 1,000 + 2 x 160.
+    let logs = vec![seconds_log(
+        "room",
+        "RS",
+        vec![second([1_000, 1_000], [2, 2]); 3],
+    )];
+    assert_eq!(ipv6(&logs).0, "Pass 1320");
+    // The mean over client-seconds, not the largest client's: (1,000 + 3,000 + 160 x 4) / 2 over each second.
+    let logs = vec![seconds_log(
+        "room",
+        "RS",
+        vec![second([1_000, 3_000], [1, 3]); 3],
+    )];
+    assert_eq!(ipv6(&logs).0, "Fail 2320");
+    let mut logs = vec![seconds_log(
+        "room",
+        "RS",
+        vec![second([1_000, 1_000], [2, 2]); 3],
+    )];
+    logs[0].seconds[1].s.remove("down_datagrams_count");
+    let gap = "run f1: measured second 1 of the room log has no second.s.down_datagrams_count";
+    assert_eq!(ipv6(&logs), ("Gap -".to_owned(), gap.to_owned()));
+}
+
+#[test]
+fn u6j_the_control_streams_p99_rise_under_a_bulk_transfer() {
+    const BULK: &str = "control_delay_bulk_ns";
+    const IDLE: &str = "control_delay_idle_ns";
+    // Two bots logs, pooled: the samples with a transfer in flight in one, those without in the other.
+    let run = |slowest: i64| {
+        let warm = lists(Warmup, &[(BULK, [90_000_000, 90_000_000])]);
+        let bulk = lists(Measured, &[(BULK, [1_000_000, slowest])]);
+        let idle = lists(Measured, &[(IDLE, [2_000_000, 1_000_000])]);
+        vec![
+            seconds_log("room", "RS", vec![lists(Measured, &[])]),
+            seconds_log("bots", "LG", vec![warm, bulk]),
+            seconds_log("bots", "LG", vec![idle]),
+        ]
+    };
+    let rise =
+        |logs: &[Log]| figure_check("bulk_control_p99_rise_ns", "<=", json!(5_000_000), logs);
+    assert_eq!(rise(&run(7_000_000)).0, "Pass 5000000");
+    assert_eq!(rise(&run(7_000_001)).0, "Fail 5000001");
+    // A faster stream under the transfer is a negative rise, a real value.
+    assert_eq!(rise(&run(1_500_000)).0, "Pass -500000");
+    // No sample with a transfer in flight in the measured seconds: a gap, never a rise of 0.
+    let mut logs = run(7_000_000);
+    logs[1].seconds[1].s.remove(BULK);
+    let gap = "run f1: no second.s.control_delay_bulk_ns sample in the measured seconds of LG's bots logs";
+    assert_eq!(rise(&logs), ("Gap -".to_owned(), gap.to_owned()));
+    let mut logs = run(7_000_000);
+    logs[0].seconds[0].s.insert(IDLE.into(), vec![1]);
+    let gap = "run f1: second.s.control_delay_idle_ns in the room log on RS1: only process bots writes it";
+    assert_eq!(rise(&logs), ("Gap -".to_owned(), gap.to_owned()));
+    assert_eq!(rise(&logs[..1]).1, "run f1: no bots log");
+}
+
+#[test]
+fn u6j_one_shots_sent_less_those_received_over_the_whole_run() {
+    const SENT: &str = "one_shots_sent_count";
+    const GOT: &str = "one_shots_received_count";
+    let counts = |name: &'static str, per_second: [(Phase, i64); 3]| -> Vec<SecondSpec> {
+        per_second
+            .map(|(ph, n)| (ph, vec![(name, n)], vec![]))
+            .to_vec()
+    };
+    // Sent in the warm-up and in the measured phase; received a second later, the last after the measured phase.
+    let run = |received: i64| {
+        let sent = counts(SENT, [(Warmup, 4_000), (Measured, 6_000), (After, 0)]);
+        let got = counts(GOT, [(Warmup, 0), (Measured, 4_000), (After, received)]);
+        vec![
+            seconds_log("room", "RS", got),
+            seconds_log("bots", "LG", sent),
+        ]
+    };
+    let dropped = |logs: &[Log]| figure_check("one_shot_dropped_count", "==", json!(0), logs);
+    assert_eq!(dropped(&run(6_000)).0, "Pass 0");
+    assert_eq!(dropped(&run(5_999)).0, "Fail 1");
+    // More received than sent is not 0 either.
+    assert_eq!(dropped(&run(6_001)).0, "Fail -1");
+    let mut logs = run(6_000);
+    logs[1].seconds[2].v.remove(SENT);
+    let gap = "run f1: second 2 of the bots log on LG1 has no second.v.one_shots_sent_count";
+    assert_eq!(dropped(&logs), ("Gap -".to_owned(), gap.to_owned()));
+    let mut logs = run(6_000);
+    logs[0].seconds.clear();
+    let gap = "run f1: no second record in its room log (second.v.one_shots_received_count)";
+    assert_eq!(dropped(&logs), ("Gap -".to_owned(), gap.to_owned()));
+    let mut logs = run(6_000);
+    logs[0].seconds[0].v.insert(SENT.into(), 1);
+    let gap =
+        "run f1: second.v.one_shots_sent_count in the room log on RS1: only process bots writes it";
+    assert_eq!(dropped(&logs), ("Gap -".to_owned(), gap.to_owned()));
+}

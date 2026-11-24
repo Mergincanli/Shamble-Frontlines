@@ -2,9 +2,10 @@
 //! slopes, arithmetic against a formula). Every name `marks.json` uses must be listed here; one that is listed but
 //! not built yet says which unit builds it, and its check comes out NOT-RUN rather than guessed.
 
-use crate::eval::{Missing, Run, every_run_rules};
+use crate::eval::{Missing, Run, every_run_rules, stat_of};
+use crate::marks::Stat;
 use crate::ratio::Ratio;
-use npt_log::Phase;
+use npt_log::{Log, Phase, SecondRecord};
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -945,6 +946,200 @@ fn machine_named(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, Lack> {
     Ok(Ratio::int(i128::from(named)))
 }
 
+// U6j's figures over second records (`marks/SERIES.md`'s "Figures" rows give each one's formula and draft words).
+
+/// The run's one room log: a gap if it has none, or more than one (these figures read one room's counters).
+fn room_log<'r>(run: &'r Run<'_>) -> Result<&'r Log, Lack> {
+    let mut rooms = run.logs.iter().filter(|l| l.header.process == "room");
+    match (rooms.next(), rooms.next()) {
+        (Some(log), None) => Ok(log),
+        (None, _) => Err(Lack::Gap(format!("run {}: no room log", run.id))),
+        _ => Err(Lack::Gap(format!("run {}: more than one room log", run.id))),
+    }
+}
+
+/// A name only one process writes (`kind`: `second.v`, `second.s`, `tick.v` or `tick.s`): in a log of another
+/// process it is a gap, as for the `hs` names (the advisor's FX-5 (a)).
+fn only_from(run: &Run<'_>, process: &str, kind: &str, name: &str) -> Result<(), Lack> {
+    let has = |l: &Log| match kind {
+        "second.v" => l.seconds.iter().any(|s| s.v.contains_key(name)),
+        "second.s" => l.seconds.iter().any(|s| s.s.contains_key(name)),
+        "tick.v" => l.ticks.iter().any(|t| t.v.contains_key(name)),
+        _ => l.ticks.iter().any(|t| t.s.contains_key(name)),
+    };
+    let other = run
+        .logs
+        .iter()
+        .find(|l| l.header.process != process && has(l));
+    other.map_or(Ok(()), |l| {
+        Err(Lack::Gap(format!(
+            "run {}: {kind}.{name} in the {} log on {}: only process {process} writes it",
+            run.id, l.header.process, l.header.machine.name
+        )))
+    })
+}
+
+/// One series of the room log's measured second records, by `sec` (`get` reads it off a record). Gaps: the name in
+/// another process's log, a measured second without it (every second record carries its counters, 0 included:
+/// README §2.3), a second logged twice, no measured second.
+fn room_seconds<'r, T>(
+    run: &'r Run<'_>,
+    kind: &str,
+    name: &str,
+    get: impl Fn(&'r SecondRecord) -> Option<T>,
+) -> Result<BTreeMap<u64, T>, Lack> {
+    only_from(run, "room", kind, name)?;
+    let mut out = BTreeMap::new();
+    let seconds = room_log(run)?.seconds.iter();
+    for s in seconds.filter(|s| s.ph == Phase::Measured) {
+        let Some(v) = get(s) else {
+            return Err(Lack::Gap(format!(
+                "run {}: measured second {} of the room log has no {kind}.{name}",
+                run.id, s.sec
+            )));
+        };
+        if out.insert(s.sec, v).is_some() {
+            return Err(Lack::Gap(format!(
+                "run {}: the room log has measured second {} twice",
+                run.id, s.sec
+            )));
+        }
+    }
+    match out.is_empty() {
+        true => Err(Lack::Gap(format!(
+            "run {}: no measured second in the room log ({kind}.{name})",
+            run.id
+        ))),
+        false => Ok(out),
+    }
+}
+
+/// A `second.s` series of the room log's measured seconds. Every list holds as many entries as the first, and for
+/// a series with one entry per client (`per_client`) the run's `clients` (the room log's header): else a gap.
+fn room_lists<'r>(
+    run: &'r Run<'_>,
+    name: &str,
+    per_client: bool,
+) -> Result<BTreeMap<u64, &'r [i64]>, Lack> {
+    let lists = room_seconds(run, "second.s", name, |s| s.s.get(name).map(Vec::as_slice))?;
+    let clients = usize::try_from(room_log(run)?.header.clients).unwrap_or(usize::MAX);
+    let first = lists.values().next().map_or(0, |l| l.len());
+    let (want, of) = match per_client {
+        true => (clients, "the run's clients (the room log's header)"),
+        false => (first, "as its first measured second"),
+    };
+    match lists.iter().find(|(_, l)| l.len() != want) {
+        Some((sec, l)) => Err(Lack::Gap(format!(
+            "run {}: measured second {sec}'s second.s.{name} holds {} entries, not {want}, {of}",
+            run.id,
+            l.len()
+        ))),
+        None => Ok(lists),
+    }
+}
+
+/// -12's and -13's reading of "per client": the largest, over client slots, of the slot's mean over the measured
+/// seconds of a per-client series.
+fn slot_mean_max(run: &Run<'_>, name: &str) -> Result<Ratio, Lack> {
+    let lists = room_lists(run, name, true)?;
+    let clients = lists.values().next().map_or(0, |l| l.len());
+    let sum = |slot: usize| lists.values().map(|l| i128::from(l[slot])).sum::<i128>();
+    match (0..clients).map(sum).max() {
+        Some(most) => Ok(Ratio::new(most, lists.len() as i128)),
+        None => Err(Lack::Gap(format!(
+            "run {}: second.s.{name} lists hold no client",
+            run.id
+        ))),
+    }
+}
+
+/// PM-0001-12's IPv6 report: the mean over client-seconds of the downstream with IPv6's 20 B more per datagram.
+fn down_mean_ipv6_bits(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let total = |name: &str| -> Result<(i128, i128), Lack> {
+        let lists = room_lists(i.run, name, true)?;
+        let all = lists.values().flat_map(|l| l.iter());
+        let sum = all.map(|v| i128::from(*v)).sum::<i128>();
+        Ok((sum, lists.values().map(|l| l.len() as i128).sum()))
+    };
+    let (bits, client_seconds) = total("down_bits")?;
+    let (datagrams, _) = total("down_datagrams_count")?;
+    match client_seconds {
+        0 => Err(Lack::Gap(format!(
+            "run {}: second.s.down_bits lists hold no client",
+            i.run.id
+        ))),
+        n => Ok(Ratio::new(bits + 160 * datagrams, n)),
+    }
+}
+
+/// The run's logs of one process other than the room (`bots`: LG's clients): a gap if it has none.
+fn logs_of<'r>(run: &'r Run<'_>, process: &str) -> Result<Vec<&'r Log>, Lack> {
+    let logs = run.logs.iter().filter(|l| l.header.process == process);
+    let logs: Vec<&Log> = logs.copied().collect();
+    match logs.is_empty() {
+        true => Err(Lack::Gap(format!("run {}: no {process} log", run.id))),
+        false => Ok(logs),
+    }
+}
+
+/// PM-0001-38: the p99 of the control stream's message delays with a bulk transfer in flight minus the p99 with
+/// none, each over every sample of LG's bots logs' measured seconds. No sample of either kind is a gap, not a 0.
+fn bulk_control_p99_rise_ns(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let p99 = |name: &str| -> Result<Ratio, Lack> {
+        only_from(i.run, "bots", "second.s", name)?;
+        let logs = logs_of(i.run, "bots")?;
+        let seconds = logs.iter().flat_map(|l| &l.seconds);
+        let lists = seconds.filter(|s| s.ph == Phase::Measured);
+        let samples: Vec<i64> = lists
+            .filter_map(|s| s.s.get(name))
+            .flatten()
+            .copied()
+            .collect();
+        match samples.is_empty() {
+            true => Err(Lack::Gap(format!(
+                "run {}: no second.s.{name} sample in the measured seconds of LG's bots logs",
+                i.run.id
+            ))),
+            false => Ok(stat_of(&Stat::Pct(Ratio::new(99, 100)), None, &samples)),
+        }
+    };
+    Ok(p99("control_delay_bulk_ns")? - p99("control_delay_idle_ns")?)
+}
+
+/// The sum of a `second.v` counter over every second record, any phase, of one process's logs. Gaps: the name in
+/// another process's log, no such log, a second record without it, no second record.
+fn second_total(run: &Run<'_>, process: &str, name: &str) -> Result<i128, Lack> {
+    only_from(run, process, "second.v", name)?;
+    let logs = logs_of(run, process)?;
+    let mut values = logs
+        .iter()
+        .flat_map(|l| l.seconds.iter().map(move |s| (l, s)));
+    let mut sum: Option<i128> = None;
+    values.try_for_each(|(l, s)| match s.v.get(name) {
+        Some(v) => {
+            sum = Some(sum.unwrap_or(0) + i128::from(*v));
+            Ok(())
+        }
+        None => Err(Lack::Gap(format!(
+            "run {}: second {} of the {process} log on {} has no second.v.{name}",
+            run.id, s.sec, l.header.machine.name
+        ))),
+    })?;
+    sum.ok_or_else(|| {
+        Lack::Gap(format!(
+            "run {}: no second record in its {process} log (second.v.{name})",
+            run.id
+        ))
+    })
+}
+
+/// PM-0001-38: the one-shot actions LG's clients sent minus those the room received, over the whole run.
+fn one_shot_dropped_count(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let sent = second_total(i.run, "bots", "one_shots_sent_count")?;
+    let received = second_total(i.run, "room", "one_shots_received_count")?;
+    Ok(Ratio::int(sent - received))
+}
+
 /// A figure's computation over its [`Inputs`].
 pub type Compute = fn(&Inputs<'_, '_>) -> Result<Ratio, Lack>;
 
@@ -962,6 +1157,17 @@ pub struct Figure {
     pub what: &'static str,
     /// The arithmetic printed beside its reported value, for the figures whose row asks for it.
     pub detail: Option<Detail>,
+}
+
+/// A figure U6j built, with no arithmetic to show.
+const fn built(name: &'static str, compute: Compute, what: &'static str) -> Figure {
+    Figure {
+        name,
+        compute: Some(compute),
+        unit: "U6j",
+        what,
+        detail: None,
+    }
 }
 
 const fn planned(name: &'static str, unit: &'static str, what: &'static str) -> Figure {
@@ -1070,14 +1276,14 @@ pub const FIGURES: &[Figure] = &[
         "U6",
         "N = 48's unit cost against N = 24's and 36's (-10)",
     ),
-    planned(
+    built(
         "down_client_mean_max_bits",
-        "U6",
+        |i| slot_mean_max(i.run, "down_bits"),
         "the largest client mean of the downstream (-12)",
     ),
-    planned(
+    built(
         "down_mean_ipv6_bits",
-        "U6",
+        down_mean_ipv6_bits,
         "the downstream mean with IPv6's 20 B more per datagram (-12)",
     ),
     planned(
@@ -1085,9 +1291,9 @@ pub const FIGURES: &[Figure] = &[
         "U6",
         "R2's downstream formula at the run's own counts (-12)",
     ),
-    planned(
+    built(
         "up_client_mean_max_bits",
-        "U6",
+        |i| slot_mean_max(i.run, "up_bits"),
         "the largest client mean of the upstream (-13)",
     ),
     planned(
@@ -1115,14 +1321,14 @@ pub const FIGURES: &[Figure] = &[
         "U6",
         "p99 of |app RTT - quinn's rtt()| per second (-33)",
     ),
-    planned(
+    built(
         "bulk_control_p99_rise_ns",
-        "U6",
+        bulk_control_p99_rise_ns,
         "the control stream's p99 delay with a bulk transfer minus without (-38)",
     ),
-    planned(
+    built(
         "one_shot_dropped_count",
-        "U6",
+        one_shot_dropped_count,
         "one-shot actions sent minus received (-38)",
     ),
     planned(
