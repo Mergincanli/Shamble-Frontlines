@@ -2,9 +2,9 @@
 - **Goal:** the netcode proof test (SPIKE_PLAN item 1) under its approved plan `.checkpoints/netcode-proof-test/plan.md`,
   rev 3.3 (the advisor and Mustafa, 2026-11-06; verdict advisor-verdict.md) · PR #40 (draft).
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`).
-  **Base:** main f5030a3 merged in at a6acc8a (MAIN-61, 2026-11-19 15:4x UTC: #61, change-set 2's v2 code; one
-  conflict, docs/STATUS.md: this branch's #40 row kept beside main's #61 row), which clears PR #40's second conflict;
-  before it main b763ba3 at 0f12d9e (MAIN-60). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
+  **Base:** main 1ec6f6c merged in at 72b0dc3 (MAIN-64, 2026-11-24 13:0x UTC: #64, CI-WASM; one conflict,
+  docs/STATUS.md: this branch's #40 row kept beside main's #64 and "#63, #62" rows); before it main f5030a3 at a6acc8a
+  (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
 - **Last update:** 2026-11-24 10:3x UTC, after his /compact (history.md:7785-7791) and his resume words: U6c's round 2
   of 3 back; MAIN-64 planned (main-64-plan.md), its advisor check running; live state checked against this card.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
@@ -77,18 +77,17 @@
   uncommitted copy of the tree; plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6c BUILT 10:07, its round RUNNING from 10:2x:** builder a3a3e3fdf559de095 (worktree, base 8c81952;
+- **Next 2, U6c: round 1 DONE, its fix pass RUNNING from 13:0x:** builder a3a3e3fdf559de095 (worktree, base 8c81952;
   launch message u6c-launch-prompt.txt; cut 06:55-07:59 and a disk-floor stop, both resumed). Blocks 1, 3-6; Block 2
   not built (C4: lever (1)); F-REDACT fixed and PASS; plants 20 of 21 fail, **F-P8: P8 does not** (ImpairSocket's Drop
   joins no thread, socket.rs:440-446); end-check2.log 11/11, 859/956 (+52/+52), 1,116.8 s (1.03x of 1,086.7); 5,431
   added, 199 removed. Snapshot wip/u6c-build.patch a4e63455… (24 files; notes u6c-build.md 426b31da…). Round (xhigh)
   -> u6c-review-{netcode,test,security}.md: security APPROVE WITH FINDINGS (5 Low, SEC-U6C-1..5; = Stop B's host read);
   test APPROVE WITH FINDINGS (5 Medium: F-A2-EXACT, F-READINGS, F-P8, F-TIMING, F-P2; 10 Low); netcode REVISE.
-- **U6c's Block 0 DONE at 3b75d00 (pushed 8c81952, 06:53):** security-u6c-deps.md's binding check steps 0-7 PASS
-  (u6c-block0.md): the lock 3394b451… (229/6, 252 packages, hyper pinned back to 1.12.0; security-u6c-lock.md and its
-  addendum CLEAR WITH CONDITIONS, SEC-U6CL-1 to -3 Low); step 5 11/11, 807/904 (= U6b's merged head); deny ok, audit 0
-  vulnerabilities; dependency-check.md's U6c section released DEP-HOLD. Before launch: u6c-run.sh (names only);
-  Q-U6C-3 to U7 and Q-U6C-5/6/7 to U8 already met (u7-brief.md:232-236, u8-build.md:177-218).
+  **Ruling** (advisor-u6c-r1.md ad72c0b8…): REVISE: fix pass FP-1 to FP-6 (about +200, to ~5,630; riders stop past
+  5,850), then round 2 on the diff (three seats); F-READINGS mine at U6c's close; NC-U6C-12 and SEC-U6C-5 into U8 (C9).
+- **U6c's Block 0 DONE at 3b75d00 (pushed 8c81952):** security-u6c-deps.md's binding check steps 0-7 PASS (u6c-block0.md;
+  the lock 3394b451…); dependency-check.md's U6c section released DEP-HOLD.
 - **T5 (i) DONE 06:3x** (the T-builder's report; container readings, never judged): 4 loads, each on its own room, all
   exit 0 (WT ready 44 ms, wss open 25 ms, the hash control refused, the real page to its Wasm 404). Records copied to
   .gate/u7/t5i/; notes u7-t-build.md copied; T-half snapshot wip/u7-t-build-t5i.patch (23 files; +376 = 2,858). For
@@ -101,7 +100,9 @@
   on top of the 5 s (TR2-U6A-4); (2) sha2 runs optimised in debug builds, so the test build's start fits its 5 s;
   (3) U6c's builder names the command for U6b's 48-connection reading (A2) and I take it at U6c's close. Named, not
   mine (C4): U6c's build reached 5,426 added after Block 6 (past 5,400), so Block 2 (P2) was not built and lever (1) is
-  pulled: P2 rides in MOVED's brief, before R1's report.
+  pulled: P2 rides in MOVED's brief, before R1's report. (4) Main 1ec6f6c taken in now, plan first (MAIN-64:
+  advisor-main-64.md). (5) U6c's round-1 ruling (the advisor's, advisor-u6c-r1.md): one fix pass, a narrow round 2,
+  the container readings at U6c's close (the probe; A2 on both transports). **Decision:** NPT-L2-ONEWAY (its §5; lean (a)).
 - Before those, none since the 2026-11-24 message. Each named in its day's message: 2026-11-23's in msg-2026-11-24.md items 1-7
   (this card at 2a7a5b8 holds them with their sources); 2026-11-22's in msg-2026-11-23.md items 1-5 (this card at
   9341c90); 2026-11-21's (this card at 0f744ba); 2026-11-20's history.md:7412-7433; 2026-11-19's history.md:7177-7193.
@@ -144,25 +145,21 @@
   u4f-20-96de6acf8223 434, u4f-22-7192607d99a1 366, u4f-47-b57221ed139d 51.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (1 agent, 2 triggers; the saver off for MAIN-64; resume by SendMessage to its ID; after a cut, from its file):**
-  - The U6c advisor a662f1797b78cae95 (read only, no cargo; cut 10:42, resumed 12:55 from its file's block 3): round 1's
-    one ruling -> advisor-u6c-r1.md. Seats DONE, resumable: netcode aa64bb15ad4467641 (REVISE: NC-U6C-1 High), test
-    a3a1718b1419d246e, security a546a4604d30ee9d4. MAIN-64's advisor a74a6501af7e576c7: step 7.
-  - The saver b7jvh8w3n ended 12:31 (time is up); off from MAIN-64's step 1 to step 6 (then restart: run_in_background,
-    timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (next 14:34; until the push the card by Edit
-    only); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
-- **My step: MAIN-64** (main-64-plan.md; main 1ec6f6c, PR #64; advisor-main-64.md with its step-1 ruling). MAIN-64
-  approved (advisor-main-64.md), running steps 1-7. If `git rev-parse -q --verify MERGE_HEAD` prints
-  1ec6f6c3852d2922989f299bfc053c403d0e52d3, the merge is in progress: no save, no `git merge --abort`, no reset. If
-  `git diff --name-only --diff-filter=U` names docs/STATUS.md, resume at step 3; otherwise resume at step 3's checks
-  before the commit (C2 (b)), then step 4. If HEAD^2 is 1ec6f6c3852d2922989f299bfc053c403d0e52d3 and HEAD is not on the
-  remote yet, resume at step 5. The netcode seat's notes and this card may show unstaged: leave them; step 6's card save
-  takes them. Anything else: the advisor rules.
-  **Next three:** (1) the U6c ruling, then the fix pass (U6c's builder) and its check; (2) the merge M3-M9 as U4f's
-  (history.md:7022-7028; M5 after a part-clean; A2's reading; C9); (3) U7's 0b check and R-half, U8's merge. Msg 23:05.
-- **Finished, resumable by SendMessage:** U6c's builder a3a3e3fdf559de095 (BUILT; notes u6c-build.md; takes the fix
-  pass); U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder ac59cce3e5d002441 (notes u8-build.md "## Pass
-  3"); the advisor a3de649cd25e474df (U8's rulings); the U6c advisor a662f1797b78cae95. Older: card at e67ef59.
+- **Running (1 agent, 2 triggers; the saver restarts after this push; resume by SendMessage to its ID, after a cut from
+  its file):**
+  - U6c's builder a3a3e3fdf559de095: the fix pass FP-1 to FP-6 by advisor-u6c-r1.md (ad72c0b8…), from 13:0x in its
+    worktree; notes u6c-build.md there ("Resume from" lines); end check .gate/u6c/fix-check.log; plants P2, P8, P18, P19, P22.
+  - Done, resumable: the U6c advisor a662f1797b78cae95 (its ruling); the seats aa64bb15ad4467641, a3a1718b1419d246e,
+    a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
+    (next 14:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
+- **My step: MAIN-64's step 7** (main-64-plan.md; advisor-main-64.md). **Steps 1-6 DONE** (history.md, "## MAIN-64"):
+  merge 72b0dc3 (parents dd6a03b, 1ec6f6c), pushed with this card's save; gate PASS, repo map 173/110, checkpoint tests
+  33/33, light run PASS (refs 1,814 = N0 + 3; the rest word for word the base's). Next: CI on the pushed head (gate,
+  smoke, toolchain), then the advisor's head check by SendMessage. **Next three:** (1) U6c's fix pass and its check,
+  then round 2 (three seats, the diff only); (2) the merge M3-M9 as U4f's (history.md:7022-7028; M5 after a part-clean;
+  the readings; C9's U8 edits); (3) U7's 0b check and R-half, U8's merge. Msg 23:05.
+- **Finished, resumable by SendMessage:** U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder
+  ac59cce3e5d002441 (notes u8-build.md "## Pass 3"); the advisor a3de649cd25e474df (U8's rulings). Older: card at e67ef59.
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): its record in Now. Open at its
   merge: F28 (U6b's flush), U6b's null certificate pair, ds-selftest's place in C1's run list (U6b's merge), U6c's names
   (advisor-u8-stopb.md:208-220, and NC-R2-4 in U6c's message), Stop B's laptop reads (driver listen, passphrase, fsn1

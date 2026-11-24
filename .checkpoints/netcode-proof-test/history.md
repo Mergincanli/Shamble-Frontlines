@@ -7817,3 +7817,36 @@ Re-create them if still needed.
   - The U6c advisor resumed by SendMessage, from its file.
   - MAIN-64's step 1 started again from its first line (C3 (b)). The saver ended before it, so its completion notice
     and an empty `pgrep` are the proof (M64-3), with no TaskStop.
+
+## MAIN-64: main 1ec6f6c (PR #64, CI-WASM) taken in (2026-11-24; main-64-plan.md, advisor-main-64.md)
+- **Why:** MAIN-52 (history.md:2055-2057). #64 changes CI (.github/workflows/toolchain.yml) and code (packages/).
+  GitHub reported PR #40 as un-mergeable from about 10:16 UTC.
+- **Plan and ruling:**
+  - The plan at 10:2x (ed31452e…, 2f6001f). The advisor gave APPROVE WITH CONDITIONS M64-1 to M64-4 at 10:3x-10:5x.
+  - Step 1 began at 10:38. It paused at 10:41 on his "98% usage", before any merge. The advisor's step-1 ruling:
+    the saver's "(terminated)" autosave d7d8a34 had already reached origin, so it was moot.
+  - The cut ran from 10:42 to 12:54. Step 1 started again at 12:55.
+- **Step 1 (12:55-13:02):**
+  - The resume line was written. The saver had ended at 12:31 ("time is up"), so the proof is M64-3's (its notice,
+    `pgrep` exit 1), with no TaskStop.
+  - One foreground save gave dd6a03b = H0, which equals origin.
+  - The fetch: origin/main 1ec6f6c, base f5030a3. The pre-checks pass: only notes lines in the status, the guard's
+    pathspec empty, and merge-tree's one conflict docs/STATUS.md.
+  - Main's CI on 1ec6f6c is 3 of 3: gate and smoke in run 45373057216, toolchain in run 45373056953.
+  - The base light run passes (light-base.log): refs 1,811, the full marks line, self 78/78, redact 11/11 with 359
+    items and 0 findings.
+- **Steps 2-4 (13:02-13:05):**
+  - `git merge origin/main`: exit 1, one CONFLICT (docs/STATUS.md), 18 paths staged (A 3, M 15).
+  - The block :24-31 was resolved by Edit, keeping :25, :29 and :30. One slip: the last removal also took the
+    newline between the #40 and #64 rows and joined them on one line. `wc -l` (119) found it, and an Edit fixed it
+    before `git add`.
+  - The result: 120 lines, no marker, and the #40 row alone differs from main.
+  - C2 (b) holds as stated (19 files, +2174/-99).
+  - Merge commit 72b0dc3, parents dd6a03b and 1ec6f6c, with git's own message and no attribution lines; the card save
+    carries them (ADV-M60H-5).
+  - Step 4's checks and C1 (c)'s three hold as stated.
+- **Step 5 (13:05):**
+  - Gate PASS (--no-smoke), repo map 173/110, checkpoint tests 33/33 (.gate/main-64/step5-outputs.txt).
+  - light.log PASS: HEAD 72b0dc3; refs 1,814 = N0 + 3; marks, self and redact equal to the base's word for word.
+- **Step 6:** pushed with the card save (no CI read before it: C4). Next: CI on the pushed head, then step 7, the
+  advisor's head check.
