@@ -182,4 +182,59 @@ Started 2026-11-24. Branch claude/optimistic-albattani-mdoonz. Edits nothing but
 
 ## My verdict on the evidence: PASS WITH NOTES (the evidence holds against the data). The spike itself has NOT passed
 by :1404: PM-0006-2 not met as written; PM-0006-9 and PM-0006-5 open; PM-0006-8 needs a ruling on "open".
+
+## Addendum after the second consultation (supersedes the lines above where they differ)
+- F-3b downgraded to Low: ADR :1440 "Beside it, the measurable marks: ... isolation in the four other browsers
+  (PM-0006-3)" puts the scripted 3-load count on the four other browsers; Brave's reading is the checklist (steps 1-3,
+  one open each, row :1371 "MP: Brave (the hosting checklist, steps 1–3)"). Wording note only: the report must say
+  Brave gave 1 load per link (all as expected), not 3 of 3. :1440 also names Safari among "the four other browsers".
+- F-5 tombstones: closes/ap and bp logs show "Uploaded 1 files" / "Uploaded 0 files (1 already uploaded)" and record
+  artifacts of 390/391 bytes (the record, not the page); no SIZES line runs in close.yml. Tombstone size not recorded.
+- Final labels (one each): PM-0006-1 met with a recorded departure (MACHINES (a), Mustafa 2026-11-15; caveat: the
+  Brave line late, an undecided timing gap). PM-0006-2 not met as written. PM-0006-3 met with a recorded departure
+  (Safari not run, Mustafa 2026-11-18 18:21:30 UTC; MACHINES). PM-0006-4 met with a recorded departure (MACHINES).
+  PM-0006-5 open. PM-0006-6 met with a recorded departure (method; plan Risk 4). PM-0006-7 open (no count readable on
+  the three pages; the step-4 "two numbers recorded" do not exist; question unanswered). PM-0006-8 met (caveat: on the
+  reading of "open branch" the ADR's :1360 reason supports; 1 PR branch + 5 Pages-only). PM-0006-9 open (7 of 8).
+  PM-0006-10 met. PM-0006-32 met.
+- ADR pass words and results-log anchors per mark:
+  - PM-0006-1 :1369 "a results-log header written before the first run" / "checked again before PM-0006-6's 24 h
+    reading"; log :6-71, :770-789, :859-860, :940.
+  - PM-0006-2 :1370 "100 % of responses carry their expected set ... previews `X-Robots-Tag: noindex`, production
+    none"; log :326-340, :437-441, :468-482, :483-486.
+  - PM-0006-3 :1371 "`true` on the flag-on preview and `false` on the flag-off preview and on production, read in the
+    page and in its worker: 3 of 3 loads per browser and deployment"; log :350-365, :379-381, :444-460.
+  - PM-0006-4 :1372 "its `Cache-Control` contains `immutable`; on a second visit ... transfers 0 bytes"; log :332-333,
+    :437-441, :452-453.
+  - PM-0006-5 :1373 "the largest file in each deployed build under 25 MiB = 26,214,400 bytes ... on every deployment
+    of the check"; log :323-325, :399, :424-432.
+  - PM-0006-6 :1374 "24 h after each test pull request closes ... none of its URLs ... answers HTTP 200 with that
+    build's marker" / "A cookie-less probe reads every URL every hour from the close to 24 h after"; log :539-591,
+    :621-627, :715-721, :753-769, :816-839.
+  - PM-0006-7 :1375 "reported, no pass number: the project's monthly build count before and after 10 direct uploads"
+    / "passes when both are recorded"; checklist step 4 :1451-1452 "Expected: two numbers recorded"; log :369-421.
+  - PM-0006-8 :1376 "on every preview URL of at least 2 open branches (aliases and hash URLs) and on PM-0006-6's
+    leftover URLs, a cookie-less client gets no build"; :1360 the reason; log :881-886, :903-909, :941-969.
+  - PM-0006-9 :1377 "every step of the hosting checklist below "achieved", 0 "not yet""; :1443 "or the numbers it
+    asks for"; log :379-381, :395-396, :420-421, :910-939, :973-979.
+  - PM-0006-10 :1378 "recorded: yes or no, with a screenshot of the page"; log :514-521, :546-551.
+  - PM-0006-32 :1379 "2 of 2 ..."; log :604-750, :993-1023.
+- The jq commands, literal (run from /home/user/Shamble-Frontlines/.gate/preview-hosting-check):
+  - SC1: `jq -r '.rows|group_by(.case)[]|"\(.[0].case) n=\(length) \([.[].outcome]|group_by(.)|map("\(.[0]):\(length)")|join(",")) minh=\([.[].hours_since_close]|min)"' day2/probe8-24h/probe-results.json`;
+    `jq '[.rows[]|select(.pr.state=="closed")]|{n:length, all24: all(.hours_since_close>=24)}' day2/probe8-24h/probe-results.json`;
+    `jq '[.rows[]|select(.case|test("^\\((a|b)\\)|^\\((a|b).\\) tomb"))]|{n:length, allgone: all(.outcome=="gone")}' day2/probe8-24h/probe-results.json`;
+    `jq '{unexpected:[.rows[]|select(.as_expected==false)]|length, wall:[.rows[]|select(.outcome=="wall")]|length, outcomes:([.rows[].outcome]|unique), maxtries:([.rows[].tries]|max)}' day2/probe8-24h/probe-results.json`.
+  - SC2: same group_by on day2/probe26-wall10 and day2/probe27-wall60; `jq -c '.rows[]|select(.outcome!="wall")|{case,form,url,status,outcome,expected}'`;
+    `jq -r '[.rows[]|select(.outcome=="wall")|.location]|map(capture("^https://(?<h>[^/]+)").h)|group_by(.)|map("\(.[0]) x\(length)")|.[]'`;
+    `jq -r '[.rows[]|select(.form=="stable" and .case!="production" and .outcome=="wall" and (.pr==null or .pr.state=="open"))|.branch]|unique'`;
+    `jq -r '.rows|map(select(.case!="production"))|group_by(.branch)[]|"\(.[0].branch) pr=\(.[0].pr.number // "none")/\(.[0].pr.state // "-") links=\(length) wall=\([.[]|select(.outcome=="wall")]|length)"' day2/probe27-wall60/probe-results.json`.
+  - SC3: `jq '{n:(.rows|length), wall:[.rows[]|select(.outcome=="wall")]|length, unexpected:[.rows[]|select(.as_expected==false)]|length, open_or_byhand_all_serve: ([.rows[]|select(.pr==null or .pr.state=="open")]|all(.outcome=="serves"))}' day2/probe25-control/probe-results.json`.
+  - SC4: `jq -c '.summary' day1/round-a/headers.json day1/uploads/headers.json`;
+    `jq -r '.records[]|. as $r|.forms[]|"\($r.branch) \(.form) \(.base) \(.result) xcr=\(.xCheckRule) robots=\([.responses[].headers["x-robots-tag"]]|unique) coop=\([.responses[].headers["cross-origin-opener-policy"]]|unique) coep=\([.responses[].headers["cross-origin-embedder-policy"]]|unique) fails=\([.responses[].failures[]]|unique)"' day1/round-a/headers.json`;
+    `jq -s '[.[].records[]|select(.mode!="production")|.forms[]]|{n:length, pass:[.[]|select(.result=="pass")]|length, distinct_links:([.[].base]|unique|length)}' day1/round-a/headers.json day1/uploads/headers.json`.
+  - SC5: `jq 'del(.rows)' day1/browsers/win/browser-results.json`;
+    `jq -r '.rows|group_by([.mark,.browser,.link])[]|"\(.[0].mark) \(.[0].browser) \(.[0].version) \(.[0].link) loads=\(length) seen=\([.[]|(.seen // (.transferSize|tostring))]|unique) outcome=\([.[].outcome]|unique)"' day1/browsers/win/browser-results.json`.
+- Not verified: the "secret: present" log lines (logs not in .gate); his screenshots and words (transcribed by the
+  session, images kept out); run metadata (schedule events, run lists, approval times) from the GitHub tool; sitting
+  2's ten headers files and SIZES lines; whether he quit Brave before step 5.
 DONE

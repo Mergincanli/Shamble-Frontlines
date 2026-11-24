@@ -1494,7 +1494,23 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 - agent verifier (its file: model opus, effort high): the evidence against ADR 0006's own words, spot-checks against
   the downloaded data, questions a-f (open branches without a pull request; "When a mark fails" and Risk 13; step 4's
   verdict; the hourly series; Brave's version late; Safari) · launched 2026-11-24 about 22:55 UTC, background · notes
-  `verifier-evidence.md`.
+  `verifier-evidence.md`. DONE (hand-back about 23:08 UTC): **PASS WITH NOTES** on the evidence (all five
+  spot-checks PASS against the data files); **the spike has not passed** by ADR 0006 :1404 ("A spike passes when every
+  mark that applies passes"): PM-0006-2 not met as written (production's one-off links 0354374e and de1c3e5e: noindex on
+  all 7 paths); -5 open (no size line recorded for sitting 2's ten builds, bite-production, restore-production, the two
+  tombstones and `revoked`; check-sizes.mjs never fails on a flagged file, so a green build proves nothing); -7 open (no
+  count shown; step 4's "two numbers recorded" do not exist); -9 open (7 of 8 steps; step 4 has no verdict word); -1,
+  -3, -4, -6 met with recorded departures (-1's Brave line, filled about 2 h after the 24-hour reading, decided by no
+  one); -8 met with a caveat (the ADR does not define "open"; say 1 pull-request branch plus 5 Pages-only branches; the
+  ADR's stated reason at :1360 fits counting all six); -10 and -32 met. "When a mark fails" (:1411-1418) sends a failed
+  mark back to the draft and never names step 2.6; the wait comes from the plan (Part 1.1, Risk 13), ADR 0002 :1507 and
+  DECISIONS: a call for the Advisor and him. Corrections for the report: ADR line numbers 3 lines on since 3747bb3
+  (:1404, :1411-1418, :1447-1450, :1453-1460); 24 slots from the closes to the 24-hour mark, not 28; "6 open branches"
+  overstated; sitting 1's -5 summary leaves out the coverage gap; Brave gave 1 load per link. Not verified by it: the
+  "secret: present" lines, his screenshots and words, run metadata, sitting 2's headers files. The gate did not run (no
+  tools/ dependencies installed).
+- agent web-fetch (model opus, effort high): Cloudflare's docs on whether direct uploads count against the Free plan's
+  500 builds a month, and where a count shows (PM-0006-7) · launched about 23:09 UTC, background.
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on the Access login for a signed-in owner
   and on Zero Trust's first screen · launched 2026-11-19 about 14:15 UTC (after the save 4396e0a's edits) · DONE; its
   answers in step 26.
