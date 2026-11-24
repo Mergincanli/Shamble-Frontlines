@@ -385,6 +385,22 @@ title and text. **3a merges only after his own answer to MUL-ADD** (the advisor 
    it nor change-set 3. The CLAUDE.md line for ACCT-3 is his to give. His Advisor's three items come before 3b.
 
 ## Open findings
+- **Round 2, test-engineer (on 79666ad9; `test-engineer-review2.md`; read 15:52 UTC): APPROVE, 0 Critical, 0 High
+  (both round-1 Highs fixed), 1 new Medium, 4 new Low, 1 nit.** It confirmed the advisor agent's conditions 1 to 4
+  for MUL-ADD by its own runs (a C check with glibc's `fmaf`: 48 of 48 constructed cases are true double-rounding
+  cases, 0 of the 10,000; its own measurement of the module on all 48: the 16 pins field for field), PM-0004-74's
+  own case on four small workspaces with real cargo, and re-ran 23 plants (23 caught). Its answer to the advisor
+  agent's question: every named hard-case class for `floor`, `ceil`, `trunc`, `round` is present, none missing.
+  - Medium, `rules_scan.rs`: `arch` counts only right after `std::` or `core::`; `use core::{arch::wasm32::..}`
+    and `use core as k; k::arch::..` pass, and the relaxed-SIMD calls then build with no flag. Fix: `arch` before
+    `::` wherever it stands, names holding `_relaxed_`, two more bites; `cfg!(target_arch)` branches stay out of
+    scope, said in the doc. **Taken in the round-2 pass.**
+  - Lows: the test title and `wasm.rs`'s doc still say "exact" for WebAssembly (taken); the FMA line is printed by
+    a passing test, which cargo hides (taken: a test named for the fact); CI runs neither generator's `--check`
+    (a follow-up for E1's CI pull request: a CI file); `from_f64` has no exact tie and no case between the largest
+    f32 and the overflow point (a STATUS follow-up); the fixture's comment says `-p tools` (taken).
+  - Not verified by it: a processor without FMA; Firefox, WebKit, Safari; the toolchain's `fmaf` source; the
+    devtools tests in release on CI (CI's release line is `-p sim -p protocol`); 20 runs on one commit.
 - **Round 2, security-auditor (on 79666ad9; `security-auditor-review2.md`; read 15:51 UTC): REVISE, 0 Critical, 1
   High, 0 Medium, 3 Low.** Round 1's M1, L2, L3, L5, L6 confirmed fixed.
   - **High (L1 not fixed; "evidence that does not hold"): the dev server still reaches the test-only module.**
@@ -536,7 +552,7 @@ title and text. **3a merges only after his own answer to MUL-ADD** (the advisor 
   (`rust-reviewer-review2.md`; with the advisor agent's question whether another allowed operation picks its
   native path by processor), test-engineer (`test-engineer-review2.md`; with its question on the hard-case classes
   for `floor`, `ceil`, `trunc`, `round`), security-auditor (`security-auditor-review2.md`; condition 2's clause
-  (d)). engine-architect and perf-auditor follow. Each works on copies under `.gate/<name>-cs3a/`; the shared
+  (d)). security-auditor and test-engineer have ended; engine-architect and perf-auditor run (card 15:52 UTC). Each works on copies under `.gate/<name>-cs3a/`; the shared
   tree is read-only for them, builds included. No source file is edited while a round is being read. No saver.
 - Prepared for the docs pass and the check, not yet run on the tree: `decisions-4.mjs` (his five messages of
   2026-11-23, 23:44:10 UTC to 2026-11-24, 11:03:53 UTC into DECISIONS, on top of main's copy; preview in
