@@ -399,14 +399,32 @@
    tests", "14 passed (1.1m)"; nothing skipped or ignored; the players' Wasm sha256 383f5303...3963; "no registry
    path in the Wasm".
 
+13. **Round 3, the verifier, the docs pass: c5f6a85a**, pushed 17:06 UTC. security-auditor's round 3 on 8619d539:
+   APPROVE, the High closed (99 request spellings, none returned the test-only module). The verifier on 8619d539:
+   PASS, nothing above Low (CI read line by line; its own full run on a clean copy; 40 of 40 plants; `mul_add` on
+   all 10,048 inputs; the draft's and the Rust page's text and checksums). C2's release run at 16:26 UTC
+   (`.gate/cs3a/c2-8619d539.log`): devtools f32 3 and stream 2, sim-wasm 9; cargo 1.99.1 (5f94df478), rustc 1.99.1
+   (58cf8f9c3); refused environment names: none. The docs pass: `docs/DECISIONS.md` by `decisions-4.mjs` (six
+   entries; `--check` passes); the report `docs/reports/2026-11-24-cs3a-rules-boundaries.md`; docs-keeper's
+   STATUS (120 lines), archive (23 follow-ups 3A-…, the closed marks), ROADMAP, REPO_MAP (the map check passes),
+   and the dated corrections to #64's report.
+   **CI on c5f6a85a, read line by line:** gate success (run 45444844867); toolchain success (run 45444844763, job
+   138625652760, 17:06:38 to 17:09:06 UTC; `.gate/cs3a/ci-c5f6a85a-toolchain.log`): the counts of step 12 again;
+   "14 passed (59.3s)"; the players' Wasm sha256 383f5303...3963; "no registry path in the Wasm".
+   **The zip for his browser check** (`make-zip.py`, from the development build at c5f6a85a):
+   `.gate/cs3a/zip/shamble-v2-03a-rules-boundaries-c5f6a85a3/shamble-v2-03a-rules-boundaries.zip`, 246,904 bytes,
+   sha256 8915aedebf1800f06f9e6d98bc7b1cf33855d3e22c2e8b4a4612df75d3c366f7, 10 files, each equal to its line in
+   `SHA256SUMS.txt` after unpacking. Its unpacked copy run as he will run it (`.gate/cs3a/zip-check.mjs`, its own
+   server, Chromium): "errors: 0", "commit: c5f6a85a3", ticks at 30 a second; opened as a file it shows the one
+   line that says to run `node serve.mjs`. **Not sent yet: it goes to him with the advisor agent's verdict.**
+
 ## Current step
-**Round 3, security-auditor only, on the dev-server fix** (the one High that was open after round 2; started after 16:13
-UTC on a1b2e802, told after 16:18 UTC that the head to judge is 8619d539; notes `security-auditor-review3.md`). Then
-the verifier until PASS; the advisor agent on the pushed head; docs-keeper; DECISIONS by script (`decisions-4.mjs`,
-six of his messages); the report; the zip and its README; the pull request's title and text in this folder, then
-tell him (his main Advisor opens the draft). **A High still open after round 3 stops the change-set for him.**
-His answer to MUL-ADD is (a) (15:58:25 UTC): what was built stays. Plain words with him: no tag or code without
-its explanation in the same sentence.
+**The advisor agent on the pushed head c5f6a85a** (c5f6a85a3142d69e3e48f531d549ddd665a156ed; started after 17:06
+UTC; notes `advisor-head.md`). Then: its verdict into the report; the zip to him (built, below) with the README's
+seven steps; tell him the pull request's title and text are in this folder (`pr-title.txt`, `pr-body.md`; his main
+Advisor opens the draft). After his browser check: his reports into the docs, the checkpoint folded and deleted
+(the last commit, no skip marker), the advisor agent on that head, his go for its full SHA.
+Plain words with him: no tag or code without its explanation in the same sentence.
 (Card written 15:31 UTC.)
 
 ## Next steps (after the compact)
