@@ -145,8 +145,7 @@
     `c_u6_11_a_mid_run_join_and_the_slots_with_no_admit_record`; six plants, each failing one and taken back. Every
     PM-0001-17 fixture reads as before. README section 1, SERIES.md's coverage clause and one new SERIES.md row
     (`event.admit`, `event.session_end`; the "read only by figures" count is now 20). 1,021 added so far.
-    **For the report (a reading still open):** the slot's LAST session may leave no tail, even with a session_end
-    (the sheet's rule): a bot that leaves for good before the stop reads INVALID.
+    (Its last-session rule was replaced by the advisor agent's ruling in the fix pass: step 23.)
 
 17. Part b, block 5 · 8735bc5ff66cb517088e2a62c27add169373afd6 (pushed) · `down_client_mean_max_bits`,
     `up_client_mean_max_bits` (`slot_mean_max`), `down_mean_ipv6_bits`, `bulk_control_p99_rise_ns`,
@@ -197,9 +196,9 @@
     plants). 132 judge tests (19 + 4 + 83 + 26). From 0e0f6547: 3,393 added, 172 deleted (the stop is 4,900).
 
 ## Current step
-**Part b's final code head is 72651a3c.** Running since about 23:20 UTC: `check.mjs` whole on it (output in the
-session's scratch folder) and the advisor agent's read of the head. Then GitHub's gate and toolchain on that SHA,
-and part b's commit id, commands and report to Mustafa. Open with him: MAIN-MODEL, SYNC-ENTITIES.
+**Part b's final code head is 72651a3c.** The advisor agent read it: APPROVE for 72651a3c, holding only if `check.mjs` whole passes on it (running since
+about 23:16 UTC; output in the session's scratch folder). Then GitHub's gate and toolchain on that SHA, and part
+b's commit id, commands and report to Mustafa. Open with him: MAIN-MODEL, SYNC-ENTITIES.
 **For the report (collected while building):**
 - Condition 4, readings still open (built on the written reading): -12 and -13 "per client" = the largest client
   mean; -15's slope method and "flat" rule; -24's halves; -27's "within 5 %" = not worse by more than 5 %;
@@ -222,50 +221,36 @@ and part b's commit id, commands and report to Mustafa. Open with him: MAIN-MODE
   fix: `session_end` carries a reason, and only a scripted leave gets the tail).
 
 ## Next steps
-1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
-   one small commit, the checks again on the new head, the new commit id to him.
-2. Part b's blocks 4 to 9 (plan-b.md section 2 and its 11 conditions; figures-b.md is the spec sheet), then one
-   review round (test-engineer and rust-reviewer, xhigh), one fix pass, the final head's checks, the advisor agent's
-   read, and part b's commit id with the report to Mustafa.
+1. `check.mjs` whole on 72651a3c must pass (the advisor agent's APPROVE of that head, 2026-11-24 about 23:20 UTC,
+   holds only then); GitHub's gate and toolchain on that SHA; then the commit id, the commands and the report to
+   Mustafa. The netcode chat merges both parts in one merge, only on his word, after his main Advisor's check.
+2. Not started, only on his word: the one-way delay comparison on a real network (NPT-L2-ONEWAY).
 
 ## Open findings
-- Left as follow-ups from part a's round (Low, no fix now): rust-reviewer's L4 (a kept bite whose only runs were left
-  out reads "no run yet", though runs exist: it needs a field on `BiteOut`) and L6 (a kept mark reading MOVED lists
-  its moved parts' lines after the summary line, but not its moved checks' or bites': the summary line and the JSON
-  carry them); test-engineer's L7 (the 12 real kept marks with a moved piece are proven never-PASS by the rule's
-  order and the two-mark enumeration, not by passing logs for each of the 12: said so in the report).
+- Follow-ups, Low, none needed before the merge (the advisor agent's read): part a's rust-reviewer L4 and L6 and
+  test-engineer L7; part b's rust-reviewer L6 (`only_from`'s kind as an enum; its scan cost), L7 (a failure with no
+  number reads "= ?" in the precondition and setup lines: not reachable today), L9 (visibility), two Info notes;
+  test-engineer's L9 (wording).
 - Not verified here: the re-plan's real-data line (re-judging `results/u4f/b57221ed139d/pm-0001-47/`): the raw logs
-  are not in the repository. For the netcode chat before it merges part a, from `spikes/netcode-proof/`:
+  are not in the repository. For the netcode chat before the merge, from `spikes/netcode-proof/`:
   `cargo run -q --locked -p npt-judge -- --marks marks/marks.json --logs <the -47 set's logs> --only PM-0001-47`,
   expected MOVED.
-- Not carried by part a: the NPT_KC_BURSTS test rider (crates/net/src/tcp_model/tests.rs, outside this fence; an
-  earlier ruling put it in "MOVED's brief": advisor-u8-brief.md:106-113). BURST-RIDER is with Mustafa.
-- With Mustafa: OUTSIDE-NOTES (the three outside marks' notes still end "Always NOT-RUN here." while they read MOVED).
+- With Mustafa: SYNC-ENTITIES (what -10's "relevant entities" count; the advisor agent recommends soldiers plus
+  hulls, as built) and MAIN-MODEL (this chat runs Fable 5.2 by his start block; CLAUDE.md says Opus 5.5).
 
 ## Key numbers
-- The judge today: src 5,238 lines (eval.rs 1,784; marks.rs 1,263; figures.rs 1,020; practice.rs 797), tests 3,618,
-  marks.json 12,630 lines, 81 marks (wc -l at e2c0e896).
-- The baseline, `node spikes/netcode-proof/check.mjs` on the base's files in this container (2026-11-24, 975 s): all
-  11 steps pass; test: measured build 807 passed, bites build 904 passed, 0 failed, 0 skipped; self 78 of 78; redact
-  11 of 11, 359 items, 0 findings; marks: 81 read, rows unchanged.
-- Part a's two planted defects, each run once and taken back (`cargo test -p npt-judge --locked --no-fail-fast`):
-  (A) a moved mark judged anyway fails `a_mark_moved_whole_is_never_judged`,
-  `moved_marks_and_parts_show_in_the_summary_and_the_json` and `the_real_marks_file_labels_what_the_trim_moved`;
-  (B) MOVED ranked above FAIL fails `a_moved_part_is_never_judged_and_the_kept_parts_still_decide`,
-  `a_moved_check_is_skipped_wherever_checks_are_chosen`, `a_moved_bite_is_never_evaluated`,
-  `a_bite_run_on_moved_parts_only_is_left_out`, `a_moved_bite_hides_no_kept_failure_or_invalid_run` and
-  `a_label_anywhere_on_a_passing_mark_never_reads_pass`.
-- Existing assertions changed by part a (old, new): cli.rs, the outside mark's line "PM-0001-39   NOT-RUN   outside
-  this change-set" is now "PM-0001-39   MOVED     outside this change-set"; engine.rs `person_and_outside_marks`, the
-  outside mark's verdict NOT-RUN is now MOVED; fixtures.rs, `pm_0006_14_counts_a_padded_session_and_waits_for_the_
-  other_n` (NOT-RUN, "N=36: 0 of 1 valid runs", "N=18: 0 of 1 valid runs") is now `pm_0006_14_counts_a_padded_
-  session_and_its_other_n_moved` (MOVED, both parts named with "slice 6, on the real sim", N=48's count reported).
+- The baseline, `node spikes/netcode-proof/check.mjs` on the base e2c0e896 in this container: 11 of 11 steps;
+  807 tests on the measured build, 904 on the bites build. Part a's head 0e0f6547: 820 and 917; 98 judge tests.
+  Part b's built head a3476e6c: 844 and 941; 122 judge tests. The final head 72651a3c: 132 judge tests.
+- marks.json sha256: c1935a5b… at the base; 86705adc… at part a's head; c3396db225b394695b6cf41460723e1d98b96f42e1d42d412976f4ca702f1b7a now.
+- Planted defects: part a's two, part b's per block (in each commit message), the fix pass's, and the reviewers' own
+  (`te-plant.mjs`, `te-plant-b.mjs`, `te-plant-b2.mjs`); every one ran once and was taken back.
 
 ## Decisions taken
-- His four answers of 2026-11-24 (checks in the container; 19 figures; the first push as the netcode head; the main
-  folder parked) · Mustafa · in the chat.
+- Mustafa, in the chat, 2026-11-24: his four first answers (checks in the container; 19 figures; the first push as
+  the netcode head; the main folder parked); and his message saved in `netcode-judge/mustafa-2026-11-24.md`
+  (OUTSIDE-NOTES (a); BURST-RIDER (a); the rough-laptop parts move by his decision; one small commit read by the
+  advisor agent; both parts in one merge on his word after his main Advisor's check).
 
 ## Running work
-- Nothing in the background but the saver (`checkpoint.mjs watch netcode-judge`), which stops by about 22:20 UTC.
-- Two questions for the netcode chat are on the board, unanswered so far (the kill record's name and fields;
-  `room_end`'s `slot` and the room log's `admit` and `session_end`).
+- `check.mjs` whole on 72651a3c, since about 23:16 UTC; the background saver (`checkpoint.mjs watch`).
