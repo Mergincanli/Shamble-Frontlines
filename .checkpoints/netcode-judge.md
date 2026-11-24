@@ -148,10 +148,11 @@ Part a is reported. Waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL. 
   folder parked) · Mustafa · in the chat.
 
 ## Running work
-- Part b's spec sheet: a test-engineer agent (xhigh, read-only), launched 2026-11-24 about 21:02 UTC, writing
-  `.checkpoints/netcode-judge/figures-b.md` (one block per figure: formula, inputs, gap rules, tests, open questions;
-  then J1's three changes, J0's two items, a size table and a build order). On its return: `plan-b.md`, then the
-  advisor agent's plan review.
+- Part b's spec sheet: DONE (`.checkpoints/netcode-judge/figures-b.md`, 358 lines, test-engineer, cited). Part b's
+  plan: `.checkpoints/netcode-judge/plan-b.md`, with the advisor agent for its plan review since 2026-11-24 about
+  21:22 UTC (six rulings asked; no part b edit before its APPROVE). On its return: its verdict and conditions into
+  plan-b.md's end, then block 1 (J0: entry 64's six items and JDG-ONLY-1). Two questions for the netcode chat are on
+  the board (the kill record's name and fields; `room_end`'s `slot` and the room log's `admit` and `session_end`).
 - The review round: test-engineer and rust-reviewer on b22c30cd, 2026-11-24 about 20:25 to 20:40 UTC: DONE.
 - The two defects that survived the test-engineer's planting are now caught, each run once and taken back: a moved
   check kept on a bite run that matches no part fails `a_moved_check_is_skipped_wherever_checks_are_chosen`; a bite
