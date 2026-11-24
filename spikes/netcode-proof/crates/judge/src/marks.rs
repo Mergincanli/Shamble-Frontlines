@@ -96,7 +96,7 @@ impl Moved {
 #[serde(deny_unknown_fields)]
 struct RawPart {
     name: String,
-    /// The part left this test (README §2.6): its runs are counted, never judged.
+    /// The part left this test (README §2.6): its runs are never judged.
     #[serde(default)]
     moved: Option<Moved>,
     #[serde(default)]
@@ -952,6 +952,17 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
     if moved_parts > 0 && moved_parts == m.parts.len() {
         errors.push("every part is moved: move the mark instead".to_owned());
     }
+    let rules = || {
+        validity
+            .iter()
+            .chain(parts.iter().flat_map(|p| &p.validity))
+    };
+    if moved_parts > 0 && rules().any(practice) {
+        errors.push(
+            "a ws-practice mark takes a bite run's numbers from every measured run of its set: move the mark, not a part"
+                .to_owned(),
+        );
+    }
     let mut bite_ids = BTreeSet::new();
     for b in &m.bites {
         if let Some(Err(e)) = b.moved.as_ref().map(Moved::check) {
@@ -967,11 +978,15 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
         match (b.expect.as_deref(), b.rule.as_deref()) {
             (None, None) => {}
             (Some("invalid"), Some(rule)) => {
+                // A kept bite's rule is the mark's or a kept part's: the judge reads no moved part's rules.
                 let named = m.validity.iter().any(|v| v == rule)
-                    || m.parts.iter().any(|p| p.validity.iter().any(|v| v == rule));
+                    || m.parts.iter().any(|p| {
+                        (b.moved.is_some() || p.moved.is_none())
+                            && p.validity.iter().any(|v| v == rule)
+                    });
                 if Rule::parse(rule).is_err() || !named {
                     errors.push(format!(
-                        "bite {:?} expects INVALID by {rule:?}, which is not a rule of the mark or its parts",
+                        "bite {:?} expects INVALID by {rule:?}, which is not a rule of the mark or its kept parts",
                         b.id
                     ));
                 }
@@ -1199,6 +1214,9 @@ mod tests {
         let whole = |head: &str| pass(head, &[S30], &[CHECK], &[]);
         let no_by = MOVED.replace("NPT-TRIM", " ");
         let report = with(MOVED, r#"{"name":"r","series":"tick.v.w","stat":"max"}"#);
+        // A bite that must make its run INVALID by a rule only the moved part names: the judge drops that rule.
+        let late = r#"{"id":"PM-0001-4/B-S","what":"late","expect":"invalid","rule":"late-zero"}"#;
+        let rd_late = rd.replace(r#""min":1"#, r#""min":1,"validity":["late-zero"]"#);
         let cases = [
             (
                 whole(&head.replace("Slice 3", " ")),
@@ -1221,6 +1239,17 @@ mod tests {
                     r#"{head}"verdict":"outside","notes":"the 60 Hz run""#
                 )),
                 "an outside mark reads MOVED by its kind",
+            ),
+            (
+                mark(&format!(
+                    r#""verdict":"outside","notes":"the 60 Hz run","bites":[{}]"#,
+                    with(MOVED, BITE)
+                )),
+                "an outside mark reads MOVED by its kind",
+            ),
+            (
+                pass("", &[S30, &rd_late], &[CHECK], &[late]),
+                "expects INVALID by \"late-zero\", which is not a rule of the mark or its kept parts",
             ),
             (
                 pass(&head, &[S30, &rd], &[CHECK], &[]),
@@ -1267,6 +1296,15 @@ mod tests {
         let errors = parse(&ws_mark("ws-practice:1.10", Some(LINE), &checks)).expect_err("refused");
         let why = "a ws_bound check cannot be moved";
         assert!(errors.iter().any(|e| e.contains(why)), "{errors:?}");
+        // A moved part on a ws-practice mark: a kept bite run takes its numbers from every measured run of its set.
+        let wt = (r#"{"name":"wt","#, format!(r#"{{"name":"wt",{MOVED},"#));
+        let text = ws_mark("ws-practice:1.10", Some(LINE), &format!("{X},{Y},{Z}"));
+        let errors = parse(&text.replacen(wt.0, &wt.1, 1)).expect_err("refused");
+        let why = "a ws-practice mark takes a bite run's numbers from every measured run";
+        assert!(errors.iter().any(|e| e.contains(why)), "{errors:?}");
+        // The moved bite may name its moved part's rule: neither is read.
+        let both = pass("", &[S30, &rd_late], &[CHECK], &[&with(MOVED, late)]);
+        parse(&file(&both)).expect("a moved bite keeps its moved part's rule as data");
     }
 
     /// A precondition is judged whole: a mark that names `pre:<mark>` is refused when that mark is moved, or has a

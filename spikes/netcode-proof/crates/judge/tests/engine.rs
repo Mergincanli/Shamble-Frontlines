@@ -2989,15 +2989,17 @@ fn a_moved_check_is_skipped_wherever_checks_are_chosen() {
     for (what, check, kept_verdict) in cases {
         let (k, why) = verdict_of(&[with(check.clone(), json!([]))], &runs);
         assert_eq!(k, kept_verdict, "{what}, kept: {why:?}");
+        let name = check["name"].as_str().expect("a name").to_owned();
         let v = judge(&marks_file(&[with(label(check), json!([]))]), &runs);
+        assert_eq!(v[0].verdict, VerdictKind::Moved, "{what}");
+        let line =
+            format!("the kept parts hold; moved, never judged here: check {name:?} to Slice 3");
+        assert_eq!(v[0].why, [line], "{what}");
+        let json = serde_json::to_value(&v[0]).expect("json");
         assert_eq!(
-            v[0].verdict,
-            VerdictKind::Moved,
-            "{what}, moved: {:?}",
-            v[0].why
+            json["moved_checks"],
+            json!([{"name": name, "moved": moved()}])
         );
-        assert!(v[0].why[0].contains("check \""), "{:?}", v[0].why);
-        assert_eq!(v[0].moved_checks.len(), 1);
         let judged = v[0].parts[0]
             .runs
             .iter()
@@ -3017,12 +3019,27 @@ fn a_moved_check_is_skipped_wherever_checks_are_chosen() {
     logs.push(bite_run(M, "PM-0001-4/B-S", "set-a", &[10, 60]));
     let (k, why) = verdict_of(&[with(max.clone(), bites.clone())], &logs);
     assert_eq!(k, VerdictKind::Pass, "{why:?}");
-    let (k, why) = verdict_of(&[with(label(max), bites)], &logs);
+    let (k, why) = verdict_of(&[with(label(max.clone()), bites.clone())], &logs);
     assert_eq!(k, VerdictKind::Fail);
     assert_eq!(
         why,
         ["bite PM-0001-4/B-S did not fail: the check cannot be shown to work"]
     );
+    // The same on a bite run that matches no part (profile P4), which is judged on the mark-wide checks alone.
+    let mark = two_parts(
+        json!({}),
+        json!({"checks": [kept, label(max)], "bites": bites}),
+    );
+    let logs = [
+        profile_run("run-1", "P2", &[10, 20, 40]),
+        profile_run("run-2", "P2", &[10, 20, 45]),
+        profile_run("run-3", "P2", &[10, 20, 50]),
+        profile_run("p3-1", "P3", &[10]),
+        profile_bite("P4", &[10, 60]),
+    ];
+    let v = judge(&marks_file(&[mark]), &logs);
+    assert_eq!(v[0].bites[0].status, BiteStatus::Missed);
+    assert_eq!(v[0].verdict, VerdictKind::Fail);
 }
 
 #[test]
@@ -3043,6 +3060,11 @@ fn a_moved_bite_is_never_evaluated() {
         );
         assert_eq!(v[0].bites[0].status, BiteStatus::Moved);
         assert!(v[0].bites[0].runs.is_empty());
+        let json = serde_json::to_value(&v[0].bites[0]).expect("json");
+        assert_eq!(
+            json,
+            json!({"id": "PM-0001-4/B-S", "status": "moved", "runs": [], "moved": moved()})
+        );
     }
     // A kept failure still shows past a moved bite.
     let (k, _) = verdict_of(&[mark], &three_runs(M, [90, 101, 100]));
@@ -3096,6 +3118,28 @@ fn a_bite_run_on_moved_parts_only_is_left_out() {
         BiteStatus::Shown,
         "{:?}",
         v.bites[0].runs
+    );
+    // On a kept part and a moved one at once: only the kept part's checks apply. The moved part's own check
+    // (max at most 50) would have shown the bite; the kept check (p99 at most 100) lets it through.
+    let l2 = json!({"name": "L2", "moved": moved(), "select": {"layer": "L2"}, "min": 1});
+    let max = json!({"name": "max", "series": "tick.v.work_ns", "stat": "max", "op": "<=", "value": 50,
+                     "parts": ["L2"]});
+    let kept = json!({"name": "tick p99", "series": "tick.v.work_ns", "stat": "p99", "op": "<=", "value": 100});
+    let s30_part = json!({"name": "S30", "select": {"profile": "P2"}, "min": 3});
+    let mixed = tick_mark(M, json!({"parts": [s30_part, l2], "checks": [kept, max]}));
+    let mut logs = s30();
+    logs.push(profile_bite("P2", &[10, 60]));
+    let v = judge(&marks_file(&[mixed]), &logs).remove(0);
+    assert_eq!(
+        v.bites[0].status,
+        BiteStatus::Missed,
+        "{:?}",
+        v.bites[0].runs
+    );
+    assert_eq!(
+        v.bites[0].runs[0].checks.len(),
+        1,
+        "the moved part's check is not read"
     );
 }
 

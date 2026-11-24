@@ -961,7 +961,7 @@ fn rule(
                 why.push(format!("pre:{id}: not in marks.json"));
                 return;
             };
-            // The loader refuses a precondition with a moved part or check, so every part and check of it counts.
+            // The loader refuses a precondition with a moved part or check (README §2.6), so none is met here.
             let matched = matched_parts(pre, run);
             let checks: Vec<&crate::marks::Check> = pre
                 .checks
@@ -1421,13 +1421,10 @@ fn eval_bite(
     // A bite run that matches only moved parts is not a run of this test (README §5): it is left out, so it can
     // neither show the bite nor miss it. A run that matches no part at all stays, judged on the mark-wide checks.
     let kept_parts = |run: &Run<'_>| {
-        let matched = matched_parts(mark, run);
-        let kept: Vec<&Part> = matched
-            .iter()
-            .copied()
-            .filter(|p| p.moved.is_none())
-            .collect();
-        (matched.is_empty() || !kept.is_empty()).then_some(kept)
+        let mut parts = matched_parts(mark, run);
+        let none = parts.is_empty();
+        parts.retain(|p| p.moved.is_none());
+        (none || !parts.is_empty()).then_some(parts)
     };
     let bite_runs: Vec<(&Run<'_>, Vec<&Part>)> = serving
         .iter()

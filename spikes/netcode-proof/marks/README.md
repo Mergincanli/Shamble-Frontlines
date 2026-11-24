@@ -244,13 +244,16 @@ that takes it. The judge never judges a moved piece and never lets it read PASS:
 - **a part** reads MOVED and none of its runs is judged;
 - **a check** is skipped wherever checks are chosen (a part's runs, its pooled checks, its setup checks, a bite run);
 - **a bite** is never evaluated, run or not;
-- an `outside` mark takes no label: it left before any trim, and reads MOVED by its kind.
+- an `outside` mark takes no label: it left before any trim, and reads MOVED by its kind;
+- a check or a reported statistic that names only moved parts is never judged either: it travels with them.
 
 `--check-marks` refuses a label where the judge would not read it, each with its own message: on a mark and also on a
 part, check or bite of it (a mark moved whole says it once); on every part of a mark (move the mark); on a part of a
 `person` mark (it is judged whole, from its `person` record); on a `ws_bound` check (the bound's line holds its
-number); on a reported statistic (it decides nothing); and on a mark that another names as its precondition
-(`pre:<mark>`), or on a part or check of it (a precondition is judged whole).
+number); on a part of a mark with the `ws-practice` rule (a bite run takes its numbers from every measured run of
+its set: move the mark); on a reported statistic (it decides nothing); and on a mark that another names as its
+precondition (`pre:<mark>`), or on a part or check of it (a precondition is judged whole). A kept bite with
+`expect: "invalid"` names a rule of the mark or of a kept part, never one that only a moved part holds.
 
 ## 3. How a verdict is reached
 1. The judge reads every results log under the given folder and keeps, per mark, the runs whose header lists it.
@@ -357,7 +360,8 @@ A bite run from a measured build is INVALID by the build rule (§4).
 Moved pieces (§2.6): a moved bite is never evaluated. A bite run that matches only moved parts is not a run of this
 test, so it is left out: it neither shows nor misses its bite, which then has no run. One that matches no part at all
 is judged on the checks that name no `parts`, as before. A moved check shows no bite: a bite run that fails only moved
-checks passed every kept one, so its bite is missed.
+checks passed every kept one, so its bite is missed (or undecided, and the mark NOT-RUN, when no kept check applies to
+that run at all).
 
 A bite with `expect: "invalid"` and a `rule` (PM-0001-30's "the validity check itself") targets that validity rule:
 it is shown only when its run is INVALID by that rule alone, every other rule holding; a run that holds the rule makes

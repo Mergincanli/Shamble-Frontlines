@@ -2348,6 +2348,11 @@
         },
         {
           "id": "PM-0001-3/not-net-of-base",
+          "moved": {
+            "to": "Slice 3, with the human run",
+            "why": "it fails only the checks of the part MP at P2, which rode the human run (R7)",
+            "by": "NPT-TRIM, 2026-11-21, as the advisor agent read its move of the human run (R7) on 2026-11-24; not a line of the re-plan's table"
+          },
           "what": "on L2, the delay not net of the base RTT fails MP's 100 +- 5 ms"
         }
       ],
@@ -4557,7 +4562,7 @@
           "moved": {
             "to": "Slice 3, with the human run",
             "why": "its only run was a leg of the human run (R7), which left the proof test",
-            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+            "by": "NPT-TRIM, 2026-11-21, as the advisor agent read its move of the human run (R7) on 2026-11-24; not a line of the re-plan's table"
           },
           "select": {
             "layer": "L2",
@@ -6746,7 +6751,7 @@
           "moved": {
             "to": "Slice 3, with the human run",
             "why": "its only run was a leg of the human run (R7), which left the proof test",
-            "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
+            "by": "NPT-TRIM, 2026-11-21, as the advisor agent read its move of the human run (R7) on 2026-11-24; not a line of the re-plan's table"
           },
           "select": {
             "layer": "L2",
@@ -10989,7 +10994,7 @@
           "name": "every listed item read once and written (10 items)",
           "moved": {
             "to": "with the items' own marks, as the MARK-NOTES sentence in this mark's notes says item by item",
-            "why": "MARK-NOTES: the record counts 4 items here, not 10",
+            "why": "MARK-NOTES, in this mark's notes: \"-56's record counts 4 items, not 10\"",
             "by": "NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)"
           },
           "series": "event.record_item.has_value",
