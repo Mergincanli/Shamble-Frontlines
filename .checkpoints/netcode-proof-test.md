@@ -135,11 +135,11 @@
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
 - **Running (3 agents, 1 shell; message or resume each by SendMessage to its ID; after a cut, from its file):**
-  - The advisor's U6b fix-diff check a108f5cdf9270999e (advisor-u6b-fix.md, saved per item; after a cut: from its file).
+  - The advisor's U6b fix-diff check a108f5cdf9270999e (advisor-u6b-fix.md, saved per item; cut 23:22, resumed 02:3x).
     Done, resumable: U6b's builder a2661dc320c9e6d00 (notes u6b-build.md "## Fix
     pass", worktree agent-a2661dc320c9e6d00), the advisor aaeb16476830d05d1 (advisor-u6b-r1.md), U6b's seats
     netcode a0a57a3948202de40, security aedb799ad9648b0e1, test a88f25b3d3f66d972.
-  - The saver b80065fbo (checkpoint.mjs watch from 23:03 to about 00:53; when it ends, restart it: run_in_background,
+  - The saver bg149e5i4 (checkpoint.mjs watch from 02:36 to about 04:26; when it ends, restart it: run_in_background,
     timeout 7200000). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (2-hourly), day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05).
 - **Finished, resumable by SendMessage:** U8's last-round seats, netcode a120f51df9a8f6986 and security
   af8c5f0fbec829595 (u6b-run.sh exports CARGO_INCREMENTAL=0; a builder on the 4 GB floor stops, never cleans);
@@ -183,4 +183,4 @@
   :7148-7160, :7169-7175; 2026-11-20 :7248-7253, :7312-7322, :7435-7444, :7535-7542; 2026-11-21 :7553-7559, :7618-7620;
   2026-11-22 :7610-7617, :7623-7628 (15:47:28 to about 19:44 UTC); 2026-11-22/23 :7655-7663 (about 20:42 to 02:36 UTC);
   2026-11-23 :7665-7673 (about 03:59 to 06:36 UTC), :7675-7687 (about 07:53 to 11:14 UTC), :7689-7701 (about 12:28 to 16:22 UTC),
-  :7724-7736 (about 17:33 to 21:12 UTC).
+  :7724-7736 (about 17:33 to 21:12 UTC); 2026-11-23/24 :7745-7753 (about 23:22 to 02:36 UTC).

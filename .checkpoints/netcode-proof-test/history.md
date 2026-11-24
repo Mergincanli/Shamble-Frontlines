@@ -7741,3 +7741,13 @@ B. I'm about to run /compact on this chat. First make sure nothing that lives on
 - Done at once: U6b's in-progress fix pass snapshotted as wip/u6b-fix.patch (its builder mid-way through its counted
   check.mjs run; wip/u6b-build.patch stays the round's 49f4488f for U6e and the advisor's check); the builder told to
   keep its notes current; the card and this file saved and pushed.
+
+## Cut by the spend limit (2026-11-23 about 23:22 UTC to 2026-11-24 02:36 UTC)
+- **The notice** (the advisor's U6b fix-diff check a108f5cdf9270999e; its task ended at about 23:22:13 UTC, HTTP 429):
+  "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 2:10am
+  (UTC)".
+- **What it stopped:** the advisor's check, its header and plan written (advisor-u6b-fix.md, 23:22:49), no item yet.
+  U6b's fix pass had ended before it (about 23:2x: snapshot e29c003c in bac0246, pushed). A container restart then
+  stopped the saver b80065fbo. The check-ins of 00:34 and 02:34 reached this chat at 02:35 UTC.
+- **Resumed 02:3x UTC:** no cargo running; git status clean (HEAD = origin); the saver restarted (bg149e5i4); the
+  advisor by SendMessage, from its plan.
