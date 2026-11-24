@@ -23,6 +23,7 @@
   - Stop B's message (B): U4k, U6d and U6e at about 3.3x, and options (a)-(c), each with my lean.
 - **FABLE, 2026-11-24 16:14 UTC (history.md:7891-7900):** the advisor tool (Fable 5.2) is on: use it before each step on
   R1's path and before a step is called done; tell him what needs it. An extra: the recorded advisor rulings stay.
+  The board add-on is active (2026-11-24).
 - **RE-PLAN answers, 2026-11-22 12:54 UTC (history.md:7595-7607):** RE-PLAN-OK yes (replan.md is the plan); MARK-NOTES
   yes as replan.md:106-111 words them (the MOVED unit writes them, with a reviewer's read); LAPTOP (b) (R8 once he names
   ML); PACK-P0 (b); R1 Thursday 3 December; dates for R2, R3, R5 and the close come with R1's run plan (aim: the close
@@ -153,8 +154,7 @@
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
     (next 20:34); day message trig_016pV7v16ktVwMuzygofJhjJ (11-24 23:05 UTC, msg-2026-11-25.md).
-- **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6 of 6 green; the advisor's head
-  check APPROVE (advisor-main-64-head.md; no new finding; ADV-M60-7 and ADV-M54-8 still open, Low).
+- **MAIN-64 DONE** (history.md, "## MAIN-64"): merge 72b0dc3 pushed at 807e92a; CI 6/6 green; head check APPROVE (advisor-main-64-head.md; ADV-M60-7, ADV-M54-8 open, Low).
 - **My step (18:3x):** round 2: netcode 3 Lows in the diff, 2 Mediums outside it before R1 (the start-edge drop read;
   LG's DONE with no READY, caught at U8's one load_up call :2218-2221); P1's +222 drops are in-window, a separate fact
   (U8's equal-on-P1 rule, :1708-1711); test 1 Medium (TE-U6C-R2-4), 7 Lows; security 2 Lows. Ruling 22:5x (19:5x: the snapshot applies on 4f9ca2b, 24 files; facts added to the request). The readings are DONE,
