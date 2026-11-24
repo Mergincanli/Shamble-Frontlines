@@ -77,13 +77,13 @@
   uncommitted copy of the tree; plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
 - **Next 1, U8:** nothing open above Low; it waits for U6c's merge (about Sat 28), then its merge M3-M9 with the advisor
   a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **Next 2, U6c's build RUNNING (launched about 06:55; cut by the spend limit 06:55-07:59, no edit lost; resumed by
-  SendMessage 08:0x):** builder a3a3e3fdf559de095 (general-purpose, opus, xhigh, worktree, background); its launch message u6c-launch-prompt.txt (added items 1-6: U7's dist names, advisor-u8-stopb.md:210-220's
-  six lines, NC-R2-4, F-JOIN-ONCE, A2's command, the 5,400 stop). `<base>` 8c81952 (U6b's merge 8efb9b2 + Block 0
-  3b75d00), 807/904, test step 1086.7 s; runner u6c-run.sh, logs .gate/u6c/; its notes in its worktree's u6c-build.md.
-  Its first build is cold (dev part-clean 06:55: 7.0 GiB; free 3,861 -> 10,666 MiB). On a cut: SendMessage it to read
-  its notes and go on. **09:11:** Blocks 1, 3, 4, 5, 6 DONE (u6c-build.md "## Done"), rustfmt applied; 5,426 added
-  (C4: Block 2 not built, lever (1) pulled); its end check.mjs running from 09:07 (.gate/u6c/end-check.log), then plants.
+- **Next 2, U6c's build RUNNING:** builder a3a3e3fdf559de095 (general-purpose, opus, xhigh, worktree, background;
+  launched ~06:55, cut 06:55-07:59, resumed 08:0x); launch message u6c-launch-prompt.txt (added items 1-6); `<base>`
+  8c81952, 807/904, test 1086.7 s; runner u6c-run.sh, logs .gate/u6c/; notes in its worktree's u6c-build.md. Blocks
+  1, 3-6 DONE, rustfmt applied, 5,428 added (C4: Block 2 not built, lever (1) pulled). End check: 10 PASS, redact FAIL
+  (F-REDACT, issue_tests.rs:266's PEM header string; fixed, not re-run); test 859/956 (+52/+52, C7 met), 1,171.9 s
+  (1.08x); then STOPPED at the disk floor (2.8 GB free; debug 7.8 GB). Snapshot wip/u6c-build.patch (24 files, 241,666
+  B; notes copied); part-clean 8.2 GiB (10,560 MiB); resumed 09:4x: F-REDACT's re-run, plants P1-P21, check.mjs.
 - **U6c's Block 0 DONE at 3b75d00 (pushed 8c81952, 06:53):** security-u6c-deps.md's binding check steps 0-7 PASS
   (u6c-block0.md): the lock 3394b451… (229/6, 252 packages, hyper pinned back to 1.12.0; security-u6c-lock.md and its
   addendum CLEAR WITH CONDITIONS, SEC-U6CL-1 to -3 Low); step 5 11/11, 807/904 (= U6b's merged head); deny ok, audit 0
