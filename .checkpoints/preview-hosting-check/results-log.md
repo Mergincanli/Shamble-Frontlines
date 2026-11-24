@@ -967,3 +967,6 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   links with the wall off, before the switch-on) showed every build serving. The
   switch-on time is not recorded to the minute (between 19:12:54 and 20:14:13 UTC), so "10 minutes" and "1 hour" are
   lower bounds; production's one-off links are behind the wall too (recorded for OQ-0006-4, not judged).
+- **Visit 2, step 8**: pull request #5 (the control, cs/pd-open) closed by the session (update_pull_request, about
+  21:17:3x UTC); its cleanup run `close` #6, id 45489619919, created 21:17:40 UTC, "waiting" on `preview` at 21:17:42
+  (so the reviewer is still on, as Day 2 expects). His approval asked, with the run's link.
