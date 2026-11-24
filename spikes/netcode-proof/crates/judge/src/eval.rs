@@ -1778,7 +1778,8 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
                     .all(|o| o == Outcome::Pass)
         };
         let members = serving.iter().copied().filter(|r| run_matches(r, &select));
-        valid.insert(part.name.clone(), members.filter(holds).collect());
+        let min = usize::try_from(part.min).unwrap_or(usize::MAX);
+        valid.insert(part.name.clone(), (min, members.filter(holds).collect()));
     }
     let ctx = &Ctx {
         parts: &valid,

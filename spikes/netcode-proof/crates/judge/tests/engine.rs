@@ -4010,3 +4010,142 @@ fn u6j_session_memory_that_grows_from_the_first_half_to_the_second() {
     let gap = "run f1: measured seconds 0 to 0 of second.s.session_buffered_bytes: two halves need 2 measured seconds";
     assert_eq!(one, ("Gap -".to_owned(), gap.to_owned()));
 }
+
+/// A mark like PM-0001-10: three parts by client count, the ratio checked on N=48's runs, the unit cost reported.
+fn sync_mark() -> Value {
+    let part =
+        |n: u32, min: u32| json!({"name": format!("N={n}"), "select": {"clients": n}, "min": min});
+    json!({
+        "id": "PM-0001-10", "title": "sync cost", "draft": draft(), "verdict": "pass",
+        "parts": [part(48, 1), part(24, 3), part(36, 3)],
+        "checks": [{"name": "ratio", "figure": "sync_cost_ratio", "op": "<=", "value": "1.1", "parts": ["N=48"]}],
+        "report": [{"name": "unit", "figure": "sync_unit_cost"}],
+        "bites": []
+    })
+}
+
+/// One room log of that mark: one measured tick with `work` ns of server-only work and `relevant` entities in
+/// total over its `clients` clients.
+fn sync_log(id: &'static str, clients: u32, work: i64, relevant: i64) -> Log {
+    let mut s = LogSpec::room(id, "set-s", "PM-0001-10").ticks("server_only_ns", &[work]);
+    s.clients = clients;
+    let mut log = s.build();
+    let mut list = vec![0; clients as usize];
+    list[0] = relevant;
+    log.ticks[0].s.insert("relevant_count".into(), list);
+    log
+}
+
+/// Seven runs: the N=48 run at unit cost `own`, three at N=24 and three at N=36 at the given unit costs.
+fn sync_runs(own: i64, n24: [i64; 3], n36: [i64; 3]) -> Vec<Log> {
+    let ids = [["a24", "b24", "c24"], ["a36", "b36", "c36"]];
+    let mut logs = vec![sync_log("a48", 48, own * 100, 100)];
+    logs.extend((0..3).map(|k| sync_log(ids[0][k], 24, n24[k] * 100, 100)));
+    logs.extend((0..3).map(|k| sync_log(ids[1][k], 36, n36[k] * 100, 100)));
+    logs
+}
+
+/// N=48's run under `sync_mark`: its check as "Outcome value", and its note.
+fn sync_out(logs: &[Log]) -> (String, String) {
+    let v = judge(&marks_file(&[sync_mark()]), logs);
+    let c = &v[0].parts[0].runs[0].checks[0];
+    let line = format!("{:?} {}", c.outcome, c.value.as_deref().unwrap_or("-"));
+    (line, c.note.clone().unwrap_or_default())
+}
+
+#[test]
+fn u6j_the_sync_unit_cost_at_48_against_24_and_36() {
+    // 110 against a mean of 100 at N=24 and of 105 at N=36: the larger ratio is 110/100.
+    let logs = sync_runs(110, [100; 3], [105; 3]);
+    assert_eq!(sync_out(&logs).0, "Pass 1.1");
+    let v = judge(&marks_file(&[sync_mark()]), &logs);
+    assert_eq!(v[0].verdict, VerdictKind::Pass, "{:?}", v[0].why);
+    assert_eq!(
+        report(&v[0], "unit"),
+        ["110", "100", "100", "100", "105", "105", "105"]
+    );
+    assert_eq!(sync_out(&sync_runs(111, [100; 3], [105; 3])).0, "Fail 1.11");
+    // N=36 decides when it is the cheaper reference: 110/95.
+    assert_eq!(
+        sync_out(&sync_runs(110, [100; 3], [95; 3])).0,
+        "Fail 1.157895"
+    );
+    // The mean of the three runs' unit costs: 90, 100 and 110 are 100.
+    assert_eq!(
+        sync_out(&sync_runs(110, [90, 100, 110], [105; 3])).0,
+        "Pass 1.1"
+    );
+    // The unit cost is work over entities, whatever the client count: 550 ns over 5 entities is 110.
+    let mut logs = sync_runs(110, [100; 3], [105; 3]);
+    logs[0] = sync_log("a48", 48, 550, 5);
+    assert_eq!(sync_out(&logs).0, "Pass 1.1");
+    // A reference run that is not valid (a cut log) is not in the mean; with it gone, N=24 waits for its third run.
+    let mut logs = sync_runs(110, [100; 3], [105; 3]);
+    let mut cut = LogSpec::room("d24", "set-s", "PM-0001-10").ticks("server_only_ns", &[900]);
+    (cut.clients, cut.footer) = (24, false);
+    logs.push(cut.build());
+    assert_eq!(sync_out(&logs).0, "Pass 1.1");
+    logs.remove(3);
+    let (line, note) = sync_out(&logs);
+    let wait = "run a48: part N=24 has 2 of its 3 valid runs: its mean unit cost is not there yet";
+    assert_eq!((line.as_str(), note.as_str()), ("Cannot -", wait));
+    // Without the cut log (an INVALID run of its own), the mark waits: NOT-RUN.
+    logs.pop();
+    let v = judge(&marks_file(&[sync_mark()]), &logs);
+    assert_eq!(v[0].verdict, VerdictKind::NotRun, "{:?}", v[0].why);
+}
+
+#[test]
+fn u6j_the_sync_unit_costs_gaps_and_its_large_sums() {
+    let gap = |edit: &dyn Fn(&mut Vec<Log>)| {
+        let mut logs = sync_runs(110, [100; 3], [105; 3]);
+        edit(&mut logs);
+        let (line, note) = sync_out(&logs);
+        assert_eq!(line, "Gap -", "{note}");
+        note
+    };
+    let why = gap(&|l| drop(l[0].ticks[0].s.remove("relevant_count")));
+    assert_eq!(
+        why,
+        "run a48: measured tick 1 of the room log lacks tick.v.server_only_ns or tick.s.relevant_count"
+    );
+    let why = gap(&|l| drop(l[0].ticks[0].s.insert("relevant_count".into(), vec![1; 47])));
+    assert_eq!(
+        why,
+        "run a48: tick 1's tick.s.relevant_count holds 47 entries, not the run's 48 clients"
+    );
+    let why = gap(&|l| l[0].ticks[0].ph = Warmup);
+    assert_eq!(
+        why,
+        "run a48: no measured tick in the room log (tick.v.server_only_ns)"
+    );
+    let why = gap(&|l| drop(l[0].ticks[0].s.insert("relevant_count".into(), vec![0; 48])));
+    assert_eq!(
+        why,
+        "run a48: tick.s.relevant_count sums to 0 over the measured ticks: no unit cost"
+    );
+    // A reference whose work is all 0 gives nothing to divide by.
+    let why =
+        gap(&|l| (1..4).for_each(|k| *l[k].ticks[0].v.get_mut("server_only_ns").expect("set") = 0));
+    assert_eq!(why, "run a48: the mean unit cost of part N=24 is 0");
+    // A gap in a reference run's own record is this run's gap too.
+    let why = gap(&|l| drop(l[5].ticks[0].s.remove("relevant_count")));
+    assert_eq!(
+        why,
+        "run b36: measured tick 1 of the room log lacks tick.v.server_only_ns or tick.s.relevant_count"
+    );
+    // Sums as large as a 30-minute soak's (a 33 ms tick on each of 54,000 ticks, 62 entities for each of 48
+    // clients), on denominators with no common factor: the exact fractions stay inside i128.
+    let mut logs = vec![sync_log("a48", 48, 1_781_999_999_989, 160_704_011)];
+    let refs = [
+        (593_999_999_971, 26_783_993),
+        (593_999_999_993, 26_784_011),
+        (594_000_000_011, 26_784_017),
+    ];
+    let ids = [["a24", "b24", "c24"], ["a36", "b36", "c36"]];
+    for (n, ids) in [24, 36].into_iter().zip(ids) {
+        logs.extend((0..3).map(|k| sync_log(ids[k], n, refs[k].0, refs[k].1 + i64::from(n))));
+    }
+    let (line, note) = sync_out(&logs);
+    assert!(line.starts_with("Pass 0.5"), "{line} {note}");
+}

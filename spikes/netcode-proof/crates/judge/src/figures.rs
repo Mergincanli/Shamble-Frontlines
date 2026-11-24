@@ -23,8 +23,9 @@ pub enum Lack {
     Fail(String),
 }
 
-/// A mark's kept parts by name, each with its valid runs: those that held their validity rules and setup checks.
-pub type Parts<'r, 'a> = BTreeMap<String, Vec<&'r Run<'a>>>;
+/// A mark's kept parts by name, each with its `min` (the valid runs the part needs) and its valid runs: those that
+/// held their validity rules and setup checks.
+pub type Parts<'r, 'a> = BTreeMap<String, (usize, Vec<&'r Run<'a>>)>;
 
 /// What a figure reads: the run under judgement, every run of its set, and the valid runs of the mark's kept parts
 /// (for a figure that compares across parts or pools a part's runs; empty where the caller has no mark's parts).
@@ -1219,6 +1220,81 @@ fn session_memory_growth_count(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
     })
 }
 
+/// PM-0001-10's unit cost of one run: mean server-only work per tick / (clients x mean relevant entities), over
+/// the room log's measured ticks. Every `tick.s.relevant_count` list holds the run's `clients` entries, so that is
+/// the sum of `tick.v.server_only_ns` over the sum of every entry, exactly. Gaps: no room log or more than one, a
+/// name in another process's log, a measured tick without either series, a list of another length, no measured
+/// tick, no relevant entity at all (nothing to divide by).
+fn sync_unit(run: &Run<'_>) -> Result<Ratio, Lack> {
+    let (work, relevant) = ("server_only_ns", "relevant_count");
+    only_from(run, "room", "tick.v", work)?;
+    only_from(run, "room", "tick.s", relevant)?;
+    let room = room_log(run)?;
+    let clients = usize::try_from(room.header.clients).unwrap_or(usize::MAX);
+    let gap = |why: String| Err(Lack::Gap(format!("run {}: {why}", run.id)));
+    let (mut ns, mut entities, mut ticks) = (0_i128, 0_i128, 0);
+    for t in room.ticks.iter().filter(|t| t.ph == Phase::Measured) {
+        let (Some(w), Some(list)) = (t.v.get(work), t.s.get(relevant)) else {
+            return gap(format!(
+                "measured tick {} of the room log lacks tick.v.{work} or tick.s.{relevant}",
+                t.t
+            ));
+        };
+        if list.len() != clients {
+            return gap(format!(
+                "tick {}'s tick.s.{relevant} holds {} entries, not the run's {clients} clients",
+                t.t,
+                list.len()
+            ));
+        }
+        ns += i128::from(*w);
+        entities += list.iter().map(|e| i128::from(*e)).sum::<i128>();
+        ticks += 1;
+    }
+    match (ticks, entities) {
+        (0, _) => gap(format!("no measured tick in the room log (tick.v.{work})")),
+        (_, 0) => gap(format!(
+            "tick.s.{relevant} sums to 0 over the measured ticks: no unit cost"
+        )),
+        _ => Ok(Ratio::new(ns, entities)),
+    }
+}
+
+/// PM-0001-10: this run's unit cost against the mean unit cost of the valid runs at N = 24 and, separately, at
+/// N = 36 (the mark's parts of those names); the larger of the two ratios. NOT-RUN while either part has fewer
+/// valid runs than its `min`; a gap if a reference's mean is 0.
+fn sync_cost_ratio(i: &Inputs<'_, '_>) -> Result<Ratio, Lack> {
+    let own = sync_unit(i.run)?;
+    let mut worst: Option<Ratio> = None;
+    for part in ["N=24", "N=36"] {
+        let (min, runs) = i
+            .parts
+            .get(part)
+            .map_or((1, &[][..]), |(m, r)| (*m, &r[..]));
+        if runs.len() < min.max(1) {
+            return Err(Lack::Waiting(format!(
+                "run {}: part {part} has {} of its {min} valid runs: its mean unit cost is not there yet",
+                i.run.id,
+                runs.len()
+            )));
+        }
+        let mut sum = Ratio::int(0);
+        for r in runs {
+            sum = sum + sync_unit(r)?;
+        }
+        if sum.num() == 0 {
+            return Err(Lack::Gap(format!(
+                "run {}: the mean unit cost of part {part} is 0",
+                i.run.id
+            )));
+        }
+        // own / (sum / n): every product checked, and the two ratios compared exactly at any size.
+        let ratio = own * Ratio::new(sum.den(), sum.num()) * Ratio::int(runs.len() as i128);
+        worst = Some(worst.map_or(ratio, |w| w.max(ratio)));
+    }
+    Ok(worst.unwrap_or(own))
+}
+
 /// A figure's computation over its [`Inputs`].
 pub type Compute = fn(&Inputs<'_, '_>) -> Result<Ratio, Lack>;
 
@@ -1345,14 +1421,14 @@ pub const FIGURES: &[Figure] = &[
         unit: "U4j",
         what: "every header names its machine in full (-1, PM-0006-11)",
     },
-    planned(
+    built(
         "sync_unit_cost",
-        "U6",
+        |i| sync_unit(i.run),
         "mean server-only work per tick / (clients x mean relevant entities) (-10)",
     ),
-    planned(
+    built(
         "sync_cost_ratio",
-        "U6",
+        sync_cost_ratio,
         "N = 48's unit cost against N = 24's and 36's (-10)",
     ),
     built(
