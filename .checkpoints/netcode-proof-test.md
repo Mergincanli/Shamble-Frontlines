@@ -147,8 +147,8 @@
   dev profile to ~7.8 GB). The unpacked folders his packing words do not cover: this card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **Running (1 agent, 1 shell, 2 triggers; resume by SendMessage to its ID, after a cut from its file):** the saver
-  bghk215os (13:08 to about 15:00; restart when it ends: run_in_background, timeout 7200000). MAIN-64 pushed at 807e92a.
+- **Running (no agent, no shell, 3 triggers):** the saver bghk215os ended at its window's end (about 14:58). Restart
+  it with round 2 at 17:51 (run_in_background, timeout 7200000); until then saves by hand.
   - No agent running (LEAN-MODE item 3: new ones only in the 30 minutes after a reset; next reset 17:50 UTC).
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
