@@ -89,3 +89,44 @@ of the sheet.
    and the report names both as things its later units must write.
 6. **Rule::LoggingOff skips the every-run rules on its logging-off runs** (sheet A10 item 7, a Medium that was there
    before): fix it in block 9 (lean), or defer by name.
+
+## 5. The advisor agent's verdict (2026-11-24, about 21:35 UTC, on 80ffa68): APPROVE with 11 conditions
+Each binds the build (my wording, shortened). Building on made-up logs before the writers exist is the right reading
+of his U6-JUDGE (b) text; the SERIES.md wording for later writers stays inside "the rows your figures need".
+1. Part a's head stands. Entry 64 (a) to (f) and JDG-ONLY-1 are block 1, before any other part-b edit to
+   crates/judge/src. Until part b merges, the netcode chat keeps JDG-ONLY-1's interim rule (every `--only` naming a
+   mark with `pre:PM-0001-2` also names PM-0001-2). The report records the ordering miss in one line.
+2. Block 2 changes no existing test's expected result: all 98 pass unchanged before any figure is added.
+   `Inputs.parts` holds only kept parts' valid runs (validity rules and setup checks held), never a moved part's.
+3. R2-INPUTS goes to netcode-architect before block 8 (one agent, xhigh). Its brief: ADR 0006:1387 ("the run's P, V,
+   shots and projectile spawns") governs PM-0006-17's check; R2's formula is E3 at docs/research/r2-netcode.md:
+   1763-1765 (P players and bots, V vehicles, every entity in view); it changes no marks.json text or number; it may
+   fix the meaning of `tick.s.relevant_count` or add one input row in SERIES.md as a row the figures need, with a
+   board note for the writer; if the ADR row and SERIES.md:284-285 cannot both hold, back to the advisor first.
+4. Figures that implement a reading still marked "(question)" or "proposed" (marks.json's notes for -12, -13, -15,
+   -24, -27, PM-0006-19; SERIES.md:287's slope method) are built on the written reading, and the report lists them
+   as readings still open for the readings change before R5, never as settled.
+5. C-U6-11 states and tests two cases: a slot with no `admit` event keeps today's single span (a mid-run joiner
+   with no admit record still fails coverage); a run with no `session_end` keeps today's verdict (a loss-burst gap
+   stays INVALID).
+6. KILL-EVENT at its lean (phase `after`, the killed run present in the set). SERIES.md's -27 row and the report
+   state the writer-side need: the run script kills the room at the end of the measured window, so `after` begins
+   at the kill. `kill_p99_ratio` is built last, after the logging-cost figure (his undecided R5 option could move it).
+7. C4-KILL is built only if the netcode chat names npt-super's kill record by the time block 7 starts; else deferred
+   by name in the report and on the card, home "before R5's -27 and PM-0006-22 runs"; the report says today's
+   exemption of any `killed` log stays open.
+8. The two writer-side SERIES.md changes (`room_end` gains `slot`; on L2 `admit` and `session_end` also in the room
+   log) are posted on the board before block 4, worded as additions that keep every existing writer's rows valid, in
+   their own rows (U6c's merge adds 51 rows to SERIES.md).
+9. Rule::LoggingOff's skip of the every-run rules on logging-off runs is fixed in block 9, with a test and a planted
+   defect; the report names it as a fix outside the U6j list.
+10. `Lack::Fail`'s failure line prints its reason, and a test asserts the exact line (for `crash_close_max_ns`, the
+    client with no `room_end`); today `fail_lines` prints only "= ?, needs …".
+11. Per figure, the report says where its input series has no writer yet (16 series) and that it is proven on
+    made-up logs only; the netcode chat's later units and R2, R3, R5 give the first real logs.
+The six rulings: (1) part a stands; (2) the sheet's list all at their leans, with conditions 5, 6, 7 and 10;
+(3) R2-INPUTS to netcode-architect; (4) C4-KILL as leaned; (5) the writer-side needs are inside the fence;
+(6) Rule::LoggingOff fixed in block 9. Kit steps as part a's (one round, no separate verifier, the advisor reads the
+final head; the size counts from 0e0f6547 against 4,900). So the build order's last two blocks become: block 7
+`sync_unit_cost` and `sync_cost_ratio`; block 9 `crash_close_max_ns`, `logging_cost_ratio`, the LoggingOff fix, the
+texts, then `kill_p99_ratio` last.

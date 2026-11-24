@@ -79,8 +79,15 @@
 - **Before the merge:** the real-data line under "Open findings"; Mustafa's answer to OUTSIDE-NOTES (on his (a), one
   more small commit lands here first).
 
+9. Part b's plan and its review · `plan-b.md` on `figures-b.md` (the spec sheet) · the advisor agent: APPROVE with 11
+   conditions (plan-b.md section 5); part a's head stands; the board has the two questions for the netcode chat.
+
 ## Current step
-Part a is reported. Waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL. Part b starts with its own plan.
+Part a is reported (waiting on Mustafa: OUTSIDE-NOTES, BURST-RIDER, MAIN-MODEL). **Part b, block 1 (J0):**
+u4s-carries.md entry 64 (a) to (f), each test shown failing under its plant and passing restored (figures-b.md C1
+gives each item's test, wording and plant), then JDG-ONLY-1 (figures-b.md C2: `judge_only`, main.rs drops its
+`retain`, a cli test on the real marks.json with `fixtures/pm-0001-4/base --only PM-0001-4`). Then commit, push, the
+size count from 0e0f6547, and block 2. Part b's board thread is open (state doing).
 
 ## Next steps
 1. If Mustafa answers OUTSIDE-NOTES (a): the three notes' sentence by `moved-table.mjs` (it rebuilds from the base),
