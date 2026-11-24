@@ -96,7 +96,10 @@
   hyper and hyper-util `default` and hyper-rustls `rustls-native-certs`, accepted in security's addendum, SEC-U6CL-3
   Low); step 6 PASS (deny: advisories/bans/sources ok, the 7 duplicates; audit: 252 crates, 0 vulnerabilities,
   RUSTSEC-2026-0441 allowed; DBs 06:33:09 and 06:33:11 UTC; deny 0.22.0, audit 0.23.0); **step 5 RUNNING**
-  (b5263aevb -> step5-check.log; cargo check exit 0, no warnings). Then step 7 (dependency-check.md), save.
+  (b5263aevb -> step5-check.log; cargo check exit 0, no warnings). Then step 7 (dependency-check.md; evidence
+  u6c-block0.md), commit, save. Before launch: u6c-run.sh made (names only); Q-U6C-3 to U7 and Q-U6C-5/6/7 to U8
+  already met (u7-brief.md:232-236, u8-build.md:177-218); launch message drafted (scratchpad u6c-launch-prompt.txt);
+  dev part-clean first if free < 8 GiB. Size: brief ~2,800, likely 3,800-4,200, stop past 6,000 (section 8).
 - **T5 (i) DONE 06:3x** (the T-builder's report; container readings, never judged): 4 loads, each on its own room, all
   exit 0 (WT ready 44 ms, wss open 25 ms, the hash control refused, the real page to its Wasm 404). Records copied to
   .gate/u7/t5i/; notes u7-t-build.md copied; T-half snapshot wip/u7-t-build-t5i.patch (23 files; +376 = 2,858). For
