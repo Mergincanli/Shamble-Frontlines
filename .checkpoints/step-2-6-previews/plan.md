@@ -109,11 +109,11 @@ none.
 - `gate` and `smoke` from the GitHub Actions app;
 - no bypass actors ("current_user_can_bypass: never").
 
-So nothing in GitHub reads a workflow's text before it reaches main. Worse, as the security-auditor infers (its
-Critical, older than step 2.6): a branch's own workflow can ask for write permissions, pass its own `gate` and
-`smoke`, and merge its own pull request. A planted `preview.yml` would then reach the token. In front of that today
-stand only the kit's rules: tier 2 for `.github/` and `hosting/`, and the guard's ask before a `.github/` edit.
-Decision MAIN-WALL (section 12) closes or accepts this.
+So nothing in GitHub reads a workflow's text before it reaches main. The security-auditor also found a further gap
+in main's rule, older than step 2.6 (its Critical); its detail is with Mustafa, kept out of pushed files by his words of 2026-11-25, 20:35 Amsterdam. In front of these today stand
+only the kit's rules: tier 2 for `.github/` and `hosting/`, and the guard's ask before a `.github/` edit. Decision
+MAIN-WALL (section 12): his (b), the risk accepted in writing for now; the wall is the Guard fix chat's next
+change-set.
 
 **`hosting/` is tier 2:** a workflow runs its script with the token. The guard asks before a `.github/` edit but not
 before a `hosting/` edit. Fixing that is a kit change, and the kit is frozen, so it becomes a STATUS follow-up.
@@ -443,7 +443,8 @@ his second short sitting.
 - **U9.** The first link (M5 to M11) and his Brave checklist.
 
 ## 11. Risks
-- **R1.** GitHub does not stop a change to `preview.yml` itself, and may let a branch merge itself (section 2.1).
+- **R1.** GitHub does not stop a change to `preview.yml` itself, and main's rule has a further gap (section 2.1; its
+  detail is with Mustafa).
   Bounded by ACCOUNT (b); closed or accepted by MAIN-WALL.
 - **R2.** `deployment: false` may not hold the branch rule the way a normal job does: the docs imply it and do not say
   it. M1 tests exactly that, with a worthless secret, before any token goes in.
@@ -483,7 +484,7 @@ Settled by the advisor agent, not his to decide:
    - (b) He names the ones that go back to the drafts first.
    - Recommendation: (a).
 5. **MAIN-WALL: the gap that predates step 2.6** (the security-auditor's Critical; section 2.1).
-   - (a) A main rule that lets only his account update main, so that no workflow can merge itself. infra-engineer
+   - (a) A main rule that lets only his account update main. infra-engineer
      designs it in its own small change-set, measured on a throwaway repository. That change-set proves three things:
      - day sessions can still merge;
      - the PR Advisor routine can still merge;

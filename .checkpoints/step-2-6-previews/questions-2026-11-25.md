@@ -47,9 +47,7 @@ Settled without him, by the advisor agent:
    - (a) All stand.
    - (b) He names those that go back to the drafts first.
    - Recommendation: (a).
-6. **MAIN-WALL: a gap that predates step 2.6.** As the security-auditor infers (its Critical), a branch's own workflow
-   can pass its own `gate` and `smoke` and merge its own pull request, because main's rule needs no approval. A
-   planted preview workflow would then reach the token.
+6. **MAIN-WALL: a gap in main's rule that predates step 2.6** (the security-auditor's Critical; its detail is with Mustafa, kept out of pushed files by his words of 2026-11-25, 20:35 Amsterdam).
    - (a) First, a main rule that lets only his account update main. It is its own small change-set, measured on a
      throwaway repository: day sessions, the PR Advisor and his Revert route must still merge, and his account must
      not skip `gate` and `smoke`. The token clicks then move to a short second sitting.

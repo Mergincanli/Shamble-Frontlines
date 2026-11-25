@@ -74,12 +74,9 @@ disk), so no durable decision was recorded there.
 VERDICT: REVISE (not BLOCK). With the guards below in the plan, no code a pull request controls reaches the token
 directly. The one Critical predates step 2.6, but the token's only wall rests on it: click 8 waits on it.
 
-1. CRITICAL, pre-existing, not caused by step 2.6 (Q1/Q7; sure: medium-high). GitHub Actions itself can cross
-   main's wall. Read: ruleset 25069670 = PR with 0 approvals, gate/smoke from github-actions (15368), no bypass, no
-   update restriction. Quoted: write access "can modify the permissions granted to the GITHUB_TOKEN ... by editing
-   the permissions key". Inferred, never to be tested here: once a changed workflow file is on a pushed branch, a
-   PR whose own gate.yml goes green and whose workflow asks contents + pull-requests write can merge itself, so a
-   planted preview.yml reaches the token. Change: put this in 2.1 "What GitHub does not enforce" and R1; click 11
+1. CRITICAL, pre-existing, not caused by step 2.6 (Q1/Q7; sure: medium-high). A gap in main's wall. Read: ruleset 25069670 = PR with 0 approvals, gate/smoke from github-actions (15368), no bypass, no
+   update restriction. [The inference that followed is removed from this pushed file by his words of 2026-11-25,
+   20:35 Amsterdam: the wall's detail stays out of pushed files.] Change: put this in 2.1 "What GitHub does not enforce" and R1; click 11
    becomes this reading; new decision MAIN-WALL: (a) a rule so that only his account can update main, designed by
    infra-engineer, measured on a throwaway repository; (b) accept in writing, bounded by ACCOUNT (b). Recommend (a).
    It goes to his Decisions needed whatever happens to this plan.

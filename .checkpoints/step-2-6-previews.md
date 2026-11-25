@@ -37,14 +37,24 @@ His 18:15 message itself (uuid 42aa43e4..., 1778 bytes, sha256 e2554c4e...) goes
 4. The advisor agent's plan review (and the security-auditor's read of the token design).
 5. Back to him for his go; nothing built before it.
 
+## His go (2026-11-25, 20:35 Amsterdam; transcript 19:36:53 UTC, uuid fa086681..., 1579 bytes, sha256 3c4f0d23...)
+On revision 2 at c40f3f9:
+- TRIGGER (a); ACCOUNT (b); LANE2-LOCKFILE (b): lane 2 owns hosting/package.json and hosting/package-lock.json, for the
+  upload tool only, outside the game's install, and nothing else of his words of 18 November changes; DEPARTURES (a).
+- MAIN-WALL (b): the risk accepted in writing for now, because the token reaches a previews-only account; the wall goes
+  to the Guard fix chat as its next change-set. The real token is his last click: if the wall is merged by then, the
+  acceptance ends there; if not, ask him again before that click.
+- His go covers the three texts by sha256 (preview.yml c66c0b0a..., preview-close.yml c2f1fa90..., wall-test.yml
+  3af06706...). The security-auditor reads preview.yml as it stands, with the token step's added duty, in round 1. If a
+  review changes a text, bring him the new text and its sha256 before his sitting.
+- Send the request to CI Builder as planned; keep the wall's detail out of every further pushed file (the notes'
+  detail was removed on 2026-11-25 after his go).
+- Unchanged: git and gh always start their own command; a merge on his go for the approved head, after his Advisor's
+  merge check.
+
 ## Current step
-6: the plan goes to him. Revision 2 with seven text conditions folded in:
-- the advisor agent APPROVE, four conditions (a second sitting under MAIN-WALL (a); its proofs; its view beside the
-  security-auditor's; TOKEN-WINDOW settled at 90 days);
-- the security-auditor APPROVE for him, three Mediums (MAIN-WALL wording; section 2.8, the script's duties; the
-  runbook's lines). No High or Critical left; the three texts are unchanged (the appendix checked byte for byte).
-His five decisions are in `questions-2026-11-25.md` (TRIGGER, ACCOUNT, LANE2-LOCKFILE, DEPARTURES, MAIN-WALL).
-Next: wait for his answers and go. Then U1 to U9 (plan section 10).
+U0: the request to CI Builder on #59 (plan section 5). Then U1 (the host folder; the dependency hold before any push of
+the manifest and lockfile: dependency-check.md after the security-auditor's answer on the exact files).
 
 ## Rules in force
 - Until a second guard fix is merged: git and gh always start their own command, with no other program in front.
