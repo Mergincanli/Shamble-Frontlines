@@ -341,3 +341,376 @@ Memory: none found for infra-engineer in this checkout (no `.claude/agent-memory
   account token; "adding Read did not help" (the failure was the window).
 - REPO STATUS :17: main protected (PR, gate + smoke green). Whether admins may bypass main's rule: NOT READ (no doc
   says; the API needs admin). The design's wall is main's review, so this matters (see D1 residuals).
+- QUOTE NOTE (for the verifier): the fetch tool returns quotes of at most 125 characters. The 2025-11-07 changelog's
+  long sentences above are FRAGMENTS JOINED by me (re-fetched 2026-11-25: "The workflow file and checkout commit will
+  always be taken from the repository's default branch," + "regardless of the pull request's base branch."; "evaluate
+  against `refs/pull/number/merge`"; "For `pull_request_target`, environment rules evaluate against the default
+  branch." is whole). Cite the fragments, not my joins.
+- REPO root `package.json`: npm workspaces `packages/*` only; `tools/` already has its own package.json and lockfile,
+  installed with `npm ci --prefix tools --omit=optional --ignore-scripts` (gate.yml:34) and `npm ci --prefix tools
+  --ignore-scripts` (gate.yml:65): a precedent for a separate locked tool folder outside the workspaces.
+- WEB GitHub REST "Get a workflow run" https://docs.github.com/en/rest/actions/workflow-runs#get-a-workflow-run (read
+  2026-11-25): schema fields "`path`: required, string", "`head_sha`: required, string", "`head_branch`: required,
+  string or null", "`event`: required, string", "`conclusion`: required, string or null", `head_repository` with
+  "`full_name`: required, string", "`pull_requests`: required, array of `Pull Request Minimal` or null". => the job can
+  require `workflow_run.path == '.github/workflows/toolchain.yml'` (the webhook payload is taken to carry the same
+  object: inferred, medium). No word on `pull_requests` for forks.
+- WEB Cloudflare, Pages custom domains https://developers.cloudflare.com/pages/configuration/custom-domains/ (read
+  2026-11-25): for a zone in the same account "the CNAME record will be added automatically after you confirm your DNS
+  record"; an apex custom domain "must be a zone on the Cloudflare account you have created your Pages project on".
+  => production on shamblefrontlines.com's apex must live in the account that holds the zone (his main account); if
+  tokens are ever to be separated by account, it is the PREVIEWS that move to a second account. Whether a Pages-only
+  token can attach a custom domain of a same-account zone through the API: not read. Sure: high on quotes.
+
+## Findings
+
+### D1. Token safety without his click (recommendation, sure: high on the mechanism, medium on the first run)
+Recommend: the preview workflow starts on `workflow_run` (workflows: [toolchain], types: [completed]) and holds the
+token in environment `preview`, whose "Deployment branches and tags" is "Selected branches and tags" with ONE branch
+rule, `main`, with NO required reviewer and "Allow administrators to bypass" unticked; the token and account id are
+environment secrets of `preview` only, never repository secrets.
+Why it keeps the token from code a pull request can change, with no click:
+1. The rule is "matched against the `GITHUB_REF` of the workflow run" (GitHub, Deployments and environments). A
+   `workflow_run` run has GITHUB_REF "Default branch" and its file must "exist on the default branch" (events page),
+   so the only workflow text that can reach the token is main's, behind main's protection (PR + gate + smoke).
+2. Every workflow a branch can add or rewrite runs on a ref the rule refuses: `pull_request` judges
+   `refs/pull/N/merge` (changelog 2025-11-07; MEASURED by the check, sitting 3: "a `main`-only branch rule refuses a
+   pull request's job that names production, judging the ref `refs/pull/10/merge`", #66 :114-115); `push` and
+   `workflow_dispatch` on a branch judge that branch. So a branch that edits the deploy job, or adds a new workflow
+   naming `preview`, gets no secret: the same measured refusal, now on `preview`.
+3. Sessions cannot loosen it: the Claude app holds "No write on administration or deployments" (#66 :396-398), and
+   "A session cannot approve a deployment with its tools" (#66 :106-107).
+4. Nothing of the pull request runs where the token is: no checkout of PR code, no install from the PR; the build
+   arrives as an artifact and is data (GitHub Security Lab 2021: "Incoming data from artifacts is potentially
+   untrusted"; Secure use: "treat artifacts uploaded from other workflows with caution").
+Job split (advisor's point; keeps write scopes and the token apart, and keeps skipped runs out of the counter):
+- `check` (no environment, no secret; permissions contents read, actions read, pull-requests read): proceed only if
+  `workflow_run.event == 'pull_request'`, `conclusion == 'success'`, `head_repository.full_name == github.repository`
+  (fork guard), `workflow_run.path == '.github/workflows/toolchain.yml'`; look the PR up by API: open, same repo,
+  `head.sha == workflow_run.head_sha` (else a newer push exists: skip); PR number must match `^[0-9]+$`, SHA
+  `^[0-9a-f]{40}$`; every PR-derived string reaches shell only through `env:` (Secure use). Download `preview-site`
+  by `run-id: ${{ github.event.workflow_run.id }}` with `github-token` (needs `actions: read`: download-artifact
+  README; answers PHC-ACTIONS-READ: keep it, in this job only) into `$RUNNER_TEMP`, never the workspace (Security
+  Lab's example). Refuse: symlinks, any path segment starting with `.`, `_worker.js` (file or folder; advanced mode
+  "will assume full control of all incoming HTTP requests"), `_routes.json`, `functions/`, `_redirects`, more than
+  20,000 files, any file of 25 MiB or more (Pages limits). Delete the artifact's own `_headers`, put main's preview
+  header file in its place (D5), check it (PHC-PREVIEW-NOINDEX), upload `site-checked` (retention 1 day).
+- `deploy` (environment `preview`; permissions contents read only): sparse checkout of main's host folder (the
+  lockfile), `npm ci --ignore-scripts` there, download `site-checked` from this same run (no extra permission:
+  "By default ... only download Artifacts within the current workflow run"), Cloudflare's verify call (PHC-TOKEN-SETUP),
+  the one wrangler command (D2) from an empty working folder, branch `pr-<N>` only (refuse anything else).
+- `after` (no secret; permissions pull-requests write, deployments read): header check on both links (D5), the month's
+  count (D3), one PR comment updated in place (link, head SHA, the page's commit label, the count). GitHub's
+  "View deployment" probably does NOT show on the PR here: the job-created deployment carries GITHUB_SHA = main's
+  last commit, not the PR head (inferred from the events table; the check's PM-0006-10 "yes" was on a `pull_request`
+  run). Hence the comment.
+Why not the others:
+- `pull_request` + fork guard, no reviewer: the check measured "with no required reviewer, a pull request's job gets
+  the token" (#66 :114); for the environment to admit it the rule must include `refs/pull/*/merge` (GitHub's own
+  words), so any branch can rewrite the job and take the token. Safe only if bounded (option b in the decision).
+- `pull_request_target`: its workflow and ref are main's (changelog: "The workflow file and checkout commit will always
+  be taken from the repository's default branch,"), so it is safe only while it runs nothing of the PR; a deploy needs
+  the PR's build, and building it there is the "pwn request" (Security Lab: "the untrusted code must be handled via
+  the `pull_request` trigger"); waiting for toolchain's artifact from it is a race. And from 2026-12-02 GitHub will
+  "block `pull_request_target` events by default in all public repositories, unless an applicable Actions event policy
+  explicitly allows them" (changelog 2026-11-02): one more setting of his.
+- A reviewer on `preview` (B9 interim): "a job cannot access environment secrets until one of the required reviewers
+  approves it" works, but costs his click per preview (#66 counted 5 and 14 per sitting had it stayed on).
+Production and OQ-0006-13: the check found "A production deploy with the `preview` environment's token is not
+refused"
+(#66 :107-108). On Cloudflare's docs read today a Pages token is account-wide ("The applicable scope of account
+permissions is `com.cloudflare.api.account`"; the check's form showed scope "Entire Account"), so a token limited to
+one project is NOT on offer (sure: medium-high; absence, not a sentence) and two projects in ONE account separate
+nothing. Only a second Cloudflare account separates tokens. Today no production project exists, so nothing of
+production is in reach; the preview project's own production slot holds his placeholder and the workflow refuses every
+branch but `pr-<digits>`. At the first release (OQ-0006-14) production's home is decided; because an apex custom domain
+"must be a zone on the Cloudflare account you have created your Pages project on", the clean split is previews moving
+to a previews-only account, not production.
+Residuals (say them to him): (1) main is the wall: a reviewed but bad change to the preview workflow, or a direct push
+to main if his rule lets admins bypass (not read), reaches the token; (2) supply chain: wrangler and its locked
+dependencies and the pinned actions run with the token; a compromised release could steal it and deploy anything to
+any Pages project of the account (today: previews and the placeholder); (3) the artifact is PR-controlled data: a PR
+runs its OWN copy of toolchain.yml (pull_request takes the merge commit's workflow), and `workflows:` matches by name,
+so "the tested build" means "the build that PR's checks passed"; the path check narrows the name match; the header file
+comes from main, never from the artifact; a PR can still put any static page on its own preview link (only branches
+of this repository: forks are refused).
+Departures this creates (decisions, not findings): ADR 0002 part 10 says "No `pull_request_target`, no
+`workflow_run`" and its options table rejects P3 ("`workflow_run` ... gets secrets and write tokens (R5-PREV-F3)");
+the build plan's condition (4) names "a reviewer on previews"; OQ-0006-13's deciders are "the Advisor, with
+security-auditor". The danger P3 names is real only if PR code runs in the privileged job, which this design forbids.
+
+### D2. The deploy step, small and movable (sure: high on the command; medium on --ignore-scripts)
+Recommend: plain Wrangler from a committed lockfile in lane 2's host folder (e.g. `hosting/deploy/package.json` and
+`package-lock.json`, Wrangler pinned exactly; 4.156.0 is the version the check ran, a newer one is re-read at build
+time), installed in the deploy job from MAIN's sparse checkout with `npm ci --prefix hosting/deploy --ignore-scripts
+--no-audit --no-fund` (the tools/ precedent, gate.yml:34, :65; PHC-LOCKFILE). The step is one command:
+`"$WRANGLER" pages deploy "$SITE" --project-name "$PROJECT" --branch "pr-$PR" --commit-hash "$HEAD_SHA"
+--commit-message "pr-$PR run $RUN" --commit-dirty=true`, run from an empty folder, with WRANGLER_OUTPUT_FILE_PATH for
+the `pages-deploy-detailed` record (url, alias, deployment_id), as the check did (#66 App. B :1544-1556).
+Not `cloudflare/wrangler-action`: it installs Wrangler "from NPM" at run time ("If Wrangler is not installed, the action
+installs a default version"), so it adds a pinned layer without locking Wrangler's own dependencies; Cloudflare's own
+example pins it by tag (`@v4`), not by SHA. Not `npx wrangler@<pin>`: npx resolves the dependency tree fresh each run
+and runs install scripts. Every action stays pinned by full SHA ("Pin references to actions to a commit SHA", Secure
+use), checkout v7.0.1 3d3c42e5..., download v8.0.2 9000827c..., upload v7.0.2 cf430e03... (the repository's and the
+check's pins; latest tags not re-read here).
+Unproven: that Wrangler's `pages deploy` works with install scripts off (its esbuild and workerd dependencies have
+install scripts; the check ran an unlocked `npm install` with scripts on). If it fails, the security-auditor chooses
+between scripts on for this one locked tree and another route; the first run shows it.
+Error path (PHC-ERROR-PATH): on failure print Wrangler's error lines and the account id's first and last 4
+characters (the check's masking confusion), never the token; the verify call first prints `status`, `not_before`,
+`expires_on` (account tokens answer at `/accounts/<id>/tokens/verify`, HTTP 200 "active"; `/user/tokens/verify`
+gives 401 for them: #66 :498-510).
+Branch name `pr-<N>`, not the git branch: the alias is "lowercased and non-alphanumeric characters are replaced with
+a hyphen" (Pages previews page), long session branch names would make long labels, and `pr-<digits>` can never equal
+the production branch, so a crafted branch name cannot steer a deploy to production.
+A move to Workers, in two lines (his WORKERS-NEXT (a); sure: medium, `wrangler preview`'s CI flags not read):
+1. Command and config: `pages deploy ... --branch pr-N` becomes `wrangler preview --name pr-N` (Previews: "creates or
+   updates a Preview for your current branch under the same Worker"; delete: "npx wrangler preview delete --name
+   <preview-name>") with a new `wrangler.jsonc` naming the Worker and its assets folder; the token takes Workers
+   Scripts Edit instead of Pages Edit; links become `pr-N-<worker>.<subdomain>.workers.dev`; the cleanup's two Pages
+   API calls become that delete command; the rest of the workflow (check, after, counter) does not change.
+2. Headers and proof: the same `_headers` file (ADR 0006 part 1: Workers static assets "takes the same `_headers`
+   file"), noindex by the host only on workers.dev Preview URLs; Previews keep "100" per Worker on Free and delete
+   "the Preview that was deployed to least recently" (no 30-day rule); ADR 0006 part 1: "a move would mean running the
+   check again on Workers": one sitting of his and about two calendar days, as the check took.
+
+### D3. Only the newest push deploys; the month's deploys counted (sure: high on the mechanism; medium on the counter)
+Only the newest push (STEP4-COUNT (b)), four layers, none needing a store:
+1. toolchain's own concurrency (`toolchain-${{ github.workflow }}-${{ github.ref }}`, cancel-in-progress,
+   toolchain.yml:20-22) cancels a PR's older run when a newer push arrives; a cancelled run ends "cancelled" and the
+   preview's `check` job requires `conclusion == 'success'` ("A workflow run is triggered regardless of the conclusion
+   of the previous workflow", events page).
+2. The upload in toolchain runs for ONE event only (D6), so a push to a PR branch makes one artifact, not two (toolchain
+   runs on both `push` and `pull_request`, toolchain.yml:13-15).
+3. The `check` job compares the PR's current head with `workflow_run.head_sha` and skips if they differ (concurrency
+   alone is not enough: "ordering is not guaranteed", workflow syntax page).
+4. The deploy job's concurrency group per PR head branch (`preview-${{ github.event.workflow_run.head_branch }}`, used
+   only as a key, never in shell), cancel-in-progress true: a newer deploy of the same PR cancels an older one still
+   running. Cleanup jobs use their own group with cancel-in-progress false (a pending cleanup must not cancel a
+   pending deploy of another PR: "any existing `pending` job or workflow in the same concurrency group will be
+   canceled").
+The counter, kept in GitHub's own records (no file, no store of ours): every job with `environment:` makes a GitHub
+deployment record, so the month's deploys = `GET /repos/{owner}/{repo}/deployments?environment=preview` filtered to
+the current UTC month (`deployments: read` in the `after` job), printed in each PR comment and the job summary next to
+Pages' "500" builds a month (whether uploads count: not answered, PM-0006-7). Two choices:
+(a) cleanup jobs use a second environment `preview-cleanup` (same main-only rule, same token pasted twice): `preview`
+    then counts deploy attempts exactly (a failed upload still counts: an upper bound by those few); recommended.
+(b) one environment: the figure is deploys plus cleanup runs (about 40 closes and 4 to 30 sweeps a month), an upper
+    bound; one fewer environment for him to make.
+Not Cloudflare's own list: the cleanup deletes deployments, so it undercounts. Expected volume, an estimate not a
+count: 38 merges on main in the last 30 days and 332 commits without [skip ci]; at 3 to 8 CI pushes per PR, about 110
+to 300 deploys a month, under 500 but not far at the top end. Recommend a warning in the comment from 400, no stop
+(what Pages does at 500, if uploads count, is not stated; a stop would block his checks).
+
+### D4. Cleanup (sure: high on deletion; low on the 30-day rule's reading)
+Close and merge: the check's way, measured: list the project's preview deployments by API (`GET
+.../pages/projects/$PROJECT/deployments?env=preview`, paginated) and `DELETE .../deployments/$id?force=true` (or
+`wrangler pages deployment delete <id> --force`: "Delete even if the deployment has an active alias"); with it every
+link of a closed PR was gone "3 to 22 minutes after the close" and still at 24.1-24.4 h and 144 h; without it the
+links "still served after 24 hours" (#66 :87-93). PHC-DELETE answered: force, through the API.
+How it starts without a click and without the token in PR-changeable code: the check's close job ran on
+`pull_request: [closed]` with `preview` (#66 App. B :1599-1615): under the main-only rule that job would now be
+refused (it judges `refs/pull/N/merge`). So:
+- one RECONCILE job (environment `preview`, or `preview-cleanup` per D3 (a); main's file only) that needs no data from
+  the PR: a no-secret job first lists the OPEN pull requests by API and passes their numbers as a job output; the
+  reconcile job lists Pages preview deployments and deletes, with force, every deployment whose branch is `pr-<N>` for
+  an N not open, and every older deployment of an open PR (keeps the newest per PR). Idempotent; forged input can at
+  most make it delete a closed PR's leftovers.
+- started three ways: (1) right after each deploy (same run); (2) on `workflow_run` of a tiny no-secret workflow
+  `preview-closed` on `pull_request: types: [closed]` (one echo step; its text is PR-controlled but holds nothing:
+  a PR that removes it only delays its own cleanup to (3)); (3) a daily schedule on main. A schedule alone cannot
+  carry the 24 h mark: "The `schedule` event can be delayed ... some queued jobs may be dropped" (events page), and the
+  check's hourly probe got "3 scheduled runs in the 24 slots" (#66 :28).
+- The weekly sweep (ADR 0006 part 3: "0 previews of closed pull requests older than 7 days"; PHC-DELETE "a weekly sweep
+  on `main`"): the daily schedule is that sweep, run more often. Not `pull_request_target` (D1).
+The 30-day rule (Pages limits, read 2026-11-25: "Preview deployments older than 30 days are deleted, unless they are
+one of the project's 100 most recent deployments"; also "Deployments always kept": "100 most recent, plus your current
+production deployment"):
+- An open PR with no new push for 30 days: its newest preview is older than 30 days, so it survives only if it is among
+  the project's 100 most recent deployments. Which deployments that ranks (only those still present, or every one
+  ever made) is NOT stated: unknown. If only present ones: the reconcile keeps about one deployment per open PR, so an
+  idle PR's link never expires. If all ever made: at 110-300 deploys a month an idle PR falls out of the 100 in about
+  10 to 27 days and is deleted after day 30.
+- Whether the link then breaks: Pages says a hash link works "until that deployment is deleted"; what a branch alias
+  does when its last deployment is gone is not stated. The check's own forced deletes left the alias gone (no build
+  served), so expect the `pr-<N>` link to stop serving (inferred).
+- The fallback: the artifact lives 7 days, so a refresh needs a rebuild: re-run the PR's toolchain run (a session can,
+  it has actions write: #66 :396-397), which deploys again. Recommend: the daily reconcile posts one line on an open PR
+  whose newest preview is older than 25 days ("this link may stop working after day 30; push or re-run the checks"),
+  no automatic rebuild (it would spend deploys and CI minutes on idle PRs). On Workers the rule is a count instead (100
+  Previews, least recently deployed deleted).
+Artifacts: toolchain's upload `retention-days: 7` (ADR 0006 part 3; minimum 1, maximum 90: upload-artifact README); the
+`site-checked` copy 1 day. The check's deployment records were kept 14 days (#66 App. B); step 2.6 keeps none beyond
+the run's log and the PR comment.
+
+### D5. Headers (sure: high that the build writes none today; medium on the bite header)
+Fact: the build writes no `_headers` today (no `_headers`, `noindex` or `X-Robots` in packages/client/scripts; the
+isolation flag lives only in Vite's dev and preview servers, packages/client/vite.config.mjs:7-12, :38-44). ADR 0002
+part 10's "The build generates the `_headers` file" is not built, and `packages/` is lane 1's (Part 15 :103).
+Recommend (a departure, so a decision): the preview header set is a host config file of lane 2's, on main (e.g.
+`hosting/pages/preview.headers`), which the `check` job copies in as `_headers` after deleting any `_headers` the
+artifact holds (D1). Header rules then come only from main's reviewed text, never from PR data, and lane 2 needs no
+edit of lane 1's build. Its content follows GLOSSARY §5 (production set plus `X-Robots-Tag: noindex`, isolation flag
+off, which is "the preview Mustafa checks"), e.g. `/*` with `X-Robots-Tag: noindex`, and `/assets/*` with
+`Cache-Control: public, max-age=31536000, immutable` (Vite's hashed files: base `./`, default `assets/` folder; ADR 0006
+part 1 already asks an immutable cache header for the content bundle). Isolated previews (COOP/COEP) are not needed now
+(the flag is "on only for profiling builds", GLOSSARY §5) and get their own file when a profiling need comes.
+The deploy job's header check (R5-PREV-REC4 mark 1, PM-0002-67: "passes, and fails when a header is removed"): in the
+no-secret `after` job, curl with a named User-Agent (PHC-PROBES) fetches the alias and the hash link: `/`, the
+`index.html`, one JS file, one `.wasm`, and the Worker's file; it requires `X-Robots-Tag: noindex` on every response,
+`application/wasm` on the `.wasm`, and `immutable` on `/assets/*` responses; no COOP or COEP. The bite cannot use
+`noindex`: Pages adds it to every preview itself ("By default, every preview deployment generated by Cloudflare Pages
+includes the X-Robots-Tag: noindex HTTP response header"; test-engineer's F1 in #67: "No bite tests a preview build
+that lacks its `noindex` rule, because the host adds one anyway"). The `immutable` rule is a header the host does not add
+by default (inferred; Pages' default caching not read), so removing it from the file must fail the check: that is the
+bite. Against GLOSSARY §5's "differs from production in anything but `noindex`": the cache rule must then sit in the
+production set too, when production gets its file (both sets carry it; they still differ only in `noindex`). If the
+reviewers rule the cache header out, the fallback bite is a marker header in both sets with different values
+(weaker: a header for testing only).
+PHC-PREVIEW-NOINDEX: a file test, before any deploy, in the `check` job: the assembled `_headers` has a `/*` block with
+`X-Robots-Tag: noindex`; plus a no-secret test on pull requests that touch the host folder: the same check against the
+real file passes and against a copy with that line removed fails (the bite). "production's does not": there is no
+production file until production exists; that half of the test comes with it. The second half of the follow-up ("before
+any preview is served where the host adds no `noindex`, the preview expectation is read there") applies to a move to
+Workers custom domains, not to pages.dev.
+
+### D6. The request to the CI Builder chat (a PROPOSAL; sure: high on the YAML keys, medium on `.gate` and hidden files)
+What toolchain.yml must add: ONE step at the end of job `toolchain`, after "Build and test with the network cut off"
+(toolchain.yml:132-197), so it runs only when every step above passed (a step's default condition is success). It
+uploads the production build folder the job already makes (toolchain.yml:172, "the page as players get it"), kept 7
+days (ADR 0006 part 3). No permission changes (upload-artifact needs none beyond the run; the check's build job had
+`contents: read` only, #66 App. B). Proposed text (LABEL (a): the pull_request run):
+
+```yaml
+      # PROPOSAL (lane 2, step 2.6's plan; not in force until the CI Builder chat's own pull request): hand the tested
+      # player build to the preview workflow (.github/workflows/preview.yml, which starts on `workflow_run` of this
+      # workflow's name `toolchain`). Pull requests from this repository only, after every step above passed. The
+      # preview workflow treats these files as data and runs none of them. Files under .gate/ may count as hidden for
+      # upload-artifact ("files within folders beginning with `.`"), hence include-hidden-files; an empty upload fails.
+      - name: Hand the tested build to the preview workflow (pull requests from this repository only)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: preview-site
+          path: .gate/dist-production/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+```
+LABEL (b) instead (the push run, page label = the PR head): the same step with
+`if: github.event_name == 'push' && github.ref != 'refs/heads/main'`; the preview then accepts `event == 'push'` and finds
+the open PR by head branch and SHA; a PR opened without a new push gets its link at its next push.
+Three lines for the CI Builder chat with it: (1) when step 2.3 replaces this file ("Step 2.3 replaces this file with
+the gate v2's workflow", toolchain.yml:3), keep the workflow name `toolchain`, the file path and the artifact name
+`preview-site`, or tell lane 2 first on the Lane requests issue (#59): the preview matches the name and checks the path;
+(2) the pin above is the check's (TR), not yet in this repository's workflows: re-read it from actions/upload-artifact
+itself ("verify it is from the action's repository and not a repository fork", Secure use); (3) if his Brave checks
+need the development page (the test-only Wasm), the path is `.gate/dist-development/` instead; one folder only (two
+would double the deploys).
+How the preview finds it (lane 2's file, for the request's context):
+`on: workflow_run: { workflows: [toolchain], types: [completed] }`; the `check` job (permissions `actions: read`) uses
+`actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2` with `name: preview-site`,
+`run-id: ${{ github.event.workflow_run.id }}`, `github-token: ${{ github.token }}`, `path: ${{ runner.temp }}/site`
+(README: `github-token` "is required when downloading artifacts from a different repository or from a different
+workflow run"; its example: "token with actions:read permissions on target repo"). PHC-ACTIONS-READ: needed, in the
+`check` job only. If no `preview-site` artifact exists (the request not merged yet), the job ends with a notice and no
+deploy, so the two pull requests can merge in either order.
+
+### D7. His clicks, once, in order, one sitting (about 20 minutes; can be done before the merge, must be before the
+first run; names are proposals)
+Cloudflare (dash.cloudflare.com, his existing account, unless he picks a previews-only account: decision ACCOUNT):
+1. Workers & Pages, Create, Pages, "Upload assets": project name e.g. `shamble-previews`; drag in a folder with one
+   placeholder `index.html` ("No game here"); Deploy. That upload is the project's production version and its only
+   one (as in the check: "Made by his drag-and-drop upload of a placeholder page ... so production's first version is
+   his"); production branch stays `main` (the check's project read `production_branch: main`). No job ever deploys to it.
+2. The project's Settings, "Preview access": leave OFF (ADR 0006 part 2: public but unlisted). Switch it ON later only
+   for unreleased art or the first multiplayer preview: the same setting, which made a Cloudflare Access application
+   with an e-mail-code login and nothing paid (#66 :99-103); OFF again: the setting off, then Zero Trust, Access,
+   Applications, delete the application.
+3. Manage Account, Account API Tokens, Create Token, Custom token: name e.g. `shamble-previews-deploy`; permissions
+   Account, Cloudflare Pages, Edit (and Read, as the check's working token held both; Read adds nothing risky);
+   account: his one account (the form offers the whole account, no single project); Client IP Address Filtering:
+   empty (GitHub's runners have changing addresses: inferred); Token expiration: set BOTH a start date (today) and an
+   end date (decision TOKEN-WINDOW) by their own fields, never the single-date chip, which made a one-day window in the
+   check (PHC-TOKEN-SETUP); Continue to summary, Create Token; keep the page open, copy the token.
+4. Copy the Account ID (the account's overview page).
+GitHub (github.com/Mergincanli/Shamble-Frontlines, Settings):
+5. Environments, New environment `preview`: Required reviewers OFF; Wait timer off; "Allow administrators to bypass
+   configured protection rules" UNTICKED (the check found it ticked at first, #66 :384-385); Deployment branches and
+   tags: "Selected branches and tags", Add rule, Ref type Branch, `main`, Add. Environment secrets
+   `CLOUDFLARE_API_TOKEN` (paste) and `CLOUDFLARE_ACCOUNT_ID` (paste).
+6. If D3 (a): a second environment `preview-cleanup`, exactly as step 5, the same two secrets.
+7. Secrets and variables, Actions, "Repository secrets": confirm none named CLOUDFLARE_*; a repository secret reaches
+   every branch's workflow and would undo step 5.
+8. Actions, General: confirm workflow permissions "Read repository contents and packages permissions" (as on the test
+   repository); optionally tick "Require actions to be pinned to a full-length commit SHA" (every action in gate.yml
+   and toolchain.yml is already pinned by SHA).
+9. Branches or Rules, main's rule: read whether administrators may bypass it (decision MAIN-BYPASS): with the token
+   behind a main-only rule, main's review is the whole wall.
+The verify answer (PHC-TOKEN-SETUP): no screenshot from him; the deploy job's first step asks Cloudflare
+(`/accounts/<id>/tokens/verify`) and prints `status`, `not_before` and `expires_on` in the run's log; the PR comment warns
+14 days before the end date. After that: nothing per preview; he opens `https://pr-<N>.shamble-previews.pages.dev`
+from the PR's comment. Untouched: the check's token is already revoked (#66).
+
+### D8. The earliest honest day for the first link (working days, not promises)
+The bootstrap (advisor's point): `workflow_run` "will only trigger a workflow run if the workflow file exists on the
+default branch", so step 2.6's own pull request cannot make or prove its own preview. Proven only after the merge, on
+the first real run: (1) the main-only rule admits the `workflow_run` job (docs say so; the refusal side was measured,
+the admission side was not); (2) the `.gate/dist-production/` upload with include-hidden-files; (3) the payload fields
+(`path`, `head_sha` equal to the PR head on a pull_request run, `pull_requests`); (4) Wrangler from the locked tree with
+install scripts off; (5) the PR comment and its permission; (6) the header check passes and its bite fails (the bite can
+be run on the first PR after the merge); (7) the counter; (8) the cleanup chain on a close; (9) the verify call on an
+account token. Before the merge: the scripts' own tests with fixtures, and optionally a throwaway job in step 2.6's
+pull request that names `preview` and must be refused (PM-0002-66's bite on the real environment, after his sitting).
+Each fix after the merge is a tier-2 pull request: the advisor agent, the security-auditor, his go in a day session.
+Count, from his go on step 2.6's plan:
+- the build (workflow files, host folder with header file and lockfile, scripts and their tests, runbook, his two
+  messages into DECISIONS): 1 working day;
+- review round 1 (advisor agent, security-auditor on tier 2, infra-engineer, test-engineer) and the fix pass: 1;
+  a round 2 if needed: +1;
+- his go to merge, his sitting (D7, about 20 minutes, can come earlier), the first PR push after both merges: the link
+  about 20 minutes after that push (toolchain's 15-minute cap plus the deploy): 0.5 to 1;
+- the CI Builder chat's edit (D6), in parallel: its own small tier-2 pull request with its plan, the advisor agent, the
+  security-auditor and his go: 1 to 2; the first link waits for it, the merge of step 2.6 does not;
+- one fix cycle after the first run (likely, given the nine items above): +1.
+So: best case 3 working days after his go; honest 4 to 6 (one fix cycle, maybe a second review round). If his go comes
+on Thursday 26 November: best Tuesday 1 December, honest Wednesday 2 to Friday 4 December; the week of 7 December if a
+review or the CI Builder's edit slips. A rehearsal in a throwaway repository first (decision FIRST-RUN (b)) adds about 2
+calendar days and his clicks for a test project and token, and removes most of the fix cycle.
+
+## Decisions this research raises (for the plan's "Decisions needed"; my recommendation marked)
+- TRIGGER (his, with the Advisor and security-auditor for OQ-0006-13): how previews get the token with no click.
+  (a) RECOMMENDED: `workflow_run` + `preview` limited to `main`, no reviewer: no click, and branch code cannot reach the
+  token (meets both "without a click from me" and "show what keeps the token safe"); departs from ADR 0002 part 10
+  ("no `workflow_run`", P3 rejected) and from the build plan's condition (4) ("a reviewer on previews"); first run only
+  after the merge. (b) P1 as ADR 0002 has it (`pull_request`; the deploy job reached through toolchain, e.g. a reusable
+  workflow called from it, so a lane 1 edit), no reviewer, the environment open to `refs/pull/*/merge`, previews in a
+  previews-only Cloudflare account: no click, but any branch can take the token; safety is only the small reach (that
+  account holds nothing else). (c) keep the reviewer: fails "I do not want to click for each preview".
+- LABEL (main session; his if he cares): which run's build the preview shows. (a) RECOMMENDED: the pull_request run
+  (the tested merge with main); the page's corner shows the merge commit, the PR comment names the head it came from.
+  (b) the push run: the page shows the head commit he approves; a PR opened without a new push waits for its next push.
+- HEADERS-SOURCE (the Advisor; departs from ADR 0002 part 10 "The build generates the `_headers` file"): (a)
+  RECOMMENDED: lane 2's header file on main, copied in by the preview workflow; (b) lane 1's build generates it (a
+  second request, in `packages/`), and the preview checks it.
+- FIRST-RUN (his): (a) RECOMMENDED: merge, then fix on main (one fix cycle budgeted, each his go); (b) a rehearsal in
+  a throwaway repository first (+2 calendar days, a test project and token from him).
+- TOKEN-WINDOW (his): the token's end date. (a) RECOMMENDED: 6 months, with the PR comment warning 14 days before;
+  (b) 90 days; (c) no end date (a lost token stays valid until he deletes it).
+- COUNTER (main session): (a) RECOMMENDED: a second environment `preview-cleanup` so `preview` counts deploys exactly;
+  (b) one environment, an upper bound.
+- MAIN-BYPASS (his): may administrators bypass main's rule? (a) RECOMMENDED: no bypass (the token's wall is main's
+  review); (b) keep it, written down as the residual.
+- ACCOUNT (his, now or at the first release): (a) RECOMMENDED now: his existing account (no production exists to
+  protect); at the first release (OQ-0006-14) move previews to a previews-only account if production joins this one,
+  since only a second account separates tokens and the apex domain must stay where its zone is; (b) a previews-only
+  account from the start (a new sign-up, nothing paid: not researched).
+- STALE-30 (main session): (a) RECOMMENDED: a one-line notice on PRs whose preview is 25+ days old; (b) re-run CI
+  automatically for them.
+- FILES (main session, the Advisor): Part 15 :103 says "the workflow file it adds for previews (a new file)"; this
+  design adds two workflow files (`preview.yml`, `preview-closed.yml`) and a host folder with a lockfile; check with
+  the Advisor that the lockfile counts as "the host's config files it adds" (Part 15's condition 2 names lane 1's
+  lockfile and new packages).
+
+## Status
+All D1-D8 blocks written 2026-11-25. Next: advisor call, then the handback.
