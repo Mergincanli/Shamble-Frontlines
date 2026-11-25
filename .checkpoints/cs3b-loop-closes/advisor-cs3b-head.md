@@ -36,3 +36,12 @@ Seat: day session, advisor agent (called by the main session). Only write: this 
 - F20 spot-checks: #65 merged_at 2026-11-24T22:40:39Z head 1624f084 (3a note right); 6abf3d2a CI log: loop 1,814 ticks 60.6 s, 138 presses, key-to-tick 238.1/257.8 ms, 502 delayed, 46 twice, 1 overtaken, 47 ignored, 16 passed (3.4m): all as the report. ROADMAP 2.2 entry moved (1 copy). repo-map-check OK 193/109.
 - VERDICT: REVISE 09b0043d (text only; code 6abf3d2a approved). Findings: High F12; Medium F13, F14, F15, F16, F17; Low F10, F18, F19.
 DONE
+
+# Block 2: review of the changes 09b0043d..8f835d11 (2026-11-25)
+Head 8f835d114dcbf03c80cb7227c9cf189539dc6d09 (= pushed branch head). Two commits 6fade7cd, 8f835d11; 10 files, docs + notes only; code stat vs 6abf3d2a empty.
+## Plan
+1. Read the diff of the report, STATUS, archive, DECISIONS, pr-body, make-zip, card; check H-1, M-2..M-6, L-1..L-3 each.
+2. decisions-5.mjs --check; repo map check; STATUS line count; quotes of his/the plan's words against their sources.
+3. ten-minutes.mjs: read it (what it runs, where it writes), the raw line in the card; plausibility of 18,089 ticks in 603.1 s.
+4. CI on 8f835d11; anything new wrong in what changed.
+## Findings (block 2)

@@ -526,6 +526,16 @@ presses Merge; (4) his browser check passes, Brave then Firefox, on a zip whose 
 the zip and his check; then the last commit (the check's result in the report, the notes folder removed), the
 advisor agent's APPROVE of that SHA, CI green, the SHA to him.
 
+**The zip for his browser check (2026-11-25, 04:17 UTC):** built from 8f835d114
+(8f835d114dcbf03c80cb7227c9cf189539dc6d09: the text fixes; the code is 6abf3d2a's, the Wasm's sha256 5ebae154...1262):
+`.gate/cs3b/zip/shamble-v2-03b-the-loop-closes-8f835d114/shamble-v2-03b-the-loop-closes.zip`, 259,212 bytes,
+sha256 3fdcf9f6a1173a707cfc4f1f8620482693ba36abc6e708322b6d3628a4071f82, 11 files, each equal to its line in
+SHA256SUMS.txt after unpacking. **The 16 browser tests against the unpacked zip: 16 passed in 3.2 minutes** (the
+loop 1,807 ticks, 134 presses and releases, 0 lost, 0 doubled; the press test 10,000 and 10,000, 0 lost, 0
+doubled, 45 copies all behind a newer post, 1 first copy overtaken, 46 ignored, 0 older posts, 0 wrong keys; the
+page shows commit 8f835d114). Its README: 10 steps, about 20 minutes, Brave then Firefox. Sent to him when the
+advisor agent has read the text fixes.
+
 **After the code (started 2026-11-25, about 03:09 UTC):** the full run of the 53 planted defects on 6abf3d2a;
 the verifier (its copy `.gate/verifier-cs3b`, its notes `verifier-cs3b.md`); docs-keeper's docs pass (its notes
 `docs-keeper-3b.md`). Then the report, the advisor agent on that head (with the question on M1), the zip.
