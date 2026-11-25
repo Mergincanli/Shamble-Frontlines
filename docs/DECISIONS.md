@@ -127,6 +127,24 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 20:51:45 UTC: his answers to the two questions from step 2.6's build: NEW-TEXT (a),
+  line 50 of the approved preview.yml changes from `run: node --test hosting/` to `run: node --test
+  hosting/preview.test.mjs`, the new text 10,577 bytes, sha256
+  31119c06e7d095baa3c99ed54bbc1a2c72d05b8b3cab88ffd4512dc12acd3abc, preview-close.yml and wall-test.yml unchanged;
+  PREVIEW-MISSING-BUILD-COMMENT (a), keep the texts: the comment covers the upload's result and the header check, and
+  anything that stops the build check (a missing build once CI hands one over, a refused build, a failed read of GitHub)
+  shows only as a red run under main in the Actions tab, as the runbook says** (the builder chat he calls Builder V2,
+  lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; no label; message
+  33a78af8-838a-4174-bfd9-23d268665740, whole; extracted by script from the chat's transcript). Records, not his words:
+  the questions he answered are this chat's message of 2026-11-25 and its file
+  .checkpoints/step-2-6-previews/questions-2026-11-25-build.md at e28b80891a01329f911e1b2b0557f444871e665b, carried into
+  step 2.6's report; the advisor agent approved NEW-TEXT and recommended (a) on the other, and the security-auditor read
+  the new text with no change and no findings. Copied by script (28 bytes, sha256
+  6fbf35bfeb7ed6bddc4fdd69a05d1221372997eec8dbc83b76fca24733dbdaac):
+> Decisions needed
+> 1.  a
+>
+> 2. a
 - **Taken by Mustafa, 2026-11-25, 19:36:53 UTC: his go on step 2.6's plan (revision 2, at c40f3f9), with his answers:
   TRIGGER (a); ACCOUNT (b), a new free Cloudflare account for previews only; LANE2-LOCKFILE (b), lane 2 owns
   hosting/package.json and hosting/package-lock.json, for the upload tool only, outside the game's install, and nothing

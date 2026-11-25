@@ -1,0 +1,50 @@
+# THROWAWAY: step 2.6's pass mark M1, removed before the final review. Each job names the environment `preview` and
+# prints only whether a worthless test secret is present. Before Mustafa's click 5 the jobs run and print "absent";
+# after it, GitHub must refuse all three before any step runs.
+name: wall-test
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+permissions: {}
+
+jobs:
+  pr-plain:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    cache-mode: none
+    environment: preview
+    steps:
+      - name: Is the test secret present?
+        env:
+          S: ${{ secrets.WALL_TEST }}
+        run: if [ -n "$S" ]; then echo present; else echo absent; fi
+
+  pr-no-deployment-record:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    cache-mode: none
+    environment:
+      name: preview
+      deployment: false
+    steps:
+      - name: Is the test secret present?
+        env:
+          S: ${{ secrets.WALL_TEST }}
+        run: if [ -n "$S" ]; then echo present; else echo absent; fi
+
+  push-to-branch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    cache-mode: none
+    environment: preview
+    steps:
+      - name: Is the test secret present?
+        env:
+          S: ${{ secrets.WALL_TEST }}
+        run: if [ -n "$S" ]; then echo present; else echo absent; fi
