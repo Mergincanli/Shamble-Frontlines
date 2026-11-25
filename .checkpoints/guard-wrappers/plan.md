@@ -81,3 +81,17 @@ an older Claude Code (before 2.1.295) would let a timed-out call through (`claud
   the forms in use.
 - Until the merge: git and gh always start their own command (his item 4); nothing is tried live; the new rows go up
   only with the fix.
+
+## 7. The advisor agent's verdict: APPROVE with 9 conditions (its notes: advisor-plan.md); what the copy build showed
+Conditions 1-3 and its ruling (1) concern open forms and stay out of this file until the merge; they are met in the
+copy (`.gate/guard-wrappers/hooks/`). Condition 4: every mutant anchor present and unique (the suites assert it).
+5: the constructor row is kept with the rule-U outcome (ask) and a new row keeps the no-throw case (allowed).
+6: new rows only in DAY_CASES, CASES and the mutant lists (decided by the hook, never run in bash). 7: red then
+green in the copy: 92 failures on the unchanged guard, then 1437/1437 (1247 old, 190 new). 8 and 9: at the apply
+step and in the report.
+Counts corrected from §3: existing test lines changed: 3 (the constructor row, now two rows; two mutant rows
+re-anchored: "R-c unwrap strips command's options" onto the table's `command` entry, and "a Map, not a plain object"
+onto the new lookup line); one new row in CASES (keywords before git status go on), which catches the older "shell
+keywords" mutant now that rule U reads on. Rule U leaves out a program word that starts with `-` (the wrapper step
+already asks on it), so #69's leftover-option row keeps its ask.
+Size: guard +33/−14, tests +54/−3 = 87 added lines of code and tests (stop line 200).

@@ -11,8 +11,11 @@
 3. Plan written · f696d45
 4. Plan revised before review: one table for every stripped name (keywords and `command` included), rule L folded in, the existing-row scan (one row and one mutant row change), the build-in-a-copy procedure, SA-R2-2 caveats; his review-tracks paste saved whole in the queued note · this commit
 
+5. The advisor agent: APPROVE with 9 conditions (plan §7) · notes advisor-plan.md
+6. Built in the copy .gate/guard-wrappers/hooks/: red 92 fails on the old guard, green 1437/1437; 87 added lines · no commit (copy is gitignored)
+
 ## Current step
-The advisor agent's review of the plan.
+Apply the copy to the real files (one write each, sha256 checked; each asks Mustafa), kit suites, gate, one commit.
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
