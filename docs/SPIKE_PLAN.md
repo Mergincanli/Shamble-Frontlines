@@ -468,11 +468,11 @@ netcode proof test's result. Step 2.6, the previews, follows the preview hosting
   (back to the draft), and the build-count mark (PM-0006-7) and his verdict on checklist step 4 (inside PM-0006-9) are
   open._
   _Pointer (2026-11-25, ADR 0006's small revision, PR #67; `docs/reports/2026-11-25-adr0006-header-row.md`), one mark
-  at a time: PM-0006-2 is met under the revised row, on readings already taken, subject to his go; PM-0006-7 is
-  complete as re-stated (the advisor agent's reading of his STEP4-COUNT (b), never his decision), with the question
-  unanswered, on readings already taken, subject to his go; PM-0006-9 waits for his word on checklist step 4, on
-  readings already taken, subject to his go. The check is not called passed: Safari stays "not checked, never as
-  passed"._
+  at a time: PM-0006-2 is met under the revised row, on readings already taken, subject to his go; PM-0006-7:
+  recorded, the question is not answered (his PASS-WORDS (a) and its condition, 2026-11-25, 14:55 Amsterdam), subject
+  to his go; PM-0006-9: every step of the hosting checklist "achieved" in his words, step 4 among them (his word of
+  2026-11-25; recorded, the question is not answered), subject to his go. The check is not called passed: Safari
+  stays "not checked, never as passed"._
 
 ### The foundation's acceptance checks (not a spike)
 - **Defined in:** [GLOSSARY §8, the foundation](research/GLOSSARY.md#the-foundation). Owner: ADR 0002's migration plan,

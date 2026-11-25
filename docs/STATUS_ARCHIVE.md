@@ -1601,14 +1601,18 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
       one deleted when the limit is reached" (Cloudflare's Previews page deletes the Preview deployed to least
       recently); G2, part 1's build-count text gives "00:55 Amsterdam time", which is his message's own label (the
       record's time, 23:53:15 UTC, is 00:53 Amsterdam): call it "his label".
+    - ADR6-REVISIT-WORKERS (his WORKERS-NEXT (a), 2026-11-25, 14:55 Amsterdam): Cloudflare's "Start new projects with
+      Workers" goes into the draft's "Revisit when" line.
   - ADR6-WK-ROUTE (infra-engineer; at R5's and R6's next revision): the R5 and R6 lines on `versions upload
     --preview-alias` and "no deletion read" get dated pointers.
   - ADR6-WK-BIC (infra-engineer): any re-run on Workers sends a descriptive User-Agent.
   - PHC-PREVIEW-NOINDEX (Medium; test-engineer's F1, older than this change): step 2.6's plan takes a build-output test
     that each preview mode's `_headers` carries the `noindex` rule and production's does not, with a bite; and, before
     any preview is served where the host adds no `noindex`, the preview expectation is read there.
-  - WORKERS-NEXT (his, optional; the report's "Decisions needed"): keep Pages and refresh the Workers route at the
-    draft's next revision, or run the check on Workers now.
+  - WORKERS-NEXT, decided by him on 2026-11-25, 14:55 Amsterdam (`docs/DECISIONS.md`): (a), keep Pages. The draft's
+    part is ADR6-REVISIT-WORKERS above; step 2.6's part is STEP26-WORKERS.
+  - STEP26-WORKERS (his, for step 2.6's plan): keep the deploy step small enough to move to Workers later, say in two
+    lines what such a move would cost, and weigh the 30-day rule for old previews.
 - **Moved from STATUS (2026-11-24)** (by lane 2's docs pass for the preview hosting check, under his OLD-LINES: lines
   about merged pull requests, moved by script, byte for byte): STATUS's Follow-ups lines 78-93 at main 28254a7, the
   four bullets of the merged pull requests #49, #50, #51 and #48 for the gate step (2.3), are the four bullets below.

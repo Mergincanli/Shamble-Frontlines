@@ -127,6 +127,34 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 13:55:08 UTC: his answers on pull request #67: PASS-WORDS (a), the three re-worded
+  places stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads
+  "recorded, the question is not answered", never "passed" on its own, and until someone shows a count the previews work
+  as if uploads count; checklist step 4 under its new words: achieved; WORKERS-NEXT (a), keep Pages, Cloudflare's "Start
+  new projects with Workers" added to the draft's "Revisit when" line at its next revision, and step 2.6's plan keeps
+  the deploy step small enough to move to Workers later, says in two lines what such a move would cost and weighs the
+  30-day rule for old previews; no go for #67 yet: when main shows the merge of #68 (lane 1's change-set 3b), that main
+  taken into lane 2's branch by one merge commit keeping both lanes' text, lane 1's lines byte for byte, this message
+  recorded in the same push, then the advisor agent's approval of exactly that commit, green checks, and its full commit
+  id to him; if #68 is not merged by Thursday 26 November, 12:00 Amsterdam, one line to him and wait; until the
+  repository's guard is fixed, no session or agent of lane 2 puts env, stdbuf or nice with options in front of git or
+  gh** (the builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat
+  on his personal account; his label: "For Builder V2, from me, written with my main Advisor (25 November, 14:55
+  Amsterdam)"; message 36549253-a995-4624-bb88-0ae8233412c1, whole; extracted by script from the chat's transcript).
+  Records, not his words: PASS-WORDS and WORKERS-NEXT are the two entries of "Decisions needed" in
+  docs/reports/2026-11-25-adr0006-header-row.md; #67's head when he wrote was 215e6d20df051f8b8a603036d656efbcea2fc2a5,
+  approved by the advisor agent. Copied by script (1809 bytes, sha256
+  d631ad5df8a25ce17563ab081552e26bccba9f2dcb036a595aae16e330cd66bd):
+> For Builder V2, from me, written with my main Advisor (25 November, 14:55 Amsterdam).
+>
+> 1. PASS-WORDS (may the three re-worded places stand): (a), they stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads "recorded, the question is not answered", never "passed" on its own. Until someone shows a count, the previews work as if uploads count.
+> 2. Checklist step 4 under its new words: achieved. What I read on 18 November: no count shown, before and after the ten uploads.
+> 3. WORKERS-NEXT: (a), keep Pages. At the draft's next revision add Cloudflare's "Start new projects with Workers" to its "Revisit when" line. In step 2.6's plan: keep the deploy step small enough to move to Workers later, say in two lines what such a move would cost, and weigh the 30-day rule for old previews.
+> 4. No go for #67 yet, because main moves first: change-set 3b (pull request #68, lane 1) merges today, and after it #67 no longer merges cleanly. Both lanes changed five docs: DECISIONS, REPO_MAP, ROADMAP, STATUS and STATUS_ARCHIVE. When main shows the merge of #68: take that main into your branch by one merge commit that keeps both lanes' text, with lane 1's lines byte for byte, as Builder V3 did for your #66. Record this message in the same push. Then your advisor agent's approval of exactly that commit and green checks on it, and give me its full commit id in one line. My main Advisor runs the merge check and I give my go for that commit.
+> 5. If #68 is not merged by Thursday 26 November, 12:00 Amsterdam, tell me in one line and wait.
+> 6. Until the repository's guard is fixed (a finding of today, another chat fixes it): no session or agent of yours puts env, stdbuf or nice with options in front of git or gh.
+>
+> Answer in at most 6 lines. Plain words, as before.
 - **Taken by Mustafa, 2026-11-25, 12:14:23 UTC: his browser check of change-set 3b in Firefox: clean; the hidden-tab
   remark he made of Brave did not come again, in Firefox or in Brave** (the builder chat he calls Builder V3,
   session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
