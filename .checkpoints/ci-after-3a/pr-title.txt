@@ -1,0 +1,1 @@
+ci-after-3a: every crate's release tests, the vector generators' checks, the test-only module's own build line, and the rule tests in GitHub's Firefox
