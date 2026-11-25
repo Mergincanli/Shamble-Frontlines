@@ -1661,7 +1661,8 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
   - E1 (change-set 3's plan, section 6 at 6491b839; his opening block of 2026-11-24, part a): **done** on the branch,
     closed when it merges: the release test line names all six crates (`-p sim -p protocol -p room -p client-endpoint
     -p sim-wasm -p devtools`) [verified 2026-11-25 at 832268e].
-  - FF-DRAW (his question first: his words of 2026-11-25, 14:55 Amsterdam, point 3): the Firefox drawing tests in CI
+  - FF-DRAW (his question first: his words of 2026-11-25, 14:55 Amsterdam, point 3; when: with the gate step 2.3, as
+    its own question, his FF-DRAW-WHEN (a) of 20:35 Amsterdam): the Firefox drawing tests in CI
     need a graphics route for Firefox on the runner, an install line or a Firefox graphics setting (such as
     `webgl.force-enabled`), each his question first. On GitHub the runner's Firefox 160.0 gave the page no WebGL ("This
     page could not start drawing: ... this.gl is null", "libEGL.so.1: not in the loader cache of this runner"; run
@@ -1693,6 +1694,8 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
     (inferred, not measured); Firefox's code under `/usr/lib/firefox` is root-owned in the 161.0 package the trial
     read, not checked on the runner's 160.0.
   - TOKEN-WORDS (the #64 block above; due "at the next CI edit"): deferred again, by the chat, not by him.
+    _Dated pointer, 2026-11-25 (his TOKEN-WORDS (a) with one change, 20:35 Amsterdam, `docs/DECISIONS.md`): it rides in
+    the next workflow text the chat asks him for, the hand-over step for Builder V2's previews, at no yes of its own._
   - FF-ORDER (infra-engineer's F3, Low): the Firefox run starts only if the Chromium run passes (`set -e`), so a red
     Chromium run gives no Firefox evidence; accepted for now.
 - **Moved from STATUS (2026-11-24)** (by lane 2's docs pass for the preview hosting check, under his OLD-LINES: lines

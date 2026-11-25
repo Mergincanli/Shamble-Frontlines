@@ -127,6 +127,31 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 19:36:36 UTC: RULES-ONLY-READ (a): he accepts the Firefox entry cut to the rule tests
+  as made (packages/e2e/playwright.config.ts, sha256 ef2136a14096fd12d5b9cce7b7fe28d611279850412a3269e5868139b19c9b0e),
+  the report kept as it is (one "no WebGL" line, three time-outs, the shared cause read from the code, not shown by the
+  run), and next time a red his words send to him comes to him before the change; TOKEN-WORDS (a), with one change: it
+  rides in the next workflow text the chat asks him for, the hand-over step for Builder V2's previews, at no yes of its
+  own, and STATUS names that home; FF-DRAW-WHEN (a), with step 2.3, as its own question; push the last head and bring
+  him its full commit id with the advisor agent's verdict, and the pull request's title and text, corrected for the red
+  run's wording, in a file with its commit and path** (the chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz,
+  a Claude Code chat on Opus 5.5 for the small CI pull request after change-set 3a; his label: "For the CI Builder,
+  from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam)."; message
+  97ac33d8-6af2-4a2e-a3a9-b79318f70b84, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-after-3a/mustafa-2026-11-25T2035-rules-only.md` (readable at commit 9c9066c of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): the chat's question RULES-ONLY-READ and TOKEN-WORDS (question-2026-11-25-rules-only.md at 679e5b5)
+  and the report's FF-DRAW-WHEN: accept the Firefox entry cut to the rule tests as made, or put the full entry back;
+  defer TOKEN-WORDS to the gate step 2.3 or fold it in now; when a graphics route for Firefox's drawing tests comes
+  back to him; each recommended (a). Records, not his words: the advisor agent's read of 80359fc was REVISE on the docs
+  only; its two Highs were fixed in f7bd1f2 (pushed with 679e5b5) before this answer. Copied by script (1146 bytes,
+  sha256 077318678703e0a990f48ce4144b81e507e570877eb8ce3bbb193ee4f06bf11e):
+> For the CI Builder, from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam).
+> 1. RULES-ONLY-READ: (a). I accept the Firefox entry cut to the rule tests as made: packages/e2e/playwright.config.ts with sha256 ef2136a14096fd12d5b9cce7b7fe28d611279850412a3269e5868139b19c9b0e. The report keeps it as it is: one "no WebGL" line, three time-outs, the shared cause read from the code and not shown by the run. Next time, a red that my words send to me comes to me before the change.
+> 2. TOKEN-WORDS: (a), with one change: it does not wait for step 2.3. It rides in the next workflow text you ask me for, the hand-over step for Builder V2's previews, so it costs no yes of its own. STATUS names that home.
+> 3. FF-DRAW-WHEN: (a), with step 2.3, as its own question.
+> 4. Push the last head and bring me its full commit id with the advisor agent's verdict. Put the pull request's title and text, corrected for the red run's wording, in a file and name its commit and path: my Advisor opens the pull request from it and checks the head before my go.
+> Unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-25, 18:00:43 UTC: his answers to the CI chat's ask 2: CI-WRITE-2 (a), write both texts
   exactly as saved at e12bb442, the workflow then sha256
   01898e4b3833812e945882106baa2bb3590866aff3c8d2dfa487a1fe38ce5742 and the test configuration
