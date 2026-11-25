@@ -13,8 +13,13 @@ session or an agent. Routines are not affected (their shell runs only git, gh, n
 **Checked by the main session:** read only, the code at :302 (env), :309 (nice) and :310 (stdbuf) does what the
 finding says. Nothing was run to try it, and nothing will be.
 
-**Until it is fixed:** no session or agent of this chat puts env, stdbuf or nice options in front of git or gh (every
-brief carries it). U7's commands need none of them (security's Q3 answer: no `env -C`, no `git -C`).
+**Until it is fixed:** no session or agent of this chat puts env, stdbuf or nice options in front of git or gh
+(brief 3 in launch-0850.md carries the line from 11:3x UTC; every later brief carries it). U7's commands need none of
+them (security's Q3 answer: no `env -C`, no `git -C`).
+
+**Worth knowing for the timing:** the gap's exact form is already in this public repository's pushed notes
+(security-u7-0b-answer.md, pushed with c843b66; this file, fc0a318), and history is never rewritten. That weighs for
+(a) soon over (c).
 
 **Options:**
 - (a) A kit session fixes it soon, as a small tier-2 change-set on its own branch (plan first, the advisor and the

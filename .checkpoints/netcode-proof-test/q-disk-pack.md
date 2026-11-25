@@ -32,4 +32,4 @@ time a bar or the floor is missed I must empty the cache again, and the next bui
 free beside a warm cache, over Builder 2's 8 GiB, which saves several cold rebuilds before R1.
 
 **Answered 2026-11-25 11:07 UTC: (b)**, with his conditions word for word at history.md:7942 (u4f-47-b57221ed139d
-stays until the -47 re-judge after Netcode Builder 2's merge). The board line is off.
+stays until the -47 re-judge after Netcode Builder 2's merge). DONE 11:29 UTC: disk-pack-b.md.

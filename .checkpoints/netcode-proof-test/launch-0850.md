@@ -66,7 +66,8 @@ C1-C14 (advisor-u7-brief.md:110-247, binding by pointer).
    copied, names only: the shared target, the lane lock, CARGO_NET_OFFLINE=true, CARGO_INCREMENTAL=0, the 4 GB floor).
    On exit 3 (under 4 GB) stop and tell me; never clean anything yourself.
 3. The cache is cold (emptied 06:1x UTC): your first build takes about 20-40 minutes. Free 13.3 GiB then.
-4. The wasm-bindgen CLI is not installed yet (security's answer on the one download). R1-R4 do not need it. Before
+4. The wasm-bindgen CLI is not installed yet (security's Q1 (b): the main session fetches it, checks its sha256, then
+   installs it, many packages in all). R1-R4 do not need it. Before
    T5 (ii) wait for my message with its path (`<root>/bin/wasm-bindgen`, 0.2.130), or stop after R4 and report.
 4b. R4's `web` step and any build.mjs run: outputs under .gate/ (C7's web-check, C13's dist-bites), never web/dist or
    web/dist-bites in the tree: security's N-U7D-1 (security-u7-deps.md: a written web/dist makes the redact step fail
@@ -77,4 +78,5 @@ C1-C14 (advisor-u7-brief.md:110-247, binding by pointer).
    blocks, tests, plants, added lines, open findings, in a short summary; I take the snapshot.
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. Never switch
-the main folder; never `cd` into another worktree; no shell loops.
+the main folder; never `cd` into another worktree; no shell loops. Never put env, stdbuf or nice options in front of
+git or gh (GUARD-ENV, q-guard-env.md).
