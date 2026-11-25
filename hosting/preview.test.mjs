@@ -488,14 +488,15 @@ describe('comment', () => {
   const env = (extra = {}) => ({ GH_TOKEN: GH, REPO, PR: '12', SHA, URL: LINK, DEPLOY: 'success', HEADERS: 'success', GITHUB_RUN_ID: '45690000001', ...extra });
   const marked = (id, login, type, body = `${MARKER}\nold`) => ({ id, user: { login, type }, body });
   function github({ head = SHA, comments = [], deployments = [], write = 200 } = {}) {
+    // Any pull request number is open with that head, so a planted value can only be refused by the check it targets.
     return fakeFetch([
-      [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/pulls\/12$/,
-        () => ({ json: { number: 12, state: 'open', head: { sha: head, repo: { full_name: REPO } } } })],
+      [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/pulls\/(\d+)$/,
+        (m) => ({ json: { number: Number(m[1]), state: 'open', head: { sha: head, repo: { full_name: REPO } } } })],
       [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/deployments\?environment=preview&per_page=100&page=(\d+)$/,
         (m) => ({ json: deployments[Number(m[1]) - 1] ?? [] })],
-      [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/12\/comments\?per_page=100&page=1$/, () => ({ json: comments })],
+      [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/\d+\/comments\?per_page=100&page=1$/, () => ({ json: comments })],
       [/^PATCH https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/comments\/(\d+)$/, () => ({ status: write, json: {} })],
-      [/^POST https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/12\/comments$/, () => ({ status: 201, json: {} })],
+      [/^POST https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/\d+\/comments$/, () => ({ status: 201, json: {} })],
     ]);
   }
   const writes = (f) => f.calls.filter((c) => c.method !== 'GET');
@@ -532,7 +533,7 @@ describe('comment', () => {
     assert.equal(writes(f).length, 0);
   });
   test('planted: another pull request\'s link, an outside link, a result GitHub never gives: refused, nothing written', async () => {
-    for (const extra of [{ URL: `https://pr-13.${SUB}` }, { URL: 'https://pr-12.evil.example' }, { DEPLOY: 'success\n' },
+    for (const extra of [{ URL: `https://pr-13.${SUB}` }, { PR: '1' }, { URL: 'https://pr-12.evil.example' }, { DEPLOY: 'success\n' },
       { HEADERS: 'passed' }, { PR: '12\n' }, { SHA: SHA.toUpperCase() }]) {
       const f = github();
       assert.equal(await run('comment', harness({ env: env(extra), fetch: f }).io), 1, JSON.stringify(extra));
