@@ -11,24 +11,34 @@ class FakeSim implements PacedSim {
   #sinceAnchor = 0;
   /** What one step costs on the clock, for the tests that need slow steps. */
   stepCostMs = 0;
+  /** The time each step was told, and a due time to give back in place of the schedule's, for one call. */
+  readonly stepTimes: number[] = [];
+  badDue: number | undefined;
   readonly #clock: { now: number };
 
   constructor(clock: { now: number }) {
     this.#clock = clock;
   }
 
-  step(): number {
+  #due(due: number): number {
+    const bad = this.badDue;
+    this.badDue = undefined;
+    return bad ?? due;
+  }
+
+  step(nowMs: number): number {
+    this.stepTimes.push(nowMs);
     this.ticks += 1;
     this.#sinceAnchor += 1;
     this.#clock.now += this.stepCostMs;
-    return this.#anchor + (this.#sinceAnchor + 1) * PERIOD;
+    return this.#due(this.#anchor + (this.#sinceAnchor + 1) * PERIOD);
   }
 
   rebase(nowMs: number): number {
     this.rebases += 1;
     this.#anchor = nowMs;
     this.#sinceAnchor = 0;
-    return nowMs + PERIOD;
+    return this.#due(nowMs + PERIOD);
   }
 }
 
@@ -84,6 +94,48 @@ test("a late wake catches up within the cap and keeps the schedule", () => {
   expect(sim.rebases).toBe(1);
   // The first of them started 3.5 periods late, the last half a period late.
   expect(pacer.lateness.max()).toBeCloseTo(3.5 * PERIOD, 6);
+});
+
+test("each step is told the time its tick started, and so is the caller", () => {
+  const { clock, sim, pacer } = setUp();
+  sim.stepCostMs = 2;
+  // 2.5 periods late: three ticks are due, and each step takes 2 ms on the clock.
+  const start = 1000 + 3.5 * PERIOD;
+  clock.now = start;
+  const told: number[] = [];
+  pacer.wake((startedAtMs) => told.push(startedAtMs));
+  expect(sim.stepTimes).toEqual([start, start + 2, start + 4]);
+  expect(told).toEqual(sim.stepTimes);
+});
+
+test("a due time that is not a finite number stops the pacer, wherever the simulation gives it", () => {
+  const refusal = "the simulation returned a due time that is not a finite number";
+  for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+    // From a step, from the rebase after a stall, from the rebase of a resume, and from the first rebase.
+    const stepped = setUp();
+    stepped.clock.now += PERIOD;
+    stepped.sim.badDue = bad;
+    expect(() => stepped.pacer.wake(() => {}), String(bad)).toThrow(refusal);
+    const resumed = setUp();
+    resumed.pacer.pause();
+    resumed.sim.badDue = bad;
+    expect(() => resumed.pacer.resume(), String(bad)).toThrow(refusal);
+    const clock = { now: 1000 };
+    const sim = new FakeSim(clock);
+    sim.badDue = bad;
+    expect(() => new Pacer(sim, () => clock.now), String(bad)).toThrow(refusal);
+  }
+  const stalled = setUp();
+  stalled.sim.stepCostMs = 40;
+  stalled.clock.now += PERIOD;
+  // Seven slow steps, then the rebase that drops the gap gives the bad time.
+  let steps = 0;
+  expect(() =>
+    stalled.pacer.wake(() => {
+      steps += 1;
+      if (steps === MAX_TICKS_PER_WAKE) stalled.sim.badDue = Number.NaN;
+    }),
+  ).toThrow(refusal);
 });
 
 test("a stall longer than the cap runs 7 ticks and drops the rest", () => {

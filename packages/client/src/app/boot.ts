@@ -1,10 +1,12 @@
 import SimWorker from "@shamble/sim-worker/worker?worker";
 import { FrameTimes } from "../harness/frame-times.ts";
+import { BUTTON_NAMES, KeyboardInput } from "../input/keyboard.ts";
 import { runHeader } from "../harness/run-header.ts";
 import type { ReportData } from "../overlay/report.ts";
 import { createPicture } from "../render/index.ts";
 import { installErrorHook } from "./error-hook.ts";
 import { readFlags } from "./flags.ts";
+import { lostAndDoubled } from "./press-tally.ts";
 import { WorkerLink } from "./worker-link.ts";
 
 // Written into the code by the build (vite.config.mjs, `define`). In a production build the first is the literal
@@ -19,8 +21,8 @@ const READOUT_EVERY_MS = 250;
 
 /**
  * The app shell's boot order: the picture first (`await renderer.init()` before the first frame), then the Worker,
- * then the frame loop. Each drawn frame posts the newest input once and draws from the two newest blocks. The page
- * never loads or calls the Wasm: the Worker does.
+ * then the frame loop. Each drawn frame posts the newest input once (the keys held and the running press counts)
+ * and draws from the two newest blocks. The page never loads or calls the Wasm: the Worker does.
  */
 export async function boot(): Promise<void> {
   const notice = document.getElementById("notice");
@@ -46,18 +48,36 @@ export async function boot(): Promise<void> {
   document.documentElement.dataset["backend"] = info.backend;
   document.documentElement.dataset["commit"] = COMMIT;
 
+  // The clock both sides share.
+  const clock = (): number => performance.timeOrigin + performance.now();
   const worker = new SimWorker();
-  const link = new WorkerLink(worker, () => performance.timeOrigin + performance.now());
+  const link = new WorkerLink(worker, clock);
+  // The game's keys, wherever the focus is; in a text box only a key that comes up counts (`KeyboardInput.key`).
+  // When the window loses the focus or the tab is hidden, no key-up will come: every key counts as let go.
+  const keys = new KeyboardInput();
+  const onKey = (event: KeyboardEvent): void => {
+    const typing = event.target instanceof Element && event.target.closest("textarea, input") !== null;
+    // The key's own time, on the clock both sides share; an event without one gets the handler's.
+    const at = event.timeStamp > 0 ? performance.timeOrigin + event.timeStamp : clock();
+    if (keys.key(event.code, event.type === "keydown", event.repeat, at, typing)) event.preventDefault();
+  };
+  window.addEventListener("keydown", onKey);
+  window.addEventListener("keyup", onKey);
+  window.addEventListener("blur", () => keys.clear(clock()));
   // The link decides that the match is over and stops the Worker (`WorkerLink.end`), whichever way the problem
   // came; here the first problem is counted once and said on the page.
   const stopped = (problem: string): void => {
     errors.note(problem);
     fail(`The match stopped: ${problem}`);
   };
-  worker.addEventListener("message", (event: MessageEvent<unknown>) => {
-    const problem = link.receive(event);
-    if (problem !== "") stopped(problem);
-  });
+  // A method with a name of its own, so that a heap profile can charge the listener's whole body to it.
+  const listener = {
+    blockArrived(event: MessageEvent<unknown>): void {
+      const problem = link.receive(event);
+      if (problem !== "") stopped(problem);
+    },
+  };
+  worker.addEventListener("message", listener.blockArrived);
   worker.addEventListener("error", (event) => {
     // A script that does not load gives an event with no message. Cancelled, so the window does not count it again.
     event.preventDefault();
@@ -71,6 +91,7 @@ export async function boot(): Promise<void> {
   window.addEventListener("resize", resize);
   resize();
   document.addEventListener("visibilitychange", () => {
+    if (document.hidden) keys.clear(clock());
     link.visibility(document.hidden);
     frames?.skip();
   });
@@ -78,9 +99,10 @@ export async function boot(): Promise<void> {
 
   let readout: ((timeMs: number) => void) | null = null;
   if (__SHAMBLE_DEVTOOLS__ && frames !== null) {
-    const [{ Overlay }, { formatReport, readoutLines }] = await Promise.all([
+    const [{ Overlay }, { formatReport, readoutLines }, { KeyDiagram, KeyLights }] = await Promise.all([
       import("../overlay/overlay.ts"),
       import("../overlay/report.ts"),
+      import("../overlay/keys.ts"),
     ]);
     const data = (): ReportData => ({
       header: runHeader(window, COMMIT, flags.runLabel),
@@ -93,6 +115,20 @@ export async function boot(): Promise<void> {
       blocks: link.blocks,
       blockBytes: link.blockBytes,
       posts: link.posts,
+      messages: { sent: link.sent, received: link.received, refused: link.refused },
+      postUsed: link.postUsed,
+      keys: BUTTON_NAMES.join(" "),
+      presses: {
+        made: keys.presses,
+        echoed: link.echo.presses,
+        ...(lostAndDoubled(keys.pressesByButton, link.echo.pressesByButton, keys.changedAt, clock()) ?? { lost: null, doubled: null }),
+      },
+      releases: { made: keys.releases, echoed: link.echo.releases, doubled: link.echo.heldWithoutPress },
+      olderPosts: link.olderPosts,
+      wrongKeys: link.wrongKeys,
+      keyToTickP50: link.keyToTick.percentile(50),
+      keyToTickP95: link.keyToTick.percentile(95),
+      keyToTickCount: link.keyToTick.count,
       frames: frames.frames,
       fps: frames.fps(),
       frameP50: frames.percentile(50),
@@ -108,8 +144,11 @@ export async function boot(): Promise<void> {
     const overlay = new Overlay(document.body, () => formatReport(data()));
     // The browser tests read the same numbers the readout shows.
     (window as unknown as { __shambleReport: () => ReportData }).__shambleReport = data;
+    const diagram = new KeyDiagram(document.body, BUTTON_NAMES, new KeyLights());
     let next = 0;
     readout = (timeMs): void => {
+      // The key diagram follows the server's echo every frame; the readout's text is rewritten less often.
+      diagram.follow(link.echo.takePressed(), link.echoHeld, timeMs);
       if (timeMs < next) return;
       next = timeMs + READOUT_EVERY_MS;
       link.requestReport();
@@ -117,10 +156,8 @@ export async function boot(): Promise<void> {
     };
   }
 
-  let sequence = 0;
   picture.loop((timeMs) => {
-    sequence = (sequence + 1) >>> 0;
-    link.frame(sequence);
+    link.frame(keys);
     picture.draw({ newest: link.newest, previous: link.previous, timeMs });
     frames?.push(timeMs);
     readout?.(timeMs);

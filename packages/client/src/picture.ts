@@ -18,7 +18,9 @@ export interface PictureInfo {
 /**
  * What the app hands over each frame. Events join when the first change-set has some. The blocks are valid during
  * this `draw` call only: afterwards the app may send them back to the Worker, and a view kept on one then reads an
- * empty buffer. Keep no view past the call.
+ * empty buffer. Keep no view past the call. How far between the two blocks a frame is drawn is the Worker's to
+ * say, because only the client endpoint knows the interpolation clock: it comes as a field of the block with the
+ * first thing that moves, and until then there is nothing to blend.
  */
 export interface PictureFrame {
   /** The newest block, and the one before it, to draw between two ticks; `null` until they have arrived. */

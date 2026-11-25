@@ -76,11 +76,29 @@ impl Section {
 /// The block's sections, in the order they are written. The header is first and has one row; `tick` at 0 and
 /// `layout_hash` at 4 never move, because the page reads the hash before it trusts any other offset. Each entity
 /// section adds its row count to the header when it enters.
+///
+/// `echo` is the input the local server last applied for this player, as its snapshot carried it back: the held
+/// buttons, and the 16 press counters packed four to a word (button `k` in byte `k % 4` of word `k / 4`), as the
+/// page posts them. `link` is the endpoint's count of messages sent, received and refused (by either side, in
+/// local play), and the number of the page's post from which the last command the server ran was built.
 #[rustfmt::skip]
 pub const BLOCK_LAYOUT: &[Section] = &[
     Section { name: "header", stride: 8, fields: &[
         Field { name: "tick",        ty: ElementType::U32, offset: 0 },
         Field { name: "layout_hash", ty: ElementType::U32, offset: 4 },
+    ] },
+    Section { name: "echo", stride: 20, fields: &[
+        Field { name: "held",          ty: ElementType::U32, offset: 0 },
+        Field { name: "presses_0_3",   ty: ElementType::U32, offset: 4 },
+        Field { name: "presses_4_7",   ty: ElementType::U32, offset: 8 },
+        Field { name: "presses_8_11",  ty: ElementType::U32, offset: 12 },
+        Field { name: "presses_12_15", ty: ElementType::U32, offset: 16 },
+    ] },
+    Section { name: "link", stride: 16, fields: &[
+        Field { name: "sent",      ty: ElementType::U32, offset: 0 },
+        Field { name: "received",  ty: ElementType::U32, offset: 4 },
+        Field { name: "refused",   ty: ElementType::U32, offset: 8 },
+        Field { name: "post_used", ty: ElementType::U32, offset: 12 },
     ] },
 ];
 
@@ -89,6 +107,47 @@ pub const LAYOUT_HASH: u32 = layout_hash(BLOCK_LAYOUT);
 
 // A block of zero bytes must never pass the page's check.
 const _: () = assert!(LAYOUT_HASH != 0);
+
+/// Where a section that starts at `start` ends, which is where the next one starts. Every section so far has
+/// exactly one row; a section with more rows brings its count into the header, and into this function, when it
+/// enters. The one place that knows it: the block writer's offsets and the generated TypeScript both come from here.
+#[must_use]
+pub const fn end_of(section: Section, start: u32) -> u32 {
+    // A section starts at a multiple of its alignment, so the page's typed-array views bind with no copy.
+    assert!(start.is_multiple_of(section.align()));
+    start + section.stride
+}
+
+/// Where each section of a table starts, in bytes from the block's start, and where the last one ends.
+#[must_use]
+pub const fn offsets<const N: usize>(sections: &[Section]) -> ([u32; N], u32) {
+    assert!(sections.len() == N);
+    let (mut starts, mut at, mut s) = ([0; N], 0, 0);
+    while s < N {
+        starts[s] = at;
+        at = end_of(sections[s], at);
+        s += 1;
+    }
+    (starts, at)
+}
+
+const OFFSETS: ([u32; BLOCK_LAYOUT.len()], u32) = offsets(BLOCK_LAYOUT);
+
+/// The length of the block's sections together: the block without its padding.
+pub const BLOCK_BYTES: u32 = OFFSETS.1;
+
+/// Where the section of `BLOCK_LAYOUT` with this name starts in the block, or `None`.
+#[must_use]
+pub const fn section_offset(name: &str) -> Option<u32> {
+    let mut s = 0;
+    while s < BLOCK_LAYOUT.len() {
+        if same(BLOCK_LAYOUT[s].name, name) {
+            return Some(OFFSETS.0[s]);
+        }
+        s += 1;
+    }
+    None
+}
 
 /// The section of `BLOCK_LAYOUT` with this name, or `None`. The block writer takes every section through it with
 /// `expect` in a `const`, where a name the table does not hold stops the build instead of the match; nothing here
@@ -374,6 +433,11 @@ mod tests {
                 assert_eq!(super::field(section.name, own.name), Some(*own));
             }
         }
+        // Each section starts where the one before it ends.
+        let starts = ["header", "echo", "link", "links"].map(section_offset);
+        assert_eq!(starts, [Some(0), Some(8), Some(28), None]);
+        assert_eq!(BLOCK_BYTES, 44);
+        assert_eq!(offsets::<2>(BASE), ([0, 8], 16));
         // A name the table does not hold gives nothing, at run time without a panic.
         assert_eq!(super::section("headers"), None);
         assert_eq!(super::field("header", "ticks"), None);

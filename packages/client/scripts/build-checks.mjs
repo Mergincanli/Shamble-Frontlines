@@ -130,7 +130,7 @@ export function cspProblems(files) {
 }
 
 /** Text that only the development readout, its report and the tests' hook hold. */
-const DEV_MARKERS = ["Copy report", "__shambleReport", "ticks while hidden", "first page: report"];
+const DEV_MARKERS = ["Copy report", "__shambleReport", "ticks while hidden", "first page: report", "key-diagram"];
 
 /**
  * The one chunk the build made from the Worker's own source module, by the name the build gave it. `chunks` is what

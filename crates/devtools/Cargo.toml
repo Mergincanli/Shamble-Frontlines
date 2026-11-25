@@ -11,8 +11,12 @@ publish.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+client-endpoint = { path = "../client-endpoint" }
+protocol = { path = "../protocol" }
+room = { path = "../room" }
 sim = { path = "../sim" }
-# For the panic hook as players get it, linked into the test module.
+# For the panic hook as players get it, linked into the test module, and for the local match's own step, which the
+# replay runner and the link simulator's tests run unchanged.
 sim-wasm = { path = "../sim-wasm" }
 wasm-bindgen = { workspace = true }
 

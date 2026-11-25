@@ -17,11 +17,18 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 [[package]]
 name = "client-endpoint"
 version = "0.0.0"
+dependencies = [
+ "protocol",
+ "sim",
+]
 
 [[package]]
 name = "devtools"
 version = "0.0.0"
 dependencies = [
+ "client-endpoint",
+ "protocol",
+ "room",
  "sim",
  "sim-wasm",
  "wasm-bindgen",
@@ -55,6 +62,10 @@ dependencies = [
 [[package]]
 name = "room"
 version = "0.0.0"
+dependencies = [
+ "protocol",
+ "sim",
+]
 
 [[package]]
 name = "rustversion"
@@ -71,6 +82,8 @@ name = "sim-wasm"
 version = "0.0.0"
 dependencies = [
  "client-endpoint",
+ "protocol",
+ "room",
  "sim",
  "wasm-bindgen",
 ]

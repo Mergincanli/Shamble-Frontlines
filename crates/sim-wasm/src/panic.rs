@@ -86,6 +86,16 @@ pub fn panic_buffer() -> *const u8 {
     BUFFER.as_ptr().cast()
 }
 
+/// The buffer's bytes as a host reads them, for native tests: the hook's own test lives in `tests/panic_hook.rs`,
+/// a test binary of its own, because it installs the process's hook and a test that panics beside it would race it.
+#[must_use]
+pub fn buffer_bytes() -> Vec<u8> {
+    BUFFER
+        .iter()
+        .map(|cell| cell.load(Ordering::Relaxed))
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -141,23 +151,5 @@ mod tests {
         let wider = cells(HEADER_BYTES + 4);
         record(&wider[..HEADER_BYTES + 2], format_args!("abcd"));
         assert_eq!(wider[HEADER_BYTES + 2].load(Ordering::Relaxed), 0xEE);
-    }
-
-    #[test]
-    fn the_hook_writes_a_panic_s_place_and_message_into_the_module_s_buffer() {
-        start();
-        assert!(std::panic::catch_unwind(|| panic!("planted for the hook's test: {}", 7)).is_err());
-        let _ = std::panic::take_hook();
-        let (length, room, text) = read(&BUFFER);
-        assert_eq!((room, length), (BUFFER_BYTES - HEADER_BYTES, text.len()));
-        assert!(
-            text.starts_with("panicked at crates/sim-wasm/src/panic.rs:"),
-            "{text}"
-        );
-        assert!(
-            text.ends_with(":\nplanted for the hook's test: 7"),
-            "{text}"
-        );
-        assert_eq!(panic_buffer(), BUFFER.as_ptr().cast());
     }
 }

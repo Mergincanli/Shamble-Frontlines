@@ -1,37 +1,11 @@
 // The first page in a real browser, on the built development page (playwright.config.ts says how to run it).
 import { readFileSync } from "node:fs";
-import { expect, test, type Page } from "@playwright/test";
-import { ADDRESS } from "../../playwright.config.ts";
-import { drawn, needsBuild, report, running, type Report } from "./report.ts";
+import { expect, test } from "@playwright/test";
+import { drawn, needsBuild, open, report, wasmCalls } from "./report.ts";
 
 const baseline = JSON.parse(readFileSync(new URL("./render-counts.json", import.meta.url), "utf8")) as Record<string, unknown>;
 
 test.beforeAll(() => void needsBuild());
-
-/** Opens the page with every WebAssembly entry point on the page replaced by one that counts and throws. */
-async function open(page: Page, query: string): Promise<string[]> {
-  const outside: string[] = [];
-  page.on("request", (request) => {
-    if (!request.url().startsWith(`${ADDRESS}/`)) outside.push(request.url());
-  });
-  // Init scripts run in the page and not in its Worker, so the Worker still loads the Wasm.
-  await page.addInitScript(() => {
-    const count = window as unknown as { __wasmCalls: number };
-    count.__wasmCalls = 0;
-    const wasm = WebAssembly as unknown as Record<string, unknown>;
-    // Every function and constructor the name holds: the first five run code or check it, the rest make its parts.
-    const names = ["instantiate", "instantiateStreaming", "compile", "compileStreaming", "validate", "Module", "Instance", "Memory"];
-    for (const name of [...names, "Table", "Global", "Tag", "Exception", "Suspending", "promising"]) {
-      wasm[name] = function () {
-        count.__wasmCalls += 1;
-        throw new Error(`the page used WebAssembly.${name}`);
-      };
-    }
-  });
-  await page.goto(`/${query}`);
-  await running(page);
-  return outside;
-}
 
 for (const [name, query] of [["the default backend", ""], ["the forced WebGL 2 fallback", "?backend=webgl"]] as const) {
   test(`the first page on ${name}`, async ({ page }, info) => {
@@ -62,7 +36,7 @@ for (const [name, query] of [["the default backend", ""], ["the forced WebGL 2 f
     expect(frames - posts).toBeLessThanOrEqual(1);
     expect(later.errors).toBe(0);
     // The page made no call into WebAssembly and no instantiation (PM-0002-2).
-    expect(await page.evaluate(() => (window as unknown as { __wasmCalls: number }).__wasmCalls)).toBe(0);
+    expect(await wasmCalls(page)).toBe(0);
     // And the Wasm runs in one Worker: no second one was started beside it.
     expect(page.workers()).toHaveLength(1);
     // Nothing was asked of any address but the small server's.

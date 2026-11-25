@@ -1,13 +1,16 @@
 //! The simulation: state, phases, tick and the navigation runtime (ADR 0002 part 3; ADR 0004). It depends on
-//! `content` only, with no transport, no async runtime and no clock. So far it holds the world (a tick counter and
-//! the match seed), its step, its state hash and the generator of its random streams (foundation step 2.5).
+//! `content` only, with no transport, no async runtime and no clock. So far it holds the world (a tick counter, the
+//! one player's applied command and the match seed), its step, its state hash and the generator of its random
+//! streams (foundation step 2.5).
 
 pub mod rng;
 pub mod state_hash;
 pub mod world;
 
 pub use rng::ChaCha8;
-pub use world::{SEED_BYTES, TICK_HZ, World};
+pub use world::{
+    BUTTONS, MatchSetup, PlayerCommand, SEED_BYTES, SHARED_STATE_BYTES, TICK_HZ, World,
+};
 
 #[cfg(test)]
 mod tests {

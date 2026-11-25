@@ -2,14 +2,39 @@
 // crates/client-endpoint/src/layout.rs. Do not edit. To write it again:
 // SHAMBLE_WRITE_TYPES=1 cargo test -p client-endpoint
 
-export const LAYOUT_HASH = 0x2df78c30;
+export const LAYOUT_HASH = 0x67fbccab;
 
 export const BLOCK_LAYOUT = {
   header: {
+    offset: 0,
     stride: 8,
     fields: {
       tick: { offset: 0, type: "u32" },
       layout_hash: { offset: 4, type: "u32" },
     },
   },
+  echo: {
+    offset: 8,
+    stride: 20,
+    fields: {
+      held: { offset: 0, type: "u32" },
+      presses_0_3: { offset: 4, type: "u32" },
+      presses_4_7: { offset: 8, type: "u32" },
+      presses_8_11: { offset: 12, type: "u32" },
+      presses_12_15: { offset: 16, type: "u32" },
+    },
+  },
+  link: {
+    offset: 28,
+    stride: 16,
+    fields: {
+      sent: { offset: 0, type: "u32" },
+      received: { offset: 4, type: "u32" },
+      refused: { offset: 8, type: "u32" },
+      post_used: { offset: 12, type: "u32" },
+    },
+  },
 } as const;
+
+/** The length of the block's sections together: a block is never shorter. */
+export const BLOCK_BYTES = 44;

@@ -11,6 +11,8 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 client-endpoint = { path = "../client-endpoint" }
+protocol = { path = "../protocol" }
+room = { path = "../room" }
 sim = { path = "../sim" }
 wasm-bindgen = { workspace = true }
 
