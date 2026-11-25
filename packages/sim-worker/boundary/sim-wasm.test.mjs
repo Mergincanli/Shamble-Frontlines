@@ -140,10 +140,10 @@ test("the glue exports what the Worker calls and nothing more", () => {
   // The two ways to load the module, the one type, and two calls asked once. The start function that installs the
   // panic hook is not among them: the glue runs it itself.
   expect(Object.keys(glue).sort()).toEqual(["Sim", "default", "initSync", "panic_buffer", "tick_hz"]);
-  // The one type's own calls: a method added to the bindings shows here. Left out: the names wasm-bindgen adds
-  // for itself (two underscores first, and the dispose symbol).
-  const calls = Reflect.ownKeys(Sim.prototype).filter((name) => typeof name === "string" && !name.startsWith("__"));
-  expect(calls.sort()).toEqual(["block_len", "block_ptr", "constructor", "free", "input", "rebase", "step"]);
+  // The one type's own calls: a method added to the bindings shows here. `__destroy_into_raw` and `free` are
+  // wasm-bindgen's own; only its dispose symbol is left out.
+  const calls = Reflect.ownKeys(Sim.prototype).filter((name) => typeof name === "string");
+  expect(calls.sort()).toEqual(["__destroy_into_raw", "block_len", "block_ptr", "constructor", "free", "input", "rebase", "step"]);
   expect(Object.getOwnPropertyNames(Sim).filter((name) => !["length", "name", "prototype"].includes(name))).toEqual([]);
 });
 

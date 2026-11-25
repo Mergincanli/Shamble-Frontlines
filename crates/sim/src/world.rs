@@ -31,6 +31,10 @@ pub struct MatchSetup {
 
 /// What the simulation reads of one player's command: the buttons held and a press counter per button, each
 /// wrapping. A command's move, aim and view time join when a system reads them.
+///
+/// The counters are running totals, so one command can bring many presses of one button at once: an honest client
+/// after an outage of 255 ticks brings up to 255. A system that acts on presses applies at most what its own rule
+/// allows per tick (one jump, one shot per cooldown) and never one action per press it finds.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PlayerCommand {
     pub buttons: u16,
@@ -125,11 +129,14 @@ impl World {
     }
 
     /// The hash of the shared state only: the one a client's state can be compared with, because it covers no
-    /// seed byte (ADR 0004 part 9). `scratch` holds the whole state's bytes afterwards.
+    /// seed byte (ADR 0004 part 9). `scratch` holds the shared bytes afterwards and nothing of the seed: what lay
+    /// behind them is overwritten before it is cut off, so a caller that hands the buffer on hands on no seed.
     #[must_use]
     pub fn shared_hash(&self, scratch: &mut Vec<u8>) -> u64 {
         self.write_state(scratch);
-        fnv1a_64(&scratch[..SHARED_STATE_BYTES])
+        scratch[SHARED_STATE_BYTES..].fill(0);
+        scratch.truncate(SHARED_STATE_BYTES);
+        fnv1a_64(scratch)
     }
 }
 
@@ -257,8 +264,9 @@ mod tests {
             assert_eq!(a.shared_hash(&mut scratch), b.shared_hash(&mut scratch));
             assert_ne!(a.state_hash(&mut scratch), b.state_hash(&mut scratch));
         }
-        // The tick and each part of the record count.
+        // The tick and each part of the record count. The buffer holds the shared bytes afterwards and no more.
         let base = a.shared_hash(&mut scratch);
+        assert_eq!(scratch.len(), SHARED_STATE_BYTES);
         a.authority_step(&[]);
         assert_ne!(a.shared_hash(&mut scratch), base);
         let (mut held, mut counted) = (world(0, 9), world(0, 9));

@@ -23,7 +23,7 @@ pub enum Inserted {
     Queued,
     /// It already waits.
     Duplicate,
-    /// It is not newer than the last command taken out: an honest late repeat.
+    /// It is not newer than the last command that ran: an honest late repeat.
     Stale,
     /// The queue holds as many as it can.
     Full,
@@ -34,8 +34,8 @@ pub struct CommandQueue {
     /// The first `len` wait, the oldest sequence first.
     waiting: [Queued; QUEUE_LEN],
     len: usize,
-    /// The sequence of the last command taken out; before the first, one below the first command offered.
-    taken: Option<u16>,
+    /// The sequence of the last command that ran; before the first, one below the first command offered.
+    newest_run: Option<u16>,
 }
 
 impl Default for CommandQueue {
@@ -48,7 +48,7 @@ impl Default for CommandQueue {
         Self {
             waiting: [empty; QUEUE_LEN],
             len: 0,
-            taken: None,
+            newest_run: None,
         }
     }
 }
@@ -65,12 +65,12 @@ impl CommandQueue {
         self.len == 0
     }
 
-    /// Puts a command in its place by sequence. Before anything was taken out, the first command offered opens
-    /// the window: whatever lies behind it is stale. So every waiting command lies within half the sequence
-    /// circle of the last one taken, and no spread of sequences can turn their order round.
+    /// Puts a command in its place by sequence. Before any command ran, the first one offered opens the window:
+    /// whatever lies behind it is stale. So every waiting command lies within half the sequence circle of the
+    /// last one that ran, and no spread of sequences can turn their order round.
     pub fn insert(&mut self, new: Queued) -> Inserted {
-        let taken = *self.taken.get_or_insert(new.sequence.wrapping_sub(1));
-        if !seq_newer(new.sequence, taken) {
+        let newest_run = *self.newest_run.get_or_insert(new.sequence.wrapping_sub(1));
+        if !seq_newer(new.sequence, newest_run) {
             return Inserted::Stale;
         }
         let waiting = self.waiting.get(..self.len).unwrap_or(&[]);
@@ -97,14 +97,21 @@ impl CommandQueue {
     }
 
     /// Takes out the oldest waiting command when its tick is `running` or earlier; one for a later tick waits.
+    /// The window does not move: the room says which command ran (`ran`).
     pub fn take_due(&mut self, running: u32) -> Option<Queued> {
         let waiting = self.waiting.get_mut(..self.len)?;
         let first = *waiting.first()?;
         ticks_after(first.tick, running)?;
         waiting.rotate_left(1);
         self.len = self.len.saturating_sub(1);
-        self.taken = Some(first.sequence);
         Some(first)
+    }
+
+    /// The command with this sequence, the one taken out last, ran: what is not newer is stale from now on. A
+    /// command that was taken out and refused does not move the window, so a refused command far ahead cannot
+    /// shut out the honest ones behind it, and every command that runs is newer than the one that ran before it.
+    pub const fn ran(&mut self, sequence: u16) {
+        self.newest_run = Some(sequence);
     }
 }
 
@@ -124,10 +131,14 @@ mod tests {
         }
     }
 
+    /// Takes out everything that waits, each command running as the room would run it.
     fn drain(queue: &mut CommandQueue) -> Vec<u16> {
-        std::iter::from_fn(|| queue.take_due(u32::MAX))
-            .map(|taken| taken.sequence)
-            .collect()
+        let mut sequences = Vec::new();
+        while let Some(taken) = queue.take_due(u32::MAX) {
+            queue.ran(taken.sequence);
+            sequences.push(taken.sequence);
+        }
+        sequences
     }
 
     #[test]
@@ -182,6 +193,24 @@ mod tests {
         let twice = Inserted::Duplicate;
         assert_eq!(kept, [yes, stale, yes, twice, stale, stale, stale]);
         assert_eq!(drain(&mut queue), [0, 20_000]);
+    }
+
+    /// A command that is taken out and does not run (the room refused it) leaves the window where it was: the
+    /// commands behind it still come in, and a second copy of it is offered to the room again, never kept twice.
+    #[test]
+    fn a_command_taken_out_and_refused_does_not_move_the_window() {
+        let mut queue = CommandQueue::default();
+        queue.insert(queued(10, 1));
+        assert_eq!(drain(&mut queue), [10]);
+        assert_eq!(queue.insert(queued(30_010, 1)), Inserted::Queued);
+        assert_eq!(queue.take_due(1).map(|taken| taken.sequence), Some(30_010));
+        // Not run. Sequence 11 is still newer than the last command that ran, and so is the refused one again.
+        assert_eq!(queue.insert(queued(11, 1)), Inserted::Queued);
+        assert_eq!(queue.insert(queued(30_010, 1)), Inserted::Queued);
+        assert_eq!(queue.insert(queued(10, 1)), Inserted::Stale);
+        // More than half the circle from the last command that ran: stale, whatever was taken out in between.
+        assert_eq!(queue.insert(queued(40_010, 1)), Inserted::Stale);
+        assert_eq!(drain(&mut queue), [11, 30_010]);
     }
 
     #[test]

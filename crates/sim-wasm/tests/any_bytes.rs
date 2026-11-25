@@ -16,7 +16,7 @@ use protocol::messages::{
     AimPoint, Command, Input, Join, JoinAccepted, JoinRejected, OwnState, PROTOCOL_VERSION,
     REDUNDANCY_CAP, RejectReason, Snapshot, SnapshotAck, ViewTime,
 };
-use protocol::wrap::press_edges;
+use protocol::wrap::{press_edges, seq_newer};
 use room::{CATCH_UP_CAP, Room};
 use sim::{BUTTONS, MatchSetup, SEED_BYTES};
 
@@ -104,10 +104,11 @@ fn control_bytes(control: &Control) -> Vec<u8> {
     bytes
 }
 
-/// The room against a client that keeps the rules, lies in one field of one message in five, and whose bytes are
-/// changed on the way one time in five. Whatever arrives: every snapshot the room writes is valid and one tick
-/// after the last; at most `CATCH_UP_CAP` commands run in a tick, and never the one that ran last; and no button
-/// is pressed more often than once per tick since the join.
+/// The room against a client that keeps the rules, lies in one message in five (one field of one command, an
+/// ack, or a flood of commands for the ticks ahead), and whose bytes are changed on the way one time in five. Whatever arrives: every snapshot the room writes is valid and one tick
+/// after the last; at most `CATCH_UP_CAP` commands run in a tick; no command runs twice (each one that runs is
+/// newer than the one before it, and over a match the sequence moves by exactly the commands run and the ones the
+/// room counted as missing); and no button is pressed more often than once per tick since the join.
 #[test]
 fn the_room_keeps_its_rules_whatever_arrives() {
     let mut random = Random(0x3B);
@@ -119,7 +120,7 @@ fn the_room_keeps_its_rules_whatever_arrives() {
     let (mut bytes, mut reply, mut written) = (Vec::new(), Vec::new(), Vec::new());
     let (acks, commands) = (Vec::new(), Vec::new());
     let mut input = Input { acks, commands };
-    let (mut totals, mut pressed) = ([0u64; 11], 0u64);
+    let (mut totals, mut pressed) = ([0u64; 13], 0u64);
     for life in 0..MATCHES {
         // The first match crosses a multiple of 65,536 ticks, and the sequences start somewhere else each time.
         let (seed, start_tick) = ([3; SEED_BYTES], 65_000 + 100_000 * life);
@@ -128,8 +129,10 @@ fn the_room_keeps_its_rules_whatever_arrives() {
         let mut sent: Vec<Command> = Vec::new();
         let (mut sequence, mut next_tick) = ((life * 7919) as u16, start_tick);
         let mut presses = [0u8; BUTTONS];
-        // What the snapshots said: the tick of the first, the last one, and the presses granted per button.
+        // What the snapshots said: the tick of the first, the last one, and the presses granted per button; and
+        // the first command seen to have run, with the room's counts of commands run and missing at that moment.
         let (mut first, mut last, mut granted) = (None, None::<Snapshot>, [0u64; BUTTONS]);
+        let mut anchor = None::<(u16, u32, u32)>;
         for call in 0..CALLS {
             let tick = room.world().tick();
             match random.below(100) {
@@ -162,7 +165,7 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                         .acks
                         .extend(seen.map(|tick| SnapshotAck { group: 0, tick }));
                     let lied = random.below(carried as u64) as usize;
-                    match (random.below(25), &mut input.commands[lied]) {
+                    match (random.below(30), &mut input.commands[lied]) {
                         (0, command) => command.sequence = random.near(sequence.into(), 20) as u16,
                         (1, command) => command.tick = random.near(command.tick, 12),
                         (2, command) => random.press(&mut command.presses),
@@ -171,6 +174,22 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                             tick: random.near(tick, 3),
                         }),
                         (4, _) => input.commands.truncate(lied),
+                        (5, _) => {
+                            // A flood: eight commands with new sequences for the eight ticks ahead, which is as
+                            // far as the room lets a client lead. Two floods close together fill the queue.
+                            input.commands.clear();
+                            for ahead in (1..=8u16).rev() {
+                                let (tick, sequence) =
+                                    (tick + u32::from(ahead), sequence.wrapping_add(ahead));
+                                let flood = Command {
+                                    tick,
+                                    sequence,
+                                    ..sent[0].clone()
+                                };
+                                input.commands.push(flood);
+                            }
+                            sequence = sequence.wrapping_add(8);
+                        }
                         _ => {}
                     }
                     if encode_input(&input, &mut bytes).is_err() {
@@ -209,9 +228,23 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                     );
                     let own = now.own.as_ref().expect("the player's own state");
                     let before = last.as_ref();
-                    if ran > 0 {
-                        let processed = before.map(|before| before.last_processed_command);
-                        assert_ne!(Some(now.last_processed_command), processed, "{at}");
+                    let processed = before.and_then(|before| before.last_processed_command);
+                    if let (true, Some(new)) = (ran > 0, now.last_processed_command) {
+                        // One command in a tick is newer than the one before it; two are each newer than the one
+                        // before, so the second is at least not the one that ran last.
+                        let moved_on = |old| {
+                            if ran == 1 {
+                                seq_newer(new, old)
+                            } else {
+                                new != old
+                            }
+                        };
+                        assert!(
+                            processed.is_none_or(moved_on),
+                            "{at}: {processed:?} then {new}"
+                        );
+                        let counters = room.counters();
+                        anchor.get_or_insert((new, counters.commands_run, counters.missing));
                     }
                     let echoed = before.and_then(|before| before.own.as_ref());
                     let echoed = echoed.map_or([0; BUTTONS], |own| own.presses);
@@ -228,10 +261,19 @@ fn the_room_keeps_its_rules_whatever_arrives() {
             }
         }
         let counters = room.counters();
+        // Over the match the sequence moved by one per command run and one per command missing, no more and no
+        // less: a command that ran twice would run without moving it.
+        let ended = last.as_ref().and_then(|last| last.last_processed_command);
+        if let (Some((began, ran, missing)), Some(ended)) = (anchor, ended) {
+            let steps = (counters.commands_run - ran) + (counters.missing - missing);
+            assert_eq!(ended.wrapping_sub(began), steps as u16, "match {life}");
+        }
         let counted = [
             counters.commands_run,
             counters.late,
             counters.joins,
+            counters.missing,
+            counters.queue_full,
             counters.rejections,
             counters.decode_errors,
             counters.refused_ack,
@@ -247,17 +289,18 @@ fn the_room_keeps_its_rules_whatever_arrives() {
         pressed += granted.iter().sum::<u64>();
     }
     // The run reached both sides of every check: commands ran in number, on time and late, presses were
-    // granted, every match was joined once, and each kind of refusal came up.
-    let [ran, late, joins, turned_away @ ..] = totals;
+    // granted, every match was joined once, and every other count came up: commands missing, a full queue, and
+    // each kind of refusal.
+    let [ran, late, joins, others @ ..] = totals;
     println!(
-        "the room: {ran} commands run ({late} late), {pressed} presses granted, turned away {turned_away:?}"
+        "the room: {ran} commands run ({late} late), {pressed} presses granted, missing, queue full and turned away {others:?}"
     );
     assert!(
         ran > 30_000 && late > 100 && pressed > 30_000,
         "{totals:?} {pressed}"
     );
     assert_eq!(joins, u64::from(MATCHES));
-    assert!(turned_away.iter().all(|count| *count > 100), "{totals:?}");
+    assert!(others.iter().all(|count| *count > 100), "{totals:?}");
 }
 
 /// The endpoint against a room that keeps the rules and lies in one field of one snapshot in five, with bytes that

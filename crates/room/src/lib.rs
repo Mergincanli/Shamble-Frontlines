@@ -225,7 +225,7 @@ impl Room {
 
     /// Whether a command that is due may run: its tick lies after the tick of the command run before it (before
     /// the first, after the tick of the join), and no press counter moved by more than one press per tick in
-    /// between. Counts what it refuses.
+    /// between. Counts what it refuses. (That its sequence is newer than the last command's is the queue's rule.)
     fn admit(&mut self, next: &Queued) -> bool {
         let (base_tick, base) = match &self.last_run {
             Some(last) => (last.tick, last.command.presses),
@@ -267,6 +267,7 @@ impl Room {
                 count(&mut self.counters.late);
             }
             count(&mut self.counters.commands_run);
+            self.queue.ran(next.sequence);
             *place = next.command;
             self.last_run = Some(next);
             ran = ran.saturating_add(1);
@@ -493,6 +494,34 @@ mod tests {
         );
         let gaps = (counters.missing, counters.late, counters.refused());
         assert_eq!(gaps, (2, 2, 0));
+    }
+
+    /// A refused command does not shut out the honest ones behind it, and no sequence comes round the circle
+    /// behind it. The room runs sequence 10; a command 30,000 ahead is taken out and refused (its tick is not
+    /// later). Sequence 11 still runs. A command 40,000 ahead of the last one that ran is stale. The refused one
+    /// again is refused again.
+    #[test]
+    fn a_command_that_runs_is_newer_than_the_last_one_that_ran_whatever_was_refused() {
+        let mut room = joined(100);
+        offer(&mut room, &[command(10, 101, 0)], None);
+        assert_eq!(step(&mut room).last_processed_command, Some(10));
+        offer(&mut room, &[command(30_010, 101, 0)], None);
+        assert_eq!(step(&mut room).last_processed_command, Some(10));
+        offer(&mut room, &[command(11, 103, 0)], None);
+        assert_eq!(step(&mut room).last_processed_command, Some(11));
+        offer(&mut room, &[command(40_011, 104, 0)], None);
+        offer(&mut room, &[command(30_010, 103, 0)], None);
+        assert_eq!(step(&mut room).last_processed_command, Some(11));
+        let counters = *room.counters();
+        let dropped = (counters.refused_not_newer, counters.stale);
+        assert_eq!(
+            (dropped, counters.commands_run, counters.missing),
+            ((2, 1), 2, 0)
+        );
+        // A command inside the window runs, and the count of missing sequences is the distance it skipped.
+        offer(&mut room, &[command(30_011, 105, 0)], None);
+        assert_eq!(step(&mut room).last_processed_command, Some(30_011));
+        assert_eq!(room.counters().missing, 29_999);
     }
 
     #[test]

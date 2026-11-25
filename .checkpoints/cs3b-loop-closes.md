@@ -286,6 +286,7 @@
   about 3,095 planned for them: 1.9 times. **After the fix pass of round 1: 6,528** (plus 105): the fixes added
   about 700, of which `any_bytes.rs` is 403. The stop line is 7,600; round 2's fixes are still to come. He was
   told the 6,500 on 2026-11-25, about 01:56 UTC.
+  **With round 2's first fixes: 6,637.**
 - **The ladder was used:** the link simulator (its rate limit and duplication, then the whole of it) and the first
   recording, each with its tests, are change-set 3c's, built right after 3b and before change-set 4. **He was told
   in three lines on 2026-11-24, about 23:56 UTC, before anything moved** (his message of 23:24:50 UTC, point 4;
@@ -330,6 +331,38 @@ percentile 185.0 ms at about 10 frames a second; the press test 10,000 presses a
 posts delayed, 68 sent twice, 68 sent behind a newer one, 67 ignored by the Worker when the report was read, 0
 ticks ran an older post, 0 refused; allocation 90 bytes a frame and 597 a block at 8 frames a second (3.8 blocks
 per frame; the limits there: 160 and 680). The log: `.gate/cs3b/ci-0dfca749-toolchain.log` (scratch).
+
+**Round 2 so far (updated 2026-11-25, 02:27 UTC):**
+- **security-auditor: PASS** (`security-auditor-review2.md`). Its Medium M1 (no bound on how late a command may
+  run): **answer accepted, deferred in writing, not closed**: the hard stop is "before online play" (no room
+  behind a network transport without the bound); build it in change-set 7 with each of the two timing ways, each
+  with a long-hold test (idle N ticks, then the backlog: at most the repeat window of two-command ticks; honest
+  outages 0 refused); the report must not read as if running on arrival had no bound (both options bound the
+  backlog as their sources build them). L1 fixed, L2 accepted. **L3 (Low, named again):** `World::shared_hash`
+  left the whole state, seed included, in the caller's buffer: **fixed now** (the bytes behind the shared ones are
+  overwritten and cut off). **New Low:** the random-message test's "no command twice" was only "not the one that
+  ran last": **fixed**, and the stronger check found something (next line). Nit (the boundary test's filter on
+  wasm-bindgen's own names): **fixed** (the names are listed outright). Its line on press counters (an honest
+  client after an outage brings up to 255 presses of one button in one command): written on
+  `sim::PlayerCommand`; **follow-ups for change-sets 4, 8 and 9** (one action or its cooldown's worth, each with
+  a test).
+- **Found by the stronger check, in the room:** the queue's window followed every command taken out, also one the
+  room then refused. So one refused command far ahead shut out the honest ones behind it for up to 32,767
+  commands, and behind it a sequence could come round the circle again. **Fixed:** the window follows the last
+  command that RAN (`CommandQueue::ran`, called by the room after its checks); tests in the queue and the room;
+  two plants. The random-message test now asserts, per match, that the sequence moved by exactly the commands
+  run plus the ones counted missing. **netcode-architect and rust-reviewer review this in round 2** (their head
+  is the commit that holds it).
+- test-engineer, perf-auditor and engine-architect: running (on 0dfca749).
+
+**What CI must show on the commit with these fixes (written before the push):** cargo debug, twice: 26, 3, 2, 19,
+8, 15, 17, 5, 1, 13, 2, 1, 1 (113); release: protocol 19 and 8, sim 17, 5 and 1; client 83, sim-worker 46, types
+7, net 1, the browser package's Node project 1; boundary 18; 16 browser tests inside the 5 minutes; the players'
+Wasm 53,783 bytes, sha256 1e0e2dd5ddc929ae1926590e48954ac8105551e92dbe09e02690713b68ab0a4a. Run here first: all
+of it; of the browser tests the two that reach the room (the loop and the 10,000 presses: 2 passed in 2.4
+minutes, 10,000 presses and releases made and echoed, 42 posts sent behind a newer one, 42 ignored, 0 older
+posts), the other 14 by CI (the port is shared with two reviewers). Planted defects:
+46; the six that touch the queue and the room's order were run and caught (02:24:53 UTC).
 
 **Round 2, first three (started 2026-11-25, about 02:00 UTC):** test-engineer, security-auditor and perf-auditor
 (Opus 5.5, effort max), each on its own copy `.gate/<name>-cs3b2` of 0dfca749; what they were given:
