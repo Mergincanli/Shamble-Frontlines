@@ -325,8 +325,50 @@ the limits, to watch).
 3. Not this chat's: the small CI pull request (an Opus 5.5 chat: Firefox in CI, every crate's release tests, the
    two generators' checks, a build step of its own for the test-only module).
 
-## Open findings
-- None yet for 3b.
+## Open findings (review round 1 on bbbf09e4; the fix pass comes after all six reviewers; updated 01:10 UTC)
+- **engine-architect: CHANGES NEEDED, one Medium, eight Lows** (`engine-architect-review1.md`; "the boundary
+  itself is sound").
+  - Medium EA-1: the follow-up EA-F9 is only partly done: the block writer and the newest post still live in
+    `sim-wasm` (`LocalMatch`); ADR 0002 has the client endpoint write the block. **To fix:** both move into
+    `client_endpoint::Endpoint`; `LocalMatch` keeps the room, the endpoint, the link, the schedule and the order.
+  - Low EA-2: a section's start is worked out twice (the generator sums strides itself). **To fix:** the generator
+    uses `layout::offsets`, and the block's length is printed into the generated file and used by the page.
+  - Low EA-3: the newest post is guarded twice (the host and Rust), and Rust's guard never fires on the shipped
+    path, differs on the first post and counts into "refused". **To fix (the main session's choice, plan 5.1):**
+    one owner, the host; Rust takes the post it is given.
+  - Low EA-4: a key held while the focus moves into the report's text box stays held. **To fix:** every key-up
+    goes through; only key-downs in a text box are skipped.
+  - Low EA-5: the host time's "never backwards" check and its counter are read by nothing. **To fix:** drop both;
+    the step keeps taking the time.
+  - Low EA-6: `devtools` names three crates it does not use until 3c. **No manifest change** (it says so; a
+    change would be a new batch under the hold): the report says they are unused until 3c.
+  - Low EA-7: the boundary test pins the module's exports, not the methods of `Sim`. **To fix:** pin them.
+  - Low EA-8: PA-N2 (where the allocation window falls against the browser's optimising) is not met, only the
+    plan's wording. **Report:** it carries over to change-set 5's method; never "done".
+  - Low EA-9 (nit): the key diagram's CSS reaches a production build, as the readout's has since change-set 2.
+    **Follow-up.**
+- **netcode-architect: PASS, one Medium, six Lows** (`netcode-architect-review1.md`; its own probes: 1,000,000
+  random Inputs into the room and 3,000,000 snapshots into the endpoint, 0 panics; a toy link with delay, 5 %
+  loss, doubled datagrams and outages of 45 and 100 ticks over the real `LocalMatch`: 10,000 presses applied
+  exactly in 7 runs, 0 refused by the room).
+  - Medium NA-1: a snapshot that is not newer (late or doubled) or comes before the join's answer counts as
+    "refused", like bytes that are no message; under a link that reorders, the next change-set's zero-refusal
+    mark would fail by construction. **To fix:** a count of its own; "refused" keeps malformed bytes and the
+    room's refusals.
+  - Low NA-2: before the first command is taken the queue has no window; a hostile spread of sequences made one
+    command run twice. **To fix:** the first queued sequence sets the window.
+  - Low NA-3: two ways the newest command could stop going out, unreachable in 3b (32,768 unconfirmed commands;
+    a tick gap above 255). **To fix:** the newest command always goes; only repeats are filtered.
+  - Low NA-4: `press.rs` says a second tap is "never dropped" while presses above 255 waiting are dropped.
+    **To fix:** the doc says the bound; the report names it as a bounded departure; the cap's size is a
+    game-design question once presses fire weapons (a follow-up).
+  - Low NA-5: before online play: acks bounded only from above and two for one group; the Join's version after
+    the token; the press check passes anything once 255 ticks are covered. **To fix now:** the Join's version
+    moves before the token (cheap while nothing is deployed). **Follow-ups:** the other two.
+  - Low NA-6: an infinite host time is kept. **Falls away with EA-5.**
+  - Low NA-7, for 3c: the link simulator needs its clock advanced through `LocalMatch`, and its reliable channel
+    must deliver exactly once (a second join answer stops the local match). **Into 3c's plan.**
+- rust-reviewer, test-engineer, security-auditor: running. perf-auditor: next free seat.
 
 ## Key numbers
 - main 28254a73; 3a's last commit 1624f084; 3a's notes 6491b839; the players' Wasm on main: 31,718 bytes, sha256
