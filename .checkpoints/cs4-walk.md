@@ -10,7 +10,7 @@
   `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is fast-forwarded to main 311c0484 (so the fixed guard loads) and is never switched ·
   **Base:** origin/main 311c0484f7a9697ae33e7a76a8cf0b507a2837c4 (taken in by merge commit 1802856)
-- **Last update:** 2026-11-25 19:27 Amsterdam (from the clock)
+- **Last update:** 2026-11-25 19:44 Amsterdam (from the clock)
 
 ## Steps done
 1. The takeover and ORDER-3C: his answer **(c)** with four conditions (2a no proof thinner; 2b the recording built
@@ -33,16 +33,24 @@
    three options; NO-SOURCE new; the stamina bar in 4c's step 4; 4c now 6,665 / 12,000 / stop 15,000). The plan's
    section 19 lists what changed since draft 1.
 
+7. The advisor agent's verdict on draft 1, re-checked by it against draft 2: **REVISE**, eleven conditions, two of
+   them High (`advisor-cs4-plan.md`): proofs of 4b's and 4c's code sat in 4d against his condition (a); the early
+   look came before the camera panel against his words "from its first playable build".
+8. **Draft 3** answers the eleven; the plan's section 20 says where each is met. Proofs moved to the part that
+   merges their code (content items 1 and 2 to 4b; the paced replay, the hostile commands and the far-corner map to
+   4c; 4d makes the recording anew); the early look after the panel (4c's step 5); WALK-CUT with times by 3b's pace
+   (7,014 lines from first commit to merge in about 16 hours); STEP-60 with what depends on the step rate;
+   DIFF-LIST carries the list, printed by `testlines-difflist.mjs` (output `testlines-difflist.md`, and into the
+   plan between two marker lines with `--into`); the Export, its manifest and the table go to `content/source/`,
+   not `docs/`; GREY-COLOURS is a default he can veto.
+
 ## Current step
-The advisor agent's review of draft 1 runs (`advisor-cs4-plan.md`; three findings written so far: F1 the
-recording's marks left in 4d against section 0's claim; F2 "first playable build" and the camera panel; F3
-DEPART-3's three limits when the content crate enters).
+The advisor agent's re-read of draft 3 (the same agent, by message).
 
 ## Next steps
-1. Fold the advisor agent's conditions into the plan (a section at its end says where each is met): draft 3.
-2. Its short second read of what changed since draft 1 (the plan's section 19 lists it) and of the conditions met.
-3. Push; send him the plan as a file; board: one line naming the plan file and its commit, then the state that says
-   the chat waits for him. Stop for his go and his letter for WALK-CUT.
+1. On its APPROVE: push; send him the plan as a file; board: one line naming the plan file and its commit, then
+   the state that says the chat waits for him. Stop for his go and his letter for WALK-CUT. On REVISE: fix, and
+   back to it.
 4. On his go: 4a's own checkpoint (`cs4a-recording`), the hash report with rust-reviewer, then 4a's steps 1 to 8
    (plan section 4). No manifest change in 4a.
 5. For 4a's docs pass: his blocks into `docs/DECISIONS.md` by script; change-set 3b's owed docs pass; the Hornet's
@@ -57,8 +65,11 @@ DEPART-3's three limits when the content crate enters).
 - The session's worker restarted once (about 18:00 Amsterdam); nothing was lost.
 
 ## Key numbers
-- Walk bottom-up from the designs: about 15,000 lines (4a 1,365; 4b 4,860; 4c 6,665; 4d 2,120), nearly half tests;
-  at 1.8 times about 27,000; the card: 3,900. The recording alone: 1,365 (change-set 3's plan: 275).
+- Walk bottom-up from the designs (draft 3): about 15,300 lines (4a 1,365; 4b 5,410; 4c 7,315; 4d 1,210), half
+  tests; planned at 1.8 times: 2,450 / 9,750 / 13,150 / 2,200 = 27,550; stop lines (planned times 1.25): 3,050 /
+  12,200 / 16,450 / 2,750. The card: 3,900. The recording alone: 1,365 (change-set 3's plan: 275).
+- The pace used for times: change-set 3b, 7,014 lines (docs, notes and lockfiles left out) from its first commit
+  (2026-11-24 23:00) to its merge (2026-11-25 14:57), about 16 hours with reviews and his check.
 - The collision library: parry3d =0.31.1; 33 new lockfile packages, 31 in the players' file's tree (rust-reviewer's
   paper reading, to be confirmed by `cargo tree` after the hold).
 - The time unit: 3,000 units a second (rust-reviewer, block 4).
@@ -71,6 +82,6 @@ DEPART-3's three limits when the content crate enters).
 - The board add-on is active for this chat (since 2026-11-25).
 
 ## Running work
-- The advisor agent (plan review of draft 1), started 2026-11-25 about 19:12 Amsterdam; notes
+- The advisor agent (its re-read of draft 3; its review of draft 1 ended REVISE at about 19:36 Amsterdam); notes
   `.checkpoints/cs4-walk/advisor-cs4-plan.md`.
 - No saver runs: the main session commits the notes by hand at each update.
