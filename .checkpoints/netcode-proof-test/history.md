@@ -7898,3 +7898,27 @@ Make good use of it and if there are things that might need to be reviewed by th
   a step is called done, and on today's choices made before it was on. CLAUDE.md's Models line keeps it an extra: the
   recorded advisor-agent reviews stay required. What may need its review is told to him in plain words.
   Transcript record 5a4f0c9f-4d09-40f1-a79e-2bad27f12f71, 16:14:02 UTC, 277 characters.
+
+## Mustafa, 2026-11-25 00:07 UTC, in this chat: his three answers, the merge word for Netcode Builder 2's branch, the take-overs (word for word)
+```text
+For the netcode chat, from me, written with my main Advisor (25 November, 01:20 Amsterdam). Lean mode stays as it is.
+
+1. NPT-EDGE-READ (where the probe takes each leg's first reading of dropped packets): (a), yes, the one-line move, with your advisor's read, in U6c's merge. The 10 seconds of warm-up and the measured window stay fully counted. The 214 drops inside P1's window on your own machine stay recorded as unexplained; this answer does not cover them.
+2. NPT-L2-ONEWAY (the one-way delay checks on the real network): (a). No tolerance changes, the round-trip checks stay as they are, and the base round trip is the leg's own measured value. Netcode Builder 2 builds it as a small change-set of its own after its branch is merged here. Pass it the pointers.
+3. STAMP-HOME (who builds the three held-back tests of the probe's time stamps): (a), you, after R1's run and before R1's report.
+4. My word for the merge of Netcode Builder 2's work: merge claude/practical-ride-igo41n into your branch, both parts in one merge. Its code commit is 72651a3c6326546b423c4773ac5a92902a37b590; my main Advisor checked it (only crates/judge, marks and its notes are touched, no manifest or lockfile, GitHub's checks green, a trial merge into your head 7e95ab7b had no conflict). Before you merge, check that every commit after 72651a3c on that branch touches only its notes. Plan first, as you do. You choose the order with U6c's merge, R1's path goes first, and the two merges never overlap. After the merge: your whole check (node spikes/netcode-proof/check.mjs), then the re-judge of the PM-0001-47 set on your real logs, which must read MOVED. If it reads anything else, stop and tell me in three lines.
+5. With that merge you take over three things from its hand-off block (.checkpoints/netcode-judge.md): my message of 24 November to Netcode Builder 2 goes into docs/DECISIONS.md by script at your next docs pass; you build the burst setting (NPT_KC_BURSTS) after R1's run and before R1's report; the check of a killed room's record is not built, because no kill record is named, and it is needed before the R5 runs.
+6. For your writer: I answered SYNC-ENTITIES (a) in Netcode Builder 2's chat. In the sync-cost mark PM-0001-10, "relevant entities per client" counts the other soldiers plus the vehicle hulls in the client's set.
+7. On the board, when you wait on me: set your thread to needs-musti with a due label and name the file that holds the full question, as you did with msg-2026-11-25.md.
+
+Answer in at most 6 lines.
+```
+- **Read as** (the main session's reading, not his words): U6c merges first (R1's path), as advisor-u6c-r2.md rules,
+  with H2 and H1 (his (a)); the advisor's read of both hand edits comes before its counted run; option (c)'s narrowing
+  is not taken, and the 214 in-window drops stay an open, unexplained fact. Netcode Builder 2's branch then merges in
+  one merge at 72651a3c… (plan first, its own advisor check; never overlapping U6c's), after checking that each later
+  commit there touches only its notes; then check.mjs whole and the -47 re-judge on the kept logs (MOVED, or three lines
+  to him). NPT-L2-ONEWAY is that chat's own small change-set after the merge; this chat passes the pointers. This chat
+  builds C-U6-8's three stamp tests and NPT_KC_BURSTS after R1's run, before R1's report; the killed-room check stays
+  open, before R5. SYNC-ENTITIES (a) is a writer need for -10 (U6d's interest writers).
+  Transcript record 97389ddd-c984-484f-a360-64e7d89ad784, 00:07:40 UTC, 2527 characters.

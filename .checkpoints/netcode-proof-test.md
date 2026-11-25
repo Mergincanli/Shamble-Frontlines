@@ -95,21 +95,20 @@
   test 5 Medium, security 5 Low (= Stop B's host read). Ruling advisor-u6c-r1.md (ad72c0b8…): the fix pass, then round 2
   on the diff; the readings mine; NC-U6C-12 and SEC-U6C-5 into U8 (C9). Block 2, the stamp tests, held back (C4, lever (1)).
 - **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
-  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** U6c's merge by advisor-u6c-r2.md after his NPT-EDGE-READ answer (H2
-  always, H1 on (a); H2 alone after end Fri 27, Amsterdam); M4b's head read in a reset's first 30 min; A2 logs kept (.gate/u6c/a2-logs/); MAIN-65's step 7 at 03:51 (trig_01Co9w6DYSoCbkQz5RWhK58i).
+  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** U6c's merge now by advisor-u6c-r2.md with H2 and H1 (his (a)):
+  M0-M4a by hand, M4b's head read at 03:51 with MAIN-65's step 7 (trig_01Co9w6DYSoCbkQz5RWhK58i), then M5-M9; then NB2's merge (below).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
-- For msg-2026-11-25.md (C7, R2): (1) U6b's merge fixed one test's cap: the double-load bite's start gets its own 2 s
-  on top of the 5 s (TR2-U6A-4); (2) sha2 runs optimised in debug builds, so the test build's start fits its 5 s;
-  (3) U6c's builder names the command for U6b's 48-connection reading (A2) and I take it at U6c's close. Named, not
-  mine (C4): U6c's build reached 5,426 added after Block 6 (past 5,400), so Block 2 (P2) was not built and lever (1) is
-  pulled: P2 was to ride in MOVED's brief (now question (7)). (4) Main 1ec6f6c taken in now, plan first (MAIN-64:
-  advisor-main-64.md). (5) U6c's round-1 ruling (advisor-u6c-r1.md): one fix pass, a narrow round 2, the readings at
-  U6c's close. **Decision:** NPT-L2-ONEWAY (its §5; lean (a); built by Netcode Builder 2). (6) Q-FP6-1 (b): the
-  failed-handshake count stays in the "no READY" line, its log half to U6e. (7) A question for him, not a choice: U6c's
-  held-back stamp tests (C-U6-8, ~170 lines in crates/net) built here after R1, before R1's report, their SERIES.md
-  reword after Netcode Builder 2's MOVED merge (my lean). (8) Round 2's netcode seat may read the code behind the two
-  readings' counts outside the diff; every outside-the-diff line carries a severity, may be taken before R1; a High goes to the advisor. (9) Main 28254a7 (#65) taken in now, plan first (MAIN-65), before U6c's merge.
+- For msg-2026-11-26.md: none yet. All of 11-24's are named in msg-2026-11-25.md (items 1-8 and its addendum's four).
+- **His answers of 2026-11-25 00:07 UTC (history.md:7902-7924):** NPT-EDGE-READ (a): H1 in U6c's merge, the 214
+  in-window drops stay unexplained; NPT-L2-ONEWAY (a): Netcode Builder 2's own small change-set after its merge here
+  (pointers passed); STAMP-HOME (a): mine, after R1's run, before R1's report. **NB2's merge, on his word:**
+  claude/practical-ride-igo41n at 72651a3c…, both parts in one merge, plan first, after U6c's (never overlapping); first
+  check that each later commit there touches only its notes; after it check.mjs whole, then the -47 re-judge on the kept
+  logs must read MOVED (else three lines to him). Take-overs from .checkpoints/netcode-judge.md: his 11-24 message to
+  NB2 into DECISIONS.md by script at the next docs pass; NPT_KC_BURSTS after R1's run, before R1's report; the
+  killed-room check stays open (before R5). SYNC-ENTITIES (a) for -10's writer: other soldiers + vehicle hulls in the
+  client's set. Board: when waiting on him, labels state=needs-musti and due, naming the file.
 - Earlier choices, each in its day's message: 11-23's (msg-2026-11-24.md items 1-7; card at 2a7a5b8), 11-22's
   (msg-2026-11-23.md items 1-5; card at 9341c90), 11-21's (card at 0f744ba), 11-20's history.md:7412-7433, 11-19's :7177-7193.
 
