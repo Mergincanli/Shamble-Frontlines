@@ -56,9 +56,11 @@ Filled 13:5x UTC in the 13:50 window (0b's save came 11:45, after the 08:50 wind
 (history.md:7970) until after his /compact. At sending: `<base>` = the then head, the fast-forward check re-run against
 it (`node .checkpoints/netcode-proof-test/ffcheck.mjs <worktree> 577816c <base>`: want 0 ADDED present, 0 differing).
 At 13:5x vs dc9244d: 577816c its ancestor; 222 paths (89 M, 132 A, 1 D); 0 ADDED present; 90 of 90 equal; web/ untouched.
+At 18:5x UTC (sent then) vs 7e2d6f3: the worktree's branch at 577816c, its ancestor; 225 paths (89 M, 135 A, 1 D); 0 ADDED
+present; 90 of 90 equal; web/ untouched; nothing outside .checkpoints/ changed since 76689c8; the lock's sha256 as below.
 The R-half now: Blocks R1-R4, then T5 (ii), by u7-brief.md rev 1.1 (sections 1, 3-6, 8) and the advisor's conditions
 C1-C14 (advisor-u7-brief.md:110-247, binding by pointer).
-1. `<base>` = <the then head> (at 13:5x: dc9244d): the netcode branch with U6c merged and U7's Block 0b committed at
+1. `<base>` = 7e2d6f333ae2f1dce76b96ccbc341d047e4972bb (filled 18:5x UTC; at 13:5x it was dc9244d): the netcode branch with U6c merged and U7's Block 0b committed at
    2701220 (wasm-bindgen = "=0.2.130" on npt-client-wasm, its three dev-dependencies npt-room, npt-server, npt-sim; the
    lock +4 lines, no new package); its code equals 76689c8's, where CI ran 6/6 green; the commits after it are notes
    only. Counts at `<base>`: check.mjs test measured 861, bites 958 (u7-block0b.md step 5). In your worktree, touching
@@ -74,8 +76,8 @@ C1-C14 (advisor-u7-brief.md:110-247, binding by pointer).
    (security's Q1 condition 5, security-u7-0b-answer.md:125: the cache now holds crates an unlocked offline resolve
    could pick up); spikes/netcode-proof/Cargo.lock stays as `<base>` has it (sha256 55604a5f…9f5d): if a step would
    change it, stop and report.
-3. The shared cache is still cold (1 MiB at 13:5x; emptied 06:1x UTC): your first build takes about 20-40 minutes.
-   Free 15,081 MiB at 13:5x UTC.
+3. The shared cache is still cold (1 MiB at 18:5x; emptied 06:1x UTC): your first build takes about 20-40 minutes.
+   Free 15,057 MiB at 18:5x UTC.
 4. The wasm-bindgen CLI 0.2.130 is installed (security's Q1 (b); its four checks pass: dependency-check.md's addendum)
    at /home/user/Shamble-Frontlines/.gate/u7-0b/cli-root/bin/wasm-bindgen. build.mjs takes it from NPT_WASM_BINDGEN
    (web/build.mjs:127; else PATH's wasm-bindgen), so give that variable this path for T5 (ii) and every build.mjs run.
