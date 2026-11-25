@@ -13,6 +13,13 @@
 // frames. So the window is taken early, before that point, and each sum also has a floor: a run in which the
 // names were lost fails instead of passing blind. Change-set 5 measures the mark itself another way (the whole
 // page's bytes with the hand-off on and off, and memory outside the heap).
+//
+// And, found by test-engineer: what this method charges to a block depends on how fast the page draws. Measured
+// at six viewport sizes in the container (2026-11-25): 478 bytes per block at 0.9 frames a second, 567 at 5.9,
+// 591 at 10.1, 765 at 23.2, 747 at 38.7, 629 at 60.0. The cause of the rise in the middle is not known. The
+// per-block limit below is right only for a slow page, as the container (about 6 frames a second, 5 blocks per
+// frame) and GitHub's runner (about 9, 3.3 per frame) are, so a run with fewer than 2.5 blocks per frame is
+// refused by name instead of being judged against a limit that was never measured for it.
 import { expect, test } from "@playwright/test";
 import { needsBuild, report, running } from "./report.ts";
 
@@ -61,12 +68,15 @@ test("the sampling heap profile attributes the hand-off's allocations by functio
   expect(after.blocks).toBeLessThan(420);
   expect(frames).toBeGreaterThan(20);
   expect(blocks).toBeGreaterThan(200);
-  // The clean page allocates the input message per frame (about 80 bytes; the key diagram none) and, per block, the
-  // message event's own data and one view (550 to 585 bytes before the listener is optimised). Each limit sits
-  // between that and one planted 64-byte typed array more (about 170 bytes more per frame, about 215 per block);
-  // each floor tells a run that lost the names to inlining, in part or whole, from a clean one.
+  const blocksPerFrame = blocks / frames;
+  expect(blocksPerFrame, "the page draws faster than the per-block limit was measured for: measure again").toBeGreaterThan(2.5);
+  // The clean page allocates, per frame, the input message and its list of returned buffers (about 75 bytes and 8
+  // more per buffer; the key diagram none) and, per block, the message event's own data and one view (520 to 610
+  // bytes before the listener is optimised). Each limit sits between that and one planted 64-byte typed array
+  // more (about 170 bytes more per frame, about 215 per block); each floor tells a run that lost the names to
+  // inlining, in part or whole, from a clean one.
   expect(perFrame).toBeGreaterThan(25);
-  expect(perFrame).toBeLessThan(170);
+  expect(perFrame).toBeLessThan(130 + 8 * blocksPerFrame);
   expect(perBlock).toBeGreaterThan(430);
   expect(perBlock).toBeLessThan(680);
   // PM-0002-7's own rate, far above what this page does: under 0.1 MB a second.

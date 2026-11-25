@@ -29,6 +29,22 @@ test("presses are the counters' steps, and releases follow from them and the hel
   expect(tally.takePressed()).toBe(0);
 });
 
+test("a button held again with no press is counted apart: the server took up an older state of the keys", () => {
+  const tally = new EchoTally();
+  // Pressed and held, let go, pressed and held again: every hold has its press.
+  tally.take(1, ...words({ 0: 1 }));
+  tally.take(0, ...words({ 0: 1 }));
+  tally.take(1, ...words({ 0: 2 }));
+  // A tap of another button while button 0 stays held changes nothing for button 0.
+  tally.take(1, ...words({ 0: 2, 3: 1 }));
+  expect(tally.heldWithoutPress).toBe(0);
+  // Let go, then held again with the counter where it was: no press was made. The releases do not show it.
+  tally.take(0, ...words({ 0: 2, 3: 1 }));
+  tally.take(1, ...words({ 0: 2, 3: 1 }));
+  tally.take(0, ...words({ 0: 2, 3: 1 }));
+  expect([tally.heldWithoutPress, tally.presses, tally.releases]).toEqual([1, 3, 3]);
+});
+
 test("a counter's wrap at 256 is one step, and every button has its own byte", () => {
   const tally = new EchoTally();
   for (let button = 0; button < 16; button += 1) {

@@ -158,8 +158,9 @@ impl Kind {
                 // Half the tokens are short, so that a mutation often lands on the length or the fields.
                 let cap = [16, MAX_TOKEN_BYTES][rng.below(2)];
                 let len = rng.edgy(cap);
+                rng.bytes(2, out);
                 out.extend_from_slice(&(len as u16).to_le_bytes());
-                rng.bytes(len + 34, out);
+                rng.bytes(len + 32, out);
             }
             Self::JoinAccepted => {
                 let mode_id = mode_id(rng);
@@ -418,9 +419,10 @@ fn whole_run(kind: Kind, per_half: u64) {
     );
     let largest = tally.largest;
     let cap = match kind {
+        Kind::Join => MAX_TOKEN_BYTES,
+        Kind::JoinAccepted => MAX_MODE_ID_BYTES,
+        Kind::JoinRejected | Kind::Snapshot => 0,
         Kind::Input => REDUNDANCY_CAP * size_of::<Command>(),
-        Kind::Snapshot => 0,
-        _ => MAX_TOKEN_BYTES,
     };
     assert!(
         largest <= cap,
@@ -506,7 +508,7 @@ fn a_planted_unchecked_index_is_found_within_the_run() {
 fn a_planted_over_allocation_is_found_within_the_run() {
     let mut decoders = Decoders::new(Kind::Join);
     let planted = |bytes: &[u8]| {
-        if let [KIND_JOIN, low, high, ..] = bytes {
+        if let [KIND_JOIN, _, _, low, high, ..] = bytes {
             let claimed = usize::from(u16::from_le_bytes([*low, *high]));
             black_box(Vec::<u8>::with_capacity(claimed));
         }

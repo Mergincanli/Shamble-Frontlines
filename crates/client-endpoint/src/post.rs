@@ -1,8 +1,15 @@
 //! The page's newest input, as the Worker's host hands it over once per tick. The page posts one per drawn frame
-//! and the host keeps the newest; `number` counts the page's posts and is never the protocol's command sequence.
+//! and the host keeps the newest by its number, so a post that comes late cannot roll the counts back; the
+//! endpoint takes what the host hands it. `number` counts the page's posts and is never the protocol's command
+//! sequence.
 #![cfg_attr(
     not(test),
-    deny(clippy::indexing_slicing, clippy::arithmetic_side_effects)
+    deny(
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::indexing_slicing,
+        clippy::arithmetic_side_effects
+    )
 )]
 
 use sim::BUTTONS;
@@ -39,15 +46,6 @@ impl Post {
             presses,
         }
     }
-
-    /// Whether this post is newer than `other`: its number lies 1 to 2^31 - 1 ahead, around the 32-bit circle. The
-    /// host keeps the newest post by this and never the last to arrive, so a post that comes late cannot roll the
-    /// counts back.
-    #[must_use]
-    pub const fn newer_than(&self, other: &Self) -> bool {
-        let ahead = self.number.wrapping_sub(other.number);
-        ahead != 0 && ahead < 0x8000_0000
-    }
 }
 
 #[cfg(test)]
@@ -64,20 +62,5 @@ mod tests {
             [1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0, 0, 255]
         );
         assert_eq!(Post::from_words(0, 0, [0; 4]), Post::NONE);
-    }
-
-    #[test]
-    fn a_post_is_newer_by_its_number_around_the_wrap() {
-        let post = |number| Post {
-            number,
-            ..Post::NONE
-        };
-        assert!(post(1).newer_than(&post(0)));
-        assert!(!post(0).newer_than(&post(1)));
-        assert!(!post(5).newer_than(&post(5)));
-        assert!(post(0).newer_than(&post(u32::MAX)));
-        assert!(!post(u32::MAX).newer_than(&post(0)));
-        assert!(post(0x7FFF_FFFF).newer_than(&post(0)));
-        assert!(!post(0x8000_0000).newer_than(&post(0)));
     }
 }

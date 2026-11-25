@@ -1,13 +1,20 @@
 /**
  * The page's count of what the server echoed: presses and releases, as the blocks' `echo` section shows them. The
  * page counts its own key presses (`KeyboardInput`); when both counts agree once the keys have been quiet for a
- * moment, no press and no release was lost or doubled on the way to the server and back.
+ * moment, no press and no release was lost on the way to the server and back.
+ *
+ * The presses are counted: each is a step of a counter. The releases are worked out, because the echo has no
+ * counter for them: a button pressed `n` times that is held now as it was before was also released `n` times. So a
+ * lost release shows as a release that never comes back (the button stays held), and the releases cannot show a
+ * doubled one by themselves. That is counted apart (`heldWithoutPress`): a button that shows as held with no press
+ * was let go and taken up again by the server without the player.
  */
 export class EchoTally {
   #held = 0;
   readonly #counts = new Uint8Array(16);
   #presses = 0;
   #releases = 0;
+  #heldWithoutPress = 0;
   #pressed = 0;
 
   get presses(): number {
@@ -16,6 +23,14 @@ export class EchoTally {
 
   get releases(): number {
     return this.#releases;
+  }
+
+  /**
+   * Times a button showed as held, after not being held, with no press in between: the server took up an older
+   * state of the keys. On a page whose posts reach the server in order this stays 0.
+   */
+  get heldWithoutPress(): number {
+    return this.#heldWithoutPress;
   }
 
   /**
@@ -32,6 +47,7 @@ export class EchoTally {
       const bit = 1 << button;
       this.#presses += presses;
       this.#releases += presses + Number((this.#held & bit) !== 0) - Number((held & bit) !== 0);
+      if (presses === 0 && (held & bit) !== 0 && (this.#held & bit) === 0) this.#heldWithoutPress += 1;
       if (presses !== 0) this.#pressed |= bit;
       this.#counts[button] = count;
     }

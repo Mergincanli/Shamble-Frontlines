@@ -1,5 +1,5 @@
 import { isWorkerToPage, Ring, type PageToWorker, type WorkerStats } from "@shamble/sim-worker";
-import { BLOCK_LAYOUT, checkLayoutHash } from "@shamble/types";
+import { BLOCK_BYTES, BLOCK_LAYOUT, checkLayoutHash } from "@shamble/types";
 import { EchoTally } from "./press-tally.ts";
 
 // Where the page reads in a block, from the generated layout: a section's start plus the field's place in its row.
@@ -14,8 +14,6 @@ const SENT = LINK.offset + LINK.fields.sent.offset;
 const RECEIVED = LINK.offset + LINK.fields.received.offset;
 const REFUSED = LINK.offset + LINK.fields.refused.offset;
 const POST_USED = LINK.offset + LINK.fields.post_used.offset;
-/** The length of the block's sections together: a block is never shorter. */
-const BLOCK_END = LINK.offset + LINK.stride;
 
 /** How the link reaches the Worker and stops it: the Worker itself, or a stand-in in tests. */
 export interface WorkerPort {
@@ -61,7 +59,11 @@ export class WorkerLink {
   #keyChange = 0;
   #newest: ArrayBuffer | null = null;
   #previous: ArrayBuffer | null = null;
-  #returned: ArrayBuffer[] = [];
+  // The buffers the page is done with, for the next input post: the first `#doneCount` places of a list that never
+  // shrinks. So taking a block makes no list and, once the list has its size, grows none: what a block costs does
+  // not depend on how many blocks fall between two frames.
+  readonly #done: ArrayBuffer[] = [];
+  #doneCount = 0;
   #layoutChecked = false;
   #hiddenAt: { timeMs: number; tick: number } | null = null;
   #ready = false;
@@ -75,6 +77,7 @@ export class WorkerLink {
   #received = 0;
   #refused = 0;
   #postUsed = 0;
+  #olderPosts = 0;
   #posts = 0;
   #failure = "";
   #stats: WorkerStats | null = null;
@@ -160,6 +163,14 @@ export class WorkerLink {
     return this.#postUsed;
   }
 
+  /**
+   * Ticks whose command was built from an older post than the tick before it used: the server ran the keys out of
+   * order. On a Worker that keeps the newest post by its number this stays 0.
+   */
+  get olderPosts(): number {
+    return this.#olderPosts;
+  }
+
   /** Input messages posted so far: one per drawn frame. */
   get posts(): number {
     return this.#posts;
@@ -240,9 +251,12 @@ export class WorkerLink {
     }
     if (buffer.byteLength !== this.#blockBytes) return this.#fail(`a block of ${buffer.byteLength} bytes, not ${this.#blockBytes}`);
     // The hash says the layouts agree; the length is still checked before any place past the header is read.
-    if (buffer.byteLength < BLOCK_END) return this.#fail(`a block of ${buffer.byteLength} bytes is shorter than its ${BLOCK_END} bytes of sections`);
+    if (buffer.byteLength < BLOCK_BYTES) return this.#fail(`a block of ${buffer.byteLength} bytes is shorter than its ${BLOCK_BYTES} bytes of sections`);
     this.#delivery.push(this.#now() - doneAt);
-    if (this.#previous !== null) this.#returned.push(this.#previous);
+    if (this.#previous !== null) {
+      this.#done[this.#doneCount] = this.#previous;
+      this.#doneCount += 1;
+    }
     this.#previous = this.#newest;
     this.#newest = buffer;
     this.#blocks += 1;
@@ -259,7 +273,10 @@ export class WorkerLink {
     this.#sent = view.getUint32(SENT, true);
     this.#received = view.getUint32(RECEIVED, true);
     this.#refused = view.getUint32(REFUSED, true);
-    this.#postUsed = view.getUint32(POST_USED, true);
+    const postUsed = view.getUint32(POST_USED, true);
+    // Behind the post the tick before used, around the 32-bit circle.
+    if ((postUsed - this.#postUsed) >>> 0 >= 0x8000_0000) this.#olderPosts += 1;
+    this.#postUsed = postUsed;
     // The post this tick used is the timed one or a later one, around the 32-bit circle: the tick took the change up.
     if (!Number.isNaN(this.#keyAt) && (this.#postUsed - this.#keyPost) >>> 0 < 0x8000_0000) {
       this.#keyToTick.push(startAt - this.#keyAt);
@@ -276,12 +293,12 @@ export class WorkerLink {
   /**
    * Once per drawn frame: the newest input (the buttons held, and the running press counts four to a word), with
    * the buffers the page is done with riding back to the pool. The post's number is the count of posts so far,
-   * around the 32-bit circle.
+   * around the 32-bit circle. The message and its list of buffers are made here and given away with the post.
    */
   frame(keys: KeySource): void {
     if (!this.#ready || this.#failure !== "") return;
-    const returned = this.#returned;
-    this.#returned = [];
+    const returned = this.#done.slice(0, this.#doneCount);
+    this.#doneCount = 0;
     this.#posts += 1;
     const post = this.#posts >>> 0;
     if (keys.changedAt !== this.#keyChange && Number.isNaN(this.#keyAt)) {

@@ -76,6 +76,12 @@ test("it keeps the two newest blocks and sends the older ones back with the next
   expect(link.posts).toBe(2);
   expect(link.delivery.count).toBe(4);
   expect(link.delivery.max()).toBe(2);
+  // Each post has a list of its own, exactly as long as it needs, and a list given away is never touched again.
+  const given = sent.slice(-2).map((entry) => entry.transfer);
+  deliver(5);
+  link.frame(NO_KEYS);
+  expect(sent.at(-1)?.transfer).toEqual([blocks[2]]);
+  expect(given).toEqual([[blocks[0], blocks[1]], []]);
 });
 
 test("the first block of every Worker start is checked, also after blocks were accepted", () => {
@@ -192,12 +198,18 @@ test("the echo and the link's counts are read from every block, and a block too 
   // Held: buttons 0 and 5. Counts: button 0 once, button 5 twice. Then sent, received, refused, the post used.
   const first = block(1, LAYOUT_HASH, 44, [0x21, 1, 0x0200, 0, 0, 7, 8, 0, 6]);
   expect(link.onMessage({ type: "block", buffer: first, startAt: 0, doneAt: 0 })).toBe("");
-  expect(link).toMatchObject({ echoHeld: 0x21, sent: 7, received: 8, refused: 0, postUsed: 6 });
+  expect(link).toMatchObject({ echoHeld: 0x21, sent: 7, received: 8, refused: 0, postUsed: 6, olderPosts: 0 });
   expect([link.echo.presses, link.echo.releases]).toEqual([3, 1]);
   // Every block counts, also one the frame loop never looks at: two more presses of button 0, and both let go.
   for (const count of [2, 3]) link.onMessage({ type: "block", buffer: block(count, LAYOUT_HASH, 44, [0, count, 0x0200, 0, 0, 9, 9, 2, 8]), startAt: 0, doneAt: 0 });
-  expect(link).toMatchObject({ echoHeld: 0, refused: 2, postUsed: 8 });
+  expect(link).toMatchObject({ echoHeld: 0, refused: 2, postUsed: 8, olderPosts: 0 });
   expect([link.echo.presses, link.echo.releases, link.echo.takePressed()]).toEqual([5, 5, 0x21]);
+  // A tick that used post 7 after a tick used post 8 ran the keys out of order, and so does one across the wrap;
+  // the same post again, or a later one, did not. Button 0 held again with no press is counted apart.
+  for (const [postUsed, held] of [[7, 1], [7, 1], [0xffff_fffe, 0], [1, 0], [0xffff_ffff, 0]] as const) {
+    link.onMessage({ type: "block", buffer: block(4, LAYOUT_HASH, 44, [held, 3, 0x0200, 0, 0, 9, 9, 2, postUsed]), startAt: 0, doneAt: 0 });
+  }
+  expect([link.olderPosts, link.echo.heldWithoutPress, link.echo.presses]).toEqual([3, 1, 5]);
 
   // A Worker whose blocks pass the hash and are shorter than the layout's sections: refused before any read past the header.
   const short = setUp();

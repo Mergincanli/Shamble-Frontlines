@@ -283,7 +283,9 @@
 
 ## Size so far (counted as 3a was: added lines under `crates/`, `packages/`, `.gitignore` and the root manifests; lockfiles and generated or fixture files apart)
 - **After steps 1 to 6 and 3A-FROM-F64: 5,825 added lines** (plus 102 in generated and fixture files), against
-  about 3,095 planned for them: 1.9 times. The stop line is 7,600; the review fixes are still to come.
+  about 3,095 planned for them: 1.9 times. **After the fix pass of round 1: 6,528** (plus 105): the fixes added
+  about 700, of which `any_bytes.rs` is 403. The stop line is 7,600; round 2's fixes are still to come. He was
+  told the 6,500 on 2026-11-25, about 01:56 UTC.
 - **The ladder was used:** the link simulator (its rate limit and duplication, then the whole of it) and the first
   recording, each with its tests, are change-set 3c's, built right after 3b and before change-set 4. **He was told
   in three lines on 2026-11-24, about 23:56 UTC, before anything moved** (his message of 23:24:50 UTC, point 4;
@@ -305,8 +307,16 @@ sim 17, 5, 1; client 83, sim-worker 46, types 7, net 1; the seven type checks; b
 tests in 3.3 minutes (the loop 1,823 ticks, 128 presses and releases made and echoed, 0 doubled, 0 older posts;
 the press test 10,000 presses and releases, 505 posts delayed, 46 sent twice, 46 sent behind a newer one, 46
 ignored by the Worker, 0 ticks ran an older post, 0 refused; allocation 102 bytes a frame, 576 a block); the
-players' Wasm 53,783 bytes (21,983 gzip, 18,368 brotli), sha256 cd63b871...86e7. Planted defects: 44 now; their
-run on the fixed tree is in `.gate/cs3b/plants-3b-run2.log` (scratch).
+players' Wasm 53,783 bytes (21,983 gzip, 18,368 brotli), sha256
+cd63b8718f7b0ba0d461f50e683dd42d7c37e7d2305923af4bb199ecf47686e7. **Planted defects: 44 of 44 caught on the fixed
+tree (2026-11-25, 01:58:23 UTC; `.gate/cs3b/plants-3b-run2.log`, scratch)**, among them the test reviewer's whole
+second bite (`bite-counted-taken`, caught at `expect(end.olderPosts).toBe(0)`); afterwards the true tree was built
+again and gives the same Wasm.
+
+**What CI must show on the fix pass's commit (written before the push):** cargo debug, twice: 26, 3, 2, 19, 8,
+13, 17, 5, 1, 13, 2, 1, 1 (111); release: protocol 19 and 8, sim 17, 5 and 1; client 83, sim-worker 46, types 7,
+net 1, the browser package's Node project 1; boundary 2 files and 18 tests; 16 browser tests inside the 5 minutes;
+the players' Wasm 53,783 bytes with the sha256 above.
 
 **CI, read line by line (before the fix pass):** green on d117fca5 and on eb0d2314 (toolchain run 45520531338,
 4 min 55 s of 15; 16 browser tests in 3.4 of 5 minutes; every count as written before the push).

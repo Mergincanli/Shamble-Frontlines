@@ -49,7 +49,8 @@ test("a one-minute local match: keys go to the local server through the real mes
   );
   // Every press and every release came back exactly once.
   expect(end.presses).toEqual({ made: 11 + taps, echoed: 11 + taps, lost: 0 });
-  expect(end.releases).toEqual({ made: 11 + taps, echoed: 11 + taps });
+  expect(end.releases).toEqual({ made: 11 + taps, echoed: 11 + taps, doubled: 0 });
+  expect(end.olderPosts).toBe(0);
   // A key change is timed when a frame posts it; on a slow page a key's down and up share one frame.
   expect(end.keyToTickCount).toBeGreaterThan(taps / 2);
   // The match ran for the minute at its rate: a tick never runs early, and no more than a second's worth is missing.

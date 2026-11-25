@@ -1,7 +1,8 @@
 //! The client endpoint's side of the message exchange (ADR 0001 parts 5 and 6; ADR 0002 part 6): it asks to join,
-//! builds each tick's command from the page's newest post, sends every command the room has not confirmed, and
-//! reads the room's snapshots. It moves no bytes itself: whoever holds the transport hands it what arrived and
-//! sends what it wrote. It never panics on bytes from the link, allocates nothing per tick, and reads no clock.
+//! holds the page's newest post, builds each tick's command from it, sends every command the room has not
+//! confirmed, reads the room's snapshots and writes the block for the page. It moves no bytes itself: whoever holds
+//! the transport hands it what arrived and sends what it wrote. It never panics on bytes from the link, allocates
+//! nothing per tick, and reads no clock.
 #![cfg_attr(
     not(test),
     deny(
@@ -22,6 +23,7 @@ use protocol::messages::{
 use protocol::wrap::{press_edges, seq_newer, ticks_after};
 use sim::{BUTTONS, TICK_HZ};
 
+use crate::block::BlockWriter;
 use crate::post::Post;
 use crate::press::PressPacer;
 
@@ -64,8 +66,13 @@ pub struct Readout {
     /// `Input` messages written, and snapshots taken.
     pub sent: u32,
     pub received: u32,
-    /// Messages not taken: bytes that were none, a snapshot that was not newer, anything before the join.
+    /// Datagrams that were no snapshot: refused.
     pub refused: u32,
+    /// Snapshots that were well formed and not taken: not newer than the newest taken (a link may deliver one
+    /// late or twice), or before the join was answered. Not a refusal: an honest room over a lossy link causes it.
+    pub late: u32,
+    /// Inputs the endpoint could not write. None can occur: every command it sends fits the wire form.
+    pub unsent: u32,
     /// Presses the room's echo lacks, or has too many of, against the command it says it ran.
     pub presses_lost: u32,
     pub presses_doubled: u32,
@@ -80,9 +87,12 @@ struct Sent {
     post: Post,
 }
 
+/// One client's side of a match: the join, the commands, the snapshots, and the block the page reads.
 pub struct Endpoint {
     content_hash: [u8; 32],
     state: EndpointState,
+    /// The page's newest post, as the host handed it over.
+    post: Post,
     pacer: PressPacer,
     next_sequence: u16,
     /// The tick of the next command: one after the first snapshot's, then one more per command.
@@ -96,16 +106,22 @@ pub struct Endpoint {
     /// The message under construction, reused every tick.
     input: Input,
     readout: Readout,
+    writer: BlockWriter,
 }
 
 impl Endpoint {
     /// An endpoint for the content with this hash, whose first command has this sequence (0 in play; near the
-    /// 16-bit wrap in the tests of the wraps).
+    /// 16-bit wrap in the tests of the wraps), with a block padded by `pad_bytes` (0 in play). The block is whole
+    /// from the start. `None` when `pad_bytes` is more padding than the block writer takes.
     #[must_use]
-    pub fn new(content_hash: [u8; 32], first_sequence: u16) -> Self {
-        Self {
+    pub fn new(content_hash: [u8; 32], first_sequence: u16, pad_bytes: u32) -> Option<Self> {
+        let readout = Readout::default();
+        let mut writer = BlockWriter::new(pad_bytes)?;
+        writer.write(&readout, 0);
+        Some(Self {
             content_hash,
             state: EndpointState::Joining,
+            post: Post::NONE,
             pacer: PressPacer::default(),
             next_sequence: first_sequence,
             next_tick: None,
@@ -117,8 +133,9 @@ impl Endpoint {
                 acks: Vec::with_capacity(1),
                 commands: Vec::with_capacity(REDUNDANCY_CAP),
             },
-            readout: Readout::default(),
-        }
+            readout,
+            writer,
+        })
     }
 
     #[must_use]
@@ -136,7 +153,32 @@ impl Endpoint {
         &self.pacer
     }
 
-    /// Writes the `Join` into `out`, for the control channel. Local play has no token.
+    /// The page's newest post, from the host. The host keeps the newest post by its number and hands that one
+    /// over once per tick; the endpoint takes what it is given.
+    pub const fn set_post(&mut self, post: Post) {
+        self.post = post;
+    }
+
+    /// The block's bytes. Their address does not change for the life of the endpoint.
+    #[must_use]
+    pub fn block(&self) -> &[u8] {
+        self.writer.bytes()
+    }
+
+    #[must_use]
+    pub const fn block_len(&self) -> u32 {
+        self.writer.byte_len()
+    }
+
+    /// Writes the block for the page from what the endpoint knows now. `refused_elsewhere` is added to the block's
+    /// count of refused messages: in local play, what the local server and the link refused.
+    pub fn write_block(&mut self, refused_elsewhere: u32) {
+        let refused = self.readout.refused.wrapping_add(refused_elsewhere);
+        self.writer.write(&self.readout, refused);
+    }
+
+    /// Writes the `Join` into `out`, for the control channel, and says whether it did. Local play has no token.
+    #[must_use]
     pub fn join(&self, out: &mut Vec<u8>) -> bool {
         let join = Join {
             token: Vec::new(),
@@ -177,69 +219,85 @@ impl Endpoint {
     }
 
     /// Builds the next tick's command from the page's newest post and writes the `Input` that carries it into
-    /// `out`: the newest snapshot as the ack, then that command and every earlier one the room has not confirmed,
-    /// the newest first, up to the cap. False, with nothing to send, until the join is accepted and the first
-    /// snapshot has said which tick the room runs next.
-    pub fn build_input(&mut self, post: &Post, out: &mut Vec<u8>) -> bool {
+    /// `out`: the newest snapshot as the ack, then that command, always, and after it every earlier one the room
+    /// has not confirmed, the newest first, up to the cap. False, with nothing to send, until the join is accepted
+    /// and the first snapshot has said which tick the room runs next.
+    #[must_use]
+    pub fn build_input(&mut self, out: &mut Vec<u8>) -> bool {
         let (EndpointState::Joined, Some(tick)) = (self.state, self.next_tick) else {
             return false;
         };
         let sequence = self.next_sequence;
-        let command = Sent {
+        let newest = Sent {
             sequence,
             tick,
             view_tick: self.newest_snapshot.unwrap_or(0),
             post: Post {
-                presses: self.pacer.next(&post.presses),
-                ..*post
+                presses: self.pacer.next(&self.post.presses),
+                ..self.post
             },
         };
         if let Some(place) = self.sent.get_mut(usize::from(sequence & RING_MASK)) {
-            *place = Some(command);
+            *place = Some(newest);
         }
         self.input.acks.clear();
         self.input.commands.clear();
         let ack = |tick| SnapshotAck { group: 0, tick };
         self.input.acks.extend(self.newest_snapshot.map(ack));
-        for back in 0..REDUNDANCY_CAP {
-            let earlier = sequence.wrapping_sub(u16::try_from(back).unwrap_or(u16::MAX));
-            let unconfirmed = self.confirmed.is_none_or(|seen| seq_newer(earlier, seen));
-            let Some(sent) = self.sent(earlier).filter(|_| unconfirmed).copied() else {
-                break;
-            };
+        // The newest command goes whatever the room confirmed; a repeat goes while the room has not confirmed it
+        // and it lies 1 to 255 ticks before the command ahead of it, which is what the wire can say.
+        let mut ahead = newest;
+        for _ in 0..REDUNDANCY_CAP {
             self.input.commands.push(Command {
-                tick: sent.tick,
-                sequence: sent.sequence,
+                tick: ahead.tick,
+                sequence: ahead.sequence,
                 move_x: 0,
                 move_y: 0,
-                buttons: sent.post.buttons,
-                presses: sent.post.presses,
+                buttons: ahead.post.buttons,
+                presses: ahead.post.presses,
                 aim: AimPoint { x: 0, y: 0, z: 0 },
                 view_time: ViewTime {
-                    tick: sent.view_tick,
+                    tick: ahead.view_tick,
                     fraction: 0,
                 },
             });
+            let earlier = ahead.sequence.wrapping_sub(1);
+            let unconfirmed = self.confirmed.is_none_or(|seen| seq_newer(earlier, seen));
+            let fits = |sent: &&Sent| {
+                let gap = ticks_after(sent.tick, ahead.tick);
+                unconfirmed && gap.is_some_and(|gap| (1..=255).contains(&gap))
+            };
+            let Some(sent) = self.sent(earlier).filter(fits).copied() else {
+                break;
+            };
+            ahead = sent;
         }
         self.next_sequence = sequence.wrapping_add(1);
         // At the last tick there is no next command: the world itself stops there.
         self.next_tick = tick.checked_add(1);
-        self.readout.sent = self.readout.sent.wrapping_add(1);
-        encode_input(&self.input, out).is_ok()
+        let written = encode_input(&self.input, out).is_ok();
+        let count = if written {
+            &mut self.readout.sent
+        } else {
+            &mut self.readout.unsent
+        };
+        *count = count.wrapping_add(1);
+        written
     }
 
-    /// Takes a datagram from the room: a snapshot. One that is not newer than the newest taken, or that comes
-    /// before the join is accepted, is counted and dropped, as are bytes that are no snapshot.
+    /// Takes a datagram from the room: a snapshot. Bytes that are no snapshot are refused and counted. A snapshot
+    /// that is not newer than the newest taken, or that comes before the join is accepted, is dropped and counted
+    /// apart, as late: a link that delivers late or twice causes it, and nobody did wrong.
     pub fn on_datagram(&mut self, bytes: &[u8]) {
-        let newest = self.newest_snapshot;
-        let taken = decode_snapshot(bytes).ok().filter(|snapshot| {
-            let newer = |newest| ticks_after(newest, snapshot.server_tick).is_some_and(|by| by > 0);
-            self.state == EndpointState::Joined && newest.is_none_or(newer)
-        });
-        let Some(snapshot) = taken else {
+        let Ok(snapshot) = decode_snapshot(bytes) else {
             self.readout.refused = self.readout.refused.wrapping_add(1);
             return;
         };
+        let newer = |newest| ticks_after(newest, snapshot.server_tick).is_some_and(|by| by > 0);
+        if self.state != EndpointState::Joined || !self.newest_snapshot.is_none_or(newer) {
+            self.readout.late = self.readout.late.wrapping_add(1);
+            return;
+        }
         self.newest_snapshot = Some(snapshot.server_tick);
         self.readout.tick = snapshot.server_tick;
         self.readout.received = self.readout.received.wrapping_add(1);
@@ -338,9 +396,13 @@ mod tests {
         }
     }
 
+    fn endpoint(first_sequence: u16) -> Endpoint {
+        Endpoint::new(HASH, first_sequence, 0).expect("no padding is allowed")
+    }
+
     /// An endpoint that has joined and taken the snapshot of tick 100.
     fn joined(first_sequence: u16) -> Endpoint {
-        let mut endpoint = Endpoint::new(HASH, first_sequence);
+        let mut endpoint = endpoint(first_sequence);
         endpoint.on_control(&accepted(30, HASH)).expect("accepted");
         endpoint.on_datagram(&snapshot(100, None, [0; BUTTONS]));
         endpoint
@@ -348,15 +410,16 @@ mod tests {
 
     /// The `Input` the endpoint writes for this post, decoded again.
     fn input(endpoint: &mut Endpoint, post: &Post) -> Input {
-        let (mut bytes, mut input) = (Vec::new(), Endpoint::new(HASH, 0).input);
-        assert!(endpoint.build_input(post, &mut bytes));
+        let (mut bytes, mut input) = (Vec::new(), self::endpoint(0).input);
+        endpoint.set_post(*post);
+        assert!(endpoint.build_input(&mut bytes));
         decode_input(&bytes, &mut input).expect("the endpoint writes a valid input");
         input
     }
 
     #[test]
     fn the_join_exchange_ends_joined_rejected_or_refused_by_name() {
-        let mut endpoint = Endpoint::new(HASH, 0);
+        let mut endpoint = endpoint(0);
         let mut bytes = Vec::new();
         assert!(endpoint.join(&mut bytes));
         let join = Join {
@@ -365,10 +428,11 @@ mod tests {
             content_hash: HASH,
         };
         assert_eq!(decode_control(&bytes), Ok(Control::Join(join)));
-        // Nothing to send before the answer, and a snapshot before it is not taken.
-        assert!(!endpoint.build_input(&Post::NONE, &mut bytes));
+        // Nothing to send before the answer, and a snapshot before it is not taken: late, not refused.
+        assert!(!endpoint.build_input(&mut bytes));
         endpoint.on_datagram(&snapshot(5, None, [0; BUTTONS]));
-        assert_eq!(endpoint.readout().refused, 1);
+        let readout = endpoint.readout();
+        assert_eq!((readout.late, readout.refused, readout.received), (1, 0, 0));
         // What is not the answer waited for leaves the endpoint joining.
         let refusals = [
             (vec![0xFF], EndpointError::Decode(DecodeError::Kind(0xFF))),
@@ -387,14 +451,14 @@ mod tests {
             endpoint.on_control(&accepted(30, HASH)),
             Err(EndpointError::Unexpected)
         );
-        assert!(!endpoint.build_input(&Post::NONE, &mut bytes));
+        assert!(!endpoint.build_input(&mut bytes));
 
-        let mut refused = Endpoint::new(HASH, 0);
+        let mut refused = self::endpoint(0);
         let reason = RejectReason::RoomFull;
         let rejected = control_bytes(&Control::JoinRejected(JoinRejected { reason }));
         assert_eq!(refused.on_control(&rejected), Ok(()));
         assert_eq!(refused.state(), EndpointState::Rejected(reason));
-        assert!(!refused.build_input(&Post::NONE, &mut bytes));
+        assert!(!refused.build_input(&mut bytes));
     }
 
     #[test]
@@ -498,14 +562,72 @@ mod tests {
         ] {
             endpoint.on_datagram(&bytes);
         }
-        let refused = Readout {
-            refused: 3,
+        // Two honest late snapshots and one piece of nonsense: counted apart, and nothing else moves.
+        let after = Readout {
+            late: 2,
+            refused: 1,
             ..before
         };
-        assert_eq!(*endpoint.readout(), refused);
+        assert_eq!(*endpoint.readout(), after);
         // The dropped snapshot's confirmation was not taken either: the first command is still sent again.
         input(&mut endpoint, &post(1, 0));
         assert_eq!(input(&mut endpoint, &post(2, 0)).commands.len(), 2);
+    }
+
+    /// The room confirms a sequence the endpoint has not sent yet (a room that counts wrong, or bytes changed on
+    /// the way that still decode): the newest command goes all the same, alone.
+    #[test]
+    fn the_newest_command_goes_whatever_the_room_confirmed() {
+        let mut endpoint = joined(0);
+        input(&mut endpoint, &post(1, 0));
+        endpoint.on_datagram(&snapshot(101, Some(500), [0; BUTTONS]));
+        for sequence in 1..=3u16 {
+            let input = input(&mut endpoint, &post(u32::from(sequence) + 1, 0));
+            let sequences: Vec<u16> = input
+                .commands
+                .iter()
+                .map(|command| command.sequence)
+                .collect();
+            assert_eq!(sequences, [sequence]);
+        }
+        assert_eq!((endpoint.readout().sent, endpoint.readout().unsent), (4, 0));
+    }
+
+    /// The endpoint writes the page's block itself: whole before the first snapshot, and after `write_block` it
+    /// holds the newest readout, with what was refused elsewhere added to the endpoint's own count.
+    #[test]
+    fn the_block_is_whole_from_the_start_and_follows_the_readout() {
+        use crate::layout::{BLOCK_BYTES, field, section_offset};
+        let read = |endpoint: &Endpoint, section: &str, name: &str| {
+            let start = section_offset(section).expect("the layout names the section");
+            let at = (start + field(section, name).expect("and the field").offset) as usize;
+            let bytes: [u8; 4] = endpoint.block()[at..at + 4].try_into().expect("four bytes");
+            u32::from_le_bytes(bytes)
+        };
+        let mut endpoint = endpoint(0);
+        assert_eq!(endpoint.block().len(), BLOCK_BYTES as usize);
+        assert_eq!(endpoint.block_len(), BLOCK_BYTES);
+        let place = endpoint.block().as_ptr();
+        // Whole before anything arrived: the layout's hash is there, so the page can check its first read.
+        assert_eq!(
+            read(&endpoint, "header", "layout_hash"),
+            crate::layout::LAYOUT_HASH
+        );
+        assert_eq!(read(&endpoint, "header", "tick"), 0);
+        assert!(Endpoint::new(HASH, 0, u32::MAX).is_none());
+
+        endpoint.on_control(&accepted(30, HASH)).expect("accepted");
+        endpoint.on_datagram(&snapshot(100, None, [0; BUTTONS]));
+        endpoint.on_datagram(&[1, 2]);
+        input(&mut endpoint, &post(1, 0));
+        // Nothing reaches the page until the block is written.
+        assert_eq!(read(&endpoint, "header", "tick"), 0);
+        endpoint.write_block(40);
+        assert_eq!(read(&endpoint, "header", "tick"), 100);
+        assert_eq!(read(&endpoint, "link", "sent"), 1);
+        assert_eq!(read(&endpoint, "link", "received"), 1);
+        assert_eq!(read(&endpoint, "link", "refused"), 41);
+        assert_eq!(endpoint.block().as_ptr(), place);
     }
 
     /// A thousand ticks of the exchange: the endpoint's two reused buffers stay where they are.
@@ -524,7 +646,8 @@ mod tests {
         };
         let before = places(&endpoint, &out);
         for tick in 0..1000u16 {
-            assert!(endpoint.build_input(&post(u32::from(tick), tick.to_le_bytes()[0]), &mut out));
+            endpoint.set_post(post(u32::from(tick), tick.to_le_bytes()[0]));
+            assert!(endpoint.build_input(&mut out));
             if tick % 3 != 0 {
                 let ran = Some(tick);
                 endpoint.on_datagram(&snapshot(101 + u32::from(tick), ran, [0; BUTTONS]));

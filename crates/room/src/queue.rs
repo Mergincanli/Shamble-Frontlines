@@ -29,11 +29,12 @@ pub enum Inserted {
     Full,
 }
 
+/// One player's waiting commands, the oldest sequence first.
 pub struct CommandQueue {
     /// The first `len` wait, the oldest sequence first.
     waiting: [Queued; QUEUE_LEN],
     len: usize,
-    /// The sequence of the last command taken out.
+    /// The sequence of the last command taken out; before the first, one below the first command offered.
     taken: Option<u16>,
 }
 
@@ -64,12 +65,12 @@ impl CommandQueue {
         self.len == 0
     }
 
-    /// Puts a command in its place by sequence.
+    /// Puts a command in its place by sequence. Before anything was taken out, the first command offered opens
+    /// the window: whatever lies behind it is stale. So every waiting command lies within half the sequence
+    /// circle of the last one taken, and no spread of sequences can turn their order round.
     pub fn insert(&mut self, new: Queued) -> Inserted {
-        if self
-            .taken
-            .is_some_and(|taken| !seq_newer(new.sequence, taken))
-        {
+        let taken = *self.taken.get_or_insert(new.sequence.wrapping_sub(1));
+        if !seq_newer(new.sequence, taken) {
             return Inserted::Stale;
         }
         let waiting = self.waiting.get(..self.len).unwrap_or(&[]);
@@ -133,7 +134,7 @@ mod tests {
     fn commands_come_out_in_sequence_whatever_order_they_came_in() {
         let mut queue = CommandQueue::default();
         assert!(queue.is_empty());
-        for sequence in [5, 3, 4, 7, 6] {
+        for sequence in [3, 5, 4, 7, 6] {
             assert_eq!(queue.insert(queued(sequence, 1)), Inserted::Queued);
         }
         assert_eq!(queue.insert(queued(4, 1)), Inserted::Duplicate);
@@ -162,12 +163,25 @@ mod tests {
     #[test]
     fn the_order_holds_across_the_sequence_wrap() {
         let mut queue = CommandQueue::default();
-        for sequence in [1, 65_534, 0, 65_535] {
+        for sequence in [65_534, 1, 0, 65_535] {
             assert_eq!(queue.insert(queued(sequence, 1)), Inserted::Queued);
         }
         assert_eq!(drain(&mut queue), [65_534, 65_535, 0, 1]);
         assert_eq!(queue.insert(queued(65_535, 1)), Inserted::Stale);
         assert_eq!(queue.insert(queued(2, 1)), Inserted::Queued);
+    }
+
+    /// A client that spreads its sequences round the circle before the first command runs: the first one offered
+    /// opens the window, what lies behind it or half the circle away is stale, and nothing comes out twice.
+    #[test]
+    fn a_spread_of_sequences_before_the_first_command_runs_nothing_twice() {
+        let mut queue = CommandQueue::default();
+        let offered = [0, 40_000, 20_000, 0, 65_535, 32_767, 32_768];
+        let kept = offered.map(|sequence| queue.insert(queued(sequence, 1)));
+        let (yes, stale) = (Inserted::Queued, Inserted::Stale);
+        let twice = Inserted::Duplicate;
+        assert_eq!(kept, [yes, stale, yes, twice, stale, stale, stale]);
+        assert_eq!(drain(&mut queue), [0, 20_000]);
     }
 
     #[test]

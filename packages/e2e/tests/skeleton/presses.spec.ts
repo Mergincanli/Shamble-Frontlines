@@ -8,7 +8,10 @@
 //
 // The mark's two bites are planted by hand and by the verifier, not here: a Worker that passes only the held
 // buttons on (taps then never reach the server), and a Worker that takes the last post to arrive in place of the
-// newest (a late post rolls the counts back).
+// newest. The second one rolls the held keys back, never the press counts (the endpoint ignores a count that goes
+// backwards), so it shows where the page looks for it: a tick that ran an older post than the tick before, and a
+// button held again with no press. The Worker's own count of the posts it ignored is checked too, but a Worker
+// that counts a late post and takes it all the same must still fail.
 import { expect, test } from "@playwright/test";
 import { needsBuild, report, running } from "./report.ts";
 
@@ -31,21 +34,30 @@ test("10,000 presses under late, reordered and repeated posts: none lost, none d
       state ^= state << 5;
       return (state >>> 0) / 0x1_0000_0000;
     };
-    const shim = window as unknown as { __shim: { posts: number; twice: number } };
-    shim.__shim = { posts: 0, twice: 0 };
-    const copies: { message: object; after: number }[] = [];
+    const shim = window as unknown as { __shim: { posts: number; twice: number; reordered: number } };
+    shim.__shim = { posts: 0, twice: 0, reordered: 0 };
+    const copies: { message: { post: number }; after: number }[] = [];
     const send = Worker.prototype.postMessage as (this: Worker, message: unknown, transfer: Transferable[]) => void;
+    // A post goes out after its wait; one that goes out behind a newer one is counted as reordered.
+    let newest = 0;
+    const later = (worker: Worker, message: { post: number }, list: Transferable[], waitMs: number): void => {
+      setTimeout(() => {
+        if (message.post <= newest) shim.__shim.reordered += 1;
+        newest = Math.max(newest, message.post);
+        send.call(worker, message, list);
+      }, waitMs);
+    };
     Worker.prototype.postMessage = function (this: Worker, message: unknown, transfer?: unknown): void {
       const list = Array.isArray(transfer) ? (transfer as Transferable[]) : [];
       if ((message as { type?: unknown }).type !== "input") return send.call(this, message, list);
       const posts = (shim.__shim.posts += 1);
-      setTimeout(() => send.call(this, message, list), 100 * random());
+      later(this, message as { post: number }, list, 100 * random());
       while (copies[0] !== undefined && copies[0].after <= posts) {
         const late = copies.shift()?.message;
         shim.__shim.twice += 1;
-        setTimeout(() => send.call(this, late, []), 100 + 100 * random());
+        if (late !== undefined) later(this, late, [], 100 + 100 * random());
       }
-      if (random() < 0.1) copies.push({ message: { ...(message as object), returned: [] }, after: posts + 2 });
+      if (random() < 0.1) copies.push({ message: { ...(message as { post: number }), returned: [] } as { post: number }, after: posts + 2 });
     };
   });
   await page.goto("/");
@@ -102,20 +114,28 @@ test("10,000 presses under late, reordered and repeated posts: none lost, none d
   await settled.catch(() => undefined);
   await page.waitForTimeout(1000);
   const end = await report(page);
-  const shim = await page.evaluate(() => (window as unknown as { __shim: { posts: number; twice: number } }).__shim);
+  const shim = await page.evaluate(() => (window as unknown as { __shim: { posts: number; twice: number; reordered: number } }).__shim);
   console.log(
     `presses under the shim: ${JSON.stringify(end.presses)}, releases ${JSON.stringify(end.releases)} in ${((Date.now() - started) / 1000).toFixed(1)} s; ` +
-      `${shim.posts} posts delayed, ${shim.twice} sent twice; the Worker ignored ${end.worker?.stalePosts} late or repeated posts; ` +
+      `${shim.posts} posts delayed, ${shim.twice} sent twice, ${shim.reordered} sent behind a newer one; ` +
+      `the Worker ignored ${end.worker?.stalePosts} late or repeated posts; ${end.olderPosts} ticks ran an older post; ` +
       `messages ${JSON.stringify(end.messages)}; ticks ${end.tick}, drops ${end.worker?.drops}`,
   );
-  // Not one press and not one release lost or doubled.
+  // Not one press lost or doubled.
   expect(end.presses).toEqual({ made: PRESSES, echoed: PRESSES, lost: 0 });
-  expect(end.releases).toEqual({ made: PRESSES, echoed: PRESSES });
-  // The shim did its work: posts came late and twice, each second copy behind two newer posts, and the Worker took
-  // the newest by number every time (the last copies may still be on their way).
+  // No tick ran an older post than the tick before it: the server took the keys in the order the page made them.
+  expect(end.olderPosts).toBe(0);
+  // Not one release lost (every button came up again) or doubled (none was held again with no press).
+  expect(end.releases).toEqual({ made: PRESSES, echoed: PRESSES, doubled: 0 });
+  // The shim did its work, or the run says nothing: posts came late, twice and behind newer ones.
   expect(shim.twice).toBeGreaterThan(shim.posts / 20);
-  expect(end.worker?.stalePosts ?? 0).toBeGreaterThanOrEqual(shim.twice - 2);
-  // Nothing was refused on the way: no late post reached the simulation.
+  expect(shim.reordered).toBeGreaterThanOrEqual(shim.twice);
+  // The Worker's own count agrees: it ignored every post that came behind a newer one (the last few may still be
+  // on their way to it, or in its next report).
+  const ignored = end.worker?.stalePosts ?? 0;
+  expect(ignored).toBeLessThanOrEqual(shim.reordered);
+  expect(ignored).toBeGreaterThanOrEqual(shim.reordered - 3);
+  // Nothing was refused on the way.
   expect(end.messages.refused).toBe(0);
   expect(end.errors).toBe(0);
 });

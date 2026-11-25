@@ -11,8 +11,9 @@ export interface Report {
   posts: number;
   messages: { sent: number; received: number; refused: number };
   postUsed: number;
+  olderPosts: number;
   presses: { made: number; echoed: number; lost: number | null };
-  releases: { made: number; echoed: number };
+  releases: { made: number; echoed: number; doubled: number };
   keyToTickP50: number;
   keyToTickP95: number;
   keyToTickCount: number;

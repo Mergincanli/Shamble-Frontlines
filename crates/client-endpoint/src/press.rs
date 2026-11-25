@@ -1,60 +1,75 @@
 //! The press pacer: from the page's running press counts to the counters a command carries (ADR 0001 part 5). The
 //! room takes at most one press per button per tick, so a button's counter moves by at most one per command and
-//! the rest waits its turn: a second tap inside one tick is applied one tick later and never dropped (Mustafa's
-//! answer PRESS-PACE (a), 2026-11-23). A tap shorter than a frame is not lost, because the page counted it, and a
-//! command that is sent twice does not double it, because it carries counters and not edges.
+//! the rest waits its turn: a second tap inside one tick is applied one tick later (Mustafa's answer PRESS-PACE
+//! (a), 2026-11-23). A tap shorter than a frame is not lost, because the page counted it, and a command that is
+//! sent twice does not double it, because it carries counters and not edges.
+//!
+//! The wait has a bound: at most `MAX_BACKLOG` presses of one button wait, and a press beyond that is dropped and
+//! counted. Only a machine gets there (more than 30 presses a second on one key for over 8 seconds); the page shows
+//! such a press as lost. How large the bound may be is a design question for when a press fires a weapon.
 #![cfg_attr(
     not(test),
-    deny(clippy::indexing_slicing, clippy::arithmetic_side_effects)
+    deny(
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::indexing_slicing,
+        clippy::arithmetic_side_effects
+    )
 )]
 
 use protocol::wrap::press_edges;
 use sim::BUTTONS;
 
-/// The most presses of one button that wait their turn; a person never reaches it.
+/// The most presses of one button that wait their turn.
 pub const MAX_BACKLOG: u16 = 255;
 
+/// One button: the page's count as of the last call, the presses the page counted that no command has carried
+/// yet, and the counter of the last command.
+#[derive(Clone, Copy, Default)]
+struct Button {
+    seen: u8,
+    waiting: u16,
+    counter: u8,
+}
+
+/// Paces one player's presses, button by button.
 #[derive(Default)]
 pub struct PressPacer {
-    /// The page's counts as of the last call.
-    seen: [u8; BUTTONS],
-    /// Presses the page counted that no command has carried yet.
-    waiting: [u16; BUTTONS],
-    /// The counters of the last command.
-    counters: [u8; BUTTONS],
+    buttons: [Button; BUTTONS],
     flooded: u32,
     backwards: u32,
 }
 
 impl PressPacer {
     /// The counters of the next command, given the page's counts now: each button with a press waiting moves by
-    /// one. A count that went backwards is ignored and counted (it is 128 or more presses ahead, which no honest
-    /// page sends between two ticks); presses above `MAX_BACKLOG` waiting are dropped and counted.
+    /// one. A count that went backwards is ignored and counted (it reads as 128 or more presses ahead, which no
+    /// honest page sends between two ticks); presses above `MAX_BACKLOG` waiting are dropped and counted.
+    #[must_use]
     pub fn next(&mut self, page: &[u8; BUTTONS]) -> [u8; BUTTONS] {
-        let buttons = self.seen.iter_mut().zip(&mut self.waiting);
-        for ((seen, waiting), (counter, page)) in buttons.zip(self.counters.iter_mut().zip(page)) {
-            let new = press_edges(*seen, *page);
+        for (button, page) in self.buttons.iter_mut().zip(page) {
+            let new = press_edges(button.seen, *page);
             if new >= 0x80 {
                 self.backwards = self.backwards.wrapping_add(1);
             } else {
-                *seen = *page;
-                let total = waiting.saturating_add(u16::from(new));
+                button.seen = *page;
+                let total = button.waiting.saturating_add(u16::from(new));
                 let over = total.saturating_sub(MAX_BACKLOG);
                 self.flooded = self.flooded.wrapping_add(u32::from(over));
-                *waiting = total.min(MAX_BACKLOG);
+                button.waiting = total.min(MAX_BACKLOG);
             }
-            if let Some(left) = waiting.checked_sub(1) {
-                *waiting = left;
-                *counter = counter.wrapping_add(1);
+            if let Some(left) = button.waiting.checked_sub(1) {
+                button.waiting = left;
+                button.counter = button.counter.wrapping_add(1);
             }
         }
-        self.counters
+        self.buttons.map(|button| button.counter)
     }
 
     /// How many presses wait their turn, over all buttons.
     #[must_use]
     pub fn waiting(&self) -> u32 {
-        self.waiting.iter().map(|waiting| u32::from(*waiting)).sum()
+        let waiting = self.buttons.iter().map(|button| u32::from(button.waiting));
+        waiting.fold(0, u32::wrapping_add)
     }
 
     /// Presses dropped above `MAX_BACKLOG`, and counts that went backwards; each wraps.
@@ -105,7 +120,7 @@ mod tests {
     #[test]
     fn a_count_that_goes_back_is_ignored_and_a_flood_is_cut() {
         let mut pacer = PressPacer::default();
-        pacer.next(&page(10, 0));
+        assert_eq!(pacer.next(&page(10, 0)), page(1, 0));
         assert_eq!(pacer.waiting(), 9);
         // An older post's count: nothing is added, nothing is taken back, and the queue goes on.
         assert_eq!(pacer.next(&page(9, 0)), page(2, 0));
@@ -114,7 +129,7 @@ mod tests {
         let mut made = 10u8;
         for _ in 0..3 {
             made = made.wrapping_add(127);
-            pacer.next(&page(made, 0));
+            let _ = pacer.next(&page(made, 0));
         }
         assert_eq!(pacer.waiting(), 254);
         assert_eq!(pacer.refused(), (8 + 3 * 127 - 255 - 2, 1));

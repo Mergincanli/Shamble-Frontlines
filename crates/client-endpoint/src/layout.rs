@@ -108,18 +108,24 @@ pub const LAYOUT_HASH: u32 = layout_hash(BLOCK_LAYOUT);
 // A block of zero bytes must never pass the page's check.
 const _: () = assert!(LAYOUT_HASH != 0);
 
-/// Where each section of a table starts, in bytes from the block's start, and where the last one ends. Every
-/// section so far has exactly one row, so a section starts where the one before it ends; a section with more rows
-/// brings its count into the header, and its place into this function, when it enters.
+/// Where a section that starts at `start` ends, which is where the next one starts. Every section so far has
+/// exactly one row; a section with more rows brings its count into the header, and into this function, when it
+/// enters. The one place that knows it: the block writer's offsets and the generated TypeScript both come from here.
+#[must_use]
+pub const fn end_of(section: Section, start: u32) -> u32 {
+    // A section starts at a multiple of its alignment, so the page's typed-array views bind with no copy.
+    assert!(start.is_multiple_of(section.align()));
+    start + section.stride
+}
+
+/// Where each section of a table starts, in bytes from the block's start, and where the last one ends.
 #[must_use]
 pub const fn offsets<const N: usize>(sections: &[Section]) -> ([u32; N], u32) {
     assert!(sections.len() == N);
     let (mut starts, mut at, mut s) = ([0; N], 0, 0);
     while s < N {
-        // A section starts at a multiple of its alignment, so the page's typed-array views bind with no copy.
-        assert!(at % sections[s].align() == 0);
         starts[s] = at;
-        at += sections[s].stride;
+        at = end_of(sections[s], at);
         s += 1;
     }
     (starts, at)

@@ -53,14 +53,18 @@ export class KeyboardInput {
   }
 
   /**
-   * A key went down or up at `atMs`. Returns whether it is one of the game's keys, so the caller can keep the
-   * browser from also scrolling on Space. A key held down repeats its key-down: a repeat counts as nothing.
+   * A key went down or up at `atMs`. Returns whether the game took it, so the caller can keep the browser from also
+   * scrolling on Space. A key held down repeats its key-down: a repeat counts as nothing.
+   *
+   * `typing` says the focus is in a text box. A key that goes down there is the text box's and counts as nothing.
+   * A key that comes up counts wherever it lands: a key held when the focus moved into the text box is let go
+   * there, and would stay held for good otherwise. The text box keeps the event either way.
    */
-  key(code: string, down: boolean, repeat: boolean, atMs: number): boolean {
+  key(code: string, down: boolean, repeat: boolean, atMs: number, typing = false): boolean {
     const key = KEYS.findIndex((entry) => entry[0] === code);
-    if (key < 0) return false;
+    if (key < 0 || (typing && down)) return false;
     if (!repeat) this.#settle(down ? this.#down | (1 << key) : this.#down & ~(1 << key), atMs);
-    return true;
+    return !typing;
   }
 
   /** No key is held any more: the window lost the focus or the tab was hidden, and no key-up will come. */

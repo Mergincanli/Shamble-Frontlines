@@ -64,6 +64,20 @@ test("losing the focus releases every key, and the counts stay", () => {
   expect([keys.releases, keys.changedAt]).toEqual([2, 9]);
 });
 
+test("in a text box a key that goes down is typing, and a key that comes up is still let go", () => {
+  const keys = new KeyboardInput();
+  // Typing "w" in a text box: no press, nothing held, and the text box keeps the event.
+  expect(keys.key("KeyW", true, false, 1, true)).toBe(false);
+  expect([keys.held, keys.presses, keys.changedAt]).toEqual([0, 0, 0]);
+  expect(keys.key("KeyW", false, false, 2, true)).toBe(false);
+  expect([keys.held, keys.releases]).toEqual([0, 0]);
+  // W held in play, then the focus moves into a text box and the key comes up there: let go, not stuck.
+  expect(keys.key("KeyW", true, false, 3)).toBe(true);
+  expect(keys.held).toBe(1);
+  expect(keys.key("KeyW", false, false, 4, true)).toBe(false);
+  expect([keys.held, keys.presses, keys.releases, keys.changedAt]).toEqual([0, 1, 1, 4]);
+});
+
 test("a button's count wraps at 256", () => {
   const keys = new KeyboardInput();
   for (let tap = 1; tap <= 600; tap += 1) {

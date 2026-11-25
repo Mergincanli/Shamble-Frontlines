@@ -6,7 +6,7 @@
 //!
 //! | Message | Bytes after the kind |
 //! |---|---|
-//! | `Join` 0x01 | token length `u16`, the token, protocol version `u16`, content hash 32 |
+//! | `Join` 0x01 | protocol version `u16` (first, so no later token format can hide it), token length `u16`, the token, content hash 32 |
 //! | `JoinAccepted` 0x02 | slot, team, squad `u8`; mode id length `u8`, the id (UTF-8); mode hash 32; content hash 32; server tick `u32`; tick rate, snapshot rate `u8` |
 //! | `JoinRejected` 0x03 | reason `u8` (1 protocol version, 2 content hash, 3 room full) |
 //! | `Input` 0x10 | ack count `u8`, per ack: group `u8`, tick `u32`; command count `u8`; the newest command: tick `u32`, sequence `u16`, its fields; each older one: how many ticks earlier `u8` (1 to 255), its fields |
@@ -123,9 +123,9 @@ pub fn encode_control(control: &Control, out: &mut Vec<u8>) -> Result<(), Encode
         Control::Join(join) => {
             let len = fits::<u16>(join.token.len(), MAX_TOKEN_BYTES, EncodeError::TooLong)?;
             put_u8(out, KIND_JOIN);
+            put_u16(out, join.protocol_version);
             put_u16(out, len);
             out.extend_from_slice(&join.token);
-            put_u16(out, join.protocol_version);
             out.extend_from_slice(&join.content_hash);
         }
         Control::JoinAccepted(accepted) => {
@@ -157,9 +157,9 @@ pub fn decode_control(bytes: &[u8]) -> Result<Control, DecodeError> {
     let mut reader = Reader::new(bytes);
     match reader.u8()? {
         KIND_JOIN => {
+            let protocol_version = reader.u16()?;
             let len = within(reader.u16()?, MAX_TOKEN_BYTES, DecodeError::TooLong)?;
             let token = reader.bytes(len)?;
-            let protocol_version = reader.u16()?;
             let content_hash = reader.array()?;
             reader.finish()?;
             Ok(Control::Join(Join {
@@ -517,7 +517,7 @@ mod tests {
     /// The wire form, byte for byte: these pin the table in this module's doc.
     #[test]
     fn each_message_has_the_bytes_the_table_gives() {
-        let join_bytes = [&[0x01, 3, 0, 9, 8, 7, 0x02, 0x01][..], &[0xC4; 32]].concat();
+        let join_bytes = [&[0x01, 0x02, 0x01, 3, 0, 9, 8, 7][..], &[0xC4; 32]].concat();
         assert_eq!(control_bytes(&join(&[9, 8, 7])), join_bytes);
         let head = [0x02, 1, 2, 3, 2, b'a', b'b'];
         let tail = [1, 2, 3, 4, 30, 30];
@@ -633,9 +633,9 @@ mod tests {
     fn what_lies_outside_a_cap_or_a_range_is_refused_by_name() {
         // A token one byte over the cap, with the bytes there: refused for its length. A length within the cap
         // that the message does not hold: truncated, whatever it claims.
-        let long = [&[KIND_JOIN, 0x01, 0x04][..], &[0; 1025 + 34]].concat();
+        let long = [&[KIND_JOIN, 1, 0, 0x01, 0x04][..], &[0; 1025 + 32]].concat();
         assert_eq!(decode_control(&long), Err(DecodeError::TooLong));
-        let short = [KIND_JOIN, 0x00, 0x04, 1, 2, 3];
+        let short = [KIND_JOIN, 1, 0, 0x00, 0x04, 1, 2, 3];
         assert_eq!(decode_control(&short), Err(DecodeError::Truncated));
         let mode = [&[KIND_JOIN_ACCEPTED, 0, 0, 0, 65][..], &[b'a'; 65 + 70]].concat();
         assert_eq!(decode_control(&mode), Err(DecodeError::TooLong));
@@ -654,6 +654,16 @@ mod tests {
         ] {
             assert_eq!(decoded_input(bytes), Err(DecodeError::TooMany));
         }
+        // The same with every byte there: five whole acks, and nine whole commands (eight, the count raised by
+        // one and the last command's 33 bytes once more), are refused for their count, before one is read.
+        let five = [&[KIND_INPUT, 5][..], &[0; 5 * 5 + 1]].concat();
+        assert_eq!(decoded_input(&five), Err(DecodeError::TooMany));
+        let eight = (0..8).map(|back| command(20 - u32::from(back), 30 - back, 1));
+        let mut nine = input_bytes(&input(0, eight.collect()));
+        assert_eq!(nine[2], 8);
+        nine[2] = 9;
+        nine.extend_from_within(nine.len() - 33..);
+        assert_eq!(decoded_input(&nine), Err(DecodeError::TooMany));
         // An older command 0 ticks back, and one that would lie before tick 0.
         let mut bytes = input_bytes(&input(0, vec![command(3, 8, 1), command(1, 7, 1)]));
         let gap_at = 3 + 6 + 32;

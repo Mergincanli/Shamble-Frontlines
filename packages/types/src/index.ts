@@ -12,7 +12,7 @@ export type { SnapshotAck } from "./generated/protocol/SnapshotAck.ts";
 export type { ViewTime } from "./generated/protocol/ViewTime.ts";
 
 // The block's layout and its hash, written by our own generator from crates/client-endpoint (generated/block).
-export { BLOCK_LAYOUT, LAYOUT_HASH } from "./generated/block/layout.ts";
+export { BLOCK_BYTES, BLOCK_LAYOUT, LAYOUT_HASH } from "./generated/block/layout.ts";
 
 export { checkLayoutHash } from "./layout-check.ts";
 export type { LayoutCheck } from "./layout-check.ts";

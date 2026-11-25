@@ -52,12 +52,14 @@ export async function boot(): Promise<void> {
   const clock = (): number => performance.timeOrigin + performance.now();
   const worker = new SimWorker();
   const link = new WorkerLink(worker, clock);
-  // The game's keys, wherever the focus is except in a text box. When the window loses the focus or the tab is
-  // hidden, no key-up will come: every key counts as let go.
+  // The game's keys, wherever the focus is; in a text box only a key that comes up counts (`KeyboardInput.key`).
+  // When the window loses the focus or the tab is hidden, no key-up will come: every key counts as let go.
   const keys = new KeyboardInput();
   const onKey = (event: KeyboardEvent): void => {
-    if (event.target instanceof Element && event.target.closest("textarea, input") !== null) return;
-    if (keys.key(event.code, event.type === "keydown", event.repeat, clock())) event.preventDefault();
+    const typing = event.target instanceof Element && event.target.closest("textarea, input") !== null;
+    // The key's own time, on the clock both sides share; an event without one gets the handler's.
+    const at = event.timeStamp > 0 ? performance.timeOrigin + event.timeStamp : clock();
+    if (keys.key(event.code, event.type === "keydown", event.repeat, at, typing)) event.preventDefault();
   };
   window.addEventListener("keydown", onKey);
   window.addEventListener("keyup", onKey);
@@ -117,7 +119,8 @@ export async function boot(): Promise<void> {
       postUsed: link.postUsed,
       keys: BUTTON_NAMES.join(" "),
       presses: { made: keys.presses, echoed: link.echo.presses, lost: unsettled(keys.presses, link.echo.presses, keys.changedAt, clock()) },
-      releases: { made: keys.releases, echoed: link.echo.releases },
+      releases: { made: keys.releases, echoed: link.echo.releases, doubled: link.echo.heldWithoutPress },
+      olderPosts: link.olderPosts,
       keyToTickP50: link.keyToTick.percentile(50),
       keyToTickP95: link.keyToTick.percentile(95),
       keyToTickCount: link.keyToTick.count,

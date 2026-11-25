@@ -5,7 +5,7 @@
 // Wasm with Node's own module, and Node's types are not a dependency, so a TypeScript file here would never be
 // type-checked.
 import { readFileSync } from "node:fs";
-import { BLOCK_LAYOUT, checkLayoutHash, LAYOUT_HASH } from "@shamble/types";
+import { BLOCK_BYTES, BLOCK_LAYOUT, checkLayoutHash, LAYOUT_HASH } from "@shamble/types";
 import { beforeAll, expect, test } from "vitest";
 import * as glue from "../pkg/sim_wasm.js";
 import { initSync, panic_buffer, Sim, tick_hz } from "../pkg/sim_wasm.js";
@@ -43,7 +43,7 @@ test("a block written by Rust passes the page's layout check, from tick 0 on", (
   expect(Math.floor(0.25 * tick_hz())).toBe(MAX_TICKS_PER_WAKE);
   // The generated layout and the Rust writer agree on the block's length: the last section's end.
   expect(sim.block_len()).toBe(44);
-  expect(BLOCK_LAYOUT.link.offset + BLOCK_LAYOUT.link.stride).toBe(44);
+  expect([BLOCK_BYTES, BLOCK_LAYOUT.link.offset + BLOCK_LAYOUT.link.stride]).toEqual([44, 44]);
   expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
   expect(tickOf(blockOf(sim))).toBe(0);
   sim.step(0);
@@ -83,13 +83,13 @@ test("what the host hands in comes back in the block: each button's count in its
     // Sent and received climb with the ticks, nothing is refused, and this tick's command was built from this post.
     expect(wordsOf(block, "link")).toEqual({ sent: button + 1, received: button + 2, refused: 0, post_used: button + 1 });
   }
-  // Any numbers are taken: nothing in `input` can trap on what a page sent. The newest post by its number
-  // counts: 17 is newer than 16, and a number half the circle away is not.
-  sim.input(17, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff);
-  sim.input(0xffff_ffff, 0, 0, 0, 0, 0);
+  // Any numbers are taken: nothing in `input` can trap on what a page sent. The last post handed in before a
+  // step counts, whatever its number: which post is the newest is the host's to say (host.ts), not the Wasm's.
+  sim.input(17, 0, 0, 0, 0, 0);
+  sim.input(0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff);
   sim.step(0);
   expect(wordsOf(blockOf(sim), "echo").held).toBe(0xffff);
-  expect(wordsOf(blockOf(sim), "link")).toMatchObject({ post_used: 17, refused: 1 });
+  expect(wordsOf(blockOf(sim), "link")).toMatchObject({ post_used: 0xffff_ffff, refused: 0 });
 });
 
 test("after the memory grows between two steps, the next block is the block of a run without the growth", () => {
@@ -140,6 +140,11 @@ test("the glue exports what the Worker calls and nothing more", () => {
   // The two ways to load the module, the one type, and two calls asked once. The start function that installs the
   // panic hook is not among them: the glue runs it itself.
   expect(Object.keys(glue).sort()).toEqual(["Sim", "default", "initSync", "panic_buffer", "tick_hz"]);
+  // The one type's own calls: a method added to the bindings shows here. Left out: the names wasm-bindgen adds
+  // for itself (two underscores first, and the dispose symbol).
+  const calls = Reflect.ownKeys(Sim.prototype).filter((name) => typeof name === "string" && !name.startsWith("__"));
+  expect(calls.sort()).toEqual(["block_len", "block_ptr", "constructor", "free", "input", "rebase", "step"]);
+  expect(Object.getOwnPropertyNames(Sim).filter((name) => !["length", "name", "prototype"].includes(name))).toEqual([]);
 });
 
 test("in the glue, each per-tick call reaches exactly one export", () => {

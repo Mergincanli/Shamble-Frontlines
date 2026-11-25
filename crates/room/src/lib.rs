@@ -83,6 +83,7 @@ fn count(counter: &mut u32) {
     *counter = counter.wrapping_add(1);
 }
 
+/// One match's server side: the world, the one player's slot and that player's commands.
 pub struct Room {
     world: World,
     content_hash: [u8; 32],
@@ -128,7 +129,9 @@ impl Room {
 
     /// Takes a message from the control channel and, when it is a `Join`, writes the answer into `reply` and
     /// returns true: accepted, or rejected for another protocol version, other content, or a slot already
-    /// taken. Local play needs no token; the token's check comes with online play.
+    /// taken. Local play needs no token; the token's check comes with online play. When it returns false,
+    /// `reply` holds nothing to send.
+    #[must_use]
     pub fn on_control(&mut self, bytes: &[u8], reply: &mut Vec<u8>) -> bool {
         let Ok(Control::Join(join)) = decode_control(bytes) else {
             count(&mut self.counters.decode_errors);
@@ -163,6 +166,13 @@ impl Room {
     }
 
     /// Takes a datagram: an `Input`. Its commands go to the queue, the oldest first.
+    ///
+    /// Checked here and in `admit`: the acks, the lead, a strictly later tick and the press pace. Not checked yet,
+    /// each with what brings it: the length of the move and the aim inside the map (the soldier and the map,
+    /// change-set 4); the view time (lag compensation); presses against cooldowns and ammunition (weapons); how
+    /// many messages a client may send, the join's deadline and its token (the connection, Slice 3); a lower
+    /// bound on an ack's tick; and how late a command may still run, so that a client cannot save ticks up and
+    /// spend them two a tick (decided with the command timing, ADR 0001's open question 6, before online play).
     pub fn on_datagram(&mut self, bytes: &[u8]) {
         if self.joined_at.is_none() || decode_input(bytes, &mut self.input).is_err() {
             count(&mut self.counters.decode_errors);
@@ -225,9 +235,9 @@ impl Room {
             count(&mut self.counters.refused_not_newer);
             return false;
         };
-        let moved = base.iter().zip(next.command.presses);
+        let mut moved = base.iter().zip(next.command.presses);
         let slow = |(old, new): (&u8, u8)| u32::from(press_edges(*old, new)) <= covered;
-        if !moved.into_iter().all(slow) {
+        if !moved.all(slow) {
             count(&mut self.counters.refused_presses);
             return false;
         }
@@ -235,7 +245,9 @@ impl Room {
     }
 
     /// Runs one tick: up to `CATCH_UP_CAP` due commands that pass the checks, then the world's step. With a player
-    /// in the slot it writes that player's snapshot of the new tick into `snapshot` and returns true.
+    /// in the slot it writes that player's snapshot of the new tick into `snapshot` and returns true; when it
+    /// returns false, `snapshot` holds nothing to send.
+    #[must_use]
     pub fn step(&mut self, snapshot: &mut Vec<u8>) -> bool {
         let running = self.world.tick().saturating_add(1);
         let mut run = [PlayerCommand::NONE; CATCH_UP_CAP];

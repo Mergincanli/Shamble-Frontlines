@@ -35,3 +35,6 @@ export const BLOCK_LAYOUT = {
     },
   },
 } as const;
+
+/** The length of the block's sections together: a block is never shorter. */
+export const BLOCK_BYTES = 44;

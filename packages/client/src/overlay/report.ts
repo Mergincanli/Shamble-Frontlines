@@ -22,12 +22,15 @@ export interface ReportData {
   readonly postUsed: number;
   /** The keys the page reads, by name. */
   readonly keys: string;
+  /** Ticks that ran an older post than the tick before them: the keys out of order (0 on a sound Worker). */
+  readonly olderPosts: number;
   /**
    * Presses and releases the page made and the server's echo brought back. `lost` is made less echoed (negative:
    * doubled) once the keys have been quiet for a moment, and `null` while the newest echo may still be on its way.
+   * `doubled` counts a button the echo showed as held again with no press (`EchoTally.heldWithoutPress`).
    */
   readonly presses: { readonly made: number; readonly echoed: number; readonly lost: number | null };
-  readonly releases: { readonly made: number; readonly echoed: number };
+  readonly releases: { readonly made: number; readonly echoed: number; readonly doubled: number };
   /** From a key change to the start of the tick that took it up: the median, the 95th percentile and how many were timed. */
   readonly keyToTickP50: number;
   readonly keyToTickP95: number;
@@ -118,12 +121,14 @@ export function formatReport(data: ReportData): string {
     ["messages.received", data.messages.received],
     ["messages.refused", data.messages.refused],
     ["postUsed", data.postUsed],
+    ["olderPosts", data.olderPosts],
     ["keys.bound", data.keys],
     ["presses.made", data.presses.made],
     ["presses.echoed", data.presses.echoed],
     ["presses.lost", data.presses.lost ?? "(counting)"],
     ["releases.made", data.releases.made],
     ["releases.echoed", data.releases.echoed],
+    ["releases.doubled", data.releases.doubled],
     ["keyToTickP50", ms(data.keyToTickP50)],
     ["keyToTickP95", ms(data.keyToTickP95)],
     ["keyToTickCount", data.keyToTickCount],

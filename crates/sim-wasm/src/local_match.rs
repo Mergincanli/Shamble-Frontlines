@@ -7,7 +7,6 @@
 //! snapshot; the block is written. So the command for a tick reaches the server before the server runs that tick,
 //! and a press the page posted before a step is in the server's state, and in the block, after that step.
 
-use client_endpoint::block::BlockWriter;
 use client_endpoint::endpoint::{Endpoint, EndpointState};
 use client_endpoint::post::Post;
 use client_endpoint::schedule::LocalSchedule;
@@ -31,31 +30,18 @@ pub fn loopback() -> Loopback {
     Loopback::new(SLOT_BYTES, 8)
 }
 
-/// What the local match itself counted, beside the room's and the endpoint's own counts. Each wraps.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct LocalCounters {
-    /// Posts that were older than the post already held: ignored.
-    pub stale_posts: u32,
-    /// Messages the link did not take.
-    pub unsent: u32,
-    /// Host times that were no number or lay before the last one: ignored.
-    pub bad_times: u32,
-}
-
+/// One local match: the local server, the client endpoint and the link between them. It owns no state of the
+/// exchange itself: the endpoint holds the page's post and writes the block, the room holds the world.
 pub struct LocalMatch<P: TransportPair = Loopback> {
     room: Room,
     endpoint: Endpoint,
     link: P,
-    writer: BlockWriter,
     schedule: LocalSchedule,
-    /// The page's newest post, by its number.
-    post: Post,
     /// The bytes that arrived and the bytes to send, each reused for every message.
     incoming: Vec<u8>,
     outgoing: Vec<u8>,
-    /// The host's time at the newest step. Nothing reads it yet: the endpoint's clock work will.
-    now_ms: f64,
-    counters: LocalCounters,
+    /// Messages the link did not take; wraps.
+    unsent: u32,
 }
 
 impl<P: TransportPair> LocalMatch<P> {
@@ -66,22 +52,21 @@ impl<P: TransportPair> LocalMatch<P> {
     pub fn new(setup: &MatchSetup, first_sequence: u16, pad_bytes: u32, link: P) -> Option<Self> {
         let mut local = Self {
             room: Room::new(setup, NO_CONTENT),
-            endpoint: Endpoint::new(NO_CONTENT, first_sequence),
+            endpoint: Endpoint::new(NO_CONTENT, first_sequence, pad_bytes)?,
             link,
-            writer: BlockWriter::new(pad_bytes)?,
             schedule: LocalSchedule::new(0.0, TICK_HZ),
-            post: Post::NONE,
             incoming: Vec::with_capacity(MAX_JOIN_BYTES),
             outgoing: Vec::with_capacity(MAX_JOIN_BYTES),
-            now_ms: f64::NEG_INFINITY,
-            counters: LocalCounters::default(),
+            unsent: 0,
         };
-        if local.endpoint.join(&mut local.outgoing) {
-            let sent = local.link.end(Side::Client);
-            let sent = { sent }.send_reliable(Channel::Control, &local.outgoing);
-            local.counters.unsent += u32::from(sent.is_err());
-        }
-        local.writer.write(local.endpoint.readout(), 0);
+        let joined = local.endpoint.join(&mut local.outgoing);
+        let mut client = local.link.end(Side::Client);
+        let sent = joined
+            && client
+                .send_reliable(Channel::Control, &local.outgoing)
+                .is_ok();
+        drop(client);
+        local.unsent = u32::from(!sent);
         Some(local)
     }
 
@@ -95,57 +80,49 @@ impl<P: TransportPair> LocalMatch<P> {
         &self.endpoint
     }
 
+    /// Messages the link did not take; wraps. They are in the block's count of refused messages.
     #[must_use]
-    pub const fn counters(&self) -> &LocalCounters {
-        &self.counters
+    pub const fn unsent(&self) -> u32 {
+        self.unsent
     }
 
     /// The block's bytes. Their address does not change for the life of the match.
     #[must_use]
     pub fn block(&self) -> &[u8] {
-        self.writer.bytes()
+        self.endpoint.block()
     }
 
     #[must_use]
     pub const fn block_len(&self) -> u32 {
-        self.writer.byte_len()
+        self.endpoint.block_len()
     }
 
-    /// The page's newest post. The newest by its number is kept, never the last to arrive: an older one is ignored
-    /// and counted, so a post that comes late cannot roll the press counts back.
-    pub fn set_post(&mut self, post: Post) {
-        if self.post.newer_than(&post) {
-            self.counters.stale_posts = self.counters.stale_posts.wrapping_add(1);
-        } else {
-            self.post = post;
-        }
+    /// The page's newest post, as the host hands it over once per tick. The host keeps the newest by its number;
+    /// the match passes on what it is given.
+    pub const fn set_post(&mut self, post: Post) {
+        self.endpoint.set_post(post);
     }
 
     /// Runs one tick, writes its block, and returns the time (the host's milliseconds) at which the next tick is
-    /// due. `now_ms` is the host's time now.
+    /// due. `_now_ms` is the host's time now; nothing reads it yet (the link simulator's clock will).
     ///
     /// # Panics
     /// When the local server refuses the join or the endpoint does not take its answer: both sides are one build,
     /// so that is a bug, and the match stops with the reason.
-    pub fn step(&mut self, now_ms: f64) -> f64 {
-        if now_ms >= self.now_ms {
-            self.now_ms = now_ms;
-        } else {
-            self.counters.bad_times = self.counters.bad_times.wrapping_add(1);
-        }
+    pub fn step(&mut self, _now_ms: f64) -> f64 {
         let Self {
             room,
             endpoint,
             link,
             incoming,
             outgoing,
-            counters,
+            unsent,
             ..
         } = self;
         let mut sent = |result: Result<(), SendError>| {
-            counters.unsent = counters.unsent.wrapping_add(u32::from(result.is_err()));
+            *unsent = unsent.wrapping_add(u32::from(result.is_err()));
         };
-        if endpoint.build_input(&self.post, outgoing) {
+        if endpoint.build_input(outgoing) {
             sent(link.end(Side::Client).send_unreliable(outgoing));
         }
         {
@@ -169,24 +146,16 @@ impl<P: TransportPair> LocalMatch<P> {
             match delivery {
                 Delivery::Datagram => endpoint.on_datagram(incoming),
                 Delivery::Reliable(Channel::Control) => {
-                    if let Err(error) = endpoint.on_control(incoming) {
-                        panic!("the local server's answer to the join was not taken: {error:?}");
-                    }
-                    if let EndpointState::Rejected(reason) = endpoint.state() {
-                        panic!("the local server refused the join: {reason:?}");
-                    }
+                    let taken = endpoint.on_control(incoming).is_ok();
+                    assert!(
+                        taken && endpoint.state() == EndpointState::Joined,
+                        "the local server's answer to the join was not an acceptance this build takes"
+                    );
                 }
             }
         }
         // In local play both sides are here, so the block's count of refused messages is everybody's.
-        let refused = endpoint
-            .readout()
-            .refused
-            .wrapping_add(room.counters().refused());
-        let refused = refused
-            .wrapping_add(counters.unsent)
-            .wrapping_add(counters.stale_posts);
-        self.writer.write(endpoint.readout(), refused);
+        endpoint.write_block(room.counters().refused().wrapping_add(*unsent));
         self.schedule.ticked();
         self.schedule.next_due_ms()
     }
@@ -236,12 +205,14 @@ mod tests {
         assert_eq!(room, [0; 6]);
         let endpoint = [
             readout.refused,
+            readout.late,
+            readout.unsent,
             readout.presses_lost,
             readout.presses_doubled,
         ];
-        assert_eq!(endpoint, [0; 3]);
+        assert_eq!(endpoint, [0; 5]);
         assert_eq!(local.endpoint().pacer().refused(), (0, 0));
-        assert_eq!(local.counters().unsent, 0);
+        assert_eq!(local.unsent(), 0);
     }
 
     #[test]
@@ -277,23 +248,20 @@ mod tests {
         clean(&local);
     }
 
-    /// ADR 0003's milestone, second half: every tick runs on the newest post. A page faster than the tick posts
-    /// two or three times before a step, a slower one not at all, and now and then an old post arrives after a
-    /// newer one: each tick's command is built from the newest by number.
+    /// ADR 0003's milestone, second half: every tick runs on the last post handed over before it. A page faster
+    /// than the tick posts two or three times before a step, a slower one not at all: each tick's command is
+    /// built from the last one. (Which post is the newest when they arrive out of order is the host's to say:
+    /// `packages/sim-worker/src/host.ts` and its test.)
     #[test]
-    fn every_tick_runs_the_newest_post() {
+    fn every_tick_runs_the_last_post_handed_over() {
         let mut local = local(0, 0);
         local.step(0.0);
-        let (mut number, mut late) = (0u32, 0);
+        let mut number = 0u32;
         for tick in 0..1800u32 {
             let posts = if tick % 7 == 3 { 0 } else { 1 + tick % 3 };
             for _ in 0..posts {
                 number += 1;
                 local.set_post(post(number, (number % 4) as u16, 0));
-            }
-            if tick % 5 == 0 && number > 2 {
-                late += 1;
-                local.set_post(post(number - 2, 0xFFFF, 200));
             }
             local.step(f64::from(tick));
             let readout = local.endpoint().readout();
@@ -301,9 +269,6 @@ mod tests {
             assert_eq!(ran, (number, (number % 4) as u16), "tick {tick}");
         }
         assert_eq!(local.room().counters().commands_run, 1800);
-        assert_eq!((late, local.counters().stale_posts), (359, 359));
-        // No late post's presses were taken.
-        assert_eq!(local.room().world().player().presses, [0; BUTTONS]);
         clean(&local);
     }
 
@@ -381,25 +346,16 @@ mod tests {
         assert_eq!(distinct.len(), 600);
     }
 
+    /// The host's time is not read yet: a time that is no number, or one that goes back, changes no tick.
     #[test]
-    fn an_older_post_and_a_time_that_is_none_are_counted_and_too_much_padding_is_refused() {
+    fn a_step_is_one_tick_whatever_time_the_host_says_and_too_much_padding_is_refused() {
         let mut local = local(0, 0);
-        local.set_post(post(9, 1, 0));
-        local.set_post(post(8, 2, 0));
-        // The same number again is the host handing its newest post over once more: taken, not counted.
-        local.set_post(post(9, 3, 0));
         for now_ms in [5.0, 4.0, f64::NAN, 5.0, f64::INFINITY] {
             local.step(now_ms);
         }
-        let counted = LocalCounters {
-            stale_posts: 1,
-            unsent: 0,
-            bad_times: 2,
-        };
-        assert_eq!(*local.counters(), counted);
-        assert_eq!(local.endpoint().readout().echo_buttons, 3);
-        // The block's count of refused messages holds the post that was ignored.
-        assert_eq!(local.block()[36..40], 1u32.to_le_bytes());
+        assert_eq!(local.room().world().tick(), 5);
+        assert_eq!(local.block()[..4], 5u32.to_le_bytes());
+        clean(&local);
         let seed = [7; sim::SEED_BYTES];
         let setup = MatchSetup {
             seed,
@@ -407,5 +363,25 @@ mod tests {
         };
         let pad = client_endpoint::block::MAX_PAD_BYTES + 1;
         assert!(LocalMatch::new(&setup, 0, pad, loopback()).is_none());
+    }
+
+    /// A link that takes nothing: nothing panics, the join never arrives, so the room has no player to send to,
+    /// and the one message that could not be sent is in the block's count of refused messages.
+    #[test]
+    fn a_link_that_takes_nothing_is_counted_in_the_block() {
+        let seed = [7; sim::SEED_BYTES];
+        let setup = MatchSetup {
+            seed,
+            start_tick: 0,
+        };
+        // Slots of one byte: no message fits.
+        let mut local = LocalMatch::new(&setup, 0, 0, Loopback::new(1, 8)).expect("no padding");
+        assert_eq!(local.unsent(), 1);
+        for step in 0..10 {
+            local.step(f64::from(step));
+        }
+        assert_eq!(local.endpoint().state(), EndpointState::Joining);
+        assert_eq!((local.unsent(), local.room().counters().joins), (1, 0));
+        assert_eq!(local.block()[36..40], 1u32.to_le_bytes());
     }
 }

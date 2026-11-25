@@ -11,7 +11,7 @@ between `f64` and the integers, and casts to `usize` and `isize` (as wide as the
   python3 -I -B crates/devtools/vectors/make_f32_vectors.py --check         compares them byte for byte, writes nothing
   python3 -I -B crates/devtools/vectors/make_f32_vectors.py --full <op>     prints every result of one operation
 
-Inputs: 10,068 cases of three f32 bit patterns (a, b, c), little-endian: every ordered pair of the edge values
+Inputs: 10,072 cases of three f32 bit patterns (a, b, c), little-endian: every ordered pair of the edge values
 first, then seeded values up to case 9,999, then 48 constructed cases for `mul_add` and 20 for the cast from f64. No
 input is a NaN (part 7: a NaN never enters the simulation); a NaN result is written as 0x7FC00000, because only which
 cases give a NaN must agree, not a NaN's bits. Expected: one line per operation with the bytes of one result and FNV-1a 64 over all its results in order,
@@ -22,9 +22,10 @@ hair. The exact sum rounds back to c. A sum worked out in f64 first loses the ha
 away from c. None of the 10,000 other cases is of this kind (checked below), so without these a `mul_add` made of
 two roundings passes.
 
-The last 20 cases are the cast from f64 to f32 where it is hardest (the follow-up 3A-FROM-F64): an f64 exactly
-half-way between two f32, which goes to the one whose last bit is 0, at one and below the smallest f32; and f64 from
-the largest f32 up to twice 2^127, where the cast turns to infinity exactly at the half-way point. They come after
+The last 24 cases are the cast from f64 to f32 where it is hardest (the follow-up 3A-FROM-F64): an f64 exactly
+half-way between two f32, which goes to the one whose last bit is 0, at one and below the smallest f32; f64 from
+the largest f32 up to twice 2^127, where the cast turns to infinity exactly at the half-way point; and, as the last
+four, the first f64 above half the smallest f32 and the half-way point below the smallest normal f32. They come after
 every other case, so no earlier case changes its number.
 
 The `pin` lines (MUL-ADD): the cases where `f32::mul_add` in WebAssembly does NOT give the exact result, each with the
@@ -45,7 +46,7 @@ from fractions import Fraction
 HERE = pathlib.Path(__file__).resolve().parent
 SEEDED = 10_000  # the edge values' pairs and the seeded cases
 FUSED = 10_048  # those, then `mul_add`'s constructed cases
-CASES = 10_068  # those, then the cast from f64's constructed cases
+CASES = 10_072  # those, then the cast from f64's constructed cases
 NAN = 0x7FC00000
 INF = 0x7F800000
 
@@ -235,6 +236,8 @@ def narrowing():
         (0x47EFFFFFF0000000, INF),  # half-way to 2^128, which no f32 holds: to the even side, infinity
         (0x47EFFFFFF0000001, INF),  # the first f64 above the half-way point
         (0x47F0000000000000, INF),  # 2^128
+        (0x3690000000000001, 0x00000001),  # the first f64 above 2^-150: up to the smallest f32
+        (0x380FFFFFE0000000, 0x00800000),  # half-way between the largest subnormal and the smallest normal: even
     ]
     cases, expected = [], []
     for double, result in doubles:
