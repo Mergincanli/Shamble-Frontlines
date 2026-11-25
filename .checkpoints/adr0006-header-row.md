@@ -28,10 +28,19 @@ calls #66 a draft: correct that in your next pull request.").
 9. Report, PR (draft), the advisor agent on the final head, ready, his go.
 
 ## Current step
-5: the plan (revision 1, saved at cbd5ada) is with the advisor agent (started about 11:24 UTC, effort xhigh; notes to
-`advisor-plan.md`). infra-engineer's research runs meanwhile (started about 11:15 UTC, effort xhigh; notes in
-`infra-engineer-workers.md`, Q1-Q8). The DECISIONS script is ready and dry-run only (scratchpad `dec/add_1107.py`:
-741 bytes, sha256 ae5eb4f6...; 16 lines at the top); it runs after APPROVE. #66 merged_at 2026-11-25 11:10:11 UTC.
+8: the review round on the ADR diff (09faefa..HEAD): test-engineer, infra-engineer, the verifier, at xhigh.
+Done before it:
+- 5: the advisor agent APPROVE with nine conditions on revision 1 (notes `advisor-plan.md`); plan revision 2 folds
+  them in (E8 dropped, E5 replaced by E10, E9 and E10 its exact words, the dates fixed: dashboard 2026-11-18, docs
+  2026-11-24).
+- 6: infra-engineer's research (22 sources, Q1-Q8; notes `infra-engineer-workers.md`): Workers docs silent on
+  production's own version links; host noindex on a Preview's workers.dev link only; Pages docs silent on whether
+  direct uploads count; Cloudflare's Pages overview: "Start new projects with Workers"; reading does not favour a
+  move. Its optional decision WORKERS-NEXT goes to the report's "Decisions needed" (no edit here).
+- 7: ADR edits dceb4e2 (E1, E2, E4, E6, E9, E10) and 1c45ed7 (E3, E7; the main session reworded the paragraph for
+  plain words, 11 lines); his 11:07:07 UTC message in DECISIONS, 0bead83 (16 lines, 741 bytes, sha256 ae5eb4f6...).
+  Gate PASS with --no-smoke (local smoke cannot start: tools' Playwright wants chromium_headless_shell-1194, the
+  container has 1243; CI runs smoke). The ADR grew 1694 -> 1712 lines (+16 before the marks table).
 
 ## Next steps
 - The plan, then the advisor agent's review.
@@ -43,12 +52,15 @@ calls #66 a draft: correct that in your next pull request.").
   on all 7 paths, written by no rule of the production build (the host added it).
 - Production's own address: no `noindex` (round-a, restore-production); the planted `noindex` caught there
   (bite-production, run 44366750977: both production links fail on all 7 paths, and on nothing else).
-- The build count: "no count shown" before and after the ten uploads (2026-11-18), and again on 2026-11-24.
+- The build count: "no count shown" in the dashboard before and after the ten uploads, both on 2026-11-18
+  (Appendix A :706-757); Cloudflare's docs read 2026-11-24 (:1384-1388) and again 2026-11-25 (Q8): silent.
 
 ## Decisions
 - His, in DECISIONS: ONE-OFF-HEADER (a) with two additions; STEP4-COUNT (b); his go for #66 (11:07:07 UTC).
-- Open for him (asked in this turn's message): where step 2.6's plan is written while the revision waits; the
-  clean-up order (probe off first; the archive and the Cloudflare deletions after his go on the revised row).
+- The advisor agent's settlements (no question to him): CHECK-CLOSE by his STEP4-COUNT (b) (E9, E10, tagged as its
+  reading); step 2.6's plan starts after this merge (he may name a second branch if he wants it sooner); TR-END's
+  condition is met, so the clean-up timing is his (probe off, then archive, then delete).
+- For him with the final head: his go (covers E9 and E10, or remove them); his word on step 4 under E10.
 
 ## Open findings
 - none yet.
