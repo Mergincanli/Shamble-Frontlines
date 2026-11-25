@@ -58,6 +58,20 @@ no wall detail, footer). Now U1: the host folder (hosting/preview.mjs, hosting/p
 then the manifest and lockfile under the dependency hold (no push of them before dependency-check.md names the
 security-auditor's answer on the exact files).
 
+## Findings during the build (U1)
+- F1 (a defect in the approved preview.yml, job `tests`): `run: node --test hosting/` fails on Node 22: the folder is
+  loaded as a module ("Error: Cannot find module 'hosting'", exit 1; measured on v22.23.4, scratch folder). Naming the
+  file works (`node --test hosting/preview.test.mjs`, exit 0; a missing named file exits 1). A `"main"` field in
+  hosting/package.json would also make the folder argument work (measured), but hides the fix. Proposed: change that
+  one line and bring him the new text and its sha256 before his sitting (his 20:35 item 5).
+- F2 (plan prose against the texts): section 2.7 says the comment reports a missing build once the hand-over step is
+  on main; with the approved texts it cannot: `check` failing leaves `go` unset, so `after` (the comment) does not run.
+  The failure shows as a red `check` job under main's Actions tab instead.
+- The real build (toolchain run 45686704452, job 139461080011, 2026-11-25 19:36 UTC): index.html plus assets/
+  index-*.css, index-*.js, sim_wasm_bg-*.wasm, worker-*.js; names use [A-Za-z0-9_-] and dots (hashes hold _ and -).
+- Wrangler 4.x releases (npm view, 2026-11-25 19:45 UTC): newest at least 7 days old: 4.164.0 (2026-11-17 11:15 UTC);
+  4.165.0 (2026-11-18 21:44 UTC) turns 7 days at 2026-11-25 21:44 UTC.
+
 ## Rules in force
 - Until a second guard fix is merged: git and gh always start their own command, with no other program in front.
 - At most 3 agents at a time; Opus; effort xhigh for infra/security design work on the drafts' parts.
