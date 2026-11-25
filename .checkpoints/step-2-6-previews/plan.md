@@ -208,7 +208,7 @@ order (engine-architect's Medium).
 - `verify-token`: it calls the fixed host `api.cloudflare.com`, never an address taken from the environment.
   - It prints only the token's status, `not_before` and `expires_on`.
   - It reads the project's real subdomain from Cloudflare's project record, which can differ from the project name,
-    for `read-url`.
+    for `read-url`. This chat added this point after both reviews, so the build's security review checks it.
 - `read-url`: it requires the link to begin with `https://pr-<number>.` on that subdomain.
 - `check-headers`: as section 2.5.
 - `comment`:
@@ -262,8 +262,10 @@ GitHub (Shamble-Frontlines, Settings):
    - "Allow administrators to bypass configured protection rules" unticked.
    - Deployment branches and tags: "Selected branches and tags", Add rule, Branch, `main`.
    - Add the environment secret `WALL_TEST` with the value `not-a-token`.
-   - Tell the session. It re-runs M1 and answers within about 3 minutes. If any planted job ran, stop: delete the
-     environment, and no token goes in.
+   - Tell the session. It re-runs M1 with its own GitHub tools and answers within about 5 minutes.
+   - If its tools cannot re-run the run or read GitHub's refusal line, he clicks "Re-run all jobs" on the run's page
+     and sends a screenshot of the refusal line.
+   - If any planted job ran, stop: delete the environment, and no token goes in.
 
 Cloudflare again:
 6. Manage Account, Account API Tokens, Create Token, Custom token, named `shamble-previews-deploy`. It must be an
@@ -363,9 +365,12 @@ Before the merge:
   - a pull-request job with `deployment: false`;
   - a push to the branch.
 
-  The bite: before click 5, they run and print "absent". The pass, after click 5 and again after click 8: GitHub
-  refuses all three before any step runs, with its refusal line quoted, and makes no deployment record. The file
-  leaves the branch before the final review.
+  The bite: before click 5, they run and print "absent". The pass, after click 5 and again after click 8:
+  - GitHub refuses all three before any step runs; each job shows no steps;
+  - its refusal line is quoted, where the session's tools show it, else from his screenshot;
+  - whether a deployment record was made is read where the tools allow, else recorded as not read.
+
+  The file leaves the branch before the final review.
 - **M2, the script's tests.** On fixtures, each with a planted defect:
   - every refuse-list entry;
   - the commit match;
@@ -421,6 +426,8 @@ MAIN-WALL (a) adds the time to design and measure main's new rule before click 8
 his second short sitting.
 
 ## 10. Order of work, after his go (each with a checkpoint save)
+- **U0.** As soon as TRIGGER is answered: the request to CI Builder on #59 (section 5). Its pull request is the likely
+  slowest part, so it goes first.
 - **U1.** The host folder: the script, its tests and the header file. Then the manifest and lockfile, by
   LANE2-LOCKFILE, with M3 before the push.
 - **U2.** The three workflow files, byte for byte as the Appendix gives them.
@@ -429,7 +436,6 @@ his second short sitting.
     and 18:15 Amsterdam (17:11:56 UTC, 1778 bytes, sha256 e2554c4e...);
   - his answers to section 12;
   - the dated pointer in #67's report (his item 4).
-- **U4.** The request to CI Builder on #59.
 - **U5.** A draft pull request, then his sitting with M1 on it.
 - **U6.** The throwaway file out.
 - **U7.** Review round 1 on the final diff, then the fix pass. A changed line goes back to him for a new yes.
@@ -467,7 +473,8 @@ Settled by the advisor agent, not his to decide:
 3. **LANE2-LOCKFILE: who writes the lockfile that pins Wrangler?** His accepted Part 15 keeps "every Cargo.toml and
    package.json, both lockfiles" with lane 1, and his words of 2026-11-18 to lane 2 read "You own no manifest and no
    lockfile".
-   - (a) Lane 1 adds the two files on a #59 request (its own small pull request; slower).
+   - (a) Lane 1 adds the two files on a #59 request: its own small pull request, with a plan, the advisor agent, the
+     security-auditor and his go, about 1 to 2 working days. Step 2.6's merge waits for it.
    - (b) He lets lane 2 own this one lockfile, for the host tool only, outside the npm workspace.
    - Recommendation: (b), for speed. Either way, Wrangler stays out of the game's install, and the security review
      (M3) applies.
@@ -491,7 +498,9 @@ Settled by the advisor agent, not his to decide:
      - The advisor agent: the gap reaches all of main whatever he picks. Under ACCOUNT (b), the token adds only the
        previews account, so (b), with (a) as the next change-set, is proportionate and keeps one sitting. Under
        ACCOUNT (a), it agrees with (a) first.
-   - This chat recommends (b) with ACCOUNT (b), and (a) as the next change-set either way.
+   - This chat recommends (b) with ACCOUNT (b), and (a) as the next change-set either way. That differs from the
+     security-auditor's recommendation. This chat changed its own from (a) to (b) after both reviewers had read
+     revision 2, and neither has read this change.
 
 ## 13. What changed from revision 1, by finding
 | Finding | Change |
@@ -519,6 +528,7 @@ Settled by the advisor agent, not his to decide:
 | engine-architect Lows | 6.9, 2.1, 2.6, 3 |
 | Security revision 2, Mediums A to C | MAIN-WALL's wording; section 2.8, the script; the runbook line in section 3 |
 | Security revision 2, the Low on outsiders' closes | not taken: it would change `preview.yml`'s text. A fork's close only starts an extra reconcile run with the token; it is a follow-up |
+| This chat's own edits after both approvals | M1's fallback click and its reading; U0 (the CI request first); the subdomain read in 2.8 (flagged for the build's security review); LANE2-LOCKFILE (a)'s cost; this chat's MAIN-WALL recommendation changed, said in the entry |
 | Advisor revision 2, conditions 1 to 4 | section 4 (a second sitting under MAIN-WALL (a)); section 9; MAIN-WALL's proofs and its two views; TOKEN-WINDOW settled |
 
 ## Appendix: the three workflow texts his go covers (each byte for byte, with its sha256)

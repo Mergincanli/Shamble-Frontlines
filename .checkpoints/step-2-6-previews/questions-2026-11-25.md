@@ -8,9 +8,9 @@ The plan is `.checkpoints/step-2-6-previews/plan.md`, revision 2.
   points. All seven are in.
 - engine-architect, the owner of ADR 0002, accepts the departure from its draft.
 - His go on the plan covers the three workflow texts in its Appendix, by their sha256:
-  - `preview.yml` c66c0b0a9351…
-  - `preview-close.yml` c2f1fa90511d…
-  - `wall-test.yml` 3af067068060…, a throwaway.
+  - `preview.yml` c66c0b0a9351a528695908c57f7256d2cd18713219c5698a17eaebaac469c28e
+  - `preview-close.yml` c2f1fa90511db0f558d4e9287d64e189877f8cbc03eb27e6efbe08787fe20e66
+  - `wall-test.yml` 3af067068060971beba8444346fdb836b7779a41403ac09d25e43027e8b18507 (a throwaway)
 - Nothing is built before his go.
 
 Settled without him, by the advisor agent:
@@ -37,7 +37,8 @@ Settled without him, by the advisor agent:
 4. **LANE2-LOCKFILE: who writes the lockfile that pins the upload tool (Wrangler)?** His Part 15 keeps every
    `package.json` and lockfile with lane 1, and his words of 2026-11-18 to lane 2 read "You own no manifest and no
    lockfile".
-   - (a) Lane 1 adds the two files on a request on issue #59 (its own small pull request; slower).
+   - (a) Lane 1 adds the two files on a request on issue #59: its own small pull request, about 1 to 2 working days.
+     Step 2.6's merge waits for it.
    - (b) Lane 2 owns this one lockfile, for the upload tool only, outside the game's npm workspace.
    - Recommendation: (b), for speed. Either way the tool stays out of the game's install, and the security-auditor
      checks the exact files before they are pushed.
@@ -54,7 +55,9 @@ Settled without him, by the advisor agent:
      not skip `gate` and `smoke`. The token clicks then move to a short second sitting.
    - (b) He accepts the risk in writing for now, with (a) as the next change-set. This is available only with
      ACCOUNT (b).
-   - The security-auditor recommends (a). The advisor agent finds (b) proportionate with ACCOUNT (b). This chat
-     recommends (b) with ACCOUNT (b), and (a) as the next change-set either way.
+   - The security-auditor recommends (a). The advisor agent finds (b) proportionate with ACCOUNT (b).
+   - This chat recommends (b) with ACCOUNT (b), and (a) as the next change-set either way. This chat changed its
+     recommendation from (a) to (b) after both reviewers had read the plan, and neither has read the change.
+   - Ask: does MAIN-WALL belong with the guard-fix chat?
 7. **The test repository's clean-up, at his own timing.** Switch off the hourly checker before 2 December, then archive
    the repository, then delete the old test project and its Access application.
