@@ -1,7 +1,98 @@
 # Plan: ADR 0006's small revision after the preview hosting check (lane 2, Builder V2)
 
-Revision 2, 2026-11-25. It folds in the advisor agent's APPROVE with nine conditions, given on revision 1 (cbd5ada).
-Its notes are in `advisor-plan.md` in this folder.
+Revision 3, 2026-11-25: the review round's fix pass. The section "Revision 3" below lists every change from revision 2.
+Where it gives a final text, that text replaces revision 2's text in section 3.
+
+Revision 2 (cbd5ada's revision 1 with the advisor agent's APPROVE and nine conditions folded in) is otherwise
+unchanged. The advisor agent's notes are in `advisor-plan.md` in this folder.
+
+## Revision 3: the fix pass after review round 1 (for the advisor agent's approval before any edit)
+Round 1 returned three verdicts:
+- infra-engineer: REVISE (F1 High; F3, F4 and F5 Low wording; F6 Low; F2 Medium, made a follow-up).
+- test-engineer: APPROVE, with condition C1 for the final head; F2, F4, F5 and F6 are Low wording fixes; F1, F3 and
+  F7 are follow-ups.
+- The verifier: FAIL, for one reason only: E3 and E7 as placed at 1c45ed7 depart from revision 2 without a recorded
+  approval. E7 runs 12 lines against "at most 8", its opener differs, and Q1 is not answered separately for alias and
+  `workers.dev` links. E3's bracket wording differs. Every claim, number, date and byte it checked holds.
+
+Their notes are in this folder: `infra-engineer-review.md`, `test-engineer-review.md`, `verifier.md`.
+
+**R3-1. E7, final text.** It replaces revision 2's frame of "at most 8 lines" and its quoted opener. It is a short
+paragraph of 15 lines; his words ask for "a short paragraph". The new text answers infra-engineer's F1, F3, F4 and F5
+and the verifier's Q1 point. Lines 155-166 at 1c45ed7 become:
+```
+   *Workers static assets, weighed again* (2026-11-25, after the header mark failed; Mustafa's ONE-OFF-HEADER (a);
+   Cloudflare's docs read 2026-11-25, paths under developers.cloudflare.com/workers/ unless marked): none of the
+   check's marks was measured on Workers. The host adds `noindex` to `workers.dev` Preview URLs, "but not to custom
+   domain Preview URLs" (previews/custom-domains); the docs are silent on production's own address, its `workers.dev`
+   URL, its version links and their aliases (versions-and-deployments/version-urls; configuration/routing/workers-dev),
+   so they neither show nor rule out the header the check found on Pages' production one-off links. A pull request
+   gets a Preview of its branch's files (previews/configuration), at most 100 per Worker on the Free plan, the oldest
+   deleted when the limit is reached, and a command that deletes it (previews; wrangler/commands/workers); on Pages,
+   PREV-DELETE was met through the cleanup job, with a departure (the check's report, PM-0006-6). A wall can cover
+   previews only (configuration/cloudflare-access); `_headers` takes host rules (static-assets/headers); 25 MiB a
+   file, as on Pages (developers.cloudflare.com/pages/platform/limits/); no monthly cap on deploys is named
+   (platform/limits; platform/pricing). Cloudflare's Pages overview says "Start new projects with Workers"
+   (developers.cloudflare.com/pages/). None of this answers a failed mark: the revised header row is met by the
+   readings already taken on Pages (the check's report, Appendix A), so Pages stays; a move would mean running the
+   check again on Workers.
+```
+What changed in it, and why:
+- "where Pages sets no cap" is cut (infra F1, High). The Pages limits page no longer says previews are unlimited; it
+  names a retention rule (follow-up ADR6-PAGES-RETENTION). The Workers side now names its own rule instead: "the oldest
+  deleted when the limit is reached" (S2: "When a limit is reached, Cloudflare automatically deletes the oldest").
+- "`workers.dev` Preview URLs" now uses the source's own words (infra F5).
+- "silent on production's own address, its `workers.dev` URL, its version links and their aliases" answers Q1 for
+  each kind of link (infra F4; the verifier; the advisor agent's condition 7). The sources are S1 and S8, and infra-
+  engineer's Q1 answers say "silent" for each.
+- "on Pages, PREV-DELETE was met through the cleanup job, with a departure" (infra F3). The report's PM-0006-6 row
+  reads "Met with a departure".
+- "as on Pages" now names its source (the verifier: pages limits :71).
+
+**R3-2. E3, final text** (as placed at 1c45ed7), with one clock fix from the verifier's Low. His decision is dated by
+his own label in Amsterdam time, while DECISIONS heads it in UTC (2026-11-24, 23:53:15):
+- "[...] and Cloudflare's docs do not say (read 2026-11-24 and 2026-11-25; PM-0006-7;
+  `docs/reports/2026-11-24-preview-hosting-check.md`). If uploads count, [...] work that way anyway (Mustafa's
+  STEP4-COUNT (b), 2026-11-25, 00:55 Amsterdam time). A paid plan [...]"
+- It replaces revision 2's "(read 2026-11-24, and again for this revision) (PM-0006-7; ...)". The dates are now
+  concrete: Q8 was read on 2026-11-25.
+
+**R3-3. E1, test-engineer's F6.** Production's custom domain is judged too, as PM-0006-8 already does:
+- "production none on its own address (the project's `pages.dev` host)" becomes "production none on its own addresses
+  (the project's `pages.dev` host, and a custom domain if CF has one, as in PM-0006-8)".
+- This is stricter, not looser.
+
+**R3-4. E1b, new: PM-0006-2's "what it proves" cell** (test-engineer's F2, Low):
+- "The host serves each header set as generated, on both URL forms (part 1; decides R5-PREV-OQ6)" becomes "The host
+  serves each header set as generated, on both URL forms (production's one-off addresses: the host's own
+  `X-Robots-Tag` recorded, not judged) (part 1; decides R5-PREV-OQ6)".
+
+**R3-5. E4, test-engineer's F5** (one date, as in E3):
+- "Cloudflare's docs do not say (2026-11-24)" becomes "Cloudflare's docs do not say (read 2026-11-24 and 2026-11-25)".
+
+**R3-6. E11, new: the hosting checklist's intro** (:1459; test-engineer's F4, Low), to match E10's "readings":
+- "or the numbers it asks for." becomes "or the readings it asks for."
+
+**R3-7. Follow-ups, not edits** (into STATUS's follow-ups, with their text in the archive):
+- ADR6-ROLLBACK (infra F2, Medium): align Rollback's trigger with the mark-fail rule; "only the deploy target
+  changes" understates a move.
+- ADR6-WK-ROUTE: the R5 and R6 lines on `versions upload --preview-alias` and "no deletion read" get dated pointers.
+- ADR6-WK-BIC: any re-run on Workers sends a descriptive User-Agent.
+- ADR6-PAGES-RETENTION: Pages keeps deployments 30 days plus the 100 newest; part 1's "no cap on previews" and the
+  options row's "Unlimited previews" are re-read at the draft's next revision; R5-PREV-F13 is checked.
+- PHC-PREVIEW-NOINDEX (test F1, Medium, older than this change): step 2.6's plan takes a build-output test that each
+  preview mode's `_headers` carries the `noindex` rule and production's does not, with a bite; and, before any preview
+  is served where the host adds no `noindex`, the preview expectation is read there.
+- ADR6-PM7-PAGES (test F3) and ADR6-PM7-FIGURE (test F7) go to the draft's next revision.
+
+**R3-8. The report**, test-engineer's C1. Whether his go covers E9 and E10 is its own entry in "Decisions needed",
+PASS-WORDS, written in plain words. His word on step 4 is its own item in "For Mustafa".
+
+**R3-9. Review round 2, on what changed only:**
+- infra-engineer re-reads E7's new lines and E3.
+- The verifier checks the head against this revision word for word, and spot-checks the new source claims (the
+  version-urls and workers-dev pages' silence; S2's "deletes the oldest"; pages limits for 25 MiB).
+- test-engineer's fixes are its own words, so the verifier's word-for-word check covers them.
 
 Branch `claude/optimistic-albattani-mdoonz`, standing in for `cs/adr0006-header-row`; this cloud session may push only
 this branch. Base: main 09faefa (#66's merge). Checkpoint: `.checkpoints/adr0006-header-row.md`.
