@@ -1,8 +1,8 @@
 diff --git a/packages/e2e/playwright.config.ts b/packages/e2e/playwright.config.ts
-index 89898a3..6f448a7 100644
+index 89898a3..90f1275 100644
 --- a/packages/e2e/playwright.config.ts
 +++ b/packages/e2e/playwright.config.ts
-@@ -1,13 +1,19 @@
+@@ -1,13 +1,20 @@
  import { defineConfig } from "@playwright/test";
  
 -// Two projects. `node` runs the browser-free tests in tests/node/: it is what the package's `test` script runs, in
@@ -13,17 +13,18 @@ index 89898a3..6f448a7 100644
  //   SHAMBLE_DIST="$PWD/packages/client/dist" SHAMBLE_CHROMIUM=/opt/pw-browsers/chromium \
  //     node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium
 +//
-+// `firefox` runs the same browser tests in Mozilla's own Firefox, the build players run (Mustafa's FIREFOX-SOURCE
-+// (c), 2026-11-25), which Playwright drives over WebDriver BiDi (`channel: "moz-firefox"`); SHAMBLE_FIREFOX names
-+// its program, as SHAMBLE_CHROMIUM names Chromium's. It leaves out the allocation spec, which reads Chromium's own
-+// heap profiler.
++// `firefox` runs the same browser tests in Mozilla's own Firefox build (Mustafa's FIREFOX-SOURCE (c), 2026-11-25),
++// which Playwright drives over WebDriver BiDi (`channel: "moz-firefox"`) in a fresh profile with Playwright's own
++// test preferences, not a player's: one of them sets `security.fileuri.strict_origin_policy` to false, so what
++// file-url.spec.ts records for Firefox may differ from a player's Firefox. SHAMBLE_FIREFOX names its program, as
++// SHAMBLE_CHROMIUM names Chromium's. It leaves out the allocation spec, which reads Chromium's own heap profiler.
  const dist = process.env["SHAMBLE_DIST"];
  const browser = process.env["SHAMBLE_CHROMIUM"];
 +const firefox = process.env["SHAMBLE_FIREFOX"];
  export const ADDRESS = "http://127.0.0.1:4173";
  
  export default defineConfig({
-@@ -26,6 +32,18 @@ export default defineConfig({
+@@ -26,6 +33,18 @@ export default defineConfig({
        timeout: 90_000,
        use: { baseURL: ADDRESS, launchOptions: browser === undefined ? {} : { executablePath: browser } },
      },

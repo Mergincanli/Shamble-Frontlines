@@ -1,17 +1,18 @@
---- .github/workflows/toolchain.yml	2026-11-24 22:52:03.074184317 +0000
-+++ /tmp/claude-0/-home-user-Shamble-Frontlines/a76aa597-3c23-5a09-a54b-6a021626ca13/scratchpad/draft/toolchain.yml	2026-11-25 17:18:24.928117143 +0000
-@@ -7,7 +7,9 @@
+--- a/.github/workflows/toolchain.yml
++++ b/.github/workflows/toolchain.yml
+@@ -7,7 +7,10 @@
  # CI-WASM: before the cut, the wasm-bindgen tool's archive is fetched and checked against Mustafa's values and by
  # GitHub's own check of the release; its one program is installed root-owned. Inside the cut the page is built with
  # it; then the boundary tests, the type checks of the Worker, the page and the browser specs, and the browser tests
 -# run (in the runner image's Google Chrome: nothing is downloaded for them).
-+# run, in the runner image's Google Chrome and then in its Mozilla Firefox (Mustafa's FIREFOX-SOURCE (c); Playwright
-+# drives that Firefox over WebDriver BiDi): nothing is downloaded for them. Inside the cut the job also runs every
-+# crate's release tests, the two vector generators' checks and the test-only module's own wasm32 build.
++# run in the runner image's Google Chrome, then the tests the firefox project of playwright.config.ts names run in its
++# Mozilla Firefox (Mustafa's FIREFOX-SOURCE (c); Playwright drives that Firefox over WebDriver BiDi): nothing is
++# downloaded for them. Inside the cut the job also runs every crate's release tests, the two vector generators' checks
++# and a wasm32 build of the test-only crate (devtools) on its own line.
  name: toolchain
  
  on:
-@@ -156,8 +158,14 @@
+@@ -156,8 +159,14 @@
                SHAMBLE_WRITE_TYPES=1 cargo test --workspace --locked
                changed=$(git status --porcelain --untracked-files=all -- packages/types/src/generated)
                [ -z "$changed" ] || { echo "writing the generated types again changed:"; echo "$changed"; exit 1; }
@@ -27,12 +28,12 @@
                npm ci --offline --ignore-scripts --no-audit --no-fund
                npm test --workspaces
                npx --no -- tsc --version
-@@ -194,4 +202,11 @@
+@@ -194,4 +203,11 @@
                SHAMBLE_DIST="$PWD/.gate/dist-development" SHAMBLE_CHROMIUM=/opt/google/chrome/chrome \
                  npx --no -- playwright test -c packages/e2e/playwright.config.ts --project=chromium --workers=1 --retries=0 \
                    --reporter=list --global-timeout=300000
-+              echo "== the browser tests in the runner image Mozilla Firefox, the same limits (the allocation spec is Chromium only)"
-+              ldconfig -p | grep -F "libEGL.so.1 " || echo "libEGL.so.1: not on this runner (printed, not judged)"
++              echo "== the tests the firefox project names, in the runner image Mozilla Firefox, the same limits (never the allocation spec)"
++              if ! cache=$(/usr/sbin/ldconfig -p); then echo "libEGL.so.1: not checked, ldconfig -p failed (printed, not judged)"; elif printf "%s\n" "$cache" | grep -F "libEGL.so.1 "; then :; else echo "libEGL.so.1: not in the loader cache of this runner (printed, not judged)"; fi
 +              [ -f /usr/lib/firefox/firefox ] && [ ! -L /usr/lib/firefox/firefox ] || { echo "/usr/lib/firefox/firefox is not a plain file"; exit 1; }
 +              /usr/lib/firefox/firefox --version
 +              SHAMBLE_DIST="$PWD/.gate/dist-development" SHAMBLE_FIREFOX=/usr/lib/firefox/firefox \
