@@ -130,6 +130,7 @@ export const CASES = [
   ['config --list', DAY, sh('git config --list'), true],
   ['timeout wrapper hides force push', DAY, sh('timeout 30 git push -f origin cs/x'), true],
   ['env wrapper hides force push', DAY, sh('env GIT_TRACE=1 git push --force origin cs/x'), true],
+  ['keywords before git status go on (SAME-GAP)', DAY, sh('if true; then git status; fi'), false],
   ['subshell hides force push', DAY, sh('(git push -f origin cs/x)'), true],
   ['absolute git path', DAY, sh('/usr/bin/git push -f origin cs/x'), true],
   ['gh api read', DAY, sh(`gh api repos/${REPO}/pulls/1`), false],
@@ -1189,13 +1190,51 @@ export const DAY_CASES = [
   ['SEC-U7B-1 env -C before a force push: the deny wins', dsh('env -C /d git push --force origin cs/x'), DENY],
   ['SEC-U7B-1 an unknown flag is read on: the force push behind it is refused', dsh('env --block-signal git push --force origin cs/x'), DENY],
   ['SEC-U7B-1 env X=1 -i: env runs -i, not git, so a force push asks', dsh('env X=1 -i git push --force origin cs/x'), ASK],
-  ['SEC-U7B-1 a program named constructor is no wrapper (no throw)', dsh('constructor -x git status'), null],
+  ['SEC-U7B-1 a program named constructor is no wrapper; git behind it asks (rule U; no throw)', dsh('constructor -x git status'), ASK],
+  ['SEC-U7B-1 a program named constructor is no wrapper (no throw)', dsh('constructor -x status'), null],
   ['SA-R1-2 env -S git, then a force push: the deny wins', dsh('env -S git push --force origin cs/x'), DENY],
   ["SA-R1-2 env -S 'git push --force': the deny wins", dsh("env -S 'git push --force' origin cs/x"), DENY],
   ['SA-R1-2 env --split-string=git, then a force push: the deny wins', dsh('env --split-string=git push --force origin cs/x'), DENY],
   ['SA-R2-1 env -Sgit (attached), then a force push: the deny wins', dsh('env -Sgit push --force origin cs/x'), DENY],
   ["SA-R2-1 env -S '' (no words), then a force push: the deny wins", dsh("env -S '' git push --force origin cs/x"), DENY],
   ['SA-R2-1 env -S with a tab in its value: the deny wins', dsh("env -S 'git\tpush' --force origin cs/x"), DENY],
+  // SAME-GAP (guard-wrappers): every name unwrap() strips reads its options from WRAP_OPTS; each known form reaches git
+  // (a force push behind it is refused) and git status behind it stays allowed (forms from each program's own help)
+  ...['timeout 30', 'timeout -k 5 30', 'timeout -k5 30', 'timeout --kill-after 5 30', 'timeout --kill-after=5 30', 'timeout -s KILL 30',
+    'timeout -sKILL 30', 'timeout --signal KILL 30', 'timeout --signal=KILL 30', 'timeout -v 30', 'timeout --verbose 30',
+    'timeout --preserve-status 30', 'timeout --foreground 30', 'timeout -- 30', 'xvfb-run -a', 'xvfb-run -l', 'xvfb-run --auto-servernum',
+    'xvfb-run --listen-tcp', 'xvfb-run -e f', 'xvfb-run -ef', 'xvfb-run --error-file f', 'xvfb-run --error-file=f', 'xvfb-run -f a',
+    'xvfb-run --auth-file a', 'xvfb-run -n 1', 'xvfb-run --server-num 1', 'xvfb-run -p x', 'xvfb-run --xauth-protocol x', 'xvfb-run -s x',
+    "xvfb-run -s '-screen 0 1x1x24'", 'xvfb-run --server-args x', 'xvfb-run -w 1', 'xvfb-run --wait 1', 'xvfb-run --', 'time', 'time -p',
+    'env time -p', 'exec', 'exec -c', 'exec -l', 'exec -cl', 'exec -a x', 'exec -ax', 'command', 'command -p', 'command --', 'nohup',
+    'noglob', 'nice -n 5 timeout 30 xvfb-run -a time -p']
+    .flatMap((w) => [[`SAME-GAP ${w}: a force push behind it is refused`, dsh(`${w} git push --force origin cs/x`), DENY],
+      [`SAME-GAP ${w}: git status behind it stays allowed`, dsh(`${w} git status`), null]]),
+  // xargs adds words from its input to git or gh, so git or gh behind it asks (a force push is still refused)
+  ...['xargs', 'xargs -0', 'xargs -r', 'xargs -t', 'xargs --null', 'xargs --no-run-if-empty', 'xargs -n 1', 'xargs -n1', 'xargs --max-args 1',
+    'xargs --max-args=1', 'xargs -I {}', 'xargs -d x', 'xargs -a f', 'xargs -P 2', 'xargs -L 1', 'xargs -s 99', 'xargs -E x', 'xargs --']
+    .flatMap((w) => [[`SAME-GAP ${w}: a force push behind it is refused`, dsh(`${w} git push --force origin cs/x`), DENY],
+      [`SAME-GAP ${w}: git behind it asks (its input adds words)`, dsh(`${w} git status`), ASK, {}, /does not follow xargs \(its input/]]),
+  ...['timeout --sig KILL 30', 'timeout --kill 5 30', 'timeout -x 30', 'xvfb-run --server-a x', 'xvfb-run -ae f', 'xvfb-run --auto', 'time -x',
+    'exec -x', 'exec -ca x', 'command -x', 'command --foo', 'nohup -x', 'builtin -x', 'noglob -x', '! -x', 'xargs -i', 'xargs -e',
+    'xargs --max 1', 'xargs -l']
+    .flatMap((w) => [[`SAME-GAP ${w}: ask`, dsh(`${w} git status`), ASK, {}, /^kit and gate files ask first in a day session: the guard does not follow /],
+      [`SAME-GAP ${w}: an agent is refused`, dsh(`${w} git status`, { agent_id: 'a1' }), DENY, {}, /an agent runs commands without /]]),
+  ['SAME-GAP a keyword before git status stays allowed', dsh('if true; then git status; fi'), null],
+  // rule U: a program the guard does not strip, with git or gh among its later words, asks; git or gh is read on
+  ['SAME-GAP U: git status behind an unknown program asks', dsh('sudo git status'), ASK, {}, /does not read sudo in front of git or gh/],
+  ['SAME-GAP U: an agent is refused', dsh('sudo git status', { agent_id: 'a1' }), DENY, {}, /not behind sudo/],
+  ['SAME-GAP U: a force push behind an unknown program is refused (read on)', dsh('sudo git push --force origin cs/x'), DENY],
+  ['SAME-GAP U: gh behind an unknown program is read on', dsh('sudo gh pr merge 27'), DENY],
+  ['SAME-GAP U: a lock wrapper', dsh('flock /tmp/l git status'), ASK],
+  ['SAME-GAP U: find -exec', dsh('find . -name x -exec git status \\;'), ASK],
+  ...['which git', 'type gh', 'grep -n git docs/x.md', 'echo gh', 'ls ~/.config/gh']
+    .map((l) => [`SAME-GAP U: ${l} only reads words`, dsh(l), null]),
+  // rule C (SA-R1-3): a line that reaches the turn limit asks; the env -u row (env takes git as the value, runs push)
+  ['SAME-GAP C: past the turn limit, a kit write asks', dsh(`${'env '.repeat(21)}sed -i s/a/b/ CLAUDE.md`), ASK, {}, /more than 20/],
+  ['SAME-GAP C: past the turn limit, git status asks', dsh(`${'X=1 '.repeat(21)}git status`), ASK, {}, /more than 20/],
+  ['SAME-GAP C: past the turn limit, a force push is refused', dsh(`${'env '.repeat(21)}git push --force origin cs/x`), DENY],
+  ['SAME-GAP env -u takes git as its value and runs push: no git check', dsh('env -u git push --force origin cs/x'), null],
   ['SA-R1-4 a long word is cut in the reason', dsh(`nice --adj=${'x'.repeat(40)} git status`), ASK, {}, /does not follow nice --adj=x{26}\.\.\. in front/],
   ['SA-R1-4 a control character is shown as ?', dsh("nice '--a\nb' git status"), ASK, {}, /does not follow nice --a\?b in front/],
 ];
@@ -1328,7 +1367,7 @@ const DAY_MUTANTS = [
   ['R-c only the listed words reach a cd', '!prefix.every((w) => CD_REACH.has(w))', 'false'],
   ['R-c command -v does not run the cd', "'command', '-p', '--']);", "'command', '-p', '-v', '--']);"],
   ['R-c a loop keyword does not reach a cd', "new Set(['if', '{',", "new Set(['while', 'if', '{',"],
-  ["R-c unwrap strips command's options", "while (/^-[pvV]+$|^--$/.test(a[0] ?? '')) a = a.slice(1);", ''],
+  ["R-c unwrap strips command's options (SAME-GAP: from WRAP_OPTS)", "['command', { flag: /^-[pvV]+$/ }]", "['command', {}]"],
   ['R-c a bare keyword runs nothing', 'prefix.every((w) => WRAPPERS.has(w))) return vcwd;', 'false) return vcwd;'],
   ['R-c a pushd to an unknown target makes the stack unknown', "if (prog === 'pushd') dirs.stack = null;", ''],
   ['R-c popd with an empty stack', 'if (a.length || !dirs.stack?.length) {', 'if (a.length || !dirs.stack) {'],
@@ -1399,10 +1438,22 @@ const DAY_MUTANTS = [
     "if (prog === 'env') while (a.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0]))"],
   ['SEC-U7B-1 a program word starting with - after the options', "if (a[0]?.startsWith('-')) unreadable ??=", 'if (false) unreadable ??='],
   ["SEC-U7B-1 nice's -N form", 'flag: /^-\\d+$/', 'flag: /^$/'],
-  ['SEC-U7B-1 a Map, not a plain object', 'const o = WRAP_OPTS.get(prog);', 'const o = Object.fromEntries(WRAP_OPTS)[prog];'],
+  ['SEC-U7B-1 a Map, not a plain object', 'const o = WRAP_OPTS.get(prog) ??', 'const o = Object.fromEntries(WRAP_OPTS)[prog] ??'],
   ['SEC-U7B-1 the ask on a wrapper form', 'if (u.unreadable) {', 'if (false) {'],
   ['SEC-U7B-1 the agent refusal', 'if (input.agent_id) return deny(`${KIT_AGENT}; an agent runs commands', 'if (false) return deny(`${KIT_AGENT}; an agent runs commands'],
   ["SA-R1-2 env -S's words are read on", 'if (o.split?.test(name)) a = [', 'if (false) a = ['],
+  // SAME-GAP (guard-wrappers)
+  ["SAME-GAP timeout's duration word", 'if (o.pos) a = a.slice(o.pos);', ''],
+  ['SAME-GAP xargs feeds words from its input', 'if (o.input) fed = true;', ''],
+  ['SAME-GAP git or gh behind xargs is unreadable', 'if (fed && ', 'if (false && '],
+  ['SAME-GAP keywords get the empty entry', '? NONE : undefined', '? undefined : undefined'],
+  ["SAME-GAP time's -p", "['time', { flag: /^-p$/ }]", "['time', {}]"],
+  ["SAME-GAP exec's -a takes a value", "['exec', { flag: /^-[cl]+$/, value: /^-a$/ }]", "['exec', { flag: /^-[cl]+$/ }]"],
+  ['SAME-GAP C the turn limit asks', 'if (turns === 20 && a.length) unreadable ??=', 'if (false) unreadable ??='],
+  ['SAME-GAP U asks', 'if (gw > 0) {', 'if (false) {'],
+  ['SAME-GAP U refuses an agent', 'if (input.agent_id) return deny(`${KIT_AGENT}; an agent runs git and gh', 'if (false) return deny(`${KIT_AGENT}; an agent runs git and gh'],
+  ['SAME-GAP U reads on', 'if (r2?.deny) return r2;', ''],
+  ['SAME-GAP U spares the read-only programs', '!NON_RUNNERS.has(prog)', 'true'],
 ];
 test('mutation runs (kit-v3-3 day rules): every rule is needed by some day case', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
