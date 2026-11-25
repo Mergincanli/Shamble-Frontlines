@@ -11,13 +11,8 @@ have returned); keep each item to its asked length.
    replan-units.md:61-62; "likely" in brackets): U4k 540-1,280 (800-1,900), U6d 1,800 (2,450-2,700), U6e 1,575-1,825
    (2,150-2,750), and the killed-room check; U6j and MOVED are Builder 2's already. Fences and waits come with Stop B,
    read from their briefs.
-3. A lighter take-in, in three lines (nothing changes until he answers; the limits are the checker's Q4 lean,
+3. A lighter take-in, three lines (nothing changes until he answers; the limits are the checker's lean,
    advisor-main-66.md:181-210, not a ruling):
-   - One take-in recipe, checked once by the advisor agent, for any main move that passes fixed limits read after the
-     fetch: main's new merges change only .md files under docs/ (no CLAUDE.md, AGENTS.md or docs/design/), no mark row
-     (`| PM-`) in docs/adr/ changes, main's CI on the tip is green, and the only conflict is STATUS.md's "In flight" block.
-   - Then the same commands re-derive the numbers into the plan with a dated line, he gets one line naming the new pull
-     requests, and only the advisor's read of the pushed head stays per move. Anything outside the limits (a second
-     conflict, code, CI, rules, a manifest, a mark row, a red run) falls back to today's full plan and check.
-   - It saves per move the plan's rewrite (30 to 90 minutes, three times today), the plan check's agent and its wait for
-     a usage window (up to 5 hours), and the stale numbers when main moves before the check.
+   - One recipe, checked once, used only when main's new merges touch only docs .md files (no CLAUDE.md, AGENTS.md, design doc or mark row), main's CI is green, and the one conflict is STATUS.md's table.
+   - The same commands re-derive the numbers, he gets one line naming the new pull requests, and only the advisor's read of the pushed head stays; anything else falls back to today's full plan.
+   - It saves per move the plan rewrite (30-90 minutes, three times today), the check agent and its wait for a usage window (up to 5 hours), and stale numbers when main moves again.
