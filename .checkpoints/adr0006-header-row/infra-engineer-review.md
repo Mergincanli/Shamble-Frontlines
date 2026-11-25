@@ -120,3 +120,56 @@ Sources: my notes `infra-engineer-workers.md` (S1-S22, Q1-Q8, all read 2026-11-2
   - the "unlimited" sentence is gone.
   Update R6-HOST-F3 (a dated pointer), part 1's *Why:* "no cap on previews" (:147-148) and the options row's
   "Unlimited previews" (:624), and check R5-PREV-F13 against it.
+
+## Round 2 (2026-11-25; the fix pass ab15d6d, head a4152ad; only what changed)
+Read: `git diff 1c45ed7..ab15d6d -- docs/adr/0006-infrastructure-operations.md`; plan.md "Revision 3" (R3-1 to R3-11).
+Two re-reads today:
+- **S2 again**, /workers/previews/index.md, dateModified 2026-09-24, :70-73: "When a limit is reached, Cloudflare
+  automatically deletes the oldest to make room:"; "**Preview limit**: the Preview that was deployed to least recently
+  is deleted."; "**Deployment limit**: the oldest deployment in that Preview is deleted."
+- **The check's report :228:** "no custom domain was used".
+
+### Round 1 findings: closed
+- **F1 closed:** "where Pages sets no cap" is cut from E7. R3-10 carries the Pages side with its present source.
+- **F3 closed:** "on Pages, PREV-DELETE was met through the cleanup job, with a departure (the check's report,
+  PM-0006-6)" matches report :35 ("Met with a departure") and names one mark only.
+- **F4 closed:** "silent on production's own address, its `workers.dev` URL, its version links and their aliases"
+  matches my Q1, which says silent for each (S1, S8, also S10, S11, S13). Both paths are right:
+  versions-and-deployments/version-urls (S1) and configuration/routing/workers-dev (S8). "Silent" stays "silent".
+- **F5 closed:** "`workers.dev` Preview URLs" is S5's own term.
+- **F6 closed:** recorded as R3-1, a short paragraph of 15 lines.
+- **"25 MiB a file, as on Pages (developers.cloudflare.com/pages/platform/limits/)":** right. S23: "The maximum file size
+  for a single Cloudflare Pages site asset is 25 MiB." On Workers, S13 covers it under the later "(platform/limits; ...)".
+
+### New findings
+- **G1. Low, optional, no push on its own.** E7, "the oldest deleted when the limit is reached", uses the page's
+  lead-in word. For the limit E7 names (100 Previews per Worker), the page's own rule is "the Preview that was deployed
+  to least recently is deleted". A reader may take "oldest" as "made first". If the line is touched again: "the least
+  recently deployed one deleted when the limit is reached" (previews).
+- **G2. Low, optional, no push on its own.** E3's "2026-11-25, 00:55 Amsterdam time" is his message's own label
+  ("25 November, 00:55 Amsterdam", DECISIONS :189). The record's time, 23:53:15 UTC, is 00:53 Amsterdam (CET, UTC+1).
+  Not wrong, since it is his label. If touched: "(Mustafa's STEP4-COUNT (b); his label "25 November, 00:55
+  Amsterdam")".
+
+### R3-10, part 1's "no cap on previews"
+- It says no more than S23:
+  - "as read on 2026-10-28" is R6-HOST-F3's date;
+  - "no longer says so" is S23's absent "unlimited" sentence;
+  - the quoted sentence is S23's :93, word for word;
+  - the URL is right.
+- It never says Pages "has a cap", and it calls the retention rule nothing but what the page says. Holds.
+
+### R3-11 and the other edits
+- **R3-11 and E1 (custom domain):** consistent with each other and with PM-0006-8's "on a custom domain if CF has one".
+  The row is stricter, not looser. The check's project had no custom domain (report :228), so that clause had nothing to
+  read, and E7's "the revised header row is met by the readings already taken" still holds. On the real project, his
+  shamblefrontlines.com at Cloudflare (OQ-0006-15) would be judged "none" if it is ever attached to Pages. That is right
+  for production.
+- **E1b:** "the host's own `X-Robots-Tag`" fits the report: the production build writes no noindex (Appendix A :667-668).
+  A wrong build rule would also show on production's own address, where the bite catches it (:805-811). Holds.
+- **E4's dates** ("read 2026-11-24 and 2026-11-25") now match E3 and my Q8. **E11**, "readings", matches E10. Both hold.
+- **Nothing else in the diff** touches part 2, part 3, the options row, the trade-off, "Revisit when" or Rollback. The
+  round 1 follow-ups (ADR6-ROLLBACK, ADR6-WK-ROUTE, ADR6-WK-BIC, ADR6-PAGES-RETENTION) stand as R3-7 lists them.
+
+### Round 2 verdict: APPROVE
+G1 and G2 are Low and optional; neither needs a push on its own.
