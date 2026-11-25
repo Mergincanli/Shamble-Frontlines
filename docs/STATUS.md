@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small CI pull request in flight; the merged #67 and #69 rows moved to the archive's "In flight" by script; other lanes' lines about #67, #68 and #69 left to their lanes)._
+_Last updated: 2026-11-25 (change-set 4a's docs pass, with 3b's owed one, on main 07d673b: #70 in flight; no change-set 3c (his ORDER-3C (c)); the merged #71's row and waiting bullet and 3a's follow-ups bullet moved to the archive by script; lane 2's lines left as they are)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -10,39 +10,39 @@ _Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small C
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged** (2026-11-25, read with git): #67, ADR 0006's revision (c1da1bd); #69 (311c048); #68, 3b (3ab9eae).
+- **Last merged** (2026-11-25, read with git): #71, ci-after-3a (07d673b); #67 (c1da1bd); #69 (311c048); #68, 3b (3ab9eae).
 - **The kit:** KIT-FREEZE-2, FREEZE-FDN, his exceptions and additions, and his words of 2026-11-13 for step 2.3 (on kit,
   gate and CI edits): `docs/DECISIONS.md`; the bullet that quoted them whole: the archive's "Phase", at its end.
 - **The legacy game is frozen** (critical fixes only). Legacy phase 0 stays PARTIAL until his Windows run.
 - **main** is protected (a pull request with the `gate` and `smoke` checks green); `toolchain` runs on every push and
   pull request but is not a required check (REQUIRED-CHECK, a finding for step 2.3); gate, smoke and toolchain green on
-  09faefa7 (read 2026-11-25, 12:34 UTC). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16).
+  07d673b (read 2026-11-25, 22:12 UTC). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16).
 
 ## In flight (one line per PR)
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| none yet (title and text in the notes, `pr-title.txt`, `pr-body.md`) | ci-after-3a, the small CI pull request after change-set 3a, by the chat he calls CI Builder: every crate's release tests (E1), the two vector generators' `--check` (3A-GEN-CHECK), `devtools`' own wasm32 build line (3A-RULES-STEP's CI half), and the rule tests in the runner image's Mozilla Firefox 160.0 (FIREFOX-TESTS (b), in part: the drawing tests wait, FF-DRAW); report `docs/reports/2026-11-25-ci-after-3a.md` | `claude/keen-tesla-v807cf` (stands in for `cs/ci-after-3a`) | risk tier 2; code head 832268e, gate, smoke and toolchain green on it (runs 45676587871, 45676587814); the head for approval to be given | the advisor agent's review of the final head; his main Advisor opens the draft; his go for that head; at the merge the unused Playwright Firefox zip is deleted (his answer of 2026-11-25, 00:07:29 UTC, point 3) |
+| #70 | change-set 4a, "The recording" (the first of Walk's four parts, his WALK-CUT (a)), by lane 1 (the chat he calls Builder V4): a recorded match replays to the same hashes, tick by tick, natively (one process, two processes, two matches in turn) and in WebAssembly on the players' file (Node and Chromium), and each planted divergence is caught at its tick with the field that differs; the one new number on the players' file is the shared state's hash (`Sim::shared_hash`), read only by a replay | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4a-recording`) | draft; risk tier 1; no browser check (nothing a player sees changes); five reviewers in two rounds (netcode-architect, rust-reviewer, test-engineer, engine-architect, security-auditor), all APPROVE in round 2, nothing Critical, High or Medium open; source final at fb5d0ff unless the verifier finds something, its local checks and CI running; 3,300 written lines against the stop line of 3,400 (3,050 before his STOP-4A (a), 2026-11-25, 20:48:11 UTC) | the verifier's PASS; the advisor agent's review of the final head; his Advisor's merge check; his go for that head |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
    then the Slice 1 note of 2026-11-10, each in a fresh chat. His words: `docs/DECISIONS.md`, "Queued".
-2. v2: the netcode proof test (#40); step 2.3's chat stays stopped. Change-set 3b merged (#68); the small CI pull
-   request by an Opus 5.5 chat (his answer of 2026-11-24, 22:44:50 UTC; E1: every crate's release tests, Firefox in CI
-   by his FIREFOX-TESTS (b), the vector files' check, the test-only module's build step) took 3b in: in flight above,
-   done once it merges (ci-after-3a). **Then change-set 3c** (new): the link simulator and the first recording, moved out of 3b by the size
-   ladder, with the state's hash on the players' file and `devtools`' three path edges; its plan holds the reviewers'
-   items (the archive, "From change-set 3b"). Then change-set 4, the first outside crate in `sim` (its plan names
-   3A-FMA-CHECK). The first builder chat stays paused; Slice 3 waits for #40 and picks how commands are timed.
+2. v2: the netcode proof test (#40); step 2.3's chat stays stopped. 3b (#68) and the small CI pull request (#71) merged.
+   **No change-set 3c:** his ORDER-3C (c), 2026-11-25, 16:59:52 UTC (`docs/DECISIONS.md`): "Split 3c at its seam." The
+   recording is change-set 4a (#70); "The link simulator follows Walk as its own small change-set and is merged before
+   change-set 7 starts." Walk is four change-sets (his WALK-CUT (a)): 4a the recording, 4b content and the world, 4c the
+   first soldier (he plays; an early look inside it), 4d sights; then the link simulator, then 7. Change-set 4's plan,
+   section 8, places each 3c item by name. The first builder chat stays paused; Slice 3 waits for #40 and picks how commands are timed.
 3. Lane 2 (Builder V2), his order of 2026-11-25: #66 merged (09faefa); #67 (ADR 0006's revision) on his go after it
    takes main in; step 2.6's plan (its first edit after his go on the revised row); the carry of his look decisions when
    his block comes; one plan for the look test page and the model-check tool (EARLY-LOOK (a)), built after his go.
 
 ## Waiting on Mustafa
-- ci-after-3a: his go for the head the advisor agent approves, CI green (his main Advisor opens the draft). Answered
-  2026-11-25, 20:35 Amsterdam: RULES-ONLY-READ (a); TOKEN-WORDS (a), its home the next workflow text the CI chat asks
-  him for (the hand-over step for Builder V2's previews); FF-DRAW-WHEN (a), with the gate step 2.3, its own question
-  (`docs/DECISIONS.md`; the report `docs/reports/2026-11-25-ci-after-3a.md`).
+- #70 (4a): his go for the head the advisor agent approves, after his Advisor's merge check (no browser check). From
+  4a's report: his choice on its eight lines (his go's point 4: "I decide then") and FIREFOX-REPLAY (the replay spec in
+  Firefox too: it widens his FIREFOX-SOURCE). STEP-60 (a): his Export again at 30 steps, before 4b's step 6. For later
+  parts: DIFF-LIST, CONTENT-SOURCE, DEPART-4, MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two
+  `docs/UNITS.md` §0 lines the Hornet's entry clashes with, open for his unit walk (his go, point 6).
 - **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (`docs/DECISIONS.md`, 11:38:37 UTC), with
   two conditions: no report calls any part of the presses mark passed; and the two drafts are made to agree at
   their next revision, which comes to him before it is written (**3B-RELEASE-DRAFTS**, his).
@@ -88,17 +88,16 @@ _Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small C
   script, byte for byte, 2026-11-24 (OLD-LINES): the archive's "Follow-ups", "Moved from STATUS (2026-11-24)".
 - **From change-sets 0 and 1 (PRs #56, #58) and Part 15:** O1 (PM-0005-54) and O2, his calls with change-set M's plan;
   the first real export; the coat's motion; the machine lines; ADR 0002's package list; #58's other follow-ups and Lows.
-- **From #60, #61 and #64** (moved by script, 2026-11-25, OLD-LINES): the archive's "Moved from STATUS (2026-11-25)".
-- **From change-set 3a** (the archive's block): 3A-FMA-CHECK (his: first outside crate), 3A-RUST-REPORT (his),
-  3A-PART7-POINTER; for ci-after-3a 3A-GEN-CHECK, 3A-RULES-STEP (below); built in 3b, closed by its merge
-  3A-FROM-F64, 3A-HOOK-TEST, 3A-MANIFEST-COMMENT; for the gate step 3A-LINT-MULADD, 3A-SCAN-NAMES, 3A-CONFIG-FILE,
-  3A-PEDANTIC; later 3A-FEATURE-VERSION, 3A-SCAN-HELPERS, 3A-PART5-CLASH, 3A-NAME-SECTION, 3A-RNG-COPY, 3A-STATS-ROWS,
-  3A-PLANTS, 3A-FMA-LOG, 3A-NO-FMA, 3A-OTHER-BROWSERS; for the drafts 3A-DEPARTURES.
-- **From change-set 3b** (the archive's block): for 7 3B-LATE-BOUND (no room on a network without it), 3B-PLAUSIBLE;
-  before online play 3B-ACKS, 3B-OUTAGE-256; for 4, 8 and 9 3B-ONE-PER-TICK; for 5 3B-ALLOC-METHOD (PA-N2 carries over);
-  for PM-0002-13 and -8 3B-KEY-POST, 3B-SATURATED; for Slice 3 3B-REFUSED-FIELD; his: 3B-LONG-HOLD, at ADR 0001's next
-  edit, with 3B-OQ6-POINTER; 3B-RELEASE-DRAFTS; design: 3B-PACER-255; for 4 3B-RESUME-FLASH; for the CI pull request
-  3B-OTHER-BROWSERS; later 3B-POOL-16, 3B-CSS-PROD, 3B-PUB-MODS, 3B-BLUR-TEST, 3B-HOSTILE-ALLOC; 3c's plan items.
+- **From #60, #61, #64 and change-set 3a (#65)** (moved by script, OLD-LINES): the archive's "Moved from STATUS (2026-11-25...)".
+- **From change-set 3b** (#68; the archive's block): for 7 3B-LATE-BOUND (no room on a network without it), 3B-PLAUSIBLE;
+  before online play 3B-ACKS, 3B-OUTAGE-256; for 4c, 8 and 9 3B-ONE-PER-TICK; for 5 3B-ALLOC-METHOD (PA-N2 carries over);
+  for PM-0002-13 and -8 3B-KEY-POST, 3B-SATURATED; for Slice 3 3B-REFUSED-FIELD; his: 3B-LONG-HOLD with 3B-OQ6-POINTER at
+  ADR 0001's next edit, 3B-RELEASE-DRAFTS; design: 3B-PACER-255; for 4c 3B-RESUME-FLASH, 3B-POOL-16, 3B-CSS-PROD,
+  3B-BLUR-TEST; 3B-OTHER-BROWSERS (FF-DRAW); later 3B-PUB-MODS; for the link simulator's change-set 3B-HOSTILE-ALLOC (by
+  4a's size ladder, told to him in STOP-4A) and 3c's link items; 3c's recording items met by 4a, closed at its merge.
+- **From change-set 4a** (#70; the archive's block): for 4b 4A-NA-4B, 4A-EA-4B; for 4c N5, 4A-BYTES-LENGTH, E2-2,
+  4A-TE-4C, 4A-NA-4C, 4A-EA-4C, security-auditor's C4; for 4c or 8 E2-3; for 7 C1 (binding from Slice 3's first build that
+  talks to a real server); for 8 N4, C2; Slice 3 C3; the gate step 4A-S3-READ; his word first 4A-FIREFOX-REPLAY; 4A-HASH-REVISIT.
 - **From ADR 0006's revision** (#67, lane 2; the archive's block): ADR6-ROLLBACK (Medium), -WK-ROUTE, -WK-BIC,
   -PAGES-RETENTION, -PM7-PAGES, -PM7-FIGURE, -WORDING, -REVISIT-WORKERS; step 2.6: STEP26-WORKERS, PHC-PREVIEW-NOINDEX.
   #66's follow-ups (PHC-CLICKLESS and the rest, for step 2.6): the archive's "Moved from STATUS (2026-11-25, lane 2)".
@@ -112,9 +111,10 @@ _Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small C
 - **CI:** the smoke job's Chromium step stalled once (PR #42); on #50 (3f29cb8, 8d8c422) its library install failed in 5
   attempts and was cancelled in 1 (a runner DNS outage). #64's browser tests use a Chrome that moves with the image.
 - **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's (R3-R6
-  spot-checked; unread sources); change-set 3a's (MUL-ADD first); change-set 3b's (no bound yet on how late a command
-  runs, before online play; releases worked out, not counted). **Legacy (frozen):** 3a's ranked list (PR #15); bot
-  navigation; the editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
+  spot-checked; unread sources); change-set 3a's (MUL-ADD first); 3b's (no bound yet on how late a command runs, before
+  online play; releases worked out, not counted); 4a's (the recording tests still follow a link, 4A-S3-READ; two planted
+  divergences only in a stand-in or native form). **Legacy (frozen):** 3a's ranked list (PR #15); bot navigation; the
+  editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
 - **Preview hosting (lane 2):** PHC-HEADER (the header mark; revised by #67, waiting for his go); PHC-PROBE-MAIL.
 
 ## Where STATUS's old sections went: the table is at the end of `docs/STATUS_ARCHIVE.md` (moved there 2026-11-18)
