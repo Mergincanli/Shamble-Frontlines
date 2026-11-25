@@ -455,6 +455,18 @@ older posts, 0 wrong keys; the press test 10,000 presses and releases, 495 posts
 590 a block, 561 of them the link's own work). Planted defects: 53; the seven that need a browser were caught
 (03:02:14 UTC), the queue's and the tests' seven too (03:03:44 UTC); the full run on the final head follows.
 Size: 6,909 added lines (stop line 7,600).
+**CI on 6abf3d2a (the final code): gate, smoke and toolchain green** (toolchain run 45537884772, job
+138948885336, 03:08:37 to 03:13:35 UTC: 4 min 58 s of its 15 minutes); every count as written above; 16 browser
+tests; the Wasm's sha256 as here. There: the loop 1,814 ticks in 60.6 s, 138 presses and releases, 0 lost, 0
+doubled, key to tick median 238.1 ms and 95th percentile 257.8 ms on a runner that drew about 7 frames a second;
+the press test 10,000 presses and releases made and echoed, 0 lost, 0 doubled, 502 posts delayed, 46 sent twice
+(all 46 behind a newer post), 1 first copy overtaken, 47 ignored by the Worker (exactly the sum), 0 ticks ran an
+older post, 0 ran other keys than their post's; allocation 91 bytes a frame, 590 a block (569 of them the link's
+own work). The log: `.gate/cs3b/ci-6abf3d2a-toolchain.log` (scratch).
+
+**After the code (started 2026-11-25, about 03:09 UTC):** the full run of the 53 planted defects on 6abf3d2a;
+the verifier (its copy `.gate/verifier-cs3b`, its notes `verifier-cs3b.md`); docs-keeper's docs pass (its notes
+`docs-keeper-3b.md`). Then the report, the advisor agent on that head (with the question on M1), the zip.
 
 **What CI must show on the commit with engine-architect's four Lows (written before the push):** cargo debug,
 twice: 26, 1, 3, 2, 19, 8, 15, 1, 17, 5, 1, 13, 1, 1 (113: the two halves of the random-message test are now one

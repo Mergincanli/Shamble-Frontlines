@@ -44,7 +44,7 @@ What this is: the same empty lit ground with its 1 m grid, now alive. Six keys a
 and Shift. A small row of six boxes at the bottom left shows them. A box does not light when you press its
 key: it lights when the press has gone to the local game server inside the page, through the real network
 messages, and has come back. The readout has two new lines: "messages" (sent, received, refused) and
-"presses" (made, echoed, lost). Nothing in this folder installs anything or goes online: the small server
+"presses" (made, echoed, lost, doubled). Nothing in this folder installs anything or goes online: the small server
 answers this computer only.
 
 You need Node 18 or newer. To check: in PowerShell, type  node --version  and press Enter.
@@ -61,15 +61,16 @@ Steps (about 15 minutes; Brave first, then Firefox once)
  2. Click once on the picture, then press and hold W. Its box should light a moment later and stay lit.
     Let go: it should go dark.
  3. Tap Space quickly ten times. The box should flash each time. In the readout, "presses" should end with
-    the same number made and echoed and "0 lost". While you are still tapping it says "(counting)".
+    the same number made and echoed, "0 lost" and "0 doubled". While you are still tapping it says "(counting)".
  4. Hold A, switch to another tab for 30 seconds, then come back without touching the keyboard. A should be
     dark (keys held are let go when the tab is hidden), "last pause" should show about 30 s hidden, and
     "ticks while hidden" 0 or a very small number.
  5. Cover Brave's window completely with another window (for example a maximised File Explorer) for
     1 minute, then bring Brave back to the front. Do not switch tabs here, only cover the window.
  6. Leave it 2 minutes, with the window in front. Then press "Copy report" and paste the result into the
-    chat. In it, "messages.sent" and "messages.received" should have climbed with "tick" (30 a second) and
-    "messages.refused" should be 0. Tell us also whether every box lit as you expected.
+    chat. In it, "messages.sent" and "messages.received" should have climbed with "tick" (30 a second), and
+    these should all be 0: "messages.refused", "olderPosts", "wrongKeys", "presses.lost", "presses.doubled"
+    and "releases.doubled". Tell us also whether every box lit as you expected.
  7. In Firefox: open http://127.0.0.1:4173 , do steps 2 and 3 once, wait 2 minutes, press "Copy report"
     and paste it.
  8. Back in PowerShell, press Ctrl+C to stop the server.

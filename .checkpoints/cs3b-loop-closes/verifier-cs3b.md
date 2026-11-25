@@ -1,0 +1,32 @@
+# Verifier, change-set 3b, head 6abf3d2a (base main 28254a73)
+
+Copy: /home/user/Shamble-Frontlines/.gate/ci-wasm-wt/.gate/verifier-cs3b (detached at 6abf3d2a). Work only there.
+
+## Plan
+1. Gate `node tools/gate.mjs --no-smoke`; `git diff --stat 28254a73 6abf3d2a -- legacy tools .github .claude CLAUDE.md` empty;
+   `git diff --stat 1ee3e918 6abf3d2a -- '*.toml' Cargo.lock 'package*.json'` empty.
+2. Logic: cargo fmt --check, clippy all targets, cargo test debug (14 binaries 114), release sim+protocol (19,8,17,5,1),
+   decoder test --nocapture (10M+10M per type, 0 panics, caps, planted index + over-alloc found; PM-0001-34 row words vs test;
+   card/notes say "started" not "passed"); vitest client 85, types 7, net 1, sim-worker 46; typecheck.sh 7 ok.
+3. Dev build into .gate/dist-development, boundary 18, Wasm 53,813 bytes sha256 5ebae154...; production build passes checks.
+4. Browser 16 tests once (port 4173 free first); readings; total time < 5 min.
+5. Plants (my copy): the 14 listed + 5 bites; then 2 of my own.
+6. PM-0002-12 row vs presses.spec.ts.
+7. CI on 6abf3d2a via gh api GET.
+8. Size numstat (6,909; stop line 7,600).
+9. Ten numbers from the card checked.
+
+## Log (one line per step: command, exit, result)
+- 1a `git diff --stat 28254a73 6abf3d2a -- legacy tools .github .claude CLAUDE.md`: empty (exit 0); no CLAUDE.md/AGENTS.md/.claude/.github/gate path anywhere in the diff; 0 files under spikes/.
+- 1b `git diff --stat 1ee3e918 6abf3d2a -- '*.toml' Cargo.lock 'package*.json'`: empty (exit 0). (28254a73..1ee3e918: 6 manifest files, 33+/3-.)
+- 1c `node tools/gate.mjs --no-smoke` exit 0: GATE PASS; [1] 5/5 parse, [2] PASS, [3] core 138/game 714/editor 353, +0 -0, dup 0, [4] 51 guarded 0 dead 0 flagged, [5b] 0 problems, [5c] 0 refs, [5d] PASS; base merge-base = origin/main 28254a7. Symbol diff +0 -0 = plan (nothing in legacy/).
+- 2a `cargo fmt --all --check` exit 0, no output. `cargo clippy --locked --workspace --all-targets` exit 0, 0 warning/error lines (10.3 s).
+- 2b `cargo test --locked --workspace` exit 0: client_endpoint 26, ce any_bytes 1, f32_vectors 3, stream_vectors 2, protocol 19, decoder_inputs 8, room 16, room any_bytes 1, sim 17, rules_scan 5, state_hash_alloc 1, sim_wasm 13, panic_hook 1, step_alloc 1 = 114 (devtools unit 0, doc-tests 0). Matches.
+- 2c `cargo test --release --locked -p sim -p protocol` exit 0: 19, 8 (7.09 s), 17, 5, 1. Matches. Release profile: overflow-checks = true (Cargo.toml:30-31).
+- 2d decoder --nocapture exit 0 (7.16 s): per type 10,000,000 random + 10,000,000 mutated, 0 panics; max bytes at once/cap: Join 1024/1024, JoinAccepted 64/64, JoinRejected 0/0, Input 0/320, Snapshot 0/0; taken random/mutated: Join 70/2,733,072, JA 284/2,431,993, JR 5,340/135,022, Input 18/2,587,079, Snap 7,864/2,355,138. Planted unchecked index found at input 17 (panic at decoder_inputs.rs:496), planted over-allocation at input 0 (31,504 bytes). Control test passes (debug and release).
+- 2d' PM-0001-34 row (ADR 0001:1626) vs test: count 10M per type met (10M random AND 10M mutated); 0 panics met (catch_unwind, run stops at first panic); "0 allocations above the size limits" met as: largest single request <= cap per type, exact calls (control: 1 call of exactly the token/mode-id length when taken, 0 when refused; Input: <=2 calls per run, each exactly a list's cap; Snapshot: 0 calls); "1 run per type" met; bite "unchecked index in one decoder found within the run" met (test plant = wrapper that indexes before the real snapshot decoder, input 17; same seed so inside the 10M run too). NOT met (so "started" only): "cargo-fuzz" (own xorshift64* generator, by his item (a)); "every message type of the catalogue" (5 of ~16 catalogue types: Ping/Pong, FullState, Resync, ClientSettings, RoomState, HostCommand, PickUpgrade, Buy, ContentReload, RoomEnded, Leave/Kick have no decoder yet). Card/notes keep to "started": test doc line 1-4 "begun ... starts the mark and does not pass it"; card lines 35, 191-192 restate the rule; no file says the mark passed ("8 passed" lines are test-binary counts).
+- 2e vitest (node node_modules/vitest/vitest.mjs run --root ...): client exit 0, 10 files 85 tests; types 2 files 7; net 1 file 1; sim-worker --dir src 7 files 46. Matches.
+- 2f `bash .checkpoints/cs3b-loop-closes/typecheck.sh` (after the dev build; script sha256 417b9136... same as main folder's) exit 0: tsc 6.0.3, 7 "ok" lines.
+- 3a dev build (SHAMBLE_WASM_BINDGEN=.../wb-tool/x/wasm-bindgen 0.2.130 = Cargo.lock) exit 0 (31.7 s): pkg/sim_wasm_bg.wasm 53,813 raw / 21,994 gzip / 18,464 brotli; sha256 5ebae15400f9435dfd31108fe380e96253695b8bed4a7e639ce94bc180b41262 (pkg and dist-development/assets identical). Matches the card. Test-only module built into .gate/rules-module.
+- 3b boundary `vitest run --root packages/sim-worker --dir packages/sim-worker/boundary` exit 0: 2 files, 18 tests. Matches.
+- 3c production build `--production --out-dir .gate/dist-production` exit 0: build's own checks passed (bundleProblems: DEV_MARKERS incl. new "key-diagram"); my grep: 0 of 5 markers in production JS; no serve.mjs; one wasm = players' (same sha256). Production CSS still carries the key-diagram rules (EA-9, a named follow-up, not new).
