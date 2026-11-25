@@ -8,13 +8,14 @@ The small CI pull request after change-set 3a, built by the chat Mustafa calls C
 
 ## Files
 - `.github/workflows/toolchain.yml`: written exactly as Mustafa approved it (CI-WRITE-2 (a), 2026-11-25, 19:00 Amsterdam; sha256 01898e4b…5742), the permission mode read right before the write: `default`.
-- `packages/e2e/playwright.config.ts`: a third project, `firefox`, approved with the workflow, then narrowed to `tests/rules/` by his rule after the first run.
+- `packages/e2e/playwright.config.ts`: a third project, `firefox`, approved with the workflow, then narrowed to `tests/rules/` after the first run, on the chat's reading of his rule (RULES-ONLY-READ, asked of him).
 - Docs: the report; DECISIONS (his words by script); STATUS, the archive's follow-ups, REPO_MAP, ROADMAP.
 
 ## Evidence
 - Each new line tried in the container first; two planted faults fail the checks.
 - First GitHub run (toolchain 45670972698): red as foreseen, the Firefox drawing tests on "This page could not start drawing: … this.gl is null", libEGL.so.1 absent, the rule tests green.
-- Second run on 832268e: gate, smoke and toolchain green; Chromium 16 passed, Firefox 2 passed, the job 5 min 20 s.
+- Second run on 832268e: gate, smoke and toolchain green; Chromium 16 passed, Firefox 2 passed, the job 5 min 22 s.
+- The first run also hit Playwright's 5-minute stop beside the "no WebGL" line; his rule sends a time-out to him first, so the rules-only change was the chat's reading, asked of him afterwards (RULES-ONLY-READ in the report).
 
 ## Reviews
 - **The advisor agent:** the plan approved (revision 2); its review of the final head is given with the full head id.
@@ -23,7 +24,7 @@ The small CI pull request after change-set 3a, built by the chat Mustafa calls C
 ## Not in it
 - No game code, no package source, no kit or gate file, no download in CI.
 - TOKEN-WORDS (a comment about the token) is deferred.
-- The two specs' stale comments are outside this fence.
+- Two specs' comments that will need updating once Firefox runs them are outside this fence (FF-SPEC-COMMENTS).
 
 ## Not verified
 - Firefox's drawing tests.
