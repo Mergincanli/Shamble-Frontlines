@@ -1,6 +1,6 @@
 # Mustafa, 2026-11-25: RELEASE-COUNT (a) with two conditions, and his browser check in Brave (the Copy report and his note on the hidden-tab step)
 
-_Copied by script from the chat's transcript (session_01WLuqnvpAh9XTitx8ehKJcQ), never retyped: the user message of 2026-11-25T11:38:37.977Z (uuid 1c462a05-585f-4152-955c-ff2492c2dada), whole (4879 bytes, sha256 76f8c4f841dda18886a8077bc418b5dd1f2bd1424e955d6b39aef27d5407d30b). What it answers: Builder V3's question of 2026-11-25, about 04:30 UTC (question-2026-11-25-browser-check.md): the browser check of change-set 3b and RELEASE-COUNT_
+_Copied by script from the chat's transcript (session_01WLuqnvpAh9XTitx8ehKJcQ), never retyped: the user message of 2026-11-25T11:38:37.977Z (uuid 1c462a05-585f-4152-955c-ff2492c2dada), whole (4879 bytes, sha256 76f8c4f841dda18886a8077bc418b5dd1f2bd1424e955d6b39aef27d5407d30b). What it answers: Builder V3's question of 2026-11-25, about 04:30 UTC (question-2026-11-25-browser-check.md): the browser check of change-set 3b and RELEASE-COUNT._
 
 ---
 For Builder V3, from me, written with my main Advisor (25 November, 12:15 Amsterdam).

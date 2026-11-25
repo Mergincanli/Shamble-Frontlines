@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-25 (change-set 3b's docs pass, after #65's merge; main 28254a7)._
+_Last updated: 2026-11-25 (change-set 3b's last commit: his browser check and RELEASE-COUNT; main 28254a7)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -22,7 +22,7 @@ _Last updated: 2026-11-25 (change-set 3b's docs pass, after #65's merge; main 28
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| none yet | change-set 3b, "The loop closes" (the second half of change-set 3, his SIZE-3 (b)), by the chat he calls Builder V3: the page's keys reach a local server in the Worker through the real messages and come back (the codec of five messages, the transport interface and the loopback, the room, the client endpoint, local play's one step); a player sees a key diagram (W, A, S, D, Space, Shift) lit from the local server's echo and two new readout lines (messages; presses); the decoder test at its row's count, a mark started, never passed (PM-0001-34); the link simulator and the first recording moved to change-set 3c by the size ladder; report `docs/reports/2026-11-25-cs3b-the-loop-closes.md` (being written) | `claude/loving-hopper-6p0mg2` (stands in for `cs/3b-loop-closes`) | risk tier 1; built; the final code 6abf3d2a; 6,909 added lines against about 3,800 planned (stop line 7,600); the players' Wasm 53,813 bytes; 114 Rust tests, 139 Node tests, 18 boundary tests, 16 browser tests; 53 of 53 planted defects caught on it; gate, smoke and toolchain green on it (toolchain run 45537884772); six reviewers passed two rounds, nothing Critical or High open; no pull request yet (his GH-NEXT (a): the chat puts the title and text in its notes, his main Advisor opens the draft, he presses Ready and Merge) | the verifier, then the advisor agent; then his browser check (Brave, then Firefox) and his go |
+| none yet | change-set 3b, "The loop closes" (the second half of change-set 3, his SIZE-3 (b)), by the chat he calls Builder V3: the page's keys reach a local server in the Worker through the real messages and come back (the codec of five messages, the transport interface and the loopback, the room, the client endpoint, local play's one step); a player sees a key diagram (W, A, S, D, Space, Shift) lit from the local server's echo and two new readout lines (messages; presses); the decoder test at its row's count, a mark started, never passed (PM-0001-34); the link simulator and the first recording moved to change-set 3c by the size ladder; report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`; his browser check `docs/reports/2026-11-25-cs3b-browser-check.md` | `claude/loving-hopper-6p0mg2` (stands in for `cs/3b-loop-closes`) | risk tier 1; built; the final code 6abf3d2a; 6,909 added lines against about 3,800 planned (stop line 7,600); the players' Wasm 53,813 bytes; 114 Rust tests, 139 Node tests, 18 boundary tests, 16 browser tests; 53 of 53 planted defects caught on it; gate, smoke and toolchain green on it (toolchain run 45537884772); six reviewers passed two rounds, nothing Critical or High open; the verifier PASS; the advisor agent approved the code as it stands; his browser check clean in Brave and Firefox (2026-11-25, both on WebGPU, every asked number 0); RELEASE-COUNT decided, (a) with two conditions; no pull request yet (his main Advisor opens it from the chat's title and text, he taps the merge) | the advisor agent's approval of the last commit and CI green on it; then his go for exactly that commit |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
@@ -38,14 +38,13 @@ _Last updated: 2026-11-25 (change-set 3b's docs pass, after #65's merge; main 28
    paused; then lane 2's work; Slice 3 waits for #40, and picks how commands are timed (his decision of 2026-11-24).
 
 ## Waiting on Mustafa
-- Change-set 3b: after the verifier and the advisor agent, his browser check (Brave, then Firefox) and his go for the
-  approved head (his main Advisor opens the draft from the chat's notes; he presses Ready and Merge).
-- **RELEASE-COUNT, open (his):** the presses mark's row (PM-0002-12) says the Worker counts presses and releases
-  "through the edge counters"; the boundary draft (ADR 0002 part 5) has the post carry press and release edge
-  counters; the netcode draft (ADR 0001 part 5) defines press counters only, and that is what 3b built: releases are
-  worked out from presses and held keys, with two checks on the page (a button held again with no press; each tick's
-  held keys against the post it used). (a) accept as built and correct the row's sentence at the drafts' next edit;
-  (b) add a release counter per button to the messages. The builder recommends (a). Text: the archive, "From 3b".
+- Change-set 3b: his go for the merge of exactly its last commit (the chat gives him the full id after the advisor
+  agent's approval of that commit and CI green; his main Advisor opens the pull request; he taps the merge). His
+  browser check is in (Brave and Firefox, 2026-11-25). His go accepts as still open: 3B-LATE-BOUND,
+  OVERFLOW-PANIC-RULE, and the two press limits (3B-PACER-255, 3B-OUTAGE-256: his decisions when due).
+- **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (`docs/DECISIONS.md`, 11:38:37 UTC), with
+  two conditions: no report calls any part of the presses mark passed; and the two drafts are made to agree at
+  their next revision, which comes to him before it is written (**3B-RELEASE-DRAFTS**, his).
 - His to give: the roles and CLAUDE.md line of ACCT-3 (his third account, which counts like the other two); his go
   before anything goes to the Rust project (3A-RUST-REPORT); ADR 0004 part 7's pointer sentence, shown first
   (3A-PART7-POINTER).
@@ -100,11 +99,12 @@ _Last updated: 2026-11-25 (change-set 3b's docs pass, after #65's merge; main 28
   3A-FROM-F64, 3A-HOOK-TEST, 3A-MANIFEST-COMMENT; for the gate step 3A-LINT-MULADD, 3A-SCAN-NAMES, 3A-CONFIG-FILE,
   3A-PEDANTIC; later 3A-FEATURE-VERSION, 3A-SCAN-HELPERS, 3A-PART5-CLASH, 3A-NAME-SECTION, 3A-RNG-COPY, 3A-STATS-ROWS,
   3A-PLANTS, 3A-FMA-LOG, 3A-NO-FMA, 3A-OTHER-BROWSERS; for the drafts 3A-DEPARTURES.
-- **From change-set 3b** (the archive's block, in review): for change-set 7 3B-LATE-BOUND (no room on a network without
+- **From change-set 3b** (the archive's block): for change-set 7 3B-LATE-BOUND (no room on a network without
   it), 3B-PLAUSIBLE; before online play 3B-ACKS, 3B-OUTAGE-256; for 4, 8 and 9 3B-ONE-PER-TICK; for 5 3B-ALLOC-METHOD
   (PA-N2 carries over); for PM-0002-13 and -8 3B-KEY-POST, 3B-SATURATED; for Slice 3 3B-REFUSED-FIELD; his:
-  3B-LONG-HOLD, at ADR 0001's next edit, with 3B-OQ6-POINTER; design: 3B-PACER-255; for the CI pull request
-  3B-OTHER-BROWSERS; later 3B-POOL-16, 3B-CSS-PROD, 3B-PUB-MODS, 3B-BLUR-TEST, 3B-HOSTILE-ALLOC; and 3c's plan items.
+  3B-LONG-HOLD, at ADR 0001's next edit, with 3B-OQ6-POINTER; 3B-RELEASE-DRAFTS; design: 3B-PACER-255; for 4
+  3B-RESUME-FLASH; for the CI pull request 3B-OTHER-BROWSERS; later 3B-POOL-16, 3B-CSS-PROD, 3B-PUB-MODS,
+  3B-BLUR-TEST, 3B-HOSTILE-ALLOC; and 3c's plan items.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100

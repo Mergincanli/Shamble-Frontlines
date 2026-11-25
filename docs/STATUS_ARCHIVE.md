@@ -1450,7 +1450,7 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     yet); ADR 0002 part 5's planned dev-only feature (3A-PART5-CLASH) (engine-architect's round 1, its departures line,
     and NEW-C). Inside DEPART-3 (a), said here so it is not lost: PM-0002-53's counter in WebAssembly is the tools
     crate's own function (test-engineer's round 1, its Low (c): "accepted by DEPART-3 (a); say so").
-- **From change-set 3b, "The loop closes"** (in review, no pull request yet; branch `claude/loving-hopper-6p0mg2`
+- **From change-set 3b, "The loop closes"** (reviewed, his browser check in, no pull request yet; branch `claude/loving-hopper-6p0mg2`
   standing in for `cs/3b-loop-closes`, final code 6abf3d2a; risk tier 1; two review rounds by six reviewers
   (engine-architect, netcode-architect, rust-reviewer, test-engineer, security-auditor, perf-auditor): round 1 on
   bbbf09e4 (2026-11-25; a container restart cut three of them short, who finished in round 2), round 2 on 0dfca749
@@ -1458,20 +1458,27 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
   come; report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`, being written. Source of every item: 3b's card,
   "Open findings" and "Round 2 so far", and the reviewers' notes `.checkpoints/cs3b-loop-closes/<reviewer>-review1.md`
   and `-review2.md`, readable on the branch until the notes are removed. The ids are this docs pass's):
-  - **His open decision, RELEASE-COUNT** (test-engineer's round 2; listed in STATUS, "Waiting on Mustafa"): the presses
-    mark's row (PM-0002-12, `docs/adr/0002-code-structure-build-toolchain.md:1283`) says "the Worker counts the
-    presses and releases it applies through the edge counters"; the boundary draft (ADR 0002 part 5, line 319) has
-    the post carry "press and release edge counters", while the netcode draft (ADR 0001 part 5, line 226) defines a
-    press counter per button only, and that is what 3b built. The releases are worked out from the presses and the
-    held keys, with two checks on the page: a button held again with no press (`EchoTally.heldWithoutPress`) and each
-    tick's held keys against the post it used (`WorkerLink.wrongKeys`), both asserted 0 in both browser specs. So the
-    mark is met for presses; for releases "0 lost and 0 doubled" is met at the echo's resolution, never "through the
-    edge counters". Options: (a) accept as built and correct the row's sentence at the drafts' next edit; (b) add a
-    release counter per button to the messages: 16 bytes more per command, so up to 128 more per input message (292
-    to 420) until delta coding. The builder recommends (a), because the releases follow exactly from the held keys
-    and the press counters (so does a charged shot that fires when its button is let go: ADR 0005's AB-3), and the
-    per-tick key check sees every wrong held state. It blocks the claim that the mark is met, not 3b's merge (the
-    advisor agent, 2026-11-25). Neither draft is edited now.
+  - **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (his words: `docs/DECISIONS.md`, the
+    entry of 11:38:37 UTC; no release counter in change-set 3c). What it was about (test-engineer's round 2): the
+    presses mark's row (PM-0002-12, `docs/adr/0002-code-structure-build-toolchain.md:1283`) says "the Worker counts
+    the presses and releases it applies through the edge counters"; the boundary draft (ADR 0002 part 5, line 319)
+    has the post carry "press and release edge counters", while the netcode draft (ADR 0001 part 5, line 226)
+    defines a press counter per button only, and that is what 3b built. The releases are worked out from the
+    presses and the held keys, with two checks on the page: a button held again with no press
+    (`EchoTally.heldWithoutPress`) and each tick's held keys against the post it used (`WorkerLink.wrongKeys`), both
+    asserted 0 in both browser specs. The option not taken, (b): a release counter per button in the messages, 16
+    bytes more per command, up to 128 more per input message (292 to 420) until delta coding. **His two
+    conditions:** no report calls any part of that mark passed, and the mark's numbers stay as the row has them;
+    and the next item.
+  - **3B-RELEASE-DRAFTS (his; at the drafts' next revision, which comes to him before it is written):** the two
+    drafts are made to agree on how releases are counted (ADR 0002 part 5's sentence about press and release edge
+    counters, and the method cell of the row PM-0002-12), with the reason written there. Neither draft is edited
+    by change-set 3b.
+  - 3B-RESUME-FLASH (change-set 4, when a soldier is on screen): what the first picture after a pause shows. In
+    his browser check he once saw, in Brave, a key's box still lit for a split second after coming back to the
+    tab; not in Firefox and not on a second try. From the code: the match stands still while the tab is hidden,
+    the box shows the server's last echo, and the first tick after the return lets the key go
+    (`docs/reports/2026-11-25-cs3b-browser-check.md`). He wrote that it is not an issue; nothing is changed.
   - 3B-LATE-BOUND (change-set 7; before online play: no room goes behind a network transport without it): the room has
     no bound on how late a command may run, so a client that sends nothing for N ticks and then its backlog runs two
     commands a tick for N ticks (security-auditor's round 1, M1, Medium; deferred in writing in its round 2, not

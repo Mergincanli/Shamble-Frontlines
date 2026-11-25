@@ -297,6 +297,21 @@
   out in a small manifest batch under the hold, answered first, before the reviews end.
 
 ## Current step
+**THE LAST STATE OF THIS CARD (2026-11-25, about 12:40 UTC; this commit is the notes' last commit, and the commit
+after it removes this card and the notes folder, as CHECKPOINTS section 9 has it).** His Firefox check came at
+12:14:23 UTC (saved by script: `cs3b-loop-closes/mustafa-2026-11-25-firefox-check.md`, 2,235 bytes, sha256
+5046b4aa...ae73): clean, every asked number 0, WebGPU, 215 presses and releases made and echoed; the hidden-tab
+remark of Brave did not come again ("I think it was either a 1 time flaw from my side and not an issue"): nothing
+is changed, the follow-up 3B-RESUME-FLASH keeps the question for change-set 4. Done in this commit: his two messages
+of 25 November into DECISIONS by `decisions-6.mjs` (5 entries; `--check` passes); the browser-check record
+`docs/reports/2026-11-25-cs3b-browser-check.md`; the report's last version (his check; RELEASE-COUNT (a) with its
+two conditions; no part of the presses mark called passed; where the notes can be read); STATUS, the archive,
+ROADMAP and the repository map; the pull request's text. **What remains, in order:** (1) the commit that removes
+the notes and puts this commit's id into the report; (2) the advisor agent's approval of exactly that commit; (3)
+one push; gate, smoke and toolchain green on it; (4) its full id to him in one line, nothing pushed after; his main
+Advisor opens the pull request from `pr-title.txt` and `pr-body.md` as they stand in THIS commit; he taps the
+merge; (5) the board: a post, and `done` after the merge. Then change-set 3c: plan first, a new checkpoint.
+
 **His answer of 2026-11-25, 11:07:13 UTC (saved by script: `cs3b-loop-closes/mustafa-2026-11-25-release-count.md`,
 1,431 bytes, sha256 3e7f2bf0...f05e; read it there, this is a pointer): RELEASE-COUNT is (a), accept as built; no
 release counter in 3c.** His two conditions: the report keeps saying presses by the row's own method and releases

@@ -4,13 +4,14 @@ Change-set 3b, "The loop closes": the second half of change-set 3. Built by the 
 (session_01WLuqnvpAh9XTitx8ehKJcQ) on his words of 2026-11-24, 23:24:50 UTC: "Otherwise build change-set 3b by the
 plan under your advisor agent's eight conditions, without waiting for me." Risk tier 1 (game code, tests, a page a
 player sees) plus `docs/DECISIONS.md`, a decision doc: it merges only on his go, after his browser check. No pull
-request exists yet: the chat puts the title and text in its notes folder, his main Advisor opens the draft, and he
-presses Ready and Merge.
+request exists yet: his main Advisor opens it from the title and text the chat wrote (`pr-title.txt` and
+`pr-body.md`, readable at the notes' last commit, below), and he taps the merge.
 
-**State of this version of the report:** the code is final at 6abf3d2a; both review rounds are closed and the
-verifier's PASS is in; the advisor agent read the head 09b0043d (REVISE for the text only, the code approved as it
-stands) and its points are worked into this version; its review of these changes and his browser check are not in
-yet (this report is updated when they arrive).
+**State of this version of the report (the last):** the code is final at 6abf3d2a; both review rounds are closed;
+the verifier's PASS is in; the advisor agent approved the code as it stands and the corrected text; his browser
+check is in, Brave and Firefox, with every asked number 0; RELEASE-COUNT is decided, (a) with two conditions. What
+follows this commit and cannot stand in it: the advisor agent's approval of exactly this commit and GitHub's checks
+on it; the chat then gives him the commit's full id and pushes nothing after it (his words of 2026-11-25).
 
 ## Goal
 Close the loop for one player on one machine: a key pressed on the page goes to a local game server inside the page
@@ -25,8 +26,9 @@ told about before anything moved. Two review rounds by six reviewers are closed 
 nothing Critical or High open. The final code is 6abf3d2a (6abf3d2a3d347ac8b2d5a169cbe5ac0aabc3d9b1, 2026-11-25,
 03:08 UTC); GitHub's `gate`, `smoke`
 and `toolchain` are green on it with every test count as written down before the push. Size: 6,909 added lines against
-about 3,800 planned (1.82 times); his stop line of 7,600 was not reached. One decision is asked of him
-(RELEASE-COUNT, below); it does not block his browser check.
+about 3,800 planned (1.82 times); his stop line of 7,600 was not reached. His browser check (2026-11-25) is clean in
+Brave and in Firefox, and the one decision asked of him, RELEASE-COUNT, is taken: (a), accept as built, with two
+conditions (below).
 
 ## Plan and approval
 - **The plan:** `cs3-plan.md`, draft 3, section 5 (advisor agent: APPROVE with conditions, worked into draft 3; his
@@ -88,15 +90,15 @@ about 3,800 planned (1.82 times); his stop line of 7,600 was not reached. One de
   which is not used, and every message type of the catalogue, of which 5 of 16 have decoders. The
   swappable-transport mark belongs to Slice 3 and is not started.
 - **The presses mark (PM-0002-12), in Chromium only: by the mark's method for presses; for releases as far as the
-  server's echo can show them, not by the row's method (RELEASE-COUNT below); and "reorders most neighbours" holds
-  only on a page that draws fast.** 10,000 scripted presses, most shorter than a tick, under a shim that delays
-  every key message by 0 to 100 ms and sends one in ten twice. On GitHub's run of 6abf3d2a: 10,000 presses made
-  and echoed, 0 lost and 0 doubled, button by button; 10,000 releases made and worked out from the echo; 502 key
-  messages delayed, 46 sent twice (all 46 behind a newer one), 1 first copy overtaken; the Worker ignored exactly
-  47; 0 ticks ran older keys than the tick before; 0 ticks held other keys than their message's; 0 refused. Its
-  bites all turn it red: held buttons only; the last message to arrive; a late message counted as ignored and taken
-  all the same; a late message's keys under the newest number; two buttons' counts swapped. **What is not met** is
-  in "Decisions and deviations".
+  server's echo can show them, not by the row's method (RELEASE-COUNT below); and "reorders most neighbours" holds only
+  on a page that draws fast.** 10,000 scripted presses, most shorter than a tick, under a shim that delays every key
+  message by 0 to 100 ms and sends one in ten twice. On GitHub's run of 6abf3d2a: 10,000 presses made and echoed, 0 lost
+  and 0 doubled, button by button; 10,000 releases made and worked out from the echo; 502 key messages delayed, 46 sent
+  twice (all 46 behind a newer one), 1 first copy overtaken; the Worker ignored exactly 47; 0 ticks ran older keys than
+  the tick before; 0 ticks held other keys than their message's; 0 refused. Its bites all turn it red: held buttons
+  only; the last message to arrive; a late message counted as ignored and taken all the same; a late message's keys
+  under the newest number; two buttons' counts swapped. **What the row asks and the runs do not show** is in "Decisions
+  and deviations".
 - **The one-minute loop (PM-0002-64, in Chromium):** on GitHub 1,814 ticks in 60.6 s, one command sent and one
   snapshot received per tick, 0 refused, 138 presses and releases made and echoed, the page makes 0 WebAssembly
   calls. **Key to tick (PM-0002-13): a reading, not judged:** median 238 ms, 95th percentile 258 ms on a runner that
@@ -188,16 +190,22 @@ those three finished in round 2. **All six: PASS in round 2.**
      "Each is one module or one data value by design; how commands are timed is no longer among them: Slice 3
      picks it (Mustafa, 2026-11-24)."
   3b's own queue picks neither way: one slot, a lockstep loopback.
-- **The presses mark, what is and is not met.** Met in Chromium: 0 lost and 0 doubled presses over 10,000, button
-  by button; both of the mark's bites turn the test red. Not met, and stated plainly: (1) the row asks for Chromium,
-  Firefox and WebKit; CI has Chromium only. (2) The row says "the Worker counts the presses and releases it applies
-  through the edge counters". There is no release counter: ADR 0001 part 5 defines press counters only, while ADR
-  0002 part 5 says the post carries "press and release edge counters". Releases are worked out on the page from the
-  presses and the held keys; a doubled one shows as a button held again with no press, and every tick's held keys
-  are checked against the message that tick used. "0 lost and 0 doubled releases" holds as far as the echo can show
-  it; the mark's method for releases is not built (RELEASE-COUNT below). (3) "Reorders most neighbours" holds only
-  on a page that draws fast: on CI's slow page only the second copies arrive out of order (1 first copy overtaken
-  in 502).
+- **The presses mark (PM-0002-12): no part of it is called passed, and its numbers stay as the row has them.**
+  What the runs show, in Chromium: presses were counted by the row's own method (the edge counters), 0 lost and 0
+  doubled over 10,000, button by button, and both of the mark's bites turn the test red; releases were counted by
+  working them out from the presses and the held keys, with two page-side checks (a button held again with no
+  press; every tick's held keys against the message that tick used), 0 lost and 0 doubled as far as the server's
+  echo can show. What the row asks and the runs do not show: (1) Chromium, Firefox and WebKit: CI has Chromium only;
+  (2) releases counted "through the edge counters": there is no release counter (ADR 0001 part 5 defines press
+  counters only, while ADR 0002 part 5 says the post carries "press and release edge counters"); (3) "reorders
+  most neighbours": that holds only on a page that draws fast; on CI's slow page only the second copies arrive
+  out of order (1 first copy overtaken in 502).
+- **RELEASE-COUNT, decided by Mustafa on 2026-11-25 (his words are in `docs/DECISIONS.md`, 11:38:37 UTC): (a),
+  accept as built.** "The messages carry press counters only, as ADR 0001 part 5 has it, and releases are worked
+  out from the presses and the held keys. No release counter is added in change-set 3c." His two conditions: this
+  report keeps saying how each was counted and "calls no part of that mark passed" (the paragraph above); and "the
+  two drafts are made to agree at their next revision", with the reason written there, a revision that "comes to
+  me before it is written": the follow-up **3B-RELEASE-DRAFTS**. No draft is edited here.
 - **Not built: a bound on how late a command may run (security-auditor's Medium).** Nothing moves in 3b, so the
   doubled rate gains nothing yet; the bound is part of the command-timing choice, which is Slice 3's. Named in the
   code where the check will go. Both reviewers set the condition: no room behind a network transport without it;
@@ -227,17 +235,29 @@ those three finished in round 2. **All six: PASS in round 2.**
   window now follows the last command that ran); the one-minute test started its clock after its first reading and
   went red once by one tick on a slow page; the press test's first script chose three of six keys.
 
-## The docs pass (in this change-set; docs-keeper)
-- `docs/DECISIONS.md`: his three messages of 2026-11-24 (22:44:50, 22:59:49 and 23:24:50 UTC), each with what it
-  answers, written by script from the chat's transcript and checked against it (`decisions-5.mjs --check`: "is
-  what this script writes (3 entries on top of 28254a7's)"). No word of his was typed by hand, and the file holds
-  no line of the chat's own (a pointer of the chat's moved to the archive, the advisor agent's Low).
+## His browser check (2026-11-25; the zip built from 8f835d114, the same code)
+Brave and Firefox on his Windows computer, both on WebGPU; the record with both reports read line by line:
+`docs/reports/2026-11-25-cs3b-browser-check.md`. In both: errors 0; messages refused 0; 0 ticks on older keys and 0
+on other keys than their message's; 215 presses made and 215 echoed, 0 lost, 0 doubled; releases 0 doubled; 0 ticks
+while hidden. Key to tick (a reading): 44.8 ms at the 95th percentile in Brave at 134 frames a second, 49.0 ms in
+Firefox at 180. **One remark of his, on the hidden-tab step in Brave:** the A box was still lit for a split second
+after he came back, then dark; not in Firefox, and not again when he tried it in Brave ("I think it was either a 1
+time flaw from my side and not an issue"). Read from the code, the picture from before the pause can show until
+the first tick after the return (about a thirtieth of a second); the match itself stood still and no key stayed
+held in it. Nothing is changed; the follow-up 3B-RESUME-FLASH keeps the question for change-set 4.
+
+## The docs pass (in this change-set; docs-keeper, then the chat for his last two messages)
+- `docs/DECISIONS.md`: his three messages of 2026-11-24 (22:44:50, 22:59:49 and 23:24:50 UTC) and his two of
+  2026-11-25 (11:38:37 UTC: RELEASE-COUNT and the Brave check; 12:14:23 UTC: the Firefox check), each with what it
+  answers, written by script from the chat's transcript and every quotation checked against it (`decisions-6.mjs
+  --check`: "is what this script writes (5 entries on top of 28254a7's)"). No word of his was typed by hand, and
+  the file holds no line of the chat's own.
 - The build plan's three sentences, as above. `docs/STATUS.md` (120 lines), `docs/STATUS_ARCHIVE.md`,
   `docs/ROADMAP.md`: 3a is merged (#65); 3b's row; 3c next with its contents; RELEASE-COUNT listed as open; 16
   follow-ups of 3b (3B-LATE-BOUND to 3B-OQ6-POINTER), each with who named it and when it is due. To keep STATUS at
   its 120 lines, the follow-up blocks of gate step 2.3 moved to the archive under a dated header. 3a's report got a
   dated note after its "No pull request exists yet". `docs/REPO_MAP.md`: about 20 new rows (the check: "repo map OK:
-  193 entries cover 109 required paths"). No ADR was edited.
+  195 entries cover 109 required paths", with this report and the browser-check record). No ADR was edited.
 
 ## Steps and commits
 1ee3e918 the manifest batch · bab5a569, 63d2bf7a step 1 (messages, decoders, loopback) · 90da28c1 step 2 (the
@@ -246,8 +266,8 @@ world) · 409b9434 step 3 (room, endpoint) · 4eeec33a steps 4 and 5 (the one st
 6803671d, a85b9dbb, 6abf3d2a the fixes of round 2.
 
 ## Not verified
-Firefox, WebKit and Brave in CI (his check covers Brave and Firefox by hand); real hardware and the WebGPU backend
-(every headless run falls back to WebGL 2); the key-to-tick mark (a reading only); the decoder mark's full count per
+Firefox, WebKit and Brave in CI (his check covered Brave and Firefox by hand, on his own machine and on WebGPU;
+every headless run falls back to WebGL 2); the key-to-tick mark (a reading only); the decoder mark's full count per
 release; release-profile runs of room, client-endpoint, sim-wasm and devtools on GitHub (local only); anything over a
 link that delays, drops or reorders (3c).
 
@@ -262,7 +282,9 @@ link that delays, drops or reorders (3c).
 late-command bound; the endpoint's plausibility bound on a snapshot's tick; acks bounded from below; presses over an
 outage. Before the marks are judged: keys posted from the key handler too (key to tick); the allocation method
 (change-set 5). For his decision at the netcode record's next edit: a long-hold case for its lag-switch mark.
-Systems that act on presses apply at most their own rule per tick (change-sets 4, 8, 9). Two test gaps from the
+Systems that act on presses apply at most their own rule per tick (change-sets 4, 8, 9). His: 3B-RELEASE-DRAFTS
+(the two drafts agree on how releases are counted, at their next revision, which comes to him before it is
+written). For change-set 4: 3B-RESUME-FLASH (what the first picture after a pause shows). Two test gaps from the
 verifier: a browser test for keys let go when the window loses the focus (3B-BLUR-TEST); a counted "no allocation"
 for hostile bytes in the room and the endpoint (3B-HOSTILE-ALLOC, with 3c's tests).
 
@@ -270,26 +292,28 @@ for hostile bytes in the room and the endpoint (3B-HOSTILE-ALLOC, with 3c's test
 Change-set 3c, the link simulator and the first recording, planned first and reviewed by the advisor agent.
 
 ## Decisions needed
-- **RELEASE-COUNT (how releases are counted for the presses mark).** The mark's row says the Worker counts presses
-  and releases "through the edge counters"; the two decision records disagree, and what is built carries counters
-  for presses only. Why it matters: the report cannot call the release half met by the mark's own method. Options:
-  (a) accept as built (releases worked out, plus the two page-side checks) and correct the row's sentence when the
-  records are next edited; (b) add a release counter per button to the messages: 16 bytes more per command, so up
-  to 128 more per input message (292 to 420) until delta coding, and about 150 to 200 lines, in 3c.
-  Recommendation: (a). The releases follow exactly from the held keys and the press counters (so will a charged
-  shot that fires when its button is let go), and the per-tick key check sees every wrong held state. It blocks
-  the claim that the mark is met, not this merge (the advisor agent's ruling).
+None open. RELEASE-COUNT is decided, (a) with two conditions (above). Not decisions now, his when they come due:
+the two press limits (3B-PACER-255, 3B-OUTAGE-256), a long-hold case for the netcode draft's lag-switch mark
+(3B-LONG-HOLD), and the drafts' wording on releases (3B-RELEASE-DRAFTS).
 
 ## For Mustafa
-1. The browser check (Brave, then Firefox once; about 20 minutes) with the zip `shamble-v2-03b-the-loop-closes`,
-   whose README has the steps: hold W and see its box light and go dark; press S, D, the left Shift and the right
-   Shift, each lighting only its own box; tap Space ten times and read "presses … 0 lost · 0 doubled"; hold D,
-   click on another window, let go there and come back (D is dark); hold A across a hidden tab; cover the window
-   for a minute; copy the report after two minutes (all of `messages.refused`, `olderPosts`, `wrongKeys`,
-   `presses.lost`, `presses.doubled`, `releases.doubled` should be 0).
-2. RELEASE-COUNT: (a) or (b).
-3. After the advisor agent's APPROVE and your check: your go for the merge of the pull request your main Advisor
-   opens from the title and text this chat hands over. **Your go accepts as still open:** the bound on how late a
-   command may run (3B-LATE-BOUND: security-auditor's Medium, deferred to change-set 7; no room on a network
-   without it); OVERFLOW-PANIC-RULE (kept in the code by hand; no lint step in CI yet; the drafts' wording with
-   their owners); and the two press limits (3B-PACER-255, 3B-OUTAGE-256), each your decision when it comes due.
+1. Your go for the merge, by your tap, of the pull request your main Advisor opens from `pr-title.txt` and
+   `pr-body.md` (at the notes' last commit, below) with exactly this commit as its head, after the advisor agent's
+   approval of this commit and GitHub's checks on it; the chat gives you the commit's full id in one line and
+   pushes nothing after it. **Your go accepts as still open:** the bound on how late a command may run
+   (3B-LATE-BOUND: security-auditor's Medium, deferred to change-set 7; no room on a network without it);
+   OVERFLOW-PANIC-RULE (kept in the code by hand; no lint step in CI until the gate step 2.3; the drafts' wording
+   with their owners); and the two press limits (3B-PACER-255, 3B-OUTAGE-256), each your decision when it comes
+   due.
+
+## Where the notes are (the checkpoint, folded in)
+The change-set's notes folder is removed by this commit, as the checkpoint rules have it. Everything in it can
+still be read at the commit before this one, **NOTES_LAST**, under `.checkpoints/cs3b-loop-closes/` and in
+`.checkpoints/cs3b-loop-closes.md` (the resume card): the plan (`cs3-plan.md`) and the two designs; the advisor
+agent's notes (`advisor-cs3b-start.md`, `advisor-cs3b-head.md`); the six reviewers' notes of both rounds, the
+verifier's and docs-keeper's; the planted defects (`plants-3b.py`, 53); the ten-minute run's script
+(`ten-minutes.mjs`); the zip's script (`make-zip.py`); the pull request's title and text (`pr-title.txt`,
+`pr-body.md`); his messages as saved by script; the two scripts that wrote `docs/DECISIONS.md`. What the card held
+and this report does not repeat line by line: every CI run read (the runs on 1ee3e918, 5c582ddd, d117fca5,
+eb0d2314, 0dfca749, 6380df45, a85b9dbb and 6abf3d2a: green, each with its counts written down before the push),
+and each finding of each reviewer with what was done about it.

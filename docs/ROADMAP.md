@@ -216,7 +216,7 @@ green on main (gate run 43461710700, toolchain run 43461710673).
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, in review]** — cs3b-loop-closes (the second
+**Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, waiting for his go]** — cs3b-loop-closes (the second
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the page's keys go to the
 Worker as posts, and a local server there answers through the real messages (five messages' codec, the transport
 interface and the loopback, the room, the client endpoint, local play's one step). A player sees a key diagram (W, A,
@@ -224,8 +224,10 @@ S, D, Space, Shift) lit from the local server's echo and two new readout lines (
 runs at its row's count: the mark has started, never passed. The link simulator and the first recording moved to a
 change-set 3c by the plan's size ladder (he was told first). Final code 6abf3d2a: 6,909 added lines against about
 3,800 planned (stop line 7,600); the players' Wasm 53,813 bytes; 114 Rust, 139 Node, 18 boundary and 16 browser tests;
-53 of 53 planted defects caught; CI green on it. Six reviewers passed two rounds; the verifier and the advisor agent are next, then his browser
-check (Brave, then Firefox) and his go; no pull request yet. Report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`.
+53 of 53 planted defects caught; CI green on it. Six reviewers passed two rounds; the verifier PASS; the advisor
+agent approved the code as it stands; his browser check clean in Brave and Firefox (2026-11-25); RELEASE-COUNT
+decided, (a) with two conditions. Next: the advisor agent's approval of the last commit, CI green on it, his go; no
+pull request yet. Report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`.
 
 **Change-set 3a of the build plan, Rules and boundaries [2026-11-24, MERGED]** — cs3a-rules-boundaries (the first
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the simulation's rules under

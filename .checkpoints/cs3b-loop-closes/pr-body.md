@@ -1,4 +1,4 @@
-**Draft until Mustafa's browser check.** Change-set 3b, "The loop closes": the second half of change-set 3. Built by the builder chat he calls Builder V3 on his words of 2026-11-24, 23:24:50 UTC (in `docs/DECISIONS.md`).
+Change-set 3b, "The loop closes": the second half of change-set 3. Mustafa's browser check is in (2026-11-25, Brave and Firefox, both on WebGPU: every asked number 0; the record: `docs/reports/2026-11-25-cs3b-browser-check.md`). Built by the builder chat he calls Builder V3 on his words of 2026-11-24, 23:24:50 UTC (in `docs/DECISIONS.md`).
 
 The report: `docs/reports/2026-11-25-cs3b-the-loop-closes.md`.
 
@@ -19,19 +19,19 @@ The link simulator and the first recording: they moved to a change-set 3c by the
 ## Evidence
 - CI on the final code 6abf3d2a: `gate`, `smoke` and `toolchain` green, every count as written down before the push: 114 Rust tests in debug, twice, and the release runs; 139 tests under Node; 18 boundary tests on the built WebAssembly; 16 browser tests in 3.4 of 5 minutes.
 - The decoder mark (ADR 0001, PM-0001-34) has started, not passed: per message type 10 million random and 10 million mutated inputs in release, 0 panics, no memory above the caps, a planted unchecked index and a planted over-allocation both found.
-- The presses mark (ADR 0002, PM-0002-12), in Chromium only: by the mark's method for presses (10,000 presses under late and repeated key messages, 0 lost and 0 doubled, button by button; five planted forms of its two bites all turn it red); for releases as far as the server's echo can show them, not by the row's method (RELEASE-COUNT below); "reorders most neighbours" holds only on a page that draws fast (on CI's slow page only the repeated copies arrive out of order).
+- The presses mark (ADR 0002, PM-0002-12), no part of it called passed; what the runs show, in Chromium only: by the mark's method for presses (10,000 presses under late and repeated key messages, 0 lost and 0 doubled, button by button; five planted forms of its two bites all turn it red); for releases as far as the server's echo can show them, not by the row's method (RELEASE-COUNT below); "reorders most neighbours" holds only on a page that draws fast (on CI's slow page only the repeated copies arrive out of order).
 - 53 planted defects, each run against the check that should catch it.
 - The players' WebAssembly: 53,813 bytes, sha256 5ebae154...1262, here and on the runner (31,718 on main).
 - Size: 6,909 added lines against about 3,800 planned; his stop line of 7,600 was not reached.
 
 ## Reviews
-Two rounds by six reviewers (test-engineer, security-auditor, perf-auditor, engine-architect, netcode-architect, rust-reviewer): all PASS in round 2, nothing Critical or High open. The verifier and the advisor agent on the head: their verdicts are in the report.
+Two rounds by six reviewers (test-engineer, security-auditor, perf-auditor, engine-architect, netcode-architect, rust-reviewer): all PASS in round 2, nothing Critical or High open. The verifier on the final code: PASS. The advisor agent: the code approved as it stands; its approval of the last commit is given to Mustafa in the chat with the commit's full id.
 
 ## Not verified
-Firefox, WebKit and Brave in CI (his check covers Brave and Firefox by hand). Real hardware and the WebGPU backend. The key-to-tick mark (a reading only). Anything over a link that delays, drops or reorders (3c).
+Firefox, WebKit and Brave in CI (his check covered Brave and Firefox by hand, on real hardware and on WebGPU; the headless runs fall back to WebGL 2). The key-to-tick mark (a reading only). Anything over a link that delays, drops or reorders (3c).
 
-## One decision asked of him
-RELEASE-COUNT: the presses mark's row says the Worker counts presses and releases "through the edge counters"; the messages carry counters for presses only, and releases are worked out on the page with two checks. (a) Accept as built and correct the row's sentence at the records' next edit, or (b) add a release counter per button to the messages (16 bytes more per command, up to 128 more per input message until delta coding). The builder recommends (a): the releases follow exactly from the held keys and the press counters. It blocks the claim that the mark is met, not this merge.
+## Decided by him on 2026-11-25
+RELEASE-COUNT: (a), accept as built (`docs/DECISIONS.md`, 11:38:37 UTC). The messages carry press counters only, and releases are worked out from the presses and the held keys; no release counter is added in change-set 3c. His two conditions: no report calls any part of the presses mark passed, and the two drafts are made to agree at their next revision, which comes to him before it is written (the follow-up 3B-RELEASE-DRAFTS).
 
 ## What his go accepts as still open
 - The bound on how late a command may run (3B-LATE-BOUND: security-auditor's Medium, deferred to change-set 7; no room on a network without it).
