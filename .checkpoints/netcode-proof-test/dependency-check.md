@@ -119,7 +119,7 @@ a06c090c7ee4b3b2f0fdf4ef9e319943957de549fb291da5aeefd6feb062748f  spikes/netcode
 bd1e23353bdcf6606256619217965bcbe3931f508fafc92300372a45417bf59a  spikes/netcode-proof/Cargo.toml
 55604a5fae45e50ee0fb262d743bc9e967b7caa3b23482de3b61de4cb28b9f5d  spikes/netcode-proof/Cargo.lock
 d8af72f767830e066b360725f200dbdf44b1df77d2c7e0bcb5150661c77c000e  spikes/netcode-proof/crates/client-wasm/Cargo.toml
-# Addendum, U7's Block 0b step 7 (the CLI), 2026-11-25 11:4x UTC, by security-u7-0b-answer.md Q1 (b) and Q2
+# Addendum, U7's Block 0b step 7 (the CLI), 2026-11-25 11:45 UTC, by security-u7-0b-answer.md Q1 (b) and Q2
 # condition 2 (`#` lines only). One main-run.sh call, log .gate/u7-0b/step7-cli.log: `env CARGO_NET_OFFLINE=false
 # cargo info wasm-bindgen-cli@0.2.130 --locked` exit 0 (11:42:15); `sha256sum -c .gate/u7-0b/cli-crate.sha256` OK for
 # /root/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f/wasm-bindgen-cli-0.2.130.crate, whose sha256 is R1's pin
