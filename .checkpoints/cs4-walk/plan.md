@@ -246,7 +246,7 @@ two soldiers, as the card places it; he feels it from change-set 5). No trigonom
 allocates. The card's sentence that the jump's reach is an open question (build plan lines 341-342) is overtaken by
 his START-RULES: the reach is 3.07 m.
 
-### 6.2 What crosses to the page (the block), and three choices between the designs
+### 6.2 What crosses to the page (the block), and six choices between the designs
 - The header gains `soldier_count`. The soldier section has **48 rows of 40 bytes** (a fixed capacity per build, the
   live count in the header, row i is slot i): the id (slot and generation), position, velocity, yaw, pitch, the flags
   (occupied, alive, on the ground, sprinting, aiming), the team, and `ready` (how far the swing from the sprint pose
