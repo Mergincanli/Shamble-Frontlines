@@ -8,13 +8,17 @@
   `/tmp/claude-0/-home-user-Shamble-Frontlines/016237bc-e7ac-5a74-a70f-32a985385e94/scratchpad/guard-wrappers-plan-detail.md`.
 
 ## 1. Goal (his item 3a, a rule, not a list of forms)
-Nothing in front of git or gh gets through the day guard unread. Four parts, all in `.claude/hooks/routine-guard.mjs`:
-- **T, tables:** every option-taking wrapper that `unwrap()` strips reads its options from `WRAP_OPTS` (flags, options
-  with a value, options it reads but cannot follow, and a count of positional words before the command). An option
-  word outside the table makes the command unreadable: an ask in a session, a refusal for an agent (as #69 did for
-  three wrappers). The other wrappers' old hand-written branches in `unwrap()` go.
-- **L, leftover:** a program word that still starts with `-` after `unwrap()` is unreadable. This covers the keywords
-  and the option-less wrappers without a table entry for each.
+Nothing in front of git or gh gets through the day guard unread. Three parts, all in `.claude/hooks/routine-guard.mjs`:
+- **T, one table for every name `unwrap()` strips:** every wrapper and keyword it strips today (each name in the
+  `WRAPPERS` set, `command`, and the four option-taking wrappers it handles by hand) reads its options from
+  `WRAP_OPTS` (flags, options with a value, options it reads but cannot follow, and a count of positional words before
+  the command). A name with no options gets an empty entry: any option word after it is unknown. An option word
+  outside the table makes the command unreadable: an ask in a session, a refusal for an agent (as #69 did for three
+  wrappers). A program word still starting with `-` after a table name is unreadable too (#69's line, now reached by
+  every stripped name). The hand-written branches for `command` and the other wrappers go; `WRAPPERS` stays as a set
+  (`dayFolder` and `unwrapRole` read it) and points `unwrap()` to an empty entry for its keywords.
+  Mapping, so "every" can be checked: each `WRAPPERS` name and `command` → the table (an entry with options where the
+  program has any, an empty one otherwise); the hand-handled wrappers → the table; nothing stays outside it.
 - **C, the turn limit (SA-R1-3, his 3b):** `unwrap()` counts its turns; a line that reaches the limit with words left
   is unreadable (asks) instead of passing.
 - **U, unknown wrappers (his 3a, last sentence):** a program the guard does not strip, with a later word whose base
@@ -23,17 +27,26 @@ Nothing in front of git or gh gets through the day guard unread. Four parts, all
   sessions only (routines: R-PROG already refuses every program outside their short list).
 
 ## 2. Symbols
-- `WRAP_OPTS`: six new entries and a `pos` field. `unwrap()`: the table branch also serves the stripped keywords that
-  take options (the `WRAPPERS` line skips names the table holds; the set itself is unchanged, since `dayFolder` and
-  `unwrapRole` read it); rules L and C; three old branches removed. New `NON_RUNNERS` (a Set) and rule U in `bash()`.
-- Unchanged: `parseShell`, `unwrapRole` (routines), `dayFolder`, `dayShellWrites`, the `command` line (an existing
-  mutant anchors on it), every message of #69.
+- `WRAP_OPTS`: new entries (with options where the program has any) and a `pos` field; `o.value` read with `?.` (an
+  empty entry has none). `unwrap()`: the `command` line and three hand-written branches removed; the `WRAPPERS` line
+  becomes a lookup of an empty entry; rule C. New `NON_RUNNERS` (a Set) and rule U in `bash()`.
+- Unchanged: `parseShell`, `unwrapRole` (routines), `dayFolder`, `dayShellWrites`, every message of #69.
 
 ## 3. Tests (pushed together with the fix, never before: his 3e)
-Every known option form of each table wrapper with a force push behind it (deny) and with git status (stays allowed);
+Every known option form of each table entry with a force push behind it (deny) and with git status (stays allowed);
 every unknown form asks and refuses an agent; rule U's ask and agent refusal, and its read-only programs staying
 silent; rule C's line at the limit (ask); the env -u row the advisor agent asked for in #69 (L2: env takes `git` as
-the value and runs another program, so no check: allowed); a mutant for each rule. All 1247 existing tests unchanged.
+the value and runs another program, so no check: allowed); a mutant for each rule.
+Existing rows, checked before the review by reading every command string in the test file with the real
+`parseShell()`/`unwrap()` (758 strings; `.gate/guard-wrappers/scan-rows.mjs`, nothing run):
+- **One row changes:** #69's "a program named constructor is no wrapper (no throw)" (`constructor -x git status`,
+  expected allowed) would ask under rule U, which is right (an unknown program with git behind it). Its command
+  becomes `constructor -x status`: still allowed, and the plain-object mutant it exists for still throws on `-x`.
+- **One mutant row is replaced:** "R-c unwrap strips command's options" anchors on the `command` line that moves into
+  the table; it is replaced by a mutant on the table's `command` entry, caught by a known-form row.
+- Rows whose outcome stays the same: `time -p cd /p && git switch` from a worktree (ask, now through the main-folder
+  check instead of the unknown folder); `env X=1 -i git push --force` (ask); the generated rows of #69 (their asks
+  keep #69's reason, which is set first). All other existing rows: no hit.
 
 ## 4. SA-R2-2 (his 3c: find out, change nothing)
 Claude Code's hooks reference (https://code.claude.com/docs/en/hooks, read through the claude-code-guide agent): a
@@ -42,7 +55,9 @@ hooks whose failure blocks the action ... To block the call when the hook times 
 timeout counts as a failure; with "block" a failure "does what exit code 2 does on that event, except on
 PermissionRequest, where it denies the request"; onFailure needs Claude Code 2.1.295 or later. Our three guard hooks
 already carry `"onFailure": "block"` (`.claude/settings.json:273, 283, 292`), and this container runs 2.1.332. So a
-very long line that runs the guard past 600 s is blocked, not let through. Nothing changes.
+very long line that runs the guard past 600 s is blocked, not let through. Nothing changes. Caveats: the quotes came
+through a model-extracted page fetch (to be rechecked on the page before any decision doc pins them); a session on
+an older Claude Code (before 2.1.295) would let a timed-out call through (`claude --version` shows it).
 
 ## 5. Size, tier, evidence, order
 - **Size (estimate):** guard about +25/−8, tests about +55: about 80 added lines of code and tests (stop line 200, CAP (a)).
@@ -50,6 +65,11 @@ very long line that runs the guard past 600 s is blocked, not let through. Nothi
 - **Evidence:** the three kit test files (main: 1247, 127, 33, measured on c1da1bd before the edit), plus the new rows
   and mutants; `node tools/gate.mjs --no-smoke` (smoke cannot start in this container; CI runs it); `unwrap()` called
   alone on the open forms before and after (output kept in the scratchpad until the merge).
+- **Build:** after APPROVE, in a copy under `.gate/guard-wrappers/` (gitignored), with the full suite run there; then
+  the guard and its tests applied to the real files and committed as ONE commit (the checkpoint saver pushes any code
+  commit, so a guard-only commit would go up without its tests), and the hook never runs a half-edited guard. Commit
+  messages, docs, notes and the PR text name no open form; the reviewers keep their probe scripts in `.gate/` or the
+  scratchpad, never in `.checkpoints/`.
 - **Order:** this plan, the advisor agent, the edits (each asks Mustafa), the kit tests and the gate, security-auditor
   on the final diff (at most two rounds), the verifier, docs-keeper, the report, the merge on his go after his
   Advisor's check. Checkpoint `.checkpoints/guard-wrappers.md`, pushed after every step.

@@ -8,7 +8,8 @@
 ## Steps done
 1. #69 merged on his go (main 311c0484); branch fast-forwarded to main c1da1bd · no commit
 2. SA-R2-2 answered from Claude Code's hooks reference (plan §4) · no commit
-3. Plan written · this commit · waiting for the advisor agent
+3. Plan written · f696d45
+4. Plan revised before review: one table for every stripped name (keywords and `command` included), rule L folded in, the existing-row scan (one row and one mutant row change), the build-in-a-copy procedure, SA-R2-2 caveats; his review-tracks paste saved whole in the queued note · this commit
 
 ## Current step
 The advisor agent's review of the plan.
