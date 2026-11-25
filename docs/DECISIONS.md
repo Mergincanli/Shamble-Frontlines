@@ -127,6 +127,29 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 00:22:09 UTC: his answers to the last two questions of the preview hosting check's
+  report: DEPARTURES item (5) (a), the pictures stay out of the repository, the pull-request page's picture among them;
+  HISTORY-ID (a), a normal merge of #66; his main Advisor checked head cbddbbfe402a95481ba8f2ba8c54fbd6a49139a7; these
+  two answers recorded by script and pushed, the advisor agent reviews that final head, its full commit id goes to him
+  in one line and nothing is pushed after it, his main Advisor checks that commit, then he types his go for exactly that
+  commit; after the merge lane 2's order stands; from now on, when the chat waits on him, the full question is saved as
+  a file in its notes and pushed, and the message names the file and the commit** (the builder chat he calls Builder V2,
+  lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For
+  Builder V2, from me, written with my main Advisor (25 November, 01:35 Amsterdam)"; message
+  6d72fe57-647f-4e4a-8c22-adc8e90b7fa1, whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): the report's DEPARTURES item (5) and HISTORY-ID, added at bff6ca1 after his message of 00:55
+  Amsterdam was written. Copied by script (1287 bytes, sha256
+  82c2c359bf47fb17636ee4a3e820228000878a9e196e5dac135bd69e51a6341c):
+> For Builder V2, from me, written with my main Advisor (25 November, 01:35 Amsterdam).
+>
+> 1. DEPARTURES item (5) (the pictures stay out of the repository, the pull-request page's picture among them): (a), it stands. The repository is public and the report writes out what each picture shows.
+> 2. HISTORY-ID (how pull request #66 is merged): (a), a normal merge. Eight characters of an account id open nothing, the branch is public already, and the report's link to the old notes stays whole.
+> 3. My main Advisor checked head cbddbbfe402a95481ba8f2ba8c54fbd6a49139a7: on main 28254a73, 7 docs files, no .checkpoints/ folder, gate, smoke and toolchain green.
+> 4. Record these two answers by script and push. Have your advisor agent review that final head. Then give me its full commit id in one line and push nothing after it. My main Advisor checks that commit, and then I type my go here for exactly that commit.
+> 5. After the merge your order stands: the small pull request that revises the infrastructure draft's header row, then step 2.6's plan.
+> 6. From now on, when you wait on me: save the full question as a file in your notes, push it, and name the file and the commit in your message.
+>
+> Answer in at most 6 lines. Plain words: no tag or code without its explanation in the same sentence.
 - **Taken by Mustafa, 2026-11-24, 23:53:15 UTC: his answers to three decisions of the preview hosting check's report:
   ONE-OFF-HEADER (a) with two additions (the revised row gives its reason and weighs Workers static assets in a short
   paragraph; step 2.6's plan starts after #66 and its first edit waits for his go on the revised row; the revision is a

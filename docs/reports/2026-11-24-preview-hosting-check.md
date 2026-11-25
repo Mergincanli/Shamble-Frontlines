@@ -22,7 +22,8 @@ production stayed open, and the deleted token was refused at Cloudflare's sign-i
 check has not passed by the draft's own rule** ("A spike passes when every mark that applies passes", ADR 0006 :1404):
 the header mark is not met as written (production's one-off links carry the "keep out of search engines" header), and
 two marks are open (the build count, and his verdict on checklist step 4, which depends on it). Five marks are met with
-departures that change no reading. Four decisions of his follow; this pull request waits for them and for his go.
+departures that change no reading. Four decisions of his follow, all answered on 2026-11-25 (in DECISIONS); this
+pull request waits for his go.
 
 | What it checks (the mark) | The draft's own words, shortened (ADR 0006) | Verdict |
 |---|---|---|
@@ -143,7 +144,8 @@ against the downloaded run data (below, "Reviews"). Where to look, mark by mark:
 - His message of 2026-11-25 (Amsterdam; 2026-11-24, 23:16:11 UTC; lane 2 building beside lane 1; his question on
   change-set 6 and M before change-set 5) added
   the same way (20 lines), so that it outlives the checkpoint; and his message of 2026-11-25, 00:55 Amsterdam (his answers
-  to three of the decisions below, and EARLY-LOOK (a)), added the same way at the top (41 lines).
+  to three of the decisions below, and EARLY-LOOK (a)), added the same way at the top (41 lines), and his message of
+  01:35 Amsterdam (DEPARTURES item (5) (a), HISTORY-ID (a)) the same way (23 lines).
 - docs-keeper's pass (its notes, readable at d28b8f1d4040, list every line): `docs/STATUS.md`, lane 2's lines (this pull
   request in "In flight"; step 2.6's plan and his question of 2026-11-25 in "Next"; his decisions, the probe's
   switch-off and the clean-up after the merge in "Waiting on Mustafa"; nine follow-ups named PHC-; two open risks,
@@ -269,9 +271,9 @@ the repository is archived and the test project deleted after this report is mer
 
 ## Decisions needed
 His answers (2026-11-25, 00:55 Amsterdam, recorded in `docs/DECISIONS.md`): ONE-OFF-HEADER (a), with his two additions;
-STEP4-COUNT (b); DEPARTURES (a) for the four departures he named, Safari written as not checked, never as passed. Still
-his: DEPARTURES item (5) and HISTORY-ID, added after his message was written. The entries stand below as they were put
-to him.
+STEP4-COUNT (b); DEPARTURES (a) for the four departures he named, Safari written as not checked, never as passed. Then
+(2026-11-25, 01:35 Amsterdam, also in DECISIONS): DEPARTURES item (5) (a), it stands, and HISTORY-ID (a), a normal merge.
+The entries stand below as they were put to him.
 
 1. **ONE-OFF-HEADER: what happens to the header mark that is not met.**
    - What: Cloudflare adds the "keep out of search engines" header (`X-Robots-Tag: noindex`) to every one-off address
@@ -321,8 +323,7 @@ to him.
      name the last four.
 
 ## For Mustafa
-1. DEPARTURES item (5) (the pictures stay out of the repository) and HISTORY-ID (a normal or a squash merge), one line
-   each.
+1. Done: DEPARTURES item (5) (a) and HISTORY-ID (a), his answers of 2026-11-25, 01:35 Amsterdam.
 2. Before 2 December you switch off the test repository's hourly checker yourself (your words of 2026-11-25). The
    clicks (GitHub's docs): Mergincanli/shamble-preview-check → Actions → in the left list, "probe" → the "..." menu at the
    top right → Disable workflow.
