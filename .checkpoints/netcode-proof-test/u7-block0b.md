@@ -44,3 +44,48 @@ files; free 4,536 -> 10,447 MiB), so the before-run is cold.
   `wasm-bindgen = "=0.2.130"` after `http-body-util`); crates/client-wasm/Cargo.toml +6 -1 (`wasm-bindgen.workspace =
   true` in place of the "joins at U7" comment, then `[dev-dependencies]` npt-room, npt-server, npt-sim).
 - `git diff --stat`: those two files only, 9 insertions, 1 deletion.
+
+## Order of the remaining steps (a choice: the advisor tool's, 05:4x; for the day message)
+2, 3, a deps-only check, 4, 6, 7, then 5 (the cold after-run, about 8.5 GB) and 8, so the disk-heavy run comes last and
+the CLI's own build folder is cleaned before it. Each step checks the same things as written; none reads another's output.
+
+## Step 2 (05:43 UTC): PASS
+- .gate/u7-0b/step2-metadata-2.log (a new name; step2-metadata.log keeps the 05:27:03 stop): free 13,265 MiB, HEAD
+  1a56082, diff 715bd28fca7de9489e7972659308bebb612a2d70a3725df4352aae99165e77bc = the first try's header (so the redo
+  is byte for byte the same), untracked e3b0c442...; `cargo metadata --format-version 1 --offline` exit 0, no network.
+
+## Step 3: PASS
+- `git diff --numstat -- spikes/netcode-proof/Cargo.lock`: `4	0`. `git diff -U0`: one hunk at :911, the four lines
+  ` "npt-room",` ` "npt-server",` ` "npt-sim",` ` "wasm-bindgen",` after ` "npt-client",` in npt-client-wasm's block
+  (:907-915); no package, version, checksum or source line. Packages 252 (= step 0). sha256 55604a5fae45e50ee0fb262d743bc9e967b7caa3b23482de3b61de4cb28b9f5d
+  (the read's 8a2ebb34... line is void: step 0 read 3394b451..., not the model).
+- The deps-only check (.gate/u7-0b/step3b-deps.log, 05:43:41-43): PASS 2.6 s, "check: all 1 steps pass", header diff
+  0b5b2289... (now with the lock).
+
+## Step 4 (05:43:52-53 UTC): PASS (.gate/u7-0b/step4-trees.log, five calls, each exit 0)
+- `-e features -i wasm-bindgen`: wasm-bindgen's feature lines exactly "default" and "std"; dev-edge dependents getrandom
+  (0.2.17 and 0.4.3), js-sys, web-time (SEC-U7D-2's expected lines).
+- `-e normal,features -i wasm-bindgen`: one package dependent, npt-client-wasm; features default and std only.
+- `-e normal --prefix none`: 20 names = npt-client-wasm, today's nine (npt-client, npt-link, npt-proto, npt-sim, libm,
+  rand_chacha, ppv-lite86, zerocopy, rand_core) and wasm-bindgen, cfg-if, wasm-bindgen-macro, wasm-bindgen-macro-support,
+  wasm-bindgen-shared, bumpalo, proc-macro2, quote, syn 3.0.9, unicode-ident; no js-sys, web-sys, wasm-bindgen-futures,
+  serde, serde_json, getrandom or tokio.
+- `-e dev --depth 1`: npt-room, npt-server, npt-sim. `--workspace --all-features --target all -e features -i
+  wasm-bindgen --depth 1`: wasm-bindgen features default and std only.
+
+## Step 6 (05:44:41-48 UTC): PASS (.gate/u7-0b/step6-deny-audit.log)
+- cargo-deny 0.22.0; cargo-audit 0.23.0 (it prints "cargo-audit-audit 0.23.0").
+- `cargo deny --locked check advisories bans sources`: exit 0, "advisories ok, bans ok, sources ok"; warnings only the
+  seven duplicate names U6c's run had (u6c-block0.md:63, :75-76): base64, getrandom, pem, syn, synstructure,
+  windows-link, windows-sys. No new one.
+- `cargo audit --file Cargo.lock`: 1567 advisories loaded, 252 crate dependencies, 0 vulnerabilities, "1 allowed
+  warning found": RUSTSEC-2026-0441 (pin-utils, unmaintained). No new one.
+- Databases: both fetched by the run (FETCH_HEAD 05:44:47 UTC ~/.cargo/advisory-db, 05:44:45 UTC
+  ~/.cargo/advisory-dbs/advisory-db-3157b0e258782691); newest commit in each 2026-11-24T22:47:44+01:00 (`git log -1
+  --format=%cI` run inside each folder by `env -C`).
+
+## Step 7, offline (05:46:32 UTC): cannot run offline
+- Through the runner (CARGO_NET_OFFLINE=true, as the read's 0b header says), with its own CARGO_TARGET_DIR and --root
+  under .gate/u7-0b/: exit 101, "error: could not find `wasm-bindgen-cli` in registry `crates-io` with version
+  `=0.2.130`" (.gate/u7-0b/step7-cli-offline.log). The CLI's .crate is not in ~/.cargo/registry/cache, so item (10)'s
+  install (and its .crate sha256 check) needs one download. Nothing was built or downloaded.
