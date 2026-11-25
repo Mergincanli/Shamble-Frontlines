@@ -49,3 +49,26 @@ Started 2026-11-25. Memory: no agent-memory folder in this checkout. Scratch: .g
     repos not stated).
   - docs.github.com disable-and-enable-workflows: Actions tab, the workflow, "..." menu, "Disable workflow"; public
     repo schedules auto-disabled after 60 days with no repository activity.
+- R7 (#66 report :1541-1551, :1667-1677): :603 IS Wrangler's `pages-deploy-detailed` entry (jq select on type, exactly
+  one per upload); the cleanup used the same list call (env=preview&page=N&per_page=25) and DELETE ?force=true. So
+  every Cloudflare call and the ND-JSON parse in preview.mjs were measured once, on Wrangler 4.156.
+
+## Verdict: REVISE (runbook only). preview.yml text change: none.
+M1 (Medium) Runbook renewal (previews.md:62-65) and the missing rebuild steps: no environment re-check (branch rule
+   main only; bypass unticked AND "Save protection rules"; reload), no "dates in their own fields, never the chip"
+   (#66 :351-363 one-day token), no check of the new token before deleting the old. No rebuild section: account
+   creation (B9: Accounts, Create Account; eligibility), the changed path (Create application, "Continue to Pages",
+   "Drag and drop your files", Get started), the environment from zero (default admin bypass, B10; a run naming a
+   missing environment creates it without rules, design D7). The plan's click 3/5 texts are superseded and the notes
+   holding the corrections are deleted at ready (CHECKPOINTS §9).
+M2 (Medium) 30-day remedy (previews.md:51-52) "re-run its toolchain run" cannot work then: GitHub re-runs only up to
+   30 days after the initial run. Item 2 (previews.md:37) "re-run the failed jobs": the checked artifact lives 1 day
+   (preview.yml:110), and a re-run keeps the original GITHUB_SHA (old main code). Fix: push a new commit; re-run
+   failed jobs only within a day.
+M3 (Medium) Token end warned only in the deploy log under main (preview.mjs:293-295); nobody reads it. Fix: record
+   the end date in STATUS with a dated renewal reminder (and the runbook says to).
+L-list: count = deploy attempts (upper bound; Nov inflated by wall-test records; deployment:false none, inferred);
+   runbook lacks the today-state notice line, verify-token's other two refusals, the 500-limit error; off-switch
+   (Disable workflow) + 60-day schedule auto-disable + red reconcile after revoke; check-headers serial fetch vs
+   10-min timeout as builds grow; reconcile pending-cancel noise; hand-over regex form / step 2.3 rename silent;
+   listing duplicates -> double delete -> red (dedupe by id); Pages' default noindex on previews (observation).

@@ -74,3 +74,21 @@ list items under `on.schedule`, flow sequences: all read correctly.
   preview/tests is advisory (red would not block a merge).
 - Gate on ad2658a: run 45717720457, jobs gate + smoke success; toolchain 45717720474 success. tools/gate.mjs has
   no reference to hosting/ (the gate proves nothing about the script; M4 is a no-regression mark only).
+
+### Block 5: CLI entry, runbook, M1 second half
+- CLI works: `node hosting/preview.mjs` -> usage, exit 2; check-build with DOWNLOAD=failure in a root without
+  toolchain.yml -> red "unexpected error ENOENT", exit 1 (fail-closed).
+- Mutation T26 `if (false && process.argv[1] ...)` (the entry guard): 117/117 still pass; the mutant exits 0 for every
+  command and does nothing (silent green: check-build writes no go, deploy/after skip, reconcile no-op). defaultIo()
+  and its `root` resolution are never executed by the suite.
+- Runbook item 4 relies on the comment step turning red when GitHub refuses the write: exactly the path T1 shows
+  unpinned.
+- M1 second half needs: fresh run AND re-run after the token click, 0 steps, refusal line via
+  check-runs/<id>/annotations, deployment record statuses (waiting -> failure) via deployments API; plus what M1 does
+  not measure today: (a) no repository/Dependabot CLOUDFLARE_* secret (click 9 rests on his word; this session's
+  proxy refuses actions/secrets), measurable by a no-environment planted job printing present/absent; (b) a tag ref
+  (push of a tag) is not among the planted jobs, while the design's argument is "every job a branch can add runs on a
+  branch ref".
+
+### Findings draft -> see final report (verdict REVISE; no High; Mediums: lint secrets-context + checkout ref, comment
+write failure + PR read failure untested, CLI entry untested, M1 token-elsewhere unmeasured)

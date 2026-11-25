@@ -93,3 +93,31 @@ R9 O2/O3 + read-url hardening. R10 verdict.
   rule may have been saved after 22:29; attempt 2's admission is explained by the unsaved box OR a not-yet-saved rule.
   Either way the fix (both saved, checked after a reload) and attempt 3 + the fresh runs hold.
 - Not readable here: the environment's settings API and the repository secret list (the proxy refuses both: HTTP 403).
+
+## R3b G2, G7, G6 detail (added after the advisor tool's read)
+- G7: grep of preview.mjs and preview.yml for GITHUB_ENV|GITHUB_PATH|GITHUB_STEP_SUMMARY|set-output|save-state: no hit.
+  The only runner-file write is setOutput (:78-83): pattern-checked value, `name=value\n` to GITHUB_OUTPUT.
+- G2: the three downloads (:91-96, :145-148, :201-204) name an exact artifact, write to a fresh $RUNNER_TEMP folder,
+  set no merge-multiple and no digest-mismatch override (default "error", E5); only check's names run-id + token (the
+  toolchain run); deploy and after read this run only.
+- G6: no WRANGLER_LOG anywhere; deploy uploads nothing (no upload-artifact in deploy); the token only on :159-160,
+  :165-166, :256-257.
+- Item 3 (missing build): check-build :238-247 fails closed (go=false, then exit 1 with ::error:: when main's toolchain
+  hands a build over; notice + exit 0 before that). Runbook :24-26 says it shows only as a red run under main. No finding.
+- Test file: fake fetch only (harness default fakeFetch), files in an mkdtemp folder removed after; WORKFLOW and HEADERS
+  read the real paths (:18-19); node:net only for a local socket file (refuse-list case :187-190).
+- My own mutations (.gate/step26-r1-sec/m1, m2): reconcile's `if (!listing.complete)` disabled -> 1 test fails; the
+  comment's `startsWith(pr-${pr}.)` tie removed -> 1 test fails. Both caught.
+
+## R9 O2, O3, read-url hardening
+- O1 stays an observation (early read E6). O2/O3: the runbook names no Wrangler bump rule and no advisory watch for
+  hosting/ (Low, runbook line; the advisories policy is the security baseline's). read-url hardening (PR in its env):
+  not needed, comment ties the number (:485, tested by m2); it would change preview.yml's text, so not asked.
+- monthCount (:454-472) counts every `preview` deployment record whatever its status: refused and failed jobs count
+  (today 9 wall-test records), and any branch job naming the environment adds one. Errs high (earlier warning).
+  Low; fix: call it an upper bound in the runbook/comment, or count only records whose newest status is success.
+
+## R10 verdict
+APPROVE on the diff; no change to preview.yml (31119c06... stays) or to the code. One condition for the token
+sitting's message (Medium, not a file of this diff). Four Lows (runbook wording x3, the month count), fix pass or STATUS
+follow-up. Detail in the handback.
