@@ -271,3 +271,8 @@ GitHub (docs.github.com):
   Dependabot and Codespaces secrets pages; (b) the tag case: a decision for him in the report (measure it with a tag job
   in wall-test.yml, a new sha256 and his yes, or record it as an unmeasured residual); recommended: the residual.
 - TE-K: the report says `preview / tests` is not a required check and the gate does not read hosting/.
+- The test-engineer's own mutations (scripts/mutate_te.py, its T1 to T25; its T26 is in scripts/mutate.py) re-run on
+  the part-2 suite (2026-11-25 ~23:38 UTC): 22 caught; the 3 that survive (T11 a thrown fetch leaves status 200, T20
+  annotate's line-break escape removed, T23 a loose "closed" test) are the three it judged equivalent itself (the outcome
+  is the same: a failed check, messages already escaped by show(), reconcile stores only open or closed). All 20 of its
+  real survivors are now caught; this chat's sweep: 32 of 32.
