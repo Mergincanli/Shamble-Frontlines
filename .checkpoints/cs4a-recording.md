@@ -9,7 +9,7 @@
   worktree `.gate/lane1-takeover`; pushed with `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its
   command; never a plain `git push`. The session's start folder is never switched · **Base:** origin/main
   c1da1bd (lane 2's docs-only #67, taken in by merge commit 75a9296; before it 311c0484)
-- **Last update:** 2026-11-25 21:19 Amsterdam (from the clock)
+- **Last update:** 2026-11-25 21:23 Amsterdam (from the clock)
 
 ## Sizes (his point 5: which is which)
 - The designs' own count for 4a, bottom-up: 1,365 lines (655 code, 710 tests).
@@ -47,14 +47,23 @@
    64 KiB (then XXH64 in our own code). Its conclusion is `state_hash.rs`'s header now (uncommitted with the
    recording's files, until the local checks are through).
 
+5. The first recording committed (eb14739): `first-loop.rec`, `.hashes`, `.vector.txt`, `manifest.txt`, with
+   `state_hash.rs`'s header from the report.
+6. The toolchain job's commands by hand on eb14739 (`local-checks.sh`): all passed. Format and lints clean (clippy
+   with warnings as errors); `cargo test` twice and the release line; the WebAssembly build of the five crates;
+   the packages' own tests (85, 51, 7, 1, and the browser package's Node test); every type check; both page
+   builds; 24 boundary tests; 17 browser tests in 195 seconds (CI stops them at 300); `make_recordings --check`.
+   The players' file: 55,607 bytes, sha256 e419e4cc0225eed60e120516c9ef73b66101ecd391c6a0e1ecd6ffb3bf628a35, the
+   same in the production and the development build (53,813 bytes before 4a: 1,794 more for the one new number).
+
 ## Current step
 **At the stop line: STOP-4A is asked of Mustafa** (`.checkpoints/cs4a-recording/question-2026-11-25-stop-4a.md`).
-Until his answer only work that adds no product line. Running: the toolchain job's commands by hand
-(`local-checks.sh`, log `.gate/local-checks.log`).
+Until his answer only work that adds no product line. CI runs on this commit (the first of 4a without
+`[skip ci]` since steps 1 and 2).
 
 ## Next steps
-1. When the local checks pass: commit `state_hash.rs`'s header and the recording's four files in a commit without
-   `[skip ci]`, push, and read CI's run (the players' file's size and sha256 against the local production build).
+1. Read CI's run on this head: gate, smoke, toolchain; the players' file's size and sha256 against the numbers
+   above; the browser run's time.
 2. A draft pull request (his standing permission), kept a draft.
 3. His answer to STOP-4A; then the
 5. Reviewers (netcode-architect, rust-reviewer, test-engineer; then engine-architect, security-auditor), the
@@ -86,8 +95,8 @@ Until his answer only work that adds no product line. Running: the toolchain job
   STOP-4A). Rung 2 (the 36,000-step run and the two matches in turn, both written and green): his decision.
 - The hash's cost (readings on this container): native release, 4,096 bytes 5.7 us, 16,384 bytes 20.7 us;
   WebAssembly release in Node 22, 5.2 us and 19.9 us; native debug 17.4 us and 69.9 us.
-- The development build's players' file: 55,607 bytes (it was 53,813 in production before 4a: production is
-  measured before the first push without `[skip ci]`).
+- The players' file: 55,607 bytes in production and in development (53,813 before 4a).
+- The browser suite: 17 tests, 195 seconds here (16 tests took 3.4 of CI's 5 minutes in 3b).
 
 ## Decisions taken
 - WALK-CUT (a) and STEP-60 (a) · Mustafa · 2026-11-25, 19:36:25 UTC. No value of the 60-step Export is carried.
@@ -95,5 +104,5 @@ Until his answer only work that adds no product line. Running: the toolchain job
   gh always start their own command. The board add-on is active.
 
 ## Running work
-- No agent runs. The local checks run in the background (started 21:17 Amsterdam).
+- No agent runs.
 - No saver runs: the main session commits the notes by hand.
