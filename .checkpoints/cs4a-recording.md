@@ -9,7 +9,7 @@
   worktree `.gate/lane1-takeover`; pushed with `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its
   command; never a plain `git push`. The session's start folder is never switched · **Base:** origin/main
   c1da1bd (lane 2's docs-only #67, taken in by merge commit 75a9296; before it 311c0484)
-- **Last update:** 2026-11-25 22:42 Amsterdam (from the clock)
+- **Last update:** 2026-11-25 23:13 Amsterdam (from the clock)
 
 ## Sizes (his point 5: which is which)
 - The designs' own count for 4a, bottom-up: 1,365 lines (655 code, 710 tests).
@@ -69,26 +69,44 @@
 11. The fix pass (91741e6, 40bf269, pushed with `[skip ci]`): every fix made; the hash is fed from the visitor with
     no buffer and `shared_hash` takes `&self`; the players' file is 54,514 bytes. 3,291 written lines, 109 under 3,400.
 
+12. The planted defects on the fixed head 07903d9 (`plants-4a.txt`): 15 defect checks caught, 4 controls held, the
+    tree put back, the clean tree green. CI green on ec005ad (six of six).
+13. Review round 2 on what the fix pass changed: five of five APPROVE, no Critical, High or Medium open
+    (`round1-fold.md`, second half). Main's #71 (the CI Builder's change) taken in by merge commit 21dff0c; CI green
+    on 21dff0c (six of six: gate, smoke, toolchain, each for the push and for the pull request).
+14. Round 2's small fixes (fb5d0ff, the final source of `crates/` and `packages/`): a stale comment, `write_state`
+    and `STATE_BYTES` test-only, `Fnv1a64` `pub(crate)`, the writer's reserve, the field comparison's print escaped.
+    Written lines: **3,300** of 3,400.
+15. The toolchain job's commands by hand on fb5d0ff (`local-checks.sh`; log `.gate/local-checks.log`): ALL LOCAL
+    CHECKS PASSED. `cargo test` twice (140 each), the release tests of the six crates (139), the packages' tests
+    (85, 51, 7, 1, and the browser package's Node test), 24 boundary tests, 17 browser tests in 195 seconds,
+    `make_recordings --check`. The players' file: 54,514 bytes, sha256
+    a4d8184c15736ec2cf2c347871afddcff289dd0a364f0d2016c87dd9866cd094 in both builds (the digest of step 11,
+    19847796...f708, was the file before the small fixes: same length, other bytes; the verifier is asked what
+    differs).
+16. His five messages of 2026-11-25 in `docs/DECISIONS.md` by script, the Hornet's entry in `docs/UNITS.md`
+    section 0 (9b5c96a; `decisions-4a.mjs check` passes).
+
 ## Current step
-The local checks run on the fixed tree (one type fix in the browser spec after the first run). Then: the planted
-defects again (the rewritten script), a commit without `[skip ci]` for CI, and review round 2 on what changed.
+The verifier runs on the final source (its notes: `cs4a-recording/verifier.md`); docs-keeper runs the docs pass
+(STATUS, STATUS_ARCHIVE, ROADMAP, REPO_MAP; its notes: `cs4a-recording/docs-keeper.md`). The main session drafts the
+report. Unpushed local commits: 1b12078, 6dccb0e, 9be3c27, fb5d0ff, 9b5c96a and what follows.
 
 ## Next steps
-1. (done: steps 10 and 11 above.)
-2. The planted defects on the fixed head; CI; round 2 on what changed (`git diff eb14739..HEAD -- crates
-   packages`): rust-reviewer (the buffer-free hash, the lint guard), test-engineer (the two-process test, the
-   plants), security-auditor (the seed checks, the plain-file check), netcode-architect and engine-architect each on
-   their own findings.
-3. The verifier until PASS; the advisor agent on the pushed head.
-4. The docs pass (docs-keeper, with the script for his words): his blocks of 2026-11-25 into `docs/DECISIONS.md`;
-   change-set 3b's owed docs pass; the Hornet's entry in `docs/UNITS.md` section 0, the two lines left as they are
-   and listed as open for his unit walk; `docs/REPO_MAP.md` line 36.
-5. The report (`/advisor-report`): his go's point 4 in at most eight lines (what the first soldier on screen does
-   not need from 4b and from 4c's first five steps, and the hours saved); every size named as the designs' count or
-   as holding the 1.8; where 4a's 2.2 times went (recording.rs 758 lines against 260 in the plan's table;
-   sha256.rs and files.rs not in that table) and what it means for 4b to 4d.
-6. Fold the checkpoints into the report, delete `.checkpoints/cs4a-recording*` (the plan in `.checkpoints/cs4-walk`
-   has to survive for 4b to 4d: decide its home with the advisor agent), mark the pull request ready.
+1. Read the verifier's result (until PASS) and docs-keeper's; commit the docs; push (the head commit without
+   `[skip ci]`); read CI on the new head (the players' file's digest on GitHub's runner against a4d8184c...d094).
+2. The report `docs/reports/<date>-cs4a-recording.md` (`/advisor-report`): his go's point 4 in at most eight lines
+   (corrected: the canonical writer is NOT movable, his values enter the content through the tool that writes with
+   it; movable are about 880 lines by the designs' count: 3.5 to 4 hours; within 4c alone about 2 hours); every size
+   named; where 4a's 2.2 times went and what it means for 4b to 4d; the caveats; S3's read side named as open.
+3. The advisor agent on the pushed head. Then the last commit: the report in, `.checkpoints/` out of the head
+   (CHECKPOINTS section 9: a ready pull request has no `.checkpoints/` file in its head; the Walk plan and his saved
+   messages stay readable at the commit the report names, and 4b's first commit puts `.checkpoints/cs4-walk*` back
+   from it), CI on it, the advisor agent on that head, the pull request marked ready, the board.
+4. Stop for his go on the merge (the approved head's full commit id as the expected head, after his Advisor's
+   merge check).
+5. Housekeeping when 4a is merged: remove the agents' copies (`.gate/rr-4a`, `rr-4a-base`, `rr-4a-r2`, `te-4a`,
+   `te-4a-r2`, `verifier-4a`) with `git worktree remove`, their target folders with `cargo clean --target-dir`.
 
 ## Open findings
 - 4A-BYTES-LENGTH (rust-reviewer, a watch for 4c, no defect today): `StateSink::bytes` writes no length, which is
@@ -121,5 +139,5 @@ defects again (the rewritten script), a commit without `[skip ci]` for CI, and r
   gh always start their own command. The board add-on is active.
 
 ## Running work
-- No agent runs. The local checks run in the background.
+- The verifier and docs-keeper run (two agents). No reviewer round is open.
 - No saver runs: the main session commits the notes by hand.
