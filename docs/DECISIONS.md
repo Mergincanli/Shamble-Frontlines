@@ -127,6 +127,48 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 22:56:01 UTC: "fixed": the environment page's bypass box saved unticked, as this chat
+  asked after the failed check; and his yes to watching pull request #72 for CI results and comments** (the builder chat
+  he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal
+  account; no label; message 5ff5bcf4-7ef7-42d0-9e5e-46203589ee68, whole; extracted by script from the chat's
+  transcript). Records, not his words: the re-run at 22:56 UTC found all three planted jobs refused before any step
+  (each "failure" with no step, no runner and no log); this chat subscribed to #72's activity. Copied by script (86
+  bytes, sha256 de1b683b3edcec03b5c61b30ddbb34fd27deac9f77e554fd98169cd07d29bf70):
+> fixed
+> Tell me yes or no: should I watch #72 for CI results and comments? sure watch it
+- **Taken by Mustafa, 2026-11-25, 22:28:33 UTC: his sitting for step 2.6, steps 5 to 7, and TOKEN-TONIGHT (b): step 5
+  reported done (the environment `preview` as this chat listed it: reviewers and wait timer off, the bypass box
+  unticked, the branch rule `main`, the test secret WALL_TEST), no secret named CLOUDFLARE_ (step 6), the Actions
+  settings done (step 7); TOKEN-TONIGHT (b): the real deploy token waits until the Guard fix chat's protection for main
+  is merged, so the token steps and the second half of the environment check come in a later short sitting** (the
+  builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his
+  personal account; no label; message 7903e9f9-6b78-4951-a72e-c82cd6c84b6d, whole; extracted by script from the chat's
+  transcript). Records, not his words: the questions and steps he answered are this chat's messages of 2026-11-25
+  evening; the re-run of the three planted jobs at 22:29 UTC then found all three running with the test value present
+  (step 2.6's report); he was asked again before the token because the protection for main was not merged (main at
+  07d673b0). Copied by script (941 bytes, sha256 4591957d0ff2199472a24610e54e581e123dab1f29f23960cf52505622bba38f):
+> Environments → `preview`. It already exists; the check's runs created it.
+>
+> * Turn off Required reviewers and the Wait timer.
+> * Untick "Allow administrators to bypass configured protection rules".
+> * Deployment branches and tags: "Selected branches and tags" → Add rule → Branch → `main`.
+> * Add the environment secret `WALL_TEST` with the value `not-a-token`.
+> * Tell me "5 done". I re-run the three check jobs and answer within about 5 minutes. GitHub must refuse all three before any step runs. If it doesn't, stop: delete the environment, and no token goes in.
+>
+> > 5 done
+>
+> Secrets and variables → Actions, then Dependabot: confirm there's no secret named CLOUDFLARE_….
+> >no such secret
+>
+> Actions → General:
+>
+> * choose "Read repository contents and packages permissions";
+> * untick "Allow GitHub Actions to create and approve pull requests";
+> * tick "Require actions to be pinned to a full-length commit SHA".
+>
+> >done
+>
+> TOKEN TONIGHT: B
 - **Taken by Mustafa, 2026-11-25, 20:51:45 UTC: his answers to the two questions from step 2.6's build: NEW-TEXT (a),
   line 50 of the approved preview.yml changes from `run: node --test hosting/` to `run: node --test
   hosting/preview.test.mjs`, the new text 10,577 bytes, sha256

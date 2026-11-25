@@ -13,6 +13,10 @@ Where everything is:
   `hosting/package.json` and `hosting/package-lock.json`: Wrangler, the upload tool, pinned.
 - The token: GitHub, the repository's Settings, Environments, `preview`: the secrets `CLOUDFLARE_API_TOKEN` and
   `CLOUDFLARE_ACCOUNT_ID`. Only `main` may use that environment. The token lives nowhere else.
+- That page must keep "Allow administrators to bypass configured protection rules" unticked AND saved (the box
+  takes effect only after "Save protection rules"). With it on, a run started from an administrator's account goes
+  past the `main` rule, and every run in this repository starts from Mustafa's account: on 2026-11-25 three planted
+  branch jobs reached the environment's test secret until the box was saved, then GitHub refused all three.
 - The host: the Cloudflare account `Shamble previews`, project `shamble-previews`. That account holds nothing else.
 
 ## When something fails
