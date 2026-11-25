@@ -41,9 +41,10 @@ needs no go of his (as U4r's and U4f's); PR #40 keeps its own go.
    run -q --locked -p npt-judge --` (the lane lock; the binary built from this tree).
 4. Q1 (advisor-main-66.md:125-140) lifts only MAIN-66's hold; U8's own ruling and M3's apply check govern U8's
    steps, and the `ops` step is the approved brief's (u8-brief.md:333-335, :524: "merge, then the `ops` step").
-5. The order: U8 now, in the idle lane, before the 0b amendment (which waits for the 23:50 re-rule); the card's "Half
-   done" says so, and the builder's new base then carries U8, the `ops` step and the install line. A choice inside the
-   plan (choice 14 for the day message).
+5. The order (changed 23:2x, the advisor tool): U8 last, after the 0b amendment, U7's builder's new base (by 00:20
+   UTC) and MAIN-67 (main moved at 20:50 by a CI change: M0 stops on it). U7's tree (wip/u7-build-rs.patch) changes
+   check.mjs and check.test.mjs too, so the builder's new base does not carry U8, and the `ops` step's two edits meet
+   U7's at U7's merge (its apply check). A choice inside the plan (choice 14).
 6. The card carries this plan's pointer and a resume line, saved before M0; each step gets a "done" line here.
 - Also: HEAD = origin re-checked after the saver stops; M3 compares modes too; ops' count is derived, not pinned
   (the glob also takes redact-check.test.mjs, the one ops file the lane changed: 11 top-level tests at 096808b and
