@@ -713,4 +713,81 @@ calendar days and his clicks for a test project and token, and removes most of t
   lockfile and new packages).
 
 ## Status
-All D1-D8 blocks written 2026-11-25. Next: advisor call, then the handback.
+All D1-D8 blocks written 2026-11-25; revised after the advisor call (see "Revision after the advisor call", which overrides: ACCOUNT now (b), COUNTER uses deployment: false, sitting before the merge). Handback sent.
+
+## Revision after the advisor call (2026-11-25); these lines OVERRIDE the D blocks above where they differ
+New sources:
+- WEB GitHub Docs, Workflow syntax, `jobs.<job_id>.environment` (same URL, offset 100000, read 2026-11-25): "Set
+  `deployment` to `false` to use an environment's secrets and variables without creating a deployment object.";
+  "Setting `deployment: false` is not compatible with custom deployment protection rules."; "All deployment protection
+  rules must pass before a job referencing the environment is sent to a runner."
+- WEB GitHub Docs, "Control deployments"
+  https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/control-deployments (read
+  2026-11-25): "Wait timer protection rules still apply"; "Required reviewers still apply"; a stated use: "Access
+  control—restrict which branches can use certain secrets via environment branch policies, without deployment
+  tracking" (so branch policies hold with `deployment: false`: implied, not said outright; sure: medium-high).
+- WEB GitHub Docs, "Manage environments"
+  https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments (read
+  2026-11-25): "Running a workflow that references an environment that does not exist will create an environment with
+  the referenced name."; "Otherwise, the newly created environment will not have any protection rules or secrets
+  configured." Steps: "Selected branches and tags", "Add deployment branch or tag rule", Ref type, name pattern, "Add
+  rule".
+- WEB Cloudflare, "Create account" https://developers.cloudflare.com/fundamentals/account/create-account (read
+  2026-11-25): "go to **Accounts**." "Select **Create Account**."; "You can create up to five additional Free
+  accounts."; "Your Cloudflare user must be active and at least seven days old." (his user dates from about
+  2026-11-15: #66 :348-350); "You must have the Super Administrator role on an existing account."; payment method not
+  stated. Changelog 2026-09-15 "free account creation" seen in search, not read.
+Line-cite corrections (grep -n, 2026-11-25): "3 scheduled runs in the 24 slots" is #66 :35 (and :1104), not :28;
+PREV-DELETE answer :89-91; the wall's reading :98-101; approvals and "A session cannot approve" and "is not refused"
+:105-109; "Measured for step 2.6" :113-114; `preview` settings with the administrator bypass :379-380; the Claude app
+:392-393 (and :108); Entire Account :352; placeholder :348; verify HTTP 200 / 401 :498, :508, :557, :567; "adding Read
+did not help" :540; PM-0006-4's planted no-cache caught :33. Part 15 cross-lane asks :164-167. vite.config.mjs
+isolation :7-12, :36, :39.
+The build plan's four conditions (:1021-1027), today:
+1. The hosting check has ended: yes (#66 merged 09faefa, 2026-11-25; #67 revised the header row, c1da1bd; his four
+   answers in DECISIONS).
+2. Change-set 2 merged: yes (STATUS_ARCHIVE :179, #61; 3a and 3b merged since; toolchain.yml:172 builds the page).
+3. "the 2.3 chat's CI change-set merged (the build job the deploy job hangs on)": NOT as written; the 2.3 chat is
+   stopped (STATUS :31) and its place is taken by the CI Builder chat's one-step edit (D6), by his words of 2026-11-25
+   (DECISIONS :461). The `toolchain` job is the build job the preview hangs on.
+4. Token in `preview` "with the draft's interim position in place (production deployed only from main, a reviewer on
+   previews)" and OQ-0006-13 answered: not yet; his sitting (D7) puts the token there; "production only from main"
+   holds trivially (no production exists); "a reviewer on previews" is what his words of 2026-11-19 refuse, replaced in
+   this design by the main-only rule; OQ-0006-13's answer is D1 if the Advisor and security-auditor accept it.
+D1 correction (the wall, said honestly): GitHub enforces on main only what STATUS :17 says, "a pull request with the
+`gate` and `smoke` checks green"; whether main also requires an approval is NOT READ, and sessions merge as his account
+while the PR Advisor routine merges on its own. Neither check reads workflow text. So a pull request that rewrites the
+preview workflow is stopped by the KIT (tier 2 for `.github/`: the advisor agent, the security-auditor and his go in a
+day session; the guard's ask before a `.github/` edit), not by GitHub. The reviewer design had a human step GitHub
+enforced; this one trades it for a kit-enforced one. That is why the bound matters (ACCOUNT below): with previews in a
+previews-only Cloudflare account, a token taken through a bad merge or a compromised dependency reaches previews only,
+never his domain or a future production.
+ACCOUNT, re-argued (now RECOMMENDED: (b), a previews-only account from the start): Cloudflare lets a user of 7 days or
+more "create up to five additional Free accounts" from Accounts, Create Account (docs above); his user qualifies. Cost:
+one more step in the same sitting; the project and token are made inside it. Gain: two independent walls (branch code
+cannot reach the token; a token that leaks anyway reaches only that account), and OQ-0006-13 answered by account, which
+is the only token separation the docs offer, while the apex domain and a future production stay in his main account
+where the zone is. (a) his existing account stays acceptable while no production exists, with the move at the first
+release.
+D3 correction (counter): the cleanup job uses `environment: { name: preview, deployment: false }`, so it makes no
+deployment record and `preview`'s records count deploy attempts exactly: NO second environment (D3 (a) and D7 step 6
+dropped). Concurrency: toolchain completes twice per push to a PR branch (its `push` run and its `pull_request` run, same
+head branch); only one carries the artifact (D6), and the `check` job drops the other by event; the concurrency group
+sits on the DEPLOY job only, never on the workflow or the `check` job, or the dropped run could cancel the real deploy.
+D4 addition: the reconcile deletes NOTHING if the open-PR list call fails, is paginated short, or returns zero while
+the Pages list holds deployments of PRs it cannot place; an empty list read as "none open" would delete every open
+preview. It also refuses any deployment whose branch is not `pr-<digits>` (the placeholder is production, never listed
+under `env=preview`).
+D5 additions: the noindex bite runs in the preview workflow file itself (`preview.yml`, a `pull_request` trigger with
+`paths: [hosting/**, .github/workflows/preview.yml]`, a no-secret job; on a branch it never reaches the token anyway).
+Evidence that the cache header is rule-controlled on Pages: the check's PM-0006-4, "the planted `no-cache` caught"
+(#66 :33): a `_headers` cache rule changed what the host served. So removing the `immutable` rule changes the response,
+and the header check can fail: the bite holds (sure: medium-high).
+D7 correction (order): a job that names `preview` before it exists creates it "with no protection rules or secrets"
+(Manage environments). So his sitting comes BEFORE step 2.6's merge, and inside step 5 the branch rule is set BEFORE
+the two secrets are pasted (if any run has already made `preview`, he edits that one the same way). New step 0, before
+step 1, if ACCOUNT (b): Cloudflare, Accounts, Create Account, name e.g. "Shamble previews"; switch to it; steps 1 to 4
+happen inside it. Step 6 (a second environment) is dropped. The optional refusal test (a throwaway job naming `preview`
+on step 2.6's pull request) can only run after the sitting.
+D8 correction: the sitting moves before the merge (it is about 20 minutes and can sit inside the review days, so the
+count is unchanged).
