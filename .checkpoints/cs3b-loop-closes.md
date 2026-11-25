@@ -297,7 +297,21 @@
   out in a small manifest batch under the hold, answered first, before the reviews end.
 
 ## Current step
-**WAITING FOR MUSTAFA (since 2026-11-25, 04:30 UTC): his browser check of 3b and his answer on RELEASE-COUNT.**
+**His answer of 2026-11-25, 11:07:13 UTC (saved by script: `cs3b-loop-closes/mustafa-2026-11-25-release-count.md`,
+1,431 bytes, sha256 3e7f2bf0...f05e; read it there, this is a pointer): RELEASE-COUNT is (a), accept as built; no
+release counter in 3c.** His two conditions: the report keeps saying presses by the row's own method and releases
+by working them out, calls no part of that mark passed, and the mark's numbers stay as the row has them; the two
+drafts are made to agree at their next revision (ADR 0002 part 5's sentence and the method cell of PM-0002-12),
+with the reason written there, and that revision comes to him before it is written: **a named follow-up,
+3B-RELEASE-DRAFTS** (to add to STATUS and the archive with the last commit). His browser check comes in his next
+message (the Copy reports from Brave and Firefox). After it: the last commit, the advisor agent's approval of
+exactly that commit, CI green; then his full commit id in one line, nothing pushed after; his main Advisor opens
+the pull request from `pr-title.txt` and `pr-body.md` (so the last commit's report names the commit where those
+two files can still be read, and `pr-body.md` must first say that RELEASE-COUNT is decided). The board: set back
+to `doing` on 2026-11-25, 11:10 UTC (his point 5); `done` after the merge. CI on 01bea7fe: gate, smoke and
+toolchain green.
+
+**STILL WAITING FOR: his browser check.** Before (since 2026-11-25, 04:30 UTC): his check and RELEASE-COUNT.
 The zip was sent to him in the chat (file tool; built from 8f835d114, sha256 3fdcf9f6...1f82; tested unpacked: 16
 browser tests pass). The full question: `cs3b-loop-closes/question-2026-11-25-browser-check.md` (commit 01bea7fe).
 The board thread says so and its state is `needs-musti` (set it back to `doing` after his answer, `done` after
