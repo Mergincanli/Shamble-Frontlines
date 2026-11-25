@@ -190,3 +190,13 @@ GitHub (docs.github.com):
   account (an administrator), this chat's re-runs included.
 - Likely cause (not yet confirmed): the bypass box unticked without "Save protection rules", or the branch rule not
   saved. Needs his screenshot of the environment page.
+
+## B11. His screenshot of the environment page (2026-11-25, after 22:31 UTC)
+- Settings, Environments, Configure preview: banner "Deployment branch rule "main" saved successfully."; Required
+  reviewers and Wait timer unticked; "Allow administrators to bypass configured protection rules" shown unticked, with
+  the "Save protection rules" button below it (whether that state was saved before 22:29 is not visible); Deployment
+  branches and tags: "Selected branches and tags", "1 branch and 0 tags allowed", rule `main`, "Currently applies to 1
+  branch"; Environment secrets: WALL_TEST ("34 minutes ago"). So the rule and the secret are as planned; the open point
+  is the bypass box's saved state. His question "which environment?" (WALL-FAIL-NEXT (a)): the GitHub environment
+  `preview`, this page.
+- Next: he clicks "Save protection rules", reloads, checks the box stays unticked, says "fixed"; this chat re-runs.
