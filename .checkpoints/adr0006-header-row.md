@@ -28,8 +28,18 @@ calls #66 a draft: correct that in your next pull request.").
 9. Report, PR (draft), the advisor agent on the final head, ready, his go.
 
 ## Current step
-8: the review round on the ADR diff (09faefa..HEAD): test-engineer, infra-engineer, the verifier, at xhigh.
-Done before it:
+9: review round 2 on what changed (infra-engineer and the verifier, both resumed with their context) and docs-keeper's
+pass (STATUS, STATUS_ARCHIVE, ROADMAP, REPO_MAP, SPIKE_PLAN), started about 11:57 UTC; draft PR #67 opened
+(https://github.com/Mergincanli/Shamble-Frontlines/pull/67) at a4152ad. Then: the report (draft in `report-draft.md`),
+the fold, the advisor agent on the final head, ready, his go.
+Round 1 (on 1c45ed7): infra-engineer REVISE (F1 High: "where Pages sets no cap" unsourced; F3-F5 Low; F2 Medium ->
+follow-up); test-engineer APPROVE (C1: PASS-WORDS its own entry; F2, F4, F5, F6 Low adopted; F1, F3, F7 follow-ups);
+the verifier FAIL on plan conformity only (E7 12 lines vs 8, opener, Q1 per link; E3 bracket). Plan revision 3
+(c440de8) -> the advisor agent APPROVE with six conditions (R3-10, R3-11 its words; PASS-WORDS covers E9, E10, E11;
+the report's top names Cloudflare's "Start new projects with Workers" and Pages' changed retention; round 2 adds
+R3-10, R3-11, S23). Fix pass ab15d6d; gate PASS (--no-smoke); ADR 1694 -> 1719 lines (+23 at the marks table:
+PM-0006-2 now :1393, "When a mark fails" :1427, the hosting checklist :1462).
+Done before round 1:
 - 5: the advisor agent APPROVE with nine conditions on revision 1 (notes `advisor-plan.md`); plan revision 2 folds
   them in (E8 dropped, E5 replaced by E10, E9 and E10 its exact words, the dates fixed: dashboard 2026-11-18, docs
   2026-11-24).
