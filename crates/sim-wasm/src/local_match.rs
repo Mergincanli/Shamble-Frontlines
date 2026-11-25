@@ -206,7 +206,7 @@ mod tests {
         let endpoint = [
             readout.refused,
             readout.late,
-            readout.unsent,
+            readout.unwritten,
             readout.presses_lost,
             readout.presses_doubled,
         ];

@@ -227,6 +227,8 @@ export class WorkerLink {
         this.#blockBytes = data.blockBytes;
         this.#tickHz = data.tickHz;
         this.#layoutChecked = false;
+        // A Worker that starts again has used no post yet: its first block is not behind the old one's last.
+        this.#postUsed = 0;
         return "";
       case "block":
         return this.#takeBlock(data.buffer, data.startAt, data.doneAt);

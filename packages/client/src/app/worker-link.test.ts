@@ -94,6 +94,18 @@ test("the first block of every Worker start is checked, also after blocks were a
   expect(link.blocks).toBe(1);
 });
 
+test("a Worker that starts again has used no post yet: its first blocks are not behind the old one's last", () => {
+  const { link, ready } = setUp();
+  ready();
+  const tick = (postUsed: number) =>
+    link.onMessage({ type: "block", buffer: block(1, LAYOUT_HASH, 44, [0, 0, 0, 0, 0, 0, 0, 0, postUsed]), startAt: 0, doneAt: 0 });
+  tick(9);
+  ready();
+  tick(0);
+  tick(12);
+  expect([link.olderPosts, link.postUsed]).toEqual([0, 12]);
+});
+
 test("a first block of another layout is refused, and the failure is said once", () => {
   const { link, sent, ready } = setUp();
   ready();

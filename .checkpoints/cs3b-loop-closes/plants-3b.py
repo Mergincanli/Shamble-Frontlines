@@ -29,7 +29,8 @@ def cargo(package, *target):
 PROTOCOL, SIM, ROOM, ENDPOINT, LOCAL = (cargo(name) for name in ("protocol", "sim", "room", "client-endpoint", "sim-wasm"))
 DECODERS = cargo("protocol", "--test", "decoder_inputs")
 STEP_ALLOC = cargo("sim-wasm", "--test", "step_alloc")
-ANY_BYTES = cargo("sim-wasm", "--test", "any_bytes")
+ROOM_ANY = cargo("room", "--test", "any_bytes")
+ENDPOINT_ANY = cargo("client-endpoint", "--test", "any_bytes")
 BUILD = ["node", "packages/client/scripts/build.mjs", "--out-dir", str(ROOT / ".gate/dist-plant")]
 E2E = ["node", "node_modules/@playwright/test/cli.js", "test", "-c", "packages/e2e/playwright.config.ts", "--project=chromium",
        "--workers=1", "--retries=0", "--reporter=list", "--global-timeout=400000", "--trace", "off"]
@@ -108,7 +109,7 @@ PLANTS = [
      [ROOM], failed("a_command_taken_out_and_refused_does_not_move_the_window")),
     ("room-run-order-any", "the same, found by the random-message run of the room",
      [(QUEUE, "        self.len = self.len.saturating_sub(1);\n        Some(first)\n", "        self.len = self.len.saturating_sub(1);\n        self.newest_run = Some(first.sequence);\n        Some(first)\n")],
-     [ANY_BYTES], failed("the_room_keeps_its_rules_whatever_arrives")),
+     [ROOM_ANY], failed("the_room_keeps_its_rules_whatever_arrives")),
     ("room-three", "three commands of one player run in one tick",
      [(ROOM_RS, "pub const CATCH_UP_CAP: usize = 2;", "pub const CATCH_UP_CAP: usize = 3;")],
      [ROOM], failed("at_most_two_commands_run_in_one_tick_and_the_rest_the_next")),
@@ -117,7 +118,7 @@ PLANTS = [
      [ENDPOINT], failed("each_button_moves_by_at_most_one_per_command_and_the_rest_waits")),
     ("pacer-two-any", "the same, found by the random-message run of the endpoint",
      [(PRESS, "                button.counter = button.counter.wrapping_add(1);", "                button.counter = button.counter.wrapping_add(2);")],
-     [ANY_BYTES], r"call \d+: a counter moved by Some\(2\)"),
+     [ENDPOINT_ANY], r"call \d+: a counter moved by Some\(2\)"),
     ("endpoint-newest-only", "the endpoint never sends a command again",
      [(ENDPOINT_RS, "let unconfirmed = self.confirmed.is_none_or(|seen| seq_newer(earlier, seen));",
        "let unconfirmed = self.confirmed.is_none_or(|seen| seq_newer(earlier, seen)) && sequence == earlier;")],
@@ -130,13 +131,13 @@ PLANTS = [
      [ENDPOINT], failed("a_snapshot_that_is_not_newer_and_bytes_that_are_none_are_counted_and_dropped")),
     ("endpoint-index", "the endpoint looks a sent command up without keeping to its ring: a panic on a room's echo, found by the random-message run",
      [(ENDPOINT_RS, "        let place = self.sent.get(usize::from(sequence & RING_MASK))?;", "        let place = &self.sent[usize::from(sequence)];")],
-     [ANY_BYTES], failed("the_endpoint_keeps_its_rules_whatever_arrives")),
+     [ENDPOINT_ANY], failed("the_endpoint_keeps_its_rules_whatever_arrives")),
     ("queue-window", "before the first command runs, the queue takes any spread of sequences",
      [(QUEUE, "        let newest_run = *self.newest_run.get_or_insert(new.sequence.wrapping_sub(1));", "        let newest_run = self.newest_run.unwrap_or(new.sequence.wrapping_sub(1));")],
      [ROOM], failed("a_spread_of_sequences_before_the_first_command_runs_nothing_twice")),
     ("room-presses-any", "the room lets a press counter move two presses a tick, found by the random-message run of the room",
      [(ROOM_RS, "u32::from(press_edges(*old, new)) <= covered;", "u32::from(press_edges(*old, new)) <= covered.saturating_mul(2);")],
-     [ANY_BYTES], r"call \d+: \d+ presses in \d+ ticks"),
+     [ROOM_ANY], r"call \d+: \d+ presses in \d+ ticks"),
     ("block-held-place", "the block writer puts the held buttons where the first counters go",
      [(BLOCK, "        put(HELD, u32::from(readout.echo_buttons));", "        put(PRESSES[0], u32::from(readout.echo_buttons));")],
      [ENDPOINT], failed("every_value_is_written_at_the_table_s_place")),
@@ -176,6 +177,9 @@ PLANTS = [
     ("link-short-block", "the link reads a block that is shorter than its sections",
      [(LINK, "    if (buffer.byteLength < BLOCK_BYTES) return", "    if (buffer.byteLength < 0) return")],
      [CLIENT + ["src/app/worker-link.test.ts"]], vitest_fail("the echo and the link's counts are read from every block")),
+    ("link-restart-posts", "a Worker that starts again is measured against the old one's last post",
+     [(LINK, "        this.#postUsed = 0;\n", "")],
+     [CLIENT + ["src/app/worker-link.test.ts"]], vitest_fail("a Worker that starts again has used no post yet")),
     ("link-key-time", "a key change is timed to a tick that still ran an older post",
      [(LINK, "(this.#postUsed - this.#keyPost) >>> 0 < 0x8000_0000) {", "this.#postUsed >= 0) {")],
      [CLIENT + ["src/app/worker-link.test.ts"]], vitest_fail("a key change is timed to the start of the first tick")),

@@ -117,7 +117,9 @@ impl Sim {
 
     /// The page's newest input, once per tick before `step`, as six plain numbers: the post's number, the held
     /// buttons in the low 16 bits, and the 16 running press counts packed four to a word (button `k` in byte
-    /// `k % 4` of word `k / 4`). Any six numbers are taken: nothing here can panic on what the page sent.
+    /// `k % 4` of word `k / 4`). Any six numbers are taken: nothing here can panic on what the page sent. The
+    /// post handed in last before a step is the one that step uses, whatever its number: keeping the newest by
+    /// number is the host's work (`packages/sim-worker/src/host.ts`).
     pub fn input(&mut self, post: u32, held: u32, p0: u32, p1: u32, p2: u32, p3: u32) {
         self.local
             .set_post(Post::from_words(post, held, [p0, p1, p2, p3]));

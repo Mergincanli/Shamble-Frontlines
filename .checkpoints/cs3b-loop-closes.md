@@ -353,7 +353,31 @@ per frame; the limits there: 160 and 680). The log: `.gate/cs3b/ci-0dfca749-tool
   two plants. The random-message test now asserts, per match, that the sequence moved by exactly the commands
   run plus the ones counted missing. **netcode-architect and rust-reviewer review this in round 2** (their head
   is the commit that holds it).
-- test-engineer, perf-auditor and engine-architect: running (on 0dfca749).
+- **engine-architect: PASS** (`engine-architect-review2.md`): its Medium and its Lows fixed or their answers
+  accepted ("no code path exists only offline"). **Four new Lows, all fixed in the next commit:** the
+  random-message test sat in `sim-wasm` though neither half meets the other side: **moved**, each half into the
+  crate whose rules it checks (`crates/room/tests/any_bytes.rs`, `crates/client-endpoint/tests/any_bytes.rs`; no
+  manifest change); two counters named `unsent` with different meanings: the endpoint's is `unwritten` now;
+  `Sim::input`'s doc says the last post handed in is used; a Worker that starts again no longer counts one
+  spurious older post (`WorkerLink` resets the post used on `ready`; a test and a plant). **For 3c** (into its
+  plan): a `link()` accessor on `LocalMatch`; the time reaches the simulator through `LocalMatch` from recorded
+  times; the simulator's loss and rate limit as silent drops; duplicated datagrams only; corruption as loss; the
+  host's time recorded with every tick; the state-hash export returns the shared hash only, as plain numbers,
+  read only during a replay, its buffer private to `Room`. **Follow-up for Slice 3:** the block's `refused` gets a
+  field of its own for what online play has no room count for.
+- **CI on 6380df45 (the security reviewer's points and the queue's window): gate, smoke and toolchain green**
+  (toolchain run 45533209579, 02:28:40 to 02:33:49 UTC), every count as written before the push, 16 browser tests
+  in 3.4 minutes, the Wasm's sha256 as here.
+- test-engineer and perf-auditor: running (on 0dfca749). netcode-architect: running (on 6380df45, with the
+  queue's window as its main question). rust-reviewer: next free seat, on the commit that holds the four Lows.
+
+**What CI must show on the commit with engine-architect's four Lows (written before the push):** cargo debug,
+twice: 26, 1, 3, 2, 19, 8, 15, 1, 17, 5, 1, 13, 1, 1 (113: the two halves of the random-message test are now one
+test each in `client-endpoint` and `room`); release: protocol 19 and 8, sim 17, 5 and 1; client 84, sim-worker
+46, types 7, net 1, the browser package's Node project 1; boundary 18; 16 browser tests inside the 5 minutes; the
+players' Wasm unchanged: 53,783 bytes, sha256 1e0e2dd5...0a4a. Run here first: all of it except the browser
+tests (nothing the browser runs changed but one reset on a second `ready`, which no browser test reaches).
+Planted defects: 47; the five that this commit touches were run and caught (02:36:05 UTC). Size: 6,747.
 
 **What CI must show on the commit with these fixes (written before the push):** cargo debug, twice: 26, 3, 2, 19,
 8, 15, 17, 5, 1, 13, 2, 1, 1 (113); release: protocol 19 and 8, sim 17, 5 and 1; client 83, sim-worker 46, types

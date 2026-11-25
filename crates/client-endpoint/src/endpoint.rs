@@ -72,7 +72,7 @@ pub struct Readout {
     /// late or twice), or before the join was answered. Not a refusal: an honest room over a lossy link causes it.
     pub late: u32,
     /// Inputs the endpoint could not write. None can occur: every command it sends fits the wire form.
-    pub unsent: u32,
+    pub unwritten: u32,
     /// Presses the room's echo lacks, or has too many of, against the command it says it ran.
     pub presses_lost: u32,
     pub presses_doubled: u32,
@@ -279,7 +279,7 @@ impl Endpoint {
         let count = if written {
             &mut self.readout.sent
         } else {
-            &mut self.readout.unsent
+            &mut self.readout.unwritten
         };
         *count = count.wrapping_add(1);
         written
@@ -590,7 +590,10 @@ mod tests {
                 .collect();
             assert_eq!(sequences, [sequence]);
         }
-        assert_eq!((endpoint.readout().sent, endpoint.readout().unsent), (4, 0));
+        assert_eq!(
+            (endpoint.readout().sent, endpoint.readout().unwritten),
+            (4, 0)
+        );
     }
 
     /// The endpoint writes the page's block itself: whole before the first snapshot, and after `write_block` it
