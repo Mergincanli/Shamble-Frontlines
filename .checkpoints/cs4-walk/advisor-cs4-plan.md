@@ -40,3 +40,6 @@ REVISE. Three High (condition (a) claim; the early look without the panel; game-
 - Still open in draft 2: F1 (plan:40-41, :221-222, :313, :319, :284-287), F2 (plan:37-39, :225-228), F3 (plan:530-560), F5 (plan:419-428), F6 (plan:495-503; NO-SOURCE (b) plan:524-526 also departs from 'from nowhere else'), F7 narrowed (old numbers now shown, plan:384-387; the entry still points to s11c instead of carrying the list), F8 (plan:429-431), F9 (plan:144, :376-377), F10 (plan:612), F11 (plan:616-622).
 - New Low: WALK-CUT's sums not updated for 4c's +100 planned: (b) is 20,750 not 20,650, (c) 23,200 not 23,100 (plan:423-426).
 - Verdict unchanged: REVISE.
+
+## Re-read of draft 3 (d9539e8)
+Plan: diff 639ce96..d9539e8 of plan.md; check each of my eleven conditions against the text section 20 points to; re-add the sums; check his quotes against the three mustafa-2026-11-25-*.md files and DECISIONS.md; check the STEP-60 wording against its evidence; verdict.
