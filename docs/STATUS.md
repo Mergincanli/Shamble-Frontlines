@@ -39,10 +39,10 @@ _Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small C
    his block comes; one plan for the look test page and the model-check tool (EARLY-LOOK (a)), built after his go.
 
 ## Waiting on Mustafa
-- ci-after-3a (the small CI pull request): his go for the head the advisor agent approves, with gate, smoke and
-  toolchain green on it (his main Advisor opens the draft; no browser check). And **FF-DRAW-WHEN**: when does a graphics
-  route for Firefox's drawing tests come back to him? (a) with the gate step 2.3, recommended; (b) in the next CI pull
-  request; (c) not until a WebGPU-capable runner exists (the report `docs/reports/2026-11-25-ci-after-3a.md`).
+- ci-after-3a: first his **RULES-ONLY-READ** (accept the Firefox entry narrowed to the rule tests without his ask,
+  after a red with one "no WebGL" line and three time-outs?) and **TOKEN-WORDS** (defer or fold in), then his go for
+  the head the advisor agent approves, CI green (his main Advisor opens the draft). **FF-DRAW-WHEN**: when a graphics
+  route for Firefox's drawing tests comes back to him (the report `docs/reports/2026-11-25-ci-after-3a.md`).
 - **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (`docs/DECISIONS.md`, 11:38:37 UTC), with
   two conditions: no report calls any part of the presses mark passed; and the two drafts are made to agree at
   their next revision, which comes to him before it is written (**3B-RELEASE-DRAFTS**, his).

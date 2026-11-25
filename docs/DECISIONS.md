@@ -152,8 +152,12 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   docs-keeper, 2026-11-25). The first GitHub run on 52ad5d3 (toolchain 45670972698, red; its log read with gh by
   docs-keeper): Chromium "16 passed (3.5m)"; "libEGL.so.1: not in the loader cache of this runner (printed, not
   judged)"; "Mozilla Firefox 160.0"; in Firefox "4 failed", "9 did not run", "2 passed (5.0m)" after "Timed out waiting
-  300s for the test suite to run", the failures reading "This page could not start drawing: can't access property
-  "getSupportedExtensions", this.gl is null". The run reached Playwright's 300 s stop as well as that line. The chat
+  300s for the test suite to run"; one of the 4 failures (file-url) reading "This page could not start drawing: can't
+  access property "getSupportedExtensions", this.gl is null", the other three (clock at its 90 s test limit, the two
+  isolation tests at their 60 s waits) timing out with no page line in the log and no artifacts uploaded; their common
+  cause is inferred (`packages/client/src/app/boot.ts:41-45`: a page that cannot draw starts neither the Worker nor the
+  report hook), not shown (this sentence corrected on the advisor agent's read of 80359fc, 2026-11-25; it had said
+  every failure read that line). The run reached Playwright's 300 s stop as well as that line. The chat
   read the red as the case his point 6 names, not as a time-out of its own, because its container trial had the same
   shape (the drawing tests failing on that line, the rest not run at the stop: `trials-main-311c048.md`, lines 14-16,
   the case his FIREFOX-GL (a), point 2, names): the chat's reading, not his words. It then narrowed the firefox entry
