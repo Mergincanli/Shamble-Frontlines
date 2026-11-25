@@ -35,3 +35,7 @@ R1's path, and the interim rule keeps this chat safe meanwhile.
 its own change-set, with the security reviewer and his go. This chat fixes nothing and keeps the interim rule in every
 brief; security-u7-0b-answer.md stays where it is on this branch (the other chat reads it there); pushed notes get no
 more detail about the gap than they hold now.
+
+**Fixed on main by #69 (311c048, merged 16:34 UTC); the interim rule widened 2026-11-25 17:00 UTC** (history.md:7993,
+word for word there): until a second guard fix is merged, every brief carries his sentence "git and gh always start
+their own command, with no other program in front of them." in place of the old one.

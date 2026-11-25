@@ -1,30 +1,35 @@
-You are the project's advisor for MAIN-66's plan check: taking main 3ab9eae into the netcode branch. First read your
+You are the project's advisor for MAIN-66's plan check: taking main 311c048 into the netcode branch. First read your
 rules from main: `git show origin/main:.claude/agents/advisor.md` (run from /home/user/Shamble-Frontlines), and follow
 them. Read only, effort xhigh. Your one output file:
 /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-main-66.md.
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write.
-Never put env, stdbuf or nice options in front of git or gh (GUARD-ENV, q-guard-env.md).
+git and gh always start their own command, with no other program in front of them.
 Write your plan first and a notes line after each check, so a usage cut loses nothing. Never `cd` into a worktree; no
 `git -C`; one simple command per Bash call; run no cargo, test, gate, light run or plant; change no file but your own;
 read nothing from the web. `gh api` is refused here: read CI with the GitHub MCP tools (load them with ToolSearch).
 
 What it is (plain words): MAIN-52, Mustafa's standing rule (history.md:2055-2057; TEST-FIRST's "main taken in when it
 changes code, CI or rules"), on R1's path (LEAN-MODE item 1, history.md:7862). Main moved from 28254a7 (MAIN-65's) to
-3ab9eae by two merges, #66 (09faefa7, docs) and #68 (change-set 3b, code); PR #40 is in conflict since 13:57 UTC. The
-plan: .checkpoints/netcode-proof-test/main-66-plan.md (187 lines, sha256 a47c1871df5b860e…c92258 when this request was
-written), in MAIN-65's approved form: main-65-plan.md, your advisor-main-65.md (M65-1 to M65-5 and its section 3
-fallbacks), advisor-main-64.md:15-48, main-61-plan.md, advisor-main-61.md:19-104, advisor-main-65-head.md.
+311c048 by three merges: #66 (09faefa7, docs), #68 (change-set 3b, code) and #69 (the guard fix: two kit files under
+.claude/hooks/, merged 16:34 UTC); PR #40 is in conflict since 13:57 UTC. His word of 17:00 UTC (history.md:7988-7998,
+word for word there): one merge takes in #66, #68 and #69. The plan: .checkpoints/netcode-proof-test/main-66-plan.md
+(214 lines, sha256 c9022aa9bea890ea…40fa61e9 when this request was written), in MAIN-65's approved form:
+main-65-plan.md, your advisor-main-65.md (M65-1 to M65-5 and its section 3 fallbacks), advisor-main-64.md:15-48,
+main-61-plan.md, advisor-main-61.md:19-104, advisor-main-65-head.md.
 
 Check, each with its evidence:
 1. Every line of the plan's "Facts checked", by your own read-only commands (git show, git diff, git rev-list,
-   git merge-base, git merge-tree --write-tree, git grep, git ls-files, git patch-id, df): above all the 87 paths and
-   their counts, the guard's pathspec (main-61-plan.md:37-40) both ways, the one conflict and its block's lines,
-   DEP-HOLD's six manifests against the merge-tree tree, the three auto-merged docs, and main's CI on 3ab9eae.
-2. "The numbers": every value C1-C6, M64-1 and M65-2 bind with, for this take-in; nothing of MAIN-65's left in place.
-3. The steps, the stop rules and the risks, above all the two new ones: U7's T-builder beside the take-in (brief 3,
+   git merge-base, git merge-tree --write-tree, git grep, git ls-files, git patch-id, df): above all the 90 paths and
+   their counts, the guard's pathspec (main-61-plan.md:37-40) both ways, the guard's merge rule
+   (.claude/hooks/routine-guard.mjs:1342-1352), the one conflict and its block's lines, DEP-HOLD's six manifests and the
+   kit folders against the merge-tree tree, the three auto-merged docs, and main's CI on 311c048.
+2. The guard line: from step 2 on, this session's hook runs main's fixed rules (settings.json:271-292, guard.mjs:42).
+   Is the plan's reading right, and is anything in steps 2-7 affected?
+3. "The numbers": every value C1-C6, M64-1 and M65-2 bind with, for this take-in; nothing of MAIN-65's left in place.
+4. The steps, the stop rules and the risks, above all the new ones: U7's T-builder beside the take-in (brief 3,
    launch-0850.md section 3, its item 7; sent in the same window on the pre-MAIN-66 head; its lane lock, u7-run.sh:25-29
-   and :55) and the saver's state at step 1.
-4. Answer Q1 and Q2 (the plan's "Questions for the checker").
+   and :55), the saver's state at step 1, and step 5e.
+5. Answer Q1, Q2 and Q3 (the plan's "Questions for the checker").
 
 At your launch the main session sends brief 3 to U7's T-builder (its worktree
 /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e: read it only by absolute path if you need
@@ -32,5 +37,5 @@ it); the builder may start cargo runs. That is not part of this check: do not wa
 the lane. Other notes saves may move HEAD while you read (.checkpoints/ only): check that, and say so.
 
 Give APPROVE, APPROVE WITH CONDITIONS or REVISE, each finding on CLAUDE.md's scale. End the file with DONE on its own
-line. Your final reply goes to the main session: the verdict, the conditions one line each, the answers to Q1 and Q2,
-and "For Mustafa". Plain words.
+line. Your final reply goes to the main session: the verdict, the conditions one line each, the answers to Q1, Q2 and
+Q3, and "For Mustafa". Plain words.

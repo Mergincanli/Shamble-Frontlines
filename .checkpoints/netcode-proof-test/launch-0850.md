@@ -94,8 +94,8 @@ C1-C14 (advisor-u7-brief.md:110-247, binding by pointer).
    worktree stays on `<base>`: MAIN-66 touches nothing under spikes/.
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. Never switch
-the main folder; never `cd` into another worktree; no shell loops. Never put env, stdbuf or nice options in front of
-git or gh (GUARD-ENV, q-guard-env.md).
+the main folder; never `cd` into another worktree; no shell loops. git and gh always start their own command, with no
+other program in front of them. (His interim rule until a second guard fix is merged: history.md:7993.)
 
 ## Session rules carried from the chat (2026-11-25 14:1x UTC, before his /compact; the card's Standing line points here)
 - The guard refuses `git -C`, `-c`, `-P`, `--git-dir`, checkout, restore, `commit --amend`, `worktree remove --force`

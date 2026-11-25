@@ -7984,3 +7984,21 @@ B. I'm about to run /compact on this chat. First make sure nothing that lives on
   brought up to date as the resume source; this message here; the save pushed and checked; a one-line reply.
   Transcript record c546c7fc-9a8f-4276-b586-bf9c287bb70e (typed while a turn ran: a queued_command attachment),
   13:55:27 UTC, 2063 characters.
+
+## Mustafa, 2026-11-25 17:00 UTC, in this chat: main 311c0484 (#69) into MAIN-66; the wider interim rule; nothing else changes (word for word)
+```text
+For the netcode chat, from me, written with my main Advisor (25 November, 17:55 Amsterdam). Lean mode stays as it is.
+
+1. Main moved again after you wrote MAIN-66's plan: the guard fix, pull request #69, was merged at 16:34 UTC. Main is now 311c0484f7a9697ae33e7a76a8cf0b507a2837c4. Against 3ab9eae it changes five files: .claude/hooks/routine-guard.mjs and its test file, docs/STATUS.md, docs/ROADMAP.md and one report. So your plan's line that the kit is untouched no longer holds. Bring main-66-plan.md and its check's request up to that main before your 18:50 UTC window, so that one merge takes in #66, #68 and #69. Tell me in one line whether your session loads the fixed guard after that merge.
+2. The interim rule is wider now, until a second guard fix is merged: git and gh always start their own command, with no other program in front of them. Put that sentence into every brief in place of the old one.
+3. Nothing else changes: brief 3 first, then the order on your card.
+
+Answer in at most 3 lines.
+```
+- **Read as** (the main session's reading, not his words): lean mode unchanged. Item 1: main is now
+  311c0484f7a9697ae33e7a76a8cf0b507a2837c4 (#69, the guard fix, merged 16:34 UTC); main-66-plan.md and
+  main-66-request.txt are brought up to that main before the 18:50 UTC window, so that one merge takes in #66, #68 and
+  #69; one line to him on whether this session loads the fixed guard after that merge. Item 2: until a second guard fix
+  is merged, every brief carries his sentence "git and gh always start their own command, with no other program in
+  front of them." in place of the old interim sentence. Item 3: brief 3 first, then the card's order. At most 3 lines.
+  Transcript record 2b0fd0bb-e89b-425c-a0fd-0be3e9678c6b, 17:00:07 UTC, 1011 characters.
