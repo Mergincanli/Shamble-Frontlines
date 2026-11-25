@@ -405,8 +405,33 @@ per frame; the limits there: 160 and 680). The log: `.gate/cs3b/ci-0dfca749-tool
 - **Found while re-running, a flaw in the loop test itself:** it started its clock after the first reading came
   back, so on a slow page the measured minute could be shorter than the ticks' minute: red by one tick, once
   (1,823 ticks against a bound of 1,822). **Fixed:** the clock starts before the first reading.
-- netcode-architect: running (on 6380df45, with the queue's window as its main question). rust-reviewer:
-  running (on a85b9dbb).
+- **netcode-architect: PASS** (`netcode-architect-review2.md`, on 6380df45). Its Medium and Lows: fixed or
+  answers accepted (on its own test link, 9 honest runs with delay, jitter, 2 to 5 % loss, 1 to 5 % doubled, heavy
+  reorder and outages of 45, 100 and 3,000 ticks: refused 0, late 427 to 3,619, and received + late + refused
+  equalled the datagrams delivered in every run). **The queue's window is right** (40 seeds of 250,000 random
+  operations against its own model, hostile sequences anywhere and 0 to 100 % of taken commands refused: 893,122
+  runs, 726,413 refusals, 0 deviations; the same operations on round 1's window: 24,393 runs not newer than the
+  last and 249,445 honest commands shut out); nothing changes for an honest client; a refused copy offered again
+  costs about 40 ns. **Four new Lows:** two more checks in the random-message tests (per step the sequence moves
+  by exactly the commands run plus the missing counted in that tick; per match received + late + refused equals
+  the datagrams handed in): **to fix**; `ran(sequence)` trusts its caller: **to fix** (the queue remembers what
+  it took out last); `Stale`'s doc covers more than a late repeat: **to fix**; the follow-up on the press check
+  past 255 ticks should say presses are LOST there (its 3,000-tick outage lost 1,024 of 2,520 presses per button,
+  exactly 4 times 256; PRESS-PACE asked about taps within one tick, so no rule of his is loosened): **the
+  follow-up's wording, in the report**.
+  - **On M1 it agrees** with the deferral, the deadline (no room behind a network transport: Slice 3's server)
+    and the place, change-set 7's scheduler seam. The form under running on arrival: a per-client budget, +1 per
+    room tick, banked to at most the repeat window (8), one spent per command run, commands over it dropped and
+    counted outside `refused()`. The form under buffering: a command whose tick lies more than 8 ticks before the
+    tick being run is dropped as late. One mark for both: idle 30, 300 or 3,000 ticks, then the backlog gives at
+    most 8 extra commands; honest outages give refused 0 and at most 7 two-command ticks. **For the owner's
+    decision at the next edit of ADR 0001:** PM-0001-21's lag-switch case holds for only 200 ms (6 ticks, inside
+    the window), so the row passes a room with no bound; a long-hold case (60 s) is proposed.
+  - **For 3c:** the link simulator models corruption as loss only (what an authenticated transport delivers:
+    RFC 9001 section 6.6, RFC 8446 section 5.2); `late` is checked against the simulator's own reorder count.
+    **Before online play (change-set 7):** the endpoint refuses and counts a snapshot more than the estimate plus
+    30 ticks ahead and a confirmation newer than the newest sequence sent.
+- rust-reviewer: running (on a85b9dbb).
 
 **What CI must show on the commit with engine-architect's four Lows (written before the push):** cargo debug,
 twice: 26, 1, 3, 2, 19, 8, 15, 1, 17, 5, 1, 13, 1, 1 (113: the two halves of the random-message test are now one

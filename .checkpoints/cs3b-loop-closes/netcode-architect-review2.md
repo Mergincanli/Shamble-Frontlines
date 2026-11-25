@@ -121,3 +121,28 @@ Round 1's notes: netcode-architect-review1.md (F1 Medium = NA-1; F2..F7 Lows = N
   with "// still make sure to avoid speedhax"; DetermineSimulationTicks: simulation_ticks clamped to the remaining
   budget. The decrement itself was not in the part read (likely another file). Confidence: high for the bank and its
   cap; medium for exactly where it is spent.
+- RUNS 2: cargo clippy --locked --workspace --all-targets: 1 warning, in my probe nc2_probe_endpoint.rs; shipped code
+  0. sim 17 + 5 + 1 pass. world.rs (6380df45): PlayerCommand doc (255 presses after an outage; systems apply their
+  own per-tick rule) and shared_hash zero-fills and truncates (hash value unchanged: same bytes): fine for 3c.
+- PRESS-PACE (DECISIONS.md:660) asked about a tap faster than a tick ("the second tap lands 33 ms later, nothing is
+  lost"); the outage loss mod 256 is another path, so no rule loosened; only the follow-up's wording (card :484).
+- POINT 5 VIEW: agree with the deferral, the deadline (no room behind a network transport, Slice 3) and the place
+  (change-set 7's scheduler seam, build plan :389-391, where PM-0001-20's L1 half runs under both ways, :486). Forms:
+  (a) a per-client command budget +1 per room tick, banked to at most REDUNDANCY_CAP (8), one spent per command run,
+  over-budget commands dropped and counted outside refused() (Source's bank, above); (b) a command whose stamped tick
+  lies more than REDUNDANCY_CAP before the tick being run is dropped as late (late + missing, not refused), catch-up
+  only within that window. One mark for both: idle 30 / 300 / 3,000 then a past-dated backlog -> at most 8 extra
+  commands; honest outages -> refused 0, <= 7 two-command ticks; honest jitter pairs untouched. PM-0001-21: yes, a
+  long-hold case (60 s) at the next ADR edit, with the bound-removed bite; part 5's lag-switch sentence gains the bank.
+
+## FINDINGS (final, round 2)
+- NA-1 fixed; NA-2 fixed; NA-3 fixed; NA-4 fixed; NA-5 fixed (follow-ups accepted); NA-6 fell away; NA-7 accepted.
+- Queue's window (6380df45): right; invariant proven and probed; no honest change; cost bounded; docs true except
+  Stale's wording. Prefer it to the dropped alternative; not both.
+- L-1 Low any_bytes.rs:232-245, :351-368: cheap checks missing (per-step identity; endpoint accounting; ack; repeats);
+  nit :376 vs :380 echo of another command's presses.
+- L-2 Low queue.rs:113-115: ran(sequence) trusts its caller; record the last taken and debug-assert, or pin in cs7.
+- L-3 Low queue.rs:26, lib.rs:59: Stale's doc "an honest late repeat" omits far-ahead and before-first cases.
+- L-4 Low card :484 follow-up wording: presses are LOST past 255 ticks of outage (1,024 of 2,520 per button at 3,000).
+VERDICT: PASS
+DONE
