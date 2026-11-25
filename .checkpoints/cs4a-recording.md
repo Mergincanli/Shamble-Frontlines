@@ -9,7 +9,7 @@
   worktree `.gate/lane1-takeover`; pushed with `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its
   command; never a plain `git push`. The session's start folder is never switched · **Base:** origin/main
   c1da1bd (lane 2's docs-only #67, taken in by merge commit 75a9296; before it 311c0484)
-- **Last update:** 2026-11-25 20:59 Amsterdam (from the clock)
+- **Last update:** 2026-11-25 21:26 Amsterdam (from the clock)
 
 ## Sizes (his point 5: which is which)
 - The designs' own count for 4a, bottom-up: 1,365 lines (655 code, 710 tests).
@@ -37,15 +37,25 @@
    match; two matches in turn), in Node on the players' file and on the test module (both profiles, both columns),
    and in Chromium 158 in a Worker on the players' file.
 
+3. The planted defects, first run (`plants-4a.py`, result `plants-4a.txt`): 11 of 11 caught on their targets (the
+   simulation changed at tick 900: native, Node, Chromium; a counter outside the state: native and Node; a hash
+   map's order and an outside draw: two processes; a WebAssembly-only difference: Node, with the field named; a
+   `usize` in the bytes: step 1), and the clean tree green after. Run again on the final head.
+4. The hash report (PM-0004-21), by rust-reviewer: **keep FNV-1a 64** (`hash-report.md`; its notes
+   `rust-reviewer-hash.md`, DONE). 1.25 ns a byte natively and in WebAssembly; 20 us at 16 KiB, 0.06 % of a tick; a
+   change in one byte is always caught; revisit when the hash first runs on a live tick or the shared state passes
+   64 KiB (then XXH64 in our own code). Its conclusion is `state_hash.rs`'s header now (uncommitted with the
+   recording's files, until the local checks are through).
+
 ## Current step
 **At the stop line: STOP-4A is asked of Mustafa** (`.checkpoints/cs4a-recording/question-2026-11-25-stop-4a.md`).
-rust-reviewer writes the hash report (PM-0004-21). Until his answer only work that adds no product line.
+Until his answer only work that adds no product line. Running: the toolchain job's commands by hand
+(`local-checks.sh`, log `.gate/local-checks.log`).
 
 ## Next steps
-1. rust-reviewer's verdict on the hash's function: KEEP, then the recording's files are committed (a commit without
-   `[skip ci]`, so CI runs); REPLACE, then the function changes first and `make_recordings` makes the hashes again.
-   Fold its report into `state_hash.rs`'s header (the report proposes the wording).
-2. The three planted divergences (a script in the notes, like 3b's plants script), each caught at its tick.
+1. When the local checks pass: commit `state_hash.rs`'s header and the recording's four files in a commit without
+   `[skip ci]`, push, and read CI's run (the players' file's size and sha256 against the local production build).
+2. A draft pull request (his standing permission), kept a draft.
 3. His answer to STOP-4A; then the
 5. Reviewers (netcode-architect, rust-reviewer, test-engineer; then engine-architect, security-auditor), the
    verifier, the advisor agent on every pushed head, the docs pass, the report, a draft pull request.
@@ -57,6 +67,13 @@ rust-reviewer writes the hash report (PM-0004-21). Until his answer only work th
    for every size whether it is the designs' count or already holds the 1.8.
 
 ## Open findings
+- 4A-BYTES-LENGTH (rust-reviewer, a watch for 4c, no defect today): `StateSink::bytes` writes no length, which is
+  right for the 16 press counters; a run of variable length (a soldier list, events) needs a fixed-width count
+  before it, or two different states can give the same bytes · 4c's step 1 · open.
+- `docs/REPO_MAP.md` line 36 says the hash's value never leaves the Worker or the server; since 4a the shared
+  state's hash does, by design · the docs pass · open.
+- rust-reviewer chained its first two read-only git calls after a `cd` (its own report); every later one ran on
+  its own · told here, no effect.
 - The checkpoint script cannot push from this worktree (it pushes the local branch's own name): notes are committed
   by path and pushed by hand; no saver runs · this chat · open.
 - The board says CI's toolchain job ran 5 minutes 20 seconds on the CI Builder's branch (information, not checked
@@ -78,6 +95,5 @@ rust-reviewer writes the hash report (PM-0004-21). Until his answer only work th
   gh always start their own command. The board add-on is active.
 
 ## Running work
-- rust-reviewer (the hash report), started 2026-11-25 about 20:57 Amsterdam; notes
-  `.checkpoints/cs4a-recording/rust-reviewer-hash.md`, the report `.checkpoints/cs4a-recording/hash-report.md`.
+- No agent runs. The local checks run in the background (started 21:25 Amsterdam).
 - No saver runs: the main session commits the notes by hand.
