@@ -75,8 +75,6 @@ fn check(recording: &Recording) -> Result<(), ReplayError> {
 pub struct Replay<'a> {
     sim: Sim,
     steps: std::slice::Iter<'a, Step>,
-    /// The whole state's bytes, for its hash: the runner's own buffer.
-    scratch: Vec<u8>,
 }
 
 impl<'a> Replay<'a> {
@@ -94,7 +92,6 @@ impl<'a> Replay<'a> {
         Ok(Self {
             sim,
             steps: recording.steps.iter(),
-            scratch: Vec::new(),
         })
     }
 
@@ -122,7 +119,7 @@ impl Iterator for Replay<'_> {
         Some(TickHashes {
             tick: world.tick(),
             shared,
-            whole: world.state_hash(&mut self.scratch),
+            whole: world.state_hash(),
         })
     }
 }
@@ -155,7 +152,7 @@ impl StateSink for Lines {
         self.line(name, format_args!("{value}"));
     }
 
-    fn bytes(&mut self, name: &'static str, value: &[u8]) {
+    fn bytes<const N: usize>(&mut self, name: &'static str, value: &[u8; N]) {
         self.line(name, format_args!("{value:?}"));
     }
 
@@ -163,8 +160,8 @@ impl StateSink for Lines {
         self.0.push_str("-- the authority's part --\n");
     }
 
-    fn secret(&mut self, name: &'static str, value: &[u8]) {
-        self.line(name, format_args!("({} bytes, never shown)", value.len()));
+    fn secret<const N: usize>(&mut self, name: &'static str, _: &[u8; N]) {
+        self.line(name, format_args!("({N} bytes, never shown)"));
     }
 }
 

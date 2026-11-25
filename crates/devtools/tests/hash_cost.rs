@@ -41,14 +41,13 @@ fn the_state_hash_s_cost_per_tick_is_read_and_printed() {
         seed: [7; SEED_BYTES],
         start_tick: 0,
     });
-    let mut scratch = Vec::new();
     for (name, shared) in [("shared_hash", true), ("state_hash", false)] {
         let (mean, p99, _) = timed(20_000, || {
             world.authority_step(&[]);
             if shared {
-                world.shared_hash(&mut scratch)
+                world.shared_hash()
             } else {
-                world.state_hash(&mut scratch)
+                world.state_hash()
             }
         });
         println!(

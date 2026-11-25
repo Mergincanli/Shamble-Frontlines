@@ -139,10 +139,10 @@ impl Sim {
 
     /// The hash of the shared state as it stands, as one plain number (a JavaScript `BigInt`): what a replay of a
     /// recorded match compares tick by tick, the same natively and in WebAssembly. It covers no byte of the match
-    /// seed and hands out no buffer. Only a replay calls it: a live tick stays at its two calls, `input` and
-    /// `step`.
+    /// seed, changes nothing and hands out no buffer. Only a replay calls it: a live tick stays at its two calls,
+    /// `input` and `step`.
     #[must_use]
-    pub fn shared_hash(&mut self) -> u64 {
+    pub fn shared_hash(&self) -> u64 {
         self.local.shared_hash()
     }
 }
@@ -217,12 +217,11 @@ mod tests {
         let mut a = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
         let mut b = Sim::create(&[9; SEED_BYTES], MODE_LOCAL, 0).expect("a good seed and mode");
         let mut held_otherwise = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
-        let mut scratch = Vec::new();
         for tick in 0..20u32 {
             let hash = a.shared_hash();
             assert_eq!(hash, b.shared_hash());
             let world = a.local().room().world();
-            assert_eq!(hash, world.shared_hash(&mut scratch));
+            assert_eq!(hash, world.shared_hash());
             // Button 0 is pressed once per tick; the third match also holds button 4 on the last tick.
             let last = u32::from(tick == 19);
             a.input(tick + 1, tick % 4, tick + 1, 0, 0, 0);
