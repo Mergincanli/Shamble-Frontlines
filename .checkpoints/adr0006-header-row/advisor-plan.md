@@ -45,3 +45,27 @@ Q6 R6: order right (probe off, archive, delete project + Access app). Timing is 
   alone, so no bite tests a missing preview noindex rule. Pre-existing; note or follow-up only.
 - Rollback :1556 "if ... a header mark fails on Pages, move to Workers": left-alone reason should be "the revised mark is
   met by readings already taken, so its trigger is not reached", not "how a move would go".
+
+## Revision 3 (plan.md at c440de8; round 1 on 09faefa..1c45ed7) - verdict: APPROVE with conditions
+Read: plan.md R3-1..R3-9; infra-engineer-review.md (F1-F6, S23); test-engineer-review.md; verifier.md (FAIL on plan
+conformity only); infra-engineer-workers.md (S2, S5, S10, S16, Q1-Q8); ADR 0006 at 1c45ed7 (:148 "no cap on previews",
+PM-0006-8 :1392 "on a custom domain if CF has one", checklist intro :1459).
+
+- E7 at 15 lines: accepted as "a short paragraph". His words set no line count; "at most 8" was the plan's own frame.
+  Every clause carries a source, as the evidence rule asks, and it is one paragraph. Cap: 15 lines, no growth in round 2.
+  The report states the length and why.
+- E1 F6 (custom domain) and E1b: within ONE-OFF-HEADER (a). (a) removes only the one-off addresses from the noindex
+  judgement. A custom domain is production's own stable address, so judging it is stricter, and PM-0006-8 already
+  names it. "own addresses" is the draft's word, never quoted as his.
+- Gap found: part 1 :148's *Why* says "no cap on previews" (R6-HOST-F3, read 2026-10-28). Pages' limits page of
+  2026-11-25 (S23) no longer says so and names a retention rule (30 days, unless among the 100 most recent). E7, seven
+  lines below, gives Workers' cap of 100. Read together, the weighing tilts toward Pages on a stale premise. Medium.
+  Fix: one dated pointer at :148, not a rewrite, and the rest stays in ADR6-PAGES-RETENTION.
+- E11 changes the checklist intro, part of the same pass-word change as E9/E10 (the advisor agent's reading): PASS-WORDS
+  names all three. Step 4's word stays his.
+- Q7 "Start new projects with Workers" plus the Pages retention change: they do not decide a move under (a), and no
+  escalation follows. The report's top says both in plain words, so his go is informed.
+- Follow-ups R3-7 accepted under the budget (ADR6-ROLLBACK Medium; PHC-PREVIEW-NOINDEX Medium to step 2.6's plan).
+- Round 2 (R3-9) accepted. Add the :148 pointer to infra-engineer's re-read and S23 to the verifier's spot-checks.
+- Low (rides this push): E1's custom domain is judged but PM-0006-2's method cell reads only the branch alias and the
+  hash URL. Add "and a custom domain if CF has one", as PM-0006-8 does.
