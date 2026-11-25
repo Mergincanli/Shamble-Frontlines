@@ -89,8 +89,13 @@ tests, map OK); pushed as a fast-forward; the main folder fast-forwarded to it (
 project shamble-previews by the legacy Pages path), click 5, clicks 9 and 10 done; TOKEN-TONIGHT (b): the token
 waits for the Guard fix chat's protection for main. M1 after click 5: try 1 FAILED (bypass box not saved; B10),
 try 2 PASSED (all three refused before any step; B12). Watching #72 (subscribed).
-Next: his screenshot of the refusal line (optional); the throwaway file out (U6); round 1 (U7); report (U8); the
-token sitting (clicks 6-8 with the save note, M1's second half) once the protection for main is merged; then his
+The order changed (2026-11-25 ~23:02 UTC): the throwaway file STAYS until the token sitting, because M1's second half
+re-runs runs 45699354868 and 45700220147, and GitHub's re-run docs ("up to 30 days", "the same GITHUB_SHA ... and
+GITHUB_REF") do not say a run can be re-run once its workflow file is gone. One comment on #72 explains the red
+wall-test checks (7177047663, as the PR rules ask). Head ad2658a: gate, smoke, preview/tests green; toolchain running.
+Next: round 1 now (security-auditor, test-engineer, infra-engineer; the throwaway out of scope); fix pass; report
+(U8); the token sitting (clicks 6-8 with the save note, M1's second half) once the protection for main is merged;
+the throwaway out (U6) right after; then his
 sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
 him again (his MAIN-WALL (b)).
 
