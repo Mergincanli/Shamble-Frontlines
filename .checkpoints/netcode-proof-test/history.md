@@ -8023,3 +8023,24 @@ I'm about to run /compact on this chat. First make sure nothing that lives only 
   missing, and what is not yet on file (choices, findings, the session rules learned); this message here; the save
   pushed and checked; a two-line reply.
   Transcript record 2347141e-61ae-49c3-887e-1db4e4bdcf8d, 17:42:38 UTC, 1740 characters.
+
+## Mustafa, 2026-11-25 19:14 UTC (his label: 19:35 Amsterdam), in this chat: Builder 2's merge window, Netcode Builder 2's pieces for Stop B, a lighter take-in of main (word for word)
+```text
+For the netcode chat, from Mustafa (written with the main Advisor, 25 November, 19:35 Amsterdam).
+Nothing here changes tonight's order: brief 3 and MAIN-66 go first. Answer at your next check-in, in the chat, without starting an agent.
+
+1. Builder 2's merge: tell me the window you now expect it in. If it has not run by the end of Friday 27 November, send me three lines on what holds it.
+2. For Stop B (my review of R1's run plan, about Tuesday 1 December): add to your forecast a short list of the pieces after R1 that Netcode Builder 2 could build alone on its own branch. For each: its folder fence, its planned size in added lines, and what it must wait for. I want to hand them over the day I decide the three cuts.
+3. Main moved four times today and MAIN-66's plan was rewritten three times. Tell me in three lines what a lighter way to take in a main move that conflicts only in docs/STATUS.md would look like, and what it would save. Change nothing until I answer.
+
+Unchanged: lean mode, and git and gh always start their own command, with no other program in front of them.
+```
+- **Read as** (the main session's reading, not his words): tonight's order unchanged (brief 3 and MAIN-66 first). The
+  three answers go in this chat at the next check-in (20:34 UTC), with no agent started for them. Item 1: the window now
+  expected for Netcode Builder 2's merge; if it has not run by the end of Friday 27 November, three lines on what holds
+  it. Item 2: Stop B's message gains a short list of the pieces after R1 that Netcode Builder 2 could build alone on its
+  own branch, each with its folder fence, its planned size in added lines and what it waits for. Item 3: three lines on
+  a lighter take-in of a main move that conflicts only in docs/STATUS.md, and what it would save; nothing changes until
+  he answers. Lean mode and the interim sentence unchanged.
+  Transcript record 868533d9-3d44-435f-a1a7-5f13242bc26f (typed while a turn ran: a queue-operation at 19:14:52.222Z,
+  then the message), 19:14:52 UTC, 1084 characters.
