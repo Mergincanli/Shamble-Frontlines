@@ -1444,6 +1444,45 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     yet); ADR 0002 part 5's planned dev-only feature (3A-PART5-CLASH) (engine-architect's round 1, its departures line,
     and NEW-C). Inside DEPART-3 (a), said here so it is not lost: PM-0002-53's counter in WebAssembly is the tools
     crate's own function (test-engineer's round 1, its Low (c): "accepted by DEPART-3 (a); say so").
+- **From the preview hosting check** (lane 2, the chat he calls Builder V2; in flight, its pull request #66;
+  branch `claude/optimistic-albattani-mdoonz` standing in for `cs/preview-hosting-check`; risk tier 1; the items of its
+  report's "Follow-ups (for STATUS)", `docs/reports/2026-11-24-preview-hosting-check.md`, their text kept; the ids are
+  this docs pass's):
+  - For step 2.6's plan:
+    - PHC-CLICKLESS: previews without his click per preview, and what keeps the token safe then (his words of
+      2026-11-19, 00:01:25 UTC).
+    - PHC-LOCKFILE: a locked install (a committed lockfile, install scripts off; his point 3 of 2026-11-16).
+    - PHC-TOKEN-SETUP: token setup ends with Cloudflare's verify answer, not a screenshot of the form; the form's
+      single-date chip sets a one-day window.
+    - PHC-PROBES: every probe gets a named User-Agent.
+    - PHC-DELETE: delete with `--force` or the API; a weekly sweep on `main`.
+    - PHC-ACTIONS-READ: `actions: read` reconsidered (SA-R2).
+    - PHC-ERROR-PATH: the deploy step's error path and the account printout (the rename answered the name; the ID is
+      masked when it equals the secret).
+  - PHC-TR-END (after the merge): the test repository: archive it (his TR-END (a)) once this report is merged; then
+    delete the test project and the Access application (Zero Trust, Access, Applications).
+  - PHC-SCRIPT-LOWS: Round 2's Lows (infra L1, L2, L4; test R2-1 to R2-6) and the deferred SA-R5, SA-R6, F5, F6 stay
+    with the throwaway scripts; none carries into step 2.6 unless its plan picks it up.
+- **Moved from STATUS (2026-11-24)** (by lane 2's docs pass for the preview hosting check, under his OLD-LINES: lines
+  about merged pull requests, moved by script, byte for byte): STATUS's Follow-ups lines 78-93 at main 28254a7, the
+  four bullets of the merged pull requests #49, #50, #51 and #48 for the gate step (2.3), are the four bullets below.
+  Their pointers to "the archive's" blocks lead to the blocks above.
+- **From status-diet (PR #49), after the gate step:** the STATUS citations left in advisor.md (:17, :286),
+  netcode-architect.md (:24) and the decision docs (one hop through the table below until then); SD-N1, SD-N2, SD-N3
+  and SD-N6 (security-auditor) and SD-L3 (the verifier): the archive's "Follow-ups", "From status-diet".
+- **From foundation 2.1a (PR #50), for the gate step (2.3):** IE-1, IE-5 (Medium: CI's live mirrors), TE-2, TE-7,
+  R2-1, A-1, N2, L-4 and the v2 root page against pre-move bases; for the drafts' next revision, five "before the
+  foundation" lines left without a pointer; the archive's "Follow-ups", "From foundation 2.1a".
+- **From foundation 2.1b (PR #51), for the gate step (2.3):** the Node 24 installer hang (his words: DECISIONS.md,
+  2026-11-11, 20:44:29 UTC); the gate's stray-page check stops after the merge (security-auditor's F4, Low, open);
+  PROMPTS-2.3 and the guard's `git -C` refusals (the 2.1b report, "Findings for 2.3").
+- **From foundation 2.2 (PR #48), for 2.3:** AUTO-ASK, MANUAL-MODE, GIT-C, ADVISOR-TOOL-WORDS, MODELS-2026-11-12,
+  REFUSED-PUSH, PIN-GUARD, G0, OVERFLOW-XCRATE-CI (or the first crate to depend on sim), TSCONFIG, REQUIRED-CHECK,
+  SAVER-SKIP-CI, CRATE-NAMES, CI-ENFORCED-LATER, WASM-ARTIFACT, TWO-PLAYWRIGHTS, TOOLKIT-RESOLVES-UP, CARGO-NET-OFFLINE,
+  CRATE-LICENCE, CUT-CARRY, CANCEL-ON-MAIN, LINT-TABLE-PEDANTIC, FEATURE-UNIFY, ROOT-WORKSPACE, CLIENT-NET-RULE,
+  NODE-26; later: OVERFLOW-PER-CRATE (with the first third-party crate), PACKAGE-ENTRIES, EMPTY-SLOTS, OQ-0002-8-TEST,
+  BRIEF-STALE. Accepted as left open (his go for #48, item 5): SETPRIV-HARDEN, SETUP-NODE-CACHE, CUT-ESCAPE (step 2.3,
+  each a CI edit that asks him); OVERFLOW-PANIC-RULE (with the first code in the room crate or a server crate).
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -1760,6 +1799,18 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   2. The scan of `crates/sim/src` reads text, not types: it refuses some valid code (3A-SCAN-HELPERS) and misses a
      macro that builds a call itself (its doc says so); it is interim until the quality gate step's lints.
   3. CI does not check that the vector files match their generators (3A-GEN-CHECK, a CI edit).
+- **The preview hosting check (ADR 0006's spike 1, SPIKE_PLAN entry 6)** (lane 2, in flight, 2026-11-24; its report
+  `docs/reports/2026-11-24-preview-hosting-check.md`, "Risks"; the ids are this docs pass's):
+  1. PHC-HEADER: the header mark (PM-0006-2) is not met as written: production's one-off links (0354374e and
+     de1c3e5e) carry the "keep out of search engines" header (`X-Robots-Tag: noindex`), which the host adds to every
+     one-off address; production's own address stays clean. By ADR 0006's "When a mark fails" (ADR 0006 :1404-1416)
+     a failed mark goes back to the draft: infra-engineer revises the part the row names by the draft's own routes,
+     and the revised part returns to the advisor and to Mustafa and the Advisor with the measured numbers. No word of
+     ADR 0006 changes in this pull request. Whether step 2.6 waits for the revision is his decision (ONE-OFF-HEADER).
+  2. PHC-PROBE-MAIL: the test repository's hourly probe reads upload records kept 14 days; the last expires on
+     2026-12-02 (about 18:35 UTC). After that every scheduled run ends red and GitHub mails the failure to Mustafa's
+     account; GitHub's docs do not say whether archiving a repository stops its scheduled runs, while switching the
+     workflow off does. So the probe is switched off before 2 December (his to do).
 - **3a, ranked (all from the change-set's evidence; not re-measured by docs-keeper):**
   1. Cabana: buildings are not NAV cells, so 27.5 % of objective routes and 25 % of siege legs cross a building roof bots can't climb (`tools/reach.js`; R19: the `navBuild` building-cell fix with bot replanning; queued as Night queue item 2, NEEDS PLAN, right after N1 and before 3b)
   2. Allocation grows with team fights (garbage-included inspector profile, MB per game second inside update(), seeded): default Cabana natural match head 4.6-4.8 vs main 2.4-3.1 (head's ally and Soviet bots fight, main's bots don't), Cabana ring combat head 1.72-2.09 vs main 1.94-1.98; DM_Tri 12 soldiers 2.9-3.0 and 48 soldiers 7.2-8.2 after the review fixes (main Cabana at 48: 6.2-6.3). Driver: `updateSoldierAnim` hit/death states (the CS11 anim split); `syncSimWorld` runs twice per step since K4 (0.39-0.43 after the house-array fix, was 0.56-0.65; main 0.16 for its one call)
