@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-25 (change-set 3b took main in: main 09faefa7, #66's merge, lane 2's preview hosting check)._
+_Last updated: 2026-11-25 (guard-env-fix, #69, in flight. Main 3ab9eaec is #68's merge (change-set 3b), whose docs pass is still owed; #66's and 3b's merged rows dropped from "In flight")._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -22,8 +22,8 @@ _Last updated: 2026-11-25 (change-set 3b took main in: main 09faefa7, #66's merg
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| none yet | change-set 3b, "The loop closes" (the second half of change-set 3, his SIZE-3 (b)), by the chat he calls Builder V3: the page's keys reach a local server in the Worker through the real messages and come back (the codec of five messages, the transport interface and the loopback, the room, the client endpoint, local play's one step); a player sees a key diagram (W, A, S, D, Space, Shift) lit from the local server's echo and two new readout lines (messages; presses); the decoder test at its row's count, a mark started, never passed (PM-0001-34); the link simulator and the first recording moved to change-set 3c by the size ladder; report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`; his browser check `docs/reports/2026-11-25-cs3b-browser-check.md` | `claude/loving-hopper-6p0mg2` (stands in for `cs/3b-loop-closes`) | risk tier 1; built; the final code 6abf3d2a; 6,909 added lines against about 3,800 planned (stop line 7,600); the players' Wasm 53,813 bytes; 114 Rust tests, 139 Node tests, 18 boundary tests, 16 browser tests; 53 of 53 planted defects caught on it; gate, smoke and toolchain green on it (toolchain run 45537884772); six reviewers passed two rounds, nothing Critical or High open; the verifier PASS; the advisor agent approved the code as it stands; his browser check clean in Brave and Firefox (2026-11-25, both on WebGPU, every asked number 0); RELEASE-COUNT decided, (a) with two conditions; no pull request yet (his main Advisor opens it from the chat's title and text, he taps the merge) | the advisor agent's approval of the last commit and CI green on it; then his go for exactly that commit |
 | #67 | ADR 0006's small revision after the preview hosting check, by lane 2 (the chat he calls Builder V2), on his ONE-OFF-HEADER (a) and STEP4-COUNT (b): the header mark (PM-0006-2) judged on production's own addresses, with the reason in the row, and production's one-off links with the host's header recorded, not judged; part 1 weighs Workers static assets in a short paragraph from Cloudflare's docs read 2026-11-25 (nothing measured on Workers; in the draft, Pages stays); the build-count question said plainly to be not answered; the pass words of PM-0006-7 and checklist step 4 re-stated as the advisor agent's reading of his STEP4-COUNT (b), never as his decision; part 1's "no cap on previews" dated; report `docs/reports/2026-11-25-adr0006-header-row.md` | `claude/optimistic-albattani-mdoonz` (stands in for `cs/adr0006-header-row`) | a draft until the advisor agent approves its final head, then ready; risk tier 1 (an ADR draft, and his message of 2026-11-25, 11:07:07 UTC in `docs/DECISIONS.md`) | the advisor agent's approval of the head that takes main's #68 merge in, then his go for it (his answers of 2026-11-25, 14:55 Amsterdam, in `docs/DECISIONS.md`: PASS-WORDS (a) with his condition, step 4 achieved (recorded, the question is not answered), WORKERS-NEXT (a)) |
+| #69 | guard-env-fix (SEC-U7B-1: the day guard dropped env, nice and stdbuf option words but not their values, so git and gh behind them went unchecked in a day session or subagent; routines unchanged), by the chat he calls the Guard fix chat | `claude/confident-gates-tbnq38` (stands in for `cs/guard-env-fix`) | draft; risk tier 2, needs-mustafa; code head c3827f4; guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES | the advisor agent's review of the final head; his go for that head (a day session) |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
@@ -59,7 +59,7 @@ _Last updated: 2026-11-25 (change-set 3b took main in: main 09faefa7, #66's merg
 - Decisions still open for him: OQ-0006-22 (before slice 3); the follow-ups marked as his call (FU-P4b, B1-MODES and
   the editor's other questions); the security review of kit-v2-2's finding 4 picks its option for him; and, from R1–R6
   (the full wording: each topic's "Shared open questions" and the v2-research report), ABL-PREDICT (Mustafa, after a
-  Feel Lab test that compares both ways on the Molotov and the Shield): does the client predict the player's own abilities?
+  Feel Lab test that compares both ways on the Molotov and the Shield): does the client predict the player's own abilities? From guard-env-fix (#69): CAP (does his 150-line cap cover the code files only, or docs and the report too) and SAME-GAP (a follow-up guard change-set for the other wrappers).
 
 ## Routines (last read with the routines API, get_trigger, 2026-11-10 20:10 UTC; that read whole: the archive's "Routines")
 - **Night shift** (trig_01QpV6y6UaG1Na2q3jumRDxh): enabled; `CRON_TZ=Europe/Amsterdam 10 0-6 * * *`; Opus 5.5.
@@ -103,6 +103,7 @@ _Last updated: 2026-11-25 (change-set 3b took main in: main 09faefa7, #66's merg
 - **From ADR 0006's revision** (#67, lane 2; the archive's block): ADR6-ROLLBACK (Medium), -WK-ROUTE, -WK-BIC,
   -PAGES-RETENTION, -PM7-PAGES, -PM7-FIGURE, -WORDING, -REVISIT-WORKERS; step 2.6: STEP26-WORKERS, PHC-PREVIEW-NOINDEX.
   #66's follow-ups (PHC-CLICKLESS and the rest, for step 2.6): the archive's "Moved from STATUS (2026-11-25, lane 2)".
+- **From guard-env-fix (#69):** GEF-SAME (the same kind of gap in other wrappers and keywords the day guard strips; the forms are with Mustafa, kept out of the repository), SA-R1-3 (the wrapper loop's turn cap), SA-R2-2 (very long lines against the hook timeout), V-2 (the folder tracking after a split-string value), the reason-text nit.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
@@ -114,7 +115,6 @@ _Last updated: 2026-11-25 (change-set 3b took main in: main 09faefa7, #66's merg
   spot-checked; unread sources); change-set 3a's (MUL-ADD first); change-set 3b's (no bound yet on how late a command
   runs, before online play; releases worked out, not counted). **Legacy (frozen):** 3a's ranked list (PR #15); bot
   navigation; the editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
-- **Preview hosting (lane 2):** PHC-HEADER, the header mark not met as written (back to the draft; revised by #67,
-  waiting for his go); PHC-PROBE-MAIL.
+- **Preview hosting (lane 2):** PHC-HEADER (the header mark; revised by #67, waiting for his go); PHC-PROBE-MAIL.
 
 ## Where STATUS's old sections went: the table is at the end of `docs/STATUS_ARCHIVE.md` (moved there 2026-11-18)
