@@ -1,11 +1,12 @@
 // Saves one of Mustafa's chat messages word for word, by script (never retyped), from the session's own record.
-//   node .checkpoints/netcode-judge/save-message.mjs <session record .jsonl> <first words of the message> <out file>
+//   node .checkpoints/netcode-judge/save-message.mjs <session record .jsonl> <first words of the message> <out file> [date]
+// (`date` is the day in the file's first line; without it 2026-11-24, the first message saved this way.)
 // The record holds a message he sends while a turn runs as a line {"type":"queue-operation","content":"..."}; one he
 // sends between turns as {"type":"user","message":{"content":...}}. The first line whose text starts with the given
 // words is written, unchanged, under a three-line head. It refuses to run if no line or more than one text matches.
 import { readFileSync, writeFileSync } from "node:fs";
 
-const [record, start, out] = process.argv.slice(2);
+const [record, start, out, date = "2026-11-24"] = process.argv.slice(2);
 if (!record || !start || !out) {
   console.error("usage: save-message.mjs <session record .jsonl> <first words of the message> <out file>");
   process.exit(2);
@@ -29,8 +30,10 @@ if (texts.size !== 1) {
 }
 const [text] = texts;
 const head = [
-  "# Mustafa's message to Netcode Builder 2, 2026-11-24, word for word",
-  "Saved by `.checkpoints/netcode-judge/save-message.mjs` from the session's record, as his item 3 asks. For whoever",
+  `# Mustafa's message to Netcode Builder 2, ${date}, word for word`,
+  date === "2026-11-24"
+    ? "Saved by `.checkpoints/netcode-judge/save-message.mjs` from the session's record, as his item 3 asks. For whoever"
+    : "Saved by `.checkpoints/netcode-judge/save-message.mjs` from the session's record, as the message asks. For whoever",
   "merges this branch: his decisions are kept in `docs/DECISIONS.md`, outside this chat's fence.",
   "",
 ];

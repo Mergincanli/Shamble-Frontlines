@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-24 about 23:35 UTC, both parts done at 72651a3c and reported.
+- **Last update:** 2026-11-25 about 00:25 UTC, both parts done and checked; waiting on the merge.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -204,10 +204,21 @@
     GitHub on that SHA: the gate workflow (jobs gate and smoke) success, run 45508565066; the toolchain workflow
     success, run 45508565097. Part b's commit id reported to Mustafa.
 
+29. Mustafa's message of 2026-11-25, 01:20 Amsterdam (saved word for word by script:
+    `netcode-judge/mustafa-2026-11-25.md`) · his main Advisor checked 72651a3c and it passed; he gives his word for
+    the merge in the netcode chat; SYNC-ENTITIES (a): -10's "relevant entities per client" are the other soldiers
+    plus the vehicle hulls in the client's set, decided before any run's data, no file of the two folders changes;
+    MAIN-MODEL (a): this chat stays on Fable 5.2 by his word, and the record says so.
+
 ## Current step
-**Both parts are done and reported: the commit is 72651a3c6326546b423c4773ac5a92902a37b590.** Waiting on Mustafa:
-his word for the merge (the netcode chat merges, after his main Advisor's check), SYNC-ENTITIES and MAIN-MODEL.
-Nothing is running but the background saver.
+**Both parts are done at 72651a3c6326546b423c4773ac5a92902a37b590 and checked by his main Advisor.** Waiting on the
+netcode chat's merge of this branch (on his word, given there). **Next, only after that merge:** the one-way delay
+comparison on the real network (NPT-L2-ONEWAY: the probe's one-way delay checks read against the profile's one-way
+delay minus half the measured base round trip; no tolerance changes; his answer (a) is given in the netcode chat,
+which passes the pointers). One small change-set of its own inside the fence: take the netcode branch's merged head
+in first, plan first, the advisor agent's review, one reviewer's read, ready before R1's report. Not started.
+**When I wait on him (his rule from 2026-11-25):** the full question as a file in these notes, pushed; the board
+thread set to needs-musti with a due label; the post names the file and the commit.
 **For the report (collected while building):**
 - Condition 4, readings still open (built on the written reading): -12 and -13 "per client" = the largest client
   mean; -15's slope method and "flat" rule; -24's halves; -27's "within 5 %" = not worse by more than 5 %;
@@ -230,10 +241,8 @@ Nothing is running but the background saver.
   fix: `session_end` carries a reason, and only a scripted leave gets the tail).
 
 ## Next steps
-1. Only on Mustafa's word: an answer to SYNC-ENTITIES may change `tick.s.relevant_count`'s row or add a count (a
-   small change-set of its own); MAIN-MODEL; the one-way delay comparison on a real network (NPT-L2-ONEWAY), not
-   started.
-2. The netcode chat merges this branch into its own (both parts in one merge), on his word.
+1. After the netcode chat has merged this branch: NPT-L2-ONEWAY, as "Current step" says (pointers come from the
+   netcode chat).
 
 ## Open findings
 - Follow-ups, Low, none needed before the merge (the advisor agent's read): part a's rust-reviewer L4 and L6 and
@@ -244,8 +253,7 @@ Nothing is running but the background saver.
   are not in the repository. For the netcode chat before the merge, from `spikes/netcode-proof/`:
   `cargo run -q --locked -p npt-judge -- --marks marks/marks.json --logs <the -47 set's logs> --only PM-0001-47`,
   expected MOVED.
-- With Mustafa: SYNC-ENTITIES (what -10's "relevant entities" count; the advisor agent recommends soldiers plus
-  hulls, as built) and MAIN-MODEL (this chat runs Fable 5.2 by his start block; CLAUDE.md says Opus 5.5).
+- With Mustafa: nothing. (SYNC-ENTITIES and MAIN-MODEL are answered: step 29.)
 
 ## Key numbers
 - The baseline, `node spikes/netcode-proof/check.mjs` on the base e2c0e896 in this container: 11 of 11 steps;
@@ -260,6 +268,9 @@ Nothing is running but the background saver.
   the netcode head; the main folder parked); and his message saved in `netcode-judge/mustafa-2026-11-24.md`
   (OUTSIDE-NOTES (a); BURST-RIDER (a); the rough-laptop parts move by his decision; one small commit read by the
   advisor agent; both parts in one merge on his word after his main Advisor's check).
+- Mustafa, in the chat, 2026-11-25 (saved in `netcode-judge/mustafa-2026-11-25.md`): SYNC-ENTITIES (a); MAIN-MODEL
+  (a): the main model of this chat is Fable 5.2 by his word (the agents stay Opus 5.5); NPT-L2-ONEWAY comes next,
+  after the merge; how to wait on him.
 
 ## Running work
 - Nothing but the background saver (`checkpoint.mjs watch`).
