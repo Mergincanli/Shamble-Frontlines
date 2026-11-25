@@ -23,7 +23,7 @@ async function start(padBytes: number): Promise<void> {
   loaded = wasmSide;
   // The seed is drawn here and goes nowhere else: no message carries it and nothing logs it (ADR 0004 part 8).
   const seed = crypto.getRandomValues(new Uint8Array(32));
-  const sim = new Sim(seed, MODE_LOCAL, padBytes, performance.now());
+  const sim = new Sim(seed, MODE_LOCAL, padBytes);
   seed.fill(0);
   host = new SimHost(
     sim,

@@ -11,11 +11,23 @@ export type PageToWorker =
   /** Start the match. `padBytes` pads the block for the hand-off readings; the game itself sends 0. */
   | { readonly type: "start"; readonly padBytes: number }
   /**
-   * The newest input, once per drawn frame: its sequence number, and the buffers the page is done with, which ride
-   * this post back to the pool (they are in its transfer list). The view time of the drawn frame joins with the
-   * change-set that uses it, as a tick and a fraction, never as the page's milliseconds.
+   * The newest input, once per drawn frame, as plain numbers: `post` counts the page's posts (it is never the
+   * protocol's command sequence), `held` has one bit per button held (16 buttons), and `p0` to `p3` hold the
+   * page's running count of presses per button, each wrapping at 256, four to a word (button `k` in byte `k % 4`
+   * of word `k / 4`), so a post that is skipped loses no press. `returned` are the buffers the page is done with,
+   * which ride this post back to the pool (they are in its transfer list). The view time of the drawn frame joins
+   * with the change-set that uses it, as a tick and a fraction, never as the page's milliseconds.
    */
-  | { readonly type: "input"; readonly sequence: number; readonly returned: ArrayBuffer[] }
+  | {
+      readonly type: "input";
+      readonly post: number;
+      readonly held: number;
+      readonly p0: number;
+      readonly p1: number;
+      readonly p2: number;
+      readonly p3: number;
+      readonly returned: ArrayBuffer[];
+    }
   /** The tab was hidden or shown: a hidden tab pauses the local match. */
   | { readonly type: "visibility"; readonly hidden: boolean }
   /** Ask for the Worker's statistics. */
@@ -26,10 +38,10 @@ export type WorkerToPage =
   /** The Wasm is loaded and the match runs; every block will be `blockBytes` long. */
   | { readonly type: "ready"; readonly blockBytes: number; readonly tickHz: number }
   /**
-   * One tick's block, transferred. `doneAt` is when the Worker finished the step, on the clock both sides share
-   * (`performance.timeOrigin + performance.now()`).
+   * One tick's block, transferred. `startAt` is when the Worker started the tick and `doneAt` when it finished the
+   * step, both on the clock both sides share (`performance.timeOrigin + performance.now()`).
    */
-  | { readonly type: "block"; readonly buffer: ArrayBuffer; readonly doneAt: number }
+  | { readonly type: "block"; readonly buffer: ArrayBuffer; readonly startAt: number; readonly doneAt: number }
   /** The Worker cannot go on: the Wasm trapped, or a message it got made no sense. */
   | { readonly type: "error"; readonly message: string }
   | { readonly type: "report"; readonly stats: WorkerStats };
@@ -42,6 +54,8 @@ export interface WorkerStats {
   readonly drops: number;
   readonly droppedMs: number;
   readonly pauses: number;
+  /** Posts that were not newer than the post the Worker held: ignored, so a late post rolls no count back. */
+  readonly stalePosts: number;
   /** How late tick starts were against their due times: the median, the 99th percentile and the worst kept. */
   readonly latenessP50: number;
   readonly latenessP99: number;
@@ -69,6 +83,7 @@ const STATS_FIELDS: { readonly [Name in keyof WorkerStats]: WorkerStats[Name] ex
   drops: "number",
   droppedMs: "number",
   pauses: "number",
+  stalePosts: "number",
   latenessP50: "number",
   latenessP99: "number",
   latenessMax: "number",
@@ -107,7 +122,13 @@ export function isPageToWorker(value: unknown): value is PageToWorker {
       return isCount(value["padBytes"]);
     case "input":
       return (
-        isCount(value["sequence"]) &&
+        isCount(value["post"]) &&
+        isCount(value["held"]) &&
+        value["held"] <= 0xffff &&
+        isCount(value["p0"]) &&
+        isCount(value["p1"]) &&
+        isCount(value["p2"]) &&
+        isCount(value["p3"]) &&
         Array.isArray(value["returned"]) &&
         value["returned"].every((buffer) => buffer instanceof ArrayBuffer)
       );
@@ -140,8 +161,8 @@ export function isWorkerToPage(value: unknown): value is WorkerToPage {
     case "ready":
       return isCount(value["blockBytes"]) && isCount(value["tickHz"]);
     case "block":
-      // One read of the time: `isFinite` refuses everything that is not a number, without converting it.
-      return value["buffer"] instanceof ArrayBuffer && Number.isFinite(value["doneAt"]);
+      // One read of each time: `isFinite` refuses everything that is not a number, without converting it.
+      return value["buffer"] instanceof ArrayBuffer && Number.isFinite(value["startAt"]) && Number.isFinite(value["doneAt"]);
     case "error":
       return typeof value["message"] === "string";
     case "report":

@@ -20,22 +20,25 @@ function setUp(options: { transfer?: boolean; blockBytes?: number; copyMs?: numb
   let tick = 0;
   let anchor = 0;
   let since = 0;
-  let newest = -1;
-  const sim: HostSim & { trapNext: boolean; trapRebase: boolean; newest(): number } = {
+  let newest: number[] = [];
+  const sim: HostSim & { trapNext: boolean; trapRebase: boolean; badDue: boolean; newest(): number[] } = {
     trapNext: false,
     trapRebase: false,
+    badDue: false,
+    /** The six numbers of the newest `input` call. */
     newest: () => newest,
-    input(sequence) {
+    input(...numbers) {
       calls.input += 1;
-      newest = sequence;
+      newest = numbers;
     },
-    step() {
+    step(nowMs) {
       calls.step += 1;
       if (this.trapNext) throw new Error("unreachable executed");
+      if (nowMs !== clock.now) throw new Error("the step was not told the host's time");
       tick += 1;
       since += 1;
       new DataView(bytes).setUint32(64, tick, true);
-      return anchor + (since + 1) * PERIOD;
+      return this.badDue ? Number.NaN : anchor + (since + 1) * PERIOD;
     },
     rebase(nowMs) {
       calls.rebase += 1;
@@ -91,6 +94,11 @@ function setUp(options: { transfer?: boolean; blockBytes?: number; copyMs?: numb
   return { host, sim, calls, posts, clock, delays, runTimer, blocks, tickOf, panicked, hasTimer: () => timer !== undefined };
 }
 
+/** An input post with these numbers: the post's number, the held buttons, and one press count in each word. */
+function input(post: number, held = 0, count = 0, returned: ArrayBuffer[] = []) {
+  return { type: "input", post, held, p0: count, p1: count + 1, p2: count + 2, p3: count + 3, returned } as const;
+}
+
 test("it says ready, then posts one transferred block per tick with two calls per tick", () => {
   const { host, calls, posts, delays, runTimer, blocks, tickOf } = setUp();
   host.start();
@@ -104,8 +112,9 @@ test("it says ready, then posts one transferred block per tick with two calls pe
   // schedule was set once, at the start (no pause, no drop).
   expect(calls).toEqual({ input: 90, step: 90, rebase: 1, block_ptr: 1, block_len: 1 });
   expect(host.stats()).toMatchObject({ ticks: 90, maxTicksInOneWake: 1, drops: 0, undetached: 0, blockBytes: 8 });
-  // The time is on the clock the page shares: the first wake came 34 ms after the start (33.33 rounded up).
-  expect(blocks()[0]?.doneAt).toBe(5_000_000 + 1000 + Math.ceil(PERIOD));
+  // The times are on the clock the page shares: the first wake came 34 ms after the start (33.33 rounded up),
+  // and the tick started and ended then.
+  expect(blocks()[0]).toMatchObject({ startAt: 5_000_000 + 1034, doneAt: 5_000_000 + 1034 });
 });
 
 test("the hand-off's time is read when the step returned, before the copy", () => {
@@ -126,11 +135,32 @@ test("the newest input reaches the simulation, and returned buffers are used aga
   runTimer();
   // Five blocks out and none returned: the fifth had to be allocated.
   expect(host.stats().poolMisses).toBe(1);
-  host.onMessage({ type: "input", sequence: 41, returned: blocks().slice(0, 3).map((block) => block.buffer) });
-  host.onMessage({ type: "input", sequence: 42, returned: [] });
+  host.onMessage(input(41, 0x8001, 7, blocks().slice(0, 3).map((block) => block.buffer)));
+  host.onMessage(input(42, 0x21, 9));
   for (let i = 0; i < 3; i += 1) runTimer();
-  expect(sim.newest()).toBe(42);
-  expect(host.stats()).toMatchObject({ poolMisses: 1, poolRefused: 0 });
+  expect(sim.newest()).toEqual([42, 0x21, 9, 10, 11, 12]);
+  expect(host.stats()).toMatchObject({ poolMisses: 1, poolRefused: 0, stalePosts: 0 });
+});
+
+test("the newest post by its number is kept, never the last to arrive", () => {
+  const { host, sim, runTimer, blocks } = setUp();
+  host.start();
+  for (let i = 0; i < 5; i += 1) runTimer();
+  // Before the page's first post the simulation gets nothing held and no press, under post number 0.
+  expect(sim.newest()).toEqual([0, 0, 0, 0, 0, 0]);
+  host.onMessage(input(0xffff_fffe, 1, 100));
+  // An older post and the same post again arrive late: both are ignored and counted, and the buffers they
+  // carry still go back to the pool.
+  host.onMessage(input(0xffff_fffd, 2, 50, [blocks()[0]!.buffer]));
+  host.onMessage(input(0xffff_fffe, 2, 50, [blocks()[1]!.buffer]));
+  runTimer();
+  expect(sim.newest()).toEqual([0xffff_fffe, 1, 100, 101, 102, 103]);
+  // The number wraps: 0 is newer than 2^32 - 2, and half the circle further is not newer.
+  host.onMessage(input(0, 3, 101));
+  host.onMessage(input(0x8000_0000, 4, 0));
+  runTimer();
+  expect(sim.newest()).toEqual([0, 3, 101, 102, 103, 104]);
+  expect(host.stats()).toMatchObject({ stalePosts: 3, poolMisses: 1 });
 });
 
 test("a block that was posted without its transfer list is counted", () => {
@@ -141,9 +171,10 @@ test("a block that was posted without its transfer list is counted", () => {
 });
 
 test("a hidden tab runs no tick and sets no timer; shown again, the match goes on from its tick", () => {
-  const { host, clock, runTimer, blocks, tickOf, hasTimer } = setUp();
+  const { host, sim, clock, runTimer, blocks, tickOf, hasTimer } = setUp();
   host.start();
   for (let i = 0; i < 10; i += 1) runTimer();
+  host.onMessage(input(7, 0x8001, 5));
   host.onMessage({ type: "visibility", hidden: true });
   expect(hasTimer()).toBe(false);
   clock.now += 360_000;
@@ -151,6 +182,8 @@ test("a hidden tab runs no tick and sets no timer; shown again, the match goes o
   host.onMessage({ type: "visibility", hidden: false });
   host.onMessage({ type: "visibility", hidden: false });
   for (let i = 0; i < 5; i += 1) runTimer();
+  // No key is held after a hidden tab (the page gets no key-up there); the press counts stay.
+  expect(sim.newest()).toEqual([7, 0, 5, 6, 7, 8]);
   expect(blocks().map((block) => tickOf(block.buffer))).toEqual(Array.from({ length: 15 }, (_, i) => i + 1));
   expect(host.stats()).toMatchObject({ ticks: 15, pauses: 1, drops: 0, maxTicksInOneWake: 1 });
 });
@@ -191,13 +224,24 @@ test("a trap's own message reaches the page, and the Wasm is never called again"
   // Whatever the page still sends, a trapped instance gets no call: not a tick, not a resume.
   const after = { ...calls };
   sim.trapNext = false;
-  host.onMessage({ type: "input", sequence: 5, returned: [] });
+  host.onMessage(input(5));
   host.onMessage({ type: "visibility", hidden: true });
   host.onMessage({ type: "visibility", hidden: false });
   expect(runTimer()).toBe(false);
   expect(hasTimer()).toBe(false);
   expect(calls).toEqual(after);
   expect(posts.filter((post) => post.type === "error")).toHaveLength(1);
+});
+
+test("a due time that is no number stops the match as a trap does, with its reason", () => {
+  const { host, sim, posts, runTimer, hasTimer } = setUp();
+  host.start();
+  runTimer();
+  sim.badDue = true;
+  runTimer();
+  expect(posts.at(-1)).toEqual({ type: "error", message: "the simulation returned a due time that is not a finite number" });
+  expect(hasTimer()).toBe(false);
+  expect(runTimer()).toBe(false);
 });
 
 test("a trap on the resume after a hidden tab is caught as one in a tick is", () => {

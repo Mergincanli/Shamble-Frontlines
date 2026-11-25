@@ -127,6 +127,442 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 13:55:08 UTC: his answers on pull request #67: PASS-WORDS (a), the three re-worded
+  places stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads
+  "recorded, the question is not answered", never "passed" on its own, and until someone shows a count the previews work
+  as if uploads count; checklist step 4 under its new words: achieved; WORKERS-NEXT (a), keep Pages, Cloudflare's "Start
+  new projects with Workers" added to the draft's "Revisit when" line at its next revision, and step 2.6's plan keeps
+  the deploy step small enough to move to Workers later, says in two lines what such a move would cost and weighs the
+  30-day rule for old previews; no go for #67 yet: when main shows the merge of #68 (lane 1's change-set 3b), that main
+  taken into lane 2's branch by one merge commit keeping both lanes' text, lane 1's lines byte for byte, this message
+  recorded in the same push, then the advisor agent's approval of exactly that commit, green checks, and its full commit
+  id to him; if #68 is not merged by Thursday 26 November, 12:00 Amsterdam, one line to him and wait; until the
+  repository's guard is fixed, no session or agent of lane 2 puts env, stdbuf or nice with options in front of git or
+  gh** (the builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat
+  on his personal account; his label: "For Builder V2, from me, written with my main Advisor (25 November, 14:55
+  Amsterdam)"; message 36549253-a995-4624-bb88-0ae8233412c1, whole; extracted by script from the chat's transcript).
+  Records, not his words: PASS-WORDS and WORKERS-NEXT are the two entries of "Decisions needed" in
+  docs/reports/2026-11-25-adr0006-header-row.md; #67's head when he wrote was 215e6d20df051f8b8a603036d656efbcea2fc2a5,
+  approved by the advisor agent. Copied by script (1809 bytes, sha256
+  d631ad5df8a25ce17563ab081552e26bccba9f2dcb036a595aae16e330cd66bd):
+> For Builder V2, from me, written with my main Advisor (25 November, 14:55 Amsterdam).
+>
+> 1. PASS-WORDS (may the three re-worded places stand): (a), they stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads "recorded, the question is not answered", never "passed" on its own. Until someone shows a count, the previews work as if uploads count.
+> 2. Checklist step 4 under its new words: achieved. What I read on 18 November: no count shown, before and after the ten uploads.
+> 3. WORKERS-NEXT: (a), keep Pages. At the draft's next revision add Cloudflare's "Start new projects with Workers" to its "Revisit when" line. In step 2.6's plan: keep the deploy step small enough to move to Workers later, say in two lines what such a move would cost, and weigh the 30-day rule for old previews.
+> 4. No go for #67 yet, because main moves first: change-set 3b (pull request #68, lane 1) merges today, and after it #67 no longer merges cleanly. Both lanes changed five docs: DECISIONS, REPO_MAP, ROADMAP, STATUS and STATUS_ARCHIVE. When main shows the merge of #68: take that main into your branch by one merge commit that keeps both lanes' text, with lane 1's lines byte for byte, as Builder V3 did for your #66. Record this message in the same push. Then your advisor agent's approval of exactly that commit and green checks on it, and give me its full commit id in one line. My main Advisor runs the merge check and I give my go for that commit.
+> 5. If #68 is not merged by Thursday 26 November, 12:00 Amsterdam, tell me in one line and wait.
+> 6. Until the repository's guard is fixed (a finding of today, another chat fixes it): no session or agent of yours puts env, stdbuf or nice with options in front of git or gh.
+>
+> Answer in at most 6 lines. Plain words, as before.
+- **Taken by Mustafa, 2026-11-25, 12:14:23 UTC: his browser check of change-set 3b in Firefox: clean; the hidden-tab
+  remark he made of Brave did not come again, in Firefox or in Brave** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 090be420-1a96-460f-a719-98a0739a5ecc, whole; extracted by script from the chat's
+  transcript). In his words: "Did some extra thorough spamming and testing, came in pretty clean." Of the hidden-tab
+  step in Firefox: "that it did work properly, unlike the brave one." And of Brave, tried again: "But when I tried
+  remaking the brave one, it didn't happen so I think it was either a 1 time flaw from my side and not an issue" The
+  Copy report he pasted follows whole. What it answers, in the chat's words (not his): Builder V3's message of
+  2026-11-25, about 11:41 UTC: the Firefox Copy report was still missing, and the question RESUME-FLASH (what the boxes
+  show in the first moment after a pause): (a) leave as built and settle it in change-set 4, (b) make the boxes go dark
+  the moment the tab hides, now. Records, not his words: the report is read line by line in
+  `docs/reports/2026-11-25-cs3b-browser-check.md`: Firefox 161 on Windows, backend WebGPU, commit 8f835d114, 4,786
+  ticks, messages refused 0, olderPosts 0, wrongKeys 0, presses 215 made and 215 echoed with 0 lost and 0 doubled,
+  releases 0 doubled, errors 0. The chat had asked him RESUME-FLASH (leave as built, or make the boxes go dark the
+  moment the tab hides); he named no letter, and the chat takes these words as: no change now. What the first picture
+  after a pause shows stays a follow-up, 3B-RESUME-FLASH, for change-set 4. Copied by script (2235 bytes, sha256
+  5046b4aaafd4d187783fac58fba3241c0251297dae4c596e18764254a693ae73):
+> Did the same for firefox (all steps):
+> > Did some extra thorough spamming and testing, came in pretty clean.
+> > I did however notice at Hold A, switch to another tab for 30 seconds, and come back: A is dark.
+> > that it did work properly, unlike the brave one.
+> But when I tried remaking the brave one, it didn't happen so I think it was either a 1 time flaw from my side and not an issue
+>
+> Shamble Frontlines, first page: report
+> backend: WebGPU
+> ticks: 4786 at 30 a second · blocks: 4786 of 44 bytes
+> frames: 179.8 a second · frame time 4.18 ms (p99 8.34 ms)
+> messages: sent 4785 · received 4786 · refused 0
+> presses: 215 made · 215 echoed · 0 lost · 0 doubled
+> errors: 0
+> last pause: 0.5 s hidden · ticks while hidden: 0 (a match that ran on: about 15)
+> isolation: no · commit: 8f835d114
+>
+> commit: 8f835d114
+> run: (none)
+> at: 2026-11-25T12:12:42.483Z
+> browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:161.0) Gecko/20100101 Firefox/161.0
+> display: 2048x1280 at 1.25x, 24 bit
+> hardwareConcurrency: 24
+> crossOriginIsolated: false
+> backend: WebGPU
+> adapter: (not given)
+> forceWebGL: false
+> webgpuOffered: true
+> timestampQuery: true
+> render.drawCalls: 3
+> render.triangles: 3
+> render.lines: 62
+> render.geometries: 3
+> render.textures: 3
+> render.programs: 6
+> tick: 4786
+> tickHz: 30
+> blocks: 4786
+> blockBytes: 44
+> inputPosts: 28497
+> messages.sent: 4785
+> messages.received: 4786
+> messages.refused: 0
+> postUsed: 28492
+> olderPosts: 0
+> wrongKeys: 0
+> keys.bound: W A S D Space Shift
+> presses.made: 215
+> presses.echoed: 215
+> presses.lost: 0
+> presses.doubled: 0
+> releases.made: 215
+> releases.echoed: 215
+> releases.doubled: 0
+> keyToTickP50: 30.00 ms
+> keyToTickP95: 49.00 ms
+> keyToTickCount: 392
+> frames: 28498
+> fps: 179.78
+> frameP50: 4.18 ms
+> frameP99: 8.34 ms
+> deliveryP50: 0.00 ms
+> deliveryP95: 0.00 ms
+> errors: 0
+> lastError: (none)
+> pauses: 3
+> lastPauseHiddenMs: 490
+> lastPauseTicksWhileHidden: 0
+> worker.ticks: 4780
+> worker.wakes: 5263
+> worker.maxTicksInOneWake: 1
+> worker.drops: 0
+> worker.droppedMs: 0
+> worker.pauses: 3
+> worker.stalePosts: 0
+> worker.latenessP50: 0.667
+> worker.latenessP99: 4.667
+> worker.latenessMax: 5
+> worker.copyP50: 0
+> worker.copyP99: 0
+> worker.blockBytes: 44
+> worker.poolMisses: 0
+> worker.poolRefused: 0
+> worker.undetached: 0
+> worker.hardwareConcurrency: 24
+> worker.crossOriginIsolated: false
+- **Taken by Mustafa, 2026-11-25, 11:38:37 UTC: RELEASE-COUNT: (a), accept as built, with two conditions; the order of
+  change-set 3b's last steps; his browser check in Brave, with one remark on the hidden-tab step** (the builder chat he
+  calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai
+  project "Shamble Frontlines ALT"; his message 1c462a05-585f-4152-955c-ff2492c2dada, whole; extracted by script from
+  the chat's transcript). His decision: "RELEASE-COUNT (how releases are counted for the presses mark PM-0002-12): (a),
+  accept as built." And: "No release counter is added in change-set 3c." His first condition: "the report keeps saying
+  that presses were counted by the row's own method and releases by working them out, and it calls no part of that mark
+  passed. The mark's numbers stay as the row has them." His second: "the two drafts are made to agree at their next
+  revision (ADR 0002 part 5's sentence about press and release edge counters, and the method cell of the row
+  PM-0002-12), with the reason written there. That revision comes to me before it is written. Put it on the follow-up
+  list under a name." On the last steps: "the last commit, your advisor agent's approval of exactly that commit,
+  GitHub's checks green on it. Then give me its full commit id in one line and push nothing after it." His remark on the
+  hidden-tab step in Brave: "it was actually still going until the moment I tabbed back." What it answers, in the chat's
+  words (not his): Builder V3's question of 2026-11-25, about 04:30 UTC (question-2026-11-25-browser-check.md): the
+  browser check of change-set 3b and RELEASE-COUNT. Records, not his words: he sent the five numbered points first at
+  11:07:13 UTC, without the check (the same text; his message 13b9e16f-570b-400f-b1d2-544d7ee0865e, 1,431 bytes, sha256
+  3e7f2bf0238516aa3fe385829569a9186872f7f743fa6ed3c367bebcb6a4f05e); the follow-up he asks for is named
+  3B-RELEASE-DRAFTS (STATUS and the archive); no draft is edited by change-set 3b. His Brave report is read line by line
+  in `docs/reports/2026-11-25-cs3b-browser-check.md`: every number he was asked to check is 0. The chat's reading of his
+  remark, from the code: the match stands still while the tab is hidden, the box shows the server's last echo, and the
+  first tick after the return lets the key go, so the picture from before the pause can show for about a thirtieth of a
+  second. Copied by script (4879 bytes, sha256 76f8c4f841dda18886a8077bc418b5dd1f2bd1424e955d6b39aef27d5407d30b):
+> For Builder V3, from me, written with my main Advisor (25 November, 12:15 Amsterdam).
+>
+> 1. RELEASE-COUNT (how releases are counted for the presses mark PM-0002-12): (a), accept as built. The messages carry press counters only, as ADR 0001 part 5 has it, and releases are worked out from the presses and the held keys. No release counter is added in change-set 3c.
+> 2. Two conditions. First: the report keeps saying that presses were counted by the row's own method and releases by working them out, and it calls no part of that mark passed. The mark's numbers stay as the row has them. Second: the two drafts are made to agree at their next revision (ADR 0002 part 5's sentence about press and release edge counters, and the method cell of the row PM-0002-12), with the reason written there. That revision comes to me before it is written. Put it on the follow-up list under a name.
+> 3. My browser check comes in my next message: the Copy reports from Brave and from Firefox.
+> 4. After my check, as your question file says: the last commit, your advisor agent's approval of exactly that commit, GitHub's checks green on it. Then give me its full commit id in one line and push nothing after it. My main Advisor opens the pull request from pr-title.txt and pr-body.md and checks it, and I tap the merge.
+> 5. On the board, set your thread back to doing now, and to done after the merge.
+>
+> Answer in at most 6 lines. Plain words, as before.
+>
+> your request: (all done, except 1 which I will comment under >)
+> The browser check, about 20 minutes, Brave first and then Firefox once, with the zip above. Its README.txt has the ten steps. In short:
+> Unzip, run node serve.mjs in the folder, and open http://127.0.0.1:4173 in Brave with the window in front. You should see the grey ground, six boxes at the bottom left (W, A, S, D, Space, Shift), "errors: 0" and the commit 8f835d114.
+> Hold W: its box lights a moment later and stays lit. Let go: it goes dark.
+> Press S, D, left Shift and right Shift in turn: each lights only its own box.
+> Tap Space ten times: "presses" ends with the same number made and echoed, "0 lost" and "0 doubled".
+> Hold D, click on another window, let go of D there, and click back: D is dark.
+> Hold A, switch to another tab for 30 seconds, and come back: A is dark.
+> >I did this and switched to another tab on the same browser, but when I opened it back again I could see for a very split second that it was still going on and that it got reset after I had tabbed back, but it was actually still going until the moment I tabbed back.
+> Cover Brave's window for a minute, then bring it back.
+> Leave it 2 minutes, press "Copy report" and paste the result here. These should all be 0: messages.refused, olderPosts, wrongKeys, presses.lost, presses.doubled, releases.doubled.
+> In Firefox: steps 2 to 5 once, wait 2 minutes, "Copy report", and paste it here.
+> Anything else you see is what the check is for: paste what you see.
+>
+> report: (I have pressed a bit more and did some extra checks)
+> Shamble Frontlines, first page: report
+> backend: WebGPU
+> ticks: 5528 at 30 a second · blocks: 5528 of 44 bytes
+> frames: 134.5 a second · frame time 5.60 ms (p99 20.70 ms)
+> messages: sent 5527 · received 5528 · refused 0
+> presses: 215 made · 215 echoed · 0 lost · 0 doubled
+> errors: 0
+> last pause: 3.2 s hidden · ticks while hidden: 0 (a match that ran on: about 96)
+> isolation: no · commit: 8f835d114
+>
+> commit: 8f835d114
+> run: (none)
+> at: 2026-11-25T11:17:19.017Z
+> browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36
+> display: 2560x1440 at 1.25x, 24 bit
+> hardwareConcurrency: 11
+> crossOriginIsolated: false
+> backend: WebGPU
+> adapter: (not given)
+> forceWebGL: false
+> webgpuOffered: true
+> timestampQuery: true
+> render.drawCalls: 3
+> render.triangles: 3
+> render.lines: 62
+> render.geometries: 3
+> render.textures: 3
+> render.programs: 6
+> tick: 5528
+> tickHz: 30
+> blocks: 5528
+> blockBytes: 44
+> inputPosts: 31944
+> messages.sent: 5527
+> messages.received: 5528
+> messages.refused: 0
+> postUsed: 31941
+> olderPosts: 0
+> wrongKeys: 0
+> keys.bound: W A S D Space Shift
+> presses.made: 215
+> presses.echoed: 215
+> presses.lost: 0
+> presses.doubled: 0
+> releases.made: 215
+> releases.echoed: 215
+> releases.doubled: 0
+> keyToTickP50: 21.50 ms
+> keyToTickP95: 44.80 ms
+> keyToTickCount: 422
+> frames: 31945
+> fps: 134.46
+> frameP50: 5.60 ms
+> frameP99: 20.70 ms
+> deliveryP50: 0.00 ms
+> deliveryP95: 0.20 ms
+> errors: 0
+> lastError: (none)
+> pauses: 1
+> lastPauseHiddenMs: 3200
+> lastPauseTicksWhileHidden: 0
+> worker.ticks: 5522
+> worker.wakes: 5524
+> worker.maxTicksInOneWake: 1
+> worker.drops: 0
+> worker.droppedMs: 0
+> worker.pauses: 1
+> worker.stalePosts: 0
+> worker.latenessP50: 1.967
+> worker.latenessP99: 14.067
+> worker.latenessMax: 15.800
+> worker.copyP50: 0
+> worker.copyP99: 0.100
+> worker.blockBytes: 44
+> worker.poolMisses: 0
+> worker.poolRefused: 0
+> worker.undetached: 0
+> worker.hardwareConcurrency: 11
+> worker.crossOriginIsolated: false
+- **Taken by Mustafa, 2026-11-25, 11:07:07 UTC: his go for the merge of pull request #66 at exactly
+  d7937de0aad4b86748c7c4574bee5a6921eeb67c, as a normal merge (his HISTORY-ID (a)), with that commit as the expected
+  head, and not if the head had changed; after the merge, the merge commit to him in one line; the status page's row
+  that still calls #66 a draft corrected in lane 2's next pull request; then the small pull request that revises the
+  infrastructure draft's header row, and after it step 2.6's plan** (the builder chat he calls Builder V2, lane 2 of the
+  build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For Builder V2, from
+  me, written with my main Advisor (25 November, 12:15 Amsterdam)"; message 30f4ab9b-ffde-4959-beef-3d3e5c015d43, whole;
+  extracted by script from the chat's transcript). Records, not his words: the chat merged #66 at 2026-11-25 11:10:11
+  UTC as merge commit 09faefa7f7cd1bca939bd2f98237e65e622d4737, a normal merge with that expected head, after reading
+  the head equal to it and gate, smoke and toolchain green on it. Copied by script (741 bytes, sha256
+  ae5eb4f652144d8559b699daca1bb36ae9fba5aa857ba7c56c3c299d044176eb):
+> For Builder V2, from me, written with my main Advisor (25 November, 12:15 Amsterdam).
+>
+> My go: merge pull request #66 at exactly d7937de0aad4b86748c7c4574bee5a6921eeb67c, as a normal merge (my HISTORY-ID (a)), with that commit as the expected head. The PR Advisor approved exactly that commit on GitHub at 06:55 UTC, my main Advisor's merge check passed on it, and gate, smoke and toolchain are green. If the head is no longer that commit, do not merge and tell me in two lines.
+>
+> After the merge: give me the merge commit in one line. The status page's row still calls #66 a draft: correct that in your next pull request. Then go on with the small pull request that revises the infrastructure draft's header row, and after it step 2.6's plan.
+- **Taken by Mustafa, 2026-11-25, 00:22:09 UTC: his answers to the last two questions of the preview hosting check's
+  report: DEPARTURES item (5) (a), the pictures stay out of the repository, the pull-request page's picture among them;
+  HISTORY-ID (a), a normal merge of #66; his main Advisor checked head cbddbbfe402a95481ba8f2ba8c54fbd6a49139a7; these
+  two answers recorded by script and pushed, the advisor agent reviews that final head, its full commit id goes to him
+  in one line and nothing is pushed after it, his main Advisor checks that commit, then he types his go for exactly that
+  commit; after the merge lane 2's order stands; from now on, when the chat waits on him, the full question is saved as
+  a file in its notes and pushed, and the message names the file and the commit** (the builder chat he calls Builder V2,
+  lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For
+  Builder V2, from me, written with my main Advisor (25 November, 01:35 Amsterdam)"; message
+  6d72fe57-647f-4e4a-8c22-adc8e90b7fa1, whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): the report's DEPARTURES item (5) and HISTORY-ID, added at bff6ca1 after his message of 00:55
+  Amsterdam was written. Copied by script (1287 bytes, sha256
+  82c2c359bf47fb17636ee4a3e820228000878a9e196e5dac135bd69e51a6341c):
+> For Builder V2, from me, written with my main Advisor (25 November, 01:35 Amsterdam).
+>
+> 1. DEPARTURES item (5) (the pictures stay out of the repository, the pull-request page's picture among them): (a), it stands. The repository is public and the report writes out what each picture shows.
+> 2. HISTORY-ID (how pull request #66 is merged): (a), a normal merge. Eight characters of an account id open nothing, the branch is public already, and the report's link to the old notes stays whole.
+> 3. My main Advisor checked head cbddbbfe402a95481ba8f2ba8c54fbd6a49139a7: on main 28254a73, 7 docs files, no .checkpoints/ folder, gate, smoke and toolchain green.
+> 4. Record these two answers by script and push. Have your advisor agent review that final head. Then give me its full commit id in one line and push nothing after it. My main Advisor checks that commit, and then I type my go here for exactly that commit.
+> 5. After the merge your order stands: the small pull request that revises the infrastructure draft's header row, then step 2.6's plan.
+> 6. From now on, when you wait on me: save the full question as a file in your notes, push it, and name the file and the commit in your message.
+>
+> Answer in at most 6 lines. Plain words: no tag or code without its explanation in the same sentence.
+- **Taken by Mustafa, 2026-11-24, 23:53:15 UTC: his answers to three decisions of the preview hosting check's report:
+  ONE-OFF-HEADER (a) with two additions (the revised row gives its reason and weighs Workers static assets in a short
+  paragraph; step 2.6's plan starts after #66 and its first edit waits for his go on the revised row; the revision is a
+  small pull request of its own after #66), STEP4-COUNT (b) (the draft says plainly that the question is not answered;
+  until a count is shown, step 2.6 works as if uploads count: only a pull request's newest push is deployed, and its
+  deploys are counted per month) and DEPARTURES (a) for the four departures he names (Safari stays written as not
+  checked, never as passed); for #66: this message recorded by script, the status row's two stale words corrected, one
+  review of the final head by the advisor agent, then ready and the head's full commit id to him, his main Advisor
+  checks that head, no merge before his go for it; EARLY-LOOK (a) as a plan first and under his conditions, which
+  changes his LANE-SPLIT answer of 2026-11-17 and his words of 2026-11-18 for the look test page and the model-check
+  tool only; lane 2's order; he switches off the test repository's hourly checker himself before 2 December** (the
+  builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his
+  personal account; his label: "For Builder V2 (lane 2), from me, written with my main Advisor (25 November, 00:55
+  Amsterdam)"; message 487190e2-1c25-4cf0-b91b-76aa5c220de6, whole; extracted by script from the chat's transcript).
+  What it answers, in the chat's words (not his): ONE-OFF-HEADER, STEP4-COUNT and DEPARTURES as the report first put
+  them (three decisions, four departures), and the chat's question (c) of 2026-11-25 on building the look test page and
+  the model-check tool before change-set 5. Records, not his words: at bff6ca1 the report had added a fifth departure
+  (the pictures stay out of the repository) and a fourth decision, HISTORY-ID (how #66 is merged); his message names
+  four departures and three decisions, so those two stay his. Copied by script (3334 bytes, sha256
+  7573f9eb9587cced4e6172911f0f023a73cef00f891c0af5af892756a45ceb9a):
+> For Builder V2 (lane 2), from me, written with my main Advisor (25 November, 00:55 Amsterdam).
+>
+> 1. My three decisions on the preview hosting check.
+> - ONE-OFF-HEADER (the header mark that is not met): (a), with two additions. The revision of the draft's row gives its reason in the row and weighs the other Cloudflare product (Workers static assets) in a short paragraph, as the draft's own rule for a failed header mark asks. Step 2.6's plan starts after pull request #66, and its first edit waits for my go on the revised row. The revision is one small pull request of its own, after #66.
+> - STEP4-COUNT (checklist step 4 and the build count): (b). The draft says plainly that the question is not answered. Until someone shows a count, step 2.6 works as if uploads count: only the newest push of a pull request is deployed, and it counts its deploys per month.
+> - DEPARTURES (the four recorded departures): (a), all four stand as recorded. Safari stays written as not checked, never as passed.
+>
+> 2. Pull request #66. Record this message by script as usual. In the same push, correct two stale words in the status board's row for this check: "PR to open" is now #66, and the count of my messages is one short. Then your advisor agent reviews the final head, once. When it approves, mark #66 ready and give me the head's full commit id. My main Advisor checks that head before I give my go. Do not merge before my go for that exact head.
+>
+> 3. EARLY-LOOK (may lane 2 build the look test page and the model-check tool before change-set 5 is merged): (a), yes, as a plan first. This changes my LANE-SPLIT answer of 17 November and my words of 18 November ("You write no game code here before change-set 5 is merged") for these two parts only, under these conditions:
+> - One plan for both parts, written after step 2.6's plan. Your advisor agent reviews it, and engine-architect reads the folder split and how the code moves at the hand-over. The plan says what changes in Part 15. It comes back to me, and nothing is built before my go on it.
+> - The model-check tool comes first. Say in the plan whether it can read a model file without a new library. If it needs one, that waits for lane 1, like the page.
+> - The look test page starts only after the carry of my look decisions is merged, and after lane 1 has added the second page to the build setup. Builder V3 makes that small pull request after change-set 3b is merged, never in the middle of it. You write the exact request on issue #59; I pass it to Builder V3.
+> - The page reads the interface file between the tracks and draws through its shape, so that the hand-over is a move of files. You edit no file of lane 1.
+> - No pass mark of change-set 6 or of M is called passed on the test page. My look in Brave comes before its merge.
+>
+> 4. Your order: #66, the draft's small revision, step 2.6's plan, the carry when my block with the picture file comes, then the plan of item 3. One pull request at a time per lane, every file has one owner, the kit stays frozen. The CI edit that hands the tested build to the preview job is the CI Builder chat's: write the exact request for it in step 2.6's plan.
+>
+> 5. I switch off the test repository's hourly checker myself before 2 December.
+>
+> Answer in at most 8 lines. Use plain words with me: no tag or code without its explanation in the same sentence.
+- **Taken by Mustafa, 2026-11-24, 23:24:50 UTC: the chat is compacted; the build plan's third sentence on command timing
+  (its risk 8): (a), changed with the other two; build change-set 3b by the plan under the advisor agent's eight
+  conditions, without waiting for him** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a
+  Claude Code chat on the account that also holds his claude.ai project "Shamble Frontlines ALT"; his message
+  fad04f54-c142-4455-8acf-6888e0e99553, whole; extracted by script from the chat's transcript). His answer on the third
+  sentence: "The third sentence in the build plan (its risk 8): (a). Change it with the other two in 3b's docs pass, and
+  show me all three old and new sentences in your report." On the build: "If the card, the repo and the summary
+  disagree, or something is missing, say what and stop. Otherwise build change-set 3b by the plan under your advisor
+  agent's eight conditions, without waiting for me." On the size and the browser tests: "If the size passes 4,900 lines,
+  the ladder applies as you described: tell me in three lines before a part moves. Time the browser tests before the
+  first push, as you said." He dated the message 25 November; the chat's clock read 2026-11-24, 23:24:50 UTC. What it
+  answers, in the chat's words (not his): the chat's message of 2026-11-24, 23:12 UTC (the advisor agent's read of his
+  three items; the question about the build plan's third sentence on command timing; the recommendation to compact)
+  Records, not his words: the card, the repository and the summary agreed (the branch at 8e3c0a75, main 28254a73, the
+  session record: model `claude-fable-5-2`, permission mode `auto`, context about 11 %); the three old and new sentences
+  stand in change-set 3b's report; the size passed 4,900 lines and the ladder applied: he was told in three lines on
+  2026-11-24, about 23:56 UTC, before a part moved, and the link simulator and the first recording are change-set 3c's;
+  the browser tests were timed on a clean copy before the push whose run counts as evidence (16 tests in 3.4 of 5
+  minutes, there and on GitHub). Copied by script (1043 bytes, sha256
+  4da9ba906c0be8213ecaa61f5adc67ab5512b5c15fe667c507735ec7b6046f73):
+> The compact is done. For Builder V3, from me, written with my main Advisor (25 November).
+>
+> 1. Rebuild from the repository, not from memory: read CLAUDE.md, your resume card (.checkpoints/cs3b-loop-closes.md) and what its "Next steps" name. Check git status and your branch against origin and main. Read your session's model and mode.
+> 2. The third sentence in the build plan (its risk 8): (a). Change it with the other two in 3b's docs pass, and show me all three old and new sentences in your report.
+> 3. Tell me in at most 6 lines where you stand and what you build first. If the card, the repo and the summary disagree, or something is missing, say what and stop. Otherwise build change-set 3b by the plan under your advisor agent's eight conditions, without waiting for me.
+> 4. If the size passes 4,900 lines, the ladder applies as you described: tell me in three lines before a part moves. Time the browser tests before the first push, as you said.
+> 5. A short block for the agent board may follow from me. Install nothing for it on your own.
+- **Taken by Mustafa, 2026-11-24, 23:16:11 UTC: in his words, "I want lane 2 building the game now, beside lane 1" (lane
+  1 is Builder V3, on his third account: change-set 3a merged as #65, 3b next; lane 1's CI edits now go to a separate
+  chat, CI Builder); lane 2 reads Part 15 and STATUS again and answers in at most 12 lines what step 2.6 still needs and
+  when his first link comes, which of its units can start now, and what of change-set 6 and M it could build before
+  change-set 5 without lane 1's folders (his decision; nothing of it built before his yes); read and answer only; one
+  pull request at a time per lane, every file one owner, the kit frozen** (the builder chat he calls Builder V2, lane 2
+  of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For Builder V2
+  (lane 2), from me, written with my main Advisor (25 November)"; a message queued while the chat worked, entry
+  0c2a5b97-5c59-4e91-87ec-b3e315f2eee9; whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): nothing the chat asked. Its line "The Cloudflare sitting is still to come, later today" came
+  after Day 2 had run (2026-11-24, from about 20:14 UTC); the chat said so and answered in its chat, changing no file
+  for it. Copied by script (1359 bytes, sha256 332b0f9e4f1ae97018fcb31c560bbf8566de41e35c6b21755dcf00c16cf2e17f):
+> For Builder V2 (lane 2), from me, written with my main Advisor (25 November). The Cloudflare sitting is still to come, later today. This block does not replace it.
+>
+> 1. I want lane 2 building the game now, beside lane 1. Lane 1 is Builder V3 on my third account: change-set 3a is merged as #65 (main 28254a73), 3b is next. Lane 1's CI edits now go to a separate chat, CI Builder.
+> 2. Read Part 15 again (docs/reports/2026-11-17-build-plan-slice-1-part-15.md) and docs/STATUS.md on main. Then tell me in at most 12 lines:
+>    a. what step 2.6 (the preview links) still needs once the sitting is done, and when I get the first link;
+>    b. which of your units can start now under Part 15 as it stands (the carry of my look decisions, the comparisons that stay);
+>    c. what of change-set 6 (Look) and M (the first model) you could build before change-set 5 is merged without touching lane 1's folders, for example the look on a test page of its own or the model checks as a tool, what that needs from lane 1, and what it would change in Part 15. That part is my decision. Build nothing of it before my yes.
+> 3. Read and answer only. Change no file and push nothing for this. Nothing else changes: one pull request at a time per lane, every file has one owner, the kit stays frozen. Use plain words with me: no tag or code without its explanation in the same sentence.
+- **Taken by Mustafa, 2026-11-24, 22:59:49 UTC: where his decisions of 21 and 22 November stand: on the netcode test's
+  branch, not on main; the chat may read them there with git show, read only** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 172046ad-6b3e-4f62-9409-b0b7fd01d20c, whole; extracted by script from the chat's
+  transcript). In his words: "The decisions you could not find are recorded on the netcode test's branch, not on main:
+  branch claude/netcode-proof-test-plan-hcky5g, file .checkpoints/netcode-proof-test/history.md, lines 7561 to 7607
+  (NPT-TRIM of 21 November and my answers to the re-plan of 22 November), and
+  .checkpoints/netcode-proof-test/moved-block.md, the part "FOR CHANGE-SET 3 ITSELF"." How to read them: "Read them with
+  git show, read only. That is not the spikes/ folder." And: "My message with the three items is my word either way."
+  What it answers, in the chat's words (not his): the chat's sentence of 22:50:20 UTC that the decisions register on
+  main has no entry of 21 or 22 November, so it could not read the decisions his message of 22:44:50 UTC names Records,
+  not his words: a pointer, not a copy: the chat read those lines on 2026-11-24, 23:00 UTC, at that branch's head
+  e8e276f0bf8b201f6a4db3b59315ac6de4c84a04 (fetched by name; nothing is ever pushed there). They are not copied onto
+  main here: his decisions of 21 and 22 November stay recorded where he recorded them, and reach main with that branch.
+  What they say for change-set 3 is the same three items as his message of 22:44:50 UTC (the entry below). Copied by
+  script (510 bytes, sha256 9533874d4ff50082bcee8326d56890f090a937253a8f8fc4f0dbe621cc9906e6):
+> For Builder V3, from me. The decisions you could not find are recorded on the netcode test's branch, not on main: branch claude/netcode-proof-test-plan-hcky5g, file .checkpoints/netcode-proof-test/history.md, lines 7561 to 7607 (NPT-TRIM of 21 November and my answers to the re-plan of 22 November), and .checkpoints/netcode-proof-test/moved-block.md, the part "FOR CHANGE-SET 3 ITSELF". Read them with git show, read only. That is not the spikes/ folder. My message with the three items is my word either way.
+- **Taken by Mustafa, 2026-11-24, 22:44:50 UTC: #65 (change-set 3a) is merged, by his main Advisor on his tap, with the
+  expected head 1624f08; the next CI edit is an Opus 5.5 chat's; next is change-set 3b, with three items first: the
+  decoder test at its row's count, command timing picked by Slice 3 and no longer by the proof test, and the link
+  simulator built by the plan** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code
+  chat on the account that also holds his claude.ai project "Shamble Frontlines ALT"; his message
+  4c185bad-ef83-4c3d-aee3-7fd23996d981, whole; extracted by script from the chat's transcript). The merge, in his words:
+  "My main Advisor marked it ready and merged it on my tap of 22:40:00 UTC, with your commit
+  1624f084924976f4bde8556509c957e1f4634341 as the expected head." And: "That tap was my go. I typed no go line in your
+  chat. Record it by script from this message." On CI: "Which model writes the next CI edit: (a). An Opus 5.5 chat
+  writes the small CI pull request, as my rule of 12 November says. You write no CI file." The decoder test's bar: "Its
+  bar is its row in ADR 0001, exactly as written: 10 million random and mutated inputs per message type, 0 panics and 0
+  allocations above the size limits, and its planted bug (an unchecked index in one decoder) is found within the run."
+  and "Until then your report says the mark has started, never that it passed." On command timing: "The proof test no
+  longer picks it. Slice 3 picks it, and change-set 7 still builds both ways. My go: with 3b's docs pass, the build
+  plan's two places that say the proof test chooses say this instead." On the link simulator: "If the ladder moves the
+  link simulator out of 3b, tell me before anyone builds it a second time." What it answers, in the chat's words (not
+  his): the chat's two questions of 22:00:05 UTC: his go for the merge of #65 at commit
+  1624f084924976f4bde8556509c957e1f4634341 (answered by point 1: his tap in his main Advisor's thread was his go; he
+  typed no go line in this chat), and which model writes the next CI edit (answered by point 2: (a), an Opus 5.5 chat).
+  Points 3 and 4 answer nothing the chat asked: they set what comes before change-set 3b's first edit Records, not his
+  words: main is 28254a73ab226379373e380eeee64336e58ef916 (2026-11-24, 22:40:39 UTC; its parents 1ec6f6c3 and 1624f084);
+  gate, smoke and toolchain were green on it (read 22:45 UTC). The advisor agent read the three items against the plan
+  on that main and approved building 3b under eight conditions; the chat answered in six lines. In change-set 3b the
+  decoder test runs at the row's count for the five message types and the report says the mark has started; the build
+  plan's sentences on command timing were changed with 3b's docs pass (three, by his answer of 23:24:50 UTC above); the
+  size ladder moved the link simulator to change-set 3c, and he was told before anyone built it. Copied by script (2601
+  bytes, sha256 f654912dcacc5eae1d9e24c4db5146dca211870b58eb89e73cc490a01a671820):
+> For Builder V3, from me, written with my main Advisor (24 November).
+>
+> 1. #65 is merged. My main Advisor marked it ready and merged it on my tap of 22:40:00 UTC, with your commit 1624f084924976f4bde8556509c957e1f4634341 as the expected head. Main is now 28254a73ab226379373e380eeee64336e58ef916, with gate, smoke and toolchain green on it. That tap was my go. I typed no go line in your chat. Record it by script from this message.
+> 2. Which model writes the next CI edit: (a). An Opus 5.5 chat writes the small CI pull request, as my rule of 12 November says. You write no CI file. If that holds up 3b anywhere, tell me in three lines.
+> 3. Next is 3b, "The loop closes". Three items from my Advisor come first. They are from the netcode test's list of marks that moved to the real game (my decisions of 21 and 22 November):
+>    a. The decoder test (the moved mark PM-0001-34, "No decoder panics or over-allocates"). Its bar is its row in ADR 0001, exactly as written: 10 million random and mutated inputs per message type, 0 panics and 0 allocations above the size limits, and its planted bug (an unchecked index in one decoder) is found within the run. Your plan has 100,000 random and 100,000 mutated inputs per decoder. In 3b the test reaches the row's count and both zeros for every message type 3b adds, with seeded inputs and a counting allocator of our own. No new tool or package in 3b. The row names cargo-fuzz, and whether that tool joins is my decision later. Until then your report says the mark has started, never that it passed.
+>    b. How commands are timed at the server (OQ-0001-6: run on arrival, or buffered one per tick). The proof test no longer picks it. Slice 3 picks it, and change-set 7 still builds both ways. My go: with 3b's docs pass, the build plan's two places that say the proof test chooses say this instead. Show me the old and the new sentences in your report.
+>    c. The link simulator. The proof test offers its own (seeded delay, jitter, loss and reordering with a packet-fate log, no rate limit and no duplication). My Advisor's lean: 3b builds its own as planned, because you never open spikes/, nothing may import from it, and the offered one lacks two things your plan lists. The choice is your plan's. If the ladder moves the link simulator out of 3b, tell me before anyone builds it a second time.
+> 4. Before 3b's first edit, your advisor agent reads these three against the plan on today's main. Then tell me in at most 6 lines what changes in size, whether anything in the plan no longer holds, and whether this chat should be compacted before the build starts.
 - _A pointer, not a decision: **his browser check of change-set 3a's zip, 2026-11-24, 21:48:49 UTC.** One chat message
   (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also
   holds his claude.ai project "Shamble Frontlines ALT"; his message b5bb0503-5aef-45fc-b832-6bc2a147b40c; 4451 bytes of
@@ -142,6 +578,22 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   "Copy report", whether Brave Shields was up, what a double-click on index.html shows; then Firefox for 2 minutes and
   its report). The message's two pictures are not in the repository (one shows a folder path of his computer); what they
   show is written in the browser-check record_
+- **Taken by Mustafa, 2026-11-24, 19:07:46 UTC: the preview hosting check's Day 2 sitting now; the token ends
+  2026-11-25T22:59:59Z, so Day 2 finishes before then; the chat reads its checkpoint, takes the fresh readings its own
+  rules ask for before he changes anything in Cloudflare, tells him the sitting's length first, then gives the list on
+  one screen and goes one step at a time; plain words with him** (the builder chat he calls Builder V2, lane 2 of the
+  build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For Builder V2 (the
+  preview hosting check), from me, written with my main Advisor (24 November)"; message
+  15af9685-0caf-45cf-a404-14f591e2e9af, whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): nothing the chat asked; Day 2 ran that evening (the report of the preview hosting check).
+  Copied by script (927 bytes, sha256 f340440ac2155648b1eea7e62c133806d5fea110ad689fe94b3cf8927a5258fe):
+> For Builder V2 (the preview hosting check), from me, written with my main Advisor (24 November). Use plain words with me: no tag or code without its explanation in the same sentence.
+>
+> I am back and I am here for the Day 2 sitting now. The Cloudflare token ends 2026-11-25T22:59:59Z (Wednesday 23:59 Amsterdam), so Day 2 has to finish before then.
+> 1. Read your resume card first (.checkpoints/preview-hosting-check.md, "Current step" and "Next steps") and check it against your branch. Do not redo finished work.
+> 2. Five days have passed since your last reading. Do whatever fresh reading your own rules ask for before I change anything in Cloudflare.
+> 3. Tell me first how long this sitting takes, and whether its second visit can be tonight or has to be tomorrow.
+> 4. Then give me Day 2's list again in one screen: each thing I click, in order, with what I should see and which mails will arrive. After that, one step at a time.
 - **Taken by Mustafa, 2026-11-24, 15:58:25 UTC: MUL-ADD (a): the fused multiply-add stays banned in the simulation,
   which writes a * b + c; the check on the built file comes with the first outside crate; the stop line of 4,100 lines
   stays; four decisions of his of 24 November (no separate animation editor; Testlines and the level editor; 3b first in
@@ -830,6 +1282,18 @@ Why recommended: The review agents checked all seven. None changes how the game 
   _Dated pointer, 2026-11-19 (the docs pass after #61's merge; the advisor agent's wording point on head 4cf30ce): where
   the header of this entry says the lost night is "accepted as the report writes it down", his words above are "is
   accepted as you wrote it down, with your lesson."_
+- **Taken by Mustafa, 2026-11-19, 13:36:08 UTC: one thing for lane 2, no work now: aiming down sights and the
+  sprint-to-fire delay are game rules of Slice 1, which lane 1 prices and places in change-set 4's plan; lane 2's wishes
+  W1 and W4 on issue #59 are needs now, and its comment there stays as it is; AIM-STATE of 2026-11-19, 00:59 stands for
+  the poses** (the builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude
+  Code chat on his personal account; his label: "My words of 2026-11-19, 12:00 (Amsterdam time)"; the message opens with
+  the line that resumed this chat after a compaction; message 88036370-e3fe-47f4-a3b4-fa570aeacd0a, whole; extracted by
+  script from the chat's transcript). Records, not his words: the decision itself (SLICE-FEEL) is in the entry of
+  2026-11-19, 13:36:37 UTC, from his message to the build chat; this entry is his message to lane 2. Copied by script
+  (663 bytes, sha256 121999261bcdd29e1bc743adc81e0c86a8816efda6ea56f920f370974b829bad):
+> You were just compacted to cut usage. Nothing is lost. Continue the preview hosting check from your checkpoint: Day 2 (step 26), starting with the 24-hour probe. Read the resume card .checkpoints/preview-hosting-check.md first. Do not redo finished work.
+>
+> My words of 2026-11-19, 12:00 (Amsterdam time): one thing for lane 2, no work now. Aiming down sights and the sprint-to-fire delay are game rules of Slice 1 by my decision of 2026-11-19. Lane 1 prices and places them in change-set 4's plan. Your wishes W1 and W4 on issue #59 are needs now; leave your comment as it is, lane 1 has this from me. My answer AIM-STATE of 2026-11-19, 00:59 stands for the poses.
 - **Taken by Mustafa, 2026-11-19, 11:07:48 UTC: his answer to the question SIZE-STOP-2 of change-set 2 (the change-set
   stood at 4,430 added lines against the stop line of 4,400, with review round 2's fix pass of 41 lines prepared and not
   yet applied): (a), the stop line moves to 4,700 and the fix pass goes in** (the build chat,
@@ -859,6 +1323,56 @@ Why recommended: The review agents checked all seven. None changes how the game 
   open at that moment. Copied by script (1 byte, sha256
   559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd):
 > A
+- **Taken by Mustafa, 2026-11-19, 00:01:25 UTC: PROJ-DRAW (a): lane 1 draws grenades and arrows in flight plainly in
+  change-set 9, and they pass to lane 2 at its merge; AIM-STATE (a) as far as the block goes: lane 2 asks for no aiming
+  flag and plans Slice 1's poses from his Testlines sandbox's rule, the idle pose brought as a proposal with pictures;
+  the needs list on issue #59 stands as posted; on the preview hosting check, with no pass mark or reviewer's condition
+  dropped or loosened: sitting 3 goes on at his "unticked", a setting is read from GitHub's public API where it can be,
+  and step 2.6's plan designs the previews without a click from him and shows what keeps the token safe then** (the
+  builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his
+  personal account; his label: "My words of 2026-11-19, 00:59 (Amsterdam time)"; message
+  8ccb05f4-fbaa-4495-90b3-6595ea781e91, whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): PROJ-DRAW (who draws grenades and arrows in flight in Slice 1) and AIM-STATE (whether lane 2
+  asks for an aiming flag), asked with the needs list of 2026-11-18. Copied by script (2196 bytes, sha256
+  7a0965c1fe8bf1939fe21f75ce819223469fd8fd48a7f8345a92d8565a211fed):
+> My words of 2026-11-19, 00:59 (Amsterdam time): my answers to PROJ-DRAW and AIM-STATE, and three things on my part in the hosting check.
+>
+> PROJ-DRAW: (a). Lane 1 draws grenades and arrows in flight plainly in change-set 9, so that change-set can be judged. They pass to you with the plain tracers and flash when change-set 9 is merged, and from then on you read the block's projectile section.
+>
+> AIM-STATE: (a) as far as the block goes: you ask for no aiming flag and plan Slice 1's poses without one. The rule for the poses is not "fired recently", and it is not settled now. "Aiming and firing" in the Art lead's sheet is the pose of a gun that is ready; it is not aiming down sights. My Shamble Testlines sandbox (github.com/Mergincanli/Shamble-Testlines; look at it, copy nothing) shows the aiming pose whenever the soldier is not sprinting and the sprint pose while he sprints. Start change-set 10's plan from that, and bring me the idle pose there as a proposal with pictures. A first shot never leaves a gun that points away from its target.
+> Whether aiming down sights and the sprint-to-fire delay become game rules in Slice 1 is a separate decision of mine, for lane 1. You hear it from me.
+>
+> The list on issue #59 stands as posted. The Advisor read it against Part 15.2 and checked a sample of its citations.
+>
+> My part in the hosting check, without dropping or loosening any pass mark or reviewer's condition:
+> - Sitting 3 goes on when I write "unticked". Until then "Required reviewers" stays ticked.
+> - Where GitHub's public API shows a setting, read it yourself in place of a screenshot from me: https://api.github.com/repos/Mergincanli/shamble-preview-check/environments answers without a sign-in, and it showed the reviewer rule on preview on 2026-11-18 at 23:56 (Amsterdam time), while the reviewer was on. A screenshot from me only where no API you can reach shows the thing. Do not read that address's "updated_at" as the time of a rule change: it did not move with my untick and my re-tick of 2026-11-18.
+> - For step 2.6's plan: I do not want to click for each preview. Design the previews without a click from me and show what keeps the token safe then. I decide on it with that plan.
+- **Taken by Mustafa, 2026-11-18, 22:56:11 UTC: the second lane: this chat is lane 2 of the build; the preview hosting
+  check keeps the first place; main merged into this chat's branch; Part 15 and his record-file answers read; lane 2's
+  first list of needs posted on issue #59; the order: the check to its report and closing pull request, then step 2.6's
+  plan, and no game code before change-set 5 is merged; no model file (GLB) made by a builder chat; main taken in at the
+  start of each unit and before a pull request opens** (the builder chat he calls Builder V2, lane 2 of the build,
+  session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "My words of 2026-11-18,
+  23:37 (Amsterdam time)"; message 81327c70-528e-4e03-bc98-e8a5d163fbd5, whole; extracted by script from the chat's
+  transcript). What it answers, in the chat's words (not his): nothing the chat asked. Copied by script (3318 bytes,
+  sha256 765226cd46573ccfd4986c12c130e6c7c7aa7053a2f1482e2d80105cd143d4ab):
+> My words of 2026-11-18, 23:37 (Amsterdam time): the second lane. You are lane 2 of the build, and this is what that brings.
+>
+> The preview hosting check keeps the first place. Whenever a step of sitting 3 or of Day 2 can move, it moves first. The work below fills the time in which the check waits on me.
+>
+> 1. Take main in: a plain merge of main into your branch. Your branch stands on 4460ef5b (the merge of pull request #52) and main has seven merges since; on 2026-11-18 main was b763ba3e (the merge of pull request #60). Your branch holds only your checkpoint files, so nothing should conflict; if anything does, stop and tell me. Push it through the checkpoint script.
+> What comes with it: two kit rules (the kept logs, #53; the saver in stints, #54), my decisions of 2026-11-14 and 2026-11-17 and the build plan with the rules for model files (#56), Part 15 (#57), the first code (#58: the message types and the block's layout), and the kit hold (#60): the checkpoint script holds a push that changes a manifest or a lockfile until its security check is recorded (.claude/CHECKPOINTS.md, section 3). You own no manifest and no lockfile, so it should never hold you; if it does, stop and tell me.
+>
+> 2. Read Part 15 of the build plan whole: docs/reports/2026-11-17-build-plan-slice-1-part-15.md, "The second lane", with my six answers at its top. It says which change-sets, folders and files are yours, what each of your units needs merged first, what you must not touch, and how the two lanes' pull requests take turns. Where its text and my answers differ, my answers hold. Then read my answers on the shared record files in docs/DECISIONS.md: RECORD-FILES (2026-11-17) and OLD-LINES (2026-11-18, 11:31). My answer REC-OLD of 2026-11-18, 20:59 (who may correct an old line in those files) stands in the message of merge commit b763ba3e until change-set 2's docs pass records it.
+>
+> 3. Send lane 1 your first list of needs from the block (Part 15.2, "What each lane needs from the other"): every field and every event that your units 6, M, 10 and 11 read from the simulation. For each: which unit reads it, on every tick or on an event, and the source that asks for it (the build plan's card, the old animation code that change-set 10 ports, an Art brief). Post it as one comment on the "Lane requests" issue, #59, naming lane 2, and give me its link in chat. It is due before change-set 4's plan is reviewed; lane 1 builds change-set 2 now. It is a first list for Slice 1: mark a wish as a wish, and later needs go the same way. Keep it light: one agent reads the sources, one consultation of your advisor tool checks the list, no review round.
+>
+> 4. Your order stays: the hosting check to its report and its closing pull request, then step 2.6's plan. The carry of my look decisions comes with a block of its own from me. You write no game code here before change-set 5 is merged, when render/, soldier/ and camera/ pass to you.
+>
+> 5. The model files (GLB) are made by a chat on my PC: Claude driving Blender through the Blender MCP, from the Art project's brief. Neither builder chat makes one. Until I give you a file from it, the code-built soldier and guns of change-set 6 stand in.
+>
+> 6. While you have no pull request open in this repository, taking main in at the start of each unit and before you open one is enough.
 - **Taken by Mustafa, 2026-11-18, 22:34:37 UTC: his answers to the five questions of change-set 2 (the first page,
   foundation step 2.5), and the size: RNG-CRATE (which random-number library, and when: none now, the library enters in
   change-set 3 and he is asked which with that plan), WB-HEALTH (go on with wasm-bindgen or not: go on, pinned to
@@ -925,6 +1439,26 @@ Why recommended: The review agents checked all seven. None changes how the game 
 > After the merge:
 > - Open change-set 2's checkpoint (the first page, foundation step 2.5), with the plan draft carried over from the notes at commit f167f061a9b0b694836c272e397c90c815d7829f. Then stop and tell me the path of its resume card: I compact this chat before you go on.
 > - Then change-set 2: its plan, its review, the build and its pull request, then stop for my go.
+- **Taken by Mustafa, 2026-11-18, 18:21:30 UTC: the browsers for the preview hosting check: in his words, "focus on
+  brave, chrome, firefox and maybe edge (most used browsers)"; sitting 2 starts now** (the builder chat he calls Builder
+  V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his message as
+  typed; message aff8acbf-a617-472c-a56a-b58822623ae1, whole; extracted by script from the chat's transcript). What it
+  answers, in the chat's words (not his): it followed the chat's report that the Safari row read 1 load of 15 (a script
+  fault). The chat's reading of it, not his words: Safari leaves this check, so the row PM-0006-3 is read on Chrome,
+  Edge and Firefox by script and in Brave by him; his BROWSER-SET of 2026-11-19 (above) keeps Safari a target of v2.
+  Copied by script (150 bytes, sha256 6e83c36e1862bb86a19eaecb4c3e8453aca429ec34e663a9ddd492f0b168f948):
+> why do you keep talking about safar, focus on brave, chrome, firefox and maybe edge (most used browsers)
+>
+> Also you can start sitting 2 now if possible
+- **Taken by Mustafa, 2026-11-18, 18:04:10 UTC: REVIEWER (b): "Required reviewers" on the test repository's preview
+  environment is unticked for the rest of the preview hosting check except sitting 3, as option (b) reads** (the builder
+  chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal
+  account; his message as typed; message cd546f27-bed3-4291-97d0-174478c77df5, whole; extracted by script from the
+  chat's transcript). What it answers, in the chat's words (not his): REVIEWER-NOW, after his question of 17:50:30 UTC
+  "Why do I have to approve these things, can't we just automate it?"; option (b): "You untick "Required reviewers" on
+  preview for everything but sitting 3". The chat's plan, not his words: ticked again before sitting 3 and kept on for
+  Day 2. Copied by script (56 bytes, sha256 67f69e0f575819b2b66cfd9a7434f385eb8ba7a8eed7f8cc809e1ec4c4af9de4):
+> B, give me the links for the untick "required reviewers"
 - **Taken by Mustafa, 2026-11-18, 18:01:08 UTC: his answers to three questions of the build chat, and the size accepted:
   KIT-FIX (may a fix to the checkpoint script's hold, in the lines changed after his first answer, be written with the
   exact text shown: yes, as shown), KIT-REMOVED (should a manifest that main removed also pass the hold when a branch
@@ -968,6 +1502,16 @@ Why recommended: The review agents checked all seven. None changes how the game 
 > The planted change for the compare step: yes, as you describe it (one generated file committed with the executable bit, taken back in the next commit).
 > "Nothing else in it": your reading is right. The report and the records that are due ride along.
 > Your stop rule for the new CI lines stands.
+- **Taken by Mustafa, 2026-11-18, 16:10:04 UTC: TOKEN-SCOPE (a): the test token keeps Cloudflare Pages Read for the rest
+  of the check; Day 1 of the check today if possible; he compacts this chat afterwards** (the builder chat he calls
+  Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his
+  message as typed; message d9550773-d802-402d-b2ba-206267f46661, whole; extracted by script from the chat's
+  transcript). What it answers, in the chat's words (not his): 1, TOKEN-SCOPE ((a) Read stays; (b) Read removed after a
+  measured run); 2, when Day 1 runs; 3, a request to compact the chat. Copied by script (183 bytes, sha256
+  219d9d7acb8b0856f59caee5f20490fbe888ac02804962d5a0acde5d392d7db1):
+> 1. A
+> 2. day 1 can be today if possible
+> 3. I'll do compact afterwards, do you want me to send you specific instructions after I have used /compact? so you know where to go from exactly
 - **Taken by Mustafa, 2026-11-18, 15:38:13 UTC: his go on the merge of #58 (change-set 1, Types: the generated types,
   the block's layout table and its hash), what he accepts with it, his answers to its five questions, and what comes
   after** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of
@@ -1009,6 +1553,33 @@ Why recommended: The review agents checked all seven. None changes how the game 
 > After the merge:
 > - One small pull request with the kit hold and the two CI edits, nothing else in it. Its ready report goes to the Advisor before my go.
 > - You may write change-set 2's plan beside it. No new library of change-set 2 is committed before that pull request is merged.
+- **Taken by Mustafa, 2026-11-18, 14:30:11 UTC: TOKEN-WINDOW done by him: the test token's expiration set to the "7
+  days" preset; the token check re-run (CHECK-RERUN) and run a second time; the account ID's first and last four
+  characters compared (ID-ENDS): they match** (the builder chat he calls Builder V2, lane 2 of the build,
+  session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his message as typed; message
+  8b31c945-c07d-4b1b-8b62-185f409e0a0e, whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): the fix for the token's one-day window found by the token check (TOKEN-WINDOW), the check's
+  re-run, and ID-ENDS. Copied by script (225 bytes, sha256
+  5b18445aebdba2b01c408c2fc7c58017fab67019ce1f957364de1a6a39a33742):
+> Step 1 done, the api token is still the same, I have also set it to 7 days expiration
+> The rerun went well tool 
+> ran the check a 2nd time, which also ran properly.
+> Yes, cloudflare account id begins with that and ends with d8e7
+- **Taken by Mustafa, 2026-11-18, 11:09:03 UTC: CHECK-YES: yes, for one run of the token check (check-token.yml, sha256
+  0ad66aa0f2b36f7469bc3bdd57a4a05b7945e0037f96b19059000e0ca9b5aa71) and the acts its request lists; ID-ENDS: yes; no
+  deploy run of any kind before his screenshot of the renamed Cloudflare account** (the builder chat he calls Builder
+  V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "My
+  words of 2026-11-18, 11:31 (Amsterdam time)"; message a0f3eeda-ce06-4801-ba28-f739b853c52d, whole; extracted by script
+  from the chat's transcript). What it answers, in the chat's words (not his): the chat's two yes requests of 2026-11-17
+  on the token check. Copied by script (762 bytes, sha256
+  9620f1e80f14718d36b44e9121d0ceb56f99b9578df4af584416030fe7ef6be7):
+> My words of 2026-11-18, 11:31 (Amsterdam time): my answers to your two yes requests of 2026-11-17 on the token check.
+>
+> CHECK-YES: yes, for one run. It covers the file check-token.yml with sha256 0ad66aa0f2b36f7469bc3bdd57a4a05b7945e0037f96b19059000e0ca9b5aa71 and the acts your request lists for that one run, nothing else. I approve only the run whose head commit holds that file. A re-run, or a push to the branch check-token after that commit, needs a new list from you first. Delete the run's logs after you have read them.
+>
+> ID-ENDS: yes. That run may print the first and last 4 characters of the account ID. I compare them with Account Details in Cloudflare.
+>
+> No deploy run of any kind starts before you have my screenshot of the renamed Cloudflare account.
 - **Taken by Mustafa, 2026-11-18, 11:08:25 UTC: his go on the merge of #57 (Part 15 of the build plan, "The second
   lane", with his six answers), what he accepts with it, his answer OLD-LINES, and what comes after** (the build chat,
   session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-18, 11:31 (Amsterdam
@@ -1063,6 +1634,14 @@ Why recommended: The review agents checked all seven. None changes how the game 
 > After the merge:
 > - Part 15 with my six answers goes to main next, as a docs change of its own. Keep it to Part 15's text, my answers by script, the pointers they need and the rules file's line on gun files. It also brings the status page and the roadmap up to date for this merge.
 > - Then change-set 1.
+- **Taken by Mustafa, 2026-11-17, 22:35:52 UTC: yes to renaming his Cloudflare account, with step-by-step instructions
+  from the chat** (the builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude
+  Code chat on his personal account; his message as typed; message 4f8140d3-f419-49e2-bea8-1bd105232a66, whole;
+  extracted by script from the chat's transcript). What it answers, in the chat's words (not his): the chat's point that
+  a failed upload could print the account's default name (his e-mail address) in a public log; renaming the account
+  removes the e-mail from that name. Copied by script (103 bytes, sha256
+  13a73507c71f9b81bd8a2bbe8106ddc9b9880446d351af1fced91b8a732b8b47):
+> yes we can change the account name, just give me digestable step by step instructions once you're ready
 - **Taken by Mustafa, 2026-11-17, 22:10:34 UTC: his answers to the six questions of the build plan's Part 15, "The
   second lane" (LANE-SPLIT, RECORD-FILES, VFX-ROUTE, VFX-FIX, VFX-MOMENTS, GUN-FILES: (a) each, with additions); the
   stop line of change-set 0; pull request #56** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal
@@ -1305,6 +1884,21 @@ Why recommended: The review agents checked all seven. None changes how the game 
 > - First show me the exact lines in chat and wait for my yes. My yes will also be the exception to the kit freeze (KIT-FREEZE-2) for this one change. Then one review round, then stop for my go on the merge.
 >
 > On today's stall (17:09 to 20:36 UTC, a call that waited for my approval): write commands in the simple forms that need no approval, one per call, as you did when you redid that step. When a call has to ask me, name it in your message before you send it.
+- **Taken by Mustafa, 2026-11-16, 08:46:16 UTC: yes to the batched diff of the check's workflows (deploy.yml
+  29593af18d34 and close.yml 3afdf389d636: "deployments: write" removed, the records kept 14 days); SA-R3 accepted for
+  this check; for step 2.6, a locked install planned and brought with step 2.6's plan** (the builder chat he calls
+  Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his
+  label: "My words of 2026-11-16, 09:20 (Amsterdam time)"; message f28ae3aa-2c0e-485e-bfd1-5e49ccb83884, whole;
+  extracted by script from the chat's transcript). What it answers, in the chat's words (not his): the chat's batched
+  diff after the review round, and the security-auditor's finding SA-R3 (the install step keeps the token out of the
+  scripts' environment, not out of their reach). Copied by script (929 bytes, sha256
+  2b6af13baa8f76b66bbf45cd781c5a216bf8af5292405b7ed534a2016af4fe5a):
+> My words of 2026-11-16, 09:20 (Amsterdam time), for the second builder chat.
+>
+> 1. Yes to the batched diff exactly as proposed: deploy.yml (sha256 starting 29593af18d34) and close.yml (sha256 starting 3afdf389d636). It removes "deployments: write" from the deploy job and keeps the records 14 days instead of 7. Nothing else changes; the two token-test variants stay as they are.
+> 2. SA-R3: I accept that risk for this check. Wrangler and what it installs run on a machine that later holds the token, so the install step keeps the token out of their environment, not out of their reach. The token ends after 10 days, serves this check only, and I delete it on Day 2.
+> 3. For step 2.6, not for this check: plan a locked install (a committed lockfile, install scripts off) and bring it to me with step 2.6's plan.
+> 4. The screenshots of preview, production and Actions, General, and the token's end date: they follow in my next message.
 - **Taken by Mustafa, 2026-11-15, 19:46:36 UTC: KL-MERGE (a), merge #53, and the security and test findings accepted as
   left open** (his label: "My words of 2026-11-15, 20:50 (Amsterdam time)"; his message typed into the netcode proof
   test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's
@@ -1332,6 +1926,45 @@ Why recommended: The review agents checked all seven. None changes how the game 
 ```text
 The kept-logs build is still waiting for you. Please switch the session to Accept edits and type "go", so I can copy the three kit files into `.claude/` in the worktree. You'll get one permission prompt for that copy.
 ```
+- **Taken by Mustafa, 2026-11-15, 18:42:30 UTC: his answers to the seven decisions of the preview hosting check's plan
+  (TR-WHERE, TOKENS, REVIEWER, MACHINES, TOMBSTONE, ACCESS-CARD and TR-END, each (a)), his go on the plan (revision 2,
+  commit 2a2f426), his yes to Part 7's six workflow texts by their sha256, what the chat may do in the test repository,
+  and three things of his (SR-READ decides before the build; the security-auditor rules on "deployments: write"; one
+  list before every sitting)** (the builder chat he calls Builder V2, lane 2 of the build,
+  session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "My words for the second
+  builder chat, written 2026-11-15, 18:35 (Amsterdam time)"; message c7a8e93b-1b32-4886-8330-e14ada13e8a7, whole;
+  extracted by script from the chat's transcript). What it answers, in the chat's words (not his): the plan's eight
+  decision entries and its "For Mustafa" asks. Copied by script (2589 bytes, sha256
+  a627d4bce60b7054288a4dee92051d8674d1b9f8719c95cf15cdf2a5ee83ad89):
+> My words for the second builder chat, written 2026-11-15, 18:35 (Amsterdam time): my answers and my go on the plan for the preview hosting check (revision 2, commit 2a2f426).
+>
+> MY ANSWERS
+> 1. TR-WHERE: (a). A new public repository of mine, shamble-preview-check.
+> 2. TOKENS: (a). One token, in preview only.
+> 3. REVIEWER: (a). Every deploy waits for my click.
+> 4. MACHINES: (a). GitHub's own machines stand in for the minimum laptop and the Mac in this check. The results log names each one. These marks are header and browser behaviour, not timings.
+> 5. TOMBSTONE: (a). The workaround runs from the start.
+> 6. ACCESS-CARD: (a). I choose the free plan and enter the details. If any screen shows a charge, I stop and tell you.
+> 7. TR-END: (a). I archive the repository, and delete the project after the report is merged.
+>
+> MY GO
+> I give my go on the plan as written: build it in the test repository once I have told you "repository ready".
+> My yes to Part 7's texts exactly as they stand in the plan at 2a2f426: deploy.yml (sha256 starting 333e5a592a05), close.yml (98b42b8e59cf), probe.yml (f24ad6e81daf), browsers.yml (6791076916ae) and the two token-test variants (fd3dc4c6029b and 8b745631a278). If a review changes one line of them, show me the exact change and wait for a new yes.
+>
+> WHAT YOU MAY DO, in the test repository only and under my login:
+> - push the named branches;
+> - open the setup pull request and the eight test pull requests, and close the six that close without a merge;
+> - start the by-hand runs and re-run the token-test jobs.
+> Merges, approvals and settings stay mine. This go covers nothing in Shamble-Frontlines beyond your checkpoint and, at the end, the report's pull request, which stops for my go.
+>
+> THREE THINGS OF MINE
+> 1. SR-READ decides before the build. If the Claude app's page lists Administration or Deployments with write access, stop before you build and tell me in three lines what that changes for this check and for the reviewer's worth.
+> 2. In the build's review, have the security-auditor rule on the deploy job's "deployments: write": say what needs it, or remove it and show me the changed line.
+> 3. Before every sitting, send me one list: the runs that will wait, in the order I approve them, and how long the sitting takes. I approve nothing that is not on the list.
+>
+> SR-READ's answer and what my Cloudflare account holds besides the domain: I tell you during setup, before I make the token. The token goes from Cloudflare's page into GitHub's secret box and nowhere else.
+>
+> In every report, write about your own process only what a record shows, with its time.
 - **Taken by Mustafa, 2026-11-15, 16:21:11 UTC: KL-CHANGE-YES (a), yes to kl-change-v2.diff; build the kept-logs rule as
   set out** (his label: "My words of 2026-11-15, 17:20 (Amsterdam time)"; his message typed into the netcode proof
   test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's
@@ -1351,6 +1984,22 @@ The kept-logs build is still waiting for you. Please switch the session to Accep
 > In that pull request's ready report: its head, the files it changes, and that the three kit files equal the text I said yes to with this diff applied, compared by script.
 >
 > Nothing real is packed or deleted before that pull request is on main and this branch has taken main in.
+- **Taken by Mustafa, 2026-11-15, 16:03:05 UTC: three notes on his task message: every "today" in it means 2026-11-14;
+  the first builder chat's go comes on Tuesday 2026-11-17, so its change-set 0 and Part 15 do not exist yet; a third
+  chat builds Shamble VFX in its own repository, not in this lane; the task does not change** (the builder chat he calls
+  Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; a
+  queued message, entry 4c6ca7ef-e16e-4efa-9288-30f5672764a9 (taken from the chat's byte-for-byte copy, checked against
+  its recorded length and sha256); his label: "My words of 2026-11-15, 17:00 (Amsterdam time)"; message
+  4c6ca7ef-e16e-4efa-9288-30f5672764a9, whole; extracted by script from the chat's transcript). What it answers, in the
+  chat's words (not his): nothing the chat asked. Copied by script (914 bytes, sha256
+  7742caa2d586b52ba46b1f234985fd865941720b50e669def4d3df850e929495):
+> My words of 2026-11-15, 17:00 (Amsterdam time), for the second builder chat. Three notes on my task message; your task does not change.
+>
+> 1. That message was written on 2026-11-14 and pasted on 2026-11-15: every "today" in it means 2026-11-14.
+> 2. The first builder chat does not have my go yet. Its plan (revision 2, commit 68addf9) waits for my go, which I give on Tuesday 2026-11-17. So its change-set 0, which records my decision on two builder chats, and its Part 15, "The second lane", do not exist yet. Until they do, that decision stands on my words in the task message.
+> 3. A third Claude Code chat builds Shamble VFX, my effects editor, in its own repo (github.com/Mergincanli/ShambleVFX). It is not in your lane and you do not touch it. I name it so that you know it exists when the picture track comes up.
+>
+> Carry on with the plan for the preview hosting check, and stop for my go as the task message says.
 - **Taken by Mustafa, 2026-11-15, 15:34:42 UTC: KL-YES with one change, and the exception to the kit freeze
   (KIT-FREEZE-2) for the kept-logs rule** (his label: "My words of 2026-11-15, 16:35 (Amsterdam time)"; his message
   typed into the netcode proof test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; the
@@ -1366,6 +2015,46 @@ The kept-logs build is still waiting for you. Please switch the session to Accep
 > - Keep all three narrowings.
 > - In the pull request's evidence: the test in which GNU tar unpacks the archive ran and was not skipped, and the dry run's result for the two real folders.
 - _[history.md:2141-2146 left out: C62H-KEEP and C62H-BOUND, the netcode test's; they stay with PR #40]_
+- **Taken by Mustafa, 2026-11-15, 15:33:37 UTC: the second builder chat's task: his lane in order (the preview hosting
+  check now, then foundation step 2.6, the carry of his look decisions into docs/LOOK_V2.md, then the units Part 15
+  gives); PREVIEW-START: "it starts now, on the infra draft as proposed"; the main model Opus 5.5 with Fable 5.2 on the
+  advisor tool; the plan for the check, with the eight things it must give him** (the builder chat he calls Builder V2,
+  lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "My
+  words of 2026-11-14, for a fresh chat on my personal account: the second builder chat for the game"; written
+  2026-11-14, pasted 2026-11-15 (his note of 16:03:05 UTC above); message 7dceb92c-e718-42e9-bfe7-7cec24c10671, whole;
+  extracted by script from the chat's transcript). Records, not his words: the decision of 2026-11-14 on two builder
+  chats that this message quotes is recorded by the first builder chat's change-set 0, as the message says. Copied by
+  script (5830 bytes, sha256 e86c6b53e9f6769a47a7024a01a127042681fd6b0b101d98cb55ab53a86b4009):
+> My words of 2026-11-14, for a fresh chat on my personal account: the second builder chat for the game.
+>
+> Where things stand. Main is 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b, with gate, smoke and toolchain green on it. It holds the empty skeleton of the new game and no game code. The first builder chat (branch claude/wonderful-hamilton-jdmlnf, main model Fable 5.2) has my go on its plan for foundation steps 2.4 and 2.5 and Slice 1, move and shoot: .checkpoints/build-plan-slice-1/plan.md on that branch, 14 change-sets. Two more chats work on this repo: the netcode proof test (PR #40, branch claude/netcode-proof-test-plan-hcky5g, my university account) and step 2.3, the gate v2 and CI (branch claude/sweet-mayer-grsukw; its plan waits for my go). Never push to another chat's branch and never touch spikes/.
+>
+> Model. Your main model is Opus 5.5. Check this session's model first and stop in one line if it is not Opus 5.5. Fable 5.2 advises through the advisor tool. My words of 2026-11-11 on it apply: consult it at the five moments, always before you save a step as done and never after, and record each consultation in the checkpoint in one line with its time. Tell me in one line which model answers the advisor tool, read from the session's records. Agents run on Opus 5.5; the agents that review, verify or design game and engine code run at effort max.
+>
+> My decision of 2026-11-14 on two builder chats. The first builder chat's change-set 0 records it in docs/DECISIONS.md; open no docs pull request for it:
+> "Two chats build the game on my personal account. The first builder chat keeps Fable 5.2 as its main model. A second builder chat has Opus 5.5 as its main model, with Fable 5.2 answering its advisor tool, and it also writes game and engine code. This changes my words of 2026-11-12 ("On my personal account, Fable 5.2 is the main model of every chat that writes game or engine code, and of every builder agent that chat starts to write that code.") for the second builder chat only. Every file has one owner: the first builder chat's plan says which change-sets and folders belong to the second chat, and neither chat edits the other's files."
+>
+> Your lane, in this order:
+> 1. Now: the preview hosting check (docs/SPIKE_PLAN.md, entry 6; docs/adr/0006-infrastructure-operations.md, parts 1 to 3 and part 13). It is the small test of the hosting service, Cloudflare Pages, that must pass before every build can get its own web link. My answer of today to the first builder's question PREVIEW-START: it starts now, on the infra draft as proposed.
+> 2. After it: foundation step 2.6, the previews, so that every pull request of both builder chats gets a link I can open in Brave and on my phone. Part 8 of the first builder chat's plan names what step 2.6 waits for.
+> 3. The carry of my look decisions of 13 and 14 November into docs/LOOK_V2.md: a docs change-set. Its own block comes from me later, with a picture file; start nothing of it now.
+> 4. Then the units that Part 15 of the first builder chat's plan, "The second lane", gives you. It is being written now. My proposal there: the comparisons that stay (its Part 3.2) and, from change-set 6 on, the picture track: 6 Look, 10 Body, 11 Feel, and M, the first Blender model. Start none of them before I tell you which are yours.
+>
+> The task now: the plan for the preview hosting check. No build, no secret, and no edit outside your checkpoint. The plan gives me:
+> 1. What the check proves and which pass marks it meets (PM-0006-1 to PM-0006-10 and PM-0006-32), in plain words.
+> 2. What you build: the test page, the throwaway workflows, the scripts.
+> 3. What I do myself, in steps one at a time: in my Cloudflare account (shamblefrontlines.com is registered there), on GitHub and in Brave. For each step: where I click, what I type, what I paste where. Which token I make, with exactly which permissions, where it is stored, who can read it, and when I revoke it.
+> 4. The security side in plain words: what a pull request can and cannot reach, and what could go wrong with the token.
+> 5. The calendar: what waits 24 hours, and the earliest day the check can end.
+> 6. Which rows need the minimum laptop or a Mac, and whether they can wait for those machines without holding the rest. My machines: the recommended desktop is an RTX 2070 with an i7-9700K; the minimum laptop is of the Intel Iris Xe class or the AMD equivalent and is not named yet; no Mac yet.
+> 7. Every CI or workflow file you need, with its exact text. No kit, gate or CI file is written before my yes to that text.
+> 8. The decisions you need from me, each with its options and your recommendation, in plain words.
+>
+> How to work. CLAUDE.md's change-set protocol. Your branch stands in for the cs/ branch; one pull request at a time. At most 3 agents, the saver running, a checkpoint after every step. Have the advisor agent review the plan. The plan gets no review rounds and no verifier; every change-set gets the full review when it is built. In a report, write about your own process and about what you told me only what a record shows, with its time. Write each unit's planned size in the plan; when one passes twice its plan while it is built, stop and tell me in three lines: what grew, why, and the cheaper option. Ask me to compact when the chat is nearly full, and do not stand still waiting for it. If the guard, the deny list or the classifier refuses a command, record it with the route you took. If a rule in the repo forbids something here and my words above do not cover it, the repo wins: stop and tell me in three lines.
+>
+> What this block covers: the plan for the preview hosting check. It covers no build, no secret and no merge.
+>
+> End with: the plan's path, a one-screen summary in plain words, my steps in order, the decisions you need from me, and how full this chat is. Then stop for my go.
 - **Taken by Mustafa, 2026-11-15, 12:34:01 UTC: the kit rule's exact lines go to his Advisor first** (his label: "My
   words of 2026-11-15, 13:35 (Amsterdam time)"; his message typed into the netcode proof test's day session,
   session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's transcript, message

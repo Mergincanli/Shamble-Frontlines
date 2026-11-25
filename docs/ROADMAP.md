@@ -155,6 +155,41 @@ CI's gate and smoke green on c090843, 1e6f84e and b6b3b81. Review round 1 and th
 `docs/reports/2026-11-11-foundation-2-1b.md`. Merged: PR #51, 2aa5e9c, 2026-11-12 13:22 UTC, by merge commit, on
 Mustafa's go after the advisor's APPROVE of 5d50bf2; CI green on main (run 43226692719).
 
+**The foundation, 2.2: the toolchain [2026-11-10 to 11-13, MERGED]** — foundation-toolchain, ADR 0002's
+migration plan step 2.2 (Mustafa's decision of 2026-11-10: the second account plans and builds steps 2.1 and 2.2 now).
+The pins: Rust 1.99.1 (`rust-toolchain.toml`); a virtual Cargo workspace and its lock with six empty crates in `crates/`
+(unsafe code denied, overflow checks in every profile for every workspace crate); npm workspaces with exact versions and
+one lock, five empty packages in `packages/` (TypeScript 6.0.3, Vitest 5.1.0, @playwright/test 1.65.0, Node 22). The CI
+job `toolchain` (`.github/workflows/toolchain.yml`; `gate.yml` unchanged) installs the pinned toolchain, checks rustc
+against the pin, then builds and tests with the network cut off (a TCP probe must fail inside); it is green on the
+build's heads, and eight planted failures each went red at the expected step and were reverted. On his yes: the four kit
+lines (the hard constraints bind `legacy/` only; his 2026-11-10 decision is the exception in the three lines that forbid
+v2 code) and the CI job's release-test line; main merged in (c901187); the overflow tests expect their panic's message.
+Review round 1 (five reviewers, 17 findings, each checked by a skeptic): the overflow setting widened to every workspace
+crate on the advisor agent's ruling (RR-1, High; his go asked, then given with the merge, OVERFLOW-ALL). Review round 2
+(four reviewers, nothing Critical or High): on the advisor agent's ruling D1-R2, `"*"` kept and the panic side handed to
+the drafts' owners. The Fable advisor's whole read before ready changed no file. The verifier passed (bd44a68). Merged:
+PR #48, 4d21c1a, 2026-11-13 16:20 UTC, by merge commit, on Mustafa's go after the advisor agent's APPROVE of 9b20b67; CI
+green on main (gate run 43461710700, toolchain run 43461710673).
+
+**The foundation, 2.3: the first docs pass [2026-11-13 to 11-14, MERGED]** — foundation-2-3-docs (PR #52, 4460ef5,
+2026-11-14 09:06:30 UTC by `merged_at`, by merge commit, on Mustafa's go of 09:02:29 UTC, quoted whole in its message,
+after the advisor agent's APPROVE of bfd719b; CI green on main), by
+Mustafa's words of 2026-11-13 (docs only, no kit, gate or CI file): his go for #48 and his decision on step 2.3 go into
+`docs/DECISIONS.md` word for word, by script; dated pointers of 2026-11-13 in SPIKE_PLAN, ADR 0002, DECISIONS
+(SLICE-ORDER condition 3) and ROADMAP, his decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the
+CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge and on his go for it, and two pointing
+clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
+`docs/reports/2026-11-13-foundation-2-3-docs.md`. Step 2.3's plan followed on its branch and waits for his go.
+
+**Kit: the saver in stints while a night run waits on agents [2026-11-16 to 11-17, MERGED]** — night-shift-stints (PR
+#54, 82c605e, 2026-11-17 07:03:03 UTC by `merged_at`, by merge commit, on his go after the advisor's and the
+security-auditor's APPROVE WITH FINDINGS and the PR Advisor routine's APPROVE of 20f9d59; CI green on main): three lines
+at the end of `.claude/NIGHT_SHIFT.md` step 6, by his NS-STATUS (a) and his yes to the exact lines (NS-LINES (a)), the
+exception to KIT-FREEZE-2 for that one change; seven Lows deferred in writing (the archive's "Follow-ups"), two of them
+his NS-TRAILER and NS-FIRST, his (b): the kit's next change after the freeze.
+
+- **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
 
@@ -176,6 +211,10 @@ Mustafa's go after the advisor's APPROVE of 5d50bf2; CI green on main (run 43226
   merged (PRs #56, #58, #61), CI builds the WebAssembly and runs the tests that need it (PR #64), and change-set 3a is
   in flight; next, in change-set 3's approved plan's order, with Firefox joining by his FIREFOX-TESTS (b): the small CI
   pull request, then 3b (`docs/STATUS.md`, "Next").
+- **Pointer, 2026-11-25 (change-set 3b's docs pass; not his words):** change-set 3a is merged (PR #65); 3b is in
+  review, the small CI pull request is an Opus 5.5 chat's beside it; then change-set 3c (the link simulator and the
+  first recording, moved out of 3b by the size ladder), then change-set 4. Slice 3 picks how commands are timed, no
+  longer the netcode proof test (his decision of 2026-11-24, `docs/DECISIONS.md`) (`docs/STATUS.md`, "Next").
 - **Superseded by v2** (paused in issue #16; where things stand: `docs/STATUS.md` and `docs/V2_PHASE0_BRIEF.md`). **Queue (Advisor, 2026-10-15; updated 2026-10-16 after 3a):** greybox phase: three-teams (0. team-prep-fixes, merged → 3a three-teams-core, merged 2026-10-17 → **N1** (next; editor Play never rebuilds the nav grid; a one-line change-set) → **R19** (navBuild building-cell fix; right after N1, before 3b; Night queue item 2, NEEDS PLAN) → 3b three-teams-hud → 3c spawn-and-buy; editor v2 comes after the playable greybox loop, per the Advisor's queue) → **"ramps as slopes in SIM"** (its own change-set, before octopon-3-greybox; lets `_botFireWorld` go) → **NC-7 blast reach by line of sight** (to the target's nearest surface, ignoring the target's own box; before the octopon-3 playtests) → octopon-3-greybox → harvest-economy → bot-replan-storm → uplinks → win-and-scoring → scale test on the Octopon-3 greybox (N = 12, 24, 36, 48). Paused until the greybox loop is playable: tutorial-field-manual, ui-step-2, ui-step-3, build-spike, ADR run. house-textures-seeded: low priority, unslotted.
 - **From the 3a report** (approved unattended work is listed in the [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)): the `navBuild` building-cell fix with bot replanning (R19: 27.5 % of Cabana objective routes cross a roof bots can't climb) is now approved into the queue as item 2, NEEDS PLAN (Advisor 2026-10-17, R19-ORDER). Advisor LOS-SIZE: the bots' sight-check budget for 48 soldiers is sized in the 48-player performance change-set, with measured cost, together with the `updateSoldierAnim` split (CS11) and the soldier draw-call reduction (about 120 per on-screen soldier); that work is still proposed, not approved, and comes before `TUNE.teams.size` rises. Advisor K4-MEASURE: bot fairness between teams is judged by target searches per bot per second and the share of time with a target (`tools/perfbots.js` fairness), plus which team's bot fires first in mutual sightings (not in the tools yet; R19's plan adds it). After N1 and R19: 3b three-teams-hud, 3c spawn-and-buy, as planned.
 - **Core loop v2 (Oct 2026):** see LOOP_V2.md; greybox prototype first (§11).
@@ -195,7 +234,50 @@ Mustafa's go after the advisor's APPROVE of 5d50bf2; CI green on main (run 43226
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Change-set 3a of the build plan, Rules and boundaries [2026-11-24, in flight]** — cs3a-rules-boundaries (the first
+**Guard fix: a wrapper's option values [2026-11-25, waiting for his go]** — guard-env-fix (PR #69, risk tier 2; SEC-U7B-1): the day guard reads env, nice and stdbuf options with their values, so git and gh behind them no longer skip its check;
+a form it cannot read asks the main session and refuses an agent; routines unchanged. Guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES; waits for the advisor agent's review of the final head and his go.
+
+**ADR 0006's small revision after the preview hosting check [2026-11-25, in flight]** — adr0006-header-row, by
+lane 2 (the chat he calls Builder V2), on his ONE-OFF-HEADER (a) and STEP4-COUNT (b) (docs only; an ADR draft, so his
+go): the header mark (PM-0006-2) is judged on production's own addresses, with the reason in the row; production's
+one-off links have the host's header recorded, not judged. Part 1 weighs Workers static assets in a short paragraph
+from Cloudflare's docs read 2026-11-25: nothing was measured on Workers, and in the draft Pages stays. The build-count
+question is said plainly to be not answered; the pass words of PM-0006-7 and checklist step 4 are re-stated as the
+advisor agent's reading of his STEP4-COUNT (b), never as his decision; part 1's "no cap on previews" is dated; his
+message of 2026-11-25, 11:07:07 UTC in `docs/DECISIONS.md`. Report `docs/reports/2026-11-25-adr0006-header-row.md`.
+PR #67. His answers of 2026-11-25 (14:55 Amsterdam): PASS-WORDS (a), with PM-0006-7 and checklist step 4 reported as
+"recorded, the question is not answered"; step 4 achieved (recorded, the question is not answered); WORKERS-NEXT
+(a), keep Pages. Main's #68 taken in by one
+merge commit; waits for the advisor agent's approval of that head and his go.
+
+**Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, waiting for his go]** — cs3b-loop-closes (the second
+half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the page's keys go to the
+Worker as posts, and a local server there answers through the real messages (five messages' codec, the transport
+interface and the loopback, the room, the client endpoint, local play's one step). A player sees a key diagram (W, A,
+S, D, Space, Shift) lit from the local server's echo and two new readout lines (messages; presses). The decoder test
+runs at its row's count: the mark has started, never passed. The link simulator and the first recording moved to a
+change-set 3c by the plan's size ladder (he was told first). Final code 6abf3d2a: 6,909 added lines against about
+3,800 planned (stop line 7,600); the players' Wasm 53,813 bytes; 114 Rust, 139 Node, 18 boundary and 16 browser tests;
+53 of 53 planted defects caught; CI green on it. Six reviewers passed two rounds; the verifier PASS; the advisor
+agent approved the code as it stands; his browser check clean in Brave and Firefox (2026-11-25); RELEASE-COUNT
+decided, (a) with two conditions. Next: the advisor agent's approval of the last commit, CI green on it, his go; no
+pull request yet. Report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`.
+
+**The preview hosting check, ADR 0006's spike 1 [2026-11-15 to 11-24, in flight]** — preview-hosting-check
+(SPIKE_PLAN entry 6), by lane 2, run by the chat he calls Builder V2 in his throwaway test repository
+Mergincanli/shamble-preview-check on a test Cloudflare Pages project: 56 runs over the rehearsal and two days of
+sittings. A closed pull request's links were gone within 24 hours, through the cleanup job (without it the host kept
+them); the login wall covered every preview link and left production's own address open; a pull request reached no
+token without his approval and no production; the deleted token was refused. Not passed by the draft's rule:
+production's one-off links carry the host's `X-Robots-Tag: noindex` (the header mark, back to the draft), and the
+build count (no count shown anywhere) and his verdict on checklist step 4 are open; five marks met with departures
+that change no reading. Two review rounds on the build, the verifier PASS WITH NOTES on the evidence; report
+`docs/reports/2026-11-24-preview-hosting-check.md`. His answers of 2026-11-25 are in DECISIONS (a normal merge,
+by his HISTORY-ID (a)); waits for the advisor agent's review of its final head and his go.
+_Pointer (2026-11-25): merged as PR #66, 09faefa, 2026-11-25 11:10:11 UTC (`merged_at`), by merge commit, a normal
+merge on his go of 11:07:07 UTC (his HISTORY-ID (a)), with the expected head d7937de._
+
+**Change-set 3a of the build plan, Rules and boundaries [2026-11-24, MERGED]** — cs3a-rules-boundaries (the first
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the simulation's rules under
 tests. A scan of `crates/sim/src` refuses a float method outside ADR 0004 part 7's list, a hash map, a clock and
 per-target code; our own ChaCha8 (his RNG-SOURCE (c)) matches the 8 published vectors and a 160,384-byte stream file;
@@ -207,7 +289,10 @@ the container's byte for byte. A player sees nothing new beyond two lines of the
 lines (stop line 4,100), 96 planted defects caught; CI green on 8619d539 and on the corrected head 8d277cf2; three
 review rounds, the third on one High, now closed; the verifier PASS and the advisor agent APPROVE on 8d277cf2; his
 browser check: errors 0 in Brave and Firefox (`docs/reports/2026-11-24-cs3a-browser-check.md`); report
-`docs/reports/2026-11-24-cs3a-rules-boundaries.md`. Waits for the advisor agent's read of the last commit and his go.
+`docs/reports/2026-11-24-cs3a-rules-boundaries.md`. Merged: PR #65, 28254a7, 2026-11-24 22:40:39 UTC, by merge
+commit, by his main Advisor on his tap of 22:40:00 UTC (his go: `docs/DECISIONS.md`, 22:44:50 UTC), with the expected
+head 1624f084 (the last commit, after the advisor agent's read); gate, smoke and toolchain green on main (read 22:45
+UTC).
 
 **CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-24, MERGED]** — ci-wasm
 (risk tier 2; planned by the first builder chat, carried by a thread of his project, built by the chat he calls
@@ -281,45 +366,3 @@ for #52 from merge commit 4460ef5's message; two pointers in "Queued"; STATUS, R
 true for main 82c605e. One review round (the verifier PASS; the advisor agent APPROVE WITH FINDINGS, Lows only) and one
 fix pass, then the advisor agent's APPROVE WITH FINDINGS of aea6f5b and the verifier's PASS. Merged: PR #55, c94c81b,
 2026-11-17 17:09:33 UTC by `merged_at`, by merge commit, on his go.
-
-**Kit: the saver in stints while a night run waits on agents [2026-11-16 to 11-17, MERGED]** — night-shift-stints (PR
-#54, 82c605e, 2026-11-17 07:03:03 UTC by `merged_at`, by merge commit, on his go after the advisor's and the
-security-auditor's APPROVE WITH FINDINGS and the PR Advisor routine's APPROVE of 20f9d59; CI green on main): three lines
-at the end of `.claude/NIGHT_SHIFT.md` step 6, by his NS-STATUS (a) and his yes to the exact lines (NS-LINES (a)), the
-exception to KIT-FREEZE-2 for that one change; seven Lows deferred in writing (the archive's "Follow-ups"), two of them
-his NS-TRAILER and NS-FIRST, his (b): the kit's next change after the freeze.
-
-**Kit: KEPT-LOGS, kept raw logs and the old build cache [2026-11-15, MERGED]** — kept-logs-rule (PR #53, 53272a1,
-2026-11-15 19:49:22 UTC by `merged_at`, by merge commit, on his KL-MERGE (a), after the security-auditor's and the
-test-engineer's APPROVE WITH FINDINGS and the advisor's APPROVE WITH CONDITIONS of a637c7a; CI green on main):
-`.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs` with its tests: a day session may pack and remove a
-closed run set's raw logs (a committed list, a read-back, free space before and after) and the one old build cache, and
-nothing else; his KEPT-LOGS (c), KL-YES (the exception to KIT-FREEZE-2 for this one rule) and KL-CHANGE-YES; SA-KL-1 to
-SA-KL-4 and KLT-1 to KLT-8 accepted as left open by his word (the kit's next change after the freeze).
-
-**The foundation, 2.3: the first docs pass [2026-11-13 to 11-14, MERGED]** — foundation-2-3-docs (PR #52, 4460ef5,
-2026-11-14 09:06:30 UTC by `merged_at`, by merge commit, on Mustafa's go of 09:02:29 UTC, quoted whole in its message,
-after the advisor agent's APPROVE of bfd719b; CI green on main), by
-Mustafa's words of 2026-11-13 (docs only, no kit, gate or CI file): his go for #48 and his decision on step 2.3 go into
-`docs/DECISIONS.md` word for word, by script; dated pointers of 2026-11-13 in SPIKE_PLAN, ADR 0002, DECISIONS
-(SLICE-ORDER condition 3) and ROADMAP, his decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the
-CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge and on his go for it, and two pointing
-clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
-`docs/reports/2026-11-13-foundation-2-3-docs.md`. Step 2.3's plan followed on its branch and waits for his go.
-
-**The foundation, 2.2: the toolchain [2026-11-10 to 11-13, MERGED]** — foundation-toolchain, ADR 0002's
-migration plan step 2.2 (Mustafa's decision of 2026-11-10: the second account plans and builds steps 2.1 and 2.2 now).
-The pins: Rust 1.99.1 (`rust-toolchain.toml`); a virtual Cargo workspace and its lock with six empty crates in `crates/`
-(unsafe code denied, overflow checks in every profile for every workspace crate); npm workspaces with exact versions and
-one lock, five empty packages in `packages/` (TypeScript 6.0.3, Vitest 5.1.0, @playwright/test 1.65.0, Node 22). The CI
-job `toolchain` (`.github/workflows/toolchain.yml`; `gate.yml` unchanged) installs the pinned toolchain, checks rustc
-against the pin, then builds and tests with the network cut off (a TCP probe must fail inside); it is green on the
-build's heads, and eight planted failures each went red at the expected step and were reverted. On his yes: the four kit
-lines (the hard constraints bind `legacy/` only; his 2026-11-10 decision is the exception in the three lines that forbid
-v2 code) and the CI job's release-test line; main merged in (c901187); the overflow tests expect their panic's message.
-Review round 1 (five reviewers, 17 findings, each checked by a skeptic): the overflow setting widened to every workspace
-crate on the advisor agent's ruling (RR-1, High; his go asked, then given with the merge, OVERFLOW-ALL). Review round 2
-(four reviewers, nothing Critical or High): on the advisor agent's ruling D1-R2, `"*"` kept and the panic side handed to
-the drafts' owners. The Fable advisor's whole read before ready changed no file. The verifier passed (bd44a68). Merged:
-PR #48, 4d21c1a, 2026-11-13 16:20 UTC, by merge commit, on Mustafa's go after the advisor agent's APPROVE of 9b20b67; CI
-green on main (gate run 43461710700, toolchain run 43461710673).

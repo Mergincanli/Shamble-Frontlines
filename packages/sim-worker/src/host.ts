@@ -7,8 +7,8 @@ import { Ring } from "./stats.ts";
 
 /** The control calls the host makes on the simulation: the Wasm's `Sim`, or a stand-in in tests. */
 export interface HostSim {
-  input(sequence: number): void;
-  step(): number;
+  input(post: number, held: number, p0: number, p1: number, p2: number, p3: number): void;
+  step(nowMs: number): number;
   rebase(nowMs: number): number;
   block_ptr(): number;
   block_len(): number;
@@ -38,8 +38,12 @@ const POOL_SIZE = 4;
 const COPY_SAMPLES = 600;
 
 /**
- * The Worker's host (ADR 0002 part 5): it paces the tick, makes the two calls per tick (`input`, then `step`),
- * copies the block once into a pooled buffer and transfers it to the page.
+ * The Worker's host (ADR 0002 part 5): it paces the tick, makes the two calls per tick (`input` with the page's
+ * newest post, then `step`), copies the block once into a pooled buffer and transfers it to the page.
+ *
+ * Of the page's posts it keeps the newest by its number, never the last to arrive: an older or repeated one is
+ * ignored and counted, so a post that comes late cannot roll the running press counts back. When the tab is hidden
+ * no key is held any more (the page gets no key-up there); the press counts stay.
  */
 export class SimHost {
   readonly #sim: HostSim;
@@ -50,7 +54,15 @@ export class SimHost {
   readonly #blockPtr: number;
   readonly #blockBytes: number;
   readonly #tickHz: number;
-  #newestSequence = 0;
+  // The newest post, as the six plain numbers the simulation takes; `#posted` once there is one.
+  #posted = false;
+  #post = 0;
+  #held = 0;
+  #p0 = 0;
+  #p1 = 0;
+  #p2 = 0;
+  #p3 = 0;
+  #stalePosts = 0;
   #timer: number | undefined;
   #undetached = 0;
   #failed = false;
@@ -65,9 +77,9 @@ export class SimHost {
     this.#pool = new BlockPool(this.#blockBytes, POOL_SIZE);
     this.#pacer = new Pacer(
       {
-        step: () => {
-          sim.input(this.#newestSequence);
-          return sim.step();
+        step: (nowMs) => {
+          sim.input(this.#post, this.#held, this.#p0, this.#p1, this.#p2, this.#p3);
+          return sim.step(nowMs);
         },
         rebase: (nowMs) => sim.rebase(nowMs),
       },
@@ -88,12 +100,26 @@ export class SimHost {
       return;
     }
     switch (data.type) {
-      case "input":
-        this.#newestSequence = data.sequence;
+      case "input": {
+        // How far this post's number lies ahead of the held one, around the 32-bit circle: 1 to 2^31 - 1 is newer.
+        const ahead = (data.post - this.#post) >>> 0;
+        if (!this.#posted || (ahead !== 0 && ahead < 0x8000_0000)) {
+          this.#posted = true;
+          this.#post = data.post;
+          this.#held = data.held;
+          this.#p0 = data.p0;
+          this.#p1 = data.p1;
+          this.#p2 = data.p2;
+          this.#p3 = data.p3;
+        } else {
+          this.#stalePosts += 1;
+        }
         for (const buffer of data.returned) this.#pool.give(buffer);
         return;
+      }
       case "visibility":
         if (data.hidden) {
+          this.#held = 0;
           this.#pacer.pause();
           this.#clearTimer();
         } else if (this.#pacer.paused && this.#call(this.#resume) !== undefined) {
@@ -110,6 +136,7 @@ export class SimHost {
     const lateness = this.#pacer.lateness;
     return {
       ...this.#pacer.counters,
+      stalePosts: this.#stalePosts,
       latenessP50: lateness.percentile(50),
       latenessP99: lateness.percentile(99),
       latenessMax: lateness.max(),
@@ -154,13 +181,14 @@ export class SimHost {
     if (sleep !== undefined && sleep !== null) this.#timer = this.#env.setTimer(this.#wake, Math.ceil(sleep));
   };
 
-  readonly #afterTick = (): void => {
+  readonly #afterTick = (startedAtMs: number): void => {
     const buffer = this.#pool.take();
     const before = this.#env.now();
     copyBlock(this.#env.memory, this.#blockPtr, this.#blockBytes, buffer);
     this.#copyMs.push(this.#env.now() - before);
     // The hand-off's clock starts when the step returned, before the copy.
-    this.#env.post({ type: "block", buffer, doneAt: this.#env.timeOrigin + before }, [buffer]);
+    const origin = this.#env.timeOrigin;
+    this.#env.post({ type: "block", buffer, startAt: origin + startedAtMs, doneAt: origin + before }, [buffer]);
     // A transferred buffer is detached, so its length is 0 here; anything else means it was copied (PM-0002-6).
     if (buffer.byteLength !== 0) this.#undetached += 1;
   };
