@@ -323,7 +323,7 @@ const gitWord = (w) => { const x = w.split('/').pop(); return x === 'git' || x =
 const shownWord = (w) => (w.length > 32 ? `${w.slice(0, 32)}...` : w).replace(/[\x00-\x1f\x7f-\x9f]/g, '?');
 // Returns { argv: the real command, unreadable: null, or the wrapper form the guard does not follow (SEC-U7B-1) }.
 export function unwrap(argv) {
-  let a = argv.slice(), unreadable = null, fed = false, fedWrap = false, turns = 0;
+  let a = argv.slice(), unreadable = null, fed = false, fedWrap = false, repl = null, turns = 0;
   for (; turns < 20 && a.length; turns++) {
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0])) { a = a.slice(1); continue; }
     const prog = basename(a[0]);
@@ -337,6 +337,7 @@ export function unwrap(argv) {
         if (o.unread?.test(name)) unreadable ??= `${prog} ${name}`;
         if (o.value?.test(name) || o.unread?.test(name)) {
           const v = name === w ? a[1] ?? '' : w.slice(name.length + (name.startsWith('--') ? 1 : 0));
+          if (o.input && name === '-I') repl = v; // xargs's replace string (R2-1)
           a = a.slice(name === w ? 2 : 1);
           if (o.split?.test(name)) a = [...v.split(/\s+/).filter(Boolean), ...a]; // the ask stays; this can only add a deny
           continue;
@@ -354,7 +355,7 @@ export function unwrap(argv) {
     break;
   }
   if (turns === 20 && a.length) unreadable ??= 'more than 20 wrappers'; // SA-R1-3: a line at the limit asks
-  if (fed && (gitWord(a[0] ?? '') || (fedWrap && !a.length))) unreadable ??= 'xargs (its input adds words)';
+  if (fed && (gitWord(a[0] ?? '') || (fedWrap && !a.length) || (repl !== null && a[0]?.includes(repl)))) unreadable ??= 'xargs (its input adds words)';
   return { argv: a, unreadable };
 }
 
@@ -798,7 +799,7 @@ async function bash(command, cwd, role, io, input) {
         'so it asks instead of guessing; run git or gh as their own command, or approve it');
       const h = argv[gw].split('/').pop(), sub = h.startsWith('git-') ? ['git', h.slice(4), ...argv.slice(gw + 1)] : argv.slice(gw);
       const r2 = h === 'gh' ? await gh(sub, role, io, vcwd, input) : await git(sub, vcwd, role, io, input, line);
-      if (r2?.deny && !(sub[1] ?? '').startsWith('-')) return r2; // SA-g: a data word before an option asks, not denies
+      if (r2?.deny && (!(sub[1] ?? '').startsWith('-') || GIT_GLOBAL.test(sub[1]))) return r2; // SA-g: a data word before an option asks
       continue;
     }
     if (prog === 'cd') { // track the folder, so later paths in the line resolve where they will run
@@ -835,6 +836,8 @@ async function bash(command, cwd, role, io, input) {
 // in a session started with --agent, so it is never checked: E10-6) is refused where the main session is asked.
 const KIT_AGENT = 'kit and gate files are edited by the main session, which asks Mustafa first';
 const GIT_PLACE_VARS = /GIT_(DIR|WORK_TREE|COMMON_DIR|INDEX_FILE)/; // fix round SA-8
+// git's own options before its subcommand: behind an unknown program they keep git's deny (the plugin review on SA-g)
+const GIT_GLOBAL = /^(-[cCpP]|--(git-dir|work-tree|namespace|exec-path|config-env|no-pager|paginate|bare|no-replace-objects|literal-pathspecs|glob-pathspecs|noglob-pathspecs|icase-pathspecs|no-optional-locks|super-prefix|attr-source|no-lazy-fetch|no-advice))(=|$)/;
 // SAME-GAP rule U: programs that only read their words (never run one), so git or gh among them asks nothing
 const NON_RUNNERS = new Set(['echo', 'printf', 'which', 'type', 'whereis', 'grep', 'egrep', 'fgrep', 'ls', 'cat', 'head', 'tail', 'wc',
   'test', '[']);
