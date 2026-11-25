@@ -509,7 +509,11 @@ lost"). Its findings, all in wording, and what was done (the commit after this c
 - **M-5:** OVERFLOW-PANIC-RULE fell due with 3b (the first code in `room`) and the report was silent: **fixed** (a
   paragraph in the report; its due point in STATUS; the drafts' wording left with their owners).
 - **M-6:** the plan's one 10-minute run was neither run nor listed: **run** (`ten-minutes.mjs`, a script of its
-  own on its own port; the reading is in the report).
+  own on port 4180; 2026-11-25, 04:04:38 to 04:14:46 UTC; `.gate/cs3b/ten-minutes.log`, scratch): 603.1 s on the
+  build of 09b0043d8, 18,089 ticks (at least 18,062 expected), 3,897 frames, 0 errors, messages 18,182 sent and
+  18,183 received, 0 refused, 269 presses and releases made and echoed, 0 lost, 0 doubled, 0 older posts, 0 wrong
+  keys, 0 drops, at most 2 ticks in one wake, 4,689 pool misses, key to tick median 228.8 ms and 95th percentile
+  367.1 ms. In the report.
 - Lows: C6's wording says the three earlier pushes plainly; the zip's README gained two steps (S, D and both
   Shifts each light only their own box; a key held when the window loses the focus is let go); the chat's own
   line left DECISIONS (by script: 3 entries now) for the archive.

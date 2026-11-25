@@ -8,8 +8,9 @@ request exists yet: the chat puts the title and text in its notes folder, his ma
 presses Ready and Merge.
 
 **State of this version of the report:** the code is final at 6abf3d2a; both review rounds are closed and the
-verifier's PASS is in; the advisor agent's review of this head and his browser check are not in yet (this report is
-updated when they arrive).
+verifier's PASS is in; the advisor agent read the head 09b0043d (REVISE for the text only, the code approved as it
+stands) and its points are worked into this version; its review of these changes and his browser check are not in
+yet (this report is updated when they arrive).
 
 ## Goal
 Close the loop for one player on one machine: a key pressed on the page goes to a local game server inside the page
@@ -100,6 +101,12 @@ about 3,800 planned (1.82 times); his stop line of 7,600 was not reached. One de
   snapshot received per tick, 0 refused, 138 presses and releases made and echoed, the page makes 0 WebAssembly
   calls. **Key to tick (PM-0002-13): a reading, not judged:** median 238 ms, 95th percentile 258 ms on a runner that
   draws about 7 frames a second (the mark is 50 ms at 60 frames a second on a named machine).
+- **The plan's one 10-minute run (PM-0002-5's reading; Chromium here, from a script of its own, never a spec CI
+  runs):** 603.1 s on the build of 09b0043d (the code of 6abf3d2a), WebGL 2 fallback, about 6.5 frames a second:
+  18,089 ticks, 0 errors, 18,182 messages sent and 18,183 received, 0 refused; a key tapped every two seconds,
+  269 presses and releases made and echoed, 0 lost, 0 doubled, 0 ticks on older or wrong keys; the Worker dropped
+  no tick and never ran more than two in one wake (`ten-minutes.mjs` in the notes; 2026-11-25, 04:04 to 04:14
+  UTC). A reading on one machine; the mark's browsers and machines come later.
 - **Never a panic on what arrives, and the rules hold under lies:** the room against a client that lies in one
   message in five and whose bytes are changed one time in five (100 matches of 3,000 calls: 81,106 commands run,
   every refusal kind reached): at most two commands per tick, in every tick the sequence moves by exactly the
@@ -144,6 +151,16 @@ those three finished in round 2. **All six: PASS in round 2.**
   confirmed the test reviewer's ruling on the presses mark. Four Lows: two test gaps found by its own plants (the
   listener that lets go of keys when the window loses the focus has no test; the room's "allocates nothing" is
   counted for honest ticks only), both named follow-ups; two corrections to the notes, made.
+- **The advisor agent on 09b0043d (2026-11-25, about 04:00 UTC): REVISE, the text only; "the code, final at
+  6abf3d2a3d347ac8b2d5a169cbe5ac0aabc3d9b1, is approved as it stands".** Its eight conditions: all met. The size:
+  still one reviewable unit. The reviews: within the budget; it read the last fixes itself and no reviewer needs to
+  look again before the merge. The late-command bound: the deferral is its to approve, and it approves it with
+  3B-LATE-BOUND's written conditions. RELEASE-COUNT: rightly his; it blocks the claim that the mark is met, not the
+  merge. Its findings were one High and five Mediums, all in wording (this report and the pull-request text called
+  the presses mark met "by its own method" for releases too; what his go accepts as still open was not listed;
+  RELEASE-COUNT's reason was wrong; the option he chose for press pacing was not quoted; OVERFLOW-PANIC-RULE's due
+  point was missing; the plan's 10-minute run was missing), and each is corrected in this version. Its review of
+  these corrections is recorded here when it is in.
 
 ## Decisions and deviations
 - **The build plan's three sentences (his words of 23:24:50 UTC: "(a). Change it with the other two in 3b's docs
