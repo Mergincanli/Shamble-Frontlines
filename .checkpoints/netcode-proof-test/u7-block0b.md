@@ -112,3 +112,11 @@ the CLI's own build folder is cleaned before it. Each step checks the same thing
   PASS deps 2.6 s; "check: all 2 steps pass"; exit 0. The PASS lines equal before.log's with the timings removed
   (`diff` of the two, each through `sed -E 's/ +[0-9.]+ s / /'`: no difference).
 - Free after: 4,250 MiB (df -m).
+
+## The dev part-clean after step 5 (06:1x UTC; no lane or agent running)
+- Why: 4,250 MiB free, just over the 4 GiB floor; the cache was debug 6.1 GB, of it incremental 2.9 GB (`du -sh`),
+  built by main-run.sh with incremental on, which U7's and U8's runners (CARGO_INCREMENTAL=0) would not reuse.
+- The card's Tools line, character for character: `env CARGO_NET_OFFLINE=true flock -x <M>/.gate/shared-target/.lane.lock
+  cargo clean --manifest-path <M>/spikes/netcode-proof/Cargo.toml --target-dir <M>/.gate/shared-target --profile dev`:
+  "Removed 19575 files, 9.5GiB total". Then `test -f` .lane.lock OK, `test -f` CACHEDIR.TAG OK, `test ! -e` debug OK;
+  free 13,344 MiB.
