@@ -1,3 +1,5 @@
+# SUPERSEDED 2026-11-25 11:38 UTC: the block went into dependency-check.md, refilled from security-u7-0b-answer.md
+# (commit 2701220). This draft is history only; never append it again.
 # Step 8, pre-staged (the main session, 2026-11-25 06:3x UTC). Not the record: dependency-check.md gets the block
 # below (filled by security's answer) only after security-u7-0b-answer.md ends DONE with Q2 (a), or after step 7.
 #

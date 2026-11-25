@@ -101,3 +101,21 @@ a0efce8e511a8865d50008172b3f88e9cc072efbe92a85a035340562b7c49524  spikes/netcode
 3394b451b06492758621445c250f44e93572e0b33a0269e68b7c9021b0f54873  spikes/netcode-proof/Cargo.lock
 a06c090c7ee4b3b2f0fdf4ef9e319943957de549fb291da5aeefd6feb062748f  spikes/netcode-proof/crates/host/Cargo.toml
 3cf4b077b8c9f8a440c74759124720ba1f9a30bdda9370c90b7c6a0bad28f45f  spikes/netcode-proof/crates/bots/Cargo.toml
+
+# DEP-HOLD release, U7's Block 0b (main's .claude/CHECKPOINTS.md §3; u7-brief.md rev 1.1 section 5)
+# security-auditor's answers, read in full (each ends DONE): .checkpoints/netcode-proof-test/security-u7-deps.md
+# (items (7)-(10); Block 0b CLEAR WITH CONDITIONS; its binding check :281-316) and
+# .checkpoints/netcode-proof-test/security-u7-0b-answer.md (Q1 (b) the .crate fetched by `cargo info` and its sha256
+# checked before the install; Q2 (a) this commit before the CLI; Q3 (b) fetch times only). Written 2026-11-25 11:38 UTC
+# by the main session after the binding check's steps 0-6 passed (evidence u7-block0b.md), for commit 2701220: the
+# manifests exactly as item (7) (+3; +6 -1); `cargo metadata --format-version 1 --offline` exit 0; the lock +4 -0,
+# npt-client-wasm's block only, 252 packages; the five trees as written (wasm-bindgen features default and std only;
+# one shipped dependent; 20 names; the three dev-dependencies); `cargo check --workspace --all-targets --locked` 0
+# warnings; check.mjs test and deps equal before and after (measured 861, bites 958); cargo-deny 0.22.0 "advisories ok,
+# bans ok, sources ok" (the seven duplicate names of U6c's run); cargo-audit 0.23.0, 252 crate dependencies, 0
+# vulnerabilities, one allowed warning RUSTSEC-2026-0441; redact 371 items, 0 findings; databases fetched 2026-11-25
+# 05:44:45 and 05:44:47 UTC.
+# The CLI (step 7): not yet installed; under security-u7-0b-answer.md Q1 (b); recorded in an addendum below after its install
+bd1e23353bdcf6606256619217965bcbe3931f508fafc92300372a45417bf59a  spikes/netcode-proof/Cargo.toml
+55604a5fae45e50ee0fb262d743bc9e967b7caa3b23482de3b61de4cb28b9f5d  spikes/netcode-proof/Cargo.lock
+d8af72f767830e066b360725f200dbdf44b1df77d2c7e0bcb5150661c77c000e  spikes/netcode-proof/crates/client-wasm/Cargo.toml
