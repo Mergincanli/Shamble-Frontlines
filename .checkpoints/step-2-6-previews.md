@@ -54,9 +54,16 @@ On revision 2 at c40f3f9:
 
 ## Current step
 U0 done: the request to CI Builder posted on #59 (comment 7172595904, 2026-11-25 ~19:40 UTC; plan section 5's text,
-no wall detail, footer). Now U1: the host folder (hosting/preview.mjs, hosting/preview.test.mjs, hosting/_headers),
-then the manifest and lockfile under the dependency hold (no push of them before dependency-check.md names the
-security-auditor's answer on the exact files).
+no wall detail, footer).
+U1, part 1 done: dfc8fb6 (hosting/preview.mjs, hosting/preview.test.mjs, hosting/_headers, REPO_MAP's hosting/ row):
+117 tests pass in a scratch copy with the approved texts; 28 of 28 mutations caught; gate PASS (--no-smoke); map OK.
+Evidence: step-2-6-previews/build-notes.md (B1 to B6).
+U1, part 2 next: hosting/package.json and hosting/package-lock.json (built in the scratchpad, npm26/; B5), committed
+locally only; the security-auditor's M3 answer on the exact files; then dependency-check.md and save.
+Then: the advisor agent's recorded verdict on F1 (the one-line text change) and F2 (the missing-build comment), then
+ONE message to him (the new text and its sha256, F2 as a decision; the question file saved and pushed first). U2
+places preview.yml only after his yes on the new text (the advisor tool: no changed bytes in .github/workflows/
+before it). U3 (records) can go meanwhile.
 
 ## Findings during the build (U1)
 - F1 (a defect in the approved preview.yml, job `tests`): `run: node --test hosting/` fails on Node 22: the folder is
