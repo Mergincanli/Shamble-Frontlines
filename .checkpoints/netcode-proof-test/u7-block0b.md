@@ -103,7 +103,12 @@ the CLI's own build folder is cleaned before it. Each step checks the same thing
 - `node spikes/netcode-proof/ops/operator/redact-check.mjs spikes/netcode-proof` (05:5x UTC): "redact-check: 371
   item(s) checked, 0 finding(s)" (M5's count was 371 too).
 
-## Step 5 (from 05:48 UTC): RUNNING
-- One runner call, a background shell: `cargo check --workspace --all-targets --locked :: node check.mjs --only
-  test,deps` -> .gate/u7-0b/step5-after.log. Bars: no warning line in the check's section; the PASS test and PASS deps
-  lines equal before.log's but for the timings. While it runs: no other runner call and no clean.
+## Step 5 (05:50:34-06:09:08 UTC): PASS
+- One runner call: `cargo check --workspace --all-targets --locked :: node check.mjs --only test,deps` ->
+  .gate/u7-0b/step5-after.log; header free 13,263 MiB, HEAD ced7e99, diff 0b5b2289... (= steps 3b, 4 and 6),
+  untracked e3b0c442...
+- `cargo check`: Finished in 29.00 s, exit 0; 0 lines with "warning" in its section (awk over the section, grep -c).
+- check.mjs: PASS test 1082.5 s (measured 861 passed, 0 failed, 0 skipped; bites 958 passed, 0 failed, 0 skipped);
+  PASS deps 2.6 s; "check: all 2 steps pass"; exit 0. The PASS lines equal before.log's with the timings removed
+  (`diff` of the two, each through `sed -E 's/ +[0-9.]+ s / /'`: no difference).
+- Free after: 4,250 MiB (df -m).
