@@ -16,8 +16,10 @@
 
 7. Applied: guard and tests copied over (sha256 equal to the tested copy: 7eb507c2…, c770dc59…); kit suites 1437/127/33; gate PASS --no-smoke; one commit · 5df545c
 
+8. security-auditor round 1 on 5df545c: REVISE (SA-d Critical older; SA-a, SA-g Medium; Lows); the plugin review: High (an optional-value long option) · fix pass built in the copy: 1485/1485, 115 lines (plan §8)
+
 ## Current step
-security-auditor round 1 on the final diff (origin/main...5df545c).
+The advisor agent's read of the plan change (SA-d's wrapper half, SA-g's narrowing); Mustafa's answer on SA-D-DIRECT; then copy over (asks him), one commit, round 2.
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.

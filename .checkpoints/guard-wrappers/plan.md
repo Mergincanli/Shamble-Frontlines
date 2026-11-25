@@ -95,3 +95,21 @@ onto the new lookup line); one new row in CASES (keywords before git status go o
 keywords" mutant now that rule U reads on. Rule U leaves out a program word that starts with `-` (the wrapper step
 already asks on it), so #69's leftover-option row keeps its ask.
 Size: guard +33/−14, tests +54/−3 = 87 added lines of code and tests (stop line 200).
+
+## 8. Round 1 (security-auditor on 5df545c: REVISE) and the plugin review: the fix pass, built in the copy
+Findings (ids only here; their forms stay out until the merge): SA-d Critical, older than this diff (git under its
+own helper names): the half behind another program is fixed (rule U's word test and read-on know the helper names);
+the bare half (no program in front) is outside his literal words and asked of him (SA-D-DIRECT). SA-a Medium fixed
+(a wrapper run by the input-fed wrapper with no program word after it asks). SA-g Medium fixed: rule U's read-on
+keeps git's deny only when the word after git or gh is not an option, so a data word asks instead of being refused
+(this narrows the advisor agent's condition 2 for that one shape; still stricter than main; agents refused). SA-h,
+SA-b, SA-f Low fixed (the last path part; read-only programs by bare name; rows). SA-c, SA-e and shell function
+definitions recorded, not fixed. The plugin review (High): one long option of the input-fed wrapper takes its value
+only after `=`; it was read as taking the next word, a silent pass this diff opened: fixed (it now asks), checked
+against findutils' manual; the other tables' values are required (coreutils: "Mandatory arguments..."; the
+display-server wrapper's getopt line uses single colons).
+Open by design (stated as L1's class): words the input-fed wrapper reads from its input reach a program the guard does
+not strip unread.
+Copy: red 18 failures on 5df545c's guard, green 1485/1485; the auditor's exhaustive pass against main (9804 lines):
+no deny or ask became a pass (121 deny→ask, each where the real program is a dash word: SA-e).
+Size against main: guard +38/−14, tests +77/−3 = 115 added lines of code and tests (stop line 200).
