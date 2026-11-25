@@ -137,3 +137,23 @@ d8af72f767830e066b360725f200dbdf44b1df77d2c7e0bcb5150661c77c000e  spikes/netcode
 # RUSTSEC-2021-0146: R1's six crates only. (d) spikes/netcode-proof/Cargo.lock still 55604a5f...9f5d.
 # All four pass: the CLI may be used once this addendum is committed (Q2 condition 3); every workspace cargo call
 # stays --locked (Q1 condition 5).
+
+# --- U7's 0b amendment (2026-11-25 23:5x UTC, the main session): two in-repo dev-dependencies of npt-client-wasm,
+# npt-link and npt-proto, for R3's room test. Cleared by security-u7-0b-amend-answer.md (sha256
+# e8d66e66accf2daac783c694050f0a23d6f5967040d1735888a8758e8bb6fe5a): Q1 yes with conditions 1-7. C6's wording is
+# the advisor's re-rule (advisor-main-66-head.md).
+# 1. Base hashes on 5da5f7d: Cargo.toml bd1e2335...f59a, Cargo.lock 55604a5f...9f5d, crates/client-wasm/Cargo.toml
+#    d8af72f7...000e, all three equal to the answer's.
+# 2. The same two Edits (the Edit tool, never cargo): client-wasm Cargo.toml f949f2bf...dc25a, Cargo.lock
+#    6e6529a8...00bc; `git diff --numstat` 2 0 for each; `git status --short -- spikes/` those two files only.
+# 3. Through main-run.sh (.gate/u7-amend-checks/c345.log; lock 23:54:31 UTC, HEAD 5da5f7d, diff 5f710af8...), every
+#    call --locked --offline: (a) `cargo tree -p npt-client-wasm -e normal,dev --depth 1`: normal edges npt-client and
+#    wasm-bindgen, dev edges npt-link, npt-proto, npt-room, npt-server and npt-sim, nothing else; exit 0.
+#    (b) `cargo tree -p npt-client-wasm -e normal --target wasm32-unknown-unknown --prefix none`: 31 lines, equal to
+#    .gate/u7-0b/step4-trees.log :199-229 (the shipped set unchanged); exit 0.
+# 4. `cargo deny --locked check bans sources`: exit 0, "bans ok, sources ok"; the same seven duplicate names as Block
+#    0b's run (base64, getrandom, pem, syn, synstructure, windows-link, windows-sys); no new warning.
+# 5. `node check.mjs --only deps`: PASS (11.3 s), exit 0.
+# 7. No difference from the answer: nothing goes back to security.
+f949f2bfbffa972d4cc0e9beae5a1ecbc4430cd4f70a9566e4f4306b427dc25a  spikes/netcode-proof/crates/client-wasm/Cargo.toml
+6e6529a86d8c7577ad5905a75c5ff8a157f46eed61ae68b1c1fa530eff5500bc  spikes/netcode-proof/Cargo.lock

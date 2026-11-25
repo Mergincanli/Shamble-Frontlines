@@ -28,6 +28,8 @@ npt-client.workspace = true
 wasm-bindgen.workspace = true
 
 [dev-dependencies]
+npt-link.workspace = true
+npt-proto.workspace = true
 npt-room.workspace = true
 npt-server.workspace = true
 npt-sim.workspace = true
