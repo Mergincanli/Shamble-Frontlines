@@ -110,3 +110,9 @@ Read-only on the working copy; my builds under `.gate/verifier-*`; no git add/co
   start: Playwright 1.56.1 wants /opt/pw-browsers/chromium_headless_shell-1194, the machine has -1243 (installing
   needs npx, refused by the brief). `--no-smoke`: GATE PASS (5a skipped). 4a touches nothing in legacy/.
   => checks 1-4, 5b-5d PASS; 5a NOT VERIFIED locally (CI's smoke job: below).
+- 22:20 the branch moved while I ran: local HEAD 6fddbf6, pushed head (PR #70) 21c1046. `git diff --name-status
+  9b5c96a HEAD`: only .checkpoints/ and docs/ (REPO_MAP, ROADMAP, STATUS, STATUS_ARCHIVE, docs/reports/2026-11-25-
+  cs4a-recording.md); `git diff --stat fb5d0ff HEAD -- crates packages` still empty; DECISIONS.md and UNITS.md not
+  touched after 9b5c96a. My results stand for the final source.
+- 1b CI on 21c1046 (`gh api .../commits/21c1046.../check-runs`, REST; GraphQL refused): gate x2 success, smoke x2
+  success (22:17:54-22:19:04 UTC), toolchain x2 in progress at 22:20. To re-read.
