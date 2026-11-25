@@ -31,8 +31,11 @@
 
 16. Round-3 fix applied hunk by hunk (each asked with its text; one restart mid-way, state checked before retrying); sha256 equal to hooks-r3 (guard 6bed5b2e…, tests 634b64fe…); 1499/127/33; gate PASS --no-smoke; one commit · see git log (round 3 fix)
 
+17. security-auditor round 3 on 9ad6bc9: REVISE: R3-1 Critical (R2-1 closed only for some spellings), R3-2 Critical (older: the input-fed wrapper hands its input to a program the guard does not strip); Lows R3-3..R3-6; the diff itself only tightened (126540 lines). The plugin review flagged the same class (Medium) · notes security-auditor-r3.md
+18. STOPPED for Mustafa (review budget: a Critical open after round 3). Pre-built in .gate/guard-wrappers/hooks-r4/ (not applied): the input-fed wrapper asks unless a read-only program follows; green 1514/1514, red 15 on 9ad6bc9; 137 added lines vs main
+
 ## Current step
-security-auditor round 3, on what changed (52e3c7e..HEAD's code commit).
+Waiting for Mustafa's decision (R3-WAY).
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
