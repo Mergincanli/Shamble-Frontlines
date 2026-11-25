@@ -21,3 +21,7 @@ after the gap is counted, the whole measured window included.
 **Where it comes from.** The advisor agent's M4b head read of U6c's two hand edits, 2026-11-25 (APPROVE WITH CONDITIONS
 C1-C6): .checkpoints/netcode-proof-test/advisor-u6c-m4b.md. U6c's merge goes on either way; nothing waits for this
 answer unless you pick (b).
+
+**Answered 2026-11-25 11:07 UTC: (a)**, keep it as merged (history.md:7943): R1's report carries one line on the gap
+as a known limit of the reading (under a millisecond by reading the code, not measured); the measured window stays
+fully counted. The board line is off.
