@@ -123,6 +123,11 @@ in the day's message as a choice taken without him.
   per-run tag or a fixed LG source port. Taker: the next change to the probe's wire, before any untrusted network.
 - **SEC-U6C-R2-2** (Low): the pin's docs and wait_peer's error still say "first datagram". Taker: the next change-set
   that edits crates/server/src/probe.rs.
+- **The page host's deadlines** (an automated security review after M8, rated Medium there: serve.rs:226 and :263-264
+  have no timeout on the TLS accept or the request read, so idle connections are held): the same item as round 1's
+  cut ("no connection cap and no handshake or read deadline, by the cut", u6c-review-security.md:41-49; round 2,
+  u6c-r2-security.md:54-58: about 1,020 idle TLS connections from an allow-listed source can lock the host out).
+  Taker: Stop B's host read before R1, with LimitNOFILE in U8's unit; the security seat rates it there.
 - **ADV-M4B-1** (Low): closes if he keeps NPT-EDGE-SLIVER (a); else (b)'s change takes it.
 - **ADV-M4B-2** (Low, wording): rides (b) if he picks it; else the next change-set that edits probe.rs or SERIES.md.
 - **The stamp tests** (Block 2, held back by C4's lever (1)): STAMP-HOME (a), his answer: this chat builds them after
