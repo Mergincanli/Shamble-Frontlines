@@ -97,3 +97,9 @@ HEAD at start: 7e2d6f333ae2f1dce76b96ccbc341d047e4972bb (notes saves may move it
 - Saver: `pgrep -af "checkpoint.mjs watch"` at 19:06 UTC shows the watch running (bash wrapper and node), the card's
   bhe11brxq (from 18:07:38 for 110 min, ends about 19:57). Step 1 will meet a running saver: TaskStop and C5 (b).
 - Card: `wc -l` 199 at 19:0x (cap 200): the resume line must replace lines (M65-3), as step 1 says.
+- The saver's secret check scans only the notes it stages (checkpoint.mjs:143-153, :197-202), not the merge's files:
+  as at MAIN-65, nothing in the 92 paths can hold step 6's save. dayShellWrites (HEAD :869-898) reads write targets
+  only; a plain merge names none, and the merge rule passes it (MAIN-64 took .github/workflows/toolchain.yml the same way).
+- expectedMarks (check.mjs:1869-1874): the PM-0001 ids from ADR 0001's `| PM-0001-n |` lines, plus PM-0004-67 and
+  PM-0006-11..27. So only lines that start `| PM-` in docs/adr/ can move the marks step (relevant to Q4).
+- Draft verdict: APPROVE WITH CONDITIONS (all Low). Next: advisor tool, then the verdict section.
