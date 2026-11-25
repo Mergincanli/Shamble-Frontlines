@@ -236,34 +236,50 @@
    counts compare the room's echo with the command it says it ran. Releases are not counted in Rust: the page
    counts them from the echo (step 6).
 
-## Size so far (counted as 3a was: added lines under `crates/`, `packages/`, `.gitignore`, the root manifests;
-## lockfiles and generated or fixture files apart)
-- After steps 1 to 3: **3,723 added lines** (plus 40 generated TypeScript lines), against about 1,835 planned for
-  them: 2.0 times. The formatter's vertical layout and the tests are the bulk; step 1 was rewritten once to cut
-  about 300 lines.
-- **Projection (C4):** steps 4 to 6 and the two code follow-ups are about 1,260 planned lines; at 2.0 that is about
-  2,500 more, so **about 6,250 for steps 1 to 6**: over the ladder's 4,900 and under the stop line of 7,600. With
-  the first recording and the link simulator (870 planned) it would pass 7,600. **So the ladder moves all three
-  parts to a change-set 3c: the link simulator's rate limit and duplication, the link simulator as a whole, the
-  first recording, each with its tests.** He is told in three lines before anything moves (his message of
-  23:24:50 UTC, point 4; his item (c)). Nothing of steps 7 and 8 is built.
+7. **Steps 4 and 5, the Worker's one step and the messages: commit 4eeec33a.** `sim-wasm`: the local match
+   (plain Rust, generic over the transport; the step in the draft's order), the bindings as a thin wrapper
+   (`new(seed, mode, pad)`, `input` with six plain numbers, `step(now_ms)`; `newest_input` gone), the block's two
+   new sections `echo` and `link` (44 bytes; each section's place printed into the generated layout),
+   3A-HOOK-TEST (the hook's test in `tests/panic_hook.rs`). Native tests: every tick runs the newest post by
+   number (1,800 ticks, late posts planted); 10,000 presses applied exactly once each; the tick and the sequence
+   across their wraps with two runs agreeing on every state hash; 18,000 ticks take no memory once warm (a
+   counting allocator of the test's own). The Worker: the newest post by its number, held buttons cleared on a
+   hidden tab, the step told the host's time, each tick's start stamped (`startAt`), a due time that is not
+   finite stops the match; the page's post renamed and still without keys. **Not built, with the recording (3c):**
+   the one new read-only number on the players' file, the state's hash (DEPART-3).
+   The players' WebAssembly file is now 56,717 bytes (23,023 gzip, 19,497 brotli), from 31,800 after step 3.
+
+## Size so far (counted as 3a was: added lines under `crates/`, `packages/`, `.gitignore` and the root manifests; lockfiles and generated or fixture files apart)
+- After steps 1 to 3: 3,723 added lines against about 1,835 planned for them (2.0 times). **After steps 1 to 5:
+  see the count in "Key numbers"** (written with each save).
+- **Projection (C4) and the ladder:** steps 1 to 6 with the two code follow-ups project to about 6,250 lines: over
+  the ladder's 4,900, under the stop line of 7,600. With the first recording and the link simulator it would pass
+  7,600. **So all three parts move to a change-set 3c: the link simulator's rate limit and duplication, the link
+  simulator as a whole, the first recording, each with its tests. He was told in three lines on 2026-11-24, about
+  23:56 UTC, before anything moved** (his message of 23:24:50 UTC, point 4; his item (c)); nothing of steps 7 and
+  8 is built, and nobody builds the link simulator elsewhere.
 - With both moved, `devtools`' three new path edges serve nothing in 3b (security-auditor's Low L2): looked at
   again before the report; a change to that manifest is a new batch under the hold.
 
 ## Current step
-**Step 4 next: the Worker's one step in the draft's order** (`sim-wasm`: the local match over the loopback, what
-crosses the bindings; `client-endpoint`: the block's two new sections), with 3A-HOOK-TEST first. Updated
-2026-11-24, 23:57 UTC (from the clock). The board add-on of his message of about 23:40 UTC is active (nothing of
-it is copied here, by his rule).
+**Step 6 next: the page, alive** (the keyboard by physical key with running press counts, the key diagram lit
+from the server's echo, the press tally, the readout's and the report's new rows, the browser test of the loop,
+the presses test by PM-0002-12's own method, the allocation spec over the new per-frame code). Then 3A-FROM-F64,
+the size check, the reviews. Updated 2026-11-25, 00:12 UTC (from the clock). The board add-on is active (nothing
+of it is copied here, by his rule).
 
-**CI, expected on the push of 409b9434** (written before the push): cargo debug, twice: client-endpoint 25,
-devtools' f32 vectors 3 and stream vectors 2, protocol 19 and its decoder test 8 (the five "100_thousand" names,
-the control, the two plants), room 12, sim 17, the scan 5, the allocation count 1, sim-wasm 9. Release (sim and
-protocol only): protocol 19, the decoder test 8 (the five "10_million" names), sim 17, 5 and 1. Node: client 70,
-sim-worker 42, types 7, net 1, the browser package's Node project 1; boundary 2 files and 17 tests; 14 browser
-tests. The type checks all "ok". Locally the whole sequence ran green on 90da28c1 (`.gate/cs3b/run-90da28c1.log`,
-scratch) but for the types package's shape test, fixed in 63d2bf7a; step 3 ran green in the workspace's tests,
-clippy and the gate.
+**CI on 5c582ddd (steps 1 to 3), read line by line:** gate, smoke and toolchain green (toolchain run
+45514237788); every count as written before the push; the decoder test's five "10_million" names in the release
+run (4.98 s on the runner); the players' file sha256 e7b7c2a2...7d71, the same as here; 14 browser tests in 1.1
+minutes.
+
+**CI, expected on the push of 4eeec33a** (written before the push): cargo debug, twice: client-endpoint 25,
+devtools' f32 vectors 3 and stream vectors 2, protocol 19 and its decoder test 8, room 12, sim 17, the scan 5,
+the allocation count 1, sim-wasm 12 with its hook test 1 and its step allocation count 1. Release (sim and
+protocol only): protocol 19, the decoder test 8 (the "10_million" names), sim 17, 5 and 1. Node: client 70,
+sim-worker 46, types 7, net 1, the browser package's Node project 1; boundary 2 files and 18 tests; 14 browser
+tests; the type checks all "ok"; the players' file 56,717 bytes, sha256 ded90598...f4f8. Locally the whole
+sequence ran green on 4eeec33a (`.gate/cs3b/run-steps45.log`, scratch; the browser tests in 1.0 minute).
 
 ## Next steps
 1. (Reading done after his compact; the build order stands:) read CLAUDE.md, this card, the plan's sections 0, 3, 5, 8, 9, 12 and 13, his
