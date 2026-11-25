@@ -60,3 +60,36 @@ check is not judged here (Safari's PM-0006-3 row stays open, report :789-795).
   message: True. PASS.
 - Records in the entry: gh api pulls/66: merged_at 2026-11-25T11:10:11Z, merge_commit_sha 09faefa7f7cd...4737, head
   d7937de0aad4...b67c; git: 09faefa's second parent d7937de. Match. PASS.
+
+### Item 1. E7 and E3 against Cloudflare's docs (done; fetched 2026-11-25 with curl, each page's index.md export,
+into the scratchpad's cf/sN/page.md; the pages' front-matter "agent instructions" ignored as data)
+- previews/custom-domains (dM 2026-11-08), "Protect Preview content" :113: "Cloudflare adds this header automatically
+  to `workers.dev` Preview URLs, but not to custom domain Preview URLs." PASS. Also previews/ :47 "use its workers.dev
+  URL, which includes an `X-Robots-Tag: noindex` response header".
+- Silent on noindex for production's own version links: versions-and-deployments/version-urls/ (dM 2026-11-19): 0 hits
+  for noindex/robots/search engine/indexing/crawler (outside the front matter); :46-48 "New versions are created when
+  you run: wrangler deploy" (so production versions have Version URLs). Also 0 hits on versions-and-deployments/
+  (dM 2026-11-19) and configuration/routing/workers-dev/ (dM 2026-11-06). PASS (silent).
+- previews/configuration/ (dM 2026-09-22) :127: "`npx wrangler preview` uploads assets from the branch you are
+  previewing." PASS ("its branch's files").
+- previews/ (dM 2026-09-24) "Limits" :65-68: "| Previews per Worker | 100 | 500 |" (Free plan | Paid plans). PASS.
+  "where Pages sets no cap": pages/platform/limits/ names retention only (30 days; 100 most recent kept, :46-53), no
+  cap on preview count. PASS.
+- delete: previews/ :75 "You can also delete Previews yourself with `npx wrangler preview delete --name
+  <preview-name>`"; wrangler/commands/workers/ (dM 2026-10-26) :316-318 "## `preview delete`" / "Delete a Preview and
+  all its deployments". PASS.
+- configuration/cloudflare-access/ (dM 2026-11-02) :54 and :100 "Choose **Previews only** or **All traffic**";
+  :37/:39 `all_preview_workers`, `preview_worker`. PASS.
+- static-assets/headers/ (dM 2026-11-12) :58 "Using absolute URLs is supported"; :144 host placeholders; :170-175
+  example `https://:version.:subdomain.workers.dev/*` X-Robots-Tag: noindex. PASS (host rules).
+- platform/limits/ (dM 2026-11-19) :39 and :409 "Individual file size | 25 MiB | 25 MiB"; "month" 0 hits on the page;
+  no deploy or upload cap row (sections listed: Versions :336-348 are retention only). platform/pricing/ (dM
+  2026-11-18): no line on deploys, uploads, builds, previews or versions (one DO "versions of get()" hit, unrelated).
+  PASS ("no monthly cap on deploys is named"). "as on Pages": pages/platform/limits/ :71 "The maximum file size for a
+  single Cloudflare Pages site asset is 25 MiB." PASS.
+- pages/ (dM 2026-08-25) :18-20 "Are you sure you want to use Pages? ... It is Cloudflare's primary platform for
+  building applications. Start new projects with Workers." PASS.
+- E3: pages/platform/limits/ (dM 2026-11-19) :26 "Each time you push new code to your Git repository, Pages will build
+  and deploy your site." :31 "| Builds per month | 500 | 5,000 | 20,000 |"; no word on direct uploads. pages/get-started/
+  direct-upload/ (dM 2026-04-21): no "count", "month" or "500"; "build" only for the user's own build command (:28, :74,
+  :129). PASS (the docs do not say).
