@@ -168,6 +168,7 @@
      -47 re-judge reads MOVED (else three lines), NB2-C10's reviewer read in step 9's window before NB2's report, then
      -47's pack.
   Then U7's round (netcode, test; after R4 and T5 (ii)) and its merge by end Mon 30; Stop B about Tue 1 Dec; R1 Thu 3 Dec.
+- **PR #40 conflict (GitHub event 13:57 UTC; checked 14:1x):** main moved 28254a7 -> 3ab9eae (#68, cs3b: 87 files, +10,884/-601, code; no .claude/, .github/, gate or CLAUDE.md file); `git merge-tree --write-tree --name-only HEAD origin/main` conflicts only in docs/STATUS.md (as MAIN-65's). MAIN-52 applies: MAIN-66 takes main in after the compact, plan first in main-65-plan.md's form with the advisor's check (a window); my lean: brief 3 first (its window closes 14:20), then MAIN-66. The PR rules (subscription.created, re-sent 14:11): merge the base in, never rewrite history; the conflict is reported to him, not on GitHub.
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): pass 3 6,111; the last round
   DONE 11-24 21:2x (NC-R2-1, SEC-R2-1 = INF-R2-1, SEC-R2-2 CLOSED; NC-R3-1 Low: r1.sh:438-452, save_log unguarded under
   set -e, a follow-up); C9 DONE 11-25 09:2x (6,170 of 6,200, nothing carried; snapshot wip/u8-build.patch 09cb4a07…, 43
