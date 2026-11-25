@@ -40,10 +40,12 @@ Report text, and cross-checked against the raw artifacts in .gate/preview-hostin
 
 ### Item 3. E7's outcome sentence, this row only (done)
 Under E1's new words, every reading on Pages (artifacts):
-- every header on both URL forms: .wasm application/wasm on every link read (round-a 6, uploads 20, restore 2, bites 4);
-  every status 200, 7 paths per link. Production one-off links fail on nothing but the noindex msg. PASS.
+- every header on both URL forms: .wasm application/wasm in all 34 readings of 23 links (round-a 6, uploads 20 readings
+  of 11 links, bites 4, bite-production 2, restore 2); every status 200, 7 paths per reading. [corrected after the
+  advisor: an earlier head -30 cut off the uploads' branch-link rows] Production one-off links fail on nothing but the noindex msg. PASS.
 - production's own address no noindex: round-a and restore-production pass; x-robots none. PASS.
-- previews noindex: round-a 4 links, uploads 20 links, bites 4 links: x-robots "noindex" on every path. PASS.
+- previews noindex: round-a 4 links / 4 readings, uploads 11 links / 20 readings (= the report's 15 preview links, 24
+  readings, :820-821), bites 4 / 4: x-robots "noindex" on every path. PASS.
 - COOP/COEP: iso-on both links same-origin / require-corp on all 7 paths; iso-off and production none. PASS.
 - both bites caught: bite-coep only "/worker.js COEP "" expected require-corp" on both links; bite-production noindex on
   production's own address. PASS.
@@ -107,6 +109,23 @@ into the scratchpad's cf/sN/page.md; the pages' front-matter "agent instructions
 - E1's reason = option (a)'s words verbatim (report :284-285). E3's STEP4-COUNT clause fits his words (DECISIONS :193).
 - Not applicable now: "no .checkpoints/ files when marked ready" (the PR is still a draft; they must go before ready).
 
-### Draft verdict
-PASS WITH NOTES: every sourced claim confirmed; every number and date traced; outcome sentence holds for PM-0006-2;
-DECISIONS byte-equal; gate PASS (smoke skipped). Notes are Low only (E7 length/opener/Q1 granularity; E3 wording).
+### After the advisor (2026-11-25)
+- advisor-plan.md read whole (47 lines, review of revision 1): no condition on E7's length or opener; Q4 only says the
+  security-auditor is not needed unless E7 changes part 2's wall text or favours a move (it does neither). It records
+  E9/E10 joining "as the advisor agent's reading" but not their exact words, so E9/E10 are checked against plan.md's
+  copy only. No recorded approval of a 12-line E7, of its opener form, of the thinner Q1 split, or of E3's parenthesis.
+- STEP4-COUNT date: DECISIONS :169 heads it "2026-11-24, 23:53:15 UTC"; his label "(25 November, 00:55 Amsterdam)".
+  E3's "2026-11-25" follows his Amsterdam date; Low: the ADR does not say which clock.
+- Gate tree: `git diff --stat 1c45ed7 HEAD -- . ':!.checkpoints'` and `git diff --stat HEAD -- . ':!.checkpoints'` are
+  empty, so the gate's working tree equals 1c45ed7 outside .checkpoints/.
+- Pages clauses in E7 with no cite in the paragraph: "as on Pages" (25 MiB) and "where Pages sets no cap": confirmed by
+  me on pages/platform/limits/ :71 and :44-53 (retention only, no cap stated); not in infra-engineer's draft.
+- "Silent": the nearest text is static-assets/headers/ :166-175, a `_headers` example the user adds
+  (`https://:version.:subdomain.workers.dev/*` X-Robots-Tag: noindex); it says nothing of what the host sends.
+
+### Verdict
+FAIL, narrow (plan conformance only). Content: every sourced claim confirmed, every number and date traced, the outcome
+sentence holds for PM-0006-2, DECISIONS byte-equal, gate PASS. But the final text departs from approved plan revision 2
+with no recorded approval: E7 12 lines vs "at most 8 lines", a different opener, Q1's alias and production workers.dev
+cases not given separately; E3's parenthesis reworded. Smallest fix: trim E7 to 8 lines with the planned opener and
+restore E3's wording, or record a plan revision 3 covering E7 as built and E3's wording, approved by the advisor agent.
