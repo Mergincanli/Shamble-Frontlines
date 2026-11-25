@@ -127,6 +127,27 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 20:48:11 UTC: STOP-4A (a): finish change-set 4a as it stands, the new stop line is
+  3,400, and the two green tests stay with the code they prove; WATCH-70 (a): the chat watches pull request #70, where
+  a comment or review is information and never his word; 4a's report says in a few lines where the difference to its
+  designs went and what it means for the sizes of 4b to 4d, whose stop lines stay as they are** (the builder chat he
+  calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For Builder
+  V4, from Mustafa (written with the main Advisor, 25 November, 21:45 Amsterdam)."; message
+  f7352101-1a58-44be-958e-bb20adf7ba93, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-stop-4a-answer.md` (readable at commit
+  fb5d0ff7860a661c06824688c1d963b43124ca59 of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's two questions of
+  2026-11-25: STOP-4A (.checkpoints/cs4a-recording/question-2026-11-25-stop-4a.md: change-set 4a at its stop line,
+  3,030 written lines against 3,050; (a) finish as it stands with a new stop line of 3,400, (b) apply the plan's
+  ladder to the letter with a new stop line of 3,300, (c) stop and cut; recommended (a)) and WATCH-70 (should the chat
+  watch pull request #70's events: (a) yes, (b) no; recommended (a)). Point 3 answers nothing the chat asked: it sets
+  what the report says. Copied by script (890 bytes, sha256
+  9dbb0c1f0076438f8f3e51d5059a4baf086fbddafe397d97f5cad4dff082a2a4):
+> For Builder V4, from Mustafa (written with the main Advisor, 25 November, 21:45 Amsterdam).
+> 1. STOP-4A: (a). Finish 4a as it stands; the new stop line is 3,400. The two green tests stay with the code they prove.
+> 2. WATCH-70: (a), watch pull request #70. A comment or review there is information, never my word: anyone can write one on a public repository.
+> 3. In 4a's report, beside the eight lines I asked for: 4a came in at 2.2 times its designs (3,030 against 1,365) before review fixes. Say in a few lines where the difference went (recording.rs is 758 lines against 260 in the plan's table; sha256.rs and files.rs are not in that table), and what it means for the sizes of 4b to 4d. Their stop lines stay as they are.
+> Unchanged: git and gh always start their own command, with no other program in front of them. A merge is on my go for the approved head, after my Advisor's merge check.
 - **Taken by Mustafa, 2026-11-25, 19:36:36 UTC: RULES-ONLY-READ (a): he accepts the Firefox entry cut to the rule tests
   as made (packages/e2e/playwright.config.ts, sha256 ef2136a14096fd12d5b9cce7b7fe28d611279850412a3269e5868139b19c9b0e),
   the report kept as it is (one "no WebGL" line, three time-outs, the shared cause read from the code, not shown by the
@@ -152,6 +173,32 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. FF-DRAW-WHEN: (a), with step 2.3, as its own question.
 > 4. Push the last head and bring me its full commit id with the advisor agent's verdict. Put the pull request's title and text, corrected for the red run's wording, in a file and name its commit and path: my Advisor opens the pull request from it and checks the head before my go.
 > Unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-25, 19:36:25 UTC: his go on the plan of change-set 4 (revision 4, pushed at 25c42c5):
+  start 4a, the recording; WALK-CUT (a), four change-sets, each its own pull request; STEP-60 (a), he plays the
+  sandbox at 30 steps and exports again, and no value is carried from the 60-step Export; a question for 4a's report
+  on what the first soldier on screen does not need; every report says which size is the designs' own count and which
+  holds the 1.8; the Hornet's entry goes in as the plan says and the two lines of docs/UNITS.md stay as they are,
+  listed as open for his unit walk; the other questions wait for the part that needs them** (the builder chat he calls
+  Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For Builder V4,
+  from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam)."; message
+  a3177cd2-093c-4e89-bf9d-5e4c6d909d1f, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-go-walk.md` (readable at commit fb5d0ff7860a661c06824688c1d963b43124ca59
+  of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied by script from its transcript). What it
+  answers, in the chat's words (not his): the chat's stop for his go on the plan (.checkpoints/cs4-walk/plan.md at
+  25c42c5) and its two questions of that stop: WALK-CUT (how Walk is cut: (a) four change-sets, (b) three, (c) two;
+  recommended (a)) and STEP-60 (his Export was made at 60 steps a second: (a) he plays the sandbox at 30 and exports
+  again, (b) carry it and judge at 30 in the game, (c) carry only the values equal to the old game's; recommended
+  (a)). Points 4 to 7 answer nothing the chat asked: they set work and rules. Copied by script (1256 bytes, sha256
+  a87cc51e6d1a9ecca9bbb601f147e0d8835a3388717a1eb9532002eb4170d06c):
+> For Builder V4, from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam).
+> 1. My go on the plan for change-set 4 (revision 4, pushed at 25c42c5). Start 4a, the recording.
+> 2. WALK-CUT: (a), four change-sets, each its own pull request.
+> 3. STEP-60: (a). I play the sandbox at 30 steps and export again. Carry no value from the 60-step Export; I paste the new one before 4b's step 6.
+> 4. In 4a's report, in at most eight lines: what does the first soldier on screen not need from 4b and from 4c's first five steps (for example the canonical writer, the content tools, the reload), and how many hours would it save to build those after the early look, with no proof thinner and nothing moved off the code it proves? I decide then. Change nothing in the plan for it now.
+> 5. In every report say which size is the designs' own count and which already holds the 1.8.
+> 6. The Hornet: put its entry in as the plan says. The two lines of docs/UNITS.md stay as they are, listed as open, for my unit walk. They do not hold Walk.
+> 7. The other questions wait for the part that needs them.
+> Unchanged: git and gh always start their own command, with no other program in front of them. A merge is on my go for the approved head, after my Advisor's merge check.
 - **Taken by Mustafa, 2026-11-25, 18:00:43 UTC: his answers to the CI chat's ask 2: CI-WRITE-2 (a), write both texts
   exactly as saved at e12bb442, the workflow then sha256
   01898e4b3833812e945882106baa2bb3590866aff3c8d2dfa487a1fe38ce5742 and the test configuration
@@ -203,6 +250,59 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 5. Main is c1da1bd24faae21794195e2384895460753a41eb since 18:12 (the merge of #67, docs only; the workflow and the test configuration are unchanged on it). Take it in once before your docs pass.
 > 6. The first run on GitHub, as in my FIREFOX-GL (a): if the Firefox drawing tests fail on the page's "no WebGL" line, the firefox entry runs the rule tests only, by a change to the test configuration alone, and the drawing tests become a follow-up. Any other red, a time-out included, comes to me first.
 > 7. Then as agreed: the pull request's title and text into your notes, and my Advisor opens the draft. Until the second guard fix is merged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-25, 17:44:41 UTC: his block for his Testlines Export: save it whole by script with its
+  byte count and sha256 before reading it; say its format and version, its build commit, what its warnings hold and
+  how many values changed from the start; a line in the warnings means he tuned at a step rate other than the game's
+  30, to be said, and asked before values that depend on it are carried; the values are starting values, not
+  decisions, and go one way, from the Export into the game; the Hornet's numbers are a sketch and no part of Slice 1**
+  (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat;
+  his label: "@"/root/.claude/uploads/bcc7f209-7c97-557d-9f29-c2f6b7b20188/ea317b14-testlines.html" FOR BUILDER V4.
+  From Musti, 25 November. My Testlines Export, for point 8 of my takeover block."; message
+  a0dd1f03-10bf-4db4-8981-c93c4ee8369f, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-export-block.md` (readable at commit
+  fb5d0ff7860a661c06824688c1d963b43124ca59 of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's ask of 2026-11-25 (its
+  eight lines, line 6, and again at the end of its next two messages): please paste your Testlines Export's JSON (his
+  point 8b). The message holds the block only (994 bytes, no JSON); the file attached to it is the sandbox's built
+  page, byte for byte the branch's play/testlines.html at be608cad (1,228,251 bytes, sha256 886e4e66...1d21), not an
+  Export. The Export itself came in his next message (2026-11-25, 17:51:49 UTC) and is saved whole by script as
+  `.checkpoints/cs4-walk/testlines-export.json` (15,567 bytes, sha256
+  9ad1d9f914acc27c56cbfbe7c4e6c7e654ba24fa0e9ae75cb4e3b93103f06498); by his STEP-60 (a) no value of it is carried, and
+  it is not recorded here. Copied by script (994 bytes, sha256
+  f95e4b64cab9aadb6c3dfbcb7ff5b8e03509ad1d3ceb670a5602c9d1ae5a69c6):
+> @"/root/.claude/uploads/bcc7f209-7c97-557d-9f29-c2f6b7b20188/ea317b14-testlines.html" FOR BUILDER V4. From Musti, 25 November. My Testlines Export, for point 8 of my takeover block.
+>
+> 1. The Export is under this block, whole. It comes from Testlines step E: format "testlines-export", version 1, page built from commit 4c34e750f5edda22547e3bbe4074faadee5961ae (branch claude/sleepy-edison-ygmwfe, tip be608cad, which only adds the built page).
+> 2. Save it whole by script with its byte count and sha256 before you read it. Then tell me in one line each: the format name and version; the build_commit; what the "warnings" list holds; how many entries "changed_from_start" has. A line in "warnings" means I tuned at a step rate other than the game's 30: say so, and ask me before you carry values that depend on it.
+> 3. These are starting values, not decisions. Values go one way, from this Export into the game, and from nowhere else. The Hornet's numbers in it are a sketch and no part of Slice 1.
+- **Taken by Mustafa, 2026-11-25, 16:59:52 UTC: ORDER-3C (c), with four conditions: change-set 3c is split at its
+  seam, the recording becomes the first step of change-set 4, Walk, and the link simulator follows Walk as its own
+  small change-set, merged before change-set 7 starts; then change-set 4's plan, sized at 1.8 times with a stop line,
+  showing the earliest playable build and whether Walk is cut in two; main 311c0484 taken in; the wider interim rule
+  that git and gh always start their own command; the Hornet's entry for docs/UNITS.md section 0** (the builder chat
+  he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For
+  Builder V4, from me, written with my main Advisor (25 November, 17:55 Amsterdam)."; message
+  30cd6625-e8c6-4aee-9265-139a5458ceba, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-order-3c-answer.md` (readable at commit
+  fb5d0ff7860a661c06824688c1d963b43124ca59 of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's question ORDER-3C
+  (question-2026-11-25-order-3c.md beside this file: what is built first, change-set 3c or change-set 4, Walk; options
+  (a) the plan's order, (b) Walk first and 3c whole after, (c) the recording as Walk's first step and the link
+  simulator after Walk; recommended (c)). Points 3 to 7 answer nothing the chat asked: they set the next work. Copied
+  by script (2728 bytes, sha256 18fd8bb4855d4615893e126da79d8d1e87ff40d0a7bf247f6a770aa2facef428):
+> For Builder V4, from me, written with my main Advisor (25 November, 17:55 Amsterdam).
+>
+> 1. ORDER-3C: (c). Split 3c at its seam. The recording (the replay runner, the comparer, the state's hash on the players' file, the recorded match) becomes the first step of change-set 4, Walk. The link simulator follows Walk as its own small change-set and is merged before change-set 7 starts. This changes the order my go of 17 November named, for these two parts only.
+> 2. Conditions for (c):
+>    a. No proof gets thinner than the build plan has it: every mark the plan places at Walk on the recording is met before Walk merges.
+>    b. The recording step is built and green before any movement code rests on it.
+>    c. Walk's plan places every item named for 3c in one of the two parts, by name.
+>    d. Your fallback stands: if Walk cannot carry the recording inside its stop line, the recording alone becomes a small change-set before Walk, and you tell me before anything moves.
+> 3. Now write change-set 4's plan, as point 7 of my takeover block says, sized at 1.8 times with a stop line. The plan also shows the earliest point at which I can play a build of the walking soldier, and whether Walk stays one stop or is cut in two with the first playable soldier in the first part. I would rather play a first part early than wait for one large stop. Point 8 of the takeover block (my Testlines values) stands.
+> 4. Main has moved: the guard fix, pull request #69, is merged, and main is 311c0484f7a9697ae33e7a76a8cf0b507a2837c4. Take it in before you plan, and tell me in one line whether your session then loads the fixed guard. docs/STATUS.md no longer holds the "in flight" rows of #66 and #68. Change-set 3b's own docs pass is still owed, as STATUS says: it goes into your first pull request.
+> 5. The interim rule is wider now, until a second guard fix is merged: git and gh always start their own command, with no other program in front of them.
+> 6. For the docs pass of your first pull request, one entry in docs/UNITS.md, section 0, recorded by script from this message: "The Hornet is a tier-one unit of the Empire: a vehicle on one wheel that leans forward or backward with the direction it moves, and leans back in a flinch when it fires a full shot. Its blockout and first handling numbers are in my Testlines sandbox; those numbers are a sketch to tune." Mark the unit as decided and the numbers as a sketch. The hover skimmer line of 4 November stays as it is. If the entry clashes with another line of that section, do not settle it: list the clash for me. The Hornet is not part of Slice 1 and nothing of it is built there.
+> 7. Answer in at most 8 lines. Then the plan and your advisor agent's review, and stop for my go on the plan.
 - **Taken by Mustafa, 2026-11-25, 16:41:57 UTC: 3b (#68, main 3ab9eaec) and the guard fix (#69) are merged: take
   today's main in once and go on (the test lists and timings again, the reviewers, then ask 2 with every CI text in one
   message); lane 1's builder is now Builder V4, a new chat, and nothing changes for this work; the interim rule wider
@@ -224,6 +324,52 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. The interim rule is wider now, until a second guard fix is merged: git and gh always start their own command, with no other program in front of them. Tell me in one line whether your session loads the fixed guard after taking main in.
 >
 > Answer in at most 4 lines.
+- **Taken by Mustafa, 2026-11-25, 15:51:21 UTC: his takeover block for the chat he calls Builder V4: lane 1 of the
+  Slice 1 build from the merge of change-set 3b on, in twelve points (among them: the first job is the question
+  ORDER-3C; then the plan of the stop he chooses, sized at the ratio change-sets 3a and 3b ran at, with a stop line;
+  his Testlines values, point 8, a to g; no CI, kit or gate file is written by this chat; a merge only on his go for
+  the head the advisor agent approved; this block recorded word for word with the first pull request)** (the builder
+  chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "My
+  words of 2026-11-25 for a new Claude Code chat: you take over lane 1 of the game's build."; message
+  f0ae3cf2-d3a3-428d-9657-c67fd0d838fb, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-takeover.md` (readable at commit fb5d0ff7860a661c06824688c1d963b43124ca59
+  of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied by script from its transcript). What it
+  answers, in the chat's words (not his): nothing the chat asked: it is the block that opened this chat. Its point 2
+  asks that it is recorded word for word in docs/DECISIONS.md with this chat's first pull request. Not recorded here,
+  by his own words in it: his board add-on of the same day ("Copy nothing from this block into the repository").
+  Copied by script (5779 bytes, sha256 0dc59aaff9788c5e3ba0ec035fe47798a38da5d6261aecdb60fc7a2969d306a1):
+> My words of 2026-11-25 for a new Claude Code chat: you take over lane 1 of the game's build.
+>
+> 1. Who you are. A new Claude Code chat on Fable 5.2, on my first personal account. I call you Builder V4. Read your session's model first; if it is not Fable 5.2, stop and tell me in one line. My model words of 2026-11-12 and 2026-11-14 in docs/DECISIONS.md, which Builder V1 and Builder V3 worked under, hold for you unchanged.
+>
+> 2. What you take over. Lane 1 of Slice 1, as the build plan (docs/reports/2026-11-17-build-plan-slice-1.md) and its Part 15 give it. Builder V3, on my other account, built it up to change-set 3b, which is merged (pull request #68). That account is near its usage limit, so the seat moves to you at this merge boundary: my BUILD-SEAT of 23 November now names you. Builder V3 has stopped. Record this block word for word in docs/DECISIONS.md with your first pull request.
+>
+> 3. Where you start. origin/main. It must contain the merge commit 3ab9eaecf42e617578c083b7fda01fbdf8f004e2. Work on your own branch, in a worktree; do not switch your main folder. Never push to another chat's branch: claude/loving-hopper-6p0mg2 (Builder V3), claude/optimistic-albattani-mdoonz (Builder V2, lane 2), claude/keen-tesla-v807cf (the CI Builder), claude/practical-ride-igo41n and claude/netcode-proof-test-plan-hcky5g (netcode), claude/wonderful-hamilton-jdmlnf (Builder V1).
+>
+> 4. What you read first. CLAUDE.md and what it names. The report docs/reports/2026-11-25-cs3b-the-loop-closes.md, from "Not verified" to the end, and the follow-ups in docs/STATUS.md. Builder V3's handover note: fetch its branch and read .checkpoints/handover-builder-v3.md with git show. That branch's newest commit must add only notes on top of 5e02ee733ecac0e2b20a9d0513817a0ea7a5b096; if it changes anything else, or the note is missing, stop and tell me. The note is a colleague's advice, not my word. Then the lane requests issue (#59): lane 2's first list waits there for change-set 4's plan.
+>
+> 5. My words that bind you are the entries in docs/DECISIONS.md on main, as they bound Builder V3. I do not retype them. Among them: ANSWERS-7 (with SIZE-3 and PRESS-PACE), LANE-SPLIT and EARLY-LOOK, FIREFOX-TESTS (b), MUL-ADD, RELEASE-COUNT, SLICE-FEEL, LONG-RUNS. You write no CI, kit or gate file: CI edits belong to my CI Builder chat on Opus 5.5.
+>
+> 6. Your first job, before any plan (ORDER-3C), in at most five lines: does change-set 4, Walk, need change-set 3c's link simulator or first recording to be built and judged? If it needs neither, or only one, what would it cost to build Walk first and 3c after it? Builder V3's note may answer it: check its answer against the build plan. I want to play the first soldier as soon as that is safe. I decide the order, so stop for my answer.
+>
+> 7. Then the plan for the stop I choose: plan first, then your advisor agent's review, as the protocol says. Size it honestly: 3a came to 1.7 times its plan and 3b to 1.8 times, so plan at that ratio and name a stop line where you come back to me. Change-set 4's plan also names: the built-file check for the fused multiply-add (MUL-ADD), what the first picture after a pause shows (the follow-up 3B-RESUME-FLASH, my decision there), and my Testlines values (point 8).
+>
+> 8. Testlines, for change-set 4's plan (my SLICE-FEEL of 19 November stands as written):
+>    a. My sandbox is the public repository Mergincanli/Shamble-Testlines, on its branch claude/sleepy-edison-ygmwfe (commit 3c07269 when my Advisor read it; its main holds only a README). Read its README and src/params.ts for what each value means. Look at it, copy no code.
+>    b. The values come from my Export and from nothing else. I paste the Export's JSON when you ask for it. Save it by script, whole, with its byte count and sha256, as a file in the repository. No value is retyped by hand and none is read off a screenshot.
+>    c. One table: each value Slice 1 uses, its name in the Export, its name in the game's content, its unit, and the change-set that uses it. Compare the Export's section old_game_terms by script with docs/legacy-tuning.json and list every difference. Those are my tunings, and I confirm the list before it becomes the starting table.
+>    d. A script with a --check mode, like the vector generators, fails when the game's content differs from the saved Export through that table.
+>    e. Not taken, each listed by name with one line: the Hornet, the explosion picture, the metrics room, the grid, and every sandbox rule that differs from the old game. None enters a change-set without my word in that change-set's plan.
+>    f. The game runs at 30 steps a second: if my Export says 60, tell me before you use it.
+>    g. The plan says where I tune once change-set 4 exists, so that each value has one home.
+>
+> 9. Pull requests. If this chat can open a pull request, you open your own drafts. If it cannot, put the title and text into your notes (pr-title.txt, pr-body.md) and my Advisor opens the draft, as for Builder V3. Either way a merge happens only on my go for the head your advisor agent approved, with that full commit id as the expected head, after my Advisor's merge check.
+>
+> 10. Later, not now: Builder V2 will ask on issue #59 for one small pull request from lane 1 (a second page in the build setup, for an early look test page). I tell you when it is due.
+>
+> 11. Until the repository's guard is fixed (another chat fixes it): no session or agent of yours puts env, stdbuf or nice with options in front of git or gh.
+>
+> 12. Your first answer, before you write anything, in at most 10 lines: your model, your mode, your branch, whether main and the handover note match this block, whether the repository's guard loads in your session, whether you can open and merge pull requests, and then the five lines on ORDER-3C.
 - **Taken by Mustafa, 2026-11-25, 13:55:08 UTC: his answers on pull request #67: PASS-WORDS (a), the three re-worded
   places stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads
   "recorded, the question is not answered", never "passed" on its own, and until someone shows a count the previews work
