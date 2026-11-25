@@ -117,10 +117,9 @@ export async function boot(): Promise<void> {
     };
   }
 
-  let sequence = 0;
   picture.loop((timeMs) => {
-    sequence = (sequence + 1) >>> 0;
-    link.frame(sequence);
+    // No key is read yet: nothing is held and nothing was pressed.
+    link.frame(0, 0, 0, 0, 0);
     picture.draw({ newest: link.newest, previous: link.previous, timeMs });
     frames?.push(timeMs);
     readout?.(timeMs);

@@ -179,13 +179,17 @@ export class WorkerLink {
     return this.#failure;
   }
 
-  /** Once per drawn frame: the newest input, with the buffers the page is done with riding back to the pool. */
-  frame(sequence: number): void {
+  /**
+   * Once per drawn frame: the newest input (the buttons held, and the running press counts four to a word), with
+   * the buffers the page is done with riding back to the pool. The post's number is the count of posts so far,
+   * around the 32-bit circle.
+   */
+  frame(held: number, p0: number, p1: number, p2: number, p3: number): void {
     if (!this.#ready || this.#failure !== "") return;
     const returned = this.#returned;
     this.#returned = [];
-    this.#port.postMessage({ type: "input", sequence, returned }, returned);
     this.#posts += 1;
+    this.#port.postMessage({ type: "input", post: this.#posts >>> 0, held, p0, p1, p2, p3, returned }, returned);
   }
 
   /** The tab was hidden or shown: the Worker pauses the match, and the page records what the pause was. */

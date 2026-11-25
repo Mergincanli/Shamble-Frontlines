@@ -5,7 +5,7 @@
 // Wasm with Node's own module, and Node's types are not a dependency, so a TypeScript file here would never be
 // type-checked.
 import { readFileSync } from "node:fs";
-import { checkLayoutHash, LAYOUT_HASH } from "@shamble/types";
+import { BLOCK_LAYOUT, checkLayoutHash, LAYOUT_HASH } from "@shamble/types";
 import { beforeAll, expect, test } from "vitest";
 import * as glue from "../pkg/sim_wasm.js";
 import { initSync, panic_buffer, Sim, tick_hz } from "../pkg/sim_wasm.js";
@@ -29,41 +29,80 @@ function blockOf(sim) {
   return into;
 }
 const tickOf = (buffer) => new DataView(buffer).getUint32(0, true);
+/** One section of a block as its words, by the generated layout's own offsets. */
+function wordsOf(buffer, section) {
+  const { offset, fields } = BLOCK_LAYOUT[section];
+  const view = new DataView(buffer);
+  return Object.fromEntries(Object.entries(fields).map(([name, field]) => [name, view.getUint32(offset + field.offset, true)]));
+}
 
 test("a block written by Rust passes the page's layout check, from tick 0 on", () => {
-  const sim = new Sim(SEED, 0, 0, 0);
+  const sim = new Sim(SEED, 0, 0);
   expect(tick_hz()).toBe(30);
   // The host's cap is a quarter of a second of the simulation's own tick rate (ADR 0004 part 5).
   expect(Math.floor(0.25 * tick_hz())).toBe(MAX_TICKS_PER_WAKE);
-  expect(sim.block_len()).toBe(8);
+  // The generated layout and the Rust writer agree on the block's length: the last section's end.
+  expect(sim.block_len()).toBe(44);
+  expect(BLOCK_LAYOUT.link.offset + BLOCK_LAYOUT.link.stride).toBe(44);
   expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
   expect(tickOf(blockOf(sim))).toBe(0);
-  sim.step();
+  sim.step(0);
   expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
   expect(new DataView(blockOf(sim)).getUint32(4, true)).toBe(LAYOUT_HASH);
 });
 
 test("two steps advance the tick by two, and each returns the next due time", () => {
-  const sim = new Sim(SEED, 0, 0, 1000);
-  expect(sim.step()).toBeCloseTo(1000 + 2 * PERIOD, 9);
-  expect(sim.step()).toBeCloseTo(1000 + 3 * PERIOD, 9);
+  const sim = new Sim(SEED, 0, 0);
+  // The host's first rebase says when the first tick is due.
+  expect(sim.rebase(1000)).toBeCloseTo(1000 + PERIOD, 9);
+  expect(sim.step(1000 + PERIOD)).toBeCloseTo(1000 + 2 * PERIOD, 9);
+  expect(sim.step(1000 + 2 * PERIOD)).toBeCloseTo(1000 + 3 * PERIOD, 9);
   expect(tickOf(blockOf(sim))).toBe(2);
   expect(sim.rebase(60_000)).toBeCloseTo(60_000 + PERIOD, 9);
-  sim.input(42);
-  expect(sim.newest_input()).toBe(42);
+});
+
+test("what the host hands in comes back in the block: each button's count in its own byte, through the real messages", () => {
+  const sim = new Sim(SEED, 0, 0);
+  sim.step(0);
+  const counts = new Uint8Array(16);
+  for (let button = 0; button < 16; button += 1) {
+    // One press of this button on top of the ones before it, with only its own bit held (and bits above the
+    // sixteenth, which are ignored).
+    counts[button] = 1;
+    const [p0, p1, p2, p3] = new Uint32Array(counts.buffer);
+    sim.input(button + 1, (0xffff_0000 | (1 << button)) >>> 0, p0, p1, p2, p3);
+    sim.step(0);
+    const block = blockOf(sim);
+    expect(wordsOf(block, "echo"), `button ${button}`).toEqual({
+      held: 1 << button,
+      presses_0_3: p0,
+      presses_4_7: p1,
+      presses_8_11: p2,
+      presses_12_15: p3,
+    });
+    // Sent and received climb with the ticks, nothing is refused, and this tick's command was built from this post.
+    expect(wordsOf(block, "link")).toEqual({ sent: button + 1, received: button + 2, refused: 0, post_used: button + 1 });
+  }
+  // Any numbers are taken: nothing in `input` can trap on what a page sent. The newest post by its number
+  // counts: 17 is newer than 16, and a number half the circle away is not.
+  sim.input(17, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0xffff_ffff);
+  sim.input(0xffff_ffff, 0, 0, 0, 0, 0);
+  sim.step(0);
+  expect(wordsOf(blockOf(sim), "echo").held).toBe(0xffff);
+  expect(wordsOf(blockOf(sim), "link")).toMatchObject({ post_used: 17, refused: 1 });
 });
 
 test("after the memory grows between two steps, the next block is the block of a run without the growth", () => {
-  const grown = new Sim(SEED, 0, 1024, 0);
-  const plain = new Sim(SEED, 0, 1024, 0);
-  grown.step();
-  plain.step();
+  const grown = new Sim(SEED, 0, 1024);
+  const plain = new Sim(SEED, 0, 1024);
+  grown.step(0);
+  plain.step(0);
   // One copy before the growth, so a host that keeps its first view is caught here whatever ran before.
   expect(tickOf(blockOf(grown))).toBe(1);
   const kept = new Uint8Array(wasm.memory.buffer, grown.block_ptr(), grown.block_len());
   wasm.memory.grow(1);
-  grown.step();
-  plain.step();
+  grown.step(0);
+  plain.step(0);
   // A view kept from before the growth reads nothing: the host must make a fresh one on every copy.
   expect(kept.byteLength).toBe(0);
   expect(new Uint8Array(blockOf(grown))).toEqual(new Uint8Array(blockOf(plain)));
@@ -71,18 +110,18 @@ test("after the memory grows between two steps, the next block is the block of a
 });
 
 test("padding makes the block longer and it still passes the check", () => {
-  const sim = new Sim(SEED, 0, 65536, 0);
-  expect(sim.block_len()).toBe(8 + 65536);
-  sim.step();
+  const sim = new Sim(SEED, 0, 65536);
+  expect(sim.block_len()).toBe(44 + 65536);
+  sim.step(0);
   expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
 });
 
 test("a bad seed, mode or padding is refused with a plain reason", () => {
-  expect(() => new Sim(new Uint8Array(31), 0, 0, 0)).toThrow("the match seed must be 32 bytes and is 31");
-  expect(() => new Sim(SEED, 1, 0, 0)).toThrow("only local play (0)");
+  expect(() => new Sim(new Uint8Array(31), 0, 0)).toThrow("the match seed must be 32 bytes and is 31");
+  expect(() => new Sim(SEED, 1, 0)).toThrow("only local play (0)");
   // The whole number counts: 256 must not be cut down to 0, which is local play.
-  expect(() => new Sim(SEED, 256, 0, 0)).toThrow("mode 256 does not exist");
-  expect(() => new Sim(SEED, 0, 0xffff_ffff, 0)).toThrow("above the writer's cap");
+  expect(() => new Sim(SEED, 256, 0)).toThrow("mode 256 does not exist");
+  expect(() => new Sim(SEED, 0, 0xffff_ffff)).toThrow("above the writer's cap");
 });
 
 test("the panic hook's buffer stands from the module's start: no text, and its room said", () => {
@@ -105,7 +144,7 @@ test("the glue exports what the Worker calls and nothing more", () => {
 
 test("in the glue, each per-tick call reaches exactly one export", () => {
   const glue = readFileSync(new URL("../pkg/sim_wasm.js", import.meta.url), "utf8");
-  for (const [method, exported] of [["input(sequence)", "sim_input"], ["step()", "sim_step"]]) {
+  for (const [method, exported] of [["input(post, held, p0, p1, p2, p3)", "sim_input"], ["step(now_ms)", "sim_step"]]) {
     const from = glue.indexOf(`    ${method} {`);
     expect(from, method).toBeGreaterThan(-1);
     const body = glue.slice(from, glue.indexOf("\n    }", from));
@@ -114,7 +153,7 @@ test("in the glue, each per-tick call reaches exactly one export", () => {
 });
 
 test("the host on the real Wasm: two calls per tick, one transferred block per tick, each passing the check", () => {
-  const sim = new Sim(SEED, 0, 0, 1000);
+  const sim = new Sim(SEED, 0, 0);
   const calls = { input: 0, step: 0, rebase: 0, block_ptr: 0, block_len: 0 };
   const counted = Object.fromEntries(
     ["input", "step", "rebase", "block_ptr", "block_len"].map((name) => [
@@ -144,7 +183,7 @@ test("the host on the real Wasm: two calls per tick, one transferred block per t
     tick_hz(),
   );
   host.start();
-  host.onMessage({ type: "input", sequence: 9, returned: [] });
+  host.onMessage({ type: "input", post: 9, held: 0x21, p0: 1, p1: 0, p2: 0, p3: 0, returned: [] });
   for (let i = 0; i < 30; i += 1) {
     // Half-way the memory grows: the host itself must copy through a fresh view from then on (PM-0002-6).
     if (i === 15) wasm.memory.grow(1);
@@ -156,6 +195,9 @@ test("the host on the real Wasm: two calls per tick, one transferred block per t
   expect(blocks.map((block) => tickOf(block.buffer))).toEqual(Array.from({ length: 30 }, (_, i) => i + 1));
   for (const block of blocks) expect(checkLayoutHash(block.buffer)).toEqual({ ok: true });
   expect(calls).toEqual({ input: 30, step: 30, rebase: 1, block_ptr: 1, block_len: 1 });
-  expect(sim.newest_input()).toBe(9);
+  // The post reached the local server through the real messages and came back: held, pressed once, and used.
+  const last = blocks.at(-1).buffer;
+  expect(wordsOf(last, "echo")).toMatchObject({ held: 0x21, presses_0_3: 1 });
+  expect(wordsOf(last, "link")).toEqual({ sent: 29, received: 30, refused: 0, post_used: 9 });
   expect(host.stats()).toMatchObject({ ticks: 30, undetached: 0, maxTicksInOneWake: 1, drops: 0 });
 });

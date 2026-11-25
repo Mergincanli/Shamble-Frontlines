@@ -11,8 +11,8 @@ const LATENESS_SAMPLES = 600;
 
 /** What the pacer drives: the simulation's step and its schedule (the Wasm's control calls, or a stand-in in tests). */
 export interface PacedSim {
-  /** Runs one tick and returns the time, in the host's milliseconds, at which the next one is due. */
-  step(): number;
+  /** Runs one tick at the host's time `nowMs` and returns the time, in the host's milliseconds, at which the next one is due. */
+  step(nowMs: number): number;
   /** Drops the time up to `nowMs` and returns when the next tick is due, one tick period later. */
   rebase(nowMs: number): number;
 }
@@ -31,6 +31,15 @@ export interface PacerCounters {
   readonly droppedMs: number;
   /** How often the match was paused and resumed. */
   readonly pauses: number;
+}
+
+/**
+ * A due time as the simulation gave it. One that is not a finite number would turn the pacer into a busy loop (a
+ * timer of `NaN` milliseconds fires at once, and no tick ever becomes due), so it stops the match instead.
+ */
+function due(value: number): number {
+  if (!Number.isFinite(value)) throw new Error("the simulation returned a due time that is not a finite number");
+  return value;
 }
 
 /**
@@ -56,7 +65,7 @@ export class Pacer {
   constructor(sim: PacedSim, now: () => number) {
     this.#sim = sim;
     this.#now = now;
-    this.#nextDueMs = sim.rebase(now());
+    this.#nextDueMs = due(sim.rebase(now()));
   }
 
   get counters(): PacerCounters {
@@ -80,19 +89,19 @@ export class Pacer {
   }
 
   /**
-   * One wake: runs every tick that is due, calling `afterTick` after each, up to `MAX_TICKS_PER_WAKE`; if ticks are
-   * still due then, drops the rest of the gap. Returns how long to sleep before the next wake, in milliseconds, or
-   * `null` while paused (the caller sets no timer).
+   * One wake: runs every tick that is due, calling `afterTick` after each with the time the tick started, up to
+   * `MAX_TICKS_PER_WAKE`; if ticks are still due then, drops the rest of the gap. Returns how long to sleep before
+   * the next wake, in milliseconds, or `null` while paused (the caller sets no timer).
    */
-  wake(afterTick: () => void): number | null {
+  wake(afterTick: (startedAtMs: number) => void): number | null {
     if (this.#paused) return null;
     this.#wakes += 1;
     let ran = 0;
     let now = this.#now();
     while (ran < MAX_TICKS_PER_WAKE && this.#nextDueMs <= now) {
       this.#lateness.push(now - this.#nextDueMs);
-      this.#nextDueMs = this.#sim.step();
-      afterTick();
+      this.#nextDueMs = due(this.#sim.step(now));
+      afterTick(now);
       ran += 1;
       now = this.#now();
     }
@@ -101,7 +110,7 @@ export class Pacer {
     if (this.#nextDueMs <= now) {
       this.#drops += 1;
       this.#droppedMs += now - this.#nextDueMs;
-      this.#nextDueMs = this.#sim.rebase(now);
+      this.#nextDueMs = due(this.#sim.rebase(now));
     }
     return Math.max(0, this.#nextDueMs - now);
   }
@@ -120,7 +129,7 @@ export class Pacer {
     if (this.#paused) {
       this.#paused = false;
       this.#pauses += 1;
-      this.#nextDueMs = this.#sim.rebase(now);
+      this.#nextDueMs = due(this.#sim.rebase(now));
     }
     return Math.max(0, this.#nextDueMs - now);
   }

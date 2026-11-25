@@ -18,6 +18,7 @@ const STATS: WorkerStats = {
   drops: 0,
   droppedMs: 0,
   pauses: 0,
+  stalePosts: 0,
   latenessP50: 0.5,
   latenessP99: 1,
   latenessMax: 1,
@@ -40,14 +41,14 @@ function setUp() {
     () => clock.now,
   );
   const ready = () => link.onMessage({ type: "ready", blockBytes: 8, tickHz: 30 });
-  const deliver = (tick: number) => link.onMessage({ type: "block", buffer: block(tick), doneAt: clock.now - 2 });
+  const deliver = (tick: number) => link.onMessage({ type: "block", buffer: block(tick), startAt: 0, doneAt: clock.now - 2 });
   return { link, sent, clock, port, ready, deliver };
 }
 
 test("it starts the Worker, and posts no input before the Worker is ready", () => {
   const { link, sent, ready } = setUp();
   link.start(4096);
-  link.frame(1);
+  link.frame(0, 0, 0, 0, 0);
   expect(sent.map((entry) => entry.message)).toEqual([{ type: "start", padBytes: 4096 }]);
   expect(ready()).toBe("");
   expect(link).toMatchObject({ ready: true, blockBytes: 8, tickHz: 30 });
@@ -60,14 +61,14 @@ test("it keeps the two newest blocks and sends the older ones back with the next
   expect(link).toMatchObject({ blocks: 4, tick: 4 });
   expect(link.newest).toBe(blocks[3]);
   expect(link.previous).toBe(blocks[2]);
-  link.frame(7);
+  link.frame(0x8001, 1, 2, 3, 4);
   expect(sent.at(-1)).toEqual({
-    message: { type: "input", sequence: 7, returned: [blocks[0], blocks[1]] },
+    message: { type: "input", post: 1, held: 0x8001, p0: 1, p1: 2, p2: 3, p3: 4, returned: [blocks[0], blocks[1]] },
     transfer: [blocks[0], blocks[1]],
   });
-  // One message per frame, and a returned buffer goes back once.
-  link.frame(8);
-  expect(sent.at(-1)?.message).toEqual({ type: "input", sequence: 8, returned: [] });
+  // One message per frame, each with the next post number, and a returned buffer goes back once.
+  link.frame(0, 1, 2, 3, 5);
+  expect(sent.at(-1)?.message).toEqual({ type: "input", post: 2, held: 0, p0: 1, p1: 2, p2: 3, p3: 5, returned: [] });
   expect(link.posts).toBe(2);
   expect(link.delivery.count).toBe(4);
   expect(link.delivery.max()).toBe(2);
@@ -79,27 +80,27 @@ test("the first block of every Worker start is checked, also after blocks were a
   deliver(1);
   // The Worker starts again (a reload of the Worker, later a rejoin): its first block is checked anew.
   ready();
-  expect(link.onMessage({ type: "block", buffer: block(1, 0), doneAt: 0 })).toContain("layout-hash");
+  expect(link.onMessage({ type: "block", buffer: block(1, 0), startAt: 0, doneAt: 0 })).toContain("layout-hash");
   expect(link.blocks).toBe(1);
 });
 
 test("a first block of another layout is refused, and the failure is said once", () => {
   const { link, sent, ready } = setUp();
   ready();
-  const reason = link.onMessage({ type: "block", buffer: block(1, LAYOUT_HASH ^ 1), doneAt: 0 });
+  const reason = link.onMessage({ type: "block", buffer: block(1, LAYOUT_HASH ^ 1), startAt: 0, doneAt: 0 });
   expect(reason).toContain("layout-hash");
   expect(link).toMatchObject({ blocks: 0, newest: null, failure: reason });
-  link.frame(1);
+  link.frame(0, 0, 0, 0, 0);
   expect(sent).toHaveLength(0);
   // One cause is one error: what still arrives after the failure is ignored, a good block too.
-  expect(link.onMessage({ type: "block", buffer: block(2, LAYOUT_HASH ^ 1), doneAt: 0 })).toBe("");
-  expect(link.onMessage({ type: "block", buffer: block(3), doneAt: 0 })).toBe("");
+  expect(link.onMessage({ type: "block", buffer: block(2, LAYOUT_HASH ^ 1), startAt: 0, doneAt: 0 })).toBe("");
+  expect(link.onMessage({ type: "block", buffer: block(3), startAt: 0, doneAt: 0 })).toBe("");
   expect(link).toMatchObject({ blocks: 0, newest: null, failure: reason });
 });
 
 test("a block of the wrong length, an error from the Worker and an unknown message each end the match and stop the Worker", () => {
   for (const [message, said] of [
-    [{ type: "block", buffer: block(1, LAYOUT_HASH, 16), doneAt: 0 }, "a block of 16 bytes, not 8"],
+    [{ type: "block", buffer: block(1, LAYOUT_HASH, 16), startAt: 0, doneAt: 0 }, "a block of 16 bytes, not 8"],
     [{ type: "error", message: "unreachable executed" }, "unreachable executed"],
     [{ type: "surprise" }, "the Worker sent a message the page does not know"],
     [{ type: "report", stats: { ticks: 5 } }, "the Worker sent a message the page does not know"],
@@ -127,7 +128,7 @@ test("the match ends once, whoever ends it first, and nothing is posted to the W
   expect(link.failure).toBe("the Worker failed");
   expect(port.terminated).toBe(1);
   const before = sent.length;
-  link.frame(2);
+  link.frame(0, 0, 0, 0, 0);
   link.requestReport();
   link.visibility(true);
   link.visibility(false);

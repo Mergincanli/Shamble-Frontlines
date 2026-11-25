@@ -5,8 +5,11 @@ import type { LayoutCheck, OwnState, Snapshot, SnapshotAck, ViewTime } from "./i
 
 test("the package exports the layout, its hash and the check", () => {
   expect(Object.keys(types).sort()).toEqual(["BLOCK_LAYOUT", "LAYOUT_HASH", "checkLayoutHash"]);
-  expect(Object.keys(types.BLOCK_LAYOUT)).toEqual(["header"]);
+  expect(Object.keys(types.BLOCK_LAYOUT)).toEqual(["header", "echo", "link"]);
   expect(types.BLOCK_LAYOUT.header.fields.layout_hash).toEqual({ offset: 4, type: "u32" });
+  // Each section starts where the one before it ends.
+  const { header, echo, link } = types.BLOCK_LAYOUT;
+  expect([header.offset, echo.offset, link.offset]).toEqual([0, header.stride, header.stride + echo.stride]);
   const check: LayoutCheck = types.checkLayoutHash(new ArrayBuffer(0));
   expect(check.ok).toBe(false);
 });
