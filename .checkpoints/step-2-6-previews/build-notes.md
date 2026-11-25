@@ -158,3 +158,15 @@ GitHub (docs.github.com):
 - The order of his clicks: his words of 20:35 Amsterdam, item 5 ("The real token is my last click") put the GitHub
   settings (plan clicks 9 and 10) before the token clicks (6, 7, 8). The wall is not merged (main 07d673b0), so he is
   asked again before the token, as his item 5 says.
+
+## B9. His sitting, click 3 (2026-11-25, his screenshots after 21:33 UTC; no account ID or subdomain copied here)
+- His screenshots show the existing account (it holds the old test project shamble-preview-check), not a new
+  previews account: clicks 1 and 2 (Accounts, Create Account, "Shamble previews"; switch to it) come first.
+- Cloudflare's dashboard changed: "Create application" opens "Create an app" (GitHub, GitLab, Hello World, a template,
+  "Upload your static files": the Workers flow) with "Need to use the legacy Pages workflow? Continue to Pages" below.
+  A Pages project for direct upload: Continue to Pages, "Drag and drop your files", Get started. Docs: Direct Upload
+  (developers.cloudflare.com/pages/get-started/direct-upload/, "Last updated Apr 21, 2026"): "Select Create application
+  > Get started > Drag and drop your files . Enter your project name in the provided field and drag and drop your
+  assets. Select Deploy site ." Create account (developers.cloudflare.com/fundamentals/account/create-account/, "Last
+  updated Sep 17, 2026"): "go to Accounts", "Select Create Account . Enter an account name. Select Create Account ."
+  Eligibility: user at least seven days old, Super Administrator on an existing account, up to five extra Free accounts.
