@@ -182,6 +182,13 @@ CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge
 clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
 `docs/reports/2026-11-13-foundation-2-3-docs.md`. Step 2.3's plan followed on its branch and waits for his go.
 
+**Kit: the saver in stints while a night run waits on agents [2026-11-16 to 11-17, MERGED]** — night-shift-stints (PR
+#54, 82c605e, 2026-11-17 07:03:03 UTC by `merged_at`, by merge commit, on his go after the advisor's and the
+security-auditor's APPROVE WITH FINDINGS and the PR Advisor routine's APPROVE of 20f9d59; CI green on main): three lines
+at the end of `.claude/NIGHT_SHIFT.md` step 6, by his NS-STATUS (a) and his yes to the exact lines (NS-LINES (a)), the
+exception to KIT-FREEZE-2 for that one change; seven Lows deferred in writing (the archive's "Follow-ups"), two of them
+his NS-TRAILER and NS-FIRST, his (b): the kit's next change after the freeze.
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -230,6 +237,19 @@ clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
 **Guard fix: a wrapper's option values [2026-11-25, waiting for his go]** — guard-env-fix (PR #69, risk tier 2; SEC-U7B-1): the day guard reads env, nice and stdbuf options with their values, so git and gh behind them no longer skip its check;
 a form it cannot read asks the main session and refuses an agent; routines unchanged. Guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES; waits for the advisor agent's review of the final head and his go.
 
+**ADR 0006's small revision after the preview hosting check [2026-11-25, in flight]** — adr0006-header-row, by
+lane 2 (the chat he calls Builder V2), on his ONE-OFF-HEADER (a) and STEP4-COUNT (b) (docs only; an ADR draft, so his
+go): the header mark (PM-0006-2) is judged on production's own addresses, with the reason in the row; production's
+one-off links have the host's header recorded, not judged. Part 1 weighs Workers static assets in a short paragraph
+from Cloudflare's docs read 2026-11-25: nothing was measured on Workers, and in the draft Pages stays. The build-count
+question is said plainly to be not answered; the pass words of PM-0006-7 and checklist step 4 are re-stated as the
+advisor agent's reading of his STEP4-COUNT (b), never as his decision; part 1's "no cap on previews" is dated; his
+message of 2026-11-25, 11:07:07 UTC in `docs/DECISIONS.md`. Report `docs/reports/2026-11-25-adr0006-header-row.md`.
+PR #67. His answers of 2026-11-25 (14:55 Amsterdam): PASS-WORDS (a), with PM-0006-7 and checklist step 4 reported as
+"recorded, the question is not answered"; step 4 achieved (recorded, the question is not answered); WORKERS-NEXT
+(a), keep Pages. Main's #68 taken in by one
+merge commit; waits for the advisor agent's approval of that head and his go.
+
 **Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, waiting for his go]** — cs3b-loop-closes (the second
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the page's keys go to the
 Worker as posts, and a local server there answers through the real messages (five messages' codec, the transport
@@ -254,6 +274,8 @@ build count (no count shown anywhere) and his verdict on checklist step 4 are op
 that change no reading. Two review rounds on the build, the verifier PASS WITH NOTES on the evidence; report
 `docs/reports/2026-11-24-preview-hosting-check.md`. His answers of 2026-11-25 are in DECISIONS (a normal merge,
 by his HISTORY-ID (a)); waits for the advisor agent's review of its final head and his go.
+_Pointer (2026-11-25): merged as PR #66, 09faefa, 2026-11-25 11:10:11 UTC (`merged_at`), by merge commit, a normal
+merge on his go of 11:07:07 UTC (his HISTORY-ID (a)), with the expected head d7937de._
 
 **Change-set 3a of the build plan, Rules and boundaries [2026-11-24, MERGED]** — cs3a-rules-boundaries (the first
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the simulation's rules under
@@ -344,10 +366,3 @@ for #52 from merge commit 4460ef5's message; two pointers in "Queued"; STATUS, R
 true for main 82c605e. One review round (the verifier PASS; the advisor agent APPROVE WITH FINDINGS, Lows only) and one
 fix pass, then the advisor agent's APPROVE WITH FINDINGS of aea6f5b and the verifier's PASS. Merged: PR #55, c94c81b,
 2026-11-17 17:09:33 UTC by `merged_at`, by merge commit, on his go.
-
-**Kit: the saver in stints while a night run waits on agents [2026-11-16 to 11-17, MERGED]** — night-shift-stints (PR
-#54, 82c605e, 2026-11-17 07:03:03 UTC by `merged_at`, by merge commit, on his go after the advisor's and the
-security-auditor's APPROVE WITH FINDINGS and the PR Advisor routine's APPROVE of 20f9d59; CI green on main): three lines
-at the end of `.claude/NIGHT_SHIFT.md` step 6, by his NS-STATUS (a) and his yes to the exact lines (NS-LINES (a)), the
-exception to KIT-FREEZE-2 for that one change; seven Lows deferred in writing (the archive's "Follow-ups"), two of them
-his NS-TRAILER and NS-FIRST, his (b): the kit's next change after the freeze.
