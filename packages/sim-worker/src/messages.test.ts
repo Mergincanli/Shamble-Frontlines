@@ -5,12 +5,16 @@ test("local play is mode 0", () => {
   expect(MODE_LOCAL).toBe(0);
 });
 
+/** An input post with nothing held and no press; a test changes what it is about. */
+const INPUT: PageToWorker = { type: "input", post: 1, held: 0, p0: 0, p1: 0, p2: 0, p3: 0, returned: [] };
+
 test("every message the page may send is accepted", () => {
+  const full = 0xffff_ffff;
   const good: PageToWorker[] = [
     { type: "start", padBytes: 0 },
     { type: "start", padBytes: 65536 },
-    { type: "input", sequence: 0, returned: [] },
-    { type: "input", sequence: 0xffff_ffff, returned: [new ArrayBuffer(8), new ArrayBuffer(8)] },
+    { ...INPUT, post: 0 },
+    { type: "input", post: full, held: 0xffff, p0: full, p1: full, p2: full, p3: full, returned: [new ArrayBuffer(8), new ArrayBuffer(8)] },
     { type: "visibility", hidden: true },
     { type: "visibility", hidden: false },
     { type: "report-request" },
@@ -32,11 +36,19 @@ test("anything else is refused", () => {
     { type: "start", padBytes: 1.5 },
     { type: "start", padBytes: 0x1_0000_0000 },
     { type: "start", padBytes: "8" },
-    { type: "input", sequence: 1 },
-    { type: "input", sequence: -1, returned: [] },
-    { type: "input", sequence: 1.5, returned: [] },
-    { type: "input", sequence: 1, returned: [new Uint8Array(8)] },
-    { type: "input", sequence: 1, returned: "none" },
+    // The old shape, a post without one of its numbers, and each number outside its range.
+    { type: "input", sequence: 1, returned: [] },
+    { ...INPUT, returned: undefined },
+    ...["post", "held", "p0", "p1", "p2", "p3"].flatMap((name) => [
+      { ...INPUT, [name]: undefined },
+      { ...INPUT, [name]: -1 },
+      { ...INPUT, [name]: 1.5 },
+      { ...INPUT, [name]: 0x1_0000_0000 },
+      { ...INPUT, [name]: "1" },
+    ]),
+    { ...INPUT, held: 0x1_0000 },
+    { ...INPUT, returned: [new Uint8Array(8)] },
+    { ...INPUT, returned: "none" },
     { type: "visibility" },
     { type: "visibility", hidden: "yes" },
   ];
@@ -50,6 +62,7 @@ const STATS: WorkerStats = {
   drops: 0,
   droppedMs: 0,
   pauses: 0,
+  stalePosts: 0,
   // No tick has started yet, or no block was copied: a reading without samples is NaN, and that is a valid report.
   latenessP50: Number.NaN,
   latenessP99: 1.5,
@@ -67,7 +80,7 @@ const STATS: WorkerStats = {
 test("every message the Worker may send is accepted", () => {
   const good: WorkerToPage[] = [
     { type: "ready", blockBytes: 8, tickHz: 30 },
-    { type: "block", buffer: new ArrayBuffer(8), doneAt: 5_000_000.25 },
+    { type: "block", buffer: new ArrayBuffer(8), startAt: 5_000_000, doneAt: 5_000_000.25 },
     { type: "error", message: "" },
     { type: "error", message: "panicked at crates/sim/src/world.rs:42:14:\nattempt to add with overflow" },
     { type: "report", stats: STATS },
@@ -90,10 +103,13 @@ test("anything else from the Worker is refused", () => {
     { type: "ready", blockBytes: "8", tickHz: 30 },
     { type: "ready", blockBytes: 8, tickHz: 29.97 },
     { type: "ready", blockBytes: -8, tickHz: 30 },
-    { type: "block", buffer: new Uint8Array(8), doneAt: 0 },
+    { type: "block", buffer: new Uint8Array(8), startAt: 0, doneAt: 0 },
     { type: "block", buffer: new ArrayBuffer(8) },
-    { type: "block", buffer: new ArrayBuffer(8), doneAt: Number.NaN },
-    { type: "block", buffer: new ArrayBuffer(8), doneAt: Number.POSITIVE_INFINITY },
+    { type: "block", buffer: new ArrayBuffer(8), doneAt: 0 },
+    { type: "block", buffer: new ArrayBuffer(8), startAt: 0 },
+    { type: "block", buffer: new ArrayBuffer(8), startAt: 0, doneAt: Number.NaN },
+    { type: "block", buffer: new ArrayBuffer(8), startAt: Number.POSITIVE_INFINITY, doneAt: 0 },
+    { type: "block", buffer: new ArrayBuffer(8), startAt: "0", doneAt: 0 },
     { type: "error" },
     { type: "error", message: 42 },
     { type: "report" },
@@ -105,7 +121,7 @@ test("anything else from the Worker is refused", () => {
 
 test("the statistics are refused when one field is missing or of another kind, whichever field it is", () => {
   const names = Object.keys(STATS) as (keyof WorkerStats)[];
-  expect(names).toHaveLength(17);
+  expect(names).toHaveLength(18);
   for (const name of names) {
     const without: Record<string, unknown> = { ...STATS };
     delete without[name];

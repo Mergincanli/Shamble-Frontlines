@@ -127,6 +127,234 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 12:14:23 UTC: his browser check of change-set 3b in Firefox: clean; the hidden-tab
+  remark he made of Brave did not come again, in Firefox or in Brave** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 090be420-1a96-460f-a719-98a0739a5ecc, whole; extracted by script from the chat's
+  transcript). In his words: "Did some extra thorough spamming and testing, came in pretty clean." Of the hidden-tab
+  step in Firefox: "that it did work properly, unlike the brave one." And of Brave, tried again: "But when I tried
+  remaking the brave one, it didn't happen so I think it was either a 1 time flaw from my side and not an issue" The
+  Copy report he pasted follows whole. What it answers, in the chat's words (not his): Builder V3's message of
+  2026-11-25, about 11:41 UTC: the Firefox Copy report was still missing, and the question RESUME-FLASH (what the boxes
+  show in the first moment after a pause): (a) leave as built and settle it in change-set 4, (b) make the boxes go dark
+  the moment the tab hides, now. Records, not his words: the report is read line by line in
+  `docs/reports/2026-11-25-cs3b-browser-check.md`: Firefox 161 on Windows, backend WebGPU, commit 8f835d114, 4,786
+  ticks, messages refused 0, olderPosts 0, wrongKeys 0, presses 215 made and 215 echoed with 0 lost and 0 doubled,
+  releases 0 doubled, errors 0. The chat had asked him RESUME-FLASH (leave as built, or make the boxes go dark the
+  moment the tab hides); he named no letter, and the chat takes these words as: no change now. What the first picture
+  after a pause shows stays a follow-up, 3B-RESUME-FLASH, for change-set 4. Copied by script (2235 bytes, sha256
+  5046b4aaafd4d187783fac58fba3241c0251297dae4c596e18764254a693ae73):
+> Did the same for firefox (all steps):
+> > Did some extra thorough spamming and testing, came in pretty clean.
+> > I did however notice at Hold A, switch to another tab for 30 seconds, and come back: A is dark.
+> > that it did work properly, unlike the brave one.
+> But when I tried remaking the brave one, it didn't happen so I think it was either a 1 time flaw from my side and not an issue
+>
+> Shamble Frontlines, first page: report
+> backend: WebGPU
+> ticks: 4786 at 30 a second · blocks: 4786 of 44 bytes
+> frames: 179.8 a second · frame time 4.18 ms (p99 8.34 ms)
+> messages: sent 4785 · received 4786 · refused 0
+> presses: 215 made · 215 echoed · 0 lost · 0 doubled
+> errors: 0
+> last pause: 0.5 s hidden · ticks while hidden: 0 (a match that ran on: about 15)
+> isolation: no · commit: 8f835d114
+>
+> commit: 8f835d114
+> run: (none)
+> at: 2026-11-25T12:12:42.483Z
+> browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:161.0) Gecko/20100101 Firefox/161.0
+> display: 2048x1280 at 1.25x, 24 bit
+> hardwareConcurrency: 24
+> crossOriginIsolated: false
+> backend: WebGPU
+> adapter: (not given)
+> forceWebGL: false
+> webgpuOffered: true
+> timestampQuery: true
+> render.drawCalls: 3
+> render.triangles: 3
+> render.lines: 62
+> render.geometries: 3
+> render.textures: 3
+> render.programs: 6
+> tick: 4786
+> tickHz: 30
+> blocks: 4786
+> blockBytes: 44
+> inputPosts: 28497
+> messages.sent: 4785
+> messages.received: 4786
+> messages.refused: 0
+> postUsed: 28492
+> olderPosts: 0
+> wrongKeys: 0
+> keys.bound: W A S D Space Shift
+> presses.made: 215
+> presses.echoed: 215
+> presses.lost: 0
+> presses.doubled: 0
+> releases.made: 215
+> releases.echoed: 215
+> releases.doubled: 0
+> keyToTickP50: 30.00 ms
+> keyToTickP95: 49.00 ms
+> keyToTickCount: 392
+> frames: 28498
+> fps: 179.78
+> frameP50: 4.18 ms
+> frameP99: 8.34 ms
+> deliveryP50: 0.00 ms
+> deliveryP95: 0.00 ms
+> errors: 0
+> lastError: (none)
+> pauses: 3
+> lastPauseHiddenMs: 490
+> lastPauseTicksWhileHidden: 0
+> worker.ticks: 4780
+> worker.wakes: 5263
+> worker.maxTicksInOneWake: 1
+> worker.drops: 0
+> worker.droppedMs: 0
+> worker.pauses: 3
+> worker.stalePosts: 0
+> worker.latenessP50: 0.667
+> worker.latenessP99: 4.667
+> worker.latenessMax: 5
+> worker.copyP50: 0
+> worker.copyP99: 0
+> worker.blockBytes: 44
+> worker.poolMisses: 0
+> worker.poolRefused: 0
+> worker.undetached: 0
+> worker.hardwareConcurrency: 24
+> worker.crossOriginIsolated: false
+- **Taken by Mustafa, 2026-11-25, 11:38:37 UTC: RELEASE-COUNT: (a), accept as built, with two conditions; the order of
+  change-set 3b's last steps; his browser check in Brave, with one remark on the hidden-tab step** (the builder chat he
+  calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai
+  project "Shamble Frontlines ALT"; his message 1c462a05-585f-4152-955c-ff2492c2dada, whole; extracted by script from
+  the chat's transcript). His decision: "RELEASE-COUNT (how releases are counted for the presses mark PM-0002-12): (a),
+  accept as built." And: "No release counter is added in change-set 3c." His first condition: "the report keeps saying
+  that presses were counted by the row's own method and releases by working them out, and it calls no part of that mark
+  passed. The mark's numbers stay as the row has them." His second: "the two drafts are made to agree at their next
+  revision (ADR 0002 part 5's sentence about press and release edge counters, and the method cell of the row
+  PM-0002-12), with the reason written there. That revision comes to me before it is written. Put it on the follow-up
+  list under a name." On the last steps: "the last commit, your advisor agent's approval of exactly that commit,
+  GitHub's checks green on it. Then give me its full commit id in one line and push nothing after it." His remark on the
+  hidden-tab step in Brave: "it was actually still going until the moment I tabbed back." What it answers, in the chat's
+  words (not his): Builder V3's question of 2026-11-25, about 04:30 UTC (question-2026-11-25-browser-check.md): the
+  browser check of change-set 3b and RELEASE-COUNT. Records, not his words: he sent the five numbered points first at
+  11:07:13 UTC, without the check (the same text; his message 13b9e16f-570b-400f-b1d2-544d7ee0865e, 1,431 bytes, sha256
+  3e7f2bf0238516aa3fe385829569a9186872f7f743fa6ed3c367bebcb6a4f05e); the follow-up he asks for is named
+  3B-RELEASE-DRAFTS (STATUS and the archive); no draft is edited by change-set 3b. His Brave report is read line by line
+  in `docs/reports/2026-11-25-cs3b-browser-check.md`: every number he was asked to check is 0. The chat's reading of his
+  remark, from the code: the match stands still while the tab is hidden, the box shows the server's last echo, and the
+  first tick after the return lets the key go, so the picture from before the pause can show for about a thirtieth of a
+  second. Copied by script (4879 bytes, sha256 76f8c4f841dda18886a8077bc418b5dd1f2bd1424e955d6b39aef27d5407d30b):
+> For Builder V3, from me, written with my main Advisor (25 November, 12:15 Amsterdam).
+>
+> 1. RELEASE-COUNT (how releases are counted for the presses mark PM-0002-12): (a), accept as built. The messages carry press counters only, as ADR 0001 part 5 has it, and releases are worked out from the presses and the held keys. No release counter is added in change-set 3c.
+> 2. Two conditions. First: the report keeps saying that presses were counted by the row's own method and releases by working them out, and it calls no part of that mark passed. The mark's numbers stay as the row has them. Second: the two drafts are made to agree at their next revision (ADR 0002 part 5's sentence about press and release edge counters, and the method cell of the row PM-0002-12), with the reason written there. That revision comes to me before it is written. Put it on the follow-up list under a name.
+> 3. My browser check comes in my next message: the Copy reports from Brave and from Firefox.
+> 4. After my check, as your question file says: the last commit, your advisor agent's approval of exactly that commit, GitHub's checks green on it. Then give me its full commit id in one line and push nothing after it. My main Advisor opens the pull request from pr-title.txt and pr-body.md and checks it, and I tap the merge.
+> 5. On the board, set your thread back to doing now, and to done after the merge.
+>
+> Answer in at most 6 lines. Plain words, as before.
+>
+> your request: (all done, except 1 which I will comment under >)
+> The browser check, about 20 minutes, Brave first and then Firefox once, with the zip above. Its README.txt has the ten steps. In short:
+> Unzip, run node serve.mjs in the folder, and open http://127.0.0.1:4173 in Brave with the window in front. You should see the grey ground, six boxes at the bottom left (W, A, S, D, Space, Shift), "errors: 0" and the commit 8f835d114.
+> Hold W: its box lights a moment later and stays lit. Let go: it goes dark.
+> Press S, D, left Shift and right Shift in turn: each lights only its own box.
+> Tap Space ten times: "presses" ends with the same number made and echoed, "0 lost" and "0 doubled".
+> Hold D, click on another window, let go of D there, and click back: D is dark.
+> Hold A, switch to another tab for 30 seconds, and come back: A is dark.
+> >I did this and switched to another tab on the same browser, but when I opened it back again I could see for a very split second that it was still going on and that it got reset after I had tabbed back, but it was actually still going until the moment I tabbed back.
+> Cover Brave's window for a minute, then bring it back.
+> Leave it 2 minutes, press "Copy report" and paste the result here. These should all be 0: messages.refused, olderPosts, wrongKeys, presses.lost, presses.doubled, releases.doubled.
+> In Firefox: steps 2 to 5 once, wait 2 minutes, "Copy report", and paste it here.
+> Anything else you see is what the check is for: paste what you see.
+>
+> report: (I have pressed a bit more and did some extra checks)
+> Shamble Frontlines, first page: report
+> backend: WebGPU
+> ticks: 5528 at 30 a second · blocks: 5528 of 44 bytes
+> frames: 134.5 a second · frame time 5.60 ms (p99 20.70 ms)
+> messages: sent 5527 · received 5528 · refused 0
+> presses: 215 made · 215 echoed · 0 lost · 0 doubled
+> errors: 0
+> last pause: 3.2 s hidden · ticks while hidden: 0 (a match that ran on: about 96)
+> isolation: no · commit: 8f835d114
+>
+> commit: 8f835d114
+> run: (none)
+> at: 2026-11-25T11:17:19.017Z
+> browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36
+> display: 2560x1440 at 1.25x, 24 bit
+> hardwareConcurrency: 11
+> crossOriginIsolated: false
+> backend: WebGPU
+> adapter: (not given)
+> forceWebGL: false
+> webgpuOffered: true
+> timestampQuery: true
+> render.drawCalls: 3
+> render.triangles: 3
+> render.lines: 62
+> render.geometries: 3
+> render.textures: 3
+> render.programs: 6
+> tick: 5528
+> tickHz: 30
+> blocks: 5528
+> blockBytes: 44
+> inputPosts: 31944
+> messages.sent: 5527
+> messages.received: 5528
+> messages.refused: 0
+> postUsed: 31941
+> olderPosts: 0
+> wrongKeys: 0
+> keys.bound: W A S D Space Shift
+> presses.made: 215
+> presses.echoed: 215
+> presses.lost: 0
+> presses.doubled: 0
+> releases.made: 215
+> releases.echoed: 215
+> releases.doubled: 0
+> keyToTickP50: 21.50 ms
+> keyToTickP95: 44.80 ms
+> keyToTickCount: 422
+> frames: 31945
+> fps: 134.46
+> frameP50: 5.60 ms
+> frameP99: 20.70 ms
+> deliveryP50: 0.00 ms
+> deliveryP95: 0.20 ms
+> errors: 0
+> lastError: (none)
+> pauses: 1
+> lastPauseHiddenMs: 3200
+> lastPauseTicksWhileHidden: 0
+> worker.ticks: 5522
+> worker.wakes: 5524
+> worker.maxTicksInOneWake: 1
+> worker.drops: 0
+> worker.droppedMs: 0
+> worker.pauses: 1
+> worker.stalePosts: 0
+> worker.latenessP50: 1.967
+> worker.latenessP99: 14.067
+> worker.latenessMax: 15.800
+> worker.copyP50: 0
+> worker.copyP99: 0.100
+> worker.blockBytes: 44
+> worker.poolMisses: 0
+> worker.poolRefused: 0
+> worker.undetached: 0
+> worker.hardwareConcurrency: 11
+> worker.crossOriginIsolated: false
 - **Taken by Mustafa, 2026-11-25, 00:22:09 UTC: his answers to the last two questions of the preview hosting check's
   report: DEPARTURES item (5) (a), the pictures stay out of the repository, the pull-request page's picture among them;
   HISTORY-ID (a), a normal merge of #66; his main Advisor checked head cbddbbfe402a95481ba8f2ba8c54fbd6a49139a7; these
@@ -191,6 +419,33 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 5. I switch off the test repository's hourly checker myself before 2 December.
 >
 > Answer in at most 8 lines. Use plain words with me: no tag or code without its explanation in the same sentence.
+- **Taken by Mustafa, 2026-11-24, 23:24:50 UTC: the chat is compacted; the build plan's third sentence on command timing
+  (its risk 8): (a), changed with the other two; build change-set 3b by the plan under the advisor agent's eight
+  conditions, without waiting for him** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a
+  Claude Code chat on the account that also holds his claude.ai project "Shamble Frontlines ALT"; his message
+  fad04f54-c142-4455-8acf-6888e0e99553, whole; extracted by script from the chat's transcript). His answer on the third
+  sentence: "The third sentence in the build plan (its risk 8): (a). Change it with the other two in 3b's docs pass, and
+  show me all three old and new sentences in your report." On the build: "If the card, the repo and the summary
+  disagree, or something is missing, say what and stop. Otherwise build change-set 3b by the plan under your advisor
+  agent's eight conditions, without waiting for me." On the size and the browser tests: "If the size passes 4,900 lines,
+  the ladder applies as you described: tell me in three lines before a part moves. Time the browser tests before the
+  first push, as you said." He dated the message 25 November; the chat's clock read 2026-11-24, 23:24:50 UTC. What it
+  answers, in the chat's words (not his): the chat's message of 2026-11-24, 23:12 UTC (the advisor agent's read of his
+  three items; the question about the build plan's third sentence on command timing; the recommendation to compact)
+  Records, not his words: the card, the repository and the summary agreed (the branch at 8e3c0a75, main 28254a73, the
+  session record: model `claude-fable-5-2`, permission mode `auto`, context about 11 %); the three old and new sentences
+  stand in change-set 3b's report; the size passed 4,900 lines and the ladder applied: he was told in three lines on
+  2026-11-24, about 23:56 UTC, before a part moved, and the link simulator and the first recording are change-set 3c's;
+  the browser tests were timed on a clean copy before the push whose run counts as evidence (16 tests in 3.4 of 5
+  minutes, there and on GitHub). Copied by script (1043 bytes, sha256
+  4da9ba906c0be8213ecaa61f5adc67ab5512b5c15fe667c507735ec7b6046f73):
+> The compact is done. For Builder V3, from me, written with my main Advisor (25 November).
+>
+> 1. Rebuild from the repository, not from memory: read CLAUDE.md, your resume card (.checkpoints/cs3b-loop-closes.md) and what its "Next steps" name. Check git status and your branch against origin and main. Read your session's model and mode.
+> 2. The third sentence in the build plan (its risk 8): (a). Change it with the other two in 3b's docs pass, and show me all three old and new sentences in your report.
+> 3. Tell me in at most 6 lines where you stand and what you build first. If the card, the repo and the summary disagree, or something is missing, say what and stop. Otherwise build change-set 3b by the plan under your advisor agent's eight conditions, without waiting for me.
+> 4. If the size passes 4,900 lines, the ladder applies as you described: tell me in three lines before a part moves. Time the browser tests before the first push, as you said.
+> 5. A short block for the agent board may follow from me. Install nothing for it on your own.
 - **Taken by Mustafa, 2026-11-24, 23:16:11 UTC: in his words, "I want lane 2 building the game now, beside lane 1" (lane
   1 is Builder V3, on his third account: change-set 3a merged as #65, 3b next; lane 1's CI edits now go to a separate
   chat, CI Builder); lane 2 reads Part 15 and STATUS again and answers in at most 12 lines what step 2.6 still needs and
@@ -211,6 +466,59 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 >    b. which of your units can start now under Part 15 as it stands (the carry of my look decisions, the comparisons that stay);
 >    c. what of change-set 6 (Look) and M (the first model) you could build before change-set 5 is merged without touching lane 1's folders, for example the look on a test page of its own or the model checks as a tool, what that needs from lane 1, and what it would change in Part 15. That part is my decision. Build nothing of it before my yes.
 > 3. Read and answer only. Change no file and push nothing for this. Nothing else changes: one pull request at a time per lane, every file has one owner, the kit stays frozen. Use plain words with me: no tag or code without its explanation in the same sentence.
+- **Taken by Mustafa, 2026-11-24, 22:59:49 UTC: where his decisions of 21 and 22 November stand: on the netcode test's
+  branch, not on main; the chat may read them there with git show, read only** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 172046ad-6b3e-4f62-9409-b0b7fd01d20c, whole; extracted by script from the chat's
+  transcript). In his words: "The decisions you could not find are recorded on the netcode test's branch, not on main:
+  branch claude/netcode-proof-test-plan-hcky5g, file .checkpoints/netcode-proof-test/history.md, lines 7561 to 7607
+  (NPT-TRIM of 21 November and my answers to the re-plan of 22 November), and
+  .checkpoints/netcode-proof-test/moved-block.md, the part "FOR CHANGE-SET 3 ITSELF"." How to read them: "Read them with
+  git show, read only. That is not the spikes/ folder." And: "My message with the three items is my word either way."
+  What it answers, in the chat's words (not his): the chat's sentence of 22:50:20 UTC that the decisions register on
+  main has no entry of 21 or 22 November, so it could not read the decisions his message of 22:44:50 UTC names Records,
+  not his words: a pointer, not a copy: the chat read those lines on 2026-11-24, 23:00 UTC, at that branch's head
+  e8e276f0bf8b201f6a4db3b59315ac6de4c84a04 (fetched by name; nothing is ever pushed there). They are not copied onto
+  main here: his decisions of 21 and 22 November stay recorded where he recorded them, and reach main with that branch.
+  What they say for change-set 3 is the same three items as his message of 22:44:50 UTC (the entry below). Copied by
+  script (510 bytes, sha256 9533874d4ff50082bcee8326d56890f090a937253a8f8fc4f0dbe621cc9906e6):
+> For Builder V3, from me. The decisions you could not find are recorded on the netcode test's branch, not on main: branch claude/netcode-proof-test-plan-hcky5g, file .checkpoints/netcode-proof-test/history.md, lines 7561 to 7607 (NPT-TRIM of 21 November and my answers to the re-plan of 22 November), and .checkpoints/netcode-proof-test/moved-block.md, the part "FOR CHANGE-SET 3 ITSELF". Read them with git show, read only. That is not the spikes/ folder. My message with the three items is my word either way.
+- **Taken by Mustafa, 2026-11-24, 22:44:50 UTC: #65 (change-set 3a) is merged, by his main Advisor on his tap, with the
+  expected head 1624f08; the next CI edit is an Opus 5.5 chat's; next is change-set 3b, with three items first: the
+  decoder test at its row's count, command timing picked by Slice 3 and no longer by the proof test, and the link
+  simulator built by the plan** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code
+  chat on the account that also holds his claude.ai project "Shamble Frontlines ALT"; his message
+  4c185bad-ef83-4c3d-aee3-7fd23996d981, whole; extracted by script from the chat's transcript). The merge, in his words:
+  "My main Advisor marked it ready and merged it on my tap of 22:40:00 UTC, with your commit
+  1624f084924976f4bde8556509c957e1f4634341 as the expected head." And: "That tap was my go. I typed no go line in your
+  chat. Record it by script from this message." On CI: "Which model writes the next CI edit: (a). An Opus 5.5 chat
+  writes the small CI pull request, as my rule of 12 November says. You write no CI file." The decoder test's bar: "Its
+  bar is its row in ADR 0001, exactly as written: 10 million random and mutated inputs per message type, 0 panics and 0
+  allocations above the size limits, and its planted bug (an unchecked index in one decoder) is found within the run."
+  and "Until then your report says the mark has started, never that it passed." On command timing: "The proof test no
+  longer picks it. Slice 3 picks it, and change-set 7 still builds both ways. My go: with 3b's docs pass, the build
+  plan's two places that say the proof test chooses say this instead." On the link simulator: "If the ladder moves the
+  link simulator out of 3b, tell me before anyone builds it a second time." What it answers, in the chat's words (not
+  his): the chat's two questions of 22:00:05 UTC: his go for the merge of #65 at commit
+  1624f084924976f4bde8556509c957e1f4634341 (answered by point 1: his tap in his main Advisor's thread was his go; he
+  typed no go line in this chat), and which model writes the next CI edit (answered by point 2: (a), an Opus 5.5 chat).
+  Points 3 and 4 answer nothing the chat asked: they set what comes before change-set 3b's first edit Records, not his
+  words: main is 28254a73ab226379373e380eeee64336e58ef916 (2026-11-24, 22:40:39 UTC; its parents 1ec6f6c3 and 1624f084);
+  gate, smoke and toolchain were green on it (read 22:45 UTC). The advisor agent read the three items against the plan
+  on that main and approved building 3b under eight conditions; the chat answered in six lines. In change-set 3b the
+  decoder test runs at the row's count for the five message types and the report says the mark has started; the build
+  plan's sentences on command timing were changed with 3b's docs pass (three, by his answer of 23:24:50 UTC above); the
+  size ladder moved the link simulator to change-set 3c, and he was told before anyone built it. Copied by script (2601
+  bytes, sha256 f654912dcacc5eae1d9e24c4db5146dca211870b58eb89e73cc490a01a671820):
+> For Builder V3, from me, written with my main Advisor (24 November).
+>
+> 1. #65 is merged. My main Advisor marked it ready and merged it on my tap of 22:40:00 UTC, with your commit 1624f084924976f4bde8556509c957e1f4634341 as the expected head. Main is now 28254a73ab226379373e380eeee64336e58ef916, with gate, smoke and toolchain green on it. That tap was my go. I typed no go line in your chat. Record it by script from this message.
+> 2. Which model writes the next CI edit: (a). An Opus 5.5 chat writes the small CI pull request, as my rule of 12 November says. You write no CI file. If that holds up 3b anywhere, tell me in three lines.
+> 3. Next is 3b, "The loop closes". Three items from my Advisor come first. They are from the netcode test's list of marks that moved to the real game (my decisions of 21 and 22 November):
+>    a. The decoder test (the moved mark PM-0001-34, "No decoder panics or over-allocates"). Its bar is its row in ADR 0001, exactly as written: 10 million random and mutated inputs per message type, 0 panics and 0 allocations above the size limits, and its planted bug (an unchecked index in one decoder) is found within the run. Your plan has 100,000 random and 100,000 mutated inputs per decoder. In 3b the test reaches the row's count and both zeros for every message type 3b adds, with seeded inputs and a counting allocator of our own. No new tool or package in 3b. The row names cargo-fuzz, and whether that tool joins is my decision later. Until then your report says the mark has started, never that it passed.
+>    b. How commands are timed at the server (OQ-0001-6: run on arrival, or buffered one per tick). The proof test no longer picks it. Slice 3 picks it, and change-set 7 still builds both ways. My go: with 3b's docs pass, the build plan's two places that say the proof test chooses say this instead. Show me the old and the new sentences in your report.
+>    c. The link simulator. The proof test offers its own (seeded delay, jitter, loss and reordering with a packet-fate log, no rate limit and no duplication). My Advisor's lean: 3b builds its own as planned, because you never open spikes/, nothing may import from it, and the offered one lacks two things your plan lists. The choice is your plan's. If the ladder moves the link simulator out of 3b, tell me before anyone builds it a second time.
+> 4. Before 3b's first edit, your advisor agent reads these three against the plan on today's main. Then tell me in at most 6 lines what changes in size, whether anything in the plan no longer holds, and whether this chat should be compacted before the build starts.
 - _A pointer, not a decision: **his browser check of change-set 3a's zip, 2026-11-24, 21:48:49 UTC.** One chat message
   (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also
   holds his claude.ai project "Shamble Frontlines ALT"; his message b5bb0503-5aef-45fc-b832-6bc2a147b40c; 4451 bytes of

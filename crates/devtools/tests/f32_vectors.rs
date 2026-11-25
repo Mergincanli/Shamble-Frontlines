@@ -102,7 +102,7 @@ fn a_changed_file_is_found_and_named() {
     assert!(
         check(&inputs[4..], &expected)
             .expect_err("a short file")
-            .contains("120572 input bytes")
+            .contains("120860 input bytes")
     );
     let short = expected.replace(sqrt_line, "#");
     assert!(

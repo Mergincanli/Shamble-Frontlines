@@ -5,5 +5,10 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+# The simulation it runs and the messages it reads and writes (ADR 0002 part 3): our own crates, by path.
+[dependencies]
+protocol = { path = "../protocol" }
+sim = { path = "../sim" }
+
 [lints]
 workspace = true
