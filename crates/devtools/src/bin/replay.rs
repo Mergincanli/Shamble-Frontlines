@@ -35,7 +35,11 @@ fn run(arguments: &[&str]) -> Result<String, String> {
             let text = |path: &str| Ok::<_, String>(String::from_utf8_lossy(&read(path)?).into_owned());
             match field_diff(&text(expected)?, &text(got)?) {
                 differing if differing.is_empty() => Ok("the two states agree, field for field\n".to_owned()),
-                differing => Err(differing.join("\n")),
+                // Escaped: a print from someone else's machine must not reach the terminal as control characters.
+                differing => {
+                    let escaped = differing.iter().map(|line| line.escape_debug().to_string());
+                    Err(escaped.collect::<Vec<_>>().join("\n"))
+                }
             }
         }
         ["state", rec, tick] => {

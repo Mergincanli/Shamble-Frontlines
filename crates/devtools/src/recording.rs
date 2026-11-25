@@ -260,7 +260,8 @@ impl Recording {
             content_hash,
             map_id,
         } = &self.header;
-        let mut bytes = Vec::with_capacity(self.steps.len().saturating_mul(STEP_BYTES));
+        let steps = self.steps.len().saturating_mul(STEP_BYTES);
+        let mut bytes = Vec::with_capacity(steps.saturating_add(87 + MAX_MAP_ID_BYTES));
         bytes.extend_from_slice(&MAGIC);
         bytes.extend_from_slice(&VERSION.to_le_bytes());
         bytes.extend_from_slice(seed);

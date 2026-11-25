@@ -12,7 +12,7 @@ const FNV_PRIME: u64 = 0x0000_0100_0000_01B3;
 /// FNV-1a, 64 bits (RFC 9923), fed in pieces: the digest of all the bytes written so far, as one byte string. It
 /// reads bytes only, never a length or a `usize`, so the digest is the same on 32-bit and 64-bit targets. A plain
 /// struct and not `core::hash::Hasher`, whose own types write lengths and machine-sized numbers into it.
-pub struct Fnv1a64(u64);
+pub(crate) struct Fnv1a64(u64);
 
 impl Fnv1a64 {
     #[must_use]

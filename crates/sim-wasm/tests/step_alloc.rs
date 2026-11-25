@@ -103,7 +103,7 @@ fn a_tick_of_the_local_match_takes_no_memory_once_the_match_is_warm() {
     );
 
     // Ten minutes of ticks at 30 a second: not one more. The shared hash is read after every tick, as a replay
-    // reads it: it takes no memory either, from its first call on (its buffer was reserved with the room).
+    // reads it: it takes no memory either, from its first call on (it has no buffer).
     let before = TAKEN.get();
     let mut hashes = 0u64;
     for number in 3..18_003 {

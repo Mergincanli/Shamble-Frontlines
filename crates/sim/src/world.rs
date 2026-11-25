@@ -18,6 +18,7 @@ pub const BUTTONS: usize = 16;
 pub const SHARED_STATE_BYTES: usize = 4 + 2 + BUTTONS;
 
 /// The length of the whole state's canonical bytes: the shared state, then the seed.
+#[cfg(test)]
 const STATE_BYTES: usize = SHARED_STATE_BYTES + SEED_BYTES;
 
 /// What the authority starts a match from. There is no `Debug`: the seed is never printed or logged (ADR 0004 part
@@ -187,7 +188,9 @@ impl World {
     }
 
     /// Writes the canonical bytes of the whole state into `out`, replacing what it held: the shared state's bytes,
-    /// then the authority's, so the shared state is a prefix.
+    /// then the authority's, so the shared state is a prefix. For this file's tests only: nothing else is handed
+    /// the seed's bytes.
+    #[cfg(test)]
     pub fn write_state(&self, out: &mut Vec<u8>) {
         out.clear();
         out.reserve(STATE_BYTES);

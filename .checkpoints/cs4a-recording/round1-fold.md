@@ -186,3 +186,21 @@ a link (with `first-loop.rec` linked to an endless device a test reads until mem
 refuses such a link, so CI cannot go green with one, and the exposure is a test run on a hostile branch. Its fix is a
 repository-wide "no tracked links" check: a gate change, risk tier 2, a follow-up for the quality gate step (2.3).
 Its conditions C1 to C4 stay follow-ups for the change-sets it named.
+
+## engine-architect: APPROVE; all five of its findings fixed (`engine-architect-r2.md`)
+The export's surface, measured again on the built file: 3 imports before and after; 18 exports before, 19 after, the
+one new being `sim_shared_hash`; one definition and no caller in the production Worker's bundle; none of the reader's
+strings in either built page. It agrees with making `World::write_state` and `STATE_BYTES` test-only (R2-2): neither
+4c nor change-set 7 needs them public.
+| # | Severity | Finding | Decision |
+|---|---|---|---|
+| E2-1 | Low, nit | `Fnv1a64` is public and has no user outside the simulation crate | Fix, 1 line: `pub(crate)` |
+| E2-2 | follow-up | `SHARED_STATE_BYTES` lost its last user outside the crate; 4c turns it into a length per match | 4c: drop the re-export then |
+| E2-3 | follow-up | Once `write_state` is test-only, `secret` is the only public way seed bytes leave the crate: a wrapper that outside readers can only count would make the seed rule one the types enforce (about 10 lines) | 4c, or change-set 8 at the latest |
+| E2-4 | a question for Mustafa, no fix | The replay spec needs no WebGL: one line in the browser tests' setup would run the recording in Firefox too; that widens his FIREFOX-SOURCE decision, so it needs his word | The report's "Decisions needed" (FIREFOX-REPLAY) |
+
+## Round 2's verdicts: five of five APPROVE; no Critical, High or Medium open
+The small fixes that ride in the next push (about 12 lines): R2-1 (a stale comment), R2-2 (`write_state` and
+`STATE_BYTES` test-only), the two nits (a long comment line; the writer's reserve), SA2-1 (the field comparison's
+print is escaped), E2-1 (`Fnv1a64` is `pub(crate)`), and T2-1 in the notes script. No reviewer round follows them: the
+verifier and the advisor agent read the final head.

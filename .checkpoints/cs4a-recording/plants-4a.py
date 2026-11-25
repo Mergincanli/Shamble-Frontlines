@@ -131,9 +131,10 @@ def plants(original, wanted):
         script = ("import('./.gate/rules-module/release/devtools.js').then((g)=>{const fs=require('node:fs');"
                   "g.initSync({module:fs.readFileSync('.gate/rules-module/release/devtools_bg.wasm')});"
                   f"process.stdout.write(g.replay_state_at(fs.readFileSync('{REC}'),600));}})")
-        _, wasm_state = run("node", "-e", script)
+        wasm_state = subprocess.run(("node", "-e", script), capture_output=True, text=True, env=ENV).stdout
         open(".gate/plants-state-native.txt", "w").write(native_state)
-        open(".gate/plants-state-wasm.txt", "w").write("\n".join(wasm_state.splitlines()[:-1]) + "\n")
+        # Node's own output only (no warning text), and without the vector line the test module adds after the state.
+        open(".gate/plants-state-wasm.txt", "w").write("".join(line + "\n" for line in wasm_state.splitlines() if not line.startswith("tick 600 shared bytes")))
         text = caught("E", "the tool names the field (the native state against the test module's)", tool("fields", ".gate/plants-state-native.txt", ".gate/plants-state-wasm.txt"), ["player.presses: expected"])
         OUT.append(("detail", True, "    " + " | ".join(line for line in text.splitlines() if line.startswith("player."))[:300]))
     if "F" in wanted:

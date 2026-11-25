@@ -1,6 +1,7 @@
 //! The scripts the recordings are made from (ADR 0002 part 8). A recording is never captured from play: it is made
 //! by a function here, with whole numbers and no clock (a step's host time is one exact division of a whole number
-//! of microseconds), so making it again is one exact command and gives the same bytes on any machine. The committed files are these functions' output (`files`), checked on every test run.
+//! of microseconds), so making it again is one exact command and gives the same bytes on any machine. The committed
+//! files are these functions' output (`files`), checked on every test run.
 
 use sim::{SEED_BYTES, TICK_HZ};
 
