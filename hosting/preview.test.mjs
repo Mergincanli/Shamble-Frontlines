@@ -4,6 +4,7 @@
 // planted defect that must turn it red.
 import { after, describe, test } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
@@ -143,6 +144,10 @@ describe('the patterns', () => {
     assert.throws(() => setOutput(h.io, 'url', `${LINK}\ngo=true`, PATTERNS.link), Refusal);
     assert.equal(h.output(), `url=${LINK}\n`);
   });
+  test('planted: a relative GITHUB_OUTPUT is refused', () => {
+    const h = harness({ env: { GITHUB_OUTPUT: 'relative/github-output' } });
+    assert.throws(() => setOutput(h.io, 'go', 'true', PATTERNS.go), Refusal);
+  });
   test('an annotation escapes "%", so outside text cannot spell a line break for the runner', async () => {
     const h = harness({ env: { RUNNER_TEMP: fresh('t'), DOWNLOAD: '%0A::error::planted' }, root: mainCheckout() });
     assert.equal(await run('check-build', h.io), 0);
@@ -268,6 +273,16 @@ describe('check-build', () => {
     assert.ok(fs.readFileSync(join(t, 'site-checked', '_headers')).equals(HEADERS));
     assertSafe(h.lines);
   });
+  test('planted: 20,000 files pass the first look, but not with main\'s header file added: refused, go=false', async () => {
+    const t = fresh('t');
+    const raw = join(t, 'site-raw');
+    writeTree(raw, { 'index.html': 'x' });
+    fs.mkdirSync(join(raw, 'assets'));
+    for (let i = 1; i < MAX_FILES; i += 1) fs.writeFileSync(join(raw, 'assets', `f${i}.js`), '');
+    const h = harness({ env: env(t, 'success'), root: mainCheckout() });
+    assert.equal(await run('check-build', h.io), 1);
+    assert.equal(h.output(), 'go=false\n');
+  });
   for (const planted of ['_headers', '_worker.js', 'functions/index.js', '.env']) {
     test(`planted ${planted} in the build: refused, go=false, nothing copied`, async () => {
       const t = fresh('t');
@@ -325,6 +340,18 @@ describe('find-pr', () => {
       assert.equal(h.output(), '');
     }
   });
+  test('planted: a listed pull request whose state is not open is ignored', async () => {
+    const h = harness({ env: env(), fetch: githubWith([[{ ...pull(12, SHA), state: 'closed' }]]) });
+    assert.equal(await run('find-pr', h.io), 0);
+    assert.equal(h.output(), '');
+  });
+  test('planted: more than 10 full pages of pull requests: a visible failure, nothing written', async () => {
+    const full = Array.from({ length: 100 }, (_, i) => pull(1000 + i, NEWER));
+    const h = harness({ env: env(), fetch: githubWith(Array.from({ length: 11 }, () => full)) });
+    assert.equal(await run('find-pr', h.io), 1);
+    assert.equal(h.fetch.calls.length, 10);
+    assert.equal(h.output(), '');
+  });
   test('planted: two pull requests share the commit: nothing written', async () => {
     const h = harness({ env: env(), fetch: githubWith([[pull(12, SHA), pull(16, SHA)]]) });
     assert.equal(await run('find-pr', h.io), 0);
@@ -338,12 +365,20 @@ describe('find-pr', () => {
 });
 
 describe('verify-token', () => {
-  const cloudflareWith = ({ status = 'active', expires = '2027-02-23T23:00:00Z', record = {} } = {}) => fakeFetch([
+  const cloudflareWith = ({ status = 'active', expires = '2027-02-23T23:00:00Z', record = {}, verifyHttp = 200, verifyOk = true,
+    projectHttp = 200, projectOk = true } = {}) => fakeFetch([
     [/^GET https:\/\/api\.cloudflare\.com\/client\/v4\/accounts\/0123456789abcdef0123456789abcdef\/tokens\/verify$/,
-      () => ({ json: { success: true, errors: [], result: { id: 'x', status, not_before: '2026-11-26T00:00:00Z', expires_on: expires } } })],
+      () => ({ status: verifyHttp, json: { success: verifyOk, errors: [], result: { id: 'x', status, not_before: '2026-11-26T00:00:00Z', expires_on: expires } } })],
     [/^GET https:\/\/api\.cloudflare\.com\/client\/v4\/accounts\/0123456789abcdef0123456789abcdef\/pages\/projects\/shamble-previews$/,
-      () => ({ json: { success: true, errors: [], result: { name: 'shamble-previews', subdomain: SUB, production_branch: 'main', ...record } } })],
+      () => ({ status: projectHttp, json: { success: projectOk, errors: [], result: { name: 'shamble-previews', subdomain: SUB, production_branch: 'main', ...record } } })],
   ]);
+  test('planted: an answer with HTTP 401 or success false is refused, though its body says "active"', async () => {
+    for (const planted of [{ verifyHttp: 401 }, { verifyOk: false }, { projectHttp: 404 }, { projectOk: false }]) {
+      const t = fresh('t');
+      assert.equal(await run('verify-token', harness({ env: env(t), fetch: cloudflareWith(planted) }).io), 1, JSON.stringify(planted));
+      assert.ok(!fs.existsSync(join(t, 'preview-subdomain')));
+    }
+  });
   const env = (t, extra = {}) => ({ RUNNER_TEMP: t, PROJECT: 'shamble-previews', CLOUDFLARE_API_TOKEN: TOKEN, CLOUDFLARE_ACCOUNT_ID: ACCOUNT, ...extra });
   test('an active token: its status and dates printed, never the token or the account; the address saved', async () => {
     const t = fresh('t');
@@ -420,6 +455,12 @@ describe('read-url', () => {
       assertSafe(h.lines);
     });
   }
+  test('planted: an upload id of the wrong shape, even when the one-off address matches it', async () => {
+    const id = 'ZZZZZZZZ-0a85-43d1-8b1f-cd80c0e1d61c';
+    const h = harness({ env: env(record([detailed({ deployment_id: id, url: `https://ZZZZZZZZ.${SUB}` })])) });
+    assert.equal(await run('read-url', h.io), 1);
+    assert.equal(h.output(), '');
+  });
   test('planted: a saved address of the wrong shape', async () => {
     assert.equal(await run('read-url', harness({ env: env(record([detailed()], 'evil.example.com')) }).io), 1);
   });
@@ -474,6 +515,27 @@ describe('check-headers', () => {
     assert.equal(await run('check-headers', h.io), 0);
     assert.equal(h.fetch.calls.length, 6);
   });
+  test('a 503, then a 403 with error 1010, are asked again; the third answer is judged', async () => {
+    let n = 0;
+    const h = harness({ env: { RUNNER_TEMP: site(), URL: LINK }, root: mainCheckout(), fetch: host((p, r) => {
+      if (p !== '/') return r;
+      n += 1;
+      return n === 1 ? { status: 503, headers: {} } : n === 2 ? { status: 403, headers: {}, text: 'error code: 1010' } : r;
+    }) });
+    assert.equal(await run('check-headers', h.io), 0);
+    assert.equal(h.fetch.calls.filter((c) => c.url === `${LINK}/`).length, 3);
+  });
+  test('planted: a 503 that stays is asked five times, then fails', async () => {
+    const h = harness({ env: { RUNNER_TEMP: site(), URL: LINK }, root: mainCheckout(),
+      fetch: host((p, r) => (p === '/' ? { status: 503, headers: {} } : r)) });
+    assert.equal(await run('check-headers', h.io), 1);
+    assert.equal(h.fetch.calls.filter((c) => c.url === `${LINK}/`).length, 5);
+  });
+  test('planted: the build\'s file list holds a refused file: refused before any call', async () => {
+    const h = harness({ env: { RUNNER_TEMP: site({ ...BUILD, _redirects: '/* https://evil.example 302' }), URL: LINK }, root: mainCheckout(), fetch: host() });
+    assert.equal(await run('check-headers', h.io), 1);
+    assert.equal(h.fetch.calls.length, 0);
+  });
   test('planted: a link of the wrong shape is refused before any call', async () => {
     const h = harness({ env: { RUNNER_TEMP: site(), URL: 'https://pr-12.evil.example' }, root: mainCheckout(), fetch: host() });
     assert.equal(await run('check-headers', h.io), 1);
@@ -494,18 +556,49 @@ describe('check-headers', () => {
 describe('comment', () => {
   const env = (extra = {}) => ({ GH_TOKEN: GH, REPO, PR: '12', SHA, URL: LINK, DEPLOY: 'success', HEADERS: 'success', GITHUB_RUN_ID: '45690000001', ...extra });
   const marked = (id, login, type, body = `${MARKER}\nold`) => ({ id, user: { login, type }, body });
-  function github({ head = SHA, comments = [], deployments = [], write = 200 } = {}) {
+  function github({ head = SHA, comments = [], deployments = [], write = 200, post = 201, pullAnswer = null, listStatus = 200,
+    countStatus = 200 } = {}) {
     // Any pull request number is open with that head, so a planted value can only be refused by the check it targets.
     return fakeFetch([
       [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/pulls\/(\d+)$/,
-        (m) => ({ json: { number: Number(m[1]), state: 'open', head: { sha: head, repo: { full_name: REPO } } } })],
+        (m) => pullAnswer ?? { json: { number: Number(m[1]), state: 'open', head: { sha: head, repo: { full_name: REPO } } } }],
       [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/deployments\?environment=preview&per_page=100&page=(\d+)$/,
-        (m) => ({ json: deployments[Number(m[1]) - 1] ?? [] })],
-      [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/\d+\/comments\?per_page=100&page=1$/, () => ({ json: comments })],
+        (m) => (countStatus === 200 ? { json: deployments[Number(m[1]) - 1] ?? [] } : { status: countStatus, json: { message: 'x' } })],
+      [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/\d+\/comments\?per_page=100&page=1$/,
+        () => (listStatus === 200 ? { json: comments } : { status: listStatus, json: { message: 'x' } })],
       [/^PATCH https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/comments\/(\d+)$/, () => ({ status: write, json: {} })],
-      [/^POST https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/\d+\/comments$/, () => ({ status: 201, json: {} })],
+      [/^POST https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/issues\/\d+\/comments$/, () => ({ status: post, json: {} })],
     ]);
   }
+  test('planted: GitHub refuses the write (403 on an update, 500 on a new comment): the step turns red', async () => {
+    assert.equal(await run('comment', harness({ env: env(), fetch: github({ comments: [marked(777, BOT, 'Bot')], write: 403 }) }).io), 1);
+    assert.equal(await run('comment', harness({ env: env(), fetch: github({ post: 500 }) }).io), 1);
+  });
+  test('planted: the pull request cannot be read (500): the step turns red and writes nothing', async () => {
+    const f = github({ pullAnswer: { status: 500, json: { message: 'x' } } });
+    assert.equal(await run('comment', harness({ env: env(), fetch: f }).io), 1);
+    assert.equal(writes(f).length, 0);
+  });
+  test('planted: the pull request is closed, or its head is a fork: nothing written', async () => {
+    for (const json of [{ number: 12, state: 'closed', head: { sha: SHA, repo: { full_name: REPO } } },
+      { number: 12, state: 'open', head: { sha: SHA, repo: { full_name: 'someone/fork' } } }]) {
+      const f = github({ pullAnswer: { json } });
+      assert.equal(await run('comment', harness({ env: env(), fetch: f }).io), 0);
+      assert.equal(writes(f).length, 0);
+    }
+  });
+  test('planted: the comments cannot be read: the step turns red, and no second comment is written', async () => {
+    const f = github({ listStatus: 500 });
+    assert.equal(await run('comment', harness({ env: env(), fetch: f }).io), 1);
+    assert.equal(writes(f).length, 0);
+  });
+  test('planted: an unreadable count is "not counted", never 0', async () => {
+    const f = github({ countStatus: 500 });
+    const h = harness({ env: env(), fetch: f });
+    assert.equal(await run('comment', h.io), 0);
+    assert.ok(JSON.parse(writes(f)[0].init.body).body.includes('not counted (see the run)'));
+    assert.ok(h.lines.some((l) => l.endsWith(': not counted')));
+  });
   const writes = (f) => f.calls.filter((c) => c.method !== 'GET');
   test('the body: the marker first, the link, the commit, fixed words only', () => {
     const body = commentBody({ pr: '12', sha: SHA, link: LINK, deploy: 'success', headers: 'success', count: 3, month: '2026-11', runUrl: 'https://github.com/x/y/actions/runs/1' });
@@ -598,7 +691,7 @@ describe('reconcile', () => {
     assert.equal(plan.now[0].d.created_on, '2026-11-01T00:00:00.000Z');
   });
   const base = 'https:\\/\\/api\\.cloudflare\\.com\\/client\\/v4\\/accounts\\/0123456789abcdef0123456789abcdef\\/pages\\/projects\\/shamble-previews\\/deployments';
-  function world({ pages, states, failPage = 0, failDelete = '' }) {
+  function world({ pages, states, failPage = 0, failDelete = '', falseDelete = '' }) {
     const events = [];
     const f = fakeFetch([
       [new RegExp(`^GET ${base}\\?env=preview&page=(\\d+)&per_page=25$`), (m) => {
@@ -607,7 +700,8 @@ describe('reconcile', () => {
         return { json: { success: true, errors: [], result: pages[page - 1] ?? [], result_info: { page, per_page: 25, total_pages: pages.length } } };
       }],
       [/^GET https:\/\/api\.github\.com\/repos\/Mergincanli\/Shamble-Frontlines\/pulls\/(\d+)$/, (m) => states[m[1]] ?? { status: 404, json: {} }],
-      [new RegExp(`^DELETE ${base}\\/([0-9a-f-]+)\\?force=true$`), (m) => (m[1] === failDelete ? { status: 500, json: { success: false } } : { json: { success: true, errors: [], result: {} } })],
+      [new RegExp(`^DELETE ${base}\\/([0-9a-f-]+)\\?force=true$`), (m) => (m[1] === failDelete ? { status: 500, json: { success: false } }
+        : m[1] === falseDelete ? { json: { success: false, errors: [{ code: 8000000, message: 'x' }] } } : { json: { success: true, errors: [], result: {} } })],
     ], events);
     return { f, events };
   }
@@ -661,10 +755,55 @@ describe('reconcile', () => {
     assert.equal(await run('reconcile', harness({ env, fetch: f }).io), 1);
     assert.equal(f.calls.filter((c) => c.method === 'DELETE').length, 2);
   });
+  test('planted: a delete answered HTTP 200 with success false counts as failed', async () => {
+    const records = [preview('pr-1', '2026-11-01T00:00:00Z')];
+    const { f } = world({ pages: [records], states: { 1: closed(1) }, falseDelete: records[0].id });
+    const h = harness({ env, fetch: f });
+    assert.equal(await run('reconcile', h.io), 1);
+    assert.ok(h.lines.some((l) => l.startsWith('  not deleted: HTTP 200')));
+  });
+  test('planted: more than 40 full pages of previews: incomplete, nothing deleted', async () => {
+    const pages = Array.from({ length: 41 }, (_, p) => Array.from({ length: 25 }, (_, i) => preview('pr-1', new Date(Date.UTC(2026, 10, 1, 0, p * 25 + i)).toISOString())));
+    const { f } = world({ pages, states: { 1: closed(1) } });
+    assert.equal(await run('reconcile', harness({ env, fetch: f }).io), 1);
+    assert.equal(f.calls.filter((c) => c.method === 'DELETE').length, 0);
+    assert.equal(f.calls.filter((c) => c.url.includes('/deployments?')).length, 40);
+  });
   test('planted: an account ID of the wrong shape: no call at all', async () => {
     const { f } = world({ pages: [[]], states: {} });
     assert.equal(await run('reconcile', harness({ env: { ...env, CLOUDFLARE_ACCOUNT_ID: 'x' }, fetch: f }).io), 1);
     assert.equal(f.calls.length, 0);
+  });
+});
+
+describe('the command line (the workflow runs `node hosting/preview.mjs <command>`)', () => {
+  const SCRIPT = join(ROOT, 'hosting/preview.mjs');
+  const cli = (args, env = {}) => spawnSync(process.execPath, [SCRIPT, ...args], { encoding: 'utf8', env: { PATH: process.env.PATH ?? '', ...env } });
+  test('no command: the usage line and exit 2', () => {
+    const r = cli([]);
+    assert.equal(r.status, 2, r.stdout + r.stderr);
+    assert.match(r.stdout, /^usage: node hosting\/preview\.mjs </);
+  });
+  test('recheck with the real files: main\'s header file passes, a changed one is refused', () => {
+    const t = fresh('cli');
+    writeTree(join(t, 'site'), { ...BUILD, _headers: HEADERS });
+    const ok = cli(['recheck'], { RUNNER_TEMP: t });
+    assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+    assert.match(ok.stdout, /passes the refuse list again/);
+    const t2 = fresh('cli');
+    const off = Buffer.from(HEADERS); off[0] ^= 1;
+    writeTree(join(t2, 'site'), { ...BUILD, _headers: off });
+    const bad = cli(['recheck'], { RUNNER_TEMP: t2 });
+    assert.equal(bad.status, 1, bad.stdout + bad.stderr);
+    assert.match(bad.stdout, /^::error::recheck: /m);
+  });
+  test('find-pr refuses a malformed commit before any call, and writes nothing', () => {
+    const out = join(fresh('cli'), 'github-output');
+    fs.writeFileSync(out, '');
+    const r = cli(['find-pr'], { HEAD_SHA: 'not-a-commit', REPO, GH_TOKEN: GH, GITHUB_OUTPUT: out });
+    assert.equal(r.status, 1, r.stdout + r.stderr);
+    assert.match(r.stdout, /^::error::find-pr: the run's commit is not a commit id/m);
+    assert.equal(fs.readFileSync(out, 'utf8'), '');
   });
 });
 
@@ -705,17 +844,25 @@ function lintWorkflow(text) {
   if (text.includes('\t')) flag('L0', null, 'a tab character');
   const records = workflowLines(text);
   for (const r of records) if (!r.inBlock && r.indent % 2 !== 0) flag('L0', r, 'an odd indent outside a block');
+  // L0: shapes this reader does not follow (a quoted key, a flow-mapping step, a space before a key's colon).
+  for (const r of records) {
+    if (!r.inBlock && /^\s*(?:- )?(?:["'][^"']*["']\s*:|\{)/.test(r.line)) flag('L0', r, 'a quoted key or a flow mapping');
+    if (!r.inBlock && /^\s*(?:- )?[A-Za-z0-9_-]+\s+:(?:\s|$)/.test(r.line)) flag('L0', r, 'a space before a key\'s colon');
+  }
   // L1 (G1): no ${{ }} inside any shell block.
   for (const r of records) if (r.step >= 0 && r.stepKey === 'run' && r.line.includes('${{')) flag('L1', r, '${{ inside run');
-  // L2 (G6): secrets only in a step's env, never job-wide or workflow-wide, never as an action input.
+  // L2 (G6): secrets (in any spelling: secrets.X, secrets['X'], toJSON(secrets)) only in a step's env, never job-wide
+  // or workflow-wide, never as an action input; and the token in exactly its three planned places.
   for (const r of records) {
-    if (r.line.includes('secrets.') && !(r.step >= 0 && r.stepKey === 'env' && r.indent === 10 && !r.inBlock)) flag('L2', r, 'a secret outside a step env');
+    if (/\bsecrets\b/.test(r.line) && !(r.step >= 0 && r.stepKey === 'env' && r.indent === 10 && !r.inBlock)) flag('L2', r, 'a secret outside a step env');
   }
-  // L3: npm ci with install scripts off, and no other installer.
+  const tokenAt = records.filter((r) => /\bsecrets\.CLOUDFLARE_API_TOKEN\b/.test(r.line)).map((r) => r.job).join(',');
+  if (tokenAt !== 'deploy,deploy,reconcile') flag('L2', null, `the token named in jobs [${tokenAt}]; planned: deploy's token check and upload, and reconcile`);
+  // L3: npm only as `npm ci --ignore-scripts` (not `=false`), and no other installer.
   for (const r of records) {
     if (!(r.step >= 0 && r.stepKey === 'run')) continue;
-    if (/\bnpm\s+(?:install|i|exec|x|add)\b|\bnpx\b|\byarn\b|\bpnpm\b/.test(r.line)) flag('L3', r, 'an installer other than npm ci');
-    if (/\bnpm\s+ci\b/.test(r.line) && !r.line.includes('--ignore-scripts')) flag('L3', r, 'npm ci without --ignore-scripts');
+    if (/\bnpx\b|\byarn\b|\bpnpm\b|\bcorepack\b/.test(r.line)) flag('L3', r, 'an installer other than npm ci');
+    if (/\bnpm\b/.test(r.line) && !/\bnpm\s+ci\b[^#]*--ignore-scripts(?![=\w-])/.test(r.line)) flag('L3', r, 'npm other than "npm ci --ignore-scripts"');
   }
   // L4 (G8): no cache in any job.
   const jobs = [...new Set(records.filter((r) => r.top === 'jobs' && r.indent === 2).map((r) => r.job))];
@@ -732,6 +879,9 @@ function lintWorkflow(text) {
     for (const r of rs) if (r.stepKey === 'with' && r.indent === 10 && r.key === 'cache') flag('L4', r, 'a cache input');
     // L5 (G1): every checkout without its credentials; every action pinned to a full commit.
     if (uses && uses.value.startsWith('actions/checkout@') && !withLine('persist-credentials: false')) flag('L5', uses, 'a checkout that keeps its credentials');
+    if (uses && uses.value.startsWith('actions/checkout@') && rs.some((r) => r.stepKey === 'with' && r.indent === 10 && (r.key === 'ref' || r.key === 'repository'))) {
+      flag('L5', uses, 'a checkout of another ref or repository (every checkout is main\'s)');
+    }
     if (uses && !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_./-]+@[0-9a-f]{40}(?:\s+#.*)?$/.test(uses.value)) flag('L5', uses, 'an action not pinned to a full commit');
   }
   if (!records.some((r) => r.indent === 0 && r.line === 'permissions: {}')) flag('L5', null, 'no top-level permissions: {}');
@@ -746,8 +896,11 @@ function plant(text, find, replacement, { count = 1, nth = 1 } = {}) {
 }
 
 describe('G9: the lint of preview.yml', () => {
-  test('the workflow as it stands passes', () => {
+  test('the workflow as it stands passes, and the reader sees its whole shape', () => {
     assert.deepEqual(lintWorkflow(WORKFLOW), []);
+    const rs = workflowLines(WORKFLOW);
+    assert.deepEqual([...new Set(rs.filter((r) => r.top === 'jobs' && r.indent === 2).map((r) => r.job))], ['tests', 'check', 'deploy', 'after', 'reconcile']);
+    assert.ok(new Set(rs.filter((r) => r.step >= 0 && r.key === 'run').map((r) => r.step)).size >= 12);
   });
   const planted = [
     ['L1', '${{ }} in a one-line run', () => plant(WORKFLOW, 'run: node hosting/preview.mjs find-pr', 'run: node hosting/preview.mjs find-pr "${{ github.event.workflow_run.head_branch }}"')],
@@ -756,7 +909,17 @@ describe('G9: the lint of preview.yml', () => {
     ['L2', 'the token job-wide', () => plant(WORKFLOW, '    needs: check\n    if: needs.check.outputs.go == \'true\'\n', '    needs: check\n    if: needs.check.outputs.go == \'true\'\n    env:\n      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n')],
     ['L2', 'the token workflow-wide', () => plant(WORKFLOW, '  WRANGLER_SEND_METRICS: "false"\n', '  WRANGLER_SEND_METRICS: "false"\n  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n')],
     ['L2', 'a secret as an action input', () => plant(WORKFLOW, 'github-token: ${{ github.token }}', 'github-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}')],
+    ['L2', 'every secret workflow-wide through toJSON', () => plant(WORKFLOW, '  WRANGLER_SEND_METRICS: "false"\n', '  WRANGLER_SEND_METRICS: "false"\n  ALL: ${{ toJSON(secrets) }}\n')],
+    ['L2', 'the token by index, job-wide', () => plant(WORKFLOW, '    needs: check\n    if: needs.check.outputs.go == \'true\'\n', '    needs: check\n    if: needs.check.outputs.go == \'true\'\n    env:\n      T: ${{ secrets[\'CLOUDFLARE_API_TOKEN\'] }}\n')],
+    ['L2', 'the token on a third step', () => plant(WORKFLOW, '          DEPLOY: ${{ needs.deploy.result }}\n', '          DEPLOY: ${{ needs.deploy.result }}\n          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n')],
     ['L3', 'npm ci with install scripts on', () => plant(WORKFLOW, 'npm ci --ignore-scripts --no-audit --no-fund', 'npm ci --no-audit --no-fund')],
+    ['L3', 'npm ci with install scripts turned back on', () => plant(WORKFLOW, 'npm ci --ignore-scripts --no-audit --no-fund', 'npm ci --ignore-scripts=false --no-audit --no-fund')],
+    ['L3', 'npm rebuild', () => plant(WORKFLOW, '          cd "$RUNNER_TEMP/wrangler"\n', '          cd "$RUNNER_TEMP/wrangler"\n          npm rebuild\n')],
+    ['L3', 'npm install by another spelling', () => plant(WORKFLOW, '          cd "$RUNNER_TEMP/wrangler"\n', '          cd "$RUNNER_TEMP/wrangler"\n          npm --prefix . install\n')],
+    ['L5', 'a checkout of the pull request\'s commit', () => plant(WORKFLOW, '          persist-credentials: false\n', '          persist-credentials: false\n          ref: ${{ github.event.workflow_run.head_sha }}\n', { count: 5, nth: 2 })],
+    ['L0', 'a quoted key', () => plant(WORKFLOW, '        run: node hosting/preview.mjs find-pr', '        "run": node hosting/preview.mjs find-pr')],
+    ['L0', 'a step as a flow mapping', () => plant(WORKFLOW, '    steps:\n', '    steps:\n      - { name: x, run: echo hi }\n', { count: 5, nth: 1 })],
+    ['L0', 'a space before a key\'s colon', () => plant(WORKFLOW, '        run: node hosting/preview.mjs find-pr', '        run : node hosting/preview.mjs find-pr')],
     ['L3', 'npx', () => plant(WORKFLOW, '          cd "$RUNNER_TEMP/wrangler"\n', '          cd "$RUNNER_TEMP/wrangler"\n          npx wrangler --version\n')],
     ['L4', 'a job without cache-mode: none', () => plant(WORKFLOW, '    if: github.event_name == \'pull_request\'\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    cache-mode: none\n', '    if: github.event_name == \'pull_request\'\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n')],
     ['L4', 'setup-node with its cache on', () => plant(WORKFLOW, 'package-manager-cache: false', 'package-manager-cache: true', { count: 5, nth: 3 })],
