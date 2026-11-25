@@ -75,4 +75,29 @@ its frozen content set and every hash line stays byte-identical, which proves th
 For 4c: `u8`, `f32` (through `to_bits`) and `row()` join `StateSink`; the paced replay reads the hash through a
 development-only driver, never through the live host's interface; the button meanings get one home in Rust.
 
-## security-auditor: (starts when a slot is free)
+## security-auditor: APPROVE; nothing Critical, High or Medium (`security-auditor-r1.md`)
+A security finding that is not fixed in the pull request counts as left open and is named to Mustafa in the report
+(`.claude/agents/advisor.md`): so all four are fixed now.
+| # | Severity | Finding | Decision |
+|---|---|---|---|
+| S1 | Low | The same as N2 and R2, plus: `Header` derives `Debug` with a public seed, unlike `World` and `MatchSetup` | Fix: the seed is checked in `Replay::new` and in `checkReplayable`, each with a refusal test; `Header`'s `Debug` is written by hand and never shows the seed (about 24 lines) |
+| S2 | Low | `world.rs`'s comment calls the shared hash "the one a client's state can be compared with"; the network draft says no state hash is exchanged with clients, and from 4c the shared part holds every soldier | Fix, 2 lines: a number a replay compares across targets, never exchanged with a client |
+| S3 | Low, hardening | A link committed in place of a recording file is followed: in a copy, `make_recordings` in write mode overwrote a file outside the repository through such a link, and `--check` cannot see links. CI's own check goes red on it, so it cannot merge green; the exposure is a session writing on a hostile branch | Fix, about 19 lines: `write` and `check` refuse anything that is not a plain file, with a test; found names are printed quoted. A repository-wide "no tracked links" check would be a gate change (risk tier 2): a follow-up for the quality gate step |
+| S4 | Low | With `SHAMBLE_TWO_PROCESSES_CHILD` already set in the environment the two-process test passes without starting a child or comparing anything | Fix, about 2 lines: the child's role also needs the parent's own arguments |
+Its conditions for later change-sets (not findings against 4a; they go to STATUS as follow-ups):
+- **C1, decided at change-set 7 and binding from Slice 3's first build that talks to a real server:** before
+  `Sim::shared_hash` is in a build whose authority is elsewhere, it hashes only the client's own world; no message
+  carries a hash over state outside the recipient's interest set and the server never answers a client's hash with
+  match or mismatch over such state; tests pin both. Why: FNV-1a can be run backwards; its script got 4 hidden bytes
+  back from one hash in 0.06 seconds (`sa_fnv_unwind.py`).
+- **C2, change-set 8:** the random streams' key and buffered output go only through `secret`; a test that the dumps
+  of two worlds that differ only in their seed are identical.
+- **C3, Slice 3:** the server refuses to start a live match on a seed that begins with `TESTSEED`.
+- **C4, the paced replay in 4c:** behind a development marker the production message check refuses; its own `Sim`
+  from the recording's test seed, never the live match; `replayOn` keeps calling `checkReplayable`.
+It left `.gate/sa-target` behind (its delete was refused).
+
+## The fix pass: the lines it may take
+Product lines planned: about 220 (the buffer-free hash 65 with its callers; the seed checks and `Header`'s `Debug`
+24; the two-process test's step and prefix and role 20; the plain-file check 19; the lint guard on the reader 11;
+the `replay` tool's field comparison 12; the rest in ones to tens). 3,030 + 220 = about 3,250 of 3,400.
