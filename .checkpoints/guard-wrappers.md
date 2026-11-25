@@ -21,13 +21,17 @@
 9. The advisor agent on the plan change: APPROVE with conditions; SA-D-DIRECT pre-approved if Mustafa says yes · notes advisor-plan.md
 10. Both versions built: .gate/guard-wrappers/hooks/ (without the direct half: 1486/1486; red 19 on 5df545c) and hooks-direct/ (with it: 1490/1490; its rows red on the other copy)
 
+11. Mustafa (2026-11-25 20:35): SA-D-DIRECT (a); MAIN-WALL queued next (before review tracks); each kit write asked with its exact text
+12. Applied hunk by hunk with Edit (each asked with its text); sha256 equal to hooks-direct (guard dc20706c…, tests e81f2bc5…); 1490/127/33; gate PASS --no-smoke; one commit · 52e3c7e · 125 added lines
+
 ## Current step
-Waiting for Mustafa's SA-D-DIRECT answer; then copy the chosen version over (asks him), kit suites, one commit, round 2 on what changed.
+security-auditor round 2 on what changed (5df545c..52e3c7e).
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
 2. Kit tests (baseline 1247/127/33 on c1da1bd) and gate; security-auditor; verifier; docs-keeper; report; PR; his go.
-3. Then the queued change-set "review tracks and who merges" (his message of 2026-11-25 18:25; brief:
+3. Then MAIN-WALL (his message of 2026-11-25 20:35: a rule that only his account can update main, measured on a throwaway repository first; plan first, his clicks listed once; one or two change-sets with review tracks, the wall first either way; the gap's detail stays out of pushed notes; sources: .checkpoints/step-2-6-previews/ on claude/optimistic-albattani-mdoonz, questions-2026-11-25.md item 6 and security-auditor-plan.md, read with git show).
+4. Then the queued change-set "review tracks and who merges" (his message of 2026-11-25 18:25; brief:
    `.checkpoints/guard-wrappers/queued-review-tracks.md`): plan first, no rule file edited before his go on the plan.
 
 ## Open findings
@@ -43,6 +47,8 @@ Waiting for Mustafa's SA-D-DIRECT answer; then copy the chosen version over (ask
 - CAP (a): his line limits on guard work count code and tests only · Mustafa · 2026-11-25 17:05
 - SAME-GAP (a): now, as the next change-set, from the new main · Mustafa · 2026-11-25 17:05
 - SA-R2-2: find out, change nothing without his word · Mustafa · 2026-11-25 17:05
+- SA-D-DIRECT (a): the direct helper check in this change-set · Mustafa · 2026-11-25 20:35
+- MAIN-WALL next, before the review-tracks plan; each kit write asked with its exact text · Mustafa · 2026-11-25 20:35
 
 ## Running work
 - none
