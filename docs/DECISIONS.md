@@ -127,6 +127,22 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 11:07:07 UTC: his go for the merge of pull request #66 at exactly
+  d7937de0aad4b86748c7c4574bee5a6921eeb67c, as a normal merge (his HISTORY-ID (a)), with that commit as the expected
+  head, and not if the head had changed; after the merge, the merge commit to him in one line; the status page's row
+  that still calls #66 a draft corrected in lane 2's next pull request; then the small pull request that revises the
+  infrastructure draft's header row, and after it step 2.6's plan** (the builder chat he calls Builder V2, lane 2 of the
+  build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For Builder V2, from
+  me, written with my main Advisor (25 November, 12:15 Amsterdam)"; message 30f4ab9b-ffde-4959-beef-3d3e5c015d43, whole;
+  extracted by script from the chat's transcript). Records, not his words: the chat merged #66 at 2026-11-25 11:10:11
+  UTC as merge commit 09faefa7f7cd1bca939bd2f98237e65e622d4737, a normal merge with that expected head, after reading
+  the head equal to it and gate, smoke and toolchain green on it. Copied by script (741 bytes, sha256
+  ae5eb4f652144d8559b699daca1bb36ae9fba5aa857ba7c56c3c299d044176eb):
+> For Builder V2, from me, written with my main Advisor (25 November, 12:15 Amsterdam).
+>
+> My go: merge pull request #66 at exactly d7937de0aad4b86748c7c4574bee5a6921eeb67c, as a normal merge (my HISTORY-ID (a)), with that commit as the expected head. The PR Advisor approved exactly that commit on GitHub at 06:55 UTC, my main Advisor's merge check passed on it, and gate, smoke and toolchain are green. If the head is no longer that commit, do not merge and tell me in two lines.
+>
+> After the merge: give me the merge commit in one line. The status page's row still calls #66 a draft: correct that in your next pull request. Then go on with the small pull request that revises the infrastructure draft's header row, and after it step 2.6's plan.
 - **Taken by Mustafa, 2026-11-25, 00:22:09 UTC: his answers to the last two questions of the preview hosting check's
   report: DEPARTURES item (5) (a), the pictures stay out of the repository, the pull-request page's picture among them;
   HISTORY-ID (a), a normal merge of #66; his main Advisor checked head cbddbbfe402a95481ba8f2ba8c54fbd6a49139a7; these
