@@ -93,3 +93,20 @@ into the scratchpad's cf/sN/page.md; the pages' front-matter "agent instructions
   and deploy your site." :31 "| Builds per month | 500 | 5,000 | 20,000 |"; no word on direct uploads. pages/get-started/
   direct-upload/ (dM 2026-04-21): no "count", "month" or "500"; "build" only for the user's own build command (:28, :74,
   :129). PASS (the docs do not say).
+
+### Plan conformance ("symbols" = plan section 3's changed sentences; script verifier-scratch/plan_vs_head.py)
+- Files: only docs/adr/0006 and docs/DECISIONS.md under docs/ (plus .checkpoints/ files, expected while draft).
+- ADR diff: 5 lines removed, 24 added (hunks at base :138, :149, :1211, :1367, :1449 = E3, E7, E6, E1/E2/E4/E9, E10).
+- E1, E2, E4, E6, E9, E10: planned After-text found verbatim (whitespace-normalised) in head. Match.
+- E3: matches except one parenthesis: plan "(read 2026-11-24, and again for this revision) (PM-0006-7;" -> head
+  "(read 2026-11-24 and 2026-11-25; PM-0006-7;". Same meaning; Low.
+- E7: placed after the *Need:* line as planned; says none measured on Workers; production version links "silent";
+  outcome under (a); no move decided. Deviations, Low: 12 lines (11 full + 1 short; checkpoint says 11) against the
+  plan's "at most 8 lines"; opener form differs from the plan's quoted opener; Q1's alias Version URLs and production
+  workers.dev URL not given separately (the plan asked "separately for preview and alias URLs and for workers.dev").
+- E1's reason = option (a)'s words verbatim (report :284-285). E3's STEP4-COUNT clause fits his words (DECISIONS :193).
+- Not applicable now: "no .checkpoints/ files when marked ready" (the PR is still a draft; they must go before ready).
+
+### Draft verdict
+PASS WITH NOTES: every sourced claim confirmed; every number and date traced; outcome sentence holds for PM-0006-2;
+DECISIONS byte-equal; gate PASS (smoke skipped). Notes are Low only (E7 length/opener/Q1 granularity; E3 wording).
