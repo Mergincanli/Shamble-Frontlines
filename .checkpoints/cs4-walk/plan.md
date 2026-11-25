@@ -1,8 +1,9 @@
-# Plan (draft 3): change-set 4, "Walk", proposed as four change-sets, 4a to 4d
+# Plan (revision 4, approved by the advisor agent): change-set 4, "Walk", proposed as four change-sets, 4a to 4d
 
 _Written by the main session (the chat Mustafa calls Builder V4, lane 1) on 2026-11-25, for Mustafa and his Advisor.
-Base: main 311c0484f7a9697ae33e7a76a8cf0b507a2837c4. Nothing is built, and no file outside `.checkpoints/` is edited
-before the advisor agent's APPROVE and his go. His words that set this plan: his takeover block
+Base: main 311c0484f7a9697ae33e7a76a8cf0b507a2837c4. The advisor agent's verdict: REVISE on drafts 1 and 2, then
+**APPROVE** on draft 3 with eight fixes that are made here (section 20). Nothing is built, and no file outside
+`.checkpoints/` is edited before his go. His words that set this plan: his takeover block
 (`mustafa-2026-11-25-takeover.md`, points 7 and 8), his answer ORDER-3C (c) with four conditions
 (`mustafa-2026-11-25-order-3c-answer.md`), his Testlines Export (`testlines-export.json`, 15,567 bytes, sha256
 9ad1d9f9...6498) and the entries of `docs/DECISIONS.md` this plan names. Drafted from four designs in this folder,
@@ -39,13 +40,13 @@ written, and the designs give plus or minus 30 %._
   screen and the camera panel works (after step 5 of 4c's steps: his words ask for the panel "from its first
   playable build"), before the big test runs and the reviews. It is a look, not a check: nothing is asked of him.
   The judged build comes at 4c's end. By change-set 3b's pace (about 7,000 lines from its first commit to its merge
-  in 16 hours, reviews and his check included) the early look is about 50 hours of this chat's work away, and the
-  judged soldier about 58, plus the waits for his gos (question WALK-CUT gives both for each way of cutting).
+  in 15 hours, reviews and his check included) the early look is about 49 hours of this chat's work away, and the
+  judged soldier about 54, plus the waits for his gos (question WALK-CUT gives both for each way of cutting).
 - **No proof gets thinner** (his condition a): section 9 places every mark the build plan puts at Walk in the part
   that merges the code it proves. Every mark on the recording is met on the movement recording before 4c merges, and
-  again on the recording made anew before 4d merges, because 4d changes the simulation. Only one mark may move to a
-  later part, the one the card itself names for that (the far-corner map, build plan lines 355-356); he is told
-  before it moves.
+  again on the recordings made anew before 4d merges, because 4d changes the simulation. No mark leaves the code it
+  proves, with one exception, the one the card itself names (the far-corner map, build plan lines 355-356); he is
+  told before it moves. Where a ladder moves anything else, the code moves with its proof.
 - **Outside code:** the collision library the simulation draft names (parry3d) brings 33 new packages into the
   lockfile, 31 of them in the players' file's tree (section 5.2). The content reader is proposed as our own code, with
   no outside package (question CONTENT-SOURCE).
@@ -62,9 +63,10 @@ side, with the reader's own proofs; the collision world is built from the map an
 WebAssembly; the built file is checked for a fused multiply-add on every build. After 4c: one soldier, moved by
 commands through the real messages on our own movement over the collision library, drawn between two ticks,
 followed by the camera; the movement recording replays identically on every target, and a paced replay in the real
-Worker shows that the picture never reaches the simulation. After 4d: aiming down sights by SLICE-FEEL on a
-recording made anew, the development reload of content, the old tuning's import report and the frame cap's
-readings: with it every mark the build plan places at Walk is met.
+Worker shows that the picture never reaches the simulation. After 4d: aiming down sights by SLICE-FEEL on
+recordings made anew, the development reload of content, the old tuning's import report and the frame cap's
+readings: with it every mark the build plan places at Walk is shown there (the build plan's own word: most of them
+count as met only once CI runs the other browsers and he has named the machines).
 
 ## 2. What Mustafa sees and plays after each part
 - **4a:** nothing new. The zip of 3b still runs; one number more can be read from the players' file by a replay.
@@ -76,8 +78,8 @@ readings: with it every mark the build plan places at Walk is met.
   stamina bar shows it), jumps with Space (held Space jumps again on every landing, as the old game and his sandbox
   do), walks onto the 0.55 m step and is stopped by the 0.56 m one, reaches the 3.05 m ledge and not the 3.1 m one,
   and the plain stand-in turns to the mouse. The camera follows at the framing of his Export; the backquote key
-  opens the camera panel with its sliders, the five old presets and "copy values". In the street corner he can jump
-  onto the cover wall and onto the houses' roof edges (MOVE-RULES, row 5).
+  opens the camera panel with its sliders, the five old presets and "copy values". If he takes MOVE-RULES row 5,
+  he can jump onto the cover wall and onto the houses' roof edges in the street corner.
 - **4d:** holding the right mouse button (and Q, if he takes MOVE-RULES row 6) he walks at 0.55 of his speed and
   cannot sprint, and the camera reacts in its sights mode.
 
@@ -163,11 +165,12 @@ and 4.
 **4b: about 5,410 lines bottom-up; planned 9,750; stop line 12,200.** Under CONTENT-SOURCE (a) step 2 shrinks to
 about 100 lines of glue and the part to about 4,280 (planned 7,700).
 - **Its ladder, fixed now** (code moves with its proof, never a proof alone): at 9,750 lines the schema writer and
-  its tests move to 4d (the panel's limits are written in the panel's code until then); at 11,000 the static
-  collision world (step 8) moves whole, with PM-0004-32, to the start of 4c, where its first user is, and 4b's page
-  draws the scene from the map alone. Never moved: the built-file check (his words tie it to the change-set that
-  brings the collision library; it runs on every build, so it reads the library's code as soon as that links), the
-  loader's seven stages with the reader's proofs of step 3b, the Testlines check.
+  its tests move to 4d, and with them the schema half of PM-0005-7 and PM-0005-8 (the panel's limits are written in
+  the panel's code until then); at 11,000 the page's scene (step 9) moves whole, with its browser tests, to the
+  start of 4c, and 4b then changes nothing a player sees and needs no browser check. Never moved: the built-file
+  check and the static collision world with PM-0004-32 (his words tie the check to the change-set that brings the
+  collision library, and the library is never declared without the code that uses it), the loader's seven stages
+  with the reader's proofs of step 3b, the Testlines check.
 
 ### 5.1 The content crate, in short
 One loader with seven stages, each of which refuses by name (a size cap; JSON only, with duplicate keys, NaN and
@@ -235,7 +238,7 @@ Symbols and tests in full: `rust-reviewer-cs4.md`, blocks 3 and 5; `netcode-arch
 | 3 | The snapshot's own soldier and the block: the header's soldier count, 48 soldier rows of 40 bytes, the owner's section; each block stamped with the time its tick was due; the page blends between ticks; the Worker's pool of buffers grows (3B-POOL-16) | `crates/protocol/src/`, `crates/client-endpoint/src/layout.rs`, `block.rs`, `packages/client/src/app/blend.ts`, `packages/sim-worker/src/host.ts` | 320 / 340 |
 | 4 | The page: the plain stand-in at the Art brief's sizes on one root, the follow camera at his Export's framing, the keys and the mouse (pointer, move, the ray), the development aim line, a plain stamina bar, the readout's new rows | `packages/client/src/soldier/`, `camera/follow.ts`, `input/`, `render/`, `app/`, `overlay/`, `picture.ts` | 800 / 540 |
 | 5 | The camera panel: sliders, the five old presets, "copy values"; the camera's content file; development-only code kept out of the production build (3B-CSS-PROD). **The early-look zip is built after this step** | `packages/client/src/camera/panel.ts`, `settings.ts`, `crates/content/src/camera.rs`, `content/camera/` | 360 / 300 |
-| 6 | The movement recording (about 2,400 ticks on the street corner and the yard) and every mark that rides it, with the three planted divergences run again on movement; the first recording re-made | `crates/devtools/`, `recordings/` | 320 / 230 |
+| 6 | The movement recording (about 2,400 ticks on the street corner and the yard) and the lane recording (a walk down the 50 m lane, for the smoothness readings), and every mark that rides them, with the three planted divergences run again on movement; the first recording re-made | `crates/devtools/`, `recordings/` | 320 / 230 |
 | 6b | The paced replay in the real Worker, in development builds only: a recording runs at live pace with the camera still and with the camera moved, and its hashes are the recording's own (PM-0004-28: nothing of the picture reaches the simulation) | `packages/sim-worker/src/`, `packages/client/src/app/`, `packages/e2e/tests/replay/` | 130 / 110 |
 | 6c | 2,000,000 hostile movement commands into a running match with no panic (PM-0004-60); the yard at the far corner of a 2 km map (PM-0004-39) | `crates/room/tests/`, `crates/sim/tests/`, `crates/devtools/` | 30 / 180 |
 | 7 | The browser tests of the page (walk, jump, the two steps, aim on a ramp, the camera follows, keys let go on blur: 3B-BLUR-TEST, the hidden tab with a soldier, allocation measured again); then the reviews, the verifier, his check | `packages/e2e/tests/` | 0 / 410 |
@@ -308,12 +311,12 @@ yet, and that nothing is asked of him. It runs on the values of the Export he ha
 Every step here builds code and proves it in the same part; no proof of 4b's or 4c's code waits for 4d.
 | Step | What | Code / tests |
 |---|---|---|
-| 1 | Aiming down sights by SLICE-FEEL (section 10): the right button held (and Q on his word, MOVE-RULES row 6), 0.55 of the speed, no sprint, the flag in the snapshot and the block (lane 2's W1), the camera's sights mode. **Because this changes the simulation, the movement recording gains aimed stretches and is made anew, and its four runs and its marks run again** (build plan line 484: a recording per change-set that changes the simulation; PM-0004-19, -21) | 170 / 210 |
+| 1 | Aiming down sights by SLICE-FEEL (section 10): the right button held (and Q on his word, MOVE-RULES row 6), 0.55 of the speed, no sprint, the flag in the snapshot and the block (lane 2's W1), the camera's sights mode. **Because this changes the simulation, the movement recording gains aimed stretches, it and the lane recording are made anew, and their four runs and their marks run again** (build plan line 484: a recording per change-set that changes the simulation; PM-0004-19, -21) | 170 / 210 |
 | 2 | The import of the old tuning with its report, walked over every leaf (PM-0005-14); a saved content file reaching the Worker within a second in development (PM-0005-10, PM-0002-31) | 300 / 390 |
-| 3 | The frame-cap setting, and the smoothness reading for each of its options on the lane recording, run through 4c's paced replay (PM-0003-42; the build plan's open question OQ-0003-10: the readings are for his pick of the cap); the SIMD reading (PM-0004-25: a reading that cannot fail; SIMD stays off) | 80 / 60 |
-**4d: about 1,210 lines bottom-up; planned 2,200; stop line 2,750.** Its ladder: at 2,200 lines the SIMD reading
-moves to a follow-up before Slice 2 (it decides nothing: SIMD stays off either way); nothing else moves. If the
-far-corner map came over from 4c, it is built and met here.
+| 3 | The frame-cap setting, and the smoothness reading for each of its options on the lane recording (made in 4c's step 6, made anew in step 1 here), run through 4c's paced replay (PM-0003-42; the build plan's open question OQ-0003-10: the readings are for his pick of the cap); the SIMD reading (PM-0004-25: a reading that cannot fail; SIMD stays off) | 80 / 60 |
+**4d: about 1,210 lines bottom-up; planned 2,200; stop line 2,750.** It has no ladder: nothing moves out of it,
+the SIMD reading included (the build plan places that reading at Walk); at the stop line the chat stops and he
+decides. If the far-corner map came over from 4c, it is built and shown here.
 
 ## 8. Every item named for 3c, placed by name (his condition c)
 Sources: `docs/STATUS.md` ("Next", item 2), `docs/STATUS_ARCHIVE.md` lines 1453-1557, Builder V3's handover note part
@@ -452,7 +455,8 @@ Each with the part that needs it. To start 4a he needs to answer only WALK-CUT.
    ("I would rather play a first part early than wait for one large stop"), and one stop of about 27,500 lines
    would hold it behind everything. Needed now. In every option the recording goes first as its own small
    change-set, 4a (his fallback (d): 2,450 planned lines, no browser check), and the early look comes at the same
-   point of the work: after about 22,850 planned lines, about 50 hours of this chat's work at change-set 3b's pace.
+   point of the work: after about 22,850 planned lines, about 49 hours of this chat's work at change-set 3b's pace
+   (7,014 lines from its first commit to its merge in 14 hours 56 minutes).
    The options differ in how many reviews and gos stand before it, and in how much one review has to carry.
    - (a) **Four change-sets**, as section 0 has them: 4a, then content and the world (9,750), then the first
      soldier (13,150), then sights (2,200). Before the early look: two gos of his (4a's and 4b's) and 4b's short
@@ -472,18 +476,23 @@ Each with the part that needs it. To start 4a he needs to answer only WALK-CUT.
    "ask me before you carry values that depend on it".) It matters because the game runs at 30 steps a second, and
    values he judged by feel at 60 may feel different at 30. Needed before 4b's step 6. What depends on the step
    rate, by the sandbox's README and code (read, not measured):
-   - **By their arithmetic, none of the values Walk uses.** The jump follows its exact arc at either rate; the
-     easing of the speed, of the camera and of the soft push are written per second; stamina is a plain rate.
+   - **By their arithmetic, as far as the code reads, none of the values Walk uses but the soft push's.** The jump
+     follows its exact arc at either rate; the easing of the speed and of the camera are written per second;
+     stamina is a plain rate. The exception: the soft push acts once per step and has limits per step (how much one
+     step may push, half of a walker's own step), so its two values may act differently at 30; he feels the push
+     from change-set 5.
    - **By feel, these, because at 60 a key press reaches the next step within 17 ms and the picture runs at most
      17 ms behind the simulation, and at 30 both are 33 ms:** the sprint multiplier (1.52), the two times for
-     speeding up and stopping (0.164 s: five steps at 30, ten at 60), the camera's 21 values (its follow rates and
-     look-ahead above all) and the aiming camera's four.
+     speeding up and stopping (0.164 s, the old game's own value: five steps at 30, ten at 60), the camera's 21
+     values (its follow rates and look-ahead above all) and the aiming camera's four.
    - **From change-set 8 on, by arithmetic too:** the per-gun delays, fire intervals and reload windows land on
      whole steps (33 ms at 30); that change-set's plan says which.
    - (a) He plays the sandbox at 30 steps and exports again; Walk carries that Export.
    - (b) Walk carries this Export, and he judges the values at 30 in the game (the early look).
-   - (c) Walk carries only the values that do not depend on feel now (the jump, gravity, the step height, stamina,
-     the body's radius), and the rest after he has played the sandbox at 30.
+   - (c) Walk carries now only the values that equal the old game's (the walk speed, the two easing times, the
+     jump, gravity, the step height, stamina, full steering in the air, the sights multiplier) and the body's
+     radius, which is a size; the values he tuned or that are new (the sprint multiplier, the push's two values,
+     every camera value) wait until he has played the sandbox at 30.
    - Recommended: **(a)**: a few minutes of his, and every value then has been felt at the game's rate.
 3. **DIFF-LIST: his yes to the list below.** It matters because by his point 8c these are his tunings, and they
    become the starting table only once he has confirmed the list. Needed before 4b's step 6.
@@ -519,24 +528,24 @@ Each with the part that needs it. To start 4a he needs to answer only WALK-CUT.
    | `T.foxPanMax` | 16 | 9.8 |
 
    **B. What he changed from the sandbox's start values** (the Export's own list: 18 entries,
-   3 of them in the groups the game does not take: the grid, the metrics room, the Hornet):
-   | Group and name | Start | His value |
-   |---|---|---|
-   | `simulation.step_rate_hz` | 30 | 60 |
-   | `soldier.faction` | "soviets" | "empire" |
-   | `movement.sprint_multiplier` | 1.214 | 1.52 |
-   | `smg.recoil_view_kick` | 0.3 | 0 |
-   | `smg.spread_rest_rad` | 0.075 | 0 |
-   | `smg.spread_per_shot_rad` | 0.005 | 0 |
-   | `smg.spread_max_rad` | 0.16 | 0 |
-   | `smg.spread_recovery_rad_per_s` | 0.7 | 0 |
-   | `aim_down_sights.ads_flatten_floor_deg` | 28.5 | 36 |
-   | `camera.lens_vertical_fov_deg` | 15 | 13 |
-   | `camera_framing.look_follow_rate_per_s` | 9 | 20.5 |
-   | `camera_framing.edge_push_rate_per_s` | 9 | 2.5 |
-   | `camera_framing.look_ahead_min_m` | 2.1 | 4.5 |
-   | `camera_framing.camera_shift_forward_m` | 2 | 0 |
-   | `camera_framing.camera_shift_side_m` | 1.2 | 0 |
+   3 of them left out here because the game does not take their group: `measuring_grid`):
+   | Group and name | Start | His value | |
+   |---|---|---|---|
+   | `simulation.step_rate_hz` | 30 | 60 | not carried: the game runs at 30 steps a second (question STEP-60) |
+   | `soldier.faction` | "soviets" | "empire" | not carried: the sandbox session's own choice |
+   | `movement.sprint_multiplier` | 1.214 | 1.52 |  |
+   | `smg.recoil_view_kick` | 0.3 | 0 |  |
+   | `smg.spread_rest_rad` | 0.075 | 0 |  |
+   | `smg.spread_per_shot_rad` | 0.005 | 0 |  |
+   | `smg.spread_max_rad` | 0.16 | 0 |  |
+   | `smg.spread_recovery_rad_per_s` | 0.7 | 0 |  |
+   | `aim_down_sights.ads_flatten_floor_deg` | 28.5 | 36 |  |
+   | `camera.lens_vertical_fov_deg` | 15 | 13 |  |
+   | `camera_framing.look_follow_rate_per_s` | 9 | 20.5 |  |
+   | `camera_framing.edge_push_rate_per_s` | 9 | 2.5 |  |
+   | `camera_framing.look_ahead_min_m` | 2.1 | 4.5 |  |
+   | `camera_framing.camera_shift_forward_m` | 2 | 0 |  |
+   | `camera_framing.camera_shift_side_m` | 1.2 | 0 |  |
 
    **C. Values with no number in the old game's tables, used by Walk:**
    | His Export's name | His value | The old game |
@@ -771,11 +780,12 @@ smoothness as readings on his screens); what a player sees by screenshots that n
 - **4a:** no browser check. **4b:** a short check in Brave and once in Firefox (about 5 minutes: the scene, "errors:
   0", the content rows, "Copy report"). **4c:** his main check (about 35 minutes, Brave then Firefox), each step
   written as what he will see: walk, sprint until the stamina locks, jump and held jump, the two steps, the three
-  ledges, the cover wall and a roof edge, a ramp up and down, the thin wall at a sprint, aim on the ground, on a
-  ledge and on a ramp, the camera panel and its five presets with "copy values", **the tab hidden for 1 minute and
-  once for 6 minutes while walking** (PM-0002-34, as the build plan's line 602 and the structure draft's checklist
-  have it), a covered window, the replay button on his 60 Hz and on his 144 Hz screen (it must say the hashes are
-  the recording's: PM-0004-28), 2 minutes of walking the lane for the smoothness numbers, "Copy report". **4d:** a
+  ledges, the cover wall and a roof edge (if he takes MOVE-RULES row 5), a ramp up and down, the thin wall at a
+  sprint, aim on the ground, on a ledge and on a ramp, the camera panel and its five presets with "copy values",
+  **the tab hidden for 1 minute and once for 6 minutes while walking** (PM-0002-34, as the build plan's line 602
+  and the structure draft's checklist have it), a covered window, the replay button on each screen he has, its
+  refresh rate noted (it must say the hashes are the recording's: PM-0004-28), 2 minutes of walking the lane for
+  the smoothness numbers, "Copy report". **4d:** a
   short check (about 10 minutes): the aimed walk, no sprint while aiming, the camera's sights mode by preset, the
   frame cap's options. The numbered lists are written with each part's zip.
 - **Reviewers per part** (Opus 5.5, effort max, at most 3 at a time, two rounds at most, the second on what
@@ -826,6 +836,17 @@ Its rulings, taken: the six choices of section 6.2 stand; recordings run on froz
 test-engineer and security-auditor before 4b is not a review round; GREY-COLOURS is a default he can veto. It
 withdrew its own first ruling on what waits after a sprint: his words and his sandbox point two ways, so
 SPRINT-DELAY-4 is his.
+
+**Its re-read of draft 3 (d9539e8): APPROVE, with eight fixes that need no further review from it**, all made in
+this text: (1, Medium) 4d has no ladder, so the SIMD reading no longer moves out of Walk; (2) change-set 3b took
+14 hours 56 minutes, not 16 (two time zones were read as one), so the early look is about 49 hours away and the
+judged soldier about 54; (3) STEP-60 says "as far as the code reads" and names the soft push as the exception, and
+its option (c) lists every value; (4) DIFF-LIST's part B names the group left out and marks the two rows the game
+does not carry; (5) section 0 says no mark leaves the code it proves but the far-corner map, 4b's first rung
+takes the schema half of PM-0005-7 and PM-0005-8 along, and its second rung now moves the page's scene, so the
+collision library is never declared without its user; (6) section 1 says "shown", the build plan's word; (7) the
+lane recording is made in 4c's step 6; (8) the roof edge is "if he takes MOVE-RULES row 5", and the replay button
+is pressed on each screen he has. It checked every quote of his words against its source, and re-added every sum.
 
 ## For Mustafa
 1. Your go on this plan, with a letter for WALK-CUT. On it, 4a starts.

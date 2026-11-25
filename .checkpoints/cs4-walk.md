@@ -44,13 +44,16 @@
    plan between two marker lines with `--into`); the Export, its manifest and the table go to `content/source/`,
    not `docs/`; GREY-COLOURS is a default he can veto.
 
+9. The advisor agent's re-read of draft 3 (d9539e8): **APPROVE**, with eight fixes that need no further review
+   from it (one Medium: 4d's ladder moved the SIMD reading out of Walk; seven Low). All eight are made: the plan is
+   revision 4, and its section 20 lists them. 3b's pace is 14 hours 56 minutes for 7,014 lines (not 16 hours).
+
 ## Current step
-The advisor agent's re-read of draft 3 (the same agent, by message).
+Stopped for Mustafa's go on the plan and his letter for WALK-CUT. The plan was sent to him in the chat; the
+board's thread for change-set 4 says the chat waits for him.
 
 ## Next steps
-1. On its APPROVE: push; send him the plan as a file; board: one line naming the plan file and its commit, then
-   the state that says the chat waits for him. Stop for his go and his letter for WALK-CUT. On REVISE: fix, and
-   back to it.
+1. His go and WALK-CUT: then 4a (step 4 below). STEP-60 is still open with him (needed before 4b's step 6).
 4. On his go: 4a's own checkpoint (`cs4a-recording`), the hash report with rust-reviewer, then 4a's steps 1 to 8
    (plan section 4). No manifest change in 4a.
 5. For 4a's docs pass: his blocks into `docs/DECISIONS.md` by script; change-set 3b's owed docs pass; the Hornet's
@@ -69,7 +72,8 @@ The advisor agent's re-read of draft 3 (the same agent, by message).
   tests; planned at 1.8 times: 2,450 / 9,750 / 13,150 / 2,200 = 27,550; stop lines (planned times 1.25): 3,050 /
   12,200 / 16,450 / 2,750. The card: 3,900. The recording alone: 1,365 (change-set 3's plan: 275).
 - The pace used for times: change-set 3b, 7,014 lines (docs, notes and lockfiles left out) from its first commit
-  (2026-11-24 23:00) to its merge (2026-11-25 14:57), about 16 hours with reviews and his check.
+  (2026-11-24 23:00:50 UTC) to its merge (2026-11-25 13:57:02 UTC), 14 hours 56 minutes with reviews and his
+  check: the early look about 49 hours of work away, the judged soldier about 54.
 - The collision library: parry3d =0.31.1; 33 new lockfile packages, 31 in the players' file's tree (rust-reviewer's
   paper reading, to be confirmed by `cargo tree` after the hold).
 - The time unit: 3,000 units a second (rust-reviewer, block 4).
@@ -82,6 +86,5 @@ The advisor agent's re-read of draft 3 (the same agent, by message).
 - The board add-on is active for this chat (since 2026-11-25).
 
 ## Running work
-- The advisor agent (its re-read of draft 3; its review of draft 1 ended REVISE at about 19:36 Amsterdam); notes
-  `.checkpoints/cs4-walk/advisor-cs4-plan.md`.
+- No agent runs. The advisor agent's notes: `.checkpoints/cs4-walk/advisor-cs4-plan.md` (ends DONE).
 - No saver runs: the main session commits the notes by hand at each update.

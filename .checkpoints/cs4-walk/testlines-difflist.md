@@ -29,24 +29,24 @@ _Printed by `testlines-difflist.mjs` from the saved Export (sha256 9ad1d9f9...64
 | `T.foxPanMax` | 16 | 9.8 |
 
 **B. What he changed from the sandbox's start values** (the Export's own list: 18 entries,
-3 of them in the groups the game does not take: the grid, the metrics room, the Hornet):
-| Group and name | Start | His value |
-|---|---|---|
-| `simulation.step_rate_hz` | 30 | 60 |
-| `soldier.faction` | "soviets" | "empire" |
-| `movement.sprint_multiplier` | 1.214 | 1.52 |
-| `smg.recoil_view_kick` | 0.3 | 0 |
-| `smg.spread_rest_rad` | 0.075 | 0 |
-| `smg.spread_per_shot_rad` | 0.005 | 0 |
-| `smg.spread_max_rad` | 0.16 | 0 |
-| `smg.spread_recovery_rad_per_s` | 0.7 | 0 |
-| `aim_down_sights.ads_flatten_floor_deg` | 28.5 | 36 |
-| `camera.lens_vertical_fov_deg` | 15 | 13 |
-| `camera_framing.look_follow_rate_per_s` | 9 | 20.5 |
-| `camera_framing.edge_push_rate_per_s` | 9 | 2.5 |
-| `camera_framing.look_ahead_min_m` | 2.1 | 4.5 |
-| `camera_framing.camera_shift_forward_m` | 2 | 0 |
-| `camera_framing.camera_shift_side_m` | 1.2 | 0 |
+3 of them left out here because the game does not take their group: `measuring_grid`):
+| Group and name | Start | His value | |
+|---|---|---|---|
+| `simulation.step_rate_hz` | 30 | 60 | not carried: the game runs at 30 steps a second (question STEP-60) |
+| `soldier.faction` | "soviets" | "empire" | not carried: the sandbox session's own choice |
+| `movement.sprint_multiplier` | 1.214 | 1.52 |  |
+| `smg.recoil_view_kick` | 0.3 | 0 |  |
+| `smg.spread_rest_rad` | 0.075 | 0 |  |
+| `smg.spread_per_shot_rad` | 0.005 | 0 |  |
+| `smg.spread_max_rad` | 0.16 | 0 |  |
+| `smg.spread_recovery_rad_per_s` | 0.7 | 0 |  |
+| `aim_down_sights.ads_flatten_floor_deg` | 28.5 | 36 |  |
+| `camera.lens_vertical_fov_deg` | 15 | 13 |  |
+| `camera_framing.look_follow_rate_per_s` | 9 | 20.5 |  |
+| `camera_framing.edge_push_rate_per_s` | 9 | 2.5 |  |
+| `camera_framing.look_ahead_min_m` | 2.1 | 4.5 |  |
+| `camera_framing.camera_shift_forward_m` | 2 | 0 |  |
+| `camera_framing.camera_shift_side_m` | 1.2 | 0 |  |
 
 **C. Values with no number in the old game's tables, used by Walk:**
 | His Export's name | His value | The old game |

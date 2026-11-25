@@ -38,7 +38,13 @@ if (partA.length !== count) { console.error(`the comparison says ${count} differ
 // Part B: what he changed from the sandbox's start values, for the groups the game takes.
 const NOT_TAKEN = new Set(['hornet', 'measuring_grid', 'metrics_room']);
 const partB = exp.changed_from_start.filter((c) => !NOT_TAKEN.has(c.group));
+const leftOutGroups = [...new Set(exp.changed_from_start.filter((c) => NOT_TAKEN.has(c.group)).map((c) => c.group))];
 const leftOut = exp.changed_from_start.length - partB.length;
+// Rows of part B that the game does not carry either, each said in its row, so that a yes to the list takes neither.
+const NOT_CARRIED = {
+  'simulation.step_rate_hz': 'not carried: the game runs at 30 steps a second (question STEP-60)',
+  'soldier.faction': 'not carried: the sandbox session\'s own choice',
+};
 
 // Part C: names with no number in the old game's tables. [path, what the old game has, optional code text to find]
 const legacy = readFileSync('legacy/shamble-game.js', 'utf8').split('\n');
@@ -88,10 +94,10 @@ const out = [
   ...partA.map(([name, old, his]) => `   | \`${name}\` | ${old} | ${his} |`),
   '',
   `   **B. What he changed from the sandbox's start values** (the Export's own list: ${exp.changed_from_start.length} entries,`,
-  `   ${leftOut} of them in the groups the game does not take: the grid, the metrics room, the Hornet):`,
-  '   | Group and name | Start | His value |',
-  '   |---|---|---|',
-  ...partB.map((c) => `   | \`${c.group}.${c.name}\` | ${show(c.start)} | ${show(c.current)} |`),
+  `   ${leftOut} of them left out here because the game does not take their group: ${leftOutGroups.map((g) => `\`${g}\``).join(', ')}):`,
+  '   | Group and name | Start | His value | |',
+  '   |---|---|---|---|',
+  ...partB.map((c) => `   | \`${c.group}.${c.name}\` | ${show(c.start)} | ${show(c.current)} | ${NOT_CARRIED[`${c.group}.${c.name}`] || ''} |`),
   '',
   '   **C. Values with no number in the old game\'s tables, used by Walk:**',
   '   | His Export\'s name | His value | The old game |',
