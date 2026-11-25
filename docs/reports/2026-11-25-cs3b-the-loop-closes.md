@@ -8,8 +8,10 @@ request exists yet: his main Advisor opens it from the title and text the chat w
 `pr-body.md`, readable at the notes' last commit, below), and he taps the merge.
 
 **State of this version of the report (the last):** main moved while the change-set was reviewed (09faefa7, the merge of
-#66: lane 2's docs only), so the branch takes main in by one merge commit, the last commit of the branch: it resolves
-five docs that both lanes changed and touches nothing else. The code is final at 6abf3d2a; both review rounds are
+#66: lane 2's docs only), so the branch takes main in by one merge commit, the last commit of the branch: it keeps
+both lanes' text in the five docs both had changed, moves a few old lines about merged pull requests by script so
+that STATUS and ROADMAP keep to their limits (each line listed under "The merge of main", below), adds that
+section here, and touches no code, kit, gate or CI file. The code is final at 6abf3d2a; both review rounds are
 closed; the verifier's PASS is in; the advisor agent approved the code as it stands and the corrected text; his browser
 check is in, Brave and Firefox, with every asked number 0; RELEASE-COUNT is decided, (a) with two conditions. What
 follows the last commit and cannot stand in it: the advisor agent's approval of exactly that commit and GitHub's checks
@@ -261,6 +263,53 @@ held in it. Nothing is changed; the follow-up 3B-RESUME-FLASH keeps the question
   dated note after its "No pull request exists yet". `docs/REPO_MAP.md`: about 20 new rows (the check: "repo map OK:
   195 entries cover 109 required paths", with this report and the browser-check record). No ADR was edited.
 
+## The merge of main (the last commit): what it did in the record files
+Main moved to 09faefa7 (the merge of #66, lane 2's preview hosting check: docs only) after the docs pass above. The
+merge commit keeps both lanes' text in the five docs both had changed and holds no code, kit, gate or CI file. Lane 2's
+lines stand byte for byte, as his RECORD-FILES has it: a script found every line lane 2 added to those five files in
+them, unchanged.
+- `docs/DECISIONS.md`: both lanes' entries, newest first across the two lanes. A script checked every entry of both
+  sides byte for byte and in its side's order: 150 entries on this side and 162 on main's, 145 at their common start,
+  167 now (5 of this lane and 17 of lane 2 added).
+- `docs/STATUS.md`: 120 lines with both lanes' rows. To fit them, this lane's own lines were tightened (the header,
+  "Last merged" and main's checks, "Next" item 2, its three bullets under "Waiting on Mustafa", the follow-ups bullet
+  of 3b). The gate-step bullet is lane 2's two lines again; this lane's sentence in it, that OVERFLOW-PANIC-RULE fell
+  due with 3b, now stands in the bullet of his go. And three bullets about merged pull requests (#60, #61, #64) moved
+  to `docs/STATUS_ARCHIVE.md`, "Moved from STATUS (2026-11-25)", by script, byte for byte (his OLD-LINES). The eight
+  lines moved:
+
+```
+- **From #60 (Mediums: with the quality gate step's kit changes, his go):** security-auditor's F1-F5, test-engineer's
+  F1-F11, infra-engineer's L1-L6; his list for that plan: a CI lockfile check, the cut's part 2, KIT-REMOVED, ":" paths.
+- **From change-set 2 (#61)** (3a's marked in the archive): for 3b NA-N1, -N2, -N4 to -N7, EA-F9, EA-F10's bindings
+  part, EA-F13's one-writer item, TE-NT7, PA-N2; for 4 NA-N3; for 5 EA-N5, GE-N1, -N4 to -N6, PA-L2; for 5 and 6 GE-F7,
+  PA-L4; for the gate step SA-F6, SA-SWAP, TE-NT2; drafts EA-F6, EA-F12; his four things (SLICE-FEEL, LANE2-LIST,
+  PROJ-DRAW, FIREFOX); his check's readings (BR-GAP, not explained; BR-LATE, NOT-SHOWN, FF-WAKES, ADAPTER, TQ-FF).
+- **From CI-WASM (#64)** (the archive's block for #64): TE-COUNT, TE-TYPE-PLANTS, TE-TSC-LINES, TE-WATCH, TE-CPU,
+  TE-HIDDEN-FRAMES, IMAGE-CHROME, CUT-PATH, TOKEN-WORDS, GH-TOOLS after 3a, SAVER, MANUAL-MODE's record value.
+```
+- `docs/ROADMAP.md`: both lanes' entries made 13 under "Recent work", one over the file's own rule (8 to 12). The
+  oldest, of the merged pull request #52, moved by script, byte for byte, to the end of "Build history". The nine
+  lines moved:
+
+```
+**The foundation, 2.3: the first docs pass [2026-11-13 to 11-14, MERGED]** — foundation-2-3-docs (PR #52, 4460ef5,
+2026-11-14 09:06:30 UTC by `merged_at`, by merge commit, on Mustafa's go of 09:02:29 UTC, quoted whole in its message,
+after the advisor agent's APPROVE of bfd719b; CI green on main), by
+Mustafa's words of 2026-11-13 (docs only, no kit, gate or CI file): his go for #48 and his decision on step 2.3 go into
+`docs/DECISIONS.md` word for word, by script; dated pointers of 2026-11-13 in SPIKE_PLAN, ADR 0002, DECISIONS
+(SLICE-ORDER condition 3) and ROADMAP, his decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the
+CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge and on his go for it, and two pointing
+clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
+`docs/reports/2026-11-13-foundation-2-3-docs.md`. Step 2.3's plan followed on its branch and waits for his go.
+```
+- `docs/STATUS_ARCHIVE.md`: both lanes' blocks. The four gate-step bullets, which each lane's docs pass had moved
+  there, stand once, under lane 2's header, with one added line that says so. `docs/REPO_MAP.md`: both lanes' rows
+  ("repo map OK: 196 entries cover 109 required paths").
+- Read from GitHub for the dashboard's own lines: #66 merged on 2026-11-25 at 11:10:11 UTC as 09faefa7; `gate`,
+  `smoke` and `toolchain` are green on it (runs 45601988010 and 45601988031). Lane 2's rows still read as they did
+  before its merge: they are lane 2's to change.
+
 ## Steps and commits
 1ee3e918 the manifest batch · bab5a569, 63d2bf7a step 1 (messages, decoders, loopback) · 90da28c1 step 2 (the
 world) · 409b9434 step 3 (room, endpoint) · 4eeec33a steps 4 and 5 (the one step; Worker and page messages) ·
@@ -293,8 +342,9 @@ for hostile bytes in the room and the endpoint (3B-HOSTILE-ALLOC, with 3c's test
 ## Proposed next step
 Change-set 3c, the link simulator and the first recording, planned first and reviewed by the advisor agent.
 
-## Where the notes are (the checkpoint, folded in) The change-set's notes folder is removed (commit ace05e9f), as the
-checkpoint rules have it. Everything in it can still be read at the commit before that one,
+## Where the notes are (the checkpoint, folded in)
+The change-set's notes folder is removed (commit ace05e9f), as the checkpoint rules have it. Everything in it can
+still be read at the commit before that one,
 **80a51e4299d2a9abb0c08adc76dc1a31716f036a**, under `.checkpoints/cs3b-loop-closes/` and in
 `.checkpoints/cs3b-loop-closes.md` (the resume card): the plan (`cs3-plan.md`) and the two designs; the advisor agent's
 notes (`advisor-cs3b-start.md`, `advisor-cs3b-head.md`); the six reviewers' notes of both rounds, the verifier's and
