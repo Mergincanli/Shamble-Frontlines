@@ -134,18 +134,22 @@ those three finished in round 2. **All six: PASS in round 2.**
 - **The build plan's three sentences (his words of 23:24:50 UTC: "(a). Change it with the other two in 3b's docs
   pass, and show me all three old and new sentences in your report.").** In
   `docs/reports/2026-11-17-build-plan-slice-1.md`:
-  1. Old: "…with both ways of timing commands built (run on arrival; buffered, one per tick), because the netcode
-     proof test still chooses between them (Part 6) and the slice's mark runs under each." New: "…because Slice 3
-     chooses between them, no longer the netcode proof test (Mustafa, 2026-11-24), and the slice's mark runs under
-     each."
-  2. Old: a row of the table "What the proof test may change": "How commands are timed at the server (OQ-0001-6):
-     run on arrival, or buffered one per tick | undecided; an input buffer of 1 to 3 ticks, as data | one command
-     scheduler in `room`; … (change-set 7) | one module". New: the row leaves that table and stands under "Not the
-     proof test's, kept open the same way": Slice 3 picks it, no longer the proof test; change-set 7 still builds
-     both ways behind one command scheduler in `room`.
+  1. Old: "The room's command scheduler behind one seam, with both ways of timing commands built (run on arrival;
+     buffered, one per tick), because the netcode proof test still chooses between them (Part 6) and the slice's
+     mark runs under each." New: "The room's command scheduler behind one seam, with both ways of timing commands
+     built (run on arrival; buffered, one per tick), because Slice 3 chooses between them, no longer the netcode
+     proof test (Mustafa, 2026-11-24), and the slice's mark runs under each."
+  2. Old, a row of the table "What the proof test may change", removed there: "| How commands are timed at the
+     server (OQ-0001-6): run on arrival, or buffered one per tick | undecided; an input buffer of 1 to 3 ticks, as
+     data | one command scheduler in `room`; one function in the client endpoint that says when the next tick is
+     due (change-set 7) | one module |". New, a sentence at the end of the paragraph "Not the proof test's, kept
+     open the same way:": "How commands are timed at the server (OQ-0001-6) is Slice 3's pick, no longer the proof
+     test's (Mustafa, 2026-11-24); change-set 7 still builds both ways behind one command scheduler in `room`."
+     (The row's two other details, the input buffer of 1 to 3 ticks and the client endpoint's function, are no
+     longer in that file; the netcode decision record still holds both.)
   3. Old (risk 8): "Each is one module or one data value by design; the largest is how commands are timed." New:
-     "Each is one module or one data value by design; how commands are timed is no longer among them: Slice 3 picks
-     it (Mustafa, 2026-11-24)."
+     "Each is one module or one data value by design; how commands are timed is no longer among them: Slice 3
+     picks it (Mustafa, 2026-11-24)."
   3b's own queue picks neither way: one slot, a lockstep loopback.
 - **The presses mark, what is and is not met.** Met in Chromium: 0 lost and 0 doubled presses over 10,000, button
   by button; both of the mark's bites turn the test red. Not met, and stated plainly: (1) the row asks for Chromium,
@@ -170,6 +174,18 @@ those three finished in round 2. **All six: PASS in round 2.**
 - **Found and fixed on the way:** a refused command far ahead shut out the honest ones behind it (the queue's
   window now follows the last command that ran); the one-minute test started its clock after its first reading and
   went red once by one tick on a slow page; the press test's first script chose three of six keys.
+
+## The docs pass (in this change-set; docs-keeper)
+- `docs/DECISIONS.md`: his three messages of 2026-11-24 (22:44:50, 22:59:49 and 23:24:50 UTC), each with what it
+  answers, and one line of the chat's own, written by script from the chat's transcript and checked against it
+  (`decisions-5.mjs --check`: "is what this script writes (4 entries on top of 28254a7's)"). No word of his was
+  typed by hand.
+- The build plan's three sentences, as above. `docs/STATUS.md` (120 lines), `docs/STATUS_ARCHIVE.md`,
+  `docs/ROADMAP.md`: 3a is merged (#65); 3b's row; 3c next with its contents; RELEASE-COUNT listed as open; 16
+  follow-ups of 3b (3B-LATE-BOUND to 3B-OQ6-POINTER), each with who named it and when it is due. To keep STATUS at
+  its 120 lines, the follow-up blocks of gate step 2.3 moved to the archive under a dated header. 3a's report got a
+  dated note after its "No pull request exists yet". `docs/REPO_MAP.md`: about 20 new rows (the check: "repo map OK:
+  193 entries cover 109 required paths"). No ADR was edited.
 
 ## Steps and commits
 1ee3e918 the manifest batch · bab5a569, 63d2bf7a step 1 (messages, decoders, loopback) · 90da28c1 step 2 (the

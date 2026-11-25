@@ -193,6 +193,10 @@ green on main (gate run 43461710700, toolchain run 43461710673).
   merged (PRs #56, #58, #61), CI builds the WebAssembly and runs the tests that need it (PR #64), and change-set 3a is
   in flight; next, in change-set 3's approved plan's order, with Firefox joining by his FIREFOX-TESTS (b): the small CI
   pull request, then 3b (`docs/STATUS.md`, "Next").
+- **Pointer, 2026-11-25 (change-set 3b's docs pass; not his words):** change-set 3a is merged (PR #65); 3b is in
+  review, the small CI pull request is an Opus 5.5 chat's beside it; then change-set 3c (the link simulator and the
+  first recording, moved out of 3b by the size ladder), then change-set 4. Slice 3 picks how commands are timed, no
+  longer the netcode proof test (his decision of 2026-11-24, `docs/DECISIONS.md`) (`docs/STATUS.md`, "Next").
 - **Superseded by v2** (paused in issue #16; where things stand: `docs/STATUS.md` and `docs/V2_PHASE0_BRIEF.md`). **Queue (Advisor, 2026-10-15; updated 2026-10-16 after 3a):** greybox phase: three-teams (0. team-prep-fixes, merged → 3a three-teams-core, merged 2026-10-17 → **N1** (next; editor Play never rebuilds the nav grid; a one-line change-set) → **R19** (navBuild building-cell fix; right after N1, before 3b; Night queue item 2, NEEDS PLAN) → 3b three-teams-hud → 3c spawn-and-buy; editor v2 comes after the playable greybox loop, per the Advisor's queue) → **"ramps as slopes in SIM"** (its own change-set, before octopon-3-greybox; lets `_botFireWorld` go) → **NC-7 blast reach by line of sight** (to the target's nearest surface, ignoring the target's own box; before the octopon-3 playtests) → octopon-3-greybox → harvest-economy → bot-replan-storm → uplinks → win-and-scoring → scale test on the Octopon-3 greybox (N = 12, 24, 36, 48). Paused until the greybox loop is playable: tutorial-field-manual, ui-step-2, ui-step-3, build-spike, ADR run. house-textures-seeded: low priority, unslotted.
 - **From the 3a report** (approved unattended work is listed in the [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)): the `navBuild` building-cell fix with bot replanning (R19: 27.5 % of Cabana objective routes cross a roof bots can't climb) is now approved into the queue as item 2, NEEDS PLAN (Advisor 2026-10-17, R19-ORDER). Advisor LOS-SIZE: the bots' sight-check budget for 48 soldiers is sized in the 48-player performance change-set, with measured cost, together with the `updateSoldierAnim` split (CS11) and the soldier draw-call reduction (about 120 per on-screen soldier); that work is still proposed, not approved, and comes before `TUNE.teams.size` rises. Advisor K4-MEASURE: bot fairness between teams is judged by target searches per bot per second and the share of time with a target (`tools/perfbots.js` fairness), plus which team's bot fires first in mutual sightings (not in the tools yet; R19's plan adds it). After N1 and R19: 3b three-teams-hud, 3c spawn-and-buy, as planned.
 - **Core loop v2 (Oct 2026):** see LOOP_V2.md; greybox prototype first (§11).
@@ -211,6 +215,17 @@ green on main (gate run 43461710700, toolchain run 43461710673).
 
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
+
+**Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, in review]** — cs3b-loop-closes (the second
+half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the page's keys go to the
+Worker as posts, and a local server there answers through the real messages (five messages' codec, the transport
+interface and the loopback, the room, the client endpoint, local play's one step). A player sees a key diagram (W, A,
+S, D, Space, Shift) lit from the local server's echo and two new readout lines (messages; presses). The decoder test
+runs at its row's count: the mark has started, never passed. The link simulator and the first recording moved to a
+change-set 3c by the plan's size ladder (he was told first). Final code 6abf3d2a: 6,909 added lines against about
+3,800 planned (stop line 7,600); the players' Wasm 53,813 bytes; 114 Rust, 139 Node, 18 boundary and 16 browser tests;
+53 of 53 planted defects caught; CI green on it. Six reviewers passed two rounds; the verifier and the advisor agent are next, then his browser
+check (Brave, then Firefox) and his go; no pull request yet. Report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`.
 
 **Change-set 3a of the build plan, Rules and boundaries [2026-11-24, MERGED]** — cs3a-rules-boundaries (the first
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the simulation's rules under
