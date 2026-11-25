@@ -318,8 +318,23 @@ again and gives the same Wasm.
 net 1, the browser package's Node project 1; boundary 2 files and 18 tests; 16 browser tests inside the 5 minutes;
 the players' Wasm 53,783 bytes with the sha256 above.
 
-**CI, read line by line (before the fix pass):** green on d117fca5 and on eb0d2314 (toolchain run 45520531338,
-4 min 55 s of 15; 16 browser tests in 3.4 of 5 minutes; every count as written before the push).
+**CI, read line by line:** before the fix pass, green on d117fca5 and on eb0d2314 (toolchain run 45520531338,
+4 min 55 s of 15; 16 browser tests in 3.4 of 5 minutes; every count as written before the push). **On the fix
+pass 0dfca749: gate, smoke and toolchain green** (toolchain run 45529670690, job 138921570476, 01:59:13 to
+02:04:00 UTC: 4 min 47 s of its 15 minutes); **every count as written above before the push** (cargo debug twice
+111; release 19, 8 with the decoder run in 5.04 s, 17, 5, 1; client 83, sim-worker 46, types 7, net 1, the
+browser package's Node project 1; boundary 18; 16 browser tests in 3.3 of the 5 minutes); the players' Wasm
+53,783 bytes with the same sha256 as here. There: the loop 1,816 ticks in 60.5 s, 186 presses and releases made
+and echoed, 0 doubled, 0 refused, key to tick (now from the key event's own time) median 167.7 ms and 95th
+percentile 185.0 ms at about 10 frames a second; the press test 10,000 presses and releases made and echoed, 713
+posts delayed, 68 sent twice, 68 sent behind a newer one, 67 ignored by the Worker when the report was read, 0
+ticks ran an older post, 0 refused; allocation 90 bytes a frame and 597 a block at 8 frames a second (3.8 blocks
+per frame; the limits there: 160 and 680). The log: `.gate/cs3b/ci-0dfca749-toolchain.log` (scratch).
+
+**Round 2, first three (started 2026-11-25, about 02:00 UTC):** test-engineer, security-auditor and perf-auditor
+(Opus 5.5, effort max), each on its own copy `.gate/<name>-cs3b2` of 0dfca749; what they were given:
+`cs3b-loop-closes/review-context-2.md`; their notes `<name>-review2.md`. Then engine-architect, netcode-architect
+and rust-reviewer on what changed.
 
 ## Next steps
 1. (Reading done after his compact; the build order stands:) read CLAUDE.md, this card, the plan's sections 0, 3, 5, 8, 9, 12 and 13, his
