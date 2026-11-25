@@ -11,7 +11,9 @@ the new text below as it will stand (its notes: security-auditor-early-read.md):
 new text can go to him as it stands. It also checked that the step that fetches the build keeps every file inside
 its folder (actions/download-artifact 8.0.2, read in its own code and tried with a crafted zip).
 
-## What waits on him
+## Answered: his message of 2026-11-25, 20:51:45 UTC: "1.  a" and "2. a" (NEW-TEXT (a), PREVIEW-MISSING-BUILD-COMMENT (a))
+
+## What waited on him
 1. **NEW-TEXT: may one line of the approved preview.yml change?**
    - What happened: building the tests showed that the line `run: node --test hosting/` (the job `tests`, line 50)
      fails on Node 22. Node loads the folder as a module ("Error: Cannot find module 'hosting'", exit 1) instead of

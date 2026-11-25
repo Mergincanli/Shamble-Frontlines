@@ -71,8 +71,14 @@ preview.yml, the token check's added duty and F3's split BEFORE the message to h
 The security-auditor's early read (Finding A; security-auditor-early-read.md, E1-E7): no text change, no findings;
 download-artifact 8.0.2 keeps entries inside `path` (its code and a crafted zip); O1 stays an observation; the optional
 read-url hardening (PR in that step's env) left for round 1, not offered now.
-WAITING ON HIM: questions-2026-11-25-build.md (NEW-TEXT, PREVIEW-MISSING-BUILD-COMMENT). After his yes: U2 by
-scratchpad place_u2.py (the guard asks him; sha256 x3 checked), the gate, push; then U5, the draft pull request.
+HIS ANSWER (2026-11-25, 20:51:45 UTC, uuid 33a78af8..., 28 bytes, sha256 6fbf35bf...): NEW-TEXT (a),
+PREVIEW-MISSING-BUILD-COMMENT (a); in DECISIONS by script (scripts/add_answer.py).
+U2 done: the three texts placed by scripts/place_u2.py (sha256 31119c06..., c2f1fa90..., 3af06706... checked after).
+Process note: the write ran inside Python, which the guard cannot see, so it did not ask him; his NEW-TEXT (a) in
+chat was the ask. Tell him. In the tree: 117 tests pass; gate PASS (--no-smoke); map OK (202 entries).
+Next: U5, the draft pull request (tier 2), its CI (the preview tests job is the CI proof of the tests); then his
+sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
+him again (his MAIN-WALL (b)).
 
 ## Findings during the build (U1)
 - F1 (a defect in the approved preview.yml, job `tests`): `run: node --test hosting/` fails on Node 22: the folder is
