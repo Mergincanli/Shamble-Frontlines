@@ -3,40 +3,52 @@
 Saved under his rule of 2026-11-25, 01:35 Amsterdam, item 6: "From now on, when you wait on me: save the full question as
 a file in your notes, push it, and name the file and the commit in your message."
 
+Where the build stands: the preview script, its tests (117, all passing; 29 of 29 planted breaks in the script caught)
+and the header file are pushed; the upload tool's lockfile passed the security-auditor's check (no findings) and is
+pushed with its record; his three messages of today are in DECISIONS; the runbook is written. The advisor agent's
+verdicts on what the build found are in advisor-build-findings.md. Before this file went out, the security-auditor read
+the new text below as it will stand (its notes: security-auditor-early-read.md): RESULT-PLACEHOLDER
+
 ## What waits on him
 1. **NEW-TEXT: may one line of the approved preview.yml change?**
    - What happened: building the tests showed that the line `run: node --test hosting/` (the job `tests`, line 50)
      fails on Node 22. Node loads the folder as a module ("Error: Cannot find module 'hosting'", exit 1) instead of
      looking for tests in it. So with the approved text, the job `tests` would be red on every run, and none of the
      tests would run.
-   - The new line: `run: node --test hosting/preview.test.mjs`. That command runs all 117 tests (exit 0); a missing
-     file fails loudly (exit 1). Nothing else in the file changes.
+   - The one-line change: line 50, from `        run: node --test hosting/` to
+     `        run: node --test hosting/preview.test.mjs`. That command runs all 117 tests (exit 0); a missing file
+     fails loudly (exit 1). Nothing else in the file changes.
    - The new text: `.checkpoints/step-2-6-previews/texts/preview-proposed.yml`, 10,577 bytes, sha256
      31119c06e7d095baa3c99ed54bbc1a2c72d05b8b3cab88ffd4512dc12acd3abc (the approved one: 10,561 bytes, sha256
-     c66c0b0a...). The full text follows below, after the decisions.
+     c66c0b0a9351a528695908c57f7256d2cd18713219c5698a17eaebaac469c28e). The full text follows at the end of this file.
    - Options:
-     - (a) Yes, the new line. preview-close.yml and wall-test.yml stay as approved, byte for byte.
+     - (a) Yes, the new line. preview-close.yml (c2f1fa90...) and wall-test.yml (3af06706...) stay as approved, byte
+       for byte.
      - (b) Keep the approved text: the job `tests` stays red, and the tests never run in CI.
      - Not offered: a field in hosting/package.json that makes the folder argument work. It was measured to work, but
        it hides the fix in a file his word gave "for the upload tool only".
-   - Recommendation: (a). Nothing goes into `.github/workflows/` before his answer.
-2. **MISSING-BUILD: how a missing build is reported.**
-   - What the plan said (section 2.7): once main's toolchain workflow hands the build over, the pull request's comment
-     says when a build is missing.
-   - What the approved texts allow: when the job `check` fails, the job that writes the comment does not run. So a
-     missing build shows as a red run under main in the Actions tab, with an error line, and GitHub's own
-     failed-run notice. The comment says nothing that time.
+   - Recommendation: (a). The advisor agent approves the change. Nothing goes into `.github/workflows/` before his
+     answer.
+2. **PREVIEW-MISSING-BUILD-COMMENT: should the preview comment also report problems that stop the build check?**
+   - Why it matters: plan section 2.7 promised that the comment says when a build is missing, but the approved texts
+     cannot do it.
+   - What the comment covers with the approved texts: the upload's result and the header check.
+   - What it cannot cover: anything that fails or stops the job `check` (a missing build once main's toolchain
+     workflow hands one over, a refused build, a failed read of GitHub). When `check` fails, the job that writes the
+     comment does not run. Those show only as a red run under main in the Actions tab, with an error line, and
+     GitHub's own failed-run notice. The runbook says so.
    - Options:
-     - (a) Keep the texts. The red run is the signal; the runbook says where to look.
-     - (b) Change preview.yml so that the comment can say it: a larger text change, read again by the security-auditor,
-       then back to him with its sha256.
-   - Recommendation: (a). A missing build should be rare once the hand-over step is in.
+     - (a) Keep the texts.
+     - (b) Change preview.yml so that the comment covers them: a new text with a new sha256, the security-auditor's
+       re-read, and the job that holds the write permission running in more cases.
+   - Recommendation: (a), as the advisor agent's too.
 
-## Known, not a decision
-- **R-COMMENT-PERM.** The job that writes the comment holds `pull-requests: write`. GitHub's docs, as the session's
-  tools can read them, do not settle whether that alone allows writing a comment on a pull request: the permission page
-  lists the comment calls under both "Issues" and "Pull requests". The first real run shows it. If GitHub refuses, the
-  fix is a small pull request of risk tier 2.
+## Known, settled, not a decision
+- **Whether the comment job's permission is enough.** That job holds `pull-requests: write`. GitHub's documentation
+  (the page "REST API endpoints for issue comments", read 2026-11-25) says that creating or updating a comment needs
+  "at least one of" "Issues" (write) or "Pull requests" (write), and that this works with the token a workflow gets.
+  So it is enough; the first real run confirms it. If it ever were not: a small fix of risk tier 2 adding
+  `issues: write` to that job, with a new sha256 and his yes.
 
 ## The full new text (texts/preview-proposed.yml)
 ```yaml
