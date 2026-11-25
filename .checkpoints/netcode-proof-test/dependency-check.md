@@ -119,3 +119,21 @@ a06c090c7ee4b3b2f0fdf4ef9e319943957de549fb291da5aeefd6feb062748f  spikes/netcode
 bd1e23353bdcf6606256619217965bcbe3931f508fafc92300372a45417bf59a  spikes/netcode-proof/Cargo.toml
 55604a5fae45e50ee0fb262d743bc9e967b7caa3b23482de3b61de4cb28b9f5d  spikes/netcode-proof/Cargo.lock
 d8af72f767830e066b360725f200dbdf44b1df77d2c7e0bcb5150661c77c000e  spikes/netcode-proof/crates/client-wasm/Cargo.toml
+# Addendum, U7's Block 0b step 7 (the CLI), 2026-11-25 11:4x UTC, by security-u7-0b-answer.md Q1 (b) and Q2
+# condition 2 (`#` lines only). One main-run.sh call, log .gate/u7-0b/step7-cli.log: `env CARGO_NET_OFFLINE=false
+# cargo info wasm-bindgen-cli@0.2.130 --locked` exit 0 (11:42:15); `sha256sum -c .gate/u7-0b/cli-crate.sha256` OK for
+# /root/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f/wasm-bindgen-cli-0.2.130.crate, whose sha256 is R1's pin
+# c37f6904387d19a319525c74af274c73912f3871c35555aa49f3ea64ebb2fc7a; then `cargo install wasm-bindgen-cli --version
+# 0.2.130 --locked --root .gate/u7-0b/cli-root --bin wasm-bindgen` (target .gate/u7-0b/cli-target) exit 0 at
+# 11:44:09: 48 crates downloaded, 161 compiled.
+# Q1's checks, all before the CLI's first use: (a) `.gate/u7-0b/cli-root/bin/wasm-bindgen --version` prints exactly the
+# line "wasm-bindgen 0.2.130", and the bin folder holds wasm-bindgen only. (b) The packaged lock
+# (~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wasm-bindgen-cli-0.2.130/Cargo.lock) has 254 [[package]]
+# blocks and no git source; the log has no "Updating git repository" line; all 48 "Downloaded" names and versions are
+# in that lock (a print-only scratch script, python3 -I). (c) `cargo audit --file` on that lock, its own runner call
+# (log .gate/u7-0b/step7-audit.log, 11:45:13-11:45:17): exit 1, as expected; 254 crate dependencies; the database
+# fetched again (1,568 advisories); 1 vulnerability, url 2.5.8 RUSTSEC-2026-0592, and 5 allowed warnings, buf_redux
+# RUSTSEC-2023-0028, chrono RUSTSEC-2026-0543, multipart RUSTSEC-2023-0050, safemem RUSTSEC-2023-0081, twoway
+# RUSTSEC-2021-0146: R1's six crates only. (d) spikes/netcode-proof/Cargo.lock still 55604a5f...9f5d.
+# All four pass: the CLI may be used once this addendum is committed (Q2 condition 3); every workspace cargo call
+# stays --locked (Q1 condition 5).
