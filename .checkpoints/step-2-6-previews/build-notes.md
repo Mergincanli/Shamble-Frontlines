@@ -170,3 +170,23 @@ GitHub (docs.github.com):
   assets. Select Deploy site ." Create account (developers.cloudflare.com/fundamentals/account/create-account/, "Last
   updated Sep 17, 2026"): "go to Accounts", "Select Create Account . Enter an account name. Select Create Account ."
   Eligibility: user at least seven days old, Super Administrator on an existing account, up to five extra Free accounts.
+
+## B10. M1 after click 5: FAILED (2026-11-25, re-runs at 22:29 UTC)
+- His message (uuid 7903e9f9-6b78-4951-a72e-c82cd6c84b6d, 22:28:33 UTC, 941 bytes, sha256 4591957d...): "5 done";
+  no CLOUDFLARE_ secret (click 9); click 10 done; TOKEN-TONIGHT: B.
+- Re-run by this chat (actions_run_trigger, rerun_workflow_run, 22:29 UTC) of wall-test runs 45699354868 (push) and
+  45700220147 (pull_request), attempt 2: ALL THREE planted jobs ran, each with "S: ***" and "present":
+  push-to-branch job 139553977636 ("present" 22:29:10), pr-plain job 139553983737 ("present" 22:29:11),
+  pr-no-deployment-record job 139553984267 ("present" 22:29:12). GitHub did not refuse any of them.
+- The plan's stop rule applies (click 5: "If any planted job ran, stop: delete the environment, and no token goes in").
+  No token was going in (TOKEN-TONIGHT (b)); WALL_TEST is the worthless "not-a-token".
+- Read (docs.github.com, 2026-11-25 ~22:31 UTC): manage-environments: "Deselect Allow administrators to bypass
+  configured protection rules . Click Save protection rules ." (a separate save, not in the plan's click 5);
+  "If you chose Selected branches and tags , to add a new rule, click Add deployment branch or tag rule ... Click Add
+  rule ." deployments-and-environments: "By default, administrators can bypass the protection rules and force
+  deployments to specific environments."; "Deployment branches and tags are available for all public repositories.";
+  "Allowing administrators to bypass protection rules is only available for public repositories for users on GitHub
+  Free, GitHub Pro, and GitHub Team plans." The repository is public (list_repos). Every run here is triggered by his
+  account (an administrator), this chat's re-runs included.
+- Likely cause (not yet confirmed): the bypass box unticked without "Save protection rules", or the branch rule not
+  saved. Needs his screenshot of the environment page.
