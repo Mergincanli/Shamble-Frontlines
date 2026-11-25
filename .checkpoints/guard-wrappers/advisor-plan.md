@@ -7,3 +7,7 @@
 ## Plan-change ruling (round 1's fix pass, before the copy goes over the real guard)
 - Read the copy's guard diff against the real one, plan §8, and the new rows and mutant. Verdict: APPROVE with
   conditions (in the handback only). SA-D-DIRECT pre-ruled: approved if Mustafa says yes. No form is named here.
+
+## Severity ruling on round 2 (no form named)
+- R2-1 raised from Medium to Critical (reason in the handback: an agent's kit write passes with no refusal, the same
+  class as SEC-U7B-1 and SA-d). Round 3 on what changed allowed. SA-g refinement may ride; R2-2 may not.
