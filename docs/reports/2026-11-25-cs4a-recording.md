@@ -123,7 +123,9 @@ and tests with the first recording eb14739; round 1's fixes 91741e6 and 40bf269;
   asked for the change). Not built: the hostile-bytes count (the ladder).
 
 ## Evidence
-- **The legacy gate:** VERIFIER_GATE. CI on the pull request: gate and smoke green.
+- **The legacy gate** (the verifier's run, in a copy of its own): checks 1 to 4 and 5b to 5d pass (5 of 5 files
+  parse; symbols core 138, game 714, editor 353, none added, none dropped). The smoke run 5a could not start on
+  this machine (the tools' Playwright wants another browser build than the machine has); it is CI's smoke job: green.
 - **The toolchain job's commands by hand on the final source** (fb5d0ff; the notes' `local-checks.sh`): all passed.
   Format and lints clean (clippy with warnings as errors); `cargo test` twice (140 passed each time); the release
   tests of all six crates (139); the two vector generators' checks; the tools crate for wasm32; the packages' own
@@ -151,11 +153,17 @@ and tests with the first recording eb14739; round 1's fixes 91741e6 and 40bf269;
   the hash first runs on a live tick or the shared state passes 64 KiB (then XXH64 in our own code).
 - **The players' file:** 54,514 bytes (53,813 before 4a: 701 more for the one new number), sha256
   a4d8184c15736ec2cf2c347871afddcff289dd0a364f0d2016c87dd9866cd094 here, in the production and the development
-  build. On GitHub's runner: CI_DIGEST.
+  build, **and the same bytes on GitHub's runner** (the toolchain job's log on 21c1046: 54,514 bytes, the same
+  sha256). Against round 1's build exactly one byte differs: a line number inside a panic message (155 became 156
+  when round 2 added a line above it; the verifier built both and compared them).
 - **Counted, not inferred:** the two hashes take no memory from their first call (`state_hash_alloc.rs`); a tick of
   the local match with the hash read after it takes none over 18,000 ticks (`step_alloc.rs`).
 - **The verifier:** VERIFIER_RESULT.
-- **CI:** CI_RESULT.
+- **CI:** green on 21c1046, which holds the final source: gate, smoke and toolchain, each for the push and for the
+  pull request (six of six). From the toolchain job's log: 419 Rust tests passed over its three runs (140, 140,
+  139); 24 boundary tests; 17 browser tests in 3.4 minutes, with the line "first-loop.rec: 1800 steps, every shared
+  hash as in the file" in Chrome 157; the rule tests in Firefox (2 passed). CI on this report's own commit (docs
+  and notes only after 21c1046) is read after the push and stated in the chat and on the pull request.
 
 ## Reviews
 Two rounds, the budget's whole; Opus 5.5 at effort max. Every finding and what happened to it:
@@ -312,8 +320,9 @@ Waiting for their part, unchanged: DIFF-LIST (with his new Export, before 4b's s
 TUNE-HOME, SPRINT-DELAY-4, NO-SOURCE (before 4c); GREY-COLOURS is a default he can veto before 4b's step 9.
 
 ## For Mustafa
-1. **The merge of pull request #70:** his go for the head the advisor agent approved, FINAL_HEAD, after his
-   Advisor's merge check. No browser check: nothing a player sees changes.
+1. **The merge of pull request #70:** his go for the head the advisor agent approved (this report's own commit; its
+   full id is in the chat's message and in the pull request's text), after his Advisor's merge check. No browser
+   check: nothing a player sees changes.
 2. **Letters** for CONTENT-SOURCE and DEPART-4 (4b cannot start its first edit without them), and for
    EARLY-LOOK-ORDER, FIREFOX-REPLAY and LINKS-CHECK.
 3. **His new Export at 30 steps** (his STEP-60 (a)), pasted into this chat before 4b's step 6; no value of the

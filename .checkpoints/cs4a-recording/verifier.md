@@ -116,3 +116,49 @@ Read-only on the working copy; my builds under `.gate/verifier-*`; no git add/co
   touched after 9b5c96a. My results stand for the final source.
 - 1b CI on 21c1046 (`gh api .../commits/21c1046.../check-runs`, REST; GraphQL refused): gate x2 success, smoke x2
   success (22:17:54-22:19:04 UTC), toolchain x2 in progress at 22:20. To re-read.
+- 8a fold R1 (`World::visit` names every field): code world.rs:163-174 `let Self { tick: _, player: _, seed } = self;`
+  and visit_shared :177-188 names all three. By running: a field `extra: u8` added to World and new() in my copy:
+  `cargo check -p sim --locked`: exit 101, E0027 "pattern does not mention field `extra`" at world.rs:168 (visit) and
+  :182 (visit_shared); restored (`cmp` equal). FIXED, CONFIRMED
+- 8b fold S1 (seed checked in Replay::new and checkReplayable; Header's Debug without the seed): replay.rs:34-39 check()
+  refuses a seed not starting with TEST_SEED_MARK (*b"TESTSEED", recording.rs:39), Replay::new calls it first (:90);
+  recording.rs:59-69 Header's Debug by hand, no seed, `finish_non_exhaustive`; Header derives no Debug (:49);
+  recording.ts:134 checkReplayable refuses. By running: `--exact replay::tests::what_this_build_cannot_replay_is_
+  refused_by_name_before_any_call` green; with the seed condition made `false && ...` in my copy: exit 101, left None,
+  right "this build cannot replay this recording's seed: a replay takes a public test seed only" (so Sim::create
+  alone would take any seed); restored. TS: `vitest run --dir src --reporter=verbose recording` (sim-worker): 5 of 5
+  passed incl. the refusal test (recording.test.ts:150-155). FIXED, CONFIRMED
+- 8c hash report item 4 (13 of 13 known answers): `python3 -I rr_known_answers.py crates/devtools/recordings/
+  first-loop.vector.txt`: 13 ok, ALL OK; each of its 8 world.rs constants is in the final world.rs tests (:403-423),
+  which pass in 2c/2d. CONFIRMED
+- 8d hash report items 1 and 8 (cost: about 1.25 ns a byte, native and Wasm alike; 20 us at 16 KiB; p99 about 40 us):
+  native `cargo test --release -p devtools --locked --test hash_cost -- --nocapture` x3 on the idle machine:
+  16,384 B mean 20.93 / 20.59 / 20.49 us (p99 41.1 / 37.0 / 34.6 us); 4,096 B 5.17 / 5.16 / 5.03 us => 1.25-1.28
+  ns/B. Wasm (boundary replay test's reading, Node 22.23.5, release module) x3: 16,384 B 19.82 / 21.02 / 21.74 us;
+  4,096 B 4.89 / 5.13 / 5.17 us => 1.21-1.33 ns/B. Report: native 20.2-21.1 (p99 31.7-40.9), Wasm 19.2-21.0. My
+  native range sits inside; my Wasm top (21.7) is 3 % above its range (one-run means, a few % noise; a different
+  harness from its bench). CONFIRMED within noise.
+- 8e hash report items 2, 9, 7 (detection), my own script verifier-fnv-claims.py (seeded, not the reviewer's code):
+  one-byte changes: 0 of 13,770 (every position x 255 values of the real 54-byte state from the vector line +
+  TESTSEED seed) and 0 of 6,120 (3,076-byte state, 24 positions x 255) hash like the original; two sign flips: low 8
+  bits unchanged in 3,000 of 3,000, 9th bit changed in 1,479 (report 1,512); word-fed FNV, two top-bit flips in
+  different words: whole hash unchanged in 10,000 of 10,000. The 4 standard FNV-1a 64 values also from my own node
+  BigInt code. CONFIRMED (that RFC 9923 section 1.4 prints them: not opened, no fetch).
+- 1c CI on 21c1046 (re-read 22:24): gate x2 success, smoke x2 success, toolchain (pull_request run 45712016082)
+  success 22:17:58-22:23:01; toolchain (push run 45712006790) still in progress. Its log (`gh api .../actions/jobs/
+  139548551493/logs`): cargo test result lines sum 419 passed / 0 failed (= 140 + 140 + 139), sim_wasm_bg.wasm
+  54,514 B sha256 a4d8184c...d094 (= mine), boundary 3 files / 24 tests, Chromium 157 "first-loop.rec: 1800 steps,
+  every shared hash as in the file", 17 browser tests in 3.2 min. The final source (fb5d0ff) is inside 21c1046.
+- 0d symbol diff against the plan (plan.md section 4 table; symbols in netcode-architect-cs4.md block 1; changes
+  from the round-1/2 folds), `git diff -U0 07d673b HEAD` on pub items:
+  + sim: StateSink (re-exported), World::visit, visit_shared, write_shared_state (step 1); Fnv1a64 pub(crate) with
+    start/write/finish (fold R8/E1, buffer-free hash). + room/LocalMatch/Sim::shared_hash(&self) (step 2); Wasm
+    export +sim_shared_hash only. + devtools modules compare, files, recording, replay, scripts, sha256; bins
+    make_recordings, replay; test-module exports replay_hashes, replay_state_at, fnv1a_64_rounds (steps 3-5; sha256.rs
+    and files.rs are not in the plan's table but implement the design's 1.1/1.4 digests and the folder check, and
+    size-notes says so). + TS recording.ts (step 7); e2e node-names.d.ts gains readFileSync(path) and readdirSync.
+  ~ World::state_hash/shared_hash lose the scratch argument (fold R8/E1); write_state and STATE_BYTES now
+    #[cfg(test)] (round 2). - nothing else dropped. 3B-HOSTILE-ALLOC's any_bytes tests untouched (moved by the ladder,
+    told to him in STOP-4A). No live code calls shared_hash: only the glue in the built Worker holds the method, no
+    Worker or page source calls it. Matches the plan with its folds: yes.
+- 0e .checkpoints/ files are in the branch (expected for a draft); before the PR is marked ready they must go.
