@@ -41,4 +41,8 @@ Notes:
 - Size: 94 added lines in the two kit files (47+47), under the 150-line cap.
 - Not verified: smoke 5a (Chromium build 1194 missing, container has 1243); interim rule (no live tries) not checkable from the repo; docs step (cond. 6) not yet due.
 - B10: verdict FAIL (V-1 only; code head c3827f4 clean on checks 1-4, 6, 7 and conditions 1-4, 7). .gate/verify-main removed with git worktree remove.
+Re-run (after a163b88, V-1 fix):
+- probe-unwrap-inscope.mjs output vs probe-after.txt: no diff (21/21 rows; the two split rows now show program x). V-1 closed.
+- git diff --name-only c3827f4 HEAD: only .checkpoints/ files (guard-env-fix.md, probe-after.txt, verifier notes and scripts); .claude/hooks diff empty. Code head still c3827f4.
+- V-2 (Low) goes to STATUS as a follow-up (caller). Final verdict: PASS WITH NOTES.
 DONE
