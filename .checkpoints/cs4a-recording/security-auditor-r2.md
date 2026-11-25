@@ -31,3 +31,28 @@ Threat model unchanged from round 1 (five lines there); what round 2 must add to
   (one hash export, sim_shared_hash); no state_hash/write_state/Fnv1a64/visit/TESTSEED/SHMBLREC strings; name section
   holds Room::shared_hash and World::shared_hash only. Built pages: no reader text; Worker chunk worker-DooL-xcp.js
   holds the glue wrapper only, no globals. Threat model: no change, one place fewer where state bytes lay.
+- S1 FIXED (read): replay.rs:37-40 the first `cannot` entry refuses a seed without TESTSEED, test at :295-299;
+  recording.ts:134 the same first in checkReplayable, test in recording.test.ts (replayOn refuses seed [7;32] and a move
+  with no call made); recording.rs:59-69 Header's Debug written by hand, seed left out (finish_non_exhaustive), test at
+  the `shown` assertion. Recording/Step derive Debug through it; no other devtools type holds a seed.
+- S3 FIXED (run, copy .gate/sa-4a-r2 at ec005ad, own target .gate/sa-target, offline): round 1's link (vector.txt ->
+  a scratch file outside the repo): write mode exit 1, "...first-loop.vector.txt" is a link or not a plain file", the
+  outside file untouched (write had rewritten .rec and .hashes in place first, same bytes); --check exit 1, same text.
+  The folder as a link: both modes exit 1, "...recordings" is a link or not a plain folder", nothing written. A link to
+  /dev/zero in first-loop.rec's place: --check (ulimit -v, timeout) exit 1 at once, never read. Unlisted names quoted
+  ({name:?}) and non-UTF-8 names now reported (to_string_lossy) instead of skipped. files.rs:65-83, :92-94, :108-115.
+- S3 read side, still open as recorded (fold file: follow-up for the gate step, risk tier 2): the other readers do not
+  go through plain(). Run: with first-loop.rec -> /dev/zero, tests/recordings.rs:18 `read` panicked "first-loop.rec:
+  out of memory" under a 1.5 GB cap (uncapped: reads until memory runs out). Same for two_processes.rs (path("rec")),
+  two_instances.rs:42-44, replay.test.mjs:15, determinism.spec.ts:68,70 (read, not run). Exposure: a test run on a
+  hostile branch; CI cannot go green with such a link (check refuses it).
+- S4 FIXED (run, same copy): SHAMBLE_TWO_PROCESSES_CHILD=1 without the parent's arguments now runs as the parent:
+  two children started (fingerprints f588d16e9539c4de and fd15704e71b89730), compared, passed (two_processes.rs:67).
+- Item 3, children's output: every step's tick/shared/whole of the scripted test seeds (first-loop, long-loop:
+  test_seed(name), and Replay::new now refuses any other) goes to the parent through pipes (.output()); the parent
+  prints only the two fingerprints and, on a failure, one Difference or the child's stderr. No new exposure.
+- R2-1 Low (new, run): bin/replay.rs:34-39 `fields` echoes the differing lines of two files verbatim, through
+  field_diff (compare.rs) and eprintln (:61). A dump with ESC ] 0 ; ... BEL (printf to a scratch file) came out with
+  033 and \a raw (od -c): a dump from another machine (the tool's very use: two targets' prints) can drive the
+  terminal. Fix: escape each printed line (`line.escape_debug()` in the `fields` arm), 1 line.
+- Copy removed with `git worktree remove` (it was clean); `.gate/sa-target` still left (round 1's refusal).

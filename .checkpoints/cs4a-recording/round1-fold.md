@@ -130,3 +130,36 @@ Every "Fix" above is made; no finding of round 1 is deferred but the ones marked
   between interleaved matches and has controls that must stay green; plants C, D and E show their tick and their
   field through the tools; the result counts defects and controls apart, names its commit and says whether the tree
   was put back.
+
+# Review round 2, on what the fix pass changed (`git diff eb14739..07903d9 -- crates packages`)
+The second and last round: a third only for an open Critical or High. A finding below High rides in the next push if
+it is a line or two, or becomes a follow-up.
+
+## rust-reviewer: APPROVE; all eight of its findings fixed (`rust-reviewer-r2.md`)
+It rebuilt the players' file as the build does: 54,514 bytes, sha256 19847796...f708, the same as here, and the same
+function bodies as its own round 1 variant (one byte differs: a panic message's line number). The test module's fuzz
+ran again at the fixed head: no trap, the same counts as round 1.
+| # | Severity | Finding | Decision |
+|---|---|---|---|
+| R2-1 | Low | `sim-wasm/tests/step_alloc.rs`'s comment still says the hash's buffer "was reserved with the room"; the buffer is gone | Fix, 1 line, in the next push |
+| R2-2 | Low | `World::write_state` writes the whole state, seed included, into a caller's buffer, and nothing outside the simulation's own unit tests calls it any more | Fix, 2 lines: `#[cfg(test)]` on it and on `STATE_BYTES` (engine-architect is asked whether 4c or change-set 7 needs it public) |
+| nit | Low | `scripts.rs` line 3 is 188 characters long after the fix; the writer's reserve dropped the header, so every encode reallocates once | Fix, 3 lines |
+
+## test-engineer: APPROVE; all seven of its fix findings fixed (`test-engineer-r2.md`)
+PM-0004-21's "each of the three injections caught at its tick with the field" is shown now, on today's state. It ran
+two plants of its own against the new tests: a seventh number on the generated `input` fails the type pin; a rebase
+that also runs a tick turns the rebase test red.
+| # | Severity | Finding | Decision |
+|---|---|---|---|
+| T2-1 | Low | The plants script merges Node's error output into plant E's WebAssembly state file, so the field comparison also printed four "no such line" entries, which the result hides by showing only the `player.` lines; the catch itself holds | Fix in the notes script for its next run (2 lines); one sentence in the report |
+| T2-2 | Low, wording | The pull request's CI job tests the head merged into main, which since #71 runs every crate's release tests, the tools crate's among them: so "the two-process test runs in debug only" is out of date for the pull request's run | The report says: release in the pull request's CI since #71 |
+The report still owes its three caveats: plant E is a stand-in; plant D was planted natively only; in CI a red replay
+names the step and the field comes from the tools by hand.
+
+## Main moved during round 2: #71 (the CI Builder's change) is taken in
+Merge commit 21dff0c (main 07d673b): CI's toolchain job now runs every crate's release tests (the tools crate's among
+them), the two vector generators' checks, the tools crate's own wasm32 build, and the rule tests in Firefox;
+`packages/e2e/playwright.config.ts` gained a `firefox` project for `tests/rules` only. No conflict: this branch had
+touched none of its files. Run here on the merged tree: the release tests of all six crates (139 passed), the tools
+crate for wasm32, both generators' checks. A wish for the CI Builder, not done here: the replay spec needs no WebGL
+and could join the `firefox` project, which would show the recording in a second engine (follow-up 4A-FIREFOX-REPLAY).
