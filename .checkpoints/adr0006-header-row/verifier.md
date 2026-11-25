@@ -141,3 +141,17 @@ restore E3's wording, or record a plan revision 3 covering E7 as built and E3's 
 3. Gate --no-smoke.
 4. PM-0006-2 under E1's final words, against Appendix A (custom domain: the check had none).
 ### Results
+- Gate (item 3): `node tools/gate.mjs --no-smoke` GATE PASS, exit 0; [1]-[4], [5b]-[5d] PASS, symbols +0 -0, 0 flagged,
+  [5a] SKIP. Ran on HEAD b5952f0 (one more checkpoint commit after a4152ad); `git diff --stat ab15d6d HEAD -- .
+  ':!.checkpoints'` and the working tree outside .checkpoints/ are empty, so the tree equals ab15d6d's docs.
+  plan.md and advisor-plan.md unchanged since a4152ad.
+- Word for word (item 1; verifier-scratch/r2_wordcheck.py): base 09faefa with every planned replacement applied
+  (revision 2's E1, E2, E3, E4, E6, E9, E10, as revision 3 amends them: R3-2, R3-3, R3-4, R3-5, R3-6, R3-10, R3-11, and
+  R3-1's block inserted after the *Need:* line) equals ab15d6d's ADR, whitespace-normalised, whole file: no departure.
+  - E7: R3-1's fenced block, 15 lines, equals head :159-173 byte for byte; preceded by the *Need:* line, followed by
+    "2. **Preview privacy.**".
+  - Each "before" found exactly once in the base (scoped for R3-10, below).
+  - R3-10 and R3-11 as in plan.md equal the advisor agent's recorded words in advisor-plan.md ("Exact texts").
+  - R3-10 names part 1's clause (:148 at 1c45ed7, base :145); that is the one changed. The same phrase "with no cap on
+    previews" stays at :67 ("The findings the decision turns on", item 1), unchanged and outside R3-10. Low note:
+    follow-up ADR6-PAGES-RETENTION (R3-7) names part 1's clause and the options row, not :67.

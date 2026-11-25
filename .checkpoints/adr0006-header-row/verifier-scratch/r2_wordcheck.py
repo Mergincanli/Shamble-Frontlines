@@ -56,7 +56,8 @@ def rep(old, new, label):
     global B
     c = B.count(old); check(f"{label}: 'before' found once in base (count {c})", c == 1); B = B.replace(old, new)
 rep("Pages' Free plan allows 500 builds a month (R6-HOST-F3, r6 lines 72–79), and whether a direct upload counts against them is a spike item (part 14). If uploads count, only the newest push of each pull request deploys (ADR 0002's concurrency cancel) and the month's deploys are counted; a paid plan is Mustafa's after a price read (proposed, not researched).", e3, "E3")
-rep(r310[0], r310[1], "R3-10")
+ctx = "every branch gets its own link "
+rep(ctx + r310[0] + " and GitHub Pages", ctx + r310[1] + " and GitHub Pages", "R3-10 (part 1 *Why*, the clause R3-10 names at :148)")
 need_end = "VISION_V2 §4 (desktop browsers first). 2. **Preview privacy.**"
 rep(need_end, "VISION_V2 §4 (desktop browsers first). " + N("\n".join(blk)) + " 2. **Preview privacy.**", "E7 insert")
 rep("- whether a direct upload counts against Pages' 500 builds a month (R6-HOST-REC1, r6 lines 633–634);", e6, "E6")
