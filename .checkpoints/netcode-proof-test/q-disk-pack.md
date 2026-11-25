@@ -3,11 +3,12 @@
 **The question, in plain words:** may I pack seven more closed sets of test logs into archives, to free about 2.3 GiB
 of disk?
 
-**Why it matters:** the build cache is cold again (my mistake at 05:2x UTC: u7-block0b.md, "the shared-target
-incident"). Refilled, it holds about 8.5 GB. After U7's check now running, about 4.5 GiB will be free, close to the
-build runner's 4 GiB floor (main-run.sh stops under it). U7's R-half and U8's fixes build next, and Builder 2's merge
-needs 8 GiB free (NB2-C5). Each time the floor is crossed I must empty the debug cache (the approved part-clean), and
-the next build is cold again: about 20 to 40 minutes, and the 8.5 GB fill again.
+**Why it matters (numbers corrected 06:2x UTC):** U7's check filled the build cache to about 9.0 GiB (9,013 MiB used;
+2.9 GiB of it incremental), leaving 4,250 MiB, just over the build runner's 4 GiB floor (main-run.sh stops under it).
+I emptied the debug cache by the approved part-clean (9,094 MiB freed): 13,344 MiB free now, the cache cold. From now
+on the builds run with incremental off, so a warm cache is about 6.1 GiB and about 7.1 GiB stays free: still under the
+8 GiB that Builder 2's merge needs at its check (NB2-C5), before U7's R-half and U8's fixes add their own builds. Each
+time a bar or the floor is missed I must empty the cache again, and the next build is cold: about 20 to 40 minutes.
 
 **Measured numbers (2026-11-25 05:4x UTC, `du -sh`):**
 - The seven sets, all from closed units, none covered by your packing words so far (the card at 74bf901):
@@ -27,5 +28,5 @@ the next build is cold again: about 20 to 40 minutes, and the 8.5 GB fill again.
   only after I confirm it is closed: about 2.3 GiB back.
 - (c) Pack nothing: I work with part-cleans, each costing a cold rebuild.
 
-**My recommendation:** (b). The archives keep every log (KEPT-LOGS), so nothing is lost; it saves several cold
-rebuilds before R1.
+**My recommendation:** (b). The archives keep every log (KEPT-LOGS), so nothing is lost; with it, about 9.4 GiB stays
+free beside a warm cache, over Builder 2's 8 GiB, which saves several cold rebuilds before R1.

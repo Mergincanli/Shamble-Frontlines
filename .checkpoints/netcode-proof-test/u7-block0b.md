@@ -114,8 +114,11 @@ the CLI's own build folder is cleaned before it. Each step checks the same thing
 - Free after: 4,250 MiB (df -m).
 
 ## The dev part-clean after step 5 (06:1x UTC; no lane or agent running)
-- Why: 4,250 MiB free, just over the 4 GiB floor; the cache was debug 6.1 GB, of it incremental 2.9 GB (`du -sh`),
-  built by main-run.sh with incremental on, which U7's and U8's runners (CARGO_INCREMENTAL=0) would not reuse.
+- Why: 4,250 MiB free, just over the 4 GiB floor. The cache's debug folder was about 9.0 GiB: incremental 2.9 GiB plus
+  6.1 GiB of the rest (one `du -sh` over both paths counts each file once, so its 6.1 G for debug excluded incremental;
+  the run used 13,263 - 4,250 = 9,013 MiB and the clean freed 13,344 - 4,250 = 9,094 MiB). Built by main-run.sh with
+  incremental on; that U7's and U8's runners (CARGO_INCREMENTAL=0) would not reuse it is my reading of cargo's
+  fingerprint, not measured.
 - The card's Tools line, character for character: `env CARGO_NET_OFFLINE=true flock -x <M>/.gate/shared-target/.lane.lock
   cargo clean --manifest-path <M>/spikes/netcode-proof/Cargo.toml --target-dir <M>/.gate/shared-target --profile dev`:
   "Removed 19575 files, 9.5GiB total". Then `test -f` .lane.lock OK, `test -f` CACHEDIR.TAG OK, `test ! -e` debug OK;
