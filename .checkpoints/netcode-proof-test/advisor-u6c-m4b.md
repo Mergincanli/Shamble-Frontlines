@@ -93,9 +93,26 @@ Read only, effort xhigh. Brief: u6c-m4b-request.txt (sha256 d124e576… checked,
 ## 1. Verdict: APPROVE WITH CONDITIONS (M5 may start once C1-C3 hold)
 The hand edits are exactly my round-2 section 3 text, with no rustfmt change. They touch only the three named files,
 and every other file in the spike is byte-equal to the builder's worktree. Section 3's four reading checks hold.
-His condition holds for the whole measured window and the whole warm-up except its first fraction of a millisecond:
-the read now comes just after the leg's zero, not before it (section 4). That is the placement he said yes to ("the
-one-line move"), so it does not stop M5. He gets it as one plain line (NPT-EDGE-SLIVER, section 8).
+His condition holds for the whole measured window, and for the whole warm-up except its first moment: the read now
+comes just after the leg's zero, not before it. By reading that moment is normally under a millisecond; it is not
+measured (section 4).
+- He said yes to (a) as my question described it: "move the read to the leg's start", a one-line move. The exact line
+  placement is my section 3 text (H1c), which his "with your advisor's read" sends to this read. That placement does
+  not stop M5.
+- The residual is ADV-M4B-1, labelled Low (below). He gets it as one plain entry (NPT-EDGE-SLIVER, section 8).
+
+**Findings of this read:**
+- **ADV-M4B-1 (Low): the warm-up's first moment lies outside the edges.** That moment runs from the zero to the read:
+  the pacer thread's start, then the /proc read. A drop there is missed only if a stall begins in it and also holds
+  the read back by about 28 ms (carried, not re-measured).
+  - Not High under "a rule loosened beyond his words": the placement is the one his (a) described, the 10 s stay
+    counted save that moment, and he is told.
+  - Not Medium: its reach is a stall of about 28 ms or more that lands on a sub-millisecond moment, once a leg.
+  - Taker: none if (a) stands (closed by his answer). If he picks (b), the small follow-up in section 8 takes it.
+- **ADV-M4B-2 (Low, wording): "at the leg's zero" should read "just after the leg's zero".** It appears in H1a's
+  module-doc line, H1c's comment and SERIES.md:915. It does not change M5 and triggers no push on its own.
+  - Taker: (b) if picked; otherwise a STATUS follow-up for the next change-set that edits
+    crates/server/src/probe.rs or marks/SERIES.md.
 
 ## 2. Section 4's head read
 - hunks.diff sha256 9a3bbeb7…7b846: matches.
@@ -139,14 +156,15 @@ one-line move"), so it does not stop M5. He gets it as one plain line (NPT-EDGE-
     about 28 ms or more, right at the leg's first instant.
   - Every stall that starts later in the warm-up, or in the window, is counted.
 - **The main session's reading** ("the warm-up and the window stay between the edges") is right except for that first
-  fraction of a millisecond. The report must say so (C5), not "fully" without the caveat.
+  moment. The report must say so (C5), not "fully" without the caveat.
 - **The strictly exact form** reads just before the pacer starts, so before `zero`. It means splitting the `started`
   closure: more than the one-line move he approved, and new text needing a head read. It is offered to him as an
   option, not built now.
 
 ## 5. Conditions, one line each
-- **C1:** M5's log header (and a probe's) shows diff 6c3b4dbb…11ec2 and untracked 5cb9a300…f33a, the tree I read.
-  Anything else: stop.
+- **C1:** M5's log header (and a probe's) shows exactly the tree I read, equal to m4a-fmt.log:3. Anything else: stop.
+  - diff 6c3b4dbbd5e9c9fafda5ee316eb16ce4b61de12e8db1bf5aa14483b141711ec2
+  - untracked 5cb9a30097a402787e5d685bf70cb97ee816709eaeaac411f16ea7206006f33a
 - **C2:** right before M5, at least 8,192 MiB free. After a probe (Q1), at least 8,192 MiB minus the probe's own use
   (its header's free minus a `df` right after it). Otherwise the approved dev part-clean first, then at least 8,192 MiB.
 - **C3:** M5 starts only once the beside-running checks (step 7's reruns, Netcode Builder 2's plan check) have ended,
@@ -156,8 +174,9 @@ one-line move"), so it does not stop M5. He gets it as one plain line (NPT-EDGE-
   - measured 861 and bites 958, 0 failed, 0 reported a skip (fix-check.log:9);
   - wasm 27,000 ticks, 0 mismatching; marks 81; self 78/78; redact 0 findings.
   The refs count is not compared, because this head tracks more files.
-- **C5:** the report states his condition as section 4 does: the read lands a fraction of a millisecond after the leg's
-  zero. It also keeps his sentence on the 214 in-window drops ("stay recorded as unexplained") word for word.
+- **C5:** the report states his condition as section 4 does: the read lands just after the leg's zero, normally under
+  a millisecond by reading, not measured. It names ADV-M4B-1 and -2, and keeps his sentence on the 214 in-window drops
+  ("stay recorded as unexplained") word for word.
 - **C6:** before any fallback in section 7, copy the M5 log and every .gate/netcode-proof-test/failed-steps/*.log into
   .gate/u6c-merge/. check.mjs deletes a step's kept log when that step next runs (check.mjs:2677).
 
@@ -199,9 +218,12 @@ one-line move"), so it does not stop M5. He gets it as one plain line (NPT-EDGE-
   - **Before M5** (C2 not met, or main-run.sh exits 3 before any command): the approved dev part-clean with no lane
     running, re-measure, then M5 at 8,192 MiB or more. Still under after the part-clean: stop and wait. Delete
     nothing else; the kept logs are evidence.
-  - **During M5:** the run counts as void (neither a code failure nor a pass) only if two things hold. The failing
-    step's kept log names "No space left on device" or "os error 28" as its first error. And no other test fails
-    without that error. Record a `df` right after.
+  - **During M5:** the run counts as void (neither a code failure nor a pass) only if two things hold.
+    - The first error names "No space left on device" or "os error 28". The source is the failing step's kept log or,
+      when that log could not be written on a full disk (check.mjs:2685-2691), the step's last 40 lines that check.mjs
+      printed into the M5 log. If neither shows the first error: stop and wait.
+    - No other test fails without that error.
+    Record a `df` right after.
   - Then: C6's copies, the part-clean, at least 8,192 MiB, and one full M5 again on C1's hashes. The report names both
     logs.
   - A run cut with no result is treated the same way: one full M5 again (U6b's run 2, advisor-u6b-m6.md:374-375).
@@ -220,14 +242,18 @@ one-line move"), so it does not stop M5. He gets it as one plain line (NPT-EDGE-
 
 ## 8. Decisions needed
 - **NPT-EDGE-SLIVER (new; no answer needed unless you want (b)).**
-  - The question: the first dropped-packet reading of each probe leg now comes a fraction of a millisecond after the
-    leg starts, not before it. Is that close enough to your "the 10 seconds of warm-up … stay fully counted"?
-  - Why it matters: a stall that starts in that first fraction of a millisecond is missed only if it also holds the
-    reading back about 28 ms. Everything after it is counted.
+  - The question: each probe leg's first reading of dropped packets now comes just after the leg starts, not before
+    it. By reading of the code that gap is normally under a millisecond; it is not measured. Is that close enough to
+    your "the 10 seconds of warm-up … stay fully counted"?
+  - Why it matters: drops from a stall that starts in that gap are missed only if the stall also holds the reading
+    back by about 28 ms (a figure carried from the round-2 ruling, not re-measured). Everything after the gap is
+    counted.
   - Options:
-    - (a) Keep it as merged: the one-line move you approved.
+    - (a) Keep it as merged: your (a), "the one-line move", placed as the round-2 ruling's text.
     - (b) A small follow-up before R1 that takes the reading just before the leg starts. That is a few changed lines,
       with its own plan, the advisor's check and one counted run.
+      - Last day to pick it: the end of Sat 28 November (Amsterdam). It must land before Stop B's fill on Tue 1
+        December, which records R1's build hashes (the card, :190-191).
   - Recommendation: (a).
 
 ## 9. For Mustafa
