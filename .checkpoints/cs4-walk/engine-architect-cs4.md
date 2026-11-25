@@ -748,3 +748,190 @@ the same fields in "Copy report". The key diagram stays.
 | browser specs: walk (move, jump, 0.55/0.56 in the yard through the page, aim on a ramp, camera follows), panel, reload hook, even-motion reading, blur, allocation re-measure | 0 | 520 |
 | Total | 1,590 | 1,670 |
 - B4 DONE. Next: B5, the cut and the order.
+- N59. Checked (grep, this copy): devtools uses `sim` (rules/stream.rs:5, rules/f32_ops.rs:13), `sim-wasm` (wasm.rs:10) and wasm-bindgen; `client-endpoint`, `protocol`, `room` are named in devtools/Cargo.toml:14-17 and used nowhere.
+
+## Block 5. The cut and the order (DONE)
+
+### 5.1 Step 1, the recording (netcode-architect designs it), placed in `devtools`
+- Files: `crates/devtools/src/replay.rs` (the runner: drives `sim_wasm::Sim` natively through the same calls the
+  Worker makes, `Sim::create(seed, mode, 0, bundle)`, then per tick `input(...)` and `step(now_ms)`, reading the shared
+  hash after each step; the native tests already call these methods, sim-wasm/src/lib.rs:181-200), `compare.rs` (the
+  first differing tick; the field-level diff comes from two native runs, since the Wasm side gives only the hash),
+  `recording.rs` (the format: read and write), `src/bin/record.rs` (write mode: a seeded scripted walker, run natively,
+  writes the recording with its expected hashes), `crates/devtools/recordings/*.rec` (data). The Wasm halves:
+  `packages/sim-worker/boundary/replay.test.mjs` (Node) and `packages/e2e/tests/rules/replay.spec.ts` (Chromium) feed
+  the recorded calls to the players' file through `new Sim(...)`, `input`, `step` and the one new read-only export
+  (DEPART-3 (a)).
+- The export: `Sim::shared_hash() -> u64` (one BigInt, read only by the replay harnesses; the live host never calls it,
+  pinned by a test on host.ts and by the boundary test's list of `Sim.prototype` names); it returns the shared hash only,
+  its buffer private to `Room` (my 3b round 2 advice, STATUS_ARCHIVE.md:1555-1556; N15).
+- Before the first recording is committed: PM-0004-21's short report (the function confirmed or replaced, its cost per
+  tick; state_hash.rs:5-7; cs3 plan :72-74). In step 1 the recording runs on today's state (tick and echo); every later
+  step that changes the state or the command re-makes it in write mode and the four runs compare on the new hashes, so
+  "built and green before any movement code rests on it" (his condition b) holds and the recording that carries the
+  marks is the one made on the moving state (step 7).
+- devtools' three path edges (security-auditor's L2 = my EA-6; STATUS_ARCHIVE.md:1549-1550): after step 1 devtools
+  uses `sim`, `sim-wasm`, wasm-bindgen, and from step 2 `content` (its bins). `client-endpoint`, `protocol` and `room`
+  stay unused (N59): drop all three in cs4's one manifest batch (no outside code; a removal); the link-simulator
+  change-set adds `protocol` back with its first user (its `TransportPair`). "No declared edge without a user at
+  merge" closes L2 by name (his condition c).
+- Where 3c's other named items go (his condition c; the archive's list, STATUS_ARCHIVE.md:1547-1557, N21): to Walk:
+  the host's time recorded with every tick; the state-hash export (shared hash only, plain numbers, replay-only, buffer
+  in `Room`); devtools' edges; 3B-HOSTILE-ALLOC (STATUS_ARCHIVE.md:1543-1546, "with 3c's tests"; the part that comes
+  first takes it: a counting allocator in the two random-message tests, `crates/room/tests/any_bytes.rs` and
+  `crates/client-endpoint/tests/any_bytes.rs`). To the link-simulator change-set: its clock through `LocalMatch` from
+  recorded times; its reliable channel exactly once; loss and the rate limit as silent drops, duplicated datagrams
+  only; corruption as loss only; a `link()` accessor on `LocalMatch`; `late` checked against its own reorder count.
+
+### 5.2 One stop or two: two (recommended)
+The bottom-up sizes (blocks 1 to 4, step 1, and the netcode side as I estimate it) come to about 11,500 lines for the
+whole card under CONTENT-SOURCE (c), about 10,400 under (a), against the card's 3,900 (build plan :250, before his
+SLICE-FEEL additions and before ORDER-3C put the recording in). One stop would be the largest change-set of the plan by
+far and would hold the first soldier behind all of it. Cut:
+- **4a, "Walk"**: the recording first, then the content crate's core, the soldier and his movement, the block, the
+  page with the stand-in, the follow camera and **the camera panel** (his Queued words: "from its first playable
+  build"), and every proof of the movement it merges (the movement recording on four runs and its marks). He sees and
+  plays: the plain stand-in in the street corner and the yard; he walks, sprints (with stamina), jumps, steps up, aims
+  with the mouse (the stand-in turns to the cursor; the development aim line shows the point the server tests), and
+  tunes the camera live with sliders and five presets, "copy values" included. His Brave check: even walking (and the
+  hidden-tab steps, PM-0002-34), the 0.55 m step and the 0.56 m stop felt in the yard, the 3.07 m reach against the
+  ledges, aiming at height on ramps and ledges, the camera panel and its presets.
+- **4b, "Walk: sights and content"**: aiming down sights by SLICE-FEEL (the right button held, 0.55 of the speed, no
+  sprint, the camera's sights mode from the panel, the `aiming` flag W1), and the content's remaining proofs: content
+  item 1's corpus on every target (PM-0005-2, -3), content item 2's seeded corpus and the bounded fuzz (PM-0005-4, -5,
+  -6), PM-0005-7 for movement fields, PM-0005-8's typed content files, the development reload (PM-0005-10), the full
+  legacy import report (PM-0005-14); the far-corner test (PM-0004-39), the bounded fuzz of movement commands
+  (PM-0004-60), 3B-HOSTILE-ALLOC if not taken in step 1's change. He sees and plays: aiming down sights with the
+  camera's reaction. His Brave check: holding the right button slows him to 0.55 and stops the sprint; the sights
+  camera mode by preset.
+- What each part meets (the plan's rows): 4a: ADR 0005's foundation line (:461); CD-1, CD-2 (core stages), CD-3, CD-4,
+  CD-5 shown on movement, maps and the camera (:502); ADR 0001 :1785 (two runs, the same hashes: :485); G10's first
+  recording (:484); PM-0004-6, -11, -15, -17, -19, -20, -21, -22, -24, -25 (reading), -30, -32, -33, -35, -54, -59;
+  PM-0002-14 (the aim in the post), -26 (smoothness reading), -29 (sizes with content), -31 (the Worker gets content),
+  -34 (his checklist); PM-0004-28 and PM-0003-42 (readings); 3A-FMA-CHECK (the change-set that brings parry3d: his
+  words, STATUS_ARCHIVE.md:1355-1357); 3A-FEATURE-VERSION, 3A-SCAN-HELPERS, 3B-ONE-PER-TICK (movement's half),
+  3B-POOL-16, 3B-CSS-PROD, 3B-BLUR-TEST, NA-N3, H2, START-RULES both rules. 4b: content items 1 and 2 (:503-504),
+  PM-0005-1 to -8, -10, -14 (the rest), PM-0004-39, -60; SLICE-FEEL's cs4 half; W1. PM-0005-16's size half and
+  PM-0004-33's comparison builds are lane 2's separate tests after 4a merges (Part 15.2 :105).
+- His conditions: (a) the marks the plan places at Walk on the recording (-17, -19, -20, -21, -24, -25's reading, ADR
+  0001 :1785, G10) are all in 4a, with the movement they prove; (b) step 1 is built and green before step 2; (c) 5.1
+  places every 3c item by name; (d) the fallback stands: if 4a's plan cannot carry the recording inside its stop line,
+  the recording alone becomes a small change-set before 4a (no browser check), and he is told before anything moves.
+- One stop instead (if he prefers): the same steps, 4b's after 4a's, one merge and one Brave check at the end, about
+  11,500 lines planned before the main session's ratio.
+
+### 5.3 4a's steps, in order (each ends green: cargo debug and release, the Wasm build, Node, boundary, browser, gate)
+0. The one manifest batch, unbuilt until security-auditor answers on its exact content (cs3 plan :67-71): the
+   `content` crate (path); `sim` -> `content`, parry3d (+ its overflow-override lines); `sim-wasm`, `client-endpoint`
+   -> `content`; devtools: drop three edges, add `content`. (Under CONTENT-SOURCE (a) or (b), serde and the rest join
+   this batch.)
+1. The recording (5.1), green natively in two processes, Node and Chromium, with one planted divergence caught at its
+   tick; PM-0004-21's report.
+2. The content crate's core (block 1.3 to 1.8, 1.10): loader, writer, the three kinds, the bundle, the constructor
+   route, the build's `content.json`, the export test (types and schemas). The recording re-made (the constructor now
+   takes the bundle).
+3. The simulation (block 2): the time unit and the rounding report (before stamina's timer: the card's "before any timer
+   exists", build plan :340-341), `Rules::take`, the table and ids, `collide` on parry3d, movement, the helpers,
+   3A-FMA-CHECK, 3A-FEATURE-VERSION, his Testlines table and `--check` (his point 8; the movement values come from his
+   Export once he has confirmed the differences list); the recording re-made.
+4. The command, the snapshot and the block (blocks 2.8 and 3): move and aim in the command, the endpoint's cast, the
+   soldier records, the block's header count, soldier and own sections, `dueAt`, the pool of 16; the recording re-made.
+5. The page (block 4 without the panel), in two halves: 5a the scene from the map, the stand-in, the follow camera
+   (walk, sprint, jump visible); 5b the mouse aim (pointer, ray, cast, facing, the aim line).
+6. The camera panel (block 4.4), with its schema-driven limits.
+7. The movement recording made on the final state and every mark that rides it; the parity marks; the readings; the
+   allocation spec re-measured; then reviews, the verifier, his Brave check.
+
+### 5.4 The earliest build he can play (an early look, not a check)
+After step 5a: the soldier walks, sprints, jumps and steps up in the street corner and the yard, seen by the follow
+camera at legacy's framing; no aim yet. Recommended: after step 5b, one step later, with the mouse aim. Either is a zip
+of the development build from a commit on the branch, before any review, with a README that says it is an early look,
+what is not in yet (the panel, sights) and that nothing is asked of him. His point 8: if his Export is not in by then,
+the early look runs on legacy's numbers and says so.
+
+### 5.5 The size ladder (each part whole with its tests, to a named place; the camera panel stays: build plan :355-356)
+- 4a, if it nears twice its plan: (1) PM-0004-32's byte dump and its 10,000 rays -> 4b; (2) PM-0004-20's query-time
+  reading -> 4b; (3) PM-0004-17's two instances -> 4b; (4) the schema writer with PM-0005-7 -> 4b, the panel's limits
+  written in its code until then. Never moved out of 4a: the recording, -19, -21, -24 on the movement it merges, the
+  parity marks -30 and -59, 3A-FMA-CHECK (his words tie it to parry3d's change-set), the camera panel.
+- 4b, if it nears twice its plan: (1) PM-0004-39's far corner and (2) the size comparison (the card's own two, build
+  plan :355-356) -> a follow-up before Slice 2; (3) content item 2's corpus for the kinds of cs4 -> cs8, where the
+  plan meets that item with weapons (:504); he is told before any part moves.
+
+### 5.6 Disagreements with the build plan and the drafts (for the plan to state)
+1. The card's size: 3,900 lines (build plan :250) against about 11,500 bottom-up (10,400 under CONTENT-SOURCE (a));
+   the card predates SLICE-FEEL and ORDER-3C, and its content line hides a parser, a writer, a schema and two tools.
+2. The card says "the movement table from the legacy tuning import" (:336); his newer words (takeover point 8 b) take the
+   values from his Export: the import maps and reports, the Export supplies the values (block 1.11).
+3. cs1's note "the header states each section's ... byte offset" (cs1 report :263): fixed capacity makes the offsets
+   constants covered by the layout hash (block 3.1).
+4. The "field of the block" for the blend (picture.ts:21-23; NA-N3): a stamp on the block message instead (block 3.4).
+5. PM-0004-15's "a proptest property" and ADR 0005's serde_json, garde and schemars: our own generator and, under
+   CONTENT-SOURCE (c), our own reader (DEPART list).
+6. PM-0004-39 cannot travel through today's command (AimPoint i16 cm, +-327.67 m); it runs headless (block 2.8).
+- B5 DONE. Next: B6 (room for lane 2's early-look page).
+
+## Block 6. Room for lane 2's early-look page (EARLY-LOOK (a), DECISIONS.md:410-416; takeover point 10) (DONE)
+1. Yes, leave room, and it costs nothing now: Walk keeps the picture's whole surface in `picture.ts` (start, setContent,
+   draw with blend, cursorRay, plainLines), so a second entry can drive `createPicture` with a content bundle and crafted
+   blocks and import nothing from `app/` ("draws through its shape, so that the hand-over is a move of files").
+2. Walk adds no second page; it only avoids one-entry assumptions in `build.mjs` and `build-checks.mjs` (the Worker-chunk
+   check already keys on its source module, not on the page; the production scan should walk every HTML entry).
+3. The crafted-block helper cs4's own `soldier/` tests need is written from the generated layout in `packages/types`
+   (lane 1's), so lane 2's page can reuse it instead of writing block offsets by hand.
+
+## Block 7. Sizes per step, risks, not yet tried (DONE)
+
+### 7.1 Sizes, bottom-up (hand-written lines; code and tests apart; plus or minus 30 % each; NOT multiplied)
+| Part, step | Code | Tests | Total |
+|---|---|---|---|
+| 4a 0: the manifest batch (configuration) | 40 | 0 | 40 |
+| 4a 1: the recording (engine-side estimate; netcode-architect's design sets the real one) | 250 | 300 | 550 |
+| 4a 2: the content crate's core, CONTENT-SOURCE (c) | 1,410 | 950 | 2,360 |
+| 4a 3: the simulation (time unit and rounding report, table and ids, collide, movement, helpers, the 3A checks, Testlines table and check) | 1,335 | 1,105 | 2,440 |
+| 4a 4: command, snapshot, block (netcode side about 300 and 300 of it) | 450 | 450 | 900 |
+| 4a 5: the page without the panel (5a scene, stand-in, follow camera; 5b aim) | 1,310 | 1,390 | 2,700 |
+| 4a 6: the camera panel | 220 | 200 | 420 |
+| 4a 7: the movement recording and its marks, readings | 150 | 200 | 350 |
+| **4a total** | **5,165** | **4,595** | **9,760** |
+| 4a under CONTENT-SOURCE (a) | 4,455 | 4,175 | 8,630 |
+| 4b: ADS (rule, input, sights camera, W1) | 140 | 150 | 290 |
+| 4b: content proofs (corpus, seeded corpus and bounded fuzz, legacy import walk, -7 movement, -8 files, development reload) | 380 | 920 | 1,300 |
+| 4b: PM-0004-39, PM-0004-60, 3B-HOSTILE-ALLOC | 30 | 180 | 210 |
+| **4b total** | **550** | **1,250** | **1,800** |
+| **Walk (4a + 4b)** | **5,715** | **5,845** | **11,560** |
+Not counted (the plan's rule, build plan :235-237): the map document (about 150 JSON lines written by hand), the
+content files written by script, generated types and schemas, the import report, recordings.
+History for the main session's ratio: change-set 3's three bottom-up designs came to about 5,850 lines (cs3 plan :23-24)
+and 3a and 3b ran 1.7 and 1.8 times their plans; these numbers are made the same way. To bring the early look sooner, the
+plan can gather the large mark runs (the 10,000-case and 1,000,000-input runs, the allocation counts, the BVH dump) in
+step 7, after step 5, each earlier step keeping the tests of its own behaviour: about 1,000 test lines move behind the
+early look.
+
+### 7.2 Risks
+1. Size: 4a alone is about 2.5 times the whole card (5.6 item 1); the early look (5.4) is the answer to "play early",
+   not the merge.
+2. parry3d, first outside crate in `sim`: its tree under the dependency hold (one security round); its Wasm share;
+   allocation inside queries; the BVH's build order; and 3A-FMA-CHECK: if the built file shows a software `fma` call
+   from parry3d's tree, cs4 stops for his decision (his MUL-ADD (a) bans it in the simulation).
+3. The jump integrator (N50): the wrong form misses START-RULES' 3.07 m by 18 cm (2.89 m).
+4. CI's browser run: 3.4 of its 5 minutes used today (cs3b report, "Evidence"); cs4 adds walk, panel and replay specs; a
+   raise is a CI edit (the CI Builder chat, his yes first on its exact text).
+5. The allocation spec's per-frame limit with an input message eight numbers longer: re-measured, never loosened by
+   guess.
+6. His Export: the movement values wait for it (his point 8 b); if it is late, the early look runs on legacy's numbers
+   and says so; if it says 60 steps a second, he is told before it is used (point 8 f).
+7. Two copies of the static world in one Wasm instance (the room's and the endpoint's): small for the test scene,
+   measured with the Wasm's memory in the report.
+8. Under CONTENT-SOURCE (c): std's shortest digits are not documented (N56); the test against `JSON.stringify` over
+   12,038 numbers is the proof.
+9. More code passes to lane 2 at cs5's merge (`render/`, `soldier/`, `camera/` grow from 136 lines today: render/*.ts).
+
+### 7.3 Not yet tried (each a first step of its build step, with rust-reviewer where Rust)
+parry3d built for wasm32 in this workspace, with `enhanced-determinism`; std's `{:e}` digits on wasm32 against native and
+`JSON.stringify`; fourteen numbers through one wasm-bindgen call with no allocation in the glue; the Pacer giving each
+tick's due time inside a catch-up wake; a Vite dev-server plugin pushing a custom event that the page forwards to the
+Worker; a TypeScript writer matching the Rust canonical writer byte for byte; ts-rs on content structs (and on structs a
+`macro_rules!` writes, if the plan uses one); the BVH dump compared byte for byte across targets.
+
+DONE

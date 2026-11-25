@@ -292,3 +292,301 @@ Items named near 3c that fit NEITHER home (flagged, so nobody counts them as 3c'
 - My round 2 Lows L-1 and L-2 are already done in 3b (any_bytes.rs per-step identity and datagram accounting;
   `queue.ran()` takes no argument, room/src/lib.rs:270): nothing to place.
 - Block 2 DONE. Next: Block 3 (the command, the snapshot, the path).
+
+## Block 3. The command, the snapshot and the path for Walk (build plan :343-344)
+
+### 3.1 The post and the one input call (page -> Worker -> endpoint)
+The post gains, beside post number, held buttons and press counts (messages.ts:13-31; ADR 0002 part 5 :318-323):
+- `move`: the WORLD move vector, made by the page from W/A/S/D and the camera's yaw (legacy movement is
+  camera-relative and the yaw is player-turnable: shamble-game.js:1320, :3271, :3282), as two `i8` in [-127, 127]
+  packed in one `u32` (x bits 0-7, y bits 8-15). Only the page knows the camera, and the vector is the player's
+  intent, recorded like a key: the replay uses the recorded vector, so the camera cannot reach the simulation
+  through it.
+- the cursor ray: origin and direction, six plain numbers, from the camera's STABLE base (no shake, recoil or kick:
+  legacy :2702-2706); Rust converts each with `as f32` (round to nearest, the same on every target). A non-finite
+  number or a zero direction: the ray is ignored for that post, the aim keeps its last point, counted
+  (`rays_refused`, readout and report). This is where floats enter, so PM-0004-24's "checked where it enters".
+- the view time: the tick of the older of the two blocks the frame was drawn between (`u32`) and the fraction
+  (`u32`, low 16 bits = floor(f x 65,536), at most 65,535) (messages.ts:19: "as a tick and a fraction").
+- aiming down sights: the right mouse button held = button 6 in `held` (its press counter exists like every
+  button's); no new field (lane 2's W1). The page stops the context menu.
+`Sim::input` becomes 15 plain numbers (post, held, p0..p3, move, ox, oy, oz, dx, dy, dz, view_tick, view_fraction):
+still one call per tick, plain numbers only (WB-HEALTH, sim-wasm lib.rs:5-6), within the four calls per tick.
+`client_endpoint::post::Post` gains `move_x, move_y: i8`, `ray: Option<Ray { origin: [f32; 3], dir: [f32; 3] }>`,
+`view: ViewTime`; `Post::from_words` becomes a total `from_numbers` (masks, finite check; never panics).
+
+### 3.2 The command on the wire: no new field
+- `protocol::messages::Command` already holds move (i8, i8), buttons, presses, aim (x `i16` cm, y `u16` cm, z
+  `i16` cm) and view time (tick `u32`, fraction `u16`): 32 bytes of fields (codec.rs:15-18). Walk only fills what is
+  zero today (endpoint.rs:254-262). No codec change, no TypeScript type regenerated for the command.
+- Sizes against ADR 0001's 200 bytes per datagram (:728): in local play every command is confirmed in its own step,
+  so an `Input` carries the newest command alone: 1 + 1 + 5 + 1 + 6 + 32 = 46 bytes. At the cap of 8 with one ack:
+  277 bytes (292 with four acks, MAX_INPUT_BYTES codec.rs:44): above 200, the departure DEPART-3 (a) already accepted
+  ("the compression must land before online play"); Walk does not change it. The aim point is 48 bits, inside
+  PM-0001-51's 80, at 1 cm, inside its 5 cm.
+- A limit to record (no draft states it): `i16` centimetres name points only within +-327.67 m of the origin, so
+  the playable map must lie inside that square until the codec widens the aim; PM-0004-39's 2 km test stays a
+  sim-level script (block 1.6). Height `u16` cm: 0 to 655.35 m.
+- Client side, so an honest client never sends what the room refuses: `client_endpoint::post::clamp_move(x, y) ->
+  (i8, i8)` (integer rule: while x^2 + y^2 > 127^2 in i32, step the longer component toward 0; the 8 keyboard
+  directions at yaw 0, (+-127, 0), (0, +-127), (+-89, +-89), unchanged; exhaustive test over all 65,536 pairs; my cs3
+  design, not built in 3b: grep finds no clamp in client-endpoint); the aim cast's point is clamped to the map's
+  bounds and quantised (3.7).
+- Room checks (room/src/lib.rs:170-175 names both for change-set 4; ADR 0001 :234-236): move length at most 1
+  (x^2 + y^2 <= 127^2 in i32), else refused and counted `refused_move`; aim inside the map's bounds (from the map
+  document), else `refused_aim`; both in `refused()`. Not checked yet, with the reason stated in on_datagram's doc:
+  reach (no weapon until change-set 8: a point beyond reach is clamped, never refused), view time (lag
+  compensation). Tests: each refusal counted; honest edges accepted ((127, 0), (89, 89), an aim on the boundary).
+
+### 3.3 room -> `sim::PlayerCommand` -> the one soldier
+- `PlayerCommand` gains `move_x, move_y: i8` and `aim: AimCm { x: i16, y: u16, z: i16 }` (the wire's integers; the
+  sim converts to metres itself). The view time stays out until a system reads it (world.rs:33's own rule). The
+  slot's player record (the last applied command) grows the same way and stays in the shared state (hashed).
+- Slot = soldier index (ADR 0004 part 2; JoinAccepted.slot). Walk: one slot, soldier 0; the soldier table's capacity
+  comes from the mode in content (1 in Walk; 12 to 48 in change-set 5).
+- Recommended rule: a soldier's movement advances once per command that runs for it (oldest first; at most
+  CATCH_UP_CAP = 2 in one world tick, room/src/lib.rs:40), and not at all in a tick with no command for it: the
+  same unit as cs7's replay of own commands (ADR 0001 part 4), so prediction matches the authority exactly. Holding
+  the last command on a missing tick AND running the late command later would move the soldier three steps over
+  two ticks. In local play every tick has exactly one command, so play is unaffected; over a network this is where
+  3B-LATE-BOUND's doubled rate becomes real movement (security-auditor round 1 M1: "once commands carry movement
+  (change-set 4) that is double speed for the idle time"), which is why no room goes behind a network transport
+  before change-set 7's bound.
+- Per command the movement step reads: move; sprint = Shift held (button 5); aiming down sights = button 6 held;
+  the jump request (block 4); the aim: the soldier stores the aim point and turns its facing toward it when it lies
+  more than 2 cm away horizontally, else keeps it (legacy :2709-2710). Recommended state: facing as a horizontal
+  unit vector (two f32, normalised with `sqrt`, on the allow-list), so no transcendental function enters the sim in
+  Walk (yaw and pitch are computed where shown: 3.5). The movement internals are rust-reviewer's and the sim
+  owner's.
+
+### 3.4 The snapshot's soldier record
+(a) The owner's own soldier, unquantised, in Walk (ADR 0001 part 4 :203-209: everything the replay reads, "sent
+unquantised"). New flag bit 4 `FLAG_SOLDIER` (the echo's bit 3 stays as built), `protocol::messages::OwnSoldier`,
+whole bytes, floats as their `u32` bits so `protocol` stays integer-only:
+| Field | Width | Meaning |
+|---|---|---|
+| generation | u16 | changes on respawn; with the slot index it names the soldier (u8 would wrap at 256 respawns, which a 20-minute match with a respawn every 5 s nearly reaches) |
+| placement | u8 | wrapping counter, +1 on spawn, respawn or teleport: the page places, never blends (ADR 0001 part 7 :340) |
+| team | u8 | 0 to 3 |
+| flags | u8 | bit 0 grounded, bit 1 sprinting, bit 2 aiming down sights; any other bit is a `Flags` error |
+| position | 3 x u32 (f32 bits) | metres |
+| velocity | 3 x u32 (f32 bits) | m/s |
+| facing | 2 x u32 (f32 bits) | horizontal unit vector |
+| aim | i16, u16, i16 | the applied aim point, cm |
+| stamina | u16 | in the sim's integer time unit, if legacy's sprint stamina is kept (STAM: max 7, regen 0.2, legacy-tuning.json) |
+| recovery | u16 | time-unit counts left of the sprint-to-sights wait; 0 = ready (3.8) |
+47 bytes; the rule: every field of the soldier's movement state, so change-set 7's reset starts from exactly the
+server's state (any field the movement design adds joins here in the same change). A Walk snapshot: kind 1 + tick 4
++ flags 1 + group 1 + received 2 + processed 2 + echo 18 + soldier 47 = 76 bytes (MAX_SNAPSHOT_BYTES 33 -> 80,
+codec.rs:45); far inside ADR 0001's 1,067-byte cap. The endpoint refuses the whole snapshot when any float's bits
+are not finite (a hostile server must not put NaN into the client's state; counted in `refused`), and an unknown
+flag bit. The decoder test (decoder_inputs.rs) gains the new part in its generator and keeps its 10 million per type.
+A first piece of PM-0001-17 comes free: a native test serialises the endpoint's decoded soldier through the same
+visitor as the room's soldier and asserts equal bytes every tick of a replay.
+(b) Spatial records, for every relevant soldier but the receiver: DESIGNED now, BUILT in change-set 5 with the first
+remote soldier (no code without its reader): index u8; generation u16 and team u8 (only in the record that brings
+the soldier into the client's set, ADR 0001 :315-316, once delta coding exists; whole bytes until then); placement
+u8; flags u8; position x, z `i16` cm and y `u16` cm (E3's 1 cm step, the same +-327.67 m square); yaw `u16` binary
+angle; pitch `i16` binary angle (E3's 10 bits later): 16 bytes per soldier in whole bytes (12 walkers: about 255
+bytes a snapshot; 48: about 830, still under the cap; bit packing and deltas before online play). No velocity on the
+wire: the Worker derives it from successive records, reset on a placement or generation change (gap 1 answered with
+no draft change; fallback if change-set 10's pictures jitter: 2 x `i16` cm/s, +4 bytes). Yaw and pitch for the
+records are quantised by the room's encoder from facing and aim with `libm::atan2f` (pure Rust, so the native server
+and the Worker's local server agree: PM-0001-17); `libm` joins `room` in change-set 5's dependency batch.
+What the state hash covers (shared part, in order): tick; per slot the player record (buttons, presses, move, aim);
+the soldier table (generation, placement, team, flags, position, velocity, facing, aim, stamina, recovery, and every
+other movement field); then the authority part (seed; the streams from change-set 8). Floats by `to_bits`. Nothing of
+presentation (yaw and pitch are not state).
+
+### 3.5 The block's soldier section (engine-architect owns the layout: the field list)
+Header gains `soldier_count` (u32, lane 2's H2), `local_index` (u32, 0xFFFF_FFFF until joined) and `local_team`
+(u32) (F12 and gap 8: in the block, from JoinAccepted, which the endpoint holds; the page reads blocks only).
+One row per soldier (Walk: one), 40 bytes, aligned to 4:
+| Field | Type | Range | Walk's source |
+|---|---|---|---|
+| pos_x, pos_y, pos_z | f32 | metres, y up; x, z within +-327.67 m; y about -20 to +42 | own soldier, exact |
+| vel_x, vel_y, vel_z | f32 | m/s; horizontal up to 13.3 (legacy's fastest), vertical -35 to +11 | own soldier, exact |
+| yaw | f32 | radians [-pi, pi); 0 faces +z (legacy rotation.y = atan2(dx, dz)) | atan2 of facing, in the endpoint |
+| pitch | f32 | radians [-pi/2, pi/2], up positive | from the fire height (1.9 m, legacy FIRE_H) toward the aim point |
+| generation | u16 | wraps | own soldier |
+| index | u8 | 0 to capacity - 1 (at most 47 in Slice 1) | slot |
+| placement | u8 | wraps; differs between the drawn pair -> place | own soldier |
+| team | u8 | 0 to 3 | own soldier |
+| flags | u8 | bit 0 grounded, bit 1 sprinting, bit 2 aiming down sights, bit 3 the local player | own soldier + slot |
+| ready | u8 | 0 = just left a sprint, 255 = ready (W4) | recovery timer and the wait's length |
+| pad | u8 | 0 | |
+New element types F32 and U16 (layout.rs:5-13 holds U8 and U32 only: "a variant enters with its first use"). Yaw and
+pitch for the block are computed in the client endpoint with `libm::atan2f` (presentation, one function for own and,
+from change-set 5, remote rows); if `libm` is not already in parry3d's tree it is one small pure-Rust crate in Walk's
+batch (the page computing them with `Math.atan2` is the cheaper alternative, allowed because they are not sim values).
+Change-set 8 adds alive (flag bit 4), weapon id (u16), health; change-set 9 the projectile section; the events E1-E6
+come with 8 and 9.
+
+### 3.6 Interpolation, and who picks the blend fraction (my follow-up NA-N3)
+- The Worker's field: each block's tick's scheduled time on the shared clock (`dueAt`, ms), stamped by the host from
+  the due time the step returned for that tick (pacing.ts:103), in the block's envelope beside `startAt` and
+  `doneAt` (messages.ts:41-44). Recommended over a field in the block's bytes: no f64 element type, no shared-clock
+  time inside Rust, and online (change-set 7) the due time still comes from the step's return (the endpoint's
+  server-time estimate), so one rule serves both modes. engine-architect may prefer it in the block (Rust writes it
+  from `now_ms` if the host then passes the shared clock).
+- The page's rule, every frame: render time r = frame time - P - d, with P = 1000/30 ms and d an adaptive allowance
+  (the 90th percentile of the last 64 blocks' arrival minus dueAt, held within [0, P/2]); draw between the held pair
+  j-1, j with dueAt(j-1) <= r < dueAt(j), at f = (r - dueAt(j-1)) / P clamped to [0, 1]; never extrapolate (hold the
+  newest, or after a pause the first new block); place, never blend, when placement or generation differs. The next
+  post reports view time = (tick of j-1, f).
+- Two blocks or three: with only the two newest, a block that arrives later than d gives a hold, and one that arrives
+  earlier gives a jump and then a hold, each as long as the difference, every tick; his Brave report has the Worker's
+  lateness at 1.97 ms median and 14.07 ms p99 (2026-11-25-cs3b-browser-check.md), against a 6.94 ms frame at 144 Hz,
+  so PM-0002-26's 5 % smoothness clause is unlikely with two. With the three newest held, r always falls inside a held
+  pair while arrival <= d: holds only above the 90th percentile. ADR 0001 part 7 (:335-336) and ADR 0002 part 5
+  (:304) say "the two newest blocks": three is a departure for the plan's list (his to accept); the Worker's pool goes
+  from 4 to 6 (host.ts:37; part of 3B-POOL-16). Proof: a pure blend function in Vitest, frame times at 60, 120 and
+  144 Hz, arrivals drawn from his reported lateness: std/mean of per-frame displacement <= 5 % with three; planted:
+  the two-block rule, and the newest block drawn without interpolation (PM-0002-26's own bite), both red at 144 Hz.
+- Who picks: the Worker gives the time, the page picks pair and fraction by that rule. picture.ts:20-23's sentence
+  ("the Worker's to say ... a field of the block") holds in substance; its wording changes, and picture.ts is lane 2's
+  interface file (engine-architect reviews; a lane matter for the plan).
+
+### 3.7 The aim: what the post carries, where the ray meets the world (PM-0002-14)
+- The page sends the ray with the keys in its one post per drawn frame (no second message kind).
+- The client endpoint casts it each tick in build_input with the sim crate's ray query against ITS OWN static world
+  (built from the same map document as the room's; online it has no room, so nothing borrows the authority's world:
+  ADR 0002 part 6 :413-414), its own soldier excluded: the first hit within 500 m; none (sky, or parallel) -> the
+  crossing with the horizontal plane at the soldier's fire height (its position from the newest snapshot + 1.9 m);
+  no crossing -> the last aim point stays. Then clamp to the map's bounds and quantise to the 1 cm grid (`round`, on
+  the allow-list). Deterministic on every target (parry3d with `enhanced-determinism`, f32) and replayed, since the
+  ray is in the .rec.
+- Remote soldiers join the cast when shooting needs their volumes at the post's view time (change-set 8; ADR 0001
+  :258-259).
+
+### 3.8 SLICE-FEEL at the wire level (DECISIONS :1227-1231; lane 2's W1 and W4)
+- Lands in change-set 4: the input (right mouse button = button 6, held); the rule (sim; numbers from his Testlines
+  Export through content): while button 6 is held and the sprint-to-sights wait is over, the soldier aims down
+  sights, walks at 0.55 of his speed (legacy adsMoveMult 0.55) and cannot sprint; leaving a sprint starts the wait
+  (integer time unit); the camera's sights mode follows the soldier's ADS flag from the block; the fields (flags bit
+  2 and `recovery` in the snapshot's own part; flags bit 2 and `ready` in the block row). Walk has no gun: the wait is
+  one stand-in value in the movement table (the reference gun's Export value), moved into each gun's row in
+  change-set 8.
+- Lands in change-set 8: firing waits each gun's sprint-to-fire delay (the same timer, its own length per gun); spread
+  rests at each gun's sights value while aiming; the aim wait per gun; `ready` then shows the longer wait (or a second
+  field if lane 2 needs both, their call then).
+- Lines (+-30 %): change-set 4 about 275 (input 15 + 15 tests, inside 3.1's page work; the rule 60 + 80 tests, movement
+  owner's; the fields 30 + 40 tests, inside 3.4/3.5; the camera reaction 20 + 15 tests); change-set 8 about 175 (fire
+  gate 30 + 50, spread at sights 20 + 30, per-gun waits 20 + 25); remote W1 and W4 in change-set 5 about 70.
+
+### 3.9 Lane 2's rows that are wire or snapshot questions
+| Row | Answer | When |
+|---|---|---|
+| F2, gap 5 | one yaw: the aim yaw is the facing (legacy :2709-2710; :2782 `_animSt.aimYaw = player.rotation.y`); lane 2 turns the hips from velocity against it | Walk; others 5 |
+| F3 | pitch in the row, radians, from the fire height toward the aim point | Walk; others 5 |
+| F4 | velocity in the row: own exact from the sim; others derived by the Worker, reset on placement/generation; no wire field | Walk; others 5 |
+| F5 | flag bit 0 grounded, from the sim; on the wire a flag bit (gap 1's "change rarely" is a bandwidth estimate, and it changes twice a jump) | Walk; others 5 |
+| F6 | flag bit 1 sprinting, from the sim, not derived from speed (speed cannot tell a sprint from a fall) | Walk; others 5 |
+| F9 | index (slot) and generation in every row | Walk |
+| F10 | placement counter (spawn, respawn, teleport), and the generation on respawn | Walk; respawn 8 |
+| F12, gap 8 | header: local_index and local_team; the block, not the interface file | Walk |
+| gap 1 | velocity as F4; grounded as F5; team in every row, and on the wire with the soldier's entry | Walk; others 5 |
+| H2 | soldier_count in the header | Walk |
+| W1 | flag bit 2 aiming down sights | Walk; others 5 |
+| W4 | `ready`, 0 to 255 | Walk; others 5 (Worker-derived) |
+- Block 3 DONE. Next: Block 4.
+
+## Block 4. The two follow-ups placed at change-set 4
+
+### 4.1 3B-ONE-PER-TICK (archive :1513-1515; written on sim::PlayerCommand, world.rs:35-37)
+- Systems that act on presses in Walk: the jump only (Space, button 4). Sprint (Shift) and aiming down sights (right
+  button) are holds; the move is a vector; the camera panel's key and the replay key are page-only and never sim
+  buttons. Crouch is not in Walk.
+- The jump's rule, per command that runs (not per tick: a tick can run two): the request is Space held OR a press edge
+  since the previous applied command (`press_edges` on button 4's counter); if requested and grounded, one jump
+  (vertical speed = jumpV, grounded off); every further press of that command is dropped, never banked: a press in
+  the air does nothing and is not kept for the landing (legacy is held-based and has no buffer:
+  shamble-game.js:2537). The press edge keeps a tap shorter than a tick (PRESS-PACE (a)).
+- Tests (sim crate, deterministic): J1 grounded, one command with Space's counter 255 ahead (an honest client after
+  an outage) -> exactly one jump, apex = the integrated value (PM-0004-59's); J2 in the air, +1 -> no jump, and no jump
+  at the landing without a new press or hold; J3 Space held across landings -> a jump at each landing (legacy's hold
+  rule: game-designer confirms it as Walk's start rule, changeable after his Brave check, like START-RULES); J4 two
+  commands in one tick, each +1 -> one jump; J5 a tap shorter than a tick (counter +1, held 0) while grounded -> one
+  jump. Planted: a jump per press (vertical speed added once per new press) -> J1 red; presses banked until the
+  landing -> J2 red; the held bit read alone -> J5 red.
+- Change-sets 8 and 9 (same follow-up): fire, reload and its active-reload press, throw: each applies at most its own
+  cooldown's worth per tick, each with its test then.
+
+### 4.2 3B-RESUME-FLASH (archive :1478-1483; browser-check report :38-48): HIS decision
+- The mechanism today: a hidden tab pauses the local match (no tick runs: host.ts:121-128, pacer.pause()); the
+  Worker lets go of every held key at the hide (`#held = 0`); on the return the first tick runs one tick period after
+  the rebase, carrying the let-go keys; until then the page draws the blocks from before the pause. In 3b that showed
+  as a key box still lit for about a thirtieth of a second.
+- With a soldier on screen (Walk): the first picture after the return is the moment of hiding, exactly (the blend
+  holds the newest block, it never extrapolates across the pause: 3.6). One tick later the keys count as let go, and
+  the soldier finishes his stop as if W had been released at the moment the tab hid: with legacy's acceleration 14
+  that is about 6.3 / 14 = 0.45 m from a walk (if Walk keeps legacy's exponential approach; the movement owner
+  confirms), then he stands. The picture may jump by one tick's motion when the first new block arrives (at most
+  13.3 m/s x 1/30 s = 0.44 m, usually about 0.2 m), because the pause sits between those two blocks.
+- The options for him:
+  (a) Leave it: after a pause the picture is the moment of hiding; one tick later the keys count as let go and the
+      soldier finishes his stop. Cost: no rule change; two guards (no extrapolation across a pause; the camera's
+      smoothing takes no catch-up step from the long frame gap) and one browser test (hide with W held, return: the
+      first frames draw the paused position, 0 ticks while hidden, the soldier stops within 15 ticks with no input):
+      about 5 lines and 40 test lines.
+  (b) As (a), and the development key diagram goes dark the moment the tab hides (what he saw in 3b no longer shows;
+      the soldier is unchanged): about 10 more lines and a test.
+  (c) Keys held at the hide count as still held until the page's first post after the return (the Worker stops
+      letting go at the hide): the soldier walks on for up to a tick before the real keys apply. About 5 lines, but
+      it undoes 3b's NA-N2 rule (a key released while away would count as held for a tick). Not recommended.
+  (d) The soldier stops dead at the return (velocity set to 0): the hidden tab would become an input of the
+      simulation (recorded, replayed), so the game would depend on presentation. Not recommended.
+  Recommendation: (a); (b) if he also wants the 3b flash gone.
+- Block 4 DONE. Next: Block 5.
+
+## Block 5. The boundary and pacing marks the build plan places at change-set 4 (Part 3.3 :571-606; PM-0003-42 :714)
+| Mark | Test, where it runs | Planted defect | Reading for his browser check |
+|---|---|---|---|
+| PM-0002-14 (the aim in the post; ADR 0002 :1285) | (1) native: a scripted LocalMatch run recomputes, every tick, the cast of the post handed in and compares it with the aim decoded from the Input bytes sent (the endpoint also counts `aim_not_from_post`, 0); (2) Chromium, CI: PM-0002-12's 10,000-press run without the shim (a sibling of presses.spec.ts): the Worker counts every page message by kind; 10,000 of 10,000 posts carry six finite ray numbers and a view time (the guard counts posts lacking them: 0), 0 messages of another kind during play, `stalePosts` 0 | a separate `{type: "aim"}` message each frame from which the Worker takes the aim: other kinds > 0, red; the endpoint casting the previous post's ray: (1) red | none |
+| PM-0002-26, smoothness clause (= PM-0004-69; build plan :594) | the pure blend function in Vitest (3.6): frame times at 60, 120 and 144 Hz, arrivals from his reported lateness, std/mean of per-frame displacement <= 5 % (CI); in Chromium a reading only (a headless page is no display) | the newest block drawn without interpolation; the two-block rule at 144 Hz | yes: std/mean per display rate in the report, from the soldier's per-frame drawn position on constant-speed stretches (holding W along the 50 m lane; in the second part the lane-walk replay) |
+| PM-0002-29 (Wasm weight with content; :597) | a size script reads the built players' file: raw, gzip level 9, Brotli level 11, name section; once, the build options table (opt-level s and z, lto off and fat, codegen-units default and 1) built into `.gate/`; every served file under 25 MiB | a 26 MB file in the output: the build's check refuses it (add that check if the build has none) | none; numbers in the report (the first limit is the Advisor's) |
+| PM-0002-31 (content reaches the Worker in development; :599) | Chromium against the Vite dev server (its own Playwright project): a script saves the movement table 20 times; the Worker stamps each arrival on the shared clock; 20 of 20 within 1 s of the file's write; records whether Vite's hot update reached the module Worker itself or the page relayed it | the relay switched off: 0 of 20; a 2 s debounce: red | none (the zip is a production build) |
+| PM-0002-34, walking steps (:602; ADR 0002 checklist :1413-1417) | support only: the hidden-tab spec extended with a walking soldier, a 5 s hide in CI (tick counter equal, the soldier's drawn position equal before and after, no extrapolation); the 60 s and 6-minute hides run from a script of their own, never a CI spec (3b's 10-minute pattern) | a Worker that simulates the hidden gap: the counter differs, red | yes: step 2 (the soldier walking at constant speed for 30 s: even, no stutter; his display rate), steps 3 and 4 (1 and 6 minutes away: exactly where he left it, 0 ticks while hidden, smooth after; with RESUME-FLASH's answer) |
+| PM-0004-28 (presentation never reaches the sim; :603) | the real Worker's paced replay mode (development builds only; the production message guard refuses it; a new dev marker): the page sends a recording, the host runs it at live pace with recorded inputs (page posts ignored and counted), reads `shared_hash()` after each step and compares with the file; Chromium, CI: `lane-walk` four times (camera fixed, camera orbiting by script, frame cap 30, uncapped) -> each equal to the file | the host's replay takes the page's live ray instead of the recorded one: the orbiting run differs, red. Control: a cosmetic draw from the page's own generator changes nothing | yes: the same on his 60 Hz and highest-rate displays, "replay hashes equal" in the report. Sound on and muted: change-set 11 |
+| PM-0003-42 (smoothness per frame-cap option; :714) | the page's frame-cap setting (a 60 fps cap; follow the display; per-tier caps wait for change-set 6's tiers): a Vitest of the cap's frame choice; the smoothness reading per option from the lane-walk replay | none (reported, no pass number) | yes: std/mean per option on each display he has |
+| PM-0004-68 to -70 ("as PM-0002-26: 2 and 3, 4") | Walk's part is the smoothness row above; jitter and the hidden tab stand as 3b left them | as above | as above |
+- Placement: PM-0002-14, the blend function and the hidden-tab support belong with the first playable soldier;
+  PM-0004-28, PM-0003-42, the lane-walk replay and PM-0002-31 can come in Walk's second part; PM-0002-29's numbers in
+  whichever part brings parry3d.
+- Block 5 DONE. Next: Block 6.
+
+## Block 6. Sizes (bottom-up, hand-written lines added, +-30 %; NOT multiplied: the main session applies 1.8)
+| Step | What | Code | Tests | Total |
+|---|---|---|---|---|
+| R | The recording, step 1 (block 1.7) | 655 | 710 | 1,365 |
+| C | The command path: post, 15-number input, the cast, the clamps, the room's two checks, PlayerCommand (block 3.1-3.3, 3.7) | 370 (Rust 225, TS 145) | 420 (Rust 275, TS 145) | 790 |
+| S | The snapshot's own soldier, its decode, the block's soldier row and header, dueAt, the blend function, the pool (3.4-3.6) | 320 (Rust 215, TS 105) | 340 (Rust 220, TS 120) | 660 |
+| J | The jump's press rule (tests J1-J5) and RESUME-FLASH (a)'s guards and test (block 4) | 15 | 110 | 125 |
+| W | Movement recordings and the marks on movement: walk script 120, lane-walk script 30, finite sink and its bite 20, SIMD script 30 | 200 | 45 | 245 |
+| B | Boundary and pacing marks (block 5): kinds counter, paced replay mode, smoothness logger, frame cap, size script | 185 | 230 | 415 |
+| Mine | | 1,745 | 1,855 | 3,600 (about 2,500 to 4,700) |
+| SF | SLICE-FEEL's rule and camera reaction (owners: movement and page; its input and fields are inside C and S) | 80 | 95 | 175 |
+Not counted: the generated TypeScript, the recordings and frozen content (data), the plants script (notes).
+- The first playable soldier needs: R (condition b: before any movement code), C without the aiming button, S, J, W's
+  `walk` recording and finite bite, PM-0002-14's tests and the hidden-tab support: about 1,495 code + 1,700 tests =
+  3,195 (+-30 %), before the content crate, parry3d, movement, the page's figure, camera and panel, which are other
+  designs'.
+- Walk's second part can take: SLICE-FEEL (the aiming button, the rule, W1 and W4 at work), PM-0004-28 and PM-0003-42
+  through the paced replay mode, `lane-walk`, PM-0002-31, the SIMD reading: about 330 code + 250 tests = 580 (+-30 %),
+  plus SF's 175.
+- R alone is about 1,365 (x 1.8 = about 2,460, the size of a small change-set). If the first part's stop line cannot
+  carry R with the soldier, his fallback (d) applies (R as its own change-set before Walk, no browser check, told to
+  him before anything moves); it also gives condition (b) by construction.
+- Block 6 DONE.
+
+## Summary of disagreements and questions (for the answer)
+Disagreements: cs3-plan step 7's 275 lines (bottom-up 1,365); cs3-plan :148-150 (Walk needs no L1); build plan :470
+(the Wasm half can be in today's CI at Walk); build plan :343-344 read as the own soldier at Walk, spatial records at
+change-set 5; ADR 0001 part 7 / ADR 0002 part 5 two blocks -> three; ADR 0001 part 6 record: velocity derived, grounded
+a flag, team on entry, a placement counter added; the aim's i16 cm caps maps at +-327.67 m (PM-0004-39 sim-level);
+PM-0004-17's "different seeds" proves nothing in cs4; per-command movement makes 3B-LATE-BOUND a movement issue from
+Walk on (network only, cs7); picture.ts's sentence wording.
+Questions for Mustafa: RESUME-FLASH (a/b/c/d, recommend a or b); BLEND-BLOCKS (three blocks, a departure; recommend
+three); only if the stop line says so, the recording's home (his fallback d). Plan-level, not his: recordings on frozen
+content copies (recommended) or live content; the jump's hold rule (game-designer confirms legacy's).
+DONE
