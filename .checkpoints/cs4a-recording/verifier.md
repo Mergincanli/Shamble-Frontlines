@@ -92,3 +92,21 @@ Read-only on the working copy; my builds under `.gate/verifier-*`; no git add/co
   two_more_processes_give_the_same_hashes_as_each_other_and_as_the_files (children replay every script + a
   36,000-tick match, compared with each other and the files; fails as not valid if hash-map fingerprints are
   equal); two_instances.rs two_matches_stepped_in_turn_each_give_their_own_hashes. All ok in both profiles. PASS
+- 6 plants, in my copy .gate/verifier-4a (HEAD), target .gate/verifier-target; each plant inserted after the anchor
+  `self.player = *newest; }` in World::authority_step by a python one-liner asserting a unique anchor (the plant
+  script's own text), removed by copying HEAD's world.rs back (`cmp` equal):
+  A `if self.tick == 899 { self.player.presses[0] ^= 1; }`: `cargo test -p devtools --locked --test recordings
+    every_recording_replays`: exit 101, "first-loop, Shared ... Difference { step: 900, expected tick 900 ... }". CAUGHT
+  G (static STEPS counter, reset at tick 0, flips presses[1] when it disagrees with the tick): `--test
+    two_instances`: exit 101, panicked at two_instances.rs:32:13, difference at step 3. CAUGHT. Controls:
+    `--test recordings every_recording_replays -- --test-threads=1`: exit 0 (HELD); `--test two_processes`: exit 0
+    (HELD, extra).
+  After removal: copy's crates/ = HEAD's (`diff -rq` empty); recordings, two_instances, two_processes green (exit 0);
+  working copy `git status --porcelain -- crates packages` empty. PASS (2 of 15 defect checks and 1 of 4 controls
+  re-run by me; the rest of plants-4a.txt not re-run, by the brief).
+- 1 legacy gate, in my copy at HEAD (tools/node_modules by `npm ci --ignore-scripts` there; this worktree has none):
+  `node tools/gate.mjs` (base merge-base(HEAD, origin/main) = 07d673b): [1] 5/5 parse, [2] PASS, [3] core 138 / game
+  714 / editor 353, +0 -0, duplicates 0, [4] 51 guarded 0 dead 0 flagged, [5b] [5c] [5d] PASS; [5a] smoke FAIL to
+  start: Playwright 1.56.1 wants /opt/pw-browsers/chromium_headless_shell-1194, the machine has -1243 (installing
+  needs npx, refused by the brief). `--no-smoke`: GATE PASS (5a skipped). 4a touches nothing in legacy/.
+  => checks 1-4, 5b-5d PASS; 5a NOT VERIFIED locally (CI's smoke job: below).

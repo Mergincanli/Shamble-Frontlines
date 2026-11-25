@@ -1791,7 +1791,8 @@ _And STATUS's "Waiting on Mustafa" bullet for ci-after-3a (#71), moved by the sa
     check: a gate change, risk tier 2.
   - 4A-FIREFOX-REPLAY (a wish for the CI Builder; his word first, engine-architect's E2-4, for 4a's report's
     "Decisions needed" as FIREFOX-REPLAY): the replay spec needs no WebGL, so one line in the browser tests' setup
-    would run the recording in Firefox too, a second engine; that widens his FIREFOX-SOURCE decision.
+    would run the recording in Firefox too, a second engine; that widens the Firefox entry he accepted as cut to the
+    rule tests (RULES-ONLY-READ (a), 2026-11-25, 19:36:36 UTC).
   - 4A-HASH-REVISIT (PM-0004-21's report, by rust-reviewer: keep FNV-1a 64): revisit when the hash first runs on a live
     tick (server or Worker) or the shared state passes 64 KiB; the replacement then is XXH64, in our own code (no
     crate). A change costs one change-set: `make_recordings` re-makes every hashes file; world.rs's 8 known answers and

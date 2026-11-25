@@ -43,3 +43,8 @@ Branch: cs/4-walk in .gate/lane1-takeover, source head fb5d0ff; main 07d673b (#7
   and the no-3c clause; a dated pointer in "Next / open". "Recent work" holds 12 entries. Not touched: the entries of
   #71 (CI Builder), #69 (guard chat) and #67 (lane 2), which still read "waiting"/"in flight" though merged (their
   lanes' lines, RECORD-FILES); told to the caller.
+- Late: the report `docs/reports/2026-11-25-cs4a-recording.md` appeared (the main session's): its REPO_MAP row added;
+  the ROADMAP entry points to it; "3,300 written lines" made exact in STATUS and ROADMAP (the report's "Final: 3,300").
+- Final checks: STATUS 120 lines; `node .claude/scripts/repo-map-check.mjs`: "repo map OK: 216 entries cover 109
+  required paths".
+DONE

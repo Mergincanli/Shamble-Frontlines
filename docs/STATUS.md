@@ -39,10 +39,10 @@ _Last updated: 2026-11-25 (change-set 4a's docs pass, with 3b's owed one, on mai
 
 ## Waiting on Mustafa
 - #70 (4a): his go for the head the advisor agent approves, after his Advisor's merge check (no browser check). From
-  4a's report: his choice on its eight lines (his go's point 4: "I decide then") and FIREFOX-REPLAY (the replay spec in
-  Firefox too: it widens his FIREFOX-SOURCE). STEP-60 (a): his Export again at 30 steps, before 4b's step 6. For later
-  parts: DIFF-LIST, CONTENT-SOURCE, DEPART-4, MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two
-  `docs/UNITS.md` §0 lines the Hornet's entry clashes with, open for his unit walk (his go, point 6).
+  4a's report: EARLY-LOOK-ORDER (his go's point 4: "I decide then"); before 4b's first edit CONTENT-SOURCE and
+  DEPART-4; FIREFOX-REPLAY (it widens the Firefox entry he cut to the rule tests); LINKS-CHECK (4A-S3-READ). STEP-60
+  (a): his Export at 30 steps before 4b's step 6, then DIFF-LIST. Later: MOVE-RULES, NO-SOURCE, RESUME-FLASH,
+  TUNE-HOME, SPRINT-DELAY-4; the two `docs/UNITS.md` §0 lines the Hornet's entry clashes with (his unit walk).
 - **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (`docs/DECISIONS.md`, 11:38:37 UTC), with
   two conditions: no report calls any part of the presses mark passed; and the two drafts are made to agree at
   their next revision, which comes to him before it is written (**3B-RELEASE-DRAFTS**, his).
