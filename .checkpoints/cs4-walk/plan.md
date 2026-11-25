@@ -1,4 +1,4 @@
-# Plan (draft 1): change-set 4, "Walk", proposed as four change-sets, 4a to 4d
+# Plan (draft 2): change-set 4, "Walk", proposed as four change-sets, 4a to 4d
 
 _Written by the main session (the chat Mustafa calls Builder V4, lane 1) on 2026-11-25, for Mustafa and his Advisor.
 Base: main 311c0484f7a9697ae33e7a76a8cf0b507a2837c4. Nothing is built, and no file outside `.checkpoints/` is edited
@@ -18,7 +18,7 @@ written, and the designs give plus or minus 30 %._
 - **Walk is nearly four times its card.** The card (`docs/reports/2026-11-17-build-plan-slice-1.md`,
   lines 250 and 334-358) plans 3,900 lines. The designs, added up from the bottom, come to about **15,000 lines**,
   nearly half of them tests. At the ratio change-sets 3a and 3b ran at (1.7 and 1.8 times their plans), that is about
-  **26,900 lines**: nearly four times change-set 3b. Why: the card was written before ORDER-3C put the recording
+  **27,000 lines**: nearly four times change-set 3b. Why: the card was written before ORDER-3C put the recording
   in (about 1,365 lines, where change-set 3's plan had 275), before SLICE-FEEL and his Testlines values; its one line
   on content hides a reader, a writer, a schema and three tools; and each pass mark the build plan places at Walk
   (about fifty) needs its own test and planted defect.
@@ -28,7 +28,7 @@ written, and the designs give plus or minus 30 %._
   |---|---|---|---|---|---|
   | 4a | The recording | nothing new: the page as 3b left it | 1,365 | 2,450 | 3,050 |
   | 4b | Content and the world | the grey street corner and training yard, drawn from the game's first content files | 4,860 | 8,750 | 10,900 |
-  | 4c | The first soldier | **he plays**: walk, sprint, jump, step up, aim with the mouse, the follow camera and its tuning panel | 6,625 | 11,900 | 14,900 |
+  | 4c | The first soldier | **he plays**: walk, sprint, jump, step up, aim with the mouse, the follow camera and its tuning panel | 6,665 | 12,000 | 15,000 |
   | 4d | Sights, and the proofs that are left | hold the right button: the slow aimed walk and the camera's sights mode | 2,120 | 3,800 | 4,800 |
   After 4d, and before change-set 7 starts: **the link simulator's own small change-set** (about 700 bottom-up).
 - **His fallback (d) is used, and this is the telling before anything moves:** the recording is too large to ride
@@ -63,13 +63,14 @@ the build plan places at Walk.
   (steps of 0.55 and 0.56 m, ledges, platforms with ramps, a thin wall, a 50 m lane) in plain greys (question
   GREY-COLOURS). The readout names the content files and their versions. A broken content file shows the loader's
   own sentence with the file and the line, and the page stays up.
-- **4c:** he walks with W, A, S, D away from the camera, sprints with Shift until the stamina runs dry, jumps with
-  Space (held Space jumps again on every landing, as the old game and his sandbox do), walks onto the 0.55 m step and
-  is stopped by the 0.56 m one, reaches the 3.05 m ledge and not the 3.1 m one, and the plain stand-in turns to the
-  mouse. The camera follows at the framing of his Export; the backquote key opens the camera panel with its sliders,
-  the five old presets and "copy values".
-- **4d:** holding the right mouse button (or Q) he walks at 0.55 of his speed and cannot sprint, and the camera
-  reacts in its sights mode.
+- **4c:** he walks with W, A, S, D away from the camera, sprints with Shift until the stamina runs dry (a plain
+  stamina bar shows it), jumps with Space (held Space jumps again on every landing, as the old game and his sandbox
+  do), walks onto the 0.55 m step and is stopped by the 0.56 m one, reaches the 3.05 m ledge and not the 3.1 m one,
+  and the plain stand-in turns to the mouse. The camera follows at the framing of his Export; the backquote key
+  opens the camera panel with its sliders, the five old presets and "copy values". In the street corner he can jump
+  onto the cover wall and onto the houses' roof edges (MOVE-RULES, row 5).
+- **4d:** holding the right mouse button (and Q, if he takes MOVE-RULES row 6) he walks at 0.55 of his speed and
+  cannot sprint, and the camera reacts in its sights mode.
 
 ## 3. Before any edit
 1. The advisor agent's APPROVE of this plan, and his go on it with WALK-CUT. Each later part starts only after the
@@ -212,13 +213,13 @@ Symbols and tests in full: `rust-reviewer-cs4.md`, blocks 3 and 5; `netcode-arch
 | 1 | The simulation: the soldier table with ids that go stale on reuse; the rules taken from content once per match; our own vector type and the three float helpers; the sweeps on the collision world; **our own movement**: walk and sprint with stamina, the easing, the jump on the exact arc, the slide along walls, the step-up, the snap to a slope going down, the soft push between two soldiers; the vectors for the two maths routines that join | `crates/sim/src/` (`ids.rs`, `soldiers.rs`, `rules.rs`, `fmath.rs`, `collision.rs`, `movement.rs`, `world.rs`) | 1,240 / 1,090 |
 | 2 | The command path: the page's post gains the move and the cursor's ray; one input call of 13 plain numbers; the endpoint casts the ray against its own copy of the world; the room refuses a move longer than 1 and an aim outside the map; the jump's rule (one jump per command however many presses it brings: 3B-ONE-PER-TICK) | `crates/client-endpoint/src/post.rs`, `endpoint.rs`, `crates/room/src/lib.rs`, `crates/sim-wasm/src/lib.rs`, `packages/sim-worker/src/` | 385 / 530 |
 | 3 | The snapshot's own soldier and the block: the header's soldier count, 48 soldier rows of 40 bytes, the owner's section; each block stamped with the time its tick was due; the page blends between ticks; the Worker's pool of buffers grows (3B-POOL-16) | `crates/protocol/src/`, `crates/client-endpoint/src/layout.rs`, `block.rs`, `packages/client/src/app/blend.ts`, `packages/sim-worker/src/host.ts` | 320 / 340 |
-| 4 | The page: the plain stand-in at the Art brief's sizes on one root, the follow camera at his Export's framing, the keys and the mouse (pointer, move, the ray), the readout's new rows. **The early-look zip is built after this step** | `packages/client/src/soldier/`, `camera/follow.ts`, `input/`, `app/`, `overlay/`, `picture.ts` | 580 / 520 |
+| 4 | The page: the plain stand-in at the Art brief's sizes on one root, the follow camera at his Export's framing, the keys and the mouse (pointer, move, the ray), a plain stamina bar, the readout's new rows. **The early-look zip is built after this step** | `packages/client/src/soldier/`, `camera/follow.ts`, `input/`, `app/`, `overlay/`, `picture.ts` | 600 / 540 |
 | 5 | The camera panel: sliders, the five old presets, "copy values"; the camera's content file; development-only code kept out of the production build (3B-CSS-PROD) | `packages/client/src/camera/panel.ts`, `settings.ts`, `crates/content/src/camera.rs`, `content/camera/` | 360 / 300 |
 | 6 | The movement recording (about 2,400 ticks on the street corner and the yard) and every mark that rides it, with the three planted divergences run again on movement; the first recording re-made | `crates/devtools/`, `recordings/` | 320 / 230 |
 | 7 | The browser tests of the page (walk, jump, the two steps, aim on a ramp, the camera follows, keys let go on blur: 3B-BLUR-TEST, the hidden tab with a soldier, allocation measured again); then the reviews, the verifier, his check | `packages/e2e/tests/` | 0 / 410 |
-**4c: about 6,625 lines bottom-up; planned 11,900; stop line 14,900.**
-- **Its ladder, fixed now:** at 11,900 lines the two interleaved matches on movement (PM-0004-17) and the SIMD
-  reading move to 4d; at 13,400 the stale-id run (PM-0004-15's 10,000 cases) moves to 4d. Never moved: the movement
+**4c: about 6,665 lines bottom-up; planned 12,000; stop line 15,000.**
+- **Its ladder, fixed now:** at 12,000 lines the two interleaved matches on movement (PM-0004-17) and the SIMD
+  reading move to 4d; at 13,500 the stale-id run (PM-0004-15's 10,000 cases) moves to 4d. Never moved: the movement
   recording on its four runs with PM-0004-19, -21 and -24, the parity marks PM-0004-30 and -59, the camera panel (his
   words: "from its first playable build").
 - **The camera panel and the early look.** His queued words ask for the panel "from its first playable build". The
@@ -228,14 +229,22 @@ Symbols and tests in full: `rust-reviewer-cs4.md`, blocks 3 and 5; `netcode-arch
 
 ### 6.1 The movement, in short (his rules and his values; the float side by rust-reviewer)
 A vertical capsule (radius from his Export, height the stand-in's 1.80 m, which is his placeholder: one number scales
-both). Each command that runs is one movement step: the wish direction from the move; the speed (walk, or walk times
-the sprint multiplier, or in 4d walk times the sights multiplier); the velocity eased toward it by a share worked out
-once per match from his speed-up and stop times; the jump when Space is held or was pressed, only from the ground;
-**the exact arc for constant gravity** (the old game's order of the two sums tops out 18 cm low at 30 steps a second:
-2.89 m where his START-RULES say 3.07 m; the exact arc gives 3.0700 m); up to four slides; the step-up (up, across,
-down); the landing; the snap to a slope. Soldiers never block each other: after all have moved, overlapping pairs
-are pushed apart softly, and the push is swept against the world so it never puts anyone in a wall. No trigonometry
-runs in the step; nothing allocates.
+both). Each command that runs is one movement step: the wish direction from the move, scaled back to length 1 so
+that a direction rounded to whole numbers on the wire still gives full speed; the speed, one of three (walk; walk
+times the Conscript's own sprint multiplier; in 4d walk times the sights multiplier); the velocity eased toward it
+by a share worked out once per match from his speed-up and stop times; stamina as the old game has it (it drains
+while he wants to sprint, in the air and against a wall too; it refills with no pause; run dry, sprint is locked
+until the bar is back at its share; a jump costs none); the jump when Space is held or was pressed, only from the
+ground; **the exact arc for constant gravity** (the old game's order of the two sums tops out 18 cm low at 30 steps
+a second: 2.89 m where his START-RULES say 3.07 m; the exact arc gives 3.0700 m); up to four slides; the step-up
+(up, across, down), **in the air too**, tested against the arc's true top: that is how a jump gains a ledge up to
+the reach (the arc's top of 2.52 m plus the 0.55 m step-up), and why the yard has ledges at 3.05 m (gained) and
+3.10 m (not); the landing; the snap to a slope. The facing turns straight to the point under the cursor, with no
+turn rate, as in the old game. Soldiers never block each other: after all have moved, overlapping pairs are pushed
+apart softly, and the push is swept against the world so it never puts anyone in a wall (built and proven here with
+two soldiers, as the card places it; he feels it from change-set 5). No trigonometry runs in the step; nothing
+allocates. The card's sentence that the jump's reach is an open question (build plan lines 341-342) is overtaken by
+his START-RULES: the reach is 3.07 m.
 
 ### 6.2 What crosses to the page (the block), and three choices between the designs
 - The header gains `soldier_count`. The soldier section has **48 rows of 40 bytes** (a fixed capacity per build, the
@@ -248,8 +257,15 @@ runs in the step; nothing allocates.
   counter: a new generation at a row means place, never slide, and Slice 1 has no teleport. (2) The input call takes
   13 numbers: the view time joins in change-set 8 with its first reader (the recording's format already has its
   place). (3) The tools crate's three unused edges are dropped in 4b's manifest batch and come back with their
-  first user (section 8). The reviewers confirm the three at 4c's step 3; if one is rejected it goes back to the
-  advisor agent.
+  first user (section 8). (4) rust-reviewer's movement steps up "only while grounded"; game-designer's check shows
+  the reach of START-RULES needs the step-up in the air too, as the old game and the sandbox both have it: the plan
+  takes that, and rust-reviewer confirms the sweep for it at 4c's step 1. (5) engine-architect's movement table
+  names the old game's unused `T.sprintMult` and gives the easing the unit of an acceleration: the content's fields
+  carry the Export's own names and units instead (section 5.1), with the Conscript's own multiplier and the easing
+  as two times. (6) The content holds the jump's **reach**, as START-RULES names it and his Export carries it, and
+  the take-off speed is worked out from it (engine-architect's table stored the speed; game-designer raised it as a
+  question: it is a sandbox difference, asked in MOVE-RULES, row 8). The reviewers confirm these at 4c's steps 1
+  and 3; if one is rejected it goes back to the advisor agent.
 - **The blend between two ticks** (follow-up NA-N3): the Worker stamps each block with the time its tick was due; the
   page picks the pair of blocks and the share between them, never looks ahead, and places (never slides) a soldier
   whose id changed. netcode-architect's design keeps the **three** newest blocks instead of the drafts' two, because
@@ -265,7 +281,7 @@ values of the Export he has cleared by then (STEP-60).
 ## 7. Change-set 4d, "Sights, and the proofs that are left"
 | Step | What | Code / tests |
 |---|---|---|
-| 1 | Aiming down sights by SLICE-FEEL (section 10): the right button or Q held, 0.55 of the speed, no sprint, the flag in the snapshot and the block (lane 2's W1), the camera's sights mode | 140 / 150 |
+| 1 | Aiming down sights by SLICE-FEEL (section 10): the right button held (and Q on his word, MOVE-RULES row 6), 0.55 of the speed, no sprint, the flag in the snapshot and the block (lane 2's W1), the camera's sights mode | 140 / 150 |
 | 2 | Content's remaining proofs: every number of the old tuning and 10,000 made ones parse to the same bits natively, in WebAssembly and in `JSON.parse` (content item 1); 10,000 broken files refused the same way everywhere and a bounded run of 1,000,000 random inputs with no panic (content item 2); the walk over every leaf of the old tuning with its report (PM-0005-14); a saved content file reaching the Worker within a second in development (PM-0005-10, PM-0002-31) | 320 / 920 |
 | 3 | The yard at the far corner of a 2 km map (PM-0004-39); 2,000,000 hostile movement commands with no panic (PM-0004-60) | 30 / 180 |
 | 4 | The paced replay in the real Worker (presentation never reaches the simulation: PM-0004-28), the frame-cap setting and the smoothness reading per option (PM-0003-42), the lane recording, the SIMD reading (PM-0004-25) | 210 / 170 |
@@ -308,22 +324,47 @@ before change-set 8; PM-0004-59's planted defect as the old game's order of the 
 is within the mark's 1 mm of the exact arc and cannot fail it.
 
 ## 10. SLICE-FEEL and the movement rules
-The rules as the old game has them, where his sandbox differs, and each line's source: `rules-cs4.md`, checked by
-game-designer (`game-designer-cs4.md`).
-- **Aiming down sights** (4d): the input is the right mouse button or Q, held (one more held button in the post and
-  the command; the page stops the browser's own menu on the canvas; in Firefox, Shift with the right button always
-  opens that menu, so Q is the key there, as his README says). The rule: 0.55 of the walk speed and no sprint while
-  aiming. The fields: the aiming flag in the simulation, the snapshot and the block (W1). The camera: its sights
-  mode and four numbers. In change-set 8: each gun's spread resting at its sights value, and the sight line.
-- **The sprint-to-fire delay** is "set per gun", and Walk has no gun: question ADS-DELAY asks whether aiming
-  already waits after a sprint in 4d on one stand-in value, or whether the rule and its values arrive whole with the
-  guns in change-set 8. Either way the block carries `ready` (W4) from 4c, so its layout does not change again.
-- **The lines they add:** in Walk about 290 bottom-up (4d's step 1), 70 more with the stand-in wait; in change-set 8
-  about 175 (the wait before the first shot and before aiming per gun, the spread at sights), by
-  netcode-architect's count.
-- **Ten sandbox rules of movement differ from the old game** and by his point 8e enter only on his word: question
-  MOVE-RULES lists them with what Walk would build.
-- **The jump:** held Space jumps again on every landing, in the old game and in his sandbox alike; Walk keeps it.
+The old game's rules line by line, where his sandbox differs, and each line's source: `rules-cs4.md` (the main
+session's draft) as corrected by game-designer's check (`game-designer-cs4.md`, verdict REVISE on the draft; where
+the two differ, the check stands, and this section and questions MOVE-RULES, SPRINT-DELAY-4 and NO-SOURCE are written
+from it).
+- **Aiming down sights** (4d). The input: the right mouse button, held, as in the old game (one more held button in
+  the post and the command; the page stops the browser's own menu on the canvas); click-to-toggle is a page setting
+  in the old game and in the sandbox alike. Q as a second aiming key is a sandbox difference (its reason: in
+  Firefox, Shift with a right click always opens the browser's menu), so it enters only on his word: MOVE-RULES,
+  row 6. The rule is the same in both games, so it needs no word: 0.55 of the walk speed while held; no sprint, and
+  aiming ends a sprint the same step; letting go with Shift still held resumes the sprint at once; stamina refills
+  while aiming; he may aim in the air, and Space still jumps. The fields: the aiming flag in the simulation, the
+  snapshot and the block (W1). The camera: its sights mode and its numbers in the camera's data and panel (the old
+  game wrote three of them into its code; his Export names them); the sandbox's two changes to that camera are
+  MOVE-RULES, row 7. In change-set 8: each gun's spread resting at its sights value, and the sight line (which has
+  a sandbox difference of its own, for that change-set's plan).
+- **The sprint-to-fire delay.** His words (SLICE-FEEL): "Coming out of a sprint, firing and aiming down sights each
+  wait a short delay, set per gun." What his sandbox does: only the gun waits. Aiming itself starts at once (the
+  slow walk, the camera, the spread's resting value); the gun swings up over its own delay and the first shot waits
+  for it; a click during the wait is kept and fires then. Walk has no gun, so by the sandbox's rule nothing waits
+  in Walk; a wait on aiming itself in 4d (netcode-architect's design, on one stand-in value) would make Walk feel
+  different from Testlines, against "the real game must not feel different from it". His words and his sandbox
+  point two ways here, so question SPRINT-DELAY-4 asks him. Either way the simulation keeps the time since the
+  sprint ended from 4c on (hashed), and the block carries `ready` (W4), filled as "gun up" until change-set 8, so
+  lane 2's layout does not move again.
+- **The lines they add:** in Walk about 290 bottom-up (4d's step 1), 70 more if SPRINT-DELAY-4 is (b); in
+  change-set 8 about 175 (the gun's wait and kept click, the spread at sights), by netcode-architect's count.
+- **Seventeen differences** between his sandbox's movement and the old game's were found (game-designer's D1 to
+  D17). Two are covered by his START-RULES (the jump's exact reach; the soft push). One is change-set 8's (a held
+  fire button ends a sprint: part of the gun's wait). One is not taken (the sandbox holds the facing inside a
+  wider circle round the soldier; Walk keeps the old game's 2 cm). The other thirteen are asked in MOVE-RULES, in
+  eight rows; by his point 8e none enters without his word.
+- **Numbers the sandbox keeps in its code**, not in his Export: question NO-SOURCE.
+- **The jump:** one jump per command, only from the ground; a press in the air is dropped, never kept for the
+  landing; held Space jumps again on every landing. All of it is the same in the old game and in his sandbox, and
+  nothing in LOOP_V2, VISION_V2 or his decisions speaks against it (game-designer, block 4); his Brave check can
+  change it.
+- **Open in the design docs and left open:** LOOP_V2 section 9's "aiming at height" (shots and aim help). In Walk
+  the aim point only turns the facing, by the old game's rule (the cursor ray's first hit, else the ground).
+- **He should know before his check:** with his 3.07 m reach and blocks at their real heights, the soldier can jump
+  onto the houses' roof edges (2.6 m) in Walk's street corner; in the old game houses were walls of endless height
+  (MOVE-RULES, row 5).
 
 ## 11. His Testlines values (his point 8, a to g)
 In full: `testlines-cs4.md`. In short:
@@ -340,9 +381,11 @@ In full: `testlines-cs4.md`. In short:
   counterpart (`testlines-compare.txt`). The 23: the Conscript's sprint multiplier (1.214 in the old game, 1.52 in
   his Export); sixteen camera values (his Experimental profile against the old camera); the SMG's recoil and four
   spread values (all 0 in his Export); the grenade's launch angle (41.253 degrees in the old game, 41.3 in the
-  Export: the sandbox's own rounding). Beside them, values with no old number at all (the body radius 0.4 m, the
-  push strength and radius, the three sprint-to-fire delays, the active-reload windows, the aiming camera's floor of
-  36 degrees). Question DIFF-LIST asks his yes to both lists before any becomes the starting table.
+  Export: the sandbox's own rounding). Beside them, values with no old number in the old game's tables (the body
+  radius 0.4 m, where the old game's 0.7 m is written into its code and so in no table; the push strength and
+  radius; the three sprint-to-fire delays; the active-reload windows; the aiming camera's floor of 36 degrees,
+  where the old game's code has 28.5). Question DIFF-LIST asks his yes to both lists before any becomes the
+  starting table.
 - **d.** The tool `testlines` has a `--check` mode: it fails, naming the row, when a content value differs from the
   saved Export through the table, when a row names a place that does not exist, or when the saved Export's bytes do
   not match the manifest. A plain test runs the same check in the job CI already has. Planted: one content value
@@ -350,7 +393,7 @@ In full: `testlines-cs4.md`. In short:
   this chat's first comparison run made, caught against his "changed from start" list).
 - **e.** Not taken, each by name with one line (`testlines-cs4.md`, section 4): the Hornet; the explosion picture;
   the metrics room; the measuring grid; the session's own choices (faction, gun); and every sandbox rule that
-  differs from the old game, of which the ten that touch movement are asked in MOVE-RULES.
+  differs from the old game, of which those that touch movement are asked in MOVE-RULES (section 10 counts them).
 - **f.** The Export says 60 steps a second: he was told before anything was used (STEP-60).
 - **g.** Where he tunes once Walk exists, one home per value: question TUNE-HOME.
 Three things the Export's rounding does, said so he knows: the speed-up and stop times read 0.164 s where the old
@@ -365,7 +408,7 @@ A lane request, never his word. The full answers with each field's name and type
 | in the block today | H1 (the tick) |
 | 4c | H2 (the soldier count), F1 position, F2 one yaw (gap 5: aim and facing are one angle in Slice 1), F3 pitch, F4 velocity (the owner's exact; other soldiers' worked out by the Worker from change-set 5), F5 on the ground, F6 sprinting, F7 alive (always set until change-set 8), F9 the id, F10 the generation (a change means place), F11's team, F12 the local soldier and his team (gap 8: in the block), W4's field `ready`; gaps 1, 5, 8, 10 |
 | 4d | W1, aiming down sights |
-| change-set 8 | F8, F13, E1 to E4, E6, W2; gaps 3 and 9; W4's rule if ADS-DELAY is (a) |
+| change-set 8 | F8, F13, E1 to E4, E6, W2; gaps 3 and 9; W4's rule (the gun's wait; under SPRINT-DELAY-4 (b) a first part of it in 4d) |
 | change-set 9 | F14, E5, W3; gap 2 |
 | later | F11's faction table (Slice 2); gap 7 (Slice 3) |
 | no field needed | W5 |
@@ -407,15 +450,38 @@ Each with the part that needs it. To start 4a he needs to answer only WALK-CUT.
    his. Needed before 4b's step 9. (a) LOOP_V2 section 9's own default, "plain blocks, with height read through
    brightness (higher is lighter)", in neutral greys, the stand-in one mid grey with a darker gun; (b) the Art
    lead's palette proposal and the brief's faction colours as placeholders; (c) one flat grey. Recommended: (a).
-6. **MOVE-RULES: which of the sandbox's movement rules that differ from the old game does the game take?** His
-   point 8e. Needed before 4c. The ten rows (`rules-cs4.md`, section 2), each with what Walk would build:
-   D1 the body's radius from his Export (0.4 m; the old game: 0.7 m); D2 the jump on its exact arc; D3 a ledge
-   gained in the air when the arc's top reaches it, without the sandbox's pull onto the block (the blend between
-   ticks smooths it); D4 sliding along a wall and losing the speed that went into it; D5 slopes walked and kept
-   going down; D6 the head bumping a block above; D7 two values for speeding up and stopping; D8 steering in the
-   air as a value; D9 sprint ending while firing (change-set 8) and while aiming (4d); D10 the soft push by a
-   strength and a radius. (a) Yes to all ten as Walk would build them; (b) yes with the rows he changes.
-   Recommended: (a): his values were tuned under these rules, and START-RULES already asks for D2 and D10.
+6. **MOVE-RULES: which of his sandbox's movement rules that differ from the old game does Walk build?** It matters
+   because his point 8e lets none in without his word in this plan, and each changes how the soldier meets walls,
+   steps and slopes. Needed before 4c (rows 6 and 7: before 4d). The rows (`game-designer-cs4.md`, block 2):
+   1. **The body's size against walls.** His Export's radius (0.4 m), with the Art stand-in's 1.80 m height for
+      headroom. The old game: 0.7 m, written into its code (so no table shows it); 1.4 m wide, he would have 0.1 m
+      to spare in the street corner's 1.5 m alley.
+   2. **Steps and edges.** He rises onto a step as soon as his body touches it, and he holds a little past an edge
+      (the body's round foot rests on it). The old game: he rises only once his centre crosses the step's edge, and
+      drops off a ledge as his centre passes it. Walk leaves out the sandbox's pull onto the block: the blend
+      between ticks smooths the rise.
+   3. **Walls.** He slides along a wall and loses the speed that went into it; corners are round. The old game: he
+      is pushed out, the speed is kept, corners are square.
+   4. **Slopes and stairs going down.** He stays on them. The old game: he falls down them in small hops.
+   5. **Real heights.** Every block has its real height: a jump that reaches a top lands on it. In Walk's street
+      corner he gets onto the 1.0 m cover with less of a jump, and onto the houses' roof edges (2.6 m, under his
+      3.07 m reach). The old game: walls and houses are endless in height; only platforms, ramps and cover can be
+      stood on.
+   6. **Q aims too**, beside the right button (4d). The old game: the right button only.
+   7. **The sights camera** tips toward the point the cursor marks in the resting view, so it settles, and never so
+      far that his feet leave the screen (4d). The old game: it tips toward the live aim point, to a fixed floor.
+   8. **Listed only: nothing he feels today.** Two values for speeding up and for stopping, and one for steering in
+      the air (the old game: one value, full steering; his Export has the old game's values in all three). The
+      head bumps a block above (nothing in Walk's scene hangs overhead). The jump is tuned by its reach, as
+      START-RULES names it, and the take-off speed is worked out (the old game: the other way round; the same jump
+      today, they part when gravity or the step height is tuned). The map's edge is the map's own bounds and the
+      speed into it is dropped (the old game: the ground less 1 m, the speed kept).
+   - (a) All eight rows, as Testlines has them.
+   - (b) The rows he names; the rest stay as the old game.
+   - (c) The old game's rule wherever they differ.
+   - Recommended: **(a)**. He has played them, and his values were tuned under them. Rows 3, 4 and 5 follow from
+     moving a real 3D body by the collision library's queries (the build plan's Walk card, his go of 17 November):
+     the old game's rule for them would have to be built against the library on purpose.
 7. **RESUME-FLASH: what does the first picture after a pause show?** It matters because he saw a key box stay lit
    for a moment in 3b's check, and a soldier now stands where that box was. Needed before 4c.
    - (a) The match as it stood when the tab hid; one tick later the keys count as let go and the soldier slows to a
@@ -435,13 +501,33 @@ Each with the part that needs it. To start 4a he needs to answer only WALK-CUT.
    - (c) Everything moves to the game at Walk.
    - Recommended: **(b)**. With it the game's camera starts from his Export's values (his Experimental profile), and
      the five old presets are ported at the old numbers, as Part 5 says.
-9. **ADS-DELAY: does aiming already wait after a sprint in Walk?** His words: the delay is "set per gun", and Walk
-   has no gun. Needed before 4d.
-   - (a) The rule and each gun's value arrive whole in change-set 8; in Walk aiming starts at once.
-   - (b) In 4d aiming waits by one stand-in value (the SMG's from his Export), moved into each gun's row in
-     change-set 8.
-   - Recommended: (a): a per-gun value keeps one home.
-10. **DEPART-4: does he accept the places where Walk reads or departs from the decision drafts?** As DEPART-3 for
+9. **SPRINT-DELAY-4: after a sprint, what waits?** It matters because SLICE-FEEL says "firing and aiming down sights
+   each wait a short delay, set per gun", while his Testlines holds back only the gun (aiming slows him and moves
+   the camera at once; the gun swings up over its delay and fires only then), and Walk has no gun. Needed before
+   4d.
+   - (a) As Testlines: aiming starts at once; only the gun waits (its swing up and its first shot, each gun's own
+     delay), all of it in change-set 8. Nothing waits in Walk.
+   - (b) Aiming waits too, from Walk on: after a sprint the slow walk and the camera start only after one stand-in
+     delay (one gun's value from his Export), replaced by each gun's own in change-set 8. Walk then differs from
+     Testlines, and the rule must also say that holding the aim button ends the sprint at once.
+   - (c) As (a) in Walk; from change-set 8 aiming also waits each gun's delay (his words taken to the letter,
+     beyond what Testlines does).
+   - Recommended: **(a)**: it is what he has played, and a per-gun value keeps one home.
+10. **NO-SOURCE: where do the numbers come from that Testlines keeps in its code and not in its Export?** It
+    matters because his point 8b takes values "from my Export and from nothing else", and Walk needs a few numbers
+    the Export does not carry. Needed before 4c. The numbers: the steepest slope he can walk; the soft push's four
+    limits (how far a head-on push turns sideways; that a push never undoes more than half of a walker's own step;
+    the most one step may push; the height gap above which two soldiers do not push); the body's height (the Art
+    stand-in's 1.80 m). Not needed in Walk, because its movement has no such number: the sandbox's pull onto a
+    block, its foot circle and its allowance for staying on a slope (Walk uses the step height there).
+    - (a) His Testlines chat makes them sliders and he exports again; Walk takes them from there.
+    - (b) The movement design picks them, starting from the sandbox's own numbers where it has one; each is a row
+      of the table marked "not from your Export", lives in the game's content, and he changes it by telling this
+      chat.
+    - (c) Drop the rules that need them and keep the old game's (for the soft push that is not possible: the old
+      game has none, and START-RULES asks for it).
+    - Recommended: **(b)**, so Walk waits on no other chat and each number still has one home (his point 8g).
+11. **DEPART-4: does he accept the places where Walk reads or departs from the decision drafts?** As DEPART-3 for
     change-set 3; each is recorded by a dated pointer at the drafts' next revision, never by rewording now. Needed
     before 4b. (a) Accept all; (b) accept with his changes. Recommended: (a). The list:
     - the page keeps the three newest blocks, where the netcode and structure drafts say two (section 6.2);
@@ -491,6 +577,9 @@ Each with the part that needs it. To start 4a he needs to answer only WALK-CUT.
 | 3A-RULES-STEP (the tools crate's first native-only dependency must be target-gated) | not met in Walk: no such dependency enters; said in each report |
 | 3B-KEY-POST, 3B-ALLOC-METHOD | change-set 5, as placed |
 | 3B-LATE-BOUND: per-command movement makes its doubled rate real movement over a network | change-set 7, unchanged: no room goes behind a network transport before it |
+| New, HOP-WATCH (game-designer): a jump costs nothing in either game, so a soldier hopping without pause may be hard to hit once shots aim at the cursor's point; measured over several runs before anyone calls it strong; any answer is a new rule for his word | change-set 8's plan |
+| New, AIM-HEIGHT: LOOP_V2 section 9's open item (shots at height, aim help) stays open; Walk's aim point only turns the facing | change-set 8's plan |
+| New, SIGHT-LINE-8E: the sandbox's sight line differs from the old game's (it ends where the shot stops): his word under point 8e | change-set 8's plan |
 
 ## 16. Risks
 1. **Size.** These are estimates made the way change-set 3's were, which ran 1.7 and 1.8 times. Each part has its
@@ -542,10 +631,14 @@ tampering cases (change-set 8). Any kit, gate or CI file. Lane 2's second page i
 Nothing of this plan is built or run. Every line count is an estimate. The collision library's tree was read from
 the registry on paper, not resolved by cargo. The choices of section 6.2 are the main session's between two
 designs; the two architects have not read them. The Export's values are saved and compared, and none is carried.
-The advisor agent has not read this draft.
+The advisor agent read draft 1 (f789b24). Draft 2 differs from it by game-designer's check, folded in after that
+read began: sections 2, 6.1, 6.2 (choices 4 to 6), 10, 11c, 12 and 15, questions MOVE-RULES (rewritten),
+SPRINT-DELAY-4 (was ADS-DELAY, now three options) and NO-SOURCE (new), a plain stamina bar in 4c's step 4 (40 lines
+more, so 4c is 6,665 bottom-up, 12,000 planned, stop line 15,000), and the total (about 27,000).
 
 ## For Mustafa
 1. Your go on this plan, with a letter for WALK-CUT. On it, 4a starts.
 2. A letter for STEP-60 (and the new Export if (a) or (c)), your yes to DIFF-LIST, and letters for CONTENT-SOURCE,
    GREY-COLOURS and DEPART-4: before 4b.
-3. Letters for MOVE-RULES, RESUME-FLASH and TUNE-HOME: before 4c. A letter for ADS-DELAY: before 4d.
+3. Letters for MOVE-RULES, NO-SOURCE, RESUME-FLASH and TUNE-HOME: before 4c. A letter for SPRINT-DELAY-4: before
+   4d.
