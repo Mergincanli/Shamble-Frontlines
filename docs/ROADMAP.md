@@ -189,6 +189,16 @@ at the end of `.claude/NIGHT_SHIFT.md` step 6, by his NS-STATUS (a) and his yes 
 exception to KIT-FREEZE-2 for that one change; seven Lows deferred in writing (the archive's "Follow-ups"), two of them
 his NS-TRAILER and NS-FIRST, his (b): the kit's next change after the freeze.
 
+**Main's docs after #52, #53 and #54 [2026-11-17, MERGED]** — docs-after-54, by Mustafa's DOCS-54 (a) of
+2026-11-17 (docs only, no kit, gate or CI file; from the netcode proof test's session, its plan approved by the advisor
+agent with conditions C1-C9): his words in that session since #52 go into `docs/DECISIONS.md` by script, copied from
+its transcript and checked byte for byte against its history.md, only his typed text inside the quotes, the netcode
+test's own words left with PR #40 and each cut named (the foundation chat's own words are that lane's to record); his go
+for #52 from merge commit 4460ef5's message; two pointers in "Queued"; STATUS, ROADMAP, the archive and REPO_MAP made
+true for main 82c605e. One review round (the verifier PASS; the advisor agent APPROVE WITH FINDINGS, Lows only) and one
+fix pass, then the advisor agent's APPROVE WITH FINDINGS of aea6f5b and the verifier's PASS. Merged: PR #55, c94c81b,
+2026-11-17 17:09:33 UTC by `merged_at`, by merge commit, on his go.
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -233,6 +243,15 @@ his NS-TRAILER and NS-FIRST, his (b): the kit's next change after the freeze.
 
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
+
+**The small CI pull request after change-set 3a [2026-11-24 to 11-25, waiting for his go]** — ci-after-3a, by the
+chat he calls CI Builder (risk tier 2; CI and the test configuration only): the `toolchain` job runs every crate's
+release tests (E1), checks the committed vector files against their two generators (3A-GEN-CHECK), builds `devtools`
+for wasm32 on a line of its own (3A-RULES-STEP's CI half) and runs the rule tests in the runner image's Mozilla
+Firefox 160.0 (FIREFOX-TESTS (b), his FIREFOX-SOURCE (c)). The first GitHub run was red as he had foreseen (the
+runner's Firefox gives the page no WebGL), so by his rule decided in advance Firefox runs the rule tests only and its
+drawing tests are a follow-up (FF-DRAW). Green on code head 832268e (Chromium 16 passed, Firefox 2). Report
+`docs/reports/2026-11-25-ci-after-3a.md`; waits for the advisor agent's review of the final head and his go.
 
 **Guard fix: a wrapper's option values [2026-11-25, waiting for his go]** — guard-env-fix (PR #69, risk tier 2; SEC-U7B-1): the day guard reads env, nice and stdbuf options with their values, so git and gh behind them no longer skip its check;
 a form it cannot read asks the main session and refuses an agent; routines unchanged. Guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES; waits for the advisor agent's review of the final head and his go.
@@ -356,13 +375,3 @@ as reports; the model-file rules and the soldier's joint list, on paper (PM-0005
 Merged: PR #56, d7dad97, 2026-11-17 23:00:12 UTC, by merge commit, on his go after the advisor agent's APPROVE of
 cd61b28; CI green on main (gate run 856 with smoke, toolchain run 155). With the merge he accepted that PM-0005-54
 stands as written (a fail with today's rifle prototype, not waived) and the checkpoint commits in main's history.
-
-**Main's docs after #52, #53 and #54 [2026-11-17, MERGED]** — docs-after-54, by Mustafa's DOCS-54 (a) of
-2026-11-17 (docs only, no kit, gate or CI file; from the netcode proof test's session, its plan approved by the advisor
-agent with conditions C1-C9): his words in that session since #52 go into `docs/DECISIONS.md` by script, copied from
-its transcript and checked byte for byte against its history.md, only his typed text inside the quotes, the netcode
-test's own words left with PR #40 and each cut named (the foundation chat's own words are that lane's to record); his go
-for #52 from merge commit 4460ef5's message; two pointers in "Queued"; STATUS, ROADMAP, the archive and REPO_MAP made
-true for main 82c605e. One review round (the verifier PASS; the advisor agent APPROVE WITH FINDINGS, Lows only) and one
-fix pass, then the advisor agent's APPROVE WITH FINDINGS of aea6f5b and the verifier's PASS. Merged: PR #55, c94c81b,
-2026-11-17 17:09:33 UTC by `merged_at`, by merge commit, on his go.
