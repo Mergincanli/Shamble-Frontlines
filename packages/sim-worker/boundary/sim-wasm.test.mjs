@@ -143,7 +143,9 @@ test("the glue exports what the Worker calls and nothing more", () => {
   // The one type's own calls: a method added to the bindings shows here. `__destroy_into_raw` and `free` are
   // wasm-bindgen's own; only its dispose symbol is left out.
   const calls = Reflect.ownKeys(Sim.prototype).filter((name) => typeof name === "string");
-  expect(calls.sort()).toEqual(["__destroy_into_raw", "block_len", "block_ptr", "constructor", "free", "input", "rebase", "step"]);
+  // `shared_hash` is the one read-only number a replay of a recorded match compares (his DEPART-3); no live tick
+  // calls it (host.test.ts pins a live tick's calls).
+  expect(calls.sort()).toEqual(["__destroy_into_raw", "block_len", "block_ptr", "constructor", "free", "input", "rebase", "shared_hash", "step"]);
   expect(Object.getOwnPropertyNames(Sim).filter((name) => !["length", "name", "prototype"].includes(name))).toEqual([]);
 });
 

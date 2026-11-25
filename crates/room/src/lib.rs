@@ -23,7 +23,7 @@ use protocol::messages::{
 };
 use protocol::wrap::{press_edges, seq_ahead, seq_newer, ticks_after};
 use queue::{CommandQueue, Inserted, Queued};
-use sim::{BUTTONS, MatchSetup, PlayerCommand, TICK_HZ, World};
+use sim::{BUTTONS, MatchSetup, PlayerCommand, SHARED_STATE_BYTES, TICK_HZ, World};
 
 const _: () = assert!(protocol::messages::BUTTONS == BUTTONS);
 
@@ -97,6 +97,9 @@ pub struct Room {
     newest_received: Option<u16>,
     newest_sent: Option<u32>,
     counters: RoomCounters,
+    /// The shared state's canonical bytes, written again for each `shared_hash`. It is this room's alone and is
+    /// handed to no one; no seed byte is ever written into it (`World::write_shared_state`).
+    hash_scratch: Vec<u8>,
 }
 
 impl Room {
@@ -114,12 +117,20 @@ impl Room {
             newest_received: None,
             newest_sent: None,
             counters: RoomCounters::default(),
+            hash_scratch: Vec::with_capacity(SHARED_STATE_BYTES),
         }
     }
 
     #[must_use]
     pub const fn world(&self) -> &World {
         &self.world
+    }
+
+    /// The hash of the world's shared state as it stands: the one number a replay compares tick by tick, the same
+    /// on every target. It covers no seed byte and takes no memory (the buffer was reserved in `new`).
+    #[must_use]
+    pub fn shared_hash(&mut self) -> u64 {
+        self.world.shared_hash(&mut self.hash_scratch)
     }
 
     #[must_use]
@@ -633,5 +644,39 @@ mod tests {
             assert_eq!(*places.get_or_insert(now), now);
         }
         assert_eq!(room.counters().commands_run, 1000);
+    }
+
+    /// The room's shared hash is the world's own. Two rooms whose seeds differ in every byte agree on it tick by
+    /// tick, and the buffer behind it holds the shared bytes only, the same in both, and never moves.
+    #[test]
+    fn the_shared_hash_is_the_world_s_and_its_buffer_holds_no_seed_byte() {
+        let seeds = [[0x5A; sim::SEED_BYTES], [0xA5; sim::SEED_BYTES]];
+        let [mut a, mut b] = seeds.map(|seed| {
+            let setup = MatchSetup {
+                seed,
+                start_tick: 3,
+            };
+            Room::new(&setup, HASH)
+        });
+        let place = a.hash_scratch.as_ptr();
+        let (mut snapshot, mut whole) = (Vec::new(), Vec::new());
+        for _ in 0..40 {
+            let hash = a.shared_hash();
+            assert_eq!(hash, b.shared_hash());
+            assert_eq!(hash, a.world().shared_hash(&mut whole));
+            assert_ne!(a.world().state_hash(&mut whole), hash);
+            assert_eq!(a.hash_scratch, b.hash_scratch);
+            assert_eq!(a.hash_scratch.len(), SHARED_STATE_BYTES);
+            // The ticks run from 3 to 42 and nothing is held: no shared byte is one of the seeds' bytes.
+            assert!(
+                a.hash_scratch
+                    .iter()
+                    .all(|byte| ![0x5A, 0xA5].contains(byte))
+            );
+            assert!(!a.step(&mut snapshot));
+            assert!(!b.step(&mut snapshot));
+        }
+        assert_eq!(a.hash_scratch.as_ptr(), place);
+        assert_eq!(a.world().tick(), 43);
     }
 }

@@ -166,6 +166,12 @@ impl<P: TransportPair> LocalMatch<P> {
         self.schedule.rebase(now_ms);
         self.schedule.next_due_ms()
     }
+
+    /// The hash of the local server's shared state as it stands (`Room::shared_hash`). No step reads it.
+    #[must_use]
+    pub fn shared_hash(&mut self) -> u64 {
+        self.room.shared_hash()
+    }
 }
 
 #[cfg(test)]

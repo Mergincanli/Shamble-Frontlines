@@ -49,6 +49,45 @@ impl PlayerCommand {
     };
 }
 
+/// What reads the state field by field, in its one fixed order (ADR 0004 part 9). Every writing of the state goes
+/// through it: the canonical bytes the hashes cover are one reader, and a dump that names each field (the replay
+/// tools') is another, so a name and its bytes cannot drift apart.
+pub trait StateSink {
+    fn u16(&mut self, name: &'static str, value: u16);
+    fn u32(&mut self, name: &'static str, value: u32);
+    /// A field that is a run of bytes, each its own value (the press counters).
+    fn bytes(&mut self, name: &'static str, value: &[u8]);
+    /// Everything before this call is the shared state; what follows is the authority's alone.
+    fn authority(&mut self);
+    /// Bytes that are never printed or logged: the match seed (ADR 0004 part 8). A reader may hash or count them.
+    fn secret(&mut self, name: &'static str, value: &[u8]);
+}
+
+/// The canonical bytes: every integer at a fixed width and little-endian, no `usize`, nothing between the fields.
+struct Canonical<'a>(&'a mut Vec<u8>);
+
+impl StateSink for Canonical<'_> {
+    // The path form on the integer's own type: the rule scan (tests/rules_scan.rs) reads text and cannot tell
+    // `.to_le_bytes()` on a tick from the same call on a float, which part 7 does not allow.
+    fn u16(&mut self, _: &'static str, value: u16) {
+        self.0.extend_from_slice(&u16::to_le_bytes(value));
+    }
+
+    fn u32(&mut self, _: &'static str, value: u32) {
+        self.0.extend_from_slice(&u32::to_le_bytes(value));
+    }
+
+    fn bytes(&mut self, _: &'static str, value: &[u8]) {
+        self.0.extend_from_slice(value);
+    }
+
+    fn authority(&mut self) {}
+
+    fn secret(&mut self, _: &'static str, value: &[u8]) {
+        self.0.extend_from_slice(value);
+    }
+}
+
 /// The whole state of one match. There is no `Debug`: the seed is never printed or logged (ADR 0004 part 8).
 pub struct World {
     tick: u32,
@@ -97,27 +136,44 @@ impl World {
             .expect("the tick counter is at u32::MAX and cannot advance");
     }
 
-    /// Writes the canonical bytes of the whole state into `out`, replacing what it held (ADR 0004 part 9): field by
-    /// field in a fixed order, every integer at a fixed width and little-endian, no `usize`. The shared state comes
-    /// first (the tick as a `u32`, then the player's buttons as a `u16` and the 16 press counters) and the
-    /// authority's own part last (the 32 seed bytes; the random streams' positions join it when a system first
-    /// draws), so the shared state is a prefix. Each field that joins the state joins here, in the same change.
-    pub fn write_state(&self, out: &mut Vec<u8>) {
-        // Every field is named in this pattern: one added to the struct later does not compile until it is written
-        // here, or left out here in plain sight.
+    /// Hands the whole state to `sink`, field by field in its one fixed order (ADR 0004 part 9). The shared state
+    /// comes first (the tick, then the player's buttons and the 16 press counters), then `authority()`, then the
+    /// authority's own part (the seed, as a secret; the random streams' positions join it when a system first
+    /// draws). Each field that joins the state joins here or in `visit_shared`, in the same change.
+    pub fn visit(&self, sink: &mut impl StateSink) {
+        self.visit_shared(sink);
+        sink.authority();
+        sink.secret("seed", &self.seed);
+    }
+
+    /// Hands the shared state to `sink` and nothing of the authority's part: it never touches the seed.
+    pub fn visit_shared(&self, sink: &mut impl StateSink) {
+        // Every field is named in this pattern: one added to the struct later does not compile until it is handed
+        // over here or in `visit`, or left out here in plain sight.
         let Self {
             tick,
             player: PlayerCommand { buttons, presses },
-            seed,
+            seed: _,
         } = self;
+        sink.u32("tick", *tick);
+        sink.u16("player.buttons", *buttons);
+        sink.bytes("player.presses", presses);
+    }
+
+    /// Writes the canonical bytes of the whole state into `out`, replacing what it held: the shared state's bytes,
+    /// then the authority's, so the shared state is a prefix.
+    pub fn write_state(&self, out: &mut Vec<u8>) {
         out.clear();
         out.reserve(STATE_BYTES);
-        // The path form on the integer's own type: the rule scan (tests/rules_scan.rs) reads text and cannot tell
-        // `.to_le_bytes()` on a tick from the same call on a float, which part 7 does not allow.
-        out.extend_from_slice(&u32::to_le_bytes(*tick));
-        out.extend_from_slice(&u16::to_le_bytes(*buttons));
-        out.extend_from_slice(presses);
-        out.extend_from_slice(seed);
+        self.visit(&mut Canonical(out));
+    }
+
+    /// Writes the canonical bytes of the shared state into `out`, replacing what it held. No seed byte is ever
+    /// written into `out`, so a caller that keeps or hands on the buffer keeps and hands on no seed.
+    pub fn write_shared_state(&self, out: &mut Vec<u8>) {
+        out.clear();
+        out.reserve(SHARED_STATE_BYTES);
+        self.visit_shared(&mut Canonical(out));
     }
 
     /// The state hash: `fnv1a_64` over the canonical bytes. `scratch` holds those bytes afterwards; passing the same
@@ -129,13 +185,10 @@ impl World {
     }
 
     /// The hash of the shared state only: the one a client's state can be compared with, because it covers no
-    /// seed byte (ADR 0004 part 9). `scratch` holds the shared bytes afterwards and nothing of the seed: what lay
-    /// behind them is overwritten before it is cut off, so a caller that hands the buffer on hands on no seed.
+    /// seed byte (ADR 0004 part 9). `scratch` holds the shared bytes afterwards.
     #[must_use]
     pub fn shared_hash(&self, scratch: &mut Vec<u8>) -> u64 {
-        self.write_state(scratch);
-        scratch[SHARED_STATE_BYTES..].fill(0);
-        scratch.truncate(SHARED_STATE_BYTES);
+        self.write_shared_state(scratch);
         fnv1a_64(scratch)
     }
 }
@@ -220,6 +273,89 @@ mod tests {
         assert_eq!(bytes[4..6], [0x01, 0x80]);
         assert_eq!(bytes[6..22], pressed().presses);
         assert_eq!(bytes[22..], counting_seed(0));
+    }
+
+    /// A reader that notes each field's name and width, and where the authority's part begins.
+    #[derive(Default)]
+    struct Names(Vec<(&'static str, usize)>);
+
+    impl StateSink for Names {
+        fn u16(&mut self, name: &'static str, _: u16) {
+            self.0.push((name, 2));
+        }
+
+        fn u32(&mut self, name: &'static str, _: u32) {
+            self.0.push((name, 4));
+        }
+
+        fn bytes(&mut self, name: &'static str, value: &[u8]) {
+            self.0.push((name, value.len()));
+        }
+
+        fn authority(&mut self) {
+            self.0.push(("authority", 0));
+        }
+
+        fn secret(&mut self, name: &'static str, value: &[u8]) {
+            self.0.push((name, value.len()));
+        }
+    }
+
+    #[test]
+    fn every_reader_of_the_state_gets_the_same_fields_in_the_same_order() {
+        let world = world(0, 0);
+        let mut names = Names::default();
+        world.visit(&mut names);
+        let fields = [
+            ("tick", 4),
+            ("player.buttons", 2),
+            ("player.presses", 16),
+            ("authority", 0),
+            ("seed", 32),
+        ];
+        assert_eq!(names.0, fields);
+        // The widths are the canonical lengths: the shared state's up to the mark, the whole state's in all.
+        let width = |fields: &[(&str, usize)]| fields.iter().map(|field| field.1).sum::<usize>();
+        assert_eq!(width(&fields[..3]), SHARED_STATE_BYTES);
+        assert_eq!(width(&fields), STATE_BYTES);
+        let mut shared = Names::default();
+        world.visit_shared(&mut shared);
+        assert_eq!(shared.0, fields[..3]);
+    }
+
+    /// A reader of the shared state that stops the test when it is handed anything of the authority's part.
+    struct SharedOnly;
+
+    impl StateSink for SharedOnly {
+        fn u16(&mut self, _: &'static str, _: u16) {}
+
+        fn u32(&mut self, _: &'static str, _: u32) {}
+
+        fn bytes(&mut self, _: &'static str, _: &[u8]) {}
+
+        fn authority(&mut self) {
+            panic!("the shared state's reader was handed the authority's part");
+        }
+
+        fn secret(&mut self, name: &'static str, _: &[u8]) {
+            panic!("the shared state's reader was handed the secret {name}");
+        }
+    }
+
+    /// The shared bytes are the whole state's first bytes, and writing them never puts a seed byte in the buffer:
+    /// this seed's bytes are 0xA0 to 0xBF, and none of them is among the shared bytes.
+    #[test]
+    fn the_shared_bytes_are_a_prefix_and_hold_no_seed_byte() {
+        let mut world = world(0xA0, 7);
+        world.authority_step(&[pressed()]);
+        world.visit_shared(&mut SharedOnly);
+        let (mut whole, mut shared) = (Vec::new(), vec![0xEE; 100]);
+        world.write_state(&mut whole);
+        world.write_shared_state(&mut shared);
+        assert_eq!(shared.len(), SHARED_STATE_BYTES);
+        assert_eq!(shared, whole[..SHARED_STATE_BYTES]);
+        assert_eq!(whole[SHARED_STATE_BYTES..], counting_seed(0xA0));
+        assert!(shared.iter().all(|byte| !(0xA0..=0xBF).contains(byte)));
     }
 
     /// Known answers from a second implementation (a script, not this code): they hold the byte order and the hash
