@@ -1467,7 +1467,11 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     tick's held keys against the post it used (`WorkerLink.wrongKeys`), both asserted 0 in both browser specs. So the
     mark is met for presses; for releases "0 lost and 0 doubled" is met at the echo's resolution, never "through the
     edge counters". Options: (a) accept as built and correct the row's sentence at the drafts' next edit; (b) add a
-    release counter per button to the messages. The builder recommends (a). Neither draft is edited now.
+    release counter per button to the messages: 16 bytes more per command, so up to 128 more per input message (292
+    to 420) until delta coding. The builder recommends (a), because the releases follow exactly from the held keys
+    and the press counters (so does a charged shot that fires when its button is let go: ADR 0005's AB-3), and the
+    per-tick key check sees every wrong held state. It blocks the claim that the mark is met, not 3b's merge (the
+    advisor agent, 2026-11-25). Neither draft is edited now.
   - 3B-LATE-BOUND (change-set 7; before online play: no room goes behind a network transport without it): the room has
     no bound on how late a command may run, so a client that sends nothing for N ticks and then its backlog runs two
     commands a tick for N ticks (security-auditor's round 1, M1, Medium; deferred in writing in its round 2, not
@@ -1486,12 +1490,17 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     gap as rust-reviewer's round 1, RR-3, whose link-simulator half is 3c's).
   - 3B-ACKS (before online play): a snapshot acknowledgement bounded from below, and one per entity group
     (netcode-architect's round 1, NA-5).
-  - 3B-OUTAGE-256 (before online play; a stated limit): during an outage presses are lost in steps of 256 once one
-    button is pressed more than 255 times unconfirmed (netcode-architect's round 1, NA-5, and round 2: its 3,000-tick
-    outage lost 1,024 of 2,520 presses per button, exactly 4 times 256; his PRESS-PACE asked about taps within one
-    tick, so in its reading no rule of his is loosened).
-  - 3B-PACER-255 (a game-design question once a press fires a weapon): how large the press pacer's bound of 255
-    waiting presses per button may be (netcode-architect's round 1, NA-4; `crates/client-endpoint/src/press.rs`).
+  - 3B-OUTAGE-256 (**his decision when due**, before online play; a stated limit): during an outage presses are
+    lost in steps of 256 once one button is pressed more than 255 times unconfirmed (netcode-architect's round 1,
+    NA-5, and round 2: its 3,000-tick outage lost 1,024 of 2,520 presses per button, exactly 4 times 256). The
+    option of PRESS-PACE he said yes to (the plan's words, not his own: `cs3-plan.md`, question 3, option (a)) reads
+    "It is applied one tick (33 ms) later; nothing is ever lost."; the question was about a second tap within one
+    tick. No person can reach this limit in 3b (it needs a network), so nothing is needed before 3b's merge (the
+    advisor agent, 2026-11-25).
+  - 3B-PACER-255 (**his decision when due**, once a press fires a weapon): at most 255 presses of one button wait
+    their turn in the press pacer; one beyond that is dropped and counted (netcode-architect's round 1, NA-4;
+    `crates/client-endpoint/src/press.rs`). Against the same option's "nothing is ever lost"; only a machine gets
+    there in 3b (more than 30 presses a second on one key for over 8 seconds).
   - 3B-ONE-PER-TICK (change-sets 4, 8 and 9, each with a test): a system that acts on presses applies at most its own
     rule per tick (one action, or its cooldown's worth), since an honest client after an outage brings up to 255
     presses of one button in one command (security-auditor's round 2; written on `sim::PlayerCommand`).
@@ -1517,6 +1526,8 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     test decides how commands are timed (`docs/adr/0001-multiplayer-netcode.md` lines 252, 1156 and 1699 to 1700); each gets a
     dated pointer to his decision of 2026-11-24 (`docs/DECISIONS.md`, 22:44:50 and 23:24:50 UTC; the build plan's three
     sentences were changed by 3b's docs pass) (the advisor agent's read of 2026-11-24, 23:12 UTC, condition C3).
+  - The board add-on is active for the builder chat he calls Builder V3 (since 2026-11-24): a pointer of the
+    chat's own, no word of his; nothing of the board is in the repository, by his rule.
   - 3B-BLUR-TEST (the verifier, 2026-11-25; with the next change to the page's key handling): nothing fails when
     the listener that lets go of every key as the window loses the focus is removed (its own plant: 85 unit tests
     and 16 browser tests still pass). A browser test holds W, sends `blur` and expects W let go.

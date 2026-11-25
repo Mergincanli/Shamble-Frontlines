@@ -83,8 +83,8 @@ _Last updated: 2026-11-25 (change-set 3b's docs pass, after #65's merge; main 28
   panel's pass rule, heatmaps and sightlines, and quality bars.
 - **Docs passes:** the B3 report's and the kit-v3-2 report's edits (R-1, R-2); the toy-box tone; DOCS-ALIGN (the
   Advisor's documents); routine proofs to record; local smoke's Chromium build; the stale citations left unedited.
-- **For the gate step (2.3), from status-diet and foundation 2.1a, 2.1b and 2.2 (PRs #49, #50, #51, #48):** their ids,
-  moved by script on 2026-11-25 to the archive's "Follow-ups", at its end, each block with its pointer to its text.
+- **For the gate step (2.3), from status-diet and foundation 2.1a to 2.2 (PRs #49, #50, #51, #48):** in the archive's
+  "Follow-ups". **OVERFLOW-PANIC-RULE fell due with 3b** (the first code in `room`): 3b's report; his go names it.
 - **From change-sets 0 and 1 (PRs #56, #58) and Part 15:** O1 (PM-0005-54) and O2, his calls with change-set M's plan;
   the first real export; the coat's motion; the machine lines; ADR 0002's package list; #58's other follow-ups and Lows.
 - **From #60 (Mediums: with the quality gate step's kit changes, his go):** security-auditor's F1-F5, test-engineer's

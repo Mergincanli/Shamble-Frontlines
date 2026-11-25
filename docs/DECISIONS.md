@@ -127,7 +127,6 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
-- _A pointer, not a decision: the board add-on is active for the builder chat he calls Builder V3 (since 2026-11-24)._
 - **Taken by Mustafa, 2026-11-24, 23:24:50 UTC: the chat is compacted; the build plan's third sentence on command timing
   (its risk 8): (a), changed with the other two; build change-set 3b by the plan under the advisor agent's eight
   conditions, without waiting for him** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a

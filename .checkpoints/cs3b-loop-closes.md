@@ -486,6 +486,42 @@ release that comes early or late. **Four Lows:** two test gaps found by its own 
 has no test; the room's "no allocation" is not counted for hostile bytes): follow-ups 3B-BLUR-TEST and
 3B-HOSTILE-ALLOC in STATUS; two notes on this card (the plant run's re-run; step 9's hashes): corrected.
 
+**The advisor agent on the head 09b0043d81894c2b4802d38aa15fec77c9426f3a: REVISE, the text only; "the code,
+final at 6abf3d2a3d347ac8b2d5a169cbe5ac0aabc3d9b1, is approved as it stands"** (2026-11-25, about 04:00 UTC; Opus
+5.5, effort max; its notes `advisor-cs3b-head.md`). Its eight conditions: all met (C6 "in purpose": three code
+pushes came before the browser timing, none changed a browser spec). The size: still one reviewable unit. The
+reviews: within the budget; no reviewer needs to look before the merge. **M1 (the late-command bound): the
+deferral is its to approve, and it approves it** with 3B-LATE-BOUND's written conditions; his go must name it.
+**RELEASE-COUNT: rightly his; it blocks the claim that the mark is met, not the merge.** The two press limits:
+right as follow-ups now, **his decisions when they come due** (the option he said yes to reads "nothing is ever
+lost"). Its findings, all in wording, and what was done (the commit after this card's):
+- **H-1 (High):** the pull-request text and the report's evidence line said the presses mark was met "by its own
+  method" for presses and releases: **fixed** (by the mark's method for presses; releases as far as the echo can
+  show them, not by the row's method; Chromium only; "reorders most neighbours" only on a fast page).
+- **M-2:** "For Mustafa" did not list what his go accepts as still open: **fixed** (3B-LATE-BOUND,
+  OVERFLOW-PANIC-RULE, the two press limits), in the report and the pull-request text.
+- **M-3:** RELEASE-COUNT's reason was wrong (a charged shot fires when its button is let go: ADR 0005's AB-3) and
+  (b)'s cost understated: **fixed** (the releases follow exactly from the held keys and the press counters; 16
+  bytes per command, up to 128 more per input message until delta coding). **He was told the wrong reason in chat
+  at about 02:55 and 03:10 UTC: corrected in the next message to him.**
+- **M-4:** the two press limits left out the option he said yes to: **fixed** (quoted as the plan's option, not
+  his words; each "his decision when due"), in the report and the archive.
+- **M-5:** OVERFLOW-PANIC-RULE fell due with 3b (the first code in `room`) and the report was silent: **fixed** (a
+  paragraph in the report; its due point in STATUS; the drafts' wording left with their owners).
+- **M-6:** the plan's one 10-minute run was neither run nor listed: **run** (`ten-minutes.mjs`, a script of its
+  own on its own port; the reading is in the report).
+- Lows: C6's wording says the three earlier pushes plainly; the zip's README gained two steps (S, D and both
+  Shifts each light only their own box; a key held when the window loses the focus is let go); the chat's own
+  line left DECISIONS (by script: 3 entries now) for the archive.
+**Its conditions on the merge:** (1) a final head that is 09b0043d plus docs-or-notes-only commits with these
+fixes, the report up to date, the checkpoint folded into the report and `.checkpoints/cs3b-loop-closes*` removed;
+(2) its review of that head's changes and an APPROVE naming the full SHA; (3) gate, smoke and toolchain green on
+that SHA and nothing pushed after; he is given the SHA, and the pull request has exactly that head when he
+presses Merge; (4) his browser check passes, Brave then Firefox, on a zip whose README commit has the same code.
+**The order that follows:** the text fixes now (this head keeps the notes); the advisor agent's review of them;
+the zip and his check; then the last commit (the check's result in the report, the notes folder removed), the
+advisor agent's APPROVE of that SHA, CI green, the SHA to him.
+
 **After the code (started 2026-11-25, about 03:09 UTC):** the full run of the 53 planted defects on 6abf3d2a;
 the verifier (its copy `.gate/verifier-cs3b`, its notes `verifier-cs3b.md`); docs-keeper's docs pass (its notes
 `docs-keeper-3b.md`). Then the report, the advisor agent on that head (with the question on M1), the zip.

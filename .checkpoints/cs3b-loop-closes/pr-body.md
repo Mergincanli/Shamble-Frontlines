@@ -19,7 +19,7 @@ The link simulator and the first recording: they moved to a change-set 3c by the
 ## Evidence
 - CI on the final code 6abf3d2a: `gate`, `smoke` and `toolchain` green, every count as written down before the push: 114 Rust tests in debug, twice, and the release runs; 139 tests under Node; 18 boundary tests on the built WebAssembly; 16 browser tests in 3.4 of 5 minutes.
 - The decoder mark (ADR 0001, PM-0001-34) has started, not passed: per message type 10 million random and 10 million mutated inputs in release, 0 panics, no memory above the caps, a planted unchecked index and a planted over-allocation both found.
-- The presses mark (ADR 0002, PM-0002-12) by its own method, in Chromium: 10,000 presses and releases under late, repeated and reordered key messages, 0 lost and 0 doubled, button by button; five planted forms of its two bites all turn it red.
+- The presses mark (ADR 0002, PM-0002-12), in Chromium only: by the mark's method for presses (10,000 presses under late and repeated key messages, 0 lost and 0 doubled, button by button; five planted forms of its two bites all turn it red); for releases as far as the server's echo can show them, not by the row's method (RELEASE-COUNT below); "reorders most neighbours" holds only on a page that draws fast (on CI's slow page only the repeated copies arrive out of order).
 - 53 planted defects, each run against the check that should catch it.
 - The players' WebAssembly: 53,813 bytes, sha256 5ebae154...1262, here and on the runner (31,718 on main).
 - Size: 6,909 added lines against about 3,800 planned; his stop line of 7,600 was not reached.
@@ -31,7 +31,12 @@ Two rounds by six reviewers (test-engineer, security-auditor, perf-auditor, engi
 Firefox, WebKit and Brave in CI (his check covers Brave and Firefox by hand). Real hardware and the WebGPU backend. The key-to-tick mark (a reading only). Anything over a link that delays, drops or reorders (3c).
 
 ## One decision asked of him
-RELEASE-COUNT: the presses mark's row says the Worker counts presses and releases "through the edge counters"; the messages carry counters for presses only, and releases are worked out on the page with two checks. (a) Accept as built and correct the row's sentence at the records' next edit, or (b) add a release counter per button to the messages. The builder recommends (a).
+RELEASE-COUNT: the presses mark's row says the Worker counts presses and releases "through the edge counters"; the messages carry counters for presses only, and releases are worked out on the page with two checks. (a) Accept as built and correct the row's sentence at the records' next edit, or (b) add a release counter per button to the messages (16 bytes more per command, up to 128 more per input message until delta coding). The builder recommends (a): the releases follow exactly from the held keys and the press counters. It blocks the claim that the mark is met, not this merge.
+
+## What his go accepts as still open
+- The bound on how late a command may run (3B-LATE-BOUND: security-auditor's Medium, deferred to change-set 7; no room on a network without it).
+- OVERFLOW-PANIC-RULE, which fell due with this first code in `room`: the code keeps the rule (plain arithmetic is denied outside tests; the lint check is clean), CI runs no lint step yet, and the drafts' wording stays with their owners.
+- Two limits against the press-pacing option he chose, each his decision when it comes due: at most 255 presses of one button wait their turn (3B-PACER-255); presses are lost in steps of 256 after an outage in which one button is pressed more than 255 times unconfirmed (3B-OUTAGE-256).
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 

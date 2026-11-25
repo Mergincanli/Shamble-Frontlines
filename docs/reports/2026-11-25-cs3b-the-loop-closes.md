@@ -38,7 +38,10 @@ about 3,800 planned (1.82 times); his stop line of 7,600 was not reached. One de
   was told in three lines before the link simulator and the recording moved; **C5** one manifest batch (path
   dependencies between our own crates, no outside package), answered by security-auditor on exactly those six files
   before it was committed or built ("yes", no condition); 3A-HOOK-TEST and 3A-FROM-F64 built as steps; **C6** the
-  browser tests were timed on a clean copy before the first evidence push: 16 tests in 3.4 of CI's 5 minutes;
+  browser tests were timed on a clean copy (16 tests in 3.4 of CI's 5 minutes) before the first push that held a
+  browser spec (eb0d2314). Said plainly against his words ("Time the browser tests before the first push, as you
+  said."): three code pushes came before that timing (the manifest batch and steps 1 to 5); none of them changed a
+  browser spec;
   **C7** release runs of room, client-endpoint, sim-wasm and devtools are local only until the CI pull request of
   another chat lands; **C8** his messages go into DECISIONS by script.
 - **The ladder (his item (c)):** at step 6 the size stood at 1.9 times the plan. The link simulator and the first
@@ -83,9 +86,11 @@ about 3,800 planned (1.82 times); his stop line of 7,600 was not reached. One de
   input 17 and a planted over-allocation at input 0. Not met, so "started" is all it is: the row names cargo-fuzz,
   which is not used, and every message type of the catalogue, of which 5 of 16 have decoders. The
   swappable-transport mark belongs to Slice 3 and is not started.
-- **The presses mark (PM-0002-12), by its own method, in Chromium:** 10,000 scripted presses, most shorter than a
-  tick, under a shim that delays every key message by 0 to 100 ms and sends one in ten twice. On GitHub's run of
-  6abf3d2a: 10,000 presses and 10,000 releases made and echoed; 0 lost and 0 doubled, button by button; 502 key
+- **The presses mark (PM-0002-12), in Chromium only: by the mark's method for presses; for releases as far as the
+  server's echo can show them, not by the row's method (RELEASE-COUNT below); and "reorders most neighbours" holds
+  only on a page that draws fast.** 10,000 scripted presses, most shorter than a tick, under a shim that delays
+  every key message by 0 to 100 ms and sends one in ten twice. On GitHub's run of 6abf3d2a: 10,000 presses made
+  and echoed, 0 lost and 0 doubled, button by button; 10,000 releases made and worked out from the echo; 502 key
   messages delayed, 46 sent twice (all 46 behind a newer one), 1 first copy overtaken; the Worker ignored exactly
   47; 0 ticks ran older keys than the tick before; 0 ticks held other keys than their message's; 0 refused. Its
   bites all turn it red: held buttons only; the last message to arrive; a late message counted as ignored and taken
@@ -176,20 +181,32 @@ those three finished in round 2. **All six: PASS in round 2.**
   code where the check will go. Both reviewers set the condition: no room behind a network transport without it;
   built in change-set 7 with each of the two timing ways and a long-hold test. Put to the advisor agent with this
   head.
-- **A bounded departure of PRESS-PACE (a):** at most 255 presses of one button wait their turn; beyond that a press
-  is dropped and counted (only a machine gets there: more than 30 presses a second on one key for over 8 seconds).
-  And a stated limit: after an outage in which one button is pressed more than 255 times unconfirmed, presses are
-  lost in steps of 256 (the counters are one byte). His answer was about taps within one tick; both are follow-ups
-  before online play.
+- **Two limits against PRESS-PACE (a), each his decision when it comes due.** The option he said yes to (the
+  plan's words, chosen with his "Yes to all seven"; not his own words) reads: "It is applied one tick (33 ms)
+  later; nothing is ever lost." As built: (1) at most 255 presses of one button wait their turn; one beyond that
+  is dropped and counted (only a machine gets there: more than 30 presses a second on one key for over 8 seconds);
+  (2) after an outage in which one button is pressed more than 255 times unconfirmed, presses are lost in steps of
+  256 (the counters are one byte). No person can reach either in 3b (the second needs a network), so the advisor
+  agent asks nothing before this merge; they are 3B-PACER-255 (due once a press fires a weapon) and 3B-OUTAGE-256
+  (due before online play).
+- **OVERFLOW-PANIC-RULE fell due with this change-set.** With his go for #48 he accepted it as left open, "due
+  with the first code in the room crate or a server crate" (`docs/DECISIONS.md`), and 3b is that first code. The
+  finding: an overflow in the room's own arithmetic panics in release, and on a server's tick that would end the
+  match, repeatably if a client can drive the value. What 3b does about it: `protocol`, `room` and the endpoint's
+  modules deny plain arithmetic outside tests (the lint `arithmetic_side_effects`), and every sum or difference of
+  a value from outside is checked, wrapping or saturating on purpose; the lint check is clean here, in the
+  verifier's copy and in the advisor agent's. What stays open: CI runs no lint step, so the rule is kept by hand
+  until the CI pull request another chat writes; and the drafts' wording (ADR 0004 part 20, ADR 0002 parts 4 and 7,
+  the marks) stays with their owners at each draft's next edit, with his go. No draft is edited here.
 - **Found and fixed on the way:** a refused command far ahead shut out the honest ones behind it (the queue's
   window now follows the last command that ran); the one-minute test started its clock after its first reading and
   went red once by one tick on a slow page; the press test's first script chose three of six keys.
 
 ## The docs pass (in this change-set; docs-keeper)
 - `docs/DECISIONS.md`: his three messages of 2026-11-24 (22:44:50, 22:59:49 and 23:24:50 UTC), each with what it
-  answers, and one line of the chat's own, written by script from the chat's transcript and checked against it
-  (`decisions-5.mjs --check`: "is what this script writes (4 entries on top of 28254a7's)"). No word of his was
-  typed by hand.
+  answers, written by script from the chat's transcript and checked against it (`decisions-5.mjs --check`: "is
+  what this script writes (3 entries on top of 28254a7's)"). No word of his was typed by hand, and the file holds
+  no line of the chat's own (a pointer of the chat's moved to the archive, the advisor agent's Low).
 - The build plan's three sentences, as above. `docs/STATUS.md` (120 lines), `docs/STATUS_ARCHIVE.md`,
   `docs/ROADMAP.md`: 3a is merged (#65); 3b's row; 3c next with its contents; RELEASE-COUNT listed as open; 16
   follow-ups of 3b (3B-LATE-BOUND to 3B-OQ6-POINTER), each with who named it and when it is due. To keep STATUS at
@@ -232,16 +249,22 @@ Change-set 3c, the link simulator and the first recording, planned first and rev
   and releases "through the edge counters"; the two decision records disagree, and what is built carries counters
   for presses only. Why it matters: the report cannot call the release half met by the mark's own method. Options:
   (a) accept as built (releases worked out, plus the two page-side checks) and correct the row's sentence when the
-  records are next edited; (b) add a release counter per button to the messages (16 more bytes each way, about 150
-  to 200 lines, in 3c). Recommendation: (a). No planned system acts on a release by itself, and the per-tick key
-  check sees every wrong held state.
+  records are next edited; (b) add a release counter per button to the messages: 16 bytes more per command, so up
+  to 128 more per input message (292 to 420) until delta coding, and about 150 to 200 lines, in 3c.
+  Recommendation: (a). The releases follow exactly from the held keys and the press counters (so will a charged
+  shot that fires when its button is let go), and the per-tick key check sees every wrong held state. It blocks
+  the claim that the mark is met, not this merge (the advisor agent's ruling).
 
 ## For Mustafa
-1. The browser check (Brave, then Firefox once; about 15 minutes) with the zip `shamble-v2-03b-the-loop-closes`,
-   whose README has the steps: hold W and see its box light and go dark; tap Space ten times and read "presses …
-   0 lost · 0 doubled"; hold A across a hidden tab; cover the window for a minute; copy the report after two
-   minutes (all of `messages.refused`, `olderPosts`, `wrongKeys`, `presses.lost`, `presses.doubled`,
-   `releases.doubled` should be 0).
+1. The browser check (Brave, then Firefox once; about 20 minutes) with the zip `shamble-v2-03b-the-loop-closes`,
+   whose README has the steps: hold W and see its box light and go dark; press S, D, the left Shift and the right
+   Shift, each lighting only its own box; tap Space ten times and read "presses … 0 lost · 0 doubled"; hold D,
+   click on another window, let go there and come back (D is dark); hold A across a hidden tab; cover the window
+   for a minute; copy the report after two minutes (all of `messages.refused`, `olderPosts`, `wrongKeys`,
+   `presses.lost`, `presses.doubled`, `releases.doubled` should be 0).
 2. RELEASE-COUNT: (a) or (b).
 3. After the advisor agent's APPROVE and your check: your go for the merge of the pull request your main Advisor
-   opens from `pr-title.txt` and `pr-body.md` in the notes folder.
+   opens from the title and text this chat hands over. **Your go accepts as still open:** the bound on how late a
+   command may run (3B-LATE-BOUND: security-auditor's Medium, deferred to change-set 7; no room on a network
+   without it); OVERFLOW-PANIC-RULE (kept in the code by hand; no lint step in CI yet; the drafts' wording with
+   their owners); and the two press limits (3B-PACER-255, 3B-OUTAGE-256), each your decision when it comes due.

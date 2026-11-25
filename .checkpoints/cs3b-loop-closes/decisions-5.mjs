@@ -56,9 +56,6 @@ const said = (m, s) => {
 // repository's records show, marked as not his words.
 const ENTRIES = [
   {
-    line: '_A pointer, not a decision: the board add-on is active for the builder chat he calls Builder V3 (since 2026-11-24)._',
-  },
-  {
     when: '2026-11-24, 23:24:50 UTC',
     file: 'mustafa-2026-11-24T232450-after-the-compact.md',
     title:

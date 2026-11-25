@@ -49,7 +49,7 @@ answers this computer only.
 
 You need Node 18 or newer. To check: in PowerShell, type  node --version  and press Enter.
 
-Steps (about 15 minutes; Brave first, then Firefox once)
+Steps (about 20 minutes; Brave first, then Firefox once)
 
  1. Unzip this zip into a folder of its own, for example C:\\shamble\\03b-loop. In that folder, click the
     address bar of the File Explorer window, type  powershell  and press Enter. In the window that opens,
@@ -60,20 +60,25 @@ Steps (about 15 minutes; Brave first, then Firefox once)
     readout "errors: 0" and the commit {commit}.
  2. Click once on the picture, then press and hold W. Its box should light a moment later and stay lit.
     Let go: it should go dark.
- 3. Tap Space quickly ten times. The box should flash each time. In the readout, "presses" should end with
+ 3. Press S, then D, then the left Shift, then the right Shift, one after the other. Each should light only
+    its own box (either Shift lights the one box "Shift").
+ 4. Tap Space quickly ten times. The box should flash each time. In the readout, "presses" should end with
     the same number made and echoed, "0 lost" and "0 doubled". While you are still tapping it says "(counting)".
- 4. Hold A, switch to another tab for 30 seconds, then come back without touching the keyboard. A should be
+ 5. Hold D, click on another window (for example a File Explorer window) while you hold it, let go of D
+    there, then click back on Brave's window. D should be dark: a key held when the window loses the focus
+    is let go.
+ 6. Hold A, switch to another tab for 30 seconds, then come back without touching the keyboard. A should be
     dark (keys held are let go when the tab is hidden), "last pause" should show about 30 s hidden, and
     "ticks while hidden" 0 or a very small number.
- 5. Cover Brave's window completely with another window (for example a maximised File Explorer) for
+ 7. Cover Brave's window completely with another window (for example a maximised File Explorer) for
     1 minute, then bring Brave back to the front. Do not switch tabs here, only cover the window.
- 6. Leave it 2 minutes, with the window in front. Then press "Copy report" and paste the result into the
+ 8. Leave it 2 minutes, with the window in front. Then press "Copy report" and paste the result into the
     chat. In it, "messages.sent" and "messages.received" should have climbed with "tick" (30 a second), and
     these should all be 0: "messages.refused", "olderPosts", "wrongKeys", "presses.lost", "presses.doubled"
     and "releases.doubled". Tell us also whether every box lit as you expected.
- 7. In Firefox: open http://127.0.0.1:4173 , do steps 2 and 3 once, wait 2 minutes, press "Copy report"
+ 9. In Firefox: open http://127.0.0.1:4173 , do steps 2 to 5 once, wait 2 minutes, press "Copy report"
     and paste it.
- 8. Back in PowerShell, press Ctrl+C to stop the server.
+10. Back in PowerShell, press Ctrl+C to stop the server.
 
 If something else shows: a box that stays lit or never lights, "lost" or "doubled" above 0, "refused" above
 0, a line of text over the picture, an error count above 0, or a blank page: that is exactly what this
