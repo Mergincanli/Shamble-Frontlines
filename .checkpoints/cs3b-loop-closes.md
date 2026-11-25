@@ -274,10 +274,12 @@
    new ones 1.1 and 1.3 minutes). Under the 4 minutes at which he is told first. The players' file there is byte
    for byte the one built here (56,717 bytes, sha256 ded90598...f4f8). The legacy gate did not run in the clean
    copy (its own tools were not installed there); it passes in the worktree.
-11. **The planted defects of 3b: `cs3b-loop-closes/plants-3b.py`** (34 plants: the message code, the simulation,
-   the room, the endpoint, the local match's step, the Worker, the page, and four in the browser: PM-0002-12's
-   two bites and one allocation per frame and per block). Its first run is in progress (`.gate/cs3b/plants-3b-
-   run1.log`, scratch); the result goes here.
+11. **The planted defects of 3b: `cs3b-loop-closes/plants-3b.py`, first run: 34 of 34 caught** (2026-11-25,
+   00:48:46 UTC; `.gate/cs3b/plants-3b-run1.log`, scratch): the message code (6, among them the unchecked index
+   planted in the real reader, found by the decoder run at input 1 of the JoinAccepted run), the simulation, the
+   room and the endpoint (11), the local match's step (3, among them a 16-byte allocation per step), the Worker
+   and the page (10), and four in the browser (PM-0002-12's two bites; one 64-byte array per frame and per block
+   against the allocation test).
 
 ## Size so far (counted as 3a was: added lines under `crates/`, `packages/`, `.gitignore` and the root manifests; lockfiles and generated or fixture files apart)
 - **After steps 1 to 6 and 3A-FROM-F64: 5,825 added lines** (plus 102 in generated and fixture files), against
@@ -291,21 +293,21 @@
   out in a small manifest batch under the hold, answered first, before the reviews end.
 
 ## Current step
-**The planted defects' first run, then the reviews** (round 1: netcode-architect, engine-architect,
-rust-reviewer; then test-engineer, security-auditor, perf-auditor; all Opus 5.5 at effort max, notes in this
-folder, their own copies under `.gate/<name>-cs3b/`). Updated 2026-11-25, 00:45 UTC (from the clock). The board
-add-on is active (nothing of it is copied here, by his rule).
+**Review round 1, first three: netcode-architect, engine-architect and rust-reviewer** (Opus 5.5, effort max;
+started 2026-11-25, about 00:47 UTC; each on its own copy `.gate/<name>-cs3b` of bbbf09e4; their notes
+`cs3b-loop-closes/<name>-review1.md`; what they were given: `cs3b-loop-closes/review-context.md`). Then
+test-engineer, security-auditor and perf-auditor; one fix pass; round 2 on what changed. Updated 2026-11-25,
+00:50 UTC (from the clock). The board add-on is active (nothing of it is copied here, by his rule).
 
-**CI on 4eeec33a (steps 4 and 5):** to be read with the next push's run.
-
-**CI, expected on this push** (written before the push; the head is the commit of this card, the code is the
-keyboard test's commit): cargo debug, twice: client-endpoint 25, devtools' f32 vectors 3 and stream vectors 2,
-protocol 19 and its decoder test 8, room 12, sim 17, the scan 5, the allocation count 1, sim-wasm 12 with its
-hook test 1 and its step allocation count 1 (106 in all). Release (sim and protocol only): protocol 19, the
-decoder test 8 (the "10_million" names), sim 17, 5 and 1. Node: client 81, sim-worker 46, types 7, net 1, the
-browser package's Node project 1; boundary 2 files and 18 tests; **16 browser tests, in under 4 of the 5
-minutes** (3.4 here; if GitHub's run takes more than 4, he is told in three lines); the type checks all "ok";
-the players' file 56,717 bytes, sha256 ded90598...f4f8.
+**CI, read line by line:** on d117fca5 (steps 4 and 5): gate, smoke and toolchain green, every count as written
+before the push, 14 browser tests in 1.1 minutes, the players' file sha256 ded90598...f4f8 as here. **On
+eb0d2314 (step 6): gate, smoke and toolchain green (toolchain run 45520531338, job 138890929194, 00:45:22 to
+00:50:17 UTC: 4 min 55 s of its 15 minutes); every count as written before the push; 16 browser tests in 3.4
+of the 5 minutes** (C6 holds on GitHub as on the clean copy). There: the loop 1,815 ticks in 60.5 s, 186
+presses made and echoed, 0 refused, key to tick median 123.8 ms and 95th percentile 139.2 ms at about 10 frames
+a second; the press test 10,000 presses and releases made and echoed, 695 posts delayed, 67 sent a second time,
+67 ignored, 0 refused; allocation 71 bytes a frame and 602 a block (the block's limit is 680: the nearest of
+the limits, to watch).
 
 ## Next steps
 1. (Reading done after his compact; the build order stands:) read CLAUDE.md, this card, the plan's sections 0, 3, 5, 8, 9, 12 and 13, his
