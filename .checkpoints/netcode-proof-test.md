@@ -138,9 +138,9 @@
 - Disk (11-25 06:1x UTC): a cold test,deps run by main-run.sh (incremental on) used 9,013 MiB (13,263 → 4,250; debug about 9.0 GiB: incremental 2.9 + 6.1 other); the dev part-clean after 0b's step 5 freed 9,094 MiB, 13,344 free, the cache cold. With incremental off (u7-run.sh; main-run.sh by `env`, as NB2-C6) a warm cache is about 6.1 GiB, so about 7.1 GiB stays free: under NB2-C5's 8,192. **DISK-PACK (b) DONE 11:29 UTC (disk-pack-b.md): all seven packed, every read-back equal, free 13,330 → 15,547 MiB; list commits cc8180a, 0472386, a98de3e, a572921, b1d445e, d26f79a, d00d15a.** His word 11:07 (history.md:7942): all seven, one at a time by §11 and brief 8.1's steps (c62h-bound-brief.md:494-499), each list commit naming its ruling: 8ee4 and d66e advisor-c62h-bound-p3.md:35; fc41 advisor-brawl1-sets-p0-full.md:7; fd46 advisor-brawl1-sets-p3-full.md:7 (both with his word); 3506 advisor-u4f-20.md:114 and advisor-u4f-f1-close.md:165; 96de that :165; 7192 advisor-u4f-20.md:146. u4f-47-b57221ed139d stays until the -47 re-judge after NB2's merge. A mismatch: it stays, nothing more, three lines to him.
 
 ## Running work (IDs to message, resume or stop; older finished lines and IDs: this card at dc9244d, before it 1b26e8c)
-- **Running now (14:0x UTC):** no agent, no workflow. One background shell: the saver bzv0lk5bh (`node
-  .claude/scripts/checkpoint.mjs watch netcode-proof-test`, the two trailers; from 12:33:58 for 110 min: ends about
-  14:24). When it ends: a hand save if anything waits, then restart it (run_in_background, timeout 7200000).
+- **Running now (14:0x UTC):** no agent, no workflow. One background shell: the saver bhkgzf4vd (`node
+  .claude/scripts/checkpoint.mjs watch netcode-proof-test`, the two trailers; from 14:24:17 for 110 min, after bzv0lk5bh's clean end at 14:23:58: ends about
+  16:14). When it ends: a hand save if anything waits, then restart it (run_in_background, timeout 7200000).
 - **Finished, resumable by SendMessage (each from its own notes):** U7's T-builder a9873cdba07a3219e (worktree
   .claude/worktrees/agent-a9873cdba07a3219e at 577816c; notes u7-t-build.md there, untracked; resume point: brief 3);
   U8's builder ac59cce3e5d002441 (worktree at 096808b; notes u8-build.md "## C9"; nothing until U8's merge); the advisor
