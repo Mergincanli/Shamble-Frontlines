@@ -26,8 +26,11 @@
 
 13. security-auditor round 2 on 52e3c7e: APPROVE; open: R2-1 Medium (older: a program named through the input-fed wrapper's replace string passes, agents included), R2-2 Low (new false asks on git-<name> words), R2-3 Low (case/.exe, L9); the plugin's SA-g refinement (Medium) · notes security-auditor-r2.md
 
+14. The advisor agent: R2-1 raised to Critical (an agent's kit write passes; same class as SEC-U7B-1 and SA-d): a third round on what changed allowed; the SA-g refinement may ride; R2-2 may not (follow-up) · notes advisor-plan.md
+15. Round-3 copy .gate/guard-wrappers/hooks-r3/: R2-1 + SA-g refinement; green 1499/1499; red 10 on 52e3c7e; 136 added lines vs main · no commit (copy)
+
 ## Current step
-The advisor agent's ruling on R2-1's severity (a third round only for High or Critical).
+Apply hooks-r3 hunk by hunk (each asked of Mustafa with its text), sha256 check, kit suites, one commit, round 3 (security-auditor, on what changed).
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
