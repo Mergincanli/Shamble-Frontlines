@@ -28,7 +28,10 @@ calls #66 a draft: correct that in your next pull request.").
 9. Report, PR (draft), the advisor agent on the final head, ready, his go.
 
 ## Current step
-4: writing the plan.
+5: the plan (revision 1, saved at cbd5ada) is with the advisor agent (started about 11:24 UTC, effort xhigh; notes to
+`advisor-plan.md`). infra-engineer's research runs meanwhile (started about 11:15 UTC, effort xhigh; notes in
+`infra-engineer-workers.md`, Q1-Q8). The DECISIONS script is ready and dry-run only (scratchpad `dec/add_1107.py`:
+741 bytes, sha256 ae5eb4f6...; 16 lines at the top); it runs after APPROVE. #66 merged_at 2026-11-25 11:10:11 UTC.
 
 ## Next steps
 - The plan, then the advisor agent's review.
