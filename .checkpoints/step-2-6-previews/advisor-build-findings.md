@@ -1,4 +1,4 @@
-# The advisor agent's verdicts on step 2.6's build findings (F1 to F4, and the order), 2026-11-25 ~20:45 UTC
+# The advisor agent's verdicts on step 2.6's build findings (F1 to F4, and the order): its answer at 2026-11-25 20:27:50 UTC (this chat's record)
 
 Its report, word for word as it came back (the advisor agent has no write tool; this file is its record).
 
@@ -82,7 +82,7 @@ The order is: U1 part 2 held until M3, U3 meanwhile, U2 after his yes, then U5 a
 1. Answer PREVIEW-MISSING-BUILD-COMMENT.
 2. Say yes or no to the new `preview.yml` (one line changed, sha256 31119c06e7d095baa3c99ed54bbc1a2c72d05b8b3cab88ffd4512dc12acd3abc, the full text brought to you), after the security-auditor's read is in.
 
-## What this chat did with it (2026-11-25 ~20:50 UTC)
+## What this chat did with it (2026-11-25, 20:28 to 20:35 UTC)
 - F1: the sha256 computed from the exact bytes (texts/preview-proposed.yml): 31119c06..., equal. Nothing placed.
 - F2: the checkpoint's wording corrected ("go is not true, so after does not run"); the decision carries the coverage
   lines; the runbook names the red run.

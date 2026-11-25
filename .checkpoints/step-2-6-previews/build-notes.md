@@ -1,4 +1,4 @@
-# Step 2.6, the build's evidence (lane 2, Builder V2), from 2026-11-25 ~19:45 UTC
+# Step 2.6, the build's evidence (lane 2, Builder V2), from 2026-11-25, 19:45:18 UTC (this chat's record)
 
 Each block is written once it is complete. Scratch work lives in the session's scratchpad (named below); nothing of it
 is shipped.
@@ -20,7 +20,7 @@ toolchain run 45686704452, job 139461080011 (2026-11-25 19:36 UTC), "production 
 `assets/worker-CyhXt1A5.js`, `index.html`. Hash characters include `_` and `-`; the refuse list's name rule allows
 letters, digits, `.`, `_`, `-` (no leading dot or `-`, no `..`, at most 128 characters).
 `workflow_run.head_sha` is the branch head: the pull-request run 45686704452 and the push run 45686692982 of the same
-push both show head 69d9b5f3 (the run list, 2026-11-25 ~19:45 UTC). find-pr compares it with each open pull request's
+push both show head 69d9b5f3 (the run list, read 2026-11-25 19:45:18 UTC). find-pr compares it with each open pull request's
 `head.sha`.
 
 ## B3. Docs read (2026-11-25, by two web-fetch agents; quotes in their reports)
@@ -52,7 +52,7 @@ GitHub (docs.github.com):
 - Pulls (rest/pulls/pulls): `state` open|closed|all; objects carry `state`, `head.sha`, `head.repo.full_name`,
   `base.repo.full_name`.
 - Permissions, settled (the advisor agent found it; this session re-read the rendered pages with curl, 2026-11-25
-  ~20:50 UTC, HTTP 200; the web-fetch tool's text lacked these boxes):
+  20:28:46 to 20:29:05 UTC, HTTP 200; the web-fetch tool's text lacked these boxes):
   - https://docs.github.com/en/rest/issues/comments, "Create an issue comment" and "Update an issue comment": "This
     endpoint works with the following fine-grained token types : ... GitHub App installation access tokens ..." and
     "The fine-grained token must have at least one of the following permission sets: "Issues" repository permissions
@@ -125,3 +125,20 @@ GitHub (docs.github.com):
   .github/workflows/preview.yml): the suite runs in a scratch copy with the texts placed (the advisor agent's Low).
 - Gate: `node tools/gate.mjs --no-smoke` PASS; `node .claude/scripts/repo-map-check.mjs` OK (198 entries, 110 paths)
   after REPO_MAP's new `hosting/` row.
+
+## B7. The checks before the message to him (the advisor tool's five, 2026-11-25 20:42 to 20:47 UTC)
+- CI on the pushed code: f0e5593 (the lockfile, the records, the runbook): gate run 45696431844 success (jobs gate and
+  smoke, "Smoke (check 5a)" success), toolchain run 45696431804 success; e5e385c (dfc8fb6, the script): gate run
+  45694111052 and toolchain run 45694111099, both success.
+- Times in the notes replaced by the record's: the CI request's tool answer 19:39:29 UTC; the run list 19:45:18; the
+  first test-runner check 19:48:13; the release list 19:48:15; the advisor agent's verdict 20:27:50; the curl re-reads
+  20:28:46 to 20:29:05; the security-auditor's M3 answer 20:30:14; dependency-check.md written 20:35:03 (its two
+  sha256 lines unchanged).
+- security-auditor-deps.md (135 lines) and security-auditor-early-read.md (79 lines) read whole: nothing of the wall's
+  detail (his item 7).
+- YAML: PyYAML 6.0.3 (SafeLoader, duplicate keys refused) parses preview-proposed.yml, preview-close.yml, wall-test.yml
+  and the approved preview.yml; names, triggers, jobs, `permissions: {}` and `cache-mode: none` on every job as
+  intended. GitHub's own reading comes only when the draft pull request opens.
+- The scratch scripts are now in scripts/ (mutate.py: `python3 mutate.py <suite> hosting/preview.mjs`, with the suite a
+  copy holding hosting/ and the texts under .github/workflows/; add_three.py; place_u2.py).
+- REPO_MAP's hosting/ row now names the manifest and lockfile.

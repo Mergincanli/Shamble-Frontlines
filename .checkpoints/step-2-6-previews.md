@@ -53,7 +53,7 @@ On revision 2 at c40f3f9:
   merge check.
 
 ## Current step
-U0 done: the request to CI Builder posted on #59 (comment 7172595904, 2026-11-25 ~19:40 UTC; plan section 5's text,
+U0 done: the request to CI Builder posted on #59 (comment 7172595904; the tool's answer at 2026-11-25 19:39:29 UTC; plan section 5's text,
 no wall detail, footer).
 U1, part 1 done: dfc8fb6 (hosting/preview.mjs, hosting/preview.test.mjs, hosting/_headers, REPO_MAP's hosting/ row):
 117 tests pass in a scratch copy with the approved texts; 28 of 28 mutations caught; gate PASS (--no-smoke); map OK.
@@ -86,7 +86,7 @@ scratchpad place_u2.py (the guard asks him; sha256 x3 checked), the gate, push; 
   The failure shows as a red `check` job under main's Actions tab instead.
 - The real build (toolchain run 45686704452, job 139461080011, 2026-11-25 19:36 UTC): index.html plus assets/
   index-*.css, index-*.js, sim_wasm_bg-*.wasm, worker-*.js; names use [A-Za-z0-9_-] and dots (hashes hold _ and -).
-- Wrangler 4.x releases (npm view, 2026-11-25 19:45 UTC): newest at least 7 days old: 4.164.0 (2026-11-17 11:15 UTC);
+- Wrangler 4.x releases (npm view, 2026-11-25 19:48:15 UTC): newest at least 7 days old: 4.164.0 (2026-11-17 11:15 UTC);
   4.165.0 (2026-11-18 21:44 UTC) turns 7 days at 2026-11-25 21:44 UTC.
 
 ## Rules in force
