@@ -5,8 +5,8 @@
   **Base:** main 28254a7 merged in at 39a0d04 (MAIN-65, 2026-11-24 23:2x UTC: #65, cs3a; one conflict,
   docs/STATUS.md: this branch's #40 row kept beside main's 3a row); before it main 1ec6f6c at 72b0dc3 (MAIN-64, #64)
   and main f5030a3 at a6acc8a (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-25 03:5x UTC: the 03:50 reset confirmed (next 08:50); three advisor agents launched (step 7,
-  M4b, NB2's plan check); U6c's M0-M4a done (uncommitted, as ruled); NB2's merge plan written; saver off (hand saves).
+- **Last update:** 2026-11-25 14:0x UTC: the save before his /compact (his B, history.md:7969-7974); the 13:50 reset
+  confirmed (next 18:50); brief 3 filled and checked, held until after the compact; his A.1-A.4 in (history.md:7964-7967).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -68,7 +68,7 @@
   line ranges; RESUME-CARD, WIP-CLEAN, TCP-FREEZE, NETEM-BAR (a), SQUASH-40, PROMOTE; one shared target; LEFTOVER-DELETE.
 - **Standing:** every agent brief carries, word for word: "Write files with the Write and Edit tools only (no sed, no
   shell redirect, no python writes; never `cargo fmt` writing files: apply rustfmt's diff by Edit); an agent with no
-  Edit tool rewrites its notes file whole with Write." Never switch the main folder (worktrees under .gate/); 3 agents at
+  Edit tool rewrites its notes file whole with Write." and the GUARD-ENV interim rule: never env, stdbuf or nice options in front of git or gh (his (a), history.md:7964). Never switch the main folder (worktrees under .gate/); 3 agents at
   most; Opus 5.5 at xhigh for netcode; the advisor is a general-purpose agent reading `git show
   origin/main:.claude/agents/advisor.md`; commits end with the Co-Authored-By and Claude-Session lines; the five U4
   briefs go to the advisor before their builds; carries word for word from u4s-carries.md, met by number in reports.
@@ -76,32 +76,22 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-24 23:3x UTC; MAIN-65 pushed 82bd694, CI green, step 7 at 03:51; U6c ruled, its merge waits on NPT-EDGE-READ; before: e788f57)
-- **U8:** pass 3 DONE ~17:29 (snapshot 0e7fbab2…, 6,111 of his 6,200 stop: items 1-8, every Low in, none carried; node
-  tests 100/0, wrappers 315/0, redact 0 findings; package files unchanged; no plant left; item 1's judge run 17:08 at
-  627401d, .gate/u8-p3/: exit 0, s30-2 INVALID as ruled). **The last round DONE 21:2x** (his words: the three Highs'
-  fixes only; old tree .gate/u8-r3-old, pass 2's bca52b2c): NC-R2-1 CLOSED (u8-r3-netcode.md), SEC-R2-1 = INF-R2-1 and
-  SEC-R2-2 CLOSED (u8-r3-security.md); one Low, NC-R3-1 (r1.sh:438-452, save_log unguarded under set -e), a follow-up.
-- **U6b CLOSED 06:2x: MERGED at 8efb9b2** (u6b-report.md holds the whole story: 5,969 added; CI green; H3 APPROVE). Its
-  builder's worktree stays (plain `git worktree remove` refuses, no force). main-run.sh sets no CARGO_INCREMENTAL.
-- **Next 1, U8:** nothing open above Low; U6c merged and C9 DONE (snapshot 09cb4a07…), so its merge M3-M9 is next with
-  the advisor a3de649cd25e474df's head read and its report (NC-R3-1 and the merge-time checks of its line below).
-- **U6c's fix pass DONE 13:50** (FP-1 to FP-6; 5,693 added; fix-check.log 11/11, 861/958 (+54/+54), 1,176.3 s; plants
-  P22, P19, P18 and P2 fail, P8 held by the compiler; snapshot wip/u6c-fix.patch 0549389e…, 24 files; notes u6c-build.md
-  a9d45dd4…; the interdiff `git diff aad2103 6c3ff00`, 10 files, +356/-94). Round 2 ran 17:57-18:22 (Running work);
-  F-P2-HEADER went to its test seat (FP-3's wording is the ruling's item 3).
-- **Next 2, U6c's round 1** (builder a3a3e3fdf559de095, base 8c81952): built 10:07 (5,431 added; 11/11, 859/956; round-1
-  snapshot wip/u6c-build.patch a4e63455…). Reviews u6c-review-{netcode,test,security}.md: netcode REVISE (NC-U6C-1 High),
-  test 5 Medium, security 5 Low (= Stop B's host read). Ruling advisor-u6c-r1.md (ad72c0b8…): the fix pass, then round 2
-  on the diff; the readings mine; NC-U6C-12 and SEC-U6C-5 into U8 (C9). Block 2, the stamp tests, held back (C4, lever (1)).
-- **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
-  2,858 added; T5i-1 to -3 for U7's round). **Next 3:** U6c's merge now by advisor-u6c-r2.md with H2 and H1 (his (a)):
-  M0-M4a by hand, M4b's head read at 03:51 with MAIN-65's step 7 (trig_01Co9w6DYSoCbkQz5RWhK58i), then M5-M9; then NB2's merge (below).
-- **RESUME (U6c's merge, M0-M4a DONE 00:2x UTC):** wip/u6c-fix.patch applied in the main folder (uncommitted; 12 modified, 12 new untracked; cmp 24/24), H1 and H2 by Edit; fmt --check exit 0; .gate/u6c-merge/hunks.diff 9a3bbeb7… (load.rs +4 -3, probe.rs +7 -3, SERIES.md +1 -1). No stash, clean, checkout or restore; saves notes-only. **M4b 04:2x: APPROVE WITH CONDITIONS C1-C6** (advisor-u6c-m4b.md, ends DONE; Lows ADV-M4B-1, -2; NPT-EDGE-SLIVER (a), his word 11:07, history.md:7943): C1 every header shows diff 6c3b4dbb…, untracked 5cb9a300… (m4a-fmt.log:3), else stop; C2 ≥ 8,192 MiB (after the probe: minus its use), else the dev part-clean; C3 M5 only after NB2's plan check ends, `cat /proc/loadavg ::` before and after it; C4 11/11, 861/958, 0 failed or skipped, wasm 27,000/0, marks 81, self 78/78, redact 0; C5 the report's wording; C6 copy the M5 log and failed-steps logs to .gate/u6c-merge/ before any fallback; fallbacks and stops: its answer 2. **DONE to M8 (05:0x UTC):** probe PASS 04:25, M5 PASS 04:48, M7 gate PASS + D10 empty, M8 one commit (24 files, 5,698 added, 199 removed; wip/u6c-*.patch removed; u6c-report.md, u6c-build.md's merge section, the history entry). M8 = 17964a3. **M9 DONE 05:0x: pushed d85cb43 (M9 before C9 on purpose: any notes save pushes the merge commit, and a container restart would lose it); CI 6/6 success (gate, smoke, toolchain; push and PR), PR #40 mergeable (clean), main unmoved; the saver restarted (bu9houd05); PR #40's closing list gains SEC-U6C-R2-1, -R2-2 and the page host's deadlines. U6C CLOSED.** C9 goes to U8's builder at 08:50 (its worktree and tests, a new snapshot, within the 89 lines left under his 6,200 stop, unbuilt Lows carried: history.md:7703-7722), not a hand edit of the patch: the fixture test pins probe_presence's lines and fields, so an untested edit could break it; deadline before Stop B's round (advisor-u6c-r1.md NC-U6C-12). **U7's Block 0b, in progress (u7-block0b.md):** no new security read is needed: security-u7-deps.md already cleared 0b WITH CONDITIONS (items (7)-(10); its binding check :281-316; C6 three dev-dependencies, a `4 0` lock diff; C10: only a difference comes back). The dev part-clean ran first (free 10,447 MiB); step 0 PASS; the before-run (`check.mjs --only test,deps`) is a background shell → .gate/u7-0b/before.log; then steps 1-8 (the edits, `cargo metadata --offline`, the lock diff, the trees, check, the after-run, deny and audit, the CLI, dependency-check.md), the save releasing the hold. **05:2x, my mistake:** a folder-level `cargo clean` (`--target <triple>` alone, which advisor-u4d2-m9.md:228-229 forbids) removed the whole shared target (9.7 GiB; no notes, logs or commits lost); remade by that ruling's method (:247-251), every cache cold; in u7-block0b.md; to him today and to the advisor at its next check. Before-run PASS; step 1 redone 05:3x; steps 2, 3, 4, 6 and the redact line PASS (05:43-05:5x); step 7 cannot run offline (the CLI's crate is not cached): to security first at 08:50 (u7-0b-security-request.md Q1-Q3; Q2 asks to commit 0b before the CLI); step 5 PASS 06:09 (0 warnings; 861/958 = before; free 4,250 MiB). u7-run.sh made (u6c-run.sh, names only: 5 lines). Left: 7 and 8 after security's answer.
+## Now (2026-11-25 14:0x UTC; the older Now block, with U6c's merge record M0-M9 and the 11-24 lines: this card at dc9244d)
+- **Closed since 11-24:** U6c (merged 17964a3, pushed d85cb43, CI 6/6; u6c-report.md); U6b (8efb9b2; u6b-report.md);
+  MAIN-65 (39a0d04, pushed 82bd694; advisor-main-65-head.md: APPROVE WITH FINDINGS, Lows only); DISK-PACK (b) (Key numbers).
+- **U7's Block 0b DONE 11:45** (u7-block0b.md; dependency-check.md: the DEP-HOLD record and its `#`-line addendum):
+  commit 2701220 (CI 6/6 on 76689c8); the CLI wasm-bindgen 0.2.130 at .gate/u7-0b/cli-root/bin/wasm-bindgen by
+  security's Q1 (b) (security-u7-0b-answer.md; logs .gate/u7-0b/step7-cli.log and step7-audit.log; check4b.py), checks
+  (a)-(d) PASS (the audit's exit 1 as expected, R1's six crates only; all 48 "Downloaded" lines in the lock). Q1
+  condition 5: every workspace cargo call stays `--locked`. cli-target (433 MiB) is cleaned at U7's close by `cargo
+  clean --target-dir`. No advisor-agent read is owed before the builder: C10 (advisor-u7-brief.md:219-220) sends only a
+  difference from (7)-(10) back to security, and u6c-block0.md shows no such read for U6c's Block 0 either.
+- **U8:** C9 DONE 09:2x (Running work, U8); its merge M3-M9 is the next unit on R1's path after brief 3.
+- **U7's T-half:** T1-T4 and T5 (i) DONE (snapshot wip/u7-t-build-t5i.patch, 2,858 added; T5i-1 to -3 for U7's round).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
-- For msg-2026-11-26.md: 1. Builder 2's merge after U6c's, in a gap of R1's path (his item 4 left the order to me; nb2-merge-plan.md). 2. U6c's Q-FP6-1: (b) stands for R1, (a) rides item 1 (b)'s follow-up (u6c-report.md). 3. M9 (the push) before C9: a notes save pushes the merge commit, and a container restart would lose it. 4. C9 to U8's builder at 08:50 (its fixture test pins probe_presence's lines), not a hand edit. 5. The 05:2x cleans: four finished units' own build folders and the release part-clean, then the incident (u7-block0b.md). 6. 0b's order 2, 3, deps, 4, 6, 7, 5, 8 (disk); step 7 to security at 08:50 (u7-0b-security-request.md). All of 11-24's are named in msg-2026-11-25.md (items 1-8 and its addendum's four).
-- **His answers of 2026-11-25 11:07 UTC (history.md:7938-7957):** DISK-PACK (b) (:7942; the disk line); NPT-EDGE-SLIVER (a) (:7943): kept as merged, and R1's report carries one line on the gap as a known limit of the reading (under a millisecond by reading the code, not measured; the measured window fully counted); item 3 (:7944): nothing before R1 (the game's change-set 3c builds its own link simulator). **Of 00:07 UTC (history.md:7902-7924):** NPT-EDGE-READ (a): H1 in U6c's merge, the 214
+- For msg-2026-11-26.md: 1. Builder 2's merge after U6c's, in a gap of R1's path (his item 4 left the order to me; nb2-merge-plan.md). 2. U6c's Q-FP6-1: (b) stands for R1, (a) rides item 1 (b)'s follow-up (u6c-report.md). 3. M9 (the push) before C9: a notes save pushes the merge commit, and a container restart would lose it. 4. C9 to U8's builder at 08:50 (its fixture test pins probe_presence's lines), not a hand edit. 5. The 05:2x cleans: four finished units' own build folders and the release part-clean, then the incident (u7-block0b.md). 6. 0b's order 2, 3, deps, 4, 6, 7, 5, 8 (disk); step 7 to security at 08:50 (u7-0b-security-request.md). 7. C9 on U8's base 096808b with no merge (git refused the fast-forward over its own notes file; my delete-to-pass message was stopped by the safety check and not re-sent: launch-0850.md). 8. Brief 3 moved to the 13:50 window (0b's save came 11:45), then held by his B until after his /compact; the fast-forward check by ffcheck.mjs. Also in that message: his 13:55 answers (GUARD-ENV, NB2-PROMPT, A.3-A.4). All of 11-24's are named in msg-2026-11-25.md (items 1-8 and its addendum's four).
+- **His answers of 2026-11-25 13:55 UTC (history.md:7959-7986):** GUARD-ENV (a) (:7964; q-guard-env.md): a small separate chat fixes the guard's gap as its own change-set, with the security reviewer and his go; I fix nothing; every brief keeps the interim rule; security-u7-0b-answer.md stays where it is on this branch; no more detail about the gap in pushed notes. NB2-PROMPT (a) (:7965; nb2-merge-plan.md:14-17): the command named first and his reply awaited; he approves only a prompt showing one `git merge --no-ff` of 0e621dae6e5b009a4cf00b6401b46d771b2215a3 and nothing else; if Builder 2's branch has moved, no command: two lines to him first. A.3-A.4 (:7966-7967): the two save messages and the reminder stay as they are. B (:7969-7974): the save before his /compact; nothing new starts before it. **Of 11:07 UTC (history.md:7938-7957):** DISK-PACK (b) (:7942; the disk line); NPT-EDGE-SLIVER (a) (:7943): kept as merged, and R1's report carries one line on the gap as a known limit of the reading (under a millisecond by reading the code, not measured; the measured window fully counted); item 3 (:7944): nothing before R1 (the game's change-set 3c builds its own link simulator). **Of 00:07 UTC (history.md:7902-7924):** NPT-EDGE-READ (a): H1 in U6c's merge, the 214
   in-window drops stay unexplained; NPT-L2-ONEWAY (a): Netcode Builder 2's own small change-set after its merge here
   (pointers passed); STAMP-HOME (a): mine, after R1's run, before R1's report. **NB2's merge, on his word:**
   claude/practical-ride-igo41n at 72651a3c…, both parts in one merge, plan first, after U6c's (never overlapping); first
@@ -147,53 +137,62 @@
 ## Key numbers (U4f's `<base>` counts, the earlier packs and his 2026-11-17 count: this card at 1b26e8c)
 - Disk (11-25 06:1x UTC): a cold test,deps run by main-run.sh (incremental on) used 9,013 MiB (13,263 → 4,250; debug about 9.0 GiB: incremental 2.9 + 6.1 other); the dev part-clean after 0b's step 5 freed 9,094 MiB, 13,344 free, the cache cold. With incremental off (u7-run.sh; main-run.sh by `env`, as NB2-C6) a warm cache is about 6.1 GiB, so about 7.1 GiB stays free: under NB2-C5's 8,192. **DISK-PACK (b) DONE 11:29 UTC (disk-pack-b.md): all seven packed, every read-back equal, free 13,330 → 15,547 MiB; list commits cc8180a, 0472386, a98de3e, a572921, b1d445e, d26f79a, d00d15a.** His word 11:07 (history.md:7942): all seven, one at a time by §11 and brief 8.1's steps (c62h-bound-brief.md:494-499), each list commit naming its ruling: 8ee4 and d66e advisor-c62h-bound-p3.md:35; fc41 advisor-brawl1-sets-p0-full.md:7; fd46 advisor-brawl1-sets-p3-full.md:7 (both with his word); 3506 advisor-u4f-20.md:114 and advisor-u4f-f1-close.md:165; 96de that :165; 7192 advisor-u4f-20.md:146. u4f-47-b57221ed139d stays until the -47 re-judge after NB2's merge. A mismatch: it stays, nothing more, three lines to him.
 
-## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **RUNNING (09:1x UTC, the 08:50 window by launch-0850.md):** **security-auditor DONE 11:1x** (security-u7-0b-answer.md ends DONE; work from the file whole, not the hand-back: Q1 (b) `cargo info` fetch, sha256 check, then the install, in one main-run.sh call, with its post-install checks and graded stop rule, many packages, not one; Q2 (a), conditions 1-3 reworded after the first write; Q3 (b) fetch times only, the draft block's "(newest entry …)" dropped; SEC-U7B-1 Critical: the guard's env/stdbuf/nice gap, confirmed by reading routine-guard.mjs:302-310, never run; GUARD-ENV with him, q-guard-env.md, due Fri 27 Nov 12:00 Amsterdam; interim rule: no env, stdbuf or nice options in front of git or gh). **Step 8 DONE 11:38: commit 2701220 (the 3 files; gate PASS --no-smoke first), its DEP-HOLD record in dependency-check.md (refilled from the answer; the draft marked superseded).** CI on 76689c8 6/6 green (11:40). **Step 7 DONE 11:45, and with it U7's Block 0b:** the CLI at .gate/u7-0b/cli-root/bin/wasm-bindgen ("wasm-bindgen 0.2.130"; the .crate's sha256 = R1's pin; 48 downloaded, 161 compiled, 11:42:15-11:44:09, log step7-cli.log); Q1's checks (a)-(d) all pass (the audit exit 1 as expected, R1's six crates only, step7-audit.log); the `#`-line addendum in dependency-check.md. Next: brief 3 at 13:50 with `<base>` = the then head (code = 76689c8, CI green) and the CLI's path (before it: the fast-forward check on ADDED and MODIFIED paths vs the builder's copy, by `git hash-object`/`cmp`; brief 3 gains Q1 condition 5's rule, every cargo call `--locked` and a changed lock a stop; the CLI's full path with the wait line dropped; build.mjs's own form for reading that path, by grep; and whether 0b owes an advisor-agent read before the builder, as u6c-block0.md may show; all 48 "Downloaded" lines were checked, no summary line); cli-target (433 MiB) cleaned at U7's close by `cargo clean --target-dir`; free 15,084 MiB. **U8's C9 DONE 09:2x** (round 1's NC-U6C-12 and SEC-U6C-5, round 2's item 5 and item 1 (b) (my brief missed those two; the builder flagged them), R1.md's stale "then stops LG": +59 over pass 3, 6,170 of 6,200, nothing carried; node 100/0, wrappers 315/0, redact 394 items 0 findings; plants fail by name; all on 096808b, so test 7's merged-state run is at U8's merge; snapshot wip/u8-build.patch 09cb4a07…, 43 files, its notes copied; one unasked INVALID, the release thread's policy name equal at both reads (plan.md:1256), for the advisor's read at U8's merge; SEC-U6C-5's URL is a Stop B fill); U8's builder ac59cce3e5d002441 on C9 since 09:0x on its base 096808b, no merge (its fast-forward was refused by git over its own notes file; my delete-to-pass message was stopped by the safety check and not re-sent: launch-0850.md; its notes u8-build.md "## C9"; test 7's merged-state run moves to U8's merge); the saver restarted 12:3x to about 14:24 (bjmqt123o ended 12:33 at its time limit, nothing unsaved). Step 8 items 1-2 PASS (hashes = dep-check-0b-draft.md; only the 3 files; gate PASS --no-smoke). Brief 3 after 0b's save, or the 13:50 window (wake-up 13:51, trig_012yU6mUzHn4jLtPTu3Qymwx fired 08:51). Check-in 08:39: nothing stopped. The before-run DONE 05:26:32: PASS (.gate/u7-0b/before.log: 861/958, 0 failed or skipped; deps PASS; u7-block0b.md). **U6c's M5 DONE 04:48:04 UTC: PASS, every C4 bar met** (.gate/u6c-merge/m5-check.log, 04:27:42-04:48:04, exit 0; header = C1's hashes, free 9,728 MiB, HEAD 842a257; all 11 steps pass; test 1026.3 s: measured 861 passed, 0 failed, 0 skipped; bites 958 passed, 0 failed, 0 skipped; wasm 27,000 ticks, 0 mismatching (both pairs); refs 1856; marks 81, rows unchanged; self 78/78; redact 11/11, 371 items, 0 findings; loadavg 0.31 0.73 0.75 before, 2.18 2.19 1.89 after). Next: M7 (gate --no-smoke, the D10 read), M8's one commit with C9's U8 edits and the report (C5's wording), M9. **The 03:58 agents, all DONE (read only; launched in the 03:50 reset's window):** step 7 af3e13c175d8f5489 DONE 04:1x (APPROVE WITH FINDINGS, Lows only; reruns done 04:03:41), M4b afaa2a622da2d42c7 DONE 04:2x (APPROVE WITH CONDITIONS C1-C6: the RESUME line); **U6c's compile-only probe DONE 04:25:05: PASS** (.gate/u6c-merge/m4c-probe.log: fmt 15.4 s, clippy 66.7 s, doc 52.7 s, all 3 steps pass, exit 0; header = C1's hashes, which cover spikes/netcode-proof only: main-run.sh:41; free 10,243 → 9,730 MiB, its use 513, so C2's bar is 7,679: met); NB2's plan check a10848a10f73ed39e DONE 04:3x (advisor-nb2-merge.md, ends DONE: APPROVE WITH CONDITIONS NB2-C1 to -C12, no Critical or High; Q1 yes: one `git merge --no-ff` in the main folder through the guard's prompt, answered by him (NB2-C3); Q2 (i), (ii) only for steps 3, 4, 6; step 5's disk fallback pre-ruled; -57 not run; U7's 0b check goes first (NB2-C1); a reviewer's read of 67892d39..72651a3c (NB2-C10); decision NB2-PROMPT to him); each prompt = its request file (hashes below) plus a launch note (HEAD bae6232, notes-only since). Before: DONE 23:1x: the round-2 ruling a0031a451c8991809 (advisor-u6c-r2.md: APPROVE; H2 before M5; H1 only on his NPT-EDGE-READ yes; U6c merges after MAIN-65 and his answer, H2 alone after end Fri 27) and MAIN-65's check ad01820dd92758e65 (APPROVE WITH CONDITIONS M65-1 to -5); saver ended 19:47, hand saves:** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
-  aacd36781fdea65a0, security a307bdd231bf3e9b4, each APPROVE WITH FINDINGS, no Critical or High (u6c-r2-*.md, each
-  ending DONE). A stopped agent resumes by SendMessage from its notes.
-  - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
-    a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-    (00:34 answered: nothing stopped; next 04:34); step 7 trig_01Co9w6DYSoCbkQz5RWhK58i (fired 03:51, one-shot; main-65-step7-request.txt b03fc992…, u6c-m4b-request.txt d124e576…, nb2-merge-request.txt df3f2576… on plan 2b7fb042…); day message trig_01XVEDQzVLaAwy4Fer6AERdS (11-25 23:05). The Fri 27 H2-alone fallback is deleted (his yes is in).
-- **MAIN-65 CLOSED 04:1x UTC: step 7 APPROVE WITH FINDINGS** (advisor-main-65-head.md, ends DONE; no finding above Low; reruns done 04:03:41: gate PASS +0 -0, repo map 186/110, checkpoint tests 33/33; toolchain = main's job line for line; PR #40 mergeable, main unmoved). Lows: ADV-M65H-1 new (msg-2026-11-26.md quotes this line's numbers, citing the card at 4824336), ADV-M65-5, ADV-M60-7, ADV-M54-8 open. **Steps 1-6 DONE 23:28 UTC:** pushed at 82bd694 (82bd69428512e679b789797d674ef04bd4743715); CI on it, read again 03:5x by run: gate 45509875991 success (23:25:40-23:27:00) and toolchain 45509875989 success (to 23:28:13) (push), gate 45509881420 success (to 23:27:10) and toolchain 45509881180 success (to 23:28:34) (pull request), each on 82bd694; merge 39a0d04 (parents H0 473f5c1, main 28254a7); STATUS.md 120 lines, "1 1" against main; H0..HEAD 64 files +4677/-317 (63 without STATUS.md, +4644/-284); anchor 9475d37 exit 0 (index and HEAD); gate PASS (--no-smoke); repo map OK 186/110; checkpoint tests 33/33; light.log PASS (refs 1848 = 1825 + 23, marks 81, self 78/78, redact 11/11, 359 items, 0 findings); outputs .gate/main-65/ kept for step 7.
-- **My step (18:3x):** round 2: netcode 3 Lows in the diff, 2 Mediums outside it before R1 (the start-edge drop read;
-  LG's DONE with no READY, caught at U8's one load_up call :2218-2221); P1's +222 drops are in-window, a separate fact
-  (U8's equal-on-P1 rule, :1708-1711); test 1 Medium (TE-U6C-R2-4), 7 Lows; security 2 Lows. Ruling 22:5x (19:5x: the snapshot applies on 4f9ca2b, 24 files; facts added to the request). The readings are DONE,
-  my own runs through u6c-run.sh, release builds (.gate/u6c/read-*.log):
-  - DONE: the release build (read-build.log, exit 0). A2 over WebSocket (read-a2-ws.log, 14:08-14:09): 1 passed in
-    70.8 s; npt-load READY then DONE, exit 0; the room exit 0; room memory peak 157,499,392 B; 5-31 inputs per client
-    per second; split violations 0; pooled p99 about 1.8 ms. A2 over WebTransport (read-a2-wt.log, to 14:12): 1 passed
-    in 100.1 s; READY, DONE, exit 0; room peak 125,689,856 B; **0**-31 inputs per client per second (for round 2's netcode seat).
-  - The probe reading DONE (read-probe.log; probe_reading.py holds the server's stdin; .gate/u6c/read-probe/): P0 and P1
-    each 1,000,000 records a direction (FP-1); legs about 112 s (B1 ~113 s by arithmetic; P2-P4 and B1 unmeasured: round
-    2's question 3); P1 lost ~1.0 % a way (the seat's count); 484 peer datagrams refused for the leg (probe.rs:286-295); drain 82/77 ms; peer errors ≈ its 76 s after the legs.
-  **Next three:** (1) MAIN-65 by its checked plan (steps 1-6; step 7's head read at 03:50); (2) U6c's merge M3-M9 as U4f's
-  (history.md:7022-7028) and the ruling, with C9's U8 edits; (3) U7's 0b check and R-half (a reset's first 30 min), then U8's merge.
-- **Finished, resumable by SendMessage:** U7's T-builder a9873cdba07a3219e (takes the R-half); U8's builder
-  ac59cce3e5d002441 (notes u8-build.md "## Pass 3"); the advisor a3de649cd25e474df (U8's rulings). Older: card at e67ef59.
-- **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): its record in Now. Open at its
-  merge: F28 (U6b's flush), U6b's null certificate pair, ds-selftest's place in C1's run list (U6b's merge), U6c's names
-  (advisor-u8-stopb.md:208-220, and NC-R2-4 in U6c's message), Stop B's laptop reads (driver listen, passphrase, fsn1
-  stock, Claude Code >= 2.1.257), `sudo -l` over ssh on RS (only the container's read). Old trees .gate/u8-r2-old
-  (60205020), .gate/u8-r3-old (bca52b2c). Not run on a VM. `node --test ops/` fails on Node 22.23: use `'ops/**/*.test.mjs'`.
-- **U6c** (rev 1.1, 8f56f37a…; C1-C9): Block 2 last (C4); Block 0 DONE at 3b75d00; its builder launched 06:56 (Now, Next 2);
-  its launch gives U7's seven dist names and carries advisor-u8-stopb.md:208-220's six lines, NC-R2-4's record names
-  (advisor-u8-r2.md) and U6b's F-JOIN-ONCE (its glue steps a client only once its link is Open); at its merge U8's
-  side checked per interface (C9). **R1 Thu 3 Dec holds with
-  about a day of slack** (section 3: U6a merged Mon 23-Tue 24, U6b Wed 25, U6c Sat 28, U7's Rust Sun 29, Stop B Tue 1);
-  three lines to him if U6b is not merged by end Thu 26, U6c by end Sun 29, or a lane unit hits SIZE-CHECK.
+## Running work (IDs to message, resume or stop; older finished lines and IDs: this card at dc9244d, before it 1b26e8c)
+- **Running now (14:0x UTC):** no agent, no workflow. One background shell: the saver bzv0lk5bh (`node
+  .claude/scripts/checkpoint.mjs watch netcode-proof-test`, the two trailers; from 12:33:58 for 110 min: ends about
+  14:24). When it ends: a hand save if anything waits, then restart it (run_in_background, timeout 7200000).
+- **Finished, resumable by SendMessage (each from its own notes):** U7's T-builder a9873cdba07a3219e (worktree
+  .claude/worktrees/agent-a9873cdba07a3219e at 577816c; notes u7-t-build.md there, untracked; resume point: brief 3);
+  U8's builder ac59cce3e5d002441 (worktree at 096808b; notes u8-build.md "## C9"; nothing until U8's merge); the advisor
+  a3de649cd25e474df (U8's rulings; takes U8's head read); NB2's plan check a10848a10f73ed39e (advisor-nb2-merge.md).
+- **Scheduled:** check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; 12:34: nothing stopped; next 16:34 UTC); day
+  message trig_01XVEDQzVLaAwy4Fer6AERdS (23:05 UTC: msg-2026-11-26.md); the 13:50 window's trig_01SSzgq9HnGPCHuN9id1zdDZ
+  fired 13:51 (one-shot). No 18:50 wake-up is set yet. The reminder that could not be deleted (it had fired) stays: A.4.
+- **My step (14:0x UTC):** the save before his /compact (his B, history.md:7969-7974). Brief 3 is filled and checked in
+  launch-0850.md section 3, held by his B.1: the 13:50 reset confirmed by the session's rate-limit events (window from
+  13:50:00, next 18:50:00 UTC); the fast-forward check vs dc9244d PASS (ffcheck.mjs: 577816c its ancestor, 222 paths, 0
+  ADDED present, 90 of 90 equal; web/ untouched); dc9244d's code = 76689c8's; the shared target cold (1 MiB), free
+  15,081 MiB, no cargo or rustc running; build.mjs reads the CLI from NPT_WASM_BINDGEN (web/build.mjs:127), and its
+  cargo call is already `--locked` (:143).
+- **Next three:**
+  1. Brief 3 (U7's R-half) right after the compact, inside the 13:50-14:20 UTC window: ffcheck.mjs against the then
+     head (a notes commit since dc9244d must add no path the builder's worktree holds), `<base>` filled, the advisor
+     tool, then SendMessage to the T-builder. Past 14:20: an 18:50 UTC wake-up
+     (send_later) and the 18:50-19:20 window.
+  2. U8's merge M3-M9 (u8-brief.md; the advisor a3de649cd25e474df's head read, in a window): the policy-name INVALID
+     (plan.md:1256), C9 on 096808b, test 7's merged-state run, NC-R3-1, and the items under U8 below.
+  3. NB2's merge, in a gap of R1's path (nb2-merge-plan.md; advisor-nb2-merge.md NB2-C1 to -C12; NB2-C1 DONE with 0b):
+     step 1 re-checks Builder 2's tip: not 0e621dae → no command, two lines to him first; else the command `git merge
+     --no-ff 0e621dae6e5b009a4cf00b6401b46d771b2215a3` is named and his reply awaited (NB2-PROMPT (a)); then check.mjs
+     whole (NB2-C5: 8,192 MiB free; the R-builder shares the lane, about 6.1 GiB warm per workspace: so in its gap), the
+     -47 re-judge reads MOVED (else three lines), NB2-C10's reviewer read in step 9's window before NB2's report, then
+     -47's pack.
+  Then U7's round (netcode, test; after R4 and T5 (ii)) and its merge by end Mon 30; Stop B about Tue 1 Dec; R1 Thu 3 Dec.
+- **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): pass 3 6,111; the last round
+  DONE 11-24 21:2x (NC-R2-1, SEC-R2-1 = INF-R2-1, SEC-R2-2 CLOSED; NC-R3-1 Low: r1.sh:438-452, save_log unguarded under
+  set -e, a follow-up); C9 DONE 11-25 09:2x (6,170 of 6,200, nothing carried; snapshot wip/u8-build.patch 09cb4a07…, 43
+  files; one unasked INVALID for the head read: the release thread's policy name equal at both reads, plan.md:1256;
+  SEC-U6C-5's URL a Stop B fill). Open at its merge: F28 (U6b's flush), U6b's null certificate pair, ds-selftest's
+  place in C1's run list, U6c's names (advisor-u8-stopb.md:208-220, NC-R2-4), Stop B's laptop reads (driver listen,
+  passphrase, fsn1 stock, Claude Code >= 2.1.257), `sudo -l` over ssh on RS (only the container's read). Old trees
+  .gate/u8-r2-old (60205020), .gate/u8-r3-old (bca52b2c). Not run on a VM. `node --test ops/` fails on Node 22.23: use
+  `'ops/**/*.test.mjs'`.
 - **U7** (brief rev 1.1, 2026-11-23: the advisor APPROVE WITH CONDITIONS, advisor-u7-brief.md 65e109aa…, C1-C14 at
   :110-247 bind by pointer, 6 Medium, 4 Low; notes netcode-u7-brief.md): about 2,200 (Rust 660 on the lane, TS/JS 1,550
   off) plus C2-C9's 150-250; valve C11 (page bites and `wt-attempts` wait for R8 if the T-half passes 3,800). Order:
-  security's read (security-u7-deps.md, CLEAR WITH CONDITIONS) -> Block 0a DONE bc87d2d -> T-half DONE (T1-T4, 8ab088e8…,
-  2,482 added) -> 0b's binding check the hour U6c merges -> the R-half Sun 29 -> one round (netcode, test; no security:
-  C12) -> merged by end Mon 30, else three lines that day. R1 holds with about a day of slack on six assumptions
-  (its section 6). Before Stop B's fill I build U7's dist twice, two clone paths and CARGO_HOMEs (SEC-SB-5's term,
+  security's read (security-u7-deps.md) -> Block 0a DONE bc87d2d -> T-half DONE (T1-T4 and T5 (i)) -> 0b DONE 11-25
+  11:45 -> the R-half (brief 3) -> one round (netcode, test; no security: C12) -> merged by end Mon 30, else three lines
+  that day. R1 Thu 3 Dec holds with slack (U6a-U6c merged by 11-25, ahead of plan); three lines to him if a lane unit
+  hits SIZE-CHECK. Before Stop B's fill I build U7's dist twice, two clone paths and CARGO_HOMEs (SEC-SB-5's term,
   advisor-u8-stopb.md:197-199): equal lists become ops/runs/r1-dist.sha256's fill; a difference goes to the advisor.
 - **Tools:** snapshot `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree> <out.patch> <prefix>`;
   part-clean (no lane running) `env CARGO_NET_OFFLINE=true flock -x <M>/.gate/shared-target/.lane.lock cargo clean
   --manifest-path <M>/spikes/netcode-proof/Cargo.toml --target-dir <M>/.gate/shared-target --profile dev`, then `test`
   the lock, CACHEDIR.TAG and no debug, df; redact `node spikes/netcode-proof/ops/operator/redact-check.mjs <spike>`; his
-  words via msgcheck.mjs. A worktree agent first runs `git merge --ff-only`; never `cd` into it; no shell loops. Main f5030a3.
+  words via msgcheck.mjs (the transcript is past Node's largest string: the scratchpad's msgcheck2.mjs streams it, and
+  msgcheck3.mjs also reads a message typed while a turn runs, a queued_command attachment); a builder's fast-forward
+  first by `node .checkpoints/netcode-proof-test/ffcheck.mjs <worktree> <its head> <base>` from the main folder (0 ADDED
+  present, 0 differing). A worktree agent first runs `git merge --ff-only`; never `cd` into it; no shell loops. Main f5030a3.
 
 ## Cuts (LEAN-MODE item 4: one line each in the day's message: from, to, what it stopped)
 - For msg-2026-11-25.md: 06:55-07:59 UTC (U6c's builder and this chat); 10:42-12:54 UTC (the U6c advisor and this
