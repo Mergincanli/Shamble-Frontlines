@@ -296,12 +296,16 @@ const WRAPPERS = new Set(['time', 'nohup', 'command', 'builtin', 'noglob', 'exec
 // flag: takes no value; value: takes the rest of its word (-uX, --unset=X) or the next word; unread: read as a value,
 // but git would run in a folder (env -C) or on words (env -S) the guard does not follow. Any other option word (an
 // abbreviation, a cluster such as -iu, a signal option) is unknown and makes the command unreadable, as does a program
-// word that still starts with - after them (env X=1 -i git ...: env runs -i). A Map, so `constructor` finds nothing.
+// word that still starts with - after them (env X=1 -i git ...: env runs -i). split: env -S's words are put back and
+// read on (SA-R1-2: env -S git ... still meets git's checks). A Map, so `constructor` finds nothing.
 const WRAP_OPTS = new Map([
-  ['env', { flag: /^(-[i0v]|--ignore-environment|--null|--debug)$/, value: /^(-u|--unset)$/, unread: /^(-[CS]|--chdir|--split-string)$/ }],
+  ['env', { flag: /^(-[i0v]|--ignore-environment|--null|--debug)$/, value: /^(-u|--unset)$/, unread: /^(-[CS]|--chdir|--split-string)$/,
+    split: /^(-S|--split-string)$/ }],
   ['nice', { flag: /^-\d+$/, value: /^(-n|--adjustment)$/ }],
   ['stdbuf', { value: /^(-[ioe]|--input|--output|--error)$/ }],
 ]);
+// a word shown in a reason: at most 32 characters, control characters as ? (SA-R1-4)
+const shownWord = (w) => (w.length > 32 ? `${w.slice(0, 32)}...` : w).replace(/[\x00-\x1f\x7f-\x9f]/g, '?');
 // Returns { argv: the real command, unreadable: null, or the wrapper form the guard does not follow (SEC-U7B-1) }.
 export function unwrap(argv) {
   let a = argv.slice(), unreadable = null;
@@ -317,13 +321,18 @@ export function unwrap(argv) {
         const w = a[0], name = w.startsWith('--') ? w.split('=')[0] : w.slice(0, 2);
         if (w === '--') { a = a.slice(1); break; }
         if (o.unread?.test(name)) unreadable ??= `${prog} ${name}`;
-        if (o.value.test(name) || o.unread?.test(name)) { a = a.slice(name === w ? 2 : 1); continue; }
-        if (!o.flag?.test(w)) unreadable ??= `${prog} ${w}`;
+        if (o.value.test(name) || o.unread?.test(name)) {
+          const v = name === w ? a[1] ?? '' : w.slice(name.length + (name.startsWith('--') ? 1 : 0));
+          a = a.slice(name === w ? 2 : 1);
+          if (o.split?.test(name)) a = [...v.split(/\s+/).filter(Boolean), ...a]; // the ask stays; this can only add a deny
+          continue;
+        }
+        if (!o.flag?.test(w)) unreadable ??= `${prog} ${shownWord(w)}`;
         a = a.slice(1);
       }
       if (prog === 'env' && a[0] === '-') a = a.slice(1); // after its options, env reads a lone - as -i
       if (prog === 'env') while (a.length && a[0].includes('=')) a = a.slice(1); // env's own rule: a word with = sets
-      if (a[0]?.startsWith('-')) unreadable ??= `${prog} before ${a[0]}`;
+      if (a[0]?.startsWith('-')) unreadable ??= `${prog} before ${shownWord(a[0])}`;
       continue;
     }
     if (prog === 'timeout') { // timeout [-s SIG | -k DUR | --opt[=v]]... DURATION command

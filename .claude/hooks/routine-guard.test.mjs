@@ -1181,7 +1181,7 @@ export const DAY_CASES = [
       [`SEC-U7B-1 ${w}: git status behind it stays allowed`, dsh(`${w} git status`), null]]),
   ...['env -C /d', 'env -C/d', 'env --chdir /d', 'env --chdir=/d', 'env -S s', 'env -Ss', 'env --split-string s',
     'env --split-string=s', 'env --ch /d', 'env --block-signal', 'env -iu X', 'env --null=x', 'env X=1 -i', 'env - -i',
-    'nice --adj=5', 'nice --5', 'nice -x 5', 'nice -', 'stdbuf --out L', 'stdbuf -x 0']
+    'env -- -i', 'nice --adj=5', 'nice --5', 'nice -x 5', 'nice -', 'stdbuf --out L', 'stdbuf -x 0']
     .flatMap((w) => [[`SEC-U7B-1 ${w}: ask`, dsh(`${w} git status`), ASK, {}, /^kit and gate files ask first in a day session: the guard does not follow (env|nice|stdbuf) /],
       [`SEC-U7B-1 ${w}: an agent is refused`, dsh(`${w} git status`, { agent_id: 'a1' }), DENY, {}, /an agent runs commands without (env|nice|stdbuf) /]]),
   ['SEC-U7B-1 the reason names the form (env -C)', dsh('env -C /d git status'), ASK, {}, /does not follow env -C in front of a command/],
@@ -1190,6 +1190,11 @@ export const DAY_CASES = [
   ['SEC-U7B-1 an unknown flag is read on: the force push behind it is refused', dsh('env --block-signal git push --force origin cs/x'), DENY],
   ['SEC-U7B-1 env X=1 -i: env runs -i, not git, so a force push asks', dsh('env X=1 -i git push --force origin cs/x'), ASK],
   ['SEC-U7B-1 a program named constructor is no wrapper (no throw)', dsh('constructor -x git status'), null],
+  ['SA-R1-2 env -S git, then a force push: the deny wins', dsh('env -S git push --force origin cs/x'), DENY],
+  ["SA-R1-2 env -S 'git push --force': the deny wins", dsh("env -S 'git push --force' origin cs/x"), DENY],
+  ['SA-R1-2 env --split-string=git, then a force push: the deny wins', dsh('env --split-string=git push --force origin cs/x'), DENY],
+  ['SA-R1-4 a long word is cut in the reason', dsh(`nice --adj=${'x'.repeat(40)} git status`), ASK, {}, /does not follow nice --adj=x{26}\.\.\. in front/],
+  ['SA-R1-4 a control character is shown as ?', dsh("nice '--a\nb' git status"), ASK, {}, /does not follow nice --a\?b in front/],
 ];
 for (const [name, input, want, opts, re] of DAY_CASES) {
   test(`day (kit-v3-3) ${want ?? 'goes on'}: ${name}`, async () => {
@@ -1394,6 +1399,7 @@ const DAY_MUTANTS = [
   ['SEC-U7B-1 a Map, not a plain object', 'const o = WRAP_OPTS.get(prog);', 'const o = Object.fromEntries(WRAP_OPTS)[prog];'],
   ['SEC-U7B-1 the ask on a wrapper form', 'if (u.unreadable) {', 'if (false) {'],
   ['SEC-U7B-1 the agent refusal', 'if (input.agent_id) return deny(`${KIT_AGENT}; an agent runs commands', 'if (false) return deny(`${KIT_AGENT}; an agent runs commands'],
+  ["SA-R1-2 env -S's words are read on", 'if (o.split?.test(name)) a = [', 'if (false) a = ['],
 ];
 test('mutation runs (kit-v3-3 day rules): every rule is needed by some day case', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
