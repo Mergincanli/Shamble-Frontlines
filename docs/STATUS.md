@@ -100,11 +100,11 @@ _Last updated: 2026-11-25 (change-set 3b's docs pass, after #65's merge; main 28
   3A-FROM-F64, 3A-HOOK-TEST, 3A-MANIFEST-COMMENT; for the gate step 3A-LINT-MULADD, 3A-SCAN-NAMES, 3A-CONFIG-FILE,
   3A-PEDANTIC; later 3A-FEATURE-VERSION, 3A-SCAN-HELPERS, 3A-PART5-CLASH, 3A-NAME-SECTION, 3A-RNG-COPY, 3A-STATS-ROWS,
   3A-PLANTS, 3A-FMA-LOG, 3A-NO-FMA, 3A-OTHER-BROWSERS; for the drafts 3A-DEPARTURES.
-- **From change-set 3b** (the archive's block, in review): for change-set 7 3B-LATE-BOUND (no room behind a network
-  transport without it), 3B-PLAUSIBLE; before online play 3B-ACKS, 3B-OUTAGE-256; for 4, 8 and 9 3B-ONE-PER-TICK; for
-  5 3B-ALLOC-METHOD (PA-N2 carries over); for PM-0002-13 and -8 3B-KEY-POST, 3B-SATURATED; for Slice 3
-  3B-REFUSED-FIELD; his: 3B-LONG-HOLD, at ADR 0001's next edit, with 3B-OQ6-POINTER; design: 3B-PACER-255; for the
-  CI pull request 3B-OTHER-BROWSERS; later 3B-POOL-16, 3B-CSS-PROD, 3B-PUB-MODS; and change-set 3c's plan items.
+- **From change-set 3b** (the archive's block, in review): for change-set 7 3B-LATE-BOUND (no room on a network without
+  it), 3B-PLAUSIBLE; before online play 3B-ACKS, 3B-OUTAGE-256; for 4, 8 and 9 3B-ONE-PER-TICK; for 5 3B-ALLOC-METHOD
+  (PA-N2 carries over); for PM-0002-13 and -8 3B-KEY-POST, 3B-SATURATED; for Slice 3 3B-REFUSED-FIELD; his:
+  3B-LONG-HOLD, at ADR 0001's next edit, with 3B-OQ6-POINTER; design: 3B-PACER-255; for the CI pull request
+  3B-OTHER-BROWSERS; later 3B-POOL-16, 3B-CSS-PROD, 3B-PUB-MODS, 3B-BLUR-TEST, 3B-HOSTILE-ALLOC; and 3c's plan items.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100

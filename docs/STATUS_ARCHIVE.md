@@ -1517,6 +1517,13 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     test decides how commands are timed (`docs/adr/0001-multiplayer-netcode.md` lines 252, 1156 and 1699 to 1700); each gets a
     dated pointer to his decision of 2026-11-24 (`docs/DECISIONS.md`, 22:44:50 and 23:24:50 UTC; the build plan's three
     sentences were changed by 3b's docs pass) (the advisor agent's read of 2026-11-24, 23:12 UTC, condition C3).
+  - 3B-BLUR-TEST (the verifier, 2026-11-25; with the next change to the page's key handling): nothing fails when
+    the listener that lets go of every key as the window loses the focus is removed (its own plant: 85 unit tests
+    and 16 browser tests still pass). A browser test holds W, sends `blur` and expects W let go.
+  - 3B-HOSTILE-ALLOC (the verifier, 2026-11-25; with 3c's tests): the room's "allocates nothing per tick" is
+    counted for honest ticks only (its own plant: an allocation on every datagram the room cannot decode passes all
+    114 tests). The two reviewers' probes counted 0 after warm-up; a counting allocator in the two random-message
+    tests makes it a test.
   - **For change-set 3c's plan** (3c: the link simulator and the first recording, moved out of 3b by the plan's size
     ladder, he told before anything moved; with them the one new read-only number on the players' file, the state's
     hash, by his DEPART-3, and `devtools`' three path edges that 3b declares and does not use yet, security-auditor's

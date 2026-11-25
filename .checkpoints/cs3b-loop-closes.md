@@ -267,8 +267,9 @@
 9. **3A-FROM-F64: commit f8db0de3.** 20 constructed cases after the existing 10,048 (exact halves at one and
    below the smallest f32; from the largest f32 to 2^128), each result worked out by hand in the generator's
    self-check; the old inputs are the new file's first 120,576 bytes (same sha256 as before) and the 16 pinned
-   lines are unchanged. New: `f32-inputs.bin` 120,816 bytes, sha256 3e9d6149...3579; `f32-expected.txt` sha256
-   12c0c2de...d1d1. Exact natively and in WebAssembly (Node; Chromium, both profiles), no new pin.
+   lines are unchanged. Then: `f32-inputs.bin` 120,816 bytes, sha256 3e9d6149...3579; `f32-expected.txt` sha256
+   12c0c2de...d1d1. **Since the fix pass 0dfca749 the files hold 24 such cases (10,072 in all): `f32-inputs.bin`
+   120,864 bytes, sha256 d59d1021...9879; `f32-expected.txt` sha256 d37cb93e...09f1.** Exact natively and in WebAssembly (Node; Chromium, both profiles), no new pin.
 10. **The clean copy (C6), `.gate/cs3b-clean` at f8db0de3:** CI's whole sequence from a cold start took 4 min 57 s
    (00:39:14 to 00:44:11 UTC); **the browser tests: 16 passed in 3.4 minutes** of CI's 5-minute limit (the two
    new ones 1.1 and 1.3 minutes). Under the 4 minutes at which he is told first. The players' file there is byte
@@ -468,6 +469,22 @@ own work). The log: `.gate/cs3b/ci-6abf3d2a-toolchain.log` (scratch).
 UTC; `.gate/cs3b/plants-3b-run4-full.log`, scratch); the 53rd, a 64-byte array per block against the allocation
 test, did not run to its check there (the browser port was the verifier's at that moment: "is already used") and
 was caught when run again alone (03:20:46 UTC). Afterwards the true tree was built again: the same Wasm.
+
+**The verifier on 6abf3d2a: PASS** (2026-11-25, about 03:35 UTC; Opus 5.5, effort max; its notes
+`verifier-cs3b.md`): the gate; formatting and the lint check clean; 114 debug tests and the release runs as
+listed; the decoder run in 7.2 s with each type's largest request against its cap (Join 1,024 of 1,024,
+JoinAccepted 64 of 64, the others 0); Node 85, 7, 1, 46; boundary 18; a development and a production build (0 of 5
+development markers in production); the Wasm's sha256 as here; **16 browser tests in 3.3 minutes** (the loop 1,819
+ticks, 126 presses and releases, 0 lost, 0 doubled; the press test 10,000 and 10,000, 0 lost, 0 doubled, 489 posts
+delayed, 45 sent twice and all 45 behind a newer post, 0 first copies overtaken, 45 ignored, 0 older posts, 0
+wrong keys; allocation 102 bytes a frame, 581 a block); 13 of 13 listed plants and the presses mark's 5 bites
+caught in its own copy; CI's counts equal the card's; the size 6,909 (7,014 with generated and fixture files);
+16 numbers of this card checked, all hold; the release runs of room, client-endpoint, sim-wasm and devtools pass
+(C7, local). **The decoder mark:** started only (not met: cargo-fuzz, and 5 of the catalogue's 16 message types
+have decoders). **The presses mark:** test-engineer's ruling confirmed; the per-tick key check now also catches a
+release that comes early or late. **Four Lows:** two test gaps found by its own plants (the window-blur listener
+has no test; the room's "no allocation" is not counted for hostile bytes): follow-ups 3B-BLUR-TEST and
+3B-HOSTILE-ALLOC in STATUS; two notes on this card (the plant run's re-run; step 9's hashes): corrected.
 
 **After the code (started 2026-11-25, about 03:09 UTC):** the full run of the 53 planted defects on 6abf3d2a;
 the verifier (its copy `.gate/verifier-cs3b`, its notes `verifier-cs3b.md`); docs-keeper's docs pass (its notes

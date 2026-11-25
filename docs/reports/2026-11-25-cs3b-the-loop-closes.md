@@ -7,9 +7,9 @@ player sees) plus `docs/DECISIONS.md`, a decision doc: it merges only on his go,
 request exists yet: the chat puts the title and text in its notes folder, his main Advisor opens the draft, and he
 presses Ready and Merge.
 
-**State of this version of the report:** the code is final at 6abf3d2a; both review rounds are closed; the
-verifier's run, the advisor agent's review of this head and his browser check are not in yet (each is named below
-where it belongs, and this report is updated when it arrives).
+**State of this version of the report:** the code is final at 6abf3d2a; both review rounds are closed and the
+verifier's PASS is in; the advisor agent's review of this head and his browser check are not in yet (this report is
+updated when they arrive).
 
 ## Goal
 Close the loop for one player on one machine: a key pressed on the page goes to a local game server inside the page
@@ -80,8 +80,9 @@ about 3,800 planned (1.82 times); his stop line of 7,600 was not reached. One de
 - **The decoder mark (PM-0001-34; C1, C2): started, not passed.** Per message type 10 million random and 10 million
   mutated seeded inputs in release (about 5 s for all five on GitHub's runner): 0 panics, no memory above the caps
   (largest single request: Join 1,024 bytes, JoinAccepted 64, the others 0), a planted unchecked index found at
-  input 17 and a planted over-allocation at input 0. The row's full count per release and the swappable-transport
-  mark belong to later change-sets.
+  input 17 and a planted over-allocation at input 0. Not met, so "started" is all it is: the row names cargo-fuzz,
+  which is not used, and every message type of the catalogue, of which 5 of 16 have decoders. The
+  swappable-transport mark belongs to Slice 3 and is not started.
 - **The presses mark (PM-0002-12), by its own method, in Chromium:** 10,000 scripted presses, most shorter than a
   tick, under a shim that delays every key message by 0 to 100 ms and sends one in ten twice. On GitHub's run of
   6abf3d2a: 10,000 presses and 10,000 releases made and echoed; 0 lost and 0 doubled, button by button; 502 key
@@ -129,6 +130,15 @@ those three finished in round 2. **All six: PASS in round 2.**
   against its own model: 893,122 commands run, 726,413 refused, 0 deviations.
 - **rust-reviewer:** eight Lows, fixed or answered; the block's bytes over 1 million ticks hash the same natively
   and in the Wasm under Node. **perf-auditor:** no finding against 3b; follow-ups below.
+- **The verifier on 6abf3d2a: PASS** (2026-11-25, about 03:35 UTC). In its own copy: the gate; formatting and the
+  lint check clean; 114 debug tests and the release runs; the decoder run (7.2 s); the Node tests, the type checks,
+  the boundary tests; a development and a production build (no development code in production); the same Wasm
+  hash; 16 browser tests in 3.3 minutes (the press test: 10,000 and 10,000, 0 lost, 0 doubled, 45 copies all behind
+  a newer one, 45 ignored, 0 older keys, 0 wrong keys); 13 planted defects of its choice and the presses mark's 5
+  bites, all caught; CI's counts equal what was written down; 16 numbers of the notes checked, all hold. It
+  confirmed the test reviewer's ruling on the presses mark. Four Lows: two test gaps found by its own plants (the
+  listener that lets go of keys when the window loses the focus has no test; the room's "allocates nothing" is
+  counted for honest ticks only), both named follow-ups; two corrections to the notes, made.
 
 ## Decisions and deviations
 - **The build plan's three sentences (his words of 23:24:50 UTC: "(a). Change it with the other two in 3b's docs
@@ -210,7 +220,9 @@ link that delays, drops or reorders (3c).
 late-command bound; the endpoint's plausibility bound on a snapshot's tick; acks bounded from below; presses over an
 outage. Before the marks are judged: keys posted from the key handler too (key to tick); the allocation method
 (change-set 5). For his decision at the netcode record's next edit: a long-hold case for its lag-switch mark.
-Systems that act on presses apply at most their own rule per tick (change-sets 4, 8, 9).
+Systems that act on presses apply at most their own rule per tick (change-sets 4, 8, 9). Two test gaps from the
+verifier: a browser test for keys let go when the window loses the focus (3B-BLUR-TEST); a counted "no allocation"
+for hostile bytes in the room and the endpoint (3B-HOSTILE-ALLOC, with 3c's tests).
 
 ## Proposed next step
 Change-set 3c, the link simulator and the first recording, planned first and reviewed by the advisor agent.
