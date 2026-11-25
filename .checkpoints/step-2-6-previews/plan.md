@@ -1,7 +1,10 @@
 # Plan: step 2.6, a preview link for every pull request (lane 2, Builder V2)
 
-Revision 2, 2026-11-25. The advisor agent approved it with four text conditions, folded in below; its approval
-holds if the security-auditor's read of revision 2 raises no Critical or High and changes none of the three texts.
+Revision 2, 2026-11-25.
+- The advisor agent approved it with four text conditions.
+- The security-auditor approved it for Mustafa with three text points (Mediums A to C). No High or Critical is
+  left, and the three texts are unchanged.
+- All seven are folded in below.
 - **Branch:** `claude/optimistic-albattani-mdoonz`, standing in for `cs/step-2-6-previews`, at main c1da1bd plus
   checkpoint commits.
 - **The design research:** infra-engineer's notes, `.checkpoints/step-2-6-previews/infra-engineer-design.md`.
@@ -196,7 +199,29 @@ a preview failed, and why:
 Before that step is on main, a missing build ends with a notice only, so the two pull requests can merge in either
 order (engine-architect's Medium).
 
-### 2.8 Privacy
+### 2.8 What the script must do (`hosting/preview.mjs`; the security-auditor's Medium B)
+- `find-pr`: check the commit id's form before any call. Accept only an open pull request from this repository
+  whose newest commit equals it; otherwise write nothing, and nothing deploys.
+- `check-build`: deploy only when the download's outcome is exactly `success`. Otherwise it never reads the folder
+  and deploys nothing (or fails visibly, section 2.7). It writes only `go=true` or `go=false`.
+- `recheck`: as G5.
+- `verify-token`: it calls the fixed host `api.cloudflare.com`, never an address taken from the environment.
+  - It prints only the token's status, `not_before` and `expires_on`.
+  - It reads the project's real subdomain from Cloudflare's project record, which can differ from the project name,
+    for `read-url`.
+- `read-url`: it requires the link to begin with `https://pr-<number>.` on that subdomain.
+- `check-headers`: as section 2.5.
+- `comment`:
+  - it checks the number, the commit and the link again, because they come from another job;
+  - it edits only the marked comment whose author is `github-actions[bot]`;
+  - it writes nothing when the commit is no longer the pull request's newest, so an older run cannot overwrite the
+    newer link's comment.
+- `reconcile`: as section 2.4.
+- Every command prints outside text (file names, pull-request fields, response headers) escaped as JSON, so no log
+  line can begin with `::`. Workflow commands reach the runner over its standard output.
+- M2 gives every pattern a test case with a trailing newline.
+
+### 2.9 Privacy
 Previews are public but unlisted (ADR 0006 part 2): they run the match offline and carry no unreleased art. So
 "Preview access" stays off. The same setting turns the wall on when unreleased art or the first multiplayer preview
 comes (#66 :99-103); that is decided then.
@@ -211,7 +236,7 @@ comes (#66 :99-103); that is decided then.
 | `hosting/_headers` | the preview header set | lane 2 |
 | `hosting/preview.mjs` | one script with eight commands: `find-pr`, `check-build`, `recheck`, `verify-token`, `read-url`, `check-headers`, `comment`, `reconcile`; Node's built-ins only | lane 2 |
 | `hosting/preview.test.mjs` | its tests on fixtures, each with a planted defect, plus G9's lint of `preview.yml`, run by the `tests` job | lane 2 |
-| `docs/runbooks/previews.md` | when something fails; the 30-day rule; the wall's switch; the token's end date and renewal | lane 2 |
+| `docs/runbooks/previews.md` | when something fails; the 30-day rule; the wall's switch; the token's end date and renewal; how to revoke the token (Manage Account, Account API Tokens, the token, Delete; a new one by clicks 6 and 8); that the previews account holds nothing else (no zone, Worker, storage, other project or other member); that two-factor login is on for his Cloudflare user | lane 2 |
 | STATUS, ROADMAP, REPO_MAP (`hosting/` and `docs/runbooks/` are new) and DECISIONS | the docs pass | lane 2's lines |
 
 Not touched: `gate.yml`, `toolchain.yml`, the gate's files, `crates/`, `packages/`, `.claude/`, any draft under
@@ -458,6 +483,9 @@ Settled by the advisor agent, not his to decide:
      - his own way past a required check, in the Revert rule, still exists.
      Clicks 6 to 8 then come in a second short sitting after the rule.
    - (b) He accepts the risk in writing for now, bounded by ACCOUNT (b), with (a) following as its own change-set.
+     (b) is available only with ACCOUNT (b).
+   - Under (a), the new rule must not let his own account skip `gate` and `smoke`. A ruleset's bypass covers every
+     rule in it (inferred), so infra-engineer measures both sides on the throwaway repository.
    - Two views:
      - The security-auditor recommends (a).
      - The advisor agent: the gap reaches all of main whatever he picks. Under ACCOUNT (b), the token adds only the
@@ -489,6 +517,8 @@ Settled by the advisor agent, not his to decide:
 | engine-architect High | LANE2-LOCKFILE |
 | engine-architect Mediums | G1, 2.5, 2.7 |
 | engine-architect Lows | 6.9, 2.1, 2.6, 3 |
+| Security revision 2, Mediums A to C | MAIN-WALL's wording; section 2.8, the script; the runbook line in section 3 |
+| Security revision 2, the Low on outsiders' closes | not taken: it would change `preview.yml`'s text. A fork's close only starts an extra reconcile run with the token; it is a follow-up |
 | Advisor revision 2, conditions 1 to 4 | section 4 (a second sitting under MAIN-WALL (a)); section 9; MAIN-WALL's proofs and its two views; TOKEN-WINDOW settled |
 
 ## Appendix: the three workflow texts his go covers (each byte for byte, with its sha256)

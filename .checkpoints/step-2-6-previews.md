@@ -38,21 +38,13 @@ His 18:15 message itself (uuid 42aa43e4..., 1778 bytes, sha256 e2554c4e...) goes
 5. Back to him for his go; nothing built before it.
 
 ## Current step
-5: plan revision 2 (1ac984a) with the security-auditor (texts included) and the advisor agent (what changed), both
-resumed with their context, started about 18:20 UTC.
-Done:
-- 4: three reads of revision 1:
-  - the advisor agent REVISE, C1 to C13 (it settled FIRST-RUN (a), LABEL (the pull-request run) and MAIN-BYPASS: main's
-    ruleset 25069670 asks for a pull request with 0 approvals and for gate and smoke, with no bypass actors);
-  - the security-auditor REVISE (a Critical older than step 2.6, MAIN-WALL: a branch's workflow could merge itself; the
-    guards G1 to G9; M1 with a worthless secret; reconcile looks every pull request up; the comment from checked values
-    only; 90 days for the token);
-  - engine-architect REVISE (a High: lane 2 owns no lockfile, by his words of 2026-11-18, "You own no manifest and no
-    lockfile", and Part 15 :72-74; it accepts departure 2, firmly with ACCOUNT (b)).
-- Revision 2 folds them all in (its section 13 maps each one); the three workflow texts are in texts/ and in its
-  Appendix with sha256 (preview.yml c66c0b0a..., preview-close.yml c2f1fa90..., wall-test.yml 3af06706...); my lint of
-  the texts passed. His quotes (a) to (d) were checked by script against message 42aa43e4.
-Next: when both answer, revision 3 if needed; then the questions file (his six decisions) pushed, and the plan to him.
+6: the plan goes to him. Revision 2 with seven text conditions folded in:
+- the advisor agent APPROVE, four conditions (a second sitting under MAIN-WALL (a); its proofs; its view beside the
+  security-auditor's; TOKEN-WINDOW settled at 90 days);
+- the security-auditor APPROVE for him, three Mediums (MAIN-WALL wording; section 2.8, the script's duties; the
+  runbook's lines). No High or Critical left; the three texts are unchanged (the appendix checked byte for byte).
+His five decisions are in `questions-2026-11-25.md` (TRIGGER, ACCOUNT, LANE2-LOCKFILE, DEPARTURES, MAIN-WALL).
+Next: wait for his answers and go. Then U1 to U9 (plan section 10).
 
 ## Rules in force
 - Until a second guard fix is merged: git and gh always start their own command, with no other program in front.
