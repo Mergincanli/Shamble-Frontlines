@@ -10,7 +10,7 @@
   `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is fast-forwarded to main 311c0484 (so the fixed guard loads) and is never switched ·
   **Base:** origin/main 311c0484f7a9697ae33e7a76a8cf0b507a2837c4 (taken in by merge commit 1802856)
-- **Last update:** 2026-11-25 19:05 Amsterdam
+- **Last update:** 2026-11-25 18:20 Amsterdam (from the clock)
 
 ## Steps done
 1. The takeover (2026-11-25): checks told to him in the first answer; ORDER-3C asked
@@ -53,7 +53,7 @@ session reads the code and writes the Testlines part (his point 8) meanwhile.
 - The checkpoint script cannot push from this worktree (it pushes the local branch's own name; this chat may push
   only to `claude/cool-pasteur-oiqk1r`): notes are committed by path and pushed by hand, and the background saver
   cannot run as it stands · this chat, 2026-11-25 · open, for the plan's "before any edit".
-- The session's worker restarted once (about 18:55 Amsterdam); nothing was lost (the notes were on disk).
+- The session's worker restarted once (about 18:00 Amsterdam); nothing was lost (the notes were on disk).
 
 ## Key numbers
 - 3c's parts as change-set 3's plan sized them: the recording 275 lines; the link simulator 595 lines.
@@ -67,4 +67,16 @@ session reads the code and writes the Testlines part (his point 8) meanwhile.
 - The board add-on is active for this chat (since 2026-11-25).
 
 ## Running work
-- None yet (the agents are started next; each is listed here with its notes file when it runs).
+- Three design agents, started 2026-11-25 about 18:10 Amsterdam, each on paper only, each writing one notes file in
+  `.checkpoints/cs4-walk/` (a restart continues from the notes; the brief of each is the main session's prompt):
+  - netcode-architect, `netcode-architect-cs4.md`: the recording as Walk's first step; every item named for 3c
+    placed by name; the command, the snapshot and the path; 3B-ONE-PER-TICK; 3B-RESUME-FLASH; the boundary marks.
+  - engine-architect, `engine-architect-cs4.md`: the content crate; the simulation's structure; the block and lane
+    2's list row by row; the page; the cut (one stop or two, the earliest playable step, the size ladder).
+  - rust-reviewer, `rust-reviewer-cs4.md`: the collision library and its dependency tree; the built-file check
+    for the fused multiply-add; our own movement; the integer time unit; the simulation's marks at Walk.
+- To start when one of them ends (at most 3 at a time): game-designer, `game-designer-cs4.md`: the old game's
+  movement rules and SLICE-FEEL (the input, the rule, the fields, what lands in change-set 8).
+- The main session's own notes: `testlines-cs4.md` (his point 8, a to g: written, values still to come from his
+  Export).
+- No saver runs (see "Open findings"): the main session commits the notes by hand at each update.
