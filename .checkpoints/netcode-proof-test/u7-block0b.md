@@ -36,8 +36,12 @@ files; free 4,536 -> 10,447 MiB), so the before-run is cold.
 - **Cost:** no logs, notes or commits lost (the shared target holds build output only); every build cache is cold
   again: this check's after-run, U7's R-half builder and U8's builder each start cold (about 20-40 min of build each,
   one lane at a time). Free disk after it: about 13.3 GB.
-- **Told:** Mustafa (this chat, and the day message msg-2026-11-26.md); the advisor at its next check (NB2's head read
-  or U7's round, whichever comes first).
+- **To tell:** Mustafa in this chat's next message (about 06:0x UTC) and in the day message msg-2026-11-26.md; the
+  advisor at its next check (NB2's head read or U7's round, whichever comes first).
+- **The rule from now on** (the advisor tool, 05:4x): a command naming .gate/shared-target goes out only if it equals
+  the card's Tools line character for character but for the profile word (`--profile dev`, `--profile release`,
+  `--doc`); never `--target <triple>`; the wasm half only as advisor-u4d2-m9.md's six lines give it (`--target-dir
+  <shared>/wasm32-unknown-unknown --profile ...`). On another exit 3: stop, `df`, and pick from that list only.
 
 ## Step 1, redone (05:3x UTC)
 - The same two edits by Edit, byte for byte as the first try: Cargo.toml +3 (the comment's two lines and
@@ -89,3 +93,17 @@ the CLI's own build folder is cleaned before it. Each step checks the same thing
   under .gate/u7-0b/: exit 101, "error: could not find `wasm-bindgen-cli` in registry `crates-io` with version
   `=0.2.130`" (.gate/u7-0b/step7-cli-offline.log). The CLI's .crate is not in ~/.cargo/registry/cache, so item (10)'s
   install (and its .crate sha256 check) needs one download. Nothing was built or downloaded.
+- **Not run on my own reading** (the advisor tool, 05:5x): the read's header says offline and C10 sends a difference
+  back to security. The question goes to security-auditor first in the 08:50 window: u7-0b-security-request.md (Q1 the
+  install with the network on, Q2 step 8's commit before step 7, Q3 the `env -C` form used for the database dates).
+  Blocks R1-R4 need the crate, not the CLI; the CLI is first used by build.mjs in T5 (ii), after R3 (u7-brief.md:59-63,
+  :129-132).
+
+## The redact step on the new lock (u7-brief.md:258-262, F26's line): PASS
+- `node spikes/netcode-proof/ops/operator/redact-check.mjs spikes/netcode-proof` (05:5x UTC): "redact-check: 371
+  item(s) checked, 0 finding(s)" (M5's count was 371 too).
+
+## Step 5 (from 05:48 UTC): RUNNING
+- One runner call, a background shell: `cargo check --workspace --all-targets --locked :: node check.mjs --only
+  test,deps` -> .gate/u7-0b/step5-after.log. Bars: no warning line in the check's section; the PASS test and PASS deps
+  lines equal before.log's but for the timings. While it runs: no other runner call and no clean.
