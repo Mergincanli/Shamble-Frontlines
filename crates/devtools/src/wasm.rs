@@ -9,6 +9,9 @@ use wasm_bindgen::prelude::*;
 // Linked whole, so that its start function installs the real hook and `panic_buffer` is an export of this module.
 use sim_wasm as _;
 
+use crate::files::vector_text;
+use crate::recording::{Recording, hashes_text};
+use crate::replay::replay;
 use crate::rules::{f32_ops, stream};
 
 /// The float vectors (PM-0004-22): an empty text when every operation gives the exact reference's results and
@@ -25,6 +28,47 @@ pub fn f32_vectors(inputs: &[u8], expected: &str) -> String {
 #[must_use]
 pub fn chacha8_vectors(file: &[u8]) -> String {
     stream::check(file).err().unwrap_or_default()
+}
+
+/// Reads a recording for the two calls below; a refusal comes back as a text that starts with `error: `.
+fn read_recording(bytes: &[u8]) -> Result<Recording, String> {
+    Recording::decode(bytes).map_err(|error| format!("error: {error}"))
+}
+
+/// The hashes file this module gives for a recording, both columns: the same runner as the native one, compiled to
+/// WebAssembly. The whole-state column is why it lives here and not on the players' file, which gives the shared
+/// hash only.
+#[wasm_bindgen]
+#[must_use]
+pub fn replay_hashes(recording: &[u8]) -> String {
+    let replayed = read_recording(recording)
+        .and_then(|read| replay(&read).map_err(|error| format!("error: {error}")));
+    match replayed {
+        Ok(lines) => hashes_text(recording, &lines),
+        Err(why) => why,
+    }
+}
+
+/// The vector file's text for `tick` as this module gives it (`files::vector_text`): the state as lines, one named
+/// field each (the seed is never among them), then the shared state's bytes and their hash. Compared line by line
+/// with the native text, it shows which fields two targets disagree on.
+#[wasm_bindgen]
+#[must_use]
+pub fn replay_state_at(recording: &[u8], tick: u32) -> String {
+    let text = read_recording(recording)
+        .and_then(|read| vector_text(&read, tick).map_err(|error| format!("error: {error}")));
+    text.unwrap_or_else(|why| why)
+}
+
+/// The state hash's function over `length` bytes, `rounds` times over: for the reading of its cost in WebAssembly
+/// (PM-0004-21's report), timed by whoever calls it. It returns the digests folded together.
+#[wasm_bindgen]
+#[must_use]
+pub fn fnv1a_64_rounds(length: u32, rounds: u32) -> u64 {
+    let bytes: Vec<u8> = (0..length).map(|at| (at * 31 % 251) as u8).collect();
+    (0..rounds).fold(0, |folded, round| {
+        folded.rotate_left(1) ^ sim::state_hash::fnv1a_64(black_box(&bytes)) ^ u64::from(round)
+    })
 }
 
 /// PM-0002-53's planted counter: a plain `+`, which panics past the counter's end in every build.
