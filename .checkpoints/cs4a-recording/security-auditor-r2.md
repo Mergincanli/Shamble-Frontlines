@@ -56,3 +56,14 @@ Threat model unchanged from round 1 (five lines there); what round 2 must add to
   033 and \a raw (od -c): a dump from another machine (the tool's very use: two targets' prints) can drive the
   terminal. Fix: escape each printed line (`line.escape_debug()` in the `fields` arm), 1 line.
 - Copy removed with `git worktree remove` (it was clean); `.gate/sa-target` still left (round 1's refusal).
+- Read, no finding: Fnv1a64 (state_hash.rs:15) has a private field and no derives; `trait Bytes` (world.rs:69) and
+  `Canonical` (:86) are private; fnv1a_64_rounds capped at 2^24 (R3 fixed; test-only); recording.ts reorder keeps every
+  DataView read inside checked bounds; the spec's digest check is identity, not security; messages.ts, host.ts and
+  worker.ts are untouched, so the page's reach is as in round 1.
+- Note (not a finding): `World::write_state` (world.rs:191, whole bytes, seed included, into a caller's Vec) is now
+  called only by sim's own tests (:296, :381); it could become test-only with C2 (change-set 8), 1 line.
+- Item 4: S1-S4 fixed. Still to name to Mustafa as open: S3's read side (follow-up for the gate step, as the fold
+  records), and R2-1 unless its 1-line fix rides a push. C1-C4 are conditions on later change-sets, not open findings
+  against 4a (they stay STATUS follow-ups).
+- Verdict: APPROVE. Nothing Critical, High or Medium. One new Low (R2-1, 1 line).
+DONE

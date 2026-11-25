@@ -171,3 +171,18 @@ force the shape 4c needs, a count and then rows; change-set 7: a hash that borro
 hashing a restored or predicted world every tick). A note for 4c, no line now: hand over every slot of the soldier
 table, with its occupied flag and generation, so that line i of a state print is always slot i and the field
 comparison never misaligns on a missing row.
+
+## security-auditor: APPROVE; its four Lows fixed; one new Low (`security-auditor-r2.md`)
+It ran the link cases in a copy: a recording file as a link to a file outside the repository, the folder itself as a
+link, a link to an endless device: write mode and `--check` refuse each, quote the path, and nothing outside is
+touched. With the child's variable set but not the parent's arguments the two-process test acts as the parent and
+compares. On the buffer-free hash: it removes two places where state bytes lay (the room's buffer of shared bytes
+and the tools' buffer of whole-state bytes, seed included); the export is read-only by its type.
+| # | Severity | Finding | Decision |
+|---|---|---|---|
+| SA2-1 | Low | `replay fields` prints the differing lines of two files as they are: a state print from someone else's machine could carry control characters to the terminal (shown with a title-setting sequence) | Fix, 1 line, in the next push: each printed line is escaped |
+**Left open, to be named to Mustafa in the report:** S3's read side. The tests that read the recordings still follow
+a link (with `first-loop.rec` linked to an endless device a test reads until memory runs out); the folder check
+refuses such a link, so CI cannot go green with one, and the exposure is a test run on a hostile branch. Its fix is a
+repository-wide "no tracked links" check: a gate change, risk tier 2, a follow-up for the quality gate step (2.3).
+Its conditions C1 to C4 stay follow-ups for the change-sets it named.
