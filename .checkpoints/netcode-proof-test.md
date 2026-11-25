@@ -141,8 +141,8 @@
 - **Running now (19:5x UTC):** no agent, no workflow; U7's T-builder below finished its partial hand-back 19:5x (resume it by SendMessage at the amended base) (finished: MAIN-66's check a0530735048f1620a, step 7's read may resume it at 23:50; security a80b793aaa16b450e on the 0b amendment, resumable for its condition 7). U7's T-builder a9873cdba07a3219e on brief 3 (resumed 18:5x; worktree
   .claude/worktrees/agent-a9873cdba07a3219e, 577816c fast-forwarded to 7e2d6f3 by itself; notes u7-build-rs.md beside
   u7-t-build.md there, untracked (both copied to the main notes 20:5x; its tree saved as wip/u7-build-rs.patch); resume point: its notes' last block). One background shell: the saver bu59it97m (`node
-  .claude/scripts/checkpoint.mjs watch netcode-proof-test`, the two trailers; restarted 19:35 after MAIN-66's push, for 110 min: ends about 21:25; TaskStop bu59it97m stops it).
-  bhe11brxq was stopped at MAIN-66's step 1 (19:27). When bu59it97m ends: a hand save if anything waits, then a restart.
+  .claude/scripts/checkpoint.mjs watch netcode-proof-test`, the two trailers; restarted 19:35 after MAIN-66's push; it ended 21:25 after its 110 min, exit 0, nothing waiting). No saver runs now: no long run before the 23:50 reset (CHECKPOINTS.md: the saver is for long runs).
+  bhe11brxq was stopped at MAIN-66's step 1 (19:27). The saver restarts with the next long run after the reset (run_in_background, timeout 7200000).
 - **Finished, resumable by SendMessage (each from its own notes):** U8's builder ac59cce3e5d002441 (worktree at 096808b;
   notes u8-build.md "## C9"; nothing until U8's merge); the advisor a3de649cd25e474df (U8's rulings; takes U8's head
   read); NB2's plan check a10848a10f73ed39e (advisor-nb2-merge.md).
