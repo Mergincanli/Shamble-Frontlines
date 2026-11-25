@@ -16,6 +16,22 @@ export interface ReportData {
   readonly blocks: number;
   readonly blockBytes: number;
   readonly posts: number;
+  /** The newest block's count of messages the endpoint sent and received and of messages either side refused. */
+  readonly messages: { readonly sent: number; readonly received: number; readonly refused: number };
+  /** The number of the post from which the last command the server ran was built. */
+  readonly postUsed: number;
+  /** The keys the page reads, by name. */
+  readonly keys: string;
+  /**
+   * Presses and releases the page made and the server's echo brought back. `lost` is made less echoed (negative:
+   * doubled) once the keys have been quiet for a moment, and `null` while the newest echo may still be on its way.
+   */
+  readonly presses: { readonly made: number; readonly echoed: number; readonly lost: number | null };
+  readonly releases: { readonly made: number; readonly echoed: number };
+  /** From a key change to the start of the tick that took it up: the median, the 95th percentile and how many were timed. */
+  readonly keyToTickP50: number;
+  readonly keyToTickP95: number;
+  readonly keyToTickCount: number;
   readonly frames: number;
   readonly fps: number;
   readonly frameP50: number;
@@ -41,6 +57,12 @@ export function fixed(value: number, digits: number): string {
 
 const ms = (value: number): string => (Number.isFinite(value) ? `${fixed(value, 2)} ms` : "no reading yet");
 
+/** Presses that did not come back, in words: none are named lost before the keys have been quiet for a moment. */
+function lostWords(lost: number | null): string {
+  if (lost === null) return "(counting)";
+  return lost < 0 ? `${-lost} doubled` : `${lost} lost`;
+}
+
 /** Why this backend runs: a fallback that was asked for reads differently from one the browser fell back to. */
 function backendLine(data: ReportData): string {
   const why =
@@ -61,6 +83,8 @@ export function readoutLines(data: ReportData): string[] {
     backendLine(data),
     `ticks: ${data.tick} at ${data.tickHz} a second · blocks: ${data.blocks} of ${data.blockBytes} bytes`,
     `frames: ${fixed(data.fps, 1)} a second · frame time ${ms(data.frameP50)} (p99 ${ms(data.frameP99)})`,
+    `messages: sent ${data.messages.sent} · received ${data.messages.received} · refused ${data.messages.refused}`,
+    `presses: ${data.presses.made} made · ${data.presses.echoed} echoed · ${lostWords(data.presses.lost)}`,
     `errors: ${data.errors}${data.lastError === "" ? "" : ` (last: ${data.lastError})`}`,
     pause === null
       ? "last pause: none yet"
@@ -90,6 +114,19 @@ export function formatReport(data: ReportData): string {
     ["blocks", data.blocks],
     ["blockBytes", data.blockBytes],
     ["inputPosts", data.posts],
+    ["messages.sent", data.messages.sent],
+    ["messages.received", data.messages.received],
+    ["messages.refused", data.messages.refused],
+    ["postUsed", data.postUsed],
+    ["keys.bound", data.keys],
+    ["presses.made", data.presses.made],
+    ["presses.echoed", data.presses.echoed],
+    ["presses.lost", data.presses.lost ?? "(counting)"],
+    ["releases.made", data.releases.made],
+    ["releases.echoed", data.releases.echoed],
+    ["keyToTickP50", ms(data.keyToTickP50)],
+    ["keyToTickP95", ms(data.keyToTickP95)],
+    ["keyToTickCount", data.keyToTickCount],
     ["frames", data.frames],
     ["fps", fixed(data.fps, 2)],
     ["frameP50", ms(data.frameP50)],

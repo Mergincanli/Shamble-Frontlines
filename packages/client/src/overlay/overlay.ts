@@ -16,6 +16,8 @@ export class Overlay {
     button.type = "button";
     button.textContent = "Copy report";
     button.addEventListener("click", () => {
+      // The button gives the focus back, so the game's keys go on working after a click on it.
+      button.blur();
       const report = makeReport();
       // The clipboard can be refused (no permission, no focus): then the text is shown to be copied by hand.
       navigator.clipboard.writeText(report).then(

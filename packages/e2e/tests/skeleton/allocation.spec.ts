@@ -1,9 +1,11 @@
 // The method of PM-0002-7 ("the boundary makes no garbage on the page"): a sampling heap profile through the Chrome
 // DevTools Protocol that also counts objects already collected, with allocations attributed by function. The mark
 // itself is judged in change-set 5, over a 10-minute match on a named machine; here the method runs for a few
-// seconds, prints what it attributes to the page's hand-off code (WorkerLink's `receive`, which unpacks the
-// message event, and `frame`, with all they call), and must be able to see a small leak: the upper limits below sit between the clean page and one
-// planted 64-byte typed array per frame or per block.
+// seconds, prints what it attributes to the page's hand-off code, and must be able to see a small leak: the upper
+// limits below sit between the clean page and one planted 64-byte typed array per frame or per block. Per block
+// that code is the message listener's whole body (`blockArrived`, which calls WorkerLink's `receive`: it unpacks
+// the message event and reads the tick, the echo and the link's counts). Per frame it is WorkerLink's `frame`,
+// which reads the keys and posts the input, and the key diagram's `follow`, each with all they call.
 //
 // What this method cannot do, found by perf-auditor: once the browser optimises the page's code it charges an
 // inlined function to its caller, and the sums by name fall towards 0. The message listener reaches that after
@@ -44,11 +46,13 @@ test("the sampling heap profile attributes the hand-off's allocations by functio
   const { profile } = (await session.send("HeapProfiler.stopSampling")) as { profile: { head: Node } };
   const frames = after.frames - before.frames;
   const blocks = after.blocks - before.blocks;
-  const perFrame = under(profile.head, "frame") / frames;
-  const perBlock = under(profile.head, "receive") / blocks;
-  const rate = (under(profile.head, "frame") + under(profile.head, "receive")) / 8;
+  const inFrames = under(profile.head, "frame") + under(profile.head, "follow");
+  const perFrame = inFrames / frames;
+  const perBlock = under(profile.head, "blockArrived") / blocks;
+  const rate = (inFrames + under(profile.head, "blockArrived")) / 8;
   console.log(
-    `allocation in the page's hand-off code: ${perFrame.toFixed(0)} bytes per frame posting the input, ` +
+    `allocation in the page's hand-off code: ${perFrame.toFixed(0)} bytes per frame posting the input and lighting the keys ` +
+      `(${under(profile.head, "follow")} bytes of it in the key diagram, over the whole window), ` +
       `${perBlock.toFixed(0)} bytes per block received, ${rate.toFixed(0)} bytes a second ` +
       `(${frames} frames in ${windowMs} ms, blocks ${before.blocks} to ${after.blocks}, ${after.worker?.drops} drops, ` +
       `${total(profile.head)} bytes sampled on the whole page)`,
@@ -57,14 +61,14 @@ test("the sampling heap profile attributes the hand-off's allocations by functio
   expect(after.blocks).toBeLessThan(420);
   expect(frames).toBeGreaterThan(20);
   expect(blocks).toBeGreaterThan(200);
-  // The clean page allocates the input message per frame (about 65 bytes) and, per block, the message event's own
-  // data and one view (about 505 bytes before the listener is optimised). Each limit sits between that and one
-  // planted 64-byte typed array more (about 170 bytes more per frame, about 215 per block); each floor tells a run
-  // that lost the names to inlining, in part or whole, from a clean one.
+  // The clean page allocates the input message per frame (about 80 bytes; the key diagram none) and, per block, the
+  // message event's own data and one view (550 to 585 bytes before the listener is optimised). Each limit sits
+  // between that and one planted 64-byte typed array more (about 170 bytes more per frame, about 215 per block);
+  // each floor tells a run that lost the names to inlining, in part or whole, from a clean one.
   expect(perFrame).toBeGreaterThan(25);
   expect(perFrame).toBeLessThan(170);
   expect(perBlock).toBeGreaterThan(430);
-  expect(perBlock).toBeLessThan(610);
+  expect(perBlock).toBeLessThan(680);
   // PM-0002-7's own rate, far above what this page does: under 0.1 MB a second.
   expect(rate).toBeLessThan(100_000);
 });
