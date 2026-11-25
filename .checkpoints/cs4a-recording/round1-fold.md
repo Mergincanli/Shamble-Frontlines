@@ -39,7 +39,24 @@ went: 1,307 of code (the hash 323, `Room::new` out of line 322, the visitor 206,
 `Vec`'s grow path about 273), 448 of function names, 39 of tables. Its copies `.gate/rr-4a` and `.gate/rr-4a-base`
 are removed with `git worktree remove` when the round is over.
 
-## test-engineer: (running)
+## test-engineer: REVISE (small); no product defect found; the gaps are in the evidence (`test-engineer-r1.md`)
+| # | Severity | Finding | Decision |
+|---|---|---|---|
+| T1 | Medium (High if the report said "three of three") | The same as N1: the hash map's order and the outside draw are reported only as "digests differ" (`two_processes.rs:92`): no tick, no field | Fix: the two-process test names the first step that differs (about 15 lines); the plants take the tick from `replay check` and the field from two `replay state` runs in two processes (notes) |
+| T2 | Medium | Plant C catches its defect only by chance: its fold has 64 values (measured on 200,000 hash maps: two agree 1 time in 64); in the first run its half on the committed recording missed, and only the 36,000-step half caught it | Fix in the plants script (notes): fold the order into 8 bytes, as plant D does, and print both orders |
+| T3 | Low | Plant B's counter survives between runs, so solo checks fail too: it cannot show what the two-matches tests add. test-engineer's own plant (state that leaks only between interleaved matches) turns exactly N3 and W2 red and leaves the solo checks green | Fix in the plants script (notes): add that plant, keep B |
+| T4 | Low | No test makes `replayOn` refuse a recording: with its check deleted `recording.test.ts` stays green (the refusal lines call `checkReplayable` directly) | Fix, about 3 lines |
+| T5 | Low | The TypeScript reader's refusal of a map id that is no UTF-8 is reached by no test, and its order differs from the Rust reader's by one check, against its own header comment | Fix, about 3 lines: one test, and the order made the Rust reader's |
+| T6 | Low | A Rust test is named "refused before any memory is taken" and asserts only the errors | Fix, 1 line: the name |
+| T7 | Low | The plants' evidence: no commit id in the result; the clean run never checks that the tree equals HEAD; the script edits the worktree other reviewers read; "11 of 11" is 6 defects on 9 targets, one field line and one control | Fix on the next run (notes): print the commit, end on an empty `git status` for `crates` and `packages`, run in a worktree of its own, count the lines for what they are |
+| T8 | Low | `hash_cost.rs` cannot fail (a reading) and takes 1.7 seconds of every debug run | Leave: it is the report's reading and CI's log shows it ran |
+| T9 | Low, wording for the report | Say: the two-process test runs in debug in CI (the release line is `-p sim -p protocol` until the small CI change E1); PM-0004-17 runs at the recordings' lengths (1,800 and 1,500 steps), not M10's 18,000; plant E is a stand-in and the search for a sine input where the two targets differ was not run; in CI a red replay names the step, and the field comes from two dumps by hand | The report |
+Its mark-by-mark table: every mark 4a carries is shown by a test that goes red on its defect, but PM-0004-21's "each
+of three at its tick with a field" (2 of 3 open: T1). Follow-ups it names for 4c: one known answer with every field
+non-zero, read by both readers; the two-process test's line filter (N6); the real sine search and the three
+injections on movement fields; the replay loop pinned to the live host's call order and its rebase on resume;
+`scripts.rs`'s button numbers pinned to `keyboard.ts`. For the small CI change E1: the tools crate's tests in release.
+It left `.gate/te-4a` (a worktree), `.gate/te-4a-target` and `.gate/te-scratch` behind: its delete was refused.
 
 ## engine-architect: (running)
 
