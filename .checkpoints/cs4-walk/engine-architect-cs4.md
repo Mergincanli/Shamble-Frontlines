@@ -934,4 +934,43 @@ tick's due time inside a catch-up wake; a Vite dev-server plugin pushing a custo
 Worker; a TypeScript writer matching the Rust canonical writer byte for byte; ts-rs on content structs (and on structs a
 `macro_rules!` writes, if the plan uses one); the BVH dump compared byte for byte across targets.
 
+## Block 8. The questions for Mustafa, in one place, and two items the blocks left implicit (DONE)
+- N60. DEPART-3 (a) accepted "three limits are code, not data, until the content crate exists in change-set 4"
+  (cs3 plan :312-313, ADR 0001 line 221): with content in cs4 they would move into content. Proposed: they stay code
+  until cs7 rebuilds the room's command scheduler behind one seam (build plan :389-391), so they move once; a departure
+  for the list, netcode-architect's to confirm.
+- N61. Part 15.2 :93-94 gives lane 1 `content/` "for movement, weapons and the test scene"; `content/camera/` is
+  neither: the plan should say lane 1 owns it until cs5's merge and that it passes to lane 2 with `camera/`.
+Questions (each self-contained in the plan's "Decisions needed"):
+1. CONTENT-SOURCE (block 1.2): who writes the code that reads and checks the game's data files? (a) the libraries ADR
+   0005 names (serde_json with float_roundtrip, serde_path_to_error, garde; schemars and ts-rs at build time): least
+   code of ours, 5 to 8 outside crates in the players' file; (b) serde_json's untyped tree with our own checks and
+   schema: 5 outside crates, duplicate keys pass silently; (c) all ours: no outside code, about 1,130 more planned lines
+   in 4a, number text identical to the browser's own. Recommended (c).
+2. WALK-CUT (block 5.2): (a) two stops: 4a the walking soldier with the camera panel and every proof of his movement,
+   4b aiming down sights and the content's remaining proofs (recommended); (b) one stop; (c) two stops with sights in
+   4a (4a larger, 4b then nothing to see, so no Brave check). Earliest early look: after 4a's step 5a; recommended after
+   5b (with the mouse aim).
+3. ADS-DELAY (SLICE-FEEL's placement): the per-gun delays after a sprint (before firing, before aiming down sights),
+   W4's swing field and the spread at sights: (a) all with the guns in cs8, in each weapon's file (recommended: each
+   value lands in its one home; lane 2 reads W4 in cs10, after cs8); (b) the sprint-to-sights delay as one value for
+   every gun in 4b's movement file, moved per gun in cs8 (he feels it one part earlier; one migration; its home moves
+   once).
+4. GREY-COLOURS (block 4.10): the greybox scene and the plain stand-in: (a) LOOP_V2 §9's own default, brightness by
+   height, neutral greys (recommended); (b) the Art lead's palette A and the brief's faction colours as placeholders;
+   (c) one flat grey. Look: his.
+5. CAM-HOME (block 4.10): camera values that his Testlines Export might also hold: (a) home is the camera file, tuned
+   in the panel (recommended); (b) home is the Export.
+6. RESUME-FLASH (3B-RESUME-FLASH, block 4.9): the first picture after a hidden tab: (a) the match as it stood, then he
+   slows to a stop (about 0.45 s) since every key was let go (recommended); (b) the Worker also stops him when the tab
+   hides (a rule only offline play would have).
+7. COLLIDER-SIZE (block 1.6): the soldier's collision capsule, a starting number he can change after Brave like
+   START-RULES: (a) radius 0.30 m (the coat hem's half width, 0.61 / 2 rounded) and height 1.80 m (the placeholder
+   height); (b) radius 0.25 m (the shoulders' half width, 0.49 / 2 rounded); (c) the game-designer proposes first.
+   Recommended (a), to be confirmed by the game-designer in the plan's review.
+8. DEPART-4 (the departures, as DEPART-3 was asked): our own seeded generator for PM-0004-15 (no proptest); under
+   CONTENT-SOURCE (c) our own reader in place of ADR 0005's crates, PM-0005-7's "garde range" read as "the field
+   table's range"; header offsets as layout constants (cs1's note); the blend stamp on the block message (picture.ts's
+   sentence); PM-0005-14's "kept value equal to legacy's" read as "not replaced by his Export"; PM-0004-39 headless only;
+   DEPART-3's three limits staying code until cs7 (N60). Recommended: accept all.
 DONE
