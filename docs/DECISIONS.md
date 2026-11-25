@@ -127,6 +127,76 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 19:36:53 UTC: his go on step 2.6's plan (revision 2, at c40f3f9), with his answers:
+  TRIGGER (a); ACCOUNT (b), a new free Cloudflare account for previews only; LANE2-LOCKFILE (b), lane 2 owns
+  hosting/package.json and hosting/package-lock.json, for the upload tool only, outside the game's install, and nothing
+  else of his words of 18 November changes; DEPARTURES (a), all nine stand, each to the drafts' next revision; MAIN-WALL
+  (b), the risk accepted in writing for now because the token reaches a previews-only account, the wall going to the
+  Guard fix chat as its next change-set, and the real token his last click: if the wall is merged by then, his
+  acceptance ends there; if not, he is asked again before that click; his go covers the three workflow texts by their
+  sha256; the security-auditor reads preview.yml as it stands, with the token step added after its review, in round 1; a
+  text a review changes comes back to him with its sha256 before his sitting; the request to the CI Builder chat as
+  planned; the wall's detail kept out of every further pushed file** (the builder chat he calls Builder V2, lane 2 of
+  the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For Builder V2,
+  from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam)"; message
+  fa086681-5e34-42cd-b549-d920748365c2, whole; extracted by script from the chat's transcript). Records, not his words:
+  TRIGGER, ACCOUNT, LANE2-LOCKFILE, DEPARTURES and MAIN-WALL are the five decisions of step 2.6's plan, revision 2,
+  section 12, carried in its report; the request to the CI Builder chat is comment 7172595904 on issue #59. Copied by
+  script (1579 bytes, sha256 3c4f0d233f522c2253a73583bea7dcb5efb543d1aaf7b97dd129f5b475f9e3d1):
+> For Builder V2, from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam).
+> My go on step 2.6's plan (revision 2, at c40f3f9), with these answers:
+> 1. TRIGGER: (a).
+> 2. ACCOUNT: (b), a new free Cloudflare account for previews only.
+> 3. LANE2-LOCKFILE: (b). Lane 2 owns hosting/package.json and hosting/package-lock.json, for the upload tool only, outside the game's install. Nothing else of my words of 18 November changes.
+> 4. DEPARTURES: (a), all nine stand, each to the drafts' next revision.
+> 5. MAIN-WALL: (b). I accept the risk in writing for now, because the token reaches a previews-only account. The wall goes to the Guard fix chat as its next change-set. The real token is my last click: if the wall is merged by then, this acceptance ends there; if not, ask me again before that click.
+> 6. My go covers the three texts by their sha256: preview.yml c66c0b0a9351a528695908c57f7256d2cd18713219c5698a17eaebaac469c28e, preview-close.yml c2f1fa90511db0f558d4e9287d64e189877f8cbc03eb27e6efbe08787fe20e66, wall-test.yml 3af067068060971beba8444346fdb836b7779a41403ac09d25e43027e8b18507. The security-auditor reads preview.yml as it stands now, with the token step you added after its review, in round 1. If a review changes a text, bring me the new text and its sha256 before my sitting.
+> 7. Send the request to the CI Builder as planned, and keep the wall's detail out of every further pushed file.
+> Unchanged: git and gh always start their own command, with no other program in front of them. A merge is on my go for the approved head, after my Advisor's merge check.
+- **Taken by Mustafa, 2026-11-25, 17:11:56 UTC: his go to merge pull request #67 at exactly
+  35adfbeb04d0326aa69a06356ff121e2fecc96ea, passed as the expected head, by a normal merge commit, which is also his go
+  on the revised header row; after the merge, the main folder fast-forwarded to main and main's new commit id to him;
+  then step 2.6's plan, the preview links: plan first, the advisor agent's review, then back to him for his go, nothing
+  built before it, the plan holding what his WORKERS-NEXT answer asks, every click of his listed once in the order he
+  does them for one sitting, the request to the CI Builder chat, and the day of the first preview link said honestly;
+  his 17:05 message into the decisions file and the dated pointer in the report go into step 2.6's first pull request**
+  (the builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on
+  his personal account; his label: "For Builder V2, from me, written with my main Advisor (25 November, 18:15
+  Amsterdam)"; message 42aa43e4-5bfd-4e61-ab7d-d94f48b51c03, whole; extracted by script from the chat's transcript).
+  Records, not his words: #67 merged as c1da1bd24faae21794195e2384895460753a41eb (2026-11-25), with 35adfbe as the
+  expected head. Copied by script (1778 bytes, sha256 e2554c4e039ca10046bd77af9f1ab9cbb44cfdbdfe0f958a7f163e2ba6bb5e07):
+> For Builder V2, from me, written with my main Advisor (25 November, 18:15 Amsterdam).
+>
+> 1. Merge #67. My go is for exactly the commit 35adfbeb04d0326aa69a06356ff121e2fecc96ea, passed as the expected head, by a normal merge commit, as for #66. My Advisor's merge check passed on it at 18:15 Amsterdam: main 311c0484 is inside, eight docs files, no notes folder, gate, smoke and toolchain green, the draft's file unchanged since its first check, the other chats' lines unchanged. If the head is anything else or a check is not green, do not merge and tell me in one line. This go is also my go on the revised header row.
+> 2. After the merge: fast-forward your main folder to main, tell me main's new commit id, and tell me in one line whether your session now loads the fixed guard. Until a second guard fix is merged, git and gh still always start their own command.
+> 3. Then step 2.6's plan, the preview links, as my order of 25 November has it. Plan first, your advisor agent's review, then back to me for my go; nothing built before it. In the plan:
+>    a. what my WORKERS-NEXT answer asks: the deploy step small enough to move, two lines on what a move would cost, and the 30-day rule for old previews;
+>    b. every click I have to do myself (the Cloudflare project, the deploy token, anything on GitHub), listed once, in the order I do them, so that I can do them in one sitting;
+>    c. what you need from the CI Builder chat (the edit that hands the tested build to the preview job), as a request it can act on;
+>    d. the day I can expect the first preview link, said honestly.
+> 4. The two small notes you kept for your next pull request (my 17:05 message into the decisions file, the dated pointer in the report) go into step 2.6's first pull request.
+>
+> Answer in at most 6 lines.
+- **Taken by Mustafa, 2026-11-25, 16:41:51 UTC: his order before his go on pull request #67: main taken into lane 2's
+  branch again, after the guard fix (pull request #69), by one merge commit keeping both sides' text, the other chat's
+  lines byte for byte, and keeping #69's removal of the "in flight" rows of #66 and #68 from STATUS; then the advisor
+  agent's approval of exactly that commit, green checks, and its full commit id to him; the interim rule widened until a
+  second guard fix is merged: git and gh always start their own command, with no other program in front of them** (the
+  builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his
+  personal account; his label: "For Builder V2, from me, written with my main Advisor (25 November, 17:05 Amsterdam)";
+  message 0ff798eb-597c-4f56-8981-cb2afa5a5e24, whole; extracted by script from the chat's transcript). Records, not his
+  words: 216fb21e is the commit he thanks for (his step-4 condition in every place it is reported, after main with #68
+  was taken in); the merge commit his order asked for is 35adfbeb04d0326aa69a06356ff121e2fecc96ea, the head his go of
+  18:15 Amsterdam names. Copied by script (1094 bytes, sha256
+  c41b21e8a1128ff144f43f44f1c6d68497d7c78b57c8c992ce04e8d34dfde869):
+> For Builder V2, from me, written with my main Advisor (25 November, 17:05 Amsterdam).
+>
+> 1. Thank you for 216fb21e: main is in and my answers are recorded.
+> 2. One more turn before my go, because main moved again. The guard fix (pull request #69, another chat) is merged. It changed docs/STATUS.md and docs/ROADMAP.md, and a trial merge shows #67 now conflicts in those two files only. Take the new main in by one merge commit that keeps both sides' text, the other chat's lines byte for byte. Its docs pass removed the "in flight" rows of #66 and #68 from STATUS to stay within 120 lines: keep that. If main does not show #69's merge yet, tell me and wait.
+> 3. Then your advisor agent's approval of exactly that commit, green checks, and its full commit id to me in one line. My Advisor runs its merge check on it and I give my go.
+> 4. The interim rule is wider now, until a second guard fix is merged: git and gh always start their own command, with no other program in front of them. Tell me in one line whether your session loads the fixed guard after taking main in.
+>
+> Answer in at most 5 lines.
 - **Taken by Mustafa, 2026-11-25, 13:55:08 UTC: his answers on pull request #67: PASS-WORDS (a), the three re-worded
   places stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads
   "recorded, the question is not answered", never "passed" on its own, and until someone shows a count the previews work
