@@ -37,3 +37,7 @@ as -57's kept sets, with -57 not run in that merge (advisor-nb2-merge.md:310-311
    folder: history.md:7942.
 
 ## Done (the script's own lines, per set)
+1. u4r-P2-8ee453c22882: list 18 files, 776,378,964 bytes, committed cc8180a, pushed with c843b66. pack 11:22 UTC:
+   "free before: 13330 MiB"; "archive: .gate/netcode-proof-test/kept-logs/u4r-P2-8ee453c22882.tar.gz, 219643715 bytes
+   from 776378964; read back: 18 of 18 files equal the list (path, bytes, sha256)"; "removed:
+   .gate/netcode-proof-test/runs/u4r-P2-8ee453c22882"; "free after: 13862 MiB".
