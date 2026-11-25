@@ -17,8 +17,11 @@
 7. security-auditor round 2 on 11887d0: APPROVE; Lows SA-R2-1 (3 rows, ridden: c3827f4), SA-R2-2 (long lines vs the hook timeout, same class on main: follow-up), nit (shownWord leaves U+2028/9 and bidi controls; no tab row: follow-up) · notes security-auditor-r2.md
 8. The automated plugin review flagged env -S's blank split vs env's own parse (Medium): checked main vs head with unwrap() alone (scratchpad split-check.mjs): where they differ main gave no check, head asks; no deny→ask versus main. Kept (ask, per the approved plan); in the report.
 
+9. The verifier on c3827f4: FAIL on V-1 (High, evidence: probe-after.txt stale since 11887d0, 2 of 21 rows); code checks 1-4, 6, 7 clean; V-2 (Low: since 11887d0 unwrap()'s argv is not always a suffix, so dayFolder can track a cd inside env -S's value; outcome still ask/agent deny, 714-line sweep 0 flips) · notes verifier.md
+10. V-1 fixed: probe-after.txt regenerated from the head, diff clean · this commit
+
 ## Current step
-The verifier on c3827f4.
+The verifier's re-run (V-1).
 
 ## Next steps
 1. The verifier on c3827f4 (the final code head).
@@ -29,6 +32,7 @@ The verifier on c3827f4.
 - SEC-U7B-1 · security-u7-0b-answer.md · fixed in 21615cb + 11887d0 (pending round 2)
 - SA-R1-2 (Medium) · fixed 11887d0 · SA-R1-1, SA-R1-4 (Low) · fixed 11887d0
 - SA-R1-3 (Low, on main too: unwrap()'s 20-turn cap) · deferred: STATUS follow-up, worded without forms
+- V-1 (High, evidence) · fixed in a checkpoint-only commit · V-2 (Low, dayFolder's suffix assumption since 11887d0) · follow-up (rounds used; never a silent pass)
 - SA-R2-1 (Low) · fixed c3827f4 · SA-R2-2 (Low, on main too: long lines vs hook timeout) · follow-up · SR2 nit (shownWord: U+2028/9, bidi; tab row) · follow-up
 - Same-class gaps outside the scope · this session · reported to Mustafa, not fixed (forms kept out of the repo)
 
