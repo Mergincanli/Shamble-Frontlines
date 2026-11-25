@@ -7934,3 +7934,24 @@ Answer in at most 6 lines.
   under a millisecond by reading, not measured; (a) keep, recommended; (b) a small follow-up, by the end of Sat 28
   November (Amsterdam). His sentence on the 214 drops stands as written above.
 - **Next:** C9 (U8's snapshot), M9 (the push, the saver, CI on PR #40), then U7's Block 0b check (NB2-C1).
+
+## Mustafa, 2026-11-25 11:07 UTC, in this chat: DISK-PACK (b), NPT-EDGE-SLIVER (a), the game's own link simulator (word for word)
+```text
+For the netcode chat, from me, written with my main Advisor (25 November, 12:15 Amsterdam). Lean mode stays as it is.
+
+1. DISK-PACK (may you pack seven closed sets of test logs to free about 2.3 GiB): (b), all seven, by the kept-logs rule as it stands (CHECKPOINTS.md section 11): one at a time, never while a run set or a build runs, each only after you confirmed that its results are committed and its ruling is closed, its list committed first, and the folder removed only when every hash matches. This is my word for fc411116c1f1 and fd4612050cd6 too. If one folder does not match its list, it stays, you pack nothing more and you tell me. u4f-47-b57221ed139d stays unpacked until the re-judge after Netcode Builder 2's merge.
+2. NPT-EDGE-SLIVER (the probe's first reading of dropped packets comes just after a leg starts, not before): (a), keep it as merged. Write the gap into R1's report in one line as a known limit of the reading: under a millisecond by reading the code, not measured. The measured window stays fully counted.
+3. For your message at the run-plan review, nothing to do before R1: the game builds its own link simulator in its change-set 3c (it moved out of change-set 3b), so a later promotion of your link simulator into the game may fall away.
+
+Answer in at most 6 lines.
+```
+- **Read as** (the main session's reading, not his words): lean mode unchanged. The seven sets of q-disk-pack.md
+  (u4r-P2-8ee453c22882, u4r-P2-fc411116c1f1, u4f-20-350677f0aef2, u4f-20-96de6acf8223, u4f-22-7192607d99a1,
+  u4r-P3-d66e23cd78f2, u4r-P3-fd4612050cd6) are packed by kept-logs.mjs, one at a time, never during a run set or a
+  build, each after its committed results and closed ruling are confirmed and its list is committed and pushed; a
+  folder that does not match its list stays, packing stops, and he is told. u4f-47-b57221ed139d stays until the -47
+  re-judge after Netcode Builder 2's merge. NPT-EDGE-SLIVER stays as merged: R1's report carries one line on the gap
+  as a known limit of the reading (under a millisecond by reading the code, not measured); the measured window stays
+  fully counted. Item 3: nothing before R1; a later promotion of this lane's link simulator into the game may fall
+  away, since the game's change-set 3c builds its own.
+  Transcript record a3032198-44eb-46ac-9157-f14e65808c33, 11:07:37 UTC, 1298 characters.
