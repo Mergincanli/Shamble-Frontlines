@@ -155,3 +155,46 @@ restore E3's wording, or record a plan revision 3 covering E7 as built and E3's 
   - R3-10 names part 1's clause (:148 at 1c45ed7, base :145); that is the one changed. The same phrase "with no cap on
     previews" stays at :67 ("The findings the decision turns on", item 1), unchanged and outside R3-10. Low note:
     follow-up ADR6-PAGES-RETENTION (R3-7) names part 1's clause and the options row, not :67.
+- Spot-checks (item 2), refetched 2026-11-25 into the scratchpad's cf-r2/r1..r4/page.md (index.md exports):
+  - pages/platform/limits/ (dM 2026-11-19) "## Preview deployments" :91: "Preview deployments older than 30 days are
+    deleted, unless they are one of the project's 100 most recent deployments." Equals R3-10's quote and S23. CONFIRMED.
+    "unlimited" appears once on the page, :99 "managed by an unlimited number of users"; no "unlimited number of
+    preview deployments" sentence. CONFIRMED gone.
+  - workers/previews/ (dM 2026-09-24) :72 "When a limit is reached, Cloudflare automatically deletes the oldest to make
+    room:" CONFIRMED (E7 "the oldest deleted when the limit is reached").
+  - version-urls (dM 2026-11-19) and configuration/routing/workers-dev (dM 2026-11-06): 0 hits each for noindex,
+    robots, search engine, indexing, crawler outside the front matter. The pages cover the Version URL forms and
+    "Aliased Version URLs" (version-urls :36-39, :69-85) and the production workers.dev URL (workers-dev :33-35), so
+    "silent on ... its workers.dev URL, its version links and their aliases" holds on the cited pages. CONFIRMED.
+    "production's own address" (route or custom domain): no noindex on these two cited pages; round 1 also found 0 on
+    versions-and-deployments, limits and the headers page's host behaviour. Silence holds on pages read only.
+  - pages/platform/limits/ :71 "The maximum file size for a single Cloudflare Pages site asset is 25 MiB." CONFIRMED.
+  - E7's new report claim: report :35 PM-0006-6 "Met with a departure"; :88-89 "yes, through the cleanup job".
+    CONFIRMED.
+- PM-0006-2 under E1's final words (item 4): "production none on its own addresses (the project's pages.dev host, and
+  a custom domain if CF has one, as in PM-0006-8)"; method "and production on a custom domain if CF has one". The check
+  had none: report :228 "no custom domain was used"; dashboard :709 "Domains: shamble-preview-check.pages.dev" only.
+  So the custom-domain clause has nothing to read, and the row's other readings stand as in round 1 (artifacts: own
+  address no noindex in round-a and restore-production; one-off X-Robots-Tag recorded on 0354374e and de1c3e5e; every
+  other header judged and as expected on all 34 readings; both bites caught). Still met on readings already taken,
+  for PM-0006-2 only.
+
+### After the advisor (round 2)
+- R3-10's history claims: docs/research/r6-infrastructure.md :72-79 (R6-HOST-F3) cites the same page,
+  developers.cloudflare.com/pages/platform/limits/, "read 2026-10-28", quoting "You can have an unlimited number of
+  preview deployments active on your project at a time." Today's page lacks it (cf-r2/r1 "unlimited" only at :99,
+  users). So "as read on 2026-10-28" and "no longer says so" are CONFIRMED by a repo record plus today's page.
+  S23 (infra-engineer-review.md :16-27) quotes the same "Preview deployments" sentence word for word (its .md line 93,
+  8,592 bytes; mine line 91, 8,474 bytes: the export's size differs, the sentence does not).
+- Commit order (Low): `git diff ab15d6d a4152ad` on plan.md and advisor-plan.md only adds text: R3-10, R3-11, the
+  condition-3/4 paragraphs, R3-9's heading note, and the advisor's "Exact texts". No existing final text (R3-1's block,
+  R3-2 to R3-6) was altered. R3-10 and R3-11 reached git in a4152ad, after the fix pass ab15d6d that carries them.
+- Head: HEAD is b5952f0 (checkpoint only, after a4152ad); no docs change after ab15d6d.
+- Custom-domain clause: not exercised by any reading. The row is met without it, not through it. The account holds
+  shamblefrontlines.com (report setup header, :349) but the project showed only its pages.dev domain (:709).
+
+### Round 2 verdict
+PASS WITH NOTES. The fix-pass head matches plan revision 3 word for word; new source claims confirmed, R3-10's history
+included; gate PASS; PM-0006-2 still met (PM-0006-2 only). Notes (Low): the phrase at :67 has no pointer and is not
+named in ADR6-PAGES-RETENTION; R3-10/R3-11 committed after the edits they authorise; silence verdicts cover the pages
+read only; the custom-domain clause is unexercised; local smoke not run (CI runs it).
