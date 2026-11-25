@@ -148,16 +148,16 @@
 - **Scheduled:** check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; 12:34: nothing stopped; next 16:34, then 20:34
   UTC); day message trig_01XVEDQzVLaAwy4Fer6AERdS (23:05 UTC: msg-2026-11-26.md); the 18:50 window's wake-up
   trig_01C1wNcsqdNANrJnkjyDahba (one-shot, 18:51 UTC). The reminder that could not be deleted (it had fired) stays: A.4.
-- **My step (17:1x UTC):** MAIN-66's plan on main 311c048 (main-66-plan.md, 214 lines, sha256 c9022aa9…61e9; read only:
+- **My step (17:1x UTC):** MAIN-66's plan on main 311c048 (main-66-plan.md, 217 lines, sha256 d210c5b4…5250; read only:
   #66 + #68 + #69, 90 paths, 30 A, 60 M; one conflict, docs/STATUS.md; spikes/ and marks untouched; the kit is main's
   two guard files, equal to main's after the merge; DEP-HOLD free; main's CI green). Brief 3 stays as filled and checked in launch-0850.md section 3 (its checks there; ffcheck.mjs
   is re-run against the then head at sending). The 13:50 window passed under his B.1; usage 10 % at 16:15.
 - **Next three:**
-  1. The 18:50 window (wake-up 18:51; be idle by 18:45): confirm the reset by the rate-limit event; ffcheck.mjs against
-     the then head; `<base>` and the free-disk figure filled; one advisor-tool call for both sends; then, in one
-     response, SendMessage to the T-builder (brief 3) and the check of main-66-plan.md (a general-purpose agent, model
-     opus, effort xhigh, given main-66-request.txt; it writes advisor-main-66.md). If the send fails, stop and tell
-     him; no fresh agent in its worktree. No merge before the check's verdict.
+  1. The 18:50 window (wake-up 18:51; idle by 18:45): confirm the reset; fetch main (still 311c048, else refresh the
+     plan's numbers or one line to him); ffcheck.mjs against the then head; `<base>` and free disk filled; one advisor
+     tool call; then, in one response, SendMessage to the T-builder (brief 3) and the check of main-66-plan.md (a
+     general-purpose agent, opus, xhigh, given main-66-request.txt; it writes advisor-main-66.md). If the send fails,
+     stop and tell him; no fresh agent in its worktree. No merge before the check's verdict.
   2. MAIN-66's steps 1-6 after its verdict (main 311c048, one merge; main-66-plan.md); step 7 (the pushed head) 23:50.
   3. U8's merge M3-M9 after MAIN-66's step 6 CI, if the checker's Q1 says yes (u8-brief.md; a3de649cd25e474df's head
      read in a window): the policy-name INVALID (plan.md:1256), C9 on 096808b, test 7's merged-state run, NC-R3-1, the items under U8 below, and the 05:2x clean incident told to the advisor (u7-block0b.md:40).

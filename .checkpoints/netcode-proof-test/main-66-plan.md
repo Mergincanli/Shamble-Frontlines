@@ -10,9 +10,10 @@ takes in #66, #68 and #69.
 MAIN-52, Mustafa's words (history.md:2055-2057; TEST-FIRST's "main taken in when it changes code, CI or rules";
 LEAN-MODE item 1 names "main taken in" on R1's path): main moved from 28254a7 (MAIN-65's) to 311c048 by three merges:
 #66 (09faefa7, 11:10:10 UTC: lane 2's preview hosting check, docs only), #68 (3ab9eae, 13:57:02 UTC: change-set 3b,
-"The loop closes", merged on his tap of 13:56:26 UTC) and #69 (311c048, 16:34:47 UTC: the guard fix, guard-env-fix,
-merged on his go). #68 changes code (crates/client-endpoint, devtools, protocol, room, sim, sim-wasm; packages/client,
-e2e, sim-worker, types), the root Cargo.toml and Cargo.lock, four crate manifests and docs; #69 changes two kit files
+"The loop closes", merged on his tap of 13:56:26 UTC) and #69 (311c048, 16:34:47 UTC: the guard fix, guard-env-fix;
+merged at 16:34 UTC, his message of 17:00 UTC). #68 changes code (crates/client-endpoint, devtools, protocol, room,
+sim, sim-wasm; packages/client, e2e, sim-worker, types), the root Cargo.toml and Cargo.lock, four crate manifests and
+docs; #69 changes two kit files
 (.claude/hooks/routine-guard.mjs and its test), docs/STATUS.md and docs/ROADMAP.md, and adds one report. GitHub reports
 PR #40 un-mergeable since #68 (the merge-conflict event of 13:57 UTC), so no pull-request CI runs on #40 until this
 merge is in (push runs go on: gate.yml and toolchain.yml run on both events). U8's merge follows it (U4f's form: its
@@ -32,9 +33,10 @@ differ; "The numbers" gives every value those conditions bind with, so no MAIN-6
   renamed. Without docs/STATUS.md: 89 files, +10,981 / -567; STATUS.md's numstat is 49 / 49. HEAD's tree holds 1,886
   files and merge-tree's 1,916 (1,886 + 30); N0 is what step 1's base run reads (this plan's saves add notes first).
 - Kit and CI: main now changes two kit files, .claude/hooks/routine-guard.mjs and .claude/hooks/routine-guard.test.mjs
-  (#69: risk tier 2 on main; security-auditor's two rounds, the verifier and the advisor agent; merged on his go: its
-  report, docs/reports/2026-11-25-guard-env-fix.md). Main changes no other `.claude/` file (settings.json and guard.mjs
-  among them) and no CLAUDE.md, AGENTS.md, `.github/`, `tools/`, `legacy/` or `.gitignore` file. This branch changes
+  (#69: risk tier 2 on main; by its report, docs/reports/2026-11-25-guard-env-fix.md: security-auditor's round-2
+  APPROVE, the verifier's re-run PASS and the advisor agent's plan approval; merged at 16:34 UTC, his message). Main
+  changes no other `.claude/` file (settings.json and guard.mjs among them) and no CLAUDE.md, AGENTS.md, `.github/`,
+  `tools/`, `legacy/` or `.gitignore` file. This branch changes
   none of the guard's pathspec (main-61-plan.md:37-40): on `origin/main...HEAD` it prints nothing. That is the guard's
   own test for a plain merge in the main folder (routine-guard.mjs:1347-1351, unchanged by #69: "a plain merge takes
   main's kit files exactly only when the branch changed none since the merge base"), so `git merge origin/main` in its
@@ -201,14 +203,15 @@ program in front of them.
    fast-forward again before U7's merge, or is the snapshot's `git apply --check` on the then head enough?
 3. With #69 in, this session's calls are checked by main's fixed rules from the first call after step 2. Any condition
    on that (step 5e; the order of the later steps), and does the take-in need a security read? My lean: no, since #69
-   had security-auditor's two rounds on main and this merge takes it byte for byte.
+   had security-auditor's two rounds on main (round 2 APPROVE) and this merge takes it byte for byte.
 
 ## Change type, tier, size
 - A merge of main: main's reviewed and merged text (90 files, +11,030 / -616) plus one conflict block resolved by hand;
   nothing else is edited by hand. #68 (3b): two review rounds by six reviewers, the verifier PASS, the advisor agent's
   approval, his browser check in Brave and Firefox, merged on his tap (its merge message). #66: the advisor agent's
-  APPROVE and the PR Advisor's APPROVE on its head, merged on his go (its merge message). #69: risk tier 2 on main,
-  security-auditor's two rounds, the verifier, the advisor agent, merged on his go (its report; his word of 17:00 UTC).
+  APPROVE and the PR Advisor's APPROVE on its head, merged on his go (its merge message). #69: risk tier 2 on main;
+  security-auditor's round-2 APPROVE, the verifier's re-run PASS, the advisor agent's plan approval (its report);
+  merged at 16:34 UTC (his message of 17:00 UTC).
 - Risk tier 1 for PR #40 (a spike PR): after the merge, `.claude/`, `.github/` and `.gitignore` equal main's (C1 (c)'s
   first check), so the PR changes no kit file; the merge commit carries main's own tier-2 change as main merged it.
 - Reviewers: the advisor (this plan, then the pushed head). Mustafa: nothing to check in Brave.

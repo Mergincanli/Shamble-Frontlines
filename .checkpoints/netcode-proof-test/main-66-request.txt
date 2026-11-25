@@ -13,7 +13,7 @@ changes code, CI or rules"), on R1's path (LEAN-MODE item 1, history.md:7862). M
 311c048 by three merges: #66 (09faefa7, docs), #68 (change-set 3b, code) and #69 (the guard fix: two kit files under
 .claude/hooks/, merged 16:34 UTC); PR #40 is in conflict since 13:57 UTC. His word of 17:00 UTC (history.md:7988-7998,
 word for word there): one merge takes in #66, #68 and #69. The plan: .checkpoints/netcode-proof-test/main-66-plan.md
-(214 lines, sha256 c9022aa9bea890ea…40fa61e9 when this request was written), in MAIN-65's approved form:
+(217 lines, sha256 d210c5b4276ad003…e6005250 when this request was written), in MAIN-65's approved form:
 main-65-plan.md, your advisor-main-65.md (M65-1 to M65-5 and its section 3 fallbacks), advisor-main-64.md:15-48,
 main-61-plan.md, advisor-main-61.md:19-104, advisor-main-65-head.md.
 
