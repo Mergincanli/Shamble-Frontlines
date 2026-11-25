@@ -555,3 +555,77 @@ pass-2 tree (wip/u8-build.patch bca52b2c…6eb7; git status: only U8's files and
   security-auditor on SEC-R2-1 and SEC-R2-2); NC-R2-4 at U6c's merge (probe_presence reads U6c's named records);
   ds-selftest's place in the C1 run list at U6b's merge; sudo's list over ssh on RS not run (the container's sudo,
   root, read here); F28 and the merge-time checks as in pass 2's Open line.
+
+## C9 (U6c's two Lows, 2026-11-25)
+Base: `git log -1 --format=%H` = 096808b7fb4b15460b72315e6ffdce7e76fa68fb. `git merge --ff-only d85cb43` refused (this
+file, blob c2683697… equal to d85cb43's); the coordinator's call: no merge, build on 096808b, move nothing. U6c's names
+read only from the main checkout, whose blobs equal d85cb43's (SERIES.md eddad091…, crates/server/src/probe.rs
+2b7178c4…, advisor-u6c-r1.md 547a2f57…). Start: 43 files, 6,111 lines; stop 6,200 (a Low past it is carried).
+Plan:
+1. NC-U6C-12 (advisor-u6c-r1.md:86-90; SERIES.md:920-923, :933-935, :952; probe.rs:517-525, :576-606, :639-653;
+   net/src/l2/probe.rs:805-810): tests first in test 7's item 4 fixtures (legHead gets P1's header.params:
+   probe_start_timer_slack_ns, probe_start_sched_policy, l2_timer_slack_ns, l2_sched_policy; legLog's leg_edge loses
+   the l2 pair; l2_summary gets probe_up_window_ns and probe_down_window_ns); then probe_presence: P1's four reads from
+   header.params (an unread start slack is u64::MAX, an unread start policy ""), the policy the same at both reads
+   (plan.md:1256's rule); each direction's rate = probe_<d>_window_count over probe_<d>_window_ns (not the nominal
+   probe_window_ns). Proof: a direction span 2 % long with exact counts reads INVALID; each of the four reads missing,
+   and a policy change, read INVALID. Plant: the nominal probe_window_ns back as the denominator.
+2. SEC-U6C-5 (advisor-u6c-r1.md:91-92; u6c-review-security.md:98-102): R1.md Stop B gets one line naming Let's
+   Encrypt's Subscriber Agreement (every `npt-cert issue` order agrees to it for him: issue.rs's
+   `terms_of_service_agreed: true`), its URL a Stop B fill marker naming the production directory's
+   `meta.termsOfService`, and section 8's Fills list names it. Test 5 pins only the Certificate row's hours: no change.
+3. End checks as pass 3 ran them, on 096808b (test 7 reads the pre-U6c server and super main.rs).
+- C9.1 DONE (NC-U6C-12): tests first: test 7's item 4 fixtures moved to U6c's places (HEAD_READS in every leg header's
+  params; leg_edge without the l2 pair; l2_summary at ph after with probe_up_window_ns and probe_down_window_ns); run
+  on the old reader, the plain present case failed on P1 ("missing at an edge"), NC-R2-4's predicted miss. Then
+  probe_presence: rate(s, d) = probe_<d>_window_count × 1e9 / probe_<d>_window_ns (None unread or 0); P1's four reads
+  from header.params, unread as u64::MAX, "" or "unknown" (socket.rs:319, :358-362 at d85cb43, blob 40b0c207… equal
+  in the main checkout; probe.rs:517-525, :593-597), the policy's name (before its priority) the same at both. R1.md
+  section 8's interface line names the merged fields. Cases: count 2 % short, span 2 % long at the exact count, a
+  span unread; each of the four missing; each unread form; SCHED_FIFO 50 against SCHED_OTHER 0 INVALID; SCHED_FIFO 99
+  present: 21 pass. Plant (the nominal probe_window_ns as the denominator): the span case reads present, FAIL;
+  restored by Edit, r1.sh 0976198d… equal to its pre-plant hash. Total 6,136 (+25).
+- C9.2 DONE (SEC-U6C-5): R1.md Stop B step 7: the certificate block's orders agree to Let's Encrypt's Subscriber
+  Agreement for him (issue.rs:183's `terms_of_service_agreed: true` at d85cb43, blob 9a3cf79b… equal in the main
+  checkout); he reads it first, at `<the production ACME directory's meta.termsOfService: filled at Stop B>`; step 8
+  and section 8's Fills list name the fill. No web fetch; the URL is the main session's fill. Test 5: 10 pass (it pins
+  only the Certificate row's hours). Total 6,140 (+4).
+- END of C9, on 096808b (no merge; test 7 reads the pre-U6c crates/server/src/main.rs and crates/super/src/main.rs,
+  so the merged-state run moves to U8's merge): `node --test 'ops/**/*.test.mjs'` 100 pass, 0 fail (test 4's script
+  check with ops/browser/node_modules linked from U8's build worktree, link removed after); `bash
+  ops/tests/wrappers.test.sh` 315 ok, 0 failed; `check.mjs --only redact` PASS, 394 items, 0 findings; package.json
+  8370495d…, package-lock.json a0efce8e… unchanged; no plant left. Files: r1.sh +9 (0976198d…), R1.md +6 (b5afcb2c…),
+  ops/tests/r1sh.test.mjs +14 (33f43158…). 43 files, 6,140 lines (+29), 60 under 6,200; nothing carried. No commit,
+  no cargo, no npm install.
+- Notes for the report: the policy-name check is an addition beyond the four reads and the rate (its source plan.md:1256;
+  it can only add an INVALID; plan.md:1256's slack-value rule is not enforced, only presence); policy names have no
+  space (thread.rs:73-83 at d85cb43, blob 499e1055… equal) and an unread policy is exactly "unknown" (socket.rs:360).
+  The fixtures follow SERIES.md, probe.rs and socket.rs as read, not a log the merged probe wrote. R1.md has no prose
+  certificate block: SEC-U6C-5's line is Stop B step 7.
+- Open, not in this brief: advisor-u6c-r2.md:321-325 also lists for C9 item 5 (plan.md:1256's sentence in U8's prose,
+  C-U8-6 in the self-test row's INVALID list, the per-leg report lines: rise, excess, difference; R1.md:216-217 still
+  reads "slack and policy reads at both edges") and item 1 (b) (R1.md's DONE-without-READY line); R1.md:224-225 still
+  says the probe block "then stops LG" (stale since pass 3 item 1: it waits for LG's end).
+- C9, more (the coordinator's second brief: advisor-u6c-r2.md:170-192 item 5, :118-130 item 1 (b), then the stale
+  line), on 096808b, no merge, nothing moved:
+  - C9.3 DONE (item 5): plan.md:1256's sentence, as written, in r1.sh's probe_presence comment and R1.md's C-U8-2, -4,
+    -6 paragraph (both had "a P1 drop goes to the advisor before any L2 mark counts"); C-U8-6 in R1.md's self-test
+    INVALID list ("no drop on the probe's P1 socket between its two reads and its row found at both"); probe_presence
+    prints, after the six verdicts, one `report <leg> (never judged): rise <r>, up span excess <e> intervals, rise -
+    excess <r-e>` line a leg (rise: leg_edge's udp_drops_count after less warmup; excess: round(probe_up_window_ns ×
+    probe_rate_pps / 1e9) less the header's probe_sent_count; "unread" for a missing value); the drop code and its
+    fixture unchanged. Tests first (test 7's item 4: the fixture headers gain probe_rate_pps 10000 and
+    probe_sent_count; run() drops report lines; P1 at rise 222, span 100.0224 s, sent 1,000,010 reads `rise 222, up
+    span excess 214 intervals, rise - excess 8`, P0 `0, 0, 0`, no report line holds INVALID): failed before the code (0
+    report lines), 21 pass after. Plant (for the record: the nominal probe_window_ns for the span): excess -10, FAIL;
+    restored by Edit, r1.sh afc331f1… equal. A first plant (sent hard-coded) passed on a fixture whose sent equalled
+    the packets; the fixture's sent became 1,000,010 so the read is shown.
+  - C9.4 DONE (item 1 (b)): R1.md's LG-loaded rooms line: a LG stdout ending DONE with no READY means every client
+    ended before READY (U6c follow-up); INVALID-ready stands; the room's wt_accept or ws_accept counts give the cause.
+  - C9.5 DONE (the stale line): R1.md's probe paragraph now ends "then for LG's own end (`lg stop` only past 120 s:
+    NC-R2-1)". Test 5: 10 pass.
+  - Files: r1.sh +13, R1.md +7, ops/tests/r1sh.test.mjs +10. Total 6,170 (+30), 30 under 6,200; nothing carried.
+  - END, on 096808b (test 7 reads the pre-U6c server and super main.rs; the merged-state run moves to U8's merge):
+    `node --test 'ops/**/*.test.mjs'` 100 pass, 0 fail (node_modules link made and removed as before); wrappers 315
+    ok, 0 failed; redact PASS, 394 items, 0 findings; package.json 8370495d…, package-lock.json a0efce8e… unchanged;
+    no plant left; r1.sh afc331f1…, R1.md 847723cd…, r1sh.test.mjs b245fe6b…. No commit, no cargo, no npm install.

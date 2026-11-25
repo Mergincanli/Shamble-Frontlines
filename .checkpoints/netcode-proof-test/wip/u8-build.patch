@@ -1480,10 +1480,10 @@ index 0000000..f3020f3
 +}
 diff --git a/spikes/netcode-proof/ops/runs/R1.md b/spikes/netcode-proof/ops/runs/R1.md
 new file mode 100644
-index 0000000..05ce483
+index 0000000..9d3ba24
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/R1.md
-@@ -0,0 +1,335 @@
+@@ -0,0 +1,348 @@
 +# R1's run plan: Thursday 3 December 2026
 +
 +The first VM day of the netcode proof test (u8-brief.md rev 1.1 section 6, with the advisor's C1, C3, C6, C7, C8 and
@@ -1572,9 +1572,12 @@ index 0000000..05ce483
 +   Start check 4 is run once in each shell, Bash and PowerShell: each `git -C` command must prompt, not be denied
 +   (PowerShell's rules match case-insensitively, so its `git -c` deny names the hooksPath key: SEC-R2-3).
 +   The operator key gets a passphrase and is held in Windows' ssh-agent for the run (SEC-SB-3).
-+7. Approve `settings.json` and `PROMPT-R1.md` explicitly; OK this plan, its cap and its delete-by times.
-+8. The main session, before his OK: fills Y and X, the expected dist SHA-256s (section 8) and re-reads hetzner.com's
-+   two price pages; any change comes to him.
++7. Approve `settings.json` and `PROMPT-R1.md` explicitly; OK this plan, its cap and its delete-by times. The
++   certificate block's orders agree to Let's Encrypt's Subscriber Agreement for him (issue.rs's
++   `terms_of_service_agreed: true`: SEC-U6C-5): he reads it first, at `<the production ACME directory's
++   meta.termsOfService: filled at Stop B>`.
++8. The main session, before his OK: fills Y and X, the Subscriber Agreement's URL (step 7), the expected dist
++   SHA-256s (section 8) and re-reads hetzner.com's two price pages; any change comes to him.
 +
 +**Thursday 3 December** (T0 = RS's creation, 09:30):
 +
@@ -1687,7 +1690,9 @@ index 0000000..05ce483
 +  so its room is held: LG runs 300 s, then the room comes down (NC-R2-3). LG must print READY by OPEN + 50 s, 10 s
 +  before the 60 s warm-up ends (`warmup_ticks` 1,800), else the room comes down before its first measured tick: its
 +  series are empty, a gap, so the run reads INVALID, never FAIL. R1's headers run stays a measured -2 run
-+  (advisor-u8-stopb.md section 3): a FAIL left after both guards is kept for the whole test.
++  (advisor-u8-stopb.md section 3): a FAIL left after both guards is kept for the whole test. A LG stdout that ends DONE
++  with no READY means every client ended before READY (U6c follow-up): the INVALID-ready verdict stands, and the room's
++  `wt_accept` or `ws_accept` counts give the cause (advisor-u6c-r2.md:128-130).
 +- **DelayStream's loaded self-test (condition 10; Q-U8-6 (ii) as ruled).** 48 LG connections over WebSocket at P2
 +  with the room running; LG's connections join within 50 s of OPEN, the 1 min warm-up follows, so the pool's mark is at
 +  OPEN + 120 s (settings `ws_split_mark_s`), and the measured window is the 5 minutes after it, to the room's end. The series it reads:
@@ -1700,17 +1705,22 @@ index 0000000..05ce483
 +- **ImpairSocket's R1 self-test (plan.md:1256; U3D-BAR, U3D-L0).** On the probe's P1 leg (10,000 per second each
 +  way): judged per direction E with L0 = 0 ≤ 10,000 ns over the probe's P1 measured records, at least 1,000,000 sent
 +  per direction; INVALID, never a pass, under the row's run conditions (-3's own count, the rate within 1 %, the
-+  slack and policy reads at both edges, no queue, pool, oversize or shaper drop, no send error, the steal reads and
-+  U3-Q9's facts present); U3D-MISS's sampling case as the row gives it; a miss goes to the advisor before any L2 mark
++  slack and policy reads at both edges, no queue, pool, oversize or shaper drop, no send error, no drop on the probe's
++  P1 socket between its two reads and its row found at both (C-U8-6), the steal reads and U3-Q9's facts present);
++  U3D-MISS's sampling case as the row gives it; a miss goes to the advisor before any L2 mark
 +  counts.
 +- **C-U8-1:** `r1.sh bringup` reads the kernel, CONFIG_HZ, the cpuidle driver, the clocksource and THP before any
 +  timing judgement. **C-U8-2, -4, -6 (Q-U8-5):** the per-leg reads sit in the probe's own leg-edge calls (U6c), one
 +  log per leg (`room-02-P0.jsonl` to `room-02-B1.jsonl`); `r1.sh probe` checks in each `leg_edge` at `ph` warmup and after
 +  with `udp_row_found` 1 and `udp_drops_count` at both (equal at both on P1), and `cpu_stat` at both with
-+  `cpu_user_count` (Q-U6C-5's names); a missing read makes that leg INVALID, and a P1 drop goes to the advisor before
-+  any L2 mark counts. The probe mints no token: LG's probe mode gets an empty token file. Planned 6 × (10 s warm-up +
-+  100 s window + about 12 s tail and set-up) = 732 s; LG sends for 792 s; the block waits for the probe's own exit in
-+  npt-super's log, at most 852 s, then stops LG.
++  `cpu_user_count` (Q-U6C-5's names); a missing read makes that leg INVALID, and "a drop on the probe's P1 socket
++  between the two reads makes ImpairSocket's self-test INVALID with its cause named, and that leg comes to the advisor
++  before any L2 mark counts with its printed E, its max and the counters, never set aside and re-run as noise"
++  (plan.md:1256). Per leg it also prints, reported and never judged: the drops' rise between the edges, the up span's
++  excess in intervals (`probe_up_window_ns` ÷ (1 s ÷ `probe_rate_pps`) − `probe_sent_count`) and the rise less the
++  excess (advisor-u6c-r2.md:187-191). The probe mints no token: LG's probe mode gets an empty token file. Planned 6 ×
++  (10 s warm-up + 100 s window + about 12 s tail and set-up) = 732 s; LG sends for 792 s; the block waits for the
++  probe's own exit in npt-super's log, at most 852 s, then for LG's own end (`lg stop` only past 120 s: NC-R2-1).
 +  **C-U8-3:** sized at 0.15 h above. **C-U8-5:** the judged form above.
 +- **Condition 4:** `npt-ctl cpus 3` moves the slices, every movable kernel thread and the unbound workqueue mask off
 +  the tick vCPU 3; bring-up reads `alone` once in a pinned room. If it reads 0, bring-up records every task it lists
@@ -1771,7 +1781,8 @@ index 0000000..05ce483
 +
 +## 8. For Stop B
 +- **Fills (the main session):** Y in both cloud-init files (`/etc/npt/commit`), then X; the expected dist SHA-256s
-+  (this session's build of U7's dist at Y, one `sha256  path` line per file, below); the kept addresses typed only in
++  (this session's build of U7's dist at Y, one `sha256  path` line per file, below); the Subscriber Agreement's URL in
++  section 2 step 7, as the production directory's `meta.termsOfService` gives it; the kept addresses typed only in
 +  the Hetzner console.
 +- **Expected dist SHA-256s (SEC-SB-5):** `ops/runs/r1-dist.sha256`, committed at X, filled at Stop B from two equal
 +  builds of U7's dist at Y in this container (two clone paths, two CARGO_HOMEs; a difference comes to the advisor
@@ -1798,10 +1809,12 @@ index 0000000..05ce483
 +  whole file beside it as `.jsonl.raw`; one empty or with no header line as `.jsonl.empty`; each such named in cut.txt.
 +  Each probe leg's header (NC-SB-3, to U6c's message): run `<settings run>-<leg>`, profile the leg, process `probe`,
 +  layer `L2`, and a footer; npt-super's log keeps the settings' run. probe_presence makes a leg that differs INVALID.
-+  It also reads each leg's rate, `l2_summary`'s `probe_up_window_count` and `probe_down_window_count` over
-+  `probe_window_ns` (10,000 a second within 1 %), and P1's `l2_timer_slack_ns` and `l2_sched_policy` at both edges
-+  (NC-SB-9; the names to U6c's message, proven at its merge); `probe_packets` counts the packets outside B1's bursts,
-+  as L1 reads it (lab/src/probe.rs:124-128; NC-SB-16, its value checked at U6c's merge).
++  It also reads each leg's rate, `l2_summary`'s `probe_<d>_window_count` over FP-1's `probe_<d>_window_ns` per
++  direction (10,000 a second within 1 %), and P1's two reads in its header's params, the window's start edge's
++  `probe_start_timer_slack_ns` and `probe_start_sched_policy` and the end edge's `l2_timer_slack_ns` and
++  `l2_sched_policy`, the policy the same at both (NC-SB-9, NC-U6C-12: U6c's merged names, SERIES.md:920-952);
++  `probe_packets` counts the packets outside B1's bursts, as L1 reads it (lab/src/probe.rs:124-128; NC-SB-16, its
++  value checked at U6c's merge).
 +- **The R1 bites:** U6a's three room bites (PM-0001-1/shared-vcpu, PM-0006-11/no-smt-map, PM-0001-16/double-load)
 +  from npt-server's bites build. The other R1 marks' bites are not needed before Thu 3 Dec (F20, confirmed), each
 +  with its judge: -2/fire-stops an S30 run (R2); -3's clock-seed, rtt-each-way, loss-per-round-trip and normal-jitter
@@ -1831,10 +1844,10 @@ index 0000000..667487a
 +# and `r1.sh host` and every `browsers` call refuse.
 diff --git a/spikes/netcode-proof/ops/runs/r1.sh b/spikes/netcode-proof/ops/runs/r1.sh
 new file mode 100644
-index 0000000..5b1f933
+index 0000000..c5b7520
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/r1.sh
-@@ -0,0 +1,876 @@
+@@ -0,0 +1,898 @@
 +#!/bin/bash
 +# r1.sh <block> [<argument>]: RS's run script for R1 (u8-brief.md rev 1.1 section 1 Block 5; C1, C3, C5; conditions
 +# 3 and 4; Q-U8-5). It runs as npt on RS from the root-owned clone, one fixed block per call:
@@ -2433,7 +2446,10 @@ index 0000000..5b1f933
 +# Q-U8-5 and C-U8-2, -4, -6 with Q-U6C-5's names (C1 (d)): each of the six per-leg logs room-02-<leg>.jsonl must hold
 +# `leg_edge` at `ph` warmup and after, with `udp_row_found` 1 and `udp_drops_count` at both (equal at both on P1), and
 +# `cpu_stat` at both with `cpu_user_count`. A missing read makes that leg INVALID, never "unreadable counts as present";
-+# a P1 drop goes to the advisor before any L2 mark counts. probe_presence <rooms dir> NN.
++# "a drop on the probe's P1 socket between the two reads makes ImpairSocket's self-test INVALID with its cause named, and
++# that leg comes to the advisor before any L2 mark counts with its printed E, its max and the counters, never set aside
++# and re-run as noise" (plan.md:1256). Per leg, after the verdicts, three numbers reported and never judged
++# (advisor-u6c-r2.md:187-191): the drops' rise, the up span's excess in intervals, the rise less the excess.
 +# NC-SB-3: each leg is its own run, so each leg log's header must read run `<settings run>-<leg>`, profile the leg,
 +# process `probe`, layer `L2`, and the log must end in its footer (the judge makes a run whose logs disagree on profile
 +# INVALID: eval.rs:37-75). probe_presence <rooms dir> NN <settings run>.
@@ -2441,9 +2457,16 @@ index 0000000..5b1f933
 +  python3 -I - "$1" "$2" "$3" << 'PY'
 +import json, os, sys
 +rooms, nn, run = sys.argv[1:4]
-+# NC-SB-9: the rate per direction from the leg's l2_summary (Q-U6C-5's window counts), 10,000 a second within 1 %; P1's
-+# slack and policy reads at both edges, ImpairSocket's names (socket.rs:319, :362). U6c's merge confirms the names.
-+RATE, P1_READS = 10000, ("l2_timer_slack_ns", "l2_sched_policy")
++# NC-SB-9, NC-U6C-12 (U6c's merged names, SERIES.md:920-935, :952): each direction's rate is l2_summary's
++# probe_<d>_window_count over FP-1's probe_<d>_window_ns, 10,000 a second within 1 %; P1's two slack and policy reads
++# (plan.md:1256's pair) are header.params' start-edge pair and ImpairSocket's end-edge pair (unread: u64::MAX, "" or
++# "unknown"; a policy reads "<name> <priority>": socket.rs:319, :358-362), the policy's name the same at both.
++RATE = 10000
++P1_READS = ("probe_start_timer_slack_ns", "probe_start_sched_policy", "l2_timer_slack_ns", "l2_sched_policy")
++def rate(s, d):
++    n, ns = (s.get(f"probe_{d}_{k}") for k in ("window_count", "window_ns"))
++    return n * 1e9 / ns if type(n) is int and type(ns) is int and ns > 0 else None
++reports, unread = [], lambda v: "unread" if v is None else v
 +for leg in ["P0", "P1", "P2", "P3", "P4", "B1"]:
 +    seen = {"leg_edge": {}, "cpu_stat": {}}
 +    head = foot = summ = None
@@ -2464,7 +2487,16 @@ index 0000000..5b1f933
 +        print(f"{leg}: INVALID: its log room-{nn}-{leg}.jsonl is missing or unreadable")
 +        continue
 +    count = lambda f, k: f.get(k) if type(f.get(k)) is int else None
-+    edge, cpu = seen["leg_edge"], seen["cpu_stat"]
++    edge, cpu, rates = seen["leg_edge"], seen["cpu_stat"], [rate(summ or {}, d) for d in ("up", "down")]
++    s0, pol0, s1, pol1 = (((head or {}).get("params") or {}).get(k) for k in P1_READS)
++    p1_read = all(type(x) is int and x != 2**64 - 1 for x in (s0, s1)) and all(type(x) is str and x not in ("", "unknown") for x in (pol0, pol1))
++    w0, w1 = (count(edge.get(ph, {}), "udp_drops_count") for ph in ("warmup", "after"))
++    span, pps, sent = (count(f, k) for f, k in ((summ or {}, "probe_up_window_ns"), ((head or {}).get("params") or {}, "probe_rate_pps"),
++        ((head or {}).get("params") or {}, "probe_sent_count")))
++    rise = None if None in (w0, w1) else w1 - w0
++    excess = None if None in (span, pps, sent) else round(span * pps / 1e9) - sent
++    reports.append(f"report {leg} (never judged): rise {unread(rise)}, up span excess {unread(excess)} intervals, "
++                   f"rise - excess {unread(None if None in (rise, excess) else rise - excess)}")
 +    gone = [f"{ev} at {ph}" for ev in seen for ph in ("warmup", "after") if ph not in seen[ev]]
 +    want = {"run": f"{run}-{leg}", "profile": leg, "process": "probe", "layer": "L2"}
 +    bad = [f"{k} {(head or {}).get(k)!r} (want {v!r})" for k, v in want.items() if (head or {}).get(k) != v]
@@ -2476,18 +2508,21 @@ index 0000000..5b1f933
 +        print(f"{leg}: INVALID: the socket's /proc/net/udp row was not read at both edges")
 +    elif any(count(cpu[ph], "cpu_user_count") is None for ph in cpu):
 +        print(f"{leg}: INVALID: /proc/stat was not read at both edges")
-+    elif not count(summ or {}, "probe_window_ns") or None in [count(summ, f"probe_{d}_window_count") for d in ("up", "down")]:
-+        print(f"{leg}: INVALID: the window's datagram counts were not read (C-U8-4's rate)")
-+    elif any(abs(count(summ, f"probe_{d}_window_count") * 1e9 / summ["probe_window_ns"] - RATE) > RATE / 100 for d in ("up", "down")):
-+        r = [round(count(summ, f"probe_{d}_window_count") * 1e9 / summ["probe_window_ns"]) for d in ("up", "down")]
-+        print(f"{leg}: INVALID: the rate up {r[0]}/s, down {r[1]}/s, is not within 1 % of {RATE}/s (C-U8-4)")
-+    elif leg == "P1" and any(k not in edge[ph] for ph in edge for k in P1_READS):
-+        print(f"P1: INVALID: a slack or policy read ({', '.join(P1_READS)}) is missing at an edge (C-U8-4)")
++    elif None in rates:
++        print(f"{leg}: INVALID: a direction's window count or span was not read (C-U8-4's rate)")
++    elif any(abs(r - RATE) > RATE / 100 for r in rates):
++        print(f"{leg}: INVALID: the rate up {round(rates[0])}/s, down {round(rates[1])}/s, is not within 1 % of {RATE}/s (C-U8-4)")
++    elif leg == "P1" and not p1_read:
++        print(f"P1: INVALID: a slack or policy read ({', '.join(P1_READS)}) is missing from its header (C-U8-4)")
++    elif leg == "P1" and pol0.split()[0] != pol1.split()[0]:
++        print(f"P1: INVALID: the release thread's policy {pol0} at the window's start, {pol1} at the header read (C-U8-4)")
 +    elif leg == "P1" and edge["after"]["udp_drops_count"] != edge["warmup"]["udp_drops_count"]:
 +        d = edge["after"]["udp_drops_count"] - edge["warmup"]["udp_drops_count"]
 +        print(f"P1: INVALID: {d} drops on the probe's P1 socket between its reads (C-U8-6): to the advisor before any L2 mark counts")
 +    else:
 +        print(f"{leg}: present at both edges")
++for r in reports:
++    print(r)
 +PY
 +}
 +
@@ -5183,10 +5218,10 @@ index 0000000..c10c13b
 +});
 diff --git a/spikes/netcode-proof/ops/tests/r1sh.test.mjs b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
 new file mode 100644
-index 0000000..877326a
+index 0000000..6852e44
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
-@@ -0,0 +1,709 @@
+@@ -0,0 +1,733 @@
 +// Test 7 (U8's fix pass, advisor-u6c-brief.md section 5 items 4, 5, 8 and 10): r1.sh's settings writers and the
 +// probe's presence check, run in bash on their real text (each function cut from r1.sh, beside stubs for the VM's
 +// reads), with fixture logs. Writes only under a temporary folder, and under NPT_R1_TREE when the caller sets it (3.1's
@@ -5244,21 +5279,25 @@ index 0000000..877326a
 +/** One npt-log event line. */
 +const ev = (name, ph, f) => JSON.stringify({ k: "event", ev: name, ph, f });
 +const LEGS = ["P0", "P1", "P2", "P3", "P4", "B1"];
++/** P1's two slack and policy reads in header.params, as U6c's merged probe writes them (SERIES.md:920-923, :952). */
++const HEAD_READS = { probe_start_timer_slack_ns: 1, probe_start_sched_policy: "SCHED_FIFO 50", l2_timer_slack_ns: 1, l2_sched_policy: "SCHED_FIFO 50" };
 +/** A leg log's header as U6c writes it (NC-SB-3's interface line), with `o` over it. */
-+const legHead = (leg, o = {}) => JSON.stringify({ k: "header", run: `R1-probe-02-${leg}`, profile: leg, process: "probe", layer: "L2", ...o });
-+/** A leg's events with both edges (drops `a` then `b`), less any `[event, ph]` in `drop`, its window, its footer. */
-+function legLog(a = 7, b = 7, drop = [], up = 1_000_000) {
++const legHead = (leg, o = {}) => JSON.stringify({ k: "header", run: `R1-probe-02-${leg}`, profile: leg, process: "probe", layer: "L2",
++  params: { ...HEAD_READS, probe_rate_pps: 10000, probe_sent_count: 1_000_000 }, ...o });
++/** A leg's events with both edges (drops `a` then `b`), less any `[event, ph]` in `drop`, its window (FP-1's counts and
++ * spans: `up` records over `upNs`), its footer. */
++function legLog(a = 7, b = 7, drop = [], up = 1_000_000, upNs = 100e9) {
 +  const lines = [];
 +  for (const [ph, drops] of [["warmup", a], ["after", b]]) {
 +    if (!drop.some(([e, p]) => e === "leg_edge" && p === ph)) {
-+      lines.push(ev("leg_edge", ph, { udp_row_found: 1, udp_drops_count: drops, snmp_udp_in_datagrams_count: 5,
-+        l2_timer_slack_ns: 1, l2_sched_policy: "SCHED_FIFO" }));
++      lines.push(ev("leg_edge", ph, { udp_row_found: 1, udp_drops_count: drops, snmp_udp_in_datagrams_count: 5 }));
 +    }
 +    if (!drop.some(([e, p]) => e === "cpu_stat" && p === ph)) {
 +      lines.push(ev("cpu_stat", ph, { cpu_user_count: 1000, cpu_system_count: 50, cpu3_user_count: 400 }));
 +    }
 +  }
-+  lines.push(ev("l2_summary", "measured", { probe_up_window_count: up, probe_down_window_count: 1_000_000, probe_window_ns: 100e9 }));
++  lines.push(ev("l2_summary", "after", { probe_up_window_count: up, probe_down_window_count: 1_000_000, probe_window_ns: 100e9,
++    probe_up_window_ns: upNs, probe_down_window_ns: 100e9 }));
 +  lines.push(JSON.stringify({ k: "footer", records: lines.length + 1, ended: "clean" }));
 +  return `${lines.join("\n")}\n`;
 +}
@@ -5293,9 +5332,18 @@ index 0000000..877326a
 +    const write = (logs, heads = {}) => {
 +      for (const leg of LEGS) writeFileSync(join(rooms, `room-02-${leg}.jsonl`), `${legHead(leg, heads[leg])}\n${logs[leg] ?? legLog()}`);
 +    };
-+    const run = () => r1bash(dir, ["probe_presence"], `probe_presence "${rooms}" 02 R1-probe-02`).trim().split("\n");
++    const all = () => r1bash(dir, ["probe_presence"], `probe_presence "${rooms}" 02 R1-probe-02`).trim().split("\n");
++    const run = () => all().filter((l) => !l.startsWith("report "));
 +    write({});
 +    assert.deepEqual(run(), LEGS.map((l) => `${l}: present at both edges`));
++    // advisor-u6c-r2.md:187-191: per leg, reported and never judged, the rise between the edges, the up span's excess in
++    // intervals (probe_up_window_ns over 1 s / probe_rate_pps, less probe_sent_count) and the rise less the excess.
++    write({ P1: legLog(7, 229, [], 1_000_000, 100_022_400_000) }, { P1: { params: { ...HEAD_READS, probe_rate_pps: 10000, probe_sent_count: 1_000_010 } } });
++    const report = all().filter((l) => l.startsWith("report "));
++    assert.equal(report.length, 6);
++    assert.equal(report[0], "report P0 (never judged): rise 0, up span excess 0 intervals, rise - excess 0");
++    assert.equal(report[1], "report P1 (never judged): rise 222, up span excess 214 intervals, rise - excess 8");
++    assert.ok(report.every((l) => !l.includes("INVALID")), "never read by the block's INVALID check");
 +    // NC-SB-3: the settings' run on a leg, two legs sharing a run, a wrong profile, a missing footer: each INVALID.
 +    write({ P4: legLog().replace(/\{"k":"footer".*\n$/, "") }, { P0: { run: "R1-probe-02" }, P3: { run: "R1-probe-02-P2" }, B1: { profile: "P1" } });
 +    const heads = run();
@@ -5317,18 +5365,29 @@ index 0000000..877326a
 +    assert.equal(run()[5], "B1: INVALID: the socket's /proc/net/udp row was not read at both edges");
 +    write({ P4: legLog().replaceAll('"cpu_user_count":1000', '"cpu_user_count":"1000"') });
 +    assert.equal(run()[4], "P4: INVALID: /proc/stat was not read at both edges");
-+    // NC-SB-9: a rate 2 % off; P1's slack read missing at warmup, its policy read at after; no window counts.
-+    write({ P2: legLog(7, 7, [], 980_000), P0: legLog().replace(/,"probe_window_ns":[^}]*/, "") });
++    // NC-SB-9, NC-U6C-12: a count 2 % short; a span 2 % long at the exact count (the nominal probe_window_ns stays
++    // 100 s, so only FP-1's per-direction span shows it); a direction's span unread.
++    write({ P2: legLog(7, 7, [], 980_000), P4: legLog(7, 7, [], 1_000_000, 102e9), P0: legLog().replace(/,"probe_up_window_ns":[^,}]*/, "") });
 +    const rate = run();
 +    assert.equal(rate[2], "P2: INVALID: the rate up 9800/s, down 10000/s, is not within 1 % of 10000/s (C-U8-4)");
-+    assert.equal(rate[0], "P0: INVALID: the window's datagram counts were not read (C-U8-4's rate)");
++    assert.equal(rate[4], "P4: INVALID: the rate up 9804/s, down 10000/s, is not within 1 % of 10000/s (C-U8-4)");
++    assert.equal(rate[0], "P0: INVALID: a direction's window count or span was not read (C-U8-4's rate)");
 +    assert.equal(rate[3], "P3: present at both edges", "an exact rate");
-+    for (const field of ["l2_timer_slack_ns", "l2_sched_policy"]) {
-+      const p1 = legLog().split("\n");
-+      p1[field === "l2_timer_slack_ns" ? 0 : 2] = p1[field === "l2_timer_slack_ns" ? 0 : 2].replace(new RegExp(`,"${field}":[^,}]*`), "");
-+      write({ P1: p1.join("\n") });
-+      assert.match(run()[1], /^P1: INVALID: a slack or policy read \(l2_timer_slack_ns, l2_sched_policy\) is missing at an edge/, field);
++    // NC-U6C-12: P1's four reads in its header; each missing, an unread start pair (u64::MAX, ""), a policy changed.
++    for (const field of Object.keys(HEAD_READS)) {
++      const { [field]: _, ...rest } = HEAD_READS;
++      write({}, { P1: { params: rest } });
++      assert.match(run()[1], /^P1: INVALID: a slack or policy read \(probe_start_timer_slack_ns, probe_start_sched_policy, l2_timer_slack_ns, l2_sched_policy\) is missing from its header/, field);
 +    }
++    for (const [k, unread] of [["probe_start_timer_slack_ns", "18446744073709551615"], ["l2_timer_slack_ns", "18446744073709551615"],
++      ["probe_start_sched_policy", '""'], ["l2_sched_policy", '"unknown"']]) {
++      writeFileSync(join(rooms, "room-02-P1.jsonl"), `${legHead("P1").replace(new RegExp(`"${k}":[^,}]*`), `"${k}":${unread}`)}\n${legLog()}`);
++      assert.match(run()[1], /^P1: INVALID: a slack or policy read .* is missing from its header/, `${k} unread`);
++    }
++    write({}, { P1: { params: { ...HEAD_READS, l2_sched_policy: "SCHED_OTHER 0" } } });
++    assert.equal(run()[1], "P1: INVALID: the release thread's policy SCHED_FIFO 50 at the window's start, SCHED_OTHER 0 at the header read (C-U8-4)");
++    write({}, { P1: { params: { ...HEAD_READS, l2_sched_policy: "SCHED_FIFO 99" } } });
++    assert.equal(run()[1], "P1: present at both edges", "the policy's name, not its priority");
 +    write({ P4: legLog(7, 7, [], 1_009_000) });
 +    assert.equal(run()[4], "P4: present at both edges", "0.9 % off: inside 1 %");
 +    write({});
