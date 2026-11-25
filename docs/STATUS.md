@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-25 (change-set 3b took main in: main 09faefa7, #66's merge, lane 2's preview hosting check)._
+_Last updated: 2026-11-25 (guard-env-fix, #69, in flight. Main 3ab9eaec is #68's merge (change-set 3b), whose docs pass is still owed; #66's and 3b's merged rows dropped from "In flight")._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -22,8 +22,7 @@ _Last updated: 2026-11-25 (change-set 3b took main in: main 09faefa7, #66's merg
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| none yet | change-set 3b, "The loop closes" (the second half of change-set 3, his SIZE-3 (b)), by the chat he calls Builder V3: the page's keys reach a local server in the Worker through the real messages and come back (the codec of five messages, the transport interface and the loopback, the room, the client endpoint, local play's one step); a player sees a key diagram (W, A, S, D, Space, Shift) lit from the local server's echo and two new readout lines (messages; presses); the decoder test at its row's count, a mark started, never passed (PM-0001-34); the link simulator and the first recording moved to change-set 3c by the size ladder; report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`; his browser check `docs/reports/2026-11-25-cs3b-browser-check.md` | `claude/loving-hopper-6p0mg2` (stands in for `cs/3b-loop-closes`) | risk tier 1; built; the final code 6abf3d2a; 6,909 added lines against about 3,800 planned (stop line 7,600); the players' Wasm 53,813 bytes; 114 Rust tests, 139 Node tests, 18 boundary tests, 16 browser tests; 53 of 53 planted defects caught on it; gate, smoke and toolchain green on it (toolchain run 45537884772); six reviewers passed two rounds, nothing Critical or High open; the verifier PASS; the advisor agent approved the code as it stands; his browser check clean in Brave and Firefox (2026-11-25, both on WebGPU, every asked number 0); RELEASE-COUNT decided, (a) with two conditions; no pull request yet (his main Advisor opens it from the chat's title and text, he taps the merge) | the advisor agent's approval of the last commit and CI green on it; then his go for exactly that commit |
-| #66 | the preview hosting check (ADR 0006's spike 1, SPIKE_PLAN entry 6), by lane 2 (the chat he calls Builder V2), run in his test repository Mergincanli/shamble-preview-check; report `docs/reports/2026-11-24-preview-hosting-check.md`: the runs are done; by the draft's rule not passed yet (the header mark not met as written; the build-count mark and his verdict on checklist step 4 open) | `claude/optimistic-albattani-mdoonz` (stands in for `cs/preview-hosting-check`) | draft; risk tier 1 (the report and his seventeen messages in `docs/DECISIONS.md`); main 28254a7 merged in | his answers of 2026-11-25 recorded, the last two at 01:35 Amsterdam (DEPARTURES item 5 (a), HISTORY-ID (a): a normal merge); the advisor agent's review of the final head; his go for that head |
+| #69 | guard-env-fix (SEC-U7B-1: the day guard dropped env, nice and stdbuf option words but not their values, so git and gh behind them went unchecked in a day session or subagent; routines unchanged), by the chat he calls the Guard fix chat | `claude/confident-gates-tbnq38` (stands in for `cs/guard-env-fix`) | draft; risk tier 2, needs-mustafa; code head c3827f4; guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES | the advisor agent's review of the final head; his go for that head (a day session) |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
@@ -61,7 +60,7 @@ _Last updated: 2026-11-25 (change-set 3b took main in: main 09faefa7, #66's merg
 - Decisions still open for him: OQ-0006-22 (before slice 3); the follow-ups marked as his call (FU-P4b, B1-MODES and
   the editor's other questions); the security review of kit-v2-2's finding 4 picks its option for him; and, from R1–R6
   (the full wording: each topic's "Shared open questions" and the v2-research report), ABL-PREDICT (Mustafa, after a
-  Feel Lab test that compares both ways on the Molotov and the Shield): does the client predict the player's own abilities?
+  Feel Lab test that compares both ways on the Molotov and the Shield): does the client predict the player's own abilities? From guard-env-fix (#69): CAP (does his 150-line cap cover the code files only, or docs and the report too) and SAME-GAP (a follow-up guard change-set for the other wrappers).
 
 ## Routines (last read with the routines API, get_trigger, 2026-11-10 20:10 UTC; that read whole: the archive's "Routines")
 - **Night shift** (trig_01QpV6y6UaG1Na2q3jumRDxh): enabled; `CRON_TZ=Europe/Amsterdam 10 0-6 * * *`; Opus 5.5.
@@ -104,6 +103,7 @@ _Last updated: 2026-11-25 (change-set 3b took main in: main 09faefa7, #66's merg
   3B-OTHER-BROWSERS; later 3B-POOL-16, 3B-CSS-PROD, 3B-PUB-MODS, 3B-BLUR-TEST, 3B-HOSTILE-ALLOC; 3c's plan items.
 - **From the preview hosting check** (lane 2; the archive's block): for step 2.6's plan PHC-CLICKLESS, PHC-LOCKFILE,
   PHC-TOKEN-SETUP, PHC-PROBES, PHC-DELETE, PHC-ACTIONS-READ, PHC-ERROR-PATH; at the merge PHC-TR-END; PHC-SCRIPT-LOWS.
+- **From guard-env-fix (#69):** GEF-SAME (the same kind of gap in other wrappers and keywords the day guard strips; the forms are with Mustafa, kept out of the repository), SA-R1-3 (the wrapper loop's turn cap), SA-R2-2 (very long lines against the hook timeout), V-2 (the folder tracking after a split-string value), the reason-text nit.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
