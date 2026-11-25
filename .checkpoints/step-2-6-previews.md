@@ -93,9 +93,20 @@ The order changed (2026-11-25 ~23:02 UTC): the throwaway file STAYS until the to
 re-runs runs 45699354868 and 45700220147, and GitHub's re-run docs ("up to 30 days", "the same GITHUB_SHA ... and
 GITHUB_REF") do not say a run can be re-run once its workflow file is gone. One comment on #72 explains the red
 wall-test checks (7177047663, as the PR rules ask). Head ad2658a: gate, smoke, preview/tests green; toolchain running.
-Next: round 1 now (security-auditor, test-engineer, infra-engineer; the throwaway out of scope); fix pass; report
-(U8); the token sitting (clicks 6-8 with the save note, M1's second half) once the protection for main is merged;
-the throwaway out (U6) right after; then his
+Round 1 done (B13): infra REVISE (runbook), security APPROVE (one condition for the token sitting), test REVISE.
+Fix pass: de6e4b58 (the runbook; reconcile's duplicate removal; the hand-over match; the count's wording) and
+6fd0375d (tests: the lint, the failure paths, the command line): 148 tests; sweeps 32/32 and the test-engineer's
+22/25 (its 3 equivalents left). Round 2 on what changed (infra-engineer, test-engineer) running from ~23:39 UTC.
+THE TOKEN SITTING'S MESSAGE must hold, in order (the security-auditor's condition, B13): (a) reload the `preview`
+page and send a screenshot: bypass box unticked, "Selected branches and tags", "1 branch and 0 tags allowed",
+`main`, no custom rule; (b) both secrets only by "Add environment secret"; (c) click 9 again after the secrets:
+Actions, Dependabot, Codespaces show no CLOUDFLARE_ name (screenshots); (d) the session re-runs M1 (fresh run and
+re-run): the refusal line (annotations API) plus zero steps for all three, a deployment record with status failure
+expected; (e) delete WALL_TEST; wall-test.yml leaves the branch. Plus the dates in their own fields (not the chip),
+and the token's end date into STATUS with a reminder 14 days before.
+Next: round 2's verdicts; the report (U8) with the docs pass (STATUS, ROADMAP, REPO_MAP report row); the advisor
+agent's review of the head; the token sitting once the protection for main is merged; the throwaway out (U6); the
+verifier on the final diff; ready; then his
 sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
 him again (his MAIN-WALL (b)).
 
