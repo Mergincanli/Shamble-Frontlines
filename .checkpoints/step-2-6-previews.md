@@ -38,7 +38,13 @@ His 18:15 message itself (uuid 42aa43e4..., 1778 bytes, sha256 e2554c4e...) goes
 5. Back to him for his go; nothing built before it.
 
 ## Current step
-2: infra-engineer's research running (background).
+4: the plan (revision 1, 081e7e9) is with three readers at once (started about 17:54 UTC, effort xhigh): the
+advisor agent (plan review; notes advisor-plan.md), the security-auditor (the token design and the untrusted build;
+notes security-auditor-plan.md), engine-architect (the departure from ADR 0002 part 10; notes engine-architect-plan.md).
+Done: 2, infra-engineer's research (D1-D8; its last section overrides); 3, the plan, after an advisor tool consultation
+(its points folded in: M1 as a pass mark before any token; ADR 0002 part 10 read; toolchain.yml read: the build lands in
+.gate/dist-production at :172 inside the cut step, so an upload step after it has the network; departures listed;
+GATE-FOLLOW and file scope put to the advisor agent).
 
 ## Rules in force
 - Until a second guard fix is merged: git and gh always start their own command, with no other program in front.
