@@ -92,3 +92,56 @@ list items under `on.schedule`, flow sequences: all read correctly.
 
 ### Findings draft -> see final report (verdict REVISE; no High; Mediums: lint secrets-context + checkout ref, comment
 write failure + PR read failure untested, CLI entry untested, M1 token-elsewhere unmeasured)
+
+### Block 6: the advisor tool's checks (2026-11-25 ~23:30 UTC)
+- Reviewed scratch = committed code: git hash-object of .gate/step26-r1-test/hosting/preview.mjs = 2d34a615 =
+  ad2658a:hosting/preview.mjs = 532780de:hosting/preview.mjs; preview.test.mjs 6f0e0c93 = ad2658a's. NOTE: the main
+  folder's working tree now holds UNCOMMITTED edits to hosting/preview.mjs, preview.test.mjs, the runbook and
+  mutate.py (count wording "deploy attempts ... upper bound", quoted handsOver regex, listing de-dup): another
+  reviewer's fix pass, not reviewed here.
+- `git diff --stat ad2658a 8fef0f6`: only .checkpoints/step-2-6-previews.md. So the CI proof on ad2658a covers the
+  reviewed head's code.
+- M3: sha256 hosting/package.json b47551b1..., package-lock.json df24ffc3... = dependency-check.md's two lines;
+  security-auditor APPROVE 20:30:14 UTC; lockfile commit 1f4fd0d (20:21, held), first pushed with f0e5593 (CI 20:35:37):
+  answer before push. Holds.
+- Sweeps re-run with TAP: every caught mutant shows "# tests 117" (the module loaded) and the failing test names
+  are the targeted tests (e.g. "planted: two pull requests share the commit"). "immutable not required" and "no
+  noindex check" are caught via the bite (good-case test fails "the bite did not bite"), as designed.
+- Lint reader on the real file: jobs [tests, check, deploy, after, reconcile], 26 steps, 12 run steps, 22 block lines
+  (6 + 6 in the two folded `if: >-`, 10 in the three `run: |`), all key-form. Item-form `- run: |` controls planted:
+  with `${{` caught (L1), without: clean. PyYAML (-I, SafeLoader) parses every MISSED variant (02-17, 23-24, 26) with the
+  5 jobs; the two 4-space re-indent variants do NOT parse (my re-indent broke the text): that item is dropped.
+- Docs (docs.github.com .../deployments-and-environments, fetched ~23:32 UTC): "Only branches and tags that match your
+  specified name patterns can deploy to the environment."; "The deployment branch or tag rule is matched against the
+  GITHUB_REF of the workflow run."; "Name patterns must be configured for branches or tags individually." The page does
+  not say how a branch rule `main` treats refs/tags/main; for "Protected branches only" it notes runs "triggered by
+  tags with the same name as a protected branch" cannot deploy. So the tag case is UNMEASURED and the docs do not
+  settle it.
+
+### Block 7: question 6, what first meets the real world at M5-M11 (unproven before merge)
+- main ADMITTED to `preview` (M1 measures only refusal) and the secrets reaching verify-token (M5).
+- Wrangler's real upload with install scripts off (B5: loads, fails at auth with a dummy token) (M5).
+- Cross-run download (download-artifact run-id + actions: read) of a real `preview-site` artifact: needs the CI
+  Builder's hand-over step on main first; until then every check ends with a notice (no preview at all).
+- Cloudflare's real response shapes (verify, project subdomain, deployments list paging/result_info, delete with
+  force, Wrangler's ND-JSON alias): every fake is built from docs + Wrangler 4.164.0 source (M5, M6, M8).
+- GitHub permissions: comment write with pull-requests: write, deployments: read for the count (M5, M9).
+- 404 propagation and Pages' 403/1010 to a runner's scripted fetch (M7); the retry policy is unpinned (T9/T10/T21).
+- The CLI entry itself (T26): first exercised by the first real run; a broken guard = all steps green, nothing done.
+- The count's meaning (M9): records include refused/failed/cancelled deploy-job starts; November already holds 9
+  wall-test records, and the click-8 re-runs add more.
+- Secret hygiene in real logs (M10): wrangler's own output with a real token; the runner masks registered secrets.
+- M11's median needs 5 real runs.
+
+### Block 8: verdict REVISE (no Critical, no High). Findings as handed back:
+M-A lint misses literal G9 bullets (toJSON(secrets)/secrets[...] job-wide; --ignore-scripts=false) test:696,:702
+M-B lint misses checkout ref:/repository: (G1) test:718
+M-C comment write failure + PR read failure unpinned (T1, T4) preview.mjs:512, :491
+M-D CLI entry + defaultIo never run (T26) preview.mjs:607-629
+M-E count not exact (refused jobs make records; measured) plan 2.3 :144, preview.mjs:454-472
+M-F M1 does not measure token-elsewhere (repo/Dependabot secret) nor a tag ref
+L-G B12 under-reports (annotations + deployments readable; fresh ad2658a refusals)
+L-H G6/G2/G4/permissions not linted; L-I unusual YAML shapes / no structure assert; L-J other unpinned paths
+(T2,T3,T5-T10,T12-T15,T17-T19,T21,T25); L-K preview/tests not required, gate blind to hosting/.
+Own mutations: 26; caught 3; equivalent 3 (T11, T20, T23); real survivors 20.
+Disclosure: early calls had `cd ... &&` before git and a `for` loop around gh (read-only).
