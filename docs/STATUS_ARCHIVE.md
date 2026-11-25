@@ -231,6 +231,20 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
 | gate-check-5 (5a smoke, 5b names, 5c layering, 5d script order; CI jobs gate + smoke) | merged: PR #5, 8675367, 2026-10-14 | done: Advisor APPROVE after his own full-gate run (PASS, 26 s) and mutations that failed correctly | none |
 | Phase 0 setup | merged (2d30e4a) | PARTIAL | Mustafa's Windows run |
 
+_Moved from STATUS (2026-11-25, ci-after-3a's docs pass, under his OLD-LINES of 2026-11-18): STATUS's rows for two merged pull requests, moved by script, byte for byte, so their cells read as they stood when they left STATUS. Both merged on 2026-11-25 (read with `git log --first-parent` on main): #69 as 311c048, #67 as c1da1bd._
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| #67 | ADR 0006's small revision after the preview hosting check, by lane 2 (the chat he calls Builder V2), on his ONE-OFF-HEADER (a) and STEP4-COUNT (b): the header mark (PM-0006-2) judged on production's own addresses, with the reason in the row, and production's one-off links with the host's header recorded, not judged; part 1 weighs Workers static assets in a short paragraph from Cloudflare's docs read 2026-11-25 (nothing measured on Workers; in the draft, Pages stays); the build-count question said plainly to be not answered; the pass words of PM-0006-7 and checklist step 4 re-stated as the advisor agent's reading of his STEP4-COUNT (b), never as his decision; part 1's "no cap on previews" dated; report `docs/reports/2026-11-25-adr0006-header-row.md` | `claude/optimistic-albattani-mdoonz` (stands in for `cs/adr0006-header-row`) | a draft until the advisor agent approves its final head, then ready; risk tier 1 (an ADR draft, and his message of 2026-11-25, 11:07:07 UTC in `docs/DECISIONS.md`) | the advisor agent's approval of the head that takes main's #68 merge in, then his go for it (his answers of 2026-11-25, 14:55 Amsterdam, in `docs/DECISIONS.md`: PASS-WORDS (a) with his condition, step 4 achieved (recorded, the question is not answered), WORKERS-NEXT (a)) |
+| #69 | guard-env-fix (SEC-U7B-1: the day guard dropped env, nice and stdbuf option words but not their values, so git and gh behind them went unchecked in a day session or subagent; routines unchanged), by the chat he calls the Guard fix chat | `claude/confident-gates-tbnq38` (stands in for `cs/guard-env-fix`) | draft; risk tier 2, needs-mustafa; code head c3827f4; guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES | the advisor agent's review of the final head; his go for that head (a day session) |
+
+_And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged 2026-11-25 as 3ab9eae), moved by the same docs pass and rule, byte for byte:_
+
+- Change-set 3b: his go for the merge of exactly its last commit (he gets the full id after the advisor agent's approval
+  and CI green; his main Advisor opens the pull request; he taps the merge). His go accepts as still open:
+  3B-LATE-BOUND, OVERFLOW-PANIC-RULE (due with 3b's code in `room`), and his two press limits when due (3B-PACER-255,
+  3B-OUTAGE-256).
+
 ## Targets
 - **v2 (VISION_V2 §3, read with MODES-3 (a): the starting sizes are totals; Mustafa, 2026-10-31):** start with two teams
   with 2–8 players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or
@@ -1245,6 +1259,10 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
       none an error count above 0); #61 merged with no fix for Firefox. The question went to him as FIREFOX-TESTS: his
       answer (c) of ANSWERS-7 (2026-11-23, 14:31:06 UTC) is now (b), by his words of 2026-11-23, 21:24:59 UTC: "Firefox
       in CI joins the small CI pull request after 3a (E1's)." (`docs/DECISIONS.md`)._
+      _Dated pointer, 2026-11-25 (ci-after-3a's docs pass): on that pull request's branch, closed when it merges, CI
+      runs the rule tests (`tests/rules/`) in the runner image's own Mozilla Firefox 160.0 on Linux (his
+      FIREFOX-SOURCE (c), 2026-11-25, 00:07:29 UTC); the browser tests that draw stay Chromium-only in CI, since the
+      runner's Firefox gives the page no WebGL (FF-DRAW, in "From ci-after-3a"); WebKit and Safari not._
   - **From his browser check** (2026-11-19, 14:46:25 to 15:09:29 UTC: eight "Copy report" texts from Brave 1.100.58 and
     Firefox 160 on his Windows computer; the record, with his four messages whole and the readings below:
     `docs/reports/2026-11-19-cs2-browser-check.md`, "Observations for the follow-ups"; the ids are that record's; none
@@ -1309,9 +1327,12 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
   - CUT-PATH (infra-engineer, Low after its own correction; with CI-CUT part 2, the gate v2): inside the cut PATH is
     the runner's, whose first folders the cut's user can write on this image, so a build script can shadow node,
     npx, git, sha256sum or Chrome for every later line; the root-owned tool protects its own file only.
+    _Pointer, 2026-11-25: new evidence from ci-after-3a's review (CUT-PATH-N1 in "From ci-after-3a")._
   - TOKEN-WORDS (security-auditor and infra-engineer, Low; the next CI edit, his yes): the comment "The only step with
     the token" (`.github/workflows/toolchain.yml:91`) is true of run steps; checkout and setup-node, both pinned by
     SHA, receive the job's token as their default input, as on main ("the only run step with the token").
+    _Pointer, 2026-11-25: not done in ci-after-3a, the next CI edit; that chat deferred it again (the chat's choice,
+    not his), to keep its pull request to his four parts; still due at the next CI edit ("From ci-after-3a")._
   - F-CHANNEL (security-auditor, Low; with change-set 3's build work; named in the list of what his go for #64
     accepts; **done in change-set 3a**, 5c92311: `CARGO_OVERRIDES` refuses every `RUSTC_` name, `__CARGO_` and
     `CARGO_UNSTABLE_`, CI's cut names still allowed, and names compared in upper case since 79666ad9;
@@ -1335,6 +1356,8 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     nothing was written on it.
   - Firefox in CI (the chat he calls Builder V3; the small CI pull request after change-set 3a, his FIREFOX-TESTS (b),
     2026-11-23, 21:24:59 UTC).
+    _Pointer, 2026-11-25: carried by the chat he calls CI Builder (ci-after-3a), in part: the rule tests in Firefox in
+    CI; the drawing tests are FF-DRAW ("From ci-after-3a")._
   - The line for CLAUDE.md on the third account (ACCT-3; his to give).
   - RR-F5's fix, SA-TREE and the `__pycache__/` line: change-set 3 (the block for #61 above). _All three **done in
     change-set 3a** (marked there, 2026-11-24)._
@@ -1375,10 +1398,18 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     `--check` (`crates/devtools/vectors/make_f32_vectors.py`, `make_chacha8_vectors.py`); a `pin` line added by hand
     would let WebAssembly accept a new wrong value while the native test ignores pins, and only review and a local
     `--check` would see it (test-engineer's round 2, L-CHECK-CI).
+    _Pointer, 2026-11-25 (ci-after-3a's docs pass): **done** on that pull request's branch, closed when it merges: the
+    `toolchain` job runs both generators' `--check` inside the network cut (`python3 -I -B ... --check`,
+    `.github/workflows/toolchain.yml`) [verified 2026-11-25 at 832268e], green there on Python 3.12.3 (run
+    45676587814); two planted faults fail the checks in the container, none is planted in CI (its report)._
   - 3A-RULES-STEP (the small CI pull request; and `devtools`' first native-only dependency): `devtools` is both the
     native tools crate and the test-only WebAssembly module every development build makes, so its first native-only
     dependency must be target-gated, or the development build and CI break; and the test-only module gets a build step
     of its own in CI (engine-architect's round 1, F5).
+    _Pointer, 2026-11-25 (ci-after-3a's docs pass): its CI half **done** on that pull request's branch, closed when it
+    merges: `cargo build --locked --target wasm32-unknown-unknown -p devtools --lib` on a line of its own inside the
+    cut [verified 2026-11-25 at 832268e]; it proves that `devtools` builds for wasm32, not the module `build.mjs` makes
+    for the tests. Still open: the rule that `devtools`' first native-only dependency is target-gated._
   - _Built in change-set 3b, on its branch (closed when 3b merges; the source: 3b's card, steps 3, 7 and 9):_
     3A-MANIFEST-COMMENT in 1ee3e918, 3A-HOOK-TEST in 4eeec33a (`crates/sim-wasm/tests/panic_hook.rs`), 3A-FROM-F64
     in f8db0de3 (20 cases) and round 1's fix pass (4 more: 24 appended, 10,072 in all) [verified 2026-11-25 at 6abf3d2a: the root `Cargo.toml`'s comment,
@@ -1439,6 +1470,10 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     such a processor.
   - 3A-OTHER-BROWSERS (with Firefox in CI, then later): the vectors ran in Node and Chromium only, not in Firefox,
     WebKit or Safari (test-engineer's round 2, "Not verified").
+    _Pointer, 2026-11-25 (ci-after-3a's docs pass): its Firefox half **done in CI on Linux** on that pull request's
+    branch, closed when it merges: the `firefox` project runs `tests/rules/` (the float and stream vectors and the
+    planted counter) in the runner image's Mozilla Firefox 160.0 (2 passed, run 45676587814) [verified 2026-11-25];
+    the Firefox drawing tests are not in CI (FF-DRAW). WebKit and Safari stay open._
   - 3A-MANIFEST-COMMENT (the next manifest batch, 3b's): the root `Cargo.toml`'s comment "in sim-wasm only" (line 14)
     is no longer true; and "The later cargo-deny wasm-bindgen rule must allow devtools too" (security-auditor's
     answer on the dependency batch, `security-auditor-deps.md`).
@@ -1532,6 +1567,10 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     for (engine-architect's round 2).
   - 3B-OTHER-BROWSERS (with the small CI pull request another chat writes): PM-0002-12 is shown in Chromium only;
     its row asks for Chromium, Firefox and WebKit (the row, `docs/adr/0002-code-structure-build-toolchain.md:1283`).
+    _Pointer, 2026-11-25 (ci-after-3a's docs pass): still open after that pull request: the mark's test
+    (`packages/e2e/tests/skeleton/presses.spec.ts`) opens the page, which the runner's Firefox cannot start drawing,
+    and lies outside `tests/rules/`, the only folder the `firefox` project runs [verified 2026-11-25 at 832268e]; it
+    waits for FF-DRAW, and WebKit for its own route._
   - 3B-OQ6-POINTER (at ADR 0001's next edit; NOT edited now): three places in the netcode draft still say the proof
     test decides how commands are timed (`docs/adr/0001-multiplayer-netcode.md` lines 252, 1156 and 1699 to 1700); each gets a
     dated pointer to his decision of 2026-11-24 (`docs/DECISIONS.md`, 22:44:50 and 23:24:50 UTC; the build plan's three
@@ -1613,6 +1652,52 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     part is ADR6-REVISIT-WORKERS above; step 2.6's part is STEP26-WORKERS.
   - STEP26-WORKERS (his, for step 2.6's plan): keep the deploy step small enough to move to Workers later, say in two
     lines what such a move would cost, and weigh the 30-day rule for old previews.
+- **From ci-after-3a, the small CI pull request after change-set 3a** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz; no pull request number yet, its title and text in the chat's notes; branch
+  `claude/keen-tesla-v807cf` standing in for `cs/ci-after-3a`, code head 832268e; risk tier 2; one review round by
+  security-auditor and infra-engineer on the tried texts before his yes: `security-auditor-ci.md` and
+  `infra-engineer-ci.md` in `.checkpoints/ci-after-3a/`, readable at 832268e until the notes are deleted; report
+  `docs/reports/2026-11-25-ci-after-3a.md`; the ids are the chat's and this docs pass's, not his):
+  - E1 (change-set 3's plan, section 6 at 6491b839; his opening block of 2026-11-24, part a): **done** on the branch,
+    closed when it merges: the release test line names all six crates (`-p sim -p protocol -p room -p client-endpoint
+    -p sim-wasm -p devtools`) [verified 2026-11-25 at 832268e].
+  - FF-DRAW (his question first: his words of 2026-11-25, 14:55 Amsterdam, point 3; when: with the gate step 2.3, as
+    its own question, his FF-DRAW-WHEN (a) of 20:35 Amsterdam): the Firefox drawing tests in CI
+    need a graphics route for Firefox on the runner, an install line or a Firefox graphics setting (such as
+    `webgl.force-enabled`), each his question first. On GitHub the runner's Firefox 160.0 gave the page no WebGL ("This
+    page could not start drawing: ... this.gl is null", "libEGL.so.1: not in the loader cache of this runner"; run
+    45670972698 on 52ad5d3, its log read 2026-11-25); in the container a blank page got the same refusal
+    (`question-2026-11-25-firefox-gl.md`). Until then the `firefox` project runs `tests/rules/` only.
+  - FF-SPEC-COMMENTS (outside that pull request's fence; with FF-DRAW, when Firefox runs these specs): the comments at
+    `packages/e2e/tests/skeleton/isolation.spec.ts:1-3` ("Chromium's 4 of the 12 cases; Firefox and WebKit run in CI
+    later") and `file-url.spec.ts:1-3` ("here for Chromium") [verified 2026-11-25 at 832268e] still read true while
+    the `firefox` project runs neither spec; they are to be updated when it does (security-auditor's F1 follow-up;
+    the plan's section 7).
+  - FF-FILEURL-PREF (security-auditor's F1, Medium; its comment fix was taken; matters only when Firefox draws):
+    Playwright starts Firefox with its own test preferences, one of them `security.fileuri.strict_origin_policy`
+    false, so what `file-url.spec.ts` records there may differ from a player's Firefox (inferred, not measured). His
+    FF-FILEURL (a) kept the spec in Firefox with that comment; the rules-only change took both out of Firefox's run.
+    Revisit with FF-DRAW.
+  - FF-STOP (infra-engineer's F6, Medium; his FF-STOP (a): "keep the 5-minute stop for the first run"): the Firefox run
+    keeps Playwright's 5-minute stop. The 15 tests Firefox would run took about 187 s in Chromium in the container, two
+    of them 2.4 minutes together, so a slower Firefox may reach the stop; revisit when the drawing tests return (a CI
+    text change: his yes first).
+  - FF-SANDBOX (infra-engineer's F5, Low): the log prints "Sandbox: CanCreateUserNamespace() unshare(CLONE_NEWPID):
+    EPERM" just before Firefox's version line (run 45676587814, read 2026-11-25), so Firefox starts with a weaker
+    sandbox of its own (the report's reading); harmless inside the cut (security-auditor's threat model: a Firefox exploit gains only the cut's user,
+    which planted code already is). A launch failure would show as the 2 rule tests failing.
+  - CUT-PATH-N1 (security-auditor's N1; new evidence for CUT-PATH in the #64 block above): the new lines call
+    `python3` and `grep` through the runner's PATH (`ldconfig` by its full path, `/usr/sbin/ldconfig`; Firefox by
+    `/usr/lib/firefox/firefox`); GitHub's image build runs `chmod -R 777` on `/opt` and `/usr/share` (security-auditor's
+    E10: actions/runner-images' scripts on their main branch, not the image of 2026-11-16, read 2026-11-25 through a
+    fetched summary, the scripts' order not read), so Chrome's folder under `/opt` is probably writable inside the cut
+    (inferred, not measured); Firefox's code under `/usr/lib/firefox` is root-owned in the 161.0 package the trial
+    read, not checked on the runner's 160.0.
+  - TOKEN-WORDS (the #64 block above; due "at the next CI edit"): deferred again, by the chat, not by him.
+    _Dated pointer, 2026-11-25 (his TOKEN-WORDS (a) with one change, 20:35 Amsterdam, `docs/DECISIONS.md`): it rides in
+    the next workflow text the chat asks him for, the hand-over step for Builder V2's previews, at no yes of its own._
+  - FF-ORDER (infra-engineer's F3, Low): the Firefox run starts only if the Chromium run passes (`set -e`), so a red
+    Chromium run gives no Firefox evidence; accepted for now.
 - **Moved from STATUS (2026-11-24)** (by lane 2's docs pass for the preview hosting check, under his OLD-LINES: lines
   about merged pull requests, moved by script, byte for byte): STATUS's Follow-ups lines 78-93 at main 28254a7, the
   four bullets of the merged pull requests #49, #50, #51 and #48 for the gate step (2.3), are the four bullets below.
@@ -1979,6 +2064,8 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   2. The scan of `crates/sim/src` reads text, not types: it refuses some valid code (3A-SCAN-HELPERS) and misses a
      macro that builds a call itself (its doc says so); it is interim until the quality gate step's lints.
   3. CI does not check that the vector files match their generators (3A-GEN-CHECK, a CI edit).
+     _Pointer, 2026-11-25: CI checks them on ci-after-3a's branch (3A-GEN-CHECK, marked done there); closed when that
+     pull request merges._
 - **The preview hosting check (ADR 0006's spike 1, SPIKE_PLAN entry 6)** (lane 2, in flight, 2026-11-24; its report
   `docs/reports/2026-11-24-preview-hosting-check.md`, "Risks"; the ids are this docs pass's):
   1. PHC-HEADER: the header mark (PM-0006-2) is not met as written: production's one-off links (0354374e and
@@ -2040,6 +2127,7 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
 | CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 28254a7, PR #65's merge commit (run ids not recorded here) | 2026-11-24 | change-set 3b's card, step 0 (read 22:45 UTC) [assumed: not read again by this docs pass] |
+| ci-after-3a (no pull request yet): the `toolchain` job with every crate's release tests, the two generator checks, `devtools`' wasm32 line and two browser runs | on 832268e: the job 18:34:50 to 18:40:12 UTC (5 min 22 s by the job's start and end; the report gives 5 min 20 s); Chromium "16 passed (3.4m)"; Firefox 160.0 "2 passed (15.0s)" (the rule tests only); Python 3.12.3; gate and smoke green (run 45676587871). The red first run on 52ad5d3 (45670972698): Chromium "16 passed (3.5m)", Firefox "4 failed", "9 did not run", "2 passed (5.0m)" at Playwright's 300 s stop | 2026-11-25 | GitHub Actions, run 45676587814 and 45670972698 logs (gh, read by ci-after-3a's docs pass) |
 | Change-set 3b (in review, no pull request yet): the `toolchain` job on a runner, the players' Wasm and the browser tests | the job 4 min 47 s (0dfca749, run 45529670690) to 4 min 58 s (the final code 6abf3d2a, run 45537884772) of its 15 minutes; CI green on d117fca5 and eb0d2314, and gate, smoke and toolchain green on 0dfca749, 6380df45, a85b9dbb and 6abf3d2a; the players' Wasm 53,813 bytes (21,994 gzip, 18,464 brotli; sha256 5ebae154...b41262) as written before the push of the commit that closes round 2's fixes (31,718 on main); 16 browser tests in 3.3 to 3.4 of CI's 5 minutes; on 0dfca749 in CI: the one-minute loop 1,816 ticks in 60.5 s, key to tick median 167.7 ms and 95th percentile 185.0 ms at about 10 frames a second; the press test 10,000 presses and releases made and echoed, 0 refused; allocation 90 bytes a frame and 597 a block; on 6abf3d2a in CI: the loop 1,814 ticks in 60.6 s, key to tick median 238.1 ms and 95th percentile 257.8 ms at about 7 frames a second, the press test 10,000 presses and releases made and echoed, 0 lost, 0 doubled, allocation 91 bytes a frame and 590 a block; 53 of 53 planted defects caught on 6abf3d2a | 2026-11-25 | change-set 3b's card, "Current step" (CI read line by line by the builder) |
 | CI on main (older) | `gate` with `smoke` (run id 45373057216) and `toolchain` (run id 45373056953) success on 1ec6f6c, PR #64's merge commit (push) | 2026-11-24 | GitHub Actions check runs (REST API, read 2026-11-24) |
 | Change-set 3a (PR #65, merged 2026-11-24 as 28254a7): the `toolchain` job on a runner, and the players' Wasm | 138 s (a1c59e8) to 185 s (8619d539) per job, from the job's start and end, on the six heads whose times the card records; the players' Wasm with the panic hook 31,718 bytes, sha256 383f5303...3963, the same bytes on the runner and in the container since the remap (RR-F5; 28,991 on the runners before 3a); 14 browser tests in Google Chrome 157.0.8103.78 in about 1.1 min; boundary tests 2 files, 17 tests; the client's unit tests 70; the allocation test 61 bytes a frame and 529 a block (75 frames) on 8619d539, whose runner image moved to 20261116.133.1 (20261116.376.1 before): the verifier's TE-WATCH read found the allocation inside its windows (25 to 170, 430 to 610) and the default backend unchanged (the WebGL 2 fallback); one red, on a1b2e802 (an assertion of the builder's, fixed forward, not re-run) | 2026-11-24 | change-set 3a's card at f153ddf4 (steps 4 to 12); the job log of 8619d539 (job 138592422504) |
