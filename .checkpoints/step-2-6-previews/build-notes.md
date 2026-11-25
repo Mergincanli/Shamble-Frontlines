@@ -276,3 +276,12 @@ GitHub (docs.github.com):
   annotate's line-break escape removed, T23 a loose "closed" test) are the three it judged equivalent itself (the outcome
   is the same: a failed check, messages already escaped by show(), reconcile stores only open or closed). All 20 of its
   real survivors are now caught; this chat's sweep: 32 of 32.
+
+## B14. Review round 2, on what changed (8fef0f6..6fd0375d)
+- infra-engineer (round2-infra-engineer.md): APPROVE. INFRA-M1 and INFRA-M2 closed; INFRA-M3 closed in the runbook only
+  (STATUS gets the end date when the token is made: carry it in the report and the token sitting's message); Lows L1,
+  L2, L3, L5, L6, L7 and the noindex observation closed; the deferrals (L4, L6's #59 note) agreed. Two new Lows, for the
+  next push: preview.mjs :291 and :295 point to "the runbook: clicks 6 and 8" (the runbook has "The token", "To
+  renew"); the runbook's rebuild step 4 points to "To renew, steps 2 to 4", skipping step 5 (the end date in STATUS),
+  and step 3's "Replace" reads "Add" in a rebuild.
+- test-engineer: running.
