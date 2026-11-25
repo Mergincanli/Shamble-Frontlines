@@ -29,7 +29,7 @@ world, not a constant (4c); `StateSink::f32` with a finite check (4c); the recor
 | R5 | Low | `state_hash.rs`'s header says the whole-state hash never leaves the Worker or the server; the committed hashes files hold it for a public test seed, by design | Fix, 1 line: "over a match's own seed" |
 | R6 | Low, optional | `recording.rs` promises never to panic and does not carry the room's lint guard (unwrap, expect, indexing, arithmetic); tried on a copy: 2 errors, both bounded products | Fix, about 11 lines |
 | R7 | Low | `compare::field_diff` has no caller outside its unit tests (plant E's field difference is made in Python) | Fix with N1: the `replay` tool gains the comparison of two state dumps, about 10 lines |
-| R8 | Low, optional | The hash can be fed straight from the visitor, with no buffer in the room: the players' file would grow by 701 bytes and not 1,794 (measured on a copy: 54,514 bytes; first-loop still replays to all 1,800 committed hashes, both columns), the export becomes `&self`, and nothing can allocate. About 60 lines | Decide with engine-architect's answer on the export's shape |
+| R8 | Low, optional | The hash can be fed straight from the visitor, with no buffer in the room: the players' file would grow by 701 bytes and not 1,794 (measured on a copy: 54,514 bytes; first-loop still replays to all 1,800 committed hashes, both columns), the export becomes `&self`, and nothing can allocate. About 60 lines | **Fix now** (engine-architect's E1 says take it now) |
 Its answers to the six questions, in short: no input makes the reader, the hashes parser, the replay or the two replay
 exports panic or take memory before a count is checked (R3 aside): read, and fuzzed in wasm32 in both profiles (20,000
 mutated inputs, every step count that would wrap a 32-bit product, all 256 map-id lengths; a planted overflow shows
@@ -58,6 +58,21 @@ injections on movement fields; the replay loop pinned to the live host's call or
 `scripts.rs`'s button numbers pinned to `keyboard.ts`. For the small CI change E1: the tools crate's tests in release.
 It left `.gate/te-4a` (a worktree), `.gate/te-4a-target` and `.gate/te-scratch` behind: its delete was refused.
 
-## engine-architect: (running)
+## engine-architect: APPROVE; nothing Critical, High or Medium in its lane (`engine-architect-r1.md`)
+| # | Severity | Finding | Decision |
+|---|---|---|---|
+| E1 | Low | Its answer to R8: take it now. "Read-only" is true of `shared_hash` but rests on three function bodies, not on the signature (`&mut self`), and the room reserves a buffer by a constant that 4c turns into a length per match. Feed FNV-1a straight from the visitor (one encoder that writes into a `Vec` or into the hash's state; a plain struct, not `core::hash::Hasher`, whose docs call its bytes "not portable across platforms"), `shared_hash(&self)` at the room, the local match and `Sim`, the room's buffer gone, and one test that the streamed hash equals `fnv1a_64` over `write_shared_state`'s bytes | **Fix now, about 50 to 60 lines** (R8 and E1 agree; the players' file shrinks by 1,093 bytes by rust-reviewer's measurement) |
+| E2 | Low | `StateSink`'s doc says "Every writing of the state goes through it": read to the letter that invites 4c to write the snapshot or the block through the visitor, which would tie the wire format to the hash's order and put the seed one mistake from a client | Fix, 2 lines: "every canonical writing (the hashes' bytes, the named dumps); the snapshot and the block keep their own layouts" |
+| E3 | Low | `bytes(&[u8])` writes no length (rust-reviewer's 4A-BYTES-LENGTH) | Fix, about 5 lines: the type `&[u8; N]`, so a run of varying length cannot be handed to it |
+| E4 | Low | `Replayable` in `recording.ts` is written by hand and nothing ties it to the generated `Sim` type: when 4c widens `input` to 13 numbers a 6-number replay would still type-check and run | Fix, about 3 lines in `recording.test.ts`, which CI type-checks with the generated types |
+| E5 | Low, optional | The pin catches a new method's name but not a changed shape of `shared_hash`; `sim-wasm/src/lib.rs`'s header does not list this number | Fix, about 3 lines |
+Its measurements: the players' file's imports are 3 before and after; its exports 18 before, 19 after, the one new
+being `sim_shared_hash`; in the production Worker's bundle `shared_hash` appears once (the glue's definition) and
+nothing calls it; none of the test-only reader's strings is in either built page. Every touched file is lane 1's.
+For 4b (no line now): content enters through the constructor only; if the players' file must compute the content's
+SHA-256, `sha256.rs` moves whole into the content crate, never a second copy; first-loop's header is re-made with
+its frozen content set and every hash line stays byte-identical, which proves that loading content changed no state.
+For 4c: `u8`, `f32` (through `to_bits`) and `row()` join `StateSink`; the paced replay reads the hash through a
+development-only driver, never through the live host's interface; the button meanings get one home in Rust.
 
 ## security-auditor: (starts when a slot is free)

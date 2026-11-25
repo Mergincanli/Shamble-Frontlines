@@ -31,3 +31,26 @@ Head: worktree `.gate/lane1-takeover`, branch cs/4-walk, source as at eb14739 (n
 8. Findings with severity, lines, follow-up change-set; coverage table; not verified.
 
 ## Findings (a line each, as found)
+- Q5 checked: `git diff --name-status c1da1bd...HEAD` outside .checkpoints = crates/ and packages/ source + 4 files in
+  crates/devtools/recordings/; no manifest, lockfile, CI, kit, gate or build-script file; devtools/Cargo.toml unchanged;
+  new imports are Node built-ins only (node:fs, node:path, node:url, node:crypto).
+- Q1 page reach checked: HostSim (host.ts:9-15) has no shared_hash; the page's 4 message types (messages.ts:10-34,
+  checked at :118-142) never call it; worker.ts keeps Sim in module scope; the built Worker chunk (.gate/dist-production
+  and dist-development, worker-Cw_wzaMy.js) assigns no globals; it holds the glue wrapper `shared_hash(){...
+  sim_shared_hash...}` (class methods are not tree-shaken), reachable only by code holding a Sim. NOT reachable.
+- Q1 seed paths checked: outside tests only devtools computes the whole-state hash (replay.rs:125); room/sim-wasm call
+  write_shared_state only (room lib.rs:132, world.rs:189-192); players' file raw exports (node, WebAssembly.Module.exports)
+  = one new `sim_shared_hash`, no state_hash/fnv/devtools strings (grep -a on pkg wasm, sha256 e419e4cc..., 55,607 B,
+  equal in both built pages). No path for a real seed or a value computed from it in 4a.
+- Q1 leak today: the shared hash covers tick + own buttons + own presses: all in the block the page already gets. Nothing.
+- Q2 checked: test module built only in non-production builds into .gate/rules-module (build.mjs:11-16, 71-72, 122-136),
+  outside the dev server's allow list (vite.config.mjs:37) and refused in a built page (build-checks.mjs:189-197); both
+  built pages hold no SHMBLREC/TESTSEED/readRecording text. recording.ts: out by import graph only (= N5).
+- F1 Low (= N2/R2, plus): replay.rs:87-99 and recording.ts:131-139/149-154 do not re-check TESTSEED; also recording.rs:38
+  `Header` derives Debug with the seed (World and MatchSetup deliberately have none). Fix in Replay::new (one entry for
+  tools, files.rs, test module) + checkReplayable; optional hand-written Debug. ~10 (+8 optional).
+- F2 Low (doc now, tests later): world.rs:187-188 (pre-existing line, now on the players' file) calls the shared hash "the
+  one a client's state can be compared with"; ADR 0001:323-324 says no state hash is exchanged with clients. From 4c the
+  shared part holds every soldier. FNV-1a steps are invertible (xor, then multiply by an odd constant mod 2^64): a hash over
+  mostly-known bytes gives the few unknown back (meet in the middle: 2^(4n) work for n unknown bytes). Conditions for
+  cs7 / Slice 3 written in the report. ~2 lines now.
