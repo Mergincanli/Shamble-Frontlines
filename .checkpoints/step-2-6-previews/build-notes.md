@@ -200,3 +200,17 @@ GitHub (docs.github.com):
   is the bypass box's saved state. His question "which environment?" (WALL-FAIL-NEXT (a)): the GitHub environment
   `preview`, this page.
 - Next: he clicks "Save protection rules", reloads, checks the box stays unticked, says "fixed"; this chat re-runs.
+
+## B12. M1 after click 5, second try: PASSED for what the tools show (2026-11-25, 22:56 UTC)
+- His "fixed" (uuid 5ff5bcf4-7ef7-42d0-9e5e-46203589ee68, 22:56:01 UTC, 86 bytes): the bypass box saved unticked;
+  and his yes to watching #72 (this chat subscribed to its activity).
+- Re-run by this chat at 22:56 UTC, attempt 3: push-to-branch job 139566690597 (run 45699354868), pr-plain job
+  139566698136 and pr-no-deployment-record job 139566697600 (run 45700220147): each "completed", "failure", with no
+  step listed, no runner assigned (22:56:12 to 22:56:15), and no log (get_job_logs: HTTP 404). get_check_run's output
+  is empty. So GitHub refused all three before any step.
+- Not read by the tools: GitHub's refusal line (a run annotation; asked of him as a screenshot, as the plan allows),
+  and whether a deployment record was made (no tool for the deployments list here): recorded as not read.
+- What the two tries show together: with the box unticked but not saved (attempt 2, 22:29), all three ran and saw
+  the test value; after "Save protection rules" (attempt 3), all three were refused. The plan's click 5 lacked the save;
+  the runbook now names it, and the token sitting's instructions must too.
+- His sitting messages (7903e9f9: TOKEN-TONIGHT (b); 5ff5bcf4) are in DECISIONS (scripts/add_sitting.py).

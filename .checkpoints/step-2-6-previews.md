@@ -85,8 +85,12 @@ is taken in later, before the merge.
 three-way check OK in all 7 files main changed; one-sided files equal; the workflow hashes intact; gate PASS, 117
 tests, map OK); pushed as a fast-forward; the main folder fast-forwarded to it (no guard prompt).
 #72's runs on e3b3642b: preview/tests 117 pass on GitHub (the CI proof); wall-test's three jobs printed "absent"
-(M1's before-bite; build-notes B8). Next: his sitting (clicks 1-5 with M1's re-run after 5; then 9, 10; then the
-question again before the token, the wall not merged; then 6-8 with M1's re-run) and then his
+(M1's before-bite; build-notes B8). His sitting 2026-11-25 evening: clicks 1-4 (new account "Shamble previews",
+project shamble-previews by the legacy Pages path), click 5, clicks 9 and 10 done; TOKEN-TONIGHT (b): the token
+waits for the Guard fix chat's protection for main. M1 after click 5: try 1 FAILED (bypass box not saved; B10),
+try 2 PASSED (all three refused before any step; B12). Watching #72 (subscribed).
+Next: his screenshot of the refusal line (optional); the throwaway file out (U6); round 1 (U7); report (U8); the
+token sitting (clicks 6-8 with the save note, M1's second half) once the protection for main is merged; then his
 sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
 him again (his MAIN-WALL (b)).
 
