@@ -33,7 +33,9 @@ test("a held key's repeats count nothing, and a tap between two frames is still 
   keys.key("KeyW", true, false, 41);
   keys.key("KeyW", false, false, 42);
   expect([keys.held, keys.word(0), keys.presses, keys.releases]).toEqual([0, 1, 2, 2]);
-  // A key-up without its key-down (the key went down before the page had the focus) is nothing.
+  // A key that went down before the page had the focus: its repeats are no press, and its key-up is nothing.
+  expect(keys.key("KeyA", true, true, 49)).toBe(true);
+  expect([keys.held, keys.presses]).toEqual([0, 2]);
   keys.key("KeyA", false, false, 50);
   expect([keys.presses, keys.releases, keys.changedAt]).toEqual([2, 2, 42]);
 });
