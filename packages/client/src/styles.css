@@ -47,3 +47,25 @@ body {
   height: 12em;
   background: #111;
 }
+
+/* The key diagram beside the readout: a box per key, lit from the server's echo. Development builds only. */
+#key-diagram {
+  position: fixed;
+  left: 8px;
+  bottom: 8px;
+  display: flex;
+  gap: 4px;
+  font: 12px/1 ui-monospace, monospace;
+}
+
+#key-diagram span {
+  padding: 6px 8px;
+  border: 1px solid #777;
+  background: rgb(0 0 0 / 70%);
+}
+
+#key-diagram span.lit {
+  border-color: #fff;
+  background: #e8e8e8;
+  color: #111;
+}

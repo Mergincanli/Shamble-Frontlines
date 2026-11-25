@@ -1,11 +1,30 @@
 //! The first message types (ADR 0001, the message table and parts 5 and 6): what each message holds, as plain Rust
-//! types. There is no codec yet: the wire form (bit widths, delta coding, 16-bit tick offsets) comes with it, in the
-//! build plan's change-set 3. A test writes their TypeScript form into `packages/types` (`ts_export`).
+//! types. Their first wire form is `codec`'s: whole bytes, every command sent whole; the narrower widths and the
+//! delta coding come before online play. A test writes their TypeScript form into `packages/types` (`ts_export`).
 //!
-//! A field marked "provisional" is open in the decision drafts. What may still move it: the netcode proof test's
-//! results (OQ-0001-6, OQ-0001-7, R2-XU-OQ4), the codec, the definition of the mode hash and the join token's format.
-//! A counter (a sequence, a press counter) wraps at its wire width, which may be narrower than its type here: two
-//! values are compared only with the codec's wrap-aware comparison, never with `<`.
+//! A field marked "provisional" is open in the decision drafts. What may still move it: how commands are timed at
+//! the server (OQ-0001-6), which Slice 3 picks; the netcode proof test's results (OQ-0001-7, R2-XU-OQ4); the
+//! definition of the mode hash and the join token's format. A counter (a sequence, a press counter) wraps at its
+//! wire width: two values are compared only with `wrap`'s compares, never with `<`.
+
+/// The protocol's version, which a `Join` carries and the room checks.
+pub const PROTOCOL_VERSION: u16 = 1;
+
+/// The buttons a command has room for: one held bit and one press counter each.
+pub const BUTTONS: usize = 16;
+
+/// The most commands one `Input` carries: the newest and its repeats (ADR 0001 part 5: "data, proposed 8"; a
+/// constant here until the content data exists).
+pub const REDUNDANCY_CAP: usize = 8;
+
+/// The most snapshot acknowledgements one `Input` carries: one per entity group, and there is one group so far.
+pub const MAX_ACKS: usize = 4;
+
+/// The longest join token, in bytes. Provisional with the token's format.
+pub const MAX_TOKEN_BYTES: usize = 1024;
+
+/// The longest mode id, in bytes of UTF-8.
+pub const MAX_MODE_ID_BYTES: usize = 64;
 
 /// Client to room, the first message on the control stream.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -46,15 +65,34 @@ pub struct JoinAccepted {
     pub snapshot_rate_hz: u8,
 }
 
+/// Room to client, the answer to a `Join` it refuses.
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
+pub struct JoinRejected {
+    pub reason: RejectReason,
+}
+
+/// Why a room refused a `Join`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
+pub enum RejectReason {
+    /// The client speaks another version of the protocol.
+    ProtocolVersion,
+    /// The client loaded other content than the room runs.
+    ContentHash,
+    /// Every slot is taken.
+    RoomFull,
+}
+
 /// Client to room, every tick: the newest snapshot the client decoded per entity group, and every command the room
-/// has not acknowledged yet, up to a cap that is data (ADR 0001 part 5).
+/// has not acknowledged yet, up to `REDUNDANCY_CAP` (ADR 0001 part 5).
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Input {
     /// One per entity group the client has decoded a snapshot of.
     pub acks: Vec<SnapshotAck>,
-    /// The commands not acknowledged yet, their sequence numbers consecutive. Provisional: their order (which end
-    /// is the newest) comes with the codec, which codes each repeat against the newer command beside it.
+    /// The commands not acknowledged yet, the newest first: each one's sequence number is one below the command
+    /// before it (wrapping), and its tick 1 to 255 ticks earlier.
     pub commands: Vec<Command>,
 }
 
@@ -84,7 +122,7 @@ pub struct Command {
     pub buttons: u16,
     /// A press counter per button, so a resent command neither loses nor doubles a press; each wraps. Provisional:
     /// its width.
-    pub presses: [u8; 16],
+    pub presses: [u8; BUTTONS],
     /// The world point the player aims at.
     pub aim: AimPoint,
     /// The time the player's view showed when the command was made.
@@ -115,7 +153,20 @@ pub struct ViewTime {
     pub fraction: u16,
 }
 
-/// Room to client, every tick: the snapshot's header (ADR 0001 part 6). Its sections enter with the data they hold.
+/// The receiving player's own part of a snapshot (ADR 0001 part 6's owner-only section). Provisional: so far it is
+/// the input the room last applied for the player, which is what the page's key diagram shows and what the client
+/// checks its sent presses against; the soldier's own state joins with the soldier.
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
+pub struct OwnState {
+    /// One bit per button the room holds as held.
+    pub buttons: u16,
+    /// The press counter per button, as the room last applied it; each wraps.
+    pub presses: [u8; BUTTONS],
+}
+
+/// Room to client, every tick: the snapshot's header (ADR 0001 part 6) and the receiving player's own part. Its
+/// other sections enter with the data they hold.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Snapshot {
@@ -131,4 +182,6 @@ pub struct Snapshot {
     pub last_processed_command: Option<u16>,
     /// The entity group this datagram holds. Provisional: its width.
     pub group: u8,
+    /// The receiving player's own part; none before the room has a player in that slot.
+    pub own: Option<OwnState>,
 }

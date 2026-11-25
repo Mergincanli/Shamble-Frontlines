@@ -11,8 +11,9 @@ publish = false
 # Shared dependency versions, set once here; each enters with the first crate that needs it (ADR 0002 part 3).
 [workspace.dependencies]
 ts-rs = { version = "=12.0.1", default-features = false }
-# The bindings the Worker loads (ADR 0002 parts 2 and 5), in sim-wasm only. The command-line tool that writes the glue
-# must be exactly this version (PM-0002-18); each bump is its own change-set.
+# The bindings the Worker loads (ADR 0002 parts 2 and 5): in sim-wasm, and in devtools for the test-only WebAssembly
+# module, which links sim-wasm's panic hook (a later cargo-deny rule on wasm-bindgen must allow both). The
+# command-line tool that writes the glue must be exactly this version (PM-0002-18); each bump is its own change-set.
 wasm-bindgen = "=0.2.130"
 
 # Every crate opts in with `[lints] workspace = true` (ADR 0002 parts 4 and 7).

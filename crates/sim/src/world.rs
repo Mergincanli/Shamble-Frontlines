@@ -1,5 +1,6 @@
 //! The world: the whole state of one match, and the step that advances it (ADR 0004 parts 1, 3, 4, 8 and 9). So far
-//! it holds the tick counter and the match seed. The step reads no clock and takes no time: one call is one tick.
+//! it holds the tick counter, the one player's applied command and the match seed. The step reads no clock and takes
+//! no time: one call is one tick.
 
 use crate::state_hash::fnv1a_64;
 
@@ -9,34 +10,87 @@ pub const TICK_HZ: u32 = 30;
 /// The length of a match seed in bytes.
 pub const SEED_BYTES: usize = 32;
 
-/// The length of the canonical state bytes: the tick (4), then the seed (32).
-const STATE_BYTES: usize = 4 + SEED_BYTES;
+/// The buttons a player's command has room for.
+pub const BUTTONS: usize = 16;
+
+/// The length of the shared state's canonical bytes: the tick (4), then the player's record (2 and 16). It is the
+/// part a client holds too; what follows it is the authority's alone.
+pub const SHARED_STATE_BYTES: usize = 4 + 2 + BUTTONS;
+
+/// The length of the whole state's canonical bytes: the shared state, then the seed.
+const STATE_BYTES: usize = SHARED_STATE_BYTES + SEED_BYTES;
+
+/// What the authority starts a match from. There is no `Debug`: the seed is never printed or logged (ADR 0004 part
+/// 8).
+pub struct MatchSetup {
+    /// From whoever starts the match; the simulation draws none itself.
+    pub seed: [u8; SEED_BYTES],
+    /// The tick the match starts at: 0 in play, and near a counter's wrap in the tests of the wraps.
+    pub start_tick: u32,
+}
+
+/// What the simulation reads of one player's command: the buttons held and a press counter per button, each
+/// wrapping. A command's move, aim and view time join when a system reads them.
+///
+/// The counters are running totals, so one command can bring many presses of one button at once: an honest client
+/// after an outage of 255 ticks brings up to 255. A system that acts on presses applies at most what its own rule
+/// allows per tick (one jump, one shot per cooldown) and never one action per press it finds.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PlayerCommand {
+    pub buttons: u16,
+    pub presses: [u8; BUTTONS],
+}
+
+impl PlayerCommand {
+    /// Nothing held and no press yet: the record before the first command.
+    pub const NONE: Self = Self {
+        buttons: 0,
+        presses: [0; BUTTONS],
+    };
+}
 
 /// The whole state of one match. There is no `Debug`: the seed is never printed or logged (ADR 0004 part 8).
 pub struct World {
     tick: u32,
+    /// The command last applied for the one player there is so far; the soldier table takes its place.
+    player: PlayerCommand,
     seed: [u8; SEED_BYTES],
 }
 
 impl World {
-    /// A new match at tick 0. The seed comes from whoever starts the match; the simulation draws none itself.
+    /// A new match at the setup's start tick, with nothing held.
     #[must_use]
-    pub const fn new(seed: [u8; SEED_BYTES]) -> Self {
-        Self { tick: 0, seed }
+    pub const fn new(setup: &MatchSetup) -> Self {
+        Self {
+            tick: setup.start_tick,
+            player: PlayerCommand::NONE,
+            seed: setup.seed,
+        }
     }
 
-    /// The number of ticks run so far. It is the simulation's only clock: sim time is `tick / TICK_HZ` seconds.
+    /// The number of ticks run so far, counted from the start tick. It is the simulation's only clock: sim time is
+    /// `tick / TICK_HZ` seconds.
     #[must_use]
     pub const fn tick(&self) -> u32 {
         self.tick
     }
 
-    /// Runs one tick of the authority's phases. So far the only state that moves is the tick counter.
+    /// The command last applied for the player.
+    #[must_use]
+    pub const fn player(&self) -> &PlayerCommand {
+        &self.player
+    }
+
+    /// Runs one tick of the authority's phases with the player's commands for it, the oldest first: the newest
+    /// becomes the player's record. With none the record holds, so a held button stays held.
     ///
     /// # Panics
     /// When the counter is at `u32::MAX`, which is 4.5 years at 30 Hz: it stops loudly and never wraps (ADR 0004 part
     /// 4: counters use explicit operations).
-    pub fn authority_step(&mut self) {
+    pub fn authority_step(&mut self, commands: &[PlayerCommand]) {
+        if let Some(newest) = commands.last() {
+            self.player = *newest;
+        }
         self.tick = self
             .tick
             .checked_add(1)
@@ -44,17 +98,25 @@ impl World {
     }
 
     /// Writes the canonical bytes of the whole state into `out`, replacing what it held (ADR 0004 part 9): field by
-    /// field in a fixed order, every integer at a fixed width and little-endian, no `usize`. The order is the tick as
-    /// a `u32`, then the 32 seed bytes. Each field that joins the state joins here, in the same change.
+    /// field in a fixed order, every integer at a fixed width and little-endian, no `usize`. The shared state comes
+    /// first (the tick as a `u32`, then the player's buttons as a `u16` and the 16 press counters) and the
+    /// authority's own part last (the 32 seed bytes; the random streams' positions join it when a system first
+    /// draws), so the shared state is a prefix. Each field that joins the state joins here, in the same change.
     pub fn write_state(&self, out: &mut Vec<u8>) {
         // Every field is named in this pattern: one added to the struct later does not compile until it is written
         // here, or left out here in plain sight.
-        let Self { tick, seed } = self;
+        let Self {
+            tick,
+            player: PlayerCommand { buttons, presses },
+            seed,
+        } = self;
         out.clear();
         out.reserve(STATE_BYTES);
         // The path form on the integer's own type: the rule scan (tests/rules_scan.rs) reads text and cannot tell
         // `.to_le_bytes()` on a tick from the same call on a float, which part 7 does not allow.
         out.extend_from_slice(&u32::to_le_bytes(*tick));
+        out.extend_from_slice(&u16::to_le_bytes(*buttons));
+        out.extend_from_slice(presses);
         out.extend_from_slice(seed);
     }
 
@@ -63,6 +125,17 @@ impl World {
     #[must_use]
     pub fn state_hash(&self, scratch: &mut Vec<u8>) -> u64 {
         self.write_state(scratch);
+        fnv1a_64(scratch)
+    }
+
+    /// The hash of the shared state only: the one a client's state can be compared with, because it covers no
+    /// seed byte (ADR 0004 part 9). `scratch` holds the shared bytes afterwards and nothing of the seed: what lay
+    /// behind them is overwritten before it is cut off, so a caller that hands the buffer on hands on no seed.
+    #[must_use]
+    pub fn shared_hash(&self, scratch: &mut Vec<u8>) -> u64 {
+        self.write_state(scratch);
+        scratch[SHARED_STATE_BYTES..].fill(0);
+        scratch.truncate(SHARED_STATE_BYTES);
         fnv1a_64(scratch)
     }
 }
@@ -80,29 +153,73 @@ mod tests {
         seed
     }
 
+    fn world(first: u8, start_tick: u32) -> World {
+        World::new(&MatchSetup {
+            seed: counting_seed(first),
+            start_tick,
+        })
+    }
+
+    /// Buttons 0x8001 and the counters 1, 2, ..., 16.
+    fn pressed() -> PlayerCommand {
+        let mut presses = [0; BUTTONS];
+        for (counter, value) in presses.iter_mut().zip(1..) {
+            *counter = value;
+        }
+        PlayerCommand {
+            buttons: 0x8001,
+            presses,
+        }
+    }
+
     #[test]
-    fn a_new_world_is_at_tick_zero_and_each_step_is_one_tick() {
-        let mut world = World::new(counting_seed(0));
-        assert_eq!(world.tick(), 0);
-        world.authority_step();
-        world.authority_step();
-        assert_eq!(world.tick(), 2);
+    fn a_new_world_is_at_its_start_tick_and_each_step_is_one_tick() {
+        let mut at_zero = world(0, 0);
+        assert_eq!(at_zero.tick(), 0);
+        assert_eq!(*at_zero.player(), PlayerCommand::NONE);
+        at_zero.authority_step(&[]);
+        at_zero.authority_step(&[]);
+        assert_eq!(at_zero.tick(), 2);
+        // A match can start anywhere, for the tests of the counters' wraps.
+        let mut late = world(0, 131_069);
+        late.authority_step(&[]);
+        assert_eq!(late.tick(), 131_070);
+    }
+
+    #[test]
+    fn the_newest_command_of_a_tick_becomes_the_record_and_none_holds_it() {
+        let mut world = world(0, 0);
+        let older = PlayerCommand {
+            buttons: 2,
+            presses: [9; BUTTONS],
+        };
+        world.authority_step(&[older, pressed()]);
+        assert_eq!(*world.player(), pressed());
+        // No command this tick: what was held stays held, and no counter moves.
+        world.authority_step(&[]);
+        assert_eq!(*world.player(), pressed());
+        world.authority_step(&[older]);
+        assert_eq!(*world.player(), older);
+        assert_eq!(world.tick(), 3);
     }
 
     #[test]
     fn state_bytes_have_a_fixed_order_and_width() {
-        let mut world = World::new(counting_seed(0));
-        for _ in 0..0x0102 {
-            world.authority_step();
+        let mut world = world(0, 0);
+        for _ in 0..0x0101 {
+            world.authority_step(&[]);
         }
+        world.authority_step(&[pressed()]);
         // What was in the buffer before does not survive.
         let mut bytes = vec![0xEE; 100];
         world.write_state(&mut bytes);
         assert_eq!(bytes.len(), STATE_BYTES);
-        assert_eq!(bytes.len(), 36);
-        // The tick 0x0000_0102, little-endian, then the seed as it was given.
+        assert_eq!((SHARED_STATE_BYTES, bytes.len()), (22, 54));
+        // The tick 0x0000_0102, little-endian; the buttons 0x8001; the counters; then the seed as it was given.
         assert_eq!(bytes[..4], [0x02, 0x01, 0x00, 0x00]);
-        assert_eq!(bytes[4..], counting_seed(0));
+        assert_eq!(bytes[4..6], [0x01, 0x80]);
+        assert_eq!(bytes[6..22], pressed().presses);
+        assert_eq!(bytes[22..], counting_seed(0));
     }
 
     /// Known answers from a second implementation (a script, not this code): they hold the byte order and the hash
@@ -110,29 +227,72 @@ mod tests {
     #[test]
     fn state_hash_matches_known_answers() {
         let mut scratch = Vec::new();
-        let mut world = World::new(counting_seed(0));
-        assert_eq!(world.state_hash(&mut scratch), 0x56a0_1268_e3dd_0d95);
+        let mut stepped = world(0, 0);
+        assert_eq!(stepped.state_hash(&mut scratch), 0x9c1e_17d4_0d7a_14dd);
         for _ in 0..3 {
-            world.authority_step();
+            stepped.authority_step(&[]);
         }
-        assert_eq!(world.state_hash(&mut scratch), 0xd172_6136_40ae_3806);
+        assert_eq!(stepped.state_hash(&mut scratch), 0x1117_0104_4a87_a676);
+        assert_eq!(world(1, 0).state_hash(&mut scratch), 0x6f2d_d929_11a2_615d);
         assert_eq!(
-            World::new(counting_seed(1)).state_hash(&mut scratch),
-            0x30ba_2d6a_3b49_4f55
+            world(0, 131_069).state_hash(&mut scratch),
+            0x7d30_b610_41b0_af34
         );
-        let last = World {
-            tick: u32::MAX,
-            seed: counting_seed(0),
-        };
-        assert_eq!(last.state_hash(&mut scratch), 0xd578_405a_3b5b_8ab1);
+        assert_eq!(
+            world(0, u32::MAX).state_hash(&mut scratch),
+            0xaea1_07e6_21c4_c5d9
+        );
+        let mut played = world(0, 0);
+        played.authority_step(&[]);
+        played.authority_step(&[pressed()]);
+        assert_eq!(played.state_hash(&mut scratch), 0xd01f_fe7c_1064_6f36);
+        assert_eq!(played.shared_hash(&mut scratch), 0x3f6e_d6ed_be36_8db6);
+    }
+
+    /// The shared hash covers the tick and the player's record and no seed byte: two matches with different seeds
+    /// agree on it, and differ on the whole state's hash.
+    #[test]
+    fn the_shared_hash_covers_no_seed_byte() {
+        let mut scratch = Vec::new();
+        let (mut a, mut b) = (world(0, 0), world(1, 0));
+        assert_eq!(a.shared_hash(&mut scratch), 0xf848_4165_2498_787d);
+        for step in 0..50 {
+            let commands = [pressed()];
+            let commands = if step % 2 == 0 { &commands[..] } else { &[] };
+            a.authority_step(commands);
+            b.authority_step(commands);
+            assert_eq!(a.shared_hash(&mut scratch), b.shared_hash(&mut scratch));
+            assert_ne!(a.state_hash(&mut scratch), b.state_hash(&mut scratch));
+        }
+        // The tick and each part of the record count. The buffer holds the shared bytes afterwards and no more.
+        let base = a.shared_hash(&mut scratch);
+        assert_eq!(scratch.len(), SHARED_STATE_BYTES);
+        a.authority_step(&[]);
+        assert_ne!(a.shared_hash(&mut scratch), base);
+        let (mut held, mut counted) = (world(0, 9), world(0, 9));
+        held.authority_step(&[PlayerCommand {
+            buttons: 1,
+            ..PlayerCommand::NONE
+        }]);
+        let mut presses = [0; BUTTONS];
+        presses[BUTTONS - 1] = 1;
+        counted.authority_step(&[PlayerCommand {
+            buttons: 0,
+            presses,
+        }]);
+        let mut plain = world(0, 9);
+        plain.authority_step(&[]);
+        let plain = plain.shared_hash(&mut scratch);
+        assert_ne!(held.shared_hash(&mut scratch), plain);
+        assert_ne!(counted.shared_hash(&mut scratch), plain);
     }
 
     #[test]
     fn the_same_seed_gives_the_same_hashes_and_every_field_counts() {
         let (mut scratch_a, mut scratch_b) = (Vec::new(), Vec::new());
-        let mut a = World::new(counting_seed(7));
-        let mut b = World::new(counting_seed(7));
-        let mut other_seed = World::new(counting_seed(8));
+        let mut a = world(7, 0);
+        let mut b = world(7, 0);
+        let mut other_seed = world(8, 0);
         let mut seen = Vec::new();
         for _ in 0..100 {
             let hash = a.state_hash(&mut scratch_a);
@@ -140,19 +300,15 @@ mod tests {
             assert_ne!(hash, other_seed.state_hash(&mut scratch_b));
             assert!(!seen.contains(&hash), "each tick has its own hash");
             seen.push(hash);
-            a.authority_step();
-            b.authority_step();
-            other_seed.authority_step();
+            a.authority_step(&[]);
+            b.authority_step(&[]);
+            other_seed.authority_step(&[]);
         }
     }
 
     #[test]
     #[should_panic(expected = "the tick counter is at u32::MAX")]
     fn the_tick_counter_stops_loudly_and_never_wraps() {
-        let mut world = World {
-            tick: u32::MAX,
-            seed: counting_seed(0),
-        };
-        world.authority_step();
+        world(0, u32::MAX).authority_step(&[]);
     }
 }

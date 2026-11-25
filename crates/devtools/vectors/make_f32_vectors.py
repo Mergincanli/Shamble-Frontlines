@@ -11,16 +11,22 @@ between `f64` and the integers, and casts to `usize` and `isize` (as wide as the
   python3 -I -B crates/devtools/vectors/make_f32_vectors.py --check         compares them byte for byte, writes nothing
   python3 -I -B crates/devtools/vectors/make_f32_vectors.py --full <op>     prints every result of one operation
 
-Inputs: 10,048 cases of three f32 bit patterns (a, b, c), little-endian: every ordered pair of the edge values
-first, then seeded values up to case 9,999, then 48 constructed cases. No input is a NaN (part 7: a NaN never enters
-the simulation); a NaN result is written as 0x7FC00000, because only which cases give a NaN must agree, not a NaN's
-bits. Expected: one line per operation with the bytes of one result and FNV-1a 64 over all its results in order,
+Inputs: 10,072 cases of three f32 bit patterns (a, b, c), little-endian: every ordered pair of the edge values
+first, then seeded values up to case 9,999, then 48 constructed cases for `mul_add` and 24 for the cast from f64. No
+input is a NaN (part 7: a NaN never enters the simulation); a NaN result is written as 0x7FC00000, because only which
+cases give a NaN must agree, not a NaN's bits. Expected: one line per operation with the bytes of one result and FNV-1a 64 over all its results in order,
 each little-endian; then the `pin` lines.
 
 The constructed cases are `mul_add`'s hard ones: c's last bit is 1 and a * b is half a unit of c's last place, less a
 hair. The exact sum rounds back to c. A sum worked out in f64 first loses the hair, lands on the half and rounds
 away from c. None of the 10,000 other cases is of this kind (checked below), so without these a `mul_add` made of
 two roundings passes.
+
+The last 24 cases are the cast from f64 to f32 where it is hardest (the follow-up 3A-FROM-F64): an f64 exactly
+half-way between two f32, which goes to the one whose last bit is 0, at one and below the smallest f32; f64 from
+the largest f32 up to twice 2^127, where the cast turns to infinity exactly at the half-way point; and, as the last
+four, the first f64 above half the smallest f32 and the half-way point below the smallest normal f32. They come after
+every other case, so no earlier case changes its number.
 
 The `pin` lines (MUL-ADD): the cases where `f32::mul_add` in WebAssembly does NOT give the exact result, each with the
 value measured there: Rust 1.99.1, wasm32-unknown-unknown, release and dev, on 2026-11-24. The toolchain's software
@@ -39,7 +45,8 @@ from fractions import Fraction
 
 HERE = pathlib.Path(__file__).resolve().parent
 SEEDED = 10_000  # the edge values' pairs and the seeded cases
-CASES = 10_048  # those, then `mul_add`'s constructed cases
+FUSED = 10_048  # those, then `mul_add`'s constructed cases
+CASES = 10_072  # those, then the cast from f64's constructed cases
 NAN = 0x7FC00000
 INF = 0x7F800000
 
@@ -216,6 +223,30 @@ def constructed():
     return cases
 
 
+def narrowing():
+    """The cast from f64's hard cases: each f64's low and high half as a and b, c zero, then the same f64 negated."""
+    doubles = [
+        (0x3FF0000010000000, 0x3F800000),  # 1 + 2^-24, half-way: to the even 1
+        (0x3FF0000030000000, 0x3F800002),  # 1 + 3 * 2^-24, half-way: to the even 1 + 2^-22
+        (0x3690000000000000, 0x00000000),  # 2^-150, half the smallest f32: to the even 0
+        (0x36A8000000000000, 0x00000002),  # 3 * 2^-150, half-way: to the even second-smallest f32
+        (0x47EFFFFFE0000000, 0x7F7FFFFF),  # the largest f32 itself
+        (0x47EFFFFFE8000000, 0x7F7FFFFF),  # a quarter of a step above it: still the largest f32
+        (0x47EFFFFFEFFFFFFF, 0x7F7FFFFF),  # the last f64 below the half-way point: still the largest f32
+        (0x47EFFFFFF0000000, INF),  # half-way to 2^128, which no f32 holds: to the even side, infinity
+        (0x47EFFFFFF0000001, INF),  # the first f64 above the half-way point
+        (0x47F0000000000000, INF),  # 2^128
+        (0x3690000000000001, 0x00000001),  # the first f64 above 2^-150: up to the smallest f32
+        (0x380FFFFFE0000000, 0x00800000),  # half-way between the largest subnormal and the smallest normal: even
+    ]
+    cases, expected = [], []
+    for double, result in doubles:
+        for sign in (0, 1):
+            cases.append((double & 0xFFFFFFFF, double >> 32 | sign << 31, 0))
+            expected.append(result | sign << 31)
+    return cases, expected
+
+
 # Measured, never worked out: what `f32::mul_add` gives in WebAssembly on the pinned toolchain where that is not the
 # exact result (the docstring's `pin` lines). Every one is a case whose result lies below the smallest normal f32.
 WASM_MUL_ADD = {
@@ -255,7 +286,7 @@ def inputs():
     while len(cases) < SEEDED:
         pick = any_f32 if len(cases) % 2 else game
         cases.append((pick(), pick(), pick()))
-    return cases[:SEEDED] + constructed()
+    return cases[:SEEDED] + constructed() + narrowing()[0]
 
 
 def fnv1a_64(data):
@@ -293,11 +324,15 @@ def self_check():
     assert op["from_f64"](0, 0x7F800000) == INF and op["from_f64"](0, 0x80100000) == 0x80000000
     # Every constructed case rounds back to its c, and two roundings give something else; no other case does.
     hard = constructed()
-    assert len(hard) == len(set(hard)) == CASES - SEEDED
+    assert len(hard) == len(set(hard)) == FUSED - SEEDED
     assert all(op["mul_add"](*case) == case[2] != through_f64(*case) for case in hard)
     # Each pin is a constructed case below the smallest normal f32, and what was measured is the two-roundings value.
     assert set(WASM_MUL_ADD) <= set(hard) and all(case[2] & 0x7F800000 == 0 for case in WASM_MUL_ADD)
     assert all(measured == through_f64(*case) != case[2] for case, measured in WASM_MUL_ADD.items())
+    # Each of the cast's constructed cases gives the result written beside it, worked out by hand.
+    casts, expected = narrowing()
+    assert len(casts) == len(set(casts)) == CASES - FUSED
+    assert [op["from_f64"](*case) for case in casts] == expected
 
 
 def main():

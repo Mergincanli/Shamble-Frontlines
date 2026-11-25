@@ -7,6 +7,9 @@ words of 2026-11-24, 11:03:53 UTC: "build change-set 3a by the plan without wait
 tests, build scripts) plus `docs/DECISIONS.md`, a decision doc: it merges only on his go, after his browser check.
 No pull request exists yet: by his words of 2026-11-23, 23:44:10 UTC the chat puts the title and text in its notes
 folder, his main Advisor opens the draft, and he presses Ready and Merge.
+_Note, 2026-11-25 (change-set 3b's docs pass; the sentence above is left as it was written): the pull request was
+opened as #65 and merged as 28254a7 on 2026-11-24 at 22:40:39 UTC, by his main Advisor on his tap of 22:40:00 UTC,
+with the expected head 1624f084 (his words of 22:44:50 UTC in `docs/DECISIONS.md`; the merge commit's message)._
 
 ## Goal
 Put the simulation's rules under tests before the game loop rests on them, and tidy the edges between the Rust

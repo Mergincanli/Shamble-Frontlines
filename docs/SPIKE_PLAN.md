@@ -462,6 +462,11 @@ netcode proof test's result. Step 2.6, the previews, follows the preview hosting
 - **Research spikes it subsumes:** R6-HOST-REC1; R5-PREV-REC2; R5-PREV-REC3 (the 24 h mark; the sweep job is the
   foundation's); R5-PREV-REC4 marks 2 and 3 (mark 1 is the foundation's); R5-PREV-REC5's mark (on the test project).
   **It decides:** PREV-DELETE (R5-PREV-OQ2); R5-PREV-OQ5; R5-PREV-OQ6; it gives Mustafa what he needs for OQ-0006-4.
+  _Pointer (2026-11-24, the preview hosting check's report): the runs are done; the results and the verdict per mark
+  are in `docs/reports/2026-11-24-preview-hosting-check.md`. By ADR 0006's rule ("A spike passes when every mark that
+  applies passes", ADR 0006 :1404) the spike has not passed yet: the header mark (PM-0006-2) is not met as written
+  (back to the draft), and the build-count mark (PM-0006-7) and his verdict on checklist step 4 (inside PM-0006-9) are
+  open._
 
 ### The foundation's acceptance checks (not a spike)
 - **Defined in:** [GLOSSARY §8, the foundation](research/GLOSSARY.md#the-foundation). Owner: ADR 0002's migration plan,

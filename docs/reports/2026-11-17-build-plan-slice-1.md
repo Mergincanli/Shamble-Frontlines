@@ -387,8 +387,8 @@ when and what. No code.
 - `client-endpoint`: the prediction step for the local soldier, the reset and replay on each snapshot, the fade and
   the snap of a correction, the interpolation buffer and delayed clock for the other soldiers, the clock estimate.
 - The room's command scheduler behind one seam, with both ways of timing commands built (run on arrival; buffered,
-  one per tick), because the netcode proof test still chooses between them (Part 6) and the slice's mark runs under
-  each.
+  one per tick), because Slice 3 chooses between them, no longer the netcode proof test (Mustafa, 2026-11-24), and
+  the slice's mark runs under each.
 - Headless tests over L1 under its profiles, with 48 scripted clients where a mark asks for 48; the same client
   endpoint also run as WebAssembly against a native room.
 - In development builds, the fake lag switch puts L1 behind the loopback in the browser.
@@ -906,7 +906,6 @@ and 14 November are not in it).
 
 | What the proof test may change | The draft's proposal today | Where it sits | Cost if it changes |
 |---|---|---|---|
-| How commands are timed at the server (OQ-0001-6): run on arrival, or buffered one per tick | undecided; an input buffer of 1 to 3 ticks, as data | one command scheduler in `room`; one function in the client endpoint that says when the next tick is due (change-set 7) | one module |
 | Sub-tick time stamps for shots (OQ-0001-7) | a tick plus a view-time fraction only | the command codec carries a version; shot timing in one function (change-set 8) | one module |
 | Snapshot field widths, the record sizes | positions to 1 cm, as the draft's table | one field table drives encoder and decoder (3) | data |
 | The datagram size cap | 1,000 bytes until measured | a parameter of the splitter (4) | data |
@@ -918,7 +917,9 @@ and 14 November are not in it).
 
 **Not the proof test's, kept open the same way:** the tick rate (one constant; every duration is data in seconds, so
 60 Hz at Slice 6 stays a data change), and the rule for soldiers bumping into each other (a design call; change-set
-7's tests name the rule they ran under).
+7's tests name the rule they ran under). How commands are timed at the server (OQ-0001-6) is Slice 3's pick, no
+longer the proof test's (Mustafa, 2026-11-24); change-set 7 still builds both ways behind one command scheduler in
+`room`.
 
 ## Part 7. How the code is checked while the gate v2 is not built (your item 7)
 **On every change-set, before its report, this chat runs the commands below and shows their output in the report.**
@@ -1254,8 +1255,8 @@ The look proof test's share of ADR 0005 lands here too (3.8): PM-0005-33 and -34
    lands later in the slice.
 7. **The stand-in must match the model's contract** (slots, joints). If change-set 0's rules change after the
    stand-in is built, the stand-in is rebuilt: about a day.
-8. **The netcode proof test may change the seams of Part 6.** Each is one module or one data value by design; the
-   largest is how commands are timed.
+8. **The netcode proof test may change the seams of Part 6.** Each is one module or one data value by design; how
+   commands are timed is no longer among them: Slice 3 picks it (Mustafa, 2026-11-24).
 9. **The newest three.js on WebGPU in Brave** is the first thing change-set 2 tries; if Brave falls back to WebGL 2
    on your PC, the label says so and the look work still holds, because every effect must exist on both.
 10. **How a build reaches your laptop is not proven** (Part 8). If the file route fails, every Brave check waits for
