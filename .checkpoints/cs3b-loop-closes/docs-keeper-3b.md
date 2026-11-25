@@ -7,3 +7,4 @@ state, 3c, follow-ups, RELEASE-COUNT open) · 4 REPO_MAP from 6abf3d2a + repo-ma
 - 2 build plan: three sentences changed (lines ~390, row 909 moved to the Not-the-proof-test paragraph, risk 8).
 - 3 ROADMAP: oldest entry (2.2) folded by line range into Build history; 3a entry marked MERGED.
 - 4 REPO_MAP: rows updated/added from 6abf3d2a; check OK 193 entries / 109 paths.
+- STATUS 3a row moved to archive In flight by script (line 25 -> 176), edited to merged form; archive 3a follow-up header corrected; 3b follow-ups block + RELEASE-COUNT + 3c plan items added; Health rows; risks entry.

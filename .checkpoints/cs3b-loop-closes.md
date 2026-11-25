@@ -464,6 +464,11 @@ the press test 10,000 presses and releases made and echoed, 0 lost, 0 doubled, 5
 older post, 0 ran other keys than their post's; allocation 91 bytes a frame, 590 a block (569 of them the link's
 own work). The log: `.gate/cs3b/ci-6abf3d2a-toolchain.log` (scratch).
 
+**Planted defects on the final code 6abf3d2a: 53 of 53 caught.** The full run caught 52 (2026-11-25, 03:16:53
+UTC; `.gate/cs3b/plants-3b-run4-full.log`, scratch); the 53rd, a 64-byte array per block against the allocation
+test, did not run to its check there (the browser port was the verifier's at that moment: "is already used") and
+was caught when run again alone (03:20:46 UTC). Afterwards the true tree was built again: the same Wasm.
+
 **After the code (started 2026-11-25, about 03:09 UTC):** the full run of the 53 planted defects on 6abf3d2a;
 the verifier (its copy `.gate/verifier-cs3b`, its notes `verifier-cs3b.md`); docs-keeper's docs pass (its notes
 `docs-keeper-3b.md`). Then the report, the advisor agent on that head (with the question on M1), the zip.

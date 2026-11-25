@@ -127,6 +127,87 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- _A pointer, not a decision: the board add-on is active for the builder chat he calls Builder V3 (since 2026-11-24)._
+- **Taken by Mustafa, 2026-11-24, 23:24:50 UTC: the chat is compacted; the build plan's third sentence on command timing
+  (its risk 8): (a), changed with the other two; build change-set 3b by the plan under the advisor agent's eight
+  conditions, without waiting for him** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a
+  Claude Code chat on the account that also holds his claude.ai project "Shamble Frontlines ALT"; his message
+  fad04f54-c142-4455-8acf-6888e0e99553, whole; extracted by script from the chat's transcript). His answer on the third
+  sentence: "The third sentence in the build plan (its risk 8): (a). Change it with the other two in 3b's docs pass, and
+  show me all three old and new sentences in your report." On the build: "If the card, the repo and the summary
+  disagree, or something is missing, say what and stop. Otherwise build change-set 3b by the plan under your advisor
+  agent's eight conditions, without waiting for me." On the size and the browser tests: "If the size passes 4,900 lines,
+  the ladder applies as you described: tell me in three lines before a part moves. Time the browser tests before the
+  first push, as you said." He dated the message 25 November; the chat's clock read 2026-11-24, 23:24:50 UTC. What it
+  answers, in the chat's words (not his): the chat's message of 2026-11-24, 23:12 UTC (the advisor agent's read of his
+  three items; the question about the build plan's third sentence on command timing; the recommendation to compact)
+  Records, not his words: the card, the repository and the summary agreed (the branch at 8e3c0a75, main 28254a73, the
+  session record: model `claude-fable-5-2`, permission mode `auto`, context about 11 %); the three old and new sentences
+  stand in change-set 3b's report; the size passed 4,900 lines and the ladder applied: he was told in three lines on
+  2026-11-24, about 23:56 UTC, before a part moved, and the link simulator and the first recording are change-set 3c's;
+  the browser tests were timed on a clean copy before the push whose run counts as evidence (16 tests in 3.4 of 5
+  minutes, there and on GitHub). Copied by script (1043 bytes, sha256
+  4da9ba906c0be8213ecaa61f5adc67ab5512b5c15fe667c507735ec7b6046f73):
+> The compact is done. For Builder V3, from me, written with my main Advisor (25 November).
+>
+> 1. Rebuild from the repository, not from memory: read CLAUDE.md, your resume card (.checkpoints/cs3b-loop-closes.md) and what its "Next steps" name. Check git status and your branch against origin and main. Read your session's model and mode.
+> 2. The third sentence in the build plan (its risk 8): (a). Change it with the other two in 3b's docs pass, and show me all three old and new sentences in your report.
+> 3. Tell me in at most 6 lines where you stand and what you build first. If the card, the repo and the summary disagree, or something is missing, say what and stop. Otherwise build change-set 3b by the plan under your advisor agent's eight conditions, without waiting for me.
+> 4. If the size passes 4,900 lines, the ladder applies as you described: tell me in three lines before a part moves. Time the browser tests before the first push, as you said.
+> 5. A short block for the agent board may follow from me. Install nothing for it on your own.
+- **Taken by Mustafa, 2026-11-24, 22:59:49 UTC: where his decisions of 21 and 22 November stand: on the netcode test's
+  branch, not on main; the chat may read them there with git show, read only** (the builder chat he calls Builder V3,
+  session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
+  Frontlines ALT"; his message 172046ad-6b3e-4f62-9409-b0b7fd01d20c, whole; extracted by script from the chat's
+  transcript). In his words: "The decisions you could not find are recorded on the netcode test's branch, not on main:
+  branch claude/netcode-proof-test-plan-hcky5g, file .checkpoints/netcode-proof-test/history.md, lines 7561 to 7607
+  (NPT-TRIM of 21 November and my answers to the re-plan of 22 November), and
+  .checkpoints/netcode-proof-test/moved-block.md, the part "FOR CHANGE-SET 3 ITSELF"." How to read them: "Read them with
+  git show, read only. That is not the spikes/ folder." And: "My message with the three items is my word either way."
+  What it answers, in the chat's words (not his): the chat's sentence of 22:50:20 UTC that the decisions register on
+  main has no entry of 21 or 22 November, so it could not read the decisions his message of 22:44:50 UTC names Records,
+  not his words: a pointer, not a copy: the chat read those lines on 2026-11-24, 23:00 UTC, at that branch's head
+  e8e276f0bf8b201f6a4db3b59315ac6de4c84a04 (fetched by name; nothing is ever pushed there). They are not copied onto
+  main here: his decisions of 21 and 22 November stay recorded where he recorded them, and reach main with that branch.
+  What they say for change-set 3 is the same three items as his message of 22:44:50 UTC (the entry below). Copied by
+  script (510 bytes, sha256 9533874d4ff50082bcee8326d56890f090a937253a8f8fc4f0dbe621cc9906e6):
+> For Builder V3, from me. The decisions you could not find are recorded on the netcode test's branch, not on main: branch claude/netcode-proof-test-plan-hcky5g, file .checkpoints/netcode-proof-test/history.md, lines 7561 to 7607 (NPT-TRIM of 21 November and my answers to the re-plan of 22 November), and .checkpoints/netcode-proof-test/moved-block.md, the part "FOR CHANGE-SET 3 ITSELF". Read them with git show, read only. That is not the spikes/ folder. My message with the three items is my word either way.
+- **Taken by Mustafa, 2026-11-24, 22:44:50 UTC: #65 (change-set 3a) is merged, by his main Advisor on his tap, with the
+  expected head 1624f08; the next CI edit is an Opus 5.5 chat's; next is change-set 3b, with three items first: the
+  decoder test at its row's count, command timing picked by Slice 3 and no longer by the proof test, and the link
+  simulator built by the plan** (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code
+  chat on the account that also holds his claude.ai project "Shamble Frontlines ALT"; his message
+  4c185bad-ef83-4c3d-aee3-7fd23996d981, whole; extracted by script from the chat's transcript). The merge, in his words:
+  "My main Advisor marked it ready and merged it on my tap of 22:40:00 UTC, with your commit
+  1624f084924976f4bde8556509c957e1f4634341 as the expected head." And: "That tap was my go. I typed no go line in your
+  chat. Record it by script from this message." On CI: "Which model writes the next CI edit: (a). An Opus 5.5 chat
+  writes the small CI pull request, as my rule of 12 November says. You write no CI file." The decoder test's bar: "Its
+  bar is its row in ADR 0001, exactly as written: 10 million random and mutated inputs per message type, 0 panics and 0
+  allocations above the size limits, and its planted bug (an unchecked index in one decoder) is found within the run."
+  and "Until then your report says the mark has started, never that it passed." On command timing: "The proof test no
+  longer picks it. Slice 3 picks it, and change-set 7 still builds both ways. My go: with 3b's docs pass, the build
+  plan's two places that say the proof test chooses say this instead." On the link simulator: "If the ladder moves the
+  link simulator out of 3b, tell me before anyone builds it a second time." What it answers, in the chat's words (not
+  his): the chat's two questions of 22:00:05 UTC: his go for the merge of #65 at commit
+  1624f084924976f4bde8556509c957e1f4634341 (answered by point 1: his tap in his main Advisor's thread was his go; he
+  typed no go line in this chat), and which model writes the next CI edit (answered by point 2: (a), an Opus 5.5 chat).
+  Points 3 and 4 answer nothing the chat asked: they set what comes before change-set 3b's first edit Records, not his
+  words: main is 28254a73ab226379373e380eeee64336e58ef916 (2026-11-24, 22:40:39 UTC; its parents 1ec6f6c3 and 1624f084);
+  gate, smoke and toolchain were green on it (read 22:45 UTC). The advisor agent read the three items against the plan
+  on that main and approved building 3b under eight conditions; the chat answered in six lines. In change-set 3b the
+  decoder test runs at the row's count for the five message types and the report says the mark has started; the build
+  plan's sentences on command timing were changed with 3b's docs pass (three, by his answer of 23:24:50 UTC above); the
+  size ladder moved the link simulator to change-set 3c, and he was told before anyone built it. Copied by script (2601
+  bytes, sha256 f654912dcacc5eae1d9e24c4db5146dca211870b58eb89e73cc490a01a671820):
+> For Builder V3, from me, written with my main Advisor (24 November).
+>
+> 1. #65 is merged. My main Advisor marked it ready and merged it on my tap of 22:40:00 UTC, with your commit 1624f084924976f4bde8556509c957e1f4634341 as the expected head. Main is now 28254a73ab226379373e380eeee64336e58ef916, with gate, smoke and toolchain green on it. That tap was my go. I typed no go line in your chat. Record it by script from this message.
+> 2. Which model writes the next CI edit: (a). An Opus 5.5 chat writes the small CI pull request, as my rule of 12 November says. You write no CI file. If that holds up 3b anywhere, tell me in three lines.
+> 3. Next is 3b, "The loop closes". Three items from my Advisor come first. They are from the netcode test's list of marks that moved to the real game (my decisions of 21 and 22 November):
+>    a. The decoder test (the moved mark PM-0001-34, "No decoder panics or over-allocates"). Its bar is its row in ADR 0001, exactly as written: 10 million random and mutated inputs per message type, 0 panics and 0 allocations above the size limits, and its planted bug (an unchecked index in one decoder) is found within the run. Your plan has 100,000 random and 100,000 mutated inputs per decoder. In 3b the test reaches the row's count and both zeros for every message type 3b adds, with seeded inputs and a counting allocator of our own. No new tool or package in 3b. The row names cargo-fuzz, and whether that tool joins is my decision later. Until then your report says the mark has started, never that it passed.
+>    b. How commands are timed at the server (OQ-0001-6: run on arrival, or buffered one per tick). The proof test no longer picks it. Slice 3 picks it, and change-set 7 still builds both ways. My go: with 3b's docs pass, the build plan's two places that say the proof test chooses say this instead. Show me the old and the new sentences in your report.
+>    c. The link simulator. The proof test offers its own (seeded delay, jitter, loss and reordering with a packet-fate log, no rate limit and no duplication). My Advisor's lean: 3b builds its own as planned, because you never open spikes/, nothing may import from it, and the offered one lacks two things your plan lists. The choice is your plan's. If the ladder moves the link simulator out of 3b, tell me before anyone builds it a second time.
+> 4. Before 3b's first edit, your advisor agent reads these three against the plan on today's main. Then tell me in at most 6 lines what changes in size, whether anything in the plan no longer holds, and whether this chat should be compacted before the build starts.
 - _A pointer, not a decision: **his browser check of change-set 3a's zip, 2026-11-24, 21:48:49 UTC.** One chat message
   (the builder chat he calls Builder V3, session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also
   holds his claude.ai project "Shamble Frontlines ALT"; his message b5bb0503-5aef-45fc-b832-6bc2a147b40c; 4451 bytes of
