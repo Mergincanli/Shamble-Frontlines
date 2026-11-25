@@ -9,7 +9,7 @@
   worktree `.gate/lane1-takeover`; pushed with `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its
   command; never a plain `git push`. The session's start folder is never switched · **Base:** origin/main
   c1da1bd (lane 2's docs-only #67, taken in by merge commit 75a9296; before it 311c0484)
-- **Last update:** 2026-11-25 21:26 Amsterdam (from the clock)
+- **Last update:** 2026-11-25 21:19 Amsterdam (from the clock)
 
 ## Sizes (his point 5: which is which)
 - The designs' own count for 4a, bottom-up: 1,365 lines (655 code, 710 tests).
@@ -95,5 +95,5 @@ Until his answer only work that adds no product line. Running: the toolchain job
   gh always start their own command. The board add-on is active.
 
 ## Running work
-- No agent runs. The local checks run in the background (started 21:25 Amsterdam).
+- No agent runs. The local checks run in the background (started 21:17 Amsterdam).
 - No saver runs: the main session commits the notes by hand.
