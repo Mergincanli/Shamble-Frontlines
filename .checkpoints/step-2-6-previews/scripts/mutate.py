@@ -33,6 +33,7 @@ M = [
   ("comment: the number's prefix accepted (no dot)", "|| !link.startsWith(`https://pr-${pr}.`)", "|| !link.startsWith(`https://pr-${pr}`)"),
   ("reconcile: duplicates not removed", "items: items.filter((d) => typeof d?.id !== 'string' || (!ids.has(d.id) && ids.add(d.id)))", "items"),
   ("check-build: only the plain hand-over name", "/^[ \\t]*name:[ \\t]*([\"']?)preview-site\\1[ \\t]*(?:#.*)?$/m", "/^[ \\t]*name:[ \\t]*preview-site[ \\t]*$/m"),
+  ("T26 the command line never runs", "if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {", "if (false && process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {"),
 ]
 bad = []
 for name, find, repl in M:
