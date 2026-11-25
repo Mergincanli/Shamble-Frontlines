@@ -76,7 +76,12 @@ PREVIEW-MISSING-BUILD-COMMENT (a); in DECISIONS by script (scripts/add_answer.py
 U2 done: the three texts placed by scripts/place_u2.py (sha256 31119c06..., c2f1fa90..., 3af06706... checked after).
 Process note: the write ran inside Python, which the guard cannot see, so it did not ask him; his NEW-TEXT (a) in
 chat was the ask. Tell him. In the tree: 117 tests pass; gate PASS (--no-smoke); map OK (202 entries).
-Next: U5, the draft pull request (tier 2), its CI (the preview tests job is the CI proof of the tests); then his
+U5: draft pull request #72 opened (2026-11-25, after 20:54 UTC; head 95d32ac). The push's wall-test run 45699354868:
+job push-to-branch ran and printed "absent" (the before-bite for the push job; "Cache mode: none"). Main moved to
+07d673b0 (#71, lane 1's ci-after-3a; no hand-over step in toolchain.yml yet; not the Guard fix chat's wall): main
+is taken in later, before the merge.
+Next: the pull request's own runs (preview/tests = the CI proof of the tests; wall-test's two pull-request jobs print
+"absent"); then his
 sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
 him again (his MAIN-WALL (b)).
 
