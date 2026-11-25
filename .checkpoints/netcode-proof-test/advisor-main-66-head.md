@@ -66,3 +66,30 @@ Terms:
 - Heads-up for the 00:20 resume (not step 7's): 6cc6712 (20:51) added u7-build-rs.md and u7-t-build.md to the branch.
   The builder's worktree holds both, untracked and byte-identical (cee61bba…, d073228f…). This is launch-0850.md:6-18's
   collision: ffcheck will show 2 ADDED present, and `git merge --ff-only` refuses over untracked files.
+- By SHA:
+  - `git diff --name-status H0 6a4de15` is main's 92 (31 A, 61 M), the same list as 28254a7..c1da1bd.
+  - shortstat "92 files changed, 11561 insertions(+), 631 deletions(-)"; without STATUS.md, the 91-file line
+    (+11,512/-582).
+  - `git diff --quiet 2935f0a H0 -- . ':(exclude).checkpoints/'` exits 0, so f3a420bc is the anchor. The anchor
+    `git diff --quiet f3a420bc 6a4de15 -- . ':(exclude).checkpoints/' ':(exclude)docs/STATUS.md'` exits 0.
+  - STATUS.md: `git diff c1da1bd 6a4de15` takes one line out (main's #40 row, the 2026-11-14 text) and puts one in
+    (the branch's #40 row, the 2026-11-15 text). It has 120 lines.
+  - Trees: H0 1,890 files, merge 1,921 (+31).
+- The whole tree: `git diff --quiet c1da1bd 69d9b5f -- . ':(exclude)spikes/' ':(exclude).checkpoints/'
+  ':(exclude)docs/'` exits 0. docs/ differs in the six names. spikes/ and docs/design/ equal H0's (exit 0). The kit
+  pathspec c1da1bd..69d9b5f prints nothing.
+- `--raw` outside .checkpoints/ and spikes/: six lines, all 100644 (no link, no submodule). No conflict marker (`git
+  grep` at 69d9b5f, outside .checkpoints/: none).
+- The merge 6a4de15: git's own message, "# Conflicts: docs/STATUS.md", no attribution lines, an SSH signature.
+  69d9b5f (19:35:18): the card only (+8/-8), both trailers.
+- The remote-tracking reflog: e32bd06 (19:24:29), then 8759e12 = H0 (19:28:32), then 69d9b5f (19:35:20). 6a4de15 was
+  never a pushed tip, so no save ran between step 2 and step 6 (M65-1).
+- CI on 69d9b5f (by run id, 6 jobs, all attempt 1, completed success, 19:35:28-19:40:46): gate run 45686693179 (gate
+  139461044262, smoke 139461044639); toolchain 45686692982 (139461043587); gate 45686704323 (gate 139461079183, smoke
+  139461079628); toolchain 45686704452 (139461080011).
+- Toolchain job logs, whole (each starts at "Current runner version"), read as data. Main's job 139375347198 and both
+  of #40's (139461043587, 139461080011) hold the same lines in the same order:
+  - 49 `test result: ok.` lines, all "0 failed; 0 ignored; 0 measured; 0 filtered out";
+  - 5 vitest `Test Files` lines (10, 1, 7, 2, 2 passed);
+  - Playwright's "1 passed" and "16 passed".
+  - No `##[error]` and no FAILED in any of the three.
