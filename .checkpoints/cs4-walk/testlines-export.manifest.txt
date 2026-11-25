@@ -1,0 +1,14 @@
+file: .checkpoints/cs4-walk/testlines-export.json
+bytes: 15567
+sha256: 9ad1d9f914acc27c56cbfbe7c4e6c7e654ba24fa0e9ae75cb4e3b93103f06498
+source: the user message of 2026-11-25T17:51:49.443Z (uuid 2dc48353-6d71-42c4-8956-c1a7393ce85f) in the chat's transcript (session_019YNMUVZR6ociHFWjByxkrq), whole, byte for byte
+format: "testlines-export"
+format_version: 1
+build: "step E (Export fit for the hand-over to the game)"
+build_commit: "4c34e750f5edda22547e3bbe4074faadee5961ae"
+camera_profile: "Experimental"
+exported_utc: "2026-11-25T17:51:36.128Z"
+values.simulation.step_rate_hz: 60
+warnings (1): ["The step rate is 60 steps a second: the game runs at 30."]
+changed_from_start: 18 entries
+usable as it is (step rate 30 and no warning): no: his answer comes first

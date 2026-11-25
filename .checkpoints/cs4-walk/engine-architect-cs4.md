@@ -315,3 +315,436 @@ derives and about 100 lines of glue). Not counted (the plan's rule, build plan :
 hand-written JSON lines; counted as configuration if the plan prefers), the movement and camera files (written by
 script), generated types, schemas and the import report.
 - B1 DONE. Next: B2, the simulation's structure.
+
+## Block 2. The simulation's structure (DONE)
+
+### 2.1 Modules of `sim` after cs4 (no globals or statics: ADR 0004 :145-146)
+| Module | Holds | Imports |
+|---|---|---|
+| `world.rs` (exists) | `World`: tick, player records, soldier table, then the seed last; the authority step; `write_state`, `state_hash`, `shared_hash` | the rest |
+| `ids.rs` (new) | `SoldierId { index: u16, generation: u16 }`, packed in a `u32` for the block and the tests; resolve-or-nothing | |
+| `soldiers.rs` (new) | the fixed-slot soldier table (ADR 0004 :131), sized at match start, iterated in index order | ids |
+| `time.rs` (new) | `UNITS_PER_TICK` (code constant, chosen from the rounding report, 1.11), `Units(u32)`, `from_seconds(f64) -> (Units, rounding)` | |
+| `rules.rs` (new) | `Rules`: the movement numbers as f32 and `Units`, made once by `Rules::take(&content::ContentSet, movement_id)` with its `Rounding` rows; never read from content inside the step | content, time |
+| `fmath.rs` (new) | part 7's three helpers (`min_f32`, `max_f32`, `clamp_f32`, plain comparisons, a defined argument on equal signed zeros, no panic on reversed bounds: ADR 0004 :271-275), `finite` checks | |
+| `collide.rs` (new) | the ONE module that imports parry3d (ADR 0004 :374-375: "behind one sim module"): `StaticWorld::build(&content::MapDocument)` (shapes ranked by id, the BVH built once), capsule shape casts, the ray query (aim), the ground probe, a caller-owned `QueryScratch` | parry3d, content |
+| `movement.rs` (new) | our own kinematic move (ADR 0004 :362-366): walk, sprint with stamina, jump, step-up, slide, the soft push between soldiers | collide, fmath, rules, time |
+| `rng.rs`, `state_hash.rs` (exist) | unchanged; no stream draws in cs4 (spawns come from the map's spawn points), so no stream is created ("when a phase first draws", world.rs:110) | |
+- The movement functions take `(&Rules, &StaticWorld, &mut Soldier, &PlayerCommand, &mut QueryScratch)`, never `&World`,
+  so cs7's prediction step calls the same functions on its own copy of one soldier (ADR 0004 part 3, :169-176: "two
+  entry points over the same phase functions"). The push between soldiers reads the whole table: authority only.
+
+### 2.2 The soldier table, stable ids and generations (PM-0004-15; ADR 0004 part 2)
+- One slot per player slot ("A soldier's slot index is its sim index", ADR 0004 :155); capacity = the match's slot
+  count, given by the setup (cs4's local match: 1; tests: up to 64), allocated in `World::new` and never grown.
+- A slot: `generation: u16` (raised, wrapping, at every spawn into it), `occupied` and `alive` bits (alive is always
+  set until cs8's deaths; Part 15.2 :124-126 wants the stand-in to show dead and respawned from a block field before
+  cs5 merges: block 3 carries the bit and the generation from cs4), `team: u8`, `position [f32;3]`, `velocity
+  [f32;3]`, `grounded`, `sprinting`, `stamina: Units`, `aim [f32;3]` (the applied command's aim point, clamped into
+  the map's bounds), `facing [f32;2]` (the horizontal unit vector toward the aim, from `sqrt` only), and, if ADS is in
+  the part that builds it, `aiming` (block 5).
+- `resolve(SoldierId) -> Option<&Soldier>` is `None` for a free slot or another generation.
+- PM-0004-15's test: 10,000 cases of up to 1,000 spawn and despawn operations on a 64-slot table, each despawned id then
+  resolves to nothing; the operations drawn from our own ChaCha8 with a fixed seed (no proptest crate: the same choice
+  as RNG-SOURCE (c); a departure from the row's "a proptest property", docs/adr/0004:1136, for the DEPART list; the
+  nightly fresh seeds are CI work). Bite: a table that does not raise the generation on reuse. This is also the card's
+  "ids over random spawns" (build plan :354).
+
+### 2.3 The tick's loops and their order (ADR 0004 part 1: one fixed order, from legacy's GP14)
+The loops outside the step are unchanged: the Worker's host paces (pacing.ts), the step takes no time (ADR 0004 :186).
+`World::authority_step(&mut self, commands: &SlotCommands)` (a fixed array: up to `CATCH_UP_CAP` commands per slot, no
+allocation), per tick:
+1. Commands, per slot in index order, oldest command first: each command is checked where it enters (every float
+   finite; a move longer than 1 scaled to length 1; the aim clamped into the map's bounds: security-auditor's L1,
+   room/src/lib.rs:168-171), and each command run is one movement sub-step of one tick's length (so a catch-up tick
+   that runs two commands moves the soldier two steps, never one: the seam with netcode-architect below).
+2. Movement, inside that sub-step (2.7): the wish velocity from the move vector, the sprint and stamina rule, the
+   acceleration toward the wish, the jump on a new press edge (at most one jump per tick however many presses the
+   counter brings: 3B-ONE-PER-TICK, STATUS_ARCHIVE.md:1513-1515), the vertical arc, the sweep with slide and
+   step-up, the ground probe.
+3. The soft push between soldiers, after every soldier has moved: pairs (i < j) in index order; overlapping capsules
+   separate by a fraction of the overlap per tick, swept against the static world so a push never puts a soldier in a
+   wall, and never stops either soldier (START-RULES, DECISIONS.md:1726: "push each other softly and never block").
+   Its strength is a movement field (`push_rate`, his to change after Brave). Felt first in cs5 (walkers); in cs4 it
+   is shown by a headless pair test (PM-0004-35's soldier pairs, build plan :640).
+4. The tick counter (checked add, as today).
+A slot that has no command this tick: what the soldier does (repeat the held inputs of the last command, as 3b's record
+does for buttons, world.rs:85-86, or stand) is netcode-architect's, with 3B-LATE-BOUND (cs7).
+
+### 2.4 What the state holds and what the hash covers (ADR 0004 part 9)
+- In the shared state, written by `write_state` field by field, floats by `to_bits`, fixed widths, little-endian, no
+  `usize`, in this order: the tick; the slot count as `u16`; per slot the player record (buttons, presses, move, aim);
+  per slot the soldier (generation, bits, team, position, velocity, stamina, aim, facing). Then the seed (authority
+  only, outside the shared hash, world.rs:127-133).
+- Not state, not hashed: the static world and its BVH (immutable for the match, rebuilt after a restore, ADR 0004
+  :164-165), the `Rules`, the query scratch. A recording pins them by carrying the content bundle it ran on (netcode's
+  format, 5.1), so a change of tuning never silently changes an old recording.
+- The hash function: FNV-1a 64 stays provisional until PM-0004-21's short report (state_hash.rs:5-7), which comes before
+  the first recording is committed (Walk's step 1).
+
+### 2.5 Zero allocation in the step (PM-0004-6; ADR 0004 :249-251)
+Every table is sized at match start; the query scratch is owned and reused; nothing is collected per query. Counted by a
+counting allocator: `crates/sim/tests/step_alloc.rs` (new: 1,800 warm ticks of a scripted walker in the yard that walks,
+sprints, jumps, slides along the thin wall and steps up) and the existing `crates/sim-wasm/tests/step_alloc.rs` on
+the moving local match. Bite: a sweep that collects its hits into a `Vec`.
+
+### 2.6 What is data and what stays code
+Data (content, block 1.6): the movement numbers, the capsule's size, the push rate, the map's shapes, spawns and bounds.
+Code: the tick rate, `UNITS_PER_TICK`, the integrator's form, the slide iteration cap, the skin width, the ground probe's
+reach, the order of the phases. The take step (`Rules::take`) runs at match setup only and reports each rounding.
+
+### 2.7 For rust-reviewer (the movement maths and the collision library: its parallel design)
+1. The jump integrator: the exact per-tick parabola (y += v dt - g dt^2 / 2; v -= g dt) samples a 2.52 m apex, so
+   the reach is 3.0700 m against the formula's 3.0708: inside PM-0004-59's 1 mm and START-RULES' 3.07 m; semi-implicit
+   Euler gives 2.89 m (N50). Confirm or show another form that meets both.
+2. Slide-and-step: shape casts per iteration, the step-up (up by step_up, across, down), ground snapping on ramps
+   (PM-0004-54's 1 cm), no tunnelling at 13.27 m/s (0.44 m a tick) through 0.2 m (PM-0004-30).
+3. The three helpers, and the scan's update (3A-SCAN-HELPERS, STATUS_ARCHIVE.md:1395-1398: it would refuse them by
+   name or path today).
+4. No transcendental function in cs4's sim (axis-aligned shapes; facing as a vector). If the snapshot wants yaw and
+   pitch angles, `atan2` comes through the pinned `libm` (ADR 0004 :283-284) in the crate that encodes; whether
+   parry3d's `enhanced-determinism` already brings simba's libm is for rust-reviewer to read.
+5. parry3d: the version; features (`dim3`, `f32`, `std`, `enhanced-determinism` on both targets, ADR 0004 :293-294; no
+   SIMD feature, no `parallel`); its transitive crates, each runtime one with its overflow-override line (root
+   Cargo.toml:31-34) and the build check that refuses a crate without one (3a step 8); its `unsafe`; whether the BVH is
+   built deterministically in insertion order (PM-0004-32's bytes); which queries allocate and how to pass a
+   caller-owned stack (PM-0004-6); the shapes: capsule against cuboid and against a convex wedge (`ConvexPolyhedron`
+   from six points: deterministic hull, built at match start), 0 `Err(Unsupported)` (PM-0004-35); its share of the Wasm
+   (PM-0004-33).
+6. 3A-FMA-CHECK (STATUS_ARCHIVE.md:1355-1360; his MUL-ADD (a)): the check on the built file, in the step that brings
+   parry3d: the players' Wasm holds no function, call or import named `fma`/`fmaf` (and no `f32.fma`-like relaxed-SIMD
+   instruction); its plant: a stand-in crate that calls `mul_add`. And 3A-FEATURE-VERSION (:1391-1394), due "when sim
+   first gets a dependency": the feature compare by name and version.
+
+### 2.8 For netcode-architect (the command, the snapshot, the recording: its parallel design)
+1. The command's fields exist (protocol/messages.rs: `move_x`/`move_y` i8, `aim: AimPoint` cm, `view_time`); cs4 fills
+   move and aim. The page sends a world-space move vector it computed from W/A/S/D and the camera's yaw (an input, not a
+   sim value: ADR 0004 :286 forbids sim values in TypeScript, not inputs) and the cursor ray; the endpoint quantizes the
+   move (127 = 1.0) and casts the ray (block 3.6). `view_time` stays 0 in cs4: nothing reads it before lag
+   compensation (Slice 3, build plan :899) or cs8's plan.
+2. Per-command movement sub-steps under catch-up (2.3), what a tick without a command does, and the late bound
+   (3B-LATE-BOUND, cs7; security M1's "double speed" warning, security-auditor-review1.md:70-79).
+3. The checks at the room: the move's length and the aim inside the map (L1); 3B-ONE-PER-TICK's test on the jump.
+4. The snapshot's soldier records (position 1 cm, yaw 16 bits, pitch 10 bits, flags, the generation when an entity
+   enters: ADR 0001 :278-279, :305-317) and the own part; block 3 lists what the page needs, so the snapshot carries at
+   least that or the endpoint derives it (velocity: derived, block 3.3). AimPoint's i16 cm (messages.rs) holds +-327.67 m:
+   PM-0004-39's 2 km map cannot travel in today's command; that test runs headless on the sim (as the row's method
+   allows: "the same scripts with the offset").
+5. The recording (Walk's step 1, its design): it must record, per tick, the host's call numbers (the post's numbers, the
+   move and the ray, `now_ms`), carry the seed and the content bundle it ran on, a format name and version, and the
+   expected shared hash per tick; inputs made by a seeded scripted walker, so the recording can be made again after each
+   format or state change (write mode) and the targets compared on the new hashes.
+
+### 2.9 The marks of block 2, each with its test and its plant
+| Mark | Test | Plant |
+|---|---|---|
+| PM-0004-6 | 2.5 | a sweep that collects into a `Vec` |
+| PM-0004-11 | block 1.11 | a planted 0.02 s interval |
+| PM-0004-15 | 2.2 | no generation raise on reuse |
+| PM-0004-17 | two local matches in one process stepped in turn equal their solo runs (the replay runner) | a `static` counter read in a phase |
+| PM-0004-19 | the movement recording natively in two processes, Node, Chromium | the -21 injections |
+| PM-0004-20 | the same with `enhanced-determinism` on; parry3d's query time per tick with the flag on and off (a reading) | |
+| PM-0004-21 | std `sin`, a `HashMap` order of at least 32 keys, a presentation draw, each armed at a tick and reported there with a field-level diff | each injection |
+| PM-0004-22 | the float vectors run again; the helpers' signed-zero cases (+0, -0) and (-0, +0), a reversed clamp | a helper built on std `min` |
+| PM-0004-24 | the replay runner flags any non-finite float it hashes; debug builds assert finite state each tick; NaN in fuzzed commands refused where it enters | a planted `0.0 / 0.0` in the movement phase |
+| PM-0004-25 | the movement recording with `simd128` on (a reading; SIMD stays off) | |
+| PM-0004-30 | on LB at 30 Hz: 0.55 up, 0.56 stops; apex equal to the integrated value within 1 mm; 0 tunnellings in 10,000 random moves at 13.27 m/s through the 0.2 m wall | a move applied as a position step without a sweep |
+| PM-0004-32 | the BVH dumped node by node, native against Wasm (test module); build time (a reading here, judged on the reference server); 10,000 rays after a restore and rebuild | colliders inserted in authoring order on one build |
+| PM-0004-33 | own Wasm size raw, gzip, brotli, with the name-section split; a one-line change rebuilds natively in <= 10 s (5 runs) | |
+| PM-0004-35 | a counter on every query result: 0 `Unsupported` over -30's runs and the push pairs | an unsupported pair placed in the scene |
+| PM-0004-39 | the yard moved to the far corner of a 2 km map: -30's marks hold; a 10-minute route covers the same distance per second within 0.1 % | (the ladder's first item, build plan :355-356) |
+| PM-0004-54 | 1,000 downward cursor rays onto the yard's ramps land within 1 cm of the slope (the endpoint's cast is the sim's query) | ramps queried as boxes |
+| PM-0004-59 | the reach (measured apex + step_up) within 1 mm at 30 Hz for 11, 24, 0.55, and equal to 3.07 m (START-RULES) | legacy's closed form returned instead |
+| PM-0004-60 | a bounded run of 1,000,000 decoded movement commands over their full ranges (NaN and infinities where floats enter) into a running sim, 0 panics (the nightly is CI work) | a planted `.unwrap()` on a client-sent value |
+| 3B-ONE-PER-TICK | one command bringing 255 jump presses gives one jump | a jump per press |
+| START-RULES' push | two soldiers walking into each other are never stopped and end apart; neither ends inside a wall | a push that blocks |
+| 3A-FMA-CHECK | 2.7 item 6 | a stand-in crate calling `mul_add` |
+| 3A-FEATURE-VERSION | the compare keys on name and version | a second version of a crate in the tree |
+
+### 2.10 Size of block 2 (bottom-up; plus or minus 30 %; the room's and the codec's side is netcode-architect's)
+| Part | Code | Tests |
+|---|---|---|
+| ids.rs, soldiers.rs | 150 | 120 |
+| time.rs, rules.rs | 120 | 80 |
+| fmath.rs | 40 | 60 |
+| collide.rs | 260 | 150 |
+| movement.rs (walk, sprint and stamina, jump, step, slide, push) | 380 | 350 |
+| world.rs (records, table, order, write_state) | 120 | 60 |
+| step_alloc (sim, sim-wasm) | 0 | 80 |
+| the -17, -21, -24 runners and injections (in devtools, on the replay runner) | 120 | 150 |
+| 3A-FMA-CHECK, 3A-FEATURE-VERSION, 3A-SCAN-HELPERS | 75 | 95 |
+| PM-0004-60 bounded fuzz | 0 | 80 |
+| PM-0004-39 far corner (ladder) | 30 | 60 |
+| ADS's rule, if built in the part (block 5) | 40 | 50 |
+| Total | 1,335 | 1,335 |
+Plus about 15 lines of configuration: parry3d's line in the root `[workspace.dependencies]` and the overflow-override
+lines of its runtime crates (a guarded file once the 2.3 chat's guard protects it: build plan :219-222).
+- B2 DONE. Next: B3, the block and lane 2's rows.
+
+## Block 3. The block (DONE)
+
+### 3.1 The layout table's changes (crates/client-endpoint/src/layout.rs, layout_ts.rs, block.rs)
+- `ElementType` gains `F32` (four bytes, IEEE 754, little-endian; "a variant enters with its first use", layout.rs:6).
+- `Section` gains `rows: u32`: its capacity of rows, a build constant; `end_of` (layout.rs:115-119, "a section with more
+  rows brings its count into the header, and into this function, when it enters") becomes `start + rows * stride`;
+  the hash's stream gains each section's `rows` (layout.rs:207-215); `layout_ts` prints `rows` beside `stride`. One
+  table still drives the writer, the generated offsets and the hash (ADR 0002 :309-312).
+- Fixed capacity per build, with the live count in the header (recommended), against a capacity per match with each
+  section's start in the header (cs1 report :263 planned "the header states each section's row count and byte
+  offset"). Fixed: every offset stays a generated constant covered by the layout hash, the page binds views with no
+  arithmetic of its own, the block's length is one number per build; the cost is a block of capacity size whatever
+  the count (3.5). Per match: smaller blocks in small matches, but section starts become runtime values the page must
+  read and check. Departure from cs1's note, with that reason, for the report.
+- Row i of the soldier section is slot i (the soldier's sim index: ADR 0004 :155): lane 2 maps instance i to row i
+  with no search; a free slot's row is zero with its `occupied` bit clear.
+
+### 3.2 The header's counts (H2; lane 2's first list; cs1 report :187-189)
+`header` (rows 1, stride 12): `tick u32 @0`, `layout_hash u32 @4` (both never move, layout.rs:76-78), `soldier_count u32
+@8`: the rows in use this tick (the match's slot count; the page loops `0 .. soldier_count`). `event_count` joins with
+cs8's event section, `projectile_count` with cs9's projectile section.
+
+### 3.3 The soldier section (rows 48, stride 36)
+| Field | Type | Offset | Meaning | Lane 2 row |
+|---|---|---|---|---|
+| id | u32 | 0 | slot index in bits 0-15, generation in bits 16-31 | F9, F10 |
+| pos_x, pos_y, pos_z | f32 | 4, 8, 12 | metres, y up, the map's axes (the soldier's origin on the ground between the feet: appendix A4 :129) | F1 |
+| vel_x, vel_z | f32 | 16, 20 | horizontal velocity, m/s, written by the client endpoint from the soldier's two newest snapshots (difference x tick rate; 0 on a generation change); no wire cost | F4 |
+| yaw | f32 | 24 | radians, the aim's facing; the convention (0 toward +z, positive toward +x, or legacy's) is stated in the layout's doc and pinned by a test | F2 |
+| pitch | f32 | 28 | radians, positive up, from the aim point and the eye height | F3 |
+| flags | u8 | 32 | bit 0 occupied, bit 1 alive (always set until cs8; Part 15.2 :124-126 asks it before cs5's hand-over), bit 2 grounded, bit 3 sprinting, bit 4 aiming down sights (W1, with the part that builds ADS) | F5, F6, F7, W1 |
+| team | u8 | 33 | the team index | F11 (team half) |
+| (reserved) | | 34-35 | written 0 by the writer, the one owner of padding (cs1 report :263) | |
+- Interpolation on the page (3.7): a row whose id is the same in both blocks is blended; a new id at a row (another
+  generation, or a soldier that was not there) is placed, never slid (ADR 0001 :316-317; lane 2's F10).
+- The capacity 48 is the design target (VISION_V2 §3: 24v24; ADR 0004 :236 "the largest mode's N (48)"); a match with
+  more slots is refused at setup. If cs5's "48 walkers" means 48 beside the player, cs5's plan raises the constant (one
+  line; the layout hash changes and the page refuses old builds by itself).
+
+### 3.4 The local player's row and team (F12; gap 8), and the blend (NA-N3)
+- `own` (rows 1, stride 20): `soldier u32 @0` (the local soldier's id; 0xFFFF_FFFF before the join is answered),
+  `team u8 @4` (3 bytes reserved), `aim_x, aim_y, aim_z f32 @8, 12, 16` (the aim point the endpoint put in its last
+  command: the point the server tests, PM-0004-54). It is the block's owner-only section of ADR 0002 :290-292; cs8
+  adds the own weapon state (F13) to it. Answer to gap 8: the block, not the interface file: the page sees only the
+  block (cs1 report :267), and `JoinAccepted.slot`/`team` reach it this way.
+- The blend (NA-N3, STATUS_ARCHIVE.md:1153-1158; picture.ts:21-23): the Worker says when each block is due, the app
+  turns that into one fraction per frame, the picture only blends. Concretely: the host adds `dueAt` (the tick's due
+  time on the shared clock, from the Pacer, which knows each tick's due time in both modes: the step returns it, ADR
+  0002 :338-340) to the `block` message beside `startAt` and `doneAt` (messages.ts:42-43); the link keeps it with each of
+  the two newest blocks; `packages/client/src/app/blend.ts` (new, lane 1) computes, once per frame, the render time
+  (the frame's time minus a smoothed minimum of arrival-minus-due, minus one tick period) and the fraction between the
+  two blocks' due times, clamped to [0, 1]; a gap of more than two periods (a pause, a rebase) snaps to 1 (this is what
+  the first picture after a pause shows: the paused match as it stood, no slide; 3B-RESUME-FLASH, block 4.9).
+  `PictureFrame` gains `blend: number` (block 4.1). Why on the message and not a header field: the block's bytes stay a
+  pure function of the state and the layout (a recorded match replayed to the page later, PM-0003-28 at 12, needs no
+  clock in them), and Rust needs no f64 element type. picture.ts's sentence changes to say so (lane 1's file; I
+  review it).
+- Whether the local soldier is drawn at the newest block or blended like the others (OQ-0001-15; build plan :915 "the
+  page's drawing of one entity (4)"): blended in cs4 (one rule for every row); the numbers for his check come in cs7.
+
+### 3.5 The block's size at 1, 12 and 48 soldiers
+header 12 + echo 20 + link 16 + own 20 + soldiers 48 x 36 = 1,728: **1,796 bytes** at 1, 12 and 48 soldiers alike
+(capacity, not count); the rows in use are 36, 432 and 1,728 bytes. At 30 blocks a second that is 53,880 bytes a second
+copied once in the Worker and transferred (no second copy). With a capacity per match it would be 104, 500 and 1,796
+bytes. Today's block is 44 bytes (sim-wasm/src/lib.rs:157). cs2's and cs3's padded readings used guessed row sizes
+(cs2 report :365): cs4's report records the first real one, and cs5 measures the hand-off at 12 and 48 on it.
+
+### 3.6 What the page posts, and what crosses the bindings (WB-HEALTH (a))
+- The post (`PageToWorker.input`, messages.ts:22-31) gains `move_x, move_z` (the world-space move from W/A/S/D and
+  the camera's yaw, length at most 1) and `ray_ox, ray_oy, ray_oz, ray_dx, ray_dy, ray_dz` (the cursor's ray from the
+  camera, picture.ts's return, block 4.1): flat numbers, no inner array per frame. `isPageToWorker` refuses a non-finite
+  number, a move longer than 1.5 or a zero direction (an error message, as today for a bad post).
+- The bindings: `input` grows from six to fourteen plain numbers (six `u32`, eight `f32`), still one call per tick
+  beside `step` (ADR 0002 :344-346, at most R1-BND-REC1 mark 2's four; wasm-bindgen passes numbers with no allocation,
+  as review 1 read for six: engine-architect-review1.md, "Q2 glue"). Rust checks each float finite where it enters (ADR
+  0004 :285-286) and keeps the last aim when the ray is bad. The aim cast runs in the client endpoint against its own
+  copy of the static world (block 1.8), from the newest post, once per tick: hit point, else the ray's crossing of the
+  ground plane, else the last aim; then quantized into `AimPoint` (cm) and clamped to the map.
+- Rejected: an input area in linear memory (a second layout table, a second generated file: right when variable-length
+  datagrams cross, Slice 3, as cs3's design said); a second per-tick call for the aim (three calls instead of two for
+  no gain).
+
+### 3.7 The Worker's buffer pool (3B-POOL-16)
+`POOL_SIZE` 4 -> 16 (packages/sim-worker/src/host.ts:37), because cs4 grows the block from 44 to 1,796 bytes and a miss
+then costs a whole block (perf-auditor-review2.md:62: returns came in lumps of 12-17 at about 6 frames a second with key
+input). 16 x 1,796 = 28,736 bytes held. Test: `block-pool.test.ts` keeps 16 and lets the 17th go; the stats count misses
+as today.
+
+### 3.8 Lane 2's first list, row by row (issue #59, comment 6994614989; a lane request, never his word)
+| Row | Lands | Field (name, type) or answer | Reason |
+|---|---|---|---|
+| H1 tick | in the block today | `header.tick` u32 | layout.rs:87 |
+| H2 row counts | cs4 | `header.soldier_count` u32; `event_count` (cs8), `projectile_count` (cs9) | each section brings its count (cs1 report :187-189) |
+| F1 position | cs4 | `pos_x/pos_y/pos_z` f32, metres, y up | the soldier section |
+| F2 facing (aim yaw) | cs4 | `yaw` f32 radians | one facing toward the aim (gap 5) |
+| F3 aim pitch | cs4 | `pitch` f32 radians | from the aim point and eye height |
+| F4 velocity against facing | cs4 | `vel_x/vel_z` f32 m/s, world axes (lane 2 turns them into its facing's frame) | derived by the endpoint, no wire cost, no teleport spike (0 on a generation change) |
+| F5 on the ground | cs4 | `flags` bit 2 | the snapshot carries the bit (netcode-architect places it; gap 1) |
+| F6 sprinting | cs4 | `flags` bit 3 | sim state: with stamina it is not derivable from speed |
+| F7 alive | cs4 (always 1 until cs8's deaths) | `flags` bit 1 | Part 15.2 :124-126: the stand-in shows dead and respawned from a block field before cs5's hand-over |
+| F8 weapon held | cs8 | `weapon` u16 (index into the bundle's weapon table) | weapons enter in cs8 |
+| F9 soldier id | cs4 | `id` u32 (index | generation << 16); row i = slot i | PM-0004-15's ids |
+| F10 respawn marker | cs4 (respawns from cs8) | the generation in `id`; a change at a row = place, not slide | ADR 0001 :316-317 |
+| F11 team, faction | team cs4; faction per team with Slice 2 | `team` u8 per soldier; a `teams` section (3 rows, `faction` u8) when factions are data (CD-13, Slice 2) | cs8's dummies take "a plain second colour" by team (build plan :797-798) |
+| F12 local player and team | cs4 | `own.soldier` u32, `own.team` u8 | gap 8: in the block |
+| F13 own reload progress, active reload | cs8 | in `own`: `reload` u8 (0-255 of the reload), `active_reload` u8 (state) | the owner-only weapon state, build plan :404 |
+| F14 projectiles | cs9 | the projectile section (id, kind, position) | PROJ-DRAW (a): lane 1 draws them plainly in cs9, they pass to lane 2 at its merge (DECISIONS.md:1203-1204) |
+| E1 shot | cs8 | event row: shooter id, weapon, tick, start point, direction | own shots in the block of the tick that fired them, others' on their interpolation timeline (ADR 0002 :298-303); the bow's release is a shot, its arrow a projectile row (cs9's plan confirms) |
+| E2 where a shot ended | cs8 | per ray: point, normal, struck (soldier id or static shape id), surface class | gap 9: a `surface` tag on map shapes joins in cs8, additively |
+| E3 hit confirmed | cs8 | attacker, victim, weapon, damage, body part, hit point, source point, kind | build plan :403-405 |
+| E4 death | cs8 | victim, killer, weapon, the point to fall away from | gap 3: the point joins the event |
+| E5 blast | cs9 | place, strength, kind, owner | one E5 row in the block whatever the wire does (gap 2: the endpoint writes it from the projectile's last trajectory change) |
+| E6 reload start and end | cs8 | start: soldier, weapon, tick; end: the same and the result (normal, quick) | SCOPE-RELOAD (build plan :33) |
+| W1 aiming down sights | the part that builds ADS (block 5) | `flags` bit 4 | a need by SLICE-FEEL (DECISIONS.md:1234-1236) |
+| W2 weapon swap | cs8 | no field: a change of `weapon` | as lane 2 says |
+| W3 grenade throw | cs9 | events `throw_start`, `throw_release` | ADR 0001 :311 (an action start) |
+| W4 sprint-to-fire swing | with the per-gun delays (cs8 under ADS-DELAY (a), block 5) | `ready` u8 in the soldier row (0 sprint pose, 255 ready) | the delay is per gun (SLICE-FEEL; LOOP_V2:125); lane 2 reads it in cs10, after cs8 |
+| W5 footsteps, landings | no field | from F4 and F5 | as lane 2 says |
+| Gap 1 | cs4 | F4 derived, F5 a flag, F11 a byte | above |
+| Gap 2 | cs9 | E5 in the block | above |
+| Gap 3 | cs8 | E4's fall-from point | above |
+| Gap 4 | decided | PROJ-DRAW (a) | his words of 2026-11-19 |
+| Gap 5 | cs4 | one yaw in Slice 1 | the sim holds one facing toward the aim point; a second field only if a rule separates body and aim |
+| Gap 6 | decided | ADS is a rule of Slice 1 (SLICE-FEEL) | his words |
+| Gap 7 | Slice 3 | in local play the predicted shot (E1) at once, the confirmed end and hit (E2, E3) from the authority | lane 2 plays the tracer to the predicted end and the impact at the confirmed point |
+| Gap 8 | cs4 | the block (`own`) | above |
+| Gap 9 | cs8 | `surface` on shapes | additive (CD-4) |
+| Gap 10 | cs4 | yes: the page holds the same bundle (block 1.8) and reads speeds, and later recoil and reload times, from it, typed by the generated types | none of these needs a block field |
+Nothing on the list is refused.
+- B3 DONE. Next: B4, the page.
+
+## Block 4. The page, folder by folder (DONE)
+Lane 1 owns every folder below until cs5 merges; then `render/`, `soldier/`, `camera/` (and, proposed, `content/camera/`)
+pass to lane 2 (Part 15.2 :112-115). The rule of today stays: only `render/` imports three, and the app reaches the
+picture through `picture.ts` alone (picture.ts:1-4).
+
+### 4.1 `src/picture.ts` (the interface file; every change reviewed by engine-architect)
+1. `PictureFrame.blend: number`: the fraction between `previous` and `newest`, in [0, 1], computed by the app (3.4);
+   the sentence of picture.ts:21-23 rewritten to say who computes it and from what (the Worker's due stamps).
+2. `Picture.setContent(content: PictureContent): void`, with `PictureContent { map: MapDocument; camera: Camera }` from
+   `@shamble/types` (generated): builds the scene from the map document and sets the camera's values; called after
+   the Worker's `ready` and again after an accepted development reload; disposes what the previous call built
+   (ADR 0003 :464-466, "Between matches").
+3. `Picture.cursorRay(x: number, y: number, out: Float32Array): boolean`: the ray from the camera as last drawn (the
+   interpolated, drawn state, ADR 0003 :460) through the canvas point (CSS pixels), written as origin then direction
+   into the app's six-float array; false before the first frame. No allocation.
+4. `Picture.cameraYaw(): number`: the drawn camera's yaw, which the app uses to turn W/A/S/D into a world-space move.
+5. `Picture.plainLines(points: Float32Array, count: number): void`: the hook for lane 1's plain lines (Part 15.2
+   :120), drawn as one line object from a preallocated buffer (a fixed capacity, 256 segments proposed). Its first
+   user in cs4: the development aim line (4.4); cs8's tracers next.
+6. `start` options gain `devtools: boolean` and `panelHost: HTMLElement | null`: in development builds the picture
+   puts its camera panel (in `camera/`, which is the picture's side by Part 15.2 :106) into that element.
+7. The muzzle point waits for cs8: nothing draws a flash or a tracer before it, and the simulation's shot start is data
+   of its own (build plan "Since the plan" :68; Part 15.2 :150).
+The local soldier's row the picture reads itself (`own.soldier`, block 3.4), like every other field.
+
+### 4.2 `src/render/` (three-picture.ts, scene.ts replacing empty-scene.ts, index.ts unchanged)
+- The scene from the map document: each `box` a box mesh, each `ramp` a wedge mesh with the same six points the
+  simulation's convex shape uses, each region a flat quad on the ground; the ground and the 1 m grid kept (they judge
+  sizes); the plain lights of cs2. Built once per `setContent`, disposed on the next; nothing per frame.
+- Colours: none decided here (question GREY-COLOURS, 4.10). Node materials only (ADR 0003 part 1, as empty-scene.ts:12-13).
+- `cursorRay` from the camera of the last drawn frame (scratch vectors kept, no `new` per call); `plainLines` as one
+  `LineSegments` over a preallocated `Float32Array`, its draw range set per frame.
+
+### 4.3 `src/soldier/` (new)
+- `stand-in.ts`: the plain stand-in at the brief's sizes (appendix A4 :133-136: boot top 0.36, hem 0.43, belt 1.045
+  to 1.10, shoulders 1.49, chin 1.54, brow 1.66, hat top 1.80; shoulders 0.49 over the arms, waist 0.33, hem 0.61,
+  hat 0.235): a few coarse parts (coat skirt, torso, head, hat, boots, arms, a 1.12 m gun bar), every part on one root
+  so the whole figure scales with one number (`STAND_IN_HEIGHT_M = 1.80`, a placeholder, :130); the root turns to
+  `yaw`, the gun bar tilts to `pitch`: "it shows facing and aim" (build plan :345). Plain on purpose (build plan
+  :876-877); cs6 (lane 2) replaces it.
+- `rows.ts`: 48 roots made at start, hidden until their row is occupied; each frame, for rows `0 .. soldier_count`,
+  position and angles blended between the two blocks by `blend` (yaw by the shorter arc); a row whose `id` differs
+  between the blocks is placed, not slid (block 3.3); a row whose `alive` bit is clear lies down (Part 15.2 :124-126:
+  built and tested now with a crafted block, so cs8 needs nothing from lane 2). No allocation per frame.
+
+### 4.4 `src/camera/` (new)
+- `follow.ts`: the follow camera at legacy's framing, ported from CD5 (LEGACY_INVENTORY.md:87; values in
+  `content/camera/camera.json`): height 40, boom 56.6, field of view 15, yaw 45 degrees, the screen dead zone 0.60 x
+  0.52, the follow, push and yaw rates, and the look-ahead and position gains legacy reads (the six dead keys not
+  ported); its update read from legacy's camera code at the build. It follows the local soldier's blended position.
+  Legacy's middle-mouse camera turn is not in Part 5's list and is not ported (his to ask).
+- `panel.ts`, `settings.ts`: the live camera tuning panel (build plan Part 5 :853-865; his "Queued" words): backquote
+  opens it; sliders for boom, height, field of view, the pitch override and the sights camera mode (the mode slider
+  matters once ADS exists, block 5); the five presets Classic, Tactical, Iso, Iso+, Foxhole (CAM_STYLES,
+  shamble-game.js:2196-2200); "copy values", which puts the camera file's exact canonical bytes on the clipboard (block
+  1.4; a text box to select when the clipboard is refused, as the report's fallback, overlay.ts:46). Slider limits come
+  from the generated camera schema (CD-3 :338-340; PM-0005-7). Development builds only.
+- The development aim line: a plain line from the local soldier's chest height to `own.aim` (the point the server
+  tests), through the plain-lines hook, development builds only (a readout toggle), for his check of aiming at height
+  on the ramps and ledges.
+
+### 4.5 `src/app/`
+- `content.ts` (new): fetches `./content.json` once, parses it (`JSON.parse`, the files by path, the camera and the map
+  read field by field into their generated types, never merged into other objects: CD-9 :454-455), and hands the
+  bundle's bytes to the link for the Worker; in development, `import.meta.hot?.on("shamble:content", ...)` refetches and
+  posts (Vite removes `import.meta.hot` from builds).
+- `blend.ts` (new): the fraction of block 3.4, a pure function with its state in numbers.
+- `boot.ts`: the order becomes: picture start; content fetch; the Worker started with the bundle; on `ready`,
+  `picture.setContent`; pointer listeners on the canvas (`contextmenu` prevented there); each frame: the move vector
+  (input/move.ts with `picture.cameraYaw()`), `picture.cursorRay`, `link.frame(keys, move, ray)`, the blend,
+  `picture.plainLines` (development), `picture.draw`.
+- `worker-link.ts`: the start message carries the bundle (transferred); the input message carries the move and the
+  ray; reads `soldier_count`, `own.soldier`, `own.team`, `own.aim`; keeps each block's `dueAt`; the development
+  `content` message; its length check stays (>= BLOCK_BYTES before any read past the header).
+
+### 4.6 `src/input/`
+- `keyboard.ts`: unchanged buttons (W, A, S, D, Space, Shift; messages.rs:83's other ten bits enter with their systems).
+- `move.ts` (new): held W/A/S/D and the camera's yaw -> a world-space move of length at most 1 (diagonals normalized).
+- `pointer.ts` (new): the cursor's canvas position; mouse buttons into the same held bits and press counters as keys
+  (the right button, legacy's sights button, shamble-game.js:3284-3285, as bit 6 once ADS is built); let go on blur
+  and on a hidden tab, like keys. 3B-BLUR-TEST (STATUS_ARCHIVE.md:1540-1542, "with the next change to the page's key
+  handling"): a browser test holds W and a mouse button, sends `blur`, expects both let go.
+
+### 4.7 `src/overlay/` (development only, behind `__SHAMBLE_DEVTOOLS__` and dynamic imports, as boot.ts:100-157)
+New readout rows: the local soldier's position, speed (from `vel`), the flags (grounded, sprinting, aiming), the aim
+point, the blend fraction, `soldier_count` and block bytes (1,796), the content's files and versions, the camera preset;
+the same fields in "Copy report". The key diagram stays.
+
+### 4.8 `src/styles.css`, and what is development-only (and how it stays out of production)
+- Development-only: the readout and report, the key diagram, the camera panel with "copy values", the aim line, the
+  bundle-injection hook for the reload test; all behind the literal `__SHAMBLE_DEVTOOLS__` (vite.config.mjs:19-21) and
+  dynamic imports, so a production build cuts them; `DEV_MARKERS` (build-checks.mjs:133) gains "camera-panel" and
+  "aim-line". The Vite content plugin has `apply: "serve"`: in no build at all.
+- 3B-CSS-PROD (STATUS_ARCHIVE.md:1526-1527), closed here because cs4 adds more development CSS: the development rules
+  move into their own CSS file imported only by the development modules (its own chunk), and the production scan also
+  reads `.css` files (build-checks.mjs:163 reads `.js` only today).
+- His zip is a development build, as for cs2 and cs3 (he copies reports from it), so the panel is in it; the
+  production build stays for the scan.
+
+### 4.9 No allocation per frame, and what the first picture after a pause shows
+- Per frame: the six-float ray array, the plain-lines buffer, the 48 roots and the scratch vectors exist from the start;
+  the blend works on numbers. The one message per frame stays (ADR 0002 :318-329) and grows by eight numbers: the
+  allocation spec's per-frame limit is measured again on the new message (allocation.spec.ts), not loosened by guess.
+- 3B-RESUME-FLASH (his, open; STATUS_ARCHIVE.md:1478-1483), now with a soldier on screen. What the code will do: the
+  match stands still while the tab is hidden (ADR 0004 :219-220); every key is let go on hide; on return the first
+  frame draws the match as it stood (the blend snaps at the gap, 3.4, so nothing slides from old stamps), and if he was
+  walking, the soldier slows to a stop over the next ticks (legacy's acceleration 14 m/s^2 stops a 6.3 m/s walk in
+  about 0.45 s: 6.3 / 14). Options: (a) that; (b) the Worker also zeroes the soldier's velocity when the tab hides:
+  a simulation rule tied to the page's visibility, which online play would never have (a hidden tab does not pause an
+  online match, ADR 0004 :219-220), so a code path only offline (ADR 0002 :413-414). Recommendation: (a).
+
+### 4.10 Questions this block raises (for Mustafa; look and rules are his)
+- GREY-COLOURS: what colours do the greybox scene and the plain stand-in take in cs4? (a) LOOP_V2 §9's own default
+  (LOOP_V2.md:158: "plain blocks, with height read through brightness (higher is lighter)") in neutral greys, the
+  stand-in one mid grey with a darker gun; (b) the Art lead's palette A proposal (appendix A5 :217-224) and the soldier
+  brief's faction colours (A4 :138-145) as placeholders; (c) one flat grey. Recommendation: (a), his own default rule,
+  which puts no look choice on screen before the carry (build plan :874-875).
+- CAM-HOME: if his Testlines Export holds camera values, which is their home? (a) the camera file, tuned in the panel
+  (recommended: the panel is the tool his Queued words name); (b) the Export, the panel only for trying.
+
+### 4.11 Size of block 4 (TypeScript and specs; plus or minus 30 %)
+| Part | Code | Tests |
+|---|---|---|
+| picture.ts | 40 | 0 |
+| render/ (scene from the map, ray, plain lines, content swap) | 260 | 60 |
+| soldier/ (stand-in, rows, blend, place-not-slide, lying down) | 220 | 120 |
+| camera/follow.ts | 160 | 120 |
+| camera/panel.ts, settings.ts | 220 | 140 |
+| app/ (content, blend, boot, worker-link) | 260 | 260 |
+| input/ (pointer, move, keyboard) | 110 | 120 |
+| overlay/ rows | 80 | 60 |
+| sim-worker (messages, host: bundle, swap, dueAt, POOL 16; worker.ts; pacing.ts due per tick) | 200 | 220 |
+| build-checks (CSS scan, markers, content.json) | 40 | 50 |
+| browser specs: walk (move, jump, 0.55/0.56 in the yard through the page, aim on a ramp, camera follows), panel, reload hook, even-motion reading, blur, allocation re-measure | 0 | 520 |
+| Total | 1,590 | 1,670 |
+- B4 DONE. Next: B5, the cut and the order.

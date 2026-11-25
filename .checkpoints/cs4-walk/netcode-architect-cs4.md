@@ -51,3 +51,244 @@ Then DONE.
 - R-TUNING (docs/legacy-tuning.json tables.T.values): moveSpeed 6.3 m/s; sprintMult 1.4286 (sprint 9.0 m/s); adsMoveMult 0.55; accel 14; gravity 24; jumpV 11 (apex 11^2/48 = 2.52 m); stepUp 0.55; arenaX 186, arenaZ 126; shieldMoveMult 0.72; STAM {max 7, regen 0.2, lockUntil 0.3} (shamble-game.js:2216); EJUMP_REACH 3.0708 (shamble-game.js:1575); FIXED_DT 1/60; BODY radii/heights (torsoR 0.52, headY 2.12, crouchDrop 0.55).
 - R-LEGACY-JUMP: legacy jump is held-based: shamble-game.js:2537 `if(jumpHeld && st.grounded){ st.vy=T.jumpV; st.grounded=false; }`; EJUMP_REACH = jumpV^2/(2 gravity) + stepUp ~3.07 m (:1575). FIRE_H 1.9, FIRE_R 0.3, FIRE_F 0.35; playerFireOrigin uses facing sin/cos (:1418-1421) -> the fire origin needs the yaw in the sim (cs8).
 - R-LEGACY-AIM: shamble-game.js:2702-2711: aim cast through the STABLE camera base (no shake/recoil/concussion) so cosmetic screen motion never drags the world aim; facing = atan2 toward the aim point when horizontal distance^2 > 0.0004 (2 cm), else kept (:2709-2710) -> facing is state (kept inside the dead zone); pitchWeapon toward the aim point. No facing-dependent movement found in T values.
+- R-CHECKS: room/tests/any_bytes.rs :97-100, :205-224 (per-step identity: sequence moves by exactly run + missing) and client-endpoint/tests/any_bytes.rs :225-231 (every datagram = received + late + refused) -> my round-2 L-1 is done in 3b; neither file has a counting allocator (3B-HOSTILE-ALLOC open). queue.ran() takes no argument (room/src/lib.rs:270) -> L-2 done.
+- R-PM3-42 (docs/adr/0003-rendering.md:1217): frame-rate cap options (60 fps cap; follow the display; a cap per tier): smoothness std/mean on 60/120/144 Hz, battery on ML (Slice 2); reported, no pass number; RD, mode P.
+- Block 0 DONE (inputs read). Next: Block 1.
+
+## Block 1. The recording, Walk's step 1, green before any movement code (condition b)
+
+### 1.1 What is recorded, and the file format (version 1)
+A recording is two committed files per name under `crates/devtools/recordings/` plus a manifest:
+- `<name>.rec` (binary, little-endian): what the host hands the simulation, call for call, so that the same calls can
+  be replayed on any target through the players' own entry points (`Sim::create`, `rebase`, `input`, `step`).
+  - Header: magic 8 bytes `SHMBLREC`; version `u16` = 1; seed 32 bytes (a public TEST seed only: its first 8 bytes
+    are `TESTSEED`; the writer refuses any other seed and every replay path refuses one, so no real match seed can
+    ever sit in a recording or be replayed by a page: ADR 0004 part 8 :312-316); start tick `u32` (0 for every
+    recording the players' file replays: `Sim::create` starts at tick 0, sim-wasm lib.rs:71-85); first command
+    sequence `u16` (0 likewise); tick rate `u16` (30; a build at another rate refuses: the time unit is per build,
+    ADR 0004 part 4); content hash 32 bytes (SHA-256 of the canonical content bundle the match ran on; all zeros =
+    no content, which only step 1's first recording uses); map id: length `u8` (at most 64) + UTF-8; tick count
+    `u32` (at most 108,000 = one hour at 30 Hz, checked against the bytes left BEFORE anything is allocated).
+  - Then one 68-byte record per step, mirroring the two calls the live host makes per tick (host.ts:79-83):
+    host time `f64` bits (8: the `now_ms` the step got; finite and never decreasing, checked by the writer and the
+    readers) | post number `u32` | held buttons `u32` (low 16 bits) | press counts 4 x `u32` (button k in byte k%4
+    of word k/4, as post.rs:35-48) | move `u32` (x in bits 0-7, y in bits 8-15, as `i8`; the rest 0) | cursor ray
+    origin 3 x `f32` bits | ray direction 3 x `f32` bits | view tick `u32` | view fraction `u32` (low 16 bits, in
+    1/65,536 of a tick). Every field Walk will ever pass is in version 1 from the start (block 3 defines move, ray
+    and view time), so the movement and aim steps change no format: step 1's recording holds zeros there.
+  - No trailing bytes. 3b's record had 24 bytes (my cs3 notes, replay.rs); version 1 is 68 because it already holds
+    Walk's post and the host's time (the 3c item "the host's time recorded with every tick", archive :1555).
+- `<name>.hashes` (text, LF): first line `shamble-hashes 1 <sha256 of the .rec> <tick count>`; then one line per step
+  k = 1..n: `<world tick after step k> <shared hash, 16 hex> <whole-state hash, 16 hex>`. Text, so that a change-set
+  that re-makes a recording shows in its diff exactly from which tick the hashes moved. The shared hash is the one
+  every target can read (the players' file exports only it); the whole-state hash (seed and streams included) is
+  computed natively only (two native processes compare it: PM-0004-18), and it is harmless to commit because the
+  seed is a public test seed.
+- `recordings/manifest.txt`: one line per file with its byte count and sha256 (as `vectors/chacha8.manifest.txt`).
+- `recordings/content/<set>/`: frozen copies of the content files a recording runs on (step 1: none). Recommended so
+  that a change of the game's own tuning (his Testlines values, block 3) does not re-make every recording: a
+  recording pins the code's behaviour on fixed data; it is re-made when the code changes, not when tuning does.
+  The other way (recordings on the live content) is noted as option B in 1.6.
+- Why two files and not one: the inputs change only with the input format (rarely); the hashes change with every
+  deliberate change of the simulation. Size at 1,800 steps: .rec 122,520 B + header (about 110 B); .hashes about
+  72 KB of text. Git deltas the unchanged inputs; a re-make adds mostly the hash text.
+
+### 1.2 The replay, the same on every target
+- Calls, in the live host's order (pacing.ts:68, :103): `Sim::create(seed, MODE_LOCAL, 0)` (plus, from the content
+  step on, the content call with the recording's frozen bundle, whose hash must equal the header's); `rebase(first
+  host time)`; then per record: `input(...)` with every field the build's `input` takes, then `step(host time)`, then
+  `shared_hash()`. A field the build's `input` cannot take yet must be zero in the record, or the replay refuses the
+  recording by name ("this build cannot replay this recording's aim"): nothing recorded is ever silently dropped.
+- The players' file gets ONE new read-only export (cs3-plan 5.1, DEPART-3; archive :1555-1556; engine-architect
+  round 2, L3): `#[wasm_bindgen] Sim::shared_hash(&mut self) -> u64` (a JavaScript BigInt; one plain number per
+  call). Rules: it returns the SHARED hash only (no seed or stream byte is in what it hashes); it is read only during
+  a replay, never on a live tick (the live host still makes exactly two calls per tick: host.test.ts pins the calls
+  a live tick makes); no call that takes or returns a block of bytes is added; the boundary test's pin of
+  `Sim.prototype` (sim-wasm.test.mjs:143-147, security-auditor round 1 L3) gains exactly this one name.
+- Where its buffer lives: private to `Room` (`hash_scratch: Vec<u8>`, reserved in `Room::new` to the shared state's
+  length), behind `Room::shared_hash(&mut self) -> u64`; `LocalMatch::shared_hash` and `Sim::shared_hash` only
+  delegate. At the source, `World` gets `write_shared_state` (writes the prefix only) and `write_state` = shared +
+  authority part, so the scratch never holds a seed byte (today shared_hash writes all and zero-fills: world.rs:135-
+  140). Tests: `scratch.len() == shared length` after the call, contents identical for two seeds that differ in
+  every byte, and no allocation after `Room::new` (sim-wasm/tests/step_alloc.rs's counting allocator calls
+  `shared_hash` every tick: 0 allocations).
+- Native runner (`crates/devtools/src/replay.rs`): the same calls on `sim_wasm::Sim` natively (its methods are plain
+  Rust off wasm32, as lib.rs's own tests use them), plus the whole-state hash through `LocalMatch::room()` ->
+  `World::state_hash` with the runner's own scratch (native only, never exported). Built "as the server builds the
+  sim" (ADR 0002 :506): release in CI's release line once E1 lands; debug twice in today's CI job.
+- Wasm in Node (`packages/sim-worker/boundary/replay.test.mjs`): the players' file, `initSync`, a TypeScript reader of
+  the format (`packages/sim-worker/src/recording.ts`, used by tests only and kept out of the production bundle by
+  the build's dev-marker check), the same calls, BigInt compare with the .hashes shared column.
+- Wasm in Chromium (`packages/e2e/tests/replay/determinism.spec.ts`): a test-only Worker script (in `packages/e2e`,
+  never shipped) loads the built players' file (its sha256 checked equal to the build's) and runs the same loop;
+  no change to the real Worker's message set is needed for this check. (The real Worker's paced replay mode, which
+  PM-0004-28 needs, is block 5's, in Walk's second part.)
+
+### 1.3 The comparer and the field-level diff (ADR 0002 :509, PM-0004-21)
+- `crates/devtools/src/compare.rs`: `first_difference(start_tick, expected: &[u64], got: &[u64]) -> Option<
+  Difference { tick, expected: Option<u64>, got: Option<u64> }>` (the first differing tick, or the first tick one
+  stream lacks; tick via checked_add). Used for file-against-target and target-against-target.
+- Field level: one visitor in `sim` drives every serialisation, so names and bytes cannot drift: `trait StateSink {
+  fn u8/u16/u32(&mut self, name: Name, v); fn f32(&mut self, name: Name, v); fn bytes(..); fn authority(&mut self) }`
+  with `World::visit(&self, &mut impl StateSink)`. The canonical writer (hash bytes) is one sink; a `Lines` sink in
+  devtools writes `name = value` lines (floats as hex bits and decimal; every float read by `to_bits`, which is also
+  PM-0004-24's finite read); the shared writer stops at `authority()`. The authority part is never printed as bytes:
+  the seed never appears in any dump (ADR 0004 part 8); stream positions may (they are not secret).
+- Native against native (two Worlds in one process have different std HashMap seeds): `field_diff` in-process.
+  Native against Wasm: the native bin `cargo run -p devtools --bin replay -- state <rec> <tick>` and, on the
+  test-only module (crates/devtools/src/wasm.rs, never shipped), `replay_state_at(content, rec, tick) -> String`;
+  the two texts are diffed line by line. A bin under `src/bin/` is found by cargo without a manifest change, so
+  devtools' Cargo.toml (and its three unused edges) stays untouched (security-auditor round 1 L2).
+- Why not a byte export on the players' file: it would go beyond DEPART-3's "one new read-only number" and his
+  WB-HEALTH words (lib.rs:5-6). The first differing tick is judged on the players' file; the fields come from the
+  test module (same source, same compiler); if the test module does not reproduce a players'-file mismatch, the
+  comparer says so, which is itself a finding.
+
+### 1.4 The generator, `--check`, and when a recording is re-made
+- Input scripts are Rust functions in `crates/devtools/src/scripts.rs` (deterministic, no clock, integer maths; host
+  times synthetic: k x 1000/30 ms plus a seeded jitter of 0-6 ms, never decreasing). The generator is the native
+  replay itself: `cargo run -p devtools --bin make_recordings` writes `.rec`, `.hashes` and the manifest;
+  `--check` makes them in memory and compares byte for byte, writes nothing, exits 1 naming the file and, for a
+  .hashes file, the first differing tick (the vector generators' behaviour: make_chacha8_vectors.py :8-9). The test
+  `crates/devtools/tests/recordings.rs` calls the same check, so CI's plain `cargo test` runs it with no CI edit; it
+  also fails on a recording file the manifest does not list, or a listed file that is missing.
+- Re-made: in the commit that changes the simulation's behaviour or its state's layout on purpose, every recording
+  is re-made by the generator, and the change-set's report names, per recording, the first tick whose hash moved
+  (the comparer between the old and new .hashes) and why. Inputs change only with an input-format change (a new
+  version; the old version is then refused by both readers). A change-set that means NOT to change the simulation
+  must leave every recording byte-identical: that is the recordings' regression value. Recordings are made from
+  scripts, never captured from play, so a re-make is one exact command.
+- Prerequisite of the first commit of a .rec (cs3-plan section 3 item 5; state_hash.rs:5-7): PM-0004-21's short
+  report, written with rust-reviewer: FNV-1a 64 kept or replaced, and its cost per tick (mean, p99) natively and in
+  Wasm, from a small timing test printed with `--nocapture` (a reading).
+
+### 1.5 The recordings, and what changes when movement lands
+- Step 1 (today's state: tick, the player's applied command, the seed; no content): `first-loop` (1,800 steps:
+  the 3b loop's inputs: the eight move keys' held patterns, Space and Shift, presses at varied gaps with two in one
+  tick and a burst the pacer must spread, repeated post numbers for a slow page and skipped ones for a fast page,
+  jittered host times; move, ray and view fields zero; public test seed; start tick 0). Green natively in three
+  processes, in Node and in Chromium on the players' file BEFORE any content, collision or movement code.
+- When movement lands (the soldier table, content, the command's move/aim): (1) the canonical state grows by the
+  soldier table (appended in the shared part, named by the visitor), and world.rs's known answers are re-made from
+  the second implementation; (2) `Sim` gains the content call: the replay passes the recording's frozen content set
+  and checks its hash; (3) `input` widens: the replay passes move, ray and view time, and the "must be zero" refusal
+  for them goes; (4) `first-loop` is re-made: its per-tick inputs stay byte for byte (`--check` proves the script
+  still makes them), its header gains the content hash and map id, and every hash changes from step 1 (the soldier
+  is in the state): the report says exactly that; (5) `walk` is added; (6) PM-0004-21's three plants are run again
+  on movement fields, PM-0004-24's finite read and its bite become meaningful, PM-0004-25's reading runs (parry3d
+  is in). The format stays version 1.
+- At Walk's end: `first-loop` (re-made), `walk` (about 2,400 steps on the street corner and the training yard: the
+  eight directions at several camera yaws, sprint, walking while aiming down sights, the sprint-to-sights wait,
+  jumps by tap, by hold and by one command carrying 255 presses, a press while in the air, the 0.55 m step up and
+  the 0.56 m stop, ramps up and down, thin walls at sprint speed, the 50 m lane, aim rays over ground, walls, box
+  tops, ramps and sky), and `lane-walk` (about 1,200 steps of constant-speed walking up and down the lane, for the
+  paced replay of block 5; Walk's second part). That is the build plan's "a recording per change-set that changes
+  the simulation" (:484) and "a movement recording" (:353). Long native-only runs (PM-0004-18's 36,000 ticks) use a
+  procedural script in Rust and are compared process against process, never committed.
+
+### 1.6 Every mark that rests on the recording at Walk: test, where it runs, planted defect
+(N = native `cargo test`; CI's job runs the workspace twice in debug = two processes; the release line joins with
+E1, the small CI pull request. W = Wasm in Node on the players' file, CI's boundary run. C = Chromium, CI's browser
+run. None needs a CI edit.)
+| Mark (build plan line) | Test, where | Planted defect, must turn it red |
+|---|---|---|
+| ADR 0004 milestone (:470): first recording's hashes natively twice and in Wasm | N1 `devtools/tests/recordings.rs::every_recording_replays_to_its_hashes` (N, both columns); N2 two-process test (below); W1 `boundary/replay.test.mjs` (W, shared column); C1 `e2e/tests/replay/determinism.spec.ts` (C) | (a) one hex digit of one .hashes line changed: all three name that tick; (b) the sim changed at one tick (`if tick == 900 { presses[0] ^= 1 }` in authority_step): N1, W1, C1 all report tick 900; (c) the TS loop skips one input call: W1 names the first tick that differs; (d) one byte of a .rec record changed: `--check` fails |
+| ADR 0004 foundation line (:473): a replay runner and the first recording in CI | the same N1, W1, C1, all in today's CI jobs | as above |
+| G10 recordings (:484): one per change-set that changes the sim | N1 iterates the manifest; fails on an unlisted or missing file | an extra unlisted `.rec` in the folder; a listed one deleted |
+| ADR 0001 :1785 (:485): a recorded input replay gives the same per-tick hash on two runs (met at 4) | N2 `devtools/tests/two_processes.rs`: the test spawns its own binary twice (std::process::Command on current_exe, a child-role env var, one exact test filter); each child replays every committed recording and a 36,000-tick procedural script, prints its std RandomState fingerprint (hash_one of a fixed key on a fresh RandomState) and a digest of its per-tick whole hashes; the parent asserts equal digests, 0 differences against the files, and different fingerprints (equal ones make the run invalid, not passed). On `walk` (movement) for the "met" | PM-0004-21's HashMap injection: the two children differ at its tick |
+| PM-0004-19 on the slice's recordings (:494) | N1, N2, W1, C1 on `first-loop`, `walk`, `lane-walk` | the three injections of PM-0004-21 |
+| PM-0004-17: nothing outside the state ("meaningful from 4") | N3 `devtools/tests/two_instances.rs`: two `Sim`s in one process, `walk` and `first-loop` stepped in turn (each a different seed and input stream), each equal to its own .hashes (both columns); W2 in `replay.test.mjs`: two `new Sim()` on one module instance, interleaved, each equal to its file. M10 (18,000 ticks) is Slice 2's form: here the recordings' lengths, said so | a `static` AtomicU32 bumped per step and added to a state field (the echo's presses in step 1, a position after movement): interleaved differs from solo |
+| PM-0004-18: same build reproduces itself | N2 above (36,000 ticks; the stress scene's form at Slice 6) | the HashMap injection |
+| PM-0004-21: divergence caught at its tick, with a field diff, 3 of 3; hash function and cost; word size | the report of 1.4; three injections armed at tick T = 600 by the plants script (the change-set's notes, like plants-3b.py): (i) std `f32::sin(K)` added to a state field, K found by the script where native and Wasm sinf differ (10^6 candidates; if none, a 1-ulp change on Wasm only stands in and the report says so): N vs W differ at T, field diff via the bin and `replay_state_at`; (ii) a std HashMap of 32 keys folded into a field in iteration order: two processes (N2) differ at T, in-process diff names the field; (iii) a presentation draw inside the sim (a planted JS `Math.random` import in Wasm, a per-process RandomState value natively) added at T: two runs differ at T. Control: a draw outside the sim (the page's own generator) leaves every hash equal. Word size: a committed vector (first-loop's shared bytes at tick 900 and their digest) checked natively and through the test module in Node | the mark's own bite: a planted `usize` field in the canonical bytes makes native (8 bytes) and Wasm (4 bytes) differ at tick 1 |
+| PM-0004-24: NaN never enters (meaningful after movement) | the `Lines`/finite sink reads every float of the state by `to_bits` on every replay of N1-N3 (release runs from E1 on) and fails naming tick and field; the sim's debug/test finite assertion each tick (movement owner's); the post's ray floats checked finite where they enter (block 3) | `0.0 / 0.0` planted in the movement phase at tick T: the debug assertion trips at T and the release runner names T and the field |
+| PM-0004-25: simd128 (a reading) | a script builds a second players' file with `-C target-feature=+simd128` into `.gate/` and runs W1 on it; mismatches reported (0 expected); nothing is decided, SIMD stays off | none (a reading) |
+
+What the collision marks rust-reviewer designs need from this runner (their tests stay theirs):
+- PM-0004-20 (parry3d's flag across targets): any recording that exercises the queries (`walk`, or a longer one
+  they add), replayed by N1/W1/C1 with first-difference and the field dump; flag-off timing is outside the runner.
+- PM-0004-30, -59 (step, apex, tunnelling, reach): sim-level scripted tests; if they want their cross-target
+  agreement shown, they express a script as a recording and the runner replays it on W and C.
+- PM-0004-32 (BVH bytes native = Wasm; rays after restore): a dump export on the TEST module (the 1.3 pattern), never
+  on the players' file.
+- PM-0004-35 (no Unsupported pair): a per-query result counter the native runner can print after a replay.
+- PM-0004-39 (far corner of a 2 km map): must stay a sim-level script: the command's aim point (i16 cm,
+  messages.rs AimPoint) cannot name a point beyond +-327.67 m, so a 2 km match through the local match is not
+  possible until the codec widens the aim (a recorded limit, block 3).
+- PM-0004-54 (cursor ray on a ramp within 1 cm): the query is theirs; my cast quantises to the 1 cm grid, which adds up
+  to 0.87 cm (half a centimetre per axis, 3-D): they should test both the query's point and the command's point.
+- PM-0004-60 (no panic from what a client can send, movement commands): the room's generator in
+  room/tests/any_bytes.rs gains move and aim at their full ranges (block 3's room checks), plus a direct fuzz of
+  `World::authority_step` with random commands: 0 panics, finite state.
+
+### 1.7 Step 1's own size (bottom-up, +-30 %; the main session multiplies)
+| Part | Code | Tests |
+|---|---|---|
+| sim: StateSink visitor, write_shared_state, shared length as a function | 60 | 50 |
+| room: hash_scratch + shared_hash; sim-wasm: LocalMatch/Sim::shared_hash | 25 | 30 |
+| devtools: recording.rs (format, caps before allocation, never panics) | 140 | 120 (round trip incl. non-zero move/ray/view; every refusal; 100,000 random and mutated inputs) |
+| devtools: replay.rs, compare.rs (first difference, Lines sink, field diff) | 150 | 60 |
+| devtools: scripts.rs (first-loop), bins make_recordings and replay, wasm.rs exports (replay_state_at, digest) | 150 | 0 |
+| devtools tests: recordings.rs, two_processes.rs, two_instances.rs | 0 | 200 |
+| 3B-HOSTILE-ALLOC: counting allocator in room/ and client-endpoint/tests/any_bytes.rs | 0 | 50 |
+| PM-0004-21 report timing + word-size vector | 0 | 40 |
+| TS: recording.ts reader; e2e test Worker | 130 | 0 |
+| TS tests: reader, boundary replay (W1, W2, pin), e2e determinism spec (C1) | 0 | 160 |
+| Total | 655 | 710 |
+About 1,365 lines (+-30 %), 52 % tests. The cs3 plan's 275 for step 7 left out the Chromium path, the TypeScript
+reader, the field-level diff, the two-process and two-instance tests and the shared-hash plumbing.
+
+### 1.8 Findings for the plan (block 1)
+- F1-1: build plan :470 "Met at 3 natively; the Wasm half in CI 2.3 after 3" — the Wasm half can be in CI at Walk
+  with no CI edit (CI already builds the players' file and runs the boundary tests and every e2e spec: verifier-cs3b
+  step 7 log); Firefox and WebKit stay with the small CI pull request (FIREFOX-TESTS (b)).
+- F1-2: PM-0004-17 with "different seeds" proves nothing on shared hashes in cs4: nothing draws from a random stream
+  yet (spread is change-set 8), so two seeds give equal shared states for equal inputs. N3 therefore uses two
+  different input streams and both hash columns (the whole hash covers the seed bytes).
+- F1-3: the field-level diff on the players' file is impossible without a byte export, which DEPART-3 does not cover:
+  the plan should say the diff comes from the test module (1.3).
+- F1-4: devtools' manifest stays as it is in Walk: bins under src/bin need no manifest line; the replay passes the
+  content as bytes through the players' own call, so devtools needs no `content` edge.
+- Block 1 DONE. Next: Block 2 (the 3c table).
+
+## Block 2. Every item named for 3c, placed by name (condition c)
+Homes: **R** = "the recording (Walk, step 1)"; **L** = "the link simulator's change-set (after Walk, merged before
+change-set 7 starts)". Sources: STATUS.md "Next" item 2 (:33-36); STATUS_ARCHIVE.md :1453-1557; Builder V3's
+handover part c; the 3b report; cs3-plan at 80a51e42; my 3b notes and reviews at 80a51e42; the question file :91-94.
+| # | Item, and who named it | Home | Note |
+|---|---|---|---|
+| 1 | The replay runner, one state hash per tick (STATUS :33; card 3 :321; cs3-plan step 7) | R | block 1.2 |
+| 2 | The comparer, first differing tick, and the field-level diff (card 3 :321; ADR 0002 :509; PM-0004-21) | R | block 1.3 |
+| 3 | The first recording, natively twice and in Wasm in Node and Chromium (cs3-plan step 7; build plan :470) | R | `first-loop`, block 1.5 |
+| 4 | ADR 0004's foundation line: a replay runner and the first recording in CI (build plan :473) | R | the lints part stays the gate chat's (2.3) |
+| 5 | The state's hash readable on the players' file (STATUS :34; DEPART-3; cs3-plan 5.1) | R | `Sim::shared_hash`, one number |
+| 6 | The export returns the shared hash only, plain numbers, read only during a replay, its buffer private to `Room` (archive :1555-1556; engine-architect round 2, L3) | R | block 1.2 |
+| 7 | The host's time recorded with every tick (archive :1555; engine-architect round 2) | R | in the .rec record from version 1 |
+| 8 | `Sim.prototype` pin catches a state or seed accessor joining the players' file; "3c adds the hash export" (security-auditor round 1, L3) | R | the pin gains exactly `shared_hash` |
+| 9 | PM-0004-21's short report (the hash function and its cost per tick) before the first recording is committed (cs3-plan section 3 item 5; state_hash.rs:5-7) | R | prerequisite of the first .rec commit |
+| 10 | PM-0004-17, -18, -19's begun parts and PM-0004-21's three plants (cs3-plan section 9, "begun") | R, re-run in Walk's movement step | block 1.6 |
+| 11 | 3B-HOSTILE-ALLOC: a counted "no allocation" for hostile bytes in the room and the endpoint (verifier; archive :1543-1546; handover part c; question file :93-94 "whichever part comes first") | R | the recording step comes first; movable to L whole if R must shrink (it is unrelated to the recording) |
+| 12 | RELEASE-COUNT (a): "No release counter is added in change-set 3c" (DECISIONS :256) | both | a constraint, nothing built; both parts honour it |
+| 13 | The link simulator: seeded delay, jitter, loss, reordering, duplication, a rate limit, a packet-fate log, profiles P0-P4 and B1 (card 3 :322-323; cs3-plan step 8) | L | my cs3 design (link.rs, SplitMix64, five draws per datagram) stands |
+| 14 | ADR 0001's milestone, "with L1 behind it in CI" (build plan :466) | L | T1: the exchange through the Worker's own step at every profile |
+| 15 | PM-0002-49: same seed gives the same fate log and hashes; 5 % bands over 1,000,000 packets per profile (build plan :474) | L | read as DEPART-3 accepted: exactly 0 at P0, the burst by its own check, delay and jitter from the drawn delay |
+| 16 | The simulator's clock reaches it through `LocalMatch` from recorded times (archive :1550-1551; NA-7; engine-architect round 2) | L | one `TransportPair` time method with a no-op default for the loopback; fed from item 7's recorded times |
+| 17 | Its reliable channel delivers exactly once (archive :1551; NA-7) | L | keeps local_match.rs's panic on a second JoinAccepted valid |
+| 18 | Loss and the rate limit as silent drops, duplicated datagrams only (archive :1551-1552; engine-architect round 2) | L | else they land in the block's `refused` |
+| 19 | Corruption as loss only, what an authenticated transport delivers (archive :1552-1554; my round 2 citing RFC 9001 §6.6 and RFC 8446 §5.2; rust-reviewer round 1, RR-3) | L | |
+| 20 | A `link()` accessor on `LocalMatch` (archive :1554; engine-architect round 2; my round 1 F7) | L | for the fate log |
+| 21 | `late` checked against the simulator's own reorder count (archive :1556-1557; my round 2) | L | received + late + refused = delivered, and late = the simulator's reorders and duplicates |
+| 22 | `devtools`' three path edges (client-endpoint, protocol, room), declared in 3b and unused (STATUS :34; security-auditor round 1 L2 = engine-architect EA-6; rust-reviewer round 1) | L | first user: L1's tests (protocol's transport, room and endpoint counters). R may use room/client-endpoint; either way no manifest change in Walk (a change reopens the dependency batch) |
+| 23 | T3: L1 with every impairment off equals the loopback's hashes, on the first recording (my cs3 notes, block 3) | L | needs item 3, which exists from Walk step 1 |
+| 24 | T4 (10,000 presses under 5 % loss, bursts and 1 % duplication) and T5 (every counter across its wrap at P2) (my cs3 notes) | L | the headless half of ADR 0001's press marks |
+| 25 | "Not verified: anything over a link that delays, drops or reorders (3c)" (3b report :322-323) | L | closed by items 13-24 |
+| 26 | My round 1 F7 (L1 needs a clock handle and an exactly-once reliable channel) | L | = items 16, 17, 20 |
+| 27 | RR-3's link-simulator half (archive :1499: "whose link-simulator half is 3c's") | L | = item 19 |
+Items named near 3c that fit NEITHER home (flagged, so nobody counts them as 3c's):
+- 3B-PLAUSIBLE (the endpoint's plausibility bound on a snapshot's tick), 3B-LATE-BOUND (how late a command may run):
+  change-set 7 (archive :1484-1499; handover part c). 3B-ACKS, 3B-OUTAGE-256: before online play.
+- 3B-BLUR-TEST (archive :1540-1542: "with the next change to the page's key handling"): Walk's page-input step (the
+  mouse and the aim-down-sights button change the key handling), not R and not L.
+- 3B-ONE-PER-TICK and 3B-RESUME-FLASH: change-set 4 by their own text (block 4), not 3c's.
+- My round 2 Lows L-1 and L-2 are already done in 3b (any_bytes.rs per-step identity and datagram accounting;
+  `queue.ran()` takes no argument, room/src/lib.rs:270): nothing to place.
+- Block 2 DONE. Next: Block 3 (the command, the snapshot, the path).
