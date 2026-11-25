@@ -12,12 +12,15 @@
 
 mod clock;
 mod phase;
+mod probe;
 mod proc_read;
 mod pump;
 mod schedule;
 mod tick_loop;
 
 pub use phase::PhaseTimers;
+// U6c: the -3 L2 probe's leg runner (u6c-brief.md Block 3; Q-U6C-1 (a): its home is npt-server's library).
+pub use probe::{PEER_WAIT_NS, PROBE_LEGS, ProbeSettings, leg_log, run_probe};
 pub use pump::{ConnLimits, Counters, Decoder, RttSource};
 #[cfg(feature = "bites")]
 pub use schedule::BITES;

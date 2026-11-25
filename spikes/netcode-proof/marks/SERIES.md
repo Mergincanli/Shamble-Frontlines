@@ -906,6 +906,57 @@ connection in the process like the split's parts, over the split's window (from 
 | `header.params.ws_split_pool_rule` | string | npt-server | the split's pool rule: one measured run per server process, the pool never reset (RC-10) |
 | `header.params.ws_split_mark_after_open_ns` | ns | npt-server | the split's window mark's time after OPEN as the settings give it; absent: no mark |
 
+## The L2 probe and the load (U6c): new rows only, no mark reads them yet
+
+npt-server's probe mode writes one log a leg, `<log>-<leg>.jsonl` (process `probe`, layer `L2`, run `<run>-<leg>`,
+profile the leg: u6c-brief.md C1 (b), NC-SB-1, NC-SB-3), from its leg's ImpairSocket (npt-net's fate log and stamps):
+the seven `second.s.probe_*` rows above (the records' seconds only), the socket's `second.v.l2_*` rows and
+`second.v.steal_permille` (the mean of the per-vCPU shares over `params.steal_cpus`) each second, `leg_edge` and
+`cpu_stat` at `ph` `warmup` (at the leg's zero, the peer pinned) and `after` (after the tail, the socket bound), and its
+`l2_summary` with the fields below beside ImpairSocket's own. Each direction's measured records are L1's count
+(lab/src/probe.rs:124-132): its first `probe_packets_count` fates outside B1's burst whose t_in is at or after the
+window's start, in t_in order (every fate sharing the last kept one's t_in kept too; up the peer's only), the burst's
+fates among them in `probe_burst_*`; the rows run to the last record's second, which is measured. C-U6-5's E fields
+cover exactly those records, on the histogram's sample set (finished fates but Oversize). P1's two
+slack and policy reads (plan.md:1256's pair, NC-R2-4): the header's `l2_timer_slack_ns` and `l2_sched_policy` (read at
+the leg's end edge, the socket bound) and the window's start edge's `probe_start_timer_slack_ns` and
+`probe_start_sched_policy`. npt-load (process `load`) writes LG's header and its per-second rows; in probe mode its
+`probe_peer` event.
+
+| Name | Unit | Written by (crate) | Meaning |
+|---|---|---|---|
+| `probe_up_count`, `probe_down_count` | count | npt-server (probe mode; npt-net's fate log) | `event.l2_summary`: n, the window's lateness samples per direction (C-U6-5) |
+| `probe_up_excess_ns`, `probe_down_excess_ns` | ns | npt-server (probe mode) | `event.l2_summary`: E[(L − 0.25 ms)+] over the window (L0 = 0, the judged form: U3D-L0) |
+| `probe_up_excess_p50_ns`, `probe_down_excess_p50_ns` | ns | npt-server (probe mode) | `event.l2_summary`: E[(L − L0 − 0.25 ms)+], L0 the window's nearest-rank p50 |
+| `probe_up_over_count`, `probe_down_over_count` | count | npt-server (probe mode) | `event.l2_summary`: the window's samples with L above 0.25 ms |
+| `probe_up_p50_ns`, `probe_up_p99_ns`, `probe_up_p999_ns`, `probe_up_max_ns`, `probe_down_p50_ns`, `probe_down_p99_ns`, `probe_down_p999_ns`, `probe_down_max_ns` | ns | npt-server (probe mode) | `event.l2_summary`: the window's lateness L by nearest rank, and its maximum |
+| `probe_window_ns` | ns | npt-server (probe mode) | `event.l2_summary`: the nominal measured window's length (the sends that put `probe_packets_count` outside B1's burst, at the rate) |
+| `probe_up_window_ns`, `probe_down_window_ns` | ns | npt-server (probe mode) | `event.l2_summary`: the span a direction's records cover: its last record's t_in minus the window's start, plus one interval (0 with no record; C-U8-4's rate read) |
+| `probe_up_window_count`, `probe_down_window_count` | count | npt-server (probe mode) | `event.l2_summary`: the records per direction, every fate, the burst's included (C-U6-6's rate read; NC-SB-9) |
+| `probe_rtt_count` | count | npt-server (probe mode) | `event.l2_summary`: the window's round trips (`second.s.probe_rtt_ns` samples) |
+| `probe_echo_repeat_count` | count | npt-server (probe mode) | `event.l2_summary`: echoes of a down datagram already echoed, counted and left out (C3) |
+| `probe_echo_unmatched_count` | count | npt-server (probe mode) | `event.l2_summary`: echoes with no down fate or no poller record, or released before the echoed datagram plus its hold |
+| `probe_echo_records_left_count` | count | npt-server (probe mode) | `event.l2_summary`: poller records beyond the Delivered up fates (0 expected) |
+| `probe_drain_hold_ns` | ns | npt-server (probe mode) | `event.l2_summary`: the one drain's hold of the socket's lock (C-U6-3) |
+| `probe_polled_count` | count | npt-server (probe mode) | `event.l2_summary`: datagrams the poller took |
+| `probe_other_source_count` | count | npt-server (probe mode) | `event.l2_summary`: datagrams from any source but the peer (dropped: C2) |
+| `probe_refused_count` | count | npt-server (probe mode) | `event.l2_summary`: the peer's datagrams of another length or leg |
+| `probe_records_dropped_count` | count | npt-server (probe mode) | `event.l2_summary`: datagrams past the poller's record capacity (0 expected) |
+| `probe_down_sent_count` | count | npt-server (probe mode) | `event.l2_summary`: the down pacer's sends over the leg |
+| `probe_down_unindexed_count` | count | npt-server (probe mode) | `event.l2_summary`: down fates with no flow index (QueueDrop, PoolDrop), each shifting the round-trip join after it (0 expected) |
+| `probe_peer_sent_count`, `probe_peer_send_err_count`, `probe_peer_received_count`, `probe_peer_recv_err_count`, `probe_peer_refused_count`, `probe_peer_echoed_count` | count | npt-load (probe mode; npt-net's `probe_peer`) | `event.probe_peer`: LG's up sends, its send errors, the down datagrams it took, its receive errors, the datagrams it refused (another length or magic), and the ups that carried an echo |
+| `header.params.room`, `header.params.mode` | string | npt-load | LG's room (00 to 31) and mode (`run`, `calibrate` or `probe`), from its settings |
+| `probe_packets_count` | count | npt-server (probe mode) | `header.params`: the settings' packets a direction outside B1's burst (NC-SB-16) |
+| `probe_warmup_ns`, `probe_tail_ns` | ns | npt-server (probe mode) | `header.params`: the leg's warm-up, and its tail (the longest one-way delay plus 1 s) |
+| `steal_cpus` | list | npt-server (probe mode) | `header.params`: the vCPUs the probe process may use, read once (C-U6-4) |
+| `probe_start_timer_slack_ns`, `probe_start_sched_policy` | ns, string | npt-server (probe mode; ImpairSocket) | `header.params`: the release thread's slack and policy read at the window's start edge (P1's second read) |
+| `probe_pacer_timer_slack_ns`, `probe_pacer_sched_policy` | ns, string | npt-server (probe mode; npt-net's Pacer) | `header.params`: the down pacer thread's slack as it read it back, and its policy |
+| `probe_fate_log_touched_count` | count | npt-server (probe mode) | `header.params`: the fate log's entries pre-touched before the leg (C-U6-3) |
+| `udp_row_found` | flag | npt-server (probe mode) | `event.leg_edge`: 1 when the socket's own /proc/net/udp (or udp6) row was found by its local port |
+| `udp_drops_count` | count | npt-server (probe mode) | `event.leg_edge`: that row's `drops`; absent when the row was not found (a failed read, never 0) |
+| `snmp_udp_<field>_count`, `snmp6_udp_<field>_count` | count | npt-server (probe mode) | `event.leg_edge`: each Udp field /proc/net/snmp (and snmp6's Udp6) prints, snake_case (in_datagrams, no_ports, in_errors, out_datagrams, rcvbuf_errors, sndbuf_errors, in_csum_errors, ignored_multi, mem_errors) |
+| `cpu_<field>_count`, `cpu<N>_<field>_count` | count | npt-server (probe mode) | `event.cpu_stat`: every `^cpu` line of /proc/stat in clock ticks as read (user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice), the summed line and each vCPU N (C-U8-2) |
+
 ## Open naming questions
 
 - Q3: no length or angle unit (`_um`, `_microdeg` proposed).

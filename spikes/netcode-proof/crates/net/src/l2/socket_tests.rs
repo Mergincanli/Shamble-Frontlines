@@ -1,7 +1,11 @@
 //! ImpairSocket on loopback, through quinn's socket trait itself (the code quinn calls), without quinn: M1, M5, M10,
 //! M11, M12, M13, M14, and U3d's timing self-test. The WebTransport routes are in `wt`'s tests.
 
-use super::super::stats::{ALLOWANCE_NS, FATE_BYTES, Fate};
+// U6c (C-U6-1, C-U6-5): the poller, the fate entries, the samples and the E forms are the probe's shipped code.
+use super::super::probe::{
+    FateEntry, Forms, Samples, excess, forms, nearest_rank, quantile, samples, start_poller,
+};
+use super::super::stats::{ALLOWANCE_NS, FATE_BYTES};
 use super::*;
 use npt_l1::{Profile, ReorderStep};
 use quinn::AsyncUdpSocket;
@@ -650,13 +654,6 @@ const DIRS: [(usize, &str); 2] = [(UP, "up"), (DOWN, "down")];
 /// exact value at P1, 0.001 × 2a with a = 5 ms (u3-verify-timing.md:42-48), not a tolerance.
 const BAR_NS: u64 = 10_000;
 
-/// What a poller saw: the datagrams `poll_recv` handed it, and when it first returned one.
-#[derive(Debug)]
-struct Polled {
-    got: u64,
-    first_at: Option<Instant>,
-}
-
 /// A multi-thread runtime with `workers` workers, as npt-server's will be (4 on RS's 4 vCPUs).
 fn runtime(workers: usize) -> tokio::runtime::Runtime {
     tokio::runtime::Builder::new_multi_thread()
@@ -666,139 +663,9 @@ fn runtime(workers: usize) -> tokio::runtime::Runtime {
         .unwrap()
 }
 
-/// Starts the inbound poller (U3D-POLL (b); R-F1): a task spawned on `rt`, as quinn spawns its endpoint driver
-/// (quinn-0.11.12 endpoint.rs:152-160). Never the test's own thread and never `block_on`: either polls from a parked
-/// thread, M13's hop and not quinn's. The poller is defined here and nowhere else (the advisor's condition 1), so the
-/// self-test, T1, T2 and T7 all poll through this one helper, and a defect planted here reaches the self-test's own
-/// poller. On each wake it calls `poll_recv` with quinn's 32 buffers of 1,472 B until Pending, as quinn's `poll_socket`
-/// does (endpoint.rs:772ff, its loop :793). The stop is polled only after Pending, so its lock never comes before a
-/// stamp (R-F9); `notify_one` keeps a permit, so no stop is lost.
-fn start_poller(
-    rt: &tokio::runtime::Handle,
-    s: &Arc<ImpairSocket>,
-    stop: &Arc<tokio::sync::Notify>,
-) -> tokio::task::JoinHandle<Polled> {
-    const SIZE: usize = L2Config::DEFAULT_MAX_DATAGRAM_BYTES;
-    const BATCH: usize = quinn::udp::BATCH_SIZE;
-    let (s, stop) = (Arc::clone(s), Arc::clone(stop));
-    let poller = async move {
-        // One buffer cut into quinn's 32, made once (quinn's recv_buf: endpoint.rs:754-759, :781-791).
-        let mut recv_buf = vec![0u8; SIZE * BATCH];
-        let mut metas = [RecvMeta::default(); BATCH];
-        let mut stopped = std::pin::pin!(stop.notified());
-        let (mut got, mut first_at) = (0u64, None);
-        std::future::poll_fn(|cx| {
-            let mut chunks = recv_buf.chunks_mut(SIZE).map(IoSliceMut::new);
-            let mut iovs: [IoSliceMut<'_>; BATCH] =
-                std::array::from_fn(|_| chunks.next().expect("BATCH chunks"));
-            loop {
-                match s.poll_recv(cx, &mut iovs, &mut metas) {
-                    Poll::Ready(Ok(n)) => {
-                        if first_at.is_none() {
-                            first_at = Some(Instant::now());
-                        }
-                        got += n as u64;
-                    }
-                    Poll::Ready(Err(e)) => panic!("poll_recv errored: {e}"),
-                    Poll::Pending => break,
-                }
-            }
-            stopped.as_mut().poll(cx)
-        })
-        .await;
-        Polled { got, first_at }
-    };
-    rt.spawn(poller)
-}
-
-/// The lateness samples' set: every finished fate but Oversize, the kinds the histogram records (impair.rs:680-684).
-fn in_e_set(kind: Kind) -> bool {
-    matches!(kind, Kind::Delivered | Kind::SendError | Kind::WouldBlock)
-}
-
-/// One direction's samples from the fate log, each list sorted ascending.
-#[derive(Debug, Default)]
-struct Samples {
-    /// L = out − due of every fate in the histogram's set (`in_e_set`), as the histogram records it.
-    late: Vec<u64>,
-    /// -3's delay, out − t_in (the profile's delay D plus L), of every Delivered fate only (R-F5).
-    delay: Vec<u64>,
-    /// Every fate of the direction, one per datagram sent: -3's count (`second.s.probe_*_lost`, gap 4).
-    fates: u64,
-    /// The profile's loss draws.
-    lost: u64,
-    /// Delivered fates released before they arrived (out < t_in): never a delay, counted so the self-test can assert
-    /// none after its prints (one monotonic clock makes it an invariant).
-    early: u64,
-}
-
-fn samples(log: &[Fate], dir: usize) -> Samples {
-    let mut s = Samples::default();
-    for f in log.iter().filter(|f| usize::from(f.dir) == dir) {
-        s.fates += 1;
-        if f.kind == Kind::Lost {
-            s.lost += 1;
-        }
-        if in_e_set(f.kind) {
-            s.late.push(f.out_ns.saturating_sub(f.due_ns));
-        }
-        if f.kind == Kind::Delivered {
-            // Only after the filter: a dropped fate has out 0, and `0 − t_in` would underflow (R-F5).
-            match f.out_ns.checked_sub(f.t_in_ns) {
-                Some(d) => s.delay.push(d),
-                None => s.early += 1,
-            }
-        }
-    }
-    s.late.sort_unstable();
-    s.delay.sort_unstable();
-    s
-}
-
-/// npt-judge's nearest rank (eval.rs:261-265; plan §6.1): ⌈q × n⌉ in integers, at least 1 and at most n (1-based).
-fn nearest_rank(n: usize, num: u64, den: u64) -> usize {
-    let n = n as u128;
-    (n * u128::from(num))
-        .div_ceil(u128::from(den))
-        .clamp(1, n.max(1)) as usize
-}
-
-/// The nearest-rank quantile num/den of `sorted` (ascending); 0 when empty.
-fn quantile(sorted: &[u64], num: u64, den: u64) -> u64 {
-    if sorted.is_empty() {
-        return 0;
-    }
-    sorted[nearest_rank(sorted.len(), num, den) - 1]
-}
-
-/// E[(L − L0 − 0.25 ms)+] over `late`, in whole ns rounded down, as `summarize` rounds (stats.rs:156); u128 sums.
-fn excess(late: &[u64], l0: u64) -> u64 {
-    if late.is_empty() {
-        return 0;
-    }
-    let c = l0 + ALLOWANCE_NS;
-    let total: u128 = late.iter().map(|&l| u128::from(l.saturating_sub(c))).sum();
-    (total / late.len() as u128) as u64
-}
-
-/// The fate log's E forms over one direction's sorted samples (U3D-L0): the judged one, with L0 = 0 (the impairer
-/// subtracts nothing, so -3 sees L itself: impair.rs:119-123), and M1's, with L0 = the exact nearest-rank p50.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct Forms {
-    p50: u64,
-    at_p50: u64,
-    at_zero: u64,
-}
-
-fn forms(late: &[u64]) -> Forms {
-    debug_assert!(late.is_sorted());
-    let p50 = quantile(late, 1, 2);
-    Forms {
-        p50,
-        at_p50: excess(late, p50),
-        at_zero: excess(late, 0),
-    }
-}
+// The poller (`start_poller`), the samples and the E forms (`samples`, `nearest_rank`, `quantile`, `excess`, `forms`)
+// moved to the probe's shipped code at U6c (probe.rs; C-U6-1, C-U6-5): the self-test, T1, T2, T5 and T7 run on them, so
+// a defect planted there reaches the probe and the self-test alike (the advisor's U3d condition 1: one poller).
 
 /// One E against U3D-BAR's bar, inclusive.
 fn would_one(e_ns: u64) -> &'static str {
@@ -922,7 +789,7 @@ fn drive(
 ) -> (Vec<(&'static str, u64)>, u64) {
     let rt = runtime(4);
     let stop = Arc::new(tokio::sync::Notify::new());
-    let poller = start_poller(rt.handle(), s, &stop);
+    let poller = start_poller(rt.handle(), s, &stop, (), |_, _, _| {});
     let peer = Arc::new(std::net::UdpSocket::bind(local()).unwrap());
     peer.set_read_timeout(Some(Duration::from_millis(200)))
         .unwrap();
@@ -984,13 +851,15 @@ fn drive(
         "every datagram accounted for in both directions within 10 s: {r:?}"
     );
     stop.notify_one();
-    let polled = rt.block_on(poller).unwrap();
+    let polled = rt.block_on(poller).unwrap().0;
     (s.run_summary(), polled.got)
 }
 
-/// The fate log's entries as they stand (the test module is socket's child: `fates` is pub(crate), impair.rs:248).
-fn fate_entries(s: &ImpairSocket) -> Vec<Fate> {
-    s.shared.lock().im.fates.entries().to_vec()
+/// The fate log's entries, drained through the probe's own parser (U6c: `FateEntry::drain_into`, the tag checked).
+fn fate_entries(s: &ImpairSocket) -> Vec<FateEntry> {
+    let mut out = Vec::new();
+    FateEntry::drain_into(s, &mut out).expect("the fate log parses");
+    out
 }
 
 /// T1 (U3d; R-F1, T-1): `start_poller`, the self-test's own poller, polls where a spawned task polls, so a busy worker's
@@ -1004,7 +873,7 @@ fn the_task_poller_takes_lateness_where_the_task_runs() {
     let s = ImpairSocket::bind(local(), cfg(fixed(20))).unwrap();
     let rt = runtime(1);
     let stop = Arc::new(tokio::sync::Notify::new());
-    let poller = start_poller(rt.handle(), &s, &stop);
+    let poller = start_poller(rt.handle(), &s, &stop, (), |_, _, _| {});
     // (1) The poller's first Pending stored its waker (condition 6 (c): read here, nothing test-only in the poller).
     let end = Instant::now() + Duration::from_secs(2);
     while s.shared.lock().waker.is_none() {
@@ -1039,7 +908,7 @@ fn the_task_poller_takes_lateness_where_the_task_runs() {
     assert!(rt.block_on(blocker).unwrap(), "no drain");
     let r = summary_when(&s, "l2_up_delivered_count", 1);
     stop.notify_one();
-    let polled = rt.block_on(poller).unwrap();
+    let polled = rt.block_on(poller).unwrap().0;
     assert_eq!(polled.got, 1, "the poller took the one datagram");
     let first = s.first_seen(p_addr).expect("stamped at the drain");
     let at = polled.first_at.expect("stamped by the poller on Ready");
@@ -1080,7 +949,7 @@ fn the_fate_log_and_the_histogram_agree() {
     let log = fate_entries(&s);
     for (d, dir) in DIRS {
         let v = |k: &str| value(&r, &format!("l2_{dir}_{k}_count"));
-        let sm = samples(&log, d);
+        let sm = samples(&log, d as u8);
         assert!(
             v("lost") > 0,
             "{dir}: some loss (fixed by the seed), so a count bite shows"
@@ -1187,10 +1056,10 @@ fn the_cross_check_reads_delay_plus_lateness() {
             p999: (29_750_000, 30_250_000),
         }
     );
-    let fate = |dir: usize, kind: Kind, t_in: u64, due: u64, out: u64| Fate {
+    let fate = |dir: usize, kind: Kind, t_in: u64, due: u64, out: u64| FateEntry {
         ordinal: 0,
         dir: dir as u8,
-        kind,
+        kind: kind as u8,
         overtaken: false,
         index: 0,
         t_in_ns: t_in,
@@ -1219,7 +1088,7 @@ fn the_cross_check_reads_delay_plus_lateness() {
         }
     }
     log.push(fate(DOWN, Kind::Delivered, 5 * MS, 4 * MS, 4 * MS));
-    let up = samples(&log, UP);
+    let up = samples(&log, UP as u8);
     assert_eq!(up.early, 0, "up: a fate released before it arrived");
     let x = cross_check(&up, &p1);
     assert_eq!(
@@ -1240,7 +1109,7 @@ fn the_cross_check_reads_delay_plus_lateness() {
     assert_eq!(agree(would_one(f.at_zero), x.pass[5]), "disagree");
     assert_eq!(agree("MISS", false), "agree", "E MISS and p99.9 FAIL");
     assert_eq!(agree("PASS", true), "agree", "E PASS and p99.9 PASS");
-    let down_s = samples(&log, DOWN);
+    let down_s = samples(&log, DOWN as u8);
     assert_eq!(
         down_s.early, 1,
         "down: the one fate released before it arrived is counted"
@@ -1248,11 +1117,11 @@ fn the_cross_check_reads_delay_plus_lateness() {
     let down = cross_check(&down_s, &p1);
     assert_eq!((down.n, down.count, down.p999), (3, 4, 90 * MS));
     // The loss share over every fate of the direction (as -3 counts `probe_*_lost`), never over the Delivered.
-    let mut loss_log: Vec<Fate> = (0..10_000u64)
+    let mut loss_log: Vec<FateEntry> = (0..10_000u64)
         .map(|i| fate(UP, Kind::Delivered, i, i + 25 * MS, i + 25 * MS))
         .collect();
     loss_log.extend((0..106u64).map(|i| fate(UP, Kind::Lost, i, 0, 0)));
-    let y = cross_check(&samples(&loss_log, UP), &p1);
+    let y = cross_check(&samples(&loss_log, UP as u8), &p1);
     assert_eq!(
         (y.n, y.count, y.lost, y.pass[1]),
         (10_000, 10_106, 106, true),
@@ -1304,12 +1173,12 @@ fn a_held_lock_makes_both_directions_late() {
             m < 8_191_000,
             "{dir}: p50 {p50} ns too high for the bound (p50 + 0.25 ms + 1 µs must stay under 8.191 ms)"
         );
-        let set: Vec<&Fate> = log
+        let set: Vec<&FateEntry> = log
             .iter()
-            .filter(|f| usize::from(f.dir) == d && in_e_set(f.kind))
+            .filter(|f| usize::from(f.dir) == d && f.in_e_set())
             .collect();
-        let late = |f: &Fate| f.out_ns.saturating_sub(f.due_ns);
-        let b: Vec<&Fate> = set
+        let late = |f: &FateEntry| f.out_ns.saturating_sub(f.due_ns);
+        let b: Vec<&FateEntry> = set
             .iter()
             .copied()
             .filter(|f| f.due_ns > t0 && f.due_ns <= t1.saturating_sub(m))
@@ -1381,32 +1250,12 @@ fn l2_timing_self_test() {
         ..L2Config::new(11, profile)
     };
     let s = ImpairSocket::bind(local(), c).unwrap();
-    // The pre-touch (R-F2): fill the log to its capacity and empty it, so every page is resident before the run and
-    // none is first touched under the lock; `Vec::drain` keeps the capacity and the pages (stats.rs:495-500).
-    let touched = {
-        let mut st = s.shared.lock();
-        let zero = Fate {
-            ordinal: 0,
-            dir: 0,
-            kind: Kind::Delivered,
-            overtaken: false,
-            index: 0,
-            t_in_ns: 0,
-            due_ns: 0,
-            out_ns: 0,
-            len: 0,
-            errno: 0,
-        };
-        let mut k = 0usize;
-        while k < cap && st.im.fates.push(zero) {
-            k += 1;
-        }
-        k
-    };
-    s.drain_fate_log(|_| {});
+    // The pre-touch (R-F2; C-U6-3, shipped at U6c): the log filled to its capacity and emptied, so every page is
+    // resident before the run and none is first touched under the lock.
+    let touched = s.pretouch_fate_log();
     let rt = runtime(4);
     let stop = Arc::new(tokio::sync::Notify::new());
-    let poller = start_poller(rt.handle(), &s, &stop);
+    let poller = start_poller(rt.handle(), &s, &stop, (), |_, _, _| {});
     let load = || std::fs::read_to_string("/proc/loadavg").unwrap_or_default();
     let load_start = load();
     let peer = Arc::new(std::net::UdpSocket::bind(local()).unwrap());
@@ -1455,7 +1304,7 @@ fn l2_timing_self_test() {
         // found by polling `run_summary` (R-F3).
         std::thread::sleep(longest + Duration::from_millis(500));
         stop.notify_one();
-        let polled = rt.block_on(poller).unwrap();
+        let polled = rt.block_on(poller).unwrap().0;
         (send_ns, sink.join().unwrap(), polled)
     });
     // Every read after the stop.
@@ -1464,11 +1313,8 @@ fn l2_timing_self_test() {
     let h = s.header_numbers();
     let texts = s.header_texts();
     let load_end = load();
-    let (sm, log_len) = {
-        let st = s.shared.lock();
-        let e = st.im.fates.entries();
-        ([samples(e, UP), samples(e, DOWN)], e.len())
-    };
+    let log = fate_entries(&s);
+    let (sm, log_len) = ([samples(&log, 0), samples(&log, 1)], log.len());
     let hist = |dir: &str, k: &str| value(&r, &format!("l2_late_{dir}_{k}"));
     let f = sm.each_ref().map(|x| forms(&x.late));
     let at_hist = DIRS.map(|(d, dir)| excess(&sm[d].late, hist(dir, "p50_ns")));

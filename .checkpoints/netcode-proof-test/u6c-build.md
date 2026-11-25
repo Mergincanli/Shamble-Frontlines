@@ -294,3 +294,19 @@ U6c's build (the probe, the load, the page host and the certificate; u6c-brief.m
 - Open after the pass: Q-FP6-1 (NC-U6C-5's footer half, above); F-P2-HEADER (P2 in shipped code fails at the header's
   base check, not at FP-3's assert); the container readings (F-READINGS) are the main session's; the disk at 2.7 G.
 - Resume from: nothing left in the fix pass; the return.
+
+## Merge (the main session, 2026-11-25; the round-2 ruling advisor-u6c-r2.md section 5, U4f's form)
+- M0 (00:1x UTC): wip/u6c-fix.patch 0549389e…; `git diff --stat 8c81952 HEAD -- spikes/netcode-proof` empty on the
+  post-MAIN-65 head; the A2 folders copied without `tokens` to .gate/u6c/a2-logs/.
+- M3-M4: `git apply --check` exit 0; `git apply` in the main folder, uncommitted; 24 files cmp-equal to this worktree.
+- M4a (00:2x): H2 (TE-U6C-R2-4) and H1 (his NPT-EDGE-READ (a), history.md:7902-7924) by Edit, with the ruling's section
+  3 text; `cargo fmt --all -- --check` exit 0 (.gate/u6c-merge/m4a-fmt.log); .gate/u6c-merge/hunks.diff 9a3bbeb7…
+  (load.rs +4 -3, probe.rs +7 -3, SERIES.md +1 -1).
+- M4b (03:58-04:2x): the advisor's head read, APPROVE WITH CONDITIONS C1-C6 (advisor-u6c-m4b.md).
+- The compile-only probe (04:22:50-04:25:05): `check.mjs --only fmt,clippy,doc` all 3 PASS (.gate/u6c-merge/
+  m4c-probe.log), header = C1's hashes.
+- M5 (04:27:42-04:48:04): `env CARGO_INCREMENTAL=0 node check.mjs` all 11 steps PASS; 861 and 958 passed, 0 failed, 0
+  skipped; wasm 27,000 ticks, 0 mismatching; marks 81; self 78/78; redact 371 items, 0 findings (.gate/u6c-merge/
+  m5-check.log). Tree hashes diff 6c3b4dbb…, untracked 5cb9a300… (fix-check's: 0e3199ae…, 22bda910…).
+- M7: `node tools/gate.mjs --no-smoke` GATE PASS (base 28254a7); D10: no change to marks.json or the judge.
+- M8: one commit, 24 files, 5,698 added, 199 removed, with the report u6c-report.md; C9 and M9 follow.

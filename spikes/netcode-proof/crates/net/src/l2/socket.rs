@@ -428,6 +428,32 @@ impl ImpairSocket {
         self.shared.lock().im.fates.drain(f);
     }
 
+    /// The pre-touch (C-U6-3; U3d's R-F2, made pub for the probe): fills the fate log to its capacity and empties it,
+    /// so every page is resident before a measured window and none is first touched under the lock (`Vec::drain`
+    /// keeps the capacity and the pages: stats.rs:545-550). Returns the entries touched: the capacity, 0 with no log.
+    pub fn pretouch_fate_log(&self) -> usize {
+        let cap = self.shared.cfg.fate_log_capacity;
+        let mut st = self.shared.lock();
+        let zero = super::stats::Fate {
+            ordinal: 0,
+            dir: 0,
+            kind: Kind::Delivered,
+            overtaken: false,
+            index: 0,
+            t_in_ns: 0,
+            due_ns: 0,
+            out_ns: 0,
+            len: 0,
+            errno: 0,
+        };
+        let mut k = 0usize;
+        while k < cap && st.im.fates.push(zero) {
+            k += 1;
+        }
+        st.im.fates.drain(|_| {});
+        k
+    }
+
     fn release_info(&self) -> ReleaseInfo {
         self.shared
             .release

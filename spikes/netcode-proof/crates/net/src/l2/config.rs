@@ -125,6 +125,13 @@ impl L2Config {
         Profile::by_name(profile).map(|p| L2Config::new(seed, p))
     }
 
+    /// B1 (npt-l1's `Profile::b1`: P2's numbers and a 1 s burst at each of `burst_starts_ns` on the socket's clock)
+    /// with this crate's defaults: U6c's probe sets its leg's burst once its peer is known (npt-server names no npt-l1
+    /// type).
+    pub fn b1(seed: u64, burst_starts_ns: &[u64]) -> L2Config {
+        L2Config::new(seed, Profile::b1(burst_starts_ns))
+    }
+
     /// The pass-through (M12): P0 with every impairment off, on the same path.
     pub fn clean(seed: u64) -> L2Config {
         let mut p = Profile::p0();

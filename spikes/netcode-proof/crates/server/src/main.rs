@@ -22,6 +22,12 @@
 //! Exit 0 after a clean end, 2 for bad settings (or a token, log or hash file that already exists, an I/O vCPU on an
 //! SMT sibling of the tick vCPU on this machine's map: Q-U6A-5, refused before step 1, or a clock outside 1970 to
 //! 9999), 3 after a crash, 1 for any other failure.
+//!
+//! **Probe mode** (U6c, C1 (b)): settings `mode` `probe` (absent or `room`: the room). The room's fields are parsed
+//! and range-checked as above and none is used; the probe's fields are checked (`probe_settings`). It mints no token
+//! file, writes no hash file and binds no TCP port: the library's `run_probe` runs the legs on `wt_bind`, `OPEN` once
+//! P0's socket is bound; exit 0 after the last leg, 1 when a leg fails or stdin closes (at once, the finished legs'
+//! logs kept), 2 for bad settings or a leg's log that exists.
 
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Write};
@@ -121,6 +127,19 @@ struct Settings {
     /// quinn's congestion controller, `newreno` or `cubic` (absent: `cubic`, quinn's default; E6).
     #[serde(default)]
     cc: Option<String>,
+    /// U6c (C1 (b)): `room` (absent: the room) or `probe`.
+    #[serde(default)]
+    mode: Option<String>,
+    /// Probe mode only (refused in room mode): LG's IPv4, the legs, the packets a direction outside B1's burst and the
+    /// warm-up in seconds (`probe_settings`).
+    #[serde(default)]
+    probe_peer_ipv4: Option<String>,
+    #[serde(default)]
+    probe_legs: Option<Vec<String>>,
+    #[serde(default)]
+    probe_packets: Option<u64>,
+    #[serde(default)]
+    probe_warmup_s: Option<u64>,
     /// The planted defect (bites builds only: a measured build refuses the field as unknown).
     #[cfg(feature = "bites")]
     #[serde(default)]
@@ -136,7 +155,19 @@ struct Checked {
     wt_addr: SocketAddr,
     ws_addr: SocketAddr,
     cc: String,
+    probe: Option<ProbeParts>,
 }
+
+/// Probe mode's settings, checked (`probe_settings`).
+struct ProbeParts {
+    peer: std::net::Ipv4Addr,
+    legs: Vec<u8>,
+    packets: u64,
+    warmup_s: u64,
+}
+
+/// The probe's rate, datagrams a second each way (ADR 0001:1590; C-U6-6).
+const PROBE_RATE_PPS: u64 = 10_000;
 
 /// A PEM file's size limit, bytes (the WebSocket certificate's chain and key).
 const PEM_CAP: u64 = 64 * 1024;
@@ -268,6 +299,7 @@ fn parse_settings(text: &[u8]) -> Result<Checked, String> {
         return Err(format!("bite {b:?} is not one npt-server's binary plants"));
     }
     let u6b = transport_settings(&s)?;
+    let probe = probe_settings(&s)?;
     Ok(Checked {
         settings: s,
         scene,
@@ -276,7 +308,107 @@ fn parse_settings(text: &[u8]) -> Result<Checked, String> {
         wt_addr: u6b.1,
         ws_addr: u6b.2,
         cc: u6b.3,
+        probe,
     })
+}
+
+/// U6c's probe fields (C1 (b); SEC-U6AD-2's rules): in room mode none may be given; probe mode needs the peer's IPv4
+/// and takes the legs (P0 first, then any of P1, P2, P3, P4, B1 in that order, each once; absent: all six), the packets
+/// a direction (1 to 10,000,000; absent: 1,000,000) and the warm-up (1 to 600 s; absent: 10).
+fn probe_settings(s: &Settings) -> Result<Option<ProbeParts>, String> {
+    let given = s.probe_peer_ipv4.is_some()
+        || s.probe_legs.is_some()
+        || s.probe_packets.is_some()
+        || s.probe_warmup_s.is_some();
+    match s.mode.as_deref().unwrap_or("room") {
+        "room" if given => return Err("a probe_* field in room mode".to_owned()),
+        "room" => return Ok(None),
+        "probe" => {}
+        m => return Err(format!("mode {m:?} is not room or probe")),
+    }
+    if s.wt_bind.parse::<SocketAddr>().is_ok_and(|a| a.port() == 0) {
+        return Err("probe mode binds wt_bind's own port, never port 0".to_owned());
+    }
+    let peer = s
+        .probe_peer_ipv4
+        .as_deref()
+        .ok_or("probe mode needs probe_peer_ipv4")?
+        .parse()
+        .map_err(|_| "probe_peer_ipv4 is not an IPv4 address".to_owned())?;
+    let all = npt_server::PROBE_LEGS.map(str::to_owned);
+    let mut legs: Vec<u8> = Vec::new();
+    for n in s.probe_legs.as_deref().unwrap_or(&all) {
+        let l = npt_server::PROBE_LEGS
+            .iter()
+            .position(|x| x == n)
+            .ok_or_else(|| format!("probe leg {n:?} is not P0, P1, P2, P3, P4 or B1"))?
+            as u8;
+        if legs.last().is_some_and(|&p| p >= l) {
+            return Err(
+                "probe_legs: each leg once, in the order P0, P1, P2, P3, P4, B1".to_owned(),
+            );
+        }
+        legs.push(l);
+    }
+    if legs.first() != Some(&0) {
+        return Err("probe_legs start with P0 (the base round trip)".to_owned());
+    }
+    let (packets, warmup_s) = (
+        s.probe_packets.unwrap_or(1_000_000),
+        s.probe_warmup_s.unwrap_or(10),
+    );
+    if !(1..=10_000_000).contains(&packets) || !(1..=600).contains(&warmup_s) {
+        return Err("probe_packets is 1 to 10,000,000 and probe_warmup_s 1 to 600".to_owned());
+    }
+    Ok(Some(ProbeParts {
+        peer,
+        legs,
+        packets,
+        warmup_s,
+    }))
+}
+
+/// Probe mode (the module text): the legs through the library's `run_probe`, stdin read on its own thread (its close
+/// stops the run), `OPEN` once P0's socket is bound.
+fn probe_mode(c: Checked) -> ExitCode {
+    let Some(p) = &c.probe else {
+        return fail(EXIT_FAILED, "not probe mode");
+    };
+    let sha = match binary_sha256() {
+        Ok(s) => s,
+        Err(e) => return fail(EXIT_FAILED, &format!("the binary's SHA-256: {e}")),
+    };
+    let s = npt_server::ProbeSettings {
+        header: header(&c, sha, local_machine(&c.settings)),
+        bind: c.wt_addr,
+        peer: p.peer,
+        legs: p.legs.clone(),
+        packets: p.packets,
+        warmup_s: p.warmup_s,
+        rate_pps: PROBE_RATE_PPS,
+        seed: c.settings.seed,
+        log: c.settings.log.clone(),
+        peer_wait_ns: npt_server::PEER_WAIT_NS,
+    };
+    let stop = Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let st = Arc::clone(&stop);
+    // stdin by std on its own thread (SEC-U6AD-1): read into a fixed buffer and dropped, until it closes.
+    let _ = std::thread::Builder::new()
+        .name("npt-stdin".into())
+        .spawn(move || {
+            let mut buf = [0u8; 256];
+            let mut stdin = io::stdin().lock();
+            while matches!(stdin.read(&mut buf), Ok(n) if n > 0) {}
+            st.store(true, std::sync::atomic::Ordering::Relaxed);
+        });
+    let mut open = || {
+        println!("OPEN");
+        let _ = io::stdout().flush();
+    };
+    match npt_server::run_probe(&s, &stop, &mut open) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err((code, why)) => fail(code, &why),
+    }
 }
 
 /// U6b's settings, range-checked (SEC-U6AD-2's rules): the transport, both bind addresses, the profile's L2
@@ -509,6 +641,9 @@ fn main() -> ExitCode {
                 Err(e) => return fail(EXIT_SETTINGS, &e),
             };
         }
+    }
+    if checked.probe.is_some() {
+        return probe_mode(checked);
     }
     run(checked)
 }
@@ -1061,6 +1196,100 @@ mod tests {
         let e = read_capped(big.to_str().expect("utf-8"), PEM_CAP).expect_err("above the cap");
         assert_eq!(e.0, EXIT_SETTINGS, "{}", e.1);
         std::fs::remove_file(&big).expect("removed");
+    }
+
+    /// U6c, C1 (b): probe mode's settings taken (the defaults: all six legs, 1,000,000 packets, 10 s) and refused (a
+    /// probe field in room mode, another mode, no peer or not an IPv4, the legs not from P0 in order once each, the
+    /// packets or warm-up out of range); room mode, absent or named, has no probe.
+    #[test]
+    fn u6c_probe_mode_settings_are_taken_and_refused() {
+        let probe = |edit: Box<dyn FnOnce(&mut serde_json::Value)>| {
+            parse_settings(&settings(|v| {
+                v["mode"] = "probe".into();
+                v["probe_peer_ipv4"] = "192.0.2.5".into();
+                v["wt_bind"] = "127.0.0.1:30003".into();
+                edit(v);
+            }))
+        };
+        let p = probe(Box::new(|_| {}))
+            .expect("taken")
+            .probe
+            .expect("probe mode");
+        assert_eq!(
+            (p.legs, p.packets, p.warmup_s, p.peer),
+            (
+                vec![0, 1, 2, 3, 4, 5],
+                1_000_000,
+                10,
+                std::net::Ipv4Addr::new(192, 0, 2, 5)
+            )
+        );
+        let p = probe(Box::new(|v| {
+            v["probe_legs"] = serde_json::json!(["P0", "P2", "B1"]);
+            v["probe_packets"] = 2_000.into();
+            v["probe_warmup_s"] = 1.into();
+        }))
+        .expect("taken")
+        .probe
+        .expect("probe mode");
+        assert_eq!((p.legs, p.packets, p.warmup_s), (vec![0, 2, 5], 2_000, 1));
+        assert!(
+            parse_settings(&settings(|_| {}))
+                .expect("room")
+                .probe
+                .is_none()
+        );
+        let room = parse_settings(&settings(|v| v["mode"] = "room".into()));
+        assert!(room.expect("room").probe.is_none());
+        let rooms: Vec<Case> = vec![
+            ("a probe field", Box::new(|v| v["probe_packets"] = 5.into())),
+            ("mode", Box::new(|v| v["mode"] = "lab".into())),
+            ("no peer", Box::new(|v| v["mode"] = "probe".into())),
+        ];
+        for (what, edit) in rooms {
+            assert!(parse_settings(&settings(edit)).is_err(), "{what}");
+        }
+        let probes: Vec<Case> = vec![
+            (
+                "peer",
+                Box::new(|v| v["probe_peer_ipv4"] = "192.0.2".into()),
+            ),
+            (
+                "an IPv6 peer",
+                Box::new(|v| v["probe_peer_ipv4"] = "::1".into()),
+            ),
+            (
+                "not P0 first",
+                Box::new(|v| v["probe_legs"] = serde_json::json!(["P1"])),
+            ),
+            (
+                "order",
+                Box::new(|v| v["probe_legs"] = serde_json::json!(["P0", "P2", "P1"])),
+            ),
+            (
+                "twice",
+                Box::new(|v| v["probe_legs"] = serde_json::json!(["P0", "P0"])),
+            ),
+            (
+                "unknown",
+                Box::new(|v| v["probe_legs"] = serde_json::json!(["P0", "P9"])),
+            ),
+            (
+                "none",
+                Box::new(|v| v["probe_legs"] = serde_json::json!([])),
+            ),
+            ("packets 0", Box::new(|v| v["probe_packets"] = 0.into())),
+            (
+                "packets",
+                Box::new(|v| v["probe_packets"] = 10_000_001.into()),
+            ),
+            ("warm-up 0", Box::new(|v| v["probe_warmup_s"] = 0.into())),
+            ("warm-up", Box::new(|v| v["probe_warmup_s"] = 601.into())),
+            ("port 0", Box::new(|v| v["wt_bind"] = "127.0.0.1:0".into())),
+        ];
+        for (what, edit) in probes {
+            assert!(probe(edit).is_err(), "{what}");
+        }
     }
 
     /// TR-U6A-6: the binary's exit by how the loop ended (the module text): clean 0, a crash 3, a log not finished 1.

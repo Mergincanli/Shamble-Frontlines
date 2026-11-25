@@ -414,6 +414,55 @@ fn u6b_open_comes_once_both_listeners_accept_and_the_hash_file_pins_the_served_c
     std::fs::remove_dir_all(&dir).expect("removed");
 }
 
+/// U6c, C1 (b): probe mode prints `OPEN` once P0's socket is bound, binds no TCP port, mints no token file and writes
+/// no hash file; with no peer, stdin's close ends it at once and non-zero, and no leg's log is left (none finished).
+#[test]
+fn u6c_probe_mode_opens_on_p0s_bind_and_ends_non_zero_when_stdin_closes() {
+    let dir = folder("u6c-probe");
+    let (wt, ws) = (free_port(true), free_port(false));
+    let s = settings(
+        &dir,
+        &[
+            ("mode", "probe".into()),
+            ("probe_peer_ipv4", "127.0.0.9".into()),
+            ("wt_bind", format!("127.0.0.1:{wt}").into()),
+            ("ws_bind", format!("127.0.0.1:{ws}").into()),
+        ],
+    );
+    let mut child = spawn(&s);
+    let out = child.stdout.take().expect("piped");
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let mut first = String::new();
+        let _ = BufReader::new(out).read_line(&mut first);
+        let _ = tx.send(first);
+    });
+    let first = rx.recv_timeout(OPEN_CAP).unwrap_or_else(|e| {
+        let _ = child.kill();
+        panic!("no OPEN within the cap: {e:?}")
+    });
+    assert_eq!(first, "OPEN\n");
+    assert!(
+        std::net::TcpStream::connect(("127.0.0.1", ws)).is_err(),
+        "no TCP port bound"
+    );
+    drop(child.stdin.take());
+    let status = child.wait().expect("ends");
+    let mut err = String::new();
+    child
+        .stderr
+        .take()
+        .expect("piped")
+        .read_to_string(&mut err)
+        .expect("stderr");
+    assert_eq!(status.code(), Some(1), "stderr: {err}");
+    assert!(err.contains("stdin closed"), "{err}");
+    for f in ["tokens", "hash.json", "room-P0.jsonl"] {
+        assert!(!dir.join(f).exists(), "{f}");
+    }
+    std::fs::remove_dir_all(&dir).expect("removed");
+}
+
 /// The process-level bites (bites builds only), each failing its mark's check by name on the log it writes.
 #[cfg(feature = "bites")]
 mod bites {

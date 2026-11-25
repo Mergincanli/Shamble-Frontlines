@@ -32,6 +32,10 @@ use npt_client::ClientEndpoint;
 use npt_link::Channel;
 use npt_sim::{Command, Scene};
 
+// U6c (u6c-brief.md Block 4): the glue that hosts a Behaviour over npt-net's clients, and npt-load.
+mod load;
+pub use load::{HostState, Hosted, LoadSettings, now_ns, run_load};
+
 /// Move vectors 22.5 degrees apart round the circle, each inside the room's x² + y² ≤ 127² check: a soldier walks
 /// through them, one step every [`TURN_EVERY`] commands.
 const MOVES: [[i8; 2]; 16] = [

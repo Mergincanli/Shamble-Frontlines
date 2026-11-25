@@ -22,6 +22,11 @@ mod ws_config;
 // L2's impairment layer (U3b, U3c): ImpairSocket, DelayStream and L2Config, plan §4.7's public items.
 mod l2;
 pub use l2::{DelayStream, ImpairSocket, L2Config};
+// U6c: the -3 L2 probe's shared pieces (u6c-brief.md Block 1), for npt-server's probe mode and npt-load's.
+pub use l2::{
+    FateEntry, Forms, LegSeries, Pacer, Polled, ProbeDatagram, ProbePeer, Samples, excess, forms,
+    leg_series, nearest_rank, probe_peer, quantile, samples, send_down, start_poller,
+};
 
 // U6b: the transports (u6b-brief.md Blocks 1-4): the connection cap, the certificate pin, what both servers share, and
 // the servers and clients themselves (plan §4.7's WtServer, WtClient, WsServer, WsClient).

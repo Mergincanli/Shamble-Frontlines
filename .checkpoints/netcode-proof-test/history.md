@@ -7922,3 +7922,15 @@ Answer in at most 6 lines.
   builds C-U6-8's three stamp tests and NPT_KC_BURSTS after R1's run, before R1's report; the killed-room check stays
   open, before R5. SYNC-ENTITIES (a) is a writer need for -10 (U6d's interest writers).
   Transcript record 97389ddd-c984-484f-a360-64e7d89ad784, 00:07:40 UTC, 2527 characters.
+
+## U6c merged: the probe, the load, the page host and the certificate (2026-11-25; u6c-report.md)
+- **What merged:** wip/u6c-fix.patch (24 files) with H2 (TE-U6C-R2-4) and H1 (his NPT-EDGE-READ (a), above), made by
+  hand in the main folder after M4 and read by the advisor's head read only (advisor-u6c-m4b.md: APPROVE WITH
+  CONDITIONS C1-C6). One commit: 24 files, 5,698 added, 199 removed; no change to marks.json or the judge.
+- **Evidence:** the compile-only probe PASS (04:25 UTC); M5 04:27:42-04:48:04 UTC all 11 steps PASS, measured 861 and
+  bites 958, 0 failed, 0 skipped, wasm 27,000 ticks 0 mismatching, marks 81, self 78/78, redact 0 findings; gate
+  --no-smoke PASS. The tree's hashes (C1) held on the probe and on M5.
+- **For him:** NPT-EDGE-SLIVER (q-npt-edge-sliver.md): the start-edge read lands just after each leg's zero, normally
+  under a millisecond by reading, not measured; (a) keep, recommended; (b) a small follow-up, by the end of Sat 28
+  November (Amsterdam). His sentence on the 214 drops stands as written above.
+- **Next:** C9 (U8's snapshot), M9 (the push, the saver, CI on PR #40), then U7's Block 0b check (NB2-C1).

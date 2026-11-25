@@ -13,6 +13,8 @@
 //! - `delay`: [`DelayStream`], the WebSocket fallback's wrapper over the TCP model (U3c), with its release clock
 //!   (`delay_clock`), its request and frame scanner (`ws_frame`) and its names (`delay_names`).
 //! - `tls_test` (tests only): the test certificate and the pinning client both TLS paths' loopback tests use.
+//! - `probe` (U6c): the -3 L2 probe's shared pieces, pub for npt-server's probe mode and npt-load's (u6c-brief.md
+//!   Block 1): the poller, the fate entries, the E forms, the datagram, the pacer, LG's end and the leg's series.
 
 mod config;
 // pub(crate) for U6b's WsLink tests (its loopback pair) and the reading handle; its public items stay plan §4.7's.
@@ -21,6 +23,7 @@ mod delay_clock;
 mod delay_names;
 mod impair;
 mod names;
+mod probe;
 mod shaper;
 mod socket;
 mod stats;
@@ -35,6 +38,10 @@ pub(crate) mod wt;
 
 pub use config::L2Config;
 pub use delay::DelayStream;
+pub use probe::{
+    FateEntry, Forms, LegSeries, Pacer, Polled, ProbeDatagram, ProbePeer, Samples, excess, forms,
+    leg_series, nearest_rank, probe_peer, quantile, samples, send_down, start_poller,
+};
 pub use socket::ImpairSocket;
 
 /// Both servers' QUIC migration setting (M9; Mustafa's U3-Q6 (a)): off, so a peer's per-address profile cannot be
