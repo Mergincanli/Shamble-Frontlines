@@ -163,3 +163,11 @@ them), the two vector generators' checks, the tools crate's own wasm32 build, an
 touched none of its files. Run here on the merged tree: the release tests of all six crates (139 passed), the tools
 crate for wasm32, both generators' checks. A wish for the CI Builder, not done here: the replay spec needs no WebGL
 and could join the `firefox` project, which would show the recording in a second engine (follow-up 4A-FIREFOX-REPLAY).
+
+## netcode-architect: APPROVE; every finding of its that was due is fixed; no new finding (`netcode-architect-r2.md`)
+On the buffer-free hash: nothing in its design for 4c wants it otherwise, and each of the three cases is better off (a
+shared length per match: the room's one buffer sized by a constant is gone; the soldier table: runs of a fixed length
+force the shape 4c needs, a count and then rows; change-set 7: a hash that borrows the world and takes no memory suits
+hashing a restored or predicted world every tick). A note for 4c, no line now: hand over every slot of the soldier
+table, with its occupied flag and generation, so that line i of a state print is always slot i and the field
+comparison never misaligns on a missing row.
