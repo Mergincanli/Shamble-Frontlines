@@ -1454,10 +1454,11 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
   standing in for `cs/3b-loop-closes`, final code 6abf3d2a; risk tier 1; two review rounds by six reviewers
   (engine-architect, netcode-architect, rust-reviewer, test-engineer, security-auditor, perf-auditor): round 1 on
   bbbf09e4 (2026-11-25; a container restart cut three of them short, who finished in round 2), round 2 on 0dfca749
-  and what changed after it, all six PASS, nothing Critical or High open; the verifier and the advisor agent still to
-  come; report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`, being written. Source of every item: 3b's card,
-  "Open findings" and "Round 2 so far", and the reviewers' notes `.checkpoints/cs3b-loop-closes/<reviewer>-review1.md`
-  and `-review2.md`, readable on the branch until the notes are removed. The ids are this docs pass's):
+  and what changed after it, all six PASS, nothing Critical or High open; the verifier PASS; the advisor agent
+  approved the code as it stands; report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`. Source of every item:
+  3b's card, "Open findings" and "Round 2 so far", and the reviewers' notes
+  `.checkpoints/cs3b-loop-closes/<reviewer>-review1.md` and `-review2.md`, readable at the notes' last commit
+  80a51e4299d2a9abb0c08adc76dc1a31716f036a. The ids are this docs pass's):
   - **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (his words: `docs/DECISIONS.md`, the
     entry of 11:38:37 UTC; no release counter in change-set 3c). What it was about (test-engineer's round 2): the
     presses mark's row (PM-0002-12, `docs/adr/0002-code-structure-build-toolchain.md:1283`) says "the Worker counts
@@ -1474,7 +1475,8 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     drafts are made to agree on how releases are counted (ADR 0002 part 5's sentence about press and release edge
     counters, and the method cell of the row PM-0002-12), with the reason written there. Neither draft is edited
     by change-set 3b.
-  - 3B-RESUME-FLASH (change-set 4, when a soldier is on screen): what the first picture after a pause shows. In
+  - 3B-RESUME-FLASH (**his, still open: he named no letter**; it comes back with change-set 4, when a soldier is
+    on screen and his browser check will see it): what the first picture after a pause shows. In
     his browser check he once saw, in Brave, a key's box still lit for a split second after coming back to the
     tab; not in Firefox and not on a second try. From the code: the match stands still while the tab is hidden,
     the box shows the server's last echo, and the first tick after the return lets the key go
@@ -1878,12 +1880,12 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   3. The inventory's line numbers hold after phase 1's move: `git mv` kept the bytes and the line numbers (foundation
      2.1b, PR #51: five pure renames, the blobs equal at 76b4f7a and at the move commit c090843), so its citations hold
      with the prefix `legacy/` (`shamble-game.js:N` is `legacy/shamble-game.js:N`) [verified 2026-11-11].
-- **Change-set 3b of the v2 build plan, "The loop closes"** (in review, 2026-11-25; the evidence: its card and
-  reviewers' notes on its branch, and its report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`, being written):
+- **Change-set 3b of the v2 build plan, "The loop closes"** (2026-11-25; the evidence: its card and reviewers'
+  notes at the notes' last commit 80a51e42, and its report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`):
   1. The room has no bound on how late a command may run (3B-LATE-BOUND): harmless while nothing moves and play is
      local, but no room goes behind a network transport without it (change-set 7).
-  2. Releases are not counted on the wire: the page works them out from presses and held keys (his open
-     RELEASE-COUNT); the presses mark's release half is met at the echo's resolution, not by the row's method.
+  2. Releases are not counted on the wire: the page works them out from presses and held keys (RELEASE-COUNT,
+     decided (a) by him on 2026-11-25); no part of the presses mark is called passed (3B-RELEASE-DRAFTS).
   3. The presses mark and the loop are shown in Chromium only (3B-OTHER-BROWSERS); the decoder mark PM-0001-34 has
      started, never passed (its row names a fuzzing tool that has not joined).
 - **Change-set 3a of the v2 build plan, "Rules and boundaries"** (merged 2026-11-24 as 28254a7, PR #65; written while

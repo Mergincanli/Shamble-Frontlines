@@ -7,11 +7,13 @@ player sees) plus `docs/DECISIONS.md`, a decision doc: it merges only on his go,
 request exists yet: his main Advisor opens it from the title and text the chat wrote (`pr-title.txt` and
 `pr-body.md`, readable at the notes' last commit, below), and he taps the merge.
 
-**State of this version of the report (the last):** the code is final at 6abf3d2a; both review rounds are closed;
-the verifier's PASS is in; the advisor agent approved the code as it stands and the corrected text; his browser
+**State of this version of the report (the last):** main moved while the change-set was reviewed (09faefa7, the merge of
+#66: lane 2's docs only), so the branch takes main in by one merge commit, the last commit of the branch: it resolves
+five docs that both lanes changed and touches nothing else. The code is final at 6abf3d2a; both review rounds are
+closed; the verifier's PASS is in; the advisor agent approved the code as it stands and the corrected text; his browser
 check is in, Brave and Firefox, with every asked number 0; RELEASE-COUNT is decided, (a) with two conditions. What
-follows this commit and cannot stand in it: the advisor agent's approval of exactly this commit and GitHub's checks
-on it; the chat then gives him the commit's full id and pushes nothing after it (his words of 2026-11-25).
+follows the last commit and cannot stand in it: the advisor agent's approval of exactly that commit and GitHub's checks
+on it; the chat then gives him its full id and pushes nothing after it (his words of 2026-11-25).
 
 ## Goal
 Close the loop for one player on one machine: a key pressed on the page goes to a local game server inside the page
@@ -291,29 +293,29 @@ for hostile bytes in the room and the endpoint (3B-HOSTILE-ALLOC, with 3c's test
 ## Proposed next step
 Change-set 3c, the link simulator and the first recording, planned first and reviewed by the advisor agent.
 
+## Where the notes are (the checkpoint, folded in) The change-set's notes folder is removed (commit ace05e9f), as the
+checkpoint rules have it. Everything in it can still be read at the commit before that one,
+**80a51e4299d2a9abb0c08adc76dc1a31716f036a**, under `.checkpoints/cs3b-loop-closes/` and in
+`.checkpoints/cs3b-loop-closes.md` (the resume card): the plan (`cs3-plan.md`) and the two designs; the advisor agent's
+notes (`advisor-cs3b-start.md`, `advisor-cs3b-head.md`); the six reviewers' notes of both rounds, the verifier's and
+docs-keeper's; the planted defects (`plants-3b.py`, 53); the ten-minute run's script (`ten-minutes.mjs`); the zip's
+script (`make-zip.py`); the pull request's title and text (`pr-title.txt`, `pr-body.md`); his messages as saved by
+script; the two scripts that wrote `docs/DECISIONS.md`. What the card held and this report does not repeat line by line:
+every CI run read (the runs on 1ee3e918, 5c582ddd, d117fca5, eb0d2314, 0dfca749, 6380df45, a85b9dbb and 6abf3d2a: green,
+each with its counts written down before the push), and each finding of each reviewer with what was done about it.
+
 ## Decisions needed
-None open. RELEASE-COUNT is decided, (a) with two conditions (above). Not decisions now, his when they come due:
-the two press limits (3B-PACER-255, 3B-OUTAGE-256), a long-hold case for the netcode draft's lag-switch mark
-(3B-LONG-HOLD), and the drafts' wording on releases (3B-RELEASE-DRAFTS).
+None needed for this merge. RELEASE-COUNT is decided, (a) with two conditions (above). Not decisions now, his when
+they come due: the two press limits (3B-PACER-255, 3B-OUTAGE-256); a long-hold case for the netcode draft's
+lag-switch mark (3B-LONG-HOLD); the drafts' wording on releases (3B-RELEASE-DRAFTS); and RESUME-FLASH, which he
+left without a letter (what the first picture after a pause shows: it comes back with change-set 4).
 
 ## For Mustafa
 1. Your go for the merge, by your tap, of the pull request your main Advisor opens from `pr-title.txt` and
-   `pr-body.md` (at the notes' last commit, below) with exactly this commit as its head, after the advisor agent's
-   approval of this commit and GitHub's checks on it; the chat gives you the commit's full id in one line and
+   `pr-body.md` (at the notes' last commit, above) with exactly the branch's last commit as its head, after the
+   advisor agent's approval of that commit and GitHub's checks on it; the chat gives you its full id in one line and
    pushes nothing after it. **Your go accepts as still open:** the bound on how late a command may run
    (3B-LATE-BOUND: security-auditor's Medium, deferred to change-set 7; no room on a network without it);
    OVERFLOW-PANIC-RULE (kept in the code by hand; no lint step in CI until the gate step 2.3; the drafts' wording
    with their owners); and the two press limits (3B-PACER-255, 3B-OUTAGE-256), each your decision when it comes
    due.
-
-## Where the notes are (the checkpoint, folded in)
-The change-set's notes folder is removed by this commit, as the checkpoint rules have it. Everything in it can
-still be read at the commit before this one, **80a51e4299d2a9abb0c08adc76dc1a31716f036a**, under `.checkpoints/cs3b-loop-closes/` and in
-`.checkpoints/cs3b-loop-closes.md` (the resume card): the plan (`cs3-plan.md`) and the two designs; the advisor
-agent's notes (`advisor-cs3b-start.md`, `advisor-cs3b-head.md`); the six reviewers' notes of both rounds, the
-verifier's and docs-keeper's; the planted defects (`plants-3b.py`, 53); the ten-minute run's script
-(`ten-minutes.mjs`); the zip's script (`make-zip.py`); the pull request's title and text (`pr-title.txt`,
-`pr-body.md`); his messages as saved by script; the two scripts that wrote `docs/DECISIONS.md`. What the card held
-and this report does not repeat line by line: every CI run read (the runs on 1ee3e918, 5c582ddd, d117fca5,
-eb0d2314, 0dfca749, 6380df45, a85b9dbb and 6abf3d2a: green, each with its counts written down before the push),
-and each finding of each reviewer with what was done about it.
