@@ -9,7 +9,7 @@
   worktree `.gate/lane1-takeover`; pushed with `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its
   command; never a plain `git push`. The session's start folder is never switched · **Base:** origin/main
   c1da1bd (lane 2's docs-only #67, taken in by merge commit 75a9296; before it 311c0484)
-- **Last update:** 2026-11-25 21:23 Amsterdam (from the clock)
+- **Last update:** 2026-11-25 21:33 Amsterdam (from the clock)
 
 ## Sizes (his point 5: which is which)
 - The designs' own count for 4a, bottom-up: 1,365 lines (655 code, 710 tests).
@@ -64,9 +64,14 @@ Until his answer only work that adds no product line. CI runs on this commit (th
 7. Draft pull request #70 opened (https://github.com/Mergincanli/Shamble-Frontlines/pull/70), head 5a16b4e, on his
    words "open own drafts if possible". It stays a draft until the report is in.
 
+8. CI on 5a16b4e, both runs (the push and the pull request): gate, smoke and toolchain green, six of six (toolchain
+   5 minutes 6 and 5 minutes 9 seconds). Read from the push run's log (45694490139): the players' file's sha256 on
+   the runner is e419e4cc...8a35, the same as here; "no registry path in the Wasm"; `cargo test` twice and the
+   release line green, the recordings' tests among them; "first-loop.rec: 1800 steps, every shared hash as in the
+   file" in HeadlessChrome 157 (158 here); 17 browser tests passed in 3.3 minutes (3.4 in the pull request's run).
+
 ## Next steps
-1. Read CI's run on 5a16b4e: gate, smoke, toolchain; the players' file's size and sha256 against the numbers
-   above; the browser run's time.
+1. (done, step 8 above.)
 2. (done: the draft pull request, step 7 above) A draft pull request (his standing permission), kept a draft.
 3. His answer to STOP-4A; then the
 5. Reviewers (netcode-architect, rust-reviewer, test-engineer; then engine-architect, security-auditor), the
