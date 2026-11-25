@@ -138,9 +138,12 @@ interim positions, until its own research before the first online playtest; the 
    Findings §1, R6-HOST-F3, lines 72–79). three.js is bundled from npm by Vite and served from the client host, so v2
    has no CDN script tag (the STATUS item "no SRI/CSP on the three.js CDN tag (belongs with hosting, ADR-001)"; inventory
    row PG19); the content security policy waits for the security baseline (part 13). Pages' Free plan allows 500 builds a
-   month (R6-HOST-F3, r6 lines 72–79), and whether a direct upload counts against them is a spike item (part 14). If
+   month (R6-HOST-F3, r6 lines 72–79). Whether a direct upload counts against them is not answered: the preview
+   hosting check saw no build count in the dashboard, before or after its ten uploads (2026-11-18), and Cloudflare's
+   docs do not say (read 2026-11-24 and 2026-11-25; PM-0006-7; `docs/reports/2026-11-24-preview-hosting-check.md`). If
    uploads count, only the newest push of each pull request deploys (ADR 0002's concurrency cancel) and the month's
-   deploys are counted; a paid plan is Mustafa's after a price read (proposed, not researched).
+   deploys are counted; until someone shows a count, the previews (foundation step 2.6) work that way anyway (Mustafa's
+   STEP4-COUNT (b), 2026-11-25). A paid plan is Mustafa's after a price read (proposed, not researched).
    *Why:* its `_headers` file sets custom response headers (COOP and COEP by name inferred), every branch gets its own
    link with no cap on previews, and GitHub Pages cannot send those headers; Pages meets every need of R5-PREV-REC2's
    list on the findings read but the deletion of a branch's latest deployment (r6-infrastructure.md,
@@ -149,6 +152,18 @@ interim positions, until its own research before the first online playtest; the 
    5 USD a month for Workers Paid only if Worker code is ever needed (r6-infrastructure.md, Options §2, start scenario,
    line 476; R6-HOST-F5, lines 87–92). *Ids:* R6-HOST-REC1, R5-PREV-REC2, R5-PREV-OQ4. *Need:* VISION_V2 §6.1 (rooms and
    private matches are reached from this client) and VISION_V2 §4 (desktop browsers first).
+   *Workers static assets, weighed again* (2026-11-25, after the header mark failed; Mustafa's ONE-OFF-HEADER (a);
+   Cloudflare's docs read 2026-11-25, paths under developers.cloudflare.com/workers/ unless marked): none of the
+   check's marks was measured on Workers. The host adds `noindex` to a Preview's `workers.dev` link, "but not to custom
+   domain Preview URLs" (previews/custom-domains); the docs are silent on production's own version links, so they
+   neither show nor rule out the header the check found on Pages' production one-off links. A pull request gets a
+   Preview of its branch's files (previews/configuration), at most 100 per Worker on the Free plan where Pages sets no
+   cap, and a command that deletes it (previews; wrangler/commands/workers); a wall can cover previews only
+   (configuration/cloudflare-access); `_headers` takes host rules (static-assets/headers); 25 MiB a file, as on Pages;
+   no monthly cap on deploys is named (platform/limits; platform/pricing). Cloudflare's Pages overview says "Start new
+   projects with Workers" (developers.cloudflare.com/pages/). None of this answers a failed mark: the revised header
+   row is met by the readings already taken on Pages (the check's report, Appendix A), so Pages stays; a move would
+   mean running the check again on Workers.
 2. **Preview privacy.** A preview that runs the match offline in the Worker with bots is public but unlisted
    (`noindex` by default, branch-name links), unless it carries unreleased art, which puts it behind
    [the access wall](../research/GLOSSARY.md#the-access-wall) (r5-toolchain-quality.md, Recommendations, Question 6,
