@@ -129,3 +129,15 @@ sentence holds for PM-0006-2, DECISIONS byte-equal, gate PASS. But the final tex
 with no recorded approval: E7 12 lines vs "at most 8 lines", a different opener, Q1's alias and production workers.dev
 cases not given separately; E3's parenthesis reworded. Smallest fix: trim E7 to 8 lines with the planned opener and
 restore E3's wording, or record a plan revision 3 covering E7 as built and E3's wording, approved by the advisor agent.
+
+## Round 2 (2026-11-25; fix pass ab15d6d, head a4152ad; plan revision 3, advisor conditions in advisor-plan.md)
+### Plan
+1. Word for word: every changed sentence of `git diff 09faefa..ab15d6d -- docs/adr/0006...` against section 3 as
+   revision 3 amends it: E7 = R3-1 block (15 lines), E3 R3-2, E1 R3-3, E1b R3-4, E4 R3-5, E11 R3-6, R3-10, R3-11; the
+   unchanged E2, E6, E9, E10 still as revision 2. Script in verifier-scratch/.
+2. Spot-checks: pages/platform/limits/ S23 sentence and the old "unlimited number of preview deployments" gone;
+   workers/previews/ "deletes the oldest"; version-urls and workers-dev silent on noindex (address, workers.dev URL,
+   version links, aliases); Pages 25 MiB.
+3. Gate --no-smoke.
+4. PM-0006-2 under E1's final words, against Appendix A (custom domain: the check had none).
+### Results
