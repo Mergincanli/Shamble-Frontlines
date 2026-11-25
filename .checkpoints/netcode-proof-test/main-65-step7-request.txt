@@ -30,8 +30,10 @@ Check, each with its evidence:
    ':(exclude)docs/design/'` exits 0: `node tools/gate.mjs --no-smoke`, `node .claude/scripts/repo-map-check.mjs` and
    `node --test .claude/scripts/checkpoint.test.mjs`, each alone. If it exits 1, run none and say so: the main session
    runs them in a worktree.
-5. Anything in U6c's merge that has reached its step M4b by your launch rides in a section the main session adds below
-   this line before the launch; if none is added, U6c is not part of this check.
+5. U6c is not part of this check (its M4b read is its own agent). Note: the main folder holds U6c's applied, uncommitted
+   files under spikes/netcode-proof/ (12 modified, 12 new and untracked); they change no commit. Run item 4's three
+   reruns first, right after your plan, and say when they are done: U6c's counted run (M5) must not start while they
+   run, since it holds timing-sensitive tests.
 
 Give APPROVE, APPROVE WITH FINDINGS or REVISE, each finding on CLAUDE.md's scale. End the file with DONE on its own
 line. Your final reply goes to the main session: the verdict, the findings one line each, and "For Mustafa". Plain words.
