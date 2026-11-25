@@ -908,6 +908,10 @@ name = "npt-client-wasm"
 version = "0.0.0"
 dependencies = [
  "npt-client",
+ "npt-room",
+ "npt-server",
+ "npt-sim",
+ "wasm-bindgen",
 ]
 
 [[package]]

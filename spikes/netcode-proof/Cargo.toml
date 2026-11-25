@@ -89,6 +89,9 @@ httparse = "=1.10.1"
 http = "=1.5.0"
 bytes = "=1.12.1"
 http-body-util = "=0.1.5"
+# U7's Block 0b (u7-brief.md section 5; security-u7-deps.md item (7)): npt-client-wasm's bindings, default features
+# (std) only, at the version the wasm-bindgen CLI is pinned to; already in Cargo.lock, so no new package.
+wasm-bindgen = "=0.2.130"
 
 [workspace.lints.rust]
 # forbid, the compiler backstop (u3c review C2R-1): in a crate that inherits these lints no #[allow] can relax it

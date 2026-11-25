@@ -25,4 +25,9 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 npt-client.workspace = true
-# wasm-bindgen joins at U7, at the version the wasm-bindgen CLI is pinned to.
+wasm-bindgen.workspace = true
+
+[dev-dependencies]
+npt-room.workspace = true
+npt-server.workspace = true
+npt-sim.workspace = true
