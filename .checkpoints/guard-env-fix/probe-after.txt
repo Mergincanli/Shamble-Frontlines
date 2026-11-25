@@ -1,0 +1,21 @@
+env -C /d git status                 -> program: git · unreadable: env -C
+env -u X git status                  -> program: git · unreadable: null
+env -S x git status                  -> program: git · unreadable: env -S
+env --chdir /d git status            -> program: git · unreadable: env --chdir
+env --unset X git status             -> program: git · unreadable: null
+env --split-string x git status      -> program: git · unreadable: env --split-string
+env --chdir=/d git status            -> program: git · unreadable: env --chdir
+env -C/d git status                  -> program: git · unreadable: env -C
+env x.y=1 git status                 -> program: git · unreadable: null
+nice --adjustment 5 git status       -> program: git · unreadable: null
+nice --adjustment=5 git status       -> program: git · unreadable: null
+nice --adj=5 git status              -> program: git · unreadable: nice --adj=5
+nice -n 5 git status                 -> program: git · unreadable: null
+nice -5 git status                   -> program: git · unreadable: null
+stdbuf -o L git status               -> program: git · unreadable: null
+stdbuf -oL git status                -> program: git · unreadable: null
+stdbuf --output L git status         -> program: git · unreadable: null
+stdbuf --output=L git status         -> program: git · unreadable: null
+env GIT_TRACE=1 git status           -> program: git · unreadable: null
+nice git status                      -> program: git · unreadable: null
+env -i git status                    -> program: git · unreadable: null

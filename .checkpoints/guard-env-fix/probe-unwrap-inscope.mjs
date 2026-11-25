@@ -7,4 +7,6 @@ const rows = [
   'stdbuf -o L git status', 'stdbuf -oL git status', 'stdbuf --output L git status', 'stdbuf --output=L git status',
   'env GIT_TRACE=1 git status', 'nice git status', 'env -i git status',
 ];
-for (const r of rows) console.log(`${r.padEnd(36)} -> program: ${unwrap(r.split(' '))[0]}`);
+// before the fix unwrap() returned an array; since guard-env-fix it returns { argv, unreadable }
+const show = (u) => (Array.isArray(u) ? `program: ${u[0]}` : `program: ${u.argv[0]} · unreadable: ${u.unreadable}`);
+for (const r of rows) console.log(`${r.padEnd(36)} -> ${show(unwrap(r.split(' ')))}`);
