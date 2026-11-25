@@ -53,8 +53,10 @@ On revision 2 at c40f3f9:
   merge check.
 
 ## Current step
-U0: the request to CI Builder on #59 (plan section 5). Then U1 (the host folder; the dependency hold before any push of
-the manifest and lockfile: dependency-check.md after the security-auditor's answer on the exact files).
+U0 done: the request to CI Builder posted on #59 (comment 7172595904, 2026-11-25 ~19:40 UTC; plan section 5's text,
+no wall detail, footer). Now U1: the host folder (hosting/preview.mjs, hosting/preview.test.mjs, hosting/_headers),
+then the manifest and lockfile under the dependency hold (no push of them before dependency-check.md names the
+security-auditor's answer on the exact files).
 
 ## Rules in force
 - Until a second guard fix is merged: git and gh always start their own command, with no other program in front.
