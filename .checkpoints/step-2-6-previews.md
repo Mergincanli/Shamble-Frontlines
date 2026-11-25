@@ -38,13 +38,21 @@ His 18:15 message itself (uuid 42aa43e4..., 1778 bytes, sha256 e2554c4e...) goes
 5. Back to him for his go; nothing built before it.
 
 ## Current step
-4: the plan (revision 1, 081e7e9) is with three readers at once (started about 17:54 UTC, effort xhigh): the
-advisor agent (plan review; notes advisor-plan.md), the security-auditor (the token design and the untrusted build;
-notes security-auditor-plan.md), engine-architect (the departure from ADR 0002 part 10; notes engine-architect-plan.md).
-Done: 2, infra-engineer's research (D1-D8; its last section overrides); 3, the plan, after an advisor tool consultation
-(its points folded in: M1 as a pass mark before any token; ADR 0002 part 10 read; toolchain.yml read: the build lands in
-.gate/dist-production at :172 inside the cut step, so an upload step after it has the network; departures listed;
-GATE-FOLLOW and file scope put to the advisor agent).
+5: plan revision 2 (1ac984a) with the security-auditor (texts included) and the advisor agent (what changed), both
+resumed with their context, started about 18:20 UTC.
+Done:
+- 4: three reads of revision 1:
+  - the advisor agent REVISE, C1 to C13 (it settled FIRST-RUN (a), LABEL (the pull-request run) and MAIN-BYPASS: main's
+    ruleset 25069670 asks for a pull request with 0 approvals and for gate and smoke, with no bypass actors);
+  - the security-auditor REVISE (a Critical older than step 2.6, MAIN-WALL: a branch's workflow could merge itself; the
+    guards G1 to G9; M1 with a worthless secret; reconcile looks every pull request up; the comment from checked values
+    only; 90 days for the token);
+  - engine-architect REVISE (a High: lane 2 owns no lockfile, by his words of 2026-11-18, "You own no manifest and no
+    lockfile", and Part 15 :72-74; it accepts departure 2, firmly with ACCOUNT (b)).
+- Revision 2 folds them all in (its section 13 maps each one); the three workflow texts are in texts/ and in its
+  Appendix with sha256 (preview.yml c66c0b0a..., preview-close.yml c2f1fa90..., wall-test.yml 3af06706...); my lint of
+  the texts passed. His quotes (a) to (d) were checked by script against message 42aa43e4.
+Next: when both answer, revision 3 if needed; then the questions file (his six decisions) pushed, and the plan to him.
 
 ## Rules in force
 - Until a second guard fix is merged: git and gh always start their own command, with no other program in front.

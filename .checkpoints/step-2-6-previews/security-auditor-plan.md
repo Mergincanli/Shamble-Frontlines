@@ -128,3 +128,8 @@ directly. The one Critical predates step 2.6, but the token's only wall rests on
    `resolved` on https://registry.npmjs.org/, sha512 integrity on every entry, wrangler at the pin,
    `hasInstallScript` packages listed, the release at least 7 days old; and the session's `npm ci --ignore-scripts`,
    `npm audit`, `npm audit signatures` outputs. Each bump: a new DEP-HOLD and a tier-2 PR.
+
+## Revision 2 (plan.md at 1ac984a; the advisor agent's C13), started 2026-11-25
+Plan (blocks): R2-1 verify sha256 of the three texts; R2-2 preview.yml against G1-G9 (the coordinator's 7 points);
+R2-3 preview-close.yml; R2-4 wall-test.yml + M1 + click 5; R2-5 clicks 5-10, TOKEN-WINDOW, MAIN-WALL (decision 6);
+R2-6 section 13 mapping; R2-7 script descriptions (hosting/preview.mjs) for omissions; R2-8 verdict.
