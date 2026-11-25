@@ -1,10 +1,9 @@
-//! The state hash's function: one fixed, unseeded hash over the canonical bytes of the whole state (ADR 0004 part 9).
-//! Two runs of a match agree while their per-tick hashes agree. It finds divergence; it is not a security check, and
-//! its value never leaves the Worker or the server, because it covers the match seed (ADR 0004 part 8).
-//!
-//! FNV-1a is the pick for the first, 36-byte world and is provisional: ADR 0004 part 9 leaves the function to the
-//! build, and PM-0004-21's report (the function picked and its cost per tick) confirms or replaces it before the
-//! first recording is committed.
+//! The state hash's function: FNV-1a 64 (RFC 9923), fixed and unseeded, over the canonical bytes (ADR 0004 part 9). It
+//! finds divergence between two runs, tick by tick; it is not a security check. Over the whole state it covers the
+//! match seed, so that value never leaves the Worker or the server (part 8); over the shared state it covers no seed
+//! byte and is the one number a replay reads from the players' file. Kept by PM-0004-21's report (change-set 4a): at
+//! 16 KiB it takes 20 us natively and in WebAssembly, 0.06% of a tick, and a change in one byte is always caught.
+//! Revisit when it first runs on a live tick or the shared state passes 64 KiB (then XXH64: 13 to 16 times faster).
 
 const FNV_OFFSET_BASIS: u64 = 0xCBF2_9CE4_8422_2325;
 const FNV_PRIME: u64 = 0x0000_0100_0000_01B3;
