@@ -1,4 +1,4 @@
-# STOP-4A: change-set 4a is at its stop line. Asked of Mustafa on 2026-11-25 (about 21:05 Amsterdam)
+# STOP-4A: change-set 4a is at its stop line. Asked of Mustafa on 2026-11-25 (21:00 Amsterdam)
 
 ## Where 4a stands
 - **Written so far: 3,030 lines** (1,523 code, 1,507 tests), counted by git against 4a's base (7670c7b), the
