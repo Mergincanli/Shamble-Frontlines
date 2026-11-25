@@ -8044,3 +8044,23 @@ Unchanged: lean mode, and git and gh always start their own command, with no oth
   he answers. Lean mode and the interim sentence unchanged.
   Transcript record 868533d9-3d44-435f-a1a7-5f13242bc26f (typed while a turn ran: a queue-operation at 19:14:52.222Z,
   then the message), 19:14:52 UTC, 1084 characters.
+
+## Mustafa, 2026-11-25 20:48 UTC (his label: 21:45 Amsterdam), in this chat: save at 91 % usage, LIGHT-TAKEIN (a), Builder 2's command heads-up, main's next moves #71 and #70 (word for word)
+```text
+You're at 91% usage make sure to save your progress (also for the agents)
+
+For the netcode chat, from Mustafa (written with the main Advisor, 25 November, 21:45 Amsterdam).
+1. LIGHT-TAKEIN: (a). Write the recipe once and have the advisor check it. It is used only inside the limits you named: main's new merges touch only docs .md files (no CLAUDE.md, AGENTS.md, design doc or mark row), main's CI is green, and the one conflict is STATUS.md's table. The advisor's read of the pushed result stays per move, and I get one line per use naming the pull requests taken in. Anything outside falls back to the full plan.
+2. Builder 2's merge on Thursday 26 November: tell me a few minutes before you name the command, so I am at the prompt.
+3. For your planning: main will move again soon with pull request #71 (the workflow and docs) and later #70 (game code in crates/sim, room, sim-wasm and devtools). Neither fits the lighter recipe.
+Unchanged: lean mode, and git and gh always start their own command, with no other program in front of them.
+```
+- **Read as** (the main session's reading, not his words): usage at 91 % of the window (it resets 23:50 UTC), so
+  everything is saved now, the agents' unsaved work included (U7's T-builder's tree as wip/u7-build-rs.patch, its two
+  notes files copied). LIGHT-TAKEIN (a): the recipe is written once and checked by the advisor agent (in a window),
+  used only inside the named limits; the advisor's read of each pushed result stays; one line to him per use naming
+  the pull requests taken in; anything outside the limits falls back to the full plan. Builder 2's merge on Thursday
+  26 November: he is told a few minutes before the command is named (NB2-PROMPT (a) unchanged). #71 (the workflow and
+  docs) and later #70 (game code in crates/sim, room, sim-wasm and devtools) each get the full take-in (MAIN-52). Lean
+  mode and the interim sentence unchanged.
+  Transcript line 98914 (a queue-operation enqueue at 20:48:15.193Z), 1040 characters.
