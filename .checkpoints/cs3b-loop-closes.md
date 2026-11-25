@@ -297,6 +297,32 @@
   out in a small manifest batch under the hold, answered first, before the reviews end.
 
 ## Current step
+**WAITING FOR MUSTAFA (since 2026-11-25, 04:30 UTC): his browser check of 3b and his answer on RELEASE-COUNT.**
+The zip was sent to him in the chat (file tool; built from 8f835d114, sha256 3fdcf9f6...1f82; tested unpacked: 16
+browser tests pass). The full question: `cs3b-loop-closes/question-2026-11-25-browser-check.md` (commit 01bea7fe).
+The board thread says so and its state is `needs-musti` (set it back to `doing` after his answer, `done` after
+the merge). The advisor agent: the code is approved as it stands (6abf3d2a); the corrected text approved "for the
+next step only" (8f835d114dcbf03c80cb7227c9cf189539dc6d09); its last points (N-1 to N-5) are in 01bea7fe.
+CI: green on 8f835d11 (toolchain run 45545524420, read by the advisor agent: the same counts and Wasm hash);
+01bea7fe's run: read it at the next turn.
+
+**When he answers, in this order:**
+1. Save his message by script (`chat-words.mjs words <transcript> <marker> <out> <title> <what it answers>`) and
+   put it into DECISIONS by a script made from `decisions-5.mjs` (his check's result; RELEASE-COUNT (a) or (b)).
+   If his check shows a fault: stop, fix by plan, new reviews as the budget has it.
+2. A browser-check record as 3a's (`docs/reports/2026-11-25-cs3b-browser-check.md`: his pasted reports, read line
+   by line: errors 0, refused 0, olderPosts 0, wrongKeys 0, lost 0, doubled 0; Brave and Firefox; the backend).
+3. The last commit: the report's state and "His browser check" section; RELEASE-COUNT's answer in the report and
+   STATUS (if (b): into 3c's plan items); the checkpoint folded into the report (name the notes' last commit as
+   where `ten-minutes.mjs`, `plants-3b.py`, `pr-title.txt`, `pr-body.md` and the reviewers' notes can be read);
+   `.checkpoints/cs3b-loop-closes*` removed. Only docs and notes may differ from 8f835d11
+   (`git diff --stat 6abf3d2a <final> -- crates packages Cargo.toml Cargo.lock` empty).
+4. The advisor agent's review of that commit (continue the same agent if it still answers; else a new `advisor`
+   run with `advisor-cs3b-head.md` from the notes' last commit): APPROVE naming the full SHA.
+5. CI green on that SHA (gate, smoke, toolchain), nothing pushed after. Give him the full SHA, and the pull
+   request's title and text (from the notes' last commit) for his main Advisor; he presses Ready and Merge. Post
+   on the board; after the merge set `done`. Then 3c: plan first.
+
 **The fix pass of review round 1 is built and verified here; next: commit and push it, read CI, then round 2**
 (three reviewers at a time: first test-engineer, security-auditor and perf-auditor, who finish their own plans on
 the fixed head; then engine-architect, netcode-architect and rust-reviewer on what changed), the verifier until
