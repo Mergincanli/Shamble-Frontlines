@@ -29,6 +29,7 @@ def cargo(package, *target):
 PROTOCOL, SIM, ROOM, ENDPOINT, LOCAL = (cargo(name) for name in ("protocol", "sim", "room", "client-endpoint", "sim-wasm"))
 DECODERS = cargo("protocol", "--test", "decoder_inputs")
 STEP_ALLOC = cargo("sim-wasm", "--test", "step_alloc")
+ANY_BYTES = cargo("sim-wasm", "--test", "any_bytes")
 BUILD = ["node", "packages/client/scripts/build.mjs", "--out-dir", str(ROOT / ".gate/dist-plant")]
 E2E = ["node", "node_modules/@playwright/test/cli.js", "test", "-c", "packages/e2e/playwright.config.ts", "--project=chromium",
        "--workers=1", "--retries=0", "--reporter=list", "--global-timeout=400000", "--trace", "off"]
@@ -57,7 +58,7 @@ ROOM_RS, QUEUE, PRESS = "crates/room/src/lib.rs", "crates/room/src/queue.rs", "c
 ENDPOINT_RS, LOCAL_RS, BLOCK = "crates/client-endpoint/src/endpoint.rs", "crates/sim-wasm/src/local_match.rs", "crates/client-endpoint/src/block.rs"
 HOST, PACING, MESSAGES = "packages/sim-worker/src/host.ts", "packages/sim-worker/src/pacing.ts", "packages/sim-worker/src/messages.ts"
 LINK, KEYS, BOOT = "packages/client/src/app/worker-link.ts", "packages/client/src/overlay/keys.ts", "packages/client/src/app/boot.ts"
-SEND = "        if endpoint.build_input(&self.post, outgoing) {\n            sent(link.end(Side::Client).send_unreliable(outgoing));\n        }\n"
+SEND = "        if endpoint.build_input(outgoing) {\n            sent(link.end(Side::Client).send_unreliable(outgoing));\n        }\n"
 NEWEST = "if (!this.#posted || (ahead !== 0 && ahead < 0x8000_0000)) {"
 INPUT_CALL = "sim.input(this.#post, this.#held, this.#p0, this.#p1, this.#p2, this.#p3);"
 
@@ -106,15 +107,30 @@ PLANTS = [
      [(ROOM_RS, "pub const CATCH_UP_CAP: usize = 2;", "pub const CATCH_UP_CAP: usize = 3;")],
      [ROOM], failed("at_most_two_commands_run_in_one_tick_and_the_rest_the_next")),
     ("pacer-two", "a button's counter moves by two per command",
-     [(PRESS, "                *counter = counter.wrapping_add(1);", "                *counter = counter.wrapping_add(2);")],
+     [(PRESS, "                button.counter = button.counter.wrapping_add(1);", "                button.counter = button.counter.wrapping_add(2);")],
      [ENDPOINT], failed("each_button_moves_by_at_most_one_per_command_and_the_rest_waits")),
+    ("pacer-two-any", "the same, found by the random-message run of the endpoint",
+     [(PRESS, "                button.counter = button.counter.wrapping_add(1);", "                button.counter = button.counter.wrapping_add(2);")],
+     [ANY_BYTES], r"call \d+: a counter moved by Some\(2\)"),
     ("endpoint-newest-only", "the endpoint never sends a command again",
      [(ENDPOINT_RS, "let unconfirmed = self.confirmed.is_none_or(|seen| seq_newer(earlier, seen));",
-       "let unconfirmed = back == 0 && self.confirmed.is_none_or(|seen| seq_newer(earlier, seen));")],
+       "let unconfirmed = self.confirmed.is_none_or(|seen| seq_newer(earlier, seen)) && sequence == earlier;")],
      [ENDPOINT], failed("each_command_is_for_the_next_tick_and_unconfirmed_ones_are_sent_again")),
     ("endpoint-echo-again", "the echo of one command is counted again with every snapshot",
      [(ENDPOINT_RS, "        if processed == self.checked {\n            return;\n        }\n", "")],
      [ENDPOINT], failed("the_echo_is_checked_once_against_the_command_the_room_ran")),
+    ("endpoint-late-refused", "a snapshot that comes late or twice is counted as refused",
+     [(ENDPOINT_RS, "            self.readout.late = self.readout.late.wrapping_add(1);", "            self.readout.refused = self.readout.refused.wrapping_add(1);")],
+     [ENDPOINT], failed("a_snapshot_that_is_not_newer_and_bytes_that_are_none_are_counted_and_dropped")),
+    ("endpoint-index", "the endpoint looks a sent command up without keeping to its ring: a panic on a room's echo, found by the random-message run",
+     [(ENDPOINT_RS, "        let place = self.sent.get(usize::from(sequence & RING_MASK))?;", "        let place = &self.sent[usize::from(sequence)];")],
+     [ANY_BYTES], failed("the_endpoint_keeps_its_rules_whatever_arrives")),
+    ("queue-window", "before the first command runs, the queue takes any spread of sequences",
+     [(QUEUE, "        let taken = *self.taken.get_or_insert(new.sequence.wrapping_sub(1));", "        let taken = self.taken.unwrap_or(new.sequence.wrapping_sub(1));")],
+     [ROOM], failed("a_spread_of_sequences_before_the_first_command_runs_nothing_twice")),
+    ("room-presses-any", "the room lets a press counter move two presses a tick, found by the random-message run of the room",
+     [(ROOM_RS, "u32::from(press_edges(*old, new)) <= covered;", "u32::from(press_edges(*old, new)) <= covered.saturating_mul(2);")],
+     [ANY_BYTES], r"call \d+: \d+ presses in \d+ ticks"),
     ("block-held-place", "the block writer puts the held buttons where the first counters go",
      [(BLOCK, "        put(HELD, u32::from(readout.echo_buttons));", "        put(PRESSES[0], u32::from(readout.echo_buttons));")],
      [ENDPOINT], failed("every_value_is_written_at_the_table_s_place")),
@@ -123,9 +139,9 @@ PLANTS = [
      [(LOCAL_RS, SEND + "        {\n", "        {\n"),
       (LOCAL_RS, "        let mut client = link.end(Side::Client);\n", SEND + "        let mut client = link.end(Side::Client);\n")],
      [LOCAL], failed("the_join_crosses_in_the_first_step_and_a_post_reaches_the_server_within_its_step")),
-    ("local-any-post", "the local match takes the last post handed in, not the newest",
-     [(LOCAL_RS, "        if self.post.newer_than(&post) {", "        if false && self.post.newer_than(&post) {")],
-     [LOCAL], failed("every_tick_runs_the_newest_post")),
+    ("local-unsent-hidden", "what the link did not take is left out of the block's count of refused messages",
+     [(LOCAL_RS, "        endpoint.write_block(room.counters().refused().wrapping_add(*unsent));", "        endpoint.write_block(room.counters().refused());")],
+     [LOCAL], failed("a_link_that_takes_nothing_is_counted_in_the_block")),
     ("step-allocates", "a step of the local match takes a little memory",
      [(LOCAL_RS, "        let Self {\n            room,\n            endpoint,", "        let _planted = std::hint::black_box(vec![0u8; 16]);\n        let Self {\n            room,\n            endpoint,")],
      [STEP_ALLOC], r"a later step took memory"),
@@ -148,8 +164,11 @@ PLANTS = [
     ("keys-repeat", "the repeat of a key that never went down here counts as a press",
      [("packages/client/src/input/keyboard.ts", "    if (!repeat) this.#settle(", "    this.#settle(")],
      [CLIENT + ["src/input/keyboard.test.ts"]], vitest_fail("a held key's repeats count nothing")),
+    ("keys-typing-up", "a key that comes up while the focus is in a text box is not let go",
+     [("packages/client/src/input/keyboard.ts", "    if (key < 0 || (typing && down)) return false;", "    if (key < 0 || typing) return false;")],
+     [CLIENT + ["src/input/keyboard.test.ts"]], vitest_fail("in a text box a key that goes down is typing")),
     ("link-short-block", "the link reads a block that is shorter than its sections",
-     [(LINK, "    if (buffer.byteLength < BLOCK_END) return", "    if (buffer.byteLength < 0) return")],
+     [(LINK, "    if (buffer.byteLength < BLOCK_BYTES) return", "    if (buffer.byteLength < 0) return")],
      [CLIENT + ["src/app/worker-link.test.ts"]], vitest_fail("the echo and the link's counts are read from every block")),
     ("link-key-time", "a key change is timed to a tick that still ran an older post",
      [(LINK, "(this.#postUsed - this.#keyPost) >>> 0 < 0x8000_0000) {", "this.#postUsed >= 0) {")],
@@ -166,10 +185,22 @@ PLANTS = [
      PRESSES, frame("expect(end.presses).toEqual({ made: PRESSES, echoed: PRESSES, lost: 0 });")),
     ("bite-last-post", "PM-0002-12's second bite: the Worker takes the last post to arrive, not the newest",
      [(HOST, NEWEST, "if (!this.#posted || ahead === ahead) {")],
-     PRESSES, frame("expect(end.worker?.stalePosts ?? 0).toBeGreaterThanOrEqual(shim.twice - 2);")),
+     PRESSES, frame("expect(end.olderPosts).toBe(0);")),
+    ("bite-counted-taken", "the second bite, whole: the Worker counts a late post as ignored and takes it all the same (the test reviewer's plant)",
+     [(HOST, "        } else {\n          this.#stalePosts += 1;\n        }\n", "        } else {\n          this.#stalePosts += 1;\n          this.#held = data.held;\n          this.#post = data.post;\n          this.#p0 = data.p0;\n          this.#p1 = data.p1;\n          this.#p2 = data.p2;\n          this.#p3 = data.p3;\n        }\n")],
+     PRESSES, frame("expect(end.olderPosts).toBe(0);")),
+    ("tally-held-again", "the page does not count a button held again with no press",
+     [("packages/client/src/app/press-tally.ts", "if (presses === 0 && (held & bit) !== 0 && (this.#held & bit) === 0) this.#heldWithoutPress += 1;", "")],
+     [CLIENT + ["src/app/press-tally.test.ts"]], vitest_fail("a button held again with no press is counted apart")),
+    ("link-older-posts", "the link does not count a tick that ran an older post",
+     [(LINK, "    if ((postUsed - this.#postUsed) >>> 0 >= 0x8000_0000) this.#olderPosts += 1;\n", "")],
+     [CLIENT + ["src/app/worker-link.test.ts"]], vitest_fail("the echo and the link's counts are read from every block")),
+    ("link-list-kept", "the link does not start its list of buffers anew after a post: they ride a second time",
+     [(LINK, "    this.#doneCount = 0;\n", "")],
+     [CLIENT + ["src/app/worker-link.test.ts"]], vitest_fail("it keeps the two newest blocks")),
     ("alloc-frame", "the key diagram allocates a small array every frame",
      [(KEYS, "    this.#lights.pressed(pressed, nowMs);\n", "    this.#lights.pressed(pressed, nowMs);\n    " + PLANTED_ARRAY + "\n")],
-     ALLOCATION, frame("expect(perFrame).toBeLessThan(170);")),
+     ALLOCATION, frame("expect(perFrame).toBeLessThan(130 + 8 * blocksPerFrame);")),
     ("alloc-block", "the message listener allocates a small array for every block",
      [(BOOT, "      const problem = link.receive(event);\n", "      " + PLANTED_ARRAY + "\n      const problem = link.receive(event);\n")],
      ALLOCATION, frame("expect(perBlock).toBeLessThan(680);")),

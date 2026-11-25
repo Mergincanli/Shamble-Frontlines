@@ -293,21 +293,23 @@
   out in a small manifest batch under the hold, answered first, before the reviews end.
 
 ## Current step
-**Review round 1, first three: netcode-architect, engine-architect and rust-reviewer** (Opus 5.5, effort max;
-started 2026-11-25, about 00:47 UTC; each on its own copy `.gate/<name>-cs3b` of bbbf09e4; their notes
-`cs3b-loop-closes/<name>-review1.md`; what they were given: `cs3b-loop-closes/review-context.md`). Then
-test-engineer, security-auditor and perf-auditor; one fix pass; round 2 on what changed. Updated 2026-11-25,
-00:50 UTC (from the clock). The board add-on is active (nothing of it is copied here, by his rule).
+**The fix pass of review round 1 is built and verified here; next: commit and push it, read CI, then round 2**
+(three reviewers at a time: first test-engineer, security-auditor and perf-auditor, who finish their own plans on
+the fixed head; then engine-architect, netcode-architect and rust-reviewer on what changed), the verifier until
+PASS, the advisor agent on the pushed head (with the question on M1), the docs pass, the report. Updated
+2026-11-25, 01:55 UTC (from the clock). The board add-on is active (nothing of it is copied here, by his rule).
 
-**CI, read line by line:** on d117fca5 (steps 4 and 5): gate, smoke and toolchain green, every count as written
-before the push, 14 browser tests in 1.1 minutes, the players' file sha256 ded90598...f4f8 as here. **On
-eb0d2314 (step 6): gate, smoke and toolchain green (toolchain run 45520531338, job 138890929194, 00:45:22 to
-00:50:17 UTC: 4 min 55 s of its 15 minutes); every count as written before the push; 16 browser tests in 3.4
-of the 5 minutes** (C6 holds on GitHub as on the clean copy). There: the loop 1,815 ticks in 60.5 s, 186
-presses made and echoed, 0 refused, key to tick median 123.8 ms and 95th percentile 139.2 ms at about 10 frames
-a second; the press test 10,000 presses and releases made and echoed, 695 posts delayed, 67 sent a second time,
-67 ignored, 0 refused; allocation 71 bytes a frame and 602 a block (the block's limit is 680: the nearest of
-the limits, to watch).
+**Verified here on the fix pass, before the commit:** formatting and the lint check clean (all targets); cargo
+debug 111 tests (26, 3, 2, 19, 8, 13, 17, 5, 1, 13, 2, 1, 1); release protocol 19 and 8 (the decoder run 5.8 s),
+sim 17, 5, 1; client 83, sim-worker 46, types 7, net 1; the seven type checks; boundary 18; the gate; 16 browser
+tests in 3.3 minutes (the loop 1,823 ticks, 128 presses and releases made and echoed, 0 doubled, 0 older posts;
+the press test 10,000 presses and releases, 505 posts delayed, 46 sent twice, 46 sent behind a newer one, 46
+ignored by the Worker, 0 ticks ran an older post, 0 refused; allocation 102 bytes a frame, 576 a block); the
+players' Wasm 53,783 bytes (21,983 gzip, 18,368 brotli), sha256 cd63b871...86e7. Planted defects: 44 now; their
+run on the fixed tree is in `.gate/cs3b/plants-3b-run2.log` (scratch).
+
+**CI, read line by line (before the fix pass):** green on d117fca5 and on eb0d2314 (toolchain run 45520531338,
+4 min 55 s of 15; 16 browser tests in 3.4 of 5 minutes; every count as written before the push).
 
 ## Next steps
 1. (Reading done after his compact; the build order stands:) read CLAUDE.md, this card, the plan's sections 0, 3, 5, 8, 9, 12 and 13, his
@@ -325,50 +327,83 @@ the limits, to watch).
 3. Not this chat's: the small CI pull request (an Opus 5.5 chat: Firefox in CI, every crate's release tests, the
    two generators' checks, a build step of its own for the test-only module).
 
-## Open findings (review round 1 on bbbf09e4; the fix pass comes after all six reviewers; updated 01:10 UTC)
-- **engine-architect: CHANGES NEEDED, one Medium, eight Lows** (`engine-architect-review1.md`; "the boundary
-  itself is sound").
-  - Medium EA-1: the follow-up EA-F9 is only partly done: the block writer and the newest post still live in
-    `sim-wasm` (`LocalMatch`); ADR 0002 has the client endpoint write the block. **To fix:** both move into
-    `client_endpoint::Endpoint`; `LocalMatch` keeps the room, the endpoint, the link, the schedule and the order.
-  - Low EA-2: a section's start is worked out twice (the generator sums strides itself). **To fix:** the generator
-    uses `layout::offsets`, and the block's length is printed into the generated file and used by the page.
-  - Low EA-3: the newest post is guarded twice (the host and Rust), and Rust's guard never fires on the shipped
-    path, differs on the first post and counts into "refused". **To fix (the main session's choice, plan 5.1):**
-    one owner, the host; Rust takes the post it is given.
-  - Low EA-4: a key held while the focus moves into the report's text box stays held. **To fix:** every key-up
-    goes through; only key-downs in a text box are skipped.
-  - Low EA-5: the host time's "never backwards" check and its counter are read by nothing. **To fix:** drop both;
-    the step keeps taking the time.
-  - Low EA-6: `devtools` names three crates it does not use until 3c. **No manifest change** (it says so; a
-    change would be a new batch under the hold): the report says they are unused until 3c.
-  - Low EA-7: the boundary test pins the module's exports, not the methods of `Sim`. **To fix:** pin them.
-  - Low EA-8: PA-N2 (where the allocation window falls against the browser's optimising) is not met, only the
-    plan's wording. **Report:** it carries over to change-set 5's method; never "done".
-  - Low EA-9 (nit): the key diagram's CSS reaches a production build, as the readout's has since change-set 2.
-    **Follow-up.**
-- **netcode-architect: PASS, one Medium, six Lows** (`netcode-architect-review1.md`; its own probes: 1,000,000
-  random Inputs into the room and 3,000,000 snapshots into the endpoint, 0 panics; a toy link with delay, 5 %
-  loss, doubled datagrams and outages of 45 and 100 ticks over the real `LocalMatch`: 10,000 presses applied
-  exactly in 7 runs, 0 refused by the room).
-  - Medium NA-1: a snapshot that is not newer (late or doubled) or comes before the join's answer counts as
-    "refused", like bytes that are no message; under a link that reorders, the next change-set's zero-refusal
-    mark would fail by construction. **To fix:** a count of its own; "refused" keeps malformed bytes and the
-    room's refusals.
-  - Low NA-2: before the first command is taken the queue has no window; a hostile spread of sequences made one
-    command run twice. **To fix:** the first queued sequence sets the window.
-  - Low NA-3: two ways the newest command could stop going out, unreachable in 3b (32,768 unconfirmed commands;
-    a tick gap above 255). **To fix:** the newest command always goes; only repeats are filtered.
-  - Low NA-4: `press.rs` says a second tap is "never dropped" while presses above 255 waiting are dropped.
-    **To fix:** the doc says the bound; the report names it as a bounded departure; the cap's size is a
-    game-design question once presses fire weapons (a follow-up).
-  - Low NA-5: before online play: acks bounded only from above and two for one group; the Join's version after
-    the token; the press check passes anything once 255 ticks are covered. **To fix now:** the Join's version
-    moves before the token (cheap while nothing is deployed). **Follow-ups:** the other two.
-  - Low NA-6: an infinite host time is kept. **Falls away with EA-5.**
-  - Low NA-7, for 3c: the link simulator needs its clock advanced through `LocalMatch`, and its reliable channel
-    must deliver exactly once (a second join answer stops the local match). **Into 3c's plan.**
-- rust-reviewer, test-engineer, security-auditor: running. perf-auditor: next free seat.
+## Open findings (review round 1 on bbbf09e4; the fix pass is built; updated 2026-11-25, 01:55 UTC)
+**What happened to the round:** engine-architect, netcode-architect and rust-reviewer finished. **The container
+restarted at about 01:32 UTC and stopped test-engineer, security-auditor and perf-auditor before their answers**;
+their notes (`<name>-review1.md`, written as they went) hold their findings up to then, every one of them is taken
+into the fix pass below, and the three finish on the fixed head in round 2 (their remaining plan items plus the
+check of the fixes). Nothing else was lost: the fix pass's edits were on disk.
+
+- **engine-architect: CHANGES NEEDED, one Medium, eight Lows** (`engine-architect-review1.md`).
+  - Medium EA-1 (the block writer and the newest post lived in `sim-wasm`): **fixed**: `Endpoint` owns both
+    (`new(hash, first_sequence, pad_bytes)`, `set_post`, `block`, `block_len`, `write_block`); `LocalMatch` keeps
+    the room, the endpoint, the link, the schedule and a count of messages the link did not take.
+  - Low EA-2 (a section's start worked out twice): **fixed**: `layout::end_of` is the one place; the generator
+    uses it and prints `BLOCK_BYTES`, which the page uses.
+  - Low EA-3 (the newest post guarded twice): **fixed**: one owner, the host (TypeScript); Rust takes the post it
+    is given; `Post::newer_than` and the Rust count of stale posts are gone.
+  - Low EA-4 (a key held when the focus moves into a text box stays held): **fixed** in `KeyboardInput.key`
+    (a key-up counts wherever it lands), with a test.
+  - Low EA-5 (the host time's check read by nothing): **fixed**: gone; `step` keeps taking the time (3c's link
+    simulator reads it).
+  - Low EA-6 (`devtools` names three crates it does not use until 3c): **no manifest change**; in the report.
+  - Low EA-7 (the boundary test did not pin `Sim`'s methods): **fixed**.
+  - Low EA-8 (PA-N2 not met): **report**: carries over to change-set 5, never "done".
+  - Low EA-9 (the key diagram's CSS reaches a production build): **follow-up**.
+- **netcode-architect: PASS, one Medium, six Lows** (`netcode-architect-review1.md`).
+  - Medium NA-1 (late or doubled snapshots counted as refused): **fixed**: `Readout.late`.
+  - Low NA-2 (no window before the first command is taken): **fixed** in `CommandQueue::insert`, with a test.
+  - Low NA-3 (the newest command could stop going out): **fixed**: it always goes; only repeats are filtered.
+  - Low NA-4 (`press.rs` said "never dropped"): **fixed** (the doc states the bound of 255 waiting); the report
+    names it a bounded departure; the bound's size is a game-design **follow-up**.
+  - Low NA-5: **fixed now**: the Join's version before its token. **Follow-ups before online play:** the acks'
+    lower bound and one ack per group; the press check past 255 ticks.
+  - Low NA-6: fell away with EA-5. Low NA-7: **into 3c's plan** (the simulator's clock through `LocalMatch`; its
+    reliable channel delivers exactly once).
+- **rust-reviewer: PASS, eight Lows** (`rust-reviewer-review1.md`).
+  - RR-1 (two panics' debug formatting cost 3,121 bytes of Wasm): **fixed**: one `assert!` with a plain message;
+    the players' Wasm is 53,783 bytes now (56,717 before).
+  - RR-2 (`post.rs`, `press.rs` denied two of the four lints): **fixed**.
+  - RR-3 (a changed datagram that still decodes stalls the exchange): **into 3c's plan** (the simulator treats
+    corruption as loss, or the endpoint gets a plausibility bound).
+  - RR-4 (no random-input test of the room and the endpoint in CI): **fixed**: `crates/sim-wasm/tests/any_bytes.rs`
+    (100 matches of 3,000 calls each side, each side's rules asserted at every step).
+  - RR-5 = EA-6. RR-6 (`#[must_use]`, doc comments): **fixed** where a false result leaves a stale buffer;
+    `pub mod queue` and `pub mod wire` stay public (**follow-up**, nit).
+  - RR-7 (plain forms; one record per button in `press.rs`): **fixed**.
+  - RR-8 (two more cases of the cast from f64): **fixed**: 4 cases appended (both signs); 10,072 cases;
+    `f32-inputs.bin` 120,864 bytes.
+- **test-engineer (cut short; its notes up to claim 5 of 8):**
+  - **High, proven by its own plant:** the presses mark's second bite planted whole (the Worker counts a late
+    post as ignored and takes it all the same) passed every line of `presses.spec.ts`. **Fixed:** the page now
+    counts ticks that ran an older post than the tick before (`WorkerLink.olderPosts`) and buttons held again with
+    no press (`EchoTally.heldWithoutPress`); both specs assert 0; the whole bite is plant `bite-counted-taken`.
+  - **High candidate:** the releases are worked out from the presses and the held bits, so their line cannot fail
+    for a doubled release. **Fixed as far as the echo allows:** a lost release still shows as a release that never
+    comes back; a doubled one shows as `heldWithoutPress` (asserted 0). The echo has no counter for releases
+    (ADR 0001's command carries press counters only): **the report says so against the mark's wording.**
+  - **High candidate:** the allocation test's per-block limit holds only for a slow page (its own readings: 593
+    bytes a block at 6 frames a second, 742 to 797 at 42 to 60). **Partly fixed:** the list of returned buffers
+    no longer empties (no list grows inside the block listener); measured again at six frame rates (478, 567,
+    591, 765, 747, 629 bytes a block at 0.9, 5.9, 10.1, 23.2, 38.7, 60.0 frames a second): the rise in the middle
+    stays and its cause is not known. So the spec now refuses by name a run with fewer than 2.5 blocks per frame,
+    and its per-frame limit follows the blocks per frame. **Follow-up for change-set 5** (the mark's own method).
+  - Low (the decoder test printed the token's cap for every control message): **fixed** (a cap per type).
+  - Low (no case of nine whole commands): **fixed** (and five whole acks).
+  - The shim's count of posts sent behind a newer one (the mark's "reordered, above 0"): **added and asserted**.
+- **security-auditor (cut short after its findings; CHANGES NEEDED in its own memory line):**
+  - **Medium M1:** the room has no bound on how late a command may run, so a client that sends nothing for N
+    ticks and then a backlog runs two commands a tick for N ticks (its probe; the total stays within the ADR's
+    bound). Nothing moves in 3b, so nothing is gained yet. **Not built in 3b; put to the advisor agent with the
+    fixed head:** the bound belongs to the command-timing choice (ADR 0001's open question 6, whose option (b)
+    names "late commands dropped"), which Mustafa gave to Slice 3 on 2026-11-24. Stated in the code where the
+    check will go (`Room::on_datagram`'s doc) and a **follow-up before online play**.
+  - Low L1 (the checks not made yet are not named where they will go): **fixed** (that doc).
+  - Low L2 = EA-6. Low L3: not in its notes (lost with the restart); round 2 names it again.
+- **perf-auditor (cut short; its notes up to question 5 of 6):** no finding so far. Its readings: the Worker's
+  tick 268 ns on main, 650 ns now, 24 to 29 bytes more per tick; key to tick in its model at 60 frames a second:
+  95th percentile 34.8 to 48.0 ms over 16 phases, none above the mark's 50 ms; the reading started at the
+  handler, not at the key event's own time: **fixed** (`event.timeStamp`).
 
 ## Key numbers
 - main 28254a73; 3a's last commit 1624f084; 3a's notes 6491b839; the players' Wasm on main: 31,718 bytes, sha256
