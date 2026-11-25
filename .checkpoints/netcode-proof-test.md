@@ -97,6 +97,7 @@
 - **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
   2,858 added; T5i-1 to -3 for U7's round). **Next 3:** U6c's merge now by advisor-u6c-r2.md with H2 and H1 (his (a)):
   M0-M4a by hand, M4b's head read at 03:51 with MAIN-65's step 7 (trig_01Co9w6DYSoCbkQz5RWhK58i), then M5-M9; then NB2's merge (below).
+- **RESUME (U6c's merge, from 00:2x UTC):** wip/u6c-fix.patch applied in the main folder at M4 (uncommitted; its new files untracked), H1 and H2 by Edit at M4a; no stash, clean, checkout or restore; saves are notes-only; resume at M4b (its own advisor read at 03:51), then M5, unless a later line here says more.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - For msg-2026-11-26.md: none yet. All of 11-24's are named in msg-2026-11-25.md (items 1-8 and its addendum's four).
