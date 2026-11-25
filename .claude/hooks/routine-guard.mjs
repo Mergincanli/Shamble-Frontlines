@@ -299,8 +299,10 @@ const WRAPPERS = new Set(['time', 'nohup', 'command', 'builtin', 'noglob', 'exec
 // word that still starts with - after them (env X=1 -i git ...: env runs -i). split: env -S's words are put back and
 // read on (SA-R1-2: env -S git ... still meets git's checks). A Map, so `constructor` finds nothing.
 // SAME-GAP (guard-wrappers): every name unwrap() strips reads its options here (each program's own --help, bash's
-// help). pos: positional words before the command (timeout's duration); input: the program adds words from its input
-// (xargs), so git or gh behind it is unreadable. The WRAPPERS keywords and option-less names get NONE: no options.
+// help; xargs's from findutils' manual: --max-lines, --eof and --replace take a value only after =, so they ask). pos:
+// positional words before the command (timeout's duration); input: the program adds words from its input (xargs), so
+// git or gh behind it, or no program word after a wrapper it runs, is unreadable. The WRAPPERS keywords and option-less
+// names get NONE: no options.
 const NONE = {};
 const WRAP_OPTS = new Map([
   ['env', { flag: /^(-[i0v]|--ignore-environment|--null|--debug)$/, value: /^(-u|--unset)$/, unread: /^(-[CS]|--chdir|--split-string)$/,
@@ -311,19 +313,23 @@ const WRAP_OPTS = new Map([
   ['xvfb-run', { flag: /^(-[al]|--auto-servernum|--listen-tcp)$/,
     value: /^(-[efnpsw]|--error-file|--auth-file|--server-num|--xauth-protocol|--server-args|--wait)$/ }],
   ['xargs', { flag: /^(-[0rtpxo]|--null|--no-run-if-empty|--verbose|--interactive|--exit|--open-tty)$/, input: true,
-    value: /^(-[adEILnPs]|--arg-file|--delimiter|--max-lines|--max-args|--max-procs|--max-chars|--process-slot-var)$/ }],
+    value: /^(-[adEILnPs]|--arg-file|--delimiter|--max-args|--max-procs|--max-chars|--process-slot-var)$/ }],
   ['command', { flag: /^-[pvV]+$/ }], ['time', { flag: /^-p$/ }], ['exec', { flag: /^-[cl]+$/, value: /^-a$/ }],
 ]);
+// a word naming git or gh by its last path part, git's own helper names (git-<name>) included (SA-d)
+const GIT_HELPER = /^git-[a-z][a-z0-9-]*$/;
+const gitWord = (w) => { const x = w.split('/').pop(); return x === 'git' || x === 'gh' || GIT_HELPER.test(x); };
 // a word shown in a reason: at most 32 characters, control characters as ? (SA-R1-4)
 const shownWord = (w) => (w.length > 32 ? `${w.slice(0, 32)}...` : w).replace(/[\x00-\x1f\x7f-\x9f]/g, '?');
 // Returns { argv: the real command, unreadable: null, or the wrapper form the guard does not follow (SEC-U7B-1) }.
 export function unwrap(argv) {
-  let a = argv.slice(), unreadable = null, fed = false, turns = 0;
+  let a = argv.slice(), unreadable = null, fed = false, fedWrap = false, turns = 0;
   for (; turns < 20 && a.length; turns++) {
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0])) { a = a.slice(1); continue; }
     const prog = basename(a[0]);
     const o = WRAP_OPTS.get(prog) ?? (WRAPPERS.has(a[0]) || WRAPPERS.has(prog) ? NONE : undefined);
     if (o) { // an unknown word is dropped alone and the reading goes on: that can only add a deny, never lift the ask
+      if (fed) fedWrap = true; // a wrapper run by xargs (SA-a)
       a = a.slice(1);
       while (a.length && a[0].startsWith('-') && a[0] !== '-') {
         const w = a[0], name = w.startsWith('--') ? w.split('=')[0] : w.slice(0, 2);
@@ -348,7 +354,7 @@ export function unwrap(argv) {
     break;
   }
   if (turns === 20 && a.length) unreadable ??= 'more than 20 wrappers'; // SA-R1-3: a line at the limit asks
-  if (fed && /^(git|gh)$/.test(basename(a[0] ?? ''))) unreadable ??= 'xargs (its input adds words)';
+  if (fed && (gitWord(a[0] ?? '') || (fedWrap && !a.length))) unreadable ??= 'xargs (its input adds words)';
   return { argv: a, unreadable };
 }
 
@@ -778,19 +784,21 @@ async function bash(command, cwd, role, io, input) {
       for (const r of c.reads) { const d = credentialDeny(r, vcwd, role, io); if (d) return d; }
     }
     if (!argv.length) continue;
+    // SA-d: git run under one of its own helper names is read as git (`git <name>` itself runs `git-<name>`)
+    if (!role && GIT_HELPER.test(argv[0].split('/').pop())) argv = ['git', argv[0].split('/').pop().slice(4), ...argv.slice(1)];
     const rawProg = argv[0];
     const prog = basename(rawProg);
     if (!role && (prog === 'cd' || prog === 'pushd' || prog === 'popd')) continue;
     // SAME-GAP rule U: a program the guard does not strip, with git or gh among its later words, may run them unread:
     // asked (an agent refused); git or gh is then read from that word on, which can only add a deny
-    const gw = !role && prog !== 'git' && prog !== 'gh' && !NON_RUNNERS.has(prog) && !prog.startsWith('-') ? argv.findIndex((w, k) => k > 0 && /^(git|gh)$/.test(basename(w))) : -1;
+    const gw = !role && prog !== 'git' && prog !== 'gh' && !NON_RUNNERS.has(rawProg) && !rawProg.startsWith('-') ? argv.findIndex((w, k) => k > 0 && gitWord(w)) : -1;
     if (gw > 0) {
       if (input.agent_id) return deny(`${KIT_AGENT}; an agent runs git and gh as their own command, not behind ${shownWord(prog)}`);
       dayAsk ??= ask(`kit and gate files ask first in a day session: the guard does not read ${shownWord(prog)} in front of git or gh, ` +
         'so it asks instead of guessing; run git or gh as their own command, or approve it');
-      const sub = argv.slice(gw);
-      const r2 = basename(sub[0]) === 'git' ? await git(sub, vcwd, role, io, input, line) : await gh(sub, role, io, vcwd, input);
-      if (r2?.deny) return r2;
+      const h = argv[gw].split('/').pop(), sub = h.startsWith('git-') ? ['git', h.slice(4), ...argv.slice(gw + 1)] : argv.slice(gw);
+      const r2 = h === 'gh' ? await gh(sub, role, io, vcwd, input) : await git(sub, vcwd, role, io, input, line);
+      if (r2?.deny && !(sub[1] ?? '').startsWith('-')) return r2; // SA-g: a data word before an option asks, not denies
       continue;
     }
     if (prog === 'cd') { // track the folder, so later paths in the line resolve where they will run

@@ -1212,12 +1212,14 @@ export const DAY_CASES = [
       [`SAME-GAP ${w}: git status behind it stays allowed`, dsh(`${w} git status`), null]]),
   // xargs adds words from its input to git or gh, so git or gh behind it asks (a force push is still refused)
   ...['xargs', 'xargs -0', 'xargs -r', 'xargs -t', 'xargs --null', 'xargs --no-run-if-empty', 'xargs -n 1', 'xargs -n1', 'xargs --max-args 1',
-    'xargs --max-args=1', 'xargs -I {}', 'xargs -d x', 'xargs -a f', 'xargs -P 2', 'xargs -L 1', 'xargs -s 99', 'xargs -E x', 'xargs --']
+    'xargs --max-args=1', 'xargs -I {}', 'xargs -d x', 'xargs -a f', 'xargs -P 2', 'xargs -L 1', 'xargs -s 99', 'xargs -E x', 'xargs --',
+    'xargs -p', 'xargs -x', 'xargs -o', 'xargs --verbose', 'xargs --interactive', 'xargs --exit', 'xargs --open-tty', 'xargs --arg-file f',
+    'xargs --delimiter x', 'xargs --max-procs 2', 'xargs --max-chars 99', 'xargs --process-slot-var V']
     .flatMap((w) => [[`SAME-GAP ${w}: a force push behind it is refused`, dsh(`${w} git push --force origin cs/x`), DENY],
       [`SAME-GAP ${w}: git behind it asks (its input adds words)`, dsh(`${w} git status`), ASK, {}, /does not follow xargs \(its input/]]),
   ...['timeout --sig KILL 30', 'timeout --kill 5 30', 'timeout -x 30', 'xvfb-run --server-a x', 'xvfb-run -ae f', 'xvfb-run --auto', 'time -x',
     'exec -x', 'exec -ca x', 'command -x', 'command --foo', 'nohup -x', 'builtin -x', 'noglob -x', '! -x', 'xargs -i', 'xargs -e',
-    'xargs --max 1', 'xargs -l']
+    'xargs --max 1', 'xargs -l', 'xargs --max-lines', 'xargs --max-lines=2']
     .flatMap((w) => [[`SAME-GAP ${w}: ask`, dsh(`${w} git status`), ASK, {}, /^kit and gate files ask first in a day session: the guard does not follow /],
       [`SAME-GAP ${w}: an agent is refused`, dsh(`${w} git status`, { agent_id: 'a1' }), DENY, {}, /an agent runs commands without /]]),
   ['SAME-GAP a keyword before git status stays allowed', dsh('if true; then git status; fi'), null],
@@ -1235,6 +1237,27 @@ export const DAY_CASES = [
   ['SAME-GAP C: past the turn limit, git status asks', dsh(`${'X=1 '.repeat(21)}git status`), ASK, {}, /more than 20/],
   ['SAME-GAP C: past the turn limit, a force push is refused', dsh(`${'env '.repeat(21)}git push --force origin cs/x`), DENY],
   ['SAME-GAP env -u takes git as its value and runs push: no git check', dsh('env -u git push --force origin cs/x'), null],
+  // security-auditor round 1 and the plugin review: their fixes, each pinned
+  ['SAME-GAP xargs --max-lines takes no next word: the force push behind it is refused', dsh('xargs --max-lines git push --force origin cs/x'), DENY],
+  ...['ls | xargs env', 'ls | xargs nohup', 'ls | xargs timeout 30', 'ls | xargs -r env X=1']
+    .flatMap((l) => [[`SA-a ${l}: the program comes from the input: ask`, dsh(l), ASK, {}, /does not follow xargs \(its input/],
+      [`SA-a ${l}: an agent is refused`, dsh(l, { agent_id: 'a1' }), DENY]]),
+  ['SA-a ls | xargs (no wrapper after it) stays silent', dsh('ls | xargs'), null],
+  ['SA-g a data word git before an option: ask, not deny', dsh('find . -name git -prune -o -print'), ASK, {}, /does not read find in front of git or gh/],
+  ['SA-g an agent is refused', dsh('apt-get install git -y', { agent_id: 'a1' }), DENY],
+  ['SA-g a git option before a force push, behind an unknown program: ask, not pass', dsh('sudo git -c x=y push --force origin cs/x'), ASK],
+  ['SA-d git under a helper name behind an unknown program is read on', dsh('sudo /usr/lib/git-core/git-push --force origin cs/x'), DENY],
+  ['SA-d a helper name behind an unknown program asks', dsh('sudo git-status'), ASK],
+  ['SA-h a word ending in /git/ is not git', dsh('sed -i s/foo/git/ docs/x.md'), null],
+  ['SA-b a path to a read-only program is not spared', dsh('./echo git push --force origin cs/x'), DENY],
+  ['SA-b a path whose last part starts with - is not left out', dsh('./-w git push --force origin cs/x'), DENY],
+  ['SA-f a leftover option word keeps its wrapper reason (U leaves it out)', dsh('env X=1 -i git status'), ASK, {}, /does not follow env before -i/],
+  ...['rg git docs', 'man git'].map((l) => [`SA-f ${l}: not read-only, so git asks`, dsh(l), ASK]),
+  // SA-D-DIRECT: git called by one of its own helper names, with nothing in front, is read as git
+  ['SA-d a helper checkout of a kit file from another branch is refused', dsh('/usr/lib/git-core/git-checkout origin/x -- .claude/settings.json'), DENY],
+  ['SA-d a helper restore from another source is refused', dsh('git-restore --source origin/x CLAUDE.md'), DENY],
+  ['SA-d an agent: a helper checkout is refused', dsh('git-checkout origin/x -- CLAUDE.md', { agent_id: 'a1' }), DENY],
+  ['SA-d a helper status decides as git status does', dsh('/usr/lib/git-core/git-status'), null],
   ['SA-R1-4 a long word is cut in the reason', dsh(`nice --adj=${'x'.repeat(40)} git status`), ASK, {}, /does not follow nice --adj=x{26}\.\.\. in front/],
   ['SA-R1-4 a control character is shown as ?', dsh("nice '--a\nb' git status"), ASK, {}, /does not follow nice --a\?b in front/],
 ];
@@ -1452,8 +1475,15 @@ const DAY_MUTANTS = [
   ['SAME-GAP C the turn limit asks', 'if (turns === 20 && a.length) unreadable ??=', 'if (false) unreadable ??='],
   ['SAME-GAP U asks', 'if (gw > 0) {', 'if (false) {'],
   ['SAME-GAP U refuses an agent', 'if (input.agent_id) return deny(`${KIT_AGENT}; an agent runs git and gh', 'if (false) return deny(`${KIT_AGENT}; an agent runs git and gh'],
-  ['SAME-GAP U reads on', 'if (r2?.deny) return r2;', ''],
-  ['SAME-GAP U spares the read-only programs', '!NON_RUNNERS.has(prog)', 'true'],
+  ['SAME-GAP U reads on', 'if (r2?.deny && ', 'if (false && '],
+  ['SAME-GAP U spares the read-only programs', '!NON_RUNNERS.has(rawProg)', 'true'],
+  ['SA-b U spares read-only programs by their bare name only', '!NON_RUNNERS.has(rawProg)', '!NON_RUNNERS.has(prog)'],
+  ['SA-b U leaves out a program word starting with -', "!rawProg.startsWith('-')", 'true'],
+  ['SA-g a data word before an option asks', "if (r2?.deny && !(sub[1] ?? '').startsWith('-')) return r2;", 'if (r2?.deny) return r2;'],
+  ['SA-a a wrapper run by xargs', 'if (fed) fedWrap = true;', ''],
+  ["SA-d git's helper names", "|| GIT_HELPER.test(x); };", '; };'],
+  ['SA-h the last path part, not basename', "const x = w.split('/').pop();", 'const x = basename(w);'],
+  ['SA-d a helper name with nothing in front is read as git', 'if (!role && GIT_HELPER.test(argv[0]', 'if (false && GIT_HELPER.test(argv[0]'],
 ];
 test('mutation runs (kit-v3-3 day rules): every rule is needed by some day case', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
