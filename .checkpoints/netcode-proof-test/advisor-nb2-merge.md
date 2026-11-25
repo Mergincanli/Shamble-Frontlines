@@ -28,7 +28,13 @@ No Critical or High. Risk tier 1: spike code and notes; no kit, CI, gate or giti
     folder.
   - So it is R1's path, due at U6c's M9, not "in a reset's first 30 minutes" as plan :23-24 files it. NB2's step 1
     starts only after 0b is done and on the card (or the card says why it is not due).
-  - Met: before step 1; the plan's Order text.
+  - 0b edits two manifests and the lock in the main folder and ends with its own save (u7-brief.md:245-251, :362), so
+    H0 will hold it. Two bars follow:
+    - Before 1g, `git status --short --untracked-files=all` lists nothing outside `.checkpoints/`.
+    - The main-run.sh headers of 1i, step 4 and step 5 (main-run.sh:42, the diff and untracked hashes) read the same
+      clean values. A dirty tree: NB2 waits.
+  - The "+47" bars then rest on 0b's own check counts, which its item (10) holds equal to M5's.
+  - Met: before step 1; the plan's Order text; 1i, 4, 5.
 - **NB2-C2 (Medium): the gap is measured, not assumed.**
   - Card :148 expects U6c's near-cold M5 to fill about 7.8 GB, so 1f will likely land under 8,192 MiB. Then the
     part-clean runs, and step 4 is cold. The 45-minute projection (U6b's warm 23.5 min) and the Risks line "mostly
@@ -111,16 +117,25 @@ No Critical or High. Risk tier 1: spike code and notes; no kit, CI, gate or giti
   - The trial merge cannot show how these meet; step 4 does. Builder 2 drops no SERIES.md row name, and the two sides
     add no name in common, so the name checks cannot newly fail.
   - Met: Risks text.
-- **NB2-C10 (Low): the report's own line under his 2026-11-15 rule (history.md:2127)**, naming what covered what:
+- **NB2-C10 (Medium): one reviewer's read of 72651a3c's last judge lines, then the report's own line under his
+  2026-11-15 rule (history.md:2127).**
+  - His rule asks for "a reviewer's read before its unit closes". 72651a3c's last 67 lines after the re-check's head
+    67892d39 (figures.rs's no-tail guard, two engine tests, README and SERIES text) had the advisor agent's read and
+    his main Advisor's check, not a reviewer agent's. His 24 November item 4 ("have your advisor agent read it")
+    covers 67892d39 only. Whether the advisor agent's read counts is his to say; I do not settle it by approving.
+  - So: a short read-only test-engineer read (or rust-reviewer) of `git diff 67892d39 72651a3c --
+    spikes/netcode-proof/crates/judge spikes/netcode-proof/marks`, in step 9's window, before NB2-MERGE's report.
+  - The merge need not wait: the rule's deadline is the unit's close, and the merge changes no byte of those lines. A
+    finding above Low gets a forward fix, plan first, as the advisor rules.
+  - The report's line then names what covered what:
   - part a: b22c30cd, read by test-engineer and rust-reviewer; its fix pass 0e0f6547, by the advisor agent;
   - part b: a3476e6c, read by both reviewers. The fix pass 7c3855c7 with 67892d39 (marks.json's five lines; his 24
     November item 4: "have your advisor agent read it. No new review round for it."): both reviewers' re-check on
     67892d39, and the advisor agent;
-  - 72651a3c's last 67 lines (figures.rs's no-tail guard, two engine tests, README and SERIES text): the advisor
-    agent's APPROVE and his main Advisor's check, not a reviewer agent. The test-engineer's re-check had proposed that
-    guard;
+  - 72651a3c's last 67 lines: the advisor agent's APPROVE, his main Advisor's check, and this condition's reviewer
+    read. The test-engineer's re-check had proposed that guard;
   - this merge changes no judge or marks.json byte (step 3's empty diff against T).
-  - Met: the report.
+  - Met: step 9's window; the report.
 - **NB2-C11 (Low): -57 is not run in this merge** (section 3). The report's "not verified" list names it, with the
   reason. Met: the report.
 - **NB2-C12 (Low): text.**
@@ -180,7 +195,8 @@ No Critical or High. Risk tier 1: spike code and notes; no kit, CI, gate or giti
   - Builder 2 left read_logs unchanged.
   - npt-log changed since b57221e only by additions (Machine::read_local, cpu_list, a test; +111 -0). Neither branch
     touches it, so the logs written at b57221e parse as they did.
-- **The two lines, exactly** (`{:<12} {:<9} {first}`, lib.rs:50-62; `moved to {to}: {why} ({by})`, marks.rs:90-92):
+- **The two lines, exactly** (`{:<12} {:<9} {first}`, lib.rs:50-62; `moved to {to}: {why} ({by})`, marks.rs:90-92).
+  Each is one line on stdout; the breaks below are for width only, so compare the text, not the breaks:
   - measured: `PM-0001-47   MOVED     moved to Slice 1 change-set 7 (Lag): the clock estimate is the real client's; its
     L1 pass here (a4cac39) stays as a record (NPT-TRIM, 2026-11-21 (the re-plan, approved 2026-11-22)); 3 run(s) here
     list it: counted, not judged`
@@ -201,7 +217,7 @@ No Critical or High. Risk tier 1: spike code and notes; no kit, CI, gate or giti
 | ADV-NB2-7 | Low | Step 3 uses a short kit pathspec; no tree anchor; redact's item count is not bound. | NB2-C7 |
 | ADV-NB2-8 | Low | No ruling for a moved tip. | NB2-C8 |
 | ADV-NB2-9 | Low | Risks miss the SERIES.md and marks.json cross-reads in other crates' tests. | NB2-C9 |
-| ADV-NB2-10 | Low (on record) | 72651a3c's last 67 lines were read by the advisor agent and checked by his main Advisor, not by a reviewer agent. | NB2-C10: said plainly in the report |
+| ADV-NB2-10 | Medium | 72651a3c's last 67 judge lines were read by the advisor agent and checked by his main Advisor, not by a reviewer agent; his 2026-11-15 rule asks for a reviewer's read, and his 24 November item 4 covers 67892d39 only. | NB2-C10: a reviewer read in step 9's window; the report line |
 | ADV-NB2-11 | Low | -57's half of the re-plan's real-data line: never run nor dropped since plan-a.md:73; not runnable as worded. | NB2-C11; follow-up |
 | ADV-NB2-12 | Low | Text: 33 rows; "self at both"; Builder 2's "before the merge"; the `--abort` reason; PR #40's close and the other slug. | NB2-C12 |
 | ADV-NB2-13 | Low (kit) | CLAUDE.md's "Still allowed" list names no merge of another lane's branch that changes no kit file. | Kit follow-up after the freeze, with ADV-M54-8 |
