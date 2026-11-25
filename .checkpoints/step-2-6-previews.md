@@ -58,15 +58,18 @@ no wall detail, footer).
 U1, part 1 done: dfc8fb6 (hosting/preview.mjs, hosting/preview.test.mjs, hosting/_headers, REPO_MAP's hosting/ row):
 117 tests pass in a scratch copy with the approved texts; 28 of 28 mutations caught; gate PASS (--no-smoke); map OK.
 Evidence: step-2-6-previews/build-notes.md (B1 to B6).
-U1, part 2: 1f4fd0d (hosting/package.json b47551b1..., hosting/package-lock.json df24ffc3...), committed locally,
-HELD (not pushed); the security-auditor's M3 answer is running (its notes: security-auditor-deps.md, D1-D3 agree).
-U3 done locally: 8a8531a (DECISIONS: his 17:05, 18:15, 20:35 messages, 70 lines, by script; the dated pointer in #67's
-report on the 2fc39fb section). Behind the held commit, so it pushes with the dependency record.
-The advisor agent's verdict on F1-F4 is running. Ready for the message: texts/preview-proposed.yml (10577 bytes,
-sha256 31119c06e7d095baa3c99ed54bbc1a2c72d05b8b3cab88ffd4512dc12acd3abc; only line 50 differs; 117 tests pass on it).
-Drafted, uncommitted: docs/runbooks/previews.md (waits for the F2 verdict; REPO_MAP row to add with it).
-Next: dependency-check.md after the M3 answer, then save (pushes 1f4fd0d and 8a8531a); the questions file, pushed;
-ONE message to him (F1 new text and sha256; F2 decision; F4 risk). U2 after his yes on the new text.
+U1, part 2 done: 1f4fd0d (hosting/package.json b47551b1..., hosting/package-lock.json df24ffc3...); the
+security-auditor's M3 answer APPROVE on both sha256, no findings (notes: security-auditor-deps.md, D1-D7; O1-O3 kept
+for round 1); dependency-check.md written from sha256sum, naming those notes.
+U3 done: 8a8531a (DECISIONS: his 17:05, 18:15, 20:35 messages, 70 lines, by script; the dated pointer in #67's report).
+986547d: docs/runbooks/previews.md (written for PREVIEW-MISSING-BUILD-COMMENT (a); changes if he picks (b)), its
+REPO_MAP row, the prefix test; 117 tests pass; 29 of 29 mutations caught.
+The advisor agent's verdicts on F1-F4 (advisor-build-findings.md): F1 APPROVE with conditions; F2 to him as
+PREVIEW-MISSING-BUILD-COMMENT, recommend (a); F3 within the plan, name the split in the report; F4 settled by GitHub's
+rendered docs (re-read with curl); the order approved; Finding A (Medium): the security-auditor reads the proposed
+preview.yml, the token check's added duty and F3's split BEFORE the message to him.
+Next: the security-auditor's early read (Finding A); then the questions file final, pushed; ONE message to him
+(NEW-TEXT: the new text 31119c06... with the one-line diff; PREVIEW-MISSING-BUILD-COMMENT). U2 after his yes.
 
 ## Findings during the build (U1)
 - F1 (a defect in the approved preview.yml, job `tests`): `run: node --test hosting/` fails on Node 22: the folder is
@@ -75,7 +78,8 @@ ONE message to him (F1 new text and sha256; F2 decision; F4 risk). U2 after his 
   hosting/package.json would also make the folder argument work (measured), but hides the fix. Proposed: change that
   one line and bring him the new text and its sha256 before his sitting (his 20:35 item 5).
 - F2 (plan prose against the texts): section 2.7 says the comment reports a missing build once the hand-over step is
-  on main; with the approved texts it cannot: `check` failing leaves `go` unset, so `after` (the comment) does not run.
+  on main; with the approved texts it cannot: when `check` fails, `go` is not `true` (check-build writes go=false
+  and exits 1), so `after` (the comment) does not run.
   The failure shows as a red `check` job under main's Actions tab instead.
 - The real build (toolchain run 45686704452, job 139461080011, 2026-11-25 19:36 UTC): index.html plus assets/
   index-*.css, index-*.js, sim_wasm_bg-*.wasm, worker-*.js; names use [A-Za-z0-9_-] and dots (hashes hold _ and -).

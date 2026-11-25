@@ -51,12 +51,19 @@ GitHub (docs.github.com):
 - List deployments (rest/deployments/deployments): `environment` parameter; max per_page 100; order not stated.
 - Pulls (rest/pulls/pulls): `state` open|closed|all; objects carry `state`, `head.sha`, `head.repo.full_name`,
   `base.repo.full_name`.
-- Permissions: the per-endpoint "fine-grained" boxes are not in the text the tool receives. The GitHub Apps page
-  (rest/authentication/permissions-required-for-github-apps) lists POST and PATCH of issue comments under both
-  "Issues" (write) and "Pull requests" (write), each with the "Additional Permissions" checkmark, which the page says
-  marks either "more than one permission" or "any one permission from a set". So whether `pull-requests: write` alone
-  can write the comment is NOT settled by a quote: risk R-COMMENT-PERM, proven or refuted on the first real run (the
-  comment appears, M5/M9). `GET .../deployments` is under "Deployments" (read), no checkmark.
+- Permissions, settled (the advisor agent found it; this session re-read the rendered pages with curl, 2026-11-25
+  ~20:50 UTC, HTTP 200; the web-fetch tool's text lacked these boxes):
+  - https://docs.github.com/en/rest/issues/comments, "Create an issue comment" and "Update an issue comment": "This
+    endpoint works with the following fine-grained token types : ... GitHub App installation access tokens ..." and
+    "The fine-grained token must have at least one of the following permission sets: "Issues" repository permissions
+    (write) "Pull requests" repository permissions (write)". "List issue comments": Issues (read) or Pull requests
+    (read). So `after`'s `pull-requests: write` is enough; `issues: write` stays out.
+  - https://docs.github.com/en/rest/deployments/deployments, "List deployments": "The fine-grained token must have the
+    following permission set: "Deployments" repository permissions (read)" (`after` holds deployments: read).
+  - https://docs.github.com/en/rest/pulls/pulls, "List pull requests": "Pull requests" (read); "Get a pull request":
+    "Pull requests" (read) or "Contents" (read) (`check` and `reconcile` hold pull-requests: read).
+  - The first run confirms it (M5/M9). If it were ever refuted: a tier-2 fix adding `issues: write` to `after`, a new
+    sha256 and his yes.
 - REST pages now name `X-GitHub-Api-Version: 2026-03-10`; the script sends 2022-11-28 (the workflow-syntax page's links
   still carry it).
 
@@ -110,7 +117,11 @@ GitHub (docs.github.com):
   (the order of calls), its cap and its fail-closed listing; the comment from checked values only; the header file's
   test; G9's lint (L0 layout, L1 `${{` in run, L2 secrets outside a step env, L3 installers, L4 cache, L5 pins and
   credentials), each with a planted variant of the real preview.yml.
-- The mutation sweep (scratchpad mutate.py): 28 mutations of the script, each breaking one guard; the suite fails on
-  all 28 (one survivor, the output's own shape check, got its own test first).
+- The mutation sweep (scratchpad mutate.py): 29 mutations of the script, each breaking one guard; the suite fails on
+  all 29. Two survivors along the way got their own tests first: the output's own shape check, and the link's prefix
+  (pull request 1 against pr-12's link: the test's fake GitHub now answers every number, so only the link check can
+  refuse; the advisor agent's Low on F3).
+- Until U2 places preview.yml, `node --test hosting/preview.test.mjs` in the real tree fails loudly (ENOENT on
+  .github/workflows/preview.yml): the suite runs in a scratch copy with the texts placed (the advisor agent's Low).
 - Gate: `node tools/gate.mjs --no-smoke` PASS; `node .claude/scripts/repo-map-check.mjs` OK (198 entries, 110 paths)
   after REPO_MAP's new `hosting/` row.

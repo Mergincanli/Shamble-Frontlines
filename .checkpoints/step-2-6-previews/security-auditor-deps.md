@@ -92,3 +92,44 @@ D7 verdict.
 - Pre-release versions (miniflare 5 beta, youch 4.1.0-beta.10, unenv 2.0.0-rc.24) are Wrangler's own exact pins.
 - npm installs some extras on glibc (linuxmusl, sharp-wasm32, @emnapi/runtime, tslib): integrity-checked, unused.
 - No finding against the two files.
+
+## Corrections and additions (after the advisor agent's check of my record)
+- D1 tree = commit: `git diff --stat 1f4fd0d -- hosting/...` empty (working tree = 1f4fd0d630e8...); `git diff --stat
+  HEAD 1f4fd0d -- hosting/...` empty at HEAD 098ed460 (later commits are checkpoints/docs only). Only untracked path
+  at the time: docs/runbooks/ (not mine, not in scope).
+- D3 exit codes: the first "exit 0" was tail's status. Re-run from a cleared node_modules with captured statuses:
+  `npm ci --ignore-scripts --no-audit --no-fund` exit 0, "added 40 packages in 3s"; `npm audit` exit 0, "found 0
+  vulnerabilities"; `npm audit signatures` exit 0, "audited 39 packages", "39 packages have verified registry
+  signatures", "24 packages have verified attestations" (outputs: .gate/step26-deps/ci2.txt, audit2.txt, sig2.txt).
+  sha256 of the copies unchanged after.
+- Attestations: verified by npm for the installed (audited) packages only; my registry.mjs checked signatures and
+  integrity for all 91, not attestations.
+- Install-script list cross-checked two ways: (a) the registry manifests (registry.jsonl) carry
+  preinstall/install/postinstall only on esbuild 0.28.2 (postinstall), fsevents 2.3.3 (install), workerd
+  1.20261117.1 (postinstall); `prepare`/`benchmark:install` entries (path-to-regexp, cookie, @sindresorhus/is, undici,
+  @jridgewell/*) do not run on a registry install; (b) `find node_modules -name binding.gyp`: only
+  sharp/src/binding.gyp, not at the package root and sharp has no gypfile flag or install script, so no implicit
+  node-gyp build. The list = the lockfile's hasInstallScript flags.
+- Builder's error 9106 not reproduced as such: my dummies gave 6003/6111 (hyphenated) and 10000 + 9109 (40-char), and
+  a fourth run hit 10429 (rate limited; probing stopped). Same conclusion: the API call path is reached.
+- Hosts: probe 3 (strace write/sendto -s 300, grep CONNECT): only `CONNECT api.cloudflare.com:443` (x2); probe 4 with
+  a fresh HOME: api.cloudflare.com x1. Wrangler still printed "update available 4.168.0": the update lookup's host was
+  not observed in probes 3-4 (likely a cache outside HOME, e.g. the OS temp folder: inferred, not proven); probe 2's
+  second connect is the likely registry lookup. A version lookup only; no code fetched (no execve beyond node and
+  the esbuild binary).
+- Stray write: the D3 `wrangler --version` ran with the real HOME and may have written under ~/.config/.wrangler
+  (Wrangler's log folder). Left in place, as told (nothing outside .gate/step26-deps removed).
+
+## D7 verdict
+APPROVE hosting/package.json sha256 b47551b125f78a667a031dd0718a025981c1395c036be3c330b5239aef7b9726 and
+hosting/package-lock.json sha256 df24ffc392062d041d4be8f9ac5b51be7a6696e0c5a8cbfc3bac0dc07a4924fc (re-hashed just
+before this verdict). No finding against the two files.
+hasInstallScript: esbuild 0.28.2, fsevents 2.3.3 (darwin only, not installed on Linux), workerd 1.20261117.1.
+Observations for round 1 (preview.yml / the script), not findings and given no severity:
+- O1 Wrangler's update check runs inside the token step (a registry version lookup, no code); WRANGLER_SEND_METRICS
+  "false" is already at texts/preview.yml:29.
+- O2 `npm audit signatures` skips the orphan @img/sharp-wasm32 (no incoming edge); covered here by my own signature
+  check; a future bump's DEP-HOLD should re-check it the same way.
+- O3 Any bump of wrangler = a new DEP-HOLD and a tier-2 PR (plan :127); 4.168.0 is current latest.
+Not verified: the real upload with a real token (M5); attestations for non-installed platform packages; the update
+lookup's host; behaviour on runners other than ubuntu-24.04 x64.
