@@ -29,7 +29,8 @@ Check, each with its evidence:
    (crates/judge/src/eval.rs: the early return and the headline order)? Name the headline text to expect and whether
    the exit code is 0.
 4. The stop rules, the risks, the tier and the review line his rule of 2026-11-15 needs (history.md:2127).
-5. Answer Q1 and Q2, and say whether -57's re-judge (the plan's Record) should run.
+5. Answer Q1 and Q2; rule step 5's disk fallback (the dev part-clean before the re-judge, under main-run.sh's 4 GiB
+   floor); and say whether -57's re-judge (the plan's Record) should run.
 
 At your launch the main folder may hold U6c's merge in progress (24 applied files, uncommitted; later its counted run).
 That is not part of this check: do not wait for it, and run nothing that takes the lane.

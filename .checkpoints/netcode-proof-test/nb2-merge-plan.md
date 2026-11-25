@@ -86,6 +86,9 @@ change-set after this merge; the pointers are passed).
       N0 (refs), the marks, self and redact lines. Nothing is saved after it, so N0 is H0's count.
 2. `git merge --no-ff -m "<subject>" -m "<body>" -m "<the two attribution lines>" T`, the body naming his word
    (history.md:7909), T and 72651a3c. Expected: exit 0, "Merge made by the 'ort' strategy."
+   - This call may ask: settings.json's allow list holds `git merge-base` only, not `git merge` (nor Q2's `git revert`),
+     so the permission mode decides. Each is named in the chat before it is sent (his rule of 2026-11-16 21:50). If
+     refused: no retry, nothing is merged, one line to him; the saver restarts and saves resume.
 3. Content checks (read only):
    - `git rev-parse HEAD^1 HEAD^2` = H0 and T.
    - `git diff --shortstat H0 HEAD` equals `git diff --shortstat e2c0e896 T` (46 files, +6,951/-208 at 0e621dae).
@@ -97,8 +100,11 @@ change-set after this merge; the pointers are passed).
 4. His whole check: free disk again (as 1f), then `bash .checkpoints/netcode-proof-test/main-run.sh
    /home/user/Shamble-Frontlines/.gate/nb2-merge/check.log env CARGO_INCREMENTAL=0 node check.mjs` in the background,
    timeout 7200000. Bar: all 11 steps pass; measured and bites = U6c's M5 counts + 47 each; 0 failed, 0 skipped; marks
-   81 read, rows unchanged; self as M5; redact 0 findings; refs N0 + 32; wasm as M5.
+   81 read, rows unchanged; self as M5; redact 0 findings; refs N0 + the added count of 1c (32 at 0e621dae); wasm as M5.
 5. His re-judge, in the set's two calls, each through main-run.sh (the lane lock; cargo builds the judge):
+   - First, free disk: main-run.sh stops under 4 GiB (`df -B1 --output=avail /home/user`, main-run.sh:38-45), and
+     step 4 may leave less. Under 4,096 MiB: the approved dev part-clean (u4r-disk-plan.md), which costs only the
+     judge's rebuild since step 4 is done, then the two calls. A fallback for the checker to pre-rule, not a stop.
    - `bash .checkpoints/netcode-proof-test/main-run.sh /home/user/Shamble-Frontlines/.gate/nb2-merge/rejudge-47-measured.log
      cargo run -q --locked -p npt-judge -- --marks marks/marks.json --logs
      /home/user/Shamble-Frontlines/.gate/netcode-proof-test/runs/u4f-47-b57221ed139d/measured --only PM-0001-47 --out
@@ -109,7 +115,8 @@ change-set after this merge; the pointers are passed).
      fit) against the 10,240 MiB line.
 6. `node tools/gate.mjs --no-smoke` PASS, against the merge-base with main.
 7. Nothing is edited by hand: no rule, mark, number or file of Builder 2's.
-8. The card save (it pushes the merge and the save); CI on the pushed head: gate, smoke and toolchain green and PR #40
+8. The card save (it pushes the merge and the save, with no skip marker since a commit other than notes is ahead:
+   checkpoint.mjs:206-207); CI on the pushed head: gate, smoke and toolchain green and PR #40
    mergeable; the saver restarts; Builder 2 is told the merged SHA (its NPT-L2-ONEWAY takes this head in first).
 9. The advisor's check of the pushed head by SHA (MAIN-65 step 7's form), in the next reset's first 30 minutes.
 
