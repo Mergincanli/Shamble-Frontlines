@@ -22,6 +22,7 @@ _Last updated: 2026-11-25 (guard-env-fix, #69, in flight. Main 3ab9eaec is #68's
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
+| #67 | ADR 0006's small revision after the preview hosting check, by lane 2 (the chat he calls Builder V2), on his ONE-OFF-HEADER (a) and STEP4-COUNT (b): the header mark (PM-0006-2) judged on production's own addresses, with the reason in the row, and production's one-off links with the host's header recorded, not judged; part 1 weighs Workers static assets in a short paragraph from Cloudflare's docs read 2026-11-25 (nothing measured on Workers; in the draft, Pages stays); the build-count question said plainly to be not answered; the pass words of PM-0006-7 and checklist step 4 re-stated as the advisor agent's reading of his STEP4-COUNT (b), never as his decision; part 1's "no cap on previews" dated; report `docs/reports/2026-11-25-adr0006-header-row.md` | `claude/optimistic-albattani-mdoonz` (stands in for `cs/adr0006-header-row`) | a draft until the advisor agent approves its final head, then ready; risk tier 1 (an ADR draft, and his message of 2026-11-25, 11:07:07 UTC in `docs/DECISIONS.md`) | the advisor agent's approval of the head that takes main's #68 merge in, then his go for it (his answers of 2026-11-25, 14:55 Amsterdam, in `docs/DECISIONS.md`: PASS-WORDS (a) with his condition, step 4 achieved (recorded, the question is not answered), WORKERS-NEXT (a)) |
 | #69 | guard-env-fix (SEC-U7B-1: the day guard dropped env, nice and stdbuf option words but not their values, so git and gh behind them went unchecked in a day session or subagent; routines unchanged), by the chat he calls the Guard fix chat | `claude/confident-gates-tbnq38` (stands in for `cs/guard-env-fix`) | draft; risk tier 2, needs-mustafa; code head c3827f4; guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES | the advisor agent's review of the final head; his go for that head (a day session) |
 
 ## Next
@@ -34,10 +35,9 @@ _Last updated: 2026-11-25 (guard-env-fix, #69, in flight. Main 3ab9eaec is #68's
    ladder, with the state's hash on the players' file and `devtools`' three path edges; its plan holds the reviewers'
    items (the archive, "From change-set 3b"). Then change-set 4, the first outside crate in `sim` (its plan names
    3A-FMA-CHECK). The first builder chat stays paused; Slice 3 waits for #40 and picks how commands are timed.
-3. Lane 2 (Builder V2), in his order of 2026-11-25: #66; ADR 0006's small revision of the header row (its own pull
-   request); step 2.6's plan (its first edit after his go on the revised row); the carry of his look decisions when his
-   block comes; then one plan for the look test page and the model-check tool (his EARLY-LOOK (a)); nothing built
-   before his go on that plan.
+3. Lane 2 (Builder V2), his order of 2026-11-25: #66 merged (09faefa); #67 (ADR 0006's revision) on his go after it
+   takes main in; step 2.6's plan (its first edit after his go on the revised row); the carry of his look decisions when
+   his block comes; one plan for the look test page and the model-check tool (EARLY-LOOK (a)), built after his go.
 
 ## Waiting on Mustafa
 - Change-set 3b: his go for the merge of exactly its last commit (he gets the full id after the advisor agent's approval
@@ -49,9 +49,8 @@ _Last updated: 2026-11-25 (guard-env-fix, #69, in flight. Main 3ab9eaec is #68's
   their next revision, which comes to him before it is written (**3B-RELEASE-DRAFTS**, his).
 - His to give: ACCT-3's roles and CLAUDE.md line (his third account, counted like the other two); his go before anything
   goes to the Rust project (3A-RUST-REPORT); ADR 0004 part 7's pointer sentence, shown first (3A-PART7-POINTER).
-- Lane 2's preview hosting check (#66): all his answers of 2026-11-25 are in DECISIONS (HISTORY-ID (a): a normal
-  merge); his go for the final head after his main Advisor checks it. He switches off the test repository's hourly checker himself before 2 December. After the
-  merge: archive the test repository, delete the test project and its Access application.
+- Lane 2's #67: his go for the head that takes main's #68 merge in. At his own timing (TR-END met): the test
+  repository's hourly checker off before 2 December, then its archive, then the test project and its Access app deleted.
 - From Part 15 (its "Lane requests" issue: #59): give lane 2 Part 15 and ask for its needs from the block; tell lane 2
   which chat on his PC makes the model files; the VFX chat's exports; pass the VFX findings on.
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's
@@ -101,8 +100,9 @@ _Last updated: 2026-11-25 (guard-env-fix, #69, in flight. Main 3ab9eaec is #68's
   for PM-0002-13 and -8 3B-KEY-POST, 3B-SATURATED; for Slice 3 3B-REFUSED-FIELD; his: 3B-LONG-HOLD, at ADR 0001's next
   edit, with 3B-OQ6-POINTER; 3B-RELEASE-DRAFTS; design: 3B-PACER-255; for 4 3B-RESUME-FLASH; for the CI pull request
   3B-OTHER-BROWSERS; later 3B-POOL-16, 3B-CSS-PROD, 3B-PUB-MODS, 3B-BLUR-TEST, 3B-HOSTILE-ALLOC; 3c's plan items.
-- **From the preview hosting check** (lane 2; the archive's block): for step 2.6's plan PHC-CLICKLESS, PHC-LOCKFILE,
-  PHC-TOKEN-SETUP, PHC-PROBES, PHC-DELETE, PHC-ACTIONS-READ, PHC-ERROR-PATH; at the merge PHC-TR-END; PHC-SCRIPT-LOWS.
+- **From ADR 0006's revision** (#67, lane 2; the archive's block): ADR6-ROLLBACK (Medium), -WK-ROUTE, -WK-BIC,
+  -PAGES-RETENTION, -PM7-PAGES, -PM7-FIGURE, -WORDING, -REVISIT-WORKERS; step 2.6: STEP26-WORKERS, PHC-PREVIEW-NOINDEX.
+  #66's follow-ups (PHC-CLICKLESS and the rest, for step 2.6): the archive's "Moved from STATUS (2026-11-25, lane 2)".
 - **From guard-env-fix (#69):** GEF-SAME (the same kind of gap in other wrappers and keywords the day guard strips; the forms are with Mustafa, kept out of the repository), SA-R1-3 (the wrapper loop's turn cap), SA-R2-2 (very long lines against the hook timeout), V-2 (the folder tracking after a split-string value), the reason-text nit.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
@@ -115,6 +115,6 @@ _Last updated: 2026-11-25 (guard-env-fix, #69, in flight. Main 3ab9eaec is #68's
   spot-checked; unread sources); change-set 3a's (MUL-ADD first); change-set 3b's (no bound yet on how late a command
   runs, before online play; releases worked out, not counted). **Legacy (frozen):** 3a's ranked list (PR #15); bot
   navigation; the editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
-- **Preview hosting (lane 2):** PHC-HEADER, the header mark not met as written (back to the draft); PHC-PROBE-MAIL.
+- **Preview hosting (lane 2):** PHC-HEADER (the header mark; revised by #67, waiting for his go); PHC-PROBE-MAIL.
 
 ## Where STATUS's old sections went: the table is at the end of `docs/STATUS_ARCHIVE.md` (moved there 2026-11-18)

@@ -127,6 +127,34 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 13:55:08 UTC: his answers on pull request #67: PASS-WORDS (a), the three re-worded
+  places stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads
+  "recorded, the question is not answered", never "passed" on its own, and until someone shows a count the previews work
+  as if uploads count; checklist step 4 under its new words: achieved; WORKERS-NEXT (a), keep Pages, Cloudflare's "Start
+  new projects with Workers" added to the draft's "Revisit when" line at its next revision, and step 2.6's plan keeps
+  the deploy step small enough to move to Workers later, says in two lines what such a move would cost and weighs the
+  30-day rule for old previews; no go for #67 yet: when main shows the merge of #68 (lane 1's change-set 3b), that main
+  taken into lane 2's branch by one merge commit keeping both lanes' text, lane 1's lines byte for byte, this message
+  recorded in the same push, then the advisor agent's approval of exactly that commit, green checks, and its full commit
+  id to him; if #68 is not merged by Thursday 26 November, 12:00 Amsterdam, one line to him and wait; until the
+  repository's guard is fixed, no session or agent of lane 2 puts env, stdbuf or nice with options in front of git or
+  gh** (the builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat
+  on his personal account; his label: "For Builder V2, from me, written with my main Advisor (25 November, 14:55
+  Amsterdam)"; message 36549253-a995-4624-bb88-0ae8233412c1, whole; extracted by script from the chat's transcript).
+  Records, not his words: PASS-WORDS and WORKERS-NEXT are the two entries of "Decisions needed" in
+  docs/reports/2026-11-25-adr0006-header-row.md; #67's head when he wrote was 215e6d20df051f8b8a603036d656efbcea2fc2a5,
+  approved by the advisor agent. Copied by script (1809 bytes, sha256
+  d631ad5df8a25ce17563ab081552e26bccba9f2dcb036a595aae16e330cd66bd):
+> For Builder V2, from me, written with my main Advisor (25 November, 14:55 Amsterdam).
+>
+> 1. PASS-WORDS (may the three re-worded places stand): (a), they stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads "recorded, the question is not answered", never "passed" on its own. Until someone shows a count, the previews work as if uploads count.
+> 2. Checklist step 4 under its new words: achieved. What I read on 18 November: no count shown, before and after the ten uploads.
+> 3. WORKERS-NEXT: (a), keep Pages. At the draft's next revision add Cloudflare's "Start new projects with Workers" to its "Revisit when" line. In step 2.6's plan: keep the deploy step small enough to move to Workers later, say in two lines what such a move would cost, and weigh the 30-day rule for old previews.
+> 4. No go for #67 yet, because main moves first: change-set 3b (pull request #68, lane 1) merges today, and after it #67 no longer merges cleanly. Both lanes changed five docs: DECISIONS, REPO_MAP, ROADMAP, STATUS and STATUS_ARCHIVE. When main shows the merge of #68: take that main into your branch by one merge commit that keeps both lanes' text, with lane 1's lines byte for byte, as Builder V3 did for your #66. Record this message in the same push. Then your advisor agent's approval of exactly that commit and green checks on it, and give me its full commit id in one line. My main Advisor runs the merge check and I give my go for that commit.
+> 5. If #68 is not merged by Thursday 26 November, 12:00 Amsterdam, tell me in one line and wait.
+> 6. Until the repository's guard is fixed (a finding of today, another chat fixes it): no session or agent of yours puts env, stdbuf or nice with options in front of git or gh.
+>
+> Answer in at most 6 lines. Plain words, as before.
 - **Taken by Mustafa, 2026-11-25, 12:14:23 UTC: his browser check of change-set 3b in Firefox: clean; the hidden-tab
   remark he made of Brave did not come again, in Firefox or in Brave** (the builder chat he calls Builder V3,
   session_01WLuqnvpAh9XTitx8ehKJcQ, a Claude Code chat on the account that also holds his claude.ai project "Shamble
@@ -355,6 +383,22 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > worker.undetached: 0
 > worker.hardwareConcurrency: 11
 > worker.crossOriginIsolated: false
+- **Taken by Mustafa, 2026-11-25, 11:07:07 UTC: his go for the merge of pull request #66 at exactly
+  d7937de0aad4b86748c7c4574bee5a6921eeb67c, as a normal merge (his HISTORY-ID (a)), with that commit as the expected
+  head, and not if the head had changed; after the merge, the merge commit to him in one line; the status page's row
+  that still calls #66 a draft corrected in lane 2's next pull request; then the small pull request that revises the
+  infrastructure draft's header row, and after it step 2.6's plan** (the builder chat he calls Builder V2, lane 2 of the
+  build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal account; his label: "For Builder V2, from
+  me, written with my main Advisor (25 November, 12:15 Amsterdam)"; message 30f4ab9b-ffde-4959-beef-3d3e5c015d43, whole;
+  extracted by script from the chat's transcript). Records, not his words: the chat merged #66 at 2026-11-25 11:10:11
+  UTC as merge commit 09faefa7f7cd1bca939bd2f98237e65e622d4737, a normal merge with that expected head, after reading
+  the head equal to it and gate, smoke and toolchain green on it. Copied by script (741 bytes, sha256
+  ae5eb4f652144d8559b699daca1bb36ae9fba5aa857ba7c56c3c299d044176eb):
+> For Builder V2, from me, written with my main Advisor (25 November, 12:15 Amsterdam).
+>
+> My go: merge pull request #66 at exactly d7937de0aad4b86748c7c4574bee5a6921eeb67c, as a normal merge (my HISTORY-ID (a)), with that commit as the expected head. The PR Advisor approved exactly that commit on GitHub at 06:55 UTC, my main Advisor's merge check passed on it, and gate, smoke and toolchain are green. If the head is no longer that commit, do not merge and tell me in two lines.
+>
+> After the merge: give me the merge commit in one line. The status page's row still calls #66 a draft: correct that in your next pull request. Then go on with the small pull request that revises the infrastructure draft's header row, and after it step 2.6's plan.
 - **Taken by Mustafa, 2026-11-25, 00:22:09 UTC: his answers to the last two questions of the preview hosting check's
   report: DEPARTURES item (5) (a), the pictures stay out of the repository, the pull-request page's picture among them;
   HISTORY-ID (a), a normal merge of #66; his main Advisor checked head cbddbbfe402a95481ba8f2ba8c54fbd6a49139a7; these
