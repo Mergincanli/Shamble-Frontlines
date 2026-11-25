@@ -1193,6 +1193,9 @@ export const DAY_CASES = [
   ['SA-R1-2 env -S git, then a force push: the deny wins', dsh('env -S git push --force origin cs/x'), DENY],
   ["SA-R1-2 env -S 'git push --force': the deny wins", dsh("env -S 'git push --force' origin cs/x"), DENY],
   ['SA-R1-2 env --split-string=git, then a force push: the deny wins', dsh('env --split-string=git push --force origin cs/x'), DENY],
+  ['SA-R2-1 env -Sgit (attached), then a force push: the deny wins', dsh('env -Sgit push --force origin cs/x'), DENY],
+  ["SA-R2-1 env -S '' (no words), then a force push: the deny wins", dsh("env -S '' git push --force origin cs/x"), DENY],
+  ['SA-R2-1 env -S with a tab in its value: the deny wins', dsh("env -S 'git\tpush' --force origin cs/x"), DENY],
   ['SA-R1-4 a long word is cut in the reason', dsh(`nice --adj=${'x'.repeat(40)} git status`), ASK, {}, /does not follow nice --adj=x{26}\.\.\. in front/],
   ['SA-R1-4 a control character is shown as ?', dsh("nice '--a\nb' git status"), ASK, {}, /does not follow nice --a\?b in front/],
 ];
