@@ -378,6 +378,11 @@ test each in `client-endpoint` and `room`); release: protocol 19 and 8, sim 17, 
 players' Wasm unchanged: 53,783 bytes, sha256 1e0e2dd5...0a4a. Run here first: all of it except the browser
 tests (nothing the browser runs changed but one reset on a second `ready`, which no browser test reaches).
 Planted defects: 47; the five that this commit touches were run and caught (02:36:05 UTC). Size: 6,747.
+**CI on a85b9dbb (that commit and the one that removes the moved test's old file): gate, smoke and toolchain
+green** (toolchain run 45534233480, 02:37:05 to 02:41:58 UTC: 4 min 53 s); every count as written above; 16
+browser tests; the Wasm's sha256 as here. That runner drew about 6 frames a second (49 frames in the allocation
+window): 80 bytes a frame, 582 a block; the press test 10,000 presses and releases made and echoed, 47 posts sent
+behind a newer one, 46 ignored when the report was read, 0 ticks ran an older post.
 
 **What CI must show on the commit with these fixes (written before the push):** cargo debug, twice: 26, 3, 2, 19,
 8, 15, 17, 5, 1, 13, 2, 1, 1 (113); release: protocol 19 and 8, sim 17, 5 and 1; client 83, sim-worker 46, types
