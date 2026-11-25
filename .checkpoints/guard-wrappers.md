@@ -14,8 +14,10 @@
 5. The advisor agent: APPROVE with 9 conditions (plan §7) · notes advisor-plan.md
 6. Built in the copy .gate/guard-wrappers/hooks/: red 92 fails on the old guard, green 1437/1437; 87 added lines · no commit (copy is gitignored)
 
+7. Applied: guard and tests copied over (sha256 equal to the tested copy: 7eb507c2…, c770dc59…); kit suites 1437/127/33; gate PASS --no-smoke; one commit · 5df545c
+
 ## Current step
-Apply the copy to the real files (one write each, sha256 checked; each asks Mustafa), kit suites, gate, one commit.
+security-auditor round 1 on the final diff (origin/main...5df545c).
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
@@ -29,6 +31,7 @@ Apply the copy to the real files (one write each, sha256 checked; each asks Must
 
 ## Key numbers
 - Kit tests on main c1da1bd's kit (= 311c0484's): routine-guard 1247, settings 127, checkpoint 33
+- After 5df545c: routine-guard 1437/1437 (190 new), settings 127, checkpoint 33; added lines guard +33/-14, tests +54/-3 = 87
 - Claude Code in this container: 2.1.332 (onFailure needs 2.1.295+)
 
 ## Decisions taken
