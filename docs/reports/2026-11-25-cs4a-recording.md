@@ -25,58 +25,44 @@ link simulator's change-set, its other named home.
 | **The designs' own count** (bottom-up, no factor) | 1,365 | 5,410 | 7,315 | 1,210 | 15,300 |
 | **Planned: holds the 1.8** | 2,450 | 9,750 | 13,150 | 2,200 | 27,550 |
 | **Stop line: planned times 1.25** (holds the 1.8 too) | 3,050, then **3,400** by his STOP-4A (a) | 12,200 | 16,450 | 2,750 | |
-| **Written** (git's count, the recording's data files left out) | 3,030 before reviews; **3,300** final | | | | |
+| **Written** (git's count, the recording's data files left out) | 3,030 when he was asked; **3,300** final | | | | |
 
-4a's written size is 2.2 times its designs' count before review fixes (he named this number) and 2.4 times at the
-end; against the planned size that holds the 1.8 it is 1.35 times. The two rounds of review fixes added 270 lines.
+4a's written size was 2.2 times its designs' count when he was asked (3,030, counted at 4895736; he named this
+number) and is 2.4 times at the end; against the planned size that holds the 1.8 it is 1.35 times. The reviewed head
+eb14739 counted 3,036 (the hash report's six header lines), so the two rounds of review fixes added 264 lines.
 
 ### 2. Where the difference went, and what it means for 4b to 4d (his answer to STOP-4A, point 3)
-The 1,665 lines between the designs' count (1,365) and the 3,030 written before reviews:
-- **The recording's format, 498 more** (`recording.rs`: 758 lines against 260 in the plan's table). Every refusal
-  has a name and a plain sentence (11 cases: about 90 lines); the hashes file and the manifest's lines live in this
-  file (about 100 lines; the design counted them with the runner); its unit tests are 324 lines.
-- **Two files the plan's table did not have, 286:** our own SHA-256 (`sha256.rs`: the hashes file names its
-  recording by that digest, the workspace has no package for it, and 4a changes no manifest) and the folder check
-  (`files.rs`: it names each wrong file and, for a hashes file, the first step that differs).
-- **The runner and the comparer, 309 more:** the refusal of what this build cannot replay, the state as named lines
-  and the field-by-field difference each got tests of their own.
-- **The WebAssembly side, 235 more** (202 of it tests): the TypeScript reader is a second implementation of the
-  format and got its own unit tests; the Node test also runs the test module in both build profiles.
-- **The scripts, the tools and the exports, 190 more; the native tests, 143 more; the first two steps, 94 more.**
-- **And 90 fewer:** the hostile-bytes count, which the ladder moved before it was written.
-- **By kind:** 12 % of the written lines are comments and 7 % are blank. The designs counted statements; the
-  project's style explains every public item and every test.
+Of the 1,665 lines beyond the designs' count: the format took 498 more (`recording.rs`, 758 against 260: every
+refusal named, the hashes file and the manifest's lines in the same file, 324 lines of tests); two files the plan's
+table did not have took 286 (our own SHA-256, since 4a changes no manifest, and the folder check); the runner and
+the comparer 309; the WebAssembly side 235; the tools 190; the native tests 143; the first two steps 94; and the
+hostile-bytes count, moved by the ladder, was 90 fewer. About a fifth of the written lines are comments or blank:
+the designs counted statements.
 
-What it means, their stop lines staying as they are (his words): a stop line is 2.25 times the designs' count (1.8
-times 1.25). A part that grows as 4a did reaches 2.2 times before any review fix and 2.4 times after: 4b about
-11,900, then about 13,000, against 12,200; 4c about 16,100, then about 17,500, against 16,450; 4d about 2,650, then
-about 2,900, against 2,750. **So each part is likely to reach its stop line and come back to him, as 4a did.** The
-designs' counts for them were made the same way as 4a's. What I do without thinning a proof: count at every step
-and say the count in each step's summary; let a ladder's rung fire when its line is reached, not after; write tests
-as tables of cases where that says the same in fewer lines. What I cannot promise: that they land under their lines.
+For 4b to 4d (their stop lines stay as they are: his words): a stop line is 2.25 times the designs' count, and 4a
+reached 2.2 times before its reviews and 2.4 after. At that rate 4b ends near 13,000 against 12,200, 4c near 17,600
+against 16,450, 4d near 2,900 against 2,750: **each is likely to reach its stop line and come back to him, as 4a
+did.** I count at every step and let each ladder's rung fire at its line; I cannot promise they land under theirs.
 
 ### 3. What the first soldier on screen does not need (his go, point 4), in eight lines
-The splits are mine, from rows the designs give whole: estimates, by the designs' way of counting.
-1. Movable from 4b, whole with their tests: the schema writer and the content types' export (about 240 lines), and
-   the Testlines tool's two report-only modes, `compare-old` and `table` (about 120).
-2. Movable from 4c's first five steps: the soft push between two soldiers (about 250: one soldier is on screen), and
-   five small page pieces (the Worker's larger pool, the readout's new rows, the development aim line, the guard for
-   the first picture after a pause, the check that development-only code stays out of production: about 270).
-3. Together about 880 lines by the designs' count: 1,580 planned at 1.8, about 1,940 at 4a's 2.2. At change-set 3b's
-   pace (2.13 hours a thousand written lines) the early look comes **about 3.4 to 4.1 hours sooner**, of about 49.
-4. Of his three examples: the reload is already after the early look (it is in 4d). **The canonical writer cannot
-   move:** his values enter the content through the tool that writes with it (`testlines write`), so without it a
-   value would be typed by hand, and its proof ("writes back the same") stays with it. Of the content tools only the
-   two report-only modes move.
-5. Also not movable: the reader and its proofs, the built-file check for the fused multiply-add (his MUL-ADD ties it
-   to the part that brings the collision library), the collision world, the time unit (before the first timer), the
-   soldier's ids, `testlines --check`, and the camera panel (his words: from the first playable build).
-6. The cost: 4b's pieces (360 by the designs' count) would merge with 4c, so 4c reaches its stop line unless about
-   810 lines of stop line move with them (4c 16,450 to 17,260; 4b 12,200 to 11,390). 4c's own pieces only change
-   order inside 4c. The advisor agent reads the new order before anything is built on it.
-7. Within 4c alone (line 2 only): about 2 to 2.5 hours sooner; no pull request's content and no stop line changes.
-8. No proof is thinner either way: each piece moves whole with its tests and is built after the early look and
-   before 4c merges. The plan is not changed for this (his words); the decision is EARLY-LOOK-ORDER below.
+1. From 4b, movable: the schema writer (about 160 lines) and the Testlines tool's two report-only modes (about 120).
+2. From 4c's first five steps, movable: the soft push between soldiers (about 250), five small page pieces (270).
+3. Not movable: the canonical writer (his values enter the content through it) and the content types' export.
+4. Not movable either: the reader, the built-file check, the collision world, the time unit, the ids, the panel.
+5. Of his examples, the reload is already after the early look: it is in 4d.
+6. All of it, 800 lines: about 3.1 to 3.7 hours sooner, of about 49; 630 lines of stop line move from 4b to 4c.
+7. Inside 4c only, 520 lines: about 2 to 2.5 hours sooner; no pull request's content and no stop line changes.
+8. No proof is thinner: each piece moves whole with its tests, built after the early look and before 4c merges.
+
+The basis of those lines, for his Advisor. Every count is by the designs' own way of counting, and the splits are my
+estimates from rows the designs give whole: 800 is 1,440 planned at 1.8 and about 1,760 at 4a's 2.2; the hours are
+at change-set 3b's pace (2.13 hours a thousand written lines). The five page pieces: the Worker's larger pool, the
+readout's new rows, the development aim line, the guard for the first picture after a pause, the check that
+development-only code stays out of production. Line 1 needs two stand-ins: the camera panel's limits are written in
+the panel's code until the schema writer lands (the plan's own ladder names this), and the differences list for his
+new Export comes from the notes' script, as the first one did. The content types' export stays because 4b's own page
+reads the map into those types, and their proof would otherwise land one part late. 4b's pieces would merge with
+4c (stop lines 11,570 and 17,080). The plan is not changed for this (his words): decision EARLY-LOOK-ORDER below.
 
 ## Plan and approval
 - **The plan:** change-set 4's plan, revision 4, section 4 (`.checkpoints/cs4-walk/plan.md`, pushed at 25c42c5;
@@ -195,8 +181,16 @@ Two rounds, the budget's whole; Opus 5.5 at effort max. Every finding and what h
 - **Left open, a security finding named to him as the rules ask** (Low): the tests that *read* the recordings
   follow a link, so on a hostile branch a recording file replaced by a link to an endless device makes a test read
   until memory runs out. The folder check refuses such a link, so CI cannot go green with one; the write side is
-  fixed. Its fix is a repository-wide "no tracked links" check: a gate change (risk tier 2), not this chat's to
-  write. Decision LINKS-CHECK below.
+  fixed for the recordings' folder and its files (a link higher up the path is the repository-wide check's). That
+  check, "no tracked links", is a gate change (risk tier 2), not this chat's to write. Decision LINKS-CHECK below.
+- **The advisor agent on the head b9a55da: REVISE, text only** (the code, the tests, CI and his five messages
+  sound). Two High: a bracket of this chat's own in `docs/DECISIONS.md` held more about his board add-on than that
+  it exists (he asked that nothing of it is in the repository): shortened, and the earlier wording stays in the
+  branch's history, which he is told in the chat; and DEPART-4's reason called the decision drafts accepted, while
+  they are Proposed. One Medium: the content types' export is not movable (ask 3 is corrected and recounted).
+  Eleven Lows, all taken: a rounding, two wrong pointers, a missing 4b follow-up, the count's date, the length of
+  asks 2 and 3, one more "not verified" line, and a third option for LINKS-CHECK. Its verdict on the corrected
+  head is stated in the chat and on the pull request.
 
 ## Decisions and deviations
 - **The stop line:** reached at 3,030 written lines before any review (the first line was 3,050); the chat stopped
@@ -234,6 +228,8 @@ Two rounds, the budget's whole; Opus 5.5 at effort max. Every finding and what h
 - The hash report's own list: no browser's WebAssembly (Node only), the real soldier table (a stand-in of the
   same shape), a server with many rooms, ARM, the players' file after `wasm-opt`.
 - The eight lines of ask 3 are estimates: the designs give those rows whole.
+- That the saved message files equal his chat messages rests on the copying script alone: the verifier and the
+  advisor agent checked the repository against the saved files, not the files against the chat.
 
 ## Risks
 1. Each later part is likely to reach its stop line (ask 2). It costs a stop and his answer each time, not a proof.
@@ -243,6 +239,10 @@ Two rounds, the budget's whole; Opus 5.5 at effort max. Every finding and what h
    match, and it must hash only the client's own world before a build talks to a real server (follow-up below).
 
 ## Follow-ups (in `docs/STATUS.md` and its archive)
+- **4b** (4A-NA-4B, 4A-EA-4B): content reaches the simulation through the constructor only; `first-loop` is made
+  anew with its frozen content set, and every hash line must stay byte for byte (the proof that loading content
+  changed no state); if the players' file must compute the content's SHA-256, `sha256.rs` moves whole into the
+  content crate, never a second copy.
 - **4c:** a fixed-width count before any run of varying length in the state (4A-BYTES-LENGTH); the three planted
   differences again on movement fields, and the real search for a WebAssembly-only difference; the paced replay
   behind a development marker, with its own `Sim` from the recording's test seed; the re-export
@@ -266,10 +266,11 @@ script. Its plan is section 5 of the approved plan; the advisor agent re-reads i
    - (a) Keep the plan's order.
    - (b) Reorder inside 4c only: the soft push and five small page pieces are built after the early look. About 2
      to 2.5 hours sooner; no pull request's content and no stop line changes.
-   - (c) As (b), and 4b's schema writer, the content types' export and the Testlines tool's two report-only modes
-     also wait until after the early look and merge with 4c. About 3.4 to 4.1 hours sooner in all; about 810 lines
-     of stop line move from 4b to 4c (11,390 and 17,260).
-   - Recommended: **(b)**. It is most of the gain that costs nothing; (c) buys about 1.5 hours more and moves work
+   - (c) As (b), and 4b's schema writer and the Testlines tool's two report-only modes also wait until after the
+     early look and merge with 4c. About 3.1 to 3.7 hours sooner in all; about 630 lines of stop line move from 4b
+     to 4c (11,570 and 17,080); the panel's limits sit in the panel's code until the schema writer lands. Because
+     (c) changes 4b, it is needed before 4b's first edit.
+   - Recommended: **(b)**. It is most of the gain and costs nothing; (c) buys about 1.2 hours more and moves work
      between two pull requests.
 2. **CONTENT-SOURCE: who writes the code that reads the content files?** (From the plan; needed before 4b's first
    edit.) It matters because that code runs on the server and in every browser for years, and each outside package
@@ -281,12 +282,14 @@ script. Its plan is section 5 of the approved plan; the advisor agent re-reads i
      outside packages; duplicate keys pass silently.
    - (c) All our own: no outside package; one reader on every side; the canonical text equal to the browser's own;
      about 1,130 more lines by the designs' count (about 2,000 planned), and a reader of ours that must be fuzzed.
-   - Recommended: **(c)**, engine-architect's choice, for the reason he gave when he chose our own random number
-     code (RNG-SOURCE (c)). It costs the first soldier a few hours.
+   - Recommended: **(c)**, engine-architect's choice: no outside package in the players' file to keep under the
+     checks, one reader on every side, and a writer whose text equals the browser's. It is the same kind of choice
+     as his RNG-SOURCE (c), our own random number code. It costs the first soldier a few hours.
 3. **DEPART-4: does he accept the places where Walk reads or departs from the decision drafts?** (From the plan;
-   needed before 4b's first edit.) It matters because the drafts are his accepted decisions; each departure is
-   recorded by a dated pointer at the drafts' next revision, never by rewording now. The list (the plan's section
-   13, item 11, shortened in wording only):
+   needed before 4b's first edit.) It matters because Walk is built on the decision drafts as proposed, and by his
+   words of 2026-11-14 "a draft is accepted only when its marks are met"; each departure is recorded by a dated
+   pointer at the drafts' next revision, never by rewording now. The list (the plan's section 13, item 11,
+   shortened in wording only):
    1. The page keeps the three newest blocks, where the netcode and structure drafts say two.
    2. The time the page blends by travels on the block's message, not as a field inside the block.
    3. He accepted for change-set 3 that "three limits are code, not data, until the content crate exists in
@@ -301,9 +304,10 @@ script. Its plan is section 5 of the approved plan; the advisor agent re-reads i
    7. The build plan places the recording's WebAssembly half in CI later: it runs in today's CI since 4a.
    8. The movement table's values come from his Export, where the card says "from the legacy tuning import";
       "every kept value equal to legacy's" reads as every value his Export does not replace.
-   9. Three marks are read differently: the random-walk test uses our own seeded generator, not the tool its row
-      names; the two matches in turn differ in seed and input, and until change-set 8 only the input makes them
-      behave differently; the jump's planted defect is the old game's order of two sums. And three smaller ones:
+   9. Three marks are read differently: the stale-id test over random spawns and despawns (PM-0004-15) uses our
+      own seeded generator, not the tool its row names; the two matches in turn differ in seed and input, and
+      until change-set 8 only the input makes them behave differently; the jump's planted defect is the old game's
+      order of two sums. And three smaller ones:
       the size "after wasm-opt" is recorded without it (the toolchain has no such tool yet); the collision tree is
       read node by node through the library's own public walk; the index of moving soldiers is a pair loop in slot
       order (48 at most), not a tree.
@@ -328,20 +332,24 @@ script. Its plan is section 5 of the approved plan; the advisor agent re-reads i
    - (a) Yes: I ask the CI Builder chat (one line in the browser tests' setup); a red comes to him before any change.
    - (b) Not now: it waits for the quality gate step, with the other browsers.
    - Recommended: **(a)**.
-5. **LINKS-CHECK: who closes the open security finding, and when?** It matters because a test run on a hostile
-   branch can be made to read without end through a committed link (Low; CI cannot go green with such a link).
+5. **LINKS-CHECK: who closes the open security finding, and when?** It matters because the tests of a branch
+   someone else wrote can be made to read without end through a committed link (Low; CI cannot go green with such a
+   link, and running a branch's tests already runs that branch's own code).
    - (a) It waits for the quality gate step (2.3), as a named follow-up.
-   - (b) The CI Builder chat adds a "no tracked links" check now (a gate change, risk tier 2, his go).
-   - Recommended: **(a)**: the exposure is a session running tests on a branch someone else wrote, which the lane
-     rules already keep to reviewed branches.
-Waiting for their part, unchanged: DIFF-LIST (with his new Export, before 4b's step 6), MOVE-RULES, RESUME-FLASH,
-TUNE-HOME, SPRINT-DELAY-4, NO-SOURCE (before 4c); GREY-COLOURS is a default he can veto before 4b's step 9.
+   - (b) The CI Builder chat adds a repository-wide "no tracked links" check now (a gate change, risk tier 2).
+   - (c) Lane 1 makes the tests that read the recordings refuse anything that is not a plain file, as the folder
+     check already does: about 15 lines in 4b, no gate change; the repository-wide check stays a follow-up for 2.3.
+   - Recommended: **(c)**, the advisor agent's proposal: it closes what lane 1 can close, and step 2.3's chat is
+     stopped.
+Waiting for their part, unchanged: DIFF-LIST (with his new Export, before 4b's step 6); MOVE-RULES, RESUME-FLASH,
+TUNE-HOME and NO-SOURCE (before 4c; MOVE-RULES' rows 6 and 7 before 4d); SPRINT-DELAY-4 (before 4d); GREY-COLOURS
+is a default he can veto before 4b's step 9.
 
 ## For Mustafa
-1. **The merge of pull request #70:** his go for the head the advisor agent approved (this report's own commit; its
-   full id is in the chat's message and in the pull request's text), after his Advisor's merge check. No browser
-   check: nothing a player sees changes.
-2. **Letters** for CONTENT-SOURCE and DEPART-4 (4b cannot start its first edit without them), and for
-   EARLY-LOOK-ORDER, FIREFOX-REPLAY and LINKS-CHECK.
+1. **The merge of pull request #70:** his go for the head the advisor agent approved (its full id is in the chat's
+   message and in the pull request's text), after his Advisor's merge check, by merge commit as #56 and #68 were
+   (a squash would leave the notes' commit c17a054 off main). No browser check: nothing a player sees changes.
+2. **Letters** for CONTENT-SOURCE and DEPART-4 (4b cannot start its first edit without them; EARLY-LOOK-ORDER too
+   if he wants its (c)), and for EARLY-LOOK-ORDER, FIREFOX-REPLAY and LINKS-CHECK.
 3. **His new Export at 30 steps** (his STEP-60 (a)), pasted into this chat before 4b's step 6; no value of the
    60-step Export is carried.

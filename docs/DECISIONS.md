@@ -336,7 +336,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied by script from its transcript). What it
   answers, in the chat's words (not his): nothing the chat asked: it is the block that opened this chat. Its point 2
   asks that it is recorded word for word in docs/DECISIONS.md with this chat's first pull request. Not recorded here,
-  by his own words in it: his board add-on of the same day ("Copy nothing from this block into the repository").
+  by his own words in it: his board add-on of the same day.
   Copied by script (5779 bytes, sha256 0dc59aaff9788c5e3ba0ec035fe47798a38da5d6261aecdb60fc7a2969d306a1):
 > My words of 2026-11-25 for a new Claude Code chat: you take over lane 1 of the game's build.
 >

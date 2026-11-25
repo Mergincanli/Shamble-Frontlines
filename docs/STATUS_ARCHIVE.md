@@ -2168,7 +2168,8 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
      natively only. Their real forms run again on movement in 4c (4A-TE-4C).
   3. In CI a red replay names the step; the differing field comes from the `replay` tool's two state prints, by hand.
   4. Size: 4a ran at 2.2 times its designs' count before review fixes (3,030 written lines against 1,365); by the
-     chat's reckoning a part that grows as 4a did ends within 2 % of its stop line, so 4b, 4c and 4d are each likely
+     chat's reckoning a part that grows as 4a did ends 2 to 4 % under its stop line before review fixes and 5 to 7 %
+     over it after them (4a's fixes added 9 %), so 4b, 4c and 4d are each likely
      to come back to him; their stop lines stay as they are (his STOP-4A, point 3).
 - **Change-set 3b of the v2 build plan, "The loop closes"** (2026-11-25; the evidence: its card and reviewers'
   notes at the notes' last commit 80a51e42, and its report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`):
