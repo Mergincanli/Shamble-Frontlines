@@ -1,12 +1,28 @@
 # MAIN-66: take main c1da1bd into the netcode branch (plan, 2026-11-25 16:2x UTC; brought up to 311c048 17:0x UTC, to c1da1bd 18:0x UTC)
 
 ## As approved
-Not checked yet. The advisor agent's check runs in the 18:50-19:20 UTC window (LEAN-MODE item 3: new agent work only in
-a reset's first 30 minutes), beside brief 3; it writes advisor-main-66.md. Nothing below runs before its verdict. His
-word of 17:00 UTC (history.md:7988-7998, word for word there) brought this plan up to main 311c048, so that one merge
-takes in #66, #68 and #69. Main then moved to c1da1bd by #67 (17:12:59 UTC, after his word; docs only): MAIN-52 and the
-card's 18:51 fetch item bring the plan up to it, so the one merge takes in #66, #67, #68 and #69 (told to him in one
-line, 18:0x UTC). His 17:00 word names #66, #68 and #69 only.
+APPROVE WITH CONDITIONS M66-1 to M66-5 (advisor-main-66.md, 19:2x UTC, on this plan at sha256 5d6003017b5f9345…859e;
+nothing Critical or High). Applied word for word, the conditions need no new review; its check of the pushed head
+(step 7) stays. They bind as that file's section 2 gives them:
+- M66-1 (Medium): U7's 0b amendment stays outside the take-in. From H0 to step 6's push it is not applied, staged or
+  committed in the main folder; security's answer, if it comes then, is read with no save. In step 1, after H0 and the
+  fetch, `git diff --quiet 2935f0a H0 -- . ':(exclude).checkpoints/'` alone: exit 0 keeps the anchor f3a420bc; exit 1
+  makes step 1's own `git merge-tree --write-tree --name-only H0 origin/main` tree the anchor, written into "The
+  numbers" by Edit before step 2.
+- M66-2 (Low): step 2's command is named in the chat first. Refused before git runs: prove nothing changed (no
+  MERGE_HEAD, HEAD = H0, status shows only notes lines), try no other form, wording or worktree, restart the saver, and
+  tell him the one command with his options (a) approve it in a prompt or (b) wait, my lean (a). A prompt: he answers
+  it. If git ran, the stop rules stand.
+- M66-3 (Low): step 5e runs in the background with a timeout of 1800000 (or in the foreground with 600000); its summary
+  lines go by Write into .gate/main-66/step5-outputs.txt; fail 0 and the count recorded; a call with no summary is no
+  result, run once more in the background, a second no-result stops; any fail stops; step 7 re-runs it.
+- M66-4 (Low): these text fixes, made before step 1.
+- M66-5 (Low): Q1 and Q4 bind as answered (advisor-main-66.md section 3): Q1 after step 6; Q4 at step 1, so a main
+  move stops the take-in before step 2 (no tolerance, advisor-main-65.md:113-114).
+His word of 17:00 UTC (history.md:7988-7998, word for word there) brought this plan up to main 311c048, so that one merge
+takes in #66, #68 and #69. Main then moved to c1da1bd by #67 (17:12:59 UTC, after his word; docs only). MAIN-52 and his
+17:00 word call for the take-in, not for #67: #67 comes in because step 2's plain merge, the only form the guard passes
+in the main folder, takes main's tip (told to him in one line, 17:5x UTC). His 17:00 word names #66, #68 and #69 only.
 
 ## Why
 MAIN-52, Mustafa's words (history.md:2055-2057; TEST-FIRST's "main taken in when it changes code, CI or rules";
@@ -96,8 +112,9 @@ differ; "The numbers" gives every value those conditions bind with, so no MAIN-6
   - Ours (:25-26): this branch's #40 row (its 2026-11-15 text; `git diff 28254a7 HEAD -- docs/STATUS.md` is 1 line in,
     1 out: the only STATUS.md line this branch changed), then the 3a "none yet" row as 28254a7 has it.
   - Theirs (:28-30): main's #40 row (its 2026-11-14 text, unchanged), then main's #67 row, then main's #69 row.
-  - Main replaced the 3a row by the 3b and #66 rows at #68, took those out for the #69 row at #69, and added the #67
-    row above it at #67. Main's file still lists #67 and #69 as in flight: main's text, taken as it is.
+  - Main added the #66 row at #66 (09faefa7: rows #40, 3a, #66), replaced the 3a row by the 3b row at #68, took the 3b
+    and #66 rows out for its own row at #69, and added the #67 row above #69's at #67 (M66-4). Main's file still lists
+    #67 and #69 as in flight: main's text, taken as it is.
 - main's docs/STATUS.md has 120 lines (c1da1bd, by numstat against the empty tree; #67's own numstat on it: 10 / 10).
 - Main's 31 new paths have no untracked file in their way (`git ls-files --others --exclude-standard -- docs
   .claude/hooks crates packages Cargo.toml Cargo.lock` prints nothing). Free disk 15,060 MiB at 18:0x UTC (the light
@@ -108,6 +125,11 @@ differ; "The numbers" gives every value those conditions bind with, so no MAIN-6
     Its cargo calls go through u7-run.sh, which holds the shared target's lane lock for each call (`-s`, or `-x` for a
     counted run: u7-run.sh:54-55). Its notes are in its own worktree, untracked there: nothing of it shows here.
   - The saver restarted after bd0efxc5i's end (about 18:07 UTC; from 16:16:54 for 110 minutes); the card names it.
+  - U7's 0b amendment (u7-0b-amend-security-request.md): two dev-dependency lines in the spike's
+    crates/client-wasm/Cargo.toml and Cargo.lock, prepared in .gate/u7-amend at c21582d with nothing committed;
+    security's read since 19:12 UTC. It stays outside the take-in (M66-1).
+  - The T-builder now runs short calls back to back (.gate/u7/rs: eight logs between 19:09 and 19:15; plants hold
+    `-x`, tests `-s`, by u7-run.sh:3-5).
   - The check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (20:34 UTC) and the day-message trigger trig_01XVEDQzVLaAwy4Fer6AERdS
     (23:05 UTC).
 
@@ -213,13 +235,16 @@ program in front of them.
   and STATUS_ARCHIVE.md. A red there is main's or the runner's, and the advisor rules before any further step.
 - New (Low): main moved three times today (#68, #69, #67). If step 1's fetch finds origin/main other than c1da1bd, C4
   stops the take-in before step 2; Q4 asks the checker which values may then be re-derived without a new check.
-- Disk: the light runs build nothing; main-run.sh's 4 GB floor stands. The T-builder's first cold build takes about
+- Disk (M66-4): the light runs build the judge (check.mjs's marks step is `cargo run -q --locked -p npt-judge`,
+  check.mjs:2633, and main-run.sh touches every crates/ file first, :48-52), on the cache emptied at 06:1x maybe its
+  registry deps too, unless the T-builder's runs rebuilt them. The judge is small, main-run.sh's 4 GB floor stands
+  (C3's exit 3 is a no-result), and the exclusive hold may be longer than MAIN-65's 32-second marks step. The T-builder's first cold build takes about
   6.1 GiB (u7-run.sh, incremental off: the card's Key numbers), so about 9 GiB stays free.
 - Order with U8: MAIN-66 merges first; U8's merge follows on its own ruling (its M3/M4 apply on the new head). Nothing
   of U8's is staged during MAIN-66.
 - The record, under "Choices taken without him": "main c1da1bd taken in now (#66, #67, #68 and #69 in one merge: his
-  word of 17:00 UTC for #66, #68 and #69; #67 by MAIN-52 and the card's fetch item, told to him in one line), plan
-  first (MAIN-66)", named in msg-2026-11-26.md, as MAIN-65 was in msg-2026-11-25.md.
+  word of 17:00 UTC for #66, #68 and #69; #67 with main's tip, by the only merge form the guard passes, told to him in
+  one line), plan first (MAIN-66)", named in msg-2026-11-26.md, as MAIN-65 was in msg-2026-11-25.md.
 
 ## Questions for the checker
 1. As M65-5 for U6c: may U8's M3-M9 run once step 6's CI is green, with step 7 reading MAIN-66 by its SHAs at 23:50 UTC
