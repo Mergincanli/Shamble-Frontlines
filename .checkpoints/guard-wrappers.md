@@ -18,8 +18,11 @@
 
 8. security-auditor round 1 on 5df545c: REVISE (SA-d Critical older; SA-a, SA-g Medium; Lows); the plugin review: High (an optional-value long option) · fix pass built in the copy: 1485/1485, 115 lines (plan §8)
 
+9. The advisor agent on the plan change: APPROVE with conditions; SA-D-DIRECT pre-approved if Mustafa says yes · notes advisor-plan.md
+10. Both versions built: .gate/guard-wrappers/hooks/ (without the direct half: 1486/1486; red 19 on 5df545c) and hooks-direct/ (with it: 1490/1490; its rows red on the other copy)
+
 ## Current step
-The advisor agent's read of the plan change (SA-d's wrapper half, SA-g's narrowing); Mustafa's answer on SA-D-DIRECT; then copy over (asks him), one commit, round 2.
+Waiting for Mustafa's SA-D-DIRECT answer; then copy the chosen version over (asks him), kit suites, one commit, round 2 on what changed.
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
