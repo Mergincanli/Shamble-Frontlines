@@ -31,6 +31,8 @@ M = [
   ("output written without its shape check", "if (!pattern.test(value)) throw new Refusal(`the output", "if (false) throw new Refusal(`the output"),
   ("annotate: no % escaping", "io.out(`::${kind}::${message.replace(/%/g, '%25')", "io.out(`::${kind}::${message.replace(/%/g, '%')"),
   ("comment: the number's prefix accepted (no dot)", "|| !link.startsWith(`https://pr-${pr}.`)", "|| !link.startsWith(`https://pr-${pr}`)"),
+  ("reconcile: duplicates not removed", "items: items.filter((d) => typeof d?.id !== 'string' || (!ids.has(d.id) && ids.add(d.id)))", "items"),
+  ("check-build: only the plain hand-over name", "/^[ \\t]*name:[ \\t]*([\"']?)preview-site\\1[ \\t]*(?:#.*)?$/m", "/^[ \\t]*name:[ \\t]*preview-site[ \\t]*$/m"),
 ]
 bad = []
 for name, find, repl in M:

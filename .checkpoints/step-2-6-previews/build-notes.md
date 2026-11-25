@@ -214,3 +214,28 @@ GitHub (docs.github.com):
   the test value; after "Save protection rules" (attempt 3), all three were refused. The plan's click 5 lacked the save;
   the runbook now names it, and the token sitting's instructions must too.
 - His sitting messages (7903e9f9: TOKEN-TONIGHT (b); 5ff5bcf4) are in DECISIONS (scripts/add_sitting.py).
+
+## B13. Review round 1 (2026-11-25, launched ~23:03 UTC; head 8fef0f6, code head ad2658a)
+- infra-engineer (round1-infra-engineer.md): REVISE, runbook only; no preview.yml change (31119c06 stands).
+  Mediums: INFRA-M1 renewal order and a rebuild section; INFRA-M2 re-run limits (30 days; the checked build kept one
+  day); INFRA-M3 the token's end date in STATUS with a reminder. Lows L1 to L7 and an observation (Pages adds noindex
+  to previews itself). Answered M1's open point: refused jobs did make deployment records (9 records, all wall-test).
+- security-auditor (round1-security-auditor.md): APPROVE; no code change; no preview.yml change. It read the refusal
+  lines through the check-run annotations API: push job 139566690597 'Branch "claude/optimistic-albattani-mdoonz" is
+  not allowed to deploy to preview due to environment protection rules.'; jobs 139566698136 and 139566697600 'Branch
+  "refs/pull/72/merge" is not allowed ...'; the fresh runs on ad2658a (45717715486, 45717720531) refused the same way.
+  A refused job leaves a deployment record with status failure (an admitted one: success). The cause of try 1 is not
+  singled out (the rule may have been saved after 22:29 too). One Medium condition on the token sitting's message
+  (a) reload and screenshot the environment page (box unticked, "1 branch and 0 tags allowed", `main`, no custom
+  rule); (b) secrets only by "Add environment secret"; (c) click 9 again after the secrets (Actions, Dependabot,
+  Codespaces); (d) the session re-runs M1: the refusal line plus zero steps for all three; a failure record expected;
+  (e) delete WALL_TEST; wall-test.yml leaves. Lows: the runbook's cause as likely and both checks after any change;
+  secrets as environment secrets in renewal; a Wrangler bump rule; the count is an upper bound.
+- test-engineer: running.
+- The fix pass, prepared (not committed until all three are in): the runbook rewritten (the environment page section,
+  before the hand-over, re-run limits, the off-switch, the count as an upper bound, the renewal order with the save,
+  the end date in STATUS, the Wrangler bump rule, rebuild from zero, the noindex observation); preview.mjs: reconcile
+  removes duplicate records by id (L7), the hand-over match takes a quoted name or a trailing comment (L6), the count
+  worded as deploy attempts (an upper bound); tests: 119 pass; the sweep: 31 of 31 caught (two new mutations).
+  Follow-ups, not in this pass: L4 (check-headers one file at a time: sample later), L6's #59 note (covered by the
+  request's note 1).
