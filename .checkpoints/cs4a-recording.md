@@ -9,7 +9,7 @@
   worktree `.gate/lane1-takeover`; pushed with `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its
   command; never a plain `git push`. The session's start folder is never switched · **Base:** origin/main
   c1da1bd (lane 2's docs-only #67, taken in by merge commit 75a9296; before it 311c0484)
-- **Last update:** 2026-11-25 21:32 Amsterdam (from the clock)
+- **Last update:** 2026-11-25 21:49 Amsterdam (from the clock)
 
 ## Sizes (his point 5: which is which)
 - The designs' own count for 4a, bottom-up: 1,365 lines (655 code, 710 tests).
@@ -56,32 +56,31 @@
    The players' file: 55,607 bytes, sha256 e419e4cc0225eed60e120516c9ef73b66101ecd391c6a0e1ecd6ffb3bf628a35, the
    same in the production and the development build (53,813 bytes before 4a: 1,794 more for the one new number).
 
+9. **STOP-4A answered by Mustafa: (a)** (2026-11-25, 20:48:11 UTC; by script in
+   `.checkpoints/cs4-walk/mustafa-2026-11-25-stop-4a-answer.md`): finish 4a as it stands, the new stop line is
+   **3,400**, the two green tests stay with the code they prove. WATCH-70 (a): this chat watches pull request #70
+   (subscribed); a comment or review there is information, never his word. His point 3: the report says where the
+   difference to the designs went and what it means for 4b to 4d; their stop lines stay as they are.
+
 ## Current step
-**At the stop line: STOP-4A is asked of Mustafa** (`.checkpoints/cs4a-recording/question-2026-11-25-stop-4a.md`).
-Until his answer only work that adds no product line. CI runs on this commit (the first of 4a without
-`[skip ci]` since steps 1 and 2).
-
-7. Draft pull request #70 opened (https://github.com/Mergincanli/Shamble-Frontlines/pull/70), head 5a16b4e, on his
-   words "open own drafts if possible". It stays a draft until the report is in.
-
-8. CI on 5a16b4e, both runs (the push and the pull request): gate, smoke and toolchain green, six of six (toolchain
-   5 minutes 6 and 5 minutes 9 seconds). Read from the push run's log (45694490139): the players' file's sha256 on
-   the runner is e419e4cc...8a35, the same as here; "no registry path in the Wasm"; `cargo test` twice and the
-   release line green, the recordings' tests among them; "first-loop.rec: 1800 steps, every shared hash as in the
-   file" in HeadlessChrome 157 (158 here); 17 browser tests passed in 3.3 minutes (3.4 in the pull request's run).
+Review round 1 on the head (source as at eb14739): netcode-architect, rust-reviewer, test-engineer (three at a
+time); then engine-architect and security-auditor. Each writes `.checkpoints/cs4a-recording/<agent>-r1.md`.
 
 ## Next steps
-1. (done, step 8 above.)
-2. (done: the draft pull request, step 7 above) A draft pull request (his standing permission), kept a draft.
-3. His answer to STOP-4A; then the
-5. Reviewers (netcode-architect, rust-reviewer, test-engineer; then engine-architect, security-auditor), the
-   verifier, the advisor agent on every pushed head, the docs pass, the report, a draft pull request.
-6. The docs pass also carries: his blocks of 2026-11-25 into `docs/DECISIONS.md` by script; change-set 3b's owed
-   docs pass; the Hornet's entry in `docs/UNITS.md` section 0 by script, the two lines of that section left as
-   they are and listed as open for his unit walk (his go, point 6).
-7. The report answers his go's point 4 in at most eight lines (what the first soldier on screen does not need from
-   4b and from 4c's first five steps, and the hours it would save to build those after the early look), and says
-   for every size whether it is the designs' count or already holds the 1.8.
+1. Fold round 1's findings: fix Critical and High and what is cheap; the rest become follow-ups; count the lines
+   against 3,400 at each fix.
+2. Round 2 on what changed (only if round 1 changed code); the planted defects again on the final head; the local
+   checks again; CI.
+3. The verifier until PASS; the advisor agent on the pushed head.
+4. The docs pass (docs-keeper, with the script for his words): his blocks of 2026-11-25 into `docs/DECISIONS.md`;
+   change-set 3b's owed docs pass; the Hornet's entry in `docs/UNITS.md` section 0, the two lines left as they are
+   and listed as open for his unit walk; `docs/REPO_MAP.md` line 36.
+5. The report (`/advisor-report`): his go's point 4 in at most eight lines (what the first soldier on screen does
+   not need from 4b and from 4c's first five steps, and the hours saved); every size named as the designs' count or
+   as holding the 1.8; where 4a's 2.2 times went (recording.rs 758 lines against 260 in the plan's table;
+   sha256.rs and files.rs not in that table) and what it means for 4b to 4d.
+6. Fold the checkpoints into the report, delete `.checkpoints/cs4a-recording*` (the plan in `.checkpoints/cs4-walk`
+   has to survive for 4b to 4d: decide its home with the advisor agent), mark the pull request ready.
 
 ## Open findings
 - 4A-BYTES-LENGTH (rust-reviewer, a watch for 4c, no defect today): `StateSink::bytes` writes no length, which is
@@ -98,7 +97,7 @@ Until his answer only work that adds no product line. CI runs on this commit (th
 
 ## Key numbers
 - Written so far (git, against 7670c7b, data files left out): **3,030 lines** (1,523 code, 1,507 tests; unit tests
-  inside source files counted as tests). 20 under the stop line.
+  inside source files counted as tests). The stop line is 3,400 since his STOP-4A (a): 370 lines of room.
 - Ladder rung 1 fired: 3B-HOSTILE-ALLOC moves to the link simulator's change-set (not written; told to him in
   STOP-4A). Rung 2 (the 36,000-step run and the two matches in turn, both written and green): his decision.
 - The hash's cost (readings on this container): native release, 4,096 bytes 5.7 us, 16,384 bytes 20.7 us;
@@ -112,5 +111,5 @@ Until his answer only work that adds no product line. CI runs on this commit (th
   gh always start their own command. The board add-on is active.
 
 ## Running work
-- No agent runs.
+- Round 1's first three reviewers: netcode-architect, rust-reviewer, test-engineer.
 - No saver runs: the main session commits the notes by hand.
