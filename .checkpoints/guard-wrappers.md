@@ -29,8 +29,10 @@
 14. The advisor agent: R2-1 raised to Critical (an agent's kit write passes; same class as SEC-U7B-1 and SA-d): a third round on what changed allowed; the SA-g refinement may ride; R2-2 may not (follow-up) · notes advisor-plan.md
 15. Round-3 copy .gate/guard-wrappers/hooks-r3/: R2-1 + SA-g refinement; green 1499/1499; red 10 on 52e3c7e; 136 added lines vs main · no commit (copy)
 
+16. Round-3 fix applied hunk by hunk (each asked with its text; one restart mid-way, state checked before retrying); sha256 equal to hooks-r3 (guard 6bed5b2e…, tests 634b64fe…); 1499/127/33; gate PASS --no-smoke; one commit · see git log (round 3 fix)
+
 ## Current step
-Apply hooks-r3 hunk by hunk (each asked of Mustafa with its text), sha256 check, kit suites, one commit, round 3 (security-auditor, on what changed).
+security-auditor round 3, on what changed (52e3c7e..HEAD's code commit).
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
