@@ -1,10 +1,10 @@
-"""The test zip of change-set 3a (plan section 4, "His browser check"): the built development page with the small
+"""The test zip of change-set 3b (plan section 5, "His browser check"): the built development page with the small
 server, a README with Mustafa's Brave and Firefox steps and the commit, and SHA256SUMS.txt. His words of 2026-11-19,
 16:08:04 UTC: the README asks him to keep the window in front and uncovered during the first run, and has one step
-with the window covered on purpose. Never committed; sent through the
-chat's file tool. Run from the repository root, after `build.mjs` wrote the development build with a clean tree:
+with the window covered on purpose. Never committed; sent through the chat's file tool. Run from the repository
+root, after `build.mjs` wrote the development build with a clean tree:
 
-    python3 -I .checkpoints/cs3a-rules-boundaries/make-zip.py .gate/dist-development .gate/cs3a/zip
+    python3 -I .checkpoints/cs3b-loop-closes/make-zip.py .gate/dist-development .gate/cs3b/zip
 
 It refuses a build whose commit is not HEAD's (or is marked "+changes"), and a stage folder that already exists.
 The zip's root is flat: index.html, serve.mjs, assets/, README.txt, SHA256SUMS.txt.
@@ -17,7 +17,7 @@ import subprocess
 import sys
 import zipfile
 
-NAME = "shamble-v2-03a-rules-boundaries"
+NAME = "shamble-v2-03b-the-loop-closes"
 
 
 def git(*args):
@@ -37,43 +37,49 @@ def files_of(folder):
     return sorted(out)
 
 
-README = """Shamble Frontlines v2, change-set 3a: rules and boundaries
+README = """Shamble Frontlines v2, change-set 3b: the loop closes
 Built from commit {commit} ({full}).
 
-What this is: the same first page as last time, an empty lit ground with a 1 m grid. Change-set 3a put the
-rules of the simulation under tests and tidied the edges between its parts, so there is almost nothing new
-to see. Two lines of the readout changed: "frames" is now a count over time (in your Firefox it said 239.2
-where the run's average was 179.9), and a value that rounds to zero no longer prints as "-0.00". Nothing
-in this folder installs anything or goes online: the small server answers this computer only.
+What this is: the same empty lit ground with its 1 m grid, now alive. Six keys are read: W, A, S, D, Space
+and Shift. A small row of six boxes at the bottom left shows them. A box does not light when you press its
+key: it lights when the press has gone to the local game server inside the page, through the real network
+messages, and has come back. The readout has two new lines: "messages" (sent, received, refused) and
+"presses" (made, echoed, lost). Nothing in this folder installs anything or goes online: the small server
+answers this computer only.
 
 You need Node 18 or newer. To check: in PowerShell, type  node --version  and press Enter.
 
-Steps (about 6 minutes of waiting; Brave first, then Firefox once)
+Steps (about 15 minutes; Brave first, then Firefox once)
 
- 1. Unzip this zip into a folder of its own, for example C:\\shamble\\03a-rules. In that folder, click the
+ 1. Unzip this zip into a folder of its own, for example C:\\shamble\\03b-loop. In that folder, click the
     address bar of the File Explorer window, type  powershell  and press Enter. In the window that opens,
     type  node serve.mjs  and press Enter. It should print:
       Shamble Frontlines: serving this folder at http://127.0.0.1:4173
-    Open http://127.0.0.1:4173 in Brave. You should see the grey ground with its grid and, in the readout,
-    "errors: 0" and the commit {commit}.
- 2. Keep Brave's window in front and uncovered for 2 minutes: no other window over it, the screen on.
-    Nothing should change, and the "frames" line should hold steady near your screen's rate.
- 3. Now cover Brave's window completely with another window (for example a maximised File Explorer) for
-    1 minute, then bring Brave back to the front. This step is on purpose: last time one run drew far
-    fewer frames than it ticked and we could not tell why. Do not switch tabs here, only cover the window.
- 4. Switch to another tab for 1 minute, then come back. "last pause" should show about 60 s hidden and
+    Open http://127.0.0.1:4173 in Brave and keep its window in front and uncovered. You should see the grey
+    ground with its grid, the row of six boxes (W, A, S, D, Space, Shift) at the bottom left, and in the
+    readout "errors: 0" and the commit {commit}.
+ 2. Click once on the picture, then press and hold W. Its box should light a moment later and stay lit.
+    Let go: it should go dark.
+ 3. Tap Space quickly ten times. The box should flash each time. In the readout, "presses" should end with
+    the same number made and echoed and "0 lost". While you are still tapping it says "(counting)".
+ 4. Hold A, switch to another tab for 30 seconds, then come back without touching the keyboard. A should be
+    dark (keys held are let go when the tab is hidden), "last pause" should show about 30 s hidden, and
     "ticks while hidden" 0 or a very small number.
- 5. Press "Copy report" and paste the result into the chat. With it, tell us two things your last check
-    did not show: whether Brave Shields was up for this page (the lion icon), and what a double-click on
-    index.html in the folder shows (expected: one line of text that says to run "node serve.mjs").
- 6. In Firefox: open http://127.0.0.1:4173 , wait 2 minutes with the window in front, press "Copy report"
-    and paste it. "frames" should now be close to the run's average (frames divided by the seconds run).
- 7. Back in PowerShell, press Ctrl+C to stop the server.
+ 5. Cover Brave's window completely with another window (for example a maximised File Explorer) for
+    1 minute, then bring Brave back to the front. Do not switch tabs here, only cover the window.
+ 6. Leave it 2 minutes, with the window in front. Then press "Copy report" and paste the result into the
+    chat. In it, "messages.sent" and "messages.received" should have climbed with "tick" (30 a second) and
+    "messages.refused" should be 0. Tell us also whether every box lit as you expected.
+ 7. In Firefox: open http://127.0.0.1:4173 , do steps 2 and 3 once, wait 2 minutes, press "Copy report"
+    and paste it.
+ 8. Back in PowerShell, press Ctrl+C to stop the server.
 
-If something else shows: a line of text over the picture, an error count above 0, a blank page, or a
-readout that does not move: that is exactly what this check is for. Paste what you see. A line that starts
-"The match stopped: the simulation stopped: panicked at" would be new in this build: it is the simulation's
-own error text reaching the page, and we would want it word for word.
+If something else shows: a box that stays lit or never lights, "lost" or "doubled" above 0, "refused" above
+0, a line of text over the picture, an error count above 0, or a blank page: that is exactly what this
+check is for. Paste what you see. A line that starts "The match stopped:" we would want word for word.
+
+One thing to know: the report's "keyToTick" lines say how long a key press took to reach the game's next
+step. We only read them for now; nothing judges them yet.
 
 If the port is taken, the server says so; then type  node serve.mjs 4174  and use that number in the
 addresses above.
