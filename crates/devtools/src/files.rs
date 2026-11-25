@@ -60,13 +60,38 @@ pub fn made() -> Result<Vec<(String, Vec<u8>)>, String> {
     Ok(files)
 }
 
-/// Writes every file into `folder`, which must exist.
+/// Refuses what is in the tree and is no plain file: a link there could lead a read or a write anywhere, and the
+/// repository's tree is not trusted. Nothing there yet is fine.
+fn plain(folder: &Path, name: &str) -> Result<(), String> {
+    // The folder is asked for by its own path: a path that ends in a separator would be followed through a link.
+    let is_folder = name.is_empty();
+    let path = if is_folder {
+        folder.to_path_buf()
+    } else {
+        folder.join(name)
+    };
+    match std::fs::symlink_metadata(&path) {
+        Ok(found) if found.is_dir() == is_folder && found.is_file() != is_folder => Ok(()),
+        Ok(_) => Err(format!(
+            "{:?} is a link or not a plain {}",
+            path.display(),
+            if is_folder { "folder" } else { "file" }
+        )),
+        Err(_) => Ok(()),
+    }
+}
+
+/// Writes every file into `folder`, which must exist. Making the recordings again is deliberate: it is done in the
+/// commit that changes the simulation on purpose, after `--check` has named the first step that moved, and the
+/// change-set's report says why; a change-set that means no change leaves every file byte for byte as it was.
 ///
 /// # Errors
-/// What `made` gives, or a file that could not be written.
+/// What `made` gives, a path that is a link or no plain file, or a file that could not be written.
 pub fn write(folder: &Path) -> Result<Vec<String>, String> {
     let files = made()?;
+    plain(folder, "")?;
     for (name, bytes) in &files {
+        plain(folder, name)?;
         std::fs::write(folder.join(name), bytes).map_err(|error| format!("{name}: {error}"))?;
     }
     Ok(files.into_iter().map(|(name, _)| name).collect())
@@ -76,11 +101,17 @@ pub fn write(folder: &Path) -> Result<Vec<String>, String> {
 /// there that the scripts do not make.
 ///
 /// # Errors
-/// Each file that is missing, differs or is not listed, by name; for a hashes file, the first step that differs.
+/// Each file that is missing, differs, is not listed or is no plain file, by name; for a hashes file, the first step
+/// that differs.
 pub fn check(folder: &Path) -> Result<(), String> {
     let files = made()?;
+    plain(folder, "")?;
     let mut wrong = Vec::new();
     for (name, bytes) in &files {
+        if let Err(why) = plain(folder, name) {
+            wrong.push(why);
+            continue;
+        }
         match std::fs::read(folder.join(name)) {
             Err(error) => wrong.push(format!("{name}: {error}")),
             Ok(found) if found == *bytes => {}
@@ -93,12 +124,12 @@ pub fn check(folder: &Path) -> Result<(), String> {
     let listing =
         std::fs::read_dir(folder).map_err(|error| format!("{}: {error}", folder.display()))?;
     let mut found: Vec<String> = listing
-        .filter_map(|entry| entry.ok()?.file_name().into_string().ok())
+        .filter_map(|entry| Some(entry.ok()?.file_name().to_string_lossy().into_owned()))
         .collect();
     found.sort();
     for name in found {
         if !files.iter().any(|(made, _)| *made == name) {
-            wrong.push(format!("{name} is in the folder and no script makes it"));
+            wrong.push(format!("{name:?} is in the folder and no script makes it"));
         }
     }
     if wrong.is_empty() {

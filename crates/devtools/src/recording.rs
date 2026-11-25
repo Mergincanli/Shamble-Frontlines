@@ -17,6 +17,16 @@
 //! The reader takes any bytes: it checks every count against the bytes it was given before it takes memory for
 //! them, and it never panics.
 
+#![cfg_attr(
+    not(test),
+    deny(
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::indexing_slicing,
+        clippy::arithmetic_side_effects
+    )
+)]
+
 use std::fmt;
 
 use sim::{SEED_BYTES, TICK_HZ};
@@ -34,8 +44,9 @@ pub const STEP_BYTES: usize = 68;
 /// The first line of a hashes file starts with this.
 pub const HASHES_MARK: &str = "shamble-hashes 1";
 
-/// What a recording says about its match.
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// What a recording says about its match. Its `Debug` never shows the seed (ADR 0004 part 8): the type cannot tell
+/// a test seed from a match's own.
+#[derive(Clone, PartialEq, Eq)]
 pub struct Header {
     pub seed: [u8; SEED_BYTES],
     pub start_tick: u32,
@@ -43,6 +54,18 @@ pub struct Header {
     pub tick_rate: u16,
     pub content_hash: [u8; 32],
     pub map_id: String,
+}
+
+impl fmt::Debug for Header {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut shown = f.debug_struct("Header");
+        shown.field("start_tick", &self.start_tick);
+        shown.field("first_sequence", &self.first_sequence);
+        shown.field("tick_rate", &self.tick_rate);
+        shown.field("content_hash", &self.content_hash);
+        shown.field("map_id", &self.map_id);
+        shown.finish_non_exhaustive()
+    }
 }
 
 /// One step: the numbers of the host's `input` call and the time its `step` call got.
@@ -57,7 +80,8 @@ pub struct Step {
     pub presses: [u32; 4],
     /// The move: x in bits 0 to 7 and y in bits 8 to 15, each an `i8`; the rest is zero.
     pub movement: u32,
-    /// The cursor ray, as the bits of its `f32` numbers.
+    /// The cursor ray, as the bits of its `f32` numbers. The input call that takes it turns the bits back into `f32`
+    /// before anything reads them: the format holds no wider number.
     pub ray_origin: [u32; 3],
     pub ray_direction: [u32; 3],
     /// The view time: a tick, and a fraction of a tick in 1/65,536 in the low 16 bits; the rest is zero.
@@ -236,7 +260,7 @@ impl Recording {
             content_hash,
             map_id,
         } = &self.header;
-        let mut bytes = Vec::with_capacity(128 + self.steps.len() * STEP_BYTES);
+        let mut bytes = Vec::with_capacity(self.steps.len().saturating_mul(STEP_BYTES));
         bytes.extend_from_slice(&MAGIC);
         bytes.extend_from_slice(&VERSION.to_le_bytes());
         bytes.extend_from_slice(seed);
@@ -294,7 +318,8 @@ impl Recording {
         if steps > MAX_STEPS {
             return Err(RecordingError::Steps(u64::from(steps)));
         }
-        let (expected, found) = (u64::from(steps) * STEP_BYTES as u64, front.0.len() as u64);
+        let expected = u64::from(steps).saturating_mul(STEP_BYTES as u64);
+        let found = front.0.len() as u64;
         if expected != found {
             return Err(RecordingError::Length { expected, found });
         }
@@ -555,6 +580,13 @@ mod tests {
         let mut same = good.clone();
         same.steps[2].host_ms = same.steps[1].host_ms;
         assert!(same.encode().is_ok());
+        // A recording's own print names its fields and never its seed (84, 69, 83, 84 is "TEST").
+        let shown = format!("{good:?}");
+        assert!(
+            shown.contains("map_id")
+                && !shown.contains("seed")
+                && !shown.contains("84, 69, 83, 84")
+        );
         // Every reason reads as a plain sentence, and none prints a seed byte.
         for error in [
             RecordingError::HeaderCut,
@@ -573,7 +605,7 @@ mod tests {
     }
 
     #[test]
-    fn bytes_of_the_wrong_shape_are_refused_before_any_memory_is_taken() {
+    fn bytes_of_the_wrong_shape_are_refused_by_name() {
         let good = full().encode().expect("it has a file form");
         let decode = Recording::decode;
         assert_eq!(decode(b""), Err(RecordingError::HeaderCut));

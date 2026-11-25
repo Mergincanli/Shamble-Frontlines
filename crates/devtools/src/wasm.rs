@@ -65,7 +65,10 @@ pub fn replay_state_at(recording: &[u8], tick: u32) -> String {
 #[wasm_bindgen]
 #[must_use]
 pub fn fnv1a_64_rounds(length: u32, rounds: u32) -> u64 {
-    let bytes: Vec<u8> = (0..length).map(|at| (at * 31 % 251) as u8).collect();
+    // At most 16 MiB, so no length can ask for more memory than a reading needs, and no product can overflow.
+    let bytes: Vec<u8> = (0..length.min(1 << 24))
+        .map(|at| (at * 31 % 251) as u8)
+        .collect();
     (0..rounds).fold(0, |folded, round| {
         folded.rotate_left(1) ^ sim::state_hash::fnv1a_64(black_box(&bytes)) ^ u64::from(round)
     })

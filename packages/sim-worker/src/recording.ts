@@ -62,13 +62,14 @@ export function readRecording(bytes: Uint8Array, tickHz: number): Recorded {
   const idLength = view.getUint8(fixed - 1);
   if (idLength > MAX_MAP_ID_BYTES) throw new Error(`the map's id is ${idLength} bytes long; the most is ${MAX_MAP_ID_BYTES}`);
   const stepsAt = fixed + idLength + 4;
-  if (bytes.length < stepsAt) throw cut();
+  if (bytes.length < fixed + idLength) throw cut();
   let mapId: string;
   try {
     mapId = new TextDecoder("utf-8", { fatal: true }).decode(bytes.subarray(fixed, fixed + idLength));
   } catch {
     throw new Error("the map's id is not UTF-8 text");
   }
+  if (bytes.length < stepsAt) throw cut();
   const count = view.getUint32(stepsAt - 4, true);
   if (count > MAX_STEPS) throw new Error(`the recording has ${count} steps; the most is ${MAX_STEPS}`);
   const found = bytes.length - stepsAt;
@@ -130,6 +131,7 @@ export function readHashes(text: string): { readonly recordingSha256: string; re
 /** What this build's `input` call cannot take yet is refused whole: nothing recorded is silently left out. */
 export function checkReplayable(recording: Recorded): void {
   const cannot = (what: string): Error => new Error(`this build cannot replay this recording's ${what}`);
+  if (ascii(recording.seed.subarray(0, 8)) !== TEST_SEED_MARK) throw cannot("seed: a replay takes a public test seed only");
   if (recording.startTick !== 0) throw cannot("start tick: a match starts at tick 0");
   if (recording.firstSequence !== 0) throw cannot("first command sequence: a match starts at sequence 0");
   if (recording.contentHash.some((byte) => byte !== 0) || recording.mapId !== "") throw cannot("content: this build takes none");

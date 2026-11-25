@@ -1,6 +1,7 @@
 //! The wasm-bindgen bindings the Worker loads, and nothing else (ADR 0002 parts 3 and 5): the small control API over
 //! local play's one step (`local_match`). The page never calls it. Per tick the Worker's host makes two calls,
-//! `input` and `step`; both take and return plain numbers, so neither makes the glue call back into JavaScript.
+//! `input` and `step`; both take and return plain numbers, so neither makes the glue call back into JavaScript. A
+//! replay of a recorded match also reads `shared_hash`, one plain number; no live tick does.
 //!
 //! What crosses this boundary is kept this small on purpose. Mustafa, 2026-11-18, on WB-HEALTH: "Keep what crosses
 //! it as small as the plan has it (one type, plain numbers on every tick): that keeps a later move off it cheap."

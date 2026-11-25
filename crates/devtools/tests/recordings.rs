@@ -5,7 +5,7 @@
 use std::path::{Path, PathBuf};
 
 use devtools::compare::{Column, first_difference};
-use devtools::files::{MANIFEST, check, made, vector_text};
+use devtools::files::{MANIFEST, check, made, vector_text, write};
 use devtools::recording::{Recording, parse_hashes};
 use devtools::replay::Replay;
 use devtools::scripts::{RECORDINGS, VECTOR_TICK};
@@ -117,8 +117,33 @@ fn the_check_names_each_file_that_differs_is_missing_or_is_not_listed() {
     });
     assert_eq!(
         extra.expect_err("an unlisted file"),
-        "stray.rec is in the folder and no script makes it"
+        "\"stray.rec\" is in the folder and no script makes it"
     );
+    // A link in a file's place is refused by the check and by the writer, which writes nothing through it.
+    #[cfg(unix)]
+    {
+        let outside = Path::new(env!("CARGO_TARGET_TMPDIR")).join("recordings-outside.txt");
+        std::fs::write(&outside, b"not to be touched").expect("a scratch file");
+        let link = changed("link", |folder| {
+            std::fs::remove_file(folder.join("first-loop.rec")).expect("the file goes");
+            std::os::unix::fs::symlink(&outside, folder.join("first-loop.rec")).expect("a link");
+            let written = write(folder).expect_err("the writer refuses a link");
+            assert!(
+                written.ends_with("first-loop.rec\" is a link or not a plain file"),
+                "{written}"
+            );
+        });
+        let refused = link.expect_err("a link in a file's place");
+        assert!(
+            refused.contains("first-loop.rec\" is a link or not a plain file"),
+            "{refused}"
+        );
+        assert_eq!(
+            std::fs::read(&outside).expect("the scratch file"),
+            b"not to be touched"
+        );
+        std::fs::remove_file(&outside).expect("the scratch file goes");
+    }
     // The manifest itself is checked like every other file.
     let manifest = changed("manifest", flip(MANIFEST, 30)).expect_err("a changed manifest");
     assert_eq!(manifest, "manifest.txt differs");

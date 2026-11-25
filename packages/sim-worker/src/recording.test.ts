@@ -1,5 +1,10 @@
 import { expect, test } from "vitest";
+import type { Sim } from "../pkg/sim_wasm.js";
 import { checkReplayable, firstDifference, readHashes, readRecording, replayOn, STEP_BYTES, type Replayable } from "./recording.ts";
+
+// The players' own type is what a replay drives: when its `input` takes more numbers, this line stops compiling
+// until `Replayable` and `replayStep` pass them. Types only: no test here needs the built file.
+export const players: (sim: Sim) => Replayable = (sim) => sim;
 
 const HEADER_BYTES = 87;
 
@@ -71,6 +76,10 @@ test("bytes that are no recording of this version are refused in plain words", (
   expect(changed((_, bytes) => bytes.set(new TextEncoder().encode("REALSEED"), 10))).toContain("a public test seed and never a match's own");
   expect(refused(bytesOf(), 60)).toBe("the recording was made at 30 ticks a second; this build runs at 60");
   expect(changed((view) => view.setUint8(82, 65))).toBe("the map's id is 65 bytes long; the most is 64");
+  // A map id of one byte that is no UTF-8: refused as no text, also when the bytes end inside the count after it.
+  const noText = new Uint8Array([...bytesOf().subarray(0, 82), 1, 0xff, ...bytesOf().subarray(83)]);
+  expect(refused(noText)).toBe("the map's id is not UTF-8 text");
+  expect(refused(noText.subarray(0, 86))).toBe("the map's id is not UTF-8 text");
   expect(changed((view) => view.setUint32(83, 0xffff_ffff, true))).toBe("the recording has 4294967295 steps; the most is 108000");
   // A count the bytes do not hold is refused by the length, before any step is read.
   expect(changed((view) => view.setUint32(83, 108_000, true))).toBe("after the header 7344000 bytes of steps should follow, and 204 do");
@@ -138,6 +147,13 @@ test("a replay makes the live host's calls in the live host's order, and refuses
   };
   const start = "this build cannot replay this recording's ";
   expect(cannot(() => {})).toBe("replayable");
+  // A recording built in memory with a seed that is no test seed, and one with a move: `replayOn` refuses both
+  // before it makes a call.
+  const before = calls.length;
+  const read = readRecording(bytesOf((view) => view.setUint32(HEADER_BYTES + 32, 1, true)), 30);
+  expect(() => replayOn(sim, read)).toThrow(`${start}move: the input call does not take it yet`);
+  expect(() => replayOn(sim, { ...read, seed: new Uint8Array(32).fill(7) })).toThrow(`${start}seed: a replay takes a public test seed only`);
+  expect(calls).toHaveLength(before);
   expect(cannot((view) => view.setUint32(42, 1, true))).toBe(`${start}start tick: a match starts at tick 0`);
   expect(cannot((view) => view.setUint16(46, 1, true))).toBe(`${start}first command sequence: a match starts at sequence 0`);
   expect(cannot((view) => view.setUint8(81, 1))).toBe(`${start}content: this build takes none`);

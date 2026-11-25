@@ -3,11 +3,12 @@
 //! - `hashes <rec>` prints the hashes file this build gives for it;
 //! - `check <rec> <hashes>` compares this build with a hashes file and exits 1 at the first step that differs;
 //! - `state <rec> <tick>` prints the state at that tick, one named field a line: two targets' prints of one tick,
-//!   compared line by line, show which fields differ. The seed is never printed.
+//!   compared line by line, show which fields differ. The seed is never printed;
+//! - `fields <state> <state>` compares two such prints and exits 1 naming each field that differs.
 
 use std::process::ExitCode;
 
-use devtools::compare::{Column, first_difference};
+use devtools::compare::{Column, field_diff, first_difference};
 use devtools::recording::{Recording, hashes_text, parse_hashes};
 use devtools::replay::{replay, state_at};
 
@@ -30,6 +31,13 @@ fn run(arguments: &[&str]) -> Result<String, String> {
                 Some(difference) => Err(format!("the file against this build, {difference}")),
             }
         }
+        ["fields", expected, got] => {
+            let text = |path: &str| Ok::<_, String>(String::from_utf8_lossy(&read(path)?).into_owned());
+            match field_diff(&text(expected)?, &text(got)?) {
+                differing if differing.is_empty() => Ok("the two states agree, field for field\n".to_owned()),
+                differing => Err(differing.join("\n")),
+            }
+        }
         ["state", rec, tick] => {
             let tick = tick.parse().map_err(|_| format!("{tick} is no tick"))?;
             let lines =
@@ -37,7 +45,7 @@ fn run(arguments: &[&str]) -> Result<String, String> {
             lines.ok_or_else(|| format!("the recording never reaches tick {tick}"))
         }
         _ => {
-            Err("usage: replay hashes <rec> | check <rec> <hashes> | state <rec> <tick>".to_owned())
+            Err("usage: replay hashes <rec> | check <rec> <hashes> | state <rec> <tick> | fields <state> <state>".to_owned())
         }
     }
 }

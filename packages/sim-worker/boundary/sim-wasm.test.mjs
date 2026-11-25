@@ -151,7 +151,8 @@ test("the glue exports what the Worker calls and nothing more", () => {
 
 test("in the glue, each per-tick call reaches exactly one export", () => {
   const glue = readFileSync(new URL("../pkg/sim_wasm.js", import.meta.url), "utf8");
-  for (const [method, exported] of [["input(post, held, p0, p1, p2, p3)", "sim_input"], ["step(now_ms)", "sim_step"]]) {
+  // The replay's one number too: no argument, one export, so its shape is pinned and not only its name.
+  for (const [method, exported] of [["input(post, held, p0, p1, p2, p3)", "sim_input"], ["step(now_ms)", "sim_step"], ["shared_hash()", "sim_shared_hash"]]) {
     const from = glue.indexOf(`    ${method} {`);
     expect(from, method).toBeGreaterThan(-1);
     const body = glue.slice(from, glue.indexOf("\n    }", from));

@@ -9,7 +9,7 @@ use std::fmt;
 use sim::{StateSink, World};
 use sim_wasm::{MODE_LOCAL, Sim};
 
-use crate::recording::{Recording, Step, TickHashes};
+use crate::recording::{Recording, Step, TEST_SEED_MARK, TickHashes};
 
 /// Why a recording is not replayed.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -34,6 +34,10 @@ impl fmt::Display for ReplayError {
 fn check(recording: &Recording) -> Result<(), ReplayError> {
     let header = &recording.header;
     let cannot = [
+        (
+            !header.seed.starts_with(&TEST_SEED_MARK),
+            "seed: a replay takes a public test seed only",
+        ),
         (
             header.start_tick != 0,
             "start tick: a match starts at tick 0",
@@ -214,7 +218,7 @@ pub fn shared_bytes_at(recording: &Recording, tick: u32) -> Result<Option<Vec<u8
 mod tests {
     use super::*;
     use crate::compare::{Column, field_diff, first_difference};
-    use crate::recording::{Header, TEST_SEED_MARK};
+    use crate::recording::Header;
     use crate::scripts::test_seed;
 
     /// Twelve steps: button 0 held on the even ones, and pressed once on each.
@@ -288,7 +292,28 @@ mod tests {
         let view = cannot("view time: the input call does not take it yet");
         assert_eq!(refused(&|r| r.steps[3].view_tick = 1), view);
         assert_eq!(refused(&|r| r.steps[3].view_fraction = 1), view);
+        // A recording built in memory with a seed that is no test seed: refused like the bytes of one.
+        assert_eq!(
+            refused(&|r| r.header.seed = [7; 32]),
+            cannot("seed: a replay takes a public test seed only")
+        );
         assert_eq!(refused(&|_| ()), None);
+    }
+
+    /// The live host drops time when it starts, after a stall and on resume (`rebase`), and a recording holds none
+    /// of those calls. That is sound only while a rebase moves the schedule and nothing of the state: with one
+    /// before every step, every hash is the same.
+    #[test]
+    fn a_rebase_before_every_step_changes_no_hash() {
+        let recording = small("a");
+        let plain = replay(&recording).expect("it replays");
+        let mut rebased = Replay::new(&recording).expect("it replays");
+        let mut got = Vec::new();
+        for step in &recording.steps {
+            rebased.sim.rebase(step.host_ms + 5_000.0);
+            got.extend(rebased.next());
+        }
+        assert_eq!(got, plain);
     }
 
     #[test]

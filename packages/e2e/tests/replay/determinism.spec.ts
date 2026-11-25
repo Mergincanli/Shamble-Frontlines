@@ -67,7 +67,11 @@ test("every recording replays in the browser's WebAssembly, on the file players 
   for (const name of names) {
     const recording = readRecording(readFileSync(path.join(recordings, name)), 30);
     checkReplayable(recording);
-    const expected = readHashes(readFileSync(path.join(recordings, name.replace(/\.rec$/, ".hashes")), "utf8")).lines;
+    const hashes = readHashes(readFileSync(path.join(recordings, name.replace(/\.rec$/, ".hashes")), "utf8"));
+    // The hashes file names its recording by digest: it is this recording's.
+    const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", Uint8Array.from(readFileSync(path.join(recordings, name)))));
+    expect(hashes.recordingSha256).toBe(Array.from(digest, (byte) => byte.toString(16).padStart(2, "0")).join(""));
+    const expected = hashes.lines;
     const steps = recording.steps.map((step): Step => [step.hostMs, step.post, step.held, ...step.presses]);
     const got = await replay([...recording.seed], steps);
     expect(got.tickHz).toBe(recording.tickRate);
