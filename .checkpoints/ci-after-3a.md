@@ -27,8 +27,7 @@
   forced: "Exhausted GL driver options"); no `/dev/dri` here. Logs: `.gate/trial/` (not committed).
 - The draft Firefox entry of the test configuration: `ci-after-3a/draft-playwright-config.diff` (applied only for
   trials; the file stays as on main between them).
-- Current step: waiting on his FIREFOX-GL (`ci-after-3a/question-2026-11-25-firefox-gl.md`, at 0a4e32a; board thread
-  needs-musti, due Wed 25 Nov 23:59).
+- Current step: FIREFOX-GL answered (a) (his words of 14:55 Amsterdam, saved by script: a red with the same "no WebGL" line on GitHub means the Firefox entry goes to rules only, the drawing tests a follow-up, three lines to him; any other red comes back with options; no install line or graphics override without his word; no env, stdbuf or nice with options before git or gh). Waiting for #68 (3b) to merge, then take main in, run lists and timings again; if not merged by Thu 26 Nov 12:00 Amsterdam, tell him in one line and go on from that main. .gate/egl deleted.
 - Next three: 1. per his answer, the final Firefox entry and the CI text (the libEGL line included; route (a): the
   Firefox lines inside the cut after Chromium, `SHAMBLE_FIREFOX=/usr/lib/firefox/firefox`, version printed, missing
   file fails by name; header comment updated); 2. security-auditor and infra-engineer read the tried texts together
