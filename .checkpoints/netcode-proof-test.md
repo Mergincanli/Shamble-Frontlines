@@ -5,8 +5,8 @@
   **Base:** main 28254a7 merged in at 39a0d04 (MAIN-65, 2026-11-24 23:2x UTC: #65, cs3a; one conflict,
   docs/STATUS.md: this branch's #40 row kept beside main's 3a row); before it main 1ec6f6c at 72b0dc3 (MAIN-64, #64)
   and main f5030a3 at a6acc8a (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-25 17:1x UTC: his word of 17:00 (history.md:7988-7998) in; MAIN-66's plan and request brought
-  up to main 311c048 (#66, #68, #69 in one merge); his new interim sentence in every brief; the 18:51 wake-up stands.
+- **Last update:** 2026-11-25 17:4x UTC: the save before his /compact (his 17:42 message, history.md:8006-8025); the
+  Now block's done and half-done lines; MAIN-66 (main 311c048) and brief 3 wait for the 18:51 wake-up.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -76,22 +76,20 @@
   `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
   security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
-## Now (2026-11-25 14:0x UTC; the older Now block, with U6c's merge record M0-M9 and the 11-24 lines: this card at dc9244d)
-- **Closed since 11-24:** U6c (merged 17964a3, pushed d85cb43, CI 6/6; u6c-report.md); U6b (8efb9b2; u6b-report.md);
-  MAIN-65 (39a0d04, pushed 82bd694; advisor-main-65-head.md: APPROVE WITH FINDINGS, Lows only); DISK-PACK (b) (Key numbers).
-- **U7's Block 0b DONE 11:45** (u7-block0b.md; dependency-check.md: the DEP-HOLD record and its `#`-line addendum):
-  commit 2701220 (CI 6/6 on 76689c8); the CLI wasm-bindgen 0.2.130 at .gate/u7-0b/cli-root/bin/wasm-bindgen by
-  security's Q1 (b) (security-u7-0b-answer.md; logs .gate/u7-0b/step7-cli.log and step7-audit.log; check4b.py), checks
-  (a)-(d) PASS (the audit's exit 1 as expected, R1's six crates only; all 48 "Downloaded" lines in the lock). Q1
-  condition 5: every workspace cargo call stays `--locked`. cli-target (433 MiB) is cleaned at U7's close by `cargo
-  clean --target-dir`. No advisor-agent read is owed before the builder: C10 (advisor-u7-brief.md:219-220) sends only a
-  difference from (7)-(10) back to security, and u6c-block0.md shows no such read for U6c's Block 0 either.
-- **U8:** C9 DONE 09:2x (Running work, U8); its merge M3-M9 is the next unit on R1's path after brief 3.
-- **U7's T-half:** T1-T4 and T5 (i) DONE (snapshot wip/u7-t-build-t5i.patch, 2,858 added; T5i-1 to -3 for U7's round).
+## Now (2026-11-25 17:4x UTC; the older Now block with 0b's details, U6c's record and the 11-24 lines: this card at da5e148, before it dc9244d)
+- **Done since the last compact (16:14-17:4x UTC; one line each; never start these again):**
+  - The saver restarted as bd0efxc5i at 16:16:54 (no commit; Running work); the 18:51 wake-up set: trig_01C1wNcsqdNANrJnkjyDahba (no commit).
+  - PR #40 re-subscribed at 16:20; its rules event read at 16:36 (no commit; lost at a compact: subscribe again before MAIN-66's step 2).
+  - MAIN-66's plan written: c33d9b2. Its fixes (the notes allowance, the silent lock wait), the check's request main-66-request.txt and brief 3's item 7: e28f3ca.
+  - His 17:00 word recorded (history.md:7988-7998) and applied: plan and request on main 311c048; his new interim sentence in brief 3, the request, the card and q-guard-env.md: 54ad78c.
+  - The plan's #69 wording taken from its sources only; the card's 18:51 item fetches main first: da5e148.
+  - The 16:34 check-in: nothing stopped, chat about 40 % (no commit). His 17:42 message recorded (history.md:8006-8025): this save.
+- **Half done (continue, never redo):** MAIN-66: plan (main-66-plan.md, 217 lines, sha256 d210c5b4…5250) and request pushed at da5e148; missing: the advisor agent's check (18:50 window), then steps 1-7. Brief 3 (U7's R-half): filled and checked in launch-0850.md section 3 (item 7 added); missing: at 18:51, ffcheck.mjs against the then head, `<base>` and the free-disk figure filled, the advisor tool, the SendMessage.
+- **Closed before:** U6c (17964a3, pushed d85cb43), U6b (8efb9b2), MAIN-65 (39a0d04, pushed 82bd694), DISK-PACK (b), U7's Block 0b (2701220; CI 6/6 on 76689c8; u7-block0b.md, dependency-check.md), U8's C9 (09:2x), U7's T-half T1-T4 and T5 (i) (wip/u7-t-build-t5i.patch, 2,858 added; T5i-1 to -3 for U7's round). Kept from 0b: every workspace cargo call stays `--locked` (Q1 condition 5); cli-target (433 MiB) is cleaned at U7's close by `cargo clean --target-dir`; no advisor read is owed before the builder (C10).
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
-- For msg-2026-11-26.md: 1. Builder 2's merge after U6c's, in a gap of R1's path (his item 4 left the order to me; nb2-merge-plan.md). 2. U6c's Q-FP6-1: (b) stands for R1, (a) rides item 1 (b)'s follow-up (u6c-report.md). 3. M9 (the push) before C9: a notes save pushes the merge commit, and a container restart would lose it. 4. C9 to U8's builder at 08:50 (its fixture test pins probe_presence's lines), not a hand edit. 5. The 05:2x cleans: four finished units' own build folders and the release part-clean, then the incident (u7-block0b.md). 6. 0b's order 2, 3, deps, 4, 6, 7, 5, 8 (disk); step 7 to security at 08:50 (u7-0b-security-request.md). 7. C9 on U8's base 096808b with no merge (git refused the fast-forward over its own notes file; my delete-to-pass message was stopped by the safety check and not re-sent: launch-0850.md). 8. Brief 3 moved to the 13:50 window (0b's save came 11:45), then held by his B until after his /compact; the fast-forward check by ffcheck.mjs. 9. Brief 3 before MAIN-66 (main 311c048, MAIN-52; his word of 17:00 UTC: one merge for #66, #68 and #69): brief 3 on the pre-MAIN-66 head by design; MAIN-66's plan written in the 16:xx gap with no agent, its check beside brief 3 in the 18:50 window. Also in that message: his 13:55 answers (GUARD-ENV, NB2-PROMPT, A.3-A.4). All of 11-24's are named in msg-2026-11-25.md (items 1-8 and its addendum's four).
-- **His word of 2026-11-25 17:00 UTC (history.md:7988-7998):** main 311c048 (#69, the guard fix) joins MAIN-66, one merge for #66, #68 and #69; his new interim sentence replaces the old in every brief (:7993); brief 3 first, then the card's order. **His answers of 2026-11-25 13:55 UTC (history.md:7959-7986):** GUARD-ENV (a) (:7964; q-guard-env.md): a small separate chat fixes the guard's gap as its own change-set, with the security reviewer and his go; I fix nothing; every brief keeps the interim rule; security-u7-0b-answer.md stays where it is on this branch; no more detail about the gap in pushed notes. NB2-PROMPT (a) (:7965; nb2-merge-plan.md:14-17): the command named first and his reply awaited; he approves only a prompt showing one `git merge --no-ff` of 0e621dae6e5b009a4cf00b6401b46d771b2215a3 and nothing else; if Builder 2's branch has moved, no command: two lines to him first. A.3-A.4 (:7966-7967): the two save messages and the reminder stay as they are. B (:7969-7974): the save before his /compact; nothing new starts before it. **Of 11:07 UTC (history.md:7938-7957):** DISK-PACK (b) (:7942; the disk line); NPT-EDGE-SLIVER (a) (:7943): kept as merged, and R1's report carries one line on the gap as a known limit of the reading (under a millisecond by reading the code, not measured; the measured window fully counted); item 3 (:7944): nothing before R1 (the game's change-set 3c builds its own link simulator). **Of 00:07 UTC (history.md:7902-7924):** NPT-EDGE-READ (a): H1 in U6c's merge, the 214
+- For msg-2026-11-26.md: 1. Builder 2's merge after U6c's, in a gap of R1's path (his item 4 left the order to me; nb2-merge-plan.md). 2. U6c's Q-FP6-1: (b) stands for R1, (a) rides item 1 (b)'s follow-up (u6c-report.md). 3. M9 (the push) before C9: a notes save pushes the merge commit, and a container restart would lose it. 4. C9 to U8's builder at 08:50 (its fixture test pins probe_presence's lines), not a hand edit. 5. The 05:2x cleans: four finished units' own build folders and the release part-clean, then the incident (u7-block0b.md). 6. 0b's order 2, 3, deps, 4, 6, 7, 5, 8 (disk); step 7 to security at 08:50 (u7-0b-security-request.md). 7. C9 on U8's base 096808b with no merge (git refused the fast-forward over its own notes file; my delete-to-pass message was stopped by the safety check and not re-sent: launch-0850.md). 8. Brief 3 moved to the 13:50 window (0b's save came 11:45), then held by his B until after his /compact; the fast-forward check by ffcheck.mjs. 9. Brief 3 before MAIN-66 (main 311c048, MAIN-52; his word of 17:00 UTC: one merge for #66, #68 and #69): brief 3 on the pre-MAIN-66 head by design; MAIN-66's plan written in the 16:xx gap with no agent, its check beside brief 3 in the 18:50 window. 10. Brief 3's item 7 (silent lane-lock waits; its notes beside u7-t-build.md) and MAIN-66's step 5e (main's guard tests after the merge), for the checker. 11. His interim sentence read as met by scripts that start git themselves with nothing in front of it (ffcheck.mjs, u7-run.sh, main-run.sh, checkpoint.mjs); told him 17:1x; kept unless he says otherwise. Also in that message: his 13:55 answers (GUARD-ENV, NB2-PROMPT, A.3-A.4) and his 17:00 word (MAIN-66 on 311c048; the wider interim rule). All of 11-24's are named in msg-2026-11-25.md (items 1-8 and its addendum's four).
+- **His 17:42 UTC message (history.md:8006-8025):** the save before his /compact (as his B of 13:55, with done and half-done lines). **His word of 2026-11-25 17:00 UTC (history.md:7988-7998):** main 311c048 (#69, the guard fix) joins MAIN-66, one merge for #66, #68 and #69; his new interim sentence replaces the old in every brief (:7993); brief 3 first, then the card's order. **His answers of 2026-11-25 13:55 UTC (history.md:7959-7986):** GUARD-ENV (a) (:7964; q-guard-env.md): a small separate chat fixes the guard's gap as its own change-set, with the security reviewer and his go; I fix nothing; every brief keeps the interim rule; security-u7-0b-answer.md stays where it is on this branch; no more detail about the gap in pushed notes. NB2-PROMPT (a) (:7965; nb2-merge-plan.md:14-17): the command named first and his reply awaited; he approves only a prompt showing one `git merge --no-ff` of 0e621dae6e5b009a4cf00b6401b46d771b2215a3 and nothing else; if Builder 2's branch has moved, no command: two lines to him first. A.3-A.4 (:7966-7967): the two save messages and the reminder stay as they are. B (:7969-7974): the save before his /compact; nothing new starts before it. **Of 11:07 UTC (history.md:7938-7957):** DISK-PACK (b) (:7942; the disk line); NPT-EDGE-SLIVER (a) (:7943): kept as merged, and R1's report carries one line on the gap as a known limit of the reading (under a millisecond by reading the code, not measured; the measured window fully counted); item 3 (:7944): nothing before R1 (the game's change-set 3c builds its own link simulator). **Of 00:07 UTC (history.md:7902-7924):** NPT-EDGE-READ (a): H1 in U6c's merge, the 214
   in-window drops stay unexplained; NPT-L2-ONEWAY (a): Netcode Builder 2's own small change-set after its merge here
   (pointers passed); STAMP-HOME (a): mine, after R1's run, before R1's report. **NB2's merge, on his word:**
   claude/practical-ride-igo41n at 72651a3c…, both parts in one merge, plan first, after U6c's (never overlapping); first
@@ -138,27 +136,25 @@
 - Disk (11-25 06:1x UTC): a cold test,deps run by main-run.sh (incremental on) used 9,013 MiB (13,263 → 4,250; debug about 9.0 GiB: incremental 2.9 + 6.1 other); the dev part-clean after 0b's step 5 freed 9,094 MiB, 13,344 free, the cache cold. With incremental off (u7-run.sh; main-run.sh by `env`, as NB2-C6) a warm cache is about 6.1 GiB, so about 7.1 GiB stays free: under NB2-C5's 8,192. **DISK-PACK (b) DONE 11:29 UTC (disk-pack-b.md): all seven packed, every read-back equal, free 13,330 → 15,547 MiB; list commits cc8180a, 0472386, a98de3e, a572921, b1d445e, d26f79a, d00d15a.** His word 11:07 (history.md:7942): all seven, one at a time by §11 and brief 8.1's steps (c62h-bound-brief.md:494-499), each list commit naming its ruling: 8ee4 and d66e advisor-c62h-bound-p3.md:35; fc41 advisor-brawl1-sets-p0-full.md:7; fd46 advisor-brawl1-sets-p3-full.md:7 (both with his word); 3506 advisor-u4f-20.md:114 and advisor-u4f-f1-close.md:165; 96de that :165; 7192 advisor-u4f-20.md:146. u4f-47-b57221ed139d stays until the -47 re-judge after NB2's merge. A mismatch: it stays, nothing more, three lines to him.
 
 ## Running work (IDs to message, resume or stop; older finished lines and IDs: this card at dc9244d, before it 1b26e8c)
-- **Running now (16:3x UTC):** no agent, no workflow. One background shell: the saver bd0efxc5i (`node
-  .claude/scripts/checkpoint.mjs watch netcode-proof-test`, the two trailers; from 16:16:54 for 110 min, after bhkgzf4vd's clean end at 16:14:18: ends about
-  18:07). When it ends: a hand save if anything waits, then restart it (run_in_background, timeout 7200000); MAIN-66's step 1 stops it.
+- **Running now (17:4x UTC):** no agent, no workflow. One background shell: the saver bd0efxc5i (`node
+  .claude/scripts/checkpoint.mjs watch netcode-proof-test`, the two trailers; from 16:16:54 for 110 min: ends about 18:07; TaskStop bd0efxc5i stops it).
+  When it ends: a hand save if anything waits, then restart it (run_in_background, timeout 7200000) before 18:45; MAIN-66's step 1 stops it (C5 (b)'s proof).
 - **Finished, resumable by SendMessage (each from its own notes):** U7's T-builder a9873cdba07a3219e (worktree
   .claude/worktrees/agent-a9873cdba07a3219e at 577816c; notes u7-t-build.md there, untracked; resume point: brief 3);
   U8's builder ac59cce3e5d002441 (worktree at 096808b; notes u8-build.md "## C9"; nothing until U8's merge); the advisor
   a3de649cd25e474df (U8's rulings; takes U8's head read); NB2's plan check a10848a10f73ed39e (advisor-nb2-merge.md).
-- **Scheduled:** check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; 12:34: nothing stopped; next 16:34, then 20:34
-  UTC); day message trig_01XVEDQzVLaAwy4Fer6AERdS (23:05 UTC: msg-2026-11-26.md); the 18:50 window's wake-up
-  trig_01C1wNcsqdNANrJnkjyDahba (one-shot, 18:51 UTC). The reminder that could not be deleted (it had fired) stays: A.4.
-- **My step (17:1x UTC):** MAIN-66's plan on main 311c048 (main-66-plan.md, 217 lines, sha256 d210c5b4…5250; read only:
-  #66 + #68 + #69, 90 paths, 30 A, 60 M; one conflict, docs/STATUS.md; spikes/ and marks untouched; the kit is main's
-  two guard files, equal to main's after the merge; DEP-HOLD free; main's CI green). Brief 3 stays as filled and checked in launch-0850.md section 3 (its checks there; ffcheck.mjs
-  is re-run against the then head at sending). The 13:50 window passed under his B.1; usage 10 % at 16:15.
+- **Scheduled:** check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; 16:34: nothing stopped; next 20:34 UTC); day
+  message trig_01XVEDQzVLaAwy4Fer6AERdS (23:05 UTC: msg-2026-11-26.md, choices 1-11); the 18:50 window's wake-up
+  trig_01C1wNcsqdNANrJnkjyDahba (one-shot, 18:51 UTC). PR #40 is subscribed. The fired reminder stays (A.4).
+- **My step (17:4x UTC):** the save before his /compact (his 17:42 message). The exact point before it: nothing in
+  flight; MAIN-66 on main 311c048 (#66 + #68 + #69: 90 paths, 30 A, 60 M; one conflict, docs/STATUS.md; the kit is main's two guard files, equal to main's after the merge; DEP-HOLD free; main's CI green) and brief 3 both wait for the 18:50 window. Next act: item 1 below at the 18:51 wake-up.
 - **Next three:**
   1. The 18:50 window (wake-up 18:51; idle by 18:45): confirm the reset; fetch main (still 311c048, else refresh the
      plan's numbers or one line to him); ffcheck.mjs against the then head; `<base>` and free disk filled; one advisor
      tool call; then, in one response, SendMessage to the T-builder (brief 3) and the check of main-66-plan.md (a
      general-purpose agent, opus, xhigh, given main-66-request.txt; it writes advisor-main-66.md). If the send fails,
      stop and tell him; no fresh agent in its worktree. No merge before the check's verdict.
-  2. MAIN-66's steps 1-6 after its verdict (main 311c048, one merge; main-66-plan.md); step 7 (the pushed head) 23:50.
+  2. MAIN-66's steps 1-6 after its verdict (main 311c048, one merge; main-66-plan.md; subscribe_pr_activity on #40 first for its rules); step 7 (the pushed head) 23:50.
   3. U8's merge M3-M9 after MAIN-66's step 6 CI, if the checker's Q1 says yes (u8-brief.md; a3de649cd25e474df's head
      read in a window): the policy-name INVALID (plan.md:1256), C9 on 096808b, test 7's merged-state run, NC-R3-1, the items under U8 below, and the 05:2x clean incident told to the advisor (u7-block0b.md:40).
   Then NB2's merge, in a gap of R1's path (nb2-merge-plan.md; advisor-nb2-merge.md NB2-C1 to -C12; NB2-C1 DONE with
@@ -193,7 +189,7 @@
   words via msgcheck.mjs (the transcript is past Node's largest string: the scratchpad's msgcheck2.mjs streams it, and
   msgcheck3.mjs also reads a message typed while a turn runs, a queued_command attachment); a builder's fast-forward
   first by `node .checkpoints/netcode-proof-test/ffcheck.mjs <worktree> <its head> <base>` from the main folder (0 ADDED
-  present, 0 differing). A worktree agent first runs `git merge --ff-only`; never `cd` into it; no shell loops. Main f5030a3.
+  present, 0 differing). A worktree agent first runs `git merge --ff-only`; never `cd` into it; no shell loops. Chat size: list_events kinds ["result"], the last request's input (usage.iterations) against contextWindow 1,000,000. His words' line: the uuid from `tail -n 300 <transcript>`, then `grep -n -F -m1 '"uuid":"<uuid>"' <transcript>`, then msgcheck3.mjs.
 
 ## Cuts (LEAN-MODE item 4: one line each in the day's message: from, to, what it stopped)
 - For msg-2026-11-25.md: 06:55-07:59 UTC (U6c's builder and this chat); 10:42-12:54 UTC (the U6c advisor and this

@@ -8002,3 +8002,24 @@ Answer in at most 3 lines.
   is merged, every brief carries his sentence "git and gh always start their own command, with no other program in
   front of them." in place of the old interim sentence. Item 3: brief 3 first, then the card's order. At most 3 lines.
   Transcript record 2b0fd0bb-e89b-425c-a0fd-0be3e9678c6b, 17:00:07 UTC, 1011 characters.
+
+## Mustafa, 2026-11-25 17:42 UTC, in this chat: the save before his /compact, with done and half-done lines (word for word)
+```text
+I'm about to run /compact on this chat. First make sure nothing that lives only in this conversation is lost. Do just this, then stop:
+1. Start no new agent, workflow or unit until after the compact. Running ones carry on: background agents and shells keep running through a compact.
+2. Bring the card up to date as your resume source (no new file; within 200 lines, dropping finished lines and pointing to the card commit that held them):
+   - Running work: every running agent, workflow, background shell and scheduled reminder, with the ID you use to message, resume or stop it, its task, its notes file and its resume point.
+   - Your own step: what you are in the middle of, the exact point you reached in it, and the next three steps.
+   - Done since the last compact: one line per finished unit or step with its commit id, so that none of it is started again.
+   - Half done: anything started and not finished, with what is already on disk or pushed and what is still missing, so that it is continued and not redone.
+   - Anything decided, found or promised in this conversation that is not on the card or in a file yet: choices for the day's message, findings and their takers, anything you told an agent beyond its brief, and the session rules you learned here (commands the guard refused, forms never to retry).
+3. Any words of mine that matter later and aren't in history.md yet go in word for word, as usual. That includes this message.
+4. Save with checkpoint.mjs and push. Check that the branch equals origin and git status is clean (or name what is held back, and why).
+5. Reply in two lines: "Ready for /compact: card <sha>; running: <names>." and "Done since the last compact: <the items>; half done: <the items, or none>."
+```
+- **Read as** (the main session's reading, not his words): nothing new starts before his /compact (running work carries
+  on); the card, within 200 lines, gains the running work with IDs, my step with its exact point and the next three,
+  one line per unit done since the last compact with its commit, the half-done items with what is on disk and what is
+  missing, and what is not yet on file (choices, findings, the session rules learned); this message here; the save
+  pushed and checked; a two-line reply.
+  Transcript record 2347141e-61ae-49c3-887e-1db4e4bdcf8d, 17:42:38 UTC, 1740 characters.

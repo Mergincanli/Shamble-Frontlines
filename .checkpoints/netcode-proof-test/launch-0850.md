@@ -106,3 +106,10 @@ other program in front of them. (His interim rule until a second guard fix is me
 - Never enumerate environment variables; never quote agent IDs to him (names only). The Stop hook is answered with a
   notes-only save. If a SendMessage to a finished agent fails, stop and tell him; never start a fresh agent in its
   worktree.
+- Learned 2026-11-25 16:1x-17:4x UTC (before his second /compact): his interim sentence in every brief and every
+  command: git and gh always start their own command, with no other program in front of them (history.md:7993).
+  `checkpoint.mjs save` refuses a skip-CI marker in `-m` (the script adds it itself). A Glob over the repository can
+  time out after 20 s: list a known folder with `ls` instead. `subscribe_pr_activity`'s result carries no rules text:
+  the rules come as their own notification (ReadNotifications), and a compact loses them. CI is read with the GitHub
+  MCP tools (`gh api` is refused). The guard passes a plain `git merge origin/main` in its own call only while the
+  branch changed no protected file since the merge base (routine-guard.mjs:1347-1351).
