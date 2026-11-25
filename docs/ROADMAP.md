@@ -243,7 +243,8 @@ question is said plainly to be not answered; the pass words of PM-0006-7 and che
 advisor agent's reading of his STEP4-COUNT (b), never as his decision; part 1's "no cap on previews" is dated; his
 message of 2026-11-25, 11:07:07 UTC in `docs/DECISIONS.md`. Report `docs/reports/2026-11-25-adr0006-header-row.md`.
 PR #67. His answers of 2026-11-25 (14:55 Amsterdam): PASS-WORDS (a), with PM-0006-7 and checklist step 4 reported as
-"recorded, the question is not answered"; step 4 achieved; WORKERS-NEXT (a), keep Pages. Main's #68 taken in by one
+"recorded, the question is not answered"; step 4 achieved (recorded, the question is not answered); WORKERS-NEXT
+(a), keep Pages. Main's #68 taken in by one
 merge commit; waits for the advisor agent's approval of that head and his go.
 
 **Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, waiting for his go]** — cs3b-loop-closes (the second
