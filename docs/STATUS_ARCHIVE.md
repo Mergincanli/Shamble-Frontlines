@@ -1490,13 +1490,13 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     gap as rust-reviewer's round 1, RR-3, whose link-simulator half is 3c's).
   - 3B-ACKS (before online play): a snapshot acknowledgement bounded from below, and one per entity group
     (netcode-architect's round 1, NA-5).
-  - 3B-OUTAGE-256 (**his decision when due**, before online play; a stated limit): during an outage presses are
-    lost in steps of 256 once one button is pressed more than 255 times unconfirmed (netcode-architect's round 1,
-    NA-5, and round 2: its 3,000-tick outage lost 1,024 of 2,520 presses per button, exactly 4 times 256). The
-    option of PRESS-PACE he said yes to (the plan's words, not his own: `cs3-plan.md`, question 3, option (a)) reads
-    "It is applied one tick (33 ms) later; nothing is ever lost."; the question was about a second tap within one
-    tick. No person can reach this limit in 3b (it needs a network), so nothing is needed before 3b's merge (the
-    advisor agent, 2026-11-25).
+  - 3B-OUTAGE-256 (**his decision when due**, before online play; a stated limit): during an outage presses are lost in
+    steps of 256 once one button is pressed more than 255 times unconfirmed (netcode-architect's round 1, NA-5, and
+    round 2: its 3,000-tick outage lost 1,024 of 2,520 presses per button, exactly 4 times 256). The option of
+    PRESS-PACE he said yes to (the plan's words, not his own: `.checkpoints/ci-wasm/cs3-plan.md` at fcf6def, line 303,
+    question 3, option (a)) reads "It is applied one tick (33 ms) later; nothing is ever lost."; the question was about
+    a second tap within one tick. No person can reach this limit in 3b (it needs a network), so nothing is needed before
+    3b's merge (the advisor agent, 2026-11-25).
   - 3B-PACER-255 (**his decision when due**, once a press fires a weapon): at most 255 presses of one button wait
     their turn in the press pacer; one beyond that is dropped and counted (netcode-architect's round 1, NA-4;
     `crates/client-endpoint/src/press.rs`). Against the same option's "nothing is ever lost"; only a machine gets
@@ -1527,7 +1527,7 @@ _From STATUS's "Waiting on Mustafa", moved here on 2026-11-24 by docs-keeper's s
     dated pointer to his decision of 2026-11-24 (`docs/DECISIONS.md`, 22:44:50 and 23:24:50 UTC; the build plan's three
     sentences were changed by 3b's docs pass) (the advisor agent's read of 2026-11-24, 23:12 UTC, condition C3).
   - The board add-on is active for the builder chat he calls Builder V3 (since 2026-11-24): a pointer of the
-    chat's own, no word of his; nothing of the board is in the repository, by his rule.
+    chat's own, no word of his; nothing of the board is in the repository (he asked for that in the chat).
   - 3B-BLUR-TEST (the verifier, 2026-11-25; with the next change to the page's key handling): nothing fails when
     the listener that lets go of every key as the window loses the focus is removed (its own plant: 85 unit tests
     and 16 browser tests still pass). A browser test holds W, sends `blur` and expects W let go.

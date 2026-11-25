@@ -152,15 +152,20 @@ those three finished in round 2. **All six: PASS in round 2.**
   listener that lets go of keys when the window loses the focus has no test; the room's "allocates nothing" is
   counted for honest ticks only), both named follow-ups; two corrections to the notes, made.
 - **The advisor agent on 09b0043d (2026-11-25, about 04:00 UTC): REVISE, the text only; "the code, final at
-  6abf3d2a3d347ac8b2d5a169cbe5ac0aabc3d9b1, is approved as it stands".** Its eight conditions: all met. The size:
+  6abf3d2a3d347ac8b2d5a169cbe5ac0aabc3d9b1, is approved as it stands".** Its eight conditions: all met, C6 "in
+  purpose" (the timing came before the first push with a browser spec, after three code pushes). The size:
   still one reviewable unit. The reviews: within the budget; it read the last fixes itself and no reviewer needs to
   look again before the merge. The late-command bound: the deferral is its to approve, and it approves it with
   3B-LATE-BOUND's written conditions. RELEASE-COUNT: rightly his; it blocks the claim that the mark is met, not the
-  merge. Its findings were one High and five Mediums, all in wording (this report and the pull-request text called
+  merge. Its findings were one High and four Mediums in wording (this report and the pull-request text called
   the presses mark met "by its own method" for releases too; what his go accepts as still open was not listed;
   RELEASE-COUNT's reason was wrong; the option he chose for press pacing was not quoted; OVERFLOW-PANIC-RULE's due
-  point was missing; the plan's 10-minute run was missing), and each is corrected in this version. Its review of
-  these corrections is recorded here when it is in.
+  point was missing) and one Medium that was a missing reading (the plan's 10-minute run); each is corrected or
+  done in this version.
+- **The advisor agent on the corrected text, 8f835d114dcbf03c80cb7227c9cf189539dc6d09 (2026-11-25, about 04:25
+  UTC): APPROVE "for the next step only: the zip may go to him on this code".** Not a merge approval: the last
+  commit (his check's result, the notes folder removed) gets its own review. All its findings closed; one new
+  Medium (this report named the wrong pull request for CI's lint step) and three Lows, corrected in this version.
 
 ## Decisions and deviations
 - **The build plan's three sentences (his words of 23:24:50 UTC: "(a). Change it with the other two in 3b's docs
@@ -209,11 +214,14 @@ those three finished in round 2. **All six: PASS in round 2.**
 - **OVERFLOW-PANIC-RULE fell due with this change-set.** With his go for #48 he accepted it as left open, "due
   with the first code in the room crate or a server crate" (`docs/DECISIONS.md`), and 3b is that first code. The
   finding: an overflow in the room's own arithmetic panics in release, and on a server's tick that would end the
-  match, repeatably if a client can drive the value. What 3b does about it: `protocol`, `room` and the endpoint's
-  modules deny plain arithmetic outside tests (the lint `arithmetic_side_effects`), and every sum or difference of
-  a value from outside is checked, wrapping or saturating on purpose; the lint check is clean here, in the
-  verifier's copy and in the advisor agent's. What stays open: CI runs no lint step, so the rule is kept by hand
-  until the CI pull request another chat writes; and the drafts' wording (ADR 0004 part 20, ADR 0002 parts 4 and 7,
+  match, repeatably if a client can drive the value. What 3b does about it: `protocol` and `room` (whole crates)
+  and the client endpoint's three modules that take values from outside (`endpoint`, `post`, `press`) deny plain
+  arithmetic outside tests (the lint `arithmetic_side_effects`), and every sum or difference of a value from
+  outside is checked, wrapping or saturating on purpose; the lint check is clean here, in the verifier's copy and
+  in the advisor agent's. What stays open: CI runs no lint step. That stage belongs to the gate step (2.3, its
+  lint stage G2), whose chat is stopped; the small CI pull request another chat writes does not hold it. Until
+  then every change-set that touches `room`, `protocol` or a server crate runs the lint by hand and says so in its
+  report. The drafts' wording (ADR 0004 part 20, ADR 0002 parts 4 and 7,
   the marks) stays with their owners at each draft's next edit, with his go. No draft is edited here.
 - **Found and fixed on the way:** a refused command far ahead shut out the honest ones behind it (the queue's
   window now follows the last command that ran); the one-minute test started its clock after its first reading and

@@ -35,7 +35,7 @@ RELEASE-COUNT: the presses mark's row says the Worker counts presses and release
 
 ## What his go accepts as still open
 - The bound on how late a command may run (3B-LATE-BOUND: security-auditor's Medium, deferred to change-set 7; no room on a network without it).
-- OVERFLOW-PANIC-RULE, which fell due with this first code in `room`: the code keeps the rule (plain arithmetic is denied outside tests; the lint check is clean), CI runs no lint step yet, and the drafts' wording stays with their owners.
+- OVERFLOW-PANIC-RULE, which fell due with this first code in `room`: the code keeps the rule (plain arithmetic is denied outside tests; the lint check is clean), CI runs no lint step (that stage belongs to the gate step 2.3, whose chat is stopped), so until then every change-set that touches `room`, `protocol` or a server crate runs the lint by hand and says so in its report; the drafts' wording stays with their owners.
 - Two limits against the press-pacing option he chose, each his decision when it comes due: at most 255 presses of one button wait their turn (3B-PACER-255); presses are lost in steps of 256 after an outage in which one button is pressed more than 255 times unconfirmed (3B-OUTAGE-256).
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

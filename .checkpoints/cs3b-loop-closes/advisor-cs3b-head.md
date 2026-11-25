@@ -45,3 +45,19 @@ Head 8f835d114dcbf03c80cb7227c9cf189539dc6d09 (= pushed branch head). Two commit
 3. ten-minutes.mjs: read it (what it runs, where it writes), the raw line in the card; plausibility of 18,089 ticks in 603.1 s.
 4. CI on 8f835d11; anything new wrong in what changed.
 ## Findings (block 2)
+- B2-0 setup: 8f835d11 = origin branch head; code stat vs 6abf3d2a empty; 10 files (docs/ 4, notes 6), plain modes. decisions-5.mjs --check: 3 entries, exit 0. STATUS 120 lines. CI on 8f835d11: gate, smoke success; toolchain running at 04:19.
+- H-1 closed: report:90-96 and pr-body Evidence: presses by the mark's method; releases "as far as the server's echo can show them, not by the row's method"; Chromium only; "reorders most neighbours" only on a fast page.
+- M-2 closed: report For Mustafa item 3 and pr-body "What his go accepts as still open" list 3B-LATE-BOUND, OVERFLOW-PANIC-RULE, 3B-PACER-255, 3B-OUTAGE-256.
+- M-3 closed: reason now "releases follow exactly from the held keys and the press counters" (report, archive, pr-body); cost 16 B per command, up to 128 per input (292 to 420). Chat told him the correction at 04:06:56 UTC (transcript).
+- M-4 closed: report and archive quote the plan's option (a) exactly as cs3-plan.md:303 / fcf6def's copy, "the plan's words ... not his own words"; both "his decision when due".
+- M-5 closed in substance, one new error (N-1): report:209-217 paragraph, STATUS:87 due point. But "kept by hand until the CI pull request another chat writes" is wrong: the small CI PR's scope (3a report:285-286; STATUS:31) has no lint step; the lint stage is the gate step's (2.3, G2; archive:818). MEDIUM N-1.
+- M-6 closed: ten-minutes.mjs read (own port 4180, outside packages/e2e/tests, writes nothing in the repo, checks errors/refused/lost/doubled/olderPosts/wrongKeys/ticks); .gate/cs3b/ten-minutes.log = card = report (603.1 s, 18,089 ticks >= 18,062, 3,897 frames, 0 errors, 269/269, "TEN MINUTES: sound", exit 0). Blocks per tick not read (Low, a reading).
+- L-1, L-2, L-3 closed: C6 wording plain; README steps 3 and 5 added, Firefox does 2 to 5; chat's line out of DECISIONS (to archive).
+- N-2 LOW: report:212-213 "the endpoint's modules deny plain arithmetic": only endpoint.rs, post.rs, press.rs do; block.rs, layout.rs, schedule.rs do plain arithmetic on layout constants and the page's pad (no network value). Name the three.
+- N-3 LOW: archive 3B-OUTAGE-256 cites "`cs3-plan.md`, question 3, option (a)" with no path; the notes go at the final commit. Cite `.checkpoints/ci-wasm/cs3-plan.md` at fcf6def (same line 303), as DECISIONS' 14:31:06 entry does.
+- N-4 LOW: report's record of my read: "Its eight conditions: all met" (C6 was "met in purpose") and "all in wording" (M-6 was a missing reading).
+- N-5 LOW (optional): archive's board line says "by his rule": cite his item 12 of 2026-11-23, 16:30:46 UTC (DECISIONS:564).
+- B2 my runs on 8f835d11: gate --no-smoke PASS; repo map OK 193/109.
+- B2 VERDICT: APPROVE the text of 8f835d114dcbf03c80cb7227c9cf189539dc6d09 for the next step (the zip on this code may go to him); not a merge approval (notes folder still in; the final commit gets its own review). H-1, M-2, M-3, M-4, M-6, L-1..L-3 closed; M-5 closed but N-1 (Medium) to fix in the final commit; N-2..N-5 Low, ride the final commit.
+- B2 CI on 8f835d11: gate, smoke, toolchain success (toolchain run 45545524420, 04:15:27-04:20:35).
+DONE (block 2)
