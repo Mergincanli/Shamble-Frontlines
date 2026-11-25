@@ -45,4 +45,8 @@ as -57's kept sets, with -57 not run in that merge (advisor-nb2-merge.md:310-311
    "free before: 13861 MiB"; "archive: .gate/netcode-proof-test/kept-logs/u4r-P2-fc411116c1f1.tar.gz, 178774134 bytes
    from 652405598; read back: 11 of 11 files equal the list (path, bytes, sha256)"; "removed:
    .gate/netcode-proof-test/runs/u4r-P2-fc411116c1f1"; "free after: 14313 MiB".
-3. u4f-20-350677f0aef2: list 24 files, 454,384,864 bytes, committed a98de3e.
+3. u4f-20-350677f0aef2: list 24 files, 454,384,864 bytes, committed a98de3e, pushed with cebafd0. pack 11:25 UTC:
+   "free before: 14313 MiB"; "archive: .gate/netcode-proof-test/kept-logs/u4f-20-350677f0aef2.tar.gz, 147964354 bytes
+   from 454384864; read back: 24 of 24 files equal the list (path, bytes, sha256)"; "removed:
+   .gate/netcode-proof-test/runs/u4f-20-350677f0aef2"; "free after: 14605 MiB".
+4. u4f-20-96de6acf8223: list 24 files, 454,384,548 bytes, committed a572921.
