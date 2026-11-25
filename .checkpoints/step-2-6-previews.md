@@ -68,8 +68,11 @@ The advisor agent's verdicts on F1-F4 (advisor-build-findings.md): F1 APPROVE wi
 PREVIEW-MISSING-BUILD-COMMENT, recommend (a); F3 within the plan, name the split in the report; F4 settled by GitHub's
 rendered docs (re-read with curl); the order approved; Finding A (Medium): the security-auditor reads the proposed
 preview.yml, the token check's added duty and F3's split BEFORE the message to him.
-Next: the security-auditor's early read (Finding A); then the questions file final, pushed; ONE message to him
-(NEW-TEXT: the new text 31119c06... with the one-line diff; PREVIEW-MISSING-BUILD-COMMENT). U2 after his yes.
+The security-auditor's early read (Finding A; security-auditor-early-read.md, E1-E7): no text change, no findings;
+download-artifact 8.0.2 keeps entries inside `path` (its code and a crafted zip); O1 stays an observation; the optional
+read-url hardening (PR in that step's env) left for round 1, not offered now.
+WAITING ON HIM: questions-2026-11-25-build.md (NEW-TEXT, PREVIEW-MISSING-BUILD-COMMENT). After his yes: U2 by
+scratchpad place_u2.py (the guard asks him; sha256 x3 checked), the gate, push; then U5, the draft pull request.
 
 ## Findings during the build (U1)
 - F1 (a defect in the approved preview.yml, job `tests`): `run: node --test hosting/` fails on Node 22: the folder is

@@ -7,7 +7,9 @@ Where the build stands: the preview script, its tests (117, all passing; 29 of 2
 and the header file are pushed; the upload tool's lockfile passed the security-auditor's check (no findings) and is
 pushed with its record; his three messages of today are in DECISIONS; the runbook is written. The advisor agent's
 verdicts on what the build found are in advisor-build-findings.md. Before this file went out, the security-auditor read
-the new text below as it will stand (its notes: security-auditor-early-read.md): RESULT-PLACEHOLDER
+the new text below as it will stand (its notes: security-auditor-early-read.md): no text change, no findings; the
+new text can go to him as it stands. It also checked that the step that fetches the build keeps every file inside
+its folder (actions/download-artifact 8.0.2, read in its own code and tried with a crafted zip).
 
 ## What waits on him
 1. **NEW-TEXT: may one line of the approved preview.yml change?**
@@ -49,6 +51,11 @@ the new text below as it will stand (its notes: security-auditor-early-read.md):
   "at least one of" "Issues" (write) or "Pull requests" (write), and that this works with the token a workflow gets.
   So it is enough; the first real run confirms it. If it ever were not: a small fix of risk tier 2 adding
   `issues: write` to that job, with a new sha256 and his yes.
+
+- **An optional hardening, not offered now.** The security-auditor suggests, as optional, giving the step that reads
+  the link the pull request's number too, so it can match the number itself; today the comment step matches it.
+  That would be a second text change, so it waits for the full security round on the final changes, and would come
+  back to him with its own sha256 if taken.
 
 ## The full new text (texts/preview-proposed.yml)
 ```yaml
