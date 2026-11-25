@@ -84,8 +84,9 @@ is taken in later, before the merge.
 07d673b0 taken in by one merge commit e3b3642b (worktree .gate/merge-71; scripts/resolve71.py, verify71.py: the
 three-way check OK in all 7 files main changed; one-sided files equal; the workflow hashes intact; gate PASS, 117
 tests, map OK); pushed as a fast-forward; the main folder fast-forwarded to it (no guard prompt).
-Next: the pull request's own runs (preview/tests = the CI proof of the tests; wall-test's two pull-request jobs print
-"absent"); then his
+#72's runs on e3b3642b: preview/tests 117 pass on GitHub (the CI proof); wall-test's three jobs printed "absent"
+(M1's before-bite; build-notes B8). Next: his sitting (clicks 1-5 with M1's re-run after 5; then 9, 10; then the
+question again before the token, the wall not merged; then 6-8 with M1's re-run) and then his
 sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
 him again (his MAIN-WALL (b)).
 

@@ -142,3 +142,19 @@ GitHub (docs.github.com):
 - The scratch scripts are now in scripts/ (mutate.py: `python3 mutate.py <suite> hosting/preview.mjs`, with the suite a
   copy holding hosting/ and the texts under .github/workflows/; add_three.py; place_u2.py).
 - REPO_MAP's hosting/ row now names the manifest and lockfile.
+
+## B8. Draft pull request #72 and the first half of M1 (2026-11-25, 20:54 to 21:01 UTC)
+- #72 opened 20:54:50 UTC (draft). GitHub held it as conflicting (mergeable_state "dirty", main 07d673b0 after #71),
+  so no pull-request run started; main taken in at e3b3642b (scripts/resolve71.py, verify71.py), pushed 20:59 UTC.
+- The CI proof of the tests: preview run 45700220336, job `tests` 139508091622 (pull_request, e3b3642b): "# tests 117",
+  "# suites 12", "# pass 117", "# fail 0" at 21:00:19 UTC; jobs check, deploy, after and reconcile skipped, as
+  designed. GitHub accepted the workflow text (the run exists and ran).
+- M1, before click 5 (the bite: the jobs run and see no secret):
+  - push-to-branch: wall-test run 45699354868 (push, 95d32ac), job 139505057787: "absent" at 20:54:21 UTC.
+  - pr-plain: wall-test run 45700220147 (pull_request, e3b3642b), job 139508091935: "absent" at 21:00:09 UTC.
+  - pr-no-deployment-record: the same run, job 139508091246: "absent" at 21:00:07 UTC.
+  These runs are the ones re-run after click 5 and after the token click.
+- Main's toolchain.yml (07d673b0) has no hand-over step yet: until it has, a preview ends with a notice.
+- The order of his clicks: his words of 20:35 Amsterdam, item 5 ("The real token is my last click") put the GitHub
+  settings (plan clicks 9 and 10) before the token clicks (6, 7, 8). The wall is not merged (main 07d673b0), so he is
+  asked again before the token, as his item 5 says.
