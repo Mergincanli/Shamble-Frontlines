@@ -90,3 +90,13 @@ Write files with the Write and Edit tools only (no sed, no shell redirect, no py
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. Never switch
 the main folder; never `cd` into another worktree; no shell loops. Never put env, stdbuf or nice options in front of
 git or gh (GUARD-ENV, q-guard-env.md).
+
+## Session rules carried from the chat (2026-11-25 14:1x UTC, before his /compact; the card's Standing line points here)
+- The guard refuses `git -C`, `-c`, `-P`, `--git-dir`, checkout, restore, `commit --amend`, `worktree remove --force`
+  and `rm -rf`; a hook refuses `gh api` and `git diff --output`. Never force-push or rewrite history.
+- Refused by the session's safety check, so never retried in any wording: `npm audit`; deleting a scheduled task (a
+  reminder that had already fired; his A.4: leave it); telling an agent to delete or move a tracked file with local
+  changes so that a refused git step passes (08:5x, above).
+- Never enumerate environment variables; never quote agent IDs to him (names only). The Stop hook is answered with a
+  notes-only save. If a SendMessage to a finished agent fails, stop and tell him; never start a fresh agent in its
+  worktree.

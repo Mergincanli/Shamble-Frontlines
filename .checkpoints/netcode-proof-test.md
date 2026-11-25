@@ -68,7 +68,7 @@
   line ranges; RESUME-CARD, WIP-CLEAN, TCP-FREEZE, NETEM-BAR (a), SQUASH-40, PROMOTE; one shared target; LEFTOVER-DELETE.
 - **Standing:** every agent brief carries, word for word: "Write files with the Write and Edit tools only (no sed, no
   shell redirect, no python writes; never `cargo fmt` writing files: apply rustfmt's diff by Edit); an agent with no
-  Edit tool rewrites its notes file whole with Write." and the GUARD-ENV interim rule: never env, stdbuf or nice options in front of git or gh (his (a), history.md:7964). Never switch the main folder (worktrees under .gate/); 3 agents at
+  Edit tool rewrites its notes file whole with Write." and the GUARD-ENV interim rule: never env, stdbuf or nice options in front of git or gh (his (a), history.md:7964); the session rules carried from the chat (guard forms, never-retried refusals): launch-0850.md's last section. Never switch the main folder (worktrees under .gate/); 3 agents at
   most; Opus 5.5 at xhigh for netcode; the advisor is a general-purpose agent reading `git show
   origin/main:.claude/agents/advisor.md`; commits end with the Co-Authored-By and Claude-Session lines; the five U4
   briefs go to the advisor before their builds; carries word for word from u4s-carries.md, met by number in reports.
@@ -158,9 +158,9 @@
   1. Brief 3 (U7's R-half) right after the compact, inside the 13:50-14:20 UTC window: ffcheck.mjs against the then
      head (a notes commit since dc9244d must add no path the builder's worktree holds), `<base>` filled, the advisor
      tool, then SendMessage to the T-builder. Past 14:20: an 18:50 UTC wake-up
-     (send_later) and the 18:50-19:20 window.
+     (send_later) and the 18:50-19:20 window. If the send fails, stop and tell him; no fresh agent in its worktree.
   2. U8's merge M3-M9 (u8-brief.md; the advisor a3de649cd25e474df's head read, in a window): the policy-name INVALID
-     (plan.md:1256), C9 on 096808b, test 7's merged-state run, NC-R3-1, and the items under U8 below.
+     (plan.md:1256), C9 on 096808b, test 7's merged-state run, NC-R3-1, the items under U8 below, and the 05:2x clean incident told to the advisor (u7-block0b.md:40: its next check).
   3. NB2's merge, in a gap of R1's path (nb2-merge-plan.md; advisor-nb2-merge.md NB2-C1 to -C12; NB2-C1 DONE with 0b):
      step 1 re-checks Builder 2's tip: not 0e621dae → no command, two lines to him first; else the command `git merge
      --no-ff 0e621dae6e5b009a4cf00b6401b46d771b2215a3` is named and his reply awaited (NB2-PROMPT (a)); then check.mjs
