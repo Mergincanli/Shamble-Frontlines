@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
   e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-25 about 00:25 UTC, both parts done and checked; waiting on the merge.
+- **Last update:** 2026-11-25 about 00:08 UTC, both parts done and checked; waiting on the merge.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
