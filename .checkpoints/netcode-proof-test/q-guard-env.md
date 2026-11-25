@@ -30,3 +30,8 @@ them (security's Q3 answer: no `env -C`, no `git -C`).
 
 **My recommendation:** (a). The fix is a few lines in one kit file and needs the kit's own reviews; it does not touch
 R1's path, and the interim rule keeps this chat safe meanwhile.
+
+**Answered 2026-11-25 13:55 UTC: (a)** (history.md:7964, word for word there): a small separate chat fixes it soon as
+its own change-set, with the security reviewer and his go. This chat fixes nothing and keeps the interim rule in every
+brief; security-u7-0b-answer.md stays where it is on this branch (the other chat reads it there); pushed notes get no
+more detail about the gap than they hold now.

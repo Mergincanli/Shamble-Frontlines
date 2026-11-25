@@ -52,23 +52,33 @@ no shell redirect, no python writes; never `cargo fmt` writing files: apply rust
 Edit tool rewrites its notes file whole with Write.
 
 ## 3. U7's T-builder takes the R-half (SendMessage; its notes u7-t-build.md; new notes u7-build-rs.md)
+Filled 13:5x UTC in the 13:50 window (0b's save came 11:45, after the 08:50 window); held by his 13:55 B.1
+(history.md:7970) until after his /compact. At sending: `<base>` = the then head, the fast-forward check re-run against
+it (`node .checkpoints/netcode-proof-test/ffcheck.mjs <worktree> 577816c <base>`: want 0 ADDED present, 0 differing).
+At 13:5x vs dc9244d: 577816c its ancestor; 222 paths (89 M, 132 A, 1 D); 0 ADDED present; 90 of 90 equal; web/ untouched.
 The R-half now: Blocks R1-R4, then T5 (ii), by u7-brief.md rev 1.1 (sections 1, 3-6, 8) and the advisor's conditions
 C1-C14 (advisor-u7-brief.md:110-247, binding by pointer).
-1. `<base>` = the netcode branch with U6c merged and U7's Block 0b committed (wasm-bindgen = "=0.2.130" on
-   npt-client-wasm, its three dev-dependencies npt-room, npt-server, npt-sim; the lock +4 lines, no new package).
-   Counts at `<base>`: check.mjs test measured 861, bites 958 (u7-block0b.md step 5). In your worktree, touching no
-   file first: `git merge --ff-only <base>` (your T-half files under web/ and your notes stay as they are; nothing under
-   web/ changed since 577816c, and the branch no longer carries a copy of u7-t-build.md). If git refuses, stop and
-   report its message; remove, restore or move nothing. Then `git log -1 --format=%H` into u7-build-rs.md, with your
-   plan for R1-R4 before any edit.
+1. `<base>` = <the then head> (at 13:5x: dc9244d): the netcode branch with U6c merged and U7's Block 0b committed at
+   2701220 (wasm-bindgen = "=0.2.130" on npt-client-wasm, its three dev-dependencies npt-room, npt-server, npt-sim; the
+   lock +4 lines, no new package); its code equals 76689c8's, where CI ran 6/6 green; the commits after it are notes
+   only. Counts at `<base>`: check.mjs test measured 861, bites 958 (u7-block0b.md step 5). In your worktree, touching
+   no file first: `git merge --ff-only <base>` (your T-half files under web/ and your notes stay as they are; checked
+   from the main folder: nothing under web/ changed since 577816c, no path the merge adds exists in your worktree, and
+   every path it changes or deletes is unmodified there). If git refuses, stop and report its message; remove, restore
+   or move nothing. Then `git log -1 --format=%H` into u7-build-rs.md, with your plan for R1-R4 before any edit.
 2. Every cargo call through `bash /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u7-run.sh [-x] [-k]
    <your worktree> <log under /home/user/Shamble-Frontlines/.gate/u7/> <command...> [:: <command...>]` (u6c-run.sh
    copied, names only: the shared target, the lane lock, CARGO_NET_OFFLINE=true, CARGO_INCREMENTAL=0, the 4 GB floor).
-   On exit 3 (under 4 GB) stop and tell me; never clean anything yourself.
-3. The cache is cold (emptied 06:1x UTC): your first build takes about 20-40 minutes. Free 13.3 GiB then.
-4. The wasm-bindgen CLI is not installed yet (security's Q1 (b): the main session fetches it, checks its sha256, then
-   installs it, many packages in all). R1-R4 do not need it. Before
-   T5 (ii) wait for my message with its path (`<root>/bin/wasm-bindgen`, 0.2.130), or stop after R4 and report.
+   On exit 3 (under 4 GB) stop and tell me; never clean anything yourself. Every cargo call carries `--locked`
+   (security's Q1 condition 5, security-u7-0b-answer.md:125: the cache now holds crates an unlocked offline resolve
+   could pick up); spikes/netcode-proof/Cargo.lock stays as `<base>` has it (sha256 55604a5f…9f5d): if a step would
+   change it, stop and report.
+3. The shared cache is still cold (1 MiB at 13:5x; emptied 06:1x UTC): your first build takes about 20-40 minutes.
+   Free 15,081 MiB at 13:5x UTC.
+4. The wasm-bindgen CLI 0.2.130 is installed (security's Q1 (b); its four checks pass: dependency-check.md's addendum)
+   at /home/user/Shamble-Frontlines/.gate/u7-0b/cli-root/bin/wasm-bindgen. build.mjs takes it from NPT_WASM_BINDGEN
+   (web/build.mjs:127; else PATH's wasm-bindgen), so give that variable this path for T5 (ii) and every build.mjs run.
+   Never install, update, rebuild or copy the CLI.
 4b. R4's `web` step and any build.mjs run: outputs under .gate/ (C7's web-check, C13's dist-bites), never web/dist or
    web/dist-bites in the tree: security's N-U7D-1 (security-u7-deps.md: a written web/dist makes the redact step fail
    closed, by design; never add `dist` to its skip list).

@@ -7955,3 +7955,32 @@ Answer in at most 6 lines.
   fully counted. Item 3: nothing before R1; a later promotion of this lane's link simulator into the game may fall
   away, since the game's change-set 3c builds its own.
   Transcript record a3032198-44eb-46ac-9157-f14e65808c33, 11:07:37 UTC, 1298 characters.
+
+## Mustafa, 2026-11-25 13:55 UTC, in this chat: GUARD-ENV (a), NB2-PROMPT (a), the save messages and the reminder stay; the save before his /compact (word for word)
+```text
+For the netcode chat, from me, written with my main Advisor (25 November, 14:55 Amsterdam). Lean mode stays as it is.
+
+A. My answers.
+1. GUARD-ENV (who fixes the gap in the guard, and when): (a). A small separate chat fixes it soon as its own change-set, with the security reviewer and my go. You fix nothing and you keep the interim rule in every brief. Leave the finding file security-u7-0b-answer.md where it is on your branch: the other chat reads it there. Write no more detail about the gap into pushed notes than is there now.
+2. NB2-PROMPT (do I answer the merge's permission prompt myself): (a), yes. Name the command first, as your plan says, and wait for my reply. I approve the prompt only if it shows one git merge --no-ff of 0e621dae6e5b009a4cf00b6401b46d771b2215a3 and nothing else. If Netcode Builder 2's branch has moved by then, do not send the command: tell me in two lines first.
+3. The two save messages that mention the board stay as they are. History is never rewritten, and my main Advisor found no address, id or key of the board in them.
+4. The reminder you could not delete: leave it.
+
+B. I'm about to run /compact on this chat. First make sure nothing that lives only in this conversation is lost. Do just this, then stop:
+1. Start no new agent, workflow or unit until after the compact. Running ones carry on.
+2. Bring the card up to date as your resume source (no new file; within 200 lines): every running agent, workflow and background shell with its ID, task, notes file and resume point; your own step and the next three after it (the Rust-half brief and Netcode Builder 2's merge among them); anything decided, found or promised in this conversation that is not on the card or in a file yet.
+3. Any words of mine that matter later and aren't in history.md yet go in word for word, as usual. That includes this message.
+4. Save with checkpoint.mjs and push. Check that the branch equals origin and git status is clean (or name what is held back, and why).
+5. Reply in one line: "Ready for /compact: card <sha>; running: <names>."
+```
+- **Read as** (the main session's reading, not his words): lean mode unchanged. GUARD-ENV (a): a small separate chat
+  fixes the guard's gap as its own change-set, with the security reviewer and his go; this chat fixes nothing, every
+  brief keeps the interim rule, security-u7-0b-answer.md stays where it is on this branch, and pushed notes get no more
+  detail on the gap than they hold now. NB2-PROMPT (a): he answers the merge's permission prompt himself; the command
+  is named first and his reply awaited; he approves only a prompt showing one `git merge --no-ff` of
+  0e621dae6e5b009a4cf00b6401b46d771b2215a3 and nothing else; if Netcode Builder 2's branch has moved by then, no command
+  is sent and he gets two lines first. Items 3 and 4: the two save messages and the reminder stay as they are. B: no new
+  agent, workflow or unit before his /compact (brief 3, filled and checked at 13:5x UTC, waits until after it); the card
+  brought up to date as the resume source; this message here; the save pushed and checked; a one-line reply.
+  Transcript record c546c7fc-9a8f-4276-b586-bf9c287bb70e (typed while a turn ran: a queued_command attachment),
+  13:55:27 UTC, 2063 characters.

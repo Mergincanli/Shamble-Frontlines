@@ -11,6 +11,10 @@ headlines, exit 0, "verdict": "MOVED" and env CARGO_INCREMENTAL=0 (C6); the merg
 (C7); a moved tip only under its test (C8); a risk line on the other crates' tests (C9); a reviewer's read of
 `git diff 67892d39 72651a3c` in the judge and marks folders before the report (C10); -57 not run, named as not
 verified (C11); its text fixes (C12). Q1: yes, in the main folder. Decision NB2-PROMPT goes to him.
+**NB2-PROMPT answered 2026-11-25 13:55 UTC: (a)** (history.md:7965, word for word there): he answers the prompt
+himself; the command is named first and his reply awaited; he approves only a prompt showing one `git merge --no-ff`
+of 0e621dae6e5b009a4cf00b6401b46d771b2215a3 and nothing else; if Builder 2's branch has moved by then, no command is
+sent: two lines to him first.
 
 ## Why
 Mustafa's word, 2026-11-25 00:07 UTC, item 4 (history.md:7909, word for word there). The lines this plan rests on:
