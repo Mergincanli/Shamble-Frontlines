@@ -5,8 +5,8 @@
   **Base:** main 28254a7 merged in at 39a0d04 (MAIN-65, 2026-11-24 23:2x UTC: #65, cs3a; one conflict,
   docs/STATUS.md: this branch's #40 row kept beside main's 3a row); before it main 1ec6f6c at 72b0dc3 (MAIN-64, #64)
   and main f5030a3 at a6acc8a (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-24 23:2x UTC: MAIN-65 merged at 39a0d04 and pushed by step 6's save; both advisors DONE (U6c's
-  ruling: H2 before M5, H1 on his NPT-EDGE-READ yes); saver ended 19:47 (hand saves); Fable on; msg sent 23:00.
+- **Last update:** 2026-11-25 03:5x UTC: the 03:50 reset confirmed (next 08:50); three advisor agents launched (step 7,
+  M4b, NB2's plan check); U6c's M0-M4a done (uncommitted, as ruled); NB2's merge plan written; saver off (hand saves).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -100,7 +100,7 @@
 - **RESUME (U6c's merge, M0-M4a DONE 00:2x UTC):** wip/u6c-fix.patch applied in the main folder (uncommitted; 12 modified, 12 new untracked; cmp 24/24), H1 and H2 by Edit; fmt --check exit 0; .gate/u6c-merge/hunks.diff 9a3bbeb7… (load.rs +4 -3, probe.rs +7 -3, SERIES.md +1 -1). No stash, clean, checkout or restore; saves notes-only. At 03:51 three agents: step 7 (main-65-step7-request.txt; its reruns first), M4b (u6c-m4b-request.txt), NB2's plan check (nb2-merge-request.txt on nb2-merge-plan.md); M5 only after M4b's APPROVE and step 7's reruns.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
-- For msg-2026-11-26.md: none yet. All of 11-24's are named in msg-2026-11-25.md (items 1-8 and its addendum's four).
+- For msg-2026-11-26.md: 1. Builder 2's merge after U6c's, in a gap of R1's path (his item 4 left the order to me; nb2-merge-plan.md). All of 11-24's are named in msg-2026-11-25.md (items 1-8 and its addendum's four).
 - **His answers of 2026-11-25 00:07 UTC (history.md:7902-7924):** NPT-EDGE-READ (a): H1 in U6c's merge, the 214
   in-window drops stay unexplained; NPT-L2-ONEWAY (a): Netcode Builder 2's own small change-set after its merge here
   (pointers passed); STAMP-HOME (a): mine, after R1's run, before R1's report. **NB2's merge, on his word:**
@@ -148,13 +148,13 @@
 - Disk (11-24 23:24 UTC, MAIN-65's light run): 10,290 MiB free (floor 4,096); debug only 212 MiB (the light runs' judge build): a near-cold M5 (≥ 8,192 first, advisor-u6b-m6.md:158-165: met; it may fill ~7.8 GB, so the dev part-clean before the next run); unpacked: card at 74bf901.
 
 ## Running work (IDs to message, resume or stop; finished lines, U4f2, the re-plan, today's packs: this card at 1b26e8c)
-- **No agent running. DONE 23:1x: the round-2 ruling a0031a451c8991809 (advisor-u6c-r2.md: APPROVE; H2 before M5; H1 only on his NPT-EDGE-READ yes; U6c merges after MAIN-65 and his answer, H2 alone after end Fri 27) and MAIN-65's check ad01820dd92758e65 (APPROVE WITH CONDITIONS M65-1 to -5); saver ended 19:47, hand saves:** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
+- **Running since 03:58 UTC (3 of 3, read only; launched in the 03:50 reset's window): step 7 af3e13c175d8f5489 (advisor-main-65-head.md; its item-4 reruns first), M4b afaa2a622da2d42c7 (advisor-u6c-m4b.md), NB2's plan check a10848a10f73ed39e (advisor-nb2-merge.md); each prompt = its request file (hashes below) plus a launch note (HEAD bae6232, notes-only since). Before: DONE 23:1x: the round-2 ruling a0031a451c8991809 (advisor-u6c-r2.md: APPROVE; H2 before M5; H1 only on his NPT-EDGE-READ yes; U6c merges after MAIN-65 and his answer, H2 alone after end Fri 27) and MAIN-65's check ad01820dd92758e65 (APPROVE WITH CONDITIONS M65-1 to -5); saver ended 19:47, hand saves:** round 2 DONE 18:22: netcode ac0f5d109f30fedce, test
   aacd36781fdea65a0, security a307bdd231bf3e9b4, each APPROVE WITH FINDINGS, no Critical or High (u6c-r2-*.md, each
   ending DONE). A stopped agent resumes by SendMessage from its notes.
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-    (next 00:34); step 7 trig_01Co9w6DYSoCbkQz5RWhK58i (03:51; main-65-step7-request.txt b03fc992…, u6c-m4b-request.txt d124e576…, nb2-merge-request.txt df3f2576… on plan 2b7fb042…); day message trig_01XVEDQzVLaAwy4Fer6AERdS (11-25 23:05). The Fri 27 H2-alone fallback is deleted (his yes is in).
-- **MAIN-65 steps 1-6 DONE 23:28 UTC (step 7 at 03:51):** pushed at 82bd694 (82bd69428512e679b789797d674ef04bd4743715); CI on it green: gate 45509875991 and toolchain 45509875989 (push), gate 45509881420 and toolchain 45509881180 (pull request); merge 39a0d04 (parents H0 473f5c1, main 28254a7); STATUS.md 120 lines, "1 1" against main; H0..HEAD 64 files +4677/-317 (63 without STATUS.md, +4644/-284); anchor 9475d37 exit 0 (index and HEAD); gate PASS (--no-smoke); repo map OK 186/110; checkpoint tests 33/33; light.log PASS (refs 1848 = 1825 + 23, marks 81, self 78/78, redact 11/11, 359 items, 0 findings); outputs .gate/main-65/ kept for step 7.
+    (00:34 answered: nothing stopped; next 04:34); step 7 trig_01Co9w6DYSoCbkQz5RWhK58i (fired 03:51, one-shot; main-65-step7-request.txt b03fc992…, u6c-m4b-request.txt d124e576…, nb2-merge-request.txt df3f2576… on plan 2b7fb042…); day message trig_01XVEDQzVLaAwy4Fer6AERdS (11-25 23:05). The Fri 27 H2-alone fallback is deleted (his yes is in).
+- **MAIN-65 steps 1-6 DONE 23:28 UTC (step 7 at 03:51):** pushed at 82bd694 (82bd69428512e679b789797d674ef04bd4743715); CI on it, read again 03:5x by run: gate 45509875991 success (23:25:40-23:27:00) and toolchain 45509875989 success (to 23:28:13) (push), gate 45509881420 success (to 23:27:10) and toolchain 45509881180 success (to 23:28:34) (pull request), each on 82bd694; merge 39a0d04 (parents H0 473f5c1, main 28254a7); STATUS.md 120 lines, "1 1" against main; H0..HEAD 64 files +4677/-317 (63 without STATUS.md, +4644/-284); anchor 9475d37 exit 0 (index and HEAD); gate PASS (--no-smoke); repo map OK 186/110; checkpoint tests 33/33; light.log PASS (refs 1848 = 1825 + 23, marks 81, self 78/78, redact 11/11, 359 items, 0 findings); outputs .gate/main-65/ kept for step 7.
 - **My step (18:3x):** round 2: netcode 3 Lows in the diff, 2 Mediums outside it before R1 (the start-edge drop read;
   LG's DONE with no READY, caught at U8's one load_up call :2218-2221); P1's +222 drops are in-window, a separate fact
   (U8's equal-on-P1 rule, :1708-1711); test 1 Medium (TE-U6C-R2-4), 7 Lows; security 2 Lows. Ruling 22:5x (19:5x: the snapshot applies on 4f9ca2b, 24 files; facts added to the request). The readings are DONE,
