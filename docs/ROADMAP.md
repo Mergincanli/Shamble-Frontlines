@@ -182,6 +182,7 @@ CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge
 clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
 `docs/reports/2026-11-13-foundation-2-3-docs.md`. Step 2.3's plan followed on its branch and waits for his go.
 
+- **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
 
@@ -225,6 +226,9 @@ clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
 
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
+
+**Guard fix: a wrapper's option values [2026-11-25, waiting for his go]** — guard-env-fix (PR #69, risk tier 2; SEC-U7B-1): the day guard reads env, nice and stdbuf options with their values, so git and gh behind them no longer skip its check;
+a form it cannot read asks the main session and refuses an agent; routines unchanged. Guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES; waits for the advisor agent's review of the final head and his go.
 
 **Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, waiting for his go]** — cs3b-loop-closes (the second
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the page's keys go to the
@@ -347,11 +351,3 @@ security-auditor's APPROVE WITH FINDINGS and the PR Advisor routine's APPROVE of
 at the end of `.claude/NIGHT_SHIFT.md` step 6, by his NS-STATUS (a) and his yes to the exact lines (NS-LINES (a)), the
 exception to KIT-FREEZE-2 for that one change; seven Lows deferred in writing (the archive's "Follow-ups"), two of them
 his NS-TRAILER and NS-FIRST, his (b): the kit's next change after the freeze.
-
-**Kit: KEPT-LOGS, kept raw logs and the old build cache [2026-11-15, MERGED]** — kept-logs-rule (PR #53, 53272a1,
-2026-11-15 19:49:22 UTC by `merged_at`, by merge commit, on his KL-MERGE (a), after the security-auditor's and the
-test-engineer's APPROVE WITH FINDINGS and the advisor's APPROVE WITH CONDITIONS of a637c7a; CI green on main):
-`.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs` with its tests: a day session may pack and remove a
-closed run set's raw logs (a committed list, a read-back, free space before and after) and the one old build cache, and
-nothing else; his KEPT-LOGS (c), KL-YES (the exception to KIT-FREEZE-2 for this one rule) and KL-CHANGE-YES; SA-KL-1 to
-SA-KL-4 and KLT-1 to KLT-8 accepted as left open by his word (the kit's next change after the freeze).
