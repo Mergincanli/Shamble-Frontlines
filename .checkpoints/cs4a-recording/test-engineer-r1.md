@@ -25,3 +25,32 @@
 - F-j (run, my copy, players' file and test module built there with --wasm-only): the interleaving-only plant in Node: W1 green, both test-module tests green, W2 RED at replay.test.mjs:87, step 3. W2 bites where the solo checks cannot. Plant removed.
 - F-k (run, my copy): N1, N2, N3 in a RELEASE build: all green against the committed (debug-made) files, the 36,000-step children equal. CI runs devtools in debug only (toolchain.yml: release line is -p sim -p protocol); PM-0004-18's "built as the server builds the sim" half is not in CI (E1).
 - F-l (run): devtools suite in debug: hash_cost.rs takes 1.73 s and cannot fail (asserts fnv's determinism only); every other group under 0.7 s.
+- F-m (CI log, job 139488422220 on 5a16b4e): devtools tests ran twice (recordings 3/3, two_instances, two_processes, hash_cost), npm test ran recording.test.ts 5/5, boundary replay.test.mjs 6/6 with the Wasm cost reading printed, the Chromium spec passed in HeadlessChrome 157. CI's claims on the card hold.
+- F-n (read): the field-level diff across targets is a tool path (bin `replay state` + test module `replay_state_at`, diffed by the plants script in Python); compare::field_diff is used by one unit test only. In CI a red W1/C1 names the tick, never the field. PR #70 says "a comparer that names ... the fields that differ there": true for the library, by hand across targets.
+- F-o (read): two_processes.rs:71 keeps only lines containing "-loop "; 4c's `walk`/`lane-walk` lines would be dropped and the test would fail as "is not" until the filter changes (4c trap, Low).
+- F-p (read): plants-4a.txt carries no commit SHA and the clean run does not check the tree equals HEAD (git status on crates/packages); the run predates eb14739 (recording files then uncommitted). The script edits world.rs and re-makes recordings in the shared worktree, where other reviewers run tests: run it in a separate worktree.
+- F-q (read): plant E is a stand-in for the libm sin injection; PM-0004-21 asks for the search over sin inputs first (PM-0004-22's table), the stand-in only if none differs. Not run. 4c (three of three on movement fields), but the report should say so.
+- F-r (read): recording.rs "every reason ... none prints a seed byte" check (recording.rs:559-572) and the hash-cost readings are fine; hash_cost.rs and the Node cost test cannot fail by design (readings).
+
+## Plant texts for plants-4a.py (anchor STEP, as the script's others)
+- Interleaving-only (for N3 and W2; N1 run with --test-threads=1, N2 and W1 stay green):
+  { static STEPS: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+    if self.tick == 0 { STEPS.store(0, std::sync::atomic::Ordering::Relaxed); }
+    if STEPS.fetch_add(1, std::sync::atomic::Ordering::Relaxed) != self.tick { self.player.presses[1] ^= 1; } }
+  My result: N3 red at two_instances.rs:32 step 3; W2 red at replay.test.mjs:87 step 3; N1 (one at a time), N2, W1, both test-module tests green.
+- Plant C widened (64 bits, so two processes differ with certainty, as plant D):
+  if self.tick == 599 { let map: std::collections::HashMap<u32, u32> = (0..32).map(|k| (k, k)).collect();
+    let mut order = 0u64; for (k, _) in &map { order = order.wrapping_mul(0x100_0000_01B3) ^ u64::from(*k); }
+    for (count, byte) in self.player.presses[2..10].iter_mut().zip(order.to_le_bytes()) { *count = byte; } }
+  and log both orders (e.g. eprintln of `order` in each child's run, read from the log) as PM-0004-21 asks.
+- Tick and field for C and D: `cargo run -q -p devtools --locked --bin replay -- check <rec> <hashes>` (names the step), then
+  `... --bin replay -- state <rec> 600` run twice (two processes) and the lines diffed (names player.presses).
+
+## Leftovers of mine (delete refused by the permission system; the main session may remove them)
+- .gate/te-4a (a git worktree at 6ebc6c7, tracked files clean, ignored build outputs inside); .gate/te-4a-target (345 MB); .gate/te-scratch/fold.
+
+## Verdict
+REVISE (small): no product defect found; every core test can go red on its defect. Asks: PM-0004-21's tick and field for the
+two two-process injections (N2 names the step, about 15 lines; the field from the dumps in the plants), plant C made certain,
+the interleaving-only plant, replayOn's refusal tested; the rest wording and 4c follow-ups. About 22 product lines in all.
+DONE

@@ -19,7 +19,25 @@ For 4b's re-read and 4c (no line now): what `first-loop` replays on once content
 frozen content copies must be listed inputs of the folder check, not unlisted files (4c); the shared length from the
 world, not a constant (4c); `StateSink::f32` with a finite check (4c); the recording's header has no mode (Slice 2).
 
-## rust-reviewer: (running)
+## rust-reviewer: APPROVE; nothing Critical or High (`rust-reviewer-r1.md`)
+| # | Severity | Finding | Decision |
+|---|---|---|---|
+| R1 | Medium (latent) | `World::visit` no longer names every field in one pattern: a new field of the authority's part (the stream positions, change-set 8) compiles as soon as `visit_shared` ignores it, even if `visit` never hands it over, and it would drop out of the whole-state hash without a sound. The old `write_state` had the whole guard | Fix, about 4 lines: `visit` names every field too |
+| R2 | Low | `Replay::new` does not refuse a seed without `TESTSEED` for a recording built in memory (netcode-architect's N2) | Fix with N2 |
+| R3 | Low | `fnv1a_64_rounds` (test-only module): its length sizes an allocation with no cap, and `at * 31` overflows above 138,547,332 (a trap, measured in Node in both profiles) | Fix, 2 lines |
+| R4 | Low | `scripts.rs` says "whole numbers only" and divides one `f64` for the host's time (the same bits on both targets, and the scripts never run in WebAssembly: only the comment is off) | Fix, 1 line |
+| R5 | Low | `state_hash.rs`'s header says the whole-state hash never leaves the Worker or the server; the committed hashes files hold it for a public test seed, by design | Fix, 1 line: "over a match's own seed" |
+| R6 | Low, optional | `recording.rs` promises never to panic and does not carry the room's lint guard (unwrap, expect, indexing, arithmetic); tried on a copy: 2 errors, both bounded products | Fix, about 11 lines |
+| R7 | Low | `compare::field_diff` has no caller outside its unit tests (plant E's field difference is made in Python) | Fix with N1: the `replay` tool gains the comparison of two state dumps, about 10 lines |
+| R8 | Low, optional | The hash can be fed straight from the visitor, with no buffer in the room: the players' file would grow by 701 bytes and not 1,794 (measured on a copy: 54,514 bytes; first-loop still replays to all 1,800 committed hashes, both columns), the export becomes `&self`, and nothing can allocate. About 60 lines | Decide with engine-architect's answer on the export's shape |
+Its answers to the six questions, in short: no input makes the reader, the hashes parser, the replay or the two replay
+exports panic or take memory before a count is checked (R3 aside): read, and fuzzed in wasm32 in both profiles (20,000
+mutated inputs, every step count that would wrap a 32-bit product, all 256 map-id lengths; a planted overflow shows
+the harness sees a trap). No float, `usize`, hash map or clock reaches the canonical bytes or the committed files.
+`sha256.rs` is right at 312 lengths against Python's hashlib and at 2^29 + 1 bytes on wasm32. Where the 1,794 bytes
+went: 1,307 of code (the hash 323, `Room::new` out of line 322, the visitor 206, the export's shim 181, a copy of
+`Vec`'s grow path about 273), 448 of function names, 39 of tables. Its copies `.gate/rr-4a` and `.gate/rr-4a-base`
+are removed with `git worktree remove` when the round is over.
 
 ## test-engineer: (running)
 
