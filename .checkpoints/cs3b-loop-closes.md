@@ -368,8 +368,45 @@ per frame; the limits there: 160 and 680). The log: `.gate/cs3b/ci-0dfca749-tool
 - **CI on 6380df45 (the security reviewer's points and the queue's window): gate, smoke and toolchain green**
   (toolchain run 45533209579, 02:28:40 to 02:33:49 UTC), every count as written before the push, 16 browser tests
   in 3.4 minutes, the Wasm's sha256 as here.
-- test-engineer and perf-auditor: running (on 0dfca749). netcode-architect: running (on 6380df45, with the
-  queue's window as its main question). rust-reviewer: next free seat, on the commit that holds the four Lows.
+- **test-engineer: PASS** (`test-engineer-review2.md`; nothing Critical or High open). Its High of round 1:
+  fixed (its own plant now fails on the mark's quantities). The releases: **answer accepted with corrections**:
+  met at the echo's resolution "0 lost and 0 doubled releases"; **not met: "the Worker counts the presses and
+  releases it applies through the edge counters"** (there is no release counter, and the page counts); the two
+  drafts disagree (ADR 0002 part 5, line 319: the post carries "press and release edge counters… (their exact
+  fields are ADR 0001's)"; ADR 0001 part 5, line 226: press counters only); a release counter is the owner's
+  decision; **the report quotes both and never calls the release half met by the mark's method.** The allocation
+  test: answer accepted. **Three new Mediums and three Lows, all fixed in the next commit:**
+  - the press test compared the shim's live count with the Worker's report (red in 2 of 5 runs on a fast page):
+    the shim is switched off after the script, and the two counts must be equal;
+  - presses were compared as totals (its plant: two buttons' counts swapped passed): **button by button** now
+    (`lostAndDoubled`, `presses.lost` and `presses.doubled` apart);
+  - every second copy counted as "sent behind a newer one", so that line could not fail: first copies overtaken
+    are counted apart and printed (0 or 1 at this page's frame rate: **the mark's "reorders most neighbours" holds
+    only on a page that draws fast; the report says so**);
+  - "as far as the echo allows" was not reached: **the link now checks every block's held keys against the post
+    its tick used** (`WorkerLink.wrongKeys`, asserted 0 in both specs): a release or press that comes early, late
+    or rolled back shows per tick, with no message change;
+  - Lows: the two "20 cases" comments say 24; a test reads the block's `refused` through the layout; the loop
+    test bounds the key-to-tick reading (above 0, the 95th percentile under 2 seconds).
+- **perf-auditor: PASS** (`perf-auditor-review2.md`). The fix pass made the page cheaper (in Node 186 to 197 bytes
+  a block at every frame rate, 213 to 348 before), cost the Worker nothing (658 ns a tick against 663; 451 or 462
+  bytes a tick on both trees; a warm Rust tick allocates nothing) and cut 2,934 bytes of Wasm (growth over main:
+  22,065 bytes: codec 7,940, endpoint 4,631, room 3,253, Vec growth 1,402, sim-wasm 1,077, UTF-8 check 694,
+  function names 2,300; ADR 0002 part 4 sets no limit yet). **It found the cause of the per-block rise:** the
+  browser's optimising compilers install code for the drawing path and that is charged to the listener's own
+  frame; the link's own work is 523 to 568 bytes a block at every rate (17 runs, 1.1 to 59.7 frames a second).
+  Low (the spec's header said the cause was unknown): **fixed**, and the link's own sum is printed. Pool misses
+  at 6 frames a second are by design (0.3 to 3 KB a second; 0 at 10, 30 and 60). Key to tick in its model: the
+  95th percentile 34.8 to 48.0 ms with 1 ms from the key's own time to its handler; **2 of 16 phases go over the
+  mark's 50 ms at a 4 ms delay, 6 of 16 at 8 ms.** **Follow-ups:** post the keys from the key handler too
+  (32.9 to 40.1 ms in every phase) before PM-0002-13 is judged; the pool from 4 to 16 once the block grows;
+  for PM-0002-8, under key input on a saturated main thread Chrome held blocks back 2 to 4.5 s here; change-set
+  5's allocation method runs with the optimising compilers off or sums under the link's own function.
+- **Found while re-running, a flaw in the loop test itself:** it started its clock after the first reading came
+  back, so on a slow page the measured minute could be shorter than the ticks' minute: red by one tick, once
+  (1,823 ticks against a bound of 1,822). **Fixed:** the clock starts before the first reading.
+- netcode-architect: running (on 6380df45, with the queue's window as its main question). rust-reviewer:
+  running (on a85b9dbb).
 
 **What CI must show on the commit with engine-architect's four Lows (written before the push):** cargo debug,
 twice: 26, 1, 3, 2, 19, 8, 15, 1, 17, 5, 1, 13, 1, 1 (113: the two halves of the random-message test are now one
