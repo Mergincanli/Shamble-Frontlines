@@ -158,8 +158,8 @@
      for the 0b amendment. Q1 lets U8's M3-M9 run from now (its agent steps wait for 23:50).
   2. U7: after MAIN-66's step 6 and security's answer, the 0b amendment (Half done) and the builder's new base; a check
      condition on the guard change goes to the builder before step 2; on its return: notes, snapshot, SIZE-CHECK.
-  3. U8's merge M3-M9 after MAIN-66's step 6 CI, if the checker's Q1 says yes (u8-brief.md; a3de649cd25e474df's head
-     read in a window): the policy-name INVALID (plan.md:1256), C9 on 096808b, test 7's merged-state run, NC-R3-1, the items under U8 below, and the 05:2x clean incident told to the advisor (u7-block0b.md:40).
+  3. U8's merge M3-M9, allowed now (Q1 yes; CI green 19:42): U4f's M1-M9 form (main-66-plan.md:45), advisor-u7-brief.md:118 (first one T5 (ii) leg's records through U8's save() and npt-judge), u8-brief.md:334 (check.mjs's `ops` step), u8-build.md:594-628 (the merged-state run), advisor-u8-stopb.md;
+     a3de649cd25e474df's head read in a window: the policy-name INVALID (plan.md:1256), C9 on 096808b, test 7's merged-state run, NC-R3-1, the items under U8 below, and the 05:2x clean incident told to the advisor (u7-block0b.md:40).
   Then NB2's merge, in a gap of R1's path (nb2-merge-plan.md; advisor-nb2-merge.md NB2-C1 to -C12; NB2-C1 DONE with
   0b): step 1 re-checks Builder 2's tip: not 0e621dae → no command, two lines to him first; else the command `git merge
   --no-ff 0e621dae6e5b009a4cf00b6401b46d771b2215a3` is named and his reply awaited (NB2-PROMPT (a)); then check.mjs
