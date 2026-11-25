@@ -11,8 +11,11 @@
 3. Baselines before the edit: settings.test 127/127, checkpoint.test 33/33 · c11b68f
 4. Mustafa's "Go" (CAP and SAME-GAP not answered: strict cap reading kept, other wrappers left alone) · the edit: WRAP_OPTS (a Map), unwrap() → { argv, unreadable }, the bash() ask/agent deny; 130 test rows, 11 mutants · 21615cb · guard 1237/1237, settings 127/127, checkpoint 33/33; gate PASS --no-smoke (smoke can't start: Playwright 1.56.1's Chromium build missing here); probe-after.txt
 
+5. security-auditor round 1 on 21615cb: REVISE (SA-R1-2 Medium: env -S turned a deny into an ask; Lows SA-R1-1, -3, -4) · notes security-auditor-r1.md
+6. Fix pass: SA-R1-2, SA-R1-1, SA-R1-4 fixed; SA-R1-3 deferred (pre-existing loop cap, outside scope) · 11887d0 · 1244/1244; reviewer's 10 extra mutants all caught; gate PASS --no-smoke
+
 ## Current step
-security-auditor's review of the final diff (round 1).
+security-auditor round 2, on what changed (21615cb..11887d0).
 
 ## Next steps
 1. security-auditor on `git diff origin/main...21615cb` (give it the scratchpad out-of-scope notes; ask whether the forms and mutants are enough).
@@ -21,12 +24,14 @@ security-auditor's review of the final diff (round 1).
 4. docs-keeper; `/advisor-report` (lean); fold the checkpoint and probes into it, delete them; PR (draft → ready) or its text in notes; the full commit id to Mustafa.
 
 ## Open findings
-- SEC-U7B-1 · security-u7-0b-answer.md · open (this change-set)
+- SEC-U7B-1 · security-u7-0b-answer.md · fixed in 21615cb + 11887d0 (pending round 2)
+- SA-R1-2 (Medium) · fixed 11887d0 · SA-R1-1, SA-R1-4 (Low) · fixed 11887d0
+- SA-R1-3 (Low, on main too: unwrap()'s 20-turn cap) · deferred: STATUS follow-up, worded without forms
 - Same-class gaps outside the scope · this session · reported to Mustafa, not fixed (forms kept out of the repo)
 
 ## Key numbers
-- added lines so far: guard +38/-6, tests +38/-0 (git diff --numstat origin/main)
-- routine-guard tests after: 1237/1237 (21615cb)
+- added lines so far: guard +47/-6, tests +44/-0 = +91 (git diff --numstat origin/main, 11887d0); docs+report must stay ≤59 under the strict reading
+- routine-guard tests after: 1237/1237 (21615cb); 1244/1244 (11887d0)
 - routine-guard tests on main's guard: 1107 tests, 1107 pass, 0 fail, 34 s (node --test, 3ab9eaec's guard files)
 - settings.test.mjs 127/127; checkpoint.test.mjs 33/33 (3ab9eaec's kit)
 

@@ -17,3 +17,10 @@ Notes (no exploit forms here: the exact forms are only in the answer to the call
 - Full suite rerun on head: routine-guard.test 1237/1237 (hooks unchanged since 21615cb).
 - Finding SA-R1-2 (rating pending B4b): one of env's read-but-unfollowed options can hold the program in its value; unwrap() then takes a later word for the program, so a deny on what runs does not fire (an ask instead). Where: routine-guard.mjs:320. Fix: read the value's words in front of the rest, unreadable still set; a row and a mutant.
 - B4 done: throw paths (none found), messages (anchors asserted once by the runner, suite green), routines (R-PROG first, rows present).
+- B4b done (scratch compare of main's and the head's unwrap(), outside the repository):
+  - SA-R1-2 rated Medium: for the separate-value spellings main reached the program in the value and denied; the head asks (a deny lifted to an approvable ask in the main session; agents still refused). For the attached spellings main passed silently and the head asks (an improvement). Verdict REVISE on this alone; fix as noted above.
+  - Finding SA-R1-3 (Low, pre-existing, same on main): unwrap()'s iteration cap (routine-guard.mjs:308) ends with a wrapper left as the program and unreadable null; arguably under stated limit L16; fix: set unreadable when the cap is hit with words left, plus a row.
+  - Finding SA-R1-4 (Low): the ask/deny reason echoes the raw unknown word (any length, newlines included: measured 330 chars) into the text Mustafa decides on (routine-guard.mjs:321, :326, :749-751); fix: echo only a capped, printable-only form (e.g. first 32 chars, control chars replaced).
+  - --help of env/nice/stdbuf not run: the head's guard itself refuses those forms for an agent (unknown option), so the option lists come from the plan's coreutils 9.4 citation and recall.
+- B5 done: verdict REVISE (SA-R1-2 Medium; Lows SA-R1-1, -3, -4). Scratch copies under .gate/guard-env-fix/ (gitignored) left in place.
+DONE
