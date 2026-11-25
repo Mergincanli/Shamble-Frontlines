@@ -16,7 +16,10 @@ advisor-u6c-m4b.md (**APPROVE WITH CONDITIONS C1-C6**), and the merge in the mai
   the room, READY when every client is in, per-second counts per client, DONE at the end.
 - **The page host and the certificate** (crates/host: issue.rs, serve.rs): the certificate order and the static file
   server R1's browser clients load from.
-- **SERIES.md:** 51 added lines (33 table rows) for the new series.
+- **SERIES.md:** 51 added lines (31 table rows, plus a table header and its separator) for the new series.
+- Checked against the builder's own Done list (u6c-build.md:84-130): Blocks 1 (npt-net's probe parts), 3 (npt-server's
+  probe mode), 4 (npt-bots' load and the npt-load binary), 5 and 6 (npt-host's `serve` and `issue`); Block 2, the
+  stamp tests, not built (C4's lever (1); STAMP-HOME (a) below).
 - **Size:** 24 files, 5,698 added, 199 removed (`git diff --cached --shortstat` at M8): the fix pass's 5,693 added
   (u6c-build.md, "SIZE after FP-6") plus the hand edits' net +5. Under his size stop of 6,000 added lines.
 - **No change to marks.json or the judge** (Mustafa, 2026-11-15, history.md:2127): `git diff --stat 8c81952 --
