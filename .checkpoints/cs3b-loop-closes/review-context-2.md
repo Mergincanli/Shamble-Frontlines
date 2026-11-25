@@ -4,8 +4,8 @@ Written by the main session (Builder V3). Read `review-context.md` (round 1) fir
 every reviewer all stand. This file says what changed since.
 
 ## What is reviewed
-- **The head of round 2: commit `HEAD2`** on the branch `claude/loving-hopper-6p0mg2`. Round 1's head was
-  `bbbf09e4`; the base is main `28254a73`. **What changed since round 1:** `git diff bbbf09e4 HEAD2 -- crates
+- **The head of round 2: commit `0dfca749`** on the branch `claude/loving-hopper-6p0mg2`. Round 1's head was
+  `bbbf09e4`; the base is main `28254a73`. **What changed since round 1:** `git diff bbbf09e4 0dfca749 -- crates
   packages` (the fix pass, one commit). Round 2 is on what changed: each fix against its finding, and anything the
   fix itself broke. A finding of round 1 that was answered with "follow-up" or "report" is not reopened unless the
   answer is wrong.
@@ -39,7 +39,7 @@ every reviewer all stand. This file says what changed since.
 
 ## Rules that changed for round 2
 - **Your own copy at the new head:** `cd /home/user/Shamble-Frontlines/.gate/ci-wasm-wt && git worktree add
-  --detach .gate/<your-name>-cs3b2 HEAD2`, then work only there. Your round-1 copy (`.gate/<your-name>-cs3b`)
+  --detach .gate/<your-name>-cs3b2 0dfca749`, then work only there. Your round-1 copy (`.gate/<your-name>-cs3b`)
   stays as it is; do not delete folders.
 - **Browser tests and page builds:** one reviewer at a time may run them, in its own copy, and only when its brief
   says so. Check that nothing listens on port 4173 first; never start one while another runs.
