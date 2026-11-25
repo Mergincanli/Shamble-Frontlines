@@ -61,10 +61,13 @@
 Until his answer only work that adds no product line. CI runs on this commit (the first of 4a without
 `[skip ci]` since steps 1 and 2).
 
+7. Draft pull request #70 opened (https://github.com/Mergincanli/Shamble-Frontlines/pull/70), head 5a16b4e, on his
+   words "open own drafts if possible". It stays a draft until the report is in.
+
 ## Next steps
-1. Read CI's run on this head: gate, smoke, toolchain; the players' file's size and sha256 against the numbers
+1. Read CI's run on 5a16b4e: gate, smoke, toolchain; the players' file's size and sha256 against the numbers
    above; the browser run's time.
-2. A draft pull request (his standing permission), kept a draft.
+2. (done: the draft pull request, step 7 above) A draft pull request (his standing permission), kept a draft.
 3. His answer to STOP-4A; then the
 5. Reviewers (netcode-architect, rust-reviewer, test-engineer; then engine-architect, security-auditor), the
    verifier, the advisor agent on every pushed head, the docs pass, the report, a draft pull request.
