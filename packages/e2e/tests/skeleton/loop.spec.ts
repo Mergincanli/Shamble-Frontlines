@@ -10,8 +10,11 @@ test.beforeAll(() => void needsBuild());
 test("a one-minute local match: keys go to the local server through the real messages and come back", async ({ page }) => {
   test.setTimeout(150_000);
   const outside = await open(page, "");
-  const start = await report(page);
+  // The clock starts before the first reading and stops after the last one comes back, so the seconds are never
+  // less than the time between the two readings: on a slow page a reading takes up to a frame to come back, and
+  // the other way round the ticks could seem to run early.
   const started = Date.now();
+  const start = await report(page);
   const box = (button: number) => page.locator("#key-diagram span").nth(button);
   await expect(page.locator("#key-diagram span")).toHaveText(["W", "A", "S", "D", "Space", "Shift"]);
 
@@ -48,11 +51,16 @@ test("a one-minute local match: keys go to the local server through the real mes
       `worker ${JSON.stringify(end.worker)}`,
   );
   // Every press and every release came back exactly once.
-  expect(end.presses).toEqual({ made: 11 + taps, echoed: 11 + taps, lost: 0 });
+  expect(end.presses).toEqual({ made: 11 + taps, echoed: 11 + taps, lost: 0, doubled: 0 });
   expect(end.releases).toEqual({ made: 11 + taps, echoed: 11 + taps, doubled: 0 });
-  expect(end.olderPosts).toBe(0);
-  // A key change is timed when a frame posts it; on a slow page a key's down and up share one frame.
+  // Every tick ran the keys of the post it used, and none an older post than the tick before it.
+  expect([end.olderPosts, end.wrongKeys]).toEqual([0, 0]);
+  // A key change is timed when a frame posts it; on a slow page a key's down and up share one frame. The time is
+  // not judged here, only that it is a time on the clock both sides share: above 0 and far under a second's worth
+  // of slow frames.
   expect(end.keyToTickCount).toBeGreaterThan(taps / 2);
+  expect(end.keyToTickP50).toBeGreaterThan(0);
+  expect(end.keyToTickP95).toBeLessThan(2000);
   // The match ran for the minute at its rate: a tick never runs early, and no more than a second's worth is missing.
   expect(ticks).toBeLessThanOrEqual(Math.ceil(30 * seconds) + 1);
   expect(ticks).toBeGreaterThan(30 * (seconds - 1) - (end.worker?.drops ?? 0) * 30);

@@ -12,7 +12,7 @@ between `f64` and the integers, and casts to `usize` and `isize` (as wide as the
   python3 -I -B crates/devtools/vectors/make_f32_vectors.py --full <op>     prints every result of one operation
 
 Inputs: 10,072 cases of three f32 bit patterns (a, b, c), little-endian: every ordered pair of the edge values
-first, then seeded values up to case 9,999, then 48 constructed cases for `mul_add` and 20 for the cast from f64. No
+first, then seeded values up to case 9,999, then 48 constructed cases for `mul_add` and 24 for the cast from f64. No
 input is a NaN (part 7: a NaN never enters the simulation); a NaN result is written as 0x7FC00000, because only which
 cases give a NaN must agree, not a NaN's bits. Expected: one line per operation with the bytes of one result and FNV-1a 64 over all its results in order,
 each little-endian; then the `pin` lines.

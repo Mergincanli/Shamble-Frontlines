@@ -267,7 +267,7 @@ impl Room {
                 count(&mut self.counters.late);
             }
             count(&mut self.counters.commands_run);
-            self.queue.ran(next.sequence);
+            self.queue.ran();
             *place = next.command;
             self.last_run = Some(next);
             ran = ran.saturating_add(1);

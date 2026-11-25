@@ -106,6 +106,34 @@ test("a Worker that starts again has used no post yet: its first blocks are not 
   expect([link.olderPosts, link.postUsed]).toEqual([0, 12]);
 });
 
+test("each block's held keys are checked against the post its tick used", () => {
+  const { link, ready } = setUp();
+  ready();
+  const tick = (held: number, postUsed: number) =>
+    link.onMessage({ type: "block", buffer: block(1, LAYOUT_HASH, 44, [held, 0, 0, 0, 0, 0, 0, 0, postUsed]), startAt: 0, doneAt: 0 });
+  // Before any post was used the server holds nothing, and that is right.
+  tick(0, 0);
+  link.frame(keys(0b01));
+  link.frame(keys(0b11));
+  tick(0b01, 1);
+  tick(0b11, 2);
+  tick(0b11, 2);
+  expect(link.wrongKeys).toBe(0);
+  // Post 2's number with post 1's keys: a key that came back, or one that came up late.
+  tick(0b01, 2);
+  expect(link.wrongKeys).toBe(1);
+  // A post the link no longer remembers (64 newer ones since) is not judged.
+  for (let post = 3; post <= 66; post += 1) link.frame(keys(0));
+  tick(0b100, 2);
+  tick(0b100, 66);
+  expect(link.wrongKeys).toBe(2);
+  // A hidden tab: the Worker lets go of every key, whatever the post it still holds said.
+  link.frame(keys(0b1000));
+  link.visibility(true);
+  tick(0, 67);
+  expect(link.wrongKeys).toBe(2);
+});
+
 test("a first block of another layout is refused, and the failure is said once", () => {
   const { link, sent, ready } = setUp();
   ready();

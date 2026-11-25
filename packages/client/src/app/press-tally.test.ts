@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { EchoTally, SETTLE_MS, unsettled } from "./press-tally.ts";
+import { EchoTally, lostAndDoubled, SETTLE_MS } from "./press-tally.ts";
 
 /** The four words of 16 counters. */
 function words(counts: Partial<Record<number, number>>): [number, number, number, number] {
@@ -14,6 +14,7 @@ test("presses are the counters' steps, and releases follow from them and the hel
   // Button 0 pressed and held; button 15 tapped (pressed and released inside one tick).
   tally.take(1, ...words({ 0: 1, 15: 1 }));
   expect([tally.presses, tally.releases]).toEqual([2, 1]);
+  expect([tally.pressesByButton[0], tally.pressesByButton[15], tally.pressesByButton[1]]).toEqual([1, 1, 0]);
   expect(tally.takePressed()).toBe(0x8001);
   // Nothing new: the same echo again.
   tally.take(1, ...words({ 0: 1, 15: 1 }));
@@ -56,10 +57,15 @@ test("a counter's wrap at 256 is one step, and every button has its own byte", (
   expect([tally.presses, tally.releases]).toEqual([16 * 512, 16 * 512]);
 });
 
-test("a press counts as lost only once the keys have been quiet for the settle time", () => {
-  expect(unsettled(10, 9, 1000, 1000 + SETTLE_MS - 1)).toBeNull();
-  expect(unsettled(10, 9, 1000, 1000 + SETTLE_MS)).toBe(1);
-  expect(unsettled(10, 10, 1000, 5000)).toBe(0);
-  // More echoed than made is a doubled press: a negative number.
-  expect(unsettled(10, 12, 1000, 5000)).toBe(-2);
+test("a press counts as lost only once the keys have been quiet for the settle time, and button by button", () => {
+  expect(lostAndDoubled([10], [9], 1000, 1000 + SETTLE_MS - 1)).toBeNull();
+  expect(lostAndDoubled([10], [9], 1000, 1000 + SETTLE_MS)).toEqual({ lost: 1, doubled: 0 });
+  expect(lostAndDoubled([10, 3], [10, 3], 1000, 5000)).toEqual({ lost: 0, doubled: 0 });
+  // More echoed than made is a doubled press.
+  expect(lostAndDoubled([10], [12], 1000, 5000)).toEqual({ lost: 0, doubled: 2 });
+  // A press that moved to another button is one lost and one doubled: the totals alone would say nothing.
+  expect(lostAndDoubled([10, 7, 0], [9, 8, 0], 1000, 5000)).toEqual({ lost: 1, doubled: 1 });
+  // Every one of the 16 buttons counts.
+  const last = Array.from({ length: 16 }, (_, button) => Number(button === 15));
+  expect(lostAndDoubled(last, new Int32Array(16), 1000, 5000)).toEqual({ lost: 1, doubled: 0 });
 });

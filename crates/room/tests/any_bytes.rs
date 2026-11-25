@@ -11,7 +11,7 @@ use protocol::messages::{
     AimPoint, Command, Input, Join, PROTOCOL_VERSION, REDUNDANCY_CAP, Snapshot, SnapshotAck,
     ViewTime,
 };
-use protocol::wrap::{press_edges, seq_newer};
+use protocol::wrap::press_edges;
 use room::{CATCH_UP_CAP, Room};
 use sim::{BUTTONS, MatchSetup, SEED_BYTES};
 
@@ -96,9 +96,9 @@ fn control_bytes(control: &Control) -> Vec<u8> {
 /// The room against a client that keeps the rules, lies in one message in five (one field of one command, an
 /// ack, or a flood of commands for the ticks ahead), and whose bytes are changed on the way one time in five.
 /// Whatever arrives: every snapshot the room writes is valid and one tick after the last; at most `CATCH_UP_CAP`
-/// commands run in a tick; no command runs twice (each one that runs is newer than the one before it, and over
-/// a match the sequence moves by exactly the commands run and the ones the room counted as missing); and no
-/// button is pressed more often than once per tick since the join.
+/// commands run in a tick; no command runs twice (in every tick the sequence moves by exactly the commands run
+/// and the ones the room counted as missing in that tick, no more and no less); and no button is pressed more
+/// often than once per tick since the join.
 #[test]
 fn the_room_keeps_its_rules_whatever_arrives() {
     let mut random = Random(0x3B);
@@ -119,10 +119,8 @@ fn the_room_keeps_its_rules_whatever_arrives() {
         let mut sent: Vec<Command> = Vec::new();
         let (mut sequence, mut next_tick) = ((life * 7919) as u16, start_tick);
         let mut presses = [0u8; BUTTONS];
-        // What the snapshots said: the tick of the first, the last one, and the presses granted per button; and
-        // the first command seen to have run, with the room's counts of commands run and missing at that moment.
+        // What the snapshots said: the tick of the first, the last one, and the presses granted per button.
         let (mut first, mut last, mut granted) = (None, None::<Snapshot>, [0u64; BUTTONS]);
-        let mut anchor = None::<(u16, u32, u32)>;
         for call in 0..CALLS {
             let tick = room.world().tick();
             match random.below(100) {
@@ -204,7 +202,8 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                     }
                 }
                 _ => {
-                    let ran_before = room.counters().commands_run;
+                    let (ran_before, missing_before) =
+                        (room.counters().commands_run, room.counters().missing);
                     if !room.step(&mut written) {
                         continue;
                     }
@@ -219,22 +218,11 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                     let own = now.own.as_ref().expect("the player's own state");
                     let before = last.as_ref();
                     let processed = before.and_then(|before| before.last_processed_command);
-                    if let (true, Some(new)) = (ran > 0, now.last_processed_command) {
-                        // One command in a tick is newer than the one before it; two are each newer than the one
-                        // before, so the second is at least not the one that ran last.
-                        let moved_on = |old| {
-                            if ran == 1 {
-                                seq_newer(new, old)
-                            } else {
-                                new != old
-                            }
-                        };
-                        assert!(
-                            processed.is_none_or(moved_on),
-                            "{at}: {processed:?} then {new}"
-                        );
-                        let counters = room.counters();
-                        anchor.get_or_insert((new, counters.commands_run, counters.missing));
+                    if let (Some(old), Some(new)) = (processed, now.last_processed_command) {
+                        // The sequence moved by one per command that ran and one per command the room counted
+                        // as missing, in this tick: a command that ran twice would run without moving it.
+                        let steps = ran + (room.counters().missing - missing_before);
+                        assert_eq!(new.wrapping_sub(old), steps as u16, "{at}: after {old}");
                     }
                     let echoed = before.and_then(|before| before.own.as_ref());
                     let echoed = echoed.map_or([0; BUTTONS], |own| own.presses);
@@ -251,13 +239,6 @@ fn the_room_keeps_its_rules_whatever_arrives() {
             }
         }
         let counters = room.counters();
-        // Over the match the sequence moved by one per command run and one per command missing, no more and no
-        // less: a command that ran twice would run without moving it.
-        let ended = last.as_ref().and_then(|last| last.last_processed_command);
-        if let (Some((began, ran, missing)), Some(ended)) = (anchor, ended) {
-            let steps = (counters.commands_run - ran) + (counters.missing - missing);
-            assert_eq!(ended.wrapping_sub(began), steps as u16, "match {life}");
-        }
         let counted = [
             counters.commands_run,
             counters.late,

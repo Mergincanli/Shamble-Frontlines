@@ -13,7 +13,7 @@
 use sim::state_hash::fnv1a_64;
 
 /// Cases in the input file: three `f32` bit patterns each, little-endian. The script's 10,000, its 48 constructed
-/// ones for `mul_add`, and its 20 for the cast from `f64` (exact halves, and the last values before the cast
+/// ones for `mul_add`, and its 24 for the cast from `f64` (exact halves, and the last values before the cast
 /// overflows).
 pub const CASES: usize = 10_072;
 

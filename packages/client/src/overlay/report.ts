@@ -24,12 +24,15 @@ export interface ReportData {
   readonly keys: string;
   /** Ticks that ran an older post than the tick before them: the keys out of order (0 on a sound Worker). */
   readonly olderPosts: number;
+  /** Ticks whose echo held other keys than the post the tick used (0 on a sound Worker). */
+  readonly wrongKeys: number;
   /**
-   * Presses and releases the page made and the server's echo brought back. `lost` is made less echoed (negative:
-   * doubled) once the keys have been quiet for a moment, and `null` while the newest echo may still be on its way.
-   * `doubled` counts a button the echo showed as held again with no press (`EchoTally.heldWithoutPress`).
+   * Presses and releases the page made and the server's echo brought back. `lost` and `doubled` presses are
+   * counted button by button once the keys have been quiet for a moment, and are `null` while the newest echo may
+   * still be on its way. A release's `doubled` counts a button the echo showed as held again with no press
+   * (`EchoTally.heldWithoutPress`).
    */
-  readonly presses: { readonly made: number; readonly echoed: number; readonly lost: number | null };
+  readonly presses: { readonly made: number; readonly echoed: number; readonly lost: number | null; readonly doubled: number | null };
   readonly releases: { readonly made: number; readonly echoed: number; readonly doubled: number };
   /** From a key change to the start of the tick that took it up: the median, the 95th percentile and how many were timed. */
   readonly keyToTickP50: number;
@@ -60,10 +63,9 @@ export function fixed(value: number, digits: number): string {
 
 const ms = (value: number): string => (Number.isFinite(value) ? `${fixed(value, 2)} ms` : "no reading yet");
 
-/** Presses that did not come back, in words: none are named lost before the keys have been quiet for a moment. */
-function lostWords(lost: number | null): string {
-  if (lost === null) return "(counting)";
-  return lost < 0 ? `${-lost} doubled` : `${lost} lost`;
+/** Presses that did not come back or came back unmade, in words; none are named before the keys have been quiet for a moment. */
+function lostWords(lost: number | null, doubled: number | null): string {
+  return lost === null || doubled === null ? "(counting)" : `${lost} lost · ${doubled} doubled`;
 }
 
 /** Why this backend runs: a fallback that was asked for reads differently from one the browser fell back to. */
@@ -87,7 +89,7 @@ export function readoutLines(data: ReportData): string[] {
     `ticks: ${data.tick} at ${data.tickHz} a second · blocks: ${data.blocks} of ${data.blockBytes} bytes`,
     `frames: ${fixed(data.fps, 1)} a second · frame time ${ms(data.frameP50)} (p99 ${ms(data.frameP99)})`,
     `messages: sent ${data.messages.sent} · received ${data.messages.received} · refused ${data.messages.refused}`,
-    `presses: ${data.presses.made} made · ${data.presses.echoed} echoed · ${lostWords(data.presses.lost)}`,
+    `presses: ${data.presses.made} made · ${data.presses.echoed} echoed · ${lostWords(data.presses.lost, data.presses.doubled)}`,
     `errors: ${data.errors}${data.lastError === "" ? "" : ` (last: ${data.lastError})`}`,
     pause === null
       ? "last pause: none yet"
@@ -122,10 +124,12 @@ export function formatReport(data: ReportData): string {
     ["messages.refused", data.messages.refused],
     ["postUsed", data.postUsed],
     ["olderPosts", data.olderPosts],
+    ["wrongKeys", data.wrongKeys],
     ["keys.bound", data.keys],
     ["presses.made", data.presses.made],
     ["presses.echoed", data.presses.echoed],
     ["presses.lost", data.presses.lost ?? "(counting)"],
+    ["presses.doubled", data.presses.doubled ?? "(counting)"],
     ["releases.made", data.releases.made],
     ["releases.echoed", data.releases.echoed],
     ["releases.doubled", data.releases.doubled],

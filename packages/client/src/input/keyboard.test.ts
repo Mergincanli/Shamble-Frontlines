@@ -14,6 +14,7 @@ test("each key is its button: held while down, counted once per press, by the ke
   // Buttons 0 to 3 in the first word, one count per byte; 4 and 5 in the second.
   expect(words(keys)).toEqual([0x0101_0101, 0x0000_0101, 0, 0]);
   expect([keys.presses, keys.releases, keys.changedAt]).toEqual([6, 0, 15]);
+  expect([...keys.pressesByButton]).toEqual([1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   codes.forEach((code) => keys.key(code, false, false, 20));
   expect([keys.held, keys.presses, keys.releases]).toEqual([0, 6, 6]);
   // The counts never go back.

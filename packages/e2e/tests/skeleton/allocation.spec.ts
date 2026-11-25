@@ -16,10 +16,15 @@
 //
 // And, found by test-engineer: what this method charges to a block depends on how fast the page draws. Measured
 // at six viewport sizes in the container (2026-11-25): 478 bytes per block at 0.9 frames a second, 567 at 5.9,
-// 591 at 10.1, 765 at 23.2, 747 at 38.7, 629 at 60.0. The cause of the rise in the middle is not known. The
-// per-block limit below is right only for a slow page, as the container (about 6 frames a second, 5 blocks per
-// frame) and GitHub's runner (about 9, 3.3 per frame) are, so a run with fewer than 2.5 blocks per frame is
-// refused by name instead of being judged against a limit that was never measured for it.
+// 591 at 10.1, 765 at 23.2, 747 at 38.7, 629 at 60.0. The cause, found by perf-auditor: the browser's optimising
+// compilers finish their background work on the drawing code, which warms up at the frame rate, and installing
+// that code is charged to whatever JavaScript runs at the next check, usually the listener's own frame, whose
+// code allocates nothing (with those compilers switched off the listener's total is flat at 545 to 600). The
+// hand-off's own work, the sum under WorkerLink's `receive`, is 523 to 568 bytes per block at every rate; it is
+// printed below. The per-block limit is right only for a slow page, as the container (about 6 frames a second, 5
+// blocks per frame) and GitHub's runner (about 9, 3.3 per frame) are, where that noise is 0 to 41 bytes: a run
+// with fewer than 2.5 blocks per frame is refused by name instead of being judged against a limit that was
+// never measured for it. Change-set 5's method must not fall into the same trap.
 import { expect, test } from "@playwright/test";
 import { needsBuild, report, running } from "./report.ts";
 
@@ -60,7 +65,8 @@ test("the sampling heap profile attributes the hand-off's allocations by functio
   console.log(
     `allocation in the page's hand-off code: ${perFrame.toFixed(0)} bytes per frame posting the input and lighting the keys ` +
       `(${under(profile.head, "follow")} bytes of it in the key diagram, over the whole window), ` +
-      `${perBlock.toFixed(0)} bytes per block received, ${rate.toFixed(0)} bytes a second ` +
+      `${perBlock.toFixed(0)} bytes per block received (${(under(profile.head, "receive") / blocks).toFixed(0)} of them in the link's own work), ` +
+      `${rate.toFixed(0)} bytes a second ` +
       `(${frames} frames in ${windowMs} ms, blocks ${before.blocks} to ${after.blocks}, ${after.worker?.drops} drops, ` +
       `${total(profile.head)} bytes sampled on the whole page)`,
   );

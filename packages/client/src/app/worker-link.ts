@@ -37,6 +37,8 @@ export interface KeySource {
 }
 
 const DELIVERY_SAMPLES = 600;
+/** How many of the newest posts the link remembers the held keys of: a power of two, far more than a tick lags. */
+const POSTED = 64;
 
 /**
  * The page's side of the hand-off (ADR 0002 part 5). It keeps the two newest blocks, sends the older ones back to
@@ -78,6 +80,10 @@ export class WorkerLink {
   #refused = 0;
   #postUsed = 0;
   #olderPosts = 0;
+  // The newest posts' numbers and held keys, by number: what each block's echo is checked against.
+  readonly #postedNumber = new Int32Array(POSTED);
+  readonly #postedHeld = new Int32Array(POSTED);
+  #wrongKeys = 0;
   #posts = 0;
   #failure = "";
   #stats: WorkerStats | null = null;
@@ -169,6 +175,14 @@ export class WorkerLink {
    */
   get olderPosts(): number {
     return this.#olderPosts;
+  }
+
+  /**
+   * Ticks whose echo held other keys than the post the tick used: a release or a press that came early, late or
+   * was rolled back. Checked for every block whose post the link still remembers; on a sound Worker this stays 0.
+   */
+  get wrongKeys(): number {
+    return this.#wrongKeys;
   }
 
   /** Input messages posted so far: one per drawn frame. */
@@ -279,6 +293,9 @@ export class WorkerLink {
     // Behind the post the tick before used, around the 32-bit circle.
     if ((postUsed - this.#postUsed) >>> 0 >= 0x8000_0000) this.#olderPosts += 1;
     this.#postUsed = postUsed;
+    // The keys the server holds are the keys of the post this tick used, exactly.
+    const posted = postUsed & (POSTED - 1);
+    if (this.#postedNumber[posted] === (postUsed | 0) && this.#postedHeld[posted] !== this.#echoHeld) this.#wrongKeys += 1;
     // The post this tick used is the timed one or a later one, around the 32-bit circle: the tick took the change up.
     if (!Number.isNaN(this.#keyAt) && (this.#postUsed - this.#keyPost) >>> 0 < 0x8000_0000) {
       this.#keyToTick.push(startAt - this.#keyAt);
@@ -308,7 +325,10 @@ export class WorkerLink {
       this.#keyAt = keys.changedAt;
       this.#keyPost = post;
     }
-    const message = { type: "input", post, held: keys.held, p0: keys.word(0), p1: keys.word(1), p2: keys.word(2), p3: keys.word(3), returned } as const;
+    const held = keys.held;
+    this.#postedNumber[post & (POSTED - 1)] = post | 0;
+    this.#postedHeld[post & (POSTED - 1)] = held;
+    const message = { type: "input", post, held, p0: keys.word(0), p1: keys.word(1), p2: keys.word(2), p3: keys.word(3), returned } as const;
     this.#port.postMessage(message, returned);
   }
 
@@ -317,6 +337,8 @@ export class WorkerLink {
     if (this.#failure !== "") return;
     this.#port.postMessage({ type: "visibility", hidden }, []);
     if (hidden) {
+      // The Worker lets go of every key while the tab is hidden: so do the posts it may still use.
+      this.#postedHeld.fill(0);
       this.#hiddenAt = { timeMs: this.#now(), tick: this.#tick };
     } else if (this.#hiddenAt !== null) {
       this.#pauses += 1;

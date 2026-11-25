@@ -130,8 +130,9 @@ fn the_endpoint_keeps_its_rules_whatever_arrives() {
         let first_sequence = (life * 7919) as u16;
         let mut endpoint = Endpoint::new(HASH, first_sequence, 0).expect("no padding is allowed");
         let (mut post, mut server_tick) = (Post::NONE, 1_000_000 * life);
-        // The newest command of the input built last.
+        // The newest command of the input built last, and how many datagrams the endpoint was handed.
         let mut last: Option<Command> = None;
+        let mut handed = 0u32;
         for call in 0..CALLS {
             if matches!(endpoint.state(), EndpointState::Rejected(_)) {
                 rejected += 1;
@@ -170,7 +171,7 @@ fn the_endpoint_keeps_its_rules_whatever_arrives() {
                         server_tick,
                         baseline_tick: None,
                         newest_command_received: Some(sequence),
-                        last_processed_command: Some(sequence.wrapping_sub(1)),
+                        last_processed_command: Some(sequence),
                         group: 0,
                         own: Some(OwnState {
                             buttons: random.next() as u16,
@@ -199,10 +200,12 @@ fn the_endpoint_keeps_its_rules_whatever_arrives() {
                         random.change(&mut bytes);
                     }
                     endpoint.on_datagram(&bytes);
+                    handed += 1;
                 }
                 75..=84 => {
                     random.fill(&mut bytes, KIND_SNAPSHOT);
                     endpoint.on_datagram(&bytes);
+                    handed += 1;
                 }
                 85..=94 => {
                     bytes.clone_from(&answers[usize::from(random.chance(30))]);
@@ -219,6 +222,9 @@ fn the_endpoint_keeps_its_rules_whatever_arrives() {
         }
         let readout = endpoint.readout();
         assert_eq!(readout.unwritten, 0);
+        // Every datagram handed in was taken, late or refused: none is counted twice and none is counted nowhere.
+        let counted = readout.received + readout.late + readout.refused;
+        assert_eq!(counted, handed, "match {life}");
         let counted = [
             readout.received,
             readout.late,

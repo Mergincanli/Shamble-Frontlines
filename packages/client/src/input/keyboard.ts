@@ -25,6 +25,7 @@ export class KeyboardInput {
   #held = 0;
   readonly #counts = new Uint8Array(16);
   readonly #words = new DataView(this.#counts.buffer);
+  readonly #made = new Int32Array(16);
   #presses = 0;
   #releases = 0;
   #changedAt = 0;
@@ -46,6 +47,11 @@ export class KeyboardInput {
 
   get releases(): number {
     return this.#releases;
+  }
+
+  /** The presses of each button so far, not wrapped: the tally compares them with the echo's, button by button. */
+  get pressesByButton(): Int32Array {
+    return this.#made;
   }
 
   get changedAt(): number {
@@ -85,6 +91,7 @@ export class KeyboardInput {
       if ((held & (1 << button)) !== 0) {
         // A typed array's element wraps at 256 by itself.
         this.#counts[button] = (this.#counts[button] ?? 0) + 1;
+        this.#made[button] = (this.#made[button] ?? 0) + 1;
         this.#presses += 1;
       } else {
         this.#releases += 1;

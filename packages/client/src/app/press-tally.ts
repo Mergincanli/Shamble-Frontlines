@@ -3,15 +3,17 @@
  * page counts its own key presses (`KeyboardInput`); when both counts agree once the keys have been quiet for a
  * moment, no press and no release was lost on the way to the server and back.
  *
- * The presses are counted: each is a step of a counter. The releases are worked out, because the echo has no
- * counter for them: a button pressed `n` times that is held now as it was before was also released `n` times. So a
- * lost release shows as a release that never comes back (the button stays held), and the releases cannot show a
- * doubled one by themselves. That is counted apart (`heldWithoutPress`): a button that shows as held with no press
- * was let go and taken up again by the server without the player.
+ * The presses are counted: each is a step of a counter, kept per button. The releases are worked out, because the
+ * echo has no counter for them: a button pressed `n` times that is held now as it was before was also released `n`
+ * times. So at the end of a run a lost release shows as a release that never came back (the button stays held);
+ * in the middle of a run it only comes late, at that button's next press, and no count here moves. A doubled one
+ * shows as a button held again with no press (`heldWithoutPress`). Which keys the server holds at each tick,
+ * early, late or rolled back, is the link's check against the post that tick used (`WorkerLink.wrongKeys`).
  */
 export class EchoTally {
   #held = 0;
   readonly #counts = new Uint8Array(16);
+  readonly #echoed = new Int32Array(16);
   #presses = 0;
   #releases = 0;
   #heldWithoutPress = 0;
@@ -23,6 +25,11 @@ export class EchoTally {
 
   get releases(): number {
     return this.#releases;
+  }
+
+  /** The presses of each button the echo has shown so far, not wrapped. */
+  get pressesByButton(): Int32Array {
+    return this.#echoed;
   }
 
   /**
@@ -46,6 +53,7 @@ export class EchoTally {
       const presses = (count - (this.#counts[button] ?? 0)) & 0xff;
       const bit = 1 << button;
       this.#presses += presses;
+      this.#echoed[button] = (this.#echoed[button] ?? 0) + presses;
       this.#releases += presses + Number((this.#held & bit) !== 0) - Number((held & bit) !== 0);
       if (presses === 0 && (held & bit) !== 0 && (this.#held & bit) === 0) this.#heldWithoutPress += 1;
       if (presses !== 0) this.#pressed |= bit;
@@ -66,9 +74,23 @@ export class EchoTally {
 export const SETTLE_MS = 500;
 
 /**
- * How many of `made` did not come back in `echoed`, or came back too often (a negative number), once the last key
- * change is `SETTLE_MS` old; `null` until then, while the newest echo may still be on its way.
+ * Once the last key change is `SETTLE_MS` old: how many presses did not come back (`lost`) and how many came back
+ * that were never made (`doubled`), button by button. So a press that the server applied to another button is one
+ * lost and one doubled, never nothing. `null` until then, while the newest echo may still be on its way.
  */
-export function unsettled(made: number, echoed: number, changedAtMs: number, nowMs: number): number | null {
-  return nowMs - changedAtMs < SETTLE_MS ? null : made - echoed;
+export function lostAndDoubled(
+  made: ArrayLike<number>,
+  echoed: ArrayLike<number>,
+  changedAtMs: number,
+  nowMs: number,
+): { lost: number; doubled: number } | null {
+  if (nowMs - changedAtMs < SETTLE_MS) return null;
+  let lost = 0;
+  let doubled = 0;
+  for (let button = 0; button < 16; button += 1) {
+    const missing = (made[button] ?? 0) - (echoed[button] ?? 0);
+    if (missing > 0) lost += missing;
+    else doubled -= missing;
+  }
+  return { lost, doubled };
 }

@@ -4,7 +4,8 @@
 // own count of presses and releases must equal what the server's echo brought back, exactly.
 //
 // The second copy of a post goes out only after two newer posts have gone, so an older post really arrives behind
-// a newer one whatever the frame rate: on a slow page, posts lie further apart than the mark's 100 ms.
+// a newer one whatever the frame rate: on a slow page, posts lie further apart than the mark's 100 ms, and first
+// copies never overtake each other (the mark's "reorders most neighbours" holds only on a page that draws fast).
 //
 // The mark's two bites are planted by hand and by the verifier, not here: a Worker that passes only the held
 // buttons on (taps then never reach the server), and a Worker that takes the last post to arrive in place of the
@@ -16,6 +17,14 @@ import { expect, test } from "@playwright/test";
 import { needsBuild, report, running } from "./report.ts";
 
 const PRESSES = 10_000;
+/** What the shim counts: posts delayed, copies sent, first copies and second copies sent behind a newer post. */
+interface Shim {
+  posts: number;
+  twice: number;
+  overtaken: number;
+  copiesBehind: number;
+  off: boolean;
+}
 /** Presses a second over the six keys: 24 a second each, under the 30 a second each that the server takes. */
 const RATE = 144;
 
@@ -34,15 +43,16 @@ test("10,000 presses under late, reordered and repeated posts: none lost, none d
       state ^= state << 5;
       return (state >>> 0) / 0x1_0000_0000;
     };
-    const shim = window as unknown as { __shim: { posts: number; twice: number; reordered: number } };
-    shim.__shim = { posts: 0, twice: 0, reordered: 0 };
+    const shim = window as unknown as { __shim: Shim };
+    shim.__shim = { posts: 0, twice: 0, overtaken: 0, copiesBehind: 0, off: false };
     const copies: { message: { post: number }; after: number }[] = [];
     const send = Worker.prototype.postMessage as (this: Worker, message: unknown, transfer: Transferable[]) => void;
-    // A post goes out after its wait; one that goes out behind a newer one is counted as reordered.
+    // A post goes out after its wait. One that goes out behind a newer one is counted: a first copy as overtaken,
+    // a second copy as a copy behind (every second copy is, by the rule below).
     let newest = 0;
-    const later = (worker: Worker, message: { post: number }, list: Transferable[], waitMs: number): void => {
+    const later = (worker: Worker, message: { post: number }, list: Transferable[], waitMs: number, count: "overtaken" | "copiesBehind"): void => {
       setTimeout(() => {
-        if (message.post <= newest) shim.__shim.reordered += 1;
+        if (message.post <= newest) shim.__shim[count] += 1;
         newest = Math.max(newest, message.post);
         send.call(worker, message, list);
       }, waitMs);
@@ -50,14 +60,21 @@ test("10,000 presses under late, reordered and repeated posts: none lost, none d
     Worker.prototype.postMessage = function (this: Worker, message: unknown, transfer?: unknown): void {
       const list = Array.isArray(transfer) ? (transfer as Transferable[]) : [];
       if ((message as { type?: unknown }).type !== "input") return send.call(this, message, list);
+      const input = message as { post: number };
+      // Switched off at the end of the script: posts go straight through, and the ones still waiting arrive
+      // behind them and are counted, so the counts stand still before they are compared.
+      if (shim.__shim.off) {
+        newest = Math.max(newest, input.post);
+        return send.call(this, message, list);
+      }
       const posts = (shim.__shim.posts += 1);
-      later(this, message as { post: number }, list, 100 * random());
+      later(this, input, list, 100 * random(), "overtaken");
       while (copies[0] !== undefined && copies[0].after <= posts) {
         const late = copies.shift()?.message;
         shim.__shim.twice += 1;
-        if (late !== undefined) later(this, late, [], 100 + 100 * random());
+        if (late !== undefined) later(this, late, [], 100 + 100 * random(), "copiesBehind");
       }
-      if (random() < 0.1) copies.push({ message: { ...(message as { post: number }), returned: [] } as { post: number }, after: posts + 2 });
+      if (random() < 0.1) copies.push({ message: { ...input, returned: [] } as { post: number }, after: posts + 2 });
     };
   });
   await page.goto("/");
@@ -97,6 +114,8 @@ test("10,000 presses under late, reordered and repeated posts: none lost, none d
     },
     { presses: PRESSES, rate: RATE },
   );
+  // The shim stops here: what it still holds goes out within 200 ms, and its counts then stand still.
+  await page.evaluate(() => void ((window as unknown as { __shim: Shim }).__shim.off = true));
   // Every one of the six keys had its share: about a sixth each.
   expect(made.reduce((sum, count) => sum + count, 0)).toBe(PRESSES);
   expect(made).toHaveLength(6);
@@ -112,29 +131,31 @@ test("10,000 presses under late, reordered and repeated posts: none lost, none d
     { timeout: 30_000 },
   );
   await settled.catch(() => undefined);
+  // Longer than the shim's last wait and two of the Worker's reports (one every 250 ms).
   await page.waitForTimeout(1000);
   const end = await report(page);
-  const shim = await page.evaluate(() => (window as unknown as { __shim: { posts: number; twice: number; reordered: number } }).__shim);
+  const shim = await page.evaluate(() => (window as unknown as { __shim: Shim }).__shim);
   console.log(
     `presses under the shim: ${JSON.stringify(end.presses)}, releases ${JSON.stringify(end.releases)} in ${((Date.now() - started) / 1000).toFixed(1)} s; ` +
-      `${shim.posts} posts delayed, ${shim.twice} sent twice, ${shim.reordered} sent behind a newer one; ` +
-      `the Worker ignored ${end.worker?.stalePosts} late or repeated posts; ${end.olderPosts} ticks ran an older post; ` +
+      `${shim.posts} posts delayed, ${shim.twice} sent twice (${shim.copiesBehind} of the copies behind a newer post), ` +
+      `${shim.overtaken} first copies overtaken; the Worker ignored ${end.worker?.stalePosts} late or repeated posts; ` +
+      `${end.olderPosts} ticks ran an older post, ${end.wrongKeys} ran other keys than their post's; ` +
       `messages ${JSON.stringify(end.messages)}; ticks ${end.tick}, drops ${end.worker?.drops}`,
   );
-  // Not one press lost or doubled.
-  expect(end.presses).toEqual({ made: PRESSES, echoed: PRESSES, lost: 0 });
-  // No tick ran an older post than the tick before it: the server took the keys in the order the page made them.
+  // Not one press lost or doubled, button by button.
+  expect(end.presses).toEqual({ made: PRESSES, echoed: PRESSES, lost: 0, doubled: 0 });
+  // No tick ran an older post than the tick before it, and every tick ran the keys of the post it used: the
+  // server took the keys in the order the page made them, each as the page posted it.
   expect(end.olderPosts).toBe(0);
+  expect(end.wrongKeys).toBe(0);
   // Not one release lost (every button came up again) or doubled (none was held again with no press).
   expect(end.releases).toEqual({ made: PRESSES, echoed: PRESSES, doubled: 0 });
-  // The shim did its work, or the run says nothing: posts came late, twice and behind newer ones.
+  // The shim did its work, or the run says nothing: posts came late and twice, and every second copy went out
+  // behind a newer post. (First copies overtake each other only on a page that draws fast; the count is printed.)
   expect(shim.twice).toBeGreaterThan(shim.posts / 20);
-  expect(shim.reordered).toBeGreaterThanOrEqual(shim.twice);
-  // The Worker's own count agrees: it ignored every post that came behind a newer one (the last few may still be
-  // on their way to it, or in its next report).
-  const ignored = end.worker?.stalePosts ?? 0;
-  expect(ignored).toBeLessThanOrEqual(shim.reordered);
-  expect(ignored).toBeGreaterThanOrEqual(shim.reordered - 3);
+  expect(shim.copiesBehind).toBe(shim.twice);
+  // The Worker's own count agrees exactly: it ignored every post that came behind a newer one, and no other.
+  expect(end.worker?.stalePosts).toBe(shim.overtaken + shim.copiesBehind);
   // Nothing was refused on the way.
   expect(end.messages.refused).toBe(0);
   expect(end.errors).toBe(0);

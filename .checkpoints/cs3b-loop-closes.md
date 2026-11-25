@@ -431,7 +431,30 @@ per frame; the limits there: 160 and 680). The log: `.gate/cs3b/ci-0dfca749-tool
     RFC 9001 section 6.6, RFC 8446 section 5.2); `late` is checked against the simulator's own reorder count.
     **Before online play (change-set 7):** the endpoint refuses and counts a snapshot more than the estimate plus
     30 ticks ahead and a confirmation newer than the newest sequence sent.
-- rust-reviewer: running (on a85b9dbb).
+- **rust-reviewer: PASS** (`rust-reviewer-review2.md`, on a85b9dbb): all eight Lows fixed or their answers hold
+  (the Wasm's formatting and panic code is main's again; the growth over main, 22,065 bytes, sits in protocol
+  7,930, client-endpoint 4,625, room 3,249, alloc 1,398, sim-wasm 1,076, core 693, the name section 2,300, data
+  540; without the name section, the open follow-up 3A-NAME-SECTION, the file would be 43,560). Its probes: the
+  queue's window against a model over 16 million operations; the room 4 start ticks of 2 million calls and the
+  endpoint 3 runs of 2 million calls, no panic, the per-step and per-datagram rules exact, 0 allocations after
+  warm-up; the block's bytes over 1 million ticks hash the same natively and in the Wasm under Node
+  (7dc617c2063b06d3). **Two new Lows:** `ran` held only if nothing was offered between a taking out and its run:
+  **fixed** (the queue names its own last command; a debug-build check with a test; a plant); the report quotes
+  each head's own compressed sizes: **in the report**.
+- **All six reviewers: PASS in round 2.** Nothing Critical or High is open. What they found in round 2 (Mediums:
+  three from test-engineer; Lows from all) is fixed in the commits after 0dfca749, or is a named follow-up.
+
+**What CI must show on the commit that closes round 2's fixes (written before the push):** cargo debug, twice:
+26, 1, 3, 2, 19, 8, 16, 1, 17, 5, 1, 13, 1, 1 (114); release: protocol 19 and 8, sim 17, 5 and 1; client 85,
+sim-worker 46, types 7, net 1, the browser package's Node project 1; boundary 18; 16 browser tests inside the 5
+minutes; the players' Wasm 53,813 bytes (21,994 gzip, 18,464 brotli), sha256
+5ebae15400f9435dfd31108fe380e96253695b8bed4a7e639ce94bc180b41262. Run here first: all of it; the 16 browser tests
+in 3.3 minutes on this Wasm and this page (the loop 1,813 ticks, 127 presses and releases, 0 lost, 0 doubled, 0
+older posts, 0 wrong keys; the press test 10,000 presses and releases, 495 posts delayed, 45 sent twice and all
+45 behind a newer post, 1 first copy overtaken, 46 ignored by the Worker, exactly; allocation 111 bytes a frame,
+590 a block, 561 of them the link's own work). Planted defects: 53; the seven that need a browser were caught
+(03:02:14 UTC), the queue's and the tests' seven too (03:03:44 UTC); the full run on the final head follows.
+Size: 6,909 added lines (stop line 7,600).
 
 **What CI must show on the commit with engine-architect's four Lows (written before the push):** cargo debug,
 twice: 26, 1, 3, 2, 19, 8, 15, 1, 17, 5, 1, 13, 1, 1 (113: the two halves of the random-message test are now one

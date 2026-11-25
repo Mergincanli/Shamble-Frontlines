@@ -6,7 +6,7 @@ import type { ReportData } from "../overlay/report.ts";
 import { createPicture } from "../render/index.ts";
 import { installErrorHook } from "./error-hook.ts";
 import { readFlags } from "./flags.ts";
-import { unsettled } from "./press-tally.ts";
+import { lostAndDoubled } from "./press-tally.ts";
 import { WorkerLink } from "./worker-link.ts";
 
 // Written into the code by the build (vite.config.mjs, `define`). In a production build the first is the literal
@@ -118,9 +118,14 @@ export async function boot(): Promise<void> {
       messages: { sent: link.sent, received: link.received, refused: link.refused },
       postUsed: link.postUsed,
       keys: BUTTON_NAMES.join(" "),
-      presses: { made: keys.presses, echoed: link.echo.presses, lost: unsettled(keys.presses, link.echo.presses, keys.changedAt, clock()) },
+      presses: {
+        made: keys.presses,
+        echoed: link.echo.presses,
+        ...(lostAndDoubled(keys.pressesByButton, link.echo.pressesByButton, keys.changedAt, clock()) ?? { lost: null, doubled: null }),
+      },
       releases: { made: keys.releases, echoed: link.echo.releases, doubled: link.echo.heldWithoutPress },
       olderPosts: link.olderPosts,
+      wrongKeys: link.wrongKeys,
       keyToTickP50: link.keyToTick.percentile(50),
       keyToTickP95: link.keyToTick.percentile(95),
       keyToTickCount: link.keyToTick.count,

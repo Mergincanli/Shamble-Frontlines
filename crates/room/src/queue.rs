@@ -23,7 +23,8 @@ pub enum Inserted {
     Queued,
     /// It already waits.
     Duplicate,
-    /// It is not newer than the last command that ran: an honest late repeat.
+    /// It is not newer than the last command that ran: a late repeat, or a sequence half the circle or more
+    /// ahead of it; before any command ran, one behind the first command offered.
     Stale,
     /// The queue holds as many as it can.
     Full,
@@ -36,6 +37,8 @@ pub struct CommandQueue {
     len: usize,
     /// The sequence of the last command that ran; before the first, one below the first command offered.
     newest_run: Option<u16>,
+    /// The sequence of the command taken out last, for `ran`.
+    taken: Option<u16>,
 }
 
 impl Default for CommandQueue {
@@ -49,6 +52,7 @@ impl Default for CommandQueue {
             waiting: [empty; QUEUE_LEN],
             len: 0,
             newest_run: None,
+            taken: None,
         }
     }
 }
@@ -104,14 +108,24 @@ impl CommandQueue {
         ticks_after(first.tick, running)?;
         waiting.rotate_left(1);
         self.len = self.len.saturating_sub(1);
+        self.taken = Some(first.sequence);
         Some(first)
     }
 
-    /// The command with this sequence, the one taken out last, ran: what is not newer is stale from now on. A
-    /// command that was taken out and refused does not move the window, so a refused command far ahead cannot
-    /// shut out the honest ones behind it, and every command that runs is newer than the one that ran before it.
-    pub const fn ran(&mut self, sequence: u16) {
-        self.newest_run = Some(sequence);
+    /// The command taken out last ran: what is not newer is stale from now on. A command that was taken out and
+    /// refused does not move the window, so a refused command far ahead cannot shut out the honest ones behind
+    /// it, and every command that runs is newer than the one that ran before it. The queue knows which command
+    /// it took out last, so no caller can name another. Call it before anything else is offered: a command put
+    /// in between could lie behind the new base (checked in debug builds).
+    pub fn ran(&mut self) {
+        if let Some(taken) = self.taken {
+            let mut waiting = self.waiting.iter().take(self.len);
+            debug_assert!(
+                waiting.all(|waits| seq_newer(waits.sequence, taken)),
+                "a command was offered between its taking out and `ran`"
+            );
+            self.newest_run = Some(taken);
+        }
     }
 }
 
@@ -135,7 +149,7 @@ mod tests {
     fn drain(queue: &mut CommandQueue) -> Vec<u16> {
         let mut sequences = Vec::new();
         while let Some(taken) = queue.take_due(u32::MAX) {
-            queue.ran(taken.sequence);
+            queue.ran();
             sequences.push(taken.sequence);
         }
         sequences
@@ -211,6 +225,22 @@ mod tests {
         // More than half the circle from the last command that ran: stale, whatever was taken out in between.
         assert_eq!(queue.insert(queued(40_010, 1)), Inserted::Stale);
         assert_eq!(drain(&mut queue), [11, 30_010]);
+    }
+
+    /// `ran` belongs right behind `take_due`: a command offered in between could lie behind the new base, and a
+    /// debug build says so.
+    #[test]
+    #[cfg(debug_assertions)]
+    #[should_panic(expected = "between its taking out and `ran`")]
+    fn a_command_offered_between_the_taking_out_and_ran_is_caught() {
+        let mut queue = CommandQueue::default();
+        queue.insert(queued(3, 1));
+        assert_eq!(drain(&mut queue), [3]);
+        queue.insert(queued(5, 1));
+        queue.insert(queued(7, 1));
+        assert_eq!(queue.take_due(1).map(|taken| taken.sequence), Some(5));
+        assert_eq!(queue.insert(queued(4, 1)), Inserted::Queued);
+        queue.ran();
     }
 
     #[test]

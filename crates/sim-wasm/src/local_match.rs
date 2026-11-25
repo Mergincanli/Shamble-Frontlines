@@ -382,6 +382,12 @@ mod tests {
         }
         assert_eq!(local.endpoint().state(), EndpointState::Joining);
         assert_eq!((local.unsent(), local.room().counters().joins), (1, 0));
-        assert_eq!(local.block()[36..40], 1u32.to_le_bytes());
+        // The block's count of refused messages, at the place the layout gives it.
+        let (section, field) = (
+            client_endpoint::layout::section_offset("link"),
+            client_endpoint::layout::field("link", "refused"),
+        );
+        let at = (section.expect("the section") + field.expect("the field").offset) as usize;
+        assert_eq!(local.block()[at..at + 4], 1u32.to_le_bytes());
     }
 }
