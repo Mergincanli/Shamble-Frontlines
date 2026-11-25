@@ -80,6 +80,10 @@ U5: draft pull request #72 opened (2026-11-25, after 20:54 UTC; head 95d32ac). T
 job push-to-branch ran and printed "absent" (the before-bite for the push job; "Cache mode: none"). Main moved to
 07d673b0 (#71, lane 1's ci-after-3a; no hand-over step in toolchain.yml yet; not the Guard fix chat's wall): main
 is taken in later, before the merge.
+#72 was held as conflicting by GitHub (mergeable_state "dirty" after #71), so no pull-request run started. Main
+07d673b0 taken in by one merge commit e3b3642b (worktree .gate/merge-71; scripts/resolve71.py, verify71.py: the
+three-way check OK in all 7 files main changed; one-sided files equal; the workflow hashes intact; gate PASS, 117
+tests, map OK); pushed as a fast-forward; the main folder fast-forwarded to it (no guard prompt).
 Next: the pull request's own runs (preview/tests = the CI proof of the tests; wall-test's two pull-request jobs print
 "absent"); then his
 sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
