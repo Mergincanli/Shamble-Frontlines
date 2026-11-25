@@ -1,6 +1,7 @@
 # Plan: step 2.6, a preview link for every pull request (lane 2, Builder V2)
 
-Revision 2, 2026-11-25.
+Revision 2, 2026-11-25. The advisor agent approved it with four text conditions, folded in below; its approval
+holds if the security-auditor's read of revision 2 raises no Critical or High and changes none of the three texts.
 - **Branch:** `claude/optimistic-albattani-mdoonz`, standing in for `cs/step-2-6-previews`, at main c1da1bd plus
   checkpoint commits.
 - **The design research:** infra-engineer's notes, `.checkpoints/step-2-6-previews/infra-engineer-design.md`.
@@ -245,8 +246,8 @@ Cloudflare again:
    - Permissions: Account, Cloudflare Pages, Edit and Read.
    - Account: the summary must show only the previews account.
    - Client IP filtering: empty. GitHub "does not recommend" its runners' address list as an allow list.
-   - Expiration: a start date of today AND an end date by decision TOKEN-WINDOW, each in its own field, never the
-     single-date chip.
+   - Expiration: a start date of today AND an end date 90 days on (TOKEN-WINDOW, settled), each in its own field,
+     never the single-date chip.
    - Create, then copy the token.
 7. Copy the Account ID from the account's overview page.
 
@@ -261,7 +262,10 @@ GitHub again:
     - "Allow GitHub Actions to create and approve pull requests" unticked;
     - tick "Require actions to be pinned to a full-length commit SHA". Every action in the three workflows already is.
 
-Click 8 waits for his MAIN-WALL answer. Under (a), it comes after main's new rule.
+Under MAIN-WALL (b), this list is one sitting. Under (a), clicks 6, 7 and 8, with M1's re-run after click 8, move
+together to a second short sitting (about 10 minutes) after main's new rule is in, so that a token never waits
+between sittings. That costs him a second sitting, against his "one sitting". The new rule's own clicks come with
+that change-set's own plan.
 
 He sends no screenshot of the token. The first deploy asks Cloudflare whether the token is valid, and prints the
 answer and its dates in its log. After the sitting, nothing is needed per preview.
@@ -388,7 +392,8 @@ So the best case is 3 working days; with one fix after the first run (likely), 4
 November: the best day is Tuesday 1 December, the honest day Wednesday 2 to Friday 4 December. If a review or CI
 Builder's pull request slips, it is the week of 7 December.
 
-MAIN-WALL (a) adds the time to design and measure main's new rule before click 8: about 2 to 4 working days.
+MAIN-WALL (a) adds the time to design and measure main's new rule before click 8 (about 2 to 4 working days), plus
+his second short sitting.
 
 ## 10. Order of work, after his go (each with a checkpoint save)
 - **U1.** The host folder: the script, its tests and the header file. Then the manifest and lockfile, by
@@ -417,8 +422,13 @@ MAIN-WALL (a) adds the time to design and measure main's new rule before click 8
 - **R6.** The guard does not ask before a `hosting/` edit (a STATUS follow-up; the kit is frozen).
 - **R7.** Each fix after the merge is a tier-2 pull request: the advisor agent, the security-auditor, his go.
 
-## 12. Decisions needed (his; the advisor agent settled FIRST-RUN (a), merge and fix on main; LABEL, the pull-request
-run's build; and MAIN-BYPASS, read: no bypass actors)
+## 12. Decisions needed (his)
+Settled by the advisor agent, not his to decide:
+- FIRST-RUN (a): merge, then fix on main.
+- LABEL: the link shows the pull-request run's build.
+- MAIN-BYPASS: read, main's rule has no bypass actors.
+- TOKEN-WINDOW: 90 days, on the security-auditor's read. A renewal is clicks 6 and 8 again.
+
 1. **TRIGGER: how a preview gets the token without his click.**
    - (a) `workflow_run` plus the main-only environment.
    - (b) The ordinary pull-request run with no reviewer: any branch could take the token.
@@ -440,16 +450,20 @@ run's build; and MAIN-BYPASS, read: no bypass actors)
    - (a) All stand.
    - (b) He names the ones that go back to the drafts first.
    - Recommendation: (a).
-5. **TOKEN-WINDOW: the token's end date.**
-   - (a) 90 days (the security-auditor).
-   - (b) 6 months (infra-engineer and the advisor agent).
-   - Recommendation: (a). A renewal is clicks 6 and 8 again, and the runbook and STATUS carry the date.
-6. **MAIN-WALL: the gap that predates step 2.6** (the security-auditor's Critical; section 2.1).
+5. **MAIN-WALL: the gap that predates step 2.6** (the security-auditor's Critical; section 2.1).
    - (a) A main rule that lets only his account update main, so that no workflow can merge itself. infra-engineer
-     designs it, measured on a throwaway repository, in its own small change-set; click 8 waits for it.
+     designs it in its own small change-set, measured on a throwaway repository. That change-set proves three things:
+     - day sessions can still merge;
+     - the PR Advisor routine can still merge;
+     - his own way past a required check, in the Revert rule, still exists.
+     Clicks 6 to 8 then come in a second short sitting after the rule.
    - (b) He accepts the risk in writing for now, bounded by ACCOUNT (b), with (a) following as its own change-set.
-   - Recommendation: the security-auditor recommends (a). This chat agrees: the gap reaches the whole repository, not
-     only previews.
+   - Two views:
+     - The security-auditor recommends (a).
+     - The advisor agent: the gap reaches all of main whatever he picks. Under ACCOUNT (b), the token adds only the
+       previews account, so (b), with (a) as the next change-set, is proportionate and keeps one sitting. Under
+       ACCOUNT (a), it agrees with (a) first.
+   - This chat recommends (b) with ACCOUNT (b), and (a) as the next change-set either way.
 
 ## 13. What changed from revision 1, by finding
 | Finding | Change |
@@ -475,6 +489,7 @@ run's build; and MAIN-BYPASS, read: no bypass actors)
 | engine-architect High | LANE2-LOCKFILE |
 | engine-architect Mediums | G1, 2.5, 2.7 |
 | engine-architect Lows | 6.9, 2.1, 2.6, 3 |
+| Advisor revision 2, conditions 1 to 4 | section 4 (a second sitting under MAIN-WALL (a)); section 9; MAIN-WALL's proofs and its two views; TOKEN-WINDOW settled |
 
 ## Appendix: the three workflow texts his go covers (each byte for byte, with its sha256)
 

@@ -133,3 +133,31 @@ directly. The one Critical predates step 2.6, but the token's only wall rests on
 Plan (blocks): R2-1 verify sha256 of the three texts; R2-2 preview.yml against G1-G9 (the coordinator's 7 points);
 R2-3 preview-close.yml; R2-4 wall-test.yml + M1 + click 5; R2-5 clicks 5-10, TOKEN-WINDOW, MAIN-WALL (decision 6);
 R2-6 section 13 mapping; R2-7 script descriptions (hosting/preview.mjs) for omissions; R2-8 verdict.
+- R2-1 done: sha256 of texts/preview.yml c66c0b0a9351..., preview-close.yml c2f1fa905116..., wall-test.yml
+  3af067068060... match the coordinator's values (sha256sum, 2026-11-25). Branch head eb36162c; plan at 1ac984a3.
+- WEB GitHub Docs, "Workflow commands" (read 2026-11-25): commands "are then sent to the runner over `stdout`";
+  `stop-commands` "allows you to log anything without accidentally running a workflow command". Whether stdout
+  `set-output` still works: not stated there (not claimed).
+- R2-2 preview.yml vs G1-G9 (read texts/preview.yml:1-260): permissions {} (:21); secrets only on step env of
+  verify-token (:157-161), wrangler (:162-174), reconcile (:254-260); cache-mode none on all 5 jobs; setup-node
+  package-manager-cache false; persist-credentials false on every checkout; no `${{` in any run block; npm ci
+  --ignore-scripts in a fresh sibling folder (:151-156); wrangler cwd $RUNNER_TEMP/empty, site $RUNNER_TEMP/site
+  (not an ancestor: G4 holds); recheck (:149-150) runs before any token step (G5 holds: a fooled `check` cannot
+  reach the token). check `if` (:54-60) right. continue-on-error (:90) safe only if check-build treats anything but
+  exact `success` as no-go (not in plan). concurrency from needs.check.outputs.pr (:123) is a string, safe.
+  environment.url (:121) safe as a value; read-url's regex (plan :89) admits any pages.dev project and any number.
+  reconcile `if` (:227-233) right on schedule / preview-close / deploy success, false on pull_request. after
+  always() (:183) right; comment must re-check PR, SHA, URL (G1 lists only number and commit).
+- R2-3 preview-close.yml: no secret, no checkout, permissions {}: right. Low: fork closes also start reconcile with
+  the token (reads nothing; only token-use frequency); a head_repository test would stop that, text change only.
+- R2-4 wall-test.yml: three jobs name only WALL_TEST, so even at click 8 an admitted job gets no real token. M1
+  (plan :331-339) with click 5 (:234-240) and click 8 (:254-256): right.
+- R2-5 clicks 5-10 right; TOKEN-WINDOW (a) 90 days: agree. MAIN-WALL (plan :447-452): (b) leans on ACCOUNT (b) but
+  does not say it is void under ACCOUNT (a); (a)'s rule must keep gate/smoke for his own merges (a ruleset bypass
+  covers every rule of that ruleset: inferred, to measure).
+- R2-6 section 13: finding 5's author filter and finding 6's runbook invariants (nothing else in the account, 2FA,
+  revoke) are not in the plan (grep: no "github-actions[bot]", "author", "2FA", "revoke").
+- R2-7 script omissions: find-pr, check-build (DOWNLOAD exact success), read-url (pr-$PR + real subdomain),
+  verify-token (fixed host, three fields only), comment (author filter, re-check, stale-head skip), escaped logs,
+  newline cases in M2.
+- R2-8 VERDICT: APPROVE to go to Mustafa, with three Mediums folded in that do not touch the three texts.

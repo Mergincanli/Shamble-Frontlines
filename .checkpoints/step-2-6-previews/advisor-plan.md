@@ -112,3 +112,46 @@ C13 (process) Section 8: the security-auditor reads revision 2 (texts included) 
 - L6 The immutable rule follows ADR 0006 part 1; production's set must carry it too (GLOSSARY §5).
 - L7 Departure 3's date: cite the entry (2026-11-24 23:53:15 UTC; his label 25 November, 00:55 Amsterdam).
 - L8 The checkpoint's "Current step" still says step 2.
+
+## Revision 2 (plan.md at 1ac984a, branch head checked 2026-11-25)
+Verdict: APPROVE, with the conditions below, which are text edits (no re-review needed for them), and subject to the
+security-auditor's read of revision 2 (C13): a Critical or High from it, or any change to the three texts, comes back
+to me for what changed.
+
+Checked:
+- The three texts: sha256 and sizes match the plan (c66c0b0a..., 10561; c2f1fa90..., 515; 3af06706..., 1415), and the
+  Appendix blocks equal texts/*.yml byte for byte (python compare).
+- preview.yml against the plan: every event or job value reaches a shell through `env:` only (the concurrency group
+  and environment URL are not shell); checkout is main's with persist-credentials false; `permissions: {}`; the token
+  on verify-token, the upload and reconcile's one step only; Wrangler from an empty folder under RUNNER_TEMP, never an
+  ancestor of the site; `check` filters name, path, event pull_request, success, this repository; reconcile never runs
+  on a pull_request event (its `if` is false there) and on a branch the environment refuses it anyway. `cache-mode:
+  none` is the same job key as toolchain.yml:37.
+- His words "You own no manifest and no lockfile" (DECISIONS :1365, his entry of 2026-11-18): confirmed;
+  LANE2-LOCKFILE is his.
+- Departure citations: ADR 0002 :643-646 (Sentry job under the preview reviewer), :889 (P3 "rejected for now"),
+  r5 :775-782 (R5-PREV-F3's two conditions): confirmed.
+- Not verified by me: the claim that the quotes of section 1 were checked by script (no transcript here).
+
+Decisions that stay his: TRIGGER, ACCOUNT, LANE2-LOCKFILE, DEPARTURES, MAIN-WALL.
+TOKEN-WINDOW does not: my first read settled it "subject to the security-auditor's read", and that read asks 90 days.
+So 90 days is settled; it moves to section 12's settled line and leaves his list.
+
+Conditions:
+R2-C1 (Medium) MAIN-WALL (a) and the clicks: a token must never wait between sittings. Under (a), clicks 6, 7 and 8,
+  with M1's re-run after click 8, move together to a second short sitting after main's new rule is in. Section 4 and
+  section 9 say plainly that (a) costs a second sitting (against "one sitting"), and that the new rule's own clicks
+  come with that change-set's plan.
+R2-C2 (Medium) MAIN-WALL (a)'s change-set must show, on its throwaway repository, that day sessions' merges and the
+  PR Advisor's merges still work under the new rule, and that the Revert rule's "his own way past a required check"
+  still exists.
+R2-C3 (Medium) MAIN-WALL's entry adds the advisor agent's view next to the security-auditor's: the gap predates step
+  2.6 and reaches all of main whatever he picks; under ACCOUNT (b) the token adds only the previews account, so (b),
+  accepted in writing with (a) as the next change-set, is proportionate and keeps one sitting; under ACCOUNT (a), (a)
+  first. His choice either way.
+R2-C4 (Low) TOKEN-WINDOW moves to the settled line (90 days; renewal is clicks 6 and 8 again).
+Lows (notes only): L9 the `comment` command skips writing when its SHA is no longer the pull request's head (an older
+  run's `after` runs even when its deploy was cancelled); L10 the comment warns from 14 days before the token's end date
+  (verify-token's expires_on); L11 M2 names the header check's bite on a recorded response (C1's second half); L12
+  whether the session can read deployment records for M1's "no deployment record" (the environments API was refused
+  here) is unproven: say how M1 reads it.
