@@ -28,7 +28,11 @@ calls #66 a draft: correct that in your next pull request.").
 9. Report, PR (draft), the advisor agent on the final head, ready, his go.
 
 ## Current step
-9: review round 2 on what changed (infra-engineer and the verifier, both resumed with their context) and docs-keeper's
+10: the fold. Round 2 done: infra-engineer APPROVE (G1, G2 -> ADR6-WORDING); the verifier PASS WITH NOTES (the
+head equals plan revision 3 word for word). Docs pass f18cd11 (docs-keeper; checked by script). Report written to
+docs/reports/2026-11-25-adr0006-header-row.md (324 lines; appendix by appendix.py). Next: this save, then the fold
+(notes deleted with the report's commit), the advisor agent on the final head, ready, the SHA to him.
+Earlier, step 9: review round 2 on what changed (infra-engineer and the verifier, both resumed with their context) and docs-keeper's
 pass (STATUS, STATUS_ARCHIVE, ROADMAP, REPO_MAP, SPIKE_PLAN), started about 11:57 UTC; draft PR #67 opened
 (https://github.com/Mergincanli/Shamble-Frontlines/pull/67) at a4152ad. Then: the report (draft in `report-draft.md`),
 the fold, the advisor agent on the final head, ready, his go.
