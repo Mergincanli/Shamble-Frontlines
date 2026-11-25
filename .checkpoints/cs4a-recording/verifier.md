@@ -162,3 +162,14 @@ Read-only on the working copy; my builds under `.gate/verifier-*`; no git add/co
     told to him in STOP-4A). No live code calls shared_hash: only the glue in the built Worker holds the method, no
     Worker or page source calls it. Matches the plan with its folds: yes.
 - 0e .checkpoints/ files are in the branch (expected for a draft); before the PR is marked ready they must go.
+- 1d CI final: the push-event toolchain run 45712006790 on 21c1046 also success (22:23:25 UTC): 6 of 6 green on
+  21c1046. The branch moved on to 6fddbf6 and be36b81 (PR head at 22:27): notes and docs only, both [skip ci], no
+  check runs on be36b81 (`total 0`). `git diff --stat fb5d0ff be36b81 -- crates packages Cargo.toml Cargo.lock
+  package.json package-lock.json .github .claude tools CLAUDE.md`: empty.
+- cleanup: `git worktree remove` of .gate/verifier-r1, verifier-main, verifier-4a: done (all three gone from `git
+  worktree list`). Left for the main session: .gate/verifier-target (510 MB build output) and .gate/verifier-logs
+  (my logs, the evidence), both gitignored; verifier-fnv-claims.py (untracked) and verifier-wasm-diff.mjs in this
+  folder. Working copy: no change of mine outside this notes folder.
+
+VERDICT: PASS WITH NOTES (notes: 5a smoke not run here; CI's six checks are on 21c1046, the head be36b81 has none).
+DONE 2026-11-25 22:28 UTC

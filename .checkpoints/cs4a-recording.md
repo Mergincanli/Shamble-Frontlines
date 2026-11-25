@@ -9,7 +9,7 @@
   worktree `.gate/lane1-takeover`; pushed with `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its
   command; never a plain `git push`. The session's start folder is never switched · **Base:** origin/main
   c1da1bd (lane 2's docs-only #67, taken in by merge commit 75a9296; before it 311c0484)
-- **Last update:** 2026-11-25 23:13 Amsterdam (from the clock)
+- **Last update:** 2026-11-25 23:28 Amsterdam (from the clock)
 
 ## Sizes (his point 5: which is which)
 - The designs' own count for 4a, bottom-up: 1,365 lines (655 code, 710 tests).
@@ -87,26 +87,28 @@
 16. His five messages of 2026-11-25 in `docs/DECISIONS.md` by script, the Hornet's entry in `docs/UNITS.md`
     section 0 (9b5c96a; `decisions-4a.mjs check` passes).
 
+17. The docs pass by docs-keeper (21c1046: STATUS, its archive, ROADMAP, REPO_MAP; change-set 3b's owed pass in it).
+18. CI green on 21c1046, which holds the final source (six of six). The players' file on GitHub's runner: 54,514
+    bytes, sha256 a4d8184c...d094, the same as here.
+19. **The verifier: PASS, with notes that do not block** (`cs4a-recording/verifier.md`, DONE). One byte differs
+    between round 1's players' file and the final one: a line number in a panic message.
+
 ## Current step
-The verifier runs on the final source (its notes: `cs4a-recording/verifier.md`); docs-keeper runs the docs pass
-(STATUS, STATUS_ARCHIVE, ROADMAP, REPO_MAP; its notes: `cs4a-recording/docs-keeper.md`). The main session drafts the
-report. Unpushed local commits: 1b12078, 6dccb0e, 9be3c27, fb5d0ff, 9b5c96a and what follows.
+The last commit: the report final (`docs/reports/2026-11-25-cs4a-recording.md`), `.checkpoints/` out of the head.
+THIS commit is the last that holds the notes: the report names it. Then CI on the last commit, the advisor agent on
+that head, the pull request marked ready, the board.
 
 ## Next steps
-1. Read the verifier's result (until PASS) and docs-keeper's; commit the docs; push (the head commit without
-   `[skip ci]`); read CI on the new head (the players' file's digest on GitHub's runner against a4d8184c...d094).
-2. The report `docs/reports/<date>-cs4a-recording.md` (`/advisor-report`): his go's point 4 in at most eight lines
-   (corrected: the canonical writer is NOT movable, his values enter the content through the tool that writes with
-   it; movable are about 880 lines by the designs' count: 3.5 to 4 hours; within 4c alone about 2 hours); every size
-   named; where 4a's 2.2 times went and what it means for 4b to 4d; the caveats; S3's read side named as open.
-3. The advisor agent on the pushed head. Then the last commit: the report in, `.checkpoints/` out of the head
-   (CHECKPOINTS section 9: a ready pull request has no `.checkpoints/` file in its head; the Walk plan and his saved
-   messages stay readable at the commit the report names, and 4b's first commit puts `.checkpoints/cs4-walk*` back
-   from it), CI on it, the advisor agent on that head, the pull request marked ready, the board.
-4. Stop for his go on the merge (the approved head's full commit id as the expected head, after his Advisor's
-   merge check).
-5. Housekeeping when 4a is merged: remove the agents' copies (`.gate/rr-4a`, `rr-4a-base`, `rr-4a-r2`, `te-4a`,
-   `te-4a-r2`, `verifier-4a`) with `git worktree remove`, their target folders with `cargo clean --target-dir`.
+1. The advisor agent's verdict on the final head; a REVISE is fixed and reviewed again.
+2. Stop for his go on the merge (the approved head's full commit id as the expected head, after his Advisor's merge
+   check). His answers wanted before 4b's first edit: CONTENT-SOURCE and DEPART-4; and EARLY-LOOK-ORDER,
+   FIREFOX-REPLAY, LINKS-CHECK (all in the report's "Decisions needed").
+3. 4b's first commit puts `.checkpoints/cs4-walk*` back from this commit (`git archive` into `.gate/`, then copy).
+4. Housekeeping when 4a is merged: remove the agents' copies (`.gate/rr-4a`, `rr-4a-base`, `rr-4a-r2`, `te-4a`,
+   `te-4a-r2`) with `git worktree remove`; their target folders and `.gate/verifier-target` with
+   `cargo clean --target-dir`.
+5. From here on every git call is alone in its shell call (five read-only `git status` calls of this chat sat behind
+   `cat`, `tail` or `pwd` in one line: named in the report).
 
 ## Open findings
 - 4A-BYTES-LENGTH (rust-reviewer, a watch for 4c, no defect today): `StateSink::bytes` writes no length, which is
@@ -139,5 +141,5 @@ report. Unpushed local commits: 1b12078, 6dccb0e, 9be3c27, fb5d0ff, 9b5c96a and 
   gh always start their own command. The board add-on is active.
 
 ## Running work
-- The verifier and docs-keeper run (two agents). No reviewer round is open.
+- No agent runs.
 - No saver runs: the main session commits the notes by hand.
