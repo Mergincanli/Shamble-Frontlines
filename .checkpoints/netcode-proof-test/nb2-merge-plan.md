@@ -1,4 +1,4 @@
-# NB2-MERGE: take Netcode Builder 2's branch into the netcode branch (plan, 2026-11-25 00:4x UTC)
+# NB2-MERGE: take Netcode Builder 2's branch into the netcode branch (plan, 2026-11-25 00:3x-00:5x UTC)
 
 ## As approved
 Not yet: the advisor agent's plan check (output advisor-nb2-merge.md) starts at 03:51 UTC with step 7 and M4b
@@ -17,7 +17,7 @@ change-set after this merge; the pointers are passed).
 
 ## Order (his item 4 leaves it to me)
 - After U6c's merge is done: M8's commit, C9, M9's push with CI green on its SHA (every check run success and PR #40
-  mergeable: advisor-main-65.md section 4 (a)), u6c-report.md, the board line. Never during any U6c step.
+  mergeable: advisor-main-65.md section 4 (a)), u6c-report.md. Never during any U6c step.
 - Then in a gap of R1's path: no R1-path step running, and none due to need the lane or the main folder before this
   merge's projected end. Projected about 45 minutes of lane: U6b's warm counted run took 23.5 minutes (05:38:21 to
   06:01:53 UTC, .gate/u6b-merge/m5-check2.log), plus the judge's build and two judge calls. The first such gap is
@@ -25,8 +25,8 @@ change-set after this merge; the pointers are passed).
   then U8's merge with the advisor's head read (the card's "Next three", item 3, and its U8 line). A shorter gap: the
   merge waits for the next one. Nothing else of the lane runs during steps 1 to 8.
 
-## Facts checked (00:2x-00:4x UTC, read only)
-- Builder 2's tip, fetched by name at 00:4x: 0e621dae6e5b009a4cf00b6401b46d771b2215a3. 72651a3c is its ancestor, with
+## Facts checked (00:2x-00:3x UTC, read only)
+- Builder 2's tip, fetched by name at 00:3x: 0e621dae6e5b009a4cf00b6401b46d771b2215a3. 72651a3c is its ancestor, with
   5 commits after it (`git rev-list --count`); each one's `git show --stat` lists only `.checkpoints/netcode-judge.md`,
   `.checkpoints/netcode-judge/mustafa-2026-11-25.md` and `.checkpoints/netcode-judge/save-message.mjs`; together 3
   files, +96/-60 (`git diff --stat 72651a3c 0e621dae`). His condition holds today; step 1 checks it again.
@@ -63,7 +63,7 @@ change-set after this merge; the pointers are passed).
 - Expected counts: Builder 2's whole check went from 807/904 at e2c0e896 to 854/951 at 72651a3c (+47 each; the later
   commits change no code), self 78 of 78 at both. So after this merge: U6c's M5 counts + 47 each (908 and 1005 if M5
   reads 861 and 958), self as M5.
-- Free disk at 00:4x: 10,255 MiB (`df -m --output=avail`). U6c's near-cold M5 runs first and uses some of it.
+- Free disk at 00:3x: 10,255 MiB (`df -m --output=avail`). U6c's near-cold M5 runs first and uses some of it.
 
 ## Steps (each command in its own call)
 1. Pre-checks (read only), then the last save before the merge:
@@ -77,14 +77,15 @@ change-set after this merge; the pointers are passed).
    e. `git merge-tree --write-tree --name-only HEAD T`: one tree line, no conflict; a conflict stops, the advisor rules.
    f. Free disk at least 8,192 MiB (advisor-u6b-m6.md:158-165); under it, the approved dev part-clean
       (u4r-disk-plan.md) and measure again; still under: stop, the advisor rules.
-   g. The base light run (`main-run.sh … node check.mjs --only refs,marks,self,redact`) into
-      .gate/nb2-merge/light-base.log: N0 (refs), the marks, self and redact lines.
-   h. The saver stopped (it restarts at U6c's M9): TaskStop, then `pgrep -f "checkpoint.mjs watch"` exit 1.
-   i. The card's resume line by Edit ("NB2-MERGE: step 2 begins at H0; if cut, the local merge commit is unpushed:
+   g. The saver stopped (it restarts at U6c's M9): TaskStop, then `pgrep -f "checkpoint.mjs watch"` exit 1.
+   h. The card's resume line by Edit ("NB2-MERGE: step 2 begins at H0; if cut, the local merge commit is unpushed:
       finish steps 3-8 from this plan, never reset"), then the card save, the last until step 8. H0 = that save,
       equal to the remote, named in the chat.
-2. `git merge --no-ff -m "<subject>" -m "<body>" T`, the body naming his word (history.md:7909), T and 72651a3c, and
-   ending with the two attribution lines. Expected: exit 0, "Merge made by the 'ort' strategy."
+   i. `mkdir -p .gate/nb2-merge`, then the base light run at H0 (`bash .checkpoints/netcode-proof-test/main-run.sh
+      /home/user/Shamble-Frontlines/.gate/nb2-merge/light-base.log node check.mjs --only refs,marks,self,redact`):
+      N0 (refs), the marks, self and redact lines. Nothing is saved after it, so N0 is H0's count.
+2. `git merge --no-ff -m "<subject>" -m "<body>" -m "<the two attribution lines>" T`, the body naming his word
+   (history.md:7909), T and 72651a3c. Expected: exit 0, "Merge made by the 'ort' strategy."
 3. Content checks (read only):
    - `git rev-parse HEAD^1 HEAD^2` = H0 and T.
    - `git diff --shortstat H0 HEAD` equals `git diff --shortstat e2c0e896 T` (46 files, +6,951/-208 at 0e621dae).
@@ -109,8 +110,7 @@ change-set after this merge; the pointers are passed).
 6. `node tools/gate.mjs --no-smoke` PASS, against the merge-base with main.
 7. Nothing is edited by hand: no rule, mark, number or file of Builder 2's.
 8. The card save (it pushes the merge and the save); CI on the pushed head: gate, smoke and toolchain green and PR #40
-   mergeable; the saver restarts; one board line (done, next, commit link) and one reply in Builder 2's MOVED thread
-   saying the merge is in at that SHA, so its NPT-L2-ONEWAY can take this head in first.
+   mergeable; the saver restarts; Builder 2 is told the merged SHA (its NPT-L2-ONEWAY takes this head in first).
 9. The advisor's check of the pushed head by SHA (MAIN-65 step 7's form), in the next reset's first 30 minutes.
 
 ## Stop rules

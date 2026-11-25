@@ -97,7 +97,7 @@
 - **T5 (i) DONE 06:3x** (U7's T-builder; 4 loads, all exit 0; records .gate/u7/t5i/; snapshot wip/u7-t-build-t5i.patch,
   2,858 added; T5i-1 to -3 for U7's round). **Next 3:** U6c's merge now by advisor-u6c-r2.md with H2 and H1 (his (a)):
   M0-M4a by hand, M4b's head read at 03:51 with MAIN-65's step 7 (trig_01Co9w6DYSoCbkQz5RWhK58i), then M5-M9; then NB2's merge (below).
-- **RESUME (U6c's merge, M0-M4a DONE 00:2x UTC):** wip/u6c-fix.patch applied in the main folder (uncommitted; 12 modified, 12 new untracked; cmp 24/24), H1 and H2 by Edit; fmt --check exit 0; .gate/u6c-merge/hunks.diff 9a3bbeb7… (load.rs +4 -3, probe.rs +7 -3, SERIES.md +1 -1). No stash, clean, checkout or restore; saves notes-only. At 03:51 three agents: step 7 (main-65-step7-request.txt; its reruns first), M4b (u6c-m4b-request.txt), NB2's plan check; M5 only after M4b's APPROVE and step 7's reruns.
+- **RESUME (U6c's merge, M0-M4a DONE 00:2x UTC):** wip/u6c-fix.patch applied in the main folder (uncommitted; 12 modified, 12 new untracked; cmp 24/24), H1 and H2 by Edit; fmt --check exit 0; .gate/u6c-merge/hunks.diff 9a3bbeb7… (load.rs +4 -3, probe.rs +7 -3, SERIES.md +1 -1). No stash, clean, checkout or restore; saves notes-only. At 03:51 three agents: step 7 (main-65-step7-request.txt; its reruns first), M4b (u6c-m4b-request.txt), NB2's plan check (nb2-merge-request.txt on nb2-merge-plan.md); M5 only after M4b's APPROVE and step 7's reruns.
 
 ## Choices taken without him (NPT-TRIM: choices inside a brief go by my lean, one line each in the day's message)
 - For msg-2026-11-26.md: none yet. All of 11-24's are named in msg-2026-11-25.md (items 1-8 and its addendum's four).
@@ -109,7 +109,7 @@
   logs must read MOVED (else three lines to him). Take-overs from .checkpoints/netcode-judge.md: his 11-24 message to
   NB2 into DECISIONS.md by script at the next docs pass; NPT_KC_BURSTS after R1's run, before R1's report; the
   killed-room check stays open (before R5). SYNC-ENTITIES (a) for -10's writer: other soldiers + vehicle hulls in the
-  client's set. Board: when waiting on him, labels state=needs-musti and due, naming the file.
+  client's set. NB2's merge plan: nb2-merge-plan.md (written 00:3x; its check at 03:51: nb2-merge-request.txt).
 - Earlier choices, each in its day's message: 11-23's (msg-2026-11-24.md items 1-7; card at 2a7a5b8), 11-22's
   (msg-2026-11-23.md items 1-5; card at 9341c90), 11-21's (card at 0f744ba), 11-20's history.md:7412-7433, 11-19's :7177-7193.
 
@@ -153,7 +153,7 @@
   ending DONE). A stopped agent resumes by SendMessage from its notes.
   - Done, resumable: U6c's builder a3a3e3fdf559de095 (the fix pass, DONE); the U6c advisor a662f1797b78cae95; the seats aa64bb15ad4467641, a3a1718b1419d246e,
     a546a4604d30ee9d4; MAIN-64's advisor a74a6501af7e576c7 (takes step 7). Triggers: check-in trig_01EKqNqwZrQTVJ6caAyRrug5
-    (next 00:34); step 7 trig_01Co9w6DYSoCbkQz5RWhK58i (03:51; main-65-step7-request.txt b03fc992…, u6c-m4b-request.txt d124e576…); day message trig_01XVEDQzVLaAwy4Fer6AERdS (11-25 23:05); U6c's H2-alone fallback trig_016oDPmJFc98ivTt3fLbjj9a (Fri 27 23:01 UTC).
+    (next 00:34); step 7 trig_01Co9w6DYSoCbkQz5RWhK58i (03:51; main-65-step7-request.txt b03fc992…, u6c-m4b-request.txt d124e576…, nb2-merge-request.txt 04ad849c… on plan af73df48…); day message trig_01XVEDQzVLaAwy4Fer6AERdS (11-25 23:05). The Fri 27 H2-alone fallback is deleted (his yes is in).
 - **MAIN-65 steps 1-6 DONE 23:28 UTC (step 7 at 03:51):** pushed at 82bd694 (82bd69428512e679b789797d674ef04bd4743715); CI on it green: gate 45509875991 and toolchain 45509875989 (push), gate 45509881420 and toolchain 45509881180 (pull request); merge 39a0d04 (parents H0 473f5c1, main 28254a7); STATUS.md 120 lines, "1 1" against main; H0..HEAD 64 files +4677/-317 (63 without STATUS.md, +4644/-284); anchor 9475d37 exit 0 (index and HEAD); gate PASS (--no-smoke); repo map OK 186/110; checkpoint tests 33/33; light.log PASS (refs 1848 = 1825 + 23, marks 81, self 78/78, redact 11/11, 359 items, 0 findings); outputs .gate/main-65/ kept for step 7.
 - **My step (18:3x):** round 2: netcode 3 Lows in the diff, 2 Mediums outside it before R1 (the start-edge drop read;
   LG's DONE with no READY, caught at U8's one load_up call :2218-2221); P1's +222 drops are in-window, a separate fact

@@ -1,0 +1,39 @@
+You are the project's advisor for NB2-MERGE's plan check: the merge of Netcode Builder 2's branch into the netcode
+branch. First read your rules from main: `git show origin/main:.claude/agents/advisor.md` (run from
+/home/user/Shamble-Frontlines), and follow them. Read only, effort xhigh. Your one output file:
+/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-nb2-merge.md.
+Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write.
+Write your plan first and a notes line after each check, so a usage cut loses nothing. Never `cd` into a worktree; no
+`git -C`; one simple command per Bash call; run no cargo, test, gate, light run or plant; change no file but your own;
+read nothing from the web.
+
+What it is (plain words): Mustafa's word of 2026-11-25 00:07 UTC, item 4 (history.md:7909, word for word there), to
+merge claude/practical-ride-igo41n (code commit 72651a3c6326546b423c4773ac5a92902a37b590, tip
+0e621dae6e5b009a4cf00b6401b46d771b2215a3 when the plan was written) into the netcode branch
+claude/netcode-proof-test-plan-hcky5g (PR #40), "both parts in one merge", after a check that every later commit there
+touches only its notes, plan first, "R1's path goes first, and the two merges never overlap" (U6c's merge and this
+one); after the merge his whole check, then the PM-0001-47 re-judge on the real logs, which must read MOVED, or three
+lines to him. The plan: .checkpoints/netcode-proof-test/nb2-merge-plan.md, in MAIN-65's form (main-65-plan.md, your
+advisor-main-65.md). Builder 2's own record: `git show 0e621dae6e5b009a4cf00b6401b46d771b2215a3:.checkpoints/netcode-judge.md`
+(its "Both parts, for whoever merges them" block and "Open findings"). The fetched tip is in this repository's objects
+(read it by SHA; no fetch needed).
+
+Check, each with its evidence:
+1. Every line of the plan's "Facts checked", by your own read-only commands (git show, git diff, git rev-list,
+   git merge-base, git merge-tree --write-tree, ls, du): above all his condition (each commit after 72651a3c touches
+   only Builder 2's notes), the guard's pathspec (main-61-plan.md:37-40) over e2c0e896..tip, the trial merge, the
+   SERIES.md overlap, and the -47 logs' folder.
+2. The steps against his item 4's words: the order (after U6c's merge, in a gap of R1's path), his two checks in his
+   order, and the bars (the counts, refs N0 + 32, MOVED on both calls).
+3. The re-judge: at the tip, will a mark-level `moved` read MOVED on both the measured and the bites logs
+   (crates/judge/src/eval.rs: the early return and the headline order)? Name the headline text to expect and whether
+   the exit code is 0.
+4. The stop rules, the risks, the tier and the review line his rule of 2026-11-15 needs (history.md:2127).
+5. Answer Q1 and Q2, and say whether -57's re-judge (the plan's Record) should run.
+
+At your launch the main folder may hold U6c's merge in progress (24 applied files, uncommitted; later its counted run).
+That is not part of this check: do not wait for it, and run nothing that takes the lane.
+
+Give APPROVE, APPROVE WITH CONDITIONS or REVISE, each finding on CLAUDE.md's scale. End the file with DONE on its own
+line. Your final reply goes to the main session: the verdict, the conditions one line each, the answers to Q1 and Q2,
+the -57 answer, and "For Mustafa". Plain words.
