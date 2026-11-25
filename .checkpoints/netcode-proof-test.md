@@ -147,7 +147,7 @@
   notes u8-build.md "## C9"; nothing until U8's merge); the advisor a3de649cd25e474df (U8's rulings; takes U8's head
   read); NB2's plan check a10848a10f73ed39e (advisor-nb2-merge.md).
 - **Scheduled:** check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; 16:34: nothing stopped; next 20:34 UTC); day
-  message trig_01XVEDQzVLaAwy4Fer6AERdS (23:05 UTC: msg-2026-11-26.md, choices 1-13). The 18:51 wake-up fired (spent).
+  message trig_01XVEDQzVLaAwy4Fer6AERdS (23:05 UTC: msg-2026-11-26.md, choices 1-13). The 18:51 wake-up fired (spent). COMPACT-WAIT reminder trig_01UTwyxrj9ALRoh2mh7bLMdC (one-shot, 20:05 UTC).
   PR #40 is subscribed. The fired reminders stay (A.4).
 - **My step (19:3x UTC): MAIN-66 steps 1-6 done; pushed 69d9b5f** (PR #40's head on base c1da1bd; mergeable_state "blocked" while CI runs; the board line 19:3x; PR #40's rules read 19:24). Next: CI on 69d9b5f (gate, smoke, toolchain, for the push and the pull request; Q1 (a)), then step 7 at 23:50. Resume: the merge is on the remote; read CI on 69d9b5f.
   The no-save window (H0 to step 6) ended with the push. 19:4x: the chat at about 83 % (the last request read 827k of 1,000,000): /compact asked 19:4x, a reminder set for +20 min (COMPACT-WAIT); U8's merge M3-M9 starts after the compact (or at the reminder), from u8-brief.md.
