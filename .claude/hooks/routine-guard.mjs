@@ -292,27 +292,51 @@ const PLAIN_DELIM = /^(?:[A-Za-z0-9_.-]+|'[A-Za-z0-9_.-]+'|"[A-Za-z0-9_.-]+"|\\[
 // Shell keywords in front of a command ({ ... }, if/then/do ..., !) are stripped too.
 const WRAPPERS = new Set(['time', 'nohup', 'command', 'builtin', 'noglob', 'exec', '!', '{', '}', 'if', 'then', 'else',
   'elif', 'fi', 'do', 'done', 'while', 'until']);
+// SEC-U7B-1 (guard-env-fix): env, nice and stdbuf are read with their options' values (GNU coreutils 9.4's --help).
+// flag: takes no value; value: takes the rest of its word (-uX, --unset=X) or the next word; unread: read as a value,
+// but git would run in a folder (env -C) or on words (env -S) the guard does not follow. Any other option word (an
+// abbreviation, a cluster such as -iu, a signal option) is unknown and makes the command unreadable, as does a program
+// word that still starts with - after them (env X=1 -i git ...: env runs -i). A Map, so `constructor` finds nothing.
+const WRAP_OPTS = new Map([
+  ['env', { flag: /^(-[i0v]|--ignore-environment|--null|--debug)$/, value: /^(-u|--unset)$/, unread: /^(-[CS]|--chdir|--split-string)$/ }],
+  ['nice', { flag: /^-\d+$/, value: /^(-n|--adjustment)$/ }],
+  ['stdbuf', { value: /^(-[ioe]|--input|--output|--error)$/ }],
+]);
+// Returns { argv: the real command, unreadable: null, or the wrapper form the guard does not follow (SEC-U7B-1) }.
 export function unwrap(argv) {
-  let a = argv.slice();
+  let a = argv.slice(), unreadable = null;
   for (let guard = 0; guard < 20 && a.length; guard++) {
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0])) { a = a.slice(1); continue; }
     const prog = basename(a[0]);
     if (prog === 'command') { a = a.slice(1); while (/^-[pvV]+$|^--$/.test(a[0] ?? '')) a = a.slice(1); continue; } // fix round R-c
     if (WRAPPERS.has(a[0]) || WRAPPERS.has(prog)) { a = a.slice(1); continue; }
-    if (prog === 'env') { a = a.slice(1); while (a.length && (a[0].startsWith('-') || /^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0]))) a = a.slice(1); continue; }
+    const o = WRAP_OPTS.get(prog);
+    if (o) { // an unknown word is dropped alone and the reading goes on: that can only add a deny, never lift the ask
+      a = a.slice(1);
+      while (a.length && a[0].startsWith('-') && a[0] !== '-') {
+        const w = a[0], name = w.startsWith('--') ? w.split('=')[0] : w.slice(0, 2);
+        if (w === '--') { a = a.slice(1); break; }
+        if (o.unread?.test(name)) unreadable ??= `${prog} ${name}`;
+        if (o.value.test(name) || o.unread?.test(name)) { a = a.slice(name === w ? 2 : 1); continue; }
+        if (!o.flag?.test(w)) unreadable ??= `${prog} ${w}`;
+        a = a.slice(1);
+      }
+      if (prog === 'env' && a[0] === '-') a = a.slice(1); // after its options, env reads a lone - as -i
+      if (prog === 'env') while (a.length && a[0].includes('=')) a = a.slice(1); // env's own rule: a word with = sets
+      if (a[0]?.startsWith('-')) unreadable ??= `${prog} before ${a[0]}`;
+      continue;
+    }
     if (prog === 'timeout') { // timeout [-s SIG | -k DUR | --opt[=v]]... DURATION command
       a = a.slice(1);
       while (a.length && a[0].startsWith('-')) a = a.slice(/^(-s|-k|--signal|--kill-after)$/.test(a[0]) ? 2 : 1);
       a = a.slice(1);
       continue;
     }
-    if (prog === 'nice') { a = a.slice(1); if (a[0] === '-n') a = a.slice(2); else if (/^-n?\d+$|^--adjustment/.test(a[0] ?? '')) a = a.slice(1); continue; }
-    if (prog === 'stdbuf') { a = a.slice(1); while (a.length && a[0].startsWith('-')) a = a.slice(1); continue; }
     if (prog === 'xvfb-run') { a = a.slice(1); while (a.length && a[0].startsWith('-')) a = a.slice(/^-(n|s|e|f|p|w)$|^--(server-num|server-args|error-file|auth-file|xauth-protocol|wait)$/.test(a[0]) ? 2 : 1); continue; }
     if (prog === 'xargs' && a.length > 1 && !a[1].startsWith('-')) { a = a.slice(1); continue; }
     break;
   }
-  return a;
+  return { argv: a, unreadable };
 }
 
 // ---------- git ----------
@@ -718,7 +742,15 @@ async function bash(command, cwd, role, io, input) {
     if (role && c.expand) return deny(`routine (${role}): an unquoted glob (* ?) or ~ would be expanded by the shell past the guard; quote it, or name the files`);
     let argv;
     if (role) { const u = unwrapRole(c.argv, role); if (u.deny) return deny(u.deny); argv = u.argv; }
-    else argv = unwrap(c.argv);
+    else {
+      const u = unwrap(c.argv);
+      argv = u.argv;
+      if (u.unreadable) { // SEC-U7B-1: a wrapper form the guard does not follow asks, an agent is refused; the scan goes on
+        if (input.agent_id) return deny(`${KIT_AGENT}; an agent runs commands without ${u.unreadable} (a wrapper form the guard does not follow)`);
+        dayAsk ??= ask(`kit and gate files ask first in a day session: the guard does not follow ${u.unreadable} in front of a command ` +
+          '(where git runs, on which words, or whether it runs), so it asks instead of guessing; write it without that, or approve it');
+      }
+    }
     if (!role) { // day sessions (kit-v3-3): a kit write asks; the scan goes on, so a later deny in the line still wins
       const w = dayShellWrites(c, argv, dirs.known ? vcwd : null, io, input);
       if (w?.deny) return w;

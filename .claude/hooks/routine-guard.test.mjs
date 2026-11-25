@@ -1168,6 +1168,28 @@ export const DAY_CASES = [
   ['SD-6 git cannot list the worktrees: ask', dsh('rm -rf docs/research'), ASK, { wtFail: true }, /could not list this repository's worktrees/],
   ['SD-6 control: rm -rf .gate/empty (no worktree in it) goes on', dsh('rm -rf .gate/empty'), null],
   ['SA-6 rm -rf / with no worktree listed (the ancestor check alone): ask', dsh('rm -rf /'), ASK, { worktrees: [] }, /holds the project folder/],
+  // SEC-U7B-1 (guard-env-fix): env, nice and stdbuf read with their options' values. Each known form reaches git (a force
+  // push behind it is refused) and git status behind it stays allowed; each form the guard does not follow asks, and an
+  // agent is refused. Forms from GNU coreutils 9.4's --help.
+  ...['env -i', 'env -', 'env --ignore-environment', 'env -0', 'env --null', 'env -v', 'env --debug', 'env -u X', 'env -uX',
+    'env --unset X', 'env --unset=X', 'env --', 'env X=1', 'env x.y=1', 'env -i -u X Y=1', 'env -- - X=1', 'nice', 'nice -n 5',
+    'nice -n5', 'nice -n -5', 'nice --adjustment 5', 'nice --adjustment=5', 'nice -5', 'nice --', 'nice -n 5 -n 3',
+    'stdbuf -i 0', 'stdbuf -i0', 'stdbuf --input 0', 'stdbuf --input=0', 'stdbuf -o L', 'stdbuf -oL', 'stdbuf --output L',
+    'stdbuf --output=L', 'stdbuf -e 0', 'stdbuf -e0', 'stdbuf --error 0', 'stdbuf --error=0', 'stdbuf -oL --',
+    'env -u X nice -n 5 stdbuf -o L']
+    .flatMap((w) => [[`SEC-U7B-1 ${w}: a force push behind it is refused`, dsh(`${w} git push --force origin cs/x`), DENY],
+      [`SEC-U7B-1 ${w}: git status behind it stays allowed`, dsh(`${w} git status`), null]]),
+  ...['env -C /d', 'env -C/d', 'env --chdir /d', 'env --chdir=/d', 'env -S s', 'env -Ss', 'env --split-string s',
+    'env --split-string=s', 'env --ch /d', 'env --block-signal', 'env -iu X', 'env --null=x', 'env X=1 -i', 'env - -i',
+    'nice --adj=5', 'nice --5', 'nice -x 5', 'nice -', 'stdbuf --out L', 'stdbuf -x 0']
+    .flatMap((w) => [[`SEC-U7B-1 ${w}: ask`, dsh(`${w} git status`), ASK, {}, /^kit and gate files ask first in a day session: the guard does not follow (env|nice|stdbuf) /],
+      [`SEC-U7B-1 ${w}: an agent is refused`, dsh(`${w} git status`, { agent_id: 'a1' }), DENY, {}, /an agent runs commands without (env|nice|stdbuf) /]]),
+  ['SEC-U7B-1 the reason names the form (env -C)', dsh('env -C /d git status'), ASK, {}, /does not follow env -C in front of a command/],
+  ['SEC-U7B-1 the reason names the form (nice --adj=5)', dsh('nice --adj=5 git status'), ASK, {}, /does not follow nice --adj=5 in front/],
+  ['SEC-U7B-1 env -C before a force push: the deny wins', dsh('env -C /d git push --force origin cs/x'), DENY],
+  ['SEC-U7B-1 an unknown flag is read on: the force push behind it is refused', dsh('env --block-signal git push --force origin cs/x'), DENY],
+  ['SEC-U7B-1 env X=1 -i: env runs -i, not git, so a force push asks', dsh('env X=1 -i git push --force origin cs/x'), ASK],
+  ['SEC-U7B-1 a program named constructor is no wrapper (no throw)', dsh('constructor -x git status'), null],
 ];
 for (const [name, input, want, opts, re] of DAY_CASES) {
   test(`day (kit-v3-3) ${want ?? 'goes on'}: ${name}`, async () => {
@@ -1359,6 +1381,19 @@ const DAY_MUTANTS = [
     'if (wts.code !== 0) return null;'],
   ['SD-6 before the not-in-a-repository return', "  const wts = io.git(['worktree',", "  if (!g) return null;\n  const wts = io.git(['worktree',"],
   ['SD-6 run from the project folder', "io.git(['worktree', 'list', '--porcelain', '-z'], io.projectDir);", "io.git(['worktree', 'list', '--porcelain', '-z'], abs);"],
+  // SEC-U7B-1 (guard-env-fix)
+  ['SEC-U7B-1 a value option takes its next word', 'a = a.slice(name === w ? 2 : 1);', 'a = a.slice(1);'],
+  ['SEC-U7B-1 an unknown option is unreadable', 'if (!o.flag?.test(w)) unreadable ??=', 'if (false) unreadable ??='],
+  ['SEC-U7B-1 env -C and -S are unreadable', 'if (o.unread?.test(name)) unreadable ??=', 'if (false) unreadable ??='],
+  ['SEC-U7B-1 -- ends the options', "if (w === '--') { a = a.slice(1); break; }", ''],
+  ["SEC-U7B-1 env's lone -", "if (prog === 'env' && a[0] === '-') a = a.slice(1);", ''],
+  ["SEC-U7B-1 env's words holding = are settings", "if (prog === 'env') while (a.length && a[0].includes('='))",
+    "if (prog === 'env') while (a.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0]))"],
+  ['SEC-U7B-1 a program word starting with - after the options', "if (a[0]?.startsWith('-')) unreadable ??=", 'if (false) unreadable ??='],
+  ["SEC-U7B-1 nice's -N form", 'flag: /^-\\d+$/', 'flag: /^$/'],
+  ['SEC-U7B-1 a Map, not a plain object', 'const o = WRAP_OPTS.get(prog);', 'const o = Object.fromEntries(WRAP_OPTS)[prog];'],
+  ['SEC-U7B-1 the ask on a wrapper form', 'if (u.unreadable) {', 'if (false) {'],
+  ['SEC-U7B-1 the agent refusal', 'if (input.agent_id) return deny(`${KIT_AGENT}; an agent runs commands', 'if (false) return deny(`${KIT_AGENT}; an agent runs commands'],
 ];
 test('mutation runs (kit-v3-3 day rules): every rule is needed by some day case', async () => {
   const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
@@ -3479,6 +3514,9 @@ export const PASS4_ROUTINE_CASES = [
     'command git status', 'exec git status', 'noglob git status', 'nodejs x.js']
     .flatMap((l) => roleRows(`wrapper or keyword: ${l}`, l, DENY, NOT_PROG(l.split(' ')[0]))),
   ...roleRows('PATH=x git status (R-PROG answers)', 'PATH=x git status', DENY, 'PATH= may not be set'),
+  // SEC-U7B-1 (guard-env-fix): the value forms are refused in routines too (R-PROG, before unwrapRole)
+  ...['env -C /d git status', 'nice --adjustment 5 git status', 'stdbuf -o L git status']
+    .flatMap((l) => roleRows(`SEC-U7B-1 ${l}`, l, DENY, NOT_PROG(l.split(' ')[0]))),
   // A4-1: no cd (a failed cd followed by ; would move the guard's folder, not bash's)
   ...roleRows('A4-1 cd .gate/nonexist; git status > .claude/settings.json', 'cd .gate/nonexist; git status > .claude/settings.json',
     DENY, NOT_PROG('cd')),
