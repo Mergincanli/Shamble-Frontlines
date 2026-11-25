@@ -33,7 +33,9 @@ CHROMIUM = ("node", "node_modules/@playwright/test/cli.js", "test", "-c", "packa
             "--project=chromium", "--workers=1", "--retries=0", "--trace", "off", "tests/replay")
 
 def note(letter, what, ok, detail):
-    line = f"{letter} {'CAUGHT' if ok else 'NOT CAUGHT'}: {what}: {detail}"
+    # A control is a run that must stay green; every other line is a defect that must be caught.
+    words = ("HELD", "DID NOT HOLD") if what.startswith("control") else ("CAUGHT", "NOT CAUGHT")
+    line = f"{letter} {words[0] if ok else words[1]}: {what}: {detail}"
     OUT.append(line); print(line, flush=True)
 
 def expect(letter, what, command, must_contain):

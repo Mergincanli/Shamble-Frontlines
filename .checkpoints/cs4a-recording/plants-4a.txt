@@ -1,0 +1,12 @@
+A CAUGHT: the simulation changed at tick 900, natively: exit 101, found ['step: 900'] of ['step: 900']
+A CAUGHT: the same, in Node on the players' file: exit 1, found ['expected 900 to be null'] of ['expected 900 to be null']
+A CAUGHT: the same, in Chromium on the players' file: exit 1, found ['Received: 900'] of ['Received: 900']
+B CAUGHT: a static counter added to the state, natively (two matches in turn): exit 101, found ['two_instances.rs', 'panicked'] of ['two_instances.rs', 'panicked']
+B CAUGHT: the same, in Node (two matches on one module instance): exit 1, found ['two matches on one module instance', 'FAIL'] of ['two matches on one module instance', 'FAIL']
+C CAUGHT: a hash map's order in the state at tick 600 (two processes): exit 101, found ['two_processes.rs', 'left == right'] of ['two_processes.rs', 'left == right']
+D CAUGHT: a draw from outside the simulation at tick 600 (two processes): exit 101, found ['two_processes.rs', 'left == right'] of ['two_processes.rs', 'left == right']
+E CAUGHT: control: the native run stays green with a WebAssembly-only change: exit 0
+E CAUGHT: one value differs in WebAssembly only at tick 600, in Node on the players' file: exit 1, found ['expected 600 to be null'] of ['expected 600 to be null']
+E CAUGHT: the field-by-field difference at tick 600 names the field: player.presses: native [2, 2, 3, 2, 141, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], WebAssembly [2, 2, 3, 2, 140, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+F CAUGHT: a usize in the canonical bytes: the natively made hashes against WebAssembly: exit 1, found ['expected 1 to be null'] of ['expected 1 to be null']
+CLEAN GREEN: build, native tests, Node, Chromium, make_recordings --check: exits [0, 0, 0, 0, 0]
