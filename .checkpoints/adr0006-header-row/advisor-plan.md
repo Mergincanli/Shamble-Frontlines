@@ -69,3 +69,15 @@ PM-0006-8 :1392 "on a custom domain if CF has one", checklist intro :1459).
 - Round 2 (R3-9) accepted. Add the :148 pointer to infra-engineer's re-read and S23 to the verifier's spot-checks.
 - Low (rides this push): E1's custom domain is judged but PM-0006-2's method cell reads only the branch alias and the
   hash URL. Add "and a custom domain if CF has one", as PM-0006-8 does.
+- Checked after the advisor tool's read: verifier.md :126-131. The verdict is FAIL, narrow, for plan conformance only;
+  every claim, number, date and byte holds; gate PASS. test-engineer-review.md :76-107: F6, F2, F5 and F4 equal R3-3,
+  R3-4, R3-5 and R3-6 word for word; F6 does not touch the method cell; the verdict is APPROVE.
+- Exact texts for the two added edits (R3-10 and R3-11, added to the plan before any edit):
+  - R3-10, part 1 :148: "with no cap on previews," becomes "with no cap on previews (as read on 2026-10-28; Pages'
+    limits page, read 2026-11-25, no longer says so and reads "Preview deployments older than 30 days are deleted,
+    unless they are one of the project's 100 most recent deployments" (developers.cloudflare.com/pages/platform/limits/):
+    follow-up ADR6-PAGES-RETENTION),". This overrides infra-engineer's advice to leave everything to the follow-up,
+    because E7 now weighs a cap on Workers against that clause. The pointer never says Pages "has a cap". The options
+    row stays in the follow-up.
+  - R3-11, PM-0006-2's method cell: "each read on its branch alias and on its deployment's hash URL" becomes "each read
+    on its branch alias and on its deployment's hash URL, and production on a custom domain if CF has one".

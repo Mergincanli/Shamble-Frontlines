@@ -88,7 +88,36 @@ his own label in Amsterdam time, while DECISIONS heads it in UTC (2026-11-24, 23
 **R3-8. The report**, test-engineer's C1. Whether his go covers E9 and E10 is its own entry in "Decisions needed",
 PASS-WORDS, written in plain words. His word on step 4 is its own item in "For Mustafa".
 
-**R3-9. Review round 2, on what changed only:**
+**R3-10. Part 1's "no cap on previews"** (:148). This is the advisor agent's condition 1 on revision 3, in its exact
+words. E7 now weighs Workers' cap of 100 against this clause, so the clause needs its present source:
+- "with no cap on previews," becomes "with no cap on previews (as read on 2026-10-28; Pages' limits page, read
+  2026-11-25, no longer says so and reads "Preview deployments older than 30 days are deleted, unless they are one of
+  the project's 100 most recent deployments" (developers.cloudflare.com/pages/platform/limits/): follow-up
+  ADR6-PAGES-RETENTION),".
+- Its source is infra-engineer's S23: the page's "Preview deployments" section, word for word, read twice on
+  2026-11-25.
+- The new text never says Pages "has a cap". The options row's "Unlimited previews" stays a follow-up.
+
+**R3-11. PM-0006-2's method cell.** This is the advisor agent's condition 2 on revision 3. E1 now judges a custom
+domain, so the method reads one:
+- "each read on its branch alias and on its deployment's hash URL" becomes "each read on its branch alias and on its
+  deployment's hash URL, and production on a custom domain if CF has one".
+
+**R3-8, as the advisor agent's condition 3 completes it.** PASS-WORDS covers E9, E10 and E11 together. It is asked
+with his go on the final head, not before the build:
+- (a) his go covers all three;
+- (b) one push removes all three.
+- Recommendation: (a).
+
+His word on step 4 stays a separate item, and nothing is written for him.
+
+**The report's top** (the advisor agent's condition 4) says plainly two things. Neither decides a move under his (a),
+and neither is escalated:
+- Cloudflare's Pages page now says "Start new projects with Workers";
+- Pages' preview retention has changed.
+
+**R3-9. Review round 2, on what changed only** (with the advisor agent's condition 5: infra-engineer also re-reads
+R3-10 and R3-11; the verifier checks them word for word and spot-checks S23's sentence):
 - infra-engineer re-reads E7's new lines and E3.
 - The verifier checks the head against this revision word for word, and spot-checks the new source claims (the
   version-urls and workers-dev pages' silence; S2's "deletes the oldest"; pages limits for 25 MiB).
