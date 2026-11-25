@@ -9,7 +9,7 @@
   worktree `.gate/lane1-takeover`; pushed with `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its
   command; never a plain `git push`. The session's start folder is never switched · **Base:** origin/main
   c1da1bd (lane 2's docs-only #67, taken in by merge commit 75a9296; before it 311c0484)
-- **Last update:** 2026-11-25 21:49 Amsterdam (from the clock)
+- **Last update:** 2026-11-25 22:42 Amsterdam (from the clock)
 
 ## Sizes (his point 5: which is which)
 - The designs' own count for 4a, bottom-up: 1,365 lines (655 code, 710 tests).
@@ -62,15 +62,23 @@
    (subscribed); a comment or review there is information, never his word. His point 3: the report says where the
    difference to the designs went and what it means for 4b to 4d; their stop lines stay as they are.
 
+10. Review round 1, all five in (`round1-fold.md` holds every finding and what happened to it): netcode-architect
+    REVISE (light), rust-reviewer APPROVE, test-engineer REVISE (small), engine-architect APPROVE, security-auditor
+    APPROVE. No Critical, no High. Mediums: the evidence for two of the three injections (N1, T1); a plant that caught
+    by chance (T2); `World::visit`'s lost guard (R1, latent).
+11. The fix pass (91741e6, 40bf269, pushed with `[skip ci]`): every fix made; the hash is fed from the visitor with
+    no buffer and `shared_hash` takes `&self`; the players' file is 54,514 bytes. 3,291 written lines, 109 under 3,400.
+
 ## Current step
-Review round 1 on the head (source as at eb14739): netcode-architect, rust-reviewer, test-engineer (three at a
-time); then engine-architect and security-auditor. Each writes `.checkpoints/cs4a-recording/<agent>-r1.md`.
+The local checks run on the fixed tree (one type fix in the browser spec after the first run). Then: the planted
+defects again (the rewritten script), a commit without `[skip ci]` for CI, and review round 2 on what changed.
 
 ## Next steps
-1. Fold round 1's findings: fix Critical and High and what is cheap; the rest become follow-ups; count the lines
-   against 3,400 at each fix.
-2. Round 2 on what changed (only if round 1 changed code); the planted defects again on the final head; the local
-   checks again; CI.
+1. (done: steps 10 and 11 above.)
+2. The planted defects on the fixed head; CI; round 2 on what changed (`git diff eb14739..HEAD -- crates
+   packages`): rust-reviewer (the buffer-free hash, the lint guard), test-engineer (the two-process test, the
+   plants), security-auditor (the seed checks, the plain-file check), netcode-architect and engine-architect each on
+   their own findings.
 3. The verifier until PASS; the advisor agent on the pushed head.
 4. The docs pass (docs-keeper, with the script for his words): his blocks of 2026-11-25 into `docs/DECISIONS.md`;
    change-set 3b's owed docs pass; the Hornet's entry in `docs/UNITS.md` section 0, the two lines left as they are
@@ -97,12 +105,14 @@ time); then engine-architect and security-auditor. Each writes `.checkpoints/cs4
 
 ## Key numbers
 - Written so far (git, against 7670c7b, data files left out): **3,030 lines** (1,523 code, 1,507 tests; unit tests
-  inside source files counted as tests). The stop line is 3,400 since his STOP-4A (a): 370 lines of room.
+  inside source files counted as tests) before the reviews; **3,291 after round 1's fix pass**. The stop line is
+  3,400 since his STOP-4A (a): 109 lines of room for round 2.
 - Ladder rung 1 fired: 3B-HOSTILE-ALLOC moves to the link simulator's change-set (not written; told to him in
   STOP-4A). Rung 2 (the 36,000-step run and the two matches in turn, both written and green): his decision.
 - The hash's cost (readings on this container): native release, 4,096 bytes 5.7 us, 16,384 bytes 20.7 us;
   WebAssembly release in Node 22, 5.2 us and 19.9 us; native debug 17.4 us and 69.9 us.
-- The players' file: 55,607 bytes in production and in development (53,813 before 4a).
+- The players' file: 54,514 bytes after the fix pass (55,607 before it; 53,813 before 4a): 701 more for the one new
+  number.
 - The browser suite: 17 tests, 195 seconds here (16 tests took 3.4 of CI's 5 minutes in 3b).
 
 ## Decisions taken
@@ -111,5 +121,5 @@ time); then engine-architect and security-auditor. Each writes `.checkpoints/cs4
   gh always start their own command. The board add-on is active.
 
 ## Running work
-- Round 1's first three reviewers: netcode-architect, rust-reviewer, test-engineer.
+- No agent runs. The local checks run in the background.
 - No saver runs: the main session commits the notes by hand.

@@ -101,3 +101,32 @@ It left `.gate/sa-target` behind (its delete was refused).
 Product lines planned: about 220 (the buffer-free hash 65 with its callers; the seed checks and `Header`'s `Debug`
 24; the two-process test's step and prefix and role 20; the plain-file check 19; the lint guard on the reader 11;
 the `replay` tool's field comparison 12; the rest in ones to tens). 3,030 + 220 = about 3,250 of 3,400.
+
+## What the fix pass did (source at 40bf269, plus one type fix in the browser spec)
+Every "Fix" above is made; no finding of round 1 is deferred but the ones marked as follow-ups for a later change-set
+(N4, N5; T8 is left as it is; T9 is the report's wording). Written lines after the pass: **3,291** (git, against
+7670c7b, the recording's data files left out): 255 more than before it, 109 under the stop line of 3,400.
+- R1: `World::visit` names every field again.
+- R8, E1: the hash is fed straight from the visitor (`Fnv1a64`, a plain struct); `state_hash(&self)` and
+  `shared_hash(&self)` take no buffer; the room's buffer is gone; `shared_hash` takes `&self` at the room, the local
+  match and `Sim`. The committed hashes are unchanged. The players' file: 54,514 bytes (55,607 before the pass; 53,813
+  before 4a), sha256 198477964866d717fff105ebe4b64e5fb8aee1c861e06d4e460e2bf1a7fff708 here.
+- E2, S2, R5, R4, N7, N8, E5: comments and doc lines. E3: `bytes` and `secret` take runs of a fixed length only.
+- N2, R2, S1: the test seed is checked in `Replay::new` and in `checkReplayable`, each with its refusal test; `Header`'s
+  `Debug` never shows the seed.
+- N3: a test that a rebase before every step changes no hash.
+- T1, N1, N6, N9, S4: the two-process test prints every step under a fixed prefix, names the first step that differs,
+  takes a child's role only with the parent's own arguments, and prints the two fingerprints.
+- R7: the `replay` tool's `fields` compares two state prints (`compare::field_diff` has a caller now).
+- S3: `files::write` and `check` refuse a link or anything that is no plain file, with a test that nothing is written
+  through a link; names are printed quoted.
+- R6: `recording.rs` carries the room's lint guard; its two products saturate.
+- R3: the timing helper's length is capped.
+- T4, T5, E4: the TypeScript reader checks in the Rust reader's order; its replay's two refusals are tested with no
+  call made; `Replayable` is pinned to the players' generated type.
+- N9: the browser spec checks the hashes file's digest against the recording.
+- T6: the test's name says what it asserts.
+- T2, T3, T7 (notes): the planted-defects script is rewritten: plant C folds 8 bytes; a new plant G leaks state only
+  between interleaved matches and has controls that must stay green; plants C, D and E show their tick and their
+  field through the tools; the result counts defects and controls apart, names its commit and says whether the tree
+  was put back.
