@@ -118,8 +118,10 @@ below differ; "The numbers" gives every value those conditions bind with, so no 
 - C1 (c): docs/ prints the same six names. `git diff --name-only H0 HEAD` equals `git diff --name-only 28254a7
   origin/main` (87 names). Without docs/STATUS.md, both pairs' shortstat reads "86 files changed, 10836 insertions(+),
   553 deletions(-)"; the whole line is expected at "87 files changed, 10884 insertions(+), 601 deletions(-)".
-- C2 (a): "beyond main's 87". The allowance covers the card, this plan, advisor-main-66.md and msg-2026-11-26.md, as
-  ` M` or `??` lines only.
+- C2 (a): "beyond main's 87". The allowance is C2 (a)'s own rule: a ` M`, ` D` or `??` line for a path under
+  .checkpoints/netcode-proof-test/, or for the card. Expected: the card, this plan, advisor-main-66.md, launch-0850.md
+  (brief 3's fill), history.md (if he writes), msg-2026-11-26.md. A letter in the first column, or any other path
+  beyond main's 87, stops.
 - C2 (b): after `git add docs/STATUS.md`, each alone: `git diff --name-only --diff-filter=U` prints nothing; `git diff
   --cached --shortstat H0 -- . ':(exclude)docs/STATUS.md'` prints the 86-file line; `git diff --cached --name-only H0 --
   .checkpoints/ spikes/` prints nothing; and the anchor `git diff --cached --quiet
@@ -151,11 +153,15 @@ below differ; "The numbers" gives every value those conditions bind with, so no 
 ## Stop rules, risks, record
 - main-61-plan.md's stop rules (:106-114) and risks (:116-128) stand, as at MAIN-64 and MAIN-65.
 - No save, commit or push by hand from step 2 until step 6's card save (M65-1): the T-builder's handback, the check-in,
-  the 23:05 trigger or the Stop hook in that window is read and gets no save until step 6.
+  the 23:05 trigger, a message from him (his words into history.md by Edit) or the Stop hook in that window is read and
+  gets no save until step 6.
 - New (Low): U7's T-builder runs beside the take-in. Its base is the pre-MAIN-66 head by design (brief 3 must go out in
   the 18:50 window, and this take-in waits for its check in the same window); it needs nothing from main, and main
-  touches nothing under spikes/. While a light run holds the lane lock (minutes: refs, marks, self, redact), its next
-  cargo call waits; u7-run.sh prints the wait, so it reads as a wait, not a failure.
+  touches nothing under spikes/. While a light run holds the lane lock exclusively (minutes: refs, marks, self,
+  redact), the builder's next u7-run.sh call waits silently: `flock` blocks before anything is printed (u7-run.sh:55;
+  its default mode is shared, `-x` only for counted runs, check.mjs runs, list or clippy confirmations, bites and
+  plants: :3-5, :25-29), and its log header comes only once the lock is held (:66-70). So brief 3 tells the builder to
+  run u7-run.sh calls in the background or with a long timeout, and to read a call with no log yet as waiting.
 - New (Low): toolchain on PR #40 now also runs 3b's tests. This branch changes nothing those tests read: it differs
   from main only in spikes/, .checkpoints/, docs/design/, the #40 row, and its own lines in DECISIONS.md, REPO_MAP.md
   and STATUS_ARCHIVE.md. A red there is main's or the runner's, and the advisor rules before any further step.

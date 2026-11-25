@@ -5,8 +5,8 @@
   **Base:** main 28254a7 merged in at 39a0d04 (MAIN-65, 2026-11-24 23:2x UTC: #65, cs3a; one conflict,
   docs/STATUS.md: this branch's #40 row kept beside main's 3a row); before it main 1ec6f6c at 72b0dc3 (MAIN-64, #64)
   and main f5030a3 at a6acc8a (MAIN-61). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-25 16:3x UTC, after his /compact (his B done at 972f638): the saver restarted, the 18:51
-  wake-up set, MAIN-66's plan written (main-66-plan.md) for its check in the 18:50 window beside brief 3.
+- **Last update:** 2026-11-25 16:4x UTC, after his /compact (his B done at 972f638): the saver restarted, the 18:51
+  wake-up set, MAIN-66's plan and its check's request written (main-66-plan.md, main-66-request.txt), brief 3's item 7.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -148,16 +148,16 @@
 - **Scheduled:** check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; 12:34: nothing stopped; next 16:34, then 20:34
   UTC); day message trig_01XVEDQzVLaAwy4Fer6AERdS (23:05 UTC: msg-2026-11-26.md); the 18:50 window's wake-up
   trig_01C1wNcsqdNANrJnkjyDahba (one-shot, 18:51 UTC). The reminder that could not be deleted (it had fired) stays: A.4.
-- **My step (16:3x UTC):** MAIN-66's plan written (main-66-plan.md, sha256 aac96d13…c1e2; read only, 16:1x-16:4x: main
+- **My step (16:4x UTC):** MAIN-66's plan written (main-66-plan.md, 187 lines, sha256 a47c1871…2258; read only: main
   3ab9eae = #66 + #68, 87 paths, 29 A, 58 M; one conflict, docs/STATUS.md; kit, spikes/ and marks untouched; DEP-HOLD
   free; main's CI green). Brief 3 stays as filled and checked in launch-0850.md section 3 (its checks there; ffcheck.mjs
   is re-run against the then head at sending). The 13:50 window passed under his B.1; usage 10 % at 16:15.
 - **Next three:**
   1. The 18:50 window (wake-up 18:51; be idle by 18:45): confirm the reset by the rate-limit event; ffcheck.mjs against
-     the then head; `<base>` filled; one advisor-tool call for both sends; then, in one response, SendMessage to the
-     T-builder (brief 3) and the advisor agent's check of main-66-plan.md (a general-purpose agent reading `git show
-     origin/main:.claude/agents/advisor.md`; it writes advisor-main-66.md). If the send fails, stop and tell him; no
-     fresh agent in its worktree. No merge before the check's verdict.
+     the then head; `<base>` and the free-disk figure filled; one advisor-tool call for both sends; then, in one
+     response, SendMessage to the T-builder (brief 3) and the check of main-66-plan.md (a general-purpose agent, model
+     opus, effort xhigh, given main-66-request.txt; it writes advisor-main-66.md). If the send fails, stop and tell
+     him; no fresh agent in its worktree. No merge before the check's verdict.
   2. MAIN-66's steps 1-6 after its verdict (main-66-plan.md); step 7, the pushed head's check, at 23:50 UTC.
   3. U8's merge M3-M9 after MAIN-66's step 6 CI, if the checker's Q1 says yes (u8-brief.md; a3de649cd25e474df's head
      read in a window): the policy-name INVALID (plan.md:1256), C9 on 096808b, test 7's merged-state run, NC-R3-1, the items under U8 below, and the 05:2x clean incident told to the advisor (u7-block0b.md:40).
@@ -168,7 +168,7 @@
   -47 re-judge reads MOVED (else three lines), NB2-C10's reviewer read in step 9's window before NB2's report, then
   -47's pack. Then U7's round (netcode, test; after R4 and T5 (ii)) and its merge by end Mon 30; Stop B about Tue 1
   Dec; R1 Thu 3 Dec.
-- **PR #40 conflict (GitHub event 13:57 UTC):** main moved 28254a7 -> 3ab9eae by two merges, #66 (09faefa7, docs) and #68 (cs3b, code): 87 files, +10,884/-601; only docs/STATUS.md conflicts. MAIN-52 applies: MAIN-66 takes it in (main-66-plan.md; its check in the 18:50 window, brief 3 first). The PR rules (subscription.created, re-sent 14:11; re-subscribed 16:20, its event comes as its own turn): merge the base in, never rewrite history; the conflict is reported to him, not on GitHub.
+- **PR #40 conflict (GitHub event 13:57 UTC):** main moved 28254a7 -> 3ab9eae by two merges, #66 (09faefa7, docs) and #68 (cs3b, code): 87 files, +10,884/-601; only docs/STATUS.md conflicts. MAIN-52 applies: MAIN-66 takes it in (main-66-plan.md; its check in the 18:50 window, brief 3 first). The PR rules (subscription.created, re-sent 14:11; re-subscribed 16:20, its event comes as its own turn): merge the base in, never rewrite history; the conflict is reported to him, not on GitHub. That rules event must be in context before MAIN-66's step 2 (subscribe again if not).
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): pass 3 6,111; the last round
   DONE 11-24 21:2x (NC-R2-1, SEC-R2-1 = INF-R2-1, SEC-R2-2 CLOSED; NC-R3-1 Low: r1.sh:438-452, save_log unguarded under
   set -e, a follow-up); C9 DONE 11-25 09:2x (6,170 of 6,200, nothing carried; snapshot wip/u8-build.patch 09cb4a07…, 43

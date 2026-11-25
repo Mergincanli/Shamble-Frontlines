@@ -65,7 +65,8 @@ C1-C14 (advisor-u7-brief.md:110-247, binding by pointer).
    no file first: `git merge --ff-only <base>` (your T-half files under web/ and your notes stay as they are; checked
    from the main folder: nothing under web/ changed since 577816c, no path the merge adds exists in your worktree, and
    every path it changes or deletes is unmodified there). If git refuses, stop and report its message; remove, restore
-   or move nothing. Then `git log -1 --format=%H` into u7-build-rs.md, with your plan for R1-R4 before any edit.
+   or move nothing. Then `git log -1 --format=%H` into u7-build-rs.md (beside u7-t-build.md in your worktree's
+   .checkpoints/netcode-proof-test/), with your plan for R1-R4 before any edit.
 2. Every cargo call through `bash /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u7-run.sh [-x] [-k]
    <your worktree> <log under /home/user/Shamble-Frontlines/.gate/u7/> <command...> [:: <command...>]` (u6c-run.sh
    copied, names only: the shared target, the lane lock, CARGO_NET_OFFLINE=true, CARGO_INCREMENTAL=0, the 4 GB floor).
@@ -86,6 +87,11 @@ C1-C14 (advisor-u7-brief.md:110-247, binding by pointer).
    6,000 added stops and reports; valve C11 if the T-half's count passes 3,800.
 6. Your notes: each finished block at once, a notes line per finding, added lines after each block. At the end: the
    blocks, tests, plants, added lines, open findings, in a short summary; I take the snapshot.
+7. From about 19:20 UTC the main session takes main into the netcode branch in the main folder (MAIN-66,
+   main-66-plan.md); its two light runs each hold the lane lock exclusively for a few minutes. A u7-run.sh call then
+   waits silently on `flock` (u7-run.sh:55) before its log is written, so run every u7-run.sh call in the background or
+   with a timeout of 10 minutes or more, and read a call whose log is not written yet as waiting, not failed. Your
+   worktree stays on `<base>`: MAIN-66 touches nothing under spikes/.
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. Never switch
 the main folder; never `cd` into another worktree; no shell loops. Never put env, stdbuf or nice options in front of
