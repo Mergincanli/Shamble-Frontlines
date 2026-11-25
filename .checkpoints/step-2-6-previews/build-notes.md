@@ -239,3 +239,35 @@ GitHub (docs.github.com):
   worded as deploy attempts (an upper bound); tests: 119 pass; the sweep: 31 of 31 caught (two new mutations).
   Follow-ups, not in this pass: L4 (check-headers one file at a time: sample later), L6's #59 note (covered by the
   request's note 1).
+- test-engineer (round1-test-engineer.md; ~23:21 UTC): REVISE, no Critical or High; its re-run of the 29 mutations: all
+  caught, each by its target. Mediums: TE-A the lint misses `toJSON(secrets)`, `secrets['X']`, `--ignore-scripts=false`,
+  `npm rebuild`, `npm --prefix . install`; TE-B the lint misses a checkout of another ref (the pwn-request shape);
+  TE-C the comment's failure paths (a refused write, an unreadable pull request) unpinned; TE-D the command line and
+  defaultIo() never run in the suite; TE-E the count is not exact (refused jobs make records: 9 this month, all
+  wall-test); TE-F M1 does not measure a CLOUDFLARE_ secret kept elsewhere, nor a tag ref. Lows: TE-G the refusal
+  lines and deployment records are readable (annotations API); TE-H more guards unlinted (G6's exact places, ...);
+  TE-I the reader's blind spots (quoted keys, flow mappings, `run :`), no structure assertion; TE-J 20 of its own 26
+  mutations survived (unpinned paths); TE-K `preview / tests` is not a required check, and the gate is blind to
+  hosting/.
+- The fix pass, part 2 (tests only; preview.yml unchanged at 31119c06): the lint's L2 matches the word `secrets` in any
+  spelling outside a step env, and the token must sit in exactly deploy, deploy, reconcile; L3 allows npm only as
+  `npm ci --ignore-scripts` (not `=false`) and flags corepack; L5 flags a checkout with `ref:` or `repository:`; L0
+  flags quoted keys, flow-mapping steps and `key :`; the real-file test asserts 5 jobs and at least 12 run steps; 10
+  new planted lint variants. Tests for the comment's refused write (403 update, 500 new), an unreadable pull request
+  (500, nothing written), a closed pull request or a fork head (nothing written), an unreadable comment list (red, no
+  duplicate), an unreadable count ("not counted", never 0); find-pr: a listed non-open state ignored, more than 10
+  full pages refused; verify-token: HTTP 401, 404 or success false refused; read-url: a malformed id refused even with
+  a matching one-off address; check-headers: a 503 then a 1010 retried, a lasting 503 tried 5 times, a refused file in
+  the list refused before any call; reconcile: success false on HTTP 200 counts as failed, more than 40 full pages
+  incomplete (nothing deleted); setOutput: a relative GITHUB_OUTPUT refused; check-build: 20,000 files pass the first
+  look but not with the header file (go=false); the command line (spawned): no command exits 2 with the usage line,
+  recheck passes main's header file and refuses a changed one, find-pr refuses a malformed commit before any call.
+  148 tests pass (13 suites). Sweeps: mine 32 of 32 caught (T26, the command line never running, added); the
+  test-engineer's 26 re-run (below).
+- TE-G taken: the refusal lines are read (the security-auditor's annotations read, B13); no screenshot needed.
+- TE-E: the count is worded as an upper bound (part 1); the report corrects plan 2.3's "exact"; M9 compares the comment's
+  number with Cloudflare's list for the month minus the wall-test records.
+- TE-F: (a) covered at the token sitting by the security-auditor's condition (c): screenshots of the Actions,
+  Dependabot and Codespaces secrets pages; (b) the tag case: a decision for him in the report (measure it with a tag job
+  in wall-test.yml, a new sha256 and his yes, or record it as an unmeasured residual); recommended: the residual.
+- TE-K: the report says `preview / tests` is not a required check and the gate does not read hosting/.
