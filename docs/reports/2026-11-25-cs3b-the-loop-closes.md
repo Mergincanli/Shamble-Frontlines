@@ -308,7 +308,7 @@ the two press limits (3B-PACER-255, 3B-OUTAGE-256), a long-hold case for the net
 
 ## Where the notes are (the checkpoint, folded in)
 The change-set's notes folder is removed by this commit, as the checkpoint rules have it. Everything in it can
-still be read at the commit before this one, **NOTES_LAST**, under `.checkpoints/cs3b-loop-closes/` and in
+still be read at the commit before this one, **80a51e4299d2a9abb0c08adc76dc1a31716f036a**, under `.checkpoints/cs3b-loop-closes/` and in
 `.checkpoints/cs3b-loop-closes.md` (the resume card): the plan (`cs3-plan.md`) and the two designs; the advisor
 agent's notes (`advisor-cs3b-start.md`, `advisor-cs3b-head.md`); the six reviewers' notes of both rounds, the
 verifier's and docs-keeper's; the planted defects (`plants-3b.py`, 53); the ten-minute run's script

@@ -1,1 +1,0 @@
-cs3b: the loop closes (keys go to a local server through the real messages and come back; the key diagram lit from its echo)
