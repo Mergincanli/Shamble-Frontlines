@@ -24,8 +24,10 @@
 11. Mustafa (2026-11-25 20:35): SA-D-DIRECT (a); MAIN-WALL queued next (before review tracks); each kit write asked with its exact text
 12. Applied hunk by hunk with Edit (each asked with its text); sha256 equal to hooks-direct (guard dc20706c…, tests e81f2bc5…); 1490/127/33; gate PASS --no-smoke; one commit · 52e3c7e · 125 added lines
 
+13. security-auditor round 2 on 52e3c7e: APPROVE; open: R2-1 Medium (older: a program named through the input-fed wrapper's replace string passes, agents included), R2-2 Low (new false asks on git-<name> words), R2-3 Low (case/.exe, L9); the plugin's SA-g refinement (Medium) · notes security-auditor-r2.md
+
 ## Current step
-security-auditor round 2 on what changed (5df545c..52e3c7e).
+The advisor agent's ruling on R2-1's severity (a third round only for High or Critical).
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
