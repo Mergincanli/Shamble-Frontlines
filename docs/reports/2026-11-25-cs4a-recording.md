@@ -80,7 +80,7 @@ The splits are mine, from rows the designs give whole: estimates, by the designs
 
 ## Plan and approval
 - **The plan:** change-set 4's plan, revision 4, section 4 (`.checkpoints/cs4-walk/plan.md`, pushed at 25c42c5;
-  readable there and at VERIFIED_PARENT, the last commit that holds the notes). Eight steps: one visitor that drives
+  readable there and at c17a054, the last commit that holds the notes). Eight steps: one visitor that drives
   every writing of the state; the one new number on the players' file; the recording's format; the runner and the
   comparer; the scripts and two tools; the first recording on its native runs; the same in WebAssembly; the planted
   differences.
@@ -158,7 +158,17 @@ and tests with the first recording eb14739; round 1's fixes 91741e6 and 40bf269;
   when round 2 added a line above it; the verifier built both and compared them).
 - **Counted, not inferred:** the two hashes take no memory from their first call (`state_hash_alloc.rs`); a tick of
   the local match with the hash read after it takes none over 18,000 ticks (`step_alloc.rs`).
-- **The verifier:** VERIFIER_RESULT.
+- **The verifier: PASS, with notes that do not block** (its notes: `.checkpoints/cs4a-recording/verifier.md` at
+  c17a054). It ran every check itself on the final source: the gate; format and lints; 140 and 139 Rust tests, and
+  140 again from a clean build of its own; the three native replay tests; 24 boundary tests; the Chromium replay;
+  the players' file rebuilt from the source to the same bytes, with main's built beside it (18 exports, then 19;
+  `sim_shared_hash` the only new one; 701 bytes more); the size (3,300); two of the fifteen planted defects in a
+  copy (the simulation changed at tick 900: found at step 900; state leaking between two matches: caught, its
+  control held); his words by the script's check (five messages and the Hornet sentence, byte for byte); two fixed
+  findings by breaking them again (a new field the visitor does not name does not compile; with the seed check
+  off its test goes red); three claims of the hash report by scripts of its own (13 of 13 known answers; 20.5 to
+  20.9 microseconds at 16 KiB natively; none of 19,890 one-byte changes hashing like the original). Its notes: the
+  last push before the merge needs a CI run (this commit has one); the notes leave the head (done in this commit).
 - **CI:** green on 21c1046, which holds the final source: gate, smoke and toolchain, each for the push and for the
   pull request (six of six). From the toolchain job's log: 419 Rust tests passed over its three runs (140, 140,
   139); 24 boundary tests; 17 browser tests in 3.4 minutes, with the line "first-loop.rec: 1800 steps, every shared
@@ -167,7 +177,7 @@ and tests with the first recording eb14739; round 1's fixes 91741e6 and 40bf269;
 
 ## Reviews
 Two rounds, the budget's whole; Opus 5.5 at effort max. Every finding and what happened to it:
-`.checkpoints/cs4a-recording/round1-fold.md` at VERIFIED_PARENT.
+`.checkpoints/cs4a-recording/round1-fold.md` at c17a054.
 - **Round 1** (on eb14739): netcode-architect REVISE (light), test-engineer REVISE (small), rust-reviewer APPROVE,
   engine-architect APPROVE, security-auditor APPROVE. No Critical, no High. Four Mediums, all fixed: two of the
   three planted differences were caught only as "the run differs", with no tick and no field (the two-process test
@@ -199,7 +209,15 @@ Two rounds, the budget's whole; Opus 5.5 at effort max. Every finding and what h
 - **Main moved twice:** #67 (docs) and #71 (the CI Builder's change) were taken in by merge commits; no conflict.
   Since #71 the pull request's CI runs every crate's release tests, the tools crate's among them.
 - **`.checkpoints/` leaves the head with this report** (CHECKPOINTS section 9). Walk's plan, the designs and his
-  saved messages stay readable at VERIFIED_PARENT; 4b's first commit puts `.checkpoints/cs4-walk*` back from there.
+  saved messages stay readable at c17a054 (in full c17a0546344156e08be0a3bf104e2db2d9432e8e, the last commit that
+  holds the notes); 4b's first commit puts `.checkpoints/cs4-walk*` back from there.
+- **His rule that git starts its own command, three slips, each read-only:** rust-reviewer (round 1, two calls)
+  and the verifier (four calls) put a `cd` in front of git, and each said so itself; and five `git status` calls
+  of this chat sat behind `cat`, `tail` or `pwd` in one shell line. Nothing was written, staged or pushed that way;
+  every push ran alone. From here on each git call of this chat is alone in its shell call.
+- **Other lanes' lines left as they are** (docs-keeper's finding): `docs/ROADMAP.md`'s entries for #71, #69 and #67
+  still read "waiting" or "in flight" though all three are merged, and lane 2's STATUS bullet for #67 likewise.
+  They are their lanes' to change.
 
 ## Not verified
 - No browser but Chromium ran the recording (Node and Chromium 158 only); Firefox and Safari did not.

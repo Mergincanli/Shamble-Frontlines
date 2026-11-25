@@ -1,6 +1,0 @@
-//! The state hash's function: FNV-1a 64 (RFC 9923), fixed and unseeded, over the canonical bytes (ADR 0004 part 9). It
-//! finds divergence between two runs, tick by tick; it is not a security check. Over the whole state it covers the
-//! match seed, so that value never leaves the Worker or the server (part 8); over the shared state it covers no seed
-//! byte and is the one number a replay reads from the players' file. Kept by PM-0004-21's report (change-set 4a): at
-//! 16 KiB it takes 20 us natively and in WebAssembly, 0.06% of a tick, and a change in one byte is always caught.
-//! Revisit when it first runs on a live tick or the shared state passes 64 KiB (then XXH64: 13 to 16 times faster).
