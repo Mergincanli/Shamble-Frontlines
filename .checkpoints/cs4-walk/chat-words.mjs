@@ -2,12 +2,12 @@
 // into the notes, byte for byte, with the question it answers. A message typed while the chat was working is stored
 // as a queued command, so both kinds are read. Builder V3's script (its branch, .checkpoints/handover-builder-v3/),
 // with the session and the folder changed. From the worktree's root:
-//   node .checkpoints/lane1-takeover/chat-words.mjs words <transcript.jsonl> <marker> <out file> <title> <what it answers>
-//   node .checkpoints/lane1-takeover/chat-words.mjs part  <saved file> <from line> <before line> <out file> <title>
+//   node .checkpoints/cs4-walk/chat-words.mjs words <transcript.jsonl> <marker> <out file> <title> <what it answers>
+//   node .checkpoints/cs4-walk/chat-words.mjs part  <saved file> <from line> <before line> <out file> <title>
 // `part` copies the lines of a saved text from the line that equals <from line> up to the line that equals <before line>.
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
-const NOTES = '.checkpoints/lane1-takeover/';
+const NOTES = '.checkpoints/cs4-walk/';
 const SESSION = 'session_019YNMUVZR6ociHFWjByxkrq';
 const sha = (s) => createHash('sha256').update(s).digest('hex');
 const size = (s) => `${Buffer.byteLength(s)} bytes, sha256 ${sha(s)}`;
