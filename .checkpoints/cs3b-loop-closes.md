@@ -311,7 +311,25 @@ two files can still be read, and `pr-body.md` must first say that RELEASE-COUNT 
 to `doing` on 2026-11-25, 11:10 UTC (his point 5); `done` after the merge. CI on 01bea7fe: gate, smoke and
 toolchain green.
 
-**STILL WAITING FOR: his browser check.** Before (since 2026-11-25, 04:30 UTC): his check and RELEASE-COUNT.
+**His message of 2026-11-25, 11:38:37 UTC (saved by script: `cs3b-loop-closes/mustafa-2026-11-25-brave-check.md`,
+4,879 bytes, sha256 76f8c4f8...d30b; read it there): the same five points again, then his browser check in Brave
+with its Copy report and one note.** The report, read line by line: commit 8f835d114; backend WebGPU; 5,528 ticks
+and 5,528 blocks of 44 bytes; 134.5 frames a second (frame time 5.60 ms, 99th percentile 20.70 ms); messages sent
+5,527, received 5,528, refused 0; presses 215 made and 215 echoed, 0 lost, 0 doubled; releases 215 and 215, 0
+doubled; olderPosts 0; wrongKeys 0; errors 0; 31,944 input posts, post used 31,941; key to tick median 21.50 ms
+and 95th percentile 44.80 ms over 422 key changes (a reading, on his machine at 134 frames a second: under the
+mark's 50 ms; not judged); one pause of 3.2 s with 0 ticks while hidden; the Worker: 0 drops, at most 1 tick per
+wake, 0 stale posts, 0 pool misses, lateness median 1.967 ms and 99th percentile 14.067 ms. Every one of the six
+numbers he was asked to check is 0. **His note on the hidden-tab step** (his words are in the file): on coming
+back he saw the A box still lit for a split second, then it went dark. **What that is, read from the code:** the
+match stands still while the tab is hidden (ticks while hidden 0); the box is lit from the server's last echo; the
+Worker's host lets go of the keys when the tab hides, and the first tick after the return carries that to the
+server. So the picture from before the pause shows until that first tick (about a thirtieth of a second). As
+built; the zip's README ("A should be dark") was inexact. **Asked of him: RESUME-FLASH**, (a) leave as built and
+settle what the first picture after a pause shows in change-set 4, or (b) make the boxes go dark the moment the
+tab hides, now (a code change with its reviews). **Not in his message: the Firefox report** (asked again).
+
+**STILL WAITING FOR: the Firefox Copy report, and RESUME-FLASH.** Before (since 2026-11-25, 04:30 UTC): his check and RELEASE-COUNT.
 The zip was sent to him in the chat (file tool; built from 8f835d114, sha256 3fdcf9f6...1f82; tested unpacked: 16
 browser tests pass). The full question: `cs3b-loop-closes/question-2026-11-25-browser-check.md` (commit 01bea7fe).
 The board thread says so and its state is `needs-musti` (set it back to `doing` after his answer, `done` after
