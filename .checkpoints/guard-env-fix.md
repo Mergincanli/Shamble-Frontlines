@@ -7,13 +7,14 @@
 ## Steps done
 1. Read CLAUDE.md, REPO_MAP, STATUS, advisor.md, CHECKPOINTS.md and the finding (git show) · no commit · gap confirmed
    by calling unwrap() alone (`probe-before.txt`)
-2. Plan written · this commit · waiting for the advisor agent
+2. Plan written · 20902d9 · the advisor agent: APPROVE with 7 conditions (plan §8)
+3. Baselines before the edit: settings.test 127/127, checkpoint.test 33/33 · this commit
 
 ## Current step
-The advisor agent's review of the plan.
+Stopped for Mustafa (his brief: "start with the plan and stop for its review"); CAP open.
 
 ## Next steps
-1. On APPROVE: edit `.claude/hooks/routine-guard.mjs` (WRAP_OPTS, unwrap, the bash() caller); each edit asks Mustafa.
+1. On Mustafa's word to go on: edit `.claude/hooks/routine-guard.mjs` (WRAP_OPTS, unwrap, the bash() caller); each edit asks Mustafa.
 2. Add the test rows and mutants; run the kit tests (baseline 1107/1107) and `node tools/gate.mjs`.
 3. security-auditor on the final diff; the verifier; docs-keeper; `/advisor-report`; the full commit id to Mustafa.
 
@@ -23,9 +24,11 @@ The advisor agent's review of the plan.
 
 ## Key numbers
 - routine-guard tests on main's guard: 1107 tests, 1107 pass, 0 fail, 34 s (node --test, 3ab9eaec's guard files)
+- settings.test.mjs 127/127; checkpoint.test.mjs 33/33 (3ab9eaec's kit)
 
 ## Decisions taken
-- The 150-line cap read as the guard and test files; docs and report counted separately · this session · open for Mustafa
+- Plan APPROVED with 7 conditions · the advisor agent · 2026-11-25
+- CAP (the 150-line cap: code files only, or docs and report too) · open for Mustafa; until then the strict reading
 
 ## Running work
 - none

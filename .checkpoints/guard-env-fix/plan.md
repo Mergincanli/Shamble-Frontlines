@@ -113,3 +113,21 @@ a day session; routines unaffected through R-PROG), and `unwrapRole()` carries t
 The exact forms are kept out of this public repository until a fix: they are in the session's scratchpad
 (`/tmp/claude-0/-home-user-Shamble-Frontlines/016237bc-e7ac-5a74-a70f-32a985385e94/scratchpad/out-of-scope-gaps.md`)
 for the advisor's and security-auditor's eyes, and go to Mustafa in the chat.
+
+## 8. The advisor agent's verdict on 20902d9: APPROVE, with seven conditions (folded in here)
+Its rulings: ask on `env -C`/`-S` whatever follows (approved); drop an unknown word alone and read on (approved: the
+flag is set first); drop every env word holding `=` (approved: GIT_PLACE_VARS still scans the raw text); the 150-line
+cap is Mustafa's to read (CAP, asked with the first edit; until he answers, docs and the report count too); no
+test-engineer (security-auditor also judges whether the forms and mutants are enough).
+1. After env's options and `=` words, and after nice's or stdbuf's options, a program word that starts with `-` counts
+   as unreadable (ask): else `env X=1 -i git push --force ...` goes from deny today to a silent pass. A row for it.
+2. The ask's reason names the form and says the guard does not follow git's folder or words; rows check the reason.
+3. `unreadable` is set before any read-on; a row with an unknown option and a force push (deny), and a row
+   `env -- - X=1 git push --force origin cs/x` (deny).
+4. Every mutant's text occurs exactly once; none of the 1107 existing rows changed or removed. Baselines recorded
+   before the edit: `settings.test.mjs` 127/127, `checkpoint.test.mjs` 33/33 (2026-11-25, 3ab9eaec's kit).
+5. The probe is updated for the new return shape, its after-output kept; both folded into the report and deleted
+   before the PR is marked ready.
+6. Docs: SEC-U7B-1's state; a STATUS follow-up for §7 that names neither the wrappers nor the forms (open security
+   findings: the PR stays needs-mustafa); the report's top states the tier and that the merge is his.
+7. The interim rule holds until the merge; the gate and the kit tests run after the edit; the checkpoint after every step.
