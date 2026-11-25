@@ -237,7 +237,8 @@ export async function checkBuild(io) {
   const outcome = io.env.DOWNLOAD ?? '';
   if (outcome !== 'success') {
     const toolchain = io.fs.readFileSync(mainFile(io, '.github/workflows/toolchain.yml'), 'utf8');
-    const handsOver = /^[ \t]*name:[ \t]*preview-site[ \t]*$/m.test(toolchain);
+    // The hand-over step's artifact name, plain or quoted, with or without a comment after it.
+    const handsOver = /^[ \t]*name:[ \t]*(["']?)preview-site\1[ \t]*(?:#.*)?$/m.test(toolchain);
     setOutput(io, 'go', 'false', PATTERNS.go);
     if (handsOver) {
       annotate(io, 'error', `no build to preview: main's toolchain workflow hands one over, but this run's could not be fetched (download outcome ${show(outcome)})`);
@@ -439,8 +440,9 @@ export function commentBody({ pr, sha, link, deploy, headers, count, month, runU
   } else {
     lines.push('- An earlier link of this pull request, if there was one, still shows the earlier build.');
   }
-  lines.push(`- Preview uploads this month (${month}, UTC): ${count === null ? 'not counted (see the run)' : count}. `
-    + 'Cloudflare\'s free plan may count each one against its 500 builds a month.'
+  lines.push(`- Preview deploy attempts this month (${month}, UTC): ${count === null ? 'not counted (see the run)' : count}. `
+    + 'Every attempt counts, so this is an upper bound on uploads; Cloudflare\'s free plan may count each upload against '
+    + 'its 500 builds a month.'
     + (count !== null && count >= COUNT_WARNING ? ' **400 or more: see docs/runbooks/previews.md.**' : ''));
   if (runUrl) lines.push(`- The run: ${runUrl}`);
   lines.push('', 'Written by the preview workflow (docs/runbooks/previews.md).');
@@ -497,9 +499,9 @@ export async function comment(io) {
   const start = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1);
   const month = new Date(start).toISOString().slice(0, 7);
   const count = await monthCount(io, name, start);
-  say(io, `preview uploads this month (${month}, UTC): ${count === null ? 'not counted' : count}`);
+  say(io, `preview deploy attempts this month (${month}, UTC), an upper bound on uploads: ${count === null ? 'not counted' : count}`);
   if (count !== null && count >= COUNT_WARNING) {
-    annotate(io, 'warning', `${count} preview uploads this month: the free plan's limit is 500 builds if uploads count`);
+    annotate(io, 'warning', `${count} preview deploy attempts this month: the free plan's limit is 500 builds if uploads count`);
   }
   const body = commentBody({ pr, sha, link: deploy === 'success' ? link : null, deploy, headers, count, month, runUrl });
   const list = await githubList(io, `/repos/${name}/issues/${pr}/comments`);
@@ -563,7 +565,9 @@ async function listPreviews(io, account, token, name) {
     const info = r.json.result_info ?? {};
     if (r.json.result.length === 0 || (Number.isSafeInteger(info.total_pages) && page >= info.total_pages)
       || (Number.isSafeInteger(info.per_page) && info.per_page > 0 && r.json.result.length < info.per_page)) {
-      return { complete: true, items };
+      // An upload made while the list is read can push a record onto the next page too: each id once.
+      const ids = new Set();
+      return { complete: true, items: items.filter((d) => typeof d?.id !== 'string' || (!ids.has(d.id) && ids.add(d.id))) };
     }
   }
   return { complete: false, items, why: `more than ${CLOUDFLARE_MAX_PAGES} pages` };

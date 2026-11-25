@@ -246,10 +246,17 @@ describe('check-build', () => {
     assert.deepEqual(watched.touched, []);
     assert.ok(h.lines.some((l) => l.startsWith('::error::no build to preview')));
   });
-  test('planted: an artifact named preview-site-checked is not the hand-over step', async () => {
-    const t = fresh('t');
-    const h = harness({ env: env(t, 'failure'), root: mainCheckout(withHandOver.replace('name: preview-site', 'name: preview-site-checked')) });
-    assert.equal(await run('check-build', h.io), 0);
+  test('planted: an artifact named preview-site-checked, or a mismatched quote, is not the hand-over step', async () => {
+    for (const name of ['name: preview-site-checked', 'name: "preview-site\'', 'name: preview-sites']) {
+      const h = harness({ env: env(fresh('t'), 'failure'), root: mainCheckout(withHandOver.replace('name: preview-site', name)) });
+      assert.equal(await run('check-build', h.io), 0, name);
+    }
+  });
+  test('the hand-over step is found quoted or with a comment after it', async () => {
+    for (const name of ['name: "preview-site"', 'name: \'preview-site\'', 'name: preview-site # the hand-over', 'name:   preview-site  ']) {
+      const h = harness({ env: env(fresh('t'), 'failure'), root: mainCheckout(withHandOver.replace('name: preview-site', name)) });
+      assert.equal(await run('check-build', h.io), 1, name);
+    }
   });
   test('a clean build: checked, copied, main\'s header file added, go=true and nothing else written', async () => {
     const t = fresh('t');
@@ -556,7 +563,7 @@ describe('comment', () => {
     const h = harness({ env: env(), fetch: unsorted });
     await run('comment', h.io);
     assert.equal(unsorted.calls.filter((c) => c.url.includes('/deployments?')).length, 3);
-    assert.ok(h.lines.includes('preview uploads this month (2026-11, UTC): 105'));
+    assert.ok(h.lines.includes('preview deploy attempts this month (2026-11, UTC), an upper bound on uploads: 105'));
   });
 });
 
@@ -638,6 +645,15 @@ describe('reconcile', () => {
     assert.equal(await run('reconcile', harness({ env, fetch: f }).io), 1);
     assert.equal(f.calls.filter((c) => c.method === 'DELETE').length, 0);
     assert.equal(f.calls.filter((c) => c.url.startsWith('https://api.github.com/')).length, 0);
+  });
+  test('a record listed on two pages (an upload made while the list was read) is deleted once', async () => {
+    const twice = preview('pr-1', '2026-11-01T00:00:00Z');
+    const page1 = [...Array.from({ length: 24 }, (_, i) => preview('pr-1', new Date(Date.UTC(2026, 10, 2, i)).toISOString())), twice];
+    const { f } = world({ pages: [page1, [twice]], states: { 1: closed(1) } });
+    assert.equal(await run('reconcile', harness({ env, fetch: f }).io), 0);
+    const deletes = f.calls.filter((c) => c.method === 'DELETE').map((c) => c.url);
+    assert.equal(deletes.filter((u) => u.includes(twice.id)).length, 1);
+    assert.equal(new Set(deletes).size, deletes.length);
   });
   test('planted: one deletion fails: the others still run, and the step turns red', async () => {
     const records = [preview('pr-1', '2026-11-01T00:00:00Z'), preview('pr-1', '2026-11-02T00:00:00Z')];

@@ -12,12 +12,28 @@ Where everything is:
   (`node --test hosting/preview.test.mjs`). `hosting/_headers`: the header set every preview gets.
   `hosting/package.json` and `hosting/package-lock.json`: Wrangler, the upload tool, pinned.
 - The token: GitHub, the repository's Settings, Environments, `preview`: the secrets `CLOUDFLARE_API_TOKEN` and
-  `CLOUDFLARE_ACCOUNT_ID`. Only `main` may use that environment. The token lives nowhere else.
-- That page must keep "Allow administrators to bypass configured protection rules" unticked AND saved (the box
-  takes effect only after "Save protection rules"). With it on, a run started from an administrator's account goes
-  past the `main` rule, and every run in this repository starts from Mustafa's account: on 2026-11-25 three planted
-  branch jobs reached the environment's test secret until the box was saved, then GitHub refused all three.
+  `CLOUDFLARE_ACCOUNT_ID`, added with that page's "Add environment secret". Never as a repository, Dependabot or
+  Codespaces secret, and never as a variable: those reach every branch. The token lives nowhere else.
 - The host: the Cloudflare account `Shamble previews`, project `shamble-previews`. That account holds nothing else.
+
+## The environment page (the wall in front of the token)
+GitHub, Settings, Environments, `preview` must keep:
+- Deployment branches and tags: "Selected branches and tags", "1 branch and 0 tags allowed", the rule `main`.
+  "No restriction", "Protected branches only", a wildcard or a tag rule would let other branches in.
+- Required reviewers and Wait timer off.
+- "Allow administrators to bypass configured protection rules" unticked AND saved: the box takes effect only after
+  "Save protection rules".
+
+After any change on that page, reload it and check the box and the rule again. Why it matters: every run in this
+repository starts from Mustafa's account, an administrator, and a re-run keeps the first run's account. On 2026-11-25
+three planted branch jobs reached the environment's test secret at 22:29 UTC. After the page was saved and reloaded,
+GitHub refused all three at 22:56 UTC ("Branch ... is not allowed to deploy to preview due to environment protection
+rules"). The likely cause was the unsaved bypass box; the `main` rule may also have been saved only after 22:29.
+
+## Before the hand-over step is on main
+Until main's `toolchain` workflow hands its build over (the CI Builder chat's step, asked on issue #59), every preview
+run ends in `check` with the notice "no build to preview: main's toolchain workflow does not hand one over yet" and
+writes no comment. That is expected.
 
 ## When something fails
 Open the Actions tab, choose the workflow `preview`, and find the run started by the pull request's `toolchain` run.
@@ -27,42 +43,62 @@ as a red run under main in the Actions tab, with an error line; the comment says
 
 1. **No comment after `toolchain` passed.**
    - `check` is red with "no build to preview: main's toolchain workflow hands one over, but this run's could not be
-     fetched": re-run the pull request's `toolchain` run, or push again.
+     fetched": re-run the pull request's `toolchain` run (possible up to 30 days after it), or push a new commit.
    - `check` is green, with "nothing to deploy: 0 open pull requests ... have <commit> as their newest commit": a newer
      push came first. Its own run brings the link.
    - `check` is red with "the build is refused": the build carried a file the refuse list refuses. The log names each
      one. Fix the build, not the list. The list changes only in a pull request of risk tier 2.
 2. **The comment says the upload failed.** Read the `deploy` job's log.
    - "the token is not active": the token has ended or was revoked. Make a new one (below).
-   - A Wrangler error: re-run the failed jobs once. If it fails again, it needs a fix in a pull request.
+   - "the project ... could not be read", or "the project's production branch is pr-...": the project was removed,
+     renamed or changed in Cloudflare. Put it right there (see "Rebuild from zero").
+   - A Wrangler error: re-run the failed jobs within a day (the checked build is kept for one day); after that, push a
+     new commit. A re-run runs main's files as they were at the first run. If Cloudflare refuses because a monthly limit
+     is reached, a re-run does not help (see "The month's count").
 3. **The comment says the header check failed.** The link works, but a header is not the planned one. The `after`
    job's log lists every file with its headers and what is wrong. Fix `hosting/_headers` or the build in a pull
    request.
-4. **`deploy` passed but no comment came.** Read the `after` job's comment step. If GitHub refused the job's token
-   (`pull-requests: write`) the right to write the comment, that needs a fix in a pull request (risk R-COMMENT-PERM in
-   step 2.6's report).
+4. **`deploy` passed but no comment came.** Read the `after` job's comment step. The job holds
+   `pull-requests: write`, which GitHub's docs say is enough to write the comment; if GitHub refused it all the same,
+   that needs a fix in a pull request.
 5. **Old previews are not deleted.** Read the `reconcile` job's log. It runs daily at 04:41 UTC, after each upload,
    and after each close. "could not all be read: nothing deleted" means Cloudflare's list failed, and the next run
    tries again. At most 20 previews are deleted per run; the rest wait for the next run. A pull request it could not
-   look up is left alone.
+   look up is left alone. A `reconcile` run shown as cancelled is normal: a newer one took its place in the queue.
+
+## Stopping previews at once
+Actions, the workflow `preview`, the "..." menu, "Disable workflow"; then revoke the token (below). With the token
+gone and the workflow still on, the daily `reconcile` turns red until the workflow is disabled. GitHub also switches
+off schedules in a public repository after 60 days without activity.
 
 ## The 30-day rule
 Cloudflare deletes "Preview deployments older than 30 days ... unless they are one of the project's 100 most recent
-deployments" (Pages' limits page). If a pull request's link stops working after a long pause, push again or re-run its
-`toolchain` run. A new upload brings the link back.
+deployments" (Pages' limits page). If a pull request's link stops working after a long pause, push a new commit to it:
+a new upload brings the link back. A re-run of its `toolchain` run works only up to 30 days after that run, so it
+cannot bring back a link this rule removed.
 
 ## The month's count
-The comment shows the preview uploads made this month (UTC). Whether an upload counts against Cloudflare's 500 builds a
-month is not known, so every upload is treated as if it counts. From 400 the comment and the log warn. Then hold back
-re-runs. Anything beyond that (a paid plan) is Mustafa's decision, after a price read.
+The comment shows the preview deploy attempts made this month (UTC): GitHub's deployment records for `preview`. Every
+attempt counts, refused, failed, cancelled and re-run ones included, so the number is an upper bound on uploads; in
+November 2026 it includes the environment check's planted jobs. Whether an upload counts against Cloudflare's 500
+builds a month is not known, so every upload is treated as if it counts. From 400 the comment and the log warn. Then
+hold back re-runs. Anything beyond that (a paid plan) is Mustafa's decision, after a price read.
 
 ## The token
-- It was made with a start date and an end date 90 days later. Every upload's log prints its status and both dates,
-  never the token. The log warns from 14 days before the end.
-- **To renew:** in Cloudflare, make a new token the same way (in the previews account: Manage Account, Account API
-  Tokens, Create Token, Custom token, permission Account / Cloudflare Pages / Edit and Read, only that account, a
-  start date and an end date 90 days on, no IP filter). Then replace `CLOUDFLARE_API_TOKEN` in the environment
-  `preview`, and delete the old token in Cloudflare.
+- It is made with a start date and an end date 90 days later, each in its own field, never the single-date chip (the
+  hosting check's chip gave a token that worked for one day). Its end date is written in STATUS when it is made, with
+  a reminder 14 days before. Every upload's log prints the token's status and both dates, never the token, and warns
+  from 14 days before the end.
+- **To renew**, in this order:
+  1. GitHub, Settings, Environments, `preview`: check the page as described above, click "Save protection rules",
+     reload and check again.
+  2. Cloudflare, the previews account: Manage Account, Account API Tokens, Create Token, Custom token. Permissions:
+     Account, Cloudflare Pages, Edit, and a second row with Read. Only the previews account. No IP filter. A start date
+     and an end date 90 days on, each in its own field. Create, then copy the token.
+  3. Replace `CLOUDFLARE_API_TOKEN` with the environment page's secret box. Then check Settings, Secrets and
+     variables (Actions, Dependabot, Codespaces): no name starts with `CLOUDFLARE_`.
+  4. On the next upload, the `deploy` log's token line shows "active" with the new dates.
+  5. Then delete the old token in Cloudflare, and update the end date in STATUS.
 - **To revoke** (a leak, or when previews stop): Cloudflare, the previews account, Manage Account, Account API Tokens,
   the token, Delete. Previews stop until a new token is made as above.
 - The token goes from Cloudflare's page into GitHub's secret box and nowhere else.
@@ -70,10 +106,30 @@ re-runs. Anything beyond that (a paid plan) is Mustafa's decision, after a price
   member. A leaked token then reaches previews only.
 - Two-factor login stays on for Mustafa's Cloudflare user.
 
+## The upload tool (Wrangler)
+`hosting/package.json` pins Wrangler at one exact version and `hosting/package-lock.json` locks every package under it;
+the `deploy` job installs them with install scripts off, beside the token. A bump is a pull request of risk tier 2,
+with a new dependency check before it is pushed: the security-auditor's answer on the exact two files, `npm audit`, and
+the registry signatures, including any package `npm audit signatures` skips (in 4.164.0: `@img/sharp-wasm32`).
+
+## Rebuild from zero
+If the previews account, its project or the environment has to be made again:
+1. Cloudflare: Accounts, Create Account, named `Shamble previews` (the user must be at least seven days old and a
+   Super Administrator; up to five extra free accounts). Switch to it.
+2. Workers & Pages, Create application, then at the bottom "Continue to Pages", "Drag and drop your files", Get
+   started. Project name `shamble-previews`; drag in a folder or zip holding one `index.html` ("No game here"); Deploy
+   site. Leave the project's production branch as given, never a `pr-<number>` name. Settings, "Preview access": off.
+3. GitHub: Settings, Environments, `preview`. A run that names a missing environment creates it with no rules, so set
+   it up at once: as in "The environment page" above, including "Save protection rules" and the reload.
+4. The token: "To renew", steps 2 to 4; the account ID (on the account's overview page) goes in the same environment as
+   `CLOUDFLARE_ACCOUNT_ID`.
+5. A new project address changes nothing else: the `deploy` job reads it from Cloudflare on every upload.
+
 ## Privacy
-Previews are public but unlisted: every response carries `X-Robots-Tag: noindex`. Cloudflare's "Preview access" stays
-off. Turning it on puts a login in front of every preview; that is decided when unreleased art or the first
-multiplayer preview comes.
+Previews are public but unlisted: every response carries `X-Robots-Tag: noindex`. Pages adds that header to previews
+itself, so the served header check cannot show that `hosting/_headers`'s own noindex rule applied; the file's test
+does. Cloudflare's "Preview access" stays off. Turning it on puts a login in front of every preview; that is decided
+when unreleased art or the first multiplayer preview comes.
 
 ## Moving to Workers later
 The upload becomes `wrangler preview --name pr-<number>` with a `wrangler.jsonc`, and the token needs Workers Scripts
