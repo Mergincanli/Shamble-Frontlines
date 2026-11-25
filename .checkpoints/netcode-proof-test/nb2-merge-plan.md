@@ -1,8 +1,16 @@
 # NB2-MERGE: take Netcode Builder 2's branch into the netcode branch (plan, 2026-11-25 00:3x-00:5x UTC)
 
 ## As approved
-Not yet: the advisor agent's plan check (output advisor-nb2-merge.md) starts at 03:51 UTC with step 7 and M4b
-(LEAN-MODE item 3: new agent work only in a reset's first 30 minutes).
+The advisor agent's check (advisor-nb2-merge.md, ends DONE; 03:58-04:3x UTC, on this plan's text 2b7fb042…):
+**APPROVE WITH CONDITIONS NB2-C1 to NB2-C12**, no Critical or High. Its own words govern wherever this plan differs. In
+short: U7's Block 0b check goes first, and the tree outside .checkpoints/ is clean with main-run.sh's hashes equal across
+1i, step 4 and step 5 (C1); the gap re-projected after 1f (C2); step 2 always asks him: name the command, set the board
+thread to needs-musti, end the turn, send only after his reply (C3); the stop rules after the merge commit by its Q2
+ruling, (i) by default and always for step 5 (C4); the part-clean form of the card's Tools line (C5); step 5's exact
+headlines, exit 0, "verdict": "MOVED" and env CARGO_INCREMENTAL=0 (C6); the merge-tree tree check and step 4's bars
+(C7); a moved tip only under its test (C8); a risk line on the other crates' tests (C9); a reviewer's read of
+`git diff 67892d39 72651a3c` in the judge and marks folders before the report (C10); -57 not run, named as not
+verified (C11); its text fixes (C12). Q1: yes, in the main folder. Decision NB2-PROMPT goes to him.
 
 ## Why
 Mustafa's word, 2026-11-25 00:07 UTC, item 4 (history.md:7909, word for word there). The lines this plan rests on:

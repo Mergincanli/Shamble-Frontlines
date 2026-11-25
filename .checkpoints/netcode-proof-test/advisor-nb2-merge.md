@@ -13,12 +13,13 @@ at T: each of the five commits after 72651a3c touches only `.checkpoints/netcode
 `.checkpoints/netcode-judge/`. The guard's pathspec over e2c0e896..T prints nothing. The trial merge is clean on
 today's head. SERIES.md's two sides are about 490 lines apart. The -47 logs are where the plan says.
 At the tip, PM-0001-47 reads MOVED on both calls, with exit 0 (section 4).
-Four things need fixing before it runs:
-- The order: U7's 0b check is due the hour U6c merges (NB2-C1).
+Five things need fixing:
+- The order: U7's 0b check is due the hour U6c merges, and it leaves its edits in H0 (NB2-C1).
 - The gap's length: step 4 will likely be cold, not warm (NB2-C2).
 - Step 2 always asks him: the guard asks on every merge into the main folder, and a pending ask freezes the session
   (NB2-C3).
 - What a stop after the merge commit does (Q2: NB2-C4).
+- One reviewer's read of 72651a3c's last 67 judge lines, before the report; the merge need not wait (NB2-C10).
 No Critical or High. Risk tier 1: spike code and notes; no kit, CI, gate or gitignored path; every file mode 100644.
 
 ## 2. Conditions (each with where it is met)
@@ -157,7 +158,8 @@ No Critical or High. Risk tier 1: spike code and notes; no kit, CI, gate or giti
     for this exact command. And the line's reason does not arise:
     - T changes no `.claude/`, settings, hook or agent file (the pathspec is empty);
     - this branch's kit equals main's (`git diff --stat HEAD origin/main -- .claude CLAUDE.md` is empty).
-  - A worktree is not better. Merging there needs a second cargo cache (a cold build, about 8 GB) or the shared one.
+  - A worktree is not better. Merging there needs a second cargo cache (a cold build, about 8 GB: my estimate, from
+    the 8,192 MiB floor) or the shared one.
     Then bringing the main folder up to the merged head asks him again: `--ff-only` to anything but origin/main asks
     (routine-guard.mjs:1343-1346).
   - Kit follow-up, after the freeze, like ADV-M54-8: the "Still allowed" list names no merge of another lane's branch
@@ -313,6 +315,11 @@ No Critical or High. Risk tier 1: spike code and notes; no kit, CI, gate or giti
   your advisor agent read it. No new review round for it."
 - -57 at T: no `moved` on the mark, its parts, checks or bites (marks.json:4074-4170). Kept sets' runs.txt: mark NOT-RUN
   ("L1 P0: 0 of 3 valid runs") in every set; part L1 P2 / L1 P3 PASS in its own set.
+- Block 0b (u7-brief.md:245-251, :362): "on the lane, the main session, the hour U6c merges": Cargo.toml and
+  crates/client-wasm/Cargo.toml edits, a 3-line lock diff, the tool, the binding check, dependency-check.md, "the save".
+  So 0b's commit will sit in H0 if it runs first (NB2-C1); T changes no manifest or lock, so no overlap.
+- After the final check-in: ADV-NB2-10 raised to Medium (his rule asks for a reviewer's read; the advisor agent's read
+  is his to count, not mine), NB2-C10 turned into a reviewer read in step 9's window; NB2-C1 gained the clean-tree bars.
 
 ## Decisions needed
 - **NB2-PROMPT: will you answer the merge's permission prompt yourself?**
@@ -323,7 +330,7 @@ No Critical or High. Risk tier 1: spike code and notes; no kit, CI, gate or giti
   - The options:
     - (a) Yes: reply when you are at your screen, then approve the prompt.
     - (b) No: the merge does not run in the main folder. A worktree route also ends in a prompt and costs a cold build
-      of about 8 GB.
+      (about 8 GB by my estimate).
   - My recommendation: (a).
 
 ## For Mustafa
