@@ -737,7 +737,12 @@ const SENTINEL_STEPS = ["sim_wasm", "core"];
 export function twinProblems(bytes, what, allowed) {
   const names = wasmFunctionNames(bytes, what);
   const steps = new Set(names.flatMap((name) => [...nameSteps(name)]));
+  // The older naming scheme hides a path inside one step when it names a trait's method or a value's clean-up
+  // (`_ZN67_$LT$heapless..vec..IntoIter...`), where a rule that reads steps would not see the crate. The pinned
+  // toolchain writes the newer scheme for every crate; a twin that holds an older name is not read as if it did.
+  const older = names.filter((name) => name.startsWith("_ZN"));
   return [
+    ...(older.length === 0 ? [] : [`${what}: ${older.length} function names are in the older naming scheme (the first: ${older[0]}), which the name rules cannot read whole`]),
     ...SENTINEL_STEPS.filter((step) => !steps.has(step)).map((step) => `${what}: no function's name holds \`${step}\`: these are not the names the rules read`),
     ...fusedMultiplyAddProblems(names).map((line) => `${what}: ${line}`),
     ...bannedMathsProblems(names).map((line) => `${what}: ${line}`),

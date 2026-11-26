@@ -779,9 +779,13 @@ describe("the built-file check", () => {
       "the release twin: the target feature +simd128 is not one the players' file is built with",
       "the release twin: the target feature +relaxed-simd is not one the players' file is built with",
     ]);
+    // A name in the older scheme: refused as such, whatever it names (a trait's method there shows no step of its crate).
+    const HIDDEN = "_ZN67_$LT$heapless..vec..IntoIter$LT$T$C$_$GT$$u20$as$u20$core..ops..drop..Drop$GT$4drop17h0123456789abcdefE";
+    expect(nameSteps(HIDDEN).has("heapless")).toBe(false);
+    planted({ bodies: [fn(), fn(), fn()], names: [OURS, CORE, HIDDEN] }, [`the release twin: 1 function names are in the older naming scheme (the first: ${HIDDEN}), which the name rules cannot read whole`]);
     // With the routine on the allow-list the same module passes; a fused multiply-add never does.
     expect(twinProblems(twin({ bodies: [fn(), fn(), fn()], names: [OURS, CORE, ACOSF] }), "the twin", [{ routine: "libm::math::acosf", why: "a test" }])).toEqual([]);
-    expect(twinProblems(twin({ bodies: [fn(), fn(), fn()], names: [OURS, CORE, LEGACY_FMAF] }), "the twin", [{ routine: "libm::math::fmaf", why: "a test" }])).toHaveLength(1);
+    expect(twinProblems(twin({ bodies: [fn(), fn(), fn()], names: [OURS, CORE, BUILTINS_FMA] }), "the twin", [{ routine: "compiler_builtins::math::libm_math::fma", why: "a test" }])).toHaveLength(1);
     // Names that are gone, a feature list that is gone, a body that cannot be read: the check stops, it does not pass.
     expect(() => twinProblems(twin({ names: null }), "the twin", [])).toThrow("0 name sections");
     expect(() => twinProblems(twin({ features: null }), "the twin", [])).toThrow("0 target_features sections");

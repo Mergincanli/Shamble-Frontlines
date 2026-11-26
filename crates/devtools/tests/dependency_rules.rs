@@ -101,6 +101,14 @@ fn locked(lock: &str, name: &str) -> Vec<String> {
         .collect()
 }
 
+/// Whether a manifest asks for the collision library: its name on any line that is not a comment (a dependency's
+/// line in any table, or a table of its own).
+fn names_library(manifest: &str) -> bool {
+    manifest
+        .lines()
+        .any(|line| !line.trim_start().starts_with('#') && line.contains("parry3d"))
+}
+
 /// What a failure says: whose decision the pinned text is.
 const HIS_YES: &str = "pinned by Mustafa's FEATURE-COMPARE (a) of 2026-11-26 (docs/DECISIONS.md, 14:09:13 UTC): \"a change of parry3d's version or of the two packages' versions needs a new yes from me; the library's std stays off\". Ask him before this changes";
 const LIBRARY: &str = r#"parry3d = { version = "=0.31.1", default-features = false, features = ["dim3", "f32", "alloc", "enhanced-determinism"] }"#;
@@ -150,6 +158,39 @@ fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone()
             "Cargo.lock's {name}: {HIS_YES}"
         );
     }
+    // The library has one asker. Another crate naming it could turn a feature on for every build beside the
+    // root's pinned line (cargo joins the features of all who ask), and the simulation would link what it never
+    // chose. One such feature, `spade`, compiles the library's one use of `rstar` and with it `heapless` 0.8.0,
+    // which has nine advisories (2026-11-18): with `spade` off nothing reaches either, and the lockfile shows it.
+    let mut askers = Vec::new();
+    for entry in std::fs::read_dir(root.join("crates")).expect("the crates folder") {
+        let krate = entry.expect("an entry").file_name();
+        let krate = krate.to_string_lossy().into_owned();
+        if root
+            .join("crates")
+            .join(&krate)
+            .join("Cargo.toml")
+            .is_file()
+            && names_library(&manifest_of(&krate))
+        {
+            askers.push(krate);
+        }
+    }
+    assert_eq!(
+        askers,
+        ["sim"],
+        "only the simulation's manifest names the collision library"
+    );
+    assert_eq!(
+        locked(&lock, "spade"),
+        Vec::<String>::new(),
+        "Cargo.lock holds spade: the collision library's feature of that name is on, and with it the library's use of rstar and heapless (security-auditor's reading of the advisories, 2026-11-27). {HIS_YES}"
+    );
+    assert_eq!(
+        (locked(&lock, "rstar"), locked(&lock, "heapless")),
+        (vec!["0.13.1".to_owned()], vec!["0.8.0".to_owned()]),
+        "rstar or heapless moved: read the advisories again (heapless is fixed from 0.9.4 on) and the built-file check's UNLINKED_CRATES"
+    );
 }
 
 #[test]
@@ -185,4 +226,22 @@ fn the_rule_reads_what_it_should_refuse() {
     assert_eq!(locked(lock, "parry3d"), ["0.31.2"]);
     assert_eq!(locked(lock, "thiserror"), ["1.0.0", "2.0.21"]);
     assert_eq!(locked(lock, "safe_arch"), Vec::<String>::new());
+    // A second asker of the library, in each spelling; a comment that only speaks of it is none.
+    for asking in [
+        "[dependencies]\nparry3d = { workspace = true, features = [\"spade\"] }\n",
+        "[dev-dependencies.parry3d]\nworkspace = true\n",
+        "[target.'cfg(unix)'.dependencies]\n  parry3d = \"=0.31.1\"\n",
+    ] {
+        assert!(names_library(asking), "{asking}");
+    }
+    assert!(!names_library(
+        "# The simulation holds parry3d; this crate does not.\n[dependencies]\nsim = { path = \"../sim\" }\n"
+    ));
+    assert_eq!(
+        locked(
+            "[[package]]\nname = \"spade\"\nversion = \"2.15.0\"\n",
+            "spade"
+        ),
+        ["2.15.0"]
+    );
 }
