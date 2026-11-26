@@ -13,4 +13,6 @@ c=$(case_dir); mkfifo "$c/.gate/dist-production/planted"; check "$c" "plant: a f
 c=$(mktemp -d "$base/c.XXXXXX"); mkdir -p "$c/.gate/dist-production"; check "$c" "plant: an empty build"
 c=$(mktemp -d "$base/c.XXXXXX"); mkdir "$c/.gate"; cp -r "$build" "$c/elsewhere"; ln -s "$c/elsewhere" "$c/.gate/dist-production"; check "$c" "plant: the build folder a link"
 c=$(mktemp -d "$base/c.XXXXXX"); mkdir -p "$c/elsewhere"; cp -r "$build" "$c/elsewhere/dist-production"; ln -s "$c/elsewhere" "$c/.gate"; check "$c" "plant: .gate a link"
+c=$(case_dir); : > "$c/.gate/dist-production/.DS_Store"; check "$c" "plant: a dot-named file"
+c=$(case_dir); mkdir "$c/.gate/dist-production/.hidden"; : > "$c/.gate/dist-production/.hidden/a.js"; check "$c" "plant: a dot-named folder"
 echo "cases left in $base (scratch)"

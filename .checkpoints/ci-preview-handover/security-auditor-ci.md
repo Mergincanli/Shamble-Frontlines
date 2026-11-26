@@ -83,3 +83,56 @@
   names preview.yml, which is on lane 2's branch, not main: true once lane 2 merges; harmless before (no consumer).
   TOKEN-WORDS :94 true (upload holds the runtime token, not the job token, and is not a run step). :130 true.
 - Any replacement text changes 067521c9...: the session rebuilds, re-hashes and re-runs plant-test.sh (plus a dot case).
+
+## Corrections after the second read (these win over the lines above)
+- Evidence labels: the three runner files (FileCommandManager.cs, NodeScriptActionHandler.cs, ScriptHandler.cs) were
+  read on actions/runner's main branch through a fetched summary, not the raw text and not the hosted runner's version.
+  "Main and post steps alike" is my inference (one handler runs a node action; the summary does not say it). The
+  ScriptHandler id-token condition stays inferred. Ownership of _actions and writability of _runner_file_commands and
+  of <Temp> from inside the cut: inferred (same uid, runner layout), not measured. Verified: tag lines, the action's
+  source lines, the docs' success() rule, BASH_ENV locally, the guard lines locally. No claim on token lifetime or cache scope.
+- B(i): severity word: no finding on the text (keep the absolute paths); its residual limits belong to SA-1 (Medium,
+  pre-existing). B(ii): no finding: no step is also safe; recommend keeping the guard (C).
+- Line numbers above refer to the rebuilt file (067521c9...), not the diff.
+- preview.yml / preview.mjs claims are as read at 9ded5a8 on lane 2's branch, not main.
+- Memory: the agent file says `memory: local`; no folder found at .claude/agent-memory-local/security-auditor/ (main
+  folder and worktree) nor /root/.claude/agent-memory/: the threat model was not read from memory.
+
+## D for both branches of C
+- GUARD-STEP yes (with SA-4's line): dot names fail the guard, so the setting never decides anything; leave
+  include-hidden-files off (default false). Recommended.
+- GUARD-STEP no: off drops a dot-named file or folder silently and the preview deploys without it; `true` puts it in the
+  7-day artifact (public to signed-in users) and lane 2's refuse list (preview.mjs:160) turns the preview red. Choose
+  off: a stray dot file (.env, .git, .DS_Store) never leaves the runner, and a missing file shows in the page itself.
+  Lane 2's reason for `true` (".gate may count as hidden") does not hold: dist/upload/index.js:130173 tests the basename
+  of each item visited from the search path down; the first item is `dist-production`.
+- The comment texts below are for GUARD-STEP yes with SA-4. If GUARD-STEP is no, the guard comment (:215-218) loses its
+  last two sentences about the check and keeps only the first, and :231 reads as in SA-6's plain variant.
+
+## Exact replacement texts (rebuilt-file lines), applied to a scratch copy and checked
+- SA-5, :4-6 become:
+# The cut: the step "Build and test with the network cut off" runs in its own network namespace (sudo unshare --net),
+# with loopback up, back as the runner's user with no docker group and no_new_privs; a TCP probe to an address
+# resolved before the cut must connect outside and fail inside (only curl exit 7 or 28 counts as cut).
+- SA-3, :217-218 become (four lines after :216 unchanged):
+      # treats these files as data). The cut's code wrote the build, so first a check that it holds only plain files
+      # and folders, none named with a leading dot (the upload follows symbolic links and drops dot names unasked),
+      # with absolute paths, since the cut's user can write in PATH. It catches a link or dot name left in the build and
+      # prints the count; it is no boundary: code that ran inside the cut is the runner's user and can still change
+      # later steps (CUT-ESCAPE).
+- SA-4, :225-226 become:
+          bad=$(/usr/bin/find "$d" -mindepth 1 \( ! -type f ! -type d -o -name '.*' \) -print)
+          [ -z "$bad" ] || { echo "not a plain file or folder, or a name that begins with a dot:"; echo "$bad"; exit 1; }
+- SA-6, :231 becomes (with SA-4):
+      # An empty upload fails; nothing whose own name begins with a dot leaves, file or folder (the check above refuses
+      # such names, so its count equals the upload's).
+  plain variant (without SA-4 / without the guard):
+      # An empty upload fails; nothing whose own name begins with a dot leaves, file or folder (the build holds none today).
+- Checks on the scratch copy with all four (sa-tools/apply.py): sha256 d017b83b82d412befb1cbb983a93215440e2b0e1608d2c8c749445db53e87fd8
+  (067521c9... no longer applies to that variant); no changed comment line over 120 characters; YAML parses (11 steps);
+  the guard script passes `bash -n`; on the real build here "5 files, 892209 bytes", exit 0; a planted `.DS_Store`,
+  exit 1 with its path. plant-test.sh needs a dot-file and a dot-folder case added. The session rebuilds the diff,
+  re-hashes and re-runs the trials before ask 2.
+- Correction: the plain variant of :231 above is 124 characters; use two lines instead:
+      # An empty upload fails; nothing whose own name begins with a dot leaves, file or folder (the build holds
+      # none today).
