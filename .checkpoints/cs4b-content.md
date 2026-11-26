@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 22:01 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 22:14 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -597,11 +597,23 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   licence file: the hosted build must ship the licence texts (a follow-up for lane 2's hosting); **RustSec
   advisories for the 33 packages were not read (no network): to be read before 4b-2 merges**; after the commit,
   the committed files are checked against the five digests.
-- **Step 6, second part: BUILT, the full local checks running** (22:01 Amsterdam): the batch in the tree (five
+- **Step 6 DONE** (commit 298837a, pushed; 2026-11-26, 22:14 Amsterdam; the full local checks passed whole: 197 Rust
+  tests in debug and 196 in release, client 100, sim-worker 51, 33 boundary tests, 18 browser tests in 208 s, the
+  recordings unchanged; **243 written lines of 4b-2**, of 8,450). The committed five files equal
+  security-auditor's five digests (checked from the commit). **The players' file is still 54,514 bytes but its
+  digest moved** (b4a9774f...ba where main has a4d8184c...): the simulation's new dependencies, of which nothing
+  is called yet; for step 7's built-file check and for rust-reviewer. One existing test pinned the list of
+  crates with overflow checks on: it is the batch's 35 now. The second part: the batch in the tree (five
   digests OK); `dependency_rules.rs`'s `sim` half (the simulation's dependencies are `content` and `parry3d`
   alone; the library's line and the three versions pinned, the failure naming his FEATURE-COMPARE (a)); the
   simulation's time unit is the content crate's own (`pub use`, 4B-TIME-REEXPORT). Clippy clean with the
   library in the tree.
+- **Next: step 7, the built-file check** (the sheet's row 7; security-auditor's SA-4B2-2: the players' imports
+  as an exact allow-list, build-machine paths in the file refused; engine-architect: the libm rule must allow
+  what `f64::round` needs at step 9, or the code rounds in whole numbers). Then step 8 (his yes to DIFF-LIST
+  first), 9, 10, the look ahead before 11 and 12.
+- **To do before 4b-2 merges:** RustSec advisories for the 33 packages (security-auditor could not read them
+  without the network); the licence texts for the hosted build (a follow-up for lane 2).
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -622,10 +634,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   after test-engineer's read, and in the report.
 
 ## Current step
-4b-1 is merged (#75, b9aad01). 4b-2, set-up: the advisor agent's short re-read of steps 6 to 12 with the
-"what leaves first" list; then step 6: the library's manifest batch made on today's main, security-auditor's
-answer on its digests, the feature compare with his two named exceptions; then steps 7 to 12 as the sheet has
-them, the count at each step's end.
+4b-2: step 6 is done and pushed (298837a; 243 written lines of 8,450). CI on it is to be read. Next: step 7, the
+built-file check.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -660,4 +670,4 @@ them, the count at each step's end.
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- No agent runs. The full local checks run on step 6 (`.gate/local-checks.log`).
+- None. CI on 298837a is the first run that downloads the library's packages.
