@@ -180,6 +180,19 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   probe closed; T1's open point closed). Builder V2 is told of the takeover. MAIN-WALL is the Guard fix chat's next
   change-set after its current guard pull request merges; he tells this chat when it is merged; until then nothing
   under .github/ and no token sitting. His rule unchanged: git and gh always start their own command.
+- T6, main moved again (2026-11-26 14:56 UTC: #73, the Guard fix chat's guard-wrappers, main 4a62873: the guard's
+  routine-guard.mjs and its tests, docs; nothing under .github/; MAIN-WALL is its next change-set, not yet open). #72
+  conflicted again (the push.merge_conflict wake). The main folder fast-forwarded first (`git merge --ff-only
+  origin/main`, alone; no prompt, as that allowed form should be), so this session runs main's guard. Then merge
+  commit 90c939f474c8f1202d9c3efbe4dd5cc65e9b5724 (parents 7aadfc17, 4a62873; base 2483e9a7): scripts/resolve73.py,
+  verify73.py (PASS; the named exceptions: four lines of main's re-wording of lane 2's own STATUS lines, Next item 3
+  (two), the Waiting bullet's first line, the preview risk line, not carried: lane 2's current text stands by
+  RECORD-FILES (a)), control73.py (four planted defects caught). ROADMAP: main held 13 "Recent work" entries; the
+  oldest, change-set 1 (PR #58, merged), moved byte for byte to Build history after Part 15 (OLD-LINES (a): the report
+  lists it with Part 15). DECISIONS 143/150/151/158 by entry. Staged tree vs 7aadfc17: main's 8 files; vs main: the
+  branch's 69. Five sha256 unchanged; 175 tests; guard tests 1551/1551 (main's files); repo map OK (224 entries); gate
+  PASS (--no-smoke); main still 4a62873 by ls-remote before the commit. Pushed (7aadfc1..90c939f, a fast-forward).
+  The advisor agent's review of 90c939f4 (scope: 6c812700..90c939f4): running (advisor-head-90c939f4.md).
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
@@ -201,7 +214,7 @@ f. His go after his Advisor's merge check; merge with the approved head as the e
 g. After #72 and the CI Builder's hand-over step (#59) are both merged: M5 to M11.
 For the docs pass before ready: STATUS's #72 row and lane 2's Waiting bullet and Next item 3 still describe the
 hand-over as to come; the report's Outcome, Proposed next step and For Mustafa likewise; the report lists the Part 15
-move (OLD-LINES) and the merge 6c812700 (the advisor agent's L1); the report's process facts gain T1's probe and his
+move and the change-set 1 move (OLD-LINES) and the merges 6c812700 and 90c939f4 (the advisor agent's L1); the report's process facts gain T1's probe and his
 GUARD-PROMPT (a), which answers, for this chat, risk 1's open point (an ask in Auto mode reached him, with the guard's
 reason); his 15:05 message goes into DECISIONS by script (uuid, 738 bytes, sha256 above).
 
