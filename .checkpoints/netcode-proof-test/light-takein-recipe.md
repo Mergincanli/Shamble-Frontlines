@@ -64,6 +64,15 @@ of them.
    with E6's shape checks again on it; the base light run `bash .checkpoints/netcode-proof-test/main-run.sh
    .gate/light-<SHA7>/light-base.log node check.mjs --only refs,marks,self,redact` gives N0, the marks line, S0 and R0
    with its items. The no-save window opens: no hand save, commit or push until step 6; a Stop hook gets one line.
+
+   _The main session's note (2026-11-26 18:5x UTC, with the advisor tool; not the checker's text, which stands word for
+   word above):_
+   - On the clean path git commits at step 2. A resume that reads "HEAD^2 is <SHA>" would then go to step 5 before the
+     clean path's seven bars ran. So on any resume into step 5, those seven bars run first: they are read only and hold
+     on either path's merge commit.
+   - The rewording is the checker's: it is asked in the first use's step-7 message.
+   - E2's and E3's "the same" means E1's command form with their own pathspec, and "prints nothing". E1b also runs per
+     merge: L-2's "E1-E4" spans it.
 2. `git rev-parse origin/main` prints SHA (else back to E0); the command named in the chat; `git merge origin/main`.
    Expected: exit 1 with E6's one CONFLICT; exit 0 only once he has answered LT-CLEAN (a), then as the clean path below.
 

@@ -10,7 +10,7 @@ the push stays summaries. U8's new stop is 6,230 lines." His S14-PUSH answer, wo
   lines). A new builder in a fresh worktree (isolation: worktree), not U8's builder ac59cce3e5d002441: its worktree
   (03d9ff3) holds those 43 files untracked, so its fast-forward would be refused (ffcheck 12:4x: 44 ADDED present).
 - The stop: 6,282 (his U8F1-SIZE (a), history.md:8108-8122, 2026-11-26 17:35 UTC; it was 6,230), so U8-F1 adds at most
-  93 net lines, tests included. The 41 are net: for the files U8-F1 touches, the
+  93 net lines, tests included. The 93 are net: for the files U8-F1 touches, the
   added column less the removed column of `git diff --numstat <base>`, the way U8's 6,189 and the M5 fix's +19 were
   counted. Item 1e's pin test is part of his S14-PUSH condition and is never carried. Before an item would pass 93,
   carry the rest, last first: item 3, then item 2's test 5 assert. Item 2's PROMPT-R1.md line is never carried. If

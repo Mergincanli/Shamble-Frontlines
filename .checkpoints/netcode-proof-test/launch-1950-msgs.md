@@ -1,4 +1,4 @@
-# The 19:50 UTC window (2026-11-26): the order and the messages, drafted 17:2x UTC by the main session
+# The 19:50 UTC window (2026-11-26): the order and the messages, drafted 17:2x UTC by the main session; brought up 18:5x-19:0x UTC (main 2671595, MAIN-68 rev 3; the three remaining messages written out)
 LEAN-MODE: new agents, and resumed agents with new work, only 19:50-20:20 UTC; at most 3 at once. This file governs
 over the 19:51 wake-up's stored prompt (trig_01RkWH8Kv4KcuVUVmiKMH7uC, written before MAIN-68's rev 2).
 - **Step 0, each its own call:**
@@ -57,19 +57,111 @@ answer its Q1-Q3. Note also: main moved (#73, #74, #76), and MAIN-68 (rev 3, on 
 merge (U7-M-1); after it, #73's guard rules check every call. Builder 2's merge came first (48efc9c, 18:02 UTC). Write .checkpoints/netcode-proof-test/advisor-u7-merge.md: APPROVE, APPROVE WITH
 CONDITIONS (each worded to apply word for word) or REVISE. End your turn as soon as the verdict is in the file.
 
-## The third slot
-- **If he answered U8F1-SIZE:** resume U8-F1's builder a7fe1b9f436f36bb1 (its worktree kept, detached at 77ffc95), with
-  his answer word for word and what it changes in its stop and its items. Its first steps, each its own call:
-  `git rev-parse --show-toplevel` (under .claude/worktrees/); `git rev-parse HEAD` =
-  77ffc95101e186f75c57a1e8770b3ab7a9442820; `git status --short` shows only its own 1a and 1b changes and its notes.
-  Then it builds on from u8-f1-build.md and u8-f1/ (the drafts), the brief as checked. If his answer is (d), the advisor
-  re-rules C6 first, and the builder moves one window.
-- **Else, if Builder 2's merge reached its step 9:** NB2-C10's reviewer read (advisor-nb2-merge.md:121-126).
-- **Else** the slot stays empty.
+## The third slot: U8-F1's builder a7fe1b9f436f36bb1 (he answered (a) at 17:35; summary "U8-F1: resume on his (a)")
+His answer to U8F1-SIZE, word for word (2026-11-26 17:35 UTC, history.md:8108-8121): "8F1-SIZE before 19:50 UTC if you
+want its builder to resume in that window;  (a)." Option (a) was your first priced option: a new stop over the whole,
+6,282 (measured: built +26, drafts +67). So U8's stop is 6,282 and U8-F1 adds at most 93 net lines, tests included.
+Everything is built as drafted, with nothing carried, and a build past 6,282 stops again with three lines (what grew,
+why, the cheaper option). The brief's section 0 now says so (/home/user/Shamble-Frontlines/.checkpoints/
+netcode-proof-test/u8-f1-brief.md:12-18, the main session's Edit, read only: "The 41 are net" now reads "The 93 are
+net"). Nothing else in the brief changed; C1-C7 as applied stand.
 
-## After C and A end (Builder 2's merge pushed 18:32 at 23e9e92, its merge 48efc9c; added 18:3x)
-- NB2's step 9: the advisor's check of the pushed head by SHA (MAIN-65 step 7's form), with step 8's re-read bars
-  (no conflict path beyond docs/STATUS.md and docs/STATUS_ARCHIVE.md; CI = the push runs) and the record in
-  .gate/nb2-merge/ (step1-record.txt, check.log, the two rejudge-47 files). It takes the first slot that frees.
-- NB2-C10's reviewer read (one reviewer agent on 72651a3c's last 67 judge lines: advisor-nb2-merge.md:121-126), in the
-  next slot that frees, before NB2's report; then -47's pack.
+First, each its own call, in your own worktree:
+- `git rev-parse --show-toplevel` (under .claude/worktrees/);
+- `git rev-parse HEAD` = 77ffc95101e186f75c57a1e8770b3ab7a9442820;
+- `git status --short` shows only your 1a and 1b changes and your notes.
+
+Any other answer: stop and report it, changing nothing.
+
+Then build on from your u8-f1-build.md and the u8-f1/ drafts (drafts.md and its scripts), the brief as checked: 1c, 1d,
+1e with its pin test, then items 2 and 3, each with its test passing before the next. The ops tests run as
+`node --test 'ops/**/*.test.mjs'` (Node 22.23 fails on `node --test ops/`).
+
+The rules:
+- No cargo. No commits: the main session takes the snapshot.
+- Never touch the main folder (/home/user/Shamble-Frontlines): a merge may run there in this window. Read only, its
+  brief file excepted. Never `cd` into another worktree.
+- One simple command per call; no `git -C`, no `git -c`, no shell loops.
+- git and gh always start their own command, with no other program in front of them.
+- Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt`
+  writing files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write.
+
+The hand-back, in u8-f1-build.md:
+- per file, added, removed and net (the brief's numstat form), against 93;
+- the tests, the plants and the redact check;
+- anything carried, and what is open.
+
+End your turn when it is in the file.
+
+## Step 9: to the advisor a10848a10f73ed39e (NB2's plan checker; summary "NB2's pushed head"), in the first slot that frees
+NB2-MERGE's step 9: your check of the pushed head by SHA, in MAIN-65 step 7's form (as advisor-main-67-head.md did for
+MAIN-67).
+
+The merge and its push:
+- The merge is 48efc9c59b06347c79d0e9ecbdcc78c6992eebde, with parents H0 22cd65d7d32f654742753867712883910429722f and
+  T 0e621dae6e5b009a4cf00b6401b46d771b2215a3. It was made 18:02-18:05 UTC on his go of 18:01 (history.md:8123-8131),
+  with the command named to him first (step1-record.txt:21-23).
+- It was pushed in the card save 23e9e92d11a8bc78f7aa9d0a2862790f1e7d0736 at 18:32.
+- The branch head at launch is `<head>`. Since 23e9e92 there are notes saves only: `git diff --name-only 23e9e92
+  <head>` names only .checkpoints/ files.
+
+The record, in .gate/nb2-merge/:
+- step1-record.txt and merge-msg.txt;
+- light-base.log;
+- check.log: 11 of 11; 908 and 1005 tests; refs 2037; redact 431 items, 0 findings;
+- rejudge-47-measured and rejudge-47-bites (.log and .json): PM-0001-47 reads MOVED in both.
+
+Step 8's two bars, as re-worded with the advisor tool at 15:1x:
+- (a) No conflict path beyond docs/STATUS.md and docs/STATUS_ARCHIVE.md. At 18:5x, against main 2671595 (fetched
+  18:4x), `git merge-tree --write-tree --name-only` with the head names only those two; MAIN-68 resolves them.
+- (b) CI is the push runs on 23e9e92:
+  - gate 45876736547, jobs gate 140105605763 and smoke 140105605489: success;
+  - toolchain 45876736642: attempt 1 failed at the wasm-bindgen archive fetch (GitHub's HTTP 504). Its one re-run
+    (PR #40's rule), attempt 2 with job 140106992032, succeeded at 18:40.
+
+Check NB2-C1 to NB2-C12 as met on the pushed head.
+
+How to read:
+- By SHA only (git show, diff and log of SHAs): MAIN-68 may be running in the main folder while you read, so never read
+  its working tree for these files.
+- No fetch, no cargo, no tests.
+- One simple command per call; no `git -C`, no `git -c`, no shell loops.
+- git and gh always start their own command, with no other program in front of them.
+- Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
+  files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write.
+
+Write .checkpoints/netcode-proof-test/advisor-nb2-head.md: APPROVE, APPROVE WITH FINDINGS or REVISE, each finding with
+its severity. End your turn as soon as the verdict is in the file.
+
+## NB2-C10: a new test-engineer (opus, effort xhigh, read only, no worktree; summary "NB2-C10 judge read"), next slot
+NB2-C10 (advisor-nb2-merge.md:121-139) asks for one read-only reviewer's read of 72651a3c's last judge lines, before
+NB2-MERGE's report. It does so under Mustafa's rule of 2026-11-15 (history.md:2127): every marks.json or judge change
+gets a reviewer's read before its unit closes.
+
+Read `git diff 67892d39 72651a3c -- spikes/netcode-proof/crates/judge spikes/netcode-proof/marks`: 67 lines, namely
+figures.rs's no-tail guard, two engine tests, and README and SERIES text. Read as much of the judge around it as you need,
+by `git show 72651a3c:<path>`. These lines are merged unchanged at 48efc9c: the merge changes no judge or marks.json byte.
+
+Answer, by reading:
+- Is the guard right?
+- Would each new test fail without it?
+- Does any README or SERIES line claim more than the code does?
+- Can anything here make a verdict wrong?
+
+How to read:
+- Read only: no edits but your file, no cargo, no tests run, no fetch.
+- By SHA only: a merge may be running in the main folder.
+- One simple command per call; no `git -C`, no `git -c`, no shell loops.
+- git and gh always start their own command, with no other program in front of them.
+- Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
+  files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write.
+
+Write .checkpoints/netcode-proof-test/review-nb2-c10.md: APPROVE, APPROVE WITH FINDINGS or REVISE, each finding with its
+severity (CLAUDE.md's scale) and file:line. End your turn when the file is written.
+
+## Order after the launches (the advisor tool, 18:5x: keep the gap between C's verdict and the merge short)
+- C's verdict lands: MAIN-68's steps 1-6 start at once, its conditions applied first by Edit, word for word. The two
+  launches below are one call each and do not wait on the merge; each reads by SHA only.
+- The first slot that frees (likely A's) gets step 9's message; the next (likely C's) gets NB2-C10's. Both launch only
+  before 20:20 UTC (LEAN-MODE); a launch that misses 20:20 waits for the 00:50 window.
+- -47's pack after NB2's report.
