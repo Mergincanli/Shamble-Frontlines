@@ -40,8 +40,8 @@ named.
 - ops/browser/node_modules for this merge's M5: the install kept in agent-abf71d95fc07b3522 (U8's first build
   worktree; package.json 8370495d…, package-lock.json a0efce8e…), linked as at U8's merge (choice 15 (i)), removed
   before M7.
-- Order (U7-M-1): MAIN-68 first (main-68-plan.md rev 2: #70, #73, #74). Builder 2's merge (46 files: crates/judge,
-  marks/ and its notes; none of U7's 43) may come before or after, never overlapping.
+- Order (U7-M-1): MAIN-68 first (main-68-plan.md rev 3: #70, #73, #74, #76; rev 2's three until main moved at 18:00
+  UTC). Builder 2's merge (46 files: crates/judge, marks/ and its notes; none of U7's 43) came first: 48efc9c, 18:02 UTC.
 - The guard: after MAIN-68, #73's rules check every call. No command below has a program in front of git or gh, and none
   runs xargs at the session level (main-run.sh's and u7-run.sh's own git and xargs calls run inside the scripts, which
   the guard does not read: INPUT-RUN). If one asks or is refused, the step stops and the advisor rules.

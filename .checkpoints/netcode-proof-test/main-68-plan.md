@@ -11,8 +11,9 @@ written. Its check: advisor-main-68b.md.
 - #76 in "Why", the merge messages and "On record": 8 docs paths (7 M, 1 A), no kit, CI, code, spike, ADR or design path.
 - The counts: 47 paths (A 24, M 23; were 45, A 23, M 22): main-wall.md added and TECHNICAL.md modified; the shortstats; main's
   STATUS.md at 120 lines (was 125); refs at 5d = N0 + 24; step 2's staged 45 (A 24, M 21).
-- C6 re-derived on the new trial tree. STATUS.md: main dropped the ci-preview-handover and guard-wrappers rows that rev 2
-  kept, and added MAIN-WALL's row. STATUS_ARCHIVE.md: main added a MAIN-WALL bullet above the guard-wrappers one.
+- C6 re-derived on the new trial tree. STATUS.md: #76 moved the ci-preview-handover and guard-wrappers rows that rev 2
+  kept to main's archive (its STATUS.md:6), and added MAIN-WALL's row. STATUS_ARCHIVE.md: main added a MAIN-WALL bullet
+  above the guard-wrappers one. C2 (b)'s 45-file line measured on the trial tree (Facts).
 - Builder 2's merge landed first (48efc9c, pushed 23e9e92), as "Order" allowed: H0 is past it.
 - New Q5 (the wall bullet's screenshot line).
 
@@ -102,9 +103,11 @@ start their own command, with no other program in front of them.
   auto-merging DECISIONS.md, REPO_MAP.md, STATUS.md and STATUS_ARCHIVE.md.
   - STATUS.md's block (markers :34, :37, :40, by `git grep -n` on the tree). Ours: :35 (#40, this branch's row, its
     2026-11-15 text) and :36 (ci-after-3a's "none yet" row, main's 07d673b text). Theirs: :38 (main's #40, its
-    2026-11-14 text) and :39 (MAIN-WALL's "none yet" row, #76's). Main moved ci-after-3a's row to its archive and has
-    dropped the ci-preview-handover and guard-wrappers rows (both merged). Main's file lists MAIN-WALL as "none yet",
-    though #76 merged: main's text, taken as it is (as ADV-M68-4).
+    2026-11-14 text) and :39 (MAIN-WALL's "none yet" row, #76's). Main moved ci-after-3a's row to its archive, and #76
+    moved the ci-preview-handover and guard-wrappers rows there too (main's STATUS.md:6, word for word: "#73 and #74
+    merged, their rows, "Waiting on" lines and follow-ups bullets moved to the archive by script"; `git grep` finds
+    neither name in a table row). Main's file lists MAIN-WALL as "none yet", though #76 merged: main's text, taken as it
+    is (as ADV-M68-4).
   - STATUS_ARCHIVE.md's block (markers :2216, :2226, :2252), right under "## Open bugs and risks" (:2215). Ours:
     :2217-2225, the "netcode proof test" bullet (9 lines, this branch's own: part of its 18/5 since 07d673b). Theirs:
     :2227-2251, main's new "MAIN-WALL" bullet (:2227-2240, 14 lines, #76's), then the "guard-wrappers" bullet
@@ -114,6 +117,10 @@ start their own command, with no other program in front of them.
   - The rest of the trial tree equals main outside spikes/, .checkpoints/ and docs/ (`git diff --stat` prints nothing)
     and HEAD in spikes/ and docs/design/ (nothing). Against main in docs/ it differs in the usual six names. DECISIONS
     24/1, REPO_MAP 17/0, STATUS 1/1 and STATUS_ARCHIVE 18/5: this branch's own (`git diff --numstat 07d673b HEAD`).
+  - Measured, not predicted: `git diff --shortstat 590246f cf3bde597e237940d3611b11d215d0a0deb6d5bd -- .
+    ':(exclude)docs/STATUS.md' ':(exclude)docs/STATUS_ARCHIVE.md'` prints "45 files changed, 6699 insertions(+), 196
+    deletions(-)", and its numstat gives DECISIONS 570/0 and REPO_MAP 38/16, main's own: the two files both sides changed
+    auto-merge to main's counts, so C2 (b)'s 45-file line holds.
 - refs: `git grep -a -l "spikes/" origin/main -- . ':(exclude)spikes/' ':(exclude)docs/' ':(exclude).checkpoints/'
   ':(exclude)*.md'` names kept-logs.mjs and its test only. Untracked: `git ls-files --others --exclude-standard -- crates
   packages docs .claude .github` prints nothing. Free disk 7,708 MiB at 18:5x UTC (13,733 before NB2's full check run,
@@ -131,10 +138,13 @@ start their own command, with no other program in front of them.
   nothing; 85 ask in a session instead of being refused; subagents are still refused.
 - #74: security-auditor's one read found nothing that stops it; its SA-1 Medium is the accepted CUT-ESCAPE (code that
   ran inside the cut can still change later steps). infra-engineer: APPROVE. (Main's STATUS row for it.)
-- #76: main's wall is on since about 17:15 UTC by his click (GitHub settings; no code or workflow changed); main's
-  archive bullet says the wall cannot tell a session from him (every session acts as his account), so this lane's pushes
-  to its own branch and the merge here are unchanged. Main's STATUS row: risk tier 2, the advisor agent APPROVE of the
-  plan and of the results.
+- #76: main's wall is on since about 17:15 UTC by his click. Main's STATUS row for it, word for word: "risk tier 2;
+  GitHub settings by his clicks, no code or workflow changed; measured on a public throwaway repository, deleted by his
+  click after 17:27 UTC [assumed: his "done" of 17:31:41 UTC]; the plan: the advisor agent APPROVE, security-auditor
+  REVISE (text only, all applied); the results: both APPROVE". Its TECHNICAL.md §8c: the wall ruleset targets "the
+  default branch", one rule, "Restrict updates", bypassed only by the "Repository admin" role, beside "Shamble Ruleset 1"
+  (pull request, gate and smoke). So it binds main only: this branch took seven pushes after 17:15 UTC (42c0d67 at 17:38
+  to 0498241 at 18:52, 23e9e92's merge among them), and the merge here is a local commit on this branch.
 - No security read for the take-in. These reasons carry: main's files come in byte for byte; after the merge, PR #40's
   diff against main holds no kit or CI file; #73, #74 and #76 merged on his go and tap with these findings open by his
   own words. Two of MAIN-66's reasons do not: #73's last security round was REVISE, not APPROVE; and #73's rules do not
@@ -224,7 +234,7 @@ form is tried.
 - C2 (b): after `git add docs/STATUS.md docs/STATUS_ARCHIVE.md`, each alone:
   - `git diff --name-only --diff-filter=U` prints nothing;
   - `git diff --cached --shortstat H0 -- . ':(exclude)docs/STATUS.md' ':(exclude)docs/STATUS_ARCHIVE.md'` prints the
-    45-file line;
+    45-file line (measured on the trial tree: Facts);
   - `git diff --cached --name-only H0 -- .checkpoints/ spikes/` prints nothing;
   - the anchor: `git diff --cached --quiet T -- . ':(exclude).checkpoints/' ':(exclude)docs/STATUS.md'
     ':(exclude)docs/STATUS_ARCHIVE.md'` exits 0 (after the commit, `HEAD` in place of `--cached`).
