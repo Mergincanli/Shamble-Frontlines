@@ -2,8 +2,8 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
+_Last updated: 2026-11-26 (guard-wrappers' docs pass, on the lane branch with main 2483e9a merged in: guard-wrappers waits for his go with R4-1 open; #70 merged; #70's row and the follow-ups bullets of the merged #67, #68, #70 and #71 moved to the archive by script; lane 2's #66 and #67 shown as merged where STATUS still had them waiting)._
 _Last updated: 2026-11-26 (step 2.6's docs pass after his answers of 12:21 UTC, lane 2, on #72's branch: #72's row; lane 2's lines in Next, Waiting on Mustafa, Follow-ups and Open risks; every other lane's and chat's line left as it was)._
-_Last updated: 2026-11-25 (change-set 4a's docs pass, with 3b's owed one, on main 07d673b: #70 in flight; no change-set 3c (his ORDER-3C (c)); the merged #71's row and waiting bullet and 3a's follow-ups bullet moved to the archive by script; lane 2's lines left as they are)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -11,19 +11,26 @@ _Last updated: 2026-11-25 (change-set 4a's docs pass, with 3b's owed one, on mai
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged** (2026-11-25, read with git): #71, ci-after-3a (07d673b); #67 (c1da1bd); #69 (311c048); #68, 3b (3ab9eae).
+- **Last merged** (2026-11-26, read with git): #70, 4a (2483e9a); #71, ci-after-3a (07d673b); #67 (c1da1bd); #69 (311c048); #68, 3b (3ab9eae).
 - **The kit:** KIT-FREEZE-2, FREEZE-FDN, his exceptions and additions, and his words of 2026-11-13 for step 2.3 (on kit,
   gate and CI edits): `docs/DECISIONS.md`; the bullet that quoted them whole: the archive's "Phase", at its end.
+- **The day guard, after guard-wrappers** (waiting for his go; his R4-END (1): "Merge what is approved."): every
+  stripped wrapper and keyword reads its options from one table; an unknown form, or a line at the turn limit (SA-R1-3),
+  asks in a session and refuses a subagent; git or gh behind a program it does not strip asks; xargs asks unless a
+  read-only program follows, also behind another program; the direct git helper check (SA-D-DIRECT (a)). **OPEN SECURITY
+  FINDING: R4-1 (Critical, open): one more spelling hides git, gh or xargs from the guard's reading, for a session and a
+  subagent; part is this change-set's class, part older; open on main too; its fix is the next guard change-set.** Until
+  then, his interim rule: "git and gh always start their own command, with no other program in front of them."
 - **The legacy game is frozen** (critical fixes only). Legacy phase 0 stays PARTIAL until his Windows run.
 - **main** is protected (a pull request with the `gate` and `smoke` checks green); `toolchain` runs on every push and
   pull request but is not a required check (REQUIRED-CHECK, a finding for step 2.3); gate, smoke and toolchain green on
-  07d673b (read 2026-11-25, 22:12 UTC). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16).
+  2483e9a (read 2026-11-26, 14:24 UTC). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16).
 
 ## In flight (one line per PR)
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| #70 | change-set 4a, "The recording" (the first of Walk's four parts, his WALK-CUT (a)), by lane 1 (the chat he calls Builder V4): a recorded match replays to the same hashes, tick by tick, natively (one process, two processes, two matches in turn) and in WebAssembly on the players' file (Node and Chromium), and each planted divergence is caught at its tick with the field that differs; the one new number on the players' file is the shared state's hash (`Sim::shared_hash`), read only by a replay | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4a-recording`) | risk tier 1; no browser check (nothing a player sees changes); five reviewers in two rounds (netcode-architect, rust-reviewer, test-engineer, engine-architect, security-auditor), all APPROVE in round 2, nothing Critical, High or Medium open; source final at fb5d0ff; the local checks, CI (on 21c1046, six of six) and the verifier (PASS) on it; 3,300 written lines against the stop line of 3,400 (3,050 before his STOP-4A (a), 2026-11-25, 20:48:11 UTC); report `docs/reports/2026-11-25-cs4a-recording.md`; ready for review once the advisor agent has approved its last head | the advisor agent's review of the last head; his Advisor's merge check; his go for that head |
+| none yet | guard-wrappers (his SAME-GAP (a): nothing in front of git or gh gets through the day guard unread), by the chat he calls the Guard fix chat; what it does: "Phase", "The day guard" | `claude/confident-gates-tbnq38` (stands in for `cs/guard-wrappers`) | risk tier 2 (his go; no pull request yet); code head 83bc2417; main 2483e9a merged in (7be0a933) in a separate worktree; guard tests 1551/1551; four security-auditor rounds (the fourth by his leave, the last), R4-1 left open by his R4-END (1); 166 added lines of code and tests (stop line 200); report `docs/reports/2026-11-26-guard-wrappers.md` | the advisor agent's review of the pushed head; his Advisor's merge check; his go for that full head id |
 | #72 | step 2.6, the preview links per pull request (lane 2, the chat he calls Builder V2): `.github/workflows/preview.yml` and `preview-close.yml`, `hosting/`, `docs/runbooks/previews.md`; report `docs/reports/2026-11-26-step-2-6-previews.md` | `claude/optimistic-albattani-mdoonz` (stands in for `cs/step-2-6-previews`) | draft; risk tier 2; built; review rounds 1 and 2 closed (infra-engineer REVISE, then APPROVE; security-auditor APPROVE in both; test-engineer REVISE, then REVISE narrow, fixed in 80a9b6a8, no third round); gate, smoke, toolchain and `preview / tests` (175 pass) green on code head 84a3ea44; the advisor agent on the guard: ESCALATE, answered by his decisions of 2026-11-26; no verifier run yet; a new chat with only this repository takes over the sensitive steps (his GUARD-OFF (a)); until then no change under .github/ or the kit, no main-folder move, no merge | the new chat, started by him from Builder V2's start block; the token sitting, which waits for the Guard fix chat's protection for main (the token's end date comes here then; no token yet); the first live link needs the CI Builder's hand-over step (asked on #59); the throwaway `wall-test.yml` out at the token sitting; the verifier, ready, the advisor agent's review of the head, his go |
 
 ## Next
@@ -36,13 +43,16 @@ _Last updated: 2026-11-25 (change-set 4a's docs pass, with 3b's owed one, on mai
    first soldier (he plays; an early look inside it), 4d sights; then the link simulator, then 7. Change-set 4's plan,
    section 8 (where to read it: 4a's report), places each 3c item by name. The first builder chat stays paused; Slice 3 waits for #40 and picks how commands are timed.
 3. Lane 2 (Builder V2), his order of 2026-11-25: #66 (09faefa) and #67 (c1da1bd) merged; step 2.6 (#72) in flight above, stopped until his GUARD-OFF answer; the carry of his look decisions when his block comes; one plan for the look test page and the model-check tool (EARLY-LOOK (a)), built after his go.
+4. The Guard fix chat, his order of 2026-11-26 (`docs/DECISIONS.md`, "Queued"): MAIN-WALL, then one guard change-set
+   with R4-1's fix and GUARD-KIT, then the review tracks with SOURCE-GO (a); each plan first.
 
 ## Waiting on Mustafa
-- #70 (4a): his go for the head the advisor agent approves, after his Advisor's merge check (no browser check). From
-  4a's report: EARLY-LOOK-ORDER (his go's point 4: "I decide then"); before 4b's first edit CONTENT-SOURCE and
-  DEPART-4; FIREFOX-REPLAY (it widens the Firefox entry he cut to the rule tests); LINKS-CHECK (4A-S3-READ). STEP-60
-  (a): his Export at 30 steps before 4b's step 6, then DIFF-LIST. Later: MOVE-RULES, NO-SOURCE, RESUME-FLASH,
-  TUNE-HOME, SPRINT-DELAY-4; the two `docs/UNITS.md` §0 lines the Hornet's entry clashes with (his unit walk).
+- guard-wrappers: his go for the head id the advisor agent approves, after his Advisor's merge check (no browser check).
+- From 4a's report (#70, merged): EARLY-LOOK-ORDER (his go's point 4: "I decide then"); before 4b's first edit
+  CONTENT-SOURCE and DEPART-4; FIREFOX-REPLAY (it widens the Firefox entry he cut to the rule tests); LINKS-CHECK
+  (4A-S3-READ). STEP-60 (a): his Export at 30 steps before 4b's step 6, then DIFF-LIST. Later: MOVE-RULES, NO-SOURCE,
+  RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two `docs/UNITS.md` §0 lines the Hornet's entry clashes with (his unit
+  walk).
 - **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (`docs/DECISIONS.md`, 11:38:37 UTC), with
   two conditions: no report calls any part of the presses mark passed; and the two drafts are made to agree at
   their next revision, which comes to him before it is written (**3B-RELEASE-DRAFTS**, his).
@@ -57,7 +67,7 @@ _Last updated: 2026-11-25 (change-set 4a's docs pass, with 3b's owed one, on mai
 - Decisions still open for him: OQ-0006-22 (before slice 3); the follow-ups marked as his call (FU-P4b, B1-MODES and
   the editor's other questions); the security review of kit-v2-2's finding 4 picks its option for him; and, from R1–R6
   (the full wording: each topic's "Shared open questions" and the v2-research report), ABL-PREDICT (Mustafa, after a
-  Feel Lab test that compares both ways on the Molotov and the Shield): does the client predict the player's own abilities? From guard-env-fix (#69): CAP (does his 150-line cap cover the code files only, or docs and the report too) and SAME-GAP (a follow-up guard change-set for the other wrappers).
+  Feel Lab test that compares both ways on the Molotov and the Shield): does the client predict the player's own abilities?
 
 ## Routines (last read with the routines API, get_trigger, 2026-11-10 20:10 UTC; that read whole: the archive's "Routines")
 - **Night shift** (trig_01QpV6y6UaG1Na2q3jumRDxh): enabled; `CRON_TZ=Europe/Amsterdam 10 0-6 * * *`; Opus 5.5.
@@ -83,31 +93,21 @@ _Last updated: 2026-11-25 (change-set 4a's docs pass, with 3b's owed one, on mai
   panel's pass rule, heatmaps and sightlines, and quality bars.
 - **Docs passes:** the B3 report's and the kit-v3-2 report's edits (R-1, R-2); the toy-box tone; DOCS-ALIGN (the
   Advisor's documents); routine proofs to record; local smoke's Chromium build; the stale citations left unedited.
-- **For the gate step (2.3), from status-diet (#49), foundation 2.1a (#50), 2.1b (#51) and 2.2 (#48):** moved by
-  script, byte for byte, 2026-11-24 (OLD-LINES): the archive's "Follow-ups", "Moved from STATUS (2026-11-24)".
 - **From change-sets 0 and 1 (PRs #56, #58) and Part 15:** O1 (PM-0005-54) and O2, his calls with change-set M's plan;
   the first real export; the coat's motion; the machine lines; ADR 0002's package list; #58's other follow-ups and Lows.
-- **From #60, #61, #64 and change-set 3a (#65)** (moved by script, OLD-LINES): the archive's "Moved from STATUS (2026-11-25...)".
-- **From change-set 3b** (#68; the archive's block): for 7 3B-LATE-BOUND (no room on a network without it), 3B-PLAUSIBLE;
-  before online play 3B-ACKS, 3B-OUTAGE-256; for 4c, 8 and 9 3B-ONE-PER-TICK; for 5 3B-ALLOC-METHOD (PA-N2 carries over);
-  for PM-0002-13 and -8 3B-KEY-POST, 3B-SATURATED; for Slice 3 3B-REFUSED-FIELD; his: 3B-LONG-HOLD with 3B-OQ6-POINTER at
-  ADR 0001's next edit, 3B-RELEASE-DRAFTS; design: 3B-PACER-255; for 4c 3B-RESUME-FLASH, 3B-POOL-16, 3B-CSS-PROD,
-  3B-BLUR-TEST; 3B-OTHER-BROWSERS (FF-DRAW); later 3B-PUB-MODS; for the link simulator's change-set 3B-HOSTILE-ALLOC (by
-  4a's size ladder, told to him in STOP-4A) and 3c's link items; 3c's recording items met by 4a, closed at its merge.
-- **From change-set 4a** (#70; the archive's block): for 4b 4A-NA-4B, 4A-EA-4B; for 4c N5, 4A-BYTES-LENGTH, E2-2,
-  4A-TE-4C, 4A-NA-4C, 4A-EA-4C, security-auditor's C4; for 4c or 8 E2-3; for 7 C1 (binding from Slice 3's first build that
-  talks to a real server); for 8 N4, C2; Slice 3 C3; the gate step 4A-S3-READ; his word first 4A-FIREFOX-REPLAY; 4A-HASH-REVISIT.
-- **From ADR 0006's revision** (#67, lane 2; the archive's block): ADR6-ROLLBACK (Medium), -WK-ROUTE, -WK-BIC,
-  -PAGES-RETENTION, -PM7-PAGES, -PM7-FIGURE, -WORDING, -REVISIT-WORKERS; step 2.6: STEP26-WORKERS, PHC-PREVIEW-NOINDEX.
-  #66's follow-ups (PHC-CLICKLESS and the rest, for step 2.6): the archive's "Moved from STATUS (2026-11-25, lane 2)".
+- **Merged pull requests' bullets** (moved by script): #49, #50, #51, #48 (gate step 2.3): the archive's "Moved from
+  STATUS (2026-11-24)"; #60, #61, #64 to #68, #70, #71: its "Moved from STATUS (2026-11-25...)" and "(2026-11-26...)".
 - **From step 2.6** (#72, lane 2; below the bar, from its two review rounds; their text is here, none in the archive yet): the lint of `preview.yml` does not check six guards: WRANGLER_LOG, metrics, job permissions, github-script, the download path, the upload's working folder (TE-H's rest); nor code beside the token: a custom shell, NODE_OPTIONS or BASH_ENV, a job container or services (the security-auditor's round-2 Low); check-headers fetches one file at a time (the infra-engineer's round-1 Low); `preview / tests` is not a required check and the gate does not read `hosting/` (TE-K).
-- **From guard-env-fix (#69):** GEF-SAME (the same kind of gap in other wrappers and keywords the day guard strips; the forms are with Mustafa, kept out of the repository), SA-R1-3 (the wrapper loop's turn cap), SA-R2-2 (very long lines against the hook timeout), V-2 (the folder tracking after a split-string value), the reason-text nit.
-- **From ci-after-3a** (the small CI pull request; the archive's block "From ci-after-3a"; each closed at its merge): done on its branch E1, 3A-GEN-CHECK, 3A-RULES-STEP's CI half (its target-gating rule stays open), the Firefox half of FIREFOX and 3A-OTHER-BROWSERS in CI on Linux (the rule tests only; WebKit and Safari open); still open 3B-OTHER-BROWSERS (its mark is a drawing test); new: FF-DRAW (his question first), FF-SPEC-COMMENTS, FF-FILEURL-PREF, FF-STOP, FF-SANDBOX, FF-ORDER; CUT-PATH's new evidence; TOKEN-WORDS deferred again.
+- **From guard-env-fix (#69):** SA-R2-2 (very long lines against the hook timeout; answered in guard-wrappers' report, nothing changed without his word), V-2 (the folder tracking after a split-string value), the reason-text nit. Closed by guard-wrappers at its merge: GEF-SAME (what is left of its class: R4-1) and SA-R1-3; CAP decided, his (a) of 2026-11-25.
+- **From guard-wrappers** (`docs/reports/2026-11-26-guard-wrappers.md`; the archive's block): INPUT-RUN (a named limit:
+  programs outside the guard's wrapper table that run their input are not inspected, the class of stated limits L1-L4);
+  next kit change-set: R2-2, R2-3, R3-3 to R3-6, ADV-R4-2, ADV-R4-4, R4-2, SA-c, SA-e, shell function definitions.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
   files) and W1-W3; kit-v3-3's stated limits (L1-L18, R-PLAIN, D-ASK); kit-v3-2's items 1-5; kit-v3-1's items 1-2;
-  kit-v2-2's finding 4 (Medium, open) and its Lows; kit-v2-1's night-rules note (issue #16's comments are trusted).
+  kit-v2-2's finding 4 (Medium, open) and its Lows; kit-v2-1's night-rules note (issue #16's comments are trusted);
+  guard-wrappers' R4-1 (Critical, open: "Phase") and INPUT-RUN (a named limit, a security finding left open).
 - **CI:** the smoke job's Chromium step stalled once (PR #42); on #50 (3f29cb8, 8d8c422) its library install failed in 5
   attempts and was cancelled in 1 (a runner DNS outage). #64's browser tests use a Chrome that moves with the image.
 - **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's (R3-R6
