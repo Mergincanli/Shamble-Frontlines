@@ -5,7 +5,12 @@
 //! would be in the simulation's tree too. The rule names direct dependencies only, so the manifest's text is the
 //! whole input: no cargo call, and nothing that needs a package to be on disk.
 //!
-//! The rule is stricter than "no normal dependency": no table of any kind but `[package]` and `[lints]`. One change
+//! `sim` depends on `content` and on the collision library alone (ADR 0002 part 3; ADR 0004 part 10), and the
+//! library's line and three locked versions are the ones Mustafa said yes to: a change to any of them fails here
+//! by name, so it reaches him before it reaches a build (security-auditor's finding on the batch: the feature
+//! compare stays silent when `std` is turned on in every build alike, and a version bump trips nothing).
+//!
+//! The content crate's rule is stricter than "no normal dependency": no table of any kind but `[package]` and `[lints]`. One change
 //! is known to come: 4b-2's step that writes the content's TypeScript types gives this crate exactly one
 //! dev-dependency, the type writer (the one line `ts-rs = { workspace = true }` under `[dev-dependencies]`: its
 //! derive must stand beside the types it reads). That change edits this rule in the same commit, after
@@ -73,6 +78,80 @@ fn the_content_crate_depends_on_nothing() {
     );
 }
 
+/// The lines of one table of a manifest that are neither empty nor comments.
+fn table(manifest: &str, name: &str) -> Vec<String> {
+    let header = format!("[{name}]");
+    let lines = manifest.lines().map(str::trim);
+    let body = lines.skip_while(|line| *line != header).skip(1);
+    let body = body.take_while(|line| !line.starts_with('['));
+    body.filter(|line| !line.is_empty() && !line.starts_with('#'))
+        .map(str::to_owned)
+        .collect()
+}
+
+/// Every version the lockfile holds of one package.
+fn locked(lock: &str, name: &str) -> Vec<String> {
+    let start = format!("name = \"{name}\"\nversion = \"");
+    let entries = lock
+        .split("[[package]]\n")
+        .filter_map(|entry| entry.strip_prefix(&start));
+    entries
+        .filter_map(|rest| rest.split('"').next())
+        .map(str::to_owned)
+        .collect()
+}
+
+/// What a failure says: whose decision the pinned text is.
+const HIS_YES: &str = "pinned by Mustafa's FEATURE-COMPARE (a) of 2026-11-26 (docs/DECISIONS.md, 14:09:13 UTC): \"a change of parry3d's version or of the two packages' versions needs a new yes from me; the library's std stays off\". Ask him before this changes";
+const LIBRARY: &str = r#"parry3d = { version = "=0.31.1", default-features = false, features = ["dim3", "f32", "alloc", "enhanced-determinism"] }"#;
+const PINNED: [(&str, &str); 3] = [
+    ("parry3d", "0.31.1"),
+    ("safe_arch", "1.2.0"),
+    ("thiserror", "2.0.21"),
+];
+
+#[test]
+fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone() {
+    let manifest = manifest_of("sim");
+    let (tables, _) = tables_and_package_keys(&manifest);
+    assert_eq!(
+        tables,
+        ["package", "dependencies", "lints"],
+        "crates/sim/Cargo.toml has a table this rule does not allow"
+    );
+    assert_eq!(
+        table(&manifest, "dependencies"),
+        [
+            "content = { path = \"../content\" }",
+            "parry3d = { workspace = true }"
+        ],
+        "the simulation's dependencies are the content crate and the collision library, and nothing else"
+    );
+    // The library's one line in the root: its version to the digit, default features off (so no `std`), four features.
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let read = |name: &str| {
+        std::fs::read_to_string(root.join(name)).unwrap_or_else(|error| panic!("{name}: {error}"))
+    };
+    let line: Vec<String> = table(&read("Cargo.toml"), "workspace.dependencies");
+    let line: Vec<&String> = line
+        .iter()
+        .filter(|line| line.starts_with("parry3d"))
+        .collect();
+    assert_eq!(
+        line,
+        [LIBRARY],
+        "the root Cargo.toml's parry3d line: {HIS_YES}"
+    );
+    let lock = read("Cargo.lock");
+    for (name, version) in PINNED {
+        assert_eq!(
+            locked(&lock, name),
+            [version],
+            "Cargo.lock's {name}: {HIS_YES}"
+        );
+    }
+}
+
 #[test]
 fn the_rule_reads_what_it_should_refuse() {
     // The check can fail: each kind of dependency table, and a build script, is seen by name.
@@ -94,4 +173,16 @@ fn the_rule_reads_what_it_should_refuse() {
     let (_, keys) =
         tables_and_package_keys("[package]\nname = \"content\"\nbuild = \"build.rs\"\n");
     assert_eq!(keys, ["name", "build"]);
+    // The simulation's half: a third dependency, the library's `std`, and a version that moved are each seen.
+    let third = "[package]\nname = \"sim\"\n[dependencies]\n# why\ncontent = { path = \"../content\" }\n\nglam = \"0.33\"\n[lints]\n";
+    assert_eq!(
+        table(third, "dependencies"),
+        ["content = { path = \"../content\" }", "glam = \"0.33\""]
+    );
+    assert_eq!(table(third, "dev-dependencies"), Vec::<String>::new());
+    assert_ne!(LIBRARY.replace("\"alloc\"", "\"alloc\", \"std\""), LIBRARY);
+    let lock = "version = 4\n\n[[package]]\nname = \"parry3d\"\nversion = \"0.31.2\"\nsource = \"x\"\n\n[[package]]\nname = \"thiserror\"\nversion = \"1.0.0\"\n\n[[package]]\nname = \"thiserror\"\nversion = \"2.0.21\"\n\n[[package]]\nname = \"thiserror-impl\"\nversion = \"2.0.21\"\n";
+    assert_eq!(locked(lock, "parry3d"), ["0.31.2"]);
+    assert_eq!(locked(lock, "thiserror"), ["1.0.0", "2.0.21"]);
+    assert_eq!(locked(lock, "safe_arch"), Vec::<String>::new());
 }

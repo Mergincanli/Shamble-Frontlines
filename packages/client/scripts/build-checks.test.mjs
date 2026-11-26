@@ -316,10 +316,19 @@ cfg-if v1.0.5 (*)
 `;
   const manifest = readFileSync(new URL("../../../Cargo.toml", import.meta.url), "utf8");
 
-  test("today's tree against the root Cargo.toml as it stands: nothing is missing", () => {
+  test("the tree of before the collision library against the root Cargo.toml as it stands: nothing is missing", () => {
     expect(runtimeCrates(TREE, "/repo")).toEqual(["cfg-if", "unicode-ident", "wasm-bindgen", "wasm-bindgen-shared"]);
     expect(runtimeCrates(TREE.replaceAll("/repo/", "C:\\repo\\"), "C:\\repo\\")).toEqual(["cfg-if", "unicode-ident", "wasm-bindgen", "wasm-bindgen-shared"]);
-    expect(overriddenCrates(manifest)).toEqual(["cfg-if", "thiserror", "ts-rs", "unicode-ident", "wasm-bindgen", "wasm-bindgen-shared"]);
+    // The six of before the collision library and the 29 of its tree (the players' tree and `safe_arch`, which only
+    // the native tests hold). The build holds the real tree against this list each time it runs (build.mjs).
+    // prettier-ignore
+    expect(overriddenCrates(manifest)).toEqual([
+      "approx", "arrayvec", "bitflags", "bytemuck", "byteorder", "cfg-if", "downcast-rs", "either", "equivalent",
+      "foldhash", "glam", "glamx", "hash32", "hashbrown", "heapless", "indexmap", "libm", "log", "num-complex",
+      "num-traits", "ordered-float", "parry3d", "rstar", "safe_arch", "serde_core", "simba", "smallvec",
+      "stable_deref_trait", "static_assertions", "thiserror", "ts-rs", "unicode-ident", "wasm-bindgen",
+      "wasm-bindgen-shared", "wide",
+    ]);
     expect(missingOverflowOverrides(TREE, manifest, "/repo")).toEqual([]);
   });
 

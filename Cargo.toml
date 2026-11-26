@@ -15,6 +15,11 @@ ts-rs = { version = "=12.0.1", default-features = false }
 # module, which links sim-wasm's panic hook (a later cargo-deny rule on wasm-bindgen must allow both). The
 # command-line tool that writes the glue must be exactly this version (PM-0002-18); each bump is its own change-set.
 wasm-bindgen = "=0.2.130"
+# The collision library, the first outside crate inside the simulation (ADR 0004 part 10): exactly this version,
+# with its own maps ordered and its vector maths scalar (`enhanced-determinism`), behind one module of `sim`
+# (crates/sim/src/collision.rs). Each bump is its own change-set: the source audit behind the built-file check
+# (packages/client/scripts/build-checks.mjs) is per version.
+parry3d = { version = "=0.31.1", default-features = false, features = ["dim3", "f32", "alloc", "enhanced-determinism"] }
 
 # Every crate opts in with `[lints] workspace = true` (ADR 0002 parts 4 and 7).
 [workspace.lints.rust]
@@ -52,4 +57,94 @@ overflow-checks = true
 overflow-checks = true
 
 [profile.release.package.wasm-bindgen-shared]
+overflow-checks = true
+
+# The collision library's tree (parry3d =0.31.1; change-set 4b): every crate `cargo tree -p sim-wasm` lists for
+# wasm32, and `safe_arch`, which only an x86 build has (the native tests). The build's own check reads the wasm32
+# list (packages/client/scripts/build-checks.mjs, missingOverflowOverrides).
+[profile.release.package.approx]
+overflow-checks = true
+
+[profile.release.package.arrayvec]
+overflow-checks = true
+
+[profile.release.package.bitflags]
+overflow-checks = true
+
+[profile.release.package.bytemuck]
+overflow-checks = true
+
+[profile.release.package.byteorder]
+overflow-checks = true
+
+[profile.release.package.downcast-rs]
+overflow-checks = true
+
+[profile.release.package.either]
+overflow-checks = true
+
+[profile.release.package.equivalent]
+overflow-checks = true
+
+[profile.release.package.foldhash]
+overflow-checks = true
+
+[profile.release.package.glam]
+overflow-checks = true
+
+[profile.release.package.glamx]
+overflow-checks = true
+
+[profile.release.package.hash32]
+overflow-checks = true
+
+[profile.release.package.hashbrown]
+overflow-checks = true
+
+[profile.release.package.heapless]
+overflow-checks = true
+
+[profile.release.package.indexmap]
+overflow-checks = true
+
+[profile.release.package.libm]
+overflow-checks = true
+
+[profile.release.package.log]
+overflow-checks = true
+
+[profile.release.package.num-complex]
+overflow-checks = true
+
+[profile.release.package.num-traits]
+overflow-checks = true
+
+[profile.release.package.ordered-float]
+overflow-checks = true
+
+[profile.release.package.parry3d]
+overflow-checks = true
+
+[profile.release.package.rstar]
+overflow-checks = true
+
+[profile.release.package.safe_arch]
+overflow-checks = true
+
+[profile.release.package.serde_core]
+overflow-checks = true
+
+[profile.release.package.simba]
+overflow-checks = true
+
+[profile.release.package.smallvec]
+overflow-checks = true
+
+[profile.release.package.stable_deref_trait]
+overflow-checks = true
+
+[profile.release.package.static_assertions]
+overflow-checks = true
+
+[profile.release.package.wide]
 overflow-checks = true

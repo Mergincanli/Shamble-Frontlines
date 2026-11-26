@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 21:41 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 22:01 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -575,6 +575,33 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   him to say yes to again). security-auditor has it (`deps-4b2-brief.md`). To put it in the tree after its
   answer: copy the five files back, `sha256sum -c` against `deps-4b2.sha256`, then commit with the foundation
   check's `sim` half and the feature compare.
+- **4b-2's first commit** (a8741fc): the unit in one test comment (4B-MEMORY-UNIT; the boundary test 7 of 7).
+- **Main after the merge is green** on b9aad01: gate with smoke (run 45879443239), toolchain (run 45879443258).
+- **The facing's zero, checked against the old game** (the advisor agent's condition 5): the old game sets
+  `rotation.y = Math.atan2(dir.x, dir.z)` (`legacy/shamble-game.js:871`, `:2710`, `:2758`): 0 faces +z and the
+  angle grows toward +x, as engine-architect proposed. To be written into the map's doc at step 8.
+- **Step 6, first part** (commit 5cc96c5; 122 written lines): the feature compare's two named exceptions in
+  `build-checks.mjs` (rust-reviewer's wording: `NATIVE_TESTS`, `TARGET_ONLY_ENTRIES`, `TEST_ONLY_FEATURES`; two
+  versions of a package in a list refused; nothing excused outside the native tests), each with its fixture and
+  near misses; the batch's real lists as data (`crates/devtools/vectors/sim-feature-lists.json`: 71, 71, 76,
+  resolved in a scratch copy with `cargo tree`, nothing compiled); four planted mistakes by hand, each red.
+- **security-auditor on the batch: APPROVE on its five digests** (`security-auditor-deps-4b2.md`; 2026-11-26):
+  all 33 packages from crates.io, every registry entry as step 0's, checksums against the cached index and
+  archives, none yanked; four build scripts and one proc macro, none reading the network, the clock or
+  randomness; `protocol` as a dev-dependency is right; nothing more needed for step 6. Its findings:
+  SA-4B2-1 Low: his two conditions "a change of parry3d's version needs a new yes from me" and "the library's
+  std stays off" were held by process only (std on moves every list alike). FIXED in step 6: the foundation
+  check's `sim` half pins the root's parry3d line and the lockfile's three versions, and its failure names his
+  decision. SA-4B2-2 Low, for step 7: the players' imports as an exact allow-list; build-machine paths in the
+  file refused. Its notes: parry3d, simba and approx are Apache-2.0 only and parry3d's archive carries no
+  licence file: the hosted build must ship the licence texts (a follow-up for lane 2's hosting); **RustSec
+  advisories for the 33 packages were not read (no network): to be read before 4b-2 merges**; after the commit,
+  the committed files are checked against the five digests.
+- **Step 6, second part: BUILT, the full local checks running** (22:01 Amsterdam): the batch in the tree (five
+  digests OK); `dependency_rules.rs`'s `sim` half (the simulation's dependencies are `content` and `parry3d`
+  alone; the library's line and the three versions pinned, the failure naming his FEATURE-COMPARE (a)); the
+  simulation's time unit is the content crate's own (`pub use`, 4B-TIME-REEXPORT). Clippy clean with the
+  library in the tree.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -582,6 +609,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   one notes file; nothing else happened. Every other git command of 4b so far started its own call.
 - One chat update was headed "about 16:50 Amsterdam" when the clock read about 16:45: a time ahead of the clock.
 - The card's "Last update" was once written 34 minutes ahead of the clock and corrected before it was committed.
+- In 4b-2's first hours three more calls put a `git status` after other commands (a card update, a line count, a
+  test run). All reads. Since then every git command stands alone in its call.
 - Two more git commands did not start their own shell call, both harmless reads or a write-back of committed text:
   a `git show HEAD:... > file` on the line after a python script (the take-in; told to him and to the advisor
   agent), and a `git log --oneline -1` after a `git status ... | head` in one call (after the merge).
@@ -631,4 +660,4 @@ them, the count at each step's end.
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- security-auditor: the dependency check of step 6's batch (started 2026-11-26 21:41 Amsterdam).
+- No agent runs. The full local checks run on step 6 (`.gate/local-checks.log`).

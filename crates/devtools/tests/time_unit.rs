@@ -19,6 +19,8 @@ fn durations() -> String {
 
 #[test]
 fn the_content_crates_unit_is_the_simulations_and_a_tick_is_a_whole_number_of_it() {
+    // One number since the simulation depends on the content crate: its unit is that crate's own, re-exported. The
+    // check stays for the day someone gives the simulation a number of its own again.
     assert_eq!(UNITS_PER_SECOND, sim::time::UNITS_PER_SECOND);
     assert_eq!((sim::TICK_HZ, sim::time::UNITS_PER_TICK), (30, 100));
     assert!(CANDIDATES.contains(&UNITS_PER_SECOND));
