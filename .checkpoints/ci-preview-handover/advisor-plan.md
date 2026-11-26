@@ -82,3 +82,31 @@ F11 (Medium) Upload trial: cite the action's own text at cf430e0 for (a) symboli
 F12 Ask 1 may go now (independent of the revisions). UPLOAD-SOURCE may ride in ask 1 (optional): an early no saves the round.
 
 Verdict: REVISE. Blocking: F10, F2, F3, F4, F5, F11. Ride: F1, F6-F9. Ask 1 may go to him now.
+
+## Re-read of revision 2 (e59b0c2; only the section "Revision 2" and the new resume card)
+Checked myself:
+- `git log`: e59b0c2 on eb62201; `.checkpoints/ci-preview-handover.md` exists (goal, where, ten steps, board, running).
+- The clone at scratchpad/ua/src: HEAD cf430e030ddbb5b0abf93d22962f4752f3646cd9 (git rev-parse). search.ts:16
+  `followSymbolicLinks: true` (and :17 `omitBrokenSymbolicLinks: true`), :19 `excludeHiddenFiles: !includeHiddenFiles`;
+  input-helper.ts:8-45 reads name, path, overwrite, include-hidden-files, archive, if-no-files-found, retention-days,
+  compression-level, no token; dist/upload/index.js:130173 tests `basename(item.path)` against /^\./. R2-6 holds.
+Each earlier finding:
+- F10/R2-1: comments :4 and :130 in the asked text; three questions to security-auditor; High route stated. Closed.
+- F2/R2-2: GUARD-STEP own choice; limits stated (lingering process, not proven); .gate and the folder as non-links; no
+  trailing slash. Closed.
+- F3/R2-3: own question naming rule 3's clash; write waits for its own yes; sent with ask 1 (allowed). Closed.
+- F4/R2-4: GitHub's Firefox, time-out, hash difference, no re-run; red upload stops. Closed.
+- F5/R2-5: card exists; departure to the report. Closed.
+- F11/R2-6: action text cited; proof route (job log via gh, as #71) checked on the push run first; counts compared. Closed.
+- F1/R2-7, F6/R2-8, F7/R2-9, F8-F9/R2-10: closed.
+New, Low (ride, no new revision):
+- N1 (Low): the root item tested is the search path itself (basename `dist-production`), so `.gate` is never judged
+  hidden; `include-hidden-files: true` only lets dot-named files inside the build through. Lane 2's comment line "Files
+  under .gate/ may count as hidden for upload-artifact, hence include-hidden-files" is then not accurate: correct it in
+  the asked text (keep or drop the input, said in ask 2), the same class as TOKEN-WORDS.
+- N2 (Low): the read-only clone of the action's source is a download not used (the #71 ruling on the measured zip):
+  name it in the report and delete it with the Firefox folder at the merge.
+- N3 (Low): revision 1's body still reads "No other change" and an ask 2 without GUARD-STEP; the header says revision 2
+  wins. Fine for the plan; the report states the final shape.
+Verdict: APPROVE (revision 2, e59b0c2), conditions N1-N3. Build may start; ask 2 still needs security-auditor's and
+infra-engineer's read with R2-1's questions, then his yes to each text and to UPLOAD-SOURCE and GUARD-STEP.

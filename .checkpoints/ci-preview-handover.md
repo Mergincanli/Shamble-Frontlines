@@ -4,7 +4,7 @@
 - Where: worktree `/home/user/Shamble-Frontlines/.gate/ci4`, local branch `cs/preview-handover` from main 2483e9a,
   pushed with `git push origin cs/preview-handover:claude/keen-tesla-v807cf` (fast-forward; never force; never the
   checkpoint script). git and gh start their own command.
-- Steps: 1. plan revision 1 (eb62201); the advisor agent REVISE. 2. plan revision 2 (this commit). 3. ask 1
+- Steps: 1. plan revision 1 (eb62201); the advisor agent REVISE. 2. plan revision 2 (e59b0c2): APPROVE with N1-N3 (advisor-plan.md). 3. ask 1
   (FF-REFETCH) and UPLOAD-SOURCE to him (sent). 4. the advisor agent's re-read of revision 2. 5. trials (Firefox 161
   after FF-REFETCH; the guard line with plants; lists; type check). 6. security-auditor and infra-engineer on the tried
   texts (with R2-1's three questions). 7. ask 2 (texts, GUARD-STEP). 8. write, push, runs. 9. docs pass, report, PR
