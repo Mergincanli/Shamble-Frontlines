@@ -8064,3 +8064,25 @@ Unchanged: lean mode, and git and gh always start their own command, with no oth
   docs) and later #70 (game code in crates/sim, room, sim-wasm and devtools) each get the full take-in (MAIN-52). Lean
   mode and the interim sentence unchanged.
   Transcript line 98914 (a queue-operation enqueue at 20:48:15.193Z), 1040 characters.
+
+## Mustafa, 2026-11-26 12:21 UTC (his label: 13:20 Amsterdam), in this chat: U7-MARK9 (a), U7-MARK8B (a), RESULTS-PUSH (b), Builder 2's "ready", #70's full take-in (word for word)
+```text
+For the netcode chat, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam).
+1. U7-MARK9: (a). Report mark 9 as "not run", never as passed, with the in-process test standing in. Name the unit that adds the per-slot list and read the real mark there.
+2. U7-MARK8B: (a), restated as "a fallback later than 3 s, or none within 10 s". The 3 s stands as twice the page's own 1.5 s timer, not as a reading. The record says the mark was restated on 26 November after measuring Chrome (1.60 s normal, 4.06 s planted) and that the planted bug is still caught.
+3. RESULTS-PUSH: (b). Only numbers leave the server and the push stays summaries. U8's new stop is 6,230 lines.
+4. Builder 2's merge: I reply "ready" when I am at the prompt.
+5. For your planning: pull request #70 (Walk part 4a, game code in crates/sim, room, sim-wasm, devtools and packages) merges today and needs a full take-in.
+Unchanged: lean mode, and git and gh always start their own command, with no other program in front of them.
+```
+- **Read as** (the main session's reading, not his words): U7-MARK9 (a): U7's T5 (ii) mark 9 is reported NOT-RUN,
+  never PASS, with F3's in-process late-wake leg standing in; the unit that adds the room's per-slot refusal list is
+  U6d (replan.md:22: room work, for R2 and R3; after R1 in replan.md:92's order), and the real mark is read there.
+  U7-MARK8B (a): mark 8 (8b) reads "a fallback later than 3 s, or none within 10 s"; the 3 s is twice the page's own
+  1.5 s timer, not a reading; the record (u7-brief.md's mark 8 and U7's report) says it was restated on 26 November
+  after measuring Chrome (run 3, in the Chromium the test drives: 1.60 s normal, 4.06 s planted) and that the planted
+  bug is still caught. RESULTS-PUSH (b): U8-F1 prints the self-tests' numbers into the summaries on the server; the
+  results push stays summaries only; U8's stop is 6,230 added lines (was 6,200). Builder 2's merge: his "ready" in this
+  chat first, as before. #70 (merged 12:22:01 UTC; main 2483e9a) gets the full take-in (MAIN-52): MAIN-68. Lean mode
+  and the interim sentence unchanged.
+  Transcript line 102607 (a queue-operation enqueue at 12:21:19.506Z), 1012 characters.
