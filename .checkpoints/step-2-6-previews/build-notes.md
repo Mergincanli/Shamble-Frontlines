@@ -396,7 +396,13 @@ GitHub (docs.github.com):
     (git alone first, other commands after). This chat only, not its agents, and git run inside scripts is not
     counted, so 53 is a floor. Agents: the test-engineer disclosed `cd ... &&` in front of read-only git calls in its
     round 2; the advisor agent of 2026-11-26 ran its read-only git calls as `git -C <main folder>`, a shape the guard
-    refuses (routine-guard.mjs:1087).
+    refuses (routine-guard.mjs:1087); the docs-keeper of 2026-11-26 ran one call with two git commands and two calls
+    beginning with `cd … &&` (its own report; notes docs-keeper.md).
+- The docs pass (docs-keeper, 2026-11-26; checked before commit): STATUS lane 2's lines only (the #72 row, Next item 3,
+  Waiting on Mustafa with the five questions recorded as open, a follow-ups line, the risks; the shared "Last updated"
+  stamp); ROADMAP: the step 2.6 entry, #67's dated pointer, and change-set 0's merged entry moved into Build history
+  byte for byte by script (scripts/fold_cs0.py) under his OLD-LINES (a) (DECISIONS.md:1994): 8 lines removed, all 8
+  re-added unchanged; REPO_MAP: the report's row (map OK, 204 entries).
 - The advisor agent's verdict (advisor-guard.md, 2026-11-26): ESCALATE. Stopped until his answer on GUARD-OFF:
   wall-test.yml's removal, any .github/ or kit write, any main-folder move other than the three allowed forms, the
   token sitting, the merge. The report, the docs pass and the notes go on, each git call on its own. Decisions for

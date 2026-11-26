@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small CI pull request in flight; the merged #67 and #69 rows moved to the archive's "In flight" by script; other lanes' lines about #67, #68 and #69 left to their lanes)._
+_Last updated: 2026-11-26 (step 2.6's docs pass, lane 2, on #72's branch at 8c8ad0d0: #72's row; lane 2's lines in Next, Waiting on Mustafa, Follow-ups and Open risks; every other lane's and chat's line left as it was)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -23,6 +23,7 @@ _Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small C
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
 | none yet (title and text in the notes, `pr-title.txt`, `pr-body.md`) | ci-after-3a, the small CI pull request after change-set 3a, by the chat he calls CI Builder: every crate's release tests (E1), the two vector generators' `--check` (3A-GEN-CHECK), `devtools`' own wasm32 build line (3A-RULES-STEP's CI half), and the rule tests in the runner image's Mozilla Firefox 160.0 (FIREFOX-TESTS (b), in part: the drawing tests wait, FF-DRAW); report `docs/reports/2026-11-25-ci-after-3a.md` | `claude/keen-tesla-v807cf` (stands in for `cs/ci-after-3a`) | risk tier 2; code head 832268e, gate, smoke and toolchain green on it (runs 45676587871, 45676587814); the head for approval to be given | the advisor agent's review of the final head; his main Advisor opens the draft; his go for that head; at the merge the unused Playwright Firefox zip is deleted (his answer of 2026-11-25, 00:07:29 UTC, point 3) |
+| #72 | step 2.6, the preview links per pull request (lane 2, the chat he calls Builder V2): `.github/workflows/preview.yml` and `preview-close.yml`, `hosting/`, `docs/runbooks/previews.md`; report `docs/reports/2026-11-26-step-2-6-previews.md` | `claude/optimistic-albattani-mdoonz` (stands in for `cs/step-2-6-previews`) | draft; risk tier 2; built; review rounds 1 and 2 closed (infra-engineer REVISE, then APPROVE; security-auditor APPROVE in both; test-engineer REVISE, then REVISE narrow, fixed in 80a9b6a8, no third round); gate, smoke, toolchain and `preview / tests` (175 pass) green on code head 84a3ea44; the advisor agent on the guard: ESCALATE; no verifier run yet; stopped until his GUARD-OFF answer | his five open questions (Waiting on Mustafa); the token sitting, which waits for the Guard fix chat's protection for main (the token's end date comes here then; no token yet); the first live link needs the CI Builder's hand-over step (asked on #59); the throwaway `wall-test.yml` out at the token sitting; the verifier, ready, the advisor agent's review of the head, his go |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
@@ -34,9 +35,7 @@ _Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small C
    ladder, with the state's hash on the players' file and `devtools`' three path edges; its plan holds the reviewers'
    items (the archive, "From change-set 3b"). Then change-set 4, the first outside crate in `sim` (its plan names
    3A-FMA-CHECK). The first builder chat stays paused; Slice 3 waits for #40 and picks how commands are timed.
-3. Lane 2 (Builder V2), his order of 2026-11-25: #66 merged (09faefa); #67 (ADR 0006's revision) on his go after it
-   takes main in; step 2.6's plan (its first edit after his go on the revised row); the carry of his look decisions when
-   his block comes; one plan for the look test page and the model-check tool (EARLY-LOOK (a)), built after his go.
+3. Lane 2 (Builder V2), his order of 2026-11-25: #66 (09faefa) and #67 (c1da1bd) merged; step 2.6 (#72) in flight above, stopped until his GUARD-OFF answer; the carry of his look decisions when his block comes; one plan for the look test page and the model-check tool (EARLY-LOOK (a)), built after his go.
 
 ## Waiting on Mustafa
 - ci-after-3a: his go for the head the advisor agent approves, CI green (his main Advisor opens the draft). Answered
@@ -48,7 +47,7 @@ _Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small C
   their next revision, which comes to him before it is written (**3B-RELEASE-DRAFTS**, his).
 - His to give: ACCT-3's roles and CLAUDE.md line (his third account, counted like the other two); his go before anything
   goes to the Rust project (3A-RUST-REPORT); ADR 0004 part 7's pointer sentence, shown first (3A-PART7-POINTER).
-- Lane 2's #67: his go for the head that takes main's #68 merge in. At his own timing (TR-END met): the test
+- Lane 2's step 2.6 (#72): five questions, open, not decided (the report's "Decisions needed"): GUARD-OFF (how the remaining sensitive steps run: a new chat with only this repository, or this chat asking him before each step), MAIN-WALL-AGAIN (does his MAIN-WALL (b) stand, given the guard did not run), GUARD-KIT (a plan-first kit change-set for the Guard fix chat), GIT-IN-NODE (does his git rule cover git inside scripts), TAG-CHECK (M1 did not measure a tag push: record it as unmeasured, or measure it); decided, apart from these: MAIN-WALL (b) and TOKEN-TONIGHT (b), the real token waiting for the Guard fix chat's protection for main (`docs/DECISIONS.md`). At his own timing (TR-END met): the test
   repository's hourly checker off before 2 December, then its archive, then the test project and its Access app deleted.
 - From Part 15 (its "Lane requests" issue: #59): give lane 2 Part 15 and ask for its needs from the block; tell lane 2
   which chat on his PC makes the model files; the VFX chat's exports; pass the VFX findings on.
@@ -102,6 +101,7 @@ _Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small C
 - **From ADR 0006's revision** (#67, lane 2; the archive's block): ADR6-ROLLBACK (Medium), -WK-ROUTE, -WK-BIC,
   -PAGES-RETENTION, -PM7-PAGES, -PM7-FIGURE, -WORDING, -REVISIT-WORKERS; step 2.6: STEP26-WORKERS, PHC-PREVIEW-NOINDEX.
   #66's follow-ups (PHC-CLICKLESS and the rest, for step 2.6): the archive's "Moved from STATUS (2026-11-25, lane 2)".
+- **From step 2.6** (#72, lane 2; below the bar, from its two review rounds; their text is here, none in the archive yet): the lint of `preview.yml` does not check six guards: WRANGLER_LOG, metrics, job permissions, github-script, the download path, the upload's working folder (TE-H's rest); nor code beside the token: a custom shell, NODE_OPTIONS or BASH_ENV, a job container or services (the security-auditor's round-2 Low); check-headers fetches one file at a time (the infra-engineer's round-1 Low); `preview / tests` is not a required check and the gate does not read `hosting/` (TE-K). A kit item (who takes it is his GUARD-KIT, open): lane 2's chat (Builder V2) ran without the guard since 2026-11-15 (two repositories in one chat, so no repository hooks loaded); GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT, GIT-IN-NODE and TAG-CHECK are his, open (Waiting on Mustafa).
 - **From guard-env-fix (#69):** GEF-SAME (the same kind of gap in other wrappers and keywords the day guard strips; the forms are with Mustafa, kept out of the repository), SA-R1-3 (the wrapper loop's turn cap), SA-R2-2 (very long lines against the hook timeout), V-2 (the folder tracking after a split-string value), the reason-text nit.
 - **From ci-after-3a** (the small CI pull request; the archive's block "From ci-after-3a"; each closed at its merge): done on its branch E1, 3A-GEN-CHECK, 3A-RULES-STEP's CI half (its target-gating rule stays open), the Firefox half of FIREFOX and 3A-OTHER-BROWSERS in CI on Linux (the rule tests only; WebKit and Safari open); still open 3B-OTHER-BROWSERS (its mark is a drawing test); new: FF-DRAW (his question first), FF-SPEC-COMMENTS, FF-FILEURL-PREF, FF-STOP, FF-SANDBOX, FF-ORDER; CUT-PATH's new evidence; TOKEN-WORDS deferred again.
 
@@ -115,6 +115,6 @@ _Last updated: 2026-11-25 (ci-after-3a's docs pass, on main c1da1bd: the small C
   spot-checked; unread sources); change-set 3a's (MUL-ADD first); change-set 3b's (no bound yet on how late a command
   runs, before online play; releases worked out, not counted). **Legacy (frozen):** 3a's ranked list (PR #15); bot
   navigation; the editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
-- **Preview hosting (lane 2):** PHC-HEADER (the header mark; revised by #67, waiting for his go); PHC-PROBE-MAIL.
+- **Preview hosting (lane 2):** PHC-HEADER (the header mark; revised by #67, merged); PHC-PROBE-MAIL. Step 2.6 (#72; the report's "Risks"): a guard that seems on but is not (lane 2's chat, Builder V2), and asks that may not reach him in auto mode (kit-wide); the report's risk 2 (no token yet; the token sitting waits for the Guard fix chat's protection for main); unproven until live: M5 to M11 (the first link, the comment, the headers served, reconcile, the count).
 
 ## Where STATUS's old sections went: the table is at the end of `docs/STATUS_ARCHIVE.md` (moved there 2026-11-18)

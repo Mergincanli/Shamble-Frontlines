@@ -199,6 +199,14 @@ true for main 82c605e. One review round (the verifier PASS; the advisor agent AP
 fix pass, then the advisor agent's APPROVE WITH FINDINGS of aea6f5b and the verifier's PASS. Merged: PR #55, c94c81b,
 2026-11-17 17:09:33 UTC by `merged_at`, by merge commit, on his go.
 
+**Change-set 0 of the build plan [2026-11-17, MERGED]** — cs0-model-rules, on his go of 2026-11-17 (docs only):
+his five messages of 2026-11-14 and 2026-11-17 into `docs/DECISIONS.md` by script; the plan and its appendix carried
+as reports; the model-file rules and the soldier's joint list, on paper (PM-0005-47 to -56); his answers in the drafts
+(open questions 98 to 96). Report `docs/reports/2026-11-17-cs0-model-rules.md`. Two review rounds (the verifier: PASS).
+Merged: PR #56, d7dad97, 2026-11-17 23:00:12 UTC, by merge commit, on his go after the advisor agent's APPROVE of
+cd61b28; CI green on main (gate run 856 with smoke, toolchain run 155). With the merge he accepted that PM-0005-54
+stands as written (a fail with today's rifle prototype, not waived) and the checkpoint commits in main's history.
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -244,6 +252,17 @@ fix pass, then the advisor agent's APPROVE WITH FINDINGS of aea6f5b and the veri
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**Step 2.6, the preview links per pull request [2026-11-25 to 11-26, built, no live link yet, not merged]** — step-2-6-previews
+(foundation step 2.6), by lane 2, the chat he calls Builder V2, on his go of 2026-11-25 for plan revision 2 (risk tier
+2: CI workflows, hosting, a deploy token): every pull request from this repository is to get a public, unlisted preview link
+of its tested build on Cloudflare Pages, in a previews-only account, with one comment holding the link and no click per
+preview. Built: `.github/workflows/preview.yml` and `preview-close.yml` (his texts, by sha256), `hosting/` (one script,
+175 tests), the runbook `docs/runbooks/previews.md`; gate, smoke, toolchain and `preview / tests` green on code head
+84a3ea44. Two review rounds closed (infra-engineer and security-auditor APPROVE; the test-engineer's narrow REVISE
+fixed, no third round). Draft PR #72, stopped until his GUARD-OFF answer (the chat ran without the guard since
+2026-11-15); the token sitting waits for the Guard fix chat's protection for main; the first live link needs the CI
+Builder's hand-over step (asked on #59). Report `docs/reports/2026-11-26-step-2-6-previews.md`.
+
 **The small CI pull request after change-set 3a [2026-11-24 to 11-25, waiting for his go]** — ci-after-3a, by the
 chat he calls CI Builder (risk tier 2; CI and the test configuration only): the `toolchain` job runs every crate's
 release tests (E1), checks the committed vector files against their two generators (3A-GEN-CHECK), builds `devtools`
@@ -268,6 +287,8 @@ PR #67. His answers of 2026-11-25 (14:55 Amsterdam): PASS-WORDS (a), with PM-000
 "recorded, the question is not answered"; step 4 achieved (recorded, the question is not answered); WORKERS-NEXT
 (a), keep Pages. Main's #68 taken in by one
 merge commit; waits for the advisor agent's approval of that head and his go.
+_Pointer (2026-11-26): merged as PR #67, c1da1bd, on 2026-11-25, a normal merge on his go, with the expected head
+35adfbe, checks green, after the advisor agent's APPROVE._
 
 **Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, waiting for his go]** — cs3b-loop-closes (the second
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the page's keys go to the
@@ -367,11 +388,3 @@ files (GUN-FILES); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. 
 on his go after the advisor agent's APPROVE of f26ac5b; CI green on main (gate run 866 with smoke, toolchain run 165).
 With the merge he answered OLD-LINES, who may fold old lines in the shared record files (`docs/DECISIONS.md`,
 2026-11-18, 11:08:25 UTC).
-
-**Change-set 0 of the build plan [2026-11-17, MERGED]** — cs0-model-rules, on his go of 2026-11-17 (docs only):
-his five messages of 2026-11-14 and 2026-11-17 into `docs/DECISIONS.md` by script; the plan and its appendix carried
-as reports; the model-file rules and the soldier's joint list, on paper (PM-0005-47 to -56); his answers in the drafts
-(open questions 98 to 96). Report `docs/reports/2026-11-17-cs0-model-rules.md`. Two review rounds (the verifier: PASS).
-Merged: PR #56, d7dad97, 2026-11-17 23:00:12 UTC, by merge commit, on his go after the advisor agent's APPROVE of
-cd61b28; CI green on main (gate run 856 with smoke, toolchain run 155). With the merge he accepted that PM-0005-54
-stands as written (a fail with today's rifle prototype, not waived) and the checkpoint commits in main's history.

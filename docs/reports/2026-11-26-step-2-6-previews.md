@@ -25,7 +25,9 @@ changed line 50 (`node --test hosting/preview.test.mjs`; `hosting/` fails on Nod
 - `hosting/preview.mjs`: one script, eight commands, Node built-ins only. `hosting/preview.test.mjs`: 175 tests (G9's
   lint of preview.yml included). `hosting/_headers`; `hosting/package.json` + lockfile: Wrangler 4.164.0 (DEP-HOLD:
   the security-auditor's APPROVE on both sha256).
-- `docs/runbooks/previews.md`; `docs/DECISIONS.md` (his six messages, by script); `docs/REPO_MAP.md` rows.
+- `docs/runbooks/previews.md`; `docs/DECISIONS.md` (his six messages, by script); `docs/REPO_MAP.md` rows; STATUS and
+  ROADMAP (lane 2's lines; change-set 0's merged ROADMAP entry moved byte for byte into Build history by script, under
+  his OLD-LINES (a)).
 - No game file, no `.claude/`, no gate file. Gate check 3: +0 -0 symbols.
 ## Evidence
 - Gate PASS (checks 1-4, 5b-5d; 5a smoke cannot start locally: the container's Chromium does not match tools'
@@ -70,5 +72,6 @@ environment page; both secrets by "Add environment secret"; no CLOUDFLARE_ secre
 5. TAG-CHECK: M1 did not measure a tag push. (a) record it as an unmeasured residual; (b) measure it with a tag job
    (a new text and his yes). Recommend (a): the rule admits branch `main` only, and "0 tags allowed".
 ## For Mustafa
-1. Answer GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT, GIT-IN-NODE and TAG-CHECK (the questions file: commit 702f42c0).
+1. Answer GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT and GIT-IN-NODE (the questions file at commit 702f42c0 holds these
+   four in full) and TAG-CHECK (in this report only).
 2. Nothing to click now; the token sitting waits for the Guard fix chat's protection for main.
