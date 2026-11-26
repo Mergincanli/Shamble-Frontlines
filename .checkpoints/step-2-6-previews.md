@@ -207,6 +207,13 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   was still running; it finished after cc5307f, added its extra checks (verdict unchanged: APPROVE 90c939f4, toolchain
   met, L1 open) and handed back its report to the second run. The second run pushed nothing before cc5307f and
   repeated nothing; its one write, a duplicate save script, was deleted uncommitted.
+- T8, main moved again (2026-11-26 15:24 UTC: #74, the CI Builder's ci-preview-handover, main 3b949c1): toolchain.yml
+  gains the hand-over step (artifact `preview-site`, the name preview.yml:93 downloads and preview.mjs:241 checks), plus
+  docs and packages/e2e/playwright.config.ts. #72 conflicts again (push.merge_conflict wake, 15:25:02 UTC; git's list:
+  DECISIONS, REPO_MAP, ROADMAP, STATUS). Not merged: a merge would bring a .github/ file into lane 2's branch, and his
+  15:05 item 3 says "nothing under .github/" until MAIN-WALL; the guard does not ask for a worktree merge. Asked him:
+  MERGE-74 (questions-2026-11-26-merge-74.md; recommended (a), one merge after MAIN-WALL). The CI half of item 6g
+  (#59's hand-over step) is merged.
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
