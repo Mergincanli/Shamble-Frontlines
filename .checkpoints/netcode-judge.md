@@ -5,9 +5,9 @@
   answer), then **part b, U6j** (the judge learns 19 figures and three waiting judge changes). Plans:
   `.checkpoints/netcode-judge/plan-a.md` and `plan-b.md`.
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
-  the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g` at
-  e2c0e896dedd5c09c2536e2fbe9323353756fe99, pushed unchanged as this branch's first push (2026-11-24 19:5x UTC).
-- **Last update:** 2026-11-25 about 00:08 UTC, both parts done and checked; waiting on the merge.
+  the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g`: first at
+  e2c0e896 (parts a and b), now at its merged head 591e2cb0ab07 (NPT-L2-ONEWAY).
+- **Last update:** 2026-11-26 about 19:25 UTC, merged; NPT-L2-ONEWAY's plan with the advisor agent.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -210,13 +210,17 @@
     plus the vehicle hulls in the client's set, decided before any run's data, no file of the two folders changes;
     MAIN-MODEL (a): this chat stays on Fable 5.2 by his word, and the record says so.
 
+30. The merge and the new base (2026-11-26) · the netcode chat merged this branch at 48efc9c5 (18:05 UTC, on
+    Mustafa's go; its tip was 0e621dae, untouched since 25 November) · this branch fast-forwarded to the netcode
+    head 591e2cb0ab07 and pushed (19:1x UTC); marks.json there is still c3396db2….
+
 ## Current step
-**Both parts are done at 72651a3c6326546b423c4773ac5a92902a37b590 and checked by his main Advisor.** Waiting on the
-netcode chat's merge of this branch (on his word, given there). **Next, only after that merge:** the one-way delay
-comparison on the real network (NPT-L2-ONEWAY: the probe's one-way delay checks read against the profile's one-way
-delay minus half the measured base round trip; no tolerance changes; his answer (a) is given in the netcode chat,
-which passes the pointers). One small change-set of its own inside the fence: take the netcode branch's merged head
-in first, plan first, the advisor agent's review, one reviewer's read, ready before R1's report. Not started.
+**NPT-L2-ONEWAY (his message of 25 November, item 4; his (a) in the netcode chat, history.md:7907):** on the real
+network (L2) the one-way delay checks of PM-0001-3 read against the profile's one-way delay minus half the leg's
+measured base round trip; no tolerance changes; the round-trip checks unchanged. One small change-set inside the
+fence. **Plan written: `.checkpoints/netcode-judge/plan-oneway.md`; with the advisor agent for its review (no judge
+or marks edit before its APPROVE).** Then the build, one reviewer's read, the final checks, the advisor's read of
+the head, and the commit id to Mustafa; the netcode chat merges it on his word. Ready before R1's report.
 **When I wait on him (his rule from 2026-11-25):** the full question as a file in these notes, pushed; the board
 thread set to needs-musti with a due label; the post names the file and the commit.
 **For the report (collected while building):**
@@ -241,8 +245,7 @@ thread set to needs-musti with a due label; the post names the file and the comm
   fix: `session_end` carries a reason, and only a scripted leave gets the tail).
 
 ## Next steps
-1. After the netcode chat has merged this branch: NPT-L2-ONEWAY, as "Current step" says (pointers come from the
-   netcode chat).
+1. NPT-L2-ONEWAY as "Current step" says.
 
 ## Open findings
 - Follow-ups, Low, none needed before the merge (the advisor agent's read): part a's rust-reviewer L4 and L6 and
