@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 19:56 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 21:41 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -538,6 +538,43 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   older than what 4b-1 merged): step 6's batch is made again on b9aad01 (root `Cargo.toml`, `crates/sim`,
   `crates/sim-wasm`, `Cargo.lock`), and goes to security-auditor by its digests before it is committed, pushed
   or built (his DEP-HOLD).
+- **The advisor agent's short re-read (2026-11-26, 19:58 Amsterdam): steps 6 to 12 APPROVED**, on revision 3 against
+  main b9aad01 (`advisor-reread-4b2-brief.md` is what it read). Its conditions:
+  1. The remade batch resolves parry3d 0.31.1, `safe_arch` and thiserror 2.0.21 exactly as step 0's batch did
+     (`deps-lockfile.diff`): a change to any of the three needs a new yes from him (his FEATURE-COMPARE (a)); any
+     of the other 30 packages that moves goes back to rust-reviewer and security-auditor before a commit.
+  2. Every changed manifest is in the digests (devtools' too, if `protocol` becomes a dev-dependency).
+  3. The two named exceptions as rust-reviewer worded them (`rust-reviewer-step0.md`), each with a fixture, a near
+     miss and a planted mistake; any other difference still stops every build.
+  4. Name the change-set that first calls a collision query from the match's step: if 4b-2, the recording covers
+     those queries (`first-loop` made again after step 10, or a recording of its own), compared natively, in
+     Chromium and in Firefox; if 4c, 4b-2's report says so and 4c carries the condition.
+  5. The facing's zero (0 faces +z, degrees grow toward +x) is a data convention and the advisor agent's call:
+     taken only after it is checked against the old game's code by file and line, before the first map file.
+  6. art-director joins graphics-engineer and perf-auditor for step 12 if it is built; netcode-architect for
+     steps 9 and 10.
+  7. 4b-1's conditions still apply (PM-0005-3; his Export's values; the first commit fixes 4B-MEMORY-UNIT).
+- **How a rung fires (its ruling):** the count is taken as in 4b-1 (against b9aad01, `crates/` and `packages/`,
+  data files left out) at every step's end AND at every commit. A rung fires when the count at the end of the
+  step before the rung's step has reached its number; he is told before a step moves; built code never moves.
+  **Look ahead before steps 11 and 12:** the count plus the step's projected size (about 520 and 1,060) plus
+  one fix pass (about 350): if that reaches 8,450, stop and ask him before the step. Past 8,450 at any commit:
+  stop and ask at once. **Past 5,633: his one sentence goes in the very next chat message**, mid-step too. A new
+  threshold or order goes back to the advisor agent first.
+- **His word is needed:** before step 6 only for a version change (condition 1); before step 8 his yes to
+  DIFF-LIST, and his decision if a range refuses a value of his Export (step 8 changes `content/source/`: the
+  report's first lines say so); before step 12 his chance to veto GREY-COLOURS (asked in the chat at the
+  merge of 4b-1); at the merge his short browser check if step 12 is built here.
+- **Step 6, the batch made again on b9aad01 (2026-11-26, 21:41 Amsterdam): OUT OF THE TREE, UNCOMMITTED AND UNBUILT**
+  (his DEP-HOLD). Five files under `.gate/cs4b/batch-4b2/`, their text as `deps-4b2.diff`, their digests as
+  `deps-4b2.sha256`: root `Cargo.toml`, `crates/sim/Cargo.toml` and `crates/sim-wasm/Cargo.toml` are byte for
+  byte step 0's files; `crates/devtools/Cargo.toml` makes `protocol` a dev-dependency (security-auditor's note;
+  nothing under `src/` names it); `Cargo.lock` by `cargo update --workspace --offline` from the cached index:
+  33 registry packages, **the same 56 packages as step 0's lockfile, every version and checksum the same**
+  (parry3d 0.31.1, safe_arch 1.2.0, thiserror 2.0.21: the advisor agent's condition 1 is met; no version for
+  him to say yes to again). security-auditor has it (`deps-4b2-brief.md`). To put it in the tree after its
+  answer: copy the five files back, `sha256sum -c` against `deps-4b2.sha256`, then commit with the foundation
+  check's `sim` half and the feature compare.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -594,4 +631,4 @@ them, the count at each step's end.
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- None yet in 4b-2.
+- security-auditor: the dependency check of step 6's batch (started 2026-11-26 21:41 Amsterdam).
