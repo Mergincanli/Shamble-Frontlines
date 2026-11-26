@@ -52,9 +52,12 @@
     or rule records (no tool), so T0 and the rule records come from his screenshots. Still missing: the real
     repository's Settings > Actions > General.
 
+14. Measurement done in mode Exempt: T1 (isolation), T2 (session merges), T4 (outsider refused, graded from GitHub's
+    refusal text: no Insights page in his Settings), T5, T7 PASS; T1e, T6, T9, T3a and the second-account merge not run
+    at his request (he dislikes the manual steps); results in .gate/main-wall/results-exempt.md (not pushed)
+
 ## Current step
-He merges the sandbox's pull request 1 (screenshot of the merge box first), answers the test chat (paste-ready text
-given), sends T0 screenshots; then the tests run.
+security-auditor and the advisor agent review the results (in parallel); then his click 11 on the real repository.
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
@@ -73,4 +76,4 @@ given), sends T0 screenshots; then the tests run.
 - THROWAWAY-PUBLIC (a): public throwaway, neutral names, deleted as soon as the results are reviewed · Mustafa · 2026-11-26 (his answer "a" in this chat)
 
 ## Running work
-- none
+- security-auditor and the advisor agent: results review
