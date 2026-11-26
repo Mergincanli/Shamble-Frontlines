@@ -54,7 +54,9 @@ dated 2026-11-04 below, each answered at most in part, except OQ-0005-AB1, whose
 advisor's reading, 2026-11-04); the drafts take it up at their next revision. It bears on faction asymmetry and keeps
 the war around the matches open, "in its own design session". It also bears, without answering, on OQ-0001-4,
 OQ-0001-7, OQ-0001-10, OQ-0005-2, AB9, AB11 and CD8, and on the design questions R1-ABL-OQ6, R2-SYNC-OQ7, R2-INT-OQ1,
-R2-INT-OQ4, R2-INT-OQ8, R2-ROOM-OQ4 and R4-LOS-OQ2.
+R2-INT-OQ4, R2-INT-OQ8, R2-ROOM-OQ4 and R4-LOS-OQ2. Mustafa's VISION-RULE, version 2 (`docs/DECISIONS.md`, the entry of
+2026-11-26, 15:51:38 UTC) later answers R2-INT-OQ1 and R4-LOS-OQ2, and for sight part of R4-LOS-OQ1 and R4-LOS-OQ4
+(their rows under "Design questions").
 
 | Code or OQ | The question, in plain words | Decider | Where |
 |---|---|---|---|
@@ -174,7 +176,7 @@ R2-INT-OQ4, R2-INT-OQ8, R2-ROOM-OQ4 and R4-LOS-OQ2.
 | R1-XT-OQ8 | DESIGN: Mustafa and the Advisor | critic rank 15: whether browser navigation and server-less previews rest on an offline-play need is the same product question as offline play itself (two rows up) |
 | R2-SYNC-OQ7 | DESIGN: Mustafa | seats for several players in a vehicle are VISION_V2 §6.4 `[OPEN]`; the drafts only keep them possible |
 | R2-BUD-OQ5 | DESIGN: the game-designer, with Mustafa | caps on vehicles and live projectiles per team are game rules; until they exist the stress scene's counts stand (GLOSSARY §3) |
-| R2-INT-OQ1 | DESIGN: Mustafa with the game-designer | what a player may see (the camera's view or the character's sight) is a game rule LOOK_V2 does not settle |
+| R2-INT-OQ1 | DESIGN: Mustafa with the game-designer | what a player may see (the camera's view or the character's sight) is a game rule LOOK_V2 does not settle. Answered by Mustafa (2026-11-26, VISION-RULE, version 2): "My answer: the character's sight." (`docs/DECISIONS.md`, the entry of 2026-11-26, 15:51:38 UTC: his point 1, the rule in his point 2). His point 3: "Not decided yet, so record it as open: the cone's final width; how the cone is drawn (a look decision); whether fences block sight; whether shots are blocked by the same things as sight." The ADR text is not rewritten yet (STATUS's follow-up VISION-RULE) |
 | R2-INT-OQ2 | DESIGN: Mustafa | camera framing and aspect ratio are a look and feel choice LOOK_V2 leaves unset; the drafts keep the camera as data |
 | R2-INT-OQ3 | DESIGN: Mustafa (LOOP_V2's owner) | which economy and objective state is team-private is a LOOP_V2 rule |
 | R2-INT-OQ4 | DESIGN: Mustafa | what the minimap shows is a game rule |
@@ -192,10 +194,10 @@ R2-INT-OQ4, R2-INT-OQ8, R2-ROOM-OQ4 and R4-LOS-OQ2.
 | R4-FLOORS-OQ1 | DESIGN: Mustafa | crouching and other stances are a game rule |
 | R4-FLOORS-OQ2 | DESIGN: Mustafa | whether bots drive vehicles and a Juggernaut climbs ramps is a game rule |
 | R4-FLOORS-OQ3 | DESIGN: Mustafa | fall damage and drop height are game rules |
-| R4-LOS-OQ1 | DESIGN: Mustafa with the game-designer | whether soldiers and vehicles block sight and shots is a game rule |
-| R4-LOS-OQ2 | DESIGN: Mustafa with the game-designer | what a player may see is a game rule LOOK_V2 does not settle (asked again for the sight pass) |
+| R4-LOS-OQ1 | DESIGN: Mustafa with the game-designer | whether soldiers and vehicles block sight and shots is a game rule. For sight, answered in part by Mustafa (2026-11-26, VISION-RULE, version 2, his point 2f): "What blocks sight: walls, buildings, static objects, vehicles, hedges and smoke. Soldiers do not block sight. While I sit inside a vehicle, my own vehicle does not block my view." (`docs/DECISIONS.md`, the entry of 2026-11-26, 15:51:38 UTC). Still open, his point 3: "whether shots are blocked by the same things as sight" |
+| R4-LOS-OQ2 | DESIGN: Mustafa with the game-designer | what a player may see is a game rule LOOK_V2 does not settle (asked again for the sight pass). Answered by Mustafa (2026-11-26, VISION-RULE, version 2): "My answer: the character's sight." (`docs/DECISIONS.md`, the entry of 2026-11-26, 15:51:38 UTC); what stays open: R2-INT-OQ1's row |
 | R4-LOS-OQ3 | DESIGN: the game-designer with Mustafa | a field of view for bots is bot design |
-| R4-LOS-OQ4 | DESIGN: the game-designer with Mustafa | whether hedges, fences and smoke block partly is a game rule; the yes-or-no form is a data flag |
+| R4-LOS-OQ4 | DESIGN: the game-designer with Mustafa | whether hedges, fences and smoke block partly is a game rule; the yes-or-no form is a data flag. For sight, answered in part by Mustafa (2026-11-26, VISION-RULE, version 2, his point 2f, quoted in R4-LOS-OQ1's row): hedges and smoke block sight (`docs/DECISIONS.md`, the entry of 2026-11-26, 15:51:38 UTC). Still open, his point 3: "whether fences block sight"; whether any of them blocks only partly is not named in his words (the docs pass's reading, 2026-11-26) |
 | R4-OBST-OQ1 | DESIGN: the game-designer with Mustafa | what a vehicle does to soldiers in its path (block, push, crush) is a game rule (critic rank 30) |
 | R4-OBST-OQ2 | DESIGN: Mustafa | whether harvesters follow fixed lanes or navigation is a LOOP_V2 §3 rule |
 | R4-OBST-OQ3 | DESIGN: Mustafa | player building exists only if Mustafa adds it to VISION_V2 §6 |
@@ -380,7 +382,7 @@ word ("gap G5", "seam S1").
 |---|---|---|
 | G1 | the asset pipeline (compression, LODs, export checks, slot renaming, per-unit budgets) | ADR 0005 OQ-0005-AS1 to AS5, "not researched"; the asset-pipeline research (ASSET-RESEARCH (a)). Its export and slot-naming part (AS3, AS4) reported on 2026-11-17: `docs/research/asset-export-rules.md` and `docs/research/soldier-joint-list.md`, rules and checks on paper, not yet proven by an export |
 | G2 | halftone flashes and ink line boil (LOOK_V2 §7) | ADR 0003: built as defaults; technique an open question; cost a look-test mark |
-| G3 | roof fade (LOOK_V2 §4) | ADR 0003 OQ-0003-6; the visibility rule stays R2-INT-OQ1 (design) |
+| G3 | roof fade (LOOK_V2 §4) | ADR 0003 OQ-0003-6; the visibility rule, R2-INT-OQ1 (design), is answered by Mustafa (2026-11-26, VISION-RULE, version 2: its row under "Design questions"; `docs/DECISIONS.md`, the entry of 2026-11-26, 15:51:38 UTC) |
 | G4 | three damage stages (LOOK_V2 §4) | ADR 0004 part 14 extends the research's two states; the third stage's trigger is OQ-0004-4 |
 | G5 | visual effects (fragments, muzzle flashes, tracers, impacts, debris) | ADR 0003 OQ-0003-7; the visual-effects budget row stands |
 | G7 | soft shadows and the lighting model (LOOK_V2 §2, §6.5) | ADR 0003 OQ-0003-4 and OQ-0003-5 |
