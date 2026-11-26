@@ -171,13 +171,21 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   No steward or babysit skill on the branch.
 - T5: GUARD-PROMPT asked of him (questions-2026-11-26-new-chat.md): main's hook script, run by hand on the probe's
   command and folder, prints permissionDecision "ask" with the reason "the main folder stays on main's reviewed
-  rules: git merge would move it (only origin/main merges into the main folder ...)"; whether his prompt showed it,
-  only he saw.
+  rules: git merge would move it (only origin/main merges into the main folder ...)".
+- HIS ANSWER (2026-11-26, 15:05 Amsterdam; message d3c924a4-7594-4631-a5b9-6cfc6f7ad7af, 14:09:35 UTC, 738 bytes,
+  sha256 4f0f6821a0a5020f47c440ebcaa9d2fabc1a75d12b41b625e518ff348b579ed7; saved whole by scripts/save_1505.py in
+  mustafa-2026-11-26T1505-guard-prompt.md; into DECISIONS at the next docs head): GUARD-PROMPT (a): the prompt read
+  "Hook PreToolUse:Bash requires confirmation for this command" with the guard's reason text under it; he answered no;
+  the chat was in Auto mode. So in this chat the guard runs and its ask reaches him in Auto mode, with its reason (the
+  probe closed; T1's open point closed). Builder V2 is told of the takeover. MAIN-WALL is the Guard fix chat's next
+  change-set after its current guard pull request merges; he tells this chat when it is merged; until then nothing
+  under .github/ and no token sitting. His rule unchanged: git and gh always start their own command.
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
 ## Next (his item 6, in order)
-c. Wait for the Guard fix chat's protection for main to merge (his TOKEN-TONIGHT (b), MAIN-WALL-AGAIN (a)). If it is
+c. Wait for the Guard fix chat's protection for main to merge (his TOKEN-TONIGHT (b), MAIN-WALL-AGAIN (a)); his
+   15:05 message: he tells this chat when it is merged; until then nothing under .github/, no token sitting. If it is
    not merged by his click on the real token, ask him again first (MAIN-WALL (b)).
 d. The token sitting, one message to him in this order (the security-auditor's conditions): (a) reload the `preview`
    environment page, screenshot (bypass box unticked, "Selected branches and tags", "1 branch and 0 tags allowed",
@@ -193,7 +201,9 @@ f. His go after his Advisor's merge check; merge with the approved head as the e
 g. After #72 and the CI Builder's hand-over step (#59) are both merged: M5 to M11.
 For the docs pass before ready: STATUS's #72 row and lane 2's Waiting bullet and Next item 3 still describe the
 hand-over as to come; the report's Outcome, Proposed next step and For Mustafa likewise; the report lists the Part 15
-move (OLD-LINES) and the merge 6c812700; the report's process facts gain T1's probe.
+move (OLD-LINES) and the merge 6c812700 (the advisor agent's L1); the report's process facts gain T1's probe and his
+GUARD-PROMPT (a), which answers, for this chat, risk 1's open point (an ask in Auto mode reached him, with the guard's
+reason); his 15:05 message goes into DECISIONS by script (uuid, 738 bytes, sha256 above).
 
 ## Findings during the build (U1)
 - F1 (a defect in the approved preview.yml, job `tests`): `run: node --test hosting/` fails on Node 22: the folder is
