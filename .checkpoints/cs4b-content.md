@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 16:36 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 16:49 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -210,11 +210,11 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     goes into 4b-1's report; it binds change-set 8 (PM-0004-9), not 4b. Its note for the builder: some of the old
     game's timers are typed into its functions and are in no table (a bot's lunge 2.5 s, fire locks of 0.1 to 0.2
     s): the report cannot see them; 4d's import and change-set 8 will.
-15. **Step 4 DONE, committed locally (not pushed until the full checks pass with step 5): 6,091 written lines**
+15. **Step 4 DONE** (pushed with step 5 after the full local checks passed on both): **6,091 written lines**
     (the step took 223): `devtools::files::read_plain` and `packages/sim-worker/boundary/plain-file.ts`, the six
     readers moved, planted links on both sides, a text scan in `tests/recordings.rs`. The folder check of 4a also
     asks for the folder by its own path with no last separator.
-16. **Step 5 BUILT, the local checks running on steps 4 and 5: 6,592 written lines** (the step took 501):
+16. **Step 5 DONE** (commit fdd9f0a, pushed; the local checks passed whole: 33 boundary tests, 18 browser tests in 209 s): **6,592 written lines** (the step took 501):
     `crates/content/src/time.rs` (`UNITS_PER_SECOND` 3,000, `units_from_seconds`), `crates/sim/src/time.rs` (the
     same number, `UNITS_PER_TICK` 100, a constant check for 30 and 60 Hz), `legacy-extract.mjs` writes
     `vectors/legacy-durations.txt` (69 durations as written) from the reviewed list
@@ -233,12 +233,39 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     #74: the guard, `toolchain.yml`, `packages/e2e/playwright.config.ts`, docs): merged into this branch before
     the docs pass.
 
+18. **His point 7 DONE:** the chat's main folder (`/home/user/Shamble-Frontlines`) stood on 311c048 (the merge of
+    #69) and is on main 3b949c1 by `git merge --ff-only origin/main`. **His point 6 answered in the chat** (no
+    "blocks sight" flag in 4b: it comes as one added field with a format version step and Slice 2's sight check;
+    4b-2's collision world keeps each collider's shape id; nothing built): his decision SIGHT-FLAG, my
+    recommendation (a); engine-architect is asked for its view in its review. The one sentence at two thirds of
+    the line was given with it (6,592 of 7,450; nothing left).
+19. **The planted defects** (`plants-4b1.py`; its console output `.gate/plants-4b1.out`): first run on fdd9f0a: 23
+    of 25 caught by the checks' own words, one WebAssembly-only (the native classes green, the Node compare names
+    the class); every file put back; the clean tree green. The two others were caught, not by the words named:
+    the script's expectation for one, and the aim tie's second copy of the two numbers for the other (removed:
+    commit 230d9e9 "the planted defects, and the aim tie speaks with its own words"). **The whole run is repeated
+    on the head the reviewers leave, and its file `plants-4b1.txt` is committed then** (a run with letters
+    overwrote the first run's file).
+20. **Main merged into the branch** (3b949c1: the guard fix #73 and the CI Builder's #74; no file of 4b-1's
+    touched; the Firefox project now also runs the replay spec): head **ef2edec**, pushed.
+21. **Review round 1 started on ef2edec** (2026-11-26, 16:47 Amsterdam): rust-reviewer, engine-architect and
+    security-auditor, each at max effort on Opus, on `git diff origin/main...HEAD -- crates packages`; the common
+    brief is `cs4b-content/review-brief-4b1.md`; their notes `<name>-review-4b1.md`. test-engineer follows.
+
+## Slips of this chat's own rules, for the report
+- One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
+  on the line after a `cat` that wrote that file, in one call (2026-11-26, about 16:46 Amsterdam). It staged that
+  one notes file; nothing else happened. Every other git command of 4b so far started its own call.
+- One chat update was headed "about 16:50 Amsterdam" when the clock read about 16:45: a time ahead of the clock.
+- The card's "Last update" was once written 34 minutes ahead of the clock and corrected before it was committed.
+
 ## Current step
-4b-1, steps 4 and 5: read the local checks (`.gate/local-checks.log`), commit step 5, push, read CI, post on the
-board. Then: his point 6 and point 7; main merged into this branch; the close (the plants script; reviewers:
-rust-reviewer, engine-architect, security-auditor, then test-engineer; the verifier; the advisor agent on the head;
-docs-keeper with his messages of 2026-11-26 and VISION-RULE; the report; the draft pull request).
-**The count is 6,592 of 7,450: 858 lines are left for the reviews' fixes.**
+4b-1, the close: review round 1 is running (three reviewers). Then: their findings fixed in one pass (858 lines
+are left under the stop line); test-engineer; round 2 on what changed; the whole plants run on that head; the
+verifier until PASS; docs-keeper (his messages of 2026-11-26 into DECISIONS by script, VISION-RULE with them, the
+ADR index, STATUS with 4B-AIM-REACH and the follow-ups, ROADMAP, REPO_MAP); the report (its first lines: what moved
+4b from 5,410 to about 7,050 by the designs' count, and the new estimate for the first build he can move a soldier
+in); the advisor agent on the head; `.checkpoints/` out of the head; the draft pull request; his go.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -273,5 +300,6 @@ docs-keeper with his messages of 2026-11-26 and VISION-RULE; the report; the dra
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- No agent runs. No saver runs: the main session commits
+- rust-reviewer, engine-architect, security-auditor (review round 1 on ef2edec, started 2026-11-26 16:47
+  Amsterdam). No saver runs: the main session commits
   the notes by hand.
