@@ -12,19 +12,36 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 14:52 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 15:10 Amsterdam (from the clock)
 
-## Sizes (his point 5 of 2026-11-25: which is which)
-- The designs' own count for 4b, bottom-up: 5,410 lines (2,780 code, 2,520 tests, 110 configuration).
-- Planned, which already holds the 1.8: 9,750. Stop line (planned times 1.25): **12,200**; it stays as it is (his
-  words of 2026-11-25).
-- At 4a's measured rate (2.2 times the designs' count before review fixes, 2.4 after) 4b would end near 11,900 and
-  then near 13,000: the count is taken at every step and said in each step's summary.
-- The ladder, fixed in the plan: at 9,750 written lines the schema writer and its tests move to 4d (with the schema
-  half of PM-0005-7 and PM-0005-8; the panel's limits are written in the panel's code until then); at 11,000 the
-  page's scene (step 9) moves whole, with its browser tests, to the start of 4c. Never moved: the built-file check,
-  the static collision world with PM-0004-32, the loader's seven stages with the reader's proofs, the Testlines
-  check. He is told before a part moves.
+## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
+- **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
+  move to 4b-2. At a stop line you stop and ask."
+- **4b-1** (this card's first pull request: steps 1 to 5, no outside package): by the designs' way of counting
+  about 3,300 lines; planned, which holds the 1.8: about 5,950; **stop line 7,450**; at 4a's measured rate (2.4
+  times) about 7,950 written. **Two thirds of the line is 4,967**: at that count he gets one sentence on where
+  the build stands.
+- **4b-2** (steps 6 to 12): about 3,750 by the designs' count; planned about 6,750; **stop line 8,450**; about
+  9,000 at 4a's rate. Its own "what leaves first" list is written before its step 6.
+- Counted after every step with git against 4b-1's base (main 2483e9a), `crates/` and `packages/` only, data files
+  left out (the committed extracts and corpus texts are data).
+
+## What leaves 4b-1 first if the count runs high, in order (his point 2; fixed before step 1)
+The build order puts what can leave last, so that a part that leaves is code not yet written. Order of building:
+step 1 (manifests), step 2a (the reader, the writer, the bundle, the movement kind, the old tuning's numbers
+extract), step 3 (the reader's proofs and the bounded fuzz run), step 2b (the map kind with its rules and the
+aim-reach test; the proofs run again with it), step 4 (the links check), step 5 (the time unit).
+1. **The time unit** (step 5; about 340 lines by the designs' count, about 800 written at 4a's rate) leaves first,
+   whole with its tests and its report, to 4b-2. Nothing in 4b-1 rests on it. It leaves if the count after step 4
+   is above 6,600.
+2. **The links check** (step 4; about 55 by the designs' count, about 130 written) leaves second, to 4b-2 (his
+   LINKS-CHECK (c) asks for it "in 4b": 4b-2 is still 4b). It leaves if the count after step 2b is above 7,300.
+3. **The map kind** (step 2b; about 480 by the designs' count, about 1,150 written) leaves third, whole with its
+   rules, the aim-reach constants and tie test and its generator classes, to 4b-2, where its first user (the
+   collision world) is. It leaves if the count after step 3 is above 6,300.
+Never leaves: the reader, the writer and the bundle with the movement kind; the reader's proofs (content items 1
+and 2) and the bounded fuzz run (his words: before the first value rests on the reader). If these alone reach
+7,450, I stop and ask.
 
 ## His answers of 2026-11-26 that bind 4b (word for word in the saved message)
 - CONTENT-SOURCE (c): "all our own. Keep the reader to what the content files need and refuse everything else,
@@ -94,11 +111,20 @@
    of devtools (narrower; changes the digest, so it would ride with step 6's batch and its own answer); the
    comment in `content`'s manifest names `tests/dependency_rules.rs`, which arrives with step 1's check.
 
+8. **His answers of 2026-11-26, 14:09:13 UTC** (`cs4-walk/mustafa-2026-11-26-size-4b.md`): SIZE-4B (b) as above;
+   "4b-1 starts now: no outside package, no wait for my Export, no browser check"; **FEATURE-COMPARE (a)**: "Two
+   named exceptions, each pinned to exact entries and versions, with tests and planted mistakes; any other
+   difference still stops every build. Conditions: a change of parry3d's version or of the two packages' versions
+   needs a new yes from me; the library's std stays off; the built-file check in 4b-2 keeps looking for SIMD and
+   fused multiply-add in the players' file; and the recorded match exercises the collision queries from the first
+   change-set that calls them, so native, Chrome and Firefox are compared on the real thing and not only on 10,000
+   rays. Recorded as a dated pointer for ADR 0002's next revision." 4b-1's report says in its first lines what
+   moved 4b from 5,410 to about 7,050 lines by the designs' count, and gives a new estimate for the first build he
+   can move a soldier in. His Export comes before the data step (step 8, in 4b-2).
+
 ## Current step
-**Waiting for Mustafa's letter for SIZE-4B** (any answer lets steps 1 to 5 start). Then: step 1's approved batch
-back into the tree (digests checked), committed and pushed with the foundation check's `content` half, and step 2
-(the reader and the writer). His FEATURE-COMPARE letter gates step 6 only. The question file:
-`cs4b-content/question-2026-11-26-feature-compare.md` (with its two dated additions).
+4b-1, step 1: the approved path-only batch back in the tree (digests checked against `deps-4b1.sha256`), with the
+foundation check's `content` half; first build; commit and push.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

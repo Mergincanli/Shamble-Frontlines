@@ -1,0 +1,13 @@
+[package]
+name = "content"
+version = "0.0.0"
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+# No dependency at all: the reader of the game's content files is all our own code (Mustafa's CONTENT-SOURCE (c),
+# 2026-11-26), and the simulation will depend on this crate (ADR 0002 part 3; ADR 0005's foundation line, which
+# crates/devtools/tests/dependency_rules.rs holds).
+
+[lints]
+workspace = true
