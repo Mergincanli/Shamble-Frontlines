@@ -149,7 +149,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   (the write's time, 14:09:14 UTC, is the main session's statement to docs-keeper). At d12e3a8
   `.github/workflows/toolchain.yml` is sha256 d017b83b82d412befb1cbb983a93215440e2b0e1608d2c8c749445db53e87fd8 and
   `packages/e2e/playwright.config.ts` 35abfd54fddb43d7bf8077b281c153c8625c22d863d04922afd0b7b1ecfe80c8, his two values
-  (read with `git show` by docs-keeper, 2026-11-26). CI on d12e3a8: to be read. Point 6's follow-up is CUT-ESCAPE-FIX
+  (read with `git show` by docs-keeper, 2026-11-26). CI: the push run on d12e3a8 green (toolchain 45836151624, gate and smoke 45836152061): the set-up passed with the upload action named, the two new steps skipped on a push, the runner's Firefox 160 "3 passed (12.5s)" with the replay test "first-loop.rec: 1800 steps, every shared hash as in the file", the job 5 min 45 s; the pull request run, the first that runs the two new steps, after the draft is opened. Point 6's follow-up is CUT-ESCAPE-FIX
   (`docs/STATUS_ARCHIVE.md`, "From ci-preview-handover"), where security-auditor's fuller form of the fix (its own copy
   of the workspace, its processes ended with the step: `security-auditor-ci.md`, SA-1, in the same notes) stands beside
   his words. Copied by script (1305 bytes, sha256 117acbaf961449dcf96cb87012776140309726104b9414d6bf9f8df882a8b145):

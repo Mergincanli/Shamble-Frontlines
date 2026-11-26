@@ -1845,14 +1845,16 @@ _Moved from STATUS (2026-11-26, ci-preview-handover's docs pass, under his OLD-L
     d12e3a8]). In the container the check passed on the real production build (5 files, 892,209 bytes) and failed on
     each of seven planted faults (`trials.md`, `question-2026-11-26-ask2.md`). The upload step has never run; its proof
     is the pull request run's log: its file count against the check's (counts, not bytes: infra-engineer's IE-5), the
-    digest and the artifact id. CI: to be read.
+    digest and the artifact id. CI: the push run on d12e3a8 skipped both steps, as meant; the pull request run is their first. No consumer yet: lane 2's `preview.yml` is not on main, and a
+    `workflow_run` starts only from main's copy, so no preview starts until it is (infra-engineer; "Open bugs and
+    risks", the ci-preview-handover entry).
   - TOKEN-WORDS (the #64 block above): **done** on the branch, closed when it merges (`toolchain.yml:94`), with two
     comments the new steps would have made false (`:4`, `:130`) [verified 2026-11-26 at d12e3a8].
   - FIREFOX-REPLAY (his block of 2026-11-26, point 2; 4A-FIREFOX-REPLAY in the 4a block above): **done** on the
     branch, closed when it merges: the `firefox` project's `testDir` is `./tests` with `testMatch`
     `["rules/**/*.spec.ts", "replay/**/*.spec.ts"]` (`packages/e2e/playwright.config.ts:38-40` [verified 2026-11-26 at
     d12e3a8]). In the container's Firefox 161.0, 3 passed, the replay test "first-loop.rec: 1800 steps, every shared
-    hash as in the file" (`trials.md`); in the runner image's Firefox: CI: to be read. A red, a time-out or a hash
+    hash as in the file" (`trials.md`); in the runner image's Firefox 160 on d12e3a8: "first-loop.rec: 1800 steps, every shared hash as in the file" (toolchain 45836151624). A red, a time-out or a hash
     difference there comes to him before any change and is never re-run for a green (his point 2; plan R2-4).
   - CUT-ESCAPE-FIX (his words of 2026-11-26, 15:05 Amsterdam, point 6: "CUT-ESCAPE stays on record as accepted. Put
     its later fix (the cut's code as its own throwaway user) into STATUS as a follow-up."; when: not named by him;
@@ -1885,7 +1887,7 @@ _Moved from STATUS (2026-11-26, ci-preview-handover's docs pass, under his OLD-L
     into main, so `preview-site` is the build of that merge, not of the pull request's head commit [assumed: from
     the plan and the review, not read in GitHub's docs by docs-keeper].
   - PH-TIME (plan R2-10): the job's time on the first run, against its 15-minute limit (`toolchain.yml:38`); main's
-    last run took 6.0 minutes (infra-engineer). CI: to be read.
+    last run took 6.0 minutes (infra-engineer). On d12e3a8 the job took 5 min 45 s (the push run).
   - PH-ACTIONS-SETTING (his 15:05 point 5; infra-engineer's one unknown): if the repository's Actions settings allow
     only chosen actions without `actions/upload-artifact`, every run fails at its start; the first run on the draft is
     the test, and such a failure goes to him with the setting to change.
@@ -2256,6 +2258,17 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   3. The inventory's line numbers hold after phase 1's move: `git mv` kept the bytes and the line numbers (foundation
      2.1b, PR #51: five pure renames, the blobs equal at 76b4f7a and at the move commit c090843), so its citations hold
      with the prefix `legacy/` (`shamble-game.js:N` is `legacy/shamble-game.js:N`) [verified 2026-11-11].
+- **ci-preview-handover, the preview hand-over step** (2026-11-26, no pull request number yet; the evidence: `plan.md`,
+  section 6, and `security-auditor-ci.md` in `.checkpoints/ci-preview-handover/`; the follow-ups: the block "From
+  ci-preview-handover" in "Follow-ups"):
+  1. The upload runs after the cut on the build the cut's code wrote: CUT-ESCAPE, accepted (his words of 2026-11-26,
+     15:05 Amsterdam, point 6), its acceptance now also resting on lane 2's preview treating the build as data
+     (PH-SA-2); its fix is CUT-ESCAPE-FIX.
+  2. The artifact `preview-site` can be downloaded by any signed-in GitHub user for 7 days: the production page only,
+     which the preview publishes anyway (the plan's risks; security-auditor: no finding).
+  3. No consumer yet: lane 2's `.github/workflows/preview.yml` is on its own branch, not in this branch's
+     `.github/workflows/` (gate.yml and toolchain.yml only [verified 2026-11-26]); a `workflow_run` starts only from
+     main's copy, so no preview starts until lane 2's file is on main (infra-engineer).
 - **Change-set 4a of the v2 build plan, "The recording"** (2026-11-25, PR #70, a draft; the evidence: the chat's card
   and `round1-fold.md` in `.checkpoints/cs4a-recording/`, folded into 4a's report before the pull request is ready):
   1. The tests that read the recordings still follow a link (4A-S3-READ): CI cannot go green with one, since the folder

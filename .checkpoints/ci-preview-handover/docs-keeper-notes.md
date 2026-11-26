@@ -42,3 +42,16 @@ Old and new text of every corrected or moved line: docs-keeper-old-new.md.
   firefox), toolchain.yml ("before the cut"; the firefox tests; the check and the upload), + the report row (date order).
   repo-map-check: exit 1, one line only: "in the map but not in the repository:
   docs/reports/2026-11-26-ci-preview-handover.md" (expected until the main session writes the report; no stub made).
+- ROADMAP.md: done, 398 -> 413 lines. New entry on top of "Recent work" (12 entries now); Part 15 folded into "Build
+  history" by script; dated pointers under 4a (merged #70, merged_at 2026-11-26T12:22:01Z) and ci-after-3a (merged #71,
+  merged_at 2026-11-25T20:49:09Z, head c9460ca), both read with gh's REST route.
+- Drift: START_HERE, MODULE_MAP, TECHNICAL, ART_DIRECTION, ANIMATION_PLAN: no claim about toolchain.yml, the firefox
+  project or the replay test (grep); nothing to fix.
+- After the advisor tool's read: REPO_MAP's [verified] tag narrowed (the upload key clause is security-auditor's,
+  [assumed]); STATUS 4A-FIREFOX-REPLAY "his block of 2026-11-26, 13:20 Amsterdam"; "no consumer yet" (preview.yml not in
+  `.github/workflows/`: gate.yml and toolchain.yml only, Glob) in the archive's hand-over item, the STATUS row and the
+  REPO_MAP row; a ci-preview-handover entry in the archive's "Open bugs and risks" (CUT-ESCAPE, the 7-day artifact, no
+  consumer yet); STATUS Open risks CI line + the 7-day artifact. Re-checked: STATUS 120 lines, archive 2389, decisions
+  --check OK x4, repo-map-check exit 1 (the report row only). docs-keeper-old-new.md's diff section rebuilt once.
+- Departure: that rebuild ran `git diff` from inside a python3 script (read-only), not as its own command (his interim
+  rule); the first copy of the section used git directly.

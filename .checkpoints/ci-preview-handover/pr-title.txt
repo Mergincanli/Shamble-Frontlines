@@ -1,0 +1,1 @@
+ci-preview-handover: the tested build handed to the preview workflow (with its check), TOKEN-WORDS, and the replay test in GitHub's Firefox

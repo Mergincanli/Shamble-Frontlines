@@ -267,6 +267,15 @@ With the merge he answered OLD-LINES, who may fold old lines in the shared recor
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**The preview hand-over step [2026-11-26, in flight]** — ci-preview-handover, by the chat he calls CI Builder, on his
+block of 2026-11-26 (risk tier 2; CI and the test configuration only): at the end of the `toolchain` job, on pull
+requests from this repository only, a check that the tested player build holds only plain files and folders with no
+dot names, then its upload as `preview-site` (7 days) for lane 2's preview workflow, by `actions/upload-artifact`
+v7.0.2 pinned by commit (his UPLOAD-SOURCE (a), GUARD-STEP (a), HIDDEN-FILES (b)); TOKEN-WORDS; the recording's replay
+test joins the rule tests in Firefox (FIREFOX-REPLAY: 3 passed in the container's Firefox 161). CUT-ESCAPE stays
+accepted, its fix a follow-up (his words). Written at d12e3a8 on his CI-WRITE-3 (a); CI: the push run on d12e3a8 green (toolchain 45836151624, gate and smoke 45836152061): the set-up passed with the upload action named, the two new steps skipped on a push, the runner's Firefox 160 "3 passed (12.5s)" with the replay test "first-loop.rec: 1800 steps, every shared hash as in the file", the job 5 min 45 s; the pull request run, the first that runs the two new steps, after the draft is opened. Report
+`docs/reports/2026-11-26-ci-preview-handover.md`; waits for the advisor agent's review of the final head and his go.
+
 **Change-set 4a of the build plan, The recording [2026-11-25]** — cs4a-recording (the first of change-set 4's four
 parts, his WALK-CUT (a); the recording came here from the old change-set 3c by his ORDER-3C (c)), by lane 1, built by
 the chat he calls Builder V4: a recorded match replays to the same hashes, tick by tick, natively (one process; two
@@ -279,6 +288,9 @@ straight from the state's one visitor, with no buffer; the hash report (PM-0004-
 check. 3,300 written lines against the stop line of 3,400 (his STOP-4A (a); the designs counted 1,365); the size
 ladder moved 3B-HOSTILE-ALLOC to the link simulator's change-set. Five reviewers in two rounds, all APPROVE in round 2.
 Report `docs/reports/2026-11-25-cs4a-recording.md`. PR #70; it merges on his go for the head the advisor agent approves, after his Advisor's merge check.
+_Pointer (2026-11-26, ci-preview-handover's docs pass): merged as PR #70, 2483e9a, 2026-11-26 12:22:01 UTC
+(`merged_at`), by merge commit, with the head 420b16b; gate, smoke and toolchain green on main (runs 45818982040 and
+45818982052)._
 
 **The small CI pull request after change-set 3a [2026-11-24 to 11-25, waiting for his go]** — ci-after-3a, by the
 chat he calls CI Builder (risk tier 2; CI and the test configuration only): the `toolchain` job runs every crate's
@@ -288,6 +300,9 @@ Firefox 160.0 (FIREFOX-TESTS (b), his FIREFOX-SOURCE (c)). The first GitHub run 
 runner's Firefox gives the page no WebGL), so by his rule decided in advance Firefox runs the rule tests only and its
 drawing tests are a follow-up (FF-DRAW). Green on code head 832268e (Chromium 16 passed, Firefox 2). Report
 `docs/reports/2026-11-25-ci-after-3a.md`; waits for the advisor agent's review of the final head and his go.
+_Pointer (2026-11-26, ci-preview-handover's docs pass): merged as PR #71, 07d673b, 2026-11-25 20:49:09 UTC
+(`merged_at`), by merge commit, by his tap with the head c9460ca pinned (his words of 2026-11-25, 21:50 Amsterdam,
+`docs/DECISIONS.md`)._
 
 **Guard fix: a wrapper's option values [2026-11-25, waiting for his go]** — guard-env-fix (PR #69, risk tier 2; SEC-U7B-1): the day guard reads env, nice and stdbuf options with their values, so git and gh behind them no longer skip its check;
 a form it cannot read asks the main session and refuses an agent; routines unchanged. Guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES; waits for the advisor agent's review of the final head and his go.
