@@ -31,7 +31,9 @@ exact text, sha256 or cmp equal to the copy, one commit for guard and tests.
 - Kit suites: routine-guard 1247 on main → 1437 → 1490 → 1499 → 1551/1551; settings 127/127; checkpoint 33/33.
 - Red first: the new rows failed on the guard before each step (92 on main's; 18; 10; 45 on 9ad6bc9's).
 - Gate PASS on 83bc2417 and on the merged head, checks 1-4 and 5b-5d; 5a smoke skipped here (Playwright cannot start
-  the container's Chromium), so CI's smoke is the evidence. Verifier: VERIFIER.
+  the container's Chromium), so CI's smoke is the evidence. Verifier: PASS with notes, 7 of 7 (diff scope; suites and
+  gate; red 45 on 9ad6bc9's guard and 195 on main's; size; every new mutant anchor once; SA-R2-2 on the hooks page;
+  a sweep rerun, 0 looser, 0 throws). Not verified: smoke here; Claude Code's version outside this container.
 - Sweeps, function calls only (no form was ever run live): round 4, 860,160 lines, 9ad6bc9 → head: 0 throws, 0 looser,
   147,077 stricter; hooks-r4b → head (253,080 lines): only stricter.
 - Against main, looser in 91 lines (ADV-R4-2), all present since round 1, by kind: 6 now pass, where the timeout
@@ -80,7 +82,8 @@ None. R4-END was decided (1); the order after this merge is his (MAIN-WALL, then
 review tracks with SOURCE-GO (a)).
 
 ## For Mustafa
-1. Your Advisor's merge check on head HEAD-SHA, then your go on that full id.
+1. Your Advisor's merge check on this pull request's head (its full id is in the chat), then your go on that id.
 
 The notes (plan, rulings, reviews, his messages) are deleted from the head and readable at SHA-NOTES under
-`.checkpoints/guard-wrappers.md` and `.checkpoints/guard-wrappers/`. CI on the head: CI-RESULT.
+`.checkpoints/guard-wrappers.md` and `.checkpoints/guard-wrappers/`. CI (gate, smoke, toolchain) runs on the pull
+request's head; the merge needs it green.
