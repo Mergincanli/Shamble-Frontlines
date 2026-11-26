@@ -419,7 +419,7 @@ GitHub (docs.github.com):
   continuation rule. The plant now puts the merge key in the workflow-wide env with no anchor: 18 of 18 caught
   (.gate/step26-r2-fix-out/mutate_lint4.txt). preview.mjs is unchanged since its sweeps (32/32, 22/25 stand).
   175 tests pass; gate PASS (--no-smoke); map OK; preview.yml sha256 31119c06 unchanged. Commit 84a3ea44 pushed alone
-  as the head (2026-11-26, after 01:00 UTC).
+  as the head (2026-11-26, its CI runs created at 00:44:05 UTC; corrected: it had said "after 01:00 UTC").
 - The CI proof of part 2: preview job tests 139612150805 (pull_request, 84a3ea44): "# tests 175", "# suites 13",
   "# pass 175", "# fail 0" at 2026-11-26 00:44:27 UTC; gate green (00:44:28); smoke and toolchain still running at
   the time of writing; wall-test red as expected (its planted jobs refused).

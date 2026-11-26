@@ -98,7 +98,7 @@ Fix pass: de6e4b58 (the runbook; reconcile's duplicate removal; the hand-over ma
 6fd0375d (tests: the lint, the failure paths, the command line): 148 tests; sweeps 32/32 and the test-engineer's
 22/25 (its 3 equivalents left). Round 2 on what changed (infra-engineer, test-engineer) running from ~23:39 UTC.
 Round 2 (B14, B15): infra APPROVE (two Lows), test REVISE narrow (N1, N2 Medium; N3 Low). The fix pass 80a9b6a8
-(pushed 2026-11-26 ~00:40 UTC; tests, two preview.mjs messages, runbook rebuild step 4; preview.yml unchanged):
+(pushed 2026-11-26, its CI runs created at 00:20:58 UTC; tests, two preview.mjs messages, runbook rebuild step 4; preview.yml unchanged):
 171 tests; the test-engineer's probes caught except its six follow-ups; lint mutants 14/14; sweeps 32/32 and 22/25;
 gate PASS (--no-smoke: local Chromium does not match tools' Playwright); map OK. No third round (Mediums).
 The security-auditor's round 2 (on ad2658a..80a9b6a8, plus the guard-ask finding) launched in the background.

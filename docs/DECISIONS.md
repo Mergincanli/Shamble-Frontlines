@@ -127,6 +127,26 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-26, 12:21:32 UTC: his answers on step 2.6 and the guard: GUARD-OFF (a), a new builder
+  chat with only this repository takes over the sensitive steps once this chat has finished the report and the docs
+  pass, its start block written by this chat, on Opus 5.5; MAIN-WALL-AGAIN (a); GUARD-KIT (a), the Guard fix chat
+  after its protection for main; GIT-IN-NODE (a), for this chat and the new one; TAG-CHECK (a), recorded as untested
+  with the reason; until the new chat has taken over, no change under .github/ or the kit, no main-folder move, no
+  merge** (the builder chat he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code
+  chat on his personal account; his label: "For Builder V2, from Mustafa (written with the main Advisor, 26 November,
+  13:20 Amsterdam)."; message 50bdbeb1-7142-429f-88fe-01b5ecd7ce6e, whole; extracted by script from the chat's
+  transcript). Records, not his words: the questions he answers are in
+  `.checkpoints/step-2-6-previews/questions-2026-11-26-guard.md` at
+  702f42c0 (the first four) and the report `docs/reports/2026-11-26-step-2-6-previews.md` at 8c8ad0d0 (TAG-CHECK).
+  Copied by script (1097 bytes, sha256 bf833cc877e0696ad202be3e13ec9c88138ad0f27eba03a28cf23db5a56c0534):
+> For Builder V2, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam).
+> 1. GUARD-OFF: (a). A new builder chat with only this repository takes over the sensitive steps, once you have finished the report and the docs pass. Write its start block for me: what is done, the branch and head, the approved texts with their sha256, what is left in order, and the guard check as its first act. It runs Opus 5.5, because it writes under .github/.
+> 2. MAIN-WALL-AGAIN: (a). It stands until the token sitting, and the token sitting waits for the Guard fix chat's protection for main.
+> 3. GUARD-KIT: (a). The Guard fix chat gets it after its protection for main.
+> 4. GIT-IN-NODE: (a), for your chat and the new one: main's tracked kit scripts may run git; a script a chat writes itself never runs git and never writes a protected file.
+> 5. TAG-CHECK: (a), recorded as untested, with the reason.
+> 6. Until the new chat has taken over: no change under .github/ or the kit, no main-folder move, no merge.
+> Unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-25, 22:56:01 UTC: "fixed": the environment page's bypass box saved unticked, as this chat
   asked after the failed check; and his yes to watching pull request #72 for CI results and comments** (the builder chat
   he calls Builder V2, lane 2 of the build, session_019YNMUSYpJGi1xxCjKgr4e5, a Claude Code chat on his personal

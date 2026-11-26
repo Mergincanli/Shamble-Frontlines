@@ -12,7 +12,9 @@ Foundation step 2.6: every pull request from this repository gets a public, unli
 on Cloudflare Pages, with one comment holding the link, and no click per preview.
 ## Outcome
 PARTIAL. Built, reviewed in two rounds, green in CI. Not yet done: the token sitting, the throwaway `wall-test.yml` out,
-the first live link (it needs the CI Builder's hand-over step, asked on #59). Stopped until his GUARD-OFF answer.
+the first live link (it needs the CI Builder's hand-over step, asked on #59). His answers of 2026-11-26 (12:21 UTC):
+a new chat with only this repository takes over these steps; until then no .github/ or kit change, no main-folder
+move, no merge.
 ## Plan and approval
 Plan revision 2 (c40f3f9): a `workflow_run` workflow on main's files, an environment `preview` limited to `main`, a
 previews-only Cloudflare account, guards G1 to G9. The advisor agent approved; his go 2026-11-25 19:36:53 UTC: TRIGGER
@@ -50,34 +52,31 @@ changed line 50 (`node --test hosting/preview.test.mjs`; `hosting/` fails on Nod
 - F2: the comment cannot report a missing build (his PREVIEW-MISSING-BUILD-COMMENT (a): the texts stay). F3: the PR
   number is matched in `comment`, not `read-url`. The month's count is an upper bound (deploy attempts), not exact as
   plan 2.3 said. `wall-test.yml` stays until the token sitting (M1's re-runs need it).
-- Process, from the record (B15, B16): 53 breaches of his interim git rule (a floor); three main-folder merges outside
-  the allowed forms (2026-11-18, 11-24, 11-25 21:00 UTC), each bringing only main's files among protected ones; the
-  guard absent since 2026-11-15; whether an ask in auto mode reaches him is open. The security-auditor rates this High
-  for the kit (Critical if the hooks ran and an ask was settled without him), outside this diff and not a follow-up;
-  the advisor agent: ESCALATE.
+- Untested, by his TAG-CHECK (a): a tag push against the environment rule. The reason: the rule admits the branch
+  `main` only ("1 branch and 0 tags allowed"), so a tag is outside it, and a tag test would need a new workflow text.
+- Process, from the record (B15, B16): 53 breaches of his interim git rule (a floor), and three main-folder merges
+  outside the allowed forms (2026-11-18, 11-24, 11-25 21:00 UTC), each bringing only main's files among protected ones.
+- The guard item: the guard absent from this chat since 2026-11-15, and whether an ask in auto mode reaches him open.
+  The security-auditor rates it High for the kit (Critical if the hooks ran and an ask was settled without him),
+  outside this diff and not a follow-up. The advisor agent: ESCALATE; his answers of 2026-11-26 settle it (below).
+- Left, by the advisor agent's review (D1): lane 2's STATUS lines are long single lines, as other lanes' are.
 ## Risks
-1. A guard that seems on but is not (this chat), and asks that may not reach him in auto mode (kit-wide).
-2. No token exists yet (his TOKEN-TONIGHT (b)): it waits for the Guard fix chat's protection for main; the
-   environment rule (M1) is the wall in front of it until then.
+1. A guard that seems on but is not (this chat), and asks that may not reach him in auto mode (kit-wide): his
+   GUARD-KIT (a) gives it to the Guard fix chat after its protection for main.
+2. No token exists yet (his TOKEN-TONIGHT (b)): it waits for the Guard fix chat's protection for main, and the
+   environment rule (M1) must still hold when it comes.
 3. Unproven until live: M5 to M11 (the first link, the comment, the headers served, reconcile, the count).
 ## Proposed next step
-After his GUARD-OFF answer, and once the Guard fix chat's protection for main is merged (his TOKEN-TONIGHT (b)): the
-token sitting with the security-auditor's conditions (a reload and screenshot of the
-environment page; both secrets by "Add environment secret"; no CLOUDFLARE_ secret elsewhere; M1 re-run; WALL_TEST and
-`wall-test.yml` removed), then the verifier, ready, and his go.
+The new chat with only this repository (his GUARD-OFF (a)), from Builder V2's start block: the guard check first;
+then, once the Guard fix chat's protection for main is merged, the token sitting with the security-auditor's conditions
+(a reload and screenshot of the environment page; both secrets by "Add environment secret"; no CLOUDFLARE_ secret
+elsewhere; M1 re-run; WALL_TEST and `wall-test.yml` removed); then the verifier, ready, and his go.
 ## Decisions needed
-1. GUARD-OFF: how the remaining sensitive steps run. (a) a new chat with only this repository, after this report; its
-   first act shows a guard prompt while he watches, and if none reaches him it works as in (b); (b) this chat, asking
-   him before each step. Recommend (a).
-2. MAIN-WALL-AGAIN: does his MAIN-WALL (b) stand, given the guard did not run? (a) until the token sitting, where his
-   rule asks him again; (b) withdraw now. Recommend (a).
-3. GUARD-KIT: a plan-first kit change-set for the Guard fix chat: show at start whether the guard is loaded, test
-   whether an ask in auto mode reaches him, no second repository in a chat that writes this one. Recommend yes.
-4. GIT-IN-NODE: does his git rule cover git inside scripts? (a) main's kit scripts may; a chat's own scripts never;
-   (b) never; (c) always. Recommend (a).
-5. TAG-CHECK: M1 did not measure a tag push. (a) record it as an unmeasured residual; (b) measure it with a tag job
-   (a new text and his yes). Recommend (a): the rule admits branch `main` only, and "0 tags allowed".
+None open. His answers of 2026-11-26 (`docs/DECISIONS.md`): GUARD-OFF (a), a new chat with only this repository takes
+over the sensitive steps; MAIN-WALL-AGAIN (a), it stands until the token sitting; GUARD-KIT (a), the Guard fix chat
+after its protection for main; GIT-IN-NODE (a), main's tracked kit scripts may run git, a chat's own scripts never;
+TAG-CHECK (a), untested, with the reason above.
 ## For Mustafa
-1. Answer GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT and GIT-IN-NODE (the questions file at commit 702f42c0 holds these
-   four in full) and TAG-CHECK (in this report only).
-2. Nothing to click now; the token sitting waits for the Guard fix chat's protection for main.
+1. Start a new Claude Code chat with only Mergincanli/Shamble-Frontlines, on Opus 5.5, and paste the start block
+   (`.checkpoints/step-2-6-previews/start-block-new-chat.md`).
+2. Nothing to click until the token sitting, which waits for the Guard fix chat's protection for main.
