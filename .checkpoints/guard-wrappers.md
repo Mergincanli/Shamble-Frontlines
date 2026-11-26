@@ -52,8 +52,14 @@
 25. STOPPED for Mustafa (his item 3: no fifth round, build nothing more; two options only: merge what is approved, or
     drop the change)
 
+26. Mustafa (2026-11-26 15:05): R4-END (1), merge what is approved; R4-1 recorded by class only (STATUS, report);
+    the report lists ADV-R4-2's 91 lines by kind; the interim rule stays until R4-1's fix merges; an ask reaches him in
+    Auto mode (a chat's own command, 14:07); order after merge: MAIN-WALL, then one guard change-set (R4-1's fix plus
+    GUARD-KIT; plan says whether it can fail closed), then the review tracks plus SOURCE-GO (a)
+
 ## Current step
-Waiting for Mustafa: merge what is approved, or drop the change (R4-END).
+Wrap-up in a detached worktree (.gate/merge-main): merge origin/main, docs-keeper, report, checkpoint deletion, push
+by name; then the advisor agent on that head, the verifier, his Advisor's merge check, his go.
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
@@ -83,6 +89,7 @@ Waiting for Mustafa: merge what is approved, or drop the change (R4-END).
 - MAIN-WALL next, before the review-tracks plan; each kit write asked with its exact text · Mustafa · 2026-11-25 20:35
 - R3-WAY (a): xargs asks in a session, refuses an agent, unless a read-only program follows; round 4 is the last · Mustafa · 2026-11-25 23:59
 - Queue: this, MAIN-WALL, GUARD-KIT (a), review tracks; no second repository in this chat · Mustafa · 2026-11-26 13:20
+- R4-END (1): merge what is approved; R4-1 by class only; order MAIN-WALL, guard (R4-1 + GUARD-KIT), review tracks + SOURCE-GO (a) · Mustafa · 2026-11-26 15:05
 
 ## Running work
 - none
