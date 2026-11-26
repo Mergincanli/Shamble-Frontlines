@@ -252,6 +252,35 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     security-auditor, each at max effort on Opus, on `git diff origin/main...HEAD -- crates packages`; the common
     brief is `cs4b-content/review-brief-4b1.md`; their notes `<name>-review-4b1.md`. test-engineer follows.
 
+22. **His VISION-RULE, version 2** (2026-11-26, 15:51:38 UTC; it replaces his block of 15:35:38 by its own
+    words): saved by script (`cs4-walk/mustafa-2026-11-26-vision-rule-v2.md`) and entered in `docs/DECISIONS.md`
+    with his four other messages of the day to this chat, by `decisions-4b1.mjs` (write at 4dffb47, then check:
+    every quoted line byte for byte). docs-keeper has the pointers in `docs/adr/README.md` and the STATUS line.
+23. **Review round 1, engine-architect: DONE** (`engine-architect-review-4b1.md`): no Critical or High; all 13
+    departures fine; it agrees on SIGHT-FLAG (no flag in 4b; for 4b-2: one collider per shape with the shape's
+    index on every leaf, blocking kept out of the tree's structure; maps before the flag mean "every shape blocks
+    movement, shots and sight"). Its findings, for the one fix pass after all three reviewers:
+    - EA-1 Medium: the scan (`crates/sim/tests/rules_scan.rs`) was to cover `crates/content/src` (hashed maps,
+      clocks, unwrap/expect/panic) and does not; CI runs no clippy, so the content crate's deny lints hold only
+      by hand. FIX: extend the scan as the sheet's step 2 planned, with planted breaches.
+    - EA-2 Medium: `Form::Ramp(Toward)` cannot become the map's TypeScript shape at step 9 (ts-rs renders it as
+      an object intersected with a string union). FIX now: `Form::Ramp { rises_toward: Toward }` (no change to
+      the file format).
+    - EA-3 Low: `dependency_rules.rs` refuses every table but [package] and [lints]; step 9 must give content
+      exactly one dev-dependency (ts-rs). FIX: say so in the rule.
+    - EA-4 Low: what replaces the two time units at step 6 is written only in the notes. FIX: one sentence in
+      `sim/src/time.rs` and a STATUS follow-up.
+    - EA-5 Low: `group` on a shape is a required key with no reader. FIX: drop it while no file exists.
+    - EA-6 Low: which way `facing_deg` 0 points and which point `at` names are not pinned, and step 8 writes the
+      first map. FIX: `at` pinned now (the ground between the feet, the design's own); the facing's zero is
+      pinned at step 8 before the first spawn is written (a STATUS follow-up and a line in the map's doc).
+    - EA-7 Low: `time.rs` says durations are converted when a file is read; the movement kind keeps seconds.
+      FIX: one wording.
+    - EA-8 Low: the doc of `Error` says 0:0 means the whole document; it also means "this field, no place".
+    - Its notes for 4b-2 (no findings): step 9's TypeScript cap of 8,388,608 needs its own tie; the bundle's
+      outer shape has no Rust struct for the type writer; `f64::round` (map.rs, time.rs) enters the players'
+      file at step 9, so step 7's libm rule must allow it or the code rounds in whole numbers.
+
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
   on the line after a `cat` that wrote that file, in one call (2026-11-26, about 16:46 Amsterdam). It staged that
@@ -300,6 +329,6 @@ in); the advisor agent on the head; `.checkpoints/` out of the head; the draft p
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- rust-reviewer, engine-architect, security-auditor (review round 1 on ef2edec, started 2026-11-26 16:47
-  Amsterdam). No saver runs: the main session commits
+- rust-reviewer and security-auditor (review round 1 on ef2edec, started 2026-11-26 16:47 Amsterdam);
+  docs-keeper (the docs pass's first part, started 2026-11-26 17:10 Amsterdam). No saver runs: the main session commits
   the notes by hand.
