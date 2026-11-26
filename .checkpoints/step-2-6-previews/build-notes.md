@@ -318,6 +318,10 @@ GitHub (docs.github.com):
   - preview.mjs sweeps on a fresh copy, every anchor applied: scripts/mutate.py 32 of 32; scripts/mutate_te.py
     22 of 25, the same three survivors as before
     (T11, T20, T23, which the test-engineer judged equivalent in round 1).
+  - Gate PASS with --no-smoke (local Chromium does not match tools' Playwright, so 5a cannot start here; CI runs it);
+    map OK (203 entries). Commit 80a9b6a8 pushed alone as the head (2026-11-26 00:20:58 UTC runs). The CI proof:
+    preview run 45728095646, job tests 139602952533 (pull_request, 80a9b6a8): "# tests 171", "# suites 13",
+    "# pass 171", "# fail 0" at 00:21:20 UTC.
 - The infra-engineer's two Lows: preview.mjs's two token messages name the runbook's sections ("The token", "To
   renew"); the runbook's rebuild step 4 goes through renewal step 5 (the end date in STATUS) and adds both secrets
   with "Add environment secret".

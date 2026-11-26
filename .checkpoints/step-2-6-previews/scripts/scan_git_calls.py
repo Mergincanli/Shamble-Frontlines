@@ -40,22 +40,25 @@ with open(path) as f:
             if gits == [0] and len(parts) == 1: continue  # a clean call: git or gh alone
             before = firsts[:max(gits)]
             if gits[0] > 0:
-                kind = 'cd in front' if firsts[0] == 'cd' else ('in a loop' if 'for' in firsts[:gits[0]] else f'{firsts[0]} in front')
+                w = firsts[0]
+                kind = 'A: ' + ('a variable assignment' if re.match(r'^[A-Za-z_][A-Za-z0-9_]*=', w) else w) + ' starts the call'
             elif len(gits) > 1:
                 others = [w for w in before if w not in ('git', 'gh')]
-                kind = f'git first, then {others[0]} and git again' if others else 'git, then git again in the same call'
+                kind = 'B: git starts the call; a later git follows ' + (others[0] if others else 'another git')
             else:
-                kind = 'git first, other commands after'
+                kind = 'C: git alone first, other commands after'
             rows.append((ts[:19].replace('T', ' '), kind, cmd.split('\n')[0][:100]))
 
-breach = [r for r in rows if r[1] != 'git first, other commands after']
-after = [r for r in rows if r[1] == 'git first, other commands after']
-print(f"# Git and gh calls since {since} UTC that did not start their own call\n")
-print(f"Breaches (something in front of a git or gh command): {len(breach)}. Git first with other commands after it "
-      f"(not in front, listed for completeness): {len(after)}.\n")
+breach = [r for r in rows if not r[1].startswith('C:')]
+after = [r for r in rows if r[1].startswith('C:')]
+a = [r for r in breach if r[1].startswith('A:')]; b = [r for r in breach if r[1].startswith('B:')]
+print(f"# Git and gh calls since {since} UTC that did not start their own call (this chat only, not its agents)\n")
+print(f"Breaches: {len(breach)}. A, something other than git or gh starts the call (cd, a variable assignment, another "
+      f"program): {len(a)}. B, git starts the call but a later git or gh command in the same call follows other "
+      f"commands: {len(b)}. Not counted, C, git alone first with other commands after it: {len(after)}.\n")
 from collections import Counter
-for k, n in Counter(r[1].split(' in front')[0] + (' in front' if ' in front' in r[1] else '') for r in breach).most_common():
+for k, n in Counter(r[1] for r in breach).most_common():
     print(f"- {k}: {n}")
 print("\n| Time (UTC) | Shape | The call's first line (cut at 100 characters) |\n|---|---|---|")
-for r in breach + after:
+for r in sorted(a) + sorted(b) + sorted(after):
     print(f"| {r[0]} | {r[1]} | `{r[2].replace('|', '/')}` |")

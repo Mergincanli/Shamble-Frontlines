@@ -18,6 +18,11 @@ M = [
   ("L3 run block lines skipped", r"    if (!(r.step >= 0 && r.stepKey === 'run')) continue;", r"    if (!(r.step >= 0 && r.stepKey === 'run' && !r.inBlock)) continue;"),
   ("reader: a commented block header not a block", r"return /^[|>][0-9+-]*(?:\s+#.*)?$/.test(value);", r"return /^[|>][0-9+-]*$/.test(value);"),
   ("commandOf: the block header read as a command", r"return r.key === 'run' && !blockHeader(r.value) ? r.value : '';", r"return r.key === 'run' ? r.value : '';"),
+  # round 2, the security-auditor's two Mediums
+  ("L0 anchors, aliases and merge keys not flagged", r"|| /^\s*(?:- )?<<\s*:/.test(r.line)) flag('L0', r, 'a YAML anchor, alias or merge key');", r"&& false) flag('L0', r, 'a YAML anchor, alias or merge key');"),
+  ("L0 merge keys not flagged", r"|| /^\s*(?:- )?<<\s*:/.test(r.line)) flag(", r") flag("),
+  ("L0 a folded run not flagged", r"if (r.key === 'run' && /^>/.test(r.value)) flag(", r"if (false) flag("),
+  ("L0 a continued value not flagged", r"if (r.step >= 0 && r.key === null && !r.item) flag(", r"if (false) flag("),
 ]
 bad = []
 for name, find, repl in M:
