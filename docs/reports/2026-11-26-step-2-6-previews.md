@@ -74,9 +74,10 @@ elsewhere; M1 re-run; WALL_TEST and `wall-test.yml` removed); then the verifier,
 ## Decisions needed
 None open. His answers of 2026-11-26 (`docs/DECISIONS.md`): GUARD-OFF (a), a new chat with only this repository takes
 over the sensitive steps; MAIN-WALL-AGAIN (a), it stands until the token sitting; GUARD-KIT (a), the Guard fix chat
-after its protection for main; GIT-IN-NODE (a), main's tracked kit scripts may run git, a chat's own scripts never;
-TAG-CHECK (a), untested, with the reason above.
+after its protection for main; GIT-IN-NODE (a), main's tracked kit scripts may run git, a chat's own scripts never run
+git and never write a protected file; TAG-CHECK (a), untested, with the reason above.
 ## For Mustafa
-1. Start a new Claude Code chat with only Mergincanli/Shamble-Frontlines, on Opus 5.5, and paste the start block
-   (`.checkpoints/step-2-6-previews/start-block-new-chat.md`).
+1. Start a new Claude Code chat on your personal account (Builder V2's: one account per branch), with only
+   Mergincanli/Shamble-Frontlines, on Opus 5.5, and paste the start block
+   (`.checkpoints/step-2-6-previews/start-block-new-chat.md`); Builder V2 names the branch head when it hands it over.
 2. Nothing to click until the token sitting, which waits for the Guard fix chat's protection for main.

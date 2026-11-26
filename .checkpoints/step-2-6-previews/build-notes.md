@@ -430,3 +430,12 @@ GitHub (docs.github.com):
   report or STATUS; H2 drop or reword risk 2's tail ("the wall in front of it until then"); H3 the STATUS stamp names
   8c8ad0d0; H4 the report's rating sentence should sit with the guard item, not after the breaches; N1 (timing drift in
   the notes) still open. Its own slip: one read-only call ran two piped `git show` commands.
+- His answers of 2026-11-26 12:21:32 UTC (DECISIONS, by scripts/add_1320.py, 1097 bytes, sha256 bf833cc8...): GUARD-OFF
+  (a), MAIN-WALL-AGAIN (a), GUARD-KIT (a), GIT-IN-NODE (a), TAG-CHECK (a); item 6: until the new chat has taken over, no
+  change under .github/ or the kit, no main-folder move, no merge. Folded into the report and STATUS (266f42e7).
+- Main moved to 2483e9a7 (#70, lane 1's cs4a) at about 12:22 UTC; #72 now conflicts in the shared docs only (no rules or
+  CI file changed on main since 07d673b0). Not merged here (his item 6): the new chat takes main in first.
+- The advisor agent's review of 266f42e7 (advisor-head-266f42e7.md): REVISE narrow; his answers recorded correctly;
+  M1 (name the branch head: the new chat checks it against the commit named at hand-over), M2 (the account), M3 (the
+  checkpoint's current step), L1 to L3: fixed in the next commit. The guard probe read (not run): asks on any branch
+  except when HEAD~1 is origin/main's commit, hence "before any commit". Its own slip: a `$(echo)` inside a gh call.
