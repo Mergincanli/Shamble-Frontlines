@@ -128,6 +128,8 @@ committed with a report fix as b35c6c08 (pushed; checked before commit: lane 2's
 for byte under OLD-LINES (a)). Next: the advisor agent's review of head b35c6c08 (a general agent reading main's
 advisor.md; notes advisor-head-b35c6c08.md); then wait for his five answers (GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT,
 GIT-IN-NODE, TAG-CHECK). If GUARD-OFF (a): hand over to a new one-repository chat from this checkpoint.
+Head reviews done: b35c6c08 (ESCALATE; fixed in 5c1f6b72), 5c1f6b72 (ESCALATE, only Lows open: H1-H4, N1, D1
+ride the next push, see B16). Waiting for his five answers.
 Next (old list, still valid for the rest): the advisor agent's recorded verdict on GUARD (options: (a) finish 2.6's risky steps, U6, the token sitting and the merge, in a
 new one-repository chat from this checkpoint; (b) stay here with asks; plus a live probe only while he watches;
 plus the kit change-set to find out why, the security-auditor's recommendation); the question file in the notes,

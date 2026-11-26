@@ -423,3 +423,10 @@ GitHub (docs.github.com):
 - The CI proof of part 2: preview job tests 139612150805 (pull_request, 84a3ea44): "# tests 175", "# suites 13",
   "# pass 175", "# fail 0" at 2026-11-26 00:44:27 UTC; gate green (00:44:28); smoke and toolchain still running at
   the time of writing; wall-test red as expected (its planted jobs refused).
+- The advisor agent's review of head 5c1f6b72 (advisor-head-5c1f6b72.md): ESCALATE (the five decisions open; not
+  REVISE: only Lows open). R6, R1, R2-R5 and D2 fixed as claimed (the ROADMAP lines checked byte for byte by script);
+  STATUS 120 lines, only lane 2's lines 104 and 118 changed; CI gate, smoke, tests green on 5c1f6b72. Open Lows, for the
+  next push that is needed anyway (a Low never triggers a push on its own): H1 name D1 (long single STATUS lines) in the
+  report or STATUS; H2 drop or reword risk 2's tail ("the wall in front of it until then"); H3 the STATUS stamp names
+  8c8ad0d0; H4 the report's rating sentence should sit with the guard item, not after the breaches; N1 (timing drift in
+  the notes) still open. Its own slip: one read-only call ran two piped `git show` commands.
