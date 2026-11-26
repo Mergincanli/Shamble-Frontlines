@@ -10,8 +10,8 @@ the push stays summaries. U8's new stop is 6,230 lines." His S14-PUSH answer, wo
   lines). A new builder in a fresh worktree (isolation: worktree), not U8's builder ac59cce3e5d002441: its worktree
   (03d9ff3) holds those 43 files untracked, so its fast-forward would be refused (ffcheck 12:4x: 44 ADDED present).
 - The stop: 6,230, so U8-F1 adds at most 41 lines (the added column of `git diff --numstat <base>` over every file it
-  touches, tests included). Before an item would pass 41, stop and carry the rest, last item first: item 3, then item 2
-  (SR-2 goes with SR-1). Item 1 is the Medium and is never carried. If the check lets item 2's proof be a scratch run
+  touches, tests included). Before an item would pass 41, stop and carry the rest, last first: item 3, then item 1e's
+  pin test, then item 2 (SR-2 goes with SR-1). Item 1's other parts are never carried. If the check lets item 2's proof be a scratch run
   under .gate/ (recorded in the notes, not counted), item 2's PROMPT-R1.md line is never carried, only its test. Say
   what was carried and why.
 
@@ -34,16 +34,23 @@ the push stays summaries. U8's new stop is 6,230 lines." His S14-PUSH answer, wo
    e. **S14-PUSH (a)'s two conditions**, his words: "The redaction check runs on the s14 folder itself before the
       push, and its result is in the run's record. If a later change puts anything into that folder that names the
       server (a host name, a routed address, a hardware address), it stops and comes to me first."
-      - PROMPT-R1.md section 6 step 2, before the push: the clone's redact-check run on `<results>\r1\s14` itself; its
-        printed result saved as `s14-redact.txt` in the pushed set, its last line in step 4's three-line summary; a
-        finding means no push: stop and tell him.
-      - A test in ops/tests/s14.test.mjs pins what the folder can hold: every file npt-s14 and r1.sh's s14 block write
-        into it, kernel.txt's sources (uname -r, the listed net.ipv4 settings, `tc qdisc show`, /proc/loadavg),
-        probe.py's JSON keys, and its only addresses (198.51.100.1 and .2). Any other writer, key or address fails it
-        by name, with a message that such a change goes to Mustafa first (his S14-PUSH condition). One plant (an added
-        `uname -n` line): fails by name; restored by sha256.
-   Item 1, 1e included, is never carried. If item 1 alone would pass 41, stop before it does and report what grew,
-   why, and the cheaper option (his stop).
+      - Always built: PROMPT-R1.md section 6 step 2, before the push: the clone's redact-check run on
+        `<results>\r1\s14` itself; its printed result saved as `s14-redact.txt` in the pushed set, its last line in
+        step 4's three-line summary; a finding means no push: stop and tell him. And one R1.md sentence (section 7):
+        the s14 folder holds only the kernel's release (uname -r), the net.ipv4 settings, the load, the TCP counters,
+        the message times and the two documentation addresses; a change that would put anything naming the server
+        into it (a host name, a routed address, a hardware address) stops and goes to Mustafa first.
+      - A scratch run, not counted: redact-check on a fixture s14 folder under .gate/ (the files npt-s14 and r1.sh's
+        s14 block write, with made-up numbers): 0 findings expected, its output in your notes. A finding: stop and
+        report; no change to redact-check.
+      - The pin test, carried before item 2 if the lines run out (the check rules that order): a test in
+        ops/tests/s14.test.mjs pins what the folder can hold: every file npt-s14 and r1.sh's s14 block write into it,
+        kernel.txt's sources (uname -r, the listed net.ipv4 settings, `tc qdisc show`, /proc/loadavg), probe.py's JSON
+        keys, and its only addresses (198.51.100.1 and .2). Any other writer, key or address fails it by name, with a
+        message that such a change goes to Mustafa first (his S14-PUSH condition). One plant (an added `uname -n`
+        line): fails by name; restored by sha256.
+   Item 1's other parts are the Medium and his conditions, and are never carried. If they alone would pass 41, stop
+   before they do and report what grew, why, and the cheaper option (his stop).
 2. **SR-1, with SR-2:** one line in PROMPT-R1.md section 6 step 2, just before the push, in PowerShell:
    `git -C <results> rev-parse --git-path hooks`, `<results>` being the folder the push uses. It must print the clone's
    own hooks folder, the one holding pre-push; anything else: stop and tell him. Not `git config --get core.hooksPath`:

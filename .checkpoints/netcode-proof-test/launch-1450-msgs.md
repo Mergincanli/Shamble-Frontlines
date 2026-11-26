@@ -36,8 +36,8 @@ Your one check of U8-F1's brief, u8-f1-brief.md (written from your advisor-u8-he
 answer, word for word in history.md:8068-8088: "RESULTS-PUSH: (b). Only numbers leave the server and the push stays
 summaries. U8's new stop is 6,230 lines." Check: the 41-line budget and its carry order; the fresh worktree (U8's
 builder's own cannot fast-forward: ffcheck found 44 ADDED paths present); item 1's prints (numbers only; are the two
-policy strings inside his words?); item 1c's list and its `<S14>` fill (S14-PUSH: his answer `<answer, or none yet>`);
-item 2's test design; the round. Also rule: may item 2's four-way proof be a scratch run under .gate/, recorded in the
+policy strings inside his words?); item 1c's list (s14/ whole and s14-redact.txt: his S14-PUSH (a)); item 2's test
+design; the round; and where item 1e's pin test sits in the carry order against item 2's line. Also rule: may item 2's four-way proof be a scratch run under .gate/, recorded in the
 builder's notes and not counted in the 41, so that the one PROMPT-R1.md line always ships (your head read says the
 builder "proves it on a throwaway repository", not that the proof is a committed test)? It may be 15-20 lines alone;
 if yes, the line is never carried, only its test. His S14-PUSH answer (history.md:8090-8106) is (a), s14/ whole,
@@ -58,4 +58,4 @@ Two recorded checks, in this order, each in its own file:
    "Write the recipe once and have the advisor check it." Answer its Q1-Q4. Write advisor-light-takein.md.
 
 ## D. U8-F1's builder (a new general-purpose agent, opus, effort xhigh, isolation: worktree)
-u8-f1-brief.md as checked (B's conditions applied word for word), `<base>` and `<S14>` filled; sent in full.
+u8-f1-brief.md as checked (B's conditions applied word for word), `<base>` filled; sent in full.
