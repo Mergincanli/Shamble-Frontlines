@@ -244,6 +244,12 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   why not), L5 (the runbook's "Before the hand-over step is on main" is out of date since #74). Its read of his "your
   own next merge" (item 6 of its notes) went to him as ORDER-WALL (questions-2026-11-26-order-wall.md; recommended (a):
   the token sitting stays before #72's merge).
+- T10, main moved again (2026-11-26 18:00:25 UTC: #76, the Guard fix chat's main-wall, main 2671595; docs only:
+  DECISIONS, REPO_MAP, ROADMAP, STATUS, STATUS_ARCHIVE, TECHNICAL, two reports; nothing under .github/ or the kit, so
+  the main folder needs no fast-forward). #72 conflicts again (push.merge_conflict wake, 18:01:21 UTC). Held, as with
+  MERGE-74: main is taken in once, at the next head #72 needs (the docs pass before ready, or at his word sooner), so
+  one merge and one review cover all of main's moves while #72 waits on ORDER-WALL and the two merges under the wall.
+  Told him once.
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
