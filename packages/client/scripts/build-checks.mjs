@@ -685,6 +685,26 @@ export function libmProblems(names, allowed) {
   });
 }
 
+/**
+ * Crates that are in the lockfile and may not be in the players' file, each for its reason. `heapless` 0.8.0 has
+ * nine advisories of 2026-11-18 (RUSTSEC-2026-0574 to -0582: unsound, fixed in 0.9.4). It comes with the collision
+ * library's `alloc` feature through `rstar`, which the library uses in one file that it compiles only with its
+ * `spade` feature; our line leaves that feature off, so nothing reaches either crate. This holds that reading: a
+ * function of either in what was built stops the build. The version cannot move alone (`rstar` 0.13 asks for 0.8).
+ */
+export const UNLINKED_CRATES = ["heapless", "rstar"];
+
+/**
+ * One line for every function whose name holds one of `UNLINKED_CRATES` as a step: the crate's own functions, and
+ * the standard library's code as that crate uses it (a generic function's name ends in the crate that used it).
+ */
+export function unlinkedCrateProblems(names) {
+  return names.flatMap((name) => {
+    const steps = nameSteps(name);
+    return UNLINKED_CRATES.filter((crate) => steps.has(crate)).map((crate) => `${name}: a function of ${crate}, a crate the players' file is built without (build-checks.mjs, UNLINKED_CRATES, has the reason)`);
+  });
+}
+
 /** The target features the players' WebAssembly is built with on the pinned toolchain: these, each switched on, and no other. */
 // prettier-ignore
 export const TARGET_FEATURES_ALLOWED = [
@@ -722,6 +742,7 @@ export function twinProblems(bytes, what, allowed) {
     ...fusedMultiplyAddProblems(names).map((line) => `${what}: ${line}`),
     ...bannedMathsProblems(names).map((line) => `${what}: ${line}`),
     ...libmProblems(names, allowed).map((line) => `${what}: ${line}`),
+    ...unlinkedCrateProblems(names).map((line) => `${what}: ${line}`),
     ...instructionProblems(bytes, what, names),
   ];
 }

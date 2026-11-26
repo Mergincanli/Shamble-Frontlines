@@ -35,6 +35,8 @@ import {
   TEST_ONLY_FEATURES,
   tooLarge,
   twinProblems,
+  UNLINKED_CRATES,
+  unlinkedCrateProblems,
   walkedStamp,
   wasmCodeOpcodes,
   wasmFunctionNames,
@@ -746,6 +748,18 @@ describe("the built-file check", () => {
       expect(bannedMathsProblems(entry.routine.split("::"))).toEqual([]);
     }
     expect(MATHS_ALLOWED).toEqual([]);
+  });
+
+  test("a function of a crate the players' file is built without is refused: its own, and the standard library's as it used it", () => {
+    const POP = "_RNvMs0_NtCs7bQx2mK1pZa_8heapless11binary_heapINtB5_10BinaryHeapmNtB5_3MaxKj20_E3pop";
+    const NEAREST = "_RNvXs_NtNtCs9aB3cD4eF5g_5rstar9algorithm16nearest_neighborINtB4_24NearestNeighborIteratormENtNtNtNtCs4NIexwV1FGX_4core4iter6traits8iterator8Iterator4next";
+    const USED_BY = "_RINvNtCs4NIexwV1FGX_4core3ptr9drop_gluemECs9aB3cD4eF5g_5rstar";
+    const reason = "a crate the players' file is built without (build-checks.mjs, UNLINKED_CRATES, has the reason)";
+    expect(unlinkedCrateProblems([...NEAR, POP, NEAREST, USED_BY])).toEqual([`${POP}: a function of heapless, ${reason}`, `${NEAREST}: a function of rstar, ${reason}`, `${USED_BY}: a function of rstar, ${reason}`]);
+    // Near misses: the words inside another step, and a step of another length.
+    expect(unlinkedCrateProblems([...NEAR, "_RNvNtCs3ebraca0qhB_8sim_wasm9heapless2", "_RNvNtCs3ebraca0qhB_8sim_wasm6rstars", "restart_f2d81c7958bfd9f2"])).toEqual([]);
+    expect(twinProblems(twin({ bodies: [fn(), fn(), fn()], names: [OURS, CORE, POP] }), "the dev-profile twin", [])).toEqual([`the dev-profile twin: ${POP}: a function of heapless, ${reason}`]);
+    expect(UNLINKED_CRATES).toEqual(["heapless", "rstar"]);
   });
 
   test("a clean twin passes, and each rule refuses its own planted module by name", () => {
