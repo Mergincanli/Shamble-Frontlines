@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 00:24 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 00:42 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -726,7 +726,13 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     50 m lane with posts) is taken too; the bundle of both is 8,375 bytes. The table's draft is
     `cs4b-content/testlines-table-draft.json` (16 rows: 15 fields and "stamina is on").
   - Ten more plants in `plants-4b2.py` (T1 to T10), tried by hand, all caught.
-- **Ahead, by the count:** steps 6, 7 and 8's first part are 2,592 written lines for about 1,545 by the designs'
+- **Ahead, by the count, after step 10's core (3,999):** by the designs' way the work done is about 1,890 (steps
+  6 and 7, about 450 of step 8, about 440 of step 10), so the rate is 2.1. What is left by the designs' way is
+  about 1,760 (step 8's second part 100, step 9 830, step 10's wiring 100, step 11 240, step 12 490). At 2.1
+  the whole would end near 7,700: **past the first rung (6,750: the schema writer, step 11, moves to 4d) and
+  close to the second (8,000: the page's scene, step 12, moves to the start of 4c)**; with both moved it ends
+  near 6,200. Two thirds of the stop line (5,633) is not reached. Told to him in the update after this step.
+- **The count before step 10 (kept for the record):** steps 6, 7 and 8's first part are 2,592 written lines for about 1,545 by the designs'
   count (1.68 times). What is left (step 8's second part about 100, steps 9 to 12 about 2,100): at 1.68 the
   whole ends near 6,300; at 4b-1's 2.17 near 7,400, which passes the first rung (6,750: the schema writer moves
   to 4d) and stays under the second (8,000) and the stop line. Two thirds (5,633) is not reached.
@@ -835,6 +841,51 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   move; the nine ids as named ignores, with this reason, once cargo-deny or cargo-audit runs in CI.
 - **HEAPLESS-ADVISORY, as asked of him in the chat (00:05): withdrawn as a decision**, on security-auditor's
   judgement; it stays in the update and the report as a thing he is told.
+- **Step 10, the core (the static world on maps made in tests): DONE** (commit 8e5a268, pushed 2026-11-27,
+  00:42; the gate passes; the full local checks passed whole: 217 Rust tests twice, 216 in release, client 129,
+  sim-worker 51, 36 boundary tests, 19 browser tests in 205 s, the recordings unchanged, the players' file
+  unchanged; **3,999 written lines of 4b-2**, of 8,450: this part took 1,304, of which `collision.rs` is 845
+  with its eight tests; the sheet's count for the whole step is 540). The browser's proof: Chromium gives the
+  native lines, in 25 ms. Built before step 9, as said above; its wiring into the match (`LocalMatch`,
+  `CreateError::World`, the map by its id from the content set) follows step 9.
+  - `crates/sim/src/collision.rs` (the one file that names the library; the scan passes with it there):
+    `StaticWorld::build(&MapDocument)` (at most 512 shapes; shapes by id, so a shape's index is its rank; each
+    corner narrowed to `f32` once, a zero without its sign; a corner that is not finite, a shape without
+    thickness and a tree deeper than 31 refused by name; the library's binned tree over the stored corners;
+    `subtree_depth(0)`), `solids()`, `tree_depth()`, `tree_bytes()` (29 bytes a node, in the library's walk
+    order), and `cast_ray` under rust-reviewer's four conditions: one function (`enter_box`) for a node and for
+    a box, a subtraction and a division per axis on the stored corners, a zero direction as an inclusive range
+    check; a node pruned only when it is entered later than the best hit; the lower index of two hits at one
+    distance; a ramp (`enter_ramp`) as its box and one plane, never met before its box. No library arithmetic
+    in a ray. `crates/sim/src/vec.rs`: `V3`.
+  - **Tests in `collision.rs` (8):** the shapes' order (three document orders, the same bytes); every leaf's
+    box is its shape's own corners; no shape, one, two; a minus zero and a number too small for `f32`; the
+    refusals, each by name, with **rust-reviewer's chain of one-centimetre cubes: 31 are taken at depth 31, 32
+    are refused, all 34 are refused**; rays (down, level, slanted, from inside, in a face's plane, on an edge,
+    the tie on a shared plane, the limit to the last bit, numbers that are none); a ramp toward each of the
+    four sides; and our ramp against the library's own wedge from the same six corners: within a tenth of a
+    millimetre on more than 3,000 rays.
+  - **No memory in a ray:** `tests/state_hash_alloc.rs` counts 28,000 rays into the deepest tree a world may
+    have (31) and the fullest world (512): 0 allocations.
+  - **The same bits on every target** (`devtools::world_proofs`, `vectors/static-world.txt`, made natively): 12
+    seeded maps (0, 1, 2, 3, 17, 64, 200, 512, 512, 300, 100 and 31 shapes; boxes and ramps on the millimetre
+    grid, a third of them sharing a face's plane) and 2,000 rays each (a fifth straight down a shape's own
+    face plane); per map the tree's depth, a digest of its bytes and a digest of every ray's shape and
+    distance bits. **Equal natively in debug and in release, and in WebAssembly under Node in the release and
+    the dev profile**; the browsers' spec is in the local checks' run. The check bites (one digit changed: the
+    map is named).
+  - **What the library links, read with the built-file check's own rules on the test-only module** (the
+    players' file does not hold the world until its wiring): release 24 functions of parry3d, dev 470; **no
+    routine of the libm crate, no function of heapless or rstar, no vector instruction, no name of the older
+    scheme**, in either profile. So the maths allow-list stays empty for the world, as rust-reviewer read it.
+    For step 9, seen in that module: content's `f64::round` arrives as `C::round`, and a 128-bit multiply as
+    `C::__multi3` (an integer helper of the toolchain's): each will need its entry with its reason, or the
+    code changes, when content is first linked into the players' file.
+  - **Plants (W1 to W9 without W2), all caught:** the tie rule dropped; a touching ray missing; the minus zero
+    kept; the document's order kept; the depth cap raised; a ramp high on the wrong side; a ramp without its
+    slope; one ray's distance moved by one unit in the last place (the committed lines differ). **W2 withdrawn
+    as no defect:** with the zero-direction branch taken out, the division by zero gives the same answers
+    (infinities, and a NaN every comparison lets through); the branch stays because it says the rule in words.
 - **To do before 4b-2 merges:** the licence texts for the hosted build (a follow-up for lane 2).
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
   `cs4-walk/mustafa-2026-11-26-grey-colours.md`; read as his answer to the one question the chat's update before
@@ -851,6 +902,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   test run). All reads. Since then every git command stands alone in its call.
 - One more, at step 7 (2026-11-26, about 22:40 Amsterdam): a `git status --short | head` stood after a `grep` in
   one call. A read. Told to him in the step's update.
+- One more git command behind another program, at step 10's count (2026-11-27, about 00:40): `git status --short
+  | head -5` after the count's python script, in one call. A read. Told to him.
 - The card's entry for commit e3acb41 was first written with a push time of 00:31 when the clock read 00:24: a
   time ahead of the clock, typed and not read. Corrected before it was committed.
 - The chat's update of 2026-11-27 was headed "00:06 Amsterdam" and was written before 00:05:10 by the machine's
@@ -870,7 +923,10 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   after test-engineer's read, and in the report.
 
 ## Current step
-4b-2: steps 6 and 7 are done and green in CI. DIFF-LIST is asked of him
+4b-2: steps 6 and 7, step 8's first part and step 10's core are done and pushed (3,999 written lines). DIFF-LIST
+is asked of him and open. With his yes: step 8's second part, then step 9 (its held manifest line is approved by
+security-auditor on two digests), then step 10's wiring, then the look ahead before steps 11 and 12.
+(Earlier text of this section:) 4b-2: steps 6 and 7 are done and green in CI. DIFF-LIST is asked of him
 (`cs4b-content/question-2026-11-26-diff-list.md`; the board thread is on needs-musti). Step 8's first part (the
 tools, on test files) is built and in its local checks; then its commit, the count, the push, CI. After his yes:
 step 8's second part (his Export, its manifest and the table under `content/source/`, the movement table by the

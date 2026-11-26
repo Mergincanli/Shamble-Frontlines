@@ -18,6 +18,7 @@ OUT = []
 ENV = dict(os.environ, SHAMBLE_WASM_BINDGEN=f"{ROOT}/.gate/wb-tool/wasm-bindgen")
 BINDINGS, SIM, WORLD = "crates/sim-wasm/src/lib.rs", "crates/sim/src/lib.rs", "crates/sim/src/world.rs"
 CHECKS, BUILD, MANIFEST = "packages/client/scripts/build-checks.mjs", "packages/client/scripts/build.mjs", "Cargo.toml"
+WORLD_RS = "crates/sim/src/collision.rs"
 WALK, HELPER, HANDOVER = "crates/devtools/src/content_files.rs", "crates/devtools/src/files.rs", "packages/client/scripts/testlines.mjs"
 PKG = "packages/sim-worker/pkg/sim_wasm_bg.wasm"
 STAMP = "packages/sim-worker/pkg/built-file-check.json"
@@ -34,6 +35,8 @@ UNIT = ("node", "../../node_modules/vitest/vitest.mjs", "run", "scripts/build-ch
 HAND = ("node", "../../node_modules/vitest/vitest.mjs", "run", "scripts/testlines.test.mjs")
 FILES = ("cargo", "test", "-p", "devtools", "--locked", "--test", "content_files")
 READERS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "recordings", "the_committed_recordings")
+COLLISION = ("cargo", "test", "-p", "sim", "--locked", "--lib", "collision")
+PROOF = ("cargo", "test", "-p", "devtools", "--locked", "--test", "static_world")
 SCAN = ("cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan", "the_simulation_crate")
 def native(crate): return ("cargo", "test", "-p", crate, "--locked", "--test", "native_target", "--target-dir", ".gate/target-plant")
 
@@ -97,6 +100,27 @@ PLANTS = [
      ["a clean twin passes, and each rule refuses its own planted module by name"]),
     ("U3", "defect", "a second asker of the library is not seen when its line is indented or is a table of its own", [("crates/devtools/tests/dependency_rules.rs", ".any(|line| !line.trim_start().starts_with('#') && line.contains(\"parry3d\"))", ".any(|line| line.starts_with(\"parry3d\"))")], ("cargo", "test", "-p", "devtools", "--locked", "--test", "dependency_rules"),
      ["the_rule_reads_what_it_should_refuse"]),
+    # Step 10, the static world.
+    ("W1", "defect", "of two shapes at one distance the first visited wins", [(WORLD_RS, "t < hit.t || (t == hit.t && shape < hit.shape)", "t < hit.t")], COLLISION,
+     ["a_ray_meets_the_first_shape_on_its_way_and_the_lower_index_of_two_at_one_distance"]),
+    # No W2. Tried: with the zero-direction branch taken out, the division by zero gives the same answers on every
+    # ray of the tests (IEEE division: infinities for an origin beside the faces, a NaN on a face, and every
+    # comparison with a NaN is false, which lets the ray through as the inclusive check does). So that change is
+    # no defect a test could find; the branch stays because it says the rule in words and leans on no NaN.
+    ("W3", "defect", "a ray that only touches a face misses the box", [(WORLD_RS, "            if origin[axis] < min[axis] || origin[axis] > max[axis] {", "            if origin[axis] <= min[axis] || origin[axis] >= max[axis] {")], COLLISION,
+     ["a_ray_meets_the_first_shape_on_its_way_and_the_lower_index_of_two_at_one_distance"]),
+    ("W4", "defect", "a minus zero keeps its sign into the world", [(WORLD_RS, "        if value == 0.0 { 0.0 } else { value }", "        value")], COLLISION,
+     ["a_minus_zero_in_a_document_leaves_no_sign_in_the_world"]),
+    ("W5", "defect", "the shapes keep the document's order", [(WORLD_RS, "        order.sort_by(|a, b| {", "        order.sort_by(|a, b| { if true { return a.cmp(b); }")], COLLISION,
+     ["a_shapes_index_is_its_rank_by_id_whatever_the_documents_order"]),
+    ("W6", "defect", "a tree one deeper than the walks' stack is taken", [(WORLD_RS, "pub const MAX_TREE_DEPTH: u32 = 31;", "pub const MAX_TREE_DEPTH: u32 = 32;")], COLLISION,
+     ["a_document_that_gives_no_world_is_refused_by_name"]),
+    ("W7", "defect", "a ramp is high on the side it rises from", [(WORLD_RS, "        Toward::PlusX => (0, true),", "        Toward::PlusX => (0, false),")], COLLISION,
+     ["a_ramp_is_met_on_its_slope_its_faces_and_its_floor_toward_each_of_the_four_sides"]),
+    ("W8", "defect", "a ramp is met where its box is, slope or no slope", [(WORLD_RS, "        if rate < 0.0 {", "        if rate < 0.0 && false {")], COLLISION,
+     ["a_ramp_is_met_on_its_slope_its_faces_and_its_floor_toward_each_of_the_four_sides"]),
+    ("W9", "defect", "one ray's distance moved by one unit in its last place: the committed lines differ", [(WORLD_RS, "    Some((enter, leave))\n}", "    Some((if enter > 17.0 && enter < 17.01 { f32::from_bits(enter.to_bits() + 1) } else { enter }, leave))\n}")], PROOF,
+     ["this build gives", "and the file has"]),
     # Step 8, the tools.
     ("T1", "defect", "the content walk takes a link, a pipe or a folder for a file", [(WALK, "            if !kind.is_file() {", "            if kind.is_dir() && kind.is_file() {")], FILES,
      ["whatever_is_not_a_kinds_folder_with_plain_id_files_is_refused_before_it_is_read"]),
