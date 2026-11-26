@@ -1,4 +1,4 @@
-# LIGHT-TAKEIN: the recipe (DRAFT rev 0.1, 2026-11-26 05:4x UTC, the main session)
+# LIGHT-TAKEIN: the recipe (DRAFT rev 0.2, 2026-11-26 05:5x UTC, the main session; 0.2: the anchor taken after H0)
 **Not usable until the advisor agent's recorded check** (the advisor tool's read is an extra, not that check). His word:
 history.md:8053 (LIGHT-TAKEIN (a), 2026-11-25 20:48 UTC), read there. It covers only a move of main whose new merges
 touch only docs .md files (no CLAUDE.md, AGENTS.md, design doc or mark row), with main's CI green and at most one
@@ -18,8 +18,11 @@ call; git and gh always start their own command, with no other program in front 
 - E5, main's CI green: on SHA, the push runs of gate (jobs gate and smoke) and toolchain all completed with success
   (GitHub tools). Still running: wait. Any other conclusion: outside.
 - E6, at most one conflict, in STATUS.md's table: `git merge-tree --write-tree --name-only HEAD <SHA>` exits 0, or 1
-  with exactly one CONFLICT line, "CONFLICT (content): Merge conflict in docs/STATUS.md". Its tree T goes on the card
-  (the anchor); in `git show <T>:docs/STATUS.md` every line between the markers starts with `|` (table rows only).
+  with exactly one CONFLICT line, "CONFLICT (content): Merge conflict in docs/STATUS.md"; in `git show <its
+  tree>:docs/STATUS.md` every line between the markers starts with `|` (table rows only). This tree is not the anchor:
+  merge-tree writes the revisions as spelled into STATUS.md's marker lines, so the tree's id depends on the spelling
+  (05:5x: b518460 with 07d673b gives a2f8c1ac; MAIN-67's full H0 with origin/main gives its recorded 151318fe; the two
+  differ only in those two lines). The anchor T is taken at step 1.
 - E7, this branch's STATUS.md differs from main's only by its #40 row: `git diff --numstat <BASE> HEAD --
   docs/STATUS.md` prints "1 1" and its two lines are #40 rows; `git grep -n -F '| #40 |' <SHA> -- docs/STATUS.md`
   finds one row.
@@ -32,7 +35,8 @@ call; git and gh always start their own command, with no other program in front 
 
 ## Steps (MAIN-66's 1-7 in the forms the guard passed there; every number derived, none pinned)
 1. The resume line on the card by Edit (replacing); the saver stopped by TaskStop with its proof; H0 = HEAD, named in
-   the chat; the base light run `bash .checkpoints/netcode-proof-test/main-run.sh .gate/light-<SHA7>/light-base.log node
+   the chat; the anchor T = the first line of `git merge-tree --write-tree --name-only <H0, full> origin/main` (this
+   spelling only), on the card, with E6's shape checks again on it; the base light run `bash .checkpoints/netcode-proof-test/main-run.sh .gate/light-<SHA7>/light-base.log node
    check.mjs --only refs,marks,self,redact` gives N0, the marks line, S0 and R0 with its items. The no-save window opens:
    no hand save, commit or push until step 6; a Stop hook gets one line.
 2. `git rev-parse origin/main` prints SHA (else back to E0); the command named in the chat; `git merge origin/main`.

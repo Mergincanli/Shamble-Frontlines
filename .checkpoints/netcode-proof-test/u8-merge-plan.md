@@ -121,6 +121,20 @@ needs no go of his (as U4r's and U4f's); PR #40 keeps its own go.
   wip/u8-build.patch; `git add` of the two notes; staged exactly the 43 A, the D and the two M; the commit
   05c63a8a993653bacd44da30c1a46a702dfaf97c (46 files; under spikes/ 43 files, 6,189 insertions = U8's count); pushed by
   the card save that carries this line. Next: M9.
+- M9 (restart) 05:43-: pushed 6913070 (carries 05c63a8; its message has no skip marker; the workflows have no path
+  filter); the saver restarted as b2bls6lah; PR #40 subscribed again (its rules event re-sent); CI on 6913070 running:
+  push gate 45763469323 and toolchain 45763469324, pull request gate 45763476998 and toolchain 45763476991. All four
+  green closes M9; then the advisor's head read at 09:50 (launch-0950.md B). The rules event arrived 05:44 (read
+  05:47 by ReadNotifications); no steward or babysit skill in the tree.
+- DONE 05:5x: M3's mode bar (not run in either attempt until now): `git ls-files -s spikes/netcode-proof/ops` all 100644;
+  `find` in agent-ac59cce3e5d002441's ops/ finds no executable file: equal. Installs set their modes (lg.yaml:121-125,
+  rs.yaml:152-154). The part-clean in the card's form: "Removed 5369 files, 6.6GiB total"; lock and CACHEDIR.TAG there,
+  no debug; free 7,843 to 14,013 MiB. The automated security review of 05c63a8 (two Medium, ops/operator/settings.json:
+  SR-1 the hooksPath denies are literal-case while git config keys are not, :33-36; SR-2 no `Bash(git * -c *)` beside
+  PowerShell's :56): to the head read (launch-0950.md B), no hand fix.
+- DONE 05:4x-06:0x: M9's CI on 6913070 all green: push gate 45763469323 and toolchain 45763469324, pull request gate
+  45763476998 and toolchain 45763476991, each completed with success. U8's merge is done; its last bar is the
+  advisor's head read in the 09:50 window (launch-0950.md B).
 - (was) RUNNING since 00:35:4x: M5 (background shell b5xy9vavj; .gate/u8-merge/m5-check.log; fmt and clippy PASS by 00:37);
   u8-report.md drafted (its M5_RESULT and M7_RESULT to fill). If the chat was compacted meanwhile: read the log's end;
   all PASS and the ops lines 0 fail: go on to M7 (gate, repo map, the link removed), then M8 and M9; a FAIL: M6.
