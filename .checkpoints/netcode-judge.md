@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g`: first at
   e2c0e896 (parts a and b), now at its merged head 591e2cb0ab07 (NPT-L2-ONEWAY).
-- **Last update:** 2026-11-26 about 19:50 UTC, NPT-L2-ONEWAY built (1a637408), the reviewer's read running.
+- **Last update:** 2026-11-26 about 20:48 UTC, NPT-L2-ONEWAY built (1a637408), the reviewer's read running.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -228,7 +228,7 @@
     NOTE: `moved-table.mjs` rebuilds marks.json from the old base and would drop this line: do not run it again.
 
 ## Current step
-**NPT-L2-ONEWAY is built at 1a637408.** Running since about 19:50 UTC: the one reviewer's read (netcode-architect,
+**NPT-L2-ONEWAY is built at 1a637408.** Running since about 20:40 UTC: the one reviewer's read (netcode-architect,
 notes `netcode-architect-oneway.md`) and `check.mjs` whole on 1a637408 (output in the session's scratch folder).
 Then: a fix pass if needed, the final checks (judge tests, clippy, fmt, --check-marks, check.mjs whole, GitHub's
 gate, smoke and toolchain on the final SHA), the advisor agent's read of the head, the commit id to Mustafa; the
