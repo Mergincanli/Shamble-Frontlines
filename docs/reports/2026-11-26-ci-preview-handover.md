@@ -18,8 +18,9 @@ draft and watches the first run.
 - **TOKEN-WORDS:** "The only run step with the token" (line 94).
 - **FIREFOX-REPLAY:** the firefox entry runs the replay test beside the rule tests (`rules/**/*.spec.ts`,
   `replay/**/*.spec.ts`). It passed on its first run in Firefox, in the container (161) and on GitHub (160).
-- **Size:** 33 lines added and 5 removed in the workflow; 6 added and 4 removed in the test configuration (48
-  changed lines outside notes and docs, against his stop line of 300).
+- **Size:** 35 lines added and 5 removed in the workflow; 6 added and 4 removed in the test configuration (50
+  changed lines outside notes and docs, against his stop line of 300; `git diff --numstat` against main 2483e9a).
+  (Ask 2 said 33 added: its count left out the two added blank lines. The text he approved is unchanged.)
 
 ## Plan and approval
 - **Plan revision 1** (eb62201): the advisor agent's REVISE. Its High: steps run after the network cut for the first
