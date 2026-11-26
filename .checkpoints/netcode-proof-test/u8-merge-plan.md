@@ -103,6 +103,24 @@ needs no go of his (as U4r's and U4f's); PR #40 keeps its own go.
   (pgrep empty), the lane lock free (flock -n), main still 07d673b; the saver bzb64iuso stopped by TaskStop. M1: the
   patch's sha256 3e1cd5b5...a531 (= the restart line). Next: this line saved (it pushes the saver's terminated autosave),
   H0, the base light run, then M3.
+- DONE 05:17-05:2x (restart): saved and pushed 9aa6dde; H0 9aa6dde118ed3a9f9887589eb9016300fedc0079 (= origin, clean);
+  the no-save window opens. Base run (u8-merge/light-base-r.log, 05:18): refs 1939 (N0), marks 81 unchanged, self 78 of
+  78, redact 11 of 11, 378 items, 0 findings. M3/M4: `git apply --check --index` exit 0, `git apply --index` exit 0;
+  `git status --short`: the 43 paths, all A; `diff -rq` of U8's fix worktree (agent-ac59cce3e5d002441, 03d9ff3) ops/
+  against the main folder's: exit 0, no difference. M4c: package.json 8370495d... and package-lock.json a0efce8e...
+  equal in agent-abf71d95fc07b3522; its node_modules linked (`ln -s`). Next: M5 in the background (refs bar 1982 = N0 +
+  43; ops 101; wrappers 315 ok; then check.mjs's 11 steps).
+- DONE 05:19-05:41 (restart): M5 (background shell blq9lev0j; .gate/u8-merge/m5-check-r.log, exit 0): ops 101 of 101,
+  wrappers "315 ok, 0 failed", check.mjs all 11 PASS (test 861/958, 0 failed, 0 skipped; wasm 27,000 ticks, 0
+  mismatching; refs 1982 = N0 + 43; marks 81 unchanged; self 78/78; redact 11/11, 421 items, 0 findings). Free after the
+  cold build: 7,843 MiB.
+- DONE 05:4x (restart): M7: unlink (the install kept); gate --no-smoke GATE PASS; "repo map OK: 207 entries cover 110
+  required paths"; `git status --short`: the 43 A paths, notes only (the card, this plan, u8-report.md, and the new
+  launch-0950.md, light-takein-recipe.md, msg-2026-11-27.md). Next: M8 (u8-build.md's merge section, the commit), M9.
+- DONE 05:4x (restart): M8: u8-build.md's merge section and u8-report.md's M5 and M7 lines written; `git rm` of
+  wip/u8-build.patch; `git add` of the two notes; staged exactly the 43 A, the D and the two M; the commit
+  05c63a8a993653bacd44da30c1a46a702dfaf97c (46 files; under spikes/ 43 files, 6,189 insertions = U8's count); pushed by
+  the card save that carries this line. Next: M9.
 - (was) RUNNING since 00:35:4x: M5 (background shell b5xy9vavj; .gate/u8-merge/m5-check.log; fmt and clippy PASS by 00:37);
   u8-report.md drafted (its M5_RESULT and M7_RESULT to fill). If the chat was compacted meanwhile: read the log's end;
   all PASS and the ops lines 0 fail: go on to M7 (gate, repo map, the link removed), then M8 and M9; a FAIL: M6.
