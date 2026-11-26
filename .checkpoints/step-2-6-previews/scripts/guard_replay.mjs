@@ -8,23 +8,24 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { join } from 'node:path';
 
-const [transcript, since = '2026-11-15T20:01:46'] = process.argv.slice(2);
+const [transcript, since = '2026-11-15T20:01:46', until = '2026-11-26T00:10:00'] = process.argv.slice(2);
 const root = process.cwd();
 const { decide, realIo } = await import(pathToFileURL(join(root, '.claude/hooks/routine-guard.mjs')).href);
 const io = { ...realIo(), gh: () => ({ code: 1, out: '' }), env: { ...process.env, SHAMBLE_ROLE: '' } };
-const rows = []; const skipped = []; let total = 0;
+const rows = []; const skipped = []; let total = 0; const seen = new Set(); // a call can appear twice in the record: count it once
 for (const line of readFileSync(transcript, 'utf8').split('\n')) {
   let e; try { e = JSON.parse(line); } catch { continue; }
   const ts = e.timestamp ?? '';
-  if (ts < since || e.isSidechain) continue;
+  if (ts < since || ts >= until || e.isSidechain) continue;
   const content = e.message?.content;
   if (!Array.isArray(content)) continue;
   for (const b of content) {
-    if (b.type !== 'tool_use') continue;
+    if (b.type !== 'tool_use' || seen.has(b.id)) continue;
+    seen.add(b.id);
     const tool = b.name ?? '';
     if (!['Bash', 'Edit', 'Write', 'NotebookEdit', 'MultiEdit'].includes(tool) && !tool.startsWith('mcp__')) continue;
     total += 1;
-    if (tool.startsWith('mcp__github__') && /merge|create|update|push|delete|add_|write|request|resolve|fork|enable|disable/.test(tool)) {
+    if (tool.startsWith('mcp__github__') && /^(merge|create|update|push|delete|add|request|resolve|unresolve|fork|enable|disable)_|_write$/.test(tool.slice(13))) {
       skipped.push([ts.slice(0, 19).replace('T', ' '), tool]); continue;
     }
     const input = { hook_event_name: 'PreToolUse', tool_name: tool, tool_input: b.input ?? {}, cwd: e.cwd || root, session_id: 'replay' };
@@ -35,7 +36,7 @@ for (const line of readFileSync(transcript, 'utf8').split('\n')) {
     rows.push([ts.slice(0, 19).replace('T', ' '), tool, kind, shape.slice(0, 60), String(d.ask ?? d.deny).replace(/\|/g, '/').replace(/\n/g, ' ').slice(0, 220)]);
   }
 }
-console.log(`# Guard replay: this chat's calls since ${since} UTC through today's guard rules\n`);
+console.log(`# Guard replay: this chat's calls from ${since} to ${until} UTC through today's guard rules\n`);
 console.log(`Calls replayed: ${total - skipped.length} of ${total}. Would ask: ${rows.filter((r) => r[2] === 'ask').length}. ` +
   `Would refuse: ${rows.filter((r) => r[2] === 'deny').length}. GitHub write tools not replayed (their check reads GitHub): ${skipped.length}.\n`);
 console.log('| Time (UTC) | Tool | Verdict | Shape (first word or file) | The guard\'s reason (cut) |\n|---|---|---|---|---|');

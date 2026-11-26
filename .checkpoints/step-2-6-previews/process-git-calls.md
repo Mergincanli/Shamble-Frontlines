@@ -1,4 +1,4 @@
-# Git and gh calls since 2026-11-25T16:41:51 UTC that did not start their own call (this chat only, not its agents)
+# Git and gh calls from 2026-11-25T16:41:51 to 2026-11-26T00:10:00 UTC that did not start their own call (this chat only, not its agents; git run inside scripts not counted)
 
 Breaches: 53. A, something other than git or gh starts the call (cd, a variable assignment, another program): 31. B, git starts the call but a later git or gh command in the same call follows other commands: 22. Not counted, C, git alone first with other commands after it: 3.
 

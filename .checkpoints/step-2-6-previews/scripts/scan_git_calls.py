@@ -4,6 +4,7 @@
 # Usage: python3 scan_git_calls.py <transcript.jsonl> [since-ISO]
 import json, re, sys
 path = sys.argv[1]; since = sys.argv[2] if len(sys.argv) > 2 else '2026-11-25T16:41:51'
+until = sys.argv[3] if len(sys.argv) > 3 else '2026-11-26T00:10:00'
 
 def strip(cmd):
     out, lines, i = [], cmd.split('\n'), 0
@@ -20,17 +21,18 @@ def strip(cmd):
     return s
 
 SEP = re.compile(r"\|\||&&|[;|\n]|\bdo\b|\bthen\b|\belse\b|\(|`|\$\(")
-rows = []
+rows = []; seen = set()  # a call can appear twice in the record: count it once
 with open(path) as f:
     for line in f:
         try: e = json.loads(line)
         except Exception: continue
         ts = e.get('timestamp', '')
-        if ts < since: continue
+        if ts < since or ts >= until: continue
         c = (e.get('message') or {}).get('content')
         if not isinstance(c, list): continue
         for b in c:
-            if b.get('type') != 'tool_use' or b.get('name') != 'Bash': continue
+            if b.get('type') != 'tool_use' or b.get('name') != 'Bash' or b.get('id') in seen: continue
+            seen.add(b.get('id'))
             cmd = b.get('input', {}).get('command', '')
             parts = [p.strip() for p in SEP.split(strip(cmd))]
             parts = [p for p in parts if p]
@@ -52,7 +54,7 @@ with open(path) as f:
 breach = [r for r in rows if not r[1].startswith('C:')]
 after = [r for r in rows if r[1].startswith('C:')]
 a = [r for r in breach if r[1].startswith('A:')]; b = [r for r in breach if r[1].startswith('B:')]
-print(f"# Git and gh calls since {since} UTC that did not start their own call (this chat only, not its agents)\n")
+print(f"# Git and gh calls from {since} to {until} UTC that did not start their own call (this chat only, not its agents; git run inside scripts not counted)\n")
 print(f"Breaches: {len(breach)}. A, something other than git or gh starts the call (cd, a variable assignment, another "
       f"program): {len(a)}. B, git starts the call but a later git or gh command in the same call follows other "
       f"commands: {len(b)}. Not counted, C, git alone first with other commands after it: {len(after)}.\n")

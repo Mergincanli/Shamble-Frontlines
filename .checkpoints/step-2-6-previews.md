@@ -118,8 +118,12 @@ Mediums fixed in part 2 of the fix pass (175 tests; commit next). THE GUARD (B16
 since 2026-11-15 20:01:46 UTC, so no repository hooks load (platform doc + CLAUDE.md); my 17:15:56 UTC "Guard: yes"
 was wrong; treat the guard as absent: ask him in chat before any .github/ or kit change (wall-test.yml's removal
 at U6 included), every main-folder move other than the three allowed forms, and every merge (on his go anyway).
-Next: commit + push part 2 (each git call alone; head must be the code commit; confirm CI shows 175); the advisor
-agent's recorded verdict on GUARD (options: (a) finish 2.6's risky steps, U6, the token sitting and the merge, in a
+DONE 2026-11-26: part 2 pushed (84a3ea44; CI: 175 pass, gate, smoke, toolchain green; wall-test red as expected).
+The advisor agent's verdict on the guard: ESCALATE (advisor-guard.md); B15/B16 corrected; the question file
+questions-2026-11-26-guard.md (GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT, GIT-IN-NODE) pushed and sent to him.
+STOPPED UNTIL HIS GUARD-OFF ANSWER: wall-test.yml's removal, any .github/ or kit write, any main-folder move other
+than the three allowed forms, the token sitting, the merge. Allowed meanwhile: the report (U8), the docs pass, notes.
+Next (old list, still valid for the rest): the advisor agent's recorded verdict on GUARD (options: (a) finish 2.6's risky steps, U6, the token sitting and the merge, in a
 new one-repository chat from this checkpoint; (b) stay here with asks; plus a live probe only while he watches;
 plus the kit change-set to find out why, the security-auditor's recommendation); the question file in the notes,
 pushed, named with its commit; the report (U8) with the docs pass (STATUS, ROADMAP, REPO_MAP report row; follow-ups:

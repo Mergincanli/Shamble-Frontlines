@@ -338,8 +338,10 @@ GitHub (docs.github.com):
   - 2026-11-25 21:00:05 UTC: the main folder was fast-forwarded from 4fda80a4 to e3b3642b
     (origin/claude/optimistic-albattani-mdoonz: this branch's merge of main 07d673b0, made in the worktree
     .gate/merge-71), with `cd` and `git status` in front. That is not one of the three forms CLAUDE.md allows in the
-    main folder. It brought main's reviewed commits: one protected file, .github/workflows/toolchain.yml; nothing
-    under .claude/, no CLAUDE.md, no gate file. The guard's rules decide "ask" for that line, run offline
+    main folder. e3b3642b is this branch's own merge commit (main 07d673b0 merged in; this branch's side docs only).
+    Among protected files it brought only .github/workflows/toolchain.yml, identical to main 07d673b0's; nothing
+    under .claude/, no CLAUDE.md, no gate file (corrected after the advisor agent's verdict, advisor-guard.md: it had
+    said "main's reviewed commits"). The guard's rules decide "ask" for that line, run offline
     (scripts/guard_offline.mjs: the bare merge, the exact line and two other shapes all "ask"; the control
     `git merge --ff-only origin/main` allowed) and through the real hook command (three runs, 67 to 87 ms, each
     printing permissionDecision "ask"). No prompt reached Mustafa: the call finished 0.21 s after it was issued. The
@@ -363,24 +365,42 @@ GitHub (docs.github.com):
 - The guard, settled from records (corrects B15's "not known"):
   - This session has two repositories (get_session: Shamble-Frontlines and shamble-preview-check). The second was
     added at 2026-11-15 20:01:46 UTC (add_repo, push access; registered 20:09:51). The record's last hook trace is at
-    20:02:36 UTC; none after. The platform's documentation (read_documentation, session.permissions): the
-    repository's .claude/settings.json is read "only [by] a session with one repository"; CLAUDE.md says the same of
-    repository hooks. So the guard has not run in this session since then. Not tested live.
+    20:02:36 UTC; none after (on its own this proves little: most calls leave no trace even while the guard runs).
+    The platform's documentation (read_documentation, session.permissions) says of the repository's
+    .claude/settings.json: "only a session with one repository reads it"; CLAUDE.md says the same of repository
+    hooks. The session's transcript folder moved to `-home-user` (the parent of both repositories) at 2026-11-15 20:08
+    UTC. And the replay below finds 80 calls the guard would have asked about, none with a prompt in the record. So
+    the guard has not run in this session since then. Not tested live.
+  - Not ruled out (the advisor agent, advisor-guard.md): on 2026-11-15, while the guard was still loaded (one
+    repository, auto mode), its three asks (16:40:32, 16:41:41, 20:02:36 UTC) left no record of a prompt; one call
+    returned 3.5 s later. Whether an ask in auto mode reaches him at all is open (the security-auditor's Critical case).
   - My answer to his 2026-11-25 18:15 Amsterdam question, sent at 17:15:56 UTC, "Guard: yes. The hooks load the guard
     from my main folder at every call", was wrong. The report corrects it at the top.
   - The auto-mode classifier did act: at 2026-11-25 15:30:10 UTC it refused a plain `git merge origin/main` in the
     main folder ("Destructive or Unwanted Actions"); the merge was then made in the worktree .gate/merge-68.
-  - Replay (scripts/guard_replay.mjs; today's rules and today's repository state, read-only, GitHub stubbed): 1,649
-    calls since 2026-11-15 20:01:46 UTC; 1,582 replayed; 84 asks, 3 refusals; 67 GitHub write calls not replayed.
-    Main-folder asks: 10 = 4 in the test repository, 3 worktree merges (worktrees gone today, so the cd cannot be
-    followed: allowed at the time), 2 plain merges of main into the main folder on his written instruction
-    (2026-11-18 22:57:55, 2026-11-24 22:49:38), the 15:30:10 merge the classifier refused, and 21:00:05. Refusals:
-    3, all in the test repository (one `git checkout`, two `git switch -C`). The other 74 asks are writes the guard
-    could not resolve (a variable, a redirect after a cd). My only commit touching a protected file since
+  - Replay (scripts/guard_replay.mjs; today's rules and today's repository state, read-only, GitHub stubbed; each
+    call counted once): 1,578 calls from 2026-11-15 20:01:46 to 2026-11-26 00:10:00 UTC; 1,546 replayed; 80 asks, 3
+    refusals; 32 GitHub write calls not replayed. (The first run's 1,649 / 84 / 67 ran to a moving end and counted
+    GitHub read tools whose names contain "request" as writes; the advisor agent's 58 used its own list: not
+    reconciled further.) Main-folder asks: 10 = 3 in the test repository (11-15 20:09:44 and 20:58:17, 11-18
+    11:10:29), 3 worktree merges (worktrees gone today, so the cd cannot be followed: allowed at the time), 2 plain
+    merges of main made in the main folder (2026-11-18 22:57:55, 2026-11-24 22:49:38: his words named the merge, not
+    the folder, so these are the same kind of move as 21:00:05, a main-folder merge outside the three allowed forms),
+    the 15:30:10 merge the classifier refused, and 21:00:05. Refusals: 3, all in the test repository (one
+    `git checkout`, two `git switch -C`). The other 70 asks are writes the guard could not resolve (a variable, a
+    redirect after a cd). scripts/place_u2.py's comment "The guard asks Mustafa before this write" was false here: the
+    guard did not run. My only commit touching a protected file since
     2026-11-15 20:01 UTC is 9ded5a87 (the three approved workflow texts, 2026-11-25 20:54:10 UTC).
   - The interim-rule count (process-git-calls.md, regrouped): 53 = 31 calls started by something other than git
     (cd, a variable, another program) + 22 started by git with a later git after other commands; 3 more not counted
-    (git alone first, other commands after). This chat only, not its agents.
+    (git alone first, other commands after). This chat only, not its agents, and git run inside scripts is not
+    counted, so 53 is a floor. Agents: the test-engineer disclosed `cd ... &&` in front of read-only git calls in its
+    round 2; the advisor agent of 2026-11-26 ran its read-only git calls as `git -C <main folder>`, a shape the guard
+    refuses (routine-guard.mjs:1087).
+- The advisor agent's verdict (advisor-guard.md, 2026-11-26): ESCALATE. Stopped until his answer on GUARD-OFF:
+  wall-test.yml's removal, any .github/ or kit write, any main-folder move other than the three allowed forms, the
+  token sitting, the merge. The report, the docs pass and the notes go on, each git call on its own. Decisions for
+  him: GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT, GIT-IN-NODE (questions-2026-11-26-guard.md).
 - Part 2's sweep, honestly: the first two runs of the 18 lint mutants left "merge keys not flagged" alive, because
   the merge-key plant also carried an anchor (flagged first) and, inside a step, a `<<:` line is also flagged by the
   continuation rule. The plant now puts the merge key in the workflow-wide env with no anchor: 18 of 18 caught
