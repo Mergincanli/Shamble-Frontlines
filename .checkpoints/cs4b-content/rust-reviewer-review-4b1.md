@@ -112,3 +112,30 @@ Brief: .checkpoints/cs4b-content/review-brief-4b1.md. Target folder: .gate/rust-
   3,716 B) on the next: scheduling noise, not an input that is slow (nit: time it alone, or on thread CPU time).
 - [wasm size] content is not in sim-wasm's tree (sim has no dependency on content yet: crates/sim/Cargo.toml), so the
   players' file is unchanged; only the test-only module (devtools cdylib) grows. Agree with the brief.
+- [wasm runs] `node node_modules/vitest/vitest.mjs run --root packages/sim-worker --dir packages/sim-worker/boundary
+  content` on the main session's module of 15:45 (built after fdd9f0a; 230d9e9 touched only tests/aim_reach.rs; HEAD
+  1831a89 changes no crate or package file): 7 passed; verdict digests equal the native ones in both profiles (release
+  5.6 s, dev 45.6 s); limits 112 ms release, 1.9 s dev, module memory 51.3 MB (ceiling 64 MiB).
+- [no panic, grep] outside tests: no assert!; String::truncate at json.rs:280/:341 cannot panic (the path holds ASCII
+  only: keys pass is_key before they are pushed); windows(2); "0".repeat(n<=21); casts after range checks. No
+  HashMap/HashSet/Instant/SystemTime in content or the new devtools library code.
+- [nits] content_proofs.rs:473 (and the brief's departure 3) say four classes run a tenth: three do (verdicts file: 3
+  classes at 50). content_proofs.rs:1101 "the megabyte inputs are spaces": "more values than a document holds"
+  (~115 KB of array entries) is folded by its length only. number.rs:74-75 cites Number::toString step 5 for the even
+  rule; the normative step leaves the last digit open, the even rule is the spec's note (recommended step 5) that the
+  engines follow.
+- [files.rs, Low] read_plain checks type and size on the path (symlink_metadata), then std::fs::read reads whatever the
+  path is at that moment: the cap and the type are not tied to the bytes read. Open once, check the handle's metadata
+  (is_file, len), read through take(cap + 1). Threat model: security-auditor's.
+## Departures (my verdicts)
+(1) fine: content stays dependency-free; the generator needs sim's ChaCha8/fnv and runs in the test module. (2) fine.
+(3) fine (it is three classes, not four: nit). (6) fine: space(), refuse_start and string() all name a byte outside
+0x20-0x7e first. (7) the rule is right (closest, then even: what V8/SpiderMonkey do) but its test is not exact: F1.
+(8) fine: on_grid(v) <=> v = fl(k/per_metre); thickness in whole steps is exact; double comparisons of on-grid values
+agree with step comparisons (fl(k/1000) strictly increasing for |k| <= 1e7; fl(m/100) = fl(10m/1000)). (10) fine (0:0
+documented as "no place" in error.rs:205-207; fuzz_judge holds line==0 <=> col==0). (13) fine (fmt --check clean).
+## Not checked
+Chromium/Firefox runs (not run: the main session's); AArch64; the TypeScript side (corpus-texts.mjs read only, not
+run); legacy-extract.mjs; the plants script's 25 plants (not rerun); a release build of content's own unit tests in
+CI terms (ran debug + the release fuzz); security threat model of files.rs (security-auditor's).
+DONE

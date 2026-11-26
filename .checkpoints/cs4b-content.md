@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 16:49 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 17:38 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -307,6 +307,46 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     - What the fuzz cannot reach, for the report: the caps (its inputs are a few KB), full map lists, more than
       one map, long strings; it is blind (no coverage measured), and about a third of its structure-aware inputs
       get no text mutation.
+26. **Review round 1, rust-reviewer: DONE** (`rust-reviewer-review-4b1.md`): no Critical or High. Findings:
+    - RR-1 Medium: the tie rule wrote the even neighbour without reading it back. At plus and minus 2^-24 (the
+      doubles below a power of two lie twice as close) the even text is another double's: the loader refused
+      every text of that number and the writer changed it by one step. Its run: 31,750,551 doubles against Node's
+      own text, 2 differ. FIX: the even text is taken only if it reads back as the number; every power of two with
+      its two neighbours, both signs, joins the corpus.
+    - RR-2 Medium: the toolchain job runs no clippy, so the content crate's "never panics" lints hold only by
+      hand; and `content` is missing from the job's release line. This chat writes no CI file: both are requests
+      for the CI Builder (STATUS, 4B-CI-CONTENT); the source scan (EA-1) holds the part text can show.
+    - RR-3 Low: the dependency rule missed dotted keys before the first table and a build script. FIX: both.
+    - RR-4 Low: `read_plain` checked the path, then read it again by path. FIX: opened once, the handle's own
+      type checked, at most the cap read.
+    - RR-5 and nits: a SAFETY note on the counting allocator; three classes, not four; the fold's comment; "the
+      slowest by the clock"; `* 1_000_000` can overflow. FIX: all.
+    - For the report: a map's canonical layout in the generator goes through the writer itself (the tree corpus
+      holds the layout apart from it).
+27. **Review round 1's one fix pass: DONE** (commit d36e416, 2026-11-26, 17:38 Amsterdam; the full local checks
+    passed whole: 33 boundary tests, 18 browser tests in 207 s; the million-input fuzz run in release; **6,932
+    written lines**, 518 under the stop line; the pass took 341): every finding of the three reviewers fixed or
+    made a follow-up.
+    - The content crate: the tie's read-back (`number.rs`); each string at its exact size (`json.rs`); Windows'
+      device names are no ids; the echo escapes a quote; `Form::Ramp { rises_toward }` (EA-2) and no `group`
+      (EA-5); the docs EA-7, EA-8.
+    - The proofs: the corpus is 20,360 numbers (2,000 ties of 1 to 25 binary places; 6,293 powers of two and
+      neighbours); a fifth limit case (fifteen texts of half a megabyte and a byte); **the limit cases are made
+      one at a time** (the first run of the new case held two heavy bundles at once and took the test module's
+      memory to 72 MiB, over its 64 MiB ceiling: the ceiling is to measure the loader, so the list no longer holds
+      them together; 49 MiB again); the generator's valid ids keep off device names by its own rule (**the
+      committed seed draws the id `aux` once**: the classes found the new rule on their own); the verdicts file
+      written again.
+    - The source scan now reads `crates/content/src` too (`rules_scan.rs`: hashed maps, clocks, per-target code,
+      and every call that can panic outside tests; 9 planted breaches, 6 controls).
+    - The tests' readers: the three vector readers through `read_plain` / `readPlainFile`; the verdicts' write
+      through `write_plain`, its switch only "1"; a stated time for the inputs at the caps in WebAssembly (Node:
+      5 s release, 60 s dev; measured 218 ms and 3,261 ms; browsers: 60 s for the page's whole run).
+    - The plants script: W's text follows the new read; five new plants a to e (the tie's read-back, the string
+      size, a device name, the echoed quote, a panic call in content code).
+    - Follow-ups, not fixed here: EA-3's step-9 note is a comment in the dependency rule; EA-4 (the simulation
+      re-exports the time unit at step 6); EA-6 (facing zero pinned at step 8); departure 9's condition (4c
+      refuses a map with fewer spawns than slots); RR-2 (the CI Builder).
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -316,8 +356,10 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
 - The card's "Last update" was once written 34 minutes ahead of the clock and corrected before it was committed.
 
 ## Current step
-4b-1, the close: review round 1 is running (three reviewers). Then: their findings fixed in one pass (858 lines
-are left under the stop line); test-engineer; round 2 on what changed; the whole plants run on that head; the
+4b-1, the close: review round 1 is in (three reviewers, no Critical or High) and its one fix pass is committed
+(d36e416; 6,932 written lines of 7,450). Now: push, CI; test-engineer's read and round 2 on what changed, on that
+head (briefs: `cs4b-content/review-brief-4b1-test-engineer.md`, `review-brief-4b1-round2.md`; at most three agents
+at a time); one last fix pass (it also adds EA-6's line on the facing's zero to the map's doc); the whole plants run on that head; the
 verifier until PASS; docs-keeper (his messages of 2026-11-26 into DECISIONS by script, VISION-RULE with them, the
 ADR index, STATUS with 4B-AIM-REACH and the follow-ups, ROADMAP, REPO_MAP); the report (its first lines: what moved
 4b from 5,410 to about 7,050 by the designs' count, and the new estimate for the first build he can move a soldier
@@ -356,6 +398,5 @@ in); the advisor agent on the head; `.checkpoints/` out of the head; the draft p
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- rust-reviewer (review round 1 on ef2edec, started 2026-11-26 16:47 Amsterdam); docs-keeper (the docs pass's
-  first part, started 2026-11-26 17:10 Amsterdam). No saver runs: the main session commits
-  the notes by hand.
+- No agent runs yet (rust-reviewer and docs-keeper's first part are done; test-engineer and round 2 start after
+  the push). No saver runs: the main session commits the notes by hand.

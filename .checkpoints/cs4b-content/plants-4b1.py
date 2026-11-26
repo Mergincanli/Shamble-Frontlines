@@ -35,6 +35,8 @@ FUZZ = test("content_fuzz", "fifty_thousand")
 RECORDINGS = test("recordings", "the_plain_read")
 TIME_UNIT = test("time_unit")
 AIM = test("aim_reach")
+CAPS = test("content_fuzz", "at_its_caps")
+SCAN = ("cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan", "the_content_crate")
 UNIT = ("cargo", "test", "-p", "content", "--locked")
 NODE = ("node", "node_modules/vitest/vitest.mjs", "run", "--root", "packages/sim-worker", "--dir", "packages/sim-worker/boundary")
 WASM = ("node", "packages/client/scripts/build.mjs", "--wasm-only")
@@ -85,10 +87,21 @@ PLANTS = [
      TIME_UNIT, ["the conversion gives 215 units where the text's digits give 216"]),
     ("V", "the simulation counts another unit than the content crate converts to", SIM_TIME, "pub const UNITS_PER_SECOND: u32 = 3_000;", "pub const UNITS_PER_SECOND: u32 = 6_000;",
      TIME_UNIT, ["the_content_crates_unit_is_the_simulations", "left: 3000", "right: 6000"]),
-    ("W", "the plain read opens whatever stands in a file's place", FILES, "    plain(folder, \"\")?;\n    plain(folder, name)?;\n    let path = folder.join(name);", "    plain(folder, \"\")?;\n    let path = folder.join(name);",
+    ("W", "the plain read opens whatever stands in a file's place", FILES, "    plain(folder, name)?;\n    let said = |error: std::io::Error|", "    let said = |error: std::io::Error|",
      RECORDINGS, ["the_plain_read_refuses_a_link", "link.rec"]),
     ("X", "the Node read opens whatever stands in a file's place", HELPER, "if (!entry.isFile()) throw", "if (entry.isSocket()) throw",
      (*NODE, "plain-file"), ["a link, a folder, a missing file and a name that is a path are refused"]),
+    # Review round 1's fixes, each shown red without its fix.
+    ("a", "the even neighbour of a tie is written without being read back (rust-reviewer's 2^-24)", NUMBER, "    (format!(\"{even}e-{decimals}\").parse::<f64>() == Ok(value)).then_some(even)", "    Some(even)",
+     CORPUS, ["the writer writes"]),
+    ("b", "a string grows by doubling as it is read (security-auditor's fifteen texts)", JSON, "let mut text = String::with_capacity(length);", "let mut text = String::new();",
+     CAPS, ["a bundle of fifteen texts of half a megabyte and a byte", "bytes held for"]),
+    ("c", "a name Windows keeps for a device passes for an id", JSON, "        && ![\"con\", \"prn\", \"aux\", \"nul\"].contains(&id)\n", "",
+     CLASSES, ["an id that is no id, case", "and the class says", "BadId"]),
+    ("d", "an echo shows a quote as it is", "crates/content/src/error.rs", "&& byte != b'\\\\' && byte != b'\"' {", "&& byte != b'\\\\' {",
+     UNIT, ["an_echo_is_short_and_shows_no_raw_byte_outside_printable_ascii", "x22"]),
+    ("e", "the content crate calls what can panic, outside its tests (the scan beside its lint guard)", BUNDLE, "    is_id(id).then_some((folder, id))", "    Some(is_id(id).then_some((folder, id))).unwrap()",
+     SCAN, ["the content crate breaks its rules", "bundle.rs", "`unwrap`"]),
 ]
 
 def note(letter, kind, ok, what, detail):
@@ -142,8 +155,8 @@ def main():
     lines.append(f"EVERY FILE PUT BACK (sha256 of {len(touched)} files as at the start): {'yes' if back else 'NO'}")
     if not letters:
         # The clean tree again: the module rebuilt, then the checks the plants used, all green.
-        exits = [run(*WASM)[0], run(*UNIT)[0], run(*test("content_proofs"))[0], run(*TIME_UNIT)[0], run(*AIM)[0], run(*test("recordings"))[0], run(*NODE, "content", "plain-file")[0]]
-        lines.append(f"CLEAN TREE GREEN: the test module's build, the content crate's tests, the proofs, the time unit, the aim tie, the recordings, Node: exits {exits}")
+        exits = [run(*WASM)[0], run(*UNIT)[0], run(*test("content_proofs"))[0], run(*TIME_UNIT)[0], run(*AIM)[0], run(*test("recordings"))[0], run(*CAPS)[0], run(*SCAN)[0], run(*NODE, "content", "plain-file")[0]]
+        lines.append(f"CLEAN TREE GREEN: the test module's build, the content crate's tests, the proofs, the time unit, the aim tie, the recordings, the caps, the source scan, Node: exits {exits}")
     open(".checkpoints/cs4b-content/plants-4b1.txt", "w").write(f"plants on {commit}\n" + "\n".join(lines) + "\n")
     print("\n".join(lines[-3:]))
 
