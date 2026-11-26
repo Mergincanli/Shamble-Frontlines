@@ -175,6 +175,31 @@ pub enum Kind {
     IdNotFileName {
         id: Echo,
     },
+    // A map's own rules.
+    /// A coordinate between two steps of its grid (`per_metre` steps a metre).
+    OffGrid {
+        bits: u64,
+        per_metre: u32,
+    },
+    /// Less than a centimetre from `min` to `max` on one axis.
+    TooThin {
+        min_bits: u64,
+        max_bits: u64,
+    },
+    /// Past the map's bounds on one axis.
+    OutsideBounds {
+        bits: u64,
+        bound_bits: u64,
+    },
+    /// The map's bounds reach past what an aim point can name, on one axis.
+    BeyondAim {
+        bits: u64,
+        reach_cm: i32,
+    },
+    /// An id stands once in its list.
+    DuplicateId {
+        id: Echo,
+    },
 }
 
 /// A refusal: the file (a bundle's path, when it is known), the place in its text (line and column in bytes, both
@@ -283,6 +308,14 @@ impl Kind {
             ),
             Self::NotAWholeNumber { bits } => format!("NotAWholeNumber {bits:016x}"),
             Self::WrongVersion { bits, newest } => format!("WrongVersion {bits:016x} {newest}"),
+            Self::OffGrid { bits, per_metre } => format!("OffGrid {bits:016x} {per_metre}"),
+            Self::TooThin { min_bits, max_bits } => {
+                format!("TooThin {min_bits:016x} {max_bits:016x}")
+            }
+            Self::OutsideBounds { bits, bound_bits } => {
+                format!("OutsideBounds {bits:016x} {bound_bits:016x}")
+            }
+            Self::BeyondAim { bits, reach_cm } => format!("BeyondAim {bits:016x} {reach_cm}"),
             // Every other payload is whole numbers, fixed words and echoes: the derived form names each field.
             other => format!("{other:?}"),
         }
@@ -334,6 +367,11 @@ impl fmt::Display for Kind {
             Self::PathOrder { path } => write!(f, "\"{path}\" is out of order or there twice"),
             Self::TooManyFiles { len, cap } => write!(f, "{len} files, more than the {cap} allowed"),
             Self::IdNotFileName { id } => write!(f, "the id \"{id}\" is not the file's name"),
+            Self::OffGrid { bits, per_metre } => write!(f, "{} is not a whole number of 1/{per_metre} m", f64::from_bits(*bits)),
+            Self::TooThin { min_bits, max_bits } => write!(f, "less than 1 cm from {} to {}", f64::from_bits(*min_bits), f64::from_bits(*max_bits)),
+            Self::OutsideBounds { bits, bound_bits } => write!(f, "{} is outside the map's bounds ({})", f64::from_bits(*bits), f64::from_bits(*bound_bits)),
+            Self::BeyondAim { bits, reach_cm } => write!(f, "the map's bound {} m is beyond the aim's reach ({reach_cm} cm)", f64::from_bits(*bits)),
+            Self::DuplicateId { id } => write!(f, "the id \"{id}\" is there twice"),
         }
     }
 }

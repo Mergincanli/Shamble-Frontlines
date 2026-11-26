@@ -19,6 +19,10 @@ use std::fmt::Write as _;
 use content::bundle::{self, MAX_BUNDLE_BYTES, MAX_FILE_BYTES, MAX_FILES};
 use content::error::{Echo, Error, Kind, MESSAGE_BYTES};
 use content::json::{self, Value};
+use content::map::{
+    Bounds, Form, Ground, MAX_REGIONS, MAX_SHAPES, MAX_SPAWNS, MapDocument, Region, Shape, Spawn,
+    Toward,
+};
 use content::movement::{self, FIELDS};
 use content::number::{number_text, parse_number};
 use content::read::Range;
@@ -231,6 +235,14 @@ fn form(canonical: &[u8], text: &[u8]) -> (usize, usize, String) {
     )
 }
 
+/// An id: one to twelve of the characters an id may hold, the first a letter or a digit.
+fn random_id(rng: &mut Rng) -> String {
+    const LETTERS: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789-_";
+    let length = 1 + rng.below(12);
+    let letter = |at| char::from(LETTERS[rng.below(if at == 0 { 36 } else { 38 })]);
+    (0..length).map(letter).collect()
+}
+
 /// A file's members, key and value text.
 type Members = Vec<(String, String)>;
 
@@ -247,10 +259,7 @@ struct File {
 
 impl File {
     fn valid(rng: &mut Rng) -> Self {
-        const LETTERS: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789-_";
-        let id: String = (0..1 + rng.below(12))
-            .map(|at| char::from(LETTERS[rng.below(if at == 0 { 36 } else { 38 })]))
-            .collect();
+        let id = random_id(rng);
         let text = |text: &str| format!("\"{text}\"");
         let mut members = vec![
             ("format".to_owned(), text(movement::FORMAT)),
@@ -333,6 +342,125 @@ fn bundle_bytes(entries: &[(String, Vec<u8>)]) -> Vec<u8> {
     out
 }
 
+/// Numbers as a list on one line.
+fn list(numbers: &[f64]) -> String {
+    let texts: Vec<String> = numbers.iter().map(|number| number_text(*number)).collect();
+    format!("[{}]", texts.join(", "))
+}
+
+/// A shape's entry on one line, with the words given for its `rises_toward` and its `type`.
+fn shape_text(shape: &Shape, toward: Option<&str>, kind: &str) -> String {
+    let toward = toward.map_or(String::new(), |toward| {
+        format!("\"rises_toward\": \"{toward}\", ")
+    });
+    let (group, id, max, min) = (&shape.group, &shape.id, list(&shape.max), list(&shape.min));
+    format!(
+        "{{\"group\": \"{group}\", \"id\": \"{id}\", \"max\": {max}, \"min\": {min}, {toward}\"type\": \"{kind}\"}}"
+    )
+}
+
+/// The word of a shape's form, if it is a ramp.
+fn toward_of(shape: &Shape) -> Option<&'static str> {
+    match shape.form {
+        Form::Box => None,
+        Form::Ramp(toward) => Some(["+x", "-x", "+z", "-z"][toward as usize]),
+    }
+}
+
+/// A valid map as the generator holds it: the document the loader must read, built here field by field and never
+/// read from a text, and each entry's text on one line, so that a class can change one entry's words.
+struct Map {
+    document: MapDocument,
+    spawns: Vec<String>,
+    shapes: Vec<String>,
+    regions: Vec<String>,
+}
+
+#[rustfmt::skip]
+impl Map {
+    /// A map with at least `least` shapes and regions and one spawn; with `fill`, a list is now and then as long
+    /// as it may be. Its bounds are whole metres, or, one time in eight, the aim's own reach on every side; every
+    /// corner is a whole number of millimetres inside them.
+    fn valid(rng: &mut Rng, least: usize, fill: bool) -> Self {
+        let [x, y, z] = [10 + rng.below(300), 5 + rng.below(60), 10 + rng.below(300)].map(|side| side as f64);
+        let bounds = match rng.below(8) {
+            0 => Bounds { min: [-327.67, 0.0, -327.67], max: [327.67, 655.35, 327.67] },
+            _ => Bounds { min: [-x, 0.0, -z], max: [x, y, z] },
+        };
+        let low = bounds.min.map(|bound| (bound * 1000.0).round() as i64);
+        let high = bounds.max.map(|bound| (bound * 1000.0).round() as i64);
+        let metres = |millimetres: i64| millimetres as f64 / 1000.0;
+        let below = |rng: &mut Rng, bound: i64| rng.below(bound as usize) as i64;
+        // A place on an axis, and a span of at least 1 cm on it.
+        let place = |rng: &mut Rng, axis: usize| metres(low[axis] + below(rng, high[axis] - low[axis] + 1));
+        let span = |rng: &mut Rng, axis: usize| {
+            let from = low[axis] + below(rng, high[axis] - low[axis] - 9);
+            (metres(from), metres(from + 10 + below(rng, high[axis] - from - 9)))
+        };
+        let count = |rng: &mut Rng, least: usize, most: u32| match rng.below(16) {
+            0 if fill => most as usize,
+            _ => least + rng.below(3),
+        };
+        let id = random_id(rng);
+        let spawns = (0..count(rng, 1, MAX_SPAWNS)).map(|at| {
+            let at_place = [0, 1, 2].map(|axis| place(rng, axis));
+            Spawn { id: format!("{id}-{at}"), at: at_place, facing_deg: rng.below(360_000) as f64 / 1000.0 }
+        }).collect();
+        let shapes = (0..count(rng, least, MAX_SHAPES)).map(|at| {
+            let spans = [0, 1, 2].map(|axis| span(rng, axis));
+            let towards = [Toward::PlusX, Toward::MinusX, Toward::PlusZ, Toward::MinusZ];
+            let form = towards.get(rng.below(5)).map_or(Form::Box, |toward| Form::Ramp(*toward));
+            Shape { id: format!("{id}_{at}"), group: id.clone(), min: spans.map(|span| span.0), max: spans.map(|span| span.1), form }
+        }).collect();
+        let regions = (0..count(rng, least, MAX_REGIONS)).map(|at| {
+            let spans = [0, 2].map(|axis| span(rng, axis));
+            let kind = if rng.below(2) == 0 { Ground::Street } else { Ground::Grass };
+            Region { id: format!("r{at}"), kind, min: spans.map(|span| span.0), max: spans.map(|span| span.1) }
+        }).collect();
+        Self::of(MapDocument { id, bounds, spawns, shapes, regions })
+    }
+
+    /// A document with its entries' texts.
+    fn of(document: MapDocument) -> Self {
+        let spawn = |spawn: &Spawn| format!("{{\"at\": {}, \"facing_deg\": {}, \"id\": \"{}\"}}", list(&spawn.at), number_text(spawn.facing_deg), spawn.id);
+        let shape = |shape: &Shape| shape_text(shape, toward_of(shape), if shape.form == Form::Box { "box" } else { "ramp" });
+        let region = |region: &Region| format!("{{\"id\": \"{}\", \"kind\": \"{}\", \"max\": {}, \"min\": {}}}", region.id, ["street", "grass"][region.kind as usize], list(&region.max), list(&region.min));
+        let (spawns, shapes, regions) = (document.spawns.iter().map(spawn).collect(), document.shapes.iter().map(shape).collect(), document.regions.iter().map(region).collect());
+        Self { document, spawns, shapes, regions }
+    }
+
+    fn path(&self) -> String {
+        format!("maps/{}.json", self.document.id)
+    }
+
+    /// The file's text: the map on one line as written here, then laid out by the canonical writer.
+    fn text(&self) -> Vec<u8> {
+        let (Bounds { min, max }, id) = (self.document.bounds, &self.document.id);
+        let (regions, shapes, spawns) = (self.regions.join(", "), self.shapes.join(", "), self.spawns.join(", "));
+        let one_line = format!("{{\"bounds\": {{\"max\": {}, \"min\": {}}}, \"format\": \"shamble-map\", \"id\": \"{id}\", \"regions\": [{regions}], \"shapes\": [{shapes}], \"spawns\": [{spawns}], \"version\": 1}}", list(&max), list(&min));
+        json::parse(one_line.as_bytes()).map_or(one_line.clone(), |top| canonical(&top)).into_bytes()
+    }
+}
+
+/// Where `token` stands in a text, `past` bytes into it: the line and the column, both from 1.
+fn find_place(text: &[u8], token: &str, past: usize) -> (usize, usize) {
+    let at = text
+        .windows(token.len())
+        .position(|window| window == token.as_bytes())
+        .unwrap_or(0)
+        + past;
+    let before = &text[..at.min(text.len())];
+    let line = 1 + before.iter().filter(|&&byte| byte == b'\n').count();
+    (
+        line,
+        1 + before
+            .iter()
+            .rev()
+            .take_while(|&&byte| byte != b'\n')
+            .count(),
+    )
+}
+
 /// One generated input with the verdict it must get.
 pub struct Case {
     /// The file's path, for `load_file`; `None` when the bytes are a bundle, for `load`.
@@ -345,7 +473,7 @@ pub struct Case {
 /// The classes, each with the share of the per-class count it runs: the four that make megabytes run a tenth. The
 /// first [`FILE_CLASSES`] make one file, the rest a bundle.
 #[rustfmt::skip]
-pub const CLASSES: [(&str, u32); 33] = [
+pub const CLASSES: [(&str, u32); 37] = [
     ("a valid file", 1), ("a refused word", 1), ("a byte-order mark", 1), ("a forbidden byte between values", 1),
     ("a tab or a carriage return", 1), ("a comment", 1), ("a number that is no number", 1),
     ("a forbidden byte in a string", 1), ("an escape the content does not use", 1), ("a text that ends early", 1),
@@ -354,11 +482,14 @@ pub const CLASSES: [(&str, u32); 33] = [
     ("a file past the byte cap", 10), ("a key the kind does not have", 1), ("a key that is missing", 1),
     ("a value of the wrong type", 1), ("a number outside its range", 1), ("another format or version", 1),
     ("an id that is no id", 1), ("an id that is not the file's name", 1), ("a text not in canonical form", 1),
+    ("a valid map", 1), ("a map's list too long or a word it does not know", 1),
+    ("a map's box off its grid, too thin or outside the bounds", 1),
+    ("a map past the aim's reach, with no spawn or an id twice", 1),
     ("a valid bundle", 1), ("a path that is no content path", 1), ("paths out of order", 1),
     ("more files than a bundle holds", 1), ("a bundle with a key too many or too few", 1),
     ("another bundle format or version", 1), ("a bundle past a byte cap", 10), ("a file refused, in a bundle", 1),
 ];
-pub const FILE_CLASSES: usize = 25;
+pub const FILE_CLASSES: usize = 29;
 
 /// Numbers that are none, or not the canonical text: the text, how far after the value's start the refusal stands
 /// (past the start, the reader has left the field), and the refusal.
@@ -688,11 +819,130 @@ fn case(class: &str, rng: &mut Rng) -> Case {
             let (line, col, kind) = form(&good, &bytes);
             refuse(bytes, line, col, "", kind)
         }
+        "a valid map" => {
+            let map = Map::valid(rng, 0, true);
+            Case { path: Some(map.path()), bytes: map.text(), expect: format!("ok Map({:?})", map.document) }
+        }
+        // The typed read's refusals stand at a place in the laid-out text: where a planted word is found, or a
+        // fixed number of lines from one (the bounds' highest corner opens on line 3; a shape's `rises_toward` is
+        // eleven lines under its id).
+        "a map's list too long or a word it does not know" => {
+            let mut map = Map::valid(rng, 1, false);
+            let (shape, region) = (rng.below(map.shapes.len()), rng.below(map.regions.len()));
+            let (form, id) = (map.document.shapes[shape].clone(), map.document.shapes[shape].id.clone());
+            let too_many = |len: usize, max: u32| format!("TooMany {{ len: {len}, max: {max} }}");
+            let not_one_of = |value: &str, allowed: &str| format!("NotOneOf {{ value: {}, allowed: {allowed:?} }}", echo(value.as_bytes()));
+            let (token, past, lines, field, kind) = match rng.below(9) {
+                0 => { map.spawns = vec![map.spawns[0].clone(); 17]; ("\"spawns\": [".to_owned(), 10, 0, "spawns".to_owned(), too_many(17, 16)) }
+                1 => { map.shapes = vec![map.shapes[0].clone(); 513]; ("\"shapes\": [".to_owned(), 10, 0, "shapes".to_owned(), too_many(513, 512)) }
+                2 => { map.regions = vec![map.regions[0].clone(); 65]; ("\"regions\": [".to_owned(), 11, 0, "regions".to_owned(), too_many(65, 64)) }
+                3 => {
+                    map.shapes[shape] = shape_text(&form, toward_of(&form), "sphere");
+                    ("\"type\": \"sphere\"".to_owned(), 8, 0, format!("shapes[{shape}].type"), not_one_of("sphere", "box or ramp"))
+                }
+                4 => {
+                    map.shapes[shape] = shape_text(&form, Some("up"), "ramp");
+                    ("\"rises_toward\": \"up\"".to_owned(), 16, 0, format!("shapes[{shape}].rises_toward"), not_one_of("up", "+x, -x, +z or -z"))
+                }
+                5 => {
+                    map.regions[region] = map.regions[region].replace("\"street\"", "\"water\"").replace("\"grass\"", "\"water\"");
+                    ("\"kind\": \"water\"".to_owned(), 8, 0, format!("regions[{region}].kind"), not_one_of("water", "street or grass"))
+                }
+                6 => {
+                    map.shapes[shape] = shape_text(&form, Some("+x"), "box");
+                    (format!("\"id\": \"{id}\""), 0, 11, format!("shapes[{shape}]"), unknown("rises_toward"))
+                }
+                7 => {
+                    map.shapes[shape] = shape_text(&form, None, "ramp");
+                    let expect = format!("{}|0:0|shapes[{shape}]|MissingKey {{ key: \"rises_toward\" }}", map.path());
+                    return Case { path: Some(map.path()), bytes: map.text(), expect };
+                }
+                _ => {
+                    let (more, text) = (rng.below(2) == 0, String::from_utf8(map.text()).unwrap_or_default());
+                    let mut lines: Vec<String> = text.lines().map(str::to_owned).collect();
+                    let kind = if more { lines.insert(3, "      0,".to_owned()); too_many(4, 3) } else { lines.remove(3); "TooFew { len: 2, min: 3 }".to_owned() };
+                    let expect = format!("{}|3:12|bounds.max|{kind}", map.path());
+                    return Case { path: Some(map.path()), bytes: text_of(&lines).into_bytes(), expect };
+                }
+            };
+            let bytes = map.text();
+            let (line, col) = find_place(&bytes, &token, past);
+            Case { path: Some(map.path()), bytes, expect: format!("{}|{}:{col}|{field}|{kind}", map.path(), line + lines) }
+        }
+        // A map's own rules name the field and no place. Each case breaks one rule on a map that keeps the others,
+        // so the rule broken is the first the loader meets.
+        "a map's box off its grid, too thin or outside the bounds" => {
+            let mut map = Map::valid(rng, 1, true).document;
+            let (shape, region, spawn) = (rng.below(map.shapes.len()), rng.below(map.regions.len()), rng.below(map.spawns.len()));
+            // An axis, and the same for a region, whose two axes are x and z.
+            let (axis, flat) = (rng.below(3), rng.below(2));
+            let (Bounds { min, max }, ground) = (map.bounds, [0, 2][flat]);
+            let step = |value: f64, millimetres: f64| ((value * 1000.0).round() + millimetres) / 1000.0;
+            let off = |value: f64, per_metre: u32| format!("OffGrid {:016x} {per_metre}", value.to_bits());
+            let thin = |min: f64, max: f64| format!("TooThin {:016x} {:016x}", min.to_bits(), max.to_bits());
+            let outside = |value: f64, bound: f64| format!("OutsideBounds {:016x} {:016x}", value.to_bits(), bound.to_bits());
+            let (field, kind) = match rng.below(9) {
+                0 => { map.bounds.max[axis] -= 0.005; (format!("bounds.max[{axis}]"), off(map.bounds.max[axis], 100)) }
+                1 => { map.shapes[shape].min[axis] += 0.0005; (format!("shapes[{shape}].min[{axis}]"), off(map.shapes[shape].min[axis], 1000)) }
+                2 => { map.spawns[spawn].at[axis] += 0.0005; (format!("spawns[{spawn}].at[{axis}]"), off(map.spawns[spawn].at[axis], 1000)) }
+                3 => { map.regions[region].max[flat] -= 0.0005; (format!("regions[{region}].max[{flat}]"), off(map.regions[region].max[flat], 1000)) }
+                // Nine millimetres thick, and not thick at all.
+                4 => {
+                    let low = map.shapes[shape].min[axis];
+                    map.shapes[shape].max[axis] = step(low, 9.0);
+                    (format!("shapes[{shape}].max[{axis}]"), thin(low, step(low, 9.0)))
+                }
+                5 => {
+                    let low = map.regions[region].min[flat];
+                    map.regions[region].max[flat] = low;
+                    (format!("regions[{region}].max[{flat}]"), thin(low, low))
+                }
+                // One millimetre past the bounds.
+                6 => { map.shapes[shape].max[axis] = step(max[axis], 1.0); (format!("shapes[{shape}].max[{axis}]"), outside(step(max[axis], 1.0), max[axis])) }
+                7 => { map.spawns[spawn].at[axis] = step(min[axis], -1.0); (format!("spawns[{spawn}].at[{axis}]"), outside(step(min[axis], -1.0), min[axis])) }
+                _ => { map.regions[region].min[flat] = step(min[ground], -1.0); (format!("regions[{region}].min[{flat}]"), outside(step(min[ground], -1.0), min[ground])) }
+            };
+            let map = Map::of(map);
+            Case { path: Some(map.path()), bytes: map.text(), expect: format!("{}|0:0|{field}|{kind}", map.path()) }
+        }
+        "a map past the aim's reach, with no spawn or an id twice" => {
+            let mut map = Map::valid(rng, 2, true).document;
+            // One centimetre past each of the reach's six edges: the bound, and the edge in centimetres.
+            let edges = [(-327.68, -32_767), (327.68, 32_767), (-0.01, 0), (655.36, 65_535), (-327.68, -32_767), (327.68, 32_767)];
+            let twice = |id: &str| format!("DuplicateId {{ id: {} }}", echo(id.as_bytes()));
+            let (field, kind) = match rng.below(9) {
+                edge @ 0..6 => {
+                    let ((bound, reach), axis) = (edges[edge], edge / 2);
+                    if edge % 2 == 0 { map.bounds.min[axis] = bound } else { map.bounds.max[axis] = bound };
+                    (format!("bounds.{}[{axis}]", ["min", "max"][edge % 2]), format!("BeyondAim {:016x} {reach}", bound.to_bits()))
+                }
+                6 => { map.spawns.clear(); ("spawns".to_owned(), "TooFew { len: 0, min: 1 }".to_owned()) }
+                7 => {
+                    let later = 1 + rng.below(map.shapes.len() - 1);
+                    map.shapes[later].id = map.shapes[rng.below(later)].id.clone();
+                    (format!("shapes[{later}].id"), twice(&map.shapes[later].id))
+                }
+                _ => {
+                    let later = 1 + rng.below(map.regions.len() - 1);
+                    map.regions[later].id = map.regions[rng.below(later)].id.clone();
+                    (format!("regions[{later}].id"), twice(&map.regions[later].id))
+                }
+            };
+            let map = Map::of(map);
+            Case { path: Some(map.path()), bytes: map.text(), expect: format!("{}|0:0|{field}|{kind}", map.path()) }
+        }
+        // Up to two maps and fourteen movement files, each read as the generator made it, in path order.
         "a valid bundle" => {
-            let count = 1 + rng.below(MAX_FILES as usize);
+            let count = 1 + rng.below(MAX_FILES as usize - 2);
             let files = distinct(rng, count);
+            let mut maps: Vec<Map> = (0..rng.below(3)).map(|_| Map::valid(rng, 0, true)).collect();
+            maps.sort_by_key(Map::path);
+            maps.dedup_by_key(|map| map.path());
+            let mut entries: Vec<(String, Vec<u8>)> = maps.iter().map(|map| (map.path(), map.text())).collect();
+            entries.extend(entries_of(&files));
+            let documents: Vec<&MapDocument> = maps.iter().map(|map| &map.document).collect();
             let reads: Vec<&str> = files.iter().map(|file| file.read.as_str()).collect();
-            bundle(&entries_of(&files), format!("ok [{}]", reads.join(", ")))
+            bundle(&entries, format!("ok {documents:?} [{}]", reads.join(", ")))
         }
         "a path that is no content path" => {
             let paths = [
@@ -808,7 +1058,7 @@ fn case(class: &str, rng: &mut Rng) -> Case {
                 continue;
             };
             let carried = |&byte: &u8| byte == b'\n' || (0x20..=0x7e).contains(&byte) && byte != b'\\';
-            if inner.bytes.iter().all(carried) {
+            if inner.bytes.iter().all(carried) && !inner.expect.starts_with("ok ") {
                 break bundle(&[(inner.path.unwrap_or_default(), inner.bytes)], inner.expect);
             }
         },
@@ -820,7 +1070,7 @@ fn case(class: &str, rng: &mut Rng) -> Case {
 fn judge(case: &Case) -> (String, String) {
     let read = match &case.path {
         Some(path) => load_file(path, &case.bytes).map(|document| format!("ok {document:?}")),
-        None => load(&case.bytes).map(|set| format!("ok {:?}", set.movements())),
+        None => load(&case.bytes).map(|set| format!("ok {:?} {:?}", set.maps(), set.movements())),
     };
     match read {
         Ok(read) => (read, String::new()),
@@ -982,7 +1232,7 @@ pub const STAGES: [&str; 9] = [
     "a file's text",
     "a file's form",
     "a file's fields",
-    "the whole set",
+    "a file's own rules",
 ];
 
 /// The stage that settled a verdict.
@@ -991,7 +1241,8 @@ fn stage<T>(result: &Result<T, Error>) -> usize {
     #[rustfmt::skip]
     let step = match &error.kind {
         Kind::TooLarge { .. } => return 1,
-        Kind::IdNotFileName { .. } => return 8,
+        Kind::IdNotFileName { .. } | Kind::OffGrid { .. } | Kind::TooThin { .. } | Kind::OutsideBounds { .. }
+        | Kind::BeyondAim { .. } | Kind::DuplicateId { .. } => return 8,
         Kind::Empty | Kind::ByteOrderMark | Kind::ForbiddenByte { .. } | Kind::Whitespace { .. } | Kind::Comment
         | Kind::TrailingComma | Kind::TopLevelNotObject | Kind::TrailingData | Kind::Unterminated
         | Kind::UnexpectedByte { .. } | Kind::RefusedLiteral { .. } | Kind::RefusedEscape { .. } | Kind::BadKey { .. }
@@ -1110,6 +1361,10 @@ pub fn fuzz_input(seed: u64, index: u64) -> (Option<String>, Vec<u8>) {
         1 + rng.below(3)
     };
     let mut entries = entries_of(&distinct(rng, count));
+    if rng.below(3) == 0 {
+        let map = Map::valid(rng, 0, false);
+        entries.insert(0, (map.path(), map.text()));
+    }
     let pick = rng.below(entries.len());
     match rng.below(12) {
         0 => entries.reverse(),
@@ -1143,9 +1398,8 @@ pub fn fuzz_judge(path: Option<&str>, bytes: &[u8]) -> Result<usize, String> {
     let read = || match path {
         Some(path) => load_file(path, bytes).map(|document| vec![document.id().to_owned()]),
         None => load(bytes).map(|set| {
-            set.movements()
-                .iter()
-                .map(|movement| movement.id.clone())
+            let maps = set.maps().iter().map(|map| map.id.clone());
+            maps.chain(set.movements().iter().map(|movement| movement.id.clone()))
                 .collect()
         }),
     };

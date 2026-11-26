@@ -24,12 +24,16 @@ another format or version|500|aa8383b7a899f0b0
 an id that is no id|500|8f3560b9ff9129c8
 an id that is not the file's name|500|cf7bdf90d631880e
 a text not in canonical form|500|a45bf37746c6d37f
-a valid bundle|500|60cf6f2660d41543
-a path that is no content path|500|2efae2b3e3a49deb
-paths out of order|500|c4c6e8b9c1664360
-more files than a bundle holds|500|deddfc12195e6d10
-a bundle with a key too many or too few|500|8bd37461efa2de47
-another bundle format or version|500|24724918587fe137
-a bundle past a byte cap|50|f5a2055175bfd835
-a file refused, in a bundle|500|55a3d78442bf78c8
-the fuzz run's first inputs|2000|9416cc022bfd2b0d
+a valid map|500|45c25e0b91994249
+a map's list too long or a word it does not know|500|6ca297b888f345fa
+a map's box off its grid, too thin or outside the bounds|500|40dbd127f5d83d0f
+a map past the aim's reach, with no spawn or an id twice|500|8c27f45188487e67
+a valid bundle|500|6eaef4977b547c5b
+a path that is no content path|500|4872004d4dcf3136
+paths out of order|500|3c93c65592b2c42d
+more files than a bundle holds|500|e47b7f010e5d1b2c
+a bundle with a key too many or too few|500|7b3cc68d551bf4c7
+another bundle format or version|500|2aa70bf03a69ee0e
+a bundle past a byte cap|50|4f0c9bfce549af81
+a file refused, in a bundle|500|db95adead86645c3
+the fuzz run's first inputs|2000|46e1524a15fb6085

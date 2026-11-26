@@ -223,6 +223,33 @@ impl<'a> Object<'a> {
         Ok((items, path))
     }
 
+    /// An array of exactly `N` numbers, each inside `range`: a corner, a place.
+    pub fn numbers<const N: usize>(
+        &mut self,
+        key: &'static str,
+        range: Range,
+    ) -> Result<[f64; N], Error> {
+        let (node, path) = self.take(key)?;
+        let Value::Array(items) = &node.value else {
+            return Err(wrong_type(node, &path, "an array"));
+        };
+        let count = |count: usize| u32::try_from(count).unwrap_or(u32::MAX);
+        let (len, exactly) = (count(items.len()), count(N));
+        if len != exactly {
+            let kind = if len > exactly {
+                Kind::TooMany { len, max: exactly }
+            } else {
+                Kind::TooFew { len, min: exactly }
+            };
+            return Err(Error::at(node.line, node.col, &path, kind));
+        }
+        let mut numbers = [0.0; N];
+        for (at, (number, item)) in numbers.iter_mut().zip(items).enumerate() {
+            *number = number_in(item, &format!("{path}[{at}]"), range)?;
+        }
+        Ok(numbers)
+    }
+
     pub fn object(&mut self, key: &'static str) -> Result<Object<'a>, Error> {
         let (node, path) = self.take(key)?;
         Object::of(node, &path)

@@ -26,6 +26,7 @@
 pub mod bundle;
 pub mod error;
 pub mod json;
+pub mod map;
 pub mod movement;
 pub mod number;
 pub mod read;

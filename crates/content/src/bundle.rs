@@ -12,6 +12,7 @@
 
 use crate::error::{Echo, Error, Kind};
 use crate::json::{self, Member, Node, Value, is_id};
+use crate::map::{self, MapDocument};
 use crate::movement::{self, Movement};
 use crate::read::Object;
 use crate::write::{canonical, first_difference};
@@ -26,17 +27,19 @@ pub const FORMAT: &str = "shamble-content-bundle";
 pub const VERSION: u32 = 1;
 
 /// The kinds of content, by the folder their files lie in. A path names its kind; no other folder is a path.
-const FOLDERS: [&str; 1] = ["movement"];
+const FOLDERS: [&str; 2] = ["maps", "movement"];
 
 /// One content file, read and checked.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Document {
+    Map(MapDocument),
     Movement(Movement),
 }
 
 impl Document {
     pub fn id(&self) -> &str {
         match self {
+            Self::Map(map) => &map.id,
             Self::Movement(movement) => &movement.id,
         }
     }
@@ -45,10 +48,19 @@ impl Document {
 /// Every content file of a match, read, checked and never changed afterwards.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct ContentSet {
+    maps: Vec<MapDocument>,
     movements: Vec<Movement>,
 }
 
 impl ContentSet {
+    pub fn maps(&self) -> &[MapDocument] {
+        &self.maps
+    }
+
+    pub fn map(&self, id: &str) -> Option<&MapDocument> {
+        self.maps.iter().find(|map| map.id == id)
+    }
+
     pub fn movements(&self) -> &[Movement] {
         &self.movements
     }
@@ -112,9 +124,11 @@ pub fn load_file(path: &str, text: &[u8]) -> Result<Document, Error> {
     };
     let read = || -> Result<Document, Error> {
         let top = document(text, MAX_FILE_BYTES)?;
-        // One arm per folder of `FOLDERS`; today there is one.
-        debug_assert_eq!(folder, "movement");
-        let document = Document::Movement(movement::read(&top)?);
+        // One arm per folder of `FOLDERS`.
+        let document = match folder {
+            "maps" => Document::Map(map::read(&top)?),
+            _ => Document::Movement(movement::read(&top)?),
+        };
         if document.id() != id {
             return Err(Error::at(
                 0,
@@ -196,6 +210,7 @@ pub fn load(bytes: &[u8]) -> Result<ContentSet, Error> {
         }
         last = Some(path);
         match load_file(path, text.as_bytes())? {
+            Document::Map(map) => set.maps.push(map),
             Document::Movement(movement) => set.movements.push(movement),
         }
     }
@@ -277,13 +292,50 @@ mod tests {
     }
 
     #[test]
+    fn a_bundle_holds_each_kind_in_its_own_folder() {
+        let map =
+            canonical(&json::parse(crate::map::tests::TEXT.as_bytes()).expect("the test map"));
+        let files = [
+            ("movement/test-soldier.json", TEST_TEXT),
+            ("maps/yard.json", map.as_str()),
+        ];
+        let set = load(write(&files).as_bytes()).expect("a valid bundle");
+        assert_eq!((set.maps().len(), set.movements().len()), (1, 1));
+        assert_eq!(set.map("yard").map(|map| map.shapes.len()), Some(2));
+        assert_eq!(set.map("test-soldier"), None);
+        // A file in another kind's folder is read as that kind, and refused by its format.
+        let moved = [
+            write(&[("maps/test-soldier.json", TEST_TEXT)]),
+            write(&[("movement/yard.json", &map)]),
+        ];
+        let expected = moved.map(|bundle| match kind_of(&bundle) {
+            Kind::WrongFormat { expected, .. } => expected,
+            _ => "another refusal",
+        });
+        assert_eq!(expected, ["shamble-map", "shamble-movement"]);
+        // A map's own rule refuses the whole bundle, with the file and the field: bounds 400 m out on x.
+        let far = map.replacen("      50,\n", "      400,\n", 1);
+        let error =
+            load(write(&[("maps/yard.json", &far)]).as_bytes()).expect_err("beyond the aim");
+        let beyond = Kind::BeyondAim {
+            bits: 400.0_f64.to_bits(),
+            reach_cm: 32_767,
+        };
+        assert_eq!(
+            (error.file.as_deref(), error.path.as_str(), error.kind),
+            (Some("maps/yard.json"), "bounds.max[0]", beyond)
+        );
+    }
+
+    #[test]
     fn the_bundles_own_rules_refuse_by_name() {
         let with = |path: &str, text: &str| write(&[(path, text)]);
         for (path, kind) in [
             ("movement/../movement/test-soldier.json", "BadPath"),
             ("../test-soldier.json", "BadPath"),
             ("source/testlines-export.json", "BadPath"),
-            ("maps/test-soldier.json", "BadPath"),
+            ("weapons/test-soldier.json", "BadPath"),
+            ("map/test-soldier.json", "BadPath"),
             ("Movement/test-soldier.json", "BadPath"),
             // A backslash cannot stand in a content string at all: the reader refuses the escape itself.
             ("movement\\test-soldier.json", "RefusedEscape { byte: 92 }"),
