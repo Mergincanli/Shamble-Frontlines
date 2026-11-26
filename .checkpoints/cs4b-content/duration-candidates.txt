@@ -1,0 +1,728 @@
+# every number field of docs/legacy-tuning.json (sha256 b04b370b06a02c3ae010502e93859fb46dddfe6ed2a9105def1356ca03888d97): 2038 numbers in 727 fields; field, places, distinct texts (12 at most)
+tables.T.values.accel	1	14
+tables.T.values.adsMoveMult	1	0.55
+tables.T.values.arenaX	1	186
+tables.T.values.arenaZ	1	126
+tables.T.values.barHealth	1	1000
+tables.T.values.bodyMult	1	1
+tables.T.values.camBack	1	56.6
+tables.T.values.camDeadX	1	0.6
+tables.T.values.camDeadY	1	0.52
+tables.T.values.camHeight	1	40
+tables.T.values.camKickDamping	1	12
+tables.T.values.camKickImpulse	1	24
+tables.T.values.camKickRange	1	34
+tables.T.values.camKickStiffness	1	110
+tables.T.values.camLerp	1	7
+tables.T.values.camLookLean	1	0.55
+tables.T.values.camPosLean	1	0.18
+tables.T.values.camPushLerp	1	9
+tables.T.values.camYawBase	1	0.7853981633974483
+tables.T.values.camYawLerp	1	14
+tables.T.values.camYawSens	1	0.006
+tables.T.values.concussionStrength	1	0.85
+tables.T.values.dustLife	1	1.05
+tables.T.values.eliteCount	1	1
+tables.T.values.eliteHealth	1	200
+tables.T.values.enemyBurst	1	1
+tables.T.values.enemyBurstPause	1	4.5
+tables.T.values.enemyCount	1	6
+tables.T.values.enemyDamage	1	34
+tables.T.values.enemyDetect	1	44
+tables.T.values.enemyFireInterval	1	0.22
+tables.T.values.enemyHealth	1	100
+tables.T.values.enemyMoveSpeed	1	4.2
+tables.T.values.enemyPreferRange	1	22
+tables.T.values.enemyRange	1	60
+tables.T.values.enemyRespawn	1	4
+tables.T.values.enemySiegeDamage	1	11
+tables.T.values.enemySpread	1	0.11
+tables.T.values.fov	1	15
+tables.T.values.fovADS	1	15
+tables.T.values.foxPanMax	1	16
+tables.T.values.fragChunks	1	14
+tables.T.values.fragCount	1	60
+tables.T.values.fragFriction	1	0.66
+tables.T.values.fragGravity	1	46
+tables.T.values.fragLaunchAngle	1	0.42
+tables.T.values.fragLife	1	1.05
+tables.T.values.fragRestitution	1	0.42
+tables.T.values.fragSpeed	1	64
+tables.T.values.gravity	1	24
+tables.T.values.grenadeBuildingDamage	1	240
+tables.T.values.grenadeDamage	1	140
+tables.T.values.grenadeMax	1	3
+tables.T.values.grenadeRadius	1	6.5
+tables.T.values.headMult	1	2.6
+tables.T.values.hqHealth	1	1600
+tables.T.values.incomeBase	1	1.5
+tables.T.values.incomeRefinery	1	9
+tables.T.values.jumpV	1	11
+tables.T.values.killReward	1	25
+tables.T.values.legMult	1	0.65
+tables.T.values.lookAheadBase	1	5.5
+tables.T.values.lookAheadFloor	1	3.5
+tables.T.values.lookAheadHip	1	8
+tables.T.values.lookBackRange	1	16
+tables.T.values.lookFwdGain	1	0.55
+tables.T.values.lookFwdRange	1	26
+tables.T.values.lookLerp	1	9
+tables.T.values.lookSideGain	1	0.55
+tables.T.values.lookSideMax	1	6
+tables.T.values.maxLean	1	26
+tables.T.values.meleeCooldown	1	0.55
+tables.T.values.meleeDamage	1	999
+tables.T.values.meleeRange	1	3
+tables.T.values.moveSpeed	1	6.3
+tables.T.values.playerHealth	1	100
+tables.T.values.posBackMax	1	2.2
+tables.T.values.posFwdGain	1	0.13
+tables.T.values.posFwdMax	1	3.2
+tables.T.values.posSideGain	1	0.18
+tables.T.values.posSideMax	1	2
+tables.T.values.powerHealth	1	700
+tables.T.values.refHealth	1	1000
+tables.T.values.regenDelay	1	3.5
+tables.T.values.regenRate	1	16
+tables.T.values.respawnDelay	1	2
+tables.T.values.resupplyCost	1	50
+tables.T.values.scorchLife	1	4
+tables.T.values.scorchRadius	1	2.4
+tables.T.values.shieldArcCos	1	0.3
+tables.T.values.shieldBlock	1	0.7
+tables.T.values.shieldCost	1	350
+tables.T.values.shieldMoveMult	1	0.72
+tables.T.values.shockRadius	1	7.5
+tables.T.values.sprintMult	1	1.4286
+tables.T.values.startCredits	1	1000
+tables.T.values.stepUp	1	0.55
+tables.T.values.weaponPitchMax	1	0.85
+tables.TUNE.values.ai.losCapS	1	0.1
+tables.TUNE.values.ai.losPerS	1	480
+tables.TUNE.values.ai.losRecheckS	1	0.1
+tables.TUNE.values.ai.retargetS	1	0.25
+tables.TUNE.values.fx.botCullR	1	50
+tables.TUNE.values.fx.botSfxR	1	90
+tables.TUNE.values.spawn.doorOut	1	4
+tables.TUNE.values.spawn.lateral	1	2
+tables.TUNE.values.teams.size	1	4
+tables.WEAPONS.values[*].cost	7	0 500
+tables.WEAPONS.values[*].damage	7	34 11 8 0 9999 9 30
+tables.WEAPONS.values[*].era	7	1
+tables.WEAPONS.values[*].fireInterval	7	0.2 0.85 0.072 1.05 0.45 0.42 0.7
+tables.WEAPONS.values[*].mag	7	1 2 36 24
+tables.WEAPONS.values[*].minLevel	7	1
+tables.WEAPONS.values[*].pellets	7	1 8 0
+tables.WEAPONS.values[*].range	7	300 34 55 0 3.6 95 200
+tables.WEAPONS.values[*].recoil	7	2 4.5 0.3 1 1.3 2.4
+tables.WEAPONS.values[*].reload	6	3.5 2.6 1.9 0.1 2.2 1.5
+tables.WEAPONS.values[*].reserve	7	999 24 144 0 120 10
+tables.WEAPONS.values[*].spreadADS	7	0.006 0.05 0.06 0 0.008
+tables.WEAPONS.values[*].spreadDecay	7	0.3 0.5 0.7 1
+tables.WEAPONS.values[*].spreadHip	7	0.022 0.1 0.075 0 0.02
+tables.WEAPONS.values[*].spreadMax	7	0.05 0.16 0 0.06
+tables.WEAPONS.values[*].spreadPerShot	7	0 0.005 0.003
+tables.WEAPONS.values[*].tracer	6	16773312 16767392 0
+tables.WEAPONS.values[*].headMult	1	1.2
+tables.WEAPONS.values[*].falloffEnd	1	35
+tables.WEAPONS.values[*].falloffMin	1	0.2
+tables.WEAPONS.values[*].falloffStart	1	15
+tables.WEAPONS.values[*].arcDeg	1	120
+tables.WEAPONS.values[*].impact	1	0.13
+tables.WEAPONS.values[*].swingDur	1	0.4
+tables.WEAPONS.values[*].burst	1	3
+tables.WEAPONS.values[*].burstInterval	1	0.06
+tables.UNIT_TYPES.values[*].accent	4	16735067 5613823 16765514 10194175
+tables.UNIT_TYPES.values[*].altWpn	2	3 4
+tables.UNIT_TYPES.values[*].burst	4	4 1 6 3
+tables.UNIT_TYPES.values[*].cost	4	0 1250
+tables.UNIT_TYPES.values[*].enemyDmg	4	8 6 5 7
+tables.UNIT_TYPES.values[*].enemyRange	4	80 24 48 70
+tables.UNIT_TYPES.values[*].fireInterval	4	0.13 0.8 0.09 0.35
+tables.UNIT_TYPES.values[*].maxHealth	4	100 150 120 110
+tables.UNIT_TYPES.values[*].preferRange	4	24 11 9 18
+tables.UNIT_TYPES.values[*].speedMult	4	1 0.95 1.5 1.05
+tables.UNIT_TYPES.values[*].sprintMult	4	1.214 1.165 1.62
+tables.UNIT_TYPES.values[*].swapCd	2	1.5 2
+tables.UNIT_TYPES.values[*].tier	4	1 2
+tables.UNIT_TYPES.values[*].wpn	4	0 1 2 5
+tables.UNIT_TYPES.values[*].banzaiCd	1	45
+tables.UNIT_TYPES.values[*].banzaiDur	1	10
+tables.UNIT_TYPES.values[*].lunge	1	48
+tables.UNIT_TYPES.values[*].bayonetCd	1	10
+tables.UNIT_TYPES.values[*].bayonetDur	1	1.3
+tables.VEHICLE_TYPES.values[*].cost	1	2500
+tables.VEHICLE_TYPES.values[*].maxHealth	1	1500
+tables.VEHICLE_TYPES.values[*].seats	1	1
+tables.VEHICLE_TYPES.values[*].tier	1	2
+tables.RIFLE_TIERS.values[*].reload	3	5 3.5 2.5
+tables.RIFLE_TIERS.values[*].span	3	5 10 0
+tables.RULES_DEFAULT.values.eco.resupply	1	50
+tables.RULES_DEFAULT.values.harv.dock	1	3
+tables.RULES_DEFAULT.values.harv.load	1	3.5
+tables.RULES_DEFAULT.values.harv.respawn	1	12
+tables.RULES_DEFAULT.values.silo.capture	1	3.5
+tables.RULES_DEFAULT.values.tbox.active	1	120
+tables.RULES_DEFAULT.values.tbox.capture	1	7
+tables.RULES_DEFAULT.values.tbox.first	1	8
+tables.RULES_DEFAULT.values.tbox.gap	1	6
+tables.ECO.values.eraCost[*]	3	60 90 120
+tables.ECO.values.payHarvester	1	600
+tables.ECO.values.paySilo	1	1
+tables.ECO.values.payTrickle	1	1
+tables.ECO.values.payTrickleDead	1	0.25
+tables.ECO.values.techBox	1	10
+tables.ECO.values.techHarvester	1	5
+tables.ECO.values.techPerHeadshot	1	2
+tables.ECO.values.techPerKill	1	1
+tables.SILO.values.captureTime	1	3.5
+tables.SILO.values.points[*].x	2	-140 140
+tables.SILO.values.points[*].z	2	-90
+tables.SILO.values.pool[*].x	3	-140 140 0
+tables.SILO.values.pool[*].z	3	-90 0
+tables.SILO.values.range	1	5
+tables.TBOX.values.activeTime	1	120
+tables.TBOX.values.captureTime	1	7
+tables.TBOX.values.firstDelay	1	8
+tables.TBOX.values.gap	1	6
+tables.TBOX.values.points[*].x	3	0 -70 70
+tables.TBOX.values.points[*].z	3	-60 0
+tables.TBOX.values.pool[*].x	3	0 -70 70
+tables.TBOX.values.pool[*].z	3	-60 0
+tables.TBOX.values.range	1	5.5
+tables.HARV.values.dockTime	1	3
+tables.HARV.values.fieldX	1	0
+tables.HARV.values.fieldZ	1	0
+tables.HARV.values.hp	1	900
+tables.HARV.values.loadTime	1	3.5
+tables.HARV.values.respawn	1	12
+tables.HARV.values.speed	1	7
+tables.JUG.values.fireInterval	1	3.4
+tables.JUG.values.maxSpeed	1	6
+tables.JUG.values.range	1	34
+tables.JUG.values.rippleMs	1	80
+tables.JUG.values.speed	1	3.2
+tables.JUG.values.targetH	1	5.6
+tables.JUG_PILOT.values.aimTurn	1	9
+tables.JUG_PILOT.values.moveSpeed	1	5.5
+tables.JUG_PILOT.values.turn	1	3.2
+tables.JUG_CANNON.values.damage	1	130
+tables.JUG_CANNON.values.headMult	1	1
+tables.JUG_CANNON.values.range	1	130
+tables.JUG_CANNON.values.tracer	1	16765562
+tables.T_CHARGE.values.bow.capApex	1	0.7
+tables.T_CHARGE.values.bow.col	1	16734762
+tables.T_CHARGE.values.bow.floor	1	0.05
+tables.T_CHARGE.values.bow.grav	1	14
+tables.T_CHARGE.values.bow.pitch	1	0.04
+tables.T_CHARGE.values.bow.sMax	1	94
+tables.T_CHARGE.values.bow.sMin	1	30
+tables.T_CHARGE.values.bow.time	1	1.35
+tables.T_CHARGE.values.jav.col	1	3727792
+tables.T_CHARGE.values.jav.floor	1	0.05
+tables.T_CHARGE.values.jav.grav	1	14
+tables.T_CHARGE.values.jav.pitch	1	0.05
+tables.T_CHARGE.values.jav.sMax	1	64
+tables.T_CHARGE.values.jav.sMin	1	32
+tables.T_CHARGE.values.max	1	1
+tables.T_CHARGE.values.nade.col	1	16756832
+tables.T_CHARGE.values.nade.floor	1	0.26
+tables.T_CHARGE.values.nade.grav	1	20
+tables.T_CHARGE.values.nade.pitch	1	0.72
+tables.T_CHARGE.values.nade.sMax	1	26
+tables.T_CHARGE.values.nade.sMin	1	13
+tables.STAM.values.lockUntil	1	0.3
+tables.STAM.values.max	1	7
+tables.STAM.values.regen	1	0.2
+tables.FIRE_H.values	1	1.9
+tables.EJUMP_REACH.values	1	3.0708333333333337
+tables.AIM_ARC_N.values	1	48
+tables.GROUND_W.values	1	372
+tables.GRID_SIZE.values	1	10
+tables.FIXED_DT.values	1	0.016666666666666666
+tables.BTN.values.ADS	1	2
+tables.BTN.values.FIRE	1	1
+tables.BTN.values.GRENADE	1	16
+tables.BTN.values.MELEE	1	8
+tables.BTN.values.RELOAD	1	4
+tables.BTN.values.SHIELD	1	32
+tables.BTN.values.SPRINT	1	64
+tables.BODY.values.crouchDrop	1	0.55
+tables.BODY.values.headR	1	0.4
+tables.BODY.values.headY	1	2.12
+tables.BODY.values.legBotY	1	0.12
+tables.BODY.values.legR	1	0.42
+tables.BODY.values.legTopY	1	0.95
+tables.BODY.values.torsoBotY	1	0.95
+tables.BODY.values.torsoR	1	0.52
+tables.BODY.values.torsoTopY	1	1.5
+tables.PART.values.body	1	1
+tables.PART.values.head	1	2.6
+tables.PART.values.legs	1	0.65
+tables.RANK_TIERS.values[*].upTo	18	3 8 14 21 29 37 45 53 60 67 73 79 ...
+tables.RANK_TIERS.values[*].n	16	1 2 3 5
+tables.RANK_TIERS.values[*].rockers	6	1 2 3
+tables.RANK_TIERS.values[*].star	2	1 2
+tables.PRESTIGE.values[*].points	10	5 8 6 12 10 16
+tables.CAM_STYLES.values.1.camBack	1	16
+tables.CAM_STYLES.values.1.camHeight	1	24
+tables.CAM_STYLES.values.1.fov	1	52
+tables.CAM_STYLES.values.1.fovADS	1	52
+tables.CAM_STYLES.values.1.id	1	1
+tables.CAM_STYLES.values.1.yaw	1	0
+tables.CAM_STYLES.values.2.camBack	1	10.5
+tables.CAM_STYLES.values.2.camHeight	1	15.5
+tables.CAM_STYLES.values.2.fov	1	52
+tables.CAM_STYLES.values.2.fovADS	1	52
+tables.CAM_STYLES.values.2.id	1	2
+tables.CAM_STYLES.values.2.yaw	1	0
+tables.CAM_STYLES.values.3.camBack	1	56.6
+tables.CAM_STYLES.values.3.camHeight	1	40
+tables.CAM_STYLES.values.3.fov	1	15
+tables.CAM_STYLES.values.3.fovADS	1	15
+tables.CAM_STYLES.values.3.id	1	3
+tables.CAM_STYLES.values.3.yaw	1	0.7853981633974483
+tables.CAM_STYLES.values.4.camBack	1	65.5
+tables.CAM_STYLES.values.4.camHeight	1	41.5
+tables.CAM_STYLES.values.4.fov	1	12
+tables.CAM_STYLES.values.4.fovADS	1	12
+tables.CAM_STYLES.values.4.id	1	4
+tables.CAM_STYLES.values.4.yaw	1	0.7853981633974483
+tables.CAM_STYLES.values.5.camBack	1	42
+tables.CAM_STYLES.values.5.camHeight	1	52
+tables.CAM_STYLES.values.5.fov	1	18
+tables.CAM_STYLES.values.5.fovADS	1	18
+tables.CAM_STYLES.values.5.id	1	5
+tables.CAM_STYLES.values.5.yaw	1	0.7853981633974483
+tables.VIG_W.values	1	300
+tables.WR_DEPLOY_MS.values	1	280
+tables.RR_C.values	1	100.53096491487338
+tables.OCC_FADE.values	1	0.24
+tables.SFX.values.master	1	0.85
+tables.ENV_DEFAULT.values._sunR	1	65.8
+tables.ENV_DEFAULT.values.amb.int	1	0.12
+tables.ENV_DEFAULT.values.fog.far	1	760
+tables.ENV_DEFAULT.values.fog.near	1	260
+tables.ENV_DEFAULT.values.ground.contrast	1	1.3
+tables.ENV_DEFAULT.values.ground.density	1	1.25
+tables.ENV_DEFAULT.values.ground.litCap	1	195
+tables.ENV_DEFAULT.values.ground.patch	1	1
+tables.ENV_DEFAULT.values.ground.tiling	1	20
+tables.ENV_DEFAULT.values.hemi.int	1	0.32
+tables.ENV_DEFAULT.values.nature.gain	1	1.56
+tables.ENV_DEFAULT.values.sun.az	1	-52.6
+tables.ENV_DEFAULT.values.sun.el	1	49.4
+tables.ENV_DEFAULT.values.sun.int	1	0.8
+tables.SUN_R.values	1	65.8
+tables.INK.values	1	1118746
+tables.WORLD_OUTLINE.values	1	0.09
+tables.CHAR_OUTLINE.values	1	0.8
+tables.RIM_COL.values	1	16742994
+tables.OUTLINE_GROUND_Y.values	1	0.02
+tables.TEAM_COL.values.allies	1	3727792
+tables.TEAM_COL.values.empire	1	16731469
+tables.TEAM_COL.values.friend	1	3727792
+tables.TEAM_COL.values.hostile	1	16731469
+tables.TEAM_COL.values.neutral	1	11904578
+tables.TEAM_COL.values.soviets	1	16731469
+tables.FACTION_PALETTES.values.Allies.BaseGear	1	10603
+tables.FACTION_PALETTES.values.Allies.CoatAccent	1	2060272
+tables.FACTION_PALETTES.values.Allies.FactionPrimary	1	2060272
+tables.FACTION_PALETTES.values.Allies.HighlightTrim	1	16631040
+tables.FACTION_PALETTES.values.Allies.PadColor	1	16631040
+tables.FACTION_PALETTES.values.Empire.BaseGear	1	2359366
+tables.FACTION_PALETTES.values.Empire.CoatAccent	1	16739584
+tables.FACTION_PALETTES.values.Empire.FactionPrimary	1	8073174
+tables.FACTION_PALETTES.values.Empire.HighlightTrim	1	16739584
+tables.FACTION_PALETTES.values.Empire.PadColor	1	16739584
+tables.FACTION_PALETTES.values.Soviets.BaseGear	1	4401176
+tables.FACTION_PALETTES.values.Soviets.CoatAccent	1	13898772
+tables.FACTION_PALETTES.values.Soviets.FactionPrimary	1	13898772
+tables.FACTION_PALETTES.values.Soviets.HighlightTrim	1	16642261
+tables.FACTION_PALETTES.values.Soviets.PadColor	1	13898772
+tables.CHAR_DEFAULT.values.colors.dark	1	1777700
+tables.CHAR_DEFAULT.values.hit.crouchDrop	1	0.55
+tables.CHAR_DEFAULT.values.hit.headR	1	0.4
+tables.CHAR_DEFAULT.values.hit.headY	1	2.12
+tables.CHAR_DEFAULT.values.hit.legBotY	1	0.12
+tables.CHAR_DEFAULT.values.hit.legR	1	0.42
+tables.CHAR_DEFAULT.values.hit.legTopY	1	0.95
+tables.CHAR_DEFAULT.values.hit.torsoBotY	1	0.95
+tables.CHAR_DEFAULT.values.hit.torsoR	1	0.52
+tables.CHAR_DEFAULT.values.hit.torsoTopY	1	1.5
+tables.CHAR_DEFAULT.values.parts[*].pos[*]	84	0 0.95 -0.2 -0.05 -0.22 -0.44 -0.21 -0.42 0.1 0.2 0.05 0.42 ...
+tables.CHAR_DEFAULT.values.parts[*].hseg	4	10 14 8
+tables.CHAR_DEFAULT.values.parts[*].ow	17	0.05 0.03
+tables.CHAR_DEFAULT.values.parts[*].r	4	0.34 0.36 0.105
+tables.CHAR_DEFAULT.values.parts[*].scale[*]	3	1 0.7 0.86
+tables.CHAR_DEFAULT.values.parts[*].wseg	4	14 16 10
+tables.CHAR_DEFAULT.values.parts[*].h	13	0.44 0.42 0.14 0.98 0.26 0.1 0.4
+tables.CHAR_DEFAULT.values.parts[*].rb	10	0.16 0.12 0.29 0.41 0.1 0.085
+tables.CHAR_DEFAULT.values.parts[*].rseg	10	10 16
+tables.CHAR_DEFAULT.values.parts[*].rt	10	0.18 0.15 0.37 0.46 0.115 0.1
+tables.CHAR_DEFAULT.values.parts[*].d	3	0.4 0.34
+tables.CHAR_DEFAULT.values.parts[*].w	3	0.2 0.46
+tables.CHAR_DEFAULT.values.pelvisY	1	0.95
+tables.CHAR_DEFAULT.values.weapon.muzzle[*]	3	0 0.02 1.08
+tables.CHAR_DEFAULT.values.weapon.pos[*]	3	0.12 -0.02 0.34
+tables.CHAR_MALE.values.colors.dark	1	2106410
+tables.CHAR_MALE.values.colors.eyes	1	2371640
+tables.CHAR_MALE.values.colors.hair	1	3811868
+tables.CHAR_MALE.values.colors.skin	1	14262391
+tables.CHAR_MALE.values.colors.steel	1	6975608
+tables.CHAR_MALE.values.hit.crouchDrop	1	0.55
+tables.CHAR_MALE.values.hit.headR	1	0.4
+tables.CHAR_MALE.values.hit.headY	1	2.12
+tables.CHAR_MALE.values.hit.legBotY	1	0.12
+tables.CHAR_MALE.values.hit.legR	1	0.42
+tables.CHAR_MALE.values.hit.legTopY	1	0.95
+tables.CHAR_MALE.values.hit.torsoBotY	1	0.95
+tables.CHAR_MALE.values.hit.torsoR	1	0.52
+tables.CHAR_MALE.values.hit.torsoTopY	1	1.5
+tables.CHAR_MALE.values.parts[*].pos[*]	114	0 0.98 -0.12 -0.21 -0.05 -0.23 -0.46 -0.22 -0.44 0.1 0.21 0.05 ...
+tables.CHAR_MALE.values.parts[*].hseg	11	10 16 12 6 8
+tables.CHAR_MALE.values.parts[*].ow	27	0.05 0.03 0.04 0 0.02
+tables.CHAR_MALE.values.parts[*].r	11	0.35 0.3 0.36 0.375 0.05 0.045 0.2 0.11
+tables.CHAR_MALE.values.parts[*].scale[*]	21	1.05 0.7 0.9 1.35 0.62 0.72 1 0.82 1.08 1.6 1.3 0.6 ...
+tables.CHAR_MALE.values.parts[*].wseg	11	14 18 16 8 12 10
+tables.CHAR_MALE.values.parts[*].h	16	0.34 0.46 0.44 0.14 1 0.28 0.18 0.028 0.58 0.59
+tables.CHAR_MALE.values.parts[*].rb	12	0.33 0.16 0.115 0.31 0.44 0.09
+tables.CHAR_MALE.values.parts[*].rseg	12	16 12 18
+tables.CHAR_MALE.values.parts[*].rt	12	0.37 0.19 0.15 0.41 0.5 0.13 0.135 0.115
+tables.CHAR_MALE.values.parts[*].d	4	0.4 0.05
+tables.CHAR_MALE.values.parts[*].w	4	0.2 0.11
+tables.CHAR_MALE.values.parts[*].rot[*]	6	0 0.12 -0.12
+tables.CHAR_MALE.values.pelvisY	1	0.98
+tables.CHAR_FEMALE.values.colors.dark	1	2106410
+tables.CHAR_FEMALE.values.colors.eyes	1	3358778
+tables.CHAR_FEMALE.values.colors.hair	1	2759698
+tables.CHAR_FEMALE.values.colors.skin	1	14855302
+tables.CHAR_FEMALE.values.colors.steel	1	6975608
+tables.CHAR_FEMALE.values.hit.crouchDrop	1	0.55
+tables.CHAR_FEMALE.values.hit.headR	1	0.4
+tables.CHAR_FEMALE.values.hit.headY	1	2.12
+tables.CHAR_FEMALE.values.hit.legBotY	1	0.12
+tables.CHAR_FEMALE.values.hit.legR	1	0.42
+tables.CHAR_FEMALE.values.hit.legTopY	1	0.95
+tables.CHAR_FEMALE.values.hit.torsoBotY	1	0.95
+tables.CHAR_FEMALE.values.hit.torsoR	1	0.52
+tables.CHAR_FEMALE.values.hit.torsoTopY	1	1.5
+tables.CHAR_FEMALE.values.parts[*].pos[*]	123	0 0.93 -0.1 -0.19 -0.05 -0.23 -0.46 -0.22 -0.44 0.09 0.19 0.05 ...
+tables.CHAR_FEMALE.values.parts[*].hseg	12	10 16 14 6 8
+tables.CHAR_FEMALE.values.parts[*].ow	30	0.05 0.03 0.04 0 0.02
+tables.CHAR_FEMALE.values.parts[*].r	12	0.34 0.11 0.36 0.048 0.04 0.16 0.095
+tables.CHAR_FEMALE.values.parts[*].scale[*]	18	1.12 0.66 0.9 0.98 1.06 1.08 1 1.18 1.55 1.3 1.05 0.58
+tables.CHAR_FEMALE.values.parts[*].wseg	12	14 12 18 16 8 10
+tables.CHAR_FEMALE.values.parts[*].h	18	0.3 0.46 0.44 0.12 0.98 0.24 0.2 0.16 0.5 0.024 0.58 0.59
+tables.CHAR_FEMALE.values.parts[*].rb	14	0.3 0.13 0.1 0.25 0.36 0.34 0.05 0.085 0.07
+tables.CHAR_FEMALE.values.parts[*].rseg	14	16 12 18 8
+tables.CHAR_FEMALE.values.parts[*].rt	14	0.35 0.16 0.125 0.33 0.4 0.1 0.085
+tables.CHAR_FEMALE.values.parts[*].d	4	0.36 0.045
+tables.CHAR_FEMALE.values.parts[*].w	4	0.17 0.1
+tables.CHAR_FEMALE.values.parts[*].rot[*]	9	0.5 0 0.12 -0.12
+tables.CHAR_FEMALE.values.pelvisY	1	0.93
+tables.GUN_KIT.values.amk.grip[*]	3	0 -0.06 -0.08
+tables.GUN_KIT.values.amk.mass	1	1
+tables.GUN_KIT.values.amk.muzzle[*]	3	0 0.02 1.08
+tables.GUN_KIT.values.amk.rail[*]	3	0.28 0.6 -0.03
+tables.GUN_KIT.values.amk.reload.at[*]	3	0 0.02 1
+tables.GUN_KIT.values.amk.stock[*]	3	0 -0.01 -0.62
+tables.GUN_KIT.values.bagpipe.grip[*]	3	0 -0.06 -0.1
+tables.GUN_KIT.values.bagpipe.mass	1	1.15
+tables.GUN_KIT.values.bagpipe.muzzle[*]	3	0 0.035 0.84
+tables.GUN_KIT.values.bagpipe.rail[*]	3	0.24 0.44 -0.12
+tables.GUN_KIT.values.bagpipe.reload.at[*]	3	0 0.05 0.1
+tables.GUN_KIT.values.bagpipe.stock[*]	3	0 -0.02 -0.56
+tables.GUN_KIT.values.lancer.grip[*]	3	0 -0.07 -0.08
+tables.GUN_KIT.values.lancer.mass	1	0.9
+tables.GUN_KIT.values.lancer.muzzle[*]	3	0 0.01 0.98
+tables.GUN_KIT.values.lancer.rail[*]	3	0.36 0.62 -0.06
+tables.GUN_KIT.values.lancer.reload.at[*]	3	0 -0.17 0.16
+tables.GUN_KIT.values.lancer.stock[*]	3	0 -0.03 -0.54
+tables.GUN_KIT.values.shabzon.grip[*]	3	0 -0.06 -0.08
+tables.GUN_KIT.values.shabzon.mass	1	0.6
+tables.GUN_KIT.values.shabzon.muzzle[*]	3	0 0.02 0.64
+tables.GUN_KIT.values.shabzon.rail[*]	3	0.1 0.4 -0.04
+tables.GUN_KIT.values.shabzon.reload.at[*]	3	0 -0.13 0.14
+tables.GUN_KIT.values.shabzon.stock[*]	3	0 -0.03 -0.47
+tables.GUN_KIT.values.torque.grip[*]	3	0 -0.06
+tables.GUN_KIT.values.torque.mass	1	0.85
+tables.GUN_KIT.values.torque.muzzle[*]	3	0 0.07 0.76
+tables.GUN_KIT.values.torque.rail[*]	3	0.3 0.52 -0.04
+tables.GUN_KIT.values.torque.reload.at[*]	3	0 0.07 0.08
+tables.GUN_KIT.values.torque.stock[*]	3	0 -0.03 -0.5
+tables.BK.values.COVER.drystone.height	1	1.4
+tables.BK.values.COVER.drystone.thickness	1	0.5
+tables.BK.values.COVER.fence.height	1	0.95
+tables.BK.values.COVER.fence.thickness	1	0.26
+tables.BK.values.COVER.hedge.height	1	1.6
+tables.BK.values.COVER.hedge.thickness	1	1
+tables.BK.values.DIMS[*][*]	12	5 14 0.1 11 3.2 7 1.2 4
+tables.BK.values.NAMED.brickFarm.d	1	5.4
+tables.BK.values.NAMED.brickFarm.pitch	1	2.4
+tables.BK.values.NAMED.brickFarm.w	1	7.5
+tables.BK.values.NAMED.brickFarm.wallH	1	3.3
+tables.BK.values.NAMED.thatchCottage.d	1	4.6
+tables.BK.values.NAMED.thatchCottage.pitch	1	3.2
+tables.BK.values.NAMED.thatchCottage.w	1	5.6
+tables.BK.values.NAMED.thatchCottage.wallH	1	2.6
+tables.BK.values.NAMED.timberHouse.d	1	5
+tables.BK.values.NAMED.timberHouse.pitch	1	2.6
+tables.BK.values.NAMED.timberHouse.w	1	6
+tables.BK.values.NAMED.timberHouse.wallH	1	3.4
+tables.BK.values.PRESETS.normandy.dims.d[*]	2	5.5 9
+tables.BK.values.PRESETS.normandy.dims.pitch[*]	2	1.8 3.2
+tables.BK.values.PRESETS.normandy.dims.w[*]	2	7 12
+tables.BK.values.PRESETS.normandy.dims.wallH[*]	2	3.4 5.4
+tables.BK.values.PRESETS.normandy.weights.dormers.0	1	45
+tables.BK.values.PRESETS.normandy.weights.dormers.1	1	35
+tables.BK.values.PRESETS.normandy.weights.dormers.2	1	20
+tables.BK.values.PRESETS.normandy.weights.footprint.L	1	20
+tables.BK.values.PRESETS.normandy.weights.footprint.T	1	14
+tables.BK.values.PRESETS.normandy.weights.footprint.U	1	10
+tables.BK.values.PRESETS.normandy.weights.footprint.longbar	1	16
+tables.BK.values.PRESETS.normandy.weights.footprint.rect	1	40
+tables.BK.values.PRESETS.normandy.weights.roof.gable	1	34
+tables.BK.values.PRESETS.normandy.weights.roof.gambrel	1	12
+tables.BK.values.PRESETS.normandy.weights.roof.halfhip	1	20
+tables.BK.values.PRESETS.normandy.weights.roof.hip	1	22
+tables.BK.values.PRESETS.normandy.weights.roof.saltbox	1	12
+tables.BK.values.PRESETS.normandy.weights.roofSkin.slate	1	30
+tables.BK.values.PRESETS.normandy.weights.roofSkin.thatch	1	20
+tables.BK.values.PRESETS.normandy.weights.roofSkin.tile	1	50
+tables.BK.values.PRESETS.normandy.weights.wallSkin.brick	1	25
+tables.BK.values.PRESETS.normandy.weights.wallSkin.plaster	1	35
+tables.BK.values.PRESETS.normandy.weights.wallSkin.timber	1	40
+tables.MELEE_IDLE.values.x	1	-0.05
+tables.MELEE_IDLE.values.y	1	0.82
+tables.ANIM.values.aim.ads.gripL[*]	3	0.06 -0.2 0.44
+tables.ANIM.values.aim.ads.gripR[*]	3	0.18 -0.14 -0.07
+tables.ANIM.values.aim.ads.gun[*]	3	0.33 0.16 0.7
+tables.ANIM.values.aim.ads.poleL[*]	3	-0.6 -0.85 -0.3
+tables.ANIM.values.aim.ads.poleR[*]	3	0.6 -0.85 -0.3
+tables.ANIM.values.aim.ads.rot[*]	3	-0.04 0 0.1
+tables.ANIM.values.aim.adsK	1	45
+tables.ANIM.values.aim.carry.gripL[*]	3	-0.2 -0.14 0.3
+tables.ANIM.values.aim.carry.gripR[*]	3	0.17 -0.04 0.03
+tables.ANIM.values.aim.carry.gun[*]	3	0.13 -0.13 0.7
+tables.ANIM.values.aim.carry.poleL[*]	3	-0.6 -0.85 -0.3
+tables.ANIM.values.aim.carry.poleR[*]	3	0.6 -0.85 -0.3
+tables.ANIM.values.aim.carry.rot[*]	3	0.72 -0.44 0.58
+tables.ANIM.values.breath	1	0.02
+tables.ANIM.values.breathRate	1	1.7
+tables.ANIM.values.charge.at[*]	3	-0.12 -0.1 0.3
+tables.ANIM.values.charge.pitch	1	0.12
+tables.ANIM.values.charge.yaw	1	0.2
+tables.ANIM.values.coat.back	1	0.75
+tables.ANIM.values.coat.flare	1	0.12
+tables.ANIM.values.coat.front	1	0.95
+tables.ANIM.values.coat.max	1	0.6
+tables.ANIM.values.coat.min	1	-0.8
+tables.ANIM.values.cycleMax	1	1.1
+tables.ANIM.values.cycleMin	1	0.26
+tables.ANIM.values.death.bounce	1	0.3
+tables.ANIM.values.death.buckleT	1	0.22
+tables.ANIM.values.death.g	1	11
+tables.ANIM.values.death.kneelY	1	0.62
+tables.ANIM.values.death.lie	1	1.4
+tables.ANIM.values.death.lieY	1	0.47
+tables.ANIM.values.death.push	1	1
+tables.ANIM.values.draw.at[*]	3	0.05 -0.35 -0.1
+tables.ANIM.values.draw.pitch	1	1.1
+tables.ANIM.values.draw.roll	1	0.4
+tables.ANIM.values.drop[*]	3	0.03 0.11 0.14
+tables.ANIM.values.duty[*]	3	0.6 0.3 0.26
+tables.ANIM.values.flinch.head	1	0.5
+tables.ANIM.values.flinch.k	1	120
+tables.ANIM.values.flinch.kick	1	9
+tables.ANIM.values.flinch.pitch	1	0.6
+tables.ANIM.values.flinch.roll	1	1
+tables.ANIM.values.hold.rifle.ads.at[*]	3	0.52 -0.04 -0.06
+tables.ANIM.values.hold.rifle.ads.blade	1	0.52
+tables.ANIM.values.hold.rifle.ads.rot[*]	2	-0.05 0
+tables.ANIM.values.hold.rifle.carry.at[*]	3	0.52 -0.34 -0.1
+tables.ANIM.values.hold.rifle.carry.blade	1	0.48
+tables.ANIM.values.hold.rifle.carry.rot[*]	3	0.24 -0.28 0.22
+tables.ANIM.values.hold.rifle.sprint.at[*]	3	0.4 -0.52 0.3
+tables.ANIM.values.hold.rifle.sprint.blade	1	0.16
+tables.ANIM.values.hold.rifle.sprint.rot[*]	3	-0.8 -1 -0.4
+tables.ANIM.values.hold.scatter.ads.at[*]	3	0.54 -0.24 -0.02
+tables.ANIM.values.hold.scatter.ads.blade	1	0.48
+tables.ANIM.values.hold.scatter.ads.rot[*]	2	-0.06 0
+tables.ANIM.values.hold.scatter.carry.at[*]	3	0.52 -0.36 -0.02
+tables.ANIM.values.hold.scatter.carry.blade	1	0.48
+tables.ANIM.values.hold.scatter.carry.rot[*]	3	0.18 -0.26
+tables.ANIM.values.hold.scatter.sprint.at[*]	3	0.4 -0.52 0.3
+tables.ANIM.values.hold.scatter.sprint.blade	1	0.16
+tables.ANIM.values.hold.scatter.sprint.rot[*]	3	-0.8 -1 -0.4
+tables.ANIM.values.hold.smg.ads.at[*]	3	0.5 0 0.02
+tables.ANIM.values.hold.smg.ads.blade	1	0.46
+tables.ANIM.values.hold.smg.ads.rot[*]	2	-0.06 0
+tables.ANIM.values.hold.smg.carry.at[*]	3	0.5 -0.28 0
+tables.ANIM.values.hold.smg.carry.blade	1	0.44
+tables.ANIM.values.hold.smg.carry.rot[*]	3	0.18 -0.26
+tables.ANIM.values.hold.smg.sprint.at[*]	3	0.42 -0.46 0.3
+tables.ANIM.values.hold.smg.sprint.blade	1	0.16
+tables.ANIM.values.hold.smg.sprint.rot[*]	3	-0.85 -1 -0.4
+tables.ANIM.values.idleSpeed	1	0.35
+tables.ANIM.values.idleStagger	1	0.11
+tables.ANIM.values.idleStepT	1	0.2
+tables.ANIM.values.katana.at[*]	3	0.16 -0.42 0.58
+tables.ANIM.values.katana.hilt[*]	3	0 -0.12
+tables.ANIM.values.katana.pitch	1	-0.7
+tables.ANIM.values.katana.sweep	1	0.3
+tables.ANIM.values.katana.yaw	1	-0.1
+tables.ANIM.values.lift[*]	2	0.13 0.26
+tables.ANIM.values.pelvisBob[*]	2	0.012 0.024
+tables.ANIM.values.pelvisRoll	1	0.035
+tables.ANIM.values.pelvisSway	1	0.02
+tables.ANIM.values.poleL[*]	3	-0.55 -0.8 -0.25
+tables.ANIM.values.poleR[*]	3	0.55 -0.8 -0.25
+tables.ANIM.values.reachFrac	1	0.97
+tables.ANIM.values.recoil.back	1	0.12
+tables.ANIM.values.recoil.chest	1	0.15
+tables.ANIM.values.recoil.pitch	1	0.22
+tables.ANIM.values.reload.pouch[*]	3	-0.3 -0.8 0.4
+tables.ANIM.values.reload.quiver[*]	3	0.3 0.4 -0.35
+tables.ANIM.values.reload.styles.break.dir[*]	3	0 -1
+tables.ANIM.values.reload.styles.break.keys[*][*]	44	0 0.16 1 0.26 0.38 0.46 0.06 0.56 0.64 0.72 0.84 0.96
+tables.ANIM.values.reload.styles.break.pose[*]	6	0.7 -0.2 -0.3 -0.05 0.05
+tables.ANIM.values.reload.styles.drum.dir[*]	3	0 -1
+tables.ANIM.values.reload.styles.drum.keys[*][*]	36	0 0.12 1 0.24 0.14 0.42 0.54 0.7 0.78 -0.02 0.88
+tables.ANIM.values.reload.styles.drum.pose[*]	6	0.3 -0.3 -0.8 -0.08 0.1 0.05
+tables.ANIM.values.reload.styles.mag.dir[*]	3	0 -1
+tables.ANIM.values.reload.styles.mag.keys[*][*]	36	0 0.12 1 0.22 0.4 0.52 0.68 0.1 0.76 -0.02 0.86
+tables.ANIM.values.reload.styles.mag.pose[*]	6	0.35 -0.25 -0.7 -0.08 0.1 0.05
+tables.ANIM.values.reload.styles.nock.dir[*]	3	0 -1
+tables.ANIM.values.reload.styles.nock.keys[*][*]	32	0 0.18 1 0.3 0.46 0.54 0.72 0.86
+tables.ANIM.values.reload.styles.nock.pose[*]	6	0.15 -0.1 -0.2 0
+tables.ANIM.values.reload.styles.ram.dir[*]	3	0 -1
+tables.ANIM.values.reload.styles.ram.keys[*][*]	40	0 0.14 1 0.24 0.36 0.44 0.28 0.52 0.6 0.68 0.8
+tables.ANIM.values.reload.styles.ram.pose[*]	6	-1.05 -0.2 0 -0.25 -0.9 0.35
+tables.ANIM.values.restepDist	1	0.26
+tables.ANIM.values.shield.at[*]	3	-0.1 -0.08 0.78
+tables.ANIM.values.shield.pitch	1	0
+tables.ANIM.values.shield.yaw	1	-0.12
+tables.ANIM.values.spr.coat.k	1	70
+tables.ANIM.values.spr.drop.k	1	90
+tables.ANIM.values.spr.gait.k	1	60
+tables.ANIM.values.spr.lean.k	1	70
+tables.ANIM.values.spr.legYaw.k	1	110
+tables.ANIM.values.spr.stance.k	1	40
+tables.ANIM.values.spr.sway.k	1	130
+tables.ANIM.values.sprintLean	1	0.3
+tables.ANIM.values.sprintRef	1	9
+tables.ANIM.values.stanceW	1	0.95
+tables.ANIM.values.sway.bob	1	0.6
+tables.ANIM.values.sway.max	1	0.22
+tables.ANIM.values.sway.turn	1	0.045
+tables.ANIM.values.throw.release[*]	3	-0.1 0.15 0.95
+tables.ANIM.values.throw.t	1	0.45
+tables.ANIM.values.throw.wind[*]	3	-0.45 0.55 -0.3
+tables.ANIM.values.toeOut	1	0.1
+tables.ANIM.values.toePitch	1	1.5
+tables.ANIM.values.torsoRoll	1	0.03
+tables.ANIM.values.twistMax	1	0.95
+tables.ANIM.values.walkLean	1	0.06
+tables.ANIM.values.walkRef	1	6.3
+tables.ARM_L1.values	1	0.46
+tables.NAV.values.budget	1	0
+tables.NAV.values.cs	1	2
+tables.NAV.values.hn	1	0
+tables.NAV.values.nx	1	0
+tables.NAV.values.nz	1	0
+tables.NAV.values.sid	1	0
+tables.NAV.values.x0	1	0
+tables.NAV.values.z0	1	0
+tables.AI_STATE.values.budget	1	0
+tables.AI_STATE.values.checks	1	0
+tables.AI_STATE.values.scans	1	0
+tables.AI_STATE.values.step	1	0
+boot_changes.DM_Cabana (default)[*].to.barrels.h	1	1
+boot_changes.DM_Cabana (default)[*].to.cart.h	1	1.3
+boot_changes.DM_Cabana (default)[*].to.haybales.h	1	1.5
+boot_changes.DM_Cabana (default)[*].to.haystack.h	1	2.4
+boot_changes.DM_Cabana (default)[*].to.logpile.h	1	1.1
+boot_changes.DM_Cabana (default)[*].to.trough.h	1	0.7
+boot_changes.DM_Cabana (default)[*].to.vegpatch.h	1	0.4
+boot_changes.DM_Cabana (default)[*].to.well.h	1	2.4
+boot_changes.DM_Cabana (default)[*].to.apple.blobs	1	6
+boot_changes.DM_Cabana (default)[*].to.apple.canopyH	1	2.8
+boot_changes.DM_Cabana (default)[*].to.apple.colR	1	1
+boot_changes.DM_Cabana (default)[*].to.apple.leaf	1	6987326
+boot_changes.DM_Cabana (default)[*].to.apple.seed	1	3
+boot_changes.DM_Cabana (default)[*].to.apple.spread	1	1.8
+boot_changes.DM_Cabana (default)[*].to.apple.trunkBot	1	0.28
+boot_changes.DM_Cabana (default)[*].to.apple.trunkH	1	1.8
+boot_changes.DM_Cabana (default)[*].to.apple.trunkTop	1	0.22
+boot_changes.DM_Cabana (default)[*].to.oak.blobs	1	8
+boot_changes.DM_Cabana (default)[*].to.oak.canopyH	1	4.2
+boot_changes.DM_Cabana (default)[*].to.oak.colR	1	1.4
+boot_changes.DM_Cabana (default)[*].to.oak.leaf	1	5209904
+boot_changes.DM_Cabana (default)[*].to.oak.seed	1	11
+boot_changes.DM_Cabana (default)[*].to.oak.spread	1	2.8
+boot_changes.DM_Cabana (default)[*].to.oak.trunkBot	1	0.5
+boot_changes.DM_Cabana (default)[*].to.oak.trunkH	1	2.6
+boot_changes.DM_Cabana (default)[*].to.oak.trunkTop	1	0.36
+boot_changes.DM_Cabana (default)[*].to.poplar.blobs	1	9
+boot_changes.DM_Cabana (default)[*].to.poplar.canopyH	1	6
+boot_changes.DM_Cabana (default)[*].to.poplar.colR	1	0.9
+boot_changes.DM_Cabana (default)[*].to.poplar.leaf	1	6262586
+boot_changes.DM_Cabana (default)[*].to.poplar.seed	1	7
+boot_changes.DM_Cabana (default)[*].to.poplar.spread	1	1.25
+boot_changes.DM_Cabana (default)[*].to.poplar.trunkBot	1	0.34
+boot_changes.DM_Cabana (default)[*].to.poplar.trunkH	1	2
+boot_changes.DM_Cabana (default)[*].to.poplar.trunkTop	1	0.18
+boot_changes.DM_Cabana (default)[*].from	6	0
+boot_changes.DM_Cabana (default)[*].to	6	30 185 125 3 -185 -125
+boot_changes.DM_Tri (?map=tri)[*].to.barrels.h	1	1
+boot_changes.DM_Tri (?map=tri)[*].to.cart.h	1	1.3
+boot_changes.DM_Tri (?map=tri)[*].to.haybales.h	1	1.5
+boot_changes.DM_Tri (?map=tri)[*].to.haystack.h	1	2.4
+boot_changes.DM_Tri (?map=tri)[*].to.logpile.h	1	1.1
+boot_changes.DM_Tri (?map=tri)[*].to.trough.h	1	0.7
+boot_changes.DM_Tri (?map=tri)[*].to.vegpatch.h	1	0.4
+boot_changes.DM_Tri (?map=tri)[*].to.well.h	1	2.4
+boot_changes.DM_Tri (?map=tri)[*].to.apple.blobs	1	6
+boot_changes.DM_Tri (?map=tri)[*].to.apple.canopyH	1	2.8
+boot_changes.DM_Tri (?map=tri)[*].to.apple.colR	1	1
+boot_changes.DM_Tri (?map=tri)[*].to.apple.leaf	1	6987326
+boot_changes.DM_Tri (?map=tri)[*].to.apple.seed	1	3
+boot_changes.DM_Tri (?map=tri)[*].to.apple.spread	1	1.8
+boot_changes.DM_Tri (?map=tri)[*].to.apple.trunkBot	1	0.28
+boot_changes.DM_Tri (?map=tri)[*].to.apple.trunkH	1	1.8
+boot_changes.DM_Tri (?map=tri)[*].to.apple.trunkTop	1	0.22
+boot_changes.DM_Tri (?map=tri)[*].to.oak.blobs	1	8
+boot_changes.DM_Tri (?map=tri)[*].to.oak.canopyH	1	4.2
+boot_changes.DM_Tri (?map=tri)[*].to.oak.colR	1	1.4
+boot_changes.DM_Tri (?map=tri)[*].to.oak.leaf	1	5209904
+boot_changes.DM_Tri (?map=tri)[*].to.oak.seed	1	11
+boot_changes.DM_Tri (?map=tri)[*].to.oak.spread	1	2.8
+boot_changes.DM_Tri (?map=tri)[*].to.oak.trunkBot	1	0.5
+boot_changes.DM_Tri (?map=tri)[*].to.oak.trunkH	1	2.6
+boot_changes.DM_Tri (?map=tri)[*].to.oak.trunkTop	1	0.36
+boot_changes.DM_Tri (?map=tri)[*].to.poplar.blobs	1	9
+boot_changes.DM_Tri (?map=tri)[*].to.poplar.canopyH	1	6
+boot_changes.DM_Tri (?map=tri)[*].to.poplar.colR	1	0.9
+boot_changes.DM_Tri (?map=tri)[*].to.poplar.leaf	1	6262586
+boot_changes.DM_Tri (?map=tri)[*].to.poplar.seed	1	7
+boot_changes.DM_Tri (?map=tri)[*].to.poplar.spread	1	1.25
+boot_changes.DM_Tri (?map=tri)[*].to.poplar.trunkBot	1	0.34
+boot_changes.DM_Tri (?map=tri)[*].to.poplar.trunkH	1	2
+boot_changes.DM_Tri (?map=tri)[*].to.poplar.trunkTop	1	0.18
+boot_changes.DM_Tri (?map=tri)[*].from	27	0 -60 -70 70 -140 -90 140
+boot_changes.DM_Tri (?map=tri)[*].to	27	-23 39.84 0 -69 -39.84 76.21 21 -111 -76.21 25 185 125 ...
+boot_changes.DM_Tri (?map=tri)[*].to.allies.dock.x	1	-18.48
+boot_changes.DM_Tri (?map=tri)[*].to.allies.dock.z	1	60.17
+boot_changes.DM_Tri (?map=tri)[*].to.allies.lane.x	1	0
+boot_changes.DM_Tri (?map=tri)[*].to.allies.lane.z	1	-18
+boot_changes.DM_Tri (?map=tri)[*].to.empire.dock.x	1	-62.78
+boot_changes.DM_Tri (?map=tri)[*].to.empire.dock.z	1	-80.59
+boot_changes.DM_Tri (?map=tri)[*].to.empire.lane.x	1	-4.33
+boot_changes.DM_Tri (?map=tri)[*].to.empire.lane.z	1	-25.5
+boot_changes.DM_Tri (?map=tri)[*].to.soviets.dock.x	1	81.26
+boot_changes.DM_Tri (?map=tri)[*].to.soviets.dock.z	1	-48.58
+boot_changes.DM_Tri (?map=tri)[*].to.soviets.lane.x	1	4.33
+boot_changes.DM_Tri (?map=tri)[*].to.soviets.lane.z	1	-25.5
+boot_changes.DM_Tri (?map=tri)[*].to.x	1	-76.21
+boot_changes.DM_Tri (?map=tri)[*].to.z	1	21
