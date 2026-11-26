@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 23:44 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 23:52 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -686,7 +686,12 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
 - **CI on step 7's head d313162: green** (gate run 45902998609, with smoke; toolchain run 45902998524, 8 min 23 s
   for its build-and-test step: 16 s more than step 6's, the dev-profile twin's build). So the built-file check
   passed on CI's own build, in both flavours, with CI's paths.
-- **Step 8, first part: the tools, on test files (built; in its local checks).** No file under `content/` is
+- **Step 8, first part: the tools, on test files: DONE** (commit 54e89d2, pushed 2026-11-26, 23:46 Amsterdam;
+  the gate passes; the full local checks passed whole: 206 Rust tests twice, 205 in release, client 128,
+  sim-worker 51, 34 boundary tests, 18 browser tests in 204 s, recordings unchanged, the players' file
+  unchanged; **2,592 written lines of 4b-2**, of 8,450: this part took 1,253 where the sheet's count for the
+  whole step is 545, mostly tests (the walk's 346, the hand-over's 266). CI's gate is green on it; its toolchain
+  run was still going at 23:52.) No file under `content/` is
   written before his DIFF-LIST answer (said to him so), the map included; the drafts wait in the notes.
   - `crates/devtools/src/content_files.rs` and `src/bin/content_bundle.rs`: the walk of `content/` (one folder
     per kind, the content crate's own list, now public; `source/` skipped but held to be a real folder; every
@@ -721,6 +726,27 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     50 m lane with posts) is taken too; the bundle of both is 8,375 bytes. The table's draft is
     `cs4b-content/testlines-table-draft.json` (16 rows: 15 fields and "stamina is on").
   - Ten more plants in `plants-4b2.py` (T1 to T10), tried by hand, all caught.
+- **Ahead, by the count:** steps 6, 7 and 8's first part are 2,592 written lines for about 1,545 by the designs'
+  count (1.68 times). What is left (step 8's second part about 100, steps 9 to 12 about 2,100): at 1.68 the
+  whole ends near 6,300; at 4b-1's 2.17 near 7,400, which passes the first rung (6,750: the schema writer moves
+  to 4d) and stays under the second (8,000) and the stop line. Two thirds (5,633) is not reached.
+- **While DIFF-LIST is open (asked 23:11; no answer of his yet at 23:52):**
+  - **Step 9's one manifest line is with security-auditor** (his DEP-HOLD: nothing of it is in the tree):
+    `crates/content/Cargo.toml` gains `[dev-dependencies] ts-rs = { workspace = true }` and `Cargo.lock`'s
+    `content` entry gains that one dependency ("Locking 0 packages"). Outside the tree:
+    `.gate/cs4b/batch-step9/`; digests `cs4b-content/deps-step9.sha256` (Cargo.lock 56bd2d52...9c47,
+    crates/content/Cargo.toml 620a400b...8b9c); diff `deps-step9.diff`; brief `deps-step9-brief.md`. Resolved
+    only (`cargo tree` in a scratch copy): the feature lists stay 71, 71 and 76 with no difference.
+  - **Step 10's design read is with rust-reviewer** (`rust-reviewer-step10-brief.md`), before any of it is
+    built. What I read in parry3d 0.31.1: `Bvh::cast_ray` keeps the first-visited leaf of two at the same
+    distance (`find_best`, `primitive_score < best_cost`), so the visiting order would decide a tie where the
+    design says the lower id wins; I proposed our own depth-first walk with our own slab test and the tie by
+    index. Also asked: which `libm` routines the tree's build links (for `maths-allowed.mjs`), and how to hold
+    the depth of 31.
+  - **A change of order, for the advisor agent's next read:** the part of step 10 that needs no content file
+    (the static world from a map document, its tree's bytes, the ray cast, on maps made in tests) is built
+    before step 9, because step 8's second part and step 9 both rest on his DIFF-LIST answer (the content files,
+    the frozen content of the first recording). No step's content changes; steps 11 and 12 stay last.
 - **To do before 4b-2 merges:** RustSec advisories for the 33 packages (security-auditor could not read them
   without the network); the licence texts for the hosted build (a follow-up for lane 2).
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
