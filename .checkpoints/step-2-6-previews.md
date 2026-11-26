@@ -234,8 +234,16 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   net 0; main's lines not lane 2's to fold). toolchain.yml equals main's (sha256 d017b83b...). Staged tree: vs 5ab420d7
   main's 8 files; vs main the branch's 74. Five sha256 unchanged; 175 tests; repo map OK (225 entries); gate PASS
   (--no-smoke); main still 3b949c1 by ls-remote before the commit. Pushed (5ab420d..851f004). The advisor agent's
-  review of 851f004 (scope 90c939f4..851f004): running (advisor-head-851f004.md), with a reading of his "your own next
-  merge" for a question to him (ORDER-WALL, to come).
+  review of 851f004 (scope 90c939f4..851f004; advisor-head-851f004.md): APPROVE (the merge and notes commits; it
+  approves no order). CI on 851f004: gate, smoke, toolchain (both runs), preview/tests green; on the pull-request run
+  #74's build check and hand-over passed and `preview-site` was uploaded (250470 bytes); no workflow_run run exists, so
+  nothing deployed; wall-test red by design (refusal lines read; the existing comment 7177047663 covers them). Lows for
+  the docs pass: L1 (the report lists Part 15, change-set 1 and the kit hold moves), L3 (the DECISIONS entry of his
+  MAIN-WALL message carries 17:31:13 UTC, not "about 17:15", which is when the rule took effect; the merge message's
+  wording), L4 (STATUS 125 lines as main: fold merged-PR lines by script under OLD-LINES (a) at the docs pass, or say
+  why not), L5 (the runbook's "Before the hand-over step is on main" is out of date since #74). Its read of his "your
+  own next merge" (item 6 of its notes) went to him as ORDER-WALL (questions-2026-11-26-order-wall.md; recommended (a):
+  the token sitting stays before #72's merge).
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
@@ -263,7 +271,7 @@ f. His go after his Advisor's merge check; merge with the approved head as the e
 g. After #72 and the CI Builder's hand-over step (#59) are both merged: M5 to M11.
 For the docs pass before ready: STATUS's #72 row and lane 2's Waiting bullet and Next item 3 still describe the
 hand-over as to come; the report's Outcome, Proposed next step and For Mustafa likewise; the report lists the Part 15
-move, the change-set 1 move and the kit hold move (OLD-LINES) and the merges 6c812700, 90c939f4 and 851f004 (the advisor agent's L1); the report's process facts gain T1's probe and his
+move, the change-set 1 move and the kit hold move (OLD-LINES) and the merges 6c812700, 90c939f4 and 851f004 (the advisor agent's L1); his MAIN-WALL message's DECISIONS entry at 17:31:13 UTC (L3); STATUS's 125 lines folded by script under OLD-LINES (a) or the reason said (L4); the runbook's "Before the hand-over step is on main" section made true (L5); the report's process facts gain T1's probe and his
 GUARD-PROMPT (a), which answers, for this chat, risk 1's open point (an ask in Auto mode reached him, with the guard's
 reason); his 15:05 message goes into DECISIONS by script (uuid, 738 bytes, sha256 above).
 
