@@ -1,0 +1,132 @@
+diff --git a/spikes/netcode-proof/ops/runs/r1.sh b/spikes/netcode-proof/ops/runs/r1.sh
+index 2eeaa57..24122c0 100644
+--- a/spikes/netcode-proof/ops/runs/r1.sh
++++ b/spikes/netcode-proof/ops/runs/r1.sh
+@@ -185,7 +185,7 @@ PY
+ }
+ # alone_min <room log>: the least `alone` over the log's affinity events.
+ alone_min() { logq "$1" affinity alone | sort -n | head -n 1; }
+-# One npt-log event field per line: logq <log> <event> <field>.
++# One npt-log event field per line: logq <log> <event> <field> (`-`: each such event's fields, one JSON object a line).
+ logq() {
+   python3 -I - "$1" "$2" "$3" << 'PY'
+ import json, sys
+@@ -196,8 +196,8 @@ try:
+             r = json.loads(line)
+         except ValueError:
+             continue
+-        if r.get("k") == "event" and r.get("ev") == ev and field in r.get("f", {}):
+-            print(r["f"][field])
++        if r.get("k") == "event" and r.get("ev") == ev and (field == "-" or field in r.get("f", {})):
++            print(json.dumps(r["f"]) if field == "-" else r["f"][field])
+ except OSError:
+     pass
+ PY
+@@ -605,7 +605,7 @@ probe() {
+ # INVALID: eval.rs:37-75). probe_presence <rooms dir> NN <settings run>.
+ probe_presence() {
+   python3 -I - "$1" "$2" "$3" << 'PY'
+-import json, os, sys
++import json, os, re, sys
+ rooms, nn, run = sys.argv[1:4]
+ # NC-SB-9, NC-U6C-12 (U6c's merged names, SERIES.md:920-935, :952): each direction's rate is l2_summary's
+ # probe_<d>_window_count over FP-1's probe_<d>_window_ns, 10,000 a second within 1 %; P1's two slack and policy reads
+@@ -613,10 +613,12 @@ rooms, nn, run = sys.argv[1:4]
+ # "unknown"; a policy reads "<name> <priority>": socket.rs:319, :358-362), the policy's name the same at both.
+ RATE = 10000
+ P1_READS = ("probe_start_timer_slack_ns", "probe_start_sched_policy", "l2_timer_slack_ns", "l2_sched_policy")
++POL = {"SCHED_OTHER": 0, "SCHED_FIFO": 1, "SCHED_RR": 2, "SCHED_BATCH": 3, "SCHED_IDLE": 5, "SCHED_DEADLINE": 6}
++pol = lambda p: f"{POL[p.split()[0]]} {int(p.split()[1])}" if type(p) is str and re.fullmatch(r"[A-Z_]+ -?\d+", p) and p.split()[0] in POL else "-1 -1"
+ def rate(s, d):
+     n, ns = (s.get(f"probe_{d}_{k}") for k in ("window_count", "window_ns"))
+     return n * 1e9 / ns if type(n) is int and type(ns) is int and ns > 0 else None
+-reports, unread = [], lambda v: "unread" if v is None else v
++reports, p1, unread = [], [], lambda v: "unread" if v is None else v
+ for leg in ["P0", "P1", "P2", "P3", "P4", "B1"]:
+     seen = {"leg_edge": {}, "cpu_stat": {}}
+     head = foot = summ = None
+@@ -640,6 +642,10 @@ for leg in ["P0", "P1", "P2", "P3", "P4", "B1"]:
+     edge, cpu, rates = seen["leg_edge"], seen["cpu_stat"], [rate(summ or {}, d) for d in ("up", "down")]
+     s0, pol0, s1, pol1 = (((head or {}).get("params") or {}).get(k) for k in P1_READS)
+     p1_read = all(type(x) is int and x != 2**64 - 1 for x in (s0, s1)) and all(type(x) is str and x not in ("", "unknown") for x in (pol0, pol1))
++    if leg == "P1":  # ADV-U8H-1 (b): l2_summary's and the slack reads' integers; each policy as its number and priority
++        vals = list((summ or {}).items()) + [(P1_READS[0], s0), (P1_READS[2], s1)]
++        p1 = [f"P1 {k} {v}" for k, v in vals if re.fullmatch("[a-z0-9_]+", k) and type(v) is int]
++        p1 += [f"P1 {k} {pol(v)}" for k, v in ((P1_READS[1], pol0), (P1_READS[3], pol1))] + [f"P1 non_integer_fields {len(vals) - len(p1)}"]
+     w0, w1 = (count(edge.get(ph, {}), "udp_drops_count") for ph in ("warmup", "after"))
+     span, pps, sent = (count(f, k) for f, k in ((summ or {}, "probe_up_window_ns"), ((head or {}).get("params") or {}, "probe_rate_pps"),
+         ((head or {}).get("params") or {}, "probe_sent_count")))
+@@ -671,7 +677,7 @@ for leg in ["P0", "P1", "P2", "P3", "P4", "B1"]:
+         print(f"P1: INVALID: {d} drops on the probe's P1 socket between its reads (C-U8-6): to the advisor before any L2 mark counts")
+     else:
+         print(f"{leg}: present at both edges")
+-for r in reports:
++for r in reports + p1:
+     print(r)
+ PY
+ }
+@@ -709,6 +715,11 @@ ds_selftest() {
+   stat_cpu "$d/stat-after.txt"
+   lg_keep "$d" 05
+   keep "$d" 05
++  # ADV-U8H-1 (b): the room's ws_split fields (condition 10's read), integers only, for the pushed summaries.
++  logq "$ROOMS/room-05$ATT.jsonl" ws_split - | python3 -I -c 'import json, re, sys
++f = json.loads((sys.stdin.read().splitlines() or ["null"])[0])
++ok = [f"{k} {v}" for k, v in f.items() if re.fullmatch("[a-z0-9_]+", k) and type(v) is int] if isinstance(f, dict) else []
++print("\n".join(ok + [f"ws_split non_integer_fields {len(f) - len(ok)}"]) if isinstance(f, dict) else "no ws_split event in the room log")' > "$d/ws_split.txt"
+ }
+ 
+ # s14_run <dir>: one npt-s14 run copied into <dir>, then compare.py's per-run standing on RS (NC-SB-12).
+diff --git a/spikes/netcode-proof/ops/tests/r1sh.test.mjs b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
+index 1b1e059..e77feb0 100644
+--- a/spikes/netcode-proof/ops/tests/r1sh.test.mjs
++++ b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
+@@ -101,7 +101,7 @@ test("item 4: the probe's settings carry U6c's probe fields; the block stores an
+   assert.match(p, /probe_presence "\$ROOMS" "02\$ATT" "\$\(setting 02 run\)" \| tee/);
+ });
+ 
+-test("item 4: probe_presence on fixture logs: present, a missing edge, a P1 drop, a missing log", () => {
++test("item 4: probe_presence on fixture logs: present, a missing edge, a P1 drop, a missing log; ADV-U8H-1's P1 integers", () => {
+   withTemp((dir) => {
+     const rooms = join(dir, "rooms");
+     mkdirSync(rooms);
+@@ -109,9 +109,12 @@ test("item 4: probe_presence on fixture logs: present, a missing edge, a P1 drop
+       for (const leg of LEGS) writeFileSync(join(rooms, `room-02-${leg}.jsonl`), `${legHead(leg, heads[leg])}\n${logs[leg] ?? legLog()}`);
+     };
+     const all = () => r1bash(dir, ["probe_presence"], `probe_presence "${rooms}" 02 R1-probe-02`).trim().split("\n");
+-    const run = () => all().filter((l) => !l.startsWith("report "));
++    const run = () => all().filter((l) => /^\w+: /.test(l));
+     write({});
+     assert.deepEqual(run(), LEGS.map((l) => `${l}: present at both edges`));
++    const ints = ["probe_up_window_count 1000000", "probe_down_window_count 1000000", "probe_window_ns 100000000000", "probe_up_window_ns 100000000000",
++      "probe_down_window_ns 100000000000", "probe_start_timer_slack_ns 1", "l2_timer_slack_ns 1", "probe_start_sched_policy 1 50", "l2_sched_policy 1 50", "non_integer_fields 0"];
++    assert.deepEqual(all().slice(12), ints.map((l) => `P1 ${l}`), "after the verdicts and reports: P1's l2_summary and its four reads, integers only");
+     // advisor-u6c-r2.md:187-191: per leg, reported and never judged, the rise between the edges, the up span's excess in
+     // intervals (probe_up_window_ns over 1 s / probe_rate_pps, less probe_sent_count) and the rise less the excess.
+     write({ P1: legLog(7, 229, [], 1_000_000, 100_022_400_000) }, { P1: { params: { ...HEAD_READS, probe_rate_pps: 10000, probe_sent_count: 1_000_010 } } });
+@@ -137,6 +140,8 @@ test("item 4: probe_presence on fixture logs: present, a missing edge, a P1 drop
+     const drop = run();
+     assert.match(drop[1], /^P1: INVALID: 2 drops on the probe's P1 socket between its reads \(C-U8-6\)/);
+     assert.equal(drop[2], "P2: present at both edges", "a drop counts against P1 only");
++    write({ P1: legLog(7, 9).replace('"probe_window_ns":100000000000', '"probe_window_ns":"100 s","probe_ok":true') }, { P1: { params: { ...HEAD_READS, l2_sched_policy: "SCHED_UNKNOWN 0" } } });
++    assert.deepEqual(all().slice(12).filter((l) => !ints.includes(l.slice(3))), ["P1 l2_sched_policy -1 -1", "P1 non_integer_fields 2"], "an INVALID P1 prints too");
+     write({ B1: legLog().replace('"udp_row_found":1', '"udp_row_found":0') });
+     assert.equal(run()[5], "B1: INVALID: the socket's /proc/net/udp row was not read at both edges");
+     write({ P4: legLog().replaceAll('"cpu_user_count":1000', '"cpu_user_count":"1000"') });
+@@ -210,6 +215,16 @@ test("item 5: npt-load's settings carry the run's fields from the room's setting
+   assert.doesNotMatch(R1, /load_up \d\d bots /, "no `bots` mode left");
+ });
+ 
++test("ADV-U8H-1 (b): ds_selftest's ws_split.txt holds the ws_split event's integer fields, or one line saying there is none", () => {
++  withTemp((dir) => {
++    const stubs = "timing_invalid() { :; }; stat_cpu() { :; }; lg_block() { :; }; lg_keep() { :; }; keep() { :; }";
++    const ws = (log) => (writeFileSync(join(dir, "room-05.jsonl"), log), r1bash(dir, ["out", "logq", "ds_selftest"], `ROOMS="${dir}"; ${stubs}; ds_selftest`),
++      readFileSync(join(dir, "results", "ds-selftest", "ws_split.txt"), "utf8"));
++    assert.equal(ws(`{\n${ev("ws_split", "measured", { ws_late_up_count: 9, ws_late_down_p99_ns: 800, ws_mode: "x" })}\n`), "ws_late_up_count 9\nws_late_down_p99_ns 800\nws_split non_integer_fields 1\n");
++    assert.equal(ws(`${ev("ws_summary", "measured", { n: 1 })}\n`), "no ws_split event in the room log\n");
++  });
++});
++
+ // Item 8: every required field of the merged Settings; values of the types it takes (it refuses unknown fields:
+ // SEC-U6AD-2). The struct (crates/server/src/main.rs:77-147, U6a's fields with U6b's and U6c's) is read from the source
+ // with each field's Rust type; a field is optional when its type is `Option<…>` or `#[serde(default)]` stands above it.
