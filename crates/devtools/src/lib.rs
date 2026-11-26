@@ -4,6 +4,7 @@
 //! test-only WebAssembly module. Nothing here is part of what players get.
 
 pub mod compare;
+pub mod content_proofs;
 pub mod files;
 pub mod recording;
 pub mod replay;

@@ -71,6 +71,37 @@ pub fn parse_number(text: &[u8]) -> Result<f64, NumberError> {
     }
 }
 
+/// ECMAScript's rule for a number that lies exactly between its two shortest texts: the one whose last digit is even
+/// (`Number::toString`, step 5). The standard library takes the upper one: 89639294043007.125 is `89639294043007.12`
+/// in a browser and `89639294043007.13` there, and the number corpus found it. Such a number has exactly one binary
+/// place more than its shortest text has decimal places; twice the number, counted in the text's last place, is then
+/// an odd whole number, and the two texts are the whole numbers on either side of its half. `decimals` is the count
+/// of decimal places in the standard library's text; the even neighbour's digits come back, or `None` when the
+/// number is no such tie.
+fn even_of_a_tie(value: f64, decimals: i32) -> Option<String> {
+    let bits = value.to_bits();
+    let exponent = i32::try_from((bits >> 52) & 0x7ff).ok()?;
+    let fraction = bits & 0x000f_ffff_ffff_ffff;
+    // The double is `mantissa` times two to the `power`; a subnormal has no hidden bit.
+    let (mantissa, power) = match exponent {
+        0 => (fraction, -1074),
+        _ => (fraction | (1 << 52), exponent.checked_sub(1075)?),
+    };
+    let zeros = mantissa.trailing_zeros();
+    let places = power
+        .checked_add(i32::try_from(zeros).ok()?)?
+        .checked_neg()?;
+    if places < 1 || decimals != places.checked_sub(1)? {
+        return None;
+    }
+    let odd = u128::from(mantissa.checked_shr(zeros)?);
+    let twice = 5_u128
+        .checked_pow(u32::try_from(decimals).ok()?)?
+        .checked_mul(odd)?;
+    let lower = twice / 2;
+    Some(lower.checked_add(lower & 1)?.to_string())
+}
+
 /// The text of a finite number: the shortest digits that read back as the same double, laid out as ECMAScript's
 /// `Number::toString` lays them out (plain digits from 1e-6 up to 1e21, an exponent beyond). Both zeros are "0", as
 /// `JSON.stringify` writes them; a number that is not finite has no text and gives "null", which no reader of this
@@ -91,10 +122,16 @@ pub fn number_text(value: f64) -> String {
     let Ok(exponent) = exponent.parse::<i32>() else {
         return scientific;
     };
-    let digits: String = mantissa.chars().filter(char::is_ascii_digit).collect();
-    let count = i32::try_from(digits.len()).unwrap_or(i32::MAX);
+    let mut digits: String = mantissa.chars().filter(char::is_ascii_digit).collect();
+    let length = |digits: &str| i32::try_from(digits.len()).unwrap_or(i32::MAX);
     // ECMAScript's n: the value is 0.<digits> times ten to the n.
-    let point = exponent.saturating_add(1);
+    let mut point = exponent.saturating_add(1);
+    let decimals = length(&digits).saturating_sub(point);
+    if let Some(even) = even_of_a_tie(value.abs(), decimals) {
+        point = length(&even).saturating_sub(decimals);
+        digits = even;
+    }
+    let count = length(&digits);
     let zeros = |count: i32| "0".repeat(usize::try_from(count).unwrap_or(0));
     if (count..=21).contains(&point) {
         // A whole number: the digits, then zeros.
@@ -240,6 +277,27 @@ mod tests {
             // Reading the text back gives the same double, but for the sign of zero.
             assert_eq!(parse_number(text.as_bytes()), Ok(value), "{text}");
         }
+        // Exactly between its two shortest texts, each double by its bits with the text a browser gives it: the even
+        // one, down or up, where the standard library's own text always goes up.
+        #[rustfmt::skip]
+        let ties = [
+            (0x42d4_61b1_91e0_dfc8_u64, "89639294043007.12"), (0x42d4_61b1_91e0_dfd8, "89639294043007.38"),
+            (0x42d4_61b1_91e0_dfe8, "89639294043007.62"), (0xc31d_6ecb_23d5_7115, "-2071148270804037.2"),
+            (0x431d_6ecb_23d5_7117, "2071148270804037.8"), (0x42ac_1998_583a_c2e0, "15448127839585.438"),
+            (0x427e_c292_6787_dc80, "2113814296701.7812"), (0x4249_e8fa_2a5a_4600, "222565782708.54688"),
+            (0x4215_553b_6f88_d800, "22906067938.210938"),
+            // Not between two: a half that is the shortest text itself.
+            (0x4310_0000_0000_0002, "1125899906842624.5"),
+        ];
+        for (bits, text) in ties {
+            assert_eq!(number_text(f64::from_bits(bits)), text);
+            assert_eq!(
+                parse_number(text.as_bytes()).map(f64::to_bits),
+                Ok(bits),
+                "{text}"
+            );
+        }
+        assert_eq!(number_text(0.125), "0.125");
         assert_eq!(number_text(f64::NAN), "null");
         assert_eq!(number_text(f64::INFINITY), "null");
         // The longest text there is: 25 bytes (the loader's cap on a number's length rests on this).

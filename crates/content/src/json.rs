@@ -155,6 +155,10 @@ impl Parser<'_> {
                 Some(b' ' | b'\n') => self.bump(),
                 Some(byte @ (b'\t' | b'\r')) => return Err(self.error(Kind::Whitespace { byte })),
                 Some(b'/') => return Err(self.error(Kind::Comment)),
+                // Named for what it is wherever it stands, not for what was expected in its place.
+                Some(byte) if !(0x20..=0x7e).contains(&byte) => {
+                    return Err(self.error(Kind::ForbiddenByte { byte }));
+                }
                 _ => return Ok(()),
             }
         }
@@ -526,6 +530,10 @@ mod tests {
             ("{\"a\": \"\u{7f}\"}", Kind::ForbiddenByte { byte: 0x7f }),
             ("{\"a\": \"\u{e9}\"}", Kind::ForbiddenByte { byte: 0xc3 }),
             ("{\"a\": \u{e9}}", Kind::ForbiddenByte { byte: 0xc3 }),
+            ("{\u{1}\"a\": 1}", Kind::ForbiddenByte { byte: 1 }),
+            ("{\"a\"\u{0}: 1}", Kind::ForbiddenByte { byte: 0 }),
+            ("{\"a\": 1\u{e9}}", Kind::ForbiddenByte { byte: 0xc3 }),
+            ("{}\u{7f}", Kind::ForbiddenByte { byte: 0x7f }),
             ("{\"\": 1}", Kind::BadKey { key: echo("") }),
             ("{\"A\": 1}", Kind::BadKey { key: echo("A") }),
             ("{\"1a\": 1}", Kind::BadKey { key: echo("1a") }),

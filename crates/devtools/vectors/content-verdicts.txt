@@ -1,0 +1,35 @@
+shamble-content-verdicts 1 20261126 500
+a valid file|500|a63056b5420a0d80
+a refused word|500|700d9bd595af15fb
+a byte-order mark|500|06bbf2089e9db361
+a forbidden byte between values|500|8d4fab7b913f7519
+a tab or a carriage return|500|645c0fc85c537c18
+a comment|500|fd98e076e6b66cb1
+a number that is no number|500|110649927ba8c8e5
+a forbidden byte in a string|500|823f764479d4bfe5
+an escape the content does not use|500|a7de19ffa58fcb86
+a text that ends early|500|9a4c7cbd7045a237
+a comma or a colon out of place|500|01e25f29e1af44f2
+brackets that do not match|500|fcba4476c8c6c974
+nesting past the cap|500|8f58c6174932867e
+a key that is there twice|500|c809899d68cfbb51
+a key that is no key|500|06d13b7fcbc76dab
+more values than a document holds|50|7a454cc75ce3286b
+a file past the byte cap|50|1eff1324df8a7f82
+a key the kind does not have|500|a3c25f24f0abced7
+a key that is missing|500|2129d5ccd20088bb
+a value of the wrong type|500|5305d12220df5a4e
+a number outside its range|500|5a1d79ede1ad6d2f
+another format or version|500|aa8383b7a899f0b0
+an id that is no id|500|8f3560b9ff9129c8
+an id that is not the file's name|500|cf7bdf90d631880e
+a text not in canonical form|500|a45bf37746c6d37f
+a valid bundle|500|60cf6f2660d41543
+a path that is no content path|500|2efae2b3e3a49deb
+paths out of order|500|c4c6e8b9c1664360
+more files than a bundle holds|500|deddfc12195e6d10
+a bundle with a key too many or too few|500|8bd37461efa2de47
+another bundle format or version|500|24724918587fe137
+a bundle past a byte cap|50|f5a2055175bfd835
+a file refused, in a bundle|500|55a3d78442bf78c8
+the fuzz run's first inputs|2000|9416cc022bfd2b0d
