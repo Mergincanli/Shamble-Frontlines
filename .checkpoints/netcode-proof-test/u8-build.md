@@ -629,3 +629,13 @@ Plan:
     `node --test 'ops/**/*.test.mjs'` 100 pass, 0 fail (node_modules link made and removed as before); wrappers 315
     ok, 0 failed; redact PASS, 394 items, 0 findings; package.json 8370495d…, package-lock.json a0efce8e… unchanged;
     no plant left; r1.sh afc331f1…, R1.md 847723cd…, r1sh.test.mjs b245fe6b…. No commit, no cargo, no npm install.
+
+## The merge (the main session, 2026-11-26, u8-merge-plan.md M0-M9)
+- First attempt, on H0 37badaf with the C9 patch (09cb4a07…): stopped at M5 00:56 UTC (test 7's item 8: U6a's pinned 27
+  settings fields against the merged server's 40); M6 undid it; nothing committed. The advisor's ruling
+  (advisor-u8-m5-ruling.md): FIX, with the High it found (the null certificate pair). The fix: u8-fix-m5.md (on the
+  lane head 03d9ff3; 6,189 lines, 11 under 6,200).
+- Second attempt, on H0 9aa6dde with the fix patch (3e1cd5b5…a531, 43 files, base 03d9ff3): `git apply --index` clean,
+  the 43 files equal to this worktree's ops/; M5 (.gate/u8-merge/m5-check-r.log): ops 101 of 101, wrappers 315 ok,
+  check.mjs all 11 PASS (861/958; refs 1982; redact 421 items, 0 findings); M7: gate PASS, repo map OK. The merge
+  report: u8-report.md. The `ops` step waits until after U7's merge (choice 15).

@@ -1,0 +1,8 @@
+# fw-lg: the Hetzner firewall object for LG (u8-brief.md rev 1.1 section 1 Block 2; plan.md:924). Inbound rules only;
+# applied in the create form and by the label selector role=lg. LG is reached only through RS (ProxyJump, plan.md:300).
+# <RS_IPV4> is the kept address npt-rs under FIXED-IP (a); <HOME_IPV4> is typed only in the Hetzner console (the
+# laptop and the PC share it: PM-0006-12's ping). `r1.sh bringup` proves both objects are in force (C5).
+#
+# direction protocol port         sources
+in          tcp      22           <RS_IPV4>/32
+in          icmp     -            <HOME_IPV4>/32

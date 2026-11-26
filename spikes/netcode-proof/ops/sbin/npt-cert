@@ -1,0 +1,121 @@
+#!/bin/bash -p
+# npt-cert issue staging|production: the WebSocket leg's browser-trusted certificate by DNS-01 by hand
+# (u8-brief.md rev 1.1 section 1 Block 3; replan-units.md:107-118; Q-U8-4 as ruled). Root-owned, 0755.
+# 1. Opens npt-host's egress to the one ACME directory host (its addresses resolved here, each element timing out
+#    after 35 minutes); DNS goes over loopback to the local resolver, which nftables admits.
+# 2. Runs U6c's issue mode as npt-host, ONE process across both phases (no ACME key or order state on disk between
+#    them). Its interface (U6c's brief, C1 (a)): stdout `PROFILE <name>`, `TXT_NAME <name>`, `TXT_VALUE <value>`;
+#    then it reads `go` on stdin; then `SERIAL <hex>`, `SHA256 <hex>`, `DONE`. The directory's profile list goes to
+#    stderr as one line `PROFILES <name>,<name>…`, which this wrapper passes through, so the cert block's results keep
+#    it. It writes four files under /var/lib/npt/tls, the key (0640, group npt-room through the setgid directory) and
+#    then the chain: staging.key.pem and staging.chain.pem, or production.key.pem and production.chain.pem (one name
+#    for both orders would make the production order exit 2 on the existing path). Every room's WebSocket names the
+#    production pair; npt-host.path starts the page host once production.chain.pem exists. The issue mode requires
+#    `shortlived` in production (fails closed); this wrapper checks the PROFILE line too.
+# 3. Polls EVERY authoritative server of the zone (npt-ns.txt in the root-owned clone) with `dig +norecurse` every
+#    15 s and sends `go` only when all show the value (Let's Encrypt validates from several perspectives). One
+#    30-minute bound covers both phases; no retry loop: a failed order stops the run and comes back to Mustafa.
+# 4. Closes the egress, prints the serial and hash for the ledger. The TXT value goes to stdout only, never a file.
+if [ "${NPT_ENV_CLEARED:-}" != 1 ]; then
+  exec /usr/bin/env -i NPT_ENV_CLEARED=1 PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C /bin/bash -p /usr/local/sbin/npt-cert "$@"
+fi
+set -euo pipefail
+set -f
+umask 022
+. /usr/local/lib/npt/npt-lib.sh
+
+die() { printf 'npt-cert: %s\n' "$*" >&2; exit 2; }
+fail() { printf 'npt-cert: order FAILED: %s. The run stops; this comes back to Mustafa.\n' "$*" >&2; exit 3; }
+
+[ "$#" -eq 2 ] && [ "$1" = issue ] && npt_valid_word "$2" staging production || die "usage: npt-cert issue staging|production"
+[ "$(tr -d '\n' < /etc/npt/role)" = rs ] || die "RS only"
+readonly PROFILE=$2
+case $PROFILE in
+  staging) readonly ACME=acme-staging-v02.api.letsencrypt.org ;;
+  production) readonly ACME=acme-v02.api.letsencrypt.org ;;
+esac
+
+ns=()
+while read -r n; do
+  case $n in '' | '#'*) continue ;; esac
+  npt_valid_hostname "$n" || die "npt-ns.txt holds a bad name"
+  ns+=("$n")
+done < /usr/local/lib/npt/npt-ns.txt
+[ "${#ns[@]}" -ge 2 ] || die "npt-ns.txt must name every authoritative server of the zone"
+
+readonly DEADLINE=$(($(date +%s) + 1800))
+left() { printf '%s\n' $((DEADLINE - $(date +%s))); }
+ISSUE_PID=''
+cleanup() {
+  if [ -n "$ISSUE_PID" ]; then kill "$ISSUE_PID" 2>/dev/null || true; fi
+  nft flush set inet npt acme_v4 || true
+}
+trap cleanup EXIT
+
+addrs=()
+while read -r a; do npt_valid_ipv4 "$a" && addrs+=("$a timeout 35m"); done < <(dig +short +time=5 +tries=2 A "$ACME")
+[ "${#addrs[@]}" -ge 1 ] || fail "the ACME host did not resolve"
+elements=$(IFS=,; printf '%s' "${addrs[*]}")
+nft "add element inet npt acme_v4 { ${elements//,/, } }"
+
+coproc ISSUE {
+  umask 027
+  exec /usr/bin/setpriv --reuid=npt-host --regid=npt-host --clear-groups --no-new-privs --bounding-set=-all \
+    --inh-caps=-all --ambient-caps=-all --reset-env /opt/npt/bin/npt-host issue "$PROFILE"
+}
+
+VALUE=''
+expect() {
+  local t line
+  t=$(left)
+  ((t > 0)) || fail "30 minutes passed before $1"
+  IFS= read -r -t "$t" line <&"${ISSUE[0]}" || fail "the issue mode ended or stalled before $1"
+  if [ "$1" = DONE ]; then
+    [ "$line" = DONE ] || fail "unexpected line from the issue mode before DONE (not printed)"
+    return 0
+  fi
+  [[ $line =~ ^$1\ ([^[:space:]]+)$ ]] || fail "unexpected line from the issue mode before $1 (not printed)"
+  VALUE=${BASH_REMATCH[1]}
+}
+
+expect PROFILE
+if [ "$PROFILE" = production ] && [ "$VALUE" != shortlived ]; then
+  fail "production requires the shortlived profile (the order's: $(npt_comm_clean "$VALUE"))"
+fi
+order_profile=$VALUE
+expect TXT_NAME
+[ "$VALUE" = "$NPT_CHALLENGE_NAME" ] || fail "the challenge name is not $NPT_CHALLENGE_NAME"
+expect TXT_VALUE
+npt_valid_txt_value "$VALUE" || fail "the TXT value is malformed"
+txt=$VALUE
+printf 'Add in Cloudflare (zone shamblefrontlines.com): type TXT, name _acme-challenge.rs.nt, content %s, TTL 1 min.\n' "$txt"
+printf 'Polling %s every 15 s; at most until %s UTC.\n' "${ns[*]}" "$(date -u -d "@$DEADLINE" +%H:%M:%S)"
+
+while :; do
+  all=1
+  for n in "${ns[@]}"; do
+    got=$(dig +norecurse +short +time=5 +tries=1 TXT "$NPT_CHALLENGE_NAME" "@$n" 2>/dev/null | tr -d '"') || got=''
+    grep -qxF -- "$txt" <<< "$got" || all=0
+  done
+  [ "$all" = 1 ] && break
+  (($(left) > 15)) || fail "the TXT record did not show on every authoritative server within 30 minutes"
+  sleep 15
+done
+printf 'Every authoritative server shows it: readying the challenge.\n'
+printf 'go\n' >&"${ISSUE[1]}"
+
+expect SERIAL
+npt_valid_hex "$VALUE" || fail "the serial is malformed"
+serial=$VALUE
+expect SHA256
+[[ $VALUE =~ ^[0-9a-f]{64}$ ]] || fail "the hash is malformed"
+sha=$VALUE
+expect DONE
+pid=$ISSUE_PID
+for _ in $(seq 1 30); do kill -0 "$pid" 2>/dev/null || break; sleep 1; done
+kill -0 "$pid" 2>/dev/null && fail "the issue mode did not end after DONE"
+wait "$pid" || fail "the issue mode ended non-zero"
+ISSUE_PID=''
+nft flush set inet npt acme_v4
+printf 'npt-cert: issued (%s, profile %s); egress closed. Ledger: serial %s, sha256 %s.\n' "$PROFILE" "$order_profile" "$serial" "$sha"
+printf 'Delete the TXT record now; the session confirms its absence over DNS-over-HTTPS.\n'

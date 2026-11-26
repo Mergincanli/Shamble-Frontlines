@@ -1,0 +1,51 @@
+#!/bin/bash -p
+# npt-capture start|stop: a packet capture with a fixed interface, filter, snap length, count cap and output path
+# (u8-brief.md rev 1.1 section 1 Block 3; plan.md:1140-1141). Root-owned, 0755. No caller text reaches tcpdump: no
+# -z, -Z, -w, -r or filter from the caller (GTFOBins). tcpdump opens the interface as root, then drops to its own
+# user before it opens the savefile (-Z tcpdump), so root never opens a path another user writes; the directory is
+# tcpdump's, readable by group npt, and the name ends in .pcap (Ubuntu's AppArmor profile for tcpdump admits it).
+if [ "${NPT_ENV_CLEARED:-}" != 1 ]; then
+  exec /usr/bin/env -i NPT_ENV_CLEARED=1 PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C /bin/bash -p /usr/local/sbin/npt-capture "$@"
+fi
+set -euo pipefail
+set -f
+umask 022
+. /usr/local/lib/npt/npt-lib.sh
+
+readonly IFACE=eth0
+readonly OUT=/var/lib/npt/capture/rs.pcap
+readonly PIDF=/run/npt-capture.pid
+readonly LOG=/run/npt-capture.log
+readonly FILTER='udp portrange 30001-30032 or tcp portrange 31000-31032'
+
+die() { printf 'npt-capture: %s\n' "$*" >&2; exit 2; }
+[ "$#" -eq 1 ] && npt_valid_word "$1" start stop || die "usage: npt-capture start|stop"
+[ "$(tr -d '\n' < /etc/npt/role)" = rs ] || die "RS only"
+
+PID=''
+running() {
+  [ -f "$PIDF" ] && [ ! -L "$PIDF" ] || return 1
+  PID=$(tr -dc '0-9' < "$PIDF")
+  [ -n "$PID" ] && [ "$(cat "/proc/$PID/comm" 2>/dev/null)" = tcpdump ]
+}
+
+case $1 in
+  start)
+    running && die "a capture is running already"
+    [ -d "/sys/class/net/$IFACE" ] || die "no interface $IFACE"
+    setsid /usr/bin/tcpdump -i "$IFACE" -n -s 96 -c 2000000 -U -Z tcpdump -w "$OUT" "$FILTER" < /dev/null > "$LOG" 2>&1 &
+    printf '%s\n' "$!" > "$PIDF"
+    sleep 1
+    running || die "tcpdump did not start (its messages: $LOG)"
+    printf 'capture started on %s: snap length 96, at most 2,000,000 packets, the two game ranges only\n' "$IFACE"
+    ;;
+  stop)
+    running || die "no capture is running"
+    kill -INT "$PID"
+    for _ in $(seq 1 20); do kill -0 "$PID" 2> /dev/null || break; sleep 0.5; done
+    kill -0 "$PID" 2> /dev/null && die "tcpdump did not stop"
+    rm -f "$PIDF"
+    tail -n 3 "$LOG"
+    printf 'capture stopped; the file stays on RS (raw data never leaves the VM: plan.md:1187-1188)\n'
+    ;;
+esac

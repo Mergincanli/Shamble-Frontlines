@@ -1,0 +1,78 @@
+#!/bin/bash -p
+# npt-s14 run: S14's kernel check on RS (u8-brief.md rev 1.1 section 1 Block 3; plan.md:1256; advisor-u3q.md:139-143).
+# Two network namespaces joined by a veth pair (198.51.100.1 and .2, RFC 5737 documentation addresses, never routed);
+# netem 50 ms each way, 2 % loss on the data direction (client to server), no jitter. The adapted probe
+# (ops/runs/s14/probe.py in the root-owned clone) runs as npt (setpriv) inside them: three runs, each 600 s steady then
+# 34 one-second total-loss bursts on both directions (the schedule is probe.py's, fixed in writing; its `bursts` mode,
+# run here as root with the run's first-message stamp, changes netem at those times and records each burst as
+# (start_ns, len_ns) from the run's first message). The root namespace's nftables is never on the path. Both
+# namespaces are torn down on every exit. Writes only under a new root-owned /var/lib/npt/s14/<UTC stamp>/.
+if [ "${NPT_ENV_CLEARED:-}" != 1 ]; then
+  exec /usr/bin/env -i NPT_ENV_CLEARED=1 PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C /bin/bash -p /usr/local/sbin/npt-s14 "$@"
+fi
+set -euo pipefail
+set -f
+umask 022
+
+readonly PROBE=/opt/npt/clone/spikes/netcode-proof/ops/runs/s14/probe.py
+readonly NSC=npt-s14c NSS=npt-s14s PORT=47999 RUNS=3 CAP=67108864
+readonly SETPRIV_NPT=(/usr/bin/setpriv --reuid=npt --regid=npt --clear-groups --no-new-privs --bounding-set=-all
+  --inh-caps=-all --ambient-caps=-all --reset-env)
+
+die() { printf 'npt-s14: %s\n' "$*" >&2; exit 2; }
+[ "$#" -eq 1 ] && [ "$1" = run ] || die "usage: npt-s14 run"
+[ "$(tr -d '\n' < /etc/npt/role)" = rs ] || die "RS only"
+modprobe sch_netem || die "no sch_netem: S14 cannot run (bring-up records why)"
+N=$(python3 -I "$PROBE" messages)
+[[ $N =~ ^[0-9]{3,6}$ ]] || die "the probe's message count is unreadable"
+OUT=/var/lib/npt/s14/$(date -u +%Y%m%dT%H%M%SZ)
+[ ! -e "$OUT" ] || die "$OUT exists already"
+ip netns list | grep -q '^npt-s14' && die "a namespace from an earlier run exists"
+install -d -o root -g root -m 0755 "$OUT"
+
+teardown() {
+  ip netns del "$NSC" 2> /dev/null || true
+  ip netns del "$NSS" 2> /dev/null || true
+}
+trap teardown EXIT
+
+ip netns add "$NSC"
+ip netns add "$NSS"
+ip link add s14c netns "$NSC" type veth peer name s14s netns "$NSS"
+ip -n "$NSC" addr add 198.51.100.1/30 dev s14c
+ip -n "$NSS" addr add 198.51.100.2/30 dev s14s
+for pair in "$NSC s14c" "$NSS s14s"; do
+  set -- $pair
+  ip -n "$1" link set lo up
+  ip -n "$1" link set "$2" up
+done
+tc -n "$NSC" qdisc add dev s14c root netem delay 50ms loss 2%
+tc -n "$NSS" qdisc add dev s14s root netem delay 50ms
+
+{
+  printf 'uname_r %s\nmessages %s\nruns %s\nstarted_utc %s\n' "$(uname -r)" "$N" "$RUNS" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  for s in tcp_recovery tcp_early_retrans tcp_sack tcp_frto tcp_rto_min_us tcp_thin_linear_timeouts tcp_timestamps \
+    tcp_dsack tcp_congestion_control tcp_available_congestion_control; do
+    printf '%s %s\n' "$s" "$(ip netns exec "$NSC" cat "/proc/sys/net/ipv4/$s" 2> /dev/null || echo absent)"
+  done
+  tc -n "$NSC" qdisc show dev s14c
+  tc -n "$NSS" qdisc show dev s14s
+} > "$OUT/kernel.txt"
+
+for run in $(seq 1 "$RUNS"); do
+  printf 'loadavg_before_run%s %s\n' "$run" "$(cat /proc/loadavg)" >> "$OUT/kernel.txt"
+  ip netns exec "$NSS" "${SETPRIV_NPT[@]}" /usr/bin/python3 -I "$PROBE" server "$PORT" "$N" \
+    | head -c "$CAP" > "$OUT/server-run$run.json" &
+  server=$!
+  sleep 1
+  coproc CLIENT { exec ip netns exec "$NSC" "${SETPRIV_NPT[@]}" /usr/bin/python3 -I "$PROBE" client 198.51.100.2 "$PORT" "$N"; }
+  client=$CLIENT_PID
+  IFS= read -r -t 30 first <&"${CLIENT[0]}" || die "run $run: the client printed no START line"
+  [[ $first =~ ^START\ ([0-9]{1,20})$ ]] || die "run $run: a malformed START line"
+  python3 -I "$PROBE" bursts "${BASH_REMATCH[1]}" > "$OUT/bursts-run$run.json"
+  head -c "$CAP" <&"${CLIENT[0]}" > "$OUT/client-run$run.json"
+  wait "$client" || die "run $run: the client ended non-zero"
+  wait "$server" || die "run $run: the server ended non-zero"
+  printf 'loadavg_after_run%s %s\n' "$run" "$(cat /proc/loadavg)" >> "$OUT/kernel.txt"
+done
+printf 'npt-s14: %s runs done; results in %s\n' "$RUNS" "$OUT"

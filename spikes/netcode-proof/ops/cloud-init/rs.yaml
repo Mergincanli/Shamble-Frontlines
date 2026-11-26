@@ -1,0 +1,238 @@
+#cloud-config
+# RS's cloud-init for the netcode proof test (u8-brief.md rev 1.1, section 1 Block 1; plan.md §10.5 as NPT-TRIM trims
+# it). It holds no secret and no address of the day (plan.md:1179); it stays under 32 KiB (ops/tests/cloudinit.test.mjs).
+# Commit pair (the brief's choice 2): /etc/npt/commit below names the run's code commit Y; this file lives at X = Y plus
+# that line, and the raw URL pasted at creation names X. The wrappers come from a root-owned clone of Y, never inline.
+ssh_pwauth: false
+disable_root: true
+ssh_genkeytypes: [ed25519]
+package_update: true
+package_upgrade: false
+package_reboot_if_required: false
+packages: [bind9-dnsutils, tcpdump]
+system_info:
+  default_user:
+    name: npt
+    uid: 2000
+    gecos: npt run login
+    lock_passwd: true
+    shell: /bin/bash
+    sudo: null
+users:
+  - default
+  - {name: npt-room, uid: 2001, gecos: npt rooms, shell: /usr/sbin/nologin, lock_passwd: true, no_create_home: true}
+  - {name: npt-host, uid: 2002, gecos: npt page host and ACME, shell: /usr/sbin/nologin, lock_passwd: true, no_create_home: true}
+  - {name: npt-build, uid: 2003, gecos: npt build, shell: /usr/sbin/nologin, lock_passwd: true}
+# The VM's own wall, loaded before any service (plan.md:926-941 as the re-plan trims it). TCP 22 and the game ranges
+# are accepted from any source because the Hetzner firewall holds the /32s (Q-U8-2; r1.sh bringup proves it, C5).
+# The room and host users are named by uid (2001 npt-room, 2002 npt-host): bootcmd runs before the users exist.
+bootcmd:
+  - |
+    nft -f - <<'NFT'
+    flush ruleset
+    table inet npt {
+      set metrics_src { type ipv4_addr; }
+      set quic_off { type inet_service; flags interval, timeout; }
+      set acme_v4 { type ipv4_addr; flags timeout; }
+      chain input {
+        type filter hook input priority filter; policy drop;
+        ct state invalid drop
+        ct state established,related accept
+        iifname "lo" accept
+        icmpv6 type { nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, packet-too-big } accept
+        udp sport 67 udp dport 68 accept
+        tcp dport 22 accept
+        udp dport @quic_off ip saddr != @metrics_src drop
+        meta nfproto ipv6 udp dport @quic_off drop
+        udp dport 30001-30032 accept
+        tcp dport 31000-31032 accept
+        tcp dport 9100 ip saddr @metrics_src accept
+      }
+      chain forward { type filter hook forward priority filter; policy drop; }
+      chain output {
+        type filter hook output priority filter; policy accept;
+        meta skuid { 2001, 2002 } ip daddr 169.254.169.254 drop
+        meta skuid { 2001, 2002 } ip6 daddr fe80::a9fe:a9fe drop
+        meta skuid 2001 ip daddr 127.0.0.53 drop
+        meta skuid 2001 th dport 53 drop
+        ct state established,related accept
+        oifname "lo" accept
+        meta skuid 2002 tcp dport 443 ip daddr @acme_v4 accept
+        meta skuid { 2001, 2002 } ct state new drop
+      }
+    }
+    NFT
+write_files:
+  - path: /etc/npt/commit
+    permissions: '0644'
+    content: |
+      0000000000000000000000000000000000000000
+  - path: /etc/npt/role
+    permissions: '0644'
+    content: |
+      rs
+  # sshd keeps the first value it reads, and these sort before 50-cloud-init.conf and 60-cloudimg-settings.conf
+  # (plan.md:1150-1155). 00-npt-open.conf sorts before 00-npt.conf; `npt-ctl peers` rewrites it with LG's port 22.
+  - path: /etc/ssh/sshd_config.d/00-npt.conf
+    permissions: '0644'
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin no
+      AuthenticationMethods publickey
+      X11Forwarding no
+      AllowAgentForwarding no
+      MaxAuthTries 3
+      LoginGraceTime 20
+      AllowUsers npt
+      AllowTcpForwarding local
+      PermitListen none
+      AllowStreamLocalForwarding no
+      PermitTunnel no
+      GatewayPorts no
+  - path: /etc/ssh/sshd_config.d/00-npt-open.conf
+    permissions: '0644'
+    content: |
+      PermitOpen none
+  - path: /etc/apt/apt.conf.d/99-npt
+    permissions: '0644'
+    content: |
+      APT::Periodic::Update-Package-Lists "0";
+      APT::Periodic::Unattended-Upgrade "0";
+      Unattended-Upgrade::Automatic-Reboot "false";
+  - path: /usr/local/sbin/npt-firstboot
+    permissions: '0700'
+    content: |
+      #!/bin/bash
+      # RS's first boot, once, from runcmd, as root. Each step is logged; any failure writes build.failed, which
+      # `r1.sh bringup` refuses. Builds run as npt-build; root installs only regular files it checked.
+      set -euo pipefail
+      umask 022
+      export PATH=/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l
+      B=/var/lib/npt/bringup
+      install -d -o root -g root -m 0755 /var/lib/npt "$B"
+      step() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >> "$B/steps.log"; }
+      trap 'step "FAILED at line $LINENO"; touch "$B/build.failed"' ERR
+      step "host-key fingerprints to the console before any fetch (F12's term): /etc/issue.d, then agetty --reload"
+      install -d -o root -g root -m 0755 /etc/issue.d   # Ubuntu 24.04 ships no /etc/issue.d (SEC-R2-1)
+      { echo "npt RS host keys (SHA256):"; for k in /etc/ssh/ssh_host_*_key.pub; do ssh-keygen -l -E sha256 -f "$k"; done; } \
+        > /etc/issue.d/50-npt-hostkeys.issue
+      agetty --reload || step "agetty --reload failed (recorded); the keys show at the console's next prompt"
+      COMMIT="$(tr -d '\n' < /etc/npt/commit)"
+      [[ "$COMMIT" =~ ^[0-9a-f]{40}$ ]] && [ "$COMMIT" != 0000000000000000000000000000000000000000 ] \
+        || { step "the code commit is not filled"; touch "$B/build.failed"; exit 2; }
+      REPO=https://github.com/Mergincanli/Shamble-Frontlines.git
+      SPIKE=spikes/netcode-proof
+      NB=/home/npt-build
+
+      step "login user npt: its own group only; no cloud-init sudo rule"
+      rm -f /etc/sudoers.d/90-cloud-init-users
+      for g in $(id -nG npt); do [ "$g" = npt ] || gpasswd -d npt "$g" >/dev/null; done
+
+      step "upgrades: security once now, then automatic upgrades and reboots off"
+      systemctl disable --now apt-daily.timer apt-daily-upgrade.timer unattended-upgrades.service || true
+      unattended-upgrade || step "unattended-upgrade returned non-zero (recorded)"
+      command -v dig tcpdump > /dev/null || { step "dig or tcpdump missing: the packages module failed (INF-SB-8)"; false; }
+
+      step "netem (S14)"
+      if modprobe sch_netem; then echo "in the image" > "$B/netem.txt"
+      elif apt-get install -y "linux-modules-extra-$(uname -r)" && modprobe sch_netem; then
+        echo "linux-modules-extra-$(uname -r)" > "$B/netem.txt"
+      else echo "missing" > "$B/netem.txt"; fi
+
+      step "root-owned clone at the code commit"
+      install -d -o root -g root -m 0755 /opt/npt /opt/npt/bin
+      git init -q /opt/npt/clone
+      git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60 -C /opt/npt/clone fetch -q --depth 1 "$REPO" "$COMMIT"
+      git -C /opt/npt/clone checkout -q --detach FETCH_HEAD
+      [ "$(git -C /opt/npt/clone rev-parse HEAD)" = "$COMMIT" ]
+      O=/opt/npt/clone/$SPIKE/ops
+
+      step "wrappers and sudoers from the clone"
+      install -d -m 0755 /usr/local/lib/npt
+      install -m 0644 "$O/sbin/npt-lib.sh" /usr/local/lib/npt/npt-lib.sh
+      install -m 0644 "$O/sbin/npt-ns.txt" /usr/local/lib/npt/npt-ns.txt
+      for w in npt-ctl npt-cert npt-capture npt-userdata npt-s14; do install -m 0755 "$O/sbin/$w" "/usr/local/sbin/$w"; done
+      visudo -c -q -f "$O/sbin/sudoers.d/npt"
+      install -m 0440 "$O/sbin/sudoers.d/npt" /etc/sudoers.d/npt
+      visudo -c -q
+
+      step "directories (Q-U8-1 terms 4 and 5: root-owned parents)"
+      install -d -o root -g root -m 0755 /var/lib/npt/state /var/lib/npt/s14 /var/lib/npt/dist
+      install -d -o npt -g npt-room -m 2750 /var/lib/npt/run
+      install -d -o npt-room -g npt-room -m 0755 /var/lib/npt/rooms /var/lib/npt/hash
+      # The WebSocket key: written by the issue mode as npt-host, 0640, group npt-room through the setgid directory,
+      # so the room reads it with its own group after setpriv clears every supplementary group (Q-U8-1 term 3).
+      install -d -o npt-host -g npt-room -m 2750 /var/lib/npt/tls
+      install -d -o npt -g npt -m 0755 /var/lib/npt/results
+      install -d -o tcpdump -g npt -m 0750 /var/lib/npt/capture
+
+      step "the RS-to-LG key: npt's ed25519, 0600, never leaves RS (C4; plan.md:1157-1162)"
+      runuser -u npt -- install -d -m 0700 /home/npt/.ssh
+      runuser -u npt -- ssh-keygen -q -t ed25519 -N '' -C npt-rs-to-lg -f /home/npt/.ssh/npt_lg
+
+      step "toolchains, the clone, the build and the dist, as npt-build"
+      runuser -u npt-build -- env -i HOME="$NB" PATH=/usr/bin:/bin COMMIT="$COMMIT" REPO="$REPO" \
+        bash -euo pipefail -s <<'BUILD' >> "$B/build.log" 2>&1
+      cd "$HOME"
+      curl --proto '=https' --tlsv1.2 -fsSL --max-time 900 --retry 2 --speed-limit 1000 --speed-time 60 -o rustup-init \
+        https://static.rust-lang.org/rustup/archive/1.29.3/x86_64-unknown-linux-gnu/rustup-init
+      echo "b1c8cb14e30889e7e2999e6b69e62d9e9b9ffc0f4df8180564d306d9680e6c55  rustup-init" | sha256sum -c -
+      chmod 0755 rustup-init
+      ./rustup-init -y -q --no-modify-path --profile minimal --default-toolchain none
+      curl --proto '=https' --tlsv1.2 -fsSL --max-time 900 --retry 2 --speed-limit 1000 --speed-time 60 -o node.tar.xz \
+        https://nodejs.org/dist/v22.23.4/node-v22.23.4-linux-x64.tar.xz
+      echo "1805bcd35e6815559bd2eb97db438d3fdb0eb3a5e6a977b7c1badca76337e9ce  node.tar.xz" | sha256sum -c -
+      mkdir -p node && tar -xJf node.tar.xz -C node --strip-components=1
+      export PATH="$HOME/.cargo/bin:$HOME/node/bin:$HOME/wbg/bin:$PATH"
+      git init -q clone
+      git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60 -C clone fetch -q --depth 1 "$REPO" "$COMMIT"
+      git -C clone checkout -q --detach FETCH_HEAD
+      test "$(git -C clone rev-parse HEAD)" = "$COMMIT"
+      cd clone/spikes/netcode-proof
+      rustup toolchain install
+      CARGO_TARGET_DIR="$HOME/.gate/wbg-target" cargo install wasm-bindgen-cli --version 0.2.130 --locked --root "$HOME/wbg"
+      cargo fetch --locked
+      cargo build --locked --offline --release --workspace --bins
+      cargo build --locked --offline --release -p npt-server --features bites --target-dir target-bites
+      cd web
+      npm_config_ignore_scripts=true npm ci --ignore-scripts
+      npm_config_ignore_scripts=true CARGO_NET_OFFLINE=true node build.mjs
+      BUILD
+      pkill -u npt-build || true
+
+      step "binaries and the dist, read as their owner npt-build and installed by root (SEC-SB-6)"
+      T="$NB/clone/$SPIKE/target/release"
+      take() { runuser -u npt-build -- cat "$1" > "/opt/npt/bin/.$2.tmp"; install -m 0755 "/opt/npt/bin/.$2.tmp" "/opt/npt/bin/$2"; rm -f "/opt/npt/bin/.$2.tmp"; }
+      for b in npt-server npt-super npt-host npt-judge; do
+        [ -f "$T/$b" ] && [ ! -L "$T/$b" ] || { step "missing binary $b"; false; }
+        take "$T/$b" "$b"
+      done
+      TB="$NB/clone/$SPIKE/target-bites/release/npt-server"
+      [ -f "$TB" ] && [ ! -L "$TB" ] || { step "missing the bites build of npt-server"; false; }
+      take "$TB" npt-server-bites
+      sha256sum /opt/npt/bin/* > "$B/bin.sha256"
+      D="$NB/clone/$SPIKE/web/dist"
+      [ -d "$D" ] && [ ! -L "$D" ]
+      runuser -u npt-build -- tar -C "$D" -cf - . | tar -C /var/lib/npt/dist --no-same-owner --no-same-permissions -xf -
+      find /var/lib/npt/dist -type l -delete
+      chown -R root:root /var/lib/npt/dist
+      chmod -R a+rX,go-w /var/lib/npt/dist
+      (cd /var/lib/npt/dist && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > "$B/dist.sha256"
+
+      step "the host key line for the page host (plan.md:288-290), root-owned, 0444"
+      printf 'rs.nt.shamblefrontlines.com %s\n' "$(cut -d' ' -f1-2 /etc/ssh/ssh_host_ed25519_key.pub)" \
+        > /var/lib/npt/dist/ssh-host-keys.txt
+      chmod 0444 /var/lib/npt/dist/ssh-host-keys.txt
+
+      step "the page host's start (Q-U6C-7): npt-host.path starts npt-host.service once the production chain exists"
+      install -o root -g root -m 0644 "$O/systemd/host.json" /etc/npt/host.json
+      install -o root -g root -m 0644 "$O/systemd/npt-host.path" "$O/systemd/npt-host.service" /etc/systemd/system/
+      systemctl daemon-reload
+      systemctl enable --now npt-host.path
+
+      git -C /opt/npt/clone rev-parse HEAD > "$B/head.txt"
+      step "build done"
+      touch "$B/build.done"
+runcmd:
+  - [/usr/local/sbin/npt-firstboot]

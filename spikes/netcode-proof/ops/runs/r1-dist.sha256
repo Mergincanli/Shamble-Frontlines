@@ -1,0 +1,4 @@
+# R1's expected dist (SEC-SB-5, advisor-u8-stopb.md section 5): one `<sha256>  ./<path>` line per file, the form
+# rs.yaml writes to /var/lib/npt/bringup/dist.sha256. Filled at Stop B from two equal builds of U7's dist at Y in the
+# container (two clone paths, two CARGO_HOMEs); committed at X. Empty, r1.sh bringup records the dist as differing,
+# and `r1.sh host` and every `browsers` call refuse.
