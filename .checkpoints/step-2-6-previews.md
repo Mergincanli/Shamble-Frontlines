@@ -219,6 +219,23 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   at the next docs head, with the question file as its record): MERGE-74 (a): main is taken in once, after MAIN-WALL
   merges; #72 stays conflicting until then (no pull-request runs on it meanwhile). Just before it he wrote that #74
   "has been marked to merge by the advisor (and probably merged)": checked, merged 15:24:23 UTC, 3b949c1.
+- HIS MESSAGE (2026-11-26, message 7aaec862-9cf9-4f10-acb5-7880f06c8af1, 17:31:13 UTC, 472 bytes, sha256
+  ffa7a8f56cb9e716a59c283c5614bba9183564e45a12e401adb4ee2cdd7bdb33; saved whole by scripts/save_1715.py in
+  mustafa-2026-11-26T1715-main-wall.md; into DECISIONS at the next docs head): MAIN-WALL is on since about 17:15 UTC
+  (only his account can update main; pull request, gate and smoke stay required); all work that stores no credential
+  resumes; the token sitting waits until one day-session merge and one PR Advisor merge have both gone through under
+  the new rule (the Guard fix chat tells him); "Your own next merge from a day session counts as the first."
+- T9, main taken in (his MERGE-74 (a), MAIN-WALL on): merge commit 851f004aa31514510726c247742124ee02b6384d (parents
+  5ab420d7, 3b949c1; base 4a62873), scripts/resolve74.py (every block one-sided by origin: main's two re-worded
+  REPO_MAP rows then lane 2's rows; lane 2's change-set 1 move stands; one follow-ups bullet each side; DECISIONS by
+  entry 151/158/155/162), verify74.py PASS (no exception), control74.py (three planted defects caught). Beyond the
+  blocks: ROADMAP's oldest "Recent work" entry, "The kit hold and two CI edits" (merged, 11 lines), moved byte for byte
+  to Build history after change-set 1 (OLD-LINES (a); main itself held 13). STATUS 125 lines, main's own count (lane 2
+  net 0; main's lines not lane 2's to fold). toolchain.yml equals main's (sha256 d017b83b...). Staged tree: vs 5ab420d7
+  main's 8 files; vs main the branch's 74. Five sha256 unchanged; 175 tests; repo map OK (225 entries); gate PASS
+  (--no-smoke); main still 3b949c1 by ls-remote before the commit. Pushed (5ab420d..851f004). The advisor agent's
+  review of 851f004 (scope 90c939f4..851f004): running (advisor-head-851f004.md), with a reading of his "your own next
+  merge" for a question to him (ORDER-WALL, to come).
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
@@ -227,7 +244,11 @@ c. Wait for the Guard fix chat's protection for main to merge (his TOKEN-TONIGHT
    15:05 message: he tells this chat when it is merged; until then nothing under .github/, no token sitting. If it is
    not merged by his click on the real token, ask him again first (MAIN-WALL (b)). Then, by his MERGE-74 (a): take
    main in once (3b949c1 or newer, MAIN-WALL and #74 together), by the scripted method (resolve/verify/control), the
-   advisor agent's review of that merge, before the token sitting's message.
+   advisor agent's review of that merge, before the token sitting's message. DONE: MAIN-WALL on (~17:15 UTC); main
+   taken in (851f004). NOW (his 17:31 UTC message): the token sitting waits for one day-session merge and one PR
+   Advisor merge under the new rule; "your own next merge from a day session counts as the first", which would put
+   #72's merge before the token sitting: the order (and what it changes: wall-test.yml, condition (d), previews on
+   main without a token) goes to him as ORDER-WALL before anything acts on it.
 d. The token sitting, one message to him in this order (the security-auditor's conditions): (a) reload the `preview`
    environment page, screenshot (bypass box unticked, "Selected branches and tags", "1 branch and 0 tags allowed",
    `main`, no custom rule); (b) both secrets only by "Add environment secret"; (c) after the secrets, the Actions,
