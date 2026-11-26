@@ -35,6 +35,7 @@ import {
   formatSizeTable,
   lockedWasmBindgenVersion,
   missingOverflowOverrides,
+  NATIVE_TESTS,
   refusedBuildSettings,
   registryRemapFlag,
   simFeatureDifferences,
@@ -109,7 +110,7 @@ function checkCrates() {
     "the players' Wasm": simFeatureList(features("normal", "-p", "sim-wasm", "--target", wasmTarget)),
     "the test-only module": simFeatureList(features("normal", "-p", "devtools", "--target", wasmTarget)),
     // As `cargo test --workspace` builds it: dev-dependencies' features count, the simulation's own test helpers do not.
-    "the native tests": simFeatureList(features("normal,dev", "--workspace"), features("normal", "--workspace")),
+    [NATIVE_TESTS]: simFeatureList(features("normal,dev", "--workspace"), features("normal", "--workspace")),
   });
   if (differences.length > 0) throw new Error(differences.join("\n"));
 }

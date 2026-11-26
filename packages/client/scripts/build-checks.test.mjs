@@ -13,6 +13,7 @@ import {
   lockedWasmBindgenVersion,
   MAX_SERVED_BYTES,
   missingOverflowOverrides,
+  NATIVE_TESTS,
   overriddenCrates,
   refusedBuildSettings,
   registryRemapFlag,
@@ -20,6 +21,8 @@ import {
   simFeatureDifferences,
   simFeatureList,
   sizeTable,
+  TARGET_ONLY_ENTRIES,
+  TEST_ONLY_FEATURES,
   tooLarge,
   wasmProblems,
   workerEntryChunk,
@@ -424,6 +427,71 @@ describe("one feature set builds the simulation in every build that runs it", ()
     expect(simFeatureDifferences({ a: simFeatureList(PLAYERS), b: simFeatureList(other) })).toEqual([]);
     const own = `${PLAYERS}1sim feature "fast-math"\n2sim v0.0.0 (/repo/crates/sim)\n`;
     expect(simFeatureDifferences({ a: simFeatureList(PLAYERS), b: simFeatureList(own) })).toHaveLength(1);
+  });
+});
+
+// Mustafa's FEATURE-COMPARE (a), 2026-11-26: "Two named exceptions, each pinned to exact entries and versions, with
+// tests and planted mistakes; any other difference still stops every build." Each exception has its fixture and its
+// near misses here; the planted mistakes are the change-set's plants script.
+describe("the feature compare's two named exceptions", () => {
+  const PLAYERS = "the players' Wasm";
+  const MODULE = "the test-only module";
+  const base = ['parry3d feature "alloc"', "parry3d v0.31.1", "thiserror v2.0.21", "wide v1.7.1"];
+  const [arch, bytemuck, archDefault] = TARGET_ONLY_ENTRIES.get("safe_arch");
+  const [thisDefault, thisStd] = TEST_ONLY_FEATURES.get("thiserror v2.0.21");
+  const compare = (players, module, native) => simFeatureDifferences({ [PLAYERS]: players, [MODULE]: module, [NATIVE_TESTS]: native });
+  const sorted = (...lists) => lists.flat().sort();
+
+  test("the first: the three entries of safe_arch, in the native tests only and to the letter", () => {
+    expect(compare(base, base, sorted(base, arch, bytemuck, archDefault))).toEqual([]);
+    // Another version of the package, and another feature of it: neither is one of the three.
+    expect(compare(base, base, sorted(base, "safe_arch v1.2.1", bytemuck, archDefault))).toEqual([expect.stringContaining('only the native tests has ["safe_arch v1.2.1"]')]);
+    expect(compare(base, base, sorted(base, arch, 'safe_arch feature "std"'))).toEqual([expect.stringContaining('only the native tests has ["safe_arch feature \\"std\\""]')]);
+    // In a WebAssembly build the package is refused by name, also when every list agrees.
+    const everywhere = sorted(base, arch);
+    expect(compare(everywhere, everywhere, everywhere)).toEqual([expect.stringContaining("the players' Wasm holds [\"safe_arch v1.2.0\"]"), expect.stringContaining("the test-only module holds")]);
+    expect(compare(base, sorted(base, arch), sorted(base, arch))).toEqual([expect.stringContaining("the test-only module holds"), expect.stringContaining("differ between the players' Wasm and the test-only module")]);
+    // An entry of another package beside it is no exception.
+    expect(compare(base, base, sorted(base, arch, 'wide feature "std"'))).toEqual([expect.stringContaining('only the native tests has ["wide feature \\"std\\""]')]);
+  });
+
+  test("the second: thiserror's two features, in the native tests only, while the players hold that version", () => {
+    expect(compare(base, base, sorted(base, thisDefault, thisStd))).toEqual([]);
+    // Another version in every list: the exception is pinned to 2.0.21 and excuses nothing.
+    const moved = base.map((entry) => (entry === "thiserror v2.0.21" ? "thiserror v2.0.22" : entry));
+    expect(compare(moved, moved, sorted(moved, thisStd))).toEqual([expect.stringContaining('only the native tests has ["thiserror feature \\"std\\""]')]);
+    // Another feature of the package; the same words on another package.
+    expect(compare(base, base, sorted(base, 'thiserror feature "extra"'))).toHaveLength(1);
+    expect(compare(base, base, sorted(base, 'thiserror-impl feature "std"'))).toHaveLength(1);
+    // The other way round: the players hold the feature and the tests do not.
+    expect(compare(sorted(base, thisStd), sorted(base, thisStd), base)).toEqual([expect.stringContaining('only the players\' Wasm has ["thiserror feature \\"std\\""]')]);
+    // In the test-only module nothing is excused.
+    expect(compare(base, sorted(base, thisStd), sorted(base, thisStd))).toEqual([expect.stringContaining("differ between the players' Wasm and the test-only module")]);
+    // Without the package in the players' list there is no version to pin to.
+    const without = base.filter((entry) => entry !== "thiserror v2.0.21");
+    expect(compare(without, without, sorted(without, thisStd))).toHaveLength(1);
+  });
+
+  test("two versions of one package in a list are refused, also when every list agrees", () => {
+    const twice = sorted(base, "hashbrown v0.16.1", "hashbrown v0.17.2");
+    expect(compare(twice, twice, twice)).toEqual([PLAYERS, MODULE, NATIVE_TESTS].map((name) => `${name} holds two versions of one package the simulation runs on: hashbrown v0.16.1 and hashbrown v0.17.2`));
+  });
+
+  test("the real lists of the collision library's batch pass, and without the two exceptions exactly their five entries are named", () => {
+    const real = JSON.parse(readFileSync(new URL("../../../crates/devtools/vectors/sim-feature-lists.json", import.meta.url), "utf8"));
+    expect(Object.entries(real).map(([name, list]) => [name, list.length])).toEqual([[PLAYERS, 71], [MODULE, 71], [NATIVE_TESTS, 76]]);
+    expect(simFeatureDifferences(real)).toEqual([]);
+    const plain = simFeatureDifferences(real, new Map(), new Map());
+    expect(plain).toEqual([`the simulation's features differ between ${PLAYERS} and ${NATIVE_TESTS}: only ${NATIVE_TESTS} has ${JSON.stringify([bytemuck, archDefault, arch, thisDefault, thisStd])}; only ${PLAYERS} has []`]);
+  });
+
+  test("the exceptions name nothing of the simulation's own maths", () => {
+    const named = [...TARGET_ONLY_ENTRIES, ...TEST_ONLY_FEATURES].flat(2).join("\n");
+    for (const crate of ["parry3d", "glam", "glamx", "simba", "wide", "libm", "num-traits", "num-complex", "approx", "sim", "content"]) {
+      expect(named).not.toMatch(new RegExp(`(^|\\n)${crate} `));
+    }
+    expect([...TARGET_ONLY_ENTRIES.keys()]).toEqual(["safe_arch"]);
+    expect([...TEST_ONLY_FEATURES.keys()]).toEqual(["thiserror v2.0.21"]);
   });
 });
 

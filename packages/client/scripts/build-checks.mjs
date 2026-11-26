@@ -306,15 +306,59 @@ export function simFeatureList(treeText, closureTree = treeText) {
   return [...found].sort();
 }
 
+/** The name `build.mjs` gives the list of the tests as `cargo test --workspace` builds them. */
+export const NATIVE_TESTS = "the native tests";
+
 /**
- * Where the simulation's feature lists differ between builds: one line per build that is not the first one's
- * equal. `lists` maps a build's name to its `simFeatureList`.
+ * The two named exceptions to "the same features in every build" (Mustafa's FEATURE-COMPARE (a), 2026-11-26: "Two
+ * named exceptions, each pinned to exact entries and versions ... any other difference still stops every build").
+ * A change of either package's version needs his yes again: its entry no longer matches, and every build stops.
+ *
+ * 1. `safe_arch` exists only where the target is x86: `wide` (which the collision library's `simba` always turns
+ *    on) names it under a target condition, so the native tests hold these three entries and no WebAssembly build
+ *    may hold any entry of that package.
+ * 2. `thiserror`'s `std` is turned on by the type writer, a dev-dependency: the native tests hold these two
+ *    entries, and only while the players' list holds exactly this version of the package.
+ *
+ * Maps, so that a package named like a property of every object cannot be found by accident.
  */
-export function simFeatureDifferences(lists) {
+export const TARGET_ONLY_ENTRIES = new Map([["safe_arch", ["safe_arch v1.2.0", 'safe_arch feature "bytemuck"', 'safe_arch feature "default"']]]);
+export const TEST_ONLY_FEATURES = new Map([["thiserror v2.0.21", ['thiserror feature "default"', 'thiserror feature "std"']]]);
+
+/**
+ * Where the simulation's feature lists differ between builds. `lists` maps a build's name to its
+ * `simFeatureList`; the first is the players' Wasm, which every other list is held against.
+ *
+ * Refused, one line each: a list that holds two versions of one package (also when every list agrees); any entry
+ * of a target-only package in a list other than the native tests' (also when every list agrees); an entry only
+ * the players' list has; an entry another list has beyond the players', unless that list is the native tests'
+ * and the entry is, to the letter, one of the two named exceptions' (the second only while the players' list
+ * holds the exception's own version entry). Nothing is excused in any other list.
+ */
+export function simFeatureDifferences(lists, targetOnly = TARGET_ONLY_ENTRIES, testOnly = TEST_ONLY_FEATURES) {
+  const nameOf = (entry) => /^([A-Za-z0-9_-]+) (v[0-9]|feature ")/.exec(entry)?.[1];
   const [[firstName, first], ...rest] = Object.entries(lists);
-  return rest
-    .filter(([, list]) => JSON.stringify(list) !== JSON.stringify(first))
-    .map(([name, list]) => `the simulation's features differ between ${firstName} and ${name}: ${JSON.stringify(first)} against ${JSON.stringify(list)}`);
+  const problems = [];
+  for (const [name, list] of Object.entries(lists)) {
+    const versions = list.filter((entry) => /^[A-Za-z0-9_-]+ v[0-9]/.test(entry));
+    for (const entry of versions) {
+      const twin = versions.find((other) => other !== entry && nameOf(other) === nameOf(entry));
+      if (twin !== undefined && entry < twin) problems.push(`${name} holds two versions of one package the simulation runs on: ${entry} and ${twin}`);
+    }
+    const strays = name === NATIVE_TESTS ? [] : list.filter((entry) => targetOnly.has(nameOf(entry)));
+    if (strays.length > 0) problems.push(`${name} holds ${JSON.stringify(strays)}, which only ${NATIVE_TESTS} may hold (a package of one target)`);
+  }
+  for (const [name, list] of rest) {
+    const excused = (entry) =>
+      name === NATIVE_TESTS &&
+      ((targetOnly.get(nameOf(entry)) ?? []).includes(entry) || [...testOnly].some(([version, features]) => features.includes(entry) && first.includes(version)));
+    const more = list.filter((entry) => !first.includes(entry) && !excused(entry));
+    const fewer = first.filter((entry) => !list.includes(entry));
+    if (more.length > 0 || fewer.length > 0) {
+      problems.push(`the simulation's features differ between ${firstName} and ${name}: only ${name} has ${JSON.stringify(more)}; only ${firstName} has ${JSON.stringify(fewer)}`);
+    }
+  }
+  return problems;
 }
 
 /**
