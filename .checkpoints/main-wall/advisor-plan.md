@@ -106,3 +106,33 @@ Administration level and the proxy's write policy (click 0 and the measurement d
 
 ## For Mustafa
 After conditions 1-4: his go on the plan, his answers on T4-BASELINE and (if needed) GUARD-SETTINGS, then click 0.
+
+# Advisor: results review of MAIN-WALL before click B (2026-11-26, mode Exempt)
+Read: the results (unpushed, `.gate/main-wall/`), the checkpoint, the brief, his card, the plan, my earlier verdicts,
+the other lane's security-auditor notes at 7aadfc17. From main's `.claude/agents/advisor.md`. Ids only here.
+
+## Verdict: APPROVE click 11 (mode Exempt): conditions 1-2 before it, 3 at it, 4-6 after
+Risk tier 2. T1 PASS and counts (his account merged in the same mode). T4 PASS on a same-head control, graded from
+reply text by his fallback (no rule record); detail in the unpushed results. T5, T7 PASS. Click 10 dropped: accepted
+(click 0 is from today).
+
+## Dropped tests (at his request)
+- T1e: inferred, not measured; not needed on the real repository.
+- T3a (his own web merge): not a precondition. Optional, least work: one screenshot of the docs pull request's merge
+  box when green (no click), before the session merges it. STATUS records it as not measured until first real use.
+- T2 second account: unmeasured for his personal Claude account (same GitHub user); covered by the first merge from
+  a personal-account chat. The PR Advisor half of T10 does not cover it (same account as the test chat).
+- T6 (optional), T9: not needed. T8: no rule record; graded from reply text by his instruction; recorded as such.
+
+## Conditions
+1. (High, process) security-auditor reviews the results before click 11 (plan section 4 B, tier 2), including the
+   test chat's two deviations and condition 4's release point; any Critical or High open stops click 11.
+2. His go on click 11 in his own words in this chat.
+3. Click 11 exactly as measured (plan section 2's settings, mode Exempt); "Shamble Ruleset 1" untouched.
+4. The other lane: its builder may resume work that stores no credential once click 12's read-back matches
+   condition 3. The token sitting itself waits for T10's day-session half (the first day-session merge under the
+   wall), not for the PR Advisor half: only a refused day-session merge leads to click 11's undo. This narrows the
+   plan line he approved ("waits for click 11 and T10"): say so to him.
+5. (Low) Click 0's missing Actions > General screenshot rides with click 12; not a precondition.
+6. The docs pull request records every deviation and dropped test, quoting his own words from the chat exactly;
+   STATUS keeps T10's PR Advisor half and the personal-account merge open until each first happens. Then click 9.

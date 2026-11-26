@@ -52,3 +52,17 @@ after the coordinator's update), the other lane's notes at e58d049e (lines 30-90
 
 ## Verdict
 REVISE (text only; W1 holds). Exact text changes in the hand-back and the scratchpad detail file.
+
+## Results review (2026-11-26, mode Exempt; detail in the scratchpad, never pushed)
+Inputs: the condensed results (not the raw report or screenshots), plan, brief, card, checkpoint items 11-14.
+- Verdict: APPROVE click 11 in mode Exempt, with click-text conditions C1-C4.
+- SA-MW-R1 Low: outsider refusal proven by refusal text and elimination, rule record unavailable (inference named).
+- SA-MW-R2 Low: isolation precondition replaced by the session-merge result (inference named; sound).
+- SA-MW-R3 Low: availability routes not measured (own web merge, second account, routine runner); moved to T10.
+- SA-MW-R4 Low: one isolation route not measured for the exempt actor; optional before deletion.
+- SA-MW-R5 Medium: grading basis changed from the recorded decision; his words not yet on record (non-blocking).
+- SA-MW-R6 Medium: stored-credential invariant (SA-MW-9) never checked; add to click 10.
+- SA-MW-R7 Low: log-header deviation, no secret; no action.
+- SA-MW-R8 Low: author-identity deviation, no new exposure; fork check before deletion.
+- C1-C4: click 11 self-contained (Exempt, only one rule ticked); click 12 read-back field by field; click 10 complete;
+  T10 covers both accounts, the routine and his web merge, with the refusal reading.

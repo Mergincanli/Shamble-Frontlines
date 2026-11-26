@@ -56,8 +56,14 @@
     refusal text: no Insights page in his Settings), T5, T7 PASS; T1e, T6, T9, T3a and the second-account merge not run
     at his request (he dislikes the manual steps); results in .gate/main-wall/results-exempt.md (not pushed)
 
+15. Results reviews: the advisor agent APPROVE (conditions: security-auditor first, his go on click 11 in his words,
+    click 11 exactly as measured, the other lane's release point, docs quote his words); security-auditor APPROVE
+    (C1 click 11 stands alone, C2 click 12 field by field, C3 secrets/variables/environments names checked once before
+    click 11 (SA-MW-9), C4 T10 reading rules; SA-MW-R1..R8 Low/Medium) · notes advisor-plan.md, security-auditor-plan.md
+    Decisions for him: TOKEN-RELEASE, T1E-BEFORE-DELETE, T4-GRADING; which Claude account this chat is on.
+
 ## Current step
-security-auditor and the advisor agent review the results (in parallel); then his click 11 on the real repository.
+His go on click 11; his two screenshots (secrets and variables names, environments); click 11; click 12.
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
@@ -76,4 +82,4 @@ security-auditor and the advisor agent review the results (in parallel); then hi
 - THROWAWAY-PUBLIC (a): public throwaway, neutral names, deleted as soon as the results are reviewed · Mustafa · 2026-11-26 (his answer "a" in this chat)
 
 ## Running work
-- security-auditor and the advisor agent: results review
+- none
