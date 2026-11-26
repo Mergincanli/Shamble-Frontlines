@@ -156,8 +156,11 @@
   1. MAIN-67 (main 07d673b, #71: CI workflow, an e2e config, docs): main-67-plan.md; its check by a0530735048f1620a
      since 00:00 (advisor-main-67.md); then steps 1-6 when the lane allows (U7's builder holds it), step 7 in a later
      window. DONE before it: MAIN-66 step 7 APPROVE and C6 APPROVE, 00:0x (advisor-main-66-head.md; no new finding).
-  2. U7: the 0b amendment DONE (56b3e1b, pushed 9177fb5); the builder runs on 9177fb5 (room tests, driver fix, end
-     check, size). C6's terms: the reworded C6 is a departure in U7's report. On its return: notes, snapshot, SIZE-CHECK.
+  2. U7: brief 3 DONE 00:28 (its notes: wip/u7-build-rs-notes-0030.md; snapshot wip/u7-build-rs.patch, 243,353 B, 42
+     files on 9177fb5): R3's two room tests in; the end check 13 of 13 PASS (test 881 and 978, +20 each: C14's floor;
+     web 56/56; self 80/80); size about 4,731 (SIZE-CHECK clear); T5 (ii) not rerun on 9177fb5. Next: U7's round
+     (netcode, test; no security: C12) in the 04:50 window: T5ii-A to -D, T5i-1 to -3, the driver's `fail` limit, C2's
+     mode-hash half (cannot fail), the reworded C6 as a departure, the builder's read-only shell-loop slip (19:4x-00:16).
   3. U8's merge LAST (the order of 23:2x, the advisor tool): after item 1, item 2's new base for U7's builder (by 00:20 UTC: new work for a finished agent) and MAIN-67 (main past c1da1bd, a CI move: full plan, its check, the merge); then u8-merge-plan.md (M0-M9 with C1, the `ops` step and the merged-state run; the advisor tool's six fixes folded in); resume from its last "done" line (no "done" line: M0 not started; staged U8 files and no commit: M6's undo or carry on from the next step);
      a3de649cd25e474df's head read in a window: the policy-name INVALID (plan.md:1256), C9 on 096808b, test 7's merged-state run, NC-R3-1, the items under U8 below, and the 05:2x clean incident told to the advisor (u7-block0b.md:40).
   Then NB2's merge, in a gap of R1's path (nb2-merge-plan.md; advisor-nb2-merge.md NB2-C1 to -C12; NB2-C1 DONE with

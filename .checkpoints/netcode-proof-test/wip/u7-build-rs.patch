@@ -769,10 +769,10 @@ index 0000000..ebe5534
 +]
 diff --git a/spikes/netcode-proof/crates/client-wasm/src/engine.rs b/spikes/netcode-proof/crates/client-wasm/src/engine.rs
 new file mode 100644
-index 0000000..e495aa0
+index 0000000..bd4cfeb
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/client-wasm/src/engine.rs
-@@ -0,0 +1,556 @@
+@@ -0,0 +1,809 @@
 +//! The browser client's plain-Rust core (u7-brief.md rev 1.1 Block R3; the advisor's C2, C5), tested natively; lib.rs
 +//! only converts for wasm-bindgen. The slot token, C5's inbox and outbox (every integer little-endian), the steps due
 +//! (each the native hosts' order: `input` with what arrived, then each command due, then the endpoint's `step`; at most
@@ -1327,6 +1327,259 @@ index 0000000..e495aa0
 +            push_record(&mut out, channels[i].parse().unwrap_or(9), &unhex(bytes[i]));
 +        }
 +        assert_eq!(out, unhex(hex[1]));
++    }
++
++    use npt_link::{Link, Loopback};
++    use npt_proto::{MODE_HASH, Message, Quant};
++    use npt_room::{RefusalRecord, Room};
++    use npt_server::{Decoder, RttSource};
++    use npt_sim::{Scene, World};
++
++    /// The room's clock at its tick 0, ns (as npt-server's tests' lab).
++    const BASE_NS: u64 = 1_000_000_000;
++    /// The Loopback's datagram limit (npt-server's tests' lab: the room's groups stay within 1,000 B).
++    const MAX_DATAGRAM: usize = 1_200;
++
++    /// R3's room (C6; C2's equality, U7's half): npt-room's `Room` behind npt-server's real `Decoder`, as npt-server's
++    /// tests host it (crates/server/tests/common/mod.rs) and as the binary builds both (tick_loop.rs:455-467,
++    /// :850-857): T5's scene and seed (stress, 7), first tick 0, npt-proto's version and content hash at the decoder,
++    /// `with_hashes(CONTENT_HASH, MODE_HASH)` at the room. One Loopback pair; the `Core` woken at its own
++    /// `next_due_ns` with what arrived as C5's records, its outbox sent at once and the wake's time passed as the next
++    /// call's send time, as the Worker does (worker.ts:283-299).
++    struct RoomHost {
++        room: Room<World>,
++        decoder: Decoder,
++        server: Loopback,
++        client: Loopback,
++        core: Core,
++        slot: Option<u8>,
++        /// Server ticks run, and the time of the last event.
++        k: u64,
++        now_ns: u64,
++        prev_send_ns: u64,
++        /// Every reliable message the room sent the client: its stream and bytes.
++        from_room: Vec<(Channel, Vec<u8>)>,
++        /// Every refusal record the room kept (its kinds 1-6, 8, 10; the sim's own are not among them).
++        refusals: Vec<RefusalRecord>,
++    }
++
++    impl RoomHost {
++        fn new() -> RoomHost {
++            let raw = [0x5a; 16];
++            let scene = Scene::stress();
++            let world = World::new(&scene, 7, 0);
++            let greybox = world.greybox().clone();
++            let room = Room::new(world, &scene, &greybox, vec![raw], 1, TICK_HZ)
++                .with_hashes(CONTENT_HASH, MODE_HASH);
++            let decoder = Decoder::new(
++                Quant::default(),
++                TICK_HZ,
++                BASE_NS,
++                PROTOCOL_VERSION,
++                CONTENT_HASH,
++                RttSource::Link,
++            );
++            let (server, client) = Loopback::pair(MAX_DATAGRAM);
++            let core = Core::new(&token(raw), &[0xa5; 16]).expect("a client");
++            RoomHost {
++                room,
++                decoder,
++                server,
++                client,
++                core,
++                slot: None,
++                k: 0,
++                now_ns: BASE_NS,
++                prev_send_ns: 0,
++                from_room: Vec::new(),
++                refusals: Vec::new(),
++            }
++        }
++
++        /// The counter `name` (by name, as the page reads them).
++        fn counter(&self, name: &str) -> u32 {
++            let i = COUNTER_NAMES.iter().position(|n| *n == name);
++            i.map_or(u32::MAX, |i| self.core.counters()[i])
++        }
++
++        /// One server tick at `now`: the session's messages through the decoder into the room, the tick, then the
++        /// room's datagrams and reliable messages (each on its own stream: npt-proto's `channel_of`) to the client.
++        fn server_tick(&mut self, now: u64) {
++            let tick = self.room.last_tick().wrapping_add(1);
++            loop {
++                let mut msgs = Vec::new();
++                self.decoder.pump(&mut self.server, now, tick, &mut msgs);
++                let mut joined = false;
++                for (m, _) in msgs {
++                    match (&m, self.slot) {
++                        (Message::Join(j), _) => {
++                            joined = true;
++                            match self.room.join(j) {
++                                Ok((slot, _)) => {
++                                    self.decoder.accept();
++                                    self.slot = Some(slot);
++                                }
++                                Err(r) => self.decoder.reject(&mut self.server, r, now),
++                            }
++                        }
++                        (_, Some(slot)) => self.room.receive(slot, &m),
++                        _ => {}
++                    }
++                }
++                if !joined {
++                    break;
++                }
++            }
++            if let Some(slot) = self.slot {
++                let sent = self.decoder.take_sent_bytes();
++                self.room
++                    .pump_report(slot, sent, self.server.max_datagram_size());
++            }
++            self.room.tick();
++            self.refusals.extend_from_slice(self.room.refusals());
++            if let Some(slot) = self.slot {
++                for d in self.room.take_datagrams(slot) {
++                    self.server.send_unreliable(&d, now);
++                }
++                for b in self.room.take_control(slot) {
++                    let channel = npt_proto::channel_of(&b).expect("a framed message");
++                    self.server.send_reliable(channel, &b, now);
++                    self.from_room.push((channel, b));
++                }
++            }
++        }
++
++        /// One wake of the client at `now`: what arrived, packed as C5's inbox; the outbox sent at once.
++        fn wake(&mut self, now: u64) {
++            let mut got = Vec::new();
++            while let Some(r) = self.client.poll_recv(now) {
++                let tag = match r.channel {
++                    Channel::Datagram => 0,
++                    Channel::Control => 1,
++                    Channel::FullState => 2,
++                };
++                got.push((tag, r.arrival_ns, r.bytes));
++            }
++            let packed: Vec<(u8, u64, &[u8])> =
++                got.iter().map(|(t, a, b)| (*t, *a, b.as_slice())).collect();
++            let out = self.core.step(now, self.prev_send_ns, &inbox(&packed));
++            for (channel, bytes) in outbox(&out) {
++                if channel == 0 {
++                    self.client.send_unreliable(&bytes, now);
++                } else {
++                    self.client.send_reliable(Channel::Control, &bytes, now);
++                }
++            }
++            self.prev_send_ns = now;
++        }
++
++        /// Server ticks on U4b's schedule, the client woken at each of its due times between them, until `done` holds
++        /// or `max_ticks` ticks have run; whether `done` held.
++        fn run(&mut self, max_ticks: u64, done: impl Fn(&RoomHost) -> bool) -> bool {
++            while self.k < max_ticks {
++                if done(self) {
++                    return true;
++                }
++                let at = BASE_NS + self.k * 1_000_000_000 / u64::from(TICK_HZ);
++                loop {
++                    let due = self.core.next_due_ns().max(self.now_ns);
++                    if due >= at {
++                        break;
++                    }
++                    self.now_ns = due;
++                    self.wake(due);
++                }
++                self.now_ns = at;
++                self.server_tick(at);
++                self.k += 1;
++            }
++            done(self)
++        }
++    }
++
++    /// R3 (C6; C2's equality): the client's `Join` (npt-proto's version and content hash) is accepted by the room as
++    /// the binary builds it; the `JoinAccepted` it sends carries `CONTENT_HASH` and `MODE_HASH`; the client takes a
++    /// full state, holds its own soldier (the page's Playing), and goes on acknowledging the room's snapshots (it
++    /// files their ticks) while the room runs its commands; nothing refused on either side.
++    #[test]
++    fn r3_the_client_joins_the_room_behind_the_servers_decoder_and_plays() {
++        let mut h = RoomHost::new();
++        assert!(
++            h.run(300, |h| h.counter("own_soldier") == 1),
++            "Playing within 10 s of room time"
++        );
++        assert_eq!((h.slot, h.counter("joined")), (Some(0), 1));
++        let accepted: Vec<_> = (h.from_room.iter())
++            .filter(|(ch, _)| *ch == Channel::Control)
++            .filter_map(|(_, b)| {
++                match npt_proto::decode(Direction::RoomToClient, Channel::Control, b) {
++                    Ok(Message::JoinAccepted(a)) => Some(a),
++                    _ => None,
++                }
++            })
++            .collect();
++        assert_eq!(accepted.len(), 1);
++        assert_eq!(
++            (
++                accepted[0].slot,
++                accepted[0].content_hash,
++                accepted[0].mode_hash
++            ),
++            (0, CONTENT_HASH, MODE_HASH)
++        );
++        assert!(h.from_room.iter().any(|(ch, _)| *ch == Channel::FullState));
++        let (playing_at, acked_then) = (h.k, h.room.client(0).and_then(|c| c.last_acked()));
++        h.run(playing_at + 60, |_| false);
++        assert_eq!(h.k, playing_at + 60);
++        let acked = h.room.client(0).and_then(|c| c.last_acked());
++        assert!(
++            acked > acked_then && acked.is_some(),
++            "{acked_then:?} -> {acked:?}"
++        );
++        assert!(h.counter("clock_samples") > 0 && h.counter("last_run_command") > 0);
++        assert!(h.room.client(0).is_some_and(|c| c.commands_run() > 0));
++        for name in [
++            "inbox_refused",
++            "pending_dropped",
++            "wrong_channel",
++            "refused",
++        ] {
++            assert_eq!(h.counter(name), 0, "{name}");
++        }
++        assert!(h.refusals.is_empty(), "{:?}", h.refusals);
++    }
++
++    /// R3 (C6): the press script's commands over 3,000 client steps draw no refusal from the room (no kind 1-6, 8 or
++    /// 10 record, every refusal counter of the slot 0) and are run; only the sim's own (cooldown) may refuse a press.
++    #[test]
++    fn r3_the_press_script_draws_no_refusal_but_the_sims_own_over_3_000_steps() {
++        let mut h = RoomHost::new();
++        assert!(h.run(3_400, |h| h.counter("steps") >= 3_000), "3,000 steps");
++        let c = h.room.client(0).expect("slot 0").counters();
++        assert!(
++            h.refusals.is_empty(),
++            "{:?}",
++            &h.refusals[..h.refusals.len().min(8)]
++        );
++        assert_eq!(
++            [
++                c.lead_refused,
++                c.not_newer,
++                c.seq_refused,
++                c.move_refused,
++                c.press_refused,
++                c.aim_refused,
++                c.buffer_full,
++                c.ack_refused,
++            ],
++            [0; 8]
++        );
++        assert!(c.commands_run >= 2_900, "{}", c.commands_run);
++        assert!(h.counter("commands") >= 2_900);
++        assert_eq!(
++            (h.counter("unencodable_commands"), h.counter("refused")),
++            (0, 0)
++        );
 +    }
 +}
 diff --git a/spikes/netcode-proof/crates/client-wasm/src/script.rs b/spikes/netcode-proof/crates/client-wasm/src/script.rs
@@ -2247,10 +2500,10 @@ index 0000000..ba1b0d2
 +});
 diff --git a/spikes/netcode-proof/web/e2e/t5ii.mjs b/spikes/netcode-proof/web/e2e/t5ii.mjs
 new file mode 100644
-index 0000000..694168a
+index 0000000..63c7b63
 --- /dev/null
 +++ b/spikes/netcode-proof/web/e2e/t5ii.mjs
-@@ -0,0 +1,337 @@
+@@ -0,0 +1,341 @@
 +#!/usr/bin/env node
 +// t5ii.mjs: Block T5 (ii), the whole client in a browser (u7-brief.md rev 1.1 section 3's browser line, pass marks 1-9;
 +// advisor-u7-brief.md C8, C9): the measured and bites dists from build.mjs, `<base>`'s release npt-server on 127.0.0.1,
@@ -2584,10 +2837,14 @@ index 0000000..694168a
 +  console.log(`t5ii: records under ${base.slice(ROOT.length + 1)}`);
 +}
 +
-+main().catch((e) => {
-+  console.error(`t5ii: ${clean(String(e.message).split("\n")[0])}`);
++/** Any failure, caught or not, prints its first line cut at any '#' (a page URL's fragment holds the join token). */
++const fail = (e) => {
++  console.error(`t5ii: ${clean(String(e?.message ?? e).split("\n")[0])}`);
 +  process.exit(1);
-+});
++};
++process.on("unhandledRejection", fail);
++process.on("uncaughtException", fail);
++main().catch(fail);
 diff --git a/spikes/netcode-proof/web/index.html b/spikes/netcode-proof/web/index.html
 new file mode 100644
 index 0000000..b3bf9df
