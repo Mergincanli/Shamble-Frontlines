@@ -207,6 +207,16 @@ Merged: PR #56, d7dad97, 2026-11-17 23:00:12 UTC, by merge commit, on his go aft
 cd61b28; CI green on main (gate run 856 with smoke, toolchain run 155). With the merge he accepted that PM-0005-54
 stands as written (a fail with today's rifle prototype, not waived) and the checkpoint commits in main's history.
 
+**Part 15 of the build plan, the second lane, to main [2026-11-17 to 11-18, MERGED]** — part-15-second-lane, by
+his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
+in `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; his two messages of 2026-11-17 in `docs/DECISIONS.md` by
+script; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules' line on gun
+files (GUN-FILES); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. The verifier: PASS. Report
+`docs/reports/2026-11-17-part-15-second-lane.md`. Merged: PR #57, 22c6afa, 2026-11-18 11:09:31 UTC, by merge commit,
+on his go after the advisor agent's APPROVE of f26ac5b; CI green on main (gate run 866 with smoke, toolchain run 165).
+With the merge he answered OLD-LINES, who may fold old lines in the shared record files (`docs/DECISIONS.md`,
+2026-11-18, 11:08:25 UTC).
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -257,6 +267,15 @@ stands as written (a fail with today's rifle prototype, not waived) and the chec
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**The preview hand-over step [2026-11-26, in flight]** — ci-preview-handover, by the chat he calls CI Builder, on his
+block of 2026-11-26 (risk tier 2; CI and the test configuration only): at the end of the `toolchain` job, on pull
+requests from this repository only, a check that the tested player build holds only plain files and folders with no
+dot names, then its upload as `preview-site` (7 days) for lane 2's preview workflow, by `actions/upload-artifact`
+v7.0.2 pinned by commit (his UPLOAD-SOURCE (a), GUARD-STEP (a), HIDDEN-FILES (b)); TOKEN-WORDS; the recording's replay
+test joins the rule tests in Firefox (FIREFOX-REPLAY: 3 passed in the container's Firefox 161). CUT-ESCAPE stays
+accepted, its fix a follow-up (his words). Written at d12e3a8 on his CI-WRITE-3 (a); CI: the push run on d12e3a8 green (toolchain 45836151624, gate and smoke 45836152061): the set-up passed with the upload action named, the two new steps skipped on a push, the runner's Firefox 160 "3 passed (12.5s)" with the replay test "first-loop.rec: 1800 steps, every shared hash as in the file", the job 5 min 45 s; the pull request run, the first that runs the two new steps, after the draft is opened. Report
+`docs/reports/2026-11-26-ci-preview-handover.md`; waits for the advisor agent's review of the final head and his go.
+
 **The second guard fix: nothing in front of git or gh unread [2026-11-25 to 11-26, waiting for his go]** —
 guard-wrappers (risk tier 2; his SAME-GAP (a); the chat he calls the Guard fix chat): the day guard reads the options of
 every wrapper and keyword it strips from one table; an unknown form, or a line at the turn limit, asks in a session and
@@ -278,6 +297,9 @@ straight from the state's one visitor, with no buffer; the hash report (PM-0004-
 check. 3,300 written lines against the stop line of 3,400 (his STOP-4A (a); the designs counted 1,365); the size
 ladder moved 3B-HOSTILE-ALLOC to the link simulator's change-set. Five reviewers in two rounds, all APPROVE in round 2.
 Report `docs/reports/2026-11-25-cs4a-recording.md`. Merged: PR #70, 2483e9a, 2026-11-26 12:22:01 UTC by `merged_at`.
+_Pointer (2026-11-26, ci-preview-handover's docs pass): merged as PR #70, 2483e9a, 2026-11-26 12:22:01 UTC
+(`merged_at`), by merge commit, with the head 420b16b; gate, smoke and toolchain green on main (runs 45818982040 and
+45818982052)._
 
 **The small CI pull request after change-set 3a [2026-11-24 to 11-25, MERGED]** — ci-after-3a, by the
 chat he calls CI Builder (risk tier 2; CI and the test configuration only): the `toolchain` job runs every crate's
@@ -287,6 +309,9 @@ Firefox 160.0 (FIREFOX-TESTS (b), his FIREFOX-SOURCE (c)). The first GitHub run 
 runner's Firefox gives the page no WebGL), so by his rule decided in advance Firefox runs the rule tests only and its
 drawing tests are a follow-up (FF-DRAW). Green on code head 832268e (Chromium 16 passed, Firefox 2). Report
 `docs/reports/2026-11-25-ci-after-3a.md`. Merged: PR #71, 07d673b, 2026-11-25 20:49:09 UTC by `merged_at`.
+_Pointer (2026-11-26, ci-preview-handover's docs pass): merged as PR #71, 07d673b, 2026-11-25 20:49:09 UTC
+(`merged_at`), by merge commit, by his tap with the head c9460ca pinned (his words of 2026-11-25, 21:50 Amsterdam,
+`docs/DECISIONS.md`)._
 
 **Guard fix: a wrapper's option values [2026-11-25, MERGED]** — guard-env-fix (PR #69, risk tier 2; SEC-U7B-1): the day guard reads env, nice and stdbuf options with their values, so git and gh behind them no longer skip its check;
 a form it cannot read asks the main session and refuses an agent; routines unchanged. Guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES. Merged: PR #69, 311c0484, 2026-11-25 16:34:48 UTC by `merged_at`, by merge commit, on his go for head 08bb20af.
@@ -395,13 +420,3 @@ UTC); the advisor agent: APPROVE (its word on the final head is in #58's descrip
 2026-11-18 15:39:28 UTC, by merge commit, on his go after that APPROVE; CI green on main (gate run 884 with smoke,
 toolchain run 182). With the merge he accepted the two misses as written and answered its five questions: the kit
 hold and the two CI edits (PR #60), the "Lane requests" issue (#59), no watch (`docs/DECISIONS.md`, 15:38:13 UTC).
-
-**Part 15 of the build plan, the second lane, to main [2026-11-17 to 11-18, MERGED]** — part-15-second-lane, by
-his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
-in `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; his two messages of 2026-11-17 in `docs/DECISIONS.md` by
-script; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules' line on gun
-files (GUN-FILES); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. The verifier: PASS. Report
-`docs/reports/2026-11-17-part-15-second-lane.md`. Merged: PR #57, 22c6afa, 2026-11-18 11:09:31 UTC, by merge commit,
-on his go after the advisor agent's APPROVE of f26ac5b; CI green on main (gate run 866 with smoke, toolchain run 165).
-With the merge he answered OLD-LINES, who may fold old lines in the shared record files (`docs/DECISIONS.md`,
-2026-11-18, 11:08:25 UTC).

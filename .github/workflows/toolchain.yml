@@ -1,9 +1,9 @@
 # Foundation step 2.2 (ADR 0002 part 2, migration plan 2.2): the pinned Rust toolchain from rust-toolchain.toml, then
 # the Rust and npm workspaces' builds and tests with the network cut off. One job, `toolchain`; the gate and smoke jobs
 # stay in gate.yml. Step 2.3 replaces this file with the gate v2's workflow.
-# The cut: the last step runs in its own network namespace (sudo unshare --net), with loopback up, back as the runner's
-# user with no docker group and no_new_privs; a TCP probe to an address resolved before the cut must connect outside
-# and fail inside (only curl exit 7 or 28 counts as cut).
+# The cut: the step "Build and test with the network cut off" runs in its own network namespace (sudo unshare --net),
+# with loopback up, back as the runner's user with no docker group and no_new_privs; a TCP probe to an address
+# resolved before the cut must connect outside and fail inside (only curl exit 7 or 28 counts as cut).
 # CI-WASM: before the cut, the wasm-bindgen tool's archive is fetched and checked against Mustafa's values and by
 # GitHub's own check of the release; its one program is installed root-owned. Inside the cut the page is built with
 # it; then the boundary tests, the type checks of the Worker, the page and the browser specs, and the browser tests
@@ -91,7 +91,7 @@ jobs:
           [ "$bytes" = "$WB_ARCHIVE_BYTES" ] || { echo "the archive is $bytes bytes, not $WB_ARCHIVE_BYTES"; exit 1; }
           printf '%s  %s\n' "$WB_ARCHIVE_SHA256" "$RUNNER_TEMP/wasm-bindgen/$WB_NAME.tar.gz" | sha256sum -c -
 
-      # Before the tool's first run (Mustafa's CI-WASM (a)). The only step with the token; gh 2.93.0 keeps it off the
+      # Before the tool's first run (Mustafa's CI-WASM (a)). The only run step with the token; gh 2.93.0 keeps it off the
       # TUF mirrors (CVE-2026-48501).
       - name: GitHub's own check of the archive (gh release verify-asset)
         env:
@@ -127,7 +127,7 @@ jobs:
           [ "$(stat -c %s "$WB_TOOL")" = "$WB_PROGRAM_BYTES" ] || { echo "the program is not $WB_PROGRAM_BYTES bytes"; exit 1; }
           printf '%s  %s\n' "$WB_PROGRAM_SHA256" "$WB_TOOL" | sha256sum -c -
 
-      - name: Fetch every dependency (the last step with the network)
+      - name: Fetch every dependency (the last step with the network before the cut)
         run: |
           cargo fetch --locked
           npm ci --ignore-scripts --no-audit --no-fund
@@ -211,3 +211,33 @@ jobs:
                 npx --no -- playwright test -c packages/e2e/playwright.config.ts --project=firefox --workers=1 --retries=0 \
                   --reporter=list --global-timeout=300000
             '
+
+      # After the cut, for pull requests from this repository only: hand the tested player build to lane 2's preview
+      # workflow (.github/workflows/preview.yml, which starts on `workflow_run` of this workflow's name `toolchain` and
+      # treats these files as data). The cut's code wrote the build, so first a check that it holds only plain files
+      # and folders, none named with a leading dot (the upload follows symbolic links and drops dot names unasked),
+      # with absolute paths, since the cut's user can write in PATH. It catches a link or dot name left in the build and
+      # prints the count; it is no boundary: code that ran inside the cut is the runner's user and can still change
+      # later steps (CUT-ESCAPE).
+      - name: Check that the tested build holds only plain files and folders (pull requests from this repository only)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: /usr/bin/bash --noprofile --norc -euo pipefail {0}
+        run: |
+          d="$GITHUB_WORKSPACE/.gate/dist-production"
+          for p in "$GITHUB_WORKSPACE/.gate" "$d"; do [ -d "$p" ] && [ ! -L "$p" ] || { echo "$p is not a plain folder"; exit 1; }; done
+          bad=$(/usr/bin/find "$d" -mindepth 1 \( ! -type f ! -type d -o -name '.*' \) -print)
+          [ -z "$bad" ] || { echo "not a plain file or folder, or a name that begins with a dot:"; echo "$bad"; exit 1; }
+          n=$(/usr/bin/find "$d" -type f -printf '.' | /usr/bin/wc -c)
+          [ "$n" -gt 0 ] || { echo "the build is empty"; exit 1; }
+          echo "$n files, $(/usr/bin/du -sb "$d" | /usr/bin/cut -f1) bytes"
+
+      # An empty upload fails; nothing whose own name begins with a dot leaves, file or folder (the check above refuses
+      # such names, so its count equals the upload's).
+      - name: Hand the tested build to the preview workflow (pull requests from this repository only)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: preview-site
+          path: .gate/dist-production
+          if-no-files-found: error
+          retention-days: 7
