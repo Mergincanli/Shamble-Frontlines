@@ -53,8 +53,13 @@ pub const CORNER_GRID: Grid = Grid { per_metre: 1_000, thinnest: 10 };
 
 /// Any coordinate: wide bounds that keep a typing mistake out. The map's own bounds are held to the aim's reach.
 pub const COORDINATE: Range = Range::closed(-10_000.0, 10_000.0);
-/// The way a spawn faces, in degrees from 0 up to 360. Which way 0 points and which way it turns is pinned in the
-/// change that writes the first map file (4b-2's data step), before any spawn is written: no code reads it yet.
+/// The way a spawn faces, in degrees from 0 up to 360. **0 faces +z, and the degrees grow toward +x**: 90 faces +x,
+/// 180 faces -z, 270 faces -x (seen from above with +x to the right and +z toward the viewer, that is a turn
+/// against the clock). It is the old game's own convention, kept so that a place and a facing mean what they meant
+/// there: its soldiers turn by `rotation.y = Math.atan2(dir.x, dir.z)` (`legacy/shamble-game.js:2710`, `:2758`; the
+/// harvester the same, `:871`). Pinned here before the first map file is written (the advisor agent's condition on
+/// 4b-2); no code reads a facing yet, and the change that first does turns it into the simulation's own direction
+/// without a sine or a cosine of the standard library (ADR 0004 part 7).
 #[rustfmt::skip]
 pub const FACING: Field = Field { name: "facing_deg", unit: "deg", range: Range { min: 0.0, max: 360.0, min_inclusive: true, max_inclusive: false } };
 

@@ -26,8 +26,9 @@ pub const MAX_FILES: u32 = 16;
 pub const FORMAT: &str = "shamble-content-bundle";
 pub const VERSION: u32 = 1;
 
-/// The kinds of content, by the folder their files lie in. A path names its kind; no other folder is a path.
-const FOLDERS: [&str; 2] = ["maps", "movement"];
+/// The kinds of content, by the folder their files lie in. A path names its kind; no other folder is a path. (The
+/// tool that reads the files under `content/` walks these folders and no other.)
+pub const FOLDERS: [&str; 2] = ["maps", "movement"];
 
 /// One content file, read and checked.
 #[derive(Debug, Clone, PartialEq)]

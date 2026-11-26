@@ -109,6 +109,15 @@ fn file_name(name: &str) -> Result<(), String> {
 /// A name that is a path, a folder or a file that is a link or of another type, a file that is not there or is
 /// larger than a read takes, each by name.
 pub fn read_plain(folder: &Path, name: &str) -> Result<Vec<u8>, String> {
+    read_plain_within(folder, name, MAX_READ_BYTES)
+}
+
+/// As [`read_plain`], for a file whose reader has a smaller limit of its own: at most `cap` bytes are taken, and
+/// one byte more is read only to say that the file is larger.
+///
+/// # Errors
+/// As [`read_plain`]; "larger than a read takes" is measured against `cap`.
+pub fn read_plain_within(folder: &Path, name: &str, cap: u64) -> Result<Vec<u8>, String> {
     file_name(name)?;
     plain(folder, "")?;
     plain(folder, name)?;
@@ -118,14 +127,52 @@ pub fn read_plain(folder: &Path, name: &str) -> Result<Vec<u8>, String> {
         return Err(format!("{name:?} is not a plain file"));
     }
     let mut bytes = Vec::new();
-    let read = file.take(MAX_READ_BYTES + 1).read_to_end(&mut bytes);
+    let read = file.take(cap.saturating_add(1)).read_to_end(&mut bytes);
     read.map_err(said)?;
-    if bytes.len() as u64 > MAX_READ_BYTES {
-        return Err(format!(
-            "{name}: more than the {MAX_READ_BYTES} bytes a read takes"
-        ));
+    if bytes.len() as u64 > cap {
+        return Err(format!("{name}: more than the {cap} bytes a read takes"));
     }
     Ok(bytes)
+}
+
+/// Whether `folder` is there as a folder of its own type: not a link to one, and not anything else.
+#[must_use]
+pub fn is_plain_folder(folder: &Path) -> bool {
+    let path: std::path::PathBuf = folder.components().collect();
+    std::fs::symlink_metadata(path).is_ok_and(|found| found.is_dir())
+}
+
+/// Puts `bytes` in `name`'s place in `folder`, which must exist: written whole into a new file beside it first
+/// (made only if no file of that name is there, never through a link), then renamed over `name`. A reader of
+/// `name` sees the old file or the new one, never half of either.
+///
+/// # Errors
+/// A name that is a path, a path that is a link or no plain file, a leftover of an earlier write, or a file that
+/// could not be written.
+pub fn replace_plain(folder: &Path, name: &str, bytes: &[u8]) -> Result<(), String> {
+    use std::io::Write as _;
+    file_name(name)?;
+    if !is_plain_folder(folder) {
+        return Err(format!("{:?} is not a plain folder", folder.display()));
+    }
+    plain(folder, name)?;
+    let new = format!(".{name}.new");
+    let said = |error: std::io::Error| format!("{new}: {error}");
+    let mut options = std::fs::File::options();
+    let mut file = options
+        .write(true)
+        .create_new(true)
+        .open(folder.join(&new))
+        .map_err(said)?;
+    let moved = file
+        .write_all(bytes)
+        .and_then(|()| file.sync_all())
+        .and_then(|()| std::fs::rename(folder.join(&new), folder.join(name)));
+    moved.map_err(|error| {
+        // The half-written file goes; if even that fails, the next write names it.
+        let _ = std::fs::remove_file(folder.join(&new));
+        said(error)
+    })
 }
 
 /// Writes one file into `folder`, which must exist, never through a link standing in the folder's or the file's

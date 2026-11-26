@@ -221,11 +221,28 @@ fn the_committed_recordings_are_read_only_through_the_plain_read() {
     assert_eq!(around, None);
     assert!(own.contains("read_plain(&folder(), name)"));
     let library = source("src/files.rs");
-    let plain_read = library
-        .split_once("pub fn read_plain")
+    // `read_plain` is one call of `read_plain_within` with the folder's own cap; the open is in the second.
+    let wrapper = library
+        .split_once("pub fn read_plain(")
         .and_then(|(_, rest)| rest.split_once("\n}\n"));
-    // One place opens a file, inside `read_plain`; nothing reads a path whole, or opens one another way.
+    assert!(wrapper.is_some_and(|(body, _)| {
+        body.trim_end()
+            .ends_with("read_plain_within(folder, name, MAX_READ_BYTES)")
+    }));
+    let plain_read = library
+        .split_once("pub fn read_plain_within(")
+        .and_then(|(_, rest)| rest.split_once("\n}\n"));
+    // One place opens a file to read it, inside `read_plain_within`; nothing reads a path whole, or opens one
+    // another way. One place makes a file, and only under a name that is not there yet (`replace_plain`).
     let (open, whole) = (["File", "::open("].concat(), format!("{read}("));
+    let made = ["File", "::options()"].concat();
+    assert_eq!(library.matches(&made).count(), 1);
+    assert!(
+        library.split_once(&made).is_some_and(
+            |(_, rest)| rest.contains(".create_new(true)") && !rest.contains(".read(true)")
+        ),
+        "a file made any other way than new"
+    );
     let others = [
         ["read_to", "_string"].concat(),
         ["Open", "Options"].concat(),
