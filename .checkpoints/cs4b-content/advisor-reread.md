@@ -48,3 +48,14 @@ DONE
 5. Verdict last, then DONE.
 
 ## Findings (a line each, as found)
+- [H] C1: real resolve confirms thiserror; std on does NOT fix it (default still differs) and safe_arch is target-only -> FEATURE-COMPARE is genuinely his; question file fair; rust-reviewer's Q3 rules exact and narrow (versions, near misses, no maths crate in the tables, tree plant).
+- [H] C2-C7, R1-R3, R5, R6, R8-R11 met as section H says (checked against sections C-G and the reads). R7 over-applied (B1 below). R4: wording risk (B2).
+- [4b-1] steps 1-5: no outside package; sizes add up (code 1,455, tests 1,690). Lows: A1 PM-0005-3 reading has two exceptions (-0 and non-canonical decimals), not one (sheet :54; ADR 0005 PM-0005-3 row); A2 corpus generator/committed V8 texts unnamed (test-list.md:82); A3 dependency_rules.rs: cargo metadata --no-deps --offline (serde/serde_derive locked, not on disk: rust-reviewer :32-33, :69); A4 links check before the time unit (4b-1 rung moves the time unit); A5 whole-cm float pitfall (0.55*100 != 55 in doubles); A6 test-list numbering + simd128 under compile_error (test-list.md:43) + section D "step 7" + his "step 6" = data step 8; A7 steps 1-5 need neither FEATURE-COMPARE nor the library.
+- [4b-2] B1 Medium: step 11 bundles the generated TS types with the schema writer, and rung 1 moves the step whole; plan's rung moves only the schema writer + schema halves (plan.md:167-169); step 12 reads MapDocument from the generated types; EA's read put the types at content-to-sim (engine-architect-read.md:162).
+- [4b-2] B2 Medium: the sharper entry-3 sentence must not enter the dated pointer as his accepted wording (sheet :170-173 vs plan.md:694-697).
+- [4b-2] B3-B7 Low: production-file instruction walk (plan 5.3) besides the twin; GREY-COLOURS default dropped from step 12's row; canonical route for the hand-written map; "step 1" = tick 1 in step 9's plant; sim's UNITS_PER_SECOND as content's re-export once sim depends on content.
+- [E] symmetric reach: right (entry 6's own words "327.67 m from the map's origin"; i16::MIN has no negation under arithmetic_side_effects). Tie test in devtools: right (C3's second way; the edge then has a user).
+
+## Verdict (re-read 2)
+Steps 1-5 (4b-1): APPROVE with A1-A7 (Low; no further review). Steps 6-12 (4b-2): HOLD until FEATURE-COMPARE's answer and, if two PRs, the re-read against the main that holds 4b-1; fix B1-B7 first.
+DONE

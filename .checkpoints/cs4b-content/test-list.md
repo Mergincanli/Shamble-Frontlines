@@ -1,5 +1,10 @@
 # 4b's test list, with the two readers' points folded in (before step 1; not a review round)
 
+_The headings carry the step numbers of `reread-sheet.md`, revision 3: 4b-1 is steps 1 to 5 (the content crate,
+the reader, its proofs, the links check, the time unit), 4b-2 is steps 6 to 12 (the collision library's batch, the
+built-file check, the tools and the data, content to the simulation, the collision world, the schema writer, the
+scene)._
+
 Sources: the plan's sections 5, 9 and 11; the designs' mark tables (`engine-architect-cs4.md` 1.12, `rust-reviewer-cs4.md`
 blocks 2 and 5); **test-engineer's read** (`test-engineer-testlist.md`: T-must 1 to 14, T-should 1 to 12) and
 **security-auditor's read** (`security-auditor-testlist.md`: S-must 1 to 12, S-should 13 to 22, S-wait 23 to 27). Where
@@ -20,7 +25,7 @@ because "the build failed"; after the last plant the players' file is rebuilt to
 - Errors echo at most 64 bytes of input, each byte outside 0x20 to 0x7E written as `\xNN`, and a whole message is
   capped (about 512 bytes) in Rust, in the Worker's trap message and in the page's message check (S-must 6).
 
-## Step 1, the built-file check
+## Step 7, the built-file check (4b-2)
 - The names, target-features and instruction rules run on the **twin before the bindings tool** (T-must 1a), and
   the imports rule on the production file. The check throws; it writes a stamp with the sha256 of the production
   file it walked, and `buildPage` refuses a page whose Wasm is not that file (S-must 1). Plants: no stamp, a stale
@@ -40,8 +45,8 @@ because "the build failed"; after the last plant the players' file is rebuilt to
   import, a host-time import; near-miss control `__wbg_performance` if the glue has none (S-must 2, T-should 1).
 - **The native side:** `rustc --print cfg` cannot fail (it never reads the flags). Instead a test asserts
   `!cfg!(target_feature = "fma")`, `"avx2"`, `"fma4"` in the native tests of `sim`, `content` and `devtools`, and
-  `compile_error!` under those features (and `simd128`, `relaxed-simd`) in `sim` and `content` (T-must 2,
-  S-should 21). Plant: `RUSTFLAGS=-Ctarget-feature=+fma` on that test.
+  `compile_error!` under `fma` and `avx2` in `sim` (not under `simd128`: the instruction walk already refuses it
+  and 4d's reading needs such a side build; the advisor agent's R6) (T-must 2, S-should 21). Plant: `RUSTFLAGS=-Ctarget-feature=+fma` on that test.
 - **The scan:** the collision-only rule matches the exact path and refuses a `pub use` or alias of the library;
   the hashed-map, clock and unwrap/expect/panic rules extend to `crates/content/src` (T-should 2).
 - **The feature compare by version:** a two-version fixture (T-should 3). The check's result is recorded again at
@@ -51,7 +56,7 @@ because "the build failed"; after the last plant the players' file is rebuilt to
   the rules run on the twin; a manifest plant rewrites the lockfile offline and the script puts both files back
   byte for byte (T-must 1).
 
-## Steps 2, 3 and 3b, the reader, the bundle and the proofs
+## Steps 2 and 3, the reader, the bundle, the kinds and the proofs (4b-1)
 - **Caps on structure, not only on bytes** (S-must 3): a node cap per file and a files cap per bundle, each
   refused by name; duplicate keys found in O(k log k). Tests: a worst-density file at the cap and a bundle of
   eight with the peak heap counted under a stated ceiling; a 100,000-key object judged under a stated time, N and W.
@@ -74,7 +79,7 @@ because "the build failed"; after the last plant the players' file is rebuilt to
   types, integer fields with 1.5, -1 and 4294967296, ranges at the next float up and down, one item too many, a
   bad format or version; whole set: duplicate ids, a shape 1 cm outside its bounds, the aim-reach rule. The three
   verdicts the cut grammar left unsaid are "refuse": a tab or carriage return outside a string, a top-level value
-  that is not an object, an empty key (put to the advisor agent).
+  that is not an object, an empty key (the advisor agent: no objection; engine-architect's read names each refusal).
 - **Each generated file carries its class and its expected error** (the kind, with the path the generator changed
   or the line and column of the injected token), asserted natively; the cross-target compare covers the whole
   record (variant, file, line and column or path, payload with doubles as bits, the message text), and for
@@ -100,19 +105,19 @@ because "the build failed"; after the last plant the players' file is rebuilt to
 - The export test for the generated types copies `protocol`'s write rules and refuses a link named `schema` or a
   `.json` link (S-should 18). PM-0005-5's scan includes `regions` and the bundle's `files` (S-should 15).
 
-## Step 3, the map's rules
+## Step 2, the map kind's rules (4b-1)
 - **The aim reach** (his DEPART-4 note; T-must 11): the reach lives in `content` as named constants; a `devtools`
   test equates them with `AimPoint`'s field types; six planted refusals (minimum and maximum of x and of z, y
   below 0, y above 655.35) and six accepted bounds.
 - Every box at least 1 cm thick on each axis, ramps really rising, every spawn and shape inside `bounds`, spawns
   at least the match's slot count; plants 1 cm outside (S-should 15, 16).
 
-## Step 4, the time unit (T-should 6)
+## Step 5, the time unit (4b-1; T-should 6)
 The oracle is 3 times the milliseconds parsed from the number's text, not the table the tool wrote; the `u32` limit
 plus and minus one; plant: truncation instead of rounding; `content`'s 3,000 equals `sim`'s `UNITS_PER_SECOND`; the
 planted 0.02 s interval fails `--check`, not only adds a row.
 
-## Steps 5 and 6, the tools and the data
+## Step 8, the tools and the data (4b-2)
 - **The tools' file rules** (S-must 10): the walk reads each entry's own type without following it and refuses
   link files, link folders, FIFOs, unknown folders and names outside the grammar; reads capped at 1 MiB + 1; the
   write target is one constant, lstat-checked, written to a new temporary file and renamed; `--check`,
@@ -125,10 +130,11 @@ planted 0.02 s interval fails `--check`, not only adds a row.
   place that does not exist; a content field no row maps. The Export's sha256 pinned in reviewed code, not only in
   the manifest beside it; `write`, then `--check`, then `content-bundle --check` stays green; 3 to 5 values pinned
   by hand from the Export's text, because a mis-mapped row is shared by `write` and `--check` (T-should 8).
-- **Which reader reads his Export** (it holds `true` five times; the cut reader refuses it): with the advisor
-  agent (F.6).
+- **Which reader reads his Export** (it holds `true` five times; the cut reader refuses it): a Node script on the
+  platform's own JSON reader, `packages/client/scripts/testlines.mjs` (the advisor agent's ruling F.6; Mustafa's
+  agreement of 2026-11-26, 13:05 UTC). The old tuning file is read the same way (`legacy-extract.mjs`).
 
-## Step 7, content to the simulation and the page
+## Step 9, content to the simulation and the page (4b-2)
 - **"Loading content changed no state"** (T-must 13): `first-loop.hashes`' per-tick lines and the whole
   `first-loop.vector.txt` equal main 2483e9a's files (compared with `git show`'s output, not with what the tool
   just wrote); plant: content folded into the state at the start fails at step 1 in N, W and C; the replay's
@@ -145,21 +151,22 @@ planted 0.02 s interval fails `--check`, not only adds a row.
 - `filesOf` refuses entries that are no plain files in the page folder, and a `content.json` over 8 MiB; a source
   scan for `innerHTML` and its kin in the page's and the Worker's sources (S-should 19, 20).
 
-## Step 8, the static collision world
+## Step 10, the static collision world (4b-2)
 - **The dump** (T-must 14): node index, child links, leaf flag, leaf data and the collider list (id, kind, minimum
-  and maximum as bits); whole dumps compared and a committed known-answer hash; a map with -0 equals the +0 map; a
+  and maximum as bits); whole dumps compared and a committed known-answer hash; a document built in code with -0 equals the +0 map (no content file can hold -0:
+  the loader refuses it); a
   map with its shapes permuted gives the same bytes; ray classes with minimum counts (axis-aligned with signed
   zero direction parts, grazing, starting inside, through shared edges, on the wedge's slope, misses).
 - **Robustness** (T-should 10, S-must 8): `StaticWorld::build` on hand-made documents (NaN, an inverted box, 0, 1
   and 512 shapes, 512 identical shapes, nested boxes, zero thickness, everything at the reach's edge) gives Ok or
   a named refusal, never a panic, N and W; how a 33-level tree is made is said, or the depth refusal is untested.
 
-## Step 9, the page's scene (T-should 11)
+## Step 12, the page's scene (4b-2; T-should 11)
 A development hook lists the drawn objects and the spec compares them with the map; the broken-bundle spec uses a
 bundle that `JSON.parse` accepts and the Rust loader refuses (a duplicate key); the loader's sentence is pinned;
 the render counts are derived from the map, not copied from the new build.
 
-## The links check (his LINKS-CHECK (c); S-must 11, T-should 12)
+## Step 4, the links check (4b-1; his LINKS-CHECK (c); S-must 11, T-should 12)
 One public read function in `devtools::files` that refuses anything whose own type is not a plain file, used at
 `tests/recordings.rs:18`, `two_instances.rs:42` and `:44`, `two_processes.rs:113` and `:115`, and inside
 `files.rs:115`; one Node helper for `boundary/replay.test.mjs:15` and `determinism.spec.ts:68`, `:70`, `:72` (read

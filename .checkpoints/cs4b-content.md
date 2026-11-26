@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 14:08 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 14:42 Amsterdam (from the clock)
 
 ## Sizes (his point 5 of 2026-11-25: which is which)
 - The designs' own count for 4b, bottom-up: 5,410 lines (2,780 code, 2,520 tests, 110 configuration).
@@ -72,40 +72,45 @@
    `thiserror`'s `default` and `std` are turned on by the type writer in test builds only. With the library's
    `std` on, `default` still differs and six more packages enter (tried, put back).
 
-## Current step
-**Stopped on two questions to Mustafa** (`cs4b-content/question-2026-11-26-feature-compare.md`): FEATURE-COMPARE
-(two named exceptions in the build's check, or another way) and SIZE-4B (4b will pass its stop line: about 6,360
-lines by the designs' count with today's additions, 14,000 to 15,300 written at 4a's rate, against 12,200). Until he
-answers: nothing of the batch is committed, pushed or built; security-auditor's dependency check waits (its content
-depends on his answer only if he picks another way than exceptions). Not waiting: the sheet's revision (R1 to R11),
-the reads by netcode-architect (DEPART-4 entry 3; the frozen content's route for `first-loop`) and
-engine-architect (the cut grammar, the script route), rust-reviewer's read of the exception's wording and of `std`.
+4. Three reads, all DONE: netcode-architect (`netcode-architect-read.md`), engine-architect
+   (`engine-architect-read.md`), rust-reviewer on step 0 (`rust-reviewer-step0.md`: the library's batch right as
+   resolved; the two exceptions' exact wording for FEATURE-COMPARE (a); `std` stays off).
+5. **The sheet's revision 3** (`reread-sheet.md`) is the plan 4b is built from. The advisor agent's second verdict
+   (`advisor-reread.md`, "Re-read 2"): **steps 1 to 5 (4b-1: no outside package) APPROVED** with conditions A1 to
+   A7, all applied in revision 3; **steps 6 to 12 (4b-2: the collision library and the world) HELD** for his
+   FEATURE-COMPARE answer and a short re-read then (B1 to B7 already fixed in revision 3). The test list
+   (`test-list.md`) carries the sheet's step numbers. **His "step 6" for the Export is step 8 in the sheet's
+   numbering (the data step).**
+6. The collision library's batch is out of the working tree, saved byte for byte under `.gate/cs4b/batch/`
+   (digests `deps-batch.sha256`; a workspace copy for read-only tree commands under `.gate/rr-4b/ws/`).
+7. **Step 1's own batch, path-only, is in the working tree, UNCOMMITTED AND UNBUILT** (his DEP-HOLD):
+   `crates/content/Cargo.toml` (no dependency), `crates/content/src/lib.rs` (the lint guard), `crates/devtools/`
+   `Cargo.toml` (`content` added; `client-endpoint` and `room` removed; `protocol` kept for the aim tie test),
+   `Cargo.lock` (one path crate). Diff `deps-4b1.diff`, digests `deps-4b1.sha256`. The build's own checks on it:
+   no new third-party crate, no missing overflow block, the feature compare without a difference.
+   security-auditor is asked on exactly this content (`security-auditor-deps-4b1.md` when it answers).
 
-## Next steps (the plan's section 5; each step ends with the count of written lines)
-0. The manifest batch: the new `content` crate; `sim` on `content` and on `parry3d` =0.31.1 (default features off;
-   `dim3`, `f32`, `alloc`, `enhanced-determinism`; its `std` off if that builds for both targets); the overflow
-   lines the build's own check asks for; the tools crate's unused path edges dropped. The root `Cargo.toml` is not
-   a file the guard protects today (read in `.claude/hooks/routine-guard.mjs`, `protectedRel`): risk tier 1.
-1. The built-file check for the fused multiply-add, with its planted defects, before the collision library is used
-   by anything (section 5.3). **If the first build shows a fused routine linked from the library's tree, 4b stops
-   for his decision.**
-2. The content crate's reader and writer (all our own): JSON to a tree with line and column, numbers, the one
-   canonical writer, the typed reader with field paths, ranges and length bounds, the schema, errors that name the
-   file. Only what the content files need; everything else refused, duplicate keys included.
-3. The bundle and the two kinds (movement table, map document). 3b. The reader's own proofs (content items 1 and
-   2; the fuzz run before the first value rests on the reader).
-4. The integer time unit, 3,000 units a second, with the rounding report.
-5. The tools: `content-bundle`, `testlines` (`--check`, `write`, `compare-old`, `table`).
-6. The data: his new Export under `content/source/`; `content/movement/soldier.json` by the tool;
-   `content/maps/test-scene.json` by hand from the Art sheet's sizes. **Needs his Export at 30 steps and his yes
-   to DIFF-LIST.**
-7. Content reaches the simulation once per match through the constructor; the build writes `content.json`; the
-   page fetches it once and hands its bytes to the Worker.
-8. The static collision world from the map; its bytes and 10,000 rays identical natively and in WebAssembly.
-9. The page draws the scene from the map; the readout's content rows; the browser tests.
-Then: the gate and the local checks at every step; reviewers (rust-reviewer, engine-architect, security-auditor;
-then test-engineer, graphics-engineer, perf-auditor; two rounds at most); the verifier; the advisor agent on every
-pushed head; docs-keeper; the report; his short browser check.
+## Current step
+**Waiting for two things before the first build:** Mustafa's letter for SIZE-4B (any answer lets steps 1 to 5
+start: the advisor agent's A7) and security-auditor's answer on step 1's batch; then `dependency-check.md`, the
+commit and the push of step 1, and step 2 (the reader and the writer). His FEATURE-COMPARE letter gates step 6
+only. The question file: `cs4b-content/question-2026-11-26-feature-compare.md` (with its two dated additions: the
+better seam, the corrected numbers).
+
+## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
+- **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
+  two extracts by script · 3 the proofs (corpus, broken files, the bounded fuzz run) · 4 the links check · 5 the
+  time unit (last, so that 4b-1's rung moves code not yet written). By the designs' count about 3,300; planned
+  5,950; stop line 7,450 if he takes two pull requests.
+- **4b-2 (held):** 6 the library's manifest batch with the feature compare · 7 the built-file check · 8 the tools
+  and the data (**his Export at 30 steps; DIFF-LIST**) · 9 content to the simulation, the generated types, the
+  frozen content of `first-loop` · 10 the static collision world · 11 the schema writer (first ladder rung) · 12
+  the page's scene (second rung). About 3,750 by the designs' count; planned 6,750; stop line 8,450.
+- Then per pull request: the gate and the local checks at every step; the plants script; reviewers (4b-1:
+  rust-reviewer, engine-architect, security-auditor, then test-engineer; 4b-2 adds graphics-engineer and
+  perf-auditor); the verifier; the advisor agent on every pushed head; docs-keeper (his messages of 2026-11-26
+  into DECISIONS by script; STATUS's line 4B-AIM-REACH; the dated pointer for DEPART-4 entry 3 as he accepted it);
+  the report (its first lines say when `content/source/` changes: his SOURCE-GO answer).
 
 ## Open findings
 - From 4a (STATUS has them): 4A-NA-4B and 4A-EA-4B (content through the constructor only; `first-loop` made anew
