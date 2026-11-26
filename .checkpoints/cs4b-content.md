@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 17:38 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 18:00 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -347,6 +347,36 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     - Follow-ups, not fixed here: EA-3's step-9 note is a comment in the dependency rule; EA-4 (the simulation
       re-exports the time unit at step 6); EA-6 (facing zero pinned at step 8); departure 9's condition (4c
       refuses a map with fewer spawns than slots); RR-2 (the CI Builder).
+28. **The fix pass pushed** (head 495204a: d36e416 and the docs pass's first part; then notes-only commits):
+    **CI green on 495204a** (gate run 45860625806; toolchain run 45860625893, 8 min 1 s, Chromium and Firefox).
+    The board has the step's line.
+29. **test-engineer's read and round 2 started on d36e416** (2026-11-26, 17:39 Amsterdam, after the push; Opus, the highest
+    effort; briefs `review-brief-4b1-test-engineer.md` and `review-brief-4b1-round2.md`): test-engineer (the whole
+    change-set, its one read), rust-reviewer and security-auditor (what changed); engine-architect took the slot
+    rust-reviewer left.
+    - **rust-reviewer, round 2: DONE** (`rust-reviewer-review-4b1-round2.md`): no Critical or High; nothing the
+      fix pass broke. RR-1 closed (its 31,750,551 doubles again: 0 round-trip failures, 0 differences from V8's
+      text; 9,913,103 values in the tie range against ECMAScript's rule worked out apart from the crate: 0
+      disagreements). RR-3, RR-4, RR-5 and the nits closed. RR-2 stays open for the CI Builder (no clippy in
+      CI). New:
+      - R2-RR-1 Medium: **the corpus's ties got thinner, not wider, and the card's two claims about them were
+        not true.** `ties()` divides a full mantissa by at most 2^25, so every value lies between 2^27 and 2^52,
+        where a tie fits only at about 2 to 4 binary places: the lines where the even rule changes the standard
+        library's digits fell from 64 to 44, and none stand at 5 to 25 places. `powersOfTwo()` writes positive
+        values only: no negative 2^-24. (The result still stands on the unit rows, the powers of two and its
+        sweep.) FIX in the last pass: ties drawn as an odd whole number over 2^q, q from 1 to 25, kept only when
+        the engine's own text has q - 1 decimals (a real tie); both signs of every power of two; the script's
+        test asserts both.
+      - R2-RR-2 Low: the content scan misses the path forms (`Option::unwrap(x)`), `unwrap_err` / `expect_err`
+        and the assert macros; a `#[cfg(test)]` on a match arm swallows the rest of its block. FIX in the last
+        pass.
+      - R2-RR-3 Low: a refused string's length is counted to the next quote, so one throwaway allocation as
+        large as the rest of the input is made. FIX: the count stops where the read would refuse.
+      - R2-RR-4 Low: `number.rs`'s first lines say "the one text ECMAScript gives" (the standard leaves the
+        last digit open). FIX: wording.
+      - R2-RR-5 Low: the scan of `files.rs` counts only `File::open(` and `fs::read(`. FIX: the other reads too.
+      - Its note: `is_id` also refuses device names for shape, spawn and region ids, which are no file names:
+        harmless.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -398,5 +428,5 @@ in); the advisor agent on the head; `.checkpoints/` out of the head; the draft p
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- No agent runs yet (rust-reviewer and docs-keeper's first part are done; test-engineer and round 2 start after
-  the push). No saver runs: the main session commits the notes by hand.
+- test-engineer (its read of the whole), security-auditor and engine-architect (round 2) are running; no edit to
+  the tree until they are done. No saver runs: the main session commits the notes by hand.
