@@ -155,10 +155,20 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   tools' packages installed in the worktree with `npm ci --prefix tools --ignore-scripts`). `git ls-remote` showed main
   still 2483e9a7 just before the commit. Pushed alone (dc00c79..6c81270, a fast-forward): this chat's first push to the
   branch was accepted. #72: draft, mergeable, no longer conflicting.
-- T4: the advisor agent's review of 6c812700: running (notes advisor-head-6c812700.md, committed when it is done).
-  CI on 6c812700 (read 2026-11-26 ~13:30 UTC): gate and smoke green (push and pull-request runs); preview/tests green,
-  "# tests 175", "# pass 175", "# fail 0" (job 139939171777, 13:23:26 UTC); wall-test's planted jobs red, as designed
-  (push-to-branch 139939153439, pr-plain 139939172242, pr-no-deployment-record 139939172739); toolchain running.
+- T4: the advisor agent's review of 6c812700 (advisor-head-6c812700.md): APPROVE (the merge only; risk tier 2,
+  needs-mustafa, draft unchanged). Conditions: (1) toolchain green: met (both runs success, 13:28:31 and 13:28:36 UTC,
+  check runs 139939148783, 139939171904); (2) L1 at the next docs head. Findings: L1 Low (OLD-LINES: the report must
+  list the Part 15 move; with it, #72's STATUS row and ROADMAP entry gain the takeover and this merge); L2 Low (two
+  "Last updated" lines in STATUS: acceptable, each lane replaces its own). Its answer on notes-only heads (main's
+  advisor.md): no review of their own before work goes on; the next review diffs from 6c812700 and covers them; no go,
+  merge or other protected step rests on a notes or [skip ci] head.
+  CI on 6c812700: gate and smoke green (push and pull-request runs); toolchain green; preview/tests green, "# tests
+  175", "# pass 175", "# fail 0" (job 139939171777, 13:23:26 UTC); wall-test's planted jobs red, as designed
+  (push-to-branch 139939153439, pr-plain 139939172242, pr-no-deployment-record 139939172739). pr-plain read myself:
+  0 steps, no runner, annotation 'Branch "refs/pull/72/merge" is not allowed to deploy to preview due to environment
+  protection rules.' The three red checks woke this chat through #72's subscription; Builder V2's comment 7177047663
+  (2026-11-25) already explains them for every head until wall-test.yml leaves, so no second comment (the PR rules).
+  No steward or babysit skill on the branch.
 - T5: GUARD-PROMPT asked of him (questions-2026-11-26-new-chat.md): main's hook script, run by hand on the probe's
   command and folder, prints permissionDecision "ask" with the reason "the main folder stays on main's reviewed
   rules: git merge would move it (only origin/main merges into the main folder ...)"; whether his prompt showed it,
