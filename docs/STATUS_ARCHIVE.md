@@ -2135,7 +2135,7 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's
 - **From #60, #61, #64, change-set 3a (#65), guard-env-fix (#69) and ci-after-3a (#71)** (moved by script, OLD-LINES): the archive's "Moved from STATUS (2026-11-25...)" and "(2026-11-26, ci-preview-handover's docs pass)".
 - **From guard-env-fix (#69):** SA-R2-2 (very long lines against the hook timeout; answered in guard-wrappers' report, nothing changed without his word), V-2 (the folder tracking after a split-string value), the reason-text nit. Closed by guard-wrappers at its merge: GEF-SAME (what is left of its class: R4-1) and SA-R1-3; CAP decided, his (a) of 2026-11-25.
 - **From change-set 4b-1, "Content"** (lane 1, the chat he calls Builder V4; branch `claude/cool-pasteur-oiqk1r`
-  standing in for `cs/4b-content`; no pull request yet; risk tier 1, no browser check; reviewed, two rounds, no
+  standing in for `cs/4b-content`; pull request #75; risk tier 1, no browser check; reviewed, two rounds, no
   Critical or High (rust-reviewer, engine-architect and security-auditor in both, test-engineer's read in round 2);
   final code 2039e3c; the planted defects' whole run on the final code caught 35 of 35, the 1 control held
   (`.checkpoints/cs4b-content/plants-4b1.txt`); report `docs/reports/2026-11-26-cs4b1-content.md`. Written by 4b-1's
@@ -2215,6 +2215,16 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's
     `packages/sim-worker/boundary/content.test.mjs` gives the test module's memory as "49 MiB"; it is 49.2 million
     bytes, 46.9 MiB. The asserted ceiling (64 MiB) is right; only the comment's unit is wrong, and it stays until
     4b-2 so that 4b-1's reviewed code does not move for a comment.
+  - 4B-SIGHT-MARK (his SIGHT-FLAG, answered; `docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC; his words: "(a). Not in
+    4b. Keep one follow-up line so that Slice 2's plan adds the mark. Which things carry it is still open in my rule
+    (fences, and whether shots follow sight)."): Slice 2's plan adds the "blocks sight" mark to the map kind, with the
+    sight check that reads it. Until then every shape blocks movement, shots and sight alike; 4b-2's collision world
+    is planned to keep, for every solid piece, the shape it came from (engine-architect's review of 4b-1), so that the
+    mark needs no rebuild of the world.
+  - 4B-FIRE-RATE (his DUR-1, answered; `docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC; his words: "(C). The table value
+    is the rate for now, and I tune it by play in Testlines. A tuned value reaches the game through my Export, as
+    before."): for change-set 8 (the guns): a gun's interval is its table value, with the timer's leftover carried
+    (ADR 0004 part 4); no value is rewritten to match the old game's rate at 60 frames a second.
   - Closed by 4b-1, at its merge: 4A-S3-READ's read side (the block "From change-set 4a" above, its dated pointer).
 
 ## Decisions pending: the rest

@@ -180,6 +180,35 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-26, 18:16:35 UTC: main moved under pull request #75 (to
+  2671595fc823750a83c58f5b5b122128eb500387, the Guard fix chat's #76), so it cannot merge at 2e282176: the chat takes
+  main in once, with no rebase and no force push; in the four clashing docs files both sides are kept, main's text
+  stays unchanged where a line belongs to another chat, and STATUS ends at 120 lines or fewer; the advisor agent
+  reviews what the take-in changed; a report in three lines; his go follows gate and smoke green on the new head;
+  SIGHT-FLAG (a): not in 4b, with one follow-up line so that Slice 2's plan adds the mark (which things carry it is
+  still open in his rule: fences, and whether shots follow sight); DUR-1 (C): the table value is the rate for now,
+  tuned by play in Testlines, a tuned value reaching the game through his Export; STATUS-LEN (a); WATCH-75: yes; the
+  advisor agent's four conditions for 4b-2 stand, and 4b-2 starts right after the merge with no new word from him**
+  (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat;
+  his label: "FOR BUILDER V4. From Mustafa, 26 November, 19:20 Amsterdam (written with my Advisor)."; message
+  90efc3d2-226c-420e-8cc3-4f04d7944f21, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-26-take-in-76.md` (readable at commit
+  42bfcc4e2a02d245911ca84558c8f0316a56c9db of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's report on change-set 4b-1
+  (pull request #75 at head 2e282176d5401d23aea2476e45f1c331433fa3ea, waiting for his go) and its four questions
+  SIGHT-FLAG, DUR-1, STATUS-LEN and WATCH-75. Copied by script (1863 bytes, sha256
+  cb7c88ca62ab31942558a0baad812401b2e8af8e20960920d9c43929dcf73138):
+> FOR BUILDER V4. From Mustafa, 26 November, 19:20 Amsterdam (written with my Advisor).
+>
+> 1. #75 cannot merge at 2e282176 any more. Main moved at 19:00 to 2671595fc823750a83c58f5b5b122128eb500387 (the Guard fix chat's #76, docs only), and four shared docs files now clash: docs/DECISIONS.md, docs/ROADMAP.md, docs/STATUS.md and docs/STATUS_ARCHIVE.md. My Advisor's merge check of 2e282176 passed on everything else: the changed files, the manifest lines, no notes in the head, the six green checks, my messages word for word in DECISIONS, and the register rows for my vision rule.
+> 2. Take main in once, the way your rules allow, with no rebase and no force push. In those four files keep both sides. Where a line belongs to another chat, main's text stays unchanged. STATUS ends at 120 lines or fewer: main is at 120 now, so fold your own lines by script.
+> 3. The advisor agent then reviews the new head, only what the take-in changed. Report to me in three lines: the new head's full id, the verdict on that id, and that every file outside those four is byte for byte as at 2e282176 or as on main. With gate and smoke green on that id you get my go for it.
+> 4. SIGHT-FLAG: (a). Not in 4b. Keep one follow-up line so that Slice 2's plan adds the mark. Which things carry it is still open in my rule (fences, and whether shots follow sight).
+> 5. DUR-1: (C). The table value is the rate for now, and I tune it by play in Testlines. A tuned value reaches the game through my Export, as before.
+> 6. STATUS-LEN: (a). #76 already did it for the guard and CI lines, which is why main's STATUS is at 120.
+> 7. WATCH-75: yes, subscribe.
+> 8. The four conditions for 4b-2 stand as the advisor agent set them. 4b-2 starts right after the merge and needs no new word from me to start.
+> 9. Rule unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-26, 17:37:10 UTC: SPEED-ORDER (b): the review tracks (with SOURCE-GO (a)) come before the guard change-set (R4-1's fix with GUARD-KIT); the queue after MAIN-WALL is now the review tracks, then the guard change-set** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 31a506d9-739f-4757-80ce-4a70f9a81f99, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1837-speed-order.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's question SPEED-ORDER, asked after the wall was on (the chat's text, not his): "should the review tracks come before the guard change-set? (a) keep your order, guard change-set first; (b) review tracks first." His "B" answers it with (b). It changes the order of his item 4 of 2026-11-26, 14:09:28 UTC (below) for these two change-sets, and the line of his review-tracks brief of 2026-11-25, 17:28:24 UTC that the second guard change-set "still goes first" if it has not started ("Queued", above); his interim rule on git and gh stands until R4-1's fix merges. Copied by script (1 bytes, sha256 df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c):
 > B
 - **Taken by Mustafa, 2026-11-26, 17:31:41 UTC: done, and the chat is to send its block to Builder V5** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message de4e9b89-d3ea-4b36-b32f-82d18b26e96d, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1831-builder-sent.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's message it answers is not in the pushed notes; what "done" covers is not recorded here. Copied by script (47 bytes, sha256 6b2ab27b1682a5fe404f0f7f1e407f4e892cf2139f2e629d23c30f4ef1270c02):

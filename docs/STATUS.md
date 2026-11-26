@@ -46,7 +46,7 @@ _Last updated: 2026-11-26 (MAIN-WALL's docs pass, on the lane branch with main 3
 4. The Guard fix chat (`docs/DECISIONS.md`, "Queued"): MAIN-WALL done but T10 ("Phase"); then, by his SPEED-ORDER (b) of 2026-11-26, 17:37:10 UTC, the review tracks with SOURCE-GO (a), then one guard change-set with R4-1's fix and GUARD-KIT; each plan first.
 
 ## Waiting on Mustafa
-- 4b-1 (#75), reviewed (two rounds, no Critical or High; the verifier and the advisor agent: its report): his go; the builder's SIGHT-FLAG, DUR-1.
+- 4b-1 (#75), reviewed (its report): his go. Answered (`docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC): SIGHT-FLAG (a), DUR-1 (C), STATUS-LEN (a).
 - Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; `docs/UNITS.md` §0's two lines (his unit walk); DIFF-LIST at 4b-2's data step.
 - His accounts, his words (2026-11-26, 17:11:23 UTC, `docs/DECISIONS.md`): "My first personal account (I have two) and 1 enterprise (university), so I have 3 accounts working on the project" (ACCT-3, below).
 - His to give: ACCT-3's roles and CLAUDE.md line (his third account, counted like the other two); his go before anything
@@ -96,11 +96,11 @@ _Last updated: 2026-11-26 (MAIN-WALL's docs pass, on the lane branch with main 3
   "for the next edit of ADR 0001 (part 9 (c) and its table Q14: hiding enemies by line of sight is now asked for, so
   R2-INT-OQ5's cost measurement at 48 players becomes due; part 9 (f): shots and their traces reach every player who can
   have them on screen, hidden shooter or not), of ADR 0004 part 13 and of ADR 0003's cutaway rule."
-- **From change-set 4b-1** (the archive's block "From change-set 4b-1"; the 4B- ids are its docs pass's):
-  4B-AIM-REACH: the loader refuses a playable map beyond the aim's reach (x and z plus or minus 327.67 m, y 0 to
-  655.35 m). The aim widens in the first change-set whose map leaves that square (none in Slice 1; Slice 2's plan says
-  whether its maps do), at the latest in Slice 3's change-set that sets the command codec for online play (PM-0001-51),
-  beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. And 14 more ids there (4B-CI-CONTENT is the CI Builder's).
+- **From change-set 4b-1** (the archive's block of that name; ids by its docs pass): 4B-AIM-REACH: the loader refuses a playable
+  map beyond the aim's reach (x and z plus or minus 327.67 m, y 0 to 655.35 m). The aim widens in the first change-set whose map
+  leaves that square (none in Slice 1; Slice 2's plan says whether its maps do), at the latest in Slice 3's change-set that sets
+  the command codec for online play (PM-0001-51), beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. And 16
+  more ids there, among them 4B-SIGHT-MARK (Slice 2's plan adds the mark), 4B-FIRE-RATE, 4B-CI-CONTENT (the CI Builder).
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
