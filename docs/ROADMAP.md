@@ -207,6 +207,16 @@ Merged: PR #56, d7dad97, 2026-11-17 23:00:12 UTC, by merge commit, on his go aft
 cd61b28; CI green on main (gate run 856 with smoke, toolchain run 155). With the merge he accepted that PM-0005-54
 stands as written (a fail with today's rifle prototype, not waived) and the checkpoint commits in main's history.
 
+**Part 15 of the build plan, the second lane, to main [2026-11-17 to 11-18, MERGED]** — part-15-second-lane, by
+his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
+in `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; his two messages of 2026-11-17 in `docs/DECISIONS.md` by
+script; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules' line on gun
+files (GUN-FILES); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. The verifier: PASS. Report
+`docs/reports/2026-11-17-part-15-second-lane.md`. Merged: PR #57, 22c6afa, 2026-11-18 11:09:31 UTC, by merge commit,
+on his go after the advisor agent's APPROVE of f26ac5b; CI green on main (gate run 866 with smoke, toolchain run 165).
+With the merge he answered OLD-LINES, who may fold old lines in the shared record files (`docs/DECISIONS.md`,
+2026-11-18, 11:08:25 UTC).
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -386,13 +396,3 @@ UTC); the advisor agent: APPROVE (its word on the final head is in #58's descrip
 2026-11-18 15:39:28 UTC, by merge commit, on his go after that APPROVE; CI green on main (gate run 884 with smoke,
 toolchain run 182). With the merge he accepted the two misses as written and answered its five questions: the kit
 hold and the two CI edits (PR #60), the "Lane requests" issue (#59), no watch (`docs/DECISIONS.md`, 15:38:13 UTC).
-
-**Part 15 of the build plan, the second lane, to main [2026-11-17 to 11-18, MERGED]** — part-15-second-lane, by
-his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
-in `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; his two messages of 2026-11-17 in `docs/DECISIONS.md` by
-script; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules' line on gun
-files (GUN-FILES); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. The verifier: PASS. Report
-`docs/reports/2026-11-17-part-15-second-lane.md`. Merged: PR #57, 22c6afa, 2026-11-18 11:09:31 UTC, by merge commit,
-on his go after the advisor agent's APPROVE of f26ac5b; CI green on main (gate run 866 with smoke, toolchain run 165).
-With the merge he answered OLD-LINES, who may fold old lines in the shared record files (`docs/DECISIONS.md`,
-2026-11-18, 11:08:25 UTC).
