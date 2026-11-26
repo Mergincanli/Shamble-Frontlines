@@ -285,3 +285,60 @@ GitHub (docs.github.com):
   renew"); the runbook's rebuild step 4 points to "To renew, steps 2 to 4", skipping step 5 (the end date in STATUS),
   and step 3's "Replace" reads "Add" in a rebuild.
 - test-engineer: running.
+
+## B15. Review round 2's fix pass (2026-11-25 23:53 to 2026-11-26 ~00:35 UTC; no third round)
+- The test-engineer's round 2 (round2-test-engineer.md): REVISE narrow, no Critical or High; N1 Medium (the part-2
+  lint's npm rule missed a command chained after a valid `npm ci --ignore-scripts`, which the round-1 lint caught: a
+  regression), N2 Medium (the token's places checked per job, not per step), N3 Low (TE-H's remainder not in STATUS;
+  a `run: | # c` header then a `# ${{ }}` line missed). Fixed in the tests only; preview.yml unchanged (sha256 31119c06).
+- The lint now, worded as the code checks it:
+  - L3: npm only as one whole command line `npm ci` + flags from {--ignore-scripts, --no-audit, --no-fund}, with
+    --ignore-scripts present (anchored at both ends: nothing chained after it, no continuation, no value, no other
+    flag); `npm_config_` (any case) and `npmrc` flagged on any line; npx, yarn, pnpm, corepack, bun, bunx on run lines.
+    B13's "L3 allows npm only as `npm ci --ignore-scripts`" did not hold for the part-2 lint (N1); it holds now as
+    worded here.
+  - Measured with npm 10.9.9 (`npm config get ignore-scripts <flags>`, 2026-11-25 23:59:37 UTC): after
+    --ignore-scripts, a later --no-ignore-scripts, --ignore-scripts=false or `--ignore-scripts false` each gives
+    false (scripts on again); --no-ignore-scripts then --ignore-scripts gives true; the flag beats
+    npm_config_ignore_scripts=false; NPM_CONFIG_IGNORE_SCRIPTS=false (capitals) without the flag gives false.
+  - L2: every line naming secrets (any case) is one of the two planned env lines, in a step env; the steps naming
+    secrets are exactly three, in order, each known by its whole command (the verify-token line, the upload's
+    four-line block, the reconcile line), each naming both secrets once. B13's "the token must sit in exactly deploy,
+    deploy, reconcile" held per job only (N2); it holds per step now.
+  - The reader: a block header with a trailing comment opens a block; commandOf() never reads a header as a command.
+  - A separate "ignore-scripts on any other line" rule was written and then dropped: every case it caught is caught
+    by the npm, npm_config or npmrc rule, so no test could pin it.
+- Evidence:
+  - The suite: 171 tests, 13 suites, 171 pass (148 + 2 controls + 21 planted variants).
+  - The test-engineer's probes on the final lint (from the scratch copy .gate/step26-r2-probe, 00:09:57 UTC): probe2
+    7 of 7 caught, its false-alarm control clean; probe3 all caught (the moved token, `| # c` + `# ${{ }}`);
+    lintprobe: 01 and 26 clean, every variant caught before still caught, 15 caught now; 07, 08, 16, 17, 23, 24 still
+    missed (TE-H's remainder: a STATUS follow-up).
+  - Lint mutants (scripts/mutate_lint.py, new): 14 of 14 caught, each first by the plant it targets.
+  - preview.mjs sweeps on a fresh copy, every anchor applied: scripts/mutate.py 32 of 32; scripts/mutate_te.py
+    22 of 25, the same three survivors as before
+    (T11, T20, T23, which the test-engineer judged equivalent in round 1).
+- The infra-engineer's two Lows: preview.mjs's two token messages name the runbook's sections ("The token", "To
+  renew"); the runbook's rebuild step 4 goes through renewal step 5 (the end date in STATUS) and adds both secrets
+  with "Add environment secret".
+- Process, from the record:
+  - 2026-11-26 00:02:30 UTC: my run of the test-engineer's lintprobe.mjs with the repository as its root wrote
+    te/variants/*.yml into the repository's root folder. Never committed (the saver commits .checkpoints/ only; git
+    status showed it untracked); deleted at 00:09:45 UTC; the probes were re-run from a scratch copy.
+  - The two message changes in preview.mjs were made by a Python string replacement with a uniqueness check, not by
+    the Edit tool that CLAUDE.md asks for.
+  - The interim git rule (his message of 2026-11-25 16:41:51 UTC: "git and gh always start their own command, with
+    no other program in front of them"): 53 of my Bash calls since then had something in front of a git or gh command
+    (process-git-calls.md, made by scripts/scan_git_calls.py from the transcript; heredoc text and quoted strings not
+    counted). The last was at 2026-11-26 00:09:57 UTC. Since then every git call runs alone.
+  - 2026-11-25 21:00:05 UTC: the main folder was fast-forwarded from 4fda80a4 to e3b3642b
+    (origin/claude/optimistic-albattani-mdoonz: this branch's merge of main 07d673b0, made in the worktree
+    .gate/merge-71), with `cd` and `git status` in front. That is not one of the three forms CLAUDE.md allows in the
+    main folder. It brought main's reviewed commits: one protected file, .github/workflows/toolchain.yml; nothing
+    under .claude/, no CLAUDE.md, no gate file. The guard's rules decide "ask" for that line, run offline
+    (scripts/guard_offline.mjs: the bare merge, the exact line and two other shapes all "ask"; the control
+    `git merge --ff-only origin/main` allowed) and through the real hook command (three runs, 67 to 87 ms, each
+    printing permissionDecision "ask"). No prompt reached Mustafa: the call finished 0.21 s after it was issued. The
+    session has been in auto mode throughout; the record shows no hook activity after 2026-11-15 20:02:36 UTC. Not
+    known: whether the hooks did not run, or an ask in auto mode is settled without a prompt. The checkpoint recorded
+    the move at the time as "(no guard prompt)" without flagging it.

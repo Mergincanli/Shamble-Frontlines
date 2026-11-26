@@ -97,6 +97,15 @@ Round 1 done (B13): infra REVISE (runbook), security APPROVE (one condition for 
 Fix pass: de6e4b58 (the runbook; reconcile's duplicate removal; the hand-over match; the count's wording) and
 6fd0375d (tests: the lint, the failure paths, the command line): 148 tests; sweeps 32/32 and the test-engineer's
 22/25 (its 3 equivalents left). Round 2 on what changed (infra-engineer, test-engineer) running from ~23:39 UTC.
+Round 2 (B14, B15): infra APPROVE (two Lows), test REVISE narrow (N1, N2 Medium; N3 Low). The fix pass 80a9b6a8
+(pushed 2026-11-26 ~00:40 UTC; tests, two preview.mjs messages, runbook rebuild step 4; preview.yml unchanged):
+171 tests; the test-engineer's probes caught except its six follow-ups; lint mutants 14/14; sweeps 32/32 and 22/25;
+gate PASS (--no-smoke: local Chromium does not match tools' Playwright); map OK. No third round (Mediums).
+The security-auditor's round 2 (on ad2658a..80a9b6a8, plus the guard-ask finding) launched in the background.
+PROCESS (B15, process-git-calls.md): 53 breaches of the interim git rule since 16:41:51 UTC; every git call runs
+alone from 2026-11-26 00:30 UTC on. The 21:00:05 UTC main-folder fast-forward to origin/claude/... was not an allowed
+form; the guard's rules say "ask" (scripts/guard_offline.mjs; the real hook command too); no prompt reached him.
+Report it with a decision (GUARD-ASK).
 THE TOKEN SITTING'S MESSAGE must hold, in order (the security-auditor's condition, B13): (a) reload the `preview`
 page and send a screenshot: bypass box unticked, "Selected branches and tags", "1 branch and 0 tags allowed",
 `main`, no custom rule; (b) both secrets only by "Add environment secret"; (c) click 9 again after the secrets:
@@ -104,8 +113,9 @@ Actions, Dependabot, Codespaces show no CLOUDFLARE_ name (screenshots); (d) the 
 re-run): the refusal line (annotations API) plus zero steps for all three, a deployment record with status failure
 expected; (e) delete WALL_TEST; wall-test.yml leaves the branch. Plus the dates in their own fields (not the chip),
 and the token's end date into STATUS with a reminder 14 days before.
-Next: round 2's verdicts; the report (U8) with the docs pass (STATUS, ROADMAP, REPO_MAP report row); the advisor
-agent's review of the head; the token sitting once the protection for main is merged; the throwaway out (U6); the
+Next: CI on 80a9b6a8 (preview / tests must show 171); the security-auditor's round-2 verdict; the report (U8) with
+the docs pass (STATUS, ROADMAP, REPO_MAP report row; the N3 follow-ups: TE-H's remainder 07, 08, 16, 17, 23, 24 and
+TE-K); the GUARD-ASK decision and the B15 disclosures in the report; the advisor agent's review of the head; the token sitting once the protection for main is merged; the throwaway out (U6); the
 verifier on the final diff; ready; then his
 sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
 him again (his MAIN-WALL (b)).
@@ -127,4 +137,8 @@ him again (his MAIN-WALL (b)).
 
 ## Rules in force
 - Until a second guard fix is merged: git and gh always start their own command, with no other program in front.
+  In practice: each git or gh call is its own Bash call, starting with git or gh, with nothing before it and
+  preferably nothing after it (no cd, no pipe, no loop); agents' briefs say the same.
+- In the main folder, only `git switch -c <new> origin/main`, `git merge --ff-only origin/main` and
+  `git pull --ff-only origin main`; every other merge happens in a worktree under .gate/.
 - At most 3 agents at a time; Opus; effort xhigh for infra/security design work on the drafts' parts.
