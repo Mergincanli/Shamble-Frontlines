@@ -61,8 +61,14 @@ CONDITIONS (each worded to apply word for word) or REVISE. End your turn as soon
 His answer to U8F1-SIZE, word for word (2026-11-26 17:35 UTC, history.md:8108-8121): "8F1-SIZE before 19:50 UTC if you
 want its builder to resume in that window;  (a)." Option (a) was your first priced option: a new stop over the whole,
 6,282 (measured: built +26, drafts +67). So U8's stop is 6,282 and U8-F1 adds at most 93 net lines, tests included.
-Everything is built as drafted, with nothing carried, and a build past 6,282 stops again with three lines (what grew,
-why, the cheaper option). The brief's section 0 now says so (/home/user/Shamble-Frontlines/.checkpoints/
+Your drafts measure exactly +93, so they fit with nothing carried. If the build comes out above 93, the brief's section 0
+governs as worded:
+- before an item would pass 93, carry the rest, last first: item 3, then item 2's test 5 assert;
+- item 2's PROMPT-R1.md line, item 1's other parts and its pin test are never carried;
+- if item 1 with the pin test would pass 93 alone, stop before it does and report what grew, why, and the cheaper
+  option.
+
+Section 0 now names the new stop (/home/user/Shamble-Frontlines/.checkpoints/
 netcode-proof-test/u8-f1-brief.md:12-18, the main session's Edit, read only: "The 41 are net" now reads "The 93 are
 net"). Nothing else in the brief changed; C1-C7 as applied stand.
 
@@ -79,8 +85,8 @@ Then build on from your u8-f1-build.md and the u8-f1/ drafts (drafts.md and its 
 
 The rules:
 - No cargo. No commits: the main session takes the snapshot.
-- Never touch the main folder (/home/user/Shamble-Frontlines): a merge may run there in this window. Read only, its
-  brief file excepted. Never `cd` into another worktree.
+- The main folder (/home/user/Shamble-Frontlines), where a merge may run in this window: write nothing there, never
+  `cd` there and run no git there; the one file you read there is the brief. Never `cd` into another worktree.
 - One simple command per call; no `git -C`, no `git -c`, no shell loops.
 - git and gh always start their own command, with no other program in front of them.
 - Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt`
@@ -119,11 +125,27 @@ Step 8's two bars, as re-worded with the advisor tool at 15:1x:
   - toolchain 45876736642: attempt 1 failed at the wasm-bindgen archive fetch (GitHub's HTTP 504). Its one re-run
     (PR #40's rule), attempt 2 with job 140106992032, succeeded at 18:40.
 
+The departures from the plan as you approved it; rule on each:
+1. Step 4's bars were re-based by the advisor tool at 15:1x on U8's merge run (no code changed since 05c63a8; NB2-C7
+   (c)): measured 861 + 47 = 908, bites 958 + 47 = 1005, refs N0 + 32 = 2037, redact 421 + 10 = 431 items
+   (step1-record.txt:15-17).
+2. Step 8's two bars were re-read with the advisor tool, and both named to him with step 2:
+   - "PR #40 mergeable" reads as (a) above;
+   - CI is the push runs only, because pull-request runs do not start while #40 conflicts (main-66-plan.md:44-45).
+3. The merge message went by `-F` from .gate/nb2-merge/merge-msg.txt, in place of the plan's three `-m`, so that no
+   newline sits inside a quoted word. The command named to him, and his go, were for that form
+   (step1-record.txt:21-23).
+4. Toolchain had its one re-run on 23e9e92 after GitHub's HTTP 504 (PR #40's rule: one re-run per job).
+
+NB2-C10's reviewer read (a test-engineer, writing review-nb2-c10.md) runs beside you: it is not yours to wait for.
+
 Check NB2-C1 to NB2-C12 as met on the pushed head.
 
 How to read:
-- By SHA only (git show, diff and log of SHAs): MAIN-68 may be running in the main folder while you read, so never read
-  its working tree for these files.
+- Commits by SHA only (git show, diff and log of SHAs): MAIN-68 may be running in the main folder while you read, so
+  never read its working tree for a tracked file.
+- From disk, read only what is in no commit: the record in .gate/nb2-merge/, and the notes under
+  .checkpoints/netcode-proof-test/ (nb2-merge-plan.md, advisor-nb2-merge.md, the card).
 - No fetch, no cargo, no tests.
 - One simple command per call; no `git -C`, no `git -c`, no shell loops.
 - git and gh always start their own command, with no other program in front of them.
