@@ -145,7 +145,7 @@
   a10848a10f73ed39e (advisor-nb2-merge.md).
 - **Scheduled:** the 09:50 window wake-up trig_01LjMQn1mvKSVPzbUTvBv6kn (one-shot, 2026-11-26 09:51 UTC: launch-0950.md); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; next 08:34 UTC); day
   message trig_01T3ENQmfQasZnSUU93vgrdM (2026-11-26 23:05 UTC: msg-2026-11-27.md; the 11-26 one sent 23:2x). The 18:51 wake-up fired (spent). The reset reminder trig_01YEaeE7q7Rv3EX1K2zNFcf7 (one-shot, 23:51 UTC: U8's M0 first; the 20:05 one spent).
-  PR #40 is subscribed. The fired reminders stay (A.4).
+  PR #40 is subscribed (again 07:35 after the compact: rules event read; 0 review threads, no conflict, no steward or babysit skill). U7's ffcheck 07:3x on 19c2698 clean (u7-fix-brief-draft.md step 0, corrected: MAIN-67's paths too). The fired reminders stay (A.4).
   (MAIN-66's and MAIN-67's step logs, the 19:4x-23:2x chat-size and order lines: this card at 9aa6dde.)
 - **Next three:**
   1. MAIN-67 CLOSED (main 07d673b, #71, in at 07cc9b7, pushed e23c783; CI green; step 7 APPROVE, advisor-main-67-head.md); MAIN-66 CLOSED too (step 7 and C6 APPROVE, advisor-main-66-head.md).

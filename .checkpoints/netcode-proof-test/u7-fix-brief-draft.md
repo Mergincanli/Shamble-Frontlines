@@ -3,9 +3,12 @@ Not sent until the advisor's round ruling (advisor-u7-round.md) strikes or adds;
 items come from the two seats' "smallest fix" columns (u7-review-netcode.md, u7-review-test.md). To U7's builder by
 SendMessage; its worktree .claude/worktrees/agent-a9873cdba07a3219e; its notes u7-build-rs.md, new section "## Fix pass".
 
-0. Base: `<base>` = the lane head at sending (6913070 or later; since 9177fb5 only U8's 43 files under ops/ and notes,
-   nothing under crates/, web/ or check.mjs). The main session runs `node .checkpoints/netcode-proof-test/ffcheck.mjs
-   <worktree> 9177fb5 <base>` first (want 0 ADDED present, 0 differing). In your worktree, touching no file first:
+0. Base: `<base>` = the lane head at sending (19c2698 or later). Since 9177fb5: U8's 43 files under ops/, MAIN-67's
+   main paths from 07cc9b7 (.github/workflows/toolchain.yml, packages/e2e/playwright.config.ts, six docs files; the
+   spike references neither config: git grep empty), and notes; nothing under crates/, web/, check.mjs, Cargo.toml or
+   Cargo.lock (`git diff --stat` empty, 07:3x UTC; the earlier "only U8's files" left MAIN-67 out). The main session runs
+   `node .checkpoints/netcode-proof-test/ffcheck.mjs <worktree> 9177fb5 <base>` first (want 0 ADDED present, 0
+   differing; 07:3x on 19c2698: 71 paths, 0 ADDED present, 13 present, 0 differing; again at sending). In your worktree, touching no file first:
    `git merge --ff-only <base>`; if git refuses, stop and report its message; remove, restore or move nothing. Then
    `git log -1 --format=%H` into the notes, with your plan for the items below before any edit.
 1. The items (each: its test red before or its plant caught, then green, in the notes):
