@@ -14,8 +14,11 @@
 ## Steps done
 1. guard-wrappers merged as #73 on his go (main 4a62873e); lane branch fast-forwarded to main · no commit
 
+2. infra-engineer's design (candidate W1, 10+2 tests, 12 clicks) · kept in .gate/main-wall/ (gap detail: not pushed)
+3. Plan written (.checkpoints/main-wall/plan.md, no gap detail); the test chat's brief in the scratchpad (not pushed)
+
 ## Current step
-Plan input: infra-engineer drafts the rule design from GitHub's documentation (.checkpoints/main-wall/infra-engineer-design.md).
+The advisor agent reviews the plan (and the brief and design, read locally).
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
@@ -31,4 +34,4 @@ Plan input: infra-engineer drafts the rule design from GitHub's documentation (.
 - Order: MAIN-WALL, guard (R4-1 + GUARD-KIT), review tracks + SOURCE-GO (a) · Mustafa · 2026-11-26 15:05
 
 ## Running work
-- infra-engineer: the design draft
+- the advisor agent: plan review
