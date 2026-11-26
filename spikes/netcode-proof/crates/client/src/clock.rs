@@ -28,6 +28,11 @@ const HALVE_NS: i64 = 100_000_000;
 /// An error above this resets the estimate (ADR 0001:241: "resetting over 500 ms"), ns.
 const RESET_NS: i64 = 500_000_000;
 
+/// `v` clamped into i64's range (C-U7-4, RR-U4F-2): an offset past either end is that end, never the other one.
+fn clamp_i64(v: i128) -> i64 {
+    i64::try_from(v).unwrap_or(if v < 0 { i64::MIN } else { i64::MAX })
+}
+
 /// One clock sample.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ClockSample {
@@ -42,11 +47,22 @@ pub struct ClockSample {
     pub server_ns: u64,
 }
 
+/// One outstanding ping (C-U7-3): its id; its wire stamp, the step's time, which its `Pong` echoes and which matching
+/// reads; its t0, the host's send time once [`ClockSync::sent`] gave one, else the wire stamp; and whether one was given
+/// (each ping is stamped once).
+#[derive(Clone, Copy, Debug)]
+struct Outstanding {
+    id: u8,
+    wire_ns: u64,
+    t0_ns: u64,
+    stamped: bool,
+}
+
 /// The command clock (the module text).
 #[derive(Clone, Debug)]
 pub struct ClockSync {
     period_ns: u64,
-    outstanding: VecDeque<(u8, u64)>,
+    outstanding: VecDeque<Outstanding>,
     samples: VecDeque<ClockSample>,
     next_id: u8,
     next_ping_ns: Option<u64>,
@@ -59,10 +75,11 @@ pub struct ClockSync {
 
 impl ClockSync {
     /// A clock for an endpoint stepping at `tick_hz` (production callers pass `npt_sim::TICK_HZ`): its tick period in
-    /// ns from that rate (carry 39: no local tick constant).
-    pub fn new(tick_hz: u32) -> ClockSync {
+    /// ns from that rate (carry 39: no local tick constant), at least 1 ns (C-U7-4, RR-U4F-5 (4): a rate above 10^9
+    /// would truncate it to 0).
+    pub(crate) fn new(tick_hz: u32) -> ClockSync {
         ClockSync {
-            period_ns: 1_000_000_000 / u64::from(tick_hz.max(1)),
+            period_ns: (1_000_000_000 / u64::from(tick_hz.max(1))).max(1),
             outstanding: VecDeque::new(),
             samples: VecDeque::new(),
             next_id: 0,
@@ -81,14 +98,9 @@ impl ClockSync {
         self
     }
 
-    /// The server's tick period, ns (10^9 / the rate passed in, truncated).
-    pub fn period_ns(&self) -> u64 {
+    /// The server's tick period, ns (10^9 / the rate passed in, truncated, at least 1).
+    pub(crate) fn period_ns(&self) -> u64 {
         self.period_ns
-    }
-
-    /// The honest ping interval, ns of host time.
-    pub fn ping_every_ns() -> u64 {
-        PING_EVERY_NS
     }
 
     /// The offset estimate, host minus server, ns: `None` before the first sample.
@@ -101,8 +113,9 @@ impl ClockSync {
         &self.samples
     }
 
-    /// `Pong`s naming none of the client's outstanding pings, dropped.
-    pub fn unknown_pongs(&self) -> u64 {
+    /// `Pong`s naming none of the client's outstanding pings, dropped (read through
+    /// [`ClientEndpoint::unknown_pongs`](crate::ClientEndpoint::unknown_pongs)).
+    pub(crate) fn unknown_pongs(&self) -> u64 {
         self.unknown_pongs
     }
 
@@ -118,18 +131,32 @@ impl ClockSync {
         if now_ns < due {
             return None;
         }
-        let mut next = due;
-        while next <= now_ns {
-            next = next.saturating_add(PING_EVERY_NS);
-        }
-        self.next_ping_ns = Some(next);
+        // The first interval past now on the grid from the first ping, in closed form (C-U7-4, RR-U4F-5 (3)):
+        // due + (⌊(now - due) / interval⌋ + 1) × interval, saturating (the loop it replaces never ended at u64::MAX).
+        let intervals = (now_ns - due) / PING_EVERY_NS + 1;
+        self.next_ping_ns = Some(due.saturating_add(intervals.saturating_mul(PING_EVERY_NS)));
         let id = self.next_id;
         self.next_id = id.wrapping_add(1);
         if self.outstanding.len() >= OUTSTANDING {
             self.outstanding.pop_front();
         }
-        self.outstanding.push_back((id, now_ns));
+        self.outstanding.push_back(Outstanding {
+            id,
+            wire_ns: now_ns,
+            t0_ns: now_ns,
+            stamped: false,
+        });
         Some(id)
+    }
+
+    /// The host's send time of the last step's datagrams (C-U7-3; NC-U4F-4): each ping made since the previous call
+    /// takes it as its t0 (never before its wire stamp), once; a ping already stamped keeps its time, however many
+    /// calls come before its `Pong`. Matching still reads the wire stamp.
+    pub(crate) fn sent(&mut self, at_ns: u64) {
+        for o in self.outstanding.iter_mut().filter(|o| !o.stamped) {
+            o.t0_ns = at_ns.max(o.wire_ns);
+            o.stamped = true;
+        }
     }
 
     /// A `Pong` that arrived at host time `arrival_ns`: one sample when it answers an outstanding ping (its id and its
@@ -146,21 +173,22 @@ impl ClockSync {
         let Some(i) = self
             .outstanding
             .iter()
-            .position(|&(o, sent)| o == id && sent == echo_ns)
+            .position(|o| o.id == id && o.wire_ns == echo_ns)
         else {
             self.unknown_pongs += 1;
             return;
         };
+        let sent_ns = self.outstanding[i].t0_ns;
         self.outstanding.remove(i);
         let hold = u64::from(hold_us) * 1_000;
-        let (t0, t1) = (i128::from(echo_ns), i128::from(arrival_ns));
+        let (t0, t1) = (i128::from(sent_ns), i128::from(arrival_ns));
         let offset = (t0 + t1 + i128::from(hold)) / 2 - i128::from(server_ns);
-        let rtt = arrival_ns.saturating_sub(echo_ns).saturating_sub(hold);
+        let rtt = arrival_ns.saturating_sub(sent_ns).saturating_sub(hold);
         if self.samples.len() >= SAMPLES_HELD {
             self.samples.pop_front();
         }
         self.samples.push_back(ClockSample {
-            offset_ns: i64::try_from(offset).unwrap_or(i64::MAX),
+            offset_ns: clamp_i64(offset),
             rtt_ns: rtt,
             at_ns: arrival_ns,
             tick,
@@ -206,13 +234,13 @@ impl ClockSync {
         let n = self.samples.len() as i128;
         (n > 0).then(|| {
             let sum: i128 = self.samples.iter().map(|s| i128::from(s.offset_ns)).sum();
-            i64::try_from(sum.div_euclid(n)).unwrap_or(i64::MAX)
+            clamp_i64(sum.div_euclid(n))
         })
     }
 
     /// The server's next tick to run at host time `host_ns`, from the estimate and the newest sample's (tick, server
     /// time): at most one above the true one (the grid's phase is known to one period), never below it.
-    pub fn next_tick_at(&self, host_ns: u64) -> Option<u32> {
+    pub(crate) fn next_tick_at(&self, host_ns: u64) -> Option<u32> {
         let e = self.estimate?;
         let s = self.samples.back()?;
         let server = i128::from(host_ns) - i128::from(e);
@@ -222,7 +250,7 @@ impl ClockSync {
 
     /// An upper estimate of the one-way delay up, ns: half the largest round trip kept plus half the spread of the
     /// round trips (the jitter margin), from the client's own samples.
-    pub fn one_way_hi_ns(&self) -> Option<u64> {
+    pub(crate) fn one_way_hi_ns(&self) -> Option<u64> {
         let hi = self.samples.iter().map(|s| s.rtt_ns).max()?;
         let lo = self.samples.iter().map(|s| s.rtt_ns).min()?;
         Some(hi / 2 + (hi - lo) / 2)
@@ -344,5 +372,144 @@ mod tests {
             let gaps: Vec<u64> = steps.windows(2).map(|w| w[1] - w[0]).collect();
             assert!(gaps.iter().all(|g| *g == every), "{hz} Hz: {gaps:?}");
         }
+    }
+
+    /// U7 R1 (C-U7-4, RR-U4F-2): a sample whose offset falls below i64's range (the room's time at u64::MAX) is
+    /// clamped to i64::MIN, never mapped to i64::MAX (the other sign), and the estimate follows it.
+    #[test]
+    fn r1_an_offset_below_i64_is_clamped_to_its_minimum() {
+        let mut c = ClockSync::new(30);
+        let id = c.ping(1_000).expect("a ping");
+        c.pong(id, 1_000, 7, 0, u64::MAX, 41_000);
+        assert_eq!(c.samples().back().map(|s| s.offset_ns), Some(i64::MIN));
+        c.step(41_000);
+        assert_eq!(c.offset_ns(), Some(i64::MIN));
+    }
+
+    /// U7 R1 (C-U7-4): a sample whose offset rises above i64's range (host times near u64::MAX, the room's at 0) is
+    /// clamped to i64::MAX.
+    #[test]
+    fn r1_an_offset_above_i64_is_clamped_to_its_maximum() {
+        let mut c = ClockSync::new(30);
+        let at = u64::MAX - 50 * MS;
+        let id = c.ping(at).expect("a ping");
+        c.pong(id, at, 7, 0, 0, at + 40 * MS);
+        assert_eq!(c.samples().back().map(|s| s.offset_ns), Some(i64::MAX));
+        c.step(at + 40 * MS);
+        assert_eq!(c.offset_ns(), Some(i64::MAX));
+    }
+
+    /// U7 R1 (C-U7-4, RR-U4F-5 (3)): the next ping time in closed form equals the loop it replaces on fixed cases
+    /// (on the boundary, just before and after it, many intervals late), and at u64::MAX it ends (the loop never did).
+    #[test]
+    fn r1_the_next_ping_in_closed_form_equals_the_old_loop() {
+        let looped = |due: u64, now: u64| {
+            let mut next = due;
+            while next <= now {
+                next = next.saturating_add(PING_EVERY_NS);
+            }
+            next
+        };
+        let p = PING_EVERY_NS;
+        for (due, now) in [
+            (0, 0),
+            (0, p - 1),
+            (0, p),
+            (0, p + 1),
+            (5, 7 * p + 3),
+            (3 * p, 3 * p),
+            (p, 40 * p - 1),
+        ] {
+            let mut c = ClockSync::new(30);
+            c.next_ping_ns = Some(due);
+            assert!(c.ping(now).is_some(), "due {due}, now {now}");
+            assert_eq!(
+                c.next_ping_ns,
+                Some(looped(due, now)),
+                "due {due}, now {now}"
+            );
+        }
+        // The u64::MAX case on its own thread under a 10 s bound (U7R-TE-7): the old loop never ends there, and this
+        // fails the test instead of hanging it (libtest has no timeout).
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let mut c = ClockSync::new(30);
+            c.next_ping_ns = Some(u64::MAX - p / 2);
+            let sent = c.ping(u64::MAX).is_some();
+            let _ = tx.send((sent, c.next_ping_ns));
+        });
+        let got = rx.recv_timeout(std::time::Duration::from_secs(10));
+        assert_eq!(got, Ok((true, Some(u64::MAX))), "returns, and saturates");
+    }
+
+    /// U7 R1 (C-U7-4): a step 1 s late sends one ping and schedules the next at the first interval past now, on the
+    /// grid from the first ping (not one interval after the missed due time).
+    #[test]
+    fn r1_a_step_one_second_late_schedules_the_first_interval_past_now() {
+        let mut c = ClockSync::new(30);
+        assert!(c.ping(0).is_some());
+        assert!(c.ping(1_050 * MS).is_some(), "the late step sends one");
+        assert_eq!(c.next_ping_ns, Some(1_100 * MS));
+        assert!(c.ping(1_099 * MS).is_none());
+        assert!(c.ping(1_100 * MS).is_some());
+    }
+
+    /// U7 R1 (C-U7-4, RR-U4F-5 (4)): at a rate of u32::MAX the period is 1 ns, not 0, and the tick estimate divides by
+    /// it without a panic.
+    #[test]
+    fn r1_the_period_is_at_least_one_ns_at_a_rate_of_u32_max() {
+        let mut c = ClockSync::new(u32::MAX);
+        assert_eq!(c.period_ns(), 1);
+        sample(&mut c, 0, 40 * MS, 0);
+        c.step(40 * MS);
+        assert!(c.next_tick_at(80 * MS).is_some());
+    }
+
+    /// The estimate after 3 s of steps at 30 Hz on a symmetric 80 ms path (several steps per round trip), each ping
+    /// leaving 5 ms after its step; with `sent`, the host's send time reaches ClockSync at every step (stamped once).
+    /// The room's clock runs 3 s ahead of the host's (offset -3 s).
+    fn lagged(with_sent: bool) -> i64 {
+        const OFFSET: i64 = -3_000 * MS as i64;
+        let (lag, one_way) = (5 * MS, 40 * MS);
+        let mut c = ClockSync::new(30);
+        let mut pongs: Vec<(u8, u64, u64, u64)> = Vec::new();
+        for k in 0..90u64 {
+            let now = k * 1_000_000_000 / 30;
+            for &(id, wire, server, arrival) in pongs.iter().filter(|p| p.3 <= now) {
+                c.pong(id, wire, 7, 0, server, arrival);
+            }
+            pongs.retain(|p| p.3 > now);
+            c.step(now);
+            if let Some(id) = c.ping(now) {
+                let left = now + lag;
+                let server = (left + one_way) as i64 - OFFSET;
+                pongs.push((id, now, server as u64, left + 2 * one_way));
+            }
+            if with_sent {
+                c.sent(now + lag);
+            }
+        }
+        c.offset_ns().expect("an estimate")
+    }
+
+    /// U7 R2 (C-U7-3; NC-U4F-4): a host whose sends lag its step by 5 ms gives the true offset when it passes the send
+    /// time, and an offset 2.5 ms low (half the lag) when it does not.
+    #[test]
+    fn r2_a_lagged_send_is_unbiased_with_sent_and_half_its_lag_low_without() {
+        assert_eq!(lagged(true), -3_000 * MS as i64);
+        assert_eq!(lagged(false), -3_000 * MS as i64 - 2_500_000);
+    }
+
+    /// U7 R2 (C-U7-3): `sent` stamps each ping once: a later call before its `Pong` (the next step's) leaves the first
+    /// send time, so the sample's round trip is the true one; and the wire stamp still matches the `Pong`.
+    #[test]
+    fn r2_sent_stamps_each_ping_once() {
+        let mut c = ClockSync::new(30);
+        let id = c.ping(0).expect("a ping");
+        c.sent(5 * MS);
+        c.sent(38 * MS);
+        c.pong(id, 0, 7, 0, 10_000 * MS, 85 * MS);
+        assert_eq!(c.samples().back().map(|s| s.rtt_ns), Some(80 * MS));
+        assert_eq!(c.unknown_pongs(), 0);
     }
 }

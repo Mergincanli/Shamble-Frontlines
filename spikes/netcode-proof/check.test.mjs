@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import {
   BITE_ID,
   CHANNEL_ONLY,
+  CLIENT_WASM_DEPENDENCIES,
   CLIPPY_TWINS,
   FAILED_STEP_DIR,
   H2_VECTOR,
@@ -30,6 +31,9 @@ import {
   WASM_BUILDS,
   WASM_CRATES,
   WASM_STEP_DIR,
+  WEB,
+  WEB_CHECK,
+  WEB_TYPESCRIPT,
   biteHomeProblems,
   buildFlagProblems,
   buildInputProblems,
@@ -70,6 +74,7 @@ import {
   treeArgs,
   unsafeProblems,
   wasmStep,
+  webStep,
   workspaceLintProblems,
 } from "./check.mjs";
 import {
@@ -118,7 +123,7 @@ function clean() {
     "npt-net": n("npt-link", "tokio", "quinn", "wtransport", "tokio-tungstenite", "npt-tcpinfo"),
     "npt-tcpinfo": [...n("libc"), ["socket2", "dev"]],
     "npt-client": n("npt-proto", "npt-sim"),
-    "npt-client-wasm": n("npt-client"),
+    "npt-client-wasm": [...n("npt-client", "wasm-bindgen"), ["npt-room", "dev"], ["npt-server", "dev"]],
     "npt-bots": n("npt-link", "npt-proto", "npt-client", "npt-net", "npt-log"),
     "npt-super": n("npt-log"),
     "npt-host": n("npt-log", "tokio"),
@@ -169,6 +174,20 @@ test("npt-client never depends on npt-net", () => {
   const p = problemsWith((e) => e["npt-client"].push(["npt-net", null]));
   assert.ok(p.includes("npt-client depends on npt-net"), p.join("\n"));
   assert.ok(p.includes("leaf crate npt-client depends on quinn"), "and through it the transports");
+});
+
+test("npt-client-wasm ships npt-client and wasm-bindgen only, and is a leaf crate (U7 R4)", () => {
+  assert.deepEqual(CLIENT_WASM_DEPENDENCIES, ["npt-client", "wasm-bindgen"]);
+  assert.ok(LEAF.includes("npt-client-wasm") && WASM_CRATES.includes("npt-client-wasm"));
+  // The clean graph gives it two dev dependencies (C6's room test), npt-server's tokio among their closures: no ship.
+  assert.ok(clean()["npt-client-wasm"].some(([d, kind]) => d === "npt-server" && kind === "dev"));
+  for (const extra of ["js-sys", "web-sys", "npt-proto", "npt-sim"]) {
+    assert.deepEqual(problemsWith((e) => e["npt-client-wasm"].push([extra, null])), [`npt-client-wasm depends on ${extra}`], extra);
+  }
+  assert.deepEqual(problemsWith((e) => e["npt-client-wasm"].push(["js-sys", "build"])), ["npt-client-wasm depends on js-sys"]);
+  assert.deepEqual(problemsWith((e) => (e["npt-client-wasm"] = n("npt-client"))), ["npt-client-wasm does not depend on wasm-bindgen"]);
+  const p = problemsWith((e) => e["npt-client-wasm"].push(["npt-net", null]));
+  assert.ok(p.includes("npt-client-wasm depends on npt-net") && p.includes("leaf crate npt-client-wasm depends on tokio"), p.join("\n"));
 });
 
 test("npt-super and npt-host keep away from the sim, room, protocol and client crates", () => {
@@ -1939,6 +1958,49 @@ test("each cargo step runs what it says: fmt, clippy and its wasm32 twin, doc an
   assert.match(lastLine(steps("clippy").out.out), /^measured build and bites build both linted$/);
 });
 
+test("the web step: npm ci in security's form only when web/ lacks TypeScript 6.0.3, tsc into .gate/, then the Node tests; it fails, never skips (U7 R4, C7)", () => {
+  const tsc = [join(WEB, "node_modules", "typescript", "bin", "tsc"), "-p", WEB, "--outDir", WEB_CHECK].join(" ");
+  const tests = ["--test", join(WEB, "test", "*.test.mjs")].join(" ");
+  const ok = { ok: true, out: "# tests 56\n# pass 56\n", stdout: "", status: 0 };
+  assert.equal(STEPS.web.length, 0, "STEPS.web(runner) defaults its runner");
+  assert.ok(WEB_CHECK.endsWith(join(".gate", "netcode-proof-test", "web-check")), "never web/dist (N-U7D-1)");
+  let r = recorder([ok, ok]);
+  let s = webStep(r.runner, { PATH: "/bin" }, () => WEB_TYPESCRIPT);
+  assert.equal(s.ok, true);
+  assert.deepEqual(r.calls.map((c) => [c.cmd, c.args.join(" ")]), [[process.execPath, tsc], [process.execPath, tests]]);
+  assert.equal(r.calls[1].env.NPT_WEB_OUT, WEB_CHECK);
+  assert.equal(r.calls[0].env.PATH, "/bin");
+  assert.match(lastLine(s.out), /^web: TypeScript 6\.0\.3, tsc into \.gate\/netcode-proof-test\/web-check; 56 of 56 tests passed$/);
+  // TypeScript absent, or another version: npm ci first, security's exact form, scripts off in its environment too.
+  for (const have of [null, "6.0.2"]) {
+    r = recorder([ok, ok, ok]);
+    s = webStep(r.runner, { PATH: "/bin" }, () => have);
+    assert.equal(s.ok, true, String(have));
+    assert.equal(r.calls[0].cmd, "npm");
+    assert.deepEqual(r.calls[0].args, ["ci", "--ignore-scripts", "--no-audit", "--no-fund", "--prefix", WEB]);
+    assert.equal(r.calls[0].env.npm_config_ignore_scripts, "true");
+    assert.deepEqual(r.calls.slice(1).map((c) => c.args.join(" ")), [tsc, tests]);
+  }
+  // Each part failing fails the step, and nothing after it runs: never a skip.
+  for (const [at, what] of [[0, "npm ci"], [1, "tsc"], [2, "node tests"]]) {
+    const results = [ok, ok, ok];
+    results[at] = { ok: false, out: "boom\n", stdout: "", status: 1 };
+    r = recorder(results);
+    s = webStep(r.runner, {}, () => null);
+    assert.equal(s.ok, false, what);
+    assert.equal(r.calls.length, at + 1, what);
+    assert.ok(lastLine(s.out).startsWith(`the web step's ${what}`), lastLine(s.out));
+  }
+  // A Node run that selects no test (exit 0, "# tests 0", or no count at all) fails too (U7R-TE-4).
+  for (const zero of ["# tests 0\n# pass 0\n", "ran --test\n"]) {
+    r = recorder([ok, { ok: true, out: zero, stdout: "", status: 0 }]);
+    s = webStep(r.runner, {}, () => WEB_TYPESCRIPT);
+    assert.equal(s.ok, false, zero);
+    assert.match(lastLine(s.out), /^the web step's node tests \(none ran\) failed/);
+  }
+  assert.ok(r.calls.every((c) => !c.args.includes("install")), "never npm install");
+});
+
 const lastLine = (text) => text.trimEnd().split("\n").at(-1);
 const cargoTail = "error: this URL is not a hyperlink\n --> crates/room/src/lib.rs:7:27\nerror: could not document `npt-room`\nwarning: build failed, waiting for other jobs to finish...\n";
 const failed = (out = cargoTail) => ({ ok: false, out, stdout: "", status: 101 });
@@ -2782,7 +2844,7 @@ test("the wasm step's builds, legs and comparisons, in order; a clean run passes
   }
   assert.equal((last.match(/ 1\.5(?:,|$)/g) ?? []).length, w.calls.length, "each timed call's seconds");
   assert.deepEqual(STEPS.wasm.length, 0, "STEPS.wasm(runner) defaults its runner");
-  assert.deepEqual(Object.keys(STEPS), ["fmt", "clippy", "clippy-wasm32", "doc", "test", "deps", "wasm", "refs", "marks", "self", "redact"]);
+  assert.deepEqual(Object.keys(STEPS), ["fmt", "clippy", "clippy-wasm32", "doc", "test", "deps", "wasm", "refs", "marks", "self", "web", "redact"]);
   // The std-sin catch path: armed at the scan's first catch in the manifest's order, native leg 1 and Wasm leg 1, then
   // the re-show (carry 83 (c)): the hash-map half's native leg 1, clean before its arming tick, against the bitten
   // native leg, its field named by compare's own clean replay against the bitten leg's dump.

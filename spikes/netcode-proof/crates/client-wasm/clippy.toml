@@ -1,0 +1,13 @@
+# The clock ban (plan §4.5): the browser client reads no clock; the Worker passes arrival stamps, `now` and the send
+# time in. The hash-map type bans (u4-build-plan.md §4.11; U4E-Q8 (a)): no iteration order depends on a hasher's seed.
+# As npt-client's clippy.toml (u7-brief.md rev 1.1 Block R3).
+disallowed-types = [
+    { path = "std::time::Instant", reason = "the clock ban: time is passed in (and std's clock traps on wasm32)" },
+    { path = "std::time::SystemTime", reason = "the clock ban: time is passed in (and std's clock traps on wasm32)" },
+    { path = "std::collections::HashMap", reason = "the hash-map ban: iteration order must not depend on a seed" },
+    { path = "std::collections::HashSet", reason = "the hash-map ban: iteration order must not depend on a seed" },
+]
+disallowed-methods = [
+    { path = "std::time::Instant::now", reason = "the clock ban" },
+    { path = "std::time::SystemTime::now", reason = "the clock ban" },
+]

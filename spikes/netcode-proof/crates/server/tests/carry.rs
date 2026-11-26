@@ -126,7 +126,7 @@ fn run(timing: CmdTiming, up: bool) -> (usize, u64, u64, i64, usize) {
         CONTENT,
         RttSource::Link,
     );
-    let mut e = ClientEndpoint::new(join, npt_sim::TICK_HZ).with_clock(9);
+    let mut e = ClientEndpoint::new(join, npt_sim::TICK_HZ).with_clock(npt_client::HONEST_MAX_LEAD);
     let commands: Vec<npt_sim::Command> = Recording::synthetic(&scene, 5, first, 200, 2_000)
         .ticks
         .iter()

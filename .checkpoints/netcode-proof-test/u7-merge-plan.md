@@ -166,6 +166,58 @@ the advisor rules."
   stopped by TaskStop at 22:08 ("Successfully stopped task"; no index.lock; no `checkpoint.mjs watch` process). M1:
   `sha256sum` 6535c18130cad99881b798a332973b37215c1edad27929dd54178efc00342728 (= the plan's). Next: this line saved
   (H0), the base light run, M2, M2b, then M3.
+- DONE 22:08:59-22:09:3x: saved and pushed dc51f0e; H0 dc51f0e387a6a2017d435e4005b9b88e8f1db6cd (= origin, clean);
+  the no-save window is open. Base run (.gate/u7-merge/light-base.log, 22:09:17-22:09:29, exit 0, HEAD dc51f0e, the
+  lock held exclusively): refs 2106 (N0), marks 81 (drafts at 626df678…; rows unchanged), self 78 of 78, redact 11 of
+  11, 431 items, 0 findings. M2: `git diff --quiet 80b6748 <H0> --` the 43 paths (from `git apply --numstat`): exit 0.
+  M2b (.gate/u7/m2b-header.log, 22:09:31-32, exit 0): HEAD 80b6748; "diff
+  551e9033246e983b62e7fb38db8eb982ce8eac383a20b685e71099549edffcd3; untracked
+  b4811e7541216436bf7af76e02ef14c7368d5752a7386fb556dee44e36b9d156" = run 4's tree. Next: M3 and M4.
+- 22:1x: M3's first `git apply --check --index` exit 1: "does not match index" for 8 of the 10 changed paths, all
+  under crates/ (bots lib.rs and load.rs, client-wasm lib.rs, client clock.rs, lib.rs and tests/trace.rs, lab
+  scenario.rs, server tests/carry.rs); check.mjs and check.test.mjs passed. Cause, not content: main-run.sh:48-52
+  touches every file under crates/ before and every 2 s during its commands (its header says so), so the base run
+  (22:09:17-29) left all of crates/ at 22:09:29.109 while the index held 20:18:26 (MAIN-68's light run), and `git
+  apply --index` trusts the index's cached stat data without reading content. Content checks, each exit 0: `git diff
+  --quiet -- spikes/` (tree = index), `git diff --quiet HEAD -- spikes/` (tree = H0), and M2 above; `git status --short`
+  listed only this file; `find -newermt` showed the whole crates/ tree at 22:09:29. The advisor tool (22:1x): no bar
+  failed, M6 not yet; `git update-index --refresh` named in the chat and run alone: exit 1, its one line
+  ".checkpoints/netcode-proof-test/u7-merge-plan.md: needs update" (this unsaved line; no spikes/ path); `git ls-files
+  --debug` of bots/src/lib.rs now 1795730969:109624894 (22:09:29.109); HEAD still dc51f0e. M3's check is re-run once,
+  by name; any second failure is a failing bar (M6, nothing applied, the saver restarted, the log to the advisor at
+  00:50). M6's undo form from here (C1's judge run and M5 go through main-run.sh and touch crates/ again): `git
+  update-index --refresh`, then `git apply -R --index` of the patch, then `git diff --quiet H0 -- spikes/`. For the
+  advisor agent's head read: a ruling on this one retry and on the form's fix (the base run before H0's save, or a
+  refresh before M3 and before M6's undo).
+- DONE 22:1x: M3, re-run once by name: `git apply --check --index` exit 0; M4: `git apply --index` exit 0. `git status
+  --short`: exactly the 43 paths staged (10 M, 33 A) and this file (unstaged). u7-m4-cmp.mjs: "43 paths in the patch;
+  43 byte-equal with mode 644 on both sides; 0 not" (exit 0). `git diff --cached --summary`: 33 "create mode 100644"
+  lines, no mode change. M4c: package.json 8370495dee2ed77e… and package-lock.json a0efce8e511a8865… equal in
+  agent-abf71d95fc07b3522 and in the main folder; ops/browser/node_modules absent, then `ln -s` of the kept install's
+  (it shows as `??`: the root .gitignore's `node_modules/` matches folders, not links; M7 removes it). C1, first half
+  (22:14:59): u7-c1.mjs <H0> saved .gate/npt-browser/records/mds-chrome-wt-a0-2026-11-26T22-14-59-687Z.jsonl, copied
+  to .gate/u7-merge/c1-logs/; log sha256 0d07fa1fcda887f87cd49b3f8a208262eb21452798ab0c47567aca882701f055; 15 page
+  lines; wasm sha256 901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77 (= run 4's: UM-3's bar met).
+  Next: the judge's call (background btqic8n9s, .gate/u7-merge/c1-judge.log), then M5.
+- DONE 22:15:07-08: C1's judge call (.gate/u7-merge/c1-judge.log, exit 0, HEAD dc51f0e; c1-verdicts.json): "PM-0001-36
+  NOT-RUN ML chrome loopback: 0 of 1 valid runs"; its parts: the six ML parts NOT-RUN (0 of 1 valid runs each), the two
+  MAC-b safari parts MOVED (NPT-TRIM), "ML* (rough, reported)" PASS with 1 run (R1-mds-chrome-wt-a00, valid), its
+  report 1024 smallest and 1024 largest; the read-once bite not run; no "npt-judge: " line. The bar is met (a verdict,
+  the rough part counting 1 log, no read error), as U8's C1 read run 3. Next: M5 in the background
+  (.gate/u7-merge/m5-check.log): ops tests, wrappers, then check.mjs's 12 steps.
+- DONE 22:15:37-22:36:58: M5 (background bf9ayfbj1; .gate/u7-merge/m5-check.log, exit 0; the lock held, incremental
+  off, cold after the part-clean): `node --test 'ops/**/*.test.mjs'` tests 101, pass 101, fail 0; `bash
+  ops/tests/wrappers.test.sh` "315 ok, 0 failed"; `env CARGO_INCREMENTAL=0 node check.mjs` "all 12 steps pass": fmt
+  1.2 s; clippy 38.4 s; clippy-wasm32 10.4 s; doc 16.8 s; test 1,114.2 s, measured 931 passed and bites 1,028 passed,
+  0 failed, 0 skipped (= UM-2's 931 and 1,028); deps 2.6 s ("npt-client-wasm ships npt-client and wasm-bindgen only"
+  among the held rules); wasm 77.0 s, 27,000 ticks native-native and native-Wasm, 0 mismatching, the hash-map bite
+  caught at SS-s1 tick 1234; refs 2139 = N0 2106 + 33; marks 81, rows unchanged; self 80 of 80; web 70 of 70 (TypeScript
+  6.0.3, no npm ci); redact 11 of 11, 464 items (431 + 33), 0 findings. Next: M7.
+- DONE 22:37-22:4x: M7: `unlink` of ops/browser/node_modules (the install still in agent-abf71d95fc07b3522: `test -d`
+  OK); `node tools/gate.mjs --no-smoke` GATE PASS (base b9aad01; 1-4, 5b-5d PASS, 5a skipped); "repo map OK: 245
+  entries cover 110 required paths"; `git status --short`: the 43 paths staged and notes only (msg-2026-11-27.md, this
+  file, u7-report.md). u7-report.md's M5 and M7 lines filled. Next: M8 (`git rm` of the three wip patches, `git add`
+  of u7-report.md and this file, the numstat check, one commit), then the card save that pushes it.
 
 ## Risks
 - M5's counts move with MAIN-68 and Builder 2: each bar comes from this merge's own base run on its own H0 (MAIN-68's

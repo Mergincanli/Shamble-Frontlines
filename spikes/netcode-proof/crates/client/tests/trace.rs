@@ -14,8 +14,9 @@ use npt_sim::Command;
 
 const HZ: u32 = 30;
 const MS: u64 = 1_000_000;
-/// The lab's controller setting: the lead bound's 12 ticks less 3, and at most 9 (option B's buffer).
-const MAX_LEAD: u32 = 9;
+/// The lab's controller setting: the lead bound's 12 ticks less 3, and at most 9 (option B's buffer): npt-client's
+/// `HONEST_MAX_LEAD` (C3).
+const MAX_LEAD: u32 = npt_client::HONEST_MAX_LEAD;
 /// The room's lead bound at 30 Hz (LEAD-BOUND: 400 ms).
 const BOUND: i64 = 12;
 /// The room's time at the join, ns.

@@ -18,8 +18,9 @@
 // compared tick by tick, with the field diff at a first mismatch; PM-0004-21's cross-target vectors; and its two
 // bites, hash-map and std-sin, in the bites builds); refs (nothing outside spikes/ references it, §4.2 and §4.9);
 // marks (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self
-// (this file's own tests); redact (redact-check's tests, then a scan of the spike's folder). It runs every step and
-// exits 1 if any failed.
+// (this file's own tests); web (U7's browser client: npm ci in security's form when web/ has no TypeScript 6.0.3, tsc
+// into .gate/, then its Node tests over that output, never skipped); redact (redact-check's tests, then a scan of the
+// spike's folder). It runs every step and exits 1 if any failed.
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -34,9 +35,22 @@ const ROOT = join(HERE, "..", "..");
 
 /**
  * The leaf crates (plan §4.2): built for wasm32, free of every transport crate and async runtime; npt-hash-wasm, the
- * check-only cdylib over npt-sim, among them (u4-build-plan.md §5 U4d2), so the wasm32 clippy and doc steps take it.
+ * check-only cdylib over npt-sim, among them (u4-build-plan.md §5 U4d2), so the wasm32 clippy and doc steps take it;
+ * and npt-client-wasm, the browser client's wasm-bindgen cdylib over npt-client (U7; u7-brief.md rev 1.1 Block R4).
  */
-export const LEAF = ["npt-link", "npt-l1", "npt-sim", "npt-proto", "npt-room", "npt-client", "npt-log", "npt-hash-wasm"];
+export const LEAF = [
+  "npt-link",
+  "npt-l1",
+  "npt-sim",
+  "npt-proto",
+  "npt-room",
+  "npt-client",
+  "npt-log",
+  "npt-hash-wasm",
+  "npt-client-wasm",
+];
+/** npt-client-wasm's only shipped dependencies (U7 R4): the wire's items come through npt-client's `wire` module. */
+export const CLIENT_WASM_DEPENDENCIES = ["npt-client", "wasm-bindgen"];
 /** Transport crates and async runtimes no leaf crate may reach (plan §4.2's list, with their own parts). */
 export const TRANSPORT = [
   "tokio",
@@ -140,6 +154,20 @@ export function dependencyProblems(meta) {
   for (const n of meta.resolve.nodes) {
     for (const d of n.deps) {
       if (byId.get(d.pkg).name === "npt-hash-wasm") problems.push(`${byId.get(n.id).name} depends on npt-hash-wasm`);
+    }
+  }
+  // npt-client-wasm (U7; u7-brief.md rev 1.1 Block R4): it ships npt-client and wasm-bindgen only, so no transport,
+  // js-sys, web-sys or other crate reaches the page's Wasm; a dev dependency does not ship (C6's in-process room test).
+  // A missing npt-client-wasm is said once, by the LEAF loop above.
+  const clientWasmId = meta.workspace_members.find((id) => byId.get(id).name === "npt-client-wasm");
+  if (clientWasmId) {
+    const node = meta.resolve.nodes.find((n) => n.id === clientWasmId);
+    const shippedDeps = (node?.deps ?? []).filter(isShipped).map((d) => byId.get(d.pkg).name);
+    for (const name of shippedDeps) {
+      if (!CLIENT_WASM_DEPENDENCIES.includes(name)) problems.push(`npt-client-wasm depends on ${name}`);
+    }
+    for (const need of CLIENT_WASM_DEPENDENCIES) {
+      if (!shippedDeps.includes(need)) problems.push(`npt-client-wasm does not depend on ${need}`);
     }
   }
   // npt-sim (U4s; the arch review's F4): it ships with SIM_DEPENDENCIES alone, so the sim stays free of every crate
@@ -2103,7 +2131,8 @@ const DEPS_CHECKED =
   "held: no leaf crate reaches a transport or runtime; npt-client has no npt-net; npt-super and npt-host keep off the " +
   "sim, room, proto (and client) crates; npt-judge ships npt-log and serde only; npt-tcpinfo ships libc only and only " +
   "npt-net uses it; npt-net has no direct libc; npt-sim ships libm, rand_chacha and rand_core only; npt-hash-wasm " +
-  "ships npt-sim only; nothing depends on npt-lab or npt-hash-wasm; the workspace forbids unsafe_code and " +
+  "ships npt-sim only; npt-client-wasm ships npt-client and wasm-bindgen only; nothing depends on npt-lab or " +
+  "npt-hash-wasm; the workspace forbids unsafe_code and " +
   "every member inherits its lints but npt-client-wasm (allow), npt-tcpinfo (deny) and npt-hash-wasm (deny), whose own " +
   "lint tables are the workspace's otherwise, key for key, with no lint given in a form the reader does not read (a " +
   "lint's own table, a quoted, dotted, hyphenated or uppercase name); no manifest has a cargo-features or rustflags " +
@@ -2609,6 +2638,47 @@ export function wasmStep(runner = run, io = WASM_IO, now = () => performance.now
   return { ok: problems.length === 0, out: [...lines, ...problems, summary].join("\n") };
 }
 
+/** web/ (U7's browser client), the TypeScript version its lock pins, and where the web step's tsc emits (C7). */
+export const WEB = join(HERE, "web");
+export const WEB_TYPESCRIPT = "6.0.3";
+export const WEB_CHECK = join(ROOT, ".gate", "netcode-proof-test", "web-check");
+
+/** web/'s installed TypeScript version, or null when it is absent or unreadable. */
+function installedTypescript() {
+  try {
+    return JSON.parse(readFileSync(join(WEB, "node_modules", "typescript", "package.json"), "utf8")).version ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The web step (U7 R4; advisor-u7-brief.md C7): (1) when web/node_modules holds no TypeScript 6.0.3 (a fresh worktree:
+ * node_modules is gitignored), `npm ci` in web/ in security's form (security-u7-deps.md items (3)-(4): `--ignore-scripts
+ * --no-audit --no-fund`, npm_config_ignore_scripts in its environment; never `npm install`); (2) tsc over web/'s one
+ * config, emitting to WEB_CHECK, never web/dist (N-U7D-1); (3) `node --test` over web/test/*.test.mjs, which read tsc's
+ * output there (NPT_WEB_OUT). It fails, never skips, when any of the three fails. Through `runner`, as the cargo
+ * steps; `installed` reads web/'s TypeScript version (check.test.mjs passes its own).
+ */
+export function webStep(runner = run, base = process.env, installed = installedTypescript) {
+  let out = "";
+  if (installed() !== WEB_TYPESCRIPT) {
+    const env = { ...base, npm_config_ignore_scripts: "true" };
+    const i = runner("npm", ["ci", "--ignore-scripts", "--no-audit", "--no-fund", "--prefix", WEB], HERE, env);
+    if (!i.ok) return failedRun(i, "the web step's npm ci");
+    out += i.out;
+  }
+  const tsc = [join(WEB, "node_modules", "typescript", "bin", "tsc"), "-p", WEB, "--outDir", WEB_CHECK];
+  const t = runner(process.execPath, tsc, HERE, base);
+  if (!t.ok) return failedRun(t, "the web step's tsc", out);
+  out += t.out;
+  const n = runner(process.execPath, ["--test", join(WEB, "test", "*.test.mjs")], HERE, { ...base, NPT_WEB_OUT: WEB_CHECK });
+  if (!n.ok) return failedRun(n, `the web step's node tests (${nodeCounts(n.out)})`, out);
+  // A glob that selects no test exits 0 with "# tests 0" (U7R-TE-4): that fails, never passes.
+  if (!(Number(n.out.match(/^# tests (\d+)/m)?.[1] ?? 0) > 0)) return failedRun(n, "the web step's node tests (none ran)", out);
+  return { ok: true, out: `${out}${n.out}\nweb: TypeScript ${WEB_TYPESCRIPT}, tsc into .gate/netcode-proof-test/web-check; ${nodeCounts(n.out)}` };
+}
+
 // Each cargo step takes the runner it calls cargo through (`run` when main calls it), so check.test.mjs pins what each
 // step runs: its commands, its flags, -D warnings included (the rust fix2 review's nit, u4s-carries.md entry 34).
 export const STEPS = {
@@ -2640,6 +2710,7 @@ export const STEPS = {
     return { ok: problems.length === 0, out: problems.length ? `${problems.join("\n")}\n${summary}` : summary };
   },
   self: () => summarized(run(process.execPath, ["--test", join(HERE, "check.test.mjs")], HERE), nodeCounts),
+  web: (runner = run) => webStep(runner),
   redact: () => {
     const t = run(process.execPath, ["--test", join(HERE, "ops", "operator", "redact-check.test.mjs")], HERE);
     if (!t.ok) return t;

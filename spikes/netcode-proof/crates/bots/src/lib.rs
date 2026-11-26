@@ -1331,7 +1331,7 @@ mod tests {
                 Behaviour::brawl(&scene, 0, 1),
             );
             if controlled {
-                (e, b) = (e.with_clock(9), b.controlled());
+                (e, b) = (e.with_clock(npt_client::HONEST_MAX_LEAD), b.controlled());
             } else {
                 e = e.with_lead(2);
             }

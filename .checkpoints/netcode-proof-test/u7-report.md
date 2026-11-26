@@ -1,5 +1,5 @@
 # U7, the plain browser client for R1 (the first real run on rented servers): the merge report
-DRAFT, written 2026-11-26 22:1x UTC as M0's prep (U7-M-7's items); the lines marked (fill) are filled at the merge.
+Written 2026-11-26 22:0x-22:4x UTC: drafted as M0's prep (U7-M-7's items), the merge's lines filled as each step ran.
 Merged into the lane by the main session, plan u7-merge-plan.md (U8's M0-M9 form with the snapshot read's U7-M-1 to
 -8; its check advisor-u7-merge.md, UM-1 to UM-5 applied). Brief u7-brief.md rev 1.1 (the advisor's C1-C14 in
 advisor-u7-brief.md); brief 3 (launch-0850.md section 3) and the fix-pass brief (advisor-u7-round.md section 2); the
@@ -21,21 +21,61 @@ u7-review-netcode.md and u7-review-test.md, ruled in advisor-u7-round.md; the sn
 - No manifest or lockfile (U7's dependencies are on the lane since Block 0b, 2701220, and its amendment, 56b3e1b:
   dependency-check.md); no marks.json; nothing under crates/judge or marks/.
 
+- New pub items: `npt_client::ClientEndpoint::sent(at_ns)`; `npt_client::HONEST_MAX_LEAD: u32 = 9`; the module
+  `npt_client::wire` (Channel, CONTENT_HASH, Direction, Join, Limits, PROTOCOL_VERSION, Command, LOOP_CATCHUP,
+  TICK_HZ); npt-client-wasm's wasm-bindgen API: `Client` (constructor `new(token, bind)`, returning a JsError on a bad
+  token; `step(now, prev_send, inbox)`, `next_due_ns`, `counters`) and the free `counter_names()` and `limits()`. Out
+  of the public surface: `ClockSync::ping_every_ns` (removed); `ClockSync::new`, `period_ns`, `unknown_pongs`,
+  `next_tick_at` and `one_way_hi_ns` (now `pub(crate)`).
+
 ## Size
-5,193 added and 47 removed (`git apply --numstat`), under SIZE-CHECK's 6,000. Planned: about 2,200 plus C2-C9's
-150-250 (the brief, section 8); the fix pass added about 462 against the advisor's estimate of about 300.
+5,193 added and 47 removed (`git apply --numstat`), under SIZE-CHECK's 6,000, against the brief's about 2,200 plus
+C2-C9's 150-250 (section 8: likely 4,200-5,050 at the 1.9-2.3 the last units grew). Added, by block, against section 8:
+| Block | Files | Added | Planned |
+|---|---|---|---|
+| R1-R2 (npt-client, the cap's readers) | clock.rs 193, lib.rs 23, sent.rs 96, trace.rs 3, scenario.rs 6, bots 1 + 2, carry.rs 1 | 325 | 220 |
+| R3 (npt-client-wasm: core, room host, tests) | engine.rs 952, script.rs 84, lib.rs 60, clippy.toml 13 | 1,109 | 380 |
+| R4 (check.mjs, its tests) | check.mjs 77, check.test.mjs 64 | 141 | 60 |
+| T1-T4 (the page, the build) | src/ 1,039, index.html 16, bites/hooks.js 10, build.mjs 181, tsconfig.json 23 | 1,269 | 960 |
+| Node tests | web/test/ (12 files) | 1,455 | 370 |
+| T5 (the browser drivers) | web/e2e/ (9 files) | 894 | 220 |
+The fix pass added about 462 of these against the advisor's estimate of about 300. Removed: 47 (clock.rs 26, check.mjs
+6, scenario.rs 5, and 10 across six files).
 
 ## Evidence on the merged tree (filled at the merge)
-- M1: the patch's sha256 6535c18130cad99881b798a332973b37215c1edad27929dd54178efc00342728 (the patch is removed by
-  this merge, WIP-CLEAN). M2: (fill). M2b, the tie to run 4: (fill: u7-run.sh's header in the builder's worktree,
-  "diff 551e9033…; untracked b4811e75…"). M3 and M4: (fill: `git apply --check --index`, then `git apply --index`, on
-  H0; the 43 paths cmp-equal to the worktree's, mode 100644).
-- C1 (U7-M-5, a form test): (fill: run 4's 6-mds `pages[0]` through U8's save() as R1, eu-path and ML*; npt-judge
-  with PM-0001-36: a verdict and no read error; the printed wasm sha256 = run 4's 901a6492…0e77).
-- M5 (one counted run through main-run.sh, the lane lock, incremental off): (fill: U8's ops tests N of N; wrappers
-  "315 ok, 0 failed"; check.mjs all 12 steps: test measured and bites against UM-2's 931 and 1,028; web 70; self 80;
-  marks 81, rows unchanged; redact 0 findings, items as counted; refs N0 + 33; wasm 27,000 ticks, 0 mismatching).
-- M7: (fill: the link removed; gate --no-smoke; the repo map check; `git status --short`).
+- H0 dc51f0e387a6a2017d435e4005b9b88e8f1db6cd (the save that carried M0's resume line; main b9aad01 unmoved). The base
+  run there (.gate/u7-merge/light-base.log): refs 2,106 (N0), marks 81 with rows unchanged, self 78 of 78, redact 431
+  items, 0 findings.
+- M1: the patch's sha256 6535c18130cad99881b798a332973b37215c1edad27929dd54178efc00342728. The merge removes it and the
+  T-half's two older snapshots inside it, wip/u7-t-build-t5i.patch and wip/u7-t-build.patch (19 web/ files, every one
+  among the 43): WIP-CLEAN. The plan's M8 named only the first two; the third is taken by the same rule.
+- M2: `git diff --quiet 80b6748 <H0> --` the 43 paths: exit 0. M2b, the tie to run 4 (.gate/u7/m2b-header.log):
+  u7-run.sh's header in the builder's worktree, HEAD 80b6748, "diff
+  551e9033246e983b62e7fb38db8eb982ce8eac383a20b685e71099549edffcd3; untracked
+  b4811e7541216436bf7af76e02ef14c7368d5752a7386fb556dee44e36b9d156", run 4's tree.
+- M3 and M4: the first `git apply --check --index` refused 8 of the 10 changed paths, all under crates/, with "does
+  not match index". The cause was not content: main-run.sh:48-52 touches every file under crates/ before and during
+  its commands, so the base run left crates/ newer than the index's cached times, which `git apply --index` trusts.
+  Three content checks exit 0 (tree = index and tree = H0 under spikes/, and M2). After the advisor tool's read, `git
+  update-index --refresh` (its one line: an unsaved notes file) and one re-run by name: exit 0; then `git apply
+  --index` exit 0. `git status --short`: exactly the 43 paths staged (10 M, 33 A); u7-m4-cmp.mjs: 43 byte-equal to the
+  worktree's with mode 644 on both sides; 33 "create mode 100644" lines, no mode change. The retry and the form's fix
+  go to the advisor agent's head read.
+- C1 (U7-M-5, a form test): run 4's 6-mds `pages[0]` (result.json d2c566aa…f3bf, = run 4's own list) through U8's
+  save() as R1 (u7-c1.mjs): log 0d07fa1f…f055, 15 page lines, the printed wasm sha256 901a6492…0e77 = run 4's (UM-3's
+  bar). npt-judge with PM-0001-36 (.gate/u7-merge/c1-verdicts.json): NOT-RUN (the six ML parts 0 of 1 valid runs, the
+  two MAC-b parts MOVED), its "ML* (rough, reported)" part PASS with 1 valid run, 1,024 B smallest and largest; no read
+  error. The log stays under .gate/ only.
+- M5 (one counted run through main-run.sh, the lane lock, incremental off, cold after the part-clean;
+  .gate/u7-merge/m5-check.log, 22:15:37-22:36:58 UTC, exit 0): U8's ops tests `node --test 'ops/**/*.test.mjs'` 101
+  of 101, 0 fail; `bash ops/tests/wrappers.test.sh` "315 ok, 0 failed"; `node check.mjs` all 12 steps PASS: test 931
+  measured and 1,028 bites passed, 0 failed, 0 skipped (UM-2's 931 and 1,028 exactly); web 70 of 70 (TypeScript 6.0.3,
+  no install); self 80 of 80; marks 81, rows unchanged; redact 11 of 11 with 464 items (431 + 33), 0 findings; refs
+  2,139 tracked files (N0 2,106 + 33); wasm 27,000 ticks native-native and native-Wasm, 0 mismatching; deps holding
+  "npt-client-wasm ships npt-client and wasm-bindgen only".
+- M7: the node_modules link removed (the install kept in agent-abf71d95fc07b3522); `node tools/gate.mjs --no-smoke`
+  GATE PASS (5a skipped); "repo map OK: 245 entries cover 110 required paths"; `git status --short`: the 43 paths
+  staged and notes only.
 - D10: no marks.json or crates/judge change, so nothing for his read of judge changes.
 - DEP-HOLD: no manifest or lockfile in the merge.
 
@@ -87,10 +127,20 @@ snapshot read: a hand read is enough).
   It ran under ignoreHTTPSErrors (the page origin uses a test certificate), so it shows the real host's setup, its CSP
   and the room accepting, not the pin admitting the certificate: the pin's evidence is marks 1 and 4 (no ignore; the
   wrong hash refused) (NC-8 (b), TE-10).
-- **The seven dist SHA-256s** (measured): index.html 46febaac…5f95, main.js c9be4a16…ccec, worker.js 4f060d18…1857,
-  lib.js 4f374eaf…4bbe, hooks.js be1c4ce7…f814, npt_client_wasm.js b355d85c…3965, npt_client_wasm_bg.wasm
-  901a6492…0e77; the bites dist the same six and hooks.js cd7be6c0…2972. They are the snapshot tree's; R1.md's
-  expected values come from the merged commit at Stop B (C13).
+- **The seven dist SHA-256s, in full** (run 4's summary.json, sha256
+  100b27d132336e1ec7aa6366aed8cb154d3a9645e8703bed27858f6811ff27ac, which lives only in the builder's worktree):
+  - index.html 46febaacfc3b2fa43a3b342c39293f0f25ca861efa98cc2f4267cca475f35f95
+  - main.js c9be4a1666f9f1086999f46ed0dc38ccd702450bb3f975c7c1cf33685e41ccec
+  - worker.js 4f060d1851c530f86767efdcf5f3fee68e0e702ef393fcf5fede3e653ae71857
+  - lib.js 4f374eafe567444bf53c802cb94b2e104fe9b7743e0fbc26c6387c073fdc4bbe
+  - hooks.js be1c4ce736532704c8c1c9dd042b4fd0273d6b90eee4651158c33a00f83cf814 (the bites dist's:
+    cd7be6c0a3696dbe1759a6da221a577f2a68e5aafb160e09db83570b44332972; its other six equal the measured)
+  - npt_client_wasm.js b355d85ca53dd9534b460d3e5c3b180296a740ecd4043741d070a058be103965
+  - npt_client_wasm_bg.wasm 901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77
+  - the binaries: npt-server 0db5ca7c0537ddf527c69f1107cd6d7179acbc02e33056e87f2fc4d6bbf95676, npt-host
+    5c7c7201c2d342e598f73f923aead25571a9b43f1826db4873b813847ccb561b; the dist's build log (final-dist.log)
+    15ceb7bd21e3fa9fde7eec0afa0851d739414f3aac06bc87788a987ac3dd2fc5.
+  They are the snapshot tree's; R1.md's expected values come from the merged commit at Stop B (C13).
 
 ## Tests (the builder's end-2 on the fixed tree; this merge's own counts are M5's, above)
 - end-2.log (10:26-10:48 UTC, HEAD 80b6748, the same diff and untracked hashes): all 12 steps PASS; test measured
@@ -141,8 +191,11 @@ snapshot read: a hand read is enough).
   `deadline_closed_count`).
 - CLIPPY_TWINS: client-wasm's clippy.toml joins the list, for check.mjs's next owner (beside CHECK-NFF-1).
 - DROP-not-REJECT: R8's bite plan and Stop B (NC-3, above).
-- ADV-U7S-5 (U8's ops/browser/config.mjs:60 comment, stale after NC-5) and ADV-U7S-6 (no test pins r1.sh's
-  load_settings to LoadSettings; the advisor read them equal): U8's next change.
+- ADV-U7S-5 (U8's ops/browser/config.mjs:60 comment, stale after NC-5): U8's next change (U8-F1, if config.mjs is
+  among its files).
+- ADV-U7S-6 (no test pins r1.sh's load_settings to LoadSettings; the advisor read the 24 keys and their ranges equal):
+  carried. U8's stop, 6,282, is spent by U8-F1 (+93 of 93), and past it unbuilt Lows are carried (history.md:7703-7722),
+  so it goes on PR #40's closing list, a test for U8's first change after R1; until then the advisor's read stands.
 - The `ops` step: the first change after this merge (UM-4: test first, U8's fix 2 install, the dependency record),
   before Stop B's fill.
 - ADV-U7S-2: a real-page control for the three shipped calls, at the next T5 (ii) run if one comes. ADV-U7S-7: `fail`'s

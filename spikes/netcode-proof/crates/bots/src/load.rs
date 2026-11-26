@@ -41,8 +41,8 @@ const HANDSHAKE_NS: u64 = 10 * SEC;
 pub const SETTINGS_CAP: u64 = 64 * 1024;
 const TOKENS_CAP: u64 = 8 * 1024;
 const TEXT_MAX: usize = 256;
-/// The controller's lead bound, the lab's (lab/src/scenario.rs:60).
-const MAX_LEAD: u32 = 9;
+/// The controller's lead bound, npt-client's one constant for every honest client (the lab's too: C3).
+const MAX_LEAD: u32 = npt_client::HONEST_MAX_LEAD;
 /// RS's TLS name on the WebSocket leg (the pin decides; the name is SNI only).
 const RS_NAME: &str = "rs.nt.shamblefrontlines.com";
 /// The honest behaviours npt-load hosts (C-U6-19's gate line: no throwing, rejoining or restarted client).

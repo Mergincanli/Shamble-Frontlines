@@ -24,6 +24,15 @@ mod clock;
 
 pub use clock::{ClockSample, ClockSync};
 
+/// The wire's items npt-client-wasm names (U7 R3; advisor-u7-brief.md C2, C5): it ships npt-client and wasm-bindgen
+/// only (check.mjs's deps rule), so it reaches npt-proto's and npt-sim's items, and npt-link's `Channel`, through here.
+/// npt-client still names nothing of npt-link but `Channel`.
+pub mod wire {
+    pub use npt_link::Channel;
+    pub use npt_proto::{CONTENT_HASH, Direction, Join, Limits, PROTOCOL_VERSION};
+    pub use npt_sim::{Command, LOOP_CATCHUP, TICK_HZ};
+}
+
 /// The bite ids this crate plants (bites builds only). u4-build-plan.md §4.14 plants each bite where its code lives:
 /// PM-0001-17/client-rounding's site is the client's call into the wire grid, so its id lives here and not in npt-sim's
 /// grid; the endpoint takes the grid for its every call into it from [`grid_with_bite`]. PM-0001-58/lt-tick-offset and
@@ -39,6 +48,12 @@ pub const BITES: [&str; 6] = [
     "PM-0001-47/tick-quantised",
     "PM-0001-20/redundancy-1",
 ];
+
+/// The honest client's tick-lead cap, [`ClientEndpoint::with_clock`]'s `max_lead` (C-U7-3; Q-U7-3 ruled,
+/// advisor-u7-brief.md C3): the room's lead bound (400 ms, 12 ticks at 30 Hz) less a margin, and at most option B's
+/// buffer plus one. One home for every honest client (the Wasm, the bots, npt-load, the lab); npt-lab's compile-time
+/// assert binds it to npt-room's bound and `CMD_CATCHUP`, since npt-client does not depend on npt-room.
+pub const HONEST_MAX_LEAD: u32 = 9;
 
 /// The signed distance of tick `a` from tick `b` (positive: `a` after `b`), wrap-aware.
 fn dist(a: u32, b: u32) -> i64 {
@@ -488,6 +503,14 @@ impl ClientEndpoint {
     /// The command clock: its offset estimate (host minus server, ns), its samples and counters (-47's read).
     pub fn clock(&self) -> &ClockSync {
         &self.clock
+    }
+
+    /// The host's send time of the last step's datagrams, in ns on the host's clock (C-U7-3; NC-U4F-4): called after
+    /// that step's output went out and before the next step's first `input`. The clock takes it as the t0 of each ping
+    /// made since the previous call (once each), while the wire keeps the step's time, which the `Pong` echoes for
+    /// matching. A host that never calls it keeps every stamp as before: a ping's t0 is its step's time.
+    pub fn sent(&mut self, at_ns: u64) {
+        self.clock.sent(at_ns);
     }
 
     /// Under the controller, the commands due at this step (0 to 2): every stamp from the last one + 1 up to the

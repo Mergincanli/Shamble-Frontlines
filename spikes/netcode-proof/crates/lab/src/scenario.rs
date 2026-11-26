@@ -56,12 +56,13 @@ use crate::mirror::{Mirror, Records, SetStats};
 /// U4f's controller setting for every endpoint of a controller run (u4f-brief.md 2.2): the lead bound's 12 ticks less
 /// a margin, and at most 9; one setting under both options (f6). The cap of 9 keeps every honest command inside option
 /// B's buffer of 8 only while the up delay is at least about 2 ticks whenever the cap binds, which L1's bounded jitter
-/// always gives; other links are C-U6-17's (NC-U4F-3).
-const CONTROLLER_MAX_LEAD: u32 = 9;
-// EA-U4F-5: the cap at most option B's buffer plus one, and below the room's lead bound in ticks.
+/// always gives; other links are C-U6-17's (NC-U4F-3). It is npt-client's one constant for every honest client (C3).
+const CONTROLLER_MAX_LEAD: u32 = npt_client::HONEST_MAX_LEAD;
+// EA-U4F-5, and C3's binding of the honest cap to the room's bound: at most option B's buffer plus one, and below the
+// room's lead bound in ticks.
 const _: () = assert!(
-    CONTROLLER_MAX_LEAD as usize <= npt_room::InputBuffer::CMD_CATCHUP + 1
-        && CONTROLLER_MAX_LEAD
+    npt_client::HONEST_MAX_LEAD as usize <= npt_room::InputBuffer::CMD_CATCHUP + 1
+        && npt_client::HONEST_MAX_LEAD
             < npt_sim::ticks_for_ms_at(npt_sim::TICK_HZ, Room::<Sim>::LEAD_BOUND_MS)
 );
 
