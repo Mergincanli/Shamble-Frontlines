@@ -228,7 +228,12 @@ the advisor rules."
 - M9, 22:38:50-: the card save 9c2fcf473f495a93c5852e214e7b0615b3126872 pushed (carries 6968215; its subject has no
   skip marker); the branch clean = origin; the saver restarted as bycyr4c38 (110 minutes, to about 00:29). CI on
   9c2fcf4, all four started 22:38:5x: push gate 45906116335 and toolchain 45906116365; pull request gate 45906121962
-  and toolchain 45906121987. Their results: (fill).
+  and toolchain 45906121987. Their results, all four success, attempt 1: push gate 45906116335 (22:38:52-22:39:40;
+  jobs gate 140203123521 and smoke 140203124576, its "Smoke (check 5a)" step success), push toolchain 45906116365
+  (22:38:52-22:46:49), pull request gate 45906121962 (22:38:56-22:39:37), pull request toolchain 45906121987
+  (22:38:56-22:46:57); PR #40's check_suite.completed event at 22:48:52 (nothing failed or running). M9's CI bar is
+  met. Left in M9: the advisor's read of the pushed head at 00:50 (U7-M-8, with the M3 retry and the form's fix),
+  then the cleanups in the forms it names.
 
 ## Risks
 - M5's counts move with MAIN-68 and Builder 2: each bar comes from this merge's own base run on its own H0 (MAIN-68's
