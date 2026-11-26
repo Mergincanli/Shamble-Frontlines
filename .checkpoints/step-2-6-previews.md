@@ -1,4 +1,4 @@
-# Checkpoint: step-2-6-previews (lane 2, Builder V2): step 2.6's plan, the preview links
+# Checkpoint: step-2-6-previews (lane 2; Builder V2, then from 2026-11-26 the new lane-2 builder chat): step 2.6, the preview links
 
 Branch `claude/optimistic-albattani-mdoonz` (stands in for `cs/step-2-6-previews`; this session may push only it),
 restarted at main c1da1bd24faae21794195e2384895460753a41eb (#67's merge, 2026-11-25). Risk tier 2 for the build (a CI
@@ -126,21 +126,64 @@ HIS ANSWERS (2026-11-26 12:21:32 UTC, in DECISIONS): GUARD-OFF (a), MAIN-WALL-AG
 (start-block-new-chat.md); until then: no change under .github/ or the kit, no main-folder move, no merge (item 6).
 The report so far: docs/reports/2026-11-26-step-2-6-previews.md, committed 8c8ad0d0 (pushed). The docs pass
 committed with a report fix as b35c6c08 (pushed; checked before commit: lane 2's lines only, the ROADMAP move byte
-for byte under OLD-LINES (a)). Next: the advisor agent's review of head b35c6c08 (a general agent reading main's
-advisor.md; notes advisor-head-b35c6c08.md); then wait for his five answers (GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT,
-GIT-IN-NODE, TAG-CHECK). If GUARD-OFF (a): hand over to a new one-repository chat from this checkpoint.
+for byte under OLD-LINES (a)).
 Head reviews done: b35c6c08 (ESCALATE; fixed in 5c1f6b72), 5c1f6b72 (ESCALATE, only Lows open: H1-H4, N1, D1
-ride the next push, see B16). HAND-OVER: the start block goes to him with the branch head named; main moved to 2483e9a7 (#70), #72 conflicts in
-the shared docs: the new chat takes main in first. Builder V2 stops pushing to the branch once the new chat confirms.
-Next (old list, still valid for the rest): the advisor agent's recorded verdict on GUARD (options: (a) finish 2.6's risky steps, U6, the token sitting and the merge, in a
-new one-repository chat from this checkpoint; (b) stay here with asks; plus a live probe only while he watches;
-plus the kit change-set to find out why, the security-auditor's recommendation); the question file in the notes,
-pushed, named with its commit; the report (U8) with the docs pass (STATUS, ROADMAP, REPO_MAP report row; follow-ups:
-TE-H 07, 08, 16, 17, 23, 24, the security-auditor's Low (shell, NODE_OPTIONS/BASH_ENV, container/services), TE-K);
-the report's top corrects "Guard: yes" and carries B15/B16's process facts; the advisor agent's review of the head; the token sitting once the protection for main is merged; the throwaway out (U6); the
-verifier on the final diff; ready; then his
-sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
-him again (his MAIN-WALL (b)).
+ride the next push, see B16), 266f42e7 (REVISE), 0bff2a75 (APPROVE with one condition, N1: met by the "Branch head:"
+line in his paste). HAND-OVER: the start block went to him with the branch head dc00c79a named.
+
+## The new lane-2 builder chat (from 2026-11-26; one repository, so the guard loads)
+Session session_019YNMUUMZBxnFZJY9gp6qxy, on his personal account, Opus 5.5 (Fable 5.2 as the advisor tool: an extra,
+his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.md, plus "Branch head: dc00c79a...").
+- T1, the guard check (item 1), in the main folder (branch claude/zen-bardeen-m030ws at 2483e9a7, equal to main):
+  `git merge --ff-only HEAD~1` alone. The tool's answer: "Denied by user". The guard's rules decide "ask" for that line
+  (`.claude/hooks/routine-guard.mjs:1383-1387`, "only origin/main merges into the main folder"; :1403 returns the ask)
+  and the hook prints an ask on PreToolUse in a day session (`.claude/hooks/guard.mjs`). What this chat saw is only the
+  denial; whether the prompt he saw carried the guard's reason text, only he saw: asked to confirm (GUARD-PROMPT). To be
+  closed before the first `.github/` change (wall-test.yml's removal at the token sitting).
+- T2: `git fetch origin claude/optimistic-albattani-mdoonz`; `git rev-parse` gave dc00c79aa1863d39dd31c1b9300bdb79a8142960,
+  equal to his "Branch head:" line; worktree `.gate/step-2-6` (local branch tracks origin). The five sha256 matched.
+  Takeover told to him in one line. Subscribed to #72's activity: the tool named no other session watching it.
+- T3, main taken in (item 6b): merge commit 6c8127005a8e805429571ec243632609fc143f1a (parents dc00c79a, 2483e9a7),
+  scripts/resolve70.py (lines moved, never retyped; DECISIONS merged by entry, because git moved a last line two entries
+  share out of a block: block-by-block would have cut main's STOP-4A entry short), checked by scripts/verify70.py
+  (result = ours + theirs - base per line; DECISIONS by entry, each side's order, newest first) and three planted defects
+  caught (scripts/control70.py: a dropped main line, two main entries swapped, main's "Last updated" dropped). Beyond the
+  conflict blocks: STATUS keeps both "Last updated" lines and joins lane 2's own Waiting bullet into one line (120);
+  ROADMAP's oldest "Recent work" entry, Part 15 (PR #57), moved byte for byte to "Build history" after change-set 0
+  (OLD-LINES (a): the report must list it). Staged tree: vs dc00c79a exactly main's 39 files; vs main exactly the
+  branch's 62. Five sha256 unchanged; 175 tests pass; repo map OK (222 entries, 114 paths); gate PASS (--no-smoke; the
+  tools' packages installed in the worktree with `npm ci --prefix tools --ignore-scripts`). `git ls-remote` showed main
+  still 2483e9a7 just before the commit. Pushed alone (dc00c79..6c81270, a fast-forward): this chat's first push to the
+  branch was accepted. #72: draft, mergeable, no longer conflicting.
+- T4: the advisor agent's review of 6c812700: running (notes advisor-head-6c812700.md, committed when it is done).
+  CI on 6c812700 (read 2026-11-26 ~13:30 UTC): gate and smoke green (push and pull-request runs); preview/tests green,
+  "# tests 175", "# pass 175", "# fail 0" (job 139939171777, 13:23:26 UTC); wall-test's planted jobs red, as designed
+  (push-to-branch 139939153439, pr-plain 139939172242, pr-no-deployment-record 139939172739); toolchain running.
+- T5: GUARD-PROMPT asked of him (questions-2026-11-26-new-chat.md): main's hook script, run by hand on the probe's
+  command and folder, prints permissionDecision "ask" with the reason "the main folder stays on main's reviewed
+  rules: git merge would move it (only origin/main merges into the main folder ...)"; whether his prompt showed it,
+  only he saw.
+- Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
+  merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
+
+## Next (his item 6, in order)
+c. Wait for the Guard fix chat's protection for main to merge (his TOKEN-TONIGHT (b), MAIN-WALL-AGAIN (a)). If it is
+   not merged by his click on the real token, ask him again first (MAIN-WALL (b)).
+d. The token sitting, one message to him in this order (the security-auditor's conditions): (a) reload the `preview`
+   environment page, screenshot (bypass box unticked, "Selected branches and tags", "1 branch and 0 tags allowed",
+   `main`, no custom rule); (b) both secrets only by "Add environment secret"; (c) after the secrets, the Actions,
+   Dependabot and Codespaces secret pages show no CLOUDFLARE_ name (screenshots); (d) this chat re-runs M1, a fresh run
+   and a re-run: the refusal line through the annotations API and zero steps for all three jobs, a deployment record
+   with status failure expected; (e) delete WALL_TEST, and wall-test.yml leaves the branch (a .github/ change: the guard
+   asks him). The token's start and end dates in their own fields, 90 days apart, never the single-date chip; its end
+   date into STATUS with a reminder 14 days before.
+e. The verifier on the final diff; fold this checkpoint into the report and delete `.checkpoints/step-2-6-previews*`
+   in the last commit before ready; a head without [skip ci]; the advisor agent's review of that head; ready.
+f. His go after his Advisor's merge check; merge with the approved head as the expected head (MCP merge tool).
+g. After #72 and the CI Builder's hand-over step (#59) are both merged: M5 to M11.
+For the docs pass before ready: STATUS's #72 row and lane 2's Waiting bullet and Next item 3 still describe the
+hand-over as to come; the report's Outcome, Proposed next step and For Mustafa likewise; the report lists the Part 15
+move (OLD-LINES) and the merge 6c812700; the report's process facts gain T1's probe.
 
 ## Findings during the build (U1)
 - F1 (a defect in the approved preview.yml, job `tests`): `run: node --test hosting/` fails on Node 22: the folder is
@@ -158,12 +201,18 @@ him again (his MAIN-WALL (b)).
   4.165.0 (2026-11-18 21:44 UTC) turns 7 days at 2026-11-25 21:44 UTC.
 
 ## Rules in force
-- Until a second guard fix is merged: git and gh always start their own command, with no other program in front.
-  In practice: each git or gh call is its own Bash call, starting with git or gh, with nothing before it and
-  preferably nothing after it (no cd, no pipe, no loop); agents' briefs say the same.
+- His "Unchanged" (2026-11-26 12:21:32 UTC): git and gh always start their own command, with no other program in
+  front of them. In practice: each git or gh call is its own Bash call, starting with git or gh, with nothing before
+  it and preferably nothing after it (no cd, no pipe, no loop); never `git -C`, `-c` or `--git-dir` (the guard refuses
+  an option before the subcommand: routine-guard.mjs:1087). The shell is moved into `.gate/step-2-6` by a `cd` call of
+  its own; `git rev-parse --show-toplevel` alone before every add, commit and push. Agents' briefs say the same.
 - In the main folder, only `git switch -c <new> origin/main`, `git merge --ff-only origin/main` and
   `git pull --ff-only origin main`; every other merge happens in a worktree under .gate/.
-- The background saver (checkpoint.mjs watch) stopped at its time limit (2026-11-26 00:56:35 UTC, nothing unsaved)
-  and stays off until his GIT-IN-NODE answer: it runs git inside node. Until then checkpoints are committed and
-  pushed by hand, each git call alone.
+- GIT-IN-NODE (a): main's tracked kit scripts may run git (the saver, checkpoint.mjs, may run again); a script a chat
+  writes itself never runs git and never writes a protected file (resolve70.py, verify70.py, control70.py run no git
+  and write only docs/ or the scratchpad). This chat commits checkpoints by hand, each git call alone.
+- Push only to claude/optimistic-albattani-mdoonz; never touch spikes/; the token goes from Cloudflare's page into
+  GitHub's secret box and nowhere else; the environment wall's detail stays out of every pushed file; no account ID,
+  e-mail address, Windows user name, Access ID or `kid` value in repository files. When waiting on him: the full
+  question as a file in the notes, pushed, named with its commit in the message.
 - At most 3 agents at a time; Opus; effort xhigh for infra/security design work on the drafts' parts.
