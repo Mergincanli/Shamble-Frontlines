@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 16:03 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 16:36 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -129,7 +129,9 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     and `load_file` (`bundle.rs`), the movement kind (`movement.rs`), the refusals (`error.rs`), and
     `packages/client/scripts/legacy-extract.mjs` with the 2,038 numbers of the old tuning file as written.
     **2,888 written lines.**
-11. **Step 3 BUILT, the local checks running on it (not committed yet): 4,824 written lines** (the sheet gave the
+11. **Step 3 DONE** (commit bdc85ca, pushed; the local checks passed whole; **CI green**: toolchain 6 min 52 s, 71 s
+    more than on step 2a; Chromium 18 passed in 3.3 min; **Firefox 160 passed 3, the new content spec among them**:
+    the corpus is also what Firefox's own engine gives for all 13,067 numbers): **4,824 written lines** (the sheet gave the
     step 800 by the designs' count; it took 1,936). What it holds:
     - `packages/client/scripts/corpus-texts.mjs` (+ test) writes `crates/devtools/vectors/content-corpus.txt`
       (13,067 numbers: the 2,038 old ones as written, 5,000 doubles from random bits, 5,000 decimals in many
@@ -161,7 +163,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
       same generator, and `content` depends on nothing), not in `crates/content/tests/`; `Field` and `Range` live
       in `read.rs`; the four classes that make megabytes run a tenth of the count; the browsers run the release
       profile only; the tree corpus is new (the test list's writer-structure point).
-    - Three fresh seeds by hand: still to run and note (SHAMBLE_FUZZ_SEED).
+    - Three fresh seeds by hand (`SHAMBLE_FUZZ_SEED`, release, 1,000,000 inputs each): 20261127, 777 and 31337:
+      no panic, every promise kept; the stages' shares within 1 in 100 of the committed seed's.
 
 12. **His Export at 30 steps arrived** (his message of 2026-11-26, 15:07:24 UTC, sent while the chat was working:
     "This is for later when you need it again"). Saved by script, never retyped: the whole message is
@@ -174,11 +177,68 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     (`values.soldier.gun`), the list of changed entries moved up by the step rate's own entry, and two measured
     pixel counts. It is needed at step 8 (4b-2), where DIFF-LIST is asked with it.
 
+13. **Step 2b DONE** (commit 0d4505f, pushed; the local checks passed whole: 18 browser tests in 209 s): **5,868 written lines** (the step took
+    1,044). What it holds:
+    - `crates/content/src/map.rs`: the map kind (`shamble-map` 1): `bounds`, at most 16 `spawns`, 512 `shapes` (a
+      box or a ramp inside its box, axis-aligned), 64 `regions`; the typed read and the map's own rules (`check`):
+      the bounds on whole centimetres and every other corner on whole millimetres; at least 1 cm thick on every
+      axis, counted in whole steps (0.14 to 0.15 is 1 cm although the subtraction of the two doubles gives less);
+      every shape, spawn and region inside the bounds; at least one spawn; an id once in its list; **the bounds
+      inside the aim's reach** (`AIM_REACH_CM` 32,767 both ways on x and z, `AIM_HEIGHT_MAX_CM` 65,535 from the
+      floor at 0: his DEPART-4 note). Five new refusals (`OffGrid`, `TooThin`, `OutsideBounds`, `BeyondAim`,
+      `DuplicateId`), each with its record and sentence. `read.rs` reads a corner (`numbers::<N>`); the bundle
+      holds the folder `maps/`.
+    - `crates/devtools/tests/aim_reach.rs`: the reach against the aim point's own field types (a wider field
+      fails it, by name).
+    - The proofs' generator makes maps (the document built in code, never read) and four new classes (a valid
+      map; a list too long or a word it does not know; a box off its grid, too thin or outside; past the reach,
+      no spawn, an id twice); bundles hold maps; the fuzz run mutates them. **37 classes; 1,000,000 fuzz inputs
+      in 34 s; three hand plants in map.rs each caught** (a reach 1 cm too wide, 9 mm taken as 1 cm, a point
+      under the bounds taken).
+    - **Departures from the sheet, for the report:** every corner of a map but the bounds lies on whole
+      millimetres (so that "at least 1 cm" is exact: a rule the sheet did not have); the loader asks for at least
+      one spawn, not "the match's slot count" (the content does not know the mode; the match's own count is
+      checked where the match is set up, 4c); the map's own rules name the field and no line.
+14. **game-designer's read of the old tuning file's durations: DONE** (`cs4b-content/game-designer-durations.md`,
+    `legacy-duration-paths.txt`; input `duration-candidates.txt`, 727 fields, by `duration-candidates.mjs`): 52
+    fields holding 69 numbers are durations (50 fields in seconds, 2 in milliseconds; 42 fields rules, 10 look);
+    all are whole milliseconds but `FIXED_DT`, the old game's own 60 Hz step, which it left to the builder: kept on
+    the list as kind `step` (no interval of play; the tick replaces it), by script, said in the list's first line.
+    **Its question for Mustafa, DUR-1** (which fire rate counts as the old game's: the old code never carries a
+    timer's leftover, so the Shabzon fired about 720 shots a minute at 60 frames a second where the table's
+    interval gives 833; ADR 0004 carries the leftover; its recommendation: the table's value now, tuned by play):
+    goes into 4b-1's report; it binds change-set 8 (PM-0004-9), not 4b. Its note for the builder: some of the old
+    game's timers are typed into its functions and are in no table (a bot's lunge 2.5 s, fire locks of 0.1 to 0.2
+    s): the report cannot see them; 4d's import and change-set 8 will.
+15. **Step 4 DONE, committed locally (not pushed until the full checks pass with step 5): 6,091 written lines**
+    (the step took 223): `devtools::files::read_plain` and `packages/sim-worker/boundary/plain-file.ts`, the six
+    readers moved, planted links on both sides, a text scan in `tests/recordings.rs`. The folder check of 4a also
+    asks for the folder by its own path with no last separator.
+16. **Step 5 BUILT, the local checks running on steps 4 and 5: 6,592 written lines** (the step took 501):
+    `crates/content/src/time.rs` (`UNITS_PER_SECOND` 3,000, `units_from_seconds`), `crates/sim/src/time.rs` (the
+    same number, `UNITS_PER_TICK` 100, a constant check for 30 and 60 Hz), `legacy-extract.mjs` writes
+    `vectors/legacy-durations.txt` (69 durations as written) from the reviewed list
+    `vectors/legacy-duration-paths.txt`, `devtools::time_report` with its tool (`time_report [--check]`) and the
+    committed `vectors/time-report.txt`: **3,000 holds 68 of the 69 with no rounding (the 69th is the old step);
+    600 rounds the 0.072 s fire interval by 0.46 %; 60 rounds 12 of them**; a rule's interval under one tick fails
+    the report (a planted 0.02 s does). `tests/time_unit.rs`: the oracle is three units a millisecond of each
+    text's own digits. **Departures:** the reviewed list is a data file the script reads, not a constant in the
+    script; the report does not list the 675 fields that are no durations (game-designer's notes name the
+    duration-like ones left off); no shot counts over 60 s (PM-0004-9 is change-set 8's).
+17. **His message of 2026-11-26, 15:35:38 UTC (VISION-RULE)**, sent while the chat was working (queued command
+    dcae7c82-851e-46e8-afe6-b0ee784ab13c in the transcript): a game rule to record "at 4b-1's docs pass and not
+    before" (saved by script then: DECISIONS, `docs/adr/README.md`, one STATUS line; no ADR text; no code); his
+    point 6 (a "blocks sight" flag in 4b?) answered in the chat when step 5 is done; his point 7: the chat's main
+    folder up to main (3b949c1) by a fast-forward when step 5 is done. Main also moved under this branch (#73,
+    #74: the guard, `toolchain.yml`, `packages/e2e/playwright.config.ts`, docs): merged into this branch before
+    the docs pass.
+
 ## Current step
-4b-1, step 3: read the local checks (`.gate/local-checks.log`), commit, push, read CI, post on the board. Then
-step 2b (the map kind with its rules, the aim reach, the tie test; the generator gets the map's classes), step 4
-(the links check), step 5 (the time unit; game-designer reads the duration paths first).
-**At 4,967 written lines he gets one sentence on where the build stands** (now 4,824: it comes early in step 2b).
+4b-1, steps 4 and 5: read the local checks (`.gate/local-checks.log`), commit step 5, push, read CI, post on the
+board. Then: his point 6 and point 7; main merged into this branch; the close (the plants script; reviewers:
+rust-reviewer, engine-architect, security-auditor, then test-engineer; the verifier; the advisor agent on the head;
+docs-keeper with his messages of 2026-11-26 and VISION-RULE; the report; the draft pull request).
+**The count is 6,592 of 7,450: 858 lines are left for the reviews' fixes.**
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -213,4 +273,5 @@ step 2b (the map kind with its rules, the aim reach, the tie test; the generator
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- No agent runs. No saver runs: the main session commits the notes by hand.
+- No agent runs. No saver runs: the main session commits
+  the notes by hand.
