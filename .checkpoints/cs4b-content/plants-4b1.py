@@ -36,6 +36,7 @@ RECORDINGS = test("recordings", "the_plain_read")
 TIME_UNIT = test("time_unit")
 AIM = test("aim_reach")
 CAPS = test("content_fuzz", "at_its_caps")
+KEYS = test("content_fuzz", "the_search")
 SCAN = ("cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan", "the_content_crate")
 UNIT = ("cargo", "test", "-p", "content", "--locked")
 NODE = ("node", "node_modules/vitest/vitest.mjs", "run", "--root", "packages/sim-worker", "--dir", "packages/sim-worker/boundary")
@@ -102,6 +103,17 @@ PLANTS = [
      UNIT, ["an_echo_is_short_and_shows_no_raw_byte_outside_printable_ascii", "x22"]),
     ("e", "the content crate calls what can panic, outside its tests (the scan beside its lint guard)", BUNDLE, "    is_id(id).then_some((folder, id))", "    Some(is_id(id).then_some((folder, id))).unwrap()",
      SCAN, ["the content crate breaks its rules", "bundle.rs", "`unwrap`"]),
+    # Round 2's fixes.
+    ("f", "a list keeps the room it grew by (security-auditor's chains: 288 bytes for an object of six)", JSON, "        members.shrink_to_fit();\n", "",
+     CAPS, ["a file of 528 chains of thirty objects of one member", "bytes held for"]),
+    ("g", "the search for a key that is there twice walks every pair of keys (test-engineer's plant)", JSON, "        let mut order: Vec<usize> = (0..members.len()).collect();", "        'walk: for (at, a) in members.iter().enumerate() { for b in members.iter().skip(at + 1) { if a.key == b.key { break 'walk; } } }\n        let mut order: Vec<usize> = (0..members.len()).collect();",
+     KEYS, ["16,383 different keys took", "more than twenty times"]),
+    ("h", "the content crate's lint guard allows where it denied", "crates/content/src/lib.rs", "    deny(\n", "    allow(\n",
+     SCAN, ["no longer denies clippy::unwrap_used outside its tests"]),
+    ("i", "the same call written after a path, which the first scan did not see", BUNDLE, "    is_id(id).then_some((folder, id))", "    Option::unwrap(Some(is_id(id).then_some((folder, id))))",
+     SCAN, ["the content crate breaks its rules", "bundle.rs", "`unwrap`"]),
+    ("j", "a map's own rules are counted with a file's name against its id again, and no map reaches them", "crates/devtools/src/content_proofs.rs", "        | Kind::DuplicateId { .. } => return 9,", "        | Kind::DuplicateId { .. } => return 8,",
+     FUZZ, ["a map's own rules settled 0 in 10,000 verdicts, under its 10"]),
 ]
 
 def note(letter, kind, ok, what, detail):
@@ -155,8 +167,8 @@ def main():
     lines.append(f"EVERY FILE PUT BACK (sha256 of {len(touched)} files as at the start): {'yes' if back else 'NO'}")
     if not letters:
         # The clean tree again: the module rebuilt, then the checks the plants used, all green.
-        exits = [run(*WASM)[0], run(*UNIT)[0], run(*test("content_proofs"))[0], run(*TIME_UNIT)[0], run(*AIM)[0], run(*test("recordings"))[0], run(*CAPS)[0], run(*SCAN)[0], run(*NODE, "content", "plain-file")[0]]
-        lines.append(f"CLEAN TREE GREEN: the test module's build, the content crate's tests, the proofs, the time unit, the aim tie, the recordings, the caps, the source scan, Node: exits {exits}")
+        exits = [run(*WASM)[0], run(*UNIT)[0], run(*test("content_proofs"))[0], run(*TIME_UNIT)[0], run(*AIM)[0], run(*test("recordings"))[0], run(*CAPS)[0], run(*KEYS)[0], run(*FUZZ)[0], run(*SCAN)[0], run(*NODE, "content", "plain-file")[0]]
+        lines.append(f"CLEAN TREE GREEN: the test module's build, the content crate's tests, the proofs, the time unit, the aim tie, the recordings, the caps, the two key shapes, the fuzz run, the source scan, Node: exits {exits}")
     open(".checkpoints/cs4b-content/plants-4b1.txt", "w").write(f"plants on {commit}\n" + "\n".join(lines) + "\n")
     print("\n".join(lines[-3:]))
 

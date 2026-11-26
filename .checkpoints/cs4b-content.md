@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 18:05 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 18:30 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -426,6 +426,43 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
       - TE-8 Low: the million-input run is NOT by hand: CI's toolchain job runs the tools crate's tests in
         release (`toolchain.yml:162`). By hand are only clippy and the content crate's own release tests. The
         brief's item 10 and this card were wrong on that; the report says it right.
+    - **engine-architect, round 2: DONE** (`engine-architect-review-4b1-round2.md`): no Critical or High; seven
+      of its eight closed (EA-2 by run: ts-rs 12.0.1 on copies of the map's types gives a plain TypeScript
+      union now); EA-6 open as planned (the sentence that defers the facing's zero to step 8 is already in
+      `map.rs`; what step 8's line must state is in its notes: 0 faces +z and degrees grow toward +x, the old
+      game's own convention; how the simulation reads an angle without a std sine is to be chosen before the
+      first map file). The raw players' build is byte for byte round 1's. New, all Low: the guard check matched
+      lint names, not the deny (= R2-SA-2); the content scan took the simulation's escape for a hashed map; a
+      file-level `#![cfg(test)]` is not seen as test code (it fails closed; a note for step 9's plan); a limit
+      case and its name were tied by position; the scan's opening comment named only the simulation.
+30. **Round 2 is complete: no Critical or High from any of the four.** Within the budget, no third round (a third
+    is only for an open Critical or High). **The last fix pass: DONE** (commit 2039e3c,
+    2026-11-26, 18:30 Amsterdam; the full local checks passed whole: 196 Rust tests in debug and 195 in release, 33
+    boundary tests, 18 browser tests in 208 s, the players' file byte for byte main's; the million-input fuzz run in
+    release; **7,164 written lines, 286 under the stop line**; the pass took 232):
+    - R2-RR-1: the corpus's 2,000 ties are real ties (an odd whole number over 2^places, kept when the engine's
+      own text has one decimal less than the number has binary places; at most 100 for one count of places; 2
+      to 25 places, 1,700 of them at 5 or more), and every power of two has both signs: **26,653 numbers**. The
+      script's test asserts both.
+    - R2-SA-1: every list is cut to its length when it closes; two more limit cases, seven in all (the chains
+      file: 96,103 bytes in, 1,197,625 held; the bundle of two such trees: 1,413,367 in, 2,469,864 held; both
+      verdicts written from reasoning and right at the first run). A limit case is found by its name.
+    - TE-1: the map's own rules are the fuzz run's tenth stage (20 in 10,000; at least 10). The verdicts file
+      moved in one line only, the fuzz line that folds the stage: no class's digest moved.
+    - TE-2: `the_search_for_a_key_that_is_there_twice_does_not_walk_every_pair` (16,383 different keys against
+      one key 16,383 times: 2.3 times in debug, 1.6 in release; refused past 20).
+    - TE-3: the comments of the two WebAssembly tests say what their ceilings are: backstops; memory per case
+      is proven natively.
+    - TE-4: the report's rounding at 4.5 units. TE-5 / R2-RR-5 / R2-SA-3: the links scan counts every way to
+      read a file; the plain read's doc says what it does not do. TE-6 / R2-RR-2 / R2-SA-2 and
+      engine-architect's Lows: the content scan (calls after a path, `unwrap_err`, the assert macros; a test
+      mark counts only on an item; no escape for a hashed map; the guard's seven lints read as denied, by
+      tokens; 17 planted breaches, 8 controls). R2-RR-3: a refused string's count stops at the refusal.
+      R2-RR-4: `number.rs`'s opening.
+    - Follow-ups, not fixed: TE-7 (one sentence per refusal pinned in a table); a file-level `#![cfg(test)]`
+      in the scan (step 9); the older vector readers outside this change-set; RR-2's CI steps; EA-6.
+    - The plants script: five more (f to j: the list's room, the pairwise key search, the guard allowed, a
+      panic call after a path, the map's rules counted away), 34 texts in all, each standing once.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -435,14 +472,12 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
 - The card's "Last update" was once written 34 minutes ahead of the clock and corrected before it was committed.
 
 ## Current step
-4b-1, the close: review round 1 is in (three reviewers, no Critical or High) and its one fix pass is committed
-(d36e416; 6,932 written lines of 7,450). Now: push, CI; test-engineer's read and round 2 on what changed, on that
-head (briefs: `cs4b-content/review-brief-4b1-test-engineer.md`, `review-brief-4b1-round2.md`; at most three agents
-at a time); one last fix pass (it also adds EA-6's line on the facing's zero to the map's doc); the whole plants run on that head; the
-verifier until PASS; docs-keeper (his messages of 2026-11-26 into DECISIONS by script, VISION-RULE with them, the
-ADR index, STATUS with 4B-AIM-REACH and the follow-ups, ROADMAP, REPO_MAP); the report (its first lines: what moved
-4b from 5,410 to about 7,050 by the designs' count, and the new estimate for the first build he can move a soldier
-in); the advisor agent on the head; `.checkpoints/` out of the head; the draft pull request; his go.
+4b-1, the close: both review rounds are in (no Critical or High) and the last fix pass is committed (2039e3c).
+Now, in this order: push, CI; the whole plants run on that head (nothing else may run
+in the tree meanwhile), its file committed; the verifier and docs-keeper's second part side by side
+(`cs4b-content/docs-keeper-brief-4b1-part2.md`); the report (`docs/reports/2026-11-26-cs4b1-content.md`; its
+draft is in the session's scratchpad); the notes out of the head in the last commit; push, CI; the advisor agent
+on that head; the draft pull request; his go.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -477,4 +512,4 @@ in); the advisor agent on the head; `.checkpoints/` out of the head; the draft p
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- engine-architect (round 2) is running; no edit to the tree until it is done. No saver runs: the main session commits the notes by hand.
+- No agent runs. Next in the tree: the plants run (it edits source files, so nothing else runs beside it). No saver runs: the main session commits the notes by hand.
