@@ -1812,7 +1812,7 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
   7be0a933 in a separate worktree; risk tier 2; no pull request yet; four security-auditor rounds, the fourth by his
   leave (R3-WAY, 2026-11-25, 23:01:07 UTC) and the last; by his R4-END (1) what is approved merges, with R4-1 open, on
   his go; report `docs/reports/2026-11-26-guard-wrappers.md`; the notes in `.checkpoints/guard-wrappers/`
-  (readable at commit <SHA-NOTES>). Class words only: every form stays out of the repository (his words of 2026-11-25,
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd). Class words only: every form stays out of the repository (his words of 2026-11-25,
   16:34:18 UTC, item 3e, and of 2026-11-26, 14:09:28 UTC, item 1). The ids are security-auditor's (SA-, R2-, R3-, R4-),
   the advisor agent's (ADV-) and the chat's (INPUT-RUN)):
   - Left open as security findings: R4-1 (Critical) and INPUT-RUN (a named limit): "Open bugs and risks",
@@ -1923,7 +1923,7 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
 STATUS's "Decisions pending"; his decisions and the queue of his words are in `docs/DECISIONS.md`._
 - **Taken by the advisor agent for guard-wrappers** (not his; its notes `.checkpoints/guard-wrappers/advisor-plan.md`
-  (readable at commit <SHA-NOTES>); no form named): the plan APPROVE with 9 conditions (plan section 7); round 1's fix
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd); no form named): the plan APPROVE with 9 conditions (plan section 7); round 1's fix
   pass APPROVE with conditions, SA-D-DIRECT approved in advance if he said yes (he did, (a), 2026-11-25, 19:36:42 UTC);
   R2-1 raised from Medium to Critical (an agent's kit write passed with no refusal, the class of SEC-U7B-1 and SA-d), so
   a third round on what changed, with SA-g's refinement riding and R2-2 not; round 4's plan change: the round-4 build

@@ -110,7 +110,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     answer to the session's recommendations; for main: DOCS-54 (a), NS-TRAILER (b) and NS-FIRST (b)", the question
     shown under it as the session's text). This item leaves "Queued" when the change-set that carries it out merges.
   - The Guard fix chat's queue (session_019YNMUUc6oiiNVygR9H56Q7; each message whole under "Decisions, newest first",
-    copied by script from its saved file in `.checkpoints/guard-wrappers/` (readable at commit <SHA-NOTES>)), in his
+    copied by script from its saved file in `.checkpoints/guard-wrappers/` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd)), in his
     order of 2026-11-26, 14:09:28 UTC (item 4), which also adds SOURCE-GO (a) to the review tracks:
     > 4. Order after this merge: MAIN-WALL first, because it is the wall behind the guard and the preview links' token sitting waits for it. Then one guard change-set with R4-1's fix and GUARD-KIT together. Then the review tracks, which also get one more line: a change under content/source/ needs my go (SOURCE-GO (a)). If security-auditor says R4-1 cannot wait behind MAIN-WALL, tell me why in two lines before you start, and I decide.
     - MAIN-WALL (his message of 2026-11-25, 19:36:42 UTC, items 2 and 3):
@@ -191,7 +191,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; his
   label: "From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor)."; message
   8b580300-4b0f-43b3-bcd6-e2adacc82158, whole; copied by script from the chat's saved file
-  `.checkpoints/guard-wrappers/mustafa-2026-11-26T1505-r4-end.md` (readable at commit <SHA-NOTES>), which the chat
+  `.checkpoints/guard-wrappers/mustafa-2026-11-26T1505-r4-end.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat
   copied by script from its transcript). What it answers, in the chat's words (not his): the chat's stop after review
   round 4 (its checkpoint, step 25): round 4 left R4-1 open as a Critical, so by his words of 2026-11-25, 23:59
   Amsterdam (item 3, the entry of 23:01:07 UTC below) the chat came back with two options only, merge what is approved
@@ -218,7 +218,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; his label: "For the Guard fix chat, from Mustafa (written
   with the main Advisor, 26 November, 13:20 Amsterdam). Nothing here interrupts round 4; read it when the round is
   done."; message 7114411c-dd6a-44ce-a901-d05b104e84fb, whole; copied by script from the chat's saved file
-  `.checkpoints/guard-wrappers/mustafa-2026-11-26T1320-guard-kit.md` (readable at commit <SHA-NOTES>), which the chat
+  `.checkpoints/guard-wrappers/mustafa-2026-11-26T1320-guard-kit.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat
   copied by script from its transcript). What it answers, in the chat's words (not his): nothing this chat asked;
   GUARD-KIT's question is Builder V2's [assumed: from the sources his item 2 names] (its notes, named in his item 2, are
   on lane 2's branch and were not read by this docs pass). His order after this merge was set again at 14:09:28 UTC (the
@@ -240,7 +240,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   the branch `claude/confident-gates-tbnq38`; his label: "For the Guard fix chat, from Mustafa (written with the main
   Advisor, 25 November, 23:59 Amsterdam)."; message 5952192e-fb7d-43d5-8be9-9be4033c3f13, whole; copied by script from
   the chat's saved file `.checkpoints/guard-wrappers/mustafa-2026-11-25T2359-r3-way.md`
-  (readable at commit <SHA-NOTES>), which the chat copied by script from its transcript). What it answers, in the chat's
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat copied by script from its transcript). What it answers, in the chat's
   words (not his): the chat's stop after review round 3 (its checkpoint, steps 17 and 18): two Criticals, R3-1 and R3-2,
   open after round 3, where the review budget stops a change-set for him, and a version pre-built (not applied) for the
   rule his (a) names; the other options of that question are not in the pushed notes. Copied by script (1031 bytes,
@@ -282,7 +282,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; his label: "For the Guard fix chat, from
   Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam)."; message ea6e5ca3-ed40-4075-9b99-c2cb4a45a1b8,
   whole; copied by script from the chat's saved file
-  `.checkpoints/guard-wrappers/mustafa-2026-11-25T2035-sa-d-direct.md` (readable at commit <SHA-NOTES>), which the chat
+  `.checkpoints/guard-wrappers/mustafa-2026-11-25T2035-sa-d-direct.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat
   copied by script from its transcript). What it answers, in the chat's words (not his): SA-D-DIRECT (the plan, section
   8): the part of round 1's finding SA-d that his words of 16:34:18 UTC did not cover, asked of him, with both versions
   built (its checkpoint, step 10: without the direct check 1486 of 1486 tests, with it 1490 of 1490). Points 2 and 3
@@ -427,7 +427,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; his label: "FOR THE GUARD FIX CHAT. From
   Musti, written with my Advisor, 25 November, 18:25 Amsterdam."; message abdc8c59-359e-4751-b81f-ca77097df1cd, whole;
   copied by script from the chat's saved file `.checkpoints/guard-wrappers/mustafa-2026-11-25T1825-review-tracks.md`
-  (readable at commit <SHA-NOTES>), which the chat copied by script from its transcript). What it answers, in the chat's
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat copied by script from its transcript). What it answers, in the chat's
   words (not his): nothing the chat asked. It is a brief, queued ("Queued, in Mustafa's words", above); what its point 3
   lists is what that plan proposes, not a rule in force. His order of 2026-11-26, 14:09:28 UTC (that entry, above) puts
   it after MAIN-WALL and the next guard change-set, with SOURCE-GO (a) added to it. Copied by script (4784 bytes, sha256
@@ -529,7 +529,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`;
   his label: "For the Guard fix chat, from me, written with my main Advisor (25 November, 17:05 Amsterdam)."; message
   0b931bf7-d0c7-4d21-aedf-2549b40573c4, whole; copied by script from the chat's saved file
-  `.checkpoints/guard-wrappers/mustafa-2026-11-25T1705-same-gap.md` (readable at commit <SHA-NOTES>), which the chat
+  `.checkpoints/guard-wrappers/mustafa-2026-11-25T1705-same-gap.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat
   copied by script from its transcript). What it answers, in the chat's words (not his): CAP and SAME-GAP, the two
   questions guard-env-fix (#69) left for him (STATUS's "Waiting on Mustafa" at main 07d673b: CAP, does his 150-line cap
   cover the code files only, or docs and the report too; SAME-GAP, a follow-up guard change-set for the other wrappers),
@@ -600,7 +600,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch
   `claude/confident-gates-tbnq38`; no label of his own (the whole message is one word); message
   fa7b2b85-5eee-4dee-92ad-61803fc38f2a, whole; copied by script from the chat's saved file
-  `.checkpoints/guard-wrappers/mustafa-2026-11-25T1526-go.md` (readable at commit <SHA-NOTES>), which the chat copied by
+  `.checkpoints/guard-wrappers/mustafa-2026-11-25T1526-go.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat copied by
   script from its transcript). No label of his own. What it answers, in the chat's words (not his): the chat's stop for
   his go on its plan of guard-env-fix, pushed at 20902d9 (14:18:10 UTC); the first edit, 21615cb, followed at 14:39:18
   UTC (both read with git log by docs-keeper). Records, not his words: owed since guard-env-fix's docs pass, which
@@ -619,7 +619,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   label: "For a new Claude Code chat on the repository Shamble-Frontlines, from me, Mustafa, written with my main
   Advisor (25 November, 14:55 Amsterdam). I call you the Guard fix chat."; message e6bed9a3-abf2-4663-a1da-cd7a61023df3,
   whole; copied by script from the chat's saved file `.checkpoints/guard-wrappers/mustafa-2026-11-25T1455-brief.md`
-  (readable at commit <SHA-NOTES>), which the chat copied by script from its transcript). No decision code. What it
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat copied by script from its transcript). No decision code. What it
   answers, in the chat's words (not his): nothing the chat asked; it opened the chat. Records, not his words: owed since
   guard-env-fix's docs pass, which recorded none of his words in this file; recorded by guard-wrappers' docs pass.
   Copied by script (2673 bytes, sha256 15ccf157ec2e1723620a5dd6cc08aef8b34c4455c48143fed02a3a763f7b3a30):

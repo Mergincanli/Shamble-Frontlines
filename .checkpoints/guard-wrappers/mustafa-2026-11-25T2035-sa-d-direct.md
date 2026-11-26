@@ -1,5 +1,0 @@
-For the Guard fix chat, from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam).
-1. SA-D-DIRECT: (a). Yes, in this change-set: the version with the direct check (125 added lines, 1490 of 1490 tests).
-2. Your next change-set after this one, before the rule-file plan: MAIN-WALL. Builder V2's security reviewer found a gap in main's merge rule (its notes: .checkpoints/step-2-6-previews/ on claude/optimistic-albattani-mdoonz, questions-2026-11-25.md item 6 and security-auditor-plan.md). I want a rule that only my account can update main, measured on a throwaway repository first: day sessions, the PR Advisor and my revert route must still merge, and my account must not skip gate and smoke. Plan first, my clicks listed once. Say in the plan whether it and the rule-file plan go as one change-set or two; the wall is built first either way, because the rule-file plan lets chats merge on green checks without my go.
-3. Keep the gap's detail out of pushed notes, as with the guard's forms.
-Unchanged: git and gh always start their own command, with no other program in front of them. Each kit write is asked of me with its exact text.

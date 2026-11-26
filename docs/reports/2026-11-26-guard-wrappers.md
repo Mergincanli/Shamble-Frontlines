@@ -10,7 +10,7 @@ round 4 left one Critical open (R4-1, below). His interim rule stays until R4-1'
 their own command, with no other program in front of them."
 
 ## Plan and approval
-Plan (`.checkpoints/guard-wrappers/plan.md`, readable at SHA-NOTES): one option table for every wrapper and keyword the
+Plan (`.checkpoints/guard-wrappers/plan.md`, readable at 68b91211f6336a9308a7b420d205854026eac1dd): one option table for every wrapper and keyword the
 guard strips (an unknown form asks in a session, refuses a subagent); the wrapper loop's turn limit asks (SA-R1-3);
 git or gh behind a program the guard does not strip asks (rule U). The advisor agent: APPROVE with 9 conditions (plan
 §7: met in the copy; 8 and 9 at the apply step and here), then APPROVE on each plan change: round 1's fixes with
@@ -82,6 +82,6 @@ review tracks with SOURCE-GO (a)).
 ## For Mustafa
 1. Your Advisor's merge check on this pull request's head (its full id is in the chat), then your go on that id.
 
-The notes (plan, rulings, reviews, his messages) are deleted from the head and readable at SHA-NOTES under
+The notes (plan, rulings, reviews, his messages) are deleted from the head and readable at 68b91211f6336a9308a7b420d205854026eac1dd under
 `.checkpoints/guard-wrappers.md` and `.checkpoints/guard-wrappers/`. CI (gate, smoke, toolchain) runs on the pull
 request's head; the merge needs it green.
