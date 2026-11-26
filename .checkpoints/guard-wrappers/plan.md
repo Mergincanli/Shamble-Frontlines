@@ -113,3 +113,16 @@ not strip unread.
 Copy: red 18 failures on 5df545c's guard, green 1485/1485; the auditor's exhaustive pass against main (9804 lines):
 no deny or ask became a pass (121 deny→ask, each where the real program is a dash word: SA-e).
 Size against main: guard +38/−14, tests +77/−3 = 115 added lines of code and tests (stop line 200).
+
+## 9. Round 4 (Mustafa, 2026-11-25 23:59: R3-WAY (a); one last round, on what changed since round 3 only)
+His words: "xargs asks me in a session and refuses a subagent, unless a read-only program follows it." Round 4 is the
+last round; a Critical or High left open means two options only (merge what is approved, or drop the change).
+- Built in the copy `.gate/guard-wrappers/hooks-r4b/` (not yet applied). It closes R3-1 and R3-2 as his line says.
+- The pre-built hooks-r4 had dropped R2-1's check (R2-1 reopened there); found before applying, closed in hooks-r4b.
+- Hunk order: one atomic Edit of the changed function, so the guard never names an undeclared variable between asks.
+- Tests: rows R3 and R3b (asks, agent refusals, two silent controls) and five mutants; one mutant anchor re-pointed.
+- Copy: green 1532/1532; red 29 on 9ad6bc9's guard, red 15 on hooks-r4.
+- Size against main: guard +46/−14, tests +103/−3 = 149 added lines of code and tests (stop line 200).
+- Boundary, for the advisor agent's ruling: other programs outside the guard's wrapper table are proposed as a named
+  limit (INPUT-RUN, the class of stated limits L1-L4), a follow-up for the next kit change-set; detail in the scratchpad.
+- Out of this round (his item 4): R2-2, R3-3, R3-4..R3-6, R2-3.
