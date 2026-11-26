@@ -1959,7 +1959,7 @@ _STATUS's "Waiting on Mustafa" lines for the same two pull requests, moved the s
     words on the missing Rule Insights page are in `docs/DECISIONS.md`, 2026-11-26, 17:11:23 and 16:48:48 UTC); SA-MW-R6
     (the stored-credential invariant SA-MW-9: checked by names at click 12, after click 11).
   - T1e not run (his T1E-BEFORE-DELETE (b)): a residual, inferred from the other results, not measured.
-  - Not measured until first use: his own web merge under the wall (T3a, dropped at his request); the first merge from
+  - Not measured until first use: his own web merge under the wall (T3a, not run; see the report's deviations); the first merge from
     his second personal Claude account; T10, one day-session merge and one PR Advisor merge under the wall (STATUS,
     "Phase"). The other lane's token sitting waits for both halves of T10 (his TOKEN-RELEASE (c)).
   - For the rule-file change-set: CLAUDE.md's "Lanes and accounts" quotes his LANE-RULES and ACCOUNTS lines, which say

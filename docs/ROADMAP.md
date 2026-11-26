@@ -293,7 +293,7 @@ REC-OLD (a), with one limit (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC).
 **Main's wall [2026-11-26, the wall on; docs in flight]** — main-wall (MAIN-WALL, risk tier 2: repository settings by his
 clicks, no code; the Guard fix chat): a second ruleset on main, "main-wall (only the owner updates main)", lets only his
 account update main; "Shamble Ruleset 1" is unchanged, so a pull request with gate and smoke green stays required for
-every merge, his included. Measured first on a public throwaway repository (now deleted); the advisor agent approved
+every merge, his included. Measured first on a public throwaway repository (deleted by his click after 17:27 UTC [assumed: his "done" of 17:31:41 UTC]); the advisor agent approved
 the plan (security-auditor: REVISE, text only, all applied) and both approved the results; rollback is one settings switch. Open: T10 (a day-session and a PR
 Advisor merge under the wall). Then, by his SPEED-ORDER (b), the review tracks, then the guard change-set. Report
 `docs/reports/2026-11-26-main-wall.md`; TECHNICAL §8c.

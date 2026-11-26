@@ -32,7 +32,7 @@ _Last updated: 2026-11-26 (MAIN-WALL's docs pass, on the lane branch with main 3
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| none yet | MAIN-WALL (his words of 2026-11-25 19:36:42 UTC: only his account updates main), by the Guard fix chat: the wall is on by his click ("Phase"); this docs pull request records it | `claude/confident-gates-tbnq38` (stands in for `cs/main-wall`) | risk tier 2; GitHub settings by his clicks, no code or workflow changed; measured on a public throwaway repository, since deleted; the plan: the advisor agent APPROVE, security-auditor REVISE (text only, all applied); the results: both APPROVE; report `docs/reports/2026-11-26-main-wall.md` | the advisor agent's review of the pushed head; the merge |
+| none yet | MAIN-WALL (his words of 2026-11-25 19:36:42 UTC: only his account updates main), by the Guard fix chat: the wall is on by his click ("Phase"); this docs pull request records it | `claude/confident-gates-tbnq38` (stands in for `cs/main-wall`) | risk tier 2; GitHub settings by his clicks, no code or workflow changed; measured on a public throwaway repository, deleted by his click after 17:27 UTC [assumed: his "done" of 17:31:41 UTC]; the plan: the advisor agent APPROVE, security-auditor REVISE (text only, all applied); the results: both APPROVE; report `docs/reports/2026-11-26-main-wall.md` | the advisor agent's review of the pushed head; the merge |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
@@ -98,7 +98,7 @@ _Last updated: 2026-11-26 (MAIN-WALL's docs pass, on the lane branch with main 3
   Advisor's documents); routine proofs to record; local smoke's Chromium build; the stale citations left unedited.
 - **From change-sets 0 and 1 (PRs #56, #58) and Part 15:** O1 (PM-0005-54) and O2, his calls with change-set M's plan;
   the first real export; the coat's motion; the machine lines; ADR 0002's package list; #58's other follow-ups and Lows.
-- **From MAIN-WALL** (`docs/reports/2026-11-26-main-wall.md`; the archive's block "From MAIN-WALL"): SA-MW-R1 to -R8 (R5 and R6 done); T1e not run; his own web merge under the wall not measured; for the rule-file change-set, ACCT-LINES: CLAUDE.md's lanes lines say two accounts, he has three ("Waiting on Mustafa").
+- **From MAIN-WALL** (`docs/reports/2026-11-26-main-wall.md`; the archive's block "From MAIN-WALL"): SA-MW-R1 to -R8 (R5 and R6 done); T1e not run; his own web merge under the wall not measured; for the rule-file change-set, ACCT-LINES: CLAUDE.md's lanes lines say two accounts, he has three ("Waiting on Mustafa").; the advisor agent's results condition 5 (click 0's Actions > General screenshot) not received [assumed: open], a Low, no new ask
 - **Merged pull requests' bullets** (moved by script): #49, #50, #51, #48 (gate step 2.3): the archive's "Moved from
   STATUS (2026-11-24)"; #60, #61, #64 to #71, #73, #74: its "Moved from STATUS (2026-11-25...)" and "(2026-11-26...)".
 
