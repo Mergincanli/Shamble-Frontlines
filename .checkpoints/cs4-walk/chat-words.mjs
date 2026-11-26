@@ -3,8 +3,9 @@
 // as a queued command, so both kinds are read. Builder V3's script (its branch, .checkpoints/handover-builder-v3/),
 // with the session and the folder changed. From the worktree's root:
 //   node .checkpoints/cs4-walk/chat-words.mjs words <transcript.jsonl> <marker> <out file> <title> <what it answers>
-//   node .checkpoints/cs4-walk/chat-words.mjs exact <transcript.jsonl> <the whole text> <out file> <title> <what it answers>
+//   node .checkpoints/cs4-walk/chat-words.mjs exact <transcript.jsonl> <the whole text> <out file> <title> <what it answers> [after]
 //   node .checkpoints/cs4-walk/chat-words.mjs part  <saved file> <from line> <before line> <out file> <title>
+// [after]: only messages sent after this time (as the transcript writes it), for a text he sent more than once.
 // `part` copies the lines of a saved text from the line that equals <from line> up to the line that equals <before line>.
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -16,8 +17,8 @@ const [mode, ...a] = process.argv.slice(2);
 if (mode === 'words' || mode === 'exact') {
   // `exact`: the message whose whole text is the marker (a one-letter answer cannot be found as a part of a text).
   const exact = mode === 'exact';
-  const [transcript, marker, out, title, answers] = a;
-  const hits = [];
+  const [transcript, marker, out, title, answers, after = ''] = a;
+  let hits = [];
   for (const line of readFileSync(transcript, 'utf8').split('\n')) {
     if (!line.includes(marker.slice(0, 20))) continue;
     let e;
@@ -31,6 +32,7 @@ if (mode === 'words' || mode === 'exact') {
       hits.push({ t: e.attachment.prompt, at: e.timestamp, id: e.uuid, how: 'the message he sent while the chat was working (stored as a queued command)' });
     }
   }
+  hits = hits.filter((hit) => String(hit.at) > after);
   if (hits.length !== 1) { console.error(`expected one message with the marker, found ${hits.length}`); process.exit(1); }
   const { t, at, id, how } = hits[0];
   writeFileSync(NOTES + out, `# ${title}\n\n_Copied by script from the chat's transcript (${SESSION}), never retyped: ${how} of ${at} (uuid ${id}), whole (${size(t)}). What it answers: ${answers}_\n\n---\n${t}\n`);

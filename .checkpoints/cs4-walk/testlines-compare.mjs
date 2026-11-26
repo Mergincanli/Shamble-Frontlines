@@ -13,8 +13,10 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 const NOTES = '.checkpoints/cs4-walk/';
-const exportText = readFileSync(NOTES + 'testlines-export.json', 'utf8');
-const manifest = readFileSync(NOTES + 'testlines-export.manifest.txt', 'utf8');
+// Two optional arguments, for a later Export: its path without the ending, and where the comparison is written.
+const [EXPORT = NOTES + 'testlines-export', OUT = NOTES + 'testlines-compare.txt'] = process.argv.slice(2);
+const exportText = readFileSync(EXPORT + '.json', 'utf8');
+const manifest = readFileSync(EXPORT + '.manifest.txt', 'utf8');
 const digest = createHash('sha256').update(exportText).digest('hex');
 if (!manifest.includes(`sha256: ${digest}`)) { console.error('the saved Export does not match its manifest'); process.exit(1); }
 const terms = JSON.parse(exportText).old_game_terms;
@@ -59,5 +61,5 @@ const out = [
   ...equal.map((l) => `- ${l}`),
   '',
 ];
-writeFileSync(NOTES + 'testlines-compare.txt', out.join('\n'));
+writeFileSync(OUT, out.join('\n'));
 console.log(out.join('\n'));

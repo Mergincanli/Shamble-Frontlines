@@ -13,12 +13,14 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 const NOTES = '.checkpoints/cs4-walk/';
-const exportText = readFileSync(NOTES + 'testlines-export.json', 'utf8');
+// Three optional arguments, for a later Export: its path without the ending, its comparison, and the list's file.
+const [EXPORT = NOTES + 'testlines-export', COMPARE = NOTES + 'testlines-compare.txt', LIST = NOTES + 'testlines-difflist.md'] = process.argv.slice(2).filter((a) => a !== '--into');
+const exportText = readFileSync(EXPORT + '.json', 'utf8');
 const digest = createHash('sha256').update(exportText).digest('hex');
-if (!readFileSync(NOTES + 'testlines-export.manifest.txt', 'utf8').includes(`sha256: ${digest}`)) {
+if (!readFileSync(EXPORT + '.manifest.txt', 'utf8').includes(`sha256: ${digest}`)) {
   console.error('the saved Export does not match its manifest'); process.exit(1);
 }
-const compare = readFileSync(NOTES + 'testlines-compare.txt', 'utf8');
+const compare = readFileSync(COMPARE, 'utf8');
 if (!compare.includes(`sha256 ${digest}`)) { console.error('testlines-compare.txt was made on another Export'); process.exit(1); }
 const exp = JSON.parse(exportText);
 const show = (v) => (typeof v === 'string' ? `"${v}"` : JSON.stringify(v));
@@ -44,6 +46,7 @@ const leftOut = exp.changed_from_start.length - partB.length;
 const NOT_CARRIED = {
   'simulation.step_rate_hz': 'not carried: the game runs at 30 steps a second (question STEP-60)',
   'soldier.faction': 'not carried: the sandbox session\'s own choice',
+  'soldier.gun': 'not carried: the sandbox session\'s own choice (the gun in his hands when he exported)',
 };
 
 // Part C: names with no number in the old game's tables. [path, what the old game has, optional code text to find]
@@ -109,7 +112,7 @@ const out = [
   '   |---|---|---|',
   ...rowsC(LATER),
 ];
-writeFileSync(NOTES + 'testlines-difflist.md', out.map((l) => l.replace(/^ {3}/, '')).join('\n') + '\n');
+writeFileSync(LIST, out.map((l) => l.replace(/^ {3}/, '')).join('\n') + '\n');
 if (process.argv.includes('--into')) {
   const planPath = NOTES + 'plan.md';
   const plan = readFileSync(planPath, 'utf8').split('\n');

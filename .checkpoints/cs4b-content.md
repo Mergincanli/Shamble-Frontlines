@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 22:16 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 23:09 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -612,6 +612,74 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   as an exact allow-list, build-machine paths in the file refused; engine-architect: the libm rule must allow
   what `f64::round` needs at step 9, or the code rounds in whole numbers). Then step 8 (his yes to DIFF-LIST
   first), 9, 10, the look ahead before 11 and 12.
+- **CI on step 6's head 298837a: green** (gate run 45896663586, with smoke; toolchain run 45896663834, 8 min 7 s
+  for its build-and-test step, the first with the library's 33 packages fetched).
+- **Step 7, the built-file check: DONE** (2026-11-26, 23:09 Amsterdam; commit d313162, pushed; the gate passes; the full local checks passed whole on the final tree: 202
+  Rust tests in debug, twice, and 201 in release, clippy clean, client 115, sim-worker 51, 34 boundary tests, 18
+  browser tests in 209 s, the recordings unchanged; **1,339 written lines of 4b-2**, of 8,450). What it holds:
+  - `packages/client/scripts/build-checks.mjs`: a reader of WebAssembly files (sections, imports, names, target
+    features), an instruction walk of every function body (`wasmCodeOpcodes`: every opcode of WebAssembly 1.0
+    and of the eight features the players' file is built with, with what follows each; an opcode or type it
+    does not know stops the build; a vector instruction, prefix 0xFD, is named with its body), the name rules
+    (`nameSteps`: every `<length><text>` reading of a name, a superset of its path's steps, so a rule can refuse
+    too much and never too little; `fusedMultiplyAddProblems`; `bannedMathsProblems`, 66 C names;
+    `libmProblems`: any function of the `libm` crate, of the toolchain's `compiler_builtins` under `math` or
+    `float`, and any C-named function that is not the bindings' or memory's, outside the allow-list
+    `maths-allowed.mjs`, which is empty today), `twinProblems` and `productionProblems` (the two the build
+    calls), `PLAYERS_IMPORTS` (the bindings' three, to the letter, hash and all: SA-4B2-2), machine paths refused
+    (`/home/`, `/root/`, `/Users/`, `\Users\`, the builder's home, cargo's folder, the repository: SA-4B2-2),
+    `walkedStamp` and `stampProblems`. `CARGO_OVERRIDES` holds `ENSURE_NO_PANIC`.
+  - `build.mjs`: both twins built (release, dev profile) and read before the bindings tool; the players' file
+    read after it; the stamp `packages/sim-worker/pkg/built-file-check.json` (build output, ignored by git); the
+    page's step refuses a file the stamp does not name. No switch skips any of it.
+  - `crates/sim/src/lib.rs`: `compile_error!` under `fma` or `avx2`. `rules_scan.rs`: that one `cfg` let
+    through (a condition whose item is `compile_error!`), the library's name only in `collision.rs` (exact
+    path; no `pub use`, no `as`), the fused family by its C names. `tests/native_target.rs` in `sim`, `content`
+    and `devtools`; the tools crate's also holds that the repository has no cargo config file (`.cargo/`, beside
+    the workspace or a crate) and that no manifest names `rustflags`, `target-cpu` or `target-feature` (the
+    test list's line; planted: a config file committed, caught). One boundary test: the stamp names the file
+    the Worker loads, and Node's own reading of its imports gives the same three.
+  - **Today's files, read by the check:** the release twin 193 functions, all named, 19,504 instructions; the
+    dev-profile twin 1,259 functions, 82,159 instructions; the players' file 153 bodies, **18,939
+    instructions**, three imports, no vector instruction, no maths routine at all (nothing of the library is
+    called yet). Its sha256 is unchanged by this step (b4a9774f...59ba).
+  - **Planted in the real source, by hand through `plants-4b2.py` (the whole run is at the close):** 24 defects
+    caught, each by its rule's own words, and 3 controls held: a `mul_add` exported from the bindings (named
+    `fmaf` in both twins); the same through the vector library from the simulation (release: `libm::math::fma::
+    fmaf`; dev: glam's `Vec3::mul_add` too: so release does keep the name, and the dev twin shows more); a
+    relaxed-SIMD multiply-add (the instruction and the two features); an import named `fma`; JavaScript's sine
+    and the clock imported (the imports rule); `sin()` in the bindings crate (`sinf`); the vector library's
+    exponential (`libm::math::expf::expf`) and its `angle_between` (`libm::math::sqrt::sqrtf`); `round()`
+    (`C::roundf`); the names stripped (`strip = true`); the path remap dropped (`/root/` found); the library
+    named in `world.rs`; three weakened rules against the unit tests; no stamp, a stale stamp, another module
+    in the players' place; the native tests under `+fma`, `+avx2`, `target-cpu=haswell`.
+  - **Findings of the plants, each a departure from the sheet's row or the test list, for the report:**
+    (1) the test list's plant "an arc cosine of the vector library" does not exist: glam 0.33.12's
+    `angle_between` runs its own polynomial and brings libm's square root and absolute value only; the plant is
+    the exponential. (2) `fma4` is dropped from the native assertion: the pinned compiler tells a stable build
+    nothing about it (`-Ctarget-feature=+fma4` left `cfg!` false and warned "unstable feature"), so the assert
+    could never fail (the advisor agent's R6 standard). (3) **For step 9 (engine-architect's note):**
+    `f32::round` arrives as the C name `roundf` alone, with no `compiler_builtins` path beside it, in both
+    twins; so an allow-list entry for `f64::round` would read `C::round`, with its reason, or the code rounds in
+    whole numbers: decided at step 9 with rust-reviewer. (4) For step 10: the dev-profile twin shows libm's
+    helper modules (`libm::math::support::*`) beside each routine; one entry `libm::math::support` would cover
+    them. (5) Two functions more than the sheet names are exported for the build (`twinProblems`,
+    `productionProblems`), and `nameSteps`, `stampProblems` and four lists for the tests.
+- **Written lines after step 7: 1,339 of 8,450** (step 7 took 1,096: the checker 453, its tests 395, the scan
+  166, the native tests 120, the build 54, the rest 8; the sheet's count for it was 890 by the designs' way, so
+  1.23 times). Two thirds of the stop line is 5,633; the rungs stand at 6,750 and 8,000. Ahead by the designs'
+  count: steps 8 to 12 are about 2,645; at this pull request's rate so far (1.34) the whole would end near
+  4,900, at the planned 1.8 near 6,100, at 4b-1's 2.17 near 7,100: under the stop line at all three, the first
+  rung reached only at the highest.
+- **His second "a"** (2026-11-26, 22:00:07 UTC; `cs4-walk/mustafa-2026-11-26-a-second.md`, saved by script): no
+  question was open in the chat but GREY-COLOURS, which his first "a" had answered 44 minutes before; DIFF-LIST
+  had not been asked in the chat. Read as the same answer again and as nothing else; said to him so.
+- **DIFF-LIST printed from his Export at 30 steps** (`cs4b-content/testlines-difflist-30.md`, by the notes'
+  two scripts, which now take an Export's path; the first list is reproduced byte for byte by the same
+  scripts). Against the list in the plan it differs in two rows of part B and nothing else: the step rate's row
+  is gone (the Export is at 30), and `soldier.gun` "smg" to "shotgun" is new (the gun in his hands when he
+  exported: not carried). Parts A (23 names) and C (7 and 16 names) are the same. **Asked of him in the update
+  at step 7's end; step 8 writes no content file before his yes.**
 - **To do before 4b-2 merges:** RustSec advisories for the 33 packages (security-auditor could not read them
   without the network); the licence texts for the hosted build (a follow-up for lane 2).
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
@@ -627,6 +695,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
 - The card's "Last update" was once written 34 minutes ahead of the clock and corrected before it was committed.
 - In 4b-2's first hours three more calls put a `git status` after other commands (a card update, a line count, a
   test run). All reads. Since then every git command stands alone in its call.
+- One more, at step 7 (2026-11-26, about 22:40 Amsterdam): a `git status --short | head` stood after a `grep` in
+  one call. A read. Told to him in the step's update.
 - Two more git commands did not start their own shell call, both harmless reads or a write-back of committed text:
   a `git show HEAD:... > file` on the line after a python script (the take-in; told to him and to the advisor
   agent), and a `git log --oneline -1` after a `git status ... | head` in one call (after the merge).
@@ -638,8 +708,9 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   after test-engineer's read, and in the report.
 
 ## Current step
-4b-2: step 6 is done and pushed (298837a; 243 written lines of 8,450). CI on it is to be read. Next: step 7, the
-built-file check.
+4b-2: steps 6 and 7 are done (1,339 written lines of 8,450). Step 7's CI is to be read. DIFF-LIST is asked of him
+(`cs4b-content/question-2026-11-26-diff-list.md`). Next: step 8 (the tools and the data): its tools first, on test
+files; its content files only after his yes.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
