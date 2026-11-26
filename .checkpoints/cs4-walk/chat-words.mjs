@@ -3,6 +3,7 @@
 // as a queued command, so both kinds are read. Builder V3's script (its branch, .checkpoints/handover-builder-v3/),
 // with the session and the folder changed. From the worktree's root:
 //   node .checkpoints/cs4-walk/chat-words.mjs words <transcript.jsonl> <marker> <out file> <title> <what it answers>
+//   node .checkpoints/cs4-walk/chat-words.mjs exact <transcript.jsonl> <the whole text> <out file> <title> <what it answers>
 //   node .checkpoints/cs4-walk/chat-words.mjs part  <saved file> <from line> <before line> <out file> <title>
 // `part` copies the lines of a saved text from the line that equals <from line> up to the line that equals <before line>.
 import { createHash } from 'node:crypto';
@@ -12,7 +13,9 @@ const SESSION = 'session_019YNMUVZR6ociHFWjByxkrq';
 const sha = (s) => createHash('sha256').update(s).digest('hex');
 const size = (s) => `${Buffer.byteLength(s)} bytes, sha256 ${sha(s)}`;
 const [mode, ...a] = process.argv.slice(2);
-if (mode === 'words') {
+if (mode === 'words' || mode === 'exact') {
+  // `exact`: the message whose whole text is the marker (a one-letter answer cannot be found as a part of a text).
+  const exact = mode === 'exact';
   const [transcript, marker, out, title, answers] = a;
   const hits = [];
   for (const line of readFileSync(transcript, 'utf8').split('\n')) {
@@ -23,8 +26,8 @@ if (mode === 'words') {
     if (e.type === 'user' && !e.isMeta && !e.isCompactSummary && e.toolUseResult === undefined) {
       const c = e.message?.content;
       const texts = typeof c === 'string' ? [c] : Array.isArray(c) ? c.filter((p) => p.type === 'text').map((p) => p.text) : [];
-      for (const t of texts) if (t.includes(marker) && !t.startsWith('This session is being continued')) hits.push({ t, at: e.timestamp, id: e.uuid, how: 'the user message' });
-    } else if (e.type === 'attachment' && e.attachment?.type === 'queued_command' && typeof e.attachment.prompt === 'string' && e.attachment.prompt.includes(marker)) {
+      for (const t of texts) if ((exact ? t.trim() === marker : t.includes(marker)) && !t.startsWith('This session is being continued')) hits.push({ t, at: e.timestamp, id: e.uuid, how: 'the user message' });
+    } else if (e.type === 'attachment' && e.attachment?.type === 'queued_command' && typeof e.attachment.prompt === 'string' && (exact ? e.attachment.prompt.trim() === marker : e.attachment.prompt.includes(marker))) {
       hits.push({ t: e.attachment.prompt, at: e.timestamp, id: e.uuid, how: 'the message he sent while the chat was working (stored as a queued command)' });
     }
   }

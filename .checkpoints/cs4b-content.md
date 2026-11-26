@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 22:14 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 22:16 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -614,6 +614,10 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   first), 9, 10, the look ahead before 11 and 12.
 - **To do before 4b-2 merges:** RustSec advisories for the 33 packages (security-auditor could not read them
   without the network); the licence texts for the hosted build (a follow-up for lane 2).
+- **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
+  `cs4-walk/mustafa-2026-11-26-grey-colours.md`; read as his answer to the one question the chat's update before
+  it asked, whose options were (a) the default greys stand and (b) he gives other colours before step 12). No
+  veto: step 12 draws the scene in LOOP_V2 section 9's default greys. For DECISIONS at the docs pass.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
