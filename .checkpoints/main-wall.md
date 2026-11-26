@@ -62,8 +62,16 @@
     click 11 (SA-MW-9), C4 T10 reading rules; SA-MW-R1..R8 Low/Medium) · notes advisor-plan.md, security-auditor-plan.md
     Decisions for him: TOKEN-RELEASE, T1E-BEFORE-DELETE, T4-GRADING; which Claude account this chat is on.
 
+16. Mustafa (2026-11-26, in this chat): CLICK-11-GO (a); T4-GRADING (a); T1E-BEFORE-DELETE (b); TOKEN-RELEASE (c)
+    "but we really need to speed up things, its taking too long and certain manual tasks are literally frustrating, to
+    the point that I am tempted to take the risk without all of these things."; WHICH-ACCOUNT: "My first personal
+    account (I have two) and 1 enterprise (university), so I have 3 accounts working on the project". His secrets
+    screenshot was the sandbox's; the real repository's is folded into click 12 (click 11 only tightens, so the order
+    swap loosens nothing: recorded as a deviation for the docs).
+
 ## Current step
-His go on click 11; his two screenshots (secrets and variables names, environments); click 11; click 12.
+His one visit: click 11, then click 12 (the saved rule page; the real repository's Secrets and variables > Actions);
+then the sandbox's fork count and deletion.
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
@@ -77,6 +85,7 @@ His go on click 11; his two screenshots (secrets and variables names, environmen
 ## Decisions taken
 - MAIN-WALL next; the wall first · Mustafa · 2026-11-25 20:35
 - Order: MAIN-WALL, guard (R4-1 + GUARD-KIT), review tracks + SOURCE-GO (a) · Mustafa · 2026-11-26 15:05
+- CLICK-11-GO (a), T4-GRADING (a), T1E-BEFORE-DELETE (b), TOKEN-RELEASE (c) · Mustafa · 2026-11-26
 - PLAN-GO (a), T4-BASELINE (b) · Mustafa · 2026-11-26 ("a" / "b")
 - EXCEPTION-SCOPE (d): no exception for his account on today's rule · Mustafa · 2026-11-26 ("ok go with D")
 - THROWAWAY-PUBLIC (a): public throwaway, neutral names, deleted as soon as the results are reviewed · Mustafa · 2026-11-26 (his answer "a" in this chat)
