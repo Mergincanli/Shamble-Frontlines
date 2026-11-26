@@ -126,3 +126,15 @@ last round; a Critical or High left open means two options only (merge what is a
 - Boundary, for the advisor agent's ruling: other programs outside the guard's wrapper table are proposed as a named
   limit (INPUT-RUN, the class of stated limits L1-L4), a follow-up for the next kit change-set; detail in the scratchpad.
 - Out of this round (his item 4): R2-2, R3-3, R3-4..R3-6, R2-3.
+
+### 9b. The advisor agent on §9 (2026-11-26; notes advisor-plan.md, "Round 4 plan change")
+- hooks-r4b APPROVE, applied only together with ADV-R4-1 (Critical, older than this change-set: a spelling of xargs
+  the guard left silent; his line (a) decides it). Built in `.gate/guard-wrappers/hooks-r4c/`: ask-only, agents
+  refused. Like xargs at the front, it stays silent only when a read-only program follows (his line, not stricter).
+- INPUT-RUN: a named limit (the class of stated limits L1-L4), a follow-up for the next kit change-set; listed in the
+  report as a security finding left open. Lows ADV-R4-2 and ADV-R4-4: follow-ups; ADV-R4-3 (a comment) rides.
+- Copy: green 1551/1551; red 17 on hooks-r4b, red 45 on 9ad6bc9's guard. Size against main: guard +55/−14,
+  tests +111/−3 = 166 added lines (stop line 200). The wide sweep against hooks-r4b and main: running.
+- Next: the advisor agent reviews hooks-r4c (a plan-change review, not a round), then the Edits asked of Mustafa.
+- Bringing in main (#71): in one separate detached worktree after round 4 (merge, docs-keeper, report, checkpoint
+  deletion, push by name); the main folder does not move.
