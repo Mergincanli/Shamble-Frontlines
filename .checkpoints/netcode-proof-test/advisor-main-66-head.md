@@ -47,6 +47,56 @@ Terms:
 - (d) If MAIN-67 lands first and changes either file's base hash, the amendment is void as prepared (security's
   condition 1).
 
+## 2. MAIN-66 step 7. Verdict: APPROVE. The lane may go on from this head.
+Heads checked: H0 8759e127df07…, merge 6a4de150a57e…, pushed 69d9b5f36a60…; the branch at 9177fb5 at the end.
+
+The take-in matches its plan:
+- The merge 6a4de15 has parents H0 and c1da1bd. Its change from H0 is main's own, name for name: 92 paths (31 added,
+  61 modified), +11,561 / -631. Without STATUS.md it is the 91-file line.
+- The anchor f3a420bc exits 0. It stays the anchor, because H0 equals 2935f0a outside .checkpoints/ (M66-1's command).
+- STATUS.md has 120 lines and differs from main only in the #40 row.
+- The pushed tree equals main's outside spikes/, .checkpoints/ and docs/; docs/ differs in the six usual names; spikes/
+  and docs/design/ equal H0's.
+- The kit equals main's, so main's two guard files are in byte for byte.
+- No save ran between the merge and the card save: the remote went from H0 straight to 69d9b5f.
+- CI on 69d9b5f is green: 6 of 6 jobs (gate, smoke and toolchain, for the push and the pull request).
+- Toolchain's summary lines equal main's job 139375347198 line for line: 49 Rust result lines, 5 vitest lines, and
+  Playwright's 1 and 16.
+
+My re-runs in the main folder pass. Their precondition holds: `git diff --quiet 6a4de15 HEAD -- .
+':(exclude)spikes/' ':(exclude).checkpoints/' ':(exclude)docs/design/'` exits 0.
+- The gate: GATE PASS (base c1da1bd, symbols +0 -0, 5a skipped).
+- The repo map: "repo map OK: 206 entries cover 110 required paths".
+- The checkpoint tests: 33 of 33.
+- Main's guard tests: 1,247 of 1,247, 0 fail (34.0 s). Each re-run equals .gate/main-66/step5-outputs.txt.
+
+The commits after 69d9b5f:
+- 69d9b5f..9177fb5 is 19 commits in a straight line, one parent each: 17 up to 5da5f7d, then 56b3e1b and 9177fb5. All
+  of them touch only .checkpoints/, with one exception: 56b3e1b, the 0b amendment.
+- 56b3e1b touches spikes/netcode-proof/Cargo.lock and crates/client-wasm/Cargo.toml (+2 each). Their after-hashes are
+  6e6529a8…00bc and f949f2bf…dc25a, as C6's term (a) asks.
+- It also adds dependency-check.md's section, and it moves the two builder-note copies into wip/ under new names. That
+  clears the fast-forward clash I flagged in the notes below.
+
+Findings: nothing above Low, and no new Low. Still open: ADV-M60-7 (the #40 row's "main 53272a1 merged in", for PR
+#40's closing docs pass) and ADV-M54-8 (the kit follow-up after the freeze).
+
+Main has moved to 07d673b since (ls-remote at 00:0x UTC). That is MAIN-67's full take-in, by his word of 20:48 UTC, and
+it does not change this head.
+
+## What I did not check
+- No light run, check.mjs or cargo run (the light runs are in step5-outputs.txt and their logs, read only). Smoke is
+  CI's, green for both events.
+- I did not read the 0b amendment's CI run on 9177fb5 (not part of step 7), or the guard-test file's own count on main
+  beyond #69's report.
+- The merge's own output and the step-3 Edits were recorded only in the chat. The committed results match.
+
+## Decisions needed
+None.
+
+## For Mustafa
+Nothing.
+
 ## Notes (one line after each check)
 - C6: advisor-u7-brief.md:167-173 read. Request :19-31 and security's answer read whole (Q1 YES with 1-7, Q2 NO, Q3
   NO; no findings).
@@ -60,7 +110,7 @@ Terms:
   npt_proto::{Join, Limits, Message, Quant}.
 - C6 written 23:5x UTC (before the 00:12 target).
 - Step 7: H0 8759e127df07…, merge 6a4de150a57e… (parents H0 and c1da1bd), pushed 69d9b5f36a60… (parent 6a4de15). The
-  first-parent line H0..69d9b5f holds only those two. 69d9b5f..HEAD (5da5f7d): 16 commits in a straight line, one parent
+  first-parent line H0..69d9b5f holds only those two. 69d9b5f..HEAD (5da5f7d): 17 commits in a straight line, one parent
   each, touching .checkpoints/ only (9 names: the card, answer-1914, history, msg-2026-11-26, u7-build-rs.md,
   u7-t-build.md, u8-c1.mjs, u8-merge-plan.md, wip/u7-build-rs.patch).
 - Heads-up for the 00:20 resume (not step 7's): 6cc6712 (20:51) added u7-build-rs.md and u7-t-build.md to the branch.
@@ -93,3 +143,21 @@ Terms:
   - 5 vitest `Test Files` lines (10, 1, 7, 2, 2 passed);
   - Playwright's "1 passed" and "16 passed".
   - No `##[error]` and no FAILED in any of the three.
+- The precondition `git diff --quiet 6a4de15 HEAD -- . ':(exclude)spikes/' ':(exclude).checkpoints/'
+  ':(exclude)docs/design/'` exits 0 (HEAD 9177fb5). So I re-ran in the main folder, each command alone:
+  - `node tools/gate.mjs --no-smoke`: GATE PASS (base c1da1bd; 1-4 and 5b-5d PASS; symbols +0 -0);
+  - `node .claude/scripts/repo-map-check.mjs`: "repo map OK: 206 entries cover 110 required paths";
+  - `node --test .claude/scripts/checkpoint.test.mjs`: tests 33, pass 33, fail 0;
+  - `node --test --test-reporter=tap .claude/hooks/routine-guard.test.mjs`: tests 1247, pass 1247, fail 0,
+    cancelled 0, skipped 0 (34.0 s).
+
+  Every count equals step5-outputs.txt. `git status --short` was clean after the runs.
+- HEAD moved during this check: 5da5f7d, then 56b3e1b (23:56:02, the 0b amendment), 9177fb5 (23:56:37) and 1219f8a
+  (23:57:24, card), plus my notes saves.
+  - 56b3e1b, with parent 5da5f7d, changes: dependency-check.md (+20); spikes/netcode-proof/Cargo.lock (+2) and
+    crates/client-wasm/Cargo.toml (+2), whose working-tree sha256 are 6e6529a8…00bc and f949f2bf…dc25a; and moves
+    u7-build-rs.md and u7-t-build.md to wip/*-notes-2050.md. That move clears my heads-up above.
+  - Local origin/main is still c1da1bd. ls-remote main is 07d673b (MAIN-67, outside this check).
+- Not read: the CI run on 56b3e1b or 9177fb5 (the amendment's, not step 7's).
+
+DONE
