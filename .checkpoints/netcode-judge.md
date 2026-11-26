@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g`: first at
   e2c0e896 (parts a and b), now at its merged head 591e2cb0ab07 (NPT-L2-ONEWAY).
-- **Last update:** 2026-11-26 about 21:25 UTC, NPT-L2-ONEWAY's final code head c56afd07, the last checks running.
+- **Last update:** 2026-11-26 about 21:00 UTC, NPT-L2-ONEWAY's final code head c56afd07, the last checks running.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -238,7 +238,7 @@
     plants each fail a test. From 591e2cb0: 379 added, 6 deleted (my stop: 400).
 
 ## Current step
-**NPT-L2-ONEWAY's final code head is c56afd07.** Running since about 21:25 UTC: `check.mjs` whole on it (output in
+**NPT-L2-ONEWAY's final code head is c56afd07.** Running since about 20:58 UTC: `check.mjs` whole on it (output in
 the session's scratch folder) and the advisor agent's read of the head. Then GitHub's gate, smoke and toolchain on
 that SHA, and the commit id with the commands to Mustafa; the netcode chat merges it on his word. Board thread for
 this piece: thr_2e70def4-84c4-45e7-addf-a17221c3deff (state doing).
