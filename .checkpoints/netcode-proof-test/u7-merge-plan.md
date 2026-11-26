@@ -218,6 +218,13 @@ the advisor rules."
   entries cover 110 required paths"; `git status --short`: the 43 paths staged and notes only (msg-2026-11-27.md, this
   file, u7-report.md). u7-report.md's M5 and M7 lines filled. Next: M8 (`git rm` of the three wip patches, `git add`
   of u7-report.md and this file, the numstat check, one commit), then the card save that pushes it.
+- DONE 22:4x: M8: `git rm` of wip/u7-build-rs.patch, wip/u7-t-build-t5i.patch and wip/u7-t-build.patch (WIP-CLEAN;
+  the third is inside the snapshot: 19 web/ files, every one among the 43); `git add` of u7-report.md and this file;
+  staged exactly the 43 (10 M, 33 A), the 3 D and the 2 M; `git diff --cached --numstat <H0> -- spikes/` = the
+  patch's numstat line for line, `--shortstat` "43 files changed, 5193 insertions(+), 47 deletions(-)"; the commit
+  69682158790a8d9c6f53f65ede9a2a1b017d5bc3 (48 files; no skip marker), HEAD^1 = H0, `git diff --quiet <it> --
+  spikes/` exit 0. Pushed by the card save that carries this line. Next: M9 (the saver restarted, CI on the pushed
+  head, push and pull request; the advisor's read of the pushed head at 00:50, with the M3 retry named).
 
 ## Risks
 - M5's counts move with MAIN-68 and Builder 2: each bar comes from this merge's own base run on its own H0 (MAIN-68's
