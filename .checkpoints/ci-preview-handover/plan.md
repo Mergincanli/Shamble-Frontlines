@@ -1,4 +1,4 @@
-# Plan: the preview hand-over step, TOKEN-WORDS and FIREFOX-REPLAY (CI Builder), revision 1
+# Plan: the preview hand-over step, TOKEN-WORDS and FIREFOX-REPLAY (CI Builder), revision 2 (revision 1 below, changed by the section "Revision 2" at the end)
 
 Branch `claude/keen-tesla-v807cf` (this chat's one push branch; its last pull request, #71, is merged and main
 2483e9a contains its head c9460ca, so a commit on main is a fast-forward there, no force). Worktree `.gate/ci4`, local
@@ -86,3 +86,46 @@ Nothing under `crates/`, no package source, no spec file, no kit or gate file, n
 
 ## 7. What Mustafa checks
 No browser check: nothing a player sees changes. He answers FF-REFETCH, then ask 2, then gives his go.
+
+## Revision 2 (the advisor agent's REVISE of eb62201, `advisor-plan.md`; each change marked R2-n)
+- R2-1 (High), steps after the network cut for the first time:
+  - The asked text also corrects two comments that would turn false: `toolchain.yml:4` ("the last step runs in its own
+    network namespace") and `:130` ("the last step with the network"). This replaces revision 1's "No other change".
+  - security-auditor gets three explicit questions: (i) absolute paths for any shell and program after the cut (PATH's
+    first folders are writable by the cut's user: CUT-PATH, `docs/STATUS_ARCHIVE.md`); (ii) whether to have no extra
+    script step at all; (iii) the upload action's own code sits in the runner's work folder, owned by the user the cut
+    runs as (inferred), so code inside the cut could change it before it runs with the network and the upload's token;
+    checkout's clean-up step at the job's end has the same exposure today (inferred). A High there goes to him before
+    or inside ask 2.
+- R2-2, the guard step is its own choice in ask 2 (GUARD-STEP: with or without), beside security-auditor's read. Its
+  limits, stated: a process left running by the cut step could change the folder after the check (the cut step's
+  processes should all have ended with it, not proven); the check covers `.gate` and `.gate/dist-production` as
+  non-links too, and the upload's path has no trailing slash.
+- R2-3, UPLOAD-SOURCE is its own question and names the clash: his opening rule 3 ends "No other new package or tool",
+  while his block of 13:20 asks for the step that needs it. The write waits for its own yes. It goes to him early, with
+  ask 1.
+- R2-4, the stop rule also covers GitHub's Firefox (160; the trial uses 161): a red, a time-out or a hash difference in
+  the replay test, there or here, stops and goes to him before any change, and a red replay test is never re-run to
+  look for a green. A red upload step stops and goes to him too.
+- R2-5, the resume card `.checkpoints/ci-preview-handover.md`, updated after every step and at least every 30 minutes,
+  committed by path and pushed by the same route; the saver departure named in the report.
+- R2-6, the upload step, from the action's own text at cf430e0 (fetched read-only with `git clone --depth 1 --branch
+  v7.0.2` into the scratchpad, nothing run; HEAD cf430e030ddbb5b0abf93d22962f4752f3646cd9):
+  - it follows symbolic links (`src/shared/search.ts:16`, `followSymbolicLinks: true`);
+  - it skips an item whose own name begins with a dot unless `include-hidden-files` is true (`search.ts:19`;
+    `dist/upload/index.js:130173`, a basename test); `include-hidden-files: true` stays;
+  - it takes no token input (`src/upload/input-helper.ts:8-45`: name, path, overwrite, include-hidden-files, archive,
+    if-no-files-found, retention-days, compression-level); it uses the runner's `ACTIONS_RUNTIME_TOKEN` from its
+    environment, so "the only run step with the token" (the job's token) stays true;
+  - GitHub's proof: the pull request run's log of the step (its file count, compared with the guard's count, and the
+    artifact's id and digest it prints), read with gh's job log, the route used for #71; checked on the push run first.
+- R2-7, the `if:` is tidiness, not the security boundary (a pull request's run uses its own copy of the workflow); the
+  boundary is lane 2's `preview.yml` (event, workflow name and path, success, and a run from this repository), named in
+  the risks and in ask 2.
+- R2-8, the firefox project matches `rules/**/*.spec.ts` and `replay/**/*.spec.ts`.
+- R2-9, the Firefox trial runs without #71's two graphics library files; if Firefox needs them, that is a stop and a
+  question to him.
+- R2-10: his point 3 is a chat reply, answered; a STATUS follow-up for step 2.3 (keep the workflow name `toolchain`,
+  the file path and the artifact name `preview-site`, lane 2's note 1); the artifact is the build of the pull request
+  merged into main, not of its head commit (for lane 2); the job's time read on the first run against its 15-minute
+  limit.
