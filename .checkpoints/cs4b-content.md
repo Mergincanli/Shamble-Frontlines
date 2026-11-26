@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 15:10 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 16:03 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -122,9 +122,63 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
    moved 4b from 5,410 to about 7,050 lines by the designs' count, and gives a new estimate for the first build he
    can move a soldier in. His Export comes before the data step (step 8, in 4b-2).
 
+9. **Step 1 DONE** (commit d830680, pushed): the content crate with no dependency, the foundation check's
+   `content` half reading the manifest's own text, devtools' two unused edges dropped.
+10. **Step 2a DONE** (commit 945da99, pushed with d21b161; the local checks passed whole): the reader (`json.rs`),
+    the numbers (`number.rs`), the canonical writer (`write.rs`), the typed read (`read.rs`), the bundle with `load`
+    and `load_file` (`bundle.rs`), the movement kind (`movement.rs`), the refusals (`error.rs`), and
+    `packages/client/scripts/legacy-extract.mjs` with the 2,038 numbers of the old tuning file as written.
+    **2,888 written lines.**
+11. **Step 3 BUILT, the local checks running on it (not committed yet): 4,824 written lines** (the sheet gave the
+    step 800 by the designs' count; it took 1,936). What it holds:
+    - `packages/client/scripts/corpus-texts.mjs` (+ test) writes `crates/devtools/vectors/content-corpus.txt`
+      (13,067 numbers: the 2,038 old ones as written, 5,000 doubles from random bits, 5,000 decimals in many
+      spellings, 1,000 doubles that may lie exactly between two shortest texts, 29 edges; each with the engine's
+      own bits and text) and `content-trees.txt` (400 random trees, each as `JSON.stringify` writes it and as it
+      writes it with sorted keys and an indent of two).
+    - `crates/devtools/src/content_proofs.rs`: the corpus checks; a seeded generator of 33 classes of broken files
+      and bundles, each case with the verdict it must get worked out by the generator (reason, file, line and
+      column, field); `verdicts()` folds each class into a digest, committed as `vectors/content-verdicts.txt`
+      (seed 20261126, 500 a class, the four megabyte classes 50, and the fuzz run's first 2,000 inputs); the
+      inputs at the caps; the fuzz run's inputs and judge.
+    - `crates/devtools/tests/content_proofs.rs` (5 tests) and `content_fuzz.rs` (a counting allocator; the caps'
+      memory and time; **1,000,000 inputs in release, 50,000 in debug, on up to 8 workers: no panic, every promise
+      kept**; each stage's minimum share asserted). Release: 26 s on 4 cores (93 s on one).
+    - The test-only module's exports `content_corpus`, `content_trees`, `content_verdicts`, `content_limits`;
+      `packages/sim-worker/boundary/content.test.mjs` (both profiles under Node: 7 tests, the WebAssembly verdicts
+      equal the native digests; dev profile 18 s) and `packages/e2e/tests/rules/content.spec.ts` (release profile
+      in the browser, 2.2 s in Chromium; the page also holds the corpus against its own engine; Firefox in CI
+      only: no Firefox on this machine).
+    - **A defect the corpus found in the writer, before any value rests on it:** a number exactly between its two
+      shortest texts (89639294043007.125) is `…07.12` in a browser (ECMAScript: the even one) and was `…07.13`
+      here (the standard library goes up). `number_text` now takes the even one (`even_of_a_tie`); 108 such
+      numbers are in the corpus.
+    - The reader names a byte no content file holds as that (`ForbiddenByte`) wherever it stands, not as "a key
+      was expected".
+    - A hand plant while building: a reader that takes tabs was caught by the class "a tab or a carriage return"
+      with the file and the place (the plants script comes at the close).
+    - **Departures from the sheet, for the report:** the proofs live in `devtools` (the WebAssembly side runs the
+      same generator, and `content` depends on nothing), not in `crates/content/tests/`; `Field` and `Range` live
+      in `read.rs`; the four classes that make megabytes run a tenth of the count; the browsers run the release
+      profile only; the tree corpus is new (the test list's writer-structure point).
+    - Three fresh seeds by hand: still to run and note (SHAMBLE_FUZZ_SEED).
+
+12. **His Export at 30 steps arrived** (his message of 2026-11-26, 15:07:24 UTC, sent while the chat was working:
+    "This is for later when you need it again"). Saved by script, never retyped: the whole message is
+    `cs4-walk/mustafa-2026-11-26-export-30.md` (15,708 bytes); the Export alone, byte for byte, is
+    `cs4b-content/testlines-export-30.json` (**15,508 bytes, sha256
+    a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab**) with `testlines-export-30.manifest.txt`
+    (`export-save.mjs` wrote both): step rate 30, no warning, 18 entries changed from the start, **usable as it
+    is**. Against the Export at 60 steps (4a's notes) 29 of 448 values differ and none of them is a value the game
+    takes in 4b or 4c: the export's time, the step rate and its warning, the gun chosen in the sandbox
+    (`values.soldier.gun`), the list of changed entries moved up by the step rate's own entry, and two measured
+    pixel counts. It is needed at step 8 (4b-2), where DIFF-LIST is asked with it.
+
 ## Current step
-4b-1, step 1: the approved path-only batch back in the tree (digests checked against `deps-4b1.sha256`), with the
-foundation check's `content` half; first build; commit and push.
+4b-1, step 3: read the local checks (`.gate/local-checks.log`), commit, push, read CI, post on the board. Then
+step 2b (the map kind with its rules, the aim reach, the tie test; the generator gets the map's classes), step 4
+(the links check), step 5 (the time unit; game-designer reads the duration paths first).
+**At 4,967 written lines he gets one sentence on where the build stands** (now 4,824: it comes early in step 2b).
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
