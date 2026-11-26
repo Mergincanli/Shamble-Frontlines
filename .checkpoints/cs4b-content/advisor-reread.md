@@ -34,3 +34,17 @@
 ## Verdict
 APPROVE for step 0 only, under conditions C1-C7; REVISE for steps 1-9 (R1-R11), back to the advisor before step 1's first edit. No ESCALATE now. Rulings F.1-F.8 in the handback.
 DONE
+
+# Re-read 2: revision 2 of the sheet (ab8eae1), 2026-11-26
+
+## Plan
+1. Read the revised sheet (sections A-I), his source-go message, the feature-compare evidence and question, the
+   three reads (netcode-architect, engine-architect, rust-reviewer so far), test-list.md, the batch digests.
+2. Check section H against C1-C7 and R1-R11, point by point.
+3. Judge: steps 1-5 (4b-1) APPROVE or REVISE; section E's one-centimetre choice; the tie test in devtools (protocol
+   edge kept?); steps 6-12 now with FEATURE-COMPARE's wording as an addendum, or held.
+4. Check claims against main where the sheet makes them (devtools' protocol edge in the new batch; the grammar; the
+   two-PR seam; SIZE-4B's numbers).
+5. Verdict last, then DONE.
+
+## Findings (a line each, as found)
