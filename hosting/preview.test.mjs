@@ -833,10 +833,20 @@ function workflowLines(text) {
     else if (indent === 6 && ctx.jobKey === 'steps' && item) { steps += 1; Object.assign(ctx, { step: steps, stepKey: key }); }
     else if (indent === 8 && ctx.step >= 0) ctx.stepKey = key;
     const value = key === null ? '' : (item ? body.slice(2) : body).slice(key.length + 1).trim();
-    if (/^[|>][0-9+-]*$/.test(value)) block = item ? indent + 2 : indent;
+    if (blockHeader(value)) block = item ? indent + 2 : indent;
     records.push({ n: i + 1, line, indent, ...ctx, key, value, item, inBlock: false });
   });
   return records;
+}
+/** A block scalar's header (`|`, `>-`, `|2+`), with or without a trailing YAML comment (`| # note`). */
+function blockHeader(value) {
+  return /^[|>][0-9+-]*(?:\s+#.*)?$/.test(value);
+}
+/** The shell command a record carries: a run block's line, a one-line run's value, or '' (a block header, not a run). */
+function commandOf(r) {
+  if (!(r.step >= 0 && r.stepKey === 'run')) return '';
+  if (r.inBlock) return r.line.trim();
+  return r.key === 'run' && !blockHeader(r.value) ? r.value : '';
 }
 function lintWorkflow(text) {
   const problems = [];
@@ -851,26 +861,53 @@ function lintWorkflow(text) {
   }
   // L1 (G1): no ${{ }} inside any shell block.
   for (const r of records) if (r.step >= 0 && r.stepKey === 'run' && r.line.includes('${{')) flag('L1', r, '${{ inside run');
-  // L2 (G6): secrets (in any spelling: secrets.X, secrets['X'], toJSON(secrets)) only in a step's env, never job-wide
-  // or workflow-wide, never as an action input; and the token in exactly its three planned places.
-  for (const r of records) {
-    if (/\bsecrets\b/.test(r.line) && !(r.step >= 0 && r.stepKey === 'env' && r.indent === 10 && !r.inBlock)) flag('L2', r, 'a secret outside a step env');
+  const stepsOf = new Map();
+  for (const r of records) if (r.step >= 0) { if (!stepsOf.has(r.step)) stepsOf.set(r.step, []); stepsOf.get(r.step).push(r); }
+  // L2 (G6): every line naming secrets (in any case and spelling: secrets.X, secrets['X'], toJSON(secrets)) is one of
+  // the two planned env lines, in a step's env: never job-wide or workflow-wide, never an action input.
+  const SECRET_LINES = ['CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}', 'CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}'];
+  const namesSecrets = (r) => /\bsecrets\b/i.test(r.line);
+  for (const r of records.filter(namesSecrets)) {
+    if (!(r.step >= 0 && r.stepKey === 'env' && r.indent === 10 && !r.inBlock)) flag('L2', r, 'a secret outside a step env');
+    else if (!SECRET_LINES.includes(r.line.trim())) flag('L2', r, 'a secret line other than the two planned ones');
   }
-  const tokenAt = records.filter((r) => /\bsecrets\.CLOUDFLARE_API_TOKEN\b/.test(r.line)).map((r) => r.job).join(',');
-  if (tokenAt !== 'deploy,deploy,reconcile') flag('L2', null, `the token named in jobs [${tokenAt}]; planned: deploy's token check and upload, and reconcile`);
-  // L3: npm only as `npm ci --ignore-scripts` (not `=false`), and no other installer.
+  // ... and the steps naming secrets are exactly the three planned ones, in order, each known by its whole command (not
+  // by its job, and not by a command it merely holds): deploy's token check, deploy's upload, reconcile; each names
+  // both secrets once. A change to one of these three commands changes this list in the same reviewed pull request.
+  const PLACES = [
+    ['deploy', 'node hosting/preview.mjs verify-token'],
+    ['deploy', [
+      '[[ "$PR" =~ ^[0-9]{1,6}$ ]] && [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || exit 1',
+      '"$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages deploy "$RUNNER_TEMP/site" \\',
+      '--project-name "$PROJECT" --branch "pr-$PR" --commit-hash "$SHA" \\',
+      '--commit-message "pull request $PR" --commit-dirty=true',
+    ].join('\n')],
+    ['reconcile', 'node hosting/preview.mjs reconcile'],
+  ];
+  const places = [...stepsOf.values()].filter((rs) => rs.some(namesSecrets)).map((rs) => {
+    const run = rs.map(commandOf).filter((s) => s !== '').join('\n');
+    const at = PLACES.findIndex(([job, command]) => rs[0].job === job && run === command);
+    const both = SECRET_LINES.every((s) => rs.filter((r) => r.line.trim() === s).length === 1);
+    return at >= 0 && both ? `planned ${at + 1}` : `${rs[0].job} line ${rs[0].n} (${run.split('\n')[0] || 'no run'})`;
+  });
+  if (places.join(', ') !== 'planned 1, planned 2, planned 3') flag('L2', null, `secrets in [${places.join(', ')}]; planned: deploy's token check and upload, and reconcile`);
+  // L3 (G5): npm only as one whole `npm ci --ignore-scripts` line whose other flags are --no-audit and --no-fund:
+  // nothing chained after it or continued onto the next line, and no flag that turns install scripts back on (npm 10
+  // reads `--no-ignore-scripts`, `--ignore-scripts=false` and `--ignore-scripts false` as on again, measured); no npm
+  // configuration on any line (npm_config_* in any case, an .npmrc); no other installer.
+  const NPM_CI = /^npm ci(?: --(?:ignore-scripts|no-audit|no-fund))+$/;
+  const plainNpmCi = (r) => NPM_CI.test(commandOf(r)) && commandOf(r).split(' ').includes('--ignore-scripts');
   for (const r of records) {
+    if (/npm_config_|npmrc/i.test(r.line)) flag('L3', r, 'npm configuration (npm_config_*, an .npmrc)');
     if (!(r.step >= 0 && r.stepKey === 'run')) continue;
-    if (/\bnpx\b|\byarn\b|\bpnpm\b|\bcorepack\b/.test(r.line)) flag('L3', r, 'an installer other than npm ci');
-    if (/\bnpm\b/.test(r.line) && !/\bnpm\s+ci\b[^#]*--ignore-scripts(?![=\w-])/.test(r.line)) flag('L3', r, 'npm other than "npm ci --ignore-scripts"');
+    if (/\bnpx\b|\byarn\b|\bpnpm\b|\bcorepack\b|\bbunx?\b/i.test(r.line)) flag('L3', r, 'an installer other than npm ci');
+    if (/\bnpm\b/i.test(r.line) && !plainNpmCi(r)) flag('L3', r, 'npm other than one whole "npm ci --ignore-scripts" line');
   }
   // L4 (G8): no cache in any job.
   const jobs = [...new Set(records.filter((r) => r.top === 'jobs' && r.indent === 2).map((r) => r.job))];
   for (const job of jobs) {
     if (!records.some((r) => r.job === job && r.indent === 4 && r.line.trim() === 'cache-mode: none')) flag('L4', null, `job ${job} without cache-mode: none`);
   }
-  const stepsOf = new Map();
-  for (const r of records) if (r.step >= 0) { if (!stepsOf.has(r.step)) stepsOf.set(r.step, []); stepsOf.get(r.step).push(r); }
   for (const [, rs] of stepsOf) {
     const uses = rs.find((r) => r.key === 'uses' && (r.indent === 6 || r.indent === 8));
     const withLine = (text2) => rs.some((r) => r.stepKey === 'with' && r.indent === 10 && r.line.trim() === text2);
@@ -902,6 +939,26 @@ describe('G9: the lint of preview.yml', () => {
     assert.deepEqual([...new Set(rs.filter((r) => r.top === 'jobs' && r.indent === 2).map((r) => r.job))], ['tests', 'check', 'deploy', 'after', 'reconcile']);
     assert.ok(new Set(rs.filter((r) => r.step >= 0 && r.key === 'run').map((r) => r.step)).size >= 12);
   });
+  test('YAML comments are not read: a comment naming secrets, npm install or npm_config_ raises nothing', () => {
+    assert.deepEqual(lintWorkflow('# no secrets, no npm install, no npm_config_ignore_scripts here\n' + WORKFLOW), []);
+  });
+  test('a block header with a trailing comment opens a block, and is not read as part of the command', () => {
+    const header = '          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson\n        run: |\n';
+    const text = plant(WORKFLOW, header, header.replace('run: |\n', 'run: | # the upload\n'));
+    assert.deepEqual(lintWorkflow(text), []);
+    assert.equal(workflowLines(text).find((r) => r.line.trim().startsWith('"$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler"')).inBlock, true);
+  });
+  const NPM_LINE = 'npm ci --ignore-scripts --no-audit --no-fund';
+  const METRICS = '  WRANGLER_SEND_METRICS: "false"\n';
+  const TOKEN = '          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n';
+  const ACCOUNT = '          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}\n';
+  const VERIFY_NAME_END = '(prints its status and dates, never the token)\n';
+  const UPLOAD_END = '            --commit-message "pull request $PR" --commit-dirty=true\n';
+  const INSTALL = '      - name: Install Wrangler from main\'s lockfile into a fresh folder, install scripts off\n        run: |\n';
+  /** Gives the install step (no secrets, no env today) an env with these lines. */
+  const onInstall = (envLines, base = WORKFLOW) => plant(base, INSTALL, INSTALL.replace('        run: |\n', `        env:\n${envLines}        run: |\n`));
+  /** The token check without its env: both secrets taken off it. */
+  const verifyBare = () => plant(WORKFLOW, `${VERIFY_NAME_END}        env:\n${TOKEN}${ACCOUNT}`, VERIFY_NAME_END);
   const planted = [
     ['L1', '${{ }} in a one-line run', () => plant(WORKFLOW, 'run: node hosting/preview.mjs find-pr', 'run: node hosting/preview.mjs find-pr "${{ github.event.workflow_run.head_branch }}"')],
     ['L1', '${{ }} in a run block', () => plant(WORKFLOW, '          cd "$RUNNER_TEMP/wrangler"\n', '          cd "$RUNNER_TEMP/wrangler"\n          echo "${{ needs.check.outputs.pr }}"\n')],
@@ -929,6 +986,29 @@ describe('G9: the lint of preview.yml', () => {
     ['L5', 'an action pinned to a tag', () => plant(WORKFLOW, 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1', 'actions/checkout@v7', { count: 5, nth: 2 })],
     ['L5', 'permissions widened', () => plant(WORKFLOW, '\npermissions: {}\n', '\npermissions: write-all\n')],
     ['L0', 'a tab', () => plant(WORKFLOW, '    timeout-minutes: 10\n', '\ttimeout-minutes: 10\n', { count: 5, nth: 1 })],
+    // Review round 2 (the test-engineer's N1 to N3): a command chained after npm ci, install scripts switched back on,
+    // npm configuration, the token's places by step, and a block header carrying a comment.
+    ['L3', 'npm install chained after npm ci', () => plant(WORKFLOW, NPM_LINE, `${NPM_LINE}; npm install left-pad`)],
+    ['L3', 'npm exec chained after npm ci', () => plant(WORKFLOW, NPM_LINE, `${NPM_LINE} && npm exec wrangler -- --version`)],
+    ['L3', 'npm rebuild chained after npm ci', () => plant(WORKFLOW, NPM_LINE, `${NPM_LINE} && npm rebuild`)],
+    ['L3', 'the flag switched off again by =false', () => plant(WORKFLOW, NPM_LINE, 'npm ci --ignore-scripts --ignore-scripts=false --no-audit --no-fund')],
+    ['L3', 'the flag switched off again by its negation', () => plant(WORKFLOW, NPM_LINE, 'npm ci --ignore-scripts --no-ignore-scripts --no-audit --no-fund')],
+    ['L3', 'the flag switched off again by the value false', () => plant(WORKFLOW, NPM_LINE, 'npm ci --ignore-scripts false --no-audit --no-fund')],
+    ['L3', 'npm ci continued onto a second line', () => plant(WORKFLOW, NPM_LINE, `${NPM_LINE} \\\n            --no-ignore-scripts`)],
+    ['L3', 'npm_config_ignore_scripts on the install step', () => onInstall('          npm_config_ignore_scripts: \'false\'\n')],
+    ['L3', 'NPM_CONFIG_IGNORE_SCRIPTS workflow-wide', () => plant(WORKFLOW, METRICS, `${METRICS}  NPM_CONFIG_IGNORE_SCRIPTS: "false"\n`)],
+    ['L3', 'an .npmrc written before npm ci', () => plant(WORKFLOW, `          ${NPM_LINE}\n`, `          echo "ignore-scripts=false" > .npmrc\n          ${NPM_LINE}\n`)],
+    ['L2', 'the token moved from the token check to the install step', () => onInstall(TOKEN, plant(WORKFLOW, TOKEN, '', { count: 3, nth: 1 }))],
+    ['L2', 'both secrets moved from the token check to the install step', () => onInstall(TOKEN + ACCOUNT, verifyBare())],
+    ['L2', 'both secrets moved to the install step, with verify-token appended to it', () => plant(onInstall(TOKEN + ACCOUNT, verifyBare()), `          ${NPM_LINE}\n`, `          ${NPM_LINE}\n          node hosting/preview.mjs verify-token\n`)],
+    ['L2', 'the token by index on a third step', () => onInstall('          T: ${{ secrets[\'CLOUDFLARE_API_TOKEN\'] }}\n')],
+    ['L2', 'every secret on a third step through toJSON', () => onInstall('          ALL: ${{ toJSON(secrets) }}\n')],
+    ['L2', 'the token in capitals on a third step', () => onInstall('          T: ${{ SECRETS.CLOUDFLARE_API_TOKEN }}\n')],
+    ['L2', 'the token in capitals on a planned step', () => plant(WORKFLOW, TOKEN, '          CLOUDFLARE_API_TOKEN: ${{ SECRETS.CLOUDFLARE_API_TOKEN }}\n', { count: 3, nth: 1 })],
+    ['L2', 'a command appended to the upload', () => plant(WORKFLOW, UPLOAD_END, `${UPLOAD_END}          printenv CLOUDFLARE_ACCOUNT_ID\n`)],
+    ['L2', 'every secret on a planned step through toJSON', () => plant(WORKFLOW, ACCOUNT, ACCOUNT + '          ALL: ${{ toJSON(secrets) }}\n', { count: 3, nth: 3 })],
+    ['L2', 'the token taken off the upload step', () => plant(WORKFLOW, TOKEN, '', { count: 3, nth: 2 })],
+    ['L1', '${{ }} in a shell comment under a block header that carries a comment', () => plant(WORKFLOW, '        run: |\n          mkdir -p "$RUNNER_TEMP/wrangler"', '        run: | # c\n          # ${{ github.event.workflow_run.head_branch }}\n          mkdir -p "$RUNNER_TEMP/wrangler"')],
   ];
   for (const [rule, name, make] of planted) {
     test(`planted: ${name} (${rule})`, () => {

@@ -288,11 +288,11 @@ export async function verifyToken(io) {
   if (v.status !== 200 || v.json?.success !== true || result.status !== 'active') {
     if (v.error) say(io, `the call did not complete: ${show(v.error)}`);
     else say(io, `Cloudflare's errors: ${show(cloudflareErrors(v.json))}`);
-    throw new Refusal('the token is not active (the runbook: a new token by clicks 6 and 8)');
+    throw new Refusal('the token is not active: make a new one (the runbook, "The token", "To renew")');
   }
   const ends = Date.parse(result.expires_on ?? '');
   if (!Number.isNaN(ends) && ends - io.now().getTime() < 14 * 24 * 3600 * 1000) {
-    annotate(io, 'warning', `the deploy token ends on ${show(result.expires_on)}: renew it (the runbook: clicks 6 and 8)`);
+    annotate(io, 'warning', `the deploy token ends on ${show(result.expires_on)}: renew it (the runbook, "The token", "To renew")`);
   }
   const p = await cloudflare(io, token, `/accounts/${account}/pages/projects/${name}`);
   const record = p.json?.result ?? {};

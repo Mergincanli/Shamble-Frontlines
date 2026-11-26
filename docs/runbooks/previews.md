@@ -121,8 +121,10 @@ If the previews account, its project or the environment has to be made again:
    site. Leave the project's production branch as given, never a `pr-<number>` name. Settings, "Preview access": off.
 3. GitHub: Settings, Environments, `preview`. A run that names a missing environment creates it with no rules, so set
    it up at once: as in "The environment page" above, including "Save protection rules" and the reload.
-4. The token: "To renew", steps 2 to 4; the account ID (on the account's overview page) goes in the same environment as
-   `CLOUDFLARE_ACCOUNT_ID`.
+4. The token: "To renew", steps 2 to 5, with two differences. In step 3 both secrets are new, so each is added with the
+   environment page's "Add environment secret": the token as `CLOUDFLARE_API_TOKEN`, and the account ID (on the
+   account's overview page) as `CLOUDFLARE_ACCOUNT_ID`. In step 5 there is no old token to delete, but the end date
+   still goes in STATUS, with a reminder 14 days before.
 5. A new project address changes nothing else: the `deploy` job reads it from Cloudflare on every upload.
 
 ## Privacy
