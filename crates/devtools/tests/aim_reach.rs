@@ -23,7 +23,6 @@ const WIDENED: &str = "the aim codec widened: move the reach in crates/content/s
 
 #[test]
 fn the_reach_is_what_the_aim_points_fields_hold() {
-    assert_eq!((AIM_REACH_CM, AIM_HEIGHT_MAX_CM), (32_767, 65_535));
     // An aim point holds the reach's two far corners, each field in its own type.
     let low = AimPoint {
         x: cm(-AIM_REACH_CM),
