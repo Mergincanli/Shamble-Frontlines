@@ -214,13 +214,20 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   15:05 item 3 says "nothing under .github/" until MAIN-WALL; the guard does not ask for a worktree merge. Asked him:
   MERGE-74 (questions-2026-11-26-merge-74.md; recommended (a), one merge after MAIN-WALL). The CI half of item 6g
   (#59's hand-over step) is merged.
+- HIS ANSWER (2026-11-26, message 03254f5d-9cb8-44c2-9b41-b580ef8e4065, 15:53:35 UTC, 1 byte, "A", sha256
+  559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd; read by script from the transcript; into DECISIONS
+  at the next docs head, with the question file as its record): MERGE-74 (a): main is taken in once, after MAIN-WALL
+  merges; #72 stays conflicting until then (no pull-request runs on it meanwhile). Just before it he wrote that #74
+  "has been marked to merge by the advisor (and probably merged)": checked, merged 15:24:23 UTC, 3b949c1.
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
 ## Next (his item 6, in order)
 c. Wait for the Guard fix chat's protection for main to merge (his TOKEN-TONIGHT (b), MAIN-WALL-AGAIN (a)); his
    15:05 message: he tells this chat when it is merged; until then nothing under .github/, no token sitting. If it is
-   not merged by his click on the real token, ask him again first (MAIN-WALL (b)).
+   not merged by his click on the real token, ask him again first (MAIN-WALL (b)). Then, by his MERGE-74 (a): take
+   main in once (3b949c1 or newer, MAIN-WALL and #74 together), by the scripted method (resolve/verify/control), the
+   advisor agent's review of that merge, before the token sitting's message.
 d. The token sitting, one message to him in this order (the security-auditor's conditions): (a) reload the `preview`
    environment page, screenshot (bypass box unticked, "Selected branches and tags", "1 branch and 0 tags allowed",
    `main`, no custom rule); (b) both secrets only by "Add environment secret"; (c) after the secrets, the Actions,
