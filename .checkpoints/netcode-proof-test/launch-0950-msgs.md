@@ -5,6 +5,7 @@ fill `<head>` with `git rev-parse HEAD` at sending. Both go out together (2 agen
 ## A. To the advisor a0530735048f1620a (summary: "U7's round ruling and the fix-pass brief")
 U7's round ruling and its fix-pass brief, please, in the 09:50 UTC window. Write parts 1 and 2 first, before 10:15 UTC
 if you can: U7's builder a9873cdba07a3219e must be resumed with the brief by 10:20 (later than that, the 14:50 window).
+End your turn as soon as parts 1 and 2 are in the file, with parts 3 to 5 one line each (your ending is what wakes me).
 If you cannot finish by 10:15, write what you have and say so.
 
 Rules, word for word: "git and gh always start their own command, with no other program in front of them." "Write
@@ -28,6 +29,16 @@ builder's notes (wip/u7-build-rs-notes-0030.md, wip/u7-t-build-notes-2050.md); m
    would), the dist differs anyway, so the evidence is one T5 (ii) rerun on the fixed tree, budgeted in the brief; the
    dist compare only if no shipped source changes. Say which.
 4. A second round or not, and its seats.
+5. U8's ops/ files come in with the fast-forward. Read only at 07:4x: their tests read none of U7's 42 files (outside
+   ops/ they read crates/server/src/main.rs, crates/super, crates/judge, crates/log, and two whole-spike scans:
+   redact-check's 0 findings and no .npmrc); the builder cannot make choice 15's node_modules link under the
+   file-writing rule. My proposal: right after the fast-forward, before any edit, the builder runs a light `node
+   check.mjs --only refs,marks,self,redact` as its new baseline (refs and redact move with U8's files), and the main
+   session runs choice 15's two ops commands on the fixed tree at U7's merge M5, as it did for U8. Rule it or change it.
+   (re-check) Builder 2's merge lands first only if he answers before about 08:30. If it does, the base also holds
+   0e621dae's 46 files (crates/judge/, marks/README.md, SERIES.md, marks.json and its own notes): none of U7's 42; not
+   in the Wasm (client-wasm's normal dependencies are npt-client, -link, -proto and -sim) nor the page (no judge or
+   marks reference under web/); the test, refs and marks counts then rise by its share too.
 
 Write .checkpoints/netcode-proof-test/advisor-u7-round.md.
 
