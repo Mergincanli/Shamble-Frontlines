@@ -36,8 +36,17 @@
 10. Mustafa (2026-11-26, in this chat): "EXCEPTION-SCOPE: ok go with D": no exception; the plan stands as approved
     (his condition of 2026-11-25 20:35 stays: his account does not skip gate and smoke).
 
+11. Mustafa (2026-11-26, in this chat, answering PLAN-GO and T4-BASELINE in that order): "a" / "b": his go on the
+    plan at 149bec7 (as revised after the advisor agent's APPROVE); T4-BASELINE (b), no baseline run (T4 passes only
+    on the record naming the second ruleset's update rule, else "unproven"); brief and card updated to match
+12. Click 0 (his screenshots): no deploy keys; 0 collaborators; the Claude app: Administration READ (read: Dependabot
+    alerts, administration, commit statuses, merge queues, metadata; read and write: actions, checks, code,
+    discussions, issues, pull requests, repository creation, repository hooks, workflows), repository access "All
+    repositories" (so click 2 needs nothing); the Claude authorization page. GUARD-SETTINGS not needed (risk 4 covers
+    his own account only). Missing: Settings > Actions > General.
+
 ## Current step
-Waiting for Mustafa: his go on the plan (not yet given in so many words) and T4-BASELINE; then click 0.
+His clicks 1, 3 (the test chat and the brief), 4, 5; the Actions > General screenshot.
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
@@ -51,6 +60,7 @@ Waiting for Mustafa: his go on the plan (not yet given in so many words) and T4-
 ## Decisions taken
 - MAIN-WALL next; the wall first · Mustafa · 2026-11-25 20:35
 - Order: MAIN-WALL, guard (R4-1 + GUARD-KIT), review tracks + SOURCE-GO (a) · Mustafa · 2026-11-26 15:05
+- PLAN-GO (a), T4-BASELINE (b) · Mustafa · 2026-11-26 ("a" / "b")
 - EXCEPTION-SCOPE (d): no exception for his account on today's rule · Mustafa · 2026-11-26 ("ok go with D")
 - THROWAWAY-PUBLIC (a): public throwaway, neutral names, deleted as soon as the results are reviewed · Mustafa · 2026-11-26 (his answer "a" in this chat)
 
