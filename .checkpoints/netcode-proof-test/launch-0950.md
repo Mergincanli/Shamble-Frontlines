@@ -1,6 +1,7 @@
 # The 09:50 UTC window (2026-11-26): what starts, in this order (the advisor tool's order of 05:3x)
 At most 3 agents at once; every brief carries the interim rule ("git and gh always start their own command, with no
 other program in front of them") and the standing file-writing sentence. Opus at xhigh for netcode work.
+A's and B's messages are drafted in launch-0950-msgs.md (07:4x UTC): re-check the marked facts, then send both.
 
 ## 0. Disk, before U7's builder resumes
 The part-clean ran at 05:5x (free 14,013 MiB). U7's builder builds cold in its own worktree (about 6.1 GiB, incremental
