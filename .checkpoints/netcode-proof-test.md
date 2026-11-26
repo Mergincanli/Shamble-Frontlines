@@ -5,8 +5,8 @@
   **Base:** main c1da1bd merged in at 6a4de15 (MAIN-66, 2026-11-25 19:3x UTC: #66, #68, #69 and #67 in one merge; one
   conflict, docs/STATUS.md: this branch's #40 row in main's table); before it main 28254a7 at 39a0d04 (MAIN-65) and
   main 1ec6f6c at 72b0dc3 (MAIN-64). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-26 14:1x UTC, before his /compact: nothing has run since the 13:09 save 98be7c0 but the
-  saver bgtqg8t6a; the resume block is in the chat. Next: his "ready" (Builder 2's merge) and the 14:51 wake-up.
+- **Last update:** 2026-11-26 14:3x UTC, after his /compact: resume checks passed (branch = origin at 891cacb, clean;
+  no agent; no 14:50 verdict file; last merge 07cc9b7). Next: his "ready" (Builder 2's merge) and the 14:51 wake-up.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -168,7 +168,7 @@
   -47 re-judge reads MOVED (else three lines), NB2-C10's reviewer read in step 9's window before NB2's report, then
   -47's pack. Then U7's round (netcode, test; after R4 and T5 (ii)) and its merge by end Mon 30; Stop B about Tue 1
   Dec; R1 Thu 3 Dec.
-- **PR #40:** main 07d673b is in (MAIN-67); #70 merged on main 12:22 (2483e9a): MAIN-68, its full take-in (main-68-plan.md; its check at 14:50). Re-subscribed 12:4x; the rules event must be in context before any CI, conflict or merge step on PR #40 (subscribe again after a compact).
+- **PR #40:** main 07d673b is in (MAIN-67); #70 merged on main 12:22 (2483e9a): MAIN-68, its full take-in (main-68-plan.md; its check at 14:50). Re-subscribed 14:37 after his compact (rules event read; dirty, head 891cacb, 0 review threads, no steward or babysit skill); the rules event must be in context before any CI, conflict or merge step on PR #40 (subscribe again after a compact).
 - **U8** (u8-brief.md rev 1.1; R1 3.55 h span, 4 h billed, cap EUR 0.80, him 161 min): pass 3 6,111; the last round
   DONE 11-24 21:2x (NC-R2-1, SEC-R2-1 = INF-R2-1, SEC-R2-2 CLOSED; NC-R3-1 Low: r1.sh:438-452, save_log unguarded under
   set -e, a follow-up); C9 DONE 11-25 09:2x (6,170 of 6,200, nothing carried; snapshot wip/u8-build.patch 09cb4a07…, 43
