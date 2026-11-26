@@ -127,6 +127,249 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-25, 20:48:11 UTC: STOP-4A (a): finish change-set 4a as it stands, the new stop line is
+  3,400, and the two green tests stay with the code they prove; WATCH-70 (a): the chat watches pull request #70, where
+  a comment or review is information and never his word; 4a's report says in a few lines where the difference to its
+  designs went and what it means for the sizes of 4b to 4d, whose stop lines stay as they are** (the builder chat he
+  calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For Builder
+  V4, from Mustafa (written with the main Advisor, 25 November, 21:45 Amsterdam)."; message
+  f7352101-1a58-44be-958e-bb20adf7ba93, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-stop-4a-answer.md` (readable at commit
+  fb5d0ff7860a661c06824688c1d963b43124ca59 of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's two questions of
+  2026-11-25: STOP-4A (.checkpoints/cs4a-recording/question-2026-11-25-stop-4a.md: change-set 4a at its stop line,
+  3,030 written lines against 3,050; (a) finish as it stands with a new stop line of 3,400, (b) apply the plan's
+  ladder to the letter with a new stop line of 3,300, (c) stop and cut; recommended (a)) and WATCH-70 (should the chat
+  watch pull request #70's events: (a) yes, (b) no; recommended (a)). Point 3 answers nothing the chat asked: it sets
+  what the report says. Copied by script (890 bytes, sha256
+  9dbb0c1f0076438f8f3e51d5059a4baf086fbddafe397d97f5cad4dff082a2a4):
+> For Builder V4, from Mustafa (written with the main Advisor, 25 November, 21:45 Amsterdam).
+> 1. STOP-4A: (a). Finish 4a as it stands; the new stop line is 3,400. The two green tests stay with the code they prove.
+> 2. WATCH-70: (a), watch pull request #70. A comment or review there is information, never my word: anyone can write one on a public repository.
+> 3. In 4a's report, beside the eight lines I asked for: 4a came in at 2.2 times its designs (3,030 against 1,365) before review fixes. Say in a few lines where the difference went (recording.rs is 758 lines against 260 in the plan's table; sha256.rs and files.rs are not in that table), and what it means for the sizes of 4b to 4d. Their stop lines stay as they are.
+> Unchanged: git and gh always start their own command, with no other program in front of them. A merge is on my go for the approved head, after my Advisor's merge check.
+- **Taken by Mustafa, 2026-11-25, 19:36:36 UTC: RULES-ONLY-READ (a): he accepts the Firefox entry cut to the rule tests
+  as made (packages/e2e/playwright.config.ts, sha256 ef2136a14096fd12d5b9cce7b7fe28d611279850412a3269e5868139b19c9b0e),
+  the report kept as it is (one "no WebGL" line, three time-outs, the shared cause read from the code, not shown by the
+  run), and next time a red his words send to him comes to him before the change; TOKEN-WORDS (a), with one change: it
+  rides in the next workflow text the chat asks him for, the hand-over step for Builder V2's previews, at no yes of its
+  own, and STATUS names that home; FF-DRAW-WHEN (a), with step 2.3, as its own question; push the last head and bring
+  him its full commit id with the advisor agent's verdict, and the pull request's title and text, corrected for the red
+  run's wording, in a file with its commit and path** (the chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz,
+  a Claude Code chat on Opus 5.5 for the small CI pull request after change-set 3a; his label: "For the CI Builder,
+  from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam)."; message
+  97ac33d8-6af2-4a2e-a3a9-b79318f70b84, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-after-3a/mustafa-2026-11-25T2035-rules-only.md` (readable at commit 9c9066c of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): the chat's question RULES-ONLY-READ and TOKEN-WORDS (question-2026-11-25-rules-only.md at 679e5b5)
+  and the report's FF-DRAW-WHEN: accept the Firefox entry cut to the rule tests as made, or put the full entry back;
+  defer TOKEN-WORDS to the gate step 2.3 or fold it in now; when a graphics route for Firefox's drawing tests comes
+  back to him; each recommended (a). Records, not his words: the advisor agent's read of 80359fc was REVISE on the docs
+  only; its two Highs were fixed in f7bd1f2 (pushed with 679e5b5) before this answer. Copied by script (1146 bytes,
+  sha256 077318678703e0a990f48ce4144b81e507e570877eb8ce3bbb193ee4f06bf11e):
+> For the CI Builder, from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam).
+> 1. RULES-ONLY-READ: (a). I accept the Firefox entry cut to the rule tests as made: packages/e2e/playwright.config.ts with sha256 ef2136a14096fd12d5b9cce7b7fe28d611279850412a3269e5868139b19c9b0e. The report keeps it as it is: one "no WebGL" line, three time-outs, the shared cause read from the code and not shown by the run. Next time, a red that my words send to me comes to me before the change.
+> 2. TOKEN-WORDS: (a), with one change: it does not wait for step 2.3. It rides in the next workflow text you ask me for, the hand-over step for Builder V2's previews, so it costs no yes of its own. STATUS names that home.
+> 3. FF-DRAW-WHEN: (a), with step 2.3, as its own question.
+> 4. Push the last head and bring me its full commit id with the advisor agent's verdict. Put the pull request's title and text, corrected for the red run's wording, in a file and name its commit and path: my Advisor opens the pull request from it and checks the head before my go.
+> Unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-25, 19:36:25 UTC: his go on the plan of change-set 4 (revision 4, pushed at 25c42c5):
+  start 4a, the recording; WALK-CUT (a), four change-sets, each its own pull request; STEP-60 (a), he plays the
+  sandbox at 30 steps and exports again, and no value is carried from the 60-step Export; a question for 4a's report
+  on what the first soldier on screen does not need; every report says which size is the designs' own count and which
+  holds the 1.8; the Hornet's entry goes in as the plan says and the two lines of docs/UNITS.md stay as they are,
+  listed as open for his unit walk; the other questions wait for the part that needs them** (the builder chat he calls
+  Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For Builder V4,
+  from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam)."; message
+  a3177cd2-093c-4e89-bf9d-5e4c6d909d1f, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-go-walk.md` (readable at commit fb5d0ff7860a661c06824688c1d963b43124ca59
+  of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied by script from its transcript). What it
+  answers, in the chat's words (not his): the chat's stop for his go on the plan (.checkpoints/cs4-walk/plan.md at
+  25c42c5) and its two questions of that stop: WALK-CUT (how Walk is cut: (a) four change-sets, (b) three, (c) two;
+  recommended (a)) and STEP-60 (his Export was made at 60 steps a second: (a) he plays the sandbox at 30 and exports
+  again, (b) carry it and judge at 30 in the game, (c) carry only the values equal to the old game's; recommended
+  (a)). Points 4 to 7 answer nothing the chat asked: they set work and rules. Copied by script (1256 bytes, sha256
+  a87cc51e6d1a9ecca9bbb601f147e0d8835a3388717a1eb9532002eb4170d06c):
+> For Builder V4, from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam).
+> 1. My go on the plan for change-set 4 (revision 4, pushed at 25c42c5). Start 4a, the recording.
+> 2. WALK-CUT: (a), four change-sets, each its own pull request.
+> 3. STEP-60: (a). I play the sandbox at 30 steps and export again. Carry no value from the 60-step Export; I paste the new one before 4b's step 6.
+> 4. In 4a's report, in at most eight lines: what does the first soldier on screen not need from 4b and from 4c's first five steps (for example the canonical writer, the content tools, the reload), and how many hours would it save to build those after the early look, with no proof thinner and nothing moved off the code it proves? I decide then. Change nothing in the plan for it now.
+> 5. In every report say which size is the designs' own count and which already holds the 1.8.
+> 6. The Hornet: put its entry in as the plan says. The two lines of docs/UNITS.md stay as they are, listed as open, for my unit walk. They do not hold Walk.
+> 7. The other questions wait for the part that needs them.
+> Unchanged: git and gh always start their own command, with no other program in front of them. A merge is on my go for the approved head, after my Advisor's merge check.
+- **Taken by Mustafa, 2026-11-25, 18:00:43 UTC: his answers to the CI chat's ask 2: CI-WRITE-2 (a), write both texts
+  exactly as saved at e12bb442, the workflow then sha256
+  01898e4b3833812e945882106baa2bb3590866aff3c8d2dfa487a1fe38ce5742 and the test configuration
+  fed4b79d38cbbbf15cd69b0225e576dbfce880f9a69292096e74b1619b9e43ed, else stop and show him; FF-STOP (a), keep the
+  5-minute stop for the first run; FF-FILEURL (a), yes, with the comment that says so; GUARD-LOAD (a), `git merge
+  --ff-only origin/main` in the main folder, alone in its command; main c1da1bd taken in once before the docs pass; on
+  the first GitHub run, if the Firefox drawing tests fail on the page's "no WebGL" line, the firefox entry runs the
+  rule tests only, by a change to the test configuration alone, and the drawing tests become a follow-up, while any
+  other red, a time-out included, comes to him first; then the pull request's title and text into the notes and his
+  Advisor opens the draft; until the second guard fix is merged, git and gh always start their own command** (the chat
+  he calls CI Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for the small CI pull request
+  after change-set 3a; his label: "FOR THE CI BUILDER. From Musti, 25 November, 19:00 Amsterdam. My answers to ask 2.";
+  message 3d775773-0e83-4611-95f3-04d6845b6436, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-after-3a/mustafa-2026-11-25T1900-ask2-answers.md` (readable at commit 832268e of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): the chat's ask 2 (question-2026-11-25-ask2.md at e12bb44): CI-WRITE-2, write the two texts exactly;
+  FF-STOP, keep the 5-minute stop; FF-FILEURL, file-url.spec.ts in Firefox with its comment; GUARD-LOAD, bring the main
+  folder to main; each recommended (a). Records, not his words: the permission mode read right before the write:
+  `default`, which his rule of 2026-11-23, 17:15:07 UTC covers; the workflow written at 18:02:02 UTC (the report
+  `docs/reports/2026-11-25-ci-after-3a.md`, lines 47-57). At 52ad5d3 the workflow is sha256
+  01898e4b3833812e945882106baa2bb3590866aff3c8d2dfa487a1fe38ce5742 and the configuration
+  fed4b79d38cbbbf15cd69b0225e576dbfce880f9a69292096e74b1619b9e43ed, his two values (read with `git show` by
+  docs-keeper, 2026-11-25). The first GitHub run on 52ad5d3 (toolchain 45670972698, red; its log read with gh by
+  docs-keeper): Chromium "16 passed (3.5m)"; "libEGL.so.1: not in the loader cache of this runner (printed, not
+  judged)"; "Mozilla Firefox 160.0"; in Firefox "4 failed", "9 did not run", "2 passed (5.0m)" after "Timed out waiting
+  300s for the test suite to run"; one of the 4 failures (file-url) reading "This page could not start drawing: can't
+  access property "getSupportedExtensions", this.gl is null", the other three (clock at its 90 s test limit, the two
+  isolation tests at their 60 s waits) timing out with no page line in the log and no artifacts uploaded; their common
+  cause is inferred (`packages/client/src/app/boot.ts:41-45`: a page that cannot draw starts neither the Worker nor the
+  report hook), not shown (this sentence corrected on the advisor agent's read of 80359fc, 2026-11-25; it had said
+  every failure read that line). The run reached Playwright's 300 s stop as well as that line. The chat
+  read the red as the case his point 6 names, not as a time-out of its own, because its container trial had the same
+  shape (the drawing tests failing on that line, the rest not run at the stop: `trials-main-311c048.md`, lines 14-16,
+  the case his FIREFOX-GL (a), point 2, names): the chat's reading, not his words. It then narrowed the firefox entry
+  to `tests/rules/` by a change to the test configuration alone (832268e; the configuration then sha256
+  ef2136a14096fd12d5b9cce7b7fe28d611279850412a3269e5868139b19c9b0e, the workflow still 01898e4b...5742, both read with
+  `git show`). With it `file-url.spec.ts` and the comment his FF-FILEURL (a) names left Firefox's run; FF-STOP's
+  5-minute stop stands in the workflow. On 832268e toolchain 45676587814 and gate 45676587871 (its gate and smoke jobs)
+  are green (read with gh): Chromium "16 passed (3.4m)", Firefox "2 passed (15.0s)", the job 18:34:50 to 18:40:12 UTC.
+  GUARD-LOAD and point 5: the main folder's head and the worktree's merge 3c02729's second parent both read c1da1bd
+  (docs-keeper, with git). Copied by script (1681 bytes, sha256
+  a7bbf87d193fa1f85e5adcb88522780be638494f1a2026da37e2ce8b565c23a2):
+> FOR THE CI BUILDER. From Musti, 25 November, 19:00 Amsterdam. My answers to ask 2.
+>
+> 1. CI-WRITE-2 (a): yes, write both texts exactly as saved at e12bb442 (draft-toolchain.diff, sha256 55bdbd69a9c4e06609a2ef3e6547e0a1562d7217f3bb4feb80a2a8b4362e424f; draft-playwright-config.diff, sha256 7f79116888311c52e29b14839ff3fa72573e02bde96e4fa0becba8170d433dbe). After the write the workflow must be sha256 01898e4b3833812e945882106baa2bb3590866aff3c8d2dfa487a1fe38ce5742 and the test configuration fed4b79d38cbbbf15cd69b0225e576dbfce880f9a69292096e74b1619b9e43ed. My Advisor rebuilt both from your drafts on main and got these two values. If either differs after your write, stop and show me the difference.
+> 2. FF-STOP (a): keep the 5-minute stop for the first run.
+> 3. FF-FILEURL (a): yes, with the comment that says so.
+> 4. GUARD-LOAD (a): yes, git merge --ff-only origin/main in your main folder, alone in its command. Tell me in one line that the fixed guard loads.
+> 5. Main is c1da1bd24faae21794195e2384895460753a41eb since 18:12 (the merge of #67, docs only; the workflow and the test configuration are unchanged on it). Take it in once before your docs pass.
+> 6. The first run on GitHub, as in my FIREFOX-GL (a): if the Firefox drawing tests fail on the page's "no WebGL" line, the firefox entry runs the rule tests only, by a change to the test configuration alone, and the drawing tests become a follow-up. Any other red, a time-out included, comes to me first.
+> 7. Then as agreed: the pull request's title and text into your notes, and my Advisor opens the draft. Until the second guard fix is merged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-25, 17:44:41 UTC: his block for his Testlines Export: save it whole by script with its
+  byte count and sha256 before reading it; say its format and version, its build commit, what its warnings hold and
+  how many values changed from the start; a line in the warnings means he tuned at a step rate other than the game's
+  30, to be said, and asked before values that depend on it are carried; the values are starting values, not
+  decisions, and go one way, from the Export into the game; the Hornet's numbers are a sketch and no part of Slice 1**
+  (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat;
+  his label: "@"/root/.claude/uploads/bcc7f209-7c97-557d-9f29-c2f6b7b20188/ea317b14-testlines.html" FOR BUILDER V4.
+  From Musti, 25 November. My Testlines Export, for point 8 of my takeover block."; message
+  a0dd1f03-10bf-4db4-8981-c93c4ee8369f, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-export-block.md` (readable at commit
+  fb5d0ff7860a661c06824688c1d963b43124ca59 of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's ask of 2026-11-25 (its
+  eight lines, line 6, and again at the end of its next two messages): please paste your Testlines Export's JSON (his
+  point 8b). The message holds the block only (994 bytes, no JSON); the file attached to it is the sandbox's built
+  page, byte for byte the branch's play/testlines.html at be608cad (1,228,251 bytes, sha256 886e4e66...1d21), not an
+  Export. The Export itself came in his next message (2026-11-25, 17:51:49 UTC) and is saved whole by script as
+  `.checkpoints/cs4-walk/testlines-export.json` (15,567 bytes, sha256
+  9ad1d9f914acc27c56cbfbe7c4e6c7e654ba24fa0e9ae75cb4e3b93103f06498); by his STEP-60 (a) no value of it is carried, and
+  it is not recorded here. Copied by script (994 bytes, sha256
+  f95e4b64cab9aadb6c3dfbcb7ff5b8e03509ad1d3ceb670a5602c9d1ae5a69c6):
+> @"/root/.claude/uploads/bcc7f209-7c97-557d-9f29-c2f6b7b20188/ea317b14-testlines.html" FOR BUILDER V4. From Musti, 25 November. My Testlines Export, for point 8 of my takeover block.
+>
+> 1. The Export is under this block, whole. It comes from Testlines step E: format "testlines-export", version 1, page built from commit 4c34e750f5edda22547e3bbe4074faadee5961ae (branch claude/sleepy-edison-ygmwfe, tip be608cad, which only adds the built page).
+> 2. Save it whole by script with its byte count and sha256 before you read it. Then tell me in one line each: the format name and version; the build_commit; what the "warnings" list holds; how many entries "changed_from_start" has. A line in "warnings" means I tuned at a step rate other than the game's 30: say so, and ask me before you carry values that depend on it.
+> 3. These are starting values, not decisions. Values go one way, from this Export into the game, and from nowhere else. The Hornet's numbers in it are a sketch and no part of Slice 1.
+- **Taken by Mustafa, 2026-11-25, 16:59:52 UTC: ORDER-3C (c), with four conditions: change-set 3c is split at its
+  seam, the recording becomes the first step of change-set 4, Walk, and the link simulator follows Walk as its own
+  small change-set, merged before change-set 7 starts; then change-set 4's plan, sized at 1.8 times with a stop line,
+  showing the earliest playable build and whether Walk is cut in two; main 311c0484 taken in; the wider interim rule
+  that git and gh always start their own command; the Hornet's entry for docs/UNITS.md section 0** (the builder chat
+  he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For
+  Builder V4, from me, written with my main Advisor (25 November, 17:55 Amsterdam)."; message
+  30cd6625-e8c6-4aee-9265-139a5458ceba, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-order-3c-answer.md` (readable at commit
+  fb5d0ff7860a661c06824688c1d963b43124ca59 of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's question ORDER-3C
+  (question-2026-11-25-order-3c.md beside this file: what is built first, change-set 3c or change-set 4, Walk; options
+  (a) the plan's order, (b) Walk first and 3c whole after, (c) the recording as Walk's first step and the link
+  simulator after Walk; recommended (c)). Points 3 to 7 answer nothing the chat asked: they set the next work. Copied
+  by script (2728 bytes, sha256 18fd8bb4855d4615893e126da79d8d1e87ff40d0a7bf247f6a770aa2facef428):
+> For Builder V4, from me, written with my main Advisor (25 November, 17:55 Amsterdam).
+>
+> 1. ORDER-3C: (c). Split 3c at its seam. The recording (the replay runner, the comparer, the state's hash on the players' file, the recorded match) becomes the first step of change-set 4, Walk. The link simulator follows Walk as its own small change-set and is merged before change-set 7 starts. This changes the order my go of 17 November named, for these two parts only.
+> 2. Conditions for (c):
+>    a. No proof gets thinner than the build plan has it: every mark the plan places at Walk on the recording is met before Walk merges.
+>    b. The recording step is built and green before any movement code rests on it.
+>    c. Walk's plan places every item named for 3c in one of the two parts, by name.
+>    d. Your fallback stands: if Walk cannot carry the recording inside its stop line, the recording alone becomes a small change-set before Walk, and you tell me before anything moves.
+> 3. Now write change-set 4's plan, as point 7 of my takeover block says, sized at 1.8 times with a stop line. The plan also shows the earliest point at which I can play a build of the walking soldier, and whether Walk stays one stop or is cut in two with the first playable soldier in the first part. I would rather play a first part early than wait for one large stop. Point 8 of the takeover block (my Testlines values) stands.
+> 4. Main has moved: the guard fix, pull request #69, is merged, and main is 311c0484f7a9697ae33e7a76a8cf0b507a2837c4. Take it in before you plan, and tell me in one line whether your session then loads the fixed guard. docs/STATUS.md no longer holds the "in flight" rows of #66 and #68. Change-set 3b's own docs pass is still owed, as STATUS says: it goes into your first pull request.
+> 5. The interim rule is wider now, until a second guard fix is merged: git and gh always start their own command, with no other program in front of them.
+> 6. For the docs pass of your first pull request, one entry in docs/UNITS.md, section 0, recorded by script from this message: "The Hornet is a tier-one unit of the Empire: a vehicle on one wheel that leans forward or backward with the direction it moves, and leans back in a flinch when it fires a full shot. Its blockout and first handling numbers are in my Testlines sandbox; those numbers are a sketch to tune." Mark the unit as decided and the numbers as a sketch. The hover skimmer line of 4 November stays as it is. If the entry clashes with another line of that section, do not settle it: list the clash for me. The Hornet is not part of Slice 1 and nothing of it is built there.
+> 7. Answer in at most 8 lines. Then the plan and your advisor agent's review, and stop for my go on the plan.
+- **Taken by Mustafa, 2026-11-25, 16:41:57 UTC: 3b (#68, main 3ab9eaec) and the guard fix (#69) are merged: take
+  today's main in once and go on (the test lists and timings again, the reviewers, then ask 2 with every CI text in one
+  message); lane 1's builder is now Builder V4, a new chat, and nothing changes for this work; the interim rule wider
+  until a second guard fix is merged: git and gh always start their own command, with no other program in front of
+  them; one line on whether the session loads the fixed guard after taking main in** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for the small CI pull request after change-set 3a;
+  his label: "For the CI Builder, from me, written with my main Advisor (25 November, 17:05 Amsterdam)."; message
+  8ec31283-88ae-48be-a305-c47ccd689a37, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-after-3a/mustafa-2026-11-25T1705-main-in.md` (readable at commit 832268e of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): nothing the chat asked: 3b (#68) and the guard fix (#69) are merged; take main in and go on; Builder
+  V4; the wider interim rule for git and gh. Records, not his words: main 311c048 (the merge of #69, after #68's
+  3ab9eae) taken in at 77d28ee (`trials-main-311c048.md`, line 1, in the same notes). Copied by script (837 bytes,
+  sha256 43066fdfed75165233bbdf32f44f5c6de03f9f084c074e8f54ff61cff1ff0f04):
+> For the CI Builder, from me, written with my main Advisor (25 November, 17:05 Amsterdam).
+>
+> 1. Change-set 3b is merged: pull request #68, main 3ab9eaec. The guard fix, pull request #69, is merged after it. Take today's main in once, which brings both, and go on as my last block says: the test lists and timings again, your reviewers, then ask 2 with every CI text in one message. If main does not show #69's merge yet, take main in anyway and go on.
+> 2. Lane 1's builder is now Builder V4, a new chat on this account. Builder V3 has stopped. Nothing changes for your work.
+> 3. The interim rule is wider now, until a second guard fix is merged: git and gh always start their own command, with no other program in front of them. Tell me in one line whether your session loads the fixed guard after taking main in.
+>
+> Answer in at most 4 lines.
+- **Taken by Mustafa, 2026-11-25, 15:51:21 UTC: his takeover block for the chat he calls Builder V4: lane 1 of the
+  Slice 1 build from the merge of change-set 3b on, in twelve points (among them: the first job is the question
+  ORDER-3C; then the plan of the stop he chooses, sized at the ratio change-sets 3a and 3b ran at, with a stop line;
+  his Testlines values, point 8, a to g; no CI, kit or gate file is written by this chat; a merge only on his go for
+  the head the advisor agent approved; this block recorded word for word with the first pull request)** (the builder
+  chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "My
+  words of 2026-11-25 for a new Claude Code chat: you take over lane 1 of the game's build."; message
+  f0ae3cf2-d3a3-428d-9657-c67fd0d838fb, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-takeover.md` (readable at commit fb5d0ff7860a661c06824688c1d963b43124ca59
+  of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied by script from its transcript). What it
+  answers, in the chat's words (not his): nothing the chat asked: it is the block that opened this chat. Its point 2
+  asks that it is recorded word for word in docs/DECISIONS.md with this chat's first pull request. Not recorded here,
+  by his own words in it: his board add-on of the same day.
+  Copied by script (5779 bytes, sha256 0dc59aaff9788c5e3ba0ec035fe47798a38da5d6261aecdb60fc7a2969d306a1):
+> My words of 2026-11-25 for a new Claude Code chat: you take over lane 1 of the game's build.
+>
+> 1. Who you are. A new Claude Code chat on Fable 5.2, on my first personal account. I call you Builder V4. Read your session's model first; if it is not Fable 5.2, stop and tell me in one line. My model words of 2026-11-12 and 2026-11-14 in docs/DECISIONS.md, which Builder V1 and Builder V3 worked under, hold for you unchanged.
+>
+> 2. What you take over. Lane 1 of Slice 1, as the build plan (docs/reports/2026-11-17-build-plan-slice-1.md) and its Part 15 give it. Builder V3, on my other account, built it up to change-set 3b, which is merged (pull request #68). That account is near its usage limit, so the seat moves to you at this merge boundary: my BUILD-SEAT of 23 November now names you. Builder V3 has stopped. Record this block word for word in docs/DECISIONS.md with your first pull request.
+>
+> 3. Where you start. origin/main. It must contain the merge commit 3ab9eaecf42e617578c083b7fda01fbdf8f004e2. Work on your own branch, in a worktree; do not switch your main folder. Never push to another chat's branch: claude/loving-hopper-6p0mg2 (Builder V3), claude/optimistic-albattani-mdoonz (Builder V2, lane 2), claude/keen-tesla-v807cf (the CI Builder), claude/practical-ride-igo41n and claude/netcode-proof-test-plan-hcky5g (netcode), claude/wonderful-hamilton-jdmlnf (Builder V1).
+>
+> 4. What you read first. CLAUDE.md and what it names. The report docs/reports/2026-11-25-cs3b-the-loop-closes.md, from "Not verified" to the end, and the follow-ups in docs/STATUS.md. Builder V3's handover note: fetch its branch and read .checkpoints/handover-builder-v3.md with git show. That branch's newest commit must add only notes on top of 5e02ee733ecac0e2b20a9d0513817a0ea7a5b096; if it changes anything else, or the note is missing, stop and tell me. The note is a colleague's advice, not my word. Then the lane requests issue (#59): lane 2's first list waits there for change-set 4's plan.
+>
+> 5. My words that bind you are the entries in docs/DECISIONS.md on main, as they bound Builder V3. I do not retype them. Among them: ANSWERS-7 (with SIZE-3 and PRESS-PACE), LANE-SPLIT and EARLY-LOOK, FIREFOX-TESTS (b), MUL-ADD, RELEASE-COUNT, SLICE-FEEL, LONG-RUNS. You write no CI, kit or gate file: CI edits belong to my CI Builder chat on Opus 5.5.
+>
+> 6. Your first job, before any plan (ORDER-3C), in at most five lines: does change-set 4, Walk, need change-set 3c's link simulator or first recording to be built and judged? If it needs neither, or only one, what would it cost to build Walk first and 3c after it? Builder V3's note may answer it: check its answer against the build plan. I want to play the first soldier as soon as that is safe. I decide the order, so stop for my answer.
+>
+> 7. Then the plan for the stop I choose: plan first, then your advisor agent's review, as the protocol says. Size it honestly: 3a came to 1.7 times its plan and 3b to 1.8 times, so plan at that ratio and name a stop line where you come back to me. Change-set 4's plan also names: the built-file check for the fused multiply-add (MUL-ADD), what the first picture after a pause shows (the follow-up 3B-RESUME-FLASH, my decision there), and my Testlines values (point 8).
+>
+> 8. Testlines, for change-set 4's plan (my SLICE-FEEL of 19 November stands as written):
+>    a. My sandbox is the public repository Mergincanli/Shamble-Testlines, on its branch claude/sleepy-edison-ygmwfe (commit 3c07269 when my Advisor read it; its main holds only a README). Read its README and src/params.ts for what each value means. Look at it, copy no code.
+>    b. The values come from my Export and from nothing else. I paste the Export's JSON when you ask for it. Save it by script, whole, with its byte count and sha256, as a file in the repository. No value is retyped by hand and none is read off a screenshot.
+>    c. One table: each value Slice 1 uses, its name in the Export, its name in the game's content, its unit, and the change-set that uses it. Compare the Export's section old_game_terms by script with docs/legacy-tuning.json and list every difference. Those are my tunings, and I confirm the list before it becomes the starting table.
+>    d. A script with a --check mode, like the vector generators, fails when the game's content differs from the saved Export through that table.
+>    e. Not taken, each listed by name with one line: the Hornet, the explosion picture, the metrics room, the grid, and every sandbox rule that differs from the old game. None enters a change-set without my word in that change-set's plan.
+>    f. The game runs at 30 steps a second: if my Export says 60, tell me before you use it.
+>    g. The plan says where I tune once change-set 4 exists, so that each value has one home.
+>
+> 9. Pull requests. If this chat can open a pull request, you open your own drafts. If it cannot, put the title and text into your notes (pr-title.txt, pr-body.md) and my Advisor opens the draft, as for Builder V3. Either way a merge happens only on my go for the head your advisor agent approved, with that full commit id as the expected head, after my Advisor's merge check.
+>
+> 10. Later, not now: Builder V2 will ask on issue #59 for one small pull request from lane 1 (a second page in the build setup, for an early look test page). I tell you when it is due.
+>
+> 11. Until the repository's guard is fixed (another chat fixes it): no session or agent of yours puts env, stdbuf or nice with options in front of git or gh.
+>
+> 12. Your first answer, before you write anything, in at most 10 lines: your model, your mode, your branch, whether main and the handover note match this block, whether the repository's guard loads in your session, whether you can open and merge pull requests, and then the five lines on ORDER-3C.
 - **Taken by Mustafa, 2026-11-25, 13:55:08 UTC: his answers on pull request #67: PASS-WORDS (a), the three re-worded
   places stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads
   "recorded, the question is not answered", never "passed" on its own, and until someone shows a count the previews work
@@ -152,6 +395,35 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. WORKERS-NEXT: (a), keep Pages. At the draft's next revision add Cloudflare's "Start new projects with Workers" to its "Revisit when" line. In step 2.6's plan: keep the deploy step small enough to move to Workers later, say in two lines what such a move would cost, and weigh the 30-day rule for old previews.
 > 4. No go for #67 yet, because main moves first: change-set 3b (pull request #68, lane 1) merges today, and after it #67 no longer merges cleanly. Both lanes changed five docs: DECISIONS, REPO_MAP, ROADMAP, STATUS and STATUS_ARCHIVE. When main shows the merge of #68: take that main into your branch by one merge commit that keeps both lanes' text, with lane 1's lines byte for byte, as Builder V3 did for your #66. Record this message in the same push. Then your advisor agent's approval of exactly that commit and green checks on it, and give me its full commit id in one line. My main Advisor runs the merge check and I give my go for that commit.
 > 5. If #68 is not merged by Thursday 26 November, 12:00 Amsterdam, tell me in one line and wait.
+> 6. Until the repository's guard is fixed (a finding of today, another chat fixes it): no session or agent of yours puts env, stdbuf or nice with options in front of git or gh.
+>
+> Answer in at most 6 lines. Plain words, as before.
+- **Taken by Mustafa, 2026-11-25, 13:54:38 UTC: FIREFOX-GL (a): ask 2 brings the full Firefox run with the read-only
+  line about libEGL.so.1, and the first GitHub run is the drawing tests' trial; decided now: if the Firefox drawing
+  tests fail there with the same no-WebGL line, the Firefox entry of the test configuration goes to the rule tests
+  only, the drawing tests become a follow-up, three lines to him, Chrome's drawing tests unchanged, and any other red
+  or cause comes back to him first with options; no install line for the runner and no Firefox setting that switches
+  off its graphics refusal without his word, each its own question in that follow-up; wait for #68's merge, take that
+  main in and run the lists and timings again (one line to him if not merged by Thursday 26 November, 12:00 Amsterdam);
+  `.gate/egl` deleted now; until the guard is fixed, no env, stdbuf or nice with options in front of git or gh** (the
+  chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for the small CI pull
+  request after change-set 3a; his label: "For the CI Builder, from me, written with my main Advisor (25 November,
+  14:55 Amsterdam)."; message 641bd3ba-3dbd-451d-919e-46ebee973577, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-after-3a/mustafa-2026-11-25T1455-firefox-gl.md` (readable at commit 832268e of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): the chat's question FIREFOX-GL (question-2026-11-25-firefox-gl.md at 0a4e32a): how Firefox enters
+  CI; (a) the full Firefox run with the libEGL line, the first GitHub run as the drawing tests' trial, (b) the rule
+  tests only, (c) more digging; recommended (a). Records, not his words: how his point 2 was applied on GitHub is in
+  the records of the entry of 2026-11-25, 18:00:43 UTC (above); the follow-up is FF-DRAW (`docs/STATUS_ARCHIVE.md`,
+  "From ci-after-3a"); `.gate/egl` deleted (the chat's card). Copied by script (1681 bytes, sha256
+  1c45836da10b4f8daadb42874fff9d72eb340e8c869564f8c29a9c44cb7ad7eb):
+> For the CI Builder, from me, written with my main Advisor (25 November, 14:55 Amsterdam).
+>
+> 1. FIREFOX-GL (how Firefox enters CI): (a). Ask 2 brings the full Firefox run with the read-only line about libEGL.so.1, and the first GitHub run is the trial of the drawing tests.
+> 2. Decided now, so that a red run needs no new question: if on GitHub's runner the Firefox drawing tests fail with the same line as in your container (the page could not start drawing because Firefox gave it no WebGL), change the Firefox entry in the test configuration to the rule tests only (your option (b)), name the Firefox drawing tests as a follow-up, and tell me in three lines. Chrome's drawing tests stay as they are. Any other red result, or any other cause, comes back to me first with options, and you fix nothing.
+> 3. No install line for the runner and no Firefox setting that switches off its own graphics refusal (such as webgl.force-enabled) without my word: each is its own question to me, in that follow-up.
+> 4. Main has moved: #66 is merged, and change-set 3b (pull request #68) merges today and adds browser tests. Before ask 2, wait until main shows the merge of #68, take that main into your branch in your worktree, and run your test lists and timings again on it. If #68 is not merged by Thursday 26 November, 12:00 Amsterdam, tell me in one line and go on from today's main.
+> 5. The two library files did not help: delete the folder .gate/egl now and say so.
 > 6. Until the repository's guard is fixed (a finding of today, another chat fixes it): no session or agent of yours puts env, stdbuf or nice with options in front of git or gh.
 >
 > Answer in at most 6 lines. Plain words, as before.
@@ -383,6 +655,32 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > worker.undetached: 0
 > worker.hardwareConcurrency: 11
 > worker.crossOriginIsolated: false
+- **Taken by Mustafa, 2026-11-25, 11:07:23 UTC: EGL-TRIAL (a): yes to two library files
+  (libegl1_1.7.0-1build1_amd64.deb and libegl-mesa0_25.2.8-0ubuntu0.24.04.5_amd64.deb, at the sizes and sha256 he
+  gives) for the container's trial only, by the question's route, the folder deleted when the pull request is merged;
+  ask 2 says which Firefox tests passed with them, adds one read-only CI line that prints whether the runner has
+  libEGL.so.1 and brings no install line for the runner; a runner without it comes back as its own question; a Firefox
+  test that still fails is read first, and a cause in the game's page is the three-line stop; every other file, version
+  or checksum to him first** (the chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on
+  Opus 5.5 for the small CI pull request after change-set 3a; his label: "For the CI Builder, from me, written with my
+  main Advisor (25 November, 12:15 Amsterdam)."; message bea1027f-bf08-4dae-aa6a-1fdb6572e64a, whole; copied by script
+  from the chat's saved file `.checkpoints/ci-after-3a/mustafa-2026-11-25T1215-egl-trial.md` (readable at commit
+  832268e of the chat's branch `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What
+  it answers, in the chat's words (not his): the chat's question EGL-TRIAL (question-2026-11-25-egl-trial.md at
+  1b64214): how the Firefox drawing tests are tried; (a) yes to libegl1 and libegl-mesa0 for the container's trial
+  only, (b) the first GitHub run as their trial, (c) Firefox in CI runs only the rule tests; recommended (a). Records,
+  not his words: with the two files the 2 rule tests passed and every drawing test still failed on "this.gl is null"
+  (`question-2026-11-25-firefox-gl.md`, in the same notes). Copied by script (1795 bytes, sha256
+  6450235a15ada4aa5c83b1d6d01fc7a41b27defe9249fce8651eca294dcbab3e):
+> For the CI Builder, from me, written with my main Advisor (25 November, 12:15 Amsterdam).
+>
+> 1. EGL-TRIAL (how the Firefox drawing tests are tried in your container): (a), yes, for these two files only and for this container's trial only: libegl1_1.7.0-1build1_amd64.deb, 28670 bytes, sha256 e549f7776216f7bd3b1c216729fb40a97a562e2eb7c563cde632b4931f9a4e57, and libegl-mesa0_25.2.8-0ubuntu0.24.04.5_amd64.deb, 117190 bytes, sha256 c04cdb8c4d29667ab9d2c3abac6bb38dc066f5cdb874d867f85f5e238d546f82, from the two addresses in your question. My main Advisor measured the same sizes and checksums over a second route and deleted its copies.
+> 2. The route is the one in your question: fetched into a new folder under .gate/, size and checksum checked before use, unpacked with dpkg-deb -x, no apt, no root, no install script, handed only to the trial's Firefox through its environment. Nothing in the system changes, nothing of it is committed, and the folder is deleted when the pull request is merged. If a value differs, stop and tell me.
+> 3. This answers your container only. Whether GitHub's runner has this library is still unknown. So in ask 2: say which Firefox tests passed here with the two files and which did not; add one read-only line to the CI text that prints whether the runner has libEGL.so.1, so the first GitHub run says it in words; and bring no install line for the runner. If the runner lacks the library, that comes back to me as its own question with options.
+> 4. A Firefox test that still fails with the library in place: read it first. If the cause is the game's page, rule 4 of my opening block holds: stop, tell me in three lines with options, and fix nothing.
+> 5. Every other file, version or checksum comes back to me first.
+>
+> Answer in at most 6 lines. Plain words, as before.
 - **Taken by Mustafa, 2026-11-25, 11:07:07 UTC: his go for the merge of pull request #66 at exactly
   d7937de0aad4b86748c7c4574bee5a6921eeb67c, as a normal merge (his HISTORY-ID (a)), with that commit as the expected
   head, and not if the head had changed; after the merge, the merge commit to him in one line; the status page's row
@@ -422,6 +720,70 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 6. From now on, when you wait on me: save the full question as a file in your notes, push it, and name the file and the commit in your message.
 >
 > Answer in at most 6 lines. Plain words: no tag or code without its explanation in the same sentence.
+- **Taken by Mustafa, 2026-11-25, 00:21:41 UTC: PW-RUNS (a) with one change of route: Playwright started through `node
+  node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts`, as Builder V3 does, since the
+  repository's deny list refuses npx and stays as it is; his yes at the permission question covers test runs and
+  listing of the project's own configuration, not "install" or "install-deps"; if the node route is refused too, stop
+  in three lines, no third route; ask 2 says in one line that CI keeps "npx --no --" and the trial ran the same program
+  through node** (the chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for
+  the small CI pull request after change-set 3a; his label: "For the CI Builder, from me, written with my main Advisor
+  (25 November, 01:35 Amsterdam)."; a message queued while the chat worked, entry e55cec24-0ff6-4b89-b89d-afe450d7f8bd,
+  whole; copied by script from the chat's saved file
+  `.checkpoints/ci-after-3a/mustafa-2026-11-25T0135-pw-runs-route.md` (readable at commit 832268e of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): the chat's question PW-RUNS (question-2026-11-25-playwright-runs.md at 808af08), after the
+  repository's deny list refused npx. Records, not his words: the trials ran Playwright that way
+  (`trials-main-311c048.md`, in the same notes); CI keeps `npx --no --`. Copied by script (1577 bytes, sha256
+  c720c1ab842b33577a255b85b6e2c1e61b9910767180507c151cb20e0a9177a1):
+> For the CI Builder, from me, written with my main Advisor (25 November, 01:35 Amsterdam).
+>
+> 1. PW-RUNS (how you may run Playwright, the browser test tool, for your trials): (a), with one change of route. The repository's own permission rules refuse every command that starts with npx: the deny list in .claude/settings.json on main holds "Bash(npx *)", and also npm exec, npm run and npm test. That list is a kit file and stays as it is. Start Playwright through node instead, as Builder V3 does for its browser tests: node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts with your environment variables in front and your options behind, from your worktree. It is the same program: the package's "playwright" command points at that cli.js (package-lock.json, node_modules/@playwright/test, "bin").
+> 2. When the permission question comes for that command, I allow it. My yes covers test runs and listing of the project's own test configuration, your draft Firefox entry included. It does not cover "install" or "install-deps": those download, and every download comes to me first.
+> 3. If the node route is refused too, stop and tell me in three lines: the exact refusal text and your permission mode. No third route: no wrapper script and no other launcher to get around a refusal.
+> 4. In ask 2, say in one line that CI's text keeps "npx --no --" like the file's other lines, and that your trial ran the same program through node.
+> 5. On the board, set your thread back to doing once your trials run.
+>
+> Answer in at most 6 lines. Plain words, as before.
+- **Taken by Mustafa, 2026-11-25, 00:20:12 UTC: PW-RUNS (a): he allows the Playwright prompts** (the chat he calls CI
+  Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for the small CI pull request after
+  change-set 3a; no label of his own; message 58859ffb-2040-4a50-a4ab-5587186b3862, whole; copied by script from the
+  chat's saved file `.checkpoints/ci-after-3a/mustafa-2026-11-25-pw-runs.md` (readable at commit 832268e of the chat's
+  branch `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the
+  chat's words (not his): the chat's question PW-RUNS (question-2026-11-25-playwright-runs.md at 808af08): how may the
+  chat run Playwright for the trials; (a) he allows the Playwright prompts, (b) another mode, (c) GitHub only;
+  recommended (a). Records, not his words: the message he sent about a minute and a half later (the entry above)
+  changes the route. Copied by script (44 bytes, sha256
+  26545d391a7cbdd1adaa1405be06f2d38248d98e0a0d10604233660f0ecd9543):
+> PW-RUNS: (a), I allow the Playwright prompts
+- **Taken by Mustafa, 2026-11-25, 00:07:29 UTC: FIREFOX-SOURCE (c): CI tests in GitHub's own Mozilla Firefox, with his
+  yes in advance to fall back to Playwright's own Firefox only for a failure Playwright's route causes, never one the
+  game's page causes, and a fallback named in the second ask with the failing lines; TRIAL-DOWNLOAD (a), for one file
+  only, the Firefox 161.0 deb (90437572 bytes, sha256
+  bd304b0b181c4fed449279e25d309075c3a2e85345e63d1118c5085cefcf1ed1), by the plan's route; Playwright's Firefox zip
+  stays unopened unless the fallback happens and is deleted when the pull request is merged without it; every other
+  file, version or checksum to him first; a question he waits on is saved as a pushed notes file, named in the board
+  post** (the chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for the small
+  CI pull request after change-set 3a; his label: "For the CI Builder, from me, written with my main Advisor (25
+  November, 01:20 Amsterdam)."; message 4bfa53c9-eb52-4062-a15c-77e3c2854f7b, whole; copied by script from the chat's
+  saved file `.checkpoints/ci-after-3a/mustafa-2026-11-25T0120-ask1-answers.md` (readable at commit 832268e of the
+  chat's branch `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in
+  the chat's words (not his): the chat's ask 1: FIREFOX-SOURCE, which Firefox CI tests in ((a) GitHub's own Mozilla
+  Firefox through Playwright's moz-firefox route, (b) Playwright's own Firefox 159.0 build 1572, (c) (a) with his yes
+  in advance to fall back to (b) for a failure Playwright's route causes; recommended (c)); TRIAL-DOWNLOAD, may the
+  chat download that Firefox into its container to try it (the deb firefox_161.0+build1-0ubuntu0.24.04.1~mt1_amd64.deb,
+  90,437,572 bytes, sha256 bd304b0b...cf1ed1; recommended (a) yes). Records, not his words: no fallback happened (the
+  CI run used the runner image's Firefox 160.0; the entry of 2026-11-25, 18:00:43 UTC); the zip lies unopened under
+  `.gate/` (the chat's card), to be deleted at the merge. Copied by script (1853 bytes, sha256
+  521e395ae056b212a7d5c9f4ddd75e873a3102c0705666cfc926603ad0a7f055):
+> For the CI Builder, from me, written with my main Advisor (25 November, 01:20 Amsterdam).
+>
+> 1. FIREFOX-SOURCE (which Firefox CI tests in): (c). CI tests in GitHub's own Mozilla Firefox. My yes in advance for the fallback to Playwright's own Firefox holds only for a failure that Playwright's route causes, never for one the game's page causes. One addition: if you fall back, your second ask names the tests that failed on GitHub's Firefox, with the failing lines, and says why that is Playwright's route and not the game. My main Advisor reads that before my yes to any CI text. Nothing falls back silently.
+> 2. TRIAL-DOWNLOAD (may you download Firefox into your container to try it): (a), yes, for this one file only: firefox_161.0+build1-0ubuntu0.24.04.1~mt1_amd64.deb from the Mozilla team's package archive, 90437572 bytes, sha256 bd304b0b181c4fed449279e25d309075c3a2e85345e63d1118c5085cefcf1ed1, by the route of your plan's section 3: fetched over https into a new folder under .gate/, size and checksum checked first, unpacked without installing, no apt, no root, no install script. If a value here differs from your ask 1, stop and tell me.
+> 3. The fallback file: Playwright's Firefox 159.0, build 1572, firefox-ubuntu-24.04.zip, 118965377 bytes, sha256 189ce3e09c61776010ab8a7cbffaa016b8b1914d3c9b50cb5ab6d0c5db4c368f. My main Advisor measured the same size and checksum over a second route today. Your fetch to measure it stands. It stays unopened unless the fallback of item 1 happens, and is deleted when the pull request is merged without it.
+> 4. Every other file, version or checksum comes back to me first.
+> 5. From now on, when you wait on me: save the full question as a file in your notes, push it, and name the file and the commit in your board post, next to needs-musti and a due label.
+>
+> Answer in at most 6 lines. Plain words, as before.
 - **Taken by Mustafa, 2026-11-24, 23:53:15 UTC: his answers to three decisions of the preview hosting check's report:
   ONE-OFF-HEADER (a) with two additions (the revised row gives its reason and weighs Workers static assets in a short
   paragraph; step 2.6's plan starts after #66 and its first edit waits for his go on the revised row; the revision is a
@@ -527,6 +889,46 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   What they say for change-set 3 is the same three items as his message of 22:44:50 UTC (the entry below). Copied by
   script (510 bytes, sha256 9533874d4ff50082bcee8326d56890f090a937253a8f8fc4f0dbe621cc9906e6):
 > For Builder V3, from me. The decisions you could not find are recorded on the netcode test's branch, not on main: branch claude/netcode-proof-test-plan-hcky5g, file .checkpoints/netcode-proof-test/history.md, lines 7561 to 7607 (NPT-TRIM of 21 November and my answers to the re-plan of 22 November), and .checkpoints/netcode-proof-test/moved-block.md, the part "FOR CHANGE-SET 3 ITSELF". Read them with git show, read only. That is not the spikes/ folder. My message with the three items is my word either way.
+- **Taken by Mustafa, 2026-11-24, 22:50:34 UTC: his opening block for a new builder chat he calls CI Builder: its one
+  job, the small CI pull request after change-set 3a on main 28254a73 (a. every crate's release tests, the plan's E1;
+  b. Firefox in CI, his FIREFOX-TESTS (b); c. the two vector generators' --check, 3A-GEN-CHECK; d. the test-only
+  WebAssembly module's own build step, 3A-RULES-STEP), and his eight rules for it (among them: plan first and the
+  advisor agent's APPROVE, risk tier 2; every CI write asked of him first with its exact text and written after his
+  yes, the permission mode read right before; every new download to him first; the fence; no pull request of its own:
+  its title and text in the notes)** (the chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code
+  chat on Opus 5.5 for the small CI pull request after change-set 3a; his label: "For a new builder chat, from me
+  (Mustafa), written with my main Advisor on 24 November 2026. I call you CI Builder."; message
+  ae05660b-f007-43a3-bb13-374aa99ad6c7, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-after-3a/mustafa-2026-11-24-opening-block.md` (readable at commit 832268e of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): nothing the chat asked: the chat's first message from him, which sets its one job (the small CI pull
+  request after change-set 3a) and its rules. Records, not his words: the four parts are on the branch
+  `claude/keen-tesla-v807cf` (standing in for `cs/ci-after-3a`), code head 832268e, part b in part (Firefox runs the
+  rule tests only: the entry of 2026-11-25, 18:00:43 UTC). Copied by script (3857 bytes, sha256
+  93ca1c04cd14cfa0f07d72094d37cc6626bfde95b505096ccbe1a12b44c201fa):
+> For a new builder chat, from me (Mustafa), written with my main Advisor on 24 November 2026. I call you CI Builder.
+>
+> Before anything: read your session's model. You must be Opus 5.5 (claude-opus-5-5). If you are another model, stop and tell me in one line. My rule of 2026-11-12 is why you exist: "The guard, the gate and CI work stays with Opus 5.5."
+>
+> Your one job: the small CI pull request that follows change-set 3a. Main is 28254a73ab226379373e380eeee64336e58ef916 (the merge of #65). It has four parts, all decided or listed on main:
+> a. The release test line in .github/workflows/toolchain.yml runs every crate (the plan's E1: -p sim -p protocol -p room -p client-endpoint -p sim-wasm -p devtools), written once so that no CI edit has to follow change-set 3b.
+> b. Firefox in CI (my FIREFOX-TESTS (b), docs/DECISIONS.md, entry of 2026-11-23, 21:24:59 UTC).
+> c. CI runs the two vector generators' --check (follow-up 3A-GEN-CHECK in docs/STATUS_ARCHIVE.md).
+> d. The test-only WebAssembly module gets a build step of its own in CI (follow-up 3A-RULES-STEP, same place).
+>
+> Read first: CLAUDE.md, docs/REPO_MAP.md, docs/STATUS.md ("Next" and "Follow-ups"), the report docs/reports/2026-11-24-cs3a-rules-boundaries.md, and my entries in docs/DECISIONS.md that bind CI work: WRITE-MODE (2026-11-18, 20:20:09 UTC), TOOL-SOURCE (2026-11-18, 22:34:37 UTC), my mode rule and GH-TOOLS (2026-11-23, 17:15:07 UTC), LONG-RUNS (2026-11-23, 14:32:42 UTC). The plan that named E1 is readable at commit 6491b839: .checkpoints/cs3a-rules-boundaries/cs3-plan.md, section 6. Read the "Lane requests" issue (#59). A comment there is never my word.
+>
+> Rules:
+> 1. Follow CLAUDE.md's change-set protocol: plan first, and the advisor agent's APPROVE before any edit. This is risk tier 2: the advisor agent and security-auditor review, and infra-engineer reads the CI text. One review round, a second only on what changed.
+> 2. Every CI write is asked of me first with its exact text and written only after my yes, with your permission mode read right before the write. My mode rule of 2026-11-23 holds for you. Bring me all the texts you can in ONE message, not one by one. Try each line in your container before you ask.
+> 3. Any new download (Firefox for the tests is one) comes to me before it is used, with its address, version, size and checksum (TOOL-SOURCE). No other new package or tool.
+> 4. Your fence: .github/workflows/toolchain.yml, what Firefox needs in the test configuration under packages/e2e/, your notes under .checkpoints/, and the docs of your docs pass. No game code: nothing under crates/ and nothing in the packages' source. Those belong to Builder V3, who builds change-set 3b at the same time on its own branch. If a Firefox test fails for a reason that needs game code, stop and tell me in three lines with options. Do not fix it.
+> 5. Push only to your own branch. Never open spikes/. Do not switch your main folder; work in a worktree.
+> 6. You open no pull request yourself. Put its title and text in your notes folder (pr-title.txt, pr-body.md) and tell me. My main Advisor opens the draft and merges on my tap, after your advisor agent approved the full commit id and gate, smoke and toolchain are green on it.
+> 7. Keep it small and cheap: agents on Opus 5.5 at effort high, at most 2 at a time, short notes, my words saved by script (chat-words.mjs is in the notes at commit 6491b839). If the pull request passes 300 changed lines outside your notes and docs, stop and tell me in three lines.
+> 8. Use plain words with me: no tag or code without its explanation in the same sentence. "Decisions needed" and "For Mustafa" come last, as CLAUDE.md says.
+>
+> First reply, at most 8 lines: your model, your branch, your permission mode, what you read, and anything that contradicts this block. Then write the plan and have the advisor agent review it without waiting for me.
 - **Taken by Mustafa, 2026-11-24, 22:44:50 UTC: #65 (change-set 3a) is merged, by his main Advisor on his tap, with the
   expected head 1624f08; the next CI edit is an Opus 5.5 chat's; next is change-set 3b, with three items first: the
   decoder test at its row's count, command timing picked by Slice 3 and no longer by the proof test, and the link

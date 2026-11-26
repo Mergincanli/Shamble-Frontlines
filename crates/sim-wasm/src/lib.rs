@@ -1,6 +1,7 @@
 //! The wasm-bindgen bindings the Worker loads, and nothing else (ADR 0002 parts 3 and 5): the small control API over
 //! local play's one step (`local_match`). The page never calls it. Per tick the Worker's host makes two calls,
-//! `input` and `step`; both take and return plain numbers, so neither makes the glue call back into JavaScript.
+//! `input` and `step`; both take and return plain numbers, so neither makes the glue call back into JavaScript. A
+//! replay of a recorded match also reads `shared_hash`, one plain number; no live tick does.
 //!
 //! What crosses this boundary is kept this small on purpose. Mustafa, 2026-11-18, on WB-HEALTH: "Keep what crosses
 //! it as small as the plan has it (one type, plain numbers on every tick): that keeps a later move off it cheap."
@@ -136,6 +137,15 @@ impl Sim {
     pub fn rebase(&mut self, now_ms: f64) -> f64 {
         self.local.rebase(now_ms)
     }
+
+    /// The hash of the shared state as it stands, as one plain number (a JavaScript `BigInt`): what a replay of a
+    /// recorded match compares tick by tick, the same natively and in WebAssembly. It covers no byte of the match
+    /// seed, changes nothing and hands out no buffer. Only a replay calls it: a live tick stays at its two calls,
+    /// `input` and `step`.
+    #[must_use]
+    pub fn shared_hash(&self) -> u64 {
+        self.local.shared_hash()
+    }
 }
 
 #[cfg(test)]
@@ -198,6 +208,33 @@ mod tests {
             assert_eq!(words(&sim)[2..7], echo, "button {button}");
             // Sent and received climb with the ticks, nothing is refused, and the post used is this step's.
             assert_eq!(words(&sim)[7..], [button + 1, button + 2, 0, button + 1]);
+        }
+    }
+
+    /// The one number a replay reads is the local server's shared hash: two matches whose seeds differ agree on it
+    /// tick by tick, and one button held differently makes it differ.
+    #[test]
+    fn the_shared_hash_is_the_local_server_s_and_covers_no_seed() {
+        let mut a = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        let mut b = Sim::create(&[9; SEED_BYTES], MODE_LOCAL, 0).expect("a good seed and mode");
+        let mut held_otherwise = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        for tick in 0..20u32 {
+            let hash = a.shared_hash();
+            assert_eq!(hash, b.shared_hash());
+            let world = a.local().room().world();
+            assert_eq!(hash, world.shared_hash());
+            // Button 0 is pressed once per tick; the third match also holds button 4 on the last tick.
+            let last = u32::from(tick == 19);
+            a.input(tick + 1, tick % 4, tick + 1, 0, 0, 0);
+            b.input(tick + 1, tick % 4, tick + 1, 0, 0, 0);
+            held_otherwise.input(tick + 1, (tick % 4) | (last << 4), tick + 1, 0, 0, 0);
+            a.step(0.0);
+            b.step(0.0);
+            held_otherwise.step(0.0);
+            assert_eq!(held_otherwise.shared_hash() == a.shared_hash(), tick < 19);
+        }
+        for sim in [&a, &b, &held_otherwise] {
+            assert_eq!(sim.local().room().counters().refused(), 0);
         }
     }
 
