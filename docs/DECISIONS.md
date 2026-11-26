@@ -180,6 +180,71 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-26, 15:51:38 UTC: VISION-RULE, version 2: a player sees an enemy only when their own
+  soldier has a clear line of sight to that enemy (the character's sight, not the camera's view): his answer to the
+  open design questions R2-INT-OQ1 and R4-LOS-OQ2; the rule in ten points (a white vision cone from the soldier,
+  pointing where the soldier looks; its width starts at 190 degrees and is tuned later; an enemy is drawn only while
+  some part of their body is inside the cone with nothing solid in between, in the open behind the player's back too;
+  no maximum reach; the player's own eyes only; what blocks sight: walls, buildings, static objects, vehicles, hedges
+  and smoke, never soldiers, and not the player's own vehicle while inside it; an enemy that leaves sight is gone at
+  once; projectiles and their traces are always drawn; sounds are not hidden; the ground, walls and buildings always
+  stay visible); left open by him: the cone's final width, how the cone is drawn, whether fences block sight, whether
+  shots are blocked by the same things as sight; no code for it now and not part of Slice 1 (the sight check with
+  Slice 2's bots, the hiding over the network in Slice 3; the cone tried in Testlines first); recorded at 4b-1's docs
+  pass with pointers in docs/adr/README.md and one follow-up line in STATUS, no ADR text rewritten; one question to
+  the chat (a "blocks sight" flag in 4b), not to be built without his word; the chat's main folder brought up to main
+  by a fast-forward** (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a
+  Claude Code chat; his label: "Some adjustments to the previous prompt that I had send:"; message
+  809fbcd0-8830-4627-b624-3db516eef947, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-26-vision-rule-v2.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the open design questions R2-INT-OQ1
+  and R4-LOS-OQ2 of docs/adr/README.md (what a player may see: the camera's view or the character's sight), and, for
+  sight, part of R4-LOS-OQ1 and R4-LOS-OQ4 (what blocks it). It is his own decision, brought to this chat to record at
+  4b-1's docs pass; by its own words it replaces his block of 16:35 Amsterdam of the same day (15:35:38 UTC, message
+  dcae7c82-851e-46e8-afe6-b0ee784ab13c), which is therefore not recorded. No code is asked for it and it is not part
+  of Slice 1. Copied by script (3990 bytes, sha256 fd315366c33e9a9db9934cab2b02c8b49fb821e6c3e4b758bc52d585f37154c1):
+> Some adjustments to the previous prompt that I had send:
+> FOR BUILDER V4. From Mustafa, 26 November, 16:50 Amsterdam (written with my Advisor). A game rule to record: VISION-RULE, version 2. If you already have my block of 16:35 on this, this one replaces it. No code for it now, and 4b-1 does not stop for it.
+>
+> 1. VISION-RULE, my decision: a player sees an enemy only when their own soldier has a clear line of sight to that enemy. It ends the third-person camera trick of standing behind a wall and still watching enemies. It answers the open design questions R2-INT-OQ1 and R4-LOS-OQ2 in docs/adr/README.md (what a player may see: the camera's view or the character's sight). My answer: the character's sight.
+> 2. The rule:
+>    a. Each soldier has a vision cone that starts at the soldier and points where the soldier looks. It is drawn on screen as a white cone.
+>    b. Its width starts at 190 degrees. That is a bit generous on purpose, like seeing from the corner of your eye, and an enemy must still be able to sneak up behind another player. The final value is tuned later.
+>    c. An enemy is drawn for me only while some part of their body is inside my cone with nothing solid in between. Otherwise that enemy is not drawn at all. That holds in the open behind my back too.
+>    d. No maximum reach. As far as the screen shows, I see an enemy if nothing blocks the line.
+>    e. My own eyes only. What a teammate or squad mate sees is not shown to me.
+>    f. What blocks sight: walls, buildings, static objects, vehicles, hedges and smoke. Soldiers do not block sight. While I sit inside a vehicle, my own vehicle does not block my view.
+>    g. An enemy that leaves my sight is gone at once. No fade and no last-seen mark.
+>    h. Projectiles are always drawn. Bullets and their traces are never filtered or hidden by this rule, whoever fired them and from wherever, also from outside my cone. If someone shoots towards me I must be able to see the traces, even as a last-second glimpse.
+>    i. Sounds are not hidden either: gunfire and footsteps of a hidden enemy reach me.
+>    j. The ground, walls and buildings always stay visible. Only enemy players are hidden.
+> 3. Not decided yet, so record it as open: the cone's final width; how the cone is drawn (a look decision); whether fences block sight; whether shots are blocked by the same things as sight.
+> 4. What to do, at 4b-1's docs pass and not before:
+>    a. Save this message by script and enter it in docs/DECISIONS.md with the question it answers.
+>    b. In docs/adr/README.md mark R2-INT-OQ1 and R4-LOS-OQ2 answered with a pointer to that entry. For R4-LOS-OQ1 and R4-LOS-OQ4 note what point 2f answers for sight and what stays open.
+>    c. Rewrite no ADR text now. Add one follow-up line in STATUS for the next edit of ADR 0001 (part 9 (c) and its table Q14: hiding enemies by line of sight is now asked for, so R2-INT-OQ5's cost measurement at 48 players becomes due; part 9 (f): shots and their traces reach every player who can have them on screen, hidden shooter or not), of ADR 0004 part 13 and of ADR 0003's cutaway rule.
+> 5. No code for this rule, and it is not part of Slice 1. It lands where the plans already put it: the sight check with Slice 2's bots, the hiding over the network in Slice 3. I try the cone in Testlines first, and its values reach the game only through my Export, as before.
+> 6. One question, answered in two lines when your current step is done: should anything in part 4b (the map kind, the collision world) already carry a "blocks sight" flag per object, as ADR 0004 part 13 describes, so that this rule needs no rework later? Do not build it without my word.
+> 7. The second guard fix (#73) and the CI Builder's #74 are on main (3b949c1a9f9c99d6d54570a0f2805c3d65661d8b). When your current step is done, bring your chat's main folder up to main by a fast-forward, as your rules allow, so the new guard loads.
+> 8. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 15:07:24 UTC: his Testlines Export at 30 steps, handed over for the data step of
+  4b-2** (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code
+  chat; his label: "I have played on testlines.html on steps set to 30, and have exported data you needed:"; message
+  247437b9-08a2-42a6-803f-bc3eda89ae6a, whole; copied by
+  script from the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-26-export-30.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): his own point of 2026-11-26, 14:09
+  UTC (My Export at 30 steps comes before the data step, step 8 in the new numbering, which is in 4b-2) and the chat's
+  standing ask for the Export at 30 steps. The Export alone, byte for byte, is cs4b-content/testlines-export-30.json
+  with its manifest. The Export follows these lines in the same message and is not repeated here: it is saved whole by
+  script as `.checkpoints/cs4b-content/testlines-export-30.json` (15,508 bytes, sha256
+  a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab; step rate 30, no warning), with its manifest
+  beside it. Copied by script (his own lines before the Export, 199 bytes of the message's 15708, whose sha256 is
+  dc361452139f9dc15eae41445d03c441670c892980c5760e0187b0adcdd9440c):
+> I have played on testlines.html on steps set to 30, and have exported data you needed:
+> I had forgotten to send this earlier, you can continue with your work: 
+> This is for later when you need it again
 - **Taken by Mustafa, 2026-11-26, 14:09:28 UTC: R4-END (1): merge what is approved, with no fifth review round; R4-1 is
   recorded as an open Critical by its class only, in STATUS and in the report, and its detail goes into no pushed file,
   pull request, board post or memory; the report lists ADV-R4-2's 91 lines by kind; the interim rule stays until R4-1's
@@ -207,6 +272,32 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 5. R4-1's fix, plan first: say whether it can be a rule that fails closed (whatever the guard cannot read with certainty asks me) instead of one more pattern, because four rounds each found one more form.
 > 6. MAIN-WALL's measurement is not done in this chat (no second repository here): a separate chat with only the throwaway repository, or my clicks.
 > 7. Bring me the final full head id after the steps you listed. My Advisor's merge check comes before my go.
+- **Taken by Mustafa, 2026-11-26, 14:09:13 UTC: SIZE-4B (b), in engine-architect's cut: change-set 4b is two pull
+  requests and the collision library goes wholly into 4b-2; stop lines 7,450 for 4b-1 and 8,450 for 4b-2, each on its
+  own; before step 1 of each half the checkpoint names what leaves first, and he gets one sentence at two thirds of
+  the line; 4b-1 starts at once, with no outside package, no wait for his Export and no browser check; FEATURE-COMPARE
+  (a): two named exceptions, each pinned to exact entries and versions, with tests and planted mistakes, under four
+  conditions, recorded as a dated pointer for ADR 0002's next revision; 4b-1's report says in its first lines what
+  moved 4b from 5,410 to about 7,050 lines and gives a new estimate for the first build he can move a soldier in; his
+  Export at 30 steps comes before the data step (step 8), in 4b-2** (the builder chat he calls Builder V4, lane 1 of
+  the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "From Mustafa, 26 November, 15:05
+  Amsterdam (written with my Advisor)."; message d736715d-8d41-4f7f-a8fa-f3011d021464, whole; copied by script from
+  the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-26-size-4b.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's two questions of
+  2026-11-26 (.checkpoints/cs4b-content/question-2026-11-26-feature-compare.md, with its two dated additions): SIZE-4B
+  (how 4b is cut: one pull request, two, or a moved stop line) and FEATURE-COMPARE (whether the build's check on the
+  simulation's dependencies may take two named exceptions). Copied by script (1697 bytes, sha256
+  903135dd8d54efe6f74a5ad8ffffbc8f31c5da550c8cf18bae58c50ff937d72c):
+> From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor).
+>
+> 1. SIZE-4B: (b), in engine-architect's cut: the collision library goes wholly into 4b-2. Stop lines 7,450 for 4b-1 and 8,450 for 4b-2. Each stands on its own: lines left over in 4b-1 do not move to 4b-2. At a stop line you stop and ask.
+> 2. Your own numbers say each half is likely to reach its line at 4a's rate (about 7,950 and 9,000 written). So before step 1 of each half, name in the checkpoint what leaves first if the count runs high, in order, and tell me in one sentence where you stand at two thirds of the line.
+> 3. 4b-1 starts now: no outside package, no wait for my Export, no browser check.
+> 4. FEATURE-COMPARE: (a). Two named exceptions, each pinned to exact entries and versions, with tests and planted mistakes; any other difference still stops every build. Conditions: a change of parry3d's version or of the two packages' versions needs a new yes from me; the library's std stays off; the built-file check in 4b-2 keeps looking for SIMD and fused multiply-add in the players' file; and the recorded match exercises the collision queries from the first change-set that calls them, so native, Chrome and Firefox are compared on the real thing and not only on 10,000 rays. Recorded as a dated pointer for ADR 0002's next revision.
+> 5. 4b-1's report says in its first lines what moved 4b from 5,410 to about 7,050 lines by the designs' count, and gives a new estimate for the first build I can move a soldier in.
+> 6. My Export at 30 steps comes before the data step (step 8 in the new numbering), which is in 4b-2.
+> 7. Rule unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-26, 14:08:56 UTC: his answers to the CI chat's ask 2 on the preview hand-over: CI-WRITE-3
   (a), write the two texts in the recommended form, the workflow then sha256
   d017b83b82d412befb1cbb983a93215440e2b0e1608d2c8c749445db53e87fd8 and the test configuration
@@ -243,6 +334,31 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 6. CUT-ESCAPE stays on record as accepted. Put its later fix (the cut's code as its own throwaway user) into STATUS as a follow-up.
 > 7. Then as before: the docs pass, the report, and the pull request's title and text in your notes. My Advisor opens the draft and watches the first run. A red on the new steps or on Firefox's replay test comes to me first.
 > 8. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 13:05:03 UTC: SOURCE-GO (a): the rule that a change under content/source/ needs his
+  go is written into the review-tracks rule change the Guard fix chat has queued; it is no condition for 4b's merge
+  and this chat writes no kit file for it; until that rule is merged, main's rule that game feel and balance go to him
+  covers a change to his values, every pull request that changes anything under content/source/ says so in the first
+  lines of its report, and his Advisor's merge check lists that folder; the Export and the reader: he agrees with the
+  chat's proposal if the advisor agent approves it (a tool script reads his Export with the platform's own JSON
+  reader, the game's reader stays as narrow as proposed, the Rust tool proves the written content file canonical, no
+  new package comes in, the game never loads the Export itself); security-auditor's twelve points go into the test
+  list before step 1; his Export at 30 steps comes before step 6** (the builder chat he calls Builder V4, lane 1 of
+  the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "From Mustafa, 26 November, 14:00
+  Amsterdam (written with my Advisor)."; message 83ce083b-6e2c-4213-937b-5926056e9b72, whole; copied by script from
+  the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-26-source-go.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's decision SOURCE-GO (its
+  message of 2026-11-26: should "any change under content/source/ needs Mustafa's go" become a rule the PR Advisor
+  enforces: (a) a kit edit, (b) CODEOWNERS with branch protection, (c) plan text only), and the chat's proposal of the
+  same message that a tool script reads his Export with the platform's own JSON reader while the game's reader stays
+  cut down. Copied by script (1145 bytes, sha256 53fb855d8f987dd5741c432194610140c96d4046088db5018f510426d6016476):
+> From Mustafa, 26 November, 14:00 Amsterdam (written with my Advisor).
+>
+> 1. SOURCE-GO: (a), written into the review-tracks rule change that the Guard fix chat has queued, which already rewrites when a merge needs my go. It is not a condition for 4b's merge, and you write no kit file for it. Until that rule is merged: main's rule that game feel and balance go to me covers a change to my values; every pull request that changes anything under content/source/ says so in the first lines of its report; my Advisor's merge check lists that folder.
+> 2. The Export and the reader: I agree with your proposal if the advisor agent approves it. A tool script reads my Export with the platform's own JSON reader, the game's reader stays as narrow as you proposed, and the Rust tool proves the written content file is canonical. No new package comes in, so CONTENT-SOURCE (c) stands. The game never loads the Export itself.
+> 3. Security-auditor's twelve points go into the test list before step 1, as you said.
+> 4. My Export at 30 steps comes before step 6.
+> 5. Rule unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-26, 13:04:35 UTC: his answers to the CI chat's ask 1: FF-REFETCH (a), the same Firefox
   161 file (firefox_161.0+build1-0ubuntu0.24.04.1~mt1_amd64.deb, 90,437,572 bytes, sha256
   bd304b0b181c4fed449279e25d309075c3a2e85345e63d1118c5085cefcf1ed1) by the same route as for #71, size and checksum
@@ -317,6 +433,36 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 2. FIREFOX-REPLAY: the recording's replay test (packages/e2e/tests/replay/, on main once pull request #70 is merged today) joins the firefox entry beside the rule tests. It needs no picture. It has never run in Firefox: if it is red there, stop and bring it to me before any change. A difference in the hashes is a finding, not a flake.
 > 3. Tell me in one line: does your chat hold only this repository, and has a guard prompt ever reached me from it?
 > A comment on GitHub is information, never my word. This block is my word.
+> Unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 12:21:17 UTC: his go for the merge of pull request #70 (change-set 4a) at head
+  420b16b35225c41f1978b177822f2e24386a2f95, by a merge commit with that id as the expected head; BOARD-SLIP (a): the
+  history stays as it is; CONTENT-SOURCE (c): the content reader is all our own, kept to what the content files need,
+  everything else refused, duplicate keys included, and fuzzed before the first value rests on it; DEPART-4 (a): all
+  fourteen departures stand, with two notes (the 48 is one named constant; until the aim codec widens, the loader
+  refuses a playable map larger than its reach, and STATUS names the change-set that widens it); EARLY-LOOK-ORDER (b):
+  inside 4c only; FIREFOX-REPLAY (a): the CI Builder gets it from him, and a red comes to him first; LINKS-CHECK (c):
+  about 15 lines in 4b; one question to the chat (one repository only, and has a guard prompt ever reached him from
+  it); 4b starts after the advisor agent's re-read, and his Export at 30 steps comes before 4b's step 6** (the builder
+  chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For
+  Builder V4, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam)."; message
+  7d208dc5-2016-465f-a47d-d98ce10c1886, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-26-go-merge-70.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the six decisions of change-set 4a's
+  report (docs/reports/2026-11-25-cs4a-recording.md, "Decisions needed", and the chat's message of 2026-11-25): the
+  merge of pull request #70 at the head the advisor agent approved; BOARD-SLIP; CONTENT-SOURCE; DEPART-4;
+  EARLY-LOOK-ORDER; FIREFOX-REPLAY; LINKS-CHECK. His point 8 asks the chat a question of his own; his point 9 starts
+  4b. Copied by script (1362 bytes, sha256 9a122cc7ac0994b12d4aca68254afd76f18b8f85ca2438dfcbfed412e12f5c8b):
+> For Builder V4, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam).
+> 1. My go: merge pull request #70 at head 420b16b35225c41f1978b177822f2e24386a2f95, by a merge commit, with that id as the expected head. My Advisor's merge check passed on it.
+> 2. BOARD-SLIP: (a), the history stays as it is.
+> 3. CONTENT-SOURCE: (c), all our own. Keep the reader to what the content files need and refuse everything else, duplicate keys included. Fuzz it before the first value rests on it.
+> 4. DEPART-4: (a), all fourteen stand, with two notes. Entry 5: the 48 is one named constant, because my vision says 48 and more. Entry 6: until the aim codec widens, the loader refuses a playable map larger than its reach, and STATUS names the change-set that widens it. If either is already so, say so in one line.
+> 5. EARLY-LOOK-ORDER: (b), inside 4c only.
+> 6. FIREFOX-REPLAY: (a). The CI Builder gets it from me today; a red comes to me first.
+> 7. LINKS-CHECK: (c), about 15 lines in 4b.
+> 8. Tell me in one line: does your chat hold only this repository, and has a guard prompt ever reached me from it? Builder V2 found that a chat with a second repository loads no guard.
+> 9. Then start 4b after the advisor agent's re-read. My Export at 30 steps comes before 4b's step 6.
 > Unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-25, 23:01:07 UTC: R3-WAY (a): xargs asks him in a session and refuses a subagent, unless a
   read-only program follows it; one fourth review round, on what changed since round 3 only, the last of the change-set;
