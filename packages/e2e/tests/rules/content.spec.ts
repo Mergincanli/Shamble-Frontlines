@@ -74,11 +74,12 @@ test("the content reader's proofs pass in the browser's WebAssembly, and the cor
     };
   });
   console.log(`the content reader's proofs: ${JSON.stringify({ ...outcome, corpusChanged: outcome.corpusChanged.slice(0, 80) })}`);
-  expect(outcome).toMatchObject({ corpus: "", trees: "", verdicts: "", limits: "", numbers: 20_360, notThisEngines: [] });
+  expect(outcome).toMatchObject({ corpus: "", trees: "", verdicts: "", limits: "", numbers: 26_653, notThisEngines: [] });
   // The checks run in the Wasm and can fail: one changed bit of one number, and a verdicts file of another seed.
   expect(outcome.corpusChanged).toContain("the reader gives 402c000000000000");
   expect(outcome.verdictsChanged).toMatch(/^this build gives\n {2}a valid file\|2\|[0-9a-f]{16}\nand the file has\n {2}a valid file\|2\|0{16}$/);
-  // The module's memory only grows; its heaviest input is a bundle at the 8 MiB cap, held three times at once.
+  // The module's memory only grows; its heaviest input is a bundle at the 8 MiB cap, held three times at once. A
+  // backstop against gross growth only: what the loader holds for each input is proven natively (content_fuzz.rs).
   expect(outcome.memory).toBeLessThan(64 * 1024 * 1024);
   // The corpus against this engine, the verdicts and the inputs at the caps, together: about ten times what they
   // took under Node when this was written (5.6 s), and under this project's own limit for one test.

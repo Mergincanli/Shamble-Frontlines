@@ -312,6 +312,9 @@ impl Parser<'_> {
                 None => return Err(self.error(Kind::Unterminated)),
             }
         }
+        // The list is cut to its length: a list that grew keeps room for more (four members after the first), and a
+        // tree of many small objects would hold several times what it needs.
+        members.shrink_to_fit();
         // A key may be there once. Sorting the members' places by key (and by place, so the order is total and the
         // same on every target) puts equal keys side by side; the later one is named. No hashed map anywhere.
         let mut order: Vec<usize> = (0..members.len()).collect();
@@ -356,6 +359,8 @@ impl Parser<'_> {
                 }
                 Some(b']') => {
                     self.bump();
+                    // Cut to its length, as an object's list is.
+                    items.shrink_to_fit();
                     return Ok(Value::Array(items));
                 }
                 Some(byte) => {
@@ -373,16 +378,17 @@ impl Parser<'_> {
     fn string(&mut self) -> Result<String, Error> {
         self.bump();
         // The text's own length, counted before any of it is kept: a string that grows as it is read can hold twice
-        // its size when it ends, and a bundle's files are strings of up to a megabyte.
+        // its size when it ends, and a bundle's files are strings of up to a megabyte. The count stops where the
+        // read below refuses, so a string that is refused takes no room for what follows the refusal.
         let (mut length, mut escaped) = (0_usize, false);
         for &byte in self.bytes.get(self.at..).unwrap_or(&[]) {
             match (escaped, byte) {
-                (false, b'"') => break,
                 (false, b'\\') => escaped = true,
-                _ => {
+                (true, b'"' | b'n') | (false, b' ' | b'!' | b'#'..=b'~') => {
                     escaped = false;
                     length = length.saturating_add(1);
                 }
+                _ => break,
             }
         }
         let mut text = String::with_capacity(length);

@@ -17,10 +17,14 @@ const [corpus, trees, verdicts] = ["content-corpus.txt", "content-trees.txt", "c
 const LIMIT_MS = 300_000;
 // The module's memory only grows. Its heaviest input is a bundle at the 8 MiB cap, held three times at once (its
 // files as the test makes them, its text, and the tree the loader reads it into): 49 MiB when this was written.
+// A backstop against gross growth, and no more: the generator's own inputs set the high-water mark, so a loader
+// that holds twice a string's size ends at the same number (planted by test-engineer). What the loader holds for
+// each input is proven natively, by the counting allocator of crates/devtools/tests/content_fuzz.rs.
 const MEMORY_CEILING = 64 * 1024 * 1024;
 // What the inputs at the caps may take in WebAssembly, per profile: about twenty times what they took when this was
-// written (218 ms and 3,261 ms; the printed lines), so that a slow machine passes and a loader whose time grows
-// faster than its input does not.
+// written (226 ms and 3,374 ms for the seven of them; the printed lines). A backstop too: a slow machine passes and a loader that hangs
+// does not; a search that walks every pair of keys stays under it, and is held natively by the test of the two key
+// shapes in the same file.
 const LIMITS_MS = { release: 5_000, dev: 60_000 };
 
 describe.each([["release", release], ["dev", dev]])("the content reader's proofs, %s profile", (profile, glue) => {
@@ -56,7 +60,7 @@ describe.each([["release", release], ["dev", dev]])("the content reader's proofs
 test("the number corpus is this engine's own: its JSON.parse gives each line's bits, its JSON.stringify each line's text", () => {
   const view = new DataView(new ArrayBuffer(8));
   const lines = corpus.split("\n").slice(1, -1);
-  expect(lines.length).toBe(20_360);
+  expect(lines.length).toBe(26_653);
   const wrong = lines.filter((line) => {
     const [bits, text, canonical] = line.split(" ");
     view.setFloat64(0, JSON.parse(text));

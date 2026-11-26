@@ -8,8 +8,9 @@
 //     <its canonical text>`, where the double is what this engine's `JSON.parse` makes of the text and the canonical
 //     text is what its `JSON.stringify` writes. The numbers: every number of the old tuning file as written
 //     (legacy-numbers.txt), 5,000 doubles from random bits, 5,000 decimal texts of up to 17 digits in many
-//     spellings, 2,000 doubles that may lie exactly between their two shortest texts, every power of two a double
-//     holds with the double under it and the double over it, and the edges.
+//     spellings, 2,000 doubles that lie exactly between their two shortest texts (2 to 25 binary places), every
+//     power of two a double holds with the double under it and the double over it, each with both signs, and the
+//     edges.
 //   crates/devtools/vectors/content-trees.txt    400 random trees, records parted by an empty line: the tree as
 //     `JSON.stringify` writes it on one line, keys as they came, then as it writes it with sorted keys and an
 //     indent of two, which is the content files' one canonical form.
@@ -72,20 +73,44 @@ function decimals(count) {
   return lines;
 }
 
-/** The `count` doubles with 1 to 25 binary places and a full mantissa: where a number can lie exactly between its
- *  two shortest texts, and the rule is the text whose last digit is even. */
-function ties(count) {
-  return Array.from({ length: count }, (_, at) => {
-    const bytes = draw("tie", at);
-    const whole = (1n << 52n) + (bytes.readBigUInt64BE(0) >> 12n);
-    return lineOf(String((bytes[8] % 2 === 0 ? 1 : -1) * (Number(whole) / 2 ** (1 + (bytes[9] % 25)))));
-  });
+/** How many decimal places a number's text has: its fraction's digits, less its exponent. */
+export function decimalsOf(text) {
+  const [mantissa, exponent = "0"] = text.split("e");
+  return (mantissa.split(".")[1] ?? "").length - Number(exponent);
 }
 
-/** Every power of two a double holds, from 2^-1074 to 2^1023, each with the double under it and the double over it:
- *  under a power of two the doubles lie twice as close as over it, which is where "halfway between two texts" and
- *  "both texts are this number's" part ways (2^-24 was written as the double under it before this was here). */
-function powersOfTwo() {
+/** The most ties kept for one count of binary places, so that the long ones are not crowded out by the short. */
+const TIES_PER_PLACES = 100;
+
+/** The `count` doubles that lie exactly between their two shortest texts, where the rule is the text whose last
+ *  digit is even: an odd whole number over 2^places, places from 1 to 25, kept only when this engine's own text of
+ *  it has one decimal place less than the number has binary places (then the number's exact decimal form ends in
+ *  a 5 one place further on: a tie). The whole number is drawn small enough that such a text can exist: its
+ *  5^places-fold has at most 19 digits. (A full mantissa over 2^places, as this was first written, is a tie at 2
+ *  to 4 places only: rust-reviewer's count.) */
+export function ties(count) {
+  const kept = new Map();
+  const perPlaces = new Map();
+  for (let at = 0; kept.size < count; at += 1) {
+    if (at > 2_000_000) throw new Error(`only ${kept.size} of ${count} ties in 2,000,000 draws`);
+    const bytes = draw("tie", at);
+    const places = 1 + (bytes[9] % 25);
+    const limit = 10n ** 19n / 5n ** BigInt(places);
+    const whole = (bytes.readBigUInt64BE(0) % (limit < 1n << 53n ? limit : 1n << 53n)) | 1n;
+    const text = String((bytes[8] % 2 === 0 ? 1 : -1) * (Number(whole) / 2 ** places));
+    const full = (perPlaces.get(places) ?? 0) >= TIES_PER_PLACES;
+    if (decimalsOf(text) !== places - 1 || kept.has(text) || full) continue;
+    kept.set(text, lineOf(text));
+    perPlaces.set(places, (perPlaces.get(places) ?? 0) + 1);
+  }
+  return [...kept.values()];
+}
+
+/** Every power of two a double holds, from 2^-1074 to 2^1023, each with the double under it and the double over it,
+ *  and all of them with both signs: under a power of two the doubles lie twice as close as over it, which is where
+ *  "halfway between two texts" and "both texts are this number's" part ways (2^-24 was written as the double under
+ *  it before this was here). */
+export function powersOfTwo() {
   const lines = [];
   for (let power = -1074; power <= 1023; power += 1) {
     view.setFloat64(0, 2 ** power);
@@ -93,7 +118,7 @@ function powersOfTwo() {
     for (const near of [bits - 1n, bits, bits + 1n]) {
       view.setBigUint64(0, near);
       const value = view.getFloat64(0);
-      if (value > 0 && Number.isFinite(value)) lines.push(lineOf(String(value)));
+      if (value > 0 && Number.isFinite(value)) lines.push(lineOf(String(value)), lineOf(String(-value)));
     }
   }
   return lines;

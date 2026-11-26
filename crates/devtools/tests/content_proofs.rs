@@ -27,7 +27,7 @@ fn the_reader_and_the_writer_agree_with_a_browser_engine_on_every_number_of_the_
     let corpus = vector("content-corpus.txt");
     assert_eq!(
         corpus.lines().count(),
-        1 + 2_038 + 10_000 + 2_000 + 6_293 + 29
+        1 + 2_038 + 10_000 + 2_000 + 12_586 + 29
     );
     assert_eq!(corpus_check(&corpus), "");
     // The corpus starts with the old tuning file's numbers, each as that file writes it.

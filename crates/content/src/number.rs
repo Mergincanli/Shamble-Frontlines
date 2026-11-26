@@ -1,9 +1,11 @@
 //! Numbers: how one is read from text and how one is written.
 //!
 //! Reading takes the whole number grammar of RFC 8259 and gives the closest double, as a browser's `JSON.parse`
-//! does; the content crate's proof compares the two bit for bit (PM-0005-2). Writing gives the one text ECMAScript's
-//! `Number::toString` gives, so `JSON.stringify` and this writer agree on every finite number. The loader itself is
-//! stricter than this reader: it takes a number only when its text is already that one text (`json.rs`).
+//! does; the content crate's proof compares the two bit for bit (PM-0005-2). Writing gives the text a browser's
+//! `Number::toString` gives: ECMAScript's rule, which leaves the last digit open where two shortest texts are
+//! equally close; the engines take the even one there, and so does this writer (`even_of_a_tie`). The proof holds
+//! the writer against an engine's own `JSON.stringify`. The loader itself is stricter than this reader: it takes a
+//! number only when its text is already that one text (`json.rs`).
 
 /// Why a text is not a number this crate reads.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

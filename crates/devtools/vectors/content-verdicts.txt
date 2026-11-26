@@ -36,4 +36,4 @@ a bundle with a key too many or too few|500|7b3cc68d551bf4c7
 another bundle format or version|500|2aa70bf03a69ee0e
 a bundle past a byte cap|50|4f0c9bfce549af81
 a file refused, in a bundle|500|abafe2a03688b110
-the fuzz run's first inputs|2000|739419f879b38726
+the fuzz run's first inputs|2000|bdc06de36c1d328c

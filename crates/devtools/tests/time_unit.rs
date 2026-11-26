@@ -95,6 +95,13 @@ fn a_rules_interval_under_one_tick_fails_the_report_and_an_extract_that_is_none_
         rounded.ends_with("\t0.0005\t2\t0.02\t0.04\trounded by 333333 millionths\n"),
         "{rounded}"
     );
+    // Four and a half units go up to five: to the even count they would go down to four.
+    let up =
+        report(&with("tables.T.values.sparkLife\ts\tlook\t0.0015")).expect("four and a half units");
+    assert!(
+        up.ends_with("\t0.0015\t5\t0.05\t0.10\trounded by 111111 millionths\n"),
+        "{up}"
+    );
     // An extract that miscounts, a line that is no four fields, a unit and a kind that are none, a text that is no
     // plain decimal: each refused by name.
     let refused = |text: String| report(&text).expect_err("refused");

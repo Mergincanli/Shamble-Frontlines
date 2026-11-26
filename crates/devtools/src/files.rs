@@ -98,8 +98,12 @@ fn file_name(name: &str) -> Result<(), String> {
 /// folder and a plain file in it, never a link (Mustafa's LINKS-CHECK (c), 2026-11-26: the tests that read the
 /// recordings refuse anything that is not a plain file, as the folder check does). The file is opened once, and what
 /// is judged again and read is the opened file itself, at most `MAX_READ_BYTES` of it. The tests that read a
-/// recording, and every reader this change-set added, read through here; `tests/recordings.rs` scans the sources
-/// of the recordings' readers by name, which holds what those files say and not what a new reader elsewhere does.
+/// committed recording or a committed vector read through here; `tests/recordings.rs` scans the sources of the
+/// recordings' readers by name, which holds what those files say and not what a new reader elsewhere does. Two
+/// things this does not do. The tests that read the repository's own sources (the manifest rule, the two source
+/// scans) read them with `std::fs`: a link there could stall such a test, never hand it a recording. And a link
+/// put in the file's place between the check and the open is followed: that takes a second writer on the machine
+/// while the test runs, where this guards the tree as it was checked out.
 ///
 /// # Errors
 /// A name that is a path, a folder or a file that is a link or of another type, a file that is not there or is

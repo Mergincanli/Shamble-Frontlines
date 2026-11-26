@@ -3,6 +3,9 @@
 //! `docs/reports/2026-11-17-build-plan-slice-1.md`, "The sim's rules, until the lints exist"): it checks exactly
 //! part 7's allow-list, it runs in the plain `cargo test`, and it is interim until those lints merge.
 //!
+//! Since change-set 4b-1 it also reads the content crate's source (`crates/content/src`; the last tests of this
+//! file): the same rules without the simulation's two allowances, and every call that can panic outside tests.
+//!
 //! It reads `crates/sim/src` as text and fails on: a float method outside part 7's list, a hash map or hash set
 //! without part 9's escape, a clock, per-target code (`target_feature`; `core::arch` however it is brought in; the
 //! relaxed SIMD calls by their names: PM-0004-23 names relaxed SIMD), and source brought in from outside `src/`
@@ -261,15 +264,20 @@ fn breaches(file: &str, source: &str) -> Vec<String> {
     breaches_of(file, source, true)
 }
 
-/// The same, with or without the rule on float methods (the simulation's own: part 7's list).
-fn breaches_of(file: &str, source: &str, floats: bool) -> Vec<String> {
+/// The same, with or without the simulation's own two allowances: the rule on float methods (part 7's list) and part
+/// 9's escape for a hashed map with its reason.
+fn breaches_of(file: &str, source: &str, simulation: bool) -> Vec<String> {
     let t = tokens(source);
     let text = |index: Option<usize>| {
         index
             .and_then(|index| t.get(index))
             .map_or("", |token| token.text.as_str())
     };
-    let covered = escaped(&t);
+    let covered = if simulation {
+        escaped(&t)
+    } else {
+        vec![false; t.len()]
+    };
     let mut found = Vec::new();
     for (i, token) in t.iter().enumerate() {
         let name = token.text.as_str();
@@ -282,7 +290,7 @@ fn breaches_of(file: &str, source: &str, floats: bool) -> Vec<String> {
         // integer's.
         let called = before == "." && next == "(";
         let on_a_path = before == "::" && !NOT_FLOATS.contains(&before_2);
-        let float_call = floats && STD.contains(&name) && (called || on_a_path);
+        let float_call = simulation && STD.contains(&name) && (called || on_a_path);
         if let Some((_, why)) = HELD.iter().find(|(held, _)| float_call && *held == name) {
             found.push(format!(
                 "{file}:{}: `{name}` is on ADR 0004 part 7's list and held back all the same ({why}); write `a * b + c`",
@@ -503,39 +511,73 @@ fn what_the_rules_allow_passes() {
 
 /// What the content crate may not call outside its tests: it refuses what is wrong and never panics on any input.
 /// Its own lint guard says so (`crates/content/src/lib.rs`), but only clippy holds that guard and the toolchain job
-/// runs no clippy; this scan holds the part of it that text can show in the plain `cargo test`, until a lint step
-/// does (an index out of range and an overflowing sum are not things a scan of text can see).
-const PANICS: [&str; 6] = [
-    "unwrap",
-    "expect",
-    "panic",
-    "unreachable",
-    "todo",
-    "unimplemented",
+/// runs no clippy; this scan holds, in the plain `cargo test`, the calls below wherever they are written as a
+/// method or after a path, until a lint step does. It is narrower than the guard on one side (an index out of range
+/// and an overflowing sum are not things a scan of text can see) and wider on another (the guard lets `assert!`
+/// through).
+const PANIC_CALLS: [&str; 4] = ["unwrap", "expect", "unwrap_err", "expect_err"];
+#[rustfmt::skip]
+const PANIC_MACROS: [&str; 10] = [
+    "panic", "unreachable", "todo", "unimplemented", "assert", "assert_eq", "assert_ne", "debug_assert",
+    "debug_assert_eq", "debug_assert_ne",
+];
+/// The words an item starts with, after its attributes and its `pub`.
+#[rustfmt::skip]
+const TEST_ITEMS: [&str; 13] = [
+    "mod", "fn", "use", "impl", "struct", "enum", "const", "static", "type", "trait", "unsafe", "async", "extern",
 ];
 
 /// For each token, whether it stands in test-only code: the item that follows `#[cfg(test)]`, to its closing brace,
-/// or to its `;` when it has no body.
+/// or to its `;` when it has no body. A `#[cfg(test)]` on anything that is no item (a match arm, a field, a
+/// statement) marks nothing: what follows it is read as code the game runs.
 fn in_tests(t: &[Token]) -> Vec<bool> {
     const MARK: [&str; 7] = ["#", "[", "cfg", "(", "test", ")", "]"];
+    let text = |at: usize| t.get(at).map_or("", |token| token.text.as_str());
+    // The place after the bracket or parenthesis that opens at `at`.
+    let past = |mut at: usize| {
+        let mut depth = 0_usize;
+        while at < t.len() {
+            match text(at) {
+                "[" | "(" => depth += 1,
+                "]" | ")" => depth = depth.saturating_sub(1),
+                _ => {}
+            }
+            at += 1;
+            if depth == 0 {
+                break;
+            }
+        }
+        at
+    };
     let mut inside = vec![false; t.len()];
     let mut at = 0;
     while at < t.len() {
-        let here = t[at..]
-            .iter()
-            .take(MARK.len())
-            .map(|token| token.text.as_str());
-        if here.eq(MARK) {
+        let marked = (0..MARK.len()).all(|k| text(at + k) == MARK[k]);
+        // What the mark stands on, past further attributes and a `pub` with or without its reach.
+        let mut item = at + MARK.len();
+        loop {
+            if text(item) == "#" && text(item + 1) == "[" {
+                item = past(item + 1);
+            } else if text(item) == "pub" {
+                item = if text(item + 1) == "(" {
+                    past(item + 1)
+                } else {
+                    item + 1
+                };
+            } else {
+                break;
+            }
+        }
+        if marked && TEST_ITEMS.contains(&text(item)) {
             let mut depth = 0_usize;
             while at < t.len() {
                 inside[at] = true;
-                match t[at].text.as_str() {
-                    "{" => depth += 1,
-                    "}" => depth = depth.saturating_sub(1),
+                match text(at) {
+                    "{" | "[" | "(" => depth += 1,
+                    "}" | "]" | ")" => depth = depth.saturating_sub(1),
                     _ => {}
                 }
-                let ends = matches!(t[at].text.as_str(), "}" | ";") && depth == 0;
-                if ends {
+                if depth == 0 && matches!(text(at), "}" | ";") {
                     break;
                 }
                 at += 1;
@@ -546,8 +588,9 @@ fn in_tests(t: &[Token]) -> Vec<bool> {
     inside
 }
 
-/// The content crate's breaches in one file: the simulation's rules but the float list (the loader's arithmetic on
-/// doubles is judged where it enters the players' file), and a call that can panic outside the tests.
+/// The content crate's breaches in one file: the simulation's rules without its two allowances (the float list:
+/// the loader's arithmetic on doubles is judged where it enters the players' file; and part 9's escape: no hashed
+/// map anywhere in this crate), and a call that can panic outside the tests.
 fn content_breaches(file: &str, source: &str) -> Vec<String> {
     let t = tokens(source);
     let tests = in_tests(&t);
@@ -556,9 +599,8 @@ fn content_breaches(file: &str, source: &str) -> Vec<String> {
         let name = token.text.as_str();
         let before = i.checked_sub(1).map_or("", |at| t[at].text.as_str());
         let next = t.get(i + 1).map_or("", |token| token.text.as_str());
-        let method = matches!(name, "unwrap" | "expect") && before == "." && next == "(";
-        let call = method || (PANICS.contains(&name) && next == "!");
-        if call && !tests[i] {
+        let call = PANIC_CALLS.contains(&name) && matches!(before, "." | "::") && next == "(";
+        if (call || (PANIC_MACROS.contains(&name) && next == "!")) && !tests[i] {
             found.push(format!(
                 "{file}:{}: `{name}`: the content crate refuses what is wrong and never panics (its lint guard, ADR 0005 CD-2): return the refusal",
                 token.line
@@ -598,25 +640,43 @@ fn the_content_crate_keeps_its_rules() {
         "the content crate breaks its rules:\n{}",
         found.join("\n")
     );
-    // The guard this scan stands beside is still the crate's first words: no `unsafe`, and the lints that deny a panic.
-    let lib = read(&src.join("lib.rs"));
-    for guard in [
-        "#![forbid(unsafe_code)]",
-        "clippy::unwrap_used",
-        "clippy::expect_used",
-        "clippy::indexing_slicing",
-        "clippy::panic",
-        "clippy::arithmetic_side_effects",
-    ] {
+    // The guard this scan stands beside is still the crate's first words: no `unsafe`, and every one of its seven
+    // lints denied outside the tests (read as tokens: a guard turned to `allow`, or one lint gone, fails here).
+    let words: Vec<String> = tokens(&read(&src.join("lib.rs")))
+        .into_iter()
+        .map(|token| token.text)
+        .collect();
+    let guard = words.join(" ");
+    assert!(
+        guard.contains("# ! [ forbid ( unsafe_code ) ]"),
+        "no `#![forbid(unsafe_code)]` in crates/content/src/lib.rs"
+    );
+    let denied = guard
+        .split_once("# ! [ cfg_attr ( not ( test ) , deny (")
+        .map(|(_, rest)| rest);
+    let denied: Vec<&str> = denied
+        .and_then(|rest| rest.split_once(')'))
+        .map_or(Vec::new(), |(lints, _)| lints.split(' ').collect());
+    #[rustfmt::skip]
+    let lints = ["unwrap_used", "expect_used", "indexing_slicing", "panic", "unreachable", "todo", "arithmetic_side_effects"];
+    for lint in lints {
         assert!(
-            lib.contains(guard),
-            "crates/content/src/lib.rs no longer holds {guard}"
+            denied.contains(&lint),
+            "crates/content/src/lib.rs no longer denies clippy::{lint} outside its tests"
         );
     }
 }
 
 #[rustfmt::skip]
-const CONTENT_BITES: [(&str, &str); 9] = [
+const CONTENT_BITES: [(&str, &str); 17] = [
+    ("fn f(x: Option<u8>) -> u8 { Option::unwrap(x) }", "`unwrap`"),
+    ("fn f(x: Result<u8, u8>) -> u8 { Result::expect(x, \"it is there\") }", "`expect`"),
+    ("fn f(x: Result<u8, u8>) -> u8 { x.unwrap_err() }", "`unwrap_err`"),
+    ("fn f(x: Result<u8, u8>) -> u8 { x.expect_err(\"it is not\") }", "`expect_err`"),
+    ("fn f(x: u8) { assert!(x > 0); }", "`assert`"),
+    ("fn f(x: u8) { debug_assert_eq!(x, 0); }", "`debug_assert_eq`"),
+    ("fn f(x: u8) -> u8 { match x { #[cfg(test)] 0 => 1, _ => 2 } }\nfn g(x: Option<u8>) -> u8 { x.unwrap() }", "2: `unwrap`"),
+    ("#[allow(clippy::disallowed_types, reason = \"an escape the simulation has\")]\nstruct S(std::collections::HashSet<u8>);", "`HashSet`"),
     ("fn f(x: Option<u8>) -> u8 { x.unwrap() }", "`unwrap`"),
     ("fn f(x: Result<u8, u8>) -> u8 { x.expect(\"it is there\") }", "`expect`"),
     ("fn f() { panic!(\"no\") }", "`panic`"),
@@ -629,7 +689,9 @@ const CONTENT_BITES: [(&str, &str); 9] = [
 ];
 
 #[rustfmt::skip]
-const CONTENT_CONTROLS: [&str; 6] = [
+const CONTENT_CONTROLS: [&str; 8] = [
+    "#[cfg(test)]\n#[allow(dead_code)]\npub(crate) const X: [u8; 2] = [Some(1_u8).unwrap(), 2];\nfn f() {}",
+    "#[cfg(test)]\npub fn g(x: Option<u8>) -> u8 { assert!(x.is_some()); x.unwrap() }\nfn f() {}",
     "fn f(x: Option<u8>) -> u8 { x.unwrap_or(0) }",
     "fn f(x: Result<u8, u8>) -> u8 { x.unwrap_or_default() }",
     "#[cfg(test)]\nmod tests {\n    #[test]\n    fn g() { let x: Option<u8> = None; assert!(x.is_none()); panic!(\"a test may\"); }\n    fn h(x: Option<u8>) -> u8 { x.expect(\"in a test\") }\n}",

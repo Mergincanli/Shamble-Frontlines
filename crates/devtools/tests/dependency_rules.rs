@@ -7,8 +7,9 @@
 //!
 //! The rule is stricter than "no normal dependency": no table of any kind but `[package]` and `[lints]`. One change
 //! is known to come: 4b-2's step that writes the content's TypeScript types gives this crate exactly one
-//! dev-dependency, the type writer (its derive must stand beside the types it reads). That change edits this rule in
-//! the same commit, after security-auditor's answer on its exact content.
+//! dev-dependency, the type writer (the one line `ts-rs = { workspace = true }` under `[dev-dependencies]`: its
+//! derive must stand beside the types it reads). That change edits this rule in the same commit, after
+//! security-auditor's answer on its exact content.
 
 use std::path::Path;
 

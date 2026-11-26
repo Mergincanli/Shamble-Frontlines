@@ -224,8 +224,16 @@ fn the_committed_recordings_are_read_only_through_the_plain_read() {
     let plain_read = library
         .split_once("pub fn read_plain")
         .and_then(|(_, rest)| rest.split_once("\n}\n"));
-    // One place opens a file, inside `read_plain`; nothing reads a path whole.
+    // One place opens a file, inside `read_plain`; nothing reads a path whole, or opens one another way.
     let (open, whole) = (["File", "::open("].concat(), format!("{read}("));
+    let others = [
+        ["read_to", "_string"].concat(),
+        ["Open", "Options"].concat(),
+    ];
+    assert!(
+        others.iter().all(|way| !library.contains(way)),
+        "{others:?}"
+    );
     let opened = plain_read.map(|(body, _)| body.matches(&open).count());
     let counts = (
         library.matches(&open).count(),

@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, expect, test } from "vitest";
-import { bitsOf, lineOf, run, sortedKeys, treesFile } from "./corpus-texts.mjs";
+import { bitsOf, decimalsOf, lineOf, powersOfTwo, run, sortedKeys, ties, treesFile } from "./corpus-texts.mjs";
 
 let dir;
 beforeAll(() => {
@@ -26,6 +26,27 @@ test("a line is the double's bits, the text as given, and the engine's own text 
   expect(bitsOf(5e-324)).toBe("0000000000000001");
   expect(() => lineOf("1e400")).toThrow("is not a finite number");
   expect(() => lineOf('"1"')).toThrow("is not a finite number");
+});
+
+test("every tie of the corpus is a real one, at many counts of binary places, and the powers of two have both signs", () => {
+  // A double's binary places, from its bits alone: the mantissa's lowest set bit against its exponent.
+  const placesOf = (bits) => {
+    const [exponent, fraction] = [Number((bits >> 52n) & 0x7ffn), (bits & 0xfffffffffffffn) | (1n << 52n)];
+    let low = 0;
+    while (((fraction >> BigInt(low)) & 1n) === 0n) low += 1;
+    return 1075 - exponent - low;
+  };
+  const lines = ties(2000).map((line) => line.split(" "));
+  expect(lines.length).toBe(2000);
+  // The engine's text has one decimal place less than the double has binary places: the exact decimal ends in a 5.
+  expect(lines.filter(([bits, , canonical]) => decimalsOf(canonical) !== placesOf(BigInt(`0x${bits}`)) - 1)).toEqual([]);
+  const places = new Set(lines.map(([bits]) => placesOf(BigInt(`0x${bits}`))));
+  expect([...places].sort((a, b) => a - b)).toEqual(Array.from({ length: 24 }, (_, at) => at + 2));
+  expect(lines.filter(([bits]) => placesOf(BigInt(`0x${bits}`)) >= 5).length).toBeGreaterThan(1500);
+  // 2^-24, where the even text is another double's, and 2^-25, a real tie: each with both signs.
+  const powers = new Set(powersOfTwo().map((line) => line.split(" ")[0]));
+  expect(["3e70000000000000", "be70000000000000", "3e60000000000000", "be60000000000000"].filter((bits) => !powers.has(bits))).toEqual([]);
+  expect(powersOfTwo().length).toBe(2 * 6293);
 });
 
 test("a tree is written once as it came and once with its keys in byte order at every level", () => {

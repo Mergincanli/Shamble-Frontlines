@@ -1165,18 +1165,28 @@ pub fn verdicts_check(expected: &str) -> String {
 }
 
 /// The inputs that lean on the caps, by name: the node cap, the duplicate-key search at its largest, a bundle of
-/// eight files of a megabyte each, a bundle of fifteen texts of just over half a megabyte.
-pub const LIMIT_CASES: [&str; 5] = [
+/// eight files of a megabyte each, a bundle of fifteen texts of just over half a megabyte, and two trees of as many
+/// one-member objects as the node cap takes.
+pub const LIMIT_CASES: [&str; 7] = [
     "an object of the most keys a document holds",
     "one key 16,383 times",
     "an object of 100,000 keys",
     "a bundle of eight files of a megabyte each",
     "a bundle of fifteen texts of half a megabyte and a byte",
+    "a file of 528 chains of thirty objects of one member",
+    "a bundle whose own tree and whose first file are such chains",
 ];
 
-/// The limit case of that place in [`LIMIT_CASES`], with the verdict it must get: what a counting allocator and a
-/// clock are held against. Each is made when it is asked for, so that no two heavy inputs are held at once: in
-/// WebAssembly the module's memory only grows, and its ceiling is to measure the loader, not this list.
+/// 528 chains of thirty objects of one member each around a 0, in one array, on one line: 16,370 nodes in 96,103
+/// bytes, six bytes of text for an object.
+fn chains_file() -> String {
+    let chain = format!("{}0{}", "{\"a\":".repeat(30), "}".repeat(30));
+    format!("{{\"a\":[{}]}}", vec![chain; 528].join(","))
+}
+
+/// The limit case of that place in [`LIMIT_CASES`], found by its name, with the verdict it must get: what a counting
+/// allocator and a clock are held against. Each is made when it is asked for, so that no two heavy inputs are held
+/// at once: in WebAssembly the module's memory only grows, and its ceiling is to measure the loader, not this list.
 pub fn limit_case(at: usize) -> Option<Case> {
     let mut rng = Rng::new(0, u64::MAX);
     let files = distinct(&mut rng, 8);
@@ -1190,19 +1200,26 @@ pub fn limit_case(at: usize) -> Option<Case> {
         }
     };
     let same = |count: usize| format!("{{{}}}\n", vec!["\"a\": 0"; count].join(", ")).into_bytes();
-    Some(match at {
+    // Where the chains' one line first leaves its canonical form: at its second byte, where a line feed belongs.
+    let on_one_line = |chains: &[u8]| {
+        let (line, col, kind) = form(b"{\n  \"a\": [\n    {\n      \"a\": {\n", chains);
+        format!("{line}:{col}|-|{kind}")
+    };
+    Some(match *LIMIT_CASES.get(at)? {
         // The most keys one object has under the node cap, in key order.
-        0 => {
+        "an object of the most keys a document holds" => {
             let keys: Vec<String> = (0..16_383).map(|at| format!("  \"k{at:05}\": 0")).collect();
             let bytes = format!("{{\n{}\n}}\n", keys.join(",\n")).into_bytes();
             refuse(bytes, "0:0|-|MissingKey { key: \"format\" }")
         }
         // The same key every time, where the search for a key that is there twice has the most to sort.
-        1 => refuse(same(16_383), "1:10|-|DuplicateKey { key: Echo(\"a\") }"),
+        "one key 16,383 times" => refuse(same(16_383), "1:10|-|DuplicateKey { key: Echo(\"a\") }"),
         // 100,000 keys, refused at the first value past the cap.
-        2 => refuse(same(100_000), "1:131071|a|TooManyNodes { cap: 16384 }"),
+        "an object of 100,000 keys" => {
+            refuse(same(100_000), "1:131071|a|TooManyNodes { cap: 16384 }")
+        }
         // A megabyte of one string in each file: read, and refused as a key the kind does not have.
-        3 => {
+        "a bundle of eight files of a megabyte each" => {
             let heavy = |file: &File| {
                 let mut heavy = file.clone();
                 let text = format!("\"{}\"", "x".repeat(1_000_000));
@@ -1219,13 +1236,53 @@ pub fn limit_case(at: usize) -> Option<Case> {
         }
         // Fifteen texts of half a megabyte and a byte, all spaces: a string that grew by doubling as it was read
         // held twice its size here (security-auditor's bundle; every text is kept at its own size since).
-        4 => {
+        "a bundle of fifteen texts of half a megabyte and a byte" => {
             let text = |at: usize| (format!("movement/f{at:02}.json"), vec![b' '; 524_289]);
             let fifteen: Vec<(String, Vec<u8>)> = (0..15).map(text).collect();
             Case {
                 path: None,
                 bytes: bundle_bytes(&fifteen),
                 expect: "movement/f00.json|1:524290|-|Empty".to_owned(),
+            }
+        }
+        // As many small objects as the node cap takes: a list that kept the room it grew by held 288 bytes for an
+        // object of six (security-auditor's second file; every list is cut to its length since). The whole tree
+        // is read before the text is refused for its form.
+        "a file of 528 chains of thirty objects of one member" => {
+            let bytes = chains_file().into_bytes();
+            let verdict = on_one_line(&bytes);
+            refuse(bytes, &verdict)
+        }
+        // Two such trees held at once: the bundle's own (564 chains of 28 under a key no entry has, which is
+        // judged after the first file) and its first file's.
+        "a bundle whose own tree and whose first file are such chains" => {
+            let file = chains_file();
+            let laid_out = |depth: usize, indent: usize| {
+                let open = |level| format!("{{\n{}\"a\": ", " ".repeat(indent + 2 * level));
+                let close = |level| format!("\n{}}}", " ".repeat(indent + 2 * level));
+                let (open, close): (String, String) = (
+                    (1..=depth).map(open).collect(),
+                    (0..depth).rev().map(close).collect(),
+                );
+                format!("{open}0{close}")
+            };
+            let entry = |path: &str, text: &str, more: &str| {
+                format!(
+                    "    {{\n      \"path\": \"{path}\",\n      \"text\": \"{text}\"{more}\n    }}"
+                )
+            };
+            let chains = vec![laid_out(28, 8); 564].join(",\n        ");
+            let first = entry("movement/a.json", &file.replace('"', "\\\""), "");
+            let second = entry(
+                "movement/b.json",
+                "{}\\n",
+                &format!(",\n      \"zz\": [\n        {chains}\n      ]"),
+            );
+            let end = "  ],\n  \"format\": \"shamble-content-bundle\",\n  \"version\": 1\n}\n";
+            Case {
+                path: None,
+                bytes: format!("{{\n  \"files\": [\n{first},\n{second}\n{end}").into_bytes(),
+                expect: format!("movement/a.json|{}", on_one_line(file.as_bytes())),
             }
         }
         _ => return None,
@@ -1245,7 +1302,7 @@ pub fn limits_check() -> String {
 }
 
 /// The stages a verdict is settled in, as the fuzz run's histogram names them.
-pub const STAGES: [&str; 9] = [
+pub const STAGES: [&str; 10] = [
     "taken",
     "the byte caps",
     "the bundle's text",
@@ -1254,7 +1311,8 @@ pub const STAGES: [&str; 9] = [
     "a file's text",
     "a file's form",
     "a file's fields",
-    "a file's own rules",
+    "a file's name against its id",
+    "a map's own rules",
 ];
 
 /// The stage that settled a verdict.
@@ -1263,8 +1321,10 @@ fn stage<T>(result: &Result<T, Error>) -> usize {
     #[rustfmt::skip]
     let step = match &error.kind {
         Kind::TooLarge { .. } => return 1,
-        Kind::IdNotFileName { .. } | Kind::OffGrid { .. } | Kind::TooThin { .. } | Kind::OutsideBounds { .. }
-        | Kind::BeyondAim { .. } | Kind::DuplicateId { .. } => return 8,
+        Kind::IdNotFileName { .. } => return 8,
+        // A stage of their own: only a map that was read whole gets here, so a run without maps settles none.
+        Kind::OffGrid { .. } | Kind::TooThin { .. } | Kind::OutsideBounds { .. } | Kind::BeyondAim { .. }
+        | Kind::DuplicateId { .. } => return 9,
         Kind::Empty | Kind::ByteOrderMark | Kind::ForbiddenByte { .. } | Kind::Whitespace { .. } | Kind::Comment
         | Kind::TrailingComma | Kind::TopLevelNotObject | Kind::TrailingData | Kind::Unterminated
         | Kind::UnexpectedByte { .. } | Kind::RefusedLiteral { .. } | Kind::RefusedEscape { .. } | Kind::BadKey { .. }

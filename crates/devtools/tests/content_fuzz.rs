@@ -93,8 +93,9 @@ fn the_counting_allocator_sees_what_is_held_at_once() {
 }
 
 /// What a file's tree may hold beyond the text it was read from, and how long one megabyte may take: far above
-/// what was measured (the printed line of each case), so that a slow machine does not fail and a tree that grows
-/// with something other than the input's size does.
+/// what was measured (the printed line of each case), so that a slow machine does not fail. The time is a backstop
+/// against a loader that hangs: it is too wide to see a search that walks every pair of keys (1.8 s under a 20 s
+/// limit, planted by test-engineer), which the test of the two key shapes below holds.
 const TREE_BYTES: usize = 4 << 20;
 const PER_MEBIBYTE: Duration = Duration::from_secs(if cfg!(debug_assertions) { 20 } else { 2 });
 
@@ -129,11 +130,40 @@ fn at_its_caps_the_loader_holds_memory_in_step_with_the_input_and_answers_in_tim
     }
 }
 
+/// The search for a key that is there twice is a sort, never a walk of every pair of keys (the test list's point
+/// on its cost). An object of 16,383 different keys is where a walk of every pair has the most to do (134 million
+/// compares); an object of one key 16,383 times is where it stops at the second key. With the sort the first takes
+/// about 2.4 times the second; with a pairwise search planted, 120 times (test-engineer's two runs). The best of
+/// three runs of each, so that one slow moment of the machine decides nothing.
+#[test]
+fn the_search_for_a_key_that_is_there_twice_does_not_walk_every_pair() {
+    let best = |name: &str| {
+        let at = LIMIT_CASES.iter().position(|case| *case == name);
+        let case = at.and_then(limit_case).expect("a limit case of that name");
+        let path = case.path.as_deref().expect("one file");
+        let once = |_| {
+            let started = Instant::now();
+            drop(std::hint::black_box(load_file(path, &case.bytes)));
+            started.elapsed()
+        };
+        (0..3).map(once).min().expect("three runs")
+    };
+    let different = best("an object of the most keys a document holds");
+    let same = best("one key 16,383 times");
+    println!("16,383 different keys: {different:?}; one key 16,383 times: {same:?}");
+    assert!(
+        different < same * 20,
+        "16,383 different keys took {different:?}, more than twenty times the {same:?} of one key 16,383 times"
+    );
+}
+
 /// The share of the verdicts each stage must settle, in ten-thousandths: about half of what the run gave when it was
-/// written (its printed histogram: 1,887 taken, 2,131, 12, 1,484, 3,322, 366, 602 and 192 in 10,000). A stage under
-/// its share was not reached as it was meant to be. The byte caps settle none: no input here is a megabyte long,
-/// and the caps are held by the classes of broken files and by the test above.
-const SHARES: [u64; STAGES.len()] = [900, 0, 1_000, 5, 700, 1_600, 150, 300, 90];
+/// written (its printed histogram: 1,867 taken, 2,131, 10, 1,508, 3,306, 384, 601, 169 and 20 in 10,000). A stage
+/// under its share was not reached as it was meant to be. The byte caps settle none: no input here is a megabyte
+/// long, and the caps are held by the classes of broken files and by the test above. The map's own rules are a
+/// stage of their own (test-engineer): counted with a file's name against its id, which a fixed rename gives, a
+/// run with no map in it passed.
+const SHARES: [u64; STAGES.len()] = [900, 0, 1_000, 5, 700, 1_600, 150, 300, 80, 10];
 
 type Tally = ([u64; STAGES.len()], (Duration, u64, usize));
 
