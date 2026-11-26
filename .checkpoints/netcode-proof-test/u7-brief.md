@@ -200,8 +200,9 @@ File and item names are leans; the builder may merge modules and reports the nam
   - **Restated on 26 November 2026 (his U7-MARK8B (a) and U7-MARK9 (a), history.md:8068-8088; the text above is kept
     as it was):** (8)'s no-wt-timeout half reads "a fallback later than 3 s, or none within 10 s". The 3 s is twice the
     page's own 1.5 s timer, not a reading. Restated after measuring Chrome (Chrome for Testing 153.0.8010.12,
-    headless): run 3 (25 Nov, the tree before the fix pass) fell back at 1.60 s normal (mark 5) and 4.06 s planted;
-    run 4 (26 Nov, the fixed tree, 80b6748 plus wip/u7-build-rs.patch 6535c181…) at 1.56 s and 4.07 s. So the planted
+    headless; each run's summary.json, m5_fallback and m8_no_wt_timeout_playing_ns): run 3 (25 Nov, the tree before
+    the fix pass) fell back at 1.60 s normal (mark 5) and 4.06 s planted; run 4 (26 Nov, the fixed tree, 80b6748 plus
+    wip/u7-build-rs.patch 6535c181…) at 1.56 s and 4.07 s. So the planted
     bug is still caught: removing the page's timer moves the fallback past 3 s. (9) is reported NOT-RUN, never PASS,
     with the in-process tests standing in (F3's legs and R3's press-script test). The real mark is read in U6d, the
     unit that adds the room's per-slot refusal list; U6d comes after R1 (replan.md:22, :92), so R1 runs with mark 9

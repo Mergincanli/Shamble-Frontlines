@@ -10,7 +10,9 @@ answer at launch, this brief waits for the next window.
   (03d9ff3) holds those 43 files untracked, so its fast-forward would be refused (ffcheck 12:4x: 44 ADDED present).
 - The stop: 6,230, so U8-F1 adds at most 41 lines (the added column of `git diff --numstat <base>` over every file it
   touches, tests included). Before an item would pass 41, stop and carry the rest, last item first: item 3, then item 2
-  (SR-2 goes with SR-1). Item 1 is the Medium and is never carried. Say what was carried and why.
+  (SR-2 goes with SR-1). Item 1 is the Medium and is never carried. If the check lets item 2's proof be a scratch run
+  under .gate/ (recorded in the notes, not counted), item 2's PROMPT-R1.md line is never carried, only its test. Say
+  what was carried and why.
 
 ## 1. What is built (in this order; each with its test passing before the next)
 1. **ADV-U8H-1 under (b): the two self-tests' numbers printed into the summaries on RS.**
@@ -22,9 +24,11 @@ answer at launch, this brief waits for the next window.
       ds-selftest/ws_split.txt, one `<name> <value>` line each, numbers only; a missing event prints one line saying so.
    c. The pushed list, word for word the same in PROMPT-R1.md section 6 step 2 (ops/operator/PROMPT-R1.md:121-123) and
       R1.md section 7 (ops/runs/R1.md:288-294), in place of "npt-judge's summaries and the redacted records":
-      `collect/`, `probe/presence.txt`, `ds-selftest/ws_split.txt`, `bringup/facts.txt`<S14>. With (a): `, and s14/
-      whole (R1.md:190-193's copied folder; numbers only)`. With (b): nothing, and R1.md section 5's model-side line
-      reads that the model side runs from the laptop's raw archive in a sitting after R1.
+      `collect/`, `probe/presence.txt`, `ds-selftest/ws_split.txt`, `bringup/facts.txt`<S14>. With his S14-PUSH
+      (a): `, and s14/ whole (R1.md:190-193's copied folder: numbers and kernel settings)`. With (b): `, and
+      s14/summary.json`, a derived summary built by an item 1e added to this brief at launch (its lines counted, the
+      brief checked again, so U8-F1 waits for the next window). With (c): nothing, and R1.md section 5's model-side
+      line says S14 reads NOT-RUN at R1 (no path here: the laptop has no Rust).
    d. Tests: one asserts the two lists equal (test 5's file, which holds PROMPT-R1.md's checks); r1sh.test.mjs reads
       presence.txt's new lines from a fixture P1 log (an `l2_summary` and the four reads) and ws_split.txt's from a
       fixture `ws_split` event. One plant each (drop a field from the print, or one name from one list): the test

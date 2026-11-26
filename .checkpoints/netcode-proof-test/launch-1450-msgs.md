@@ -37,8 +37,13 @@ answer, word for word in history.md:8068-8088: "RESULTS-PUSH: (b). Only numbers 
 summaries. U8's new stop is 6,230 lines." Check: the 41-line budget and its carry order; the fresh worktree (U8's
 builder's own cannot fast-forward: ffcheck found 44 ADDED paths present); item 1's prints (numbers only; are the two
 policy strings inside his words?); item 1c's list and its `<S14>` fill (S14-PUSH: his answer `<answer, or none yet>`);
-item 2's test design; the round. Write .checkpoints/netcode-proof-test/advisor-u8-f1-brief.md: APPROVE, APPROVE WITH
-CONDITIONS (each worded to apply word for word) or REVISE. End your turn at once: the builder takes your slot.
+item 2's test design; the round. Also rule: may item 2's four-way proof be a scratch run under .gate/, recorded in the
+builder's notes and not counted in the 41, so that the one PROMPT-R1.md line always ships (your head read says the
+builder "proves it on a throwaway repository", not that the proof is a committed test)? It may be 15-20 lines alone;
+if yes, the line is never carried, only its test. S14-PUSH's options for `<S14>`: (a) s14/ whole; (b) a derived
+summary (a new item, re-checked); (c) neither (S14 NOT-RUN at R1). Write
+.checkpoints/netcode-proof-test/advisor-u8-f1-brief.md: APPROVE, APPROVE WITH CONDITIONS (each worded to apply word
+for word) or REVISE. End your turn at once: the builder takes your slot.
 
 ## C. To a new advisor (general-purpose, opus, effort xhigh; summary: "MAIN-68's plan, then the take-in recipe")
 You are the project's advisor agent: first read `git show origin/main:.claude/agents/advisor.md` whole and act by it.
