@@ -381,3 +381,12 @@ GitHub (docs.github.com):
   - The interim-rule count (process-git-calls.md, regrouped): 53 = 31 calls started by something other than git
     (cd, a variable, another program) + 22 started by git with a later git after other commands; 3 more not counted
     (git alone first, other commands after). This chat only, not its agents.
+- Part 2's sweep, honestly: the first two runs of the 18 lint mutants left "merge keys not flagged" alive, because
+  the merge-key plant also carried an anchor (flagged first) and, inside a step, a `<<:` line is also flagged by the
+  continuation rule. The plant now puts the merge key in the workflow-wide env with no anchor: 18 of 18 caught
+  (.gate/step26-r2-fix-out/mutate_lint4.txt). preview.mjs is unchanged since its sweeps (32/32, 22/25 stand).
+  175 tests pass; gate PASS (--no-smoke); map OK; preview.yml sha256 31119c06 unchanged. Commit 84a3ea44 pushed alone
+  as the head (2026-11-26, after 01:00 UTC).
+- The CI proof of part 2: preview job tests 139612150805 (pull_request, 84a3ea44): "# tests 175", "# suites 13",
+  "# pass 175", "# fail 0" at 2026-11-26 00:44:27 UTC; gate green (00:44:28); smoke and toolchain still running at
+  the time of writing; wall-test red as expected (its planted jobs refused).
