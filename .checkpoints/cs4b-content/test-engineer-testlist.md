@@ -30,3 +30,8 @@ Memory: no local agent memory exists (.claude/agent-memory-local/test-engineer a
 - engine-architect-cs4.md 1.3 (7 stages; stage 2 still says "escapes per RFC 8259, lone surrogate refused": superseded
   by B.1), 1.4 (writer = JSON.stringify(sortedKeys, null, 2)+"\n", -0 written "-0"), 1.12 (mark table; PM-0005-4
   classes list "bad UTF-8", "__proto__", 10,000-deep, 50 MB files; written before the B.1 cut).
+- rust-reviewer-cs4.md block 1 (parry3d =0.31.1, std off untried; 31 overflow blocks; 3A-FEATURE-VERSION live),
+  block 2 (twin names + opcode walk of production + imports; rules list; P1-P5 planted in real source by plants
+  script; controls; native: rustc --print cfg, planted CARGO_ENCODED_RUSTFLAGS=-Ctarget-cpu=native; P2 decides
+  whether release inlines libm fmaf -> dev-profile twin "before Walk merges"), block 3 (static world: -0 -> +0 at
+  validation; tree dump via traverse + accessors, FNV-1a 64, LE to_bits; depth <= 31), block 5 rows -11, -32, -33.
