@@ -18,6 +18,7 @@ OUT = []
 ENV = dict(os.environ, SHAMBLE_WASM_BINDGEN=f"{ROOT}/.gate/wb-tool/wasm-bindgen")
 BINDINGS, SIM, WORLD = "crates/sim-wasm/src/lib.rs", "crates/sim/src/lib.rs", "crates/sim/src/world.rs"
 CHECKS, BUILD, MANIFEST = "packages/client/scripts/build-checks.mjs", "packages/client/scripts/build.mjs", "Cargo.toml"
+WALK, HELPER, HANDOVER = "crates/devtools/src/content_files.rs", "crates/devtools/src/files.rs", "packages/client/scripts/testlines.mjs"
 PKG = "packages/sim-worker/pkg/sim_wasm_bg.wasm"
 STAMP = "packages/sim-worker/pkg/built-file-check.json"
 
@@ -30,6 +31,9 @@ def run(*command, env=None):
 WASM = ("node", "packages/client/scripts/build.mjs", "--wasm-only")
 PAGE = ("node", "--input-type=module", "-e", f'import {{ buildPage }} from "{ROOT}/packages/client/scripts/build.mjs"; await buildPage({{ production: true, outDir: "{ROOT}/.gate/dist-plant" }});')
 UNIT = ("node", "../../node_modules/vitest/vitest.mjs", "run", "scripts/build-checks.test.mjs")
+HAND = ("node", "../../node_modules/vitest/vitest.mjs", "run", "scripts/testlines.test.mjs")
+FILES = ("cargo", "test", "-p", "devtools", "--locked", "--test", "content_files")
+READERS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "recordings", "the_committed_recordings")
 SCAN = ("cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan", "the_simulation_crate")
 def native(crate): return ("cargo", "test", "-p", crate, "--locked", "--test", "native_target", "--target-dir", ".gate/target-plant")
 
@@ -87,6 +91,27 @@ PLANTS = [
     ("P14", "defect", "the imports rule turned into a list of banned words",
      [(CHECKS, "...imports.filter((entry) => !PLAYERS_IMPORTS.some((known) => same(known, entry)))", "...imports.filter((entry) => /fma|sin|now/.test(entry.name))")], UNIT,
      ["the players' file passes with the bindings' own imports"]),
+    # Step 8, the tools.
+    ("T1", "defect", "the content walk takes a link, a pipe or a folder for a file", [(WALK, "            if !kind.is_file() {", "            if kind.is_dir() && kind.is_file() {")], FILES,
+     ["whatever_is_not_a_kinds_folder_with_plain_id_files_is_refused_before_it_is_read"]),
+    ("T2", "defect", "the content walk reads a file of any name", [(WALK, 'if !name.strip_suffix(".json").is_some_and(content::json::is_id) {', 'if !name.strip_suffix(".json").is_some_and(|id| !id.is_empty()) {')], FILES,
+     ["whatever_is_not_a_kinds_folder_with_plain_id_files_is_refused_before_it_is_read"]),
+    ("T3", "defect", "the bundle tool writes without asking the loader", [(WALK, "        content::load_file(path, text.as_bytes()).map_err(|error| error.message())?;", "        let _ = content::load_file(path, text.as_bytes());"), (WALK, "    content::load(text.as_bytes()).map_err(|error| error.message())?;", "    let _ = content::load(text.as_bytes());")], FILES,
+     ["a_file_that_is_not_in_canonical_form_is_refused_in_the_loaders_words"]),
+    ("T4", "defect", "the bundle may be written inside the content folder when the path is spelled with ..", [(WALK, "    if real(out)?.starts_with(real(content)?) {", "    if out.starts_with(content) {")], FILES,
+     ["the_bundle_is_written_outside_the_content_folder_and_never_through_a_link"]),
+    ("T5", "defect", "the file helper makes a file through whatever stands in its place", [(HELPER, "        .create_new(true)\n", "        .create(true)\n")], READERS,
+     ["a file made any other way than new"]),
+    ("T6", "defect", "the hand-over compares numbers loosely (a minus zero passes for zero)", [(HANDOVER, "    else if (!Object.is(content[field], value)) lines.push(", "    else if (content[field] !== value) lines.push(")], HAND,
+     ["the check finds a value one step of a double away"]),
+    ("T7", "defect", "a table row may name a path as its field", [(HANDOVER, "!/^[a-z][a-z0-9_]{0,63}$/.test(row.field)", "!/^[^ ]+$/.test(row.field)")], HAND,
+     ["a row is refused for anything but a field's name"]),
+    ("T8", "defect", "the hand-over writes through a link in the target's place", [(HANDOVER, "  if (there !== undefined && !there.isFile()) throw", "  if (there !== undefined && there.isDirectory()) throw")], HAND,
+     ["no file is read or written through a link"]),
+    ("T9", "defect", "the Export in use is whatever the manifest beside it says (no pin in code)", [(HANDOVER, "  if (found !== pinned) throw", "  if (found !== pinned && false) throw")], HAND,
+     ["the Export is the pinned one"]),
+    ("T10", "defect", "an Export made at 60 steps a second is handed over", [(HANDOVER, "  if (rate !== 30) throw", "  if (rate === undefined) throw")], HAND,
+     ["the Export is the pinned one"]),
 ]
 
 def note(name, kind, ok, what, detail):
@@ -173,7 +198,7 @@ def main():
     before = {path: digest(path) for path in touched}
     for name, kind, what, edits, command, words in PLANTS:
         if names and name not in names: continue
-        planted(name, kind, what, edits, command, words, cwd="packages/client" if command is UNIT else None)
+        planted(name, kind, what, edits, command, words, cwd="packages/client" if command in (UNIT, HAND) else None)
     stamp_plants(names)
     native_plants(names)
     back = {path: digest(path) for path in touched} == before

@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 23:09 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 23:44 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -671,15 +671,56 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   count: steps 8 to 12 are about 2,645; at this pull request's rate so far (1.34) the whole would end near
   4,900, at the planned 1.8 near 6,100, at 4b-1's 2.17 near 7,100: under the stop line at all three, the first
   rung reached only at the highest.
-- **His second "a"** (2026-11-26, 22:00:07 UTC; `cs4-walk/mustafa-2026-11-26-a-second.md`, saved by script): no
-  question was open in the chat but GREY-COLOURS, which his first "a" had answered 44 minutes before; DIFF-LIST
-  had not been asked in the chat. Read as the same answer again and as nothing else; said to him so.
+- **He sent "a" once; the chat was shown it three times** (`cs4-walk/redelivered-2026-11-26.md`). The showings
+  of 22:00:07 and 22:43:17 UTC are the record's own repeats of his message of 21:16:26 (the same source id, each
+  right after the session's worker restarted), not messages of his. The first repeat was wrongly saved as "his
+  second message" (commit 0b068ee; the note is removed) and told to him as such; the second came after
+  DIFF-LIST was asked and **was not taken as its answer: DIFF-LIST is open**. `chat-words.mjs` leaves repeats
+  out from now on. Told to him.
 - **DIFF-LIST printed from his Export at 30 steps** (`cs4b-content/testlines-difflist-30.md`, by the notes'
   two scripts, which now take an Export's path; the first list is reproduced byte for byte by the same
   scripts). Against the list in the plan it differs in two rows of part B and nothing else: the step rate's row
   is gone (the Export is at 30), and `soldier.gun` "smg" to "shotgun" is new (the gun in his hands when he
   exported: not carried). Parts A (23 names) and C (7 and 16 names) are the same. **Asked of him in the update
   at step 7's end; step 8 writes no content file before his yes.**
+- **CI on step 7's head d313162: green** (gate run 45902998609, with smoke; toolchain run 45902998524, 8 min 23 s
+  for its build-and-test step: 16 s more than step 6's, the dev-profile twin's build). So the built-file check
+  passed on CI's own build, in both flavours, with CI's paths.
+- **Step 8, first part: the tools, on test files (built; in its local checks).** No file under `content/` is
+  written before his DIFF-LIST answer (said to him so), the map included; the drafts wait in the notes.
+  - `crates/devtools/src/content_files.rs` and `src/bin/content_bundle.rs`: the walk of `content/` (one folder
+    per kind, the content crate's own list, now public; `source/` skipped but held to be a real folder; every
+    entry asked for its own type, never followed; a link in a file's or a folder's place, a pipe, a nested
+    folder, an unknown folder, a file at the top, a name that is no `<id>.json`, a file over the loader's cap or
+    no text: each refused before it is read), the bundle after the loader took each file and the whole, and the
+    tool's two modes (`--check` writes nothing; `<folder>` puts `content.json` there: the folder must be a plain
+    folder whose real place lies outside `content/`). `files.rs` gains `read_plain_within` (a reader's own cap),
+    `is_plain_folder` and `replace_plain` (a new file made only under a name that is not there, then renamed).
+    Four tests on scratch folders (`tests/content_files.rs`): 12 refused layouts and 6 refused texts, each with
+    the tree's entries, bytes and times unchanged, and both modes saying the same.
+  - `packages/client/scripts/testlines.mjs` (`--check`, `write`, `compare-old`, `table`) with ten tests on a
+    made-up Export: the Export's sha256 pinned in the script (a9d47785...c4ab) and held against the manifest; an
+    Export at another step rate than 30 or with a warning is not handed over; the table names fields, never
+    files (a row with a path is refused; plants `../.claude/settings.json`, an absolute path,
+    `content/source/x.json`); numbers compared bit for bit; no read or write through a link; reads capped at 1
+    MiB; the target written new and renamed. `canonical.mjs` (three tests) brings a hand-written file to the
+    loader's form and takes a content path only.
+  - `crates/content/src/map.rs`: **the facing's zero is pinned in the map's doc** (0 faces +z, the degrees grow
+    toward +x; the old game's `atan2(dir.x, dir.z)`), before any map file exists (the advisor agent's condition
+    5). How the simulation reads an angle is said there for the change that first reads one (no sine or cosine
+    of the standard library).
+  - **Found on the way:** (1) the tool's first inside-content check was fooled by a path spelled with `..`; its
+    own test caught it; the real places are compared now. (2) 4b-1's scan of the recordings' readers went red on
+    the helper's new shape (the open moved into `read_plain_within`), as it should: the scan now names that
+    door, and holds that the one place that makes a file makes it new. (3) The product script's comparison
+    gives the notes' counts on his Export (23 different, 60 equal, none without a counterpart).
+  - **Dry runs, printing and scratch only (`.gate/cs4b/draft/`, never `content/`):** the movement table his
+    Export would give is taken by the loader as it stands, so **no range of the movement kind refuses a value of
+    his** (the advisor agent's condition 7); the test scene's draft (`cs4b-content/test-scene-draft.json`: 23
+    shapes, 8 spawns, 6 regions; the Art sheet's house sizes, the marks' steps, ledges, thin wall and ramps, a
+    50 m lane with posts) is taken too; the bundle of both is 8,375 bytes. The table's draft is
+    `cs4b-content/testlines-table-draft.json` (16 rows: 15 fields and "stamina is on").
+  - Ten more plants in `plants-4b2.py` (T1 to T10), tried by hand, all caught.
 - **To do before 4b-2 merges:** RustSec advisories for the 33 packages (security-auditor could not read them
   without the network); the licence texts for the hosted build (a follow-up for lane 2).
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
@@ -697,6 +738,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   test run). All reads. Since then every git command stands alone in its call.
 - One more, at step 7 (2026-11-26, about 22:40 Amsterdam): a `git status --short | head` stood after a `grep` in
   one call. A read. Told to him in the step's update.
+- The chat told him "Your second 'a' (23:00 Amsterdam)" as if he had sent a second message. He had not: it was
+  his first message shown to the chat again after a restart. Corrected in the chat and in the notes.
 - Two more git commands did not start their own shell call, both harmless reads or a write-back of committed text:
   a `git show HEAD:... > file` on the line after a python script (the take-in; told to him and to the advisor
   agent), and a `git log --oneline -1` after a `git status ... | head` in one call (after the merge).
@@ -708,9 +751,13 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   after test-engineer's read, and in the report.
 
 ## Current step
-4b-2: steps 6 and 7 are done (1,339 written lines of 8,450). Step 7's CI is to be read. DIFF-LIST is asked of him
-(`cs4b-content/question-2026-11-26-diff-list.md`). Next: step 8 (the tools and the data): its tools first, on test
-files; its content files only after his yes.
+4b-2: steps 6 and 7 are done and green in CI. DIFF-LIST is asked of him
+(`cs4b-content/question-2026-11-26-diff-list.md`; the board thread is on needs-musti). Step 8's first part (the
+tools, on test files) is built and in its local checks; then its commit, the count, the push, CI. After his yes:
+step 8's second part (his Export, its manifest and the table under `content/source/`, the movement table by the
+script, the test scene from the draft, the real-files checks). Without his answer, the next work that does not
+rest on it: step 10's static collision world on a map built in code is not possible without step 9's seat; so
+step 9's parts that need no content file (the constructor's bundle argument on the test texts) come next.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

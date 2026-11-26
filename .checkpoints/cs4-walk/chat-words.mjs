@@ -6,6 +6,9 @@
 //   node .checkpoints/cs4-walk/chat-words.mjs exact <transcript.jsonl> <the whole text> <out file> <title> <what it answers> [after]
 //   node .checkpoints/cs4-walk/chat-words.mjs part  <saved file> <from line> <before line> <out file> <title>
 // [after]: only messages sent after this time (as the transcript writes it), for a text he sent more than once.
+// A queued command whose `source_uuid` is the id of a message already in the record is that message handed to the
+// chat again (seen twice on 2026-11-26, each time right after the session's worker was restarted): it is no new
+// message of his, it is never saved as one, and the script says how many it left out.
 // `part` copies the lines of a saved text from the line that equals <from line> up to the line that equals <before line>.
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -19,20 +22,25 @@ if (mode === 'words' || mode === 'exact') {
   const exact = mode === 'exact';
   const [transcript, marker, out, title, answers, after = ''] = a;
   let hits = [];
+  const seen = new Set();
+  let repeats = 0;
   for (const line of readFileSync(transcript, 'utf8').split('\n')) {
     if (!line.includes(marker.slice(0, 20))) continue;
     let e;
     try { e = JSON.parse(line); } catch { continue; }
     if (e.isSidechain) continue;
     if (e.type === 'user' && !e.isMeta && !e.isCompactSummary && e.toolUseResult === undefined) {
+      seen.add(e.uuid);
       const c = e.message?.content;
       const texts = typeof c === 'string' ? [c] : Array.isArray(c) ? c.filter((p) => p.type === 'text').map((p) => p.text) : [];
       for (const t of texts) if ((exact ? t.trim() === marker : t.includes(marker)) && !t.startsWith('This session is being continued')) hits.push({ t, at: e.timestamp, id: e.uuid, how: 'the user message' });
     } else if (e.type === 'attachment' && e.attachment?.type === 'queued_command' && typeof e.attachment.prompt === 'string' && (exact ? e.attachment.prompt.trim() === marker : e.attachment.prompt.includes(marker))) {
+      if (seen.has(e.attachment.source_uuid)) { repeats += 1; continue; }
       hits.push({ t: e.attachment.prompt, at: e.timestamp, id: e.uuid, how: 'the message he sent while the chat was working (stored as a queued command)' });
     }
   }
   hits = hits.filter((hit) => String(hit.at) > after);
+  if (repeats > 0) console.error(`left out: ${repeats} repeat(s) of a message already in the record (handed to the chat again, not sent again)`);
   if (hits.length !== 1) { console.error(`expected one message with the marker, found ${hits.length}`); process.exit(1); }
   const { t, at, id, how } = hits[0];
   writeFileSync(NOTES + out, `# ${title}\n\n_Copied by script from the chat's transcript (${SESSION}), never retyped: ${how} of ${at} (uuid ${id}), whole (${size(t)}). What it answers: ${answers}_\n\n---\n${t}\n`);
