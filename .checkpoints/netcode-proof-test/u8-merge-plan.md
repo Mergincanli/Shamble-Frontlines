@@ -72,6 +72,31 @@ needs no go of his (as U4r's and U4f's); PR #40 keeps its own go.
   45728836660); M0's checks (no agent runs, no cargo or rustc, main still 07d673b, branch = origin and clean, free 14,039
   MiB); M1 (the patch 09cb4a07...e660); ops/browser's package.json 8370495d... and package-lock.json a0efce8e... equal in
   agent-abf71d95fc07b3522. Next: the saver stopped, H0, the base run, then M3.
+- DONE 00:34-00:36: the saver by981ffzh stopped (its terminated autosave pushed by 37badaf; pgrep exit 1); H0
+  37badafbf72ae6dadb99155fd370e4ffcd983798 (= origin, clean); the no-save window opens. Base run (u8-merge/light-base.log,
+  lock 00:34:40): refs 1932 (N0), marks 81 unchanged, self 78 of 78, redact 11 of 11, 378 items, 0 findings. M2/M3/M4:
+  `git apply --check --index` exit 0, `git apply --index` exit 0; `git status --short`: the 43 paths, all A; `diff -rq`
+  of U8's worktree ops/ against the main folder's: only ops/operator/redact-check.test.mjs differs (the lane's change
+  since 096808b, not U8's). Next: M4c (the link), C1, M5 (refs bar 1975).
+- DONE 00:35: M4c, the link (`ln -s` to agent-abf71d95fc07b3522's ops/browser/node_modules; package files equal). C1:
+  u8-c1.mjs wrote .gate/npt-browser/records/mds-chrome-wt-a0-2026-11-26T00-35-28-859Z.jsonl through U8's save() (14
+  page lines; log sha256 b16358f2...7781; wasm sha256 dbdc8629...80d4) and copied it alone to .gate/u8-merge/c1-logs/;
+  the judge through main-run.sh (c1-judge.log, lock 00:35:34): exit 0, no "npt-judge: " line; c1-verdicts.json:
+  PM-0001-36 NOT-RUN (the ML and MAC-b parts: 0 of 1 valid runs), its "ML* (rough, reported)" part PASS. The bar (a
+  verdict, never a read error) is met. Note: while the link exists, main-run.sh's untracked hash prints "sha256sum:
+  ops/browser/node_modules: Is a directory" (a header line only). Next: M5 in the background.
+- STOPPED AT M5, 00:56 (M6 applied, nothing committed): check.mjs all 11 steps PASS (test 861/958, refs 1975 = N0 + 43,
+  marks 81, self 78/78, redact 11/11 with 421 items, 0 findings), but `node --test 'ops/**/*.test.mjs'` 99 of 100: test
+  71, r1sh.test.mjs:226-227, "item 8: room_settings writes only fields the settings types accept, every U6a field,
+  `bite` only in a bite room": "U6a's merged Settings: 26 fields and the bites build's `bite`", 40 !== 27 (the merged
+  Settings has 13 more fields from U6b and U6c: the alignment test 7 exists to catch). wrappers.test.sh not run (the
+  runner stops at the first failure). M6: `git apply -R --index` exit 0, the link removed (unlink), spikes/ equal to H0
+  (`git diff --quiet H0 -- spikes/` exit 0). C1's result stands (independent of the merge). Next: the advisor's ruling
+  in the 04:50 window (with MAIN-67's step 7), then U8's builder (ac59cce3e5d002441) fixes r1.sh's room_settings and the
+  pin, then this merge again from M0.
+- (was) RUNNING since 00:35:4x: M5 (background shell b5xy9vavj; .gate/u8-merge/m5-check.log; fmt and clippy PASS by 00:37);
+  u8-report.md drafted (its M5_RESULT and M7_RESULT to fill). If the chat was compacted meanwhile: read the log's end;
+  all PASS and the ops lines 0 fail: go on to M7 (gate, repo map, the link removed), then M8 and M9; a FAIL: M6.
 
 ## Steps
 - **M0, preconditions:** no agent or workflow running; the lane lock free; HEAD = origin, clean; `git fetch origin
