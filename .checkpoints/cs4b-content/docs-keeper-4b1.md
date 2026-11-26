@@ -38,3 +38,12 @@ Started 2026-11-26 16:10 UTC (date -u). Worktree `.gate/lane1-takeover`, branch 
 - Note 16:23 UTC: the main session's uncommitted fix pass changes crates/ (content-corpus.txt header now 20360, was
   13067 at ef2edec): REPO_MAP's numbers are tagged "at ef2edec" and need the main session's update after the fix pass.
 ## Status: DONE (first pass), 2026-11-26 16:23 UTC.
+
+# Part 2 (after the reviews), started 17:35 UTC; code head 2039e3c
+## Plan
+1. Check each fix-pass claim against the tree; make REPO_MAP rows, ROADMAP's 4b-1 entry and the archive block true.
+2. Archive block: new 4B- ids for the reviews' follow-ups (who found each); correct 4B-CI-CONTENT (fuzz run in CI;
+   clippy + content release tests by hand).
+3. STATUS: state "reviewed (two rounds, no Critical or High)"; shrink lane 1's lines (moves by script); list other
+   lanes' stale lines with lines freed. repo-map-check.
+## Done (part 2)

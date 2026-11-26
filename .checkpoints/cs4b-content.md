@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 18:30 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 18:35 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -463,6 +463,17 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
       in the scan (step 9); the older vector readers outside this change-set; RR-2's CI steps; EA-6.
     - The plants script: five more (f to j: the list's room, the pairwise key search, the guard allowed, a
       panic call after a path, the map's rules counted away), 34 texts in all, each standing once.
+31. **The last fix pass pushed** (head 21e1550; the gate green on it, run 45868324364; the toolchain run
+    45868324356 was going when this was written). The board has the step's line.
+32. **The planted defects, the whole run on the final code** (`plants-4b1.txt`, on 21e1550; its log
+    `.gate/plants-4b1.log`): **35 of 35 caught by the words of their own check, the control held, every file put
+    back (sha256 of 13 files), the clean tree green** (the test module's build, the content crate's tests, the
+    proofs, the time unit, the aim tie, the recordings, the caps, the two key shapes, the fuzz run, the source
+    scan, Node: every exit 0). Commit 029013d.
+33. **The verifier and docs-keeper's second part started** (2026-11-26, 18:35 Amsterdam): the verifier on the
+    report's draft (`report-draft-4b1.md`, a copy of the session's draft with its open marks; brief
+    `verifier-brief-4b1.md`; it runs the full local checks itself, so the main session runs no cargo meanwhile);
+    docs-keeper on `docs-keeper-brief-4b1-part2.md`.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -470,11 +481,13 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   one notes file; nothing else happened. Every other git command of 4b so far started its own call.
 - One chat update was headed "about 16:50 Amsterdam" when the clock read about 16:45: a time ahead of the clock.
 - The card's "Last update" was once written 34 minutes ahead of the clock and corrected before it was committed.
+- The chat told him, in its update after round 1's fix pass, that the million-input fuzz run is by hand. It is
+  not: CI's release line runs the tools crate's tests (test-engineer's TE-8). Corrected in the chat's update
+  after test-engineer's read, and in the report.
 
 ## Current step
-4b-1, the close: both review rounds are in (no Critical or High) and the last fix pass is committed (2039e3c).
-Now, in this order: push, CI; the whole plants run on that head (nothing else may run
-in the tree meanwhile), its file committed; the verifier and docs-keeper's second part side by side
+4b-1, the close: both review rounds are in (no Critical or High), the last fix pass is pushed (code 2039e3c) and
+the plants run is in (35 of 35). Now: the verifier and docs-keeper's second part side by side
 (`cs4b-content/docs-keeper-brief-4b1-part2.md`); the report (`docs/reports/2026-11-26-cs4b1-content.md`; its
 draft is in the session's scratchpad); the notes out of the head in the last commit; push, CI; the advisor agent
 on that head; the draft pull request; his go.
@@ -512,4 +525,5 @@ on that head; the draft pull request; his go.
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- No agent runs. Next in the tree: the plants run (it edits source files, so nothing else runs beside it). No saver runs: the main session commits the notes by hand.
+- The verifier and docs-keeper (second part), both started 2026-11-26 18:35 Amsterdam. No cargo and no browser
+  run by the main session while the verifier runs the local checks. No saver runs: the main session commits the notes by hand.
