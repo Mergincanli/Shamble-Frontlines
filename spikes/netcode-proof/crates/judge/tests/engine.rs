@@ -5053,17 +5053,18 @@ fn u6j_the_kill_ratios_and_the_egress_ratios_last_gaps() {
 // the leg's own base round trip; nothing else moves. Made-up logs: no real L2 probe log exists before R1.
 
 const UP: &str = "probe_up_delay_ns";
-const ONE_WAY_CHECKS: [&str; 6] = [
+const ONE_WAY_CHECKS: [&str; 7] = [
     "mean low",
     "mean high",
     "end low",
     "end high",
     "round trip",
     "packets",
+    "least",
 ];
 
 /// A mark like PM-0001-3 at P1: an L1 and an L2 part share the checks; the one-way mean (25 ms +- 5 %) and lower
-/// end (20 ms +- 0.25 ms), the round trip, and a count over the one-way series.
+/// end (20 ms +- 0.25 ms), the round trip, a count over the one-way series, and its least value.
 fn one_way_mark() -> Value {
     let rows = [
         (UP, "mean", ">=", 23_750_000),
@@ -5072,6 +5073,7 @@ fn one_way_mark() -> Value {
         (UP, "p001", "<=", 20_250_000),
         ("probe_rtt_ns", "mean", "<=", 52_500_000),
         (UP, "count", "==", 3),
+        (UP, "min", ">=", 19_750_000),
     ];
     let check = |(name, (series, stat, op, value)): (&str, (&str, &str, &str, i64))| {
         let series = format!("second.s.{series}");
@@ -5116,7 +5118,7 @@ fn one_way_out(logs: &[Log]) -> (Vec<String>, Vec<String>, Vec<String>) {
 
 /// A bound in force as the judge prints it.
 fn net(op: &str, bound: &str, written: i64, base: i64) -> String {
-    format!("{op} {bound} (the profile's {written} less half the base round trip {base})")
+    format!("{op} {bound} (the written {written} less half the base round trip {base})")
 }
 
 const STAMPED: [i64; 3] = [19_700_000, 24_700_000, 29_700_000];
@@ -5130,8 +5132,14 @@ fn oneway_an_l2_run_reads_its_one_way_bounds_net_of_half_its_base() {
     assert_eq!(lines, all_pass);
     assert_eq!(needs[0], net(">=", "23450000", 23_750_000, 600_000));
     assert_eq!(needs[3], net("<=", "19950000", 20_250_000, 600_000));
+    assert_eq!(needs[6], net(">=", "19450000", 19_750_000, 600_000));
     // Nothing else moves: the round trip and the count read as written.
-    assert_eq!(needs[4..], ["<= 52500000", "== 3"]);
+    assert_eq!(needs[4..6], ["<= 52500000", "== 3"]);
+    // Another L2 log of the run that carries no one-way series (LG's `load` log, with no base) changes nothing.
+    let mut load = probe_log("p1", "L2", STAMPED, None);
+    (load.header.process, load.seconds) = ("load".to_owned(), vec![]);
+    let with_load = [probe_log("p1", "L2", STAMPED, Some(json!(600_000))), load];
+    assert_eq!(one_way_out(&with_load).0, all_pass);
     // The same log on the model (L1) is never net, whatever its header says: its lower end fails the written bound.
     let (lines, needs, _) = one_way_out(&[probe_log("p1", "L1", STAMPED, Some(json!(600_000)))]);
     assert_eq!(
@@ -5165,17 +5173,17 @@ fn oneway_an_l2_run_reads_its_one_way_bounds_net_of_half_its_base() {
 
 #[test]
 fn oneway_a_base_the_judge_cannot_read_is_a_gap() {
-    // The four one-way checks gap alike; the round trip is judged as ever (and the count: two logs hold 6 packets).
+    // The five one-way checks gap alike; the round trip is judged as ever (and the count: two logs hold 6 packets).
     let gap = |logs: &[Log]| {
         let (lines, _, notes) = one_way_out(logs);
-        assert!(lines[..4].iter().all(|l| l.ends_with(": Gap")), "{lines:?}");
-        assert!(notes[..4].iter().all(|n| *n == notes[0]), "{notes:?}");
-        let count = if logs.len() == 1 {
-            "packets: Pass"
-        } else {
-            "packets: Fail"
-        };
-        assert_eq!(lines[4..], ["round trip: Pass", count]);
+        let one_way = [0, 1, 2, 3, 6];
+        assert!(
+            one_way.iter().all(|i| lines[*i].ends_with(": Gap")),
+            "{lines:?}"
+        );
+        assert!(one_way.iter().all(|i| notes[*i] == notes[0]), "{notes:?}");
+        let count = ["packets: Pass", "packets: Fail"][logs.len() - 1];
+        assert_eq!(lines[4..6], ["round trip: Pass", count]);
         notes[0].clone()
     };
     let (of, whole) = (
@@ -5210,8 +5218,8 @@ fn oneway_a_base_the_judge_cannot_read_is_a_gap() {
     // Half the base above a written bound: the model adds no delay there, so that check has no bound to read.
     let (lines, needs, notes) =
         one_way_out(&[probe_log("p1", "L2", STAMPED, Some(json!(40_000_000)))]);
-    let far = "half the base round trip (40000000 ns) is above the written bound 19750000: the model adds no delay \
-               there, so the check has no bound to read";
+    let far = "half the base round trip (40000000 ns) is above the written bound 19750000: the bound in force would \
+               be below 0 ns";
     assert_eq!(
         (lines[2].as_str(), notes[2].as_str()),
         ("end low: Gap", far)
@@ -5287,6 +5295,9 @@ fn oneway_the_real_marks_one_way_checks_on_l2() {
         outcome == "Pass" && needs.ends_with("less half the base round trip 400000)")
     };
     assert!(l2.iter().all(net), "{l2:?}");
+    // To the letter: the lower end of each direction, 19,750,000 less 200,000.
+    let lower = ">= 19550000 (the written 19750000 less half the base round trip 400000)";
+    assert_eq!(l2.iter().filter(|c| c.2 == lower).count(), 2, "{l2:?}");
     // On the model the same stamps fail the three written lower bounds of each direction.
     let l1 = one_way("L1", "L1 P1");
     let failed: Vec<&str> = l1

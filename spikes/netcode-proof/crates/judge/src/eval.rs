@@ -468,8 +468,8 @@ fn in_force(
 /// the probe stamps only that added part, so a log on layer `L2` that carries the series is read against the written
 /// bound minus half its `params.base_rtt_ns`, exact. `None` for every other check and for a run with no such log
 /// (L1 is the model itself: never net). Gaps: such a log without the param, a param that is not a whole number of
-/// ns at 0 or above, logs that disagree on it, and half a base above the written bound (the model adds no delay
-/// there, so the check has no bound to read).
+/// ns at 0 or above, logs that disagree on it, and half a base above the written bound (the bound in force would be
+/// below 0 ns).
 fn one_way_bound(
     check: &crate::marks::Check,
     runs: &[&Run<'_>],
@@ -512,8 +512,8 @@ fn one_way_bound(
     let net = *written - Ratio::new(i128::from(base), 2);
     if net < Ratio::int(0) {
         return Err(format!(
-            "half the base round trip ({base} ns) is above the written bound {written}: the model adds no delay \
-             there, so the check has no bound to read"
+            "half the base round trip ({base} ns) is above the written bound {written}: the bound in force would \
+             be below 0 ns"
         ));
     }
     Ok(Some((net, base)))
@@ -581,7 +581,7 @@ fn eval_check(
             let (bound, needs) = match net {
                 None => (*t, t.to_string()),
                 Some((net, base)) => {
-                    let how = format!("the profile's {t} less half the base round trip {base}");
+                    let how = format!("the written {t} less half the base round trip {base}");
                     (net, format!("{net} ({how})"))
                 }
             };
