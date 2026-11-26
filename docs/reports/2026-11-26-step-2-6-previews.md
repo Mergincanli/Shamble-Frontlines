@@ -26,20 +26,21 @@ changed line 50 (`node --test hosting/preview.test.mjs`; `hosting/` fails on Nod
   lint of preview.yml included). `hosting/_headers`; `hosting/package.json` + lockfile: Wrangler 4.164.0 (DEP-HOLD:
   the security-auditor's APPROVE on both sha256).
 - `docs/runbooks/previews.md`; `docs/DECISIONS.md` (his six messages, by script); `docs/REPO_MAP.md` rows; STATUS and
-  ROADMAP (lane 2's lines; change-set 0's merged ROADMAP entry moved byte for byte into Build history by script, under
-  his OLD-LINES (a)).
+  ROADMAP (lane 2's lines; change-set 0's merged entry, ROADMAP lines 371-377, moved byte for byte to Build history
+  lines 202-208 by script, under his OLD-LINES (a)).
 - No game file, no `.claude/`, no gate file. Gate check 3: +0 -0 symbols.
 ## Evidence
 - Gate PASS (checks 1-4, 5b-5d; 5a smoke cannot start locally: the container's Chromium does not match tools'
   Playwright). On GitHub at 84a3ea44: gate, smoke, toolchain green; preview/tests "# tests 175", "# pass 175" (job
   139612150805). `wall-test` red by design (its planted jobs are refused).
 - Mutation sweeps: preview.mjs 32/32 and the test-engineer's 22/25 (its 3 judged equivalent); the lint 18/18.
-- M1 (the wall in front of the token): try 1 failed (the bypass box was not saved); try 2 passed: all three planted
-  jobs refused before any step, the refusal line read through the annotations API (B12).
+- M1 (the wall in front of the token): try 1 failed (likely cause: the bypass box was not saved); try 2 passed: all
+  three planted jobs refused before any step (B12), the refusal line read through the annotations API (B13).
 - npm 10.9.9 measured: `--no-ignore-scripts`, `--ignore-scripts=false`, `--ignore-scripts false` turn scripts on again.
 ## Reviews
 - Round 1 (head 8fef0f6): infra REVISE (runbook: renewal order, re-run limits, end date in STATUS): fixed. Security
-  APPROVE, with conditions for the token sitting (below). Test REVISE (TE-A to TE-J): fixed in de6e4b58 and 6fd0375d.
+  APPROVE, with conditions for the token sitting (below). Test REVISE (TE-A to TE-J): fixed or moved (de6e4b58,
+  6fd0375d).
 - Round 2: infra APPROVE (two Lows fixed); test REVISE narrow (N1 a regression in the npm rule, N2 the token's places
   per job): fixed in 80a9b6a8; security APPROVE (two Mediums: YAML anchors, YAML-continued npm lines): fixed in
   84a3ea44. Follow-ups to STATUS: six unlinted guards (WRANGLER_LOG, metrics, job permissions, github-script, the
@@ -51,18 +52,23 @@ changed line 50 (`node --test hosting/preview.test.mjs`; `hosting/` fails on Nod
   plan 2.3 said. `wall-test.yml` stays until the token sitting (M1's re-runs need it).
 - Process, from the record (B15, B16): 53 breaches of his interim git rule (a floor); three main-folder merges outside
   the allowed forms (2026-11-18, 11-24, 11-25 21:00 UTC), each bringing only main's files among protected ones; the
-  guard absent since 2026-11-15; whether an ask in auto mode reaches him is open. The advisor agent: ESCALATE.
+  guard absent since 2026-11-15; whether an ask in auto mode reaches him is open. The security-auditor rates this High
+  for the kit (Critical if the hooks ran and an ask was settled without him), outside this diff and not a follow-up;
+  the advisor agent: ESCALATE.
 ## Risks
 1. A guard that seems on but is not (this chat), and asks that may not reach him in auto mode (kit-wide).
-2. The token sits behind the environment rule alone until the Guard fix chat's protection for main is merged.
+2. No token exists yet (his TOKEN-TONIGHT (b)): it waits for the Guard fix chat's protection for main; the
+   environment rule (M1) is the wall in front of it until then.
 3. Unproven until live: M5 to M11 (the first link, the comment, the headers served, reconcile, the count).
 ## Proposed next step
-After his GUARD-OFF answer: the token sitting with the security-auditor's conditions (a reload and screenshot of the
+After his GUARD-OFF answer, and once the Guard fix chat's protection for main is merged (his TOKEN-TONIGHT (b)): the
+token sitting with the security-auditor's conditions (a reload and screenshot of the
 environment page; both secrets by "Add environment secret"; no CLOUDFLARE_ secret elsewhere; M1 re-run; WALL_TEST and
 `wall-test.yml` removed), then the verifier, ready, and his go.
 ## Decisions needed
 1. GUARD-OFF: how the remaining sensitive steps run. (a) a new chat with only this repository, after this report; its
-   first act shows a guard prompt while he watches; (b) this chat, asking him before each step. Recommend (a).
+   first act shows a guard prompt while he watches, and if none reaches him it works as in (b); (b) this chat, asking
+   him before each step. Recommend (a).
 2. MAIN-WALL-AGAIN: does his MAIN-WALL (b) stand, given the guard did not run? (a) until the token sitting, where his
    rule asks him again; (b) withdraw now. Recommend (a).
 3. GUARD-KIT: a plan-first kit change-set for the Guard fix chat: show at start whether the guard is loaded, test

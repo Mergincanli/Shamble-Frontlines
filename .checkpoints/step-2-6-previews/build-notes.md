@@ -397,7 +397,14 @@ GitHub (docs.github.com):
     counted, so 53 is a floor. Agents: the test-engineer disclosed `cd ... &&` in front of read-only git calls in its
     round 2; the advisor agent of 2026-11-26 ran its read-only git calls as `git -C <main folder>`, a shape the guard
     refuses (routine-guard.mjs:1087); the docs-keeper of 2026-11-26 ran one call with two git commands and two calls
-    beginning with `cd … &&` (its own report; notes docs-keeper.md).
+    beginning with `cd … &&` (its own report; notes docs-keeper.md); the advisor agent's head review ran one call with
+    `date -u;` in front of a read-only `gh api` (its own report).
+- The advisor agent's review of head b35c6c08 (advisor-head-b35c6c08.md): ESCALATE (the same five open decisions);
+  reproduced 175 tests, the three sha256, CI green; review budget within; nothing Critical or High open in the diff.
+  Fixed in the next push: R6 (risk 2 and the next step now follow his TOKEN-TONIGHT (b)), R1 (the security-auditor's
+  rating in the report; the guard item moved out of STATUS's below-the-bar follow-ups into the risks line), the Lows
+  (try 1's cause "likely"; the refusal line cites B13; "fixed or moved"; GUARD-OFF (a)'s fallback; the moved ROADMAP
+  lines named). Left: D1 (long single STATUS lines, as other lanes do).
 - The docs pass (docs-keeper, 2026-11-26; checked before commit): STATUS lane 2's lines only (the #72 row, Next item 3,
   Waiting on Mustafa with the five questions recorded as open, a follow-ups line, the risks; the shared "Last updated"
   stamp); ROADMAP: the step 2.6 entry, #67's dated pointer, and change-set 0's merged entry moved into Build history
