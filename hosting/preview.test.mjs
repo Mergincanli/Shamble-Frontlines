@@ -854,10 +854,17 @@ function lintWorkflow(text) {
   if (text.includes('\t')) flag('L0', null, 'a tab character');
   const records = workflowLines(text);
   for (const r of records) if (!r.inBlock && r.indent % 2 !== 0) flag('L0', r, 'an odd indent outside a block');
-  // L0: shapes this reader does not follow (a quoted key, a flow-mapping step, a space before a key's colon).
+  // L0: shapes this reader does not follow (a quoted key, a flow-mapping step, a space before a key's colon), and shapes
+  // that would carry a step's lines somewhere this reader cannot see: a YAML anchor, alias or merge key (one step's env
+  // reused on another), a folded run (`run: >` joins its lines into one command), and any value continued onto a
+  // second line outside a `|` block (YAML joins those lines too).
   for (const r of records) {
-    if (!r.inBlock && /^\s*(?:- )?(?:["'][^"']*["']\s*:|\{)/.test(r.line)) flag('L0', r, 'a quoted key or a flow mapping');
-    if (!r.inBlock && /^\s*(?:- )?[A-Za-z0-9_-]+\s+:(?:\s|$)/.test(r.line)) flag('L0', r, 'a space before a key\'s colon');
+    if (r.inBlock) continue;
+    if (/^\s*(?:- )?(?:["'][^"']*["']\s*:|\{)/.test(r.line)) flag('L0', r, 'a quoted key or a flow mapping');
+    if (/^\s*(?:- )?[A-Za-z0-9_-]+\s+:(?:\s|$)/.test(r.line)) flag('L0', r, 'a space before a key\'s colon');
+    if (/^\s*(?:- )?(?:[A-Za-z0-9_-]+:\s+)?[&*][A-Za-z0-9_-]/.test(r.line) || /^\s*(?:- )?<<\s*:/.test(r.line)) flag('L0', r, 'a YAML anchor, alias or merge key');
+    if (r.key === 'run' && /^>/.test(r.value)) flag('L0', r, 'a folded run (only a | block keeps one command per line)');
+    if (r.step >= 0 && r.key === null && !r.item) flag('L0', r, 'a value continued onto another line (only a | block may span lines)');
   }
   // L1 (G1): no ${{ }} inside any shell block.
   for (const r of records) if (r.step >= 0 && r.stepKey === 'run' && r.line.includes('${{')) flag('L1', r, '${{ inside run');
@@ -892,8 +899,9 @@ function lintWorkflow(text) {
   });
   if (places.join(', ') !== 'planned 1, planned 2, planned 3') flag('L2', null, `secrets in [${places.join(', ')}]; planned: deploy's token check and upload, and reconcile`);
   // L3 (G5): npm only as one whole `npm ci --ignore-scripts` line whose other flags are --no-audit and --no-fund:
-  // nothing chained after it or continued onto the next line, and no flag that turns install scripts back on (npm 10
-  // reads `--no-ignore-scripts`, `--ignore-scripts=false` and `--ignore-scripts false` as on again, measured); no npm
+  // nothing chained after it, no flag that turns install scripts back on (npm 10 reads `--no-ignore-scripts`,
+  // `--ignore-scripts=false` and `--ignore-scripts false` as on again, measured), and no continuation (a trailing `\`
+  // fails the whole-line match; L0 refuses a folded run and any other value continued onto a second line); no npm
   // configuration on any line (npm_config_* in any case, an .npmrc); no other installer.
   const NPM_CI = /^npm ci(?: --(?:ignore-scripts|no-audit|no-fund))+$/;
   const plainNpmCi = (r) => NPM_CI.test(commandOf(r)) && commandOf(r).split(' ').includes('--ignore-scripts');
@@ -954,6 +962,7 @@ describe('G9: the lint of preview.yml', () => {
   const ACCOUNT = '          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}\n';
   const VERIFY_NAME_END = '(prints its status and dates, never the token)\n';
   const UPLOAD_END = '            --commit-message "pull request $PR" --commit-dirty=true\n';
+  const VERIFY_STEP = '      - name: Ask Cloudflare whether the token is valid';
   const INSTALL = '      - name: Install Wrangler from main\'s lockfile into a fresh folder, install scripts off\n        run: |\n';
   /** Gives the install step (no secrets, no env today) an env with these lines. */
   const onInstall = (envLines, base = WORKFLOW) => plant(base, INSTALL, INSTALL.replace('        run: |\n', `        env:\n${envLines}        run: |\n`));
@@ -1009,6 +1018,14 @@ describe('G9: the lint of preview.yml', () => {
     ['L2', 'every secret on a planned step through toJSON', () => plant(WORKFLOW, ACCOUNT, ACCOUNT + '          ALL: ${{ toJSON(secrets) }}\n', { count: 3, nth: 3 })],
     ['L2', 'the token taken off the upload step', () => plant(WORKFLOW, TOKEN, '', { count: 3, nth: 2 })],
     ['L1', '${{ }} in a shell comment under a block header that carries a comment', () => plant(WORKFLOW, '        run: |\n          mkdir -p "$RUNNER_TEMP/wrangler"', '        run: | # c\n          # ${{ github.event.workflow_run.head_branch }}\n          mkdir -p "$RUNNER_TEMP/wrangler"')],
+    // Review round 2 (the security-auditor's two Mediums, its own shapes): the token check's env reused on the install
+    // step by an anchor and an alias (or a merge key), and npm ci continued by YAML itself (a folded or a plain run).
+    ['L0', 'the token check\'s env reused on the install step by an anchor and an alias', () => plant(plant(WORKFLOW, `${VERIFY_NAME_END}        env:\n`, `${VERIFY_NAME_END}        env: &cf\n`), INSTALL, INSTALL.replace('        run: |\n', '        env: *cf\n        run: |\n'))],
+    // A merge key needs an anchor, which is flagged too, and inside a step the continuation rule flags it as well; this
+    // plant (workflow-wide, no anchor) tests the merge-key rule on its own.
+    ['L0', 'a merge key in the workflow-wide env', () => plant(WORKFLOW, METRICS, `${METRICS}  <<: *cf\n`)],
+    ['L0', 'npm ci continued by a folded run', () => plant(WORKFLOW, VERIFY_STEP, `      - name: i2\n        run: >\n          ${NPM_LINE}\n          --no-ignore-scripts\n${VERIFY_STEP}`)],
+    ['L0', 'npm ci continued by a plain run on two lines', () => plant(WORKFLOW, VERIFY_STEP, `      - name: i3\n        run: npm ci --no-audit --no-fund --ignore-scripts\n          false\n${VERIFY_STEP}`)],
   ];
   for (const [rule, name, make] of planted) {
     test(`planted: ${name} (${rule})`, () => {
