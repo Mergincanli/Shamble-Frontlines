@@ -64,7 +64,8 @@ For C's verdict (advisor-main-68b.md) and rev 4. Nothing here is bound until the
   text as it is). By rev 3's rule: keep :35, :39, :40 in that order; drop :36 and :38; `wc -l` 120.
 - STATUS_ARCHIVE.md's block, markers :2385, :2395, :2421, right under "## Open bugs and risks" (:2384). Ours: :2386-2394,
   the netcode proof test bullet (9 lines). Theirs: :2396-2409, the MAIN-WALL bullet (14 lines), then :2410-2420, the
-  guard-wrappers bullet (11 lines). The CI smoke bullet follows at :2422. Keep ours, then theirs; drop only the markers.
+  guard-wrappers bullet (11 lines). The CI smoke bullet follows at :2422. NOT "ours first": C68B-4 rules main's bullets
+  first, then ours (T's :2396-2420, then :2386-2394); only the markers go.
 - Measured on the trial tree: `git diff --shortstat HEAD 6497e29d… -- . ':(exclude)docs/STATUS.md'
   ':(exclude)docs/STATUS_ARCHIVE.md'` prints "85 files changed, 50926 insertions(+), 223 deletions(-)" (main's own), and
   its numstat gives DECISIONS 745/0 and REPO_MAP 58/20 (main's own). Against main outside spikes/, .checkpoints/ and

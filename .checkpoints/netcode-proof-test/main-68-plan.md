@@ -417,8 +417,12 @@ form is tried.
   change-set, so no screenshot is asked of him. Right?
 
 ## Change type, tier, size
-A merge of main's reviewed content (47 files, +7,144 / -242), with two conflict blocks resolved by hand; nothing else is
-edited by hand.
+A merge of main's reviewed content (87 files, +51,544 / -271: six pull requests, #70, #73, #74, #76, #77 and #75), with
+two conflict blocks resolved by hand; nothing else is edited by hand. (Rev 3's 47 files and four pull requests were for
+2671595.)
+- #77: docs only, risk tier 0; merged by the PR Advisor routine after its APPROVE of head 4e8a87e.
+- #75: code, manifests and docs, risk tier 1 by main's STATUS row; reviewed in two rounds with no Critical or High;
+  merged at 18:53:15 UTC with head 2542b1a, the advisor agent's approved head (C68B-5 on record).
 - #70: five reviewers in two rounds, the verifier PASS, the advisor agent's APPROVE of its head 420b16b; merged on his go
   after his Advisor's merge check.
 - #73: risk tier 2 on main; four security-auditor rounds, the last REVISE, R4-1 left open by his R4-END (1); the advisor
