@@ -172,6 +172,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/reports/2026-11-25-guard-env-fix.md` | The report of guard-env-fix (PR #69, merged; the chat he calls the Guard fix chat): the day guard reads env, nice and stdbuf options with their values (SEC-U7B-1), so git and gh behind them no longer skip its check. |
 | `docs/reports/2026-11-26-ci-preview-handover.md` | The report of the preview hand-over pull request (the chat he calls CI Builder): the check and the upload that hand the tested player build to lane 2's preview workflow as `preview-site`, TOKEN-WORDS, the recording's replay test in Firefox (FIREFOX-REPLAY); the plan and its approval, his answers, the trials, the two reviews, what changed and what is not verified |
 | `docs/reports/2026-11-26-guard-wrappers.md` | The report of guard-wrappers (his SAME-GAP (a); the Guard fix chat): one option table for every wrapper and keyword the day guard strips, and what reads git or gh behind other programs; R4-1 left open as a Critical, by class only, by his R4-END (1); its follow-ups. |
+| `docs/reports/2026-11-26-main-wall.md` | The report of MAIN-WALL (the Guard fix chat): main's wall, a second ruleset by his click that lets only his account update main while today's ruleset keeps a pull request with gate and smoke required for every merge; the measurement on a throwaway repository (results by class only), the reviews, his answers, the deviations, T10 open |
 
 ## .claude/
 | Path | What it is |

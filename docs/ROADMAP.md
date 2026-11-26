@@ -217,6 +217,29 @@ on his go after the advisor agent's APPROVE of f26ac5b; CI green on main (gate r
 With the merge he answered OLD-LINES, who may fold old lines in the shared record files (`docs/DECISIONS.md`,
 2026-11-18, 11:08:25 UTC).
 
+**Change-set 1 of the build plan, Types [2026-11-18, MERGED]** — cs1-types (foundation step
+2.4), by lane 1, on his words of 2026-11-18 with his go on #57: the first eight message types in `crates/protocol`
+(plain types, no codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript
+generated into `packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's
+layout-hash check. Two review rounds; report `docs/reports/2026-11-18-cs1-types.md`, which tells two misses first (CI
+built the new dependency before its security check; an evidence record withdrawn and redone). The verifier: PASS (15:03
+UTC); the advisor agent: APPROVE (its word on the final head is in #58's description). Merged: PR #58, 9b4b518,
+2026-11-18 15:39:28 UTC, by merge commit, on his go after that APPROVE; CI green on main (gate run 884 with smoke,
+toolchain run 182). With the merge he accepted the two misses as written and answered its five questions: the kit
+hold and the two CI edits (PR #60), the "Lane requests" issue (#59), no watch (`docs/DECISIONS.md`, 15:38:13 UTC).
+
+**The kit hold and two CI edits [2026-11-18, MERGED]** — kit-hold-ci, by lane 1, on his words of
+2026-11-18 with his go on #58 (risk tier 2, kit and CI): the checkpoint script holds a push that changes a manifest or
+a lockfile until its security check is recorded (his answer DEP-HOLD (a): `.claude/scripts/checkpoint.mjs`, six new
+tests, one rule line in `.claude/CHECKPOINTS.md` §3), written on his yes to its exact text, once with one change of
+his and once more for the fix of a hole in the changed lines; the `toolchain` job runs with no cache, writes the
+generated types again and compares them, and type-checks `packages/types` (his CI-CUT (a), part 1, and CI-TYPES (a)),
+shown on real runs; 293 added lines, accepted by his word. One review round, nothing Critical or High; report
+`docs/reports/2026-11-18-kit-hold-ci.md`. Merged: PR #60, b763ba3, 2026-11-18 20:30:46 UTC, by merge commit, on his go
+after the advisor agent's APPROVE of e5ca735; CI green on main (gate run 900 with smoke, toolchain run 198). With the
+merge he accepted the four things that went wrong and the five Mediums as follow-ups, and answered WRITE-MODE (a) and
+REC-OLD (a), with one limit (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC).
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -267,6 +290,14 @@ With the merge he answered OLD-LINES, who may fold old lines in the shared recor
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**Main's wall [2026-11-26, the wall on; docs in flight]** — main-wall (MAIN-WALL, risk tier 2: repository settings by his
+clicks, no code; the Guard fix chat): a second ruleset on main, "main-wall (only the owner updates main)", lets only his
+account update main; "Shamble Ruleset 1" is unchanged, so a pull request with gate and smoke green stays required for
+every merge, his included. Measured first on a public throwaway repository (now deleted); the advisor agent approved
+the plan (security-auditor: REVISE, text only, all applied) and both approved the results; rollback is one settings switch. Open: T10 (a day-session and a PR
+Advisor merge under the wall). Then, by his SPEED-ORDER (b), the review tracks, then the guard change-set. Report
+`docs/reports/2026-11-26-main-wall.md`; TECHNICAL §8c.
+
 **The preview hand-over step [2026-11-26, in flight]** — ci-preview-handover, by the chat he calls CI Builder, on his
 block of 2026-11-26 (risk tier 2; CI and the test configuration only): at the end of the `toolchain` job, on pull
 requests from this repository only, a check that the tested player build holds only plain files and folders with no
@@ -276,14 +307,15 @@ test joins the rule tests in Firefox (FIREFOX-REPLAY: 3 passed in the container'
 accepted, its fix a follow-up (his words). Written at d12e3a8 on his CI-WRITE-3 (a); CI: the push run on d12e3a8 green (toolchain 45836151624, gate and smoke 45836152061): the set-up passed with the upload action named, the two new steps skipped on a push, the runner's Firefox 160 "3 passed (12.5s)" with the replay test "first-loop.rec: 1800 steps, every shared hash as in the file", the job 5 min 45 s; the pull request run, the first that runs the two new steps, after the draft is opened. Report
 `docs/reports/2026-11-26-ci-preview-handover.md`; waits for the advisor agent's review of the final head and his go.
 
-**The second guard fix: nothing in front of git or gh unread [2026-11-25 to 11-26, waiting for his go]** —
+**The second guard fix: nothing in front of git or gh unread [2026-11-25 to 11-26, MERGED (#73, 4a62873e)]** —
 guard-wrappers (risk tier 2; his SAME-GAP (a); the chat he calls the Guard fix chat): the day guard reads the options of
 every wrapper and keyword it strips from one table; an unknown form, or a line at the turn limit, asks in a session and
 refuses a subagent; git or gh behind a program it does not strip asks; xargs asks unless a read-only program follows;
 the direct git helper check. Guard tests 1551/1551; 166 added lines of code and tests (stop line 200). Four
 security-auditor rounds, the fourth by his leave; it left R4-1 open (Critical, one more spelling, recorded by class
 only), and by his R4-END (1) what is approved merges. Next, in his order: MAIN-WALL, then R4-1's fix with GUARD-KIT,
-then the review tracks. Report `docs/reports/2026-11-26-guard-wrappers.md`.
+then the review tracks. Report `docs/reports/2026-11-26-guard-wrappers.md`. _Corrected 2026-11-26 (MAIN-WALL's docs
+pass): merged as PR #73, 4a62873e; his SPEED-ORDER (b) has since put the review tracks before R4-1's fix._
 
 **Change-set 4a of the build plan, The recording [2026-11-25 to 11-26, MERGED]** — cs4a-recording (the first of change-set 4's four
 parts, his WALK-CUT (a); the recording came here from the old change-set 3c by his ORDER-3C (c)), by lane 1, built by
@@ -397,26 +429,3 @@ yet). Two review rounds, no Critical or High open; report `docs/reports/2026-11-
 check in Brave and Firefox: errors 0, WebGPU started in both (`docs/reports/2026-11-19-cs2-browser-check.md`). Merged:
 PR #61, f5030a3, 2026-11-19 15:10:54 UTC, by merge commit, on his go of 14:28:25 UTC for head 4cf30ce; CI green on
 main (gate run 934 with smoke, toolchain run 232).
-
-**The kit hold and two CI edits [2026-11-18, MERGED]** — kit-hold-ci, by lane 1, on his words of
-2026-11-18 with his go on #58 (risk tier 2, kit and CI): the checkpoint script holds a push that changes a manifest or
-a lockfile until its security check is recorded (his answer DEP-HOLD (a): `.claude/scripts/checkpoint.mjs`, six new
-tests, one rule line in `.claude/CHECKPOINTS.md` §3), written on his yes to its exact text, once with one change of
-his and once more for the fix of a hole in the changed lines; the `toolchain` job runs with no cache, writes the
-generated types again and compares them, and type-checks `packages/types` (his CI-CUT (a), part 1, and CI-TYPES (a)),
-shown on real runs; 293 added lines, accepted by his word. One review round, nothing Critical or High; report
-`docs/reports/2026-11-18-kit-hold-ci.md`. Merged: PR #60, b763ba3, 2026-11-18 20:30:46 UTC, by merge commit, on his go
-after the advisor agent's APPROVE of e5ca735; CI green on main (gate run 900 with smoke, toolchain run 198). With the
-merge he accepted the four things that went wrong and the five Mediums as follow-ups, and answered WRITE-MODE (a) and
-REC-OLD (a), with one limit (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC).
-
-**Change-set 1 of the build plan, Types [2026-11-18, MERGED]** — cs1-types (foundation step
-2.4), by lane 1, on his words of 2026-11-18 with his go on #57: the first eight message types in `crates/protocol`
-(plain types, no codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript
-generated into `packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's
-layout-hash check. Two review rounds; report `docs/reports/2026-11-18-cs1-types.md`, which tells two misses first (CI
-built the new dependency before its security check; an evidence record withdrawn and redone). The verifier: PASS (15:03
-UTC); the advisor agent: APPROVE (its word on the final head is in #58's description). Merged: PR #58, 9b4b518,
-2026-11-18 15:39:28 UTC, by merge commit, on his go after that APPROVE; CI green on main (gate run 884 with smoke,
-toolchain run 182). With the merge he accepted the two misses as written and answered its five questions: the kit
-hold and the two CI edits (PR #60), the "Lane requests" issue (#59), no watch (`docs/DECISIONS.md`, 15:38:13 UTC).
