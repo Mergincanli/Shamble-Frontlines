@@ -23,3 +23,14 @@
 - [F6 Medium] D: `cargo check` of devtools without the three edges "before the batch is shown to security-auditor" = a build holding the change before the answer (CHECKPOINTS s3: "build nothing that holds the change"); prove by grep now.
 - [F7 Medium] nativeTargetProblems in build.mjs sees only build.mjs's own env (which already refuses CARGO_ENCODED_RUSTFLAGS etc.); the native test build that runs sim is never checked -> a cfg!(target_feature="fma"/"avx2") assertion in sim's/devtools' native tests is the real check.
 - [lockfile] change-set 2's exact commands not reachable (shallow clone; cc9fc71 absent); 3a (0412814) and 3b (1ee3e91) recorded `cargo update --workspace --offline` ("Locking 0 packages"). cargo update -w is index-only; cargo metadata (no --no-deps) fetches every package (man page).
+- [coordinator] F.6, F.7 (security-auditor), F.8 + three unsaid grammar verdicts (test-engineer) added mid-read; SA and TE notes read (both DONE).
+- [F8 Medium] DEPART-4 entry 3 says "netcode-architect confirms it at 4b's re-read" (plan.md:694-697) and 4A-NA-4B is "for 4b's re-read" (STATUS_ARCHIVE.md:1745-1746): neither is in the sheet. TE probe: hashes line 1 = sha256(recording)+count (recording.rs:377-393); reader takes VERSION 1 only (recording.rs:37, :150, :299).
+- [F7 confirmed] TE M2 probe: rustc never reads cargo's flag variables, so nativeTargetProblems cannot see a planted flag; SA P9 proposes compile_error! under cfg(target_feature).
+- [F.7 premise] mergeAllowed admits only docs/, tools/, README.md, FIRST_PROMPTS.md (routine-guard.mjs:84-99; advisor.md:72-74): no content/ path merges without his go today; the gap is classification, not the merge.
+- [F.8] devtools loses its protocol edge in the batch: the tie test belongs in sim-wasm (protocol + content), or devtools keeps protocol.
+- [sizes] 4a: 3,300 written / 1,365 bottom-up = 2.42; 4b at 2.4 = 12,984 before today's additions (my rough +500..700 bottom-up) -> past 12,200 even after both rungs; schema writer is built in step 2 but its rung (9,750) fires late -> build it last before step 9.
+- [F.1] change-set 7 is offline (build plan :386-394); "before online play" = Slice 3 (Part 6 :893-902); 3B-ACKS/3B-OUTAGE-256 are "before online play" (STATUS.md:93), not 7; the quote at sheet :116 is netcode-architect's (netcode-architect-cs4.md:325) of DEPART-3's list, not his typed words (he tapped "Yes to all seven", DECISIONS.md:1501). AimPoint widths set under PM-0001-51 (ADR 0001:1648, <= 80 bits).
+
+## Verdict
+APPROVE for step 0 only, under conditions C1-C7; REVISE for steps 1-9 (R1-R11), back to the advisor before step 1's first edit. No ESCALATE now. Rulings F.1-F.8 in the handback.
+DONE

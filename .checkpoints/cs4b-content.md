@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 13:27 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 14:08 Amsterdam (from the clock)
 
 ## Sizes (his point 5 of 2026-11-25: which is which)
 - The designs' own count for 4b, bottom-up: 5,410 lines (2,780 code, 2,520 tests, 110 configuration).
@@ -48,12 +48,38 @@
 0. 4a merged on his go (pull request #70, main 2483e9a, by merge commit, expected head 420b16b). Walk's notes put
    back byte for byte from c17a054 (first commit of this branch). His message of 2026-11-26 saved by script.
 
+1. The re-read sheet (`cs4b-content/reread-sheet.md`) and three reads. test-engineer's and security-auditor's
+   reads of the test list (DONE both): folded into `cs4b-content/test-list.md`. **The advisor agent's re-read
+   (`advisor-reread.md`, DONE): step 0 approved under conditions C1 to C7; steps 1 to 9 need a revised sheet (R1 to
+   R11), which comes back to it before step 1's first edit.** Its rulings: the Testlines tool is a script on the
+   platform's JSON reader, and so is every read of his Export and of `docs/legacy-tuning.json` (F.6, R1); the
+   reader's numbers are narrowed to canonical text (R2); the aim reach lives in `content` with a tie test in
+   `sim-wasm` (F.8, C3); the change-set that widens the aim is "the first that brings a map beyond it, at the latest
+   the one that sets the command codec for online play" (F.1, its STATUS line is in its notes); ts-rs stays the
+   type writer (F.3); lockfile by `cargo update --workspace` (C6).
+2. His message of 2026-11-26, 13:05:03 UTC (`cs4-walk/mustafa-2026-11-26-source-go.md`): SOURCE-GO (a), into the
+   Guard fix chat's queued rule change, no kit file from this chat, not a condition for 4b's merge; until then every
+   pull request that changes anything under `content/source/` says so in the first lines of its report. The Export
+   is read by a tool script with the platform's own JSON reader (he agrees, if the advisor agent approves: it did).
+3. **Step 0, the manifest batch: in the working tree, UNCOMMITTED AND UNBUILT** (his DEP-HOLD). Root `Cargo.toml`
+   (the `parry3d` line, `std` off; 29 overflow blocks), `crates/content/Cargo.toml` and an empty `src/lib.rs` with
+   the lint guard, `crates/sim` (content, parry3d), `crates/sim-wasm` (content), `crates/devtools` (content; its
+   three unused edges dropped on the grep's proof), `Cargo.lock` by `cargo update --workspace` (33 registry
+   packages and `content`; sha256 f7233053...3667). The batch's text and digests are in the notes
+   (`deps-manifests.diff`, `deps-lockfile.diff`, `deps-batch.sha256`). The build's own checks on the resolved tree,
+   run with nothing compiled (`.gate/cs4b/check-crates.mjs`): overflow blocks complete for the WebAssembly and the
+   host tree; **the feature compare is red** (`deps-feature-compare.txt`): `safe_arch` exists natively only, and
+   `thiserror`'s `default` and `std` are turned on by the type writer in test builds only. With the library's
+   `std` on, `default` still differs and six more packages enter (tried, put back).
+
 ## Current step
-Before any edit: the advisor agent's re-read of the plan's section 5 against main 2483e9a with his answers (it
-carries 4b's exact symbols to add and to remove); then test-engineer and security-auditor read the test list (not a
-review round: the advisor agent's ruling in the plan, section 17); then step 0, the one manifest batch, uncommitted
-and unbuilt until security-auditor has answered on exactly that content (`dependency-check.md`; his DEP-HOLD: while
-a manifest or lockfile differs from main nothing is pushed before that file exists).
+**Stopped on two questions to Mustafa** (`cs4b-content/question-2026-11-26-feature-compare.md`): FEATURE-COMPARE
+(two named exceptions in the build's check, or another way) and SIZE-4B (4b will pass its stop line: about 6,360
+lines by the designs' count with today's additions, 14,000 to 15,300 written at 4a's rate, against 12,200). Until he
+answers: nothing of the batch is committed, pushed or built; security-auditor's dependency check waits (its content
+depends on his answer only if he picks another way than exceptions). Not waiting: the sheet's revision (R1 to R11),
+the reads by netcode-architect (DEPART-4 entry 3; the frozen content's route for `first-loop`) and
+engine-architect (the cut grammar, the script route), rust-reviewer's read of the exception's wording and of `std`.
 
 ## Next steps (the plan's section 5; each step ends with the count of written lines)
 0. The manifest batch: the new `content` crate; `sim` on `content` and on `parry3d` =0.31.1 (default features off;
