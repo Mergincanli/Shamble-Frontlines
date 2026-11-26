@@ -11,4 +11,5 @@ pub mod replay;
 pub mod rules;
 pub mod scripts;
 pub mod sha256;
+pub mod time_report;
 pub mod wasm;

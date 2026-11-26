@@ -110,6 +110,17 @@ pub fn read_plain(folder: &Path, name: &str) -> Result<Vec<u8>, String> {
     std::fs::read(&path).map_err(|error| format!("{name}: {error}"))
 }
 
+/// Writes one file into `folder`, which must exist, never through a link standing in the folder's or the file's
+/// place.
+///
+/// # Errors
+/// A path that is a link or no plain file, or a file that could not be written.
+pub fn write_plain(folder: &Path, name: &str, bytes: &[u8]) -> Result<(), String> {
+    plain(folder, "")?;
+    plain(folder, name)?;
+    std::fs::write(folder.join(name), bytes).map_err(|error| format!("{name}: {error}"))
+}
+
 /// Writes every file into `folder`, which must exist. Making the recordings again is deliberate: it is done in the
 /// commit that changes the simulation on purpose, after `--check` has named the first step that moved, and the
 /// change-set's report says why; a change-set that means no change leaves every file byte for byte as it was.
@@ -118,10 +129,8 @@ pub fn read_plain(folder: &Path, name: &str) -> Result<Vec<u8>, String> {
 /// What `made` gives, a path that is a link or no plain file, or a file that could not be written.
 pub fn write(folder: &Path) -> Result<Vec<String>, String> {
     let files = made()?;
-    plain(folder, "")?;
     for (name, bytes) in &files {
-        plain(folder, name)?;
-        std::fs::write(folder.join(name), bytes).map_err(|error| format!("{name}: {error}"))?;
+        write_plain(folder, name, bytes)?;
     }
     Ok(files.into_iter().map(|(name, _)| name).collect())
 }

@@ -30,6 +30,7 @@ pub mod map;
 pub mod movement;
 pub mod number;
 pub mod read;
+pub mod time;
 pub mod write;
 
 pub use bundle::{ContentSet, Document, load, load_file};

@@ -1,0 +1,53 @@
+# The reviewed list of the old tuning file's duration fields (game-designer's read of 2026-11-26, .checkpoints/cs4b-content/game-designer-durations.md at the time; its list is copied here by script). One change by the builder: FIXED_DT, the old game's own 60 Hz step, is kind `step`, not `rules`: it is no interval of play and the v2 tick replaces it. field<TAB>unit (s or ms)<TAB>kind (rules, look or step)<TAB>evidence
+tables.T.values.dustLife	s	look	game.js:1062 fx life (grenade dust puff)
+tables.T.values.enemyBurstPause	s	rules	game.js:2913 en.fireCd after a bot burst (+rand 0.6), counted down by dt
+tables.T.values.enemyFireInterval	s	rules	game.js:2923,2927 bot siege fireCd (x1.6 +rand 0.4), counted down by dt
+tables.T.values.enemyRespawn	s	rules	game.js:1520 bot respawnT
+tables.T.values.fragLife	s	look	game.js:1072-1073 shrapnel particle life; core.js:89 "grenade VFX"
+tables.T.values.meleeCooldown	s	rules	core.js:84 defined, read nowhere in legacy/ (meaning: melee cooldown)
+tables.T.values.regenDelay	s	rules	game.js:2700 compared with ps.lastHitT before health regen
+tables.T.values.respawnDelay	s	rules	game.js:1518,1826 player ps.deadT
+tables.T.values.scorchLife	s	look	game.js:1077 fx life (scorch decal)
+tables.TUNE.values.ai.losCapS	s	rules	game.js:2889 sight budget cap = losPerS*losCapS (seconds of refill); core.js:104
+tables.TUNE.values.ai.losRecheckS	s	rules	game.js:1588 en.losT compared with it, remainder carried
+tables.TUNE.values.ai.retargetS	s	rules	game.js:1597 en.retargetT += retargetS, overshoot carried; 769 stagger
+tables.WEAPONS.values[*].fireInterval	s	rules	game.js:1471 ps.fireCd between shots
+tables.WEAPONS.values[*].reload	s	rules	game.js:2685 reloadT/w.reload, reload ends at 1
+tables.WEAPONS.values[*].impact	s	rules	game.js:2742 swingT>=swingImpact triggers meleeHitCheck (katana)
+tables.WEAPONS.values[*].swingDur	s	look	game.js:2740-2743 swing pose phase swingT/swingDur and swing end; rules only via impact<=swingDur
+tables.WEAPONS.values[*].burstInterval	s	rules	game.js:1471 ps.fireCd between burst rounds (lancer)
+tables.UNIT_TYPES.values[*].fireInterval	s	rules	game.js:2913 bot en.fireCd inside a burst
+tables.UNIT_TYPES.values[*].swapCd	s	rules	game.js:1377,1382 ps.swapCd, 2676 counted down by dt
+tables.UNIT_TYPES.values[*].banzaiCd	s	rules	game.js:1399 ps.banzaiCd, 2677 counted down by dt
+tables.UNIT_TYPES.values[*].banzaiDur	s	rules	game.js:1385 ps.banzaiT; 2449 HUD shows it in s
+tables.UNIT_TYPES.values[*].bayonetCd	s	rules	game.js:1403 ps.bayonetCd, 2679 counted down by dt
+tables.UNIT_TYPES.values[*].bayonetDur	s	rules	game.js:1391 ps.bayonetT
+tables.RIFLE_TIERS.values[*].reload	s	rules	game.js:788 defined; only .span is read (789-790, 1863) (meaning: per-tier reload)
+tables.RULES_DEFAULT.values.harv.dock	s	rules	game.js:43 applyRules -> HARV.dockTime
+tables.RULES_DEFAULT.values.harv.load	s	rules	game.js:43 applyRules -> HARV.loadTime
+tables.RULES_DEFAULT.values.harv.respawn	s	rules	game.js:43 applyRules -> HARV.respawn
+tables.RULES_DEFAULT.values.silo.capture	s	rules	game.js:43 applyRules -> SILO.captureTime
+tables.RULES_DEFAULT.values.tbox.active	s	rules	game.js:43 applyRules -> TBOX.activeTime
+tables.RULES_DEFAULT.values.tbox.capture	s	rules	game.js:43 applyRules -> TBOX.captureTime
+tables.RULES_DEFAULT.values.tbox.first	s	rules	game.js:43 applyRules -> TBOX.firstDelay
+tables.RULES_DEFAULT.values.tbox.gap	s	rules	game.js:43 applyRules -> TBOX.gap
+tables.SILO.values.captureTime	s	rules	game.js:1001,1003 prog += dt/captureTime
+tables.TBOX.values.activeTime	s	rules	game.js:912 tbox.timer; 931 HUD m:ss
+tables.TBOX.values.captureTime	s	rules	game.js:954,956 prog += dt/captureTime
+tables.TBOX.values.firstDelay	s	rules	game.js:899,922 tbox.gap; 944 gap -= dt
+tables.TBOX.values.gap	s	rules	game.js:919 tbox.gap; 944 gap -= dt
+tables.HARV.values.dockTime	s	rules	game.js:873 hv.t, 874 hv.t -= dt
+tables.HARV.values.loadTime	s	rules	game.js:872 hv.t, 874 hv.t -= dt
+tables.HARV.values.respawn	s	rules	game.js:849 hv.respawnT, 863 -= dt
+tables.JUG.values.fireInterval	s	rules	game.js:1345 jug.fireCd after a 3-shell ripple
+tables.JUG.values.rippleMs	ms	rules	game.js:1345 rippleT = rippleMs/1000 between the 3 shells (each fires _jugFirePilot)
+tables.T_CHARGE.values.bow.time	s	rules	game.js:1707,1729 full-charge time; chargeFrac = charge.t/time sets throw speed
+tables.T_CHARGE.values.max	s	rules	game.js:1707,1729 full-charge time for jav/nade (charge.t capped at max)
+tables.STAM.values.max	s	rules	game.js:2216 "7s full sprint"; 2771 stamina -= dt/STAM.max
+tables.FIXED_DT.values	s	step	core.js:1479 1/60 sim step; read only by makeInputCommand (core.js:1481), which nothing calls
+tables.WR_DEPLOY_MS.values	ms	look	game.js:3033 setTimeout before deploy from the war-room menu (UI)
+tables.ANIM.values.cycleMax	s	look	game.js:141 "gait cycle bounds (s)", 309
+tables.ANIM.values.cycleMin	s	look	game.js:141 "gait cycle bounds (s)", 309
+tables.ANIM.values.death.buckleT	s	look	game.js:463-464 D.t/buckleT, D.t in seconds
+tables.ANIM.values.idleStepT	s	look	game.js:144 "step time (s)", 337,344 F.dur
+tables.ANIM.values.throw.t	s	look	game.js:183 "(chest space, s)", 371 thrF += dtc/TW.t
