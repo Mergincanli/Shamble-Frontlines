@@ -34,7 +34,10 @@ always start their own command, with no other program in front of them.
 - C2 (a): "beyond main's 8"; the allowance as MAIN-66's: a ` M`, ` D` or `??` line under .checkpoints/netcode-proof-test/
   or the card. Expected: the card, this plan, advisor-main-67.md, advisor-main-66-head.md, history.md (if he writes).
 - C2 (b): `git diff --cached --shortstat H0 -- . ':(exclude)docs/STATUS.md'` prints the 7-file line; the anchor is
-  re-derived at step 1 from H0 (M66-1 (a)'s form) and binds as there.
+  re-derived at step 1 from H0 (M66-1 (a)'s form) and binds as there. Re-derived 00:0x (M67-2): H0
+  b518460e885ded1a558767331096eed247fb0e57; `git merge-tree --write-tree --name-only H0 origin/main` exit 1, one
+  CONFLICT (docs/STATUS.md), auto-merging DECISIONS.md, REPO_MAP.md, STATUS.md, STATUS_ARCHIVE.md; T =
+  151318feb18349c6b7978d9f67d5cd59e2430ff6.
 - C2 (c), C3: "builder 4" is U7's builder on 9177fb5 and u7-run.sh; its hand-back is only read until the push.
 - C4: after `git fetch origin` in its own call, origin/main must be 07d673b0ee509d36ce1b976ed8dfae002c7d7b4a; main's CI
   as in the Facts. A further move stops before step 2 (advisor-main-65.md:113-114), unless it fits his LIGHT-TAKEIN
