@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 00:42 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 00:44 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -921,6 +921,86 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
 - The chat told him, in its update after round 1's fix pass, that the million-input fuzz run is by hand. It is
   not: CI's release line runs the tools crate's tests (test-engineer's TE-8). Corrected in the chat's update
   after test-engineer's read, and in the report.
+
+## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
+His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
+minutes.md`, saved by script): "make sure to save your and the agents work every 25 minutes, this way my other
+account can continue with what you were making. (Do not see this as a reason to cut your work to save usage,
+just continue as you were)". So: the chat's work and its agents' work are committed and pushed at least every
+25 minutes, and the work itself is not cut.
+
+**Where everything is.** Branch `claude/cool-pasteur-oiqk1r` on origin (this chat's own; a session of another
+account works on its own branch from this head and never pushes here: his Lanes rule). The head when this was
+written: 6a2639c (notes) on 8e5a268 (code). Nothing is uncommitted. No agent is running. The board add-on is
+active for this chat (thread state: needs-musti, for DIFF-LIST).
+
+**State of 4b-2, by step** (3,999 written lines of 8,450; two thirds is 5,633; rungs at 6,750 and 8,000):
+- 6 the library's batch: done (298837a). 7 the built-file check: done (d313162, then 2f058b2 and e3acb41 for the
+  advisories' rule). 8, first part, the two tools on test files: done (54e89d2). 10, the core, the static world
+  on maps made in tests: done (8e5a268). CI: green through 54e89d2; 2f058b2, e3acb41 and 8e5a268 to be read.
+- **Blocked on his own answer to DIFF-LIST** (asked 2026-11-26, 23:11 Amsterdam;
+  `cs4b-content/question-2026-11-26-diff-list.md`): step 8's second part, step 9, step 10's wiring. A bare "a"
+  has reached this chat twice as a repeat of his older message (`cs4-walk/redelivered-2026-11-26.md`): it is
+  no answer. `chat-words.mjs` shows whether a message is a repeat (its `source_uuid`).
+
+**On his yes, in this order:**
+1. **Step 8, second part.** `content/source/testlines-export.json` = `cs4b-content/testlines-export-30.json`
+   byte for byte (sha256 a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab, the pin in
+   `packages/client/scripts/testlines.mjs`); its manifest beside it (it must hold the line `sha256: <that
+   digest>`); `content/source/testlines-table.json` = `cs4b-content/testlines-table-draft.json` (16 rows).
+   Then `node packages/client/scripts/testlines.mjs write` and `--check` (it makes
+   `content/movement/soldier.json`: 15 values; the dry run's text is in the chat's record and the loader took
+   it). The map: `content/maps/test-scene.json` = `cs4b-content/test-scene-draft.json`, then
+   `node packages/client/scripts/canonical.mjs maps/test-scene.json`. Then
+   `cargo run -p devtools --bin content_bundle -- --check`. Tests on the real files: the real `content/` through
+   `devtools::content_files::run`; `testlines.mjs --check` in `testlines.test.mjs`; three to five of his values
+   held by a second route (found in the Export's own text by their names, never typed: his rule) against what
+   the Rust loader reads; `StaticWorld::build` on the real map (depth, a committed tree digest). The report's
+   first lines say that `content/source/` changes (his SOURCE-GO answer).
+2. **Step 9** (the sheet's row 9, `cs4b-content/reread-sheet.md:167`). Its manifest line is approved by
+   security-auditor on two digests (`deps-step9.sha256`; the two files are remade from `deps-step9.diff`, or
+   lie in `.gate/cs4b/batch-step9/` on this machine): commit them only together with the dependency rule's
+   edit (`dependency_rules.rs`: the content crate's tables become package, dev-dependencies, lints; SA-STEP9-1:
+   the refusal test's list and two more plants; SA-STEP9-2: the comment at `build-checks.mjs` about nested
+   generated types), then check the committed files against both digests. When content is first linked into
+   the players' file the built-file check will name `C::round` (content's `f64::round`) and perhaps
+   `C::__multi3`: each gets an entry in `maths-allowed.mjs` with its reason, or the code changes; rust-reviewer
+   decides. The first recording's frozen content, the constructor's new argument and every caller: the row.
+3. **Step 10's wiring** (the row at `reread-sheet.md:168`): `CreateError::MapMissing` and `::World`, the local
+   match holding the world of the map `test-scene`, the fuzz run through `StaticWorld::build`, and the
+   built-file check's result recorded where the library is first linked into the players' file.
+4. **The look ahead before steps 11 and 12** (the count then, plus about 520 and 1,060, plus a fix pass of about
+   350; a rung that is reached moves its step: 11 to 4d, 12 to the start of 4c; past 8,450: stop and ask him).
+5. **The close:** `plants-4b2.py <commit>` whole; reviewers on the final diff (rust-reviewer, engine-architect,
+   security-auditor, test-engineer; netcode-architect for steps 9 and 10; graphics-engineer, perf-auditor and
+   art-director if step 12 is built), two rounds at most; the verifier until PASS; docs-keeper (his messages
+   into DECISIONS by script: 18:52:56, 21:16:26 and 23:43:38 UTC of 2026-11-26, and his DIFF-LIST answer;
+   STATUS follow-ups: heapless 0.9.4 when rstar or parry3d move; the licence texts for the hosted build); the
+   report (`/advisor-report`; its first lines: `content/source/` changes); the notes out of the head; a draft
+   pull request; the advisor agent on the final head (it runs the gate itself; it is told of the order change:
+   step 10's core before step 9); his go; the merge with the full head as the expected head.
+
+**What is on this machine only (under `.gate/`, not in git) and how to make it again:**
+- `.gate/wb-tool/wasm-bindgen`: the bindings tool, the file `packages/client/scripts/wasm-bindgen-tool.mjs`
+  records (CI's toolchain workflow shows the download and the checks). `local-checks.sh` points
+  `SHAMBLE_WASM_BINDGEN` at it.
+- `.gate/strict-line.txt`: one line, read by `local-checks.sh`: `strict="--noEmit --strict
+  --noUncheckedIndexedAccess --exactOptionalPropertyTypes --noImplicitOverride --noFallthroughCasesInSwitch
+  --noImplicitReturns --isolatedModules --verbatimModuleSyntax --erasableSyntaxOnly
+  --allowImportingTsExtensions --module preserve --target es2023 --lib es2023"` (CI's own flags).
+- `.gate/pw-1194/chromium_headless_shell-1194/chrome-linux/headless_shell`: a link to the machine's Chromium,
+  so that `PLAYWRIGHT_BROWSERS_PATH="$PWD/.gate/pw-1194" node tools/gate.mjs` runs (after `npm --prefix tools
+  ci`); CI's smoke job is the check on the pinned browser.
+- `.gate/cs4b/batch-step9/` (step 9's two files) and `.gate/rust-reviewer-step10-scratch/` (its probe; what
+  the tests need of it, the chain of cubes, is in `collision.rs`).
+- The local checks: `bash .checkpoints/cs4b-content/local-checks.sh > .gate/local-checks.log 2>&1` (about 13
+  minutes; the last line must be ALL LOCAL CHECKS PASSED). The count: `git diff --numstat origin/main --
+  crates packages`, added lines, `crates/devtools/vectors/` left out but for `.py` files, before every commit.
+
+**Rules that bind whoever continues** (his words are in the card's first sections and in `docs/DECISIONS.md`):
+every git and gh command alone in its own shell call; no CI, kit or gate file; no value typed by hand; a
+manifest change held for security-auditor's answer; times from the clock; no file under `content/` before his
+DIFF-LIST answer; no merge without his go on the head the advisor agent approved.
 
 ## Current step
 4b-2: steps 6 and 7, step 8's first part and step 10's core are done and pushed (3,999 written lines). DIFF-LIST
