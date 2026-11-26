@@ -1,68 +1,68 @@
 # U7 review round, test seat (test-engineer, 2026-11-26)
-Packet: u7-round-packet.md. Seat: is each claim proven (C14's +20, plants, T5 (ii)'s marks, web tests, e2e drivers'
-honesty, evidence tree = reviewed tree).
+Packet: u7-round-packet.md. Seat: is each claim proven (C14's +20, the plants, T5 (ii)'s marks and what "not readable"
+leaves unproven, the web tests, the e2e drivers' honesty, the evidence's tree against the reviewed one).
 
-## Plan
-1. Read the brief (u7-brief.md rev 1.1), the conditions C1-C14 (advisor-u7-brief.md), both builders' notes. DONE.
-2. Evidence: end-1.log, t5ii-run-3.log + run folder summary.json, r3-room-2.log, plant logs. DONE.
-3. Tie the evidence tree to the patch (diff/untracked hashes vs the patch). DONE.
-4. Read the diff: Rust tests (clock.rs, sent.rs, engine.rs, script.rs), check.mjs web step, web tests, fakes, e2e. DONE.
-5. Claim / proof / gap table; findings with file:line; what I did not read. (below, after the notes)
+**VERDICT: APPROVE WITH FINDINGS.** 0 Critical, 0 High; 4 Medium (new, or worse than the packet writes them) plus 1
+known-open Medium I agree with (T5ii-D); 7 Low. One condition on the evidence: until U7R-TE-1 closes, T5 (ii)'s
+marks (1-6, 8a, C8) are evidence for 7e2d6f3's tree plus the builder's 19:35 files, not for the reviewed tree.
 
-## Notes (one line per finding, as I go)
-- N1 Tree tie, end-1: patch head lines 1-750 (the 10 tracked files) sha256 = ffdba3ef...d8c4 = end-1's `diff`; the 32
-  new files read from the worktree (patch's list, C-sorted, `sha256sum` lines, relative paths) hash to 89aa34ae...5409
-  = end-1's `untracked`; each of the 32 new files' content in the patch equals the worktree file (32 of 32 same). So
-  end-1 ran on exactly base 9177fb5 + this patch. Patch size 243,393 B (packet says 243,353 B: a packet typo).
-- N2 Tree tie, T5 (ii) run 3: HEAD 7e2d6f3, diff ffdba3ef (same tracked), untracked 08a7f9f3 (not 89aa34ae); the dist
-  was built at 19:35 on untracked 8b27b164 (t5ii-dist.log:3). `git diff --stat 7e2d6f3 9177fb5 -- spikes/`: only
-  Cargo.lock +2 and client-wasm/Cargo.toml +2. Between dist and end-1 the builder's own untracked files changed too
-  (engine.rs's room tests, t5ii.mjs's `fail`, probe-worker.js), which the builder's equivalence (notes :110) omits.
-  The room tests sit inside engine.rs's `#[cfg(test)] mod tests` (patch :1047-1583), so the Wasm is likely unchanged:
-  likely, not shown.
-- N3 C14: 20 `#[test]` added, 0 removed in the patch (clock.rs 7, sent.rs 2, engine.rs 10, script.rs 1); 881-861 =
-  978-958 = 20; the base's counts are 7e2d6f3's and 9177fb5 changes no test (N2). Test step 1,053.9 s vs base
-  1,055.5-1,082.5 s (u7-0b before.log:5, step5-after.log:181): no 1.5x stop.
-- N4 Plants (R): each log's tree hash differs from the clean run's and names exactly the brief's test(s): P1, P2, P3,
-  P4 (+ sent.rs), P5, P6, P7 (panic), P18, P17 (E0080 at scenario.rs:63), room-a (3 tests), room-b (3 tests). T-half
-  plants P8-P16, P19: counts in notes only (no kept log); web sources' sha256s today equal the plant-time "before"
-  hashes (lib.ts fdf3b39c, worker.ts 8906558a, main.ts 74b7dda4, hooks.ts 1856f8e2), so they cover the reviewed code.
-- N5 FINDING (Medium) C-U7-3's two browser links are untested. (a) engine.rs `Core::step` (patch :959-961) calls
-  `self.endpoint.sent(prev_send_ns)`; no test fails if the call is deleted or given `now_ns`: the only callers with a
-  non-zero prev_send are r3_the_first_step (asserts an empty outbox) and RoomHost::wake (prev = the last wake's time =
-  the ping's wire stamp, so t0 = max(at, wire) = wire either way). (b) worker.test.mjs:84 asserts prevSendNs[i] =
-  nowNs[i-1] under a FakeClock that never moves inside a wake, so "stamped after the sends" (worker.ts:289-291) cannot
-  be told from "stamped before". Only the endpoint's `sent` is proven (clock.rs, sent.rs, P4).
-- N6 FINDING (Medium) Mark 9: NOT-RUN is right (room.jsonl keys: event/second/header/footer only, no per-slot refusal),
-  but the stand-in table is weaker than it reads: `refused` is the client's own decoder count (client/src/lib.rs:480-484),
-  not the room's kinds 1-6, 8, 10; `last_run_command` near `commands` shows commands ran, not that none were refused.
-  The in-process room legs (engine.rs RoomHost::run, patch :1460-1480) wake the Core exactly at next_due_ns over a
-  zero-latency Loopback: no late wake, no catch-up burst, which is the browser's risk for kind 10 (buffer_full) and kind
-  1. So "no refusal but the sim's own" is proven only under exact wakes.
-- N7 FINDING (Medium) Mark 7's CSP half: the probe shows the Worker fires `securitypolicyviolation`
-  (summary.json console_probe.status "refused in 3 ms; violation connect-src"; probe-worker.js:5-7), so a counter is
-  at hand; the page reads none, so the Worker half (where both transports run) stays unread, and the page half has no
-  positive control (the probe refuses only in the Worker). Same gap in C8 (summary c8.csp_lines from page console only).
-- N8 FINDING (Medium) T5i-1 is systematic, not one-off: run 3's ws_accept shows accepted 1 + handshake_failed 1 in
-  every WebSocket load (2-smoke-ws, 5-fallback, 8b, C8) and 0 in every WebTransport-only load; T5 (i) B the same. Root
-  cause unknown; the known-open list carries it as a one-load note.
-- N9 FINDING (Medium) The web step passes on an empty selection: check.mjs webStep runs `node --test <web>/test/*.test.mjs`
-  and fails only on a non-zero exit; Node 22.23.4 here, `node --test '/nonexistent-dir-xyz/test/*.test.mjs'`: "# tests
-  0", exit 0. A moved or renamed test folder gives "0 of 0 tests passed" and PASS: C7's "fails, never skips" is not
-  held for that case; check.test.mjs's pin has no zero-count case.
-- N10 Mark 8b (T5ii-B): agree with the builder; not worse than written. The contrast 1.60 s (mark 5, page timer) vs
-  4.06 s (8b, Chromium's QUIC idle timeout) shows the bite removes the page's timer; dist.test.mjs:93-108 proves the
-  page half (no fallback in 10 s). For R8: -29 catches this bite only when QUIC is silently dropped (an ICMP-refused
-  port fails WebTransport at once, so the page falls back fast with or without the bite). Low note.
-- N11 Lows seen: dist.test.mjs:19-28 scans stand-in wasm-bindgen files, build.mjs scans the real Wasm for home paths
-  only (I grepped the 19:35 real dist: no PM-0001-, no innerHTML); clock.rs's u64::MAX case (patch :569-572) would hang,
-  not fail, if the loop came back (libtest has no timeout); no test of "joined, no clock sample: no attempt.ok 1";
-  PENDING_MAX, UNI_MAX, WS_BUFFER_MAX (worker.ts:53-55, :213, :261-271) untested and the fakes cannot backpressure
-  (fakes.mjs:106, :54); the createWritable branch (worker.ts:182-183) runs nowhere (Chromium 153 lacks it, the fake
-  too); t5ii.mjs:35 defaults `commit` to 7e2d6f3 (summary.json's commit is a constant, not read); C8's WebTransport page
-  runs with ignoreHTTPSErrors (t5ii.mjs:192), so it does not isolate the pin (loads 1, 3, 4 do); C2's JoinAccepted
-  equalities (patch :1517-1525) echo RoomHost::new's own with_hashes (patch :1373-1374), both halves: the evidence is the
-  Decoder's acceptance (room-b bites) and T5 (ii)'s accepted joins against the binary; the npm ci branch of webStep is
-  recorder-tested only; client-wasm's clippy.toml equals client's below its header but is not in CLIPPY_TWINS
-  (check.mjs:995); r3_the_limits_are_the_wires pins 65,541 as FULL_STATE + 5, not U6b's FULL_STATE_MAX; notes :104 says
-  "13 steps", end-1.log says 12.
+## Findings (ranked)
+| Id | Sev | Where | What is wrong | Smallest fix |
+|---|---|---|---|---|
+| U7R-TE-1 | Medium | notes 0030 :110; t5ii-dist.log:3; t5ii-run-3.log:3; end-1.log:3 | T5 (ii) ran on another tree than the one reviewed, and the builder's equivalence covers only half of the gap. I tied end-1 to the patch exactly: the patch's 10 tracked files hash to end-1's `diff` ffdba3ef, and its 32 new files to end-1's `untracked` 89aa34ae (each file's content equal, 32 of 32). Run 3 is HEAD 7e2d6f3 with untracked 08a7f9f3, and its dist was built at 19:35 on untracked 8b27b164. The base gap is only the lock and client-wasm's manifest (`git diff --stat 7e2d6f3 9177fb5 -- spikes/`: 2 files, +4). The builder's own later edits are left out: engine.rs's room tests, t5ii.mjs's `fail`, probe-worker.js. The room tests sit in engine.rs's `#[cfg(test)]` (:292-293), so an equal Wasm is likely, but not shown. | The main session (cargo): build.mjs on the reviewed tree, measured and `--bites`. Compare the 8 SHA-256s with run 3's summary.json `dist` and `bites_dist`. If they are equal, run 3 stands for the reviewed page. If not, rerun T5 (ii) once. npt-server and npt-host have no npt-client edge (t5ii-bins.log), and the fast-forward leaves their sources alone. |
+| U7R-TE-2 | Medium | client-wasm/src/engine.rs:208; web/test/worker.test.mjs:84; web/src/worker.ts:289-291 | C-U7-3's two browser links are untested. I found this by reading, not by a plant. (a) Deleting `self.endpoint.sent(prev_send_ns)` fails no test. The only non-zero prev_send callers are r3_the_first_step (:399, which asserts an empty outbox) and RoomHost::wake (:698, prev = the previous wake's time = the ping's wire stamp, so t0 = max(prev, wire) = wire either way). I have not shown whether passing `now_ns` instead is caught. (b) worker.test.mjs:84 asserts prevSendNs[i] = nowNs[i-1] under a FakeClock that never moves inside a wake, so stamping after the sends cannot be told from stamping before them. Only the endpoint's `sent` is proven (clock.rs, sent.rs, P4). | (a) A Core test: wake 1 at t sends a ping; wake 2 gets prev_send = t + 5 ms and a Pong in its inbox; assert the sample's rtt or offset uses t + 5 ms. Plant: delete :208. (b) The fake writer advances the FakeClock by 1 ms per write; assert prevSendNs[i] = nowNs[i-1] + the sends' time. Plant: stamp before the sends. |
+| U7R-TE-3 | Medium | T5ii-A; t5ii.mjs:244-247; client/src/lib.rs:480-484; engine.rs:703-720; room/src/input.rs:68 | Mark 9 (u7-brief.md:199: "no kind-10 refusal and nothing counted as forged") is NOT-RUN, and its stand-in is weaker than written. It is right that the log cannot be read: run 3's room.jsonl holds header, event, second and footer only, with no per-slot refusal. But the stand-in table's `refused` is the client's own decoder count (lib.rs:480-484), not the room's kinds 1-6, 8 or 10. `last_run_command` near `commands` shows that commands ran, not that none were refused. The in-process room legs wake the Core exactly at next_due_ns over a zero-latency Loopback (:703-720). A late wake and a LOOP_CATCHUP burst are never exercised against the room, and that is the case kind 10 names ("more commands in a tick than the catch-up cap", input.rs:68). | Report mark 9 NOT-RUN, and label `refused` as "the client's decoder refusals, not the room's". Add one in-process leg with late wakes (for example every 10th wake 200 ms late, plus one 1 s stall) that asserts no RefusalRecord and the slot's 8 refusal counters at 0. The binary's per-slot log stays U6b's or U6d's (a carry). |
+| U7R-TE-4 | Medium | check.mjs:2675-2677; check.test.mjs (the web-step test) | The web step passes when it selects no test. It runs `node --test <web>/test/*.test.mjs` and fails only on a non-zero exit. Here, Node 22.23.4 on `node --test '/nonexistent-dir-xyz/test/*.test.mjs'` printed "# tests 0" and exit 0. A renamed or moved test folder would give "0 of 0 tests passed" and a PASS, so C7's "fails, never skips" does not hold for that case. check.test.mjs's pin has no zero-count case. | webStep fails when nodeCounts reports 0 tests (or fewer than a floor), and check.test.mjs gets a recorder case with "# tests 0". |
+| U7R-TE-5 | Low | T5i-1; run 3 `*/room.jsonl` ws_accept; SERIES.md:894 | Worse than written: this is not a one-load note. Every WebSocket load shows accepted 1 and handshake_failed 1 (2-smoke-ws, 5-fallback, 8b, C8; T5 (i) B too), and every load with WebTransport only shows 0. Every such load ran under ignoreHTTPSErrors, so a certificate-exception cause is neither confirmed nor ruled out. The series exists (SERIES.md:894), but no mark reads it (marks.json: 0 hits), so no verdict moves today. | Before R1, run one WebSocket leg without ignoreHTTPSErrors (the test certificate trusted by an SPKI flag) or with a Node wss client, and record the cause. |
+| U7R-TE-6 | Low | engine.rs:598, :753 | C2's JoinAccepted check is worse than the packet's "only the content-hash half is evidence". Both halves echo RoomHost::new's own `with_hashes(CONTENT_HASH, MODE_HASH)`, so neither can fail on a shipped change. The real evidence is the Decoder accepting the Core's Join (plant room-b bites) and T5 (ii)'s joins being accepted by the real binary. | Say so in the report. No code change. |
+| U7R-TE-7 | Low | clock.rs:433; engine.rs `counters()` and r3_counter_names_and_counters_pair_by_index; the mark-9 counters | Tests that cannot fail, or that hang instead. If the old loop came back, the u64::MAX case would hang rather than fail (libtest has no timeout). The length assert is guaranteed by `[u32; COUNTER_NAMES.len()]`. No test sees `refused` or `unencodable_commands` non-zero through the Core, yet those are the columns the mark-9 table shows. | Run the u64::MAX case under a step bound, or say that it hangs. Give one Core test non-zero `refused` (a malformed datagram in the inbox), checked by name. |
+| U7R-TE-8 | Low | worker.ts:53-55, :182-183, :213, :261-271; fakes.mjs:54, :106 | Missing negative cases. Joined with no clock sample must not write attempt.ok 1 (PM-0006-15's "one echo"), and no test pushes JoinAccepted alone. PENDING_MAX, UNI_MAX and WS_BUFFER_MAX are never driven, and the fakes cannot backpressure (`bufferedAmount` is fixed at 0, writes resolve at once). The `createWritable()` branch runs nowhere: Chromium 153 lacks it and so does the fake, so Firefox at R1 is its first run. | Three or four Node cases: JoinAccepted alone; a stuck writer; a 5th uni stream; `bufferedAmount` over the cap; a fake that has `createWritable`. |
+| U7R-TE-9 | Low | dist.test.mjs:19-28; build.mjs:150 | The "no PM-0001-, no innerHTML" scan reads stand-in wasm-bindgen files, and build.mjs scans the real Wasm only for home paths. I grepped the real 19:35 dist (all 7 files): no PM-0001- and no innerHTML. | build.mjs scans the real seven files for both, or the report says the scan was done by hand. |
+| U7R-TE-10 | Low | t5ii.mjs:35, :192, :335-341 | Driver provenance. `commit` defaults to 7e2d6f3, so summary.json's commit is a constant and is not read from the tree. C8's WebTransport page runs under ignoreHTTPSErrors, so C8 does not isolate the pin (loads 1, 3 and 4 do). `fail` exits without the finallys (known). | Require `--commit`, or read it with git. Record the dist's build log hash in summary.json. Note C8's pin limit in the report. |
+| U7R-TE-11 | Low | T-half notes :53-65; notes 0030 :104; packet :11; check.mjs:995; engine.rs `r3_the_limits_are_the_wires` | Records. The plants P8-P16 and P19 kept no log (pass counts in the notes only; the web sources' sha256s today equal the plant-time "before" hashes). The notes say "13 steps" where end-1 says 12. The packet gives the patch as 243,353 B; it is 243,393 B. webStep's `npm ci` branch is tested only through the recorder. client-wasm's clippy.toml is not in CLIPPY_TWINS. The limits test pins 65,541 as FULL_STATE + 5, not U6b's FULL_STATE_MAX. | Wording in the report, plus one run of the web step in a fresh worktree before merge. The rest are carries. |
+
+## Known open, weighed (packet section "Known open")
+- T5ii-A: worse than written. See U7R-TE-3.
+- T5ii-B: agree, not worse. Mark 5 (the page's own timer) fell back at 1.60 s; with the bite, Chromium's QUIC idle timeout made it 4.06 s. That contrast shows the bite removes the page's timer, and dist.test.mjs:93-108 proves the page half. Restating mark 8b is the advisor's call, not the builder's. Note for R8: -29 catches this bite only when QUIC is dropped silently. A port refused by ICMP fails WebTransport at once, so the page falls back fast with or without the bite.
+- T5ii-C: agree. Run 3 shows the HTTP responses and both transports stayed local: every response came from 127.0.0.1:31000, and the C8 room's wt_accept and ws_accept each show accepted 1.
+- T5ii-D: agree, Medium as it stands. It also covers C8's "no CSP violation", since summary c8.csp_lines are read from page console lines only. The probe proves the Worker fires `securitypolicyviolation` (probe-worker.js:5-7: "violation connect-src"). Take the builder's own fix before merge: a `page_csp_violations` counter counted in the Worker and on the page, read by the driver, plus a page-side refusal in the probe as the positive control.
+- T5i-1: worse than written. See U7R-TE-5.
+- T5i-2: agree. It is U6b's counter, and no U7 claim rests on it.
+- T5i-3: the same as T5ii-D.
+- The driver's dead token in a log, and the cut at '#': agree, fixed, and checked by the builder's `fail` dry run (notes :110). `fail` skips the finallys: agree, Low (U7R-TE-10). A left-over npt-host would show as C8 `host_listening` false on the next run.
+- t5i.mjs's raw `e.message` (:144, :205): agree. Only the synthetic fragment, and no effect on the evidence.
+- C2's mode-hash half: worse than written. See U7R-TE-6.
+- T5 (ii) not rerun on 9177fb5: worse than written. See U7R-TE-1.
+- The shell-loop slip: agree. The loops only read logs. Every counted run went through u7-run.sh with its own header, so no evidence is affected.
+
+## Claim · proof · gap
+| Claim | Proof (kind) | Gap |
+|---|---|---|
+| C14: +20 measured, +20 bites | end-1.log: 881/978 against 861/958; the patch adds 20 `#[test]` and removes 0 (log, reading) | None. It sits exactly on the floor; 2 of the 20 need C6's reworded dev edges (approved: advisor-main-66-head.md §1). |
+| The end check passes on the reviewed tree | end-1.log, 12 of 12; tree hashes reproduced by me from the patch (log, reproduced) | None. The test step took 1,053.9 s against the base's 1,055.5-1,082.5 s. |
+| C-U7-4 (R1) | clock.rs r1_* (5); P1-P3 logs (log) | TE-7: the u64::MAX case hangs instead of failing. |
+| C-U7-3 (R2), endpoint `sent` | clock.rs r2_* (2), sent.rs (2); P4 logs (log) | TE-2: the Core and Worker links are untested. |
+| C3, the cap's binding | P17: E0080 at scenario.rs:63 (log) | None. |
+| R3: token, catch-up, packing, truncation, limits | engine.rs r3_* (8); P5-P7, P18 logs (log) | TE-11: limits pinned to a copied literal. |
+| C6 and C2: joins behind the real Decoder; the press script draws no refusal | the two room tests; room-a and room-b logs (log) | TE-3: exact wakes only. TE-6: the JoinAccepted check echoes the test's own setting. |
+| C5's golden file, both sides | boundary.test.mjs; engine.rs golden test; P18 (log, plus the builder's notes for Node) | None. |
+| R4: LEAF, the deps rule, the web step | check.test.mjs 80/80; end-1 deps and web PASS (log) | TE-4: zero tests pass. TE-11: npm ci recorder-only. |
+| T2-T4 page logic, C4 and C9 | 56 Node tests (log, counts); P8-P16 and P19 (builder's notes only) | TE-8, TE-9. |
+| T5 (ii) marks 1-6, 8a, C8 | run 3 summary.json (log) | TE-1 (another tree); TE-10 (C8's pin). |
+| Mark 7 | run 3 plus the probe (log) | T5ii-D: the Worker half cannot be read. |
+| Mark 8b | run 3; dist.test.mjs:93 (log) | T5ii-B: not met as written. |
+| Mark 9 | none (NOT-RUN) | TE-3. |
+| C1: the judge reads the page's log | u8-merge-plan.md:84-86 (main session, run 3's 6-mds) | It is run 3's tree (TE-1). |
+
+## What I did not read or run
+- I read worker.ts, lib.ts, main.ts and build.mjs only where cited. I did not read build.test.mjs, contact.js, t5i.mjs, probe.js or probe.html, or serve.mjs past the CSP. I did not read the T5 (i) run folder, or U8's patch.
+- I did not read the main session's 00:0x UTC message to the builder (brief 3's last part, behind "no rerun needed"). launch-0850.md §3 sets no rule on rerunning T5 (ii) on a new base.
+- The netcode seat's items: the token and bind handling, the CSP fit, the pub items, and the cap values against the wire.
+- Nothing built or run: no cargo, no browser, no Node suite. The one command run was `node --test` on a glob that matches nothing, to read Node's exit code. All file reads were by absolute path; no cd and no git in the builder's worktree.
+
+## Notes (one line per finding, as I went)
+- N1 Tree tie for end-1 reproduced (U7R-TE-1's first half). N2 Run 3's tree differs (TE-1). N3 C14 counts (table).
+- N4 The plant logs are real: each tree hash differs from the clean run's, and each names the brief's tests. The T-half plants have no logs (TE-11).
+- N5 TE-2. N6 TE-3. N7 T5ii-D agreed, with the C8 addition. N8 TE-5, Low after a grep: no mark reads it.
+- N9 TE-4: Node 22.23.4 `node --test` with an empty glob gives exit 0. N10 T5ii-B agreed, with the R8 note.
+- N11 The Lows: TE-6 to TE-11. Read before the verdict: advisor-main-66-head.md §1 (C6 reworded) and launch-0850.md §3.

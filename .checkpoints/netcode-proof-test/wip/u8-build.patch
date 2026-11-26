@@ -1844,7 +1844,7 @@ index 0000000..667487a
 +# and `r1.sh host` and every `browsers` call refuse.
 diff --git a/spikes/netcode-proof/ops/runs/r1.sh b/spikes/netcode-proof/ops/runs/r1.sh
 new file mode 100644
-index 0000000..c5b7520
+index 0000000..2eeaa57
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/r1.sh
 @@ -0,0 +1,898 @@
@@ -2066,10 +2066,10 @@ index 0000000..c5b7520
 +}
 +
 +# room_settings NN <kind> [<log suffix>]: writes /var/lib/npt/run/room-NN.json (npt writes, npt-room reads through
-+# its group) with only the fields the settings types accept (each refuses unknown fields: SEC-U6AD-2): U6a's merged
-+# struct (crates/server/src/main.rs:62-103; `bite` only in a bites build, so only in a bite room), U6b's (the binds,
-+# `transport`, the WebSocket pair, `hash_path`, `ws_split_mark_s`) and U6c's (`mode`; the probe's four: C1 (b)), the
-+# last two checked at their merges. Each start is its own run, R1-<set>-NN<suffix> (the judge groups logs by run:
++# its group) with only the fields the settings type accepts (it refuses unknown fields: SEC-U6AD-2), checked by item 8
++# against the merged struct, crates/server/src/main.rs:77-147: U6a's fields with U6b's (the binds, `transport`, the
++# WebSocket pair, `hash_path`, `ws_split_mark_s`) and U6c's (`mode`; the probe's four: C1 (b)); `bite` only in a bites
++# build, so only in a bite room. Each start is its own run, R1-<set>-NN<suffix> (the judge groups logs by run:
 +# eval.rs:37-75). npt-ctl builds npt-super's flags from this same file (npt-lib.sh npt_super_args), so npt-super's log
 +# and the room's carry one run and the same set, role, layer, profile, date, scene, tick_hz and bite (item 10).
 +# U8's values for U6a's required fields it had not set: io_threads one per housekeeping vCPU; warmup_ticks 1,800
@@ -2077,7 +2077,7 @@ index 0000000..c5b7520
 +# Kinds: alone, headers, probe, calibrate, start, ds, browser:<slots>, bite:<id>.
 +room_settings() {
 +  local nn=$1 kind=$2 sfx=${3:-}$ATT scene=SS clients=1 tick=$TICK layer=L2 profile=P0 transport=both mode=room
-+  local set role=measured marks='' bite='' mark=null warmup=0 dur=0 cpu='' hk io='' addr commit day s f args chain=null key=null
++  local set role=measured marks='' bite='' mark=null warmup=0 dur=0 cpu='' hk io='' addr commit day s f args chain='""' key='""'
 +  # -16 ("every room start in every run": marks.json) in every kind but the probe and the bites (NC-SB-6); the probe
 +  # serves -3 only, C-U8-2, -4 and -6 being conditions, not marks (NC-SB-5).
 +  case $kind in
@@ -2089,7 +2089,7 @@ index 0000000..c5b7520
 +    ds) set=ds-selftest clients=48 warmup=1800 dur=420000 transport=ws profile=P2 mark=120 marks=PM-0001-16 ;;
 +    browser:*)
 +      # Only a browser room presents the production chain (INF-SB-1, NC-SB-11); every other kind serves the room's own
-+      # certificate (null pair: u6b-brief.md:209-212's form for runs with no browser; its field form is U6b's).
++      # certificate (the empty pair, U6b's merged form: main.rs:119-122).
 +      set=browsers clients=${kind#browser:} tick=null marks=PM-0001-16
 +      chain='"/var/lib/npt/tls/production.chain.pem"' key='"/var/lib/npt/tls/production.key.pem"'
 +      ;;
@@ -5218,10 +5218,10 @@ index 0000000..c10c13b
 +});
 diff --git a/spikes/netcode-proof/ops/tests/r1sh.test.mjs b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
 new file mode 100644
-index 0000000..6852e44
+index 0000000..1b1e059
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/tests/r1sh.test.mjs
-@@ -0,0 +1,733 @@
+@@ -0,0 +1,752 @@
 +// Test 7 (U8's fix pass, advisor-u6c-brief.md section 5 items 4, 5, 8 and 10): r1.sh's settings writers and the
 +// probe's presence check, run in bash on their real text (each function cut from r1.sh, beside stubs for the VM's
 +// reads), with fixture logs. Writes only under a temporary folder, and under NPT_R1_TREE when the caller sets it (3.1's
@@ -5434,10 +5434,22 @@ index 0000000..6852e44
 +  assert.doesNotMatch(R1, /load_up \d\d bots /, "no `bots` mode left");
 +});
 +
-+// Item 8: the settings types refuse unknown fields (SEC-U6AD-2). U6a's are its merged struct's (read here from the
-+// source); U6b's and U6c's are the names their briefs and C1 (b) fix, checked again at their merges.
++// Item 8: every required field of the merged Settings; values of the types it takes (it refuses unknown fields:
++// SEC-U6AD-2). The struct (crates/server/src/main.rs:77-147, U6a's fields with U6b's and U6c's) is read from the source
++// with each field's Rust type; a field is optional when its type is `Option<…>` or `#[serde(default)]` stands above it.
 +const SERVER = readFileSync(join(OPS, "..", "crates", "server", "src", "main.rs"), "utf8");
-+const U6A = [...SERVER.match(/\nstruct Settings \{\n([\s\S]*?)\n\}/)[1].matchAll(/^ {4}([a-z_0-9]+): /gm)].map((m) => m[1]);
++const FIELDS = [];
++let serdeDefault = false;
++for (const l of SERVER.match(/\nstruct Settings \{\n([\s\S]*?)\n\}/)[1].split("\n")) {
++  const f = l.match(/^ {4}([a-z_0-9]+): (.+),$/);
++  if (f) FIELDS.push({ name: f[1], type: f[2], optional: serdeDefault || f[2].startsWith("Option<") });
++  serdeDefault = f ? false : serdeDefault || /^ {4}#\[serde\(default\)\]$/.test(l);
++}
++const NAMES = FIELDS.map((f) => f.name);
++/** A JSON value against a Rust type of the struct; a type not named here never fits, so it fails by name. */
++const fits = (t, v) => (t.startsWith("Option<") ? v === null || fits(t.slice(7, -1), v)
++  : t.startsWith("Vec<") ? Array.isArray(v) && v.every((x) => fits(t.slice(4, -1), x))
++    : t === "String" ? typeof v === "string" : ["u32", "u64"].includes(t) && Number.isInteger(v) && v >= 0);
 +const U6B = ["wt_bind", "ws_bind", "transport", "ws_cert_chain", "ws_cert_key", "hash_path", "ws_split_mark_s"];
 +const U6C = ["mode", "probe_peer_ipv4", "probe_legs", "probe_packets", "probe_warmup_s"];
 +const KINDS = [["00", "alone"], ["01", "headers"], ["02", "probe"], ["03", "calibrate"], ["04", "start", "-s07"],
@@ -5447,14 +5459,21 @@ index 0000000..6852e44
 +  return JSON.parse(readFileSync(join(dir, "run", `room-${nn}.json`), "utf8"));
 +};
 +
-+test("item 8: room_settings writes only fields the settings types accept, every U6a field, `bite` only in a bite room", () => {
-+  assert.equal(U6A.length, 27, "U6a's merged Settings: 26 fields and the bites build's `bite`");
++test("item 8: the merged Settings holds 40 fields: U6a's 26 + `bite` + U6b's 7 + `cc` + U6c's 5", () => {
++  assert.equal(FIELDS.length, 40, "U6a's 26 + `bite` + U6b's 7 + `cc` (U6b's E6) + U6c's 5 = 40: a struct change fails here");
++  assert.deepEqual([...U6B, "cc", ...U6C, "bite"].filter((x) => !NAMES.includes(x)), [], "U6b's 7, `cc`, U6c's 5 and `bite` among the 40");
++});
++
++test("item 8: room_settings writes every required field of the merged Settings, values of the types it takes", () => {
 +  withTemp((dir) => {
 +    for (const k of KINDS) {
 +      const s = settingsFor(dir, k);
 +      const keys = Object.keys(s);
-+      assert.deepEqual(keys.filter((x) => ![...U6A, ...U6B, ...U6C].includes(x)), [], `${k[1]}: no unknown field`);
-+      assert.deepEqual(U6A.filter((x) => x !== "bite" && !keys.includes(x)), [], `${k[1]}: every U6a field`);
++      assert.deepEqual(keys.filter((x) => !NAMES.includes(x)), [], `${k[1]}: no unknown field`);
++      assert.deepEqual(FIELDS.filter((f) => !f.optional && f.name !== "bite" && !keys.includes(f.name)).map((f) => f.name), [], `${k[1]}: every required field`);
++      const bad = FIELDS.filter((f) => f.name in s && !fits(f.type, s[f.name])).map((f) => `${f.name}: ${f.type} is not ${JSON.stringify(s[f.name])}`);
++      assert.deepEqual(bad, [], `${k[1]}: each value of the type the struct takes`);
++      assert.ok(!("cc" in s), `${k[1]}: no cc: R1 runs quinn's default, cubic (main.rs:127-129; PM-0001-24, the mark that selects it, is R3's)`);
 +      assert.equal("bite" in s, k[1].startsWith("bite:"), `${k[1]}: bite only in a bites build's room`);
 +      assert.equal(keys.some((x) => x.startsWith("probe_")), k[1] === "probe", `${k[1]}: the probe's four in the probe only`);
 +      assert.ok(!("super" in s) && !("log_path" in s) && !("token_path" in s), "npt-super's values ride on its flags");
@@ -5550,7 +5569,7 @@ index 0000000..6852e44
 +      const body = readFileSync(join(dir, "run", `room-${k[0]}.json`), "utf8");
 +      assert.equal(body.includes("production."), browser, `${k[1]}: production.* only in a browser room`);
 +      assert.deepEqual([s.ws_cert_chain, s.ws_cert_key], browser
-+        ? ["/var/lib/npt/tls/production.chain.pem", "/var/lib/npt/tls/production.key.pem"] : [null, null]);
++        ? ["/var/lib/npt/tls/production.chain.pem", "/var/lib/npt/tls/production.key.pem"] : ["", ""]);
 +    }
 +    writeFileSync(join(dir, "hash", "room-05.json"), JSON.stringify({ algorithm: "sha-256", value_hex: "5e".repeat(32), validity_ns: 1 }));
 +    const ds = r1bash(dir, ["json_obj", "room_settings", "load_settings"], "room_settings 05 ds\nload_settings 05 run ws 48 450");
