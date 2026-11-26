@@ -12,3 +12,5 @@ Started 2026-11-26 16:10 UTC (date -u). Worktree `.gate/lane1-takeover`, branch 
 5. Drift: START_HERE, MODULE_MAP, TECHNICAL for crate lists / content not built.
 
 ## Done
+- 1 DONE (16:11 UTC): docs/adr/README.md lines 57-59 (one sentence after the 2026-11-04 list), rows R2-INT-OQ1,
+  R4-LOS-OQ1, R4-LOS-OQ2, R4-LOS-OQ4, G3. Every quote checked by node `includes` against DECISIONS.md: all true.

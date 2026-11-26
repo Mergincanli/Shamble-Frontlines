@@ -281,6 +281,33 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
       outer shape has no Rust struct for the type writer; `f64::round` (map.rs, time.rs) enters the players'
       file at step 9, so step 7's libm rule must allow it or the code rounds in whole numbers.
 
+24. **CI on the merged head ef2edec: green** (gate; toolchain 7 min 54 s, main's new workflow: Firefox also runs
+    the replay spec, through the new file helper). The toolchain run on fdd9f0a was cancelled by the next push.
+25. **Review round 1, security-auditor: DONE** (`security-auditor-review-4b1.md`): no Critical or High;
+    dependencies and the browser side PASS (the lockfile and the two manifests are step 1's approved digests; the
+    players' file on disk unchanged, 54,514 bytes, sha256 a4d8184c...); departures 3, 6, 11, 12 fine; 9 fine on one
+    condition (4c's match setup refuses by name a map with fewer spawns than slots: a STATUS follow-up). Findings:
+    - SA-1 Medium: the memory ceiling (input + 4 MiB) holds only for the four limit cases: a decoded string grows
+      by doubling and is never shrunk (15 texts of 2^19+1 bytes: 7.9 MB in, 15.7 MB held). FIX: each string gets
+      its exact size; that bundle joins the limit cases (native, Node, browsers).
+    - SA-2 Medium: three new readers of committed vectors go around the plain read
+      (`tests/content_proofs.rs`, `boundary/content.test.mjs`, `rules/content.spec.ts`), and the
+      `SHAMBLE_WRITE_VERDICTS` write is a plain `std::fs::write` (a committed link at the verdicts file would
+      turn that by-hand run into a write to the link's target). FIX: `read_plain`/`write_plain` and
+      `readPlainFile` everywhere; the switch takes only "1".
+    - SA-3 Low: Windows device names (con, prn, aux, nul, com0-9, lpt0-9) are valid ids, and an id is a file
+      name. FIX: refused in `is_id`.
+    - SA-4 Low: the echo leaves a quote raw, so an echoed key can close the sentence's quotes. FIX: the quote as
+      `\x22`; `record()` has no cap (about 2 KB at worst): kept for tests and tools, said in its doc.
+    - SA-5 Low: the lints hold only by hand (the same as EA-1). FIX: the scan.
+    - SA-6 Low: `write_plain` checks no name; `files.rs` words the scan as finding "another way in". FIX: the
+      name check, and the honest wording.
+    - SA-7 Low: no time asserted in WebAssembly; "four" megabyte classes are three; the finite-range scan covers
+      the movement fields only. FIX: all three.
+    - What the fuzz cannot reach, for the report: the caps (its inputs are a few KB), full map lists, more than
+      one map, long strings; it is blind (no coverage measured), and about a third of its structure-aware inputs
+      get no text mutation.
+
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
   on the line after a `cat` that wrote that file, in one call (2026-11-26, about 16:46 Amsterdam). It staged that
@@ -329,6 +356,6 @@ in); the advisor agent on the head; `.checkpoints/` out of the head; the draft p
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- rust-reviewer and security-auditor (review round 1 on ef2edec, started 2026-11-26 16:47 Amsterdam);
-  docs-keeper (the docs pass's first part, started 2026-11-26 17:10 Amsterdam). No saver runs: the main session commits
+- rust-reviewer (review round 1 on ef2edec, started 2026-11-26 16:47 Amsterdam); docs-keeper (the docs pass's
+  first part, started 2026-11-26 17:10 Amsterdam). No saver runs: the main session commits
   the notes by hand.
