@@ -143,7 +143,7 @@
 - **Finished, resumable by SendMessage (each from its own notes):** U8's builder ac59cce3e5d002441 (worktree at 03d9ff3;
   notes u8-fix-m5.md); the advisor a3de649cd25e474df (U8's rulings; takes U8's head read); NB2's plan check
   a10848a10f73ed39e (advisor-nb2-merge.md).
-- **Scheduled:** the 09:50 window wake-up trig_01LjMQn1mvKSVPzbUTvBv6kn (one-shot, 2026-11-26 09:51 UTC: launch-0950.md and its drafted messages launch-0950-msgs.md); the 10:12 net trig_01X11KYmGRJhpUuJBjd2mhTY (one-shot: U7's fix brief sent by 10:20); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; next 08:34 UTC); day
+- **Scheduled:** the 14:50 window wake-up trig_015fcQVLjaXmpovEfPWAw9vk (one-shot, 14:51 UTC: U7's snapshot read, the recipe's check, NB2-C10 if due, U8-F1 if his answer is in); the 09:51 wake-up trig_01LjMQn1mvKSVPzbUTvBv6kn and the 10:12 net trig_01X11KYmGRJhpUuJBjd2mhTY fired (spent); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; next 08:34 UTC); day
   message trig_01T3ENQmfQasZnSUU93vgrdM (2026-11-26 23:05 UTC: msg-2026-11-27.md; the 11-26 one sent 23:2x). The 18:51 wake-up fired (spent). The reset reminder trig_01YEaeE7q7Rv3EX1K2zNFcf7 (one-shot, 23:51 UTC: U8's M0 first; the 20:05 one spent).
   PR #40 is subscribed (again 07:35 after the compact: rules event read; 0 review threads, no conflict, no steward or babysit skill). U7's ffcheck 07:3x on 19c2698 clean (u7-fix-brief-draft.md step 0, corrected: MAIN-67's paths too). The fired reminders stay (A.4).
   (MAIN-66's and MAIN-67's step logs, the 19:4x-23:2x chat-size and order lines: this card at 9aa6dde.)
