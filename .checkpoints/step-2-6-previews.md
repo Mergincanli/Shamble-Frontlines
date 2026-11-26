@@ -192,7 +192,20 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   lists it with Part 15). DECISIONS 143/150/151/158 by entry. Staged tree vs 7aadfc17: main's 8 files; vs main: the
   branch's 69. Five sha256 unchanged; 175 tests; guard tests 1551/1551 (main's files); repo map OK (224 entries); gate
   PASS (--no-smoke); main still 4a62873 by ls-remote before the commit. Pushed (7aadfc1..90c939f, a fast-forward).
-  The advisor agent's review of 90c939f4 (scope: 6c812700..90c939f4): running (advisor-head-90c939f4.md).
+  The advisor agent's review of 90c939f4 (scope: 6c812700..90c939f4; advisor-head-90c939f4.md): APPROVE (the merge
+  of main 4a62873 and four notes-only commits; risk tier 2, needs-mustafa, draft unchanged). Conditions: (1) toolchain
+  green on 90c939f4: met (both runs success, 15:11:25 and 15:11:26 UTC, check runs 139998384735, 139998336269; gate,
+  smoke and preview/tests green too); (2) L1 at the next docs head (the report lists Part 15 and change-set 1). L2
+  Low, information only: lane 1's STATUS lines are stale after #73 (as on main itself), not lane 2's to reword.
+- T7, a rewind (2026-11-26): his message of 15:05 Amsterdam came into the chat twice, the same 738 bytes (uuid
+  d3c924a4 at 14:09:35 UTC; uuid 46bc5952-2195-40ae-ac19-dd011f9ddc66 at 15:10:01 UTC); he wrote that he may have
+  pressed "rewind" by accident. The first run (14:09-15:08 UTC) did T5's answer record, T6 and the pushes 7aadfc1,
+  90c939f, 8441ac0, 5e2760d; the rewind removed that run from the chat's context, not from GitHub or the disk. The
+  second run read the first run's tool calls and messages back from the transcript (scratchpad lost-span.txt,
+  lost-text.txt) and checked the state: GitHub's branch head 5e2760da, main 4a62873, the worktree clean but for the
+  review's final notes (its verdict, written after the snapshot 5e2760d; the agent's completion notice never reached
+  the second run), the main folder at 4a62873. The second run pushed nothing before this commit and repeated nothing;
+  its one write, a duplicate save script, was deleted uncommitted.
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
