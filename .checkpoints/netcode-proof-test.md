@@ -157,7 +157,7 @@
      since 00:00 (advisor-main-67.md); then steps 1-6 when the lane allows (U7's builder holds it), step 7 in a later
      window. DONE before it: MAIN-66 step 7 APPROVE and C6 APPROVE, 00:0x (advisor-main-66-head.md; no new finding).
   2. U7: brief 3 DONE 00:28 (its notes: wip/u7-build-rs-notes-0030.md; snapshot wip/u7-build-rs.patch, 243,353 B, 42
-     files on 9177fb5): R3's two room tests in; the end check 13 of 13 PASS (test 881 and 978, +20 each: C14's floor;
+     files on 9177fb5): R3's two room tests in; the end check 12 of 12 PASS (end-1.log "all 12 steps pass"; the builder's "13" was wrong) (test 881 and 978, +20 each: C14's floor;
      web 56/56; self 80/80); size about 4,731 (SIZE-CHECK clear); T5 (ii) not rerun on 9177fb5. Next: U7's round
      (netcode, test; no security: C12) in the 04:50 window: T5ii-A to -D, T5i-1 to -3, the driver's `fail` limit, C2's
      mode-hash half (cannot fail), the reworded C6 as a departure, the builder's read-only shell-loop slip (19:4x-00:16).

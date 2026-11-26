@@ -53,6 +53,22 @@ needs no go of his (as U4r's and U4f's); PR #40 keeps its own go.
   (7e2d6f3 plus its unsaved R-half, run 3's t5-dist). M5's command is U6c's form: `bash main-run.sh <log> cat
   /proc/loadavg :: env CARGO_INCREMENTAL=0 node check.mjs :: cat /proc/loadavg` (u6c-merge/m5-check.log, 20.4 min).
 
+## Changes before M0 (2026-11-26 00:3x UTC, the advisor tool's second read; they win over the steps below)
+- M0's main is now 07d673b (MAIN-67 merged it at 07cc9b7, pushed e23c783); M0 also waits for CI on e23c783 green
+  (gate done; toolchain was still running at 00:3x) and PR #40 mergeable.
+- The `ops` step waits until after U7's merge (u8-brief.md:524, "merge, then the `ops` step"): U7's tree changes the
+  same pin (check.test.mjs:2785 gains "web" in wip/u7-build-rs.patch), so M4b tonight would break U7's apply check.
+  M5 tonight is `node check.mjs` (the 11 steps) plus `node --test 'ops/**/*.test.mjs'` and `bash
+  ops/tests/wrappers.test.sh` in the same main-run.sh call. No install tonight: ops/browser/node_modules linked from
+  agent-abf71d95fc07b3522 as U8's builder did, removed before M7. Choice 15 for the day message.
+- M5's bars: a light base run at H0 first (as MAIN-67's), then refs = N0 + 43 (all 43 of U8's files are new), marks,
+  self and redact items as counted then (redact's item count rises by U8's text files); test, ops 100 pass expected.
+- The part-clean runs before M0 (free 7,207 MiB at 00:26, under 8,192), in the card's Tools form character for
+  character; if the guard asks or refuses, stop with nothing staged and one line for him.
+- A "done" line goes here after each step.
+- DONE 00:3x: the part-clean, in the card's form (no ask): "Removed 6564 files, 7.3GiB total"; the lock and CACHEDIR.TAG
+  there, no debug folder; free 7,207 to 14,039 MiB. M5 will build cold.
+
 ## Steps
 - **M0, preconditions:** no agent or workflow running; the lane lock free; HEAD = origin, clean; `git fetch origin
   main`: main still c1da1bd (a code, CI or rules move stops here: MAIN-52, plan first; a docs-only move is noted, nothing
