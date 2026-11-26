@@ -258,6 +258,7 @@ _And STATUS's "Waiting on Mustafa" bullet for ci-after-3a (#71), moved by the sa
   him for (the hand-over step for Builder V2's previews); FF-DRAW-WHEN (a), with the gate step 2.3, its own question
   (`docs/DECISIONS.md`; the report `docs/reports/2026-11-25-ci-after-3a.md`).
 
+_Moved from STATUS (2026-11-26, ci-preview-handover's docs pass, under his OLD-LINES of 2026-11-18): STATUS's row for the merged change-set 4a (PR #70, 2483e9a, merged 2026-11-26 12:22:01 UTC by `merged_at`, read with gh's REST route), moved by script, byte for byte, so its cells read as they stood when it left STATUS:_
 _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES of 2026-11-18): STATUS's row for the merged change-set 4a (PR #70, 2483e9a, merged 2026-11-26 12:22:01 UTC by `merged_at`, read with gh api), moved by script, byte for byte, so its cells read as they stood when it left STATUS:_
 
 | PR | Work | Branch | State | Waiting on |
@@ -822,6 +823,12 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
       (kill(2)). A real boundary needs a different uid with its own copy of the workspace, a container or VM, or a
       separate job whose output nothing trusted runs. Today the job has `contents: read` and no secrets, and
       `gate.yml`'s toolkit dependencies already run with the same reach (security-auditor).
+      _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass; his words of 2026-11-26, 15:05 Amsterdam, point 6,
+      `docs/DECISIONS.md`: "CUT-ESCAPE stays on record as accepted."): on that pull request's branch a step after the
+      cut uploads the build the cut's code wrote, for lane 2's preview workflow, which publishes it with a Cloudflare
+      token (security-auditor's read on lane 2's branch at 9ded5a8); the acceptance now also rests on that workflow
+      treating the build as data (PH-SA-2), and the later fix is
+      CUT-ESCAPE-FIX (both in "From ci-preview-handover")._
     - **SETPRIV-HARDEN** (D5, security-auditor's SA-2): the cut's privilege drop (`setpriv --reuid="$(id -u)"
       --regid=nogroup --clear-groups --no-new-privs`, `toolchain.yml:69` [verified 2026-11-13]) has neither
       `--inh-caps=-all` (setpriv(1)'s own advice when dropping from root) nor `--bounding-set=-all`, and the step prints
@@ -1282,6 +1289,9 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
       runs the rule tests (`tests/rules/`) in the runner image's own Mozilla Firefox 160.0 on Linux (his
       FIREFOX-SOURCE (c), 2026-11-25, 00:07:29 UTC); the browser tests that draw stay Chromium-only in CI, since the
       runner's Firefox gives the page no WebGL (FF-DRAW, in "From ci-after-3a"); WebKit and Safari not._
+      _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): on that pull request's branch, closed when it
+      merges, the `firefox` project also runs the recording's replay test (`tests/replay/`), his FIREFOX-REPLAY
+      (FIREFOX-REPLAY in "From ci-preview-handover")._
   - **From his browser check** (2026-11-19, 14:46:25 to 15:09:29 UTC: eight "Copy report" texts from Brave 1.100.58 and
     Firefox 160 on his Windows computer; the record, with his four messages whole and the readings below:
     `docs/reports/2026-11-19-cs2-browser-check.md`, "Observations for the follow-ups"; the ids are that record's; none
@@ -1352,6 +1362,9 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
     SHA, receive the job's token as their default input, as on main ("the only run step with the token").
     _Pointer, 2026-11-25: not done in ci-after-3a, the next CI edit; that chat deferred it again (the chat's choice,
     not his), to keep its pull request to his four parts; still due at the next CI edit ("From ci-after-3a")._
+    _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): **done** on that pull request's branch, closed when
+    it merges: `.github/workflows/toolchain.yml:94` reads "The only run step with the token" [verified 2026-11-26 at
+    d12e3a8]._
   - F-CHANNEL (security-auditor, Low; with change-set 3's build work; named in the list of what his go for #64
     accepts; **done in change-set 3a**, 5c92311: `CARGO_OVERRIDES` refuses every `RUSTC_` name, `__CARGO_` and
     `CARGO_UNSTABLE_`, CI's cut names still allowed, and names compared in upper case since 79666ad9;
@@ -1377,6 +1390,8 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
     2026-11-23, 21:24:59 UTC).
     _Pointer, 2026-11-25: carried by the chat he calls CI Builder (ci-after-3a), in part: the rule tests in Firefox in
     CI; the drawing tests are FF-DRAW ("From ci-after-3a")._
+    _Dated pointer, 2026-11-26: the replay test joins them on ci-preview-handover's branch, closed when it merges
+    (FIREFOX-REPLAY in "From ci-preview-handover")._
   - The line for CLAUDE.md on the third account (ACCT-3; his to give).
   - RR-F5's fix, SA-TREE and the `__pycache__/` line: change-set 3 (the block for #61 above). _All three **done in
     change-set 3a** (marked there, 2026-11-24)._
@@ -1493,6 +1508,9 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
     branch, closed when it merges: the `firefox` project runs `tests/rules/` (the float and stream vectors and the
     planted counter) in the runner image's Mozilla Firefox 160.0 (2 passed, run 45676587814) [verified 2026-11-25];
     the Firefox drawing tests are not in CI (FF-DRAW). WebKit and Safari stay open._
+    _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): on that pull request's branch, closed when it
+    merges, the `firefox` project also runs the recording's replay test (FIREFOX-REPLAY in "From
+    ci-preview-handover")._
   - 3A-MANIFEST-COMMENT (the next manifest batch, 3b's): the root `Cargo.toml`'s comment "in sim-wasm only" (line 14)
     is no longer true; and "The later cargo-deny wasm-bindgen rule must allow devtools too" (security-auditor's
     answer on the dependency batch, `security-auditor-deps.md`).
@@ -1737,6 +1755,8 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
   - TOKEN-WORDS (the #64 block above; due "at the next CI edit"): deferred again, by the chat, not by him.
     _Dated pointer, 2026-11-25 (his TOKEN-WORDS (a) with one change, 20:35 Amsterdam, `docs/DECISIONS.md`): it rides in
     the next workflow text the chat asks him for, the hand-over step for Builder V2's previews, at no yes of its own._
+    _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): **done** there, on that pull request's branch, closed
+    when it merges (`toolchain.yml:94`, "The only run step with the token" [verified 2026-11-26 at d12e3a8])._
   - FF-ORDER (infra-engineer's F3, Low): the Firefox run starts only if the Chromium run passes (`set -e`), so a red
     Chromium run gives no Firefox evidence; accepted for now.
 - **From change-set 4a, "The recording"** (PR #70, a draft; lane 1, the chat he calls Builder V4; branch
@@ -1801,12 +1821,79 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
     "Decisions needed" as FIREFOX-REPLAY): the replay spec needs no WebGL, so one line in the browser tests' setup
     would run the recording in Firefox too, a second engine; that widens the Firefox entry he accepted as cut to the
     rule tests (RULES-ONLY-READ (a), 2026-11-25, 19:36:36 UTC).
+    _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): his word came as FIREFOX-REPLAY in his block of
+    2026-11-26, 13:20 Amsterdam (`docs/DECISIONS.md`); **done** on that pull request's branch, closed when it merges
+    (FIREFOX-REPLAY in "From ci-preview-handover")._
   - 4A-HASH-REVISIT (PM-0004-21's report, by rust-reviewer: keep FNV-1a 64): revisit when the hash first runs on a live
     tick (server or Worker) or the shared state passes 64 KiB; the replacement then is XXH64, in our own code (no
     crate). A change costs one change-set: `make_recordings` re-makes every hashes file; world.rs's 8 known answers and
     the vector file's label and digest by hand; the old hashes must still replay green before the swap. Not measured
     by the report: Chromium, Firefox and Safari (WebAssembly in Node only), the real soldier table, a server running
     many rooms, ARM.
+- **From ci-preview-handover, the preview hand-over step** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz, on his block of 2026-11-26, 13:20 Amsterdam; lane 2's request: issue #59, its
+  comment of 2026-11-25, 19:39 UTC; no pull request number yet, its title and text in the chat's notes; local branch
+  `cs/preview-handover` pushed to `claude/keen-tesla-v807cf`, code head d12e3a8; risk tier 2; the advisor agent's plan
+  review `advisor-plan.md` and one review round by security-auditor and infra-engineer on the tried texts before his
+  yes, `security-auditor-ci.md` and `infra-engineer-ci.md`, all in `.checkpoints/ci-preview-handover/`, readable at
+  d12e3a8 until the notes are deleted; report `docs/reports/2026-11-26-ci-preview-handover.md`; CI on d12e3a8: to be
+  read; the ids are this docs pass's, the reviewers' own ids in brackets, not his):
+  - The hand-over (his UPLOAD-SOURCE (a), GUARD-STEP (a) and HIDDEN-FILES (b)): at the end of job `toolchain`, on pull
+    requests from this repository only, a check with absolute program paths that `.gate/dist-production` holds only
+    plain files and folders, none named with a leading dot, and is not empty (it prints the file count and size), then
+    `actions/upload-artifact` at cf430e030ddbb5b0abf93d22962f4752f3646cd9 (v7.0.2) uploads it as `preview-site`, kept 7
+    days, an empty upload an error, hidden files off (`.github/workflows/toolchain.yml:215-243` [verified 2026-11-26 at
+    d12e3a8]). In the container the check passed on the real production build (5 files, 892,209 bytes) and failed on
+    each of seven planted faults (`trials.md`, `question-2026-11-26-ask2.md`). The upload step has never run; its proof
+    is the pull request run's log: its file count against the check's (counts, not bytes: infra-engineer's IE-5), the
+    digest and the artifact id. CI: the push run on d12e3a8 skipped both steps, as meant; the pull request run is their first. No consumer yet: lane 2's `preview.yml` is not on main, and a
+    `workflow_run` starts only from main's copy, so no preview starts until it is (infra-engineer; "Open bugs and
+    risks", the ci-preview-handover entry).
+  - TOKEN-WORDS (the #64 block above): **done** on the branch, closed when it merges (`toolchain.yml:94`), with two
+    comments the new steps would have made false (`:4`, `:130`) [verified 2026-11-26 at d12e3a8].
+  - FIREFOX-REPLAY (his block of 2026-11-26, point 2; 4A-FIREFOX-REPLAY in the 4a block above): **done** on the
+    branch, closed when it merges: the `firefox` project's `testDir` is `./tests` with `testMatch`
+    `["rules/**/*.spec.ts", "replay/**/*.spec.ts"]` (`packages/e2e/playwright.config.ts:38-40` [verified 2026-11-26 at
+    d12e3a8]). In the container's Firefox 161.0, 3 passed, the replay test "first-loop.rec: 1800 steps, every shared
+    hash as in the file" (`trials.md`); in the runner image's Firefox 160 on d12e3a8: "first-loop.rec: 1800 steps, every shared hash as in the file" (toolchain 45836151624). A red, a time-out or a hash
+    difference there comes to him before any change and is never re-run for a green (his point 2; plan R2-4).
+  - CUT-ESCAPE-FIX (his words of 2026-11-26, 15:05 Amsterdam, point 6: "CUT-ESCAPE stays on record as accepted. Put
+    its later fix (the cut's code as its own throwaway user) into STATUS as a follow-up."; when: not named by him;
+    CUT-ESCAPE's own home is step 2.3, by his go for #48): the cut's code as its own throwaway user.
+    security-auditor's fuller form of the fix (its SA-1, Medium, CUT-ESCAPE itself, not new with this change): its own
+    uid on its own copy of the workspace, the output copied out by root and checked, and `unshare --pid --fork` so that
+    no process of the cut outlives the step. Why: the cut's code keeps the runner's uid and can change what later steps
+    run (the action's code in the work folder and the step's `GITHUB_ENV` and `GITHUB_PATH` files, inferred from the
+    runner's layout; `BASH_ENV` set that way reaches the check's absolute shell, shown locally), and the upload holds
+    the runner's upload key with the network, as checkout's and setup-node's post steps already do (from the runner's
+    source, read through a fetched summary: inferred).
+  - PH-SA-2 (security-auditor's SA-2, Low): CUT-ESCAPE's acceptance rested on "contents: read and no secrets"; after
+    this change a workflow holding the Cloudflare token publishes what the cut wrote, so the acceptance now also rests
+    on lane 2's preview treating the build as data. security-auditor's read at lane 2's 9ded5a8 (its branch, not main;
+    [assumed] here, not read by docs-keeper): `hosting/preview.mjs` walks with lstat (no link followed), refuses dot
+    names, names outside a safe set, host-acted files and non-plain items, caps size and count, needs `index.html`,
+    and never runs the build; `preview.yml`'s job `check` needs the run's workflow name `toolchain`, its path, the
+    event `pull_request`, success and a run from this repository. The sentence is on CUT-ESCAPE's record above.
+  - PH-IE-4 (infra-engineer's IE-4, Low, likely benign): the upload keeps `overwrite` false; if artifact names are
+    scoped to the run, not the attempt, a re-run of a pull request run whose first attempt uploaded `preview-site`
+    fails the step, and lane 2's runbook prescribes that re-run. GitHub's docs are silent on it; the action's own client
+    expects several artifacts of one name in a run (consistent with names per attempt, not shown). Read it on the first
+    re-run; `overwrite: true` would be a CI text change (his yes first).
+  - PH-KEEP-NAMES (for the gate step 2.3; lane 2's note 1 in its request; plan R2-10): step 2.3 replaces
+    `toolchain.yml`; keep the workflow name `toolchain`, the path `.github/workflows/toolchain.yml` and the artifact
+    name `preview-site`, or change lane 2's preview with them: its `check` job matches the name and the path, and
+    `preview.mjs` finds the hand-over on main by the line `name: preview-site` (infra-engineer's read at lane 2's
+    dc00c79).
+  - PH-MERGE-REF (for lane 2; the advisor agent's F9, plan R2-10): a pull request run builds the pull request merged
+    into main, so `preview-site` is the build of that merge, not of the pull request's head commit [assumed: from
+    the plan and the review, not read in GitHub's docs by docs-keeper].
+  - PH-TIME (plan R2-10): the job's time on the first run, against its 15-minute limit (`toolchain.yml:38`); main's
+    last run took 6.0 minutes (infra-engineer). On d12e3a8 the job took 5 min 45 s (the push run).
+  - PH-ACTIONS-SETTING (his 15:05 point 5; infra-engineer's one unknown): if the repository's Actions settings allow
+    only chosen actions without `actions/upload-artifact`, every run fails at its start; the first run on the draft is
+    the test, and such a failure goes to him with the setting to change.
+  - PH-DELETE (at this pull request's merge; his FF-REFETCH (a), the advisor agent's N2): the Firefox 161 folder under
+    `.gate/` and the read-only copy of the action's code in the scratchpad (a download not used) are deleted.
 - **From guard-wrappers** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7; branch
   `claude/confident-gates-tbnq38` standing in for `cs/guard-wrappers`, code head 83bc2417, main 2483e9a merged in at
   7be0a933 in a separate worktree; risk tier 2; no pull request yet; four security-auditor rounds, the fourth by his
@@ -1897,6 +1984,12 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
   3A-FROM-F64, 3A-HOOK-TEST, 3A-MANIFEST-COMMENT; for the gate step 3A-LINT-MULADD, 3A-SCAN-NAMES, 3A-CONFIG-FILE,
   3A-PEDANTIC; later 3A-FEATURE-VERSION, 3A-SCAN-HELPERS, 3A-PART5-CLASH, 3A-NAME-SECTION, 3A-RNG-COPY, 3A-STATS-ROWS,
   3A-PLANTS, 3A-FMA-LOG, 3A-NO-FMA, 3A-OTHER-BROWSERS; for the drafts 3A-DEPARTURES.
+- **Moved from STATUS (2026-11-26, ci-preview-handover's docs pass)** (under his OLD-LINES: lines about merged pull
+  requests, moved by script, byte for byte): STATUS's Follow-ups bullets for guard-env-fix (PR #69, merged 2026-11-25
+  as 311c048) and ci-after-3a (PR #71, merged 2026-11-25 as 07d673b) are the two bullets below. The second one's
+  pointer leads to the block "From ci-after-3a" above; its "TOKEN-WORDS deferred again" is done on ci-preview-handover's
+  branch (the block "From ci-preview-handover" above).
+- **From guard-env-fix (#69):** GEF-SAME (the same kind of gap in other wrappers and keywords the day guard strips; the forms are with Mustafa, kept out of the repository), SA-R1-3 (the wrapper loop's turn cap), SA-R2-2 (very long lines against the hook timeout), V-2 (the folder tracking after a split-string value), the reason-text nit.
 - **Moved from STATUS (2026-11-26, guard-wrappers' docs pass)** (under his OLD-LINES: lines about merged pull requests,
   moved by script, byte for byte, to keep STATUS within its 120 lines): STATUS's Follow-ups bullets for change-set 3b
   (PR #68, merged 2026-11-25 as 3ab9eae), change-set 4a (PR #70, merged 2026-11-26 as 2483e9a) and ci-after-3a (PR
@@ -1910,7 +2003,7 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
   4a's size ladder, told to him in STOP-4A) and 3c's link items; 3c's recording items met by 4a, closed at its merge.
 - **From change-set 4a** (#70; the archive's block): for 4b 4A-NA-4B, 4A-EA-4B; for 4c N5, 4A-BYTES-LENGTH, E2-2,
   4A-TE-4C, 4A-NA-4C, 4A-EA-4C, security-auditor's C4; for 4c or 8 E2-3; for 7 C1 (binding from Slice 3's first build that
-  talks to a real server); for 8 N4, C2; Slice 3 C3; the gate step 4A-S3-READ; his word first 4A-FIREFOX-REPLAY; 4A-HASH-REVISIT.
+  talks to a real server); for 8 N4, C2; Slice 3 C3; the gate step 4A-S3-READ; 4A-FIREFOX-REPLAY (his block of 2026-11-26, 13:20 Amsterdam; done on ci-preview-handover's branch); 4A-HASH-REVISIT.
 - **From ci-after-3a** (the small CI pull request; the archive's block "From ci-after-3a"; each closed at its merge): done on its branch E1, 3A-GEN-CHECK, 3A-RULES-STEP's CI half (its target-gating rule stays open), the Firefox half of FIREFOX and 3A-OTHER-BROWSERS in CI on Linux (the rule tests only; WebKit and Safari open); still open 3B-OTHER-BROWSERS (its mark is a drawing test); new: FF-DRAW (his question first), FF-SPEC-COMMENTS, FF-FILEURL-PREF, FF-STOP, FF-SANDBOX, FF-ORDER; CUT-PATH's new evidence; TOKEN-WORDS deferred again.
 - **Moved from STATUS (2026-11-26, guard-wrappers' docs pass, the same rule)**: STATUS's Follow-ups bullet for ADR
   0006's revision (PR #67, lane 2, merged 2026-11-25 as c1da1bd) is the bullet below, moved by script, byte for byte.
@@ -2249,6 +2342,17 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   3. The inventory's line numbers hold after phase 1's move: `git mv` kept the bytes and the line numbers (foundation
      2.1b, PR #51: five pure renames, the blobs equal at 76b4f7a and at the move commit c090843), so its citations hold
      with the prefix `legacy/` (`shamble-game.js:N` is `legacy/shamble-game.js:N`) [verified 2026-11-11].
+- **ci-preview-handover, the preview hand-over step** (2026-11-26, no pull request number yet; the evidence: `plan.md`,
+  section 6, and `security-auditor-ci.md` in `.checkpoints/ci-preview-handover/`; the follow-ups: the block "From
+  ci-preview-handover" in "Follow-ups"):
+  1. The upload runs after the cut on the build the cut's code wrote: CUT-ESCAPE, accepted (his words of 2026-11-26,
+     15:05 Amsterdam, point 6), its acceptance now also resting on lane 2's preview treating the build as data
+     (PH-SA-2); its fix is CUT-ESCAPE-FIX.
+  2. The artifact `preview-site` can be downloaded by any signed-in GitHub user for 7 days: the production page only,
+     which the preview publishes anyway (the plan's risks; security-auditor: no finding).
+  3. No consumer yet: lane 2's `.github/workflows/preview.yml` is on its own branch, not in this branch's
+     `.github/workflows/` (gate.yml and toolchain.yml only [verified 2026-11-26]); a `workflow_run` starts only from
+     main's copy, so no preview starts until lane 2's file is on main (infra-engineer).
 - **Change-set 4a of the v2 build plan, "The recording"** (2026-11-25, PR #70, a draft; the evidence: the chat's card
   and `round1-fold.md` in `.checkpoints/cs4a-recording/`, folded into 4a's report before the pull request is ready):
   1. The tests that read the recordings still follow a link (4A-S3-READ): CI cannot go green with one, since the folder
@@ -2342,6 +2446,7 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
 | Editor rebuild (Cabana): full-map draw calls boot / 1 / 2 rebuilds | base 1992 / 2406 / 3502 · head 1992 / 1992 / 1992; heap after GC boot / 10 rebuilds: base 42.9 / 119.5 MB · head 42.7 / 44.5 MB | 2026-10-14 | preview.js harness + perf-auditor |
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
+| CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (push; gate run 45818982040 with its gate and smoke jobs, completed 12:23 UTC; toolchain run 45818982052, 12:28 UTC) | 2026-11-26 | GitHub's REST API, the commit's workflow runs and the gate run's jobs (read by ci-preview-handover's docs-keeper) |
 | CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (gate 12:22:25, smoke 12:23:01, toolchain 12:28:06 UTC by `completed_at`) | 2026-11-26 | GitHub's REST API, the commit's check runs (read 14:24 UTC by docs-keeper) [verified] |
 | guard-wrappers (no pull request yet): the kit's three test files | `routine-guard.test.mjs` 1551/1551 (1247 on main c1da1bd by the chat's count; `.claude/` unchanged from c1da1bd to 2483e9a, read with git diff), `settings.test.mjs` 127/127, `checkpoint.test.mjs` 33/33, on the docs pass's worktree at 54bbf38c (main 2483e9a merged in) | 2026-11-26 | `node --test`, run by docs-keeper [verified] |
 | CI on main (older) | `gate`, `smoke` and `toolchain` success on 07d673b, PR #71's merge commit (push; gate and smoke completed 20:49 UTC, toolchain 20:54 UTC) | 2026-11-25 | GitHub's REST API, the commit's check runs (read 22:12 UTC) |
