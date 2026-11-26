@@ -4,6 +4,8 @@
 // runs without the lib check, because Playwright's and Vite's own type files need Node's types.
 declare module "node:fs" {
   export function readFileSync(path: string | URL, encoding: "utf8"): string;
+  export function readFileSync(path: string | URL): Uint8Array;
+  export function readdirSync(path: string | URL): string[];
 }
 declare module "node:path" {
   const path: { join(...parts: string[]): string };

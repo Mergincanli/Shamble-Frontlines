@@ -102,12 +102,20 @@ fn a_tick_of_the_local_match_takes_no_memory_once_the_match_is_warm() {
         "the first three steps took memory {warm_up} times"
     );
 
-    // Ten minutes of ticks at 30 a second: not one more.
+    // Ten minutes of ticks at 30 a second: not one more. The shared hash is read after every tick, as a replay
+    // reads it: it takes no memory either, from its first call on (it has no buffer).
     let before = TAKEN.get();
+    let mut hashes = 0u64;
     for number in 3..18_003 {
         step(&mut local, number);
+        hashes ^= local.shared_hash();
     }
-    assert_eq!(TAKEN.get() - before, 0, "a later step took memory");
+    assert_eq!(
+        TAKEN.get() - before,
+        0,
+        "a later step or its hash took memory"
+    );
+    assert_ne!(std::hint::black_box(hashes), 0);
     assert_eq!(local.room().counters().commands_run, 18_002);
     assert_eq!(local.room().counters().refused(), 0);
 }

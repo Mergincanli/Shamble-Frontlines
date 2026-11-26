@@ -245,6 +245,19 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
   3B-LATE-BOUND, OVERFLOW-PANIC-RULE (due with 3b's code in `room`), and his two press limits when due (3B-PACER-255,
   3B-OUTAGE-256).
 
+_Moved from STATUS (2026-11-25, change-set 4a's docs pass, under his OLD-LINES of 2026-11-18): STATUS's row for the merged ci-after-3a (PR #71, 07d673b, merged 2026-11-25 20:49:09 UTC by `merged_at`), moved by script, byte for byte, so its cells read as they stood when it left STATUS:_
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| none yet (title and text in the notes, `pr-title.txt`, `pr-body.md`) | ci-after-3a, the small CI pull request after change-set 3a, by the chat he calls CI Builder: every crate's release tests (E1), the two vector generators' `--check` (3A-GEN-CHECK), `devtools`' own wasm32 build line (3A-RULES-STEP's CI half), and the rule tests in the runner image's Mozilla Firefox 160.0 (FIREFOX-TESTS (b), in part: the drawing tests wait, FF-DRAW); report `docs/reports/2026-11-25-ci-after-3a.md` | `claude/keen-tesla-v807cf` (stands in for `cs/ci-after-3a`) | risk tier 2; code head 832268e, gate, smoke and toolchain green on it (runs 45676587871, 45676587814); the head for approval to be given | the advisor agent's review of the final head; his main Advisor opens the draft; his go for that head; at the merge the unused Playwright Firefox zip is deleted (his answer of 2026-11-25, 00:07:29 UTC, point 3) |
+
+_And STATUS's "Waiting on Mustafa" bullet for ci-after-3a (#71), moved by the same docs pass and rule, byte for byte:_
+
+- ci-after-3a: his go for the head the advisor agent approves, CI green (his main Advisor opens the draft). Answered
+  2026-11-25, 20:35 Amsterdam: RULES-ONLY-READ (a); TOKEN-WORDS (a), its home the next workflow text the CI chat asks
+  him for (the hand-over step for Builder V2's previews); FF-DRAW-WHEN (a), with the gate step 2.3, its own question
+  (`docs/DECISIONS.md`; the report `docs/reports/2026-11-25-ci-after-3a.md`).
+
 ## Targets
 - **v2 (VISION_V2 §3, read with MODES-3 (a): the starting sizes are totals; Mustafa, 2026-10-31):** start with two teams
   with 2–8 players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or
@@ -1495,6 +1508,13 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
   3b's card, "Open findings" and "Round 2 so far", and the reviewers' notes
   `.checkpoints/cs3b-loop-closes/<reviewer>-review1.md` and `-review2.md`, readable at the notes' last commit
   80a51e4299d2a9abb0c08adc76dc1a31716f036a. The ids are this docs pass's):
+  _Pointer, 2026-11-25 (change-set 4a's docs pass, which carries 3b's owed one): **merged** as PR #68, 3ab9eae,
+  2026-11-25 13:57:03 UTC by `merged_at`, by merge commit, from his main Advisor thread on his tap of 13:56:26 UTC, with
+  the expected head 5e02ee73 (the merge commit's message) [verified 2026-11-25 with git and GitHub's REST API]. There is
+  no change-set 3c any more (his ORDER-3C (c) of 2026-11-25, 16:59:52 UTC, `docs/DECISIONS.md`): read each "3c" below
+  as change-set 4a for the recording's items and as the link simulator's own change-set (after 4d, merged before
+  change-set 7 starts) for the simulator's, as change-set 4's plan, section 8, places them by name (the plan:
+  `.checkpoints/cs4-walk/plan.md` at c17a054, the last commit of 4a's branch that holds its notes)._
   - **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (his words: `docs/DECISIONS.md`, the
     entry of 11:38:37 UTC; no release counter in change-set 3c). What it was about (test-engineer's round 2): the
     presses mark's row (PM-0002-12, `docs/adr/0002-code-structure-build-toolchain.md:1283`) says "the Worker counts
@@ -1584,6 +1604,9 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
     counted for honest ticks only (its own plant: an allocation on every datagram the room cannot decode passes all
     114 tests). The two reviewers' probes counted 0 after warm-up; a counting allocator in the two random-message
     tests makes it a test.
+    _Pointer, 2026-11-25 (change-set 4a's docs pass): moved by 4a's size ladder (rung 1, at 2,450 written lines) to
+    the link simulator's own change-set, its other named home; not written in 4a; told to him before it moved, in
+    the question STOP-4A, which he answered (a) at 20:48:11 UTC._
   - **For change-set 3c's plan** (3c: the link simulator and the first recording, moved out of 3b by the plan's size
     ladder, he told before anything moved; with them the one new read-only number on the players' file, the state's
     hash, by his DEPART-3, and `devtools`' three path edges that 3b declares and does not use yet, security-auditor's
@@ -1595,6 +1618,18 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
     with every tick; the state-hash export returns the shared hash only, as plain numbers, read only during a replay,
     its buffer private to `Room` (all three engine-architect's round 2); `late` checked against the simulator's own
     reorder count (netcode-architect's round 2).
+    _Pointer, 2026-11-25 (change-set 4a's docs pass): placed by change-set 4's plan, section 8 (rows 1-27;
+    `.checkpoints/cs4-walk/plan.md` at c17a054). **Met by
+    4a, closed at its merge (#70):** the replay runner, the comparer and the field-by-field difference, the first
+    recording natively and in WebAssembly and in CI (rows 1-4); the state's hash on the players' file, shared hash
+    only, as one plain number, read only during a replay, with its pin, and the host's time recorded with every tick
+    (rows 5-8; since 4a's fix pass the hash has no buffer at all: `shared_hash(&self)` [verified 2026-11-25 at
+    fb5d0ff]); the hash report (PM-0004-21: keep FNV-1a 64) before the first recording was committed, and the begun
+    parts of PM-0004-17, -18, -19 with the three planted divergences (rows 9-10, run again on movement in 4c). Row 11,
+    3B-HOSTILE-ALLOC, moved (above); row 12, RELEASE-COUNT (a): nothing built. **To the link simulator's change-set:**
+    the simulator itself, its clock, its reliable channel, loss and corruption, `link()`, `late` and its marks (rows
+    13-21, 23-27). The three path edges (row 22): still unused after 4a [verified at fb5d0ff]; dropped in 4b's
+    manifest batch if still unused there, each back with its first user in the link simulator's change-set._
 - **From the preview hosting check** (lane 2, the chat he calls Builder V2; in flight, its pull request #66 (2026-11-25: merged, 09faefa);
   branch `claude/optimistic-albattani-mdoonz` standing in for `cs/preview-hosting-check`; risk tier 1; the items of its
   report's "Follow-ups (for STATUS)", `docs/reports/2026-11-24-preview-hosting-check.md`, their text kept; the ids are
@@ -1698,6 +1733,74 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
     the next workflow text the chat asks him for, the hand-over step for Builder V2's previews, at no yes of its own._
   - FF-ORDER (infra-engineer's F3, Low): the Firefox run starts only if the Chromium run passes (`set -e`), so a red
     Chromium run gives no Firefox evidence; accepted for now.
+- **From change-set 4a, "The recording"** (PR #70, a draft; lane 1, the chat he calls Builder V4; branch
+  `claude/cool-pasteur-oiqk1r` standing in for `cs/4a-recording`, source final at fb5d0ff unless the verifier finds
+  something; risk tier 1, no browser check; two review rounds by five reviewers (netcode-architect, rust-reviewer,
+  test-engineer, engine-architect, security-auditor): round 1 on eb14739, round 2 on what the fix pass changed, all
+  five APPROVE in round 2, nothing Critical, High or Medium open; the stop line 3,400 by his STOP-4A (a). Source of
+  every item: the chat's `.checkpoints/cs4a-recording/round1-fold.md` and `hash-report.md` (at c17a054), folded into 4a's report
+  before the pull request is marked ready. N4, N5, C1-C4, E2-2, E2-3, 4A-BYTES-LENGTH and 4A-FIREFOX-REPLAY are the
+  reviewers' and the chat's ids; the other 4A- ids are this docs pass's):
+  - For 4b:
+    - 4A-NA-4B (netcode-architect's round 1, for 4b's re-read): what `first-loop` replays on once content reaches the
+      constructor.
+    - 4A-EA-4B (engine-architect's round 1): content enters through the constructor only; if the players' file must
+      compute the content's SHA-256, `sha256.rs` moves whole into the content crate, never a second copy; first-loop's
+      header is re-made with its frozen content set and every hash line stays byte-identical, which proves that
+      loading content changed no state.
+  - For 4c:
+    - N5 (netcode-architect's round 1, Low): `recording.ts` stays out of the production build only because nothing
+      imports it: a development marker when the paced replay imports it.
+    - 4A-BYTES-LENGTH (rust-reviewer, a watch, no defect today): `StateSink::bytes` writes no length, which is right
+      for the 16 press counters; a run of variable length (a soldier list, events) needs a fixed-width count before
+      it, or two different states can give the same bytes (4c's step 1). Since 4a's fix pass (E3) `bytes` and `secret`
+      take runs of a fixed length only, so a run of varying length cannot be handed to them [verified 2026-11-25 at
+      fb5d0ff: `crates/sim/src/world.rs`, `StateSink`].
+    - E2-2 (engine-architect's round 2): `SHARED_STATE_BYTES` lost its last user outside the crate; 4c turns it into a
+      length per match: drop the re-export then.
+    - 4A-NA-4C (netcode-architect's rounds 1 and 2): the frozen content copies are listed inputs of the folder check,
+      not unlisted files; the shared length comes from the world, not a constant; `StateSink::f32` with a finite
+      check; every slot of the soldier table is handed over with its occupied flag and generation, so that line i of
+      a state print is always slot i and the field comparison never misaligns. For Slice 2: the recording's header
+      has no mode.
+    - 4A-EA-4C (engine-architect's round 1): `u8`, `f32` (through `to_bits`) and `row()` join `StateSink`; the paced
+      replay reads the hash through a development-only driver, never through the live host's interface; the button
+      meanings get one home in Rust.
+    - 4A-TE-4C (test-engineer's round 1): one known answer with every field non-zero, read by both readers; the real
+      search for a sine input where the two targets differ, and the three injections on movement fields; the replay
+      loop pinned to the live host's call order and its rebase on resume; `scripts.rs`'s button numbers pinned to
+      `keyboard.ts` (its fifth item, the two-process test's line filter, N6, was fixed in 4a).
+    - C4 (security-auditor, the paced replay in 4c): behind a development marker the production message check
+      refuses; its own `Sim` from the recording's test seed, never the live match; `replayOn` keeps calling
+      `checkReplayable`.
+  - E2-3 (engine-architect's round 2; 4c, or change-set 8 at the latest): with `write_state` test-only (done in 4a),
+    `secret` is the only public way seed bytes leave the crate; a wrapper that outside readers can only count would
+    make the seed rule one the types enforce (about 10 lines).
+  - C1 (security-auditor; decided at change-set 7 and binding from Slice 3's first build that talks to a real server):
+    before `Sim::shared_hash` is in a build whose authority is elsewhere, it hashes only the client's own world; no
+    message carries a hash over state outside the recipient's interest set, and the server never answers a client's
+    hash with match or mismatch over such state; tests pin both. Why: FNV-1a can be run backwards (its script got 4
+    hidden bytes back from one hash in 0.06 seconds).
+  - For change-set 8: N4 (netcode-architect's round 1, Low, about 4 lines): `files.rs` and `bin/replay.rs` report the
+    shared column's step first; once random streams join the authority's part, the whole column can differ earlier.
+    C2 (security-auditor): the random streams' key and buffered output go only through `secret`, with a test that the
+    dumps of two worlds that differ only in their seed are identical.
+  - For Slice 3: C3 (security-auditor): the server refuses to start a live match on a seed that begins with `TESTSEED`.
+  - 4A-S3-READ (security-auditor's round 2, left open, to be named to him in 4a's report; for the quality gate step
+    2.3): S3's read side. The tests that read the recordings still follow a link (with `first-loop.rec` linked to an
+    endless device a test reads until memory runs out); the folder check refuses such a link, so CI cannot go green
+    with one, and the exposure is a test run on a hostile branch. Its fix is a repository-wide "no tracked links"
+    check: a gate change, risk tier 2.
+  - 4A-FIREFOX-REPLAY (a wish for the CI Builder; his word first, engine-architect's E2-4, for 4a's report's
+    "Decisions needed" as FIREFOX-REPLAY): the replay spec needs no WebGL, so one line in the browser tests' setup
+    would run the recording in Firefox too, a second engine; that widens the Firefox entry he accepted as cut to the
+    rule tests (RULES-ONLY-READ (a), 2026-11-25, 19:36:36 UTC).
+  - 4A-HASH-REVISIT (PM-0004-21's report, by rust-reviewer: keep FNV-1a 64): revisit when the hash first runs on a live
+    tick (server or Worker) or the shared state passes 64 KiB; the replacement then is XXH64, in our own code (no
+    crate). A change costs one change-set: `make_recordings` re-makes every hashes file; world.rs's 8 known answers and
+    the vector file's label and digest by hand; the old hashes must still replay green before the swap. Not measured
+    by the report: Chromium, Firefox and Safari (WebAssembly in Node only), the real soldier table, a server running
+    many rooms, ARM.
 - **Moved from STATUS (2026-11-24)** (by lane 2's docs pass for the preview hosting check, under his OLD-LINES: lines
   about merged pull requests, moved by script, byte for byte): STATUS's Follow-ups lines 78-93 at main 28254a7, the
   four bullets of the merged pull requests #49, #50, #51 and #48 for the gate step (2.3), are the four bullets below.
@@ -1739,6 +1842,17 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
   check" above.
 - **From the preview hosting check** (lane 2; the archive's block): for step 2.6's plan PHC-CLICKLESS, PHC-LOCKFILE,
   PHC-TOKEN-SETUP, PHC-PROBES, PHC-DELETE, PHC-ACTIONS-READ, PHC-ERROR-PATH; at the merge PHC-TR-END; PHC-SCRIPT-LOWS.
+- **Moved from STATUS (2026-11-25, change-set 4a's docs pass)** (under his OLD-LINES: lines about merged pull requests,
+  moved by script, byte for byte): STATUS's Follow-ups bullet for change-set 3a (PR #65, merged 2026-11-24 as 28254a7)
+  is the bullet below. Its pointer to "the archive's block" leads to the block "From change-set 3a" above; since #71's
+  merge (07d673b) 3A-GEN-CHECK and 3A-RULES-STEP's CI half are done (the block "From ci-after-3a" above), and change-set
+  4's plan (section 15) places 3A-FMA-CHECK and 3A-FEATURE-VERSION in 4a and 4b, 3A-SCAN-HELPERS in 4c, and
+  3A-PART5-CLASH in 4b's step 3 if the content's types are the first that nest.
+- **From change-set 3a** (the archive's block): 3A-FMA-CHECK (his: first outside crate), 3A-RUST-REPORT (his),
+  3A-PART7-POINTER; for ci-after-3a 3A-GEN-CHECK, 3A-RULES-STEP (below); built in 3b, closed by its merge
+  3A-FROM-F64, 3A-HOOK-TEST, 3A-MANIFEST-COMMENT; for the gate step 3A-LINT-MULADD, 3A-SCAN-NAMES, 3A-CONFIG-FILE,
+  3A-PEDANTIC; later 3A-FEATURE-VERSION, 3A-SCAN-HELPERS, 3A-PART5-CLASH, 3A-NAME-SECTION, 3A-RNG-COPY, 3A-STATS-ROWS,
+  3A-PLANTS, 3A-FMA-LOG, 3A-NO-FMA, 3A-OTHER-BROWSERS; for the drafts 3A-DEPARTURES.
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -2045,6 +2159,18 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   3. The inventory's line numbers hold after phase 1's move: `git mv` kept the bytes and the line numbers (foundation
      2.1b, PR #51: five pure renames, the blobs equal at 76b4f7a and at the move commit c090843), so its citations hold
      with the prefix `legacy/` (`shamble-game.js:N` is `legacy/shamble-game.js:N`) [verified 2026-11-11].
+- **Change-set 4a of the v2 build plan, "The recording"** (2026-11-25, PR #70, a draft; the evidence: the chat's card
+  and `round1-fold.md` in `.checkpoints/cs4a-recording/`, folded into 4a's report before the pull request is ready):
+  1. The tests that read the recordings still follow a link (4A-S3-READ): CI cannot go green with one, since the folder
+     check refuses it; the repository-wide check is a gate change for step 2.3.
+  2. Two planted divergences are shown in a weaker form: plant E (a WebAssembly-only difference) is a stand-in, and
+     the search for a sine input where the two targets differ was not run; plant D (an outside draw) was planted
+     natively only. Their real forms run again on movement in 4c (4A-TE-4C).
+  3. In CI a red replay names the step; the differing field comes from the `replay` tool's two state prints, by hand.
+  4. Size: 4a ran at 2.2 times its designs' count before review fixes (3,030 written lines against 1,365); by the
+     chat's reckoning a part that grows as 4a did ends 2 to 4 % under its stop line before review fixes and 5 to 7 %
+     over it after them (4a's fixes added 9 %), so 4b, 4c and 4d are each likely
+     to come back to him; their stop lines stay as they are (his STOP-4A, point 3).
 - **Change-set 3b of the v2 build plan, "The loop closes"** (2026-11-25; the evidence: its card and reviewers'
   notes at the notes' last commit 80a51e42, and its report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`):
   1. The room has no bound on how late a command may run (3B-LATE-BOUND): harmless while nothing moves and play is
@@ -2126,9 +2252,11 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
 | Editor rebuild (Cabana): full-map draw calls boot / 1 / 2 rebuilds | base 1992 / 2406 / 3502 · head 1992 / 1992 / 1992; heap after GC boot / 10 rebuilds: base 42.9 / 119.5 MB · head 42.7 / 44.5 MB | 2026-10-14 | preview.js harness + perf-auditor |
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
-| CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 28254a7, PR #65's merge commit (run ids not recorded here) | 2026-11-24 | change-set 3b's card, step 0 (read 22:45 UTC) [assumed: not read again by this docs pass] |
+| CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 07d673b, PR #71's merge commit (push; gate and smoke completed 20:49 UTC, toolchain 20:54 UTC) | 2026-11-25 | GitHub's REST API, the commit's check runs (read 22:12 UTC) |
+| Change-set 4a (PR #70, a draft): the players' Wasm, the hash's cost, the tests | the players' Wasm 54,514 bytes on the final source fb5d0ff (53,813 before 4a), sha256 a4d8184c...d094, the same on the verifier's rebuild and on GitHub's runner (CI on 21c1046); after round 1's fix pass it was 19847796...f708, one byte other (a line number in a panic message), and 55,607 bytes before that pass; the state hash: native release 4,096 bytes 5.7 us and 16,384 bytes 20.7 us, WebAssembly release in Node 22 5.2 and 19.9 us; 17 browser tests in 195 s in the container; the release tests of all six crates, 139 passed, on the tree with #71 taken in | 2026-11-25 | the chat's card and `round1-fold.md` (`.checkpoints/cs4a-recording/`); not re-measured by docs-keeper, not re-read at fb5d0ff |
+| CI on main (older) | `gate`, `smoke` and `toolchain` success on 28254a7, PR #65's merge commit (run ids not recorded here) | 2026-11-24 | change-set 3b's card, step 0 (read 22:45 UTC) [assumed: not read again by this docs pass] |
 | ci-after-3a (no pull request yet): the `toolchain` job with every crate's release tests, the two generator checks, `devtools`' wasm32 line and two browser runs | on 832268e: the job 18:34:50 to 18:40:12 UTC (5 min 22 s by the job's start and end; the report gives 5 min 20 s); Chromium "16 passed (3.4m)"; Firefox 160.0 "2 passed (15.0s)" (the rule tests only); Python 3.12.3; gate and smoke green (run 45676587871). The red first run on 52ad5d3 (45670972698): Chromium "16 passed (3.5m)", Firefox "4 failed", "9 did not run", "2 passed (5.0m)" at Playwright's 300 s stop | 2026-11-25 | GitHub Actions, run 45676587814 and 45670972698 logs (gh, read by ci-after-3a's docs pass) |
-| Change-set 3b (in review, no pull request yet): the `toolchain` job on a runner, the players' Wasm and the browser tests | the job 4 min 47 s (0dfca749, run 45529670690) to 4 min 58 s (the final code 6abf3d2a, run 45537884772) of its 15 minutes; CI green on d117fca5 and eb0d2314, and gate, smoke and toolchain green on 0dfca749, 6380df45, a85b9dbb and 6abf3d2a; the players' Wasm 53,813 bytes (21,994 gzip, 18,464 brotli; sha256 5ebae154...b41262) as written before the push of the commit that closes round 2's fixes (31,718 on main); 16 browser tests in 3.3 to 3.4 of CI's 5 minutes; on 0dfca749 in CI: the one-minute loop 1,816 ticks in 60.5 s, key to tick median 167.7 ms and 95th percentile 185.0 ms at about 10 frames a second; the press test 10,000 presses and releases made and echoed, 0 refused; allocation 90 bytes a frame and 597 a block; on 6abf3d2a in CI: the loop 1,814 ticks in 60.6 s, key to tick median 238.1 ms and 95th percentile 257.8 ms at about 7 frames a second, the press test 10,000 presses and releases made and echoed, 0 lost, 0 doubled, allocation 91 bytes a frame and 590 a block; 53 of 53 planted defects caught on 6abf3d2a | 2026-11-25 | change-set 3b's card, "Current step" (CI read line by line by the builder) |
+| Change-set 3b (PR #68, merged 2026-11-25 as 3ab9eae; written while in review): the `toolchain` job on a runner, the players' Wasm and the browser tests | the job 4 min 47 s (0dfca749, run 45529670690) to 4 min 58 s (the final code 6abf3d2a, run 45537884772) of its 15 minutes; CI green on d117fca5 and eb0d2314, and gate, smoke and toolchain green on 0dfca749, 6380df45, a85b9dbb and 6abf3d2a; the players' Wasm 53,813 bytes (21,994 gzip, 18,464 brotli; sha256 5ebae154...b41262) as written before the push of the commit that closes round 2's fixes (31,718 on main); 16 browser tests in 3.3 to 3.4 of CI's 5 minutes; on 0dfca749 in CI: the one-minute loop 1,816 ticks in 60.5 s, key to tick median 167.7 ms and 95th percentile 185.0 ms at about 10 frames a second; the press test 10,000 presses and releases made and echoed, 0 refused; allocation 90 bytes a frame and 597 a block; on 6abf3d2a in CI: the loop 1,814 ticks in 60.6 s, key to tick median 238.1 ms and 95th percentile 257.8 ms at about 7 frames a second, the press test 10,000 presses and releases made and echoed, 0 lost, 0 doubled, allocation 91 bytes a frame and 590 a block; 53 of 53 planted defects caught on 6abf3d2a | 2026-11-25 | change-set 3b's card, "Current step" (CI read line by line by the builder) |
 | CI on main (older) | `gate` with `smoke` (run id 45373057216) and `toolchain` (run id 45373056953) success on 1ec6f6c, PR #64's merge commit (push) | 2026-11-24 | GitHub Actions check runs (REST API, read 2026-11-24) |
 | Change-set 3a (PR #65, merged 2026-11-24 as 28254a7): the `toolchain` job on a runner, and the players' Wasm | 138 s (a1c59e8) to 185 s (8619d539) per job, from the job's start and end, on the six heads whose times the card records; the players' Wasm with the panic hook 31,718 bytes, sha256 383f5303...3963, the same bytes on the runner and in the container since the remap (RR-F5; 28,991 on the runners before 3a); 14 browser tests in Google Chrome 157.0.8103.78 in about 1.1 min; boundary tests 2 files, 17 tests; the client's unit tests 70; the allocation test 61 bytes a frame and 529 a block (75 frames) on 8619d539, whose runner image moved to 20261116.133.1 (20261116.376.1 before): the verifier's TE-WATCH read found the allocation inside its windows (25 to 170, 430 to 610) and the default backend unchanged (the WebGL 2 fallback); one red, on a1b2e802 (an assertion of the builder's, fixed forward, not re-run) | 2026-11-24 | change-set 3a's card at f153ddf4 (steps 4 to 12); the job log of 8619d539 (job 138592422504) |
 | CI on main (older) | `gate` with `smoke` (run 934, id 44551896122) and `toolchain` (run 232, id 44551894194) success on f5030a3, PR #61's merge commit (push) | 2026-11-19 | GitHub Actions runs (REST API, read 2026-11-23) |

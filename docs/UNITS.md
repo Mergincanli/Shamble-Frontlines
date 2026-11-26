@@ -53,6 +53,16 @@ LOOP_V2 (§5 units, §7 combat feel, §13 amps, loot and ammo). The reference ro
   Multigunner as the reference). (2026-11-04)
 - `[IDEA]` Empire: a hover skimmer as its first vehicle (fast, crosses water, sideways dash, rides just above the
   ground; no true flight under the top-down camera), and a disguise transport at tier two. (2026-11-04)
+- `[DECIDED]` Empire: the Hornet. In his words: "The Hornet is a tier-one unit of the Empire: a vehicle on one wheel
+  that leans forward or backward with the direction it moves, and leans back in a flinch when it fires a full shot.
+  Its blockout and first handling numbers are in my Testlines sandbox; those numbers are a sketch to tune." The unit
+  is decided; its numbers are a sketch to tune, not decided. It is not part of Slice 1 and nothing of it is built
+  there. (2026-11-25, 16:59:52 UTC; whole in `docs/DECISIONS.md`, his answer ORDER-3C, point 6)
+  - Open, for his unit walk (listed, never settled here: his words of 2026-11-25, "The two lines of docs/UNITS.md stay
+    as they are, listed as open, for my unit walk"): this entry meets two lines of this section. Under Factions,
+    decided: "the counter triangle and tier one stay shared; the differences grow with tech (tier-two specialists and
+    vehicles are unique)", while the Hornet is a tier-one unit of the Empire alone. And the idea just above: "Empire:
+    a hover skimmer as its first vehicle", while the Hornet is a vehicle at tier one. Both lines stay as they are.
 
 ---
 

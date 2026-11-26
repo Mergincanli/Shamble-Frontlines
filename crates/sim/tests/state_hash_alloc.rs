@@ -1,6 +1,5 @@
-//! "Passing the same buffer every tick means no allocation after the first call" (`World::state_hash`), counted and
-//! not inferred: a global allocator that counts, around the system's. A test of a buffer's address and capacity
-//! cannot show it, because an allocator may hand the same block out again after a free.
+//! "There is no buffer, so it takes no memory" (`World::state_hash`), counted and not inferred: a global allocator
+//! that counts, around the system's.
 //!
 //! It is a test binary of its own because a program has one global allocator, and the count is kept per thread
 //! because the test harness allocates on its own threads while a test runs.
@@ -63,12 +62,11 @@ unsafe impl GlobalAlloc for Counting {
 static ALLOCATOR: Counting = Counting;
 
 #[test]
-fn the_state_hash_takes_memory_once_and_never_again() {
+fn the_state_hashes_take_no_memory() {
     let mut world = World::new(&MatchSetup {
         seed: [7; SEED_BYTES],
         start_tick: 0,
     });
-    let mut scratch = Vec::new();
 
     // The control: the counter sees an allocation when there is one.
     let before = taken();
@@ -80,14 +78,10 @@ fn the_state_hash_takes_memory_once_and_never_again() {
     );
     drop(seen);
 
-    // The first call sizes the buffer: one allocation.
+    // The hash is fed field by field with no buffer: not even the first call takes memory.
     let before = taken();
-    let first = world.state_hash(&mut scratch);
-    assert_eq!(
-        taken() - before,
-        1,
-        "the first call sizes the scratch buffer once"
-    );
+    let first = world.state_hash();
+    assert_eq!(taken() - before, 0, "the first call took memory");
 
     // Ten minutes of ticks at 30 a second, each stepped with a command and hashed twice: not one more.
     let before = taken();
@@ -97,15 +91,10 @@ fn the_state_hash_takes_memory_once_and_never_again() {
             buttons: tick,
             presses: [tick.to_le_bytes()[0]; BUTTONS],
         }]);
-        black_box(world.shared_hash(&mut scratch));
-        last = black_box(world.state_hash(&mut scratch));
+        black_box(world.shared_hash());
+        last = black_box(world.state_hash());
     }
     assert_eq!(taken() - before, 0, "a later call took memory");
     assert_ne!(first, last);
-
-    // A buffer that comes back in with other content, or longer, is reused all the same.
-    scratch.extend_from_slice(&[0xEE; 200]);
-    let before = taken();
-    assert_eq!(world.state_hash(&mut scratch), last);
-    assert_eq!(taken() - before, 0);
+    assert_eq!(world.state_hash(), last);
 }
