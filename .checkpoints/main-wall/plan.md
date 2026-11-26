@@ -29,8 +29,10 @@ repository in this chat (his 13:20 item 1, 15:05 item 6).
   does anything else he authorises as himself. The wall separates his account from everything else; separating his
   own decision from a session's act stays with the guard, the pull-request review and his go.
 
-## 3. The measurement (throwaway repository `wall-throwaway`, public, his account)
-Run by a separate test chat that holds only `wall-throwaway` (opened by him, from the brief; one test on each of his
+## 3. The measurement (throwaway repository `sandbox-1126`, public, his account: THROWAWAY-PUBLIC (a), his answer of 2026-11-26)
+Neutral names in the throwaway (repository, workflow files, branches, comments, ruleset names; the copied ruleset is
+renamed on import), and it is deleted as soon as the results are reviewed (re-created if a re-test is needed).
+Run by a separate test chat that holds only `sandbox-1126` (opened by him, from the brief; one test on each of his
 Claude accounts) and by his own clicks with screenshots. Results reach this chat by his paste.
 Tests, ids only here (detail in the brief): T0 both rulesets read back; T1 isolation, decisive and first: a pull
 request with red checks must not merge by any route, his web merge included (fail = the design is dead, no click on
@@ -42,21 +44,23 @@ T10 runs on the real repository after his click there: the next day-session merg
 
 ## 4. His clicks, listed once (each change with its undo; screen names to confirm on screen)
 A. Throwaway repository:
-1. Create `wall-throwaway` (public, with a README). Undo: Settings > Danger Zone > Delete.
+1. Create `sandbox-1126` (public, with a README). Undo: Settings > Danger Zone > Delete.
 2. Give the Claude app access to it (github.com Settings > Applications > Installed GitHub Apps > Claude > Configure).
    Undo: remove it there.
-3. Open the test chat (a new Claude Code chat holding only `wall-throwaway`) and paste the brief; later the same on
+3. Open the test chat (a new Claude Code chat holding only `sandbox-1126`) and paste the brief; later the same on
    his other Claude account for T2. Undo: archive the chats.
 4. Copy today's ruleset: real repository > Settings > Rules > Rulesets > "Shamble Ruleset 1" > Export ruleset (a
-   download only); in `wall-throwaway` > New ruleset > Import > check it > Create. Undo: delete it there.
-5. Add the wall in `wall-throwaway` (section 2's settings, mode Exempt; if "Exempt" or "Repository admin" is not
+   download only); in `sandbox-1126` > New ruleset > Import > rename it `ruleset-1` > check it > Create; the wall in
+   click 5 is named `ruleset-2` there. Undo: delete it there.
+5. Add the wall in `sandbox-1126` (section 2's settings, mode Exempt; if "Exempt" or "Repository admin" is not
    offered: note it and tell the test chat, or stop). Undo: delete it, or Enforcement status Disabled.
 6. His tests from his test card (handed to him in chat with the brief, not pushed: steps, expected result and stop
    line for T1a in each mode, T3a-c, T6, T7 and T9): one screenshot each.
 7. Only if needed: switch the wall to "For pull requests only"; re-run. Undo: set it back.
-8. Optional T11: a test routine pointed at `wall-throwaway` only. Undo: delete it.
-9. Paste the test chat's report and his screenshots here. Keep `wall-throwaway` until T10 passed, then delete it and
-   remove the app's access.
+8. Optional T11: a test routine pointed at `sandbox-1126` only. Undo: delete it.
+9. Paste the test chat's report and his screenshots here. Once the advisor agent and security-auditor have reviewed
+   them: delete `sandbox-1126` (click 1's undo) and remove the app's access (click 2's undo). Re-create it if a
+   re-test is needed.
 B. Real repository (only after the measurement passed, the advisor agent reviewed the results, and his go):
 10. Read and screenshot, changing nothing: Deploy keys, Collaborators, Installed GitHub Apps and the Claude app's
     "Administration" level.

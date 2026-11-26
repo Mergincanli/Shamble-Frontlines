@@ -19,6 +19,7 @@
 
 4. The advisor agent: REVISE, text only (C1-C7, brief fixes, THROWAWAY-PUBLIC for him) · notes advisor-plan.md
 5. Plan revised (C1-C7); brief fixed and his test card written (.gate/main-wall/, not pushed)
+6. His THROWAWAY-PUBLIC (a): neutral names (sandbox-1126, ruleset-1, ruleset-2) and early deletion in the plan, brief and card
 
 ## Current step
 security-auditor reviews the design, the brief and the card (C6), then the advisor agent on the revision.
@@ -35,6 +36,7 @@ security-auditor reviews the design, the brief and the card (C6), then the advis
 ## Decisions taken
 - MAIN-WALL next; the wall first · Mustafa · 2026-11-25 20:35
 - Order: MAIN-WALL, guard (R4-1 + GUARD-KIT), review tracks + SOURCE-GO (a) · Mustafa · 2026-11-26 15:05
+- THROWAWAY-PUBLIC (a): public throwaway, neutral names, deleted as soon as the results are reviewed · Mustafa · 2026-11-26 (his answer "a" in this chat)
 
 ## Running work
 - security-auditor: design, brief and card
