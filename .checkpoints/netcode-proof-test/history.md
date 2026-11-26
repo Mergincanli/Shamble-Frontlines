@@ -8119,3 +8119,13 @@ ready
   take-in, by the recipe's conflict-free path, within his LIGHT-TAKEIN limits. "ready": Builder 2's merge now
   (nb2-merge-plan.md, NB2-C3 and NB2-PROMPT (a): the command named first, his reply awaited).
   Transcript line 104783 (a queue-operation enqueue at 17:35:59.551Z), 103 characters.
+
+## Mustafa, 2026-11-26 18:01 UTC, in this chat: his go for Builder 2's merge command (word for word)
+```text
+go
+```
+- **Read as** (the main session's reading, not his words): his go for the step-2 command named to him at 17:4x UTC,
+  `git merge --no-ff -F /home/user/Shamble-Frontlines/.gate/nb2-merge/merge-msg.txt
+  0e621dae6e5b009a4cf00b6401b46d771b2215a3`, with his item 4 (history.md:7909). Sent at 18:02 UTC after the tip
+  re-read 0e621dae: the merge 48efc9c59b06347c79d0e9ecbdcc78c6992eebde (parents H0 22cd65d and T).
+  Transcript line 105054 (record a72ae2b3-1d7e-4d89-af60-d5d7507f387d, 18:01:32.990Z), 2 characters.
