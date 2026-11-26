@@ -69,9 +69,15 @@
     screenshot was the sandbox's; the real repository's is folded into click 12 (click 11 only tightens, so the order
     swap loosens nothing: recorded as a deviation for the docs).
 
+17. Click 11 done by him on the real repository (2026-11-26 ~17:15 UTC): "main-wall (only the owner updates main)",
+    Active, Repository admin Exempt, Default (applies to main), only Restrict updates; "Shamble Ruleset 1" not opened.
+    Click 12: the saved page (as measured); Secrets and variables > Actions: no repository secrets; one environment
+    secret WALL_TEST in environment "preview" (the other lane's wall-test placeholder, per its step 2.6 plan; value not
+    seen) - SA-MW-9 holds by names. Sandbox deletion next (his click).
+
 ## Current step
-His one visit: click 11, then click 12 (the saved rule page; the real repository's Secrets and variables > Actions);
-then the sandbox's fork count and deletion.
+Sandbox deletion (his); the docs pull request (DECISIONS by script, STATUS, archive, ROADMAP, REPO_MAP, TECHNICAL
+"main's wall", F2-F7, the report); T10: one day-session merge and one PR Advisor merge under the wall (TOKEN-RELEASE (c)).
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
