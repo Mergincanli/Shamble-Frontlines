@@ -46,8 +46,14 @@
 23. Applied: 3 guard Edits, 4 test Edits, each asked; cmp equal to hooks-r4c (guard b1ab3110…, tests 7c0f0f36…);
     1551/127/33; gate PASS --no-smoke; one commit · 83bc2417
 
+24. security-auditor round 4 (the last) on 83bc2417: REVISE: R4-1 Critical open (partly this diff's class, partly
+    older; open on main too), R4-2 Low (a cost class; fails closed); nothing looser than 9ad6bc9, no throw, every
+    round-3 spelling closed (860,160 lines) · notes security-auditor-r4.md
+25. STOPPED for Mustafa (his item 3: no fifth round, build nothing more; two options only: merge what is approved, or
+    drop the change)
+
 ## Current step
-security-auditor round 4 (the last) on 83bc2417, on what changed since round 3 (9ad6bc9).
+Waiting for Mustafa: merge what is approved, or drop the change (R4-END).
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
