@@ -91,6 +91,8 @@ PLANTS = [
     ("P14", "defect", "the imports rule turned into a list of banned words",
      [(CHECKS, "...imports.filter((entry) => !PLAYERS_IMPORTS.some((known) => same(known, entry)))", "...imports.filter((entry) => /fma|sin|now/.test(entry.name))")], UNIT,
      ["the players' file passes with the bindings' own imports"]),
+    ("U1", "defect", "the rule on crates that may not be linked finds nothing", [(CHECKS, "    return UNLINKED_CRATES.filter((crate) => steps.has(crate)).map(", "    return UNLINKED_CRATES.filter(() => false).map(")], UNIT,
+     ["a function of a crate the players' file is built without is refused"]),
     # Step 8, the tools.
     ("T1", "defect", "the content walk takes a link, a pipe or a folder for a file", [(WALK, "            if !kind.is_file() {", "            if kind.is_dir() && kind.is_file() {")], FILES,
      ["whatever_is_not_a_kinds_folder_with_plain_id_files_is_refused_before_it_is_read"]),

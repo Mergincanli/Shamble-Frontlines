@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 23:52 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 00:04 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -747,8 +747,23 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     (the static world from a map document, its tree's bytes, the ray cast, on maps made in tests) is built
     before step 9, because step 8's second part and step 9 both rest on his DIFF-LIST answer (the content files,
     the frozen content of the first recording). No step's content changes; steps 11 and 12 stay last.
-- **To do before 4b-2 merges:** RustSec advisories for the 33 packages (security-auditor could not read them
-  without the network); the licence texts for the hosted build (a follow-up for lane 2).
+- **CI on step 8's first part, 54e89d2: green** (gate run 45906827061 with smoke; toolchain run 45906826997, 8 min
+  49 s for its build-and-test step).
+- **The advisories are read** (the to-do from security-auditor's note on step 6's batch; 2026-11-26, 23:55):
+  one request to the OSV database's batch query with the names and versions of the lockfile's 49 registry
+  packages. **48 have none. `heapless` 0.8.0 has nine** (RUSTSEC-2026-0574 to -0582, published 2026-11-18, all
+  "unsound", fixed in 0.9.4). The whole reading is `cs4b-content/advisories-2026-11-26.md`. In short: the
+  package comes with parry3d's `alloc` feature through `rstar` 0.13.1 (which asks for heapless "0.8", so it
+  cannot move alone); parry3d names `rstar` in one file that it compiles only with its `spade` feature, which
+  our line leaves off (`src/transformation/mod.rs:48-49`); so both packages are compiled and nothing reaches
+  them. **Made a rule of the build:** `UNLINKED_CRATES` (`heapless`, `rstar`) in `build-checks.mjs`: a function
+  of either in a twin stops the build (one more test, one more plant, both twins pass today). **Commit 2f058b2,
+  pushed 00:04** (the gate passes; the full local checks passed whole: 206 Rust tests twice, 205 in release,
+  client 129, 34 boundary tests, 18 browser tests in 206 s; **2,627 written lines of 4b-2**). Then to
+  security-auditor for its judgement, and to him in the update and the report (a package inside
+  the batch he said yes to; no version of the three he pinned is touched).
+- **To do before 4b-2 merges:** the licence texts for the hosted build (a follow-up for lane 2); a STATUS
+  follow-up to take `heapless` 0.9.4 or later when `rstar` or parry3d next move.
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
   `cs4-walk/mustafa-2026-11-26-grey-colours.md`; read as his answer to the one question the chat's update before
   it asked, whose options were (a) the default greys stand and (b) he gives other colours before step 12). No
@@ -764,6 +779,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   test run). All reads. Since then every git command stands alone in its call.
 - One more, at step 7 (2026-11-26, about 22:40 Amsterdam): a `git status --short | head` stood after a `grep` in
   one call. A read. Told to him in the step's update.
+- Commit 2f058b2's message gives the written lines as 2,626; the count, taken after the commit instead of
+  before it, is 2,627. The message stays as it is (no history is rewritten); the card and the chat have 2,627.
 - The chat told him "Your second 'a' (23:00 Amsterdam)" as if he had sent a second message. He had not: it was
   his first message shown to the chat again after a restart. Corrected in the chat and in the notes.
 - Two more git commands did not start their own shell call, both harmless reads or a write-back of committed text:
