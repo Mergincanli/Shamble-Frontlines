@@ -181,3 +181,108 @@ UTF-16 result is from an in-memory buffer, not a real PowerShell save.
 - On a block's re-run (-aN, only after an INVALID), ws_split.txt and presence.txt hold the last attempt only; the
   earlier attempt's numbers stay in the raw tarball.
 - DONE (stopped at 1b by section 0's rule; the main session takes the snapshot).
+
+# Resume (17:4x UTC): his U8F1-SIZE (a), stop 6,282, so 93 net lines (u8-f1-brief.md:12-18 as the main session edited it)
+Checks, each its own call: top level .../.claude/worktrees/agent-a7fe1b9f436f36bb1; HEAD 77ffc95101e1...; status: only
+r1.sh, r1sh.test.mjs and the notes. Building from drafts.md, item by item.
+
+## 1c and 1d DONE
+- PROMPT-R1.md section 6 step 2: "Put only `collect/`, ... and `s14-redact.txt` into `<results>\r1\` (`<results>` is
+  `.gate\npt-results\results`)" in place of "npt-judge's summaries and the redacted records". R1.md section 7: a new
+  bullet carrying the same list (its 1e and 3 sentences follow).
+- r1plan.test.mjs (test 5's file): "ADV-U8H-1 (b), S14-PUSH (a): one pushed list, word for word, ...": R1.md's list
+  pinned to the literal, PROMPT-R1.md's equal to it. r1plan + operator: 21 pass (3.6's deny check included).
+- Plant 1d: `bringup/facts.txt` dropped from PROMPT-R1.md's list: the test failed by name ("the same list in both
+  files"). Restored: PROMPT-R1.md sha256 7b0e4e9a...ae50 before and after.
+
+## 1e DONE
+- PROMPT-R1.md step 2: C5's words (the hook's own check: the fixed copy with `--vms`, run on `<results>\r1\s14`, its
+  whole output saved as `<results>\r1\s14-redact.txt`, in UTF-8, its last line in step 4's summary; a finding or any
+  exit but 0: no push, stop and tell him).
+- R1.md section 7's bullet: what the s14 folder holds (true: netem's settings, the cc names and errors, the attempt
+  and browser-leg times and the standings added to the brief's list), every writer (C6's list and `attempts`), and the
+  stop-and-go-to-Mustafa sentence naming the pin test.
+- s14.test.mjs: the pin test as pin-draft.test.mjs had it (42 lines), `text` added to the helpers import; one change:
+  the hardware-address pattern is `(?:[0-9a-f]{2}:){5}[0-9a-f]{2}` (no `::`, which redact-check reads as IPv6).
+- Tests: s14, r1plan, operator, redact: 34 pass (redact.test.mjs scans the new test file too: clean).
+- Plants: an added `uname -n` line in npt-s14's kernel.txt block: fails "kernel.txt's sources ... goes to Mustafa
+  first" naming `uname -n`; a hardware address in probe.py: fails "probe.py's addresses" naming it. Restored: npt-s14
+  0c62ea52...9e1d, probe.py 65020716...0434, before and after. (The scratch draft's hostname and nodename plants
+  stand for the same lines, unchanged in the tree.)
+- Count after item 1: PROMPT-R1.md 7/2 (+5), R1.md 9/0 (+9), r1.sh 17/6 (+11), r1plan.test.mjs 6/0 (+6),
+  r1sh.test.mjs 17/2 (+15), s14.test.mjs 44/1 (+43): **+89 of 93**.
+
+## Item 2 DONE (SR-1 with SR-2)
+- PROMPT-R1.md step 2, just before the push: "in PowerShell, `git -C <results> rev-parse --git-path hooks` must print
+  the clone's own hooks folder, the one holding pre-push; anything else: stop and tell him." (`<results>` defined once
+  in the same step: `.gate\npt-results\results`, inside the results worktree the push uses.)
+- R1.md section 2 step 6 (Stop B's start-check line) extended, word for word C3's: "and, in PowerShell, `git -C
+  <results> rev-parse --git-path hooks` prints the clone's own hooks folder, prompting, not denied".
+- The assert in r1plan.test.mjs's list test ("SR-1: the hooks re-read just before the push"). operator.test.mjs 3.6
+  also reads every backticked `git ...` in PROMPT-R1.md, the new line among them, against every deny: no deny matches.
+- Plant: the line set back to `git -C <results> config --get core.hooksPath`: the test failed by name (the SR-1
+  message). Restored: PROMPT-R1.md sha256 f981d0b6...13da before and after.
+- The four-way proof: the scratch run above (hooks-proof.mjs): all of (i)-(iv) change the printed path.
+
+## Item 3 DONE (ADV-U8H-2)
+R1.md section 7's bullet ends: "At R1's report the advisor applies plan.md:1256's slack-value rule from presence.txt's
+printed reads (ADV-U8H-2)." (No test: a clause, as the brief has it.)
+
+# HAND-BACK (U8-F1 built whole, 2026-11-26 about 18:1x UTC; no commit: the main session takes the snapshot)
+**Size against 93** (`git diff --numstat 77ffc95101e186f75c57a1e8770b3ab7a9442820`):
+
+| File | Added | Removed | Net |
+|---|---|---|---|
+| spikes/netcode-proof/ops/operator/PROMPT-R1.md | 8 | 2 | +6 |
+| spikes/netcode-proof/ops/runs/R1.md | 12 | 1 | +11 |
+| spikes/netcode-proof/ops/runs/r1.sh | 17 | 6 | +11 |
+| spikes/netcode-proof/ops/tests/r1plan.test.mjs | 7 | 0 | +7 |
+| spikes/netcode-proof/ops/tests/r1sh.test.mjs | 17 | 2 | +15 |
+| spikes/netcode-proof/ops/tests/s14.test.mjs | 44 | 1 | +43 |
+| **Total** | **105** | **12** | **+93 of 93** (U8 at 6,282, his stop) |
+
+Lines removed only where an item replaces text: PROMPT-R1.md's old step 2 lines (2), R1.md's Stop B line's end (1),
+r1.sh's changed lines (6: import, reports' start, the print loop, logq's comment and two lines), r1sh.test.mjs's
+test title and verdict filter (2), s14.test.mjs's helpers import (1). Nothing deleted to make room.
+**Carried: nothing** (item 3 and item 2's assert both fit).
+
+**Tests on the final tree**
+- `node --test` on the 8 browser-free ops test files: 95 pass, 0 fail (the base's 92 + the ws_split test, the list
+  test, the pin test).
+- `node --test '<spike>/ops/**/*.test.mjs'` (the glob form): 104 tests, 103 pass, 1 fail: browser.test.mjs's "the
+  scripts: plain Node on standalone webdriverio ..." (ERR_MODULE_NOT_FOUND 'webdriverio': this worktree has no
+  ops/browser/node_modules; the brief's section 2 leaves browser.test.mjs out; U8-F1 touches nothing under ops/browser/).
+- `bash ops/tests/wrappers.test.sh`: "315 ok, 0 failed".
+- `node ops/operator/redact-check.mjs <spike>`: "421 item(s) checked, 0 finding(s)".
+- `node check.mjs --only refs,self,redact`: PASS refs, PASS self (78 of 78), PASS redact (11 of 11; 421 items, 0
+  findings); "check: all 3 steps pass". No file added.
+- Scratch, not counted: redact-check on the fixture s14 folder: 14 items, 0 findings; UTF-16 output reads as binary
+  (the PROMPT line names UTF-8); the four-way hooks proof: all four change the printed path.
+
+**Plants** (each failed its test by name; each restored, sha256 equal before and after)
+| Item | Plant | Failed | Restored |
+|---|---|---|---|
+| 1a | one slack read dropped from P1's print | item 4's test ("after the verdicts and reports ...") | r1.sh a6f1dded...3a3a |
+| 1b | the first ws_split field dropped | the ws_split test | r1.sh 6169122a...2831 (then form) |
+| 1d | `bringup/facts.txt` dropped from PROMPT-R1.md's list | the list test ("the same list in both files") | PROMPT-R1.md 7b0e4e9a...ae50 |
+| 1e | an added `uname -n` line in npt-s14's kernel.txt block | the pin test ("kernel.txt's sources ... goes to Mustafa first") | npt-s14 0c62ea52...9e1d |
+| 1e | a hardware address in probe.py | the pin test ("probe.py's addresses ...") | probe.py 65020716...0434 |
+| 2 | the re-read line set back to `config --get core.hooksPath` | the list test (the SR-1 message) | PROMPT-R1.md f981d0b6...13da |
+
+**For the round (section 5: security-auditor at xhigh; then the advisor's head read)**: the new PROMPT-R1.md step 2 and
+R1.md lines (section 2 step 6; section 7's new bullet), r1.sh's two prints (probe_presence's P1 lines; ds_selftest's
+ws_split.txt, through logq's `-`), and s14.test.mjs's pin test.
+
+**Open**
+- For Mustafa at Stop B (he approves both files by hand): R1.md's s14 sentence goes beyond the brief's words in two
+  ways, each to make it true: it names `attempts` (r1.sh's block start writes `attempt <n> <UTC time>` into the
+  folder; C6's list leaves it out), and it adds what the folder really holds beside the brief's list (netem's settings,
+  the cc names and errors, the attempt and browser-leg times, the run standings).
+- Low: logq does not guard a JSON line that is not an object; at ds_selftest's end such a line would make a finished
+  block read stopped. npt-log writes objects only.
+- On a block's re-run, ws_split.txt and presence.txt hold the last attempt only (the raw tarball keeps all).
+- Not verified here: the re-read line on Git for Windows (Stop B's laptop read is that check); a real PowerShell save
+  in UTF-16 (the in-memory buffer stands for it); browser.test.mjs (no packages in this worktree).
+- The scratch files stay: .checkpoints/netcode-proof-test/u8-f1/ (drafts.md, list-draft.test.mjs, pin-draft.test.mjs,
+  hooks-proof.mjs, missing-log.mjs); the worktree's .gate/u8-f1/ (hooks-proof-1/, s14-fixture/) is not snapshotted.
+DONE

@@ -1,21 +1,129 @@
-# MAIN-68: take main 2671595 (#70, #73, #74, #76) into the lane: the plan, rev 3
+# MAIN-68: take main b9aad01 (#70, #73, #74, #76, #77, #75) into the lane: the plan, rev 4 (rev 3 as checked)
+Rev 4 (2026-11-26 20:1x UTC) is rev 3 (sha256 a6ff0bc46fcfa5552209e9094fc0f4ed5176d5807515ea86eb2e26578104274a, on
+2671595) with C68B-1 to C68B-6 applied word for word: advisor-main-68b.md, APPROVE WITH CONDITIONS for main's tip
+b9aad01954be666340a7ec5c6e9fc9353b11abf1 (20:0x UTC). No new check; step 7's read of the pushed head stays. Where a rev 3
+line below differs from "As checked", "As checked" governs.
 Rev 3 brought up 2026-11-26 18:4x-18:5x UTC: main moved after rev 2 by one docs-only merge, #76 (MAIN-WALL's record,
 18:00:25 UTC), so rev 2's "Order" applies ("if main moved, this plan is brought up first, then checked"). Rev 2 (16:5x-17:2x
 UTC, on 3b949c1, sha256 20d27df93c27d79bffa29c8e401ebc8c54763ed08430a5def4534638d2e13832) brought rev 1 up by R68-1 to
 R68-8 (advisor-main-68.md). Rev 1 (12:5x UTC, on 2483e9a, sha256 e0bb8c75…2eca24) was REVISE: main moved after it was
 written. Its check: advisor-main-68b.md.
 
-## What rev 3 changes (everything else is rev 2's text)
-- Main's tip 2671595fc823750a83c58f5b5b122128eb500387 in C4, C5 (a), step 4's parents and step 6. Its CI: gate run
-  45872417625, toolchain run 45872417457 (job 140090951266, step 7's baseline).
-- #76 in "Why", the merge messages and "On record": 8 docs paths (7 M, 1 A), no kit, CI, code, spike, ADR or design path.
-- The counts: 47 paths (A 24, M 23; were 45, A 23, M 22): main-wall.md added and TECHNICAL.md modified; the shortstats; main's
-  STATUS.md at 120 lines (was 125); refs at 5d = N0 + 24; step 2's staged 45 (A 24, M 21).
-- C6 re-derived on the new trial tree. STATUS.md: #76 moved the ci-preview-handover and guard-wrappers rows that rev 2
-  kept to main's archive (its STATUS.md:6), and added MAIN-WALL's row. STATUS_ARCHIVE.md: main added a MAIN-WALL bullet
-  above the guard-wrappers one. C2 (b)'s 45-file line measured on the trial tree (Facts).
-- Builder 2's merge landed first (48efc9c, pushed 23e9e92), as "Order" allowed: H0 is past it.
-- New Q5 (the wall bullet's screenshot line).
+## As checked: C68B-1 to C68B-6 (advisor-main-68b.md section 2), word for word; P-2 and the Q answers in its section 3
+- **C68B-1 (Medium): the procedure.** Replace rev 3's "Order" first bullet with:
+
+  "This plan's check binds the tip it reads (advisor-main-68b.md: b9aad01). Step 1 starts as soon as the check's values
+  are in this plan, in the same window. At step 1, after `git fetch origin` in its own call, C4 reads origin/main:
+  - equal to b9aad01954be666340a7ec5c6e9fc9353b11abf1: go on.
+  - moved: classify the new first-parent merges by P-2 (advisor-main-68b.md section 3). Under P-2 (a), re-derive and
+    tell him in one line. Under P-2 (b), stop before step 2 for a new check, which reads only the new merges and binds
+    the new tip.
+
+  In step 2, before the merge and in its own call: `git rev-parse origin/main` prints the bound tip; otherwise stop
+  before step 2."
+- **C68B-2 (High): the values for b9aad01.** They replace rev 3's "What rev 3 changes", the Facts' counts and "The
+  numbers". Each one equals my reading in section 4.
+  - **C4.** origin/main = b9aad01954be666340a7ec5c6e9fc9353b11abf1. Main's push runs, attempt 1, all success:
+    - gate 45879443239 (gate 140114837556, smoke 140114837338);
+    - toolchain 45879443258 (job 140114848934).
+
+    #77's runs on 47bb79e were cancelled by #75's push; only the tip's runs count.
+  - **First-parent 07d673b..b9aad01:** #70 2483e9a, #73 4a62873, #74 3b949c1, #76 2671595, #77 47bb79e, #75 b9aad01.
+    The merge base is 07d673b.
+  - **C1 (c).** `git diff --name-only H0 HEAD` equals `git diff --name-only 07d673b origin/main`: 87 names, A 60, M 27,
+    no D or R, all 100644.
+    - Whole: "87 files changed, 51544 insertions(+), 271 deletions(-)".
+    - Without docs/STATUS.md and docs/STATUS_ARCHIVE.md: "85 files changed, 50926 insertions(+), 223 deletions(-)" (both
+      pairs).
+    - STATUS.md 46/46, STATUS_ARCHIVE.md 572/2.
+    - docs/ against main: the usual six names.
+  - **C1 (a), (b), 5d:** refs = N0 + 60.
+  - **Step 2:** `UU docs/STATUS.md`, `UU docs/STATUS_ARCHIVE.md`, and main's other 85 paths staged (A 60, M 25).
+  - **C2 (a):** "beyond main's 87".
+  - **C2 (b):** the 85-file line, then the anchor as rev 3 gives it. T is from H0 (6497e29d on HEAD 07cb835; not
+    bound). T's bar adds "and one `<<<<<<<` line in each of the two files (`git grep -c -E '^<<<<<<<' T --
+    docs/STATUS.md docs/STATUS_ARCHIVE.md`)".
+  - **C5 (a):** rev 3's resume line, with b9aad01954be666340a7ec5c6e9fc9353b11abf1 in place of 2671595's full SHA, and
+    "HEAD^2 is b9aad01" in place of "HEAD^2 is 2671595".
+  - **5a-5c and 5e:** as rev 3. #75 and #77 change no .claude/, tools/ or .github/ file, so 5e expects 1,551 and the
+    checkpoint tests 33.
+  - **Step 6's toolchain on PR #40** also runs #75's tests:
+    - the content crate's own tests;
+    - devtools' content proofs, fuzz, time unit, aim reach and dependency rules;
+    - sim's rules scan;
+    - the client scripts' two tests;
+    - the e2e content spec under tests/rules/ (Chromium, and Firefox by #74);
+    - the sim-worker content and plain-file boundary tests.
+
+    On main this job took 18:53:35-19:03:18, its build-and-test step 9 min 20 s of the job's 15.
+  - **Step 7's baseline:** job 140114848934, by M67-3's list. #74's two steps were skipped on main (its steps 11-12),
+    so rev 3's own bar for them stands.
+  - **M65-2's fallbacks:** refs = H0's tree count + 60, with `--diff-filter=A H0 HEAD` naming main's 60. The staged
+    tally equals `git diff --name-status 07d673b origin/main` (87, A 60, M 27). STATUS.md's line count is main's (120
+    today), with no tolerance.
+  - If a value that does not depend on H0 reads otherwise at step 1 on b9aad01, stop before step 2; the advisor rules.
+    The values that depend on H0 are T, its line numbers, N0, M0, S0 and R0.
+- **C68B-3 (Medium): DEP-HOLD** (the request's item 1). Replace the Facts' DEP-HOLD line with:
+
+  "DEP-HOLD: main changes three dependency files, Cargo.lock (5/2), crates/content/Cargo.toml (new, 13 lines) and
+  crates/devtools/Cargo.toml (3/2), all #75's. This branch changes none of them (`git diff --name-only 07d673b H0 --
+  Cargo.toml Cargo.lock crates packages package.json package-lock.json` prints nothing), so after the merge each equals
+  main's byte for byte. DEP-HOLD's own exception covers that: 'A manifest or lockfile is not held when its content in
+  the push equals its content on main (origin/main as last fetched)' (.claude/CHECKPOINTS.md §3;
+  checkpoint.mjs:23-24, :135). That is MAIN-66's precedent (#68's manifests, main-66-plan.md:95-99). No
+  dependency-check.md line is written for main's files. No registry package enters: Cargo.lock's diff adds only the
+  path crate `content` (no `source` or `checksum` line) and changes devtools' dependency list. Before step 6's save, in
+  its own call, `git diff --quiet origin/main HEAD -- Cargo.lock Cargo.toml crates packages package.json
+  package-lock.json` exits 0. If the save still reports a held file (exit 1, 'NOT pushed'), stop: no record is written,
+  and the advisor rules. That can happen if origin/main moved locally after step 1."
+- **C68B-4 (Medium): C6 as a rule with derived bars** (the request's item 2), in place of rev 3's C6 and step 3:
+  - **Preconditions, read at step 1 on T (each alone):**
+    - `git diff --numstat 07d673b H0 -- docs/STATUS.md` prints "1 1", and its two lines are #40 rows;
+    - `git diff --name-only -G'^[|] #40 [|]' 07d673b origin/main -- docs/STATUS.md` prints nothing (main's own #40 row
+      unchanged);
+    - each of the two files has one block in T (C68B-2's count);
+    - in the archive's block, ours' side is H0's netcode proof test bullet (its lines are + lines of `git diff -U0
+      07d673b H0 -- docs/STATUS_ARCHIVE.md`), and main's side holds only main's + lines since 07d673b.
+
+    A miss stops before step 2.
+  - **STATUS.md, the rule:** the block becomes main's side, with main's #40 row replaced by H0's #40 row byte for byte;
+    nothing else changes. (Today that means: keep T's :35, then :39 and :40, the MAIN-WALL and #75 rows; drop :36,
+    ci-after-3a's row, which main moved, and :38, main's #40.)
+  - **STATUS_ARCHIVE.md, the rule:** the block becomes main's side as main has it, then ours' side (H0's bullet) byte
+    for byte; only the three marker lines go. That is main's first: see Q1. (Today: T's :2396-2420, then
+    :2386-2394.)
+  - **The bars, after `git add docs/STATUS.md docs/STATUS_ARCHIVE.md`, each alone:**
+    - the marker grep prints nothing;
+    - `wc -l docs/STATUS.md` equals `git grep -c "" origin/main -- docs/STATUS.md` (120 today);
+    - `git diff --cached --numstat origin/main -- docs/STATUS.md` prints "1 1", and `git diff --cached -U0 origin/main
+      -- docs/STATUS.md` shows main's #40 row out and H0's in;
+    - `git diff --cached --numstat origin/main -- docs/STATUS_ARCHIVE.md` equals `git diff --numstat 07d673b H0 --
+      docs/STATUS_ARCHIVE.md` (18 5 today);
+    - `wc -l docs/STATUS_ARCHIVE.md` equals main's count plus H0's added minus its removed (2720 + 13 = 2733 today);
+    - `git diff --cached -U0 origin/main -- docs/STATUS_ARCHIVE.md` holds exactly the + and - lines of `git diff -U0
+      07d673b H0 -- docs/STATUS_ARCHIVE.md`, positions aside.
+
+    A miss stops; the merge stays; the advisor rules.
+- **C68B-5 (Low): the reason, the record and his line.**
+  - "Why" adds:
+    - #77 (47bb79e, 18:52:17 UTC): docs only, merged by the PR Advisor routine (its message);
+    - #75 (b9aad01, 18:53:13 UTC): code, manifests and docs. It comes in with main's tip, by the only merge form the
+      guard passes.
+  - On record for #75:
+    - its merge message holds only its title;
+    - main's STATUS row still reads "#75 (draft) … his go for the head the advisor agent approves";
+    - its pull request body names the advisor agent's APPROVE of head 2542b1a and says "A merge happens only on
+      Mustafa's go in the builder chat, for the head above";
+    - GitHub shows it merged at 18:53:15 UTC by Mergincanli with head 2542b1a.
+
+    His go is lane 1's record, not on file here. The take-in takes main as it is.
+  - The record line names all six: "main b9aad01 taken in (#70, #73, #74, #76, #77 and #75 in one merge: his word of
+    12:21 UTC for #70; the rest with main's tip, by the only merge form the guard passes), plan first (MAIN-68)". His
+    one line in msg-2026-11-27.md names the same six.
+- **C68B-6 (Low): rev 3's Q answers bind as section 3 gives them:** Q1's order, in C68B-4; Q2's addition; Q4's limit;
+  Q5.
+- The values file main-68-rev4-values.md (the main session's own reading of b9aad01, 19:5x-20:0x UTC) agrees with every
+  value both name; C68B-2 governs.
 
 ## Why (R68-2)
 MAIN-52 calls for it. Main moved from 07d673b (MAIN-67's) to 2671595 by four merges, and each of the first three alone
@@ -23,7 +131,10 @@ calls for a take-in:
 - #70 changes code (crates/, packages/);
 - #73 changes rules (two kit files: the day guard and its tests);
 - #74 changes CI (.github/workflows/toolchain.yml) and code outside spikes/ (packages/e2e/playwright.config.ts);
-- #76 changes docs .md files only (MAIN-WALL's record of main's wall and his decisions).
+- #76 changes docs .md files only (MAIN-WALL's record of main's wall and his decisions);
+- #77 (47bb79e, 18:52:17 UTC): docs only, merged by the PR Advisor routine (its message);
+- #75 (b9aad01, 18:53:13 UTC): code, manifests and docs. It comes in with main's tip, by the only merge form the guard
+  passes. (C68B-5; on record for #75: C68B-5 in "As checked".)
 
 His word of 12:21 UTC (history.md:8068-8088), "#70 ... merges today and needs a full take-in", names #70 only. #73, #74
 and #76 come in with main's tip, because step 2's `git merge origin/main`, the only form the guard passes in the main
@@ -125,8 +236,18 @@ start their own command, with no other program in front of them.
   ':(exclude)*.md'` names kept-logs.mjs and its test only. Untracked: `git ls-files --others --exclude-standard -- crates
   packages docs .claude .github` prints nothing. Free disk 7,708 MiB at 18:5x UTC (13,733 before NB2's full check run,
   18:05-18:29); the light runs need 4,096 (main-66-plan.md:120-121).
-- DEP-HOLD: no Cargo.toml, Cargo.lock, package.json or package-lock.json among the 47. Nothing under spikes/, docs/adr/
-  or docs/design/ (no `| PM-` row moves).
+- DEP-HOLD: main changes three dependency files, Cargo.lock (5/2), crates/content/Cargo.toml (new, 13 lines) and
+  crates/devtools/Cargo.toml (3/2), all #75's. This branch changes none of them (`git diff --name-only 07d673b H0 --
+  Cargo.toml Cargo.lock crates packages package.json package-lock.json` prints nothing), so after the merge each equals
+  main's byte for byte. DEP-HOLD's own exception covers that: 'A manifest or lockfile is not held when its content in
+  the push equals its content on main (origin/main as last fetched)' (.claude/CHECKPOINTS.md §3;
+  checkpoint.mjs:23-24, :135). That is MAIN-66's precedent (#68's manifests, main-66-plan.md:95-99). No
+  dependency-check.md line is written for main's files. No registry package enters: Cargo.lock's diff adds only the
+  path crate `content` (no `source` or `checksum` line) and changes devtools' dependency list. Before step 6's save, in
+  its own call, `git diff --quiet origin/main HEAD -- Cargo.lock Cargo.toml crates packages package.json
+  package-lock.json` exits 0. If the save still reports a held file (exit 1, 'NOT pushed'), stop: no record is written,
+  and the advisor rules. That can happen if origin/main moved locally after step 1. (C68B-3.) Nothing under spikes/ or
+  docs/design/; docs/adr/README.md 8/6 (#75), no `| PM-` row moves.
 
 ## On record (R68-5)
 - R4-1 (Critical) is open on main by his R4-END (1). #73's report: "one more spelling hides git, gh or xargs from the
@@ -173,37 +294,34 @@ form is tried.
    (below); the base light run into .gate/main-68/light-base.log (run_in_background, timeout 7200000), giving N0, M0 and
    the self count.
 2. Named in the chat first (M66-2): `git merge origin/main`. It writes into .claude/hooks/ and .github/workflows/.
+   - Before the merge, in its own call (C68B-1): `git rev-parse origin/main` prints
+     b9aad01954be666340a7ec5c6e9fc9353b11abf1; otherwise stop before step 2.
    - Refused before git runs: prove nothing changed (no MERGE_HEAD, HEAD = H0, status shows only notes lines), try no
      other form, wording or worktree, restart the saver, and tell him the one command with options (a) approve it in a
      prompt or (b) wait, my lean (a). A prompt: he answers it.
    - Expected: exit 1, "CONFLICT (content): Merge conflict in docs/STATUS.md" and "CONFLICT (content): Merge conflict in
      docs/STATUS_ARCHIVE.md", no other CONFLICT line. `git status --short` shows `UU docs/STATUS.md`, `UU
-     docs/STATUS_ARCHIVE.md`, and main's other 45 paths staged (A 24, M 21).
+     docs/STATUS_ARCHIVE.md`, and main's other 85 paths staged (A 60, M 25) (C68B-2).
    - From the next call on, #73's rules check this session's calls.
-3. Resolve by Edit, each kept line word for word from its side (C6):
-   - STATUS.md: this branch's #40 row, then main's MAIN-WALL row. The ci-after-3a row and main's #40 row go.
-   - STATUS_ARCHIVE.md: this branch's netcode proof test bullet (9 lines), then main's MAIN-WALL bullet (14 lines) and
-     guard-wrappers bullet (11 lines), as main has them. Only the three marker lines go.
-   - Then the marker grep (nothing) and `wc -l docs/STATUS.md`: exactly 120, before `git add docs/STATUS.md
-     docs/STATUS_ARCHIVE.md`.
-   - After the add: `git diff --cached --numstat origin/main -- docs/STATUS.md` prints "1 1" (the line out is main's
-     #40, its 2026-11-14 text; the line in, H0's #40 row).
-   - `git diff --cached --numstat origin/main -- docs/STATUS_ARCHIVE.md` is expected at "18 5" (H0's own `git diff
-     --numstat 07d673b H0 -- docs/STATUS_ARCHIVE.md`). That is a prediction; the content check governs: `git diff
-     --cached -U0 origin/main -- docs/STATUS_ARCHIVE.md` shows only H0's own changes, the bullet's nine lines word for
-     word among them.
-4. `git commit --no-edit`: two parents, H0 and 2671595, git's own message (the card save carries the attribution lines).
+3. By C68B-4 ("As checked"), in place of rev 3's step 3: by Edit, STATUS.md's block becomes main's side with main's #40
+   row replaced by H0's #40 row byte for byte; STATUS_ARCHIVE.md's block becomes main's side as main has it, then H0's
+   bullet byte for byte; only the three marker lines go in each. Then `git add docs/STATUS.md docs/STATUS_ARCHIVE.md`
+   and C68B-4's bars, each alone. Today's lines on T (re-derived at step 1): STATUS.md keep :35, then :39 and :40, drop
+   :36 and :38; STATUS_ARCHIVE.md :2396-2420, then :2386-2394.
+4. `git commit --no-edit`: two parents, H0 and b9aad01, git's own message (the card save carries the attribution lines).
 5. a-c as written: GATE PASS (`--no-smoke`); "repo map OK", its two numbers recorded; the checkpoint tests pass, 0 fail,
    the count recorded (33 at MAIN-66; main changes no .claude/scripts/ file).
    - d: the light run (run_in_background): every count equals the base run's word for word, except HEAD, and refs =
-     N0 + 24.
+     N0 + 60 (C68B-2).
    - e: `node --test .claude/hooks/routine-guard.test.mjs` (main's file now), in M66-3's form (in the background,
      timeout 1800000; its summary lines by Write into .gate/main-68/step5-outputs.txt). The bar: 0 fail, the count
      recorded. Expected 1,551 (#73's report, "Evidence": "1247 on main → 1437 → 1490 → 1499 → 1551/1551"; main's STATUS
      row "guard tests 1551/1551"; #76 changes no .claude/ file). Another total with 0 fail, while `git diff --quiet
      origin/main HEAD -- .claude/` exits 0, is recorded and goes on (M65-2); any fail stops.
-6. As written: main's CI on 2671595 read again; the card save pushes (`wc -l` on the card first: 200 or fewer); CI on
-   the pushed head, push and pull request: gate (gate, smoke) and toolchain green.
+6. As written: main's CI on b9aad01 read again; before the save, in its own call, C68B-3's `git diff --quiet origin/main
+   HEAD -- Cargo.lock Cargo.toml crates packages package.json package-lock.json` exits 0; the card save pushes (`wc -l`
+   on the card first: 200 or fewer); CI on the pushed head, push and pull request: gate (gate, smoke) and toolchain
+   green, toolchain with #75's tests too (C68B-2's list).
    - Toolchain now also runs #70's tests (devtools' recording, replay, two-instance and two-process tests; sim-worker's
      recording and replay boundary tests; the e2e replay spec in Chromium and, by #74, in Firefox).
    - #74's two steps have their own bar, since main skipped them: on PR #40's pull-request toolchain run both succeed,
@@ -212,11 +330,11 @@ form is tried.
      advisor.
    - The saver restarts here, both trailers.
 7. The advisor's check of the pushed head by SHA (MAIN-65 step 7's form): new agent work, in the next reset's first 30
-   minutes unless it rides an agent already running. Its toolchain baseline: main's run 45872417457, job 140090951266,
+   minutes unless it rides an agent already running. Its toolchain baseline: main's run 45879443258, job 140114848934,
    compared line for line as M67-3 gives it (the `test result:` lines, the vitest `Test Files` lines, and every
    Playwright "passed" line, Chromium and Firefox); #74's two steps by step 6's bar.
 
-## The numbers (in place of MAIN-66's and MAIN-67's)
+## The numbers (in place of MAIN-66's and MAIN-67's; for b9aad01 C68B-2 governs every value here, and rev 3's 2671595 values left below are the record only)
 - C1 (a), (b), 5d: the base run gives every count (refs N0, the full marks line, self S0 of S0, redact R0 of R0 with M0
   items, 0 findings); 5d equals them word for word, except HEAD, and refs = N0 + 24.
 - C1 (c):
@@ -244,42 +362,42 @@ form is tried.
   step 2. T goes into this section by Edit before step 2 (cf3bde59 on HEAD 590246f at this revision; not bound).
 - C2 (c), C3: no builder runs on the lane. U8-F1's builder, if resumed, works in its own worktree and runs no cargo; its
   hand-back is only read until the push.
-- C4: after `git fetch origin` in its own call, origin/main must be 2671595fc823750a83c58f5b5b122128eb500387. Main's CI
-  is its own push runs: gate 45872417625 (gate 140090952092, smoke 140090951826) and toolchain 45872417457
-  (140090951266), all completed with success. A further move stops before step 2 (advisor-main-65.md:113-114), unless
-  the check's answer to Q3 lets it be re-derived.
+- C4: after `git fetch origin` in its own call, origin/main must be b9aad01954be666340a7ec5c6e9fc9353b11abf1. Main's CI
+  is its own push runs, attempt 1, all success: gate 45879443239 (gate 140114837556, smoke 140114837338) and toolchain
+  45879443258 (job 140114848934); #77's runs on 47bb79e were cancelled by #75's push, and only the tip's runs count. A
+  further move: C68B-1 and P-2 (advisor-main-68b.md section 3). (C68B-2.)
 - C5 (a), the resume line, word for word: "MAIN-68 approved (advisor-main-68b.md), running steps 1-7. If `git rev-parse
-  -q --verify MERGE_HEAD` prints 2671595fc823750a83c58f5b5b122128eb500387, the merge is in progress: no save, no `git
+  -q --verify MERGE_HEAD` prints b9aad01954be666340a7ec5c6e9fc9353b11abf1, the merge is in progress: no save, no `git
   merge --abort`, no reset. If `git diff --name-only --diff-filter=U` names docs/STATUS.md or docs/STATUS_ARCHIVE.md,
-  resume at step 3; otherwise resume at step 3's checks before the commit (C2 (b)), then step 4. If HEAD^2 is 2671595
+  resume at step 3; otherwise resume at step 3's checks before the commit (C2 (b)), then step 4. If HEAD^2 is b9aad01
   and HEAD is not on the remote yet, resume at step 5. advisor-main-68b.md and this card may show unstaged: leave them;
   step 6's card save takes them. U8-F1's builder works in its own worktree: nothing of it shows here. Anything else: the
   advisor rules."
 - C5 (b): the saver running then is stopped by TaskStop at step 1, with its proof; it restarts at step 6.
-- C6:
-  - STATUS.md's block is merged lines 34-40 (`<<<<<<< HEAD` :34, `=======` :37, `>>>>>>> origin/main` :40). Keep :35
-    (ours #40, the 2026-11-15 text) and :39 (main's MAIN-WALL row), in that order. Drop :36 (ci-after-3a's row) and :38
-    (main's #40, the 2026-11-14 text).
-  - STATUS_ARCHIVE.md's block is merged lines 2216-2252 (`<<<<<<< HEAD` :2216, `=======` :2226, `>>>>>>> origin/main`
-    :2252). Keep :2217-2225 (ours, the netcode proof test bullet), then :2227-2251 (main's MAIN-WALL and guard-wrappers
-    bullets). Drop only the three marker lines.
-  - The line numbers are re-derived on step 1's tree T (from H0) if they move; the rows and bullets stay as named.
+- C6: by C68B-4 ("As checked"), in place of rev 3's C6: its preconditions read at step 1 on T, its rule for each file,
+  its bars after the add.
 - Step 7's toolchain baseline: run 45872417457, job 140090951266 (M67-3's list), and step 6's bar for #74's two steps.
 - M65-2's fallbacks stand with these values: refs at 5d = H0's tree count + 24, with `git diff --name-only
   --diff-filter=A H0 HEAD` listing main's 24 added names; the staged tally `git diff --cached --name-status H0` = `git
   diff --name-status 07d673b origin/main` (47 paths, A 24, M 23); STATUS.md's 120 with no tolerance.
 
 ## Order with the rest of the day
-- This plan's check (advisor-main-68b.md) is new agent work: in the 19:50 UTC window, by resuming the advisor that
-  checked rev 1 (it holds #70's half), reading only #73's, #74's and #76's halves and the new numbers. Just before its
-  launch: `git ls-remote origin refs/heads/main`; if main moved, this plan is brought up first, then checked.
+- This plan's check binds the tip it reads (advisor-main-68b.md: b9aad01). Step 1 starts as soon as the check's values
+  are in this plan, in the same window. At step 1, after `git fetch origin` in its own call, C4 reads origin/main:
+  - equal to b9aad01954be666340a7ec5c6e9fc9353b11abf1: go on.
+  - moved: classify the new first-parent merges by P-2 (advisor-main-68b.md section 3). Under P-2 (a), re-derive and
+    tell him in one line. Under P-2 (b), stop before step 2 for a new check, which reads only the new merges and binds
+    the new tip.
+
+  In step 2, before the merge and in its own call: `git rev-parse origin/main` prints the bound tip; otherwise stop
+  before step 2. (C68B-1.)
 - Steps 1-6 after the check, when no other merge runs. Builder 2's merge landed first (48efc9c, 18:02 UTC; pushed
   23e9e92), so H0 is past it, and this plan's anchor and counts are re-derived from H0 at step 1. U7's merge comes after
   this one (U7-M-1); its check.mjs whole run needs the part-clean first (8,192 MiB; 7,708 free at 18:5x).
 - Step 7 in the window after step 6, unless it rides an agent then running.
-- The record, under "Choices taken without him": "main 2671595 taken in (#70, #73, #74 and #76 in one merge: his word of
-  12:21 UTC for #70; #73, #74 and #76 with main's tip, by the only merge form the guard passes), plan first (MAIN-68)",
-  named in msg-2026-11-27.md with all four pull requests.
+- The record, under "Choices taken without him": "main b9aad01 taken in (#70, #73, #74, #76, #77 and #75 in one merge:
+  his word of 12:21 UTC for #70; the rest with main's tip, by the only merge form the guard passes), plan first
+  (MAIN-68)". His one line in msg-2026-11-27.md names the same six. (C68B-5.)
 
 ## Questions for the checker
 - Q1: STATUS_ARCHIVE.md's block: both sides added under "## Open bugs and risks". Is ours then main's (git's order)
