@@ -9,6 +9,10 @@ use wasm_bindgen::prelude::*;
 // Linked whole, so that its start function installs the real hook and `panic_buffer` is an export of this module.
 use sim_wasm as _;
 
+use crate::content_proofs;
+use crate::files::vector_text;
+use crate::recording::{Recording, hashes_text};
+use crate::replay::replay;
 use crate::rules::{f32_ops, stream};
 
 /// The float vectors (PM-0004-22): an empty text when every operation gives the exact reference's results and
@@ -25,6 +29,82 @@ pub fn f32_vectors(inputs: &[u8], expected: &str) -> String {
 #[must_use]
 pub fn chacha8_vectors(file: &[u8]) -> String {
     stream::check(file).err().unwrap_or_default()
+}
+
+/// Reads a recording for the two calls below; a refusal comes back as a text that starts with `error: `.
+fn read_recording(bytes: &[u8]) -> Result<Recording, String> {
+    Recording::decode(bytes).map_err(|error| format!("error: {error}"))
+}
+
+/// The hashes file this module gives for a recording, both columns: the same runner as the native one, compiled to
+/// WebAssembly. The whole-state column is why it lives here and not on the players' file, which gives the shared
+/// hash only.
+#[wasm_bindgen]
+#[must_use]
+pub fn replay_hashes(recording: &[u8]) -> String {
+    let replayed = read_recording(recording)
+        .and_then(|read| replay(&read).map_err(|error| format!("error: {error}")));
+    match replayed {
+        Ok(lines) => hashes_text(recording, &lines),
+        Err(why) => why,
+    }
+}
+
+/// The vector file's text for `tick` as this module gives it (`files::vector_text`): the state as lines, one named
+/// field each (the seed is never among them), then the shared state's bytes and their hash. Compared line by line
+/// with the native text, it shows which fields two targets disagree on.
+#[wasm_bindgen]
+#[must_use]
+pub fn replay_state_at(recording: &[u8], tick: u32) -> String {
+    let text = read_recording(recording)
+        .and_then(|read| vector_text(&read, tick).map_err(|error| format!("error: {error}")));
+    text.unwrap_or_else(|why| why)
+}
+
+/// The content reader's proofs (content items 1 and 2), each as the native tests run it, each an empty text when it
+/// holds or what differs when it does not. The number corpus: the reader's bits and the writer's text against a
+/// browser engine's own, number by number.
+#[wasm_bindgen]
+#[must_use]
+pub fn content_corpus(corpus: &str) -> String {
+    content_proofs::corpus_check(corpus)
+}
+
+/// The tree corpus: the canonical writer's text against the engine's `JSON.stringify` with sorted keys.
+#[wasm_bindgen]
+#[must_use]
+pub fn content_trees(trees: &str) -> String {
+    content_proofs::trees_check(trees)
+}
+
+/// The classes of broken files and the fuzz run's first inputs, judged here and compared with the committed
+/// digests of the native verdicts: record for record, messages included.
+#[wasm_bindgen]
+#[must_use]
+pub fn content_verdicts(expected: &str) -> String {
+    content_proofs::verdicts_check(expected)
+}
+
+/// The inputs that lean on the loader's caps, each against its verdict; whoever calls it reads the clock and the
+/// module's memory.
+#[wasm_bindgen]
+#[must_use]
+pub fn content_limits() -> String {
+    content_proofs::limits_check()
+}
+
+/// The state hash's function over `length` bytes, `rounds` times over: for the reading of its cost in WebAssembly
+/// (PM-0004-21's report), timed by whoever calls it. It returns the digests folded together.
+#[wasm_bindgen]
+#[must_use]
+pub fn fnv1a_64_rounds(length: u32, rounds: u32) -> u64 {
+    // At most 16 MiB, so no length can ask for more memory than a reading needs, and no product can overflow.
+    let bytes: Vec<u8> = (0..length.min(1 << 24))
+        .map(|at| (at * 31 % 251) as u8)
+        .collect();
+    (0..rounds).fold(0, |folded, round| {
+        folded.rotate_left(1) ^ sim::state_hash::fnv1a_64(black_box(&bytes)) ^ u64::from(round)
+    })
 }
 
 /// PM-0002-53's planted counter: a plain `+`, which panics past the counter's end in every build.

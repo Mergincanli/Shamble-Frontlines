@@ -109,6 +109,59 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     added only with his yes to its exact text (the entry "Taken by Mustafa, 2026-11-17, 10:43:48 UTC: RECS-1043, his
     answer to the session's recommendations; for main: DOCS-54 (a), NS-TRAILER (b) and NS-FIRST (b)", the question
     shown under it as the session's text). This item leaves "Queued" when the change-set that carries it out merges.
+  - The Guard fix chat's queue (session_019YNMUUc6oiiNVygR9H56Q7; each message whole under "Decisions, newest first",
+    copied by script from its saved file in `.checkpoints/guard-wrappers/` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd)), in his
+    order of 2026-11-26, 14:09:28 UTC (item 4), which also adds SOURCE-GO (a) to the review tracks:
+    > 4. Order after this merge: MAIN-WALL first, because it is the wall behind the guard and the preview links' token sitting waits for it. Then one guard change-set with R4-1's fix and GUARD-KIT together. Then the review tracks, which also get one more line: a change under content/source/ needs my go (SOURCE-GO (a)). If security-auditor says R4-1 cannot wait behind MAIN-WALL, tell me why in two lines before you start, and I decide.
+    - _Pointer (not his words): MAIN-WALL is carried out by the change-set MAIN-WALL (the wall on main since 2026-11-26,
+      about 17:15 UTC, by his own click), so it leaves "Queued" at that change-set's merge; his words for it stand under
+      "Decisions, newest first" (2026-11-25, 19:36:42 UTC, items 2 and 3; 2026-11-26, 12:24:26 UTC, item 1, and 14:09:28
+      UTC, item 6). His SPEED-ORDER (b) (2026-11-26, 17:37:10 UTC, the entry under "Decisions, newest first") puts the
+      review tracks before the guard change-set, so the two items below stand in that order, and the review-tracks
+      brief's line that the second guard change-set "still goes first" yields to it._
+    - The review tracks and who merges (his brief of 2026-11-25, 17:28:24 UTC, whole), with SOURCE-GO (a) (his item 4 of
+      2026-11-26, 14:09:28 UTC, above). What its point 3 lists is what that plan proposes, not a rule in force:
+      > FOR THE GUARD FIX CHAT. From Musti, written with my Advisor, 25 November, 18:25 Amsterdam.
+      >
+      > Your next change-set after the second guard change-set: the review tracks and who merges. Risk tier 2. Plan first, and no rule file is edited before my go on the plan. If the second guard change-set has not started, it still goes first.
+      >
+      > 1. My words, saved by script and recorded word for word in docs/DECISIONS.md with this change-set.
+      > From my walk of 25 November:
+      > "Light review track by default. Exceptions that always get the full checks: netcode, the Rust core, server code, anything anti-cheat."
+      > "The rule lives in the repo files, not in a label someone picks."
+      > "Less process on small changes, so I see visible progress sooner."
+      > From my reply of 25 November, evening:
+      > "My eyes only where it shows: I only check pull requests that change what I see on screen. Everything else merges on green checks plus your review; V4 merges its own."
+      > What I mean by it: "your review" is my Advisor's merge check. V4 is Builder V4, lane 1's builder chat, and the same holds for every builder chat. "What I see on screen" is today's "anything a player sees, hears or feels".
+      >
+      > 2. Why. Measured by my Advisor from commit times on the last three merged pull requests. Stop 3a (#65): building 2.4 hours, checks 4.0, waiting for me 4.9. Stop 3b (#68): 1.1, 4.9 and 9.2. The guard fix (#69): 0.3, 1.0 and 1.2. Measure them yourself before you quote them.
+      >
+      > 3. What the plan proposes, as the smallest change to CLAUDE.md and the advisor agent's file that does it:
+      > a. The track of a pull request is worked out by a script from the files it touches, never picked by a person or a chat. In doubt it is the full track.
+      > b. LIGHT-DEF (a), what "light" means: the plan and the advisor agent's read of it stay; the gate and CI stay; one review round by the one reviewer that fits, at the repository's default effort; the verifier on the final result; a short report; no second round unless a High or Critical is open.
+      > c. A fifth exception that always gets the full checks: the rule files themselves (CLAUDE.md, .claude/, .github/, the gate files, the guard).
+      > d. CORE-REVIEWERS (a), what "full" means for the Rust core, and for netcode and server code in the game: the test-engineer always, plus at most two more picked by a rule from what the piece touches. The plan writes that rule. At most two rounds, as today. Show whether each High of stops 3a and 3b would have been found or missed under it. The effort of these reviewers stays as in my words of 12 November.
+      > e. Who merges. A pull request that changes nothing a player sees, hears or feels, and meets nothing in f, is merged by the chat that built it, with no go from me, when all of these hold for the same full commit id: gate, smoke and toolchain green; the advisor agent's approval; my Advisor's merge check; and that id passed as the merge's expected head. A later push needs all of them again.
+      > f. EYES-KEEP (a). Three things keep my go even when nothing shows: anything that costs money or cannot be undone; the rule files in c; and a decision of mine that is changed or newly set (a decision draft accepted, a design or look rule, a pass mark). A record of words I typed, copied by script, is not in this list.
+      > g. One table of every reason that makes a pull request "needs-mustafa" today: it stays with me, it moves to my Advisor's merge check, or it goes, each with one line why. Nothing leaves that table silently.
+      >
+      > 4. What the plan answers plainly:
+      > a. How my Advisor's merge check reaches the building chat without my paste. My Advisor proposes one comment on the pull request that names the full commit id and what was checked. And what stops a chat from writing that line for itself: all sessions post as the same GitHub user, so if nothing can stop it, say so, and say what catches it afterwards. My Advisor proposes to compare every merge on main with its own checks at each board check.
+      > b. How the building chat is woken when that check is in, without me.
+      > c. What the PR Advisor routine still does, and what changes in the risk tier table.
+      > d. How a wrong change that shows nothing is caught after the merge. The rollback rule stays as it is.
+      >
+      > 5. Shape. Every changed sentence shown old beside new. Every word of mine that it changes or narrows, listed. The security-auditor and the advisor agent on the plan. Size it bottom-up: rule text, script and tests count, docs and the report do not, as in CAP (a). The stop line is twice that size. If it is more than 150 added lines, show me a smaller version beside it.
+      >
+      > 6. Until this change is merged, today's rules hold in every chat. Until the second guard fix is merged: git and gh always start their own command, with no other program in front of them.
+      >
+      > End with "Decisions needed" and "For Mustafa".
+    - One guard change-set with R4-1's fix and GUARD-KIT together (his message of 2026-11-26, 12:24:26 UTC, item 2, and
+      14:09:28 UTC, item 5; the order, item 4, above). R4-1 stays recorded by its class only (his item 1 of 14:09:28
+      UTC):
+      > 2. GUARD-KIT: (a), a plan-first kit change-set: every chat shows at its start whether the guard is loaded; find out whether an ask in auto mode reaches me at all; a rule that a chat writing this repository holds no second repository. Sources: .checkpoints/step-2-6-previews/questions-2026-11-26-guard.md and build-notes.md sections B15 and B16 on claude/optimistic-albattani-mdoonz.
+      > 5. R4-1's fix, plan first: say whether it can be a rule that fails closed (whatever the guard cannot read with certainty asks me) instead of one more pattern, because four rounds each found one more form.
+    - Each of these two leaves "Queued" when the change-set that carries it out merges.
   - The entries below are pointers to items carried out.
   - STATUS-DIET and LANE-RULES, with his Models addition and ACCOUNTS (his queue of 2026-11-10, items 2 and 3, his
     answers of 07:08:14 UTC and his second message, item 1): carried out by status-diet, so moved from here to
@@ -127,6 +180,451 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-26, 18:16:35 UTC: main moved under pull request #75 (to
+  2671595fc823750a83c58f5b5b122128eb500387, the Guard fix chat's #76), so it cannot merge at 2e282176: the chat takes
+  main in once, with no rebase and no force push; in the four clashing docs files both sides are kept, main's text
+  stays unchanged where a line belongs to another chat, and STATUS ends at 120 lines or fewer; the advisor agent
+  reviews what the take-in changed; a report in three lines; his go follows gate and smoke green on the new head;
+  SIGHT-FLAG (a): not in 4b, with one follow-up line so that Slice 2's plan adds the mark (which things carry it is
+  still open in his rule: fences, and whether shots follow sight); DUR-1 (C): the table value is the rate for now,
+  tuned by play in Testlines, a tuned value reaching the game through his Export; STATUS-LEN (a); WATCH-75: yes; the
+  advisor agent's four conditions for 4b-2 stand, and 4b-2 starts right after the merge with no new word from him**
+  (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat;
+  his label: "FOR BUILDER V4. From Mustafa, 26 November, 19:20 Amsterdam (written with my Advisor)."; message
+  90efc3d2-226c-420e-8cc3-4f04d7944f21, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-26-take-in-76.md` (readable at commit
+  42bfcc4e2a02d245911ca84558c8f0316a56c9db of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's report on change-set 4b-1
+  (pull request #75 at head 2e282176d5401d23aea2476e45f1c331433fa3ea, waiting for his go) and its four questions
+  SIGHT-FLAG, DUR-1, STATUS-LEN and WATCH-75. Copied by script (1863 bytes, sha256
+  cb7c88ca62ab31942558a0baad812401b2e8af8e20960920d9c43929dcf73138):
+> FOR BUILDER V4. From Mustafa, 26 November, 19:20 Amsterdam (written with my Advisor).
+>
+> 1. #75 cannot merge at 2e282176 any more. Main moved at 19:00 to 2671595fc823750a83c58f5b5b122128eb500387 (the Guard fix chat's #76, docs only), and four shared docs files now clash: docs/DECISIONS.md, docs/ROADMAP.md, docs/STATUS.md and docs/STATUS_ARCHIVE.md. My Advisor's merge check of 2e282176 passed on everything else: the changed files, the manifest lines, no notes in the head, the six green checks, my messages word for word in DECISIONS, and the register rows for my vision rule.
+> 2. Take main in once, the way your rules allow, with no rebase and no force push. In those four files keep both sides. Where a line belongs to another chat, main's text stays unchanged. STATUS ends at 120 lines or fewer: main is at 120 now, so fold your own lines by script.
+> 3. The advisor agent then reviews the new head, only what the take-in changed. Report to me in three lines: the new head's full id, the verdict on that id, and that every file outside those four is byte for byte as at 2e282176 or as on main. With gate and smoke green on that id you get my go for it.
+> 4. SIGHT-FLAG: (a). Not in 4b. Keep one follow-up line so that Slice 2's plan adds the mark. Which things carry it is still open in my rule (fences, and whether shots follow sight).
+> 5. DUR-1: (C). The table value is the rate for now, and I tune it by play in Testlines. A tuned value reaches the game through my Export, as before.
+> 6. STATUS-LEN: (a). #76 already did it for the guard and CI lines, which is why main's STATUS is at 120.
+> 7. WATCH-75: yes, subscribe.
+> 8. The four conditions for 4b-2 stand as the advisor agent set them. 4b-2 starts right after the merge and needs no new word from me to start.
+> 9. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 17:37:10 UTC: SPEED-ORDER (b): the review tracks (with SOURCE-GO (a)) come before the guard change-set (R4-1's fix with GUARD-KIT); the queue after MAIN-WALL is now the review tracks, then the guard change-set** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 31a506d9-739f-4757-80ce-4a70f9a81f99, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1837-speed-order.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's question SPEED-ORDER, asked after the wall was on (the chat's text, not his): "should the review tracks come before the guard change-set? (a) keep your order, guard change-set first; (b) review tracks first." His "B" answers it with (b). It changes the order of his item 4 of 2026-11-26, 14:09:28 UTC (below) for these two change-sets, and the line of his review-tracks brief of 2026-11-25, 17:28:24 UTC that the second guard change-set "still goes first" if it has not started ("Queued", above); his interim rule on git and gh stands until R4-1's fix merges. Copied by script (1 bytes, sha256 df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c):
+> B
+- **Taken by Mustafa, 2026-11-26, 17:31:41 UTC: done, and the chat is to send its block to Builder V5** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message de4e9b89-d3ea-4b36-b32f-82d18b26e96d, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1831-builder-sent.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's message it answers is not in the pushed notes; what "done" covers is not recorded here. Copied by script (47 bytes, sha256 6b2ab27b1682a5fe404f0f7f1e407f4e892cf2139f2e629d23c30f4ef1270c02):
+> Okay,
+>
+> done: just send your block to builder v5
+- **Taken by Mustafa, 2026-11-26, 17:27:17 UTC: done, except deleting the throwaway repository (sandbox-1126); he asks whether to delete it now** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 2f215f0d-dfd4-45bd-8228-40c62c019460, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1827-done-all.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's ask it answers is not in the pushed notes; what "done all" covers is not recorded here. Copied by script (62 bytes, sha256 4fa09f1d7576542889ea7bf2f0ea2ff8c446e5eff4ad1678c61446dcee5e8739):
+> done all, except deleting the sandbox.
+> Want me to do that now?
+- **Taken by Mustafa, 2026-11-26, 17:11:23 UTC: WHICH-ACCOUNT, his answer on the Claude accounts (three of his work on the project: two personal, one university); TOKEN-RELEASE (c), with his words on speed; T1E-BEFORE-DELETE (b); CLICK-11-GO (a), his go on adding the wall to this repository; T4-GRADING (a), T4 graded from GitHub's refusal text** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 9d4ec4da-c9b0-46d1-a494-78e936bf6d3b, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1811-answers.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's questions after the two reviews of the throwaway repository's results (its checkpoint, steps 15 and 16): WHICH-ACCOUNT, which Claude account this chat is on, which the chat reads as his first personal account [assumed: from his answer] (the line that starts "WHICH-ACCOUNT:" reads as the chat's question, pasted back by him, and his answer is the line that starts with ">" [assumed: from the form]); TOKEN-RELEASE, when the other lane's token sitting may start, (c): after T10, one day-session merge and one PR Advisor merge under the wall; T1E-BEFORE-DELETE, whether T1e runs before the throwaway repository is deleted, (b): it was not run; CLICK-11-GO, his go on click 11; T4-GRADING, (a): T4 graded from GitHub's refusal text, since his Settings has no Rule Insights page (16:48:48 UTC, below). It replaces T4-BASELINE (b)'s grading by the rule record (16:15:39 UTC, below). The CLAUDE.md lines that say two accounts are unchanged: a follow-up. Copied by script (451 bytes, sha256 6da3951cf33b36fff8cdc87ac6240edc3e00ea7d321e70ed53634cc579cfdb72):
+> WHICH-ACCOUNT: is this chat on your personal or your university Claude account?
+> >My first personal account (I have two) and 1 enterprise (university), so I have 3 accounts working on the project
+> TOKEN-RELEASE: C, but we really need to speed up things, its taking too long and certain manual tasks are literally frustrating, to the point that I am tempted to take the risk without all of these things.
+>
+> T1E-BEFORE-DELETE: b
+> CLICK-11-GO: a
+> T4-GRADING: a
+- **Taken by Mustafa, 2026-11-26, 17:01:04 UTC: his question, in plain terms, on what this chat and the throwaway repository's test chats are for and how they help the project; Builder V5 has waited hours for MAIN-WALL's merge; the work feels to him like stalling** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 1a4fd6e1-bc01-488a-9974-f9a0ddf942b0, his own lines only: the test chat's text he relayed in the same message is left out; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1801-stalling-own-lines.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): nothing the chat asked. Copied by script (401 bytes, sha256 3f6c260703e97c7cc36ada737dffd40776e2a4d5891835215ae422a93206fd7e):
+> Can you in laymen's terms explain me what the purpose of your chat is as Guard fix and what we are currently doing with these test chats (sandbox-1126) and how it contributed to the project.
+> Builder V5 has been waiting for me to tell him untill MAIN-WALL is merged for hours now, and its frustrating that I am doing these things while Builder could've worked on the game.
+> It feels like we're stalling
+- **Taken by Mustafa, 2026-11-26, 16:48:48 UTC: his repository Settings shows no Rules Insights page, only Rulesets: the basis on which T4 was graded from GitHub's refusal text (his T4-GRADING (a), 17:11:23 UTC, above)** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 75e2520d-405d-4b9c-98d3-df127adf48d9, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1748-no-insights.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's ask for the rule record (the rule insights) of the throwaway repository [assumed: from the plan's T4 pass mark; the ask is not in the pushed notes]. Copied by script (80 bytes, sha256 e028f06784325cd521d901848c82fae1202425b55f25240a13060d90801c743b):
+> There is no settings > Rules > Insights
+> There is Rulesets>rulesets (no insights)
+- **Taken by Mustafa, 2026-11-26, 16:46:59 UTC: he will not take again the screenshots that show the rulesets saved (he sent them already, and dislikes these manual tasks); he will add the one of ruleset-1 on gate and smoke** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 4d6c6951-b885-49fa-a13a-579029387c64, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1746-manual-tasks.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's ask for screenshots of the throwaway repository's saved rulesets [assumed: the ask is not in the pushed notes]. Copied by script (191 bytes, sha256 fe1020e50988423bfdbd8e8f44e284b39c3090eda033c93e1a4cbe7bde4172a4):
+> I have already send you the screenshots showing that I had saved it, not gonna do the same task again (I dislike these manual tasks)
+> I will add the one from ruleset-1 regarding gate and smoke
+- **Taken by Mustafa, 2026-11-26, 16:39:33 UTC: his setup clicks on the throwaway repository done and the test chat started for sandbox-1126; a screenshot of the ruleset page added** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message a07f7ff8-f008-4419-a69f-ccccf41f8fc4, his own lines only: the test chat's text he relayed in the same message is left out; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1739-setup-done-own-lines.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the plan's clicks on the throwaway repository (its checkpoint, step 13: clicks 1, 3, 4 and 5 done). Copied by script (112 bytes, sha256 7e9cfb321bebed7f4826f801da3418ab21c90ab5fb354fe2166c6086484390af):
+> done, started the new chat, for sandbox-1126
+>
+> I have also added a screenshot of how the ruleset page looks like
+- **Taken by Mustafa, 2026-11-26, 16:15:39 UTC: PLAN-GO (a), his go on MAIN-WALL's plan; T4-BASELINE (b), no baseline run** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message c2bcfe0c-6bf0-4e92-9139-f348c7ee5820, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1715-plan-go.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's two questions, in this order (its checkpoint, step 11): PLAN-GO, his go on the plan at 149bec7 as revised after the advisor agent's APPROVE; T4-BASELINE, whether the main proof (T4) includes a control with the second ruleset off: (b), no baseline, T4 passing only on the record naming the second ruleset's update rule, else "unproven". T4's grading was later set by his T4-GRADING (a) (17:11:23 UTC, above). Copied by script (3 bytes, sha256 7e18f737311b2dc3b2f269dd78396b0351f14fb66efa879f768cb23181883c78):
+> a
+> b
+- **Taken by Mustafa, 2026-11-26, 16:05:26 UTC: EXCEPTION-SCOPE (d): no exception for his account from today's rule; the plan stands as approved, so his account does not skip gate and smoke; it replaces his request of 15:57:28 UTC (below)** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message bbde400f-a630-4daa-83c9-5dcb65ce32f6, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1705-exception-scope.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's question EXCEPTION-SCOPE after his request of 15:57:28 UTC (its checkpoint, steps 9 and 10): sessions act as his account, so an exception for his account very likely reaches every session too; his (d) is no exception. Copied by script (29 bytes, sha256 4cc10247424d505c63de69d47e59dc121a5ef91d6c113ecddb446ac4fefa52da):
+> EXCEPTION-SCOPE: ok go with D
+- **Taken by Mustafa, 2026-11-26, 15:57:28 UTC: replaced at 16:05:26 UTC by his EXCEPTION-SCOPE (d) (above), so not in force: his request for an exception for his account from today's rule (pull request, gate and smoke)** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message b3bd1246-ffe0-492f-9199-b3b7d9e5e897, as saved (the saved file ends at an open bracket and a colon); copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1657-exception.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's description of the rule; the first line reads as the chat's text, pasted back by him (it addresses him: "meaning your account"), and his reply is the line that starts with ">" [assumed: from the form]. Copied by script (393 bytes, sha256 82ec653c7a5a6c2a933b33bf4473028e3eb06417541fdd0724c77368b3872f2a):
+> The rule: a second rule on main where only the repository admin, meaning your account, may update main. Today's rule stays exactly as it is, so a pull request, gate and smoke stay required for everyone, you included.
+> > No, there will be an exception for me where its not required for my account.
+> Add this and let me know what needs to be done (I haven't followed the steps you've given me yet:
+- **Taken by Mustafa, 2026-11-26, 15:51:38 UTC: VISION-RULE, version 2: a player sees an enemy only when their own
+  soldier has a clear line of sight to that enemy (the character's sight, not the camera's view): his answer to the
+  open design questions R2-INT-OQ1 and R4-LOS-OQ2; the rule in ten points (a white vision cone from the soldier,
+  pointing where the soldier looks; its width starts at 190 degrees and is tuned later; an enemy is drawn only while
+  some part of their body is inside the cone with nothing solid in between, in the open behind the player's back too;
+  no maximum reach; the player's own eyes only; what blocks sight: walls, buildings, static objects, vehicles, hedges
+  and smoke, never soldiers, and not the player's own vehicle while inside it; an enemy that leaves sight is gone at
+  once; projectiles and their traces are always drawn; sounds are not hidden; the ground, walls and buildings always
+  stay visible); left open by him: the cone's final width, how the cone is drawn, whether fences block sight, whether
+  shots are blocked by the same things as sight; no code for it now and not part of Slice 1 (the sight check with
+  Slice 2's bots, the hiding over the network in Slice 3; the cone tried in Testlines first); recorded at 4b-1's docs
+  pass with pointers in docs/adr/README.md and one follow-up line in STATUS, no ADR text rewritten; one question to
+  the chat (a "blocks sight" flag in 4b), not to be built without his word; the chat's main folder brought up to main
+  by a fast-forward** (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a
+  Claude Code chat; his label: "Some adjustments to the previous prompt that I had send:"; message
+  809fbcd0-8830-4627-b624-3db516eef947, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-26-vision-rule-v2.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the open design questions R2-INT-OQ1
+  and R4-LOS-OQ2 of docs/adr/README.md (what a player may see: the camera's view or the character's sight), and, for
+  sight, part of R4-LOS-OQ1 and R4-LOS-OQ4 (what blocks it). It is his own decision, brought to this chat to record at
+  4b-1's docs pass; by its own words it replaces his block of 16:35 Amsterdam of the same day (15:35:38 UTC, message
+  dcae7c82-851e-46e8-afe6-b0ee784ab13c), which is therefore not recorded. No code is asked for it and it is not part
+  of Slice 1. Copied by script (3990 bytes, sha256 fd315366c33e9a9db9934cab2b02c8b49fb821e6c3e4b758bc52d585f37154c1):
+> Some adjustments to the previous prompt that I had send:
+> FOR BUILDER V4. From Mustafa, 26 November, 16:50 Amsterdam (written with my Advisor). A game rule to record: VISION-RULE, version 2. If you already have my block of 16:35 on this, this one replaces it. No code for it now, and 4b-1 does not stop for it.
+>
+> 1. VISION-RULE, my decision: a player sees an enemy only when their own soldier has a clear line of sight to that enemy. It ends the third-person camera trick of standing behind a wall and still watching enemies. It answers the open design questions R2-INT-OQ1 and R4-LOS-OQ2 in docs/adr/README.md (what a player may see: the camera's view or the character's sight). My answer: the character's sight.
+> 2. The rule:
+>    a. Each soldier has a vision cone that starts at the soldier and points where the soldier looks. It is drawn on screen as a white cone.
+>    b. Its width starts at 190 degrees. That is a bit generous on purpose, like seeing from the corner of your eye, and an enemy must still be able to sneak up behind another player. The final value is tuned later.
+>    c. An enemy is drawn for me only while some part of their body is inside my cone with nothing solid in between. Otherwise that enemy is not drawn at all. That holds in the open behind my back too.
+>    d. No maximum reach. As far as the screen shows, I see an enemy if nothing blocks the line.
+>    e. My own eyes only. What a teammate or squad mate sees is not shown to me.
+>    f. What blocks sight: walls, buildings, static objects, vehicles, hedges and smoke. Soldiers do not block sight. While I sit inside a vehicle, my own vehicle does not block my view.
+>    g. An enemy that leaves my sight is gone at once. No fade and no last-seen mark.
+>    h. Projectiles are always drawn. Bullets and their traces are never filtered or hidden by this rule, whoever fired them and from wherever, also from outside my cone. If someone shoots towards me I must be able to see the traces, even as a last-second glimpse.
+>    i. Sounds are not hidden either: gunfire and footsteps of a hidden enemy reach me.
+>    j. The ground, walls and buildings always stay visible. Only enemy players are hidden.
+> 3. Not decided yet, so record it as open: the cone's final width; how the cone is drawn (a look decision); whether fences block sight; whether shots are blocked by the same things as sight.
+> 4. What to do, at 4b-1's docs pass and not before:
+>    a. Save this message by script and enter it in docs/DECISIONS.md with the question it answers.
+>    b. In docs/adr/README.md mark R2-INT-OQ1 and R4-LOS-OQ2 answered with a pointer to that entry. For R4-LOS-OQ1 and R4-LOS-OQ4 note what point 2f answers for sight and what stays open.
+>    c. Rewrite no ADR text now. Add one follow-up line in STATUS for the next edit of ADR 0001 (part 9 (c) and its table Q14: hiding enemies by line of sight is now asked for, so R2-INT-OQ5's cost measurement at 48 players becomes due; part 9 (f): shots and their traces reach every player who can have them on screen, hidden shooter or not), of ADR 0004 part 13 and of ADR 0003's cutaway rule.
+> 5. No code for this rule, and it is not part of Slice 1. It lands where the plans already put it: the sight check with Slice 2's bots, the hiding over the network in Slice 3. I try the cone in Testlines first, and its values reach the game only through my Export, as before.
+> 6. One question, answered in two lines when your current step is done: should anything in part 4b (the map kind, the collision world) already carry a "blocks sight" flag per object, as ADR 0004 part 13 describes, so that this rule needs no rework later? Do not build it without my word.
+> 7. The second guard fix (#73) and the CI Builder's #74 are on main (3b949c1a9f9c99d6d54570a0f2805c3d65661d8b). When your current step is done, bring your chat's main folder up to main by a fast-forward, as your rules allow, so the new guard loads.
+> 8. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 15:28:51 UTC: THROWAWAY-PUBLIC (a): the throwaway repository is public, with neutral names, and deleted as soon as the results are reviewed** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 6fe0dfd1-e3ff-478f-9d3b-adbfd5cd9d51, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1628-throwaway-public.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the question THROWAWAY-PUBLIC from the advisor agent's REVISE of the plan (the chat's checkpoint, steps 4 and 6). Copied by script (1 bytes, sha256 ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb):
+> a
+- **Taken by Mustafa, 2026-11-26, 15:07:24 UTC: his Testlines Export at 30 steps, handed over for the data step of
+  4b-2** (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code
+  chat; his label: "I have played on testlines.html on steps set to 30, and have exported data you needed:"; message
+  247437b9-08a2-42a6-803f-bc3eda89ae6a, whole; copied by
+  script from the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-26-export-30.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): his own point of 2026-11-26, 14:09
+  UTC (My Export at 30 steps comes before the data step, step 8 in the new numbering, which is in 4b-2) and the chat's
+  standing ask for the Export at 30 steps. The Export alone, byte for byte, is cs4b-content/testlines-export-30.json
+  with its manifest. The Export follows these lines in the same message and is not repeated here: it is saved whole by
+  script as `.checkpoints/cs4b-content/testlines-export-30.json` (15,508 bytes, sha256
+  a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab; step rate 30, no warning), with its manifest
+  beside it. Copied by script (his own lines before the Export, 199 bytes of the message's 15708, whose sha256 is
+  dc361452139f9dc15eae41445d03c441670c892980c5760e0187b0adcdd9440c):
+> I have played on testlines.html on steps set to 30, and have exported data you needed:
+> I had forgotten to send this earlier, you can continue with your work: 
+> This is for later when you need it again
+- **Taken by Mustafa, 2026-11-26, 14:56:06 UTC: his go to merge #73 (guard-wrappers) at exactly 7bff799f34119fd97588bda0edfc25c46d0f6a9e as a merge commit, with that id as the expected head, after his Advisor's merge check and the advisor agent's verdict on that id; then MAIN-WALL's plan, in his order; #74 takes main in after this merge; the interim rule on git and gh unchanged** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 8248067c-7efd-48cd-ae38-45fd23d9eaad, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1545-merge-go.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): his item 7 of 14:09:28 UTC (below): the final full head id, his Advisor's merge check before his go; #73 merged at 4a62873e (2026-11-26, 14:56:33 UTC, the merge commit's date, read with git). Copied by script (1333 bytes, sha256 f7f3486a9a959b485fe26d05bc73aef8995f484fcbde98c58ac146b4edd59ec4):
+> FOR THE GUARD FIX CHAT. From Mustafa, 26 November, 15:45 Amsterdam (written with my Advisor).
+>
+> 1. My Advisor's merge check on pull request #73 passed at head 7bff799f34119fd97588bda0edfc25c46d0f6a9e. What it checked: main 2483e9a7 is inside it; only the guard, its test file and six docs files changed; the guard's code equals round 4's commit 83bc2417; no notes folder in the tree; gate, smoke and toolchain are green on that id; the guard's test file ran 1551 of 1551 in its own copy; my eight messages stand in DECISIONS line for line; the report lists the 91 lines by kind and names R4-1 by its class only.
+> 2. First show me your advisor agent's verdict that names this full id. If it did not approve exactly this id, or the head has moved, stop and tell me.
+> 3. If it did: this is my go. Merge #73 at exactly 7bff799f34119fd97588bda0edfc25c46d0f6a9e as a merge commit, with that id as the merge's expected head.
+> 4. After the merge, tell me main's new id in one line. Then start MAIN-WALL's plan, in the order I gave.
+> 5. For your information: the CI Builder's pull request #74 changes the same five docs files (DECISIONS, STATUS, STATUS_ARCHIVE, ROADMAP, REPO_MAP). It takes main in after your merge. Nothing for you to do there.
+> 6. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 14:09:28 UTC: R4-END (1): merge what is approved, with no fifth review round; R4-1 is
+  recorded as an open Critical by its class only, in STATUS and in the report, and its detail goes into no pushed file,
+  pull request, board post or memory; the report lists ADV-R4-2's 91 lines by kind; the interim rule stays until R4-1's
+  fix is merged; for the record, a guard ask reaches him in Auto mode for a chat's own command (a subagent's ask is
+  still unknown); the order after this merge: MAIN-WALL, then one guard change-set with R4-1's fix and GUARD-KIT
+  together, then the review tracks with one more line, a change under content/source/ needs his go (SOURCE-GO (a));
+  R4-1's fix plan says whether it can be a rule that fails closed; MAIN-WALL's measurement is not done in this chat; the
+  final full head id comes to him after his Advisor's merge check** (the chat he calls the Guard fix chat,
+  session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; his
+  label: "From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor)."; message
+  8b580300-4b0f-43b3-bcd6-e2adacc82158, whole; copied by script from the chat's saved file
+  `.checkpoints/guard-wrappers/mustafa-2026-11-26T1505-r4-end.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat
+  copied by script from its transcript). What it answers, in the chat's words (not his): the chat's stop after review
+  round 4 (its checkpoint, step 25): round 4 left R4-1 open as a Critical, so by his words of 2026-11-25, 23:59
+  Amsterdam (item 3, the entry of 23:01:07 UTC below) the chat came back with two options only, merge what is approved
+  or drop the change; its recommendation is not in the pushed notes. Point 3 answers GUARD-KIT's question on asks in
+  Auto mode for a chat's own command, from his own test; points 4 to 7 set the order and the work. Copied by script
+  (1905 bytes, sha256 e5b0b258803c94cb0f5efb071f120ad792c996d021e34c39d861ea04f64f9398):
+> From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor).
+>
+> 1. R4-END: (1). Merge what is approved. No fifth round. R4-1 is recorded as an open Critical by its class only, in STATUS and in the report; its detail goes into no pushed file, pull request, board post or memory.
+> 2. For the head you bring me: the report lists the 91 lines of ADV-R4-2 by kind (the 6 that now pass and cannot start their program; the 85 that were refused and now ask me). The interim rule stays until R4-1's fix is merged: git and gh always start their own command, with no other program in front of them.
+> 3. For your record on the 85: an ask does reach me in Auto mode. Today at 14:07 Amsterdam the new lane-2 chat (one repository, Opus 5.5, Auto mode) ran git merge --ff-only HEAD~1 in its main folder. I got the prompt "Hook PreToolUse:Bash requires confirmation for this command" with the guard's reason text, and answered no. That settles GUARD-KIT's question for a chat's own command; a subagent's ask is still unknown.
+> 4. Order after this merge: MAIN-WALL first, because it is the wall behind the guard and the preview links' token sitting waits for it. Then one guard change-set with R4-1's fix and GUARD-KIT together. Then the review tracks, which also get one more line: a change under content/source/ needs my go (SOURCE-GO (a)). If security-auditor says R4-1 cannot wait behind MAIN-WALL, tell me why in two lines before you start, and I decide.
+> 5. R4-1's fix, plan first: say whether it can be a rule that fails closed (whatever the guard cannot read with certainty asks me) instead of one more pattern, because four rounds each found one more form.
+> 6. MAIN-WALL's measurement is not done in this chat (no second repository here): a separate chat with only the throwaway repository, or my clicks.
+> 7. Bring me the final full head id after the steps you listed. My Advisor's merge check comes before my go.
+- **Taken by Mustafa, 2026-11-26, 14:09:13 UTC: SIZE-4B (b), in engine-architect's cut: change-set 4b is two pull
+  requests and the collision library goes wholly into 4b-2; stop lines 7,450 for 4b-1 and 8,450 for 4b-2, each on its
+  own; before step 1 of each half the checkpoint names what leaves first, and he gets one sentence at two thirds of
+  the line; 4b-1 starts at once, with no outside package, no wait for his Export and no browser check; FEATURE-COMPARE
+  (a): two named exceptions, each pinned to exact entries and versions, with tests and planted mistakes, under four
+  conditions, recorded as a dated pointer for ADR 0002's next revision; 4b-1's report says in its first lines what
+  moved 4b from 5,410 to about 7,050 lines and gives a new estimate for the first build he can move a soldier in; his
+  Export at 30 steps comes before the data step (step 8), in 4b-2** (the builder chat he calls Builder V4, lane 1 of
+  the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "From Mustafa, 26 November, 15:05
+  Amsterdam (written with my Advisor)."; message d736715d-8d41-4f7f-a8fa-f3011d021464, whole; copied by script from
+  the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-26-size-4b.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's two questions of
+  2026-11-26 (.checkpoints/cs4b-content/question-2026-11-26-feature-compare.md, with its two dated additions): SIZE-4B
+  (how 4b is cut: one pull request, two, or a moved stop line) and FEATURE-COMPARE (whether the build's check on the
+  simulation's dependencies may take two named exceptions). Copied by script (1697 bytes, sha256
+  903135dd8d54efe6f74a5ad8ffffbc8f31c5da550c8cf18bae58c50ff937d72c):
+> From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor).
+>
+> 1. SIZE-4B: (b), in engine-architect's cut: the collision library goes wholly into 4b-2. Stop lines 7,450 for 4b-1 and 8,450 for 4b-2. Each stands on its own: lines left over in 4b-1 do not move to 4b-2. At a stop line you stop and ask.
+> 2. Your own numbers say each half is likely to reach its line at 4a's rate (about 7,950 and 9,000 written). So before step 1 of each half, name in the checkpoint what leaves first if the count runs high, in order, and tell me in one sentence where you stand at two thirds of the line.
+> 3. 4b-1 starts now: no outside package, no wait for my Export, no browser check.
+> 4. FEATURE-COMPARE: (a). Two named exceptions, each pinned to exact entries and versions, with tests and planted mistakes; any other difference still stops every build. Conditions: a change of parry3d's version or of the two packages' versions needs a new yes from me; the library's std stays off; the built-file check in 4b-2 keeps looking for SIMD and fused multiply-add in the players' file; and the recorded match exercises the collision queries from the first change-set that calls them, so native, Chrome and Firefox are compared on the real thing and not only on 10,000 rays. Recorded as a dated pointer for ADR 0002's next revision.
+> 5. 4b-1's report says in its first lines what moved 4b from 5,410 to about 7,050 lines by the designs' count, and gives a new estimate for the first build I can move a soldier in.
+> 6. My Export at 30 steps comes before the data step (step 8 in the new numbering), which is in 4b-2.
+> 7. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 14:08:56 UTC: his answers to the CI chat's ask 2 on the preview hand-over: CI-WRITE-3
+  (a), write the two texts in the recommended form, the workflow then sha256
+  d017b83b82d412befb1cbb983a93215440e2b0e1608d2c8c749445db53e87fd8 and the test configuration
+  35abfd54fddb43d7bf8077b281c153c8625c22d863d04922afd0b7b1ecfe80c8, any other value a stop; GUARD-STEP (a), keep the
+  check before the upload; HIDDEN-FILES (b), off; the upload action stays at the pin
+  cf430e030ddbb5b0abf93d22962f4752f3646cd9; he does not look up the Actions permissions, the first run on the draft
+  pull request is the test; CUT-ESCAPE stays on record as accepted, and its later fix (the cut's code as its own
+  throwaway user) goes into STATUS as a follow-up; then the docs pass, the report and the pull request's title and text
+  in the notes, his Advisor opens the draft and watches the first run, and a red on the new steps or on Firefox's
+  replay test comes to him first; git and gh always start their own command** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work (the small CI pull request after
+  change-set 3a, then the preview hand-over); his label: "From Mustafa, 26 November, 15:05 Amsterdam (written with my
+  Advisor)."; message 8e3f694b-4053-4ce3-a2fd-d0dcff40d13e, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-preview-handover/mustafa-2026-11-26T1505-ask2-answers.md` (readable at commit d12e3a8 of the chat's
+  branch `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the
+  chat's words (not his): the chat's ask 2 (question-2026-11-26-ask2.md at 3e3cf08): CI-WRITE-3, write the workflow and
+  the test configuration in the recommended form; GUARD-STEP, keep the check before the upload; HIDDEN-FILES,
+  include-hidden-files on or off; recommended (a), (a), (b). Records, not his words: the main session wrote both files
+  on this answer; its commit d12e3a8's message gives the permission mode read right before the write as `acceptEdits`
+  (the write's time, 14:09:14 UTC, is the main session's statement to docs-keeper). At d12e3a8
+  `.github/workflows/toolchain.yml` is sha256 d017b83b82d412befb1cbb983a93215440e2b0e1608d2c8c749445db53e87fd8 and
+  `packages/e2e/playwright.config.ts` 35abfd54fddb43d7bf8077b281c153c8625c22d863d04922afd0b7b1ecfe80c8, his two values
+  (read with `git show` by docs-keeper, 2026-11-26). CI: the push run on d12e3a8 green (toolchain 45836151624, gate and smoke 45836152061): the set-up passed with the upload action named, the two new steps skipped on a push, the runner's Firefox 160 "3 passed (12.5s)" with the replay test "first-loop.rec: 1800 steps, every shared hash as in the file", the job 5 min 45 s; the pull request run, the first that runs the two new steps, after the draft is opened. Point 6's follow-up is CUT-ESCAPE-FIX
+  (`docs/STATUS_ARCHIVE.md`, "From ci-preview-handover"), where security-auditor's fuller form of the fix (its own copy
+  of the workspace, its processes ended with the step: `security-auditor-ci.md`, SA-1, in the same notes) stands beside
+  his words. Copied by script (1305 bytes, sha256 117acbaf961449dcf96cb87012776140309726104b9414d6bf9f8df882a8b145):
+> From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor).
+>
+> 1. CI-WRITE-3: (a). Write the two texts in the recommended form. My Advisor rebuilt both from main and your saved diffs at 3e3cf08 and got your values: .github/workflows/toolchain.yml d017b83b82d412befb1cbb983a93215440e2b0e1608d2c8c749445db53e87fd8, packages/e2e/playwright.config.ts 35abfd54fddb43d7bf8077b281c153c8625c22d863d04922afd0b7b1ecfe80c8. After writing, show both files' sha256. Any other value is a stop.
+> 2. GUARD-STEP: (a). Keep the check before the upload.
+> 3. HIDDEN-FILES: (b). Off.
+> 4. The upload action stays at the pin cf430e030ddbb5b0abf93d22962f4752f3646cd9.
+> 5. Actions permissions: I do not look it up. The first run on the draft pull request is the test. If it fails at its start because the action is not allowed, stop and tell me which setting to change.
+> 6. CUT-ESCAPE stays on record as accepted. Put its later fix (the cut's code as its own throwaway user) into STATUS as a follow-up.
+> 7. Then as before: the docs pass, the report, and the pull request's title and text in your notes. My Advisor opens the draft and watches the first run. A red on the new steps or on Firefox's replay test comes to me first.
+> 8. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 13:05:03 UTC: SOURCE-GO (a): the rule that a change under content/source/ needs his
+  go is written into the review-tracks rule change the Guard fix chat has queued; it is no condition for 4b's merge
+  and this chat writes no kit file for it; until that rule is merged, main's rule that game feel and balance go to him
+  covers a change to his values, every pull request that changes anything under content/source/ says so in the first
+  lines of its report, and his Advisor's merge check lists that folder; the Export and the reader: he agrees with the
+  chat's proposal if the advisor agent approves it (a tool script reads his Export with the platform's own JSON
+  reader, the game's reader stays as narrow as proposed, the Rust tool proves the written content file canonical, no
+  new package comes in, the game never loads the Export itself); security-auditor's twelve points go into the test
+  list before step 1; his Export at 30 steps comes before step 6** (the builder chat he calls Builder V4, lane 1 of
+  the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "From Mustafa, 26 November, 14:00
+  Amsterdam (written with my Advisor)."; message 83ce083b-6e2c-4213-937b-5926056e9b72, whole; copied by script from
+  the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-26-source-go.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's decision SOURCE-GO (its
+  message of 2026-11-26: should "any change under content/source/ needs Mustafa's go" become a rule the PR Advisor
+  enforces: (a) a kit edit, (b) CODEOWNERS with branch protection, (c) plan text only), and the chat's proposal of the
+  same message that a tool script reads his Export with the platform's own JSON reader while the game's reader stays
+  cut down. Copied by script (1145 bytes, sha256 53fb855d8f987dd5741c432194610140c96d4046088db5018f510426d6016476):
+> From Mustafa, 26 November, 14:00 Amsterdam (written with my Advisor).
+>
+> 1. SOURCE-GO: (a), written into the review-tracks rule change that the Guard fix chat has queued, which already rewrites when a merge needs my go. It is not a condition for 4b's merge, and you write no kit file for it. Until that rule is merged: main's rule that game feel and balance go to me covers a change to my values; every pull request that changes anything under content/source/ says so in the first lines of its report; my Advisor's merge check lists that folder.
+> 2. The Export and the reader: I agree with your proposal if the advisor agent approves it. A tool script reads my Export with the platform's own JSON reader, the game's reader stays as narrow as you proposed, and the Rust tool proves the written content file is canonical. No new package comes in, so CONTENT-SOURCE (c) stands. The game never loads the Export itself.
+> 3. Security-auditor's twelve points go into the test list before step 1, as you said.
+> 4. My Export at 30 steps comes before step 6.
+> 5. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 13:04:35 UTC: his answers to the CI chat's ask 1: FF-REFETCH (a), the same Firefox
+  161 file (firefox_161.0+build1-0ubuntu0.24.04.1~mt1_amd64.deb, 90,437,572 bytes, sha256
+  bd304b0b181c4fed449279e25d309075c3a2e85345e63d1118c5085cefcf1ed1) by the same route as for #71, size and checksum
+  checked before use, unpacked without installing, deleted at this pull request's merge, and a stop if the archive no
+  longer serves exactly that file or Firefox needs anything more; UPLOAD-SOURCE (a), actions/upload-artifact v7.0.2
+  pinned by the full commit cf430e030ddbb5b0abf93d22962f4752f3646cd9, for the hand-over step only, nothing of it run
+  before his yes on ask 2's exact text; what ask 2 holds in one message; git and gh always start their own command**
+  (the chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work (the
+  small CI pull request after change-set 3a, then the preview hand-over); his label: "From Mustafa, 26 November, 14:00
+  Amsterdam (written with my Advisor)."; message 235f7b30-0a58-4ed7-9e2f-88b44fcfa1ac, whole; copied by script from the
+  chat's saved file `.checkpoints/ci-preview-handover/mustafa-2026-11-26T1400-ask1-answers.md` (readable at commit
+  d12e3a8 of the chat's branch `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What
+  it answers, in the chat's words (not his): the chat's ask 1 (question-2026-11-26-ask1.md at fb9b1a4): FF-REFETCH,
+  fetch the same Firefox 161 file again for the trial; UPLOAD-SOURCE, may CI use actions/upload-artifact v7.0.2 pinned
+  by cf430e030ddbb5b0abf93d22962f4752f3646cd9; each recommended (a). Records, not his words: the trial (`trials.md`, in
+  the same notes): the file fetched again, 90,437,572 bytes with its sha256 checked, unpacked with `dpkg-deb -x`, no
+  graphics library files; the firefox project with the drafted configuration, 3 passed in the container's Firefox
+  161.0, the replay test among them ("first-loop.rec: 1800 steps, every shared hash as in the file"). Ask 2:
+  `question-2026-11-26-ask2.md` (same notes), answered in the entry above. Copied by script (1185 bytes, sha256
+  db5ad37dddf9d5b8693ee4c62437ef0f6a01de7e37803dd87b5237c29b499254):
+> From Mustafa, 26 November, 14:00 Amsterdam (written with my Advisor).
+>
+> 1. FF-REFETCH: (a). The same file by the same route as for #71: firefox_161.0+build1-0ubuntu0.24.04.1~mt1_amd64.deb, 90,437,572 bytes, sha256 bd304b0b181c4fed449279e25d309075c3a2e85345e63d1118c5085cefcf1ed1. Size and checksum checked before use, unpacked without installing, deleted at this pull request's merge. If the archive no longer serves exactly that file, or Firefox needs anything more, stop and ask me.
+> 2. UPLOAD-SOURCE: (a). actions/upload-artifact v7.0.2, pinned by the full commit cf430e030ddbb5b0abf93d22962f4752f3646cd9, for the hand-over step only. Nothing of it runs before my yes on ask 2's exact text.
+> 3. Ask 2, in one message: every text with each changed file's sha256 after the change; the output line that ties v7.0.2 to that commit, confirmed by security-auditor; the guard line as its own yes or no; the hidden-files setting as its own yes or no; and security-auditor's answers on the steps that run after the network cut. My Advisor rebuilds the files and compares them before I answer.
+> 4. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 12:24:26 UTC: MAIN-WALL's measurement on a throwaway repository never adds a second
+  repository to this chat (a chat with two repositories loads no repository hooks): it runs in a separate chat that
+  holds only that repository, or by his own clicks, its results reaching the chat by his paste, and MAIN-WALL's plan
+  says which; GUARD-KIT (a), a plan-first kit change-set: every chat shows at its start whether the guard is loaded,
+  find out whether an ask in auto mode reaches him, and a rule that a chat writing this repository holds no second
+  repository; the chat's queue: this guard change-set, MAIN-WALL, GUARD-KIT, the review tracks, with MAIN-WALL's plan
+  saying whether GUARD-KIT's parts ride with MAIN-WALL or with the review tracks; a one-line answer on whether the guard
+  is loaded in this chat** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat
+  on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; his label: "For the Guard fix chat, from Mustafa (written
+  with the main Advisor, 26 November, 13:20 Amsterdam). Nothing here interrupts round 4; read it when the round is
+  done."; message 7114411c-dd6a-44ce-a901-d05b104e84fb, whole; copied by script from the chat's saved file
+  `.checkpoints/guard-wrappers/mustafa-2026-11-26T1320-guard-kit.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat
+  copied by script from its transcript). What it answers, in the chat's words (not his): nothing this chat asked;
+  GUARD-KIT's question is Builder V2's [assumed: from the sources his item 2 names] (its notes, named in his item 2, are
+  on lane 2's branch and were not read by this docs pass). His order after this merge was set again at 14:09:28 UTC (the
+  entry above): R4-1's fix and GUARD-KIT go together, after MAIN-WALL. Records, not his words: the chat's answer to item
+  4 (its checkpoint, step 21): the guard is loaded, shown by a harmless call that the guard refused with its own
+  message. Copied by script (1478 bytes, sha256 ca68f88e8ddcfcfc652211c15d6db6fdfb702b661b2f8d7d1745bbb04c2ea9a4):
+> For the Guard fix chat, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam). Nothing here interrupts round 4; read it when the round is done.
+> 1. A finding from Builder V2: its guard has not run since 15 November, because a second repository was added to that chat, and a chat with two repositories loads no repository hooks. So for MAIN-WALL's measurement on a throwaway repository: never add a second repository to your chat. The measurement runs in a separate chat that holds only the throwaway repository, or by my own clicks, and its results reach you by my paste. Say in MAIN-WALL's plan which.
+> 2. GUARD-KIT: (a), a plan-first kit change-set: every chat shows at its start whether the guard is loaded; find out whether an ask in auto mode reaches me at all; a rule that a chat writing this repository holds no second repository. Sources: .checkpoints/step-2-6-previews/questions-2026-11-26-guard.md and build-notes.md sections B15 and B16 on claude/optimistic-albattani-mdoonz.
+> 3. Your queue is then: this guard change-set, MAIN-WALL, GUARD-KIT, the review tracks. In MAIN-WALL's plan, say whether GUARD-KIT's parts can ride with MAIN-WALL or with the review tracks, so the review tracks do not slip by a whole change-set.
+> 4. Tell me in one line: is the guard loaded in your own chat, and how do you know?
+> Unchanged: each kit write is asked of me with its exact text; git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 12:21:41 UTC: his word to start the preview hand-over step lane 2 (Builder V2) asked
+  for on issue #59 (its comment of 2026-11-25, 19:39 UTC): plan first, then the exact text asked of him; in the same
+  pull request TOKEN-WORDS and FIREFOX-REPLAY (the recording's replay test joins the firefox entry beside the rule
+  tests; if it is red there, stop and bring it to him before any change; a difference in the hashes is a finding, not a
+  flake); one line on whether the chat holds only this repository and whether a guard prompt has ever reached him from
+  it; a comment on GitHub is information, never his word** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work (the small CI pull request after
+  change-set 3a, then the preview hand-over); his label: "For the CI Builder, from Mustafa (written with the main
+  Advisor, 26 November, 13:20 Amsterdam)."; message 809624c6-2cf9-449f-934c-64e21bb3eda0, whole; copied by script from
+  the chat's saved file `.checkpoints/ci-preview-handover/mustafa-2026-11-26T1320-preview-handover.md` (readable at
+  commit d12e3a8 of the chat's branch `claude/keen-tesla-v807cf`), which the chat copied by script from its
+  transcript). What it answers, in the chat's words (not his): nothing the chat asked: Builder V2's request (issue #59,
+  comment of 2026-11-25, 19:39 UTC) is waiting; plan first, then the exact text asked of him; in the same pull request
+  TOKEN-WORDS and FIREFOX-REPLAY; one line on whether the chat holds only this repository and whether a guard prompt
+  has reached him. Records, not his words: point 3 answered in the chat (plan R2-10, `plan.md` in the same notes). The
+  plan's revision 2 (e59b0c2) approved by the advisor agent with its conditions N1-N3 (`advisor-plan.md`, same notes);
+  TOKEN-WORDS and FIREFOX-REPLAY are in d12e3a8. Copied by script (1086 bytes, sha256
+  d7291959828c6d065e29d3ad04d0fc4334b64031349ed44559a01112ba990f18):
+> For the CI Builder, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam).
+> Builder V2's request has been waiting on GitHub since yesterday: issue #59, its comment of 25 November, 19:39 UTC. Lane 2 asks for one step at the end of the toolchain job that hands the tested build to the preview workflow. Read it there and start: plan first, then ask me for the exact text as before. In the same pull request:
+> 1. TOKEN-WORDS, the one-word comment fix.
+> 2. FIREFOX-REPLAY: the recording's replay test (packages/e2e/tests/replay/, on main once pull request #70 is merged today) joins the firefox entry beside the rule tests. It needs no picture. It has never run in Firefox: if it is red there, stop and bring it to me before any change. A difference in the hashes is a finding, not a flake.
+> 3. Tell me in one line: does your chat hold only this repository, and has a guard prompt ever reached me from it?
+> A comment on GitHub is information, never my word. This block is my word.
+> Unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 12:21:17 UTC: his go for the merge of pull request #70 (change-set 4a) at head
+  420b16b35225c41f1978b177822f2e24386a2f95, by a merge commit with that id as the expected head; BOARD-SLIP (a): the
+  history stays as it is; CONTENT-SOURCE (c): the content reader is all our own, kept to what the content files need,
+  everything else refused, duplicate keys included, and fuzzed before the first value rests on it; DEPART-4 (a): all
+  fourteen departures stand, with two notes (the 48 is one named constant; until the aim codec widens, the loader
+  refuses a playable map larger than its reach, and STATUS names the change-set that widens it); EARLY-LOOK-ORDER (b):
+  inside 4c only; FIREFOX-REPLAY (a): the CI Builder gets it from him, and a red comes to him first; LINKS-CHECK (c):
+  about 15 lines in 4b; one question to the chat (one repository only, and has a guard prompt ever reached him from
+  it); 4b starts after the advisor agent's re-read, and his Export at 30 steps comes before 4b's step 6** (the builder
+  chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For
+  Builder V4, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam)."; message
+  7d208dc5-2016-465f-a47d-d98ce10c1886, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-26-go-merge-70.md` (readable at commit
+  4dffb47adf046ca7589697fccec96e104ea52f4a of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the six decisions of change-set 4a's
+  report (docs/reports/2026-11-25-cs4a-recording.md, "Decisions needed", and the chat's message of 2026-11-25): the
+  merge of pull request #70 at the head the advisor agent approved; BOARD-SLIP; CONTENT-SOURCE; DEPART-4;
+  EARLY-LOOK-ORDER; FIREFOX-REPLAY; LINKS-CHECK. His point 8 asks the chat a question of his own; his point 9 starts
+  4b. Copied by script (1362 bytes, sha256 9a122cc7ac0994b12d4aca68254afd76f18b8f85ca2438dfcbfed412e12f5c8b):
+> For Builder V4, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam).
+> 1. My go: merge pull request #70 at head 420b16b35225c41f1978b177822f2e24386a2f95, by a merge commit, with that id as the expected head. My Advisor's merge check passed on it.
+> 2. BOARD-SLIP: (a), the history stays as it is.
+> 3. CONTENT-SOURCE: (c), all our own. Keep the reader to what the content files need and refuse everything else, duplicate keys included. Fuzz it before the first value rests on it.
+> 4. DEPART-4: (a), all fourteen stand, with two notes. Entry 5: the 48 is one named constant, because my vision says 48 and more. Entry 6: until the aim codec widens, the loader refuses a playable map larger than its reach, and STATUS names the change-set that widens it. If either is already so, say so in one line.
+> 5. EARLY-LOOK-ORDER: (b), inside 4c only.
+> 6. FIREFOX-REPLAY: (a). The CI Builder gets it from me today; a red comes to me first.
+> 7. LINKS-CHECK: (c), about 15 lines in 4b.
+> 8. Tell me in one line: does your chat hold only this repository, and has a guard prompt ever reached me from it? Builder V2 found that a chat with a second repository loads no guard.
+> 9. Then start 4b after the advisor agent's re-read. My Export at 30 steps comes before 4b's step 6.
+> Unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-25, 23:01:07 UTC: R3-WAY (a): xargs asks him in a session and refuses a subagent, unless a
+  read-only program follows it; one fourth review round, on what changed since round 3 only, the last of the change-set;
+  if round 4 approves, the full head id comes to him after his Advisor's merge check; if it leaves a Critical or High
+  open, no fifth round and nothing more built, but two options only, merge what is approved or drop the change, with a
+  recommendation; the three minor points stay follow-ups for the next kit change-set, with no push for them; then
+  MAIN-WALL** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on
+  the branch `claude/confident-gates-tbnq38`; his label: "For the Guard fix chat, from Mustafa (written with the main
+  Advisor, 25 November, 23:59 Amsterdam)."; message 5952192e-fb7d-43d5-8be9-9be4033c3f13, whole; copied by script from
+  the chat's saved file `.checkpoints/guard-wrappers/mustafa-2026-11-25T2359-r3-way.md`
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): the chat's stop after review round 3 (its checkpoint, steps 17 and 18): two Criticals, R3-1 and R3-2,
+  open after round 3, where the review budget stops a change-set for him, and a version pre-built (not applied) for the
+  rule his (a) names; the other options of that question are not in the pushed notes. Copied by script (1031 bytes,
+  sha256 78d553316a144c17466373f376532f4b17d9170ed9eb84c9984615419e1905b8):
+> For the Guard fix chat, from Mustafa (written with the main Advisor, 25 November, 23:59 Amsterdam).
+> 1. R3-WAY: (a). xargs asks me in a session and refuses a subagent, unless a read-only program follows it.
+> 2. A fourth review round is allowed, once, on what changed since round 3 only. It is the last round of this change-set.
+> 3. If round 4 approves: bring me the full head id for my go, after my Advisor's merge check. If it leaves a Critical or High open: start no fifth round and build nothing more. Come back with two options only, merge what is approved or drop the change, and your recommendation.
+> 4. The three minor points (the git-… words, the refusal that should ask, the smaller notes) stay follow-ups for the next kit change-set. No push for them.
+> 5. Then MAIN-WALL, as queued. The guard is the seatbelt; main's rule is the wall.
+> Unchanged: each kit write is asked of me with its exact text; git and gh always start their own command, with no other program in front of them; no detail of the open forms in pushed notes.
+- **Taken by Mustafa, 2026-11-25, 20:50:19 UTC: pull request #71 is merged (main
+  07d673b0ee509d36ce1b976ed8dfae002c7d7b4a, by his tap, with the chat's head c9460ca1a9ced37e99bff84b834d5508f6ce7575
+  pinned): close the card for ci-after-3a; the next job comes from Builder V2, the hand-over step in toolchain.yml for
+  the preview links, with TOKEN-WORDS in the same text, from the new main, plan first, the exact text asked of him as
+  before; until its request arrives, nothing; git and gh always start their own command** (the chat he calls CI
+  Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work (the small CI pull request
+  after change-set 3a, then the preview hand-over); his label: "For the CI Builder, from Mustafa (written with the main
+  Advisor, 25 November, 21:50 Amsterdam)."; message ae5412be-9767-4362-a331-eec1cbb0425f, whole; copied by script from
+  the chat's saved file `.checkpoints/ci-preview-handover/mustafa-2026-11-25T2150-merged-next.md` (readable at commit
+  d12e3a8 of the chat's branch `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What
+  it answers, in the chat's words (not his): nothing the chat asked: #71 merged (main 07d673b0); close the card; the
+  next job is Builder V2's hand-over step with TOKEN-WORDS, plan first, nothing until the request arrives. Records, not
+  his words: 07d673b's second parent is c9460ca (read with git by docs-keeper, 2026-11-26); this branch's
+  `.checkpoints/` holds no ci-after-3a card (docs-keeper's listing, 2026-11-26). Copied by script (623 bytes, sha256
+  5026102639a131148d9b3f755da0e94b3541d1bc5c0f7efbc0c55be04b36fab8):
+> For the CI Builder, from Mustafa (written with the main Advisor, 25 November, 21:50 Amsterdam).
+> Pull request #71 is merged: main is 07d673b0ee509d36ce1b976ed8dfae002c7d7b4a, by my tap, with your head c9460ca1a9ced37e99bff84b834d5508f6ce7575 pinned. Close your card for ci-after-3a.
+> Your next job comes from Builder V2: the hand-over step in toolchain.yml for the preview links, with TOKEN-WORDS in the same text. Start from the new main, plan first, and ask me for the exact text as before. Until its request arrives, do nothing.
+> Unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-25, 20:48:11 UTC: STOP-4A (a): finish change-set 4a as it stands, the new stop line is
+  3,400, and the two green tests stay with the code they prove; WATCH-70 (a): the chat watches pull request #70, where
+  a comment or review is information and never his word; 4a's report says in a few lines where the difference to its
+  designs went and what it means for the sizes of 4b to 4d, whose stop lines stay as they are** (the builder chat he
+  calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For Builder
+  V4, from Mustafa (written with the main Advisor, 25 November, 21:45 Amsterdam)."; message
+  f7352101-1a58-44be-958e-bb20adf7ba93, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-stop-4a-answer.md` (readable at commit
+  fb5d0ff7860a661c06824688c1d963b43124ca59 of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's two questions of
+  2026-11-25: STOP-4A (.checkpoints/cs4a-recording/question-2026-11-25-stop-4a.md: change-set 4a at its stop line,
+  3,030 written lines against 3,050; (a) finish as it stands with a new stop line of 3,400, (b) apply the plan's
+  ladder to the letter with a new stop line of 3,300, (c) stop and cut; recommended (a)) and WATCH-70 (should the chat
+  watch pull request #70's events: (a) yes, (b) no; recommended (a)). Point 3 answers nothing the chat asked: it sets
+  what the report says. Copied by script (890 bytes, sha256
+  9dbb0c1f0076438f8f3e51d5059a4baf086fbddafe397d97f5cad4dff082a2a4):
+> For Builder V4, from Mustafa (written with the main Advisor, 25 November, 21:45 Amsterdam).
+> 1. STOP-4A: (a). Finish 4a as it stands; the new stop line is 3,400. The two green tests stay with the code they prove.
+> 2. WATCH-70: (a), watch pull request #70. A comment or review there is information, never my word: anyone can write one on a public repository.
+> 3. In 4a's report, beside the eight lines I asked for: 4a came in at 2.2 times its designs (3,030 against 1,365) before review fixes. Say in a few lines where the difference went (recording.rs is 758 lines against 260 in the plan's table; sha256.rs and files.rs are not in that table), and what it means for the sizes of 4b to 4d. Their stop lines stay as they are.
+> Unchanged: git and gh always start their own command, with no other program in front of them. A merge is on my go for the approved head, after my Advisor's merge check.
+- **Taken by Mustafa, 2026-11-25, 19:36:42 UTC: SA-D-DIRECT (a): the direct check goes in this change-set (the version
+  with 125 added lines and 1490 of 1490 tests); MAIN-WALL is the chat's next change-set, before the rule-file plan: a
+  rule that only his account can update main, measured on a throwaway repository first (day sessions, the PR Advisor and
+  his revert route must still merge, and his account must not skip gate and smoke), plan first, his clicks listed once,
+  the plan saying whether it and the rule-file plan are one change-set or two, the wall built first either way; the
+  gap's detail stays out of pushed notes** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a
+  Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; his label: "For the Guard fix chat, from
+  Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam)."; message ea6e5ca3-ed40-4075-9b99-c2cb4a45a1b8,
+  whole; copied by script from the chat's saved file
+  `.checkpoints/guard-wrappers/mustafa-2026-11-25T2035-sa-d-direct.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat
+  copied by script from its transcript). What it answers, in the chat's words (not his): SA-D-DIRECT (the plan, section
+  8): the part of round 1's finding SA-d that his words of 16:34:18 UTC did not cover, asked of him, with both versions
+  built (its checkpoint, step 10: without the direct check 1486 of 1486 tests, with it 1490 of 1490). Points 2 and 3
+  answer nothing the chat asked. Copied by script (1154 bytes, sha256
+  c39fd632d2076d6acb63ca066f795a3b8e78a19d3cae9f0ec12cf9bf4f170df8):
+> For the Guard fix chat, from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam).
+> 1. SA-D-DIRECT: (a). Yes, in this change-set: the version with the direct check (125 added lines, 1490 of 1490 tests).
+> 2. Your next change-set after this one, before the rule-file plan: MAIN-WALL. Builder V2's security reviewer found a gap in main's merge rule (its notes: .checkpoints/step-2-6-previews/ on claude/optimistic-albattani-mdoonz, questions-2026-11-25.md item 6 and security-auditor-plan.md). I want a rule that only my account can update main, measured on a throwaway repository first: day sessions, the PR Advisor and my revert route must still merge, and my account must not skip gate and smoke. Plan first, my clicks listed once. Say in the plan whether it and the rule-file plan go as one change-set or two; the wall is built first either way, because the rule-file plan lets chats merge on green checks without my go.
+> 3. Keep the gap's detail out of pushed notes, as with the guard's forms.
+> Unchanged: git and gh always start their own command, with no other program in front of them. Each kit write is asked of me with its exact text.
 - **Taken by Mustafa, 2026-11-25, 19:36:36 UTC: RULES-ONLY-READ (a): he accepts the Firefox entry cut to the rule tests
   as made (packages/e2e/playwright.config.ts, sha256 ef2136a14096fd12d5b9cce7b7fe28d611279850412a3269e5868139b19c9b0e),
   the report kept as it is (one "no WebGL" line, three time-outs, the shared cause read from the code, not shown by the
@@ -152,6 +650,32 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. FF-DRAW-WHEN: (a), with step 2.3, as its own question.
 > 4. Push the last head and bring me its full commit id with the advisor agent's verdict. Put the pull request's title and text, corrected for the red run's wording, in a file and name its commit and path: my Advisor opens the pull request from it and checks the head before my go.
 > Unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-25, 19:36:25 UTC: his go on the plan of change-set 4 (revision 4, pushed at 25c42c5):
+  start 4a, the recording; WALK-CUT (a), four change-sets, each its own pull request; STEP-60 (a), he plays the
+  sandbox at 30 steps and exports again, and no value is carried from the 60-step Export; a question for 4a's report
+  on what the first soldier on screen does not need; every report says which size is the designs' own count and which
+  holds the 1.8; the Hornet's entry goes in as the plan says and the two lines of docs/UNITS.md stay as they are,
+  listed as open for his unit walk; the other questions wait for the part that needs them** (the builder chat he calls
+  Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For Builder V4,
+  from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam)."; message
+  a3177cd2-093c-4e89-bf9d-5e4c6d909d1f, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-go-walk.md` (readable at commit fb5d0ff7860a661c06824688c1d963b43124ca59
+  of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied by script from its transcript). What it
+  answers, in the chat's words (not his): the chat's stop for his go on the plan (.checkpoints/cs4-walk/plan.md at
+  25c42c5) and its two questions of that stop: WALK-CUT (how Walk is cut: (a) four change-sets, (b) three, (c) two;
+  recommended (a)) and STEP-60 (his Export was made at 60 steps a second: (a) he plays the sandbox at 30 and exports
+  again, (b) carry it and judge at 30 in the game, (c) carry only the values equal to the old game's; recommended
+  (a)). Points 4 to 7 answer nothing the chat asked: they set work and rules. Copied by script (1256 bytes, sha256
+  a87cc51e6d1a9ecca9bbb601f147e0d8835a3388717a1eb9532002eb4170d06c):
+> For Builder V4, from Mustafa (written with the main Advisor, 25 November, 20:35 Amsterdam).
+> 1. My go on the plan for change-set 4 (revision 4, pushed at 25c42c5). Start 4a, the recording.
+> 2. WALK-CUT: (a), four change-sets, each its own pull request.
+> 3. STEP-60: (a). I play the sandbox at 30 steps and export again. Carry no value from the 60-step Export; I paste the new one before 4b's step 6.
+> 4. In 4a's report, in at most eight lines: what does the first soldier on screen not need from 4b and from 4c's first five steps (for example the canonical writer, the content tools, the reload), and how many hours would it save to build those after the early look, with no proof thinner and nothing moved off the code it proves? I decide then. Change nothing in the plan for it now.
+> 5. In every report say which size is the designs' own count and which already holds the 1.8.
+> 6. The Hornet: put its entry in as the plan says. The two lines of docs/UNITS.md stay as they are, listed as open, for my unit walk. They do not hold Walk.
+> 7. The other questions wait for the part that needs them.
+> Unchanged: git and gh always start their own command, with no other program in front of them. A merge is on my go for the approved head, after my Advisor's merge check.
 - **Taken by Mustafa, 2026-11-25, 18:00:43 UTC: his answers to the CI chat's ask 2: CI-WRITE-2 (a), write both texts
   exactly as saved at e12bb442, the workflow then sha256
   01898e4b3833812e945882106baa2bb3590866aff3c8d2dfa487a1fe38ce5742 and the test configuration
@@ -203,6 +727,106 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 5. Main is c1da1bd24faae21794195e2384895460753a41eb since 18:12 (the merge of #67, docs only; the workflow and the test configuration are unchanged on it). Take it in once before your docs pass.
 > 6. The first run on GitHub, as in my FIREFOX-GL (a): if the Firefox drawing tests fail on the page's "no WebGL" line, the firefox entry runs the rule tests only, by a change to the test configuration alone, and the drawing tests become a follow-up. Any other red, a time-out included, comes to me first.
 > 7. Then as agreed: the pull request's title and text into your notes, and my Advisor opens the draft. Until the second guard fix is merged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-25, 17:44:41 UTC: his block for his Testlines Export: save it whole by script with its
+  byte count and sha256 before reading it; say its format and version, its build commit, what its warnings hold and
+  how many values changed from the start; a line in the warnings means he tuned at a step rate other than the game's
+  30, to be said, and asked before values that depend on it are carried; the values are starting values, not
+  decisions, and go one way, from the Export into the game; the Hornet's numbers are a sketch and no part of Slice 1**
+  (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat;
+  his label: "@"/root/.claude/uploads/bcc7f209-7c97-557d-9f29-c2f6b7b20188/ea317b14-testlines.html" FOR BUILDER V4.
+  From Musti, 25 November. My Testlines Export, for point 8 of my takeover block."; message
+  a0dd1f03-10bf-4db4-8981-c93c4ee8369f, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-export-block.md` (readable at commit
+  fb5d0ff7860a661c06824688c1d963b43124ca59 of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's ask of 2026-11-25 (its
+  eight lines, line 6, and again at the end of its next two messages): please paste your Testlines Export's JSON (his
+  point 8b). The message holds the block only (994 bytes, no JSON); the file attached to it is the sandbox's built
+  page, byte for byte the branch's play/testlines.html at be608cad (1,228,251 bytes, sha256 886e4e66...1d21), not an
+  Export. The Export itself came in his next message (2026-11-25, 17:51:49 UTC) and is saved whole by script as
+  `.checkpoints/cs4-walk/testlines-export.json` (15,567 bytes, sha256
+  9ad1d9f914acc27c56cbfbe7c4e6c7e654ba24fa0e9ae75cb4e3b93103f06498); by his STEP-60 (a) no value of it is carried, and
+  it is not recorded here. Copied by script (994 bytes, sha256
+  f95e4b64cab9aadb6c3dfbcb7ff5b8e03509ad1d3ceb670a5602c9d1ae5a69c6):
+> @"/root/.claude/uploads/bcc7f209-7c97-557d-9f29-c2f6b7b20188/ea317b14-testlines.html" FOR BUILDER V4. From Musti, 25 November. My Testlines Export, for point 8 of my takeover block.
+>
+> 1. The Export is under this block, whole. It comes from Testlines step E: format "testlines-export", version 1, page built from commit 4c34e750f5edda22547e3bbe4074faadee5961ae (branch claude/sleepy-edison-ygmwfe, tip be608cad, which only adds the built page).
+> 2. Save it whole by script with its byte count and sha256 before you read it. Then tell me in one line each: the format name and version; the build_commit; what the "warnings" list holds; how many entries "changed_from_start" has. A line in "warnings" means I tuned at a step rate other than the game's 30: say so, and ask me before you carry values that depend on it.
+> 3. These are starting values, not decisions. Values go one way, from this Export into the game, and from nowhere else. The Hornet's numbers in it are a sketch and no part of Slice 1.
+- **Taken by Mustafa, 2026-11-25, 17:28:24 UTC: his brief for a later change-set, the review tracks and who merges (risk
+  tier 2; plan first, and no rule file edited before his go on the plan), queued after the second guard change-set: his
+  words of 25 November to record with that change-set, his reasons, what its plan proposes and what it answers; until it
+  merges today's rules hold in every chat** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a
+  Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; his label: "FOR THE GUARD FIX CHAT. From
+  Musti, written with my Advisor, 25 November, 18:25 Amsterdam."; message abdc8c59-359e-4751-b81f-ca77097df1cd, whole;
+  copied by script from the chat's saved file `.checkpoints/guard-wrappers/mustafa-2026-11-25T1825-review-tracks.md`
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): nothing the chat asked. It is a brief, queued ("Queued, in Mustafa's words", above); what its point 3
+  lists is what that plan proposes, not a rule in force. His order of 2026-11-26, 14:09:28 UTC (that entry, above) puts
+  it after MAIN-WALL and the next guard change-set, with SOURCE-GO (a) added to it. Copied by script (4784 bytes, sha256
+  aee18b7553ab813013ac3678fed175c600cf8676db9bb898641525580bc33625):
+> FOR THE GUARD FIX CHAT. From Musti, written with my Advisor, 25 November, 18:25 Amsterdam.
+>
+> Your next change-set after the second guard change-set: the review tracks and who merges. Risk tier 2. Plan first, and no rule file is edited before my go on the plan. If the second guard change-set has not started, it still goes first.
+>
+> 1. My words, saved by script and recorded word for word in docs/DECISIONS.md with this change-set.
+> From my walk of 25 November:
+> "Light review track by default. Exceptions that always get the full checks: netcode, the Rust core, server code, anything anti-cheat."
+> "The rule lives in the repo files, not in a label someone picks."
+> "Less process on small changes, so I see visible progress sooner."
+> From my reply of 25 November, evening:
+> "My eyes only where it shows: I only check pull requests that change what I see on screen. Everything else merges on green checks plus your review; V4 merges its own."
+> What I mean by it: "your review" is my Advisor's merge check. V4 is Builder V4, lane 1's builder chat, and the same holds for every builder chat. "What I see on screen" is today's "anything a player sees, hears or feels".
+>
+> 2. Why. Measured by my Advisor from commit times on the last three merged pull requests. Stop 3a (#65): building 2.4 hours, checks 4.0, waiting for me 4.9. Stop 3b (#68): 1.1, 4.9 and 9.2. The guard fix (#69): 0.3, 1.0 and 1.2. Measure them yourself before you quote them.
+>
+> 3. What the plan proposes, as the smallest change to CLAUDE.md and the advisor agent's file that does it:
+> a. The track of a pull request is worked out by a script from the files it touches, never picked by a person or a chat. In doubt it is the full track.
+> b. LIGHT-DEF (a), what "light" means: the plan and the advisor agent's read of it stay; the gate and CI stay; one review round by the one reviewer that fits, at the repository's default effort; the verifier on the final result; a short report; no second round unless a High or Critical is open.
+> c. A fifth exception that always gets the full checks: the rule files themselves (CLAUDE.md, .claude/, .github/, the gate files, the guard).
+> d. CORE-REVIEWERS (a), what "full" means for the Rust core, and for netcode and server code in the game: the test-engineer always, plus at most two more picked by a rule from what the piece touches. The plan writes that rule. At most two rounds, as today. Show whether each High of stops 3a and 3b would have been found or missed under it. The effort of these reviewers stays as in my words of 12 November.
+> e. Who merges. A pull request that changes nothing a player sees, hears or feels, and meets nothing in f, is merged by the chat that built it, with no go from me, when all of these hold for the same full commit id: gate, smoke and toolchain green; the advisor agent's approval; my Advisor's merge check; and that id passed as the merge's expected head. A later push needs all of them again.
+> f. EYES-KEEP (a). Three things keep my go even when nothing shows: anything that costs money or cannot be undone; the rule files in c; and a decision of mine that is changed or newly set (a decision draft accepted, a design or look rule, a pass mark). A record of words I typed, copied by script, is not in this list.
+> g. One table of every reason that makes a pull request "needs-mustafa" today: it stays with me, it moves to my Advisor's merge check, or it goes, each with one line why. Nothing leaves that table silently.
+>
+> 4. What the plan answers plainly:
+> a. How my Advisor's merge check reaches the building chat without my paste. My Advisor proposes one comment on the pull request that names the full commit id and what was checked. And what stops a chat from writing that line for itself: all sessions post as the same GitHub user, so if nothing can stop it, say so, and say what catches it afterwards. My Advisor proposes to compare every merge on main with its own checks at each board check.
+> b. How the building chat is woken when that check is in, without me.
+> c. What the PR Advisor routine still does, and what changes in the risk tier table.
+> d. How a wrong change that shows nothing is caught after the merge. The rollback rule stays as it is.
+>
+> 5. Shape. Every changed sentence shown old beside new. Every word of mine that it changes or narrows, listed. The security-auditor and the advisor agent on the plan. Size it bottom-up: rule text, script and tests count, docs and the report do not, as in CAP (a). The stop line is twice that size. If it is more than 150 added lines, show me a smaller version beside it.
+>
+> 6. Until this change is merged, today's rules hold in every chat. Until the second guard fix is merged: git and gh always start their own command, with no other program in front of them.
+>
+> End with "Decisions needed" and "For Mustafa".
+- **Taken by Mustafa, 2026-11-25, 16:59:52 UTC: ORDER-3C (c), with four conditions: change-set 3c is split at its
+  seam, the recording becomes the first step of change-set 4, Walk, and the link simulator follows Walk as its own
+  small change-set, merged before change-set 7 starts; then change-set 4's plan, sized at 1.8 times with a stop line,
+  showing the earliest playable build and whether Walk is cut in two; main 311c0484 taken in; the wider interim rule
+  that git and gh always start their own command; the Hornet's entry for docs/UNITS.md section 0** (the builder chat
+  he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "For
+  Builder V4, from me, written with my main Advisor (25 November, 17:55 Amsterdam)."; message
+  30cd6625-e8c6-4aee-9265-139a5458ceba, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-order-3c-answer.md` (readable at commit
+  fb5d0ff7860a661c06824688c1d963b43124ca59 of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied
+  by script from its transcript). What it answers, in the chat's words (not his): the chat's question ORDER-3C
+  (question-2026-11-25-order-3c.md beside this file: what is built first, change-set 3c or change-set 4, Walk; options
+  (a) the plan's order, (b) Walk first and 3c whole after, (c) the recording as Walk's first step and the link
+  simulator after Walk; recommended (c)). Points 3 to 7 answer nothing the chat asked: they set the next work. Copied
+  by script (2728 bytes, sha256 18fd8bb4855d4615893e126da79d8d1e87ff40d0a7bf247f6a770aa2facef428):
+> For Builder V4, from me, written with my main Advisor (25 November, 17:55 Amsterdam).
+>
+> 1. ORDER-3C: (c). Split 3c at its seam. The recording (the replay runner, the comparer, the state's hash on the players' file, the recorded match) becomes the first step of change-set 4, Walk. The link simulator follows Walk as its own small change-set and is merged before change-set 7 starts. This changes the order my go of 17 November named, for these two parts only.
+> 2. Conditions for (c):
+>    a. No proof gets thinner than the build plan has it: every mark the plan places at Walk on the recording is met before Walk merges.
+>    b. The recording step is built and green before any movement code rests on it.
+>    c. Walk's plan places every item named for 3c in one of the two parts, by name.
+>    d. Your fallback stands: if Walk cannot carry the recording inside its stop line, the recording alone becomes a small change-set before Walk, and you tell me before anything moves.
+> 3. Now write change-set 4's plan, as point 7 of my takeover block says, sized at 1.8 times with a stop line. The plan also shows the earliest point at which I can play a build of the walking soldier, and whether Walk stays one stop or is cut in two with the first playable soldier in the first part. I would rather play a first part early than wait for one large stop. Point 8 of the takeover block (my Testlines values) stands.
+> 4. Main has moved: the guard fix, pull request #69, is merged, and main is 311c0484f7a9697ae33e7a76a8cf0b507a2837c4. Take it in before you plan, and tell me in one line whether your session then loads the fixed guard. docs/STATUS.md no longer holds the "in flight" rows of #66 and #68. Change-set 3b's own docs pass is still owed, as STATUS says: it goes into your first pull request.
+> 5. The interim rule is wider now, until a second guard fix is merged: git and gh always start their own command, with no other program in front of them.
+> 6. For the docs pass of your first pull request, one entry in docs/UNITS.md, section 0, recorded by script from this message: "The Hornet is a tier-one unit of the Empire: a vehicle on one wheel that leans forward or backward with the direction it moves, and leans back in a flinch when it fires a full shot. Its blockout and first handling numbers are in my Testlines sandbox; those numbers are a sketch to tune." Mark the unit as decided and the numbers as a sketch. The hover skimmer line of 4 November stays as it is. If the entry clashes with another line of that section, do not settle it: list the clash for me. The Hornet is not part of Slice 1 and nothing of it is built there.
+> 7. Answer in at most 8 lines. Then the plan and your advisor agent's review, and stop for my go on the plan.
 - **Taken by Mustafa, 2026-11-25, 16:41:57 UTC: 3b (#68, main 3ab9eaec) and the guard fix (#69) are merged: take
   today's main in once and go on (the test lists and timings again, the reviewers, then ask 2 with every CI text in one
   message); lane 1's builder is now Builder V4, a new chat, and nothing changes for this work; the interim rule wider
@@ -224,6 +848,127 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. The interim rule is wider now, until a second guard fix is merged: git and gh always start their own command, with no other program in front of them. Tell me in one line whether your session loads the fixed guard after taking main in.
 >
 > Answer in at most 4 lines.
+- **Taken by Mustafa, 2026-11-25, 16:34:18 UTC: his go for the merge of #69 (guard-env-fix) at exactly
+  08bb20af3b41634c98ffe48279fb2704f911d5ed, passed as the expected head, by a normal merge commit; CAP (a): a line limit
+  of his on guard work counts code and tests, not docs and the report; SAME-GAP (a): now, as the chat's next change-set,
+  from the new main, a rule that nothing in front of git or gh gets through unread (every wrapper and keyword the day
+  guard strips reads its options from a table; a form the table does not know asks in a session and refuses an agent; a
+  wrapper with options that the guard does not strip is treated the same when git or gh follows it), with the wrapper
+  loop's turn limit (SA-R1-3) and the advisor agent's test row; SA-R2-2: find out, change nothing without his word; a
+  stop line of 200 added lines of code and tests; the test rows pushed with the fix and the open forms kept out of docs,
+  notes and pull request text until it is merged; the interim rule: git and gh always start their own command; a
+  one-line answer on whether a running chat loads the fixed guard after the merge** (the chat he calls the Guard fix
+  chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`;
+  his label: "For the Guard fix chat, from me, written with my main Advisor (25 November, 17:05 Amsterdam)."; message
+  0b931bf7-d0c7-4d21-aedf-2549b40573c4, whole; copied by script from the chat's saved file
+  `.checkpoints/guard-wrappers/mustafa-2026-11-25T1705-same-gap.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat
+  copied by script from its transcript). What it answers, in the chat's words (not his): CAP and SAME-GAP, the two
+  questions guard-env-fix (#69) left for him (STATUS's "Waiting on Mustafa" at main 07d673b: CAP, does his 150-line cap
+  cover the code files only, or docs and the report too; SAME-GAP, a follow-up guard change-set for the other wrappers),
+  and the merge of #69. Records, not his words: #69 merged as 311c0484 at 2026-11-25 16:34:48 UTC, head 08bb20af (read
+  with gh api, `merged_at`, by docs-keeper, 2026-11-26). Copied by script (2409 bytes, sha256
+  7570dcca9c805cfeb1db75aca47503b3a263df688eed8320d9b4578025266614):
+> For the Guard fix chat, from me, written with my main Advisor (25 November, 17:05 Amsterdam).
+>
+> 1. Merge #69. My go is for exactly the commit 08bb20af3b41634c98ffe48279fb2704f911d5ed, passed as the expected head, by a normal merge commit. My Advisor's merge check passed on it at 16:55 Amsterdam: it sits on main 3ab9eaec, five files, 149 added lines, gate, smoke and toolchain green, and the guard's tests ran again there at 1247 of 1247. If the head is anything else or a check is not green, do not merge and tell me in one line. After the merge give me main's new commit id.
+> 2. CAP: (a). From now on a line limit of mine on guard work counts code and tests. Docs and the report do not count.
+> 3. SAME-GAP: (a), now, as your next change-set, from the new main. The same route as before: plan first, your advisor agent, the edit asks me, security-auditor, verifier, report, and the merge on my go after my Advisor's check.
+>    a. The goal is a rule, not a list of forms: nothing in front of git or gh gets through unread. Every wrapper and keyword the day guard strips reads its options from a table, as env, nice and stdbuf now do. A form the table does not know asks in a session and refuses an agent. A wrapper with options that the guard does not strip at all is treated the same way when git or gh follows it.
+>    b. With it: the wrapper loop's turn limit (SA-R1-3), so that a line that reaches the limit asks instead of passing, and the test row your advisor agent suggested for the env -u case.
+>    c. SA-R2-2 (very long lines against the hook's time limit): find out from Claude Code's own documentation what happens when a hook runs out of time, whether the command then runs or not, and tell me. Change nothing for it without my word.
+>    d. Stop line: 200 added lines of code and tests. If the rule needs more, stop before you build and tell me the size.
+>    e. Push the new test rows together with the fix, not before it, and keep the open forms out of docs, notes and pull request text until the fix is merged. Never try a form with a live command.
+> 4. Until that second fix is merged, in your chat too: git and gh always start their own command, with no other program in front of them.
+> 5. Tell me in one line whether a chat that is already running loads the fixed guard by itself after the merge, or what it must do to get it. I pass that on to the other chats.
+>
+> Answer in at most 8 lines. Plain words.
+- **Taken by Mustafa, 2026-11-25, 15:51:21 UTC: his takeover block for the chat he calls Builder V4: lane 1 of the
+  Slice 1 build from the merge of change-set 3b on, in twelve points (among them: the first job is the question
+  ORDER-3C; then the plan of the stop he chooses, sized at the ratio change-sets 3a and 3b ran at, with a stop line;
+  his Testlines values, point 8, a to g; no CI, kit or gate file is written by this chat; a merge only on his go for
+  the head the advisor agent approved; this block recorded word for word with the first pull request)** (the builder
+  chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; his label: "My
+  words of 2026-11-25 for a new Claude Code chat: you take over lane 1 of the game's build."; message
+  f0ae3cf2-d3a3-428d-9657-c67fd0d838fb, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-25-takeover.md` (readable at commit fb5d0ff7860a661c06824688c1d963b43124ca59
+  of the chat's branch `claude/cool-pasteur-oiqk1r`), which the chat copied by script from its transcript). What it
+  answers, in the chat's words (not his): nothing the chat asked: it is the block that opened this chat. Its point 2
+  asks that it is recorded word for word in docs/DECISIONS.md with this chat's first pull request. Not recorded here,
+  by his own words in it: his board add-on of the same day.
+  Copied by script (5779 bytes, sha256 0dc59aaff9788c5e3ba0ec035fe47798a38da5d6261aecdb60fc7a2969d306a1):
+> My words of 2026-11-25 for a new Claude Code chat: you take over lane 1 of the game's build.
+>
+> 1. Who you are. A new Claude Code chat on Fable 5.2, on my first personal account. I call you Builder V4. Read your session's model first; if it is not Fable 5.2, stop and tell me in one line. My model words of 2026-11-12 and 2026-11-14 in docs/DECISIONS.md, which Builder V1 and Builder V3 worked under, hold for you unchanged.
+>
+> 2. What you take over. Lane 1 of Slice 1, as the build plan (docs/reports/2026-11-17-build-plan-slice-1.md) and its Part 15 give it. Builder V3, on my other account, built it up to change-set 3b, which is merged (pull request #68). That account is near its usage limit, so the seat moves to you at this merge boundary: my BUILD-SEAT of 23 November now names you. Builder V3 has stopped. Record this block word for word in docs/DECISIONS.md with your first pull request.
+>
+> 3. Where you start. origin/main. It must contain the merge commit 3ab9eaecf42e617578c083b7fda01fbdf8f004e2. Work on your own branch, in a worktree; do not switch your main folder. Never push to another chat's branch: claude/loving-hopper-6p0mg2 (Builder V3), claude/optimistic-albattani-mdoonz (Builder V2, lane 2), claude/keen-tesla-v807cf (the CI Builder), claude/practical-ride-igo41n and claude/netcode-proof-test-plan-hcky5g (netcode), claude/wonderful-hamilton-jdmlnf (Builder V1).
+>
+> 4. What you read first. CLAUDE.md and what it names. The report docs/reports/2026-11-25-cs3b-the-loop-closes.md, from "Not verified" to the end, and the follow-ups in docs/STATUS.md. Builder V3's handover note: fetch its branch and read .checkpoints/handover-builder-v3.md with git show. That branch's newest commit must add only notes on top of 5e02ee733ecac0e2b20a9d0513817a0ea7a5b096; if it changes anything else, or the note is missing, stop and tell me. The note is a colleague's advice, not my word. Then the lane requests issue (#59): lane 2's first list waits there for change-set 4's plan.
+>
+> 5. My words that bind you are the entries in docs/DECISIONS.md on main, as they bound Builder V3. I do not retype them. Among them: ANSWERS-7 (with SIZE-3 and PRESS-PACE), LANE-SPLIT and EARLY-LOOK, FIREFOX-TESTS (b), MUL-ADD, RELEASE-COUNT, SLICE-FEEL, LONG-RUNS. You write no CI, kit or gate file: CI edits belong to my CI Builder chat on Opus 5.5.
+>
+> 6. Your first job, before any plan (ORDER-3C), in at most five lines: does change-set 4, Walk, need change-set 3c's link simulator or first recording to be built and judged? If it needs neither, or only one, what would it cost to build Walk first and 3c after it? Builder V3's note may answer it: check its answer against the build plan. I want to play the first soldier as soon as that is safe. I decide the order, so stop for my answer.
+>
+> 7. Then the plan for the stop I choose: plan first, then your advisor agent's review, as the protocol says. Size it honestly: 3a came to 1.7 times its plan and 3b to 1.8 times, so plan at that ratio and name a stop line where you come back to me. Change-set 4's plan also names: the built-file check for the fused multiply-add (MUL-ADD), what the first picture after a pause shows (the follow-up 3B-RESUME-FLASH, my decision there), and my Testlines values (point 8).
+>
+> 8. Testlines, for change-set 4's plan (my SLICE-FEEL of 19 November stands as written):
+>    a. My sandbox is the public repository Mergincanli/Shamble-Testlines, on its branch claude/sleepy-edison-ygmwfe (commit 3c07269 when my Advisor read it; its main holds only a README). Read its README and src/params.ts for what each value means. Look at it, copy no code.
+>    b. The values come from my Export and from nothing else. I paste the Export's JSON when you ask for it. Save it by script, whole, with its byte count and sha256, as a file in the repository. No value is retyped by hand and none is read off a screenshot.
+>    c. One table: each value Slice 1 uses, its name in the Export, its name in the game's content, its unit, and the change-set that uses it. Compare the Export's section old_game_terms by script with docs/legacy-tuning.json and list every difference. Those are my tunings, and I confirm the list before it becomes the starting table.
+>    d. A script with a --check mode, like the vector generators, fails when the game's content differs from the saved Export through that table.
+>    e. Not taken, each listed by name with one line: the Hornet, the explosion picture, the metrics room, the grid, and every sandbox rule that differs from the old game. None enters a change-set without my word in that change-set's plan.
+>    f. The game runs at 30 steps a second: if my Export says 60, tell me before you use it.
+>    g. The plan says where I tune once change-set 4 exists, so that each value has one home.
+>
+> 9. Pull requests. If this chat can open a pull request, you open your own drafts. If it cannot, put the title and text into your notes (pr-title.txt, pr-body.md) and my Advisor opens the draft, as for Builder V3. Either way a merge happens only on my go for the head your advisor agent approved, with that full commit id as the expected head, after my Advisor's merge check.
+>
+> 10. Later, not now: Builder V2 will ask on issue #59 for one small pull request from lane 1 (a second page in the build setup, for an early look test page). I tell you when it is due.
+>
+> 11. Until the repository's guard is fixed (another chat fixes it): no session or agent of yours puts env, stdbuf or nice with options in front of git or gh.
+>
+> 12. Your first answer, before you write anything, in at most 10 lines: your model, your mode, your branch, whether main and the handover note match this block, whether the repository's guard loads in your session, whether you can open and merge pull requests, and then the five lines on ORDER-3C.
+- **Taken by Mustafa, 2026-11-25, 14:26:48 UTC: his go on the plan of change-set guard-env-fix (#69)** (the chat he
+  calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch
+  `claude/confident-gates-tbnq38`; no label of his own (the whole message is one word); message
+  fa7b2b85-5eee-4dee-92ad-61803fc38f2a, whole; copied by script from the chat's saved file
+  `.checkpoints/guard-wrappers/mustafa-2026-11-25T1526-go.md` (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat copied by
+  script from its transcript). No label of his own. What it answers, in the chat's words (not his): the chat's stop for
+  his go on its plan of guard-env-fix, pushed at 20902d9 (14:18:10 UTC); the first edit, 21615cb, followed at 14:39:18
+  UTC (both read with git log by docs-keeper). Records, not his words: owed since guard-env-fix's docs pass, which
+  recorded none of his words in this file; recorded by guard-wrappers' docs pass. Copied by script (2 bytes, sha256
+  6cc8519b91584e8bd435d63341e0838a99721948718b1c9c1e9c358c64ba992a):
+> Go
+- **Taken by Mustafa, 2026-11-25, 13:56:32 UTC: his brief for the change-set guard-env-fix (#69, risk tier 2): close one
+  gap in the guard's unwrap(), where env, nice and stdbuf dropped an option but not its value; an option it does not
+  know is never guessed (a question to him, a refusal in a routine); tests for every option form of the three wrappers
+  with a git command behind it, and tests that today's allowed commands stay allowed; scope: that function, its tests
+  and the docs lines, anything else reported to him and not fixed; a stop at 150 added lines; the order (the plan, the
+  advisor agent, the edit asking him, the gate, security-auditor, the verifier, the report; at most two review rounds; a
+  checkpoint pushed after every step); until the fix is merged, no env, stdbuf or nice with options in front of git or
+  gh, and the gap never tried with a live command; the merge is his** (the chat he calls the Guard fix chat,
+  session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; his
+  label: "For a new Claude Code chat on the repository Shamble-Frontlines, from me, Mustafa, written with my main
+  Advisor (25 November, 14:55 Amsterdam). I call you the Guard fix chat."; message e6bed9a3-abf2-4663-a1da-cd7a61023df3,
+  whole; copied by script from the chat's saved file `.checkpoints/guard-wrappers/mustafa-2026-11-25T1455-brief.md`
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd), which the chat copied by script from its transcript). No decision code. What it
+  answers, in the chat's words (not his): nothing the chat asked; it opened the chat. Records, not his words: owed since
+  guard-env-fix's docs pass, which recorded none of his words in this file; recorded by guard-wrappers' docs pass.
+  Copied by script (2673 bytes, sha256 15ccf157ec2e1723620a5dd6cc08aef8b34c4455c48143fed02a3a763f7b3a30):
+> For a new Claude Code chat on the repository Shamble-Frontlines, from me, Mustafa, written with my main Advisor (25 November, 14:55 Amsterdam). I call you the Guard fix chat.
+>
+> Your one job: a small change-set that closes one gap in the repository's guard. Risk tier 2 (a kit file).
+>
+> 1. Read first: CLAUDE.md, docs/REPO_MAP.md, docs/STATUS.md, .claude/agents/advisor.md and .claude/CHECKPOINTS.md. Then the finding: the file .checkpoints/netcode-proof-test/security-u7-0b-answer.md (its entry SEC-U7B-1) and q-guard-env.md beside it, on the branch claude/netcode-proof-test-plan-hcky5g. Read them with git show. Never switch to that branch and never push to it.
+> 2. The gap, in plain words: in .claude/hooks/routine-guard.mjs the function unwrap() strips wrapper commands off a command before the guard looks at it. For env, nice and stdbuf it drops an option but not that option's value, so the value is taken for the program, and a git or gh command behind it gets no check and no question in a day session.
+> 3. What the fix must do: unwrap() reads these three wrappers' options together with their values, and where it meets an option it does not know, it never guesses: the command then counts as unreadable (a question to me, a refusal in a routine), never as allowed. Tests in .claude/hooks/routine-guard.test.mjs for every option form of the three wrappers, each with a git command behind it, and tests that today's allowed commands stay allowed. If your plan finds a better shape, argue it in the plan.
+> 4. Scope: that function and its tests, plus the docs lines the docs-keeper needs. Anything else you find in the guard you report to me and do not fix. Stop and ask me if the change passes 150 added lines.
+> 5. The order, as CLAUDE.md has it: the plan first, the advisor agent's review of the plan, then the edit (a kit file, so the edit asks me and I tap), the gate, the security-auditor's review of the final diff, the verifier, the report. At most two review rounds. Keep a checkpoint card and push it after every step.
+> 6. Until your fix is merged: you and your agents put no env, stdbuf or nice with options in front of git or gh. Never try the gap with a live command: the tests call the function only.
+> 7. The merge is mine. When the report is in, give me the full commit id in one line and push nothing after it. If you cannot open a pull request yourself, write its title and text into your notes and say so: my main Advisor opens it.
+> 8. Write to me in plain words: the story first, then "Decisions needed", then "For Mustafa". No tag or code without its explanation in the same sentence.
+>
+> Start with the plan and stop for its review. Answer in at most 8 lines.
 - **Taken by Mustafa, 2026-11-25, 13:55:08 UTC: his answers on pull request #67: PASS-WORDS (a), the three re-worded
   places stand, on one condition: wherever the build-count mark PM-0006-7 or checklist step 4 is reported, it reads
   "recorded, the question is not answered", never "passed" on its own, and until someone shows a count the previews work

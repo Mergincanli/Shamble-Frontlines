@@ -1,0 +1,6 @@
+tick = 900
+player.buttons = 32
+player.presses = [3, 3, 3, 3, 211, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+-- the authority's part --
+seed = (32 bytes, never shown)
+tick 900 shared bytes 84030000200003030303d30700000000000000000000 fnv1a64 9928339d0eca76ae

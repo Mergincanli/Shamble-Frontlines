@@ -246,6 +246,109 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
   3B-LATE-BOUND, OVERFLOW-PANIC-RULE (due with 3b's code in `room`), and his two press limits when due (3B-PACER-255,
   3B-OUTAGE-256).
 
+_Moved from STATUS (2026-11-25, change-set 4a's docs pass, under his OLD-LINES of 2026-11-18): STATUS's row for the merged ci-after-3a (PR #71, 07d673b, merged 2026-11-25 20:49:09 UTC by `merged_at`), moved by script, byte for byte, so its cells read as they stood when it left STATUS:_
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| none yet (title and text in the notes, `pr-title.txt`, `pr-body.md`) | ci-after-3a, the small CI pull request after change-set 3a, by the chat he calls CI Builder: every crate's release tests (E1), the two vector generators' `--check` (3A-GEN-CHECK), `devtools`' own wasm32 build line (3A-RULES-STEP's CI half), and the rule tests in the runner image's Mozilla Firefox 160.0 (FIREFOX-TESTS (b), in part: the drawing tests wait, FF-DRAW); report `docs/reports/2026-11-25-ci-after-3a.md` | `claude/keen-tesla-v807cf` (stands in for `cs/ci-after-3a`) | risk tier 2; code head 832268e, gate, smoke and toolchain green on it (runs 45676587871, 45676587814); the head for approval to be given | the advisor agent's review of the final head; his main Advisor opens the draft; his go for that head; at the merge the unused Playwright Firefox zip is deleted (his answer of 2026-11-25, 00:07:29 UTC, point 3) |
+
+_And STATUS's "Waiting on Mustafa" bullet for ci-after-3a (#71), moved by the same docs pass and rule, byte for byte:_
+
+- ci-after-3a: his go for the head the advisor agent approves, CI green (his main Advisor opens the draft). Answered
+  2026-11-25, 20:35 Amsterdam: RULES-ONLY-READ (a); TOKEN-WORDS (a), its home the next workflow text the CI chat asks
+  him for (the hand-over step for Builder V2's previews); FF-DRAW-WHEN (a), with the gate step 2.3, its own question
+  (`docs/DECISIONS.md`; the report `docs/reports/2026-11-25-ci-after-3a.md`).
+
+_Moved from STATUS (2026-11-26, ci-preview-handover's docs pass, under his OLD-LINES of 2026-11-18): STATUS's row for the merged change-set 4a (PR #70, 2483e9a, merged 2026-11-26 12:22:01 UTC by `merged_at`, read with gh's REST route), moved by script, byte for byte, so its cells read as they stood when it left STATUS:_
+_Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES of 2026-11-18): STATUS's row for the merged change-set 4a (PR #70, 2483e9a, merged 2026-11-26 12:22:01 UTC by `merged_at`, read with gh api), moved by script, byte for byte, so its cells read as they stood when it left STATUS:_
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| #70 | change-set 4a, "The recording" (the first of Walk's four parts, his WALK-CUT (a)), by lane 1 (the chat he calls Builder V4): a recorded match replays to the same hashes, tick by tick, natively (one process, two processes, two matches in turn) and in WebAssembly on the players' file (Node and Chromium), and each planted divergence is caught at its tick with the field that differs; the one new number on the players' file is the shared state's hash (`Sim::shared_hash`), read only by a replay | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4a-recording`) | risk tier 1; no browser check (nothing a player sees changes); five reviewers in two rounds (netcode-architect, rust-reviewer, test-engineer, engine-architect, security-auditor), all APPROVE in round 2, nothing Critical, High or Medium open; source final at fb5d0ff; the local checks, CI (on 21c1046, six of six) and the verifier (PASS) on it; 3,300 written lines against the stop line of 3,400 (3,050 before his STOP-4A (a), 2026-11-25, 20:48:11 UTC); report `docs/reports/2026-11-25-cs4a-recording.md`; ready for review once the advisor agent has approved its last head | the advisor agent's review of the last head; his Advisor's merge check; his go for that head |
+
+_Moved from STATUS (2026-11-26, MAIN-WALL's docs pass, under his OLD-LINES of 2026-11-18): STATUS's rows for the merged ci-preview-handover (PR #74, merge commit 3b949c1a, 2026-11-26 15:24:22 UTC, the merge commit's date read with git; `merged_at` not read) and guard-wrappers (PR #73, merge commit 4a62873e, 2026-11-26 14:56:33 UTC, the same way; merged on his go of 14:56:06 UTC for head 7bff799f, `docs/DECISIONS.md`), moved by script, byte for byte, so their cells read as they stood when they left STATUS:_
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| none yet (title and text in the notes) | ci-preview-handover, by the chat he calls CI Builder (his block of 2026-11-26, 13:20 Amsterdam; lane 2's request on issue #59): at the end of the `toolchain` job, on pull requests from this repository only, a check that the tested player build holds only plain files and folders with no name that begins with a dot, then the hand-over of that build to lane 2's preview workflow as the artifact `preview-site`, kept 7 days (`actions/upload-artifact` v7.0.2 at cf430e0, his UPLOAD-SOURCE (a)); TOKEN-WORDS and two comments made true; the recording's replay test joins the rule tests in Firefox (FIREFOX-REPLAY) | `claude/keen-tesla-v807cf` (stands in for `cs/preview-handover`) | risk tier 2; no browser check; written at d12e3a8 on his CI-WRITE-3 (a), GUARD-STEP (a) and HIDDEN-FILES (b) (2026-11-26, 15:05 Amsterdam), both files at his sha256 values; one review round before his yes (security-auditor: nothing stops the change, its SA-1 Medium is the accepted CUT-ESCAPE; infra-engineer: APPROVE); in the container Firefox 161 3 passed (the replay test included), Chromium 17 passed, the check on the real build and on seven planted faults; the upload step has never run, and no preview starts until lane 2's `preview.yml` is on main; CI: the push run on d12e3a8 green (the new steps skipped on a push; Firefox 3 passed, the replay test among them); the pull request run to read; report `docs/reports/2026-11-26-ci-preview-handover.md` | his Advisor opens the draft and watches the first run; the advisor agent's review of the final head; his go for that head |
+| none yet | guard-wrappers (his SAME-GAP (a): nothing in front of git or gh gets through the day guard unread), by the chat he calls the Guard fix chat; what it does: "Phase", "The day guard" | `claude/confident-gates-tbnq38` (stands in for `cs/guard-wrappers`) | risk tier 2 (his go; no pull request yet); code head 83bc2417; main 2483e9a merged in (7be0a933) in a separate worktree; guard tests 1551/1551; four security-auditor rounds (the fourth by his leave, the last), R4-1 left open by his R4-END (1); 166 added lines of code and tests (stop line 200); report `docs/reports/2026-11-26-guard-wrappers.md` | the advisor agent's review of the pushed head; his Advisor's merge check; his go for that full head id |
+
+_STATUS's "Waiting on Mustafa" lines for the same two pull requests, moved the same way (both merged since, as the header above says):_
+
+- ci-preview-handover (CI Builder): his go for the head the advisor agent approves, after his Advisor has opened the draft and watched the first run (the push run on d12e3a8 green; the pull request run is the first to run the two new steps); a red on the new steps or on Firefox's replay test comes to him first; if the run fails at its start because the action is not allowed, the chat tells him which setting to change (his 15:05 points 5 and 7).
+- guard-wrappers: his go for the head id the advisor agent approves, after his Advisor's merge check (no browser check).
+
+_And lane 1's own lines that change-set 4b-1's docs pass replaced in STATUS (lane 1 wrote them), moved by the same script, byte for byte, so their words stay on record: "Next" item 2 as it stood, the "Waiting on Mustafa" bullet from 4a's report (its answered items now point at `docs/DECISIONS.md`), and the bullet for RELEASE-COUNT (decided on 2026-11-25; its condition 3B-RELEASE-DRAFTS stays open, listed in the archive's "Follow-ups", the bullet "From change-set 3b", which STATUS's "Merged pull requests' bullets" points at):_
+
+2. v2: the netcode proof test (#40); step 2.3's chat stays stopped. 3b (#68), the small CI pull request (#71) and 4a (#70) merged.
+   **No change-set 3c:** his ORDER-3C (c), 2026-11-25, 16:59:52 UTC (`docs/DECISIONS.md`): "Split 3c at its seam." The
+   recording is change-set 4a (#70); "The link simulator follows Walk as its own small change-set and is merged before
+   change-set 7 starts." Walk is four change-sets (his WALK-CUT (a)): 4a the recording, 4b content and the world, 4c the
+   first soldier (he plays; an early look inside it), 4d sights; then the link simulator, then 7. Change-set 4's plan,
+   section 8 (where to read it: 4a's report), places each 3c item by name. The first builder chat stays paused; Slice 3 waits for #40 and picks how commands are timed.
+
+- From 4a's report (#70, merged 2026-11-26, 2483e9a): EARLY-LOOK-ORDER (his go's point 4: "I decide then"); before 4b's first edit
+  CONTENT-SOURCE and DEPART-4; FIREFOX-REPLAY (it widens the Firefox entry he cut to the rule tests; answered by his block of 2026-11-26, 13:20 Amsterdam; carried by ci-preview-handover); LINKS-CHECK
+  (4A-S3-READ). STEP-60 (a): his Export at 30 steps before 4b's step 6, then DIFF-LIST. Later: MOVE-RULES, NO-SOURCE,
+  RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two `docs/UNITS.md` §0 lines the Hornet's entry clashes with (his unit
+  walk).
+- **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (`docs/DECISIONS.md`, 11:38:37 UTC), with
+  two conditions: no report calls any part of the presses mark passed; and the two drafts are made to agree at
+  their next revision, which comes to him before it is written (**3B-RELEASE-DRAFTS**, his).
+
+_Moved from STATUS (2026-11-26, change-set 4b-1's docs pass, second part, to bring STATUS toward his 120 lines): lane 1's own lines (lane 1 wrote them), moved by script, byte for byte, where STATUS now has short forms: its first part's "Last updated" line, 4b-1's in-flight row as it stood before the reviews, "Next" item 2, the "Waiting on Mustafa" bullets with the long form of the builder's questions SIGHT-FLAG and DUR-1 and what he answered on 2026-11-26, the "From change-set 4b-1" follow-ups bullet and the "v2" open-risks bullet as they stood:_
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| none yet | change-set 4b-1, "Content" (the first of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (the chat he calls Builder V4): the content crate `crates/content` with no dependency (one reader for a cut grammar of JSON, the canonical writer, the bundle, the movement kind, the map kind with its own exact rules and the aim's reach, the time unit's conversion), the simulation's time unit, the reader's proofs and a bounded fuzz run natively, under Node and in the browsers, the old tuning's numbers and durations extracted by script, the time unit's rounding report, and the links check (his LINKS-CHECK (c)); 6,591 written lines against the stop line 7,450 | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4b-content`) | risk tier 1, no browser check; built (code head ef2edec, main 3b949c1 merged in), in review round 1 (rust-reviewer, engine-architect, security-auditor; test-engineer follows) | the reviews and their fix pass, the verifier; the advisor agent's verdict on the final head; then his go for that head |
+
+_Last updated: 2026-11-26 (change-set 4b-1's docs pass, first part, by lane 1's docs-keeper, on its branch with main 3b949c1 merged in: 4b-1 in flight, in review round 1; VISION-RULE's follow-up and pointers; 4b-1's follow-ups and the builder's two questions; the merged #73's and #74's rows, waiting bullets and top lines moved to the archive by script under OLD-LINES, with lane 1's replaced lines; the reviews' outcomes come in the main session's own pass)._
+
+2. v2: the netcode proof test (#40); step 2.3's chat stays stopped. Walk (his WALK-CUT (a); no 3c: his ORDER-3C (c),
+   `docs/DECISIONS.md`): 4a merged (#70); **4b-1 in review**; 4b-2 (steps 6 to 12: the collision library and world, his
+   Export's data, the page's scene; after a short re-read by the advisor agent); 4c the first soldier; 4d sights; then
+   the link simulator, before change-set 7. The first builder chat stays paused; Slice 3 waits for #40.
+
+- Change-set 4b-1 (no browser check): his go for the head the advisor agent approves; and the builder's two questions,
+  in its report. **SIGHT-FLAG**: should 4b already give each map object a "blocks sight" flag? The builder and
+  engine-architect recommend not in 4b: it comes in Slice 2 with the sight check. **DUR-1**: which fire rate counts as
+  the old game's? The old code never carried a timer's leftover time, so the Shabzon fired about 720 shots a minute at
+  60 frames a second where its table value of 0.072 s gives 833; it binds change-set 8; game-designer's read
+  (`.checkpoints/cs4b-content/game-designer-durations.md`, gone from the tree at the pull request's close, readable at
+  the branch's commits) recommends the table's value now, tuned by play.
+- Answered on 2026-11-26 (`docs/DECISIONS.md`, 12:21:17, 13:05:03 and 14:09:13 UTC): CONTENT-SOURCE, DEPART-4,
+  EARLY-LOOK-ORDER, LINKS-CHECK, SOURCE-GO, SIZE-4B, FEATURE-COMPARE; FIREFOX-REPLAY (carried by #74). STEP-60: his
+  Export at 30 steps is in (15:07:24 UTC; saved whole in the chat's notes); DIFF-LIST is asked at 4b-2's data step
+  (step 8). Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two
+  `docs/UNITS.md` §0 lines the Hornet's entry clashes with (his unit walk).
+
+- **From change-set 4b-1** (in review; the archive's block "From change-set 4b-1"; the 4B- ids are its docs pass's):
+  4B-AIM-REACH: the loader refuses a playable map beyond the aim's reach (x and z plus or minus 327.67 m, y 0 to
+  655.35 m). The aim widens in the first change-set whose map leaves that square (none in Slice 1; Slice 2's plan says
+  whether its maps do), at the latest in Slice 3's change-set that sets the command codec for online play (PM-0001-51),
+  beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. ADR 0002's next revision: 4B-FEATURE-POINTER;
+  the drafts' next revision: 4B-DEPART-3, 4B-PM5-3 (his acceptance); the CI Builder: 4B-CI-CONTENT; 4d's import and
+  change-set 8: 4B-OLD-TIMERS. Closed by 4b-1's step 4, at its merge: 4A-S3-READ's read side.
+
+- **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's (R3-R6
+  spot-checked; unread sources); change-set 3a's (MUL-ADD first); 3b's (no bound yet on how late a command runs, before
+  online play; releases worked out, not counted); 4a's (two planted divergences only in a stand-in or native form; the
+  recording tests' link read, 4A-S3-READ, closed on 4b-1's branch, at its merge). **Legacy (frozen):** 3a's ranked list (PR #15); bot navigation; the
+  editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
+
+_Moved from STATUS (2026-11-26, change-set 4b-1's take-in of main 2671595 under pull request #75; his word of 18:16:35 UTC: "fold your own lines by script"): lane 1's own lines as they stood on the branch at 2e28217, byte for byte, where STATUS now holds a shorter form (its top line, its two "Waiting on Mustafa" bullets, the list of ids of "From change-set 4b-1"); and main's lines of lane 1's that the branch's lines replace and that were not in this archive yet:_
+
+_Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's docs-keeper, on code 2039e3c: 4b-1 reviewed; the reviews' follow-ups; lane 1's lines shortened, their long form moved to the archive by script; its first part moved the merged #73's and #74's lines there under OLD-LINES)._
+- 4b-1, reviewed (two rounds, no Critical or High; the verifier and the advisor agent on its final head: its report):
+  his go; the builder's SIGHT-FLAG ("blocks sight" flag in 4b?), DUR-1 (the old fire rate?): long form, the archive.
+- Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two `docs/UNITS.md` §0
+  lines the Hornet's entry clashes with (his unit walk); DIFF-LIST at 4b-2's data step (his Export at 30 steps is in).
+  beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. Also 4B-FEATURE-POINTER, 4B-DEPART-3, 4B-PM5-3,
+  4B-CI-CONTENT (the CI Builder), 4B-OLD-TIMERS, 4B-TIME-REEXPORT, 4B-FACING-ZERO, 4B-SPAWN-SLOTS, 4B-PLAN-4B2,
+  4B-FUZZ-REACH, 4B-REFUSAL-TABLE, 4B-SCAN-CFG-TEST, 4B-OLD-READERS, 4B-MEMORY-UNIT. Closed at merge: 4A-S3-READ.
+  online play; releases worked out, not counted); 4a's (the recording tests still follow a link, 4A-S3-READ; two planted
+  divergences only in a stand-in or native form). **Legacy (frozen):** 3a's ranked list (PR #15); bot navigation; the
+
 ## Targets
 - **v2 (VISION_V2 §3, read with MODES-3 (a): the starting sizes are totals; Mustafa, 2026-10-31):** start with two teams
   with 2–8 players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or
@@ -805,6 +908,12 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
       (kill(2)). A real boundary needs a different uid with its own copy of the workspace, a container or VM, or a
       separate job whose output nothing trusted runs. Today the job has `contents: read` and no secrets, and
       `gate.yml`'s toolkit dependencies already run with the same reach (security-auditor).
+      _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass; his words of 2026-11-26, 15:05 Amsterdam, point 6,
+      `docs/DECISIONS.md`: "CUT-ESCAPE stays on record as accepted."): on that pull request's branch a step after the
+      cut uploads the build the cut's code wrote, for lane 2's preview workflow, which publishes it with a Cloudflare
+      token (security-auditor's read on lane 2's branch at 9ded5a8); the acceptance now also rests on that workflow
+      treating the build as data (PH-SA-2), and the later fix is
+      CUT-ESCAPE-FIX (both in "From ci-preview-handover")._
     - **SETPRIV-HARDEN** (D5, security-auditor's SA-2): the cut's privilege drop (`setpriv --reuid="$(id -u)"
       --regid=nogroup --clear-groups --no-new-privs`, `toolchain.yml:69` [verified 2026-11-13]) has neither
       `--inh-caps=-all` (setpriv(1)'s own advice when dropping from root) nor `--bounding-set=-all`, and the step prints
@@ -1265,6 +1374,9 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
       runs the rule tests (`tests/rules/`) in the runner image's own Mozilla Firefox 160.0 on Linux (his
       FIREFOX-SOURCE (c), 2026-11-25, 00:07:29 UTC); the browser tests that draw stay Chromium-only in CI, since the
       runner's Firefox gives the page no WebGL (FF-DRAW, in "From ci-after-3a"); WebKit and Safari not._
+      _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): on that pull request's branch, closed when it
+      merges, the `firefox` project also runs the recording's replay test (`tests/replay/`), his FIREFOX-REPLAY
+      (FIREFOX-REPLAY in "From ci-preview-handover")._
   - **From his browser check** (2026-11-19, 14:46:25 to 15:09:29 UTC: eight "Copy report" texts from Brave 1.100.58 and
     Firefox 160 on his Windows computer; the record, with his four messages whole and the readings below:
     `docs/reports/2026-11-19-cs2-browser-check.md`, "Observations for the follow-ups"; the ids are that record's; none
@@ -1335,6 +1447,9 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
     SHA, receive the job's token as their default input, as on main ("the only run step with the token").
     _Pointer, 2026-11-25: not done in ci-after-3a, the next CI edit; that chat deferred it again (the chat's choice,
     not his), to keep its pull request to his four parts; still due at the next CI edit ("From ci-after-3a")._
+    _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): **done** on that pull request's branch, closed when
+    it merges: `.github/workflows/toolchain.yml:94` reads "The only run step with the token" [verified 2026-11-26 at
+    d12e3a8]._
   - F-CHANNEL (security-auditor, Low; with change-set 3's build work; named in the list of what his go for #64
     accepts; **done in change-set 3a**, 5c92311: `CARGO_OVERRIDES` refuses every `RUSTC_` name, `__CARGO_` and
     `CARGO_UNSTABLE_`, CI's cut names still allowed, and names compared in upper case since 79666ad9;
@@ -1360,6 +1475,8 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
     2026-11-23, 21:24:59 UTC).
     _Pointer, 2026-11-25: carried by the chat he calls CI Builder (ci-after-3a), in part: the rule tests in Firefox in
     CI; the drawing tests are FF-DRAW ("From ci-after-3a")._
+    _Dated pointer, 2026-11-26: the replay test joins them on ci-preview-handover's branch, closed when it merges
+    (FIREFOX-REPLAY in "From ci-preview-handover")._
   - The line for CLAUDE.md on the third account (ACCT-3; his to give).
   - RR-F5's fix, SA-TREE and the `__pycache__/` line: change-set 3 (the block for #61 above). _All three **done in
     change-set 3a** (marked there, 2026-11-24)._
@@ -1476,6 +1593,9 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
     branch, closed when it merges: the `firefox` project runs `tests/rules/` (the float and stream vectors and the
     planted counter) in the runner image's Mozilla Firefox 160.0 (2 passed, run 45676587814) [verified 2026-11-25];
     the Firefox drawing tests are not in CI (FF-DRAW). WebKit and Safari stay open._
+    _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): on that pull request's branch, closed when it
+    merges, the `firefox` project also runs the recording's replay test (FIREFOX-REPLAY in "From
+    ci-preview-handover")._
   - 3A-MANIFEST-COMMENT (the next manifest batch, 3b's): the root `Cargo.toml`'s comment "in sim-wasm only" (line 14)
     is no longer true; and "The later cargo-deny wasm-bindgen rule must allow devtools too" (security-auditor's
     answer on the dependency batch, `security-auditor-deps.md`).
@@ -1497,6 +1617,13 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
   3b's card, "Open findings" and "Round 2 so far", and the reviewers' notes
   `.checkpoints/cs3b-loop-closes/<reviewer>-review1.md` and `-review2.md`, readable at the notes' last commit
   80a51e4299d2a9abb0c08adc76dc1a31716f036a. The ids are this docs pass's):
+  _Pointer, 2026-11-25 (change-set 4a's docs pass, which carries 3b's owed one): **merged** as PR #68, 3ab9eae,
+  2026-11-25 13:57:03 UTC by `merged_at`, by merge commit, from his main Advisor thread on his tap of 13:56:26 UTC, with
+  the expected head 5e02ee73 (the merge commit's message) [verified 2026-11-25 with git and GitHub's REST API]. There is
+  no change-set 3c any more (his ORDER-3C (c) of 2026-11-25, 16:59:52 UTC, `docs/DECISIONS.md`): read each "3c" below
+  as change-set 4a for the recording's items and as the link simulator's own change-set (after 4d, merged before
+  change-set 7 starts) for the simulator's, as change-set 4's plan, section 8, places them by name (the plan:
+  `.checkpoints/cs4-walk/plan.md` at c17a054, the last commit of 4a's branch that holds its notes)._
   - **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (his words: `docs/DECISIONS.md`, the
     entry of 11:38:37 UTC; no release counter in change-set 3c). What it was about (test-engineer's round 2): the
     presses mark's row (PM-0002-12, `docs/adr/0002-code-structure-build-toolchain.md:1283`) says "the Worker counts
@@ -1586,6 +1713,9 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
     counted for honest ticks only (its own plant: an allocation on every datagram the room cannot decode passes all
     114 tests). The two reviewers' probes counted 0 after warm-up; a counting allocator in the two random-message
     tests makes it a test.
+    _Pointer, 2026-11-25 (change-set 4a's docs pass): moved by 4a's size ladder (rung 1, at 2,450 written lines) to
+    the link simulator's own change-set, its other named home; not written in 4a; told to him before it moved, in
+    the question STOP-4A, which he answered (a) at 20:48:11 UTC._
   - **For change-set 3c's plan** (3c: the link simulator and the first recording, moved out of 3b by the plan's size
     ladder, he told before anything moved; with them the one new read-only number on the players' file, the state's
     hash, by his DEPART-3, and `devtools`' three path edges that 3b declares and does not use yet, security-auditor's
@@ -1597,6 +1727,18 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
     with every tick; the state-hash export returns the shared hash only, as plain numbers, read only during a replay,
     its buffer private to `Room` (all three engine-architect's round 2); `late` checked against the simulator's own
     reorder count (netcode-architect's round 2).
+    _Pointer, 2026-11-25 (change-set 4a's docs pass): placed by change-set 4's plan, section 8 (rows 1-27;
+    `.checkpoints/cs4-walk/plan.md` at c17a054). **Met by
+    4a, closed at its merge (#70):** the replay runner, the comparer and the field-by-field difference, the first
+    recording natively and in WebAssembly and in CI (rows 1-4); the state's hash on the players' file, shared hash
+    only, as one plain number, read only during a replay, with its pin, and the host's time recorded with every tick
+    (rows 5-8; since 4a's fix pass the hash has no buffer at all: `shared_hash(&self)` [verified 2026-11-25 at
+    fb5d0ff]); the hash report (PM-0004-21: keep FNV-1a 64) before the first recording was committed, and the begun
+    parts of PM-0004-17, -18, -19 with the three planted divergences (rows 9-10, run again on movement in 4c). Row 11,
+    3B-HOSTILE-ALLOC, moved (above); row 12, RELEASE-COUNT (a): nothing built. **To the link simulator's change-set:**
+    the simulator itself, its clock, its reliable channel, loss and corruption, `link()`, `late` and its marks (rows
+    13-21, 23-27). The three path edges (row 22): still unused after 4a [verified at fb5d0ff]; dropped in 4b's
+    manifest batch if still unused there, each back with its first user in the link simulator's change-set._
 - **From the preview hosting check** (lane 2, the chat he calls Builder V2; in flight, its pull request #66 (2026-11-25: merged, 09faefa);
   branch `claude/optimistic-albattani-mdoonz` standing in for `cs/preview-hosting-check`; risk tier 1; the items of its
   report's "Follow-ups (for STATUS)", `docs/reports/2026-11-24-preview-hosting-check.md`, their text kept; the ids are
@@ -1698,8 +1840,211 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
   - TOKEN-WORDS (the #64 block above; due "at the next CI edit"): deferred again, by the chat, not by him.
     _Dated pointer, 2026-11-25 (his TOKEN-WORDS (a) with one change, 20:35 Amsterdam, `docs/DECISIONS.md`): it rides in
     the next workflow text the chat asks him for, the hand-over step for Builder V2's previews, at no yes of its own._
+    _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): **done** there, on that pull request's branch, closed
+    when it merges (`toolchain.yml:94`, "The only run step with the token" [verified 2026-11-26 at d12e3a8])._
   - FF-ORDER (infra-engineer's F3, Low): the Firefox run starts only if the Chromium run passes (`set -e`), so a red
     Chromium run gives no Firefox evidence; accepted for now.
+- **From change-set 4a, "The recording"** (PR #70, a draft; lane 1, the chat he calls Builder V4; branch
+  `claude/cool-pasteur-oiqk1r` standing in for `cs/4a-recording`, source final at fb5d0ff unless the verifier finds
+  something; risk tier 1, no browser check; two review rounds by five reviewers (netcode-architect, rust-reviewer,
+  test-engineer, engine-architect, security-auditor): round 1 on eb14739, round 2 on what the fix pass changed, all
+  five APPROVE in round 2, nothing Critical, High or Medium open; the stop line 3,400 by his STOP-4A (a). Source of
+  every item: the chat's `.checkpoints/cs4a-recording/round1-fold.md` and `hash-report.md` (at c17a054), folded into 4a's report
+  before the pull request is marked ready. N4, N5, C1-C4, E2-2, E2-3, 4A-BYTES-LENGTH and 4A-FIREFOX-REPLAY are the
+  reviewers' and the chat's ids; the other 4A- ids are this docs pass's):
+  - For 4b:
+    - 4A-NA-4B (netcode-architect's round 1, for 4b's re-read): what `first-loop` replays on once content reaches the
+      constructor.
+    - 4A-EA-4B (engine-architect's round 1): content enters through the constructor only; if the players' file must
+      compute the content's SHA-256, `sha256.rs` moves whole into the content crate, never a second copy; first-loop's
+      header is re-made with its frozen content set and every hash line stays byte-identical, which proves that
+      loading content changed no state.
+  - For 4c:
+    - N5 (netcode-architect's round 1, Low): `recording.ts` stays out of the production build only because nothing
+      imports it: a development marker when the paced replay imports it.
+    - 4A-BYTES-LENGTH (rust-reviewer, a watch, no defect today): `StateSink::bytes` writes no length, which is right
+      for the 16 press counters; a run of variable length (a soldier list, events) needs a fixed-width count before
+      it, or two different states can give the same bytes (4c's step 1). Since 4a's fix pass (E3) `bytes` and `secret`
+      take runs of a fixed length only, so a run of varying length cannot be handed to them [verified 2026-11-25 at
+      fb5d0ff: `crates/sim/src/world.rs`, `StateSink`].
+    - E2-2 (engine-architect's round 2): `SHARED_STATE_BYTES` lost its last user outside the crate; 4c turns it into a
+      length per match: drop the re-export then.
+    - 4A-NA-4C (netcode-architect's rounds 1 and 2): the frozen content copies are listed inputs of the folder check,
+      not unlisted files; the shared length comes from the world, not a constant; `StateSink::f32` with a finite
+      check; every slot of the soldier table is handed over with its occupied flag and generation, so that line i of
+      a state print is always slot i and the field comparison never misaligns. For Slice 2: the recording's header
+      has no mode.
+    - 4A-EA-4C (engine-architect's round 1): `u8`, `f32` (through `to_bits`) and `row()` join `StateSink`; the paced
+      replay reads the hash through a development-only driver, never through the live host's interface; the button
+      meanings get one home in Rust.
+    - 4A-TE-4C (test-engineer's round 1): one known answer with every field non-zero, read by both readers; the real
+      search for a sine input where the two targets differ, and the three injections on movement fields; the replay
+      loop pinned to the live host's call order and its rebase on resume; `scripts.rs`'s button numbers pinned to
+      `keyboard.ts` (its fifth item, the two-process test's line filter, N6, was fixed in 4a).
+    - C4 (security-auditor, the paced replay in 4c): behind a development marker the production message check
+      refuses; its own `Sim` from the recording's test seed, never the live match; `replayOn` keeps calling
+      `checkReplayable`.
+  - E2-3 (engine-architect's round 2; 4c, or change-set 8 at the latest): with `write_state` test-only (done in 4a),
+    `secret` is the only public way seed bytes leave the crate; a wrapper that outside readers can only count would
+    make the seed rule one the types enforce (about 10 lines).
+  - C1 (security-auditor; decided at change-set 7 and binding from Slice 3's first build that talks to a real server):
+    before `Sim::shared_hash` is in a build whose authority is elsewhere, it hashes only the client's own world; no
+    message carries a hash over state outside the recipient's interest set, and the server never answers a client's
+    hash with match or mismatch over such state; tests pin both. Why: FNV-1a can be run backwards (its script got 4
+    hidden bytes back from one hash in 0.06 seconds).
+  - For change-set 8: N4 (netcode-architect's round 1, Low, about 4 lines): `files.rs` and `bin/replay.rs` report the
+    shared column's step first; once random streams join the authority's part, the whole column can differ earlier.
+    C2 (security-auditor): the random streams' key and buffered output go only through `secret`, with a test that the
+    dumps of two worlds that differ only in their seed are identical.
+  - For Slice 3: C3 (security-auditor): the server refuses to start a live match on a seed that begins with `TESTSEED`.
+  - 4A-S3-READ (security-auditor's round 2, left open, to be named to him in 4a's report; for the quality gate step
+    2.3): S3's read side. The tests that read the recordings still follow a link (with `first-loop.rec` linked to an
+    endless device a test reads until memory runs out); the folder check refuses such a link, so CI cannot go green
+    with one, and the exposure is a test run on a hostile branch. Its fix is a repository-wide "no tracked links"
+    check: a gate change, risk tier 2.
+    _Dated pointer, 2026-11-26 (4b-1's docs pass): the read side is **done** on 4b-1's branch by its step 4, his
+    LINKS-CHECK (c) ("about 15 lines in 4b", the entry of 2026-11-26, 12:21:17 UTC), closed when 4b-1 merges: the Rust
+    tests read a recording only through `devtools::files::read_plain`, the Node tests and the browser spec only through
+    `packages/sim-worker/boundary/plain-file.ts`, both refusing anything that is not a plain file in a plain folder, with
+    planted links on both sides and a text scan in `tests/recordings.rs` [verified 2026-11-26 at ef2edec]. The
+    repository-wide "no tracked links" check stays for the gate step 2.3 (the chat's reading of LINKS-CHECK (c) in its checkpoint, not his words)._
+  - 4A-FIREFOX-REPLAY (a wish for the CI Builder; his word first, engine-architect's E2-4, for 4a's report's
+    "Decisions needed" as FIREFOX-REPLAY): the replay spec needs no WebGL, so one line in the browser tests' setup
+    would run the recording in Firefox too, a second engine; that widens the Firefox entry he accepted as cut to the
+    rule tests (RULES-ONLY-READ (a), 2026-11-25, 19:36:36 UTC).
+    _Dated pointer, 2026-11-26 (ci-preview-handover's docs pass): his word came as FIREFOX-REPLAY in his block of
+    2026-11-26, 13:20 Amsterdam (`docs/DECISIONS.md`); **done** on that pull request's branch, closed when it merges
+    (FIREFOX-REPLAY in "From ci-preview-handover")._
+  - 4A-HASH-REVISIT (PM-0004-21's report, by rust-reviewer: keep FNV-1a 64): revisit when the hash first runs on a live
+    tick (server or Worker) or the shared state passes 64 KiB; the replacement then is XXH64, in our own code (no
+    crate). A change costs one change-set: `make_recordings` re-makes every hashes file; world.rs's 8 known answers and
+    the vector file's label and digest by hand; the old hashes must still replay green before the swap. Not measured
+    by the report: Chromium, Firefox and Safari (WebAssembly in Node only), the real soldier table, a server running
+    many rooms, ARM.
+- **From ci-preview-handover, the preview hand-over step** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz, on his block of 2026-11-26, 13:20 Amsterdam; lane 2's request: issue #59, its
+  comment of 2026-11-25, 19:39 UTC; no pull request number yet, its title and text in the chat's notes; local branch
+  `cs/preview-handover` pushed to `claude/keen-tesla-v807cf`, code head d12e3a8; risk tier 2; the advisor agent's plan
+  review `advisor-plan.md` and one review round by security-auditor and infra-engineer on the tried texts before his
+  yes, `security-auditor-ci.md` and `infra-engineer-ci.md`, all in `.checkpoints/ci-preview-handover/`, readable at
+  d12e3a8 until the notes are deleted; report `docs/reports/2026-11-26-ci-preview-handover.md`; CI on d12e3a8: to be
+  read; the ids are this docs pass's, the reviewers' own ids in brackets, not his):
+  - The hand-over (his UPLOAD-SOURCE (a), GUARD-STEP (a) and HIDDEN-FILES (b)): at the end of job `toolchain`, on pull
+    requests from this repository only, a check with absolute program paths that `.gate/dist-production` holds only
+    plain files and folders, none named with a leading dot, and is not empty (it prints the file count and size), then
+    `actions/upload-artifact` at cf430e030ddbb5b0abf93d22962f4752f3646cd9 (v7.0.2) uploads it as `preview-site`, kept 7
+    days, an empty upload an error, hidden files off (`.github/workflows/toolchain.yml:215-243` [verified 2026-11-26 at
+    d12e3a8]). In the container the check passed on the real production build (5 files, 892,209 bytes) and failed on
+    each of seven planted faults (`trials.md`, `question-2026-11-26-ask2.md`). The upload step has never run; its proof
+    is the pull request run's log: its file count against the check's (counts, not bytes: infra-engineer's IE-5), the
+    digest and the artifact id. CI: the push run on d12e3a8 skipped both steps, as meant; the pull request run is their first. No consumer yet: lane 2's `preview.yml` is not on main, and a
+    `workflow_run` starts only from main's copy, so no preview starts until it is (infra-engineer; "Open bugs and
+    risks", the ci-preview-handover entry).
+  - TOKEN-WORDS (the #64 block above): **done** on the branch, closed when it merges (`toolchain.yml:94`), with two
+    comments the new steps would have made false (`:4`, `:130`) [verified 2026-11-26 at d12e3a8].
+  - FIREFOX-REPLAY (his block of 2026-11-26, point 2; 4A-FIREFOX-REPLAY in the 4a block above): **done** on the
+    branch, closed when it merges: the `firefox` project's `testDir` is `./tests` with `testMatch`
+    `["rules/**/*.spec.ts", "replay/**/*.spec.ts"]` (`packages/e2e/playwright.config.ts:38-40` [verified 2026-11-26 at
+    d12e3a8]). In the container's Firefox 161.0, 3 passed, the replay test "first-loop.rec: 1800 steps, every shared
+    hash as in the file" (`trials.md`); in the runner image's Firefox 160 on d12e3a8: "first-loop.rec: 1800 steps, every shared hash as in the file" (toolchain 45836151624). A red, a time-out or a hash
+    difference there comes to him before any change and is never re-run for a green (his point 2; plan R2-4).
+  - CUT-ESCAPE-FIX (his words of 2026-11-26, 15:05 Amsterdam, point 6: "CUT-ESCAPE stays on record as accepted. Put
+    its later fix (the cut's code as its own throwaway user) into STATUS as a follow-up."; when: not named by him;
+    CUT-ESCAPE's own home is step 2.3, by his go for #48): the cut's code as its own throwaway user.
+    security-auditor's fuller form of the fix (its SA-1, Medium, CUT-ESCAPE itself, not new with this change): its own
+    uid on its own copy of the workspace, the output copied out by root and checked, and `unshare --pid --fork` so that
+    no process of the cut outlives the step. Why: the cut's code keeps the runner's uid and can change what later steps
+    run (the action's code in the work folder and the step's `GITHUB_ENV` and `GITHUB_PATH` files, inferred from the
+    runner's layout; `BASH_ENV` set that way reaches the check's absolute shell, shown locally), and the upload holds
+    the runner's upload key with the network, as checkout's and setup-node's post steps already do (from the runner's
+    source, read through a fetched summary: inferred).
+  - PH-SA-2 (security-auditor's SA-2, Low): CUT-ESCAPE's acceptance rested on "contents: read and no secrets"; after
+    this change a workflow holding the Cloudflare token publishes what the cut wrote, so the acceptance now also rests
+    on lane 2's preview treating the build as data. security-auditor's read at lane 2's 9ded5a8 (its branch, not main;
+    [assumed] here, not read by docs-keeper): `hosting/preview.mjs` walks with lstat (no link followed), refuses dot
+    names, names outside a safe set, host-acted files and non-plain items, caps size and count, needs `index.html`,
+    and never runs the build; `preview.yml`'s job `check` needs the run's workflow name `toolchain`, its path, the
+    event `pull_request`, success and a run from this repository. The sentence is on CUT-ESCAPE's record above.
+  - PH-IE-4 (infra-engineer's IE-4, Low, likely benign): the upload keeps `overwrite` false; if artifact names are
+    scoped to the run, not the attempt, a re-run of a pull request run whose first attempt uploaded `preview-site`
+    fails the step, and lane 2's runbook prescribes that re-run. GitHub's docs are silent on it; the action's own client
+    expects several artifacts of one name in a run (consistent with names per attempt, not shown). Read it on the first
+    re-run; `overwrite: true` would be a CI text change (his yes first).
+  - PH-KEEP-NAMES (for the gate step 2.3; lane 2's note 1 in its request; plan R2-10): step 2.3 replaces
+    `toolchain.yml`; keep the workflow name `toolchain`, the path `.github/workflows/toolchain.yml` and the artifact
+    name `preview-site`, or change lane 2's preview with them: its `check` job matches the name and the path, and
+    `preview.mjs` finds the hand-over on main by the line `name: preview-site` (infra-engineer's read at lane 2's
+    dc00c79).
+  - PH-MERGE-REF (for lane 2; the advisor agent's F9, plan R2-10): a pull request run builds the pull request merged
+    into main, so `preview-site` is the build of that merge, not of the pull request's head commit [assumed: from
+    the plan and the review, not read in GitHub's docs by docs-keeper].
+  - PH-TIME (plan R2-10): the job's time on the first run, against its 15-minute limit (`toolchain.yml:38`); main's
+    last run took 6.0 minutes (infra-engineer). On d12e3a8 the job took 5 min 45 s (the push run).
+  - PH-ACTIONS-SETTING (his 15:05 point 5; infra-engineer's one unknown): if the repository's Actions settings allow
+    only chosen actions without `actions/upload-artifact`, every run fails at its start; the first run on the draft is
+    the test, and such a failure goes to him with the setting to change.
+  - PH-DELETE (at this pull request's merge; his FF-REFETCH (a), the advisor agent's N2): the Firefox 161 folder under
+    `.gate/` and the read-only copy of the action's code in the scratchpad (a download not used) are deleted.
+- **From guard-wrappers** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7; branch
+  `claude/confident-gates-tbnq38` standing in for `cs/guard-wrappers`, code head 83bc2417, main 2483e9a merged in at
+  7be0a933 in a separate worktree; risk tier 2; no pull request yet (_corrected 2026-11-26 (MAIN-WALL's docs pass): merged since as PR #73, 4a62873e, 2026-11-26 14:56:33 UTC by the merge commit's date_); four security-auditor rounds, the fourth by his
+  leave (R3-WAY, 2026-11-25, 23:01:07 UTC) and the last; by his R4-END (1) what is approved merges, with R4-1 open, on
+  his go; report `docs/reports/2026-11-26-guard-wrappers.md`; the notes in `.checkpoints/guard-wrappers/`
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd). Class words only: every form stays out of the repository (his words of 2026-11-25,
+  16:34:18 UTC, item 3e, and of 2026-11-26, 14:09:28 UTC, item 1). The ids are security-auditor's (SA-, R2-, R3-, R4-),
+  the advisor agent's (ADV-) and the chat's (INPUT-RUN)):
+  - Left open as security findings: R4-1 (Critical) and INPUT-RUN (a named limit): "Open bugs and risks",
+    "guard-wrappers".
+  - For the next kit change-set (his R3-WAY of 2026-11-25, 23:01:07 UTC, item 4: the minor points stay follow-ups, with
+    no push for them):
+    - R2-2 (Low, round 2): false asks on the git-… words (his item 4's words).
+    - R2-3 (Low, round 2, older than this change-set): in the area of kit-v3-3's stated limit L9.
+    - R3-3 (Low, round 3): false refusals in one shape, behind a program that is not read-only.
+    - R3-4 (Low, round 3): a few of git's options are missing from a table; they fall to an ask, never a pass.
+    - R3-5 (Low, round 3): one value form has no test row.
+    - R3-6 (Low, round 3): false asks in one shape.
+    - R4-2 (Low, round 4): a cost class in the new check; it fails closed (a guard that runs out of time blocks the
+      call: SA-R2-2's answer, below).
+    - ADV-R4-2 (Low, the advisor agent): the plan's "no deny or ask became a pass" against main does not hold on the
+      wider sweep: 91 lines are looser than main, all older than round 4, by kind as his item 2 of 2026-11-26,
+      14:09:28 UTC has them:
+      "(the 6 that now pass and cannot start their program; the 85 that were refused and now ask me)"; subagents are
+      still refused on the 85; the report lists them by kind.
+    - ADV-R4-4 (Low, the advisor agent): one check holds today only because another rule asks first; no gap today.
+    - SA-c (Low, round 1): a reading case, recorded, not fixed.
+    - SA-e (Low, round 1): lines that main refused now ask instead in a session (never a pass; 121 in round 1's sweep).
+    - Shell function definitions (round 1): not inspected; recorded, not fixed.
+  - Closed at this change-set's merge, from guard-env-fix (#69): GEF-SAME (what is left of its class: R4-1) and SA-R1-3
+    (a line at the turn limit asks); CAP decided, his (a) of 2026-11-25, 16:34:18 UTC. SA-R2-2 answered (the plan,
+    section 4, from Claude Code's hooks reference): a guard hook that runs out of time blocks the call, because the
+    guard's three hooks set `"onFailure": "block"` (Claude Code 2.1.295 or later; this container 2.1.332; an older
+    Claude Code would let the call run); nothing changed, his word first.
+  - Closed in this change-set for every form the reviews ran (ids only; what round 4 left open is R4-1): SA-d (Critical,
+    older) with SA-D-DIRECT (his (a)), SA-a and SA-g (Medium), SA-b, SA-f and SA-h (Low), the plugin review's High, R2-1
+    (raised to Critical by the advisor agent), R3-1 and R3-2 (Critical, by his R3-WAY (a)), ADV-R4-1 (Critical, older),
+    ADV-R4-3 (Low).
+- **From MAIN-WALL** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7; branch
+  `claude/confident-gates-tbnq38` standing in for `cs/main-wall`; risk tier 2: repository settings by his clicks, no code;
+  report `docs/reports/2026-11-26-main-wall.md`; the notes in `.checkpoints/main-wall.md` and `.checkpoints/main-wall/`
+  (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6). Class words only: the gap's detail stays out of pushed notes (his words of
+  2026-11-25, 19:36:42 UTC, item 3). The ids are security-auditor's (SA-MW-) and the plan's (T1e, T10)):
+  - security-auditor's results review (APPROVE, mode Exempt), Lows: SA-MW-R1 (the outsider's refusal proven by
+    GitHub's refusal text and elimination, the rule record unavailable: an inference, named); SA-MW-R2 (the isolation
+    precondition replaced by the session-merge result: an inference, named); SA-MW-R3 (availability routes not
+    measured: his own web merge, the second account, the routine's runner; moved to T10); SA-MW-R4 (one isolation
+    route not measured for the exempt actor); SA-MW-R7 (a log-header deviation, no secret; no action); SA-MW-R8 (an
+    author-identity deviation, no new exposure).
+  - Its two Mediums, done: SA-MW-R5 (the grading basis changed from his recorded decision: his T4-GRADING (a) and his
+    words on the missing Rule Insights page are in `docs/DECISIONS.md`, 2026-11-26, 17:11:23 and 16:48:48 UTC); SA-MW-R6
+    (the stored-credential invariant SA-MW-9: checked by names at click 12, after click 11).
+  - T1e not run (his T1E-BEFORE-DELETE (b)): a residual, inferred from the other results, not measured.
+  - Not measured until first use: his own web merge under the wall (T3a, not run; see the report's deviations); the first merge from
+    his second personal Claude account; T10, one day-session merge and one PR Advisor merge under the wall (STATUS,
+    "Phase"). The other lane's token sitting waits for both halves of T10 (his TOKEN-RELEASE (c)).
+  - For the rule-file change-set: CLAUDE.md's "Lanes and accounts" quotes his LANE-RULES and ACCOUNTS lines, which say
+    two accounts; his answer of 2026-11-26, 17:11:23 UTC says three (`docs/DECISIONS.md`); the lines need his new words.
+  - The advisor agent's results condition 5: click 0's missing Settings > Actions > General screenshot was to ride with
+    click 12; the chat's checkpoint (step 17) does not record it as received [assumed: open].
 - **Moved from STATUS (2026-11-24)** (by lane 2's docs pass for the preview hosting check, under his OLD-LINES: lines
   about merged pull requests, moved by script, byte for byte): STATUS's Follow-ups lines 78-93 at main 28254a7, the
   four bullets of the merged pull requests #49, #50, #51 and #48 for the gate step (2.3), are the four bullets below.
@@ -1741,10 +2086,179 @@ _And STATUS's "Waiting on Mustafa" bullet for change-set 3b's merge (#68, merged
   check" above.
 - **From the preview hosting check** (lane 2; the archive's block): for step 2.6's plan PHC-CLICKLESS, PHC-LOCKFILE,
   PHC-TOKEN-SETUP, PHC-PROBES, PHC-DELETE, PHC-ACTIONS-READ, PHC-ERROR-PATH; at the merge PHC-TR-END; PHC-SCRIPT-LOWS.
+- **Moved from STATUS (2026-11-25, change-set 4a's docs pass)** (under his OLD-LINES: lines about merged pull requests,
+  moved by script, byte for byte): STATUS's Follow-ups bullet for change-set 3a (PR #65, merged 2026-11-24 as 28254a7)
+  is the bullet below. Its pointer to "the archive's block" leads to the block "From change-set 3a" above; since #71's
+  merge (07d673b) 3A-GEN-CHECK and 3A-RULES-STEP's CI half are done (the block "From ci-after-3a" above), and change-set
+  4's plan (section 15) places 3A-FMA-CHECK and 3A-FEATURE-VERSION in 4a and 4b, 3A-SCAN-HELPERS in 4c, and
+  3A-PART5-CLASH in 4b's step 3 if the content's types are the first that nest.
+- **From change-set 3a** (the archive's block): 3A-FMA-CHECK (his: first outside crate), 3A-RUST-REPORT (his),
+  3A-PART7-POINTER; for ci-after-3a 3A-GEN-CHECK, 3A-RULES-STEP (below); built in 3b, closed by its merge
+  3A-FROM-F64, 3A-HOOK-TEST, 3A-MANIFEST-COMMENT; for the gate step 3A-LINT-MULADD, 3A-SCAN-NAMES, 3A-CONFIG-FILE,
+  3A-PEDANTIC; later 3A-FEATURE-VERSION, 3A-SCAN-HELPERS, 3A-PART5-CLASH, 3A-NAME-SECTION, 3A-RNG-COPY, 3A-STATS-ROWS,
+  3A-PLANTS, 3A-FMA-LOG, 3A-NO-FMA, 3A-OTHER-BROWSERS; for the drafts 3A-DEPARTURES.
+- **Moved from STATUS (2026-11-26, ci-preview-handover's docs pass)** (under his OLD-LINES: lines about merged pull
+  requests, moved by script, byte for byte): STATUS's Follow-ups bullets for guard-env-fix (PR #69, merged 2026-11-25
+  as 311c048) and ci-after-3a (PR #71, merged 2026-11-25 as 07d673b) are the two bullets below. The second one's
+  pointer leads to the block "From ci-after-3a" above; its "TOKEN-WORDS deferred again" is done on ci-preview-handover's
+  branch (the block "From ci-preview-handover" above).
+- **From guard-env-fix (#69):** GEF-SAME (the same kind of gap in other wrappers and keywords the day guard strips; the forms are with Mustafa, kept out of the repository), SA-R1-3 (the wrapper loop's turn cap), SA-R2-2 (very long lines against the hook timeout), V-2 (the folder tracking after a split-string value), the reason-text nit.
+- **Moved from STATUS (2026-11-26, guard-wrappers' docs pass)** (under his OLD-LINES: lines about merged pull requests,
+  moved by script, byte for byte, to keep STATUS within its 120 lines): STATUS's Follow-ups bullets for change-set 3b
+  (PR #68, merged 2026-11-25 as 3ab9eae), change-set 4a (PR #70, merged 2026-11-26 as 2483e9a) and ci-after-3a (PR
+  #71, merged 2026-11-25 as 07d673b) are the three bullets below. Their pointers to "the archive's" blocks lead to the
+  blocks above; where those blocks say "a draft" or "no pull request yet", the merges named here came after.
+- **From change-set 3b** (#68; the archive's block): for 7 3B-LATE-BOUND (no room on a network without it), 3B-PLAUSIBLE;
+  before online play 3B-ACKS, 3B-OUTAGE-256; for 4c, 8 and 9 3B-ONE-PER-TICK; for 5 3B-ALLOC-METHOD (PA-N2 carries over);
+  for PM-0002-13 and -8 3B-KEY-POST, 3B-SATURATED; for Slice 3 3B-REFUSED-FIELD; his: 3B-LONG-HOLD with 3B-OQ6-POINTER at
+  ADR 0001's next edit, 3B-RELEASE-DRAFTS; design: 3B-PACER-255; for 4c 3B-RESUME-FLASH, 3B-POOL-16, 3B-CSS-PROD,
+  3B-BLUR-TEST; 3B-OTHER-BROWSERS (FF-DRAW); later 3B-PUB-MODS; for the link simulator's change-set 3B-HOSTILE-ALLOC (by
+  4a's size ladder, told to him in STOP-4A) and 3c's link items; 3c's recording items met by 4a, closed at its merge.
+- **From change-set 4a** (#70; the archive's block): for 4b 4A-NA-4B, 4A-EA-4B; for 4c N5, 4A-BYTES-LENGTH, E2-2,
+  4A-TE-4C, 4A-NA-4C, 4A-EA-4C, security-auditor's C4; for 4c or 8 E2-3; for 7 C1 (binding from Slice 3's first build that
+  talks to a real server); for 8 N4, C2; Slice 3 C3; the gate step 4A-S3-READ; 4A-FIREFOX-REPLAY (his block of 2026-11-26, 13:20 Amsterdam; done on ci-preview-handover's branch); 4A-HASH-REVISIT.
+- **From ci-after-3a** (the small CI pull request; the archive's block "From ci-after-3a"; each closed at its merge): done on its branch E1, 3A-GEN-CHECK, 3A-RULES-STEP's CI half (its target-gating rule stays open), the Firefox half of FIREFOX and 3A-OTHER-BROWSERS in CI on Linux (the rule tests only; WebKit and Safari open); still open 3B-OTHER-BROWSERS (its mark is a drawing test); new: FF-DRAW (his question first), FF-SPEC-COMMENTS, FF-FILEURL-PREF, FF-STOP, FF-SANDBOX, FF-ORDER; CUT-PATH's new evidence; TOKEN-WORDS deferred again.
+- **Moved from STATUS (2026-11-26, guard-wrappers' docs pass, the same rule)**: STATUS's Follow-ups bullet for ADR
+  0006's revision (PR #67, lane 2, merged 2026-11-25 as c1da1bd) is the bullet below, moved by script, byte for byte.
+  Its pointers lead to the block "From ADR 0006's revision" and to "Moved from STATUS (2026-11-25, lane 2)" above.
+- **From ADR 0006's revision** (#67, lane 2; the archive's block): ADR6-ROLLBACK (Medium), -WK-ROUTE, -WK-BIC,
+  -PAGES-RETENTION, -PM7-PAGES, -PM7-FIGURE, -WORDING, -REVISIT-WORKERS; step 2.6: STEP26-WORKERS, PHC-PREVIEW-NOINDEX.
+  #66's follow-ups (PHC-CLICKLESS and the rest, for step 2.6): the archive's "Moved from STATUS (2026-11-25, lane 2)".
+- **Moved from STATUS (2026-11-26, MAIN-WALL's docs pass)** (under his OLD-LINES: lines about merged pull requests, moved
+  by script, byte for byte, to keep STATUS within its 120 lines): STATUS's Follow-ups bullets for ci-preview-handover (PR
+  #74, merged 2026-11-26 as 3b949c1a) and guard-wrappers (PR #73, merged 2026-11-26 as 4a62873e) are the bullets below;
+  where they say "closed when it merges", that merge has come. guard-wrappers' R4-1 and INPUT-RUN stay open ("Open bugs
+  and risks", "guard-wrappers"). The two bullets after them (a pointer line and guard-env-fix's (PR #69, merged 2026-11-25) follow-ups,
+  whose SA-R2-2 and V-2 stay open) moved the same way.
+- **From ci-preview-handover** (the archive's block "From ci-preview-handover"; the ids are that docs pass's, not his): done on its branch, closed when it merges, TOKEN-WORDS and 4A-FIREFOX-REPLAY (his FIREFOX-REPLAY); CUT-ESCAPE stays on record as accepted (his 15:05 point 6) and its later fix is CUT-ESCAPE-FIX ("the cut's code as its own throwaway user"); PH-SA-2 (CUT-ESCAPE's acceptance now also rests on lane 2's preview treating the build as data); PH-IE-4 (a re-run and the artifact's name, read on the first re-run); for the gate step 2.3 PH-KEEP-NAMES; for lane 2 PH-MERGE-REF; on the first run PH-TIME and PH-ACTIONS-SETTING; at the merge PH-DELETE (the action's read-only copy and the Firefox folder).
+- **From guard-wrappers** (`docs/reports/2026-11-26-guard-wrappers.md`; the archive's block): INPUT-RUN (a named limit:
+  programs outside the guard's wrapper table that run their input are not inspected, the class of stated limits L1-L4);
+  next kit change-set: R2-2, R2-3, R3-3 to R3-6, ADV-R4-2, ADV-R4-4, R4-2, SA-c, SA-e, shell function definitions.
+- **From #60, #61, #64, change-set 3a (#65), guard-env-fix (#69) and ci-after-3a (#71)** (moved by script, OLD-LINES): the archive's "Moved from STATUS (2026-11-25...)" and "(2026-11-26, ci-preview-handover's docs pass)".
+- **From guard-env-fix (#69):** SA-R2-2 (very long lines against the hook timeout; answered in guard-wrappers' report, nothing changed without his word), V-2 (the folder tracking after a split-string value), the reason-text nit. Closed by guard-wrappers at its merge: GEF-SAME (what is left of its class: R4-1) and SA-R1-3; CAP decided, his (a) of 2026-11-25.
+- **From change-set 4b-1, "Content"** (lane 1, the chat he calls Builder V4; branch `claude/cool-pasteur-oiqk1r`
+  standing in for `cs/4b-content`; pull request #75; risk tier 1, no browser check; reviewed, two rounds, no
+  Critical or High (rust-reviewer, engine-architect and security-auditor in both, test-engineer's read in round 2);
+  final code 2039e3c; the planted defects' whole run on the final code caught 35 of 35, the 1 control held
+  (`.checkpoints/cs4b-content/plants-4b1.txt`); report `docs/reports/2026-11-26-cs4b1-content.md`. Written by 4b-1's
+  docs pass, first part (before the reviews) and second part (after them), 2026-11-26. The 4B- ids are this docs
+  pass's, not his; each item names its source and who found it. The notes files named here leave the tree at the pull
+  request's close and stay readable at the branch's commits):
+  - 4B-AIM-REACH (fixed at the plan's re-read, its text as given to this docs pass; his DEPART-4 (a), entry 6's note, the
+    entry of 2026-11-26, 12:21:17 UTC: "STATUS names the change-set that widens it"): the loader refuses a playable map
+    beyond the aim's reach (x and z plus or minus 327.67 m, y 0 to 655.35 m). The aim widens in the first change-set
+    whose map leaves that square (none in Slice 1; Slice 2's plan says whether its maps do), at the latest in Slice 3's
+    change-set that sets the command codec for online play (PM-0001-51), beside 3B-ACKS and 3B-OUTAGE-256. No numbered
+    change-set holds it yet. Built in 4b-1: `crates/content/src/map.rs` refuses bounds beyond `AIM_REACH_CM` (32,767)
+    on x and z or above `AIM_HEIGHT_MAX_CM` (65,535) (`BeyondAim`), and `crates/devtools/tests/aim_reach.rs` fails by
+    name when the aim point's field widens [verified 2026-11-26 at 2039e3c: `map.rs:35-38`, `aim_reach.rs`'s header].
+  - 4B-FEATURE-POINTER (his FEATURE-COMPARE (a), the entry of 2026-11-26, 14:09:13 UTC, point 4, which ends "Recorded as
+    a dated pointer for ADR 0002's next revision."): the two named exceptions to the build's check that the simulation's
+    features are the same in every build, with his conditions in that entry, are a dated pointer for ADR 0002's next
+    revision. The exceptions themselves are built in 4b-2 (step 6), not in 4b-1.
+  - 4B-DEPART-3 (the re-read sheet's section H, `.checkpoints/cs4b-content/reread-sheet.md` lines 185 to 190): the dated
+    pointer for the plan's departure DEPART-4 entry 3, at the drafts' next revision, in this order. (1) Entry 3 as he
+    accepted it (DEPART-4 (a), the entry of 2026-11-26, 12:21:17 UTC), the plan's own text
+    (`.checkpoints/cs4-walk/plan.md` lines 694 to 697): “DEPART-3, which he accepted for change-set 3, said of the
+    network draft (its line 221): "three limits are code, not data, until the content crate exists in change-set 4".
+    The crate exists from 4b, and the three limits stay code until change-set 7, which rebuilds the room's command
+    scheduling behind one seam, so that they move once (engine-architect's proposal; netcode-architect confirms it at
+    4b's re-read)”. (2) netcode-architect confirmed it at 4b's re-read (`.checkpoints/cs4b-content/netcode-architect-read.md`,
+    its CONFIRM of change-set 7). (3) netcode-architect's sharper sentence, netcode-architect's and not his, as the
+    sheet sets it out: “...stay code until change-set 7, which rebuilds the room's command scheduling behind one seam
+    and the client endpoint's sending; there they become content values within capacities the code keeps, with
+    defaults equal to today's 8, 8 and 2”. If that sentence should become the departure itself, it goes to him as a
+    question (the sheet's own rule).
+  - 4B-PM5-3 (the builder's reading, for his acceptance at the drafts' next revision): ADR 0005's PM-0005-3 asks for the
+    corpus "written back as the same text as its input"; 4b-1 reads it with two stated exceptions: -0, written "0"; and
+    a corpus input that is not already canonical, written back as the engine writes it [verified 2026-11-26 at 2039e3c:
+    `crates/content/src/number.rs:263`, the pair `(-0.0, "0")`].
+  - 4B-CI-CONTENT (two requests for the CI Builder; this chat writes no CI file; found by rust-reviewer, RR-2, and
+    security-auditor, SA-5, in round 1, and test-engineer, TE-8): (1) a clippy step in the `toolchain` job, so that
+    the content crate's lint guard is held by CI and not only by the source scan and by hand (security-auditor: not
+    later than 4b-2's merge); (2) `-p content` in the job's release test line. The million-input fuzz run DOES run in
+    CI: the release line holds `-p devtools`; only clippy and the content crate's own release tests run by hand
+    (test-engineer's TE-8, correcting the first part of this docs pass, which said otherwise) [verified 2026-11-26 at
+    2039e3c: `.github/workflows/toolchain.yml:162` names `sim`, `protocol`, `room`, `client-endpoint`, `sim-wasm` and
+    `devtools`, not `content`; no `clippy` in the file].
+  - 4B-OLD-TIMERS (game-designer's note for the builder, `.checkpoints/cs4b-content/game-designer-durations.md` lines 91
+    to 93): some of the old game's timers are typed into its functions and are in no table (a bot's lunge cooldown
+    2.5 s, fire locks of 0.1 to 0.2 s, among others), so the time unit's report cannot see them; 4d's import and
+    change-set 8 meet them.
+  - 4B-TIME-REEXPORT (engine-architect, EA-4, round 1; for 4b-2's step 6): the simulation re-exports the content
+    crate's time unit when `sim` first depends on `content`; until then the number 3,000 stands twice, held equal by
+    `crates/devtools/tests/time_unit.rs` [verified 2026-11-26 at 2039e3c: `crates/sim/src/time.rs`'s header says so].
+  - 4B-FACING-ZERO (engine-architect, EA-6, rounds 1 and 2; for 4b-2's step 8, before the first map file is written):
+    which way a spawn's `facing_deg` of 0 points is pinned then; a spawn's `at` is pinned now (the point on the ground
+    between the feet: `map.rs`'s `Spawn`). By its round 2 the line must state that 0 faces +z and degrees grow toward
+    +x (the old game's own convention), and how the simulation reads an angle without a std sine is chosen before the
+    first map file, since a tighter grid later is a version step
+    (`.checkpoints/cs4b-content/engine-architect-review-4b1-round2.md`).
+  - 4B-SPAWN-SLOTS (security-auditor, round 1, its condition on the plan's departure 9, the loader asking for at least
+    one spawn only; for 4c): 4c's match setup refuses, by name, a map with fewer spawns than the match has slots.
+  - 4B-PLAN-4B2 (engine-architect's notes, no findings; for 4b-2's plan): step 9's TypeScript cap of 8,388,608 bytes
+    needs its own tie to the Rust cap; the bundle's outer shape has no Rust struct for the type writer; `f64::round`
+    (`map.rs`, `time.rs`) enters the players' file at step 9, so step 7's libm rule must allow it or the code rounds
+    in whole numbers [verified 2026-11-26 at 2039e3c: `map.rs:225`, `time.rs:33`].
+  - 4B-FUZZ-REACH (security-auditor, round 1; a stated limit): the fuzz run cannot reach the caps (its inputs are a few
+    kilobytes), full map lists, more than one map in a bundle, or long strings, and it measures no coverage; the caps
+    are held by the seven limit cases instead.
+  - 4B-REFUSAL-TABLE (test-engineer, TE-7, Low): one sentence per refusal pinned in a table; today one refusal's
+    sentence is pinned, the others only by the digests, which the by-hand rewrite replaces without showing what
+    changed.
+  - 4B-SCAN-CFG-TEST (engine-architect, round 2; for 4b-2's steps 6, 7 and 9): the source scan does not see a file
+    under a file-level `#![cfg(test)]` as test code (it fails closed), and step 9 plans one in the content crate
+    (`ts_export.rs`); when the build lints of steps 6 and 7 land, their hashed-map and clock half must cover the
+    content crate too.
+  - 4B-OLD-READERS (security-auditor, round 2; outside this change-set): two older readers of committed vectors go
+    around the plain read, `packages/sim-worker/boundary/rules.test.mjs` and
+    `packages/e2e/tests/rules/wasm-rules.spec.ts` [verified 2026-11-26 at 2039e3c: `rules.test.mjs:15` reads the vectors with `readFileSync`; `wasm-rules.spec.ts:33` hands Playwright a vector by its path with `route.fulfill`].
+  - 4B-MEMORY-UNIT (the verifier, on the final code; for 4b-2's first commit): the comment of
+    `packages/sim-worker/boundary/content.test.mjs` gives the test module's memory as "49 MiB"; it is 49.2 million
+    bytes, 46.9 MiB. The asserted ceiling (64 MiB) is right; only the comment's unit is wrong, and it stays until
+    4b-2 so that 4b-1's reviewed code does not move for a comment.
+  - 4B-SIGHT-MARK (his SIGHT-FLAG, answered; `docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC; his words: "(a). Not in
+    4b. Keep one follow-up line so that Slice 2's plan adds the mark. Which things carry it is still open in my rule
+    (fences, and whether shots follow sight)."): Slice 2's plan adds the "blocks sight" mark to the map kind, with the
+    sight check that reads it. Until then every shape blocks movement, shots and sight alike; 4b-2's collision world
+    is planned to keep, for every solid piece, the shape it came from (engine-architect's review of 4b-1), so that the
+    mark needs no rebuild of the world.
+  - 4B-FIRE-RATE (his DUR-1, answered; `docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC; his words: "(C). The table value
+    is the rate for now, and I tune it by play in Testlines. A tuned value reaches the game through my Export, as
+    before."): for change-set 8 (the guns): a gun's interval is its table value, with the timer's leftover carried
+    (ADR 0004 part 4); no value is rewritten to match the old game's rate at 60 frames a second.
+  - Closed by 4b-1, at its merge: 4A-S3-READ's read side (the block "From change-set 4a" above, its dated pointer).
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
 STATUS's "Decisions pending"; his decisions and the queue of his words are in `docs/DECISIONS.md`._
+- **Taken by the advisor agent for MAIN-WALL** (not his; its notes `.checkpoints/main-wall/advisor-plan.md` (readable at
+  commit 68b690f130c6a7c5cd770d5fabd088091f9110e6); ids only): the plan REVISE (text only, C1-C7: this chat reads no rulesets, so T10's read-back and
+  click 4's fallback are his and the designer's two read-only reads are recorded as a departure; two change-sets, the
+  review tracks' merge-on-green only after click 11 and T10; security-auditor's answer on R4-1 recorded; his test card;
+  guard-wrappers' F2-F7 named; the security review; the SHA read), with THROWAWAY-PUBLIC put to him; the re-review
+  APPROVE with four conditions (T4-BASELINE marked as his choice with its two clicks; SA-MW-9 in the TECHNICAL note;
+  security-auditor named before click B; a per-run branch name), all applied; the results review APPROVE of click 11
+  in mode Exempt, with conditions: security-auditor reviews the results first (done: APPROVE), his go on click 11 in his
+  own words (CLICK-11-GO (a)), click 11 exactly as measured with "Shamble Ruleset 1" untouched, the dropped tests
+  recorded as not run (T1e inferred; T3a, his web merge, open until first use; the second account's merge open), click
+  10 dropped (click 0 was the same day), and the docs quoting his words exactly. Its condition 4 would have let the other
+  lane's token sitting start after T10's day-session half alone; his TOKEN-RELEASE (c) (2026-11-26, 17:11:23 UTC,
+  `docs/DECISIONS.md`) decides instead: the token sitting waits for both halves of T10.
+- **Taken by the advisor agent for guard-wrappers** (not his; its notes `.checkpoints/guard-wrappers/advisor-plan.md`
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd); no form named): the plan APPROVE with 9 conditions (plan section 7); round 1's fix
+  pass APPROVE with conditions, SA-D-DIRECT approved in advance if he said yes (he did, (a), 2026-11-25, 19:36:42 UTC);
+  R2-1 raised from Medium to Critical (an agent's kit write passed with no refusal, the class of SEC-U7B-1 and SA-d), so
+  a third round on what changed, with SA-g's refinement riding and R2-2 not; round 4's plan change: the round-4 build
+  approved only together with ADV-R4-1 (Critical, older), closed in the reviewed build as his line (a) says (asks,
+  agents refused, silent only when a read-only program follows) for the forms the reviews ran; INPUT-RUN a named limit
+  (the class of stated limits L1-L4), a follow-up listed in the report as a security finding left open, so his go covers
+  it knowingly; ADV-R4-2 and ADV-R4-4 Low follow-ups; ADV-R4-3 rides; the order of the edits (the guard in three Edits,
+  the tests in four, each asked of him, one commit); main brought in from one separate detached worktree, the main
+  folder not moved (a fast-forward of the main folder to a commit built in a worktree is not one of the three moves
+  CLAUDE.md's Never line allows, and the advisor cannot widen it); the final build APPROVE (a plan-change review, not a
+  round); for the notes, the report names the full SHA of the last commit that holds them, STATUS gets one follow-up
+  pointer, and the pull request merges with a merge commit.
 - **Taken by the advisor for A3** (inside his words; he can overrule any at merge; plan revision 2 §3.2, from
   `advisor-plan-rev1.md` and `advisor-e10.md`): AF-MECH (b), the day guard answers "ask", the settings ask list stays
   empty · AF-AGENT (b), an agent's kit edit is refused, keyed on `agent_id` only · AF-COVER, a trimmed (b): file tools
@@ -1868,6 +2382,31 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   events; Opus 5.5; runs 16:07 UTC (succeeded) and 18:46 UTC (failed: the usage limit); next 2026-11-11 06:45 UTC.
 
 ## Open bugs and risks
+- **MAIN-WALL** (main's wall, by his click on 2026-11-26, about 17:15 UTC; TECHNICAL, "Main's wall"; class words only):
+  - The wall cannot tell a session from him: every Claude session acts as his GitHub account, so the wall separates his
+    account from everything else; the guard, the reviews and his go separate his decisions from a session's acts.
+  - The wall does not protect itself: his account can change any ruleset (the Claude app holds Administration read only,
+    click 0's screenshot, so the chats cannot). A day session asks him for a screenshot of both rulesets at the start of
+    any kit, CI or gate change-set (the plan's risk 4).
+  - The rollback (Enforcement status Disabled) reopens what the wall closes while it lasts (SA-MW-11): STATUS records the
+    date and why, and the same day the wall goes back to Active or the question goes to him.
+  - In mode Exempt his own merges leave no bypass audit entry; each pull request's history still shows them.
+  - SA-MW-9's invariant: no credential of his account, and none of any bypass actor, is stored where a workflow can read
+    it; checked by names at click 12 (no repository secrets; one environment secret in the environment "preview", the
+    other lane's wall-test placeholder).
+  - Unmeasured until first use: T10 (a day-session merge and a PR Advisor merge), his own web merge, his second
+    personal Claude account's first merge. R4-1 in the guard stays bounded by the wall and today's ruleset.
+- **guard-wrappers** (the day guard, `.claude/hooks/routine-guard.mjs`; waiting for his go (_corrected 2026-11-26 (MAIN-WALL's docs pass): merged since as PR #73, 4a62873e, 2026-11-26 14:56:33 UTC by the merge commit's date_); by his R4-END (1) what is
+  approved merges with these open, on his go; class words only, every form out of the repository by his words of
+  2026-11-25, 16:34:18 UTC, item 3e, and 2026-11-26, 14:09:28 UTC, item 1):
+  - R4-1 (Critical, open; security-auditor's round 4 on 83bc2417, the last round): one more spelling hides git, gh or
+    xargs from the guard's reading, for a session and a subagent; part is this change-set's class, part older; open on
+    main too; its fix is the next guard change-set (his order of 2026-11-26: after MAIN-WALL, together with GUARD-KIT;
+    its plan says whether it can be a rule that fails closed). Until that fix merges, his interim rule:
+    "git and gh always start their own command, with no other program in front of them."
+  - INPUT-RUN (a named limit; the advisor agent's ruling of 2026-11-26): programs outside the guard's wrapper table that
+    run their input are not inspected, the class of kit-v3-3's stated limits L1-L4; listed in the report as a security
+    finding left open.
 - **netcode proof test** (in flight, PR #40; its plan ranks 15 risks, plan §13; here its numbers 1 to 4 and 11):
   1. WebTransport with a pinned certificate hash may not work in every browser (U7 locally, R1's smoke page, then
   reading R-24); 2. R5-TEST-OQ2 has no fallback if neither WebTransport crate sits on a custom quinn endpoint (U3
@@ -2056,6 +2595,31 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   3. The inventory's line numbers hold after phase 1's move: `git mv` kept the bytes and the line numbers (foundation
      2.1b, PR #51: five pure renames, the blobs equal at 76b4f7a and at the move commit c090843), so its citations hold
      with the prefix `legacy/` (`shamble-game.js:N` is `legacy/shamble-game.js:N`) [verified 2026-11-11].
+- **ci-preview-handover, the preview hand-over step** (2026-11-26, no pull request number yet; the evidence: `plan.md`,
+  section 6, and `security-auditor-ci.md` in `.checkpoints/ci-preview-handover/`; the follow-ups: the block "From
+  ci-preview-handover" in "Follow-ups"):
+  1. The upload runs after the cut on the build the cut's code wrote: CUT-ESCAPE, accepted (his words of 2026-11-26,
+     15:05 Amsterdam, point 6), its acceptance now also resting on lane 2's preview treating the build as data
+     (PH-SA-2); its fix is CUT-ESCAPE-FIX.
+  2. The artifact `preview-site` can be downloaded by any signed-in GitHub user for 7 days: the production page only,
+     which the preview publishes anyway (the plan's risks; security-auditor: no finding).
+  3. No consumer yet: lane 2's `.github/workflows/preview.yml` is on its own branch, not in this branch's
+     `.github/workflows/` (gate.yml and toolchain.yml only [verified 2026-11-26]); a `workflow_run` starts only from
+     main's copy, so no preview starts until lane 2's file is on main (infra-engineer).
+- **Change-set 4a of the v2 build plan, "The recording"** (2026-11-25, PR #70, a draft; the evidence: the chat's card
+  and `round1-fold.md` in `.checkpoints/cs4a-recording/`, folded into 4a's report before the pull request is ready):
+  1. The tests that read the recordings still follow a link (4A-S3-READ): CI cannot go green with one, since the folder
+     check refuses it; the repository-wide check is a gate change for step 2.3.
+     _Dated pointer, 2026-11-26 (4b-1's docs pass): closed on 4b-1's branch by its step 4, at its merge; the
+     repository-wide check stays for step 2.3 (the follow-up 4A-S3-READ's dated pointer, "Follow-ups")._
+  2. Two planted divergences are shown in a weaker form: plant E (a WebAssembly-only difference) is a stand-in, and
+     the search for a sine input where the two targets differ was not run; plant D (an outside draw) was planted
+     natively only. Their real forms run again on movement in 4c (4A-TE-4C).
+  3. In CI a red replay names the step; the differing field comes from the `replay` tool's two state prints, by hand.
+  4. Size: 4a ran at 2.2 times its designs' count before review fixes (3,030 written lines against 1,365); by the
+     chat's reckoning a part that grows as 4a did ends 2 to 4 % under its stop line before review fixes and 5 to 7 %
+     over it after them (4a's fixes added 9 %), so 4b, 4c and 4d are each likely
+     to come back to him; their stop lines stay as they are (his STOP-4A, point 3).
 - **Change-set 3b of the v2 build plan, "The loop closes"** (2026-11-25; the evidence: its card and reviewers'
   notes at the notes' last commit 80a51e42, and its report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`):
   1. The room has no bound on how late a command may run (3B-LATE-BOUND): harmless while nothing moves and play is
@@ -2139,9 +2703,15 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
 | Editor rebuild (Cabana): full-map draw calls boot / 1 / 2 rebuilds | base 1992 / 2406 / 3502 · head 1992 / 1992 / 1992; heap after GC boot / 10 rebuilds: base 42.9 / 119.5 MB · head 42.7 / 44.5 MB | 2026-10-14 | preview.js harness + perf-auditor |
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
-| CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 28254a7, PR #65's merge commit (run ids not recorded here) | 2026-11-24 | change-set 3b's card, step 0 (read 22:45 UTC) [assumed: not read again by this docs pass] |
+| MAIN-WALL: main's rulesets | two Active: "Shamble Ruleset 1" (pull request; `gate` and `smoke` required; no deletion; no force push; no bypass; not opened at the click) and "main-wall (only the owner updates main)" (default branch; only Restrict updates; bypass the Repository admin role, mode Exempt); no repository secrets, one environment secret in "preview" (SA-MW-9 by names) | 2026-11-26 | his screenshots at click 12, as the chat's checkpoint (step 17) and the plan record them; not read by docs-keeper [assumed] |
+| CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (push; gate run 45818982040 with its gate and smoke jobs, completed 12:23 UTC; toolchain run 45818982052, 12:28 UTC) | 2026-11-26 | GitHub's REST API, the commit's workflow runs and the gate run's jobs (read by ci-preview-handover's docs-keeper) |
+| CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (gate 12:22:25, smoke 12:23:01, toolchain 12:28:06 UTC by `completed_at`) | 2026-11-26 | GitHub's REST API, the commit's check runs (read 14:24 UTC by docs-keeper) [verified] |
+| guard-wrappers (no pull request yet (_corrected 2026-11-26 (MAIN-WALL's docs pass): merged since as PR #73, 4a62873e, 2026-11-26 14:56:33 UTC by the merge commit's date_)): the kit's three test files | `routine-guard.test.mjs` 1551/1551 (1247 on main c1da1bd by the chat's count; `.claude/` unchanged from c1da1bd to 2483e9a, read with git diff), `settings.test.mjs` 127/127, `checkpoint.test.mjs` 33/33, on the docs pass's worktree at 54bbf38c (main 2483e9a merged in) | 2026-11-26 | `node --test`, run by docs-keeper [verified] |
+| CI on main (older) | `gate`, `smoke` and `toolchain` success on 07d673b, PR #71's merge commit (push; gate and smoke completed 20:49 UTC, toolchain 20:54 UTC) | 2026-11-25 | GitHub's REST API, the commit's check runs (read 22:12 UTC) |
+| Change-set 4a (PR #70, a draft): the players' Wasm, the hash's cost, the tests | the players' Wasm 54,514 bytes on the final source fb5d0ff (53,813 before 4a), sha256 a4d8184c...d094, the same on the verifier's rebuild and on GitHub's runner (CI on 21c1046); after round 1's fix pass it was 19847796...f708, one byte other (a line number in a panic message), and 55,607 bytes before that pass; the state hash: native release 4,096 bytes 5.7 us and 16,384 bytes 20.7 us, WebAssembly release in Node 22 5.2 and 19.9 us; 17 browser tests in 195 s in the container; the release tests of all six crates, 139 passed, on the tree with #71 taken in | 2026-11-25 | the chat's card and `round1-fold.md` (`.checkpoints/cs4a-recording/`); not re-measured by docs-keeper, not re-read at fb5d0ff |
+| CI on main (older) | `gate`, `smoke` and `toolchain` success on 28254a7, PR #65's merge commit (run ids not recorded here) | 2026-11-24 | change-set 3b's card, step 0 (read 22:45 UTC) [assumed: not read again by this docs pass] |
 | ci-after-3a (no pull request yet): the `toolchain` job with every crate's release tests, the two generator checks, `devtools`' wasm32 line and two browser runs | on 832268e: the job 18:34:50 to 18:40:12 UTC (5 min 22 s by the job's start and end; the report gives 5 min 20 s); Chromium "16 passed (3.4m)"; Firefox 160.0 "2 passed (15.0s)" (the rule tests only); Python 3.12.3; gate and smoke green (run 45676587871). The red first run on 52ad5d3 (45670972698): Chromium "16 passed (3.5m)", Firefox "4 failed", "9 did not run", "2 passed (5.0m)" at Playwright's 300 s stop | 2026-11-25 | GitHub Actions, run 45676587814 and 45670972698 logs (gh, read by ci-after-3a's docs pass) |
-| Change-set 3b (in review, no pull request yet): the `toolchain` job on a runner, the players' Wasm and the browser tests | the job 4 min 47 s (0dfca749, run 45529670690) to 4 min 58 s (the final code 6abf3d2a, run 45537884772) of its 15 minutes; CI green on d117fca5 and eb0d2314, and gate, smoke and toolchain green on 0dfca749, 6380df45, a85b9dbb and 6abf3d2a; the players' Wasm 53,813 bytes (21,994 gzip, 18,464 brotli; sha256 5ebae154...b41262) as written before the push of the commit that closes round 2's fixes (31,718 on main); 16 browser tests in 3.3 to 3.4 of CI's 5 minutes; on 0dfca749 in CI: the one-minute loop 1,816 ticks in 60.5 s, key to tick median 167.7 ms and 95th percentile 185.0 ms at about 10 frames a second; the press test 10,000 presses and releases made and echoed, 0 refused; allocation 90 bytes a frame and 597 a block; on 6abf3d2a in CI: the loop 1,814 ticks in 60.6 s, key to tick median 238.1 ms and 95th percentile 257.8 ms at about 7 frames a second, the press test 10,000 presses and releases made and echoed, 0 lost, 0 doubled, allocation 91 bytes a frame and 590 a block; 53 of 53 planted defects caught on 6abf3d2a | 2026-11-25 | change-set 3b's card, "Current step" (CI read line by line by the builder) |
+| Change-set 3b (PR #68, merged 2026-11-25 as 3ab9eae; written while in review): the `toolchain` job on a runner, the players' Wasm and the browser tests | the job 4 min 47 s (0dfca749, run 45529670690) to 4 min 58 s (the final code 6abf3d2a, run 45537884772) of its 15 minutes; CI green on d117fca5 and eb0d2314, and gate, smoke and toolchain green on 0dfca749, 6380df45, a85b9dbb and 6abf3d2a; the players' Wasm 53,813 bytes (21,994 gzip, 18,464 brotli; sha256 5ebae154...b41262) as written before the push of the commit that closes round 2's fixes (31,718 on main); 16 browser tests in 3.3 to 3.4 of CI's 5 minutes; on 0dfca749 in CI: the one-minute loop 1,816 ticks in 60.5 s, key to tick median 167.7 ms and 95th percentile 185.0 ms at about 10 frames a second; the press test 10,000 presses and releases made and echoed, 0 refused; allocation 90 bytes a frame and 597 a block; on 6abf3d2a in CI: the loop 1,814 ticks in 60.6 s, key to tick median 238.1 ms and 95th percentile 257.8 ms at about 7 frames a second, the press test 10,000 presses and releases made and echoed, 0 lost, 0 doubled, allocation 91 bytes a frame and 590 a block; 53 of 53 planted defects caught on 6abf3d2a | 2026-11-25 | change-set 3b's card, "Current step" (CI read line by line by the builder) |
 | CI on main (older) | `gate` with `smoke` (run id 45373057216) and `toolchain` (run id 45373056953) success on 1ec6f6c, PR #64's merge commit (push) | 2026-11-24 | GitHub Actions check runs (REST API, read 2026-11-24) |
 | Change-set 3a (PR #65, merged 2026-11-24 as 28254a7): the `toolchain` job on a runner, and the players' Wasm | 138 s (a1c59e8) to 185 s (8619d539) per job, from the job's start and end, on the six heads whose times the card records; the players' Wasm with the panic hook 31,718 bytes, sha256 383f5303...3963, the same bytes on the runner and in the container since the remap (RR-F5; 28,991 on the runners before 3a); 14 browser tests in Google Chrome 157.0.8103.78 in about 1.1 min; boundary tests 2 files, 17 tests; the client's unit tests 70; the allocation test 61 bytes a frame and 529 a block (75 frames) on 8619d539, whose runner image moved to 20261116.133.1 (20261116.376.1 before): the verifier's TE-WATCH read found the allocation inside its windows (25 to 170, 430 to 610) and the default backend unchanged (the WebGL 2 fallback); one red, on a1b2e802 (an assertion of the builder's, fixed forward, not re-run) | 2026-11-24 | change-set 3a's card at f153ddf4 (steps 4 to 12); the job log of 8619d539 (job 138592422504) |
 | CI on main (older) | `gate` with `smoke` (run 934, id 44551896122) and `toolchain` (run 232, id 44551894194) success on f5030a3, PR #61's merge commit (push) | 2026-11-19 | GitHub Actions runs (REST API, read 2026-11-23) |

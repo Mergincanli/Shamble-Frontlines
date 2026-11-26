@@ -143,13 +143,16 @@ test("the glue exports what the Worker calls and nothing more", () => {
   // The one type's own calls: a method added to the bindings shows here. `__destroy_into_raw` and `free` are
   // wasm-bindgen's own; only its dispose symbol is left out.
   const calls = Reflect.ownKeys(Sim.prototype).filter((name) => typeof name === "string");
-  expect(calls.sort()).toEqual(["__destroy_into_raw", "block_len", "block_ptr", "constructor", "free", "input", "rebase", "step"]);
+  // `shared_hash` is the one read-only number a replay of a recorded match compares (his DEPART-3); no live tick
+  // calls it (host.test.ts pins a live tick's calls).
+  expect(calls.sort()).toEqual(["__destroy_into_raw", "block_len", "block_ptr", "constructor", "free", "input", "rebase", "shared_hash", "step"]);
   expect(Object.getOwnPropertyNames(Sim).filter((name) => !["length", "name", "prototype"].includes(name))).toEqual([]);
 });
 
 test("in the glue, each per-tick call reaches exactly one export", () => {
   const glue = readFileSync(new URL("../pkg/sim_wasm.js", import.meta.url), "utf8");
-  for (const [method, exported] of [["input(post, held, p0, p1, p2, p3)", "sim_input"], ["step(now_ms)", "sim_step"]]) {
+  // The replay's one number too: no argument, one export, so its shape is pinned and not only its name.
+  for (const [method, exported] of [["input(post, held, p0, p1, p2, p3)", "sim_input"], ["step(now_ms)", "sim_step"], ["shared_hash()", "sim_shared_hash"]]) {
     const from = glue.indexOf(`    ${method} {`);
     expect(from, method).toBeGreaterThan(-1);
     const body = glue.slice(from, glue.indexOf("\n    }", from));

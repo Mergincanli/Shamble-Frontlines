@@ -1,0 +1,97 @@
+//! Which crate may depend on which, read from the manifests' own text (ADR 0005's foundation line; ADR 0002 part 3).
+//!
+//! `content` depends on nothing: the reader of the game's content files is all our own code (Mustafa's
+//! CONTENT-SOURCE (c), 2026-11-26), and the simulation will depend on this crate, so anything `content` depended on
+//! would be in the simulation's tree too. The rule names direct dependencies only, so the manifest's text is the
+//! whole input: no cargo call, and nothing that needs a package to be on disk.
+//!
+//! The rule is stricter than "no normal dependency": no table of any kind but `[package]` and `[lints]`. One change
+//! is known to come: 4b-2's step that writes the content's TypeScript types gives this crate exactly one
+//! dev-dependency, the type writer (the one line `ts-rs = { workspace = true }` under `[dev-dependencies]`: its
+//! derive must stand beside the types it reads). That change edits this rule in the same commit, after
+//! security-auditor's answer on its exact content.
+
+use std::path::Path;
+
+/// The table headers of a manifest, in order, and the keys of its `[package]` table.
+fn tables_and_package_keys(manifest: &str) -> (Vec<String>, Vec<String>) {
+    let mut tables = Vec::new();
+    let mut package_keys = Vec::new();
+    for line in manifest.lines() {
+        let line = line.trim();
+        if let Some(header) = line.strip_prefix('[') {
+            tables.push(header.trim_end_matches(']').trim_matches('[').to_owned());
+        } else if tables.is_empty() && !line.is_empty() && !line.starts_with('#') {
+            // A key before the first table (`dependencies.x = "1"`) is a table in another spelling: named as one.
+            tables.push(format!("a line before the first table: {line}"));
+        } else if tables.last().is_some_and(|table| table == "package")
+            && !line.is_empty()
+            && !line.starts_with('#')
+            && let Some((key, _)) = line.split_once('=')
+        {
+            package_keys.push(key.trim().to_owned());
+        }
+    }
+    (tables, package_keys)
+}
+
+fn manifest_of(krate: &str) -> String {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("..")
+        .join(krate)
+        .join("Cargo.toml");
+    std::fs::read_to_string(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()))
+}
+
+#[test]
+fn the_content_crate_depends_on_nothing() {
+    let (tables, package_keys) = tables_and_package_keys(&manifest_of("content"));
+    // Every table the manifest may have. A dependency table of any kind (normal, dev, build, per target), a
+    // feature table or a patch is a new table, and fails here by its name.
+    assert_eq!(
+        tables,
+        ["package", "lints"],
+        "crates/content/Cargo.toml has a table this rule does not allow"
+    );
+    // No build script and no native library: neither `build` nor `links` may be set.
+    assert_eq!(
+        package_keys,
+        [
+            "name",
+            "version",
+            "edition.workspace",
+            "rust-version.workspace",
+            "publish.workspace"
+        ],
+        "crates/content/Cargo.toml's [package] table has a key this rule does not allow"
+    );
+    // Cargo runs a `build.rs` beside the manifest with no key naming it: nothing of that name is there.
+    let script = Path::new(env!("CARGO_MANIFEST_DIR")).join("../content/build.rs");
+    assert!(
+        std::fs::symlink_metadata(&script).is_err(),
+        "crates/content has a build script"
+    );
+}
+
+#[test]
+fn the_rule_reads_what_it_should_refuse() {
+    // The check can fail: each kind of dependency table, and a build script, is seen by name.
+    for planted in [
+        "[dependencies]\nprotocol = { path = \"../protocol\" }\n",
+        "[dev-dependencies]\nts-rs = { workspace = true }\n",
+        "[build-dependencies]\ncc = \"1\"\n",
+        "[target.'cfg(unix)'.dependencies]\nlibc = \"0.2\"\n",
+        "[features]\nloose = []\n",
+    ] {
+        let manifest =
+            format!("[package]\nname = \"content\"\n\n{planted}\n[lints]\nworkspace = true\n");
+        let (tables, _) = tables_and_package_keys(&manifest);
+        assert_ne!(tables, ["package", "lints"], "{planted}");
+    }
+    // A dependency spelled as a key before any table is seen too.
+    let dotted = "dependencies.protocol = { path = \"../protocol\" }\n[package]\nname = \"content\"\n[lints]\n";
+    assert_eq!(tables_and_package_keys(dotted).0.len(), 3);
+    let (_, keys) =
+        tables_and_package_keys("[package]\nname = \"content\"\nbuild = \"build.rs\"\n");
+    assert_eq!(keys, ["name", "build"]);
+}

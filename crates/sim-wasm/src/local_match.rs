@@ -166,6 +166,12 @@ impl<P: TransportPair> LocalMatch<P> {
         self.schedule.rebase(now_ms);
         self.schedule.next_due_ms()
     }
+
+    /// The hash of the local server's shared state as it stands (`Room::shared_hash`). No step reads it.
+    #[must_use]
+    pub fn shared_hash(&self) -> u64 {
+        self.room.shared_hash()
+    }
 }
 
 #[cfg(test)]
@@ -318,7 +324,7 @@ mod tests {
     fn the_tick_and_the_sequence_cross_their_wraps_and_two_runs_agree() {
         let run = || {
             let mut local = local(131_069, 65_533);
-            let (mut scratch, mut hashes) = (Vec::new(), Vec::new());
+            let mut hashes = Vec::new();
             let mut presses = [0u8; BUTTONS];
             for step in 0..600u32 {
                 let button = step as usize % BUTTONS;
@@ -330,7 +336,7 @@ mod tests {
                     presses,
                 });
                 local.step(f64::from(step));
-                hashes.push(local.room().world().state_hash(&mut scratch));
+                hashes.push(local.room().world().state_hash());
             }
             let world = local.room().world();
             assert_eq!((world.tick(), world.player().presses), (131_669, presses));
