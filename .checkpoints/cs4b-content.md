@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 18:35 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 18:51 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -474,6 +474,30 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     report's draft (`report-draft-4b1.md`, a copy of the session's draft with its open marks; brief
     `verifier-brief-4b1.md`; it runs the full local checks itself, so the main session runs no cargo meanwhile);
     docs-keeper on `docs-keeper-brief-4b1-part2.md`.
+34. **CI green on 21e1550, which holds the final code** (gate run 45868324364; toolchain run 45868324356, 7 min
+    17 s, Chromium and Firefox).
+35. **docs-keeper's second part: DONE** (commit 5662ad2): the docs true for the final code; eight follow-up ids
+    from the reviews in the archive's block (and 4B-MEMORY-UNIT after the verifier, added by the main session);
+    4B-CI-CONTENT corrected; STATUS from 134 to 124 lines (his limit is 120; the 4 over are other lanes' lines
+    about merged pull requests, named in its notes and not reworded: the report's question STATUS-LEN).
+36. **Draft pull request #75 opened** (2026-11-26, after the docs pass's second part); STATUS's row names it.
+37. **The verifier: the code and every check result hold; FAIL on the report's first draft on wording and counts
+    only (one Medium, seven Low); PASS on the corrected text** (`verifier-4b1.md`; its own log
+    `.gate/verifier-local-checks.log`). It ran the full local checks (196 and 195 Rust tests, the packages'
+    tests, 33 boundary tests, 18 browser tests in 211 s, the players' file's digest), the million-input fuzz run
+    (the same histogram, the caps' bytes the same in all seven rows), the corpus (26,653; 1,998 of the 2,000 ties
+    real by its own script, the other two plus and minus 2^-24), the time report, the written lines (7,164), his
+    words (the script's check; every quote in the report against DECISIONS), five plants against the log, two
+    plants of its own (both caught), eleven "fixed" rows in the code. Its corrections, all made: test-engineer
+    planted five in a copy and two were NOT caught (its two findings; now plants g and j); "four" new Medium
+    are five; the test module's memory is 49.2 million bytes, 46.9 MiB, not "49 MiB" (the comment of
+    `content.test.mjs` keeps the slip until 4b-2: 4B-MEMORY-UNIT); words of test-engineer's set in quotation
+    marks; a sentence on his VISION-RULE list; his message of 15:51:38 in the list of what binds; twelve
+    departures fine and the seventh a finding; one number for 4b-2's projection (8,140); a number with no saved
+    log (the 72,482,816 bytes of the limit cases held together: from the failing test's message in the chat).
+38. **The report** `docs/reports/2026-11-26-cs4b1-content.md` is written from the corrected draft; this card and
+    the notes leave the head in the commit that adds it (CHECKPOINTS.md part 9): they stay readable at the commit
+    before it, which the report names.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -481,16 +505,17 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   one notes file; nothing else happened. Every other git command of 4b so far started its own call.
 - One chat update was headed "about 16:50 Amsterdam" when the clock read about 16:45: a time ahead of the clock.
 - The card's "Last update" was once written 34 minutes ahead of the clock and corrected before it was committed.
+- The chat told him "four new Mediums" for round 2 (they are five: the fifth was told as "one limit stays") and
+  "49 MiB" for the test module's memory (46.9 MiB), and that test-engineer's own plants were all caught (two of
+  five were not). The verifier found all three; corrected in the chat and in the report.
 - The chat told him, in its update after round 1's fix pass, that the million-input fuzz run is by hand. It is
   not: CI's release line runs the tools crate's tests (test-engineer's TE-8). Corrected in the chat's update
   after test-engineer's read, and in the report.
 
 ## Current step
-4b-1, the close: both review rounds are in (no Critical or High), the last fix pass is pushed (code 2039e3c) and
-the plants run is in (35 of 35). Now: the verifier and docs-keeper's second part side by side
-(`cs4b-content/docs-keeper-brief-4b1-part2.md`); the report (`docs/reports/2026-11-26-cs4b1-content.md`; its
-draft is in the session's scratchpad); the notes out of the head in the last commit; push, CI; the advisor agent
-on that head; the draft pull request; his go.
+4b-1, the close: everything but the last two steps is done. Now: the report into the tree with the notes out of
+the head (one commit), push, CI on that head; the advisor agent on that head; the pull request's description
+with that head's full id; his go. 4b-2 then starts from the notes at the commit before the report's.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -525,5 +550,4 @@ on that head; the draft pull request; his go.
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- The verifier and docs-keeper (second part), both started 2026-11-26 18:35 Amsterdam. No cargo and no browser
-  run by the main session while the verifier runs the local checks. No saver runs: the main session commits the notes by hand.
+- No agent runs. The advisor agent starts on the head that holds the report.

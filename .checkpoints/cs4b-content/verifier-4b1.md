@@ -41,3 +41,12 @@
 
 ## Verdict
 FAIL (text only; the code and every number of the checks hold). One Medium (test-engineer's plants softened), the rest Low: 341/573 -> 340/572; "Four new Medium" -> five; "49 MiB" -> 49 MB (47 MiB); test-engineer quote not in its notes; SIGHT-FLAG "his list says" for shots; binding answers list omits 15:51:38; departure 7 not "fine" for rust-reviewer; 8,100 vs 8,140. Not checked: CI runs, Firefox, legacy gate, step 1 / 2a split (92 / 2,796), 4a's 2.4 ratio, three other fuzz seeds at step 3.
+
+## Re-check of the corrected draft (text only)
+- (1) plants paragraph: five, three caught, two not, my two named: HOLDS (test-engineer-review-4b1.md:51-56).
+- (2) 230d9e9 (planted defects' commit) = 6,591 written lines (git numstat origin/main...230d9e9, vectors out): 6,592 - 1 + 341 (-> 6,932 at d36e416) + 232 = 7,164. HOLDS; my earlier "340" measured from fdd9f0a and missed that one line; the new text is right.
+- (3) "Five new Medium": HOLDS. (5) no quotation marks: HOLDS. (6) SIGHT-FLAG wording: HOLDS. (7) 15:51:38 and Export 15:07:24 (DECISIONS l.183, l.231): HOLDS. (8) twelve fine, seventh a finding; 8,140 in both places: HOLDS.
+- (4) 49.2 million bytes = 46.9 MiB: HOLDS (my run 49,217,536). "72.5 million bytes (69 MiB)": no source found in the card (l.336 says "72 MiB") or any saved log under .gate/: UNSOURCED, Low.
+- Corpus sentence (1,998 + the two of 2^-24): HOLDS. Outcome: HOLDS. STATUS: 124 now, 125 on origin/main, 134 at 495204a; limit 120 (DECISIONS l.3513); R4-1 Critical open and the interim rule in STATUS l.20-22: HOLDS. #69's merge and PR #75: not checked (no network).
+- Verifier paragraph: fair. It leaves out only my note on 4b-2's projection (8,100 vs 8,140), which is now fixed: optional.
+- Re-check verdict: PASS WITH NOTES (one Low: the 72.5 million bytes).
