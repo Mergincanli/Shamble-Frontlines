@@ -68,6 +68,10 @@ needs no go of his (as U4r's and U4f's); PR #40 keeps its own go.
 - A "done" line goes here after each step.
 - DONE 00:3x: the part-clean, in the card's form (no ask): "Removed 6564 files, 7.3GiB total"; the lock and CACHEDIR.TAG
   there, no debug folder; free 7,207 to 14,039 MiB. M5 will build cold.
+- DONE 00:3x: MAIN-67's step 6 (CI on e23c783 all green: gate 45728829441 and 45728836685, toolchain 45728829428 and
+  45728836660); M0's checks (no agent runs, no cargo or rustc, main still 07d673b, branch = origin and clean, free 14,039
+  MiB); M1 (the patch 09cb4a07...e660); ops/browser's package.json 8370495d... and package-lock.json a0efce8e... equal in
+  agent-abf71d95fc07b3522. Next: the saver stopped, H0, the base run, then M3.
 
 ## Steps
 - **M0, preconditions:** no agent or workflow running; the lane lock free; HEAD = origin, clean; `git fetch origin
