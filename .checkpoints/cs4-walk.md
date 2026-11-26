@@ -10,7 +10,7 @@
   `git push origin cs/4-walk:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is fast-forwarded to main 311c0484 (so the fixed guard loads) and is never switched ·
   **Base:** origin/main 311c0484f7a9697ae33e7a76a8cf0b507a2837c4 (taken in by merge commit 1802856)
-- **Last update:** 2026-11-25 19:54 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 13:28 Amsterdam (from the clock)
 
 ## Steps done
 1. The takeover and ORDER-3C: his answer **(c)** with four conditions (2a no proof thinner; 2b the recording built
@@ -48,16 +48,29 @@
    from it (one Medium: 4d's ladder moved the SIMD reading out of Walk; seven Low). All eight are made: the plan is
    revision 4, and its section 20 lists them. 3b's pace is 14 hours 56 minutes for 7,014 lines (not 16 hours).
 
+10. His go on the plan (2026-11-25, 19:36:25 UTC): WALK-CUT (a), four change-sets, each its own pull request;
+    STEP-60 (a), a new Export at 30 steps before 4b's step 6.
+11. **4a, the recording: built, reviewed and merged** (pull request #70; main 2483e9a, by merge commit, on his go of
+    2026-11-26, 12:21:17 UTC, for the head 420b16b the advisor agent approved). Its report:
+    `docs/reports/2026-11-25-cs4a-recording.md`; its notes are readable at c17a054.
+12. His answers of 2026-11-26 (`mustafa-2026-11-26-go-merge-70.md`): BOARD-SLIP (a); CONTENT-SOURCE (c), the reader
+    kept to what the content files need, everything else refused, fuzzed before the first value rests on it;
+    DEPART-4 (a) with two notes (the 48 one named constant; the loader refuses a map beyond the aim codec's reach
+    and STATUS names the change-set that widens it); EARLY-LOOK-ORDER (b); FIREFOX-REPLAY (a), from him to the CI
+    Builder; LINKS-CHECK (c), about 15 lines in 4b.
+
 ## Current step
-Stopped for Mustafa's go on the plan and his letter for WALK-CUT. The plan was sent to him in the chat; the
-board's thread for change-set 4 says the chat waits for him.
+4b, content and the world: its own card `.checkpoints/cs4b-content.md`. These notes were put back from c17a054 byte
+for byte in this branch's first commit.
 
 ## Next steps
-1. His go and WALK-CUT: then 4a (step 4 below). STEP-60 is still open with him (needed before 4b's step 6).
-4. On his go: 4a's own checkpoint (`cs4a-recording`), the hash report with rust-reviewer, then 4a's steps 1 to 8
-   (plan section 4). No manifest change in 4a.
-5. For 4a's docs pass: his blocks into `docs/DECISIONS.md` by script; change-set 3b's owed docs pass; the Hornet's
-   entry in `docs/UNITS.md` section 0 by script, with the two clashes listed for him (lines 21-23 and 54-55).
+1. 4b (the plan's section 5), then 4c (section 6; the early look inside it, with EARLY-LOOK-ORDER (b): the soft
+   push and five small page pieces after the early look), then 4d (section 7), then the link simulator's
+   change-set, merged before change-set 7 starts.
+2. Still his, each before its part: DIFF-LIST with his new Export (before 4b's step 6); MOVE-RULES, RESUME-FLASH,
+   TUNE-HOME, NO-SOURCE (before 4c; MOVE-RULES' rows 6 and 7 before 4d); SPRINT-DELAY-4 (before 4d); GREY-COLOURS
+   is a default he can veto before 4b's step 9.
+3. His messages of 2026-11-26 go into `docs/DECISIONS.md` by script with 4b's docs pass.
 
 ## Open findings
 - The checkpoint script cannot push from this worktree: notes are committed by path and pushed by hand; no saver
