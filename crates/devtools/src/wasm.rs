@@ -14,6 +14,7 @@ use crate::files::vector_text;
 use crate::recording::{Recording, hashes_text};
 use crate::replay::replay;
 use crate::rules::{f32_ops, stream};
+use crate::world_proofs;
 
 /// The float vectors (PM-0004-22): an empty text when every operation gives the exact reference's results and
 /// `mul_add`'s pinned cases their measured values (MUL-ADD), or what differs.
@@ -91,6 +92,14 @@ pub fn content_verdicts(expected: &str) -> String {
 #[must_use]
 pub fn content_limits() -> String {
     content_proofs::limits_check()
+}
+
+/// The static world's proof: the trees this module builds and the rays it casts, against the native build's
+/// committed lines.
+#[wasm_bindgen]
+#[must_use]
+pub fn static_world(expected: &str) -> String {
+    world_proofs::check(expected)
 }
 
 /// The state hash's function over `length` bytes, `rounds` times over: for the reading of its cost in WebAssembly

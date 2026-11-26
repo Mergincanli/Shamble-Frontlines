@@ -4,7 +4,10 @@
 // reason its result is the same bits on every target; a fused multiply-add and the functions of BANNED_MATHS are
 // refused whatever this list says.
 //
-// Empty today: the simulation calls no maths routine. Each entry: { routine: "libm::math::sqrtf", why: "..." }.
+// Empty today: the simulation calls no maths routine, and the static collision world links none (its tree's build
+// and its rays are additions, subtractions, multiplications, divisions and comparisons; rust-reviewer's read of
+// 2026-11-27). Each entry names a routine by its path as the build check prints it, and covers the steps below it:
+// { routine: "libm::math::sqrt", why: "..." } covers libm::math::sqrt::sqrtf; a C-named one is "C::round".
 
 /** @type {{ routine: string, why: string }[]} */
 export const MATHS_ALLOWED = [];

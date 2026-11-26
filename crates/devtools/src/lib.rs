@@ -15,3 +15,4 @@ pub mod scripts;
 pub mod sha256;
 pub mod time_report;
 pub mod wasm;
+pub mod world_proofs;
