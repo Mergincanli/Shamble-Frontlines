@@ -263,7 +263,7 @@ f. His go after his Advisor's merge check; merge with the approved head as the e
 g. After #72 and the CI Builder's hand-over step (#59) are both merged: M5 to M11.
 For the docs pass before ready: STATUS's #72 row and lane 2's Waiting bullet and Next item 3 still describe the
 hand-over as to come; the report's Outcome, Proposed next step and For Mustafa likewise; the report lists the Part 15
-move and the change-set 1 move (OLD-LINES) and the merges 6c812700 and 90c939f4 (the advisor agent's L1); the report's process facts gain T1's probe and his
+move, the change-set 1 move and the kit hold move (OLD-LINES) and the merges 6c812700, 90c939f4 and 851f004 (the advisor agent's L1); the report's process facts gain T1's probe and his
 GUARD-PROMPT (a), which answers, for this chat, risk 1's open point (an ask in Auto mode reached him, with the guard's
 reason); his 15:05 message goes into DECISIONS by script (uuid, 738 bytes, sha256 above).
 
