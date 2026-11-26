@@ -346,3 +346,38 @@ GitHub (docs.github.com):
     session has been in auto mode throughout; the record shows no hook activity after 2026-11-15 20:02:36 UTC. Not
     known: whether the hooks did not run, or an ask in auto mode is settled without a prompt. The checkpoint recorded
     the move at the time as "(no guard prompt)" without flagging it.
+
+## B16. The security-auditor's round 2, the fix pass's part 2, and the guard facts settled (2026-11-26 ~00:30-01:10 UTC)
+- The security-auditor (round2-security-auditor.md), on ad2658a..80a9b6a8: APPROVE, no Critical or High in the diff;
+  its round-1 Lows all closed (runbook lines cited). New: Medium, a YAML anchor and alias (or merge key) reuses the
+  token check's env on another step and L2 sees nothing; Medium, npm ci continued by YAML (a folded `run: >` or a
+  plain two-line run) and L3 sees nothing, so "no continuation" in the lint's comment and in B15 did not hold; Low,
+  nothing lints code running beside the token (a custom shell, NODE_OPTIONS or BASH_ENV, a job container or
+  services): added to TE-H's follow-ups. All three protected files in the PR equal his approved texts by sha256
+  (preview.yml 31119c06 per NEW-TEXT (a), preview-close.yml c2f1fa90, wall-test.yml 3af06706).
+- Part 2 of round 2's fix pass (tests only; the one fix pass for its review, which came after part 1's push): L0
+  flags any YAML anchor, alias or merge key, a folded run, and any value continued onto a second line outside a `|`
+  block. The real preview.yml stays clean (as do the other workflows: a false-alarm check). 4 planted tests in its
+  own shapes: 175 pass. Lint mutants 18 (4 new). The test-engineer's probes unchanged: all caught except its six
+  follow-ups; controls 01, 26 and the comment control clean.
+- The guard, settled from records (corrects B15's "not known"):
+  - This session has two repositories (get_session: Shamble-Frontlines and shamble-preview-check). The second was
+    added at 2026-11-15 20:01:46 UTC (add_repo, push access; registered 20:09:51). The record's last hook trace is at
+    20:02:36 UTC; none after. The platform's documentation (read_documentation, session.permissions): the
+    repository's .claude/settings.json is read "only [by] a session with one repository"; CLAUDE.md says the same of
+    repository hooks. So the guard has not run in this session since then. Not tested live.
+  - My answer to his 2026-11-25 18:15 Amsterdam question, sent at 17:15:56 UTC, "Guard: yes. The hooks load the guard
+    from my main folder at every call", was wrong. The report corrects it at the top.
+  - The auto-mode classifier did act: at 2026-11-25 15:30:10 UTC it refused a plain `git merge origin/main` in the
+    main folder ("Destructive or Unwanted Actions"); the merge was then made in the worktree .gate/merge-68.
+  - Replay (scripts/guard_replay.mjs; today's rules and today's repository state, read-only, GitHub stubbed): 1,649
+    calls since 2026-11-15 20:01:46 UTC; 1,582 replayed; 84 asks, 3 refusals; 67 GitHub write calls not replayed.
+    Main-folder asks: 10 = 4 in the test repository, 3 worktree merges (worktrees gone today, so the cd cannot be
+    followed: allowed at the time), 2 plain merges of main into the main folder on his written instruction
+    (2026-11-18 22:57:55, 2026-11-24 22:49:38), the 15:30:10 merge the classifier refused, and 21:00:05. Refusals:
+    3, all in the test repository (one `git checkout`, two `git switch -C`). The other 74 asks are writes the guard
+    could not resolve (a variable, a redirect after a cd). My only commit touching a protected file since
+    2026-11-15 20:01 UTC is 9ded5a87 (the three approved workflow texts, 2026-11-25 20:54:10 UTC).
+  - The interim-rule count (process-git-calls.md, regrouped): 53 = 31 calls started by something other than git
+    (cd, a variable, another program) + 22 started by git with a later git after other commands; 3 more not counted
+    (git alone first, other commands after). This chat only, not its agents.

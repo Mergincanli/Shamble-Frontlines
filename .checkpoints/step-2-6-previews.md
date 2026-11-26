@@ -113,9 +113,18 @@ Actions, Dependabot, Codespaces show no CLOUDFLARE_ name (screenshots); (d) the 
 re-run): the refusal line (annotations API) plus zero steps for all three, a deployment record with status failure
 expected; (e) delete WALL_TEST; wall-test.yml leaves the branch. Plus the dates in their own fields (not the chip),
 and the token's end date into STATUS with a reminder 14 days before.
-Next: CI on 80a9b6a8 (preview / tests must show 171); the security-auditor's round-2 verdict; the report (U8) with
-the docs pass (STATUS, ROADMAP, REPO_MAP report row; the N3 follow-ups: TE-H's remainder 07, 08, 16, 17, 23, 24 and
-TE-K); the GUARD-ASK decision and the B15 disclosures in the report; the advisor agent's review of the head; the token sitting once the protection for main is merged; the throwaway out (U6); the
+CI on 80a9b6a8: preview/tests 171 pass (job 139602952533). The security-auditor's round 2: APPROVE (B16); its two
+Mediums fixed in part 2 of the fix pass (175 tests; commit next). THE GUARD (B16): this session has two repositories
+since 2026-11-15 20:01:46 UTC, so no repository hooks load (platform doc + CLAUDE.md); my 17:15:56 UTC "Guard: yes"
+was wrong; treat the guard as absent: ask him in chat before any .github/ or kit change (wall-test.yml's removal
+at U6 included), every main-folder move other than the three allowed forms, and every merge (on his go anyway).
+Next: commit + push part 2 (each git call alone; head must be the code commit; confirm CI shows 175); the advisor
+agent's recorded verdict on GUARD (options: (a) finish 2.6's risky steps, U6, the token sitting and the merge, in a
+new one-repository chat from this checkpoint; (b) stay here with asks; plus a live probe only while he watches;
+plus the kit change-set to find out why, the security-auditor's recommendation); the question file in the notes,
+pushed, named with its commit; the report (U8) with the docs pass (STATUS, ROADMAP, REPO_MAP report row; follow-ups:
+TE-H 07, 08, 16, 17, 23, 24, the security-auditor's Low (shell, NODE_OPTIONS/BASH_ENV, container/services), TE-K);
+the report's top corrects "Guard: yes" and carries B15/B16's process facts; the advisor agent's review of the head; the token sitting once the protection for main is merged; the throwaway out (U6); the
 verifier on the final diff; ready; then his
 sitting with M1 (plan section 4). Before click 8 (the real token): if the Guard fix chat's wall is not merged, ask
 him again (his MAIN-WALL (b)).
