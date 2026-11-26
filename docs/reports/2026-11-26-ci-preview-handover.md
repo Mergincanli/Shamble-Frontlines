@@ -74,8 +74,11 @@ draft and watches the first run.
   - The runner's Firefox 160 gave "3 passed (12.5s)", with the replay test "first-loop.rec: 1800 steps, every shared
     hash as in the file" (815 ms).
   - The job took 5 min 45 s, against its 15-minute limit.
-- **Not yet shown:** the two new steps running. The pull request run, once the draft is open, is their first: the
-  guard's count, the upload's "there will be 5 files uploaded", its digest and the artifact id.
+- **The first pull request run** (draft #74 at head 90f97d1, as Mustafa relayed it on 2026-11-26, 15:50 Amsterdam;
+  not read by the chat): green. The check printed "5 files, 892209 bytes"; the upload took 5 files as the artifact
+  `preview-site` (id 15128137720, 250472 bytes, sha256
+  5c00d3c6521ca209ce4333011e0b63d52b3aa8d6e201280f81dbca0166f79eb7, kept until 3 December); Firefox passed 3, the
+  replay test among them. So the Actions setting allows the upload action.
 
 ## Reviews (Opus 5.5, effort high; one round on the tried texts, before ask 2)
 - **security-auditor:** nothing stops the change; no Critical or High.
@@ -98,10 +101,9 @@ draft and watches the first run.
   `git diff` inside itself, instead of git starting its own command. Nothing was written by it. Every other git and
   gh call started its own command.
 - **Lines of the shared records moved or corrected (REC-OLD, OLD-LINES):** listed with their old and new text in
-  `docs-keeper-old-new.md` in the notes, at the notes' last commit (the parent of the head).
+  `docs-keeper-old-new.md` in the notes, at 6ca780fc, the notes' last commit.
 
 ## Not verified
-- The two new steps running on GitHub: the pull request run is their first.
 - The re-run case (PH-IE-4).
 - That the runner's action folder is writable by the cut's user: inferred, not measured.
 - Lane 2's `preview.yml` as it will be on main; it was read on lane 2's branch.
@@ -118,8 +120,7 @@ draft and watches the first run.
 None.
 
 ## For Mustafa
-1. Your main Advisor opens the draft from `.checkpoints/ci-preview-handover/pr-title.txt` and `pr-body.md` at the
-   notes' last commit (the parent of the head, named in the chat), and watches the first pull request run. A red on
-   the new steps or on Firefox's replay test comes to you first.
+1. Done: his main Advisor opened draft #74 from `.checkpoints/ci-preview-handover/pr-title.txt` and `pr-body.md` at
+   the notes' last commit, 6ca780fc4a83624dd2d751189946a1d15f72df62; its first run is green (Evidence).
 2. Your go for the head's full id, after the advisor agent approves it with gate, smoke and toolchain green on it.
    Nothing a player sees changes, so there is no browser check.

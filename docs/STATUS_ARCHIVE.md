@@ -259,6 +259,7 @@ _And STATUS's "Waiting on Mustafa" bullet for ci-after-3a (#71), moved by the sa
   (`docs/DECISIONS.md`; the report `docs/reports/2026-11-25-ci-after-3a.md`).
 
 _Moved from STATUS (2026-11-26, ci-preview-handover's docs pass, under his OLD-LINES of 2026-11-18): STATUS's row for the merged change-set 4a (PR #70, 2483e9a, merged 2026-11-26 12:22:01 UTC by `merged_at`, read with gh's REST route), moved by script, byte for byte, so its cells read as they stood when it left STATUS:_
+_Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES of 2026-11-18): STATUS's row for the merged change-set 4a (PR #70, 2483e9a, merged 2026-11-26 12:22:01 UTC by `merged_at`, read with gh api), moved by script, byte for byte, so its cells read as they stood when it left STATUS:_
 
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
@@ -1893,6 +1894,44 @@ _Moved from STATUS (2026-11-26, ci-preview-handover's docs pass, under his OLD-L
     the test, and such a failure goes to him with the setting to change.
   - PH-DELETE (at this pull request's merge; his FF-REFETCH (a), the advisor agent's N2): the Firefox 161 folder under
     `.gate/` and the read-only copy of the action's code in the scratchpad (a download not used) are deleted.
+- **From guard-wrappers** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7; branch
+  `claude/confident-gates-tbnq38` standing in for `cs/guard-wrappers`, code head 83bc2417, main 2483e9a merged in at
+  7be0a933 in a separate worktree; risk tier 2; no pull request yet; four security-auditor rounds, the fourth by his
+  leave (R3-WAY, 2026-11-25, 23:01:07 UTC) and the last; by his R4-END (1) what is approved merges, with R4-1 open, on
+  his go; report `docs/reports/2026-11-26-guard-wrappers.md`; the notes in `.checkpoints/guard-wrappers/`
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd). Class words only: every form stays out of the repository (his words of 2026-11-25,
+  16:34:18 UTC, item 3e, and of 2026-11-26, 14:09:28 UTC, item 1). The ids are security-auditor's (SA-, R2-, R3-, R4-),
+  the advisor agent's (ADV-) and the chat's (INPUT-RUN)):
+  - Left open as security findings: R4-1 (Critical) and INPUT-RUN (a named limit): "Open bugs and risks",
+    "guard-wrappers".
+  - For the next kit change-set (his R3-WAY of 2026-11-25, 23:01:07 UTC, item 4: the minor points stay follow-ups, with
+    no push for them):
+    - R2-2 (Low, round 2): false asks on the git-… words (his item 4's words).
+    - R2-3 (Low, round 2, older than this change-set): in the area of kit-v3-3's stated limit L9.
+    - R3-3 (Low, round 3): false refusals in one shape, behind a program that is not read-only.
+    - R3-4 (Low, round 3): a few of git's options are missing from a table; they fall to an ask, never a pass.
+    - R3-5 (Low, round 3): one value form has no test row.
+    - R3-6 (Low, round 3): false asks in one shape.
+    - R4-2 (Low, round 4): a cost class in the new check; it fails closed (a guard that runs out of time blocks the
+      call: SA-R2-2's answer, below).
+    - ADV-R4-2 (Low, the advisor agent): the plan's "no deny or ask became a pass" against main does not hold on the
+      wider sweep: 91 lines are looser than main, all older than round 4, by kind as his item 2 of 2026-11-26,
+      14:09:28 UTC has them:
+      "(the 6 that now pass and cannot start their program; the 85 that were refused and now ask me)"; subagents are
+      still refused on the 85; the report lists them by kind.
+    - ADV-R4-4 (Low, the advisor agent): one check holds today only because another rule asks first; no gap today.
+    - SA-c (Low, round 1): a reading case, recorded, not fixed.
+    - SA-e (Low, round 1): lines that main refused now ask instead in a session (never a pass; 121 in round 1's sweep).
+    - Shell function definitions (round 1): not inspected; recorded, not fixed.
+  - Closed at this change-set's merge, from guard-env-fix (#69): GEF-SAME (what is left of its class: R4-1) and SA-R1-3
+    (a line at the turn limit asks); CAP decided, his (a) of 2026-11-25, 16:34:18 UTC. SA-R2-2 answered (the plan,
+    section 4, from Claude Code's hooks reference): a guard hook that runs out of time blocks the call, because the
+    guard's three hooks set `"onFailure": "block"` (Claude Code 2.1.295 or later; this container 2.1.332; an older
+    Claude Code would let the call run); nothing changed, his word first.
+  - Closed in this change-set for every form the reviews ran (ids only; what round 4 left open is R4-1): SA-d (Critical,
+    older) with SA-D-DIRECT (his (a)), SA-a and SA-g (Medium), SA-b, SA-f and SA-h (Low), the plugin review's High, R2-1
+    (raised to Critical by the advisor agent), R3-1 and R3-2 (Critical, by his R3-WAY (a)), ADV-R4-1 (Critical, older),
+    ADV-R4-3 (Low).
 - **Moved from STATUS (2026-11-24)** (by lane 2's docs pass for the preview hosting check, under his OLD-LINES: lines
   about merged pull requests, moved by script, byte for byte): STATUS's Follow-ups lines 78-93 at main 28254a7, the
   four bullets of the merged pull requests #49, #50, #51 and #48 for the gate step (2.3), are the four bullets below.
@@ -1951,11 +1990,45 @@ _Moved from STATUS (2026-11-26, ci-preview-handover's docs pass, under his OLD-L
   pointer leads to the block "From ci-after-3a" above; its "TOKEN-WORDS deferred again" is done on ci-preview-handover's
   branch (the block "From ci-preview-handover" above).
 - **From guard-env-fix (#69):** GEF-SAME (the same kind of gap in other wrappers and keywords the day guard strips; the forms are with Mustafa, kept out of the repository), SA-R1-3 (the wrapper loop's turn cap), SA-R2-2 (very long lines against the hook timeout), V-2 (the folder tracking after a split-string value), the reason-text nit.
+- **Moved from STATUS (2026-11-26, guard-wrappers' docs pass)** (under his OLD-LINES: lines about merged pull requests,
+  moved by script, byte for byte, to keep STATUS within its 120 lines): STATUS's Follow-ups bullets for change-set 3b
+  (PR #68, merged 2026-11-25 as 3ab9eae), change-set 4a (PR #70, merged 2026-11-26 as 2483e9a) and ci-after-3a (PR
+  #71, merged 2026-11-25 as 07d673b) are the three bullets below. Their pointers to "the archive's" blocks lead to the
+  blocks above; where those blocks say "a draft" or "no pull request yet", the merges named here came after.
+- **From change-set 3b** (#68; the archive's block): for 7 3B-LATE-BOUND (no room on a network without it), 3B-PLAUSIBLE;
+  before online play 3B-ACKS, 3B-OUTAGE-256; for 4c, 8 and 9 3B-ONE-PER-TICK; for 5 3B-ALLOC-METHOD (PA-N2 carries over);
+  for PM-0002-13 and -8 3B-KEY-POST, 3B-SATURATED; for Slice 3 3B-REFUSED-FIELD; his: 3B-LONG-HOLD with 3B-OQ6-POINTER at
+  ADR 0001's next edit, 3B-RELEASE-DRAFTS; design: 3B-PACER-255; for 4c 3B-RESUME-FLASH, 3B-POOL-16, 3B-CSS-PROD,
+  3B-BLUR-TEST; 3B-OTHER-BROWSERS (FF-DRAW); later 3B-PUB-MODS; for the link simulator's change-set 3B-HOSTILE-ALLOC (by
+  4a's size ladder, told to him in STOP-4A) and 3c's link items; 3c's recording items met by 4a, closed at its merge.
+- **From change-set 4a** (#70; the archive's block): for 4b 4A-NA-4B, 4A-EA-4B; for 4c N5, 4A-BYTES-LENGTH, E2-2,
+  4A-TE-4C, 4A-NA-4C, 4A-EA-4C, security-auditor's C4; for 4c or 8 E2-3; for 7 C1 (binding from Slice 3's first build that
+  talks to a real server); for 8 N4, C2; Slice 3 C3; the gate step 4A-S3-READ; 4A-FIREFOX-REPLAY (his block of 2026-11-26, 13:20 Amsterdam; done on ci-preview-handover's branch); 4A-HASH-REVISIT.
 - **From ci-after-3a** (the small CI pull request; the archive's block "From ci-after-3a"; each closed at its merge): done on its branch E1, 3A-GEN-CHECK, 3A-RULES-STEP's CI half (its target-gating rule stays open), the Firefox half of FIREFOX and 3A-OTHER-BROWSERS in CI on Linux (the rule tests only; WebKit and Safari open); still open 3B-OTHER-BROWSERS (its mark is a drawing test); new: FF-DRAW (his question first), FF-SPEC-COMMENTS, FF-FILEURL-PREF, FF-STOP, FF-SANDBOX, FF-ORDER; CUT-PATH's new evidence; TOKEN-WORDS deferred again.
+- **Moved from STATUS (2026-11-26, guard-wrappers' docs pass, the same rule)**: STATUS's Follow-ups bullet for ADR
+  0006's revision (PR #67, lane 2, merged 2026-11-25 as c1da1bd) is the bullet below, moved by script, byte for byte.
+  Its pointers lead to the block "From ADR 0006's revision" and to "Moved from STATUS (2026-11-25, lane 2)" above.
+- **From ADR 0006's revision** (#67, lane 2; the archive's block): ADR6-ROLLBACK (Medium), -WK-ROUTE, -WK-BIC,
+  -PAGES-RETENTION, -PM7-PAGES, -PM7-FIGURE, -WORDING, -REVISIT-WORKERS; step 2.6: STEP26-WORKERS, PHC-PREVIEW-NOINDEX.
+  #66's follow-ups (PHC-CLICKLESS and the rest, for step 2.6): the archive's "Moved from STATUS (2026-11-25, lane 2)".
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
 STATUS's "Decisions pending"; his decisions and the queue of his words are in `docs/DECISIONS.md`._
+- **Taken by the advisor agent for guard-wrappers** (not his; its notes `.checkpoints/guard-wrappers/advisor-plan.md`
+  (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd); no form named): the plan APPROVE with 9 conditions (plan section 7); round 1's fix
+  pass APPROVE with conditions, SA-D-DIRECT approved in advance if he said yes (he did, (a), 2026-11-25, 19:36:42 UTC);
+  R2-1 raised from Medium to Critical (an agent's kit write passed with no refusal, the class of SEC-U7B-1 and SA-d), so
+  a third round on what changed, with SA-g's refinement riding and R2-2 not; round 4's plan change: the round-4 build
+  approved only together with ADV-R4-1 (Critical, older), closed in the reviewed build as his line (a) says (asks,
+  agents refused, silent only when a read-only program follows) for the forms the reviews ran; INPUT-RUN a named limit
+  (the class of stated limits L1-L4), a follow-up listed in the report as a security finding left open, so his go covers
+  it knowingly; ADV-R4-2 and ADV-R4-4 Low follow-ups; ADV-R4-3 rides; the order of the edits (the guard in three Edits,
+  the tests in four, each asked of him, one commit); main brought in from one separate detached worktree, the main
+  folder not moved (a fast-forward of the main folder to a commit built in a worktree is not one of the three moves
+  CLAUDE.md's Never line allows, and the advisor cannot widen it); the final build APPROVE (a plan-change review, not a
+  round); for the notes, the report names the full SHA of the last commit that holds them, STATUS gets one follow-up
+  pointer, and the pull request merges with a merge commit.
 - **Taken by the advisor for A3** (inside his words; he can overrule any at merge; plan revision 2 §3.2, from
   `advisor-plan-rev1.md` and `advisor-e10.md`): AF-MECH (b), the day guard answers "ask", the settings ask list stays
   empty · AF-AGENT (b), an agent's kit edit is refused, keyed on `agent_id` only · AF-COVER, a trimmed (b): file tools
@@ -2079,6 +2152,17 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   events; Opus 5.5; runs 16:07 UTC (succeeded) and 18:46 UTC (failed: the usage limit); next 2026-11-11 06:45 UTC.
 
 ## Open bugs and risks
+- **guard-wrappers** (the day guard, `.claude/hooks/routine-guard.mjs`; waiting for his go; by his R4-END (1) what is
+  approved merges with these open, on his go; class words only, every form out of the repository by his words of
+  2026-11-25, 16:34:18 UTC, item 3e, and 2026-11-26, 14:09:28 UTC, item 1):
+  - R4-1 (Critical, open; security-auditor's round 4 on 83bc2417, the last round): one more spelling hides git, gh or
+    xargs from the guard's reading, for a session and a subagent; part is this change-set's class, part older; open on
+    main too; its fix is the next guard change-set (his order of 2026-11-26: after MAIN-WALL, together with GUARD-KIT;
+    its plan says whether it can be a rule that fails closed). Until that fix merges, his interim rule:
+    "git and gh always start their own command, with no other program in front of them."
+  - INPUT-RUN (a named limit; the advisor agent's ruling of 2026-11-26): programs outside the guard's wrapper table that
+    run their input are not inspected, the class of kit-v3-3's stated limits L1-L4; listed in the report as a security
+    finding left open.
 - **CI, the smoke job's Chromium step** (for infra-engineer; PR #42's checks, read with the GitHub API by the main
   session on 2026-11-07): on #42's head e223ecc, the pull_request run 42313665674 stalled in the step "Install
   Chromium's system libraries (browser restored from the cache)", which comes before "Smoke (check 5a)": attempt 1
@@ -2363,7 +2447,9 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
 | CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (push; gate run 45818982040 with its gate and smoke jobs, completed 12:23 UTC; toolchain run 45818982052, 12:28 UTC) | 2026-11-26 | GitHub's REST API, the commit's workflow runs and the gate run's jobs (read by ci-preview-handover's docs-keeper) |
-| CI on main (2026-11-25) | `gate`, `smoke` and `toolchain` success on 07d673b, PR #71's merge commit (push; gate and smoke completed 20:49 UTC, toolchain 20:54 UTC) | 2026-11-25 | GitHub's REST API, the commit's check runs (read 22:12 UTC) |
+| CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (gate 12:22:25, smoke 12:23:01, toolchain 12:28:06 UTC by `completed_at`) | 2026-11-26 | GitHub's REST API, the commit's check runs (read 14:24 UTC by docs-keeper) [verified] |
+| guard-wrappers (no pull request yet): the kit's three test files | `routine-guard.test.mjs` 1551/1551 (1247 on main c1da1bd by the chat's count; `.claude/` unchanged from c1da1bd to 2483e9a, read with git diff), `settings.test.mjs` 127/127, `checkpoint.test.mjs` 33/33, on the docs pass's worktree at 54bbf38c (main 2483e9a merged in) | 2026-11-26 | `node --test`, run by docs-keeper [verified] |
+| CI on main (older) | `gate`, `smoke` and `toolchain` success on 07d673b, PR #71's merge commit (push; gate and smoke completed 20:49 UTC, toolchain 20:54 UTC) | 2026-11-25 | GitHub's REST API, the commit's check runs (read 22:12 UTC) |
 | Change-set 4a (PR #70, a draft): the players' Wasm, the hash's cost, the tests | the players' Wasm 54,514 bytes on the final source fb5d0ff (53,813 before 4a), sha256 a4d8184c...d094, the same on the verifier's rebuild and on GitHub's runner (CI on 21c1046); after round 1's fix pass it was 19847796...f708, one byte other (a line number in a panic message), and 55,607 bytes before that pass; the state hash: native release 4,096 bytes 5.7 us and 16,384 bytes 20.7 us, WebAssembly release in Node 22 5.2 and 19.9 us; 17 browser tests in 195 s in the container; the release tests of all six crates, 139 passed, on the tree with #71 taken in | 2026-11-25 | the chat's card and `round1-fold.md` (`.checkpoints/cs4a-recording/`); not re-measured by docs-keeper, not re-read at fb5d0ff |
 | CI on main (older) | `gate`, `smoke` and `toolchain` success on 28254a7, PR #65's merge commit (run ids not recorded here) | 2026-11-24 | change-set 3b's card, step 0 (read 22:45 UTC) [assumed: not read again by this docs pass] |
 | ci-after-3a (no pull request yet): the `toolchain` job with every crate's release tests, the two generator checks, `devtools`' wasm32 line and two browser runs | on 832268e: the job 18:34:50 to 18:40:12 UTC (5 min 22 s by the job's start and end; the report gives 5 min 20 s); Chromium "16 passed (3.4m)"; Firefox 160.0 "2 passed (15.0s)" (the rule tests only); Python 3.12.3; gate and smoke green (run 45676587871). The red first run on 52ad5d3 (45670972698): Chromium "16 passed (3.5m)", Firefox "4 failed", "9 did not run", "2 passed (5.0m)" at Playwright's 300 s stop | 2026-11-25 | GitHub Actions, run 45676587814 and 45670972698 logs (gh, read by ci-after-3a's docs pass) |

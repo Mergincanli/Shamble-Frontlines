@@ -298,31 +298,45 @@ const WRAPPERS = new Set(['time', 'nohup', 'command', 'builtin', 'noglob', 'exec
 // abbreviation, a cluster such as -iu, a signal option) is unknown and makes the command unreadable, as does a program
 // word that still starts with - after them (env X=1 -i git ...: env runs -i). split: env -S's words are put back and
 // read on (SA-R1-2: env -S git ... still meets git's checks). A Map, so `constructor` finds nothing.
+// SAME-GAP (guard-wrappers): every name unwrap() strips reads its options here (each program's own --help, bash's
+// help; xargs's from findutils' manual: --max-lines, --eof and --replace take a value only after =, so they ask). pos:
+// positional words before the command (timeout's duration); input: the program adds words from its input (xargs), so
+// anything after it but a read-only program, or a replace string in its command words, is unreadable (R3-WAY). The
+// WRAPPERS keywords and option-less names get NONE: no options.
+const NONE = {};
 const WRAP_OPTS = new Map([
   ['env', { flag: /^(-[i0v]|--ignore-environment|--null|--debug)$/, value: /^(-u|--unset)$/, unread: /^(-[CS]|--chdir|--split-string)$/,
     split: /^(-S|--split-string)$/ }],
   ['nice', { flag: /^-\d+$/, value: /^(-n|--adjustment)$/ }],
   ['stdbuf', { value: /^(-[ioe]|--input|--output|--error)$/ }],
+  ['timeout', { flag: /^(-v|--verbose|--preserve-status|--foreground)$/, value: /^(-[sk]|--signal|--kill-after)$/, pos: 1 }],
+  ['xvfb-run', { flag: /^(-[al]|--auto-servernum|--listen-tcp)$/,
+    value: /^(-[efnpsw]|--error-file|--auth-file|--server-num|--xauth-protocol|--server-args|--wait)$/ }],
+  ['xargs', { flag: /^(-[0rtpxo]|--null|--no-run-if-empty|--verbose|--interactive|--exit|--open-tty)$/, input: true,
+    value: /^(-[adEILnPs]|--arg-file|--delimiter|--max-args|--max-procs|--max-chars|--process-slot-var)$/ }],
+  ['command', { flag: /^-[pvV]+$/ }], ['time', { flag: /^-p$/ }], ['exec', { flag: /^-[cl]+$/, value: /^-a$/ }],
 ]);
+// a word naming git or gh by its last path part, git's own helper names (git-<name>) included (SA-d)
+const GIT_HELPER = /^git-[a-z][a-z0-9-]*$/;
+const gitWord = (w) => { const x = w.split('/').pop(); return x === 'git' || x === 'gh' || GIT_HELPER.test(x); };
 // a word shown in a reason: at most 32 characters, control characters as ? (SA-R1-4)
 const shownWord = (w) => (w.length > 32 ? `${w.slice(0, 32)}...` : w).replace(/[\x00-\x1f\x7f-\x9f]/g, '?');
 // Returns { argv: the real command, unreadable: null, or the wrapper form the guard does not follow (SEC-U7B-1) }.
 export function unwrap(argv) {
-  let a = argv.slice(), unreadable = null;
-  for (let guard = 0; guard < 20 && a.length; guard++) {
+  let a = argv.slice(), unreadable = null, fed = false, reps = [], span = null, turns = 0;
+  for (; turns < 20 && a.length; turns++) {
     if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(a[0])) { a = a.slice(1); continue; }
     const prog = basename(a[0]);
-    if (prog === 'command') { a = a.slice(1); while (/^-[pvV]+$|^--$/.test(a[0] ?? '')) a = a.slice(1); continue; } // fix round R-c
-    if (WRAPPERS.has(a[0]) || WRAPPERS.has(prog)) { a = a.slice(1); continue; }
-    const o = WRAP_OPTS.get(prog);
+    const o = WRAP_OPTS.get(prog) ?? (WRAPPERS.has(a[0]) || WRAPPERS.has(prog) ? NONE : undefined);
     if (o) { // an unknown word is dropped alone and the reading goes on: that can only add a deny, never lift the ask
       a = a.slice(1);
       while (a.length && a[0].startsWith('-') && a[0] !== '-') {
         const w = a[0], name = w.startsWith('--') ? w.split('=')[0] : w.slice(0, 2);
         if (w === '--') { a = a.slice(1); break; }
         if (o.unread?.test(name)) unreadable ??= `${prog} ${name}`;
-        if (o.value.test(name) || o.unread?.test(name)) {
+        if (o.value?.test(name) || o.unread?.test(name)) {
           const v = name === w ? a[1] ?? '' : w.slice(name.length + (name.startsWith('--') ? 1 : 0));
+          if (o.input && name === '-I') reps.push(v); // every replace string xargs fills from its input (R2-1, R3-1)
           a = a.slice(name === w ? 2 : 1);
           if (o.split?.test(name)) a = [...v.split(/\s+/).filter(Boolean), ...a]; // the ask stays; this can only add a deny
           continue;
@@ -330,21 +344,20 @@ export function unwrap(argv) {
         if (!o.flag?.test(w)) unreadable ??= `${prog} ${shownWord(w)}`;
         a = a.slice(1);
       }
+      if (o.pos) a = a.slice(o.pos);
+      if (o.input) { fed = true; span ??= a; }
       if (prog === 'env' && a[0] === '-') a = a.slice(1); // after its options, env reads a lone - as -i
       if (prog === 'env') while (a.length && a[0].includes('=')) a = a.slice(1); // env's own rule: a word with = sets
       if (a[0]?.startsWith('-')) unreadable ??= `${prog} before ${shownWord(a[0])}`;
       continue;
     }
-    if (prog === 'timeout') { // timeout [-s SIG | -k DUR | --opt[=v]]... DURATION command
-      a = a.slice(1);
-      while (a.length && a[0].startsWith('-')) a = a.slice(/^(-s|-k|--signal|--kill-after)$/.test(a[0]) ? 2 : 1);
-      a = a.slice(1);
-      continue;
-    }
-    if (prog === 'xvfb-run') { a = a.slice(1); while (a.length && a[0].startsWith('-')) a = a.slice(/^-(n|s|e|f|p|w)$|^--(server-num|server-args|error-file|auth-file|xauth-protocol|wait)$/.test(a[0]) ? 2 : 1); continue; }
-    if (prog === 'xargs' && a.length > 1 && !a[1].startsWith('-')) { a = a.slice(1); continue; }
     break;
   }
+  if (turns === 20 && a.length) unreadable ??= 'more than 20 wrappers'; // SA-R1-3: a line at the limit asks
+  // R3-1, R3-2: xargs hands words from its input to the program after it, so anything but a read-only program asks;
+  // so does a replace string in any word from after the first xargs's options through the program word
+  const used = span ? span.slice(0, span.length - a.length + 1) : [];
+  if (fed && (!(a.length && NON_RUNNERS.has(a[0])) || used.some((w) => reps.some((r) => w.includes(r))))) unreadable ??= 'xargs (its input adds words)';
   return { argv: a, unreadable };
 }
 
@@ -774,9 +787,32 @@ async function bash(command, cwd, role, io, input) {
       for (const r of c.reads) { const d = credentialDeny(r, vcwd, role, io); if (d) return d; }
     }
     if (!argv.length) continue;
+    // SA-d: git run under one of its own helper names is read as git (`git <name>` itself runs `git-<name>`)
+    if (!role && GIT_HELPER.test(argv[0].split('/').pop())) argv = ['git', argv[0].split('/').pop().slice(4), ...argv.slice(1)];
     const rawProg = argv[0];
     const prog = basename(rawProg);
     if (!role && (prog === 'cd' || prog === 'pushd' || prog === 'popd')) continue;
+    // SAME-GAP rule U: a program the guard does not strip, with git or gh among its later words, may run them unread:
+    // asked (an agent refused); git or gh is then read from that word on, which can only add a deny
+    const front = !role && prog !== 'git' && prog !== 'gh' && !NON_RUNNERS.has(rawProg) && !rawProg.startsWith('-');
+    const gw = front ? argv.findIndex((w, k) => k > 0 && gitWord(w)) : -1;
+    if (gw > 0) {
+      if (input.agent_id) return deny(`${KIT_AGENT}; an agent runs git and gh as their own command, not behind ${shownWord(prog)}`);
+      dayAsk ??= ask(`kit and gate files ask first in a day session: the guard does not read ${shownWord(prog)} in front of git or gh, ` +
+        'so it asks instead of guessing; run git or gh as their own command, or approve it');
+      const h = argv[gw].split('/').pop(), sub = h.startsWith('git-') ? ['git', h.slice(4), ...argv.slice(gw + 1)] : argv.slice(gw);
+      const r2 = h === 'gh' ? await gh(sub, role, io, vcwd, input) : await git(sub, vcwd, role, io, input, line);
+      if (r2?.deny && (!(sub[1] ?? '').startsWith('-') || GIT_GLOBAL.test(sub[1]))) return r2; // SA-g: a data word before an option asks
+      continue;
+    }
+    // ADV-R4-1: xargs behind such a program is read from each xargs word on, as at the front (R3-WAY): it asks unless a
+    // read-only program follows it, an agent refused
+    const xu = front ? argv.map((w, k) => (k > 0 && w.split('/').pop() === 'xargs' ? unwrap(argv.slice(k)).unreadable : null)).find(Boolean) : null;
+    if (xu) {
+      if (input.agent_id) return deny(`${KIT_AGENT}; an agent does not run ${xu} behind ${shownWord(prog)} (a form the guard does not follow)`);
+      dayAsk ??= ask(`kit and gate files ask first in a day session: the guard does not follow ${xu} behind ${shownWord(prog)}, ` +
+        'so it asks instead of guessing; write it without that, or approve it');
+    }
     if (prog === 'cd') { // track the folder, so later paths in the line resolve where they will run
       const target = argv[1] && argv[1] !== '-' ? resolve(vcwd, argv[1].replace(/^~(?=\/|$)/, io.home)) : io.home;
       if (role && projectRel(target, vcwd, io) === null && !insideDir(target, input.scratchpad_dir, vcwd, io)) {
@@ -811,6 +847,11 @@ async function bash(command, cwd, role, io, input) {
 // in a session started with --agent, so it is never checked: E10-6) is refused where the main session is asked.
 const KIT_AGENT = 'kit and gate files are edited by the main session, which asks Mustafa first';
 const GIT_PLACE_VARS = /GIT_(DIR|WORK_TREE|COMMON_DIR|INDEX_FILE)/; // fix round SA-8
+// git's own options before its subcommand: behind an unknown program they keep git's deny (the plugin review on SA-g)
+const GIT_GLOBAL = /^(-[cCpP]|--(git-dir|work-tree|namespace|exec-path|config-env|no-pager|paginate|bare|no-replace-objects|literal-pathspecs|glob-pathspecs|noglob-pathspecs|icase-pathspecs|no-optional-locks|super-prefix|attr-source|no-lazy-fetch|no-advice))(=|$)/;
+// SAME-GAP rule U: programs that only read their words (never run one), so git or gh among them asks nothing
+const NON_RUNNERS = new Set(['echo', 'printf', 'which', 'type', 'whereis', 'grep', 'egrep', 'fgrep', 'ls', 'cat', 'head', 'tail', 'wc',
+  'test', '[']);
 // git clone's options that take the next word as their value (F-b: so the URL and the folder are found)
 const CLONE_VALUE = new Set(['-o', '--origin', '-b', '--branch', '-u', '--upload-pack', '--reference', '--reference-if-able',
   '--depth', '--shallow-since', '--shallow-exclude', '-c', '--config', '--template', '-j', '--jobs', '--filter',
