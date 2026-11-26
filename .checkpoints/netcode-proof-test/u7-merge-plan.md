@@ -1,4 +1,6 @@
 # U7's merge into the lane: the plan (M0-M9), written 2026-11-26 17:1x UTC by the main session
+As checked: APPROVE WITH CONDITIONS UM-1 to UM-5, all Low (advisor-u7-merge.md, 19:5x-20:0x UTC), applied word for word
+below; no new check.
 Form: U8's M0-M9 (u8-merge-plan.md: its steps, with the changes that won over them there) with U7's terms, and the
 snapshot read's conditions U7-M-1 to U7-M-8 (advisor-u7-snapshot.md section 4) applied. Its check: the advisor
 a0530735048f1620a, who wrote those conditions, in the 19:50 UTC window (its item 5: "else I bring it at 19:50"). The
@@ -37,11 +39,29 @@ named.
   --ignore-scripts`; a real folder the root .gitignore covers), or the step fails with one line naming that install. It
   goes to the advisor first (the dependency record), before Stop B's fill. Builder 2's whole run, if after it, counts
   13 steps instead of 11.
+  - UM-4: the `ops` step's own change. It is its own change by the main session: a plan first and the advisor's check
+    in a window, after this merge's M9 and before Stop B's fill, with these parts:
+    - (a) **Test first.** check.test.mjs:2785's list gains "ops" after "web", and `node --test check.test.mjs` fails on
+      that assert. Then check.mjs's STEPS gains `ops` after `web`: `node --test 'ops/**/*.test.mjs'`, then `bash
+      ops/tests/wrappers.test.sh`, both in HERE, failing if either fails, summarised with nodeCounts and the wrappers'
+      last line. The self tests pass.
+    - (b) **U8's fix 2, the real install.** First, package.json 8370495d… and package-lock.json a0efce8e… by sha256.
+      Then `npm_config_ignore_scripts=true npm ci --ignore-scripts --prefix spikes/netcode-proof/ops/browser`, its own
+      call. Then both sha256s unchanged and `git status --short` unchanged (the folder is a real one, so the root
+      .gitignore's `node_modules/` covers it). npm's "added N packages" and its audit line are recorded; "4 moderate" is
+      security's expected chain (security-u8-deps.md C3 (c)).
+    - (c) **The dependency record.** One note section in dependency-check.md (the install's form, both sha256s before
+      and after, npm's two lines), with no bare sha256 line: no manifest or lockfile changes, so DEP-HOLD holds nothing,
+      and no new security read is needed (the form and the lock were cleared at U8).
+    - (d) **A missing folder.** When ops/browser/node_modules is absent, the step fails with one line naming that
+      install.
+    - (e) **Whole runs before it lands** keep choice 15 (i): ops tests and wrappers beside `node check.mjs`.
 - ops/browser/node_modules for this merge's M5: the install kept in agent-abf71d95fc07b3522 (U8's first build
   worktree; package.json 8370495d…, package-lock.json a0efce8e…), linked as at U8's merge (choice 15 (i)), removed
   before M7.
-- Order (U7-M-1): MAIN-68 first (main-68-plan.md rev 3: #70, #73, #74, #76; rev 2's three until main moved at 18:00
-  UTC). Builder 2's merge (46 files: crates/judge, marks/ and its notes; none of U7's 43) came first: 48efc9c, 18:02 UTC.
+- Order (U7-M-1): MAIN-68 first, at main's tip when it runs (b9aad01 at the advisor's check: #70, #73, #74, #76, #77
+  and #75; #75 adds a root-workspace crate, nothing under spikes/). Builder 2's merge (46 files: crates/judge, marks/ and
+  its notes; none of U7's 43) came first: 48efc9c, 18:02 UTC.
 - The guard: after MAIN-68, #73's rules check every call. No command below has a program in front of git or gh, and none
   runs xargs at the session level (main-run.sh's and u7-run.sh's own git and xargs calls run inside the scripts, which
   the guard does not read: INPUT-RUN). If one asks or is refused, the step stops and the advisor rules.
@@ -61,6 +81,8 @@ the advisor rules."
   - Free disk at least 8,192 MiB; under it, the part-clean in the card's Tools form, then measure again; still under:
     stop, the advisor rules.
   - u7-report.md drafted (U7-M-7's items; M5's and C1's lines to fill) and u7-c1.mjs written.
+  - Before M0 (UM-3): `git diff --no-index` of u8-c1.mjs and u7-c1.mjs (its own call) shows only the four changes Facts
+    names: the header (:1-4), :12, :14 and :47.
   - The resume line onto the card by Edit (replacing lines). The saver stopped by TaskStop with its proof; H0 = HEAD,
     named in the chat. The no-save window runs from here to M8's push: a Stop hook gets one line, no save.
   - The base light run at H0: `bash .checkpoints/netcode-proof-test/main-run.sh
@@ -84,7 +106,9 @@ the advisor rules."
   marks/marks.json --logs /home/user/Shamble-Frontlines/.gate/u7-merge/c1-logs --out
   /home/user/Shamble-Frontlines/.gate/u7-merge/c1-verdicts.json --only PM-0001-36`. The bar: a PM-0001-36 entry with a
   verdict, its "ML* (rough, reported)" part counting 1 log, and no "npt-judge: " line. A read error is M6. NC-6 changed
-  the Recorder; run 4's records hold the same two kinds, `event` and `second`.
+  the Recorder; run 4's records hold the same two kinds, `event` and `second`. At C1 (UM-3): the line "wasm sha256" it
+  prints equals 901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77, run 4's npt_client_wasm_bg.wasm.
+  Otherwise M6.
 - **M5 (U7-M-4):** one main-run.sh call, cheap runs first: `bash .checkpoints/netcode-proof-test/main-run.sh
   /home/user/Shamble-Frontlines/.gate/u7-merge/m5-check.log node --test 'ops/**/*.test.mjs' :: bash
   ops/tests/wrappers.test.sh :: env CARGO_INCREMENTAL=0 node check.mjs` (run_in_background, timeout 7200000). All
@@ -94,6 +118,8 @@ the advisor rules."
   - check.mjs: all 12 steps (U7's `web` included).
   - The counts recorded as found: test against end-2's 884/981 (MAIN-68 and Builder 2 may move it); web 70; self 80;
     marks 81, rows unchanged; redact 0 findings, items as counted; refs = N0 + 33 (the 33 new files); wasm as end-2.
+  - UM-2: test: 931 measured and 1,028 bites passed, 0 failed, 0 skipped. If the totals differ: name the difference. If
+    `git diff --stat 48efc9c H0 -- spikes/netcode-proof/crates` explains it, record it and go on; otherwise M6.
 - **M6:** a failing test or bar is never retried unnamed. It stops the merge: `git apply -R --index` of the patch (then
   `git diff --quiet H0 -- spikes/` exits 0), the link removed, the saver restarted. The failure and its log go to the
   advisor in the next window. Nothing is committed.
@@ -117,7 +143,10 @@ the advisor rules."
 - **M9, after the push (U7-M-8):** the saver restarted; CI on the pushed head (gate with gate and smoke, toolchain; push
   and pull request), all green; the advisor's read of the pushed head in the next window (not a round). After that read,
   the cleanups (U7's builder's worktree, .gate/u7-amend, cli-target's 433 MiB) in the forms the advisor names: a worktree
-  with uncommitted files needs more than a plain `git worktree remove`.
+  with uncommitted files needs more than a plain `git worktree remove`. UM-5: their forms are named at the advisor's read
+  of the pushed head, not here. Never `git worktree remove --force` and never `rm -rf`: the guard refuses both
+  (launch-0850.md:103-104). The builder's worktree holds U7's uncommitted files and its notes, so it comes off only by a
+  form that keeps every file a copy is not yet committed for.
 
 ## Done lines (one per step, by Edit, as at U8's merge)
 (none yet)
@@ -131,7 +160,7 @@ the advisor rules."
   none of U7's 43. Its merge comes before or after U7's, one at a time; if first, M5's ops count is its count.
 - #73's rules: a refusal or an ask stops the step where it is (M6's form if after M4).
 
-## Questions for the checker
+## Questions for the checker (answered: advisor-u7-merge.md, "The plan's questions": Q1 UM-4; Q2 enough; Q3 right)
 - Q1: the `ops` step as the first change after this merge (out of it, so M6's undo works and the commit equals the
   snapshot), carrying U8's fix 2 install. Rule on that change's form and its dependency record, or say it waits for
   Stop B's fill.
