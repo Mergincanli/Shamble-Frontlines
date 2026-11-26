@@ -15,10 +15,13 @@ step "cargo test, twice (the second writes the generated types again)"; cargo te
 [ "$before" = "$(digests)" ] || { echo "the generated types changed when they were written again"; exit 1; }
 step "release tests of every crate, the WebAssembly build of the five crates (the job's lines since #71)"
 cargo test --release -p sim -p protocol -p room -p client-endpoint -p sim-wasm -p devtools --locked
+# Beyond CI's line (a request for the CI Builder: `content` in the release test line): the content crate in release.
+cargo test --release -p content --locked
 cargo build --locked --target wasm32-unknown-unknown -p sim -p protocol -p room -p client-endpoint -p sim-wasm
 step "the two vector generators' checks, and the tools crate for wasm32 on its own line"
 python3 -I -B crates/devtools/vectors/make_chacha8_vectors.py --check; python3 -I -B crates/devtools/vectors/make_f32_vectors.py --check
 cargo build --locked --target wasm32-unknown-unknown -p devtools --lib
+node packages/client/scripts/legacy-extract.mjs --check
 step "each package's own tests"; for p in client sim-worker types net; do (cd packages/$p && if [ "$p" = sim-worker ]; then node ../../node_modules/vitest/vitest.mjs run --dir src; else node ../../node_modules/vitest/vitest.mjs run; fi); done
 (cd packages/e2e && node ../../node_modules/@playwright/test/cli.js test --project=node)
 step "type checks of the types package"
