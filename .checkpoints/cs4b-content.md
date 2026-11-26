@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 00:44 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 00:56 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -886,6 +886,22 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     slope; one ray's distance moved by one unit in the last place (the committed lines differ). **W2 withdrawn
     as no defect:** with the zero-direction branch taken out, the division by zero gives the same answers
     (infinities, and a NaN every comparison lets through); the branch stays because it says the rule in words.
+- **Step 9, the pieces that need no content file** (built while DIFF-LIST is open; 2026-11-27):
+  - **First piece DONE** (commit c09f459, pushed 00:55; the gate passes; the full local checks passed whole;
+    **4,047 written lines of 4b-2**): the content crate's one dev-dependency, the type writer, exactly as
+    security-auditor approved it (both committed files equal the two digests, checked after the copy and before
+    the commit); `dependency_rules.rs` holds the three tables and the one line, with four planted manifests
+    (SA-STEP9-1); the comment on the "known clash" in `build-checks.mjs` (SA-STEP9-2).
+  - **Second piece: built, in its local checks at 00:56:** `crates/content/src/ts_export.rs` (the protocol
+    crate's export test, copied, with the content crate's folder: the two crates share no code); the derives
+    under `cfg(test)` on `Movement`, `MapDocument`, `Bounds`, `Spawn`, `Shape`, `Form`, `Toward`, `Region`,
+    `Ground`; eight generated files under `packages/types/src/generated/content/` (a shape is its corners and
+    `{ "type": "box" } | { "type": "ramp", rises_toward }`, the file's own keys; `Toward` is "+x" | "-x" |
+    "+z" | "-z"); their exports in `packages/types/src/index.ts` and a type test (three lines that must not
+    compile); and the source scan now takes a file that starts with `#![cfg(test)]` as test-only as a whole
+    (4B-SCAN-CFG-TEST: three bites, one control).
+  - **What of step 9 still waits for his DIFF-LIST answer:** the constructor taking the bundle, the page's
+    fetch of `content.json`, the build running the bundle tool, the first recording's frozen content.
 - **To do before 4b-2 merges:** the licence texts for the hosted build (a follow-up for lane 2).
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
   `cs4-walk/mustafa-2026-11-26-grey-colours.md`; read as his answer to the one question the chat's update before
@@ -930,14 +946,16 @@ just continue as you were)". So: the chat's work and its agents' work are commit
 25 minutes, and the work itself is not cut.
 
 **Where everything is.** Branch `claude/cool-pasteur-oiqk1r` on origin (this chat's own; a session of another
-account works on its own branch from this head and never pushes here: his Lanes rule). The head when this was
-written: 6a2639c (notes) on 8e5a268 (code). Nothing is uncommitted. No agent is running. The board add-on is
+account works on its own branch from this head and never pushes here: his Lanes rule). The head: see the last
+"DONE" entries above (the card is saved with every push). Nothing is uncommitted. No agent is running. The board add-on is
 active for this chat (thread state: needs-musti, for DIFF-LIST).
 
 **State of 4b-2, by step** (3,999 written lines of 8,450; two thirds is 5,633; rungs at 6,750 and 8,000):
 - 6 the library's batch: done (298837a). 7 the built-file check: done (d313162, then 2f058b2 and e3acb41 for the
   advisories' rule). 8, first part, the two tools on test files: done (54e89d2). 10, the core, the static world
-  on maps made in tests: done (8e5a268). CI: green through 54e89d2; 2f058b2, e3acb41 and 8e5a268 to be read.
+  on maps made in tests: done (8e5a268). 9, first piece, the type writer's manifest line and its rule: done
+  (c09f459); 9, second piece, the generated content types: see the entry "Step 9, the pieces that need no
+  content file" above. CI: green through 54e89d2; the later heads to be read.
 - **Blocked on his own answer to DIFF-LIST** (asked 2026-11-26, 23:11 Amsterdam;
   `cs4b-content/question-2026-11-26-diff-list.md`): step 8's second part, step 9, step 10's wiring. A bare "a"
   has reached this chat twice as a repeat of his older message (`cs4-walk/redelivered-2026-11-26.md`): it is
