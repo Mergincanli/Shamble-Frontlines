@@ -90,3 +90,45 @@ earlier decisions come from `security-auditor-deps-4b1.md` and `security-auditor
   build-checks.mjs:282-283 says so). Exception 2 (build-checks.mjs:321-327) is pinned to entries, not askers: its
   basis is unchanged. The "known clash" (build-checks.mjs:285-288: a FEATURE only dev-dependencies turn on, reaching
   sim's tree) does not fire: the batch adds no feature (content has no [features]); cfg(test) + dev edge instead.
+- [x] Sources tied to the lock (`security-auditor-deps-4b2-src.py`, python -I, reads only): ts-rs 12.0.1 (89 files),
+  ts-rs-macros 12.0.1 (21), thiserror 2.0.21 (105), thiserror-impl 2.0.21 (17): unpacked = archive, no missing or
+  extra file; each archive's sha256 = the batch lock's checksum. ts-rs: no build script, 0 unsafe; ts-rs-macros: proc
+  macro, 0 unsafe; thiserror's build.rs and thiserror-impl's one `unsafe` token are not new (thiserror is in every
+  build since step 6; the proc macro already runs). Lock necessity: head lock + batch manifest (`ws-mixed`) ->
+  `cargo tree --locked` refuses ("cannot update the lock file ... --locked"); batch lock resolves with no rewrite.
+- [x] 6 missing pieces (Q4). No second batch foreseen. Content's kinds (map.rs:73-136, movement.rs:38-54,
+  bundle.rs:35-37) use String, Vec, [f64; 2|3], f64, u32 and plain/struct-variant enums: ts-rs 12.0.1 covers them
+  with default features off (engine-architect ran it on the map's types, card line 430); the `.ts` import extension
+  is runtime `Config` (protocol: ts_export.rs:110-112), not the old import-esm feature; no serde, no third-party type,
+  so no `*-impl`/serde-compat/format feature. packages/types/package.json exports only "." -> re-exports go in
+  src/index.ts (code). sim, sim-wasm (`content` line, its comment names the constructor) and devtools already depend
+  on content; bytes cross wasm-bindgen as &[u8] with no js-sys. CI's write-again check covers all of
+  packages/types/src/generated (toolchain.yml:159-161). Must ride in the same commit (not a manifest): the rule edit
+  (with the batch alone `the_content_crate_depends_on_nothing` fails, dependency_rules.rs:56-60). Not manifests, for
+  step 9's plan: helper attributes inside cfg_attr; `Config::new()` not `from_env()` (no TS_RS_* steering); its own
+  folder generated/content and scratch name; the card's open note that the content scan does not take a file-level
+  `#![cfg(test)]` as test code (card line 436/462). Also: Grid.thinnest is i64 -> `bigint` by default if exported.
+
+## Findings
+- SA-STEP9-1 Low (the rule edit's commit, not the batch): `the_rule_reads_what_it_should_refuse`
+  (dependency_rules.rs:155-169) compares its plants with ["package", "lints"] and plants exactly
+  `[dev-dependencies]\nts-rs = { workspace = true }`, the line that becomes allowed. Left as is it still passes,
+  but proves nothing about the new rule. Fix: compare with the new list, and plant a second dev-dependency and a
+  ts-rs line with a feature (`features = ["format"]`), each seen through `table(.., "dev-dependencies")`.
+- SA-STEP9-2 Low (wording, same commit): build-checks.mjs:285-288 says the step that first nests generated types in
+  sim's tree decides which side gives way; step 9 adds no feature (cfg(test) + dev edge), so the compare is
+  untouched. Say so there, so no later change adds a `ts` feature to content on ADR 0002 part 5's old plan.
+- No Critical, High or Medium.
+
+## Verdict
+APPROVE on the two digests of deps-step9.sha256: Cargo.lock
+56bd2d52483a46eb0843b465e21a8d3492e3df1b9263b46bf9c7cdb61f3b9c47, crates/content/Cargo.toml
+620a400b14da6030dce2fda1f336358f3edc13cc0d92f802bdfd260416738b9c. Committed with the rule edit; after the commit,
+check the committed blobs against both digests; no cargo call without --locked between copy-in and commit.
+Not checked: RustSec/OSV (no network; the session's OSV note lists none for ts-rs's tree: not re-verified);
+heapless 0.8.0's nine advisories (unchanged by this batch; its own request); nothing compiled (the derive on
+content's real types untried); `--target all` (offline: serde's archive not cached); non-Linux hosts.
+- [x] 7 answer
+DONE
+- Correction: step 1's short form "620a400b...9b8c" is a typo; the digest ends ...738b9c (full text in the Verdict).
+- Progress: all seven plan steps are done (the [x] lines above supersede the unticked Progress list).
