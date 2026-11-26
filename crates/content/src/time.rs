@@ -3,9 +3,9 @@
 //! 3,000 is the least number that a millisecond and a 60th of a second both divide. Every duration of the old game's
 //! tuning but its own step is a whole number of milliseconds and converts exactly, and a tick is a whole number of
 //! units at 30 Hz (100) and at 60 Hz (50), so a duration in units stays the same when the tick rate changes. The
-//! rounding report lists every old duration with its units (`devtools`'s `time_report`, PM-0004-11). A content kind
-//! that holds a duration converts it here, once, when its file is read; the simulation counts units and never
-//! converts.
+//! rounding report lists every old duration with its units (`devtools`'s `time_report`, PM-0004-11). A content file
+//! keeps a duration as it is written, in seconds; whoever starts a match converts it here, once, when it works out
+//! the match's own numbers from the content. Nothing converts while a match runs: timers count units.
 
 /// Units in a second.
 pub const UNITS_PER_SECOND: u32 = 3_000;

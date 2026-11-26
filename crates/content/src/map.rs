@@ -53,8 +53,8 @@ pub const CORNER_GRID: Grid = Grid { per_metre: 1_000, thinnest: 10 };
 
 /// Any coordinate: wide bounds that keep a typing mistake out. The map's own bounds are held to the aim's reach.
 pub const COORDINATE: Range = Range::closed(-10_000.0, 10_000.0);
-/// The way a spawn faces, in degrees from 0 up to 360 (the simulation says which way 0 is when it first turns a
-/// soldier: change-set 4c).
+/// The way a spawn faces, in degrees from 0 up to 360. Which way 0 points and which way it turns is pinned in the
+/// change that writes the first map file (4b-2's data step), before any spawn is written: no code reads it yet.
 #[rustfmt::skip]
 pub const FACING: Field = Field { name: "facing_deg", unit: "deg", range: Range { min: 0.0, max: 360.0, min_inclusive: true, max_inclusive: false } };
 
@@ -80,6 +80,7 @@ pub struct Bounds {
     pub max: [f64; 3],
 }
 
+/// Where a soldier starts: `at` is the point on the ground between the feet, the soldier's own origin.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Spawn {
     pub id: String,
@@ -87,11 +88,10 @@ pub struct Spawn {
     pub facing_deg: f64,
 }
 
-/// A solid piece of the world. `group` names the part of the map it belongs to (an id, not a fixed list).
+/// A solid piece of the world.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Shape {
     pub id: String,
-    pub group: String,
     pub min: [f64; 3],
     pub max: [f64; 3],
     pub form: Form,
@@ -102,7 +102,10 @@ pub struct Shape {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Form {
     Box,
-    Ramp(Toward),
+    /// A named field, as the file has it (`rises_toward`), so that the generated types can say the same.
+    Ramp {
+        rises_toward: Toward,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -162,7 +165,7 @@ pub fn read(top: &Node) -> Result<MapDocument, Error> {
     }
     let mut shapes = Vec::new();
     for mut entry in entries(&mut object, "shapes", MAX_SHAPES)? {
-        let (id, group) = (entry.id("id")?.to_owned(), entry.id("group")?.to_owned());
+        let id = entry.id("id")?.to_owned();
         let (min, max) = (
             entry.numbers("min", COORDINATE)?,
             entry.numbers("max", COORDINATE)?,
@@ -170,23 +173,17 @@ pub fn read(top: &Node) -> Result<MapDocument, Error> {
         // A box has no `rises_toward`: the key is read only for a ramp, so on a box it is a key the kind does not have.
         let form = match entry.one_of("type", &FORMS, "box or ramp")? {
             0 => Form::Box,
-            _ => Form::Ramp(
-                match entry.one_of("rises_toward", &TOWARDS, "+x, -x, +z or -z")? {
+            _ => Form::Ramp {
+                rises_toward: match entry.one_of("rises_toward", &TOWARDS, "+x, -x, +z or -z")? {
                     0 => Toward::PlusX,
                     1 => Toward::MinusX,
                     2 => Toward::PlusZ,
                     _ => Toward::MinusZ,
                 },
-            ),
+            },
         };
         entry.finish()?;
-        shapes.push(Shape {
-            id,
-            group,
-            min,
-            max,
-            form,
-        });
+        shapes.push(Shape { id, min, max, form });
     }
     let mut regions = Vec::new();
     for mut entry in entries(&mut object, "regions", MAX_REGIONS)? {
@@ -382,7 +379,7 @@ pub(crate) mod tests {
     use crate::json::parse;
 
     /// A small valid map on one line (a file has it in canonical form; the typed read does not ask).
-    pub(crate) const TEXT: &str = r#"{"bounds": {"max": [50, 20, 50], "min": [-50, 0, -50]}, "format": "shamble-map", "id": "yard", "regions": [{"id": "street", "kind": "street", "max": [10, 2], "min": [-10, -2]}], "shapes": [{"group": "yard", "id": "step_055", "max": [1, 0.55, 1], "min": [0, 0, 0], "type": "box"}, {"group": "yard", "id": "ramp_a", "max": [4, 1, 2], "min": [2, 0, 0], "rises_toward": "-z", "type": "ramp"}], "spawns": [{"at": [0, 0, -5], "facing_deg": 90, "id": "a"}], "version": 1}"#;
+    pub(crate) const TEXT: &str = r#"{"bounds": {"max": [50, 20, 50], "min": [-50, 0, -50]}, "format": "shamble-map", "id": "yard", "regions": [{"id": "street", "kind": "street", "max": [10, 2], "min": [-10, -2]}], "shapes": [{"id": "step_055", "max": [1, 0.55, 1], "min": [0, 0, 0], "type": "box"}, {"id": "ramp_a", "max": [4, 1, 2], "min": [2, 0, 0], "rises_toward": "-z", "type": "ramp"}], "spawns": [{"at": [0, 0, -5], "facing_deg": 90, "id": "a"}], "version": 1}"#;
 
     fn read_text(text: &str) -> Result<MapDocument, Error> {
         read(&parse(text.as_bytes()).expect(text))
@@ -417,7 +414,6 @@ pub(crate) mod tests {
         assert_eq!(map.spawns, [spawn]);
         let shape = |id: &str, min, max, form| Shape {
             id: id.to_owned(),
-            group: "yard".to_owned(),
             min,
             max,
             form,
@@ -426,7 +422,9 @@ pub(crate) mod tests {
             "ramp_a",
             [2.0, 0.0, 0.0],
             [4.0, 1.0, 2.0],
-            Form::Ramp(Toward::MinusZ),
+            Form::Ramp {
+                rises_toward: Toward::MinusZ,
+            },
         );
         assert_eq!(
             map.shapes,
@@ -450,7 +448,9 @@ pub(crate) mod tests {
             let map = read_text(&TEXT.replace("\"-z\"", &format!("\"{word}\""))).expect(word);
             assert_eq!(
                 map.shapes.last().map(|shape| shape.form),
-                Some(Form::Ramp(toward))
+                Some(Form::Ramp {
+                    rises_toward: toward
+                })
             );
         }
         let grass =
@@ -479,7 +479,7 @@ pub(crate) mod tests {
             ("\"type\": \"box\"", "\"rises_toward\": \"+x\", \"type\": \"box\"".to_owned(), "shapes[0]", Kind::UnknownKey { key: Echo::of(b"rises_toward") }),
             ("[0, 0, -5]", "[0, 0]".to_owned(), "spawns[0].at", Kind::TooFew { len: 2, min: 3 }),
             ("[10, 2]", "[10, 2, 0]".to_owned(), "regions[0].max", Kind::TooMany { len: 3, max: 2 }),
-            ("\"group\": \"yard\", \"id\": \"step_055\"", "\"group\": \"The Yard\", \"id\": \"step_055\"".to_owned(), "shapes[0].group", Kind::BadId { id: Echo::of(b"The Yard") }),
+            ("\"id\": \"step_055\"", "\"id\": \"Step 055\"".to_owned(), "shapes[0].id", Kind::BadId { id: Echo::of(b"Step 055") }),
             ("\"bounds\": {\"max\": [50, 20, 50], ", "\"bounds\": {\"centre\": 0, \"max\": [50, 20, 50], ".to_owned(), "bounds", Kind::UnknownKey { key: Echo::of(b"centre") }),
             ("\"regions\": [{", "\"regions\": [1, {".to_owned(), "regions[0]", Kind::WrongType { expected: "an object", found: "a number" }),
             ("\"format\": \"shamble-map\"", "\"format\": \"shamble-movement\"".to_owned(), "format", Kind::WrongFormat { found: Echo::of(b"shamble-movement"), expected: FORMAT }),
@@ -511,6 +511,14 @@ pub(crate) mod tests {
             Ok(16)
         );
         assert_eq!((MAX_SPAWNS, MAX_SHAPES, MAX_REGIONS), (16, 512, 64));
+        // Every number of a map lies in a range with finite ends, as every field of the movement kind does.
+        for range in [COORDINATE, FACING.range] {
+            assert!(range.min.is_finite() && range.max.is_finite() && range.min < range.max);
+            assert!(
+                range.min.abs() < 9_007_199_254_740_992.0
+                    && range.max.abs() < 9_007_199_254_740_992.0
+            );
+        }
     }
 
     #[test]

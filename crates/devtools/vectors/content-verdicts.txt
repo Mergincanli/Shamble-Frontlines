@@ -14,26 +14,26 @@ brackets that do not match|500|fcba4476c8c6c974
 nesting past the cap|500|8f58c6174932867e
 a key that is there twice|500|c809899d68cfbb51
 a key that is no key|500|06d13b7fcbc76dab
-more values than a document holds|50|7a454cc75ce3286b
+more values than a document holds|50|e098d7df25f00fea
 a file past the byte cap|50|1eff1324df8a7f82
 a key the kind does not have|500|a3c25f24f0abced7
 a key that is missing|500|2129d5ccd20088bb
 a value of the wrong type|500|5305d12220df5a4e
 a number outside its range|500|5a1d79ede1ad6d2f
 another format or version|500|aa8383b7a899f0b0
-an id that is no id|500|8f3560b9ff9129c8
+an id that is no id|500|892bc5b0c1a74239
 an id that is not the file's name|500|cf7bdf90d631880e
-a text not in canonical form|500|a45bf37746c6d37f
-a valid map|500|45c25e0b91994249
-a map's list too long or a word it does not know|500|6ca297b888f345fa
-a map's box off its grid, too thin or outside the bounds|500|40dbd127f5d83d0f
-a map past the aim's reach, with no spawn or an id twice|500|8c27f45188487e67
-a valid bundle|500|6eaef4977b547c5b
+a text not in canonical form|500|ed42affbb16753c6
+a valid map|500|b60f1e1a29a18686
+a map's list too long or a word it does not know|500|da9f5d55eb2b0e53
+a map's box off its grid, too thin or outside the bounds|500|f4dc7eed11a7595a
+a map past the aim's reach, with no spawn or an id twice|500|804874907c017bcf
+a valid bundle|500|ea7d76ca6d16950b
 a path that is no content path|500|4872004d4dcf3136
 paths out of order|500|3c93c65592b2c42d
 more files than a bundle holds|500|e47b7f010e5d1b2c
 a bundle with a key too many or too few|500|7b3cc68d551bf4c7
 another bundle format or version|500|2aa70bf03a69ee0e
 a bundle past a byte cap|50|4f0c9bfce549af81
-a file refused, in a bundle|500|db95adead86645c3
-the fuzz run's first inputs|2000|46e1524a15fb6085
+a file refused, in a bundle|500|abafe2a03688b110
+the fuzz run's first inputs|2000|739419f879b38726

@@ -71,13 +71,14 @@ pub fn parse_number(text: &[u8]) -> Result<f64, NumberError> {
     }
 }
 
-/// ECMAScript's rule for a number that lies exactly between its two shortest texts: the one whose last digit is even
-/// (`Number::toString`, step 5). The standard library takes the upper one: 89639294043007.125 is `89639294043007.12`
-/// in a browser and `89639294043007.13` there, and the number corpus found it. Such a number has exactly one binary
-/// place more than its shortest text has decimal places; twice the number, counted in the text's last place, is then
-/// an odd whole number, and the two texts are the whole numbers on either side of its half. `decimals` is the count
-/// of decimal places in the standard library's text; the even neighbour's digits come back, or `None` when the
-/// number is no such tie.
+/// The rule for a number that lies exactly between its two shortest texts: the one whose last digit is even. It is
+/// the reading ECMAScript recommends (`Number::toString`, note 2; its step 5 alone leaves the last digit open), and
+/// the one V8 and SpiderMonkey follow: the number corpus holds this writer to both. The standard library takes the
+/// upper text: 89639294043007.125 is `89639294043007.12` in a browser and `89639294043007.13` there, and the corpus
+/// found it. Such a number has exactly one binary place more than its shortest text has decimal places; twice the
+/// number, counted in the text's last place, is then an odd whole number, and the two texts are the whole numbers on
+/// either side of its half. `decimals` is the count of decimal places in the standard library's text; the even
+/// neighbour's digits come back, or `None` when the number is no such tie.
 fn even_of_a_tie(value: f64, decimals: i32) -> Option<String> {
     let bits = value.to_bits();
     let exponent = i32::try_from((bits >> 52) & 0x7ff).ok()?;
@@ -99,7 +100,12 @@ fn even_of_a_tie(value: f64, decimals: i32) -> Option<String> {
         .checked_pow(u32::try_from(decimals).ok()?)?
         .checked_mul(odd)?;
     let lower = twice / 2;
-    Some(lower.checked_add(lower & 1)?.to_string())
+    let even = lower.checked_add(lower & 1)?.to_string();
+    // Halfway is not enough: both neighbours must be texts of this very double. Just below a power of two the
+    // doubles lie twice as close as above it, so the lower neighbour of a power of two can read back as the double
+    // under it (2^-24 is `5.960464477539063e-8`; `...062e-8` is the double below). The even neighbour is taken only
+    // if it reads back as this number; the standard library's own text always does.
+    (format!("{even}e-{decimals}").parse::<f64>() == Ok(value)).then_some(even)
 }
 
 /// The text of a finite number: the shortest digits that read back as the same double, laid out as ECMAScript's
@@ -288,6 +294,11 @@ mod tests {
             (0x4215_553b_6f88_d800, "22906067938.210938"),
             // Not between two: a half that is the shortest text itself.
             (0x4310_0000_0000_0002, "1125899906842624.5"),
+            // Halfway between two texts of which only one is its own: under a power of two the doubles lie twice as
+            // close, and the even text below 2^-24 is the next double's (the last two rows). 2^-25 is a plain tie.
+            (0x3e70_0000_0000_0000, "5.960464477539063e-8"), (0xbe70_0000_0000_0000, "-5.960464477539063e-8"),
+            (0x3e60_0000_0000_0000, "2.9802322387695312e-8"), (0x3e6f_ffff_ffff_ffff, "5.960464477539062e-8"),
+            (0x3e70_0000_0000_0001, "5.960464477539064e-8"),
         ];
         for (bits, text) in ties {
             assert_eq!(number_text(f64::from_bits(bits)), text);

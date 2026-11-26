@@ -8,7 +8,8 @@
 //     <its canonical text>`, where the double is what this engine's `JSON.parse` makes of the text and the canonical
 //     text is what its `JSON.stringify` writes. The numbers: every number of the old tuning file as written
 //     (legacy-numbers.txt), 5,000 doubles from random bits, 5,000 decimal texts of up to 17 digits in many
-//     spellings, 1,000 doubles that may lie exactly between their two shortest texts, and the edges.
+//     spellings, 2,000 doubles that may lie exactly between their two shortest texts, every power of two a double
+//     holds with the double under it and the double over it, and the edges.
 //   crates/devtools/vectors/content-trees.txt    400 random trees, records parted by an empty line: the tree as
 //     `JSON.stringify` writes it on one line, keys as they came, then as it writes it with sorted keys and an
 //     indent of two, which is the content files' one canonical form.
@@ -71,14 +72,31 @@ function decimals(count) {
   return lines;
 }
 
-/** The `count` doubles with one to eight binary places and a full mantissa: where a number can lie exactly between
- *  its two shortest texts, and the rule is the text whose last digit is even. */
+/** The `count` doubles with 1 to 25 binary places and a full mantissa: where a number can lie exactly between its
+ *  two shortest texts, and the rule is the text whose last digit is even. */
 function ties(count) {
   return Array.from({ length: count }, (_, at) => {
     const bytes = draw("tie", at);
     const whole = (1n << 52n) + (bytes.readBigUInt64BE(0) >> 12n);
-    return lineOf(String((bytes[8] % 2 === 0 ? 1 : -1) * (Number(whole) / 2 ** (1 + (bytes[9] % 8)))));
+    return lineOf(String((bytes[8] % 2 === 0 ? 1 : -1) * (Number(whole) / 2 ** (1 + (bytes[9] % 25)))));
   });
+}
+
+/** Every power of two a double holds, from 2^-1074 to 2^1023, each with the double under it and the double over it:
+ *  under a power of two the doubles lie twice as close as over it, which is where "halfway between two texts" and
+ *  "both texts are this number's" part ways (2^-24 was written as the double under it before this was here). */
+function powersOfTwo() {
+  const lines = [];
+  for (let power = -1074; power <= 1023; power += 1) {
+    view.setFloat64(0, 2 ** power);
+    const bits = view.getBigUint64(0);
+    for (const near of [bits - 1n, bits, bits + 1n]) {
+      view.setBigUint64(0, near);
+      const value = view.getFloat64(0);
+      if (value > 0 && Number.isFinite(value)) lines.push(lineOf(String(value)));
+    }
+  }
+  return lines;
 }
 
 /** The edges, each written by hand: both zeros, the largest and smallest doubles, 2^53 and its neighbours, and the
@@ -91,7 +109,7 @@ const EDGES = [
 
 /** The whole corpus file for the old tuning file's number texts. */
 export function corpusFile(legacyTexts) {
-  const lines = [...legacyTexts.map(lineOf), ...randomDoubles(5000), ...decimals(5000), ...ties(1000), ...EDGES.map(lineOf)];
+  const lines = [...legacyTexts.map(lineOf), ...randomDoubles(5000), ...decimals(5000), ...ties(2000), ...powersOfTwo(), ...EDGES.map(lineOf)];
   return `shamble-content-corpus 1 ${lines.length}\n${lines.join("\n")}\n`;
 }
 

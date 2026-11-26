@@ -1,6 +1,8 @@
 //! The simulation's time unit (ADR 0004 part 4): timers count whole units, of which a tick is a whole number. The
-//! content crate turns a duration written in seconds into units when it reads a file (`content::time`); the two
-//! crates hold the same number, and a test in `devtools` says so until this crate depends on that one.
+//! content crate turns a duration written in seconds into units (`content::time`). The two crates hold the same
+//! number, and `crates/devtools/tests/time_unit.rs` says so, until this crate depends on that one (4b-2, with the
+//! collision library): from then on `UNITS_PER_SECOND` here is `pub use content::time::UNITS_PER_SECOND`, that
+//! test's first check goes, and the constant check below stays.
 
 use crate::TICK_HZ;
 

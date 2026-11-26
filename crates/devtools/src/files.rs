@@ -4,6 +4,7 @@
 //! field and its shared bytes (the word-size vector: the same text on a 32-bit and a 64-bit target). `manifest.txt` lists
 //! every file with its length and SHA-256.
 
+use std::io::Read as _;
 use std::path::Path;
 
 use sim::state_hash::fnv1a_64;
@@ -85,37 +86,51 @@ fn plain(folder: &Path, name: &str) -> Result<(), String> {
 /// The most bytes one read of a committed file takes: far above any file of the folder.
 pub const MAX_READ_BYTES: u64 = 64 * 1024 * 1024;
 
+/// A name that is one file's name and no path.
+fn file_name(name: &str) -> Result<(), String> {
+    if name.is_empty() || name == "." || name == ".." || name.contains(['/', '\\']) {
+        return Err(format!("{name:?} is not a file's name"));
+    }
+    Ok(())
+}
+
 /// A committed file's bytes, read only when the folder and the file are what they are by their own type: a plain
 /// folder and a plain file in it, never a link (Mustafa's LINKS-CHECK (c), 2026-11-26: the tests that read the
-/// recordings refuse anything that is not a plain file, as the folder check does). Every test that reads a recording
-/// reads it through here; `tests/recordings.rs` scans their sources for another way in.
+/// recordings refuse anything that is not a plain file, as the folder check does). The file is opened once, and what
+/// is judged again and read is the opened file itself, at most `MAX_READ_BYTES` of it. The tests that read a
+/// recording, and every reader this change-set added, read through here; `tests/recordings.rs` scans the sources
+/// of the recordings' readers by name, which holds what those files say and not what a new reader elsewhere does.
 ///
 /// # Errors
 /// A name that is a path, a folder or a file that is a link or of another type, a file that is not there or is
 /// larger than a read takes, each by name.
 pub fn read_plain(folder: &Path, name: &str) -> Result<Vec<u8>, String> {
-    if name.is_empty() || name == "." || name == ".." || name.contains(['/', '\\']) {
-        return Err(format!("{name:?} is not a file's name"));
-    }
+    file_name(name)?;
     plain(folder, "")?;
     plain(folder, name)?;
-    let path = folder.join(name);
-    let found = std::fs::symlink_metadata(&path).map_err(|error| format!("{name}: {error}"))?;
-    if found.len() > MAX_READ_BYTES {
+    let said = |error: std::io::Error| format!("{name}: {error}");
+    let file = std::fs::File::open(folder.join(name)).map_err(said)?;
+    if !file.metadata().map_err(said)?.is_file() {
+        return Err(format!("{name:?} is not a plain file"));
+    }
+    let mut bytes = Vec::new();
+    let read = file.take(MAX_READ_BYTES + 1).read_to_end(&mut bytes);
+    read.map_err(said)?;
+    if bytes.len() as u64 > MAX_READ_BYTES {
         return Err(format!(
-            "{name}: {} bytes, more than a read takes",
-            found.len()
+            "{name}: more than the {MAX_READ_BYTES} bytes a read takes"
         ));
     }
-    std::fs::read(&path).map_err(|error| format!("{name}: {error}"))
+    Ok(bytes)
 }
 
 /// Writes one file into `folder`, which must exist, never through a link standing in the folder's or the file's
 /// place.
 ///
 /// # Errors
-/// A path that is a link or no plain file, or a file that could not be written.
+/// A name that is a path, a path that is a link or no plain file, or a file that could not be written.
 pub fn write_plain(folder: &Path, name: &str, bytes: &[u8]) -> Result<(), String> {
+    file_name(name)?;
     plain(folder, "")?;
     plain(folder, name)?;
     std::fs::write(folder.join(name), bytes).map_err(|error| format!("{name}: {error}"))

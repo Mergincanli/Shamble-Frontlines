@@ -23,7 +23,7 @@ use std::panic::catch_unwind;
 use std::time::{Duration, Instant};
 
 use content::{load, load_file};
-use devtools::content_proofs::{STAGES, fuzz_input, fuzz_judge, limit_cases};
+use devtools::content_proofs::{LIMIT_CASES, STAGES, fuzz_input, fuzz_judge, limit_case};
 
 thread_local! {
     /// The bytes this thread holds now, and the most it has held since `peak` last started. A constant start
@@ -43,7 +43,9 @@ fn count(taken: usize, given_back: usize) {
 struct Counting;
 
 // SAFETY: every call is passed to the system allocator unchanged, with the caller's own arguments, so its contract
-// is the system allocator's; the only thing added is a thread-local pair of numbers.
+// is the system allocator's; the only thing added is a thread-local pair of numbers. `count` holds what a global
+// allocator must: it never unwinds (it reads and sets a `Cell` through `try_with` and its sums saturate) and it never
+// allocates (the thread-local is constant-initialised, `Copy`, and has no destructor).
 unsafe impl GlobalAlloc for Counting {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         count(layout.size(), 0);
@@ -98,7 +100,12 @@ const PER_MEBIBYTE: Duration = Duration::from_secs(if cfg!(debug_assertions) { 2
 
 #[test]
 fn at_its_caps_the_loader_holds_memory_in_step_with_the_input_and_answers_in_time() {
-    for (name, case) in limit_cases() {
+    assert!(
+        limit_case(LIMIT_CASES.len()).is_none(),
+        "a case the list does not name"
+    );
+    for (at, name) in LIMIT_CASES.into_iter().enumerate() {
+        let case = limit_case(at).expect("every name of the list has its case");
         let started = Instant::now();
         let (verdict, held) = peak(|| match &case.path {
             Some(path) => load_file(path, &case.bytes).map(drop),
@@ -175,7 +182,10 @@ fn run(inputs: u64) {
         .map(|tally| tally.1)
         .max()
         .unwrap_or_default();
-    println!("seed {seed}, {inputs} inputs; the slowest: input {index}, {bytes} bytes, {took:?}");
+    // By the wall clock with the workers side by side: a reading that names an input to look at, not a measure.
+    println!(
+        "seed {seed}, {inputs} inputs; the slowest by the clock: input {index}, {bytes} bytes, {took:?}"
+    );
     for (stage, (name, share)) in STAGES.iter().zip(SHARES).enumerate() {
         let count: u64 = tallies.iter().map(|tally| tally.0[stage]).sum();
         let had = count * 10_000 / inputs;

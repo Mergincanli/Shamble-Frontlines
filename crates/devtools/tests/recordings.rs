@@ -224,11 +224,14 @@ fn the_committed_recordings_are_read_only_through_the_plain_read() {
     let plain_read = library
         .split_once("pub fn read_plain")
         .and_then(|(_, rest)| rest.split_once("\n}\n"));
-    let opened = plain_read.map(|(body, _)| body.matches(&format!("{read}(")).count());
-    assert_eq!(
-        (library.matches(&format!("{read}(")).count(), opened),
-        (1, Some(1))
+    // One place opens a file, inside `read_plain`; nothing reads a path whole.
+    let (open, whole) = (["File", "::open("].concat(), format!("{read}("));
+    let opened = plain_read.map(|(body, _)| body.matches(&open).count());
+    let counts = (
+        library.matches(&open).count(),
+        library.matches(&whole).count(),
     );
+    assert_eq!((counts, opened), ((1, 0), Some(1)));
     for path in [
         "../../packages/sim-worker/boundary/replay.test.mjs",
         "../../packages/e2e/tests/replay/determinism.spec.ts",

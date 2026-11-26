@@ -11,7 +11,9 @@ pub const ECHO_BYTES: usize = 64;
 pub const MESSAGE_BYTES: usize = 512;
 
 /// A short piece of input, made safe to show: at most [`ECHO_BYTES`] bytes of it; every byte outside the printable
-/// ASCII range, and the backslash, written as `\xNN`; a cut marked with three dots.
+/// ASCII range, the backslash and the quote written as `\xNN` (a sentence puts an echo between quotes, and an echoed
+/// quote would end them early); a cut marked with three dots. An echo is still text to show as text: a page sets it
+/// as text content, never as markup.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Echo(String);
 
@@ -19,7 +21,7 @@ impl Echo {
     pub fn of(input: &[u8]) -> Self {
         let mut text = String::new();
         for &byte in input.iter().take(ECHO_BYTES) {
-            if (0x20..=0x7e).contains(&byte) && byte != b'\\' {
+            if (0x20..=0x7e).contains(&byte) && byte != b'\\' && byte != b'"' {
                 text.push(char::from(byte));
             } else {
                 // Writing to a `String` cannot fail.
@@ -203,8 +205,10 @@ pub enum Kind {
 }
 
 /// A refusal: the file (a bundle's path, when it is known), the place in its text (line and column in bytes, both
-/// from 1; 0 and 0 for the whole document), the field (a path such as `shapes[3].min[0]`; empty when no field is
-/// meant), and the reason.
+/// from 1), the field (a path such as `shapes[3].min[0]`; empty when no field is meant), and the reason. A place of
+/// 0 and 0 is no place: with no field it means the whole document, and with a field it means that field, wherever
+/// it stands (a key that is missing has no place; a map's own rules are held on the document read, and a canonical
+/// file has one key a line, so the field finds it).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Error {
     pub file: Option<String>,
@@ -244,7 +248,8 @@ impl Error {
     }
 
     /// The refusal as one line in a fixed field order, with every number as digits and every double as its 16 hex
-    /// digits: what two targets' verdicts are compared on.
+    /// digits: what two targets' verdicts are compared on. It is for tests and tools: unlike [`Error::message`] it
+    /// is not cut to a length (a field path of 32 keys makes it about 2,000 bytes), so no page shows it.
     pub fn record(&self) -> String {
         let file = self.file.as_deref().unwrap_or("-");
         let path = if self.path.is_empty() {
@@ -359,7 +364,7 @@ impl fmt::Display for Kind {
             }
             Self::TooMany { len, max } => write!(f, "{len} entries, more than the {max} allowed"),
             Self::TooFew { len, min } => write!(f, "{len} entries, fewer than the {min} needed"),
-            Self::BadId { id } => write!(f, "\"{id}\" is not an id (lower-case letters, digits, - and _, 1 to 64)"),
+            Self::BadId { id } => write!(f, "\"{id}\" is not an id (lower-case letters, digits, - and _, 1 to 64; no device name of Windows)"),
             Self::NotOneOf { value, allowed } => write!(f, "\"{value}\" is not one of {allowed}"),
             Self::WrongFormat { found, expected } => write!(f, "the format is \"{found}\", not \"{expected}\""),
             Self::WrongVersion { bits, newest } => write!(f, "version {} is not one this build reads (newest: {newest})", f64::from_bits(*bits)),
@@ -387,6 +392,16 @@ mod tests {
             Echo::of(b"a\x1b[2J\\b\x7f\x80\n").as_str(),
             "a\\x1B[2J\\x5Cb\\x7F\\x80\\x0A"
         );
+        // A quote is escaped too: a message puts an echo between quotes, and the echo cannot close them.
+        assert_eq!(
+            Echo::of(b"a\" is fine, \"b").as_str(),
+            "a\\x22 is fine, \\x22b"
+        );
+        let said = Kind::BadId {
+            id: Echo::of(b"x\" is an id; \""),
+        }
+        .to_string();
+        assert_eq!(said.matches('"').count(), 2, "{said}");
         let long = Echo::of(&[b'k'; 1 << 20]);
         assert_eq!(long.as_str().len(), ECHO_BYTES + 3);
         assert!(long.as_str().ends_with("..."));

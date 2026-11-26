@@ -7,14 +7,21 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import * as dev from "../../../.gate/rules-module/dev/devtools.js";
 import * as release from "../../../.gate/rules-module/release/devtools.js";
+import { readPlainFile } from "./plain-file.ts";
 
-const vector = (name) => readFileSync(new URL(`../../../crates/devtools/vectors/${name}`, import.meta.url), "utf8");
+// The committed vectors, each read only when it is a plain file in a plain folder (plain-file.ts).
+const vectors = new URL("../../../crates/devtools/vectors/", import.meta.url);
+const vector = (name) => new TextDecoder("utf-8", { fatal: true }).decode(readPlainFile(vectors, name));
 const [corpus, trees, verdicts] = ["content-corpus.txt", "content-trees.txt", "content-verdicts.txt"].map(vector);
 // The dev profile is not optimised: its own limit, far above what it took here (the printed lines).
 const LIMIT_MS = 300_000;
 // The module's memory only grows. Its heaviest input is a bundle at the 8 MiB cap, held three times at once (its
 // files as the test makes them, its text, and the tree the loader reads it into): 49 MiB when this was written.
 const MEMORY_CEILING = 64 * 1024 * 1024;
+// What the inputs at the caps may take in WebAssembly, per profile: about twenty times what they took when this was
+// written (218 ms and 3,261 ms; the printed lines), so that a slow machine passes and a loader whose time grows
+// faster than its input does not.
+const LIMITS_MS = { release: 5_000, dev: 60_000 };
 
 describe.each([["release", release], ["dev", dev]])("the content reader's proofs, %s profile", (profile, glue) => {
   const wasm = glue.initSync({ module: readFileSync(new URL(`../../../.gate/rules-module/${profile}/devtools_bg.wasm`, import.meta.url)) });
@@ -42,13 +49,14 @@ describe.each([["release", release], ["dev", dev]])("the content reader's proofs
     const bytes = wasm.memory.buffer.byteLength;
     console.log(`the content limits, ${profile} profile: ${took} ms, the module's memory at ${bytes} bytes`);
     expect(bytes).toBeLessThan(MEMORY_CEILING);
+    expect(took).toBeLessThan(LIMITS_MS[profile]);
   });
 });
 
 test("the number corpus is this engine's own: its JSON.parse gives each line's bits, its JSON.stringify each line's text", () => {
   const view = new DataView(new ArrayBuffer(8));
   const lines = corpus.split("\n").slice(1, -1);
-  expect(lines.length).toBe(13_067);
+  expect(lines.length).toBe(20_360);
   const wrong = lines.filter((line) => {
     const [bits, text, canonical] = line.split(" ");
     view.setFloat64(0, JSON.parse(text));

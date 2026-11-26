@@ -258,6 +258,11 @@ fn escaped(t: &[Token]) -> Vec<bool> {
 
 /// Every breach of the rules in one file's source, each as "file:line: what".
 fn breaches(file: &str, source: &str) -> Vec<String> {
+    breaches_of(file, source, true)
+}
+
+/// The same, with or without the rule on float methods (the simulation's own: part 7's list).
+fn breaches_of(file: &str, source: &str, floats: bool) -> Vec<String> {
     let t = tokens(source);
     let text = |index: Option<usize>| {
         index
@@ -277,7 +282,7 @@ fn breaches(file: &str, source: &str) -> Vec<String> {
         // integer's.
         let called = before == "." && next == "(";
         let on_a_path = before == "::" && !NOT_FLOATS.contains(&before_2);
-        let float_call = STD.contains(&name) && (called || on_a_path);
+        let float_call = floats && STD.contains(&name) && (called || on_a_path);
         if let Some((_, why)) = HELD.iter().find(|(held, _)| float_call && *held == name) {
             found.push(format!(
                 "{file}:{}: `{name}` is on ADR 0004 part 7's list and held back all the same ({why}); write `a * b + c`",
@@ -490,6 +495,165 @@ fn what_the_rules_allow_passes() {
     for source in CONTROLS {
         assert_eq!(
             breaches("control.rs", source),
+            Vec::<String>::new(),
+            "{source}"
+        );
+    }
+}
+
+/// What the content crate may not call outside its tests: it refuses what is wrong and never panics on any input.
+/// Its own lint guard says so (`crates/content/src/lib.rs`), but only clippy holds that guard and the toolchain job
+/// runs no clippy; this scan holds the part of it that text can show in the plain `cargo test`, until a lint step
+/// does (an index out of range and an overflowing sum are not things a scan of text can see).
+const PANICS: [&str; 6] = [
+    "unwrap",
+    "expect",
+    "panic",
+    "unreachable",
+    "todo",
+    "unimplemented",
+];
+
+/// For each token, whether it stands in test-only code: the item that follows `#[cfg(test)]`, to its closing brace,
+/// or to its `;` when it has no body.
+fn in_tests(t: &[Token]) -> Vec<bool> {
+    const MARK: [&str; 7] = ["#", "[", "cfg", "(", "test", ")", "]"];
+    let mut inside = vec![false; t.len()];
+    let mut at = 0;
+    while at < t.len() {
+        let here = t[at..]
+            .iter()
+            .take(MARK.len())
+            .map(|token| token.text.as_str());
+        if here.eq(MARK) {
+            let mut depth = 0_usize;
+            while at < t.len() {
+                inside[at] = true;
+                match t[at].text.as_str() {
+                    "{" => depth += 1,
+                    "}" => depth = depth.saturating_sub(1),
+                    _ => {}
+                }
+                let ends = matches!(t[at].text.as_str(), "}" | ";") && depth == 0;
+                if ends {
+                    break;
+                }
+                at += 1;
+            }
+        }
+        at += 1;
+    }
+    inside
+}
+
+/// The content crate's breaches in one file: the simulation's rules but the float list (the loader's arithmetic on
+/// doubles is judged where it enters the players' file), and a call that can panic outside the tests.
+fn content_breaches(file: &str, source: &str) -> Vec<String> {
+    let t = tokens(source);
+    let tests = in_tests(&t);
+    let mut found = breaches_of(file, source, false);
+    for (i, token) in t.iter().enumerate() {
+        let name = token.text.as_str();
+        let before = i.checked_sub(1).map_or("", |at| t[at].text.as_str());
+        let next = t.get(i + 1).map_or("", |token| token.text.as_str());
+        let method = matches!(name, "unwrap" | "expect") && before == "." && next == "(";
+        let call = method || (PANICS.contains(&name) && next == "!");
+        if call && !tests[i] {
+            found.push(format!(
+                "{file}:{}: `{name}`: the content crate refuses what is wrong and never panics (its lint guard, ADR 0005 CD-2): return the refusal",
+                token.line
+            ));
+        }
+    }
+    found
+}
+
+#[test]
+fn the_content_crate_keeps_its_rules() {
+    let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("../content/src");
+    let mut files = Vec::new();
+    rust_files(&src, &mut files);
+    let name = |file: &PathBuf| {
+        file.strip_prefix(&src)
+            .expect("under src")
+            .display()
+            .to_string()
+    };
+    let names: Vec<String> = files.iter().map(name).collect();
+    // A scan of the wrong folder would find nothing and pass.
+    assert!(
+        ["lib.rs", "json.rs", "bundle.rs", "map.rs"]
+            .iter()
+            .all(|file| names.iter().any(|name| name == file)),
+        "not the content crate's sources: {names:?}"
+    );
+    let read = |file: &PathBuf| fs::read_to_string(file).expect("a readable file");
+    let found: Vec<String> = files
+        .iter()
+        .zip(&names)
+        .flat_map(|(file, name)| content_breaches(name, &read(file)))
+        .collect();
+    assert!(
+        found.is_empty(),
+        "the content crate breaks its rules:\n{}",
+        found.join("\n")
+    );
+    // The guard this scan stands beside is still the crate's first words: no `unsafe`, and the lints that deny a panic.
+    let lib = read(&src.join("lib.rs"));
+    for guard in [
+        "#![forbid(unsafe_code)]",
+        "clippy::unwrap_used",
+        "clippy::expect_used",
+        "clippy::indexing_slicing",
+        "clippy::panic",
+        "clippy::arithmetic_side_effects",
+    ] {
+        assert!(
+            lib.contains(guard),
+            "crates/content/src/lib.rs no longer holds {guard}"
+        );
+    }
+}
+
+#[rustfmt::skip]
+const CONTENT_BITES: [(&str, &str); 9] = [
+    ("fn f(x: Option<u8>) -> u8 { x.unwrap() }", "`unwrap`"),
+    ("fn f(x: Result<u8, u8>) -> u8 { x.expect(\"it is there\") }", "`expect`"),
+    ("fn f() { panic!(\"no\") }", "`panic`"),
+    ("fn f(x: u8) -> u8 { match x { 0 => 1, _ => unreachable!() } }", "`unreachable`"),
+    ("fn f() { todo!() }", "`todo`"),
+    ("fn f() { unimplemented!() }", "`unimplemented`"),
+    ("#[cfg(test)] mod tests { fn g() { let _ = Some(1).unwrap(); } }\nfn f(x: Option<u8>) -> u8 { x.unwrap() }", "2: `unwrap`"),
+    ("fn f() { let _ = std::collections::HashMap::<u8, u8>::new(); }", "`HashMap`"),
+    ("fn f() { let _ = Instant::now(); }", "`Instant`"),
+];
+
+#[rustfmt::skip]
+const CONTENT_CONTROLS: [&str; 6] = [
+    "fn f(x: Option<u8>) -> u8 { x.unwrap_or(0) }",
+    "fn f(x: Result<u8, u8>) -> u8 { x.unwrap_or_default() }",
+    "#[cfg(test)]\nmod tests {\n    #[test]\n    fn g() { let x: Option<u8> = None; assert!(x.is_none()); panic!(\"a test may\"); }\n    fn h(x: Option<u8>) -> u8 { x.expect(\"in a test\") }\n}",
+    "#[cfg(test)]\nuse std::fmt::Debug;\nfn f() {}",
+    "fn f(x: f64) -> f64 { (x * 100.0).round().sqrt().sin() }",
+    "// x.unwrap() and panic!(\"in prose\")\nfn expect(x: u8) -> u8 { x }\nfn f() -> u8 { expect(1) }",
+];
+
+#[test]
+fn each_breach_planted_in_content_code_is_found_once_and_by_name() {
+    for (source, must) in CONTENT_BITES {
+        let found = content_breaches("planted.rs", source);
+        assert!(
+            found.len() == 1 && found[0].contains(must),
+            "{source}\nfound: {found:#?}\nwanted one finding with {must}"
+        );
+    }
+}
+
+#[test]
+fn what_the_content_crates_rules_allow_passes() {
+    for source in CONTENT_CONTROLS {
+        assert_eq!(
+            content_breaches("control.rs", source),
             Vec::<String>::new(),
             "{source}"
         );

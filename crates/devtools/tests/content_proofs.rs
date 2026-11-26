@@ -3,25 +3,32 @@
 //! run in WebAssembly through the test-only module (`packages/sim-worker/boundary/content.test.mjs` under Node,
 //! `packages/e2e/tests/rules/content.spec.ts` in the browsers).
 
+use std::path::{Path, PathBuf};
+
 use devtools::content_proofs::{CLASSES, corpus_check, trees_check, verdicts, verdicts_check};
+use devtools::files::{read_plain, write_plain};
 
 /// The committed verdicts' seed and count per class (the classes that make megabytes run a tenth of it).
 const SEED: u64 = 20_261_126;
 const PER_CLASS: u32 = 500;
 
-fn path_of(name: &str) -> String {
-    format!("{}/vectors/{name}", env!("CARGO_MANIFEST_DIR"))
+fn folder() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("vectors")
 }
 
 fn vector(name: &str) -> String {
-    // Read when the test runs, never built into the program.
-    std::fs::read_to_string(path_of(name)).unwrap_or_else(|error| panic!("{name}: {error}"))
+    // Read when the test runs, never built into the program, and only when it is a plain file in a plain folder.
+    let bytes = read_plain(&folder(), name).unwrap_or_else(|why| panic!("{why}"));
+    String::from_utf8(bytes).unwrap_or_else(|_| panic!("{name} is not text"))
 }
 
 #[test]
 fn the_reader_and_the_writer_agree_with_a_browser_engine_on_every_number_of_the_corpus() {
     let corpus = vector("content-corpus.txt");
-    assert_eq!(corpus.lines().count(), 1 + 2_038 + 10_000 + 1_000 + 29);
+    assert_eq!(
+        corpus.lines().count(),
+        1 + 2_038 + 10_000 + 2_000 + 6_293 + 29
+    );
     assert_eq!(corpus_check(&corpus), "");
     // The corpus starts with the old tuning file's numbers, each as that file writes it.
     let legacy = vector("legacy-numbers.txt");
@@ -64,11 +71,11 @@ fn the_canonical_writer_writes_what_a_browser_engine_writes_for_every_tree_of_th
 
 #[test]
 fn every_class_of_broken_file_gets_the_refusal_its_class_says_and_the_committed_digests() {
-    // SHAMBLE_WRITE_VERDICTS=1 writes the file again (after a change that is meant to change a verdict or a
-    // message); without it the file is only read.
-    if std::env::var_os("SHAMBLE_WRITE_VERDICTS").is_some() {
+    // SHAMBLE_WRITE_VERDICTS=1, and no other value, writes the file again (after a change that is meant to change a
+    // verdict or a message), never through a link in its place; without it the file is only read.
+    if std::env::var("SHAMBLE_WRITE_VERDICTS").as_deref() == Ok("1") {
         let made = verdicts(SEED, PER_CLASS).unwrap_or_else(|why| panic!("{why}"));
-        std::fs::write(path_of("content-verdicts.txt"), made).expect("the verdicts file");
+        write_plain(&folder(), "content-verdicts.txt", made.as_bytes()).expect("the verdicts file");
     }
     let committed = vector("content-verdicts.txt");
     let first = format!("shamble-content-verdicts 1 {SEED} {PER_CLASS}");

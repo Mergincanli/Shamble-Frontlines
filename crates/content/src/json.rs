@@ -71,10 +71,19 @@ pub fn is_key(key: &str) -> bool {
 }
 
 /// Whether `id` is an id's grammar: a lower-case letter or a digit, then those, `-` and `_`, at most
-/// [`MAX_NAME_BYTES`] in all. An id is also a file's name, so it starts with no `-`.
+/// [`MAX_NAME_BYTES`] in all. An id is also a file's name, so it starts with no `-` and is none of the names Windows
+/// keeps for its devices (`con`, `prn`, `aux`, `nul`, `com0` to `com9`, `lpt0` to `lpt9`): no file of such a name can
+/// be made there, whatever its ending.
 pub fn is_id(id: &str) -> bool {
+    let port = |name: &str| {
+        id.strip_prefix(name)
+            .is_some_and(|rest| rest.len() == 1 && rest.as_bytes().iter().all(u8::is_ascii_digit))
+    };
     let mut bytes = id.bytes();
     id.len() <= MAX_NAME_BYTES
+        && !["con", "prn", "aux", "nul"].contains(&id)
+        && !port("com")
+        && !port("lpt")
         && bytes
             .next()
             .is_some_and(|first| first.is_ascii_lowercase() || first.is_ascii_digit())
@@ -363,7 +372,20 @@ impl Parser<'_> {
     /// A string, from its opening quote to its closing one: printable ASCII, and the two escapes `\"` and `\n`.
     fn string(&mut self) -> Result<String, Error> {
         self.bump();
-        let mut text = String::new();
+        // The text's own length, counted before any of it is kept: a string that grows as it is read can hold twice
+        // its size when it ends, and a bundle's files are strings of up to a megabyte.
+        let (mut length, mut escaped) = (0_usize, false);
+        for &byte in self.bytes.get(self.at..).unwrap_or(&[]) {
+            match (escaped, byte) {
+                (false, b'"') => break,
+                (false, b'\\') => escaped = true,
+                _ => {
+                    escaped = false;
+                    length = length.saturating_add(1);
+                }
+            }
+        }
+        let mut text = String::with_capacity(length);
         loop {
             let Some(byte) = self.peek() else {
                 return Err(self.error(Kind::Unterminated));
@@ -666,5 +688,17 @@ mod tests {
             assert!(!is_id(id), "{id}");
         }
         assert!(is_id(&"i".repeat(MAX_NAME_BYTES)) && !is_id(&"i".repeat(MAX_NAME_BYTES + 1)));
+        // An id is a file's name: none of the names Windows keeps for its devices, and every name beside them.
+        for id in [
+            "con", "prn", "aux", "nul", "com0", "com1", "com9", "lpt0", "lpt5", "lpt9",
+        ] {
+            assert!(!is_id(id), "{id}");
+        }
+        for id in [
+            "co", "cons", "con-1", "nul_", "com", "com10", "coma", "lpt", "lpt-1", "lpt00", "1com",
+            "com_1",
+        ] {
+            assert!(is_id(id), "{id}");
+        }
     }
 }

@@ -8,7 +8,7 @@
 //!   verdict it must get, worked out by the generator itself: the reason, the file, the line and column, the field.
 //!   A class's verdicts and messages are folded into one digest and the digests are a committed file, so the native
 //!   and the WebAssembly verdicts are compared record for record;
-//! - the inputs that lean on the caps ([`limit_cases`]) and the bounded fuzz run's inputs and judge
+//! - the inputs that lean on the caps ([`LIMIT_CASES`], [`limit_case`]) and the bounded fuzz run's inputs and judge
 //!   ([`fuzz_input`], [`fuzz_judge`]), which `tests/content_fuzz.rs` runs by the million.
 //!
 //! They live here and not in `content`'s own tests because the WebAssembly side runs the same generator, and
@@ -172,12 +172,12 @@ fn in_range(rng: &mut Rng, range: Range) -> f64 {
 }
 
 /// A piece of input as a refusal shows it, written out again here so that the loader's own echo is held against
-/// something: 64 bytes at most, and everything but printable ASCII, the backslash too, as `\xNN`.
+/// something: 64 bytes at most, and everything but printable ASCII, the backslash and the quote too, as `\xNN`.
 fn echo(bytes: &[u8]) -> String {
     let mut shown = String::new();
     for &byte in bytes.iter().take(64) {
         match byte {
-            b'\\' | 0..=0x1f | 0x7f.. => {
+            b'\\' | b'"' | 0..=0x1f | 0x7f.. => {
                 let _ = write!(shown, "\\x{byte:02X}");
             }
             _ => shown.push(char::from(byte)),
@@ -235,12 +235,21 @@ fn form(canonical: &[u8], text: &[u8]) -> (usize, usize, String) {
     )
 }
 
-/// An id: one to twelve of the characters an id may hold, the first a letter or a digit.
+/// An id: one to twelve of the characters an id may hold, the first a letter or a digit. A draw that lands on a name
+/// Windows keeps for its devices is no id (the committed seed draws `aux` once): it gets one more letter. The rule is
+/// the generator's own here, never the loader's `is_id`, which is what the classes judge.
 fn random_id(rng: &mut Rng) -> String {
     const LETTERS: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789-_";
     let length = 1 + rng.below(12);
     let letter = |at| char::from(LETTERS[rng.below(if at == 0 { 36 } else { 38 })]);
-    (0..length).map(letter).collect()
+    let mut id: String = (0..length).map(letter).collect();
+    let port = id.len() == 4
+        && (id.starts_with("com") || id.starts_with("lpt"))
+        && id.ends_with(|last: char| last.is_ascii_digit());
+    if port || ["con", "prn", "aux", "nul"].contains(&id.as_str()) {
+        id.push('x');
+    }
+    id
 }
 
 /// A file's members, key and value text.
@@ -353,17 +362,15 @@ fn shape_text(shape: &Shape, toward: Option<&str>, kind: &str) -> String {
     let toward = toward.map_or(String::new(), |toward| {
         format!("\"rises_toward\": \"{toward}\", ")
     });
-    let (group, id, max, min) = (&shape.group, &shape.id, list(&shape.max), list(&shape.min));
-    format!(
-        "{{\"group\": \"{group}\", \"id\": \"{id}\", \"max\": {max}, \"min\": {min}, {toward}\"type\": \"{kind}\"}}"
-    )
+    let (id, max, min) = (&shape.id, list(&shape.max), list(&shape.min));
+    format!("{{\"id\": \"{id}\", \"max\": {max}, \"min\": {min}, {toward}\"type\": \"{kind}\"}}")
 }
 
 /// The word of a shape's form, if it is a ramp.
 fn toward_of(shape: &Shape) -> Option<&'static str> {
     match shape.form {
         Form::Box => None,
-        Form::Ramp(toward) => Some(["+x", "-x", "+z", "-z"][toward as usize]),
+        Form::Ramp { rises_toward } => Some(["+x", "-x", "+z", "-z"][rises_toward as usize]),
     }
 }
 
@@ -409,8 +416,8 @@ impl Map {
         let shapes = (0..count(rng, least, MAX_SHAPES)).map(|at| {
             let spans = [0, 1, 2].map(|axis| span(rng, axis));
             let towards = [Toward::PlusX, Toward::MinusX, Toward::PlusZ, Toward::MinusZ];
-            let form = towards.get(rng.below(5)).map_or(Form::Box, |toward| Form::Ramp(*toward));
-            Shape { id: format!("{id}_{at}"), group: id.clone(), min: spans.map(|span| span.0), max: spans.map(|span| span.1), form }
+            let form = towards.get(rng.below(5)).map_or(Form::Box, |toward| Form::Ramp { rises_toward: *toward });
+            Shape { id: format!("{id}_{at}"), min: spans.map(|span| span.0), max: spans.map(|span| span.1), form }
         }).collect();
         let regions = (0..count(rng, least, MAX_REGIONS)).map(|at| {
             let spans = [0, 2].map(|axis| span(rng, axis));
@@ -470,7 +477,8 @@ pub struct Case {
     pub expect: String,
 }
 
-/// The classes, each with the share of the per-class count it runs: the four that make megabytes run a tenth. The
+/// The classes, each with the share of the per-class count it runs: the three heavy ones (one at the cap on values,
+/// two that make megabytes) run a tenth. The
 /// first [`FILE_CLASSES`] make one file, the rest a bundle.
 #[rustfmt::skip]
 pub const CLASSES: [(&str, u32); 37] = [
@@ -796,8 +804,9 @@ fn case(class: &str, rng: &mut Rng) -> Case {
         // The text as the file has it, and the id it is read as (the last holds a line feed, written as its escape).
         "an id that is no id" => {
             let long = (long.as_str(), long.as_str());
-            let ids = [("Abc", "Abc"), ("a b", "a b"), ("a<b", "a<b"), ("-ab", "-ab"), ("", ""), long];
-            let (text, read) = *ids.get(rng.below(7)).unwrap_or(&("a\\nb", "a\nb"));
+            // The last three are names Windows keeps for its devices: no file of such a name can be made there.
+            let ids = [("Abc", "Abc"), ("a b", "a b"), ("a<b", "a<b"), ("-ab", "-ab"), ("", ""), long, ("con", "con"), ("lpt1", "lpt1"), ("com0", "com0")];
+            let (text, read) = *ids.get(rng.below(10)).unwrap_or(&("a\\nb", "a\nb"));
             let kind = format!("BadId {{ id: {} }}", echo(read.as_bytes()));
             refuse(put(id_at, &format!("\"{text}\"")), id_at + 2, 9, "id", kind)
         }
@@ -1098,8 +1107,8 @@ pub fn verdicts(seed: u64, per_class: u32) -> Result<String, String> {
                     case.bytes.len()
                 )
             })?;
-            // The megabyte inputs are spaces: their length says all of them.
-            let small = case.bytes.len() <= 65_536;
+            // An input of a megabyte is spaces, or one megabyte text in a bundle: its length says all of it.
+            let small = case.bytes.len() <= 262_144;
             let bytes = if small { &case.bytes[..] } else { &[][..] };
             let length = (case.bytes.len() as u64).to_le_bytes();
             let parts = [
@@ -1155,9 +1164,20 @@ pub fn verdicts_check(expected: &str) -> String {
     }
 }
 
-/// The inputs that lean on the caps (the node cap, the duplicate-key search at its largest, a bundle of eight files
-/// of a megabyte each), with the verdict each must get: what a counting allocator and a clock are held against.
-pub fn limit_cases() -> Vec<(&'static str, Case)> {
+/// The inputs that lean on the caps, by name: the node cap, the duplicate-key search at its largest, a bundle of
+/// eight files of a megabyte each, a bundle of fifteen texts of just over half a megabyte.
+pub const LIMIT_CASES: [&str; 5] = [
+    "an object of the most keys a document holds",
+    "one key 16,383 times",
+    "an object of 100,000 keys",
+    "a bundle of eight files of a megabyte each",
+    "a bundle of fifteen texts of half a megabyte and a byte",
+];
+
+/// The limit case of that place in [`LIMIT_CASES`], with the verdict it must get: what a counting allocator and a
+/// clock are held against. Each is made when it is asked for, so that no two heavy inputs are held at once: in
+/// WebAssembly the module's memory only grows, and its ceiling is to measure the loader, not this list.
+pub fn limit_case(at: usize) -> Option<Case> {
     let mut rng = Rng::new(0, u64::MAX);
     let files = distinct(&mut rng, 8);
     let path = files[0].path.clone();
@@ -1169,53 +1189,55 @@ pub fn limit_cases() -> Vec<(&'static str, Case)> {
             expect,
         }
     };
-    // The most keys one object has under the node cap, in key order; then the same key every time, where the search
-    // for a key that is there twice has the most to sort; then 100,000 keys, refused at the first value past the cap.
-    let keys: Vec<String> = (0..16_383).map(|at| format!("  \"k{at:05}\": 0")).collect();
     let same = |count: usize| format!("{{{}}}\n", vec!["\"a\": 0"; count].join(", ")).into_bytes();
-    // A megabyte of one string in each file: read, and refused as a key the kind does not have.
-    let heavy = |file: &File| {
-        let mut heavy = file.clone();
-        heavy
-            .members
-            .push(("zz".to_owned(), format!("\"{}\"", "x".repeat(1_000_000))));
-        (file.path.clone(), heavy.text().into_bytes())
-    };
-    let eight: Vec<(String, Vec<u8>)> = files.iter().map(heavy).collect();
-    let unknown = format!(
-        "{path}|{}:3|-|UnknownKey {{ key: Echo(\"zz\") }}",
-        files[0].members.len() + 2
-    );
-    vec![
-        (
-            "an object of the most keys a document holds",
-            refuse(
-                format!("{{\n{}\n}}\n", keys.join(",\n")).into_bytes(),
-                "0:0|-|MissingKey { key: \"format\" }",
-            ),
-        ),
-        (
-            "one key 16,383 times",
-            refuse(same(16_383), "1:10|-|DuplicateKey { key: Echo(\"a\") }"),
-        ),
-        (
-            "an object of 100,000 keys",
-            refuse(same(100_000), "1:131071|a|TooManyNodes { cap: 16384 }"),
-        ),
-        (
-            "a bundle of eight files of a megabyte each",
+    Some(match at {
+        // The most keys one object has under the node cap, in key order.
+        0 => {
+            let keys: Vec<String> = (0..16_383).map(|at| format!("  \"k{at:05}\": 0")).collect();
+            let bytes = format!("{{\n{}\n}}\n", keys.join(",\n")).into_bytes();
+            refuse(bytes, "0:0|-|MissingKey { key: \"format\" }")
+        }
+        // The same key every time, where the search for a key that is there twice has the most to sort.
+        1 => refuse(same(16_383), "1:10|-|DuplicateKey { key: Echo(\"a\") }"),
+        // 100,000 keys, refused at the first value past the cap.
+        2 => refuse(same(100_000), "1:131071|a|TooManyNodes { cap: 16384 }"),
+        // A megabyte of one string in each file: read, and refused as a key the kind does not have.
+        3 => {
+            let heavy = |file: &File| {
+                let mut heavy = file.clone();
+                let text = format!("\"{}\"", "x".repeat(1_000_000));
+                heavy.members.push(("zz".to_owned(), text));
+                (file.path.clone(), heavy.text().into_bytes())
+            };
+            let eight: Vec<(String, Vec<u8>)> = files.iter().map(heavy).collect();
+            let line = files[0].members.len() + 2;
             Case {
                 path: None,
                 bytes: bundle_bytes(&eight),
-                expect: unknown,
-            },
-        ),
-    ]
+                expect: format!("{path}|{line}:3|-|UnknownKey {{ key: Echo(\"zz\") }}"),
+            }
+        }
+        // Fifteen texts of half a megabyte and a byte, all spaces: a string that grew by doubling as it was read
+        // held twice its size here (security-auditor's bundle; every text is kept at its own size since).
+        4 => {
+            let text = |at: usize| (format!("movement/f{at:02}.json"), vec![b' '; 524_289]);
+            let fifteen: Vec<(String, Vec<u8>)> = (0..15).map(text).collect();
+            Case {
+                path: None,
+                bytes: bundle_bytes(&fifteen),
+                expect: "movement/f00.json|1:524290|-|Empty".to_owned(),
+            }
+        }
+        _ => return None,
+    })
 }
 
 /// The limit cases against this build: an empty text when each gets its verdict, or the first that does not.
 pub fn limits_check() -> String {
-    let wrong = limit_cases().into_iter().find_map(|(name, case)| {
+    let wrong = LIMIT_CASES.iter().enumerate().find_map(|(at, name)| {
+        let Some(case) = limit_case(at) else {
+            return Some(format!("{name}: the list names a case that is not made"));
+        };
         let got = judge(&case).0;
         (got != case.expect).then(|| format!("{name}: the loader says {got}, not {}", case.expect))
     });

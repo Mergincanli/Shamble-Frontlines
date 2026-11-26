@@ -46,7 +46,7 @@ fn exact(text: &str, unit: &str) -> Result<(u128, u32), String> {
 fn units_exact(number: u128, places: u32, per_second: u32) -> (u128, bool, u128) {
     let (scaled, scale) = (number * u128::from(per_second), 10_u128.pow(places));
     let units = (scaled + scale / 2) / scale;
-    let off = (units * scale).abs_diff(scaled) * 1_000_000 / scaled.max(1);
+    let off = (units * scale).abs_diff(scaled).saturating_mul(1_000_000) / scaled.max(1);
     (units, scaled.is_multiple_of(scale), off)
 }
 

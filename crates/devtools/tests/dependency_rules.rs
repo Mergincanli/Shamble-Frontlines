@@ -4,6 +4,11 @@
 //! CONTENT-SOURCE (c), 2026-11-26), and the simulation will depend on this crate, so anything `content` depended on
 //! would be in the simulation's tree too. The rule names direct dependencies only, so the manifest's text is the
 //! whole input: no cargo call, and nothing that needs a package to be on disk.
+//!
+//! The rule is stricter than "no normal dependency": no table of any kind but `[package]` and `[lints]`. One change
+//! is known to come: 4b-2's step that writes the content's TypeScript types gives this crate exactly one
+//! dev-dependency, the type writer (its derive must stand beside the types it reads). That change edits this rule in
+//! the same commit, after security-auditor's answer on its exact content.
 
 use std::path::Path;
 
@@ -15,6 +20,9 @@ fn tables_and_package_keys(manifest: &str) -> (Vec<String>, Vec<String>) {
         let line = line.trim();
         if let Some(header) = line.strip_prefix('[') {
             tables.push(header.trim_end_matches(']').trim_matches('[').to_owned());
+        } else if tables.is_empty() && !line.is_empty() && !line.starts_with('#') {
+            // A key before the first table (`dependencies.x = "1"`) is a table in another spelling: named as one.
+            tables.push(format!("a line before the first table: {line}"));
         } else if tables.last().is_some_and(|table| table == "package")
             && !line.is_empty()
             && !line.starts_with('#')
@@ -56,6 +64,12 @@ fn the_content_crate_depends_on_nothing() {
         ],
         "crates/content/Cargo.toml's [package] table has a key this rule does not allow"
     );
+    // Cargo runs a `build.rs` beside the manifest with no key naming it: nothing of that name is there.
+    let script = Path::new(env!("CARGO_MANIFEST_DIR")).join("../content/build.rs");
+    assert!(
+        std::fs::symlink_metadata(&script).is_err(),
+        "crates/content has a build script"
+    );
 }
 
 #[test]
@@ -73,6 +87,9 @@ fn the_rule_reads_what_it_should_refuse() {
         let (tables, _) = tables_and_package_keys(&manifest);
         assert_ne!(tables, ["package", "lints"], "{planted}");
     }
+    // A dependency spelled as a key before any table is seen too.
+    let dotted = "dependencies.protocol = { path = \"../protocol\" }\n[package]\nname = \"content\"\n[lints]\n";
+    assert_eq!(tables_and_package_keys(dotted).0.len(), 3);
     let (_, keys) =
         tables_and_package_keys("[package]\nname = \"content\"\nbuild = \"build.rs\"\n");
     assert_eq!(keys, ["name", "build"]);

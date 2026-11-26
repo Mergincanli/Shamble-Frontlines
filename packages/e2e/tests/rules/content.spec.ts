@@ -7,10 +7,12 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
+import { readPlainFile } from "../../../sim-worker/boundary/plain-file.ts";
 
 const root = fileURLToPath(new URL("../../../..", import.meta.url));
 const ORIGIN = "http://rules.invalid";
 const VECTORS = ["content-corpus.txt", "content-trees.txt", "content-verdicts.txt"];
+const vector = (name: string): string => new TextDecoder("utf-8", { fatal: true }).decode(readPlainFile(path.join(root, "crates/devtools/vectors"), name));
 
 interface Outcome {
   corpus: string;
@@ -33,7 +35,8 @@ test("the content reader's proofs pass in the browser's WebAssembly, and the cor
       const contentType = name.endsWith(".js") ? "text/javascript" : "application/wasm";
       return route.fulfill({ contentType, path: path.join(root, ".gate/rules-module/release", name) });
     }
-    if (VECTORS.includes(name)) return route.fulfill({ contentType: "text/plain", path: path.join(root, "crates/devtools/vectors", name) });
+    // A vector is handed out only when it is a plain file in a plain folder (plain-file.ts), never through a link.
+    if (VECTORS.includes(name)) return route.fulfill({ contentType: "text/plain", body: vector(name) });
     return route.fulfill({ status: 404, body: "" });
   });
   await page.goto(`${ORIGIN}/`);
@@ -71,10 +74,13 @@ test("the content reader's proofs pass in the browser's WebAssembly, and the cor
     };
   });
   console.log(`the content reader's proofs: ${JSON.stringify({ ...outcome, corpusChanged: outcome.corpusChanged.slice(0, 80) })}`);
-  expect(outcome).toMatchObject({ corpus: "", trees: "", verdicts: "", limits: "", numbers: 13_067, notThisEngines: [] });
+  expect(outcome).toMatchObject({ corpus: "", trees: "", verdicts: "", limits: "", numbers: 20_360, notThisEngines: [] });
   // The checks run in the Wasm and can fail: one changed bit of one number, and a verdicts file of another seed.
   expect(outcome.corpusChanged).toContain("the reader gives 402c000000000000");
   expect(outcome.verdictsChanged).toMatch(/^this build gives\n {2}a valid file\|2\|[0-9a-f]{16}\nand the file has\n {2}a valid file\|2\|0{16}$/);
   // The module's memory only grows; its heaviest input is a bundle at the 8 MiB cap, held three times at once.
   expect(outcome.memory).toBeLessThan(64 * 1024 * 1024);
+  // The corpus against this engine, the verdicts and the inputs at the caps, together: about ten times what they
+  // took under Node when this was written (5.6 s), and under this project's own limit for one test.
+  expect(outcome.tookMs).toBeLessThan(60_000);
 });
