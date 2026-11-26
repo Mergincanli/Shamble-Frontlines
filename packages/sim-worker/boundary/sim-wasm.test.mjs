@@ -4,6 +4,7 @@
 // `test` script leaves this folder out and CI runs it after its builds. Plain JavaScript on purpose: they read the
 // Wasm with Node's own module, and Node's types are not a dependency, so a TypeScript file here would never be
 // type-checked.
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { BLOCK_BYTES, BLOCK_LAYOUT, checkLayoutHash, LAYOUT_HASH } from "@shamble/types";
 import { beforeAll, expect, test } from "vitest";
@@ -134,6 +135,21 @@ test("the panic hook's buffer stands from the module's start: no text, and its r
   // The one number the Worker's reader holds a copy of.
   expect(PANIC_TEXT_ROOM).toBe(1016);
   expect(readPanicMessage(wasm.memory, ptr)).toBe("");
+});
+
+test("the players' Wasm is the file the built-file check walked, and it asks the host for the bindings' three calls only", () => {
+  const bytes = readFileSync(new URL("../pkg/sim_wasm_bg.wasm", import.meta.url));
+  // The stamp the build leaves after a clean walk of this file (build-checks.mjs, walkedStamp).
+  const stamp = JSON.parse(readFileSync(new URL("../pkg/built-file-check.json", import.meta.url), "utf8"));
+  expect(stamp.production).toBe(createHash("sha256").update(bytes).digest("hex"));
+  // Node's own reading of the imports, beside the build's reader: an error's text, a throw, the table's set-up. No
+  // clock, no randomness, no maths function of the host.
+  const imports = WebAssembly.Module.imports(new WebAssembly.Module(bytes)).map(({ module, name, kind }) => `${kind} ${module} ${name}`);
+  expect(imports.sort()).toEqual([
+    "function ./sim_wasm_bg.js __wbg_Error_208446807d0d1e30",
+    "function ./sim_wasm_bg.js __wbg___wbindgen_throw_4c88d8bf264fd984",
+    "function ./sim_wasm_bg.js __wbindgen_init_externref_table",
+  ]);
 });
 
 test("the glue exports what the Worker calls and nothing more", () => {

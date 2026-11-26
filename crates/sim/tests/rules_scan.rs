@@ -12,6 +12,11 @@
 //! (`#[path]`, also inside `cfg_attr`; `include!`), which it would not read. A branch on the target itself
 //! (`cfg(target_arch = "..")`) is not this scan's to judge: that is for review and the later lint.
 //!
+//! Since change-set 4b-2 (the collision library's arrival) it also holds: the library's name in one file only,
+//! `collision.rs`, and there neither handed on (`pub use`) nor renamed (`as`); and a fused multiply-add by its other
+//! names (`fma`, `fmaf` and the like), beside `mul_add` above. One `target_feature` is let through: a `#[cfg(..)]`
+//! whose item is `compile_error!`, which can stop a build and can pick no code.
+//!
 //! A scan of text sees no types. So a banned name counts wherever it is called as a method (`.min(`) and after any
 //! path (`f32::min`, `Self::min`, a type alias, a generic, `<f32 as T>::min`), unless that path is an integer type
 //! or one of `Ord`, `PartialOrd`, `Iterator` and `cmp`: integer code writes the path form on its own type
@@ -82,6 +87,27 @@ const ITEMS_NOT: [&str; 4] = ["fn", "unsafe", "async", "extern"];
 /// Part 9's escape as the scan reads it, token by token; `"…"` is a string that is not empty: the written reason.
 #[rustfmt::skip]
 const ESCAPE: [&str; 13] = ["#", "[", "allow", "(", "clippy", "::", "disallowed_types", ",", "reason", "=", "\"…\"", ")", "]"];
+
+/// The collision library's crate, and the one file of `src/` that may name it (ADR 0004 part 10: "parry3d's
+/// queries with our own kinematic movement", and "the surface used is small"; change-set 4's plan keeps that
+/// surface in one module, so that the rest of the simulation holds our own types only). The path is exact: a
+/// `collision.rs` in a folder below is another file.
+const LIBRARY: &str = "parry3d";
+const LIBRARY_FILE: &str = "collision.rs";
+
+/// A fused multiply-add under the names it has outside std's `mul_add` (C's, which the `libm` crate and the
+/// toolchain's own routines share): Mustafa's MUL-ADD (a) again. The built-file check refuses the same names in
+/// what was built (`packages/client/scripts/build-checks.mjs`, `FUSED_STEPS`); this refuses them where they are
+/// written.
+const FUSED: [&str; 7] = [
+    "fma",
+    "fmaf",
+    "fmaf16",
+    "fmaf128",
+    "fmal",
+    "fma_round",
+    "fma_wide_round",
+];
 
 /// The banned methods that part 7 and PM-0004-23 name.
 #[rustfmt::skip]
@@ -259,6 +285,73 @@ fn escaped(t: &[Token]) -> Vec<bool> {
     covered
 }
 
+/// Which tokens stand in a `#[cfg(..)]` whose item is `compile_error!`: a condition that can only stop a build picks
+/// no code, so it may name a target feature (the simulation refuses a native build with `fma` or `avx2` on).
+fn build_guards(t: &[Token]) -> Vec<bool> {
+    let text = |index: usize| t.get(index).map_or("", |token| token.text.as_str());
+    let mut covered = vec![false; t.len()];
+    for start in 0..t.len() {
+        if [
+            text(start),
+            text(start + 1),
+            text(start + 2),
+            text(start + 3),
+        ] != ["#", "[", "cfg", "("]
+        {
+            continue;
+        }
+        // To the bracket that closes the attribute.
+        let (mut end, mut depth) = (start + 1, 0);
+        while end < t.len() {
+            match text(end) {
+                "[" | "(" => depth += 1,
+                "]" | ")" => depth -= 1,
+                _ => {}
+            }
+            if depth == 0 {
+                break;
+            }
+            end += 1;
+        }
+        if end < t.len() && text(end + 1) == "compile_error" && text(end + 2) == "!" {
+            covered[start..=end].fill(true);
+        }
+    }
+    covered
+}
+
+/// What is wrong with one naming of the collision library, if anything: it stands outside the library's one file,
+/// or in a `use` that hands it on (`pub`) or renames it (`as`).
+fn library_breach(file: &str, t: &[Token], at: usize) -> Option<&'static str> {
+    if file != LIBRARY_FILE {
+        return Some(
+            "is named outside `collision.rs`: the rest of the simulation holds our own types only",
+        );
+    }
+    let text = |index: usize| t.get(index).map_or("", |token| token.text.as_str());
+    // The statement this naming stands in: back to what ends the one before it, on to its own `;`.
+    let start = (0..at)
+        .rev()
+        .find(|&index| matches!(text(index), ";" | "}"))
+        .map_or(0, |index| index + 1);
+    let end = (at..t.len())
+        .find(|&index| text(index) == ";")
+        .unwrap_or(t.len());
+    let words: Vec<&str> = (start..end).map(text).collect();
+    let item = words
+        .iter()
+        .position(|word| matches!(*word, "use" | "extern"));
+    match item {
+        Some(item) if words[..item].contains(&"pub") => {
+            Some("is handed on with `pub`: other files would name the library through this one")
+        }
+        Some(_) if words.contains(&"as") => {
+            Some("is renamed with `as`: the library's names stay the ones a search finds")
+        }
+        _ => None,
+    }
+}
+
 /// Every breach of the rules in one file's source, each as "file:line: what".
 fn breaches(file: &str, source: &str) -> Vec<String> {
     breaches_of(file, source, true)
@@ -278,6 +371,7 @@ fn breaches_of(file: &str, source: &str, simulation: bool) -> Vec<String> {
     } else {
         vec![false; t.len()]
     };
+    let guards = build_guards(&t);
     let mut found = Vec::new();
     for (i, token) in t.iter().enumerate() {
         let name = token.text.as_str();
@@ -322,9 +416,24 @@ fn breaches_of(file: &str, source: &str, simulation: bool) -> Vec<String> {
             && (before == "::"
                 || next == "::"
                 || (matches!(before, "{" | ",") && matches!(next, "as" | "," | "}")));
-        if name == "target_feature" || arch || name.contains("_relaxed_") {
+        if (name == "target_feature" && !guards[i]) || arch || name.contains("_relaxed_") {
             found.push(format!(
                 "{file}:{}: `{name}`: no per-target code in the simulation, SIMD least of all (ADR 0004 part 7: one result on every target)",
+                token.line
+            ));
+        }
+        if simulation && FUSED.contains(&name) {
+            found.push(format!(
+                "{file}:{}: `{name}`: a fused multiply-add, whose bits differ between the native build and WebAssembly (MUL-ADD); write `a * b + c`",
+                token.line
+            ));
+        }
+        if let Some(why) = (simulation && name == LIBRARY)
+            .then(|| library_breach(file, &t, i))
+            .flatten()
+        {
+            found.push(format!(
+                "{file}:{}: `{name}`: the collision library {why} (ADR 0004 part 10)",
                 token.line
             ));
         }
@@ -470,6 +579,42 @@ const BITES: [(&str, &str); 43] = [
     ("fn f() -> &'static str { \"a line break \\\n inside a text\" }\nfn g(x: f32) -> f32 { x.ln() }", "3: `ln`"),
 ];
 
+/// The same for the rules of change-set 4b-2: a fused multiply-add by its other names, a target feature outside a
+/// build's own refusal, and the collision library's name by the file it stands in.
+#[rustfmt::skip]
+const LATER_BITES: [(&str, &str, &str); 16] = [
+    ("planted.rs", "fn f(a: f32, b: f32, c: f32) -> f32 { fmaf(a, b, c) }", "`fmaf`: a fused multiply-add"),
+    ("planted.rs", "fn f(a: f64, b: f64, c: f64) -> f64 { libm::fma(a, b, c) }", "`fma`: a fused multiply-add"),
+    ("collision.rs", "use parry3d::simba::scalar::ComplexField;\nfn f(a: f32) -> f32 { ComplexField::fma_round(a) }", "2: `fma_round`"),
+    ("planted.rs", "extern \"C\" { fn fmaf128(a: f32, b: f32, c: f32) -> f32; }", "`fmaf128`"),
+    // A target feature that picks code, on any item but a build's refusal; the attribute's other spellings.
+    ("planted.rs", "#[cfg(target_feature = \"fma\")] fn f() {}", "`target_feature`"),
+    ("planted.rs", "#[cfg(not(target_feature = \"avx2\"))] const WIDE: bool = true; compile_error!(\"x\");", "`target_feature`"),
+    ("planted.rs", "#[cfg_attr(target_feature = \"fma\", inline)] compile_error!(\"x\");", "`target_feature`"),
+    ("planted.rs", "fn f() -> bool { cfg!(target_feature = \"fma\") }", "`target_feature`"),
+    // The library: outside its one file, in a file of the same name one folder down, handed on, renamed.
+    ("world.rs", "use parry3d::query::Ray;", "`parry3d`: the collision library is named outside `collision.rs`"),
+    ("world.rs", "fn f(ray: &parry3d::query::Ray) {}", "`parry3d`: the collision library is named outside `collision.rs`"),
+    ("map/collision.rs", "use parry3d::query::Ray;", "`parry3d`: the collision library is named outside `collision.rs`"),
+    ("lib.rs", "pub use collision::StaticWorld;\nextern crate parry3d;", "2: `parry3d`: the collision library is named outside"),
+    ("collision.rs", "pub use parry3d::query::Ray;", "`parry3d`: the collision library is handed on with `pub`"),
+    ("collision.rs", "fn f() {}\npub(crate) use parry3d::{bounding_volume::Aabb, query::Ray};", "2: `parry3d`: the collision library is handed on with `pub`"),
+    ("collision.rs", "use parry3d as shapes;", "`parry3d`: the collision library is renamed with `as`"),
+    ("collision.rs", "struct S;\nuse parry3d::query::{Ray as Line, RayCast};", "2: `parry3d`: the collision library is renamed with `as`"),
+];
+
+/// And what those rules let through: a build's refusal under a target feature, the library in its own file with
+/// its own names, and words that only look like the banned ones.
+#[rustfmt::skip]
+const LATER_CONTROLS: [(&str, &str); 6] = [
+    ("lib.rs", "#[cfg(any(target_feature = \"fma\", target_feature = \"avx2\"))]\ncompile_error!(\"the simulation is built without them\");"),
+    ("lib.rs", "#[cfg(target_feature = \"fma\")] compile_error!(\"x\"); fn f(fmax: u32, format: u32) -> u32 { fmax + format }"),
+    ("collision.rs", "use parry3d::bounding_volume::Aabb;\nuse parry3d::query::{Ray, RayCast};\nfn f(ray: &Ray, shape: &parry3d::shape::Cuboid) -> f32 { ray.dir.x as f32 }"),
+    ("collision.rs", "pub struct StaticWorld { tree: parry3d::partitioning::Bvh }\npub fn f(n: usize) -> u32 { n as u32 }"),
+    ("world.rs", "// parry3d is named in collision.rs only\nfn f() -> &'static str { \"parry3d and fmaf\" }"),
+    ("world.rs", "use crate::collision::StaticWorld; fn f(world: &StaticWorld, parry: u32) -> u32 { parry }"),
+];
+
 /// What must pass: the allowed methods, the path forms on integers, the escape on an item, and names in prose.
 #[rustfmt::skip]
 const CONTROLS: [&str; 12] = [
@@ -507,6 +652,26 @@ fn what_the_rules_allow_passes() {
             "{source}"
         );
     }
+}
+
+#[test]
+fn the_later_rules_find_each_planted_breach_once_and_pass_what_they_allow() {
+    for (file, source, must) in LATER_BITES {
+        let found = breaches(file, source);
+        assert!(
+            found.len() == 1 && found[0].starts_with(file) && found[0].contains(must),
+            "{file}: {source}\nfound: {found:#?}\nwanted one finding with {must}"
+        );
+    }
+    for (file, source) in LATER_CONTROLS {
+        assert_eq!(
+            breaches(file, source),
+            Vec::<String>::new(),
+            "{file}: {source}"
+        );
+    }
+    // The library's one file is not there yet (the static collision world brings it): the rule holds from now on.
+    assert!(FUSED.iter().all(|name| !STD.contains(name)) && STD.contains(&"mul_add"));
 }
 
 /// What the content crate may not call outside its tests: it refuses what is wrong and never panics on any input.

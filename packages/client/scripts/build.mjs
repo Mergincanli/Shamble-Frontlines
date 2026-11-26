@@ -19,9 +19,15 @@
 // its file must be the one wasm-bindgen-tool.mjs records (a plain file of that size and sha256), and its version
 // must equal the wasm-bindgen library in Cargo.lock (PM-0002-18). The path that was checked is the path that is
 // run: the tool is never looked up by name.
+//
+// The built-file check (build-checks.mjs explains each rule) reads what was built, on every build: cargo's own
+// output with its names, in the release profile and in the dev profile, before the bindings tool runs (no fused
+// multiply-add, no maths routine outside the allow-list, no vector instruction), and then the file players get (the
+// instructions again, its imports, no path of this machine). A clean walk leaves a stamp beside that file, and no
+// page is built from a file the stamp does not name. Nothing skips it.
 
 import { execFileSync } from "node:child_process";
-import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -36,15 +42,21 @@ import {
   lockedWasmBindgenVersion,
   missingOverflowOverrides,
   NATIVE_TESTS,
+  productionProblems,
   refusedBuildSettings,
   registryRemapFlag,
   simFeatureDifferences,
   simFeatureList,
   sizeTable,
+  stampProblems,
   tooLarge,
+  twinProblems,
+  walkedStamp,
+  wasmCodeOpcodes,
   wasmProblems,
   workerEntryChunk,
 } from "./build-checks.mjs";
+import { MATHS_ALLOWED } from "./maths-allowed.mjs";
 import { WASM_BINDGEN_TOOL } from "./wasm-bindgen-tool.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -54,7 +66,12 @@ const pkgDir = path.join(root, "packages/sim-worker/pkg");
 const workerSource = path.join(root, "packages/sim-worker/src/worker.ts");
 const targetDir = path.join(root, "target");
 const wasmFile = path.join(targetDir, "wasm32-unknown-unknown/release/sim_wasm.wasm");
+/** The same crate in the dev profile: built only to be read, where no call is inlined away and every name stands. */
+const devWasmFile = path.join(targetDir, "wasm32-unknown-unknown/debug/sim_wasm.wasm");
 const wasmTarget = "wasm32-unknown-unknown";
+/** The players' WebAssembly as the Worker loads it, and the stamp the built-file check leaves beside it. */
+const playersWasmFile = path.join(pkgDir, "sim_wasm_bg.wasm");
+const stampFile = path.join(pkgDir, "built-file-check.json");
 /**
  * The environment of every cargo call this script makes. Its one addition: the compiler flags, which are the path
  * remap and nothing else (panic locations inside registry crates name one fixed place, not this machine's cargo
@@ -147,14 +164,30 @@ export function buildWasm() {
   // the target's features), and into this repository's own target folder, which is where it is read from below.
   refuseSettings();
   checkCrates();
-  execFileSync(
-    "cargo",
-    ["build", "--locked", "--release", "--target", wasmTarget, "-p", "sim-wasm", "--target-dir", targetDir],
-    { cwd: root, stdio: "inherit", env: cargoEnv() },
-  );
+  // An earlier walk's stamp goes first: until this walk is clean, no page can be built from what pkg/ holds.
+  rmSync(stampFile, { force: true });
+  const refuse = (problems) => {
+    if (problems.length > 0) throw new Error(`the built-file check refuses the players' WebAssembly:\n  ${problems.join("\n  ")}`);
+  };
+  for (const profile of [["--release"], []]) {
+    execFileSync(
+      "cargo",
+      ["build", "--locked", ...profile, "--target", wasmTarget, "-p", "sim-wasm", "--target-dir", targetDir],
+      { cwd: root, stdio: "inherit", env: cargoEnv() },
+    );
+  }
+  // The name rules read the twins before the bindings tool: a file the tool itself would refuse fails here, by its rule.
+  const twin = readFileSync(wasmFile);
+  const devTwin = readFileSync(devWasmFile);
+  refuse([...twinProblems(twin, "the release twin", MATHS_ALLOWED), ...twinProblems(devTwin, "the dev-profile twin", MATHS_ALLOWED)]);
   mkdirSync(pkgDir, { recursive: true });
   // Checked again: the cargo build above ran build scripts as this same user.
   execFileSync(checkedTool(), ["--target", "web", "--out-dir", pkgDir, wasmFile], { cwd: root, stdio: "inherit" });
+  const production = readFileSync(playersWasmFile);
+  const cargoHome = process.env["CARGO_HOME"];
+  refuse(productionProblems(production, [os.homedir(), path.resolve(root, cargoHome === undefined || cargoHome === "" ? path.join(os.homedir(), ".cargo") : cargoHome), root]));
+  writeFileSync(stampFile, walkedStamp({ twin, devTwin, production }));
+  console.log(`the built-file check: ${wasmCodeOpcodes(production).instructions} instructions of the players' WebAssembly walked, and both twins' names read\n`);
   const rows = sizeTable(
     readdirSync(pkgDir)
       .filter((name) => name.endsWith(".wasm") || name.endsWith(".js"))
@@ -180,6 +213,15 @@ function filesOf(folder, prefix = "") {
     .flatMap((entry) =>
       entry.isDirectory() ? filesOf(path.join(folder, entry.name), `${prefix}${entry.name}/`) : [`${prefix}${entry.name}`],
     );
+}
+
+/** The stamp file's text, or nothing when the built-file check left none. */
+function stampText() {
+  try {
+    return readFileSync(stampFile, "utf8");
+  } catch {
+    return undefined;
+  }
 }
 
 /** Builds the page into `outDir` and checks every served file. Returns their size table. */
@@ -213,11 +255,14 @@ export async function buildPage({ production, outDir }) {
     .filter((name) => name !== "serve.mjs")
     .map((name) => ({ name, bytes: readFileSync(path.join(outDir, name)) }));
   const rows = sizeTable(files);
+  const playersWasm = readFileSync(playersWasmFile);
   const problems = [
     ...tooLarge(rows).map((row) => `${row.name}: a served file reaches 25 MiB`),
     ...cspProblems(files),
     ...bundleProblems(files, production, workerEntry),
-    ...wasmProblems(files, readFileSync(path.join(pkgDir, "sim_wasm_bg.wasm"))),
+    // The page's WebAssembly is the Worker's file, and the Worker's file is the one the built-file check walked.
+    ...stampProblems(stampText(), playersWasm),
+    ...wasmProblems(files, playersWasm),
   ];
   if (problems.length > 0) throw new Error(`the built page is refused:\n  ${problems.join("\n  ")}`);
   return rows;
