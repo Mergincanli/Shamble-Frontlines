@@ -1,8 +1,9 @@
 # Plan: main-wall (MAIN-WALL) · risk tier 2 (repository settings) · for the advisor agent, then Mustafa's go
 Base: main 4a62873e. Branch: claude/confident-gates-tbnq38 (stands in for cs/main-wall). No code change: GitHub
 settings by his clicks, a measurement on a throwaway repository, then docs. The gap's detail stays out of this file
-(his 20:35 item 3): the design with its test detail is in `.gate/main-wall/infra-engineer-design.md` (gitignored) and
-the test chat's brief in the session scratchpad (`main-wall-throwaway-brief.md`); neither is pushed.
+(his 20:35 item 3): the design with its test detail, the test chat's brief and his test card are in `.gate/main-wall/`
+(gitignored; copies in the session scratchpad); none is pushed. Sources read: the other lane's notes at 7aadfc17
+(claude/optimistic-albattani-mdoonz; the branch has moved since).
 
 ## 1. Goal (his words, 2026-11-25 20:35, item 2, as recorded in DECISIONS)
 A rule that only his account can update main, measured on a throwaway repository first. Day sessions, the PR Advisor
@@ -50,7 +51,8 @@ A. Throwaway repository:
    download only); in `wall-throwaway` > New ruleset > Import > check it > Create. Undo: delete it there.
 5. Add the wall in `wall-throwaway` (section 2's settings, mode Exempt; if "Exempt" or "Repository admin" is not
    offered: note it and tell the test chat, or stop). Undo: delete it, or Enforcement status Disabled.
-6. His tests T1a, T3, T7, T9 (T6 if he has a second GitHub account): one screenshot each.
+6. His tests from his test card (handed to him in chat with the brief, not pushed: steps, expected result and stop
+   line for T1a in each mode, T3a-c, T6, T7 and T9): one screenshot each.
 7. Only if needed: switch the wall to "For pull requests only"; re-run. Undo: set it back.
 8. Optional T11: a test routine pointed at `wall-throwaway` only. Undo: delete it.
 9. Paste the test chat's report and his screenshots here. Keep `wall-throwaway` until T10 passed, then delete it and
@@ -65,16 +67,30 @@ B. Real repository (only after the measurement passed, the advisor agent reviewe
 
 ## 5. Evidence, reviews, docs, size
 - Evidence: the test chat's report (merge SHAs, run links, the rule record) and his screenshots, read against the
-  expected results; the real repository's screenshots and T10's two merges. This chat cannot read rulesets itself
-  (its GitHub tools have no ruleset reader), so the read-backs are the test chat's and his.
+  expected results; the real repository's screenshots and T10's two merges. This chat does not read rulesets: its
+  `gh` is for search only (the session's rule), so T10's read-back is his screenshot of both rulesets (click 12) and
+  click 4's fallback is his setting the boxes by hand from that screenshot. The design's two read-only `gh api` reads
+  (the repository and ruleset 25069670, by infra-engineer) were a departure from that rule; the report records it.
 - Reviews: the advisor agent on this plan, on the measurement results before click B, and on every pushed head;
-  security-auditor on the design and the results (tier 2); infra-engineer is the designer.
+  security-auditor on the design, the brief and his test card BEFORE anything goes to him, and on the results before
+  click 11, each finding addressed or deferred in writing (tier 2); infra-engineer is the designer.
 - Docs (one small pull request after click 12, which is also T10's day-session merge): STATUS, the archive, ROADMAP,
   and a short "main's wall" note in TECHNICAL (what each ruleset does, the rollback click, what it cannot tell apart);
-  guard-wrappers' six Low follow-ups (F2-F7) ride in it. No code, no workflow on the real repository, zero CI minutes.
-- Change-sets: MAIN-WALL alone. Then, in his order (15:05 item 4): one guard change-set with R4-1's fix and GUARD-KIT
-  (its parts ride there, as his 15:05 order replaced his 13:20 item 3), then the review tracks with SOURCE-GO (a).
-  The review tracks do not slip beyond that order. The other lane's token sitting waits for click 11 and T10.
+  guard-wrappers' follow-ups from the advisor agent's final-head review of #73 ride in it, all docs only: F2 (STATUS
+  and the archive say "no pull request yet"), F3 (the report's base line and one red count), F4 (a count word in
+  DECISIONS), F7 (the report's "never run live" line); F5 (the pull request text's footer) needs no file change; F6 was
+  accepted. No code, no workflow on the real repository, zero CI minutes. STATUS marks T10's PR Advisor half open
+  until its first merge.
+- Change-sets: two, as he asked (20:35): MAIN-WALL alone, and the rule-file plan (the review tracks and who merges,
+  with SOURCE-GO (a)) as its own change-set later; the wall is built first, and the review tracks' merge-on-green rule
+  takes effect only after click 11 and T10 have passed. Between them, in his order (15:05 item 4): one guard
+  change-set with R4-1's fix and GUARD-KIT (its parts ride there, as his 15:05 order replaced his 13:20 item 3). The
+  other lane's token sitting waits for click 11 and T10.
+- R4-1 and this order (his 15:05 item 4): security-auditor was asked on 2026-11-26 and answered that R4-1 can wait
+  behind MAIN-WALL (branch protection, the pull-request review and his go keep it off main); so nothing goes to him
+  before the measurement on that point.
+- The test chat runs without the guard: the throwaway repository has no repository hooks, so its only limits are the
+  brief's words and its binding to one repository.
 
 ## 6. Risks (ranked; full list in the design)
 1. High, stop-gated: a bypass in the wall reaches today's ruleset, so his account and every session could merge

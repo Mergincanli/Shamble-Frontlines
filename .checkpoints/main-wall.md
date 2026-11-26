@@ -8,7 +8,7 @@
 - **Branch:** claude/confident-gates-tbnq38 (stands in for cs/main-wall) · **Base:** main 4a62873e
 - **Sources (read with git show, never checked out):** claude/optimistic-albattani-mdoonz at 7aadfc17,
   .checkpoints/step-2-6-previews/: questions-2026-11-25.md item 6, security-auditor-plan.md, questions-2026-11-26-guard.md,
-  build-notes.md B15/B16
+  build-notes.md B15/B16 (read at 7aadfc17; the branch has moved since)
 - **Last update:** 2026-11-26 afternoon Amsterdam
 
 ## Steps done
@@ -17,8 +17,11 @@
 2. infra-engineer's design (candidate W1, 10+2 tests, 12 clicks) · kept in .gate/main-wall/ (gap detail: not pushed)
 3. Plan written (.checkpoints/main-wall/plan.md, no gap detail); the test chat's brief in the scratchpad (not pushed)
 
+4. The advisor agent: REVISE, text only (C1-C7, brief fixes, THROWAWAY-PUBLIC for him) · notes advisor-plan.md
+5. Plan revised (C1-C7); brief fixed and his test card written (.gate/main-wall/, not pushed)
+
 ## Current step
-The advisor agent reviews the plan (and the brief and design, read locally).
+security-auditor reviews the design, the brief and the card (C6), then the advisor agent on the revision.
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
@@ -34,4 +37,4 @@ The advisor agent reviews the plan (and the brief and design, read locally).
 - Order: MAIN-WALL, guard (R4-1 + GUARD-KIT), review tracks + SOURCE-GO (a) · Mustafa · 2026-11-26 15:05
 
 ## Running work
-- the advisor agent: plan review
+- security-auditor: design, brief and card
