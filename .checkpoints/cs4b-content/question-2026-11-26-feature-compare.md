@@ -68,3 +68,20 @@ step 1, so he can choose the cut instead of meeting it.
   14,300).
 - Recommended: **(b)**: two reviews of about 7,000 lines each find more than one of 14,000, and the first half can
   merge while he plays the sandbox for his Export.
+
+## Added 2026-11-26, after engine-architect's read: SIZE-4B's option (b), drawn better
+engine-architect read the seam and moves one thing: **the collision library goes wholly into the second pull
+request.** Then the first one brings no outside package at all.
+- **4b-1:** the content crate (the reader, its proofs, its fuzz run), the map and movement kinds with the aim-reach
+  rule, the time unit, the two extract scripts, the links check. Its lockfile gains only our own `content` crate, so
+  it needs no answer on outside packages and no exception in the build's check: **it can start as soon as the
+  advisor agent has the revised sheet, without waiting for FEATURE-COMPARE.** Nothing a player sees; no browser
+  check; it does not wait for his Export.
+- **4b-2:** the collision library's manifest batch (security-auditor's dependency check; FEATURE-COMPARE), the
+  built-file check for the fused multiply-add in that same pull request (his MUL-ADD words: "in the same change-set
+  that brings the first outside crate into the simulation"), the Testlines script and his values, content into the
+  simulation, the collision world, the page's scene; his short browser check.
+- By the designs' way of counting each half is about 3,100 to 3,250 lines: planned at 1.8 about 5,600 to 5,850,
+  about 7,500 to 7,800 written at 4a's measured rate. A stop line each of the planned size times 1.25.
+- If he keeps one pull request ((a) or (c)), the order inside it is unchanged and the first edit waits for
+  FEATURE-COMPARE and the dependency check.
