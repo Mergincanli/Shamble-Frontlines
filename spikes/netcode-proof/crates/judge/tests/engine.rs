@@ -5048,3 +5048,255 @@ fn u6j_the_kill_ratios_and_the_egress_ratios_last_gaps() {
         "run f1: R2's formula gives 0 bytes at the run's counts"
     );
 }
+
+// NPT-L2-ONEWAY: on the real network (L2) PM-0001-3's one-way delay checks read against the written bound less half
+// the leg's own base round trip; nothing else moves. Made-up logs: no real L2 probe log exists before R1.
+
+const UP: &str = "probe_up_delay_ns";
+const ONE_WAY_CHECKS: [&str; 6] = [
+    "mean low",
+    "mean high",
+    "end low",
+    "end high",
+    "round trip",
+    "packets",
+];
+
+/// A mark like PM-0001-3 at P1: an L1 and an L2 part share the checks; the one-way mean (25 ms +- 5 %) and lower
+/// end (20 ms +- 0.25 ms), the round trip, and a count over the one-way series.
+fn one_way_mark() -> Value {
+    let rows = [
+        (UP, "mean", ">=", 23_750_000),
+        (UP, "mean", "<=", 26_250_000),
+        (UP, "p001", ">=", 19_750_000),
+        (UP, "p001", "<=", 20_250_000),
+        ("probe_rtt_ns", "mean", "<=", 52_500_000),
+        (UP, "count", "==", 3),
+    ];
+    let check = |(name, (series, stat, op, value)): (&str, (&str, &str, &str, i64))| {
+        let series = format!("second.s.{series}");
+        json!({"name": name, "series": series, "stat": stat, "op": op, "value": value})
+    };
+    let checks: Vec<Value> = ONE_WAY_CHECKS.into_iter().zip(rows).map(check).collect();
+    json!({
+        "id": "PM-0001-3", "title": "the network model", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "L1 P1", "select": {"layer": "L1"}, "min": 1},
+                  {"name": "L2 P1", "select": {"layer": "L2", "process": "probe"}, "min": 1}],
+        "checks": checks,
+        "bites": [{"id": "PM-0001-3/rtt-each-way", "what": "the full round trip each way"}]
+    })
+}
+
+/// One probe log of run `id` on `layer`: three up delays in one measured second, a round trip of 52.4 ms, and the
+/// leg's base round trip in its header (`None`: not written).
+fn probe_log(id: &'static str, layer: &'static str, delays: [i64; 3], base: Option<Value>) -> Log {
+    let mut s = LogSpec::room(id, "set-p", "PM-0001-3");
+    (s.layer, s.process, s.profile) = (layer, "probe", "P1");
+    s.params.extend(base.map(|b| ("base_rtt_ns", b)));
+    let lists = vec![(UP, delays.to_vec()), ("probe_rtt_ns", vec![52_400_000; 3])];
+    s.seconds = vec![(Measured, vec![], lists)];
+    s.build()
+}
+
+/// The first run's checks under `one_way_mark`, in the mark's order: "name: Outcome", `needs`, and the note.
+fn one_way_out(logs: &[Log]) -> (Vec<String>, Vec<String>, Vec<String>) {
+    let v = judge(&marks_file(&[one_way_mark()]), logs).remove(0);
+    let run = v.parts.iter().find_map(|p| p.runs.first()).expect("a run");
+    let lines = run
+        .checks
+        .iter()
+        .map(|c| format!("{}: {:?}", c.name, c.outcome));
+    let needs = run.checks.iter().map(|c| c.needs.clone());
+    let notes = run
+        .checks
+        .iter()
+        .map(|c| c.note.clone().unwrap_or_default());
+    (lines.collect(), needs.collect(), notes.collect())
+}
+
+/// A bound in force as the judge prints it.
+fn net(op: &str, bound: &str, written: i64, base: i64) -> String {
+    format!("{op} {bound} (the profile's {written} less half the base round trip {base})")
+}
+
+const STAMPED: [i64; 3] = [19_700_000, 24_700_000, 29_700_000];
+
+#[test]
+fn oneway_an_l2_run_reads_its_one_way_bounds_net_of_half_its_base() {
+    let all_pass = ONE_WAY_CHECKS.map(|n| format!("{n}: Pass"));
+    // A base round trip of 0.6 ms: the probe stamps each delay 0.3 ms below the profile's. The lower end at 19.7 ms
+    // is below the written 19.75 ms and inside the bound in force, 19.45 ms.
+    let (lines, needs, _) = one_way_out(&[probe_log("p1", "L2", STAMPED, Some(json!(600_000)))]);
+    assert_eq!(lines, all_pass);
+    assert_eq!(needs[0], net(">=", "23450000", 23_750_000, 600_000));
+    assert_eq!(needs[3], net("<=", "19950000", 20_250_000, 600_000));
+    // Nothing else moves: the round trip and the count read as written.
+    assert_eq!(needs[4..], ["<= 52500000", "== 3"]);
+    // The same log on the model (L1) is never net, whatever its header says: its lower end fails the written bound.
+    let (lines, needs, _) = one_way_out(&[probe_log("p1", "L1", STAMPED, Some(json!(600_000)))]);
+    assert_eq!(
+        lines[..3],
+        ["mean low: Pass", "mean high: Pass", "end low: Fail"]
+    );
+    assert_eq!(needs[2], ">= 19750000");
+    // A base of 0 moves nothing, and says so.
+    let (lines, needs, _) = one_way_out(&[probe_log("p1", "L2", STAMPED, Some(json!(0)))]);
+    assert_eq!(lines[2], "end low: Fail");
+    assert_eq!(needs[2], net(">=", "19750000", 19_750_000, 0));
+    // To the nanosecond. The lower end's two bounds, less 300,000: 19,450,000 and 19,950,000.
+    let out = |delays, base: i64| one_way_out(&[probe_log("p1", "L2", delays, Some(json!(base)))]);
+    let ends = |lowest: i64| [lowest, 24_700_000, 49_400_000 - lowest];
+    assert_eq!(out(ends(19_450_000), 600_000).0, all_pass);
+    assert_eq!(out(ends(19_449_999), 600_000).0[2], "end low: Fail");
+    assert_eq!(out(ends(19_950_000), 600_000).0, all_pass);
+    assert_eq!(out(ends(19_950_001), 600_000).0[3], "end high: Fail");
+    // The mean's two bounds, less 300,000: 23,450,000 and 25,950,000 (the lower end kept inside its own).
+    let mean = |m: i64, off: i64| [19_700_000, m, 2 * m - 19_700_000 + off];
+    assert_eq!(out(mean(23_450_000, 0), 600_000).0, all_pass);
+    assert_eq!(out(mean(23_450_000, -1), 600_000).0[0], "mean low: Fail");
+    assert_eq!(out(mean(25_950_000, 0), 600_000).0, all_pass);
+    assert_eq!(out(mean(25_950_000, 1), 600_000).0[1], "mean high: Fail");
+    // An odd base: the half is exact, 300,000.5, so the lower bound in force is 19,449,999.5.
+    let (lines, needs, _) = out(ends(19_450_000), 600_001);
+    assert_eq!(lines, all_pass);
+    assert_eq!(needs[2], net(">=", "19449999.5", 19_750_000, 600_001));
+    assert_eq!(out(ends(19_449_999), 600_001).0[2], "end low: Fail");
+}
+
+#[test]
+fn oneway_a_base_the_judge_cannot_read_is_a_gap() {
+    // The four one-way checks gap alike; the round trip is judged as ever (and the count: two logs hold 6 packets).
+    let gap = |logs: &[Log]| {
+        let (lines, _, notes) = one_way_out(logs);
+        assert!(lines[..4].iter().all(|l| l.ends_with(": Gap")), "{lines:?}");
+        assert!(notes[..4].iter().all(|n| *n == notes[0]), "{notes:?}");
+        let count = if logs.len() == 1 {
+            "packets: Pass"
+        } else {
+            "packets: Fail"
+        };
+        assert_eq!(lines[4..], ["round trip: Pass", count]);
+        notes[0].clone()
+    };
+    let (of, whole) = (
+        "run p1: the probe log on RS1",
+        "not a whole number of ns at 0 or above",
+    );
+    let with = |base: Value| gap(&[probe_log("p1", "L2", STAMPED, Some(base))]);
+    let none = "has no params.base_rtt_ns: on L2 a one-way delay check reads net of half the leg's base round trip";
+    assert_eq!(
+        gap(&[probe_log("p1", "L2", STAMPED, None)]),
+        format!("{of} {none}")
+    );
+    assert_eq!(
+        with(json!("600000")),
+        format!("{of}: params.base_rtt_ns is \"600000\", {whole}")
+    );
+    assert_eq!(
+        with(json!(-2)),
+        format!("{of}: params.base_rtt_ns is -2, {whole}")
+    );
+    assert_eq!(
+        with(json!(600_000.5)),
+        format!("{of}: params.base_rtt_ns is 600000.5, {whole}")
+    );
+    // Two logs of the run that carry the series and name different bases.
+    let other = probe_log("p1", "L2", STAMPED, Some(json!(600_002)));
+    let two = gap(&[probe_log("p1", "L2", STAMPED, Some(json!(600_000))), other]);
+    assert_eq!(
+        two,
+        format!("{of}: the logs a one-way delay check reads disagree on params.base_rtt_ns")
+    );
+    // Half the base above a written bound: the model adds no delay there, so that check has no bound to read.
+    let (lines, needs, notes) =
+        one_way_out(&[probe_log("p1", "L2", STAMPED, Some(json!(40_000_000)))]);
+    let far = "half the base round trip (40000000 ns) is above the written bound 19750000: the model adds no delay \
+               there, so the check has no bound to read";
+    assert_eq!(
+        (lines[2].as_str(), notes[2].as_str()),
+        ("end low: Gap", far)
+    );
+    assert_eq!(needs[0], net(">=", "3750000", 23_750_000, 40_000_000));
+}
+
+#[test]
+fn oneway_a_bite_on_l2_is_still_shown_and_the_loader_refuses_a_pooled_one() {
+    // The measured runs pass; the bite run applies the full round trip each way (about 50 ms, less the same half).
+    let mut bite = probe_log(
+        "b1",
+        "L2",
+        [44_700_000, 49_700_000, 54_700_000],
+        Some(json!(600_000)),
+    );
+    (bite.header.role, bite.header.bite) =
+        ("bite".to_owned(), Some("PM-0001-3/rtt-each-way".to_owned()));
+    bite.header.build.features = vec!["bites".to_owned()];
+    let l1 = probe_log("l1", "L1", [20_000_000, 25_000_000, 30_000_000], None);
+    let logs = [
+        l1,
+        probe_log("p1", "L2", STAMPED, Some(json!(600_000))),
+        bite,
+    ];
+    let v = judge(&marks_file(&[one_way_mark()]), &logs).remove(0);
+    assert_eq!(v.verdict, VerdictKind::Pass, "{:?}", v.why);
+    assert_eq!(v.bites[0].status, BiteStatus::Shown, "{:?}", v.bites[0]);
+    // marks.json may not pool such a check, or compare it with other runs: each run is net of its own base.
+    let against =
+        json!({"value": null, "factor": "1.05", "against": {"roles": ["twin"], "combine": "mean"}});
+    for extra in [json!({"pooled": true}), against] {
+        let mut mark = one_way_mark();
+        for (k, v) in extra.as_object().expect("an object") {
+            mark["checks"][0][k] = v.clone();
+        }
+        let text =
+            json!({"schema": 1, "drafts_commit": "a".repeat(40), "marks": [mark]}).to_string();
+        let refused = parse_marks(&text).expect_err("refused").join("; ");
+        assert!(
+            refused.contains("a one-way delay check is a plain check: no pooled or against"),
+            "{refused}"
+        );
+    }
+}
+
+/// The real marks.json: an L2 P1 probe run's sixteen one-way checks read the bounds in force. Ten delays per
+/// direction, each 0.2 ms below the profile's (a base of 0.4 ms): the lower end at 19.6 ms, the p90 at 28.6 ms and
+/// the upper end at 29.6 ms are all outside the written bounds and inside those in force.
+#[test]
+fn oneway_the_real_marks_one_way_checks_on_l2() {
+    let delays = [196, 243, 243, 243, 243, 243, 243, 244, 286, 296]
+        .map(|d| d * 100_000)
+        .to_vec();
+    // Each one-way check of the run in `part`, as (its name, its outcome, its `needs`).
+    let one_way = |layer: &'static str, part: &str| -> Vec<(String, String, String)> {
+        let mut log = probe_log("p1", layer, STAMPED, Some(json!(400_000)));
+        for name in [UP, "probe_down_delay_ns"] {
+            log.seconds[0].s.insert(name.to_owned(), delays.clone());
+        }
+        let v = npt_judge::judge_only(&real_marks(), &[log], &["PM-0001-3".to_owned()]).remove(0);
+        let part = v.parts.iter().find(|p| p.name == part).expect("the part");
+        let checks = part.runs[0].checks.iter().filter(|c| {
+            c.name.contains(" delay") || c.name.contains("jitter") || c.name.contains("uniform")
+        });
+        checks
+            .map(|c| (c.name.clone(), format!("{:?}", c.outcome), c.needs.clone()))
+            .collect()
+    };
+    let l2 = one_way("L2", "L2 P1");
+    assert_eq!(l2.len(), 16);
+    let net = |(_, outcome, needs): &(String, String, String)| {
+        outcome == "Pass" && needs.ends_with("less half the base round trip 400000)")
+    };
+    assert!(l2.iter().all(net), "{l2:?}");
+    // On the model the same stamps fail the three written lower bounds of each direction.
+    let l1 = one_way("L1", "L1 P1");
+    let failed: Vec<&str> = l1
+        .iter()
+        .filter(|c| c.1 == "Fail")
+        .map(|c| c.0.as_str())
+        .collect();
+    assert_eq!((l1.len(), failed.len()), (16, 6), "{failed:?}");
+    assert!(
+        failed.iter().all(|n| n.ends_with(", low")) && l1.iter().all(|c| !c.2.contains("base")),
+        "{l1:?}"
+    );
+}

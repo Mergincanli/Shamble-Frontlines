@@ -294,6 +294,25 @@ pub enum Measure {
     Figure(String),
 }
 
+/// PM-0001-3's one-way delay series: on the real network (L2) the probe stamps only the delay the model added, half
+/// the path's base round trip below the profile's one-way delay (README §2.3, NPT-L2-ONEWAY).
+pub const ONE_WAY_SERIES: [&str; 2] = ["probe_up_delay_ns", "probe_down_delay_ns"];
+
+impl Measure {
+    /// A statistic of place (mean, min, max or a percentile; never a count, a sum or a share) over one of
+    /// `ONE_WAY_SERIES`: the measures whose bound an L2 run reads net of half its base round trip.
+    pub fn one_way_place(&self) -> Option<&str> {
+        match self {
+            Measure::Series {
+                source: Source::SecondS(name),
+                stat: Stat::Mean | Stat::Min | Stat::Max | Stat::Pct(_),
+                ..
+            } => Some(name.as_str()).filter(|n| ONE_WAY_SERIES.contains(n)),
+            _ => None,
+        }
+    }
+}
+
 /// The comparison a check makes.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Threshold {
@@ -649,6 +668,15 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
     }
     if c.setup && (c.pooled || matches!(threshold, Threshold::Against { .. })) {
         return Err("a setup check reads its own run only: no pooled or against".to_owned());
+    }
+    if measure.one_way_place().is_some()
+        && (c.pooled || matches!(threshold, Threshold::Against { .. }))
+    {
+        return Err(
+            "a one-way delay check is a plain check: no pooled or against (on L2 each run reads net of its own base \
+             round trip)"
+                .to_owned(),
+        );
     }
     let ws_bound = match c.ws_bound.as_deref() {
         None => None,

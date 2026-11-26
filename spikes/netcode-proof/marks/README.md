@@ -183,6 +183,20 @@ A part selects runs and says how many valid runs it needs:
   to the next millisecond (k never moves), and prints the numbers in force with M_p, M_m, s and f beside the check.
   Such a check names its parts, each judged by the `ws-practice` rule (§4); a mark has at most one check per letter,
   and the rule makes a run INVALID unless these checks' numbers are the bound's.
+- **The one-way delay series on the real network** (PM-0001-3; NPT-L2-ONEWAY, Mustafa, 2026-11-25): no field
+  marks it; the judge carries the rule. On L2 the model adds (the profile's round trip − the path's base round trip)
+  ÷ 2 each way, and the probe stamps only that added part, so its one-way delays sit half the base below the
+  profile's. A check with a `value` over `second.s.probe_up_delay_ns` or `second.s.probe_down_delay_ns` whose `stat`
+  is a statistic of place (`mean`, `min`, `max` or a percentile; never `count`, `sum` or `share`) is therefore read,
+  in a log on layer `L2` that carries the series, against its written bound minus half that log's
+  `header.params.base_rtt_ns`, exactly (a half nanosecond when the base is odd; the model itself floors its half to a
+  whole nanosecond, under 1 ns away). Both ends of a tolerance move together, so no tolerance changes. The judge
+  prints the bound in force beside the check: `>= 23550000 (the profile's 23750000 less half the base round trip
+  400000)`. Nothing else moves: not the round-trip checks (`probe_rtt_ns`), not a count over the same series, not a
+  report (it prints the stamped values), and never a log on L1, which is the model itself. Gaps: such a log without
+  `base_rtt_ns`; one that is not a whole number of ns at 0 or above; logs that disagree on it; half a base above the
+  written bound (the model adds no delay there, so the check has no bound to read). Such a check is a plain check:
+  the loader refuses `pooled` and `against` on it (each run reads net of its own base).
 - **`moved`** (optional): the check left this test (2.6) and is skipped wherever checks are chosen. A bite's entry
   may carry `moved` too (§5).
 - **An empty comparison** (the advisor's Q11 ruling, u4-build-plan.md §4.6): a figure that compares pairs
