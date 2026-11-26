@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g`: first at
   e2c0e896 (parts a and b), now at its merged head 591e2cb0ab07 (NPT-L2-ONEWAY).
-- **Last update:** 2026-11-26 about 20:48 UTC, NPT-L2-ONEWAY built (1a637408), the reviewer's read running.
+- **Last update:** 2026-11-26 about 21:25 UTC, NPT-L2-ONEWAY's final code head c56afd07, the last checks running.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -227,13 +227,21 @@
     87 + 26); eleven plants, each failing a test and taken back. From 591e2cb0: 368 added, 6 deleted (my stop: 400).
     NOTE: `moved-table.mjs` rebuilds marks.json from the old base and would drop this line: do not run it again.
 
+33. The one reviewer's read (netcode-architect, `netcode-architect-oneway.md`) on 1a637408 · APPROVE WITH FINDINGS,
+    five Low: the sign and the half are right against the model and the probe's stamps; the round trip rightly
+    stays; the made-up logs look like the probe's; it ran the tests and the plants itself.
+34. The fix pass · c56afd07002f6c13af418c8f016d6087fe806813 (pushed) · Lows 1 to 4 taken (a `min` check and a second
+    L2 log without the series are tested: its two surviving plants fail a test now; one real-marks bound to the
+    letter; "written" for "the profile's"; the gap's reason is "the bound in force would be below 0 ns"). Low 5 is
+    a follow-up (the label of the part "L2 P0 (the real path, recorded)": on P0 the stamps hold only the
+    pass-through socket's own hold time; a marks.json part name, outside this diff). 136 judge tests; thirteen
+    plants each fail a test. From 591e2cb0: 379 added, 6 deleted (my stop: 400).
+
 ## Current step
-**NPT-L2-ONEWAY is built at 1a637408.** Running since about 20:40 UTC: the one reviewer's read (netcode-architect,
-notes `netcode-architect-oneway.md`) and `check.mjs` whole on 1a637408 (output in the session's scratch folder).
-Then: a fix pass if needed, the final checks (judge tests, clippy, fmt, --check-marks, check.mjs whole, GitHub's
-gate, smoke and toolchain on the final SHA), the advisor agent's read of the head, the commit id to Mustafa; the
-netcode chat merges it on his word. Ready before R1's report. Board thread for this piece:
-thr_2e70def4-84c4-45e7-addf-a17221c3deff (state doing).
+**NPT-L2-ONEWAY's final code head is c56afd07.** Running since about 21:25 UTC: `check.mjs` whole on it (output in
+the session's scratch folder) and the advisor agent's read of the head. Then GitHub's gate, smoke and toolchain on
+that SHA, and the commit id with the commands to Mustafa; the netcode chat merges it on his word. Board thread for
+this piece: thr_2e70def4-84c4-45e7-addf-a17221c3deff (state doing).
 **When I wait on him (his rule from 2026-11-25):** the full question as a file in these notes, pushed; the board
 thread set to needs-musti with a due label; the post names the file and the commit.
 **For the report (collected while building):**
