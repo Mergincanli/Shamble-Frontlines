@@ -5,8 +5,8 @@
   **Base:** main c1da1bd merged in at 6a4de15 (MAIN-66, 2026-11-25 19:3x UTC: #66, #68, #69 and #67 in one merge; one
   conflict, docs/STATUS.md: this branch's #40 row in main's table); before it main 28254a7 at 39a0d04 (MAIN-65) and
   main 1ec6f6c at 72b0dc3 (MAIN-64). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-26 17:4x UTC: his 17:35 answers recorded (U8F1-SIZE (a), LT-CLEAN (a), "ready"): Builder 2's
-  merge started (step 1); MAIN-68 rev 2 and u7-merge-plan.md checked at 19:50 (launch-1950-msgs.md).
+- **Last update:** 2026-11-26 17:4x UTC. NB2-MERGE: step 2 begins at H0 (the save carrying this line); if cut, the local
+  merge commit is unpushed: finish steps 3-8 from nb2-merge-plan.md, never reset. 1a-1g done (T 0e621dae, tree b542bcdf).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
