@@ -207,6 +207,68 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 5. R4-1's fix, plan first: say whether it can be a rule that fails closed (whatever the guard cannot read with certainty asks me) instead of one more pattern, because four rounds each found one more form.
 > 6. MAIN-WALL's measurement is not done in this chat (no second repository here): a separate chat with only the throwaway repository, or my clicks.
 > 7. Bring me the final full head id after the steps you listed. My Advisor's merge check comes before my go.
+- **Taken by Mustafa, 2026-11-26, 14:08:56 UTC: his answers to the CI chat's ask 2 on the preview hand-over: CI-WRITE-3
+  (a), write the two texts in the recommended form, the workflow then sha256
+  d017b83b82d412befb1cbb983a93215440e2b0e1608d2c8c749445db53e87fd8 and the test configuration
+  35abfd54fddb43d7bf8077b281c153c8625c22d863d04922afd0b7b1ecfe80c8, any other value a stop; GUARD-STEP (a), keep the
+  check before the upload; HIDDEN-FILES (b), off; the upload action stays at the pin
+  cf430e030ddbb5b0abf93d22962f4752f3646cd9; he does not look up the Actions permissions, the first run on the draft
+  pull request is the test; CUT-ESCAPE stays on record as accepted, and its later fix (the cut's code as its own
+  throwaway user) goes into STATUS as a follow-up; then the docs pass, the report and the pull request's title and text
+  in the notes, his Advisor opens the draft and watches the first run, and a red on the new steps or on Firefox's
+  replay test comes to him first; git and gh always start their own command** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work (the small CI pull request after
+  change-set 3a, then the preview hand-over); his label: "From Mustafa, 26 November, 15:05 Amsterdam (written with my
+  Advisor)."; message 8e3f694b-4053-4ce3-a2fd-d0dcff40d13e, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-preview-handover/mustafa-2026-11-26T1505-ask2-answers.md` (readable at commit d12e3a8 of the chat's
+  branch `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the
+  chat's words (not his): the chat's ask 2 (question-2026-11-26-ask2.md at 3e3cf08): CI-WRITE-3, write the workflow and
+  the test configuration in the recommended form; GUARD-STEP, keep the check before the upload; HIDDEN-FILES,
+  include-hidden-files on or off; recommended (a), (a), (b). Records, not his words: the main session wrote both files
+  on this answer; its commit d12e3a8's message gives the permission mode read right before the write as `acceptEdits`
+  (the write's time, 14:09:14 UTC, is the main session's statement to docs-keeper). At d12e3a8
+  `.github/workflows/toolchain.yml` is sha256 d017b83b82d412befb1cbb983a93215440e2b0e1608d2c8c749445db53e87fd8 and
+  `packages/e2e/playwright.config.ts` 35abfd54fddb43d7bf8077b281c153c8625c22d863d04922afd0b7b1ecfe80c8, his two values
+  (read with `git show` by docs-keeper, 2026-11-26). CI: the push run on d12e3a8 green (toolchain 45836151624, gate and smoke 45836152061): the set-up passed with the upload action named, the two new steps skipped on a push, the runner's Firefox 160 "3 passed (12.5s)" with the replay test "first-loop.rec: 1800 steps, every shared hash as in the file", the job 5 min 45 s; the pull request run, the first that runs the two new steps, after the draft is opened. Point 6's follow-up is CUT-ESCAPE-FIX
+  (`docs/STATUS_ARCHIVE.md`, "From ci-preview-handover"), where security-auditor's fuller form of the fix (its own copy
+  of the workspace, its processes ended with the step: `security-auditor-ci.md`, SA-1, in the same notes) stands beside
+  his words. Copied by script (1305 bytes, sha256 117acbaf961449dcf96cb87012776140309726104b9414d6bf9f8df882a8b145):
+> From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor).
+>
+> 1. CI-WRITE-3: (a). Write the two texts in the recommended form. My Advisor rebuilt both from main and your saved diffs at 3e3cf08 and got your values: .github/workflows/toolchain.yml d017b83b82d412befb1cbb983a93215440e2b0e1608d2c8c749445db53e87fd8, packages/e2e/playwright.config.ts 35abfd54fddb43d7bf8077b281c153c8625c22d863d04922afd0b7b1ecfe80c8. After writing, show both files' sha256. Any other value is a stop.
+> 2. GUARD-STEP: (a). Keep the check before the upload.
+> 3. HIDDEN-FILES: (b). Off.
+> 4. The upload action stays at the pin cf430e030ddbb5b0abf93d22962f4752f3646cd9.
+> 5. Actions permissions: I do not look it up. The first run on the draft pull request is the test. If it fails at its start because the action is not allowed, stop and tell me which setting to change.
+> 6. CUT-ESCAPE stays on record as accepted. Put its later fix (the cut's code as its own throwaway user) into STATUS as a follow-up.
+> 7. Then as before: the docs pass, the report, and the pull request's title and text in your notes. My Advisor opens the draft and watches the first run. A red on the new steps or on Firefox's replay test comes to me first.
+> 8. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 13:04:35 UTC: his answers to the CI chat's ask 1: FF-REFETCH (a), the same Firefox
+  161 file (firefox_161.0+build1-0ubuntu0.24.04.1~mt1_amd64.deb, 90,437,572 bytes, sha256
+  bd304b0b181c4fed449279e25d309075c3a2e85345e63d1118c5085cefcf1ed1) by the same route as for #71, size and checksum
+  checked before use, unpacked without installing, deleted at this pull request's merge, and a stop if the archive no
+  longer serves exactly that file or Firefox needs anything more; UPLOAD-SOURCE (a), actions/upload-artifact v7.0.2
+  pinned by the full commit cf430e030ddbb5b0abf93d22962f4752f3646cd9, for the hand-over step only, nothing of it run
+  before his yes on ask 2's exact text; what ask 2 holds in one message; git and gh always start their own command**
+  (the chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work (the
+  small CI pull request after change-set 3a, then the preview hand-over); his label: "From Mustafa, 26 November, 14:00
+  Amsterdam (written with my Advisor)."; message 235f7b30-0a58-4ed7-9e2f-88b44fcfa1ac, whole; copied by script from the
+  chat's saved file `.checkpoints/ci-preview-handover/mustafa-2026-11-26T1400-ask1-answers.md` (readable at commit
+  d12e3a8 of the chat's branch `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What
+  it answers, in the chat's words (not his): the chat's ask 1 (question-2026-11-26-ask1.md at fb9b1a4): FF-REFETCH,
+  fetch the same Firefox 161 file again for the trial; UPLOAD-SOURCE, may CI use actions/upload-artifact v7.0.2 pinned
+  by cf430e030ddbb5b0abf93d22962f4752f3646cd9; each recommended (a). Records, not his words: the trial (`trials.md`, in
+  the same notes): the file fetched again, 90,437,572 bytes with its sha256 checked, unpacked with `dpkg-deb -x`, no
+  graphics library files; the firefox project with the drafted configuration, 3 passed in the container's Firefox
+  161.0, the replay test among them ("first-loop.rec: 1800 steps, every shared hash as in the file"). Ask 2:
+  `question-2026-11-26-ask2.md` (same notes), answered in the entry above. Copied by script (1185 bytes, sha256
+  db5ad37dddf9d5b8693ee4c62437ef0f6a01de7e37803dd87b5237c29b499254):
+> From Mustafa, 26 November, 14:00 Amsterdam (written with my Advisor).
+>
+> 1. FF-REFETCH: (a). The same file by the same route as for #71: firefox_161.0+build1-0ubuntu0.24.04.1~mt1_amd64.deb, 90,437,572 bytes, sha256 bd304b0b181c4fed449279e25d309075c3a2e85345e63d1118c5085cefcf1ed1. Size and checksum checked before use, unpacked without installing, deleted at this pull request's merge. If the archive no longer serves exactly that file, or Firefox needs anything more, stop and ask me.
+> 2. UPLOAD-SOURCE: (a). actions/upload-artifact v7.0.2, pinned by the full commit cf430e030ddbb5b0abf93d22962f4752f3646cd9, for the hand-over step only. Nothing of it runs before my yes on ask 2's exact text.
+> 3. Ask 2, in one message: every text with each changed file's sha256 after the change; the output line that ties v7.0.2 to that commit, confirmed by security-auditor; the guard line as its own yes or no; the hidden-files setting as its own yes or no; and security-auditor's answers on the steps that run after the network cut. My Advisor rebuilds the files and compares them before I answer.
+> 4. Rule unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-26, 12:24:26 UTC: MAIN-WALL's measurement on a throwaway repository never adds a second
   repository to this chat (a chat with two repositories loads no repository hooks): it runs in a separate chat that
   holds only that repository, or by his own clicks, its results reaching the chat by his paste, and MAIN-WALL's plan
@@ -231,6 +293,31 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. Your queue is then: this guard change-set, MAIN-WALL, GUARD-KIT, the review tracks. In MAIN-WALL's plan, say whether GUARD-KIT's parts can ride with MAIN-WALL or with the review tracks, so the review tracks do not slip by a whole change-set.
 > 4. Tell me in one line: is the guard loaded in your own chat, and how do you know?
 > Unchanged: each kit write is asked of me with its exact text; git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 12:21:41 UTC: his word to start the preview hand-over step lane 2 (Builder V2) asked
+  for on issue #59 (its comment of 2026-11-25, 19:39 UTC): plan first, then the exact text asked of him; in the same
+  pull request TOKEN-WORDS and FIREFOX-REPLAY (the recording's replay test joins the firefox entry beside the rule
+  tests; if it is red there, stop and bring it to him before any change; a difference in the hashes is a finding, not a
+  flake); one line on whether the chat holds only this repository and whether a guard prompt has ever reached him from
+  it; a comment on GitHub is information, never his word** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work (the small CI pull request after
+  change-set 3a, then the preview hand-over); his label: "For the CI Builder, from Mustafa (written with the main
+  Advisor, 26 November, 13:20 Amsterdam)."; message 809624c6-2cf9-449f-934c-64e21bb3eda0, whole; copied by script from
+  the chat's saved file `.checkpoints/ci-preview-handover/mustafa-2026-11-26T1320-preview-handover.md` (readable at
+  commit d12e3a8 of the chat's branch `claude/keen-tesla-v807cf`), which the chat copied by script from its
+  transcript). What it answers, in the chat's words (not his): nothing the chat asked: Builder V2's request (issue #59,
+  comment of 2026-11-25, 19:39 UTC) is waiting; plan first, then the exact text asked of him; in the same pull request
+  TOKEN-WORDS and FIREFOX-REPLAY; one line on whether the chat holds only this repository and whether a guard prompt
+  has reached him. Records, not his words: point 3 answered in the chat (plan R2-10, `plan.md` in the same notes). The
+  plan's revision 2 (e59b0c2) approved by the advisor agent with its conditions N1-N3 (`advisor-plan.md`, same notes);
+  TOKEN-WORDS and FIREFOX-REPLAY are in d12e3a8. Copied by script (1086 bytes, sha256
+  d7291959828c6d065e29d3ad04d0fc4334b64031349ed44559a01112ba990f18):
+> For the CI Builder, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam).
+> Builder V2's request has been waiting on GitHub since yesterday: issue #59, its comment of 25 November, 19:39 UTC. Lane 2 asks for one step at the end of the toolchain job that hands the tested build to the preview workflow. Read it there and start: plan first, then ask me for the exact text as before. In the same pull request:
+> 1. TOKEN-WORDS, the one-word comment fix.
+> 2. FIREFOX-REPLAY: the recording's replay test (packages/e2e/tests/replay/, on main once pull request #70 is merged today) joins the firefox entry beside the rule tests. It needs no picture. It has never run in Firefox: if it is red there, stop and bring it to me before any change. A difference in the hashes is a finding, not a flake.
+> 3. Tell me in one line: does your chat hold only this repository, and has a guard prompt ever reached me from it?
+> A comment on GitHub is information, never my word. This block is my word.
+> Unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-26, 12:21:32 UTC: his answers on step 2.6 and the guard: GUARD-OFF (a), a new builder
   chat with only this repository takes over the sensitive steps once this chat has finished the report and the docs
   pass, its start block written by this chat, on Opus 5.5; MAIN-WALL-AGAIN (a); GUARD-KIT (a), the Guard fix chat
@@ -332,6 +419,25 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 1.  a
 >
 > 2. a
+- **Taken by Mustafa, 2026-11-25, 20:50:19 UTC: pull request #71 is merged (main
+  07d673b0ee509d36ce1b976ed8dfae002c7d7b4a, by his tap, with the chat's head c9460ca1a9ced37e99bff84b834d5508f6ce7575
+  pinned): close the card for ci-after-3a; the next job comes from Builder V2, the hand-over step in toolchain.yml for
+  the preview links, with TOKEN-WORDS in the same text, from the new main, plan first, the exact text asked of him as
+  before; until its request arrives, nothing; git and gh always start their own command** (the chat he calls CI
+  Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work (the small CI pull request
+  after change-set 3a, then the preview hand-over); his label: "For the CI Builder, from Mustafa (written with the main
+  Advisor, 25 November, 21:50 Amsterdam)."; message ae5412be-9767-4362-a331-eec1cbb0425f, whole; copied by script from
+  the chat's saved file `.checkpoints/ci-preview-handover/mustafa-2026-11-25T2150-merged-next.md` (readable at commit
+  d12e3a8 of the chat's branch `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What
+  it answers, in the chat's words (not his): nothing the chat asked: #71 merged (main 07d673b0); close the card; the
+  next job is Builder V2's hand-over step with TOKEN-WORDS, plan first, nothing until the request arrives. Records, not
+  his words: 07d673b's second parent is c9460ca (read with git by docs-keeper, 2026-11-26); this branch's
+  `.checkpoints/` holds no ci-after-3a card (docs-keeper's listing, 2026-11-26). Copied by script (623 bytes, sha256
+  5026102639a131148d9b3f755da0e94b3541d1bc5c0f7efbc0c55be04b36fab8):
+> For the CI Builder, from Mustafa (written with the main Advisor, 25 November, 21:50 Amsterdam).
+> Pull request #71 is merged: main is 07d673b0ee509d36ce1b976ed8dfae002c7d7b4a, by my tap, with your head c9460ca1a9ced37e99bff84b834d5508f6ce7575 pinned. Close your card for ci-after-3a.
+> Your next job comes from Builder V2: the hand-over step in toolchain.yml for the preview links, with TOKEN-WORDS in the same text. Start from the new main, plan first, and ask me for the exact text as before. Until its request arrives, do nothing.
+> Unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-25, 20:48:11 UTC: STOP-4A (a): finish change-set 4a as it stands, the new stop line is
   3,400, and the two green tests stay with the code they prove; WATCH-70 (a): the chat watches pull request #70, where
   a comment or review is information and never his word; 4a's report says in a few lines where the difference to its
