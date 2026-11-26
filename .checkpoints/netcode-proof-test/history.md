@@ -8104,3 +8104,18 @@ From Mustafa, 26 November, 14:00 Amsterdam (written with my Advisor).
   what the folder may hold by a test. U8-F1's builder may start in the 14:50 UTC window. Next: his /compact after this
   record, then his "ready" for Builder 2's merge. The interim rule unchanged.
   Transcript line 103266 (a queue-operation enqueue at 13:04:13.574Z), 1026 characters.
+
+## Mustafa, 2026-11-26 17:35 UTC, in this chat: U8F1-SIZE (a), LT-CLEAN (a), "ready" for Builder 2's merge (word for word)
+```text
+8F1-SIZE before 19:50 UTC if you want its builder to resume in that window;  (a).
+
+LT-CLEAN: (a)
+
+ready
+```
+- **Read as** (the main session's reading, not his words): the first line answers U8F1-SIZE with (a): U8's stop is
+  6,282 lines (was 6,230), U8-F1 is built as drafted with nothing deferred, its builder resumes in the 19:50 window,
+  and a build past 6,282 stops again. LT-CLEAN (a): a main move that merges with no conflict is inside the light
+  take-in, by the recipe's conflict-free path, within his LIGHT-TAKEIN limits. "ready": Builder 2's merge now
+  (nb2-merge-plan.md, NB2-C3 and NB2-PROMPT (a): the command named first, his reply awaited).
+  Transcript line 104783 (a queue-operation enqueue at 17:35:59.551Z), 103 characters.

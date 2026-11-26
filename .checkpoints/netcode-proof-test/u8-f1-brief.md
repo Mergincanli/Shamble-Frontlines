@@ -9,11 +9,12 @@ the push stays summaries. U8's new stop is 6,230 lines." His S14-PUSH answer, wo
 - Base `<base>`: the branch head at launch (U8 merged at 05c63a8: 43 files under spikes/netcode-proof/ops/, 6,189 added
   lines). A new builder in a fresh worktree (isolation: worktree), not U8's builder ac59cce3e5d002441: its worktree
   (03d9ff3) holds those 43 files untracked, so its fast-forward would be refused (ffcheck 12:4x: 44 ADDED present).
-- The stop: 6,230, so U8-F1 adds at most 41 lines, tests included. The 41 are net: for the files U8-F1 touches, the
+- The stop: 6,282 (his U8F1-SIZE (a), history.md:8108-8122, 2026-11-26 17:35 UTC; it was 6,230), so U8-F1 adds at most
+  93 net lines, tests included. The 41 are net: for the files U8-F1 touches, the
   added column less the removed column of `git diff --numstat <base>`, the way U8's 6,189 and the M5 fix's +19 were
-  counted. Item 1e's pin test is part of his S14-PUSH condition and is never carried. Before an item would pass 41,
+  counted. Item 1e's pin test is part of his S14-PUSH condition and is never carried. Before an item would pass 93,
   carry the rest, last first: item 3, then item 2's test 5 assert. Item 2's PROMPT-R1.md line is never carried. If
-  item 1, with the pin test, would pass 41 alone, stop before it does and report what grew, why, and the cheaper
+  item 1, with the pin test, would pass 93 alone, stop before it does and report what grew, why, and the cheaper
   option (his stop). Item 1's other parts are never carried. Say what was carried and why.
 
 ## 1. What is built (in this order; each with its test passing before the next)
@@ -60,14 +61,14 @@ the push stays summaries. U8's new stop is 6,230 lines." His S14-PUSH answer, wo
         keys, and its only addresses (198.51.100.1 and .2). Any other writer, key or address fails it by name, with a
         message that such a change goes to Mustafa first (his S14-PUSH condition). One plant (an added `uname -n`
         line): fails by name; restored by sha256.
-   Item 1's other parts are the Medium and his conditions, and are never carried. If they alone would pass 41, stop
+   Item 1's other parts are the Medium and his conditions, and are never carried. If they alone would pass 93, stop
    before they do and report what grew, why, and the cheaper option (his stop).
 2. **SR-1, with SR-2:** one line in PROMPT-R1.md section 6 step 2, just before the push, in PowerShell:
    `git -C <results> rev-parse --git-path hooks`, `<results>` being the folder the push uses. It must print the clone's
    own hooks folder, the one holding pre-push; anything else: stop and tell him. Not `git config --get core.hooksPath`:
    settings.json:55's deny matches it in PowerShell (advisor-u8-head.md section 3). The four-way proof is a scratch run:
    a throwaway repository under your worktree's .gate/ (never this repository), with each of (i) to (iv) and the
-   printed path recorded in u8-f1-build.md. It is not counted in the 41 and not committed. The committed part is the
+   printed path recorded in u8-f1-build.md. It is not counted in the 93 and not committed. The committed part is the
    PROMPT-R1.md line, plus R1.md's Stop B start-check line extended with: 'and, in PowerShell, `git -C <results>
    rev-parse --git-path hooks` prints the clone's own hooks folder, prompting, not denied' (the laptop's git is not
    this container's). A hooks path set (i) by `git config core.hookspath <x>` in lower case, (ii) with `--worktree`
@@ -98,7 +99,7 @@ background with a long timeout and read its log when told it ended. Notes after 
 .checkpoints/netcode-proof-test/u8-f1-build.md. No commit: the main session takes the snapshot.
 
 ## 4. At the end
-The items, tests, plants, the net lines against 41 (section 0), anything carried, and what is open, in a short summary.
+The items, tests, plants, the net lines against 93 (section 0), anything carried, and what is open, in a short summary.
 
 ## 5. Its round
 security-auditor at xhigh, one short read of the new PROMPT-R1.md and R1.md lines (the pushed set's exposure and
