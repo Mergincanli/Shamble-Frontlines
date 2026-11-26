@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g`: first at
   e2c0e896 (parts a and b), now at its merged head 591e2cb0ab07 (NPT-L2-ONEWAY).
-- **Last update:** 2026-11-26 about 21:00 UTC, NPT-L2-ONEWAY's final code head c56afd07, the last checks running.
+- **Last update:** 2026-11-26 about 21:20 UTC, NPT-L2-ONEWAY done at c56afd07 and reported; waiting on his word.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -237,11 +237,30 @@
     pass-through socket's own hold time; a marks.json part name, outside this diff). 136 judge tests; thirteen
     plants each fail a test. From 591e2cb0: 379 added, 6 deleted (my stop: 400).
 
+35. NPT-L2-ONEWAY's final checks · c56afd07002f6c13af418c8f016d6087fe806813 · the advisor agent: APPROVE for this
+    head (2026-11-26 about 21:15 UTC; its four conditions and the fence held). `check.mjs` whole in this container:
+    11 of 11 (test: 912 and 1009, 0 failed, 0 skipped); the judge's own: 136 tests, clippy and fmt exit 0,
+    --check-marks 81. GitHub on that SHA: gate (gate, smoke) success, run 45895055329; toolchain success, run
+    45895055296. The question file for his word: `netcode-judge/q-oneway-merge.md`.
+
+## NPT-L2-ONEWAY, for whoever merges it (the netcode chat, only on Mustafa's word, after his main Advisor's check)
+- **The commit:** c56afd07002f6c13af418c8f016d6087fe806813 (commits after it touch only `.checkpoints/netcode-judge*`),
+  on the netcode head 591e2cb0: two code commits, 6 files under `crates/judge/` and `marks/`, 379 added, 6 deleted.
+- **To repeat the checks:** as the block above ("Both parts"); the judge's tests are 136 now (19 + 4 + 87 + 26).
+- **marks.json:** sha256 a41ee58398274840c20eac3f09ab144fe8bc84dda5f7c7233fd5fd7589ea24f2 (one field: PM-0001-3's
+  notes). `moved-table.mjs` rebuilds the file from the old base and would drop that line: never run it again.
+- **SERIES.md, for the merge with U6c's rows:** three rows reworded (`second.s.probe_down_delay_ns`,
+  `second.s.probe_up_delay_ns`, `header.params.base_rtt_ns`); none added.
+- **For the probe's writer:** every L2 leg's log that carries a one-way series must carry `base_rtt_ns` in its
+  header params, a whole number of ns at 0 or above (it does today: net/src/l2/socket.rs:338); else the run is INVALID.
+- **A follow-up (Low):** the part name "L2 P0 (the real path, recorded)" misleads (on P0 the stamps hold only the
+  socket's own hold time): for the readings change before R5.
+
 ## Current step
-**NPT-L2-ONEWAY's final code head is c56afd07.** Running since about 20:58 UTC: `check.mjs` whole on it (output in
-the session's scratch folder) and the advisor agent's read of the head. Then GitHub's gate, smoke and toolchain on
-that SHA, and the commit id with the commands to Mustafa; the netcode chat merges it on his word. Board thread for
-this piece: thr_2e70def4-84c4-45e7-addf-a17221c3deff (state doing).
+**NPT-L2-ONEWAY is done and reported: c56afd07.** Waiting on Mustafa (question file
+`.checkpoints/netcode-judge/q-oneway-merge.md`): his main Advisor's check of that commit and his word, in the netcode
+chat, for the merge. Nothing is running but the background saver. Board thread for this piece:
+thr_2e70def4-84c4-45e7-addf-a17221c3deff (needs-musti, due before R1's report).
 **When I wait on him (his rule from 2026-11-25):** the full question as a file in these notes, pushed; the board
 thread set to needs-musti with a due label; the post names the file and the commit.
 **For the report (collected while building):**
@@ -266,7 +285,7 @@ thread set to needs-musti with a due label; the post names the file and the comm
   fix: `session_end` carries a reason, and only a scripted leave gets the tail).
 
 ## Next steps
-1. NPT-L2-ONEWAY as "Current step" says.
+1. Nothing of mine is open. After his word, the netcode chat merges c56afd07.
 
 ## Open findings
 - Follow-ups, Low, none needed before the merge (the advisor agent's read): part a's rust-reviewer L4 and L6 and
