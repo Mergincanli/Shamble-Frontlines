@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 14:42 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 14:52 Amsterdam (from the clock)
 
 ## Sizes (his point 5 of 2026-11-25: which is which)
 - The designs' own count for 4b, bottom-up: 5,410 lines (2,780 code, 2,520 tests, 110 configuration).
@@ -83,19 +83,22 @@
    numbering (the data step).**
 6. The collision library's batch is out of the working tree, saved byte for byte under `.gate/cs4b/batch/`
    (digests `deps-batch.sha256`; a workspace copy for read-only tree commands under `.gate/rr-4b/ws/`).
-7. **Step 1's own batch, path-only, is in the working tree, UNCOMMITTED AND UNBUILT** (his DEP-HOLD):
-   `crates/content/Cargo.toml` (no dependency), `crates/content/src/lib.rs` (the lint guard), `crates/devtools/`
-   `Cargo.toml` (`content` added; `client-endpoint` and `room` removed; `protocol` kept for the aim tie test),
-   `Cargo.lock` (one path crate). Diff `deps-4b1.diff`, digests `deps-4b1.sha256`. The build's own checks on it:
-   no new third-party crate, no missing overflow block, the feature compare without a difference.
-   security-auditor is asked on exactly this content (`security-auditor-deps-4b1.md` when it answers).
+7. **Step 1's own batch, path-only: APPROVED by security-auditor** on its three digests
+   (`security-auditor-deps-4b1.md`; `dependency-check.md` is written and names them). The batch: `crates/content/`
+   (`Cargo.toml` with no dependency; `src/lib.rs` with the lint guard), `crates/devtools/Cargo.toml` (`content`
+   added; `client-endpoint` and `room` removed; `protocol` kept for the aim tie test), `Cargo.lock` (one path
+   crate). **It is NOT in the working tree and not committed:** the advisor agent's A7 lets steps 1 to 5 start only
+   once he has answered SIZE-4B. To put it back: the tracked files from `deps-4b1.diff`, the two new files from
+   `cs4b-content/step1-files/` (their `.txt` copies), then compare with `deps-4b1.sha256`; a copy also lies under
+   `.gate/cs4b/batch-4b1/`. security-auditor's two notes, neither blocking: `protocol` could be a dev-dependency
+   of devtools (narrower; changes the digest, so it would ride with step 6's batch and its own answer); the
+   comment in `content`'s manifest names `tests/dependency_rules.rs`, which arrives with step 1's check.
 
 ## Current step
-**Waiting for two things before the first build:** Mustafa's letter for SIZE-4B (any answer lets steps 1 to 5
-start: the advisor agent's A7) and security-auditor's answer on step 1's batch; then `dependency-check.md`, the
-commit and the push of step 1, and step 2 (the reader and the writer). His FEATURE-COMPARE letter gates step 6
-only. The question file: `cs4b-content/question-2026-11-26-feature-compare.md` (with its two dated additions: the
-better seam, the corrected numbers).
+**Waiting for Mustafa's letter for SIZE-4B** (any answer lets steps 1 to 5 start). Then: step 1's approved batch
+back into the tree (digests checked), committed and pushed with the foundation check's `content` half, and step 2
+(the reader and the writer). His FEATURE-COMPARE letter gates step 6 only. The question file:
+`cs4b-content/question-2026-11-26-feature-compare.md` (with its two dated additions).
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
