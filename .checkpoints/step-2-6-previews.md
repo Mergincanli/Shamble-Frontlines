@@ -203,9 +203,10 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   90c939f, 8441ac0, 5e2760d; the rewind removed that run from the chat's context, not from GitHub or the disk. The
   second run read the first run's tool calls and messages back from the transcript (scratchpad lost-span.txt,
   lost-text.txt) and checked the state: GitHub's branch head 5e2760da, main 4a62873, the worktree clean but for the
-  review's final notes (its verdict, written after the snapshot 5e2760d; the agent's completion notice never reached
-  the second run), the main folder at 4a62873. The second run pushed nothing before this commit and repeated nothing;
-  its one write, a duplicate save script, was deleted uncommitted.
+  review's final notes (its verdict, written after the snapshot 5e2760d), the main folder at 4a62873. The review agent
+  was still running; it finished after cc5307f, added its extra checks (verdict unchanged: APPROVE 90c939f4, toolchain
+  met, L1 open) and handed back its report to the second run. The second run pushed nothing before cc5307f and
+  repeated nothing; its one write, a duplicate save script, was deleted uncommitted.
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 

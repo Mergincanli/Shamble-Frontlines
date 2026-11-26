@@ -28,3 +28,13 @@
 
 ## Verdict
 APPROVE head 90c939f474c8f1202d9c3efbe4dd5cc65e9b5724 (the merge of main 4a62873 and four notes-only commits). Risk tier 2, needs-mustafa, draft unchanged. Conditions: (1) toolchain green on 90c939f4 (both runs) before anything rests on this head; (2) L1 at the next docs head.
+
+## After the advisor-tool check (extra checks)
+- git diff --numstat 4a62873 90c939f4 -- docs/: DECISIONS +150/-0, REPO_MAP +6/-0, report adr0006 +4/-0; STATUS -6 lines, all lane 2's (Next 3: 3 lines, Waiting: 2, risk: 1; 4 of them main's re-wordings, 2 base lines lane 2 rewrote, content kept); ROADMAP -21 = Recent work's Part 15 (moved on 6c812700) and change-set 1 (moved here). Lane 1's own lines untouched.
+- Notes commits read: advisor-head-6c812700.md (the APPROVE and the notes-only rule, as the checkpoint says), questions-2026-11-26-new-chat.md (GUARD-PROMPT, as T5 says), checkpoint diff: no account ID, e-mail, token, guard-bypass spelling or new wall detail.
+- 6c812700's parents dc00c79a + 2483e9a7 (T3 OK). Main folder at 4a62873 (git worktree list; T6's ff OK).
+- wall-test pr-plain (check run 139998383704): 0 steps, no runner, annotation 'Branch "refs/pull/72/merge" is not allowed to deploy to preview due to environment protection rules.': red by design.
+- Full gate locally: 5a smoke FAIL only because Playwright's Chromium is absent here (my own observation); 1-4, 5b-5d PASS. CI smoke green x2 stands: legacy/, tools/, gate.yml equal main.
+- Toolchain on 90c939f4: push and pull_request both completed success. Condition (1) met.
+- The worktree moved to 5e2760d during my review: 8441ac0 and 5e2760d change only .checkpoints/ (git diff --name-only 90c939f4 5e2760d), so every run above holds for 90c939f4's content. They are notes-only [skip ci] heads; no go rests on them.
+- Final verdict unchanged: APPROVE 90c939f4, condition (2) L1 at the next docs head.
