@@ -5,8 +5,8 @@
   **Base:** main c1da1bd merged in at 6a4de15 (MAIN-66, 2026-11-25 19:3x UTC: #66, #68, #69 and #67 in one merge; one
   conflict, docs/STATUS.md: this branch's #40 row in main's table); before it main 28254a7 at 39a0d04 (MAIN-65) and
   main 1ec6f6c at 72b0dc3 (MAIN-64). MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 20:1x UTC. C's verdict names b9aad01 (advisor-main-68b.md: C68B-1 to -6, applied: plan rev 4): MAIN-68's
-  step 1 now. Step 9 APPROVE WITH FINDINGS (advisor-nb2-head.md). Running: U8-F1's round, NB2-C10. Next window 00:50.
+- **Last update:** 20:1x UTC, MAIN-68's no-save window. RESUME LINE (C5 (a), word for word): "MAIN-68 approved (advisor-main-68b.md), running steps 1-7. If `git rev-parse -q --verify MERGE_HEAD` prints b9aad01954be666340a7ec5c6e9fc9353b11abf1, the merge is in progress: no save, no `git merge --abort`, no reset. If `git diff --name-only --diff-filter=U` names docs/STATUS.md or docs/STATUS_ARCHIVE.md, resume at step 3; otherwise resume at step 3's checks before the commit (C2 (b)), then step 4. If HEAD^2 is b9aad01 and HEAD is not on the remote yet, resume at step 5. advisor-main-68b.md and this card may show unstaged: leave them; step 6's card save takes them. U8-F1's builder works in its own worktree: nothing of it shows here. Anything else: the advisor rules."
+  H0 fe08e5f (main-68-plan.md rev 4). Running beside it, read only: U8-F1's security round, NB2-C10's read. Next window 00:50.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
