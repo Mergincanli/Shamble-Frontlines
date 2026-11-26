@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 00:04 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 00:06 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -737,6 +737,20 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     `.gate/cs4b/batch-step9/`; digests `cs4b-content/deps-step9.sha256` (Cargo.lock 56bd2d52...9c47,
     crates/content/Cargo.toml 620a400b...8b9c); diff `deps-step9.diff`; brief `deps-step9-brief.md`. Resolved
     only (`cargo tree` in a scratch copy): the feature lists stay 71, 71 and 76 with no difference.
+  - **security-auditor's answer on step 9's batch: APPROVE** (2026-11-27, 00:06) on the two digests,
+    Cargo.lock 56bd2d52483a46eb0843b465e21a8d3492e3df1b9263b46bf9c7cdb61f3b9c47 and crates/content/Cargo.toml
+    620a400b14da6030dce2fda1f336358f3edc13cc0d92f802bdfd260416738b9c
+    (`security-auditor-deps-step9.md`). No Critical, High or Medium. It found: the lockfile's change is the one
+    entry and is needed (`--locked` refuses the head's lockfile with the new manifest); no build players get
+    holds the type writer (five builds' feature trees identical, head against batch; the lists stay 71, 71 and
+    76); the second exception's basis is unchanged; the derive puts no code into a non-test build; no second
+    batch is foreseen. **Its conditions for the commit:** the two files go in only together with the dependency
+    rule's edit, then the committed files are checked against both digests. Two Lows for that commit:
+    SA-STEP9-1 (the rule's refusal test still compares with `["package", "lints"]` and one of its plants is the
+    line that becomes allowed: compare with the new list, plant a second dev-dependency and a ts-rs line with a
+    feature); SA-STEP9-2 (the comment at `build-checks.mjs:285-288` about "the step that first nests generated
+    types": say that step 9 settles it with `cfg(test)` and no feature). Not checked by it: nothing compiled;
+    the advisories (asked of it next, as a question of its own).
   - **Step 10's design read is with rust-reviewer** (`rust-reviewer-step10-brief.md`), before any of it is
     built. What I read in parry3d 0.31.1: `Bvh::cast_ray` keeps the first-visited leaf of two at the same
     distance (`find_best`, `primitive_score < best_cost`), so the visiting order would decide a tie where the
@@ -779,6 +793,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   test run). All reads. Since then every git command stands alone in its call.
 - One more, at step 7 (2026-11-26, about 22:40 Amsterdam): a `git status --short | head` stood after a `grep` in
   one call. A read. Told to him in the step's update.
+- The chat's update of 2026-11-27 was headed "00:06 Amsterdam" and was written before 00:05:10 by the machine's
+  clock (the next event's own time stamp): a minute or two ahead of the clock. Told to him.
 - Commit 2f058b2's message gives the written lines as 2,626; the count, taken after the commit instead of
   before it, is 2,627. The message stays as it is (no history is rewritten); the card and the chat have 2,627.
 - The chat told him "Your second 'a' (23:00 Amsterdam)" as if he had sent a second message. He had not: it was

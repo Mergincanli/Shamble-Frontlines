@@ -132,3 +132,8 @@ content's real types untried); `--target all` (offline: serde's archive not cach
 DONE
 - Correction: step 1's short form "620a400b...9b8c" is a typo; the digest ends ...738b9c (full text in the Verdict).
 - Progress: all seven plan steps are done (the [x] lines above supersede the unticked Progress list).
+- HEAD moved while I worked: 2357d3b (2f058b2 + two notes commits). `git diff --stat 54e89d2 HEAD` over Cargo.lock,
+  Cargo.toml, crates/, rust-toolchain.toml, package*.json, packages/: only build-checks.mjs (+21, UNLINKED_CRATES at
+  :688+, wired into twinProblems) and its test (+14). simFeatureList / simFeatureDifferences / TEST_ONLY_FEATURES and
+  the lines cited (285-288, 321-327) are unchanged, so the list results and the verdict stand. The heapless rule is
+  not judged here.
