@@ -1,4 +1,6 @@
-# Advisor report: guard-wrappers (2026-11-26, branch claude/confident-gates-tbnq38 for cs/guard-wrappers, base main c1da1bd)
+# Advisor report: guard-wrappers (2026-11-26, branch claude/confident-gates-tbnq38 for cs/guard-wrappers, base main 2483e9a7)
+
+_Corrected 2026-11-26 (MAIN-WALL's docs pass, F2-F7 of the advisor agent's final-head review of #73): this line named base main c1da1bd; the merge base of #73 was 2483e9a7 (`git merge-base` of the merge commit 4a62873e's two parents). The red count "18" below and the "function calls only" line are corrected in place [assumed: the caller's brief of the review's F3 and F7; the review is not in the pushed notes]._
 
 ## Goal
 Mustafa's SAME-GAP (a), his words: "nothing in front of git or gh gets through unread." The day guard is the seatbelt
@@ -29,12 +31,12 @@ exact text, sha256 or cmp equal to the copy, one commit for guard and tests.
 - Code commits: 5df545c7 (the rule), 52e3c7ef (round 1's fixes, SA-D-DIRECT), 9ad6bc97 (round 3), 83bc2417 (round 4);
   main merged at 7be0a933 in a separate worktree (the main folder did not move: the advisor agent's ruling).
 - Kit suites: routine-guard 1247 on main → 1437 → 1490 → 1499 → 1551/1551; settings 127/127; checkpoint 33/33.
-- Red first: the new rows failed on the guard before each step (92 on main's; 18; 10; 45 on 9ad6bc9's).
+- Red first: the new rows failed on the guard before each step (92 on main's; 18, round 1's count on an intermediate copy of the guard, not on a commit; 10; 45 on 9ad6bc9's).
 - Gate PASS on 83bc2417 and on the merged head, checks 1-4 and 5b-5d; 5a smoke skipped here (Playwright cannot start
   the container's Chromium), so CI's smoke is the evidence. Verifier: PASS with notes, 7 of 7 (diff scope; suites and
   gate; red 45 on 9ad6bc9's guard and 195 on main's; size; every new mutant anchor once; SA-R2-2 on the hooks page;
   a sweep rerun, 0 looser, 0 throws). Not verified: smoke here; Claude Code's version outside this container.
-- Sweeps, function calls only (no form was ever run live): round 4, 860,160 lines, 9ad6bc9 → head: 0 throws, 0 looser,
+- Sweeps, function calls only (no form was run live, except one harmless live check of the timeout wrapper with `true`): round 4, 860,160 lines, 9ad6bc9 → head: 0 throws, 0 looser,
   147,077 stricter; hooks-r4b → head (253,080 lines): only stricter.
 - Against main, looser in 91 lines (ADV-R4-2), all present since round 1, by kind: 6 now pass, where the timeout
   wrapper gets a lone dash in its duration's place before a read-only program, git or gh (timeout refuses that dash

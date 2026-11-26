@@ -251,17 +251,6 @@ check in Brave and Firefox: errors 0, WebGPU started in both (`docs/reports/2026
 PR #61, f5030a3, 2026-11-19 15:10:54 UTC, by merge commit, on his go of 14:28:25 UTC for head 4cf30ce; CI green on
 main (gate run 934 with smoke, toolchain run 232).
 
-**CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-24, MERGED]** — ci-wasm
-(risk tier 2; planned by the first builder chat, carried by a thread of his project, built by the chat he calls
-Builder V3): before the network cut the `toolchain` job fetches the wasm-bindgen tool's archive by his TOOL-SOURCE
-values, runs GitHub's own check on it and installs its one program root-owned; inside the cut it builds the page
-twice, then runs the boundary tests, five type checks and the 12 browser tests in the runner image's Chrome (CI does
-not pin the test counts). Two CI writes on his yes (the first stopped at its install check on `/opt`), three planted
-faults each red at its own step; with it his browser check of #61 and his words of 2026-11-19 and 2026-11-23. Two
-review rounds, no Critical or High; report `docs/reports/2026-11-19-ci-wasm.md`. Merged: PR #64, 1ec6f6c, 2026-11-24
-10:15:31 UTC, by merge commit, by his main Advisor on his tap after his go for head 8aadfb0; CI green on main (gate
-run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with it.
-
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -326,6 +315,14 @@ natively, under Node and in the browsers; the source scan reads the content crat
 (c)). 7,164 written lines against the stop line 7,450; no browser check. Two review rounds, no Critical or High; the
 planted defects 35 of 35 caught. Report `docs/reports/2026-11-26-cs4b1-content.md`. Next: 4b-2.
 
+**Main's wall [2026-11-26, the wall on; docs in flight]** — main-wall (MAIN-WALL, risk tier 2: repository settings by his
+clicks, no code; the Guard fix chat): a second ruleset on main, "main-wall (only the owner updates main)", lets only his
+account update main; "Shamble Ruleset 1" is unchanged, so a pull request with gate and smoke green stays required for
+every merge, his included. Measured first on a public throwaway repository (deleted by his click after 17:27 UTC [assumed: his "done" of 17:31:41 UTC]); the advisor agent approved
+the plan (security-auditor: REVISE, text only, all applied) and both approved the results; rollback is one settings switch. Open: T10 (a day-session and a PR
+Advisor merge under the wall). Then, by his SPEED-ORDER (b), the review tracks, then the guard change-set. Report
+`docs/reports/2026-11-26-main-wall.md`; TECHNICAL §8c.
+
 **The preview hand-over step [2026-11-26, in flight]** — ci-preview-handover, by the chat he calls CI Builder, on his
 block of 2026-11-26 (risk tier 2; CI and the test configuration only): at the end of the `toolchain` job, on pull
 requests from this repository only, a check that the tested player build holds only plain files and folders with no
@@ -336,15 +333,15 @@ accepted, its fix a follow-up (his words). Written at d12e3a8 on his CI-WRITE-3 
 `docs/reports/2026-11-26-ci-preview-handover.md`; waits for the advisor agent's review of the final head and his go.
 _Pointer (2026-11-26, 4b-1's docs pass): merged as PR #74, merge commit 3b949c1 (its own time 15:24:22 UTC, read with `git log`)._
 
-**The second guard fix: nothing in front of git or gh unread [2026-11-25 to 11-26, waiting for his go]** —
+**The second guard fix: nothing in front of git or gh unread [2026-11-25 to 11-26, MERGED (#73, 4a62873e)]** —
 guard-wrappers (risk tier 2; his SAME-GAP (a); the chat he calls the Guard fix chat): the day guard reads the options of
 every wrapper and keyword it strips from one table; an unknown form, or a line at the turn limit, asks in a session and
 refuses a subagent; git or gh behind a program it does not strip asks; xargs asks unless a read-only program follows;
 the direct git helper check. Guard tests 1551/1551; 166 added lines of code and tests (stop line 200). Four
 security-auditor rounds, the fourth by his leave; it left R4-1 open (Critical, one more spelling, recorded by class
 only), and by his R4-END (1) what is approved merges. Next, in his order: MAIN-WALL, then R4-1's fix with GUARD-KIT,
-then the review tracks. Report `docs/reports/2026-11-26-guard-wrappers.md`.
-_Pointer (2026-11-26, 4b-1's docs pass): merged as PR #73, merge commit 4a62873 (its own time 14:56:33 UTC, read with `git log`)._
+then the review tracks. Report `docs/reports/2026-11-26-guard-wrappers.md`. _Corrected 2026-11-26 (MAIN-WALL's docs
+pass): merged as PR #73, 4a62873e; his SPEED-ORDER (b) has since put the review tracks before R4-1's fix._
 
 **Change-set 4a of the build plan, The recording [2026-11-25 to 11-26, MERGED]** — cs4a-recording (the first of change-set 4's four
 parts, his WALK-CUT (a); the recording came here from the old change-set 3c by his ORDER-3C (c)), by lane 1, built by
@@ -436,3 +433,14 @@ browser check: errors 0 in Brave and Firefox (`docs/reports/2026-11-24-cs3a-brow
 commit, by his main Advisor on his tap of 22:40:00 UTC (his go: `docs/DECISIONS.md`, 22:44:50 UTC), with the expected
 head 1624f084 (the last commit, after the advisor agent's read); gate, smoke and toolchain green on main (read 22:45
 UTC).
+
+**CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-24, MERGED]** — ci-wasm
+(risk tier 2; planned by the first builder chat, carried by a thread of his project, built by the chat he calls
+Builder V3): before the network cut the `toolchain` job fetches the wasm-bindgen tool's archive by his TOOL-SOURCE
+values, runs GitHub's own check on it and installs its one program root-owned; inside the cut it builds the page
+twice, then runs the boundary tests, five type checks and the 12 browser tests in the runner image's Chrome (CI does
+not pin the test counts). Two CI writes on his yes (the first stopped at its install check on `/opt`), three planted
+faults each red at its own step; with it his browser check of #61 and his words of 2026-11-19 and 2026-11-23. Two
+review rounds, no Critical or High; report `docs/reports/2026-11-19-ci-wasm.md`. Merged: PR #64, 1ec6f6c, 2026-11-24
+10:15:31 UTC, by merge commit, by his main Advisor on his tap after his go for head 8aadfb0; CI green on main (gate
+run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with it.
