@@ -28,14 +28,17 @@ repository in this chat (his 13:20 item 1, 15:05 item 6).
 - What it cannot tell apart, said plainly: every Claude session acts as his account (through the Claude app), and so
   does anything else he authorises as himself. The wall separates his account from everything else; separating his
   own decision from a session's act stays with the guard, the pull-request review and his go.
+- Invariant (SA-MW-9): no credential of his account, and none of any bypass actor, is stored where a workflow can read
+  it; one there would reopen what the wall closes.
 
 ## 3. The measurement (throwaway repository `sandbox-1126`, public, his account: THROWAWAY-PUBLIC (a), his answer of 2026-11-26)
 Neutral names in the throwaway (repository, workflow files, branches, comments, ruleset names; the copied ruleset is
 renamed on import), and it is deleted as soon as the results are reviewed (re-created if a re-test is needed).
+Its content is treated as public for good: GitHub keeps forks of a deleted public repository (SA-MW-10).
 Run by a separate test chat that holds only `sandbox-1126` (opened by him, from the brief; one test on each of his
 Claude accounts) and by his own clicks with screenshots. Results reach this chat by his paste.
 Tests, ids only here (detail in the brief): T0 both rulesets read back; T1 isolation, decisive and first: a pull
-request with red checks must not merge by any route, his web merge included (fail = the design is dead, no click on
+request with red checks must not merge by any route, his web merge included, counting only together with T2 and T3a in the same mode (fail = the design is dead, no click on
 the real repository); T2 session merges from both Claude accounts; T3 his web merge waits for gate and smoke; T4-T6
 writes that are not his account are refused (T6 optional); T7 the revert route; T8 the audit record; T9 the default
 branch stays; T11 optional, the PR Advisor's harness on the throwaway. Each refusal counts only when controls show it
@@ -43,8 +46,13 @@ came from the wall. Then the same set again for the fallback mode, only if neede
 T10 runs on the real repository after his click there: the next day-session merge and the next PR Advisor merge.
 
 ## 4. His clicks, listed once (each change with its undo; screen names to confirm on screen)
+0. Before click 1, on the real repository: read and screenshot, changing nothing: Deploy keys, Collaborators,
+   Installed GitHub Apps and the Claude app's "Administration" level, and Settings > Actions > General. What the
+   Administration reading means: none or read: risk 4 covers his own account only; write: SA-MW-3 holds and decision
+   GUARD-SETTINGS (section 7) comes to him before the measurement.
 A. Throwaway repository:
-1. Create `sandbox-1126` (public, with a README). Undo: Settings > Danger Zone > Delete.
+1. Create `sandbox-1126` (public, with a README); then its Settings > Actions > General > fork pull request
+   approval: "Require approval for all external contributors". Undo: Settings > Danger Zone > Delete.
 2. Give the Claude app access to it (github.com Settings > Applications > Installed GitHub Apps > Claude > Configure).
    Undo: remove it there.
 3. Open the test chat (a new Claude Code chat holding only `sandbox-1126`) and paste the brief; later the same on
@@ -62,10 +70,12 @@ A. Throwaway repository:
    them: delete `sandbox-1126` (click 1's undo) and remove the app's access (click 2's undo). Re-create it if a
    re-test is needed.
 B. Real repository (only after the measurement passed, the advisor agent reviewed the results, and his go):
-10. Read and screenshot, changing nothing: Deploy keys, Collaborators, Installed GitHub Apps and the Claude app's
-    "Administration" level.
-11. Add the wall exactly as click 5, in the chosen mode. Do not open or edit "Shamble Ruleset 1". Undo (the rollback,
+10. Repeat click 0's screenshots (changing nothing), so the record is from the day of the change.
+11. Add the wall exactly as click 5, named as in section 2 (not `ruleset-2`), in the chosen mode. Do not open or edit "Shamble Ruleset 1". Undo (the rollback,
     one settings switch, needs no merge, so a wrong wall cannot trap main): the wall > Enforcement status: Disabled.
+    Disabled reopens what the wall closes (SA-MW-11): STATUS records the date and why, and the same day the wall goes
+    back to Active (both rulesets read again) or the question goes to him. A refused PR Advisor merge alone is no
+    reason to disable: a day session merges on his go (risk 3).
 12. A screenshot of both rulesets; then T10 (this chat's next merge and the PR Advisor's next merge). If a merge is
     refused: click 11's undo.
 
@@ -102,10 +112,21 @@ B. Real repository (only after the measurement passed, the advisor agent reviewe
 2. High, by nature: the wall cannot tell a session from him (section 2). Control: say so in STATUS and TECHNICAL.
 3. Medium: the PR Advisor's runner differs from a day chat. Control: T11 or T10; if refused, it reports, a day
    session merges on his go, or he disables the wall.
-4. Medium: the wall does not protect itself; his account can change any ruleset. Control: click 10 records the Claude
-   app's Administration level; a day session asks him for a ruleset screenshot at the start of any kit, CI or gate
-   change-set.
+4. Critical if confirmed, older than MAIN-WALL (SA-MW-3): the wall does not protect itself; click 0 decides. A day
+   session asks him for a screenshot of both rulesets at the start of any kit, CI or gate change-set.
 5. Medium (Exempt only): no bypass audit entry for his merges; each pull request's history still shows them.
 6. Low: GitHub changes rulesets (it did in 2025-09 and 2026-05). Control: T0's read-back is cheap to repeat.
+7. Low: other merge routes. Auto-merge stays off on the real repository; turning it on re-runs T1 and T4 first.
 What it does not cover: who acts inside his account; what gate and smoke check; branches other than main; settings,
 secrets and environments; the preview token (its own environment protection; the wall is its precondition).
+
+## 7. Decisions for him (from security-auditor's review, SA-MW-1 and SA-MW-3; its notes: security-auditor-plan.md)
+- T4-BASELINE: should the main proof (T4) include a control run with the second ruleset switched off, expected to go
+  through, so that the refusal with it on is shown to come from it? It is the only proof when GitHub's rule record is
+  unreadable or unclear. Its cost: a run log in the public sandbox showing documented GitHub behaviour (the repository
+  is neutral; forks would outlive its deletion). Options: (a) run it; (b) skip it, rely on the record alone, and
+  report T4 as "unproven" if the record cannot be read. Recommended: (a) (security-auditor and this chat).
+- GUARD-SETTINGS, only if click 0 shows the Claude app with write on "Administration": (a) the guard change-set (R4-1
+  with GUARD-KIT) adds a pass mark that settings writes are refused by every route, failing closed, and STATUS says the
+  wall depends on that until it merges; (b) he accepts the risk in writing, bounded by his own account; (c) he limits
+  or uninstalls the Claude app (this stops sessions). Recommended: (a).
