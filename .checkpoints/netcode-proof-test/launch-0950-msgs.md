@@ -35,10 +35,11 @@ builder's notes (wip/u7-build-rs-notes-0030.md, wip/u7-t-build-notes-2050.md); m
    file-writing rule. My proposal: right after the fast-forward, before any edit, the builder runs a light `node
    check.mjs --only refs,marks,self,redact` as its new baseline (refs and redact move with U8's files), and the main
    session runs choice 15's two ops commands on the fixed tree at U7's merge M5, as it did for U8. Rule it or change it.
-   (re-check) Builder 2's merge lands first only if he answers before about 08:30. If it does, the base also holds
-   0e621dae's 46 files (crates/judge/, marks/README.md, SERIES.md, marks.json and its own notes): none of U7's 42; not
-   in the Wasm (client-wasm's normal dependencies are npt-client, -link, -proto and -sim) nor the page (no judge or
-   marks reference under web/); the test, refs and marks counts then rise by its share too.
+   Builder 2's merge did not land first (no reply from Mustafa by 08:30 UTC), so the base holds none of it; it moves to
+   a gap after U7's fix pass, before U7's merge. Its 46 files at 0e621dae (crates/judge/, marks/README.md, SERIES.md,
+   marks.json and its own notes) are none of U7's 42, and feed neither the Wasm (client-wasm's normal dependencies are
+   npt-client, -link, -proto and -sim) nor the page (no judge or marks reference under web/). So a T5 (ii) rerun done
+   before it still stands after it; U7's merge M5 then runs on a tree that holds both.
 
 Write .checkpoints/netcode-proof-test/advisor-u7-round.md.
 
