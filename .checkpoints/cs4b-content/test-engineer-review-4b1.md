@@ -74,3 +74,29 @@ Memory: none local (as in test-engineer-testlist.md).
   (fifteen 512 KiB texts + bundle_bytes' growing Vec) leaves enough freed memory to absorb the doubled strings. So
   in Wasm the ceiling measures the module (generator included), not the loader; "a fresh instance per case" would
   not fix it. Fix: reword (memory per case is native only), or a counting allocator in the test module.
+- F2 Wasm numbers (scratch builds, content_limits all five cases): clean release 270 ms, quadratic 854 ms (limit
+  5,000); clean dev 3,308 ms, quadratic 6,093 ms (limit 60,000): passes everywhere. Ratio idea: native debug case 0
+  vs case 1 is 45/19 ms = 2.4x clean, 1,823/15 ms = 120x quadratic.
+
+## Ranked findings (final)
+- F1 Medium | content_fuzz.rs:136 + content_proofs.rs:1265-1267 | stage 8's share met by IdNotFileName alone; map
+  rules 21 in 10,000 (DuplicateId 0, BeyondAim 5 in 200,000) unguarded | tally + plant 5 | own share for map rules
+  (~10) and map files taken | can wait, best before 4b-2 step 8.
+- F2 Medium | content_fuzz.rs:95-99,128; content.test.mjs:21-24 | time limits cannot see a quadratic dup search |
+  plant 4 native + Wasm numbers | ratio check or drop the claim | can wait.
+- F3 Medium | content.test.mjs:18-20,51; content.spec.ts:81-82 | Wasm memory ceilings blind to SA-1's doubling |
+  49,479,680 = 49,479,680; case 4 alone 38,731,776 both | reword / count in-module | can wait (High if the report
+  counts them as memory evidence).
+- L1 Low | time_report.rs:46-51, time_unit.rs:92-95 | exact path's tie not pinned vs half-even | 1.5 units both 2 |
+  add 0.0015 s (4.5 -> 5) | can wait.
+- L2 Low | recordings.rs:218-220,228-234; files.rs:100-101 | scan misses read_to_string/OpenOptions, same-line only;
+  doc says every new reader reads through read_plain, dependency_rules.rs:42 and rules_scan.rs:590 do not | read |
+  widen the count, narrow the doc | can wait.
+- L3 Low | rules_scan.rs:508-515,559 | assert!/assert_eq!/unwrap_err/expect_err and UFCS Option::unwrap not seen |
+  read | add them + bites | can wait.
+- L4 Low | error.rs:424-429; tests/content_proofs.rs:76-79 | only one sentence pinned; others only by the digest
+  that SHAMBLE_WRITE_VERDICTS=1 rewrites | read | one sentence per Kind | can wait.
+- L5 Low (wording) | review-brief-4b1-round2/test-engineer item 10 | the million run is in CI (toolchain.yml:162,
+  -p devtools release); by hand: -p content release and clippy; 4B-CI-CONTENT names no clippy step | read | fix
+  the report's words and the follow-up | can wait.
+DONE 2026-11-26.

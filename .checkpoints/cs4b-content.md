@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 18:02 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 18:05 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -400,6 +400,32 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
         block (the docs pass's second part adds it); the CI clippy step should not wait past 4b-2's merge;
         outside this change-set, `rules.test.mjs` and `wasm-rules.spec.ts` (older) still read vectors without
         the helper (a follow-up).
+    - **test-engineer's read of the whole: DONE** (`test-engineer-review-4b1.md`): no Critical or High; 3
+      Medium, 5 Low, each of which can wait by its own word. What holds, in its words: the generator works out
+      its verdicts apart from the loader (records typed by hand, its own layout and echo, the caps as numbers);
+      every run checks each record against its class again, so writing the digests again cannot hide a wrong
+      record; the aim reach, the map rules, the time unit's digit oracle, the planted links and the scan's
+      planted breaches are sound; three more defects planted in a copy were each caught by their own class (the
+      node cap one too high, the files cap one too high, a shape 1 mm past the bounds). Findings:
+      - TE-1 Medium: the fuzz run's stage shares cannot see the map kind drop out of the run: stage 8 counts the
+        renamed file together with the map's own rules (of 200,000 inputs: 3,453 against 425; duplicate id 0,
+        the reach 5). FIX in the last pass: the map's own rules are a stage of their own with a minimum.
+      - TE-2 Medium: the time limits cannot see a duplicate-key search that takes quadratic time (planted:
+        every check stays green; 45 ms becomes 1.82 s under a 20 s limit), so the test list's point on that
+        search's cost is not proven and two comments claim more than they hold. FIX: two inputs of one shape
+        are compared (distinct keys against one key 16,383 times: 2.4 times clean, 120 times planted).
+      - TE-3 Medium: the Node and browser memory ceilings cannot see the string-doubling defect (a module built
+        with it ends at the same 49,479,680 bytes: the generator's own inputs set the high-water mark); only
+        the native counting allocator does. FIX: said so in both comments and in the report (it would be High
+        if the report counted those ceilings as proof of memory per case).
+      - TE-4 Low: the time report's rounding is tested at one tie where half-to-even gives the same. FIX: 4.5
+        units.
+      - TE-5 Low: the links scan (= R2-RR-5, R2-SA-3). TE-6 Low: the content scan's gaps (= R2-RR-2, R2-SA-2).
+      - TE-7 Low: one error sentence is pinned; the others only by the digests. NOT fixed here (a table of 45
+        sentences; the stop line): a follow-up.
+      - TE-8 Low: the million-input run is NOT by hand: CI's toolchain job runs the tools crate's tests in
+        release (`toolchain.yml:162`). By hand are only clippy and the content crate's own release tests. The
+        brief's item 10 and this card were wrong on that; the report says it right.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -451,5 +477,4 @@ in); the advisor agent on the head; `.checkpoints/` out of the head; the draft p
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- test-engineer (its read of the whole) and engine-architect (round 2) are running; no edit to the tree until
-  they are done. No saver runs: the main session commits the notes by hand.
+- engine-architect (round 2) is running; no edit to the tree until it is done. No saver runs: the main session commits the notes by hand.
