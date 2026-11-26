@@ -49,3 +49,10 @@ CONDITIONS (each worded to apply word for word) or REVISE. End your turn as soon
   re-rules C6 first, and the builder moves one window.
 - **Else, if Builder 2's merge reached its step 9:** NB2-C10's reviewer read (advisor-nb2-merge.md:121-126).
 - **Else** the slot stays empty.
+
+## After C and A end (Builder 2's merge pushed 18:32 at 23e9e92, its merge 48efc9c; added 18:3x)
+- NB2's step 9: the advisor's check of the pushed head by SHA (MAIN-65 step 7's form), with step 8's re-read bars
+  (no conflict path beyond docs/STATUS.md and docs/STATUS_ARCHIVE.md; CI = the push runs) and the record in
+  .gate/nb2-merge/ (step1-record.txt, check.log, the two rejudge-47 files). It takes the first slot that frees.
+- NB2-C10's reviewer read (one reviewer agent on 72651a3c's last 67 judge lines: advisor-nb2-merge.md:121-126), in the
+  next slot that frees, before NB2's report; then -47's pack.
