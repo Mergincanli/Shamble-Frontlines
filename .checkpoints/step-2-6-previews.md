@@ -124,8 +124,10 @@ questions-2026-11-26-guard.md (GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT, GIT-IN-NOD
 STOPPED UNTIL HIS GUARD-OFF ANSWER: wall-test.yml's removal, any .github/ or kit write, any main-folder move other
 than the three allowed forms, the token sitting, the merge. Allowed meanwhile: the report (U8), the docs pass, notes.
 The report so far: docs/reports/2026-11-26-step-2-6-previews.md, committed 8c8ad0d0 (pushed). The docs pass
-(docs-keeper: STATUS, ROADMAP, REPO_MAP if needed) running; then commit it, then the advisor agent's review of
-that head (report + docs), then wait for his answers.
+committed with a report fix as b35c6c08 (pushed; checked before commit: lane 2's lines only, the ROADMAP move byte
+for byte under OLD-LINES (a)). Next: the advisor agent's review of head b35c6c08 (a general agent reading main's
+advisor.md; notes advisor-head-b35c6c08.md); then wait for his five answers (GUARD-OFF, MAIN-WALL-AGAIN, GUARD-KIT,
+GIT-IN-NODE, TAG-CHECK). If GUARD-OFF (a): hand over to a new one-repository chat from this checkpoint.
 Next (old list, still valid for the rest): the advisor agent's recorded verdict on GUARD (options: (a) finish 2.6's risky steps, U6, the token sitting and the merge, in a
 new one-repository chat from this checkpoint; (b) stay here with asks; plus a live probe only while he watches;
 plus the kit change-set to find out why, the security-auditor's recommendation); the question file in the notes,
