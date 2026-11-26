@@ -64,12 +64,16 @@ A. Throwaway repository:
    offered: note it and tell the test chat, or stop). Undo: delete it, or Enforcement status Disabled.
 6. His tests from his test card (handed to him in chat with the brief, not pushed: steps, expected result and stop
    line for T1a in each mode, T3a-c, T6, T7 and T9): one screenshot each.
+6b. Only if he chose T4-BASELINE (a), when the test chat asks: `ruleset-2` > Enforcement status: Disabled. Undo: 6c.
+6c. When the test chat says the baseline run is done: `ruleset-2` > Enforcement status: Active (the test chat re-reads
+   both rulesets).
 7. Only if needed: switch the wall to "For pull requests only"; re-run. Undo: set it back.
 8. Optional T11: a test routine pointed at `sandbox-1126` only. Undo: delete it.
 9. Paste the test chat's report and his screenshots here. Once the advisor agent and security-auditor have reviewed
    them: delete `sandbox-1126` (click 1's undo) and remove the app's access (click 2's undo). Re-create it if a
    re-test is needed.
-B. Real repository (only after the measurement passed, the advisor agent reviewed the results, and his go):
+B. Real repository (only after the measurement passed, the advisor agent and security-auditor reviewed the results,
+   and his go):
 10. Repeat click 0's screenshots (changing nothing), so the record is from the day of the change.
 11. Add the wall exactly as click 5, named as in section 2 (not `ruleset-2`), in the chosen mode. Do not open or edit "Shamble Ruleset 1". Undo (the rollback,
     one settings switch, needs no merge, so a wrong wall cannot trap main): the wall > Enforcement status: Disabled.
@@ -89,7 +93,8 @@ B. Real repository (only after the measurement passed, the advisor agent reviewe
   security-auditor on the design, the brief and his test card BEFORE anything goes to him, and on the results before
   click 11, each finding addressed or deferred in writing (tier 2); infra-engineer is the designer.
 - Docs (one small pull request after click 12, which is also T10's day-session merge): STATUS, the archive, ROADMAP,
-  and a short "main's wall" note in TECHNICAL (what each ruleset does, the rollback click, what it cannot tell apart);
+  and a short "main's wall" note in TECHNICAL (what each ruleset does, the rollback click, what it cannot tell apart,
+  and SA-MW-9's invariant);
   guard-wrappers' follow-ups from the advisor agent's final-head review of #73 ride in it, all docs only: F2 (STATUS
   and the archive say "no pull request yet"), F3 (the report's base line and one red count), F4 (a count word in
   DECISIONS), F7 (the report's "never run live" line); F5 (the pull request text's footer) needs no file change; F6 was
@@ -121,11 +126,9 @@ What it does not cover: who acts inside his account; what gate and smoke check; 
 secrets and environments; the preview token (its own environment protection; the wall is its precondition).
 
 ## 7. Decisions for him (from security-auditor's review, SA-MW-1 and SA-MW-3; its notes: security-auditor-plan.md)
-- T4-BASELINE: should the main proof (T4) include a control run with the second ruleset switched off, expected to go
-  through, so that the refusal with it on is shown to come from it? It is the only proof when GitHub's rule record is
-  unreadable or unclear. Its cost: a run log in the public sandbox showing documented GitHub behaviour (the repository
-  is neutral; forks would outlive its deletion). Options: (a) run it; (b) skip it, rely on the record alone, and
-  report T4 as "unproven" if the record cannot be read. Recommended: (a) (security-auditor and this chat).
+- T4-BASELINE: should the main proof (T4) include a control with the second ruleset off, so the refusal is shown to
+  come from it? Cost: one more public record in the sandbox. Options: (a) run it; (b) skip it, and report T4 as
+  "unproven" if GitHub's rule record cannot be read. Recommended: (a) (security-auditor, the advisor agent, this chat).
 - GUARD-SETTINGS, only if click 0 shows the Claude app with write on "Administration": (a) the guard change-set (R4-1
   with GUARD-KIT) adds a pass mark that settings writes are refused by every route, failing closed, and STATUS says the
   wall depends on that until it merges; (b) he accepts the risk in writing, bounded by his own account; (c) he limits

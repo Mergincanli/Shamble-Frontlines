@@ -24,8 +24,12 @@
 7. security-auditor on the design, brief and card: REVISE, text only (SA-MW-1..12; decisions T4-BASELINE and
    GUARD-SETTINGS for him) · notes security-auditor-plan.md; all applied (plan pushed; brief and card in .gate/main-wall/)
 
+8. The advisor agent's re-review: APPROVE with four conditions (applied as written: the baseline marked as his choice
+   with clicks 6b and 6c, SA-MW-9 in the TECHNICAL note, security-auditor named in part B, a per-run branch name);
+   T4-BASELINE's wording shortened · notes advisor-plan.md
+
 ## Current step
-The advisor agent re-reviews the revised plan, brief and card.
+Waiting for Mustafa: his go on the plan; T4-BASELINE; then click 0 (GUARD-SETTINGS only if click 0 calls for it).
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
@@ -42,4 +46,4 @@ The advisor agent re-reviews the revised plan, brief and card.
 - THROWAWAY-PUBLIC (a): public throwaway, neutral names, deleted as soon as the results are reviewed · Mustafa · 2026-11-26 (his answer "a" in this chat)
 
 ## Running work
-- the advisor agent: re-review
+- none

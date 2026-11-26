@@ -61,3 +61,48 @@ that holds no data. A private throwaway would need GitHub Pro (same docs sentenc
 ## For Mustafa
 After C1-C7: his go on the plan; then the clicks as listed. Note: the test chat runs without the guard (no repository
 hooks there); its limits are the brief's words and the chat's one-repository binding.
+
+# Advisor: re-review of MAIN-WALL's plan (2026-11-26, plan at eedf59d3)
+Read: the plan at eedf59d3, security-auditor's public notes, its unpushed detail (second pass wins), the brief and his
+test card (unpushed, `.gate/main-wall/`). Ids only here.
+
+## Verdict: APPROVE, with conditions 1-4 applied before the plan goes to him (no further advisor review needed if
+applied as written; any other change comes back)
+Risk tier stays 2. W1, the stop gates and the order hold.
+
+## My conditions C1-C7: all met
+C1 (this chat does not read rulesets; T10's read-back and click 4's fallback are his; the design's reads recorded as a
+departure), C2 (two change-sets; merge-on-green only after click 11 and T10), C3 (security-auditor's answer recorded),
+C4 (his card exists), C5 (F2-F7 named, source the advisor's final-head review of #73, docs only), C6 (review done),
+C7 (SHA read named). THROWAWAY-PUBLIC (a), his answer: applied (neutral names, deletion after review).
+
+## security-auditor's findings: SA-MW-1 to SA-MW-12 read as met, except two gaps below
+SA-MW-2, -3 (click 0 first; GUARD-SETTINGS as his decision), -4, -5, -6, -7, -8, -10, -11, -12: met in plan, brief and
+card. SA-MW-1: met in the brief's pass mark, but see condition 1. SA-MW-9: met in the plan; see condition 2.
+
+## Conditions
+1. (Medium) T4-BASELINE is his open decision, but the brief already runs the baseline route as a pass mark, and
+   the clicks it needs (switch the second sandbox ruleset off, then back on) are in neither the plan's click list nor
+   his card. Mark the brief's baseline route "only if Mustafa chose T4-BASELINE (a)", and add those two clicks, each
+   with its undo, to section 4 (under click 6) and to his card.
+2. (Low) Section 5's TECHNICAL note also carries SA-MW-9's invariant (the auditor asked for the same line there).
+3. (Low) Section 4 B's opening line also names security-auditor's review of the results (section 5 already says so).
+4. (Low) The brief's contents-write control in job `merge` uses a fixed branch name; a second run would get "already
+   exists", which proves nothing. Use a name unique per run.
+
+## Gap-detail discipline (pushed files)
+The plan and both notes files hold ids, classes and the rule's guarantee. Low: section 7's T4-BASELINE wording says a
+little more about T4's actor than the rest of the plan; the class is already in pushed notes, so this alone triggers
+no push. If the plan is pushed again anyway, shorten it to "a control with the second ruleset off, so the refusal is
+shown to come from it; cost: one more public record in the sandbox", and give him the full reason in chat.
+
+## Not checked by me
+The security-auditor's answer on R4-1 (taken as recorded in the plan); live rulesets, the Claude app's
+Administration level and the proxy's write policy (click 0 and the measurement decide them).
+
+## Decisions needed (go to him with the plan; both as written in plan section 7)
+- T4-BASELINE: recommended (a). I agree: without it, T4 can end "unproven" and "only his account" has no proof.
+- GUARD-SETTINGS: only if click 0 shows write on Administration; recommended (a). I agree.
+
+## For Mustafa
+After conditions 1-4: his go on the plan, his answers on T4-BASELINE and (if needed) GUARD-SETTINGS, then click 0.
