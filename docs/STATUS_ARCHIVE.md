@@ -265,6 +265,18 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
 |---|---|---|---|---|
 | #70 | change-set 4a, "The recording" (the first of Walk's four parts, his WALK-CUT (a)), by lane 1 (the chat he calls Builder V4): a recorded match replays to the same hashes, tick by tick, natively (one process, two processes, two matches in turn) and in WebAssembly on the players' file (Node and Chromium), and each planted divergence is caught at its tick with the field that differs; the one new number on the players' file is the shared state's hash (`Sim::shared_hash`), read only by a replay | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4a-recording`) | risk tier 1; no browser check (nothing a player sees changes); five reviewers in two rounds (netcode-architect, rust-reviewer, test-engineer, engine-architect, security-auditor), all APPROVE in round 2, nothing Critical, High or Medium open; source final at fb5d0ff; the local checks, CI (on 21c1046, six of six) and the verifier (PASS) on it; 3,300 written lines against the stop line of 3,400 (3,050 before his STOP-4A (a), 2026-11-25, 20:48:11 UTC); report `docs/reports/2026-11-25-cs4a-recording.md`; ready for review once the advisor agent has approved its last head | the advisor agent's review of the last head; his Advisor's merge check; his go for that head |
 
+_Moved from STATUS (2026-11-26, MAIN-WALL's docs pass, under his OLD-LINES of 2026-11-18): STATUS's rows for the merged ci-preview-handover (PR #74, merge commit 3b949c1a, 2026-11-26 15:24:22 UTC, the merge commit's date read with git; `merged_at` not read) and guard-wrappers (PR #73, merge commit 4a62873e, 2026-11-26 14:56:33 UTC, the same way; merged on his go of 14:56:06 UTC for head 7bff799f, `docs/DECISIONS.md`), moved by script, byte for byte, so their cells read as they stood when they left STATUS:_
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| none yet (title and text in the notes) | ci-preview-handover, by the chat he calls CI Builder (his block of 2026-11-26, 13:20 Amsterdam; lane 2's request on issue #59): at the end of the `toolchain` job, on pull requests from this repository only, a check that the tested player build holds only plain files and folders with no name that begins with a dot, then the hand-over of that build to lane 2's preview workflow as the artifact `preview-site`, kept 7 days (`actions/upload-artifact` v7.0.2 at cf430e0, his UPLOAD-SOURCE (a)); TOKEN-WORDS and two comments made true; the recording's replay test joins the rule tests in Firefox (FIREFOX-REPLAY) | `claude/keen-tesla-v807cf` (stands in for `cs/preview-handover`) | risk tier 2; no browser check; written at d12e3a8 on his CI-WRITE-3 (a), GUARD-STEP (a) and HIDDEN-FILES (b) (2026-11-26, 15:05 Amsterdam), both files at his sha256 values; one review round before his yes (security-auditor: nothing stops the change, its SA-1 Medium is the accepted CUT-ESCAPE; infra-engineer: APPROVE); in the container Firefox 161 3 passed (the replay test included), Chromium 17 passed, the check on the real build and on seven planted faults; the upload step has never run, and no preview starts until lane 2's `preview.yml` is on main; CI: the push run on d12e3a8 green (the new steps skipped on a push; Firefox 3 passed, the replay test among them); the pull request run to read; report `docs/reports/2026-11-26-ci-preview-handover.md` | his Advisor opens the draft and watches the first run; the advisor agent's review of the final head; his go for that head |
+| none yet | guard-wrappers (his SAME-GAP (a): nothing in front of git or gh gets through the day guard unread), by the chat he calls the Guard fix chat; what it does: "Phase", "The day guard" | `claude/confident-gates-tbnq38` (stands in for `cs/guard-wrappers`) | risk tier 2 (his go; no pull request yet); code head 83bc2417; main 2483e9a merged in (7be0a933) in a separate worktree; guard tests 1551/1551; four security-auditor rounds (the fourth by his leave, the last), R4-1 left open by his R4-END (1); 166 added lines of code and tests (stop line 200); report `docs/reports/2026-11-26-guard-wrappers.md` | the advisor agent's review of the pushed head; his Advisor's merge check; his go for that full head id |
+
+_STATUS's "Waiting on Mustafa" lines for the same two pull requests, moved the same way (both merged since, as the header above says):_
+
+- ci-preview-handover (CI Builder): his go for the head the advisor agent approves, after his Advisor has opened the draft and watched the first run (the push run on d12e3a8 green; the pull request run is the first to run the two new steps); a red on the new steps or on Firefox's replay test comes to him first; if the run fails at its start because the action is not allowed, the chat tells him which setting to change (his 15:05 points 5 and 7).
+- guard-wrappers: his go for the head id the advisor agent approves, after his Advisor's merge check (no browser check).
+
 ## Targets
 - **v2 (VISION_V2 §3, read with MODES-3 (a): the starting sizes are totals; Mustafa, 2026-10-31):** start with two teams
   with 2–8 players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or
@@ -1896,7 +1908,7 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
     `.gate/` and the read-only copy of the action's code in the scratchpad (a download not used) are deleted.
 - **From guard-wrappers** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7; branch
   `claude/confident-gates-tbnq38` standing in for `cs/guard-wrappers`, code head 83bc2417, main 2483e9a merged in at
-  7be0a933 in a separate worktree; risk tier 2; no pull request yet; four security-auditor rounds, the fourth by his
+  7be0a933 in a separate worktree; risk tier 2; no pull request yet (_corrected 2026-11-26 (MAIN-WALL's docs pass): merged since as PR #73, 4a62873e, 2026-11-26 14:56:33 UTC by the merge commit's date_); four security-auditor rounds, the fourth by his
   leave (R3-WAY, 2026-11-25, 23:01:07 UTC) and the last; by his R4-END (1) what is approved merges, with R4-1 open, on
   his go; report `docs/reports/2026-11-26-guard-wrappers.md`; the notes in `.checkpoints/guard-wrappers/`
   (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd). Class words only: every form stays out of the repository (his words of 2026-11-25,
@@ -1932,6 +1944,28 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
     older) with SA-D-DIRECT (his (a)), SA-a and SA-g (Medium), SA-b, SA-f and SA-h (Low), the plugin review's High, R2-1
     (raised to Critical by the advisor agent), R3-1 and R3-2 (Critical, by his R3-WAY (a)), ADV-R4-1 (Critical, older),
     ADV-R4-3 (Low).
+- **From MAIN-WALL** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7; branch
+  `claude/confident-gates-tbnq38` standing in for `cs/main-wall`; risk tier 2: repository settings by his clicks, no code;
+  report `docs/reports/2026-11-26-main-wall.md`; the notes in `.checkpoints/main-wall.md` and `.checkpoints/main-wall/`
+  (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6). Class words only: the gap's detail stays out of pushed notes (his words of
+  2026-11-25, 19:36:42 UTC, item 3). The ids are security-auditor's (SA-MW-) and the plan's (T1e, T10)):
+  - security-auditor's results review (APPROVE, mode Exempt), Lows: SA-MW-R1 (the outsider's refusal proven by
+    GitHub's refusal text and elimination, the rule record unavailable: an inference, named); SA-MW-R2 (the isolation
+    precondition replaced by the session-merge result: an inference, named); SA-MW-R3 (availability routes not
+    measured: his own web merge, the second account, the routine's runner; moved to T10); SA-MW-R4 (one isolation
+    route not measured for the exempt actor); SA-MW-R7 (a log-header deviation, no secret; no action); SA-MW-R8 (an
+    author-identity deviation, no new exposure).
+  - Its two Mediums, done: SA-MW-R5 (the grading basis changed from his recorded decision: his T4-GRADING (a) and his
+    words on the missing Rule Insights page are in `docs/DECISIONS.md`, 2026-11-26, 17:11:23 and 16:48:48 UTC); SA-MW-R6
+    (the stored-credential invariant SA-MW-9: checked by names at click 12, after click 11).
+  - T1e not run (his T1E-BEFORE-DELETE (b)): a residual, inferred from the other results, not measured.
+  - Not measured until first use: his own web merge under the wall (T3a, not run; see the report's deviations); the first merge from
+    his second personal Claude account; T10, one day-session merge and one PR Advisor merge under the wall (STATUS,
+    "Phase"). The other lane's token sitting waits for both halves of T10 (his TOKEN-RELEASE (c)).
+  - For the rule-file change-set: CLAUDE.md's "Lanes and accounts" quotes his LANE-RULES and ACCOUNTS lines, which say
+    two accounts; his answer of 2026-11-26, 17:11:23 UTC says three (`docs/DECISIONS.md`); the lines need his new words.
+  - The advisor agent's results condition 5: click 0's missing Settings > Actions > General screenshot was to ride with
+    click 12; the chat's checkpoint (step 17) does not record it as received [assumed: open].
 - **Moved from STATUS (2026-11-24)** (by lane 2's docs pass for the preview hosting check, under his OLD-LINES: lines
   about merged pull requests, moved by script, byte for byte): STATUS's Follow-ups lines 78-93 at main 28254a7, the
   four bullets of the merged pull requests #49, #50, #51 and #48 for the gate step (2.3), are the four bullets below.
@@ -2011,10 +2045,35 @@ _Moved from STATUS (2026-11-26, guard-wrappers' docs pass, under his OLD-LINES o
 - **From ADR 0006's revision** (#67, lane 2; the archive's block): ADR6-ROLLBACK (Medium), -WK-ROUTE, -WK-BIC,
   -PAGES-RETENTION, -PM7-PAGES, -PM7-FIGURE, -WORDING, -REVISIT-WORKERS; step 2.6: STEP26-WORKERS, PHC-PREVIEW-NOINDEX.
   #66's follow-ups (PHC-CLICKLESS and the rest, for step 2.6): the archive's "Moved from STATUS (2026-11-25, lane 2)".
+- **Moved from STATUS (2026-11-26, MAIN-WALL's docs pass)** (under his OLD-LINES: lines about merged pull requests, moved
+  by script, byte for byte, to keep STATUS within its 120 lines): STATUS's Follow-ups bullets for ci-preview-handover (PR
+  #74, merged 2026-11-26 as 3b949c1a) and guard-wrappers (PR #73, merged 2026-11-26 as 4a62873e) are the bullets below;
+  where they say "closed when it merges", that merge has come. guard-wrappers' R4-1 and INPUT-RUN stay open ("Open bugs
+  and risks", "guard-wrappers"). The two bullets after them (a pointer line and guard-env-fix's (PR #69, merged 2026-11-25) follow-ups,
+  whose SA-R2-2 and V-2 stay open) moved the same way.
+- **From ci-preview-handover** (the archive's block "From ci-preview-handover"; the ids are that docs pass's, not his): done on its branch, closed when it merges, TOKEN-WORDS and 4A-FIREFOX-REPLAY (his FIREFOX-REPLAY); CUT-ESCAPE stays on record as accepted (his 15:05 point 6) and its later fix is CUT-ESCAPE-FIX ("the cut's code as its own throwaway user"); PH-SA-2 (CUT-ESCAPE's acceptance now also rests on lane 2's preview treating the build as data); PH-IE-4 (a re-run and the artifact's name, read on the first re-run); for the gate step 2.3 PH-KEEP-NAMES; for lane 2 PH-MERGE-REF; on the first run PH-TIME and PH-ACTIONS-SETTING; at the merge PH-DELETE (the action's read-only copy and the Firefox folder).
+- **From guard-wrappers** (`docs/reports/2026-11-26-guard-wrappers.md`; the archive's block): INPUT-RUN (a named limit:
+  programs outside the guard's wrapper table that run their input are not inspected, the class of stated limits L1-L4);
+  next kit change-set: R2-2, R2-3, R3-3 to R3-6, ADV-R4-2, ADV-R4-4, R4-2, SA-c, SA-e, shell function definitions.
+- **From #60, #61, #64, change-set 3a (#65), guard-env-fix (#69) and ci-after-3a (#71)** (moved by script, OLD-LINES): the archive's "Moved from STATUS (2026-11-25...)" and "(2026-11-26, ci-preview-handover's docs pass)".
+- **From guard-env-fix (#69):** SA-R2-2 (very long lines against the hook timeout; answered in guard-wrappers' report, nothing changed without his word), V-2 (the folder tracking after a split-string value), the reason-text nit. Closed by guard-wrappers at its merge: GEF-SAME (what is left of its class: R4-1) and SA-R1-3; CAP decided, his (a) of 2026-11-25.
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
 STATUS's "Decisions pending"; his decisions and the queue of his words are in `docs/DECISIONS.md`._
+- **Taken by the advisor agent for MAIN-WALL** (not his; its notes `.checkpoints/main-wall/advisor-plan.md` (readable at
+  commit 68b690f130c6a7c5cd770d5fabd088091f9110e6); ids only): the plan REVISE (text only, C1-C7: this chat reads no rulesets, so T10's read-back and
+  click 4's fallback are his and the designer's two read-only reads are recorded as a departure; two change-sets, the
+  review tracks' merge-on-green only after click 11 and T10; security-auditor's answer on R4-1 recorded; his test card;
+  guard-wrappers' F2-F7 named; the security review; the SHA read), with THROWAWAY-PUBLIC put to him; the re-review
+  APPROVE with four conditions (T4-BASELINE marked as his choice with its two clicks; SA-MW-9 in the TECHNICAL note;
+  security-auditor named before click B; a per-run branch name), all applied; the results review APPROVE of click 11
+  in mode Exempt, with conditions: security-auditor reviews the results first (done: APPROVE), his go on click 11 in his
+  own words (CLICK-11-GO (a)), click 11 exactly as measured with "Shamble Ruleset 1" untouched, the dropped tests
+  recorded as not run (T1e inferred; T3a, his web merge, open until first use; the second account's merge open), click
+  10 dropped (click 0 was the same day), and the docs quoting his words exactly. Its condition 4 would have let the other
+  lane's token sitting start after T10's day-session half alone; his TOKEN-RELEASE (c) (2026-11-26, 17:11:23 UTC,
+  `docs/DECISIONS.md`) decides instead: the token sitting waits for both halves of T10.
 - **Taken by the advisor agent for guard-wrappers** (not his; its notes `.checkpoints/guard-wrappers/advisor-plan.md`
   (readable at commit 68b91211f6336a9308a7b420d205854026eac1dd); no form named): the plan APPROVE with 9 conditions (plan section 7); round 1's fix
   pass APPROVE with conditions, SA-D-DIRECT approved in advance if he said yes (he did, (a), 2026-11-25, 19:36:42 UTC);
@@ -2152,7 +2211,21 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   events; Opus 5.5; runs 16:07 UTC (succeeded) and 18:46 UTC (failed: the usage limit); next 2026-11-11 06:45 UTC.
 
 ## Open bugs and risks
-- **guard-wrappers** (the day guard, `.claude/hooks/routine-guard.mjs`; waiting for his go; by his R4-END (1) what is
+- **MAIN-WALL** (main's wall, by his click on 2026-11-26, about 17:15 UTC; TECHNICAL, "Main's wall"; class words only):
+  - The wall cannot tell a session from him: every Claude session acts as his GitHub account, so the wall separates his
+    account from everything else; the guard, the reviews and his go separate his decisions from a session's acts.
+  - The wall does not protect itself: his account can change any ruleset (the Claude app holds Administration read only,
+    click 0's screenshot, so the chats cannot). A day session asks him for a screenshot of both rulesets at the start of
+    any kit, CI or gate change-set (the plan's risk 4).
+  - The rollback (Enforcement status Disabled) reopens what the wall closes while it lasts (SA-MW-11): STATUS records the
+    date and why, and the same day the wall goes back to Active or the question goes to him.
+  - In mode Exempt his own merges leave no bypass audit entry; each pull request's history still shows them.
+  - SA-MW-9's invariant: no credential of his account, and none of any bypass actor, is stored where a workflow can read
+    it; checked by names at click 12 (no repository secrets; one environment secret in the environment "preview", the
+    other lane's wall-test placeholder).
+  - Unmeasured until first use: T10 (a day-session merge and a PR Advisor merge), his own web merge, his second
+    personal Claude account's first merge. R4-1 in the guard stays bounded by the wall and today's ruleset.
+- **guard-wrappers** (the day guard, `.claude/hooks/routine-guard.mjs`; waiting for his go (_corrected 2026-11-26 (MAIN-WALL's docs pass): merged since as PR #73, 4a62873e, 2026-11-26 14:56:33 UTC by the merge commit's date_); by his R4-END (1) what is
   approved merges with these open, on his go; class words only, every form out of the repository by his words of
   2026-11-25, 16:34:18 UTC, item 3e, and 2026-11-26, 14:09:28 UTC, item 1):
   - R4-1 (Critical, open; security-auditor's round 4 on 83bc2417, the last round): one more spelling hides git, gh or
@@ -2446,9 +2519,10 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
 | Editor rebuild (Cabana): full-map draw calls boot / 1 / 2 rebuilds | base 1992 / 2406 / 3502 · head 1992 / 1992 / 1992; heap after GC boot / 10 rebuilds: base 42.9 / 119.5 MB · head 42.7 / 44.5 MB | 2026-10-14 | preview.js harness + perf-auditor |
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
+| MAIN-WALL: main's rulesets | two Active: "Shamble Ruleset 1" (pull request; `gate` and `smoke` required; no deletion; no force push; no bypass; not opened at the click) and "main-wall (only the owner updates main)" (default branch; only Restrict updates; bypass the Repository admin role, mode Exempt); no repository secrets, one environment secret in "preview" (SA-MW-9 by names) | 2026-11-26 | his screenshots at click 12, as the chat's checkpoint (step 17) and the plan record them; not read by docs-keeper [assumed] |
 | CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (push; gate run 45818982040 with its gate and smoke jobs, completed 12:23 UTC; toolchain run 45818982052, 12:28 UTC) | 2026-11-26 | GitHub's REST API, the commit's workflow runs and the gate run's jobs (read by ci-preview-handover's docs-keeper) |
 | CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (gate 12:22:25, smoke 12:23:01, toolchain 12:28:06 UTC by `completed_at`) | 2026-11-26 | GitHub's REST API, the commit's check runs (read 14:24 UTC by docs-keeper) [verified] |
-| guard-wrappers (no pull request yet): the kit's three test files | `routine-guard.test.mjs` 1551/1551 (1247 on main c1da1bd by the chat's count; `.claude/` unchanged from c1da1bd to 2483e9a, read with git diff), `settings.test.mjs` 127/127, `checkpoint.test.mjs` 33/33, on the docs pass's worktree at 54bbf38c (main 2483e9a merged in) | 2026-11-26 | `node --test`, run by docs-keeper [verified] |
+| guard-wrappers (no pull request yet (_corrected 2026-11-26 (MAIN-WALL's docs pass): merged since as PR #73, 4a62873e, 2026-11-26 14:56:33 UTC by the merge commit's date_)): the kit's three test files | `routine-guard.test.mjs` 1551/1551 (1247 on main c1da1bd by the chat's count; `.claude/` unchanged from c1da1bd to 2483e9a, read with git diff), `settings.test.mjs` 127/127, `checkpoint.test.mjs` 33/33, on the docs pass's worktree at 54bbf38c (main 2483e9a merged in) | 2026-11-26 | `node --test`, run by docs-keeper [verified] |
 | CI on main (older) | `gate`, `smoke` and `toolchain` success on 07d673b, PR #71's merge commit (push; gate and smoke completed 20:49 UTC, toolchain 20:54 UTC) | 2026-11-25 | GitHub's REST API, the commit's check runs (read 22:12 UTC) |
 | Change-set 4a (PR #70, a draft): the players' Wasm, the hash's cost, the tests | the players' Wasm 54,514 bytes on the final source fb5d0ff (53,813 before 4a), sha256 a4d8184c...d094, the same on the verifier's rebuild and on GitHub's runner (CI on 21c1046); after round 1's fix pass it was 19847796...f708, one byte other (a line number in a panic message), and 55,607 bytes before that pass; the state hash: native release 4,096 bytes 5.7 us and 16,384 bytes 20.7 us, WebAssembly release in Node 22 5.2 and 19.9 us; 17 browser tests in 195 s in the container; the release tests of all six crates, 139 passed, on the tree with #71 taken in | 2026-11-25 | the chat's card and `round1-fold.md` (`.checkpoints/cs4a-recording/`); not re-measured by docs-keeper, not re-read at fb5d0ff |
 | CI on main (older) | `gate`, `smoke` and `toolchain` success on 28254a7, PR #65's merge commit (run ids not recorded here) | 2026-11-24 | change-set 3b's card, step 0 (read 22:45 UTC) [assumed: not read again by this docs pass] |
