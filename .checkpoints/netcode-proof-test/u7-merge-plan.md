@@ -149,7 +149,23 @@ the advisor rules."
   form that keeps every file a copy is not yet committed for.
 
 ## Done lines (one per step, by Edit, as at U8's merge)
-(none yet)
+- DONE 22:0x-22:1x: M0's prep: u7-report.md drafted (U7-M-7's items, the (fill) lines for M2-M7 and C1); u7-c1.mjs
+  written; UM-3's `git diff --no-index` of u8-c1.mjs and u7-c1.mjs: only the header (:1-4), :12, :14 and :47; the
+  part-clean in the card's form (no ask): "Removed 5674 files, 6.8GiB total", the lock and CACHEDIR.TAG there, no
+  debug folder, free 7,622 to 13,886 MiB; saved ea0a20d. The advisor tool 22:0x: five checks before the saver stop,
+  all met: C1's log names carry stampNow()'s millisecond ISO stamp (lib.mjs:160, :174-176), so no collision with U8's
+  mds-chrome-wt-a0-2026-11-26T00-35-28-859Z.jsonl, and OUT .gate/u7-merge/c1-logs does not exist yet; PR #40's rules
+  event read 22:06; TaskStop loaded; `git fetch origin main` fresh, FETCH_HEAD b9aad01 (= MAIN-68's tip: no move);
+  u7-m4-cmp.mjs written for M3/M4's compare (the patch's paths, byte-equal and mode 644 on both sides; read only).
+  Also known: web/node_modules holds TypeScript 6.0.3 (the `web` step runs no npm ci); main-run.sh makes its log's
+  folder; wip/u7-t-build.patch (19 web/ files, every one among the 43) is tracked and inside this snapshot, so M8's
+  `git rm` takes it too, under WIP-CLEAN as the T5 (i) one (the plan's M8 left it out; recorded in u7-report.md).
+- DONE 22:08-22:1x: M0: MAIN-68's step 6 done (CI green on 7971da0); no agent or workflow running; no cargo, rustc or
+  npt process (pgrep exit 1); the lane lock free (flock -n); HEAD ea0a20d = origin before this edit, clean but the
+  new notes; main b9aad01; free 13,886 MiB; the resume line on the card (line 8, replaced). The saver bpqdxxpm4
+  stopped by TaskStop at 22:08 ("Successfully stopped task"; no index.lock; no `checkpoint.mjs watch` process). M1:
+  `sha256sum` 6535c18130cad99881b798a332973b37215c1edad27929dd54178efc00342728 (= the plan's). Next: this line saved
+  (H0), the base light run, M2, M2b, then M3.
 
 ## Risks
 - M5's counts move with MAIN-68 and Builder 2: each bar comes from this merge's own base run on its own H0 (MAIN-68's
