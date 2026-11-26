@@ -9,7 +9,7 @@ pub mod world;
 
 pub use rng::ChaCha8;
 pub use world::{
-    BUTTONS, MatchSetup, PlayerCommand, SEED_BYTES, SHARED_STATE_BYTES, TICK_HZ, World,
+    BUTTONS, MatchSetup, PlayerCommand, SEED_BYTES, SHARED_STATE_BYTES, StateSink, TICK_HZ, World,
 };
 
 #[cfg(test)]

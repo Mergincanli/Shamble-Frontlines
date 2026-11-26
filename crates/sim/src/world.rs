@@ -2,7 +2,7 @@
 //! it holds the tick counter, the one player's applied command and the match seed. The step reads no clock and takes
 //! no time: one call is one tick.
 
-use crate::state_hash::fnv1a_64;
+use crate::state_hash::Fnv1a64;
 
 /// Ticks per second: the one build-time constant, the same on the server and the client (ADR 0004 part 4; TICK-30).
 pub const TICK_HZ: u32 = 30;
@@ -18,6 +18,7 @@ pub const BUTTONS: usize = 16;
 pub const SHARED_STATE_BYTES: usize = 4 + 2 + BUTTONS;
 
 /// The length of the whole state's canonical bytes: the shared state, then the seed.
+#[cfg(test)]
 const STATE_BYTES: usize = SHARED_STATE_BYTES + SEED_BYTES;
 
 /// What the authority starts a match from. There is no `Debug`: the seed is never printed or logged (ADR 0004 part
@@ -47,6 +48,64 @@ impl PlayerCommand {
         buttons: 0,
         presses: [0; BUTTONS],
     };
+}
+
+/// What reads the state field by field, in its one fixed order (ADR 0004 part 9). Every canonical writing of the
+/// state goes through it: the bytes the hashes cover are one reader, and a dump that names each field (the replay
+/// tools') is another, so a name and its bytes cannot drift apart. The snapshot and the block are no such writing:
+/// they keep their own layouts.
+pub trait StateSink {
+    fn u16(&mut self, name: &'static str, value: u16);
+    fn u32(&mut self, name: &'static str, value: u32);
+    /// A field that is a run of bytes of a fixed length, each its own value (the press counters). A run whose length
+    /// can vary is never handed over here: it is a count, then rows of a fixed width.
+    fn bytes<const N: usize>(&mut self, name: &'static str, value: &[u8; N]);
+    /// Everything before this call is the shared state; what follows is the authority's alone.
+    fn authority(&mut self);
+    /// Bytes that are never printed or logged: the match seed (ADR 0004 part 8). A reader may hash or count them.
+    fn secret<const N: usize>(&mut self, name: &'static str, value: &[u8; N]);
+}
+
+/// Where the canonical bytes go: into a buffer, or straight into the hash, with no buffer between.
+trait Bytes {
+    fn put(&mut self, bytes: &[u8]);
+}
+
+impl Bytes for Vec<u8> {
+    fn put(&mut self, bytes: &[u8]) {
+        self.extend_from_slice(bytes);
+    }
+}
+
+impl Bytes for Fnv1a64 {
+    fn put(&mut self, bytes: &[u8]) {
+        self.write(bytes);
+    }
+}
+
+/// The canonical bytes: every integer at a fixed width and little-endian, no `usize`, nothing between the fields.
+struct Canonical<'a, B>(&'a mut B);
+
+impl<B: Bytes> StateSink for Canonical<'_, B> {
+    // The path form on the integer's own type: the rule scan (tests/rules_scan.rs) reads text and cannot tell
+    // `.to_le_bytes()` on a tick from the same call on a float, which part 7 does not allow.
+    fn u16(&mut self, _: &'static str, value: u16) {
+        self.0.put(&u16::to_le_bytes(value));
+    }
+
+    fn u32(&mut self, _: &'static str, value: u32) {
+        self.0.put(&u32::to_le_bytes(value));
+    }
+
+    fn bytes<const N: usize>(&mut self, _: &'static str, value: &[u8; N]) {
+        self.0.put(value);
+    }
+
+    fn authority(&mut self) {}
+
+    fn secret<const N: usize>(&mut self, _: &'static str, value: &[u8; N]) {
+        self.0.put(value);
+    }
 }
 
 /// The whole state of one match. There is no `Debug`: the seed is never printed or logged (ADR 0004 part 8).
@@ -97,46 +156,71 @@ impl World {
             .expect("the tick counter is at u32::MAX and cannot advance");
     }
 
-    /// Writes the canonical bytes of the whole state into `out`, replacing what it held (ADR 0004 part 9): field by
-    /// field in a fixed order, every integer at a fixed width and little-endian, no `usize`. The shared state comes
-    /// first (the tick as a `u32`, then the player's buttons as a `u16` and the 16 press counters) and the
-    /// authority's own part last (the 32 seed bytes; the random streams' positions join it when a system first
-    /// draws), so the shared state is a prefix. Each field that joins the state joins here, in the same change.
-    pub fn write_state(&self, out: &mut Vec<u8>) {
-        // Every field is named in this pattern: one added to the struct later does not compile until it is written
-        // here, or left out here in plain sight.
+    /// Hands the whole state to `sink`, field by field in its one fixed order (ADR 0004 part 9). The shared state
+    /// comes first (the tick, then the player's buttons and the 16 press counters), then `authority()`, then the
+    /// authority's own part (the seed, as a secret; the random streams' positions join it when a system first
+    /// draws). Each field that joins the state joins here or in `visit_shared`, in the same change.
+    pub fn visit(&self, sink: &mut impl StateSink) {
+        // Every field is named here too: one added to the struct later does not compile until it is handed over
+        // here, or left to `visit_shared` in plain sight.
+        let Self {
+            tick: _,
+            player: _,
+            seed,
+        } = self;
+        self.visit_shared(sink);
+        sink.authority();
+        sink.secret("seed", seed);
+    }
+
+    /// Hands the shared state to `sink` and nothing of the authority's part: it never touches the seed.
+    pub fn visit_shared(&self, sink: &mut impl StateSink) {
+        // Every field is named in this pattern: one added to the struct later does not compile until it is handed
+        // over here, or left to `visit` in plain sight.
         let Self {
             tick,
             player: PlayerCommand { buttons, presses },
-            seed,
+            seed: _,
         } = self;
+        sink.u32("tick", *tick);
+        sink.u16("player.buttons", *buttons);
+        sink.bytes("player.presses", presses);
+    }
+
+    /// Writes the canonical bytes of the whole state into `out`, replacing what it held: the shared state's bytes,
+    /// then the authority's, so the shared state is a prefix. For this file's tests only: nothing else is handed
+    /// the seed's bytes.
+    #[cfg(test)]
+    pub fn write_state(&self, out: &mut Vec<u8>) {
         out.clear();
         out.reserve(STATE_BYTES);
-        // The path form on the integer's own type: the rule scan (tests/rules_scan.rs) reads text and cannot tell
-        // `.to_le_bytes()` on a tick from the same call on a float, which part 7 does not allow.
-        out.extend_from_slice(&u32::to_le_bytes(*tick));
-        out.extend_from_slice(&u16::to_le_bytes(*buttons));
-        out.extend_from_slice(presses);
-        out.extend_from_slice(seed);
+        self.visit(&mut Canonical(out));
     }
 
-    /// The state hash: `fnv1a_64` over the canonical bytes. `scratch` holds those bytes afterwards; passing the same
-    /// buffer every tick means no allocation after the first call (counted in `tests/state_hash_alloc.rs`).
-    #[must_use]
-    pub fn state_hash(&self, scratch: &mut Vec<u8>) -> u64 {
-        self.write_state(scratch);
-        fnv1a_64(scratch)
+    /// Writes the canonical bytes of the shared state into `out`, replacing what it held. No seed byte is ever
+    /// written into `out`, so a caller that keeps or hands on the buffer keeps and hands on no seed.
+    pub fn write_shared_state(&self, out: &mut Vec<u8>) {
+        out.clear();
+        out.reserve(SHARED_STATE_BYTES);
+        self.visit_shared(&mut Canonical(out));
     }
 
-    /// The hash of the shared state only: the one a client's state can be compared with, because it covers no
-    /// seed byte (ADR 0004 part 9). `scratch` holds the shared bytes afterwards and nothing of the seed: what lay
-    /// behind them is overwritten before it is cut off, so a caller that hands the buffer on hands on no seed.
+    /// The state hash: FNV-1a 64 over the canonical bytes, each field fed straight into it. There is no buffer, so
+    /// it takes no memory (counted in `tests/state_hash_alloc.rs`).
     #[must_use]
-    pub fn shared_hash(&self, scratch: &mut Vec<u8>) -> u64 {
-        self.write_state(scratch);
-        scratch[SHARED_STATE_BYTES..].fill(0);
-        scratch.truncate(SHARED_STATE_BYTES);
-        fnv1a_64(scratch)
+    pub fn state_hash(&self) -> u64 {
+        let mut hash = Fnv1a64::start();
+        self.visit(&mut Canonical(&mut hash));
+        hash.finish()
+    }
+
+    /// The hash of the shared state only, which covers no seed byte (ADR 0004 part 9): the number a replay compares
+    /// tick by tick across targets. It is never exchanged with a client: no state hash is (ADR 0001 part 6).
+    #[must_use]
+    pub fn shared_hash(&self) -> u64 {
+        let mut hash = Fnv1a64::start();
+        self.visit_shared(&mut Canonical(&mut hash));
+        hash.finish()
     }
 }
 
@@ -222,53 +306,133 @@ mod tests {
         assert_eq!(bytes[22..], counting_seed(0));
     }
 
+    /// A reader that notes each field's name and width, and where the authority's part begins.
+    #[derive(Default)]
+    struct Names(Vec<(&'static str, usize)>);
+
+    impl StateSink for Names {
+        fn u16(&mut self, name: &'static str, _: u16) {
+            self.0.push((name, 2));
+        }
+
+        fn u32(&mut self, name: &'static str, _: u32) {
+            self.0.push((name, 4));
+        }
+
+        fn bytes<const N: usize>(&mut self, name: &'static str, _: &[u8; N]) {
+            self.0.push((name, N));
+        }
+
+        fn authority(&mut self) {
+            self.0.push(("authority", 0));
+        }
+
+        fn secret<const N: usize>(&mut self, name: &'static str, _: &[u8; N]) {
+            self.0.push((name, N));
+        }
+    }
+
+    #[test]
+    fn every_reader_of_the_state_gets_the_same_fields_in_the_same_order() {
+        let world = world(0, 0);
+        let mut names = Names::default();
+        world.visit(&mut names);
+        let fields = [
+            ("tick", 4),
+            ("player.buttons", 2),
+            ("player.presses", 16),
+            ("authority", 0),
+            ("seed", 32),
+        ];
+        assert_eq!(names.0, fields);
+        // The widths are the canonical lengths: the shared state's up to the mark, the whole state's in all.
+        let width = |fields: &[(&str, usize)]| fields.iter().map(|field| field.1).sum::<usize>();
+        assert_eq!(width(&fields[..3]), SHARED_STATE_BYTES);
+        assert_eq!(width(&fields), STATE_BYTES);
+        let mut shared = Names::default();
+        world.visit_shared(&mut shared);
+        assert_eq!(shared.0, fields[..3]);
+    }
+
+    /// A reader of the shared state that stops the test when it is handed anything of the authority's part.
+    struct SharedOnly;
+
+    impl StateSink for SharedOnly {
+        fn u16(&mut self, _: &'static str, _: u16) {}
+
+        fn u32(&mut self, _: &'static str, _: u32) {}
+
+        fn bytes<const N: usize>(&mut self, _: &'static str, _: &[u8; N]) {}
+
+        fn authority(&mut self) {
+            panic!("the shared state's reader was handed the authority's part");
+        }
+
+        fn secret<const N: usize>(&mut self, name: &'static str, _: &[u8; N]) {
+            panic!("the shared state's reader was handed the secret {name}");
+        }
+    }
+
+    /// The shared bytes are the whole state's first bytes, and writing them never puts a seed byte in the buffer:
+    /// this seed's bytes are 0xA0 to 0xBF, and none of them is among the shared bytes.
+    #[test]
+    fn the_shared_bytes_are_a_prefix_and_hold_no_seed_byte() {
+        let mut world = world(0xA0, 7);
+        world.authority_step(&[pressed()]);
+        world.visit_shared(&mut SharedOnly);
+        let (mut whole, mut shared) = (Vec::new(), vec![0xEE; 100]);
+        world.write_state(&mut whole);
+        world.write_shared_state(&mut shared);
+        assert_eq!(shared.len(), SHARED_STATE_BYTES);
+        assert_eq!(shared, whole[..SHARED_STATE_BYTES]);
+        assert_eq!(whole[SHARED_STATE_BYTES..], counting_seed(0xA0));
+        // The hashes are fed field by field with no buffer: they are the function over exactly these bytes.
+        let over = crate::state_hash::fnv1a_64;
+        assert_eq!(
+            (world.shared_hash(), world.state_hash()),
+            (over(&shared), over(&whole))
+        );
+        assert!(shared.iter().all(|byte| !(0xA0..=0xBF).contains(byte)));
+    }
+
     /// Known answers from a second implementation (a script, not this code): they hold the byte order and the hash
     /// still, on every target the tests run on.
     #[test]
     fn state_hash_matches_known_answers() {
-        let mut scratch = Vec::new();
         let mut stepped = world(0, 0);
-        assert_eq!(stepped.state_hash(&mut scratch), 0x9c1e_17d4_0d7a_14dd);
+        assert_eq!(stepped.state_hash(), 0x9c1e_17d4_0d7a_14dd);
         for _ in 0..3 {
             stepped.authority_step(&[]);
         }
-        assert_eq!(stepped.state_hash(&mut scratch), 0x1117_0104_4a87_a676);
-        assert_eq!(world(1, 0).state_hash(&mut scratch), 0x6f2d_d929_11a2_615d);
-        assert_eq!(
-            world(0, 131_069).state_hash(&mut scratch),
-            0x7d30_b610_41b0_af34
-        );
-        assert_eq!(
-            world(0, u32::MAX).state_hash(&mut scratch),
-            0xaea1_07e6_21c4_c5d9
-        );
+        assert_eq!(stepped.state_hash(), 0x1117_0104_4a87_a676);
+        assert_eq!(world(1, 0).state_hash(), 0x6f2d_d929_11a2_615d);
+        assert_eq!(world(0, 131_069).state_hash(), 0x7d30_b610_41b0_af34);
+        assert_eq!(world(0, u32::MAX).state_hash(), 0xaea1_07e6_21c4_c5d9);
         let mut played = world(0, 0);
         played.authority_step(&[]);
         played.authority_step(&[pressed()]);
-        assert_eq!(played.state_hash(&mut scratch), 0xd01f_fe7c_1064_6f36);
-        assert_eq!(played.shared_hash(&mut scratch), 0x3f6e_d6ed_be36_8db6);
+        assert_eq!(played.state_hash(), 0xd01f_fe7c_1064_6f36);
+        assert_eq!(played.shared_hash(), 0x3f6e_d6ed_be36_8db6);
     }
 
     /// The shared hash covers the tick and the player's record and no seed byte: two matches with different seeds
     /// agree on it, and differ on the whole state's hash.
     #[test]
     fn the_shared_hash_covers_no_seed_byte() {
-        let mut scratch = Vec::new();
         let (mut a, mut b) = (world(0, 0), world(1, 0));
-        assert_eq!(a.shared_hash(&mut scratch), 0xf848_4165_2498_787d);
+        assert_eq!(a.shared_hash(), 0xf848_4165_2498_787d);
         for step in 0..50 {
             let commands = [pressed()];
             let commands = if step % 2 == 0 { &commands[..] } else { &[] };
             a.authority_step(commands);
             b.authority_step(commands);
-            assert_eq!(a.shared_hash(&mut scratch), b.shared_hash(&mut scratch));
-            assert_ne!(a.state_hash(&mut scratch), b.state_hash(&mut scratch));
+            assert_eq!(a.shared_hash(), b.shared_hash());
+            assert_ne!(a.state_hash(), b.state_hash());
         }
-        // The tick and each part of the record count. The buffer holds the shared bytes afterwards and no more.
-        let base = a.shared_hash(&mut scratch);
-        assert_eq!(scratch.len(), SHARED_STATE_BYTES);
+        // The tick and each part of the record count.
+        let base = a.shared_hash();
         a.authority_step(&[]);
-        assert_ne!(a.shared_hash(&mut scratch), base);
+        assert_ne!(a.shared_hash(), base);
         let (mut held, mut counted) = (world(0, 9), world(0, 9));
         held.authority_step(&[PlayerCommand {
             buttons: 1,
@@ -282,22 +446,21 @@ mod tests {
         }]);
         let mut plain = world(0, 9);
         plain.authority_step(&[]);
-        let plain = plain.shared_hash(&mut scratch);
-        assert_ne!(held.shared_hash(&mut scratch), plain);
-        assert_ne!(counted.shared_hash(&mut scratch), plain);
+        let plain = plain.shared_hash();
+        assert_ne!(held.shared_hash(), plain);
+        assert_ne!(counted.shared_hash(), plain);
     }
 
     #[test]
     fn the_same_seed_gives_the_same_hashes_and_every_field_counts() {
-        let (mut scratch_a, mut scratch_b) = (Vec::new(), Vec::new());
         let mut a = world(7, 0);
         let mut b = world(7, 0);
         let mut other_seed = world(8, 0);
         let mut seen = Vec::new();
         for _ in 0..100 {
-            let hash = a.state_hash(&mut scratch_a);
-            assert_eq!(hash, b.state_hash(&mut scratch_b));
-            assert_ne!(hash, other_seed.state_hash(&mut scratch_b));
+            let hash = a.state_hash();
+            assert_eq!(hash, b.state_hash());
+            assert_ne!(hash, other_seed.state_hash());
             assert!(!seen.contains(&hash), "each tick has its own hash");
             seen.push(hash);
             a.authority_step(&[]);

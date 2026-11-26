@@ -207,6 +207,16 @@ Merged: PR #56, d7dad97, 2026-11-17 23:00:12 UTC, by merge commit, on his go aft
 cd61b28; CI green on main (gate run 856 with smoke, toolchain run 155). With the merge he accepted that PM-0005-54
 stands as written (a fail with today's rifle prototype, not waived) and the checkpoint commits in main's history.
 
+**Part 15 of the build plan, the second lane, to main [2026-11-17 to 11-18, MERGED]** — part-15-second-lane, by
+his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
+in `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; his two messages of 2026-11-17 in `docs/DECISIONS.md` by
+script; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules' line on gun
+files (GUN-FILES); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. The verifier: PASS. Report
+`docs/reports/2026-11-17-part-15-second-lane.md`. Merged: PR #57, 22c6afa, 2026-11-18 11:09:31 UTC, by merge commit,
+on his go after the advisor agent's APPROVE of f26ac5b; CI green on main (gate run 866 with smoke, toolchain run 165).
+With the merge he answered OLD-LINES, who may fold old lines in the shared record files (`docs/DECISIONS.md`,
+2026-11-18, 11:08:25 UTC).
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -233,6 +243,11 @@ stands as written (a fail with today's rifle prototype, not waived) and the chec
   review, the small CI pull request is an Opus 5.5 chat's beside it; then change-set 3c (the link simulator and the
   first recording, moved out of 3b by the size ladder), then change-set 4. Slice 3 picks how commands are timed, no
   longer the netcode proof test (his decision of 2026-11-24, `docs/DECISIONS.md`) (`docs/STATUS.md`, "Next").
+- **Pointer, 2026-11-25 (change-set 4a's docs pass; not his words):** change-set 3b is merged (PR #68) and the small CI
+  pull request too (PR #71). There is no change-set 3c: his ORDER-3C (c) of 2026-11-25, 16:59:52 UTC
+  (`docs/DECISIONS.md`) splits it; the recording is change-set 4a (PR #70, in flight), and the link simulator follows
+  Walk as its own small change-set, merged before change-set 7 starts. Walk is four change-sets by his WALK-CUT (a):
+  4a the recording, 4b content and the world, 4c the first soldier (he plays), 4d sights (`docs/STATUS.md`, "Next").
 - **Superseded by v2** (paused in issue #16; where things stand: `docs/STATUS.md` and `docs/V2_PHASE0_BRIEF.md`). **Queue (Advisor, 2026-10-15; updated 2026-10-16 after 3a):** greybox phase: three-teams (0. team-prep-fixes, merged → 3a three-teams-core, merged 2026-10-17 → **N1** (next; editor Play never rebuilds the nav grid; a one-line change-set) → **R19** (navBuild building-cell fix; right after N1, before 3b; Night queue item 2, NEEDS PLAN) → 3b three-teams-hud → 3c spawn-and-buy; editor v2 comes after the playable greybox loop, per the Advisor's queue) → **"ramps as slopes in SIM"** (its own change-set, before octopon-3-greybox; lets `_botFireWorld` go) → **NC-7 blast reach by line of sight** (to the target's nearest surface, ignoring the target's own box; before the octopon-3 playtests) → octopon-3-greybox → harvest-economy → bot-replan-storm → uplinks → win-and-scoring → scale test on the Octopon-3 greybox (N = 12, 24, 36, 48). Paused until the greybox loop is playable: tutorial-field-manual, ui-step-2, ui-step-3, build-spike, ADR run. house-textures-seeded: low priority, unslotted.
 - **From the 3a report** (approved unattended work is listed in the [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)): the `navBuild` building-cell fix with bot replanning (R19: 27.5 % of Cabana objective routes cross a roof bots can't climb) is now approved into the queue as item 2, NEEDS PLAN (Advisor 2026-10-17, R19-ORDER). Advisor LOS-SIZE: the bots' sight-check budget for 48 soldiers is sized in the 48-player performance change-set, with measured cost, together with the `updateSoldierAnim` split (CS11) and the soldier draw-call reduction (about 120 per on-screen soldier); that work is still proposed, not approved, and comes before `TUNE.teams.size` rises. Advisor K4-MEASURE: bot fairness between teams is judged by target searches per bot per second and the share of time with a target (`tools/perfbots.js` fairness), plus which team's bot fires first in mutual sightings (not in the tools yet; R19's plan adds it). After N1 and R19: 3b three-teams-hud, 3c spawn-and-buy, as planned.
 - **Core loop v2 (Oct 2026):** see LOOP_V2.md; greybox prototype first (§11).
@@ -251,6 +266,19 @@ stands as written (a fail with today's rifle prototype, not waived) and the chec
 
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
+
+**Change-set 4a of the build plan, The recording [2026-11-25]** — cs4a-recording (the first of change-set 4's four
+parts, his WALK-CUT (a); the recording came here from the old change-set 3c by his ORDER-3C (c)), by lane 1, built by
+the chat he calls Builder V4: a recorded match replays to the same hashes, tick by tick, natively (one process; two
+more processes with different hash-map seeds, with a 36,000-step run; two matches in turn) and in WebAssembly on the
+file players get (in Node, and in Chromium in a Worker). The first recording, 1,800 steps on today's state, is
+committed with its hashes, a word-size vector and a manifest, checked by `make_recordings --check` and every test run.
+The one new number on the players' file is the shared state's hash (`Sim::shared_hash`), read only by a replay and fed
+straight from the state's one visitor, with no buffer; the hash report (PM-0004-21) keeps FNV-1a 64. On the fixed head
+15 planted defect checks were caught at their targets and 4 controls held. A player sees nothing new: no browser
+check. 3,300 written lines against the stop line of 3,400 (his STOP-4A (a); the designs counted 1,365); the size
+ladder moved 3B-HOSTILE-ALLOC to the link simulator's change-set. Five reviewers in two rounds, all APPROVE in round 2.
+Report `docs/reports/2026-11-25-cs4a-recording.md`. PR #70; it merges on his go for the head the advisor agent approves, after his Advisor's merge check.
 
 **Step 2.6, the preview links per pull request [2026-11-25 to 11-26, built, no live link yet, not merged]** — step-2-6-previews
 (foundation step 2.6), by lane 2, the chat he calls Builder V2, on his go of 2026-11-25 for plan revision 2 (risk tier
@@ -290,18 +318,21 @@ merge commit; waits for the advisor agent's approval of that head and his go.
 _Pointer (2026-11-26): merged as PR #67, c1da1bd, on 2026-11-25, a normal merge on his go, with the expected head
 35adfbe, checks green, after the advisor agent's APPROVE._
 
-**Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, waiting for his go]** — cs3b-loop-closes (the second
+**Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, MERGED]** — cs3b-loop-closes (the second
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the page's keys go to the
 Worker as posts, and a local server there answers through the real messages (five messages' codec, the transport
 interface and the loopback, the room, the client endpoint, local play's one step). A player sees a key diagram (W, A,
 S, D, Space, Shift) lit from the local server's echo and two new readout lines (messages; presses). The decoder test
 runs at its row's count: the mark has started, never passed. The link simulator and the first recording moved to a
-change-set 3c by the plan's size ladder (he was told first). Final code 6abf3d2a: 6,909 added lines against about
+change-set 3c by the plan's size ladder (he was told first); since his ORDER-3C (c) there is no 3c: the recording is
+change-set 4a, the link simulator its own change-set after Walk. Final code 6abf3d2a: 6,909 added lines against about
 3,800 planned (stop line 7,600); the players' Wasm 53,813 bytes; 114 Rust, 139 Node, 18 boundary and 16 browser tests;
 53 of 53 planted defects caught; CI green on it. Six reviewers passed two rounds; the verifier PASS; the advisor
 agent approved the code as it stands; his browser check clean in Brave and Firefox (2026-11-25); RELEASE-COUNT
-decided, (a) with two conditions. Next: the advisor agent's approval of the last commit, CI green on it, his go; no
-pull request yet. Report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`.
+decided, (a) with two conditions. Report `docs/reports/2026-11-25-cs3b-the-loop-closes.md`. Merged: PR #68, 3ab9eae,
+2026-11-25 13:57:03 UTC (`merged_at`), by merge commit, from his main Advisor thread on his tap of 13:56:26 UTC, with
+the expected head 5e02ee73 (the last commit, which Builder V3 reported its advisor agent had approved); gate, smoke and
+toolchain green on it before the merge (the merge commit's message).
 
 **The preview hosting check, ADR 0006's spike 1 [2026-11-15 to 11-24, in flight]** — preview-hosting-check
 (SPIKE_PLAN entry 6), by lane 2, run by the chat he calls Builder V2 in his throwaway test repository
@@ -378,13 +409,3 @@ UTC); the advisor agent: APPROVE (its word on the final head is in #58's descrip
 2026-11-18 15:39:28 UTC, by merge commit, on his go after that APPROVE; CI green on main (gate run 884 with smoke,
 toolchain run 182). With the merge he accepted the two misses as written and answered its five questions: the kit
 hold and the two CI edits (PR #60), the "Lane requests" issue (#59), no watch (`docs/DECISIONS.md`, 15:38:13 UTC).
-
-**Part 15 of the build plan, the second lane, to main [2026-11-17 to 11-18, MERGED]** — part-15-second-lane, by
-his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
-in `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; his two messages of 2026-11-17 in `docs/DECISIONS.md` by
-script; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules' line on gun
-files (GUN-FILES); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. The verifier: PASS. Report
-`docs/reports/2026-11-17-part-15-second-lane.md`. Merged: PR #57, 22c6afa, 2026-11-18 11:09:31 UTC, by merge commit,
-on his go after the advisor agent's APPROVE of f26ac5b; CI green on main (gate run 866 with smoke, toolchain run 165).
-With the merge he answered OLD-LINES, who may fold old lines in the shared record files (`docs/DECISIONS.md`,
-2026-11-18, 11:08:25 UTC).

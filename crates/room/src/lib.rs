@@ -122,6 +122,13 @@ impl Room {
         &self.world
     }
 
+    /// The hash of the world's shared state as it stands: the one number a replay compares tick by tick, the same
+    /// on every target. It covers no seed byte, changes nothing and takes no memory.
+    #[must_use]
+    pub fn shared_hash(&self) -> u64 {
+        self.world.shared_hash()
+    }
+
     #[must_use]
     pub const fn counters(&self) -> &RoomCounters {
         &self.counters
@@ -633,5 +640,30 @@ mod tests {
             assert_eq!(*places.get_or_insert(now), now);
         }
         assert_eq!(room.counters().commands_run, 1000);
+    }
+
+    /// The room's shared hash is the world's own, read through a shared borrow: two rooms whose seeds differ in every
+    /// byte agree on it tick by tick, and differ on the whole state's hash.
+    #[test]
+    fn the_shared_hash_is_the_world_s_and_covers_no_seed_byte() {
+        let seeds = [[0x5A; sim::SEED_BYTES], [0xA5; sim::SEED_BYTES]];
+        let [mut a, mut b] = seeds.map(|seed| {
+            let setup = MatchSetup {
+                seed,
+                start_tick: 3,
+            };
+            Room::new(&setup, HASH)
+        });
+        let mut snapshot = Vec::new();
+        for _ in 0..40 {
+            let (shared, read_only): (u64, &Room) = (a.shared_hash(), &a);
+            assert_eq!(shared, read_only.shared_hash());
+            assert_eq!(shared, b.shared_hash());
+            assert_eq!(shared, a.world().shared_hash());
+            assert_ne!(a.world().state_hash(), b.world().state_hash());
+            assert!(!a.step(&mut snapshot));
+            assert!(!b.step(&mut snapshot));
+        }
+        assert_eq!(a.world().tick(), 43);
     }
 }
