@@ -28,8 +28,13 @@
    with clicks 6b and 6c, SA-MW-9 in the TECHNICAL note, security-auditor named in part B, a per-run branch name);
    T4-BASELINE's wording shortened · notes advisor-plan.md
 
+9. Mustafa (2026-11-26, in this chat): "No, there will be an exception for me where its not required for my account."
+   (on today's rule: pull request, gate, smoke). This changes his recorded condition of 2026-11-25 20:35 ("his account
+   must not skip gate and smoke"). Asked him EXCEPTION-SCOPE: sessions act as his account, so an exception for his
+   account very likely reaches every session too (to measure). No click done by him yet.
+
 ## Current step
-Waiting for Mustafa: his go on the plan; T4-BASELINE; then click 0 (GUARD-SETTINGS only if click 0 calls for it).
+Waiting for Mustafa: EXCEPTION-SCOPE; then the plan is revised and reviewed again before his go.
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
