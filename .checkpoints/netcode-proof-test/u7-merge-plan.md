@@ -225,6 +225,10 @@ the advisor rules."
   69682158790a8d9c6f53f65ede9a2a1b017d5bc3 (48 files; no skip marker), HEAD^1 = H0, `git diff --quiet <it> --
   spikes/` exit 0. Pushed by the card save that carries this line. Next: M9 (the saver restarted, CI on the pushed
   head, push and pull request; the advisor's read of the pushed head at 00:50, with the M3 retry named).
+- M9, 22:38:50-: the card save 9c2fcf473f495a93c5852e214e7b0615b3126872 pushed (carries 6968215; its subject has no
+  skip marker); the branch clean = origin; the saver restarted as bycyr4c38 (110 minutes, to about 00:29). CI on
+  9c2fcf4, all four started 22:38:5x: push gate 45906116335 and toolchain 45906116365; pull request gate 45906121962
+  and toolchain 45906121987. Their results: (fill).
 
 ## Risks
 - M5's counts move with MAIN-68 and Builder 2: each bar comes from this merge's own base run on its own H0 (MAIN-68's
